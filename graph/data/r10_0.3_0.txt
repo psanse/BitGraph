@@ -1,0 +1,15 @@
+c File written by GRAPH:10/3/2016 9h:31m:5s
+c r10_0.3.txt
+p edge 10 11
+
+e 1 4
+e 2 5
+e 3 4
+e 3 5
+e 3 9
+e 3 10
+e 4 7
+e 6 7
+e 7 8
+e 8 9
+e 9 10
