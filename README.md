@@ -1,2 +1,2 @@
 # BITSCAN_plus
-Refactoring BITSCAN with modern C**
+Refactoring BITSCAN with modern C++
