@@ -67,7 +67,7 @@ namespace com {
 	   template<class Collection_t>
 	   inline bool all_equal(const Collection_t& col){
 		   if(col.empty()) return true;
-		   for(typename Collection_t::const_iterator it=col.begin()+1; it!=col.end(); ++it){
+		   for(auto it=col.begin()+1; it!=col.end(); ++it){
 			   if(col[0]!=*it) return false;
 		   }
 		return true;
@@ -76,20 +76,20 @@ namespace com {
 	   template <class Collection_t>
 	   inline
 	   ostream& print_collection(const Collection_t& c,  ostream&  o= cout, bool with_endl=false){
-		   copy(c.begin(), c.end(), ostream_iterator<typename Collection_t::value_type>(o," " ));
+		   copy(c.cbegin(), c.cend(), ostream_iterator<typename Collection_t::value_type>(o," " ));
 		   o<<" ["<<c.size()<<"]";
 		   if(with_endl) o<<endl;
 		   return o;
 	   }
 	   	   
-	   inline
+	/*   inline
 	   ostream& print_collection(const vector<vint>& c, ostream&  o = cout) {
 		   o << "printing " << c.size() << " elements" << endl;
 		   for (int i = 0; i < c.size(); i++) {
 			   print_collection<vint>(c[i], o, true);			  
 		   }
 		   return o;
-	   }
+	   }*/
 
 	   template <class T>
 	   inline
@@ -121,12 +121,12 @@ namespace com {
 	   int MAX;
 #endif
 	  	   
-	   stack_t():pt(EMPTY_VAL), stack(NULL) {
+	   stack_t():pt(EMPTY_VAL), stack(nullptr) {
 #ifdef DEBUG_STACKS
 		   int MAX=EMPTY_VAL;
 #endif   
 	   }
-	   stack_t(int MAX_SIZE):stack(NULL){
+	   stack_t(int MAX_SIZE):stack(nullptr){
 		   init(MAX_SIZE); 
 #ifdef DEBUG_STACKS
 		   MAX = MAX_SIZE;
@@ -140,7 +140,7 @@ namespace com {
 #endif
 	   }
 	   void clear() {
-		   if (stack) { delete[] stack; } stack = NULL;  pt = EMPTY_VAL;
+		   if (stack) { delete[] stack; } stack = nullptr;  pt = EMPTY_VAL;
 #ifdef DEBUG_STACKS
 		   MAX = EMPTY_VAL;
 #endif
