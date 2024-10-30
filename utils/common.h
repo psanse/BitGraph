@@ -368,6 +368,11 @@ namespace com {
 	//
 	// class RandomUniformGen
 	//
+	//  Generates a uniform distribution for ints and floating point numbers in
+	//  a given range.
+	//
+	//	@date:2024/10/29
+	//
 	//////////////////
 
 
