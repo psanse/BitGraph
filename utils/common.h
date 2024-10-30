@@ -16,8 +16,8 @@ using namespace std;
 ///////////////////////
 // common typedefs
 
-typedef vector<int> vint;
-typedef vector<double> vdob;
+using vint = vector<int>;
+using vdob = vector<double>;
 
 ///////////
 //switches
