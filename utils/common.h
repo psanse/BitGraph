@@ -8,6 +8,7 @@
 #include <string>
 #include <iterator>
 #include <vector>
+#include <random>
 #include "logger.h"
 
 using namespace std;
@@ -362,11 +363,92 @@ namespace com {
    
 
    namespace mat{
+
+	 ///////////////////
+	//
+	// class RandomUniformGen
+	//
+	//////////////////
+
+
+	   template<	typename D = std::uniform_int_distribution<int>,
+		   typename RE = std::mt19937						>		//std::default_random_engine in this machine
+		   class RandomUniformGen {
+		   public:
+			   using result_type = typename D::result_type;
+			   using dist_type = D;
+			   using rgen_type = RE;
+
+			   constexpr static unsigned int FIXED_RANDOM_SEED = 10000;		//default seed for randomness
+
+			   result_type a() { return dist_.param().a(); }
+			   result_type b() { return dist_.param().b(); }
+
+			   static void set_range(result_type min, result_type max) {
+				   dist_.param(D::param_type{ min, max });
+			   }
+
+			   static void seed(std::size_t seed) {							//external seed
+				   seed_ = seed;
+				   re_.seed(seed_);
+			   }
+			   static void seed() {											//internal seed- 
+				   std::random_device rd;
+
+				   ///////////////////////////////////////
+				   if (rd.entropy())											//checks if the source of randomness in HW is valid
+					   seed_ = rd();
+				   else
+					   seed_ = static_cast<decltype(seed_)>(std::chrono::high_resolution_clock::now().time_since_epoch().count());
+				   /////////////////////////////////////////
+
+				   re_.seed(seed_);
+			   }
+
+			   result_type operator()() {
+				   return dist_(re_);
+			   }
+
+			   result_type operator()(result_type min, result_type max) {
+				   return dist_(re_, D::param_type{ min, max });
+			   }
+
+			   //////////////////////////////////////////////////////////////////
+			   RandomUniformGen() = default;
+			   RandomUniformGen(const RandomUniformGen&) = delete;
+			   RandomUniformGen& operator = (const RandomUniformGen&) = delete;
+			   //////////////////////////////////////////////////////////////////
+		   private:
+			   static RE re_;										//random gen
+			   static D dist_;										//uniform distribution
+			   static std::size_t seed_;							//default seed
+	   };
+
+	   ////////////////////////////////////////////////////////////////
+	   template<typename D = std::uniform_int_distribution<int>,
+		   typename RE = std::mt19937							>
+		   using ugen = RandomUniformGen< D, RE >;
+
+	   using iugen = RandomUniformGen< std::uniform_int_distribution<int>, std::mt19937 >;
+	   using rugen = RandomUniformGen< std::uniform_real_distribution<double>, std::mt19937 >;
+	   ////////////////////////////////////////////////////////////////
+
+	   template<typename D, typename RE> RE RandomUniformGen<D, RE>::re_;
+	   template<typename D, typename RE> D RandomUniformGen<D, RE>::dist_;
+	   template<typename D, typename RE>
+	   std::size_t RandomUniformGen<D, RE>::seed_ = RandomUniformGen<D, RE>::FIXED_RANDOM_SEED;
+
+
 	   inline
 	   bool uniform_dist(double p){
 		   //returns true with prob p, 0 with 1-p
-		   double n_01=rand()/(double)RAND_MAX;
-		   return (n_01<=p);
+		  /* double n_01=rand()/(double)RAND_MAX;
+		   return (n_01<=p);*/
+
+		   /////////////////////////////
+		   rugen r;
+		   return r(0.0, 1.0) <= p;
+		    ////////////////////////////
 	   }
 	   template<typename T>
 	   inline 
