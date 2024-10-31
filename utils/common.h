@@ -32,16 +32,7 @@ namespace com {
   }
 
    namespace stl {
-
-	 /*  template<class Col_t>
-	   inline bool all_equal(const Col_t& col){
-		   if(col.empty()) return true;
-		   for(auto it=col.begin()+1; it!=col.end(); ++it){
-			   if(col[0]!=*it) return false;
-		   }
-		return true;
-	   }*/
-	   
+	   	   
 	   /**********************
 	   *
 	   *	all_equal(...)
@@ -59,6 +50,15 @@ namespace com {
 					== col.cend()									);
 	   }
 
+	   /**********************
+	   *
+	   *	print_collection(...)
+	   *
+	   *	@returns: stream with all the elements of the collection
+	   *
+	   *    @comments: not valid for C-arrays 
+	   *
+	   ***********************/
 	   template <class Col_t>
 	   inline
 	   ostream& print_collection(const Col_t& c,  ostream&  o= cout, bool with_endl=false){
@@ -77,22 +77,54 @@ namespace com {
 		   return o;
 	   }*/
 
-	   template <class CArr>
+	   //template <class T>
+	   //inline
+	   //ostream& print_array(T* begin, T* end,  ostream&  o = cout,  bool with_endl = false, bool with_index = false) {
+		  // int nC = 0;
+		  // for (T* pt = begin; pt != end; pt++) {
+			 //  if (with_index) {
+				//   o <<"["<<nC<<"]"<< *pt << " "; nC++;
+			 //  }
+			 //  else {
+				//   o << *pt << " "; nC++;
+			 //  }		    
+		  // }
+		  // o << " [" << nC << "]";
+		  // if (with_endl) o << endl;
+		  // return o;
+	   //}
+	   
+	   /**********************
+	   *
+	   *	print_collection(...)
+	   *
+	   *	@returns: stream with the elements inside a range
+	   *	@param with_index: includes index for each element	
+	   *
+	   *    @comments: valid for C-arrays as well
+	   *
+	   **********************/
+	   template <class ForwardIterator>
 	   inline
-	   ostream& print_array(CArr* begin, CArr* end,  ostream&  o = cout,  bool with_endl = false, bool with_index = false) {
+		ostream& print_collection(	const ForwardIterator begin, const ForwardIterator end,
+									ostream&  o = cout, 
+									bool with_endl = false,
+									bool with_index = false											)
+	   {
 		   int nC = 0;
-		   for (T* pt = begin; pt != end; pt++) {
+		   for (auto it = begin; it != end; ++it) {
 			   if (with_index) {
-				   o <<"["<<nC<<"]"<< *pt << " "; nC++;
+				   o << "[" << nC << "]" << *it << " "; nC++;
 			   }
 			   else {
-				   o << *pt << " "; nC++;
-			   }		    
+				   o << *it << " "; nC++;
+			   }
 		   }
 		   o << " [" << nC << "]";
 		   if (with_endl) o << endl;
 		   return o;
 	   }
+
 
    }
    	
@@ -213,29 +245,29 @@ namespace com {
 		const ColCrit_t& crit;
 	};
 
-	template<class T, class Col_t>
+	template<class T, class ColCrit_t>
 	struct has_smaller_val_prod {
-		has_smaller_val_prod(const Col_t& out) :crit(out) {}
+		has_smaller_val_prod(const ColCrit_t& out) :crit(out) {}
 		bool operator()(const T& a, const T& b) const {
 			return (crit[a] * a < crit[b] * b);
 		}
-		const Col_t& crit;
+		const ColCrit_t& crit;
 	};
 
-	template<class T, class Col_t>
+	template<class T, class ColCrit_t>
 	struct has_smaller_val_diff {
-		has_smaller_val_diff(const Col_t& out) :crit(out) {}
+		has_smaller_val_diff(const ColCrit_t& out) :crit(out) {}
 		bool operator()(const T& a, const T& b) const {
 			return ((crit[a] - a) < (crit[b] - b));
 		}
-		const Col_t& crit;
+		const ColCrit_t& crit;
 	};
 
 
 	//functors which use two (1.main, 2.tiebreak) global external critera which evaluates to a number
-	template<class T, class Col_t>
+	template<class T, class ColCrit_t>
 	struct has_smaller_val_with_tb {
-		has_smaller_val_with_tb(const Col_t& ref, const Col_t& tb) :
+		has_smaller_val_with_tb(const ColCrit_t& ref, const ColCrit_t& tb) :
 			crit1(ref),
 			crit2(tb) {}
 
@@ -247,14 +279,14 @@ namespace com {
 			return (crit2[a] < crit2[b]);
 
 		}
-		const Col_t& crit1;
-		const Col_t& crit2;		/* tiebreak */
+		const ColCrit_t& crit1;
+		const ColCrit_t& crit2;		/* tiebreak */
 	};
 
 
-	template<class T, class Col_t>
+	template<class T, class ColCrit_t>
 	struct has_greater_val_with_tb {
-		has_greater_val_with_tb(const Col_t& ref, const Col_t& tb) :
+		has_greater_val_with_tb(const ColCrit_t& ref, const ColCrit_t& tb) :
 			crit1(ref),
 			crit2(tb) {}
 
@@ -265,8 +297,8 @@ namespace com {
 
 			return (crit2[a] > crit2[b]);
 		}
-		const Col_t& crit1;
-		const Col_t& crit2;		/* tiebreak */
+		const ColCrit_t& crit1;
+		const ColCrit_t& crit2;		/* tiebreak */
 	};
 
 
