@@ -27,8 +27,29 @@ using vdob = vector<double>;
 namespace com {
  
  namespace dir {
+	 /**********************
+	   *
+	   *	append_slash(...)
+	   *
+	   *	@comments: appends a slash at the end of the path if no slash is present.
+	   *			   The type of slash depends on the SO (Linux '/', Windows '\')
+	   *
+	   *	@param path: string containing a path to be modified 
+	   *
+	   **********************/
 	 void append_slash(string & path);
-	 string remove_path(string & path);
+
+	 /**********************
+	   *
+	   *	remove_path(...)
+	   *
+	   *	@returns: substring after the last slash of the path.
+	   *			  If no slash, path is returned
+	   *
+	   *	@param path: input string
+	   *
+	   **********************/
+	 string remove_path(const string & path);
   }
 
    namespace stl {
@@ -76,24 +97,7 @@ namespace com {
 		   }
 		   return o;
 	   }*/
-
-	   //template <class T>
-	   //inline
-	   //ostream& print_array(T* begin, T* end,  ostream&  o = cout,  bool with_endl = false, bool with_index = false) {
-		  // int nC = 0;
-		  // for (T* pt = begin; pt != end; pt++) {
-			 //  if (with_index) {
-				//   o <<"["<<nC<<"]"<< *pt << " "; nC++;
-			 //  }
-			 //  else {
-				//   o << *pt << " "; nC++;
-			 //  }		    
-		  // }
-		  // o << " [" << nC << "]";
-		  // if (with_endl) o << endl;
-		  // return o;
-	   //}
-	   
+	   	 
 	   /**********************
 	   *
 	   *	print_collection(...)
