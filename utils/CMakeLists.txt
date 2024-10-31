@@ -6,6 +6,7 @@ add_library (utils benchmark.cpp
 logger.cpp 
 result.cpp
 test_analyser.cpp
+common.cpp
 ${useful_headers_for_IDE}
 )
 

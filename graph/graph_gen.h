@@ -364,7 +364,7 @@ int RandomGen<Graph_t>::create_ugraph (Graph_t& g, int n, double p){
 	//gen undirected edges
 	for(int i=0; i<n-1; i++){
 		for(int j=i+1; j<n; j++){
-			if(com::mat::uniform_dist(p)){
+			if(com::rand::uniform_dist(p)){
 				g.add_edge(i,j);
 			}
 		}
@@ -402,7 +402,7 @@ int RandomGen<Graph_t>::create_graph (Graph_t& g, int n, double p){
 	for(int i=0; i<n; i++){
 		for(int j=0; j<n; j++){
 			if(i==j) continue;				//remove self-loops
-			if(com::mat::uniform_dist(p)){
+			if(com::rand::uniform_dist(p)){
 				g.add_edge(i,j);
 			}
 		}

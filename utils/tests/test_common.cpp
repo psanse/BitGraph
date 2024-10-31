@@ -139,7 +139,7 @@ TEST(sort, insert_ordered){
 	int score[4]; score[0]=30;  score[1]=20;  score[2]=5;		/* sorting criteria */
 	
 	const int N=4;												
-	int pos=com::mat::INSERT_ORDERED_SORT_NON_INCR(data,score, N /* tamaño tras inserción N */, 3, 21);
+	int pos=com::sort::INSERT_ORDERED_SORT_NON_INCR(data,score, N /* tamaño tras inserción N */, 3, 21);
 	for(int i=0; i<N; i++){
 		cout<<"["<<data[i]<<","<<score[data[i]]<<"]"<<endl;		
 	}
