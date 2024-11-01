@@ -1,5 +1,6 @@
 # Create a library 
 set(useful_headers_for_IDE ./common.h
+./prec_timer.h
 )
 
 add_library (utils benchmark.cpp 

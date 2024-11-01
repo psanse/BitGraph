@@ -2,8 +2,6 @@
 //
 //@created: 2024/10/31 
 
-
-#include <iostream>
 #include "common.h"
 
 using namespace std;
@@ -69,7 +67,7 @@ namespace com {
 namespace com {
 	namespace dir {
 
-		 void append_slash(string & path) {
+		 void append_slash(std::string & path) {
 			/////////////////
 			// appends slash at the end of a path string if required taking into account SO
 
@@ -97,7 +95,7 @@ namespace com {
 			}
 		}
 		 		
-		 string remove_path(const string & path) {
+		 string remove_path(const std::string & path) {
 			 size_t pos = path.find_last_of("\\/");
 			 if (pos == string::npos) return path;
 			 else return path.substr(pos + 1);
@@ -141,6 +139,39 @@ namespace com {
 
 			f.close();
 			return 0;
+		}
+	}
+}
+
+namespace com {
+	namespace time {
+		//////////////////////////////////////
+		//
+		// makeTimePoint(...)
+		// 
+		// converts calendar time to timepoint of system clock
+		//
+		/////////////////////////////////////
+
+		
+		std::chrono::system_clock::time_point
+		makeTimePoint(	int year, int mon, int day,
+						int hour, int min, int sec		)
+		{
+			struct std::tm t;
+			t.tm_sec = sec;						// second of minute (0 .. 59 and 60 for leap seconds)
+			t.tm_min = min;						// minute of hour (0 .. 59)
+			t.tm_hour = hour;					// hour of day (0 .. 23)
+			t.tm_mday = day;					// day of month (0 .. 31)
+			t.tm_mon = mon - 1;					// month of year (0 .. 11)
+			t.tm_year = year - 1900;			// year since 1900
+			t.tm_isdst = -1;					// determine whether daylight saving time
+
+			std::time_t tt = std::mktime(&t);
+			if (tt == -1) {
+				throw "no valid system time";
+			}
+			return std::chrono::system_clock::from_time_t(tt);
 		}
 	}
 }

@@ -5,27 +5,30 @@
 #ifndef __COMMON_H__
 #define	__COMMON_H__
 
+#include "logger.h"
+
 #include <iostream>
 #include <fstream>
 #include <string>
 #include <vector>
 #include <random>
-#include "logger.h"
-
-using namespace std;
+#include <chrono>
+#include <ctime>
 
 ///////////////////////
-// useful aliases
+// useful aliases 
 
-using vint = vector<int>;
-using vdob = vector<double>;
+using vint = std::vector<int>;
+using vdob = std::vector<double>;
 
 ///////////
 //switches
+
 //#define DEBUG_STACKS					//[DEF-OFF] in relese- checks stack sizes (important to debug SAT engine)
 
 namespace com {
- 
+	
+
  namespace dir {
 	 /**********************
 	   *
@@ -37,7 +40,7 @@ namespace com {
 	   *	@param path: string containing a path to be modified 
 	   *
 	   **********************/
-	 void append_slash(string & path);
+	 void append_slash(std::string & path);
 
 	 /**********************
 	   *
@@ -49,7 +52,7 @@ namespace com {
 	   *	@param path: input string
 	   *
 	   **********************/
-	 string remove_path(const string & path);
+	 std::string remove_path(const std::string & path);
   }
 
    namespace stl {
@@ -82,8 +85,8 @@ namespace com {
 	   ***********************/
 	   template <class Col_t>
 	   inline
-	   ostream& print_collection(const Col_t& c,  ostream&  o= cout, bool with_endl=false){
-		   copy(c.cbegin(), c.cend(), ostream_iterator<typename Col_t::value_type>(o," " ));
+	   std::ostream& print_collection(const Col_t& c, std::ostream&  o= std::cout, bool with_endl=false){
+		   std::copy(c.cbegin(), c.cend(), std::ostream_iterator<typename Col_t::value_type>(o," " ));
 		   o<<" ["<<c.size()<<"]";
 		   if(with_endl) o<<endl;
 		   return o;
@@ -110,10 +113,10 @@ namespace com {
 	   **********************/
 	   template <class ForwardIterator>
 	   inline
-		ostream& print_collection(	const ForwardIterator begin, const ForwardIterator end,
-									ostream&  o = cout, 
-									bool with_endl = false,
-									bool with_index = false											)
+		std::ostream& print_collection(	const ForwardIterator begin, const ForwardIterator end,
+										std::ostream&  o = cout,
+										bool with_endl = false,
+										bool with_index = false											)
 	   {
 		   int nC = 0;
 		   for (auto it = begin; it != end; ++it) {
@@ -128,8 +131,6 @@ namespace com {
 		   if (with_endl) o << endl;
 		   return o;
 	   }
-
-
    }
    	
   /////////////////////////////////////////////
@@ -146,8 +147,8 @@ namespace com {
 	
    namespace fileproc{
 		  
-	   int READ_EMPTY_LINES(fstream& f);
-	   int READ_SET_OF_INTERDICTED_NODES(const char* filename, vector<int>& interdicted_nodes);
+	   int READ_EMPTY_LINES(std::fstream& f);
+	   int READ_SET_OF_INTERDICTED_NODES(const char* filename, std::vector<int>& interdicted_nodes);
 
 	   template<class Col_t>
 	   inline
@@ -173,10 +174,10 @@ namespace com {
 
     namespace counting{
 		inline
-		int count_words(string str){
+		int count_words(std::string str){
 			int word_count( 0 );
-			stringstream ss(str);
-			string word;
+			std::stringstream ss(str);
+			std::string word;
 			while( ss >> word ) ++word_count;
 			return word_count;
 
@@ -242,7 +243,7 @@ namespace com {
 
 	template<class T, class ColCrit_t>
 	struct has_smaller_val<T*, ColCrit_t> {
-		has_smaller_val(const vector<ColCrit_t>& c) :crit(c) {}
+		has_smaller_val(const ColCrit_t& c) :crit(c) {}
 		bool operator()(const T* &a, const T* &b) const {
 			return (crit[*a] < crit[*b]);
 		}
@@ -561,11 +562,11 @@ namespace com {
 		//TODO@operator ==
 
 
-		ostream& print(ostream& o) const {
+		std::ostream& print(std::ostream& o) const {
 			o << "[";   for (int i = 0; i < pt; i++) { o << stack[i] << " "; } o << "]" << "[" << pt << "]" << endl;
 			return o;
 		}
-		friend ostream& operator <<(ostream& o, const stack_t & s) {
+		friend std::ostream& operator <<(std::ostream& o, const stack_t & s) {
 			o << "[";   for (int i = 0; i < s.pt; i++) { o << s.stack[i] << " "; } o << "]" << "[" << s.pt << "]" << endl;
 			return o;
 		}
@@ -600,7 +601,7 @@ namespace com {
 		T* get_elem() { return pt; }
 		void set_elem(const T& data) { *pt = data; }							//deep copy
 		void swap(pt_elem& out) { T* temp = pt; pt = out.pt; out.pt = temp; }
-		ostream& print_elem(ostream& o = std::cout) { pt->print(o); return o; }
+		std::ostream& print_elem(std::ostream& o = std::cout) { pt->print(o); return o; }
 	};
 
 
@@ -626,6 +627,106 @@ namespace com {
 		size_t size() { return sz; }
 	};
 
+}
+
+//////////////////////////////
+//
+// TIME UTILITIES 
+//
+//////////////////////////////
+namespace com {
+	namespace time {
+		//////////////////////////////////////
+		//
+		// I/O for durations
+		// (shows ratio and ticks)
+		//
+		/////////////////////////////////////
+
+		template <typename V, typename R>
+		inline
+			std::ostream& operator << (std::ostream& s, const std::chrono::duration<V, R>& d)
+		{
+			s << "[" << d.count() << " of "
+				<< R::num << "/"
+				<< R::den << "]";
+			return s;
+		}
+
+
+
+		//////////////////////////////////////
+		//
+		// toDouble (duration)
+		//
+		// returns the duration in seconds 
+		//
+		/////////////////////////////////////
+
+		template <typename T, typename R>
+		inline
+			double toDouble(const std::chrono::duration<T, R>& d) noexcept
+		{
+			return std::chrono::duration_cast<std::chrono::duration<double>>(d).count();
+		}
+
+		//////////////////////////////////////
+		//
+		// tp2string
+		//
+		// std::chrono::timepoint to string
+		//
+		/////////////////////////////////////
+
+		template<typename TP_t>
+		inline
+			std::string tp2string(const TP_t& tp, bool date = true)
+		{
+			std::time_t t = TP_t::clock::to_time_t(tp);				// convert to POSIX system time
+			std::string tstr;
+
+
+
+			if (date) {
+				auto formattedTimeLocal = std::put_time(std::localtime(&t), "%H:%M:%S --- %d/%b/%Y");		// HH:MM:SS - 01/Nov/2024 localtime
+				//auto formattedTimeUtc = std::put_time(std::gmtime(&t)	,	"%H:%M:%S");					// HH:MM:SS - - 01/Nov/2024 UTC (universal time)
+
+				std::stringstream sstr;
+				sstr << formattedTimeLocal << std::endl;
+				tstr = sstr.str();
+
+				//////////////////////////////////////////////////////////////////
+				// Deprecated POSIX style code
+
+				//tstr = std::ctime(&t);									// convert to calendar time (takes local time zone into account)
+				//std::string ts = std::asctime(gmtime(&t));				// conversion to UTC (universal)	
+				//tstr.resize(tstr.size() - 1);								// skip trailing newline
+				///////////////////////////////////////////////////////////////////
+			}
+			else {
+				auto formattedTimeLocal = std::put_time(std::localtime(&t), "%H:%M:%S");		// HH:MM:SS localtime
+				//auto formattedTimeUtc = std::put_time(std::gmtime(&t), "%H:%M:%S");			// HH:MM:SS UTC (universal)
+
+				std::stringstream sstr;
+				sstr << formattedTimeLocal << std::endl;
+				tstr = sstr.str();
+			}
+
+			return tstr;
+		}
+
+		//////////////////////////////////////
+		//
+		// makeTimePoint(...)
+		// 
+		// converts calendar time to timepoint of system clock
+		//
+		/////////////////////////////////////
+		std::chrono::system_clock::time_point
+		makeTimePoint(	int year, int mon, int day,
+						int hour, int min, int sec = 0		);
+	
+	}
 }
 
 
