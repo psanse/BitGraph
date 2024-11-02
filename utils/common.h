@@ -106,7 +106,7 @@ namespace com {
 	   *	print_collection(...)
 	   *
 	   *	@returns: stream with the elements inside a range
-	   *	@param with_index: includes index for each element	
+	   *	@param with_index: flag to include the index of each element	
 	   *
 	   *    @comments: valid for C-arrays as well
 	   *

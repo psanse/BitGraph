@@ -1,5 +1,9 @@
 //logger.h: a light logger class (no timestamps, no file configuration, no multiple IDs)
-//last update: 24/02/15
+//
+//@last update: 24/02/15
+//@last update: 02/11/24
+//
+//@TODO - change logger ASAP (02/11/2024)
 
 #ifndef __LOGGER_H__
 #define __LOGGER_H__
@@ -8,8 +12,6 @@
 #include <sstream>
 #include <iostream>
 #include <fstream>
-
-using namespace std;			//TODO@ - remove! (01/11/2024)
 
 enum {LOGGER_ERROR=0,LOGGER_WARNING,LOGGER_INFO,LOGGER_PRINT, LOGGER_DEBUG};
 
@@ -25,11 +27,12 @@ enum {LOGGER_ERROR=0,LOGGER_WARNING,LOGGER_INFO,LOGGER_PRINT, LOGGER_DEBUG};
 #define LOG_LINE()			Logger(LOGGER_ERROR).Log()<<"-------------------------"
 
 class Logger {
+	
 public:
 	Logger(int type); 
 	virtual ~Logger();
 
-	ostringstream& Log(){return os;}
+	std::ostringstream& Log(){return os;}
 
 	//redirects / appends std::cout to ofstream. 
 	static void SetFileStream(std::string filename="");
@@ -40,7 +43,7 @@ public:
 	static void SetInformationLevel(int type=LOGGER_PRINT)	{predefined_type=type;}
 
 	static std::string GetString(){
-		string str=string_stream.str();
+		std::string str=string_stream.str();
 		string_stream.str("");
 		return str;
 	}
@@ -49,15 +52,14 @@ private:
 		
 protected:
 	
-	ostringstream os;
-	static string filename;						/* added in 5/1/17 */
-	static ofstream file;
-	static ostringstream string_stream;
+	std::ostringstream os;
+	static std::string filename;						/* added in 5/1/17 */
+	static std::ofstream file;
+	static std::ostringstream string_stream;
 	static bool use_string_stream;
 	static int predefined_type;					//configured type for the Logger pattern
 
 };
-
 
 #endif 
 

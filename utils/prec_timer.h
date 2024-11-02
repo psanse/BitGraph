@@ -26,10 +26,10 @@
 
 class PrecisionTimer
 {
-	using clock_t = chrono::high_resolution_clock;					//chrono::steady_clock = chrono::high_resolution_clock in VS 2015
-	using wall_clock_t = chrono::system_clock;						//MUST BE
-	using timepoint_t = chrono::time_point<clock_t>;
-	using wall_timepoint_t = chrono::time_point<wall_clock_t>;
+	using clock_t = std::chrono::high_resolution_clock;					//chrono::steady_clock = chrono::high_resolution_clock in VS 2015
+	using wall_clock_t = std::chrono::system_clock;						//MUST BE
+	using timepoint_t = std::chrono::time_point<clock_t>;
+	using wall_timepoint_t = std::chrono::time_point<wall_clock_t>;
 
 public:
 	void wall_tic() { wall_time = get_wall_time(); }
@@ -37,7 +37,7 @@ public:
 	void cpu_tic() { cpu_time = get_cpu_time(); }
 	double cpu_toc() const { return com::time::toDouble(get_cpu_time() - cpu_time); };
 
-	static string local_timestamp(bool date = true) {
+	static std::string local_timestamp(bool date = true) {
 		return com::time::tp2string(wall_clock_t::now(), date);				//MUST BE wall clock
 }
 private:
