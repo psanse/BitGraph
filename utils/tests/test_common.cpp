@@ -53,7 +53,10 @@ TEST(Common, pt_elem_basic){
 	};
 
 	pt_elem<s_triplet> myp1;
-	myp1.print_elem(); cout<<endl;		//takes default values
+	stringstream sstr;
+	myp1.print_elem(sstr); sstr << endl;		//takes default values
+	LOG_INFO(sstr.str().c_str());
+	   	
 
 	EXPECT_EQ(10, myp1.get_elem()->a);
 	EXPECT_EQ(20, myp1.get_elem()->b);

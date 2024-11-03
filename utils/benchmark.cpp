@@ -13,7 +13,7 @@ Benchmark::Benchmark(const string& pathname):m_PATH(pathname){
 		LOG_WARNING("Path for benchmark files empty");
 		return;
 	}
-	LOG_INFO("Path for benchmark files: "<<m_PATH);
+	LOG_INFO("Path for benchmark files: ", m_PATH.c_str());
 }
 
 void Benchmark::add_test(const string str_file){

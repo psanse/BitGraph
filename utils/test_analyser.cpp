@@ -166,9 +166,9 @@ int TestAnalyser::analyser(info_t* info){
 	//updates m_nRep, m_nAlg
 	if(update_sizes()==ERR){
 		if(m_nRep<=0)
-			LOG_ERROR("TestAnalyser::Error in number of repetitions: "<<m_nRep);
+			LOG_ERROR("TestAnalyser::Error in number of repetitions: ",m_nRep);
 		if(m_nAlg<=0){
-			LOG_ERROR("TestAnalyser::Error en number of algorithms: "<<m_nAlg);
+			LOG_ERROR("TestAnalyser::Error en number of algorithms: ",m_nAlg);
 		}
 		return ERR;
 	}
@@ -385,7 +385,7 @@ void TestAnalyser::print_single_rep	(ostream & o, int nRep, int idAlg){
 			/*stringstream sstr("");
 			sstr<<"Bad output"<<"Test:"<<a<<" Rep:"<<nRep<<endl;
 			LOG_INFO(sstr.str().c_str()<<endl);*/
-			LOG_ERROR("Bad output"<<" Test:"<<a<<" Rep:"<<nRep);
+			LOG_ERROR("Bad output", " Test:", a, " Rep:", nRep);
 			break;
 		}
 	}

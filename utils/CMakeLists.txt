@@ -1,10 +1,11 @@
 # Create a library 
 set(useful_headers_for_IDE ./common.h
 ./prec_timer.h
+./logger.h
 )
 
 add_library (utils benchmark.cpp 
-logger.cpp 
+#logger.cpp 
 result.cpp
 test_analyser.cpp
 common.cpp
@@ -29,10 +30,10 @@ if (utils_build_tests)
 add_executable (test_utils ./tests/gtest_main.cc
 #./tests/test_batch.cpp
 #./tests/test_benchmark.cpp
-./tests/test_common.cpp
+#./tests/test_common.cpp
 #./tests/test_file.cpp
 #./tests/test_logger.cpp
-# ./tests/test_result.cpp
+ ./tests/test_result.cpp
 #./tests/test_stress_timer.cpp
 #./tests/test_tanal.cpp
 #./tests/test_thread.cpp

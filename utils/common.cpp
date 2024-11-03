@@ -126,7 +126,7 @@ namespace com {
 
 			std::ifstream f(filename, ios::binary | ios::in);
 			if (!f) {
-				LOG_ERROR("Could not open file: " << filename);
+				LOG_ERROR("Could not open file: ", filename);
 				return -1;
 			}
 			interdicted_nodes.clear();

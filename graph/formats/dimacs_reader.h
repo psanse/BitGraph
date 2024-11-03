@@ -73,7 +73,7 @@ int DIMACS_READER::read_dimacs_header(fstream& f, int& n, int& m){
 		default:									
 			//f.close();
 			LOG_ERROR("read_RTN_weights(string filename)-wrong DIMACS protocol");
-			LOG_ERROR("first character of new line is: "<<c);				
+			LOG_ERROR("first character of new line is: ", c);				
 			return -1;
 		}
 	}while(loop_finding_header);
