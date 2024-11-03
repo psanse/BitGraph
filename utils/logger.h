@@ -1,20 +1,19 @@
-// logy v1.2 -- A simplistic, light-weight, single-header C++ logger
-// (!) Summer 2018 by Giovanni Squillero <giovanni.squillero@polito.it>
-// This code has been dedicated to the public domain
-// Project page: https://github.com/squillero/logy
+// log.h: logy v1.2 -- A simplistic, light-weight, single-header C++ logger
+//		  (!) Summer 2018 by Giovanni Squillero <giovanni.squillero@polito.it>
+//		  This code has been dedicated to the public domain
 //
-// @date:03/11/24
+//		  Project page: https://github.com/squillero/logy
 //
-//@TODO - change macros at global space
+//@comments: 
+//1.vectors & initializer_list are supported using sfinae
 //
-//@comments:
-//1. vectors & initializer_list are supported using sfinae
+//@last_update: 03/11/2024
 
-#ifndef __LOGGER_H__
-#define __LOGGER_H__
+#ifndef	__LOGY_H__
+#define __LOGY_H__
 
 #ifdef _MSC_VER
-#define _CRT_SECURE_NO_WARNINGS		//for std::localtime Windows (VS)
+#define _CRT_SECURE_NO_WARNINGS
 #endif
 
 #include <type_traits>
@@ -25,27 +24,26 @@
 #include <cstdio>
 #include <ctime>
 
-//////////////////////////////////////////
-//old logger macros compatibility - 
-//(use LOGG_XXX for objects)
+//////////////////////////////////////////////
+//logger levels - PICK AN OPTION (undef default) 
+//
+//#define LOGY_ERROR		//only ERROR (minimum priority)
+//#define LOGY_VERBOSE		//all except DEBUG (second priority)
+//#define LOGY_DEBUG		//all - top priority
+//undef	  WARNING and ERROR
 
-#define LOG_ERROR(msg)			Warning(msg)
+//////////////////////////////////////////
+//my old logger macros compatibility
+
+#define LOG_ERROR(msg)			Error(msg)
 #define LOG_WARNING(msg)		Warning(msg)
 #define LOG_INFO(msg)			Info(msg)
 #define LOG_PRINT(msg)			Info(msg)
 #define LOG_DEBUG(msg)			Debug(msg)
 
 //////////////////////
-#define LOG_PAK()				Warning("press any key to continue")
-#define LOG_LINE()				Warning("-------------------------")
-
-//////////////////////
-//Logger Levels
-
-//#define VERBOSE			//all except DEBUG messages
-#define DEBUG				//all messages
-//#undef VERBOSE
-//#undef DEBUG
+#define LOG_PAK()				Info("press any key to continue")
+#define LOG_LINE()				Info("-------------------------")
 
 
 template <typename T> struct is_rangeloop_supported { static const bool value = false; };
@@ -146,6 +144,14 @@ void _Warning(T... args) {
 }
 
 template<typename... T>
+void _Error(T... args) {
+	logy_header(" ERROR: ");
+	std::fprintf(stderr, args...);
+	std::fprintf(stderr, "\n");
+	std::fflush(stderr);
+}
+
+template<typename... T>
 void _Silent(T... args) {
 	logy_header(" ");
 	std::fprintf(stderr, args...);
@@ -166,6 +172,11 @@ static void _Info(const char *arg) {
 }
 static void _Warning(const char *arg) {
 	logy_header(" WARNING: ");
+	std::fprintf(stderr, "%s\n", arg);
+	std::fflush(stderr);
+}
+static void _Error(const char *arg) {
+	logy_header(" ERROR: ");
 	std::fprintf(stderr, "%s\n", arg);
 	std::fflush(stderr);
 }
@@ -196,37 +207,61 @@ static inline void _Warning2(T... args) {
 }
 
 template<typename... T>
+static inline void _Error2(T... args) {
+	logy_header(" ERROR:");
+	logy_helper(std::forward<T>(args)...);
+}
+
+template<typename... T>
 static inline void _Silent2(T... args) {
 	logy_header("");
 	logy_helper(std::forward<T>(args)...);
 }
 
-#if defined(DEBUG) || defined(LOGGING_DEBUG)
+#if  defined(DEBUG) || defined(LOGY_DEBUG) 
 
 #define Debug(...) _Debug(__VA_ARGS__)
 #define Info(...) _Info(__VA_ARGS__)
 #define Warning(...) _Warning(__VA_ARGS__)
+#define Error(...) _Error(__VA_ARGS__)
 #define LOGG_DEBUG(...) _Debug2(__VA_ARGS__)
 #define LOGG_INFO(...) _Info2(__VA_ARGS__)
 #define LOGG_WARNING(...) _Warning2(__VA_ARGS__)
+#define LOGG_ERROR(...) _Error2(__VA_ARGS__)
 
-#elif defined(VERBOSE) || defined(LOGGING_VERBOSE)
+#elif  defined(VERBOSE) || defined(LOGY_VERBOSE) 
 
 #define Debug(...) ((void)0)
 #define Info(...) _Info(__VA_ARGS__)
 #define Warning(...) _Warning(__VA_ARGS__)
+#define Error(...) _Error(__VA_ARGS__)
 #define LOGG_DEBUG(...) ((void)0)						//added a G at the end to avoid name colision with my old logger (pss)
 #define LOGG_INFO(...) _Info2(__VA_ARGS__)				//added a G at the end to avoid name colision with my old logger (pss)
 #define LOGG_WARNING(...) _Warning2(__VA_ARGS__)		//added a G at the end to avoid name colision with my old logger (pss)
+#define LOGG_ERROR(...) _Error2(__VA_ARGS__)
 
-#else
+#elif  defined(ERROR) || defined(LOGY_ERROR)			//only error - disables everything else
+
+#define Debug(...) ((void)0)
+#define Info(...) ((void)0)
+#define Warning(...) ((void)0)
+#define Error(...) _Error(__VA_ARGS__)
+#define LOGG_DEBUG(...) ((void)0)					//added a G at the end to avoid name colision with my old logger (pss)
+#define LOGG_INFO(...) ((void)0)					//added a G at the end to avoid name colision with my old logger (pss)
+#define LOGG_WARNING(...) ((void)0)					//added a G at the end to avoid name colision with my old logger (pss)
+#define LOGG_ERROR(...) _Error2(__VA_ARGS__)
+
+
+#else 
 
 #define Debug(...) ((void)0)
 #define Info(...) ((void)0)
 #define Warning(...) _Warning(__VA_ARGS__)
+#define Error(...) _Error(__VA_ARGS__)
 #define LOGG_DEBUG(...) ((void)0)
 #define LOGG_INFO(...) ((void)0)
 #define LOGG_WARNING(...) _Warning2(__VA_ARGS__)
+#define LOGG_ERROR(...) _Error2(__VA_ARGS__)
 
 #endif
 
@@ -234,5 +269,5 @@ static inline void _Silent2(T... args) {
 #define LOGY(...) _Silent2(__VA_ARGS__)
 
 
-#endif 
 
+#endif
