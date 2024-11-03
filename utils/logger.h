@@ -25,12 +25,15 @@
 #include <ctime>
 
 //////////////////////////////////////////////
-//logger levels - PICK AN OPTION (undef default) 
+//logger levels - [Warning and ERROR only - default] 
+//
+// (uncomment one to the options to change default)
 //
 //#define LOGY_ERROR		//only ERROR (minimum priority)
 //#define LOGY_VERBOSE		//all except DEBUG (second priority)
 //#define LOGY_DEBUG		//all - top priority
-//undef	  WARNING and ERROR
+//
+//all undef	  WARNING and ERROR
 
 //////////////////////////////////////////
 //my old logger macros compatibility
