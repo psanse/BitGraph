@@ -25,13 +25,13 @@
 #include <ctime>
 
 //////////////////////////////////////////////
-//logger levels - [Warning and ERROR only - default] 
+//logger level manual setting - [Warning and ERROR only - default] 
 //
 // (uncomment one to the options to change default)
 //
-//#define LOGY_ERROR		//only ERROR (minimum priority)
-//#define LOGY_VERBOSE		//all except DEBUG (second priority)
-//#define LOGY_DEBUG		//all - top priority
+//#define LOGGER_ERROR_LEVEL		//only ERROR (minimum priority)
+//#define LOGGER_VERBOSE_LEVEL		//all except DEBUG (second priority)
+//#define LOGGER_DEBUG_LEVEL		//all - top priority
 //
 //all undef	  WARNING and ERROR
 
@@ -221,7 +221,7 @@ static inline void _Silent2(T... args) {
 	logy_helper(std::forward<T>(args)...);
 }
 
-#if  defined(DEBUG) || defined(LOGY_DEBUG) 
+#if  defined(DEBUG) || defined(LOGGER_DEBUG_LEVEL)			//all messages
 
 #define Debug(...) _Debug(__VA_ARGS__)
 #define Info(...) _Info(__VA_ARGS__)
@@ -232,7 +232,7 @@ static inline void _Silent2(T... args) {
 #define LOGG_WARNING(...) _Warning2(__VA_ARGS__)
 #define LOGG_ERROR(...) _Error2(__VA_ARGS__)
 
-#elif  defined(VERBOSE) || defined(LOGY_VERBOSE) 
+#elif  defined(VERBOSE) || defined(LOGGER_VERBOSE_LEVEL)	//all messages but debug
 
 #define Debug(...) ((void)0)
 #define Info(...) _Info(__VA_ARGS__)
@@ -243,7 +243,7 @@ static inline void _Silent2(T... args) {
 #define LOGG_WARNING(...) _Warning2(__VA_ARGS__)		//added a G at the end to avoid name colision with my old logger (pss)
 #define LOGG_ERROR(...) _Error2(__VA_ARGS__)
 
-#elif  defined(ERROR) || defined(LOGY_ERROR)			//only error - disables everything else
+#elif  defined(ERROR) || defined(LOGGER_ERROR_LEVEL)		//only error - disables everything else
 
 #define Debug(...) ((void)0)
 #define Info(...) ((void)0)
@@ -253,7 +253,6 @@ static inline void _Silent2(T... args) {
 #define LOGG_INFO(...) ((void)0)					//added a G at the end to avoid name colision with my old logger (pss)
 #define LOGG_WARNING(...) ((void)0)					//added a G at the end to avoid name colision with my old logger (pss)
 #define LOGG_ERROR(...) _Error2(__VA_ARGS__)
-
 
 #else 
 
