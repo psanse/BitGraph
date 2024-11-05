@@ -14,6 +14,7 @@
 #include <random>
 #include <chrono>
 #include <ctime>
+#include <type_traits>
 
 ///////////////////////
 // useful aliases 
@@ -189,122 +190,132 @@ namespace com {
 //
 // Useful FUNCTORS
 //
+// (simplified with copilot suggestions :-))
+//
 //////////////////////////////
 
 namespace com {
 
 	//functors which use a global external critera which evaluates to a number
-	template<class T, class ColCrit_t>
-	struct has_greater_val {
-		has_greater_val(const ColCrit_t& c) : crit(c) {}
-
-		bool operator()(const T &a, const T &b) const {
-			return (crit[a] > crit[b]);
-		}
-		const ColCrit_t& crit;
-	};
-
-	template<class T, class ColCrit_t>
-	struct has_greater_val<T*, ColCrit_t> {
-		has_greater_val(const ColCrit_t& c) : crit(c) {}
-
-		bool operator()(const T* &a, const T* &b) const {
-			return (crit[*a] > crit[*b]);
-		}
-		const ColCrit_t& crit;
-	};
-
-	template<class T, class ColCrit_t>
-	struct has_greater_val_prod {
-		has_greater_val_prod(const ColCrit_t& c) :crit(c) {}
+	template<class T, class ColCrit_t, bool Greater, typename Enable = void>
+	struct has_val {
+		explicit has_val(const ColCrit_t& c) : crit(c) {}
 
 		bool operator()(const T& a, const T& b) const {
-			return (crit[a] * a > crit[b] * b);
+			if constexpr (Greater) {
+				return crit[a] > crit[b];
+			}
+			else {
+				return crit[a] < crit[b];
+			}
 		}
-		const ColCrit_t& crit;
-	};
-	template<class T, class ColCrit_t>
-	struct has_greater_val_diff {
-		has_greater_val_diff(const ColCrit_t& out) :crit(out) {}
-		bool operator()(const T &a, const T &b) const {
-			return ((crit[a] - a) > (crit[b] - b));
-		}
+
 		const ColCrit_t& crit;
 	};
 
-	template<class T, class ColCrit_t>
-	struct has_smaller_val {
-		has_smaller_val(const ColCrit_t& c) :crit(c) {}
+	// Especialización para punteros
+	template<class T, class ColCrit_t, bool Greater>
+	struct has_val<T*, ColCrit_t, Greater, typename std::enable_if< std::is_pointer<T*>::value>::type > {
+		explicit has_val(const ColCrit_t& c) : crit(c) {}
+
+		bool operator()(const T* a, const T* b) const {
+			if constexpr (Greater) {
+				return crit[*a] > crit[*b];
+			}
+			else {
+				return crit[*a] < crit[*b];
+			}
+		}
+
+		const ColCrit_t& crit;
+	};
+
+	// Para comparaciones de productos
+	template<class T, class ColCrit_t, bool Greater>
+	struct has_val_prod {
+		explicit has_val_prod(const ColCrit_t& c) : crit(c) {}
+
 		bool operator()(const T& a, const T& b) const {
-			return (crit[a] < crit[b]);
+			auto prod_a = crit[a] * a;
+			auto prod_b = crit[b] * b;
+			if constexpr (Greater) {
+				return prod_a > prod_b;
+			}
+			else {
+				return prod_a < prod_b;
+			}
 		}
+
 		const ColCrit_t& crit;
 	};
 
-	template<class T, class ColCrit_t>
-	struct has_smaller_val<T*, ColCrit_t> {
-		has_smaller_val(const ColCrit_t& c) :crit(c) {}
-		bool operator()(const T* &a, const T* &b) const {
-			return (crit[*a] < crit[*b]);
-		}
-		const ColCrit_t& crit;
-	};
+	// Para comparaciones de diferencias
+	template<class T, class ColCrit_t, bool Greater>
+	struct has_val_diff {
+		explicit has_val_diff(const ColCrit_t& c) : crit(c) {}
 
-	template<class T, class ColCrit_t>
-	struct has_smaller_val_prod {
-		has_smaller_val_prod(const ColCrit_t& out) :crit(out) {}
 		bool operator()(const T& a, const T& b) const {
-			return (crit[a] * a < crit[b] * b);
+			auto diff_a = crit[a] - a;
+			auto diff_b = crit[b] - b;
+			if constexpr (Greater) {
+				return diff_a > diff_b;
+			}
+			else {
+				return diff_a < diff_b;
+			}
 		}
+
 		const ColCrit_t& crit;
 	};
+
+	// Alias para simplificar la creación de instancias
+	template<class T, class ColCrit_t>
+	using has_greater_val = has_val<T, ColCrit_t, true>;
 
 	template<class T, class ColCrit_t>
-	struct has_smaller_val_diff {
-		has_smaller_val_diff(const ColCrit_t& out) :crit(out) {}
-		bool operator()(const T& a, const T& b) const {
-			return ((crit[a] - a) < (crit[b] - b));
-		}
-		const ColCrit_t& crit;
-	};
+	using has_smaller_val = has_val<T, ColCrit_t, false>;
 
+	template<class T, class ColCrit_t>
+	using has_greater_val_prod = has_val_prod<T, ColCrit_t, true>;
 
+	template<class T, class ColCrit_t>
+	using has_smaller_val_prod = has_val_prod<T, ColCrit_t, false>;
+
+	template<class T, class ColCrit_t>
+	using has_greater_val_diff = has_val_diff<T, ColCrit_t, true>;
+
+	template<class T, class ColCrit_t>
+	using has_smaller_val_diff = has_val_diff<T, ColCrit_t, false>;
+
+	   
 	//functors which use two (1.main, 2.tiebreak) global external critera which evaluates to a number
-	template<class T, class ColCrit_t>
-	struct has_smaller_val_with_tb {
-		has_smaller_val_with_tb(const ColCrit_t& ref, const ColCrit_t& tb) :
-			crit1(ref),
-			crit2(tb) {}
+	template<class T, class ColCrit_t, bool Greater>
+	struct has_val_with_tb {
+		explicit has_val_with_tb(const ColCrit_t& ref, const ColCrit_t& tb)
+			: crit1(ref), crit2(tb) {}
 
 		bool operator()(const T& a, const T& b) const {
-
-			if (crit1[a] < crit1[b]) return true;
-			if (crit1[a] > crit1[b]) return false;
-
-			return (crit2[a] < crit2[b]);
-
+			// Compara usando crit1 primero
+			if (Greater ? crit1[a] > crit1[b] : crit1[a] < crit1[b]) {
+				return true;
+			}
+			if (Greater ? crit1[a] < crit1[b] : crit1[a] > crit1[b]) {
+				return false;
+			}
+			// Tiebreak con crit2
+			return Greater ? crit2[a] > crit2[b] : crit2[a] < crit2[b];
 		}
+
 		const ColCrit_t& crit1;
-		const ColCrit_t& crit2;		/* tiebreak */
+		const ColCrit_t& crit2;  // Tiebreak
 	};
 
+	// Alias para simplificar la creación de estructuras específicas
+	template<class T, class ColCrit_t>
+	using has_smaller_val_with_tb = has_val_with_tb<T, ColCrit_t, false>;
 
 	template<class T, class ColCrit_t>
-	struct has_greater_val_with_tb {
-		has_greater_val_with_tb(const ColCrit_t& ref, const ColCrit_t& tb) :
-			crit1(ref),
-			crit2(tb) {}
-
-		bool operator()(const T& a, const T& b) const {
-
-			if (crit1[a] > crit1[b]) return true;
-			if (crit1[a] < crit1[b]) return false;
-
-			return (crit2[a] > crit2[b]);
-		}
-		const ColCrit_t& crit1;
-		const ColCrit_t& crit2;		/* tiebreak */
-	};
+	using has_greater_val_with_tb = has_val_with_tb<T, ColCrit_t, true>;
 
 
 	//functors for collections of elements 
