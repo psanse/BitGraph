@@ -690,41 +690,56 @@ namespace com {
 		/////////////////////////////////////
 
 		template<typename TP_t>
-		inline
-			std::string tp2string(const TP_t& tp, bool date = true)
-		{
-			std::time_t t = TP_t::clock::to_time_t(tp);				// convert to POSIX system time
-			std::string tstr;
-
-
+		inline std::string tp2string(const TP_t& tp, bool date = true) {
+			std::time_t t = TP_t::clock::to_time_t(tp); // Convert to POSIX system time
+			std::stringstream sstr;
 
 			if (date) {
-				auto formattedTimeLocal = std::put_time(std::localtime(&t), "%H:%M:%S --- %d/%b/%Y");		// HH:MM:SS - 01/Nov/2024 localtime
-				//auto formattedTimeUtc = std::put_time(std::gmtime(&t)	,	"%H:%M:%S");					// HH:MM:SS - - 01/Nov/2024 UTC (universal time)
-
-				std::stringstream sstr;
-				sstr << formattedTimeLocal << std::endl;
-				tstr = sstr.str();
-
-				//////////////////////////////////////////////////////////////////
-				// Deprecated POSIX style code
-
-				//tstr = std::ctime(&t);									// convert to calendar time (takes local time zone into account)
-				//std::string ts = std::asctime(gmtime(&t));				// conversion to UTC (universal)	
-				//tstr.resize(tstr.size() - 1);								// skip trailing newline
-				///////////////////////////////////////////////////////////////////
+				sstr << std::put_time(std::localtime(&t), "%H:%M:%S --- %d/%b/%Y"); // HH:MM:SS --- DD/Mon/YYYY
 			}
 			else {
-				auto formattedTimeLocal = std::put_time(std::localtime(&t), "%H:%M:%S");		// HH:MM:SS localtime
-				//auto formattedTimeUtc = std::put_time(std::gmtime(&t), "%H:%M:%S");			// HH:MM:SS UTC (universal)
-
-				std::stringstream sstr;
-				sstr << formattedTimeLocal << std::endl;
-				tstr = sstr.str();
+				sstr << std::put_time(std::localtime(&t), "%H:%M:%S"); // HH:MM:SS
 			}
 
-			return tstr;
+			return sstr.str();
 		}
+			   		 
+		//template<typename TP_t>
+		//inline
+		//	std::string tp2string(const TP_t& tp, bool date = true)
+		//{
+		//	std::time_t t = TP_t::clock::to_time_t(tp);				// convert to POSIX system time
+		//	std::string tstr;
+
+
+
+		//	if (date) {
+		//		auto formattedTimeLocal = std::put_time(std::localtime(&t), "%H:%M:%S --- %d/%b/%Y");		// HH:MM:SS - 01/Nov/2024 localtime
+		//		//auto formattedTimeUtc = std::put_time(std::gmtime(&t)	,	"%H:%M:%S");					// HH:MM:SS - - 01/Nov/2024 UTC (universal time)
+
+		//		std::stringstream sstr;
+		//		sstr << formattedTimeLocal << std::endl;
+		//		tstr = sstr.str();
+
+		//		//////////////////////////////////////////////////////////////////
+		//		// Deprecated POSIX style code
+
+		//		//tstr = std::ctime(&t);									// convert to calendar time (takes local time zone into account)
+		//		//std::string ts = std::asctime(gmtime(&t));				// conversion to UTC (universal)	
+		//		//tstr.resize(tstr.size() - 1);								// skip trailing newline
+		//		///////////////////////////////////////////////////////////////////
+		//	}
+		//	else {
+		//		auto formattedTimeLocal = std::put_time(std::localtime(&t), "%H:%M:%S");		// HH:MM:SS localtime
+		//		//auto formattedTimeUtc = std::put_time(std::gmtime(&t), "%H:%M:%S");			// HH:MM:SS UTC (universal)
+
+		//		std::stringstream sstr;
+		//		sstr << formattedTimeLocal << std::endl;
+		//		tstr = sstr.str();
+		//	}
+
+		//	return tstr;
+		//}
 
 		//////////////////////////////////////
 		//
