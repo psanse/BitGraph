@@ -1,3 +1,4 @@
+//result.cpp: implementation of the result class (result.h)
 
 #include "result.h"
 #include "logger.h"

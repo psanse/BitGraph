@@ -1,3 +1,5 @@
+//benchmark.cpp: implementation of Benchmark class in benchmark.h
+
 #include "benchmark.h"
 #include "logger.h"
 #include <string>
