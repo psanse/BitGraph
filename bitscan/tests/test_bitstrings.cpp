@@ -367,10 +367,11 @@ TEST_F(BitScanningTest, reverse_non_destructive){
 		if(nBit==EMPTY_ELEM) break;
 		res.insert(nBit);	
 	}
-	for(set<int>::iterator it=res.begin(); it!=res.end(); ++it){
-		cout<<*it<<" ";
-	}
-	cout<<"----------------------------------------------"<<endl;
+	// CTG: eliminar salida a pantalla de los test
+	//for(set<int>::iterator it=res.begin(); it!=res.end(); ++it){
+	//	cout<<*it<<" ";
+	//}
+	//cout<<"----------------------------------------------"<<endl;
 
 	EXPECT_TRUE(res==sol);
 }
