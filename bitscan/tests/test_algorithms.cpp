@@ -60,6 +60,7 @@ TEST(bb_t, basic){
 
 	EXPECT_EQ(-1,b.pop());
 	EXPECT_TRUE(b.is_empty()); */
+	
 	//CTG: sera mas bien asi?
 	
 	b.set_bit(10);
