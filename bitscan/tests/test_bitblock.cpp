@@ -30,4 +30,3 @@ TEST(Scan, single_block) {
 	EXPECT_EQ(31,bitblock::msb64_intrinsic(bb));
 }
 
-//prueba cris
