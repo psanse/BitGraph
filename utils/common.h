@@ -241,7 +241,7 @@ namespace com {
 		
    //functors which use a global external critera which evaluates to a number
    template<class data_t, class crit_t>
-   struct has_greater_val:public binary_function<data_t, crit_t, bool>{
+   struct has_greater_val/* :public binary_function<data_t, data_t, bool>*/ {
 	   has_greater_val(const vector<crit_t>& out):crit(out){}
 	  
 	   bool operator()(const data_t &a, const data_t &b) const{
@@ -251,7 +251,7 @@ namespace com {
    };
       
    template<class data_t, class crit_t>
-   struct has_greater_val<data_t*, crit_t>:public binary_function<data_t*, crit_t, bool>{
+   struct has_greater_val<data_t*, crit_t>/* :public binary_function<data_t*, data_t*, bool>*/ {
 	   has_greater_val(const vector<crit_t>& out):crit(out){}
 	  
 	   bool operator()(const data_t *a, const data_t *b) const{
@@ -261,7 +261,7 @@ namespace com {
    };
 
      template<class data_t, class crit_t>
-   struct has_greater_val_prod:public binary_function<data_t, crit_t, bool>{
+   struct has_greater_val_prod/* :public binary_function<data_t, data_t, bool> */{
 	   has_greater_val_prod(const vector<crit_t>& out):crit(out){}
 	  
 	   bool operator()(const data_t &a, const data_t &b) const{
@@ -271,7 +271,7 @@ namespace com {
    };
 
     template<class data_t, class crit_t>
-   struct has_greater_val_diff:public binary_function<data_t, crit_t, bool>{
+   struct has_greater_val_diff/* :public binary_function<data_t, data_t, bool> */{
 	   has_greater_val_diff(const vector<crit_t>& out):crit(out){}
 	   bool operator()(const data_t &a, const data_t &b) const{
 		   return ((crit[a]-a) > (crit[b]-b));
@@ -280,7 +280,7 @@ namespace com {
    };
 
     template<class data_t, class crit_t>
-   struct has_smaller_val:public binary_function<data_t, crit_t, bool>{
+   struct has_smaller_val/* :public binary_function<data_t, data_t, bool>*/ {
 	   has_smaller_val(const vector<crit_t>& out):crit(out){}
 	   bool operator()(const data_t &a, const data_t &b) const{
 		   return (crit[a]<crit[b]);
@@ -289,7 +289,7 @@ namespace com {
    }; 
 
     template<class data_t, class crit_t>
-   struct has_smaller_val<data_t*, crit_t>:public binary_function<data_t*, crit_t, bool>{
+   struct has_smaller_val<data_t*, crit_t> /* :public binary_function<data_t*, data_t*, bool> */{
 	   has_smaller_val(const vector<crit_t>& out):crit(out){}
 	   bool operator()(const data_t* &a, const data_t* &b) const{
 		   return (crit[*a]<crit[*b]);
@@ -298,7 +298,7 @@ namespace com {
    }; 
 
     template<class data_t, class crit_t>
-   struct has_smaller_val_prod:public binary_function<data_t, crit_t, bool>{
+   struct has_smaller_val_prod /* :public binary_function<data_t, data_t, bool> */{
 	   has_smaller_val_prod(const vector<crit_t>& out):crit(out){}
 	   bool operator()(const data_t &a, const data_t &b) const{
 		   return (crit[a]*a < crit[b]*b);
@@ -307,7 +307,7 @@ namespace com {
    };
 
     template<class data_t, class crit_t>
-   struct has_smaller_val_diff:public binary_function<data_t, crit_t, bool>{
+   struct has_smaller_val_diff /* :public binary_function<data_t, data_t, bool> */ {
 	   has_smaller_val_diff(const vector<crit_t>& out):crit(out){}
 	   bool operator()(const data_t &a, const data_t &b) const{
 		   return ((crit[a]-a) < (crit[b]-b));
