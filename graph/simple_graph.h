@@ -569,7 +569,7 @@ int Graph<T>::read_dimacs(const string& filename){
 	for(int e=0 /*1*/; e<nEdges; e++){
 		f>>c;
 		if(c!='e'){
-			LOG_ERROR(filename<<":wrong header for edges reading DIMACS format");
+			LOGG_ERROR(filename, ":wrong header for edges reading DIMACS format");
 			clear();
 			f.close();
 			return -1;
