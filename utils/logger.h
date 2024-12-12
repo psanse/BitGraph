@@ -26,6 +26,8 @@
 #include <sstream>
 #include <cstdio>
 #include <ctime>
+#include <initializer_list>
+
 
 //////////////////////////////////////////////
 //logger level manual setting - [Warning and ERROR only - default] 
@@ -36,7 +38,7 @@
 //#define LOGGER_VERBOSE_LEVEL		//all except DEBUG (second priority)
 //#define LOGGER_DEBUG_LEVEL		//all - top priority
 //
-//all undef	  WARNING and ERROR
+//all undef	 WARNING and ERROR
 
 //////////////////////////////////////////
 //my old logger macros compatibility
@@ -51,14 +53,6 @@
 #define LOG_PAK()				Info("press any key to continue")
 #define LOG_LINE()				Info("-------------------------")
 
-#include <iostream>
-#include <sstream>
-#include <string>
-#include <vector>
-#include <initializer_list>
-#include <chrono>
-#include <ctime>
-#include <type_traits>
 
 // Type trait to check for range loop support
 template <typename T> struct is_rangeloop_supported : std::false_type {};
