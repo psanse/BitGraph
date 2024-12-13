@@ -1,6 +1,7 @@
 /*
- *info_base.cpp:		implementation of infoCLQ_Base class for result logs of clique and clique-based algorithms
+ *info_base.cpp: implementation of info_base class for result logs of clique and clique-based algorithms
  *@date 12/12/2012
+ *@last_update 13/23/2024
  *@dev pss
  */
 
@@ -10,80 +11,86 @@
 #include <iostream>
 using namespace std;
 
-//ostream& operator<<(ostream& o, const infoCLQ_Base& k) {
-//	o << k.name.c_str()<<"\t" <<k.N <<"\t"<<k.M<< "\t"<< k.TIME_LIMIT<< "\t" << k.TIME_LIMIT_HEUR << "\t" << k.id_alg << "\t"
-//	  << k.id_sorting_alg_called <<"\t" << k.id_sorting_alg_real << "\t" 
-//	  << k.is_degree_ordering << "\t" << k.id_AMTS << "\t"
-//	  << k.LB_0_no_AMTS<<"\t" <<k.LB_0_AMTS<<"\t"  
-////	  << k.UB_0_LupMCKP << "\t" << k.UB_0_dantzig_MT << "\t" << k.UB_0_alfa << "\t" << k.UB_0_cplex_lp << "\t"
-// 	  << k.incumbent << "\t" << k.optimum << "\t" 
-//	  << k.time_parse<<"\t"<<k.time_preproc << "\t" << k.time_incumbent << "\t" << k.time_search << "\t" << k.time_limit_reached << "\t"
-//	  << k.nSteps << "\t"
-//	  << k.nLastIsetCalls << "\t" << k.nsLastIsetCalls << "\t" << k.nLastIsetPreFilterCalls << "\t" << k.nsLastIsetPreFilterCalls << "\t"<< k.nCurrIsetCalls << "\t" << k.nsCurrIsetCalls << "\t"
-//	  << k.nVertexCalls << "\t" << k.nsVertexCalls << "\t" << k.nUBpartCalls << "\t" << k.nsUBpartCalls << "\t" << k.K
-//	  << std::endl;	
-//	return o;
-//}
+ostream& operator<<(ostream& o, const info_base& info) {
+	return info.printTable(o);
+}
 
-//std::ostream& infoCLQ_Base::print_params(std::ostream& o) {
-//	LOG_INFO("");
-//	LOG_INFO("*****************************");
-//	LOG_INFO("DATA:" << name.c_str() << "\t N:" << N << "\t M:" << M << "\t D:" << 2 * M / (float)((N - 1) * N));
-//	LOG_INFO("TIME_LIMIT:" << TIME_LIMIT);
-//	LOG_INFO("TIME_LIMIT_HEUR:" << TIME_LIMIT_HEUR);
-//	LOG_INFO("ALG:" << id_alg);
-//	LOG_INFO("SORTING:" << id_sorting_alg_called);
-//	LOG_INFO("AMTS:" << id_AMTS);
-//	if (this->K != -1) {
-//		LOG_INFO("MAX UB:" << K);
-//	}
-//	LOG_INFO("*****************************");
-//	return o;
-//}
-//
-//std::ostream& infoCLQ_Base::print_results(std::ostream& o) {
-//	LOG_INFO("*****************************");
-//	LOG_INFO("w:" << optimum << "\tt_par: " << time_parse << "\tt_pp: " << time_preproc << "\tt_search: " << time_search << "\t#steps: " << nSteps);
-//	LOG_INFO("*****************************");
-//	return o;
-//}
-//
-//std::ostream& infoCLQ_Base::print_timers(std::ostream& o) {
-//	LOG_INFO("");
-//	LOG_INFO("*****************************");
-//	LOG_INFO("start_time_parse:" << start_time_parse / (float)CLOCKS_PER_SEC);
-//	LOG_INFO("start_time_preproc:" << start_time_preproc / (float)CLOCKS_PER_SEC);
-//	LOG_INFO("start_time_incumbent:" << start_time_incumbent / (float)CLOCKS_PER_SEC);
-//	LOG_INFO("start_time_search:" << start_time_search / (float)CLOCKS_PER_SEC);
-//	LOG_INFO("time_parse:" << time_parse);
-//	LOG_INFO("time_preproc:" << time_preproc);
-//	LOG_INFO("time_incumbent:" << time_incumbent);
-//	LOG_INFO("time_search:" << time_search);
-//	LOG_INFO("TIME_LIMIT:" << TIME_LIMIT);
-//	LOG_INFO("TIME_LIMIT_HEUR:" << TIME_LIMIT_HEUR);
-//	LOG_INFO("*****************************");
-//	return o;
-//}
+template<typename res_t>
+std::ostream& info_base<res_t>::printParams(std::ostream& o) {
+	LOG_INFO("");
+	LOG_INFO("*****************************");
+	LOG_INFO("DATA:" << nameInstance_.c_str() << "\t N:" << N_ << "\t M:" << M_ << "\t D:" << 2 * M_ / (float)((N_ - 1) * N_));
+	LOG_INFO("TIME_LIMIT:" << TIME_OUT_);
+	LOG_INFO("TIME_LIMIT_HEUR:" << TIME_OUT_HEUR_);
+	LOG_INFO("ALG:" << idAlg_);
+	LOG_INFO("SORTING:" << idSort_);
+	LOG_INFO("AMTS:" << idAMTS_);
+	if (this->K_ != 0) {
+		LOG_INFO("MAX UB:" << K);
+	}
+	LOG_INFO("*****************************");
+	return o;
+}
 
+template<typename res_t>
+std::ostream& info_base<res_t>::printResults(std::ostream& o) {
+	LOG_INFO("*****************************");
+	LOG_INFO("w:" << optimum_ << "\tt_par: " << timeParse_ << "\tt_pp: " << timePreproc_ << "\tt_search: " << timeSearch_ << "\t#steps: " << nSteps_);
+	LOG_INFO("*****************************");
+	return o;
+}
 
-void infoCLQ_Base::startTimer(phase_t t)
+template<typename res_t>
+std::ostream& info_base<res_t>::printTimers(std::ostream& o) {
+	LOG_INFO("");
+	LOG_INFO("*****************************");
+	//LOG_INFO("start_time_parse:" << startTimeParse_ / (float)CLOCKS_PER_SEC);
+	//LOG_INFO("start_time_preproc:" << startTimePreproc_ / (float)CLOCKS_PER_SEC);
+	//LOG_INFO("start_time_incumbent:" << startTimeIncumbent_ / (float)CLOCKS_PER_SEC);
+	//LOG_INFO("start_time_search:" << startTimeSearch_ / (float)CLOCKS_PER_SEC);
+	LOG_INFO("time_parse:" << timeParse_);
+	LOG_INFO("time_preproc:" << timePreproc_);
+	LOG_INFO("time_incumbent:" << timeIncumbent_);
+	LOG_INFO("time_search:" << timeSearch_);
+	LOG_INFO("TIME_LIMIT:" << TIME_OUT_);
+	LOG_INFO("TIME_LIMIT_HEUR:" << TIME_OUT_HEUR_);
+	LOG_INFO("*****************************");
+	return o;
+}
+
+template<typename res_t>
+std::ostream& info_base<res_t>::printTable(std::ostream& o)
+{
+	  o	<< nameInstance_.c_str() << "\t" << N_ << "\t" << M_ << "\t" << TIME_OUT_ << "\t" << TIME_OUT_HEUR_ << "\t" << idAlg_ << "\t"
+		<< idSort_ << "\t" << idSortReal_ << "\t"
+		<< idAMTS_ << "\t"		
+		<< incumbent_ << "\t" << optimum_ << "\t"
+		<< timeParse_ << "\t" << timePreproc_ << "\t" << timeIncumbent_ << "\t" << timeSearch_ << "\t" 
+		<< nSteps_ << "\t"
+		<< std::endl;
+
+	return o;
+}
+
+template<typename res_t>
+void info_base<res_t>::startTimer(phase_t t)
 {
 	//TODO -here: reset data for search and preprocessing selectively in this function (i.e. reset_preproc_info(); reset_search_info(); reset_bound_info())....
 
 	switch (t) {
 	case phase_t::SEARCH:
-		start_time_search = clock();
-		reset_search_info();					//CHECK()?
+		startTimeSearch_ = clock();
+		//resetSearchInfo();					//CHECK()?
 		break;
 	case phase_t::PREPROC:
-		start_time_preproc = clock();
-		reset_preproc_info();					//CHECK()?
+		startTimePreproc_ = clock();
+		//resetPreprocInfo();					//CHECK()?
 		break;
 	case phase_t::PARSE:
-		start_time_parse = clock();
+		startTimeParse_ = clock();
 		break;
 	case phase_t::LAST_INCUMBENT:
-		start_time_incumbent = clock();
+		startTimeIncumbent_ = clock();
 		break;
 
 	default:
@@ -93,24 +100,24 @@ void infoCLQ_Base::startTimer(phase_t t)
 	}	
 }
 
-
-void infoCLQ_Base::resetTimer(phase_t t) {
+template<typename res_t>
+void info_base<res_t>::resetTimer(phase_t t) {
 	switch (t) {
 	case phase_t::SEARCH:
-		start_time_search = 0.0;
-		time_search = 0.0;
+		startTimeSearch_ = 0.0;
+		timeSearch_ = 0.0;
 		break;
 	case phase_t::PARSE:
-		start_time_parse = 0.0;
-		time_parse = 0.0;
+		startTimeParse_ = 0.0;
+		timeParse_ = 0.0;
 		break;
 	case phase_t::PREPROC:
-		start_time_preproc = 0.0;
-		time_preproc = 0.0;
+		startTimePreproc_ = 0.0;
+		timePreproc_ = 0.0;
 		break;
 	case phase_t::LAST_INCUMBENT:
-		start_time_incumbent = 0.0;
-		time_incumbent = 0.0;
+		startTimeIncumbent_ = 0.0;
+		timeIncumbent_ = 0.0;
 		break;	
 	default:
 		LOG_ERROR("bizarre timer type, exiting...-infoCSP::clear_time");
@@ -119,15 +126,16 @@ void infoCLQ_Base::resetTimer(phase_t t) {
 	}
 }
 
-void infoCLQ_Base::resetTimers() {
+template<typename res_t>
+void info_base<res_t>::resetTimers() {
 	resetTimer(SEARCH);
 	resetTimer(PARSE);
 	resetTimer(PREPROC);
 	resetTimer(LAST_INCUMBENT);
 }
 
-
-double infoCLQ_Base::readTimer(phase_t t)
+template<typename res_t>
+double info_base<res_t>::readTimer(phase_t t)
 {
 	double elapsedTime;
 	clock_t endTime = clock();
@@ -135,19 +143,19 @@ double infoCLQ_Base::readTimer(phase_t t)
 	switch (t) {
 	case phase_t::SEARCH:
 		time_search = (double)(endTime - startTimeSearch_) / (double)CLOCKS_PER_SEC;
-		elapsed_time = time_search;
+		elapsedTime = time_search;
 		break;
 	case phase_t::PREPROC:
 		time_preproc = (double)(endTime - startTimePreproc_) / (double)CLOCKS_PER_SEC;
-		elapsed_time = time_preproc;
+		elapsedTime = time_preproc;
 		break;
 	case phase_t::PARSE:
 		time_parse = (double)(endTime - startTimeParse_) / (double)CLOCKS_PER_SEC;
-		elapsed_time = time_parse;	
+		elapsedTime = time_parse;
 		break;
 	case phase_t::LAST_INCUMBENT:
 		time_incumbent = (double)(endTime - startTimeIncumbent_) / (double)CLOCKS_PER_SEC;
-		elapsed_time = timeIncumbent_;
+		elapsedTime = timeIncumbent_;
 		break;
 
 	default:
@@ -156,29 +164,38 @@ double infoCLQ_Base::readTimer(phase_t t)
 		exit(-1);
 	}
 
-	return elapsed_time;
+	return elapsedTime;
 }
 
-double infoCLQ_Base::elapsedTime(clock_t start_time)
+template<typename res_t>
+double info_base<res_t>::elapsedTime(clock_t start_time)
 {
 	clock_t end_time = clock();	
 	return  (double)((end_time - start_time) / (double)CLOCKS_PER_SEC);
 }
 
+template<typename res_t>
+void info_base<res_t>::resetGeneralInfo() {
+	nameFileLog_.clear();
+	nameInstance_.clear();
+	N_ = 0;
+	M_ = 0;
+	K_ = 0;
+	TIME_OUT_ = DBL_MAX;
+	TIME_OUT_HEUR_ = DBL_MAX;
+	idAlg_ = -1;
+	idAMTS_ = -1;
+	idSort_ = -1;
+}
 
-void infoCLQ_Base::resetGeneralInfo() {
-	TIME_LIMIT = DBL_MAX;
-	name.clear();
-	name_log.clear();
-	N = 0;
-	M = 0;
-	K = 0;
-	id_alg = -1;
-	id_AMTS = -1;
-	id_sorting_alg_called = -1;
-	time_parse = 0.0;
-
-	//....
+template<typename res_t>
+void info_base<res_t>::resetSearchInfo()
+{
+	incumbent_ = 0;
+	optimum_ = 0;
+	nSteps_ = 0;
+	timeOutReached_ = false;
+	sol_.clear();
 }
 
 
@@ -186,19 +203,41 @@ void infoCLQ_Base::resetGeneralInfo() {
 //
 // DERIVED CLASS
 
-void infoCLQ::resetSearchInfo() {
-	optimum = 0;  incumbent = 0; nSteps = 0;
+void infoCLQ::resetSearchInfo() override
+{
+	info_base::resetSearchInfo();
+			
 	nLastIsetCalls = 0; nUBpartCalls = 0; nCurrIsetCalls = 0; nVertexCalls = 0; nLastIsetPreFilterCalls = 0;
 	nsLastIsetCalls = 0;  nsUBpartCalls = 0; nsCurrIsetCalls = 0; nsVertexCalls = 0; nsLastIsetPreFilterCalls = 0;
-	time_incumbent = 0.0; time_search = 0.0; time_limit_reached = false;
+	resetTimer(SEARCH); resetTimer(LAST_INCUMBENT);
 }
 
-void infoCLQ::resetPreprocInfo() {
-	id_sorting_alg_real = -1;
-	is_degree_ordering = false; branching_root_size = 0;
-	sol.clear();
-	LB_0_no_AMTS = 0.0; LB_0_AMTS = 0.0;
-	time_preproc = 0.0;
+std::ostream& infoCLQ::print_table(std::ostream& o)
+{
+	  o	<< nameInstance_.c_str() << "\t" << N_ << "\t" << M_ << "\t" << TIME_OUT_ << "\t" << TIME_OUT_HEUR_ << "\t" << idAlg_ << "\t"
+		<< idSort_ << "\t" << idSortReal_ << "\t"
+		<< isDegOrd_ << "\t" << idAMTS_ << "\t"
+		<< LB_0_no_AMTS_ << "\t" << LB_0_AMTS_ << "\t"
+		<< incumbent_ << "\t" << optimum_ << "\t"
+		<< timeParse_ << "\t" << timePreproc_ << "\t" << timeIncumbent_ << "\t" << timeSearch_ << "\t" << isTimeOutReached_ << "\t"
+		<< nSteps_ << "\t"
+		<< nLastIsetCalls_ << "\t" << nsLastIsetCalls_ << "\t" << nLastIsetPreFilterCalls_ << "\t" << nsLastIsetPreFilterCalls_ << "\t" 
+		<< nCurrIsetCalls_ << "\t" << nsCurrIsetCalls_ << "\t"
+		<< nVertexCalls_ << "\t" << nsVertexCalls_ << "\t" << nUBpartCalls_ << "\t" << nsUBpartCalls_ << "\t" << K_
+		<< std::endl;
+
+	return o;
+}
+
+void infoCLQ::resetPreprocInfo()
+{
+	LB_0_no_AMTS_ = 0.0; LB_0_AMTS_ = 0.0;
+	branchingRootSize_ = 0;
+	idSortReal_ = -1;
+	isDegOrd_ = false;
+		
+	resetTimer(PREPROC);
+	sol_.clear();								//candidate solution found during preprocessing
 }
 
 
