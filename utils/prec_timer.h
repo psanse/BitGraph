@@ -39,7 +39,7 @@ public:
 
 	static std::string local_timestamp(bool date = true) {
 		return com::time::tp2string(wall_clock_t::now(), date);				//MUST BE wall clock
-}
+	}
 private:
 	timepoint_t get_cpu_time() const { return clock_t::now(); }
 	wall_timepoint_t get_wall_time() const { return wall_clock_t::now(); }

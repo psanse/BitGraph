@@ -15,7 +15,7 @@ ostream& operator<<(ostream& o, const info_base& info) {
 	return info.printTable(o);
 }
 
-std::ostream& info_base::printParams(std::ostream& o) const
+std::ostream& infoBase::printParams(std::ostream& o) const
 {
 	LOG_INFO("");
 	LOG_INFO("*****************************");
@@ -31,7 +31,7 @@ std::ostream& info_base::printParams(std::ostream& o) const
 	LOG_INFO("*****************************");
 	return o;
 }
-std::ostream& info_base::printTimers(std::ostream& o) const
+std::ostream& infoBase::printTimers(std::ostream& o) const
 {
 	LOG_INFO("");
 	LOG_INFO("*****************************");
@@ -50,7 +50,7 @@ std::ostream& info_base::printTimers(std::ostream& o) const
 }
 
 
-std::ostream& info_base::printTable(std::ostream& o) const
+std::ostream& infoBase::printTable(std::ostream& o) const
 {
 	  o	<< nameInstance_.c_str() << "\t" << N_ << "\t" << M_ << "\t" << TIME_OUT_ << "\t" << TIME_OUT_HEUR_ << "\t" << idAlg_ << "\t"
 		<< idSort_ << "\t" << idSortReal_ << "\t"
@@ -61,24 +61,24 @@ std::ostream& info_base::printTable(std::ostream& o) const
 	return o;
 }
 
-void info_base::startTimer(phase_t t)
+void infoBase::startTimer(phase_t t)
 {
 	//TODO -here: reset data for search and preprocessing selectively in this function (i.e. reset_preproc_info(); reset_search_info(); reset_bound_info())....
 
 	switch (t) {
 	case phase_t::SEARCH:
-		startTimeSearch_ = clock();
+		startTimeSearch_ = PrecisionTimer::clock_t::now();
 		//resetSearchInfo();					//CHECK()?
 		break;
 	case phase_t::PREPROC:
-		startTimePreproc_ = clock();
+		startTimePreproc_ = PrecisionTimer::clock_t::now();
 		//resetPreprocInfo();					//CHECK()?
 		break;
 	case phase_t::PARSE:
-		startTimeParse_ = clock();
+		startTimeParse_ = PrecisionTimer::clock_t::now();
 		break;
 	case phase_t::LAST_INCUMBENT:
-		startTimeIncumbent_ = clock();
+		startTimeIncumbent_ = PrecisionTimer::clock_t::now();
 		break;
 
 	default:
@@ -89,22 +89,22 @@ void info_base::startTimer(phase_t t)
 }
 
 
-void info_base::resetTimer(phase_t t) {
+void infoBase::clearTimer(phase_t t) {
 	switch (t) {
 	case phase_t::SEARCH:
-		startTimeSearch_ = 0.0;
+		startTimeSearch_ = startTimeSearch_();
 		timeSearch_ = 0.0;
 		break;
 	case phase_t::PARSE:
-		startTimeParse_ = 0.0;
+		startTimeParse_ = startTimeParse_();
 		timeParse_ = 0.0;
 		break;
 	case phase_t::PREPROC:
-		startTimePreproc_ = 0.0;
+		startTimePreproc_ = startTimePreproc_();
 		timePreproc_ = 0.0;
 		break;
 	case phase_t::LAST_INCUMBENT:
-		startTimeIncumbent_ = 0.0;
+		startTimeIncumbent_ = startTimeIncumbent_();
 		timeIncumbent_ = 0.0;
 		break;	
 	default:
@@ -114,34 +114,33 @@ void info_base::resetTimer(phase_t t) {
 	}
 }
 
-
-void info_base::resetTimers() {
-	resetTimer(SEARCH);
-	resetTimer(PARSE);
-	resetTimer(PREPROC);
-	resetTimer(LAST_INCUMBENT);
+void infoBase::clearTimers() {
+	clearTimer(SEARCH);
+	clearTimer(PARSE);
+	clearTimer(PREPROC);
+	clearTimer(LAST_INCUMBENT);
 }
 
-double info_base::readTimer(phase_t t)
+double infoBase::readTimer(phase_t t)
 {
 	double elapsedTime;
-	clock_t endTime = clock();
-
+	tpoint_t endTime = PrecisionTimer::clock_t::now();
+	
 	switch (t) {
 	case phase_t::SEARCH:
-		time_search = (double)(endTime - startTimeSearch_) / (double)CLOCKS_PER_SEC;
-		elapsedTime = time_search;
+		timeSearch_ =  com::time::toDouble(endTime - startTimeSearch_);
+		elapsedTime = timeSearch_;
 		break;
 	case phase_t::PREPROC:
-		time_preproc = (double)(endTime - startTimePreproc_) / (double)CLOCKS_PER_SEC;
-		elapsedTime = time_preproc;
+		timePreproc_ = com::time::toDouble(endTime - startTimeSearch_);
+		elapsedTime = timePreproc_;
 		break;
 	case phase_t::PARSE:
-		time_parse = (double)(endTime - startTimeParse_) / (double)CLOCKS_PER_SEC;
-		elapsedTime = time_parse;
+		timeParse_ = com::time::toDouble(endTime - startTimeSearch_);
+		elapsedTime = timeParse_;
 		break;
 	case phase_t::LAST_INCUMBENT:
-		time_incumbent = (double)(endTime - startTimeIncumbent_) / (double)CLOCKS_PER_SEC;
+		timeIncumbent_ = com::time::toDouble(endTime - startTimeSearch_);
 		elapsedTime = timeIncumbent_;
 		break;
 
@@ -154,13 +153,14 @@ double info_base::readTimer(phase_t t)
 	return elapsedTime;
 }
 
-double info_base::elapsedTime(clock_t start_time)
+double infoBase::elapsedTime(tpoint_t startTime)
 {
-	clock_t end_time = clock();	
-	return  (double)((end_time - start_time) / (double)CLOCKS_PER_SEC);
+	tpoint_t endTime = PrecisionTimer::clock_t::now();
+	return com::time::toDouble(endTime - startTime);
+
 }
 
-void info_base::resetGeneralInfo() {
+void infoBase::clearGeneralInfo() {
 	nameFileLog_.clear();
 	nameInstance_.clear();
 	N_ = 0;
