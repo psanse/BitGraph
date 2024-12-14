@@ -24,7 +24,7 @@ std::ostream& infoBase::printParams(std::ostream& o) const
 	LOG_INFO("TIME_LIMIT_HEUR:" << TIME_OUT_HEUR_);
 	LOG_INFO("ALG:" << idAlg_);
 	LOG_INFO("SORTING:" << idSort_);
-	LOG_INFO("AMTS:" << idAMTS_);
+	LOG_INFO("AMTS:" << idHeur_);
 	if (this->K_ != 0) {
 		LOG_INFO("MAX UB:" << K);
 	}
@@ -54,7 +54,7 @@ std::ostream& infoBase::printTable(std::ostream& o) const
 {
 	  o	<< nameInstance_.c_str() << "\t" << N_ << "\t" << M_ << "\t" << TIME_OUT_ << "\t" << TIME_OUT_HEUR_ << "\t" << idAlg_ << "\t"
 		<< idSort_ << "\t" << idSortReal_ << "\t"
-		<< idAMTS_ << "\t"			
+		<< idHeur_ << "\t"			
 		<< timeParse_ << "\t" << timePreproc_ << "\t" << timeIncumbent_ << "\t" << timeSearch_ << "\t" 
 		<< std::endl;
 
@@ -169,7 +169,7 @@ void infoBase::clearGeneralInfo() {
 	TIME_OUT_ = DBL_MAX;
 	TIME_OUT_HEUR_ = DBL_MAX;
 	idAlg_ = -1;
-	idAMTS_ = -1;
+	idHeur_ = -1;
 	idSort_ = -1;
 }
 
@@ -191,7 +191,7 @@ std::ostream& infoCLQ::printTable(std::ostream& o) const
 {
 	  o	<< nameInstance_.c_str() << "\t" << N_ << "\t" << M_ << "\t" << TIME_OUT_ << "\t" << TIME_OUT_HEUR_ << "\t" << idAlg_ << "\t"
 		<< idSort_ << "\t" << idSortReal_ << "\t"
-		<< isDegOrd_ << "\t" << idAMTS_ << "\t"
+		<< isDegOrd_ << "\t" << idHeur_ << "\t"
 		<< LB_0_no_AMTS_ << "\t" << LB_0_AMTS_ << "\t"
 		<< incumbent_ << "\t" << optimum_ << "\t"
 		<< timeParse_ << "\t" << timePreproc_ << "\t" << timeIncumbent_ << "\t" << timeSearch_ << "\t" << isTimeOutReached_ << "\t"

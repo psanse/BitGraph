@@ -13,9 +13,7 @@
 #include "../prec_timer.h"
 #include <vector>
 #include <iostream>
-#include <cfloat>
 #include <limits>
-//#include <time.h>
 
 using tpoint_t = PreciseTimer::timepoint_t;
 
@@ -49,10 +47,9 @@ struct infoBase {
 	//algorithms
 	////////////////////
 	int idAlg_;								//algorithm identifier
-	int idAMTS_;							//clique heuristic strategy (AMTS, no AMTS or combined with other heuristics)	
+	int idHeur_;							//root heuristic policy (currently AMTS, no AMTS or combined with other heuristics)	
 	int idSort_;							//sorting policy selected as input configuration parameter (might not be the final choice)
-
-	
+		
 //////////////////////
 // timers
 //////////////////////
@@ -76,7 +73,7 @@ struct infoBase {
 		nameFileLog_(FILE_LOG), nameInstance_(""),
 		N_(0), M_(0), K_(0),
 		TIME_OUT_(std::numeric_limits<double>::max()), TIME_OUT_HEUR_(std::numeric_limits<double>::max()),
-		idAlg_(-1), idAMTS_(-1), idSort_(-1)
+		idAlg_(-1), idHeur_(-1), idSort_(-1)
 	{}
 			
 	//timers
@@ -104,7 +101,7 @@ struct infoBase {
 	/////////////
 	//I/O
 	friend std::ostream& operator<<(std::ostream&, const infoBase&);
-	virtual std::ostream& printTable(std::ostream & = std::cout) const;
+	virtual std::ostream& printTable(std::ostream & = std::cout) const;								//results in table format for output file
 
 	std::ostream& printParams(std::ostream& = std::cout) const;
 	std::ostream& printTimers(std::ostream& = std::cout) const;
@@ -125,9 +122,9 @@ struct infoCLQ : public infoBase {
 	infoCLQ() :infoBase(), 
 		incumbent_(0), optimum_(0), nSteps_(0), isTimeOutReached_(false),
 		LB_0_no_AMTS(0), LB_0_AMTS(0),
-		branching_root_size(0),
-		id_AMTS(-1), id_sorting_alg_real(-1), id_sorting_alg_called(-1),	
-		is_degree_ordering(false),
+		branchingRootSize_(0),
+		idSortReal_(-1), 
+		isDegOrd_(false),
 		nLastIsetPreFilterCalls(0), nLastIsetCalls(0), nCurrIsetCalls(0), nVertexCalls(0), nUBpartCalls(0),
 		nsLastIsetPreFilterCalls(0), nsLastIsetCalls(0), nsCurrIsetCalls(0), nsVertexCalls(0), nsUBpartCalls(0)
 	{}
@@ -151,7 +148,7 @@ struct infoCLQ : public infoBase {
 	}
 
 	//I/O
-	std::ostream& printResults(std::ostream & = std::cout) const;							//results in nice format for console			
+	std::ostream& printResults(std::ostream & = std::cout) const;							//results (summary) in nice format for console			
 	std::ostream& printTable(std::ostream & = std::cout) const override;					//results in table format for output file
 
 /////////////////////
