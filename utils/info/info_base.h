@@ -1,6 +1,7 @@
 /*
- *info.h: interface for result logs of clique and clique-based algorithms
- *@date 12/12/2012
+ *info_base.h: interface for result logs of clique and clique-based algorithms
+ *@date 12/12/2024
+ *@last_update 13/23/2024
  *@dev pss
  */
 
@@ -26,7 +27,7 @@ constexpr std::string FILE_LOG = "info_clique.txt";
 //  @brief base class to report results of graph algorithms
 //
 ///////////////////////
-template <typename res_t = int>
+
 struct info_base {
 	enum class phase_t { SEARCH = 0, PREPROC, LAST_INCUMBENT, PARSE };
 
@@ -48,14 +49,6 @@ struct info_base {
 	int idAMTS_;							//clique heuristic strategy (AMTS, no AMTS or combined with other heuristics)	
 	int idSort_;							//sorting policy selected as input configuration parameter (might not be the final choice)
 
-/////////////////////
-//search
-////////////////////
-	res_t incumbent_;						//best solution value found during search (not in preproc)
-	res_t optimum_;							//best solution value (omega) - will be the same as incumbent is time out limit is not reached
-	uint64_t nSteps_;						//recursive calls to the algorithm		
-	bool  isTimeOutReached_;					//flag time out	
-	std::vector<int> sol_;					//best solution (vertices)
 	
 //////////////////////
 // timers
@@ -80,7 +73,6 @@ struct info_base {
 		nameFileLog_(FILE_LOG), nameInstance_(""),
 		N_(0), M_(0), K_(0),
 		TIME_OUT_(DBL_MAX), TIME_OUT_HEUR_(DBL_MAX),
-		incumbent_(0), optimum_(0), nSteps_(0), isTimeOutReached_(false),
 		idAlg_(-1), idAMTS_(-1), idSort_(-1)
 	{}
 			
@@ -89,43 +81,46 @@ struct info_base {
 	double readTimer(phase_t t);
 	double elapsedTime(clock_t start_time);
 		
-	
 	//context 
 	void resetGeneralInfo();				//CHECK comment: "manually at the start of every run"	
 	void resetTimers();						//reset all timers
 	void resetTimer(phase_t t);
 	
 	void reset() {
-		resetGeneralInfo();					//CHECK comment "manually at the start of every run"	
-		resetSearchInfo();					
+		resetGeneralInfo();					//CHECK comment "manually at the start of every run"
 		resetTimers();
+
+		//other info in derived classes
+		resetPreprocInfo();					//virtual call - does nothing at this level
+		resetSearchInfo();					//virtual call - does nothing at this level
 	}
 
-	virtual void resetSearchInfo();
-
+	virtual void resetPreprocInfo() {}
+	virtual void resetSearchInfo() {}
 
 	/////////////
 	//I/O
 	friend std::ostream& operator<<(std::ostream&, const info_base&);
-	virtual std::ostream& printTable(std::ostream & = std::cout);
+	virtual std::ostream& printTable(std::ostream & = std::cout) const;
 
-	std::ostream& printParams(std::ostream& = std::cout);
-	std::ostream& printResults(std::ostream& = std::cout);
-	std::ostream& printTimers(std::ostream& = std::cout);
+	std::ostream& printParams(std::ostream& = std::cout) const;
+	std::ostream& printTimers(std::ostream& = std::cout) const;
 
+	virtual std::ostream& printResults(std::ostream& o = std::cout)  const { return o; }			//Does nothing at this level
 };
 
 //////////////////////
 //
 //	infoCLQ
 // 
-//  @brief info on results of the clique algorithms
+//  @brief info on results for MCP algorithms
 //		   (some are CliSAT specific)
 //
 ///////////////////////
 
 struct infoCLQ : public info_base {
 	infoCLQ() :info_base(), 
+		incumbent_(0), optimum_(0), nSteps_(0), isTimeOutReached_(false),
 		LB_0_no_AMTS(0), LB_0_AMTS(0),
 		branching_root_size(0),
 		id_AMTS(-1), id_sorting_alg_real(-1), id_sorting_alg_called(-1),	
@@ -134,22 +129,33 @@ struct infoCLQ : public info_base {
 		nsLastIsetPreFilterCalls(0), nsLastIsetCalls(0), nsCurrIsetCalls(0), nsVertexCalls(0), nsUBpartCalls(0)
 	{}
 
-	void resetPreprocInfo();
+	void resetPreprocInfo() override;
 	void resetSearchInfo() override;
 	
-	void reset(bool lazy=true){		
+	void reset(bool lazy=true){	
 		resetPreprocInfo()
-		resetSearchInfo();					//CHECK comment "MUST BE MANUAL!"									
+		resetSearchInfo();													
 		resetTimers();
 		if (!lazy) {
-			info_base::reset();
+			info_base::reset();						//clears general info
 		}		
 	}
 
-	std::ostream& print_table(std::ostream & = std::cout) override;
+	std::ostream& printResults(std::ostream & = std::cout) const;							//results in nice format for console			
+	std::ostream& printTable(std::ostream & = std::cout) const override;					//results in table format for output file
 
 /////////////////////
 //data members
+
+	/////////////////////
+	//search
+	////////////////////
+	uint32_t incumbent_;					//best solution value found during search (not in preproc)
+	uint32_t optimum_;						//best solution value (omega) - will be the same as incumbent is time out limit is not reached
+	uint64_t nSteps_;						//recursive calls to the algorithm		
+	bool  isTimeOutReached_;				//flag time out	
+	std::vector<int> sol_;					//best solution (vertices)
+
 	
 	//////////////////////
 	//  Preproc info  
@@ -168,7 +174,7 @@ struct infoCLQ : public info_base {
 		
 	//////////////////////
 	//	Additional search info 
-	// (specific of certain algorithms)
+	// (specific of certain algorithms - CliSAT)
 	//////////////////////
 	uint64_t nLastIsetPreFilterCalls_;		//calls to the bound
 	uint64_t nLastIsetCalls_;				//calls to the bound
