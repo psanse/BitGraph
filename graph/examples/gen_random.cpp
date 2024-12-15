@@ -10,7 +10,7 @@
 #include "../graph_gen.h"
 #include "../utils/logger.h"
 
-#define LOGGER_VERBOSE_LEVEL		//all except DEBUG (second priority)
+//#define LOGGER_VERBOSE_LEVEL		//all except DEBUG (second priority) -  CMake option by default
 
 using namespace std;
 
