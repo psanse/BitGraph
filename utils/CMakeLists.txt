@@ -7,13 +7,14 @@ info/info_base.h
 )
 
 #created utils library
-add_library (utils benchmark.cpp 
-#logger.cpp 
+add_library (utils
+benchmark.cpp 
 result.cpp
 test_analyser.cpp
 common.cpp
 info/info_base.cpp
 info/info_clq.cpp                                   #move to clq algorithms and remove from here
+#logger.cpp 
 ${useful_headers_for_IDE}
 )
 
