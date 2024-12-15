@@ -1,7 +1,9 @@
 #set useful headers 
-set(useful_headers_for_IDE ./common.h
+set(useful_headers_for_IDE 
+./common.h
 ./prec_timer.h
-./logger.h
+./logger
+./info/info_base.h
 )
 
 #created utils library
@@ -10,6 +12,7 @@ add_library (utils benchmark.cpp
 result.cpp
 test_analyser.cpp
 common.cpp
+info/info_base.cpp
 ${useful_headers_for_IDE}
 )
 
@@ -54,10 +57,11 @@ add_executable (test_utils ./tests/gtest_main.cc
 #./tests/test_file.cpp
 # ./tests/test_logger.cpp
 # ./tests/test_result.cpp
- ./tests/test_precise_timer.cpp
+# ./tests/test_precise_timer.cpp
 #./tests/test_tanal.cpp
 #./tests/test_thread.cpp
 #./test_analyser.cpp
+ ./tests/test_info.cpp
 )
 
 target_include_directories (test_utils PUBLIC ../googletest/include/)

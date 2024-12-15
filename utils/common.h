@@ -6,15 +6,15 @@
 #define	__COMMON_H__
 
 #include "logger.h"
-
-#include <iostream>
-#include <fstream>
-#include <string>
-#include <vector>
-#include <random>
 #include <chrono>
 #include <ctime>
+#include <fstream>
+#include <iomanip>
+#include <iostream>
+#include <random>
+#include <string>
 #include <type_traits>
+#include <vector>
 
 ///////////////////////
 // useful aliases 

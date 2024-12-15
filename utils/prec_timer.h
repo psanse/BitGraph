@@ -26,6 +26,7 @@
 
 class PrecisionTimer
 {
+public:
 	using clock_t = std::chrono::high_resolution_clock;					//chrono::steady_clock = chrono::high_resolution_clock in VS 2015
 	using wall_clock_t = std::chrono::system_clock;						//MUST BE
 	using timepoint_t = std::chrono::time_point<clock_t>;
