@@ -9,9 +9,9 @@
 #define __DECODE_ORDERINGS_H__
 
 #include "../utils/logger.h"
-#include <algorithm>
 #include <vector>
-#include <iterator>
+#include <algorithm>
+
 
 using vint = std::vector<int>;
 
@@ -32,7 +32,7 @@ private:
 				}
 				catch (const std::out_of_range& oor) {
 					LOG_ERROR("Out of Range error: ", oor.what());
-					LOG_ERROR("DecodeFunction: operator() - vertex : ", v );
+					LOG_ERROR("DecodeVertex: operator() - vertex : ", v );
 					LOG_ERROR("exiting...");
 					std::exit(-1);
 				}
