@@ -1,11 +1,12 @@
-///////////////////////////////
-// interface for the Decode class, which decodes orderings in graphs
-// author: pss
-// date: 29/11/2013
-// last update:15/8/17
+/*
+* @file decode.h
+* @brief interface for the Decode class, which decodes orderings in graphs
+* @date 29/11/13
+* @last_update 17/12/24
+*/
 
-#ifndef __DECODE_H__
-#define __DECODE_H__
+#ifndef __DECODE_ORDERINGS_H__
+#define __DECODE_ORDERINGS_H__
 
 #include "../utils/logger.h"
 #include <algorithm>
