@@ -66,13 +66,14 @@ add_executable (test_graph ./tests/gtest_main.cpp
 #  ./tests/test_graph_sort.cpp
 # ./tests/test_kcore.cpp
 #./tests/test_kcore_in_folder.cpp
- ./tests/test_random_graph.cpp
+# ./tests/test_random_graph.cpp
 #./tests/test_sparse_graph.cpp
 # ./tests/test_fixed_graph.cpp
 # ./tests/test_wgraph.cpp
 #	./tests/test_wegraph.cpp
 #  ./tests/test_graph_map.cpp
 # ./tests/test_graph_fast_sort.cpp
+ ./tests/test_decode.cpp
 )
 
 target_include_directories (test_graph PUBLIC ../googletest/include/)
