@@ -377,7 +377,7 @@ template<class Graph_t>
 inline
 int GraphFastRootSort<Graph_t>::sort_non_increasing_deg(bool rev){
 	fill_stack_root();
-	com::has_greater_val<int, int> pred(nb_neigh);
+	com::has_greater_val<int, vint> pred(nb_neigh);
 	std::stable_sort(nodes.begin(),  nodes.end(), pred);
 	if(rev){
 		std::reverse(nodes.begin(), nodes.end());
@@ -390,7 +390,7 @@ template<class Graph_t>
 inline
 int GraphFastRootSort<Graph_t>::sort_non_decreasing_deg(bool rev){
 	fill_stack_root();
-	com::has_smaller_val<int, int> pred(nb_neigh);
+	com::has_smaller_val<int, vint> pred(nb_neigh);
 	std::stable_sort(nodes.begin(),  nodes.end(), pred);
 	
 	if(rev){
@@ -403,7 +403,7 @@ template<class Graph_t>
 inline
 int GraphFastRootSort<Graph_t>::sort_non_increasing_deg_with_support_tb(bool rev ){
 	fill_stack_root();
-	com::has_greater_val_with_tb<int, int> pred(nb_neigh, deg_neigh);
+	com::has_greater_val_with_tb<int, vint> pred(nb_neigh, deg_neigh);
 	std::stable_sort(nodes.begin(),  nodes.end(), pred);
 
 	if(rev){
@@ -416,7 +416,7 @@ template<class Graph_t>
 inline
 int GraphFastRootSort<Graph_t>::sort_non_decreasing_deg_with_support_tb(bool rev){
 	fill_stack_root();
-	com::has_smaller_val_with_tb<int, int> pred(nb_neigh, deg_neigh);
+	com::has_smaller_val_with_tb<int, vint> pred(nb_neigh, deg_neigh);
 	std::stable_sort(nodes.begin(),  nodes.end(), pred);
 
 	if(rev){

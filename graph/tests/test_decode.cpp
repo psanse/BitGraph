@@ -12,6 +12,7 @@
 #include "../graph.h"
 #include "../graph_gen.h"
 #include "../algorithms/graph_sort.h"
+#include "../algorithms/graph_fast_sort.h"
 
 using namespace std;
 
@@ -24,8 +25,8 @@ TEST(Graph_sort, Decode) {
 	ug.add_edge(78, 5);	
 		
 	//computes MIN_DEG_DEGEN ordering in format [OLD_INDEX]=NEW_INDEX
-	GraphSort<ugraph> o(ug);
-	vint vres = o.new_order_fast(gbbs::MIN_DEG_DEGEN, gbbs::PLACE_LF);
+	GraphFastRootSort<ugraph> o(ug);												//old reference sorting is GraphSort<ugraph> o(ug) - CHECK
+	vint vres = o.new_order(gbbs::MIN_DEG_DEGEN, gbbs::PLACE_LF);
 	
 	//initis decoder
 	Decode::reverse_in_place(vres);		//format[NEW_INDEX] = OLD_INDEX
