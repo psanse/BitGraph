@@ -11,16 +11,22 @@
 #include "../utils/logger.h"
 #include <algorithm>
 #include <vector>
+#include <iterator>
 
 using vint = std::vector<int>;
 
 class Decode {
 private:
-	struct DecodeFunction {
-	public:
-		DecodeFunction(const vector< vint >& o) : orderings(o) {}
+	/*
+	* @brief functor which unwinds orders for a given vertex
+	*/
+	struct DecodeVertex {
+		DecodeVertex(const std::vector<vint>& ords) :
+			ords_(ords)
+		{}
+
 		int operator() (int v) const {
-			for (auto it = orderings.rbegin(); it != orderings.rend(); ++it) {
+			for (auto it = ords_.rbegin(); it != ords_.rend(); ++it) {
 				try {
 					v = (*it).at(v);								//will throw exception	
 				}
@@ -35,7 +41,7 @@ private:
 		}
 		
 		/////////////////////////////////////		
-		const vector< vint >& orderings;
+		const std::vector<vint>& ords_;
 	};
 
 public:
@@ -44,17 +50,17 @@ public:
 	static vint reverse(const vint& o);							//changes [index]-->[value] 
 	////////////////////////////////////////////////
 
-	void clear() { orderings.clear(); }
-	void insert_ordering(const vint& o) { orderings.push_back(o); }
-	vector<int> get_first_ordering() const { return orderings.front(); }
-	bool is_empty() const { return orderings.empty(); }
+	void clear() { ords_.clear(); }
+	void insert_ordering(const vint& o) { ords_.emplace_back(o); }
+	vint  get_first_ordering() const  { return ords_.front(); }
+	bool is_empty() const { return ords_.empty(); }
 	
 	/*
 	* @brief decodes a single vertex for the given orderings
 	* @date 16/6/17 
 	* @last_update 17/12/2024
 	*/
-	int decode_node(int v) const;											//determines original vertex given a composition of orderings [new]-[old]								
+	int decode_node(int v) const;											
 	
 	/*
 	* @brief decodes of a list of vertices for the given orderings
@@ -69,76 +75,8 @@ public:
 
 //////////////////////
 // data members
-	vector< vint> orderings;												//[new]--[old] composition of orderings
+	std::vector<vint> ords_;					//composition of orderings in [new]--[old] format
 };
 
-inline
-int Decode::decode_node(int v) const 
-{
-	DecodeFunction df(orderings);
-	return df(v);
-}
-
-inline
-void Decode::reverse_in_place(vint& o)
-{
-	vint vaux(o.size());
-	for (std::size_t i = 0; i < o.size(); ++i) {
-		vaux[o[i]] = i;
-	}
-	o = std::move(vaux);
-}
-
-inline
-vint Decode::reverse(const vint& o)  
-{
-	vint vres(o.size());
-	for (std::size_t i = 0; i < o.size(); ++i) {
-		vres[o[i]] = i;
-	}
-	return vres;
-}
-
-inline
-vint Decode::decode_list(const vint& l) const 
-{
-	vint res;
-	if (!l.empty()) {
-		DecodeFunction df(orderings);
-		res.resize(l.size());
-		transform(l.cbegin(), l.cend(), res.begin(), df);
-	}
-	return res;
-}
-
-inline
-int Decode::decode_list(const vint& l, vint& res) const
-{
-	if (orderings.empty()) {					//no reordering, return a copy
-		res = l;
-		return 0;
-	}
-
-	res.clear();
-	res.reserve(l.size());
-	DecodeFunction df(orderings);
-	transform(l.cbegin(), l.cend(), res.begin(), df);
-
-	//old code- why using a back_insert_iterator?
-	//std::back_insert_iterator< std::vector<int> > b_it(res);	
-	//transform(l.cbegin(), l.cend(), b_it, df );
-	
-	return 0;
-}
-
-inline
-int Decode::decode_list_in_place(vint& l)
-{	
-	if (l.empty()) return -1;
-
-	DecodeFunction df(orderings);
-	transform(l.begin(), l.end(), l.begin(), df);
-	return 0;
-}
 
 #endif
