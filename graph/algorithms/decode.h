@@ -61,7 +61,7 @@ public:
 	* @date 4/10/17
 	* @last_update 17/12/2024
 	* 
-	* TODO- check what should be the return value when the orderings are empty!
+	* TODO- check what should be the return value when the given orderings are empty!
 	*/
 	vint decode_list(const vint& list) const;
 	int decode_list(const vint& l, vint& res) const;						
@@ -80,7 +80,7 @@ int Decode::decode_node(int v) const
 }
 
 inline
-void Decode::reverse_in_place(vector<int>& o)
+void Decode::reverse_in_place(vint& o)
 {
 	vint vaux(o.size());
 	for (std::size_t i = 0; i < o.size(); ++i) {

@@ -26,7 +26,8 @@ TEST(Graph_sort, Decode) {
 	//computes MIN_DEG_DEGEN ordering in format [OLD_INDEX]=NEW_INDEX
 	GraphSort<ugraph> o(ug);
 	vint vres = o.new_order_fast(gbbs::MIN_DEG_DEGEN, gbbs::PLACE_LF);
-			
+	
+	//initis decoder
 	Decode::reverse_in_place(vres);		//format[NEW_INDEX] = OLD_INDEX
 	Decode d;
 	d.insert_ordering(vres);
