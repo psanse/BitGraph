@@ -222,7 +222,8 @@ vint GraphFastRootSort<Graph_t>::new_order (int alg, bool ltf, bool o2n)
 		LOG_ERROR(" GraphFastRootSort<Graph_t>::new_order-bizarre algorithm");
 	}
 		
-	if (o2n) { Decode::reverse_in_place(nodes); }             //[OLD] to [NEW]
+	//conversion [OLD] to [NEW] if required
+	if (o2n) { Decode::reverse_in_place(nodes); }            
 	return nodes;
 }
 
