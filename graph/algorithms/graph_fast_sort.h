@@ -170,9 +170,10 @@ vint GraphFastRootSort<Graph_t>::new_order (int alg, bool ltf, bool o2n)
 
 	//trivial case
 	if (alg == NONE) {
-		LOG_ERROR("NONE alg. sorting petition detected, returning trivial isomorphism- GraphFastRootSort<Graph_t>::new_order()");
+		LOG_WARNING("NONE alg. sorting petition detected, returning trivial isomorphism- GraphFastRootSort<Graph_t>::new_order()");
+		nodes.reserve(NV);
 		for (int i = 0; i < NV; i++) {
-			nodes.push_back(i);
+			nodes.emplace_back(i);
 		}
 		return nodes;
 	}
