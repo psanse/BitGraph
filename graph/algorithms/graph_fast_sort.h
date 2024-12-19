@@ -177,7 +177,7 @@ vint GraphFastRootSort<Graph_t>::new_order (int alg, bool ltf, bool o2n)
 		return nodes;
 	}
 	
-	//TODO- change to switch
+	//TODO- change to switch statement
 	
 	if(alg==MIN_DEGEN){
 		fill_stack_root();
