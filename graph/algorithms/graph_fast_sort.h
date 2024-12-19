@@ -1,25 +1,29 @@
-//graph_fast_sort.h: header for GraphFastRootSort class which sorts graphs by different criteria
-//date: 12/03/15
-//authors: pss
-//EXPERIMENTAL-CHANGE STACK TO VECTOR!!!   (18/03/19: changed and simplified, TEST PROPERLY) 
-//TODO: CHECK how the static order affects the degen order
+/*
+* graph_fast_sort.h: header for GraphFastRootSort class which sorts graphs by different criteria
+* @date 12/03/15
+* @last_update 19/12/24
+* @dev pss
+* @comments EXPERIMENTAL-CHANGE STACK TO VECTOR!!!   (18/03/19: changed and simplified, TEST PROPERLY) 
+* @todo : CHECK how the static order affects the degen order
+*/
 
 #ifndef __GRAPH_FAST_SORT_H__
 #define __GRAPH_FAST_SORT_H__
 
-#include <iostream>
 #include <algorithm>
+#include <iostream>
 #include <vector>
-#include <iterator>
-#include "../graph.h"
-#include "../kcore.h"
-#include "filter_graph_sort_type.h"			//limits template Graph_t to undirected types
+//#include <iterator>
+//#include "../graph.h"
+//#include "../kcore.h"
+//#include "filter_graph_sort_type.h"			//limits template Graph_t to undirected types
 #include "utils/logger.h"
 #include "utils/common.h"					//sort functors
 #include "decode.h"
 
 
 using namespace std;
+using vint = std::vector<int>;
 
 /////////////////
 ////
@@ -64,59 +68,36 @@ public:
 	static int SORT_SUBGRAPH_NON_DEC_DEG(Graph_t& g, vint& lhs, vint& rhs, bool ltf = true);			//EXPERIMENTAL-sorting subgraphs
 
 	static void fill_vertices(vint&, int NV);															//fills vector with all vertices in NV [0..NV-1]
-////////////////
-//static infertace
-public:
 	static int compute_deg(const Graph_t& g, vint& deg);
 
-////////////////
-// data members	
-protected:
-	Graph_t& g;		
+	////////////////////////
+	//construction / allocation
+	GraphFastRootSort(Graph_t& gout) : g(gout),  NV(g.number_of_vertices()), nb_neigh(NULL), deg_neigh(NULL) { init();}
+	~GraphFastRootSort() = default;
 
-	int NV;
-	vector<int> nb_neigh;
-	vector<int> deg_neigh;
+	const vint& get_degree() const { return nb_neigh; }
 
-	typename Graph_t::_bbt node_active_state;			//1bit-active, 0bit-passive
-	vector<int> nodes;
-
-////////////////
-// interface	
-public:
-
-////////////////////////
-//construction / allocation
-	GraphFastRootSort(Graph_t& gout)	:g(gout),	  NV(g.number_of_vertices()), nb_neigh(NULL), deg_neigh(NULL) { init();}
-	~GraphFastRootSort(){}
-
-	const vector<int>& get_degree() const { return nb_neigh; }
-
-protected:
-	int init();
-	
-public:
-/////////////////////////
-// useful operations	
+	/////////////////////////
+	// useful operations	
 	void fill_stack_root();												//fills stack with all vertices
 	void compute_deg_root();											//computes number of neighbors
 	void compute_support_root();										//computes sum of the number of neighbors 
 	
 	void fill_stack(vint& nodes_out) { nodes = nodes_out;}
 	
-////////////
-//static: 
-//1. requires computation of support and deg
-//2. internally sets node stack 1...NV
+	////////////
+	//static: 
+	//1. requires computation of support and deg
+	//2. internally sets node stack 1...NV
 	
 	int  sort_non_increasing_deg(bool rev=false);						
 	int  sort_non_decreasing_deg(bool rev=false);
 	int  sort_non_increasing_deg_with_support_tb(bool rev=false);
 	int  sort_non_decreasing_deg_with_support_tb(bool rev=false);
 
-///////////
-//degen: 
-// 1. corrupt deg info: will need to be recomputed for sequences of sorts
+	///////////
+	//degen: 
+	// 1. corrupt deg info: will need to be recomputed for sequences of sorts
 
 	int  sort_degen_non_decreasing_degree(bool rev=false);				
 	int  sort_degen_non_increasing_degree(bool rev=false);				
@@ -133,32 +114,61 @@ public:
 	//int  sort_non_increasing_deg_with_support_tb(int n, bool rev = false);
 	//int  sort_non_decreasing_deg_with_support_tb(int n, bool rev = false);
 
-///////////
-//drivers
-	vint new_order	(int alg, bool ltf=true, bool o2n=true);								/* interface for the framework */
-	int reorder		(const vint& new_order, Graph_t& gn, Decode* d=NULL);					// (new) interface for the framework- TODO@build an in-place reordering as in the old GraphSort 	
+	///////////
+	//drivers - the real interface
+
+	/*
+	* @brief computes a new ordering in [OLD]->[NEW] format	
+	*/
+	vint new_order	(int alg, bool ltf=true, bool o2n=true);
+
+	/*
+	* @brief determines an isomorphism for a given ordering
+	* @param gn graph to store the isomorphism
+	* @param new_order ordering in [OLD]->[NEW] format
+	*/
+	int reorder	 (const vint& new_order, Graph_t& gn, Decode* d=NULL);						
 	
-////////////////////////
-// I/O
+	////////////////////////
+	// I/O
 	ostream& print(int type, ostream& o);
+
+
+///////////////////////
+// internal operations
+protected:
+
+	int init();
+
+/////////////////////////////////////////////
+// data members	
+protected:
+
+	Graph_t& g;
+	int NV;
+	vint nb_neigh;
+	vint deg_neigh;
+	typename Graph_t::_bbt node_active_state;				//1bit-active, 0bit-passive	
+	vint nodes;
 };
 
 template<class Graph_t>
 inline
 void  GraphFastRootSort<Graph_t>::fill_vertices(vint& lv, int NV) {
 	lv.clear();
+	lv.reserve(NV);
 	for (int i = 0; i < NV; i++) {
-		lv.push_back(i);
+		lv.emplace_back(i);
 	}
 }
 
 template<class Graph_t>
 inline
-vint GraphFastRootSort<Graph_t>::new_order (int alg, bool ltf, bool o2n){
-/////////////////
-//returns [OLD]->[NEW] mapping
-	
+vint GraphFastRootSort<Graph_t>::new_order (int alg, bool ltf, bool o2n)
+{
 	nodes.clear();
+
+	//trivial case
 	if (alg == NONE) {
 		LOG_ERROR("NONE alg. sorting petition detected, returning trivial isomorphism- GraphFastRootSort<Graph_t>::new_order()");
 		for (int i = 0; i < NV; i++) {
@@ -166,7 +176,9 @@ vint GraphFastRootSort<Graph_t>::new_order (int alg, bool ltf, bool o2n){
 		}
 		return nodes;
 	}
-		
+	
+	//TODO- change to switch
+	
 	if(alg==MIN_DEGEN){
 		fill_stack_root();
 		compute_deg_root();
