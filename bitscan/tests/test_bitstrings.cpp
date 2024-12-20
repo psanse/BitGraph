@@ -818,7 +818,7 @@ TEST(BitBoardN, ArraySubscripOperator) {
 
 	bb1[0] = bb[0];
 	EXPECT_TRUE(bb1.is_bit(10));
-	EXPECT_TRUE(bb1.is_bit(60));
+	EXPECT_TRUE(bb1.is_bit(20));
 	EXPECT_FALSE(bb1.is_bit(30));
 
 }
