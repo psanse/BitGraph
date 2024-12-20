@@ -1,13 +1,19 @@
 
-#include <iostream>
-#include "gtest/gtest.h"
-#include "../graph.h"
+/*
+* graph_fast_sort_test.cpp unit tests for graph_fast_sort.h
+* @date 
+* @last_update 20/12/24
+* @TODO - REFACTOR TESTS!, logs etc.. (20/12/2024)
+* @TODO - Check logger! (20/12/2024)
+*/ 
+
 #include "../algorithms/graph_fast_sort.h"
 #include "../algorithms/graph_fast_sort_weighted.h"
+#include "../graph.h"
+#include "gtest/gtest.h"
+#include <iostream>
 //#include "../algorithms/graph_sort.h"
 #include "utils/common.h"
-#include "../graph_gen.h"
-#include "utils/result.h"
 #include "utils/file.h"
 #include <string>
 
@@ -21,7 +27,8 @@ using namespace std;
 #define TEST_GRAPH_FAST_SORT_STEP_BY_STEP				//DEF-OFF
 #define print_graph_fast_sort_logs
 
-TEST(GraphFastRootSort_W, basic) {
+
+TEST(GraphFastRootSort_W,basic) {
 
 	LOG_INFO("GraphFastRootSort_W: basic-----------------------");
 	const int NV = 6;

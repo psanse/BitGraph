@@ -178,11 +178,11 @@ vint GraphFastRootSort_W<GraphW_t>::sort_by_weight(bool ltf, bool o2n) {
 	_mypt::fill_vertices(order, NV);
 	
 	if (ltf) {
-		com::has_smaller_val<int, typename GraphW_t::_wt> pred(gw.get_weights());
+		com::has_smaller_val<int, std::vector<typename GraphW_t::_wt>> pred(gw.get_weights());
 		std::stable_sort(order.begin(), order.end(), pred);
 	}
 	else {
-		com::has_greater_val<int, typename GraphW_t::_wt> pred(gw.get_weights());
+		com::has_greater_val<int, std::vector<typename GraphW_t::_wt>> pred(gw.get_weights());
 		std::stable_sort(order.begin(), order.end(), pred);
 	}
 	   

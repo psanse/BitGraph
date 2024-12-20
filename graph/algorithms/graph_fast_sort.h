@@ -4,7 +4,8 @@
 * @last_update 19/12/24
 * @dev pss
 * @comments EXPERIMENTAL-CHANGE STACK TO VECTOR!!!   (18/03/19: changed and simplified, TEST PROPERLY) 
-* @todo : CHECK how the static order affects the degen order
+* @TODO CHECK how the static order affects the degen order
+* @TODO FIX enum types
 */
 
 #ifndef __GRAPH_FAST_SORT_H__
@@ -18,8 +19,9 @@
 //#include "../kcore.h"
 //#include "filter_graph_sort_type.h"			//limits template Graph_t to undirected types
 #include "utils/logger.h"
-#include "utils/common.h"					//sort functors
+#include "utils/common.h"						//sort functors
 #include "decode.h"
+#include "bitscan/bbtypes.h"					//for EMPTY_ELEM constant	
 
 
 using namespace std;
@@ -72,40 +74,53 @@ public:
 
 	////////////////////////
 	//construction / allocation
-	GraphFastRootSort(Graph_t& gout) : g(gout),  NV(g.number_of_vertices()), nb_neigh(NULL), deg_neigh(NULL) { init();}
+	GraphFastRootSort(Graph_t& gout) : g_(gout),  NV_(g_.number_of_vertices()), nb_neigh_(NULL), deg_neigh_(NULL) { init();}
 	~GraphFastRootSort() = default;
 
 	const vint& get_degree() const { return nb_neigh; }
 
 	/////////////////////////
 	// useful operations	
-	void fill_stack_root();												//fills stack with all vertices
-	void compute_deg_root();											//computes number of neighbors
-	void compute_support_root();										//computes sum of the number of neighbors 
+	void fill_stack_root();												//fills node_ stack with all vertices according to index
+	void compute_deg_root();											//computes number of neighbors for each vertex
+
+	/*
+	* @brief computes support for all vertices (sum of the number of neighbors )
+	* @comments may include the same vertex twice	 
+	*/
+	void compute_support_root();									
 	
-	void fill_stack(vint& nodes_out) { nodes = nodes_out;}
+	void fill_stack(vint& nodes_out) { nodes_ = nodes_out;}
 	
-	////////////
-	//static: 
-	//1. requires computation of support and deg
-	//2. internally sets node stack 1...NV
-	
+	/*
+	* @brief non-degenerate ordering
+	* @param rev reverse ordering if TRUE
+	* @comments requires prior computation of support and deg
+	* @comments	internally sets node stack 1...NV 
+	*/
 	int  sort_non_increasing_deg(bool rev=false);						
 	int  sort_non_decreasing_deg(bool rev=false);
 	int  sort_non_increasing_deg_with_support_tb(bool rev=false);
 	int  sort_non_decreasing_deg_with_support_tb(bool rev=false);
 
-	///////////
-	//degen: 
-	// 1. corrupt deg info: will need to be recomputed for sequences of sorts
-
+	
+	/*
+	* @brief degenerate ordering
+	* @comments deg info is not restored after the call
+	*/
 	int  sort_degen_non_decreasing_degree(bool rev=false);				
 	int  sort_degen_non_increasing_degree(bool rev=false);				
 	
-	//use a prior node stack info as reference order
+	/*
+	*@brief composite (min) degenerate ordering on a prior given ordering in nodes_ 
+	*@param rev reverse ordering if TRUE
+	*@comments the vertex ordering has to be in @nodes prior to the call
+	*@TODO - set initial ordering as a parameter
+	*@TODO - create unique function with bool param 
+	*/
 	int sort_degen_composite_non_decreasing_degree( bool rev = false);		
 	int sort_degen_composite_non_increasing_degree( bool rev = false);	
-	
+		
 	//extension-TODO@substitute original primitives for n=0. n can be positive or negative (09/12/2020)
 	// int sort_non_increasing_deg (vint& rhs, vint& lhs,  bool rev = false);
 		  
@@ -119,13 +134,16 @@ public:
 
 	/*
 	* @brief computes a new ordering in [OLD]->[NEW] format	
+	* @param alg sorting algorithm (TODO - should be an enum)
 	*/
 	vint new_order	(int alg, bool ltf=true, bool o2n=true);
 
 	/*
 	* @brief determines an isomorphism for a given ordering
-	* @param gn graph to store the isomorphism
+	* @param gn output isomorphic graph
 	* @param new_order ordering in [OLD]->[NEW] format
+	* @param d ptr to decode object to store the ordering
+	* @comments only for simple undirected graphs with no weights
 	*/
 	int reorder	 (const vint& new_order, Graph_t& gn, Decode* d=NULL);						
 	
@@ -138,18 +156,22 @@ public:
 // internal operations
 protected:
 
+	/*
+	* @brief restores context for NV_ vertices
+	* @TODO - check if this is the best interface (20/12/24)
+	*/
 	int init();
 
 /////////////////////////////////////////////
 // data members	
 protected:
 
-	Graph_t& g;
-	int NV;
-	vint nb_neigh;
-	vint deg_neigh;
-	typename Graph_t::_bbt node_active_state;				//1bit-active, 0bit-passive	
-	vint nodes;
+	Graph_t& g_;
+	int NV_;
+	vint nb_neigh_;
+	vint deg_neigh_;
+	typename Graph_t::_bbt node_active_state_;				//bitset for active vertices: 1bit-active, 0bit-passive. Used in degenerate orderings	
+	vint nodes_;
 };
 
 template<class Graph_t>
@@ -166,96 +188,99 @@ template<class Graph_t>
 inline
 vint GraphFastRootSort<Graph_t>::new_order (int alg, bool ltf, bool o2n)
 {
-	nodes.clear();
+	nodes_.clear();
 
 	//trivial case
 	if (alg == NONE) {
 		LOG_WARNING("NONE alg. sorting petition detected, returning trivial isomorphism- GraphFastRootSort<Graph_t>::new_order()");
-		nodes.reserve(NV);
-		for (int i = 0; i < NV; i++) {
-			nodes.emplace_back(i);
+		nodes_.reserve(NV_);
+		for (int i = 0; i < NV_; i++) {
+			nodes_.emplace_back(i);
 		}
-		return nodes;
+		return nodes_;
 	}
 	
-	//TODO- change to switch statement
-	
-	if(alg==MIN_DEGEN){
+	switch (alg) {															//TODO Fix enums - alg should be an enum
+	case MIN_DEGEN: 
 		fill_stack_root();
 		compute_deg_root();
-		sort_degen_non_decreasing_degree(ltf);					//checked with framework!
-	}else if (alg == MIN_DEGEN_COMPO) {
+		sort_degen_non_decreasing_degree(ltf);								//checked with framework - (20/12/19 - what does this mean?)
+		break;
+	case MIN_DEGEN_COMPO:
 		compute_deg_root();
 		compute_support_root();
 		sort_non_decreasing_deg_with_support_tb(false /* MUST BE*/);
 		sort_degen_composite_non_decreasing_degree(ltf);
-	}else if (alg == MAX_DEGEN) {
+		break;
+	case MAX_DEGEN:
 		fill_stack_root();
 		compute_deg_root();
 		sort_degen_non_increasing_degree(ltf);
-	}
-	else if (alg == MAX_DEGEN_COMPO) {
+		break;
+	case MAX_DEGEN_COMPO:
 		compute_deg_root();
 		compute_support_root();
 		sort_non_increasing_deg_with_support_tb(false /* MUST BE*/);
 		sort_degen_composite_non_increasing_degree(ltf);
-	}
-	else if(alg == MAX){	
+		break;
+	case MAX:
 		compute_deg_root();
 		sort_non_increasing_deg(ltf);
-	}
-	else if (alg == MIN) {		
+		break;
+	case MIN:
 		compute_deg_root();
 		sort_non_decreasing_deg(ltf);
-	}
-	else if (alg == MAX_WITH_SUPPORT) {
+		break;
+	case MAX_WITH_SUPPORT:
 		compute_deg_root();
 		compute_support_root();
 		sort_non_increasing_deg_with_support_tb(ltf);
-	}
-	else if (alg == MIN_WITH_SUPPORT) {
+		break;
+	case MIN_WITH_SUPPORT:
 		compute_deg_root();
 		compute_support_root();
 		sort_non_decreasing_deg_with_support_tb(ltf);
-	}
-	else {
-		LOG_ERROR(" GraphFastRootSort<Graph_t>::new_order-bizarre algorithm");
+		break;
+	default:
+		LOG_ERROR("unknown sorting algorithm : ", alg, "- GraphFastRootSort<Graph_t>::new_order");
+		LOG_ERROR("exiting...");
+		exit(-1);
 	}
 		
 	//conversion [OLD] to [NEW] if required
-	if (o2n) { Decode::reverse_in_place(nodes); }            
-	return nodes;
+	if (o2n) { Decode::reverse_in_place(nodes_); }            
+	return nodes_;
 }
 
 template<class Graph_t>
 inline
 int GraphFastRootSort<Graph_t>::sort_degen_non_decreasing_degree(bool rev){
-	node_active_state.set_bit(0, NV-1);			//all active, pending to be ordered
-	int min_deg=NV, v=EMPTY_ELEM;
-	nodes.clear();
+	node_active_state_.set_bit(0, NV_-1);					//all active, pending to be ordered
+	int min_deg=NV_, v=EMPTY_ELEM;
+	nodes_.clear();
 
-	for(int i=0; i<NV; i++){
-		min_deg=NV;
-		for(int j=0; j<NV; j++){
-			if(node_active_state.is_bit(j) && nb_neigh[j] < min_deg){
-				min_deg=nb_neigh[j];
+	for(int i=0; i<NV_; i++){
+		min_deg=NV_;
+		for(int j=0; j<NV_; j++){
+			if(node_active_state_.is_bit(j) && nb_neigh_[j] < min_deg){
+				min_deg=nb_neigh_[j];
 				v=j;
 			}
 		}
-		nodes.push_back(v);
-		node_active_state.erase_bit(v);
-		typename Graph_t::_bbt& bbn=g.get_neighbors(v);
+		nodes_.push_back(v);
+		node_active_state_.erase_bit(v);
+		typename Graph_t::_bbt& bbn=g_.get_neighbors(v);
 		bbn.init_scan(bbo::NON_DESTRUCTIVE);
 		while(true){
 			int w=bbn.next_bit();
 			if(w==EMPTY_ELEM) break;
-			if(node_active_state.is_bit(w))
-				nb_neigh[w]--;
+			if(node_active_state_.is_bit(w))
+				nb_neigh_[w]--;
 		}
 	}//endFor
 
 	if(rev){
-		std::reverse(nodes.begin(), nodes.end());
+		std::reverse(nodes_.begin(), nodes_.end());
 	}
 	return 0;
 }
@@ -263,32 +288,32 @@ int GraphFastRootSort<Graph_t>::sort_degen_non_decreasing_degree(bool rev){
 template<class Graph_t>
 inline
 int GraphFastRootSort<Graph_t>::sort_degen_non_increasing_degree(bool rev){
-	node_active_state.set_bit(0, NV-1);											//all active, pending to be ordered
+	node_active_state_.set_bit(0, NV_-1);											//all active, pending to be ordered
 	int max_deg=0, v=EMPTY_ELEM;
-	nodes.clear();
+	nodes_.clear();
 
-	for(int i=0; i<NV; i++){
+	for(int i=0; i<NV_; i++){
 		max_deg=-1;
-		for(int j=0; j<NV; j++){
-			if(node_active_state.is_bit(j) && nb_neigh[j] > max_deg){			 /* MUST BE >= */
-				max_deg=nb_neigh[j];
+		for(int j=0; j<NV_; j++){
+			if(node_active_state_.is_bit(j) && nb_neigh_[j] > max_deg){			 /* MUST BE >=  (20/12/24) TODO- CHECK*/
+				max_deg=nb_neigh_[j];
 				v=j;
 			}
 		}
-		nodes.push_back(v);
-		node_active_state.erase_bit(v);
-		typename Graph_t::_bbt& bbn=g.get_neighbors(v);
+		nodes_.push_back(v);
+		node_active_state_.erase_bit(v);
+		typename Graph_t::_bbt& bbn=g_.get_neighbors(v);
 		bbn.init_scan(bbo::NON_DESTRUCTIVE);
 		while(true){
 			int w=bbn.next_bit();
 			if(w==EMPTY_ELEM) break;
-			if(node_active_state.is_bit(w))
-				nb_neigh[w]--;
+			if(node_active_state_.is_bit(w))
+				nb_neigh_[w]--;
 		}
 	}//endFor
 
 	if(rev){
-		std::reverse(nodes.begin(), nodes.end());
+		std::reverse(nodes_.begin(), nodes_.end());
 	}
 	return 0;
 }
@@ -296,37 +321,39 @@ int GraphFastRootSort<Graph_t>::sort_degen_non_increasing_degree(bool rev){
 template<class Graph_t>
 inline int GraphFastRootSort<Graph_t>::sort_degen_composite_non_decreasing_degree(bool rev)
 {
-	//////////////////
-	// param@order:MUST BE a root ordering (mapping of all vertices, size- NV)
+	node_active_state_.set_bit(0, NV_ - 1);			//all active, pending to be ordered
+	int min_deg = NV_, v = EMPTY_ELEM;
+	vint nodes_ori = nodes_;
+	nodes_.clear();
 
-	node_active_state.set_bit(0, NV - 1);			//all active, pending to be ordered
-	int min_deg = NV, v = EMPTY_ELEM;
-	vint nodes_ori = nodes;
-	nodes.clear();
-
-	for (int i = 0; i < NV; i++) {
-		min_deg = NV;
-		for (int j = 0; j < NV; j++) {
+	for (int i = 0; i < NV_; i++) {
+		//finds vertex with minimum degree
+		min_deg = NV_;
+		for (int j = 0; j < NV_; j++) {
 			int u = nodes_ori[j];
-			if (node_active_state.is_bit(u) && nb_neigh[u] < min_deg) {
-				min_deg = nb_neigh[u];
+			if (node_active_state_.is_bit(u) && nb_neigh_[u] < min_deg) {
+				min_deg = nb_neigh_[u];
 				v = u;
 			}
 		}
-		nodes.push_back(v);
-		node_active_state.erase_bit(v);
-		typename Graph_t::_bbt& bbn = g.get_neighbors(v);
+
+		//updates context
+		nodes_.emplace_back(v);
+		node_active_state_.erase_bit(v);
+
+		//updates neighborhood info in remaining vertices
+		typename Graph_t::_bbt& bbn = g_.get_neighbors(v);
 		bbn.init_scan(bbo::NON_DESTRUCTIVE);
 		while (true) {
 			int w = bbn.next_bit();
 			if (w == EMPTY_ELEM) break;
-			if (node_active_state.is_bit(w))
-				nb_neigh[w]--;
+			if (node_active_state_.is_bit(w))
+				nb_neigh_[w]--;
 		}
-	}//endFor
+	}
 
 	if (rev) {
-		std::reverse(nodes.begin(), nodes.end());
+		std::reverse(nodes_.begin(), nodes_.end());
 	}
 	return 0;
 }
@@ -334,45 +361,35 @@ inline int GraphFastRootSort<Graph_t>::sort_degen_composite_non_decreasing_degre
 template<class Graph_t>
 inline int GraphFastRootSort<Graph_t>::sort_degen_composite_non_increasing_degree(bool rev)
 {
-	//////////////////
-	// param@order:MUST BE a root ordering (mapping of all vertices, size- NV)
-
-	node_active_state.set_bit(0, NV - 1);											//all active, pending to be ordered
+	node_active_state_.set_bit(0, NV_ - 1);											//all active, pending to be ordered
 	int max_deg = 0, v = EMPTY_ELEM;
-	vint nodes_ori = nodes;
-	nodes.clear();
-
-	//com::stl::print_collection<vint>(nodes_ori, cout, true);
-	//cin.get();
-	
-
-	for (int i = 0; i < NV; i++) {
+	vint nodes_ori = nodes_;
+	nodes_.clear();
+		
+	for (int i = 0; i < NV_; i++) {
+		//finds vertex with maximum degree
 		max_deg = -1;
-		for (int j = 0; j < NV; j++) {
+		for (int j = 0; j < NV_; j++) {
 			int u = nodes_ori[j];
-			if (node_active_state.is_bit(u) && nb_neigh[u] > max_deg) {			 /* MUST BE >= */
-				max_deg = nb_neigh[u];
+			if (node_active_state_.is_bit(u) && nb_neigh_[u] > max_deg) {			 /* MUST BE >=  (20/12/24) TODO- CHECK*/
+				max_deg = nb_neigh_[u];
 				v = u;
 			}
 		}
-		nodes.push_back(v);
-		node_active_state.erase_bit(v);
-		typename Graph_t::_bbt& bbn = g.get_neighbors(v);
+		nodes_.push_back(v);
+		node_active_state_.erase_bit(v);
+		typename Graph_t::_bbt& bbn = g_.get_neighbors(v);
 		bbn.init_scan(bbo::NON_DESTRUCTIVE);
 		while (true) {
 			int w = bbn.next_bit();
 			if (w == EMPTY_ELEM) break;
-			if (node_active_state.is_bit(w))
-				nb_neigh[w]--;
+			if (node_active_state_.is_bit(w))
+				nb_neigh_[w]--;
 		}
-
-		//print(PRINT_DEGREE, cout);
-		//cin.get();
-
-	}//endFor
+	}
 
 	if (rev) {
-		std::reverse(nodes.begin(), nodes.end());
+		std::reverse(nodes_.begin(), nodes_.end());
 	}
 	return 0;
 }
@@ -381,9 +398,10 @@ inline int GraphFastRootSort<Graph_t>::sort_degen_composite_non_increasing_degre
 template<class Graph_t>
 inline
 void GraphFastRootSort<Graph_t>::fill_stack_root(){
-	nodes.clear();
-	for(int i=0; i<NV; i++){
-			nodes.push_back(i);
+	nodes_.clear();
+	nodes_.reserve(NV_);
+	for(int i=0; i<NV_; i++){
+			nodes_.emplace_back(i);
 	}
 }
 
@@ -391,10 +409,10 @@ template<class Graph_t>
 inline
 int GraphFastRootSort<Graph_t>::sort_non_increasing_deg(bool rev){
 	fill_stack_root();
-	com::has_greater_val<int, vint> pred(nb_neigh);
-	std::stable_sort(nodes.begin(),  nodes.end(), pred);
+	com::has_greater_val<int, vint> pred(nb_neigh_);
+	std::stable_sort(nodes_.begin(),  nodes_.end(), pred);
 	if(rev){
-		std::reverse(nodes.begin(), nodes.end());
+		std::reverse(nodes_.begin(), nodes_.end());
 	}
 	return 0;
 }
@@ -404,11 +422,11 @@ template<class Graph_t>
 inline
 int GraphFastRootSort<Graph_t>::sort_non_decreasing_deg(bool rev){
 	fill_stack_root();
-	com::has_smaller_val<int, vint> pred(nb_neigh);
-	std::stable_sort(nodes.begin(),  nodes.end(), pred);
+	com::has_smaller_val<int, vint> pred(nb_neigh_);
+	std::stable_sort(nodes_.begin(),  nodes_.end(), pred);
 	
 	if(rev){
-		std::reverse(nodes.begin(), nodes.end());
+		std::reverse(nodes_.begin(), nodes_.end());
 	}
 	return 0;
 }
@@ -417,11 +435,11 @@ template<class Graph_t>
 inline
 int GraphFastRootSort<Graph_t>::sort_non_increasing_deg_with_support_tb(bool rev ){
 	fill_stack_root();
-	com::has_greater_val_with_tb<int, vint> pred(nb_neigh, deg_neigh);
-	std::stable_sort(nodes.begin(),  nodes.end(), pred);
+	com::has_greater_val_with_tb<int, vint> pred(nb_neigh_, deg_neigh_);
+	std::stable_sort(nodes_.begin(),  nodes_.end(), pred);
 
 	if(rev){
-		std::reverse(nodes.begin(), nodes.end());
+		std::reverse(nodes_.begin(), nodes_.end());
 	}
 	return 0;
 }
@@ -430,11 +448,11 @@ template<class Graph_t>
 inline
 int GraphFastRootSort<Graph_t>::sort_non_decreasing_deg_with_support_tb(bool rev){
 	fill_stack_root();
-	com::has_smaller_val_with_tb<int, vint> pred(nb_neigh, deg_neigh);
-	std::stable_sort(nodes.begin(),  nodes.end(), pred);
+	com::has_smaller_val_with_tb<int, vint> pred(nb_neigh_, deg_neigh_);
+	std::stable_sort(nodes_.begin(),  nodes_.end(), pred);
 
 	if(rev){
-		std::reverse(nodes.begin(), nodes.end());
+		std::reverse(nodes_.begin(), nodes_.end());
 	}
 	return 0;
 }
@@ -442,55 +460,54 @@ int GraphFastRootSort<Graph_t>::sort_non_decreasing_deg_with_support_tb(bool rev
 template<class Graph_t>
 inline
 void GraphFastRootSort<Graph_t>::compute_deg_root(){
-	for(int elem=0; elem<NV; elem++){		
-		nb_neigh[elem]=g.get_neighbors(elem).popcn64();
+	for(int elem=0; elem<NV_; elem++){		
+		nb_neigh_[elem]=g_.get_neighbors(elem).popcn64();
 
-		//Graph_t::_bbt& bbn=g.get_neighbors(elem);		
+		//Graph_t::_bbt& bbn=g_.get_neighbors(elem);		
 	/*	bbn.init_scan(bbo::NON_DESTRUCTIVE);
 		while(true){
 			int w=bbn.next_bit();
 			if(w==EMPTY_ELEM) break;
-			nb_neigh[elem]++;	
+			nb_neigh_[elem]++;	
 		}*/
 	}
 }
 
 template<class Graph_t>
 inline
-void GraphFastRootSort<Graph_t>::compute_support_root(){
-/////////////
-// support: sum of number of neighbors for each vertex 
-//       	(STATIC concept: can include the same vertex twice!)	 
-	
-	for(int elem=0; elem<NV; elem++){
-		deg_neigh[elem]=0;
-		typename Graph_t::_bbt& bbn=g.get_neighbors(elem);
+void GraphFastRootSort<Graph_t>::compute_support_root()
+{
+	for(int elem=0; elem<NV_; elem++){
+		deg_neigh_[elem]=0;
+		typename Graph_t::_bbt& bbn=g_.get_neighbors(elem);
 		bbn.init_scan(bbo::NON_DESTRUCTIVE);
 		while(true){
 			int w=bbn.next_bit();
 			if(w==EMPTY_ELEM) break;
-			deg_neigh[elem]+=nb_neigh[w];	
+			deg_neigh_[elem]+=nb_neigh_[w];	
 		}
 	}
 }
 
 template<class Graph_t>
 inline
-ostream& GraphFastRootSort<Graph_t>::print(int type, ostream& o){
+ostream& GraphFastRootSort<Graph_t>::print(int type, ostream& o)
+{	
 	if(type==PRINT_DEGREE){
-		for(int i=0; i<NV; i++){
-			o<<nb_neigh[i]<<" ";
+		for(int i=0; i<NV_; i++){
+			o<<nb_neigh_[i]<<" ";
 		}		
-	}
-	
-	if(type==PRINT_SUPPORT){
-		for(int i=0; i<NV; i++){
-			o<<deg_neigh[i]<<" ";
+	}else if(type==PRINT_SUPPORT){
+		for(int i=0; i<NV_; i++){
+			o<<deg_neigh_[i]<<" ";
 		}		
+	}else if(type==PRINT_NODES){
+		com::stl::print_collection<vint>(nodes_, o);		
 	}
-
-	if(type==PRINT_NODES){
-		com::stl::print_collection<vint>(nodes, o);		
+	else {
+		LOG_ERROR("unknown print type- GraphFastRootSort<Graph_t>::print()");
+		LOG_ERROR("exiting...");
+		exit(-1);
 	}
 	
 	o<<endl;
@@ -498,12 +515,11 @@ ostream& GraphFastRootSort<Graph_t>::print(int type, ostream& o){
 }
 
 template<class Graph_t>
-inline int GraphFastRootSort<Graph_t>::compute_deg(const Graph_t & g, vint & deg)
-{
-	int NV = g.number_of_vertices();	
-	deg.assign(NV, -1);
-	for (int v = 0; v < NV; v++) {
-		deg[v] = g.get_neighbors(v).popcn64();
+inline int GraphFastRootSort<Graph_t>::compute_deg(const Graph_t & g, vint & deg){
+	int NV_ = g_.number_of_vertices();	
+	deg.assign(NV_, -1);
+	for (int v = 0; v < NV_; v++) {
+		deg[v] = g_.get_neighbors(v).popcn64();
 	}
 	return 0;
 }
@@ -512,59 +528,42 @@ template<class Graph_t>
 inline
 int GraphFastRootSort<Graph_t>::init(){
 	
-	nb_neigh.assign(NV, 0);
-	deg_neigh.assign(NV, 0);
-
-	//nb_neigh= new int[NV];
-	//deg_neigh= new int[NV];
-	//for(int i=0; i<NV; i++){
-	//	nb_neigh[i]=0;
-	//	deg_neigh[i]=0;
-	//}
-
-	//if( nb_neigh==NULL ||  deg_neigh==NULL){
-	//	perror("error: ");
-	//	return -1;
-	//}
-	
-	//nodes.init(NV);
-	node_active_state.init(NV);	
+	nb_neigh_.assign(NV_, 0);
+	deg_neigh_.assign(NV_, 0);
+	node_active_state_.init(NV_);	
 	return 0;
 }
 //
 //template<class Graph_t>
 //inline
 //void GraphFastRootSort<Graph_t>::clear(){
-//	if(nb_neigh){
-//		delete [] nb_neigh;
+//	if(nb_neigh_){
+//		delete [] nb_neigh_;
 //	}
-//	nb_neigh=NULL;
+//	nb_neigh_=NULL;
 //
-//	if(deg_neigh){
-//		delete [] deg_neigh;
+//	if(deg_neigh_){
+//		delete [] deg_neigh_;
 //	}
-//	deg_neigh=NULL;
+//	deg_neigh_=NULL;
 //}
 
 template<class Graph_t>
 inline
-int GraphFastRootSort<Graph_t>::reorder(const vint& new_order, Graph_t& gn, Decode* d) {
-	/////////////////////
-	// EXPERIMENTAL-ONLY FOR SIMPLE GRAPHS
-	//
-	// param@new_order: mapping [OLD]->[NEW]
-		
-	int NV = g.number_of_vertices();
+int GraphFastRootSort<Graph_t>::reorder(const vint& new_order, Graph_t& gn, Decode* d) 
+{
+	int NV = g_.number_of_vertices();
 	gn.init(NV);
-	gn.set_name(g.get_name(), false /* no path separation */ );	
-	gn.set_path(g.get_path());
-		
-	//only for undirected graphs
+	gn.set_name(g_.get_name(), false /* no path separation */ );	
+	gn.set_path(g_.get_path());
+	
+	//creates the new edges of the isomorphic graph 
 	for (int i = 0; i < NV - 1; i++) {
 		for (int j = i + 1; j < NV; j++) {
-			if (g.is_edge(i, j)) {								//in O(log) for sparse graphs, should be specialized for that case
-				//switch edges according to new numbering
-				gn.add_edge(new_order[i], new_order[j]);
+			if (g_.is_edge(i, j)) {									//in O(log) for sparse graphs, should be specialized for that case
+				//////////////////////////////////////////////
+				gn.add_edge(new_order[i], new_order[j]);			//maps the new edges according to the new given order
+				//////////////////////////////////////////////
 			}
 		}
 	}
@@ -719,7 +718,7 @@ int GraphFastRootSort<Graph_t>::SORT_SUBGRAPH_NON_INC_DEG(Graph_t& g, vint& lhs,
 		nb_neigh[v] = deg;
 
 	}	
-	com::has_smaller_val<int, int> p(nb_neigh);
+	com::has_smaller_val<int, vint> p(nb_neigh);
 
 	//I/O
 	/*com::stl::print_array(nb_neigh, nb_neigh+ g.number_of_vertices());
@@ -814,7 +813,7 @@ int GraphFastRootSort<Graph_t>::SORT_SUBGRAPH_NON_DEC_DEG(Graph_t& g, vint& lhs,
 	com::has_smaller_val<int, int /* vertex degrees */> p(nb_neigh);
 
 	//I/O
-	/*com::stl::print_array(nb_neigh, nb_neigh+ g.number_of_vertices());
+	/*com::stl::print_array(nb_neigh, nb_neigh+ g_.number_of_vertices());
 	LOG_INFO("-----------------");*/
 
 
@@ -833,7 +832,7 @@ int GraphFastRootSort<Graph_t>::SORT_SUBGRAPH_NON_DEC_DEG(Graph_t& g, vint& lhs,
 				
 
 		//I/O
-		/*com::stl::print_array(nb_neigh, nb_neigh + g.number_of_vertices());
+		/*com::stl::print_array(nb_neigh, nb_neigh + g_.number_of_vertices());
 		LOG_INFO("-----------------");
 		cin.get();*/
 
