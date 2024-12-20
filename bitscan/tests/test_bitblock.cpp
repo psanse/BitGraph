@@ -30,3 +30,15 @@ TEST(Scan, single_block) {
 	EXPECT_EQ(31,bitblock::msb64_intrinsic(bb));
 }
 
+
+TEST(BITBOARD_Performance, standard) {
+	BITBOARD bb1 = 0xf0f0f0f0;
+	BITBOARD bb2 = 0x070f0f0f;
+	// check time ?
+	for (int i = 0; i < 100000; i++) {
+		EXPECT_EQ(16, bitblock::popc64(bb1));
+		EXPECT_EQ(15, bitblock::popc64(bb2));
+	}
+
+}
+

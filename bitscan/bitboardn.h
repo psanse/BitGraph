@@ -165,6 +165,11 @@ inline virtual bool is_empty		(int nBBL, int nBBH)				const;
 virtual	int* to_old_vector			(int* lv, int& size);
 virtual	int* to_old_vector_reverse	(int* lv, int& size);
 ////////////////////////
+// operator [] - 0 based index, returns/modify a complete BITBOARD
+//TODO: Check limits!!!!!!
+BITBOARD& operator[](std::size_t index) { return m_aBB[index]; }
+const BITBOARD& operator[](std::size_t index) const { return m_aBB[index]; }
+////////////////////////
 //Member data
 protected:
 	BITBOARD* m_aBB;
