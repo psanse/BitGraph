@@ -145,8 +145,7 @@ TEST(Fast_Sorting_stateless, SORT_SUBGRAPH_DEG) {
 	///////////////////
 	   
 	int status=GraphFastRootSort<ugraph>::SORT_SUBGRAPH_NON_INC_DEG(ug, lhs, rhs, true /* lhs-> max_deg in rhs, FIRST_TO_LAST */);     //TODO@ TEST SORT_SUBGRAPH_NON_DEC_DEG(ug, lhs, rhs, true /* lhs-> max_deg in rhs, FIRST_TO_LAST */);
-	
-				
+					
 	vint res;
 	res.push_back(5); 
 	res.push_back(4); 
@@ -318,17 +317,6 @@ TEST(Fast_Sorting, DISABLED_basic_new_graph_sort){
 	cfs.sort_non_increasing_deg_with_support_tb();
 	cfs.sort_degen_composite_non_increasing_degree();
 	cfs.print(static_cast<int>(gt::sort_print_t::PRINT_NODES), cout);
-	
-
-	//vint vno=cfs.new_order_fast(MIN_DEG_DEGEN, PLACE_LF);
-	//com::stl::print_collection(vno); cout<<endl;
-
-	//GraphSort<ugraph> cs(ug);
-	//vint vfno=cs.new_order(MIN_DEG_DEGEN, PLACE_LF);
-	//com::stl::print_collection(vfno);
-
-	//EXPECT_EQ(vno, vfno);
-
 
 	LOG_INFO("Fast_Sorting: END basic_new_graph_sort-------------------");
 #ifdef	TEST_GRAPH_FAST_SORT_STEP_BY_STEP

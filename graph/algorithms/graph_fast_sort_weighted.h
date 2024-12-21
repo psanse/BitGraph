@@ -25,19 +25,31 @@ template <class GraphW_t>
 class GraphFastRootSort_W: public GraphFastRootSort <typename GraphW_t::_gt>{
 
 public:
-	using type = GraphFastRootSort_W<GraphW_t>;
-	using basic_type = GraphW_t;
-	using gtype = typename basic_type::_gt;
-	using ptype = typename GraphFastRootSort <gtype>;
+	using basic_type = GraphW_t;									//weighted graph type
+	using type = GraphFastRootSort_W<GraphW_t>;	
+	using ugtype = typename basic_type::_gt;						//non-weighted graph type	
+	using ptype = typename GraphFastRootSort <ugtype>;				//parent type
 	
-	//typedef GraphFastRootSort <typename GraphW_t::_gt> _mypt;
-	enum class sort_algw_t { MAX_WEIGHT = 100 };
+	enum class sort_algw_t { MAX_WEIGHT = 100 };					//sorting algorithms for weighted graphs	
 
 ////////////////
 // public interface 
 public:
-
+	/*
+	* @brief computes a new_order in [OLD]->[NEW] format
+	* @param alg sorting algorithm
+	* @param ltf  last to first
+	* @param o2n  old to new
+	*/
 	vint new_order	(int alg, bool ltf = true, bool o2n = true)		override;							
+	
+	/*
+	* @brief determines a weighted graph isomorphism for a given ordering
+	* @param gn output isomorphic weighted graph
+	* @param new_order ordering in [OLD]->[NEW] format
+	* @param d ptr to decode object to store the ordering
+	* @comments only for simple undirected graphs with no weights
+	*/
 	int  reorder	(const vint& new_order, GraphW_t& gn, Decode* d = NULL);		// (new) interface for the framework- TODO@build an in-place reordering as in the old GraphSort 	
 
 public:
@@ -65,14 +77,6 @@ private:
 template <class GraphW_t >
 inline
 vint GraphFastRootSort_W<GraphW_t>::new_order (int alg, bool ltf, bool o2n){
-/////////////////
-// Computes new order of vertices accordig to @alg
-//
-// PARAMS
-// @alg:algorithm
-// @ltf:last to first
-// @o2n:old to new
-
 	vector<int> order;
 
 	switch (alg) {
@@ -86,10 +90,10 @@ vint GraphFastRootSort_W<GraphW_t>::new_order (int alg, bool ltf, bool o2n){
 	case ptype::sort_alg_t::MAX_WITH_SUPPORT:
 	case ptype::sort_alg_t::MIN_WITH_SUPPORT:
 		
-		order= ptype::new_order( alg,  ltf,  o2n);
+		order = ptype::new_order(alg, ltf, o2n);		//sorts the graph according to non-weighted criteria
 		break;
     
-	case sort_algw_t::MAX_WEIGHT:
+	case sort_algw_t::MAX_WEIGHT:						//currently the only sorting algorithm for weighted graphs
 		order = sort_by_weight( ltf, o2n);
 		break;
 
