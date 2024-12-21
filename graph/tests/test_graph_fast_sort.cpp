@@ -14,9 +14,9 @@
 #include <iostream>
 //#include "../algorithms/graph_sort.h"
 #include "utils/common.h"
+#include "utils/logger.h"
 #include "utils/file.h"
 #include <string>
-
 
 using namespace std;
 //using namespace gbbs;
@@ -44,13 +44,13 @@ TEST(GraphFastRootSort_W,basic) {
 	ugw.set_w(1, 5.0);
 	ugw.set_w(2, 3.0);
 
-
-	GraphFastRootSort_W<ugraph_w> gf(ugw);
+	using gt = GraphFastRootSort_W<ugraph_w>;
+	gt gf(ugw);
 
 //////////////////
 //SORT BY DEGREE
 //////////////////
-	vint order= gf.new_order(GraphFastRootSort_W<ugraph_w>::MIN, false /*f2l*/, false /*n2o*/);
+	vint order= gf.new_order((int)gt::ptype::sort_alg_t::MIN, false /*f2l*/, false /*n2o*/);
 	
 	//deg(5)=3,  deg(2)=3, deg(1)=2,  deg(3)=1, deg(4)=1, deg(0)=0
 	vint order_exp;
@@ -75,7 +75,7 @@ TEST(GraphFastRootSort_W,basic) {
 //SORT BY WEIGHT (non-increasing)
 //////////////////
 	//w(1)=5.0,  w(0)=4.0, w(2)=3.0,  w(3)=1.0, w(4)=1.0, w(5)=1.0
-	order = gf.new_order(GraphFastRootSort_W<ugraph_w>::MAX_WEIGHT, false /*f2l*/, false /*n2o*/);			
+	order = gf.new_order((int)gt::sort_algw_t::MAX_WEIGHT, false /*f2l*/, false /*n2o*/);			
 	order_exp.clear();
 	order_exp.push_back(1);
 	order_exp.push_back(0);
@@ -177,9 +177,10 @@ TEST(Fast_Sorting, gen_min_width_tb_support_graphs) {
 	cout << fullname << endl;
 	ugraph ug(fullname);
 
-	GraphFastRootSort<ugraph> cfs(ug);
+	using gt = GraphFastRootSort<ugraph>;
+	gt cfs(ug);
 	
-	vint otn_minwc = cfs.new_order(GraphFastRootSort<ugraph>::MIN_DEGEN_COMPO, true);
+	vint otn_minwc = cfs.new_order((int)gt::sort_alg_t::MIN_DEGEN_COMPO, true);
 	cout << "MAPPING MIN_WIDTH_DEGEN_COMPOSITE LAST TO FIRST-old to new" << endl;
 	com::stl::print_collection<vint>(otn_minwc, cout, true);
 		
@@ -206,13 +207,14 @@ TEST(Fast_Sorting, DISABLED_dimacs) {
 	cout << fullname << endl;
 	ugraph ug(fullname);
 
-	GraphFastRootSort<ugraph> cfs(ug);
+	using gt = GraphFastRootSort<ugraph>;
+	gt cfs(ug);
 			
-	vint otn_minw=cfs.new_order(GraphFastRootSort<ugraph>::MIN_DEGEN, true);
+	vint otn_minw=cfs.new_order((int)gt::sort_alg_t::MIN_DEGEN, true);
 	cout << "MAPPING MIN_WIDTH_DEGEN LAST TO FIRST-old to new" << endl;
 	com::stl::print_collection<vint>(otn_minw, cout, true);										//checked with framework for a number  of graphs!
 
-	vint otn_minwc = cfs.new_order(GraphFastRootSort<ugraph>::MIN_DEGEN_COMPO, true);
+	vint otn_minwc = cfs.new_order((int)gt::sort_alg_t::MIN_DEGEN_COMPO, true);
 	cout << "MAPPING MIN_WIDTH_DEGEN_COMPOSITE LAST TO FIRST-old to new" << endl;
 	com::stl::print_collection<vint>(otn_minwc, cout, true);
 	
@@ -235,7 +237,8 @@ TEST(Fast_Sorting, DISABLED_basic_new_graph_sort){
     ug.add_edge(1, 4);
 	ug.add_edge(3, 5);
 		
-	GraphFastRootSort<ugraph> cfs(ug);
+	using gt = GraphFastRootSort<ugraph>;
+	gt cfs(ug);
 		
 	//cfs.print(GraphFastSort<ugraph>::PRINT_ADY_LIST, cout);
 	//cfs.print(GraphFastSort<ugraph>::PRINT_DEGREE, cout);
@@ -243,28 +246,28 @@ TEST(Fast_Sorting, DISABLED_basic_new_graph_sort){
 		
 	cfs.compute_deg_root();
 	cout <<"degree info:" << endl;
-	cfs.print(GraphFastRootSort<ugraph>::PRINT_DEGREE, cout);
+	cfs.print(static_cast<int>(gt::sort_print_t::PRINT_DEGREE), cout);
 
 	cfs.compute_support_root();
 	//cfs.print(GraphFastRootSort<ugraph>::PRINT_DEGREE, cout);
 	cout << "support info:" << endl;
-	cfs.print(GraphFastRootSort<ugraph>::PRINT_SUPPORT, cout);
+	cfs.print(static_cast<int>(gt::sort_print_t::PRINT_SUPPORT), cout);
 
 	cfs.sort_non_decreasing_deg();
 	cout << "non_decreasing mapping:" << endl;
-	cfs.print(GraphFastRootSort<ugraph>::PRINT_NODES, cout);
+	cfs.print(static_cast<int>(gt::sort_print_t::PRINT_NODES), cout);
 	
 	cfs.sort_non_increasing_deg();	
 	cout << "non_increasing mapping:" << endl;
-	cfs.print(GraphFastRootSort<ugraph>::PRINT_NODES, cout);		
+	cfs.print(static_cast<int>(gt::sort_print_t::PRINT_NODES), cout);
 	
 	cout << "non_decreasing support tb mapping:" << endl;
 	cfs.sort_non_decreasing_deg_with_support_tb();
-	cfs.print(GraphFastRootSort<ugraph>::PRINT_NODES, cout);
+	cfs.print(static_cast<int>(gt::sort_print_t::PRINT_NODES), cout);
 	
 	cout << "non_increasing support tb mapping:" << endl;
 	cfs.sort_non_increasing_deg_with_support_tb();
-	cfs.print(GraphFastRootSort<ugraph>::PRINT_NODES, cout);
+	cfs.print(static_cast<int>(gt::sort_print_t::PRINT_NODES), cout);
 	
 ///////////////
 //DEGEN SORTING
@@ -272,22 +275,22 @@ TEST(Fast_Sorting, DISABLED_basic_new_graph_sort){
 	
 	cout<<"non decreasing degen mapping:"<<endl;
 	cfs.sort_degen_non_decreasing_degree();
-	cfs.print(GraphFastRootSort<ugraph>::PRINT_NODES, cout);
+	cfs.print(static_cast<int>(gt::sort_print_t::PRINT_NODES), cout);
 
 	cout << "non decreasing degen mapping reverse...." << endl;
 	cfs.compute_deg_root();												//necessary after prior degen ordering
 	cfs.sort_degen_non_decreasing_degree(true);
-	cfs.print(GraphFastRootSort<ugraph>::PRINT_NODES, cout);
+	cfs.print(static_cast<int>(gt::sort_print_t::PRINT_NODES), cout);
 	
 	cout << "non increasing degen mapping:" << endl;
 	cfs.compute_deg_root();
 	cfs.sort_degen_non_increasing_degree();
-	cfs.print(GraphFastRootSort<ugraph>::PRINT_NODES, cout);
+	cfs.print(static_cast<int>(gt::sort_print_t::PRINT_NODES), cout);
 
 	cout << "non increasing degen mapping reverse...." << endl;
 	cfs.compute_deg_root();
 	cfs.sort_degen_non_increasing_degree(true);
-	cfs.print(GraphFastRootSort<ugraph>::PRINT_NODES, cout);
+	cfs.print(static_cast<int>(gt::sort_print_t::PRINT_NODES), cout);
 	
 	//Composites
 	cout << endl << "DEGENERATE COMPOSITES SORTING..." << endl;	
@@ -296,25 +299,25 @@ TEST(Fast_Sorting, DISABLED_basic_new_graph_sort){
 	cfs.compute_deg_root();												 //necessary after prior degen ordering
 	cfs.sort_non_decreasing_deg();
 	cfs.sort_degen_composite_non_decreasing_degree();
-	cfs.print(GraphFastRootSort<ugraph>::PRINT_NODES, cout);
+	cfs.print(static_cast<int>(gt::sort_print_t::PRINT_NODES), cout);
 
 	cout << "non decreasing with support tb + non decreasing degen mapping:" << endl;
 	cfs.compute_deg_root();												 //necessary after prior degen ordering
 	cfs.sort_non_decreasing_deg_with_support_tb();
 	cfs.sort_degen_composite_non_decreasing_degree();
-	cfs.print(GraphFastRootSort<ugraph>::PRINT_NODES, cout);
+	cfs.print(static_cast<int>(gt::sort_print_t::PRINT_NODES), cout);
 		
 	cout << "non increasing + non increasing degen mapping:" << endl;
 	cfs.compute_deg_root();												 //necessary after prior degen ordering
 	cfs.sort_non_increasing_deg();
 	cfs.sort_degen_composite_non_increasing_degree();
-	cfs.print(GraphFastRootSort<ugraph>::PRINT_NODES, cout);
+	cfs.print(static_cast<int>(gt::sort_print_t::PRINT_NODES), cout);
 	
 	cout << "non increasing with support tb + non increasing degen mapping:" << endl;
 	cfs.compute_deg_root();												 //necessary after prior degen ordering
 	cfs.sort_non_increasing_deg_with_support_tb();
 	cfs.sort_degen_composite_non_increasing_degree();
-	cfs.print(GraphFastRootSort<ugraph>::PRINT_NODES, cout);
+	cfs.print(static_cast<int>(gt::sort_print_t::PRINT_NODES), cout);
 	
 
 	//vint vno=cfs.new_order_fast(MIN_DEG_DEGEN, PLACE_LF);

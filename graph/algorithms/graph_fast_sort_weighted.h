@@ -5,17 +5,12 @@
 #ifndef __GRAPH_FAST_SORT_WEIGHTED_H__
 #define __GRAPH_FAST_SORT_WEIGHTED_H__
 
-#include <iostream>
-#include <algorithm>
-#include <vector>
-#include <iterator>
-#include "../graph.h"
 #include "../algorithms/graph_fast_sort.h"
-#include "../kcore.h"
-#include "filter_graph_sort_type.h"			//limits template Graph_t to undirected types
-#include "utils/logger.h"
-#include "utils/common.h"					//sort functors
 #include "decode.h"
+#include "utils/common.h"						
+#include "utils/logger.h"
+#include <vector>
+//#include "filter_graph_sort_type.h"			//limits template Graph_t to undirected types
 
 using namespace std;
 
@@ -30,36 +25,42 @@ template <class GraphW_t>
 class GraphFastRootSort_W: public GraphFastRootSort <typename GraphW_t::_gt>{
 
 public:
-	typedef GraphFastRootSort <typename GraphW_t::_gt> _mypt;
-	enum { MAX_WEIGHT=100 };
+	using type = GraphFastRootSort_W<GraphW_t>;
+	using basic_type = GraphW_t;
+	using gtype = typename basic_type::_gt;
+	using ptype = typename GraphFastRootSort <gtype>;
+	
+	//typedef GraphFastRootSort <typename GraphW_t::_gt> _mypt;
+	enum class sort_algw_t { MAX_WEIGHT = 100 };
 
 ////////////////
-// data members	
-private:
-	GraphW_t& gw;
+// public interface 
+public:
+
+	vint new_order	(int alg, bool ltf = true, bool o2n = true)		override;							
+	int  reorder	(const vint& new_order, GraphW_t& gn, Decode* d = NULL);		// (new) interface for the framework- TODO@build an in-place reordering as in the old GraphSort 	
 
 public:
 ////////////////////////
 //construction / allocation
 	GraphFastRootSort_W(GraphW_t& gwout): gw(gwout), GraphFastRootSort<typename GraphW_t::_gt>(gwout.graph()){ }
-	~GraphFastRootSort_W(){}
-	
-////////////////
-// interface (public)	
-public:
-	
-///////////
-//overrides
-	vint new_order	(int alg, bool ltf=true, bool o2n=true);								/* interface for the framework */
-	int reorder		(const vint& new_order, GraphW_t& gn, Decode* d=NULL);					// (new) interface for the framework- TODO@build an in-place reordering as in the old GraphSort 	
+	~GraphFastRootSort_W() = default;
+
+	GraphFastRootSort_W	(const GraphFastRootSort_W&) = delete;
+	GraphFastRootSort_W& operator=(const GraphFastRootSort_W&) = delete;
+	GraphFastRootSort_W	(GraphFastRootSort_W&&) = delete;
+	GraphFastRootSort_W& operator=(GraphFastRootSort_W&&) = delete;
 
 private:
-////////////////
-//sorting 
+	////////////////
+	//sorting 
 	vint sort_by_weight(bool ltf = true, bool o2n = true);
 
+////////////////
+// data members	
+private:
+	const GraphW_t& gw;
 };
-
 
 template <class GraphW_t >
 inline
@@ -75,25 +76,26 @@ vint GraphFastRootSort_W<GraphW_t>::new_order (int alg, bool ltf, bool o2n){
 	vector<int> order;
 
 	switch (alg) {
-	case _mypt::NONE:
-	case _mypt::MIN_DEGEN:
-	case _mypt::MIN_DEGEN_COMPO:
-	case _mypt::MAX_DEGEN:
-	case _mypt::MAX_DEGEN_COMPO:
-	case _mypt::MAX:
-	case _mypt::MIN:
-	case _mypt::MAX_WITH_SUPPORT:
-	case _mypt::MIN_WITH_SUPPORT:
-
-		order= _mypt::new_order( alg,  ltf,  o2n);
+	case ptype::sort_alg_t::NONE:
+	case ptype::sort_alg_t::MIN_DEGEN:
+	case ptype::sort_alg_t::MIN_DEGEN_COMPO:
+	case ptype::sort_alg_t::MAX_DEGEN:
+	case ptype::sort_alg_t::MAX_DEGEN_COMPO:
+	case ptype::sort_alg_t::MAX:
+	case ptype::sort_alg_t::MIN:
+	case ptype::sort_alg_t::MAX_WITH_SUPPORT:
+	case ptype::sort_alg_t::MIN_WITH_SUPPORT:
+		
+		order= ptype::new_order( alg,  ltf,  o2n);
 		break;
     
-	case MAX_WEIGHT:
+	case sort_algw_t::MAX_WEIGHT:
 		order = sort_by_weight( ltf, o2n);
 		break;
 
 	default:
-		LOG_ERROR("bizarre algorithm- GraphFastRootSort_W<Graph_t>::new_order(...), exiting...");
+		LOG_ERROR("unknown algorithm - GraphFastRootSort_W<GraphW_t>::new_order(...)");
+		LOG_ERROR("exiting...");
 		exit(-1);
 	}
 	return order;
@@ -175,7 +177,7 @@ vint GraphFastRootSort_W<GraphW_t>::sort_by_weight(bool ltf, bool o2n) {
 
 	vint order;
 	const int NV = gw.number_of_vertices();
-	_mypt::fill_vertices(order, NV);
+	ptype::fill_vertices(order, NV);
 	
 	if (ltf) {
 		com::has_smaller_val<int, std::vector<typename GraphW_t::_wt>> pred(gw.get_weights());
