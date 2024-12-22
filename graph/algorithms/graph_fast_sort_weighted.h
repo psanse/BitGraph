@@ -1,6 +1,9 @@
-//graph_fast_sort_weighted.h: header for GraphFastRootSort_W_W class which sorts weighted graphs by different criteria
-//date: 12/03/2021
-//authors: pss
+/*
+* graph_fast_sort_weighted.h: header for GraphFastRootSort_W_W class which sorts weighted graphs by different criteria
+* @created 12/03/21
+* @last_update 20/12/24
+* @dev pss
+*/
 
 #ifndef __GRAPH_FAST_SORT_WEIGHTED_H__
 #define __GRAPH_FAST_SORT_WEIGHTED_H__
@@ -17,7 +20,7 @@ using namespace std;
 ///////////////////////////
 //
 // class GraphFastRootSort_W
-// (sorting for vertex weighted graphs)
+// (ordering of vertices for vertex weighted graphs)
 //
 ////////////////////////////
 
