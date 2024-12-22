@@ -26,10 +26,11 @@ class GraphFastRootSort_W: public GraphFastRootSort <typename GraphW_t::_gt>{
 
 public:
 	using basic_type = GraphW_t;									//weighted graph type
-	using type = GraphFastRootSort_W<GraphW_t>;	
+	using type = GraphFastRootSort_W<GraphW_t>;						//own type	
 	using ugtype = typename basic_type::_gt;						//non-weighted graph type	
 	using ptype = typename GraphFastRootSort <ugtype>;				//parent type
-	
+	using wtype = typename GraphW_t::_wt;							//weight type
+
 	enum class sort_algw_t { MAX_WEIGHT = 100 };					//sorting algorithms for weighted graphs	
 
 ////////////////
@@ -50,7 +51,7 @@ public:
 	* @param d ptr to decode object to store the ordering
 	* @comments only for simple undirected graphs with no weights
 	*/
-	int  reorder	(const vint& new_order, GraphW_t& gn, Decode* d = NULL);		// (new) interface for the framework- TODO@build an in-place reordering as in the old GraphSort 	
+	int  reorder	(const vint& new_order, GraphW_t& gn, Decode* d = nullptr);		// (new) interface for the framework- TODO@build an in-place reordering as in the old GraphSort 	
 
 public:
 ////////////////////////
@@ -64,8 +65,12 @@ public:
 	GraphFastRootSort_W& operator=(GraphFastRootSort_W&&) = delete;
 
 private:
-	////////////////
-	//sorting 
+	/*
+	* @brief non-degenerate maximum weight sorting of vertices 
+	* @param ltf last to first (MAXIMUM WEIGHT LAST)
+	* @param o2n old to new
+	* @comments uses stable sort
+	*/
 	vint sort_by_weight(bool ltf = true, bool o2n = true);
 
 ////////////////
@@ -108,21 +113,16 @@ vint GraphFastRootSort_W<GraphW_t>::new_order (int alg, bool ltf, bool o2n){
 template <class GraphW_t >
 inline
 int GraphFastRootSort_W<GraphW_t>::reorder(const vint& new_order, GraphW_t& gn, Decode* d) {
-	/////////////////////
-	// EXPERIMENTAL-ONLY FOR SIMPLE GRAPHS
-	//
-	// PARAMS
-	// @new_order: MUST BE mapping [OLD]->[NEW]!
-
+	
 	int NV = gw.number_of_vertices();
-	gn.init(NV, 1.0);												//assigns unit weights- TODO@CHECK BEST INIT STRATEGY						
+	gn.init(NV, 1.0);												//assigns unit weights(1.0) 						
 	gn.set_name(gw.get_name(), false /* no path separation */);
 	gn.set_path(gw.get_path());
 
-	//only for undirected graphs
+	//generate isomorphism (only for undirected graphs)
 	for (int i = 0; i < NV - 1; i++) {
 		for (int j = i + 1; j < NV; j++) {
-			if (gw.is_edge(i, j)) {									//in O(log) for sparse graphs, should be specialized for that case
+			if (gw.is_edge(i, j)) {									//is_edge is in O(log) for sparse graphs, should be specialized for that case
 				//switch edges according to new numbering
 				gn.add_edge(new_order[i], new_order[j]);
 			}
@@ -131,9 +131,9 @@ int GraphFastRootSort_W<GraphW_t>::reorder(const vint& new_order, GraphW_t& gn, 
 
 	///////////////
 	//stores decoding information [NEW]->[OLD]
-	if (d != NULL) {
-		vint aux(new_order);
-		Decode::reverse_in_place(aux);								//maps [NEW] to [OLD]		
+	if (d != nullptr) {
+		vint aux(new_order);										//new_order is [OLD]->[NEW]
+		Decode::reverse_in_place(aux);								//aux is [NEW] to [OLD]		
 		d->insert_ordering(aux);
 	}
 
@@ -168,35 +168,26 @@ int GraphFastRootSort_W<GraphW_t>::reorder(const vint& new_order, GraphW_t& gn, 
 	return 0;
 }
 
-
 template <class GraphW_t >
 inline
 vint GraphFastRootSort_W<GraphW_t>::sort_by_weight(bool ltf, bool o2n) {
-	/////////////////////
-	// Orders vertices by weights (absolute stable ordering)
-	// Default is FIRST TO LAST, e.g., @lft is MAXIMUM WEIGHT LAST
-	// 
-	// 
-	// RETURNS a valid ordering O[OLD_INDEX]=NEW_INDEX
-
+	
 	vint order;
 	const int NV = gw.number_of_vertices();
 	ptype::fill_vertices(order, NV);
 	
 	if (ltf) {
-		com::has_smaller_val<int, std::vector<typename GraphW_t::_wt>> pred(gw.get_weights());
+		com::has_smaller_val< int, std::vector<wtype> > pred(gw.get_weights());
 		std::stable_sort(order.begin(), order.end(), pred);
 	}
 	else {
-		com::has_greater_val<int, std::vector<typename GraphW_t::_wt>> pred(gw.get_weights());
+		com::has_greater_val< int, std::vector<wtype> > pred(gw.get_weights());
 		std::stable_sort(order.begin(), order.end(), pred);
 	}
 	   
 	if (o2n) { Decode::reverse_in_place(order); }
 	return order;
 }
-
-
 
 #endif
 

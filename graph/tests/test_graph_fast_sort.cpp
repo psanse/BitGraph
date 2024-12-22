@@ -70,7 +70,6 @@ TEST(GraphFastRootSort_W,basic) {
 	com::stl::print_collection(order, cout, true);
 #endif
 
-
 //////////////////
 //SORT BY WEIGHT (non-increasing)
 //////////////////
