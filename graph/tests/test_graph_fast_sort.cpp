@@ -2,23 +2,22 @@
 * graph_fast_sort_test.cpp unit tests for graph_fast_sort.h
 * @date 
 * @last_update 20/12/24
+* @logger_level determined by CMake
 * @TODO - REFACTOR TESTS!, logs etc.. (20/12/2024)
-* @TODO - Check logger! (20/12/2024)
 */ 
-
-//#define LOGGER_DEBUG_LEVEL		//all except DEBUG (second priority) -  CMake option by default
-//constexpr int LOGGER_DEBUG_LEVEL = 0;
 
 #include "../algorithms/graph_fast_sort.h"
 #include "../algorithms/graph_fast_sort_weighted.h"
 #include "../graph.h"
 #include "gtest/gtest.h"
 #include <iostream>
-//#include "../algorithms/graph_sort.h"
 #include "utils/common.h"
 #include "utils/logger.h"
 #include "utils/file.h"
 #include <string>
+
+//#include "../algorithms/graph_sort.h"							//deprecated old code
+//#include "../algorithms/graph_sort_weighted.h"				//deprecated old code
 
 using namespace std;
 //using namespace gbbs;
@@ -28,7 +27,6 @@ using namespace std;
 
 #define TEST_GRAPH_FAST_SORT_STEP_BY_STEP				//DEF-OFF
 #define print_graph_fast_sort_logs
-
 
 TEST(GraphFastRootSort_W,basic) {
 
