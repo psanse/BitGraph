@@ -1,4 +1,3 @@
-
 /*
 * graph_fast_sort_test.cpp unit tests for graph_fast_sort.h
 * @date 
@@ -6,6 +5,9 @@
 * @TODO - REFACTOR TESTS!, logs etc.. (20/12/2024)
 * @TODO - Check logger! (20/12/2024)
 */ 
+
+//#define LOGGER_DEBUG_LEVEL		//all except DEBUG (second priority) -  CMake option by default
+//constexpr int LOGGER_DEBUG_LEVEL = 0;
 
 #include "../algorithms/graph_fast_sort.h"
 #include "../algorithms/graph_fast_sort_weighted.h"

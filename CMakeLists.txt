@@ -31,6 +31,24 @@ endif()
 add_definitions (-D_PATH_FOR_COPT_TESTS_DATA_IN_SRC_CODE=\"${CMAKE_SOURCE_DIR}/copt/data\") 
 add_definitions (-D_PATH_FOR_GRAPH_TESTS_DATA_IN_SRC_CODE=\"${CMAKE_SOURCE_DIR}/graph/data\") 
 
+#logger level (see utils/logger.h) configurable from CMake at run time
+#to note: there is no checking of the value if it is not set from the CMake GUI
+set(LOG_LEVEL "debug" CACHE STRING "LOG_LEVEL chosen in CMake at run time")
+set_property(CACHE LOG_LEVEL PROPERTY STRINGS debug verbose error)
+message("LOGGER_LEVEL='${LOG_LEVEL}'")
+
+if( ${LOG_LEVEL} STREQUAL "debug")
+add_definitions(-DLOGGER_DEBUG_LEVEL)				#all messages (logger.h) 
+endif()
+
+if( ${LOG_LEVEL}  STREQUAL "verbose")
+add_definitions(-DLOGGER_VERBOSE_LEVEL)				#all messages (logger.h)  	
+endif()
+
+if( ${LOG_LEVEL}  STREQUAL "error")
+add_definitions(-DLOGGER_ERROR_LEVEL)				#all messages (logger.h)  	
+endif()
+
 #############
 #
 # OpenMP (VSTUDIO)

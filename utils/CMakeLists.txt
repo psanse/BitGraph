@@ -18,25 +18,6 @@ info/info_clq.cpp                                   #move to clq algorithms and 
 ${useful_headers_for_IDE}
 )
 
-#make logger level configurable from CMake at run time
-#to note: there is no checking of the value if it is not set from the CMake GUI
-set(LOG_LEVEL "debug" CACHE STRING "LOG_LEVEL chosen in CMake at run time")
-set_property(CACHE LOG_LEVEL PROPERTY STRINGS debug verbose error)
-message("LOGGER_LEVEL='${LOG_LEVEL}'")
-
-if( ${LOG_LEVEL} STREQUAL "debug")
-add_definitions(-DLOGGER_DEBUG_LEVEL)				#all messages (logger.h)  	
-endif()
-
-if( ${LOG_LEVEL}  STREQUAL "verbose")
-add_definitions(-DLOGGER_VERBOSE_LEVEL)				#all messages (logger.h)  	
-endif()
-
-if( ${LOG_LEVEL}  STREQUAL "error")
-add_definitions(-DLOGGER_ERROR_LEVEL)				#all messages (logger.h)  	
-endif()
-
-
 # Make sure the compiler can find include files for our utils library
 # when other libraries or executables link to bitscan
 target_include_directories (utils PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})

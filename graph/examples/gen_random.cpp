@@ -94,10 +94,10 @@ int main(int argc, char** argv){
 
 	LOG_INFO("*******************************");
 	LOG_INFO("Generating random graph benchmark");
-	LOG_INFO("PATH: " << str_path_benchmark);
+	LOG_INFO("PATH: ", str_path_benchmark);
 	sstr = std::stringstream();
 	sstr << input;
-	LOG_INFO(sstr.str());	
+	LOGG_INFO(sstr.str());	
 	LOG_INFO("*******************************");
 	/////////////////////////////////////////////////////////////////////////
 		
