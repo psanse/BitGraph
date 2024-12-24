@@ -56,8 +56,11 @@ public:
 	// drivers - the real public interface
 	///////////////
 	/*
-	* @brief computes a new ordering in [OLD]->[NEW] format
+	* @brief computes a new ordering 
 	* @param alg sorting algorithm
+	* @param ltf last to first ordering
+	* @param o2n old to new ordering
+	* @return new ordering in [OLD]->[NEW] format
 	*/
 	virtual vint new_order(int alg, bool ltf = true, bool o2n = true);
 
@@ -87,7 +90,8 @@ public:
 	GraphFastRootSort(GraphFastRootSort&&) = delete;
 	GraphFastRootSort& operator=(GraphFastRootSort&&) = delete;
 
-	const vint& get_degree() const { return nb_neigh; }
+	const vint& get_degree() const { return nb_neigh_; }
+	const vint& get_support() const { return deg_neigh_; }
 
 	/////////////////////////
 	// useful operations	
@@ -103,22 +107,23 @@ public:
 	void fill_stack(vint& nodes) { nodes_ = nodes;}
 	
 	/*
-	* @brief non-degenerate ordering
+	* @brief computes a degree non-degenerate ordering in @nodes_, format [NEW]->[OLD]
 	* @param rev reverse ordering if TRUE
 	* @comments requires prior computation of support and deg
-	* @comments	internally sets node stack 1...NV 
+	* @comments	initially sets @nodes_ to 1...NV 	
+	* @return new ordering in [NEW]->[OLD] format
 	*/
-	int  sort_non_increasing_deg(bool rev=false);						
-	int  sort_non_decreasing_deg(bool rev=false);
-	int  sort_non_increasing_deg_with_support_tb(bool rev=false);
-	int  sort_non_decreasing_deg_with_support_tb(bool rev=false);
+	vint&  sort_non_increasing_deg(bool rev=false);						
+	vint&  sort_non_decreasing_deg(bool rev=false);
+	vint&  sort_non_increasing_deg_with_support_tb(bool rev=false);
+	vint&  sort_non_decreasing_deg_with_support_tb(bool rev=false);
 		
 	/*
-	* @brief degenerate ordering
+	* @brief degenerate degree ordering
 	* @comments deg info is not restored after the call
 	*/
-	int  sort_degen_non_decreasing_degree(bool rev=false);				
-	int  sort_degen_non_increasing_degree(bool rev=false);				
+	vint&  sort_degen_non_decreasing_degree(bool rev=false);				
+	vint&  sort_degen_non_increasing_degree(bool rev=false);				
 	
 	/*
 	*@brief composite (min) degenerate ordering on a prior given ordering in nodes_ 
@@ -127,8 +132,8 @@ public:
 	*@TODO - set initial ordering as a parameter
 	*@TODO - create unique function with bool param 
 	*/
-	int sort_degen_composite_non_decreasing_degree( bool rev = false);		
-	int sort_degen_composite_non_increasing_degree( bool rev = false);	
+	vint& sort_degen_composite_non_decreasing_degree( bool rev = false);		
+	vint& sort_degen_composite_non_increasing_degree( bool rev = false);	
 		
 	//TODO - substitute original primitives for n=0. n can be positive or negative (09/12/2020)
 	// int sort_non_increasing_deg (vint& rhs, vint& lhs,  bool rev = false);
@@ -247,7 +252,7 @@ vint GraphFastRootSort<Graph_t>::new_order (int alg, bool ltf, bool o2n)
 
 template<class Graph_t>
 inline
-int GraphFastRootSort<Graph_t>::sort_degen_non_decreasing_degree(bool rev){
+vint& GraphFastRootSort<Graph_t>::sort_degen_non_decreasing_degree(bool rev){
 	node_active_state_.set_bit(0, NV_-1);					//all active, pending to be ordered
 	int min_deg=NV_, v=EMPTY_ELEM;
 	nodes_.clear();
@@ -275,12 +280,12 @@ int GraphFastRootSort<Graph_t>::sort_degen_non_decreasing_degree(bool rev){
 	if(rev){
 		std::reverse(nodes_.begin(), nodes_.end());
 	}
-	return 0;
+	return nodes_;
 }
 
 template<class Graph_t>
 inline
-int GraphFastRootSort<Graph_t>::sort_degen_non_increasing_degree(bool rev){
+vint& GraphFastRootSort<Graph_t>::sort_degen_non_increasing_degree(bool rev){
 	node_active_state_.set_bit(0, NV_-1);											//all active, pending to be ordered
 	int max_deg=0, v=EMPTY_ELEM;
 	nodes_.clear();
@@ -308,11 +313,11 @@ int GraphFastRootSort<Graph_t>::sort_degen_non_increasing_degree(bool rev){
 	if(rev){
 		std::reverse(nodes_.begin(), nodes_.end());
 	}
-	return 0;
+	return nodes_;
 }
 
 template<class Graph_t>
-inline int GraphFastRootSort<Graph_t>::sort_degen_composite_non_decreasing_degree(bool rev)
+inline vint& GraphFastRootSort<Graph_t>::sort_degen_composite_non_decreasing_degree(bool rev)
 {
 	node_active_state_.set_bit(0, NV_ - 1);			//all active, pending to be ordered
 	int min_deg = NV_, v = EMPTY_ELEM;
@@ -348,11 +353,11 @@ inline int GraphFastRootSort<Graph_t>::sort_degen_composite_non_decreasing_degre
 	if (rev) {
 		std::reverse(nodes_.begin(), nodes_.end());
 	}
-	return 0;
+	return nodes_;
 }
 
 template<class Graph_t>
-inline int GraphFastRootSort<Graph_t>::sort_degen_composite_non_increasing_degree(bool rev)
+inline vint& GraphFastRootSort<Graph_t>::sort_degen_composite_non_increasing_degree(bool rev)
 {
 	node_active_state_.set_bit(0, NV_ - 1);											//all active, pending to be ordered
 	int max_deg = 0, v = EMPTY_ELEM;
@@ -388,7 +393,7 @@ inline int GraphFastRootSort<Graph_t>::sort_degen_composite_non_increasing_degre
 	if (rev) {
 		std::reverse(nodes_.begin(), nodes_.end());
 	}
-	return 0;
+	return nodes_;
 }
 
 
@@ -404,20 +409,20 @@ void GraphFastRootSort<Graph_t>::fill_stack_root(){
 
 template<class Graph_t>
 inline
-int GraphFastRootSort<Graph_t>::sort_non_increasing_deg(bool rev){
+vint& GraphFastRootSort<Graph_t>::sort_non_increasing_deg(bool rev){
 	fill_stack_root();
 	com::has_greater_val<int, vint> pred(nb_neigh_);
 	std::stable_sort(nodes_.begin(),  nodes_.end(), pred);
 	if(rev){
 		std::reverse(nodes_.begin(), nodes_.end());
 	}
-	return 0;
+	return nodes_;
 }
 
 
 template<class Graph_t>
 inline
-int GraphFastRootSort<Graph_t>::sort_non_decreasing_deg(bool rev){
+vint& GraphFastRootSort<Graph_t>::sort_non_decreasing_deg(bool rev){
 	fill_stack_root();
 	com::has_smaller_val<int, vint> pred(nb_neigh_);
 	std::stable_sort(nodes_.begin(),  nodes_.end(), pred);
@@ -425,12 +430,12 @@ int GraphFastRootSort<Graph_t>::sort_non_decreasing_deg(bool rev){
 	if(rev){
 		std::reverse(nodes_.begin(), nodes_.end());
 	}
-	return 0;
+	return nodes_;
 }
 
 template<class Graph_t>
 inline
-int GraphFastRootSort<Graph_t>::sort_non_increasing_deg_with_support_tb(bool rev ){
+vint& GraphFastRootSort<Graph_t>::sort_non_increasing_deg_with_support_tb(bool rev ){
 	fill_stack_root();
 	com::has_greater_val_with_tb<int, vint> pred(nb_neigh_, deg_neigh_);
 	std::stable_sort(nodes_.begin(),  nodes_.end(), pred);
@@ -438,12 +443,12 @@ int GraphFastRootSort<Graph_t>::sort_non_increasing_deg_with_support_tb(bool rev
 	if(rev){
 		std::reverse(nodes_.begin(), nodes_.end());
 	}
-	return 0;
+	return nodes_;
 }
 
 template<class Graph_t>
 inline
-int GraphFastRootSort<Graph_t>::sort_non_decreasing_deg_with_support_tb(bool rev){
+vint& GraphFastRootSort<Graph_t>::sort_non_decreasing_deg_with_support_tb(bool rev){
 	fill_stack_root();
 	com::has_smaller_val_with_tb<int, vint> pred(nb_neigh_, deg_neigh_);
 	std::stable_sort(nodes_.begin(),  nodes_.end(), pred);
@@ -451,7 +456,7 @@ int GraphFastRootSort<Graph_t>::sort_non_decreasing_deg_with_support_tb(bool rev
 	if(rev){
 		std::reverse(nodes_.begin(), nodes_.end());
 	}
-	return 0;
+	return nodes_;
 }
 
 template<class Graph_t>
