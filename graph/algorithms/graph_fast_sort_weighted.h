@@ -59,7 +59,7 @@ public:
 public:
 ////////////////////////
 //construction / allocation
-	GraphFastRootSort_W(GraphW_t& gwout): gw(gwout), GraphFastRootSort<typename GraphW_t::_gt>(gwout.graph()){ }
+	GraphFastRootSort_W(GraphW_t& gw): gw_(gw), GraphFastRootSort<typename GraphW_t::_gt>(gw.graph()){ }
 	~GraphFastRootSort_W() = default;
 
 	GraphFastRootSort_W	(const GraphFastRootSort_W&) = delete;
@@ -67,6 +67,8 @@ public:
 	GraphFastRootSort_W	(GraphFastRootSort_W&&) = delete;
 	GraphFastRootSort_W& operator=(GraphFastRootSort_W&&) = delete;
 
+	const GraphW_t& get_graph() const { return gw_; }
+	
 private:
 	/*
 	* @brief non-degenerate maximum weight sorting of vertices 
@@ -79,7 +81,7 @@ private:
 ////////////////
 // data members	
 private:
-	const GraphW_t& gw;
+	const GraphW_t& gw_;
 };
 
 template <class GraphW_t >
@@ -117,15 +119,15 @@ template <class GraphW_t >
 inline
 int GraphFastRootSort_W<GraphW_t>::reorder(const vint& new_order, GraphW_t& gn, Decode* d) {
 	
-	int NV = gw.number_of_vertices();
+	int NV = gw_.number_of_vertices();
 	gn.init(NV, 1.0);												//assigns unit weights(1.0) 						
-	gn.set_name(gw.get_name(), false /* no path separation */);
-	gn.set_path(gw.get_path());
+	gn.set_name(gw_.get_name(), false /* no path separation */);
+	gn.set_path(gw_.get_path());
 
 	//generate isomorphism (only for undirected graphs)
 	for (int i = 0; i < NV - 1; i++) {
 		for (int j = i + 1; j < NV; j++) {
-			if (gw.is_edge(i, j)) {									//is_edge is in O(log) for sparse graphs, should be specialized for that case
+			if (gw_.is_edge(i, j)) {									//is_edge is in O(log) for sparse graphs, should be specialized for that case
 				//switch edges according to new numbering
 				gn.add_edge(new_order[i], new_order[j]);
 			}
@@ -143,7 +145,7 @@ int GraphFastRootSort_W<GraphW_t>::reorder(const vint& new_order, GraphW_t& gn, 
 	/////////////////////
 	//weights (vertices) -update
 	for (int i = 0; i <NV; i++) {
-		gn.set_w(new_order[i], gw.get_w(i));
+		gn.set_w(new_order[i], gw_.get_w(i));
 	}
 	
 	/////////////////////
@@ -176,15 +178,15 @@ inline
 vint GraphFastRootSort_W<GraphW_t>::sort_by_weight(bool ltf, bool o2n) {
 	
 	vint order;
-	const int NV = gw.number_of_vertices();
+	const int NV = gw_.number_of_vertices();
 	ptype::fill_vertices(order, NV);
 	
 	if (ltf) {
-		com::has_smaller_val< int, std::vector<wtype> > pred(gw.get_weights());
+		com::has_smaller_val< int, std::vector<wtype> > pred(gw_.get_weights());
 		std::stable_sort(order.begin(), order.end(), pred);
 	}
 	else {
-		com::has_greater_val< int, std::vector<wtype> > pred(gw.get_weights());
+		com::has_greater_val< int, std::vector<wtype> > pred(gw_.get_weights());
 		std::stable_sort(order.begin(), order.end(), pred);
 	}
 	   

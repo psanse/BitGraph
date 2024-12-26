@@ -56,7 +56,7 @@ public:
 	// drivers - the real public interface
 	///////////////
 	/*
-	* @brief computes a new ordering 
+	* @brief Computes a new ordering 
 	* @param alg sorting algorithm
 	* @param ltf last to first ordering
 	* @param o2n old to new ordering
@@ -65,9 +65,9 @@ public:
 	virtual vint new_order(int alg, bool ltf = true, bool o2n = true);
 
 	/*
-	* @brief determines an isomorphism for a given ordering
+	* @brief Determines an isomorphism for a given ordering
 	* @param gn output isomorphic graph
-	* @param new_order ordering in [OLD]->[NEW] format
+	* @param New_order ordering in [OLD]->[NEW] format
 	* @param d ptr to decode object to store the ordering
 	* @comments only for simple undirected graphs with no weights
 	*/
@@ -92,38 +92,43 @@ public:
 
 	const vint& get_degree() const { return nb_neigh_; }
 	const vint& get_support() const { return deg_neigh_; }
+	const Graph_t& get_graph() const { return g_; }
+	std::size_t number_of_vertices() const { return NV_; }
 
 	/////////////////////////
 	// useful operations
 
 	/*
-	*@brief sets trivial ordering [1..NV] in @nodes_
+	* @brief Sets trivial ordering [1..NV] in @nodes_,
+	*		 a starting point for all sorting primitives	
+	*		
 	*/
 	void set_ordering();	
 
 	/*
-	* @brief sets a given ordering in [OLD]->[NEW] format in @nodes_
+	* @brief Sets an ordering in [OLD]->[NEW] format in @nodes_.
+	*		 This will be the given ordering in composite orderings
 	*/
 	void set_ordering(vint& nodes) { nodes_ = nodes; }
 
 	/*
-	*@brief computes the degree of each vertex
+	* @brief Computes the degree of each vertex
 	*/ 
 	const vint& compute_deg_root();											
 
 	/*
-	* @brief computes support for all vertices (sum of the number of neighbors)
-	* @comments may include the same vertex twice	 
+	* @brief Computes support for all vertices (sum of the number of neighbors)
+	* @comments May include the same vertex twice	 
 	*/
 	const vint& compute_support_root();									
 		
 	
 	/*
-	* @brief computes a degree non-degenerate ordering in @nodes_, format [NEW]->[OLD]
+	* @brief Computes a degree non-degenerate ordering in @nodes_, format [NEW]->[OLD]
 	* @param rev reverse ordering if TRUE
 	* @comment1 requires prior computation of support and deg
 	* @comment2	initially sets @nodes_ to 1...NV
-	* @return new ordering in [NEW]->[OLD] format
+	* @return New ordering in [NEW]->[OLD] format
 	*/
 	const vint&  sort_non_increasing_deg(bool rev=false);						
 	const vint&  sort_non_decreasing_deg(bool rev=false);
@@ -131,9 +136,9 @@ public:
 	const vint&  sort_non_decreasing_deg_with_support_tb(bool rev=false);
 		
 	/*
-	* @brief degenerate degree ordering
+	* @brief Degenerate degree ordering
 	* @comments deg info is not restored after the call
-	* @return new ordering in [NEW]->[OLD] format
+	* @return New ordering in [NEW]->[OLD] format
 	*/
 	const vint&  sort_degen_non_decreasing_degree(bool rev=false);				
 	const vint&  sort_degen_non_increasing_degree(bool rev=false);				
@@ -143,7 +148,7 @@ public:
 	*@param rev reverse ordering if TRUE
 	*@comments the vertex ordering has to be in @nodes prior to the call 
 	*@TODO - create unique function with bool param 
-	*@return new ordering in [NEW]->[OLD] format
+	*@return New ordering in [NEW]->[OLD] format
 	*/
 	const vint& sort_degen_composite_non_decreasing_degree( bool rev = false);		
 	const vint& sort_degen_composite_non_increasing_degree( bool rev = false);	
@@ -165,7 +170,7 @@ public:
 protected:
 
 	/*
-	* @brief restores context for NV_ vertices
+	* @brief Restores context for NV_ vertices
 	*/
 	int reset();
 	
@@ -182,6 +187,7 @@ protected:
 	bb_type node_active_state_;								//bitset for active vertices: 1bit-active, 0bit-passive. Used in degenerate orderings	
 	vint nodes_;											//stores the ordering
 };
+/////////////////////////////////////////////////////////////////////////////////////////////
 
 template<class Graph_t>
 inline

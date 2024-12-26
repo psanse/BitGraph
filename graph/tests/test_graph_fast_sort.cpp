@@ -1,9 +1,9 @@
 /*
-* graph_fast_sort_test.cpp unit tests for graph_fast_sort.h
-* @date 
+* test_graph_fast_sort.cpp Unit tests for Class GraphFastRootSort for non-weighted graphs (graph_fast_sort.h)
+* @created  
 * @last_update 20/12/24
 * @logger_level determined by CMake
-* @TODO - REFACTOR TESTS!, logs etc.. (20/12/2024)
+* @TODO - CHECK AND REFACTOR TESTS  (20/12/2024)
 */ 
 
 #include "../algorithms/graph_fast_sort.h"
@@ -16,17 +16,10 @@
 #include "utils/file.h"
 #include <string>
 
-//#include "../algorithms/graph_sort.h"							//deprecated old code
-//#include "../algorithms/graph_sort_weighted.h"				//deprecated old code
-
 using namespace std;
-//using namespace gbbs;
 
-#define PATH		 "C:/Users/pablo/Desktop/dimacs/"
-#define LOG_FILE	 "C:/Users/pablo/Desktop/log.txt"
+#define PATH_GFS_TESTS_DATA	 PATH_GRAPH_TESTS_CMAKE_SRC_CODE		//fixed in CMakeLists.txt
 
-#define TEST_GRAPH_FAST_SORT_STEP_BY_STEP				//DEF-OFF
-#define print_graph_fast_sort_logs
 
 class GraphFastRootSortTest : public ::testing::Test {
 protected:
@@ -42,6 +35,18 @@ protected:
 	const int NV = 6;
 	ugraph ug;
 };
+
+TEST_F(GraphFastRootSortTest, constructor) {
+	using gt = GraphFastRootSort<ugraph>;
+	gt sorter(ug);
+
+	//unweighted part
+	auto g = sorter.get_graph();
+	EXPECT_EQ(sorter.number_of_vertices(), g.number_of_vertices());
+	EXPECT_EQ(NV, g.number_of_vertices());
+
+	//...
+}
 
 TEST_F(GraphFastRootSortTest, compute_deg_root) {
 
@@ -299,129 +304,49 @@ TEST_F(GraphFastRootSortTest, sort_degen_composite_non_increasing_degree_ltf) {
 	sorter.print(static_cast<int>(gt::sort_print_t::PRINT_NODES), cout);*/
 }
 
-//////////////////////////////////////////////////////////////
-
-//TODO - CHECK THESE TESTS (20/12/24)
-
-TEST(Fast_Sorting, DISABLED_dimacs) {
-	LOG_INFO("Fast_Sorting: dimacs-------------------------");
-	string name = "brock200_2.clq";
-	string fullname = PATH;
-	fullname += name;
-
-	cout << fullname << endl;
-	ugraph ug(fullname);
-
+TEST(GraphFastRootSort, new_order) {
+	
 	using gt = GraphFastRootSort<ugraph>;
-	gt cfs(ug);
+	string name = "brock200_2.clq";
+	name.insert(0, PATH_GFS_TESTS_DATA);
+	
+	ugraph ug(name);
+	gt sorter(ug);
+	
+	//degenerate min degree ordering
+	vint mapping = sorter.new_order(static_cast<int>(gt::sort_alg_t::MIN_DEGEN), true, true);
 
-	vint otn_minw = cfs.new_order((int)gt::sort_alg_t::MIN_DEGEN, true);
-	cout << "MAPPING MIN_WIDTH_DEGEN LAST TO FIRST-old to new" << endl;
-	com::stl::print_collection<vint>(otn_minw, cout, true);										//checked with framework for a number  of graphs!
+	//////////////////////////////////////////
+	EXPECT_EQ(mapping[0], 191 ); 
+	EXPECT_EQ(mapping[1], 127);
+	EXPECT_EQ(mapping[199], 0);
+	//////////////////////////////////////////
+	
+	//I/O
+	//cout <<"degenerate minimum degree ordering - format last-to-first and old.to-new" << endl;
+	//sorter.print(static_cast<int>(gt::sort_print_t::PRINT_NODES), cout);
 
-	vint otn_minwc = cfs.new_order((int)gt::sort_alg_t::MIN_DEGEN_COMPO, true);
-	cout << "MAPPING MIN_WIDTH_DEGEN_COMPOSITE LAST TO FIRST-old to new" << endl;
-	com::stl::print_collection<vint>(otn_minwc, cout, true);
 
+	//composite ordering based on the previous ordering
+	vint mapping_compo = sorter.new_order(static_cast<int>(gt::sort_alg_t::MIN_DEGEN_COMPO), true, true);		
+ 
+	//////////////////////////////////////////
+	EXPECT_EQ(mapping_compo[0], 190);
+	EXPECT_EQ(mapping_compo[1], 126);
+	EXPECT_EQ(mapping_compo[199], 5);
+	//////////////////////////////////////////
 
-	LOG_INFO("Fast_Sorting: END dimacs-------------------");
-#ifdef	TEST_GRAPH_FAST_SORT_STEP_BY_STEP
-	LOG_ERROR("press any key to continue");
-	cin.get();
-#endif
-
+	//I/O
+	//cout <<"composite degenerate minimum degree ordering - format last-to-first and old-to-new" << endl;
+	//sorter.print(static_cast<int>(gt::sort_print_t::PRINT_NODES), cout);
 }
 
-TEST(GraphFastRootSort_W,basic) {
-
-	LOG_INFO("GraphFastRootSort_W: basic-----------------------");
-	const int NV = 6;
-	ugraph_w ugw(NV);		//unti weights (1.0) to all vertices
-
-	ugw.add_edge(1, 2);				
-	ugw.add_edge(1, 5);			
-	ugw.add_edge(2, 4);
-	ugw.add_edge(2, 5);
-	ugw.add_edge(3, 5);
-
-	ugw.set_w(0, 4.0);
-	ugw.set_w(1, 5.0);
-	ugw.set_w(2, 3.0);
-
-	using gt = GraphFastRootSort_W<ugraph_w>;
-	gt gf(ugw);
-
-//////////////////
-//SORT BY DEGREE
-//////////////////
-	vint order= gf.new_order((int)gt::ptype::sort_alg_t::MIN, false /*f2l*/, false /*n2o*/);
-	
-	//deg(5)=3,  deg(2)=3, deg(1)=2,  deg(3)=1, deg(4)=1, deg(0)=0
-	vint order_exp;
-	order_exp.push_back(0);
-	order_exp.push_back(3);
-	order_exp.push_back(4);
-	order_exp.push_back(1);
-	order_exp.push_back(2);
-	order_exp.push_back(5);
-
-	//////////////////
-	//TEST
-	EXPECT_EQ(order_exp, order);
-
-	   	
-#ifdef  print_graph_fast_sort_logs
-	com::stl::print_collection(order, cout, true);
-#endif
-
-//////////////////
-//SORT BY WEIGHT (non-increasing)
-//////////////////
-	//w(1)=5.0,  w(0)=4.0, w(2)=3.0,  w(3)=1.0, w(4)=1.0, w(5)=1.0
-	order = gf.new_order((int)gt::sort_algw_t::MAX_WEIGHT, false /*f2l*/, false /*n2o*/);			
-	order_exp.clear();
-	order_exp.push_back(1);
-	order_exp.push_back(0);
-	order_exp.push_back(2);
-	order_exp.push_back(3);
-	order_exp.push_back(4);
-	order_exp.push_back(5);
-
-	//////////////////
-	//TEST
-	EXPECT_EQ(order_exp, order);
-
-#ifdef  print_graph_fast_sort_logs
-	com::stl::print_collection(order, cout, true);
-#endif		  
-	
-////////////////////
-//REORDER  (by non-increasing weight)
-//////////////////
-	ugraph_w ugw_sorted;
-	gf.reorder(order, ugw_sorted);
-
-	//////////////////
-	//TEST
-	EXPECT_TRUE(5, ugw_sorted.get_w(0));
-	EXPECT_TRUE(4, ugw_sorted.get_w(1));
-	EXPECT_TRUE(3, ugw_sorted.get_w(2));
-	EXPECT_TRUE(1, ugw_sorted.get_w(3));
-	EXPECT_TRUE(1, ugw_sorted.get_w(4));
-	EXPECT_TRUE(1, ugw_sorted.get_w(5));
-
-#ifdef  print_graph_fast_sort_logs
-	ugw_sorted.print_weights();
-#endif
-
-
-	LOG_INFO("GraphFastRootSort_W: END basic-------------------");
-#ifdef	TEST_GRAPH_FAST_SORT_STEP_BY_STEP
-	LOG_ERROR("press any key to continue");
-	cin.get();
-#endif
-}
-
+////////////////////////////////////
+// 
+// TESTS for sorting subgraphs
+// (experimental)
+//
+////////////////////////////////////
 
 TEST(Fast_Sorting_stateless, SORT_SUBGRAPH_DEG) {
 ///////////////
@@ -458,7 +383,7 @@ TEST(Fast_Sorting_stateless, SORT_SUBGRAPH_DEG) {
 		
 
 	LOG_INFO("Fast_Sorting_stateless: END SORT_SUBGRAPH_DEG-------------------");
-#ifdef	TEST_GRAPH_FAST_SORT_STEP_BY_STEP
+#ifdef	TEST_GFS_STEP_BY_STEP
 	LOG_ERROR("press any key to continue");
 	cin.get();
 #endif
@@ -473,7 +398,7 @@ TEST(Fast_Sorting, gen_min_width_tb_support_graphs) {
 	//string name = "keller5.clq";
 	string name = "C250.9.clq";
 	
-	string fullname = PATH;
+	string fullname = PATH_GFS_TESTS_DATA;
 	fullname += name;
 
 	cout << fullname << endl;
@@ -493,7 +418,7 @@ TEST(Fast_Sorting, gen_min_width_tb_support_graphs) {
 	ugo.write_dimacs(FILE_LOG((ugo.get_name() + "s").c_str(), WRITE));
 
 	LOG_INFO("Fast_Sorting: END gen_min_width_tb_support_graphs-------------------");
-#ifdef	TEST_GRAPH_FAST_SORT_STEP_BY_STEP
+#ifdef	TEST_GFS_STEP_BY_STEP
 	LOG_ERROR("press any key to continue");
 	cin.get();
 #endif

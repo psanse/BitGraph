@@ -28,9 +28,19 @@ endif()
 # USEFUL GLOBAL DEFINITIONS
 # (use inside the code)
 #############
-add_definitions (-D_PATH_FOR_COPT_TESTS_DATA_IN_SRC_CODE=\"${CMAKE_SOURCE_DIR}/copt/data\") 
-add_definitions (-D_PATH_FOR_GRAPH_TESTS_DATA_IN_SRC_CODE=\"${CMAKE_SOURCE_DIR}/graph/data\") 
+set(PATH_GRAPH_TESTS_CMAKE_GUI ${CMAKE_SOURCE_DIR}/graph/data CACHE PATH "PATH for GRAPH unit tests")
+message("PATH_GRAPH_TESTS_CMAKE_GUI='${PATH_GRAPH_TESTS_CMAKE_GUI}'")
+add_definitions (-DPATH_GRAPH_TESTS_CMAKE_SRC_CODE=\"${PATH_GRAPH_TESTS_CMAKE_GUI}/\") 
 
+set(PATH_COPT_TESTS_CMAKE_GUI ${CMAKE_SOURCE_DIR}/copt/data CACHE PATH "PATH for COPT unit tests")
+#message("PATH_COPT_TESTS_CMAKE_GUI='${PATH_COPT_TESTS_CMAKE_GUI}'")
+add_definitions (-DPATH_COPT_TESTS_CMAKE_SRC_CODE=\"${PATH_COPT_TESTS_CMAKE_GUI}/\") 
+
+#old definitions
+#add_definitions (-D_PATH_FOR_COPT_TESTS_DATA_IN_SRC_CODE=\"${CMAKE_SOURCE_DIR}/copt/data/\") 
+#add_definitions (-D_PATH_FOR_GRAPH_TESTS_DATA_IN_SRC_CODE=\"${CMAKE_SOURCE_DIR}/graph/data/\") 
+
+##############
 #logger level (see utils/logger.h) configurable from CMake at run time
 #to note: there is no checking of the value if it is not set from the CMake GUI
 set(LOG_LEVEL "debug" CACHE STRING "LOG_LEVEL chosen in CMake at run time")
