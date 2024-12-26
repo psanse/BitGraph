@@ -42,21 +42,21 @@ public:
 	/*
 	* @brief computes a new_order in [OLD]->[NEW] format
 	* @param alg sorting algorithm
-	* @param ltf  last to first
-	* @param o2n  old to new
+	* @param ltf  last to first if TRUE
+	* @param o2n  old to new if TRUE
 	*/
 	vint new_order	(int alg, bool ltf = true, bool o2n = true)		override;							
 	
 	/*
-	* @brief determines a weighted graph isomorphism for a given ordering
+	* @brief creates a weighted graph isomorphism for a given ordering
 	* @param gn output isomorphic weighted graph
-	* @param new_order ordering in [OLD]->[NEW] format
+	* @param new_order given ordering in [NEW]->[OLD] format
 	* @param d ptr to decode object to store the ordering
 	* @comments only for simple undirected graphs with no weights
+	* @return 0 if successful
 	*/
-	int  reorder	(const vint& new_order, GraphW_t& gn, Decode* d = nullptr);		// (new) interface for the framework- TODO@build an in-place reordering as in the old GraphSort 	
+	int  reorder (const vint& new_order, GraphW_t& gn, Decode* d = nullptr);		
 
-public:
 ////////////////////////
 //construction / allocation
 	GraphFastRootSort_W(GraphW_t& gw): gw_(gw), GraphFastRootSort<typename GraphW_t::_gt>(gw.graph()){ }
@@ -87,7 +87,7 @@ private:
 template <class GraphW_t >
 inline
 vint GraphFastRootSort_W<GraphW_t>::new_order (int alg, bool ltf, bool o2n){
-	vector<int> order;
+	vint order;
 
 	switch (alg) {
 	case ptype::sort_alg_t::NONE:
@@ -143,7 +143,7 @@ int GraphFastRootSort_W<GraphW_t>::reorder(const vint& new_order, GraphW_t& gn, 
 	}
 
 	/////////////////////
-	//weights (vertices) -update
+	//vertex weights update
 	for (int i = 0; i <NV; i++) {
 		gn.set_w(new_order[i], gw_.get_w(i));
 	}
@@ -177,21 +177,22 @@ template <class GraphW_t >
 inline
 vint GraphFastRootSort_W<GraphW_t>::sort_by_weight(bool ltf, bool o2n) {
 	
-	vint order;
-	const int NV = gw_.number_of_vertices();
-	ptype::fill_vertices(order, NV);
+	//set trivial ordering [1..NV] in @nodes_ as starting point 
+	ptype::set_ordering();									
 	
 	if (ltf) {
 		com::has_smaller_val< int, std::vector<wtype> > pred(gw_.get_weights());
-		std::stable_sort(order.begin(), order.end(), pred);
+		std::stable_sort(nodes_.begin(), nodes_.end(), pred);
 	}
 	else {
 		com::has_greater_val< int, std::vector<wtype> > pred(gw_.get_weights());
-		std::stable_sort(order.begin(), order.end(), pred);
+		std::stable_sort(nodes_.begin(), nodes_.end(), pred);
 	}
-	   
-	if (o2n) { Decode::reverse_in_place(order); }
-	return order;
+	 
+	//old to new conversion if required
+	if (o2n) { Decode::reverse_in_place(nodes_); }
+
+	return nodes_;
 }
 
 #endif

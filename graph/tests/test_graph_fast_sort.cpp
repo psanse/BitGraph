@@ -2,8 +2,8 @@
 * test_graph_fast_sort.cpp Unit tests for Class GraphFastRootSort for non-weighted graphs (graph_fast_sort.h)
 * @created  
 * @last_update 20/12/24
-* @logger_level determined by CMake
 * @TODO - CHECK AND REFACTOR TESTS  (20/12/2024)
+* @TODO - missing test for creating a new graph (reorder function) (26/12/24)
 */ 
 
 #include "../algorithms/graph_fast_sort.h"

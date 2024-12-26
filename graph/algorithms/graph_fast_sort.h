@@ -46,7 +46,7 @@ public:
 	//////////////////////////
 	//static methods / utilities
 	static int compute_deg(const Graph_t& g, vint& deg);
-	static void fill_vertices(vint&, std::size_t NV);															//fills vector with numbers [0..NV-1]
+	static void fill_vertices(vint&, std::size_t NV);													//fills vector with numbers [0..NV-1]
 	
 	static int SORT_SUBGRAPH_NON_INC_DEG(Graph_t& g, vint& lhs, vint& rhs, bool ftl= true);				//EXPERIMENTAL-sorting subgraphs
 	static int SORT_SUBGRAPH_NON_DEC_DEG(Graph_t& g, vint& lhs, vint& rhs, bool ltf = true);			//EXPERIMENTAL-sorting subgraphs
@@ -58,18 +58,19 @@ public:
 	/*
 	* @brief Computes a new ordering 
 	* @param alg sorting algorithm
-	* @param ltf last to first ordering
-	* @param o2n old to new ordering
+	* @param ltf last to first ordering if TRUE
+	* @param o2n old to new ordering	if TRUE
 	* @return new ordering in [OLD]->[NEW] format
 	*/
 	virtual vint new_order(int alg, bool ltf = true, bool o2n = true);
 
 	/*
-	* @brief Determines an isomorphism for a given ordering
+	* @brief Creates an isomorphism for a given ordering
 	* @param gn output isomorphic graph
-	* @param New_order ordering in [OLD]->[NEW] format
+	* @param new_order given ordering in [NEW]->[OLD] format
 	* @param d ptr to decode object to store the ordering
 	* @comments only for simple undirected graphs with no weights
+	* @return 0 if successful
 	*/
 	int reorder(const vint& new_order, Graph_t& gn, Decode* d = nullptr);
 
