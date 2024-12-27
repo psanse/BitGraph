@@ -40,8 +40,6 @@ public:
 
 	enum class sort_print_t	{PRINT_DEGREE=0, PRINT_SUPPORT, PRINT_NODES};
 	enum class sort_alg_t	{MIN_DEGEN = 0, MAX_DEGEN, MIN_DEGEN_COMPO, MAX_DEGEN_COMPO, MAX, MIN, MAX_WITH_SUPPORT, MIN_WITH_SUPPORT, NONE };
-	enum class sort_place_t	{FIRST_TO_LAST = 0, LAST_TO_FIRST=1 };
-	enum class sort_type_t	{NEW_TO_OLD = 0, OLD_TO_NEW = 1 };
 	
 	////////////////////////
 	//static methods / utilities
