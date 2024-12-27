@@ -59,7 +59,7 @@ if (graph_build_tests)
 
 # Add executable called "helloDemo" that is built from the source files
 # "demo.cxx" and "demo_b.cxx". The extensions are automatically found.
-add_executable (test_graph ./tests/gtest_main.cpp
+add_executable (test_graph  tests/gtest_main.cpp
 # ./tests/test_degree.cpp
 #  ./tests/test_format.cpp
 #  ./tests/test_graph.cpp
@@ -75,9 +75,9 @@ add_executable (test_graph ./tests/gtest_main.cpp
 #	./tests/test_wegraph.cpp
 #  ./tests/test_graph_map.cpp
 
-   ./tests/test_graph_fast_sort.cpp
-   ./tests/test_graph_fast_sort_weighted.cpp
-   ./tests/test_decode.cpp
+   tests/test_graph_fast_sort.cpp
+   tests/test_graph_fast_sort_weighted.cpp
+   tests/test_decode.cpp
 )
 
 target_include_directories (test_graph PUBLIC ../googletest/include/)
