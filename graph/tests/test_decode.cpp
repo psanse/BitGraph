@@ -23,13 +23,15 @@ TEST(Graph_sort, Decode) {
 	ug.add_edge(1, 3);
 	ug.add_edge(1, 4);
 	ug.add_edge(78, 5);	
-		
-	//computes MIN_DEG_DEGEN ordering in format [OLD_INDEX]=NEW_INDEX
-	GraphFastRootSort<ugraph> o(ug);												//old reference sorting is GraphSort<ugraph> o(ug) - CHECK
-	vint vres = o.new_order(gbbs::MIN_DEG_DEGEN, gbbs::PLACE_LF);
+
+	
+	//computes ordering in format [OLD]->[NEW]
+	using  gt = GraphFastRootSort<ugraph>;
+	gt o(ug);											
+	vint vres = o.new_order(static_cast<int>(gt::sort_alg_t::MIN_DEGEN), true /*ltf*/, true);
 	
 	//initis decoder
-	Decode::reverse_in_place(vres);		//format[NEW_INDEX] = OLD_INDEX
+	Decode::reverse_in_place(vres);			//format [NEW]->[OLD]
 	Decode d;
 	d.insert_ordering(vres);
 
