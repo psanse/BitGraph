@@ -38,8 +38,8 @@ public:
 	using type = typename GraphFastRootSort< Graph_t>;					//own type		
 	using bb_type = typename Graph_t::_bbt;								//bitboard type
 
-	enum class sort_print_t	{PRINT_DEGREE=0, PRINT_SUPPORT, PRINT_NODES};
-	enum class sort_alg_t	{MIN_DEGEN = 0, MAX_DEGEN, MIN_DEGEN_COMPO, MAX_DEGEN_COMPO, MAX, MIN, MAX_WITH_SUPPORT, MIN_WITH_SUPPORT, NONE };
+	enum  	{PRINT_DEGREE=0, PRINT_SUPPORT, PRINT_NODES};
+	enum  	{MIN_DEGEN = 0, MAX_DEGEN, MIN_DEGEN_COMPO, MAX_DEGEN_COMPO, MAX, MIN, MAX_WITH_SUPPORT, MIN_WITH_SUPPORT, NONE };
 	
 	////////////////////////
 	//static methods / utilities
@@ -203,7 +203,7 @@ vint GraphFastRootSort<Graph_t>::new_order (int alg, bool ltf, bool o2n)
 	nodes_.clear();
 
 	switch (alg) {
-	case sort_alg_t::NONE:								//trivial case- with exit condition!
+	case NONE:								//trivial case- with exit condition!
  		nodes_.reserve(NV_);						
 		for (int i = 0; i < NV_; i++) {
 			nodes_.emplace_back(i);
@@ -215,42 +215,42 @@ vint GraphFastRootSort<Graph_t>::new_order (int alg, bool ltf, bool o2n)
 		///////////////////////
 
 		break;
-	case sort_alg_t::MIN_DEGEN:
+	case MIN_DEGEN:
 		set_ordering();
 		compute_deg_root();
 		sort_degen_non_decreasing_degree(ltf);			//checked with framework - (20/12/19 - what does this mean?)
 		break;
-	case sort_alg_t::MIN_DEGEN_COMPO:
+	case MIN_DEGEN_COMPO:
 		compute_deg_root();
 		compute_support_root();
 		sort_non_decreasing_deg_with_support_tb(false /* MUST BE*/);
 		sort_degen_composite_non_decreasing_degree(ltf);
 		break;
-	case sort_alg_t::MAX_DEGEN:
+	case MAX_DEGEN:
 		set_ordering();
 		compute_deg_root();
 		sort_degen_non_increasing_degree(ltf);
 		break;
-	case sort_alg_t::MAX_DEGEN_COMPO:
+	case MAX_DEGEN_COMPO:
 		compute_deg_root();
 		compute_support_root();
 		sort_non_increasing_deg_with_support_tb(false /* MUST BE*/);
 		sort_degen_composite_non_increasing_degree(ltf);
 		break;
-	case sort_alg_t::MAX:
+	case MAX:
 		compute_deg_root();
 		sort_non_increasing_deg(ltf);
 		break;
-	case sort_alg_t::MIN:
+	case MIN:
 		compute_deg_root();
 		sort_non_decreasing_deg(ltf);
 		break;
-	case sort_alg_t::MAX_WITH_SUPPORT:
+	case MAX_WITH_SUPPORT:
 		compute_deg_root();
 		compute_support_root();
 		sort_non_increasing_deg_with_support_tb(ltf);
 		break;
-	case sort_alg_t::MIN_WITH_SUPPORT:
+	case MIN_WITH_SUPPORT:
 		compute_deg_root();
 		compute_support_root();
 		sort_non_decreasing_deg_with_support_tb(ltf);

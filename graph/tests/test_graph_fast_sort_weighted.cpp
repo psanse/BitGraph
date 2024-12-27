@@ -69,7 +69,7 @@ TEST_F(GraphFastRootSortWeightedTest, new_order) {
 	gt sorter(ugw);	
 
 	//sort by min degree (non-decreasing)
-	vint mapping_deg= sorter.new_order(static_cast<int>(gt::ptype::sort_alg_t::MIN), false /*f2l*/, true /*o2n*/);
+	vint mapping_deg= sorter.new_order(gt::ptype::MIN, false /*f2l*/, true /*o2n*/);
 	
 	////////////////////////////////////////////
 	vint mapping_deg_exp = { 0, 3, 4, 1, 2, 5 };
@@ -81,7 +81,7 @@ TEST_F(GraphFastRootSortWeightedTest, new_order) {
 	//sorter.print(static_cast<int>(gt::sort_print_t::PRINT_NODES), cout);					
 	
 	//sort according to non-increasing weight
-	vint mapping_dec_weight = sorter.new_order(static_cast<int>(gt::sort_algw_t::MAX_WEIGHT), false /*f2l*/, true /*o2n*/);
+	vint mapping_dec_weight = sorter.new_order(gt::MAX_WEIGHT, false /*f2l*/, true /*o2n*/);
 
 	////////////////////////////////////////////
 	vint mapping_dec_weight_exp = { 1, 0, 2, 3, 4, 5 };				//w(1)=5.0,  w(0)=4.0, w(2)=3.0,  w(3)=1.0, w(4)=1.0, w(5)=1.0
@@ -89,7 +89,7 @@ TEST_F(GraphFastRootSortWeightedTest, new_order) {
 	///////////////////////////////////////////
 
 	//sort according to non-decreasing weight
-	vint mapping_inc_weight = sorter.new_order(static_cast<int>(gt::sort_algw_t::MIN_WEIGHT), false /*f2l*/, true /*o2n*/);
+	vint mapping_inc_weight = sorter.new_order(gt::MIN_WEIGHT, false /*f2l*/, true /*o2n*/);
 
 	////////////////////////////////////////////
 	vint mapping_inc_weight_exp = { 3, 4, 5, 2, 0, 1 };				//w(3)=1.0,  w(4)=1.0, w(5)=1.0,  w(2)=3.0, w(0)=4.0, w(1)=5.0
@@ -107,7 +107,7 @@ TEST_F(GraphFastRootSortWeightedTest, reorder) {
 
 	using gt = GraphFastRootSort_W<ugraph_w>;
 	gt sorter(ugw);
-	vint mapping_weight = sorter.new_order(static_cast<int>(gt::sort_algw_t::MAX_WEIGHT), false /*f2l*/, true /*o2n*/);
+	vint mapping_weight = sorter.new_order(gt::MAX_WEIGHT, false /*f2l*/, true /*o2n*/);
 
 	
 	////////////////////

@@ -27,7 +27,7 @@ TEST(Decode, GraphFastRootSort) {
 	//computes ordering in format [OLD]->[NEW]
 	using  gt = GraphFastRootSort<ugraph>;
 	gt sorter(ug);											
-	vint vres = sorter.new_order(static_cast<int>(gt::sort_alg_t::MIN), false /*ltf*/, true /*o2n*/);
+	vint vres = sorter.new_order(static_cast<int>(gt::MIN), false /*ltf*/, true /*o2n*/);
 
 	//I/O
 	//sorter.print(static_cast<int>(gt::sort_print_t::PRINT_NODES), std::cout);

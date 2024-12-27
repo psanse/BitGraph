@@ -63,7 +63,7 @@ TEST_F(GraphFastRootSortTest, compute_deg_root) {
 	
 	//I/O
 	//cout << "degree info:" << endl;
-	//sorter.print(static_cast<int>(gt::sort_print_t::PRINT_DEGREE), cout);*/
+	//sorter.print((gt::PRINT_DEGREE), cout);*/
 }
 
 TEST_F(GraphFastRootSortTest, compute_support_root) {
@@ -80,7 +80,7 @@ TEST_F(GraphFastRootSortTest, compute_support_root) {
 
 	//I/O
 	/*cout << "support info:" << endl;
-	sorter.print(static_cast<int>(gt::sort_print_t::PRINT_SUPPORT), cout);*/
+	sorter.print((gt::PRINT_SUPPORT), cout);*/
 }
 
 TEST_F(GraphFastRootSortTest, sort_non_decreasing_deg) {
@@ -97,7 +97,7 @@ TEST_F(GraphFastRootSortTest, sort_non_decreasing_deg) {
 
 	//I/O
 	//cout << "non_decreasing degree ordering:" << endl;
-	//sorter.print(static_cast<int>(gt::sort_print_t::PRINT_NODES), cout);
+	//sorter.print(gt::PRINT_NODES, cout);
 }
 
 TEST_F(GraphFastRootSortTest, sort_non_increasing_deg) {
@@ -114,7 +114,7 @@ TEST_F(GraphFastRootSortTest, sort_non_increasing_deg) {
 
 	//I/O
 	/*cout << "non_increasing degree ordering:" << endl;
-	sorter.print(static_cast<int>(gt::sort_print_t::PRINT_NODES), cout);*/
+	sorter.print(gt::PRINT_NODES, cout);*/
 }
 
 TEST_F(GraphFastRootSortTest, sort_non_decreasing_deg_with_support_tb) {
@@ -132,7 +132,7 @@ TEST_F(GraphFastRootSortTest, sort_non_decreasing_deg_with_support_tb) {
 
 	//I/O
 	/*cout << "non-decreasing degree ordering with support tb:" << endl;
-	sorter.print(static_cast<int>(gt::sort_print_t::PRINT_NODES), cout);*/
+	sorter.print(gt::PRINT_NODES, cout);*/
 }
 
 TEST_F(GraphFastRootSortTest, sort_non_increasing_deg_with_support_tb) {
@@ -150,7 +150,7 @@ TEST_F(GraphFastRootSortTest, sort_non_increasing_deg_with_support_tb) {
 
 	//I/O
 	/*cout << "non-increasing degree ordering with support tb:" << endl;
-	sorter.print(static_cast<int>(gt::sort_print_t::PRINT_NODES), cout);*/
+	sorter.print(gt::PRINT_NODES, cout);*/
 }
 
 TEST_F(GraphFastRootSortTest, sort_degen_non_decreasing_degree) {
@@ -167,7 +167,7 @@ TEST_F(GraphFastRootSortTest, sort_degen_non_decreasing_degree) {
 
 	//I/O
 	/*cout << "non-decreasing degenerate ordering:" << endl;
-	sorter.print(static_cast<int>(gt::sort_print_t::PRINT_NODES), cout);*/
+	sorter.print(gt::PRINT_NODES, cout);*/
 }
 
 TEST_F(GraphFastRootSortTest, sort_degen_non_decreasing_degree_ltf) {
@@ -185,7 +185,7 @@ TEST_F(GraphFastRootSortTest, sort_degen_non_decreasing_degree_ltf) {
 
 	//I/O
 	/*cout << "non-decreasing degenerate ordering last-to-first:" << endl;
-	sorter.print(static_cast<int>(gt::sort_print_t::PRINT_NODES), cout);*/
+	sorter.print(gt::PRINT_NODES, cout);*/
 }
 
 
@@ -205,7 +205,7 @@ TEST_F(GraphFastRootSortTest, sort_degen_non_increasing_degree) {
 
 	//I/O
 	/*cout << "non-increasing degenerate ordering:" << endl;
-	sorter.print(static_cast<int>(gt::sort_print_t::PRINT_NODES), cout);*/
+	sorter.print(gt::PRINT_NODES, cout);*/
 }
 
 TEST_F(GraphFastRootSortTest, sort_degen_non_increasing_degree_ltf) {
@@ -223,7 +223,7 @@ TEST_F(GraphFastRootSortTest, sort_degen_non_increasing_degree_ltf) {
 
 	//I/O
 	/*cout << "non-increasing degenerate ordering last-to-first:" << endl;
-	sorter.print(static_cast<int>(gt::sort_print_t::PRINT_NODES), cout);*/
+	sorter.print(gt::PRINT_NODES, cout);*/
 }
 
 /////////////////
@@ -247,7 +247,7 @@ TEST_F(GraphFastRootSortTest, sort_degen_composite_non_decreasing_degree) {
 
 	//I/O
 	/*cout << "composite: (i) non-decreasing + (ii) non-decreasing degree degenerate ordering" << endl;
-	sorter.print(static_cast<int>(gt::sort_print_t::PRINT_NODES), cout);*/
+	sorter.print(gt::PRINT_NODES, cout);*/
 }
 
 TEST_F(GraphFastRootSortTest, sort_degen_composite_non_decreasing_degree_ltf) {
@@ -266,7 +266,7 @@ TEST_F(GraphFastRootSortTest, sort_degen_composite_non_decreasing_degree_ltf) {
 
 	//I/O
 	/*cout << "composite: (i) non-decreasing + (ii) non-decreasing degree degenerate ordering last-to-first" << endl;
-	sorter.print(static_cast<int>(gt::sort_print_t::PRINT_NODES), cout);*/
+	sorter.print(gt::PRINT_NODES, cout);*/
 }
 
 TEST_F(GraphFastRootSortTest, sort_degen_composite_non_increasing_degree) {
@@ -284,7 +284,7 @@ TEST_F(GraphFastRootSortTest, sort_degen_composite_non_increasing_degree) {
 
 	//I/O
 	//cout << "composite: (i) non-decreasing + (ii) non-increasing degree degenerate ordering" << endl;
-	//sorter.print(static_cast<int>(gt::sort_print_t::PRINT_NODES), cout);
+	//sorter.print(gt::PRINT_NODES, cout);
 }
 
 TEST_F(GraphFastRootSortTest, sort_degen_composite_non_increasing_degree_ltf) {
@@ -303,7 +303,7 @@ TEST_F(GraphFastRootSortTest, sort_degen_composite_non_increasing_degree_ltf) {
 
 	//I/O
 	/*cout << "composite: (i) non-increasing + (ii) non-increasing degree degenerate ordering last-to-first" << endl;
-	sorter.print(static_cast<int>(gt::sort_print_t::PRINT_NODES), cout);*/
+	sorter.print(gt::PRINT_NODES, cout);*/
 }
 
 TEST_F(GraphFastRootSortTest, new_order) {
@@ -313,7 +313,7 @@ TEST_F(GraphFastRootSortTest, new_order) {
 
 	//absolute min degree ordering first-to-last and old-to-new 
 	//nodes_ = {0, 2, 4, 5, 3, 1}
-	vint mapping = sorter.new_order(static_cast<int>(gt::sort_alg_t::MIN), false, true);
+	vint mapping = sorter.new_order((gt::MIN), false, true);
 
 	//////////////////////////////////////////
 	EXPECT_EQ(mapping[0], 0);			
@@ -326,7 +326,7 @@ TEST_F(GraphFastRootSortTest, new_order) {
 
 	//I/O
 	/*cout <<"degenerate minimum degree ordering - format last-to-first and old-to-new" << endl;
-	sorter.print(static_cast<int>(gt::sort_print_t::PRINT_NODES), cout);*/
+	sorter.print(gt::PRINT_NODES, cout);*/
 
 }
 
@@ -363,7 +363,7 @@ TEST(GraphFastRootSort, new_order_dimacs) {
 	gt sorter(ug);
 
 	//degenerate min degree ordering
-	vint mapping = sorter.new_order(static_cast<int>(gt::sort_alg_t::MIN_DEGEN), true, true);
+	vint mapping = sorter.new_order((gt::MIN_DEGEN), true, true);
 
 	//////////////////////////////////////////
 	EXPECT_EQ(mapping[0], 199);
@@ -373,11 +373,11 @@ TEST(GraphFastRootSort, new_order_dimacs) {
 
 	//I/O
 	/*cout <<"degenerate minimum degree ordering - format last-to-first and old-to-new" << endl;
-	sorter.print(static_cast<int>(gt::sort_print_t::PRINT_NODES), cout);*/
+	sorter.print(gt::PRINT_NODES, cout);*/
 
 
 	//composite ordering based on the previous ordering
-	vint mapping_compo = sorter.new_order(static_cast<int>(gt::sort_alg_t::MIN_DEGEN_COMPO), true, true);
+	vint mapping_compo = sorter.new_order((gt::MIN_DEGEN_COMPO), true, true);
 
 	//////////////////////////////////////////
 	EXPECT_EQ(mapping_compo[0], 69);
@@ -387,7 +387,7 @@ TEST(GraphFastRootSort, new_order_dimacs) {
 
 	//I/O
 	//cout <<"composite degenerate minimum degree ordering - format last-to-first and old-to-new" << endl;
-	//sorter.print(static_cast<int>(gt::sort_print_t::PRINT_NODES), cout);
+	//sorter.print(gt::PRINT_NODES, cout);
 }
 
 ////////////////////////////////////
@@ -446,7 +446,7 @@ TEST(Fast_Sorting, DISABLED_gen_min_width_tb_support_graphs) {
 	using gt = GraphFastRootSort<ugraph>;
 	gt cfs(ug);
 	
-	vint otn_minwc = cfs.new_order((int)gt::sort_alg_t::MIN_DEGEN_COMPO, true);
+	vint otn_minwc = cfs.new_order((int)gt::MIN_DEGEN_COMPO, true);
 	cout << "MAPPING MIN_WIDTH_DEGEN_COMPOSITE LAST TO FIRST-old to new" << endl;
 	com::stl::print_collection<vint>(otn_minwc, cout, true);
 		

@@ -34,7 +34,7 @@ public:
 	using ptype = typename GraphFastRootSort <ugtype>;				//parent type
 	using wtype = typename GraphW_t::_wt;							//weight type
 
-	enum class sort_algw_t { MAX_WEIGHT = 100, MIN_WEIGHT };		//sorting algorithms for weighted graphs	
+	enum  { MAX_WEIGHT = 100, MIN_WEIGHT };							//sorting algorithms for weighted graphs	
 
 ////////////////
 // public interface 
@@ -98,24 +98,24 @@ vint GraphFastRootSort_W<GraphW_t>::new_order (int alg, bool ltf, bool o2n){
 	nodes_.clear();											//clears the ordering
 
 	switch (alg) {
-	case ptype::sort_alg_t::NONE:
-	case ptype::sort_alg_t::MIN_DEGEN:
-	case ptype::sort_alg_t::MIN_DEGEN_COMPO:
-	case ptype::sort_alg_t::MAX_DEGEN:
-	case ptype::sort_alg_t::MAX_DEGEN_COMPO:
-	case ptype::sort_alg_t::MAX:
-	case ptype::sort_alg_t::MIN:
-	case ptype::sort_alg_t::MAX_WITH_SUPPORT:
-	case ptype::sort_alg_t::MIN_WITH_SUPPORT:
+	case ptype::NONE:
+	case ptype::MIN_DEGEN:
+	case ptype::MIN_DEGEN_COMPO:
+	case ptype::MAX_DEGEN:
+	case ptype::MAX_DEGEN_COMPO:
+	case ptype::MAX:
+	case ptype::MIN:
+	case ptype::MAX_WITH_SUPPORT:
+	case ptype::MIN_WITH_SUPPORT:
 		
 		ptype::new_order(alg, ltf, o2n);				//sorts the graph according to non-weighted criteria
 		break;
     
-	case sort_algw_t::MAX_WEIGHT:						//currently the only sorting algorithm for weighted graphs
+	case MAX_WEIGHT:						//currently the only sorting algorithm for weighted graphs
 		sort_by_non_increasing_weight(ltf);
 		if (!o2n) { Decode::reverse_in_place(nodes_); }
 		break;
-	case sort_algw_t::MIN_WEIGHT:						//currently the only sorting algorithm for weighted graphs
+	case MIN_WEIGHT:						//currently the only sorting algorithm for weighted graphs
 		sort_by_non_decreasing_weight(ltf);
 		if (!o2n) { Decode::reverse_in_place(nodes_); }
 		break;
