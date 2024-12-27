@@ -61,44 +61,55 @@ TEST_F(GraphFastRootSortWeightedTest, new_order) {
 	gt sorter(ugw);	
 
 	//sort by min degree (non-decreasing)
-	vint mapping_deg= sorter.new_order(static_cast<int>(gt::ptype::sort_alg_t::MIN), false /*f2l*/, false /*n2o*/);
+	vint mapping_deg= sorter.new_order(static_cast<int>(gt::ptype::sort_alg_t::MIN), false /*f2l*/, true /*o2n*/);
 	
 	////////////////////////////////////////////
 	vint mapping_deg_exp = { 0, 3, 4, 1, 2, 5 };
 	EXPECT_EQ(mapping_deg, mapping_deg_exp);
 	////////////////////////////////////////////
-
-	//order_exp.push_back(0);
-	//order_exp.push_back(3);
-	//order_exp.push_back(4);
-	//order_exp.push_back(1);
-	//order_exp.push_back(2);
-	//order_exp.push_back(5);
 		   	
 	//I/O
 	//cout << "absolute min degree ordering with format:  first-to-last, new-to-old" << endl;
-	//sorter.print(static_cast<int>(gt::sort_print_t::PRINT_NODES), cout);					//Equivalent to com::stl::print_collection(mapping, cout, true);
+	//sorter.print(static_cast<int>(gt::sort_print_t::PRINT_NODES), cout);					
 	
 	//sort according to non-increasing weight
-	vint mapping_weight = sorter.new_order(static_cast<int>(gt::sort_algw_t::MAX_WEIGHT), false /*f2l*/, false /*n2o*/);
+	vint mapping_dec_weight = sorter.new_order(static_cast<int>(gt::sort_algw_t::MAX_WEIGHT), false /*f2l*/, true /*o2n*/);
 
 	////////////////////////////////////////////
-	vint mapping_weight_exp = { 1, 0, 2, 3, 4, 5 };				//w(1)=5.0,  w(0)=4.0, w(2)=3.0,  w(3)=1.0, w(4)=1.0, w(5)=1.0
-	EXPECT_EQ(mapping_weight, mapping_weight_exp);
+	vint mapping_dec_weight_exp = { 1, 0, 2, 3, 4, 5 };				//w(1)=5.0,  w(0)=4.0, w(2)=3.0,  w(3)=1.0, w(4)=1.0, w(5)=1.0
+	EXPECT_EQ(mapping_dec_weight, mapping_dec_weight_exp);
 	///////////////////////////////////////////
 
+	//sort according to non-decreasing weight
+	vint mapping_inc_weight = sorter.new_order(static_cast<int>(gt::sort_algw_t::MIN_WEIGHT), false /*f2l*/, true /*o2n*/);
+
+	////////////////////////////////////////////
+	vint mapping_inc_weight_exp = { 3, 4, 5, 2, 0, 1 };				//w(3)=1.0,  w(4)=1.0, w(5)=1.0,  w(2)=3.0, w(0)=4.0, w(1)=5.0
+	EXPECT_EQ(mapping_inc_weight, mapping_inc_weight_exp);
+	///////////////////////////////////////////
+
+
 	//I/O
-	/*cout << "absolute non-incresing weight with format:  first-to-last, new-to-old" << endl;
+	/*cout << "absolute non-incresing weight with format:  first-to-last, old-to-new" << endl;
 	com::stl::print_collection(mapping_weight, cout, true);*/
+		
+}
+
+TEST_F(GraphFastRootSortWeightedTest, reorder) {
+
+	using gt = GraphFastRootSort_W<ugraph_w>;
+	gt sorter(ugw);
+	vint mapping_weight = sorter.new_order(static_cast<int>(gt::sort_algw_t::MAX_WEIGHT), false /*f2l*/, true /*o2n*/);
+
 	
 	////////////////////
 	//creating an isomorphism  (by non-increasing weight)
 
 	ugraph_w ugw_sorted;
-	sorter.reorder(mapping_weight, ugw_sorted);					//mapping_weight is in new-to-old format
+	sorter.reorder(mapping_weight, ugw_sorted);						//mapping_weight MUST BE in old-to-new format
 
 	////////////////////////////////////////////
-	EXPECT_DOUBLE_EQ(5, ugw_sorted.get_w(0));					//w(1)=5.0,  w(0)=4.0, w(2)=3.0,  w(3)=1.0, w(4)=1.0, w(5)=1.0
+	EXPECT_DOUBLE_EQ(5, ugw_sorted.get_w(0));						//w(1)=5.0,  w(0)=4.0, w(2)=3.0,  w(3)=1.0, w(4)=1.0, w(5)=1.0
 	EXPECT_DOUBLE_EQ(4, ugw_sorted.get_w(1));
 	EXPECT_DOUBLE_EQ(3, ugw_sorted.get_w(2));
 	EXPECT_DOUBLE_EQ(1, ugw_sorted.get_w(3));

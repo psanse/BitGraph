@@ -67,7 +67,7 @@ public:
 	/*
 	* @brief Creates an isomorphism for a given ordering
 	* @param gn output isomorphic graph
-	* @param new_order given ordering in [NEW]->[OLD] format
+	* @param new_order given ordering in [OLD]->[NEW] format
 	* @param d ptr to decode object to store the ordering
 	* @comments only for simple undirected graphs with no weights
 	* @return 0 if successful
@@ -129,7 +129,7 @@ public:
 	* @param rev reverse ordering if TRUE
 	* @comment1 requires prior computation of support and deg
 	* @comment2	initially sets @nodes_ to 1...NV
-	* @return New ordering in [NEW]->[OLD] format
+	* @return New ordering in [OLD]->[NEW] format
 	*/
 	const vint&  sort_non_increasing_deg(bool rev=false);						
 	const vint&  sort_non_decreasing_deg(bool rev=false);
@@ -139,17 +139,17 @@ public:
 	/*
 	* @brief Degenerate degree ordering
 	* @comments deg info is not restored after the call
-	* @return New ordering in [NEW]->[OLD] format
+	* @return New ordering in [OLD]->[NEW] format
 	*/
 	const vint&  sort_degen_non_decreasing_degree(bool rev=false);				
 	const vint&  sort_degen_non_increasing_degree(bool rev=false);				
 	
 	/*
-	*@brief COMPOSITE (min) degenerate ordering on a prior given ordering in @nodes_ 
+	*@brief Composite (min) degenerate ordering on a prior given ordering in @nodes_ 
 	*@param rev reverse ordering if TRUE
 	*@comments the vertex ordering has to be in @nodes prior to the call 
 	*@TODO - create unique function with bool param 
-	*@return New ordering in [NEW]->[OLD] format
+	*@return New ordering in [OLD]->[NEW] format
 	*/
 	const vint& sort_degen_composite_non_decreasing_degree( bool rev = false);		
 	const vint& sort_degen_composite_non_increasing_degree( bool rev = false);	
@@ -265,8 +265,8 @@ vint GraphFastRootSort<Graph_t>::new_order (int alg, bool ltf, bool o2n)
 		exit(-1);
 	}
 		
-	//conversion [OLD] to [NEW] if required
-	if (o2n) { Decode::reverse_in_place(nodes_); }            
+	//conversion [NEW] to [OLD] if required
+	if (!o2n) { Decode::reverse_in_place(nodes_); }            
 	return nodes_;
 }
 

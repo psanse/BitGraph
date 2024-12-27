@@ -304,36 +304,83 @@ TEST_F(GraphFastRootSortTest, sort_degen_composite_non_increasing_degree_ltf) {
 	sorter.print(static_cast<int>(gt::sort_print_t::PRINT_NODES), cout);*/
 }
 
-TEST(GraphFastRootSort, new_order) {
+TEST_F(GraphFastRootSortTest, new_order) {
+
+	using gt = GraphFastRootSort<ugraph>;
+	gt sorter(ug);
+
+	//absolute min degree ordering first-to-last and old-to-new 
+	//nodes_ = {0, 2, 4, 5, 3, 1}
+	vint mapping = sorter.new_order(static_cast<int>(gt::sort_alg_t::MIN), false, true);
+
+	//////////////////////////////////////////
+	EXPECT_EQ(mapping[0], 0);			
+	EXPECT_EQ(mapping[1], 2);
+	EXPECT_EQ(mapping[2], 4);
+	EXPECT_EQ(mapping[3], 5);
+	EXPECT_EQ(mapping[4], 3);
+	EXPECT_EQ(mapping[5], 1);
+	//////////////////////////////////////////
+
+	//I/O
+	/*cout <<"degenerate minimum degree ordering - format last-to-first and old-to-new" << endl;
+	sorter.print(static_cast<int>(gt::sort_print_t::PRINT_NODES), cout);*/
+
+}
+
+TEST_F(GraphFastRootSortTest, reorder) {
+	using gt = GraphFastRootSort<ugraph>;
+	gt sorter(ug);
+
+	sorter.compute_deg_root();
+	vint mapping_o2n=sorter.sort_non_decreasing_deg();					//nodes_ = {0, 2, 4, 5, 3, 1}
+																		//deg =	{ 0, 3, 1, 2, 1, 1 };
+	//compute isomorphism
+	ugraph ugn;
+	sorter.reorder(mapping_o2n, ugn);
 	
+	////////////////////////////////////////////
+	EXPECT_EQ(ug.number_of_vertices(), ugn.number_of_vertices());
+	EXPECT_EQ(ug.number_of_edges(), ugn.number_of_edges());
+	EXPECT_EQ(ug.degree(0), ugn.degree(0));
+	EXPECT_EQ(ug.degree(2), ugn.degree(1));
+	EXPECT_EQ(ug.degree(1), ugn.degree(2));					
+	EXPECT_EQ(ug.degree(4), ugn.degree(3));
+	EXPECT_EQ(ug.degree(5), ugn.degree(4));					
+	EXPECT_EQ(ug.degree(3), ugn.degree(5));						
+	////////////////////////////////////////////
+}
+
+TEST(GraphFastRootSort, new_order_dimacs) {
+
 	using gt = GraphFastRootSort<ugraph>;
 	string name = "brock200_2.clq";
 	name.insert(0, PATH_GFS_TESTS_DATA);
-	
+
 	ugraph ug(name);
 	gt sorter(ug);
-	
+
 	//degenerate min degree ordering
 	vint mapping = sorter.new_order(static_cast<int>(gt::sort_alg_t::MIN_DEGEN), true, true);
 
 	//////////////////////////////////////////
-	EXPECT_EQ(mapping[0], 191 ); 
-	EXPECT_EQ(mapping[1], 127);
-	EXPECT_EQ(mapping[199], 0);
+	EXPECT_EQ(mapping[0], 199);
+	EXPECT_EQ(mapping[1], 194);
+	EXPECT_EQ(mapping[199], 139);
 	//////////////////////////////////////////
-	
+
 	//I/O
-	//cout <<"degenerate minimum degree ordering - format last-to-first and old.to-new" << endl;
-	//sorter.print(static_cast<int>(gt::sort_print_t::PRINT_NODES), cout);
+	/*cout <<"degenerate minimum degree ordering - format last-to-first and old-to-new" << endl;
+	sorter.print(static_cast<int>(gt::sort_print_t::PRINT_NODES), cout);*/
 
 
 	//composite ordering based on the previous ordering
-	vint mapping_compo = sorter.new_order(static_cast<int>(gt::sort_alg_t::MIN_DEGEN_COMPO), true, true);		
- 
+	vint mapping_compo = sorter.new_order(static_cast<int>(gt::sort_alg_t::MIN_DEGEN_COMPO), true, true);
+
 	//////////////////////////////////////////
-	EXPECT_EQ(mapping_compo[0], 190);
-	EXPECT_EQ(mapping_compo[1], 126);
-	EXPECT_EQ(mapping_compo[199], 5);
+	EXPECT_EQ(mapping_compo[0], 69);
+	EXPECT_EQ(mapping_compo[1], 9);
+	EXPECT_EQ(mapping_compo[199], 139);
 	//////////////////////////////////////////
 
 	//I/O
@@ -423,8 +470,6 @@ TEST(Fast_Sorting, gen_min_width_tb_support_graphs) {
 	cin.get();
 #endif
 }
-
-
 
 
 
