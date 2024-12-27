@@ -72,13 +72,18 @@ public:
 private:
 	/*
 	* @brief Non-degenerate maximum weight sorting of vertices 
-	* @param ltf last to first format if TRUE (MAXIMUM WEIGHT LAST)
-	* @param o2n old to new format if TRUE
+	* @param ltf last to first if TRUE 
 	* @comments uses stable sort
 	* @returns reference to the new ordering in @nodes_ ([OLD]->[NEW] format)
 	*/
-	const vint& sort_by_weight(bool ltf = true, bool o2n = true) = delete;
 	const vint& sort_by_non_increasing_weight(bool ltf = true);
+
+	/*
+	* @brief Non-degenerate minimum weight sorting of vertices
+	* @param ltf last to first if TRUE
+	* @comments uses stable sort
+	* @returns reference to the new ordering in @nodes_ ([OLD]->[NEW] format)
+	*/
 	const vint& sort_by_non_decreasing_weight(bool ltf = true);
 
 ////////////////
@@ -180,28 +185,6 @@ int GraphFastRootSort_W<GraphW_t>::reorder(const vint& new_order, GraphW_t& gn, 
 
 	return 0;
 }
-
-//template <class GraphW_t >
-//inline
-//const vint& GraphFastRootSort_W<GraphW_t>::sort_by_weight(bool ltf, bool o2n) {
-//	
-//	//set trivial ordering [1..NV] in @nodes_ as starting point 
-//	ptype::set_ordering();									
-//	
-//	if (ltf) {
-//		com::has_smaller_val< int, std::vector<wtype> > pred(gw_.get_weights());
-//		std::stable_sort(nodes_.begin(), nodes_.end(), pred);
-//	}
-//	else {
-//		com::has_greater_val< int, std::vector<wtype> > pred(gw_.get_weights());
-//		std::stable_sort(nodes_.begin(), nodes_.end(), pred);
-//	}
-//	 
-//	//old to new conversion if required
-//	if (o2n) { Decode::reverse_in_place(nodes_); }
-//
-//	return nodes_;
-//}
 
 template<class GraphW_t>
 inline 

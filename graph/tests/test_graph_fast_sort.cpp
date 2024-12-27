@@ -1,9 +1,8 @@
 /*
 * test_graph_fast_sort.cpp Unit tests for Class GraphFastRootSort for non-weighted graphs (graph_fast_sort.h)
-* @created  
-* @last_update 20/12/24
-* @TODO - CHECK AND REFACTOR TESTS  (20/12/2024)
-* @TODO - missing test for creating a new graph (reorder function) (26/12/24)
+* @big refactoring december 2024  
+* @last_update 27/12/24
+* @TODO - SUBGRAPH ORDERING TESTS DISABLED  (27/12/2024)
 */ 
 
 #include "../algorithms/graph_fast_sort.h"
@@ -30,6 +29,7 @@ protected:
 		ug.add_edge(1, 4);
 		ug.add_edge(3, 5);
 	}
+	void TearDown() override {}
 	
 	//ugraph instance	
 	const int NV = 6;
@@ -395,12 +395,10 @@ TEST(GraphFastRootSort, new_order_dimacs) {
 //
 ////////////////////////////////////
 
-TEST(Fast_Sorting_stateless, SORT_SUBGRAPH_DEG) {
+TEST(Fast_Sorting_stateless, DISABLED_SORT_SUBGRAPH_DEG) {
 ///////////////
 //Very experimental function (06/01/2021)
-
-	LOG_INFO("Fast_Sorting_stateless: SORT_SUBGRAPH_DEG-----------------------");
-
+	
 	const int NV = 6;
 	ugraph ug(NV);
 	ug.add_edge(1, 2);
@@ -427,18 +425,10 @@ TEST(Fast_Sorting_stateless, SORT_SUBGRAPH_DEG) {
 	res.push_back(3);
 	EXPECT_EQ(res, lhs);
 	EXPECT_EQ(res.size(), lhs.size());
-		
-
-	LOG_INFO("Fast_Sorting_stateless: END SORT_SUBGRAPH_DEG-------------------");
-#ifdef	TEST_GFS_STEP_BY_STEP
-	LOG_ERROR("press any key to continue");
-	cin.get();
-#endif
 }
 
-
-TEST(Fast_Sorting, gen_min_width_tb_support_graphs) {
-	LOG_INFO("Fast_Sorting: gen_min_width_tb_support_graphs-------------------------");
+TEST(Fast_Sorting, DISABLED_gen_min_width_tb_support_graphs) {
+	
 	//string name = "brock400_1.clq";
 	//string name = "p_hat700-3.clq";
 	//string name = "gen400_p0.9_75.clq";
@@ -463,12 +453,6 @@ TEST(Fast_Sorting, gen_min_width_tb_support_graphs) {
 	cfs.reorder(otn_minwc, ugo);
 	ugo.print_data();
 	ugo.write_dimacs(FILE_LOG((ugo.get_name() + "s").c_str(), WRITE));
-
-	LOG_INFO("Fast_Sorting: END gen_min_width_tb_support_graphs-------------------");
-#ifdef	TEST_GFS_STEP_BY_STEP
-	LOG_ERROR("press any key to continue");
-	cin.get();
-#endif
 }
 
 

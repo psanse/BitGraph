@@ -74,8 +74,8 @@ add_executable (test_graph ./tests/gtest_main.cpp
 # ./tests/test_wgraph.cpp
 #	./tests/test_wegraph.cpp
 #  ./tests/test_graph_map.cpp
-# ./tests/test_graph_fast_sort.cpp
-  ./tests/test_graph_fast_sort_weighted.cpp
+  ./tests/test_graph_fast_sort.cpp
+# ./tests/test_graph_fast_sort_weighted.cpp
 #./tests/test_decode.cpp
 )
 

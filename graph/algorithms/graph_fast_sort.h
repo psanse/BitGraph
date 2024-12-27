@@ -43,13 +43,19 @@ public:
 	enum class sort_place_t	{FIRST_TO_LAST = 0, LAST_TO_FIRST=1 };
 	enum class sort_type_t	{NEW_TO_OLD = 0, OLD_TO_NEW = 1 };
 	
-	//////////////////////////
+	////////////////////////
 	//static methods / utilities
-	static int compute_deg(const Graph_t& g, vint& deg);
-	static void fill_vertices(vint&, std::size_t NV);													//fills vector with numbers [0..NV-1]
+
+	/*
+	* @brief Computes the degree of the vertices of a graph 
+	* @param g input graph G=(V, E)
+	* @param deg output vector of size |V| (v[i] = deg(vi))
+	*/
+	static int compute_deg(const Graph_t& g, vint& deg);		
 	
-	static int SORT_SUBGRAPH_NON_INC_DEG(Graph_t& g, vint& lhs, vint& rhs, bool ftl= true);				//EXPERIMENTAL-sorting subgraphs
-	static int SORT_SUBGRAPH_NON_DEC_DEG(Graph_t& g, vint& lhs, vint& rhs, bool ltf = true);			//EXPERIMENTAL-sorting subgraphs
+	//sorting subgraphs (experimental)
+	static int SORT_SUBGRAPH_NON_INC_DEG(Graph_t& g, vint& lhs, vint& rhs, bool ftl= true);				
+	static int SORT_SUBGRAPH_NON_DEC_DEG(Graph_t& g, vint& lhs, vint& rhs, bool ltf = true);			
 	
 
 	///////////////
@@ -153,7 +159,8 @@ public:
 	*/
 	const vint& sort_degen_composite_non_decreasing_degree( bool rev = false);		
 	const vint& sort_degen_composite_non_increasing_degree( bool rev = false);	
-		
+	
+	/////////////////
 	//TODO - substitute original primitives for n=0. n can be positive or negative (09/12/2020)
 	// int sort_non_increasing_deg (vint& rhs, vint& lhs,  bool rev = false);
 		  
@@ -190,15 +197,6 @@ protected:
 };
 /////////////////////////////////////////////////////////////////////////////////////////////
 
-template<class Graph_t>
-inline
-void  GraphFastRootSort<Graph_t>::fill_vertices(vint& lv, std::size_t NV) {
-	lv.clear();
-	lv.reserve(NV);
-	for (int i = 0; i < NV; i++) {
-		lv.emplace_back(i);
-	}
-}
 
 template<class Graph_t>
 inline

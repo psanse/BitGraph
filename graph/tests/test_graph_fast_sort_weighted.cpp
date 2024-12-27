@@ -2,7 +2,6 @@
 * test_graph_fast_sort_weighted.cpp Unit tests for Class GraphFastRootSort_W for vertex weighted graphs (graph_fast_sort_weighted.h)
 * @created 
 * @last_update 26/12/24
-* TODO - CHECK AND REFACTOR TESTS (26/12/24)	
 */ 
 
 #include "../algorithms/graph_fast_sort.h"
@@ -33,6 +32,8 @@ protected:
 
 		//rest of vertices have default weight 1.0
 	}
+
+	void TearDown() override {}
 	
 	//ugraph instance	
 	//deg(5)=3,  deg(2)=3, deg(1)=2,  deg(3)=1, deg(4)=1, deg(0)=0
