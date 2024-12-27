@@ -42,8 +42,10 @@ TEST_F(GraphFastRootSortTest, constructor) {
 
 	//unweighted part
 	auto g = sorter.get_graph();
+	///////////////////////////////////////////////////////////////////
 	EXPECT_EQ(sorter.number_of_vertices(), g.number_of_vertices());
 	EXPECT_EQ(NV, g.number_of_vertices());
+	///////////////////////////////////////////////////////////////////
 
 	//...
 }

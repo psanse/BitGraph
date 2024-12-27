@@ -45,15 +45,22 @@ TEST_F(GraphFastRootSortWeightedTest, constructor) {
 	using gt = GraphFastRootSort_W<ugraph_w>;
 	gt sorter(ugw);
 
-	//unweighted part
+	//test unweighted part of the graph
 	auto gw = sorter.get_graph();
+	////////////////////////////////////////////
 	EXPECT_EQ(sorter.number_of_vertices(), gw.number_of_vertices());
 	EXPECT_EQ(NV, gw.number_of_vertices());
+	////////////////////////////////////////////
 
-	//weighted part
+	//test weights
+	////////////////////////////////////////////
 	EXPECT_DOUBLE_EQ(4.0, gw.get_w(0));
 	EXPECT_DOUBLE_EQ(5.0, gw.get_w(1));
 	EXPECT_DOUBLE_EQ(3.0, gw.get_w(2));
+	EXPECT_DOUBLE_EQ(1.0, gw.get_w(3));
+	EXPECT_DOUBLE_EQ(1.0, gw.get_w(4));
+	EXPECT_DOUBLE_EQ(1.0, gw.get_w(5));
+	////////////////////////////////////////////
 }
 
 TEST_F(GraphFastRootSortWeightedTest, new_order) {

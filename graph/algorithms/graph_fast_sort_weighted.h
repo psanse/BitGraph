@@ -140,7 +140,7 @@ int GraphFastRootSort_W<GraphW_t>::reorder(const vint& new_order, GraphW_t& gn, 
 	//generate isomorphism (only for undirected graphs)
 	for (int i = 0; i < NV - 1; i++) {
 		for (int j = i + 1; j < NV; j++) {
-			if (gw_.is_edge(i, j)) {									//is_edge is in O(log) for sparse graphs, should be specialized for that case
+			if (gw_.is_edge(i, j)) {								//is_edge is in O(log) for sparse graphs, should be specialized for that case
 				//switch edges according to new numbering
 				gn.add_edge(new_order[i], new_order[j]);
 			}

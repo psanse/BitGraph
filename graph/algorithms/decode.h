@@ -18,7 +18,7 @@ using vint = std::vector<int>;
 class Decode {
 private:
 	/*
-	* @brief functor which unwinds orders for a given vertex
+	* @brief functor which unwinds composite orderings for a given vertex
 	*/
 	struct DecodeVertex {
 		DecodeVertex(const std::vector<vint>& ords) :
@@ -66,7 +66,7 @@ public:
 	* @brief decodes of a list of vertices for the given orderings
 	* @date 4/10/17
 	* @last_update 17/12/2024
-	* 
+	* @param list list of vertices
 	* TODO- check what should be the return value when the given orderings are empty!
 	*/
 	vint decode_list(const vint& list) const;
