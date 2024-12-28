@@ -397,7 +397,53 @@ TEST(GraphFastRootSort, new_order_dimacs) {
 //
 ////////////////////////////////////
 
-TEST(Fast_Sorting_stateless, DISABLED_SORT_SUBGRAPH_DEG) {
+TEST(subgraphSort, basic) {
+	
+	const int NV = 6;
+	ugraph ug(NV);
+	ug.add_edge(1, 2);
+	ug.add_edge(1, 5);			
+	ug.add_edge(2, 4);
+	ug.add_edge(2, 5);
+	ug.add_edge(3, 5);										//deg(0)=0, deg(1)=2, deg(2)=3 
+
+	//setup
+	using gt = GraphFastRootSort<ugraph>;
+	const int K = 3;
+	gt sorter(ug);
+	sorter.compute_deg_root();
+
+	//sorts first K=3 vertices according to non-increasing deg
+	vint mapping = sorter.sort_non_increasing_deg(K);
+		
+	//I/O
+	//sorter.print(gt::PRINT_NODES, cout);
+
+	//////////////////////////////////////////
+	vint mapping_exp = { 2, 1, 0, 3, 4, 5 };				//vertices 0, 1, 2 are sorted according to non-increasing deg
+	EXPECT_EQ(mapping.size(), NV);
+	EXPECT_EQ(mapping, mapping_exp);
+	//////////////////////////////////////////
+
+
+
+	//sorts first K=3 vertices according to non-decreasing deg
+	mapping = sorter.sort_non_decreasing_deg(K);
+		
+	//I/O
+	//sorter.print(gt::PRINT_NODES, cout);
+
+	//////////////////////////////////////////
+	mapping_exp = { 0, 1, 2, 3, 4, 5 };						//vertices 0, 1, 2 are sorted according to non-increasing deg
+	EXPECT_EQ(mapping.size(), NV);
+	EXPECT_EQ(mapping, mapping_exp);
+	//////////////////////////////////////////
+
+}
+
+//TODO- check this tests , possibly refactor the original class
+
+TEST(subgraphSort_stateless, DISABLED_SORT_SUBGRAPH_DEG) {
 ///////////////
 //Very experimental function (06/01/2021)
 	
@@ -429,7 +475,7 @@ TEST(Fast_Sorting_stateless, DISABLED_SORT_SUBGRAPH_DEG) {
 	EXPECT_EQ(res.size(), lhs.size());
 }
 
-TEST(Fast_Sorting, DISABLED_gen_min_width_tb_support_graphs) {
+TEST(subgraphSort_stateless, DISABLED_gen_min_width_tb_support_graphs) {
 	
 	//string name = "brock400_1.clq";
 	//string name = "p_hat700-3.clq";

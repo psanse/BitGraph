@@ -61,17 +61,7 @@ namespace com {
 					}
 		}
 
-		/*
-		* @brief fills Collection with numbers [0..NV-1] - similar to std::iota  
-		*/
-		template<typename Col_t>
-		void fill_vertices(Col_t&, std::size_t NV) {
-			lv.clear();
-			lv.reserve(NV);
-			for (int i = 0; i < NV; i++) {
-				lv.emplace_back(i);
-			}
-		}
+		
 	}
 }
 
