@@ -498,7 +498,7 @@ int Ugraph<T>::degree (int v, const BitBoardN& bbn) const	{
 // degree of v considering only adjacent vertices in subgraph passed
 
 	int ndeg=0;
-	for(int i=0; i<_mypt::BB_;i++)
+	for(int i=0; i<_mypt::NBB_;i++)
 		ndeg+=bitblock::popc64(_mypt::adj_[v].get_bitboard(i)& bbn.get_bitboard(i));
 
 return ndeg;
@@ -513,7 +513,7 @@ int Ugraph<T>::degree_up (int v, const BitBoardN& bbn) const	{
 
 	int ndeg=0;
 	int nBB=WDIV(v);
-	for(int i=nBB+1; i<_mypt::BB_;i++)
+	for(int i=nBB+1; i<_mypt::NBB_;i++)
 		ndeg+=bitblock::popc64(_mypt::adj_[v].get_bitboard(i)& bbn.get_bitboard(i));
 
 	//truncate the bitblock of v
@@ -531,7 +531,7 @@ int Ugraph<T>::degree (int v, int UB, const BitBoardN& bbn) const	{
 
 
 	int ndeg=0;
-	for(int i=0; i<_mypt::BB_;i++){
+	for(int i=0; i<_mypt::NBB_;i++){
 		ndeg+=bitblock::popc64(_mypt::adj_[v].get_bitboard(i)& bbn.get_bitboard(i));
 		if(ndeg>=UB) return UB;
 	}

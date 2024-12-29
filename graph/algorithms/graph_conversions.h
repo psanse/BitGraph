@@ -42,7 +42,7 @@ int GraphConversion::sug2ug(const sparse_ugraph& sug, ugraph& ug){
 		return -1;
 	}
 	ug.NV_=NV;
-	ug.BB_=INDEX_1TO1(NV);
+	ug.NBB_=INDEX_1TO1(NV);
 
 	for(int i=0; i<NV; i++){
 		ug.adj_[i].init(NV);		
@@ -90,7 +90,7 @@ int GraphConversion::ug2sug(const ugraph& ug, sparse_ugraph& sug){
 		return -1;
 	}
 	sug.NV_=NV;
-	sug.BB_=INDEX_1TO1(NV);
+	sug.NBB_=INDEX_1TO1(NV);
 
 	for(int i=0; i<NV; i++){
 		sug.adj_[i].init(NV);		

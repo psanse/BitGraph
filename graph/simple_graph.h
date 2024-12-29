@@ -1,8 +1,7 @@
 /*  
  * graph.h file from the GRAPH library, a C++ library for bit encoded 
- * simple graphs. GRAPH stores the adjacency matrix un full 
- * but each row is encoded as a bitstring. GRAPH is at the core of  BBMC, a 
- * state of the art leading exact maximum clique algorithm. 
+ * simple graphs. GRAPH stores the adjacency matrix in full, each row encoded as a bitstring. 
+ * GRAPH is at the core many state of the art leading exact clique algorithms. 
  * (see license file (legal.txt) for references)
  *
  * Copyright (C)
@@ -26,8 +25,8 @@
 #include "bitscan/bitscan.h"
 #include "filter_graph_encoding_type.h"
 #include "formats/dimacs_reader.h"
-#include "./formats/mmx_reader.h"
-#include "./formats/edges_reader.h"
+#include "formats/mmx_reader.h"
+#include "formats/edges_reader.h"
 #include "utils/prec_timer.h"
 #include "utils/logger.h"
 #include <iostream>
@@ -35,12 +34,10 @@
 #include <iomanip>
 #include <vector>
 
-
 //////////////////
 //switches 
 
 //#define DIMACS_REFERENCE_VERTICES_0			//DEFAULT OFF! (real DIMACS format)
-
 
 template<class T>
 class Graph: public filterGraphEncodingType<T>{
@@ -50,11 +47,15 @@ class Graph: public filterGraphEncodingType<T>{
 //	friend class Graph_W;				/* all specializations are friends */
 
 public:
-	
+		
+	using type = Graph<T>;				//own type
+	using basic_type = T;				//basic type (a type of bitset)
+	using _bbt = basic_type;			//alias for basic type - for backward compatibility
+
 	//typedef _Graph<T> _mypt;
 	//typedef Graph<T>  _myt;	
-	typedef	 T		_bbt;				/* an alias used elsewhere */
-	typedef int		_wt;				/* weight type: default value in the framework*/
+	//typedef	 T		_bbt;			/* an alias used elsewhere */
+	//typedef int		_wt;			/* weight type: default value in the framework*/
 		
 	template <class U>
 	friend bool operator ==				(const Graph<U>& lhs, const Graph<U>& rhs);				//EXPERIMENTAL! only compares the adj. matrix	
@@ -63,7 +64,8 @@ public:
 	Graph								(int nV);												//creates empty graph with size vertices	
 	Graph								(std::string filename);	
 	Graph								(int nV, int* adj[], string name = "");					//old-style adjacency matrix
-virtual	~Graph							(){/*clear();*/};
+virtual	~Graph() = default; 
+//virtual	~Graph						(){/*clear();*/};
 
 /////////////
 // setters and getters
@@ -80,7 +82,7 @@ virtual void remove_edge				(int v, int w);
 
 	//bitstring encoding
 	int number_of_vertices				()					const		{return NV_; }
-	int number_of_blocks				()					const		{return BB_;}
+	int number_of_blocks				()					const		{return NBB_;}
 virtual	BITBOARD number_of_edges		(bool lazy=true);
 virtual	BITBOARD number_of_edges		(const T& bbsg )	const;								//on induced subgraph
 const T& get_neighbors					(int v)				const		{return adj_[v];}
@@ -141,14 +143,13 @@ virtual	ostream& print_data				(bool lazy=true, std::ostream& = std::cout, bool 
 // data members
 protected:
 	std::vector<T> adj_;	//adjacency matrix 
-	int NV_;				//number of vertices
+	std::size_t NV_;		//number of vertices
 	BITBOARD NE_;			//number of edges (updated on the fly)
-	int BB_;				//number of bit blocks per row (in the case of sparse graphs this is a maximum value)
+	int NBB_;				//number of bit blocks per row (in the case of sparse graphs this is a maximum value)
 	
-
-	//strings
+	//names
 	std::string name_;		//graph label	
-	std::string path_;		//(extension used for weight files-4/3/17)
+	std::string path_;		//(extension used for weight files - (4/3/17)
 };
 
 template <class T>
@@ -177,8 +178,6 @@ bool operator == (const Graph<T>& lhs, const Graph<T>& rhs){
 	return true;*/
 }
 
-
-
 template <class T>
 inline
 ostream& Graph<T>::print_adj (std::ostream& o, bool add_endl){
@@ -206,12 +205,12 @@ ostream& Graph<T>::print_adj (std::ostream& o, bool add_endl){
 }
 
 template<class T>
-Graph<T>::Graph(void): NV_(0), BB_(0), NE_(0), name_(""), path_(""){
+Graph<T>::Graph(void): NV_(0), NBB_(0), NE_(0), name_(""), path_(""){
 	adj_.clear();	
 }
 
 template<class T>
-Graph<T>::Graph(string filename): NV_(0), BB_(0), NE_(0), name_(""), path_("") {
+Graph<T>::Graph(string filename): NV_(0), NBB_(0), NE_(0), name_(""), path_("") {
 	adj_.clear();
 	int status = set_graph(filename);
 	if (status == -1) { LOG_ERROR("error when opening file, exiting...-Graph<T>::Graph"); exit(-1); }
@@ -271,7 +270,7 @@ void Graph<T>::set_name(std::string name, bool separate_path){
 template<class T>
 void Graph<T>::clear (){
 	adj_.clear(), name_.clear(), path_.clear();
-	NV_=0, BB_=0, NE_=0;
+	NV_=0, NBB_=0, NE_=0;
 }
 
 template<class T>
@@ -297,13 +296,13 @@ int Graph<T>::init(int size){
 		adj_.assign(size, T(size));				//old and new bitstrings have different sizes!! (17/01/2023) (1)
 	}catch(...){
 		NV_ = 0;
-		BB_ = 0;		
+		NBB_ = 0;		
 		LOG_ERROR("memory for graph not allocated-Graph<T>::init");
 		return -1;
 	}
 
 	NV_=size;
-	BB_=INDEX_1TO1(NV_);
+	NBB_=INDEX_1TO1(NV_);
 		
 	//zero edges
 	for(int i=0; i<NV_; i++){
@@ -796,13 +795,13 @@ double Graph<T>::block_density	()	const{
 
 	size_t nBB=0;
 	for(int v=0; v<NV_; ++v){
-		for(int bb=0; bb<BB_; bb++){
+		for(int bb=0; bb<NBB_; bb++){
 			if(adj_[v].get_bitboard(bb))				
 				nBB++;
 		}
 	}
 
-return (nBB/static_cast<double>(BB_*NV_));
+return (nBB/static_cast<double>(NBB_*NV_));
 }
 
 template<> inline
