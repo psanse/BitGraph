@@ -26,10 +26,11 @@ set(LEDA_ROOT C:/Leda63/)
 include_directories(${LEDA_ROOT}/incl)
 link_directories(${LEDA_ROOT})
 
-add_library (graph ./formats/mmio.cpp 
-./algorithms/decode.cpp
+add_library (graph simple_graph.cpp
+formats/mmio.cpp 
+algorithms/decode.cpp
 ${useful_headers_for_IDE} 
-./draw/ldraw.cpp
+draw/ldraw.cpp
 )
 
 TARGET_LINK_LIBRARIES (graph debug leda_mdd.lib)
@@ -37,8 +38,9 @@ TARGET_LINK_LIBRARIES( graph optimized leda_md.lib)
 
 else()
 
-add_library (graph ./formats/mmio.cpp
-./algorithms/decode.cpp
+add_library (graph simple_graph.cpp
+formats/mmio.cpp
+algorithms/decode.cpp
 ${useful_headers_for_IDE}
 )
 set_target_properties(graph 
