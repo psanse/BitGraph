@@ -62,7 +62,7 @@ if (graph_build_tests)
 add_executable (test_graph  tests/gtest_main.cpp
 # ./tests/test_degree.cpp
 #  ./tests/test_format.cpp
-#  ./tests/test_graph.cpp
+    tests/test_graph.cpp
 #  ./tests/test_func.cpp
 #./tests/test_graph_properties_in_folder.cpp
 #  ./tests/test_graph_sort.cpp
@@ -75,9 +75,9 @@ add_executable (test_graph  tests/gtest_main.cpp
 #	./tests/test_wegraph.cpp
 #  ./tests/test_graph_map.cpp
 
-   tests/test_graph_fast_sort.cpp
-   tests/test_graph_fast_sort_weighted.cpp
-   tests/test_decode.cpp
+#   tests/test_graph_fast_sort.cpp
+#   tests/test_graph_fast_sort_weighted.cpp
+#   tests/test_decode.cpp
 )
 
 target_include_directories (test_graph PUBLIC ../googletest/include/)

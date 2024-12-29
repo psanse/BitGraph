@@ -36,16 +36,16 @@ int GraphConversion::sug2ug(const sparse_ugraph& sug, ugraph& ug){
 
 	//***allocation-check
 	try{
-		ug.m_g.resize(NV);	
+		ug.adj_.resize(NV);	
 	}catch(...){
 		LOG_ERROR("GraphConversion::sug2ug()-:memory for graph not allocated");
 		return -1;
 	}
-	ug.m_size=NV;
-	ug.m_BB=INDEX_1TO1(NV);
+	ug.NV_=NV;
+	ug.BB_=INDEX_1TO1(NV);
 
 	for(int i=0; i<NV; i++){
-		ug.m_g[i].init(NV);		
+		ug.adj_[i].init(NV);		
 	}
 	////////////////////
 
@@ -53,12 +53,12 @@ int GraphConversion::sug2ug(const sparse_ugraph& sug, ugraph& ug){
 //conversion
 	int ugi=0;
 	for(int v=0; v<NV; v++){
-		for(sparse_bitarray::velem_cit it= sug.m_g[v].begin(); it!=sug.m_g[v].end(); ++it){
+		for(sparse_bitarray::velem_cit it= sug.adj_[v].begin(); it!=sug.adj_[v].end(); ++it){
 			int sgi=it->index;
 			BITBOARD sgbb=it->bb;
 
 			if(ugi<sgi){ugi=sgi;}
-			ug.m_g[v].get_bitboard(sgi)=sgbb;
+			ug.adj_[v].get_bitboard(sgi)=sgbb;
 		}
 	}
 	
@@ -84,16 +84,16 @@ int GraphConversion::ug2sug(const ugraph& ug, sparse_ugraph& sug){
 
 	//***allocation-check
 	try{
-		sug.m_g.resize(NV);	
+		sug.adj_.resize(NV);	
 	}catch(...){
 		LOG_ERROR("GraphConversion::sug2ug()-:memory for graph not allocated");
 		return -1;
 	}
-	sug.m_size=NV;
-	sug.m_BB=INDEX_1TO1(NV);
+	sug.NV_=NV;
+	sug.BB_=INDEX_1TO1(NV);
 
 	for(int i=0; i<NV; i++){
-		sug.m_g[i].init(NV);		
+		sug.adj_[i].init(NV);		
 	}
 
 
@@ -104,12 +104,12 @@ int GraphConversion::ug2sug(const ugraph& ug, sparse_ugraph& sug){
 	int NBB=ug.number_of_blocks();
 	for(int v=0; v<NV; v++){
 		for(int bbi=0; bbi<NBB; bbi++){
-			BITBOARD bb=ug.m_g[v].get_bitboard(bbi);
+			BITBOARD bb=ug.adj_[v].get_bitboard(bbi);
 			if(bb!=0){
 				sparse_bitarray::elem_t elem;
 				elem.index=bbi;
 				elem.bb=bb;
-				sug.m_g[v].get_elem_set().push_back(elem);
+				sug.adj_[v].get_elem_set().push_back(elem);
 			}
 		}
 	}

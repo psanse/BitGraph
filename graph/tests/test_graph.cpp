@@ -252,7 +252,7 @@ TEST(Ugraph, graph_from_adj_mat) {
 	stringstream sstr;
 	ug.print_data(true, sstr);
 	ug.print_adj(sstr);
-	LOG_INFO(sstr.str());
+	LOGG_INFO(sstr.str());
 #endif
 
 	for (int i = 0; i < NV; i++) {
@@ -302,7 +302,7 @@ TEST(Graph, graph_from_adj_mat) {
 	stringstream sstr;
 	g.print_data(true, sstr);
 	g.print_adj(sstr);
-	LOG_INFO(sstr.str());
+	LOGG_INFO(sstr.str());
 #endif
 
 	for (int i = 0; i < NV; i++) {

@@ -106,9 +106,9 @@ void Ugraph<T>::add_edge (int v, int w){
 ///////////////
 // sets v-->w (no self loops allowed)
 	if(v != w){
-		_mypt::m_g[v].set_bit(w);
-		_mypt::m_g[w].set_bit(v);
-		_mypt::m_edges++;
+		_mypt::adj_[v].set_bit(w);
+		_mypt::adj_[w].set_bit(v);
+		_mypt::NE_++;
 	}
 }
 
@@ -117,9 +117,9 @@ void Ugraph<T>::remove_edge (int v, int w){
 ///////////////
 // removes bidirected edge
 	if(v!=w){
-		_mypt::m_g[v].erase_bit(w);
-		_mypt::m_g[w].erase_bit(v);
-		_mypt::m_edges--;
+		_mypt::adj_[v].erase_bit(w);
+		_mypt::adj_[w].erase_bit(v);
+		_mypt::NE_--;
 	}
 }
 
@@ -130,7 +130,7 @@ int Ugraph<T>::max_degree_of_graph () const{
 
 	int max_degree=0, temp=0; 
 
-	for(int i=0; i<_mypt::m_size;i++){
+	for(int i=0; i<_mypt::NV_;i++){
 		temp=degree(i);
 		if(temp>max_degree)
 				max_degree=temp;
@@ -162,7 +162,7 @@ return max_degree;
 
 template<class T>
 ostream& Ugraph<T>::print_degrees (std::ostream& o) const {
-	for(int i=0; i<_mypt::m_size; i++){
+	for(int i=0; i<_mypt::NV_; i++){
 		o<<"deg("<<i<<")"<<":"<<degree(i)<<" ";
 	}
 	return o;
@@ -176,11 +176,11 @@ BITBOARD Ugraph<T>::number_of_edges (const BitBoardN& bbn) const{
 // Last Updated: 12/4/12  
 	
 	unsigned long long  edges=0;
-	for(int i=0; i<_mypt::m_size-1; i++){
+	for(int i=0; i<_mypt::NV_-1; i++){
 		if(bbn.is_bit(i)){
-			for(int j=i+1; j<_mypt::m_size; j++)
+			for(int j=i+1; j<_mypt::NV_; j++)
 				if(bbn.is_bit(j)){
-					if( _mypt::m_g[i].is_bit(j) )
+					if( _mypt::adj_[i].is_bit(j) )
 							edges++;
 				}
 		}
@@ -190,7 +190,7 @@ return edges;
 
 template<class T>
 double Ugraph<T>::density	(bool lazy)	{
-	BITBOARD max_edges=_mypt::m_size;
+	BITBOARD max_edges=_mypt::NV_;
 	max_edges*=(max_edges-1);
 	return (2*number_of_edges(lazy)/(double)max_edges);
 }
@@ -201,20 +201,20 @@ inline
 BITBOARD Ugraph<T>::number_of_edges	(bool lazy) {
 ///////////////////
 // Should be specialized for sparse graphs
-	if(lazy && _mypt::m_edges !=0) 
-				return _mypt::m_edges;
+	if(lazy && _mypt::NE_ !=0) 
+				return _mypt::NE_;
 
 	BITBOARD  edges=0;
-	for(int i=0; i<_mypt::m_size-1; i++){
-		for(int j=i+1; j<_mypt::m_size; j++){
+	for(int i=0; i<_mypt::NV_-1; i++){
+		for(int j=i+1; j<_mypt::NV_; j++){
 			if(_mypt::is_edge(i,j)){				//O(log) for sparse graphs 
 				edges++;
 			}
 		}
 	}
-	_mypt::m_edges=edges;
+	_mypt::NE_=edges;
 	
-return _mypt::m_edges;
+return _mypt::NE_;
 }
 
 template<> 
@@ -222,23 +222,23 @@ inline
 BITBOARD Ugraph<sparse_bitarray>::number_of_edges	(bool lazy) {
 /////////////
 //Specialization for sparse graphs (is adjacent runs in O(log)) 
-	if(lazy && Graph<sparse_bitarray>::m_edges !=0) 
-				return Graph<sparse_bitarray>::m_edges;
+	if(lazy && Graph<sparse_bitarray>::NE_ !=0) 
+				return Graph<sparse_bitarray>::NE_;
 	
 	BITBOARD  edges=0;
-	for(int i=0; i<Graph<sparse_bitarray>::m_size-1; i++){
-		edges+=m_g[i].popcn64(i+1);		//O(log)
+	for(int i=0; i<Graph<sparse_bitarray>::NV_-1; i++){
+		edges+=adj_[i].popcn64(i+1);		//O(log)
 	}
-	Graph<sparse_bitarray>::m_edges=edges;
+	Graph<sparse_bitarray>::NE_=edges;
 	
-return Graph<sparse_bitarray>::m_edges;
+return Graph<sparse_bitarray>::NE_;
 }
 
 template<class T>
 inline
 ostream& Ugraph<T>::print_edges (std::ostream& o) const{
-	for(int i=0; i<_mypt::m_size-1; i++){
-		for(int j=i+1; j<_mypt::m_size; j++){
+	for(int i=0; i<_mypt::NV_-1; i++){
+		for(int j=i+1; j<_mypt::NV_; j++){
 			if(_mypt::is_edge(i, j)){
 				o<<"["<<i<<"]"<<"--"<<"["<<j<<"]"<<endl;
 			}
@@ -250,8 +250,8 @@ ostream& Ugraph<T>::print_edges (std::ostream& o) const{
 template<class T>
 inline
 ostream& Ugraph<T>::print_matrix(std::ostream& o) const {
-	for (int i = 0; i < _mypt::m_size; i++) {
-		for (int j =0; j < _mypt::m_size; j++) {
+	for (int i = 0; i < _mypt::NV_; i++) {
+		for (int j =0; j < _mypt::NV_; j++) {
 			if (_mypt::is_edge(i, j)) {
 				o << "1";
 			}
@@ -267,9 +267,9 @@ ostream& Ugraph<T>::print_matrix(std::ostream& o) const {
 template<class T>
 inline
 ostream& Ugraph<T>::print_edges (T& bbsg, std::ostream& o) const{
-	for(int i=0; i<_mypt::m_size-1; i++){
+	for(int i=0; i<_mypt::NV_-1; i++){
 		if(!bbsg.is_bit(i)) continue;
-		for(int j=i+1; j<_mypt::m_size; j++){
+		for(int j=i+1; j<_mypt::NV_; j++){
 			if(!bbsg.is_bit(j)) continue;	
 			if(_mypt::is_edge(i, j)){
 				o<<"["<<i<<"]"<<"--"<<"["<<j<<"]"<<endl;
@@ -300,22 +300,22 @@ void Ugraph<T>::write_dimacs (ostream & o) {
 	o<<"c File written by GRAPH:"<<PrecisionTimer::local_timestamp();
 
 	//name
-	if(!_mypt::m_name.empty())
-		o<<"c "<<_mypt::m_name.c_str()<<endl;
+	if(!_mypt::name_.empty())
+		o<<"c "<<_mypt::name_.c_str()<<endl;
 
 	//tamaño del grafo
-	o<<"p edge "<<_mypt::m_size<<" "<<number_of_edges(false /* recompute */)<<endl<<endl;
+	o<<"p edge "<<_mypt::NV_<<" "<<number_of_edges(false /* recompute */)<<endl<<endl;
 
 	//write DIMACS nodes n <v> <w>
 	/*if (_mypt::is_weighted_v()){
-		for(int v=0; v<_mypt::m_size; v++){
+		for(int v=0; v<_mypt::NV_; v++){
 			o<<"n "<<v+1<<" "<<_mypt::get_wv(v)<<endl;
 		}
 	}*/
 
 	//bidirectional edges
-	for(int v=0; v<_mypt::m_size-1; v++){
-		for(int w=v+1; w<_mypt::m_size; w++){
+	for(int v=0; v<_mypt::NV_-1; v++){
+		for(int w=v+1; w<_mypt::NV_; w++){
 			if(_mypt::is_edge(v,w) )							//O(log) for sparse graphs: specialize
 					o<<"e "<<v+1<<" "<<w+1<<endl;				//1 based vertex notation dimacs
 		}
@@ -332,21 +332,21 @@ void Ugraph<sparse_bitarray>::write_dimacs (ostream& o) {
 	o<<"c File written by GRAPH:"<<PrecisionTimer::local_timestamp();
 	
 	//name
-	if(!Graph<sparse_bitarray>::m_name.empty())
-		o<<"c "<<Graph<sparse_bitarray>::m_name.c_str()<<endl;
+	if(!Graph<sparse_bitarray>::name_.empty())
+		o<<"c "<<Graph<sparse_bitarray>::name_.c_str()<<endl;
 
 	//tamaño del grafo
-	o<<"p edge "<<Graph<sparse_bitarray>::m_size<<" "<<number_of_edges()<<endl<<endl;
+	o<<"p edge "<<Graph<sparse_bitarray>::NV_<<" "<<number_of_edges()<<endl<<endl;
 	
 	//Escribir nodos
-	for(int v=0; v<Graph<sparse_bitarray>::m_size-1; v++){
+	for(int v=0; v<Graph<sparse_bitarray>::NV_-1; v++){
 		//non destructive scan starting from the vertex onwards
-		pair<bool, int> p=Graph<sparse_bitarray>::m_g[v].find_pos(WDIV(v));
+		pair<bool, int> p=Graph<sparse_bitarray>::adj_[v].find_pos(WDIV(v));
 		if(p.second==EMPTY_ELEM) continue;					//no more bitblocks
-		Graph<sparse_bitarray>::m_g[v].m_scan.bbi=p.second; 
-		(p.first)? Graph<sparse_bitarray>::m_g[v].m_scan.pos= WMOD(v) : Graph<sparse_bitarray>::m_g[v].m_scan.pos=MASK_LIM;		//if bitblock contains v, start from that position onwards
+		Graph<sparse_bitarray>::adj_[v].m_scan.bbi=p.second; 
+		(p.first)? Graph<sparse_bitarray>::adj_[v].m_scan.pos= WMOD(v) : Graph<sparse_bitarray>::adj_[v].m_scan.pos=MASK_LIM;		//if bitblock contains v, start from that position onwards
 		while(1){
-			int w=Graph<sparse_bitarray>::m_g[v].next_bit();
+			int w=Graph<sparse_bitarray>::adj_[v].next_bit();
 			if(w==EMPTY_ELEM)
 					 break;
 			o<<"e "<<v+1<<" "<<w+1<<endl;	
@@ -366,12 +366,12 @@ void  Ugraph<T>::write_EDGES(ostream& o){
 	o<<"% File written by GRAPH:"<<PrecisionTimer::local_timestamp();
 
 	//name
-	if(!_mypt::m_name.empty())
-		o<<"% "<<_mypt::m_name.c_str()<<endl;
+	if(!_mypt::name_.empty())
+		o<<"% "<<_mypt::name_.c_str()<<endl;
 	
 	//write edges
-	for(int v=0; v<_mypt::m_size-1; v++){
-		for(int w=v+1; w<_mypt::m_size; w++){
+	for(int v=0; v<_mypt::NV_-1; v++){
+		for(int w=v+1; w<_mypt::NV_; w++){
 			if(_mypt::is_edge(v,w) )							//O(log) for sparse graphs: specialize
 					o<<v+1<<" "<<w+1<<endl;						//1 based vertex notation dimacs
 		}
@@ -390,18 +390,18 @@ void Ugraph<sparse_bitarray>::write_EDGES(ostream& o) {
 	o<<"% File written by GRAPH:"<<PrecisionTimer::local_timestamp();
 	
 	//name
-	if(!Graph<sparse_bitarray>::m_name.empty())
-		o<<"% "<<Graph<sparse_bitarray>::m_name.c_str()<<endl;
+	if(!Graph<sparse_bitarray>::name_.empty())
+		o<<"% "<<Graph<sparse_bitarray>::name_.c_str()<<endl;
 
 	//writes edges
-	for(int v=0; v<Graph<sparse_bitarray>::m_size-1; v++){
+	for(int v=0; v<Graph<sparse_bitarray>::NV_-1; v++){
 		//non destructive scan starting from the vertex onwards
-		pair<bool, int> p=Graph<sparse_bitarray>::m_g[v].find_pos(WDIV(v));
+		pair<bool, int> p=Graph<sparse_bitarray>::adj_[v].find_pos(WDIV(v));
 		if(p.second==EMPTY_ELEM) continue;										//no more bitblocks
-		Graph<sparse_bitarray>::m_g[v].m_scan.bbi=p.second; 
-		(p.first)? Graph<sparse_bitarray>::m_g[v].m_scan.pos= WMOD(v) : Graph<sparse_bitarray>::m_g[v].m_scan.pos=MASK_LIM;			//if bitblock contains v, start from that position onwards
+		Graph<sparse_bitarray>::adj_[v].m_scan.bbi=p.second; 
+		(p.first)? Graph<sparse_bitarray>::adj_[v].m_scan.pos= WMOD(v) : Graph<sparse_bitarray>::adj_[v].m_scan.pos=MASK_LIM;			//if bitblock contains v, start from that position onwards
 		while(1){
-			int w=Graph<sparse_bitarray>::m_g[v].next_bit();
+			int w=Graph<sparse_bitarray>::adj_[v].next_bit();
 			if(w==EMPTY_ELEM)
 					 break;
 			o<<v+1<<" "<<w+1<<endl;	
@@ -423,16 +423,16 @@ void Ugraph<T>::write_mtx(ostream & o){
 	o<<"% File written by GRAPH:"<<PrecisionTimer::local_timestamp();
 		
 	//name
-	if(!_mypt::m_name.empty())
-		o<<"% "<<_mypt::m_name.c_str()<<endl;
+	if(!_mypt::name_.empty())
+		o<<"% "<<_mypt::name_.c_str()<<endl;
 
 	//size and edges
-	_mypt::m_edges=0;																	//eliminates lazy evaluation of edge count 
-	o<<_mypt::m_size<<" "<<_mypt::m_size<<" "<<number_of_edges()<<endl;
+	_mypt::NE_=0;																	//eliminates lazy evaluation of edge count 
+	o<<_mypt::NV_<<" "<<_mypt::NV_<<" "<<number_of_edges()<<endl;
 	
 	//writes edges
-	for(int v=0; v<_mypt::m_size-1; v++){
-		for(int w=v+1; w<_mypt::m_size; w++){
+	for(int v=0; v<_mypt::NV_-1; v++){
+		for(int w=v+1; w<_mypt::NV_; w++){
 			if(_mypt::is_edge(v,w) )							//O(log) for sparse graphs: specialize
 					o<<v+1<<" "<<w+1<<endl;						//1 based vertex notation dimacs
 		}
@@ -453,22 +453,22 @@ void Ugraph<sparse_bitarray>::write_mtx(ostream & o){
 	o<<"% File written by GRAPH:"<<PrecisionTimer::local_timestamp();
 		
 	//name
-	if(!Graph<sparse_bitarray>::m_name.empty())
-		o<<"% "<<Graph<sparse_bitarray>::m_name.c_str()<<endl;
+	if(!Graph<sparse_bitarray>::name_.empty())
+		o<<"% "<<Graph<sparse_bitarray>::name_.c_str()<<endl;
 
 	//size and edges
-	m_edges=0;																	//eliminates lazy evaluation of edge count 
-	o<<Graph<sparse_bitarray>::m_size<<" "<<Graph<sparse_bitarray>::m_size<<" "<<number_of_edges()<<endl;
+	NE_=0;																	//eliminates lazy evaluation of edge count 
+	o<<Graph<sparse_bitarray>::NV_<<" "<<Graph<sparse_bitarray>::NV_<<" "<<number_of_edges()<<endl;
 	
 	//writes edges
-	for(int v=0; v<Graph<sparse_bitarray>::m_size-1; v++){
+	for(int v=0; v<Graph<sparse_bitarray>::NV_-1; v++){
 		//non destructive scan starting from the vertex onwards
-		pair<bool, int> p=Graph<sparse_bitarray>::m_g[v].find_pos(WDIV(v));
+		pair<bool, int> p=Graph<sparse_bitarray>::adj_[v].find_pos(WDIV(v));
 		if(p.second==EMPTY_ELEM) continue;										//no more bitblocks
-		Graph<sparse_bitarray>::m_g[v].m_scan.bbi=p.second; 
-		(p.first)? Graph<sparse_bitarray>::m_g[v].m_scan.pos= WMOD(v) : Graph<sparse_bitarray>::m_g[v].m_scan.pos=MASK_LIM;			//if bitblock contains v, start from that position onwards
+		Graph<sparse_bitarray>::adj_[v].m_scan.bbi=p.second; 
+		(p.first)? Graph<sparse_bitarray>::adj_[v].m_scan.pos= WMOD(v) : Graph<sparse_bitarray>::adj_[v].m_scan.pos=MASK_LIM;			//if bitblock contains v, start from that position onwards
 		while(1){
-			int w=Graph<sparse_bitarray>::m_g[v].next_bit();
+			int w=Graph<sparse_bitarray>::adj_[v].next_bit();
 			if(w==EMPTY_ELEM)
 					 break;
 			o<<v+1<<" "<<w+1<<endl;	
@@ -480,15 +480,15 @@ void Ugraph<sparse_bitarray>::write_mtx(ostream & o){
 template<class T>
 inline
 int Ugraph<T>::degree (int v) const{
-	return _mypt::m_g[v].popcn64();
+	return _mypt::adj_[v].popcn64();
 }
 
 template<>
 inline
 int Ugraph<sparse_bitarray>::degree (int v) const{
-	if(Graph<sparse_bitarray>::m_g[v].is_empty()) return 0;
+	if(Graph<sparse_bitarray>::adj_[v].is_empty()) return 0;
 
-return Graph<sparse_bitarray>::m_g[v].popcn64();
+return Graph<sparse_bitarray>::adj_[v].popcn64();
 }
 
 template<class T>
@@ -498,8 +498,8 @@ int Ugraph<T>::degree (int v, const BitBoardN& bbn) const	{
 // degree of v considering only adjacent vertices in subgraph passed
 
 	int ndeg=0;
-	for(int i=0; i<_mypt::m_BB;i++)
-		ndeg+=bitblock::popc64(_mypt::m_g[v].get_bitboard(i)& bbn.get_bitboard(i));
+	for(int i=0; i<_mypt::BB_;i++)
+		ndeg+=bitblock::popc64(_mypt::adj_[v].get_bitboard(i)& bbn.get_bitboard(i));
 
 return ndeg;
 }
@@ -513,11 +513,11 @@ int Ugraph<T>::degree_up (int v, const BitBoardN& bbn) const	{
 
 	int ndeg=0;
 	int nBB=WDIV(v);
-	for(int i=nBB+1; i<_mypt::m_BB;i++)
-		ndeg+=bitblock::popc64(_mypt::m_g[v].get_bitboard(i)& bbn.get_bitboard(i));
+	for(int i=nBB+1; i<_mypt::BB_;i++)
+		ndeg+=bitblock::popc64(_mypt::adj_[v].get_bitboard(i)& bbn.get_bitboard(i));
 
 	//truncate the bitblock of v
-	ndeg+=bitblock::popc64(bitblock::MASK_1(WMOD(v)+1,63) & _mypt::m_g[v].get_bitboard(nBB)& bbn.get_bitboard(nBB));
+	ndeg+=bitblock::popc64(bitblock::MASK_1(WMOD(v)+1,63) & _mypt::adj_[v].get_bitboard(nBB)& bbn.get_bitboard(nBB));
 return ndeg;
 }
 
@@ -531,8 +531,8 @@ int Ugraph<T>::degree (int v, int UB, const BitBoardN& bbn) const	{
 
 
 	int ndeg=0;
-	for(int i=0; i<_mypt::m_BB;i++){
-		ndeg+=bitblock::popc64(_mypt::m_g[v].get_bitboard(i)& bbn.get_bitboard(i));
+	for(int i=0; i<_mypt::BB_;i++){
+		ndeg+=bitblock::popc64(_mypt::adj_[v].get_bitboard(i)& bbn.get_bitboard(i));
 		if(ndeg>=UB) return UB;
 	}
 
@@ -546,7 +546,7 @@ int Ugraph<sparse_bitarray>::degree (int v, const BitBoardN& bbn) const	{
 // degree of v considering only adjacent vertices in subgraph passed
 	
 	int ndeg=0;
-	for(sparse_bitarray::velem_cit it= m_g[v].begin(); it!=m_g[v].end(); ++it){
+	for(sparse_bitarray::velem_cit it= adj_[v].begin(); it!=adj_[v].end(); ++it){
 		ndeg+=bitblock::popc64(it->bb & bbn.get_bitboard(it->index));
 	}
 
@@ -561,7 +561,7 @@ int Ugraph<sparse_bitarray>::degree (int v, int UB, const BitBoardN& bbn) const	
 // if deg is greater than UB the search is truncated and UB is returned
 	
 	int ndeg=0;
-	for(sparse_bitarray::velem_cit it= m_g[v].begin(); it!=m_g[v].end(); ++it){
+	for(sparse_bitarray::velem_cit it= adj_[v].begin(); it!=adj_[v].end(); ++it){
 		ndeg+=bitblock::popc64(it->bb & bbn.get_bitboard(it->index));
 		if(ndeg>=UB) return UB;
 	}
@@ -576,10 +576,10 @@ int Ugraph<sparse_bitarray>::degree (int v, const BitBoardS & bbs) const	{
 // degree of v considering only adjacent vertices in subgraph passed
 
 	int ndeg=0;
-	sparse_bitarray::velem_cit itv = m_g[v].begin();
+	sparse_bitarray::velem_cit itv = adj_[v].begin();
 	sparse_bitarray::velem_cit itbb = bbs.begin();
 	
-	while(itv!=m_g[v].end() && itbb!=bbs.end()){
+	while(itv!=adj_[v].end() && itbb!=bbs.end()){
 
 		if(itv->index<itbb->index){ 
 			itv++;
@@ -601,10 +601,10 @@ int Ugraph<sparse_bitarray>::degree (int v, int UB, const BitBoardS & bbs) const
 // if deg is greater than UB the search is truncated and UB is returned
 
 	int ndeg=0;
-	sparse_bitarray::velem_cit itv = m_g[v].begin();
+	sparse_bitarray::velem_cit itv = adj_[v].begin();
 	sparse_bitarray::velem_cit itbb = bbs.begin();
 	
-	while(itv!=m_g[v].end() && itbb!=bbs.end()){
+	while(itv!=adj_[v].end() && itbb!=bbs.end()){
 
 		if(itv->index<itbb->index){ 
 			itv++;
@@ -629,11 +629,11 @@ int Ugraph<T>::create_complement (Ugraph& ug) const	{
 // RETURN VAL: -1 if ERROR, O if OK
 		
 	//memory allocation of new complement graph
-	if( ug.init(_mypt::m_size)==-1 ) return -1;
+	if( ug.init(_mypt::NV_)==-1 ) return -1;
 
-	for(int i=0; i<_mypt::m_size-1; i++){
-		for(int j=i+1; j<_mypt::m_size; j++){
-			if(!_mypt::m_g[i].is_bit(j)){
+	for(int i=0; i<_mypt::NV_-1; i++){
+		for(int j=i+1; j<_mypt::NV_; j++){
+			if(!_mypt::adj_[i].is_bit(j)){
 				ug.add_edge(i,j);
 			}
 		}
@@ -643,7 +643,7 @@ int Ugraph<T>::create_complement (Ugraph& ug) const	{
 	//if weighted, copy the weights also
 	/*if(this->m_is_wv){
 		ug.m_is_wv=true;
-		ug.m_wv.resize(this->m_size);
+		ug.m_wv.resize(this->NV_);
 		copy(this->m_wv.begin(), this->m_wv.end(), ug.m_wv.begin());
 	}*/
 	return 0;
@@ -662,7 +662,7 @@ int Ugraph<T>::create_complement (Ugraph& ug) const	{
 //{
 //
 //	//memory allocation of the new complement graph
-//	if (ug.init(_mypt::m_size) == -1) return -1;
+//	if (ug.init(_mypt::NV_) == -1) return -1;
 //
 //	vector<int> vnn;
 //	_mypt::get_neighbors(v).to_vector(vnn);
@@ -733,14 +733,14 @@ inline int Ugraph<T>::add_vertex(_bbt * neigh)
 	LOG_ERROR("exiting...");
 	exit (-1);
 
-	// _mypt::m_size = _mypt::m_size + 1;
+	// _mypt::NV_ = _mypt::NV_ + 1;
 
 	//try {
 	//	if (neigh == NULL) {
-	//		_mypt::m_g.resize(_mypt::m_size);
+	//		_mypt::adj_.resize(_mypt::NV_);
 	//	}
 	//	else {
-	//		_mypt::m_g.resize(_mypt::m_size, T(*neigh));
+	//		_mypt::adj_.resize(_mypt::NV_, T(*neigh));
 	//	}
 
 	//}

@@ -1,12 +1,12 @@
 /*  
  * graph.h file from the GRAPH library, a C++ library for bit encoded 
- * simple unweighted graphs. GRAPH stores the adjacency matrix un full 
- * but each row is encoded as a bitsrting. GRAPH is at the core of  BBMC, a 
+ * simple graphs. GRAPH stores the adjacency matrix un full 
+ * but each row is encoded as a bitstring. GRAPH is at the core of  BBMC, a 
  * state of the art leading exact maximum clique algorithm. 
  * (see license file (legal.txt) for references)
  *
  * Copyright (C)
- * Author: Pablo San Segundo
+ * Main developper: Pablo San Segundo
  * Intelligent Control Research Group CAR(UPM-CSIC) 
  *
  * Permission to use, modify and distribute this software is
@@ -20,32 +20,27 @@
  *
  */
 
-
 #ifndef __SIMPLE_GRAPH_H__
 #define __SIMPLE_GRAPH_H__
-
-#include <iostream>
-#include <fstream>
-#include <iomanip>
-#include <string.h>
-#include <ios>
 
 #include "bitscan/bitscan.h"
 #include "filter_graph_encoding_type.h"
 #include "formats/dimacs_reader.h"
 #include "./formats/mmx_reader.h"
 #include "./formats/edges_reader.h"
-#include <math.h>
 #include "utils/prec_timer.h"
 #include "utils/logger.h"
-#include "utils/common.h"
+#include <iostream>
+#include <fstream>
+#include <iomanip>
+#include <vector>
+
 
 //////////////////
 //switches 
 
 //#define DIMACS_REFERENCE_VERTICES_0			//DEFAULT OFF! (real DIMACS format)
 
-using namespace std; 
 
 template<class T>
 class Graph: public filterGraphEncodingType<T>{
@@ -74,22 +69,22 @@ virtual	~Graph							(){/*clear();*/};
 // setters and getters
 	int set_graph						(std::string filename);
 		
-	std::string get_name				() const {return m_name;}
-	std::string get_path				() const {return m_path;}
+	std::string get_name				() const {return name_;}
+	std::string get_path				() const {return path_;}
 	void set_name						(std::string graph_name, bool separate_path=false);		//clears path by DEFAULT (separate_path = false)
-	void set_path						(std::string path_name) {m_path = path_name;}
+	void set_path						(std::string path_name) {path_ = path_name;}
 const T* get_graph						()					const;	
 virtual void add_edge					(int v, int w);								//v->w	(no self_loops allowed)
 virtual void remove_edge				(int v, int w);	
 		void remove_edges				(int v);									//removes in-out edges from v
 
 	//bitstring encoding
-	int number_of_vertices				()					const		{return m_size; }
-	int number_of_blocks				()					const		{return m_BB;}
+	int number_of_vertices				()					const		{return NV_; }
+	int number_of_blocks				()					const		{return BB_;}
 virtual	BITBOARD number_of_edges		(bool lazy=true);
 virtual	BITBOARD number_of_edges		(const T& bbsg )	const;								//on induced subgraph
-const T& get_neighbors					(int v)				const		{return m_g[v];}
-      T& get_neighbors					(int v)							{return m_g[v];}
+const T& get_neighbors					(int v)				const		{return adj_[v];}
+      T& get_neighbors					(int v)							{return adj_[v];}
 	
 //////////////////////////
 // memory allocation 
@@ -130,29 +125,30 @@ virtual void remove_vertices			(const BitBoardN&);
 // I/O
 public:
 	//TODO@place in a graph_io class
-	int read_dimacs						(const string& filename);	
-	int read_mtx						(const string& filename);
-	int read_EDGES						(const string& filename);
-	int read_01							(const string& filename);
-virtual	void  write_dimacs				(ostream& o);	
-virtual	void  write_EDGES				(ostream& o);
+	int read_dimacs						(const std::string& filename);	
+	int read_mtx						(const std::string& filename);
+	int read_EDGES						(const std::string& filename);
+	int read_01							(const std::string& filename);
+virtual	void  write_dimacs				(std::ostream& o);	
+virtual	void  write_EDGES				(std::ostream& o);
 
 virtual	ostream& print_data				(bool lazy=true, std::ostream& = std::cout, bool endl=true);
 	ostream& print_adj					(std::ostream& = std::cout, bool add_endl=true);
-	virtual ostream& print_edges		(ostream& = std::cout) const;
+	virtual ostream& print_edges		(std::ostream& = std::cout) const;
 	virtual ostream& print_edges		(T& bbsg, ostream& = std::cout) const;	/* edges of subgraph*/
 		
 //////////////////////////
-// ATTRIBUTES
+// data members
 protected:
-	vector<T> m_g;			//adjacency matrix 
-	int m_size;				//graph order (number of vertices)
-	int m_BB;				//number of bit blocks per row (in the case of sparse graphs this is a maximum value)
-	BITBOARD m_edges;		//number of edges (updated on the fly)
+	std::vector<T> adj_;	//adjacency matrix 
+	int NV_;				//number of vertices
+	BITBOARD NE_;			//number of edges (updated on the fly)
+	int BB_;				//number of bit blocks per row (in the case of sparse graphs this is a maximum value)
+	
 
 	//strings
-	std::string m_name;		//graph label	
-	std::string m_path;		//(extension used for weight files-4/3/17)
+	std::string name_;		//graph label	
+	std::string path_;		//(extension used for weight files-4/3/17)
 };
 
 template <class T>
@@ -173,8 +169,8 @@ Graph<T>::Graph(int nV, int* adj[], string name) {
 template <class T>
 bool operator == (const Graph<T>& lhs, const Graph<T>& rhs){
 
-	return lhs.m_g == rhs.m_g;
-	/*for(int i=0; i<lhs.m_size; i++){
+	return lhs.adj_ == rhs.adj_;
+	/*for(int i=0; i<lhs.NV_; i++){
 		if(!(lhs.get_neighbors(i)==rhs.get_neighbors(i)))
 			return false;
 	}
@@ -194,8 +190,8 @@ ostream& Graph<T>::print_adj (std::ostream& o, bool add_endl){
 // TODO@ test (3/12/17)
 
 		
-	for(int i=0; i<m_size; i++){
-		for(int j=0; j<m_size; j++){
+	for(int i=0; i<NV_; i++){
+		for(int j=0; j<NV_; j++){
 			/*if(i==j && m_is_wv){
 				o<<m_wv[i]<<" ";
 			}else*/ if(is_edge(i,j)){
@@ -210,13 +206,13 @@ ostream& Graph<T>::print_adj (std::ostream& o, bool add_endl){
 }
 
 template<class T>
-Graph<T>::Graph(void): m_size(0), m_BB(0), m_edges(0), m_name(""), m_path(""){
-	m_g.clear();	
+Graph<T>::Graph(void): NV_(0), BB_(0), NE_(0), name_(""), path_(""){
+	adj_.clear();	
 }
 
 template<class T>
-Graph<T>::Graph(string filename): m_size(0), m_BB(0), m_edges(0), m_name(""), m_path("") {
-	m_g.clear();
+Graph<T>::Graph(string filename): NV_(0), BB_(0), NE_(0), name_(""), path_("") {
+	adj_.clear();
 	int status = set_graph(filename);
 	if (status == -1) { LOG_ERROR("error when opening file, exiting...-Graph<T>::Graph"); exit(-1); }
 }
@@ -224,8 +220,8 @@ Graph<T>::Graph(string filename): m_size(0), m_BB(0), m_edges(0), m_name(""), m_
 template<class T>
 Graph<T>::Graph (int size){
 //creates empty graph of size
-	m_name.clear();
-	m_path.clear();
+	name_.clear();
+	path_.clear();
 	init(size);
 }
 
@@ -236,11 +232,11 @@ void Graph<T>::set_name(std::string name, bool separate_path){
 	if(separate_path){
 		std::string str=name;
 		size_t found=str.find_last_of("/\\");
-		m_name=str.substr(found+1);
-		m_path=str.substr(0,found+1);  //includes slash
+		name_=str.substr(found+1);
+		path_=str.substr(0,found+1);  //includes slash
 	}else{
-		m_name=name;
-		m_path.clear();
+		name_=name;
+		path_.clear();
 	}
 	
 
@@ -261,21 +257,21 @@ void Graph<T>::set_name(std::string name, bool separate_path){
 //	if(this==&g) return *this;		//same graph
 //
 //	//allocation
-//	init(g.m_size);					 //possibly throw exception
-//	for(int i=0; i<m_size; i++){
-//					m_g[i]=g.m_g[i];
+//	init(g.NV_);					 //possibly throw exception
+//	for(int i=0; i<NV_; i++){
+//					adj_[i]=g.adj_[i];
 //	}
 //	
-//	this->m_name=g.m_name;
-//	this->m_path=g.m_path;	
+//	this->name_=g.name_;
+//	this->path_=g.path_;	
 //				
 //return *this;
 //}
 
 template<class T>
 void Graph<T>::clear (){
-	m_g.clear(), m_name.clear(), m_path.clear();
-	m_size=0, m_BB=0, m_edges=0;
+	adj_.clear(), name_.clear(), path_.clear();
+	NV_=0, BB_=0, NE_=0;
 }
 
 template<class T>
@@ -289,29 +285,29 @@ int Graph<T>::init(int size){
 	//clear();
 	//	
 	//try{
-	//	m_g.resize(size);	
+	//	adj_.resize(size);	
 	//}catch(...){
 	//	cout<<"memory for graph not allocated";
 	//	return -1;
 	//}
 
 //new simple allocation
-	m_edges = 0;
+	NE_ = 0;
 	try{
-		m_g.assign(size, T(size));				//old and new bitstrings have different sizes!! (17/01/2023) (1)
+		adj_.assign(size, T(size));				//old and new bitstrings have different sizes!! (17/01/2023) (1)
 	}catch(...){
-		m_size = 0;
-		m_BB = 0;		
+		NV_ = 0;
+		BB_ = 0;		
 		LOG_ERROR("memory for graph not allocated-Graph<T>::init");
 		return -1;
 	}
 
-	m_size=size;
-	m_BB=INDEX_1TO1(m_size);
+	NV_=size;
+	BB_=INDEX_1TO1(NV_);
 		
 	//zero edges
-	for(int i=0; i<m_size; i++){
-		m_g[i].init(m_size);					//MUST BE!  (1)
+	for(int i=0; i<NV_; i++){
+		adj_[i].init(NV_);					//MUST BE!  (1)
 	}
 
 
@@ -324,10 +320,10 @@ int Graph<T>::add_vertex(int toADD) {
 	// Allocates memory for the enlarged graph |V'|= |V| + toADD
 	// with an empty neighborhood
 	
-	m_size += toADD;
+	NV_ += toADD;
 
 	try {
-		m_g.resize(m_size);
+		adj_.resize(NV_);
 	}
 	catch (...) {
 		LOG_INFO("memory for graph not allocated-Graph<T>::enlarge(...), exiting");
@@ -346,7 +342,7 @@ Graph<T>& Graph<T>::create_subgraph (int size, Graph<T>& newg)  {
 // creates new subgraph with subset of size vertices 
 
 	//assert is size required is greater or equal current size
-	if(size >= m_size || size <= 0){
+	if(size >= NV_ || size <= 0){
 		LOG_ERROR("Graph<T>& Graph<T>::create_subgraph-wrong shrinking size for graph. Remains unchanged");
 		return *this;
 	}
@@ -355,12 +351,12 @@ Graph<T>& Graph<T>::create_subgraph (int size, Graph<T>& newg)  {
 	int bbh=WDIV(size-1);
 
 	
-	for(int i=0; i<newg.m_size; i++){
+	for(int i=0; i<newg.NV_; i++){
 		for(int j=0; j<=bbh; j++){
-			newg.m_g[i].get_bitboard(j)=m_g[i].get_bitboard(j);
+			newg.adj_[i].get_bitboard(j)=adj_[i].get_bitboard(j);
 		}
 		//trims last bitblock
-		newg.m_g[i].get_bitboard(bbh)&=~Tables::mask_left[WMOD(size-1)];
+		newg.adj_[i].get_bitboard(bbh)&=~Tables::mask_left[WMOD(size-1)];
 	}
 	
 return newg;
@@ -375,7 +371,7 @@ Graph<sparse_bitarray>& Graph<sparse_bitarray>::create_subgraph (int size, Graph
 // RETURNS: reference to the new subgraph
 	
 	//assert is size required is greater or equal current size
-	if(size>=m_size || size<=0){
+	if(size>=NV_ || size<=0){
 		LOG_ERROR("Graph<sparse_bitarray>& Graph<sparse_bitarray>::create_subgraph-wrong shrinking size for graph. Remains unchanged");
 		return *this;
 	}
@@ -383,9 +379,9 @@ Graph<sparse_bitarray>& Graph<sparse_bitarray>::create_subgraph (int size, Graph
 	newg.init(size);
 	
 	//copies to the new graph
-	for(int i=0; i<newg.m_size; i++){
-		newg.m_g[i]=m_g[i];
-		newg.m_g[i].clear_bit(size, EMPTY_ELEM);		//from size to the end
+	for(int i=0; i<newg.NV_; i++){
+		newg.adj_[i]=adj_[i];
+		newg.adj_[i].clear_bit(size, EMPTY_ELEM);		//from size to the end
 	}
 
 return newg;
@@ -406,20 +402,20 @@ inline
 int Graph<sparse_bitarray>::shrink_to_fit(int size){
 /////////////////////
 // shrinks graph to the size passed (must be less than current size)
-	if(m_size<=size){
+	if(NV_<=size){
 		LOG_ERROR("Graph<sparse_bitarray>::shrink_to_fit-wrong shrinking size for graph, remains unchanged");
 		return -1;
 	}
 
 	//trims vertices 
 	for(int i=0; i<size; i++){
-		m_g[i].clear_bit(size, EMPTY_ELEM);		//from size to the end
+		adj_[i].clear_bit(size, EMPTY_ELEM);		//from size to the end
 	}
 	
 	//resizes adjacency matrix
-	m_g.resize(size);
-	m_size=size;
-	m_edges=0;									//so that when needed will be recomputed
+	adj_.resize(size);
+	NV_=size;
+	NE_=0;									//so that when needed will be recomputed
 
 return 0;
 }
@@ -428,7 +424,7 @@ return 0;
 
 template<class T>
 const T* Graph<T>::get_graph()	const{
-	return m_g;
+	return adj_;
 }
 
 template<class T>
@@ -449,16 +445,16 @@ void Graph<T>::add_edge (int v, int w){
 ///////////////
 // sets v-->w (no self loops allowed)
 	if(v!=w){
-		m_g[v].set_bit(w);
-		m_edges++;
+		adj_[v].set_bit(w);
+		NE_++;
 	}
 
 }
 
 template<class T>
 void Graph<T>::remove_edge	(int v, int w){
-	m_g[v].erase_bit(w);
-	m_edges--;
+	adj_[v].erase_bit(w);
+	NE_--;
 }
 
 template<class T>
@@ -466,12 +462,12 @@ void Graph<T>::remove_edges (int v){
 //removes in-out edges from v
 	
 	//erases all outgoing edges from v
-	m_g[v].erase_bit();
+	adj_[v].erase_bit();
 
 	//erases all ingoing edges
-	for(int w=0; w<m_size; w++){
+	for(int w=0; w<NV_; w++){
 		if(w==v) continue;
-		m_g[w].erase_bit(v);
+		adj_[w].erase_bit(v);
 	}
 
 	//updates edges
@@ -518,7 +514,7 @@ int Graph<T>::read_dimacs(const string& filename){
 	//	LOG_ERROR("Graph<T>::read_dimacs-DIMACS weights found in file: excluding other weights");
 	//	init_wv();
 	//	m_is_wv=true;
-	//	for(int n=0; n<m_size; n++){
+	//	for(int n=0; n<NV_; n++){
 	//		f>>c>>v1>>wv;
 	//		if(!f.good()){
 	//			cerr<<"bad line related to weights"<<endl;
@@ -684,7 +680,7 @@ int  Graph<T>::read_EDGES (const string& filename){
 template<class T>
 inline
 ostream& Graph<T>::print_data( bool lazy, std::ostream& o, bool endl) {
-	o << m_name.c_str() << "\t" << number_of_vertices() << "\t" << std::fixed << number_of_edges(lazy) << "\t" << std::setprecision(6) << density(true);
+	o << name_.c_str() << "\t" << number_of_vertices() << "\t" << std::fixed << number_of_edges(lazy) << "\t" << std::setprecision(6) << density(true);
 	if (endl) { o << std::endl; }
 	return o;
 }
@@ -692,8 +688,8 @@ ostream& Graph<T>::print_data( bool lazy, std::ostream& o, bool endl) {
 template<class T>
 inline
 ostream& Graph<T>::print_edges (std::ostream& o) const{
-	for(int i=0; i<m_size-1; i++){
-		for(int j=i+1; j<m_size; j++){
+	for(int i=0; i<NV_-1; i++){
+		for(int j=i+1; j<NV_; j++){
 			if(is_edge(i,j)){
 				o<<"["<<i<<"]"<<"-->"<<"["<<j<<"]"<<endl;
 			}
@@ -710,9 +706,9 @@ inline
 ostream& Graph<T>::print_edges (T& bbsg, ostream& o)const {
 /////////////
 // TODO-optimize
-	for(int i=0; i<m_size-1; i++){
+	for(int i=0; i<NV_-1; i++){
 		if(!bbsg.is_bit(i)) continue;
-		for(int j=i+1; j<m_size; j++){
+		for(int j=i+1; j<NV_; j++){
 			if(!bbsg.is_bit(j)) continue;
 			if(is_edge(i,j)){
 				o<<"["<<i<<"]"<<"-->"<<"["<<j<<"]"<<endl;
@@ -733,11 +729,11 @@ BITBOARD Graph<T>::number_of_edges	(const T& bbn) const{
 // Last Updated: 12/4/12  
 	
 	BITBOARD edges=0;
-	for(int i=0; i<m_size; i++){
+	for(int i=0; i<NV_; i++){
 		if(bbn.is_bit(i)){
-			for(int j=0; j<m_size; j++)
+			for(int j=0; j<NV_; j++)
 				if(bbn.is_bit(j)){
-					if(m_g[i].is_bit(j)) edges++;
+					if(adj_[i].is_bit(j)) edges++;
 				}
 		}
 	}
@@ -750,20 +746,20 @@ BITBOARD Graph<T>::number_of_edges	(bool lazy) {
 // Computes edges only once and caches its value
 //
 // REMARKS: Can be an expensive operation
-	if (lazy && m_edges != 0) { return m_edges; }
+	if (lazy && NE_ != 0) { return NE_; }
 	
 	BITBOARD  edges=0;
-	for(int i=0; i<m_size; i++){
-		for(int j=0; j<m_size; j++){
+	for(int i=0; i<NV_; i++){
+		for(int j=0; j<NV_; j++){
 			if(is_edge(i,j)){			//O(log) in sparse graphs (specialize)
 				edges++;
 			}
 		}
 	}
-	m_edges=edges;
+	NE_=edges;
 	
 
-return m_edges;
+return NE_;
 }
 
 template<> inline
@@ -771,21 +767,21 @@ BITBOARD Graph<sparse_bitarray>::number_of_edges(bool lazy) {
 //specialization for sparse graphs (is adjacent runs in O(log)) 
 // 
 
-	if(lazy && m_edges !=0) 
-				return m_edges;
+	if(lazy && NE_ !=0) 
+				return NE_;
 		
 	BITBOARD  edges=0;
-	for(int i=0; i<m_size; i++){
-		edges+=m_g[i].popcn64();
+	for(int i=0; i<NV_; i++){
+		edges+=adj_[i].popcn64();
 	}
-	m_edges=edges;
+	NE_=edges;
 	
-return m_edges;
+return NE_;
 }
 
 template<class T>
 double Graph<T>::density (bool lazy) {
-	BITBOARD max_edges=m_size;									//important for very large graphs as (I) is bigger than unsigned int
+	BITBOARD max_edges=NV_;									//important for very large graphs as (I) is bigger than unsigned int
 	max_edges*=(max_edges-1);									//(I)
 	return (number_of_edges(lazy)/(double)max_edges);				//n*(n-1) edges
 }
@@ -799,14 +795,14 @@ double Graph<T>::block_density	()	const{
 // REMARKS: has to be specialized for sparse graphs
 
 	size_t nBB=0;
-	for(int v=0; v<m_size; ++v){
-		for(int bb=0; bb<m_BB; bb++){
-			if(m_g[v].get_bitboard(bb))				
+	for(int v=0; v<NV_; ++v){
+		for(int bb=0; bb<BB_; bb++){
+			if(adj_[v].get_bitboard(bb))				
 				nBB++;
 		}
 	}
 
-return (nBB/static_cast<double>(m_BB*m_size));
+return (nBB/static_cast<double>(BB_*NV_));
 }
 
 template<> inline
@@ -817,10 +813,10 @@ double Graph<sparse_bitarray>::block_density	()	const{
 // RESULT: should be a 1.0 ratio, since only non-zero bitblocks are stored
 
 	size_t nBB=0; size_t nBBt=0;
-	for(int v=0; v<m_size; ++v){
-		nBBt+=m_g[v].number_of_bitblocks();
-		for(int bb=0; bb<m_g[v].number_of_bitblocks(); bb++){
-			if(m_g[v].get_bitboard(bb))							
+	for(int v=0; v<NV_; ++v){
+		nBBt+=adj_[v].number_of_bitblocks();
+		for(int bb=0; bb<adj_[v].number_of_bitblocks(); bb++){
+			if(adj_[v].get_bitboard(bb))							
 						nBB++;
 		}
 	}
@@ -834,14 +830,14 @@ double Graph<sparse_bitarray>::block_density_index()	{
 /////////////////////////
 // a measure of sparsity in relation to the number of bitblocks //
 	size_t nBB=0; size_t nBBt=0;
-	for(int v=0; v<m_size; ++v){
-		nBBt+=m_g[v].number_of_bitblocks();
+	for(int v=0; v<NV_; ++v){
+		nBBt+=adj_[v].number_of_bitblocks();
 	}
 
-	BITBOARD aux=ceil(m_size/double(WORD_SIZE));
-	BITBOARD maxBlock=m_size*aux;
+	BITBOARD aux=ceil(NV_/double(WORD_SIZE));
+	BITBOARD maxBlock=NV_*aux;
 
-	cout<<m_size<<":"<<aux<<":"<<nBBt<<":"<<maxBlock<<endl;
+	cout<<NV_<<":"<<aux<<":"<<nBBt<<":"<<maxBlock<<endl;
 	return (double(nBBt))/maxBlock;
 
 }
@@ -854,10 +850,10 @@ double Graph<sparse_bitarray>::average_block_density_index()	{
 //
 	size_t nBB=0; size_t nBBt=0;
 	double den=0.0;
-	for(int v=0; v<m_size; ++v){
-		nBB=m_g[v].number_of_bitblocks();
+	for(int v=0; v<NV_; ++v){
+		nBB=adj_[v].number_of_bitblocks();
 		nBBt+=nBB;
-		int pc=m_g[v].popcn64();
+		int pc=adj_[v].popcn64();
 		den+=double(pc)/(BITBOARD(nBB)*WORD_SIZE);
 	}
 		
@@ -879,7 +875,7 @@ bool Graph<T>::is_edge	(int i, int j) const{
 // true if there is an edge (i,j)
 // First created: 14/10/2010
 
-	return(m_g[i].is_bit(j));
+	return(adj_[i].is_bit(j));
 }
 
 
@@ -888,8 +884,8 @@ bool Graph<T>::is_no_self_loops () const{
 //////////////////
 // true if there is no edge (v,v) 
 
-	for(int i=0; i<m_size; i++)
-		if( m_g[i].is_bit(i)) {
+	for(int i=0; i<NV_; i++)
+		if( adj_[i].is_bit(i)) {
 			cout<<"Graph with self-loops in:"<<i<<endl;
 			return false;
 		}
@@ -902,23 +898,23 @@ void Graph<T>::remove_vertices (const BitBoardN& bbn, Graph& g){
 /////////////////////
 // returns in g the induced graph by bbn
 
-	m_edges=0;									//resets vertices
+	NE_=0;									//resets vertices
 	int pc=bbn.popcn64();
-	int new_size=m_size-pc;
+	int new_size=NV_-pc;
 	if(pc==0){return;}
 	else if(new_size==0){ g.clear();}				//empty graph
 	
 	g.init(new_size);
-	g.set_name(this->m_name);
+	g.set_name(this->name_);
 	int l=0; int m=0;
 	
 	//runs through the whole graph
-	for(int i=0; i<m_size-1; i++){
+	for(int i=0; i<NV_-1; i++){
 		if(bbn.is_bit(i))continue;				//jumps over vertices marked for deletion
 		m=l+1;										
-		for(int j=i+1; j<m_size; j++){
+		for(int j=i+1; j<NV_; j++){
 			if(bbn.is_bit(j)) continue;			//jumps over vertices marked for deletion
-			if(m_g[i].is_bit(j)){
+			if(adj_[i].is_bit(j)){
 				g.add_edge(l,m);
 			}
 			m++;
@@ -947,7 +943,7 @@ int Graph<T>::degree_out (int v)const{
 ///////////////////
 // outcoming edges from v
 
-	return m_g[v].popcn64();
+	return adj_[v].popcn64();
 }
 
 
@@ -956,9 +952,9 @@ int Graph<T>::degree_in (int v)const{
 ///////////////////
 // incoming edges to v (endpoint in v)
 	int res=0;
-	for(int i=0; i<m_size; i++){
+	for(int i=0; i<NV_; i++){
 		if(i==v) continue;
-		if(m_g[i].is_bit(v)) 
+		if(adj_[i].is_bit(v)) 
 			res++;
 	}
 return res;
@@ -968,14 +964,14 @@ template<class T>
 void Graph<T>::make_bidirected (){
 ///////////////////
 // makes all edges symmetrical
-	for(int i=0; i<m_size; i++){
-		for(int j=0; j<m_size; j++){
+	for(int i=0; i<NV_; i++){
+		for(int j=0; j<NV_; j++){
 			if(is_edge(i,j)) add_edge(j, i);
 			if(is_edge(j,i)) add_edge(i, j);
 		}
 	}
 	
-	m_edges=0;	//resets edges to avoid lazy evaluation later
+	NE_=0;	//resets edges to avoid lazy evaluation later
 }
 
 template<class T>
@@ -988,22 +984,22 @@ void Graph<T>::write_dimacs (ostream& o) {
 	o<<"c File written by GRAPH:"<<PrecisionTimer::local_timestamp();
 	
 	//name
-	if(!m_name.empty())
-		o<<"\nc "<<m_name.c_str()<<endl;
+	if(!name_.empty())
+		o<<"\nc "<<name_.c_str()<<endl;
 
 	//tamaño del grafo
-	o<<"p edge "<<m_size<<" "<<number_of_edges()<<endl<<endl;
+	o<<"p edge "<<NV_<<" "<<number_of_edges()<<endl<<endl;
 
 	//write DIMACS nodes n <v> <w>
 	//if (is_weighted_v()){
-	//	for(int v=0; v<m_size; v++){
+	//	for(int v=0; v<NV_; v++){
 	//		o<<"n "<<v+1<<" "<<get_wv(v)<<endl;
 	//	}
 	//}
 	
 	//write edges
-	for(int v=0; v<m_size; v++){
-		for(int w=0; w<m_size; w++){
+	for(int v=0; v<NV_; v++){
+		for(int w=0; w<NV_; w++){
 			if(v==w) continue;
 			if(is_edge(v,w) )							//O(log) for sparse graphs: specialize
 					o<<"e "<<v+1<<" "<<w+1<<endl;		//1 based vertex notation dimacs
@@ -1023,12 +1019,12 @@ void  Graph<T>::write_EDGES	(ostream& o){
 	o<<"% File written by GRAPH:"<<PrecisionTimer::local_timestamp();
 	
 	//name
-	if(!m_name.empty())
-		o<<"\n%  "<<m_name.c_str()<<endl;
+	if(!name_.empty())
+		o<<"\n%  "<<name_.c_str()<<endl;
 	
 	//write edges
-	for(int v=0; v<m_size; v++){
-		for(int w=0; w<m_size; w++){
+	for(int v=0; v<NV_; v++){
+		for(int w=0; w<NV_; w++){
 			if(v==w) continue;
 			if(is_edge(v,w) )							//O(log) for sparse graphs: specialize
 					o<<v+1<<" "<<w+1<<endl;				//1 based vertex notation dimacs
@@ -1046,18 +1042,18 @@ void Graph<sparse_bitarray>::write_dimacs (ostream& o) {
 	//***timestamp 
 	
 	//name
-	if(!m_name.empty())
-		o<<"\nc "<<m_name.c_str()<<endl;
+	if(!name_.empty())
+		o<<"\nc "<<name_.c_str()<<endl;
 
 	//tamaño del grafo
-	o<<"p edge "<<m_size<<" "<<number_of_edges()<<endl<<endl;
+	o<<"p edge "<<NV_<<" "<<number_of_edges()<<endl<<endl;
 	
 	//Escribir nodos
-	for(int v=0; v<m_size; v++){
+	for(int v=0; v<NV_; v++){
 		//non destructive scan of each bitstring
-		if(m_g[v].init_scan(bbo::NON_DESTRUCTIVE)!=EMPTY_ELEM){
+		if(adj_[v].init_scan(bbo::NON_DESTRUCTIVE)!=EMPTY_ELEM){
 			while(1){
-				int w=m_g[v].next_bit();
+				int w=adj_[v].next_bit();
 				if(w==EMPTY_ELEM)
 					break;
 				o<<"e "<<v+1<<" "<<w+1<<endl;	
