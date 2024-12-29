@@ -341,8 +341,9 @@ namespace com {
 //////////////////////////////
 namespace com {
 	namespace sort {
-
-
+		enum { FIRST_TO_LAST = 0, LAST_TO_FIRST };		
+		enum { NEW_TO_OLD = 0, OLD_TO_NEW };			//format of the ordering - old-to-new in the space of the original graph, new-to-old in the space of the new graph
+ 		
 		/********************************************************************************************************************************
 		*
 		*		 Sorting of n items (integer) according to non-increasing values of their scores (double)

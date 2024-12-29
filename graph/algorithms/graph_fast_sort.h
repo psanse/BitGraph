@@ -1,11 +1,12 @@
 /*
 * graph_fast_sort.h: header for GraphFastRootSort class which sorts graphs by different criteria
 * @created 12/03/15
-* @tag1 changed nodes_ stack to vector (18/03/19)
-* @last_update 19/12/24
+* @tag_1 changed nodes_ stack to vector (18/03/19)
+* @last_update 29/12/24
 * @dev pss
 * 
-* @TODO CHECK how the static order affects the degen order
+* @TODO add.further primitives for composite orderings in subgraphs (29/12/24)
+* @TOD0 add new_order(...) for subgraphs (29/12/24)
 */
 
 #ifndef __GRAPH_FAST_SORT_H__
@@ -134,7 +135,7 @@ public:
 	* @important requires prior computation of deg
 	* @return output ordering in [OLD]->[NEW] format
 	*/
-	const vint&  sort_non_increasing_deg(bool rev=false);		
+	const vint&  sort_non_increasing_deg(bool rev);		
 
 	/*
 	* @brief Computes a non-decreasing degree (non-degenerate) ordering 
@@ -142,7 +143,7 @@ public:
 	* @important requires prior computation of deg
 	* @return ouptut ordering in [OLD]->[NEW] format
 	*/
-	const vint&  sort_non_decreasing_deg(bool rev=false);
+	const vint&  sort_non_decreasing_deg(bool rev);
 
 	/*
 	* @brief Computes a non-increasing degree (non-degenerate) ordering with tiebreak by supprt 
@@ -150,7 +151,7 @@ public:
 	* @important requires prior computation of deg and support
 	* @return output ordering in [OLD]->[NEW] format
 	*/
-	const vint&  sort_non_increasing_deg_with_support_tb(bool rev=false);
+	const vint&  sort_non_increasing_deg_with_support_tb(bool rev);
 
 	/*
 	* @brief Computes a non-decreasing degree (non-degenerate) ordering with tiebreak by supprt
@@ -158,15 +159,15 @@ public:
 	* @important requires prior computation of deg and support
 	* @return output ordering in [OLD]->[NEW] format
 	*/
-	const vint&  sort_non_decreasing_deg_with_support_tb(bool rev=false);
+	const vint&  sort_non_decreasing_deg_with_support_tb(bool rev);
 		
 	/*
 	* @brief Degenerate non-decreasing degree ordering
 	* @comments deg info is not restored after the call
 	* @return output ordering in [OLD]->[NEW] format
 	*/
-	const vint&  sort_degen_non_decreasing_degree(bool rev=false);				
-	const vint&  sort_degen_non_increasing_degree(bool rev=false);				
+	const vint&  sort_degen_non_decreasing_degree(bool rev);				
+	const vint&  sort_degen_non_increasing_degree(bool rev);				
 	
 	/*
 	*@brief Composite non-decreasing degree degenerate ordering based on a prior given ordering 
@@ -174,7 +175,7 @@ public:
 	*@comments the vertex ordering has to be set (with set_ordering(...)) prior to the call
 	*@return output ordering in [OLD]->[NEW] format
 	*/
-	const vint& sort_degen_composite_non_decreasing_degree( bool rev = false);	
+	const vint& sort_degen_composite_non_decreasing_degree( bool rev);	
 
 
 	/*
@@ -183,26 +184,45 @@ public:
 	*@comments the vertex ordering has to be set (with set_ordering(...)) prior to the call
 	*@return output ordering in [OLD]->[NEW] format
 	*/
-	const vint& sort_degen_composite_non_increasing_degree( bool rev = false);	
+	const vint& sort_degen_composite_non_increasing_degree( bool rev );	
 	
 	/////////////////
-	// Subgrah ordering (experimental)
+	// Subgrah ordering 
+	// (TODO - add further primitives for composites..)
 	
 	/*
-	*@brief sorts the first k vertices by non-increasing degree (non-degenerate) in @nodes_
+	*@brief sorts the first k vertices by non-increasing degree (non-degenerate) 
 	*@param first_k  first k < |V|  vertices to sort ([0..k-1])
 	*@param rev reverse ordering if TRUE
 	*@return output ordering in [OLD]->[NEW] format
 	*/
-    const vint&  sort_non_increasing_deg(int first_k, bool rev = false);
+    const vint&  sort_non_increasing_deg(int first_k, bool rev );
+	
+	/*
+	*@brief sorts [first, last] consecutive vertices by non-increasing degree (non-degenerate)
+	*@param first  first vertex to sort (0-based index) - in  [0, |V|-1] 
+	*@param last  last vertex to sort	(0-based index)	- in  [0, |V|-1], > first 
+	*@param rev reverse ordering if TRUE
+	*@return output ordering in [OLD]->[NEW] format
+	*/
+	const vint& sort_non_increasing_deg(int first, int last, bool rev);
 
 	/*
-	*@brief sorts the first k vertices by non-decreasing degree (non-degenerate) in @nodes_
+	*@brief sorts the first k vertices by non-decreasing degree (non-degenerate) 
 	*@param first_k  first k < |V|  vertices to sort ([0..k-1])
 	*@param rev reverse ordering if TRUE
 	*@return output ordering in [OLD]->[NEW] format
 	*/
-	const vint&  sort_non_decreasing_deg(int first_k, bool rev = false);
+	const vint&  sort_non_decreasing_deg(int first_k, bool rev);
+
+	/*
+	*@brief sorts [first, last] consecutive vertices by non-decreasing degree (non-degenerate)
+	*@param first  first vertex to sort (0-based index) - in  [0, |V|-1]
+	*@param last  last vertex to sort	(0-based index)	- in  [0, |V|-1], > first
+	*@param rev reverse ordering if TRUE
+	*@return output ordering in [OLD]->[NEW] format
+	*/
+	const vint& sort_non_decreasing_deg(int first, int last, bool rev);
 
 	//TODO - add tiebreak support for subgraph ordering 
 	//int  sort_non_increasing_deg_with_support_tb(int n, bool rev = false);
@@ -458,7 +478,7 @@ const vint& GraphFastRootSort<Graph_t>::sort_degen_composite_non_increasing_degr
 template<class Graph_t>
 inline const vint& GraphFastRootSort<Graph_t>::sort_non_increasing_deg(int first_k, bool rev)
 {		
-	set_ordering();
+	
 	vint kord;
 	::com::sort::fill_vertices(kord, first_k);
 
@@ -471,7 +491,7 @@ inline const vint& GraphFastRootSort<Graph_t>::sort_non_increasing_deg(int first
 		std::reverse(kord.begin(), kord.end());
 	}
 
-	//generates the ordering - first k vertices at the beginning
+	//generates the ordering in @nodes_ - first k vertices at the beginning
 	nodes_= kord;
 	nodes_.reserve(NV_);
 	for (int v = first_k; v < NV_; v++) {
@@ -481,9 +501,35 @@ inline const vint& GraphFastRootSort<Graph_t>::sort_non_increasing_deg(int first
 }
 
 template<class Graph_t>
-inline const vint& GraphFastRootSort<Graph_t>::sort_non_decreasing_deg(int first_k, bool rev)
-{
-	set_ordering();
+inline const vint& GraphFastRootSort<Graph_t>::sort_non_increasing_deg(int first, int last,  bool rev) {
+
+	vint kord;
+	kord.reserve(last - first + 1);
+	for (int i = first; i <= last; i++) {
+		kord.emplace_back(i);
+	}
+
+	//////////////////////////////////////////////////////
+	::com::has_greater_val<int, vint> pred(nb_neigh_);
+	//////////////////////////////////////////////////////
+
+	std::stable_sort(kord.begin(), kord.end(), pred);
+	if (rev) {
+		std::reverse(kord.begin(), kord.end());
+	}
+
+	//generates the ordering - first k vertices at the beginning
+	set_ordering();				//trivial ordering in @nodes_
+	int index = first;
+	for (auto v : kord) {
+		nodes_[index++] = v;	//substitute in nodes_ the sorted vertices
+	}
+		
+	return nodes_;
+}
+
+template<class Graph_t>
+inline const vint& GraphFastRootSort<Graph_t>::sort_non_decreasing_deg(int first_k, bool rev){	
 	vint kord;
 	::com::sort::fill_vertices(kord, first_k);
 
@@ -501,6 +547,34 @@ inline const vint& GraphFastRootSort<Graph_t>::sort_non_decreasing_deg(int first
 	nodes_.reserve(NV_);
 	for (int v = first_k; v < NV_; v++) {
 		nodes_.emplace_back(v);
+	}
+
+	return nodes_;
+}
+
+template<class Graph_t>
+inline const vint& GraphFastRootSort<Graph_t>::sort_non_decreasing_deg(int first, int last, bool rev) {
+
+	vint kord;
+	kord.reserve(last - first + 1);
+	for (int i = first; i <= last; i++) {
+		kord.emplace_back(i);
+	}
+
+	//////////////////////////////////////////////////////
+	::com::has_smaller_val<int, vint> pred(nb_neigh_);
+	//////////////////////////////////////////////////////
+
+	std::stable_sort(kord.begin(), kord.end(), pred);
+	if (rev) {
+		std::reverse(kord.begin(), kord.end());
+	}
+
+	//generates the ordering - first k vertices at the beginning
+	set_ordering();				//trivial ordering in @nodes_
+	int index = first;
+	for (auto v : kord) {
+		nodes_[index++] = v;	//substitute in @nodes_ the sorted vertices
 	}
 
 	return nodes_;

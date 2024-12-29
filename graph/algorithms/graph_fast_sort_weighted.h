@@ -146,19 +146,19 @@ int GraphFastRootSort_W<GraphW_t>::reorder(const vint& new_order, GraphW_t& gn, 
 			}
 		}
 	}
-
-	///////////////
-	//stores decoding information [NEW]->[OLD]
-	if (d != nullptr) {
-		vint aux(new_order);										//new_order is [OLD]->[NEW]
-		Decode::reverse_in_place(aux);								//aux is [NEW] to [OLD]		
-		d->insert_ordering(aux);
-	}
-
+	
 	/////////////////////
 	//vertex weights update
 	for (int i = 0; i <NV; i++) {
 		gn.set_w(new_order[i], gw_.get_w(i));
+	}
+
+	///////////////
+	//stores decoding information [NEW]->[OLD]
+	if (d != nullptr) {
+		vint aux(new_order);										//@new_order is in format [OLD]->[NEW]
+		Decode::reverse_in_place(aux);								//@aux is in format [NEW] to [OLD]		
+		d->insert_ordering(aux);
 	}
 	
 	/////////////////////

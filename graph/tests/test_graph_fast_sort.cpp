@@ -16,6 +16,7 @@
 #include <string>
 
 using namespace std;
+using namespace ::com::sort;
 
 #define PATH_GFS_TESTS_DATA	 PATH_GRAPH_TESTS_CMAKE_SRC_CODE		//fixed in CMakeLists.txt
 
@@ -88,7 +89,7 @@ TEST_F(GraphFastRootSortTest, sort_non_decreasing_deg) {
 	using gt = GraphFastRootSort<ugraph>;
 	gt sorter(ug);
 	sorter.compute_deg_root();
-	vint mapping = sorter.sort_non_decreasing_deg();
+	vint mapping = sorter.sort_non_decreasing_deg(false);
 
 	////////////////////////////////////////////
 	vint mapping_exp = { 0, 2, 4, 5, 3, 1 };
@@ -105,7 +106,7 @@ TEST_F(GraphFastRootSortTest, sort_non_increasing_deg) {
 	using gt = GraphFastRootSort<ugraph>;
 	gt sorter(ug);
 	sorter.compute_deg_root();
-	vint mapping = sorter.sort_non_increasing_deg();
+	vint mapping = sorter.sort_non_increasing_deg(false);
 
 	////////////////////////////////////////////
 	vint mapping_exp = { 1, 3, 2, 4, 5, 0 };
@@ -123,7 +124,7 @@ TEST_F(GraphFastRootSortTest, sort_non_decreasing_deg_with_support_tb) {
 	gt sorter(ug);
 	sorter.compute_deg_root();
 	sorter.compute_support_root();
-	vint mapping = sorter.sort_non_decreasing_deg_with_support_tb();
+	vint mapping = sorter.sort_non_decreasing_deg_with_support_tb(false);
 
 	////////////////////////////////////////////
 	vint mapping_exp = { 0, 5, 2, 4, 3, 1 };
@@ -141,7 +142,7 @@ TEST_F(GraphFastRootSortTest, sort_non_increasing_deg_with_support_tb) {
 	gt sorter(ug);
 	sorter.compute_deg_root();
 	sorter.compute_support_root();
-	vint mapping = sorter.sort_non_increasing_deg_with_support_tb();
+	vint mapping = sorter.sort_non_increasing_deg_with_support_tb(false);
 
 	////////////////////////////////////////////
 	vint mapping_exp = { 1, 3, 2, 4, 5, 0 };
@@ -158,7 +159,7 @@ TEST_F(GraphFastRootSortTest, sort_degen_non_decreasing_degree) {
 	using gt = GraphFastRootSort<ugraph>;
 	gt sorter(ug);
 	sorter.compute_deg_root();	
-	vint mapping = sorter.sort_degen_non_decreasing_degree();
+	vint mapping = sorter.sort_degen_non_decreasing_degree(false);
 
 	////////////////////////////////////////////
 	vint mapping_exp = { 0, 2, 4, 1, 3, 5 };
@@ -194,7 +195,7 @@ TEST_F(GraphFastRootSortTest, sort_degen_non_increasing_degree) {
 	using gt = GraphFastRootSort<ugraph>;
 	gt sorter(ug);
 	sorter.compute_deg_root();	
-	vint mapping = sorter.sort_degen_non_increasing_degree();
+	vint mapping = sorter.sort_degen_non_increasing_degree(false);
 
 	//TODO - complete test
 
@@ -237,8 +238,8 @@ TEST_F(GraphFastRootSortTest, sort_degen_composite_non_decreasing_degree) {
 	using gt = GraphFastRootSort<ugraph>;
 	gt sorter(ug);
 	sorter.compute_deg_root();
-	sorter.sort_non_decreasing_deg();										//ordering I
-	vint mapping = sorter.sort_degen_composite_non_decreasing_degree();		//ordering II (tbs are based on ordering I)
+	sorter.sort_non_decreasing_deg(false);										//ordering I
+	vint mapping = sorter.sort_degen_composite_non_decreasing_degree(false);		//ordering II (tbs are based on ordering I)
 
 	////////////////////////////////////////////
 	vint mapping_exp = { 0, 2, 4, 5, 3, 1 };
@@ -255,7 +256,7 @@ TEST_F(GraphFastRootSortTest, sort_degen_composite_non_decreasing_degree_ltf) {
 	using gt = GraphFastRootSort<ugraph>;
 	gt sorter(ug);
 	sorter.compute_deg_root();
-	sorter.sort_non_decreasing_deg();											//ordering I
+	sorter.sort_non_decreasing_deg(false);											//ordering I
 	vint mapping = sorter.sort_degen_composite_non_decreasing_degree(true);		//ordering II (tbs are based on ordering I)
 
 	////////////////////////////////////////////
@@ -274,8 +275,8 @@ TEST_F(GraphFastRootSortTest, sort_degen_composite_non_increasing_degree) {
 	using gt = GraphFastRootSort<ugraph>;
 	gt sorter(ug);
 	sorter.compute_deg_root();
-	sorter.sort_non_increasing_deg();										//ordering I
-	vint mapping = sorter.sort_degen_composite_non_increasing_degree();		//ordering II (tbs are based on ordering I)
+	sorter.sort_non_increasing_deg(false);										//ordering I
+	vint mapping = sorter.sort_degen_composite_non_increasing_degree(false);		//ordering II (tbs are based on ordering I)
 
 	////////////////////////////////////////////
 	vint mapping_exp = { 1, 3, 2, 4, 5, 0 };
@@ -292,7 +293,7 @@ TEST_F(GraphFastRootSortTest, sort_degen_composite_non_increasing_degree_ltf) {
 	using gt = GraphFastRootSort<ugraph>;
 	gt sorter(ug);
 	sorter.compute_deg_root();
-	sorter.sort_non_increasing_deg();											//ordering I
+	sorter.sort_non_increasing_deg(false);											//ordering I
 	vint mapping = sorter.sort_degen_composite_non_increasing_degree(true);		//ordering II (tbs are based on ordering I)
 
 	////////////////////////////////////////////
@@ -313,7 +314,7 @@ TEST_F(GraphFastRootSortTest, new_order) {
 
 	//absolute min degree ordering first-to-last and old-to-new 
 	//nodes_ = {0, 2, 4, 5, 3, 1}
-	vint mapping = sorter.new_order((gt::MIN), false, true);
+	vint mapping = sorter.new_order((gt::MIN), FIRST_TO_LAST, OLD_TO_NEW);
 
 	//////////////////////////////////////////
 	EXPECT_EQ(mapping[0], 0);			
@@ -335,7 +336,7 @@ TEST_F(GraphFastRootSortTest, reorder) {
 	gt sorter(ug);
 
 	sorter.compute_deg_root();
-	vint mapping_o2n=sorter.sort_non_decreasing_deg();					//nodes_ = {0, 2, 4, 5, 3, 1}
+	vint mapping_o2n=sorter.sort_non_decreasing_deg(false);					//nodes_ = {0, 2, 4, 5, 3, 1}
 																		//deg =	{ 0, 3, 1, 2, 1, 1 };
 	//compute isomorphism
 	ugraph ugn;
@@ -363,7 +364,7 @@ TEST(GraphFastRootSort, new_order_dimacs) {
 	gt sorter(ug);
 
 	//degenerate min degree ordering
-	vint mapping = sorter.new_order((gt::MIN_DEGEN), true, true);
+	vint mapping = sorter.new_order((gt::MIN_DEGEN), LAST_TO_FIRST, OLD_TO_NEW);
 
 	//////////////////////////////////////////
 	EXPECT_EQ(mapping[0], 199);
@@ -377,7 +378,7 @@ TEST(GraphFastRootSort, new_order_dimacs) {
 
 
 	//composite ordering based on the previous ordering
-	vint mapping_compo = sorter.new_order((gt::MIN_DEGEN_COMPO), true, true);
+	vint mapping_compo = sorter.new_order((gt::MIN_DEGEN_COMPO), LAST_TO_FIRST, OLD_TO_NEW);
 
 	//////////////////////////////////////////
 	EXPECT_EQ(mapping_compo[0], 69);
@@ -397,7 +398,7 @@ TEST(GraphFastRootSort, new_order_dimacs) {
 //
 ////////////////////////////////////
 
-TEST(subgraphSort, basic) {
+TEST(subgraphSort, first_k) {
 	
 	const int NV = 6;
 	ugraph ug(NV);
@@ -405,7 +406,7 @@ TEST(subgraphSort, basic) {
 	ug.add_edge(1, 5);			
 	ug.add_edge(2, 4);
 	ug.add_edge(2, 5);
-	ug.add_edge(3, 5);										//deg(0)=0, deg(1)=2, deg(2)=3 
+	ug.add_edge(3, 5);										//deg(0)=0, deg(1)=2, deg(2)=3, deg(3)=1, deg(4)=1, deg(5)=3 
 
 	//setup
 	using gt = GraphFastRootSort<ugraph>;
@@ -414,7 +415,7 @@ TEST(subgraphSort, basic) {
 	sorter.compute_deg_root();
 
 	//sorts first K=3 vertices according to non-increasing deg
-	vint mapping = sorter.sort_non_increasing_deg(K);
+	vint mapping = sorter.sort_non_increasing_deg(K, false);
 		
 	//I/O
 	//sorter.print(gt::PRINT_NODES, cout);
@@ -426,9 +427,8 @@ TEST(subgraphSort, basic) {
 	//////////////////////////////////////////
 
 
-
 	//sorts first K=3 vertices according to non-decreasing deg
-	mapping = sorter.sort_non_decreasing_deg(K);
+	mapping = sorter.sort_non_decreasing_deg(K, false);
 		
 	//I/O
 	//sorter.print(gt::PRINT_NODES, cout);
@@ -441,7 +441,50 @@ TEST(subgraphSort, basic) {
 
 }
 
-//TODO- check this tests , possibly refactor the original class
+TEST(subgraphSort, first_to_last) {
+
+	const int NV = 6;
+	ugraph ug(NV);
+	ug.add_edge(1, 2);
+	ug.add_edge(1, 5);
+	ug.add_edge(2, 4);
+	ug.add_edge(2, 5);
+	ug.add_edge(3, 5);										//deg(0)=0, deg(1)=2, deg(2)=3, deg(3)=1, deg(4)=1, deg(5)=3 
+
+	//setup
+	using gt = GraphFastRootSort<ugraph>;
+	const int FIRST = 1, LAST=2;
+	gt sorter(ug);
+	sorter.compute_deg_root();
+
+	//sorts vertices in the interval [FIRST, LAST] according to non-increasing deg
+	vint mapping = sorter.sort_non_increasing_deg(FIRST, LAST, false);
+
+	//I/O
+	//sorter.print(gt::PRINT_NODES, cout);
+
+	//////////////////////////////////////////
+	vint mapping_exp = { 0, 2, 1, 3, 4, 5 };				
+	EXPECT_EQ(mapping.size(), NV);
+	EXPECT_EQ(mapping, mapping_exp);
+	//////////////////////////////////////////
+
+
+	//sorts vertices in the interval [FIRST, LAST] according to non-decreasing deg
+	mapping = sorter.sort_non_decreasing_deg(FIRST, LAST, false);
+
+	//I/O
+	//sorter.print(gt::PRINT_NODES, cout);
+
+	////////////////////////////////////////////
+	mapping_exp = { 0, 1, 2, 3, 4, 5 };						
+	EXPECT_EQ(mapping.size(), NV);
+	EXPECT_EQ(mapping, mapping_exp);
+	//////////////////////////////////////////
+
+}
+
+//TODO- check this tests , possibly refactor the original classe
 
 TEST(subgraphSort_stateless, DISABLED_SORT_SUBGRAPH_DEG) {
 ///////////////
