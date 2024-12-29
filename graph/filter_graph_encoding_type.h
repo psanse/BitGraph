@@ -4,6 +4,8 @@
 #ifndef _FILER_GRAPH_TYPE_ERROR_
 #define _FILER_GRAPH_TYPE_ERROR_
 
+#include "bitscan/bitscan.h"
+
 template <class T>
 struct filterGraphTypeError;		//error at compile time with invalid specializations and a nice name
 

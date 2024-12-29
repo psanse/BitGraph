@@ -22,15 +22,23 @@
 #ifndef __SIMPLE_GRAPH_H__
 #define __SIMPLE_GRAPH_H__
 
-#include "bitscan/bitscan.h"
+//#include "bitscan/bitscan.h"
 #include "filter_graph_encoding_type.h"
 #include <iostream>
+#include <string>
 #include <vector>
 
 //////////////////
 //switches 
-
 //#define DIMACS_REFERENCE_VERTICES_0			//DEFAULT OFF! (real DIMACS format)
+
+//////////////////
+//
+// generic class Graph
+// 
+// Basic types limited to bitarrays and sparse bitarrays
+// 
+//////////////////
 
 template<class T>
 class Graph: public filterGraphTypeError<T>{
@@ -49,12 +57,8 @@ public:
 	Graph								();														//does not allocate memory
 	Graph								(int nV);												//creates empty graph with size vertices	
 	Graph								(std::string filename);	
-	Graph								(int nV, int* adj[], string name = "");					//old-style adjacency matrix
+	Graph								(int nV, int* adj[], std::string filename = "");					//old-style adjacency matrix
 virtual	~Graph() = default; 
-
-	//comparison operators
-template <class U>
-friend bool operator ==				(const Graph<U>& lhs, const Graph<U>& rhs);				//EXPERIMENTAL! only compares the adj. matrix	
 
 /////////////
 // setters and getters
@@ -99,12 +103,18 @@ virtual	double density					(bool lazy=true)		;
 	int degree_in						(int v)					const;				//edges incident to v
 
 	void make_bidirected				();											//make all edges symmetrical
+
 /////////////
 // Boolean
 virtual	bool is_edge					(int i, int j)			const;		
 		
 private:
 	bool is_no_self_loops				()						const;
+
+////////////////
+//Comparisons
+	template <class U>
+	friend bool operator ==				(const Graph<U>& lhs, const Graph<U>& rhs);				//EXPERIMENTAL! only compares the adj. matrix	
 
 /////////////
 // Update operations
@@ -137,8 +147,8 @@ protected:
 	int NBB_;				//number of bit blocks per row (in the case of sparse graphs this is a maximum value)
 	
 	//names
-	std::string name_;		//graph label	
-	std::string path_;		//(extension used for weight files - (4/3/17)
+	std::string name_;		//name of instance, without path	
+	std::string path_;		//path of instance
 };
 
 template <class T>
