@@ -44,7 +44,7 @@ TEST(bb_t, basic){
 	LOG_INFO("bb_t::basic-------------------------------------------------------");
 	bb_t<bitarray> b;
 	b.init(65);
-	b.push(10);
+/*	b.push(10);
 	b.push(64);
 	b.push(65);
 	b.print();
@@ -59,7 +59,27 @@ TEST(bb_t, basic){
 	EXPECT_EQ(0, b.get_size());
 
 	EXPECT_EQ(-1,b.pop());
+	EXPECT_TRUE(b.is_empty()); */
+	
+	//CTG: sera mas bien asi?
+	
+	b.set_bit(10);
+	b.set_bit(64);
+	b.set_bit(65);
+	b.print();
+	EXPECT_EQ(3, b.get_pc());
+	EXPECT_EQ(65, b.pop());
+	EXPECT_EQ(2, b.get_pc());
+
+	EXPECT_EQ(64, b.pop());
+	EXPECT_EQ(1, b.get_pc());
+
+	EXPECT_EQ(10, b.pop());
+	EXPECT_EQ(0, b.get_pc());
+
+	EXPECT_EQ(-1, b.pop());
 	EXPECT_TRUE(b.is_empty());
+
 	b.print(); cout<<endl;
 
 	LOG_INFO("------------------------------------------------------------------");

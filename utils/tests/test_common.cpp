@@ -53,7 +53,10 @@ TEST(Common, pt_elem_basic){
 	};
 
 	pt_elem<s_triplet> myp1;
-	myp1.print_elem(); cout<<endl;		//takes default values
+	stringstream sstr;
+	myp1.print_elem(sstr); sstr << endl;		//takes default values
+	LOG_INFO(sstr.str().c_str());
+	   	
 
 	EXPECT_EQ(10, myp1.get_elem()->a);
 	EXPECT_EQ(20, myp1.get_elem()->b);
@@ -139,7 +142,7 @@ TEST(sort, insert_ordered){
 	int score[4]; score[0]=30;  score[1]=20;  score[2]=5;		/* sorting criteria */
 	
 	const int N=4;												
-	int pos=com::mat::INSERT_ORDERED_SORT_NON_INCR(data,score, N /* tamaño tras inserción N */, 3, 21);
+	int pos=com::sort::INSERT_ORDERED_SORT_NON_INCR(data,score, N /* tamaño tras inserción N */, 3, 21);
 	for(int i=0; i<N; i++){
 		cout<<"["<<data[i]<<","<<score[data[i]]<<"]"<<endl;		
 	}

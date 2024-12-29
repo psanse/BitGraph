@@ -8,6 +8,9 @@
 #include <string>
 #include "../graph.h"
 #include "../graph_gen.h"
+#include "../utils/logger.h"
+
+//#define LOGGER_VERBOSE_LEVEL		//all except DEBUG (second priority) -  CMake option by default
 
 using namespace std;
 
@@ -35,7 +38,7 @@ struct input_t{
 int main(int argc, char** argv){
 	stringstream sstr;
 	string str_path_benchmark;
-	Logger::SetInformationLevel(LOGGER_INFO);
+	//Logger::SetInformationLevel(LOGGER_INFO);
 
 	if (argc != 9) {
 		LOG_ERROR("please enter the range of sizes [nLB, nUB], the range of densities [pLB, pUB], the number of instances per G(N,P), the size increment, the density increment and the path, exiting...");
@@ -77,24 +80,24 @@ int main(int argc, char** argv){
 		exit(-1);
 	}
 	if (input.nRep <=0 ) {
-		LOG_ERROR("number of repetitions invalid: "<< input.nRep<< " exiting...");
+		LOGG_ERROR("number of repetitions invalid: ", input.nRep, " exiting...");
 		exit(-1);
 	}
 	if (input.incN <= 0) {
-		LOG_ERROR("size of  graphs increment invalid: "<<input.incN<< " exiting...");
+		LOGG_ERROR("size of  graphs increment invalid: ", input.incN,  " exiting...");
 		exit(-1);
 	}
 	if (input.incP <= 0) {
-		LOG_ERROR("density of  graphs increment invalid: "<< input.incP<<" exiting...");
+		LOGG_ERROR("density of  graphs increment invalid: ", input.incP, " exiting...");
 		exit(-1);
 	}
 
 	LOG_INFO("*******************************");
 	LOG_INFO("Generating random graph benchmark");
-	LOG_INFO("PATH: " << str_path_benchmark);
+	LOG_INFO("PATH: ", str_path_benchmark);
 	sstr = std::stringstream();
 	sstr << input;
-	LOG_INFO(sstr.str());	
+	LOGG_INFO(sstr.str());	
 	LOG_INFO("*******************************");
 	/////////////////////////////////////////////////////////////////////////
 		

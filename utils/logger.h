@@ -1,63 +1,211 @@
-//logger.h: a light logger class (no timestamps, no file configuration, no multiple IDs)
-//last update: 24/02/15
+// log.h: logy v1.2 -- A simplistic, light-weight, single-header C++ logger
+//		  (!) Summer 2018 by Giovanni Squillero <giovanni.squillero@polito.it>
+//		  This code has been dedicated to the public domain
+//
+//		  Project page: https://github.com/squillero/logy
+//
+//@comments: 
+//1.vectors & initializer_list are supported using SFINAE
+//2.C++11 compliant
+//3.Refined with the help of copilot (06/11/2024)
+//
+//@first_update: 03/11/2024
+//@last_update: 06/11/2024
 
-#ifndef __LOGGER_H__
-#define __LOGGER_H__
+#ifndef	__LOGY_H__
+#define __LOGY_H__
 
+#ifdef _MSC_VER
+#define _CRT_SECURE_NO_WARNINGS
+#endif
+
+#include <type_traits>
+#include <vector>
+#include <iostream>
 #include <string>
 #include <sstream>
-#include <iostream>
-#include <fstream>
-
-using namespace std;
-
-enum {LOGGER_ERROR=0,LOGGER_WARNING,LOGGER_INFO,LOGGER_PRINT, LOGGER_DEBUG};
-
-//complete log level
-#define LOG_ERROR(msg)		Logger(LOGGER_ERROR).Log()<<msg
-#define LOG_WARNING(msg)	Logger(LOGGER_WARNING).Log()<<msg
-#define LOG_INFO(msg)		Logger(LOGGER_INFO).Log()<<msg
-#define LOG_PRINT(msg)		Logger(LOGGER_PRINT).Log()<<msg
-#define LOG_DEBUG(msg)		Logger(LOGGER_DEBUG).Log()<<msg
-
-////////////////////
-#define LOG_PAK()			Logger(LOGGER_ERROR).Log()<<"press any key to continue"
-#define LOG_LINE()			Logger(LOGGER_ERROR).Log()<<"-------------------------"
-
-class Logger {
-public:
-	Logger(int type); 
-	virtual ~Logger();
-
-	ostringstream& Log(){return os;}
-
-	//redirects / appends std::cout to ofstream. 
-	static void SetFileStream(std::string filename="");
-	static void CleanFileStream();
-
-	//duplicates output to ostringstream
-	static void SetStringStream(bool set=true){use_string_stream=set;}
-	static void SetInformationLevel(int type=LOGGER_PRINT)	{predefined_type=type;}
-
-	static std::string GetString(){
-		string str=string_stream.str();
-		string_stream.str("");
-		return str;
-	}
-private:
-	int set_type;								//type of the current log
-		
-protected:
-	
-	ostringstream os;
-	static string filename;						/* added in 5/1/17 */
-	static ofstream file;
-	static ostringstream string_stream;
-	static bool use_string_stream;
-	static int predefined_type;					//configured type for the Logger pattern
-
-};
+#include <cstdio>
+#include <ctime>
+#include <initializer_list>
 
 
-#endif 
+//////////////////////////////////////////////
+//logger level manual setting - [Warning and ERROR only - default] 
+//
+// (uncomment one to the options to change default)
+//
+//#define LOGGER_ERROR_LEVEL		//only ERROR (minimum priority)
+//#define LOGGER_VERBOSE_LEVEL		//all except DEBUG (second priority)
+//#define LOGGER_DEBUG_LEVEL		//all - top priority
+//
+//all undef	 WARNING and ERROR
 
+//////////////////////////////////////////
+//my old logger macros compatibility
+
+#define LOG_ERROR(msg)			Error(msg)
+#define LOG_WARNING(msg)		Warning(msg)
+#define LOG_INFO(msg)			Info(msg)
+#define LOG_PRINT(msg)			Info(msg)
+#define LOG_DEBUG(msg)			Debug(msg)
+
+//////////////////////
+#define LOG_PAK()				Info("press any key to continue")
+#define LOG_LINE()				Info("-------------------------")
+
+
+// Type trait to check for range loop support
+template <typename T> struct is_rangeloop_supported : std::false_type {};
+template <typename T> struct is_rangeloop_supported<std::vector<T>> : std::true_type {};
+template <typename T> struct is_rangeloop_supported<std::initializer_list<T>> : std::true_type {};
+
+// Tag expansion function for supported range-loop types
+template<typename T>
+typename std::enable_if<is_rangeloop_supported<T>::value, std::string>::type tag_expand(const T& arg) {
+	std::ostringstream ss;
+	ss << "[";
+	for (const auto& e : arg)
+		ss << " " << tag_expand(e);
+	ss << " ]";
+	return ss.str();
+}
+
+// Tag expansion function for non-range-loop types
+template<typename T>
+typename std::enable_if<!is_rangeloop_supported<T>::value, std::string>::type tag_expand(const T& arg) {
+	std::ostringstream ss;
+	ss << arg;
+	return ss.str();
+}
+
+// Log header with timestamp
+static inline void logy_header(const char* tag) {
+	char timestamp[100] = "";
+	std::time_t t = std::time(nullptr);
+	std::strftime(timestamp, sizeof(timestamp), "[%H:%M:%S]-[%d/%b/%Y]", std::localtime(&t));
+	std::fprintf(stderr, "%s%s", timestamp, tag);
+}
+
+// Log helper functions for variadic templates
+static inline void logy_helper() {
+	std::cerr << std::endl;
+}
+
+template<typename F, typename... R>
+static inline void logy_helper(const F& first, R&&... rest) {
+	std::cerr << " " << tag_expand(first);
+	logy_helper(std::forward<R>(rest)...);
+}
+
+// Direct logging functions with printf-style format strings
+template<typename... T>
+void _Debug(const char* format, T... args) {
+	logy_header(" DEBUG: ");
+	std::fprintf(stderr, format, args...);
+	std::fprintf(stderr, "\n");
+	std::fflush(stderr);
+}
+
+template<typename... T>
+void _Info(const char* format, T... args) {
+	logy_header(" INFO: ");
+	std::fprintf(stderr, format, args...);
+	std::fprintf(stderr, "\n");
+	std::fflush(stderr);
+}
+
+template<typename... T>
+void _Warning(const char* format, T... args) {
+	logy_header(" WARNING: ");
+	std::fprintf(stderr, format, args...);
+	std::fprintf(stderr, "\n");
+	std::fflush(stderr);
+}
+
+template<typename... T>
+void _Error(const char* format, T... args) {
+	logy_header(" ERROR: ");
+	std::fprintf(stderr, format, args...);
+	std::fprintf(stderr, "\n");
+	std::fflush(stderr);
+}
+
+// Direct print logging without format strings
+template<typename... T>
+void _Debug2(T&&... args) {
+	logy_header(" DEBUG:");
+	logy_helper(std::forward<T>(args)...);
+}
+
+template<typename... T>
+void _Info2(T&&... args) {
+	logy_header(" INFO:");
+	logy_helper(std::forward<T>(args)...);
+}
+
+template<typename... T>
+void _Warning2(T&&... args) {
+	logy_header(" WARNING:");
+	logy_helper(std::forward<T>(args)...);
+}
+
+template<typename... T>
+void _Error2(T&&... args) {
+	logy_header(" ERROR:");
+	logy_helper(std::forward<T>(args)...);
+}
+
+#if defined(DEBUG) || defined(LOGGER_DEBUG_LEVEL)  // All messages enabled
+
+#define Debug(...) _Debug(__VA_ARGS__)
+#define Info(...) _Info(__VA_ARGS__)
+#define Warning(...) _Warning(__VA_ARGS__)
+#define Error(...) _Error(__VA_ARGS__)
+#define LOGG_DEBUG(...) _Debug2(__VA_ARGS__)
+#define LOGG_INFO(...) _Info2(__VA_ARGS__)
+#define LOGG_WARNING(...) _Warning2(__VA_ARGS__)
+#define LOGG_ERROR(...) _Error2(__VA_ARGS__)
+
+#elif defined(VERBOSE) || defined(LOGGER_VERBOSE_LEVEL)  // All except debug
+
+#define Debug(...) ((void)0)
+#define Info(...) _Info(__VA_ARGS__)
+#define Warning(...) _Warning(__VA_ARGS__)
+#define Error(...) _Error(__VA_ARGS__)
+#define LOGG_DEBUG(...) ((void)0)
+#define LOGG_INFO(...) _Info2(__VA_ARGS__)
+#define LOGG_WARNING(...) _Warning2(__VA_ARGS__)
+#define LOGG_ERROR(...) _Error2(__VA_ARGS__)
+
+#elif defined(ERROR) || defined(LOGGER_ERROR_LEVEL)  // Only errors
+
+#define Debug(...) ((void)0)
+#define Info(...) ((void)0)
+#define Warning(...) ((void)0)
+#define Error(...) _Error(__VA_ARGS__)
+#define LOGG_DEBUG(...) ((void)0)
+#define LOGG_INFO(...) ((void)0)
+#define LOGG_WARNING(...) ((void)0)
+#define LOGG_ERROR(...) _Error2(__VA_ARGS__)
+
+#else  // Only warnings and errors by default
+
+#define Debug(...) ((void)0)
+#define Info(...) ((void)0)
+#define Warning(...) _Warning(__VA_ARGS__)
+#define Error(...) _Error(__VA_ARGS__)
+#define LOGG_DEBUG(...) ((void)0)
+#define LOGG_INFO(...) ((void)0)
+#define LOGG_WARNING(...) _Warning2(__VA_ARGS__)
+#define LOGG_ERROR(...) _Error2(__VA_ARGS__)
+
+#endif
+
+#define Logy(...) _Silent(__VA_ARGS__)
+#define LOGY(...) _Silent2(__VA_ARGS__)
+
+
+
+
+
+#endif

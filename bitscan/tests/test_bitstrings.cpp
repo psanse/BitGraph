@@ -367,10 +367,11 @@ TEST_F(BitScanningTest, reverse_non_destructive){
 		if(nBit==EMPTY_ELEM) break;
 		res.insert(nBit);	
 	}
-	for(set<int>::iterator it=res.begin(); it!=res.end(); ++it){
-		cout<<*it<<" ";
-	}
-	cout<<"----------------------------------------------"<<endl;
+	// CTG: eliminar salida a pantalla de los test
+	//for(set<int>::iterator it=res.begin(); it!=res.end(); ++it){
+	//	cout<<*it<<" ";
+	//}
+	//cout<<"----------------------------------------------"<<endl;
 
 	EXPECT_TRUE(res==sol);
 }
@@ -806,6 +807,20 @@ TEST(BitScanning, first_found){
 	EXPECT_EQ(72, ff);
 }
 
+TEST(BitBoardN, ArraySubscripOperator) {
+	BitBoardN bb(32);
+	bb.set_bit(10);
+	bb.set_bit(20);
+	bb.set_bit(64);
 
+	//assignment
+	BitBoardN bb1(32);
+
+	bb1[0] = bb[0];
+	EXPECT_TRUE(bb1.is_bit(10));
+	EXPECT_TRUE(bb1.is_bit(20));
+	EXPECT_FALSE(bb1.is_bit(30));
+
+}
 
 

@@ -1,11 +1,20 @@
-# Create a library 
-set(useful_headers_for_IDE ./common.h
+#set useful headers 
+set(useful_headers_for_IDE 
+common.h
+prec_timer.h
+logger.h
+info/info_base.h
 )
 
-add_library (utils benchmark.cpp 
-logger.cpp 
+#created utils library
+add_library (utils
+benchmark.cpp 
 result.cpp
 test_analyser.cpp
+common.cpp
+info/info_base.cpp
+info/info_clq.cpp                                   #move to clq algorithms and remove from here
+#logger.cpp 
 ${useful_headers_for_IDE}
 )
 
@@ -27,14 +36,16 @@ if (utils_build_tests)
 add_executable (test_utils ./tests/gtest_main.cc
 #./tests/test_batch.cpp
 #./tests/test_benchmark.cpp
-./tests/test_common.cpp
+#./tests/test_common.cpp
 #./tests/test_file.cpp
-#./tests/test_logger.cpp
+# ./tests/test_logger.cpp
 # ./tests/test_result.cpp
-#./tests/test_stress_timer.cpp
+# ./tests/test_precise_timer.cpp
 #./tests/test_tanal.cpp
 #./tests/test_thread.cpp
 #./test_analyser.cpp
+#./tests/test_info.cpp
+  ./tests/test_info_clq.cpp
 )
 
 target_include_directories (test_utils PUBLIC ../googletest/include/)

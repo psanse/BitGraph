@@ -27,6 +27,7 @@ include_directories(${LEDA_ROOT}/incl)
 link_directories(${LEDA_ROOT})
 
 add_library (graph ./formats/mmio.cpp 
+./algorithms/decode.cpp
 ${useful_headers_for_IDE} 
 ./draw/ldraw.cpp
 )
@@ -37,6 +38,7 @@ TARGET_LINK_LIBRARIES( graph optimized leda_md.lib)
 else()
 
 add_library (graph ./formats/mmio.cpp
+./algorithms/decode.cpp
 ${useful_headers_for_IDE}
 )
 set_target_properties(graph 
@@ -57,7 +59,7 @@ if (graph_build_tests)
 
 # Add executable called "helloDemo" that is built from the source files
 # "demo.cxx" and "demo_b.cxx". The extensions are automatically found.
-add_executable (test_graph ./tests/gtest_main.cpp
+add_executable (test_graph  tests/gtest_main.cpp
 # ./tests/test_degree.cpp
 #  ./tests/test_format.cpp
 #  ./tests/test_graph.cpp
@@ -66,13 +68,16 @@ add_executable (test_graph ./tests/gtest_main.cpp
 #  ./tests/test_graph_sort.cpp
 # ./tests/test_kcore.cpp
 #./tests/test_kcore_in_folder.cpp
- ./tests/test_random_graph.cpp
+# ./tests/test_random_graph.cpp
 #./tests/test_sparse_graph.cpp
 # ./tests/test_fixed_graph.cpp
 # ./tests/test_wgraph.cpp
 #	./tests/test_wegraph.cpp
 #  ./tests/test_graph_map.cpp
-# ./tests/test_graph_fast_sort.cpp
+
+   tests/test_graph_fast_sort.cpp
+   tests/test_graph_fast_sort_weighted.cpp
+   tests/test_decode.cpp
 )
 
 target_include_directories (test_graph PUBLIC ../googletest/include/)

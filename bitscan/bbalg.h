@@ -235,7 +235,7 @@ inline BITBOARD gen_random_bitboard(double p){
 //generates a random BITBOARD with density p of 1-bits
 	BITBOARD bb=0;
 	for(int i=0; i<WORD_SIZE; i++){
-		if(com::mat::uniform_dist(p)){
+		if(com::rand::uniform_dist(p)){
 			bb|=Tables::mask[i];
 		}
 	}

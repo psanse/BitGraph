@@ -661,7 +661,7 @@ typename KCore<T>::vint KCore<T>::find_heur_clique(int num_iter){
 			 max_size=curr_clique.size();
 
 			 //I/O
-			 LOG_DEBUG(iter<<"."<<"lb:"<<max_size<<" seed:"<<m_ver[i]);
+			 LOGG_DEBUG(iter, "." , "lb:" , max_size, " seed:" , m_ver[i]);
 		}
 
 
@@ -720,7 +720,7 @@ KCore<sparse_ugraph>::vint KCore<sparse_ugraph>::find_heur_clique_opt(int num_it
 			 max_size=largest_clique.size();
 
 			 //I/O
-			 LOG_DEBUG(iter<<"."<<"lb:"<<max_size<<" seed: ["<<i<<":"<<m_ver[i]<<"]");
+			 LOGG_DEBUG(iter, ".", "lb:", max_size, " seed: [" , i, ":" , m_ver[i], "]");
 		}
 
 		//evaluation of number of iterations 
@@ -728,8 +728,8 @@ KCore<sparse_ugraph>::vint KCore<sparse_ugraph>::find_heur_clique_opt(int num_it
 	}
 
 	if(num_iter!=EMPTY_ELEM)
-		LOG_INFO("kc["<<"it:"<<iter<<","<<" lb:"<<max_size<<"]");
-	else LOG_INFO("kc[lb:"<<max_size<<"]");
+		LOG_INFO("kc[","it:", iter, "," , " lb:", max_size, "]");
+	else LOG_INFO("kc[lb:", max_size, "]");
 
 	return largest_clique;
 }
@@ -802,7 +802,7 @@ KCore<sparse_ugraph>::vint KCore<sparse_ugraph>::find_heur_clique_sparse(int num
 			 max_size=largest_clique.size();
 
 			 //I/O
-			 LOG_DEBUG(iter<<"."<<"lb:"<<max_size<<" seed: ["<<i<<":"<<m_ver[i]<<"]");
+			 LOGG_DEBUG(iter, ".", "lb:" , max_size , " seed: [" , i , ":", m_ver[i], "]");
 		}
 
 		//evaluation of number of iterations 
@@ -810,8 +810,8 @@ KCore<sparse_ugraph>::vint KCore<sparse_ugraph>::find_heur_clique_sparse(int num
 	}
 
 	if(num_iter!=EMPTY_ELEM)
-		LOG_INFO("kc["<<"it:"<<iter<<","<<" lb:"<<max_size<<"]");
-	else LOG_INFO("kc[lb:"<<max_size<<"]");
+		LOG_INFO("kc[", "it:", iter, "," , " lb:" , max_size , "]");
+	else LOG_INFO("kc[lb:" , max_size, "]");
 	return largest_clique;
 }
 

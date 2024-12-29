@@ -26,7 +26,8 @@ class TestAnalyser{
 
 public:
 	struct info_t{
-		info_t():same_lb(false),same_sol(false), same_steps(false), steps_first_greater(false),steps_lhs(0),steps_rhs(0) {}
+		info_t():	same_lb(false), same_sol(false), same_steps(false),
+					steps_first_greater(false), steps_lhs(0), steps_rhs(0) {}
 		bool same_steps;
 		bool same_sol;
 		bool same_lb;

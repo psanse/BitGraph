@@ -1,3 +1,4 @@
+//result.cpp: implementation of the result class (result.h)
 
 #include "result.h"
 #include "logger.h"
@@ -124,7 +125,7 @@ usint Result::inc_counter(usint index, double num){
 		m_lc[index]+=num;
 	}catch(exception e){
 		cout<<e.what();
-		LOG_ERROR("Result:: "<<"error when incrementing counter: "<<index);
+		LOG_ERROR("Result:: error when incrementing counter: ", index);
 		return -1;
 	}
 

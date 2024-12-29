@@ -510,45 +510,6 @@ TEST(Decode, basic) {
 	EXPECT_EQ(e, v);
 }
 
-TEST(Graph_sort, Decode){
-////////////
-// decoding a sequence of orderings
-
-	cout<<"Order: Decode------------------------"<<endl;
-	ugraph ug(106);    
-    ug.add_edge(1, 2);
-    ug.add_edge(1, 3);
-    ug.add_edge(1, 4);
-	ug.add_edge(78, 5);
-	ug.print_data();
-		
-	ugraph ug1(ug);
-
-//MIN WIDTH algorithm
-	cout<<endl<<"init min width----------------------"<<endl;
-	GraphSort<ugraph> o(ug1);
-	vint vres=o.new_order(gbbs::MIN_DEG_DEGEN, gbbs::PLACE_LF); cout<<endl;
-	copy(vres.begin(), vres.end(), ostream_iterator<int>(cout, " "));
-	o.reorder(vres);
-
-	Decode d;
-	d.reverse_in_place(vres);
-	d.insert_ordering(vres);
-
-	vint vlist;
-	vlist.push_back(105);
-	vlist.push_back(104);
-	vlist.push_back(103);
-	vlist.push_back(102);
-	vlist.push_back(101);
-	vlist.push_back(100);
-	
-	vint dec=d.decode_list(vlist);
-	cout<<endl;
-	com::stl::print_collection(dec);
-			
-	cout<<"--------------------------------------"<<endl;
-}
 
 TEST(GraphSort, support){
 	cout<<"--------------------------------------------------------"<<endl;
@@ -753,37 +714,6 @@ TEST(GraphSort_in_place, reorder_simple){
     cout<<"--------------------------------------------------------"<<endl;
 }
 
-
-TEST(Graph_composite_sort, basic){
-////////////
-// decoding a sequence of orderings
-
-    cout<<"Graph_composite_sort: basic------------------------"<<endl;
-    ugraph ug(6);    
-    ug.add_edge(1, 2);
-    ug.add_edge(1, 3);
-    ug.add_edge(1, 4);
-    ug.add_edge(4, 5);
-    ug.print_data();
-
-    
-    GraphSort<ugraph> o(ug);
-    vector<pair<sort_t, place_t> > lo;
-    lo.push_back(pair<sort_t, place_t>(NONE,PLACE_LF));
-    lo.push_back(pair<sort_t, place_t>(NONE,PLACE_LF));
-
-    Decode d;
-    o.reorder_composite(lo,d,NULL);
-	vector<int> vindex(6);
-	for(int i=0; i<vindex.size(); i++){
-		vindex[i]=i;
-	}
-	vector<int> vdec=d.decode_list(vindex);		//same ordering expected since the graph remains the original one
-	EXPECT_EQ(vindex, vdec);
-	
-	
-    cout<<"--------------------------------------"<<endl;
-}
 
 
 TEST(Graph_sort,get_v_basic ){

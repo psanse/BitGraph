@@ -7,8 +7,8 @@
 
 #include "../bitscan.h"					//bit string library
 #include "gtest/gtest.h"
-#include "utils/common.h"
-#include "utils/logger.h"
+
+
 #include <vector>
 
 using namespace std;
@@ -384,27 +384,32 @@ TEST(Masks, AND_trimming){
 	bb1.set_bit(100);
 
 	//AND
-	cout<<AND(bb, bb1, bbresAND,11)<<endl;
+	AND(bb, bb1, bbresAND,11, true);
+	//AND(1,bb, bb1, bbresAND);
 	EXPECT_TRUE(bbresAND.is_bit(10));
 	EXPECT_FALSE(bbresAND.is_bit(64));
 	EXPECT_EQ(1, bbresAND.popcn64());
 
 	bbresAND.erase_bit();
-	cout<<AND(bb, bb1, bbresAND,10)<<endl;
+	AND(bb, bb1, bbresAND,10, true);
+	//AND(10,bb, bb1, bbresAND);
 	EXPECT_FALSE(bbresAND.is_bit(10));
 
 	bbresAND.erase_bit();
-	cout<<AND(bb, bb1, bbresAND,64)<<endl;
+	AND(bb, bb1, bbresAND,64, true);
+	//AND(64,bb, bb1, bbresAND);
 	EXPECT_FALSE(bbresAND.is_bit(64));
 
 	bbresAND.erase_bit();
-	cout<<AND(bb, bb1, bbresAND,65)<<endl;
+	AND(bb, bb1, bbresAND,65, true);
+	//AND(65,bb, bb1, bbresAND);
 	EXPECT_TRUE(bbresAND.is_bit(64));
 		
 
 	//AND
 	bbresAND.erase_bit();
-	cout<<AND(bb, bb1, bbresAND, 5)<<endl;
+	AND(bb, bb1, bbresAND, 5, true);
+	//AND(5,bb, bb1, bbresAND);
 	EXPECT_FALSE(bbresAND.is_bit(10));
 	EXPECT_FALSE(bbresAND.is_bit(64));
 	EXPECT_TRUE(1, bbresAND.is_empty());
