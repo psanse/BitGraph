@@ -16,14 +16,12 @@
  * This software is provided "AS IS" with no warranty of any 
  * kind, express or implied, and with no claim as to its
  * suitability for any purpose.
- *
  */
 
 #ifndef __SIMPLE_GRAPH_H__
 #define __SIMPLE_GRAPH_H__
 
-//#include "bitscan/bitscan.h"
-#include "filter_graph_encoding_type.h"
+#include "filter_graph_encoding_type.h"			//contains #include "bitscan/bitscan.h"
 #include <iostream>
 #include <string>
 #include <vector>
@@ -68,10 +66,6 @@ virtual	~Graph() = default;
 	std::string get_path				() const {return path_;}
 	void set_name						(std::string graph_name, bool separate_path=false);		//clears path by DEFAULT (separate_path = false)
 	void set_path						(std::string path_name) {path_ = path_name;}
-const vector<T>& get_graph				()	const;	
-virtual void add_edge					(int v, int w);								//v->w	(no self_loops allowed)
-virtual void remove_edge				(int v, int w);	
-		void remove_edges				(int v);									//removes in-out edges from v
 
 	//bitstring encoding
 	int number_of_vertices				()					const		{return NV_; }
@@ -80,7 +74,8 @@ virtual	BITBOARD number_of_edges		(bool lazy=true);
 virtual	BITBOARD number_of_edges		(const T& bbsg )	const;								//on induced subgraph
 const T& get_neighbors					(int v)				const		{return adj_[v];}
       T& get_neighbors					(int v)							{return adj_[v];}
-	
+const vector<T>& get_adjacency_matrix	()					const		{return adj_;}
+
 //////////////////////////
 // memory allocation 
 	int init							(int nV);									//allocates memory for n vertices
@@ -91,8 +86,7 @@ const T& get_neighbors					(int v)				const		{return adj_[v];}
 	int add_vertex						(int toADD);								//enlarges the graph with @toADD new isolanies 
 					
 //////////////	
-// Basic operations
-		
+// Basic operations		
 virtual	double density					(bool lazy=true)		;	
 	double density						(const T& )				;					//on induced graph
 	double block_density				()						const;
@@ -101,6 +95,12 @@ virtual	double density					(bool lazy=true)		;
 
 	int degree_out						(int v)					const;				//outgoing edges from v
 	int degree_in						(int v)					const;				//edges incident to v
+
+//////////////	
+// Modifiers
+virtual void add_edge					(int v, int w);								//v->w	(no self_loops allowed)
+virtual void remove_edge				(int v, int w);
+	void remove_edges					(int v);									//removes edges with endpoint in v
 
 	void make_bidirected				();											//make all edges symmetrical
 

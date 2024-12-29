@@ -245,12 +245,6 @@ int Graph<T>::shrink_to_fit(int size){
 	return -1;
 }
 
-
-template<class T>
-const vector<T>& Graph<T>::get_graph()	const{
-	return adj_;
-}
-
 template<class T>
 int Graph<T>::set_graph (string filename){
 	if(read_dimacs(filename)==-1){
