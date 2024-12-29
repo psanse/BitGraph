@@ -205,15 +205,22 @@ ostream& Graph<T>::print_adj (std::ostream& o, bool add_endl){
 }
 
 template<class T>
-Graph<T>::Graph(void): NV_(0), NBB_(0), NE_(0), name_(""), path_(""){
-	adj_.clear();	
-}
+Graph<T>::Graph(void) :
+	NV_(0), NBB_(0), NE_(0),
+	name_(""), path_("")
+{}
 
 template<class T>
-Graph<T>::Graph(string filename): NV_(0), NBB_(0), NE_(0), name_(""), path_("") {
-	adj_.clear();
-	int status = set_graph(filename);
-	if (status == -1) { LOG_ERROR("error when opening file, exiting...-Graph<T>::Graph"); exit(-1); }
+Graph<T>::Graph(string filename): 
+	NV_(0), NBB_(0), NE_(0),
+	name_(""), path_("") 
+{
+	if (set_graph(filename) == -1) {
+		LOGG_ERROR("error when reading file: ", filename, "Graph<T>::Graph");
+		LOG_ERROR("exiting...");
+		exit(-1);
+	}
+	//if (status == -1) { LOG_ERROR("error when opening file, exiting...-Graph<T>::Graph"); exit(-1); }
 }
 
 template<class T>
