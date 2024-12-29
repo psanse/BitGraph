@@ -1,17 +1,17 @@
 //filter.h : limits Graph<T> metaclass types  to bitarrays and sparse bitarrays
 //i.e. a Graph cannot be constructed on watched_bitstrings
 
-#ifndef _FILER_GRAPH_ENCODING_
-#define _FILER_GRAPH_ENCODING_
+#ifndef _FILER_GRAPH_TYPE_ERROR_
+#define _FILER_GRAPH_TYPE_ERROR_
 
 template <class T>
-struct filterGraphEncodingType;		//error at compile time
+struct filterGraphTypeError;		//error at compile time with invalid specializations and a nice name
 
 //valid specializations
 template <>
-struct filterGraphEncodingType<bitarray>{};
+struct filterGraphTypeError<bitarray>{};
 template <>
-struct filterGraphEncodingType<sparse_bitarray>{};
+struct filterGraphTypeError<sparse_bitarray>{};
 
 
 #endif

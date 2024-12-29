@@ -40,7 +40,7 @@
 //#define DIMACS_REFERENCE_VERTICES_0			//DEFAULT OFF! (real DIMACS format)
 
 template<class T>
-class Graph: public filterGraphEncodingType<T>{
+class Graph: public filterGraphTypeError<T>{
 	friend class GraphConversion;
 
 //	template<typename G, typename W>
