@@ -63,7 +63,7 @@ virtual	~Graph() = default;
 	//bitstring encoding
 	int number_of_vertices				()					const		{return NV_; }
 	int number_of_blocks				()					const		{return NBB_;}
-virtual	BITBOARD number_of_edges		(bool lazy=true);
+virtual	BITBOARD number_of_edges		(bool lazy = true);
 virtual	BITBOARD number_of_edges		(const T& bbsg )	const;								//on induced subgraph
 const T& get_neighbors					(int v)				const		{return adj_[v];}
       T& get_neighbors					(int v)							{return adj_[v];}
@@ -112,8 +112,8 @@ private:
 	* @param rhs right hand side graph
 	* @returns TRUE if lhs.adj_ == rhs.adj_
 	*/
-	template <class U = T>
-	friend bool operator ==				(const Graph<U>& lhs, const Graph<U>& rhs);  
+	template <class T>
+	friend bool operator ==				(const Graph<T>& lhs, const Graph<T>& rhs);  
 
 /////////////
 // Update operations

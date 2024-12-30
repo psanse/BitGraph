@@ -185,8 +185,7 @@ int Graph<T>::init(std::size_t n){
 		adj_[i].init(NV_);					//MUST BE!  (1)
 	}
 
-
-return 0;
+	return 0;
 }
 
 template<class T>
@@ -241,22 +240,23 @@ int Graph<T>::shrink_to_fit(std::size_t size){
 /////////////////////
 // shrinks graph to the size passed (must be less than current size)
 	
-	LOG_ERROR("Graph<T>::shrink_to_fit-shrinking is only possible in sparse graphs; the graph remains unchanged");
-
+	LOG_ERROR("Shrinking is only possible in sparse graphs; the graph remains unchanged - Graph<T>::shrink_to_fit");
+	LOG_ERROR("exiting...");
 	return -1;
 }
 
 template<class T>
 int Graph<T>::set_graph (string filename){
-	if(read_dimacs(filename)==-1){
-		if(read_mtx(filename)==-1){
-			if(read_EDGES(filename)==-1){
-				LOG_ERROR("Graph<T>::set_graph-unable to read file in any of these formats: DIMACS/MTX/EDGES");
+	if(read_dimacs(filename) == -1){
+		if(read_mtx(filename) == -1){
+			if(read_EDGES(filename) == -1){
+				LOG_ERROR("unable to read file in any of these formats: DIMACS/MTX/EDGES - Graph<T>::set_graph");
+				LOG_ERROR("exiting...");
 				return -1;
 			}
 		}
 	}
-return 0;
+	return 0;
 }
 
 template<class T>
@@ -560,7 +560,7 @@ return edges;
 template<class T>
 BITBOARD Graph<T>::number_of_edges	(bool lazy) {
 ////////////
-// Computes edges only once and caches its value
+// Computes edges only once and stores its value
 //
 // REMARKS: Can be an expensive operation
 	if (lazy && NE_ != 0) { return NE_; }
