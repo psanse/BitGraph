@@ -1,9 +1,13 @@
-//graph_inout.h: stateless functions for input-output
-//
-//date@10/07/2019
-//last_update@26/07/2022
-//
-//author: pss
+/*
+* graph_inout.h: stateless functions for io operations on graphs
+* @date 10/07/2019
+* @last_update 30/12/2022
+* @dev pss
+* TODO@: this code contains oinly yED format - possibly change name of file
+*/
+
+#ifndef	_GRAPH_INPUT_OUTPUT_H_
+#define _GRAPH_INPUT_OUTPUT_H_
 
 #include <fstream>
 #include <sstream>
@@ -15,36 +19,23 @@
 #include "utils/common.h"
 #include "../graph.h"
 
-using namespace std;
-
-#ifndef	_GRAPH_INPUT_OUTPUT_H_
-#define _GRAPH_INPUT_OUTPUT_H_
 
 #define  _USE_MATH_DEFINES				//for PI
 #include <math.h>
 
+using vint = vector<int>
+
 namespace gio {
 	
-	template<class Graph_t>
-	inline
-		int graph_to_dimacs(Graph_t& g, string filename) {
-		////////////
-		// g2file-dimacs format
-		ofstream f(filename);
-		if (f) {
-			g.write_dimacs(f);
-			f.close();
-			return 0;
-		}
-		return -1;
-	}
-	
-	/**********************************************
-	*	
-	*	 gml format (yED)- preliminary
-	*
-	************************************************/	
 	namespace yed {
+
+		/**********************************************
+		*
+		*	 Utilities to write in gml format (yED) 
+		*    (experimental)
+		*
+		************************************************/
+
 		constexpr int MAX_COL_RGB_GML = 23;
 		//constexpr std::array<const char*, 23> table_RGB = { "#990000", "#ff0000", "#ff6666",  "#999900", "#ffff00", "#ffff66",  "#009900", "#00ff00", "#66ff66", "#004C99", "#0080ff", "#66b2ff",
 		//												    "#990099", "#ff00ff", "#ff66ff",  "#404040", "#808080", "#c0c0c0" , "#009999", "#00ffff", "#66ffff"  "#ffcc00", "#000000",  "#ffffff" };
@@ -62,7 +53,7 @@ namespace gio {
 		};
 
 		inline
-		ostream& add_vertex(ostream& gml, int i, double x = 0, double y = 0, double scale = 7.5, col_t COL = DEFAULT, double w = 11.0, double h = 11.0, string type = "roundrectangle", int font_size = 7) {
+		std::ostream& add_vertex(std::ostream& gml, int i, double x = 0, double y = 0, double scale = 7.5, col_t COL = DEFAULT, double w = 11.0, double h = 11.0, string type = "roundrectangle", int font_size = 7) {
 			///////////////////////////
 			// param@i: id, label:= i+1
 
@@ -83,7 +74,7 @@ namespace gio {
 		}
 
 		inline
-		ostream& add_edge(ostream& gml, int i, int j, col_t COL = BLACK, edge_t E_STYLE= NONE) {
+		std::ostream& add_edge(std::ostream& gml, int i, int j, col_t COL = BLACK, edge_t E_STYLE= NONE) {
 			gml << " edge   [ "
 				<< " source  " << i
 				<< " target " << j
@@ -107,13 +98,13 @@ namespace gio {
 		}
 
 		inline
-		ostream& HEADER(ostream& gml) {
+		std::ostream& HEADER(std::ostream& gml) {
 			gml << "graph  [ hierarchic  1  directed  1 \n\n" << endl;
 			return gml;
 		}
 
 		inline
-		ostream& CLOSE_HEADER(ostream& gml) {
+		std::ostream& CLOSE_HEADER(std::ostream& gml) {
 			gml << "\n] \n\n" << endl;
 			return gml;
 		}
@@ -125,11 +116,11 @@ namespace gio {
 		*********************/
 		template<class Graph_t>
 		inline
-			int graph_to_gml(Graph_t& g, string filename, double scale = 7.5, int flag_edges=1) {
+			int graph_to_gml(Graph_t& g, std::string filename, double scale = 7.5, int flag_edges=1) {
 			const int N = g.number_of_vertices();
 			if (N == 0) { LOG_INFO("cannot paint the empty graph, will produce no output -gio::yed::graph_to_gml"); return 0; }
-			string filenameExt = filename + ".gml";
-			ofstream grafo(filenameExt);
+			std::string filenameExt = filename + ".gml";
+			std::ofstream grafo(filenameExt);
 			if (!grafo) { LOG_ERROR("file: " << filenameExt << "could no be opened" << " -gio::yed::graph_to_gml(...)"); return -1; }
 
 			//////////////////////////////////
@@ -170,11 +161,11 @@ namespace gio {
 		*********************/
 		template<class Graph_t>
 		inline
-			int graph_to_gml(Graph_t& g, vint& vset, string filename, col_t col = gio::yed::GREEN, double scale = 7.5, int flag_edges = 1, string path="") {
+			int graph_to_gml(Graph_t& g, vint& vset, std::string filename, col_t col = gio::yed::GREEN, double scale = 7.5, int flag_edges = 1, std::string path="") {
 			const int N = g.number_of_vertices();
 			if (N == 0) { LOG_INFO("cannot paint the empty graph, will produce no output- gio::yed::graph_to_gml"); return 0; }
-			string filenameExt =path + filename + ".gml";
-			ofstream grafo(filenameExt);
+			std::string filenameExt =path + filename + ".gml";
+			std::ofstream grafo(filenameExt);
 			if (!grafo) { LOG_ERROR("file: " << filenameExt << "could no be opened" << " -graph_to_gml(...)"); return -1; }
 			typename Graph_t::_bbt bbclq(vset, N);
 			//bbclq.print(cout, true);
@@ -223,11 +214,11 @@ namespace gio {
 		*********************/
 		template<class Graph_t>
 		inline
-			int graph_to_gml_clique(Graph_t& g, vint& clq, string filename, col_t col_clq = gio::yed::GREEN, col_t col = gio::yed::DEFAULT, double scale = 7.5, int flag_edges = 1, string path = "") {
+			int graph_to_gml_clique(Graph_t& g, vint& clq, std::string filename, col_t col_clq = gio::yed::GREEN, col_t col = gio::yed::DEFAULT, double scale = 7.5, int flag_edges = 1, std::string path = "") {
 			const int N = g.number_of_vertices();
 			if (N == 0) { LOG_INFO("cannot paint the empty graph, will produce no output -gio::yed::graph_to_gml_clique"); return 0; }
-			string filenameExt = path + filename + ".gml";
-			ofstream grafo(filenameExt);
+			std::string filenameExt = path + filename + ".gml";
+			std::ofstream grafo(filenameExt);
 			if (!grafo) { LOG_ERROR("file: " << filenameExt << " could no be opened" << " -gio::yed::graph_to_gml_clique(...)"); return -1; }
 			typename Graph_t::_bbt bbclq(clq, N);
 			//bbclq.print(cout, true);
@@ -280,12 +271,11 @@ namespace gio {
 		*
 		*********************/
 		template<class Graph_t>
-		inline
-			int graph_to_gml_color(Graph_t& g, vector<vint>& isets, string filename, double scale = 7.5, int flag_edges = 1) {
+		inline int graph_to_gml_color(Graph_t& g, vector<vint>& isets, std::string filename, double scale = 7.5, int flag_edges = 1) {
 			const int N = g.number_of_vertices();
 			if (N == 0) { LOG_INFO("cannot paint the empty graph, will produce no output -gio::yed::graph_to_gml_color"); return 0; }
-			string filenameExt = filename + ".gml";
-			ofstream grafo(filenameExt);
+			std::string filenameExt = filename + ".gml";
+			std::ofstream grafo(filenameExt);
 			if (!grafo) { LOG_ERROR("file: " << filenameExt << "could no be opened" << " -gio::yed::graph_to_gml_color(...)"); return -1; }
 			
 
@@ -405,10 +395,10 @@ namespace gio {
 		********************/
 		template<class Graph_t>
 		inline
-			int graph_to_gml_circular (Graph_t& g, string filename, double radius = 2, double scale = 20, int flag_edges = 1) {
+			int graph_to_gml_circular (Graph_t& g, std::string filename, double radius = 2, double scale = 20, int flag_edges = 1) {
 			const int N = g.number_of_vertices();
-			string filenameExt = filename + ".gml";
-			ofstream grafo(filenameExt);
+			std::string filenameExt = filename + ".gml";
+			std::ofstream grafo(filenameExt);
 			if (!grafo) { LOG_ERROR("file: " << filenameExt << "could no be opened" << "- graph_to_gml(...)"); return -1; }
 			
 			///////////////////////////////

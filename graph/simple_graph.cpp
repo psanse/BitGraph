@@ -320,12 +320,12 @@ int Graph<T>::read_dimacs(const string& filename){
 		return -1;
 	}
 
-	if(DIMACS_READER::read_dimacs_header(f, size, nEdges)==-1){
+	if(::gio::dimacs::read_dimacs_header(f, size, nEdges)==-1){
 		clear(); f.close(); return -1;
 	}	
 	
 	init(size);
-	DIMACS_READER::read_empty_lines(f);
+	::gio::read_empty_lines(f);
 
 	//read weights format n <x> <w> if they exist
 	//c=f.peek();
@@ -352,7 +352,7 @@ int Graph<T>::read_dimacs(const string& filename){
 	//	}
 
 	//	LOG_INFO("Graph<T>::read_dimacs-Weights read correctly from DIMACS file"<<filename);
-	//	DIMACS_READER::read_empty_lines(f);
+	//	::gio::dimacs::read_empty_lines(f);
 	//}
 /////////////////////	
 //read edges
