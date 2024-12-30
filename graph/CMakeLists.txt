@@ -64,8 +64,8 @@ if (graph_build_tests)
 # "demo.cxx" and "demo_b.cxx". The extensions are automatically found.
 add_executable (test_graph  tests/gtest_main.cpp
 # ./tests/test_degree.cpp
-#  ./tests/test_format.cpp
-    tests/test_graph.cpp
+   ./tests/test_format.cpp
+#    tests/test_graph.cpp
 #  ./tests/test_func.cpp
 #./tests/test_graph_properties_in_folder.cpp
 #  ./tests/test_graph_sort.cpp

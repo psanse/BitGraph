@@ -1,5 +1,5 @@
 /*
-* dimacs_reader.h  header of stateless class DIMACS_READER which implements a number of utilities to read dimacs format
+* dimacs_format.h  header of stateless class DIMACS_READER which implements a number of utilities to read dimacs format
 * @creation 30/09/2018
 * @last_update 30/12/2024
 * @dev pss

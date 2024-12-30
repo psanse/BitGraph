@@ -7,9 +7,9 @@
 #include <iostream>
 #include "gtest/gtest.h"
 #include "../graph.h"
-#include "formats/dimacs_reader.h"
+#include "formats/dimacs_format.h"
 #include "utils/common_paths.h"
-#include "graph/formats/graph_inout.h"
+#include "graph/formats/yED_format.h"
 
 using namespace std;
 

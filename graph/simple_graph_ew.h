@@ -226,7 +226,7 @@ int Graph_EW< ugraph, W >::set_we (int v, int w, W val) {
 		_mypt::m_we[w][v] = val;		
 	}
 	else {
-		LOG_ERROR("bizarre petition to add weight to the non-edge" << "[" << v << "," << w << "]" << "-Base_Graph_EW<Graph_t,W >::set_we(int, int, W)");
+		LOG_ERROR("bizarre petition to add weight to the non-edge", "[", v , "," , w , "]" , "-Base_Graph_EW<Graph_t,W >::set_we(int, int, W)");
 		LOG_ERROR("weight not added");
 		return -1;
 	}
@@ -479,7 +479,7 @@ int Base_Graph_EW<Graph_t, W >::set_we(int v, int w, W val) {
 		m_we[v][w] = val;
 	}
 	else {
-		LOG_ERROR("bizarre petition to add weight to the non-edge"<< "[" << v << "," << w << "]" << "-Base_Graph_EW<Graph_t,W >::set_we(int, int, W)");
+		LOG_ERROR("bizarre petition to add weight to the non-edge" , "[" , v , "," , w , "]" , "-Base_Graph_EW<Graph_t,W >::set_we(int, int, W)");
 		LOG_ERROR("weight not added");
 		return -1;
 	}	
@@ -558,13 +558,13 @@ int Base_Graph_EW<Graph_t, W>::read_dimacs(const string& filename){
 	
 	fstream f(filename.c_str());
 	if(!f){
-		LOG_ERROR("File: "<< filename<<" could not be opened reading DIMACS format- Base_Graph_EW<Graph_t, W>::read_dimacs(...)");
+		LOG_ERROR("File: " , filename , " could not be opened reading DIMACS format- Base_Graph_EW<Graph_t, W>::read_dimacs(...)");
 		return -1;
 	}
 
 	//read header
 	///////////////////////////////////////////////////////////
-	if(DIMACS_READER::read_dimacs_header(f, size, nEdges) == -1){
+	if(::gio::dimacs::read_dimacs_header(f, size, nEdges) == -1){
 	////////////////////////////////////////////////////////////
 		f.close();
 		return -1;
@@ -573,7 +573,7 @@ int Base_Graph_EW<Graph_t, W>::read_dimacs(const string& filename){
 	init(size);
 
 	///////////////////////////////////////////////////////////
-	DIMACS_READER::read_empty_lines(f);
+	::gio::read_empty_lines(f);
 	////////////////////////////////////////////////////////////
 
 	///////////////////////
@@ -600,7 +600,7 @@ int Base_Graph_EW<Graph_t, W>::read_dimacs(const string& filename){
 		}
 	
 		///////////////////////////////////////////////////////////
-		DIMACS_READER::read_empty_lines(f);
+		::gio::read_empty_lines(f);
 		///////////////////////////////////////////////////////////
 	}
 	

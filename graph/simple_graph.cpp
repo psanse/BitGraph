@@ -11,10 +11,10 @@
 
 
 #include "bitscan/bitscan.h"
-#include "formats/dimacs_reader.h"
+#include "formats/dimacs_format.h"
 #include "formats/mmio.h"
-#include "formats/edges_reader.h"
-#include "formats/mmx_reader.h"
+#include "formats/edges_format.h"
+#include "formats/mmx_format.h"
 #include "simple_graph.h"
 #include "utils/logger.h"
 #include "utils/prec_timer.h"
