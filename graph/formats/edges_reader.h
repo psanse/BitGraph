@@ -1,5 +1,5 @@
 //edges_reader.h: header of class MMXI to read MMX format in GRAPH
-//				currently only reads matrix from aconfiguration MCPS
+//				currently only reads matrix from a configuration MCPS
 //date: 19/11/2014
 //author: pss
 

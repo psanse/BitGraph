@@ -45,8 +45,8 @@ public:
 	using _bbt = basic_type;			//alias for basic type - for backward compatibility
 			
 	//constructors
-	Graph								();														//does not allocate memory
-	Graph								(std::size_t n);												//creates empty graph with size vertices	
+	Graph								();															
+	Graph								(std::size_t n);											//creates graph with n=|V| and m=0 	
 	Graph								(std::string filename);	
 	Graph								(std::size_t n, int* adj[], std::string filename = "");		//old-style adjacency matrix
 virtual	~Graph() = default; 
@@ -122,9 +122,9 @@ public:
 virtual void remove_vertices			(const BitBoardN&);				
 
 ////////////
-// I/O
+// Read / write operations
+// (TODO - place in a graph_io class?)
 public:
-	//TODO@place in a graph_io class
 	int read_dimacs						(const std::string& filename);	
 	int read_mtx						(const std::string& filename);
 	int read_EDGES						(const std::string& filename);
@@ -132,6 +132,8 @@ public:
 virtual	void  write_dimacs				(std::ostream& o);	
 virtual	void  write_EDGES				(std::ostream& o);
 
+////////////
+// I/O operations
 virtual	ostream& print_data				(bool lazy=true, std::ostream& = std::cout, bool endl=true);
 	ostream& print_adj					(std::ostream& = std::cout, bool endl=true);
 	virtual ostream& print_edges		(std::ostream& = std::cout) const;
