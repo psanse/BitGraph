@@ -23,6 +23,8 @@
 #include <iostream>
 #include <vector>
 
+#include "simple_sparse_graph.h"				//specializations for sparse graphs
+
 using namespace std;
 
 
@@ -46,7 +48,7 @@ Graph<T>::Graph(string filename) :
 }
 
 template<class T>
-Graph<T>::Graph(int size) {
+Graph<T>::Graph(std::size_t size) {
 	//creates empty graph of size
 	name_.clear();
 	path_.clear();
@@ -54,7 +56,7 @@ Graph<T>::Graph(int size) {
 }
 
 template <class T>
-Graph<T>::Graph(int nV, int* adj[], string filename) {
+Graph<T>::Graph(std::size_t nV, int* adj[], string filename) {
 	if (init(nV) == -1) {
 		LOG_ERROR("bizarre graph construction-Graph<T>::Graph(...), exiting... ");
 		exit(-1); 
@@ -95,7 +97,6 @@ ostream& Graph<T>::print_adj (std::ostream& o, bool add_endl){
 	if(add_endl) o<<endl;
 	return o;	
 }
-
 
 
 template<class T>
@@ -148,7 +149,7 @@ void Graph<T>::clear (){
 }
 
 template<class T>
-int Graph<T>::init(int size){
+int Graph<T>::init(std::size_t n){
 ///////////////////////////
 // Allocates memory for the empty graph (new 18/06/19)
 //
@@ -158,7 +159,7 @@ int Graph<T>::init(int size){
 	//clear();
 	//	
 	//try{
-	//	adj_.resize(size);	
+	//	adj_.resize(n);	
 	//}catch(...){
 	//	cout<<"memory for graph not allocated";
 	//	return -1;
@@ -167,15 +168,16 @@ int Graph<T>::init(int size){
 //new simple allocation
 	NE_ = 0;
 	try{
-		adj_.assign(size, T(size));				//old and new bitstrings have different sizes!! (17/01/2023) (1)
+		adj_.assign(n, T(n));				//old and new bitstrings have different sizes!! (17/01/2023) (1)
 	}catch(...){
 		NV_ = 0;
 		NBB_ = 0;		
-		LOG_ERROR("memory for graph not allocated-Graph<T>::init");
+		LOG_ERROR("memory for graph not allocated - Graph<T>::init");
+		LOG_ERROR("exiting...");
 		return -1;
 	}
 
-	NV_=size;
+	NV_= n;
 	NBB_=INDEX_1TO1(NV_);
 		
 	//zero edges
@@ -207,9 +209,8 @@ int Graph<T>::add_vertex(int toADD) {
 }
 
 
-
 template<class T>
-Graph<T>& Graph<T>::create_subgraph (int size, Graph<T>& newg)  {
+Graph<T>& Graph<T>::create_subgraph (std::size_t size, Graph<T>& newg)  {
 //////////////////////////
 // creates new subgraph with subset of size vertices 
 
@@ -236,7 +237,7 @@ return newg;
 
 
 template<class T>
-int Graph<T>::shrink_to_fit(int size){
+int Graph<T>::shrink_to_fit(std::size_t size){
 /////////////////////
 // shrinks graph to the size passed (must be less than current size)
 	
@@ -795,154 +796,155 @@ void  Graph<T>::write_EDGES	(ostream& o){
 	}
 }
 
-////////////////////////
+//////////////////////////
 //
-// SPECIALIZATIONS
+// SPECIALIZATIONS - deprecated
+// (now included in the header simple_sparse_graph.h)
 //
-////////////////////////
+//////////////////////////
 
-template<>
-Graph<sparse_bitarray>& Graph<sparse_bitarray>::create_subgraph(int size, Graph<sparse_bitarray>& newg) {
-	//////////////////////////
-	// creates new subgraph with vertex set V=[1,2,..., size]
-	//
-	// RETURNS: reference to the new subgraph
-
-		//assert is size required is greater or equal current size
-	if (size >= NV_ || size <= 0) {
-		LOG_ERROR("Graph<sparse_bitarray>& Graph<sparse_bitarray>::create_subgraph-wrong shrinking size for graph. Remains unchanged");
-		return *this;
-	}
-
-	newg.init(size);
-
-	//copies to the new graph
-	for (int i = 0; i < newg.NV_; i++) {
-		newg.adj_[i] = adj_[i];
-		newg.adj_[i].clear_bit(size, EMPTY_ELEM);		//from size to the end
-	}
-
-	return newg;
-}
-
-template<>
-int Graph<sparse_bitarray>::shrink_to_fit(int size) {
-	/////////////////////
-	// shrinks graph to the size passed (must be less than current size)
-	if (NV_ <= size) {
-		LOG_ERROR("Graph<sparse_bitarray>::shrink_to_fit-wrong shrinking size for graph, remains unchanged");
-		return -1;
-	}
-
-	//trims vertices 
-	for (int i = 0; i < size; i++) {
-		adj_[i].clear_bit(size, EMPTY_ELEM);		//from size to the end
-	}
-
-	//resizes adjacency matrix
-	adj_.resize(size);
-	NV_ = size;
-	NE_ = 0;									//so that when needed will be recomputed
-
-	return 0;
-}
-
-
-template<>
-BITBOARD Graph<sparse_bitarray>::number_of_edges(bool lazy) {
-	//specialization for sparse graphs (is adjacent runs in O(log)) 
-	// 
-
-	if (lazy && NE_ != 0)
-		return NE_;
-
-	BITBOARD  edges = 0;
-	for (int i = 0; i < NV_; i++) {
-		edges += adj_[i].popcn64();
-	}
-	NE_ = edges;
-
-	return NE_;
-}
-
-template<>
-double Graph<sparse_bitarray>::block_density()	const {
-	/////////////////////////
-	// specialization for sparse graphs
-	//
-	// RESULT: should be a 1.0 ratio, since only non-zero bitblocks are stored
-
-	size_t nBB = 0; size_t nBBt = 0;
-	for (int v = 0; v < NV_; ++v) {
-		nBBt += adj_[v].number_of_bitblocks();
-		for (int bb = 0; bb < adj_[v].number_of_bitblocks(); bb++) {
-			if (adj_[v].get_bitboard(bb))
-				nBB++;
-		}
-	}
-
-	return nBB / double(nBBt);
-}
-
-template<>
-double Graph<sparse_bitarray>::block_density_index() {
-	/////////////////////////
-	// a measure of sparsity in relation to the number of bitblocks //
-	size_t nBB = 0; size_t nBBt = 0;
-	for (int v = 0; v < NV_; ++v) {
-		nBBt += adj_[v].number_of_bitblocks();
-	}
-
-	BITBOARD aux = ceil(NV_ / double(WORD_SIZE));
-	BITBOARD maxBlock = NV_ * aux;
-
-	cout << NV_ << ":" << aux << ":" << nBBt << ":" << maxBlock << endl;
-	return (double(nBBt)) / maxBlock;
-
-}
-
-template<>
-void Graph<sparse_bitarray>::write_dimacs(ostream& o) {
-	/////////////////////////
-	// writes file in dimacs format 
-
-		//***timestamp 
-
-		//name
-	if (!name_.empty())
-		o << "\nc " << name_.c_str() << endl;
-
-	//tamaño del grafo
-	o << "p edge " << NV_ << " " << number_of_edges() << endl << endl;
-
-	//Escribir nodos
-	for (int v = 0; v < NV_; v++) {
-		//non destructive scan of each bitstring
-		if (adj_[v].init_scan(bbo::NON_DESTRUCTIVE) != EMPTY_ELEM) {
-			while (1) {
-				int w = adj_[v].next_bit();
-				if (w == EMPTY_ELEM)
-					break;
-				o << "e " << v + 1 << " " << w + 1 << endl;
-			}
-		}
-	}
-}
+//template<>
+//Graph<sparse_bitarray>& Graph<sparse_bitarray>::create_subgraph(int size, Graph<sparse_bitarray>& newg) {
+//	//////////////////////////
+//	// creates new subgraph with vertex set V=[1,2,..., size]
+//	//
+//	// RETURNS: reference to the new subgraph
+//
+//		//assert is size required is greater or equal current size
+//	if (size >= NV_ || size <= 0) {
+//		LOG_ERROR("Graph<sparse_bitarray>& Graph<sparse_bitarray>::create_subgraph-wrong shrinking size for graph. Remains unchanged");
+//		return *this;
+//	}
+//
+//	newg.init(size);
+//
+//	//copies to the new graph
+//	for (int i = 0; i < newg.NV_; i++) {
+//		newg.adj_[i] = adj_[i];
+//		newg.adj_[i].clear_bit(size, EMPTY_ELEM);		//from size to the end
+//	}
+//
+//	return newg;
+//}
+//
+//template<>
+//int Graph<sparse_bitarray>::shrink_to_fit(int size) {
+//	/////////////////////
+//	// shrinks graph to the size passed (must be less than current size)
+//	if (NV_ <= size) {
+//		LOG_ERROR("Graph<sparse_bitarray>::shrink_to_fit-wrong shrinking size for graph, remains unchanged");
+//		return -1;
+//	}
+//
+//	//trims vertices 
+//	for (int i = 0; i < size; i++) {
+//		adj_[i].clear_bit(size, EMPTY_ELEM);		//from size to the end
+//	}
+//
+//	//resizes adjacency matrix
+//	adj_.resize(size);
+//	NV_ = size;
+//	NE_ = 0;									//so that when needed will be recomputed
+//
+//	return 0;
+//}
+//
+//
+//template<>
+//BITBOARD Graph<sparse_bitarray>::number_of_edges(bool lazy) {
+//	//specialization for sparse graphs (is adjacent runs in O(log)) 
+//	// 
+//
+//	if (lazy && NE_ != 0)
+//		return NE_;
+//
+//	BITBOARD  edges = 0;
+//	for (int i = 0; i < NV_; i++) {
+//		edges += adj_[i].popcn64();
+//	}
+//	NE_ = edges;
+//
+//	return NE_;
+//}
+//
+//template<>
+//double Graph<sparse_bitarray>::block_density()	const {
+//	/////////////////////////
+//	// specialization for sparse graphs
+//	//
+//	// RESULT: should be a 1.0 ratio, since only non-zero bitblocks are stored
+//
+//	size_t nBB = 0; size_t nBBt = 0;
+//	for (int v = 0; v < NV_; ++v) {
+//		nBBt += adj_[v].number_of_bitblocks();
+//		for (int bb = 0; bb < adj_[v].number_of_bitblocks(); bb++) {
+//			if (adj_[v].get_bitboard(bb))
+//				nBB++;
+//		}
+//	}
+//
+//	return nBB / double(nBBt);
+//}
+//
+//template<>
+//double Graph<sparse_bitarray>::block_density_index() {
+//	/////////////////////////
+//	// a measure of sparsity in relation to the number of bitblocks //
+//	size_t nBB = 0; size_t nBBt = 0;
+//	for (int v = 0; v < NV_; ++v) {
+//		nBBt += adj_[v].number_of_bitblocks();
+//	}
+//
+//	BITBOARD aux = ceil(NV_ / double(WORD_SIZE));
+//	BITBOARD maxBlock = NV_ * aux;
+//
+//	cout << NV_ << ":" << aux << ":" << nBBt << ":" << maxBlock << endl;
+//	return (double(nBBt)) / maxBlock;
+//
+//}
+//
+//template<>
+//void Graph<sparse_bitarray>::write_dimacs(ostream& o) {
+//	/////////////////////////
+//	// writes file in dimacs format 
+//
+//		//***timestamp 
+//
+//		//name
+//	if (!name_.empty())
+//		o << "\nc " << name_.c_str() << endl;
+//
+//	//tamaño del grafo
+//	o << "p edge " << NV_ << " " << number_of_edges() << endl << endl;
+//
+//	//Escribir nodos
+//	for (int v = 0; v < NV_; v++) {
+//		//non destructive scan of each bitstring
+//		if (adj_[v].init_scan(bbo::NON_DESTRUCTIVE) != EMPTY_ELEM) {
+//			while (1) {
+//				int w = adj_[v].next_bit();
+//				if (w == EMPTY_ELEM)
+//					break;
+//				o << "e " << v + 1 << " " << w + 1 << endl;
+//			}
+//		}
+//	}
+//}
 
 
 ////////////////////////////////////////////
-//list of valid types for cpp code generation
+//list of valid types to allow generic code in *.cpp files 
 
 template class  Graph<bitarray>;
 template class  Graph<sparse_bitarray>;
 
-//sparse method specializations
-template Graph<sparse_bitarray>& Graph<sparse_bitarray>::create_subgraph(int, Graph<sparse_bitarray>&);
-template int Graph<sparse_bitarray>::shrink_to_fit(int);
-template BITBOARD Graph<sparse_bitarray>::number_of_edges(bool);
-template double Graph<sparse_bitarray>::block_density()	const;
-template double Graph<sparse_bitarray>::block_density_index();
-template void Graph<sparse_bitarray>::write_dimacs(ostream& o);
+//sparse method specializations (now included in the header simple_sparse_graph.h)
+//template Graph<sparse_bitarray>& Graph<sparse_bitarray>::create_subgraph(int, Graph<sparse_bitarray>&);
+//template int Graph<sparse_bitarray>::shrink_to_fit(int);
+//template BITBOARD Graph<sparse_bitarray>::number_of_edges(bool);
+//template double Graph<sparse_bitarray>::block_density()	const;
+//template double Graph<sparse_bitarray>::block_density_index();
+//template void Graph<sparse_bitarray>::write_dimacs(ostream& o);
 
 ////////////////////////////////////////////
 

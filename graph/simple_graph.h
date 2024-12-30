@@ -1,21 +1,14 @@
 /*  
- * graph.h file from the GRAPH library, a C++ library for bit encoded 
+ * graph.h file for the class Graph for simple graphs  
+ *
+ * This code is part of the GRAPH C++ library for bit encoded 
  * simple graphs. GRAPH stores the adjacency matrix in full, each row encoded as a bitstring. 
  * GRAPH is at the core many state of the art leading exact clique algorithms. 
- * (see license file (legal.txt) for references)
- *
+ * 
  * Copyright (C)
  * Main developper: Pablo San Segundo
  * Intelligent Control Research Group CAR(UPM-CSIC) 
  *
- * Permission to use, modify and distribute this software is
- * granted provided that this copyright notice appears in all 
- * copies, in source code or in binaries. For precise terms 
- * see the accompanying LICENSE file.
- *
- * This software is provided "AS IS" with no warranty of any 
- * kind, express or implied, and with no claim as to its
- * suitability for any purpose.
  */
 
 #ifndef __SIMPLE_GRAPH_H__
@@ -32,9 +25,9 @@
 
 //////////////////
 //
-// generic class Graph
+// Generic class Graph<T>
 // 
-// Basic types limited to bitarrays and sparse bitarrays
+// (T is limited to bitarray and sparse_bitarray types)
 // 
 //////////////////
 
@@ -53,9 +46,9 @@ public:
 			
 	//constructors
 	Graph								();														//does not allocate memory
-	Graph								(int nV);												//creates empty graph with size vertices	
+	Graph								(std::size_t n);												//creates empty graph with size vertices	
 	Graph								(std::string filename);	
-	Graph								(int nV, int* adj[], std::string filename = "");					//old-style adjacency matrix
+	Graph								(std::size_t n, int* adj[], std::string filename = "");		//old-style adjacency matrix
 virtual	~Graph() = default; 
 
 /////////////
@@ -78,10 +71,10 @@ const vector<T>& get_adjacency_matrix	()					const		{return adj_;}
 
 //////////////////////////
 // memory allocation 
-	int init							(int nV);									//allocates memory for n vertices
-	void clear							();											//deallocates memory if required
-	Graph& create_subgraph				(int size, Graph& newh)  ;
-	int shrink_to_fit					(int size);									//reduces the graph to size (currently only for sparse graphs)
+	int init							(std::size_t n);							//allocates memory for n vertices
+	void clear							();											//deallocates memory 
+	Graph& create_subgraph				(std::size_t n, Graph& g)  ;
+	int shrink_to_fit					(std::size_t n);							//reduces the graph to size (currently only for sparse graphs)
 
 	int add_vertex						(int toADD);								//enlarges the graph with @toADD new isolanies 
 					
@@ -101,8 +94,7 @@ virtual	double density					(bool lazy=true)		;
 virtual void add_edge					(int v, int w);								//v->w	(no self_loops allowed)
 virtual void remove_edge				(int v, int w);
 	void remove_edges					(int v);									//removes edges with endpoint in v
-
-	void make_bidirected				();											//make all edges symmetrical
+	void make_bidirected				();											//make all existing edges symmetrical
 
 /////////////
 // Boolean
@@ -113,8 +105,15 @@ private:
 
 ////////////////
 //Comparisons
-	template <class U>
-	friend bool operator ==				(const Graph<U>& lhs, const Graph<U>& rhs);				//EXPERIMENTAL! only compares the adj. matrix	
+
+	/*
+	* @brief determines if two graphs have the same adjacency matrices 
+	* @param lhs left hand side graph
+	* @param rhs right hand side graph
+	* @returns TRUE if lhs.adj_ == rhs.adj_
+	*/
+	template <class U = T>
+	friend bool operator ==				(const Graph<U>& lhs, const Graph<U>& rhs);  
 
 /////////////
 // Update operations
@@ -134,7 +133,7 @@ virtual	void  write_dimacs				(std::ostream& o);
 virtual	void  write_EDGES				(std::ostream& o);
 
 virtual	ostream& print_data				(bool lazy=true, std::ostream& = std::cout, bool endl=true);
-	ostream& print_adj					(std::ostream& = std::cout, bool add_endl=true);
+	ostream& print_adj					(std::ostream& = std::cout, bool endl=true);
 	virtual ostream& print_edges		(std::ostream& = std::cout) const;
 	virtual ostream& print_edges		(T& bbsg, ostream& = std::cout) const;	/* edges of subgraph*/
 		
@@ -152,15 +151,6 @@ protected:
 };
 
 template <class T>
-inline
-bool operator == (const Graph<T>& lhs, const Graph<T>& rhs) {
-
-	return lhs.adj_ == rhs.adj_;
-	/*for(int i=0; i<lhs.NV_; i++){
-		if(!(lhs.get_neighbors(i)==rhs.get_neighbors(i)))
-			return false;
-	}
-	return true;*/
-}
+inline bool operator == (const Graph<T>& lhs, const Graph<T>& rhs) {	return lhs.adj_ == rhs.adj_; }
 
 #endif

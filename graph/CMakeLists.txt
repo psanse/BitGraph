@@ -1,15 +1,16 @@
 # Create a library called "Hello" which includes the source file "hello.cxGRBx".
 # The extension is already found. Any number of sources could be listed here.
-set(useful_headers_for_IDE ./simple_graph.h
-./simple_ugraph.h
-./simple_graph_ew.h
-./simple_graph_w.h
-./kcore.h
-./graph_gen.h
-#./algorithms/graph_sort.h
-./algorithms/graph_map.h
-./algorithms/graph_fast_sort.h
-./algorithms/graph_fast_sort_weighted.h
+set(useful_headers_for_IDE simple_graph.h
+simple_sparse_graph.h
+simple_ugraph.h
+simple_graph_ew.h
+simple_graph_w.h
+kcore.h
+graph_gen.h
+#algorithms/graph_sort.h
+algorithms/graph_map.h
+algorithms/graph_fast_sort.h
+algorithms/graph_fast_sort_weighted.h
 )
 
 #### SCRIPT to add LEDA to graph library(only Win32)#####
