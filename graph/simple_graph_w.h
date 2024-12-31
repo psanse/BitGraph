@@ -122,7 +122,7 @@ const _bbt& get_neighbors				(int v)		const			{ return m_g.get_neighbors(v); }
 	int number_of_vertices()  const { return m_g.number_of_vertices(); }
 	int number_of_edges()   { return m_g.number_of_edges(); }	
 	void add_edge(int v, int w){m_g.add_edge(v, w);}
-	void set_name(string str, bool separate_path = false) {m_g.set_name(str, separate_path);}
+	void set_name(string str) {m_g.set_name(str);}
 	bool is_edge(int v, int w)  const { return m_g.is_edge(v, w); }
 	double density()  { return m_g.density(); }
 

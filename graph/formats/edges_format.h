@@ -41,7 +41,7 @@ EDGES<T>::EDGES(string filename, T& gout):g(gout){
 	}
 
 	//set name without path
-	g.set_name(filename, true);
+	g.set_name(filename);
 }
 
 template<class T>
@@ -104,7 +104,7 @@ int EDGES<T>::read(){
 	}else {cout<<"graph read correctly-----------------------"<<endl;}
 
 	//set name (without path)
-	g.set_name(graphname, false);
+	g.set_name(graphname);
 	
 return 0;
 }

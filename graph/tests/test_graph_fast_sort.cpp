@@ -19,7 +19,6 @@
 using namespace std;
 using namespace ::com::sort;
 
-
 class GraphFastRootSortTest : public ::testing::Test {
 protected:
 	void SetUp() override {

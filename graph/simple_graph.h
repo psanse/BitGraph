@@ -1,14 +1,16 @@
 /*  
- * graph.h file for the class Graph for simple graphs  
+ * simple_graph.h file for the class Graph for simple graphs  
+ * 
+ * @last_update 31/12/24
+ * @dev pss
  *
  * This code is part of the GRAPH C++ library for bit encoded 
- * simple graphs. GRAPH stores the adjacency matrix in full, each row encoded as a bitstring. 
- * GRAPH is at the core many state of the art leading exact clique algorithms. 
+ * simple graphs. GRAPH stores the adjacency matrix in full, each 
+ * row encoded as a bitstring. 
  * 
- * Copyright (C)
- * Main developper: Pablo San Segundo
- * Intelligent Control Research Group CAR(UPM-CSIC) 
- *
+ * GRAPH is at the core many state of the art leading exact clique 
+ * algorithms. 
+ * 
  */
 
 #ifndef __SIMPLE_GRAPH_H__
@@ -31,7 +33,7 @@
 // 
 //////////////////
 
-template<class T>
+template<class T = bitarray>
 class Graph: public filterGraphTypeError<T>{
 	friend class GraphConversion;
 
@@ -57,7 +59,7 @@ virtual	~Graph() = default;
 		
 	std::string get_name				() const {return name_;}
 	std::string get_path				() const {return path_;}
-	void set_name						(std::string graph_name, bool separate_path=false);		//clears path by DEFAULT (separate_path = false)
+	void set_name						(std::string graph_name);		
 	void set_path						(std::string path_name) {path_ = path_name;}
 
 	//bitstring encoding
@@ -71,7 +73,26 @@ const vector<T>& get_adjacency_matrix	()					const		{return adj_;}
 
 //////////////////////////
 // memory allocation 
-	int init							(std::size_t n);							//allocates memory for n vertices
+
+	/*
+	* @brief resets to empty graph with |V|= n
+	* @param n number of vertices
+	* @param reset_name if true, @name_ and @path_ reset to empty
+	* @returns 0 if success, -1 if memory allocation fails
+	* @updates 18/06/19, 31/12/24
+	* @comment_1 preserved for backward compatibility (use reset(...))
+	*/
+	int init							(std::size_t n, bool reset_name = true);	
+
+	/*
+	* @brief resets to empty graph given name and number of vertices
+	* @param n number of vertices
+	* @param name name of the instance 
+	* @returns 0 if success, -1 if memory allocation fails
+	* @creation 31/12/24
+	*/
+	int reset							(std::size_t n, string name = "");
+
 	void clear							();											//deallocates memory 
 	Graph& create_subgraph				(std::size_t n, Graph& g)  ;
 	int shrink_to_fit					(std::size_t n);							//reduces the graph to size (currently only for sparse graphs)

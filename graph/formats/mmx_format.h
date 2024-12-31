@@ -102,7 +102,7 @@ int MMI<T>::read(const string& filename){
     }
 
 	//name (remove path)
-	g.set_name(filename, true);	
+	g.set_name(filename);	
 
 			
 	fclose(f);

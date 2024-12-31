@@ -1,7 +1,11 @@
 /*  
  * simple_graph.cpp implementation file of the class Graph (header simple_graph.h)
  * 
- * @comments: see end of file for valid template types
+ * @last_update 31/12/2024
+ * @dev pss
+ * 
+ * @comments see end of file for valid template types
+ * 
  */
 
  //////////////////
@@ -48,11 +52,10 @@ Graph<T>::Graph(string filename) :
 }
 
 template<class T>
-Graph<T>::Graph(std::size_t size) {
-	//creates empty graph of size
+Graph<T>::Graph(std::size_t NV) {
 	name_.clear();
 	path_.clear();
-	init(size);
+	init(NV);
 }
 
 template <class T>
@@ -98,49 +101,34 @@ ostream& Graph<T>::print_adj (std::ostream& o, bool add_endl){
 	return o;	
 }
 
-
 template<class T>
-void Graph<T>::set_name(std::string name, bool separate_path){
-//name for file of weights assumed to be the same as "name" but with a w
+void Graph<T>::set_name(std::string name){
+
+	//update name
+	size_t found = name.find_last_of("/\\");
 	
-	if(separate_path){
-		std::string str=name;
-		size_t found=str.find_last_of("/\\");
-		name_=str.substr(found+1);
-		path_=str.substr(0,found+1);  //includes slash
-	}else{
-		name_=name;
+	//update path and name
+	if (found != string::npos) {
+		name_ = name.substr(found + 1);
+		path_ = name.substr(0, found + 1);  //includes slash
+	}
+	else {
+		name_ = name;
 		path_.clear();
 	}
+
 	
-
-	//adding name for weights in nodes (6/10/16)
-	//std::string str=name;
-	//string wname=str.substr(str.find_last_of("/\\")+1);
-	//wname="w"+wname;
-	//string str1(name);
-	//m_wname=str.substr(0,str1.find_last_of("/\\")+1);
-	//m_wname+=wname;
+	//if(separate_path){
+	//	size_t found=name.find_last_of("/\\");
+	//	name_ = str.substr(found + 1);
+	//	if (found != string::npos) {			
+	//		path_ = str.substr(0, found + 1);  //includes slash
+	//	}
+	//}else{
+	//	name_=name;
+	//	path_.clear();
+	//}
 }
-
-//template<class T>
-//Graph<T>& Graph<T>::operator= (const Graph& g){
-///////////////////
-//// Sets graph (allocates memory)
-//
-//	if(this==&g) return *this;		//same graph
-//
-//	//allocation
-//	init(g.NV_);					 //possibly throw exception
-//	for(int i=0; i<NV_; i++){
-//					adj_[i]=g.adj_[i];
-//	}
-//	
-//	this->name_=g.name_;
-//	this->path_=g.path_;	
-//				
-//return *this;
-//}
 
 template<class T>
 void Graph<T>::clear (){
@@ -149,41 +137,78 @@ void Graph<T>::clear (){
 }
 
 template<class T>
-int Graph<T>::init(std::size_t n){
-///////////////////////////
-// Allocates memory for the empty graph (new 18/06/19)
-//
+int Graph<T>::init (std::size_t NV, bool reset_name){
 
-//deprecated--
-	//deallocates previous
-	//clear();
-	//	
-	//try{
-	//	adj_.resize(n);	
-	//}catch(...){
-	//	cout<<"memory for graph not allocated";
-	//	return -1;
-	//}
-
-//new simple allocation
-	NE_ = 0;
-	try{
-		adj_.assign(n, T(n));				//old and new bitstrings have different sizes!! (17/01/2023) (1)
-	}catch(...){
-		NV_ = 0;
-		NBB_ = 0;		
-		LOG_ERROR("memory for graph not allocated - Graph<T>::init");
-		LOG_ERROR("exiting...");
+	if (NV <= 0) {
+		LOG_ERROR("Invalid graph size - Graph<T>::init");
 		return -1;
 	}
 
-	NV_= n;
-	NBB_=INDEX_1TO1(NV_);
+	//initialization
+	NV_ = NV;
+	NBB_ = INDEX_1TO1(NV_);
+	NE_ = 0;
+
+	try{
+		//////////////////////////////
+		adj_.assign(NV, T(NV));				//bitsets initialize to 0		
+		//////////////////////////////
 		
-	//zero edges
-	for(int i=0; i<NV_; i++){
-		adj_[i].init(NV_);					//MUST BE!  (1)
+	}catch(const std::bad_alloc& e){
+		LOG_ERROR("memory for graph not allocated - Graph<T>::init");
+		LOG_ERROR(e.what());		
+		NV_ = 0;
+		NBB_ = 0;			
+		return -1;
 	}
+			
+	//init bitarrays with zero edges - CHECK if needed (should not be)
+	//for(std::size_t i=0; i<NV_; i++){
+	//	adj_[i].init(NV_);					//MUST BE! - CHECK THIS COMMENT (31/12/24)
+	//}
+
+	//clears name if requested
+	if (reset_name) {
+		name_.clear();
+		path_.clear();
+	}
+
+	return 0;
+}
+
+template<class T>
+int Graph<T>::reset	(std::size_t NV, string name) {
+
+	if (NV <= 0) {
+		LOG_ERROR("Invalid graph size ", NV," - Graph<T>::reset");
+		return -1;
+	}
+
+	//initialization
+	NV_ = NV;
+	NBB_ = INDEX_1TO1(NV_);
+	NE_ = 0;
+
+	try {
+		//////////////////////////////
+		adj_.assign(NV, T(NV));				//bitsets initialize to 0		
+		//////////////////////////////
+	}
+	catch (const std::bad_alloc& e) {
+		LOG_ERROR("memory for graph not allocated - Graph<T>::init");
+		LOG_ERROR(e.what());
+		NV_ = 0;
+		NBB_ = 0;
+		return -1;
+	}
+
+	//init bitarrays with zero edges - CHECK if needed (should not be)
+	//for (std::size_t i = 0; i < NV_; i++) {
+	//	adj_[i].init(NV_);					//MUST BE! - CHECK THIS COMMENT (31/12/24)
+	//}
+
+	//update instance name
+	set_name(name);	
 
 	return 0;
 }
@@ -413,7 +438,7 @@ int Graph<T>::read_dimacs(const string& filename){
 	f.close();
 	
 	//name (removes path)
-	set_name(filename, true);
+	set_name(filename);
 
 	//extension for weighted files (9/10/16)
 	string str(filename);					//filename contains the full path
@@ -474,7 +499,7 @@ int Graph<T>::read_01(const string& filename) {
 	f.close();
 
 	//name (removes path)
-	set_name(filename, true);
+	set_name(filename);
 	return 0;
 }
 

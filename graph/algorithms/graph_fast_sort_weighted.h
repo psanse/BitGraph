@@ -134,7 +134,7 @@ int GraphFastRootSort_W<GraphW_t>::reorder(const vint& new_order, GraphW_t& gn, 
 	
 	int NV = gw_.number_of_vertices();
 	gn.init(NV, 1.0);												//assigns unit weights(1.0) 						
-	gn.set_name(gw_.get_name(), false /* no path separation */);
+	gn.set_name(gw_.get_name());
 	gn.set_path(gw_.get_path());
 
 	//generate isomorphism (only for undirected graphs)
