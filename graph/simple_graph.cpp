@@ -214,49 +214,31 @@ int Graph<T>::reset	(std::size_t NV, string name) {
 }
 
 template<class T>
-int Graph<T>::add_vertex(int toADD) {
-	///////////////////////////
-	// Allocates memory for the enlarged graph |V'|= |V| + toADD
-	// with an empty neighborhood
-	
-	NV_ += toADD;
-
-	try {
-		adj_.resize(NV_);
-	}
-	catch (...) {
-		LOG_INFO("memory for graph not allocated-Graph<T>::enlarge(...), exiting");
-		exit(-1);
-	}
-
-	return 0;
-}
-
-
-template<class T>
-Graph<T>& Graph<T>::create_subgraph (std::size_t size, Graph<T>& newg)  {
-//////////////////////////
-// creates new subgraph with subset of size vertices 
+Graph<T>& Graph<T>::create_subgraph (std::size_t first_k, Graph<T>& newg)  {
 
 	//assert is size required is greater or equal current size
-	if(size >= NV_ || size <= 0){
-		LOG_ERROR("Graph<T>& Graph<T>::create_subgraph-wrong shrinking size for graph. Remains unchanged");
-		return *this;
+	if(first_k >= NV_ || first_k <= 0){
+		LOG_ERROR("Bad new size - graph remains unchangedGraph<T>&- Graph<T>::create_subgraph");
+		return newg;
 	}
 		
-	newg.init(size);
-	int bbh=WDIV(size-1);
+	if (newg.reset(first_k) == -1) {
+		LOG_ERROR("memory for graph not allocated - Graph<T>::create_subgraph");
+		return newg;
+	}
 
+	std::size_t bbh = WDIV (first_k - 1);
 	
-	for(int i=0; i<newg.NV_; i++){
-		for(int j=0; j<=bbh; j++){
+	//copy the relevant vertices of the adjacency matrix
+	for(std::size_t i=0; i<newg.NV_; i++){
+		for(std::size_t j=0; j<=bbh; j++){
 			newg.adj_[i].get_bitboard(j)=adj_[i].get_bitboard(j);
 		}
 		//trims last bitblock
-		newg.adj_[i].get_bitboard(bbh)&=~Tables::mask_left[WMOD(size-1)];
+		newg.adj_[i].get_bitboard(bbh)&=~Tables::mask_left[WMOD(first_k - 1)];
 	}
 	
-return newg;
+	return newg;
 }
 
 
@@ -265,8 +247,7 @@ int Graph<T>::shrink_to_fit(std::size_t size){
 /////////////////////
 // shrinks graph to the size passed (must be less than current size)
 	
-	LOG_ERROR("Shrinking is only possible in sparse graphs; the graph remains unchanged - Graph<T>::shrink_to_fit");
-	LOG_ERROR("exiting...");
+	LOG_ERROR("Shrinking is vaid only for sparse graphs; the graph remains unchanged - Graph<T>::shrink_to_fit");
 	return -1;
 }
 
@@ -286,13 +267,10 @@ int Graph<T>::set_graph (string filename){
 
 template<class T>
 void Graph<T>::add_edge (int v, int w){
-///////////////
-// sets v-->w (no self loops allowed)
-	if(v!=w){
+	if(v != w){
 		adj_[v].set_bit(w);
 		NE_++;
 	}
-
 }
 
 template<class T>
@@ -303,19 +281,19 @@ void Graph<T>::remove_edge	(int v, int w){
 
 template<class T>
 void Graph<T>::remove_edges (int v){
-//removes in-out edges from v
 	
 	//erases all outgoing edges from v
 	adj_[v].erase_bit();
 
 	//erases all ingoing edges
-	for(int w=0; w<NV_; w++){
-		if(w==v) continue;
+	for(int w = 0; w < NV_; w++){
+		if(w == v) continue;
 		adj_[w].erase_bit(v);
 	}
 
 	//updates edges
-	number_of_edges(false);
+	NE_ = 0;					//resets edges to avoid lazy evaluation later
+	//number_of_edges(false);
 }
 
 template<class T>
@@ -604,15 +582,12 @@ BITBOARD Graph<T>::number_of_edges	(bool lazy) {
 return NE_;
 }
 
-
-
 template<class T>
 double Graph<T>::density (bool lazy) {
-	BITBOARD max_edges=NV_;									//important for very large graphs as (I) is bigger than unsigned int
-	max_edges*=(max_edges-1);									//(I)
-	return (number_of_edges(lazy)/(double)max_edges);				//n*(n-1) edges
+	BITBOARD max_edges = NV_;								//type MUST BE for very large graphs as (I) is bigger than unsigned int
+	max_edges *= (max_edges - 1);							//(I)
+	return (number_of_edges(lazy) / (double)max_edges);		//n*(n-1) edges
 }
-
 
 template<class T>
 double Graph<T>::block_density	()	const{
@@ -652,9 +627,10 @@ double Graph<sparse_bitarray>::average_block_density_index()	{
 
 template<class T>
 double Graph<T>::density(const T & bbN )  {
-	unsigned long long  edges=number_of_edges(bbN);
-	if(edges==0) return 0.0;
-	unsigned long long  pc=bbN.popcn64();
+	BITBOARD  edges = number_of_edges(bbN);
+	if (edges == 0) { return 0.0; }
+
+	BITBOARD  pc = bbN.popcn64();
 	return edges/(double)(pc*(pc-1)/2);
 }
 
@@ -688,13 +664,13 @@ void Graph<T>::remove_vertices (const BitBoardN& bbn, Graph& g){
 /////////////////////
 // returns in g the induced graph by bbn
 
-	NE_=0;									//resets vertices
+	NE_=0;										//resets vertices
 	int pc=bbn.popcn64();
 	int new_size=NV_-pc;
 	if(pc==0){return;}
-	else if(new_size==0){ g.clear();}				//empty graph
+	else if(new_size==0){ g.clear();}			//empty graph
 	
-	g.init(new_size);
+	g.reset(new_size);
 	g.set_name(this->name_);
 	int l=0; int m=0;
 	
@@ -711,7 +687,7 @@ void Graph<T>::remove_vertices (const BitBoardN& bbn, Graph& g){
 		}
 		l++;
 	}
-return ;
+
 }
 
 template<class T>
@@ -727,33 +703,21 @@ void Graph<T>::remove_vertices (const BitBoardN& bbn){
 	(*this)=g;								//allocation 2	
 }
 
-
 template<class T>
-int Graph<T>::degree_out (int v)const{
-///////////////////
-// outcoming edges from v
+int Graph<T>::degree_in (int v) const{
 
-	return adj_[v].popcn64();
-}
-
-
-template<class T>
-int Graph<T>::degree_in (int v)const{
-///////////////////
-// incoming edges to v (endpoint in v)
 	int res=0;
 	for(int i=0; i<NV_; i++){
-		if(i==v) continue;
-		if(adj_[i].is_bit(v)) 
-			res++;
+		if(i == v) continue;
+		if (adj_[i].is_bit(v)) { res++; }
+
 	}
-return res;
+	return res;
 }
 
 template<class T>
 void Graph<T>::make_bidirected (){
-///////////////////
-// makes all edges symmetrical
+
 	for(int i=0; i<NV_; i++){
 		for(int j=0; j<NV_; j++){
 			if(is_edge(i,j)) add_edge(j, i);
@@ -761,7 +725,7 @@ void Graph<T>::make_bidirected (){
 		}
 	}
 	
-	NE_=0;	//resets edges to avoid lazy evaluation later
+	NE_ = 0;	//resets edges to avoid lazy evaluation later
 }
 
 template<class T>

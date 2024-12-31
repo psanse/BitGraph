@@ -88,7 +88,7 @@ const vector<T>& get_adjacency_matrix	()					const		{return adj_;}
 
 //////////////////////////
 // memory allocation 
-
+public:
 	/*
 	* @brief resets to empty graph with |V|= n
 	* @param n number of vertices
@@ -108,33 +108,103 @@ const vector<T>& get_adjacency_matrix	()					const		{return adj_;}
 	*/
 	int reset							(std::size_t n, string name = "");
 
-	void clear							();											//deallocates memory 
-	Graph& create_subgraph				(std::size_t n, Graph& g)  ;
-	int shrink_to_fit					(std::size_t n);							//reduces the graph to size (currently only for sparse graphs)
+	/*
+	* @brief deallocates memory and resets to default values
+	*/
+	void clear							();											 
 
-	int add_vertex						(int toADD);								//enlarges the graph with @toADD new isolanies 
-					
+	/*
+	* @brief computes the induced subgraph by the first k vertices in the current graph 
+	* @param first_k first k vertices to be included in the new graph
+	* @param g output new induced subgraph 
+	* @returns the new induced subgraph (if the operation fails, g remains unchanged)
+	*/
+	Graph& create_subgraph				(std::size_t first_k, Graph& g)  ;
+	
+	/*
+	* @brief reduces the graph to n vertices (currently only for sparse graphs)
+	* @param n number of vertices of the new graph
+	* @returns 0 if success, -1 if memory allocation fails
+	*/
+	int shrink_to_fit					(std::size_t n);
+						
 //////////////	
-// Basic operations		
+// Basic operations	
+public:
+	/*
+	* @brief density of the directed graph
+	* @param lazy reads NE_ cached value if TRUE
+	*/
+	
 virtual	double density					(bool lazy=true)		;	
-	double density						(const T& )				;					//on induced graph
+	
+	/*
+	* @brief density of the subgraph induced by a set of vertices
+	* @param set input set of vertices (bitset)
+	*/
+	double density						(const T& set)			;					
+	
 	double block_density				()						const;
 	double block_density_index			()						;					//returns number of blocks/total possible number of blocks
  	double average_block_density_index	()						;					//average density per block
 
-	int degree_out						(int v)					const;				//outgoing edges from v
-	int degree_in						(int v)					const;				//edges incident to v
+	/*
+	* @brief number of outgoing edges from v
+	* @param v input vertex
+	*/
+	int degree_out						(int v)					const { return adj_[v].popcn64(); }
+	
+	/*
+	* @brief number edges incident to v
+	* @param v input vertex
+	*/
+	int degree_in						(int v)					const;
 
 //////////////	
 // Modifiers
-virtual void add_edge					(int v, int w);								//v->w	(no self_loops allowed)
-virtual void remove_edge				(int v, int w);
-	void remove_edges					(int v);									//removes edges with endpoint in v
-	void make_bidirected				();											//make all existing edges symmetrical
+public:
+	/*
+	* @brief adds edge {v -> w} to the graph,
+	*		 no self loops allowed 
+	* @param v outgoing endpoint 
+	* @param w ingoing endpoint
+	* 
+	*/
+virtual void add_edge					(int v, int w);		
 
+	/*
+	* @brief removes edge {v -> w} from the graph
+	* @param v outgoing endpoint
+	* @param w ingoing endpoint
+	*/
+virtual void remove_edge				(int v, int w);
+
+	/*
+	* @brief removes edges with endpoint in v (outgoing/ingoing) 		 
+	* @param v input vertex
+	*/
+	void remove_edges					(int v);									
+	
+	/*
+	* @brief makes all edges bidirected (conversion to undirected graph)
+	*/
+	void make_bidirected				();	
+
+	/*
+	* @brief creates the subgraph induced by the vertices NOT in the input set
+	*		 TODO - CHECK!
+	* @param set input set of vertices
+	* @param g ouptut induced subgraph
+	*/
+	void remove_vertices				(const BitBoardN& set, Graph& g);
+
+virtual void remove_vertices			(const BitBoardN& set);
+	
 /////////////
-// Boolean
-virtual	bool is_edge					(int i, int j)			const;		
+// Boolean properties
+public:
+
+virtual	bool is_edge					(int v, int w)			const;		
 		
 private:
 	bool is_no_self_loops				()						const;
@@ -150,17 +220,13 @@ private:
 	*/
 	template <class T>
 	friend bool operator ==				(const Graph<T>& lhs, const Graph<T>& rhs);  
-
-/////////////
-// Update operations
-public:
-	void remove_vertices				(const BitBoardN&, Graph&);				
-virtual void remove_vertices			(const BitBoardN&);				
+		
 
 ////////////
 // Read / write operations
-// (TODO - place in a graph_io class?)
+// (TODO - place in a graph_io class ? , stateless functions ?)
 public:
+
 	int read_dimacs						(const std::string& filename);	
 	int read_mtx						(const std::string& filename);
 	int read_EDGES						(const std::string& filename);
