@@ -1,9 +1,11 @@
-//common_paths.h: useful paths used in the framework in different tests and targest and by different machines
-//date@: 20/06/19
+/*
+* common_paths.h useful paths for different tests and targest and by different machines
+* @creation_date  20/06/19
+* @last_update    31/12/24
+*/
 
-#ifndef _COMMON_PATHS_H_
-#define _COMMON_PATHS_H_
-
+#ifndef __COMMON_PATHS_H__
+#define __COMMON_PATHS_H__
 
 ///////////////////
 //
@@ -11,7 +13,11 @@
 //
 // uses CMake definition: _PATH_FOR_TESTS_DATA_IN_SRC_CODE
 //////////////////
-//#define TESTS_GRAPH_DATA				_PATH_FOR_GRAPH_TESTS_DATA_IN_SRC_CODE "xxx"
+ 
+//cmake GUI
+#define TESTS_GRAPH_DATA_CMAKE				PATH_GRAPH_TESTS_CMAKE_SRC_CODE
+#define TESTS_COPT_DATA_CMAKE				PATH_COPT_TESTS_CMAKE_SRC_CODE
+
 
 //ETSIDI
 #define TEST_GRAPH_PATH_DIMACS_ETSIDI_I7	"C:/Users/i7/Desktop/dimacs/"

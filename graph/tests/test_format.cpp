@@ -4,12 +4,12 @@
 //update@29/10/22 (gml format)
 
 
-#include <iostream>
-#include "gtest/gtest.h"
-#include "../graph.h"
+#include "graph/graph.h"
 #include "formats/dimacs_format.h"
-#include "utils/common_paths.h"
 #include "graph/formats/yED_format.h"
+#include "gtest/gtest.h"
+#include "utils/common_paths.h"
+#include <iostream>
 
 using namespace std;
 
@@ -20,14 +20,11 @@ using namespace std;
 *  GML FORMAT 			
 *
 *  fist_update@30/10/22
-*  last_update@30/10/22
+*  last_update@31/12/24
 *
 **************************/
 
-
 TEST(G2gml, clique) {
-
-	LOG_INFO("G2gml::clique------------------------");
 		
 	const int NV = 6;
 	ugraph ug(NV);
@@ -46,20 +43,14 @@ TEST(G2gml, clique) {
 
 	/////////////////////////////////////////////////////////////////////
 	int status = gio::yed::graph_to_gml_clique(ug, clq, "gclique");
+	ASSERT_EQ(status, 0);
 	/////////////////////////////////////////////////////////////////////
-
-	LOG_INFO("G2gml::clique-----------------------");
-#ifdef	TEST_COL_AS_CLQ_ONE_TEST_AT_A_TIME
-	LOG_ERROR("press any key to continue");
-	cin.get();
-#endif
 
 }
 
 TEST(G2gml, vertex_set) {
 /////////////////
-// colors the vertex set
-	LOG_INFO("G2gml::vertex_set------------------------");
+// colors the vertex set	
 
 	const int NV = 6;
 	ugraph ug(NV);
@@ -78,19 +69,13 @@ TEST(G2gml, vertex_set) {
 
 	/////////////////////////////////////////////////////////////////////
 	int status = gio::yed::graph_to_gml(ug, vset, "gset", gio::yed::YELLOW);
+	ASSERT_EQ(status, 0);
 	/////////////////////////////////////////////////////////////////////
 
-	LOG_INFO("G2gml::vertex_set-----------------------");
-#ifdef	TEST_COL_AS_CLQ_ONE_TEST_AT_A_TIME
-	LOG_ERROR("press any key to continue");
-	cin.get();
-#endif
 }
 
-
 TEST(G2gml, normal_graph) {
-	LOG_INFO("G2gml:normal_graph-----------------------------------");
-	
+		
 	ugraph g(6);
 	g.add_edge(0, 1);
 	g.add_edge(0, 2);
@@ -99,16 +84,9 @@ TEST(G2gml, normal_graph) {
 
 	int status = gio::yed::graph_to_gml(g, "test_graph_gml_1");
 	ASSERT_EQ(status, 0);
-		
-	LOG_INFO("-----------------------------------------------------");
-#ifdef	TEST_GRAPH_FORMAT_ONE_TEST_AT_A_TIME
-	LOG_INFO("press any key to continue");
-	cin.get();
-#endif
 }
 
 TEST(G2gml, layered_graph) {
-	LOG_INFO("G2gml:layered_graph----------------------------------");
 
 	ugraph g(10);
 	g.add_edge(0, 1);
@@ -124,20 +102,14 @@ TEST(G2gml, layered_graph) {
 	layers.push_back(4); layers.push_back(5); layers.push_back(EMPTY_ELEM);
 	layers.push_back(6); layers.push_back(7); layers.push_back(8); layers.push_back(9); layers.push_back(EMPTY_ELEM);
 	
+	/////////////////////////////////////////////////////////////////////
 	int status = gio::yed::graph_to_gml_layered(g, layers,"test_graph_gml_lay");
 	ASSERT_EQ(status, 0);
-
-
-	LOG_INFO("-----------------------------------------------------");
-#ifdef	TEST_GRAPH_FORMAT_ONE_TEST_AT_A_TIME
-	LOG_INFO("press any key to continue");
-	cin.get();
-#endif
+	/////////////////////////////////////////////////////////////////////
 }
 
 TEST(G2gml, circular) {
-	LOG_INFO("G2gml:circular----------------------------------");
-
+	
 	ugraph g(10);
 	g.add_edge(0, 1);
 	g.add_edge(1, 3);
@@ -146,18 +118,15 @@ TEST(G2gml, circular) {
 	g.add_edge(4, 9);
 	g.add_edge(5, 8);
 
-	
+	/////////////////////////////////////////////////////////////////////
 	int status = gio::yed::graph_to_gml_circular(g, "test_graph_gml_circ");
 	ASSERT_EQ(status, 0);
-
-
-	LOG_INFO("-----------------------------------------------------");
-#ifdef	TEST_GRAPH_FORMAT_ONE_TEST_AT_A_TIME
-	LOG_INFO("press any key to continue");
-	cin.get();
-#endif
+	/////////////////////////////////////////////////////////////////////
 }
 
+/////////////////////////////
+// DISABLED TESTS - CHECK
+/////////////////////////////
 
 TEST(GtoDimacs, DISABLED_read_RTN_edge_weighted){
 ///////////////////
@@ -291,71 +260,6 @@ TEST(Graph_test, DISABLED_read_edgelist){
 #endif
 }
 
-
-//TEST(Graph_test, write_edgelist){
-////////////////////
-//// reads as undirected graph a file with edges repeated
-//// writes it correctly 
-//	LOG_INFO("Graph_test:write_edgelist---------------------------------------");
-//	string path=TEST_GRAPH_PATH_TEST_ETSIDI;
-//
-//	/*string filename="bio-MUTAG_g1.edges";					
-//	cout<<"READING: "<<filename<<"-----------------------"<<endl;*/
-//	ugraph g1(path + "bio-MUTAG_g1.edges");
-//	g1.print_data();
-//	EXPECT_EQ(54,g1.number_of_edges());
-//
-//	ofstream f("bio-MUTAG_g1_u.edges");
-//	g1.write_EDGES(f);
-//	f.close();
-//
-//	g1.set_graph(path + "bio-MUTAG_g1_u.edges");
-//	g1.print_data();
-//	EXPECT_EQ(27,g1.number_of_edges());
-//
-//
-//	////////////////////////
-//	/*filename="ia-southernwomen.edges";	
-//	cout<<"READING: "<<filename<<"-----------------------"<<endl;*/
-//	g1.set_graph(path +  "ia-southernwomen.edges");
-//	g1.print_data();
-//	EXPECT_EQ(75,g1.number_of_edges());
-//
-//	f.open("ia-southernwomen_u.edges");
-//	g1.write_EDGES(f);
-//	f.close();
-//
-//	g1.set_graph(path + "ia-southernwomen_u.edges");
-//	g1.print_data();
-//	EXPECT_EQ(64,g1.number_of_edges());
-//
-//	LOG_INFO("----------------------------------------------------------------");
-//	LOG_INFO("PRESS ANY KEY TO CONTINUE...");
-//	cin.get();
-//}
-
-//
-//
-//TEST(Graph_test, write_edgelist_I){
-////////////////////
-//// reads as undirected graph a file with edges repeated
-//// writes it correctly 
-//
-//	string filename="aff-digg.mtx";					
-//	cout<<"READING: "<<filename<<"-----------------------"<<endl;
-//	ugraph g1(filename);
-//	g1.print_data();
-//	//EXPECT_EQ(54,g1.number_of_edges());
-//
-//	ofstream f("aff-digg_u.edges");
-//	g1.write_EDGES(f);
-//	f.close();
-//
-//	g1.set_graph("aff-digg_u.edge");
-//	g1.print_data();
-//	EXPECT_EQ(27,g1.number_of_edges());
-//
-//}
 
 
 

@@ -11,14 +11,13 @@
 #include "gtest/gtest.h"
 #include <iostream>
 #include "utils/common.h"
+#include "utils/common_paths.h"
 #include "utils/logger.h"
 #include "utils/file.h"
 #include <string>
 
 using namespace std;
 using namespace ::com::sort;
-
-#define PATH_GFS_TESTS_DATA	 PATH_GRAPH_TESTS_CMAKE_SRC_CODE		//fixed in CMakeLists.txt
 
 
 class GraphFastRootSortTest : public ::testing::Test {
@@ -358,7 +357,7 @@ TEST(GraphFastRootSort, new_order_dimacs) {
 
 	using gt = GraphFastRootSort<ugraph>;
 	string name = "brock200_2.clq";
-	name.insert(0, PATH_GFS_TESTS_DATA);
+	name.insert(0, TESTS_GRAPH_DATA_CMAKE);
 
 	ugraph ug(name);
 	gt sorter(ug);
