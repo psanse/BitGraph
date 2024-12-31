@@ -35,10 +35,8 @@
 
 template<class T = bitarray>
 class Graph: public filterGraphTypeError<T>{
-	friend class GraphConversion;
-
-//	template<typename G, typename W>
-//	friend class Graph_W;				/* all specializations are friends */
+	
+	friend class GraphConversion;			
 
 public:
 		
@@ -51,16 +49,33 @@ public:
 	Graph								(std::size_t n);											//creates graph with n=|V| and m=0 	
 	Graph								(std::string filename);	
 	Graph								(std::size_t n, int* adj[], std::string filename = "");		//old-style adjacency matrix
+
+	//TODO - copy constructor, operator=, move constructor, move operator=
+
+	//destructor	
 virtual	~Graph() = default; 
+
 
 /////////////
 // setters and getters
+	/*
+	* @brief sets graph from file in dimacs/MTX/Edges formats (in this order)
+	* @param filename file
+	* @returns 0 if success, -1 if file cannot be read
+	*/
 	int set_graph						(std::string filename);
-		
+
+	/*
+	* @brief Sets instance name.
+	*		 Separates path and instance name internally (if applicable
+	* @param instance name of instance
+	*/
+	void set_name						(std::string instance);
+	
+	void set_path						(std::string path_name) { path_ = path_name; }
 	std::string get_name				() const {return name_;}
 	std::string get_path				() const {return path_;}
-	void set_name						(std::string graph_name);		
-	void set_path						(std::string path_name) {path_ = path_name;}
+	
 
 	//bitstring encoding
 	int number_of_vertices				()					const		{return NV_; }

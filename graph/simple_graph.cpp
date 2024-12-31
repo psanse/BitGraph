@@ -275,8 +275,8 @@ int Graph<T>::set_graph (string filename){
 	if(read_dimacs(filename) == -1){
 		if(read_mtx(filename) == -1){
 			if(read_EDGES(filename) == -1){
-				LOG_ERROR("unable to read file in any of these formats: DIMACS/MTX/EDGES - Graph<T>::set_graph");
-				LOG_ERROR("exiting...");
+				LOG_ERROR("Unable to read a graph form file ", filename, "- Graph<T>::set_graph");
+				LOG_ERROR("Format considered: DIMACS / MTX / EDGES");
 				return -1;
 			}
 		}
