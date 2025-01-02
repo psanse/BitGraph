@@ -43,9 +43,9 @@ public:
 	using _bbt = basic_type;			//alias for basic type - for backward compatibility
 			
 	//constructors
-	Graph								();															
+	Graph								();															//creates empty graph
 	Graph								(std::size_t n);											//creates graph with n=|V| and m=0 	
-	Graph								(std::string filename);	
+	Graph								(std::string filename);										//creates graph from file		
 	Graph								(std::size_t n, int* adj[], std::string filename = "");		//old-style adjacency matrix
 
 	

@@ -31,7 +31,7 @@
 template<class T = bitarray>
 class Ugraph : public Graph<T> {
 
-	friend class GraphConversion;
+	friend class GraphConversion;		//TODO-CHECK
 
 public:
 
@@ -42,15 +42,16 @@ public:
 	using _bbt = basic_type;			//alias for backward compatibility
 	using _mypt = ptype;				//alias for backward compatibility
 
-	//constructors	
-	//using ptype::Graph;				//inherit constructors
-
-	Ugraph						() : Graph() {}										//does not allocate memory
-	Ugraph						(int nVert) : Graph(nVert){}						//creates empty graph with size vertices	
-	Ugraph						(std::string filename) /* : Graph(filename) {}*/;	//reads graph from file
-	Ugraph						(int nV, int* adj[], string name);
+	//constructors - cannot all be inherited	
+	Ugraph						() : Graph() {}										//creates empty graph
+	Ugraph						(std::size_t n) : Graph(n){}						//creates empty graph of size n=|V|	
+	Ugraph						(std::string filename);								//reads graph from file
+	Ugraph						(std::size_t n, int* adj[], string name);			//old-style adjacency matrix
    	
-	~Ugraph						() = default;								//~Ugraph() { _mypt::clear(); };
+	//TODO copy constructor, move constructor, copy operator =, move operator = (1/1/2025)
+
+	//destructor
+	~Ugraph						() = default;										
 		
 
 virtual	void add_edge			(int v, int w);									//sets bidirected edge

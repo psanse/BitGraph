@@ -16,16 +16,22 @@
 
 using namespace std;
 
-
 template<class T>
-Ugraph<T>::Ugraph(string filename) :Graph<T>() {
-	int status = _mypt::set_graph(filename);
-	if (status == -1) { LOG_ERROR("error when opening file, exiting...-Ugraph<T>::Ugraph"); exit(-1); }
+Ugraph<T>::Ugraph(string filename) : Graph<T>()		
+{
+	//cannot call Graph<T>::Graph(filename) because Graph<T>::add_edge is overriden!
+
+	if (ptype::set_graph(filename) == -1) {
+		LOGG_ERROR("error when reading file: ", filename, "Graph<T>::Graph");
+		LOG_ERROR("exiting...");
+		exit(-1);
+	}
+	
 }
 
 template <class T>
 inline
-Ugraph<T>::Ugraph(int nV, int* adj[], string name) {
+Ugraph<T>::Ugraph(std::size_t nV, int* adj[], string name) {
 	_mypt::set_name(name);													//name includes the full path
 	if (_mypt::init(nV) == -1) { LOG_ERROR("bizarre graph construction-Graph<T>::Graph(...), exiting... "); exit(-1); }
 
