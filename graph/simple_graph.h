@@ -1,7 +1,7 @@
 /* 
  * simple_graph.h file for the class Graph for simple graphs  
  * 
- * @creation_date 17/6/10? 
+ * @creation_date 17/6/10 
  * @last_update 31/12/24
  * @dev pss
  *
@@ -96,7 +96,7 @@ virtual	~Graph()										= default;
 
 	/*
 	* @brief Counts the number of edges	in an induced subgraph
-	* @param set input bitset of vertices that induces the subgrap
+	* @param set input bitset of vertices that induces the subgraph
 	* @returns number of edges
 	*/
 	virtual	BITBOARD number_of_edges	(const T& set )	const;				

@@ -44,6 +44,53 @@ Ugraph<T>::Ugraph(std::size_t nV, int* adj[], string name) {
 	}
 }
 
+template<class T>
+inline
+BITBOARD Ugraph<T>::number_of_edges(bool lazy) {
+
+	if (!lazy || ptype::NE_ == 0) {
+		ptype::NE_ = 0;
+
+		//adds all edges and divides by 2 for efficiency - checks for self loops	
+		for (int i = 0; i < NV_; i++) {
+			ptype::NE_ += adj_[i].popcn64();
+		}
+
+		//////////////////////////////
+		if (ptype::NE_ % 2 != 0) {
+			LOG_ERROR("odd number of edges found in simple undirected graph - Ugraph<T>::number_of_edges");
+			LOG_ERROR("exiting...");
+			exit(-1);					//TODO: throw exception
+		}
+		//////////////////////////////
+
+		ptype::NE_ /= 2;						//MUST be even at this point			
+	}
+
+	return ptype::NE_;
+}
+
+template<class T>
+BITBOARD Ugraph<T>::number_of_edges(const T& bbn) const{
+	BITBOARD NE = 0;
+
+	//reads only the upper triangle of the adjacency matrix
+	for (std::size_t i = 0; i < ptype::NV_ - 1; ++i) {
+		if ( bbn.is_bit(i) ) {
+			for ( std::size_t j = i + 1; j < _mypt::NV_; ++j) {
+				if ( bbn.is_bit(j) ) { 
+					if (_mypt::adj_[i].is_bit(j)) { ++NE; }
+				}
+			}
+		}
+	}
+	
+	return NE;
+
+// @created 17/6/10 
+// @last_updated 02/01/24
+}
+
 
 template<class T>
 void Ugraph<T>::add_edge (int v, int w){
@@ -112,25 +159,7 @@ ostream& Ugraph<T>::print_degrees (std::ostream& o) const {
 	return o;
 }
 
-template<class T>
-BITBOARD Ugraph<T>::number_of_edges (const BitBoardN& bbn) const{
-////////////////
-// Reads upper triangle of the adjacency matrix
-// Date of creation: 17/6/10 
-// Last Updated: 12/4/12  
-	
-	unsigned long long  edges=0;
-	for(int i=0; i<_mypt::NV_-1; i++){
-		if(bbn.is_bit(i)){
-			for(int j=i+1; j<_mypt::NV_; j++)
-				if(bbn.is_bit(j)){
-					if( _mypt::adj_[i].is_bit(j) )
-							edges++;
-				}
-		}
-	}
-return edges;
-}
+
 
 template<class T>
 double Ugraph<T>::density	(bool lazy)	{
@@ -140,26 +169,7 @@ double Ugraph<T>::density	(bool lazy)	{
 }
 
 
-template<class T>
-inline
-BITBOARD Ugraph<T>::number_of_edges	(bool lazy) {
-///////////////////
-// Should be specialized for sparse graphs
-	if(lazy && _mypt::NE_ !=0) 
-				return _mypt::NE_;
 
-	BITBOARD  edges=0;
-	for(int i=0; i<_mypt::NV_-1; i++){
-		for(int j=i+1; j<_mypt::NV_; j++){
-			if(_mypt::is_edge(i,j)){				//O(log) for sparse graphs 
-				edges++;
-			}
-		}
-	}
-	_mypt::NE_=edges;
-	
-return _mypt::NE_;
-}
 
 template<> 
 inline

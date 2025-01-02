@@ -548,15 +548,13 @@ BITBOARD Graph<T>::number_of_edges	(const T& bbn) const{
 	
 	BITBOARD NE = 0;
 
-	for(int i = 0; i < NV_; i++){
-		if(bbn.is_bit(i)){
-			NE += adj_[i].popcn64();				//includes self-loops
-						
-			/*for (int j = 0; j < NV_; j++) {
-				if (bbn.is_bit(j)) {
-					if (adj_[i].is_bit(j)) NE++;
+	for(std::size_t i = 0; i < NV_; i++){
+		if(bbn.is_bit(i)){						
+			for (std::size_t j = 0; j < NV_; j++) {
+				if (bbn.is_bit(j)) {						//includes possible self loops
+					if (adj_[i].is_bit(j)) { NE++; }
 				}
-			}*/
+			}
 		}
 	}
 
@@ -568,14 +566,8 @@ BITBOARD Graph<T>::number_of_edges	(bool lazy) {
 		
 	if (!lazy || NE_ == 0) {					//no lazy evaluation if NE_ = 0
 		NE_ = 0;
-		for (int i = 0; i < NV_; i++) {
-			NE_ += adj_[i].popcn64();
-			
-			//for (int j = 0; j < NV_; j++) {
-			//	if (is_edge(i, j)) {			//O(log) in sparse graphs 
-			//		NE_++;
-			//	}
-			//}
+		for (std::size_t i = 0; i < NV_; i++) {
+			NE_ += adj_[i].popcn64();			
 		}
 	}
 	
