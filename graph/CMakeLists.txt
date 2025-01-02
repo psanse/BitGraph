@@ -28,6 +28,7 @@ include_directories(${LEDA_ROOT}/incl)
 link_directories(${LEDA_ROOT})
 
 add_library (graph simple_graph.cpp
+simple_ugraph.cpp
 formats/mmio.cpp 
 algorithms/decode.cpp
 ${useful_headers_for_IDE} 
@@ -40,6 +41,7 @@ TARGET_LINK_LIBRARIES( graph optimized leda_md.lib)
 else()
 
 add_library (graph simple_graph.cpp
+simple_ugraph.cpp
 formats/mmio.cpp
 algorithms/decode.cpp
 ${useful_headers_for_IDE}
