@@ -431,12 +431,6 @@ void Ugraph<sparse_bitarray>::write_mtx(ostream & o){
 }
 
 
-template<class T>
-inline
-int Ugraph<T>::degree (int v) const{
-	return _mypt::adj_[v].popcn64();
-}
-
 template<>
 inline
 int Ugraph<sparse_bitarray>::degree (int v) const{

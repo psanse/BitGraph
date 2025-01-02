@@ -65,19 +65,28 @@ public:
 	BITBOARD number_of_edges	(bool lazy = true)						  override;
 	
 	/*
-	* @brief Counts the number of edges	in an induced subgraph
+	* @brief Counts the number of edges	in an induced subgraph by a set of vertices
 	*/
 	BITBOARD number_of_edges	(const T&) 								const override;			
 
 /////////////
 // basic operations
+
+//TODO implement bitstring conversions according to the templates properly (3/4/18) - CHECK (02/01/2025)
 public:
 
-	//degree: TODO implement bitstring conversions according to the templates properly (3/4/18)
-	int degree(int v)													const;
-	int degree(int v, const BitBoardN& bbn)								const;
+	/*
+	* @brief computes the number of neighbors of v (deg(v))
+	*/
+	int degree					(int v)									const { return ptype::adj_[v].popcn64(); }
+	
+	/*
+	*  @brief number of neighbors of v in a set of vertices
+	*/
+	int degree					(int v, const BitBoardN& bbn)			const;
+	int degree					(int v, const BitBoardS& bbs)			const;
+
 	int degree(int v, int UB, const BitBoardN& bbn)						const;  //truncated degree (14/2/2016)
-	int degree(int v, const BitBoardS& bbs)								const;
 	int degree(int v, int UB, const BitBoardS& bbs)						const;	//truncated degree  (14/2/2016)
 	int degree_up(int v, const BitBoardN& bbn)							const;  //TODO: test (27/4/2016)
 	int max_degree_of_graph()											const;

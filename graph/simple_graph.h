@@ -95,7 +95,7 @@ virtual	~Graph()										= default;
 	virtual	BITBOARD number_of_edges	(bool lazy = true);
 
 	/*
-	* @brief Counts the number of edges	in an induced subgraph
+	* @brief Counts the number of edges	in an induced subgraph by a set of vertices
 	* @param set input bitset of vertices that induces the subgraph
 	* @returns number of edges
 	*/
@@ -152,9 +152,10 @@ virtual	double density					(bool lazy=true);
 	
 	/*
 	* @brief density of the subgraph induced by a set of vertices
-	* @param set input set of vertices (bitset)
+	* @param set input (bit) set of vertices 
 	*/
-	double density						(const T& set);					
+	template <class bitset_t = T>
+	double density						(const bitset_t& set);
 	
 	/*
 	* @brief number of empty bit blocks / total number of bit blocks

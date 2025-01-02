@@ -611,7 +611,8 @@ double Graph<T>::block_density	()	const {
 
 
 template<class T>
-double Graph<T>::density(const T & bbN )  {
+template <class bitset_t>
+double Graph<T>::density(const bitset_t& bbN )  {
 	BITBOARD  edges = number_of_edges(bbN);
 	if (edges == 0) { return 0.0; }
 
