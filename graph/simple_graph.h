@@ -1,6 +1,7 @@
-/*  
+/* 
  * simple_graph.h file for the class Graph for simple graphs  
  * 
+ * @creation_date 17/6/10? 
  * @last_update 31/12/24
  * @dev pss
  *
@@ -21,9 +22,6 @@
 #include <string>
 #include <vector>
 
-//////////////////
-//switches 
-//#define DIMACS_REFERENCE_VERTICES_0			//DEFAULT OFF! (real DIMACS format)
 
 //////////////////
 //
@@ -34,7 +32,7 @@
 //////////////////
 
 template<class T = bitarray>
-class Graph: public filterGraphTypeError<T>{
+class Graph: public filterGraphTypeError<T> {
 	
 	friend class GraphConversion;			
 
@@ -50,10 +48,15 @@ public:
 	Graph								(std::string filename);	
 	Graph								(std::size_t n, int* adj[], std::string filename = "");		//old-style adjacency matrix
 
-	//TODO - copy constructor, operator=, move constructor, move operator=
+	
+	Graph								(Graph&& g)		= default;		//move constructor
+	Graph								(const Graph& g)= default;		//copy constructor
+	Graph& operator =					(const Graph& g)= default;		//copy operator =
+	Graph& operator =					(Graph&& g)		= default;		//move operator =
+	
 
 	//destructor	
-virtual	~Graph() = default; 
+virtual	~Graph()										= default; 
 
 
 /////////////
@@ -77,14 +80,31 @@ virtual	~Graph() = default;
 	std::string get_path				() const {return path_;}
 	
 
-	//bitstring encoding
 	int number_of_vertices				()					const		{return NV_; }
 	int number_of_blocks				()					const		{return NBB_;}
-virtual	BITBOARD number_of_edges		(bool lazy = true);
-virtual	BITBOARD number_of_edges		(const T& bbsg )	const;								//on induced subgraph
+	
+	/*
+	* @brief Counts the number of edges	(includes self loops)
+	* 
+	*		 @comment: it can be a heavy operation for massive graphs
+	* 
+	* @param lazy if TRUE (reads value @NE_)
+	*			  if FALSE counts and updates @NE_	
+	* @returns number of edges 
+	*/
+	virtual	BITBOARD number_of_edges	(bool lazy = true);
+
+	/*
+	* @brief Counts the number of edges	in an induced subgraph
+	* @param set input bitset of vertices that induces the subgrap
+	* @returns number of edges
+	*/
+	virtual	BITBOARD number_of_edges	(const T& set )	const;				
+
+const vector<T>& get_adjacency_matrix	()					const		{ return adj_; }
 const T& get_neighbors					(int v)				const		{return adj_[v];}
       T& get_neighbors					(int v)							{return adj_[v];}
-const vector<T>& get_adjacency_matrix	()					const		{return adj_;}
+
 
 //////////////////////////
 // memory allocation 
@@ -114,14 +134,6 @@ public:
 	void clear							();											 
 
 	/*
-	* @brief computes the induced subgraph by the first k vertices in the current graph 
-	* @param first_k first k vertices to be included in the new graph
-	* @param g output new induced subgraph 
-	* @returns the new induced subgraph (if the operation fails, g remains unchanged)
-	*/
-	Graph& create_subgraph				(std::size_t first_k, Graph& g)  ;
-	
-	/*
 	* @brief reduces the graph to n vertices (currently only for sparse graphs)
 	* @param n number of vertices of the new graph
 	* @returns 0 if success, -1 if memory allocation fails
@@ -136,17 +148,34 @@ public:
 	* @param lazy reads NE_ cached value if TRUE
 	*/
 	
-virtual	double density					(bool lazy=true)		;	
+virtual	double density					(bool lazy=true);	
 	
 	/*
 	* @brief density of the subgraph induced by a set of vertices
 	* @param set input set of vertices (bitset)
 	*/
-	double density						(const T& set)			;					
+	double density						(const T& set);					
 	
+	/*
+	* @brief number of empty bit blocks / total number of bit blocks
+	* 
+	*		 Specialized for sparse graphs
+	*/	
 	double block_density				()						const;
-	double block_density_index			()						;					//returns number of blocks/total possible number of blocks
- 	double average_block_density_index	()						;					//average density per block
+	
+	/*
+	* @brief number of allocated blocks /total possible number of blocks
+	*
+	*		 ONLY for sparse graphs
+	*/	
+	double block_density_sparse			()						const;					
+ 	
+	/*
+	* @brief average measure of block density (averages the density of each sparse bitset)
+	*
+	*		 ONLY for sparse graphs
+	*/
+	double average_block_density_sparse	()						const;					
 
 	/*
 	* @brief number of outgoing edges from v
@@ -162,6 +191,7 @@ virtual	double density					(bool lazy=true)		;
 
 //////////////	
 // Modifiers
+
 public:
 	/*
 	* @brief adds edge {v -> w} to the graph,
@@ -190,28 +220,42 @@ virtual void remove_edge				(int v, int w);
 	*/
 	void make_bidirected				();	
 
+//////////////	
+// Induced subgraphs
+
+	/*
+	* @brief computes the induced subgraph by the first k vertices in the current graph
+	* @param first_k first k vertices to be included in the new graph
+	* @param g output new induced subgraph
+	* @returns the new induced subgraph (if the operation fails, g remains unchanged)
+	*/
+	Graph& create_subgraph				(std::size_t first_k, Graph& g);
+
 	/*
 	* @brief creates the subgraph induced by the vertices NOT in the input set
-	*		 TODO - CHECK!
 	* @param set input set of vertices
 	* @param g ouptut induced subgraph
 	*/
 	void remove_vertices				(const BitBoardN& set, Graph& g);
 
-virtual void remove_vertices			(const BitBoardN& set);
+//////////////	
+// deleted - CHECK	
+	virtual void remove_vertices		(const BitBoardN& set) = delete;	//commented out implementation - EXPERIMENTAL
 	
 /////////////
 // Boolean properties
 public:
 
-virtual	bool is_edge					(int v, int w)			const;		
-		
-private:
-	bool is_no_self_loops				()						const;
+virtual	bool is_edge					(int v, int w)			const { return(adj_[v].is_bit(w)); }
+	
+	/*
+	* @brief returns TRUE is  (v, v) edges are present
+	*/
+	bool is_self_loop					()						const;
 
 ////////////////
 //Comparisons
-
+public:
 	/*
 	* @brief determines if two graphs have the same adjacency matrices 
 	* @param lhs left hand side graph

@@ -71,6 +71,109 @@ TEST(Ugraph, equal_2) {
 #endif;
 }
 
+TEST(Ugraph, degree) {
+
+	string path = PATH_GRAPH_TESTS_CMAKE_SRC_CODE;
+	ugraph g(path + "sample.clq");
+
+	EXPECT_EQ(7, g.number_of_vertices());
+	EXPECT_EQ(11, g.number_of_edges());
+
+	//deg(1)=3
+	g.print_degrees();
+	EXPECT_EQ(3, g.degree(1));
+	
+
+	bitarray bba(g.number_of_vertices());
+	bba.set_bit(0);
+	bba.set_bit(1);
+	bba.set_bit(6);
+	EXPECT_EQ(1, g.degree(1, bba));
+
+	bba.erase_bit();
+	bba.set_bit(0); bba.set_bit(1);
+	EXPECT_EQ(1, g.degree(1, bba));
+
+}
+
+TEST(Ugraph, degree_brock) {
+	LOG_INFO("Graph: degree_brock -------------------");
+	string path = TEST_GRAPH_PATH_DATA;
+	ugraph g(path + "brock200_1.clq");
+
+
+	EXPECT_EQ(200, g.number_of_vertices());
+	EXPECT_EQ(14834, g.number_of_edges());
+
+	bitarray bba(g.number_of_vertices());
+	EXPECT_FALSE(g.is_edge(0, 1));		//(1)
+
+	bba.set_bit(0); bba.set_bit(1);
+	EXPECT_EQ(0, g.degree(1, bba));		//expected because of (1)
+
+	bba.set_bit(0, g.number_of_vertices() - 1);
+	EXPECT_EQ(g.get_neighbors(1).popcn64(), g.degree(1, bba));
+
+	LOG_INFO("Graph: END degree_brock------");
+#ifdef TEST_GRAPH_STEP_BY_STEP
+	LOG_ERROR("press any key to continue");
+	cin.get();
+#endif;
+}
+
+
+TEST(Ugraph, max_degree_subgraph) {
+	LOG_INFO("Graph: max_degree_subgraph ------------------------");
+	ugraph g(100);
+	g.add_edge(0, 1);
+	g.add_edge(1, 2);
+	g.add_edge(1, 3);
+	g.add_edge(2, 3);
+	g.add_edge(78, 79);
+	g.add_edge(79, 80);
+
+	bitarray sg(g.number_of_vertices());
+	sg.init_bit(0, 3);
+	EXPECT_EQ(3, g.max_degree_of_subgraph(sg));	//1(3)
+
+	sg.init_bit(0, 2);
+	EXPECT_EQ(2, g.max_degree_of_subgraph(sg));  //1(2)
+
+	sg.init_bit(78, 79);						//78(1)
+	EXPECT_EQ(1, g.max_degree_of_subgraph(sg));
+
+	LOG_INFO("Graph: END max_degree_subgraph------");
+#ifdef TEST_GRAPH_STEP_BY_STEP
+	LOG_ERROR("press any key to continue");
+	cin.get();
+#endif;
+}
+
+TEST(Ugraph, density) {
+	
+	LOG_INFO("Graph: density ------------");
+	string path = TEST_GRAPH_PATH_DATA;
+
+	///////////
+	//undirected
+	ugraph ug(path + "brock200_1.clq");
+
+	int NV = 200; int NE = ug.number_of_edges();
+	EXPECT_EQ(14834, NE);
+	EXPECT_EQ(NV, ug.number_of_vertices());
+	BITBOARD aux = NV * (NV - 1);
+	double d = (2 * NE) / (double)aux;
+	EXPECT_EQ(d, ug.density());
+
+	
+
+	LOG_INFO("Graph: END density------");
+#ifdef TEST_GRAPH_STEP_BY_STEP
+	LOG_ERROR("press any key to continue");
+	cin.get();
+#endif;
+}
+
 TEST(Ugraph, create_induced) {
 	///////////////////
 	// TESTS induced subgraph functionality
@@ -326,6 +429,28 @@ TEST(Ugraph, remove_edges){
 	EXPECT_TRUE(g.is_edge(0,2));
 
 	LOG_INFO("Ugraph: END remove_edges------");
+#ifdef TEST_GRAPH_STEP_BY_STEP
+	LOG_ERROR("press any key to continue");
+	cin.get();
+#endif;
+}
+
+TEST(Ugraph, equality) {
+	/////////////////
+	// Silly testing of the new predefined equality for simple-unweighted graphs(18/06/19) 
+
+	LOG_INFO("Graph: equality ------------");
+	string path = TEST_GRAPH_PATH_DATA;
+
+	ugraph g(path + "brock200_1.clq");
+	ugraph g1;
+
+	g1 = g;
+	EXPECT_EQ(g1.get_name(), g.get_name());
+	EXPECT_EQ(g1.number_of_edges(), g.number_of_edges());
+	EXPECT_EQ(g1.is_edge(100, 199), g.is_edge(100, 199));
+
+	LOG_INFO("Graph: END equality------");
 #ifdef TEST_GRAPH_STEP_BY_STEP
 	LOG_ERROR("press any key to continue");
 	cin.get();

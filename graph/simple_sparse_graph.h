@@ -104,10 +104,11 @@ inline double Graph<sparse_bitarray>::block_density()	const {
 }
 
 template<>
-inline double Graph<sparse_bitarray>::block_density_index() {
-	/////////////////////////
-	// a measure of sparsity in relation to the number of bitblocks //
-	size_t nBB = 0; size_t nBBt = 0;
+inline double Graph<sparse_bitarray>::block_density_sparse() const {
+	
+	std::size_t nBB = 0, nBBt = 0;
+	
+	//number of allocated blocks
 	for (int v = 0; v < NV_; ++v) {
 		nBBt += adj_[v].number_of_bitblocks();
 	}
@@ -115,9 +116,23 @@ inline double Graph<sparse_bitarray>::block_density_index() {
 	BITBOARD aux = ceil(NV_ / double(WORD_SIZE));
 	BITBOARD maxBlock = NV_ * aux;
 
-	cout << NV_ << ":" << aux << ":" << nBBt << ":" << maxBlock << endl;
-	return (double(nBBt)) / maxBlock;
+	return static_cast<double>(nBBt) / maxBlock;
+}
 
+template<>
+inline double Graph<sparse_bitarray>::average_block_density_sparse() const {
+
+	size_t nBB = 0, nBBt = 0;
+	double den = 0.0;
+		
+	for (int i = 0; i < NV_; ++i) {
+		nBB = adj_[i].number_of_bitblocks();
+		nBBt += nBB;
+		int pc = adj_[i].popcn64();
+		den += static_cast<double>(pc) / (BITBOARD(nBB) * WORD_SIZE);
+	}
+
+	return (den / nBBt);
 }
 
 template<>

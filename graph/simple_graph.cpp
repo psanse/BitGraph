@@ -11,7 +11,7 @@
  //////////////////
  //switches 
 
- //#define DIMACS_REFERENCE_VERTICES_0			//DEFAULT OFF! (real DIMACS format)
+ //#define DIMACS_REFERENCE_VERTICES_0			//0 index DIMACS format [DEF-OFF (real DIMACS format)] 
 
 
 #include "bitscan/bitscan.h"
@@ -47,8 +47,7 @@ Graph<T>::Graph(string filename) :
 		LOGG_ERROR("error when reading file: ", filename, "Graph<T>::Graph");
 		LOG_ERROR("exiting...");
 		exit(-1);
-	}
-	//if (status == -1) { LOG_ERROR("error when opening file, exiting...-Graph<T>::Graph"); exit(-1); }
+	}	
 }
 
 template<class T>
@@ -323,8 +322,10 @@ int Graph<T>::read_dimacs(const string& filename){
 		return -1;
 	}
 
-	if(::gio::dimacs::read_dimacs_header(f, size, nEdges)==-1){
-		clear(); f.close(); return -1;
+	if(::gio::dimacs::read_dimacs_header(f, size, nEdges) == -1){
+		clear(); 
+		f.close(); 
+		return -1;
 	}	
 	
 	init(size);
@@ -436,7 +437,8 @@ int Graph<T>::read_dimacs(const string& filename){
 //		
 //		read_weights(str);
 //	}
-return 0;
+
+	return 0;
 }
 
 template<class T>
@@ -543,87 +545,78 @@ ostream& Graph<T>::print_edges (T& bbsg, ostream& o)const {
 
 template<class T>
 BITBOARD Graph<T>::number_of_edges	(const T& bbn) const{
-////////////////
-// Number of edges in the graph induced by bbn 
-// Source: 17/6/10 
-// Last Updated: 12/4/12  
 	
-	BITBOARD edges=0;
-	for(int i=0; i<NV_; i++){
+	BITBOARD NE = 0;
+
+	for(int i = 0; i < NV_; i++){
 		if(bbn.is_bit(i)){
-			for(int j=0; j<NV_; j++)
-				if(bbn.is_bit(j)){
-					if(adj_[i].is_bit(j)) edges++;
+			NE += adj_[i].popcn64();				//includes self-loops
+						
+			/*for (int j = 0; j < NV_; j++) {
+				if (bbn.is_bit(j)) {
+					if (adj_[i].is_bit(j)) NE++;
 				}
+			}*/
 		}
 	}
-return edges;
+
+	return NE;
 }
 
 template<class T>
 BITBOARD Graph<T>::number_of_edges	(bool lazy) {
-////////////
-// Computes edges only once and stores its value
-//
-// REMARKS: Can be an expensive operation
-	if (lazy && NE_ != 0) { return NE_; }
-	
-	BITBOARD  edges=0;
-	for(int i=0; i<NV_; i++){
-		for(int j=0; j<NV_; j++){
-			if(is_edge(i,j)){			//O(log) in sparse graphs (specialize)
-				edges++;
-			}
+		
+	if (!lazy || NE_ == 0) {					//no lazy evaluation if NE_ = 0
+		NE_ = 0;
+		for (int i = 0; i < NV_; i++) {
+			NE_ += adj_[i].popcn64();
+			
+			//for (int j = 0; j < NV_; j++) {
+			//	if (is_edge(i, j)) {			//O(log) in sparse graphs 
+			//		NE_++;
+			//	}
+			//}
 		}
 	}
-	NE_=edges;
 	
-
-return NE_;
+	return NE_;
 }
 
 template<class T>
 double Graph<T>::density (bool lazy) {
 	BITBOARD max_edges = NV_;								//type MUST BE for very large graphs as (I) is bigger than unsigned int
 	max_edges *= (max_edges - 1);							//(I)
-	return (number_of_edges(lazy) / (double)max_edges);		//n*(n-1) edges
+	return (number_of_edges(lazy) / (double)max_edges);		//n*(n-1) edges (since it is a directed graph))
 }
 
 template<class T>
-double Graph<T>::block_density	()	const{
-/////////////////////////
-// number of empty bitblocks wrt total amount 
-//
-// REMARKS: has to be specialized for sparse graphs
+double Graph<T>::block_density	()	const {
 
-	size_t nBB=0;
-	for(int v=0; v<NV_; ++v){
-		for(int bb=0; bb<NBB_; bb++){
-			if(adj_[v].get_bitboard(bb))				
-				nBB++;
+	size_t nBB = 0;
+	for(int v = 0; v < NV_; ++v){
+		for(int bb = 0; bb < NBB_; bb++){
+			if(adj_[v].get_bitboard(bb))		//non-empty bitblock				
+				nBB++;						
 		}
 	}
 
-return (nBB/static_cast<double>(NBB_*NV_));
+	return (nBB / static_cast<double>(NBB_ * NV_));
 }
 
-
-template<>
-double Graph<sparse_bitarray>::average_block_density_index()	{
-/////////////////////////
-// average of density per block
+//template<class T>
+//double Graph<T>::block_density_index()	const {
 //
-	size_t nBB=0; size_t nBBt=0;
-	double den=0.0;
-	for(int v=0; v<NV_; ++v){
-		nBB=adj_[v].number_of_bitblocks();
-		nBBt+=nBB;
-		int pc=adj_[v].popcn64();
-		den+=double(pc)/(BITBOARD(nBB)*WORD_SIZE);
-	}
-		
-	return (den/nBBt);
-}
+//	LOG_ERROR("function only for sparse graphs - Graph<T>::block_density_index");
+//	return -1;
+//}
+
+//template<class T>
+//double Graph<T>::average_block_density_index()	const {
+//
+//	LOG_ERROR("function only for sparse graphs - Graph<T>::average_block_density_index");
+//	return -1;
+//}
+
 
 template<class T>
 double Graph<T>::density(const T & bbN )  {
@@ -631,55 +624,47 @@ double Graph<T>::density(const T & bbN )  {
 	if (edges == 0) { return 0.0; }
 
 	BITBOARD  pc = bbN.popcn64();
-	return edges/(double)(pc*(pc-1)/2);
+	return edges / static_cast<double>(pc * (pc-1) / 2);
 }
 
-
 template<class T>
-bool Graph<T>::is_edge	(int i, int j) const{
-//////////////////
-// true if there is an edge (i,j)
-// First created: 14/10/2010
-
-	return(adj_[i].is_bit(j));
-}
-
-
-template<class T>
-bool Graph<T>::is_no_self_loops () const{
-//////////////////
-// true if there is no edge (v,v) 
-
-	for(int i=0; i<NV_; i++)
-		if( adj_[i].is_bit(i)) {
-			cout<<"Graph with self-loops in:"<<i<<endl;
-			return false;
+bool Graph<T>::is_self_loop () const{
+	for(int i = 0; i < NV_; i++)
+		if( adj_[i].is_bit(i)) {			
+			return true;
 		}
-return true;
+	return false;
 }
-
 
 template<class T>
 void Graph<T>::remove_vertices (const BitBoardN& bbn, Graph& g){
-/////////////////////
-// returns in g the induced graph by bbn
 
-	NE_=0;										//resets vertices
-	int pc=bbn.popcn64();
-	int new_size=NV_-pc;
-	if(pc==0){return;}
-	else if(new_size==0){ g.clear();}			//empty graph
+	//determine the size of the graph g
+	int pc = bbn.popcn64();
+	int new_size= NV_ - pc;
+
+	if (new_size <= 0) {
+		LOG_ERROR("empty graph after deletion - Graph<T>::remove_vertices");
+		g.clear();
+		return;
+	}
+
+	//initialize new graph
+	if (g.reset(new_size) == -1) {
+		LOG_ERROR("memory for graph not allocated - Graph<T>::remove_vertices");
+		return;
+	}
 	
-	g.reset(new_size);
+	//computes the induced graph in g
 	g.set_name(this->name_);
-	int l=0; int m=0;
+	int l = 0;
 	
-	//runs through the whole graph
-	for(int i=0; i<NV_-1; i++){
-		if(bbn.is_bit(i))continue;				//jumps over vertices marked for deletion
-		m=l+1;										
-		for(int j=i+1; j<NV_; j++){
-			if(bbn.is_bit(j)) continue;			//jumps over vertices marked for deletion
+	//adds the edges with endpoints not in the bbn set
+	for(int i = 0; i < NV_ - 1; i++){
+		if( bbn.is_bit(i) ) continue;				//jumps over vertices marked for deletion
+		int m = l + 1;										
+		for(int j = i + 1; j < NV_; j++){
+			if(bbn.is_bit(j)) continue;				//jumps over vertices marked for deletion
 			if(adj_[i].is_bit(j)){
 				g.add_edge(l,m);
 			}
@@ -690,18 +675,18 @@ void Graph<T>::remove_vertices (const BitBoardN& bbn, Graph& g){
 
 }
 
-template<class T>
-void Graph<T>::remove_vertices (const BitBoardN& bbn){
-///////////////
-// Experimental: deletes input list of nodes by creating a temporal graph
+//template<class T>
+//void Graph<T>::remove_vertices (const BitBoardN& bbn){
+/////////////////
+//// Experimental: deletes input list of nodes by creating a temporal graph
+////
+//// OBSERVATIONS:
+//// 1.Inefficient implementation with double allocation of memory
 //
-// OBSERVATIONS:
-// 1.Inefficient implementation with double allocation of memory
-
-	Graph<T> g;
-	this->remove_vertices(bbn,g);			//allocation 1
-	(*this)=g;								//allocation 2	
-}
+//	Graph<T> g;
+//	this->remove_vertices(bbn,g);			//allocation 1
+//	(*this)=g;								//allocation 2	
+//}
 
 template<class T>
 int Graph<T>::degree_in (int v) const{

@@ -1,24 +1,19 @@
-/*  
- * ugraph.h file from the GRAPH library, a C++ library for bit encoded 
- * simple unweighted graphs. GRAPH stores the adjacency matrix un full 
- * but each row is encoded as a bitsrting. GRAPH is at the core of  BBMC, a 
- * state of the art leading exact maximum clique algorithm. 
- * (see license file (legal.txt) for references)
+/*
+ * simple_ugraph.h file for the class Ugraph for simple undirected graphs
  *
- * Copyright (C)
- * Author: Pablo San Segundo
- * Intelligent Control Research Group CAR(UPM-CSIC) 
+ * @creation_date 17/6/10?
+ * @last_update 01/01/25
+ * @dev pss
  *
- * Permission to use, modify and distribute this software is
- * granted provided that this copyright notice appears in all 
- * copies, in source code or in binaries. For precise terms 
- * see the accompanying LICENSE file.
+ * This code is part of the GRAPH C++ library for bit encoded
+ * simple graphs. GRAPH stores the adjacency matrix in full, each
+ * row encoded as a bitstring.
  *
- * This software is provided "AS IS" with no warranty of any 
- * kind, express or implied, and with no claim as to its
- * suitability for any purpose.
+ * GRAPH is at the core many state of the art leading exact clique
+ * algorithms.
  *
  */
+
 
 #ifndef __SIMPLE_UGRAPH_H__
 #define __SIMPLE_UGRAPH_H__
@@ -26,23 +21,42 @@
 #include "simple_graph.h"
 #include "utils/prec_timer.h"
 
-template<class T>
-class Ugraph : public Graph<T>{
-	friend class GraphConversion;
-public:
-	typedef Graph<T> _mypt;
-	typedef typename _mypt::_bbt _bbt;
-	
-	Ugraph						() : Graph<T>(){}									//does not allocate memory
-	Ugraph						(int nVert) : Graph<T>(nVert){}						//creates empty graph with size vertices	
-	//Ugraph					(const Ugraph& ug) : Graph<T>(ug){}
-	Ugraph						(std::string filename);	
-	Ugraph						(int nV, int* adj[], string name);
-    ~Ugraph						(){_mypt::clear();};
+ //////////////////
+ //
+ // Generic class Ugraph<T>
+ // 
+ // (T is limited to bitarray and sparse_bitarray types)
+ // 
+ //////////////////
 
-virtual	void add_edge				(int v, int w);									//sets bidirected edge
-virtual	void remove_edge			(int v, int w);
-virtual	void remove_vertices		(const BitBoardN& bbn);
+template<class T = bitarray>
+class Ugraph : public Graph<T> {
+
+	friend class GraphConversion;
+
+public:
+
+	using type = Ugraph<T>;				//own type
+	using ptype = Graph<T>;				//parent type
+	using basic_type = T;				//basic type (a type of bitset)
+	
+	using _bbt = basic_type;			//alias for backward compatibility
+	using _mypt = ptype;				//alias for backward compatibility
+
+	//constructors	
+	//using ptype::Graph;				//inherit constructors
+
+	Ugraph						() : Graph() {}										//does not allocate memory
+	Ugraph						(int nVert) : Graph(nVert){}						//creates empty graph with size vertices	
+	Ugraph						(std::string filename) /* : Graph(filename) {}*/;	//reads graph from file
+	Ugraph						(int nV, int* adj[], string name);
+   	
+	~Ugraph						() = default;								//~Ugraph() { _mypt::clear(); };
+		
+
+virtual	void add_edge			(int v, int w);									//sets bidirected edge
+virtual	void remove_edge		(int v, int w);
+virtual	void remove_vertices	(const BitBoardN& bbn) = delete;				//commented out implementation - EXPERIMENTAL
 				
 	//degree: TODO@implement bitstring conversions according to the templates properly (3/4/18)
 	int degree					(int v)									const;
@@ -79,6 +93,11 @@ virtual	void write_EDGES			(ostream & filename);
 		void write_mtx				(ostream & filename);
 };
 
+template<class T>
+Ugraph<T>::Ugraph(string filename) :Graph<T>() {
+	int status = _mypt::set_graph(filename);
+	if (status == -1) { LOG_ERROR("error when opening file, exiting...-Ugraph<T>::Ugraph"); exit(-1); }
+}
 
 template <class T>
 inline
@@ -95,11 +114,7 @@ Ugraph<T>::Ugraph(int nV, int* adj[], string name) {
 	}
 }
 
-template<class T>
-Ugraph<T>::Ugraph(string filename):Graph<T>(){
-	int status = _mypt::set_graph(filename);
-	if (status == -1) { LOG_ERROR("error when opening file, exiting...-Ugraph<T>::Ugraph"); exit(-1); }
-}
+
 
 template<class T>
 void Ugraph<T>::add_edge (int v, int w){
@@ -280,14 +295,14 @@ ostream& Ugraph<T>::print_edges (T& bbsg, std::ostream& o) const{
 	return o;
 }
 
-template<class T>
-void Ugraph<T>::remove_vertices (const BitBoardN& bbn){
-//////////////////////////
-// Experimental: inefficient implementation: allocating memory twice 
-	Ugraph g;
-	this->_mypt::remove_vertices(bbn,g);			//allocation 1
-	(*this)=g;										//allocation 2	
-}
+//template<class T>
+//void Ugraph<T>::remove_vertices (const BitBoardN& bbn){
+////////////////////////////
+//// Experimental: inefficient implementation: allocating memory twice 
+//	Ugraph g;
+//	this->_mypt::remove_vertices(bbn,g);			//allocation 1
+//	(*this)=g;										//allocation 2	
+//}
 
 
 template<class T>

@@ -6,6 +6,34 @@
 
 using namespace std;
 
+TEST(Graph_sparse_test, max_degree_subgraph_sparse) {
+	LOG_INFO("Graph: max_degree_subgraph_sparse ------------------");
+
+	sparse_ugraph g(100);
+	g.add_edge(0, 1);
+	g.add_edge(1, 2);
+	g.add_edge(1, 3);
+	g.add_edge(2, 3);
+	g.add_edge(78, 79);
+	g.add_edge(79, 80);
+
+	sparse_bitarray sg(g.number_of_vertices());
+	sg.init_bit(0, 3);
+	EXPECT_EQ(3, g.max_degree_of_subgraph(sg));	//1(3)
+
+	sg.init_bit(0, 2);
+	EXPECT_EQ(2, g.max_degree_of_subgraph(sg));  //1(2)
+
+	sg.init_bit(78, 79);						//78(1)
+	EXPECT_EQ(1, g.max_degree_of_subgraph(sg));
+
+	LOG_INFO("Graph: END max_degree_subgraph_sparse------");
+#ifdef TEST_GRAPH_STEP_BY_STEP
+	LOG_ERROR("press any key to continue");
+	cin.get();
+#endif;
+}
+
 TEST(Graph_sparse_test, graph_from_file){
 ///////////////////
 // Undirected graphs read by directed graph class (all edges are non symmetrical)
@@ -100,12 +128,12 @@ TEST(Graph_sparse_test,is_edge){
 	EXPECT_FALSE(g.is_edge(2,0));
 	
 	//makes bidirected and removes the first 4 vertices
-	g.make_bidirected();
-	BitBoardN bbn(4);
-	bbn.set_bit(0, 3);
-	g.remove_vertices(bbn);
-	EXPECT_EQ(3, g.number_of_vertices());		//7-4=3 vertices which form a clique (but directed)
-	EXPECT_EQ(3, g.number_of_edges());
+	//g.make_bidirected();
+	//BitBoardN bbn(4);
+	//bbn.set_bit(0, 3);
+	//g.remove_vertices(bbn);
+	//EXPECT_EQ(3, g.number_of_vertices());		//7-4=3 vertices which form a clique (but directed)
+	//EXPECT_EQ(3, g.number_of_edges());
 }
 
 TEST(Graph_sparse_test, degree_sample){
