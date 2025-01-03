@@ -534,24 +534,7 @@ ostream& Graph<T>::print_edges (std::ostream& o) const{
 	return o;
 }
 
-template<class T>
-ostream& Graph<T>::print_edges (T& bbsg, ostream& o)const {
-/////////////
-// TODO-optimize
-	for(int i=0; i<NV_-1; i++){
-		if(!bbsg.is_bit(i)) continue;
-		for(int j=i+1; j<NV_; j++){
-			if(!bbsg.is_bit(j)) continue;
-			if(is_edge(i,j)){
-				o<<"["<<i<<"]"<<"-->"<<"["<<j<<"]"<<endl;
-			}
-			if(is_edge(j,i)){
-				o<<"["<<j<<"]"<<"-->"<<"["<<i<<"]"<<endl;
-			}
-		}
-	}
-	return o;
-}
+
 
 template<class T>
 BITBOARD Graph<T>::number_of_edges	(const T& bbn) const{
@@ -698,10 +681,10 @@ int Graph<T>::degree_in (int v) const{
 template<class T>
 void Graph<T>::make_bidirected (){
 
-	for(int i=0; i<NV_; i++){
-		for(int j=0; j<NV_; j++){
-			if(is_edge(i,j)) add_edge(j, i);
-			if(is_edge(j,i)) add_edge(i, j);
+	for (std::size_t i = 0; i < NV_; ++i) {
+		for (std::size_t j = 0; j < NV_; ++j) {
+			if (is_edge(i, j)) add_edge(j, i);
+			if (is_edge(j, i)) add_edge(i, j);
 		}
 	}
 	
@@ -709,57 +692,46 @@ void Graph<T>::make_bidirected (){
 }
 
 template<class T>
-void Graph<T>::write_dimacs (ostream& o)  {
-/////////////////////////
-// writes file in dimacs format 
-	
-	//timestamp 
-	o<<"c File written by GRAPH:"<<PrecisionTimer::local_timestamp();
-	
-	//name
-	if(!name_.empty())
-		o<<"\nc "<<name_.c_str()<<endl;
+void Graph<T>::write_dimacs ( ostream& o)  {
 
-	//tamaño del grafo
-	o<<"p edge "<<NV_<<" "<<number_of_edges()<<endl<<endl;
-
-	//write DIMACS nodes n <v> <w>
-	//if (is_weighted_v()){
-	//	for(int v=0; v<NV_; v++){
-	//		o<<"n "<<v+1<<" "<<get_wv(v)<<endl;
-	//	}
-	//}
+	//timestamp comment
+	o << "c File written by GRAPH:" << PrecisionTimer::local_timestamp();
 	
-	//write edges
-	for(int v=0; v<NV_; v++){
-		for(int w=0; w<NV_; w++){
-			if(v==w) continue;
-			if(is_edge(v,w) )							//O(log) for sparse graphs: specialize
-					o<<"e "<<v+1<<" "<<w+1<<endl;		//1 based vertex notation dimacs
-			
+	//name comment
+	if( !name_.empty() )
+		o << "\nc " << name_.c_str() << endl;
+
+	//dimacs header
+	o << "p edge " << NV_ << " " << number_of_edges(false /* recompute */) << endl << endl;
+
+	//write edges 1-based vertex notation 
+	for ( std::size_t v = 0; v < NV_; ++v ){
+		for ( std::size_t w = 0; w < NV_; ++w ){
+			if( v == w ) continue;
+			if ( is_edge(v, w) ) {								//O(log) for sparse graphs: specialize
+				o << "e " << v + 1 << " " << w + 1 << endl;		
+			}
 		}
 	}
 }
 
 template<class T>
 void  Graph<T>::write_EDGES	(ostream& o){
-/////////////////////////
-// writes simple unweighted graphs  in edge list format 
-// note: loops are not allowed
-		
-	//timestamp 
-	o<<"% File written by GRAPH:"<<PrecisionTimer::local_timestamp();
+
+	//timestamp comment
+	o << "% File written by GRAPH:" << PrecisionTimer::local_timestamp();
 	
-	//name
+	//name comment
 	if(!name_.empty())
-		o<<"\n%  "<<name_.c_str()<<endl;
+		o << "\n%  "<< name_.c_str() << endl;
 	
-	//write edges
-	for(int v=0; v<NV_; v++){
-		for(int w=0; w<NV_; w++){
-			if(v==w) continue;
-			if(is_edge(v,w) )							//O(log) for sparse graphs: specialize
-					o<<v+1<<" "<<w+1<<endl;				//1 based vertex notation dimacs
+	//write edges 1-based vertex notation
+	for( std::size_t v = 0; v < NV_; ++v ){
+		for( std::size_t w = 0; w < NV_; ++w ){
+			if(v == w) continue;
+			if (is_edge(v, w)) {							//O(log) for sparse graphs: specialize
+				o << v + 1 << " " << w + 1 << endl;				
+			}
 			
 		}
 	}

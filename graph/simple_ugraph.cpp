@@ -8,7 +8,6 @@
   *
   */
 
-
 #include "simple_ugraph.h"
 #include "utils/prec_timer.h"
 
@@ -21,7 +20,7 @@ Ugraph<T>::Ugraph(string filename) : Graph<T>()
 {
 	//cannot call Graph<T>::Graph(filename) because Graph<T>::add_edge is overriden!
 
-	if (ptype::set_graph(filename) == -1) {
+	if (ptype::set_graph(filename) == -1 ) {
 		LOGG_ERROR("error when reading file: ", filename, "Graph<T>::Graph");
 		LOG_ERROR("exiting...");
 		exit(-1);
@@ -31,11 +30,15 @@ Ugraph<T>::Ugraph(string filename) : Graph<T>()
 
 template <class T>
 Ugraph<T>::Ugraph(std::size_t nV, int* adj[], string name) {
-	_mypt::set_name(name);													//name includes the full path
-	if (_mypt::init(nV) == -1) { LOG_ERROR("bizarre graph construction-Graph<T>::Graph(...), exiting... "); exit(-1); }
+	ptype::set_name(name);													
+	if (ptype::reset(nV) == -1) { 
+		LOG_ERROR("Bad graph construction - Ugraph<T>::Ugraph(std::size_t , int* adj[], string)");
+		LOG_ERROR("exiting...");
+		exit(-1);
+	}
 
-	for (int i = 0; i < nV-1; i++) {
-		for (int j = i+1; j < nV; j++) {
+	for (std::size_t i = 0; i < nV - 1; ++i) {
+		for (std::size_t j = i + 1; j < nV; ++j) {
 			if (adj[i][j] == 1) {
 				add_edge(i, j);
 			}
@@ -50,7 +53,7 @@ BITBOARD Ugraph<T>::number_of_edges(bool lazy) {
 		ptype::NE_ = 0;
 
 		//adds all edges and divides by 2 for efficiency - checks for self loops	
-		for (int i = 0; i < NV_; i++) {
+		for (std::size_t i = 0; i < NV_; i++) {
 			ptype::NE_ += adj_[i].popcn64();
 		}
 
@@ -163,9 +166,10 @@ ostream& Ugraph<T>::print_edges (std::ostream& o) const{
 }
 
 template<class T>
-ostream& Ugraph<T>::print_matrix(std::ostream& o) const {
-	for (std::size_t i = 0; i < ptype::NV_; i++) {
-		for (std::size_t j = 0; j < ptype::NV_; j++) {
+ostream& Ugraph<T>::print_matrix(std::ostream& o) const
+{
+	for (std::size_t i = 0; i < ptype::NV_; ++i) {
+		for (std::size_t j = 0; j < ptype::NV_; ++j) {
 			if (ptype::is_edge(i, j)) {
 				o << "1";
 			}
@@ -175,21 +179,6 @@ ostream& Ugraph<T>::print_matrix(std::ostream& o) const {
 		}
 		o << endl;
 	}
-	return o;
-}
-
-template<class T>
-ostream& Ugraph<T>::print_edges (T& bbsg, std::ostream& o) const{
-	for(int i=0; i<_mypt::NV_-1; i++){
-		if(!bbsg.is_bit(i)) continue;
-		for(int j=i+1; j<_mypt::NV_; j++){
-			if(!bbsg.is_bit(j)) continue;	
-			if(_mypt::is_edge(i, j)){
-				o<<"["<<i<<"]"<<"--"<<"["<<j<<"]"<<endl;
-			}
-		}
-	}
-
 	return o;
 }
 
@@ -205,103 +194,89 @@ ostream& Ugraph<T>::print_edges (T& bbsg, std::ostream& o) const{
 
 template<class T>
 void Ugraph<T>::write_dimacs (ostream & o)  {
-/////////////////////////
-// writes file in dimacs format with timestamp
 		
-	//timestamp 
-	o<<"c File written by GRAPH:"<<PrecisionTimer::local_timestamp();
+	//timestamp comment 
+	o << "c File written by GRAPH:" << PrecisionTimer::local_timestamp();
 
-	//name
+	//name comment
 	if(!_mypt::name_.empty())
-		o<<"c "<<_mypt::name_.c_str()<<endl;
+		o << "c " << _mypt::name_.c_str() << endl;
 
-	//tamaño del grafo
-	o<<"p edge "<<_mypt::NV_<<" "<<number_of_edges(false /* recompute */)<<endl<<endl;
+	//dimacs header
+	o << "p edge " << ptype::NV_ << " " << number_of_edges (false /* recompute */) << endl << endl;
 
-	//write DIMACS nodes n <v> <w>
-	/*if (_mypt::is_weighted_v()){
-		for(int v=0; v<_mypt::NV_; v++){
-			o<<"n "<<v+1<<" "<<_mypt::get_wv(v)<<endl;
-		}
-	}*/
-
-	//bidirectional edges
-	for(int v=0; v<_mypt::NV_-1; v++){
-		for(int w=v+1; w<_mypt::NV_; w++){
-			if(_mypt::is_edge(v,w) )							//O(log) for sparse graphs: specialize
-					o<<"e "<<v+1<<" "<<w+1<<endl;				//1 based vertex notation dimacs
+	//bidirectional edges (1 based in dimacs)
+	for( std::size_t v = 0; v < ptype::NV_ - 1; ++v ){
+		for( std::size_t w = v + 1; w < ptype::NV_; ++w ){
+			if (ptype::is_edge(v, w)) {										//O(log) for sparse graphs: specialize
+				o << "e " << v + 1 << " " << w + 1 << endl;
+			}
 		}
 	}
 }
-
 
 template<class T>
-void  Ugraph<T>::write_EDGES(ostream& o){
-/////////////////////////
-// writes simple unweighted grafs  in edge list format 
-// note: loops are not allowed
-		
-	//timestamp 
-	o<<"% File written by GRAPH:"<<PrecisionTimer::local_timestamp();
+void  Ugraph<T>::write_EDGES (ostream& o){
 
-	//name
-	if(!_mypt::name_.empty())
-		o<<"% "<<_mypt::name_.c_str()<<endl;
+	//timestamp comment
+	o << "% File written by GRAPH:" << PrecisionTimer::local_timestamp();
+
+	//name coment
+	if(!ptype::name_.empty())
+		o << "% " << ptype::name_.c_str() << endl;
 	
-	//write edges
-	for(int v=0; v<_mypt::NV_-1; v++){
-		for(int w=v+1; w<_mypt::NV_; w++){
-			if(_mypt::is_edge(v,w) )							//O(log) for sparse graphs: specialize
-					o<<v+1<<" "<<w+1<<endl;						//1 based vertex notation dimacs
+	//write edges - 1 based vertex notation
+	for( std::size_t v = 0; v < ptype::NV_ - 1; ++v ){
+		for( std::size_t w = v + 1; w < ptype::NV_; ++w ){
+			if ( ptype::is_edge(v, w) ) {							//O(log) for sparse graphs: specialize
+				o << v + 1 << " " << w + 1 << endl;
+			}
 		}
 	}
 }
-
 
 template<class T>
 void Ugraph<T>::write_mtx(ostream & o){
-/////////////////////////
-// writes simple unweighted grafs  in edge list format 
-// note: loops are not allowed
 		
-	//header
-	o<<"%%MatrixMarket matrix coordinate pattern symmetric"<<endl;
+	//header comment
+	o << "%%MatrixMarket matrix coordinate pattern symmetric" << endl;
 	
-	//timestamp
-	o<<"% File written by GRAPH:"<<PrecisionTimer::local_timestamp();
+	//timestamp comment
+	o << "% File written by GRAPH:" << PrecisionTimer::local_timestamp();
 		
-	//name
-	if(!_mypt::name_.empty())
-		o<<"% "<<_mypt::name_.c_str()<<endl;
+	//name comment
+	if(! ptype::name_.empty() )
+		o << "% " << ptype::name_.c_str() << endl;
 
-	//size and edges
-	_mypt::NE_=0;																	//eliminates lazy evaluation of edge count 
-	o<<_mypt::NV_<<" "<<_mypt::NV_<<" "<<number_of_edges()<<endl;
+	//number of vertices and edges
+	ptype::NE_=0;																			//eliminates lazy evaluation of edge count 
+	o << ptype::NV_ << " " << ptype::NV_ << " " << number_of_edges() << endl;
 	
-	//writes edges
-	for(int v=0; v<_mypt::NV_-1; v++){
-		for(int w=v+1; w<_mypt::NV_; w++){
-			if(_mypt::is_edge(v,w) )							//O(log) for sparse graphs: specialize
-					o<<v+1<<" "<<w+1<<endl;						//1 based vertex notation dimacs
+	//writes edges 1-based vertex notation
+	for( std::size_t v = 0; v < ptype::NV_ - 1; ++v ){
+		for( std::size_t  w = v + 1; w < ptype::NV_; ++w ){
+			if ( ptype::is_edge(v, w) ) {														//O(log) for sparse graphs: specialize
+				o << v + 1 << " " << w + 1 << endl;						
+			}
 		}
 	}
 }
 
-
 template<class T>
 int Ugraph<T>::degree_up (int v, const BitBoardN& bbn) const	{
-////////////////////
-// degree of v considering only adjacent vertices with higher index in the subgraph passed
-// (applied as pivot strategy for enumeration)
 
-	int ndeg=0;
-	int nBB=WDIV(v);
-	for(int i=nBB+1; i<_mypt::NBB_;i++)
-		ndeg+=bitblock::popc64(_mypt::adj_[v].get_bitboard(i)& bbn.get_bitboard(i));
+	int nDeg=0, nBB = WDIV(v);
+
+	for (int i = nBB + 1; i < ptype::NBB_; ++i) {
+		nDeg += bitblock::popc64( _mypt::adj_[v].get_bitboard(i) & bbn.get_bitboard(i) );
+	}
 
 	//truncate the bitblock of v
-	ndeg+=bitblock::popc64(bitblock::MASK_1(WMOD(v)+1,63) & _mypt::adj_[v].get_bitboard(nBB)& bbn.get_bitboard(nBB));
-return ndeg;
+	nDeg += bitblock::popc64 ( bitblock::MASK_1( WMOD(v) + 1, 63 ) &
+							   ptype::adj_[v].get_bitboard(nBB) & bbn.get_bitboard(nBB)	
+							);
+	
+	return nDeg;
 }
 
 template<class T>
@@ -412,7 +387,6 @@ template class  Ugraph<sparse_bitarray>;
 
 
 ////////////////////////////////////////////
-
 
 
 

@@ -137,6 +137,14 @@ public:
 	*/
 	int degree					(int v, int UB, const BitBoardS& bbs)	const;	//truncated degree  (14/2/2016)
 	
+	/*
+	*  @brief number of neighbors of v in a vertex set with higher index than v
+	* 
+	*		  (applied as pivotal strategy for clique enumeration)
+	* 
+	*  @param bbn input (bit) set of vertices
+	*  
+	*/
 	int degree_up				(int v, const BitBoardN& bbn)			const;  //TODO: test (27/4/2016)
 	
 	/*
@@ -177,17 +185,6 @@ public:
 	void remove_edge			(int v, int w)							override;
 
 //////////////	
-// deleted - CHECK	
-virtual	void remove_vertices	(const BitBoardN& bbn) = delete;				//commented out implementation - EXPERIMENTAL
-	
-	/*	
-	*  @brief enlarges the graph with a new vertex (provided its neighborhood)
-	*		  TODO - code removed, BUGGY (should not be called , unit tests DISABLED)
-	*/
-	int add_vertex				( _bbt* neigh = NULL) = delete;								
-
-
-//////////////	
 // Induced subgraphs
 
 //TODO	Graph& create_subgraph	(std::size_t first_k, Graph& g) const  override;
@@ -208,15 +205,27 @@ virtual	void remove_vertices	(const BitBoardN& bbn) = delete;				//commented out
 	*  @returns 0 if success, -1 if error
 	*/
 	int create_subgraph			(Ugraph& g, int v)						const;			
-	
-			
+		
 		
 ////////////
 // Read / write basic operations
 public:
-
+	/*
+	* @brief writes undirected graph in dimacs format
+	* @param o output stream
+	*/
 	void write_dimacs			(std::ostream& filename)				override;
+	
+	/*
+	* @brief writes undirected graph in edge list format
+	* @param o output stream
+	*/
 	void write_EDGES			(std::ostream& filename)				override;
+	
+	/*
+	* @brief writes undirected graph in MMX (Matrix Market) format
+	* @param o output stream
+	*/
 	void write_mtx				(std::ostream& filename);				//MTX format only for Ugraph? (03/01/2025)
 
 
@@ -226,14 +235,25 @@ public:
 
 	ostream& print_degrees		(std::ostream& = std::cout)				const;
 	ostream& print_edges		(std::ostream& = std::cout)				const override;
-	ostream& print_edges		(T& bbsg, std::ostream& = std::cout)	const override;
+	
+	template<class bitset_t = T>
+	ostream& print_edges		(bitset_t& bbsg, std::ostream& = std::cout)	const ;
 	ostream& print_matrix		(std::ostream& = std::cout)				const;
+
+//////////////	
+// deleted - CHECK	
+	virtual	void remove_vertices(const BitBoardN& bbn) = delete;				//commented out implementation - EXPERIMENTAL
+
+	/*
+	*  @brief enlarges the graph with a new vertex (provided its neighborhood)
+	*		  TODO - code removed, BUGGY (should not be called , unit tests DISABLED)
+	*/
+	int add_vertex(_bbt* neigh = NULL) = delete;
 
 };
 
-///////////////////////////////////////////////////////
 
-////////////
+/////////////////////////////////////////////////////////////
 // Necessary implementation of template methods in header file
 
 template<class T>
@@ -257,6 +277,23 @@ int Ugraph<T>::max_subgraph_degree (bitset_t& sg) const {
 	}
 
 	return max_degree;
+}
+
+template<class T>
+template<class bitset_t>
+ostream& Ugraph<T>::print_edges(bitset_t& bbsg, std::ostream& o) const
+{
+	for (std::size_t i = 0; i < ptype::NV_ - 1; ++i) {
+		if (!bbsg.is_bit(i)) continue;
+		for (std::size_t j = i + 1; j < ptype::NV_; ++j) {
+			if (!bbsg.is_bit(j)) continue;
+			if (ptype::is_edge(i, j)) {
+				o << "[" << i << "]" << "--" << "[" << j << "]" << endl;
+			}
+		}
+	}
+
+	return o;
 }
 
 #endif

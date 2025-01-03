@@ -275,13 +275,23 @@ public:
 	int read_mtx						(const std::string& filename);
 	int read_EDGES						(const std::string& filename);
 	int read_01							(const std::string& filename);
-virtual	void  write_dimacs				(std::ostream& o) ;	
+
+	/*
+	* @brief writes directed graph in dimacs format
+	* @param o output stream
+	*/
+	virtual	void  write_dimacs				(std::ostream& o);
+
+	/*
+	* @brief writes directed graph in edge list format
+	* @param o output stream
+	*/
 virtual	void  write_EDGES				(std::ostream& o);
 
 ////////////
 // I/O basic operations
-	ostream& print_data					(bool lazy=true, std::ostream& = std::cout, bool endl=true);
-	ostream& print_adj					(std::ostream& = std::cout, bool endl=true);
+	ostream& print_data					(bool lazy = true, std::ostream& = std::cout, bool endl = true);
+	ostream& print_adj					(std::ostream& = std::cout, bool endl = true);
 	
 	virtual ostream& print_edges		(std::ostream& = std::cout) const;
 
@@ -290,7 +300,8 @@ virtual	void  write_EDGES				(std::ostream& o);
 	* @param bbsg input (bit) set of vertices
 	* @param o output stream
 	*/
-	virtual ostream& print_edges		(T& bbsg, ostream& o = std::cout) const;	
+	template <class bitset_t = T>
+	ostream& print_edges				(bitset_t& bbsg, ostream& o = std::cout)	const;	
 		
 //////////////////////////
 // data members
@@ -305,9 +316,7 @@ protected:
 	std::string path_;		//path of instance
 };
 
-///////////////////////////////////////////////////////
-
-////////////
+//////////////////////////////////////////
 // Necessary implementation of template methods in header file
 
 template <class T>
@@ -322,4 +331,28 @@ inline double Graph<T>::density(const bitset_t& bbN) {
 	BITBOARD  pc = bbN.popcn64();
 	return edges / static_cast<double>(pc * (pc - 1) / 2);
 }
+
+template<class T>
+template<class bitset_t>
+ostream& Graph<T>::print_edges(bitset_t& bbsg, ostream& o) const {
+	/////////////
+	// TODO-optimize
+	for (int i = 0; i < NV_ - 1; i++) {
+		if (!bbsg.is_bit(i)) continue;
+		for (int j = i + 1; j < NV_; j++) {
+			if (!bbsg.is_bit(j)) continue;
+			if (is_edge(i, j)) {
+				o << "[" << i << "]" << "-->" << "[" << j << "]" << endl;
+			}
+			if (is_edge(j, i)) {
+				o << "[" << j << "]" << "-->" << "[" << i << "]" << endl;
+			}
+		}
+	}
+	return o;
+}
+
+
+
+
 #endif

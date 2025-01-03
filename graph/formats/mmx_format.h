@@ -1,5 +1,5 @@
 /*
-* mmx_format.h header of class MMXI to read MMX format in GRAPH
+* mmx_format.h header of class MMI to read MMX format in GRAPH
 *			 Currently only reads matrix format for configuration MCPS
 * @creation_date 6/10/2014
 * @last_update 30/12/2024
