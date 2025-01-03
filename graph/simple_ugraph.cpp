@@ -143,8 +143,8 @@ double Ugraph<T>::density(bool lazy) {
 
 template<class T>
 ostream& Ugraph<T>::print_degrees (std::ostream& o) const {
-	for(int i=0; i<_mypt::NV_; ++i){
-		o<<"deg("<<i<<")"<<":"<<degree(i)<<" ";
+	for(std::size_t i = 0; i < ptype::NV_; ++i){
+		o << "deg(" << i << ")" << ":" << degree(i) <<" ";
 	}
 	return o;
 }
@@ -152,10 +152,10 @@ ostream& Ugraph<T>::print_degrees (std::ostream& o) const {
 
 template<class T>
 ostream& Ugraph<T>::print_edges (std::ostream& o) const{
-	for(int i=0; i<_mypt::NV_-1; i++){
-		for(int j=i+1; j<_mypt::NV_; j++){
-			if(_mypt::is_edge(i, j)){
-				o<<"["<<i<<"]"<<"--"<<"["<<j<<"]"<<endl;
+	for(std::size_t i=0; i< ptype::NV_-1; i++){
+		for(std::size_t j = i + 1; j< ptype::NV_; j++){
+			if(ptype::is_edge(i, j)){
+				o << "["<<i<<"]" << "--" << "[" << j << "]" << endl;
 			}
 		}
 	}
@@ -164,9 +164,9 @@ ostream& Ugraph<T>::print_edges (std::ostream& o) const{
 
 template<class T>
 ostream& Ugraph<T>::print_matrix(std::ostream& o) const {
-	for (int i = 0; i < _mypt::NV_; i++) {
-		for (int j =0; j < _mypt::NV_; j++) {
-			if (_mypt::is_edge(i, j)) {
+	for (std::size_t i = 0; i < ptype::NV_; i++) {
+		for (std::size_t j = 0; j < ptype::NV_; j++) {
+			if (ptype::is_edge(i, j)) {
 				o << "1";
 			}
 			else {
@@ -204,7 +204,7 @@ ostream& Ugraph<T>::print_edges (T& bbsg, std::ostream& o) const{
 
 
 template<class T>
-void Ugraph<T>::write_dimacs (ostream & o) {
+void Ugraph<T>::write_dimacs (ostream & o)  {
 /////////////////////////
 // writes file in dimacs format with timestamp
 		
@@ -366,47 +366,37 @@ int Ugraph<T>::create_complement (Ugraph& ug) const	{
 
 template<class T>
 int Ugraph<T>::create_subgraph(Ugraph & ug, int v) const
-/////////////////////
-// generates the graph induced by N(v) 
-//
-// PARAMS
-// ug@ the new induced subgraph
-// v@ the vertex whose neighborhood induces the subgraph
-//
-// RETURN VAL: -1 if ERROR, O if OK
 {
 	vector<int> vnn;
-	_mypt::get_neighbors(v).to_vector(vnn);
+	ptype::get_neighbors(v).to_vector(vnn);
 
 	return create_subgraph(ug, vnn);	
 }
 
 template<class T>
-int Ugraph<T>::create_subgraph(Ugraph & ug, std::vector<int>& lv) const
-/////////////////////
-// generates the graph the induced by the set of vertices lv
-//
-// PARAM
-// ug@: the output graph
-// lv@: the set of vertices that induce ug
-//
-// RETURN VAL: -1 if ERROR, O if OK
+int Ugraph<T>::create_subgraph(Ugraph & ug, vint& lv) const
 {
-	//ASSERT
-	if (lv.empty()) { LOG_ERROR("empty set found while creating an induced graph-::create_induced(...)"); return -1; }
+	if (lv.empty()) {
+		LOG_ERROR("empty set found while creating an induced graph - Ugraph<T>::create_induced");
+		return -1; 
+	}
 	
 	const int NV = lv.size();
-	if (ug.init(NV) == -1) { LOG_ERROR("error during allocation-Ugraph<T>::create_induced(...)");  return -1; } 
-		
-	for (int i = 0; i < NV - 1; i++) {
-		for (int j = i + 1; j < NV; j++) {
+	if (ug.reset(NV) == -1) { 
+		LOG_ERROR("bad allocation - Ugraph<T>::create_induced"); 
+		return -1; 
+	} 
 
-			//add edges accordingly
+	//add appropiate edges
+	for (std::size_t i = 0; i < NV - 1; i++) {
+		for (std::size_t j = i + 1; j < NV; j++) {
+						
 			if (_mypt::is_edge(lv[i], lv[j])) {
-				ug.add_edge(i, j);						//CHECK!
+				ug.add_edge(i, j);						//adds bidirected edge
 			}
 		}
 	}	
+
 	return 0;
 }
 

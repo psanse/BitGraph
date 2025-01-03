@@ -76,12 +76,12 @@ virtual	~Graph()										= default;
 	void set_name						(std::string instance);
 	
 	void set_path						(std::string path_name) { path_ = path_name; }
-	std::string get_name				() const {return name_;}
-	std::string get_path				() const {return path_;}
+	std::string get_name				()					const {return name_;}
+	std::string get_path				()					const {return path_;}
 	
 
-	int number_of_vertices				()					const		{return NV_; }
-	int number_of_blocks				()					const		{return NBB_;}
+	std::size_t number_of_vertices		()					const		{return NV_; }
+	std::size_t number_of_blocks		()					const		{return NBB_;}
 	
 	/*
 	* @brief Counts the number of edges	(includes self loops)
@@ -266,25 +266,31 @@ public:
 	template <class T>
 	friend bool operator ==				(const Graph<T>& lhs, const Graph<T>& rhs);  
 		
-
 ////////////
-// Read / write operations
-// (TODO - place in a graph_io class ? , stateless functions ?)
+// Read / write basic operations
+
 public:
 
 	int read_dimacs						(const std::string& filename);	
 	int read_mtx						(const std::string& filename);
 	int read_EDGES						(const std::string& filename);
 	int read_01							(const std::string& filename);
-virtual	void  write_dimacs				(std::ostream& o);	
+virtual	void  write_dimacs				(std::ostream& o) ;	
 virtual	void  write_EDGES				(std::ostream& o);
 
 ////////////
-// I/O operations
-virtual	ostream& print_data				(bool lazy=true, std::ostream& = std::cout, bool endl=true);
+// I/O basic operations
+	ostream& print_data					(bool lazy=true, std::ostream& = std::cout, bool endl=true);
 	ostream& print_adj					(std::ostream& = std::cout, bool endl=true);
+	
 	virtual ostream& print_edges		(std::ostream& = std::cout) const;
-	virtual ostream& print_edges		(T& bbsg, ostream& = std::cout) const;	/* edges of subgraph*/
+
+	/*
+	* @brief Edges of the subgraph induced by a set of vertices to output stream
+	* @param bbsg input (bit) set of vertices
+	* @param o output stream
+	*/
+	virtual ostream& print_edges		(T& bbsg, ostream& o = std::cout) const;	
 		
 //////////////////////////
 // data members
@@ -292,7 +298,7 @@ protected:
 	std::vector<T> adj_;	//adjacency matrix 
 	std::size_t NV_;		//number of vertices
 	BITBOARD NE_;			//number of edges (updated on the fly)
-	int NBB_;				//number of bit blocks per row (in the case of sparse graphs this is a maximum value)
+	std::size_t NBB_;		//number of bit blocks per row (in the case of sparse graphs this is a maximum value)
 	
 	//names
 	std::string name_;		//name of instance, without path	

@@ -20,6 +20,9 @@
 
 #include "simple_graph.h"
 
+
+using vint = std::vector<int>;
+
  //////////////////
  //
  // Generic class Ugraph<T>
@@ -162,7 +165,7 @@ public:
 	* @param v endpoint
 	* @param w endpoint
 	*/
-	void add_edge				(int v, int w)  override;					
+	void add_edge				(int v, int w)							override;					
 	
 	/*
 	* @brief Removes bidirectional edge {v, w}
@@ -171,7 +174,7 @@ public:
 	* @param v endpoint
 	* @param w endpoint
 	*/
-	void remove_edge			(int v, int w)	override;
+	void remove_edge			(int v, int w)							override;
 
 //////////////	
 // deleted - CHECK	
@@ -189,26 +192,42 @@ virtual	void remove_vertices	(const BitBoardN& bbn) = delete;				//commented out
 
 //TODO	Graph& create_subgraph	(std::size_t first_k, Graph& g) const  override;
 
-	int create_subgraph			(Ugraph& g, int v)						const;			//returns induced subgraph on g by the neighborhood of v (29/08/2021)
-	int create_subgraph			(Ugraph& g, std::vector<int>& lv)		const;			//returns induced subgraph on g by the set of vertices lv
+	/*
+	*  @brief Computes the subgraph induced by a set of vertices
+	*  @param lv input set of vertices (std::vector<int>)
+	*  @returns 0 if success, -1 if error
+	*/
+	int create_subgraph			(Ugraph& g, vint& lv)					const;
+
+	/*
+	*  @brief Computes the subgraph induced by the neighborhood of a  vertex (29/08/21)
+	*		 
+	*		 Calls create_subgraph(Ugraph& g, vint& lv)
+	* 
+	*  @param v input vertex which determines the neighborhood
+	*  @returns 0 if success, -1 if error
+	*/
+	int create_subgraph			(Ugraph& g, int v)						const;			
+	
+			
 		
 ////////////
-// Read / write operations
+// Read / write basic operations
 public:
 
-	virtual	void write_dimacs	(std::ostream& filename);
-	virtual	void write_EDGES	(std::ostream& filename);
-	void write_mtx				(std::ostream& filename);
+	void write_dimacs			(std::ostream& filename)				override;
+	void write_EDGES			(std::ostream& filename)				override;
+	void write_mtx				(std::ostream& filename);				//MTX format only for Ugraph? (03/01/2025)
 
 
 /////////////////	
-//I/O operations
+//	I/O basic operations
 public:
 
-	ostream& print_degrees		(std::ostream& = std::cout)			const;
-virtual	ostream& print_edges	(std::ostream& = std::cout)			const;
-virtual ostream& print_edges	(T& bbsg, std::ostream& = std::cout)const;
-virtual	ostream& print_matrix	(std::ostream& = std::cout)			const;
+	ostream& print_degrees		(std::ostream& = std::cout)				const;
+	ostream& print_edges		(std::ostream& = std::cout)				const override;
+	ostream& print_edges		(T& bbsg, std::ostream& = std::cout)	const override;
+	ostream& print_matrix		(std::ostream& = std::cout)				const;
 
 };
 

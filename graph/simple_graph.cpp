@@ -503,7 +503,17 @@ int  Graph<T>::read_EDGES (const string& filename){
 
 template<class T>
 ostream& Graph<T>::print_data( bool lazy, std::ostream& o, bool endl) {
-	o << name_.c_str() << "\t" << number_of_vertices() << "\t" << std::fixed << number_of_edges(lazy) << "\t" << std::setprecision(6) << density(true);
+
+	//Uses the Template Method Pattern (number_of_edges is overriden)
+
+	////////////////////////////////////////////////////////////////
+	o	<< name_.c_str() << "\t" << number_of_vertices() << "\t" 
+		<< std::fixed << number_of_edges (lazy)	<< "\t"
+		<< std::setprecision(6) << density(true);		
+	////////////////////////////////////////////////////////////////
+
+	/*Note: lazy comp. of density since the number of edges have already been computed previously */
+
 	if (endl) { o << std::endl; }
 	return o;
 }
@@ -699,7 +709,7 @@ void Graph<T>::make_bidirected (){
 }
 
 template<class T>
-void Graph<T>::write_dimacs (ostream& o) {
+void Graph<T>::write_dimacs (ostream& o)  {
 /////////////////////////
 // writes file in dimacs format 
 	
