@@ -223,7 +223,7 @@ public:
 	void write_EDGES			(std::ostream& filename)				override;
 	
 	/*
-	* @brief writes undirected graph in MMX (Matrix Market) format
+	* @brief writes undirected graph in MMX (Matrix Exchange) format
 	* @param o output stream
 	*/
 	void write_mtx				(std::ostream& filename);				//MTX format only for Ugraph? (03/01/2025)
