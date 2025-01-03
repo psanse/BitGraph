@@ -29,16 +29,17 @@ Ugraph<T>::Ugraph(string filename) : Graph<T>()
 }
 
 template <class T>
-Ugraph<T>::Ugraph(std::size_t nV, int* adj[], string name) {
-	ptype::set_name(name);													
-	if (ptype::reset(nV) == -1) { 
+Ugraph<T>::Ugraph(std::size_t NV, int* adj[], string name) {
+														
+	if (ptype::reset(NV) == -1) {
 		LOG_ERROR("Bad graph construction - Ugraph<T>::Ugraph(std::size_t , int* adj[], string)");
 		LOG_ERROR("exiting...");
 		exit(-1);
 	}
+	ptype::set_name(name);
 
-	for (std::size_t i = 0; i < nV - 1; ++i) {
-		for (std::size_t j = i + 1; j < nV; ++j) {
+	for (std::size_t i = 0; i < NV - 1; ++i) {
+		for (std::size_t j = i + 1; j < NV; ++j) {
 			if (adj[i][j] == 1) {
 				add_edge(i, j);
 			}

@@ -23,9 +23,49 @@ using namespace std;
 //#define TEST_GRAPH_STEP_BY_STEP				//ON to control manually the start of each test
 #define print_test_graph_logs
 
+TEST(Ugraph, constructor_adj_matrix) {
+	
+	//build adjacency matrix
+	const int NV = 3;
+
+	int** adj = new int* [NV];
+	for (int i = 0; i < NV; i++) {
+		adj[i] = new int[NV];
+	}
+
+	//initialize adjacency matrix to zero
+	for (std::size_t i = 0; i < NV; i++) {
+		for (std::size_t j = 0; j < NV; j++) {
+			adj[i][j] = 0;
+		}
+	}
+
+	//adds directed edges
+	adj[0][1] = 1; 		//[0] -> [1]
+	adj[0][2] = 1; 		//[0] -> [2]
+
+	////////////////////////////////
+	ugraph ug(3, adj, "mygraph");				//undirected graph constructed from directed graph - only upper half of the adjacency matrix is read
+	////////////////////////////////
+
+	////////////////////////////////
+	EXPECT_TRUE(ug.is_edge(0, 1));
+	EXPECT_TRUE(ug.is_edge(0, 2));
+	EXPECT_TRUE(ug.is_edge(1, 0));
+	EXPECT_TRUE(ug.is_edge(2, 0));
+	EXPECT_STREQ("mygraph", ug.get_name().c_str());
+	////////////////////////////////
+
+	//deallcoate memory
+	for (std::size_t i = 0; i < NV; i++) {
+		delete[] adj[i];
+	}
+	delete[] adj;
+}
+
 TEST(Ugraph, equal_1) {
 
-	string path = TESTS_GRAPH_DATA_CMAKE;
+	string path = PATH_GRAPH_TESTS_CMAKE_SRC_CODE;
 
 	ugraph ug1(path + "brock200_1.clq");
 	ugraph ug2(ug1);
@@ -37,8 +77,7 @@ TEST(Ugraph, equal_1) {
 }
 
 TEST(Ugraph, equal_2) {
-	LOG_INFO("Ugraph: operator_equal ------------");
-
+	
 	ugraph g(7);
 	g.add_edge(0, 1);
 	g.add_edge(1, 2);
@@ -53,22 +92,19 @@ TEST(Ugraph, equal_2) {
 
 	///////////
 	g1 = g;
-	///////////
+	//////////
 
-	EXPECT_EQ(7, g1.number_of_vertices());
-	EXPECT_TRUE(g1.is_edge(0, 1));
-	EXPECT_TRUE(g1.is_edge(1, 2));
-	EXPECT_TRUE(g1.is_edge(2, 3));
-	EXPECT_TRUE(g1.is_edge(0, 3));
-	EXPECT_TRUE(g1.is_edge(5, 6));
+	//////////////////////////////////////////////
+	EXPECT_EQ	(7, g1.number_of_vertices());
+	EXPECT_TRUE	(g1.is_edge(0, 1));
+	EXPECT_TRUE	(g1.is_edge(1, 2));
+	EXPECT_TRUE	(g1.is_edge(2, 3));
+	EXPECT_TRUE	(g1.is_edge(0, 3));
+	EXPECT_TRUE	(g1.is_edge(5, 6));
 	EXPECT_FALSE(g1.is_edge(0, 2));
 	EXPECT_STREQ("toy", g1.get_name().c_str());
+	//////////////////////////////////////////////
 
-	LOG_INFO("Ugraph: END operator_equal --------");
-#ifdef TEST_GRAPH_STEP_BY_STEP
-	LOG_ERROR("press any key to continue");
-	cin.get();
-#endif;
 }
 
 TEST(Ugraph, degree) {
@@ -76,50 +112,64 @@ TEST(Ugraph, degree) {
 	string path = PATH_GRAPH_TESTS_CMAKE_SRC_CODE;
 	ugraph g(path + "sample.clq");
 
-	EXPECT_EQ(7, g.number_of_vertices());
-	EXPECT_EQ(11, g.number_of_edges());
-
-	//deg(1)=3
-	g.print_degrees();
-	EXPECT_EQ(3, g.degree(1));
+	EXPECT_EQ	(7, g.number_of_vertices());
+	EXPECT_EQ	(11, g.number_of_edges());
 	
+	/////////////////////////////
+	EXPECT_EQ	( 3, g.degree(1) );
+	/////////////////////////////
+	
+	//define a subset of vertices
+	bitarray bbset	(g.number_of_vertices());
+	bbset.set_bit	(0);
+	bbset.set_bit	(1);
+	bbset.set_bit	(6);
 
-	bitarray bba(g.number_of_vertices());
-	bba.set_bit(0);
-	bba.set_bit(1);
-	bba.set_bit(6);
-	EXPECT_EQ(1, g.degree(1, bba));
+	//////////////////////////////////
+	EXPECT_EQ	(1, g.degree(1, bbset) );		//degree of 1 in the subset {0,1,6}
+	/////////////////////////////////
 
-	bba.erase_bit();
-	bba.set_bit(0); bba.set_bit(1);
-	EXPECT_EQ(1, g.degree(1, bba));
+	//remove vertex {6} from the subset
+	bbset.erase_bit(6);
+	
+	//////////////////////////////////
+	EXPECT_EQ	(1, g.degree(1, bbset) );		//same result, the negihbor is vertex {0} not {6}
+	//////////////////////////////////
 
 }
 
-TEST(Ugraph, degree_brock) {
-	LOG_INFO("Graph: degree_brock -------------------");
-	string path = TEST_GRAPH_PATH_DATA;
+TEST(Ugraph, degree_dimacs) {
+	
+	string path = PATH_GRAPH_TESTS_CMAKE_SRC_CODE;
 	ugraph g(path + "brock200_1.clq");
 
 
-	EXPECT_EQ(200, g.number_of_vertices());
-	EXPECT_EQ(14834, g.number_of_edges());
+	EXPECT_EQ		(200, g.number_of_vertices());
+	EXPECT_EQ		(14834, g.number_of_edges());
 
-	bitarray bba(g.number_of_vertices());
-	EXPECT_FALSE(g.is_edge(0, 1));		//(1)
+	///////////////////////////////////////////
+	EXPECT_FALSE(g.is_edge(0, 1));								//(1)	
+	///////////////////////////////////////////
 
-	bba.set_bit(0); bba.set_bit(1);
-	EXPECT_EQ(0, g.degree(1, bba));		//expected because of (1)
+	//define a subset of vertices
+	bitarray bbset (g.number_of_vertices());
+	bbset.set_bit(0);
+	bbset.set_bit(1);
 
-	bba.set_bit(0, g.number_of_vertices() - 1);
-	EXPECT_EQ(g.get_neighbors(1).popcn64(), g.degree(1, bba));
+	///////////////////////////////////////////
+	EXPECT_EQ	(0, g.degree(1, bbset) );						//expected because of (1)
+	///////////////////////////////////////////
 
-	LOG_INFO("Graph: END degree_brock------");
-#ifdef TEST_GRAPH_STEP_BY_STEP
-	LOG_ERROR("press any key to continue");
-	cin.get();
-#endif;
+	//set of all vertices
+	bbset.set_bit(0, g.number_of_vertices() - 1);
+
+	//////////////////////////////////////////////
+	EXPECT_EQ(g.degree(1), g.degree(1, bbset));
+	//////////////////////////////////////////////
+
 }
+
+//TODO - CONTINUE REFACTORIZING THE CODE (04/01/2025)
 
 TEST(Ugraph, max_subgraph_degree) {
 	LOG_INFO("Graph: max_degree_subgraph ------------------------");
@@ -336,55 +386,7 @@ TEST(Ugraph, DISABLED_add_single_vertex) {
 #endif;
 }
 
-TEST(Ugraph, graph_from_adj_mat) {
-	///////////////////
-	// Undirected graphs read by directed graph class (all edges are non symmetrical)
 
-	LOG_INFO("Ugraph: graph_from_ady_mat ------------");
-
-	//build adyacency matrix
-	const int NV = 3;
-
-	int** adj = new int*[NV];
-	for (int i = 0; i < NV; i++) {
-		adj[i] = new int[NV];
-	}
-	for (int i = 0; i < NV; i++) {
-		for (int j = 0; j < NV; j++) {
-			adj[i][j] = 0;
-		}
-	}
-	adj[0][1] = 1; 		//[0] -> [1]
-	adj[0][2] = 1; 		//[0] -> [2]
-
-	ugraph ug(3, adj, "mygraph");
-
-	//TESTS
-	EXPECT_TRUE(ug.is_edge(0, 1));
-	EXPECT_TRUE(ug.is_edge(0, 2));
-	EXPECT_TRUE(ug.is_edge(1, 0));
-	EXPECT_TRUE(ug.is_edge(2, 0));
-
-	//I/O
-#ifdef print_test_graph_logs
-	stringstream sstr;
-	ug.print_data(true, sstr);
-	ug.print_adj(sstr);
-	LOGG_INFO(sstr.str());
-#endif
-
-	for (int i = 0; i < NV; i++) {
-		delete[] adj[i];
-	}
-	delete[] adj;
-	
-
-	LOG_INFO("Ugraph: END graph_from_ady_mat------");
-#ifdef TEST_GRAPH_STEP_BY_STEP
-	LOG_ERROR("press any key to continue");
-	cin.get();
-#endif;
-}
 
 TEST(Ugraph, complement_graph){
 

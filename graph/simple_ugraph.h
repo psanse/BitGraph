@@ -49,6 +49,12 @@ public:
 	Ugraph						() : Graph() {}										//creates empty graph
 	Ugraph						(std::size_t n) : Graph(n){}						//creates empty graph of size n=|V|	
 	Ugraph						(std::string filename);								//reads graph from file
+	
+	/*
+	* @brief Creates a graph from an C-style adjacency matrix
+	*		 
+	*		Reads only the upper triangle of the adjacency matrix
+	*/
 	Ugraph						(std::size_t n, int* adj[], string name);			//old-style adjacency matrix
    	
 	//TODO copy constructor, move constructor, copy operator =, move operator = (1/1/2025)
