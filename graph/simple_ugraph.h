@@ -214,7 +214,8 @@ public:
 		
 		
 ////////////
-// Read / write basic operations
+// Write basic operations
+// Note: Read operations are inherited from the base class Graph (using the Template Pattern)
 public:
 	/*
 	* @brief writes undirected graph in dimacs format

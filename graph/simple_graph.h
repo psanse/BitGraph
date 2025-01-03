@@ -49,10 +49,10 @@ public:
 	Graph								(std::size_t n, int* adj[], std::string filename = "");		//old-style adjacency matrix
 
 	
-	Graph								(Graph&& g)		= default;		//move constructor
-	Graph								(const Graph& g)= default;		//copy constructor
-	Graph& operator =					(const Graph& g)= default;		//copy operator =
-	Graph& operator =					(Graph&& g)		= default;		//move operator =
+	Graph								(Graph&& g)		= default;									//move constructor
+	Graph								(const Graph& g)= default;									//copy constructor
+	Graph& operator =					(const Graph& g)= default;									//copy operator =
+	Graph& operator =					(Graph&& g)		= default;									//move operator =
 	
 
 	//destructor	
@@ -250,7 +250,7 @@ public:
 virtual	bool is_edge					(int v, int w)			const { return(adj_[v].is_bit(w)); }
 	
 	/*
-	* @brief returns TRUE is  (v, v) edges are present
+	* @brief returns TRUE if (v, v) edges are present
 	*/
 	bool is_self_loop					()						const;
 
