@@ -21,24 +21,31 @@
 ////////////////////////
 
 template<>
-inline Graph<sparse_bitarray>& Graph<sparse_bitarray>::create_subgraph(std::size_t size, Graph<sparse_bitarray>& newg) {
+inline Graph<sparse_bitarray>& Graph<sparse_bitarray>::create_subgraph(std::size_t first_k, Graph<sparse_bitarray>& newg) const{
 	//////////////////////////
 	// creates new subgraph with vertex set V=[1,2,..., size]
 	//
 	// RETURNS: reference to the new subgraph
 
-		//assert is size required is greater or equal current size
-	if (size >= NV_ || size <= 0) {
-		LOG_ERROR("Graph<sparse_bitarray>& Graph<sparse_bitarray>::create_subgraph-wrong shrinking size for graph. Remains unchanged");
-		return *this;
+	//assert is size required is greater or equal current size
+	if (first_k >= NV_ || first_k <= 0) {
+		LOG_ERROR("Bad new size - graph remains unchanged - Graph<sparse_bitarray>::create_subgraph");
+		return newg;
 	}
 
-	newg.init(size);
+	if (newg.reset(first_k) == -1) {
+		LOG_ERROR("memory for graph not allocated - Graph<sparse_bitarray>::create_subgraph");
+		return newg;
+	}
+
+		
+
+	newg.init(first_k);
 
 	//copies to the new graph
 	for (int i = 0; i < newg.NV_; i++) {
 		newg.adj_[i] = adj_[i];
-		newg.adj_[i].clear_bit(size, EMPTY_ELEM);		//from size to the end
+		newg.adj_[i].clear_bit(first_k, EMPTY_ELEM);		//from size to the end
 	}
 
 	return newg;

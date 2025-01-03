@@ -121,8 +121,7 @@ TEST(Ugraph, degree_brock) {
 #endif;
 }
 
-
-TEST(Ugraph, max_degree_subgraph) {
+TEST(Ugraph, max_subgraph_degree) {
 	LOG_INFO("Graph: max_degree_subgraph ------------------------");
 	ugraph g(100);
 	g.add_edge(0, 1);
@@ -134,13 +133,13 @@ TEST(Ugraph, max_degree_subgraph) {
 
 	bitarray sg(g.number_of_vertices());
 	sg.init_bit(0, 3);
-	EXPECT_EQ(3, g.max_degree_of_subgraph(sg));	//1(3)
+	EXPECT_EQ(3, g.max_subgraph_degree(sg));	//1(3)
 
 	sg.init_bit(0, 2);
-	EXPECT_EQ(2, g.max_degree_of_subgraph(sg));  //1(2)
+	EXPECT_EQ(2, g.max_subgraph_degree(sg));  //1(2)
 
 	sg.init_bit(78, 79);						//78(1)
-	EXPECT_EQ(1, g.max_degree_of_subgraph(sg));
+	EXPECT_EQ(1, g.max_subgraph_degree(sg));
 
 	LOG_INFO("Graph: END max_degree_subgraph------");
 #ifdef TEST_GRAPH_STEP_BY_STEP
@@ -194,7 +193,7 @@ TEST(Ugraph, create_induced) {
 	lv.push_back(2);  lv.push_back(3); lv.push_back(5); lv.push_back(6);
 
 	////////////////////////////////
-	int status = g.create_induced(ugi, lv);		 //G(lv)
+	int status = g.create_subgraph(ugi, lv);		 //G(lv)
 	////////////////////////////////
 	ASSERT_EQ(0, status);
 	ASSERT_EQ(4, ugi.number_of_vertices());
@@ -209,7 +208,7 @@ TEST(Ugraph, create_induced) {
 #endif
 
 	////////////////////////////////
-	status = g.create_induced(ugi, 0);				//G(N(0), neighbour set indiced
+	status = g.create_subgraph(ugi, 0);				//G(N(0), neighbour set indiced
 	////////////////////////////////
 	ASSERT_EQ(0, status);
 	ASSERT_EQ(2, ugi.number_of_vertices());
@@ -251,9 +250,9 @@ TEST(Ugraph, DISABLED_add_vertex_multiple) {
 	bbn.set_bit(0);
 	bbn.set_bit(3);
 
-	g.add_vertex(&bbn);			//extends graph according to the @bbn neighborhood
-	g.add_vertex(&bbn);			//extends graph according to the @bbn neighborhood
-	g.add_vertex(&bbn);			//extends graph according to the @bbn neighborhood
+	//g.add_vertex(&bbn);			//extends graph according to the @bbn neighborhood
+	//g.add_vertex(&bbn);			//extends graph according to the @bbn neighborhood
+	//g.add_vertex(&bbn);			//extends graph according to the @bbn neighborhood
 
 /////////////////
 //TESTS
@@ -304,7 +303,7 @@ TEST(Ugraph, DISABLED_add_single_vertex) {
 	bbn.set_bit(0);
 	bbn.set_bit(3);
 
-	g.add_vertex(&bbn);			//extends graph according to the @bbn neighborhood
+	//g.add_vertex(&bbn);			//extends graph according to the @bbn neighborhood
 	
 #ifdef	print_graph_logs
 	g.print_data(false, cout, true);
@@ -323,7 +322,7 @@ TEST(Ugraph, DISABLED_add_single_vertex) {
 ///////////////////
 //Extends graph by one vertex with empty neighborhood
 
-	g.add_vertex();	
+	//g.add_vertex();	
 	EXPECT_EQ(g.number_of_vertices(), NV + 2);
 	EXPECT_EQ(g.number_of_edges(false), 4 + 2);
 	v = NV + 1;

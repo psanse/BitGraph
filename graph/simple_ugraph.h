@@ -3,7 +3,7 @@
  *						(no self loops)
  *
  * @creation_date 17/6/10
- * @last_update 01/01/25
+ * @last_update 03/01/25
  * @dev pss
  *
  * This code is part of the GRAPH C++ library for bit encoded
@@ -70,58 +70,175 @@ public:
 	BITBOARD number_of_edges	(const T&) 								const override;			
 
 /////////////
-// basic operations
+// Basic operations
 
-//TODO implement bitstring conversions according to the templates properly (3/4/18) - CHECK (02/01/2025)
+	/*
+	* @brief density of the undirected graph
+	* @param lazy reads NE_ cached value if TRUE
+	*/
+	double density				(bool lazy = true )						override;
+
+	/*
+	* @brief Computes complement graph
+	* @param g output complement graph
+	* @return 0 if success, -1 if error 
+	*/
+	int create_complement		(Ugraph& g)									const;	
+
+
+/////////////
+// degree-related operations
+// TODO implement bitstring conversions according to the templates properly (3/4/18) - CHECK (02/01/2025)
 public:
 
 	/*
-	* @brief computes the number of neighbors of v (deg(v))
+	* @brief Computes the number of neighbors of v (deg(v))	*		
 	*/
 	int degree					(int v)									const { return ptype::adj_[v].popcn64(); }
 	
 	/*
 	*  @brief number of neighbors of v in a set of vertices
+	* 
+	*		  (specialized for sparse graphs)
+	* 
+	*  @param bbn input non-sparse (bit) set of vertices
 	*/
 	int degree					(int v, const BitBoardN& bbn)			const;
+	
+	/*
+	*  @brief number of neighbors of v in a sparse encoded set of vertices
+	* 
+	*		  (sparse graphs ONLY )
+	* 
+	*  @param bbn input sparse (bit) set of vertices
+	*/
 	int degree					(int v, const BitBoardS& bbs)			const;
 
-	int degree(int v, int UB, const BitBoardN& bbn)						const;  //truncated degree (14/2/2016)
-	int degree(int v, int UB, const BitBoardS& bbs)						const;	//truncated degree  (14/2/2016)
-	int degree_up(int v, const BitBoardN& bbn)							const;  //TODO: test (27/4/2016)
-	int max_degree_of_graph()											const;
-	int max_degree_of_subgraph(T& sg)									const;
-
-
-
-virtual	void add_edge			(int v, int w);									//sets bidirected edge
-virtual	void remove_edge		(int v, int w);
-virtual	void remove_vertices	(const BitBoardN& bbn) = delete;				//commented out implementation - EXPERIMENTAL
-				
-	
-
-
-	//graph creation	
-	int create_complement		(Ugraph& g)								const;			//returns complement graph in g
-	int create_induced			(Ugraph& g, int v)						const;			//returns induced subgraph on g by the neighborhood of v (29/08/2021)
-	int create_induced			(Ugraph& g, std::vector<int>& lv)		const;			//returns induced subgraph on g by the set of vertices lv
-
-	int add_vertex				(_bbt* neigh = NULL);	//***BUGGY!-***enlarges the graph with a new vertex (provided its neighborhood)
-
-	//properties
-	double density				(bool lazy=true);
-	
-	//I/O
-	ostream& print_degrees			(std::ostream& = std::cout)			const;
-virtual	ostream& print_edges		(std::ostream& = std::cout)			const;
-virtual ostream& print_edges		(T& bbsg, std::ostream& = std::cout)	const;
-virtual	ostream& print_matrix		(std::ostream& = std::cout)			const;
-
+	/*
+	*  @brief truncated number of neighbors of v in a set of vertices
+	* 
+	*		  (specialized for sparse graphs)
+	* 
+	*  @param bbn input (bit) set of vertices
+	*  @returns neighbors of v if <= UB, otherwise UB
+	*/
+	int degree					(int v, int UB, const BitBoardN& bbn)	const;  //truncated degree (14/2/2016)
 		
-virtual	void write_dimacs			(std::ostream & filename);
-virtual	void write_EDGES			(std::ostream & filename);
-		void write_mtx				(std::ostream & filename);
+	/*
+	*  @brief truncated number of neighbors of v in a sparse enconded set of vertices
+	*
+	*		  (ONLY for sparse graphs)
+	*
+	*  @param bbn input sparse (bit) set of vertices
+	*  @returns neighbors of v if <= UB, otherwise UB
+	*/
+	int degree					(int v, int UB, const BitBoardS& bbs)	const;	//truncated degree  (14/2/2016)
+	
+	int degree_up				(int v, const BitBoardN& bbn)			const;  //TODO: test (27/4/2016)
+	
+	/*
+	*  @brief returns the maximum degree of the graph, 
+	*         i.e., the maximum degree of any of its vertices
+	*/
+	int max_graph_degree		()										const;
+	
+	/*
+	*  @brief returns the maximum degree of an induced subgraph
+	*  @param sg input (bit) set of vertices of the subgraph
+ 	*/
+	template<class bitset_t>
+	int max_subgraph_degree		(bitset_t& sg)							const;
+
+	//TODO implement min_degree (03/01/2025)
+	
+//////////////	
+// Modifiers
+public:
+
+	/*
+	* @brief Adds bidirectional edge {v, w}
+	*		 a) no self-loops are added (currently no feedback)
+	*		 b) keeps track of the number of edges
+	* @param v endpoint
+	* @param w endpoint
+	*/
+	void add_edge				(int v, int w)  override;					
+	
+	/*
+	* @brief Removes bidirectional edge {v, w}
+	*		 a) if self_loop (v = w), graph remains unchanged
+	*		 b) keeps track of the number of edges
+	* @param v endpoint
+	* @param w endpoint
+	*/
+	void remove_edge			(int v, int w)	override;
+
+//////////////	
+// deleted - CHECK	
+virtual	void remove_vertices	(const BitBoardN& bbn) = delete;				//commented out implementation - EXPERIMENTAL
+	
+	/*	
+	*  @brief enlarges the graph with a new vertex (provided its neighborhood)
+	*		  TODO - code removed, BUGGY (should not be called , unit tests DISABLED)
+	*/
+	int add_vertex				( _bbt* neigh = NULL) = delete;								
+
+
+//////////////	
+// Induced subgraphs
+
+//TODO	Graph& create_subgraph	(std::size_t first_k, Graph& g) const  override;
+
+	int create_subgraph			(Ugraph& g, int v)						const;			//returns induced subgraph on g by the neighborhood of v (29/08/2021)
+	int create_subgraph			(Ugraph& g, std::vector<int>& lv)		const;			//returns induced subgraph on g by the set of vertices lv
+		
+////////////
+// Read / write operations
+public:
+
+	virtual	void write_dimacs	(std::ostream& filename);
+	virtual	void write_EDGES	(std::ostream& filename);
+	void write_mtx				(std::ostream& filename);
+
+
+/////////////////	
+//I/O operations
+public:
+
+	ostream& print_degrees		(std::ostream& = std::cout)			const;
+virtual	ostream& print_edges	(std::ostream& = std::cout)			const;
+virtual ostream& print_edges	(T& bbsg, std::ostream& = std::cout)const;
+virtual	ostream& print_matrix	(std::ostream& = std::cout)			const;
+
 };
+
+///////////////////////////////////////////////////////
+
+////////////
+// Necessary implementation of template methods in header file
+
+template<class T>
+template<class bitset_t>
+inline
+int Ugraph<T>::max_subgraph_degree (bitset_t& sg) const {
+	
+	int max_degree = 0, temp = 0;
+
+	int v = EMPTY_ELEM;
+	if (sg.init_scan(bbo::NON_DESTRUCTIVE) != EMPTY_ELEM) {
+		while (true) {
+			v = sg.next_bit();
+			if (v == EMPTY_ELEM) break;
+
+			//compute max_degree circumscribed to subgraph
+			temp = degree (v, sg);
+			if (temp > max_degree)
+				max_degree = temp;
+		}
+	}
+
+	return max_degree;
+}
 
 #endif
 

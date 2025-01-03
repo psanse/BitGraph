@@ -25,9 +25,9 @@
 #ifndef __GRAPH_H__
 #define __GRAPH_H__
 
-#include "simple_sparse_graph.h"
+//#include "simple_sparse_graph.h"
+//#include "simple_sparse_ugraph.h"
 #include "simple_ugraph.h"
-
 
 
 //the only possible graphs

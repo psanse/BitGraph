@@ -2,6 +2,7 @@
 # The extension is already found. Any number of sources could be listed here.
 set(useful_headers_for_IDE simple_graph.h
 simple_sparse_graph.h
+simple_sparse_ugraph.h
 simple_ugraph.h
 simple_graph_ew.h
 simple_graph_w.h
@@ -80,8 +81,8 @@ add_executable (test_graph  tests/gtest_main.cpp
 #  ./tests/test_graph_map.cpp
 
 #   TESTS UNDER DEVELOPMENT  / CHECKING
-	tests/test_graph.cpp
-#	tests/test_ugraph.cpp
+#	tests/test_graph.cpp
+	tests/test_ugraph.cpp
 #	tests/test_sparse_graph.cpp
 
 #	TESTS CHECKED

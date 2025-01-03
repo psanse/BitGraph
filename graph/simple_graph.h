@@ -230,7 +230,7 @@ virtual void remove_edge				(int v, int w);
 	* @param g output new induced subgraph
 	* @returns the new induced subgraph (if the operation fails, g remains unchanged)
 	*/
-	Graph& create_subgraph				(std::size_t first_k, Graph& g);
+virtual	Graph& create_subgraph			(std::size_t first_k, Graph& g) const;
 
 	/*
 	* @brief creates the subgraph induced by the vertices NOT in the input set
@@ -299,7 +299,21 @@ protected:
 	std::string path_;		//path of instance
 };
 
+///////////////////////////////////////////////////////
+
+////////////
+// Necessary implementation of template methods in header file
+
 template <class T>
 inline bool operator == (const Graph<T>& lhs, const Graph<T>& rhs) {	return lhs.adj_ == rhs.adj_; }
 
+template<class T>
+template <class bitset_t>
+inline double Graph<T>::density(const bitset_t& bbN) {
+	BITBOARD  edges = number_of_edges(bbN);
+	if (edges == 0) { return 0.0; }
+
+	BITBOARD  pc = bbN.popcn64();
+	return edges / static_cast<double>(pc * (pc - 1) / 2);
+}
 #endif

@@ -213,7 +213,7 @@ int Graph<T>::reset	(std::size_t NV, string name) {
 }
 
 template<class T>
-Graph<T>& Graph<T>::create_subgraph (std::size_t first_k, Graph<T>& newg)  {
+Graph<T>& Graph<T>::create_subgraph (std::size_t first_k, Graph<T>& newg) const  {
 
 	//assert is size required is greater or equal current size
 	if(first_k >= NV_ || first_k <= 0){
@@ -610,15 +610,7 @@ double Graph<T>::block_density	()	const {
 //}
 
 
-template<class T>
-template <class bitset_t>
-double Graph<T>::density(const bitset_t& bbN )  {
-	BITBOARD  edges = number_of_edges(bbN);
-	if (edges == 0) { return 0.0; }
 
-	BITBOARD  pc = bbN.popcn64();
-	return edges / static_cast<double>(pc * (pc-1) / 2);
-}
 
 template<class T>
 bool Graph<T>::is_self_loop () const{
