@@ -162,14 +162,16 @@ virtual	double density					(bool lazy=true);
 	double density						(const bitset_t& set);
 	
 	/*
-	* @brief number of empty bit blocks / total number of bit blocks
-	* 
-	*		 Specialized for sparse graphs
+	* @brief number of non-empty bit blocks / total number of bit blocks
+	*		
+			 Specialized for sparse graphs
+	*		 (in the case of sparse graphs, density is expected to be 1.0)
+	*		
 	*/	
 	double block_density				()						const;
 	
 	/*
-	* @brief number of allocated blocks /total possible number of blocks
+	* @brief number of allocated blocks / total possible number of blocks
 	*
 	*		 ONLY for sparse graphs
 	*/	
@@ -284,7 +286,11 @@ public:
 	* @brief writes directed graph in dimacs format
 	* @param o output stream
 	*/
-	virtual	void  write_dimacs				(std::ostream& o);
+	virtual	void  write_dimacs			(std::ostream& o);
+
+	std::ostream& timestamp_dimacs		(std::ostream& o = std::cout);
+	std::ostream& name_dimacs			(std::ostream& o = std::cout);
+	std::ostream& header_dimacs			(std::ostream& o = std::cout, bool lazy = true);
 
 	/*
 	* @brief writes directed graph in edge list format

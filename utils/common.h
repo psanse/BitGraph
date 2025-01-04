@@ -171,6 +171,7 @@ namespace com {
 		   f.close();
 		   return 0;
 	   }
+
    }
 
     namespace counting{

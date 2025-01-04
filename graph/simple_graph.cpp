@@ -75,30 +75,7 @@ Graph<T>::Graph(std::size_t nV, int* adj[], string filename) {
 	}
 }
 
-template <class T>
-ostream& Graph<T>::print_adj (std::ostream& o, bool add_endl){
-////////////////////
-// prints adjacency 1-0 matrix (vertex weights removed, cannot be here!)
-//
-// COMMENTS: vertex weights removed! cannot be  here (28/07/19)
-//
-// TODO@ test (3/12/17)
 
-		
-	for(int i=0; i<NV_; i++){
-		for(int j=0; j<NV_; j++){
-			/*if(i==j && m_is_wv){
-				o<<m_wv[i]<<" ";
-			}else*/ if(is_edge(i,j)){
-				o<<"1"<<" ";
-			}else {o<<"0"<<" ";}			
-		}
-		o<<endl;
-	}
-
-	if(add_endl) o<<endl;
-	return o;	
-}
 
 template<class T>
 void Graph<T>::set_name(std::string name){
@@ -295,6 +272,51 @@ void Graph<T>::remove_edges (int v){
 	//updates edges
 	NE_ = 0;					//resets edges to avoid lazy evaluation later
 	//number_of_edges(false);
+}
+
+template <class T>
+ostream& Graph<T>::print_adj(std::ostream& o, bool add_endl) {
+	////////////////////
+	// prints adjacency 1-0 matrix (vertex weights removed, cannot be here!)
+	//
+	// COMMENTS: vertex weights removed! cannot be  here (28/07/19)
+	//
+	// TODO@ test (3/12/17)
+
+
+	for (int i = 0; i < NV_; i++) {
+		for (int j = 0; j < NV_; j++) {
+			/*if(i==j && m_is_wv){
+				o<<m_wv[i]<<" ";
+			}else*/ if (is_edge(i, j)) {
+				o << "1" << " ";
+			}
+			else { o << "0" << " "; }
+		}
+		o << endl;
+	}
+
+	if (add_endl) o << endl;
+	return o;
+}
+
+template<class T>
+std::ostream& Graph<T>::timestamp_dimacs(std::ostream& o) {
+	o << "c File written by GRAPH:" << PrecisionTimer::local_timestamp();
+	return o;
+}
+
+template<class T>
+std::ostream& Graph<T>::name_dimacs(std::ostream& o){
+	if (!name_.empty())
+		o << "\nc " << name_.c_str() << endl;
+	return o;
+}
+
+template<class T>
+std::ostream& Graph<T>::header_dimacs(std::ostream& o, bool lazy){
+	o << "p edge " << NV_ << " " << number_of_edges(lazy) << endl << endl;
+	return o;
 }
 
 template<class T>
@@ -697,14 +719,13 @@ template<class T>
 void Graph<T>::write_dimacs ( ostream& o)  {
 
 	//timestamp comment
-	o << "c File written by GRAPH:" << PrecisionTimer::local_timestamp();
-	
-	//name comment
-	if( !name_.empty() )
-		o << "\nc " << name_.c_str() << endl;
+	timestamp_dimacs(o);
 
-	//dimacs header
-	o << "p edge " << NV_ << " " << number_of_edges(false /* recompute */) << endl << endl;
+	//name comment
+	name_dimacs(o);
+
+	//dimacs header - recompute edges
+	header_dimacs(o, false);
 
 	//write edges 1-based vertex notation 
 	for ( std::size_t v = 0; v < NV_; ++v ){

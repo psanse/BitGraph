@@ -22,101 +22,77 @@
 
 template<>
 inline Graph<sparse_bitarray>& Graph<sparse_bitarray>::create_subgraph(std::size_t first_k, Graph<sparse_bitarray>& newg) const{
-	//////////////////////////
-	// creates new subgraph with vertex set V=[1,2,..., size]
-	//
-	// RETURNS: reference to the new subgraph
-
-	//assert is size required is greater or equal current size
+	
+	//assertions
 	if (first_k >= NV_ || first_k <= 0) {
 		LOG_ERROR("Bad new size - graph remains unchanged - Graph<sparse_bitarray>::create_subgraph");
 		return newg;
 	}
 
+	//allocates memory for the new graph
 	if (newg.reset(first_k) == -1) {
 		LOG_ERROR("memory for graph not allocated - Graph<sparse_bitarray>::create_subgraph");
 		return newg;
 	}
-
 		
 
-	newg.init(first_k);
-
-	//copies to the new graph
+	//copies first k elements of the adjacency matrix 
 	for (int i = 0; i < newg.NV_; i++) {
 		newg.adj_[i] = adj_[i];
-		newg.adj_[i].clear_bit(first_k, EMPTY_ELEM);		//from size to the end
+		newg.adj_[i].clear_bit(first_k, EMPTY_ELEM);		//closed range
 	}
 
 	return newg;
 }
 
 template<>
-inline int Graph<sparse_bitarray>::shrink_to_fit(std::size_t size) {
-	/////////////////////
-	// shrinks graph to the size passed (must be less than current size)
+inline int Graph<sparse_bitarray>::shrink_to_fit (std::size_t size) {
+	
+	//assertions
 	if (NV_ <= size) {
-		LOG_ERROR("Graph<sparse_bitarray>::shrink_to_fit-wrong shrinking size for graph, remains unchanged");
+		LOG_ERROR("Wrong shrinking size ", size, " the graph remains unchanged - Graph<sparse_bitarray>::shrink_to_fit");
 		return -1;
 	}
 
 	//trims vertices 
 	for (int i = 0; i < size; i++) {
-		adj_[i].clear_bit(size, EMPTY_ELEM);		//from size to the end
+		adj_[i].clear_bit(size, EMPTY_ELEM);				//closed range
 	}
 
 	//resizes adjacency matrix
 	adj_.resize(size);
 	NV_ = size;
-	NE_ = 0;									//so that when needed will be recomputed
+	NE_ = 0;												//so that when required, the value will be recomputed
+	NBB_ = INDEX_1TO1(size);								//maximum number of bitblocks per row (for sparse graphs)		
 
 	return 0;
 }
 
-
-template<>
-inline BITBOARD Graph<sparse_bitarray>::number_of_edges(bool lazy) {
-	//specialization for sparse graphs (is adjacent runs in O(log)) 
-	// 
-
-	if (lazy && NE_ != 0)
-		return NE_;
-
-	BITBOARD  edges = 0;
-	for (int i = 0; i < NV_; i++) {
-		edges += adj_[i].popcn64();
-	}
-	NE_ = edges;
-
-	return NE_;
-}
-
 template<>
 inline double Graph<sparse_bitarray>::block_density()	const {
-	/////////////////////////
-	// specialization for sparse graphs
-	//
-	// RESULT: should be a 1.0 ratio, since only non-zero bitblocks are stored
 
-	size_t nBB = 0; size_t nBBt = 0;
-	for (int v = 0; v < NV_; ++v) {
+	std::size_t nBB = 0;							//number of non-empty bitblocks	
+	std::size_t nBBt = 0;							//number of allocated bitblocks (all should be non-empty in the sparse case)
+
+	for (std::size_t v = 0; v < NV_; ++v) {
 		nBBt += adj_[v].number_of_bitblocks();
-		for (int bb = 0; bb < adj_[v].number_of_bitblocks(); bb++) {
-			if (adj_[v].get_bitboard(bb))
-				nBB++;
+		for (std::size_t bb = 0; bb < adj_[v].number_of_bitblocks(); bb++) {
+			if (adj_[v].get_bitboard(bb)) {
+				nBB++;								//nBB should be equal to nBBt
+			}
 		}
 	}
 
-	return nBB / double(nBBt);
+	return nBB / static_cast<double>(nBBt);			//density should be 1.0
 }
 
 template<>
 inline double Graph<sparse_bitarray>::block_density_sparse() const {
-	
-	std::size_t nBB = 0, nBBt = 0;
+									
+	std::size_t nBBt = 0;							//number of allocated bitblocks (all should be non-empty in the sparse case)
 	
 	//number of allocated blocks
-	for (int v = 0; v < NV_; ++v) {
+	for (std::size_t v = 0; v < NV_; ++v) {
 		nBBt += adj_[v].number_of_bitblocks();
 	}
 
@@ -129,14 +105,15 @@ inline double Graph<sparse_bitarray>::block_density_sparse() const {
 template<>
 inline double Graph<sparse_bitarray>::average_block_density_sparse() const {
 
-	size_t nBB = 0, nBBt = 0;
+	std::size_t nBB = 0;							//number of non-empty bitblocks	
+	std::size_t nBBt = 0;							//number of allocated bitblocks (all should be non-empty in the sparse case)
 	double den = 0.0;
 		
-	for (int i = 0; i < NV_; ++i) {
+	for (std::size_t i = 0; i < NV_; ++i) {
 		nBB = adj_[i].number_of_bitblocks();
 		nBBt += nBB;
-		int pc = adj_[i].popcn64();
-		den += static_cast<double>(pc) / (BITBOARD(nBB) * WORD_SIZE);
+		den += static_cast<double>(adj_[i].popcn64()) /
+				( BITBOARD(nBB) * WORD_SIZE );
 	}
 
 	return (den / nBBt);
@@ -144,29 +121,30 @@ inline double Graph<sparse_bitarray>::average_block_density_sparse() const {
 
 template<>
 inline void Graph<sparse_bitarray>::write_dimacs(ostream& o) {
-	/////////////////////////
-	// writes file in dimacs format 
 
-		//***timestamp 
 
-		//name
-	if (!name_.empty())
-		o << "\nc " << name_.c_str() << endl;
+	//timestamp comment
+	timestamp_dimacs(o);
 
-	//tamaño del grafo
-	o << "p edge " << NV_ << " " << number_of_edges() << endl << endl;
+	//name comment
+	name_dimacs(o);
 
-	//Escribir nodos
-	for (int v = 0; v < NV_; v++) {
+	//dimacs header - does not recompute edges, can be a heavy operation
+	header_dimacs(o, true);
+
+
+	//write edges 1-based vertex notation
+	for (std::size_t v = 0; v < NV_; ++v) {
+
 		//non destructive scan of each bitstring
 		if (adj_[v].init_scan(bbo::NON_DESTRUCTIVE) != EMPTY_ELEM) {
 			while (1) {
 				int w = adj_[v].next_bit();
-				if (w == EMPTY_ELEM)
-					break;
+				if (w == EMPTY_ELEM) { break; }
 				o << "e " << v + 1 << " " << w + 1 << endl;
 			}
 		}
+
 	}
 }
 
