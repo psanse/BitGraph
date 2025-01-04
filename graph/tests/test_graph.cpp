@@ -8,14 +8,12 @@
 */
 
 #include "../graph.h"
-#include "../graph/algorithms/graph_conversions.h"
 #include "gtest/gtest.h"
-#include "utils/common_paths.h"
+//#include "utils/common_paths.h"
 #include <iostream>
 
 using namespace std;
 using vint = vector<int>;
-
 
 class GraphTest : public ::testing::Test {
 protected:
@@ -219,7 +217,7 @@ TEST_F(GraphTest, equal) {
 
 TEST(Graph, equal_dimacs) {
 
-	string path = TESTS_GRAPH_DATA_CMAKE;
+	string path = PATH_GRAPH_TESTS_CMAKE_SRC_CODE;
 	
 	graph g1(path + "brock200_1.clq");
 	graph g2(g1);
@@ -323,6 +321,107 @@ TEST(Graph, remove_edges) {
 	EXPECT_EQ(1, g.number_of_edges());
 
 }
+
+TEST(Graph, shrink_to_fit) {
+
+	graph g(100);
+	g.add_edge(0, 1);
+	g.add_edge(1, 2);
+	g.add_edge(2, 3);
+	g.add_edge(0, 3);
+	g.add_edge(54, 55);
+	g.add_edge(88, 89);
+	g.add_edge(88, 90);
+	g.add_edge(89, 90);
+
+	//shrinking not possible in non-sparse graphs
+	int status = g.shrink_to_fit(50);
+
+	////////////////////////////
+	ASSERT_EQ(-1, status);
+	////////////////////////////
+
+}
+
+TEST(Graph, create_subgraph){
+
+	const int NV = 100;
+
+	graph g(NV);
+	g.add_edge(0,1);
+	g.add_edge(1,2);
+	g.add_edge(2,3);
+	g.add_edge(0,3);
+	g.add_edge(54,55);
+	g.add_edge(88,89);
+	g.add_edge(88,90);
+	g.add_edge(89,90);
+
+	//creates subgraph with first 50 vertices
+	graph g1;
+	g.create_subgraph(50, g1);
+
+	////////////////////////////////////////
+	EXPECT_EQ(50, g1.number_of_vertices());
+	EXPECT_EQ(4, g1.number_of_edges());			//0->1, 1->2, 2->3, 0->3
+	////////////////////////////////////////
+
+	//creates subgraph with first 3 vertices
+	g.create_subgraph(3, g1);
+	EXPECT_EQ(3, g1.number_of_vertices());
+	EXPECT_EQ(2, g1.number_of_edges());			//0->1, 1->2 
+	
+}
+
+
+//////////////////
+//
+// CHECK THE FOLLOWING TESTS
+//
+/////////////////
+
+//TEST(Graph_test,average_block_density){
+//	const int NUM_BB=4;
+//	graph g(64*NUM_BB);
+//	g.add_edge(0,1);
+//	g.add_edge(1,2);
+//	g.add_edge(0,2);
+//	
+//	int nV=g.number_of_vertices();
+//	EXPECT_DOUBLE_EQ(2.0/(nV*NUM_BB) ,g.block_density());		//around 1/500 of useful bitblocks
+//	
+//	sparse_graph g1(64*NUM_BB);
+//	g1.add_edge(0,1);
+//	g1.add_edge(1,2);
+//	g1.add_edge(0,2);
+//
+//	EXPECT_DOUBLE_EQ(1.0, g1.block_density());					//all bitblocks are supposed to be non empty
+//	
+//	//almost full density
+//	ugraph g2(4);
+//	g2.add_edge(0,1);
+//	g2.add_edge(1,2);
+//	g2.add_edge(0,2);
+//
+//	EXPECT_DOUBLE_EQ(3.0/g2.number_of_vertices(), g2.block_density());		
+//
+//	//spare case
+//	sparse_ugraph g3(4);
+//	g3.add_edge(0,1);
+//	g3.add_edge(1,2);
+//	g3.add_edge(0,2);
+//
+//	EXPECT_DOUBLE_EQ(1.0, g3.block_density());	
+//}
+
+
+
+
+
+
+
+
+
 
 
 

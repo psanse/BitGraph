@@ -78,7 +78,7 @@ virtual	~Graph()										= default;
 	void set_path						(std::string path_name) { path_ = path_name; }
 	std::string get_name				()					const {return name_;}
 	std::string get_path				()					const {return path_;}
-	
+	int get_number_of_edges				()					const { return NE_; }
 
 	std::size_t number_of_vertices		()					const		{return NV_; }
 	std::size_t number_of_blocks		()					const		{return NBB_;}
@@ -93,6 +93,7 @@ virtual	~Graph()										= default;
 	* @returns number of edges 
 	*/
 	virtual	BITBOARD number_of_edges	(bool lazy = true);
+		
 
 	/*
 	* @brief Counts the number of edges	in an induced subgraph by a set of vertices
@@ -134,7 +135,10 @@ public:
 	void clear							();											 
 
 	/*
-	* @brief reduces the graph to n vertices (currently only for sparse graphs)
+	* @brief reduces the graph to n vertices 
+	*
+	*		(currently only for sparse graphs)
+	* 
 	* @param n number of vertices of the new graph
 	* @returns 0 if success, -1 if memory allocation fails
 	*/

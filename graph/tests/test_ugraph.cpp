@@ -7,21 +7,46 @@
 */
 
 #include "../graph.h"
-#include "../graph/algorithms/graph_conversions.h"
 #include "gtest/gtest.h"
-#include "utils/common_paths.h"
+//#include "utils/common_paths.h"
 #include <iostream>
 
 using namespace std;
 
-///////////////
-//switches
-//#define rlf_sort_logs  -TODO@insert log switch
-#define print_graph_logs
+TEST(Ugraph_test, constructor_file){
 
+	string path = PATH_GRAPH_TESTS_CMAKE_SRC_CODE;
 
-//#define TEST_GRAPH_STEP_BY_STEP				//ON to control manually the start of each test
-#define print_test_graph_logs
+	ugraph g1(PATH_GRAPH_TESTS_CMAKE_SRC_CODE "brock200_1.clq");
+	ugraph g2(PATH_GRAPH_TESTS_CMAKE_SRC_CODE "brock200_2.clq");
+	ugraph g3(PATH_GRAPH_TESTS_CMAKE_SRC_CODE "brock200_3.clq");
+	ugraph g4(PATH_GRAPH_TESTS_CMAKE_SRC_CODE "brock200_4.clq");
+
+	//test number of vertices
+	//////////////////////////////////////////
+	EXPECT_EQ(200, g1.number_of_vertices());
+	EXPECT_EQ(200, g2.number_of_vertices());
+	EXPECT_EQ(200, g3.number_of_vertices());
+	EXPECT_EQ(200, g4.number_of_vertices());
+	//////////////////////////////////////////
+
+	//test number of edges
+	//////////////////////////////////////////
+	EXPECT_EQ(14834,g1.number_of_edges());
+	EXPECT_EQ(9876,g2.number_of_edges());
+	EXPECT_EQ(12048,g3.number_of_edges());
+	EXPECT_EQ(13089,g4.number_of_edges());
+	//////////////////////////////////////////
+		
+	//test names 
+	/////////////////////////////////////////////////////
+	EXPECT_STREQ("brock200_1.clq",g1.get_name().c_str());
+	EXPECT_STREQ("brock200_2.clq",g2.get_name().c_str());
+	EXPECT_STREQ("brock200_3.clq",g3.get_name().c_str());
+	EXPECT_STREQ("brock200_4.clq",g4.get_name().c_str());
+	/////////////////////////////////////////////////////
+
+}
 
 TEST(Ugraph, constructor_adj_matrix) {
 	
@@ -63,7 +88,8 @@ TEST(Ugraph, constructor_adj_matrix) {
 	delete[] adj;
 }
 
-TEST(Ugraph, equal_1) {
+
+TEST(Ugraph, equal_brock) {
 
 	string path = PATH_GRAPH_TESTS_CMAKE_SRC_CODE;
 
@@ -76,7 +102,7 @@ TEST(Ugraph, equal_1) {
 
 }
 
-TEST(Ugraph, equal_2) {
+TEST(Ugraph, equal_toy) {
 	
 	ugraph g(7);
 	g.add_edge(0, 1);
@@ -172,7 +198,7 @@ TEST(Ugraph, degree_dimacs) {
 //TODO - CONTINUE REFACTORIZING THE CODE (04/01/2025)
 
 TEST(Ugraph, max_subgraph_degree) {
-	LOG_INFO("Graph: max_degree_subgraph ------------------------");
+	
 	ugraph g(100);
 	g.add_edge(0, 1);
 	g.add_edge(1, 2);
@@ -181,54 +207,74 @@ TEST(Ugraph, max_subgraph_degree) {
 	g.add_edge(78, 79);
 	g.add_edge(79, 80);
 
-	bitarray sg(g.number_of_vertices());
-	sg.init_bit(0, 3);
-	EXPECT_EQ(3, g.max_subgraph_degree(sg));	//1(3)
+	//induced subgraph by {0, 1, 2, 3}
+	bitarray bbset(g.number_of_vertices());
+	bbset.set_bit(0, 3);
+	EXPECT_EQ(3, g.max_subgraph_degree(bbset));		
 
-	sg.init_bit(0, 2);
-	EXPECT_EQ(2, g.max_subgraph_degree(sg));  //1(2)
+	//induced subgraph by {0, 1, 2}
+	bbset.init_bit(0, 2);									//clears the rest of bits
+	EXPECT_EQ(2, g.max_subgraph_degree(bbset));		
 
-	sg.init_bit(78, 79);						//78(1)
-	EXPECT_EQ(1, g.max_subgraph_degree(sg));
+	//induced subgraph by {78, 79}
+	bbset.init_bit(78, 79);									//clears the rest of bits				
+	EXPECT_EQ(1, g.max_subgraph_degree(bbset));
 
-	LOG_INFO("Graph: END max_degree_subgraph------");
-#ifdef TEST_GRAPH_STEP_BY_STEP
-	LOG_ERROR("press any key to continue");
-	cin.get();
-#endif;
 }
 
-TEST(Ugraph, density) {
-	
-	LOG_INFO("Graph: density ------------");
-	string path = TEST_GRAPH_PATH_DATA;
+TEST(Ugraph, density_sample) {
 
-	///////////
-	//undirected
+	string path = PATH_GRAPH_TESTS_CMAKE_SRC_CODE;
+	ugraph ug(path + "sample.clq");
+
+	const int NVexp = 7;
+	const int NEexp = 11;
+
+	auto NV = ug.number_of_vertices();
+	auto NE = ug.number_of_edges();
+
+	//////////////////////
+	EXPECT_EQ(NEexp, NE);
+	EXPECT_EQ(NVexp, NV);
+	//////////////////////
+	
+	//expected density
+	BITBOARD aux = NVexp * (NVexp - 1);
+	double dexp = (2 * NEexp) / static_cast<double> (aux);
+
+	////////////////////////////////
+	EXPECT_EQ(dexp, ug.density());
+	/////////////////////////////////
+}
+
+TEST(Ugraph, density_brock) {
+		
+	string path = PATH_GRAPH_TESTS_CMAKE_SRC_CODE;
 	ugraph ug(path + "brock200_1.clq");
 
-	int NV = 200; int NE = ug.number_of_edges();
-	EXPECT_EQ(14834, NE);
-	EXPECT_EQ(NV, ug.number_of_vertices());
-	BITBOARD aux = NV * (NV - 1);
-	double d = (2 * NE) / (double)aux;
-	EXPECT_EQ(d, ug.density());
-
+	const int NVexp = 200;
+	const int NEexp = 14834;
 	
+	auto NV = ug.number_of_vertices();
+	auto NE = ug.number_of_edges();
+	
+	//////////////////////
+	EXPECT_EQ(NEexp, NE);
+	EXPECT_EQ(NVexp, NV);
+	//////////////////////
 
-	LOG_INFO("Graph: END density------");
-#ifdef TEST_GRAPH_STEP_BY_STEP
-	LOG_ERROR("press any key to continue");
-	cin.get();
-#endif;
+	//expected density
+	BITBOARD aux = NVexp * (NVexp - 1);
+	double dexp = (2 * NEexp) / static_cast<double> ( aux );
+	
+	/////////////////////////////////
+	EXPECT_EQ(dexp, ug.density());
+	/////////////////////////////////
+
 }
 
-TEST(Ugraph, create_induced) {
-	///////////////////
-	// TESTS induced subgraph functionality
+TEST(Ugraph, create_subgraph) {
 	
-	LOG_INFO("Ugraph: create_induced ------------");
-
 	const int NV = 10;
 
 	ugraph g(NV);
@@ -238,44 +284,85 @@ TEST(Ugraph, create_induced) {
 	g.add_edge(0, 3);
 	g.add_edge(5, 6);
 
-	ugraph ugi;
+	//set of vertices {2, 3, 5, 6}
 	std::vector<int> lv;
 	lv.push_back(2);  lv.push_back(3); lv.push_back(5); lv.push_back(6);
 
 	////////////////////////////////
-	int status = g.create_subgraph(ugi, lv);		 //G(lv)
+	ugraph ugi;
+	int status = g.create_subgraph(ugi, lv);		 //G[set of vertices]
 	////////////////////////////////
-	ASSERT_EQ(0, status);
-	ASSERT_EQ(4, ugi.number_of_vertices());
-	ASSERT_EQ(2, ugi.number_of_edges(false));
-	ASSERT_TRUE(ugi.is_edge(0,1));					//edge (2,3)
-	ASSERT_TRUE(ugi.is_edge(2,3));					//edge (5,6)
-	
-	
-#ifdef print_test_graph_logs
-	ugi.print_data();
-	ugi.print_edges();
-#endif
 
 	////////////////////////////////
-	status = g.create_subgraph(ugi, 0);				//G(N(0), neighbour set indiced
+	ASSERT_EQ	(0, status);
+	EXPECT_EQ	(4, ugi.number_of_vertices());
+	EXPECT_EQ	(2, ugi.get_number_of_edges());
+	EXPECT_TRUE	(ugi.is_edge(0,1));					//edge (2,3)
+	EXPECT_TRUE	(ugi.is_edge(2,3));					//edge (5,6)
 	////////////////////////////////
-	ASSERT_EQ(0, status);
-	ASSERT_EQ(2, ugi.number_of_vertices());
-	ASSERT_EQ(0, ugi.number_of_edges(false));
 
-#ifdef print_test_graph_logs
-	ugi.print_data();
-	ugi.print_edges();
-#endif
+	////////////////////////////////
+	status = g.create_subgraph(ugi, 0);				//G[N(0)] 
+	////////////////////////////////
 
-	LOG_INFO("Ugraph: END create_induced --------");
-#ifdef TEST_GRAPH_STEP_BY_STEP
-	LOG_ERROR("press any key to continue");
-	cin.get();
-#endif;
+	////////////////////////////////
+	ASSERT_EQ	(0, status);
+	EXPECT_EQ	(2, ugi.number_of_vertices());
+	EXPECT_EQ	(0, ugi.get_number_of_edges());
+	////////////////////////////////
+
 }
 
+
+TEST(Ugraph, complement_graph){
+		
+	ugraph g(4);
+	g.add_edge(0,1);
+	g.add_edge(1,2);
+	g.add_edge(0,2);
+	
+	///////////////////////////////
+	ugraph cg;
+	g.create_complement(cg);
+	///////////////////////////////
+
+	////////////////////////////////
+	EXPECT_TRUE	(cg.is_edge(0,3));
+	EXPECT_TRUE	(cg.is_edge(1,3));
+	EXPECT_TRUE	(cg.is_edge(2,3));
+	EXPECT_FALSE(cg.is_edge(0, 1));
+	EXPECT_FALSE(cg.is_edge(1, 2));
+	EXPECT_EQ	(g.number_of_vertices(), cg.number_of_vertices());
+	////////////////////////////////
+
+}
+
+TEST(Ugraph, remove_edges){
+		
+	ugraph g(4);
+	g.add_edge(0,1);
+	g.add_edge(1,2);
+	g.add_edge(1,3);
+	g.add_edge(0,2);
+
+	//removes all edges with endpoint in {1}
+	g.remove_edges(1);
+	
+	////////////////////////////////
+	EXPECT_TRUE	( g.is_edge(0, 2) );
+	EXPECT_FALSE( g.is_edge(1, 2) );
+	EXPECT_FALSE( g.is_edge(1, 3) );
+	EXPECT_FALSE( g.is_edge(0, 1) );
+	EXPECT_EQ	(1, g.number_of_edges());		//edge {0, 2}
+	////////////////////////////////
+
+}
+
+/////////////////////////////
+//
+// DISABLED TESTS
+//
+/////////////////////////////
 
 TEST(Ugraph, DISABLED_add_vertex_multiple) {
 	///////////////////
@@ -314,7 +401,7 @@ TEST(Ugraph, DISABLED_add_vertex_multiple) {
 	EXPECT_TRUE(g.is_edge(v, 3));
 	EXPECT_FALSE(g.is_edge(v, 1));
 
-	v = NV+1;
+	v = NV + 1;
 	EXPECT_TRUE(g.is_edge(v, 0));
 	EXPECT_TRUE(g.is_edge(v, 3));
 	EXPECT_FALSE(g.is_edge(v, 1));
@@ -323,7 +410,7 @@ TEST(Ugraph, DISABLED_add_vertex_multiple) {
 	EXPECT_TRUE(g.is_edge(v, 0));
 	EXPECT_TRUE(g.is_edge(v, 3));
 	EXPECT_FALSE(g.is_edge(v, 1));
-	
+
 	LOG_INFO("Ugraph: END add_vertex_multiple --------");
 #ifdef TEST_GRAPH_STEP_BY_STEP
 	LOG_ERROR("press any key to continue");
@@ -346,38 +433,38 @@ TEST(Ugraph, DISABLED_add_single_vertex) {
 	g.add_edge(1, 2);
 	g.add_edge(2, 3);
 	g.add_edge(0, 3);
-	  	
-///////////////////
-//Extends graph according to this neighborhood
+
+	///////////////////
+	//Extends graph according to this neighborhood
 	graph::_bbt bbn(NV + 1 /* MUST BE THE NEW SIZE! */);
 	bbn.set_bit(0);
 	bbn.set_bit(3);
 
 	//g.add_vertex(&bbn);			//extends graph according to the @bbn neighborhood
-	
+
 #ifdef	print_graph_logs
 	g.print_data(false, cout, true);
 	g.print_edges();
 #endif
 
-/////////////////
-//TESTS
+	/////////////////
+	//TESTS
 	int v = NV;
 	EXPECT_EQ(g.number_of_vertices(), NV + 1);
 	EXPECT_EQ(g.number_of_edges(false), 4 + 2);
 	EXPECT_TRUE(g.is_edge(v, 0));
 	EXPECT_TRUE(g.is_edge(v, 3));
 	EXPECT_FALSE(g.is_edge(v, 1));
-	   	
-///////////////////
-//Extends graph by one vertex with empty neighborhood
 
-	//g.add_vertex();	
+	///////////////////
+	//Extends graph by one vertex with empty neighborhood
+
+		//g.add_vertex();	
 	EXPECT_EQ(g.number_of_vertices(), NV + 2);
 	EXPECT_EQ(g.number_of_edges(false), 4 + 2);
 	v = NV + 1;
 	EXPECT_FALSE(g.is_edge(v, 0));
-	
+
 
 	LOG_INFO("Ugraph: END add_single_vertex --------");
 #ifdef TEST_GRAPH_STEP_BY_STEP
@@ -385,164 +472,6 @@ TEST(Ugraph, DISABLED_add_single_vertex) {
 	cin.get();
 #endif;
 }
-
-
-
-TEST(Ugraph, complement_graph){
-
-	LOG_INFO("Ugraph: complement_graph ------------------");
-
-	
-	ugraph g(4);
-	g.add_edge(0,1);
-	g.add_edge(1,2);
-	g.add_edge(0,2);
-	
-
-	ugraph cg;
-	g.create_complement(cg);
-
-	EXPECT_TRUE(cg.is_edge(0,3));
-	EXPECT_TRUE(cg.is_edge(1,3));
-	EXPECT_TRUE(cg.is_edge(2,3));
-	EXPECT_EQ(g.number_of_vertices(),cg.number_of_vertices());
-	//cg.print_edges();
-
-	LOG_INFO("Ugraph: END complement_graph------");
-#ifdef TEST_GRAPH_STEP_BY_STEP
-	LOG_ERROR("press any key to continue");
-	cin.get();
-#endif;
-}
-
-TEST(Ugraph, remove_edges){
-	LOG_INFO("Ugraph: remove_edges ------------------------");
-	
-	ugraph g(4);
-	g.add_edge(0,1);
-	g.add_edge(1,2);
-	g.add_edge(1,3);
-	g.add_edge(0,2);
-
-	g.remove_edges(1);
-	g.print_edges();
-	g.print_data(false);
-	EXPECT_TRUE(g.is_edge(0,2));
-
-	LOG_INFO("Ugraph: END remove_edges------");
-#ifdef TEST_GRAPH_STEP_BY_STEP
-	LOG_ERROR("press any key to continue");
-	cin.get();
-#endif;
-}
-
-TEST(Ugraph, equality) {
-	/////////////////
-	// Silly testing of the new predefined equality for simple-unweighted graphs(18/06/19) 
-
-	LOG_INFO("Graph: equality ------------");
-	string path = TEST_GRAPH_PATH_DATA;
-
-	ugraph g(path + "brock200_1.clq");
-	ugraph g1;
-
-	g1 = g;
-	EXPECT_EQ(g1.get_name(), g.get_name());
-	EXPECT_EQ(g1.number_of_edges(), g.number_of_edges());
-	EXPECT_EQ(g1.is_edge(100, 199), g.is_edge(100, 199));
-
-	LOG_INFO("Graph: END equality------");
-#ifdef TEST_GRAPH_STEP_BY_STEP
-	LOG_ERROR("press any key to continue");
-	cin.get();
-#endif;
-}
-
-
-TEST(Conversions, sparse2ugraph){
-	LOG_INFO("Conversions: sparse2ugraph ------------------------");
-
-
-	sparse_ugraph sug(4);
-	sug.add_edge(0,1);
-	sug.add_edge(1,2);
-	sug.add_edge(1,3);
-	sug.add_edge(0,2);
-
-	ugraph ug;
-	GraphConversion::sug2ug(sug, ug);
-
-	EXPECT_EQ(4,ug.number_of_vertices());
-	EXPECT_EQ(4,ug.number_of_edges());
-	EXPECT_TRUE(ug.is_edge(0,1));
-	EXPECT_TRUE(ug.is_edge(1,2));
-	EXPECT_TRUE(ug.is_edge(1,3));
-	EXPECT_TRUE(ug.is_edge(0,2));
-
-
-	sparse_ugraph sug1(300);
-	sug1.add_edge(0,1);
-	sug1.add_edge(1,2);
-	sug1.add_edge(1,3);
-	sug1.add_edge(0,2);
-
-	GraphConversion::sug2ug(sug1, ug);
-	EXPECT_EQ(300,ug.number_of_vertices());
-	EXPECT_EQ(4,ug.number_of_edges());
-	EXPECT_TRUE(ug.is_edge(0,1));
-	EXPECT_TRUE(ug.is_edge(1,2));
-	EXPECT_TRUE(ug.is_edge(1,3));
-	EXPECT_TRUE(ug.is_edge(0,2));
-	ug.print_data(false);
-		
-	LOG_INFO("Conversions: END sparse2ugraph------");
-#ifdef TEST_GRAPH_STEP_BY_STEP
-	LOG_ERROR("press any key to continue");
-	cin.get();
-#endif;
-}
-
-TEST(Conversions, ugraph2sparse_ugraph){
-	LOG_INFO("Conversions: ugraph2sparse_ugraph ------------------------");
-	ugraph ug(4);
-	ug.add_edge(0,1);
-	ug.add_edge(1,2);
-	ug.add_edge(1,3);
-	ug.add_edge(0,2);
-
-	sparse_ugraph sug;
-	GraphConversion::ug2sug(ug, sug);
-
-	EXPECT_EQ(4,sug.number_of_vertices());
-	EXPECT_EQ(4,sug.number_of_edges());
-	EXPECT_TRUE(sug.is_edge(0,1));
-	EXPECT_TRUE(sug.is_edge(1,2));
-	EXPECT_TRUE(sug.is_edge(1,3));
-	EXPECT_TRUE(sug.is_edge(0,2));
-	sug.print_data(false);
-
-	ugraph ug1(300);
-	ug1.add_edge(0,1);
-	ug1.add_edge(1,2);
-	ug1.add_edge(1,3);
-	ug1.add_edge(0,2);
-
-	GraphConversion::ug2sug(ug1, sug);
-	EXPECT_EQ(300,sug.number_of_vertices());
-	EXPECT_EQ(4,sug.number_of_edges());
-	EXPECT_TRUE(sug.is_edge(0,1));
-	EXPECT_TRUE(sug.is_edge(1,2));
-	EXPECT_TRUE(sug.is_edge(1,3));
-	EXPECT_TRUE(sug.is_edge(0,2));
-	sug.print_data(false);
-		
-	LOG_INFO("Conversions: END ugraph2sparse_ugraph------");
-#ifdef TEST_GRAPH_STEP_BY_STEP
-	LOG_ERROR("press any key to continue");
-	cin.get();
-#endif;
-}
-
 
 //////////////////
 //
@@ -584,87 +513,7 @@ TEST(Conversions, ugraph2sparse_ugraph){
 //
 //	EXPECT_DOUBLE_EQ(1.0, g3.block_density());	
 //}
-//
-//TEST(Graph_test, resize){
-//	graph g(100);
-//	g.add_edge(0,1);
-//	g.add_edge(1,2);
-//	g.add_edge(2,3);
-//	g.add_edge(0,3);
-//	g.add_edge(54,55);
-//	g.add_edge(88,89);
-//	g.add_edge(88,90);
-//	g.add_edge(89,90);
-//
-//	graph g1;
-//	g.create_subgraph(50, g1);
-//	EXPECT_EQ(50, g1.number_of_vertices());
-//	EXPECT_EQ(4, g1.number_of_edges());			//0->1, 1->2, 2->3, 0->3
-//	cout<<"----------------------------"<<endl;
-//
-//	g.create_subgraph(3, g1);
-//	EXPECT_EQ(3, g1.number_of_vertices());
-//	EXPECT_EQ(2, g1.number_of_edges());			//0->1, 1->2, 2->3
-//	cout<<"----------------------------"<<endl;
-//}
-//
-//TEST(Graph_test, shrink_graph){
-//	graph g(100);
-//	g.add_edge(0,1);
-//	g.add_edge(1,2);
-//	g.add_edge(2,3);
-//	g.add_edge(0,3);
-//	g.add_edge(54,55);
-//	g.add_edge(88,89);
-//	g.add_edge(88,90);
-//	g.add_edge(89,90);
-//
-//	//shrinking not possible in non sparse graphs
-//	int r=g.shrink_to_fit(50);
-//	EXPECT_EQ(-1,r);
-//
-//
-//	ugraph g1(100);
-//	g1.add_edge(0,1);
-//
-//	//shrinking not possible in non sparse graphs
-//	int r1=g1.shrink_to_fit(50);
-//	EXPECT_EQ(-1,r);
-//}
-//
-//
-//TEST(Ugraph_test,ugraph_from_file){
-/////////////////////
-//// correct use of ugraph object to read undirected DIMACS graph
-//
-//	ugraph g1("brock200_1.clq");
-//	ugraph g2("brock200_2.clq");
-//	ugraph g3("brock200_3.clq");
-//	ugraph g4("brock200_4.clq");
-//
-//	//Number of edges
-//	EXPECT_EQ(14834,g1.number_of_edges());
-//	EXPECT_EQ(9876,g2.number_of_edges());
-//	EXPECT_EQ(12048,g3.number_of_edges());
-//	EXPECT_EQ(13089,g4.number_of_edges());
-//
-//	//is undirected
-//	EXPECT_EQ(g1.is_edge(3,2),g1.is_edge(2,3));
-//	EXPECT_EQ(g1.is_edge(4,2),g1.is_edge(2,4));
-//
-//	//Number of vertices
-//	EXPECT_EQ(200,g1.number_of_vertices());
-//	EXPECT_EQ(200,g2.number_of_vertices());
-//	EXPECT_EQ(200,g3.number_of_vertices());
-//	EXPECT_EQ(200,g4.number_of_vertices());
-//
-//	//Name
-//	EXPECT_STREQ("brock200_1.clq",g1.get_name().c_str());
-//	EXPECT_STREQ("brock200_2.clq",g2.get_name().c_str());
-//	EXPECT_STREQ("brock200_3.clq",g3.get_name().c_str());
-//	EXPECT_STREQ("brock200_4.clq",g4.get_name().c_str());
-//}
-//
+
 //
 //TEST(Ugraph_test,removing_vertices){
 //	ugraph g("sample.clq");

@@ -13,6 +13,13 @@
 
 using namespace std;
 
+////////////////////////
+//
+// GraphConversion
+// (TODO - struct or namespace instead of class (04/01/2025))
+//
+////////////////////////
+
 class GraphConversion{
 public:
 	static int sug2ug(const sparse_ugraph& , ugraph&);

@@ -246,7 +246,9 @@ int Graph<T>::shrink_to_fit(std::size_t size){
 /////////////////////
 // shrinks graph to the size passed (must be less than current size)
 	
-	LOG_ERROR("Shrinking is vaid only for sparse graphs; the graph remains unchanged - Graph<T>::shrink_to_fit");
+	LOG_WARNING("Shrinking is valid only for sparse graphs - Graph<T>::shrink_to_fit");
+	LOG_WARNING("The graph remains unchanged");
+		
 	return -1;
 }
 
