@@ -284,6 +284,9 @@ public:
 
 	/*
 	* @brief writes directed graph in dimacs format
+	* 
+	*		(specialized for sparse graphs)
+	* 
 	* @param o output stream
 	*/
 	virtual	void  write_dimacs			(std::ostream& o);

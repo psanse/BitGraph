@@ -250,7 +250,7 @@ void Ugraph<T>::write_mtx(ostream & o){
 		o << "% " << ptype::name_.c_str() << endl;
 
 	//number of vertices and edges
-	ptype::NE_=0;																			//eliminates lazy evaluation of edge count 
+	ptype::NE_ = 0;																			//eliminates lazy evaluation of edge count 
 	o << ptype::NV_ << " " << ptype::NV_ << " " << number_of_edges() << endl;
 	
 	//writes edges 1-based vertex notation
