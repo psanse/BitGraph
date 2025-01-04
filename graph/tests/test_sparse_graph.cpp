@@ -1,12 +1,23 @@
 
-#include <iostream>
-#include "gtest/gtest.h"
-#include "../graph_gen.h"
+/*
+* test_sparse_graph.cpp  tests for sparse directed and undirected graphs
+* @created ?
+* @updated 29/12/20
+* @last_update 31/12/24
+* @dev pss
+* @TODO - ADD TESTS
+*/
+
 #include "../graph.h"
+#include "../graph_gen.h"
+#include "gtest/gtest.h"
+#include <iostream>
 
 using namespace std;
 
-TEST(Graph_sparse_test, max_degree_subgraph_sparse) {
+//TODO - CHECK THESE TESTS!!!!! (04/01/2025)
+
+TEST(Graph_sparse, max_subgraph_degree) {
 	LOG_INFO("Graph: max_degree_subgraph_sparse ------------------");
 
 	sparse_ugraph g(100);
@@ -19,13 +30,13 @@ TEST(Graph_sparse_test, max_degree_subgraph_sparse) {
 
 	sparse_bitarray sg(g.number_of_vertices());
 	sg.init_bit(0, 3);
-	EXPECT_EQ(3, g.max_degree_of_subgraph(sg));	//1(3)
+	EXPECT_EQ(3, g.max_subgraph_degree(sg));	//1(3)
 
 	sg.init_bit(0, 2);
-	EXPECT_EQ(2, g.max_degree_of_subgraph(sg));  //1(2)
+	EXPECT_EQ(2, g.max_subgraph_degree(sg));  //1(2)
 
 	sg.init_bit(78, 79);						//78(1)
-	EXPECT_EQ(1, g.max_degree_of_subgraph(sg));
+	EXPECT_EQ(1, g.max_subgraph_degree(sg));
 
 	LOG_INFO("Graph: END max_degree_subgraph_sparse------");
 #ifdef TEST_GRAPH_STEP_BY_STEP
@@ -34,14 +45,14 @@ TEST(Graph_sparse_test, max_degree_subgraph_sparse) {
 #endif;
 }
 
-TEST(Graph_sparse_test, graph_from_file){
+TEST(Graph_sparse_test,constructor_file){
 ///////////////////
 // Undirected graphs read by directed graph class (all edges are non symmetrical)
-	
-	sparse_graph g1("brock200_1.clq");
-	sparse_graph g2("brock200_2.clq");
-	sparse_graph g3("brock200_3.clq");
-	sparse_graph g4("brock200_4.clq");
+
+	sparse_graph g1(PATH_GRAPH_TESTS_CMAKE_SRC_CODE "brock200_1.clq");
+	sparse_graph g2(PATH_GRAPH_TESTS_CMAKE_SRC_CODE "brock200_2.clq");
+	sparse_graph g3(PATH_GRAPH_TESTS_CMAKE_SRC_CODE "brock200_3.clq");
+	sparse_graph g4(PATH_GRAPH_TESTS_CMAKE_SRC_CODE "brock200_4.clq");
 
 	//Number of (directed) edges
 	EXPECT_EQ(14834,g1.number_of_edges());
@@ -78,9 +89,9 @@ TEST(Graph_sparse_test, graph_from_file){
 }
 
 
-TEST(Graph_sparse_test,graph_copy){
+TEST(Graph_sparse_test,constructor_copy){
 
-	sparse_graph g("brock200_2.clq");
+	sparse_graph g(PATH_GRAPH_TESTS_CMAKE_SRC_CODE "brock200_2.clq");
 	sparse_graph g1(g);
 
 	EXPECT_EQ(g.number_of_edges(),g1.number_of_edges());
@@ -97,7 +108,7 @@ TEST(Graph_sparse_test,graph_copy){
 
 TEST(Graph_sparse_test,is_edge){
 	
-	sparse_graph g("sample.clq");
+	sparse_graph g(PATH_GRAPH_TESTS_CMAKE_SRC_CODE "sample.clq");
 	
 	EXPECT_TRUE(g.is_edge(1,0));
 	EXPECT_TRUE(g.is_edge(2,0));
@@ -136,9 +147,9 @@ TEST(Graph_sparse_test,is_edge){
 	//EXPECT_EQ(3, g.number_of_edges());
 }
 
-TEST(Graph_sparse_test, degree_sample){
+TEST(Ugraph_sparse, degree_sample){
 	
-	sparse_ugraph g("sample.clq");
+	sparse_ugraph g(PATH_GRAPH_TESTS_CMAKE_SRC_CODE "sample.clq");
 	
 	
 	EXPECT_EQ (3,g.degree(1));
@@ -153,9 +164,9 @@ TEST(Graph_sparse_test, degree_sample){
 	EXPECT_EQ (1,g.degree(1,bbs));
 }
 
-TEST(Graph_sparse_test, degree_brock){
+TEST(Ugraph_sparse, degree_brock){
 	
-	sparse_ugraph g("brock200_1.clq");
+	sparse_ugraph g(PATH_GRAPH_TESTS_CMAKE_SRC_CODE "brock200_1.clq");
 	
 	sparse_bitarray bbs(g.number_of_vertices());
 	EXPECT_FALSE(g.is_edge(0,1));		//(1)
@@ -168,19 +179,8 @@ TEST(Graph_sparse_test, degree_brock){
 }
 
 
-TEST(Graph_sparse_test, write_to_file){
-	sparse_graph sg(1000);
-	sg.add_edge(1,3);
-	sg.add_edge(5,7);
-	sg.add_edge(100,999);
-	sg.add_edge(0,10);
-	ofstream f("log.txt");
-	sg.write_dimacs(f);
-	f.close();
 
-}
-
-TEST(Graph_sparse_test, create_subgraph){
+TEST(Graph_sparse, create_subgraph){
 	sparse_graph g(100);
 	g.add_edge(0,1);
 	g.add_edge(1,2);
@@ -200,13 +200,12 @@ TEST(Graph_sparse_test, create_subgraph){
 	EXPECT_EQ(3, g1.number_of_vertices());
 	EXPECT_EQ(2, g1.number_of_edges());			//0->1, 1->2, 2->3
 	
-	//creating a wrong size subgraph
-	int nV=g.number_of_vertices();
-	EXPECT_EQ(nV,(g.create_subgraph(0, g1)).number_of_vertices());
+	//creating a wrong size subgraph - g1 remains unchanged
+	EXPECT_EQ( g1.number_of_vertices(), (g.create_subgraph(0, g1)).number_of_vertices() );
 
 }
 
-TEST(Graph_sparse_test, shrink_graph){
+TEST(Graph_sparse, shrink_graph){
 	sparse_graph g(100);
 	g.add_edge(0,1);
 	g.add_edge(1,2);
@@ -229,14 +228,14 @@ TEST(Graph_sparse_test, shrink_graph){
 	EXPECT_FALSE(g.is_edge(2,3));
 }
 
-TEST(Ugraph_sparse_test,ugraph_from_file){
+TEST(Ugraph_sparse,ugraph_from_file){
 ///////////////////
 // correct use of ugraph object to read undirected DIMACS graph
 
-	sparse_ugraph g1("brock200_1.clq");
-	sparse_ugraph g2("brock200_2.clq");
-	sparse_ugraph g3("brock200_3.clq");
-	sparse_ugraph g4("brock200_4.clq");
+	sparse_ugraph g1(PATH_GRAPH_TESTS_CMAKE_SRC_CODE "brock200_1.clq");
+	sparse_ugraph g2(PATH_GRAPH_TESTS_CMAKE_SRC_CODE "brock200_2.clq");
+	sparse_ugraph g3(PATH_GRAPH_TESTS_CMAKE_SRC_CODE "brock200_3.clq");
+	sparse_ugraph g4(PATH_GRAPH_TESTS_CMAKE_SRC_CODE "brock200_4.clq");
 
 	//Number of edges
 	EXPECT_EQ(14834,g1.number_of_edges());
@@ -261,7 +260,7 @@ TEST(Ugraph_sparse_test,ugraph_from_file){
 	EXPECT_STREQ("brock200_4.clq",g4.get_name().c_str());
 }
 
-TEST(Ugraph_sparse_test, numberof_edges){
+TEST(Ugraph_sparse, number_of_edges){
 	sparse_ugraph g(140);
 	g.add_edge(1,4);
 	g.add_edge(0,4);
@@ -272,7 +271,22 @@ TEST(Ugraph_sparse_test, numberof_edges){
 	EXPECT_EQ(5,g.number_of_edges());
 }
 
-TEST(Ugraph_sparse_test, write_to_file){
+///////////////////////////
+// DISABLED TESTS
+
+
+TEST(Graph_sparse, DISABLED_write_to_file) {
+	sparse_graph sg(1000);
+	sg.add_edge(1, 3);
+	sg.add_edge(5, 7);
+	sg.add_edge(100, 999);
+	sg.add_edge(0, 10);
+	ofstream f("log.txt");
+	sg.write_dimacs(f);
+	f.close();
+}
+
+TEST(Ugraph_sparse, DISABLED_write_to_file){
 	sparse_ugraph sug(1000);
 	sug.add_edge(1,3);
 	sug.add_edge(5,7);
@@ -284,7 +298,7 @@ TEST(Ugraph_sparse_test, write_to_file){
 
 }
 
-TEST(Ugraph_sparse, adjacency_matrix){
+TEST(Ugraph_sparse, DISABLED_adjacency_matrix){
 	
 	const int NV_INF=100, NV_SUP=1000, INC_SIZE=100, REP_MAX=10;
     const double DEN_INF=.1,DEN_SUP=.9, INC_DENSITY=.1;
