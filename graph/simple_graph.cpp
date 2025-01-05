@@ -301,13 +301,13 @@ ostream& Graph<T>::print_adj(std::ostream& o, bool add_endl) {
 }
 
 template<class T>
-std::ostream& Graph<T>::timestamp_dimacs(std::ostream& o) {
+std::ostream& Graph<T>::timestamp_dimacs(std::ostream& o) const {
 	o << "c File written by GRAPH:" << PrecisionTimer::local_timestamp();
 	return o;
 }
 
 template<class T>
-std::ostream& Graph<T>::name_dimacs(std::ostream& o){
+std::ostream& Graph<T>::name_dimacs(std::ostream& o) const {
 	if (!name_.empty())
 		o << "\nc " << name_.c_str() << endl;
 	return o;

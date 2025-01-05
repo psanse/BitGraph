@@ -291,8 +291,8 @@ public:
 	*/
 	virtual	void  write_dimacs			(std::ostream& o);
 
-	std::ostream& timestamp_dimacs		(std::ostream& o = std::cout);
-	std::ostream& name_dimacs			(std::ostream& o = std::cout);
+	std::ostream& timestamp_dimacs		(std::ostream& o = std::cout) const;
+	std::ostream& name_dimacs			(std::ostream& o = std::cout) const;
 	std::ostream& header_dimacs			(std::ostream& o = std::cout, bool lazy = true);
 
 	/*
