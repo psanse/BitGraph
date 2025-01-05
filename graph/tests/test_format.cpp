@@ -1,8 +1,12 @@
-//test_format.cpp: tests for reading graphs in different ASCII formats
-//
-//update@23/01/19 (checked with new Graph_t types)
-//update@29/10/22 (gml format)
-
+/*
+* test_format.cpp  tests for reading different graph ASCII formats
+* @created ?
+* @update 23/01/19 (checked with new Graph_t types)
+* @update 29/10/22 (gml format)
+* @last_update 05/01/25
+* @dev pss
+* @TODO - CHECK disabled tests
+*/
 
 #include "graph/graph.h"
 #include "formats/dimacs_format.h"
@@ -13,7 +17,6 @@
 
 using namespace std;
 
-//#define TEST_GRAPH_FORMAT_ONE_TEST_AT_A_TIME
 
 /*************************
 *

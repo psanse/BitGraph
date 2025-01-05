@@ -654,7 +654,7 @@ int Base_Graph_EW<Graph_t, W>::read_dimacs(const string& filename){
 	f.close();
 	
 	//name (removes path)
-	m_g.set_name(filename, true);
+	m_g.set_name(filename);
 	
 	//stores order
 	NV = m_g.number_of_vertices();
