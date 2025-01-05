@@ -25,13 +25,14 @@ inline Graph<sparse_bitarray>& Graph<sparse_bitarray>::create_subgraph(std::size
 	
 	//assertions
 	if (first_k >= NV_ || first_k <= 0) {
-		LOG_ERROR("Bad new size - graph remains unchanged - Graph<sparse_bitarray>::create_subgraph");
+		LOGG_WARNING("Bad new size ", first_k, " - graph remains unchanged - Graph<sparse_bitarray>::create_subgraph");
 		return newg;
 	}
 
 	//allocates memory for the new graph
 	if (newg.reset(first_k) == -1) {
 		LOG_ERROR("memory for graph not allocated - Graph<sparse_bitarray>::create_subgraph");
+		LOG_ERROR("graph remains unchanged");
 		return newg;
 	}
 		
@@ -50,7 +51,7 @@ inline int Graph<sparse_bitarray>::shrink_to_fit (std::size_t size) {
 	
 	//assertions
 	if (NV_ <= size) {
-		LOG_ERROR("Wrong shrinking size ", size, " the graph remains unchanged - Graph<sparse_bitarray>::shrink_to_fit");
+		LOG_WARNING("Wrong shrinking size ", size, " the graph remains unchanged - Graph<sparse_bitarray>::shrink_to_fit");
 		return -1;
 	}
 
