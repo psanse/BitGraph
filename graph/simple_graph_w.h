@@ -83,11 +83,11 @@ public:
 	using _wt =	 W;										
 	
 	//constructors
-	Base_Graph_W						():	g_(){};																		//creates empty graph
+	Base_Graph_W						()							:g_(){};											//creates empty graph
 	Base_Graph_W						(std::vector<W>& lw);															//creates empty graph with vertex weights
-	Base_Graph_W						(_gt& gout, vector<W>& lw)  :g_(gout), w_(lw) {}								//creates graph with vertex weights	
-	Base_Graph_W						(_gt& gout)					:g_(gout), w_ (gout.number_of_vertices(), 1) {}		//creates graph with unit weights
-	Base_Graph_W						(int nV, W val=1.0)			:g_()	{ init(nV, val); }							//creates empty graph of size nV with unit weights	
+	Base_Graph_W						(_gt& g, vector<W>& lw)		:g_(g), w_(lw) {}									//creates graph with vertex weights	
+	Base_Graph_W						(_gt& g)					:g_(g), w_(g.number_of_vertices(), 1) {}			//creates graph with unit weights
+	Base_Graph_W						(int n, W val=1.0)			:g_()	{ reset (n, val); }							//creates empty graph of |V|= n with unit weights	
 	
 	/*
 	* @brief Reads weighted graph from ASCII file in DIMACS format
@@ -108,7 +108,7 @@ public:
 // setters and getters
 	
 	void set_w							(int v, W val)				{ w_.at(v)=val;}				
-	void set_w							(W val=1.0)					{ w_.assign(g_.number_of_vertices(), val);}		
+	void set_w							(W val = 1.0)				{ w_.assign(g_.number_of_vertices(), val);}		
 	
 	/*
 	* @brief sets vertex weights to all vertices
@@ -190,6 +190,8 @@ const _bbt& get_neighbors				(int v)		const			{ return g_.get_neighbors(v); }
 	* @brief generates weights based on modulus operation [Pullan 2008, MODE = 200]
 	* 
 	*			w(v) = (v + 1) % MODE	(v 1-based index)
+	*			
+	*			MODE = 1 -> w(v) = 1	(unweighted graph)
 	*/
 	int gen_mode_weights				(int MODE = WEIGHT_AUTO_GEN_MODE);						
 	
@@ -207,7 +209,7 @@ public:
 	ostream& print_weights				(vint& lnodes, std::ostream& o= std::cout)									const;
 	ostream& print_weights				(com::stack_t<int>& lv, ostream& o= std::cout)								const;
 	ostream& print_weights				(com::stack_t<int>& lv, const vint& mapping, std::ostream& o= std::cout)	const;
-	ostream& print_weights				(int* lv, int size, std::ostream& o= std::cout)								const;
+	ostream& print_weights				(int* lv, int n, std::ostream& o= std::cout)								const;
 
 /////////////////////////////////////
 // data members
@@ -296,16 +298,15 @@ int Graph_W<ugraph, W>::create_complement(Graph_W& g) const {
 }
 
 
-
-
 template<class Graph_t, class W>
 Base_Graph_W<Graph_t, W>::Base_Graph_W(vector<W>& lw){
 	try{
-		g_.init(lw.size());
-		w_=lw;
+		g_.reset(lw.size() );
+		w_ = lw;
 	}catch(...){
-		LOG_ERROR("Base_Graph_W<T, W>::init(vector<W>& lw)-error during memory graph allocation");
-		return;
+		LOG_ERROR("error during memory graph allocation - Base_Graph_W<T, W>::Base_Graph_W");
+		LOG_ERROR("exiting...");
+		std::exit(-1);
 	}	
 }
 
@@ -313,7 +314,7 @@ template<class Graph_t, class W>
 inline Base_Graph_W<Graph_t, W>::Base_Graph_W(std::string filename){	
 	
 	if (read_dimacs(filename) == -1) {
-		LOG_ERROR("Base_Graph_W<Graph_t, W>::Base_Graph_W(std::string)-error reading DIMACS file");
+		LOG_ERROR("error reading DIMACS file -Base_Graph_W<Graph_t, W>::Base_Graph_W");
 		LOG_ERROR("exiting...");
 		std::exit(-1);
 	}
@@ -349,7 +350,8 @@ int Base_Graph_W<Graph_t, W>::init(std::size_t NV , W val, bool reset_name = tru
 	try{
 		g_.reset(NV);
 		w_.assign(NV, val);
-	}catch(...){
+	}
+	catch(...){
 		LOG_ERROR("Bad memory allocation - Base_Graph_W<Graph_t, W>::init");
 		return -1;
 	}
@@ -359,7 +361,7 @@ int Base_Graph_W<Graph_t, W>::init(std::size_t NV , W val, bool reset_name = tru
 		g_.set_path("");
 	}
 		
-return 0;
+	return 0;
 }
 
 template<class Graph_t, class W>
@@ -367,18 +369,21 @@ inline int Base_Graph_W<Graph_t, W>::reset(std::size_t NV, W val, string name)
 {
 	try {
 		g_.reset(NV);
-		w_.assign(NV, val);
-		g_.set_name(name);
+		w_.assign(NV, val);		
 	}
 	catch (...) {
-		LOG_ERROR("bad allocation- Base_Graph_W<Graph_t, W>::reset(int, string)");
+		LOG_ERROR("bad allocation- Base_Graph_W<Graph_t, W>::reset");
 		return -1;
 	}
+
+	g_.set_name(name);
+
 	return 0;
 }
 
 template<class Graph_t, class W>
-void Base_Graph_W<Graph_t, W>::clear	(){
+void Base_Graph_W<Graph_t, W>::clear ()
+{
 	g_.clear();
 	w_.clear();
 }
@@ -402,7 +407,7 @@ template <class Graph_t, class W>
 inline
 W Base_Graph_W<Graph_t, W>::maximum_weight(int& v) const{
 
-	typename vector<W>::const_iterator it = std::max_element(w_.begin(), w_.end());
+	auto it = std::max_element(w_.begin(), w_.end());
 	v = it - w_.begin();
 	return *it;
 }
@@ -412,6 +417,80 @@ W Base_Graph_W<Graph_t, W>::maximum_weight(int& v) const{
 // I/O
 //
 //////////////
+
+template<class Graph_t, class W>
+inline
+ostream& Base_Graph_W<Graph_t, W>::write_dimacs(ostream& o) {
+	/////////////////////////
+	// writes file in dimacs format 
+
+	//timestamp 
+	o << "c File written by GRAPH:" << PrecisionTimer::local_timestamp();
+
+	//name
+	if (!g_.get_name().empty())
+		o << "\nc " << g_.get_name().c_str() << endl;
+
+	//tamaño del grafo
+	const int NV = g_.number_of_vertices();
+	o << "p edge " << NV << " " << g_.number_of_edges() << endl << endl;
+
+	//write DIMACS nodes n <v> <w>
+	//if (is_weighted_v()){
+	for (int v = 0; v << NV; v++) {
+		o << "n " << v + 1 << " " << get_w(v) << endl;
+	}
+	//}
+
+	//write edges
+	for (int v = 0; v < NV; v++) {
+		for (int w = 0; w < NV; w++) {
+			if (v == w) continue;
+			if (g_.is_edge(v, w))							//O(log) for sparse graphs: specialize
+				o << "e " << v + 1 << " " << w + 1 << endl;			//1 based vertex notation dimacs
+
+		}
+	}
+
+	return o;
+}
+
+template<class W>
+inline
+ostream& Graph_W<ugraph, W>::write_dimacs(ostream& o) {
+	/////////////////////////
+	// writes file in dimacs format 
+
+		//timestamp 
+	o << "c File written by GRAPH:" << PrecisionTimer::local_timestamp();
+
+	//name
+	if (!ptype::g_.get_name().empty())
+		o << "\nc " << ptype::g_.get_name().c_str() << endl;
+
+	//tamaño del grafo
+	const int NV = ptype::g_.number_of_vertices();
+	o << "p edge " << NV << " " << ptype::g_.number_of_edges() << endl << endl;
+
+	//write DIMACS nodes n <v> <w>
+	//if (is_weighted_v()){
+	for (int v = 0; v < NV; v++) {
+		o << "n " << v + 1 << " " << ptype::get_w(v) << endl;
+	}
+	//}
+
+	//write edges
+	for (int v = 0; v < NV - 1; v++) {
+		for (int w = v + 1; w < NV; w++) {
+			//if(v==w) continue;
+			if (ptype::g_.is_edge(v, w))					//O(log) for sparse graphs: specialize
+				o << "e " << v + 1 << " " << w + 1 << endl;			//1 based vertex notation dimacs
+
+		}
+	}
+
+	return o;
+}
 
 template<class Graph_t, class W>
 int Base_Graph_W<Graph_t, W>::read_dimacs(const string& filename){
@@ -445,7 +524,7 @@ int Base_Graph_W<Graph_t, W>::read_dimacs(const string& filename){
 		clear(); f.close(); return -1;
 	}	
 	
-	init(size);
+	reset(size);
 	::gio::read_empty_lines(f);
 
 	//read weights format n <x> <w> if they exist
@@ -482,7 +561,7 @@ int Base_Graph_W<Graph_t, W>::read_dimacs(const string& filename){
 	//read the first edge to determine the type of input
 	f.getline(line, 250); 
 	stringstream sstr(line);
-	int nw=com::counting::count_words(sstr.str());
+	int nw = ::com::counting::count_words(sstr.str());
 	if(nw!=3){
 		LOGG_ERROR(filename , "read_dimacs()-wrong edge line format reading DIMACS format-Base_Graph_W<Graph_t, W>:");
 		clear(); f.close(); return -1;
@@ -539,49 +618,13 @@ int Base_Graph_W<Graph_t, W>::read_dimacs(const string& filename){
 return 0;
 }
 
-template<class Graph_t, class W>
-inline
-ostream& Base_Graph_W<Graph_t, W>::write_dimacs (ostream& o) {
-/////////////////////////
-// writes file in dimacs format 
-	
-	//timestamp 
-	o<<"c File written by GRAPH:"<<PrecisionTimer::local_timestamp();
-	
-	//name
-	if(!g_.get_name().empty())
-		o<<"\nc "<<g_.get_name().c_str()<<endl;
-
-	//tamaño del grafo
-	const int NV=g_.number_of_vertices();
-	o<<"p edge "<<NV<<" "<<g_.number_of_edges()<<endl<<endl;
-
-	//write DIMACS nodes n <v> <w>
-	//if (is_weighted_v()){
-		for(int v=0; v<<NV; v++){
-			o<<"n "<<v+1<<" "<<get_w(v)<<endl;
-		}
-	//}
-	
-	//write edges
-	for(int v=0; v<NV; v++){
-		for(int w=0; w<NV; w++){
-			if(v==w) continue;
-			if(g_.is_edge(v,w) )							//O(log) for sparse graphs: specialize
-					o<<"e "<<v+1<<" "<<w+1<<endl;			//1 based vertex notation dimacs
-			
-		}
-	}
-
-	return o;
-}
 
 template<class Graph_t, class W>
 inline
 ostream& Base_Graph_W<Graph_t, W>::print_data(bool lazy, std::ostream& o, bool endl) {
 	g_.print_data(lazy, o, false);
-	o<<" w";
-	if(endl) o<<std::endl;	
+	o << " w";
+	if (endl) { o << std::endl; }
 	return o;
 }
 
@@ -590,33 +633,32 @@ template <class Graph_t, class W>
 inline
 ostream& Base_Graph_W<Graph_t, W>::print_weights (com::stack_t<int>& lv, ostream& o) const{
 
-	for(int i=0; i<lv.pt; i++){
-		o<<"["<<lv.get_elem(i)<<","<<w_[lv.get_elem(i)]<<"] ";
+	for(std::size_t i=0; i<lv.pt; i++){
+		o << "[" << lv.get_elem(i) << "," << w_[lv.get_elem(i)] << "] ";
 	}
-	o<<"("<<lv.pt<<")"<<endl;
+	o << "(" << lv.pt << ")" <<endl;
 	return o;
 }
 
 template <class Graph_t, class W>
 inline
-ostream& Base_Graph_W<Graph_t, W>::print_weights (int* lv, int size, ostream& o) const{
+ostream& Base_Graph_W<Graph_t, W>::print_weights (int* lv, int NV, ostream& o) const{
 
-	for(int i=0; i<size; i++){
-		o<<"["<<lv[i]<<","<<w_[lv[i]]<<"] ";
+	for(std::size_t i=0; i< NV; i++){
+		o << "[" << lv[i] << "," << w_[lv[i]] << "] ";
 	}
-	o<<"("<<size<<")"<<endl;
+	o << "(" << NV << ")" << endl;
 	return o;
 }
 
 template <class Graph_t, class W>
 inline
 ostream& Base_Graph_W<Graph_t, W>::print_weights (com::stack_t<int>& lv, const vint& mapping, ostream& o) const{
-////////////////
-//
-	for(int i=0; i<lv.pt; i++){
-		o<<"["<<mapping[lv.get_elem(i)]<<","<<w_[mapping[lv.get_elem(i)]]<<"] ";
+
+	for(std::size_t i=0; i<lv.pt; i++){
+		o << "[" << mapping[lv.get_elem(i)] << "," << w_[mapping[lv.get_elem(i)]] << "] ";
 	}
-	o<<"("<<lv.pt<<")"<<endl;
+	o << "(" << lv.pt << ")" << endl;
 	return o;
 }
 			
@@ -624,23 +666,25 @@ ostream& Base_Graph_W<Graph_t, W>::print_weights (com::stack_t<int>& lv, const v
 template <class Graph_t, class W>
 inline
 ostream& Base_Graph_W<Graph_t, W>::print_weights (vint& lv, ostream& o) const{
-	for(int i=0; i<lv.size(); i++){
-		o<<"["<<lv[i]<<","<<w_[lv[i]]<<"] ";
+	
+	for(std::size_ i=0; i<lv.size(); i++){
+		o << "[" << lv[i] << "," << w_[lv[i]] << "] ";
 	}
-	o<<"("<<lv.size()<<")"<<endl;
+	o << "(" << lv.size() << ")" << endl;
 	return o;
 }
 
 template <class Graph_t, class W>
 inline
 ostream& Base_Graph_W<Graph_t, W>::print_weights (_bbt& bbsg, ostream& o) const{
+	
 	bbsg.init_scan(bbo::NON_DESTRUCTIVE);										/* CHECK sparse graphs */
 	while(true){
-		int v=bbsg.next_bit();
-		if(v==EMPTY_ELEM) break;
-		o<<"["<<v<<","<<w_[v]<<"] ";
+		int v = bbsg.next_bit();
+		if(v == EMPTY_ELEM) break;
+		o << "[" << v << "," << w_[v] << "] ";
 	}
-	o<<"("<<bbsg.popcn64()<<")"<<endl;
+	o << "(" << bbsg.popcn64() << ")" << endl;
 	return o;
 }
 
@@ -648,12 +692,13 @@ template <class Graph_t, class W>
 inline
 ostream& Base_Graph_W<Graph_t, W>::print_weights (ostream& o, bool show_v) const{
 
-	const int NV=g_.number_of_vertices();
+	const std::size_t NV = g_.number_of_vertices();
+
 	if(show_v){
-		for(int i=0; i<NV; i++){
-			o<<"["<<i<<","<<w_[i]<<"] ";
+		for(std::size_t i = 0; i < NV; ++i){
+			o << "[" << i << "," << w_[i] << "] ";
 		}
-		o<<endl;
+		o << endl;
 	}else{
 		com::stl::print_collection<vector<W>>(w_, o, true);
 	}
@@ -706,42 +751,7 @@ int Base_Graph_W<Graph_t, W>::read_weights(const string& filename){
 }
 
 
-template<class W>
-inline
-ostream& Graph_W<ugraph, W>::write_dimacs (ostream& o) {
-/////////////////////////
-// writes file in dimacs format 
-	
-	//timestamp 
-	o<<"c File written by GRAPH:"<<PrecisionTimer::local_timestamp();
-	
-	//name
-	if(!ptype::g_.get_name().empty())
-		o<<"\nc "<< ptype::g_.get_name().c_str()<<endl;
 
-	//tamaño del grafo
-	const int NV= ptype::g_.number_of_vertices();
-	o<<"p edge "<<NV<<" "<< ptype::g_.number_of_edges()<<endl<<endl;
-
-	//write DIMACS nodes n <v> <w>
-	//if (is_weighted_v()){
-		for(int v=0; v<NV; v++){
-			o<<"n "<<v+1<<" "<< ptype::get_w(v)<<endl;
-		}
-	//}
-	
-	//write edges
-	for(int v=0; v<NV-1; v++){
-		for(int w=v+1; w<NV; w++){
-			//if(v==w) continue;
-			if(ptype::g_.is_edge(v,w) )					//O(log) for sparse graphs: specialize
-					o<<"e "<<v+1<<" "<<w+1<<endl;			//1 based vertex notation dimacs
-			
-		}
-	}
-
-	return o;
-}
 
 
 #endif
