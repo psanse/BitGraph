@@ -53,177 +53,256 @@
 //#define FILE_EXTENSION_D							0x101		//Classical weights used in tests: 1-200 in a loop
 //#define FILE_EXTENSION_WWW						0x102		//LAMSADE (2018): weights preprocessed for the MEWCP
 
-/////////////////////////
-// automatic generation mode
-#define WEIGHT_AUTO_GEN_MODE						200			// wi = (i % WEIGHT_AUTO_GEN_MODE) + 1, i:1...N, WEIGHT_AUTO_GEN_MODE=1 is the unweighted case							
+constexpr int WEIGHT_AUTO_GEN_MODE = 200;			//for modulus weight generation (see Base_Graph_W::gen_mode_weights)						
 
-using namespace std;											/* not use in headers! */
+using namespace std;								// TODO- remove from header! 
+
+///////////////////////
+//
+// Base_Graph_W class 
+// 
+// (used to be able to specialize functions
+// according to the type of graph only)
+//
+// User type class is Graph_W 
+//
+////////////////////////
 
 template<class Graph_t, class W>
 class Base_Graph_W {	
-///////////////////////
-//
-// Base class used to be able to specialize functions
-// according to the type of graph only
-//
-// The user type class is Graph_W! (see below) 
-//
-///////////////////////
-
-protected:	
-	Graph_t m_g;
-	vector<W> m_w;																				//vector of weights (currently automated reading for DIMACS graphs in an auxiliary graph with extension *.w or *.d)
-
+																					
 public:
-	typedef typename Graph_t::_bbt _bbt;
-	typedef W _wt;																				//external type name alias used in the framework
+
+	using type = Base_Graph_W<Graph_t, W>;				//own type
+	using graph_type = Graph_t;							//graph type	
+	using basic_type = typename Graph_t::basic_type;	//bitset type used by graph type 
 		
-	Base_Graph_W						():	m_g(){};											//does not allocate memory
-	Base_Graph_W						(vector<W>& lw);										//empty graph structure with vertex weights
-	Base_Graph_W						(Graph_t& gout, vector<W>& lw):m_g(gout),m_w(lw){}	
-	Base_Graph_W						(Graph_t& gout) :m_g(gout), m_w(gout.number_of_vertices(), 1) {}				//assumes unit weighted graph
-	Base_Graph_W						(int nV, W val=1.0):m_g(){init(nV, val);}											//creates empty graph with size vertices	
-	Base_Graph_W						(std::string filename);									//TODO@**** (read weighted ASCII file or generate weights using formula)
-virtual	~Base_Graph_W					(){clear(); /* not necessary */};		
+	//alias types for backward compatibility
+	using _gt = graph_type;								
+	using _bbt = basic_type;							
+	using _wt =	 W;										
+	
+	//constructors
+	Base_Graph_W						():	g_(){};																		//creates empty graph
+	Base_Graph_W						(std::vector<W>& lw);															//creates empty graph with vertex weights
+	Base_Graph_W						(_gt& gout, vector<W>& lw)  :g_(gout), w_(lw) {}								//creates graph with vertex weights	
+	Base_Graph_W						(_gt& gout)					:g_(gout), w_ (gout.number_of_vertices(), 1) {}		//creates graph with unit weights
+	Base_Graph_W						(int nV, W val=1.0)			:g_()	{ init(nV, val); }							//creates empty graph of size nV with unit weights	
+	
+	/*
+	* @brief Reads weighted graph from ASCII file in DIMACS format
+	*		
+	*		 If unable to read weights generates modulus weights [Pullman 2008]
+	* 
+	*		 TODO: add support for other formats
+	*/
+	Base_Graph_W						(std::string filename);															
+
+	
+	//TODO other constructors and assign operators (1/1/2025)
+
+	//destructor
+	virtual	~Base_Graph_W()	 = default;		
 
 /////////////
 // setters and getters
-	void set_w							(int v, W val)				{m_w.at(v)=val;}				
-	void set_w							(W val=1.0)					{m_w.assign(m_g.number_of_vertices(), val);}		
-	int	 set_w							(vector<W>& lw);										
 	
+	void set_w							(int v, W val)				{ w_.at(v)=val;}				
+	void set_w							(W val=1.0)					{ w_.assign(g_.number_of_vertices(), val);}		
+	
+	/*
+	* @brief sets vertex weights to all vertices
+	* @param lw vector of weights of size |V|
+	* @returns 0 if success, -1 if error
+	*/
+	int	 set_w							(std::vector<W>& lw);
+	
+	Graph_t& graph						()							{ return g_;}
+const Graph_t& graph					()			const			{ return g_; }
 
-//	Graph_t& graph() { return m_g; }
-	Graph_t& graph						()							{return m_g;}	
-	W get_w								(int v)		const			{return m_w[v];}	
-const vector<W>& get_weights			()			const			{return m_w;}	
-	vector<W>& get_weights				()							{return m_w;}	
+	W get_w								(int v)		const			{ return w_[v];}	
+const vector<W>& get_weights			()			const			{ return w_;}	
+	vector<W>& get_weights				()							{ return w_;}	
 	
+	/*
+	* @brief Determines weight and vertex of maximum weight
+	* @param v ouptut vector of maximum weight
+	* @returns weight of vertex v
+	*/
 	W maximum_weight					(int& v)	const;	
 	
-const _bbt& get_neighbors				(int v)		const			{ return m_g.get_neighbors(v); }
- 	_bbt& get_neighbors					(int v)						{ return m_g.get_neighbors(v); }
-	std::string get_name				()			const			{ return m_g.get_name(); }
-	void set_path						(std::string path_name)		{ m_g.set_path(path_name); }
-	std::string get_path				()			const			{ return m_g.get_path(); }
+const _bbt& get_neighbors				(int v)		const			{ return g_.get_neighbors(v); }
+ 	_bbt& get_neighbors					(int v)						{ return g_.get_neighbors(v); }
+	
+	void set_name						(std::string str)			{ g_.set_name(str); }
+	std::string get_name				()			const			{ return g_.get_name(); }
+	void set_path						(std::string path_name)		{ g_.set_path(path_name); }
+	std::string get_path				()			const			{ return g_.get_path(); }
 
-///////////////////////////
-//weight generation
-	int gen_w							(int MODE= WEIGHT_AUTO_GEN_MODE);						//automatic generation of weights TODO@
-	bool is_unit_weights				();
+	int number_of_vertices				()			const			{ return g_.number_of_vertices(); }
+	int number_of_edges					(bool lazy = true)			{ return g_.number_of_edges(lazy); }
+
 
 //////////////////////////
 // memory allocation 
-  	int init							(int nV, W val=1.0);									//allocates memory for n vertices, assigns val as weight to all vertices (default unit weights)
-	void clear							();														//deallocates memory if required
+
+	/*
+	* @brief resets to empty graph with |V|= n and assigns weight val to all vertices
+	* @param n number of vertices
+	* @param reset_name if true, @name_ and @path_ reset to empty
+	* @returns 0 if success, -1 if memory allocation fails
+	* @comment preserved for backward compatibility (use reset(...))
+	*/
+	int init (std::size_t n, W val = 1.0, bool reset_name = true);								
+	
+
+	/*
+	* @brief resets to empty graph given name and number of vertices
+	* @param n number of vertices
+	* @param name name of the instance
+	* @returns 0 if success, -1 if memory allocation fails
+	*/
+	int reset (std::size_t n, W val = 1.0,  string name = "");
+
+	/*
+	* @brief deallocates memory and resets to default values
+	*/
+	void clear();													
+
 
 /////////////////////////
-//useful interfaces for the layered graph
-	int number_of_vertices()  const { return m_g.number_of_vertices(); }
-	int number_of_edges()   { return m_g.number_of_edges(); }	
-	void add_edge(int v, int w){m_g.add_edge(v, w);}
-	void set_name(string str) {m_g.set_name(str);}
-	bool is_edge(int v, int w)  const { return m_g.is_edge(v, w); }
-	double density()  { return m_g.density(); }
+//basic graph operations
 
+	void add_edge						(int v, int w)					{ g_.add_edge(v, w); }
+	double density						(bool lazy = true)				{ return g_.density(lazy); }
+
+/////////////
+// boolean properties
+
+	bool is_edge						(int v, int w)		const		{ return g_.is_edge(v, w); }
+	bool is_unit_weighted				();
+
+
+///////////////////////////
+//weight generation
+	
+	/*
+	* @brief generates weights based on modulus operation [Pullan 2008, MODE = 200]
+	* 
+	*			w(v) = (v + 1) % MODE	(v 1-based index)
+	*/
+	int gen_mode_weights				(int MODE = WEIGHT_AUTO_GEN_MODE);						
+	
 ////////////
 // I/O
 public:
-	int read_dimacs						(const string& filename);			
-	ostream& write_dimacs				(ostream& o=std::cout);								//CHECK!
+	int read_dimacs						(const std::string& filename);			
+	virtual ostream& write_dimacs		(std::ostream& o = std::cout);												//CHECK!
+	int read_weights					(const std::string& filename);
 		
- virtual  ostream& print_data			(bool lazy=true, std::ostream& o=std::cout, bool endl=true);	
-	int read_weights					(const string& filename);	
-	ostream& print_weights				(ostream& o= std::cout, bool show_v=true) const; 
-	ostream& print_weights				(_bbt & bbsg, ostream& o= std::cout) const;
-	ostream& print_weights				(vint& lnodes, ostream& o= std::cout) const;
-	ostream& print_weights				(com::stack_t<int>& lv, ostream& o= std::cout) const;
-	ostream& print_weights				(com::stack_t<int>& lv, const vint& mapping, ostream& o= std::cout) const;
-	ostream& print_weights				(int* lv, int size, ostream& o= std::cout) const;
+	ostream& print_data					(bool lazy = true, std::ostream& o = std::cout, bool endl = true);	
+	
+	ostream& print_weights				(std::ostream& o= std::cout, bool show_v=true)								const;
+	ostream& print_weights				(_bbt & bbsg, std::ostream& o= std::cout)									const;
+	ostream& print_weights				(vint& lnodes, std::ostream& o= std::cout)									const;
+	ostream& print_weights				(com::stack_t<int>& lv, ostream& o= std::cout)								const;
+	ostream& print_weights				(com::stack_t<int>& lv, const vint& mapping, std::ostream& o= std::cout)	const;
+	ostream& print_weights				(int* lv, int size, std::ostream& o= std::cout)								const;
+
+/////////////////////////////////////
+// data members
+
+protected:
+	Graph_t g_;
+	vector<W> w_;					//vector of weights (currently automated reading for DIMACS graphs in an auxiliary graph with extension *.w or *.d)
+
 };
 
+///////////////////////
+//
+// Graph_W class 
+// (user generic class to specialize for different types of graphs) 
+//
+///////////////////////
 
 template<class Graph_t, class W>
-class Graph_W: public Base_Graph_W<Graph_t, W> {
-
-public:
-	typedef Graph_t _gt;
-
-public:
-	Graph_W	()										:Base_Graph_W<Graph_t, W>(){}							//does not allocate memory
-	Graph_W	(vector<W>& lw)							:Base_Graph_W<Graph_t, W>(lw){}							//empty graph structure with vertex weights
-	Graph_W	(Graph_t& g_out, vector<W>& lw)			:Base_Graph_W<Graph_t, W>(g_out, lw){}
-	Graph_W	(int nV, W val=1.0)						:Base_Graph_W<Graph_t, W>(nV, val){}					//creates empty graph with size vertices	
-	Graph_W	(std::string filename)					:Base_Graph_W<Graph_t, W>(filename){}
-};
+class Graph_W : public Base_Graph_W <Graph_t, W> {};
 
 ////////////////////////////////////
-// main specialization- target class for undirected graphs
+// 
+// Specialization for undirected graphs
+//
+////////////////////////////////////
 
 template<class W>
 class Graph_W<ugraph, W>: public Base_Graph_W<ugraph, W> {
 public:
-	typedef  Base_Graph_W<ugraph, W>  _mypt;
-	typedef  ugraph						_gt;
-	typedef  W							_wt;
+
+	using type = Graph_W<ugraph, W>;					//own type
+	using ptype = Base_Graph_W<ugraph, W>;				//parent type
+	using graph_type = ugraph;							//graph type
+	using basic_type = typename graph_type::basic_type;	//bitset type used by graph type 
+
+	//alias types for backward compatibility
+	using _wt = W;										//weight number type for backward compatibility
+	using _gt = graph_type;								
 
 public:
-	Graph_W	()										:Base_Graph_W<ugraph, W>(){}							  //does not allocate memory
-	Graph_W	(vector<W>& lw)							:Base_Graph_W<ugraph, W>(lw){}							  //empty graph structure with vertex weights
-	Graph_W	(ugraph& g_out, vector<W>& lw)			:Base_Graph_W<ugraph, W>(g_out, lw){}
-	Graph_W	(ugraph& g_out)							:Base_Graph_W<ugraph, W>(g_out) {}						  //construction from unweighted type -> unit weights
-	Graph_W	(int nV, W val=1.0)						:Base_Graph_W<ugraph, W>(nV, val){}						  //creates empty graph with size vertices	
-	Graph_W	(std::string filename)					:Base_Graph_W<ugraph, W>(filename){}
+	//constructors (inherited)
+	using Base_Graph_W<ugraph, W>::Base_Graph_W;		
 
 /////////////
 //useful interface-specific for undirected weighted graphs
-	int max_degree_of_graph	()													{ return _mypt::m_g.max_degree_of_graph(); }
-	int degree				()													{ return _mypt::m_g.degree(); }
-	int degree				(int v)							const				{ return _mypt::m_g.degree(v); }
-	int degree				(int v, const BitBoardN& bbn)	const				{ return _mypt::m_g.degree(v, bbn); }
+	int max_graph_degree	()													{ return ptype::g_.max_graph_degree(); }
+	int degree				(int v)							const				{ return ptype::g_.degree(v); }
+	int degree				(int v, const BitBoardN& bbn)	const				{ return ptype::g_.degree(v, bbn); }
 
-	int create_complement	(Graph_W<ugraph, W>& g)			const;											  //weights (also name, path,...) are also stored in the new graph
-	int create_complement	(ugraph& g)					    const;											  //weights (also name, path,...) are lost
+	/*
+	* @brief Complement graph (currently name info of original graph is lost)
+	* @param g output graph
+	* @returns 0 if success, -1 if error
+	*/
+	int create_complement	(Graph_W& g)					const;	
+
+	/*
+	* @brief Complement undirected graph (weights are lost)
+	* @param g output complement undirected unweighted graph
+	* @returns 0 if success, -1 if error
+	*/
+	int create_complement	(ugraph& g)					    const				{ return ptype::g_.create_complement(g);}		 
+
+
 
 ///////////
-//override
+//I/O operations
 	
-	ostream& write_dimacs (ostream& o=std::cout);								
+	ostream& write_dimacs	(ostream& o = std::cout)		override;								
 };
+
+
+////////////////////////////////////////////////////////////////
+// Necessary implementation of template methods in header file
 
 template<class W>
 inline
-int Graph_W<ugraph, W>::create_complement(Graph_W<ugraph, W>& g) const {
-	/////////////////////
-	//TODO@ name, path info is lost
+int Graph_W<ugraph, W>::create_complement(Graph_W& g) const {
 
 	g.set_name(this->get_name());
 	g.set_path(this->get_path());
-	g.get_weights() = _mypt::m_w;
-	_mypt::m_g.create_complement(g.graph());
+	g.get_weights() = ptype::w_;
+	ptype::g_.create_complement(g.graph());
 
 	return 0;
 }
 
-template<class W>
-inline
-int Graph_W<ugraph, W>::create_complement(ugraph& g) const {
-
-	_mypt::m_g.create_complement(g);
-	return 0;
-}
 
 
-template<class Graph_t, class W>
-Base_Graph_W<Graph_t, W>::Base_Graph_W(string filename){
-	read_dimacs	(filename);							
-}
 
 template<class Graph_t, class W>
 Base_Graph_W<Graph_t, W>::Base_Graph_W(vector<W>& lw){
 	try{
-		m_g.init(lw.size());
-		m_w=lw;
+		g_.init(lw.size());
+		w_=lw;
 	}catch(...){
 		LOG_ERROR("Base_Graph_W<T, W>::init(vector<W>& lw)-error during memory graph allocation");
 		return;
@@ -231,75 +310,100 @@ Base_Graph_W<Graph_t, W>::Base_Graph_W(vector<W>& lw){
 }
 
 template<class Graph_t, class W>
-inline int Base_Graph_W<Graph_t, W>::gen_w(int MODE){
-//////////////////////////
-// weight generation: (v + 1) % MODE	[Pullan 2008-MODE=200]
-
-	m_w.clear();
-	const int NV = m_g.number_of_vertices();
-	for (int i = 0; i < NV; i++) {
-		m_w.push_back((i + 1) % MODE + 1);
+inline Base_Graph_W<Graph_t, W>::Base_Graph_W(std::string filename){	
+	
+	if (read_dimacs(filename) == -1) {
+		LOG_ERROR("Base_Graph_W<Graph_t, W>::Base_Graph_W(std::string)-error reading DIMACS file");
+		LOG_ERROR("exiting...");
+		std::exit(-1);
 	}
+}
+
+template<class Graph_t, class W>
+inline int Base_Graph_W<Graph_t, W>::gen_mode_weights(int MODE){
+
+	const std::size_t NV = g_.number_of_vertices();
+
+	w_.clear();
+	w_.reserve(NV);
+		
+	for (std::size_t i = 0; i < NV; i++) {
+		w_.emplace_back((i + 1) % MODE + 1);
+	}
+
 	return 0;
 }
 
 template<class Graph_t, class W>
-inline bool Base_Graph_W<Graph_t, W>::is_unit_weights()
+inline bool Base_Graph_W<Graph_t, W>::is_unit_weighted()
 {
-	for (int v : m_w) {
+	for (int v : w_) {
 		if (v != 1) return false;
 	}
 	return true;
 }
 
 template<class Graph_t, class W>
-int Base_Graph_W<Graph_t, W>::init(int size, W val){
-///////////////////////////
-// Allocates memory for the empty graph (deallocates previous)
-	clear();
-		 
+int Base_Graph_W<Graph_t, W>::init(std::size_t NV , W val, bool reset_name = true){
+			 
 	try{
-		m_g.init(size);
-		m_w.assign(size, val);
+		g_.reset(NV);
+		w_.assign(NV, val);
 	}catch(...){
-		LOG_ERROR("Base_Graph_W<Graph_t, W>::init()-error during memory graph allocation");
+		LOG_ERROR("Bad memory allocation - Base_Graph_W<Graph_t, W>::init");
 		return -1;
+	}
+
+	if (reset_name) {
+		g_.set_name("");
+		g_.set_path("");
 	}
 		
 return 0;
 }
 
 template<class Graph_t, class W>
+inline int Base_Graph_W<Graph_t, W>::reset(std::size_t NV, W val, string name)
+{
+	try {
+		g_.reset(NV);
+		w_.assign(NV, val);
+		g_.set_name(name);
+	}
+	catch (...) {
+		LOG_ERROR("bad allocation- Base_Graph_W<Graph_t, W>::reset(int, string)");
+		return -1;
+	}
+	return 0;
+}
+
+template<class Graph_t, class W>
 void Base_Graph_W<Graph_t, W>::clear	(){
-	m_g.clear();
-	m_w.clear();
+	g_.clear();
+	w_.clear();
 }
 
 template <class Graph_t, class W>
 inline
-int	Base_Graph_W<Graph_t,W >::set_w (vector<W>& w_out){
-/////////////
-// sets the weights of all vertices for the given graph structure
+int	Base_Graph_W<Graph_t,W >::set_w (vector<W>& lw){
 
-	if(m_g.number_of_vertices()!=w_out.size()){
-		LOG_ERROR("bizarre number of weights "<< w_out.size() <<" in a "<< m_g.number_of_vertices() <<" vertex graph-Base_Graph_W<Graph_t,W >::set_weights()");
+	//assert
+	if(g_.number_of_vertices() != lw.size()){
+		LOG_ERROR ("bizarre number of weights - Base_Graph_W<Graph_t,W >::set_w");
+		LOG_ERROR ("weights remain unchanged");
 		return -1;
 	}
 
-	m_w=w_out;
+	w_ = lw;
 	return 0;
 }
 
 template <class Graph_t, class W>
 inline
 W Base_Graph_W<Graph_t, W>::maximum_weight(int& v) const{
-/////////////
-// param@v: vertex with maximum weight (REGraph_tURNED)
-// 
-// RETURNS maximum weight value
 
-	typename vector<W>::const_iterator it=std::max_element(m_w.begin(), m_w.end());
-	v=it-m_w.begin();
+	typename vector<W>::const_iterator it = std::max_element(w_.begin(), w_.end());
+	v = it - w_.begin();
 	return *it;
 }
 
@@ -337,18 +441,18 @@ int Base_Graph_W<Graph_t, W>::read_dimacs(const string& filename){
 	}
 
 	//read header
-	if(DIMACS_READER::read_dimacs_header(f, size, nEdges)==-1){
+	if(::gio::dimacs::read_dimacs_header(f, size, nEdges)==-1){
 		clear(); f.close(); return -1;
 	}	
 	
 	init(size);
-	DIMACS_READER::read_empty_lines(f);
+	::gio::read_empty_lines(f);
 
 	//read weights format n <x> <w> if they exist
 	c=f.peek();
 	if(c=='n' || c=='v' ){																						/* 'v' format is used by Zavalnij in evil_W benchmark */
 		//LOG_INFO("Base_Graph_W<Graph_t, W>::read_dimacs-DIMACS weights found in file: excluding other weights");
-		for(int n=0; n<m_g.number_of_vertices(); n++){
+		for(int n=0; n<g_.number_of_vertices(); n++){
 			f>>c>>v1>>wv;
 			if(!f.good()){
 				cerr<<"bad line related to weights"<<endl;
@@ -356,7 +460,7 @@ int Base_Graph_W<Graph_t, W>::read_dimacs(const string& filename){
 				f.close();
 				return -1;
 			}
-			m_w[v1-1]=wv;
+			w_[v1-1]=wv;
 			if(wv==0){
 				cerr<<filename<<":wrong header for edges reading DIMACS format"<<endl;
 				clear();
@@ -367,7 +471,7 @@ int Base_Graph_W<Graph_t, W>::read_dimacs(const string& filename){
 		}
 
 		//LOG_INFO("Base_Graph_W<Graph_t, W>::read_dimacs-Weights read correctly from DIMACS file"<<filename);
-		DIMACS_READER::read_empty_lines(f);
+		::gio::read_empty_lines(f);
 	}else{
 		LOG_INFO("read_dimacs-no weights in file, initially assuming unit weights 1.0-Base_Graph_W<Graph_t, W>");
 	}
@@ -380,14 +484,14 @@ int Base_Graph_W<Graph_t, W>::read_dimacs(const string& filename){
 	stringstream sstr(line);
 	int nw=com::counting::count_words(sstr.str());
 	if(nw!=3){
-		LOG_ERROR(filename<<"read_dimacs()-wrong edge line format reading DIMACS format-Base_Graph_W<Graph_t, W>:");
+		LOGG_ERROR(filename , "read_dimacs()-wrong edge line format reading DIMACS format-Base_Graph_W<Graph_t, W>:");
 		clear(); f.close(); return -1;
 	}
 	
 	//parse the first edge
 	if(nw==3){
 		sstr>>c>>v1>>v2;	
-		m_g.add_edge(v1-1,v2-1);
+		g_.add_edge(v1-1,v2-1);
 	}
 	
 	//remaining edges
@@ -401,14 +505,14 @@ int Base_Graph_W<Graph_t, W>::read_dimacs(const string& filename){
 		}
 		//add bidirectional edge	
 		f>>v1>>v2;
-		m_g.add_edge(v1-1,v2-1);
+		g_.add_edge(v1-1,v2-1);
 			
 		f.getline(line, 250);  //remove remaining part of the line
 	}
 	f.close();
 	
 	//name (removes path)
-	m_g.set_name(filename, true);
+	g_.set_name(filename);
 
 	//extension for weighted files (9/10/16)
 	string str(filename);					//filename contains the full path
@@ -416,7 +520,7 @@ int Base_Graph_W<Graph_t, W>::read_dimacs(const string& filename){
 
 	//////////////////////////////////////////////////////////////////////////////
 	//read weights from external files if necessary (deprecated 2023/09/26)
-	if(m_w.empty()){
+	if(w_.empty()){
 			
 
 #ifdef FILE_EXTENSION_W	
@@ -445,12 +549,12 @@ ostream& Base_Graph_W<Graph_t, W>::write_dimacs (ostream& o) {
 	o<<"c File written by GRAPH:"<<PrecisionTimer::local_timestamp();
 	
 	//name
-	if(!m_g.get_name().empty())
-		o<<"\nc "<<m_g.get_name().c_str()<<endl;
+	if(!g_.get_name().empty())
+		o<<"\nc "<<g_.get_name().c_str()<<endl;
 
 	//tamaño del grafo
-	const int NV=m_g.number_of_vertices();
-	o<<"p edge "<<NV<<" "<<m_g.number_of_edges()<<endl<<endl;
+	const int NV=g_.number_of_vertices();
+	o<<"p edge "<<NV<<" "<<g_.number_of_edges()<<endl<<endl;
 
 	//write DIMACS nodes n <v> <w>
 	//if (is_weighted_v()){
@@ -463,7 +567,7 @@ ostream& Base_Graph_W<Graph_t, W>::write_dimacs (ostream& o) {
 	for(int v=0; v<NV; v++){
 		for(int w=0; w<NV; w++){
 			if(v==w) continue;
-			if(m_g.is_edge(v,w) )							//O(log) for sparse graphs: specialize
+			if(g_.is_edge(v,w) )							//O(log) for sparse graphs: specialize
 					o<<"e "<<v+1<<" "<<w+1<<endl;			//1 based vertex notation dimacs
 			
 		}
@@ -475,7 +579,7 @@ ostream& Base_Graph_W<Graph_t, W>::write_dimacs (ostream& o) {
 template<class Graph_t, class W>
 inline
 ostream& Base_Graph_W<Graph_t, W>::print_data(bool lazy, std::ostream& o, bool endl) {
-	m_g.print_data(lazy, o, false);
+	g_.print_data(lazy, o, false);
 	o<<" w";
 	if(endl) o<<std::endl;	
 	return o;
@@ -487,7 +591,7 @@ inline
 ostream& Base_Graph_W<Graph_t, W>::print_weights (com::stack_t<int>& lv, ostream& o) const{
 
 	for(int i=0; i<lv.pt; i++){
-		o<<"["<<lv.get_elem(i)<<","<<m_w[lv.get_elem(i)]<<"] ";
+		o<<"["<<lv.get_elem(i)<<","<<w_[lv.get_elem(i)]<<"] ";
 	}
 	o<<"("<<lv.pt<<")"<<endl;
 	return o;
@@ -498,7 +602,7 @@ inline
 ostream& Base_Graph_W<Graph_t, W>::print_weights (int* lv, int size, ostream& o) const{
 
 	for(int i=0; i<size; i++){
-		o<<"["<<lv[i]<<","<<m_w[lv[i]]<<"] ";
+		o<<"["<<lv[i]<<","<<w_[lv[i]]<<"] ";
 	}
 	o<<"("<<size<<")"<<endl;
 	return o;
@@ -510,7 +614,7 @@ ostream& Base_Graph_W<Graph_t, W>::print_weights (com::stack_t<int>& lv, const v
 ////////////////
 //
 	for(int i=0; i<lv.pt; i++){
-		o<<"["<<mapping[lv.get_elem(i)]<<","<<m_w[mapping[lv.get_elem(i)]]<<"] ";
+		o<<"["<<mapping[lv.get_elem(i)]<<","<<w_[mapping[lv.get_elem(i)]]<<"] ";
 	}
 	o<<"("<<lv.pt<<")"<<endl;
 	return o;
@@ -521,7 +625,7 @@ template <class Graph_t, class W>
 inline
 ostream& Base_Graph_W<Graph_t, W>::print_weights (vint& lv, ostream& o) const{
 	for(int i=0; i<lv.size(); i++){
-		o<<"["<<lv[i]<<","<<m_w[lv[i]]<<"] ";
+		o<<"["<<lv[i]<<","<<w_[lv[i]]<<"] ";
 	}
 	o<<"("<<lv.size()<<")"<<endl;
 	return o;
@@ -534,7 +638,7 @@ ostream& Base_Graph_W<Graph_t, W>::print_weights (_bbt& bbsg, ostream& o) const{
 	while(true){
 		int v=bbsg.next_bit();
 		if(v==EMPTY_ELEM) break;
-		o<<"["<<v<<","<<m_w[v]<<"] ";
+		o<<"["<<v<<","<<w_[v]<<"] ";
 	}
 	o<<"("<<bbsg.popcn64()<<")"<<endl;
 	return o;
@@ -544,14 +648,14 @@ template <class Graph_t, class W>
 inline
 ostream& Base_Graph_W<Graph_t, W>::print_weights (ostream& o, bool show_v) const{
 
-	const int NV=m_g.number_of_vertices();
+	const int NV=g_.number_of_vertices();
 	if(show_v){
 		for(int i=0; i<NV; i++){
-			o<<"["<<i<<","<<m_w[i]<<"] ";
+			o<<"["<<i<<","<<w_[i]<<"] ";
 		}
 		o<<endl;
 	}else{
-		com::stl::print_collection<vector<W>>(m_w, o, true);
+		com::stl::print_collection<vector<W>>(w_, o, true);
 	}
 	return o;
 }
@@ -570,25 +674,25 @@ int Base_Graph_W<Graph_t, W>::read_weights(const string& filename){
 	
 	ifstream f(filename.c_str());
 	if(f.fail()){
-		LOG_DEBUG("could not open weight file: " <<filename);
+		LOG_DEBUG("could not open weight file: " ,filename);
 		return -1;
 	}	
 
-	LOG_INFO("reading vertex weights from: "<<filename.c_str()); 
+	LOG_INFO("reading vertex weights from: " , filename.c_str()); 
 
 	//allocate memory
-	const int NV=m_g.number_of_vertices();
-	m_w.assign(NV, 0.0);
+	const int NV=g_.number_of_vertices();
+	w_.assign(NV, 0.0);
 	
 	//simple reading: assumes no empty lines and no
 	double w=-1.0;
 	for(int i=0; i<NV; i++){
 		f>>w;
 		if(f.fail()){
-			LOG_ERROR("bad reading of weights in:" <<filename);
+			LOG_ERROR("bad reading of weights in:" , filename);
 			return -1;		
 		}
-		m_w[i]=w;		/*memory is already allocated for m_w*/
+		w_[i]=w;		/*memory is already allocated for m_w*/
 	}
 	f.close();
 
@@ -612,17 +716,17 @@ ostream& Graph_W<ugraph, W>::write_dimacs (ostream& o) {
 	o<<"c File written by GRAPH:"<<PrecisionTimer::local_timestamp();
 	
 	//name
-	if(!_mypt::m_g.get_name().empty())
-		o<<"\nc "<< _mypt::m_g.get_name().c_str()<<endl;
+	if(!ptype::g_.get_name().empty())
+		o<<"\nc "<< ptype::g_.get_name().c_str()<<endl;
 
 	//tamaño del grafo
-	const int NV= _mypt::m_g.number_of_vertices();
-	o<<"p edge "<<NV<<" "<< _mypt::m_g.number_of_edges()<<endl<<endl;
+	const int NV= ptype::g_.number_of_vertices();
+	o<<"p edge "<<NV<<" "<< ptype::g_.number_of_edges()<<endl<<endl;
 
 	//write DIMACS nodes n <v> <w>
 	//if (is_weighted_v()){
 		for(int v=0; v<NV; v++){
-			o<<"n "<<v+1<<" "<< _mypt::get_w(v)<<endl;
+			o<<"n "<<v+1<<" "<< ptype::get_w(v)<<endl;
 		}
 	//}
 	
@@ -630,7 +734,7 @@ ostream& Graph_W<ugraph, W>::write_dimacs (ostream& o) {
 	for(int v=0; v<NV-1; v++){
 		for(int w=v+1; w<NV; w++){
 			//if(v==w) continue;
-			if(_mypt::m_g.is_edge(v,w) )					//O(log) for sparse graphs: specialize
+			if(ptype::g_.is_edge(v,w) )					//O(log) for sparse graphs: specialize
 					o<<"e "<<v+1<<" "<<w+1<<endl;			//1 based vertex notation dimacs
 			
 		}

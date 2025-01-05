@@ -8,14 +8,15 @@
 #include "../graph.h"						//contains all relevant graph types
 #include "../algorithms/graph_sort.h"
 #include "utils/logger.h"
-#include "copt/batch/batch_gen.h"
+#include "graph/graph_gen.h"
+//#include "copt/batch/batch_gen.h"
 #include "utils/common_paths.h";
 
 using namespace std;
 
 //////////////////
 //switches
-#define TEST_GRAPH_WEIGHTED_STEP_BY_STEP				//ON to control manually the start of each test
+//#define TEST_GRAPH_WEIGHTED_STEP_BY_STEP				//ON to control manually the start of each test
 //#define print_test_graph_weighted_logs
 
 TEST(GraphW, basic){

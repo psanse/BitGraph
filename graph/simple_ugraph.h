@@ -97,6 +97,7 @@ public:
 
 /////////////
 // degree-related operations
+// 
 // TODO implement bitstring conversions according to the templates properly (3/4/18) - CHECK (02/01/2025)
 public:
 

@@ -153,7 +153,7 @@ int WeightGen<Graph_t>::create_wgraph (Graph_t& g, type_t type, string FILE_EXTE
 	string filename=path + g.graph().get_name() + FILE_EXTENSION;
 	f.open(filename, ofstream::out);
 	if(!f){
-		LOG_INFO("WeightGen<Graph_t>::create_wgraph ()--cannot write weights to file "<<filename);
+		LOGG_INFO("WeightGen<Graph_t>::create_wgraph ()--cannot write weights to file ", filename);
 		return -1;
 	}
 
