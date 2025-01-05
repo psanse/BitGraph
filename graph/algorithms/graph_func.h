@@ -18,7 +18,6 @@
 
 using namespace std;
 
-
 namespace gfunc{
 ////////////////////////
 // stateless functions for GRAPH

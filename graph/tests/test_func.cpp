@@ -3,13 +3,13 @@
 // last_update@:23/01/2019 (adapted for the new Graph_W type) 
 
 
-#include <iostream>
-#include "gtest/gtest.h"
 #include "../graph.h"
 #include "../graph/algorithms/graph_func.h"
+#include "gtest/gtest.h"
+#include <iostream>
 
+using vint = vector<int>;
 using namespace std;
-typedef  vector<int> vint;
 
 #define TEST_GRAPH_FUNC_STEP_BY_STEP
 #define print_graph_func_logs
