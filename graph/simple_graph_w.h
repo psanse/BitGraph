@@ -12,6 +12,7 @@
  * GRAPH is at the core many state of the art leading exact clique
  * algorithms.
  *
+ * TODO - specialization for sparse graphs
  */
 
 #ifndef __SIMPLE_GRAPH_WEIGHTED_H__
