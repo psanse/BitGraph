@@ -46,7 +46,7 @@ template<class Graph_t, class W>
 class Base_Graph_W {	
 																					
 public:
-	enum { Wext = 0, Dext, WWWext, NOext };					//file extensions for weights	
+	enum { Wext = 0, Dext, WWWext, NOext };				//file extensions for weights (used in function read_dimacs)	
 
 	using type = Base_Graph_W<Graph_t, W>;				//own type
 	using graph_type = Graph_t;							//graph type	

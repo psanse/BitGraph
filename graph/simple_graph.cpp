@@ -629,8 +629,6 @@ double Graph<T>::block_density	()	const {
 //}
 
 
-
-
 template<class T>
 bool Graph<T>::is_self_loop () const{
 	for(int i = 0; i < NV_; i++)

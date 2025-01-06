@@ -180,7 +180,7 @@ namespace com {
 			int word_count( 0 );
 			std::stringstream ss(str);
 			std::string word;
-			while( ss >> word ) ++word_count;
+			while (ss >> word) { ++word_count; }
 			return word_count;
 
 		}
