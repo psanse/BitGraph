@@ -176,7 +176,7 @@ namespace com {
 
     namespace counting{
 		inline
-		int count_words(std::string str){
+		int number_of_words(std::string str){
 			int word_count( 0 );
 			std::stringstream ss(str);
 			std::string word;

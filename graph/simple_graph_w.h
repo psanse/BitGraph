@@ -46,6 +46,7 @@ template<class Graph_t, class W>
 class Base_Graph_W {	
 																					
 public:
+	enum { Wext = 0, Dext, WWWext, NOext };					//file extensions for weights	
 
 	using type = Base_Graph_W<Graph_t, W>;				//own type
 	using graph_type = Graph_t;							//graph type	
@@ -176,9 +177,35 @@ const _bbt& get_neighbors				(int v)		const			{ return g_.get_neighbors(v); }
 ////////////
 // I/O
 public:
-	int read_dimacs						(const std::string& filename);												//TODO - Nicify!	
-	virtual ostream& write_dimacs		(std::ostream& o = std::cout);												//TODO - Nicify!
-	int read_weights					(const std::string& filename);												//TODO - Nicify!
+		
+	/*
+	* @brief Writes directed graph to stream in dimacs format
+	*
+	*		 (self-loops are not considered)
+	*/
+	virtual ostream& write_dimacs		(std::ostream& o = std::cout);												
+	
+	/*
+	* @brief Reads weighted undirected graph from file in DIMACS format
+	* @param filename name of the file
+	* @param type extension of additional filename for separate weights (Wext, Dext, WWWext, NOext)
+	*		 default NOext - no additional file
+	* @returns 0 if success, -1 if error
+	*/
+	int read_dimacs						(string filename, int type = NOext);
+	
+	/*
+	* @brief Reads weights from an external file (only weights) 
+	* 
+	*		 Format: numbers ordered and separated (line, space) 
+	*				  i.e. {5 6 7 ...} -> w(1)=5, w(2)=6, w(3)=7,...
+	*			
+	*		 Weights not assigned in the file are set to 0.0
+	* 
+	* @param filename name of the file
+	* @returns 0 if success, -1 if error (empty vector of weights)
+	*/
+	int read_weights					(string filename);												
 		
 	ostream& print_data					(bool lazy = true, std::ostream& o = std::cout, bool endl = true);	
 	
@@ -254,6 +281,11 @@ public:
 ///////////
 //I/O operations
 	
+	/*
+	* @brief Writes undirected graph to stream in dimacs format
+	* 
+	*		 (self-loops are not considered)
+	*/
 	ostream& write_dimacs	(ostream& o = std::cout)		override;								
 };
 

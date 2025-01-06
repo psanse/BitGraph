@@ -82,8 +82,8 @@ inline int Base_Graph_W<Graph_t, W>::gen_mode_weights(int MODE){
 template<class Graph_t, class W>
 inline bool Base_Graph_W<Graph_t, W>::is_unit_weighted()
 {
-	for (int v : w_) {
-		if (v != 1) return false;
+	for (W v : w_) {
+		if (v != 1.0) return false;
 	}
 	return true;
 }
@@ -144,7 +144,7 @@ inline
 int	Base_Graph_W<Graph_t,W >::set_w (vector<W>& lw){
 
 	//assert
-	if(g_.number_of_vertices() != lw.size()){
+	if( g_.number_of_vertices() != lw.size() ){
 		LOG_ERROR ("bizarre number of weights - Base_Graph_W<Graph_t,W >::set_w");
 		LOG_ERROR ("weights remain unchanged");
 		return -1;
@@ -172,34 +172,29 @@ W Base_Graph_W<Graph_t, W>::maximum_weight(int& v) const{
 template<class Graph_t, class W>
 inline
 ostream& Base_Graph_W<Graph_t, W>::write_dimacs(ostream& o) {
-	/////////////////////////
-	// writes file in dimacs format 
-
-	//timestamp 
-	o << "c File written by GRAPH:" << PrecisionTimer::local_timestamp();
-
-	//name
-	if (!g_.get_name().empty())
-		o << "\nc " << g_.get_name().c_str() << endl;
-
-	//tamaño del grafo
-	const int NV = g_.number_of_vertices();
-	o << "p edge " << NV << " " << g_.number_of_edges() << endl << endl;
-
+	
+	//timestamp comment
+	g_.timestamp_dimacs(o);
+	
+	//name comment
+	g_.name_dimacs(o);
+	
+	//dimacs header - recompute edges
+	g_.header_dimacs(o, false);
+		
 	//write DIMACS nodes n <v> <w>
-	//if (is_weighted_v()){
-	for (int v = 0; v << NV; v++) {
+	const int NV = g_.number_of_vertices();
+	for (int v = 0; v < NV; ++v ) {
 		o << "n " << v + 1 << " " << get_w(v) << endl;
 	}
-	//}
-
-	//write edges
-	for (int v = 0; v < NV; v++) {
-		for (int w = 0; w < NV; w++) {
+	
+	//write undirected edges (1-based vertex notation dimacs)
+	for (std::size_t v = 0; v < NV; ++v) {
+		for (std::size_t w = 0; w < NV; ++w) {
 			if (v == w) continue;
-			if (g_.is_edge(v, w))							//O(log) for sparse graphs: specialize
+			if (g_.is_edge(v, w)) {									//O(log) for sparse graphs: specialize
 				o << "e " << v + 1 << " " << w + 1 << endl;			//1 based vertex notation dimacs
-
+			}
 		}
 	}
 
@@ -209,34 +204,27 @@ ostream& Base_Graph_W<Graph_t, W>::write_dimacs(ostream& o) {
 template<class W>
 inline
 ostream& Graph_W<ugraph, W>::write_dimacs(ostream& o) {
-	/////////////////////////
-	// writes file in dimacs format 
 
-		//timestamp 
-	o << "c File written by GRAPH:" << PrecisionTimer::local_timestamp();
+	//timestamp comment
+	g_.timestamp_dimacs(o);
 
-	//name
-	if (!ptype::g_.get_name().empty())
-		o << "\nc " << ptype::g_.get_name().c_str() << endl;
+	//name comment
+	g_.name_dimacs(o);
 
-	//tamaño del grafo
-	const int NV = ptype::g_.number_of_vertices();
-	o << "p edge " << NV << " " << ptype::g_.number_of_edges() << endl << endl;
+	//dimacs header - recompute edges
+	g_.header_dimacs(o, false);
 
 	//write DIMACS nodes n <v> <w>
-	//if (is_weighted_v()){
-	for (int v = 0; v < NV; v++) {
-		o << "n " << v + 1 << " " << ptype::get_w(v) << endl;
+	const int NV = g_.number_of_vertices();
+	for (int v = 0; v < NV; ++v) {
+		o << "n " << v + 1 << " " << get_w(v) << endl;
 	}
-	//}
 
-	//write edges
-	for (int v = 0; v < NV - 1; v++) {
-		for (int w = v + 1; w < NV; w++) {
-			//if(v==w) continue;
-			if (ptype::g_.is_edge(v, w))					//O(log) for sparse graphs: specialize
-				o << "e " << v + 1 << " " << w + 1 << endl;			//1 based vertex notation dimacs
-
+	//write directed edges (1-based vertex notation dimacs)
+	for (std::size_t v = 0; v < NV - 1; ++v) {
+		for (std::size_t w = v + 1; w < NV; ++w) {
+			if (ptype::g_.is_edge(v, w))							//O(log) for sparse graphs: specialize
+				o << "e " << v + 1 << " " << w + 1 << endl;			
 		}
 	}
 
@@ -244,24 +232,9 @@ ostream& Graph_W<ugraph, W>::write_dimacs(ostream& o) {
 }
 
 template<class Graph_t, class W>
-int Base_Graph_W<Graph_t, W>::read_dimacs(const string& filename){
-/////////////////////////////
-// Reads an unweighted simple directed graph in dimacs format
-// 'c' comment
-// 'p' next numbers in the line are size and number of edges
-// 'e' next in the lines is an edge
-// 
-// RETURN VALUE: 0 if correct, -1 in case of error (no memory allocation)
-//
-// Extension (9/10/16): Will aways attempt to read weights for nodes from 
-//						filename.w file
-//
-// Extension (6/09/17): Reading weights in DIMACS format (n <V> <W(V)>)
-//////////////////////
-	
-	int size, nEdges, v1, v2, edges=0;
-	W wv=0.0;
-	char token[10]; char line [250]; char c;
+int Base_Graph_W<Graph_t, W>::read_dimacs (string filename, int type){
+			
+	std::string line;
 	
 	fstream f(filename.c_str());
 	if(!f){
@@ -271,145 +244,163 @@ int Base_Graph_W<Graph_t, W>::read_dimacs(const string& filename){
 	}
 
 	//read header
-	if(::gio::dimacs::read_dimacs_header(f, size, nEdges) == -1){
-		clear(); f.close(); return -1;
+	int nV = -1, nEdges = -1;
+	if(::gio::dimacs::read_dimacs_header(f, nV, nEdges) == -1){
+		clear(); 
+		f.close();
+		return -1;
 	}	
 	
-	reset(size);
+	//allocates memory for the graph, assigns default unit weights
+	reset(nV);
+
+	//skips empty lines
 	::gio::read_empty_lines(f);
 
-	//read weights format n <x> <w> if they exist
-	c=f.peek();
-	if(c=='n' || c=='v' ){																						/* 'v' format is used by Zavalnij in evil_W benchmark */
-		//LOG_INFO("Base_Graph_W<Graph_t, W>::read_dimacs-DIMACS weights found in file: excluding other weights");
-		for(int n=0; n<g_.number_of_vertices(); n++){
-			f>>c>>v1>>wv;
-			if(!f.good()){
-				cerr<<"bad line related to weights"<<endl;
+	//////////////
+	//read vertex weights format <n> <vertex index> <weight> if they exist
+	int v1 = -1, v2 = 1;
+	W wv = 0.0;
+	char c;
+	c = f.peek();
+	switch (c) {
+	case 'n':
+	case 'v':						// 'v' format used by Zavalnij in evil_W benchmark 
+
+		for (int n = 0; n < nV; ++n) {
+			f >> c >> v1 >> wv;
+			if (!f.good()) {
+				cerr << "bad line related to weights" << endl;
 				clear();
 				f.close();
 				return -1;
 			}
-			w_[v1-1]=wv;
-			if(wv==0){
-				cerr<<filename<<":wrong header for edges reading DIMACS format"<<endl;
+			w_[v1 - 1] = wv;
+			if (wv == 0) {
+				cerr << filename << ":wrong header for edges reading DIMACS format" << endl;
 				clear();
 				f.close();
 				return -1;
 			}
-			f.getline(line, 250);  //remove remaining part of the line
+			std::getline(f, line);  //remove remaining part of the line
 		}
 
-		//LOG_INFO("Base_Graph_W<Graph_t, W>::read_dimacs-Weights read correctly from DIMACS file"<<filename);
+		//skip empty lines
 		::gio::read_empty_lines(f);
-	}else{
-		LOG_DEBUG("read_dimacs-no weights in file, initially assuming unit weights 1.0-Base_Graph_W<Graph_t, W>");
+
+		break;
+	default:
+		LOG_DEBUG("Bad weights in file ", filename, " setting unit weights - Base_Graph_W<Graph_t, W>::read_dimacs");
 	}
+			
+	//read weights from external files if necessary 
+	//( @date 9/10/16, the use of additional weight files is deprecated now (26/09/23) )
+	if (w_.empty()) {
+		string strExt(filename);					
 
-/////////////////////	
-//read edges
+		switch (type) {
+		case Wext:
+			strExt += ".w";
+			read_weights(strExt);
+			break;
+		case Dext:
+			strExt += ".d";
+			read_weights(strExt);
+			break;
+		case WWWext:
+			strExt += ".www";
+			read_weights(strExt);
+			break;
+		default:
+			;				//no LOG - no weights expected to be read
+		}
+	}
+	
+	////////////////	
+	//read edges
 
-	//read the first edge to determine the type of input
-	f.getline(line, 250); 
+	//read the first edge line - 3 tokens expected (no edge-weights)
+	std::getline(f, line);
 	stringstream sstr(line);
-	int nw = ::com::counting::count_words(sstr.str());
-	if(nw!=3){
-		LOGG_ERROR(filename , "read_dimacs()-wrong edge line format reading DIMACS format-Base_Graph_W<Graph_t, W>:");
-		clear(); f.close(); return -1;
+	int nw = ::com::counting::number_of_words (line /*sstr.str()*/);
+
+	//assert
+	if(nw != 3){
+		LOGG_ERROR ("Wrong edge format reading first edge line - Base_Graph_W<Graph_t, W>::read_dimacs");
+		clear();
+		f.close();
+		return -1;
 	}
 	
 	//parse the first edge
-	if(nw==3){
-		sstr>>c>>v1>>v2;	
-		g_.add_edge(v1-1,v2-1);
+	if(nw == 3){
+		sstr >> c >> v1 >> v2;	
+		g_.add_edge(v1 - 1,v2 - 1);
 	}
 	
 	//remaining edges
-	for(int e=1; e<nEdges; e++){
-		f>>c;
-		if(c!='e'){
-			cerr<<filename<<":wrong header for edges reading DIMACS format"<<endl;
+	for(int e = 1; e < nEdges; ++e){
+		f >> c;
+		if(c != 'e'){
+			LOG_ERROR("Wrong edge format reading edges - Base_Graph_W<Graph_t, W>::read_dimacs");
 			clear();
 			f.close();
 			return -1;
 		}
 		//add bidirectional edge	
-		f>>v1>>v2;
-		g_.add_edge(v1-1,v2-1);
+		f >> v1 >> v2;
+		g_.add_edge(v1 - 1,v2 - 1);
 			
-		f.getline(line, 250);  //remove remaining part of the line
+		std::getline(f, line);  //remove remaining part of the line
 	}
 	f.close();
 	
-	//name (removes path)
+	//set name 
 	g_.set_name(filename);
 
-	//extension for weighted files (9/10/16)
-	string str(filename);					//filename contains the full path
 	
-
-	//////////////////////////////////////////////////////////////////////////////
-	//read weights from external files if necessary (deprecated 2023/09/26)
-	if(w_.empty()){
-			
-
-#ifdef FILE_EXTENSION_W	
-		str+=".w";
-#elif FILE_EXTENSION_D
-		str+=".d";
-#elif FILE_EXTENSION_WWW
-		str+=".www";
-#else
-		str+=".nofile";
-#endif
-		
-		read_weights(str);
-	}
-	///////////////////////////////////////////////////////////////////////////////////
-return 0;
+	return 0;
 }
 
 template<class Graph_t, class W>
 inline
-int Base_Graph_W<Graph_t, W>::read_weights(const string& filename) {
-	///////////////
-	// reads weights from an external file (only weights)
-	// 
-	// REMARKS
-	// I.assumes the format are separated (line, space,...) ordered weights
-	// i.e. (5 6 7 ...)->w(1)=5, w(2)=6, w(3)=7,...
-	// II. allocates memory for m_wv
-
-
+int Base_Graph_W<Graph_t, W>::read_weights(string filename) {
+	
+	////////////////////////////////
 	ifstream f(filename.c_str());
-	if (f.fail()) {
-		LOG_DEBUG("could not open weight file: ", filename);
+	////////////////////////////////
+
+	//assert
+	if (!f) {
+		LOG_WARNING("Weight file ", filename, "could not be found - Base_Graph_W<Graph_t, W>::read_weights");
 		return -1;
 	}
 
-	LOG_INFO("reading vertex weights from: ", filename.c_str());
+	//debugging IO
+	LOG_DEBUG("reading vertex weights from: ", filename, "- Base_Graph_W<Graph_t, W>::read_weights");
 
-	//allocate memory
-	const int NV = g_.number_of_vertices();
-	w_.assign(NV, 0.0);
+	//allocation of memory for weights
+	auto NV = g_.number_of_vertices();
+	w_.clear();
+	w_.reserve(NV);
 
-	//simple reading: assumes no empty lines and no
+	//reads weights
 	double w = -1.0;
-	for (int i = 0; i < NV; i++) {
+	for (std::size_t i = 0; i < NV; ++i) {
 		f >> w;
 		if (f.fail()) {
-			LOG_ERROR("bad reading of weights in:", filename);
+			LOG_ERROR("bad reading of weights in:", filename, "- Base_Graph_W<Graph_t, W>::read_weights");
+			w_.clear();
 			return -1;
 		}
-		w_[i] = w;		/*memory is already allocated for m_w*/
+		//////////////
+		w_[i] = w;		
+		//////////////
 	}
-	f.close();
 
-	//check to screen
-	/*for(int i=0; i<m_size; i++){
-		cout<<m_wv[i]<<" ";
-	}
-	cout<<endl;*/
+	/////////////////
+	f.close();
+	////////////////
 
 	return 0;
 }

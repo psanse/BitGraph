@@ -78,7 +78,6 @@ add_executable (test_graph  tests/gtest_main.cpp
 #  tests/test_random_graph.cpp
 #  tests/test_fixed_graph.cpp
 
-
 #  tests/test_wegraph.cpp
 #  tests/test_graph_map.cpp
 
