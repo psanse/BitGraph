@@ -103,7 +103,7 @@ TEST_F(UGraphWTest, assignment) {
 TEST_F(UGraphWTest, init) {
 
 	//inits graph - unit weights and clears old name
-	gw.init(3);
+	gw.reset(3);
 
 	///////////////////////////////
 	EXPECT_EQ	(1, gw.get_w(0));
