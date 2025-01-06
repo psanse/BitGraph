@@ -3,14 +3,13 @@
 //last update@16/01/19
 //author:pss
 
-#include <iostream>
-#include "gtest/gtest.h"
 #include "../graph.h"						//contains all relevant graph types
-#include "../algorithms/graph_sort.h"
+#include "gtest/gtest.h"
+#include <iostream>
 #include "utils/logger.h"
 #include "graph/graph_gen.h"
-//#include "copt/batch/batch_gen.h"
 #include "utils/common_paths.h";
+//#include "../algorithms/graph_sort.h"
 
 using namespace std;
 
@@ -19,79 +18,82 @@ using namespace std;
 //#define TEST_GRAPH_WEIGHTED_STEP_BY_STEP				//ON to control manually the start of each test
 //#define print_test_graph_weighted_logs
 
-TEST(GraphW, basic){
-	LOG_INFO("GraphW:basic---------------------------------------");
-	const int NV = 5;
+class GraphWTest : public ::testing::Test {
+protected:
+	void SetUp() override {
+		gw.reset(NV, 0.0);
+		gw.graph().add_edge(0, 1);
+		gw.graph().add_edge(0, 2);
+		gw.set_w(0, 1);
+		gw.set_w(1, 2);
+		gw.set_w(2, 3);
+		gw.set_name("toy_weighted");
+	}
+	void TearDown() override {}
 
-	Graph_W<ugraph, int> gw;		/* new layered template object for weighted graphs */ 
-	gw.init(NV, 0.0);
-	gw.graph().add_edge(0,1);
-	gw.graph().add_edge(0,2);
-	gw.set_w(0,1);
-	gw.set_w(1,2);
-	gw.set_w(2,3);
-	
-/////
-//I/O
-#ifdef print_test_graph_weighted_logs
+	//undirected graph instance	
+	const int NV = 5;
+	ugraph_wi gw;											//undirected graph with integer weights
+};
+
+TEST_F(GraphWTest, basic) {
+		
+
+	/////
+	//I/O
 	gw.print_data();
 	gw.print_weights();				//vertex and weight pairs
 	gw.print_weights(cout, false);	//only weights
-#endif
 
-//////
-//setting weights
+
+	//////
+	//setting weights
 	vector<int> w(NV, 3.0);
 	gw.set_w(w);
-	gw.set_w(3,10);
+	gw.set_w(3, 10);
 	EXPECT_EQ(10, gw.get_w(3));
 	EXPECT_EQ(3, gw.get_w(0));
 	EXPECT_EQ(3, gw.get_w(4));
 
 	//incorrect assignent, too many weights
 	w.assign(10, 5);
-	EXPECT_EQ(-1, gw.set_w(w));
+	ASSERT_EQ(-1, gw.set_w(w));
 
-///////
-// copy constructor
+	///////
+	// copy constructor
 	Graph_W<ugraph, int> gw_copy(gw);
 	EXPECT_EQ(10, gw_copy.get_w(3));
 	EXPECT_EQ(3, gw_copy.get_w(0));
 	EXPECT_EQ(3, gw_copy.get_w(4));
 
-/////
-//I/O
+	/////
+	//I/O
 #ifdef print_test_graph_weighted_logs
 	gw_copy.print_data();
 	gw_copy.print_weights();
 #endif
 
-////////
-// assignment
+	////////
+	// assignment
 	Graph_W<ugraph, int> gw3;
-	gw3=gw;
+	gw3 = gw;
 	EXPECT_EQ(10, gw3.get_w(3));
 	EXPECT_EQ(3, gw3.get_w(0));
 	EXPECT_EQ(3, gw3.get_w(4));
 
-//I/O
+	//I/O
 #ifdef print_test_graph_weighted_logs
 	gw3.print_data();
 #endif
 
-///////
-// new graph: 3 nodes, unit weight 
+	///////
+	// new graph: 3 nodes, unit weight 
 	gw.init(3);
 	EXPECT_EQ(1, gw.get_w(0));
 	EXPECT_EQ(1, gw.get_w(1));
 	EXPECT_EQ(1, gw.get_w(2));
 
-////////	
-	LOG_INFO("GraphW: END basic --------");
-#ifdef TEST_GRAPH_WEIGHTED_STEP_BY_STEP
-	LOG_ERROR("press any key to continue");
-	cin.get();
-#endif;
+	////////	
 }
 
 TEST(GraphW, generate_weights){

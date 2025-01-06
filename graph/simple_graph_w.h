@@ -99,7 +99,11 @@ public:
 	Base_Graph_W						(std::string filename);															
 
 	
-	//TODO other constructors and assign operators (1/1/2025)
+	Base_Graph_W						(const Base_Graph_W& g) = default;												//copy constructor
+	Base_Graph_W						(Base_Graph_W&& g)		= default;												//move constructor
+	Base_Graph_W& operator =			(const Base_Graph_W& g) = default;												//copy operator =
+	Base_Graph_W& operator =			(Base_Graph_W&& g)		= default;												//move operator =
+
 
 	//destructor
 	virtual	~Base_Graph_W()	 = default;		
@@ -198,9 +202,9 @@ const _bbt& get_neighbors				(int v)		const			{ return g_.get_neighbors(v); }
 ////////////
 // I/O
 public:
-	int read_dimacs						(const std::string& filename);			
-	virtual ostream& write_dimacs		(std::ostream& o = std::cout);												//CHECK!
-	int read_weights					(const std::string& filename);
+	int read_dimacs						(const std::string& filename);												//TODO - Nicify!	
+	virtual ostream& write_dimacs		(std::ostream& o = std::cout);												//TODO - Nicify!
+	int read_weights					(const std::string& filename);												//TODO - Nicify!
 		
 	ostream& print_data					(bool lazy = true, std::ostream& o = std::cout, bool endl = true);	
 	
@@ -215,8 +219,8 @@ public:
 // data members
 
 protected:
-	Graph_t g_;
-	vector<W> w_;					//vector of weights (currently automated reading for DIMACS graphs in an auxiliary graph with extension *.w or *.d)
+	Graph_t g_;							//graph
+	vector<W> w_;						//vector of weights 
 
 };
 
@@ -300,11 +304,17 @@ int Graph_W<ugraph, W>::create_complement(Graph_W& g) const {
 
 template<class Graph_t, class W>
 Base_Graph_W<Graph_t, W>::Base_Graph_W(vector<W>& lw){
+
+	if (g_.reset(NV) == -1) {
+		LOG_ERROR("error during memory graph allocation - Base_Graph_W<T, W>::Base_Graph_W");
+		LOG_ERROR("exiting...");
+		std::exit(-1);
+	}
+
 	try{
-		g_.reset(lw.size() );
 		w_ = lw;
 	}catch(...){
-		LOG_ERROR("error during memory graph allocation - Base_Graph_W<T, W>::Base_Graph_W");
+		LOG_ERROR("error during weigth assignment - Base_Graph_W<T, W>::Base_Graph_W");
 		LOG_ERROR("exiting...");
 		std::exit(-1);
 	}	
@@ -345,14 +355,18 @@ inline bool Base_Graph_W<Graph_t, W>::is_unit_weighted()
 }
 
 template<class Graph_t, class W>
-int Base_Graph_W<Graph_t, W>::init(std::size_t NV , W val, bool reset_name = true){
-			 
+int Base_Graph_W<Graph_t, W>::init(std::size_t NV , W val, bool reset_name){
+	
+	if (g_.reset(NV) == -1) {
+		LOG_ERROR("error during memory graph allocation - Base_Graph_W<T, W>::init");
+		return -1;
+	}
+
 	try{
-		g_.reset(NV);
 		w_.assign(NV, val);
 	}
 	catch(...){
-		LOG_ERROR("Bad memory allocation - Base_Graph_W<Graph_t, W>::init");
+		LOG_ERROR("bad weight assignment - Base_Graph_W<Graph_t, W>::init");
 		return -1;
 	}
 
@@ -367,12 +381,16 @@ int Base_Graph_W<Graph_t, W>::init(std::size_t NV , W val, bool reset_name = tru
 template<class Graph_t, class W>
 inline int Base_Graph_W<Graph_t, W>::reset(std::size_t NV, W val, string name)
 {
+	if (g_.reset(NV) == -1) {
+		LOG_ERROR("error during memory graph allocation - Base_Graph_W<T, W>::reset");
+		return -1;
+	}
+
 	try {
-		g_.reset(NV);
-		w_.assign(NV, val);		
+		w_.assign(NV, val);
 	}
 	catch (...) {
-		LOG_ERROR("bad allocation- Base_Graph_W<Graph_t, W>::reset");
+		LOG_ERROR("bad weight assignment - Base_Graph_W<Graph_t, W>::reset");
 		return -1;
 	}
 
@@ -382,8 +400,7 @@ inline int Base_Graph_W<Graph_t, W>::reset(std::size_t NV, W val, string name)
 }
 
 template<class Graph_t, class W>
-void Base_Graph_W<Graph_t, W>::clear ()
-{
+void Base_Graph_W<Graph_t, W>::clear (){
 	g_.clear();
 	w_.clear();
 }
@@ -414,7 +431,7 @@ W Base_Graph_W<Graph_t, W>::maximum_weight(int& v) const{
 
 ///////////////
 //
-// I/O
+// I/O operations
 //
 //////////////
 
@@ -520,7 +537,7 @@ int Base_Graph_W<Graph_t, W>::read_dimacs(const string& filename){
 	}
 
 	//read header
-	if(::gio::dimacs::read_dimacs_header(f, size, nEdges)==-1){
+	if(::gio::dimacs::read_dimacs_header(f, size, nEdges) == -1){
 		clear(); f.close(); return -1;
 	}	
 	
@@ -618,12 +635,58 @@ int Base_Graph_W<Graph_t, W>::read_dimacs(const string& filename){
 return 0;
 }
 
+template<class Graph_t, class W>
+inline
+int Base_Graph_W<Graph_t, W>::read_weights(const string& filename) {
+	///////////////
+	// reads weights from an external file (only weights)
+	// 
+	// REMARKS
+	// I.assumes the format are separated (line, space,...) ordered weights
+	// i.e. (5 6 7 ...)->w(1)=5, w(2)=6, w(3)=7,...
+	// II. allocates memory for m_wv
+
+
+	ifstream f(filename.c_str());
+	if (f.fail()) {
+		LOG_DEBUG("could not open weight file: ", filename);
+		return -1;
+	}
+
+	LOG_INFO("reading vertex weights from: ", filename.c_str());
+
+	//allocate memory
+	const int NV = g_.number_of_vertices();
+	w_.assign(NV, 0.0);
+
+	//simple reading: assumes no empty lines and no
+	double w = -1.0;
+	for (int i = 0; i < NV; i++) {
+		f >> w;
+		if (f.fail()) {
+			LOG_ERROR("bad reading of weights in:", filename);
+			return -1;
+		}
+		w_[i] = w;		/*memory is already allocated for m_w*/
+	}
+	f.close();
+
+	//check to screen
+	/*for(int i=0; i<m_size; i++){
+		cout<<m_wv[i]<<" ";
+	}
+	cout<<endl;*/
+
+	return 0;
+}
+
+
 
 template<class Graph_t, class W>
 inline
 ostream& Base_Graph_W<Graph_t, W>::print_data(bool lazy, std::ostream& o, bool endl) {
 	g_.print_data(lazy, o, false);
-	o << " w";
+	o << "\t w";								//adds tag to indicate it is weighted		
 	if (endl) { o << std::endl; }
 	return o;
 }
@@ -705,50 +768,6 @@ ostream& Base_Graph_W<Graph_t, W>::print_weights (ostream& o, bool show_v) const
 	return o;
 }
 
-template<class Graph_t, class W>
-inline
-int Base_Graph_W<Graph_t, W>::read_weights(const string& filename){
-///////////////
-// reads weights from an external file (only weights)
-// 
-// REMARKS
-// I.assumes the format are separated (line, space,...) ordered weights
-// i.e. (5 6 7 ...)->w(1)=5, w(2)=6, w(3)=7,...
-// II. allocates memory for m_wv
-	
-	
-	ifstream f(filename.c_str());
-	if(f.fail()){
-		LOG_DEBUG("could not open weight file: " ,filename);
-		return -1;
-	}	
-
-	LOG_INFO("reading vertex weights from: " , filename.c_str()); 
-
-	//allocate memory
-	const int NV=g_.number_of_vertices();
-	w_.assign(NV, 0.0);
-	
-	//simple reading: assumes no empty lines and no
-	double w=-1.0;
-	for(int i=0; i<NV; i++){
-		f>>w;
-		if(f.fail()){
-			LOG_ERROR("bad reading of weights in:" , filename);
-			return -1;		
-		}
-		w_[i]=w;		/*memory is already allocated for m_w*/
-	}
-	f.close();
-
-	//check to screen
-	/*for(int i=0; i<m_size; i++){
-		cout<<m_wv[i]<<" ";
-	}
-	cout<<endl;*/
-		
-	return 0; 
-}
 
 
 

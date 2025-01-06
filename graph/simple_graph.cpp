@@ -530,10 +530,12 @@ ostream& Graph<T>::print_data( bool lazy, std::ostream& o, bool endl) {
 
 	//Uses the Template Method Pattern (number_of_edges is overriden)
 
+	if (!name_.empty()) { o << name_.c_str() << '\t'; }
+
 	////////////////////////////////////////////////////////////////
-	o	<< name_.c_str() << "\t" << number_of_vertices() << "\t" 
+	o	<< number_of_vertices() << "\t" 
 		<< std::fixed << number_of_edges (lazy)	<< "\t"
-		<< std::setprecision(6) << density(true);		
+		<< std::setprecision(3) << density(true);		
 	////////////////////////////////////////////////////////////////
 
 	/*Note: lazy comp. of density since the number of edges have already been computed previously */
