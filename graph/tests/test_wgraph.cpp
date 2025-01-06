@@ -1,22 +1,21 @@
-//test_wgraph.cpp: tests for graphs with weights
-//date@:9/10/16
-//last update@16/01/19
-//author:pss
+/*
+* test_wgraph.cpp  tests for vertex weighted graphs
+* @created 9/10/16
+* @last_update 06/01/24
+* @dev pss
+* 
+* @TODO - ADD TESTS
+*/
 
-#include "../graph.h"						//contains all relevant graph types
-#include "gtest/gtest.h"
-#include <iostream>
-#include "utils/logger.h"
+#include "graph/graph.h"						//contains all relevant graph types
 #include "graph/graph_gen.h"
+#include "gtest/gtest.h"
 #include "utils/common_paths.h";
+#include "utils/logger.h"
+#include <iostream>
 //#include "../algorithms/graph_sort.h"
 
 using namespace std;
-
-//////////////////
-//switches
-//#define TEST_GRAPH_WEIGHTED_STEP_BY_STEP				//ON to control manually the start of each test
-//#define print_test_graph_weighted_logs
 
 class GraphWTest : public ::testing::Test {
 protected:
@@ -36,75 +35,105 @@ protected:
 	ugraph_wi gw;											//undirected graph with integer weights
 };
 
-TEST_F(GraphWTest, basic) {
-		
+TEST_F(GraphWTest, contruction) {
 
-	/////
-	//I/O
-	gw.print_data();
-	gw.print_weights();				//vertex and weight pairs
-	gw.print_weights(cout, false);	//only weights
+	EXPECT_EQ	(NV, gw.number_of_vertices());
+	EXPECT_EQ	(2,  gw.number_of_edges());
 
+	//vertex weights
+	EXPECT_EQ	(1, gw.get_w(0));
+	EXPECT_EQ	(2, gw.get_w(1));
+	EXPECT_EQ	(3, gw.get_w(2));
 
-	//////
-	//setting weights
-	vector<int> w(NV, 3.0);
-	gw.set_w(w);
-	gw.set_w(3, 10);
-	EXPECT_EQ(10, gw.get_w(3));
-	EXPECT_EQ(3, gw.get_w(0));
-	EXPECT_EQ(3, gw.get_w(4));
+	//edges
+	EXPECT_TRUE	(gw.is_edge(0, 1));
+	EXPECT_TRUE	(gw.is_edge(0, 2));
+	EXPECT_FALSE(gw.is_edge(1, 2));
 
-	//incorrect assignent, too many weights
-	w.assign(10, 5);
-	ASSERT_EQ(-1, gw.set_w(w));
-
-	///////
-	// copy constructor
-	Graph_W<ugraph, int> gw_copy(gw);
-	EXPECT_EQ(10, gw_copy.get_w(3));
-	EXPECT_EQ(3, gw_copy.get_w(0));
-	EXPECT_EQ(3, gw_copy.get_w(4));
-
-	/////
-	//I/O
-#ifdef print_test_graph_weighted_logs
-	gw_copy.print_data();
-	gw_copy.print_weights();
-#endif
-
-	////////
-	// assignment
-	Graph_W<ugraph, int> gw3;
-	gw3 = gw;
-	EXPECT_EQ(10, gw3.get_w(3));
-	EXPECT_EQ(3, gw3.get_w(0));
-	EXPECT_EQ(3, gw3.get_w(4));
-
-	//I/O
-#ifdef print_test_graph_weighted_logs
-	gw3.print_data();
-#endif
-
-	///////
-	// new graph: 3 nodes, unit weight 
-	gw.init(3);
-	EXPECT_EQ(1, gw.get_w(0));
-	EXPECT_EQ(1, gw.get_w(1));
-	EXPECT_EQ(1, gw.get_w(2));
-
-	////////	
+	EXPECT_STREQ("toy_weighted", gw.get_name().c_str());
 }
+
+TEST_F(GraphWTest, copy_constructor) {
+
+	Graph_W<ugraph, int> gw_copy(gw);
+
+	//////////////////////////////////
+	EXPECT_EQ	(NV, gw_copy.number_of_vertices());
+	EXPECT_EQ	(2, gw_copy.number_of_edges());
+
+	//vertex weights
+	EXPECT_EQ	(1, gw_copy.get_w(0));
+	EXPECT_EQ	(2, gw_copy.get_w(1));
+	EXPECT_EQ	(3, gw_copy.get_w(2));
+
+	//edges
+	EXPECT_TRUE	(gw_copy.is_edge(0, 1));
+	EXPECT_TRUE	(gw_copy.is_edge(0, 2));
+	EXPECT_FALSE(gw_copy.is_edge(1, 2));
+
+	EXPECT_STREQ("toy_weighted", gw_copy.get_name().c_str());
+	//////////////////////////////////
+
+}
+
+TEST_F(GraphWTest, assignment) {
+
+	Graph_W<ugraph, int> gw1;
+	gw1 = gw;
+
+	//////////////////////////////////
+	EXPECT_EQ(NV, gw1.number_of_vertices());
+	EXPECT_EQ(2, gw1.number_of_edges());
+
+	//vertex weights
+	EXPECT_EQ(1, gw1.get_w(0));
+	EXPECT_EQ(2, gw1.get_w(1));
+	EXPECT_EQ(3, gw1.get_w(2));
+
+	//edges
+	EXPECT_TRUE(gw1.is_edge(0, 1));
+	EXPECT_TRUE(gw1.is_edge(0, 2));
+	EXPECT_FALSE(gw1.is_edge(1, 2));
+
+	EXPECT_STREQ("toy_weighted", gw1.get_name().c_str());
+	//////////////////////////////////
+
+}
+
+TEST_F(GraphWTest, init) {
+
+	//inits graph - unit weights and clears old name
+	gw.init(3);
+
+	///////////////////////////////
+	EXPECT_EQ	(1, gw.get_w(0));
+	EXPECT_EQ	(1, gw.get_w(1));
+	EXPECT_EQ	(1, gw.get_w(2));
+	EXPECT_TRUE	(gw.get_name().empty());
+	/////////////////////////////////
+}
+
+TEST_F(GraphWTest, reset) {
+
+	//inits graph - unit weights and clears old name
+	gw.reset(3, 1, "toy");
+
+	///////////////////////////////
+	EXPECT_EQ	(1, gw.get_w(0));
+	EXPECT_EQ	(1, gw.get_w(1));
+	EXPECT_EQ	(1, gw.get_w(2));
+	EXPECT_STREQ("toy", gw.get_name().c_str());
+	/////////////////////////////////
+}
+
 
 TEST(GraphW, generate_weights){
 ////////////////
 // reads DIMACS file without weights and generates weights with %200 formula
 // date of creation: 15/04/18
-
-	LOG_INFO("GraphW:generate_weights---------------------------------------");
-
-	string path= TEST_GRAPH_PATH_DATA;
-	Graph_W<ugraph, int> ugw(path + "brock200_1.clq");
+		
+		
+	Graph_W<ugraph, int> ugw(PATH_GRAPH_TESTS_CMAKE_SRC_CODE  "brock200_1.clq");
 	const int NV=ugw.graph().number_of_vertices();
 		
 	//generate weights WDEG mode
@@ -112,12 +141,7 @@ TEST(GraphW, generate_weights){
 
 	EXPECT_EQ(200, ugw.graph().number_of_vertices());
 	EXPECT_EQ(2, ugw.get_w(0));
-		
-	LOG_INFO("GraphW: END generate_weights --------");
-#ifdef TEST_GRAPH_WEIGHTED_STEP_BY_STEP
-	LOG_ERROR("press any key to continue");
-	cin.get();
-#endif;
+
 }
 
 TEST(GraphW, gen_weights_to_file){
