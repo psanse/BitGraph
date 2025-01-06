@@ -507,7 +507,9 @@ ostream& Base_Graph_W<Graph_t, W>::print_weights (ostream& o, bool show_v) const
 //list of valid types to allow generic code in *.cpp files 
 
 template class  Base_Graph_W<ugraph, int>;
+template class  Base_Graph_W<ugraph, double>;
 template class  Graph_W<ugraph, int>;
+template class  Graph_W<ugraph, double>;
 
 //other specializations... (sparse_graph)
 

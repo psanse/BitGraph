@@ -17,7 +17,7 @@
 
 using namespace std;
 
-class GraphWTest : public ::testing::Test {
+class UGraphWTest : public ::testing::Test {
 protected:
 	void SetUp() override {
 		gw.reset(NV, 0.0);
@@ -35,7 +35,7 @@ protected:
 	ugraph_wi gw;											//undirected graph with integer weights
 };
 
-TEST_F(GraphWTest, contruction) {
+TEST_F(UGraphWTest, contruction) {
 
 	EXPECT_EQ	(NV, gw.number_of_vertices());
 	EXPECT_EQ	(2,  gw.number_of_edges());
@@ -53,7 +53,7 @@ TEST_F(GraphWTest, contruction) {
 	EXPECT_STREQ("toy_weighted", gw.get_name().c_str());
 }
 
-TEST_F(GraphWTest, copy_constructor) {
+TEST_F(UGraphWTest, copy_constructor) {
 
 	Graph_W<ugraph, int> gw_copy(gw);
 
@@ -76,7 +76,7 @@ TEST_F(GraphWTest, copy_constructor) {
 
 }
 
-TEST_F(GraphWTest, assignment) {
+TEST_F(UGraphWTest, assignment) {
 
 	Graph_W<ugraph, int> gw1;
 	gw1 = gw;
@@ -100,7 +100,7 @@ TEST_F(GraphWTest, assignment) {
 
 }
 
-TEST_F(GraphWTest, init) {
+TEST_F(UGraphWTest, init) {
 
 	//inits graph - unit weights and clears old name
 	gw.init(3);
@@ -113,7 +113,7 @@ TEST_F(GraphWTest, init) {
 	/////////////////////////////////
 }
 
-TEST_F(GraphWTest, reset) {
+TEST_F(UGraphWTest, reset) {
 
 	//inits graph - unit weights and clears old name
 	gw.reset(3, 1, "toy");
