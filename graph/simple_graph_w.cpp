@@ -303,7 +303,7 @@ int Base_Graph_W<Graph_t, W>::read_dimacs(const string& filename){
 		//LOG_INFO("Base_Graph_W<Graph_t, W>::read_dimacs-Weights read correctly from DIMACS file"<<filename);
 		::gio::read_empty_lines(f);
 	}else{
-		LOG_INFO("read_dimacs-no weights in file, initially assuming unit weights 1.0-Base_Graph_W<Graph_t, W>");
+		LOG_DEBUG("read_dimacs-no weights in file, initially assuming unit weights 1.0-Base_Graph_W<Graph_t, W>");
 	}
 
 /////////////////////	

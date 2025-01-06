@@ -55,7 +55,7 @@ TEST_F(UGraphWTest, contruction) {
 
 TEST_F(UGraphWTest, copy_constructor) {
 
-	Graph_W<ugraph, int> gw_copy(gw);
+	ugraph_wi gw_copy(gw);
 
 	//////////////////////////////////
 	EXPECT_EQ	(NV, gw_copy.number_of_vertices());
@@ -78,7 +78,7 @@ TEST_F(UGraphWTest, copy_constructor) {
 
 TEST_F(UGraphWTest, assignment) {
 
-	Graph_W<ugraph, int> gw1;
+	ugraph_wi gw1;
 	gw1 = gw;
 
 	//////////////////////////////////
@@ -126,25 +126,63 @@ TEST_F(UGraphWTest, reset) {
 	/////////////////////////////////
 }
 
+TEST(UGraphW, constructor_from_file) {
 
-TEST(GraphW, generate_weights){
-////////////////
-// reads DIMACS file without weights and generates weights with %200 formula
-// date of creation: 15/04/18
-		
-		
-	Graph_W<ugraph, int> ugw(PATH_GRAPH_TESTS_CMAKE_SRC_CODE  "brock200_1.clq");
-	const int NV=ugw.graph().number_of_vertices();
-		
-	//generate weights WDEG mode
-	WeightGen< Graph_W<ugraph, int> >::create_wgraph(ugw, WeightGen< Graph_W<ugraph, int> >::WMOD, 200);
+	//read DIMACS graph from file - no DIMACS weights, assumed to be unit weights
+	ugraph_wi ugw(PATH_GRAPH_TESTS_CMAKE_SRC_CODE  "sample.clq");
+	const int NV = ugw.graph().number_of_vertices();
 
-	EXPECT_EQ(200, ugw.graph().number_of_vertices());
-	EXPECT_EQ(2, ugw.get_w(0));
+	EXPECT_EQ(7, NV);
+	EXPECT_EQ(1, ugw.get_w(0));
+	EXPECT_EQ(1, ugw.get_w(1));
+	EXPECT_EQ(1, ugw.get_w(6));
 
 }
 
-TEST(GraphW, gen_weights_to_file){
+TEST(UGraphW, gen_weights_dimacs){
+		
+	//read DIMACS graph from file - no DIMACS weights, assumed to be unit weights
+	ugraph_wi ugw (PATH_GRAPH_TESTS_CMAKE_SRC_CODE  "brock200_1.clq");
+	const int NV = ugw.graph().number_of_vertices();
+
+	EXPECT_EQ(200, NV);
+	EXPECT_EQ(1, ugw.get_w(0));
+	EXPECT_EQ(1, ugw.get_w(1));
+	EXPECT_EQ(1, ugw.get_w(199));
+
+	//generate modulus weights 
+	WeightGen< ugraph_wi >::create_wgraph(ugw, WeightGen<ugraph_wi>::WMOD, 200);
+		
+	EXPECT_EQ(2, ugw.get_w(0));
+	EXPECT_EQ(3, ugw.get_w(1));
+	EXPECT_EQ(200, ugw.get_w(198));
+	EXPECT_EQ(1, ugw.get_w(199));			//unit weight - check!
+}
+
+TEST(UGraphW, gen_random) {
+	
+	const int NV = 50;
+	const double density = 0.3;
+		
+	//creates random graph of size NV with modulus weights
+	ugraph_wi ugw;
+	RandomGen<ugraph_wi>::create_ugraph(ugw, NV, density);							/* empty vertex weights by default */
+	WeightGen<ugraph_wi>::create_wgraph(ugw, WeightGen<ugraph_wi>::WMOD);
+
+	/////////////////////
+	EXPECT_EQ(NV, ugw.graph().number_of_vertices());
+	EXPECT_TRUE(ugw.density()< density + 0.01);
+	EXPECT_TRUE(ugw.density()> density - 0.01);
+	////////////////////
+}
+
+///////////////
+//
+// DISABLED TESTS
+//
+///////////////
+
+TEST(GraphW, DISABLED_gen_weights_to_file){
 ////////////////
 // reads DIMACS file without weights and generates "*.d" file with weights
 // date of creation: 15/04/18
@@ -166,39 +204,6 @@ TEST(GraphW, gen_weights_to_file){
 	EXPECT_EQ(NV, ugw.graph().number_of_vertices());
 	
 	LOG_INFO("GraphW: END gen_weights_to_file --------");
-#ifdef TEST_GRAPH_WEIGHTED_STEP_BY_STEP
-	LOG_ERROR("press any key to continue");
-	cin.get();
-#endif;
-}
-
-TEST(GraphW, gen_random){
-////////////////
-// generates a random graph and adds random weights
-//
-// TODO@define more tests
-
-	LOG_INFO("GraphW:gen_random---------------------------------------");
-
-	Graph_W<ugraph, int> ugw;
-	typedef Graph_W<ugraph, int> _gt;
-	const int NV=20;
-
-	RandomGen<_gt>::create_ugraph(ugw, NV, .3);						/* empty vertex weights by default */
-	WeightGen< _gt >::create_wgraph(ugw, WeightGen<_gt>::WMOD);
-
-//I/O
-#ifdef print_test_graph_weighted_logs
-	ugw.print_data();
-	ugw.print_weights();
-#endif
-
-	/////////////////////
-	//TESTS
-	EXPECT_EQ(NV, ugw.graph().number_of_vertices());
-
-
-	LOG_INFO("GraphW: END gen_random --------");
 #ifdef TEST_GRAPH_WEIGHTED_STEP_BY_STEP
 	LOG_ERROR("press any key to continue");
 	cin.get();

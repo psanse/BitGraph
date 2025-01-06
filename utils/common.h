@@ -471,15 +471,15 @@ namespace com {
 				//////////////////////////////////////////////////////////////////
 
 			private:
-				static RE re_;										//random gen
+				static RE re_;										//random generator
 				static D dist_;										//uniform distribution
 				static std::size_t seed_;							//default seed
 		};
 
 		////////////////////////////////////////////////////////////////
-		template<typename D = std::uniform_int_distribution<int>,
-			typename RE = std::mt19937							>
-			using ugen = RandomUniformGen< D, RE >;
+		template  < typename D = std::uniform_int_distribution<int>,
+					typename RE = std::mt19937							>
+		using ugen = RandomUniformGen< D, RE >;
 
 		using iugen = RandomUniformGen< std::uniform_int_distribution<int>, std::mt19937 >;
 		using rugen = RandomUniformGen< std::uniform_real_distribution<double>, std::mt19937 >;
@@ -490,7 +490,9 @@ namespace com {
 		inline
 			bool uniform_dist(double p) {
 			//returns true with prob p, 0 with 1-p
-		   /* double n_01=rand()/(double)RAND_MAX;
+
+			//c- windows generator (deprecated)
+		   /* double n_01=std::rand()/(double)RAND_MAX;
 			return (n_01<=p);*/
 
 			/////////////////////////////
