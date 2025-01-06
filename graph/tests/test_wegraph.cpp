@@ -18,7 +18,7 @@ TEST(EdgeWeighted_New, read_write_dimacs) {
 
 	LOG_INFO("EdgeWeighted_New:read_write_dimacs------------------------");
 
-	Graph_EW<ugraph, int> ugew(_PATH_FOR_GRAPH_TESTS_DATA_IN_SRC_CODE "/toy_ew_dimacs.txt");
+	Graph_EW<ugraph, int> ugew(PATH_GRAPH_TESTS_CMAKE_SRC_CODE "toy_ew_dimacs.txt");
 	ugew.print_weights();
 		
 	//vertex weights
@@ -36,14 +36,14 @@ TEST(EdgeWeighted_New, read_write_dimacs) {
 	EXPECT_EQ(67, ugew.get_we(3, 4));
 
 	//write
-	ofstream of(_PATH_FOR_GRAPH_TESTS_DATA_IN_SRC_CODE "/toy_ew_dimacs_gen.txt");
+	ofstream of(PATH_GRAPH_TESTS_CMAKE_SRC_CODE "toy_ew_dimacs_gen.txt");
 	//////////////////////////////////
 	ugew.write_dimacs(of);
 	//////////////////////////////////
 	of.close();
 
 	//TODO@read and test properly (visually correct);
-	Graph_EW<ugraph, int> ugew_gen(_PATH_FOR_GRAPH_TESTS_DATA_IN_SRC_CODE "/toy_ew_dimacs_gen.txt");
+	Graph_EW<ugraph, int> ugew_gen(PATH_GRAPH_TESTS_CMAKE_SRC_CODE "toy_ew_dimacs_gen.txt");
 	ugew.print_weights();
 			
 	LOG_INFO("EdgeWeighted_New: END read_write_dimacs-------------------");

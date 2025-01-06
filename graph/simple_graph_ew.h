@@ -16,6 +16,7 @@
 #include "utils/prec_timer.h"
 #include "utils/logger.h"
 #include "utils/common.h"
+#include "graph/formats/dimacs_format.h"
 #include "graph/simple_graph.h"
 
 using namespace std;	/* not recommended in headers :-) */
@@ -32,24 +33,28 @@ using namespace std;	/* not recommended in headers :-) */
 template<class Graph_t, class W>
 class Base_Graph_EW {							
 public:
-	typedef vector<vector<W>> mat_t;
-	typedef Graph_t _gt;
+	using mat_t = vector<vector<W>>;					//matrix type for weights
 
-protected:
-	Graph_t m_g;
-	mat_t   m_we;																						//extended for vertex and edge weights (20_/11/21))																	
-	int NV;																								//order of @m_g for commodity
+	using type = Base_Graph_EW<Graph_t, W>;				//own type
+	using graph_type = Graph_t;							//graph type	
+	using basic_type = typename Graph_t::basic_type;	//bitset type used by graph type 
+
+	//alias types for backward compatibility
+	using _gt = graph_type;
+	using _bbt = basic_type;
+	using _wt = W;																					
 	
-public:
-	static const W NOWT;
-	typedef typename Graph_t::_bbt _bbt;
-	typedef W _wt;																						//external type name alias used in the framework
-
+	//constants - globals
+	static const W NOWT;								//default weight value for empty weights	
+																				
+	//constructors
 	Base_Graph_EW(Graph_t& g_out, mat_t& lwe) :m_g(g_out), m_we(lwe), NV(m_g.number_of_vertices()) {}
 	Base_Graph_EW(int nV, W val = 0.0) { init(nV, val); }												//creates empty graph with size vertices	
 	Base_Graph_EW(string filename);																		//read weighted ASCII file or generate weights using formula- CHECK! (21/11/2021))
 	Base_Graph_EW() : NV(-1) {};																		//does not allocate memory (neither graph nor weights)
-	virtual	~Base_Graph_EW() {};
+	
+	//destructor
+virtual	~Base_Graph_EW() = default;
 
 	/////////////
 	// setters and getters	(USE ALWAYS after init(...))
@@ -83,7 +88,7 @@ public:
 //useful common interface with layered graph
 	int number_of_vertices()	const { return NV; }
 	void add_edge(int v, int w) { m_g.add_edge(v, w); }
-	void set_name(string str, bool sep_path = false) { m_g.set_name(str, sep_path); }
+	void set_name(string str) { m_g.set_name(str); }
 	string get_name()	const { return m_g.get_name(); }
 	string get_path()	const { return m_g.get_path(); }
 	void set_path(string path_name) { m_g.set_path(path_name); }
@@ -108,6 +113,14 @@ public:
 	virtual ostream& print_data(bool lazy = true, ostream& o = cout, bool endl = true);
 	virtual	ostream& print_weights(ostream& o = cout, bool line_format = true)							const;
 	virtual	ostream& print_weights(vint& lnodes, ostream& o = cout)										const;
+
+///////////////////
+//data members
+
+protected:
+	Graph_t m_g;
+	mat_t   m_we;			//extended for vertex and edge weights (20_/11/21))																	
+	int NV;					//order of @m_g for commodity - REMOVE (06/01/2025)																				
 };
 
 //////////////////////////////////////////////////////////////
@@ -589,7 +602,7 @@ int Base_Graph_EW<Graph_t, W>::read_dimacs(const string& filename){
 				f.close();
 				return -1;
 			}
-			m_we[v1/*-1*/][v1/* -1*/] = wv;
+			m_we[v1 -1 ][v1 -1] = wv;
 			if(wv == 0){
 				LOG_ERROR ("wrong header for edges reading DIMACS format-Base_Graph_EW<Graph_t, W>::read_dimacs");
 				clear();
@@ -612,7 +625,7 @@ int Base_Graph_EW<Graph_t, W>::read_dimacs(const string& filename){
 	bool with_edges=true;
 	f.getline(line, 250); 
 	stringstream sstr(line);
-	int nw=com::counting::count_words(sstr.str());
+	int nw=com::counting::number_of_words(sstr.str());
 	if(nw != 4){
 		LOG_ERROR("bizarre edge_weights in file, assumed unweighted - Base_Graph_EW<Graph_t, W>::read_dimacs()");
 		with_edges=false;		
