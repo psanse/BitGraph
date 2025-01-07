@@ -6,6 +6,7 @@
 #include <stdlib.h>
 #include "../kcore.h"
 #include "utils/common.h"  //to print collections
+#include "utils/prec_timer.h"
 
 using namespace std;
 

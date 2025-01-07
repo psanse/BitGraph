@@ -2,20 +2,21 @@
  * simple_graph_w.cpp implementation file of the classes BaseGraph_W and Graph_W Ugraph (header simple_graph_w.h)
  *
  * @created 16/01/2019
+ * @last_update 06/01/2025
  * @dev pss
  *
  * @comments see end of file for valid template types
  *
  */
 
-#include <iostream>
-#include <fstream>
 #include "bitscan/bitscan.h"
 #include "formats/dimacs_format.h"
-#include "utils/prec_timer.h"
-#include "utils/logger.h"
-#include "utils/common.h"
 #include "simple_graph_w.h"			
+#include "utils/common.h"
+#include "utils/logger.h"
+#include "utils/prec_timer.h"
+#include <fstream>
+#include <iostream>
 				
 using namespace std;							
 

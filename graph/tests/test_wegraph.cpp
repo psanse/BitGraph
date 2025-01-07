@@ -10,6 +10,7 @@
 #include "graph_gen.h"			
 #include "utils/common_paths.h"
 
+
 using namespace std;
 
 //#define TEST_GRAPH_FAST_SORT_STEP_BY_STEP										//[DEF-OFF] ON for one test at a time
@@ -182,17 +183,17 @@ TEST(EdgeWeighted_New, gen_random){
 //////////////////
 //directed graph
 
-	Graph_EW<graph, int> gew;
-	typedef Graph_EW<graph, int> _gt;
-	
-	RandomGen<_gt>::create_graph(gew, NV, .3);								/* 0.0 edge weights */
-	EdgeWeightGen< _gt >::create_wgraph(gew, EdgeWeightGen<_gt>::WMOD);
+	//Graph_EW<graph, int> gew;
+	//typedef Graph_EW<graph, int> _gt;
+	//
+	//RandomGen<_gt>::create_graph(gew, NV, .3);								/* 0.0 edge weights */
+	//EdgeWeightGen< _gt >::create_wgraph(gew, EdgeWeightGen<_gt>::WMOD);
 
-	//QUERIES....
+	////QUERIES....
 
-	//I/O
-	gew.print_data();
-	gew.print_weights();
+	////I/O
+	//gew.print_data();
+	//gew.print_weights();
 	
 	LOG_INFO("EdgeWeighted_New: END gen_random-----------------------");
 #ifdef	TEST_GRAPH_FAST_SORT_STEP_BY_STEP

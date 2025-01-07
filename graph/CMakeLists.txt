@@ -32,6 +32,7 @@ link_directories(${LEDA_ROOT})
 add_library (graph simple_graph.cpp
 simple_ugraph.cpp
 simple_graph_w.cpp
+simple_graph_ew.cpp
 formats/mmio.cpp 
 algorithms/decode.cpp
 ${useful_headers_for_IDE} 
@@ -46,6 +47,7 @@ else()
 add_library (graph simple_graph.cpp
 simple_ugraph.cpp
 simple_graph_w.cpp
+simple_graph_ew.cpp
 formats/mmio.cpp
 algorithms/decode.cpp
 ${useful_headers_for_IDE}
