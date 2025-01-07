@@ -267,6 +267,7 @@ public:
 
 	/////////////
 	//useful framework-specific interface for undirected weighted graphs
+	
 	int max_graph_degree	()														{ return ptype::g_.max_graph_degree(); }
 	int degree				(int v)										const		{ return ptype::g_.degree(v); }
 	int degree				(int v, const typename ptype::_bbt & bbn)	const		{ return ptype::g_.degree(v, bbn); }
@@ -281,7 +282,6 @@ public:
 
 	virtual	std::ostream& write_dimacs	(std::ostream& o);
 };
-
 
 
 #endif
