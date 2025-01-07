@@ -62,7 +62,7 @@ public:
 	using _wt = W;																					
 	
 	//constants - globals
-	static const W NOWT;								//default weight value for empty weights (0.0)	
+	static const W NOWT;								//default/no weight value for weights (0.0)	
 																				
 	//constructors
 	Base_Graph_EW			()										{};											//no memory allocation
@@ -194,7 +194,7 @@ virtual	~Base_Graph_EW()										= default;
 	void neg_w();																						
 
 ////////////
-// I/O
+// I/O 
 public:
 
 	int read_dimacs					(const string& filename);
@@ -214,8 +214,10 @@ protected:
 
 //////////////////////////////////////////////////////////////
 template<class Graph_t, class W>
-//const W Base_Graph_EW<Graph_t, W >::NOWT = 0x1FFFFFFF;												 //[default ]equivalent to CLQMAX_INT- TODO@check which is the best constant for EMPTY WEIGHTS!
-const W Base_Graph_EW <Graph_t, W >::NOWT = 0;															 //equivalent to CLQMAX_INT- TODO@check which is the best constant for EMPTY WEIGHTS!
+const W Base_Graph_EW <Graph_t, W >::NOWT = 0;															
+
+//const W Base_Graph_EW<Graph_t, W >::NOWT = 0x1FFFFFFF;		//equivalent to CLQMAX_INT
+
 /////////////////////////////////////////////////////////////
 
 ////////////////////////
@@ -731,31 +733,30 @@ ostream& Base_Graph_EW<Graph_t, W>::write_dimacs (ostream& o) {
 template <class Graph_t, class W>
 inline
 ostream& Base_Graph_EW<Graph_t, W>::print_weights (ostream& o, bool line_format) const{
-///////////////////////
-// outputs to stream weights in different formats
 
-	o << "\n***********************************"<<endl;
-	const int NV=number_of_vertices();
-	
+	auto NV = number_of_vertices();
+
+	o << "\n***********************************" << endl;
+		
 	if(line_format){
-		for(int i=0; i<NV; i++){		
-			for(int j=0; j<NV; j++){
+		for(std::size_t i = 0; i < NV; ++i){		
+			for(std::size_t j = 0; j < NV; ++j){
 				if(we_[i][j] != Base_Graph_EW<Graph_t, W>::NOWT){
-					o<<"["<<i<<"->"<<j<<" ("<<we_[i][j]<<")] "<<endl;
+					o << "[" << i << "->" << j << " (" << we_[i][j] << ")] " << endl;
 				}
 			}			
 		}	
-	}else{					//outputs to stream edge-weights in matrix form
-		for(int i=0; i<NV; i++){
-			for(int j=0; j<NV; j++){
+	}else{								//outputs to stream edge-weights in matrix form
+		for(std::size_t i = 0; i < NV; ++i){
+			for(std::size_t j = 0; j < NV; ++j){
 				if (we_[i][j] != Base_Graph_EW<Graph_t, W>::NOWT) {
-					o << we_[i][j] << "\t";
+					o << we_[i][j] << '\t';
 				}
 				else {
-					o << "--" << "\t";
+					o << "--" << '\t';
 				}
 			}
-			o<<endl;
+			o << endl;
 		}
 	}
 	o << "*************************************" << endl;
@@ -782,10 +783,10 @@ ostream& Base_Graph_EW<Graph_t, W>::print_weights (vint& ln, ostream& o) const{
 
 template<class Graph_t, class W>
 inline
-ostream& Base_Graph_EW<Graph_t, W>::print_data(bool lazy, std::ostream& o, bool endl) {
+ostream& Base_Graph_EW<Graph_t, W>::print_data (bool lazy, std::ostream& o, bool endl) {
 	g_.print_data(lazy, o, false);
-	o<<" ew";
-	if(endl) o<<std::endl;	
+	o << " ew";								//"w" for vertex-weighted graphs in GRAPH lib
+	if (endl) { o << std::endl; }
 	return o;
 }
 
