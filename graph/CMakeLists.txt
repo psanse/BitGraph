@@ -73,7 +73,6 @@ if (graph_build_tests)
 add_executable (test_graph  tests/gtest_main.cpp
 #  tests/test_degree.cpp			
 #  tests/test_graph_sort.cpp
-
 #  tests/test_graph_properties_in_folder.cpp  
 #  tests/test_kcore.cpp
 #  tests/test_kcore_in_folder.cpp
@@ -84,7 +83,6 @@ add_executable (test_graph  tests/gtest_main.cpp
 
 #  TESTS UNDER DEVELOPMENT  / CHECKING
    tests/test_wegraph.cpp
-#  tests/test_wgraph.cpp
 #  tests/test_func.cpp
 
 #  TESTS CHECKED
@@ -93,6 +91,7 @@ add_executable (test_graph  tests/gtest_main.cpp
 #  tests/test_decode.cpp
 #  tests/test_graph.cpp
 #  tests/test_ugraph.cpp
+#  tests/test_wgraph.cpp
 #  tests/test_graph_conversions.cpp
 #  tests/test_sparse_graph.cpp
 #  tests/test_format.cpp  

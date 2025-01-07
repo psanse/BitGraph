@@ -15,7 +15,6 @@
  * GRAPH is at the core many state of the art leading exact clique
  * algorithms.
  *
- * TODO - REFACTORING and TESTING (06/01/2025)
  */
 
 #ifndef __SIMPLE_GRAPH_EDGE_WEIGHTED_H__

@@ -1,60 +1,58 @@
-//test_wegraph.cpp: all tests for graphs with edge_weights (for now weights are over undirected edges to all effects; I am not sure yet if directed edges will have impact on weighted edges)
-//initial date:20/7/18
-//author:pss
+/*
+* test_wegraph.cpp  tests for edge-weighted graphs
+* @created 20/7/18
+* @last_update 08/01/25
+* @dev pss
+*
+* @TODO - ADD TESTS
+*/
 
 #include <iostream>
 #include "gtest/gtest.h"
-#include "graph.h"										//contains all relevant graph types
 #include "utils/logger.h"
-#include "utils/file.h"
 #include "graph_gen.h"			
 #include "utils/common_paths.h"
-
+#include "simple_graph_ew.h"
 
 using namespace std;
 
 //#define TEST_GRAPH_FAST_SORT_STEP_BY_STEP										//[DEF-OFF] ON for one test at a time
 
-TEST(EdgeWeighted_New, read_write_dimacs) {
-
-	LOG_INFO("EdgeWeighted_New:read_write_dimacs------------------------");
+TEST(UGraphEW, constructor_file) {
 
 	Graph_EW<ugraph, int> ugew(PATH_GRAPH_TESTS_CMAKE_SRC_CODE "toy_ew_dimacs.txt");
-	ugew.print_weights();
-		
-	//vertex weights
+	
+	EXPECT_EQ(5, ugew.number_of_vertices());
+	EXPECT_EQ(5, ugew.number_of_edges());
+
+	//all vertex weights 
 	EXPECT_EQ(10, ugew.get_we(0, 0));
 	EXPECT_EQ(20, ugew.get_we(1, 1));
 	EXPECT_EQ(30, ugew.get_we(2, 2));
 	EXPECT_EQ(40, ugew.get_we(3, 3));
 	EXPECT_EQ(50, ugew.get_we(4, 4));
 
-	//edge weights
+	//all (undirected) edge weights
 	EXPECT_EQ(27, ugew.get_we(0, 1));
 	EXPECT_EQ(37, ugew.get_we(0, 2));
 	EXPECT_EQ(47, ugew.get_we(0, 3));
 	EXPECT_EQ(57, ugew.get_we(2, 4));
 	EXPECT_EQ(67, ugew.get_we(3, 4));
 
-	//write
-	ofstream of(PATH_GRAPH_TESTS_CMAKE_SRC_CODE "toy_ew_dimacs_gen.txt");
-	//////////////////////////////////
-	ugew.write_dimacs(of);
-	//////////////////////////////////
-	of.close();
+	////write
+	//ofstream of(PATH_GRAPH_TESTS_CMAKE_SRC_CODE "toy_ew_dimacs_gen.txt");
+	////////////////////////////////////
+	//ugew.write_dimacs(of);
+	////////////////////////////////////
+	//of.close();
 
 	//TODO@read and test properly (visually correct);
-	Graph_EW<ugraph, int> ugew_gen(PATH_GRAPH_TESTS_CMAKE_SRC_CODE "toy_ew_dimacs_gen.txt");
-	ugew.print_weights();
-			
-	LOG_INFO("EdgeWeighted_New: END read_write_dimacs-------------------");
-#ifdef	TEST_GRAPH_FAST_SORT_STEP_BY_STEP
-	LOG_ERROR("press any key to continue");
-	cin.get();
-#endif
+	//Graph_EW<ugraph, int> ugew_gen(PATH_GRAPH_TESTS_CMAKE_SRC_CODE "toy_ew_dimacs_gen.txt");
+	//ugew.print_weights();
+
 }
 
-TEST(EdgeWeighted_New, basic){
+TEST(UGraphEW, basic){
 
 	LOG_INFO("EdgeWeighted_New:basic---------------------------------");
 	Graph_EW<ugraph, double> ugew(10, 0.0);
@@ -130,7 +128,7 @@ TEST(EdgeWeighted_New, basic){
 #endif
 }
 
-TEST(EdgeWeighted_New, generate_weights){
+TEST(UGraphEW, generate_weights){
 ////////////////
 // reads DIMACS file without weights and generates weights with %200 formula
 // date of creation: 15/04/18
@@ -159,7 +157,7 @@ TEST(EdgeWeighted_New, generate_weights){
 #endif
 }
 
-TEST(EdgeWeighted_New, gen_random){
+TEST(UGraphEW, gen_random){
 ////////////////
 // generates a random graph and adds random edge weights
 //
