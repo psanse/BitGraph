@@ -58,7 +58,9 @@ TEST(EdgeWeighted_New, basic){
 	LOG_INFO("EdgeWeighted_New:basic---------------------------------");
 	Graph_EW<ugraph, double> ugew(10, 0.0);
 	ugew.set_name("test graph");
-	double NOWT = Graph_EW<ugraph, double>::NOWT;
+	
+	double NOWT = Graph_EW<ugraph, double>::NOWT;		//empty weights are 0 - CKECK!
+	//double NOWT = 0;		
 
 	ugew.graph().add_edge(0,1);
 	int status =ugew.set_we(0, 1, 1.0);
