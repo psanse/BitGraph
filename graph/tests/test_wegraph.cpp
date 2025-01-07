@@ -18,9 +18,13 @@ using namespace std;
 
 //#define TEST_GRAPH_FAST_SORT_STEP_BY_STEP										//[DEF-OFF] ON for one test at a time
 
-TEST(UGraphEW, constructor_file) {
+using ugraph_ewi = Graph_EW<ugraph, int>;
+using ugraph_ew	 = Graph_EW<ugraph, double>;
+using vint = vector<int>;
 
-	Graph_EW<ugraph, int> ugew(PATH_GRAPH_TESTS_CMAKE_SRC_CODE "toy_ew_dimacs.txt");
+TEST(UGraphEW, constructor_file) {
+		
+	ugraph_ewi ugew(PATH_GRAPH_TESTS_CMAKE_SRC_CODE "toy_ew_dimacs.txt");
 	
 	EXPECT_EQ(5, ugew.number_of_vertices());
 	EXPECT_EQ(5, ugew.number_of_edges());
@@ -49,16 +53,15 @@ TEST(UGraphEW, constructor_file) {
 	//TODO@read and test properly (visually correct);
 	//Graph_EW<ugraph, int> ugew_gen(PATH_GRAPH_TESTS_CMAKE_SRC_CODE "toy_ew_dimacs_gen.txt");
 	//ugew.print_weights();
-
 }
 
 TEST(UGraphEW, basic){
 
 	LOG_INFO("EdgeWeighted_New:basic---------------------------------");
-	Graph_EW<ugraph, double> ugew(10, 0.0);
+	ugraph_ew ugew(10, 0.0);
 	ugew.set_name("test graph");
 	
-	double NOWT = Graph_EW<ugraph, double>::NOWT;		//empty weights are 0 - CKECK!
+	double NOWT = ugraph_ew::NOWT;		//empty weights are 0 - CKECK!
 	//double NOWT = 0;		
 
 	ugew.graph().add_edge(0,1);
@@ -75,7 +78,7 @@ TEST(UGraphEW, basic){
 	EXPECT_DOUBLE_EQ(1.3, ugew.get_we(0, 0));
 	
 	//list of the first 3 nodes
-	vector<int> lv;
+	vint lv;
 	lv.push_back(0); lv.push_back(1); lv.push_back(2); 
 		
 //////////
@@ -136,11 +139,11 @@ TEST(UGraphEW, generate_weights){
 	LOG_INFO("EdgeWeighted_New:generate_weights-----------------------");
 
 	string path= TEST_CLIQUE_PATH_DIMACS_ETSIDI_I9;
-	Graph_EW<ugraph, int> ugew(path + "brock200_1.clq");
+	ugraph_ewi ugew(path + "brock200_1.clq");
 	const int NV=ugew.graph().number_of_vertices();
 		
 	//generate weights WDEG mode
-	EdgeWeightGen< Graph_EW<ugraph, int> >::create_wgraph(ugew, EdgeWeightGen<Graph_EW<ugraph, int>>::WMOD, 200);
+	EdgeWeightGen< ugraph_ewi >::create_wgraph(ugew, EdgeWeightGen<ugraph_ewi>::WMOD, 200);
 
 	EXPECT_EQ(200, ugew.graph().number_of_vertices());
 	EXPECT_EQ(6, ugew.get_we(2, 1));		
@@ -165,12 +168,11 @@ TEST(UGraphEW, gen_random){
 	
 	LOG_INFO("EdgeWeighted_New:gen_random----------------------------");
 
-	Graph_EW<ugraph, int> ugew;
-	typedef Graph_EW<ugraph, int> _ugt;
+	ugraph_ewi ugew;
 	const int NV=10;
 
-	RandomGen<_ugt>::create_ugraph(ugew, NV, .3);								/* 0.0 edge weights */
-	EdgeWeightGen< _ugt >::create_wgraph(ugew, EdgeWeightGen<_ugt>::WMOD);
+	RandomGen<ugraph_ewi>::create_ugraph(ugew, NV, .3);										/* 0.0 edge weights */
+	EdgeWeightGen< ugraph_ewi >::create_wgraph(ugew, EdgeWeightGen<ugraph_ewi>::WMOD);
 
 	//QUERIES....
 
