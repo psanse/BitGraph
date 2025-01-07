@@ -152,7 +152,11 @@ const _bbt& get_neighbors				(int v)		const			{ return g_.get_neighbors(v); }
 /////////////////////////
 //basic graph operations
 
+	/*
+	*  @brief adds edge, no self-loops allowed
+	*/
 	void add_edge						(int v, int w)					{ g_.add_edge(v, w); }
+	
 	double density						(bool lazy = true)				{ return g_.density(lazy); }
 
 /////////////

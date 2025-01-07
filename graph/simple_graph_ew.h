@@ -1,5 +1,7 @@
 /*
- * simple_graph_ew.h file for the classes Base_Graph_EW and Graph_EW for edge and vertex-weighted graphs 
+ * simple_graph_ew.h file for the classes Base_Graph_EW and Graph_EW for edge-weighted graphs 
+ *					 (note: the edge weights for self-loops are possible, and the interface 
+							gives them consideration of vertex weights							)
  *
  * @creation_date 16/01/19
  * @update_date_one 10/11/2021 - train application
@@ -31,6 +33,10 @@
 
 using namespace std;	/* not recommended in headers :-) */
 	 
+//alias
+template<class W>
+using vecw = vector<W>;	
+
 ///////////////////////
 //
 // class Base_Graph_EW 
@@ -56,81 +62,147 @@ public:
 	using _wt = W;																					
 	
 	//constants - globals
-	static const W NOWT;								//default weight value for empty weights	
+	static const W NOWT;								//default weight value for empty weights (0.0)	
 																				
 	//constructors
-	Base_Graph_EW			() {};																				//no memory allocation
+	Base_Graph_EW			()										{};											//no memory allocation
 	Base_Graph_EW			(mat_t& lwe);																		//creates empty graph with edge weights
-	Base_Graph_EW			(_gt& g, mat_t& lwe) : g_(g), we_(lwe) {}											//creates graph with edge weights
-	Base_Graph_EW			(int n, W val = NOWT)								{ init(n, val); }				//creates empty graph with |V|= n and val weights	
+	Base_Graph_EW			(_gt& g, mat_t& lwe) : g_(g), we_(lwe)	{}											//creates graph with edge weights
+	Base_Graph_EW			(int n, W val = NOWT)					{ init(n, val); }							//creates empty graph with |V|= n and val weights	
 	Base_Graph_EW			(string filename);																	//read weighted ASCII file or generate weights using formula- CHECK! (21/11/2021))
 			
 	//copy constructor, move constructor, copy operator =, move operator =
-	Base_Graph_EW					(const Base_Graph_EW& g) = default;
-	Base_Graph_EW					(Base_Graph_EW&& g)		= default;
-	Base_Graph_EW& operator =		(const Base_Graph_EW& g) = default;
-	Base_Graph_EW& operator =		(Base_Graph_EW&& g)		= default;
+	Base_Graph_EW					(const Base_Graph_EW& g)	= default;
+	Base_Graph_EW					(Base_Graph_EW&& g)			= default;
+	Base_Graph_EW& operator =		(const Base_Graph_EW& g)	= default;
+	Base_Graph_EW& operator =		(Base_Graph_EW&& g)			= default;
 
 	//destructor
-virtual	~Base_Graph_EW() = default;
+virtual	~Base_Graph_EW()										= default;
 
 /////////////
 // setters and getters	
-
-	void set_wv			(int v, W val)						{ we_[v][v] = val; }						//idem to set_we( v, v, W val)
-	virtual	int set_we	(int v, int w,  W val);															//sets edge(v,w) or (w.v)) to edge-weight value we 					
-	virtual	void set_we	(W val = 0.0);																	//sets all weights to val 
+	/*
+	*  @brief sets self-loop edge weight (considered as vertex-weight)
+	*/
+	void set_wv			(int v, W val)						{ we_[v][v] = val; }					
+	
+	/*
+	*  @brief sets edge weight given an edge 
+	*	
+	*	(currently weights in self-loops can be added, similar to set_wv)
+	*
+	*  @returns 0 if success or -1 if a weight is added to a non-edge
+	*/
+	virtual	int set_we	(int v, int w,  W val);															 					
+	
+	/*
+	*  @brief sets edge weight given an edge
+	*
+	*	(weights in self-loops are included)
+	*
+	*  @returns 0 if success or -1 if a weight is added to a non-edge
+	*/
 	virtual	int	set_we	(mat_t& lw);
 	
+	/*
+	*  @brief sets all weights to val
+	*/
+	virtual	void set_we	(W val = NOWT);																	//sets all weights to val 
 
-	W get_we			(int v, int w)	const				{ return we_[v][w]; }
-	W get_wv			(int v)			const				{ return we_[v][v]; }									
-	vector<W> get_wv	()				const; 
+	
+	W get_we			(int v, int w)			const		{ return we_[v][w]; }
+	W get_wv			(int v)					const		{ return we_[v][v]; }									
+	
+	/*
+	*  @brief getter for vertex weights
+	*/
+	vecw<W> get_wv		()						const;
+	
 	mat_t& get_we		()									{ return we_; }	
-	const mat_t& get_we	()				const				{ return we_; }
+	const mat_t& get_we	()						const		{ return we_; }
 	Graph_t& graph		()									{ return g_; }
-	const Graph_t& graph()				const				{ return g_; }
+	const Graph_t& graph()						const		{ return g_; }
+
+	int number_of_vertices	()					const		{ return g_.number_of_vertices(); }
+	int number_of_edges		(bool lazy = true)				{ return g_.number_of_edges(lazy); }
+
+
+	const _bbt& get_neighbors	(int v)			const		{ return g_.get_neighbors(v); }
+	_bbt& get_neighbors			(int v)						{ return g_.get_neighbors(v); }
+
+	void set_name				(string str)				{ g_.set_name(str); }
+	string get_name				()				const		{ return g_.get_name(); }
+	string get_path				()				const		{ return g_.get_path(); }
+	void set_path				(string path_name)			{ g_.set_path(path_name); }
 
 //////////////////////////
 // memory allocation
-// 
-	int init			(int nV, W val = NOWT);															//allocates memory for n vertices, assigns weight  @val to ALL vertices and edges
-	int init			(Graph_t& g_out);
+ 
+	/*
+	* @brief resets to empty graph with |V|= n and assigns weight val to all vertices and edges
+	* @param n number of vertices
+	* @param reset_name if true, @name_ and @path_ reset to empty
+	* @returns 0 if success, -1 if memory allocation fails
+	* 
+	* @comment preserved for backward compatibility (use reset(...))
+	*/
+	int init			(int n, W val = NOWT, bool reset_name = true);															
 	void clear			()									 { g_.clear(); we_.clear(); }
+		
+	/*
+	* @brief resets to empty graph |V|= n and assigns weight val to all vertices and edges
+	* @param n number of vertices
+	* @param name name of the instance
+	* @returns 0 if success, -1 if memory allocation fails
+	*/
+	int reset			(std::size_t n, W val = NOWT, string name = "");
 
-	/////////////////////////
-	// consistency
-	bool is_consistent	();																				//checks that edge_weights are present only in edges
+/////////////////////////
+//basic graph operations
 
-////////////////////////
-//useful common interface with layered graph
-	int number_of_vertices()	const { return g_.number_of_vertices(); }
-	void add_edge(int v, int w) { g_.add_edge(v, w); }
-	void set_name(string str) { g_.set_name(str); }
-	string get_name()	const { return g_.get_name(); }
-	string get_path()	const { return g_.get_path(); }
-	void set_path(string path_name) { g_.set_path(path_name); }
+	/*
+	*  @brief adds edge, no self-loops allowed
+	*/
+	void add_edge		(int v, int w)							{ g_.add_edge(v, w); }
+
+	double density		(bool lazy = true)						{ return g_.density(lazy); }
+
+/////////////////////////
+// boolean properties
+
+	bool is_edge		(int v, int w)			const			{ return g_.is_edge(v, w); }
 	
-	//used in the framework
-	const _bbt& get_neighbors(int v)		const { return g_.get_neighbors(v); }
-	_bbt& get_neighbors(int v) { return g_.get_neighbors(v); }
-	int number_of_edges() { return g_.number_of_edges(); }
-	bool is_edge(int v, int w)  const { return g_.is_edge(v, w); }
-	double density() { return g_.density(); }
+	/*
+	* @brief consistency check 
+	* 
+	*		 I. edges with no default weight 
+	*		 TODO...
+	* @returns true if consistent, false otherwise
+	*/
+	bool is_consistent	();																				
+	
+////////////////////////
+//weight operations
+	
+	/*
+	* @brief changes the sign of the weights 
+	*		we(i, j) = -we(i, j)
+	*		 
+	* @returns true if consistent, false otherwise
+	*/
+	void neg_w();																						
 
-	////////////////////////
-	//weight operations
-	void neg_w();																						//negates the weights- we(i, j) = -we(i, j)
-
-	////////////
-	// I/O
+////////////
+// I/O
 public:
-	int read_dimacs(const string& filename);
-	virtual	ostream& write_dimacs(ostream& o);
 
-	virtual ostream& print_data(bool lazy = true, ostream& o = cout, bool endl = true);
-	virtual	ostream& print_weights(ostream& o = cout, bool line_format = true)							const;
-	virtual	ostream& print_weights(vint& lnodes, ostream& o = cout)										const;
+	int read_dimacs					(const string& filename);
+	virtual	ostream& write_dimacs	(ostream& o);
+
+	virtual ostream& print_data		(bool lazy = true, ostream& o = cout, bool endl = true);
+	virtual	ostream& print_weights	(ostream& o = cout, bool line_format = true)							const;
+	virtual	ostream& print_weights	(vint& lnodes, ostream& o = cout)										const;
 
 ///////////////////
 //data members
@@ -142,28 +214,27 @@ protected:
 
 //////////////////////////////////////////////////////////////
 template<class Graph_t, class W>
-//const W Base_Graph_EW<Graph_t, W >::NOWT = 0x1FFFFFFF;																		//[default ]equivalent to CLQMAX_INT- TODO@check which is the best constant for EMPTY WEIGHTS!
-const W Base_Graph_EW<Graph_t, W >::NOWT = 0;																				//equivalent to CLQMAX_INT- TODO@check which is the best constant for EMPTY WEIGHTS!
+//const W Base_Graph_EW<Graph_t, W >::NOWT = 0x1FFFFFFF;												 //[default ]equivalent to CLQMAX_INT- TODO@check which is the best constant for EMPTY WEIGHTS!
+const W Base_Graph_EW <Graph_t, W >::NOWT = 0;															 //equivalent to CLQMAX_INT- TODO@check which is the best constant for EMPTY WEIGHTS!
 /////////////////////////////////////////////////////////////
 
 ////////////////////////
 //
 // Graph_WE class 
-// (user generic class to specialize for different types of graphs) 
+// 
+// I.  user generic class to specialize for different types of graphs
+// II. currently only defined for ugraph type
 //
 ///////////////////////
 
 template <class Graph_t, class W>
 class Graph_EW : public Base_Graph_EW<Graph_t, W> {};
 
-///////////////////////
+////////////////////////////////////
+// 
+// Specialization for undirected graphs
 //
-// class Graph_EW<ugraph> 
-// (specialization for undirected class)
-//
-// currently the one-and-only user class
-//
-///////////////////////
+////////////////////////////////////
 
 template <class W>
 class Graph_EW<ugraph, W> : public Base_Graph_EW<ugraph, W> {
@@ -179,22 +250,14 @@ public:
 	using _wt = W;										//weight number type for backward compatibility
 	using _gt = graph_type;
 	
-
 	//constructors (inherited)
 	using Base_Graph_EW<ugraph, W>::Base_Graph_EW;
 
-
-	//Graph_EW() :Base_Graph_EW<ugraph, W>() {}
-	//Graph_EW(ugraph& g_out, _mat_t& lwe) :Base_Graph_EW<ugraph, W>(g_out, lwe) {}
-	//Graph_EW(int NV, W val = 0.0) :Base_Graph_EW<ugraph, W>(NV, val) {}									//creates empty graph with size vertices	
-	//Graph_EW(std::string filename) :Base_Graph_EW<ugraph, W>(filename) {}
-	//virtual ~Graph_EW() {}
-
 	/////////////
 	//overrides setters
-	virtual	int set_we(int v, int w, W we);
-	virtual	void set_we(W val = 0.0);
-	virtual	int set_we(mat_t& lw);
+	virtual	int set_we	(int v, int w, W we);
+	virtual	void set_we	(W val = 0.0);
+	virtual	int set_we	(mat_t& lw);
 
 	/////////////
 	//useful framework-specific interface for undirected weighted graphs
@@ -214,13 +277,9 @@ public:
 	virtual	ostream& write_dimacs(ostream& o);
 };
 
-//////////////////////////////////////////////////////////////////////////////////////////
-//Graph_EW< ugraph, W > implementation
-
-
 template<class W>
 inline
-int Graph_EW<ugraph, W>::create_complement(Graph_EW<ugraph, W>& g) const {
+int Graph_EW<ugraph, W>::create_complement (Graph_EW<ugraph, W>& g) const {
 	/////////////////////
 	//TODO@ name, path info is lost
 
@@ -265,7 +324,7 @@ int Graph_EW< ugraph, W >::set_we (int v, int w, W val) {
 
 template <class W>
 inline
-void Graph_EW< ugraph, W >::set_we(W val) {
+void Graph_EW< ugraph, W >::set_we (W val) {
 ////////////////////////
 // partial specialization for undirected graphs (symmetrical edge weights)
 	
@@ -293,7 +352,7 @@ void Graph_EW< ugraph, W >::set_we(W val) {
 
 template <class W>
 inline
-int Graph_EW< ugraph, W >::set_we(typename Graph_EW<ugraph, W>::mat_t& lw) {
+int Graph_EW< ugraph, W >::set_we (typename Graph_EW<ugraph, W>::mat_t& lw) {
 ////////////////////////
 // partial specialization for undirected graphs (symmetrical edge weights)
 		
@@ -326,157 +385,52 @@ int Graph_EW< ugraph, W >::set_we(typename Graph_EW<ugraph, W>::mat_t& lw) {
 	return 0;
 }
 
-template <class W>
-inline
-ostream& Graph_EW<ugraph, W>::print_weights (ostream& o, bool line_format, bool only_vertex_weights) const{
-///////////////////////
-// outputs to stream edge-weights (UPPER-TRIANGLE) in different formats
-
-	auto NV = ptype::number_of_vertices();
-	
-	o << "\n***********************************" << endl;
-	if (only_vertex_weights == false) {
-		if (line_format) {
-			for (int v = 0; v < NV; v++) {
-				if (ptype::we_[v][v] != ptype::NOWT) {
-					o << "[" << v << " (" << ptype::we_[v][v] << ")] " << endl;
-				}
-			}
-
-			for (int i = 0; i < NV - 1; i++) {
-				for (int j = i + 1; j < NV; j++) {
-					if (ptype::we_[i][j] != ptype::NOWT) {
-						o << "[" << i << "-" << j << " (" << ptype::we_[i][j] << ")] " << endl;
-					}
-				}
-			}
-		}
-		else {																			//outputs to stream edge-weights in matrix form
-			for (int i = 0; i < NV; i++) {
-				for (int j = i; j < NV; j++) {
-					if (ptype::we_[i][j] != ptype::NOWT) {
-						o << "[" << i << "-" << j << " (" << ptype::we_[i][j] << ")] ";
-					}
-					else {
-						o << "--" << " ";
-					}
-				}
-				o << endl;
-			}
-		}
-	}else{
-		for (int v = 0; v < NV; v++) {
-			if (ptype::we_[v][v] != ptype::NOWT) {
-				o << "[" << v << " (" << ptype::we_[v][v] << ")] " << endl;
-			}
-		}
-	}
-	o << "***********************************" << endl;
-	return o;
-}
-
-template <class W>
-inline
-ostream& Graph_EW<ugraph, W>::print_weights (vint& ln, ostream& o, bool only_vertex_weights) const{
-/////////////////////////
-// Shows relevant vertex and edge weights
-	   
-	o << "\n***********************************" << endl;
-	if (only_vertex_weights == false) {
-		for (int i = 0; i < ln.size(); i++) {
-			if (ptype::we_[ln[i]][ln[i]] != ptype::NOWT) {
-				o << "[" << ln[i] << " (" << ptype::we_[ln[i]][ln[i]] << ")] " << endl;
-			}
-		}
-
-		for (int i = 0; i < ln.size() - 1; i++) {
-			for (int j = i + 1; j < ln.size(); j++) {
-				if (ptype::we_[ln[i]][ln[j]] != ptype::NOWT) {
-					o << "[" << ln[i] << "-" << ln[j] << " (" << ptype::we_[ln[i]][ln[j]] << ")] " << endl;
-				}
-			}
-		}
-	}
-	else {
-		for (int i = 0; i < ln.size(); i++) {
-			if (ptype::we_[ln[i]][ln[i]] != ptype::NOWT) {
-				o << "[" << ln[i] << " (" << ptype::we_[ln[i]][ln[i]] << ")] " << endl;
-			}
-		}
-	}
-	o << "***********************************" << endl;
-	return o;
-}
-
-template<class W>
-inline
-ostream& Graph_EW<ugraph, W>::write_dimacs (ostream& o) {
-/////////////////////////
-// writes file in dimacs format 
-	
-	auto NV = ptype::number_of_vertices();
-
-	//timestamp 
-	o<<"c File written by GRAPH:"<<PrecisionTimer::local_timestamp();
-	
-	//name
-	if(!ptype::g_.get_name().empty())
-		o<<"c "<< ptype::g_.get_name().c_str()<<endl;
-
-	//tamaño del grafo
-	o<<"p edge "<< ptype::number_of_vertices() <<" "<< ptype::g_.number_of_edges()<<endl;
-		
-	//write vertex weights
-	for (int v = 0; v < NV; v++) {
-		if (ptype::we_[v][v] != ptype::NOWT) {
-			o << "n " << v + 1 << " " << ptype::we_[v][v] << endl;
-		}
-	}
-
-	//write edges and edge weights
-	for(int v=0; v< NV -1; v++){
-		for(int w=v+1; w< NV; w++){
-			if (ptype::g_.is_edge(v, w)) {														//O(log) for sparse graphs: specialize
-				o << "e " << v + 1 << " " << w + 1 << " " << ptype::we_[v][w] << endl;		//1 based vertex notation dimacs
-			}
-		}
-	}
-	return o;
-}
-
-///////////////////////////////////////////////////////////////////////////////////////
-//Base_Graph_EW implementation
 
 template<class Graph_t, class W>
 inline
-int Base_Graph_EW<Graph_t, W>::init(int size, W val){
-///////////////////////////
-// Allocates memory for the empty graph (deallocates previous)
+int Base_Graph_EW<Graph_t, W>::init(int NV, W val, bool reset_name){
 
-	try{
-		g_.init(size);
-		we_.assign(size, vector<W>(size, val));
-	}catch(...){
-		LOG_ERROR("bad allocation- Base_Graph_EW<Graph_t, W>::init(int, W)");
+	if (g_.reset(NV) == -1) {
+		LOG_ERROR("error during memory graph allocation - Base_Graph_EW<T, W>::init");
 		return -1;
-	}		
+	}
+	
+	try {
+		we_.assign(NV, vector<W>(NV, val));
+	}
+	catch (...) {
+		LOG_ERROR("bad weight assignment - Base_Graph_EW<Graph_t, W>::init");
+		return -1;
+	}
+
+	if (reset_name) {
+		g_.set_name("");
+		g_.set_path("");
+	}
+
 return 0;
 }
 
-template<class Graph_t, class W>
-inline
-int Base_Graph_EW<Graph_t, W>::init(Graph_t& g_out) {
 
-	try {
-		g_ = g_out;
-		NV = number_of_vertices();
-		we_.assign(NV, vector<W>(NV, NOWT));		
-	}
-	catch (...) {
-		LOG_ERROR("bad allocation- Base_Graph_EW<Graph_t, W>::init(Graph_t&)");
+template<class Graph_t, class W>
+inline int Base_Graph_EW<Graph_t, W>::reset(std::size_t n, W val, string name)
+{
+	if (g_.reset(NV) == -1) {
+		LOG_ERROR("error during memory graph allocation - Base_Graph_W<T, W>::reset");
 		return -1;
 	}
-	return 0;
+
+	try {
+		we_.assign(NV, vector<W>(NV, val));
+	}
+	catch (...) {
+		LOG_ERROR("bad weight assignment - Base_Graph_EW<Graph_t, W>::init");
+		return -1;
+	}
+
+	g_.set_name(name);
+
+	return 0;	
 }
 
 template<class Graph_t, class W>
@@ -487,8 +441,7 @@ inline bool Base_Graph_EW<Graph_t, W>::is_consistent(){
 	for (int i = 0; i < NV; i++) {
 		for (int j = 0; j < NV; j++) {
 			if ( we_[i][j] == NOWT &&  g_.is_edge(i, j) ) {
-				LOG_ERROR("bizarre edge-weight-Base_Graph_EW<Graph_t, W>::is_consistent()");
-				LOG_ERROR("["<<i<<","<<j<<" ("<<we_[i][j]<<")]");
+				LOG_WARNING	("edge [", i, ", ", j ,")] with def. weight - Base_Graph_EW<Graph_t, W>::is_consistent()");
 				return false;
 			}
 		}
@@ -528,20 +481,16 @@ Base_Graph_EW<Graph_t, W>::Base_Graph_EW(string filename){
 template <class Graph_t, class W>
 inline
 int Base_Graph_EW<Graph_t, W >::set_we(int v, int w, W val) {
-//////////////////
-// sets edge-weight if there is at least an edge between v and w (v->w or w->v)
-// sets vertex weight if @v = @w
-//
-// RETURNS -1 if no edge- weight will not be added
 	
-	if (v == w || g_.is_edge(v, w)) {
+	if (v == w || g_.is_edge(v, w)) {		
 		we_[v][w] = val;
 	}
 	else {
-		LOG_ERROR("bizarre petition to add weight to the non-edge" , "[" , v , "," , w , "]" , "-Base_Graph_EW<Graph_t,W >::set_we(int, int, W)");
-		LOG_ERROR("weight not added");
+		LOG_DEBUG("edge weight cannot be added to the non-edge" , "(" , v , "," , w , ")" , "- Base_Graph_EW<Graph_t,W >::set_we");
+		LOG_DEBUG("weight not added");
 		return -1;
 	}	
+
 	return 0;
 }
 
@@ -567,8 +516,6 @@ void Base_Graph_EW< Graph_t, W>::set_we(W val) {
 template <class Graph_t, class W>
 inline
 int Base_Graph_EW< Graph_t, W>::set_we(mat_t& lw) {
-/////////////////
-//sets all edges-weights in existing edges and vertex weights to @lw
 	
 	auto NV = number_of_vertices();
 
@@ -578,21 +525,18 @@ int Base_Graph_EW< Graph_t, W>::set_we(mat_t& lw) {
 	}
 
 	//set to empty wv and non-edges
-	for (int v = 0; v < NV; v++) {
-		for (int w = 0; w < NV; w++) {
+	for (std::size_t v = 0; v < NV; ++v) {
+		for (std::size_t w = 0; w < NV; ++w) {
 			if (v == w || g_.is_edge(v, w)) {
 				we_[v][w] = lw[v][w];
 			}
 		}
 	}
+
 	return 0;
 }
 
-///////////////
-//
-// I/O
-//
-//////////////
+
 
 template<class Graph_t, class W>
 inline void Base_Graph_EW<Graph_t, W>::neg_w(){
@@ -605,6 +549,26 @@ inline void Base_Graph_EW<Graph_t, W>::neg_w(){
 				we_[i][j] = -we_[i][j];
 		}
 }
+
+template<class Graph_t, class W>
+inline
+vecw<W> Base_Graph_EW<Graph_t, W>::get_wv()  const {
+
+	auto NV = number_of_vertices();
+
+	vector<W> res;
+	res.reserve(NV)
+		for (int v = 0; v < NV; v++) {
+			res.emplace_back(we_[v][v]);
+		}
+	return res;
+}
+
+///////////////
+//
+// I/O
+//
+//////////////
 
 template<class Graph_t, class W>
 inline
@@ -825,14 +789,123 @@ ostream& Base_Graph_EW<Graph_t, W>::print_data(bool lazy, std::ostream& o, bool 
 	return o;
 }
 
-template<class Graph_t, class W>
+template <class W>
 inline
-vector<W> Base_Graph_EW<Graph_t, W>::get_wv()  const {
-	vector<W> res;
-	for (int v = 0; v< NV; v++) {
-		res.push_back(we_[v][v]);
+ostream& Graph_EW<ugraph, W>::print_weights (ostream& o, bool line_format, bool only_vertex_weights) const{
+///////////////////////
+// outputs to stream edge-weights (UPPER-TRIANGLE) in different formats
+
+	auto NV = ptype::number_of_vertices();
+	
+	o << "\n***********************************" << endl;
+	if (only_vertex_weights == false) {
+		if (line_format) {
+			for (int v = 0; v < NV; v++) {
+				if (ptype::we_[v][v] != ptype::NOWT) {
+					o << "[" << v << " (" << ptype::we_[v][v] << ")] " << endl;
+				}
+			}
+
+			for (int i = 0; i < NV - 1; i++) {
+				for (int j = i + 1; j < NV; j++) {
+					if (ptype::we_[i][j] != ptype::NOWT) {
+						o << "[" << i << "-" << j << " (" << ptype::we_[i][j] << ")] " << endl;
+					}
+				}
+			}
+		}
+		else {																			//outputs to stream edge-weights in matrix form
+			for (int i = 0; i < NV; i++) {
+				for (int j = i; j < NV; j++) {
+					if (ptype::we_[i][j] != ptype::NOWT) {
+						o << "[" << i << "-" << j << " (" << ptype::we_[i][j] << ")] ";
+					}
+					else {
+						o << "--" << " ";
+					}
+				}
+				o << endl;
+			}
+		}
+	}else{
+		for (int v = 0; v < NV; v++) {
+			if (ptype::we_[v][v] != ptype::NOWT) {
+				o << "[" << v << " (" << ptype::we_[v][v] << ")] " << endl;
+			}
+		}
 	}
-	return res;
+	o << "***********************************" << endl;
+	return o;
 }
+
+template <class W>
+inline
+ostream& Graph_EW<ugraph, W>::print_weights (vint& ln, ostream& o, bool only_vertex_weights) const{
+/////////////////////////
+// Shows relevant vertex and edge weights
+	   
+	o << "\n***********************************" << endl;
+	if (only_vertex_weights == false) {
+		for (int i = 0; i < ln.size(); i++) {
+			if (ptype::we_[ln[i]][ln[i]] != ptype::NOWT) {
+				o << "[" << ln[i] << " (" << ptype::we_[ln[i]][ln[i]] << ")] " << endl;
+			}
+		}
+
+		for (int i = 0; i < ln.size() - 1; i++) {
+			for (int j = i + 1; j < ln.size(); j++) {
+				if (ptype::we_[ln[i]][ln[j]] != ptype::NOWT) {
+					o << "[" << ln[i] << "-" << ln[j] << " (" << ptype::we_[ln[i]][ln[j]] << ")] " << endl;
+				}
+			}
+		}
+	}
+	else {
+		for (int i = 0; i < ln.size(); i++) {
+			if (ptype::we_[ln[i]][ln[i]] != ptype::NOWT) {
+				o << "[" << ln[i] << " (" << ptype::we_[ln[i]][ln[i]] << ")] " << endl;
+			}
+		}
+	}
+	o << "***********************************" << endl;
+	return o;
+}
+
+template<class W>
+inline
+ostream& Graph_EW<ugraph, W>::write_dimacs (ostream& o) {
+/////////////////////////
+// writes file in dimacs format 
+	
+	auto NV = ptype::number_of_vertices();
+
+	//timestamp 
+	o<<"c File written by GRAPH:"<<PrecisionTimer::local_timestamp();
+	
+	//name
+	if(!ptype::g_.get_name().empty())
+		o<<"c "<< ptype::g_.get_name().c_str()<<endl;
+
+	//tamaño del grafo
+	o<<"p edge "<< ptype::number_of_vertices() <<" "<< ptype::g_.number_of_edges()<<endl;
+		
+	//write vertex weights
+	for (int v = 0; v < NV; v++) {
+		if (ptype::we_[v][v] != ptype::NOWT) {
+			o << "n " << v + 1 << " " << ptype::we_[v][v] << endl;
+		}
+	}
+
+	//write edges and edge weights
+	for(int v=0; v< NV -1; v++){
+		for(int w=v+1; w< NV; w++){
+			if (ptype::g_.is_edge(v, w)) {														//O(log) for sparse graphs: specialize
+				o << "e " << v + 1 << " " << w + 1 << " " << ptype::we_[v][w] << endl;		//1 based vertex notation dimacs
+			}
+		}
+	}
+	return o;
+}
+
 
 #endif
