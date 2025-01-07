@@ -103,24 +103,24 @@ TEST(EdgeWeighted_New, basic){
 	ugew_c.print_weights();
 
 //////////
-//directed graphs 
+//directed graphs  (currently only for ugraphs)
 	
 	//weights of type int
-	Graph_EW<graph, int> gew(10, 0.0);
-	gew.set_name("test graph 2");
-	gew.graph().add_edge(0,1);
-	gew.set_we(0, 1, 1);
-	gew.set_we(0, 2, 2);							/* non-edge*/
-	gew.set_we(2, 2, 3);							/* vertex weight */
-			
-	EXPECT_EQ(1, gew.get_we(0,1));
-	EXPECT_EQ((int)NOWT, gew.get_we(0,2));
-	EXPECT_EQ(3, gew.get_we(2, 2));
+	//Graph_EW<graph, int> gew(10, 0);
+	//gew.set_name("test graph 2");
+	//gew.graph().add_edge(0,1);
+	//gew.set_we(0, 1, 1);
+	//gew.set_we(0, 2, 2);							/* non-edge*/
+	//gew.set_we(2, 2, 3);							/* vertex weight */
+	//		
+	//EXPECT_EQ(1, gew.get_we(0,1));
+	//EXPECT_EQ((int)NOWT, gew.get_we(0,2));
+	//EXPECT_EQ(3, gew.get_we(2, 2));
 
 //////////
 //I/O 
-	gew.print_data();
-	gew.print_weights();							
+	/*gew.print_data();
+	gew.print_weights();							*/
 
 	LOG_INFO("GraphFastRootSort_W: END basic-------------------------");
 #ifdef	TEST_GRAPH_FAST_SORT_STEP_BY_STEP

@@ -37,21 +37,13 @@ int Graph_W<ugraph, W>::create_complement(Graph_W& g) const {
 
 
 template<class Graph_t, class W>
-Base_Graph_W<Graph_t, W>::Base_Graph_W(vector<W>& lw){
+Base_Graph_W<Graph_t, W>::Base_Graph_W(vector<W>& lw) : w_(lw) {
 
 	if (g_.reset(lw.size()) == -1) {
 		LOG_ERROR("error during memory graph allocation - Base_Graph_W<T, W>::Base_Graph_W");
 		LOG_ERROR("exiting...");
 		std::exit(-1);
 	}
-
-	try{
-		w_ = lw;
-	}catch(...){
-		LOG_ERROR("error during weigth assignment - Base_Graph_W<T, W>::Base_Graph_W");
-		LOG_ERROR("exiting...");
-		std::exit(-1);
-	}	
 }
 
 template<class Graph_t, class W>
@@ -131,12 +123,6 @@ inline int Base_Graph_W<Graph_t, W>::reset(std::size_t NV, W val, string name)
 	g_.set_name(name);
 
 	return 0;
-}
-
-template<class Graph_t, class W>
-void Base_Graph_W<Graph_t, W>::clear (){
-	g_.clear();
-	w_.clear();
 }
 
 template <class Graph_t, class W>
