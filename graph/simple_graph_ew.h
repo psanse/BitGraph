@@ -131,10 +131,10 @@ virtual	~Base_Graph_EW()										= default;
 	const _bbt& get_neighbors	(int v)			const		{ return g_.get_neighbors(v); }
 	_bbt& get_neighbors			(int v)						{ return g_.get_neighbors(v); }
 
-	void set_name				(std::string str)				{ g_.set_name(str); }
+	void set_name				(std::string str)			{ g_.set_name(str); }
 	string get_name				()				const		{ return g_.get_name(); }
 	string get_path				()				const		{ return g_.get_path(); }
-	void set_path				(std::string path_name)			{ g_.set_path(path_name); }
+	void set_path				(std::string path_name)		{ g_.set_path(path_name); }
 
 //////////////////////////
 // memory allocation
@@ -176,7 +176,7 @@ virtual	~Base_Graph_EW()										= default;
 	/*
 	* @brief consistency check 
 	* 
-	*		 I. edges with no default weight 
+	*		 I. edges with default weights 
 	*		 TODO...
 	* @returns true if consistent, false otherwise
 	*/
@@ -195,14 +195,48 @@ virtual	~Base_Graph_EW()										= default;
 
 ////////////
 // I/O 
-public:
 
-	int read_dimacs						(const std::string& filename);
+	virtual std::ostream& print_data (bool lazy = true, std::ostream& o = std::cout, bool endl = true);
+
+	/*
+	* @brief Reads weighted directed graph from file in DIMACS format
+	* 
+	*			I. vertex weights are read in lines n <v> <w>, if missing, weights are set to NOWT
+	* 
+	*			II. if the file has edges with no edge weights, weights are set to NOWT
+	* 
+	* @param filename name of the file	 
+	* @returns 0 if success, -1 if error
+	*/
+	int read_dimacs						(std::string filename);
+
+	/*
+	* @brief Writes directed graph to stream in dimacs format
+	*
+	*		 I. weights in self-loops are considered vertex weights
+	* 
+	*		II. vertex weights with value NOWT are not written to file
+	* 
+	*		III.For every edge, a weight is written (including NOWT)
+	* 
+	* @param o output stream
+	* @returns output stream
+	*/
 	virtual	std::ostream& write_dimacs	(std::ostream& o);
-
-	virtual std::ostream& print_data	(bool lazy = true, std::ostream& o = std::cout, bool endl = true);
-	virtual	std::ostream& print_weights	(std::ostream& o = std::cout, bool line_format = true)							const;
-	virtual	std::ostream& print_weights	(vint& lnodes, std::ostream& o = std::cout)										const;
+		
+	/*
+	* @brief streams non-empty (weight value not NOWT) weights
+	*		 of all directed edges. 
+	*/
+	virtual	std::ostream& print_weights	(std::ostream& o = std::cout, bool line_format = true,
+											bool only_vertex_weights = false		)					const;
+	
+	/*
+	* @brief streams non-empty (weight value not NOWT) weights 
+	*		 of directed edges with endpoints in vertices in lv
+	*/
+	virtual	std::ostream& print_weights	(vint& lv, std::ostream& o = std::cout, 
+											bool only_vertex_weights = false		)					const;
 
 ///////////////////
 //data members
@@ -261,25 +295,75 @@ public:
 	*  @returns 0 if success or -1 if called for a non-edge
 	*/
 	int set_we	(int v, int w, W we)	override;
-	
+
+	/*
+	*  @brief sets edge-weight val to all vertices (_we[v, v]) and edge weights
+	* 
+	*		I. NOWT is set as weight value to non-edges
+	* 
+	* @param val weight value
+	*/
 	void set_we	(W val = 0.0)			override;
+	
+	/*
+	*  @brief sets edge-weights in lw consistently to the graph
+	*
+	*		I. NOWT is set as weight value to non-edges in lw
+	*
+	* @param lw input vertex and edge weights
+	*/
 	int set_we	(mat_t& lw)				override;
 
-	/////////////
-	//useful framework-specific interface for undirected weighted graphs
+/////////////
+//useful framework-specific interface for undirected weighted graphs
 	
 	int max_graph_degree	()														{ return ptype::g_.max_graph_degree(); }
 	int degree				(int v)										const		{ return ptype::g_.degree(v); }
 	int degree				(int v, const typename ptype::_bbt & bbn)	const		{ return ptype::g_.degree(v, bbn); }
 
-	int create_complement	(Graph_EW<ugraph, W>& g)					const;				  //weights (also name, path,...) are also stored in the new graph
-	int create_complement	(ugraph& g)									const;				  //weights (also name, path,...) are lost
+	/*
+	* @brief Complement graph (currently name info of original graph is lost)
+	* @param g output graph
+	* @returns 0 if success, -1 if error
+	*/
+	int create_complement	(Graph_EW<ugraph, W>& g)					const;				
+	
+	/*
+	* @brief Complement undirected graph (weights are lost)
+	* @param g output complement undirected unweighted graph
+	* @returns 0 if success, -1 if error
+	*/
+	int create_complement	(ugraph& g)									const		{ return ptype::g_.create_complement(g); }
 
-	/////////////
-	//overrides I/O
-	virtual	std::ostream& print_weights	(std::ostream& o = std::cout, bool line_format = true, bool only_vertex_weights = false)		const;
-	virtual	std::ostream& print_weights	(vint& lv, std::ostream& o = std::cout, bool only_vertex_weights = false)						const;
+/////////////
+// I/O operations
 
+	/*
+	* @brief streams non-empty (weight value not NOWT) weights
+	*		 of all undirected edges.
+	*/
+	virtual	std::ostream& print_weights	(std::ostream& o = std::cout, bool line_format = true,
+											bool only_vertex_weights = false					)	const override;
+	
+	/*
+	* @brief streams non-empty (weight value not NOWT) weights
+	*		 of undirected edges with endpoints in vertices in lv
+	*/
+	virtual	std::ostream& print_weights	(vint& lv, std::ostream& o = std::cout,
+												bool only_vertex_weights = false)					const override;
+
+	/*
+	* @brief Writes undirected graph to stream in dimacs format
+	*
+	*		 I. weights in self-loops are considered vertex weights
+	*
+	*		II. vertex weights with value NOWT are not written to file
+	*
+	*		III.for every edge, a weight is written (including NOWT)
+	*
+	* @param o output stream
+	* @returns output stream
+	*/
 	virtual	std::ostream& write_dimacs	(std::ostream& o);
 };
 

@@ -225,7 +225,7 @@ int Base_Graph_W<Graph_t, W>::read_dimacs (string filename, int type){
 	
 	fstream f(filename.c_str());
 	if(!f){
-		LOG_ERROR("read_dimacs-File could not be opened reading DIMACS format-Base_Graph_W<Graph_t, W>");
+		LOG_ERROR("error when reading file ", filename, " in DIMACS format - Base_Graph_W<Graph_t, W>::read_dimacs");
 		clear();
 		return -1;
 	}
@@ -239,15 +239,19 @@ int Base_Graph_W<Graph_t, W>::read_dimacs (string filename, int type){
 	}	
 	
 	//allocates memory for the graph, assigns default unit weights
-	reset(nV);
+	if (reset(nV) == -1) {
+		clear();
+		f.close();
+		return -1;
+	}
 
 	//skips empty lines
 	::gio::read_empty_lines(f);
 
 	//////////////
 	//read vertex weights format <n> <vertex index> <weight> if they exist
-	int v1 = -1, v2 = 1;
-	W wv = 0.0;
+	int v1 = -1, v2 = -1;
+	W wv = -1;
 	char c;
 	c = f.peek();
 	switch (c) {
@@ -256,19 +260,24 @@ int Base_Graph_W<Graph_t, W>::read_dimacs (string filename, int type){
 
 		for (int n = 0; n < nV; ++n) {
 			f >> c >> v1 >> wv;
-			if (!f.good()) {
-				cerr << "bad line related to weights" << endl;
+			
+			//assert
+			if (f.bad()) {
+				LOG_ERROR("error when reading vertex-weights - Base_Graph_W<Graph_t, W>::read_dimacs");
 				clear();
 				f.close();
 				return -1;
 			}
+
+			//non-positive vertex-weight check
+			if (wv <= 0.0) {
+				LOG_WARNING("non-positive weight read: ", wv, "- Base_Graph_W<Graph_t, W>::read_dimacs");
+			}
+
+			////////////////////
 			w_[v1 - 1] = wv;
-			if (wv == 0) {
-				cerr << filename << ":wrong header for edges reading DIMACS format" << endl;
-				clear();
-				f.close();
-				return -1;
-			}
+			////////////////////
+						
 			std::getline(f, line);  //remove remaining part of the line
 		}
 
@@ -307,6 +316,14 @@ int Base_Graph_W<Graph_t, W>::read_dimacs (string filename, int type){
 	//read edges
 
 	//read the first edge line - 3 tokens expected (no edge-weights)
+	c = f.peek();
+	if (c != 'e') {
+		LOG_ERROR("Wrong edge format reading edges - Base_Graph_EW<Graph_t, W>::read_dimacs");
+		clear();
+		f.close();
+		return -1;
+	}
+
 	std::getline(f, line);
 	stringstream sstr(line);
 	int nw = ::com::counting::number_of_words (line /*sstr.str()*/);
@@ -328,7 +345,7 @@ int Base_Graph_W<Graph_t, W>::read_dimacs (string filename, int type){
 	//remaining edges
 	for(int e = 1; e < nEdges; ++e){
 		f >> c;
-		if(c != 'e'){
+		if(c != 'e' || f.bad()){
 			LOG_ERROR("Wrong edge format reading edges - Base_Graph_W<Graph_t, W>::read_dimacs");
 			clear();
 			f.close();
@@ -344,8 +361,7 @@ int Base_Graph_W<Graph_t, W>::read_dimacs (string filename, int type){
 	
 	//set name 
 	g_.set_name(filename);
-
-	
+		
 	return 0;
 }
 
