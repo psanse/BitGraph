@@ -80,7 +80,7 @@ public:
 // (random generation of generic sparse graphs)
 //
 //////////////////
-template<class Graph_t, int logSizeTable = 35000>
+template<class Graph_t, int logSizeTable = 35000 >
 class SparseRandomGen {};
 
 /////////////////
@@ -91,7 +91,7 @@ class SparseRandomGen {};
 //////////////////
 
 template< int logSizeTable >
-class SparseRandomGen <sparse_ugraph, logSizeTable >
+class SparseRandomGen <sparse_ugraph, logSizeTable>
 {
 	/*
 	*  @brief decodes undimensional edge index to upper triangle of adjacency matrix
@@ -139,8 +139,8 @@ public:
 	enum type_t {WMOD=0, WDEG};
 
 	//non-sparse generators
-	static int create_wgraph (Graph_t& g, type_t, int wmod = DEFAULT_WEIGHT_MODULUS);
-	static int create_wgraph (Graph_t& g, type_t, string FILE_EXTENSION, string FILE_PATH="",  int wmod= DEFAULT_WEIGHT_MODULUS);
+	static int create_weights (Graph_t& g, type_t, int wmod = DEFAULT_WEIGHT_MODULUS);
+	static int create_weights (Graph_t& g, type_t, string FILE_EXTENSION, string FILE_PATH="",  int wmod= DEFAULT_WEIGHT_MODULUS);
 };
 
 /////////////////
@@ -161,15 +161,15 @@ public:
 	enum type_t { WMOD = 0};
 
 	//non sparse generators
-	static int create_wgraph(Graph_t& g, type_t, int wmod = 200);
-	static int create_wgraph(Graph_t& g, type_t, string FILE_EXTENSION, string FILE_PATH = "", int wmod = 200);
+	static int create_weights (Graph_t& g, type_t, int wmod = 200);
+	static int create_weights (Graph_t& g, type_t, string FILE_EXTENSION, string FILE_PATH = "", int wmod = 200);
 };
 
 ////////////////////////////////////////////////////////////////////////
 // Necessary implementations of generic code in header file
 
 template<class Graph_t>
-int RandomGen<Graph_t>::create_ugraph(Graph_t& g, std::size_t n, double p) {
+int RandomGen<Graph_t>::create_ugraph (Graph_t& g, std::size_t n, double p) {
 	///////////////////////////
 	// Generates uniform simple random undirected graph  (no self loops)
 	// with name r<N>_0.<P>.txt
@@ -388,7 +388,7 @@ int SparseRandomGen<sparse_ugraph, logSizeTable>::create_ugraph(sparse_ugraph& g
 
 template<class Graph_t>
 inline
-int WeightGen<Graph_t>::create_wgraph (Graph_t& g, type_t type, int wmod){
+int WeightGen<Graph_t>::create_weights (Graph_t& g, type_t type, int wmod){
 /////////////////////////////////
 // adds weight following two criteria:
 //
@@ -408,7 +408,7 @@ int WeightGen<Graph_t>::create_wgraph (Graph_t& g, type_t type, int wmod){
 			g.set_w(v,(1 + ((v+1) % wmod) ));
 		}
 	}else{
-		LOG_INFO("WeightGen<Graph_t>::create_wgraph()-incorred weight generation mode");
+		LOG_INFO("WeightGen<Graph_t>::create_weights()-incorred weight generation mode");
 	}
 
 	return 0;	
@@ -416,7 +416,7 @@ int WeightGen<Graph_t>::create_wgraph (Graph_t& g, type_t type, int wmod){
 
 template<class Graph_t>
 inline
-int WeightGen<Graph_t>::create_wgraph (Graph_t& g, type_t type, string FILE_EXTENSION, string FILE_PATH, int wmod){
+int WeightGen<Graph_t>::create_weights (Graph_t& g, type_t type, string FILE_EXTENSION, string FILE_PATH, int wmod){
 /////////////////////////////////
 // adds weight following two criteria:
 //
@@ -440,7 +440,7 @@ int WeightGen<Graph_t>::create_wgraph (Graph_t& g, type_t type, string FILE_EXTE
 			g.set_w(v,(1 + ((v+1) % wmod) ));
 		}
 	}else{
-		LOG_INFO("WeightGen<Graph_t>::create_wgraph()-incorred weight generation mode");
+		LOG_INFO("WeightGen<Graph_t>::create_weights()-incorred weight generation mode");
 	}
 	
 
@@ -453,7 +453,7 @@ int WeightGen<Graph_t>::create_wgraph (Graph_t& g, type_t type, string FILE_EXTE
 	string filename=path + g.graph().get_name() + FILE_EXTENSION;
 	f.open(filename, ofstream::out);
 	if(!f){
-		LOGG_INFO("WeightGen<Graph_t>::create_wgraph ()--cannot write weights to file ", filename);
+		LOGG_INFO("WeightGen<Graph_t>::create_weights ()--cannot write weights to file ", filename);
 		return -1;
 	}
 
@@ -467,7 +467,7 @@ int WeightGen<Graph_t>::create_wgraph (Graph_t& g, type_t type, string FILE_EXTE
 
 template<class Graph_t>
 inline
-int EdgeWeightGen<Graph_t>::create_wgraph (Graph_t& g, type_t type, int wmod){
+int EdgeWeightGen<Graph_t>::create_weights (Graph_t& g, type_t type, int wmod){
 /////////////////////////////////
 // adds edge-weights to EXISTING EDGES according to the following criteria:
 //
@@ -484,7 +484,7 @@ int EdgeWeightGen<Graph_t>::create_wgraph (Graph_t& g, type_t type, int wmod){
 	if(type==WMOD){
 		g.gen_modulus_weights();
 	}else{
-		LOG_INFO("bad weight generation mode - EdgeWeightGen<Graph_t>::create_wgraph");
+		LOG_INFO("bad weight generation mode - EdgeWeightGen<Graph_t>::create_weights");
 		LOG_INFO("all weights set to empty value");
 		return -1;
 	}	
@@ -494,7 +494,7 @@ int EdgeWeightGen<Graph_t>::create_wgraph (Graph_t& g, type_t type, int wmod){
 
 template<class Graph_t>
 inline
-int EdgeWeightGen<Graph_t>::create_wgraph (Graph_t& g, type_t type, string FILE_EXTENSION, string FILE_PATH, int wmod){
+int EdgeWeightGen<Graph_t>::create_weights (Graph_t& g, type_t type, string FILE_EXTENSION, string FILE_PATH, int wmod){
 /////////////////////////////////
 // adds edge-weights to EXISTING EDGES according to the following criteria:
 //
@@ -513,7 +513,7 @@ int EdgeWeightGen<Graph_t>::create_wgraph (Graph_t& g, type_t type, string FILE_
 	if(type==WMOD){
 		g.gen_modulus_weights();		
 	}else{
-		LOG_INFO("WeightGen<Graph_t>::create_wgraph()-incorred weight generation mode");
+		LOG_INFO("WeightGen<Graph_t>::create_weights()-incorred weight generation mode");
 	}
 	
 	//copies weights to file
@@ -524,7 +524,7 @@ int EdgeWeightGen<Graph_t>::create_wgraph (Graph_t& g, type_t type, string FILE_
 	string filename=path + g.get_name() + FILE_EXTENSION;
 	f.open(filename, ofstream::out);
 	if(!f){
-		LOG_INFO("WeightGen<Graph_t>::create_wgraph ()--cannot write weights to file "<<filename);
+		LOG_INFO("WeightGen<Graph_t>::create_weights ()--cannot write weights to file "<<filename);
 		return -1;
 	}
 	

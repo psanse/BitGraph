@@ -92,9 +92,9 @@ TEST_F(UGraphEWTest, set_weight) {
 TEST_F(UGraphEWTest, generate_weights) {
 
 	//generate modulus-weights 
-	EdgeWeightGen<ugraph_ewi>::create_wgraph(	ugew,
+	EdgeWeightGen<ugraph_ewi>::create_weights(	ugew,
 												EdgeWeightGen<ugraph_ewi>::WMOD,
-												DEFAULT_VALUE_MODE_AUTO_GEN_WEIGHTS			);		//(change name - adding weights to ugew, but not creating it)
+												DEFAULT_WEIGHT_MODULUS					);		//(change name - adding weights to ugew, but not creating it)
 
 	EXPECT_EQ(NV, ugew.graph().number_of_vertices());
 	EXPECT_EQ(4, ugew.get_we(0, 1));
@@ -126,7 +126,7 @@ TEST(UGraphEW, DISABLED_gen_random ){
 	const int NV=10;
 
 	RandomGen<ugraph_ewi>::create_ugraph(ugew, NV, .3);										/* 0.0 edge weights */
-	EdgeWeightGen< ugraph_ewi >::create_wgraph(ugew, EdgeWeightGen<ugraph_ewi>::WMOD);
+	EdgeWeightGen< ugraph_ewi >::create_weights(ugew, EdgeWeightGen<ugraph_ewi>::WMOD);
 
 	//QUERIES....
 
@@ -141,7 +141,7 @@ TEST(UGraphEW, DISABLED_gen_random ){
 	//typedef Graph_EW<graph, int> _gt;
 	//
 	//RandomGen<_gt>::create_graph(gew, NV, .3);								/* 0.0 edge weights */
-	//EdgeWeightGen< _gt >::create_wgraph(gew, EdgeWeightGen<_gt>::WMOD);
+	//EdgeWeightGen< _gt >::create_weights(gew, EdgeWeightGen<_gt>::WMOD);
 
 	////QUERIES....
 
@@ -199,7 +199,7 @@ TEST(UGraphEW, DISABLED_write_to_file) {
 //	const int NV=ug.number_of_vertices();
 //	
 //	//generate weights (only mode)
-//	EdgeWeightGen<ugraph>::create_wgraph(ug, EdgeWeightGen<ugraph>::WMOD, ".we", PATH);
+//	EdgeWeightGen<ugraph>::create_weights(ug, EdgeWeightGen<ugraph>::WMOD, ".we", PATH);
 //		
 //	const int LB=5000;									//CHECK! (sol is apparently 21230)
 //	ubew<ugraph> ubg(&ug);
@@ -270,7 +270,7 @@ TEST(UGraphEW, DISABLED_write_to_file) {
 //	const int NV=ug.number_of_vertices();
 //	
 //	//generate weights (only mode)
-//	EdgeWeightGen<ugraph>::create_wgraph(ug, EdgeWeightGen<ugraph>::WMOD, ".we", PATH);
+//	EdgeWeightGen<ugraph>::create_weights(ug, EdgeWeightGen<ugraph>::WMOD, ".we", PATH);
 //			
 //	//I/O: edge-weights of first k nodes
 //	const int K=10;
@@ -461,7 +461,7 @@ TEST(UGraphEW, DISABLED_write_to_file) {
 //	const int NV=ug.number_of_vertices();
 //	
 //	//generate weights (only mode)
-//	EdgeWeightGen<ugraph>::create_wgraph(ug, EdgeWeightGen<ugraph>::WMOD, ".we", PATH);
+//	EdgeWeightGen<ugraph>::create_weights(ug, EdgeWeightGen<ugraph>::WMOD, ".we", PATH);
 //	
 //	//TESTS
 //	EXPECT_TRUE(ug.is_edge_weighted());
