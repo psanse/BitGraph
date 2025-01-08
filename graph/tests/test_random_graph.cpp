@@ -28,7 +28,7 @@ TEST(Random_Graph, ugraph){
 // Undirected graphs read by directed graph class (all edges are non symmetrical)
 	
 	ugraph ug;
-	RandomGen<ugraph>::create_ugraph(ug, 100, .30);
+	RandomGen<ugraph>::create_graph(ug, 100, .30);
 	ug.print_data();
 
 	//check if inside the range
@@ -38,7 +38,7 @@ TEST(Random_Graph, ugraph){
 	//will crate a benchmark in default (project) directory
 	random_attr_t r(100, 150, .3, .5, 1, 50, .1); 
 	RandomGen<ugraph>::create_graph_benchmark(".", r);
-	RandomGen<ugraph>::create_ugraph_benchmark(".", r);
+	//RandomGen<ugraph>::create_graph_benchmark(".", r);
 }
 
 TEST(Random_Graph, sparse_ugraph){
@@ -46,7 +46,7 @@ TEST(Random_Graph, sparse_ugraph){
 // Undirected graphs read by directed graph class (all edges are non symmetrical)
 	
 	sparse_ugraph ug;
-	RandomGen<sparse_ugraph>::create_ugraph(ug, 100, .30);
+	RandomGen<sparse_ugraph>::create_graph(ug, 100, .30);
 	ug.print_data();
 
 	//check if inside the range
@@ -56,7 +56,7 @@ TEST(Random_Graph, sparse_ugraph){
 	//will crate a benchmark in default (project) directory
 	random_attr_t r(100, 150, .3, .5, 1, 50, .1); 
 	RandomGen<sparse_ugraph>::create_graph_benchmark(".", r);
-	RandomGen<sparse_ugraph>::create_ugraph_benchmark(".", r);
+	//RandomGen<sparse_ugraph>::create_graph_benchmark(".", r);
 }
 //
 //TEST(Sparse_Random_Graph, write_to_file){

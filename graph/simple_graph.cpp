@@ -738,13 +738,6 @@ void Graph<T>::gen_random_edges(double p) {
 			}
 		}
 	}
-	/*for (std::size_t i = 0; i < NV_ - 1; i++) {
-		for (std::size_t j = i + 1; j < NV_; j++) {
-			if (::com::rand::uniform_dist(p)) {
-				add_edge(i, j);
-			}
-		}
-	}*/
 }
 
 template<class T>

@@ -66,11 +66,34 @@ template<class Graph_t>
 class RandomGen{
 public:
 	//single graph generation
-	static int create_ugraph			(Graph_t& g, std::size_t n, double p);
+	//static int create_ugraph			(Graph_t& g, std::size_t n, double p);
+
+	/*
+	* @brief generates uniform simple random graph (n, p)
+	*
+	*			I. no self-loops
+	* 
+	*			II. name r<n>_<p>.txt
+	* 
+	* @param g output graph
+	* @param n number of vertices
+	* @param p probability of edge creation
+	* @returns 0 if OK, -1 if ERROR
+	*/
 	static int create_graph				(Graph_t& g, std::size_t n, double p);
 	
-	//benchmark generation
-	static int create_ugraph_benchmark	(const std::string& path, const random_attr_t& rd);	
+	/*
+	* @brief creates a set uniform random (n, p) directed/undirected graphs
+	*
+	*			I. no self-loops
+	* 
+	*			II. names  r<n_<p>.txt 
+	*
+	* @param path input directory where the files are created 
+	* @param rd input data to generate the benchmark
+	* 
+	* @returns 0 if OK, -1 if ERROR
+	*/
 	static int create_graph_benchmark	(const std::string& path, const random_attr_t& rd);
 };
 
@@ -78,6 +101,8 @@ public:
 //
 // class SparseRandomGen
 // (random generation of generic sparse graphs)
+// 
+// Currently only for undirected graphs
 //
 //////////////////
 template<class Graph_t, int logSizeTable = 35000 >
@@ -168,123 +193,37 @@ public:
 ////////////////////////////////////////////////////////////////////////
 // Necessary implementations of generic code in header file
 
-template<class Graph_t>
-int RandomGen<Graph_t>::create_ugraph (Graph_t& g, std::size_t n, double p) {
-	///////////////////////////
-	// Generates uniform simple random undirected graph  (no self loops)
-	// with name r<N>_0.<P>.txt
-	//
-	// RETURNS: -1 if ERROR, 0 if OK
-	// Notes: no self loops
-
-		//ASSERTS
-	if (n <= 0) {
-		cerr << "wrong size for random graph" << std::endl;
-		return -1;
-	}
-
-	if (g.init(n)) {
-		cerr << "error during allocation: undirected random graph not generated" << std::endl;
-		return -1;
-	}
-
-
-	//gen undirected edges
-	for (int i = 0; i < n - 1; i++) {
-		for (int j = i + 1; j < n; j++) {
-			if (::com::rand::uniform_dist(p)) {
-				g.add_edge(i, j);
-			}
-		}
-	}
-
-	//name random
-	std::stringstream sstr;
-	sstr << "r" << n << "_" << p << ".txt";
-	g.set_name(sstr.str());
-
-	return 0;
-}
 
 template<class Graph_t>
 int RandomGen<Graph_t>::create_graph(Graph_t& g, std::size_t n, double p) {
-	///////////////////////////
-	// Generates uniform simple random directed graph  (no self loops)
-	// with name r<N>_0.<P>.txt
-	//
-	// RETURNS: -1 if ERROR, 0 if OK
-	// Notes: no self loops
 
-		//ASSERTS
+	//assert - TODO DEBUG MODE
 	if (n <= 0) {
-		cerr << "wrong size for random graph" << std::endl;
+		LOG_ERROR("bad number of vertices - RandomGen<Graph_t>::create_graph");
 		return -1;
 	}
 
-	if (g.init(n)) {
-		cerr << "error during allocation: directed random graph not generated" << std::endl;
+	if (g.reset(n) == -1) {
+		LOG_ERROR("error during allocation - RandomGen<Graph_t>::create_graph");
 		return -1;
 	}
 
-	//gen undirected edges
-	for (int i = 0; i < n; i++) {
-		for (int j = 0; j < n; j++) {
-			if (i == j) continue;				//remove self-loops
-			if (com::rand::uniform_dist(p)) {
-				g.add_edge(i, j);
-			}
-		}
-	}
+	//////////////////
+	g.gen_random_edges(p);		//generate edges appriopriately (undirected / directed)
+	//////////////////
+	
 
-	//name random
+	//name - r<n>_<p>.txt
 	std::stringstream sstr;
 	sstr << "r" << n << "_" << p << ".txt";
 	g.set_name(sstr.str());
 
 	return 0;
-}
-
-template<class Graph_t>
-int RandomGen<Graph_t>::create_ugraph_benchmark(const string& path, const random_attr_t& rd) {
-	///////////////////////////
-	// Generates full benchmark, each file with notation r<N>_0.<P>.txt
-	//
-	// REMARKS: could be written directly to the stream without using graph object (*** TO DO)
-
-	std::ostringstream o;
-	Graph_t g;
-	std::ofstream f;
-
-	//add slash '/' at the end to the path if required
-	string mypath(path);
-	com::dir::append_slash(mypath);
-
-
-	for (int i = rd.nLB; i <= rd.nUB; i += rd.incN) {
-		for (double j = rd.pLB; j <= rd.pUB; j += rd.incP) {
-			for (int k = 0; k < rd.nRep; k++) {
-				create_ugraph(g, i, j);
-				o.str("");
-				o << mypath.c_str() << "r" << i << "_" << j << "_" << k << ".txt";
-				f.open(o.str().c_str());
-				if (!f) {
-					cerr << "Error al generar el archivo" << endl;
-					return -1;
-				}
-				g.write_dimacs(f);
-				f.close();
-			}
-		}
-	}
-	return 0;		//OK
 }
 
 template<class Graph_t>
 int RandomGen<Graph_t>::create_graph_benchmark(const string& path, const random_attr_t& rd) {
-	///////////////////////////
-	// Generates full benchmark, each file with notation r<N>_0.<P>.txt
-	//
-	// REMARKS: could be written directly to the stream without using graph object 
+
 
 	std::ostringstream o;
 	Graph_t g;
@@ -294,11 +233,14 @@ int RandomGen<Graph_t>::create_graph_benchmark(const string& path, const random_
 	string mypath(path);
 	com::dir::append_slash(mypath);
 
-
 	for (int i = rd.nLB; i <= rd.nUB; i += rd.incN) {
 		for (double j = rd.pLB; j <= rd.pUB; j += rd.incP) {
 			for (int k = 0; k < rd.nRep; k++) {
+
+				//////////////////////////
 				create_graph(g, i, j);
+				//////////////////////////
+
 				o.str("");
 				o << mypath.c_str() << "r" << i << "_" << j << "_" << k << ".txt";
 				f.open(o.str().c_str());

@@ -124,7 +124,7 @@ TEST(UGraphEW, DISABLED_gen_random ){
 	ugraph_ewi ugew;
 	const int NV=10;
 
-	RandomGen<ugraph_ewi>::create_ugraph(ugew, NV, .3);										/* 0.0 edge weights */
+	RandomGen<ugraph_ewi>::create_graph(ugew, NV, .3);										/* 0.0 edge weights */
 	EdgeWeightGen< ugraph_ewi >::create_weights(ugew, EdgeWeightGen<ugraph_ewi>::WMOD);
 
 	//QUERIES....

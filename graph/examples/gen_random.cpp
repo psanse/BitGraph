@@ -103,7 +103,7 @@ int main(int argc, char** argv){
 		
 	//create the benchmark
 	random_attr_t rt(input.nLB, input.nUB, input.pLB, input.pUB, input.nRep, input.incN, input.incP);
-	RandomGen<ugraph>::create_ugraph_benchmark(str_path_benchmark.c_str(), rt);
+	RandomGen<ugraph>::create_graph_benchmark(str_path_benchmark.c_str(), rt);
 
 
 	//////////////////////////////////

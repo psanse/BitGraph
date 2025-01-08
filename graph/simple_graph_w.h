@@ -155,6 +155,9 @@ const _bbt& get_neighbors				(int v)		const			{ return g_.get_neighbors(v); }
 	void add_edge						(int v, int w)					{ g_.add_edge(v, w); }
 	
 	double density						(bool lazy = true)				{ return g_.density(lazy); }
+	
+	void gen_random_edges				(double p)						{ g_.gen_random_edges(p); }
+
 
 /////////////
 // boolean properties

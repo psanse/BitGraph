@@ -172,6 +172,11 @@ virtual	~Base_Graph_EW()										= default;
 
 	double density		(bool lazy = true)						{ return g_.density(lazy); }
 
+	void gen_random_edges(double p)								{ g_.gen_random_edges(p); }
+
+
+	
+
 /////////////////////////
 // boolean properties
 
@@ -298,8 +303,8 @@ public:
 	//constructors (inherited)
 	using Base_Graph_EW<ugraph, W>::Base_Graph_EW;
 
-	/////////////
-	//overrides setters
+/////////////
+//setters and getters
 
 	/*
 	*  @brief sets edge weight given an undirected edge {v, w}
