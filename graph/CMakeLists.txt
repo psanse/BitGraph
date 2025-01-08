@@ -73,16 +73,16 @@ if (graph_build_tests)
 add_executable (test_graph  tests/gtest_main.cpp
 			
 #  tests/test_graph_sort.cpp
+#  tests/test_degree.cpp
 #  tests/test_graph_properties_in_folder.cpp  
 #  tests/test_kcore.cpp
 #  tests/test_kcore_in_folder.cpp
-#  tests/test_random_graph.cpp
-#  tests/test_fixed_graph.cpp
 
+#  tests/test_fixed_graph.cpp
 #  tests/test_graph_map.cpp
 
 #  TESTS UNDER DEVELOPMENT  / CHECKING
-   tests/test_degree.cpp
+  tests/test_random_graph.cpp
 #  tests/test_func.cpp
 
 #  TESTS CHECKED
