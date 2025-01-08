@@ -145,7 +145,6 @@ private:
 	double log_[logSizeTable];
 };
 
-
 /////////////////
 //
 // Class WeightGen
@@ -155,15 +154,14 @@ private:
 //
 ////////////////
 
-template<class Graph_t>
+template <class Graph_t>
 class WeightGen
 {
 public:
 	enum type_t {WMOD=0, WDEG};
 
-	//non-sparse generators
-	static int create_weights (Graph_t& g, type_t, int wmod = DEFAULT_WEIGHT_MODULUS);
-	static int create_weights (Graph_t& g, type_t, string FILE_EXTENSION, string FILE_PATH="",  int wmod= DEFAULT_WEIGHT_MODULUS);
+	//non-sparse generator
+	static int create_weights (Graph_t& g, type_t, int wmod = DEFAULT_WEIGHT_MODULUS , string FILE_EXTENSION = "", string FILE_PATH = "");
 };
 
 /////////////////
@@ -328,80 +326,51 @@ int SparseRandomGen<sparse_ugraph, logSizeTable>::create_ugraph(sparse_ugraph& g
 
 template<class Graph_t>
 inline
-int WeightGen<Graph_t>::create_weights (Graph_t& g, type_t type, int wmod){
-/////////////////////////////////
-// adds weight following two criteria:
-//
-// 1. WDEG- weight is the degree of the vertex
-// 2. WMOD- weight is the index%wmod (default wmod=200)
-// date of creation: 16/01/19
-		
-	const int NV=g.graph().number_of_vertices();
-	g.set_w(0);
+int WeightGen<Graph_t>::create_weights (Graph_t& g, type_t type, int wmod, string FILE_EXTENSION, string FILE_PATH){
 
-	if(type==WDEG){
-		for(int v=0; v<NV; v++){
-			g.set_w(v,g.graph().degree(v));
-		}
-	}else if(type==WMOD){
-		for(int v=0; v<NV; v++){
-			g.set_w(v,(1 + ((v+1) % wmod) ));
-		}
-	}else{
-		LOG_INFO("WeightGen<Graph_t>::create_weights()-incorred weight generation mode");
-	}
-
-	return 0;	
-}
-
-template<class Graph_t>
-inline
-int WeightGen<Graph_t>::create_weights (Graph_t& g, type_t type, string FILE_EXTENSION, string FILE_PATH, int wmod){
-/////////////////////////////////
-// adds weight following two criteria:
-//
-// 1. WDEG- weight is the degree of the vertex
-// 2. WMOD- weight is the index%wmod (default wmod=200)
-//
-// copies weight to file with FILE_EXTENSION appended to the current name of graph
-// date of creation: 5/8/17
-//
-// RETURNS 0-ok, -1 Err
-
-	const int NV=g.graph().number_of_vertices();
-	g.set_w(1.0);
+	const int NV = g.graph().number_of_vertices();		
 	
-	if(type==WDEG){
-		for(int v=0; v<NV; v++){
-			g.set_w(v,g.graph().degree(v));
-		}
-	}else if(type==WMOD){
-		for(int v=0; v<NV; v++){
-			g.set_w(v,(1 + ((v+1) % wmod) ));
-		}
-	}else{
-		LOG_INFO("WeightGen<Graph_t>::create_weights()-incorred weight generation mode");
-	}
-	
+	//no need to clear the current weights since they are overwritten
 
-	//copies weights to file
-	ofstream f;
-	
-	
-	string path=FILE_PATH;
-	if(!path.empty()){ 	com::dir::append_slash(path); }
-	string filename=path + g.graph().get_name() + FILE_EXTENSION;
-	f.open(filename, ofstream::out);
-	if(!f){
-		LOGG_INFO("WeightGen<Graph_t>::create_weights ()--cannot write weights to file ", filename);
+	switch (type) {
+	case WDEG:
+		for (std::size_t v = 0; v < NV; ++v) {
+			g.set_w(v, g.graph().degree(v));
+		}
+		break;
+	case WMOD:
+		for (std::size_ v = 0; v < NV; ++v) {
+			g.set_w(v, (1 + ((v + 1) % wmod)));
+		}
+		break;
+	default:
+		LOG_INFO("incorrect weight generation mode - WeightGen<Graph_t>::create_weights");
 		return -1;
 	}
+		
+	/////////////////////////////
+	//streams weights to file
+	if (!FILE_EXTENSION.empty() && !FILE_PATH.empty()) {
+		
+		//determines the filename
+		string path = FILE_PATH;
+		com::dir::append_slash(path);
+		string filename = path + g.graph().get_name() + FILE_EXTENSION;
 
+		//streams weights to file
+		ofstream f(filename);
+		if (!f) {
+			LOGG_INFO("WeightGen<Graph_t>::create_weights () - cannot write weights to file ", filename);
+			return -1;
+		}
 
-	//g.write_weights(f);
-	g.print_weights(f, false);
+		///////////////////////////
+		g.print_weights(f, false);			//no vertex index is streamed with the weight value
+		///////////////////////////
 
-	f.close();
+		f.close();
+	}
+		
 	return 0;	
 }
 
