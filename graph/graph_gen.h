@@ -65,8 +65,6 @@ struct random_attr_t {
 template<class Graph_t>
 class RandomGen{
 public:
-	//single graph generation
-	//static int create_ugraph			(Graph_t& g, std::size_t n, double p);
 
 	/*
 	* @brief generates uniform simple random graph (n, p)
