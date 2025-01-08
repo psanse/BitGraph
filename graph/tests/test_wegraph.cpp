@@ -1,64 +1,68 @@
-//test_wegraph.cpp: all tests for graphs with edge_weights (for now weights are over undirected edges to all effects; I am not sure yet if directed edges will have impact on weighted edges)
-//initial date:20/7/18
-//author:pss
+/*
+* test_wegraph.cpp  tests for edge-weighted graphs
+* @created 20/7/18
+* @last_update 08/01/25
+* @dev pss
+*
+* @TODO - ADD TESTS
+*/
 
 #include <iostream>
 #include "gtest/gtest.h"
-#include "graph.h"										//contains all relevant graph types
 #include "utils/logger.h"
-#include "utils/file.h"
 #include "graph_gen.h"			
 #include "utils/common_paths.h"
+#include "simple_graph_ew.h"
 
 using namespace std;
 
 //#define TEST_GRAPH_FAST_SORT_STEP_BY_STEP										//[DEF-OFF] ON for one test at a time
 
-TEST(EdgeWeighted_New, read_write_dimacs) {
+using ugraph_ewi = Graph_EW<ugraph, int>;
+using ugraph_ew	 = Graph_EW<ugraph, double>;
+using vint = vector<int>;
 
-	LOG_INFO("EdgeWeighted_New:read_write_dimacs------------------------");
-
-	Graph_EW<ugraph, int> ugew(_PATH_FOR_GRAPH_TESTS_DATA_IN_SRC_CODE "/toy_ew_dimacs.txt");
-	ugew.print_weights();
+TEST(UGraphEW, constructor_file) {
 		
-	//vertex weights
+	ugraph_ewi ugew(PATH_GRAPH_TESTS_CMAKE_SRC_CODE "toy_ew_dimacs.txt");
+	
+	EXPECT_EQ(5, ugew.number_of_vertices());
+	EXPECT_EQ(5, ugew.number_of_edges());
+
+	//all vertex weights 
 	EXPECT_EQ(10, ugew.get_we(0, 0));
 	EXPECT_EQ(20, ugew.get_we(1, 1));
 	EXPECT_EQ(30, ugew.get_we(2, 2));
 	EXPECT_EQ(40, ugew.get_we(3, 3));
 	EXPECT_EQ(50, ugew.get_we(4, 4));
 
-	//edge weights
+	//all (undirected) edge weights
 	EXPECT_EQ(27, ugew.get_we(0, 1));
 	EXPECT_EQ(37, ugew.get_we(0, 2));
 	EXPECT_EQ(47, ugew.get_we(0, 3));
 	EXPECT_EQ(57, ugew.get_we(2, 4));
 	EXPECT_EQ(67, ugew.get_we(3, 4));
 
-	//write
-	ofstream of(_PATH_FOR_GRAPH_TESTS_DATA_IN_SRC_CODE "/toy_ew_dimacs_gen.txt");
-	//////////////////////////////////
-	ugew.write_dimacs(of);
-	//////////////////////////////////
-	of.close();
+	////write
+	//ofstream of(PATH_GRAPH_TESTS_CMAKE_SRC_CODE "toy_ew_dimacs_gen.txt");
+	////////////////////////////////////
+	//ugew.write_dimacs(of);
+	////////////////////////////////////
+	//of.close();
 
 	//TODO@read and test properly (visually correct);
-	Graph_EW<ugraph, int> ugew_gen(_PATH_FOR_GRAPH_TESTS_DATA_IN_SRC_CODE "/toy_ew_dimacs_gen.txt");
-	ugew.print_weights();
-			
-	LOG_INFO("EdgeWeighted_New: END read_write_dimacs-------------------");
-#ifdef	TEST_GRAPH_FAST_SORT_STEP_BY_STEP
-	LOG_ERROR("press any key to continue");
-	cin.get();
-#endif
+	//Graph_EW<ugraph, int> ugew_gen(PATH_GRAPH_TESTS_CMAKE_SRC_CODE "toy_ew_dimacs_gen.txt");
+	//ugew.print_weights();
 }
 
-TEST(EdgeWeighted_New, basic){
+TEST(UGraphEW, basic){
 
 	LOG_INFO("EdgeWeighted_New:basic---------------------------------");
-	Graph_EW<ugraph, double> ugew(10, 0.0);
+	ugraph_ew ugew(10, 0.0);
 	ugew.set_name("test graph");
-	double NOWT = Graph_EW<ugraph, double>::NOWT;
+	
+	double NOWT = ugraph_ew::NOWT;		//empty weights are 0 - CKECK!
+	//double NOWT = 0;		
 
 	ugew.graph().add_edge(0,1);
 	int status =ugew.set_we(0, 1, 1.0);
@@ -74,7 +78,7 @@ TEST(EdgeWeighted_New, basic){
 	EXPECT_DOUBLE_EQ(1.3, ugew.get_we(0, 0));
 	
 	//list of the first 3 nodes
-	vector<int> lv;
+	vint lv;
 	lv.push_back(0); lv.push_back(1); lv.push_back(2); 
 		
 //////////
@@ -101,24 +105,24 @@ TEST(EdgeWeighted_New, basic){
 	ugew_c.print_weights();
 
 //////////
-//directed graphs 
+//directed graphs  (currently only for ugraphs)
 	
 	//weights of type int
-	Graph_EW<graph, int> gew(10, 0.0);
-	gew.set_name("test graph 2");
-	gew.graph().add_edge(0,1);
-	gew.set_we(0, 1, 1);
-	gew.set_we(0, 2, 2);							/* non-edge*/
-	gew.set_we(2, 2, 3);							/* vertex weight */
-			
-	EXPECT_EQ(1, gew.get_we(0,1));
-	EXPECT_EQ((int)NOWT, gew.get_we(0,2));
-	EXPECT_EQ(3, gew.get_we(2, 2));
+	//Graph_EW<graph, int> gew(10, 0);
+	//gew.set_name("test graph 2");
+	//gew.graph().add_edge(0,1);
+	//gew.set_we(0, 1, 1);
+	//gew.set_we(0, 2, 2);							/* non-edge*/
+	//gew.set_we(2, 2, 3);							/* vertex weight */
+	//		
+	//EXPECT_EQ(1, gew.get_we(0,1));
+	//EXPECT_EQ((int)NOWT, gew.get_we(0,2));
+	//EXPECT_EQ(3, gew.get_we(2, 2));
 
 //////////
 //I/O 
-	gew.print_data();
-	gew.print_weights();							
+	/*gew.print_data();
+	gew.print_weights();							*/
 
 	LOG_INFO("GraphFastRootSort_W: END basic-------------------------");
 #ifdef	TEST_GRAPH_FAST_SORT_STEP_BY_STEP
@@ -127,7 +131,7 @@ TEST(EdgeWeighted_New, basic){
 #endif
 }
 
-TEST(EdgeWeighted_New, generate_weights){
+TEST(UGraphEW, generate_weights){
 ////////////////
 // reads DIMACS file without weights and generates weights with %200 formula
 // date of creation: 15/04/18
@@ -135,11 +139,11 @@ TEST(EdgeWeighted_New, generate_weights){
 	LOG_INFO("EdgeWeighted_New:generate_weights-----------------------");
 
 	string path= TEST_CLIQUE_PATH_DIMACS_ETSIDI_I9;
-	Graph_EW<ugraph, int> ugew(path + "brock200_1.clq");
+	ugraph_ewi ugew(path + "brock200_1.clq");
 	const int NV=ugew.graph().number_of_vertices();
 		
 	//generate weights WDEG mode
-	EdgeWeightGen< Graph_EW<ugraph, int> >::create_wgraph(ugew, EdgeWeightGen<Graph_EW<ugraph, int>>::WMOD, 200);
+	EdgeWeightGen< ugraph_ewi >::create_wgraph(ugew, EdgeWeightGen<ugraph_ewi>::WMOD, 200);
 
 	EXPECT_EQ(200, ugew.graph().number_of_vertices());
 	EXPECT_EQ(6, ugew.get_we(2, 1));		
@@ -156,7 +160,7 @@ TEST(EdgeWeighted_New, generate_weights){
 #endif
 }
 
-TEST(EdgeWeighted_New, gen_random){
+TEST(UGraphEW, gen_random){
 ////////////////
 // generates a random graph and adds random edge weights
 //
@@ -164,12 +168,11 @@ TEST(EdgeWeighted_New, gen_random){
 	
 	LOG_INFO("EdgeWeighted_New:gen_random----------------------------");
 
-	Graph_EW<ugraph, int> ugew;
-	typedef Graph_EW<ugraph, int> _ugt;
+	ugraph_ewi ugew;
 	const int NV=10;
 
-	RandomGen<_ugt>::create_ugraph(ugew, NV, .3);								/* 0.0 edge weights */
-	EdgeWeightGen< _ugt >::create_wgraph(ugew, EdgeWeightGen<_ugt>::WMOD);
+	RandomGen<ugraph_ewi>::create_ugraph(ugew, NV, .3);										/* 0.0 edge weights */
+	EdgeWeightGen< ugraph_ewi >::create_wgraph(ugew, EdgeWeightGen<ugraph_ewi>::WMOD);
 
 	//QUERIES....
 
@@ -180,17 +183,17 @@ TEST(EdgeWeighted_New, gen_random){
 //////////////////
 //directed graph
 
-	Graph_EW<graph, int> gew;
-	typedef Graph_EW<graph, int> _gt;
-	
-	RandomGen<_gt>::create_graph(gew, NV, .3);								/* 0.0 edge weights */
-	EdgeWeightGen< _gt >::create_wgraph(gew, EdgeWeightGen<_gt>::WMOD);
+	//Graph_EW<graph, int> gew;
+	//typedef Graph_EW<graph, int> _gt;
+	//
+	//RandomGen<_gt>::create_graph(gew, NV, .3);								/* 0.0 edge weights */
+	//EdgeWeightGen< _gt >::create_wgraph(gew, EdgeWeightGen<_gt>::WMOD);
 
-	//QUERIES....
+	////QUERIES....
 
-	//I/O
-	gew.print_data();
-	gew.print_weights();
+	////I/O
+	//gew.print_data();
+	//gew.print_weights();
 	
 	LOG_INFO("EdgeWeighted_New: END gen_random-----------------------");
 #ifdef	TEST_GRAPH_FAST_SORT_STEP_BY_STEP

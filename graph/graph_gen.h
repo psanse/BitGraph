@@ -153,7 +153,7 @@ int WeightGen<Graph_t>::create_wgraph (Graph_t& g, type_t type, string FILE_EXTE
 	string filename=path + g.graph().get_name() + FILE_EXTENSION;
 	f.open(filename, ofstream::out);
 	if(!f){
-		LOG_INFO("WeightGen<Graph_t>::create_wgraph ()--cannot write weights to file "<<filename);
+		LOGG_INFO("WeightGen<Graph_t>::create_wgraph ()--cannot write weights to file ", filename);
 		return -1;
 	}
 
@@ -364,7 +364,7 @@ int RandomGen<Graph_t>::create_ugraph (Graph_t& g, int n, double p){
 	//gen undirected edges
 	for(int i=0; i<n-1; i++){
 		for(int j=i+1; j<n; j++){
-			if(com::rand::uniform_dist(p)){
+			if(::com::rand::uniform_dist(p)){
 				g.add_edge(i,j);
 			}
 		}

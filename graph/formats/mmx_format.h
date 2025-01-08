@@ -1,7 +1,11 @@
-//mmx_reader.h: header of class MMXI to read MMX format in GRAPH
-//				currently only reads matrix format for configuration MCPS
-//date: 6/10/2014
-//author: pss
+/*
+* mmx_format.h header of class MMI to read MMX format in GRAPH
+*			 Currently only reads matrix format for configuration MCPS
+* @creation_date 6/10/2014
+* @last_update 30/12/2024
+* @dev pss
+*/
+
 
 #include "mmio.h"
 #include <cstdio>
@@ -98,7 +102,7 @@ int MMI<T>::read(const string& filename){
     }
 
 	//name (remove path)
-	g.set_name(filename, true);	
+	g.set_name(filename);	
 
 			
 	fclose(f);

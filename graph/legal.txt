@@ -2,7 +2,7 @@ Contents: GRAPH library to manage simple unweighted bit encoded graphs
 
 Release: GRAPH 1.0
 First update: July 2014
-Last update: May 2015
+Last update: December 2024
 Author: pablo san segundo CAR(UPM-CSIC)
 URL: https://www.researchgate.net/profile/Pablo_San_Segundo
 Platforms: tested on Windows 64bit OS (should work on Linux)

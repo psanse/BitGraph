@@ -41,5 +41,6 @@ typedef Graph_W<ugraph, int> ugraph_wi;
 
 #include "simple_graph_ew.h"						//MUST BE AFTER ugraph type 
 typedef Graph_EW<ugraph, double> ugraph_ew;
+typedef Graph_EW<ugraph, int> ugraph_ewi;
 
 #endif

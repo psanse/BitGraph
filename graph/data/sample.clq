@@ -1,4 +1,5 @@
-c MatrixMarket matrix coordinate pattern symmetric
+c toy example for unit tests
+c date 2010
 p edge 7 11
 e 2 1
 e 3 1

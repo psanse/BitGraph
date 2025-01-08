@@ -1,7 +1,10 @@
-//edges_reader.h: header of class MMXI to read MMX format in GRAPH
-//				currently only reads matrix from aconfiguration MCPS
-//date: 19/11/2014
-//author: pss
+/*
+* edges_format.h header of class MMXI to read MMX format in GRAPH
+* 				   Currently only reads matrix from a configuration MCPS
+* @creation_date 19/11/2014
+* @last_update 30/12/2024
+* @dev pss
+*/
 
 #include "stdio.h"
 #include <fstream>
@@ -38,7 +41,7 @@ EDGES<T>::EDGES(string filename, T& gout):g(gout){
 	}
 
 	//set name without path
-	g.set_name(filename, true);
+	g.set_name(filename);
 }
 
 template<class T>
@@ -101,7 +104,7 @@ int EDGES<T>::read(){
 	}else {cout<<"graph read correctly-----------------------"<<endl;}
 
 	//set name (without path)
-	g.set_name(graphname, false);
+	g.set_name(graphname);
 	
 return 0;
 }
