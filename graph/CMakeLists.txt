@@ -71,7 +71,7 @@ if (graph_build_tests)
 # Add executable called "helloDemo" that is built from the source files
 # "demo.cxx" and "demo_b.cxx". The extensions are automatically found.
 add_executable (test_graph  tests/gtest_main.cpp
-#  tests/test_degree.cpp			
+			
 #  tests/test_graph_sort.cpp
 #  tests/test_graph_properties_in_folder.cpp  
 #  tests/test_kcore.cpp
@@ -82,7 +82,7 @@ add_executable (test_graph  tests/gtest_main.cpp
 #  tests/test_graph_map.cpp
 
 #  TESTS UNDER DEVELOPMENT  / CHECKING
-   tests/test_wegraph.cpp
+   tests/test_degree.cpp
 #  tests/test_func.cpp
 
 #  TESTS CHECKED
@@ -92,6 +92,7 @@ add_executable (test_graph  tests/gtest_main.cpp
 #  tests/test_graph.cpp
 #  tests/test_ugraph.cpp
 #  tests/test_wgraph.cpp
+#  tests/test_wegraph.cpp
 #  tests/test_graph_conversions.cpp
 #  tests/test_sparse_graph.cpp
 #  tests/test_format.cpp  

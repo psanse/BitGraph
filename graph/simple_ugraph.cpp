@@ -377,7 +377,6 @@ int Ugraph<T>::create_subgraph(Ugraph & ug, vint& lv) const
 }
 
 
-
 ////////////////////////////////////////////
 //list of valid types to allow generic code in *.cpp files 
 
