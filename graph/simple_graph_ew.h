@@ -208,7 +208,7 @@ virtual	~Base_Graph_EW()										= default;
 	* 
 	*			II.we(v, v) are set to NOWT
 	*/
-	virtual void gen_modulus_weights (int MODULUS = DEFAULT_VALUE_MODE_AUTO_GEN_WEIGHTS);
+	virtual void gen_modulus_weights (int MODULUS = DEFAULT_WEIGHT_MODULUS);
 
 ////////////
 // I/O 
@@ -342,7 +342,7 @@ public:
 	*			II.we(v, v) are set to NOWT
 	*		
 	*/
-	void gen_modulus_weights(int MODULUS = DEFAULT_VALUE_MODE_AUTO_GEN_WEIGHTS)  override;
+	void gen_modulus_weights(int MODULUS = DEFAULT_WEIGHT_MODULUS)  override;
 
 /////////////
 //useful framework-specific interface for undirected weighted graphs

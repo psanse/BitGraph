@@ -9,18 +9,15 @@
 #include <random>					//uses uniform int random generator
 
 #include "graph.h"
-//#include "simple_graph_w.h"
-//#include "simple_graph_ew.h"
 #include "utils/common.h"
 	
 using namespace std;
 
 //////////////////////////////////////////////////////////////
-constexpr int DEFAULT_VALUE_MODE_AUTO_GEN_WEIGHTS = 200;			//for modulus weight generation 						
+constexpr int DEFAULT_WEIGHT_MODULUS = 200;							//for modulus weight generation  [Pullman 2008]					
 //////////////////////////////////////////////////////////////
 
 
-//for random tests
 struct random_attr_t {
 	friend ostream & operator<<(ostream& o, const random_attr_t& r) {o<<"["<<r.nLB<<" "<<r.nUB<<" "<<r.pLB \
 										<<" "<<r.pUB<<" "<<r.nRep<<" "<<r.incN<<" "<<r.incP<<"]"<<endl; return o;}
@@ -84,8 +81,8 @@ public:
 	enum type_t {WMOD=0, WDEG};
 
 //non sparse generators
-	static int create_wgraph (Graph_t& g, type_t, int wmod = DEFAULT_VALUE_MODE_AUTO_GEN_WEIGHTS);
-	static int create_wgraph (Graph_t& g, type_t, string FILE_EXTENSION, string FILE_PATH="",  int wmod= DEFAULT_VALUE_MODE_AUTO_GEN_WEIGHTS);
+	static int create_wgraph (Graph_t& g, type_t, int wmod = DEFAULT_WEIGHT_MODULUS);
+	static int create_wgraph (Graph_t& g, type_t, string FILE_EXTENSION, string FILE_PATH="",  int wmod= DEFAULT_WEIGHT_MODULUS);
 };
 
 
