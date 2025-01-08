@@ -78,10 +78,10 @@ inline bool Base_Graph_EW<Graph_t, W>::is_consistent(){
 
 	auto NV = number_of_vertices();
 
-	for (int i = 0; i < NV; i++) {
-		for (int j = 0; j < NV; j++) {
+	for (std::size_t i = 0; i < NV; ++i) {
+		for (std::size_t j = 0; j < NV; ++j) {
 			if ( we_[i][j] == NOWT &&  g_.is_edge(i, j) ) {
-				LOG_WARNING	("edge [", i, ", ", j ,")] with def. weight - Base_Graph_EW<Graph_t, W>::is_consistent()");
+				LOGG_WARNING ("edge [", i, ", ", j ,")] with def. weight - Base_Graph_EW<Graph_t, W>::is_consistent()");
 				return false;
 			}
 		}
@@ -108,6 +108,17 @@ Base_Graph_EW<Graph_t, W>::Base_Graph_EW(string filename){
 }
 
 
+template<class Graph_t, class W>
+void Base_Graph_EW<Graph_t, W>::set_wv( W val) {
+
+	auto NV = number_of_vertices();
+
+	for (std::size_t v = 0; v < NV; v++) {
+			we_[v][v] = val;
+	}	
+
+}
+
 template <class Graph_t, class W>
 inline
 int Base_Graph_EW<Graph_t, W >::set_we(int v, int w, W val) {
@@ -116,7 +127,7 @@ int Base_Graph_EW<Graph_t, W >::set_we(int v, int w, W val) {
 		we_[v][w] = val;
 	}
 	else {
-		LOG_WARNING ("edge weight cannot be added to the non-edge" , "(" , v , "," , w , ")" , "- Base_Graph_EW<Graph_t,W >::set_we");
+		LOGG_WARNING ("edge weight cannot be added to the non-edge" , "(" , v , "," , w , ")" , "- Base_Graph_EW<Graph_t,W >::set_we");
 		LOG_WARNING ("weight not added");
 		return -1;
 	}	
@@ -179,6 +190,31 @@ inline void Base_Graph_EW<Graph_t, W>::neg_w(){
 				we_[i][j] = -we_[i][j];
 		}
 }
+
+
+template<class Graph_t, class W>
+inline int Base_Graph_EW<Graph_t, W>::gen_modulus_weights(int MODULUS) {
+
+	auto NV = number_of_vertices();
+
+	//vertex-weights NOWT
+	set_wv(NOWT);
+
+	for (std::size_t v = 0; v < NV; ++v) {
+		for (std::size_t w = 0; w < NV; ++w) {
+			
+			if (g_.is_edge(v, w)) {
+
+				///////////////////////////////////////
+				set_we(v, w, ( 1 + ( (v + w + 2 /* 0-based index*/) % MODULUS) )   );
+				///////////////////////////////////////
+			}
+		}
+	}
+
+	return 0;
+}
+
 
 template<class Graph_t, class W>
 inline
@@ -406,7 +442,7 @@ ostream& Base_Graph_EW<Graph_t, W>::print_weights (ostream& o, bool line_format,
 
 	auto NV = number_of_vertices();
 
-	o << "\n***********************************" << endl;
+	o << "\n**********non-empty edge-weights*************************" << endl;
 
 	if (only_vertex_weights == false) {
 
@@ -443,7 +479,8 @@ ostream& Base_Graph_EW<Graph_t, W>::print_weights (ostream& o, bool line_format,
 		}
 	}
 
-	o << "*************************************" << endl;
+	o << "**********************************************************" << endl;
+
 	return o;
 }
 
@@ -451,7 +488,7 @@ template <class Graph_t, class W>
 inline
 ostream& Base_Graph_EW<Graph_t, W>::print_weights (vint& lv, ostream& o, bool only_vertex_weights) const{
 
-	o << "\n***********************************" << endl;
+	o << "\n**********non-empty edge-weights*************************" << endl;
 
 	if (only_vertex_weights == false) {
 
@@ -473,7 +510,8 @@ ostream& Base_Graph_EW<Graph_t, W>::print_weights (vint& lv, ostream& o, bool on
 		}
 	}
 
-	o << "************************************" << endl;
+	o << "**********************************************************" << endl;
+
 	return o;
 }
 
@@ -586,6 +624,30 @@ int Graph_EW< ugraph, W >::set_we(typename Graph_EW<ugraph, W>::mat_t& lw) {
 	return 0;
 }
 
+template<class W>
+int Graph_EW<ugraph, W>::gen_modulus_weights(int MODULUS)
+{
+	auto NV = number_of_vertices();
+
+	//vertex-weights NOWT
+	set_wv(NOWT);
+
+	//sets weights of undirected edges
+	for (std::size_t v = 0; v < NV - 1; ++v) {
+		for (std::size_t w = v + 1; w < NV; ++w) {
+			if (g_.is_edge(v, w)) {
+
+				///////////////////////////////////////
+				set_we(v, w, (1 + ((v + w + 2 /* 0-based index*/) % MODULUS)));
+				///////////////////////////////////////
+
+			}
+		}
+	}
+
+	return 0;
+}
+
 
 template <class W>
 inline
@@ -593,7 +655,8 @@ ostream& Graph_EW<ugraph, W>::print_weights (ostream& o, bool line_format, bool 
 
 	auto NV = ptype::number_of_vertices();
 	
-	o << "\n***********************************" << endl;
+	o << "\n**********non-empty edge-weights*************************" << endl;
+
 	if (only_vertex_weights == false) {
 
 		//streams edge-weights 
@@ -633,7 +696,9 @@ ostream& Graph_EW<ugraph, W>::print_weights (ostream& o, bool line_format, bool 
 			}
 		}
 	}
-	o << "***********************************" << endl;
+
+	o << "**********************************************************" << endl;
+
 	return o;
 }
 
@@ -641,7 +706,7 @@ template <class W>
 inline
 ostream& Graph_EW<ugraph, W>::print_weights (vint& ln, ostream& o, bool only_vertex_weights) const{
 	   
-	o << "\n***********************************" << endl;
+	o << "\n**********non-empty edge-weights*************************" << endl;
 
 	if (only_vertex_weights == false) {
 
@@ -668,7 +733,7 @@ ostream& Graph_EW<ugraph, W>::print_weights (vint& ln, ostream& o, bool only_ver
 			}
 		}
 	}
-	o << "***********************************" << endl;
+	o << "**********************************************************" << endl;
 
 	return o;
 }

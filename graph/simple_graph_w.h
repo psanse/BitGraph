@@ -23,9 +23,6 @@
 #include "utils/common.h"
 #include "graph/simple_ugraph.h"
 
-//////////////////////////////////////////////////////////////
-constexpr int DEFAULT_VALUE_MODE_AUTO_GEN_WEIGHTS = 200;			//for modulus weight generation (see Base_Graph_W::gen_mode_weights)						
-//////////////////////////////////////////////////////////////
 
 //alias
 using vint = std::vector<int>;

@@ -84,6 +84,11 @@ virtual	~Base_Graph_EW()										= default;
 	void set_wv			(int v, W val)						{ we_[v][v] = val; }					
 	
 	/*
+	*  @brief sets all self-loop edge weights to the same weigth value
+	*/
+	void set_wv			( W val = NOWT);
+
+	/*
 	*  @brief sets edge weight given a directed edge (v, w)
 	*  @param v input vertex
 	*  @param w input vertex
@@ -147,7 +152,7 @@ virtual	~Base_Graph_EW()										= default;
 	* @comment preserved for backward compatibility (use reset(...))
 	*/
 	int init			(int n, W val = NOWT, bool reset_name = true);															
-	void clear			()									 { g_.clear(); we_.clear(); }
+	void clear			()										{ g_.clear(); we_.clear(); }
 		
 	/*
 	* @brief resets to empty graph |V|= n and assigns weight val to all vertices and edges
@@ -190,7 +195,20 @@ virtual	~Base_Graph_EW()										= default;
 	*		 
 	* @returns true if consistent, false otherwise
 	*/
-	void neg_w();																						
+	void neg_w();	
+
+
+	///////////////////////////
+	//weight generation
+
+	/*
+	* @brief generates weights based on modulus operation [Pullan 2008, MODULUS = 200]
+	*
+	*			I. we(v, w) = 1 + ((v + w) % MODULUS)	(1-based index)
+	* 
+	*			II.we(v, v) are set to NOWT
+	*/
+	virtual int gen_modulus_weights (int MODULUS = DEFAULT_VALUE_MODE_AUTO_GEN_WEIGHTS);
 
 ////////////
 // I/O 
@@ -312,6 +330,19 @@ public:
 	* @param lw input vertex and edge weights
 	*/
 	int set_we	(mat_t& lw)				override;
+
+/////////////
+// weight operations
+
+	/*
+	* @brief generates weights based on modulus operation [Pullan 2008, MODULUS = 200]
+	*
+	*			I. we(v, w) = 1 + ((v + w) % MODULUS)	(1-based index)
+	* 
+	*			II.we(v, v) are set to NOWT
+	*		
+	*/
+	int gen_modulus_weights(int MODULUS = DEFAULT_VALUE_MODE_AUTO_GEN_WEIGHTS)  override;
 
 /////////////
 //useful framework-specific interface for undirected weighted graphs

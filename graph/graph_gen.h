@@ -9,10 +9,16 @@
 #include <random>					//uses uniform int random generator
 
 #include "graph.h"
-#include "simple_graph_w.h"
+//#include "simple_graph_w.h"
+//#include "simple_graph_ew.h"
 #include "utils/common.h"
 	
 using namespace std;
+
+//////////////////////////////////////////////////////////////
+constexpr int DEFAULT_VALUE_MODE_AUTO_GEN_WEIGHTS = 200;			//for modulus weight generation 						
+//////////////////////////////////////////////////////////////
+
 
 //for random tests
 struct random_attr_t {
@@ -78,8 +84,8 @@ public:
 	enum type_t {WMOD=0, WDEG};
 
 //non sparse generators
-	static int create_wgraph (Graph_t& g, type_t, int wmod=200);
-	static int create_wgraph (Graph_t& g, type_t, string FILE_EXTENSION, string FILE_PATH="",  int wmod=200);
+	static int create_wgraph (Graph_t& g, type_t, int wmod = DEFAULT_VALUE_MODE_AUTO_GEN_WEIGHTS);
+	static int create_wgraph (Graph_t& g, type_t, string FILE_EXTENSION, string FILE_PATH="",  int wmod= DEFAULT_VALUE_MODE_AUTO_GEN_WEIGHTS);
 };
 
 
@@ -192,28 +198,22 @@ int EdgeWeightGen<Graph_t>::create_wgraph (Graph_t& g, type_t type, int wmod){
 /////////////////////////////////
 // adds edge-weights to EXISTING EDGES according to the following criteria:
 //
-// 1. WMOD- edge-weight is the standard (v + w) mod(wmod) +1 weight used (Pullham and others)
+// 1. WMOD- edge-weight is the standard (v + w) mod(wmod) + 1 weight used (Pullham and others)
 //    Note: v and w MUST be 1 based
 
 //
 // RETURNS 0-ok, -1 Err
 //
-// COMMENTS: currently only for undirected graphs because of main loop!
 	
 	const int NV= g.graph().number_of_vertices();
 	g.set_we(Graph_t::NOWT);
-	//g.init_we();
 
 	if(type==WMOD){
-		for(int v=0; v<NV-1; v++){
-			for(int w=v+1; w<NV; w++){
-				if(g.graph().is_edge(v,w)){
-					g.set_we(v,w,(1+((2+v+w) % wmod)));  /* v, w are 1 based in [ref] */
-				}
-			}
-		}
+		g.gen_modulus_weights();
 	}else{
-		LOG_INFO("WeightGen<Graph_t>::create_wgraph()-incorred weight generation mode");
+		LOG_INFO("bad weight generation mode - EdgeWeightGen<Graph_t>::create_wgraph");
+		LOG_INFO("all weights set to empty value");
+		return -1;
 	}	
 	
 	return 0;
@@ -238,13 +238,7 @@ int EdgeWeightGen<Graph_t>::create_wgraph (Graph_t& g, type_t type, string FILE_
 	int NV=g.number_of_vertices();
 
 	if(type==WMOD){
-		for(int v=0; v<NV-1; v++){
-			for(int w=v+1; w<NV; w++){
-				if(g.is_edge(v,w)){
-					g.set_we(v,w,(1+((2+v+w)%wmod)));  			
-				}
-			}
-		}
+		g.gen_modulus_weights();		
 	}else{
 		LOG_INFO("WeightGen<Graph_t>::create_wgraph()-incorred weight generation mode");
 	}
