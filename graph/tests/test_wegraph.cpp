@@ -94,7 +94,7 @@ TEST_F(UGraphEWTest, generate_weights) {
 	//generate modulus-weights 
 	EdgeWeightGen<ugraph_ewi>::create_weights(	ugew,
 												EdgeWeightGen<ugraph_ewi>::WMOD,
-												DEFAULT_WEIGHT_MODULUS					);		//(change name - adding weights to ugew, but not creating it)
+												DEFAULT_WEIGHT_MODULUS					);		
 
 	EXPECT_EQ(NV, ugew.graph().number_of_vertices());
 	EXPECT_EQ(4, ugew.get_we(0, 1));
@@ -105,7 +105,6 @@ TEST_F(UGraphEWTest, generate_weights) {
 	//I/O
 	//ugew.print_weights()
 }
-
 
 //////////////////
 //

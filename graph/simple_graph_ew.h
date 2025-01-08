@@ -380,7 +380,7 @@ public:
 	*		 of undirected edges with endpoints in vertices in lv
 	*/
 	virtual	std::ostream& print_weights	(vint& lv, std::ostream& o = std::cout,
-												bool only_vertex_weights = false)					const override;
+												bool only_vertex_weights = false				)	const override;
 
 	/*
 	* @brief Writes undirected graph to stream in dimacs format

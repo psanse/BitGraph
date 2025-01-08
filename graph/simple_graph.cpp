@@ -271,7 +271,16 @@ void Graph<T>::remove_edges (int v){
 
 	//updates edges
 	NE_ = 0;					//resets edges to avoid lazy evaluation later
-	//number_of_edges(false);
+	
+}
+
+template<class T>
+void Graph<T>::remove_edges() {
+	for (std::size_t v = 0; v < NV_; ++v) {
+		adj_[v].erase_bit();
+	}
+
+	NE_ = 0;					
 }
 
 template <class T>
@@ -713,6 +722,46 @@ void Graph<T>::make_bidirected (){
 	}
 	
 	NE_ = 0;	//resets edges to avoid lazy evaluation later
+}
+
+template<class T>
+void Graph<T>::gen_random_edges(double p) {
+
+	//removes all edges
+	remove_edges();
+
+	//sets directed edges with probability p
+	for (std::size_t i = 0; i < NV_ ; ++i ) {
+		for (std::size_t j = 0; j < NV_; ++j ) {
+			if (::com::rand::uniform_dist(p)) {
+				add_edge(i, j);
+			}
+		}
+	}
+	/*for (std::size_t i = 0; i < NV_ - 1; i++) {
+		for (std::size_t j = i + 1; j < NV_; j++) {
+			if (::com::rand::uniform_dist(p)) {
+				add_edge(i, j);
+			}
+		}
+	}*/
+}
+
+template<class T>
+int Graph<T>::gen_random_edge(int v, int w, double p){
+
+	//assert - TODO condition to DEBUG mode
+	if (v == w || v >= NV_ || w >= NV_ || p < 0 || p > 1) {
+		LOG_ERROR("wrong input params - Graph<T>::gen_random_edge");
+		return -1;
+	}
+
+	//generates edge
+	if (::com::rand::uniform_dist(p)) {
+		 add_edge(v, w);
+	}
+	
+	return 0;
 }
 
 template<class T>

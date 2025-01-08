@@ -191,6 +191,19 @@ public:
 	*/
 	void remove_edge			(int v, int w)							override;
 
+	/*
+	* @brief generates undirected edges with probability p.
+	*
+	*		 I. (v, v) not allowed.
+	*		 II. Valid for directed/undirected graphs (TMP design)
+	*
+	* @param v input endpoint
+	* @param w input endpoint
+	* @returns 0 is success, -1 if error
+	*/
+	void gen_random_edges		(double p)								override;
+
+
 //////////////	
 // Induced subgraphs
 

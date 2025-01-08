@@ -46,13 +46,13 @@ struct random_attr_t {
 	}
 
 	//data
-	std::size_t  nLB;					//range of vertices
+	std::size_t  nLB;					//range of vertices [nLB, nUB]
 	std::size_t  nUB;
-	double pLB;							//range of probabilities	
+	double pLB;							//range of densities [pLB, pUB]	
 	double pUB;
 	std::size_t  nRep;					//number of repetitions
 	std::size_t  incN;					//increment of vertices
-	double incP;						//increment of probabilities
+	double incP;						//increment of densities
 };
 
 /////////////////
@@ -96,7 +96,7 @@ class SparseRandomGen <sparse_ugraph, logSizeTable>
 	/*
 	*  @brief decodes undimensional edge index to upper triangle of adjacency matrix
 	* 
-	*		  (personal communication with [Fast Random graph generation, 2011] authors)
+	*		  (see [Fast Random graph generation, 2011], personal comm. with authors)
 	*/
 	static void decode (BITBOARD edge_index, unsigned int& i, unsigned int& j, unsigned int n);
 
