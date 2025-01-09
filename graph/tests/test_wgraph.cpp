@@ -128,8 +128,9 @@ TEST_F(UGraphWTest, reset) {
 
 TEST(UGraphW, constructor_from_file) {
 
-	//read DIMACS graph from file - no DIMACS weights, assumed to be unit weights
+	//read DIMACS graph from file - no DIMACS weights, sets default weights 
 	ugraph_wi ugw(PATH_GRAPH_TESTS_CMAKE_SRC_CODE  "sample.clq");
+
 	const int NV = ugw.graph().number_of_vertices();
 
 	EXPECT_EQ(7, NV);
@@ -141,14 +142,15 @@ TEST(UGraphW, constructor_from_file) {
 
 TEST(UGraphW, gen_weights_dimacs){
 		
-	//read DIMACS graph from file - no DIMACS weights, assumed to be unit weights
+	//read DIMACS graph from file - no DIMACS weights, sets default weights 
 	ugraph_wi ugw (PATH_GRAPH_TESTS_CMAKE_SRC_CODE  "brock200_1.clq");
+
 	const int NV = ugw.graph().number_of_vertices();
 
 	EXPECT_EQ(200, NV);
-	EXPECT_EQ(1, ugw.get_w(0));
-	EXPECT_EQ(1, ugw.get_w(1));
-	EXPECT_EQ(1, ugw.get_w(199));
+	EXPECT_EQ(ugraph_wi::DEFWT, ugw.get_w(0));
+	EXPECT_EQ(ugraph_wi::DEFWT, ugw.get_w(1));
+	EXPECT_EQ(ugraph_wi::DEFWT, ugw.get_w(199));
 
 	//generate modulus weights 
 	WeightGen< ugraph_wi >::create_weights(ugw, WeightGen<ugraph_wi>::WMOD, 200);
