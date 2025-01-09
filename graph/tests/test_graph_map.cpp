@@ -13,7 +13,6 @@
 using namespace std;
 
 TEST(Graph_map_single, build_mapping){
-	LOG_INFO("Graph_map_single-build_mapping()---------------");
 	
 	const int SIZE=10;
 	ugraph ug(SIZE);
@@ -24,9 +23,9 @@ TEST(Graph_map_single, build_mapping){
 
 	
 	GraphMapSingle gm;
-	gm.build_mapping(ug, GraphFastRootSort<ugraph>::MIN_DEGEN, GraphFastRootSort<ugraph>::FIRST_TO_LAST,
-						 GraphFastRootSort<ugraph>::NONE, GraphFastRootSort<ugraph>::FIRST_TO_LAST, "MIN_DEG", "");
-
+	gm.build_mapping< ugraph, GraphFastRootSort<ugraph>> (ug,   GraphFastRootSort<ugraph>::MIN_DEGEN, ::com::sort::FIRST_TO_LAST,
+																GraphFastRootSort<ugraph>::NONE,	     ::com::sort::FIRST_TO_LAST, "MIN_DEG", "");
+		
 	gm.print_names(); cout<<endl;
 	gm.print_mappings();
 	
@@ -34,13 +33,11 @@ TEST(Graph_map_single, build_mapping){
 	int vl=5;
 	int vr=gm.map_l2r(vl);
 	EXPECT_EQ(vl,gm.map_r2l(vr));
-	
-	LOG_INFO("-----------------------------");
+
 }
 
 TEST(Graph_map_single, build_mapping_II){
-	LOG_INFO("Graph_map_single-build_mapping_II()---------------");
-	
+		
 	const int SIZE=10;
 	ugraph ug(SIZE);
 	ug.add_edge(0,1);
@@ -50,7 +47,7 @@ TEST(Graph_map_single, build_mapping_II){
 
 	//predefined ordering
 	GraphFastRootSort<ugraph> gol(ug);
-	vint o2n=gol.new_order(GraphFastRootSort<ugraph>::MIN_DEGEN, GraphFastRootSort<ugraph>::LAST_TO_FIRST);
+	vint o2n = gol.new_order(GraphFastRootSort<ugraph>::MIN_DEGEN, ::com::sort::LAST_TO_FIRST);
 
 	GraphMapSingle gm;
 	gm.build_mapping(o2n);		/* builds mapping*/
@@ -69,8 +66,7 @@ TEST(Graph_map_single, build_mapping_II){
 	int vl=5;
 	int vr=gm.map_l2r(vl);
 	EXPECT_EQ(vl,gm.map_r2l(vr));
-	cin.get();
-	LOG_INFO("-----------------------------");
+
 }
 
 ////////////////

@@ -192,7 +192,6 @@ TEST(GFunc, neighbors){
 	neigh_exp.push_back(64);
 	EXPECT_EQ(neigh_exp, neigh);
 
-
 	//////////////
 	//neighbors of {63} after {63} in bitset bbV = {64}
 	neighbors_after<ugraph>(ug, 63, bbV, neigh);
@@ -252,8 +251,7 @@ TEST(GFunc, sort){
 	EXPECT_EQ(1, lv[1]);
 	EXPECT_EQ(2, lv.size());
 	////////////////////////
-
-	
+		
 	lv.clear();
 	lv.push_back(0);
 	lv.push_back(1);
@@ -267,7 +265,6 @@ TEST(GFunc, sort){
 	EXPECT_EQ(2, lv.size());
 	////////////////////////
 	
-
 	bitarray bbref(5);
 	bbref.set_bit(2);
 	bbref.set_bit(3);
@@ -281,7 +278,6 @@ TEST(GFunc, sort){
 	EXPECT_EQ(0, lv[1]);
 	EXPECT_EQ(2, lv.size());
 	////////////////////////
-
 
 	//empty reference set of vertices - lv unchanged
 	//lv = { 1, 0 }
@@ -308,7 +304,6 @@ TEST(GFunc, sort){
 	EXPECT_EQ(0, lv[1]);
 	EXPECT_EQ(2, lv.size());
 	////////////////////////
-		
 
 }
 
