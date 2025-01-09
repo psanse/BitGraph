@@ -11,11 +11,6 @@
 using namespace std;
 using vint = std::vector<int>;
 
-
-//#define TEST_GRAPH_FUNC_STEP_BY_STEP
-//#define print_graph_func_logs
-
-
 TEST(Graph_func, is_triangleFree_subgraph) {
 	
 	const int NV = 5;
@@ -26,19 +21,14 @@ TEST(Graph_func, is_triangleFree_subgraph) {
 	ug.add_edge(1, 3);
 		
 	vint tri;
-	//////////////////
-	//TEST	
 	int tri_free = gfunc::is_triangleFree_subgraph(ug, ug.get_neighbors(0), tri);
-	EXPECT_TRUE(tri_free);														//[1]-->[3]
-	////////////////////
-
-	//////////////////
-	//TEST
+	EXPECT_TRUE(tri_free);																//[1]-->[3]
+	
+	
 	ug.add_edge(1, 2);
 	ug.add_edge(1, 3);
 	ug.add_edge(2, 3);
 	EXPECT_FALSE(gfunc::is_triangleFree_subgraph(ug, ug.get_neighbors(0), tri));
-	////////////////////
 
 }
 
