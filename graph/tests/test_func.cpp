@@ -11,52 +11,46 @@
 using namespace std;
 using vint = std::vector<int>;
 
-TEST(Graph_func, is_triangleFree_subgraph) {
-	
-	const int NV = 5;
-	ugraph ug(NV);
-	ug.add_edge(0, 1);
-	ug.add_edge(0, 2);
-	ug.add_edge(0, 3);
-	ug.add_edge(1, 3);
-		
-	vint tri;
-	int tri_free = gfunc::is_triangleFree_subgraph(ug, ug.get_neighbors(0), tri);
-	EXPECT_TRUE(tri_free);																//[1]-->[3]
-	
-	
-	ug.add_edge(1, 2);
-	ug.add_edge(1, 3);
-	ug.add_edge(2, 3);
-	EXPECT_FALSE(gfunc::is_triangleFree_subgraph(ug, ug.get_neighbors(0), tri));
+class GFuncTest : public ::testing::Test {
+protected:
+	void SetUp() override {
+		ug.reset(NV);
+		ug.add_edge(0, 1);
+		ug.add_edge(0, 2);
+		ug.add_edge(0, 3);
+		ug.add_edge(1, 3);
+		ug.set_name("toy");
+	}
+	void TearDown() override {}
 
+	//undirected graph instance	
+	const int NV = 5;
+	ugraph ug;											//undirected graph with integer weights
+};
+
+TEST_F(GFuncTest, is_triangleFree_subgraph) {
+		
+	vint triangle;	
+	EXPECT_TRUE(gfunc::is_triangleFree_subgraph(ug, ug.get_neighbors(0), triangle));			
+
+	//adds a triangle
+	ug.add_edge(1, 2);
+	ug.add_edge(2, 3);
+	EXPECT_FALSE(gfunc::is_triangleFree_subgraph(ug, ug.get_neighbors(0), triangle));
 }
 
-TEST(Graph_func, is_edgeFree_subgraph) {
-	
-	const int NV = 5;
-	ugraph ug(NV);
-	ug.add_edge(0, 1);
-	ug.add_edge(0, 2);
-	ug.add_edge(0, 3);
-	ug.add_edge(1, 3);
-
-	//////////////////
-	//TEST
+TEST_F(GFuncTest, is_edgeFree_subgraph) {
+		
 	vint edge;
-	int edge_free = gfunc::is_edgeFree_subgraph(ug, ug.get_neighbors(0), edge);
-	EXPECT_FALSE(edge_free);											//[1]-->[3]
-	////////////////////
-
-	//////////////////
-	//TEST
+	EXPECT_FALSE(gfunc::is_edgeFree_subgraph(ug, ug.get_neighbors(0), edge) );				//{1, 3} is in G[{1, 2, 3}]					
+	
+	//removes the only edge 
 	ug.remove_edge(1, 3);
 	EXPECT_TRUE(gfunc::is_edgeFree_subgraph(ug, ug.get_neighbors(0), edge));
-	////////////////////
 
 }
 
-TEST(Graph_func, sort_by_weights){
+TEST(GFuncVertexWeighted, sort_w){
 	
 	using namespace gfunc::vertexW;	
 
