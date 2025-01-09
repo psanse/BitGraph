@@ -5,7 +5,7 @@
 * @last_update 09/01/25
 * @dev pss
 *
-* TODO... (09/01/25)
+* TODO CHECK edgeW::ew_shift_2_highest_index function  (09/01/25)
 */
 
 #ifndef __GRAPH_FUNC_H__
@@ -145,7 +145,6 @@ namespace gfunc{
 		
 		return lv.size();
 	}
-
 
 	/*
 	* @brief List of neighbors of v in the set of vertices bbref () that come after v
@@ -447,6 +446,7 @@ namespace gfunc{
 		* @param g: a simple graph
 		* @param lv: std::vector of vertices to be sorted
 		* @param min_sort: sorting flag (true: non-decreasing, false: non-increasing)
+		* @returns sorted set of vertices
 		*/
 		template<typename Graph_t>
 		vint& sort_w(const Graph_t& g, vint& lv, bool min_sort = true) {
@@ -512,9 +512,10 @@ namespace gfunc{
 		* @param g: a simple graph
 		* @param lv: set of vertices
 		* @param min_sort: sorting flag (true: non-decreasing, false: non-increasing)
+		* @returns sorted set of vertices
 		*/
 		template<typename Graph_t>
-		vint& sort_wd(const Graph_t& g, vint& lv, bool min_sort = true) {
+		vint& sort_wdProd(const Graph_t& g, vint& lv, bool min_sort = true) {
 
 			//weights as part of the sorting criteria
 			const auto& weights = g.get_weights();
@@ -545,9 +546,10 @@ namespace gfunc{
 		* @param lv: set of vertices
 		* @param size: number of vertices in the array
 		* @param min_sort: sorting flag (true: non-decreasing, false: non-increasing)
+		* @returns pointer to the sorted array
 		*/
 		template<typename Graph_t>
-		int* sort_wd(const Graph_t& g, int* lv, int size, bool min_sort = true) {
+		int* sort_wdProd(const Graph_t& g, int* lv, int size, bool min_sort = true) {
 
 			//weights as part of the sorting criteria
 			const auto& weights = g.get_weights();
@@ -577,9 +579,10 @@ namespace gfunc{
 		* @param g: a simple graph
 		* @param lv: set of vertices
 		* @param min_sort: sorting flag (true: non-decreasing, false: non-increasing)
+		* @returns sorted set of vertices
 		*/
 		template<typename Graph_t>
-		int sort_wddiff(const Graph_t& g, vint& lv, bool min_sort = true) {
+		vint& sort_wdDif(const Graph_t& g, vint& lv, bool min_sort = true) {
 
 			//weights as part of the sorting criteria
 			const auto& weights = g.get_weights();
@@ -603,7 +606,7 @@ namespace gfunc{
 			else {
 				std::sort(lv.begin(), lv.end(), my_struct_greater_diff);
 			}
-			return 0;
+			return lv;
 		}
 
 		/*
@@ -612,9 +615,10 @@ namespace gfunc{
 		* @param lv: set of vertices
 		* @param size: number of vertices in the array
 		* @param min_sort: sorting flag (true: non-decreasing, false: non-increasing)
+		* @returns pointer to the sorted array
 		*/
 		template<typename Graph_t>
-		int sort_wddiff(const Graph_t& g, int* lv, int size, bool min_sort = true) {
+		int* sort_wdDif(const Graph_t& g, int* lv, int size, bool min_sort = true) {
 
 			//weights as part of the sorting criteria
 			const auto& weights = g.get_weights();
@@ -635,19 +639,9 @@ namespace gfunc{
 			else {
 				std::sort(lv, lv + size, compare_greater);
 			}
-			return 0;
+			return lv;
 		}
-
-
-		/*struct smaller_than_wd{
-			smaller_than_wd(Graph_t* g_out):g(g_out){NV=g_out->number_of_vertices();}
-			bool smaller_than_wd()(int a, int v){
-				return g->get_wv(a)*(abs(a-NV)) <  g->get_wv(b)*(abs(b-NV));
-			}
-
-			int NV;
-			Graph_t* g;
-		};*/
+	
 
 	} //namespace vertexW
 
@@ -666,7 +660,66 @@ namespace gfunc{
 			accum_we(double* lw):lw(lw){}
 			const double* lw;
 		};*/
+		
+		template<typename Graph_t>
+		typename Graph_t::_wt wesum(const Graph_t& g, bool only_we = false)		 { LOG_ERROR("not implemented yet -  edgeW::wesum"); return 0; }
+		
+		//alias
+		template<class W>
+		using UEW = Graph_EW<ugraph, W>;
 
+		/*
+		* @brief Determines the sum of the edge-weights of a given undirected graph
+		* @param only_we: flag to consider only edge-weights (true) or also vertex-weights we_(v, v) (false)
+		* @returns sum of the weights
+		* 
+		* TODO - simplified code (09/01/25)
+		*/
+		template<typename W>
+		typename UEW<W>::_bbt wesum(const UEW<W>& g, bool only_we = false) {
+		
+			double total_weight = 0.0;
+			const auto NV = g.number_of_vertices();
+						
+			for (auto i = 0; i < NV - 1; ++i) {
+				for (auto j = (only_we ? i + 1 : i); j < NV; j++) {
+
+					if (g.get_we(i, j) != UEW<W>::NOWT) {
+						total_weight += g.get_we(i, j);				//no edge-checking!
+					}
+				}
+			}
+			
+			return total_weight;
+		}
+
+		/*
+		* @brief Determines the sum of the edge-weights of an induced subgraph
+		* 
+		*		I. Does not add default empty weigth value in case of inconsisten graphs		
+		* 
+		* @param lv: list of vertices in the induced subgraph
+		* @param only_we: flag to consider only edge-weights (true) or also vertex-weights we_(v, v) (false)
+		* @returns sum of the weights
+		* 
+		*/
+		template<typename Graph_t>
+		typename Graph_t::_wt wesum(const Graph_t& g, vint& lv, bool only_we = false) {
+			
+			double total_weight = 0.0;
+			const auto NV = lv.size();
+			
+			for (auto i = 0; i < NV - 1; i++) {
+				for (auto j = (only_we ? i + 1 : i); j < NV; ++j) {
+
+					if (g.get_we(i, j) != Graph_t::NOWT) {		//Checks grahp consistency - perhaps remove or do it in DEBUG mode only
+						res += g.get_we(lv[i], lv[j]);			//no edge-checking!
+					}
+				}
+			}
+			
+			return res;
+		}
 
 		template<class Graph_t, class _wt>
 		int ew_shift_2_highest_index(const Graph_t& g, const int* lv, _wt* lw, int size_lv, double wper = 1.0) {
@@ -707,55 +760,8 @@ namespace gfunc{
 			return 0;
 		}
 
-		template<typename Graph_t>
-		typename Graph_t::_wt wesum(const Graph_t& g, bool only_we = false) {
-			double res = 0.0;
-			const int NV = g.number_of_vertices();
 
-			if (only_we) {
-				for (int i = 0; i < NV - 1; i++) {
-					for (int j = i + 1; j < NV; j++) {
-						if (g.get_we(i, j) != Graph_t::NOWT)
-							res += g.get_we(i, j);				//no edge-checking!
-					}
-				}
-			}
-			else {		//all weights, including vertex weights
-				for (int i = 0; i < NV; i++) {
-					for (int j = i; j < NV; j++) {
-						if (g.get_we(i, j) != Graph_t::NOWT)
-							res += g.get_we(i, j);				//no edge-checking!
-					}
-				}
-			}
 
-			return res;
-		}
-
-		template<typename Graph_t>
-		typename Graph_t::_wt wesum(const Graph_t& g, vint& lv, bool only_we = false) {
-			double res = 0.0;
-			const int NV = lv.size();
-			if (only_we) {
-				for (int i = 0; i < NV - 1; i++) {
-					for (int j = i + 1; j < NV; j++) {
-						if (g.get_we(i, j) != Graph_t::NOWT)
-							res += g.get_we(lv[i], lv[j]);			//no edge-checking!
-					}
-				}
-			}
-			else {//all weights, including vertex weights
-
-				for (int i = 0; i < NV; i++) {
-					for (int j = i; j < NV; j++) {
-						if (g.get_we(i, j) != Graph_t::NOWT)
-							res += g.get_we(lv[i], lv[j]);			//no edge-checking!
-					}
-				}
-			}
-
-			return res;
-		}
 	} //namespace edgeW
 
 } //namespace

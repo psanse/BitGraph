@@ -363,7 +363,7 @@ int WeightGen<Graph_t>::create_weights (Graph_t& g, type_t type, int wmod, strin
 		}
 		break;
 	case WMOD:
-		for (std::size_ v = 0; v < NV; ++v) {
+		for (std::size_t v = 0; v < NV; ++v) {
 			g.set_w(v, (1 + ((v + 1) % wmod)));
 		}
 		break;

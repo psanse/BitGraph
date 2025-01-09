@@ -151,7 +151,7 @@ TEST(UGraphW, gen_weights_dimacs){
 	EXPECT_EQ(1, ugw.get_w(199));
 
 	//generate modulus weights 
-	WeightGen< ugraph_wi >::create_wgraph(ugw, WeightGen<ugraph_wi>::WMOD, 200);
+	WeightGen< ugraph_wi >::create_weights(ugw, WeightGen<ugraph_wi>::WMOD, 200);
 		
 	EXPECT_EQ(2, ugw.get_w(0));
 	EXPECT_EQ(3, ugw.get_w(1));
@@ -166,8 +166,8 @@ TEST(UGraphW, gen_random) {
 		
 	//creates random graph of size NV with modulus weights
 	ugraph_wi ugw;
-	RandomGen<ugraph_wi>::create_ugraph(ugw, NV, density);							/* empty vertex weights by default */
-	WeightGen<ugraph_wi>::create_wgraph(ugw, WeightGen<ugraph_wi>::WMOD);
+	RandomGen<ugraph_wi>::create_graph(ugw, NV, density);							/* empty vertex weights by default */
+	WeightGen<ugraph_wi>::create_weights(ugw, WeightGen<ugraph_wi>::WMOD);
 
 	/////////////////////
 	EXPECT_EQ(NV, ugw.graph().number_of_vertices());
@@ -196,7 +196,7 @@ TEST(GraphW, DISABLED_gen_weights_to_file){
 	const int NV=ugw.graph().number_of_vertices();
 	
 	//generate weights WDEG mode
-	WeightGen< Graph_W<ugraph, int> >::create_wgraph(ugw, WeightGen<Graph_W<ugraph, int>>::WMOD, ".d", TEST_GRAPH_PATH_LOG);
+	WeightGen< Graph_W<ugraph, int> >::create_weights(ugw, WeightGen<Graph_W<ugraph, int>>::WMOD, DEFAULT_WEIGHT_MODULUS, ".d", TEST_GRAPH_PATH_LOG);
 		
 
 	/////////////////////
