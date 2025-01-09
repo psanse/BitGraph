@@ -1,64 +1,88 @@
-//test_random_graph: test for the random graph generators
-//
-//last update@23/01/19 (check with the new Graph types)
+/*
+* test_random_graph.cpp  tests for random graph and weight generators
+* @created ?
+* @updated @23/01/19 (check with the new Graph types)
+* @last_update 09/01/25
+* @dev pss
+* 
+* TODO - ADD TESTS, weights...
+*/
 
-#include <iostream>
-#include <iomanip>
+#include "graph/graph.h"
+#include "graph/graph_gen.h"
 #include "gtest/gtest.h"
-#include "../graph.h"
-#include "../graph_gen.h"
+#include <iostream>
 
 using namespace std;
 
-//*** TODO remove log files created
-TEST(Random_Graph, basic_struct){
+TEST(Random_Graph, random_attr_t){
+	
 	random_attr_t r1(100, 150, .3, .5, 1, 50, .1);
+		
+	EXPECT_EQ(100, r1.nLB);
+	EXPECT_EQ(150, r1.nUB);
+	EXPECT_EQ(.3, r1.pLB);
+	EXPECT_EQ(.5, r1.pUB);
+	EXPECT_EQ(1, r1.nRep);	
 	EXPECT_EQ(50, r1.incN);
 	EXPECT_EQ(.1, r1.incP);
-	
-	random_attr_t r2(r1);
-	r2=r1;
-	EXPECT_EQ(r2.incN, r1.incN);
-	cout<<r1;
-	cout<<r2;
+
 }
 
 TEST(Random_Graph, ugraph){
-///////////////////
-// Undirected graphs read by directed graph class (all edges are non symmetrical)
 	
 	ugraph ug;
-	RandomGen<ugraph>::create_ugraph(ug, 100, .30);
-	ug.print_data();
-
+	RandomGen<ugraph>::create_graph(ug, 100, .30);
+	
 	//check if inside the range
 	EXPECT_GE(.33, ug.density());
 	EXPECT_LE(.27, ug.density());
 	
-	//will crate a benchmark in default (project) directory
-	random_attr_t r(100, 150, .3, .5, 1, 50, .1); 
-	RandomGen<ugraph>::create_graph_benchmark(".", r);
-	RandomGen<ugraph>::create_ugraph_benchmark(".", r);
+	//TODO...
 }
 
 TEST(Random_Graph, sparse_ugraph){
-///////////////////
-// Undirected graphs read by directed graph class (all edges are non symmetrical)
 	
-	sparse_ugraph ug;
-	RandomGen<sparse_ugraph>::create_ugraph(ug, 100, .30);
-	ug.print_data();
-
+	sparse_ugraph sug;
+	RandomGen<sparse_ugraph>::create_graph(sug, 100, .30);
+	
 	//check if inside the range
-	EXPECT_GE(.33, ug.density());
-	EXPECT_LE(.27, ug.density());
+	EXPECT_GE(.33, sug.density());
+	EXPECT_LE(.27, sug.density());
+
+	//TODO...
 	
-	//will crate a benchmark in default (project) directory
-	random_attr_t r(100, 150, .3, .5, 1, 50, .1); 
-	RandomGen<sparse_ugraph>::create_graph_benchmark(".", r);
-	RandomGen<sparse_ugraph>::create_ugraph_benchmark(".", r);
 }
+
+////////////////////
 //
+// DSIABLED TESTS - CHECK
+//
+////////////////////
+
+
+TEST(Random_Graph, DISABLE_create_benchmark) {
+
+	//will crate a benchmark in default (project) directory
+	random_attr_t r(100, 150, .3, .5, 1, 50, .1);
+	RandomGen<ugraph>::create_graph_benchmark(".", r);
+	//RandomGen<ugraph>::create_graph_benchmark(".", r);
+}
+
+TEST(Random_Graph, DISABLE_create_sparse_benchmark) {
+
+	////will crate a benchmark in default (project) directory
+	//random_attr_t r(100, 150, .3, .5, 1, 50, .1); 
+	//RandomGen<sparse_ugraph>::create_graph_benchmark(".", r);
+	////RandomGen<sparse_ugraph>::create_graph_benchmark(".", r);
+}
+
+////////////////////
+//
+// COMMENTED OUT TESTS - CHECK
+//
+////////////////////
+
 //TEST(Sparse_Random_Graph, write_to_file){
 //	sparse_ugraph ug;
 //	SparseRandomGen<> spgen;

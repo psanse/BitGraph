@@ -59,7 +59,8 @@ private:
 	int degree					(bitarray& bb);							
 
 ////////////
-//the graph
+//graph
+
 	ugraph& m_g;				
 	vint m_vdeg;				//initialized to 0 upon construction
 };

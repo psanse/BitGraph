@@ -14,7 +14,7 @@ TEST(brock, sort_degree){
 ///////////////////
 // Undirected graphs read by directed graph class (all edges are non symmetrical)
 	
-	ugraph ug("brock200_1.clq");
+	ugraph ug(PATH_GRAPH_TESTS_CMAKE_SRC_CODE "brock200_1.clq");
 	DegUg deg(ug);
 	const int NUM_VERTEX=10;
 

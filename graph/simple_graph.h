@@ -44,8 +44,8 @@ public:
 			
 	//constructors
 	Graph								();															//creates empty graph
-	Graph								(std::size_t n);											//creates graph with n=|V| and m=0 	
-	Graph								(std::string filename);										//creates graph from file		
+explicit Graph							(std::size_t n);											//creates graph with n=|V| and m=0 	
+explicit Graph							(std::string filename);										//creates graph from file		
 	Graph								(std::size_t n, int* adj[], std::string filename = "");		//old-style adjacency matrix
 
 	
@@ -133,6 +133,7 @@ public:
 	* @brief deallocates memory and resets to default values
 	*/
 	void clear							();											 
+		
 
 	/*
 	* @brief reduces the graph to n vertices 
@@ -223,9 +224,40 @@ virtual void remove_edge				(int v, int w);
 	void remove_edges					(int v);									
 	
 	/*
+	* @brief removes all edges
+	*/
+	void remove_edges					();
+
+
+	/*
 	* @brief makes all edges bidirected (conversion to undirected graph)
 	*/
 	void make_bidirected				();	
+
+	//random generation
+
+	/*
+	* @brief generates directed edges with probability p.
+	*
+	*		 I. (v, v) not allowed.
+	*
+	* @param v input endpoint
+	* @param w input endpoint
+	* @returns 0 is success, -1 if error
+	*/
+	virtual void gen_random_edges		(double p);
+	
+	/*
+	* @brief generates edge (v, w) with probability p.
+	* 
+	*		 I. (v, v) not allowed.
+	*		 II. Valid for directed/undirected graphs (TMP design)
+	* 
+	* @param v input endpoint
+	* @param w input endpoint
+	* @returns 0 is success, -1 if error 	
+	*/
+	int gen_random_edge		(int v, int w, double p);
 
 //////////////	
 // Induced subgraphs

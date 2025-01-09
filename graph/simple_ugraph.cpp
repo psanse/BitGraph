@@ -125,6 +125,23 @@ void Ugraph<T>::remove_edge (int v, int w){
 }
 
 template<class T>
+void Ugraph<T>::gen_random_edges(double p){
+
+	//removes all edges
+	remove_edges();
+
+	//sets undirected edges with probability p
+	for (std::size_t i = 0; i < NV_ - 1; i++) {
+		for (std::size_t j = i + 1; j < NV_; j++) {
+			if (::com::rand::uniform_dist(p)) {
+				add_edge(i, j);
+			}
+		}
+	}
+
+}
+
+template<class T>
 int Ugraph<T>::max_graph_degree () const {
 
 	int max_degree=0, temp=0; 
@@ -375,7 +392,6 @@ int Ugraph<T>::create_subgraph(Ugraph & ug, vint& lv) const
 
 	return 0;
 }
-
 
 
 ////////////////////////////////////////////

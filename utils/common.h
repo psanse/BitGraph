@@ -216,7 +216,7 @@ namespace com {
 
 	// Especialización para punteros
 	template<class T, class ColCrit_t, bool Greater>
-	struct has_val<T*, ColCrit_t, Greater, typename std::enable_if< std::is_pointer<T*>::value>::type > {
+	struct has_val<T*, ColCrit_t, Greater, typename std::enable_if< std::is_pointer<T>::value>::type > {
 		explicit has_val(const ColCrit_t& c) : crit(c) {}
 
 		bool operator()(const T* a, const T* b) const {
