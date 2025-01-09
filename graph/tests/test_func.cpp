@@ -1,7 +1,12 @@
-//test_func.cpp: tests for functions in graph_func.h (namespace gfunc)
-//
-// last_update@:23/01/2019 (adapted for the new Graph_W type) 
-
+/*
+* test_func.cpp  tests for namespace gfunc functions
+* @created 20/7/18
+* @update Graph_W type 23/01/19
+* @last_update 09/01/25
+* @dev pss
+*
+* @TODO - ADD TESTS, CHECK DISABLED (08/01/2025)
+*/
 
 #include "../graph.h"
 #include "../graph/algorithms/graph_func.h"
@@ -54,8 +59,9 @@ TEST(GFuncVertexWeighted, sort_w){
 	
 	using namespace gfunc::vertexW;	
 
-	const int NV=5;
-	Graph_W<ugraph, int> ugw(NV, 0.0);		//0.0 vertex weights (unit weights by default)
+	const int NV = 5;
+
+	ugraph_wi ugw(NV, ugraph_wi::NOWT);		//0.0 vertex weights (unit weights by default)
 	ugw.add_edge(0,1);
 	ugw.add_edge(1,2);
 	ugw.add_edge(0,2);
@@ -65,7 +71,7 @@ TEST(GFuncVertexWeighted, sort_w){
 	ugw.set_w(2,1);
 
 	//I/O
-	ugw.print_weights();
+	//ugw.print_weights();
 
 	//sort vector
 	vint lv; lv.push_back(0); lv.push_back(1); lv.push_back(2);

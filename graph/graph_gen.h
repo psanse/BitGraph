@@ -244,7 +244,6 @@ int RandomGen<Graph_t>::create_graph(Graph_t& g, std::size_t n, double p) {
 template<class Graph_t>
 int RandomGen<Graph_t>::create_graph_benchmark(const string& path, const random_attr_t& rd) {
 
-
 	std::ostringstream o;
 	Graph_t g;
 	std::ofstream f;

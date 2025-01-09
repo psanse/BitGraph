@@ -18,7 +18,16 @@
 #include <fstream>
 #include <iostream>
 				
-using namespace std;							
+using namespace std;
+
+/////////////////////////////////////////////////
+template<class Graph_t, class W>
+const W Base_Graph_W <Graph_t, W >::NOWT = 0.0;			//is 0.0 the best value for empty weight?									
+
+template<class Graph_t, class W>
+const W Base_Graph_W <Graph_t, W >::DEFWT = 1.0;												
+/////////////////////////////////////////////////
+
 
 ////////////////////////////////////////////////////////////////
 // Necessary implementation of template methods in header file
