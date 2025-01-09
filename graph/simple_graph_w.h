@@ -176,7 +176,7 @@ const _bbt& get_neighbors				(int v)		const			{ return g_.get_neighbors(v); }
 	*			
 	*			MODE = 1 -> w(v) = 1	(unweighted graph)
 	*/
-	int gen_mode_weights				(int MODE = DEFAULT_WEIGHT_MODULUS);
+	int gen_modulus_weights				(int MODE = DEFAULT_WEIGHT_MODULUS);
 	
 ////////////
 // I/O

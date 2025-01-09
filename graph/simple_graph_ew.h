@@ -212,6 +212,8 @@ virtual	~Base_Graph_EW()										= default;
 	*			I. we(v, w) = 1 + ((v + w) % MODULUS)	(1-based index)
 	* 
 	*			II.we(v, v) are set to NOWT
+	* 
+	*			III. non-edges are not overritten
 	*/
 	virtual void gen_modulus_weights (int MODULUS = DEFAULT_WEIGHT_MODULUS);
 
@@ -344,8 +346,9 @@ public:
 	*
 	*			I. we(v, w) = 1 + ((v + w) % MODULUS)	(1-based index)
 	* 
-	*			II.we(v, v) are set to NOWT
+	*			II.we(v, v) and non-edge weights are set to NOWT
 	*		
+	*			III. non-edges are not overritten
 	*/
 	void gen_modulus_weights(int MODULUS = DEFAULT_WEIGHT_MODULUS)  override;
 

@@ -200,7 +200,7 @@ template<class Graph_t, class W>
 				///////////////////////////////////////
 				set_we(v, w, ( 1 + ( (v + w + 2 /* 0-based index*/) % MODULUS) )   );
 				///////////////////////////////////////
-			}
+			}			
 		}
 	}
 }
@@ -536,8 +536,8 @@ int Graph_EW< ugraph, W >::set_we(int v, int w, W val) {
 		ptype::we_[w][v] = val;
 	}
 	else {
-		LOG_WARNING("bizarre petition to add weight to the non-edge", "(", v, ",", w, ")", " - Graph_EW<Graph_t,W >::set_we");
-		LOG_WARNING("weight not added");
+		LOGG_DEBUG	("bizarre petition to add weight to the non-edge", "(", v, ",", w, ")", " - Graph_EW<Graph_t,W >::set_we");
+		LOG_DEBUG	("weight not added");
 		return -1;
 	}
 
@@ -620,7 +620,7 @@ void Graph_EW<ugraph, W>::gen_modulus_weights(int MODULUS)
 				set_we(v, w, (1 + ((v + w + 2 /* 0-based index*/) % MODULUS)));
 				///////////////////////////////////////
 
-			}
+			}			
 		}
 	}
 }

@@ -160,8 +160,19 @@ class WeightGen
 public:
 	enum type_t {WMOD=0, WDEG};
 
-	//non-sparse generator
-	static int create_weights (Graph_t& g, type_t, int wmod = DEFAULT_WEIGHT_MODULUS , string FILE_EXTENSION = "", string FILE_PATH = "");
+	/*
+	* @brief Overrites new vertex weights in the graph
+	*
+	*		I. we(v) = 1 + (v % mod) [Pullham 2008]
+	*
+	*		II. Optionally the weights are written to a file
+	*
+	*		TODO: specialize for sparse-graphs
+	*
+	* @returns -1 if error, 0 if OK
+	*/
+	static int create_weights (Graph_t& g, type_t, int wmod = DEFAULT_WEIGHT_MODULUS,
+								string FILE_EXTENSION = "", string FILE_PATH = ""		);
 };
 
 /////////////////
@@ -180,10 +191,23 @@ class EdgeWeightGen
 {
 public:
 	enum type_t { WMOD = 0};
+	
+	/*
+	* @brief Generates weights for existing edges in a graph
+	* 
+	*		I. we(v, w) = 1 + ((v + w) % mod) [Pullham 2008]
+	* 
+	*		II. we(v, v) and non-edge weights are set to NOWT
+	* 
+	*		III. Optionally the weights are written to a file
+	* 
+	*		TODO: specialize for sparse-graphs
+	* 
+	* @returns -1 if error, 0 if OK
+	*/
+	static int create_weights (Graph_t& g, type_t, int wmod = DEFAULT_WEIGHT_MODULUS,
+								string FILE_EXTENSION = "", string FILE_PATH = ""			);
 
-	//non sparse generators
-	static int create_weights (Graph_t& g, type_t, int wmod = 200);
-	static int create_weights (Graph_t& g, type_t, string FILE_EXTENSION, string FILE_PATH = "", int wmod = 200);
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -376,72 +400,44 @@ int WeightGen<Graph_t>::create_weights (Graph_t& g, type_t type, int wmod, strin
 
 template<class Graph_t>
 inline
-int EdgeWeightGen<Graph_t>::create_weights (Graph_t& g, type_t type, int wmod){
-/////////////////////////////////
-// adds edge-weights to EXISTING EDGES according to the following criteria:
-//
-// 1. WMOD- edge-weight is the standard (v + w) mod(wmod) + 1 weight used (Pullham and others)
-//    Note: v and w MUST be 1 based
+int EdgeWeightGen<Graph_t>::create_weights (Graph_t& g, type_t type, int wmod, string FILE_EXTENSION = "", string FILE_PATH = ""){
 
-//
-// RETURNS 0-ok, -1 Err
-//
-	
-	const int NV= g.graph().number_of_vertices();
-	g.set_we(Graph_t::NOWT);
-
-	if(type==WMOD){
-		g.gen_modulus_weights();
-	}else{
+	switch (type) {
+	case WMOD:
+		g.gen_modulus_weights(wmod);		//overrites all weights, no need to clear them previously
+		break;
+	default:
 		LOG_INFO("bad weight generation mode - EdgeWeightGen<Graph_t>::create_weights");
-		LOG_INFO("all weights set to empty value");
+		LOG_INFO("original weights unchanged");
 		return -1;
-	}	
+	}
+
+	/////////////////////////////
+	//streams weights to file
+	if (!FILE_EXTENSION.empty() && !FILE_PATH.empty()) {
+
+		//determines the filename
+		string path = FILE_PATH;
+		com::dir::append_slash(path);
+		string filename = path + g.graph().get_name() + FILE_EXTENSION;
+
+		//streams weights to file
+		ofstream f(filename);
+		if (!f) {
+			LOGG_INFO("cannot write edge-weights to file ", filename, " - EdgeWeightGen<Graph_t>::create_weights");
+			return -1;
+		}
+
+		///////////////////////////
+		g.print_weights(f, false);			//NOWT weight values are not streamed - vertex index is not streamed with the weight value
+		///////////////////////////
+
+		f.close();
+	}
 	
 	return 0;
 }
 
-template<class Graph_t>
-inline
-int EdgeWeightGen<Graph_t>::create_weights (Graph_t& g, type_t type, string FILE_EXTENSION, string FILE_PATH, int wmod){
-/////////////////////////////////
-// adds edge-weights to EXISTING EDGES according to the following criteria:
-//
-// 1. WMOD- edge-weight is the standard (v+w) mod(wmod) +1 weight used (Pullham and others)
-//
-// copies edge-weights to file with FILE_EXTENSION appended to the current name of graph
-// date of creation: 20/07/18
-//
-// RETURNS 0-ok, -1 Err
-//
-// COMMENTS: only for undirected graphs because of main loop!
-
-	g.init_we();
-	int NV=g.number_of_vertices();
-
-	if(type==WMOD){
-		g.gen_modulus_weights();		
-	}else{
-		LOG_INFO("WeightGen<Graph_t>::create_weights()-incorred weight generation mode");
-	}
-	
-	//copies weights to file
-	ofstream f;
-		
-	string path=FILE_PATH;
-	if(!path.empty()){ 	com::dir::append_slash(path); }
-	string filename=path + g.get_name() + FILE_EXTENSION;
-	f.open(filename, ofstream::out);
-	if(!f){
-		LOG_INFO("WeightGen<Graph_t>::create_weights ()--cannot write weights to file "<<filename);
-		return -1;
-	}
-	
-	g.write_edge_weights(f);
-
-	f.close();
-	return 0;	
-}
 
 
 

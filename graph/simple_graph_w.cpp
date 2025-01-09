@@ -55,7 +55,7 @@ Base_Graph_W<Graph_t, W>::Base_Graph_W(std::string filename){
 }
 
 template<class Graph_t, class W>
- int Base_Graph_W<Graph_t, W>::gen_mode_weights(int MODE){
+ int Base_Graph_W<Graph_t, W>::gen_modulus_weights(int MODE){
 
 	const std::size_t NV = g_.number_of_vertices();
 
