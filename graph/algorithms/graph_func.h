@@ -11,7 +11,7 @@
 #ifndef __GRAPH_FUNC_H__
 #define __GRAPH_FUNC_H__
 
-#include "../graph.h"
+#include "graph/graph.h"
 #include "utils/common.h"
 #include "utils/logger.h"
 #include <algorithm>

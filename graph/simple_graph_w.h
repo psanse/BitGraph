@@ -55,7 +55,7 @@ public:
 	using _wt =	 W;	
 
 	//constants - globals
-	static const W NOWT;								//no weight value for weights (0.0)	
+	static const W NOWT;								//empty weight value for weights (0.0)	
 	static const W DEFWT;								//default weight value for weights (1.0)	
 	
 	//constructors
