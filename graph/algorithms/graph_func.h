@@ -16,7 +16,7 @@
 #include "utils/logger.h"
 #include <algorithm>
 #include <iostream>
-#include <numeric>							/* accumulate */
+#include <numeric>					/* accumulate */
 
 using namespace std;				//TODO - remove from global namespace in the header
 
