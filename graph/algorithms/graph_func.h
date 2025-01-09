@@ -6,23 +6,25 @@
 #ifndef __GRAPH_FUNC_H__
 #define __GRAPH_FUNC_H__
 
-#include <iostream>
+#include "../graph.h"
+#include "utils/common.h"
+#include "utils/logger.h"
 #include <algorithm>
+#include <iostream>
 #include <numeric>							/* accumulate */
 
-#include "../graph.h"
-#include "../kcore.h"
-#include "filter_graph_sort_type.h"			//Template Graph_t reduced to undirected types
-#include "utils/logger.h"
-#include "utils/common.h"
+using namespace std;				//TODO - remove from global namespace in the header
 
-using namespace std;
+///////////////////////
+//
+// namespace gfunc
+// 
+// (stateless functions for GRAPH)
+//
+///////////////////
 
 namespace gfunc{
-////////////////////////
-// stateless functions for GRAPH
-	
-	
+		
 	template<class Graph_t>
 	int sort_deg(const Graph_t& g, vint& lv, const vint& ref, bool min_sort=true){
 	/////////////////
@@ -46,9 +48,9 @@ namespace gfunc{
 		
 		//sorting according to ldeg
 		if(min_sort){
-			std::sort(lv.begin(), lv.end(), com::has_smaller_val<int, int>(ldeg));			
+			std::sort(lv.begin(), lv.end(), com::has_smaller_val<int, vector<int>>(ldeg));			
 		}else{
-			std::sort(lv.begin(), lv.end(), com::has_greater_val<int, int>(ldeg));	
+			std::sort(lv.begin(), lv.end(), com::has_greater_val<int, vector<int>>(ldeg));
 		}
 		
 		return 0;
@@ -70,9 +72,9 @@ namespace gfunc{
 		
 		//sorting according to ldeg
 		if(min_sort){
-			std::sort(lv.begin(), lv.end(), com::has_smaller_val<int, int>(ldeg));			
+			std::sort(lv.begin(), lv.end(), com::has_smaller_val<int, vector<int>>(ldeg));			
 		}else{
-			std::sort(lv.begin(), lv.end(), com::has_greater_val<int, int>(ldeg));	
+			std::sort(lv.begin(), lv.end(), com::has_greater_val<int, vector<int>>(ldeg));
 		}
 		
 		return 0;
@@ -108,7 +110,7 @@ namespace gfunc{
 	}
 
 	template<class Graph_t>
-	int neighbors_post(const Graph_t& g, int v,  typename  Graph_t::_bbt& bbref, vector<int>& lv_n){
+	int neighbors_post (const Graph_t& g, int v,  typename  Graph_t::_bbt& bbref, vector<int>& lv_n){
 	/////////////////
 	// Computes list of neighbors of v of bbref and that COME AFTER v, and stores them in lvn 
 	// (only for undirected graphs)
@@ -293,8 +295,8 @@ namespace gfunc{
 	
 	template<typename Graph_t>
 	int sort_w(const Graph_t& g, vint& lv, bool min_sort=true){
-		com::has_smaller_val<int, typename Graph_t::_wt> my_struct_smaller (g.get_weights()) ;
-		com::has_greater_val<int, typename Graph_t::_wt> my_struct_greater (g.get_weights()) ;
+		com::has_smaller_val<int, typename vector<Graph_t::_wt>> my_struct_smaller (g.get_weights()) ;
+		com::has_greater_val<int, typename vector<Graph_t::_wt>> my_struct_greater (g.get_weights()) ;
 
 		//sorting according to ldeg
 		if(min_sort){
@@ -307,8 +309,8 @@ namespace gfunc{
 
 	template<typename Graph_t>
 	int sort_w(const Graph_t& g, int* lv, int size, bool min_sort=true){
-		com::has_smaller_val<int, typename Graph_t::_wt> my_struct_smaller (g.get_weights()) ;
-		com::has_greater_val<int, typename Graph_t::_wt> my_struct_greater (g.get_weights()) ;
+		com::has_smaller_val<int, typename vector<Graph_t::_wt>> my_struct_smaller (g.get_weights()) ;
+		com::has_greater_val<int, typename vector<Graph_t::_wt>> my_struct_greater (g.get_weights()) ;
 
 		//sorting according to ldeg
 		if(min_sort){
@@ -321,8 +323,8 @@ namespace gfunc{
 
 	template<typename Graph_t>
 	int sort_wd(const Graph_t& g, vint& lv, bool min_sort=true){
-		com::has_smaller_val_prod<int, typename Graph_t::_wt> my_struct_smaller_comb (g.get_weights()) ;
-		com::has_greater_val_prod<int, typename Graph_t::_wt> my_struct_greater_comb (g.get_weights()) ;
+		com::has_smaller_val_prod<int, typename vector<Graph_t::_wt>> my_struct_smaller_comb (g.get_weights()) ;
+		com::has_greater_val_prod<int, typename vector<Graph_t::_wt>> my_struct_greater_comb (g.get_weights()) ;
 
 		//sorting according to ldeg
 		if(min_sort){
@@ -336,8 +338,8 @@ namespace gfunc{
 	
 	template<typename Graph_t>
 	int sort_wd(const Graph_t& g, int* lv, int size, bool min_sort=true){
-		com::has_smaller_val_prod<int, typename Graph_t::_wt> my_struct_smaller_comb (g.get_weights()) ;
-		com::has_greater_val_prod<int, typename Graph_t::_wt> my_struct_greater_comb (g.get_weights()) ;
+		com::has_smaller_val_prod<int, typename vector<Graph_t::_wt>> my_struct_smaller_comb (g.get_weights()) ;
+		com::has_greater_val_prod<int, typename vector<Graph_t::_wt>> my_struct_greater_comb (g.get_weights()) ;
 
 		//sorting according to ldeg
 		if(min_sort){
@@ -350,8 +352,8 @@ namespace gfunc{
 
 		template<typename Graph_t>
 	int sort_wddiff(const Graph_t& g, vint& lv, bool min_sort=true){
-		com::has_smaller_val_diff<int, typename Graph_t::_wt> my_struct_smaller_diff (g.get_weights()) ;
-		com::has_greater_val_diff<int, typename Graph_t::_wt> my_struct_greater_diff (g.get_weights()) ;
+		com::has_smaller_val_diff<int, typename vector<Graph_t::_wt>> my_struct_smaller_diff (g.get_weights()) ;
+		com::has_greater_val_diff<int, typename vector<Graph_t::_wt>> my_struct_greater_diff (g.get_weights()) ;
 
 		//sorting according to ldeg
 		if(min_sort){
@@ -365,8 +367,8 @@ namespace gfunc{
 	
 	template<typename Graph_t>
 	int sort_wddiff(const Graph_t& g, int* lv, int size, bool min_sort=true){
-		com::has_smaller_val_diff<int, typename Graph_t::_wt> my_struct_smaller_diff (g.get_weights()) ;
-		com::has_greater_val_diff<int, typename Graph_t::_wt> my_struct_greater_diff (g.get_weights()) ;
+		com::has_smaller_val_diff<int, typename  vector<Graph_t::_wt>> my_struct_smaller_diff (g.get_weights()) ;
+		com::has_greater_val_diff<int, typename  vector<Graph_t::_wt>> my_struct_greater_diff (g.get_weights()) ;
 
 		//sorting according to ldeg
 		if(min_sort){
@@ -489,16 +491,6 @@ namespace gfunc{
 		return res;
 	}
 
-
-
-
-
-
-
-
-
-
-
-}
+} //namespace
 
 #endif

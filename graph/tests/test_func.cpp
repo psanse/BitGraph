@@ -11,13 +11,12 @@
 using vint = vector<int>;
 using namespace std;
 
-#define TEST_GRAPH_FUNC_STEP_BY_STEP
-#define print_graph_func_logs
+//#define TEST_GRAPH_FUNC_STEP_BY_STEP
+//#define print_graph_func_logs
 
 
 TEST(Graph_func, is_triangle_free) {
-	LOG_INFO("Graph_func::is_triangle_free()---------");
-
+	
 	const int NV = 5;
 	ugraph ug(NV);
 	ug.add_edge(0, 1);
@@ -43,19 +42,14 @@ TEST(Graph_func, is_triangle_free) {
 #ifdef print_graph_func_logs
 	stringstream sstr;
 	com::stl::print_collection<vint>(tri, sstr);
-	LOG_INFO(sstr.str());
+	LOGG_INFO(sstr.str());
 #endif
-			
-	LOG_INFO("------------------------------------");
-#ifdef	TEST_GRAPH_FUNC_STEP_BY_STEP
-	LOG_ERROR("press any key to continue");
-	cin.get();
-#endif
+		
+
 }
 
 TEST(Graph_func, is_edge_free) {
-	LOG_INFO("Graph_func::is_edge_free()---------");
-
+	
 	const int NV = 5;
 	ugraph ug(NV);
 	ug.add_edge(0, 1);
@@ -76,17 +70,10 @@ TEST(Graph_func, is_edge_free) {
 	EXPECT_TRUE(gfunc::is_edge_free(ug, ug.get_neighbors(0), edge));
 	////////////////////
 
-
-	LOG_INFO("------------------------------------");
-#ifdef	TEST_GRAPH_FUNC_STEP_BY_STEP
-	LOG_ERROR("press any key to continue");
-	cin.get();
-#endif
 }
 
 
 TEST(Graph_func, sort_by_weights){
-	LOG_INFO("Graph_func::sort_by_weights()---------");
 	
 	const int NV=5;
 	Graph_W<ugraph, int> ugw(NV, 0.0);		//0.0 vertex weights (unit weights by default)
@@ -123,15 +110,11 @@ TEST(Graph_func, sort_by_weights){
 		EXPECT_EQ(expected_old[i], lv_old[i]);
 	}
 	
-	LOG_INFO("------------------------------------");
-	LOG_INFO("PRESS ANY KEY TO CONTINUE");
-	cin.get();
 }
 
 TEST(Graph_func, sum_of_weights){
 
-	LOG_INFO("Graph_func::sum_of_weights()---------");
-
+	
 	const int NV=5;
 	Graph_W<ugraph, int> ugw(NV, 0.0);		//0.0 vertex weights (unit weights by default)
 	ugw.add_edge(0,1);
@@ -157,14 +140,10 @@ TEST(Graph_func, sum_of_weights){
 	bb.set_bit(2);
 	w=gfunc::wsum(ugw,bb);
 	EXPECT_EQ(6,w);
-	
-	LOG_INFO("------------------------------------");
-	LOG_INFO("PRESS ANY KEY TO CONTINUE");
-	cin.get();
+
 }
 
 TEST(Graph_func, neighbors){
-	LOG_INFO("Graph_func::neighbors()---------");
 	
 	const int NV=100;
 	ugraph ug(NV);
@@ -208,9 +187,6 @@ TEST(Graph_func, neighbors){
 	EXPECT_EQ(expected, res);
 //	com::stl::print_collection(res,cout, true);
 		
-	LOG_INFO("------------------------------------");
-	LOG_INFO("PRESS ANY KEY TO CONTINUE");
-	cin.get();
 }
 
 
@@ -218,7 +194,6 @@ TEST(Graph_func, sort){
 //////////////
 // date: 24/10/17
 
-	LOG_INFO("Graph_func::sort()-------------");
 	ugraph ug(5);
 	ug.add_edge(0,1);
 	ug.add_edge(1,2);
@@ -258,7 +233,7 @@ TEST(Graph_func, sort){
 	gfunc::sort_deg(ug,lv,bbref,false);	
 	EXPECT_EQ(1,lv.front());
 		
-	LOG_INFO("------------------------------------");
+
 }
 
 
