@@ -47,8 +47,8 @@ public:
 
 	//constructors - cannot all be inherited	
 	Ugraph						() : Graph() {}										//creates empty graph
-	Ugraph						(std::size_t n) : Graph(n){}						//creates empty graph of size n=|V|	
-	Ugraph						(std::string filename);								//reads graph from file
+explicit Ugraph					(std::size_t n) : Graph(n){}						//creates empty graph of size n=|V|	
+explicit Ugraph					(std::string filename);								//reads graph from file
 	
 	/*
 	* @brief Creates a graph from an C-style adjacency matrix

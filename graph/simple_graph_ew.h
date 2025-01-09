@@ -60,11 +60,11 @@ public:
 	static const W NOWT;								//default/no weight value for weights (0.0)	
 																				
 	//constructors
-	Base_Graph_EW			()										{};											//no memory allocation
-	Base_Graph_EW			(mat_t& lwe);																		//creates empty graph with edge weights
-	Base_Graph_EW			(_gt& g, mat_t& lwe) : g_(g), we_(lwe)	{}											//creates graph with edge weights
-	Base_Graph_EW			(int n, W val = NOWT)					{ reset(n, val); }							//creates empty graph with |V|= n and val weights	
-	Base_Graph_EW			(std::string filename);																	//read weighted ASCII file or generate weights using formula- CHECK! (21/11/2021))
+	Base_Graph_EW				()										{};											//no memory allocation
+explicit Base_Graph_EW			(mat_t& lwe);																		//creates empty graph with edge weights
+	Base_Graph_EW				(_gt& g, mat_t& lwe) : g_(g), we_(lwe)	{}											//creates graph with edge weights
+explicit Base_Graph_EW			(int n, W val = NOWT)					{ reset(n, val); }							//creates empty graph with |V|= n and val weights	
+explicit Base_Graph_EW			(std::string filename);																//read weighted ASCII file or generate weights using formula- CHECK! (21/11/2021))
 			
 	//copy constructor, move constructor, copy operator =, move operator =
 	Base_Graph_EW					(const Base_Graph_EW& g)	= default;

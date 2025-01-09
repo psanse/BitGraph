@@ -44,8 +44,8 @@ public:
 			
 	//constructors
 	Graph								();															//creates empty graph
-	Graph								(std::size_t n);											//creates graph with n=|V| and m=0 	
-	Graph								(std::string filename);										//creates graph from file		
+explicit Graph							(std::size_t n);											//creates graph with n=|V| and m=0 	
+explicit Graph							(std::string filename);										//creates graph from file		
 	Graph								(std::size_t n, int* adj[], std::string filename = "");		//old-style adjacency matrix
 
 	

@@ -60,10 +60,10 @@ public:
 	
 	//constructors
 	Base_Graph_W						() {};																				//No memory allocation
-	Base_Graph_W						(std::vector<W>& lw);																//creates empty graph with |V|= n with vertex weights
+explicit Base_Graph_W					(std::vector<W>& lw);																//creates empty graph with |V|= n with vertex weights
 	Base_Graph_W						(_gt& g, vector<W>& lw)		:g_(g), w_(lw) {}										//creates graph with vertex weights	
 	Base_Graph_W						(_gt& g)					:g_(g), w_(g.number_of_vertices(), 1) {}				//creates graph with unit weights
-	Base_Graph_W						(int n, W val = DEFWT)				  { reset(n, val); }							//creates empty graph with |V|= n with unit weights	
+explicit Base_Graph_W					(int n, W val = DEFWT)				  { reset(n, val); }							//creates empty graph with |V|= n with unit weights	
 	
 	/*
 	* @brief Reads weighted graph from ASCII file in DIMACS format
