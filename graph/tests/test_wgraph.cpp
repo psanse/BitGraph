@@ -1,10 +1,10 @@
 /*
 * test_wgraph.cpp  tests for vertex weighted graphs
 * @created 9/10/16
-* @last_update 06/01/24
+* @last_update 09/01/25
 * @dev pss
 * 
-* @TODO - ADD TESTS
+* @TODO - ADD TESTS and check disabled / commented out tests at the end of file (09/01/25)
 */
 
 #include "graph/graph.h"						//contains all relevant graph types
