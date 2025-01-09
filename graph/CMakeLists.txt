@@ -11,6 +11,7 @@ kcore.h
 graph_gen.h
 #algorithms/graph_sort.h
 algorithms/graph_map.h
+algorithms/graph_func.h
 algorithms/graph_fast_sort.h
 algorithms/graph_fast_sort_weighted.h
 )
