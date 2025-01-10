@@ -11,15 +11,14 @@
  //////////////////
  //switches 
 
- //#define DIMACS_REFERENCE_VERTICES_0			//0 index DIMACS format [DEF-OFF (real DIMACS format)] 
-
+//#define DIMACS_INDEX_0_FORMAT			//0 index DIMACS format [DEF-OFF (real DIMACS format)] 
 
 #include "bitscan/bitscan.h"
-#include "formats/dimacs_format.h"
-#include "formats/mmio.h"
-#include "formats/edges_format.h"
-#include "formats/mmx_format.h"
-#include "simple_graph.h"
+#include "graph/formats/dimacs_format.h"
+#include "graph/formats/mmio.h"
+#include "graph/formats/edges_format.h"
+#include "graph/formats/mmx_format.h"
+#include "graph/simple_graph.h"
 #include "utils/logger.h"
 #include "utils/prec_timer.h"
 #include <fstream>
@@ -429,7 +428,7 @@ int Graph<T>::read_dimacs(const string& filename){
 
 		//read and add edge
 		f>>v1>>v2;
-#ifdef DIMACS_REFERENCE_VERTICES_0 
+#ifdef DIMACS_INDEX_0_FORMAT 
 		add_edge(v1,v2);
 #else
 		add_edge(v1-1, v2-1);

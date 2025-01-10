@@ -10,8 +10,8 @@
  */
 
 #include "bitscan/bitscan.h"
-#include "formats/dimacs_format.h"
-#include "simple_graph_ew.h"	
+#include "graph/formats/dimacs_format.h"
+#include "graph/simple_graph_ew.h"	
 #include "utils/common.h"
 #include "utils/logger.h"
 #include "utils/prec_timer.h"

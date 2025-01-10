@@ -9,6 +9,7 @@
 #define __SIMPLE_SPARSE_UGRAPH_H__
 
 #include "simple_ugraph.h"
+#include "utils/prec_timer.h"
 #include <iostream>
 #include <string>
 #include <vector>

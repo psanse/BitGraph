@@ -12,6 +12,27 @@
 #include "gtest/gtest.h"
 #include <iostream>
 
+//#include "utils/prec_timer.h"
+//#include "utils/logger.h"
+//#include "graph/simple_ugraph.h"
+//#include "graph/simple_sparse_ugraph.h"
+//#include "graph/simple_graph_w.h"
+//#include "graph/simple_graph_ew.h"
+
+
+
+//typedef Graph<bitarray> graph;						//simple graph
+//typedef Ugraph<bitarray> ugraph;					//simple undirected graph
+//typedef Graph<sparse_bitarray> sparse_graph;		//simple sparse graph
+//typedef Ugraph<sparse_bitarray> sparse_ugraph;		//simple sparse undirected graph
+//typedef Graph_W<ugraph, double> ugraph_w;
+//typedef Graph_W<ugraph, int> ugraph_wi;
+//
+//
+//typedef Graph_EW<ugraph, double> ugraph_ew;
+//typedef Graph_EW<ugraph, int> ugraph_ewi;
+
+
 using namespace std;
 using vint = std::vector<int>;
 

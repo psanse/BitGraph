@@ -27,8 +27,8 @@
 
 #include "simple_ugraph.h"
 
+//currently	the only possible graph types
 
-//the only possible graphs
 typedef Graph<bitarray> graph;						//simple graph
 typedef Ugraph<bitarray> ugraph;					//simple undirected graph
 typedef Graph<sparse_bitarray> sparse_graph;		//simple sparse graph
@@ -36,11 +36,11 @@ typedef Ugraph<sparse_bitarray> sparse_ugraph;		//simple sparse undirected graph
 
 
 #include "simple_graph_w.h"							//MUST BE AFTER ugraph type 
-typedef Graph_W<ugraph, double> ugraph_w;
-typedef Graph_W<ugraph, int> ugraph_wi;
+typedef Graph_W<ugraph, double> ugraph_w;			//simple vertex weighted graph with double weights
+typedef Graph_W<ugraph, int> ugraph_wi;				//simple vertex weighted graph with int weights
 
 #include "simple_graph_ew.h"						//MUST BE AFTER ugraph type 
-typedef Graph_EW<ugraph, double> ugraph_ew;
-typedef Graph_EW<ugraph, int> ugraph_ewi;
+typedef Graph_EW<ugraph, double> ugraph_ew;			//simple edge weighted graph with double weights
+typedef Graph_EW<ugraph, int> ugraph_ewi;			//simple edge weighted graph with int weights
 
 #endif

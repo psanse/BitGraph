@@ -5,7 +5,7 @@
 * @last_update 17/12/24
 */
 
-#include "decode.h"
+#include "graph/algorithms/decode.h"
 
 int Decode::decode_node(int v) const
 { 

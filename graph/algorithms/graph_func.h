@@ -11,17 +11,30 @@
 #ifndef __GRAPH_FUNC_H__
 #define __GRAPH_FUNC_H__
 
-#include "graph/graph.h"
 #include "utils/common.h"
 #include "utils/logger.h"
 #include <algorithm>
 #include <iostream>
-#include <numeric>					/* accumulate */
+#include "graph/simple_ugraph.h"
+//#include "graph/simple_sparse_ugraph.h"
+#include "graph/simple_graph_w.h"				// must be after ugraph include
+#include "graph/simple_graph_ew.h"				// must beafter ugraph include
 
 using namespace std;				//TODO - remove from global namespace in the header
 
+//////
 //aliases
 using vint = std::vector<int>;
+
+//aliases for graph types (see graph.h)
+typedef Graph<bitarray> graph;						//simple graph
+typedef Ugraph<bitarray> ugraph;					//simple undirected graph
+//typedef Graph<sparse_bitarray> sparse_graph;		//simple sparse graph
+//typedef Ugraph<sparse_bitarray> sparse_ugraph;	//simple sparse undirected graph
+typedef Graph_W<ugraph, double> ugraph_w;
+typedef Graph_W<ugraph, int> ugraph_wi;
+typedef Graph_EW<ugraph, double> ugraph_ew;
+typedef Graph_EW<ugraph, int> ugraph_ewi;
 
 ///////////////////////
 // namespace gfunc 
