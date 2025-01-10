@@ -5,8 +5,8 @@
 #ifndef __GRAPH_SORT_H__
 #define __GRAPH_SORT_H__
 
-#include "../graph.h"
-#include "../kcore.h"
+#include "graph/graph.h"
+#include "graph/algorithms/kcore.h"
 #include "filter_graph_sort_type.h"			//Template Graph_t reduced to undirected types
 #include "utils/logger.h"
 #include "utils/common.h"

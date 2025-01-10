@@ -8,7 +8,7 @@
 */
 
 #include "graph/graph.h"						//contains all relevant graph types
-#include "graph/graph_gen.h"
+#include "graph/algorithms/graph_gen.h"
 #include "gtest/gtest.h"
 #include "utils/common_paths.h";
 #include "utils/logger.h"

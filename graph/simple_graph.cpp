@@ -89,7 +89,7 @@ void Graph<T>::set_name(std::string name){
 		path_ = name.substr(0, found + 1);  //includes slash
 	}
 	else {
-		name_ = name;
+		name_ = std::move(name);
 		path_.clear();
 	}
 
@@ -184,7 +184,7 @@ int Graph<T>::reset	(std::size_t NV, string name) {
 	//}
 
 	//update instance name
-	set_name(name);	
+	set_name(std::move(name));	
 
 	return 0;
 }

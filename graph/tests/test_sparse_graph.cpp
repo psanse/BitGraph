@@ -7,8 +7,8 @@
 * @TODO - ADD TESTS
 */
 
-#include "../graph.h"
-#include "../graph_gen.h"
+#include "graph/graph.h"
+#include "graph/algorithms/graph_gen.h"
 #include "gtest/gtest.h"
 #include <iostream>
 

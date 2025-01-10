@@ -12,6 +12,8 @@
  * GRAPH is at the core many state of the art leading exact clique 
  * algorithms. 
  * 
+ * TODO use SFINAE to filter types (10/01/2025)
+ * 
  */
 
 #ifndef __SIMPLE_GRAPH_H__
@@ -49,10 +51,10 @@ explicit Graph							(std::string filename);										//creates graph from file
 	Graph								(std::size_t n, int* adj[], std::string filename = "");		//old-style adjacency matrix
 
 	
-	Graph								(Graph&& g)		= default;									//move constructor
-	Graph								(const Graph& g)= default;									//copy constructor
-	Graph& operator =					(const Graph& g)= default;									//copy operator =
-	Graph& operator =					(Graph&& g)		= default;									//move operator =
+	Graph								(Graph&& g)	noexcept	= default;							//move constructor
+	Graph								(const Graph& g)		= default;							//copy constructor
+	Graph& operator =					(const Graph& g)		= default;							//copy operator =
+	Graph& operator =					(Graph&& g)	noexcept	= default;							//move operator =
 	
 
 	//destructor	
@@ -75,13 +77,13 @@ virtual	~Graph()										= default;
 	*/
 	void set_name						(std::string instance);
 	
-	void set_path						(std::string path_name) { path_ = path_name; }
-	std::string get_name				()					const {return name_;}
-	std::string get_path				()					const {return path_;}
-	int get_number_of_edges				()					const { return NE_; }
+	void set_path						(std::string path_name)		{ path_ = std::move(path_name); }
+	std::string get_name				()					const	{return name_;}
+	std::string get_path				()					const	{return path_;}
+	int get_number_of_edges				()					const	{ return NE_; }
 
-	std::size_t number_of_vertices		()					const		{return NV_; }
-	std::size_t number_of_blocks		()					const		{return NBB_;}
+	std::size_t number_of_vertices		()					const	{return NV_; }
+	std::size_t number_of_blocks		()					const	{return NBB_;}
 	
 	/*
 	* @brief Counts the number of edges	(includes self loops)

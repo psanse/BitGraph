@@ -1,8 +1,8 @@
 //graph_map.h: conversions between two isomporphic graphs encoded by GRAPH (14/8/17)
 //			   extended to inlcude mapping to a single sorting (1/10/17)
 
-#ifndef __GRAPH_ISOMORPHISM_MAPPINGS_H__
-#define	__GRAPH_ISOMORPHISM_MAPPINGS_H__
+#ifndef __GRAPH_MAPPINGS_H__
+#define	__GRAPH_MAPPINGS_H__
 
 #include <iostream>
 #include <vector>
@@ -84,14 +84,14 @@ public:
 	int build_mapping		(G_t&, int lhs_s, int lhs_p, int rhs_s, int rhs_p,
 								string lhs_name = "", string rhs_name = ""				);
 
-	int build_mapping(vint& lhs_o2n, vint& rhs_o2n, string lhs_name = "", string rhs_name = "");
+	int build_mapping(const vint& lhs_o2n, const vint& rhs_o2n, string lhs_name = "", string rhs_name = "");
 
 	//////////////////////
 	//single ordering
 	template< typename Alg_t, typename G_t = Alg_t::_gt >
 	int build_mapping		(G_t&, int lhs_s, int lhs_p, string lhs_name = ""			);
 		
-	int build_mapping		(vint& lhs_o2n, string lhs_name = "");
+	int build_mapping		(const vint& lhs_o2n, string lhs_name = "");
 
 //////////////
 //I/O
@@ -206,8 +206,8 @@ int GraphMap::build_mapping(G_t& g, int slhs, int plhs, int srhs, int prhs,
 		r2l_[v]= o2n_lhs[ n2o_rhs[v] ] ;			// r->l 
 	}
 
-	nameL_=lhs_name;
-	nameR_=rhs_name;
+	nameL_= std::move(lhs_name);
+	nameR_= std::move(rhs_name);
 	
 	if(!is_consistent()){
 		LOG_ERROR("bad ordering - GraphMap::build_mapping");
@@ -247,7 +247,7 @@ int GraphMap::build_mapping (G_t& g, int lhs_s, int lhs_p, string lhs_name ) {
 }
 
 inline
-int GraphMap::build_mapping	(vint& o2n_lhs, vint& o2n_rhs, string lhs_name, string rhs_name){
+int GraphMap::build_mapping	(const vint& o2n_lhs, const vint& o2n_rhs, string lhs_name, string rhs_name){
 		
 	vint n2o_lhs, n2o_rhs;
 
@@ -269,8 +269,8 @@ int GraphMap::build_mapping	(vint& o2n_lhs, vint& o2n_rhs, string lhs_name, stri
 		r2l_[v]= o2n_lhs[ n2o_rhs[v] ] ;				// r->l 
 	}
 
-	nameL_=lhs_name;
-	nameR_=rhs_name;
+	nameL_ = std::move(lhs_name);
+	nameR_ = std::move(rhs_name);
 		
 
 	//assert
@@ -289,12 +289,12 @@ int GraphMap::build_mapping	(vint& o2n_lhs, vint& o2n_rhs, string lhs_name, stri
 }
 
 inline
-int GraphMap::build_mapping(vint& lhs_o2n, string lhs_name) {
+int GraphMap::build_mapping(const vint& lhs_o2n, string lhs_name) {
 	
 	l2r_ = lhs_o2n;
 	r2l_ = Decode::reverse(l2r_);
 
-	nameL_ = lhs_name;
+	nameL_ = std::move(lhs_name);
 	nameR_ = "NOT USED - SINGLE MAPPING";
 
 	return 0;

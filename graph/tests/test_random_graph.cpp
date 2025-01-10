@@ -9,7 +9,7 @@
 */
 
 #include "graph/graph.h"
-#include "graph/graph_gen.h"
+#include "graph/algorithms/graph_gen.h"
 #include "gtest/gtest.h"
 #include <iostream>
 
