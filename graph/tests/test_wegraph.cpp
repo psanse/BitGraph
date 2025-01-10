@@ -10,7 +10,7 @@
 #include <iostream>
 #include "gtest/gtest.h"
 #include "utils/logger.h"
-#include "graph_gen.h"			
+#include "graph/algorithms/graph_gen.h"			
 #include "utils/common_paths.h"
 #include "simple_graph_ew.h"
 
@@ -39,8 +39,6 @@ protected:
 	const int NV = 5;
 	ugraph_ewi ugew;											//undirected graph with integer weights
 };
-
-
 
 TEST(UGraphEW, constructor_file) {
 		
