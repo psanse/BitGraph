@@ -1,29 +1,45 @@
-//test_graph_map.cpp: tests for GraphMap class for mapping between two isomorphisms
-//date@ 14/8/17
-//update@ 03/01/20-updated tests for new graph data structures (GraphFastRootSort)- currently only for unit weighted graphs
+/*
+* test_graph_map.cpp  tests for GraphMap class which manages a pair of vertex orderings
+* @created  14/8/17
+* @update 03/01/20 - adapted to the new GraphFastRootSort class
+* @last_update 10/01/25
+* @dev pss
+*
+* TODO - check deprecated tests 
+*/
 
-#include <iostream>
+#include "graph/algorithms/graph_fast_sort.h"
+#include "graph/algorithms/graph_map.h"
 #include "gtest/gtest.h"
+#include "simple_ugraph.h"
 #include "utils/common.h"
-#include "../algorithms/graph_map.h"
-
-//#include "../algorithms/graph_sort.h"
-#include "../algorithms/graph_fast_sort.h"
+#include <iostream>
 
 using vint = std::vector<int>;
+using  ugraph = Ugraph<bitarray>;
 
 using namespace std;
 
-TEST(Graph_map, build_mapping) {
-	
-	const int NV = 4;
+class GraphMapTest : public ::testing::Test {
+protected:
+	void SetUp() override {
+		ug.reset(NV);
+		ug.add_edge(0, 1);
+		ug.add_edge(0, 2);
+		ug.add_edge(0, 3);
+	}
+	void TearDown() override {}
 
-	ugraph ug(NV);			//{0(3), 1(2), 2(3), 3(2)}
-	ug.add_edge(0, 1);
-	ug.add_edge(0, 2);
-	ug.add_edge(0, 3);		
-	
+	//undirected graph instance	
+	const int NV = 4;
+	ugraph ug;											
+};
+
+TEST_F(GraphMapTest, build_mapping) {
+		
+	//degrees: {0(3), 1(2), 2(3), 3(2)}
 	//l2r={1, 2, 3 ,0}, r2l={3, 0, 1, 2}
+
 	GraphMap gm;
 	gm.build_mapping< GraphFastRootSort<ugraph>> (ug, GraphFastRootSort<ugraph>::MAX, ::com::sort::FIRST_TO_LAST,
 													  GraphFastRootSort<ugraph>::MIN, ::com::sort::FIRST_TO_LAST, "MAX F2L", "MIN F2L"	);
@@ -48,62 +64,56 @@ TEST(Graph_map, build_mapping) {
 
 }
 
-TEST(Graph_map_single, build_mapping){
-	
-	const int SIZE=10;
-	ugraph ug(SIZE);
-	ug.add_edge(0,1);
-	ug.add_edge(1,2);
-	ug.add_edge(2,3);
-	ug.add_edge(0,3);		/* cycle 0-3 */
-
-	
-	GraphMapSingle gm;
-	gm.build_mapping< ugraph, GraphFastRootSort<ugraph>> (ug,   GraphFastRootSort<ugraph>::MIN_DEGEN, ::com::sort::FIRST_TO_LAST,
-																GraphFastRootSort<ugraph>::NONE,	  ::com::sort::FIRST_TO_LAST, "MIN_DEG", "");
+TEST_F(GraphMapTest, build_mapping_single_ordering){
 		
-	gm.print_names(); cout<<endl;
-	gm.print_mappings();
+	//degrees: {0(3), 1(2), 2(3), 3(2)}
+	//l2r={1, 2, 3 ,0}
+
+	GraphMap gm;
+	gm.build_mapping< GraphFastRootSort<ugraph> > (ug, GraphFastRootSort<ugraph>::MIN, ::com::sort::FIRST_TO_LAST, "MIN_DEG");
 	
-	//check values
-	int vl=5;
-	int vr=gm.map_l2r(vl);
-	EXPECT_EQ(vl,gm.map_r2l(vr));
+	EXPECT_EQ(NV, gm.size());
+	
+	//check mappings
+	vint l2rexp;
+	l2rexp.push_back(1); l2rexp.push_back(2); l2rexp.push_back(3); l2rexp.push_back(0);
 
-}
-
-TEST(Graph_map_single, build_mapping_II){
-		
-	const int SIZE=10;
-	ugraph ug(SIZE);
-	ug.add_edge(0,1);
-	ug.add_edge(1,2);
-	ug.add_edge(2,3);
-	ug.add_edge(0,3);		/* cycle 0-3 */
-
-	//predefined ordering
-	GraphFastRootSort<ugraph> gol(ug);
-	vint o2n = gol.new_order(GraphFastRootSort<ugraph>::MIN_DEGEN, ::com::sort::LAST_TO_FIRST);
-
-	GraphMapSingle gm;
-	gm.build_mapping(o2n);		/* builds mapping*/
+	EXPECT_EQ(l2rexp, gm.get_l2r());
 
 	//I/O
-	gm.print_names(); cout<<endl;
-	gm.print_mappings();
-	
-	//checking some values
-	EXPECT_EQ(9,gm.map_l2r(4));
-	EXPECT_EQ(8,gm.map_l2r(5));
-	EXPECT_EQ(4,gm.map_r2l(9));
-	EXPECT_EQ(5,gm.map_r2l(8));
-		
-	//check consistency
-	int vl=5;
-	int vr=gm.map_l2r(vl);
-	EXPECT_EQ(vl,gm.map_r2l(vr));
+	/*gm.print_names();
+	gm.print_mappings();*/	
 
 }
+
+TEST_F(GraphMapTest, predefined_single_ordering){
+	
+	//predefined ordering
+	GraphFastRootSort<ugraph> gol(ug);
+	vint o2n = gol.new_order(GraphFastRootSort<ugraph>::MIN, ::com::sort::FIRST_TO_LAST);
+
+	GraphMap gm;
+	gm.build_mapping(o2n, "MIN F2L");			// builds mapping according to the given ordering
+
+	EXPECT_EQ(NV, gm.size());
+
+	//check mappings
+	vint l2rexp;
+	l2rexp.push_back(1); l2rexp.push_back(2); l2rexp.push_back(3); l2rexp.push_back(0);
+
+	EXPECT_EQ(l2rexp, gm.get_l2r());
+	EXPECT_STREQ("MIN F2L", gm.nameL().c_str());
+
+	//I/O
+	/*gm.print_names(); 
+	gm.print_mappings();*/
+}
+
+///////////////
+//
+// DEPRECATED TESTS - CHECK
+//
+//////////////////
 
 ////////////////
 // Weighted graphs: TODO-change to new format!
