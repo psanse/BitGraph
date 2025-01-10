@@ -6,9 +6,9 @@
 #include <iostream>
 #include <string.h>
 #include <string>
-#include "../graph.h"
-#include "../graph_gen.h"
-#include "../utils/logger.h"
+#include "graph/algorithms/graph_gen.h"
+#include "utils/logger.h"
+
 
 //#define LOGGER_VERBOSE_LEVEL		//all except DEBUG (second priority) -  CMake option by default
 

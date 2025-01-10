@@ -4,7 +4,7 @@
 #include <iostream>
 #include <stdio.h>
 #include <stdlib.h>
-#include "../kcore.h"
+#include "graph/algorithms/kcore.h"
 #include "utils/common.h"  //to print collections
 #include "utils/prec_timer.h"
 
