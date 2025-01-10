@@ -19,63 +19,104 @@
 
 using namespace std;
 
+///////////////////////
+// 
+// GraphMap for managing pairs of vertex orderings	
+//
+///////////////////////
 
 class GraphMap{
-///////////////
-//interface	
+
 public:
-	enum print_t {L2R=0, R2L, ALL};
-	int size()									{return l2r.size();}
-	vint get_l2r() 								{return l2r;}	
-	vint get_r2l()								{return r2l;}
-	const vint& get_l2r () const				{return l2r;}	
-	const vint& get_r2l () const				{return r2l;}	
-	void set_l2r(vint& l, std::string name)		{l2r=l; name_l=name;}	
-	void set_r2l(vint& r, std::string name)		{r2l=r; name_r=name;}
+	enum print_t { L2R = 0, R2L, BOTH };			//streaming configuration
 
-	vint& get_o2n_lhs()							{ return o2nl; }			//[OLD]->[NEW] mappings for lhs graph
-	vint& get_o2n_rhs()							{ return o2nr; }			//[OLD]->[NEW] mappings for rhs graph
+///////////////////////
+//setters and getters
 
-	void clear() { l2r.clear(); r2l.clear(); name_l.clear(); name_r.clear(); }
+	int size()									{return l2r_.size();}
+	vint& get_l2r() 							{return l2r_;}	
+	vint& get_r2l()								{return r2l_;}
+	const vint& get_l2r () const				{return l2r_;}	
+	const vint& get_r2l () const				{return r2l_;}	
+
+	//sets mapping (no need to build it)
+	void set_l2r (vint& l, std::string name)	{l2r_=l; nameL_=name;}	
+	void set_r2l (vint& r, std::string name)	{r2l_=r; nameR_=name;}
+
 ////////////////
-//mapping 
-	int map_l2r(int v)const				{return l2r[v]; } 
-	int map_r2l(int v)const				{return r2l[v]; } 
-	template<class bitstring_t>
-	bitstring_t& map_l2r(bitstring_t& bbl, bitstring_t& bbr, bool overwrite=true) const;
-	template<class bitstring_t>
-	bitstring_t& map_r2l(bitstring_t& bbl, bitstring_t& bbr, bool overwrite=true) const;
-	template<class bitstring_array_t>
-	bitstring_array_t& map_l2r(bitstring_array_t& bbl, bitstring_array_t& bbr, int from, int to) const;		/* range includes both ends */
-	template<class bitstring_array_t>
-	bitstring_array_t& map_r2l(bitstring_array_t& bbl, bitstring_array_t& bbr, int from, int to) const;		/* range includes both ends */
-		
+// mapping getters
+	
+	int map_l2r (int v) const					{return l2r_[v]; } 
+	int map_r2l (int v) const					{return r2l_[v]; } 
+
+	/*
+	* @brief maps a (bit) set of vertices (bbl) to a (bit) set of vertices (bbr)
+	* @param bbl: input bitset of vertices in the space of the left ordering
+	* @param bbr: output bitset of vertices in the space of the right ordering
+	* @param overwrite: if TRUE, bbr is erased before mapping
+	*/
+	template<class bitset_t>
+	bitset_t& map_l2r				(bitset_t& bbl, bitset_t& bbr, bool overwrite = true)			const;
+
+	/*
+	* @brief maps a (bit) set of vertices (bbr) to a (bit) set of vertices (bbl)
+	* @param bbl: output bitset of vertices in the space of the left ordering
+	* @param bbr: input bitset of vertices in the space of the right ordering
+	* @param overwrite: if TRUE, bbr is erased before mapping
+	*/
+	template<class bitset_t>
+	bitset_t& map_r2l				(bitset_t& bbl, bitset_t& bbr, bool overwrite = true)			const;
+
+	//TODO - extend to other set representations
+
 ////////////////////
+// build mapping operations
 
-	//build driver
-	template<class Graph_t, class Alg_t= GraphFastRootSort<Graph_t>>
-	int build_mapping	(Graph_t&, int lhs_s, int lhs_p, int rhs_s, int rhs_p, 
-										string lhs_name="", string rhs_name=""	);	
+	/*
+	* @brief Computes mapping between the two different sortings of a graph
+	* 
+	*		 I. The mappings are available by the getters get_l2r(), get_r2l()
+	* 
+	*		 II. Type Alg_t is a sorting algorithm (e.g. GraphFastRootSort<Graph_t>)
+	* 
+	* @param lhs_s, rhs_s: input sorting strategies of the left and right orderings
+	* @param lhs_p, rhs_p: input placement strategies of the left and right orderings (first-to-last, last-to-first)
+	* @param lhs_name, rhs_name: fancy names for the orderings
+	* @returns -1 if error, 0 otherwise
+	*/
+	template< typename Alg_t , typename G_t = Alg_t::_gt >
+	int build_mapping		(G_t&, int lhs_s, int lhs_p, int rhs_s, int rhs_p,
+								string lhs_name = "", string rhs_name = ""				);
 
-	int build_mapping	(vint& lhs_o2n, vint& rhs_o2n, string lhs_name="", string rhs_name="");
+	int build_mapping		(vint& lhs_o2n, vint& rhs_o2n, string lhs_name="", string rhs_name="");
 	
 	//I/O
-	ostream& print_mappings	(print_t type=ALL, ostream& o=cout);
-	ostream& print_names	(print_t type=ALL, ostream& o=cout);
+	ostream& print_mappings	(print_t type = BOTH, ostream& o=cout);
+	ostream& print_names	(print_t type = BOTH, ostream& o=cout);
 
-	
-protected:
-	void init(int NV, int val)		{l2r.assign(NV, val); r2l.assign(NV, val); name_l.clear(); name_r.clear();}
-	
+///////////////
+//Boolean operations
+
+	/*
+	* @brief checks if the internal mapping state l2r_, r2l is consistent
+	*/
 	bool is_consistent();
 
-////////////////
-// state
-	vint l2r, r2l;					//mapping
-	string name_l;
-	string name_r;
+
+///////////////////////
+//private interface
+
+protected:	
+	void clear	()							{ l2r_.clear(); r2l_.clear(); nameL_.clear(); nameR_.clear(); }
+	void reset	(std::size_t NV)			{ clear(); 	l2r_.resize(NV); r2l_.resize(NV);	}
 	
-	vint o2nl, o2nr;				//o2n transformations from the reference graph to l and r graphs
+	
+////////////////
+// data members
+
+	vint l2r_, r2l_;					//mapping between left and right ordering
+	string nameL_;					//fancy name of left ordering
+	string nameR_;					//fancy name of right ordering	
 };
 
 //////////////
@@ -97,10 +138,10 @@ public:
 
 inline
 int GraphMapSingle::build_mapping(vint& old_to_new, string lhs_name){
-	l2r=old_to_new;
-	r2l=Decode::reverse(l2r);
-	name_l=lhs_name;
-	name_r="SINGLE GRAPH MAPPING";
+	l2r_=old_to_new;
+	r2l_=Decode::reverse(l2r_);
+	nameL_=lhs_name;
+	nameR_="NOT USED - SINGLE MAPPING";
 	return 0;
 }
 
@@ -117,17 +158,17 @@ int GraphMapSingle::build_mapping(Graph_t& g, int slhs, int plhs,int srhs, int p
 //
 // COMMENTS: g may be weighted (weights are also ordered)
 	
-	int NV=g.number_of_vertices();
+	auto NV = g.number_of_vertices();
 	//vint o2n_lhs, n2o_lhs, o2n_rhs, n2o_rhs;	
 	//init(NV,EMPTY_ELEM /* -1 */);					/* no need to initialize sets manually*/
 		
 	//determine sorting lhs
 	Alg_t gol(g);
-	l2r=gol.new_order(slhs, plhs);
-	r2l=Decode::reverse(l2r);	
+	l2r_=gol.new_order(slhs, plhs);
+	r2l_=Decode::reverse(l2r_);	
 
-	name_l=lhs_name;
-	name_r="SINGLE GRAPH MAPPING";
+	nameL_=lhs_name;
+	nameR_="SINGLE GRAPH MAPPING";
 		
 	if(!is_consistent()){
 		LOG_ERROR("bizarre ordering");
@@ -136,117 +177,99 @@ int GraphMapSingle::build_mapping(Graph_t& g, int slhs, int plhs,int srhs, int p
 	return 0;
 }
 
-template<class bitstring_t>
+template<class bitset_t>
 inline
-bitstring_t& GraphMap::map_l2r(bitstring_t& bbl, bitstring_t& bbr, bool overwrite) const{
-	if(overwrite) {bbr.erase_bit();}
+bitset_t& GraphMap::map_l2r (bitset_t& bbl, bitset_t& bbr, bool overwrite) const{
+
+	//cleans bbr if requested
+	if(overwrite) { bbr.erase_bit();}
+
+	//sets bitscanning configuration
 	bbl.init_scan(bbo::NON_DESTRUCTIVE);
-	while(true){
-		int v=bbl.next_bit();
-		if(v==EMPTY_ELEM) break;
-		bbr.set_bit(l2r[v]);
+
+	//bitscans bbl and sets bits in bbr
+	int v;
+	while(v = bbl.next_bit() != EMPTY_ELEM){
+		bbr.set_bit(l2r_[v]);
 	}
+
 	return bbr;
 }
 
-template<class bitstring_t>
+template<class bitset_t>
 inline
-bitstring_t& GraphMap::map_r2l(bitstring_t& bbl, bitstring_t& bbr, bool overwrite) const{
-	if(overwrite) {bbl.erase_bit();}
+bitset_t& GraphMap::map_r2l (bitset_t& bbl, bitset_t& bbr, bool overwrite) const{
+
+	//cleans bbr if requested
+	if (overwrite) { bbl.erase_bit(); }
+
+	//sets bitscanning configuration
 	bbr.init_scan(bbo::NON_DESTRUCTIVE);
-	while(true){
-		int v=bbr.next_bit();
-		if(v==EMPTY_ELEM) break;
-		bbl.set_bit(r2l[v]);
+
+	//bitscans bbl and sets bits in bbr
+	int v;
+	while (v = bbr.next_bit() != EMPTY_ELEM) {
+		bbl.set_bit(r2l_[v]);
 	}
+		
 	return bbl;
 }
 
-template<class bitstring_array_t>
-inline
-bitstring_array_t& GraphMap::map_l2r(bitstring_array_t& bbal, bitstring_array_t& bbar, int from, int to) const{
-//////////////////
-// assumes bbal and bbar are correctly allocated
-	for(int c=from; c<=to; c++){
-		map_l2r(bbal.pbb[c],bbar.pbb[c]);
-	}
-	return bbar;
-}
-
-template<class bitstring_array_t>
-inline
-bitstring_array_t& GraphMap::map_r2l(bitstring_array_t& bbal, bitstring_array_t& bbar, int from, int to)const {
-//////////////////
-// maps a set of bitarrays within range (both ends included)
-//
-// COMMENTS: no assertion for capacity
-
-	for(int c=from; c<=to; c++){
-		map_r2l(bbal.pbb[c],bbar.pbb[c]);
-	}
-	return bbal;
-}
 
 inline
 bool GraphMap::is_consistent(){
-/////////////////////
-// checks all reverse mappings for consistency
-	for(int v=0; v<l2r.size(); v++){
-		if(v!=r2l[l2r[v]]) return false;
+
+	for(auto v = 0;  v < l2r_.size(); ++v){
+		if (v != r2l_[l2r_[v]]) {
+			return false;
+		}
 	}
+
 	return true;
 }
 
-template<class Graph_t, class Alg_t>
+template<class Alg_t, class G_t>
 inline
-int GraphMap::build_mapping(Graph_t& g, int slhs, int plhs, int srhs, int prhs,
-							string lhs_name, string rhs_name){
-/////////////////////////
-// builds mapping between the two different sortings of g
-//
-// RETURNS 0 ok, -1 Error
-//
-// COMMENTS: g may be weighted (weights are also ordered)
+int GraphMap::build_mapping(G_t& g, int slhs, int plhs, int srhs, int prhs,
+								string lhs_name, string rhs_name				)
+{
+	vint o2n_lhs, n2o_lhs, o2n_rhs, n2o_rhs;
+
+	auto NV = g.number_of_vertices();
 	
-	int NV=g.number_of_vertices();
-	vint o2n_lhs, n2o_lhs, o2n_rhs, n2o_rhs;	
-	init(NV,EMPTY_ELEM /* -1 */);
+	reset(NV);
 		
 	//determine sorting lhs
-	Alg_t gol(g);
-	o2n_lhs=gol.new_order(slhs, plhs);
-	n2o_lhs=Decode::reverse(o2n_lhs);	
+	Alg_t gol (g);
+	o2n_lhs = gol.new_order (slhs, plhs);
+	n2o_lhs = Decode::reverse(o2n_lhs);	
 
 	//determine sorting rhs
 	Alg_t gor(g);
-	o2n_rhs=gor.new_order(srhs, prhs);
-	n2o_rhs=Decode::reverse(o2n_rhs);	
+	o2n_rhs = gor.new_order (srhs, prhs );
+	n2o_rhs = Decode::reverse(o2n_rhs);	
 
 	//determines direct and reverse mappings independently
-	for(int v=0; v<NV; v++){
-		l2r[v]= o2n_rhs[ n2o_lhs[v] ];				/* l->r */
+	for(auto v = 0; v < NV; v++){
+		l2r_[v]= o2n_rhs[ n2o_lhs[v] ];				// l->r
 	}
-	for(int v=0; v<NV; v++){
-		r2l[v]= o2n_lhs[ n2o_rhs[v] ] ;				/* r->l */
+	for(auto v = 0; v < NV; v++){
+		r2l_[v]= o2n_lhs[ n2o_rhs[v] ] ;			// r->l 
 	}
 
-	name_l=lhs_name;
-	name_r=rhs_name;
-		
+	nameL_=lhs_name;
+	nameR_=rhs_name;
+	
+	if(!is_consistent()){
+		LOG_ERROR("bad ordering - GraphMap::build_mapping");
+		return -1;
+	}
+
 	//I/O
 	//cout<<"N2O_D"; com::stl::print_collection(n2o_d); cout<<endl;
 	//cout<<"O2N_D";com::stl::print_collection(o2n_d); cout<<endl;
 	//cout<<"O2N_W";com::stl::print_collection(o2n_w); cout<<endl;
 	//cout<<"N2O_W";com::stl::print_collection(n2o_w); cout<<endl;
-
-	if(!is_consistent()){
-		LOG_ERROR("bizarre ordering");
-		return -1;
-	}
-
-	//stores input o2n transformations (could be useful in the future)
-	this->o2nl = o2n_lhs;
-	this->o2nr = o2n_rhs;
 
 	return 0;
 }
@@ -258,10 +281,11 @@ int GraphMap::build_mapping(vint& o2n_lhs, vint& o2n_rhs, string lhs_name, strin
 //
 // RETURNS 0 ok, -1 Error
 		
-	
-	int NV=o2n_lhs.size();
-	vint n2o_lhs, n2o_rhs;	
-	init(NV,EMPTY_ELEM /* -1 */);
+	vint n2o_lhs, n2o_rhs;
+
+	auto NV = o2n_lhs.size();	
+
+	reset(NV);
 		
 	//determine sorting lhs
 	n2o_lhs=Decode::reverse(o2n_lhs);	
@@ -271,29 +295,27 @@ int GraphMap::build_mapping(vint& o2n_lhs, vint& o2n_rhs, string lhs_name, strin
 
 	//determines direct and reverse mappings independently
 	for(int v=0; v<NV; v++){
-		l2r[v]= o2n_rhs[ n2o_lhs[v] ];				/* l->r */
+		l2r_[v]= o2n_rhs[ n2o_lhs[v] ];				// l->r 
 	}
 	for(int v=0; v<NV; v++){
-		r2l[v]= o2n_lhs[ n2o_rhs[v] ] ;				/* r->l */
+		r2l_[v]= o2n_lhs[ n2o_rhs[v] ] ;				// r->l 
 	}
 
-	name_l=lhs_name;
-	name_r=rhs_name;
+	nameL_=lhs_name;
+	nameR_=rhs_name;
 		
+
+	//assert
+	if (!is_consistent()) {
+		LOG_ERROR("bad ordering - GraphMap::build_mapping");
+		return -1;
+	}
+
 	//I/O
 	//cout<<"N2O_D"; com::stl::print_collection(n2o_d); cout<<endl;
 	//cout<<"O2N_D";com::stl::print_collection(o2n_d); cout<<endl;
 	//cout<<"O2N_W";com::stl::print_collection(o2n_w); cout<<endl;
 	//cout<<"N2O_W";com::stl::print_collection(n2o_w); cout<<endl;
-
-	if(!is_consistent()){
-		LOG_ERROR("bizarre ordering");
-		return -1;
-	}
-
-	//stores input o2n transformations  (could be useful in the future)
-	o2nl = o2n_lhs;
-	o2nr = o2n_rhs;
 
 	return 0;
 }
@@ -302,18 +324,28 @@ inline
 ostream& GraphMap::print_mappings(print_t type, ostream& o){
 	switch(type){
 	case L2R:
-		com::stl::print_collection(l2r,o);
+		o << "\n*****************" << endl;
+		o << "L->R" << endl;
+		com::stl::print_collection(l2r_,o, true);
+		o << "\n*****************" << endl;
 		break;
 	case R2L:
-		com::stl::print_collection(r2l,o);
+		o << "\n*****************" << endl;
+		o << "R->L" << endl;
+		com::stl::print_collection(r2l_,o, true);
+		o << "******************" << endl;
 		break;
-	case ALL:
-		com::stl::print_collection(l2r,o); o<<endl;
-		com::stl::print_collection(r2l,o);
+	case BOTH:
+		o << "\n*****************" << endl;
+		o << "L->R and R->L" << endl;
+		com::stl::print_collection(l2r_,o, true);
+		com::stl::print_collection(r2l_,o, true); 
+		o << "*****************" << endl;
 		break;
 	default:
-		LOG_ERROR("GraphMap::print_mappings()-bizarre print type");
+		LOG_WARNING("bad printing type - GraphMap::print_mappings");
 	}
+
 	return o;
 }
 
@@ -321,18 +353,19 @@ inline
 ostream& GraphMap::print_names(print_t type, ostream& o){
 	switch(type){
 	case L2R:
-		o<<"L:"<<name_l;
+		o<<"L:"<<nameL_;
 		break;
 	case R2L:
-		o<<"R:"<<name_r;
+		o<<"R:"<<nameR_;
 		break;
-	case ALL:
-		o<<"L:"<<name_l; o<<endl;
-		o<<"R:"<<name_r;
+	case BOTH:
+		o<<"L:"<<nameL_; o<<endl;
+		o<<"R:"<<nameR_;
 		break;
 	default:
-		LOG_ERROR("GraphMap::print_names()-bizarre print type");
+		LOG_WARNING("bad printing type - GraphMap::print_names");
 	}
+		
 	return o;
 }
 

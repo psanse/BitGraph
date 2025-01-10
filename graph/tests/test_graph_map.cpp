@@ -10,7 +10,43 @@
 //#include "../algorithms/graph_sort.h"
 #include "../algorithms/graph_fast_sort.h"
 
+using vint = std::vector<int>;
+
 using namespace std;
+
+TEST(Graph_map, build_mapping) {
+	
+	const int NV = 4;
+
+	ugraph ug(NV);			//{0(3), 1(2), 2(3), 3(2)}
+	ug.add_edge(0, 1);
+	ug.add_edge(0, 2);
+	ug.add_edge(0, 3);		
+	
+	//l2r={1, 2, 3 ,0}, r2l={3, 0, 1, 2}
+	GraphMap gm;
+	gm.build_mapping< GraphFastRootSort<ugraph>> (ug, GraphFastRootSort<ugraph>::MAX, ::com::sort::FIRST_TO_LAST,
+													  GraphFastRootSort<ugraph>::MIN, ::com::sort::FIRST_TO_LAST, "MAX F2L", "MIN F2L"	);
+	//////////////////////////////////												  
+	EXPECT_EQ	(NV, gm.size());
+	EXPECT_TRUE	(gm.is_consistent());
+	//////////////////////////////////
+			
+	vint l2rexp;
+	l2rexp.push_back(1); l2rexp.push_back(2); l2rexp.push_back(3); l2rexp.push_back(0);
+	vint r2lexp;
+	r2lexp.push_back(3); r2lexp.push_back(0); r2lexp.push_back(1); r2lexp.push_back(2);
+
+	//////////////////////////////////
+	EXPECT_EQ	(l2rexp, gm.get_l2r());
+	EXPECT_EQ	(r2lexp, gm.get_r2l());
+	//////////////////////////////////
+	
+	//I/O
+	/*gm.print_names();
+	gm.print_mappings();*/
+
+}
 
 TEST(Graph_map_single, build_mapping){
 	
@@ -24,7 +60,7 @@ TEST(Graph_map_single, build_mapping){
 	
 	GraphMapSingle gm;
 	gm.build_mapping< ugraph, GraphFastRootSort<ugraph>> (ug,   GraphFastRootSort<ugraph>::MIN_DEGEN, ::com::sort::FIRST_TO_LAST,
-																GraphFastRootSort<ugraph>::NONE,	     ::com::sort::FIRST_TO_LAST, "MIN_DEG", "");
+																GraphFastRootSort<ugraph>::NONE,	  ::com::sort::FIRST_TO_LAST, "MIN_DEG", "");
 		
 	gm.print_names(); cout<<endl;
 	gm.print_mappings();
