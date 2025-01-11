@@ -12,9 +12,13 @@
 #include "utils/common_paths.h"
 #include <iostream>
 
+
 using namespace std;
 
+
 TEST(Conversions, sparse2ugraph) {
+
+	
 
 	sparse_ugraph sug(4);
 	sug.add_edge(0, 1);

@@ -1,132 +1,114 @@
-//graph_conversions.h: conversions between different graph types of the GRAPH library
+/*
+ * graph_conversions.h conversions between different graph types of the GRAPH library 
+ *
+ * @creation_date 25/11/16
+ * @last_update 11/01/25
+ * @dev pss
+ *
+ */
 
 #ifndef __GRAPH_TYPE_CONVERSIONS_H__
 #define	__GRAPH_TYPE_CONVERSIONS_H__
 
-
-#include <iostream>
-#include <algorithm>
-#include "../graph.h"
-#include "filter_graph_sort_type.h"			//Template Graph_t reduced to undirected types
-#include "utils/logger.h"
+#include "simple_ugraph.h"								//currently, contains the only converted graph types
 #include "utils/common.h"
+#include "utils/logger.h"
+#include <iostream>
 
 using namespace std;
 
+//alias for the converted graph types
+using ugraph = Ugraph<bitarray>;						//simple undirected graph type
+using sparse_ugraph = Ugraph<sparse_bitarray>;			//simple sparse undirected graph type
+
 ////////////////////////
 //
-// GraphConversion
-// (TODO - struct or namespace instead of class (04/01/2025))
+// GraphConversion 
+// 
+// Conversions between different graph types of the GRAPH library
+// (stateless - globals)
+// 
+// Comment: namespace is not used for a clean friendship declaration in the Graph classes
 //
 ////////////////////////
 
-class GraphConversion{
+class GraphConversion {
 public:
-	static int sug2ug(const sparse_ugraph& , ugraph&);
-	static int ug2sug(const ugraph& , sparse_ugraph&);
-	
-};
 
-inline
-int GraphConversion::sug2ug(const sparse_ugraph& sug, ugraph& ug){
-///////////////////
-// Converts sug into ug
-// 
-// date_of_creation: 25/11/16
+	//constructor - deleted
+	GraphConversion() = delete;
 
-	int NV=sug.number_of_vertices();
+	/*
+	* @brief conversion from sparse_ugraph to ugraph
+	* @returns 0 if conversion is successful, -1 otherwise
+	* @date	25/11/16
+	*/
+	static int sug2ug(const sparse_ugraph& sug, ugraph& ug)
+	{
 
-///////////////
-//allocation
-	//init ug: ***TODO lazy flag?
-	ug.clear();
+		auto NV = sug.number_of_vertices();
 
-	//***allocation-check
-	try{
-		ug.adj_.resize(NV);	
-	}catch(...){
-		LOG_ERROR("GraphConversion::sug2ug()-:memory for graph not allocated");
-		return -1;
-	}
-	ug.NV_=NV;
-	ug.NBB_=INDEX_1TO1(NV);
-
-	for(int i=0; i<NV; i++){
-		ug.adj_[i].init(NV);		
-	}
-	////////////////////
-
-/////////////////////
-//conversion
-	int ugi=0;
-	for(int v=0; v<NV; v++){
-		for(sparse_bitarray::velem_cit it= sug.adj_[v].begin(); it!=sug.adj_[v].end(); ++it){
-			int sgi=it->index;
-			BITBOARD sgbb=it->bb;
-
-			if(ugi<sgi){ugi=sgi;}
-			ug.adj_[v].get_bitboard(sgi)=sgbb;
+		//allocation - empty graph of size NV
+		if (ug.reset(NV) == -1) {
+			LOG_ERROR("memory for graph not allocated- GraphConversion::sug2ug");
+			return -1;
 		}
-	}
-	
-	//copy other data
-	ug.set_name(sug.get_name());
-	//ug.m_is_wv=sug.is_weighted_v();
-		
-	return 0;
-}
 
-inline
-int GraphConversion::ug2sug(const ugraph& ug, sparse_ugraph& sug){
-///////////////////
-// Converts ug into sparse sug
-// 
-// date_of_creation: 25/11/16
+		//copies adjacency (non-empty) bitblock array
+		for (auto v = 0; v < NV; ++v) {
+			for (auto it = sug.adj_[v].begin(); it != sug.adj_[v].end(); ++it) {
 
-	int NV=ug.number_of_vertices();
+				////////////////////////////////////////////////////
+				ug.adj_[v].get_bitboard(it->index) = it->bb;
+				////////////////////////////////////////////////////
 
-///////////////
-//allocation
-	sug.clear();
-
-	//***allocation-check
-	try{
-		sug.adj_.resize(NV);	
-	}catch(...){
-		LOG_ERROR("GraphConversion::sug2ug()-:memory for graph not allocated");
-		return -1;
-	}
-	sug.NV_=NV;
-	sug.NBB_=INDEX_1TO1(NV);
-
-	for(int i=0; i<NV; i++){
-		sug.adj_[i].init(NV);		
-	}
-
-
-/////////////////////
-//conversion
-	
-	int ugi=0;
-	int NBB=ug.number_of_blocks();
-	for(int v=0; v<NV; v++){
-		for(int bbi=0; bbi<NBB; bbi++){
-			BITBOARD bb=ug.adj_[v].get_bitboard(bbi);
-			if(bb!=0){
-				sparse_bitarray::elem_t elem;
-				elem.index=bbi;
-				elem.bb=bb;
-				sug.adj_[v].get_elem_set().push_back(elem);
 			}
 		}
-	}
-	
-	//copy other data
-	sug.set_name(ug.get_name());
-	//sug.m_is_wv=ug.is_weighted_v();
 
-	return 0;
-}
+		//name
+		ug.set_name(sug.get_name());
+
+		return 0;
+	}
+
+
+	/*
+	* @brief conversion from ugraph to sparse_ugraph
+	* @returns 0 if conversion is successful, -1 otherwise
+	* @date	25/11/16
+	*/
+	static	int ug2sug(const ugraph& ug, sparse_ugraph& sug)
+	{
+		auto NV = ug.number_of_vertices();
+
+		//allocation - empty graph of size NV
+		if (sug.reset(NV) == -1) {
+			LOG_ERROR("memory for graph not allocated- GraphConversion::sug2ug");
+			return -1;
+		}
+
+		//add edges	
+		auto NBB = ug.number_of_blocks();
+		for (auto v = 0; v < NV; ++v) {
+			for (auto nBB = 0; nBB < NBB; ++nBB) {
+
+				BITBOARD bb = ug.adj_[v].get_bitboard(nBB);
+				if (bb != 0) {
+					////////////////////////////////////////////////////
+					sug.adj_[v].get_elem_set().emplace_back(nBB, bb);
+					////////////////////////////////////////////////////
+				}
+
+			}
+		}
+
+		//name
+		sug.set_name(ug.get_name());
+
+		return 0;
+	}
+
+};
 
 
 

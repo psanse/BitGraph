@@ -24,7 +24,6 @@
 #include <string>
 #include <vector>
 
-
 //////////////////
 //
 // Generic class Graph<T>
@@ -36,7 +35,8 @@
 template<class T = bitarray>
 class Graph: public filterGraphTypeError<T> {
 	
-	friend class GraphConversion;			
+	friend class GraphConversion;	
+	
 
 public:
 		
