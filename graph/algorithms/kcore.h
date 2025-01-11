@@ -35,9 +35,13 @@
 
 using namespace std;
 
-//alias
+//useful alias
 typedef map<int,int>			map_t;
 typedef map<int,int>::iterator	map_it;
+
+using vint = vector<int>;
+using vint_it = vector<int>::iterator;
+using vint_cit = vector<int>::const_iterator;
 
 ///////////////////
 //
@@ -50,25 +54,31 @@ typedef map<int,int>::iterator	map_it;
 
 template<class T>
 class KCore{
-	friend ostream& operator<< (ostream& o, const KCore& kc){ kc.print_kcore(o); return o;}
+
+	friend ostream& operator<< (std::ostream& o, const KCore& kc){ kc.print_kcore(o); return o;}
+	
+	enum data_t { DEG, BIN, VER, POS };
+
 private:
-	typedef vector<int> vint;
-	typedef vector<int>::iterator vint_it;
-	typedef vector<int>::const_iterator vint_cit;
-	enum data_t{DEG, BIN, VER, POS};
+	using basic_type = T;						//a graph from GRAPH, typically sparse_ugraph
+	using type = KCore;
+
+	//alias for backward compatibility
+	using _bbt = typename basic_type::_bbt;		//bitset type
+	using _gt = basic_type;						//graph type
 
 public:
 /////////////
 // constructor, setters and getters
-	KCore(T& g, typename T::_bbt* bbset=NULL);
+	KCore	(T& g, typename T::_bbt* bbset = NULL);
 	
-	int get_kcore_number				();								//size of largest kcore	
-	int get_kcore_size					(int k)					const;	//size of the vertices with core number k
+	int get_kcore_number				();																//size of largest kcore	
+	int get_kcore_size					(int k)					const;							//size of the vertices with core number k
 	int coreness						(int v)					const {return m_deg[v];}
 	vint get_kcore_numbers				(int k)					const;							
 const vint& get_kcore_numbers			()						const {return m_deg;}
 	const vint& get_kcore_ordering		()						const {return m_ver;}
-	void set_subgraph					(typename T::_bbt*);				
+	void set_subgraph					(_bbt *);
 
 //////////////
 // interface
@@ -82,11 +92,11 @@ inline	vint find_heur_clique_opt		(int num_iter=EMPTY_ELEM);				//only available
 	int make_kcore_filter				(map_t& filter, bool reverse=true);		//***experimental, applied to clique, probably remove
 	
 	//I/O
-	void print_kcore					(bool real_deg=false, ostream& o=cout)		const;
+	void print_kcore					(bool real_deg=false, std::ostream& o = std::cout)		const;
 				
 private:
 	//I/O
-	void print							(data_t=VER, ostream& o=cout);	
+	void print							(data_t = VER, std::ostream& o = std::cout);
 	
 ////////////
 // k-core init steps
@@ -96,12 +106,13 @@ private:
 	void bin_sort(vint& lv, bool rev);											//bin sort according to vertex set lv (rev TRUE: vertices taken in reverse order)	
 							
 ///////////
-// attributes
+// data members
+
 	T& m_g;								
-	typename T::_bbt* m_subg;													//kcore(subgraph) or kcore(full graph) if NULL
+	_bbt* m_subg;													//kcore(subgraph) or kcore(full graph) if NULL
 	const int m_NV;																//size of graph
 	
-	vint m_deg;			
+	vint m_deg;
 	vint m_bin;
 	vint m_ver;
 	vint m_pos;
@@ -532,7 +543,7 @@ int KCore<T>::get_kcore_number(){
 }
 
 template<class T>
-typename KCore<T>::vint KCore<T>::get_kcore_numbers(int k)	const {
+vint KCore<T>::get_kcore_numbers(int k)	const {
 /////////////////////////
 //INPUT PARAM: k>=0 
 //
@@ -553,7 +564,7 @@ template<class T>
 int KCore<T>::get_kcore_size (int k) const{
 /////////////////////////
 
-	int counter=0;
+	auto counter=0;
 	
 	for(int v=0; v<m_deg.size(); ++v){
 		if(m_deg[v]==k)
@@ -626,7 +637,7 @@ return filter.size();
 }
 
 template<class T>
-typename KCore<T>::vint KCore<T>::find_heur_clique(int num_iter){
+vint KCore<T>::find_heur_clique(int num_iter){
 ///////////////////////
 // A more efficient and clean implementation of the greedy clique heuristic based on Kcore
 //
@@ -691,7 +702,7 @@ typename KCore<T>::vint KCore<T>::find_heur_clique(int num_iter){
 
 template<>
 inline
-KCore<sparse_ugraph>::vint KCore<sparse_ugraph>::find_heur_clique_opt(int num_iter){
+vint KCore<sparse_ugraph>::find_heur_clique_opt(int num_iter){
 ///////////////////////
 // Optimized version of find_clique for speed
 // date:30/12/2014
@@ -770,7 +781,7 @@ struct remove_kcore{
 
 template<>
 inline
-KCore<sparse_ugraph>::vint KCore<sparse_ugraph>::find_heur_clique_sparse(int num_iter){
+vint KCore<sparse_ugraph>::find_heur_clique_sparse(int num_iter){
 ///////////////////////
 // Optimized version of find_clique for speed in large saprse graphs
 // date:30/12/2014
