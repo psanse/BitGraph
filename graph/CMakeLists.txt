@@ -73,15 +73,12 @@ if (graph_build_tests)
 # "demo.cxx" and "demo_b.cxx". The extensions are automatically found.
 add_executable ( test_graph  tests/gtest_main.cpp
 			
-#  tests/test_graph_sort.cpp
-   
-#  tests/test_kcore.cpp
+#  tests/test_graph_sort.cpp   
 #  tests/test_kcore_in_folder.cpp
 
 #  TESTS UNDER DEVELOPMENT  / CHECKING
-  tests/test_graph_conversions.cpp
+   tests/test_kcore.cpp
  
-
 #  TESTS CHECKED
 #  tests/test_func.cpp
 #  tests/test_graph.cpp
