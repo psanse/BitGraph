@@ -12,12 +12,12 @@
 #include <iostream>
 #include <sstream>
 #include <algorithm>
-#include <map>
+#include <map> 
 
 /////////////////////////
 //SWAP-MACRO: places vertex u as last vertex in the bin with one less degree. Updates bin but not degree of u
 #define SWAP(u)	{ int du = m_deg[(u)]; int pu = m_pos[(u)]; int pw = m_bin[du]; int w = m_ver[pw]; \
-				   if( (u) != w){ m_pos[(u)] = pw; m_pos[w] = pu; m_ver[pu] = w; m_ver[pw] = (u);} m_bin[du]++; }
+				    if( (u) != w){ m_pos[(u)] = pw; m_pos[w] = pu; m_ver[pu] = w; m_ver[pw] = (u);} m_bin[du]++; }
 
 //int du=m_deg[u];
 //int pu=m_pos[u];
