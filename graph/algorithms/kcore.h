@@ -2,6 +2,8 @@
 //author:pss
 //date of creation: 6/6/14
 //last update: 11/01/25
+//
+//TODO - mention reference paper to determine KCore
 
 #ifndef __KCORE_H__
 #define __KCORE_H__
@@ -13,6 +15,8 @@
 #include <sstream>
 #include <algorithm>
 #include <map> 
+
+#include "graph/simple_sparse_ugraph.h"
 
 /////////////////////////
 //SWAP-MACRO: places vertex u as last vertex in the bin with one less degree. Updates bin but not degree of u
@@ -33,9 +37,11 @@
 
 //////////////////////////
 
-using namespace std;
+using namespace std;									//TODO - remove from header file
 
 //useful alias
+typedef Ugraph<sparse_bitarray> sparse_ugraph;			//simple sparse undirected graph
+
 typedef map<int,int>			map_t;
 typedef map<int,int>::iterator	map_it;
 
@@ -57,9 +63,9 @@ class KCore{
 
 	friend ostream& operator<< (std::ostream& o, const KCore& kc){ kc.print_kcore(o); return o;}
 	
-	enum data_t { DEG, BIN, VER, POS };
+	enum print_t { DEG, BIN, VER, POS };
 
-private:
+public:
 	using basic_type = T;						//a graph from GRAPH, typically sparse_ugraph
 	using type = KCore;
 
@@ -67,13 +73,19 @@ private:
 	using _bbt = typename basic_type::_bbt;		//bitset type
 	using _gt = basic_type;						//graph type
 
+////////////////////
+//construction
 public:
-/////////////
-// constructor, setters and getters
+
 	KCore	(T& g, typename T::_bbt* bbset = NULL);
 	
+	//TODO - destructor, copies, moves...
+	 
+/////////
+//setters and getters
+
 	int get_kcore_number				();																//size of largest kcore	
-	int get_kcore_size					(int k)					const;							//size of the vertices with core number k
+	int get_kcore_size					(int k)					const;									//size of the vertices with core number k
 	int coreness						(int v)					const {return m_deg[v];}
 	vint get_kcore_numbers				(int k)					const;							
 const vint& get_kcore_numbers			()						const {return m_deg;}
@@ -81,39 +93,48 @@ const vint& get_kcore_numbers			()						const {return m_deg;}
 	void set_subgraph					(_bbt *);
 
 //////////////
-// interface
+// main public interface
+
 	void kcore							();										//default kcore (vertices with minimum kcore placed first in m_ver)
 	int kcore_UB						(int UB);								//new kcore (vertices with kcore=UB (or nearest real degree > UB) are placed last in m_ver)
-	int width							(bool rev=false);						//computes width using m_ver list and real degrees
-	vint find_heur_clique				(int num_iter=EMPTY_ELEM);
+	int width							(bool rev=false);						//computes width of the graph using m_ver list and real degrees
+	
+	//sparse specific
+	vint find_heur_clique(int num_iter = EMPTY_ELEM);							//greedy clique heuristic based on KCore ordering
 inline	vint find_heur_clique_opt		(int num_iter=EMPTY_ELEM);				//only available for sparse graphs
-	vint find_heur_clique_sparse		(int num_iter=EMPTY_ELEM);
+vint find_heur_clique_sparse(int num_iter = EMPTY_ELEM);						//only available for sparse graphs	
 		
 	int make_kcore_filter				(map_t& filter, bool reverse=true);		//***experimental, applied to clique, probably remove
-	
+
 	//I/O
 	void print_kcore					(bool real_deg=false, std::ostream& o = std::cout)		const;
-				
+
+//////////////
+// private interface
 private:
-	//I/O
-	void print							(data_t = VER, std::ostream& o = std::cout);
-	
-////////////
-// k-core init steps
+
+	//k-core init steps
 	void init_kcore();															//inits degrees and bin
 	void init_bin();															//inits just the bin
 	void bin_sort();															//default bin sort
-	void bin_sort(vint& lv, bool rev);											//bin sort according to vertex set lv (rev TRUE: vertices taken in reverse order)	
+	void bin_sort(vint& lv, bool rev);											//bin sort according to vertex set lv (rev TRUE: vertices taken in reverse order)
+	
+	//I/O
+	void print							(print_t = VER, std::ostream& o = std::cout);
+					
 							
 ///////////
 // data members
+private:
 
-	T& m_g;								
-	_bbt* m_subg;													//kcore(subgraph) or kcore(full graph) if NULL
-	const int m_NV;																//size of graph
+	T& m_g;																		//the one and only graph G=(V, E)			
+	const int m_NV;																//size of graph |V| - for convenience, possibly remove
+
+	_bbt* m_subg;																//to manage kcore in subgraphs (default NULL)	
 	
-	vint m_deg;
-	vint m_bin;
+	//data structures
+	vint m_deg;																	//coreness of vertices																
+	vint m_bin;																	//bins of differente degrees, implements bin sort algorithm
 	vint m_ver;
 	vint m_pos;
 };
@@ -847,7 +868,7 @@ vint KCore<sparse_ugraph>::find_heur_clique_sparse(int num_iter){
 
 
 template<class T>
-void KCore<T>::print(data_t type, ostream& o){
+void KCore<T>::print(print_t type, ostream& o){
 	switch(type){
 	case DEG:
 		for(int i=0; i<m_deg.size();i++)
