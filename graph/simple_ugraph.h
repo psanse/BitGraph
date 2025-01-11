@@ -34,7 +34,7 @@ using vint = std::vector<int>;
 template<class T = bitarray>
 class Ugraph : public Graph<T> {
 
-	friend class GraphConversion;		//TODO-CHECK
+	friend class GraphConversion;		
 
 public:
 
