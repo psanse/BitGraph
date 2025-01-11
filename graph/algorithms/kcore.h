@@ -1,13 +1,13 @@
-//kcore.h: header for the Kcore class which computes graph degeneracy linearly in the numbe
+//kcore.h: header for the Kcore class which computes graph degeneracy linearly in |V|
 //author:pss
 //date of creation: 6/6/14
+//last update: 11/01/25
 
 #ifndef __KCORE_H__
 #define __KCORE_H__
 
-
 #include <vector>
-#include "graph.h"
+#include "graph.h"						//TODO - change to the specific graph classes
 #include "utils/logger.h"
 #include <iostream>
 #include <sstream>
@@ -15,9 +15,9 @@
 #include <map>
 
 /////////////////////////
-//SWAP-MACRO: places vertex u as last vertex in the bin with one less degree. Updates been but not degree of u
-#define SWAP(u)	{ int du=m_deg[(u)]; int pu=m_pos[(u)]; int pw=m_bin[du]; int w= m_ver[pw]; \
-				   if((u)!=w){ m_pos[(u)]=pw; m_pos[w]=pu; m_ver[pu]=w;	m_ver[pw]=(u);} m_bin[du]++;  }
+//SWAP-MACRO: places vertex u as last vertex in the bin with one less degree. Updates bin but not degree of u
+#define SWAP(u)	{ int du = m_deg[(u)]; int pu = m_pos[(u)]; int pw = m_bin[du]; int w = m_ver[pw]; \
+				   if( (u) != w){ m_pos[(u)] = pw; m_pos[w] = pu; m_ver[pu] = w; m_ver[pw] = (u);} m_bin[du]++; }
 
 //int du=m_deg[u];
 //int pu=m_pos[u];
@@ -34,8 +34,19 @@
 //////////////////////////
 
 using namespace std;
+
+//alias
 typedef map<int,int>			map_t;
 typedef map<int,int>::iterator	map_it;
+
+///////////////////
+//
+// KCore class
+//
+// Manages coreness of vertices in a graph
+// Managaes core of a graph
+//
+////////////////////
 
 template<class T>
 class KCore{
@@ -96,6 +107,9 @@ private:
 	vint m_pos;
 };
 
+//////////////////////////////////////////////////////
+// IMPLEMENTATION - in header for generic code
+
 template<class T>
 KCore<T>::KCore(T& g, typename T::_bbt* bbset): m_g(g), m_NV(g.number_of_vertices()), m_deg(m_NV), m_pos(m_NV){
 	//*** check empty bbset
@@ -110,7 +124,6 @@ void KCore<T>::set_subgraph	(typename T::_bbt* new_subg){
 		m_ver.assign(m_subg->popcn64(), EMPTY_ELEM);
 	else  m_ver.assign(m_NV,EMPTY_ELEM);
 }
-
 
 template<class T>
 void KCore<T>::kcore(){
