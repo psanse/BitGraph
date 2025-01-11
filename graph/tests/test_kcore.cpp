@@ -23,7 +23,7 @@ TEST(KCore, kcore_decomposition_sparse){
 	
 	KCore<sparse_ugraph> kc(ug);
 	kc.kcore();
-	vector<int> v= kc.get_kcore_numbers(2);
+	vector<int> v= kc.get_kcore_set(2);
 	EXPECT_EQ(1, count(v.begin(), v.end(), 0));
 	EXPECT_EQ(1, count(v.begin(), v.end(), 1));
 	EXPECT_EQ(1, count(v.begin(), v.end(), 6));
@@ -41,7 +41,7 @@ TEST(KCore, kcore_decomposition_sparse){
 	KCore<sparse_ugraph> kc1(ug1);
 	kc1.kcore();
 	
-	v= kc1.get_kcore_numbers(1);
+	v= kc1.get_kcore_set(1);
 	for(int i=0; i<6; i++)
 		EXPECT_EQ(i, v[i]);
 	
@@ -53,18 +53,18 @@ TEST(KCoreUB, kcore_example){
 	//test with real kcore number
 	KCore<ugraph> kc(ug);	
 	kc.kcore();
-	int kcn=kc.get_kcore_number();
+	int kcn=kc.get_max_kcore();
 	int UB_corr=kc.kcore_UB(kcn);
-	int kcUBn=kc.get_kcore_number();
+	int kcUBn=kc.get_max_kcore();
 	EXPECT_EQ(UB_corr, kcUBn);
 	EXPECT_EQ(kcUBn, kc.width(true));   //checks width (real degrees)
 	
 	//test with UB on kcore number
 	KCore<ugraph> kc1(ug);
 	kc1.kcore();
-	kcn=kc1.get_kcore_number();
+	kcn=kc1.get_max_kcore();
 	UB_corr=kc1.kcore_UB(kcn);
-	kcUBn=kc1.get_kcore_number();
+	kcUBn=kc1.get_max_kcore();
 	EXPECT_EQ(UB_corr, kcUBn);	
 	EXPECT_EQ(kcUBn, kc.width(true)); //checks width (real degrees)
 
@@ -72,9 +72,9 @@ TEST(KCoreUB, kcore_example){
 	//test with UB on kcore number
 	KCore<ugraph> kc2(ug);
 	kc2.kcore();
-	kcn=kc2.get_kcore_number();
+	kcn=kc2.get_max_kcore();
 	UB_corr=kc2.kcore_UB(kcn);
-	kcUBn=kc2.get_kcore_number();
+	kcUBn=kc2.get_max_kcore();
 	EXPECT_EQ(UB_corr, kcUBn);	
 	EXPECT_EQ(kcUBn, kc.width(true)); //checks width (real degrees)
 }
@@ -86,9 +86,9 @@ TEST(KCoreUB, kcore_example_I){
 	//test with real kcore number
 	KCore<ugraph> kc(ug);
 	kc.kcore();
-	int kcn=kc.get_kcore_number();
+	int kcn=kc.get_max_kcore();
 	int UB_corr=kc.kcore_UB(kcn);
-	int kcUBn=kc.get_kcore_number();
+	int kcUBn=kc.get_max_kcore();
 	EXPECT_EQ(UB_corr, kcUBn);
 	EXPECT_EQ(kcUBn, kc.width(true)); //checks width (real degrees)
 
@@ -100,9 +100,9 @@ TEST(KCoreUB, kcore_example_II){
 	//test with real kcore number
 	KCore<ugraph> kc(ug);
 	kc.kcore();
-	int kcn=kc.get_kcore_number();
+	int kcn=kc.get_max_kcore();
 	int UB_corr=kc.kcore_UB(kcn);
-	int kcUBn=kc.get_kcore_number();
+	int kcUBn=kc.get_max_kcore();
 	EXPECT_EQ(UB_corr, kcUBn);
 	EXPECT_EQ(kcUBn, kc.width(true)); //checks width (real degrees)
 }
@@ -147,17 +147,17 @@ TEST(KCoreUB, DISABLED_random){
 			
 				KCore<ugraph> kc(ug);
 				kc.kcore();
-				int kcn=kc.get_kcore_number();
+				int kcn=kc.get_max_kcore();
 
 				KCore<ugraph> kcUB(ug);
 				int UB_corr= kcUB.kcore_UB(kcn);	
-				int kcUBn=kcUB.get_kcore_number();
+				int kcUBn=kcUB.get_max_kcore();
 				EXPECT_EQ(UB_corr, kcUBn);
 				EXPECT_EQ(kcUBn, kcUB.width(true));		//checks width (real degrees)
 				
 				
 				if(kcn!=kcUBn){
-					sstr<<":"<<"kcore: "<<kc.get_kcore_number()<<" kcore_UB: "<<kcUB.get_kcore_number();
+					sstr<<":"<<"kcore: "<<kc.get_max_kcore()<<" kcore_UB: "<<kcUB.get_max_kcore();
 					LOGG_INFO(sstr.str());
 				}
 	

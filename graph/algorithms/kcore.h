@@ -1,9 +1,12 @@
-//kcore.h: header for the Kcore class which computes graph degeneracy linearly in |V|
-//author:pss
-//date of creation: 6/6/14
-//last update: 11/01/25
-//
-//TODO - mention reference paper to determine KCore
+/*
+ * kcore.h file for the classes Base_Graph_W and Graph_W for weighted graphs
+ *
+ * @creation_date 6/6/14
+ * @last_update 11/01/25
+ * @dev pss
+ *
+ * //TODO - mention reference paper to determine KCore
+ */
 
 #ifndef __KCORE_H__
 #define __KCORE_H__
@@ -17,8 +20,9 @@
 
 /////////////////////////
 //SWAP-MACRO: places vertex u as last vertex in the bin with one less degree. Updates bin but not degree of u
-#define SWAP(u)	{ int du = deg_[(u)]; int pu = pos_[(u)]; int pw = bin_[du]; int w = ver_[pw]; \
-				    if( (u) != w){ pos_[(u)] = pw; pos_[w] = pu; ver_[pu] = w; ver_[pw] = (u);} bin_[du]++; }
+#define SWAP_BIN(u)	{ int du = deg_[(u)]; int pu = pos_[(u)]; int pw = bin_[du]; int w = ver_[pw];		\
+						if( (u) != w) { pos_[(u)] = pw; pos_[w] = pu; ver_[pu] = w; ver_[pw] = (u);}	\
+						bin_[du]++;																			}
 
 //int du=deg_[u];
 //int pu=pos_[u];
@@ -26,7 +30,7 @@
 //int w= ver_[pw];
 //if(u!=w){			//else there is no need to move the vertex
 //	pos_[u]=pw;
-//	pos_[w]=pu;	//swap (u->w) with first vertex with same degree
+//	pos_[w]=pu;	//SWAP_BIN (u->w) with first vertex with same degree
 //	ver_[pu]=w;
 //	ver_[pw]=u;
 //}	
@@ -81,18 +85,68 @@ public:
 ////////////////
 //setters and getters
 
-	int get_kcore_number				();																//size of largest kcore	
-	int get_kcore_size					(int k)					const;									//number of vertices with core number k
-	int coreness						(int v)					const	{return deg_[v];}
-	vint get_kcore_numbers				(int k)					const;							
-const vint& get_kcore_numbers			()						const	{return deg_;}
-	const vint& get_kcore_ordering		()						const	{return ver_;}
-	void set_subgraph					(_bbt *);
+	/*
+	* @brief Maximum core number of the graph
+	*		 (must be called afer kcore())
+	* @returns Maximum core number of the graph or -1 if error
+	*/
+	int get_max_kcore					()								const;																	
+	
+	/*
+	* @brief Core number of a given vertex
+	*		 (must be called afer kcore())
+	*/
+	int coreness						(std::size_t v)					const { return deg_[v]; }
+	
+	/*
+	* @brief Size of tke kcore for a given k >=0, number of vertices with core number k
+	*		 (must be called afer kcore())
+	*/
+	int get_kcore_size					(std::size_t k)					const;
+	
+	/*
+	* @brief Set of vertices with kcore number greater than a given k >=0
+	*		 (must be called afer kcore()).
+	* 
+	*		 I. K==0: all vertices V
+	*/
+	vint get_kcore_set					(std::size_t k)					const;
+
+	/*
+	* @brief Coreness of all vertices
+	*		 (must be called afer kcore()).
+	*/
+	const vint& get_kcore_numbers		()								const	{ return deg_;}
+	
+	
+
+	const vint& get_kcore_ordering		()								const	{ return ver_;}
+	
+	/*
+	* @brief Extension to operate on induced subgraphs. If psg = nullptr kcore is 
+	*		 computed on the full graph.
+	* @returns 0 if success, -1 if memory allocation fails
+	*/
+	int set_subgraph					(_bbt * psg = nullptr);
 
 //////////////
-// main public interface
+// Main operations
 
-	void kcore							();										//default kcore (vertices with minimum kcore placed first in ver_)
+	////////////
+	// RETURNS: 
+	// A) min width ordering pos_[OLD_INDEX]=NEW_INDEX (lowest index, lowest degree) or ver_[NEW_INDEX]=OLD_INDEX
+	// B) The resulting (k-core) degree for each vertex 
+	// C) The k-core upper bound for the graph is the degree of the last vertex
+
+	/*
+	* @brief Computes maximum core and coreness. After its execution: 
+	*	
+	*		 I. @ver_ contains the vertices in non-decreasing kcore order
+	*		II. @deg_ contains the coreness of each vertex
+	*/
+	void kcore							();										
+
+
 	int kcore_UB						(int UB);								//new kcore (vertices with kcore=UB (or nearest real degree > UB) are placed last in ver_)
 	int width							(bool rev=false);						//computes width of the graph using ver_ list and real degrees
 	
@@ -146,25 +200,27 @@ KCore<T>::KCore(T& g, typename T::_bbt* bbset): g_(g), NV_(g.number_of_vertices(
 }
 
 template<class T>
-void KCore<T>::set_subgraph	(_bbt* new_subg){
-	psg_ = new_subg;
-	if (psg_) {
-		ver_.assign (psg_->popcn64(), EMPTY_ELEM);
+int KCore<T>::set_subgraph(_bbt* psg) {
+
+	psg_ = psg;
+
+	try {
+		if (psg_ != nullptr) {
+			ver_.assign (psg_ -> popcn64(), EMPTY_ELEM);		//nullptr - operates on the subgraph induced by the bitset of vertices (*psg)
+		}
+		else {
+			ver_.assign (NV_, EMPTY_ELEM);						//nullptr - operates on the full graph
+		}
 	}
-	else {
-		ver_.assign (NV_, EMPTY_ELEM);
+	catch (std::bad_alloc& ba) {
+		LOGG_ERROR("bad_alloc exception - KCore<T>::set_subgraph", ba.what());
+		return -1;
 	}
 }
 
 template<class T>
 void KCore<T>::kcore(){
-////////////
-// 
-// INPUT: Simple undirected graph
-// RETURNS: 
-// A) min width ordering pos_[OLD_INDEX]=NEW_INDEX (lowest index, lowest degree) or ver_[NEW_INDEX]=OLD_INDEX
-// B) The resulting (k-core) degree for each vertex 
-// C) The k-core upper bound for the graph is the degree of the last vertex
+
 
 	//inits data structures
 	init_kcore();
@@ -183,7 +239,7 @@ void KCore<T>::kcore(){
 
 					int dv=deg_[v];
 					if(deg_[u]>deg_[v]){
-						SWAP(u);				//swap movement in ver_
+						SWAP_BIN(u);				//swap movement in ver_
 						deg_[u]--;				//decrease degree of swapped vertex
 					}
 				}
@@ -205,7 +261,7 @@ void KCore<T>::kcore(){
 
 					int dv=deg_[v];
 					if(deg_[u]>deg_[v]){
-						SWAP(u);				//swap movement in ver_
+						SWAP_BIN(u);				//swap movement in ver_
 						deg_[u]--;				//decrease degree of swapped vertex
 					}
 				}
@@ -287,7 +343,7 @@ int KCore<T>::kcore_UB(int UB_out){
 
 					int dv=deg_[v];
 					if(deg_[u]>UB){
-						SWAP(u);			
+						SWAP_BIN(u);			
 						//update degree: if vertex u has deg LB+1, instead of updating to LB it takes the degree of v
 						if(deg_[u]==UB+1){
 							deg_[u]=dv;	
@@ -317,7 +373,7 @@ int KCore<T>::kcore_UB(int UB_out){
 
 							int dv=deg_[v];
 							if(deg_[u]>UB){
-								SWAP(u);			//swaps u to the last position of vertices with one less degree	(does not update degree)
+								SWAP_BIN(u);			//swaps u to the last position of vertices with one less degree	(does not update degree)
 								//update degree
 								(deg_[u]==UB+1)? deg_[u]=dv : deg_[u]--;
 							}
@@ -556,42 +612,42 @@ int KCore<T>::width(bool rev){
 
 
 template<class T>
-int KCore<T>::get_kcore_number(){
-//must be called afer k_core()
-	if(ver_.empty()) return -1;
+int KCore<T>::get_max_kcore() const{
+
+	//assert
+	if (ver_.empty()) {
+		return -1;
+	}
+
 	return deg_[ver_.back()];
 }
 
 template<class T>
-vint KCore<T>::get_kcore_numbers(int k)	const {
-/////////////////////////
-//INPUT PARAM: k>=0 
-//
-// RETURN VALUES 
-// k>=0 : set of vertices with kcore number greater than k (k==0 is V)
+vint KCore<T>::get_kcore_set (std::size_t k) const {
 
 	vint res;
 	
-	for(int v=0; v<deg_.size(); ++v){
-		if(deg_[v]>=k)
-			 res.push_back(v);
+	for(auto v = 0; v < deg_.size(); ++v){
+		if (deg_[v] >= k) {
+			res.emplace_back(v);
+		}
 	}
 		
-return res;
+	return res;
 }
 
 template<class T>
-int KCore<T>::get_kcore_size (int k) const{
-/////////////////////////
+int KCore<T>::get_kcore_size (std::size_t k) const	{
 
-	auto counter=0;
+	auto count = 0;
 	
-	for(int v=0; v<deg_.size(); ++v){
-		if(deg_[v]==k)
-			 counter++;
+	for(auto v = 0; v < deg_.size(); ++v){
+		if (deg_[v] == k) {
+			count++;
+		}
 	}
 		
-return counter;
+	return count;
 }
 
 template<class T>
