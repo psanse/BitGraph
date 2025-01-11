@@ -18,7 +18,6 @@ using namespace std;
 
 typedef vector<int> vint;
 
-
 TEST(KCore, kcore_decomposition_sparse){
 	sparse_ugraph ug(PATH_GRAPH_TESTS_CMAKE_SRC_CODE "star.clq");
 	

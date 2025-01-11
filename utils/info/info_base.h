@@ -33,7 +33,7 @@ namespace com {
 		enum class phase_t { SEARCH = 0, PREPROC, LAST_INCUMBENT, PARSE };
 
 		/////////////////////
-		//general configuration
+		//general info
 		////////////////////
 		std::string nameFileLog_;				//log file name
 		std::string nameInstance_;				//instance name
