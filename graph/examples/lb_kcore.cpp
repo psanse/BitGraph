@@ -25,7 +25,7 @@ int main(int argc, char** argv){
 	//find initial clique
 	sparse_ugraph ug(filename);
 	KCore<sparse_ugraph> kc(ug);
-	kc.kcore();
+	kc.find_kcore();
 	vector<int> initial_clique;
 	PrecisionTimer pt;
 	pt.wall_tic();

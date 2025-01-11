@@ -22,7 +22,7 @@ TEST(KCore, kcore_decomposition_sparse){
 	sparse_ugraph ug(PATH_GRAPH_TESTS_CMAKE_SRC_CODE "star.clq");
 	
 	KCore<sparse_ugraph> kc(ug);
-	kc.kcore();
+	kc.find_kcore();
 	vector<int> v= kc.get_kcore_set(2);
 	EXPECT_EQ(1, count(v.begin(), v.end(), 0));
 	EXPECT_EQ(1, count(v.begin(), v.end(), 1));
@@ -39,7 +39,7 @@ TEST(KCore, kcore_decomposition_sparse){
 	ug1.add_edge(0,5);
 
 	KCore<sparse_ugraph> kc1(ug1);
-	kc1.kcore();
+	kc1.find_kcore();
 	
 	v= kc1.get_kcore_set(1);
 	for(int i=0; i<6; i++)
@@ -52,7 +52,7 @@ TEST(KCoreUB, kcore_example){
 	
 	//test with real kcore number
 	KCore<ugraph> kc(ug);	
-	kc.kcore();
+	kc.find_kcore();
 	int kcn=kc.get_max_kcore();
 	int UB_corr=kc.kcore_UB(kcn);
 	int kcUBn=kc.get_max_kcore();
@@ -61,7 +61,7 @@ TEST(KCoreUB, kcore_example){
 	
 	//test with UB on kcore number
 	KCore<ugraph> kc1(ug);
-	kc1.kcore();
+	kc1.find_kcore();
 	kcn=kc1.get_max_kcore();
 	UB_corr=kc1.kcore_UB(kcn);
 	kcUBn=kc1.get_max_kcore();
@@ -71,7 +71,7 @@ TEST(KCoreUB, kcore_example){
 	
 	//test with UB on kcore number
 	KCore<ugraph> kc2(ug);
-	kc2.kcore();
+	kc2.find_kcore();
 	kcn=kc2.get_max_kcore();
 	UB_corr=kc2.kcore_UB(kcn);
 	kcUBn=kc2.get_max_kcore();
@@ -85,7 +85,7 @@ TEST(KCoreUB, kcore_example_I){
 	
 	//test with real kcore number
 	KCore<ugraph> kc(ug);
-	kc.kcore();
+	kc.find_kcore();
 	int kcn=kc.get_max_kcore();
 	int UB_corr=kc.kcore_UB(kcn);
 	int kcUBn=kc.get_max_kcore();
@@ -99,7 +99,7 @@ TEST(KCoreUB, kcore_example_II){
 	
 	//test with real kcore number
 	KCore<ugraph> kc(ug);
-	kc.kcore();
+	kc.find_kcore();
 	int kcn=kc.get_max_kcore();
 	int UB_corr=kc.kcore_UB(kcn);
 	int kcUBn=kc.get_max_kcore();
@@ -146,7 +146,7 @@ TEST(KCoreUB, DISABLED_random){
 				//}
 			
 				KCore<ugraph> kc(ug);
-				kc.kcore();
+				kc.find_kcore();
 				int kcn=kc.get_max_kcore();
 
 				KCore<ugraph> kcUB(ug);

@@ -117,9 +117,11 @@ public:
 	*		 (must be called afer kcore()).
 	*/
 	const vint& get_kcore_numbers		()								const	{ return deg_;}
-	
-	
-
+		
+	/*
+	* @brief Sorting of the vertices according to non-decreasing kcore number
+	*		 (must be called afer kcore()).
+	*/
 	const vint& get_kcore_ordering		()								const	{ return ver_;}
 	
 	/*
@@ -134,20 +136,23 @@ public:
 
 	////////////
 	// RETURNS: 
-	// A) min width ordering pos_[OLD_INDEX]=NEW_INDEX (lowest index, lowest degree) or ver_[NEW_INDEX]=OLD_INDEX
+	// A) min width ordering pos_[OLD_INDEX]=NEW_INDEX (lowest index, lowest degree) or ver_[NEW_INDEX] = OLD_INDEX
 	// B) The resulting (k-core) degree for each vertex 
 	// C) The k-core upper bound for the graph is the degree of the last vertex
 
 	/*
-	* @brief Computes maximum core and coreness. After its execution: 
+	* @brief Computes maximum core and coreness (core algorithm). 
+	*		 After its execution: 
 	*	
 	*		 I. @ver_ contains the vertices in non-decreasing kcore order
 	*		II. @deg_ contains the coreness of each vertex
 	*/
-	void kcore							();										
+	void find_kcore							();										
 
 
 	int kcore_UB						(int UB);								//new kcore (vertices with kcore=UB (or nearest real degree > UB) are placed last in ver_)
+	
+	
 	int width							(bool rev=false);						//computes width of the graph using ver_ list and real degrees
 	
 	//sparse specific
@@ -219,8 +224,7 @@ int KCore<T>::set_subgraph(_bbt* psg) {
 }
 
 template<class T>
-void KCore<T>::kcore(){
-
+void KCore<T>::find_kcore(){
 
 	//inits data structures
 	init_kcore();
