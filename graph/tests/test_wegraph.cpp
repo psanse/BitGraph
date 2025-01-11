@@ -110,7 +110,6 @@ TEST_F(UGraphEWTest, generate_weights) {
 //
 //////////////////
 
-
 TEST(UGraphEW, DISABLED_gen_random ){
 ////////////////
 // generates a random graph and adds random edge weights
@@ -165,7 +164,6 @@ TEST(UGraphEW, DISABLED_write_to_file) {
 	//Graph_EW<ugraph, int> ugew_gen(PATH_GRAPH_TESTS_CMAKE_SRC_CODE "toy_ew_dimacs_gen.txt");
 	//ugew.print_weights();
 }
-
 
 
 ///////////////
