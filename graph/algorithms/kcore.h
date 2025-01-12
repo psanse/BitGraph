@@ -59,7 +59,7 @@ using vint_cit = vector<int>::const_iterator;
 //
 ////////////////////
 
-template<class T>
+template<class Graph_t>
 class KCore{
 
 	friend ostream& operator<< (std::ostream& o, const KCore& kc){ kc.print_kcore(o); return o;}
@@ -67,7 +67,7 @@ class KCore{
 	enum print_t { DEG, BIN, VER, POS };
 
 public:
-	using basic_type = T;						//a graph from GRAPH, typically sparse_ugraph
+	using basic_type = Graph_t;						//a graph from GRAPH, typically sparse_ugraph
 	using type = KCore;
 
 	//alias for backward compatibility
@@ -78,7 +78,7 @@ public:
 //construction
 public:
 
-	KCore	(T& g, typename T::_bbt* bbset = nullptr);
+	KCore	(Graph_t& g, _bbt* bbset = nullptr);
 	
 	//TODO - destructor, copies, moves...
 	 
@@ -196,7 +196,7 @@ private:
 // data members
 private:
 
-	T& g_;																		//the one and only graph G=(V, E)			
+	Graph_t& g_;																		//the one and only graph G=(V, E)			
 	const int NV_;																//size of graph |V| - for convenience, possibly remove
 	_bbt* psg_;																	//to manage kcore in subgraphs (default nullptr)	
 	
@@ -210,15 +210,15 @@ private:
 //////////////////////////////////////////////////////
 // IMPLEMENTATION - in header for generic code
 
-template<class T>
-KCore<T>::KCore(T& g, typename T::_bbt* bbset): g_(g), NV_(g.number_of_vertices()), deg_(NV_), pos_(NV_){
+template<class Graph_t>
+KCore<Graph_t>::KCore(Graph_t& g, _bbt* bbset): g_(g), NV_(g.number_of_vertices()), deg_(NV_), pos_(NV_){
 	//*** check empty bbset
 	//*** check id bbset may hold NV_/64 bitblocks
 	set_subgraph(bbset);
 }
 
-template<class T>
-int KCore<T>::set_subgraph(_bbt* psg) {
+template<class Graph_t>
+int KCore<Graph_t>::set_subgraph(_bbt* psg) {
 
 	psg_ = psg;
 
@@ -236,8 +236,8 @@ int KCore<T>::set_subgraph(_bbt* psg) {
 	}
 }
 
-template<class T>
-void KCore<T>::find_kcore(){
+template<class Graph_t>
+void KCore<Graph_t>::find_kcore(){
 
 	//inits data structures
 	init_kcore();
@@ -295,8 +295,8 @@ void KCore<T>::find_kcore(){
 	}
 }	
 
-template<class T>
-int KCore<T>::find_kcore_UB (int UB_out){
+template<class Graph_t>
+int KCore<Graph_t>::find_kcore_UB (int UB_out){
 ////////////
 //  date of creation: 5/3/16
 //  last update: 5/3/16
@@ -331,14 +331,14 @@ int KCore<T>::find_kcore_UB (int UB_out){
 
 	//Check subgraph is empty
 	if(psg_ != nullptr){
-		LOG_INFO("Subgraph variant not implemented yet - KCore<T>::kcore_UB");
+		LOG_INFO("Subgraph variant not implemented yet - KCore<Graph_t>::kcore_UB");
 		return -1;
 	}
 	
 	//check that UB_out is not the maximum graph degree
 	//i.e. deg = 1 , bin has size 2 (0 and 1)
 	if(bin_.size() <= UB_out + 1){																		
-		LOG_INFO("UB is not worse than maximum graph degree: vertices left as is - KCore<T>::kcore_UB");
+		LOG_INFO("UB is not worse than maximum graph degree: vertices left as is - KCore<Graph_t>::kcore_UB");
 		return UB_out;						
 	}
 
@@ -430,8 +430,8 @@ int KCore<T>::find_kcore_UB (int UB_out){
 	return UB;
 }	
 
-template<class T>
-void KCore<T>::init_kcore(){
+template<class Graph_t>
+void KCore<Graph_t>::init_kcore(){
 
 	int max_gdeg=0, v=EMPTY_ELEM;
 
@@ -473,8 +473,8 @@ void KCore<T>::init_kcore(){
 	}
 }
 
-template<class T>
-void KCore<T>::init_bin(){
+template<class Graph_t>
+void KCore<Graph_t>::init_bin(){
 //////////////////
 // Initialization of bin only (compared with init_kcore())
 // Assumes degrees in deg_ are set appropiately
@@ -505,8 +505,8 @@ void KCore<T>::init_bin(){
 	}
 }
 
-template<class T>
-void KCore<T>::bin_sort(){
+template<class Graph_t>
+void KCore<Graph_t>::bin_sort(){
 ////////////////
 // sorts vertices in bbset by non decreasing degree in linear time
 //
@@ -549,8 +549,8 @@ void KCore<T>::bin_sort(){
 	bin_[0]=0;
 }
 
-template<class T>
-void KCore<T>::bin_sort(vint& lv, bool rev){
+template<class Graph_t>
+void KCore<Graph_t>::bin_sort(vint& lv, bool rev){
 ////////////////
 // sorts vertices in lv by non decreasing degree (deg_) in linear time (EXPERIMENTAL)
 // date of creation: 7/3/16
@@ -600,8 +600,8 @@ void KCore<T>::bin_sort(vint& lv, bool rev){
 	bin_[0]=0;
 }
 
-template<class T>
-int KCore<T>::minimum_width (bool rev){
+template<class Graph_t>
+int KCore<Graph_t>::minimum_width (bool rev){
 ///////////////////
 // Width of the ordering in ver_ using real degrees (rev=TRUE reverse direction)
 // HEAVY COMPUTATIONALLY - use only for checking purposes	
@@ -647,12 +647,12 @@ int KCore<T>::minimum_width (bool rev){
 	return max_width;
 }
 
-template<class T>
-int KCore<T>::minimum_width_fast() {
+template<class Graph_t>
+int KCore<Graph_t>::minimum_width_fast() {
 	
 	//assert DEBUG
 	if (lv.empty()) {
-		LOG_ERROR("degree information not available - KCore<T>::width_fast");
+		LOG_ERROR("degree information not available - KCore<Graph_t>::width_fast");
 		return -1;
 	}
 	
@@ -670,8 +670,8 @@ int KCore<T>::minimum_width_fast() {
 }
 
 
-template<class T>
-int KCore<T>::get_max_kcore() const{
+template<class Graph_t>
+int KCore<Graph_t>::get_max_kcore() const{
 
 	//assert
 	if (ver_.empty()) {
@@ -681,8 +681,8 @@ int KCore<T>::get_max_kcore() const{
 	return deg_[ver_.back()];
 }
 
-template<class T>
-vint KCore<T>::get_kcore_set (std::size_t k) const {
+template<class Graph_t>
+vint KCore<Graph_t>::get_kcore_set (std::size_t k) const {
 
 	vint res;
 	
@@ -695,8 +695,8 @@ vint KCore<T>::get_kcore_set (std::size_t k) const {
 	return res;
 }
 
-template<class T>
-int KCore<T>::get_kcore_size (std::size_t k) const	{
+template<class Graph_t>
+int KCore<Graph_t>::get_kcore_size (std::size_t k) const	{
 
 	auto count = 0;
 	
@@ -709,8 +709,8 @@ int KCore<T>::get_kcore_size (std::size_t k) const	{
 	return count;
 }
 
-template<class T>
-int KCore<T>::make_kcore_filter (map_t& filter, bool reverse) {
+template<class Graph_t>
+int KCore<Graph_t>::make_kcore_filter (map_t& filter, bool reverse) {
 ///////////////////////////////
 // maps kcore number to the starting vertex of the next kcore partition (filter[kc(v)]->first vertex w,  kc(w)=kc(v)+1)
 // Example [v,kc(v)], reverse=TRUE, kcore dec:[1,1][2,1][3,2][4,1] then filter[2]=1 the single element in filter
@@ -771,8 +771,8 @@ int KCore<T>::make_kcore_filter (map_t& filter, bool reverse) {
 return filter.size();
 }
 
-template<class T>
-vint KCore<T>::find_heur_clique(int num_iter){
+template<class Graph_t>
+vint KCore<Graph_t>::find_heur_clique(int num_iter){
 ///////////////////////
 // A more efficient and clean implementation of the greedy clique heuristic based on Kcore
 //
@@ -981,8 +981,8 @@ vint KCore<sparse_ugraph>::find_heur_clique_sparse(int num_iter){
 ///////////////////////
 
 
-template<class T>
-void KCore<T>::print(print_t type, ostream& o){
+template<class Graph_t>
+void KCore<Graph_t>::print(print_t type, ostream& o){
 	switch(type){
 	case DEG:
 		for(int i=0; i<deg_.size();i++)
@@ -1009,8 +1009,8 @@ void KCore<T>::print(print_t type, ostream& o){
 	}
 }
 
-template<class T>
-void KCore<T>::print_kcore(bool real_deg, ostream& o)	const{
+template<class Graph_t>
+void KCore<Graph_t>::print_kcore(bool real_deg, ostream& o)	const{
 	if(psg_==nullptr){	//whole graph
 		for(vint::const_iterator it=ver_.begin(); it!=ver_.end(); it++){
 			cout<<"["<<*it<<":"<<deg_[*it];
