@@ -11,12 +11,46 @@
 
 //#include "../../copt/common/common_clq.h"
 
-using namespace std;
 
 //#define TEST_PATH_BIG_GRAPHS		"C:/Users/i7/Desktop/bigGraphs/"
 //#define TEST_PATH_DIMACS_GRAPHS		"C:/Users/i7/Desktop/dimacs/"
 
-typedef vector<int> vint;
+using namespace std;
+
+//aliases
+using vint =  vector<int>;
+
+class KcoreWTest : public ::testing::Test {
+protected:
+	void SetUp() override {
+		ug.reset(NV);
+		ug.add_edge(0, 1);
+		ug.add_edge(0, 2);
+		ug.add_edge(0, 3);
+		ug.set_name("star");
+	}
+	void TearDown() override {}
+
+	//undirected graph instance	
+	const int NV = 4;
+	ugraph ug;												//undirected graph with integer weights
+};
+
+TEST_F(KcoreWTest, width) {
+
+	KCore<ugraph> kc(ug);
+	kc.find_kcore();
+	
+	auto min_width	= kc.minimum_width	(false);			//1 - minimum width of the graph 
+	auto width		= kc.minimum_width	(true);				//3 - a width but not minimum
+	
+	EXPECT_EQ(min_width, kc.get_max_kcore());				//minimum width = k in the max k-core 
+	EXPECT_NE(width, kc.get_max_kcore());
+
+	//I/O
+	//kc.print_kcore(false, cout);							//prints the coreness of each vertex
+	//kc.print_kcore(true, cout);							//prints the coreness and degree of each vertex
+}
 
 TEST(KCore, kcore_decomposition_sparse){
 	sparse_ugraph ug(PATH_GRAPH_TESTS_CMAKE_SRC_CODE "star.clq");

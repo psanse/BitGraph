@@ -149,24 +149,19 @@ public:
 	int find_kcore_UB					(int UB);								//new kcore (vertices with kcore=UB (or nearest real degree > UB) are placed last in ver_)
 	
 	/*
-	* @brief width(v) = maximum number of neighbours of v that come AFTER v given the ordering in @vder_ 
-	*		 Computes the maximum width value of the vertices in @vder_ 
+	* @brief Computes the maximum number of neighbors that come AFTER any vertex in the ordering in @ver_ (first-to-last)
+	*		 ( Computes the minimum width of the graph when rev := FALSE  (@ver_ first-to-last). )			
 	* 
-	*		 I. The real width is provided by rev = TRUE (related to vertices that PRECEDE v)
-	*		 II.Heavy computationally - use only for tests
+	*		 I. The width of a graph G is w if the vertices can be arranged such that the maximum number of neighbours of any vertex
+	*				PRECEDING that vertex is w.	*
+	*		II. A non-increasing kcore ordering (i.e. vertices in the largest kcore first) is a miminum width ordering.
+	*		III.The minimum width of a graph  = the maximum kcore of a graph 
+	*		IV.Heavy computationally - use only for tests
 	* 
-	* @param rev TRUE: computes width in reverse order (last-to-first) 
-	* @return maximum width of the graph / subgraph
+	* @param rev if FALSE computes mimimum width, TRUE a width but not minimum
+	* @return minimum width or just a width of the graph @g_
 	*/
 	int minimum_width					(bool rev = false);						//computes width of the graph using ver_ list 
-	
-	/*
-	* @brief Width of the graph / subgraph as the degree of the last vertex 
-	*		 GIVEN a non-decreasing kcore ordering in @ver_ (CHECK)
-	* 
-	* @return  width of the graph / subgraph		
-	*/
-	int minimum_width_fast				();						
 	
 	//////////////////////
 	//clique heuristics
@@ -674,8 +669,8 @@ void KCore<Graph_t>::bin_sort(vint& lv, bool rev){
 template<class Graph_t>
 int KCore<Graph_t>::minimum_width (bool rev){
 
-	int max_width = EMPTY_ELEM;
-	int	width = EMPTY_ELEM;
+	int maxNumNeigh = EMPTY_ELEM;
+	int	numNeigh = EMPTY_ELEM;
 	_bbt bb_unsel(NV_); 
 	_bbt bb_sel(NV_);
 
@@ -688,8 +683,8 @@ int KCore<Graph_t>::minimum_width (bool rev){
 			bb_unsel.erase_bit(bb_sel);
 			
 			///////////////////////////////
-			width = bb_unsel.popcn64();
-			if (max_width < width) { max_width = width; }
+			numNeigh = bb_unsel.popcn64();
+			if (maxNumNeigh < numNeigh) { maxNumNeigh = numNeigh; }
 			////////////////////////////////
 
 			bb_sel.set_bit(*it);
@@ -704,38 +699,17 @@ int KCore<Graph_t>::minimum_width (bool rev){
 			bb_unsel.erase_bit(bb_sel);
 			
 			///////////////////////////////
-			width = bb_unsel.popcn64();
-			if (max_width < width) { max_width = width; }
+			numNeigh = bb_unsel.popcn64();
+			if (maxNumNeigh < numNeigh) { maxNumNeigh = numNeigh; }
 			///////////////////////////////
 
 			bb_sel.set_bit(*it);
 		}
 	}
 
-	return max_width;
+	return maxNumNeigh;
 }
 
-template<class Graph_t>
-int KCore<Graph_t>::minimum_width_fast() {
-	
-	//assert DEBUG
-	if (lv.empty()) {
-		LOG_ERROR("degree information not available - KCore<Graph_t>::width_fast");
-		return -1;
-	}
-	
-	auto v = ver_.back();
-	auto count = 0;
-
-	//counts the number of neighbours of v in vdeg_
-	for (auto it = ver_.rbegin() + 1; it != ver_(); ++it) {
-		if (g_.is_edge(*it, v)) {
-			count++;						
-		}
-	}
-
-	return count;	
-}
 
 
 template<class Graph_t>
@@ -1092,9 +1066,9 @@ void KCore<Graph_t>::print_kcore(bool real_deg, ostream& o)	const{
 		}*/
 	}else{				//subgraph
 		int v=EMPTY_ELEM;
-		if(m_subg->init_scan(bbo::NON_DESTRUCTIVE)!=EMPTY_ELEM){
+		if(psg_->init_scan(bbo::NON_DESTRUCTIVE)!=EMPTY_ELEM){
 			while(true){
-				v=m_subg->next_bit();
+				v= psg_->next_bit();
 				if(v==EMPTY_ELEM) break;
 				o<<"["<<v<<","<<deg_[v];
 				if(real_deg){
