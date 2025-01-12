@@ -216,7 +216,7 @@ private:
 // data members
 private:
 
-	Graph_t& g_;																		//the one and only graph G=(V, E)			
+	Graph_t& g_;																//the one and only graph G=(V, E)			
 	const int NV_;																//size of graph |V| - for convenience, possibly remove
 	_bbt* psg_;																	//to manage kcore in subgraphs (default nullptr)	
 	
