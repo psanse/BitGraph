@@ -103,18 +103,19 @@ int Ugraph<sparse_bitarray>::degree(int v, int UB, const BitBoardS& bbs) const {
 
 	while (itv != adj_[v].end() && itbb != bbs.end()) {
 
-		if (itv->index < itbb->index) {
+		if (itv -> index < itbb -> index) {
 			++itv;
 		}
-		else if (itv->index > itbb->index) {
+		else if (itv -> index > itbb -> index) {
 			++itbb;
 		}
 		else { //same index
-			ndeg += bitblock::popc64(itv->bb & itbb->bb);
+			ndeg += bitblock::popc64(itv -> bb & itbb -> bb);
 			if (ndeg >= UB) return UB;
 			++itv; ++itbb;
 		}
 	}
+
 	return ndeg;
 }
 

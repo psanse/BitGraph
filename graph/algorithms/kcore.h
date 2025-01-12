@@ -162,31 +162,51 @@ public:
 	
 	/*
 	* @brief Width of the graph / subgraph as the degree of the last vertex 
-	*		 in the non-decreasing kcore ordering in @ver_ (CHECK)
+	*		 GIVEN a non-decreasing kcore ordering in @ver_ (CHECK)
 	* 
 	* @return  width of the graph / subgraph		
 	*/
 	int minimum_width_fast						();						
 	
+	//////////////////////
 	//clique heuristics
 	vint find_heur_clique				(int num_iter = EMPTY_ELEM);			//greedy clique heuristic based on KCore ordering
-inline	vint find_heur_clique_opt		(int num_iter=EMPTY_ELEM);				//only available for sparse graphs
+inline	vint find_heur_clique_opt		(int num_iter = EMPTY_ELEM);			//only available for sparse graphs
 vint find_heur_clique_sparse			(int num_iter = EMPTY_ELEM);			//only available for sparse graphs	
-	
-	//experimental 
+
+////////////////
+//Experimental 
 	int make_kcore_filter				(map_t& filter, bool reverse=true);		//applied to clique, probably remove
 
-	//I/O
-	void print_kcore					(bool real_deg=false, std::ostream& o = std::cout)		const;
+///////////////
+//I/O
+	void print_kcore					(bool real_deg = false, std::ostream& o = std::cout)		const;
 
 //////////////
 // private interface
 private:
 
 	//k-core init steps
-	void init_kcore						();										//inits degrees and bins
-	void init_bin						();										//inits just the bin
+	/*
+	* @brief Inits deg_ and bins_ data structures (graph or induced subgraph depending on @psg_)
+	* @returns 0 if success, -1 if memory allocation fails
+	*/
+	int init_kcore						();										
+
+	/*
+	* @brief Inits bin_ data structure for graph / subgraph 
+	*				 
+	*      I. @deg_ MUST already be set
+	* 
+	* @returns 0 if success, -1 if memory allocation fails
+	* 
+	* @created 13/3/16
+	* @last_update 12/01/25
+	*/
+	int init_bin						();										//inits just the bin
+	
 	void bin_sort						();										//default bin sort
+	
 	void bin_sort						(vint& lv, bool rev);					//bin sort according to vertex set lv (rev TRUE: vertices taken in reverse order)
 	
 	//I/O
@@ -202,7 +222,7 @@ private:
 	
 	//algo data structures
 	vint deg_;																	//coreness of vertices																
-	vint bin_;																	//bins of differente degrees, implements bin sort algorithm
+	vint bin_;																	//bins [deg[v]] = number of vertices with deg[v] - for bin sort sorting algorithm
 	vint ver_;																	//vertices in non-decreasing kcore order (new to old format)
 	vint pos_;
 };
@@ -249,7 +269,7 @@ void KCore<Graph_t>::find_kcore(){
 	if(psg_ == nullptr){
 
 		//kcore computation for the full graph
-		for(auto v : ver_){		
+		for(auto& v : ver_){		
 
 			//iterates over N(v)
 			_bbt& neigh = g_.get_neighbors(v); 
@@ -343,82 +363,83 @@ int KCore<Graph_t>::find_kcore_UB (int UB_out){
 	}
 
 	//variables / update UB to the nearest existing degree
-	auto u = EMPTY_ELEM, v = EMPTY_ELEM;
-	auto UB = UB_out;
+	int u = EMPTY_ELEM, v = EMPTY_ELEM;
+	int UB = UB_out;
 	int w = ver_[bin_[UB]];
 	if(deg_[w] != UB){ UB = deg_[w];}
 		
 	//main loop
-	int deg = UB; int p_iter; int p_newUB; 
+	int deg = UB;
+	int p_iter; 
+	int p_newUB; 
 	bool first_time_newLB = true;
 	while(deg >= 1){
 		p_iter=bin_[deg];
 		do{
 			//classical kcore loop for vertices with degree deg
-			v=ver_[p_iter];
-			/*cout<<"current vertex v: "<<v<<endl;*/
-			first_time_newLB=true;
-			p_newUB=EMPTY_ELEM;
+			v = ver_[p_iter];
+			first_time_newLB = true;
+			p_newUB = EMPTY_ELEM;
 
 			//loop over neighbors of v with degree greater than UB
-			if(g_.get_neighbors(v).init_scan(bbo::NON_DESTRUCTIVE)!=EMPTY_ELEM){
-				while(1){
-					u=g_.get_neighbors(v).next_bit();
-					if(u==EMPTY_ELEM) break;
+			if(g_.get_neighbors(v).init_scan(bbo::NON_DESTRUCTIVE) != EMPTY_ELEM){
+				while((u = g_.get_neighbors(v).next_bit()) != EMPTY_ELEM){
+									
+					if(deg_[u] > UB){
 
-					int dv=deg_[v];
-					if(deg_[u]>UB){
-						SWAP_BIN(u);			
+						/////////////////
+						SWAP_BIN(u);	
+						/////////////////
+						
 						//update degree: if vertex u has deg LB+1, instead of updating to LB it takes the degree of v
-						if(deg_[u]==UB+1){
-							deg_[u]=dv;	
-							if(first_time_newLB && dv!=UB){
-								first_time_newLB=false;
-								p_newUB=pos_[u];		//new position of u
+						if(deg_[u] == UB + 1){
+							deg_[u] = deg_[v];
+							if(first_time_newLB && deg_[v] != UB){
+								first_time_newLB = false;
+								p_newUB = pos_[u];		//new position of u
 							}
 						}else deg_[u]--;
 					}
 				}
-			}//endif
+			}
 
 			///////////////////////////////////////////////////////
 			//extra loop for new vertices with degree LB caused by v
 
-			if(p_newUB!=EMPTY_ELEM){
-				while(p_newUB!=bin_[UB+1]){
+			if(p_newUB != EMPTY_ELEM){
+				while(p_newUB != bin_[UB + 1]){
 
 					//classical kcore loop for new vertices with degree LB
 					v=ver_[p_newUB];
 
 					//loop over neighbors of v with degree greater than UB
 					if(g_.get_neighbors(v).init_scan(bbo::NON_DESTRUCTIVE)!=EMPTY_ELEM){
-						while(1){
-							u=g_.get_neighbors(v).next_bit();
-							if(u==EMPTY_ELEM) break;
 
-							int dv=deg_[v];
+						while((u = g_.get_neighbors(v).next_bit()) != EMPTY_ELEM){													
 							if(deg_[u]>UB){
-								SWAP_BIN(u);			//swaps u to the last position of vertices with one less degree	(does not update degree)
-								//update degree
-								(deg_[u]==UB+1)? deg_[u]=dv : deg_[u]--;
+								
+								/////////////////
+								SWAP_BIN(u);										//swaps u to the last position of vertices with one less degree	(does not update degree)
+								/////////////////
+								
+								(deg_[u]==UB+1)? deg_[u]= deg_[v] : deg_[u]--;		//updates degree
 							}
 						}
 					}//endif
 
 					p_newUB++;	//next vertex in UB
-				}//next vertex with degree UB
-			}//end if filter condition
-
-			// end of extra loop
-			//////////////////////////////////////////////////
+				}
+			}// end of extra loop 			
 
 			p_iter++;	//next vertex v
+
 		}while(p_iter!=bin_[deg+1]);
 
 		//find next legal deg below current deg
-		const int DEG=deg;
-		do{deg--;}
-		while(bin_[DEG]==bin_[deg] && deg>0);
+		const int DEG = deg;
+		do{
+			deg--;
+		} while(bin_[DEG] == bin_[deg] && deg > 0);
 	}//end of main loop
 	
 
@@ -431,78 +452,113 @@ int KCore<Graph_t>::find_kcore_UB (int UB_out){
 }	
 
 template<class Graph_t>
-void KCore<Graph_t>::init_kcore(){
+int KCore<Graph_t>::init_kcore(){
 
-	int max_gdeg=0, v=EMPTY_ELEM;
+	int max_deg = 0, v = EMPTY_ELEM;
 
-	if(psg_==nullptr){
-		//kcore of the whole graph
-		for(int v=0; v<NV_; v++){
-			deg_[v]=g_.degree(v);
-			if(max_gdeg<deg_[v])
-					max_gdeg=deg_[v];
+	if( psg_== nullptr){							//kcore of the whole graph
+		
+		//sets degrees and finds maximum degree of G
+		for (auto v = 0; v < NV_; ++v){
+			deg_[v] = g_.degree(v);
+			if (max_deg < deg_[v]) {
+				max_deg = deg_[v];
+			}
 		}
 
-		bin_.assign(max_gdeg+1, 0);
-		for(int v=0; v<NV_; v++){
-			bin_[deg_[v]]+=1;					//note that isolani should not be in the list
+		//allocates bin space	 
+		try {
+			/////////////////////////////////
+			bin_.assign(max_deg + 1, 0);
+			/////////////////////////////////
+		}
+		catch (std::bad_alloc& ba) {
+			LOGG_ERROR("bad_alloc exception - KCore<T>::init_kcore", ba.what());
+			return -1;
+		}
+
+		//sets bins values
+		for(auto v = 0; v < NV_; ++v ){
+			bin_[deg_[v]] += 1;										//note that isolani should not be in the list
 		}
 
 	}else{
-		//kcore of bbset of vertices
-		psg_->init_scan(bbo::NON_DESTRUCTIVE);	//bbset cannot be empty, no empty check condition
-		while(true){
-			v=psg_->next_bit();
-			if(v==EMPTY_ELEM) break;
 
-			//compute degree in the set
-			deg_[v]=g_.degree(v, *psg_);
-			if(max_gdeg<deg_[v])
-				max_gdeg=deg_[v];
+		//kcore for the subgraph induced by psg_
+		psg_ -> init_scan(bbo::NON_DESTRUCTIVE);					//psg_ cannot be empty, no empty check condition
+		
+		while ((v = psg_ -> next_bit()) != EMPTY_ELEM) {
+
+			//sets degree values with endoints in the set
+			deg_[v] = g_.degree (v, *psg_);
+			if (max_deg < deg_[v]) {
+				max_deg = deg_[v];
+			}
 		}
 
-		bin_.assign(max_gdeg+1, 0);
+		//allocates bin space for the induced subgraph	
+		try {
+			/////////////////////////////////
+			bin_.assign(max_deg + 1, 0);
+			/////////////////////////////////
+		}
+		catch (std::bad_alloc& ba) {
+			LOGG_ERROR("bad_alloc exception - KCore<T>::init_kcore", ba.what());
+			return -1;
+		}
+
+		//sets bins values for the induced subgraph
 		psg_->init_scan(bbo::NON_DESTRUCTIVE);
 		v=EMPTY_ELEM;
-		while(true){
-			v=psg_->next_bit();
-			if(v==EMPTY_ELEM) break;
-
-			bin_[deg_[v]]+=1;	
+		while( (v = psg_ -> next_bit()) != EMPTY_ELEM ){			
+			bin_[deg_[v]] += 1;	
 		}
 	}
+
+	return 0;
 }
 
 template<class Graph_t>
-void KCore<Graph_t>::init_bin(){
-//////////////////
-// Initialization of bin only (compared with init_kcore())
-// Assumes degrees in deg_ are set appropiately
-//
-// last_update: 13/3/16
-//
-// REMARKS: Only for the full graph at present
-//
-// APPLICATIONS: 1-kcore_UB
+int KCore<Graph_t>::init_bin(){
+	
+	//finds maximum degree of G
+	int max_deg = EMPTY_ELEM;
+	max_deg = *( std::max_element(deg_.begin(), deg_.end()) );
 
-	int max_gdeg=0, v=EMPTY_ELEM;
-
-	if(psg_==nullptr){
-		//kcore of the whole graph
-		for(int v=0; v<NV_; v++){
-			//deg_[v]=g_.degree(v);			//degrees already computed
-			if(max_gdeg<deg_[v])
-					max_gdeg=deg_[v];
-		}
-
-		bin_.assign(max_gdeg+1, 0);
-		for(int v=0; v<NV_; v++){
-			bin_[deg_[v]]+=1;					//note that isolani should not be in the list
-		}
-
-	}else{
-		LOG_ERROR("Kcore::init_kcore_UB() - not valid for subgrahs");
+	//allocates bin space	 
+	try {
+		/////////////////////////////////
+		bin_.assign(max_deg + 1, 0);
+		/////////////////////////////////
 	}
+	catch (std::bad_alloc& ba) {
+		LOGG_ERROR("bad_alloc exception - KCore<T>::init_kcore", ba.what());
+		return -1;
+	}
+
+	//sets bins values as required
+	int v = EMPTY_ELEM;
+	if (psg_ == nullptr) {
+
+		//full graph
+		for (auto v = 0; v < NV_; ++v) {
+			bin_[deg_[v]] += 1;									//note that isolani should not be in the list
+		}
+
+	}
+	else {
+
+		//induced subgraph
+		psg_ -> init_scan(bbo::NON_DESTRUCTIVE);				//psg_ cannot be empty, no empty check condition
+
+		v = EMPTY_ELEM;
+		while ((v = psg_->next_bit()) != EMPTY_ELEM) {
+			bin_[deg_[v]] += 1;
+		}
+
+	}
+
+	return 0;
 }
 
 template<class Graph_t>
@@ -512,41 +568,45 @@ void KCore<Graph_t>::bin_sort(){
 //
 // REMARKS: init_k_core has to be called first
 
-	//init bin_ to point at the correct position in vertex array according to size
-	int start=0, num=0;
-	for(int d=0; d<bin_.size(); d++){		
-		num=bin_[d];					
-		bin_[d]=start;
-		start+=num;
-	}
+	//sets bin_ with the position in the new ordering (I): 
+	//based on the number of vertices with that degree previously stored with init_bin()
+	//Example  bin_ = {3, 4, 2, 1} -> bin_ = {0, 3, 7, 9}
+	auto start = 0;
+	for (auto& bval : bin_) {
+		auto num = bval;
+		bval = start;
+		start += num;
+	}	
 
-	if(psg_==nullptr){
-		//bin_sort of all the graph
-		for(int v=0; v<ver_.size(); v++){
-			pos_[v]=bin_[deg_[v]];			//stores the new position of v (pos_ is not strictly needed for bin_sort, but it is for kcore)
-			ver_[pos_[v]]=v;		
+	if(psg_ == nullptr){
+
+		//bin_sort full graph
+		for(auto v = 0; v < ver_.size(); ++v){
+			pos_[v] = bin_[deg_[v]];					//stores the new position of v (pos_ is not strictly needed for bin_sort, but it is for kcore)
+			ver_[pos_[v]] = v;							//places v in the new position in ver_ (mapping -  new-to-old format)			
 			bin_[deg_[v]]++;
 		}
 	}else{
-		//bin_sort of subgraph
-		psg_->init_scan(bbo::NON_DESTRUCTIVE);
-		int v=EMPTY_ELEM;
-		while(true){
-			v=psg_->next_bit();
-			if(v==EMPTY_ELEM) break;
 
-			pos_[v]=bin_[deg_[v]];			
-			ver_[pos_[v]]=v;		
+		//bin_sort subgraph induced by psg_
+		psg_->init_scan(bbo::NON_DESTRUCTIVE);			//psg_ cannot be empty, no empty check condition
+
+		auto v = EMPTY_ELEM;
+		while( (v = psg_->next_bit())!= EMPTY_ELEM ){
+			pos_[v] = bin_[deg_[v]];			
+			ver_[pos_[v]] = v;		
 			bin_[deg_[v]]++;
 		}
 	}
 
-	//corrects bin indexes after ordering (after update will point to the first element of their type)
-	//after correction: bin[0]=0 always, bin[1]=0 if there are no isolani etc.
-	for(int d=bin_.size()-1; d>=1; d--){
-		bin_[d]=bin_[d-1];
+	//restores the bin indexes with the position in the new ordering (I)
+	//after fixing: bin[0] = 0 always, bin[1] = 0 if there are no isolani etc.
+	//bin_ = {1, 4, 8, 10} -> bin_ = {0, 1, 4, 8}
+	for(auto d = bin_.size() - 1; d >= 1 ; --d){
+		bin_[d] = bin_[d - 1];
 	}
-	bin_[0]=0;
+	bin_[0] = 0;
+
 }
 
 template<class Graph_t>
@@ -602,9 +662,6 @@ void KCore<Graph_t>::bin_sort(vint& lv, bool rev){
 
 template<class Graph_t>
 int KCore<Graph_t>::minimum_width (bool rev){
-///////////////////
-// Width of the ordering in ver_ using real degrees (rev=TRUE reverse direction)
-// HEAVY COMPUTATIONALLY - use only for checking purposes	
 
 	int max_width = EMPTY_ELEM;
 	int	width = EMPTY_ELEM;

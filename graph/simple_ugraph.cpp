@@ -146,7 +146,7 @@ int Ugraph<T>::max_graph_degree () const {
 
 	int max_degree=0, temp=0; 
 
-	for(int i=0; i<ptype::NV_; ++i){
+	for(int i = 0; i < ptype::NV_; ++i){
 		temp = degree (i);
 		if( temp > max_degree)
 				max_degree = temp;
