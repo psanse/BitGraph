@@ -671,7 +671,7 @@ void KCore<Graph_t>::bin_sort(vint& lv, bool rev){
 template<class Graph_t>
 int KCore<Graph_t>::minimum_width (bool rev){
 
-	int maxNumNeigh = EMPTY_ELEM;
+	int maxNumNeigh = EMPTY_ELEM; 
 	int	numNeigh = EMPTY_ELEM;
 	_bbt bb_unsel(NV_); 
 	_bbt bb_sel(NV_);
