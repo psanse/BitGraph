@@ -159,7 +159,6 @@ public:
 	* @brief number of neighbors of v that come after v 
 	*
 	* @param v: input vertex
-	*
 	*/
 	int degree_up				(int v)									const;  
 	

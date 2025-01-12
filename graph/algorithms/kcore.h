@@ -261,6 +261,8 @@ int KCore<Graph_t>::set_subgraph(_bbt* psg) {
 		LOGG_ERROR("bad_alloc exception - KCore<T>::set_subgraph", ba.what());
 		return -1;
 	}
+
+	return 0;
 }
 
 template<class Graph_t>
@@ -694,7 +696,7 @@ int KCore<Graph_t>::minimum_width (bool rev){
 
 		for(auto it = ver_.begin(); it != ver_.end(); ++it){
 
-			///computes subgraph population (TODO: optimize)
+			//computes subgraph population (TODO: optimize)
 			bb_unsel = g_.get_neighbors(*it);
 			bb_unsel.erase_bit(bb_sel);
 			

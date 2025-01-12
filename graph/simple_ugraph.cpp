@@ -318,7 +318,9 @@ int Ugraph<T>::degree (int v, int UB, const BitBoardN& bbn) const	{
 
 	int nDeg = 0;
 	for(auto i = 0; i < _mypt::NBB_; ++i){
-		nDeg += bitblock::popc64(_mypt::adj_[v].get_bitboard(i)& bbn.get_bitboard(i));
+
+		nDeg += bitblock::popc64(_mypt::adj_[v].get_bitboard(i) & bbn.get_bitboard(i));
+
 		if (nDeg >= UB) { return UB; }
 	}
 
