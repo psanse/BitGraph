@@ -7,10 +7,11 @@ simple_sparse_ugraph.h
 simple_ugraph.h
 simple_graph_ew.h
 simple_graph_w.h
-kcore.h
-graph_gen.h
+algorithms/kcore.h
+algorithms/graph_gen.h
 #algorithms/graph_sort.h
 algorithms/graph_map.h
+algorithms/graph_func.h
 algorithms/graph_fast_sort.h
 algorithms/graph_fast_sort_weighted.h
 )
@@ -70,31 +71,33 @@ if (graph_build_tests)
 
 # Add executable called "helloDemo" that is built from the source files
 # "demo.cxx" and "demo_b.cxx". The extensions are automatically found.
-add_executable (test_graph  tests/gtest_main.cpp
-#  tests/test_degree.cpp			
-#  tests/test_graph_sort.cpp
-#  tests/test_graph_properties_in_folder.cpp  
-#  tests/test_kcore.cpp
+add_executable ( test_graph  tests/gtest_main.cpp
+			
+#  tests/test_graph_sort.cpp   
 #  tests/test_kcore_in_folder.cpp
-#  tests/test_random_graph.cpp
-#  tests/test_fixed_graph.cpp
-
-#  tests/test_graph_map.cpp
 
 #  TESTS UNDER DEVELOPMENT  / CHECKING
-   tests/test_wegraph.cpp
-#  tests/test_func.cpp
-
+   tests/test_kcore.cpp
+#   tests/test_ugraph.cpp
+#   tests/test_sparse_graph.cpp 
+ 
 #  TESTS CHECKED
-#  tests/test_graph_fast_sort.cpp
-#  tests/test_graph_fast_sort_weighted.cpp
-#  tests/test_decode.cpp
+#  tests/test_func.cpp
 #  tests/test_graph.cpp
 #  tests/test_ugraph.cpp
 #  tests/test_wgraph.cpp
+#  tests/test_wegraph.cpp
+#  tests/test_sparse_graph.cpp 
+#  tests/test_wegraph.cpp
+#  tests/test_graph_fast_sort.cpp
+#  tests/test_graph_fast_sort_weighted.cpp
+#  tests/test_decode.cpp
+#  tests/test_random_graph.cpp
 #  tests/test_graph_conversions.cpp
 #  tests/test_sparse_graph.cpp
-#  tests/test_format.cpp  
+#  tests/test_format.cpp 
+#  tests/test_graph_map.cpp 
+
 )
 
 target_include_directories (test_graph PUBLIC ../googletest/include/)

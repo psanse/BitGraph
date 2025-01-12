@@ -8,7 +8,7 @@
 #ifndef __GRAPH_FAST_SORT_WEIGHTED_H__
 #define __GRAPH_FAST_SORT_WEIGHTED_H__
 
-#include "../algorithms/graph_fast_sort.h"
+#include "graph/algorithms/graph_fast_sort.h"
 #include "decode.h"
 #include "utils/common.h"						
 #include "utils/logger.h"
@@ -180,7 +180,7 @@ int GraphFastRootSort_W<GraphW_t>::reorder(const vint& new_order, GraphW_t& gn, 
 	//g = gn;
 
 	////new order to stream if available
-	//if (o != NULL)
+	//if (o != nullptr)
 	//	copy(new_order.begin(), new_order.end(), ostream_iterator<int>(*o, " "));
 
 	return 0;

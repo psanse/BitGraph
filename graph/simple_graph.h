@@ -12,6 +12,8 @@
  * GRAPH is at the core many state of the art leading exact clique 
  * algorithms. 
  * 
+ * TODO use SFINAE to filter types (10/01/2025)
+ * 
  */
 
 #ifndef __SIMPLE_GRAPH_H__
@@ -21,7 +23,6 @@
 #include <iostream>
 #include <string>
 #include <vector>
-
 
 //////////////////
 //
@@ -34,7 +35,8 @@
 template<class T = bitarray>
 class Graph: public filterGraphTypeError<T> {
 	
-	friend class GraphConversion;			
+	friend class GraphConversion;	
+	
 
 public:
 		
@@ -44,15 +46,15 @@ public:
 			
 	//constructors
 	Graph								();															//creates empty graph
-	Graph								(std::size_t n);											//creates graph with n=|V| and m=0 	
-	Graph								(std::string filename);										//creates graph from file		
+explicit Graph							(std::size_t n);											//creates graph with n=|V| and m=0 	
+explicit Graph							(std::string filename);										//creates graph from file		
 	Graph								(std::size_t n, int* adj[], std::string filename = "");		//old-style adjacency matrix
 
 	
-	Graph								(Graph&& g)		= default;									//move constructor
-	Graph								(const Graph& g)= default;									//copy constructor
-	Graph& operator =					(const Graph& g)= default;									//copy operator =
-	Graph& operator =					(Graph&& g)		= default;									//move operator =
+	Graph								(Graph&& g)	noexcept	= default;							//move constructor
+	Graph								(const Graph& g)		= default;							//copy constructor
+	Graph& operator =					(const Graph& g)		= default;							//copy operator =
+	Graph& operator =					(Graph&& g)	noexcept	= default;							//move operator =
 	
 
 	//destructor	
@@ -75,13 +77,13 @@ virtual	~Graph()										= default;
 	*/
 	void set_name						(std::string instance);
 	
-	void set_path						(std::string path_name) { path_ = path_name; }
-	std::string get_name				()					const {return name_;}
-	std::string get_path				()					const {return path_;}
-	int get_number_of_edges				()					const { return NE_; }
+	void set_path						(std::string path_name)		{ path_ = std::move(path_name); }
+	std::string get_name				()					const	{return name_;}
+	std::string get_path				()					const	{return path_;}
+	int get_number_of_edges				()					const	{ return NE_; }
 
-	std::size_t number_of_vertices		()					const		{return NV_; }
-	std::size_t number_of_blocks		()					const		{return NBB_;}
+	std::size_t number_of_vertices		()					const	{return NV_; }
+	std::size_t number_of_blocks		()					const	{return NBB_;}
 	
 	/*
 	* @brief Counts the number of edges	(includes self loops)
@@ -133,6 +135,7 @@ public:
 	* @brief deallocates memory and resets to default values
 	*/
 	void clear							();											 
+		
 
 	/*
 	* @brief reduces the graph to n vertices 
@@ -223,9 +226,40 @@ virtual void remove_edge				(int v, int w);
 	void remove_edges					(int v);									
 	
 	/*
+	* @brief removes all edges
+	*/
+	void remove_edges					();
+
+
+	/*
 	* @brief makes all edges bidirected (conversion to undirected graph)
 	*/
 	void make_bidirected				();	
+
+	//random generation
+
+	/*
+	* @brief generates directed edges with probability p.
+	*
+	*		 I. (v, v) not allowed.
+	*
+	* @param v input endpoint
+	* @param w input endpoint
+	* @returns 0 is success, -1 if error
+	*/
+	virtual void gen_random_edges		(double p);
+	
+	/*
+	* @brief generates edge (v, w) with probability p.
+	* 
+	*		 I. (v, v) not allowed.
+	*		 II. Valid for directed/undirected graphs (TMP design)
+	* 
+	* @param v input endpoint
+	* @param w input endpoint
+	* @returns 0 is success, -1 if error 	
+	*/
+	int gen_random_edge		(int v, int w, double p);
 
 //////////////	
 // Induced subgraphs

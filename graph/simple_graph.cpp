@@ -11,15 +11,14 @@
  //////////////////
  //switches 
 
- //#define DIMACS_REFERENCE_VERTICES_0			//0 index DIMACS format [DEF-OFF (real DIMACS format)] 
-
+//#define DIMACS_INDEX_0_FORMAT			//0 index DIMACS format [DEF-OFF (real DIMACS format)] 
 
 #include "bitscan/bitscan.h"
-#include "formats/dimacs_format.h"
-#include "formats/mmio.h"
-#include "formats/edges_format.h"
-#include "formats/mmx_format.h"
-#include "simple_graph.h"
+#include "graph/formats/dimacs_format.h"
+#include "graph/formats/mmio.h"
+#include "graph/formats/edges_format.h"
+#include "graph/formats/mmx_format.h"
+#include "graph/simple_graph.h"
 #include "utils/logger.h"
 #include "utils/prec_timer.h"
 #include <fstream>
@@ -89,7 +88,7 @@ void Graph<T>::set_name(std::string name){
 		path_ = name.substr(0, found + 1);  //includes slash
 	}
 	else {
-		name_ = name;
+		name_ = std::move(name);
 		path_.clear();
 	}
 
@@ -184,7 +183,7 @@ int Graph<T>::reset	(std::size_t NV, string name) {
 	//}
 
 	//update instance name
-	set_name(name);	
+	set_name(std::move(name));	
 
 	return 0;
 }
@@ -271,7 +270,16 @@ void Graph<T>::remove_edges (int v){
 
 	//updates edges
 	NE_ = 0;					//resets edges to avoid lazy evaluation later
-	//number_of_edges(false);
+	
+}
+
+template<class T>
+void Graph<T>::remove_edges() {
+	for (std::size_t v = 0; v < NV_; ++v) {
+		adj_[v].erase_bit();
+	}
+
+	NE_ = 0;					
 }
 
 template <class T>
@@ -420,7 +428,7 @@ int Graph<T>::read_dimacs(const string& filename){
 
 		//read and add edge
 		f>>v1>>v2;
-#ifdef DIMACS_REFERENCE_VERTICES_0 
+#ifdef DIMACS_INDEX_0_FORMAT 
 		add_edge(v1,v2);
 #else
 		add_edge(v1-1, v2-1);
@@ -713,6 +721,39 @@ void Graph<T>::make_bidirected (){
 	}
 	
 	NE_ = 0;	//resets edges to avoid lazy evaluation later
+}
+
+template<class T>
+void Graph<T>::gen_random_edges(double p) {
+
+	//removes all edges
+	remove_edges();
+
+	//sets directed edges with probability p
+	for (std::size_t i = 0; i < NV_ ; ++i ) {
+		for (std::size_t j = 0; j < NV_; ++j ) {
+			if (::com::rand::uniform_dist(p)) {
+				add_edge(i, j);
+			}
+		}
+	}
+}
+
+template<class T>
+int Graph<T>::gen_random_edge(int v, int w, double p){
+
+	//assert - TODO condition to DEBUG mode
+	if (v == w || v >= NV_ || w >= NV_ || p < 0 || p > 1) {
+		LOG_ERROR("wrong input params - Graph<T>::gen_random_edge");
+		return -1;
+	}
+
+	//generates edge
+	if (::com::rand::uniform_dist(p)) {
+		 add_edge(v, w);
+	}
+	
+	return 0;
 }
 
 template<class T>

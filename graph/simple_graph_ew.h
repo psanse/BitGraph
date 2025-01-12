@@ -60,11 +60,11 @@ public:
 	static const W NOWT;								//default/no weight value for weights (0.0)	
 																				
 	//constructors
-	Base_Graph_EW			()										{};											//no memory allocation
-	Base_Graph_EW			(mat_t& lwe);																		//creates empty graph with edge weights
-	Base_Graph_EW			(_gt& g, mat_t& lwe) : g_(g), we_(lwe)	{}											//creates graph with edge weights
-	Base_Graph_EW			(int n, W val = NOWT)					{ reset(n, val); }							//creates empty graph with |V|= n and val weights	
-	Base_Graph_EW			(std::string filename);																	//read weighted ASCII file or generate weights using formula- CHECK! (21/11/2021))
+	Base_Graph_EW				()										{};											//no memory allocation
+explicit Base_Graph_EW			(mat_t& lwe);																		//creates empty graph with edge weights
+	Base_Graph_EW				(_gt& g, mat_t& lwe) : g_(g), we_(lwe)	{}											//creates graph with edge weights
+explicit Base_Graph_EW			(int n, W val = NOWT)					{ reset(n, val); }							//creates empty graph with |V|= n and val weights	
+explicit Base_Graph_EW			(std::string filename);																//read weighted ASCII file or generate weights using formula- CHECK! (21/11/2021))
 			
 	//copy constructor, move constructor, copy operator =, move operator =
 	Base_Graph_EW					(const Base_Graph_EW& g)	= default;
@@ -83,6 +83,11 @@ virtual	~Base_Graph_EW()										= default;
 	*/
 	void set_wv			(int v, W val)						{ we_[v][v] = val; }					
 	
+	/*
+	*  @brief sets all self-loop edge weights to the same weigth value
+	*/
+	void set_wv			( W val = NOWT);
+
 	/*
 	*  @brief sets edge weight given a directed edge (v, w)
 	*  @param v input vertex
@@ -147,7 +152,7 @@ virtual	~Base_Graph_EW()										= default;
 	* @comment preserved for backward compatibility (use reset(...))
 	*/
 	int init			(int n, W val = NOWT, bool reset_name = true);															
-	void clear			()									 { g_.clear(); we_.clear(); }
+	void clear			()										{ g_.clear(); we_.clear(); }
 		
 	/*
 	* @brief resets to empty graph |V|= n and assigns weight val to all vertices and edges
@@ -166,6 +171,11 @@ virtual	~Base_Graph_EW()										= default;
 	void add_edge		(int v, int w)							{ g_.add_edge(v, w); }
 
 	double density		(bool lazy = true)						{ return g_.density(lazy); }
+
+	void gen_random_edges(double p)								{ g_.gen_random_edges(p); }
+
+
+	
 
 /////////////////////////
 // boolean properties
@@ -190,7 +200,22 @@ virtual	~Base_Graph_EW()										= default;
 	*		 
 	* @returns true if consistent, false otherwise
 	*/
-	void neg_w();																						
+	void neg_w();	
+
+
+	///////////////////////////
+	//weight generation
+
+	/*
+	* @brief generates weights based on modulus operation [Pullan 2008, MODULUS = 200]
+	*
+	*			I. we(v, w) = 1 + ((v + w) % MODULUS)	(1-based index)
+	* 
+	*			II.we(v, v) are set to NOWT
+	* 
+	*			III. non-edges are not overritten
+	*/
+	virtual void gen_modulus_weights (int MODULUS = DEFAULT_WEIGHT_MODULUS);
 
 ////////////
 // I/O 
@@ -280,8 +305,8 @@ public:
 	//constructors (inherited)
 	using Base_Graph_EW<ugraph, W>::Base_Graph_EW;
 
-	/////////////
-	//overrides setters
+/////////////
+//setters and getters
 
 	/*
 	*  @brief sets edge weight given an undirected edge {v, w}
@@ -312,6 +337,20 @@ public:
 	* @param lw input vertex and edge weights
 	*/
 	int set_we	(mat_t& lw)				override;
+
+/////////////
+// weight operations
+
+	/*
+	* @brief generates weights based on modulus operation [Pullan 2008, MODULUS = 200]
+	*
+	*			I. we(v, w) = 1 + ((v + w) % MODULUS)	(1-based index)
+	* 
+	*			II.we(v, v) and non-edge weights are set to NOWT
+	*		
+	*			III. non-edges are not overritten
+	*/
+	void gen_modulus_weights(int MODULUS = DEFAULT_WEIGHT_MODULUS)  override;
 
 /////////////
 //useful framework-specific interface for undirected weighted graphs
@@ -349,7 +388,7 @@ public:
 	*		 of undirected edges with endpoints in vertices in lv
 	*/
 	virtual	std::ostream& print_weights	(vint& lv, std::ostream& o = std::cout,
-												bool only_vertex_weights = false)					const override;
+												bool only_vertex_weights = false				)	const override;
 
 	/*
 	* @brief Writes undirected graph to stream in dimacs format

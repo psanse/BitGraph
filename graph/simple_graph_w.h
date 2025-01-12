@@ -23,9 +23,6 @@
 #include "utils/common.h"
 #include "graph/simple_ugraph.h"
 
-//////////////////////////////////////////////////////////////
-constexpr int DEFAULT_VALUE_MODE_AUTO_GEN_WEIGHTS = 200;			//for modulus weight generation (see Base_Graph_W::gen_mode_weights)						
-//////////////////////////////////////////////////////////////
 
 //alias
 using vint = std::vector<int>;
@@ -55,14 +52,18 @@ public:
 	//alias types for backward compatibility
 	using _gt = graph_type;								
 	using _bbt = basic_type;							
-	using _wt =	 W;										
+	using _wt =	 W;	
+
+	//constants - globals
+	static const W NOWT;								//empty weight value for weights (0.0)	
+	static const W DEFWT;								//default weight value for weights (1.0)	
 	
 	//constructors
 	Base_Graph_W						() {};																				//No memory allocation
-	Base_Graph_W						(std::vector<W>& lw);																//creates empty graph with |V|= n with vertex weights
+explicit Base_Graph_W					(std::vector<W>& lw);																//creates empty graph with |V|= n with vertex weights
 	Base_Graph_W						(_gt& g, vector<W>& lw)		:g_(g), w_(lw) {}										//creates graph with vertex weights	
 	Base_Graph_W						(_gt& g)					:g_(g), w_(g.number_of_vertices(), 1) {}				//creates graph with unit weights
-	Base_Graph_W						(int n, W val=1.0)						   { reset(n, val); }						//creates empty graph with |V|= n with unit weights	
+explicit Base_Graph_W					(int n, W val = DEFWT)				  { reset(n, val); }							//creates empty graph with |V|= n with unit weights	
 	
 	/*
 	* @brief Reads weighted graph from ASCII file in DIMACS format
@@ -87,7 +88,7 @@ public:
 // setters and getters
 	
 	void set_w							(int v, W val)				{ w_.at(v)=val;}				
-	void set_w							(W val = 1.0)				{ w_.assign(g_.number_of_vertices(), val);}		
+	void set_w							(W val = DEFWT)				{ w_.assign(g_.number_of_vertices(), val);}		
 	
 	/*
 	* @brief sets vertex weights to all vertices
@@ -132,7 +133,7 @@ const _bbt& get_neighbors				(int v)		const			{ return g_.get_neighbors(v); }
 	* @returns 0 if success, -1 if memory allocation fails
 	* @comment preserved for backward compatibility (use reset(...))
 	*/
-	int init							(std::size_t n, W val = 1.0, bool reset_name = true);								
+	int init							(std::size_t n, W val = DEFWT, bool reset_name = true);
 	
 
 	/*
@@ -141,7 +142,7 @@ const _bbt& get_neighbors				(int v)		const			{ return g_.get_neighbors(v); }
 	* @param name name of the instance
 	* @returns 0 if success, -1 if memory allocation fails
 	*/
-	int reset							(std::size_t n, W val = 1.0,  string name = "");
+	int reset							(std::size_t n, W val = DEFWT,  string name = "");
 
 	/*
 	* @brief deallocates memory and resets to default values
@@ -158,6 +159,9 @@ const _bbt& get_neighbors				(int v)		const			{ return g_.get_neighbors(v); }
 	void add_edge						(int v, int w)					{ g_.add_edge(v, w); }
 	
 	double density						(bool lazy = true)				{ return g_.density(lazy); }
+	
+	void gen_random_edges				(double p)						{ g_.gen_random_edges(p); }
+
 
 /////////////
 // boolean properties
@@ -176,7 +180,7 @@ const _bbt& get_neighbors				(int v)		const			{ return g_.get_neighbors(v); }
 	*			
 	*			MODE = 1 -> w(v) = 1	(unweighted graph)
 	*/
-	int gen_mode_weights				(int MODE = DEFAULT_VALUE_MODE_AUTO_GEN_WEIGHTS);
+	int gen_modulus_weights				(int MODE = DEFAULT_WEIGHT_MODULUS);
 	
 ////////////
 // I/O

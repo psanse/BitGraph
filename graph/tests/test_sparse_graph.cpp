@@ -7,8 +7,8 @@
 * @TODO - ADD TESTS
 */
 
-#include "../graph.h"
-#include "../graph_gen.h"
+#include "graph/graph.h"
+#include "graph/algorithms/graph_gen.h"
 #include "gtest/gtest.h"
 #include <iostream>
 
@@ -290,6 +290,25 @@ TEST(Ugraph_sparse, degree_brock){
 	///////////////////////////////////////////////////////////
 }
 
+TEST(Ugraph_sparse, degree_up) {
+
+	const int NV = 40;
+	sparse_ugraph sug(NV);
+
+	sug.add_edge(2, 3);
+	sug.add_edge(2, 5);
+	sug.add_edge(27, 30);
+	sug.add_edge(38, 39);
+
+	///////////////////////////////
+	EXPECT_EQ(2, sug.degree_up(2));
+	EXPECT_EQ(0, sug.degree_up(10));			
+	EXPECT_EQ(1, sug.degree_up(38));
+	EXPECT_EQ(1, sug.degree_up(27));
+	////////////////////////////////
+
+}
+
 TEST(Ugraph_sparse,ugraph_from_file){
 
 	sparse_ugraph g1(PATH_GRAPH_TESTS_CMAKE_SRC_CODE "brock200_1.clq");
@@ -363,7 +382,7 @@ TEST(Ugraph_sparse, DISABLED_adjacency_matrix){
             for(int rep=0;rep<REP_MAX;rep++){
 				 cout<<"--------------------------------------------------------"<<endl;
 				sparse_ugraph ug;
-				SparseRandomGen<>().create_ugraph(ug,N,P);
+				SparseRandomGen<sparse_ugraph>().create_ugraph(ug,(std::size_t)N,P);
 				sparse_ugraph ug2(ug);
 			
 

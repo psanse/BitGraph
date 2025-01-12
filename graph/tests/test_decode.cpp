@@ -8,10 +8,10 @@
 #include "utils/common.h"
 #include "utils/result.h"
 #include "gtest/gtest.h"
-#include "../graph.h"
-#include "../graph_gen.h"
-#include "../algorithms/graph_sort.h"
-#include "../algorithms/graph_fast_sort.h"
+#include "graph/graph.h"
+#include "graph/algorithms/graph_gen.h"
+#include "graph/algorithms/graph_sort.h"
+#include "graph/algorithms/graph_fast_sort.h"
 
 using namespace std;
 

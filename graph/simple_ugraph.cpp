@@ -125,11 +125,28 @@ void Ugraph<T>::remove_edge (int v, int w){
 }
 
 template<class T>
+void Ugraph<T>::gen_random_edges(double p){
+
+	//removes all edges
+	remove_edges();
+
+	//sets undirected edges with probability p
+	for (std::size_t i = 0; i < NV_ - 1; i++) {
+		for (std::size_t j = i + 1; j < NV_; j++) {
+			if (::com::rand::uniform_dist(p)) {
+				add_edge(i, j);
+			}
+		}
+	}
+
+}
+
+template<class T>
 int Ugraph<T>::max_graph_degree () const {
 
 	int max_degree=0, temp=0; 
 
-	for(int i=0; i<ptype::NV_; ++i){
+	for(int i = 0; i < ptype::NV_; ++i){
 		temp = degree (i);
 		if( temp > max_degree)
 				max_degree = temp;
@@ -266,30 +283,48 @@ void Ugraph<T>::write_mtx(ostream & o){
 template<class T>
 int Ugraph<T>::degree_up (int v, const BitBoardN& bbn) const	{
 
-	int nDeg=0, nBB = WDIV(v);
+	int nDeg = 0, nBB = WDIV(v);
 
-	for (int i = nBB + 1; i < ptype::NBB_; ++i) {
+	for (auto i = nBB + 1; i < ptype::NBB_; ++i) {
 		nDeg += bitblock::popc64( _mypt::adj_[v].get_bitboard(i) & bbn.get_bitboard(i) );
 	}
 
 	//truncate the bitblock of v
 	nDeg += bitblock::popc64 ( bitblock::MASK_1( WMOD(v) + 1, 63 ) &
 							   ptype::adj_[v].get_bitboard(nBB) & bbn.get_bitboard(nBB)	
-							);
+							 );
 	
+	return nDeg;
+}
+
+template<class T>
+int Ugraph<T>::degree_up(int v) const 
+{
+	int nDeg = 0, nBB = WDIV(v);
+
+	for (auto i = nBB + 1; i < ptype::NBB_; ++i) {
+		nDeg += bitblock::popc64( _mypt::adj_[v].get_bitboard(i) );
+	}
+
+	//truncate the bitblock of v
+	nDeg += bitblock::popc64( bitblock::MASK_1(WMOD(v) + 1, 63) &
+							  ptype::adj_[v].get_bitboard(nBB)	   );
+
 	return nDeg;
 }
 
 template<class T>
 int Ugraph<T>::degree (int v, int UB, const BitBoardN& bbn) const	{
 
-	int ndeg=0;
-	for(int i=0; i<_mypt::NBB_;i++){
-		ndeg+=bitblock::popc64(_mypt::adj_[v].get_bitboard(i)& bbn.get_bitboard(i));
-		if(ndeg >= UB) return UB;		
+	int nDeg = 0;
+	for(auto i = 0; i < _mypt::NBB_; ++i){
+
+		nDeg += bitblock::popc64(_mypt::adj_[v].get_bitboard(i) & bbn.get_bitboard(i));
+
+		if (nDeg >= UB) { return UB; }
 	}
 
-return ndeg;
+	return nDeg;
 }
 
 template<class T>
@@ -375,7 +410,6 @@ int Ugraph<T>::create_subgraph(Ugraph & ug, vint& lv) const
 
 	return 0;
 }
-
 
 
 ////////////////////////////////////////////

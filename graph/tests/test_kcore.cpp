@@ -2,146 +2,161 @@
 #include <fstream>
 #include <string>
 #include "gtest/gtest.h"
-#include "../graph_gen.h"
-#include "../algorithms/graph_sort.h"
-#include "../kcore.h"
-#include "../../utils/common.h"
-#include "../../utils/logger.h"
-#include "../../copt/common/common_clq.h"
+#include "graph/algorithms/graph_gen.h"
+//#include "graph/algorithms/graph_sort.h"
+#include "graph/algorithms/kcore.h"
+#include "utils/common.h"
+#include "utils/logger.h"
+#include "utils/result.h"
+
+//#include "../../copt/common/common_clq.h"
+
+
+//#define TEST_PATH_BIG_GRAPHS		"C:/Users/i7/Desktop/bigGraphs/"
+//#define TEST_PATH_DIMACS_GRAPHS		"C:/Users/i7/Desktop/dimacs/"
 
 using namespace std;
 
-#define TEST_PATH_BIG_GRAPHS		"C:/Users/i7/Desktop/bigGraphs/"
-#define TEST_PATH_DIMACS_GRAPHS		"C:/Users/i7/Desktop/dimacs/"
+//aliases
+using vint =  vector<int>;
 
-typedef vector<int> vint;
-
-TEST(DISABLE_KCoreOrdering, kcore_example){
-///////////////
-// Testing new fast orderings (30/10/17)
-
-	LOG_INFO("KCoreOrdering::kcore_example()-----------------");
-	
-	string filename(TEST_PATH_BIG_GRAPHS);
-	//filename+=("brock200_1.clq");
-	filename+="cond-mat-2005.clq";
-	//filename+="soc-Slashdot0811_u.edges.clq";
-
-	ugraph ug(filename);
-	ug.print_data();
-	const int NV=ug.number_of_vertices()-1;
-	KCore<ugraph> kc(ug);	
-	kc.kcore();
-	vint lkc=kc.get_kcore_numbers();
-
-	Result r;
-	r.tic();
-
-	//sorting according to non-decreasing coreness
-	GraphSort<ugraph> gs(ug);
-	vint ord=kc.get_kcore_ordering();
-	reverse(ord.begin(),ord.end());
-	Decode::reverse_in_place(ord);	
-		
-	ugraph ugn(1);
-	Decode d;
-	gs.reorder_edge_based(ord,ugn,d,NULL);								/*slightly faster than reordering in place (much faster for big graphs) */
-	//gs.reorder(ord,gn,d,NULL);									
-	//gs.reorder_edge_based(ord,d,NULL);
-	//gs.reorder_edge_based(ord,NULL);								
-	
-	r.toc();
-	LOG_INFO("kc:["<<r.get_user_time()<<"]");
-
-	ugn.print_data();
-	EXPECT_EQ(ugn.number_of_edges(), ug.number_of_edges());
-
-
-	//test
-	LOG_INFO("deg(first):"<<ug.degree(0)<<" deg(last):"<<ug.degree(NV-1));
-	EXPECT_GT(ug.degree(0), ug.degree(NV-1));
-
-	//test-coreness
-	KCore<ugraph> kc_ord(ugn);
-	kc_ord.kcore();
-	LOG_INFO("core(first):"<<kc.coreness(0)<<" deg(last):"<<kc.coreness(NV-1));
-	EXPECT_GT(kc.coreness(0), kc.coreness(NV-1));
-
-	//test-corenesses of the two graphs
-	vint lkc_ord=kc_ord.get_kcore_numbers();
-	//sort(lkc.begin(), lkc.end(), greater_equal<int>());			/* is also possible */
-	vint new_lkc(lkc.size());
-	for(int i=0; i<lkc.size(); i++){
-		new_lkc[ord[i]]=lkc[i];
+class KcoreWTest : public ::testing::Test {
+protected:
+	void SetUp() override {
+		ug.reset(NV);
+		ug.add_edge(0, 1);
+		ug.add_edge(0, 2);
+		ug.add_edge(0, 3);
+		ug.set_name("star");
 	}
-	EXPECT_EQ(new_lkc, lkc_ord);
-	//com::stl::print_collection<vint>(lkc,cout,true);
-		
-	cin.get();
-	LOG_INFO("-----------------------------------------------");
+	void TearDown() override {}
+
+	//undirected graph instance	
+	const int NV = 4;
+	ugraph ug;												//undirected graph with integer weights
+};
+
+TEST_F(KcoreWTest, width) {
+
+	KCore<ugraph> kc(ug);
+	kc.find_kcore();
+	
+	auto min_width	= kc.minimum_width	(false);			//1 - minimum width of the graph 
+	auto width		= kc.minimum_width	(true);				//3 - a width but not minimum
+	
+	EXPECT_EQ(min_width, kc.get_max_kcore());				//minimum width = k in the max k-core 
+	EXPECT_NE(width, kc.get_max_kcore());
+
+	//I/O
+	//kc.print_kcore(false, cout);							//prints the coreness of each vertex
+	//kc.print_kcore(true, cout);							//prints the coreness and degree of each vertex
+}
+
+TEST(KCore, kcore_decomposition_sparse){
+	
+	sparse_ugraph ug(PATH_GRAPH_TESTS_CMAKE_SRC_CODE "star.clq");
+	
+	KCore<sparse_ugraph> kc(ug);
+	kc.find_kcore();
+	vector<int> v= kc.get_kcore_set(2);
+	EXPECT_EQ(1, count(v.begin(), v.end(), 0));
+	EXPECT_EQ(1, count(v.begin(), v.end(), 1));
+	EXPECT_EQ(1, count(v.begin(), v.end(), 6));
+	EXPECT_EQ(0, count(v.begin(), v.end(), 7));
+	
+	////////////
+	v.clear();
+	sparse_ugraph ug1(100);							//an empty graph
+	ug1.add_edge(0,1);
+	ug1.add_edge(0,2);
+	ug1.add_edge(0,3);
+	ug1.add_edge(0,4);
+	ug1.add_edge(0,5);
+
+	KCore<sparse_ugraph> kc1(ug1);
+	kc1.find_kcore();
+	
+	v= kc1.get_kcore_set(1);
+	for (int i = 0; i < 6; i++) {
+		EXPECT_EQ(i, v[i]);
+	}
+	
 }
 
 TEST(KCoreUB, kcore_example){
-	ugraph ug("brock200_1.clq");
+
+	ugraph ug(PATH_GRAPH_TESTS_CMAKE_SRC_CODE "brock200_1.clq");
 	
 	//test with real kcore number
 	KCore<ugraph> kc(ug);	
-	kc.kcore();
-	int kcn=kc.get_kcore_number();
-	int UB_corr=kc.kcore_UB(kcn);
-	int kcUBn=kc.get_kcore_number();
+	kc.find_kcore();
+	int kcn=kc.get_max_kcore();
+	int UB_corr=kc.find_kcore_UB(kcn);
+	int kcUBn=kc.get_max_kcore();
 	EXPECT_EQ(UB_corr, kcUBn);
-	EXPECT_EQ(kcUBn, kc.width(true));   //checks width (real degrees)
+	EXPECT_EQ(kcUBn, kc.minimum_width(true));   //checks width (real degrees)
 	
 	//test with UB on kcore number
 	KCore<ugraph> kc1(ug);
-	kc1.kcore();
-	kcn=kc1.get_kcore_number();
-	UB_corr=kc1.kcore_UB(kcn);
-	kcUBn=kc1.get_kcore_number();
+	kc1.find_kcore();
+	kcn = kc1.get_max_kcore();
+	UB_corr=kc1.find_kcore_UB(kcn);
+	kcUBn=kc1.get_max_kcore();
+
 	EXPECT_EQ(UB_corr, kcUBn);	
-	EXPECT_EQ(kcUBn, kc.width(true)); //checks width (real degrees)
+	EXPECT_EQ(kcUBn, kc.minimum_width(true)); //checks width (real degrees)
 
 	
 	//test with UB on kcore number
 	KCore<ugraph> kc2(ug);
-	kc2.kcore();
-	kcn=kc2.get_kcore_number();
-	UB_corr=kc2.kcore_UB(kcn);
-	kcUBn=kc2.get_kcore_number();
+	kc2.find_kcore();
+	kcn=kc2.get_max_kcore();
+	UB_corr=kc2.find_kcore_UB(kcn);
+	kcUBn=kc2.get_max_kcore();
+
 	EXPECT_EQ(UB_corr, kcUBn);	
-	EXPECT_EQ(kcUBn, kc.width(true)); //checks width (real degrees)
+	EXPECT_EQ(kcUBn, kc.minimum_width(true)); //checks width (real degrees)
 }
 
 
 TEST(KCoreUB, kcore_example_I){
-	ugraph ug("ia-southernwomen.edges");
+
+	ugraph ug(PATH_GRAPH_TESTS_CMAKE_SRC_CODE "ia-southernwomen.edges");
 	
 	//test with real kcore number
 	KCore<ugraph> kc(ug);
-	kc.kcore();
-	int kcn=kc.get_kcore_number();
-	int UB_corr=kc.kcore_UB(kcn);
-	int kcUBn=kc.get_kcore_number();
+	kc.find_kcore();
+	int kcn=kc.get_max_kcore();
+	int UB_corr=kc.find_kcore_UB(kcn);
+	int kcUBn=kc.get_max_kcore();
+
 	EXPECT_EQ(UB_corr, kcUBn);
-	EXPECT_EQ(kcUBn, kc.width(true)); //checks width (real degrees)
+	EXPECT_EQ(kcUBn, kc.minimum_width(true)); //checks width (real degrees)
 
 }
 
 TEST(KCoreUB, kcore_example_II){
-	ugraph ug("r10_0.2_23.txt");
+
+	ugraph ug(PATH_GRAPH_TESTS_CMAKE_SRC_CODE "r10_0.2_23.txt");
 	
 	//test with real kcore number
 	KCore<ugraph> kc(ug);
-	kc.kcore();
-	int kcn=kc.get_kcore_number();
-	int UB_corr=kc.kcore_UB(kcn);
-	int kcUBn=kc.get_kcore_number();
+	kc.find_kcore();
+	int kcn=kc.get_max_kcore();
+	int UB_corr=kc.find_kcore_UB(kcn);
+	int kcUBn=kc.get_max_kcore();
+
 	EXPECT_EQ(UB_corr, kcUBn);
-	EXPECT_EQ(kcUBn, kc.width(true)); //checks width (real degrees)
+	EXPECT_EQ(kcUBn, kc.minimum_width(true)); //checks width (real degrees)
 }
 
-TEST(KCoreUB, random){
+///////////////
+//
+// DISABLED TESTS
+//
+////////////////
+
+TEST(KCoreUB, DISABLED_random){
 	random_attr_t rd(10, 100, .05, .20, 50, 10, .05);
 	const BOOL store_graph=true;
 	char PATH[250]="C:\\Users\\pablo\\Desktop\\random_tests\\";
@@ -174,25 +189,98 @@ TEST(KCoreUB, random){
 				//}
 			
 				KCore<ugraph> kc(ug);
-				kc.kcore();
-				int kcn=kc.get_kcore_number();
+				kc.find_kcore();
+				int kcn=kc.get_max_kcore();
 
 				KCore<ugraph> kcUB(ug);
-				int UB_corr= kcUB.kcore_UB(kcn);	
-				int kcUBn=kcUB.get_kcore_number();
+				int UB_corr= kcUB.find_kcore_UB(kcn);
+				int kcUBn=kcUB.get_max_kcore();
 				EXPECT_EQ(UB_corr, kcUBn);
-				EXPECT_EQ(kcUBn, kcUB.width(true));		//checks width (real degrees)
+				EXPECT_EQ(kcUBn, kcUB.minimum_width(true));		//checks width (real degrees)
 				
 				
 				if(kcn!=kcUBn){
-					sstr<<":"<<"kcore: "<<kc.get_kcore_number()<<" kcore_UB: "<<kcUB.get_kcore_number();
-					LOG_INFO(sstr.str());
+					sstr<<":"<<"kcore: "<<kc.get_max_kcore()<<" kcore_UB: "<<kcUB.get_max_kcore();
+					LOGG_INFO(sstr.str());
 				}
 	
 			}
 		}
 	}
 }
+
+/////////////////////
+//
+// COMMENTED OUT TESTS - DEPRECATED
+//
+// TODO: Update tests
+/////////////////////
+
+//TEST(DISABLE_KCoreOrdering, kcore_example){
+/////////////////
+//// Testing new fast orderings (30/10/17)
+//
+//	LOG_INFO("KCoreOrdering::kcore_example()-----------------");
+//	
+//	string filename(TEST_PATH_BIG_GRAPHS);
+//	//filename+=("brock200_1.clq");
+//	filename+="cond-mat-2005.clq";
+//	//filename+="soc-Slashdot0811_u.edges.clq";
+//
+//	ugraph ug(filename);
+//	ug.print_data();
+//	const int NV=ug.number_of_vertices()-1;
+//	KCore<ugraph> kc(ug);	
+//	kc.kcore();
+//	vint lkc=kc.get_kcore_numbers();
+//
+//	Result r;
+//	r.tic();
+//
+//	//sorting according to non-decreasing coreness
+//	GraphSort<ugraph> gs(ug);
+//	vint ord=kc.get_kcore_ordering();
+//	reverse(ord.begin(),ord.end());
+//	Decode::reverse_in_place(ord);	
+//		
+//	ugraph ugn(1);
+//	Decode d;
+//	gs.reorder_edge_based(ord,ugn,d,nullptr);								/*slightly faster than reordering in place (much faster for big graphs) */
+//	//gs.reorder(ord,gn,d,nullptr);									
+//	//gs.reorder_edge_based(ord,d,nullptr);
+//	//gs.reorder_edge_based(ord,nullptr);								
+//	
+//	r.toc();
+//	LOGG_INFO("kc:[" , r.get_user_time() , "]");
+//
+//	ugn.print_data();
+//	EXPECT_EQ(ugn.number_of_edges(), ug.number_of_edges());
+//
+//
+//	//test
+//	LOGG_INFO("deg(first):" , ug.degree(0), " deg(last):" , ug.degree(NV-1));
+//	EXPECT_GT(ug.degree(0), ug.degree(NV-1));
+//
+//	//test-coreness
+//	KCore<ugraph> kc_ord(ugn);
+//	kc_ord.kcore();
+//	LOGG_INFO("core(first):" , kc.coreness(0) , " deg(last):" , kc.coreness(NV-1));
+//	EXPECT_GT(kc.coreness(0), kc.coreness(NV-1));
+//
+//	//test-corenesses of the two graphs
+//	vint lkc_ord=kc_ord.get_kcore_numbers();
+//	//sort(lkc.begin(), lkc.end(), greater_equal<int>());			/* is also possible */
+//	vint new_lkc(lkc.size());
+//	for(int i=0; i<lkc.size(); i++){
+//		new_lkc[ord[i]]=lkc[i];
+//	}
+//	EXPECT_EQ(new_lkc, lkc_ord);
+//	//com::stl::print_collection<vint>(lkc,cout,true);
+//		
+//	cin.get();
+//	LOG_INFO("-----------------------------------------------");
+//}
+
 
 //TEST(KCore, kcore_example){
 //	ugraph ug("brock200_1.clq");
@@ -331,34 +419,7 @@ TEST(KCoreUB, random){
 //}
 //
 //
-//TEST(KCore, kcore_decomposition_sparse){
-//	sparse_ugraph ug("star.clq");
-//	
-//	KCore<sparse_ugraph> kc(ug);
-//	kc.kcore();
-//	vector<int> v= kc.get_kcore_numbers(2);
-//	EXPECT_EQ(1, count(v.begin(), v.end(), 0));
-//	EXPECT_EQ(1, count(v.begin(), v.end(), 1));
-//	EXPECT_EQ(1, count(v.begin(), v.end(), 6));
-//	EXPECT_EQ(0, count(v.begin(), v.end(), 7));
-//	
-//	////////////
-//	v.clear();
-//	sparse_ugraph ug1(100);							//an empty graph
-//	ug1.add_edge(0,1);
-//	ug1.add_edge(0,2);
-//	ug1.add_edge(0,3);
-//	ug1.add_edge(0,4);
-//	ug1.add_edge(0,5);
-//
-//	KCore<sparse_ugraph> kc1(ug1);
-//	kc1.kcore();
-//	
-//	v= kc1.get_kcore_numbers(1);
-//	for(int i=0; i<6; i++)
-//		EXPECT_EQ(i, v[i]);
-//	
-//}
+
 //
 //TEST(Ugraph_sparse, find_clique){
 //	

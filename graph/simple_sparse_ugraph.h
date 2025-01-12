@@ -9,6 +9,7 @@
 #define __SIMPLE_SPARSE_UGRAPH_H__
 
 #include "simple_ugraph.h"
+#include "utils/prec_timer.h"
 #include <iostream>
 #include <string>
 #include <vector>
@@ -35,7 +36,36 @@ BITBOARD Ugraph<sparse_bitarray>::number_of_edges(bool lazy) {
 }
 
 template<>
-int Ugraph<sparse_bitarray>::degree(int v) const {
+inline int Ugraph<sparse_bitarray>::degree_up(int v) const
+{
+	int nDeg = 0, nBB = WDIV(v);
+
+	//find the bitblock of v
+	auto it = adj_[v].begin();
+	for (; it != adj_[v].end(); ++it) {
+		if (it->index == nBB) break;
+	}
+
+	//check no neighbors
+	if (it == adj_[v].end()) {
+		return 0;							//no neighbors
+	}
+
+	//truncate the bitblock of v and count the number of neighbors
+	nDeg += bitblock::popc64(	bitblock::MASK_1(WMOD(v) + 1, 63) &	it->bb );
+
+	//add the rest of neighbours in the bitblocks that follow
+	++it;
+	for (; it != adj_[v].end(); ++it) {
+		nDeg += bitblock::popc64(it->bb);
+	}
+	
+	return nDeg;
+}
+
+
+template<>
+inline int Ugraph<sparse_bitarray>::degree(int v) const {
 
 	if (Graph<sparse_bitarray>::adj_[v].is_empty()) return 0;
 
@@ -102,18 +132,19 @@ int Ugraph<sparse_bitarray>::degree(int v, int UB, const BitBoardS& bbs) const {
 
 	while (itv != adj_[v].end() && itbb != bbs.end()) {
 
-		if (itv->index < itbb->index) {
+		if (itv -> index < itbb -> index) {
 			++itv;
 		}
-		else if (itv->index > itbb->index) {
+		else if (itv -> index > itbb -> index) {
 			++itbb;
 		}
 		else { //same index
-			ndeg += bitblock::popc64(itv->bb & itbb->bb);
+			ndeg += bitblock::popc64(itv -> bb & itbb -> bb);
 			if (ndeg >= UB) return UB;
 			++itv; ++itbb;
 		}
 	}
+
 	return ndeg;
 }
 

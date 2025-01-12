@@ -24,7 +24,9 @@ typedef double bound_t;
 //switches
 //#define print_result_logs					//DEF-ON but switch off for clique enumeration
 
-#define DEFAULT_MAX_NUM_SOL		5000		//* default: relevant for Clique Partition / Enumeration routines */
+constexpr usint DEFAULT_MAX_NUM_SOL = 5000;		//* default: relevant for Clique Partition / Enumeration routines */
+
+//#define DEFAULT_MAX_NUM_SOL		5000		//* default: relevant for Clique Partition / Enumeration routines */
 //#define DEFAULT_MAX_NUM_SOLs	200	
 //////////////
 

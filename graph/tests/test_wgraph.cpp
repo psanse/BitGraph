@@ -1,14 +1,14 @@
 /*
 * test_wgraph.cpp  tests for vertex weighted graphs
 * @created 9/10/16
-* @last_update 06/01/24
+* @last_update 09/01/25
 * @dev pss
 * 
-* @TODO - ADD TESTS
+* @TODO - ADD TESTS and check disabled / commented out tests at the end of file (09/01/25)
 */
 
 #include "graph/graph.h"						//contains all relevant graph types
-#include "graph/graph_gen.h"
+#include "graph/algorithms/graph_gen.h"
 #include "gtest/gtest.h"
 #include "utils/common_paths.h";
 #include "utils/logger.h"
@@ -128,8 +128,9 @@ TEST_F(UGraphWTest, reset) {
 
 TEST(UGraphW, constructor_from_file) {
 
-	//read DIMACS graph from file - no DIMACS weights, assumed to be unit weights
+	//read DIMACS graph from file - no DIMACS weights, sets default weights 
 	ugraph_wi ugw(PATH_GRAPH_TESTS_CMAKE_SRC_CODE  "sample.clq");
+
 	const int NV = ugw.graph().number_of_vertices();
 
 	EXPECT_EQ(7, NV);
@@ -141,17 +142,18 @@ TEST(UGraphW, constructor_from_file) {
 
 TEST(UGraphW, gen_weights_dimacs){
 		
-	//read DIMACS graph from file - no DIMACS weights, assumed to be unit weights
+	//read DIMACS graph from file - no DIMACS weights, sets default weights 
 	ugraph_wi ugw (PATH_GRAPH_TESTS_CMAKE_SRC_CODE  "brock200_1.clq");
+
 	const int NV = ugw.graph().number_of_vertices();
 
 	EXPECT_EQ(200, NV);
-	EXPECT_EQ(1, ugw.get_w(0));
-	EXPECT_EQ(1, ugw.get_w(1));
-	EXPECT_EQ(1, ugw.get_w(199));
+	EXPECT_EQ(ugraph_wi::DEFWT, ugw.get_w(0));
+	EXPECT_EQ(ugraph_wi::DEFWT, ugw.get_w(1));
+	EXPECT_EQ(ugraph_wi::DEFWT, ugw.get_w(199));
 
 	//generate modulus weights 
-	WeightGen< ugraph_wi >::create_wgraph(ugw, WeightGen<ugraph_wi>::WMOD, 200);
+	WeightGen< ugraph_wi >::create_weights(ugw, WeightGen<ugraph_wi>::WMOD, 200);
 		
 	EXPECT_EQ(2, ugw.get_w(0));
 	EXPECT_EQ(3, ugw.get_w(1));
@@ -166,8 +168,8 @@ TEST(UGraphW, gen_random) {
 		
 	//creates random graph of size NV with modulus weights
 	ugraph_wi ugw;
-	RandomGen<ugraph_wi>::create_ugraph(ugw, NV, density);							/* empty vertex weights by default */
-	WeightGen<ugraph_wi>::create_wgraph(ugw, WeightGen<ugraph_wi>::WMOD);
+	RandomGen<ugraph_wi>::create_graph(ugw, NV, density);							/* empty vertex weights by default */
+	WeightGen<ugraph_wi>::create_weights(ugw, WeightGen<ugraph_wi>::WMOD);
 
 	/////////////////////
 	EXPECT_EQ(NV, ugw.graph().number_of_vertices());
@@ -196,7 +198,7 @@ TEST(GraphW, DISABLED_gen_weights_to_file){
 	const int NV=ugw.graph().number_of_vertices();
 	
 	//generate weights WDEG mode
-	WeightGen< Graph_W<ugraph, int> >::create_wgraph(ugw, WeightGen<Graph_W<ugraph, int>>::WMOD, ".d", TEST_GRAPH_PATH_LOG);
+	WeightGen< Graph_W<ugraph, int> >::create_weights(ugw, WeightGen<Graph_W<ugraph, int>>::WMOD, DEFAULT_WEIGHT_MODULUS, ".d", TEST_GRAPH_PATH_LOG);
 		
 
 	/////////////////////

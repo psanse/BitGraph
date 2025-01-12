@@ -1,21 +1,19 @@
 /*
 * test_graph_conversions.cpp  tests for class GraphConversion to convert between different graph types
 * @created 04/01/2025 (from older tests)
-* @last_update 04/01/2025
+* @last_update 11/01/2025
 * @dev pss
-* TODO - CHECK 
+* 
 */
 
-#include "../graph.h"
-#include "../graph/algorithms/graph_conversions.h"		//for graph to sparse graph conversions - possibly remove to other test file
+#include "graph/algorithms/graph_conversions.h"			
 #include "gtest/gtest.h"
-#include "utils/common_paths.h"
 #include <iostream>
 
 using namespace std;
 
 TEST(Conversions, sparse2ugraph) {
-
+	
 	sparse_ugraph sug(4);
 	sug.add_edge(0, 1);
 	sug.add_edge(1, 2);
@@ -32,7 +30,6 @@ TEST(Conversions, sparse2ugraph) {
 	EXPECT_TRUE(ug.is_edge(1, 3));
 	EXPECT_TRUE(ug.is_edge(0, 2));
 
-
 	sparse_ugraph sug1(300);
 	sug1.add_edge(0, 1);
 	sug1.add_edge(1, 2);
@@ -46,7 +43,6 @@ TEST(Conversions, sparse2ugraph) {
 	EXPECT_TRUE(ug.is_edge(1, 2));
 	EXPECT_TRUE(ug.is_edge(1, 3));
 	EXPECT_TRUE(ug.is_edge(0, 2));
-
 
 }
 
@@ -81,7 +77,6 @@ TEST(Conversions, ugraph2sparse_ugraph) {
 	EXPECT_TRUE(sug.is_edge(1, 2));
 	EXPECT_TRUE(sug.is_edge(1, 3));
 	EXPECT_TRUE(sug.is_edge(0, 2));
-
 
 }
 

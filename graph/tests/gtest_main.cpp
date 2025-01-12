@@ -1,8 +1,8 @@
 #include <iostream>
 
 #include "gtest/gtest.h"
-#include "../simple_ugraph.h"
-#include "../kcore.h"
+#include "graph/simple_ugraph.h"
+#include "graph/algorithms/kcore.h"
 
 
 GTEST_API_ int main(int argc, char **argv) {

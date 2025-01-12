@@ -1,172 +1,181 @@
-//test_func.cpp: tests for functions in graph_func.h (namespace gfunc)
-//
-// last_update@:23/01/2019 (adapted for the new Graph_W type) 
+/*
+* test_func.cpp  tests for namespace gfunc functions
+* @created 20/7/18
+* @update Graph_W type 23/01/19
+* @last_update 09/01/25
+* @dev pss
+*
+* TODO - ADD TESTS... (09/01/25)
+*/
 
-
-#include "../graph.h"
-#include "../graph/algorithms/graph_func.h"
+#include "graph/algorithms/graph_func.h"
 #include "gtest/gtest.h"
 #include <iostream>
 
-using vint = vector<int>;
+//#include "utils/prec_timer.h"
+//#include "utils/logger.h"
+//#include "graph/simple_ugraph.h"
+//#include "graph/simple_sparse_ugraph.h"
+//#include "graph/simple_graph_w.h"
+//#include "graph/simple_graph_ew.h"
+
+
+
+//typedef Graph<bitarray> graph;						//simple graph
+//typedef Ugraph<bitarray> ugraph;					//simple undirected graph
+//typedef Graph<sparse_bitarray> sparse_graph;		//simple sparse graph
+//typedef Ugraph<sparse_bitarray> sparse_ugraph;		//simple sparse undirected graph
+//typedef Graph_W<ugraph, double> ugraph_w;
+//typedef Graph_W<ugraph, int> ugraph_wi;
+//
+//
+//typedef Graph_EW<ugraph, double> ugraph_ew;
+//typedef Graph_EW<ugraph, int> ugraph_ewi;
+
+
 using namespace std;
+using vint = std::vector<int>;
 
-#define TEST_GRAPH_FUNC_STEP_BY_STEP
-#define print_graph_func_logs
-
-
-TEST(Graph_func, is_triangle_free) {
-	LOG_INFO("Graph_func::is_triangle_free()---------");
-
-	const int NV = 5;
-	ugraph ug(NV);
-	ug.add_edge(0, 1);
-	ug.add_edge(0, 2);
-	ug.add_edge(0, 3);
-	ug.add_edge(1, 3);
-		
-	vint tri;
-	//////////////////
-	//TEST	
-	int tri_free = gfunc::is_triangle_free(ug, ug.get_neighbors(0), tri);
-	EXPECT_TRUE(tri_free);														//[1]-->[3]
-	////////////////////
-
-	//////////////////
-	//TEST
-	ug.add_edge(1, 2);
-	ug.add_edge(1, 3);
-	ug.add_edge(2, 3);
-	EXPECT_FALSE(gfunc::is_triangle_free(ug, ug.get_neighbors(0), tri));
-	////////////////////
-
-#ifdef print_graph_func_logs
-	stringstream sstr;
-	com::stl::print_collection<vint>(tri, sstr);
-	LOG_INFO(sstr.str());
-#endif
-			
-	LOG_INFO("------------------------------------");
-#ifdef	TEST_GRAPH_FUNC_STEP_BY_STEP
-	LOG_ERROR("press any key to continue");
-	cin.get();
-#endif
-}
-
-TEST(Graph_func, is_edge_free) {
-	LOG_INFO("Graph_func::is_edge_free()---------");
-
-	const int NV = 5;
-	ugraph ug(NV);
-	ug.add_edge(0, 1);
-	ug.add_edge(0, 2);
-	ug.add_edge(0, 3);
-	ug.add_edge(1, 3);
-
-	//////////////////
-	//TEST
-	vint edge;
-	int edge_free = gfunc::is_edge_free(ug, ug.get_neighbors(0), edge);
-	EXPECT_FALSE(edge_free);											//[1]-->[3]
-	////////////////////
-
-	//////////////////
-	//TEST
-	ug.remove_edge(1, 3);
-	EXPECT_TRUE(gfunc::is_edge_free(ug, ug.get_neighbors(0), edge));
-	////////////////////
-
-
-	LOG_INFO("------------------------------------");
-#ifdef	TEST_GRAPH_FUNC_STEP_BY_STEP
-	LOG_ERROR("press any key to continue");
-	cin.get();
-#endif
-}
-
-
-TEST(Graph_func, sort_by_weights){
-	LOG_INFO("Graph_func::sort_by_weights()---------");
-	
-	const int NV=5;
-	Graph_W<ugraph, int> ugw(NV, 0.0);		//0.0 vertex weights (unit weights by default)
-	ugw.add_edge(0,1);
-	ugw.add_edge(1,2);
-	ugw.add_edge(0,2);
-
-	ugw.set_w(0,3);
-	ugw.set_w(1,2);
-	ugw.set_w(2,1);
-
-	//I/O
-	ugw.print_weights();
-
-	//sort vector
-	vint lv; lv.push_back(0); lv.push_back(1); lv.push_back(2);
-	gfunc::sort_w(ugw,lv, true);
-	vint expected;
-	expected.push_back(2); expected.push_back(1); expected.push_back(0);
-	EXPECT_EQ(expected, lv);
-
-	gfunc::sort_w(ugw,lv, false);
-	expected.clear();
-	expected.push_back(0); expected.push_back(1); expected.push_back(2);
-	EXPECT_EQ(expected, lv);
-
-	//sort old_vector
-	int lv_old[3];
-	copy(lv.begin(), lv.end(), lv_old);
-	gfunc::sort_w(ugw,lv_old, 3, true);
-	int expected_old[3];
-	expected_old[0]=2; expected_old[1]=1; expected_old[2]=0;
-	for(int i=0; i<3; i++){
-		EXPECT_EQ(expected_old[i], lv_old[i]);
+class GFuncTest : public ::testing::Test {
+protected:
+	void SetUp() override {
+		ug.reset(NV);
+		ug.add_edge(0, 1);
+		ug.add_edge(0, 2);
+		ug.add_edge(0, 3);
+		ug.add_edge(1, 3);
+		ug.set_name("toy");
 	}
-	
-	LOG_INFO("------------------------------------");
-	LOG_INFO("PRESS ANY KEY TO CONTINUE");
-	cin.get();
+	void TearDown() override {}
+
+	//undirected graph instance	
+	const int NV = 5;
+	ugraph ug;											//undirected graph with integer weights
+};
+
+class GFuncTestW : public ::testing::Test {
+protected:
+	void SetUp() override {
+		ugw.reset(NV, ugraph_wi::NOWT);
+		ugw.add_edge(0, 1);
+		ugw.add_edge(1, 2);
+		ugw.add_edge(0, 2);
+
+		ugw.set_w(0, 3);
+		ugw.set_w(1, 2);
+		ugw.set_w(2, 1);
+		ugw.set_name("ugraph_VW");
+	}
+	void TearDown() override {}
+
+	//undirected graph instance	
+	const int NV = 5;
+	ugraph_wi ugw;											//undirected graph with integer weights
+};
+
+
+TEST_F(GFuncTest, is_triangleFree_subgraph) {
+		
+	vint triangle;	
+	EXPECT_TRUE(gfunc::is_triangleFree_subgraph(ug, ug.get_neighbors(0), triangle));			
+
+	//adds a triangle
+	ug.add_edge(1, 2);
+	ug.add_edge(2, 3);
+	EXPECT_FALSE(gfunc::is_triangleFree_subgraph(ug, ug.get_neighbors(0), triangle));
 }
 
-TEST(Graph_func, sum_of_weights){
-
-	LOG_INFO("Graph_func::sum_of_weights()---------");
-
-	const int NV=5;
-	Graph_W<ugraph, int> ugw(NV, 0.0);		//0.0 vertex weights (unit weights by default)
-	ugw.add_edge(0,1);
-	ugw.add_edge(1,2);
-	ugw.add_edge(0,2);
-
-	ugw.set_w(0,1);
-	ugw.set_w(1,2);
-	ugw.set_w(2,3);
-
-	//I/O
-	ugw.print_weights();
+TEST_F(GFuncTest, is_edgeFree_subgraph) {
+		
+	vint edge;
+	EXPECT_FALSE(gfunc::is_edgeFree_subgraph(ug, ug.get_neighbors(0), edge) );				//{1, 3} is in G[{1, 2, 3}]					
 	
-	vint lv; lv.push_back(0); lv.push_back(1);
-	int w=gfunc::wsum(ugw,lv);
-	EXPECT_EQ(3,w);
+	//removes the only edge 
+	ug.remove_edge(1, 3);
+	EXPECT_TRUE(gfunc::is_edgeFree_subgraph(ug, ug.get_neighbors(0), edge));
 
-	bitarray bb(5);
-	bb.set_bit(0);  bb.set_bit(1); 
-	w=gfunc::wsum(ugw,bb);
-	EXPECT_EQ(3,w);
+}
 
-	bb.set_bit(2);
-	w=gfunc::wsum(ugw,bb);
+TEST_F(GFuncTestW, sort_w){
+	
+	using namespace gfunc::vertexW;	
+
+	//set of vertices
+	vint lv; 
+	lv.push_back(0);
+	lv.push_back(1); 
+	lv.push_back(2);
+
+	//sorts the set of vertices according to non-decreasing weight
+	sort_w(ugw,lv, true);
+
+	vint lv_exp;		
+	lv_exp.push_back(2);
+	lv_exp.push_back(1);
+	lv_exp.push_back(0);
+	EXPECT_EQ(lv_exp, lv);				//{w(2)=1, w(1)=2, w(0)=3
+
+	//sorts the set of vertices according to non-increasing weight
+	sort_w(ugw,lv, false);
+
+	lv_exp.clear();
+	lv_exp.push_back(0);
+	lv_exp.push_back(1);
+	lv_exp.push_back(2);
+	EXPECT_EQ(lv_exp, lv);
+
+	//sort C-style array
+	int lv_C[3];
+	copy(lv.begin(), lv.end(), lv_C);
+
+	//sorts the set of vertices according to non-decreasing weight
+	sort_w(ugw, lv_C, 3, true);
+	
+	int lv_Cexp[3];
+	lv_Cexp[0]=2; 
+	lv_Cexp[1]=1;
+	lv_Cexp[2]=0;
+
+	for(int i = 0; i < 3; i++){
+		EXPECT_EQ(lv_Cexp[i], lv_C[i]);
+	}
+
+}
+
+TEST_F(GFuncTestW, wsum){
+
+	using namespace gfunc::vertexW;
+	
+	//set of vertices {0, 1}
+	vint lv; 
+	lv.push_back(0);
+	lv.push_back(1);
+
+	//sums the weights of the vertices in lv ={0, 1}
+	int w = wsum(ugw,lv);
+	EXPECT_EQ(5,w);
+		
+	bitarray bblv(5);
+	bblv.set_bit(0);
+	bblv.set_bit(1);
+
+	//sums the weights of the (bit) set of vertices bblv = {0, 1}
+	w = wsum (ugw, bblv);
+	EXPECT_EQ(5,w);
+
+	//sums the weights of the (bit) set of vertices bblv = {0, 1, 2}
+	bblv.set_bit(2);
+	w = wsum (ugw, bblv);
 	EXPECT_EQ(6,w);
-	
-	LOG_INFO("------------------------------------");
-	LOG_INFO("PRESS ANY KEY TO CONTINUE");
-	cin.get();
+
 }
 
-TEST(Graph_func, neighbors){
-	LOG_INFO("Graph_func::neighbors()---------");
+TEST(GFunc, neighbors){
+
+	using namespace gfunc;
 	
-	const int NV=100;
+	const int NV = 100;
+
 	ugraph ug(NV);
 	ug.add_edge(0,1);
 	ug.add_edge(0,2);
@@ -178,87 +187,145 @@ TEST(Graph_func, neighbors){
 	ug.add_edge(3,64);
 	ug.add_edge(63,64);
 	
-	bitarray bbV(100);
-	bbV.set_bit(0,NV-1); 
-	vint res;
+	//(bit) set of vertices {0, ..., 99}
+	bitarray bbV (100);
+	bbV.set_bit(0, NV - 1); 
+	
+	/////////////
+	//neighbors of vertex {3} in bitset bbV = {0, 63, 64}
+	vint neigh;
+	neighbors<ugraph>(ug, 3, bbV, neigh);
+
+	//expected neighbors
+	vint neigh_exp;
+	neigh_exp.push_back(0);
+	neigh_exp.push_back(63);
+	neigh_exp.push_back(64);
+	EXPECT_EQ(neigh_exp, neigh);
+
+	//////////////
+	//neighbors of {3} after {3} in bitset bbV = {63, 64}
+	neighbors_after<ugraph>(ug, 3, bbV, neigh);
+
+	//expected neighbors
+	neigh_exp.clear();
+	neigh_exp.push_back(63);
+	neigh_exp.push_back(64);
+	EXPECT_EQ(neigh_exp, neigh);
+
+	//////////////
+	//neighbors of {63} after {63} in bitset bbV = {64}
+	neighbors_after<ugraph>(ug, 63, bbV, neigh);
+
+	//expected neighbors
+	neigh_exp.clear(); 
+	neigh_exp.push_back(64);
+	EXPECT_EQ(neigh_exp, neigh);
+
+	//////////////
+	//neighbors of {0} after {0} in bitset bbV = {1, 2, 3, 63, 64, 65}
+	neighbors_after<ugraph>(ug, 0, bbV, neigh);
+
+	//expected neighbors
+	neigh_exp.clear(); 
+	neigh_exp.push_back(1); 
+	neigh_exp.push_back(2); 
+	neigh_exp.push_back(3); 
+	neigh_exp.push_back(63); 
+	neigh_exp.push_back(64);  
+	neigh_exp.push_back(65);
+	EXPECT_EQ(neigh_exp, neigh);
 		
-	//neighbors
-	gfunc::neighbors<ugraph>(ug, 3, bbV, res);
-	vint expected;
-	expected.push_back(0); expected.push_back(63); expected.push_back(64);
-	EXPECT_EQ(expected, res);
-//	com::stl::print_collection(res,cout, true);
-
-	//neighbors_post 
-	gfunc::neighbors_post<ugraph>(ug, 3, bbV, res);
-	expected.clear();
-	expected.push_back(63); expected.push_back(64);
-	EXPECT_EQ(expected, res);
-//	com::stl::print_collection(res,cout, true);
-
-	//neighbors_post
-	gfunc::neighbors_post<ugraph>(ug, 63, bbV, res);
-	expected.clear(); expected.push_back(64); 
-	EXPECT_EQ(expected, res);
-//	com::stl::print_collection(res,cout, true);
-
-	//neighbors_post
-	gfunc::neighbors_post<ugraph>(ug, 0, bbV, res);
-	expected.clear(); expected.push_back(1); expected.push_back(2); expected.push_back(3); expected.push_back(63); expected.push_back(64);  expected.push_back(65); 
-	EXPECT_EQ(expected, res);
-//	com::stl::print_collection(res,cout, true);
-		
-	LOG_INFO("------------------------------------");
-	LOG_INFO("PRESS ANY KEY TO CONTINUE");
-	cin.get();
 }
 
-
-TEST(Graph_func, sort){
-//////////////
 // date: 24/10/17
+TEST(GFunc, sort){				
 
-	LOG_INFO("Graph_func::sort()-------------");
-	ugraph ug(5);
+	using namespace ::gfunc::sort;
+
+	const int NV = 5;
+
+	//defines undirected graph
+	ugraph ug(NV);
 	ug.add_edge(0,1);
 	ug.add_edge(1,2);
 	ug.add_edge(0,2);
 	ug.add_edge(0,3);
 
+	//set of vertices
 	vector<int> lv;
 	lv.push_back(0);
 	lv.push_back(1);
+
+	//set of vertices
 	vector<int> lref;
 	lref.push_back(2);
 	lref.push_back(3);
 	lref.push_back(4);
 
-	gfunc::sort_deg(ug,lv,lref,false);	
-	EXPECT_EQ(0,lv.front());
+	//sorts lv ={0, 1} according to non-increasing degree in lv_ref {2, 3, 4}
+	//lv = {0 (2), 1 (1)}
+	sort_deg (ug, lv, lref, false);	
 
+	////////////////////////
+	EXPECT_EQ(0, lv[0]);
+	EXPECT_EQ(1, lv[1]);
+	EXPECT_EQ(2, lv.size());
+	////////////////////////
+		
 	lv.clear();
 	lv.push_back(0);
 	lv.push_back(1);
-	gfunc::sort_deg(ug,lv,lref,true);
-	EXPECT_EQ(1,lv.front());
+
+	//sorts lv={0, 1} according to non-decreasing degree in lv_ref {2, 3, 4}
+	sort_deg(ug,lv,lref,true);		//lv = { 1 (1), 0 (2)}
+	
+	////////////////////////
+	EXPECT_EQ(1, lv[0]);
+	EXPECT_EQ(0, lv[1]);
+	EXPECT_EQ(2, lv.size());
+	////////////////////////
 	
 	bitarray bbref(5);
 	bbref.set_bit(2);
 	bbref.set_bit(3);
 	bbref.set_bit(4);
-	gfunc::sort_deg(ug,lv,bbref,true);
-	EXPECT_EQ(1,lv.front());
 
-	//empty ref test
+	//sorts lv={1, 0} according to non-decreasing degree in bbref {2, 3, 4}
+	sort_deg(ug,lv,bbref,true);
+
+	////////////////////////
+	EXPECT_EQ(1, lv[0]);
+	EXPECT_EQ(0, lv[1]);
+	EXPECT_EQ(2, lv.size());
+	////////////////////////
+
+	//empty reference set of vertices - lv unchanged
+	//lv = { 1, 0 }
 	lref.clear();
-	gfunc::sort_deg(ug,lv,lref,false);	
-	EXPECT_EQ(1,lv.front());
 
+	//sorts with empty reference set of vertices - lv unchanged = {1, 0}
+	sort_deg(ug, lv, lref, false);	
+
+	////////////////////////
+	EXPECT_EQ(1, lv[0]);
+	EXPECT_EQ(0, lv[1]);
+	EXPECT_EQ(2, lv.size());
+	////////////////////////
+
+	//empty reference (bit)set of vertices 
+	//lv = { 1, 0 }
 	bbref.erase_bit();
-	gfunc::sort_deg(ug,lv,bbref,false);	
-	EXPECT_EQ(1,lv.front());
-		
-	LOG_INFO("------------------------------------");
+
+	//sorts with empty reference set of vertices - lv unchanged = {1, 0}
+	sort_deg(ug,lv,bbref,false);
+
+	////////////////////////
+	EXPECT_EQ(1, lv[0]);
+	EXPECT_EQ(0, lv[1]);
+	EXPECT_EQ(2, lv.size());
+	////////////////////////
+
 }
 
 

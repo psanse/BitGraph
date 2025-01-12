@@ -34,7 +34,7 @@ using vint = std::vector<int>;
 template<class T = bitarray>
 class Ugraph : public Graph<T> {
 
-	friend class GraphConversion;		//TODO-CHECK
+	friend class GraphConversion;		
 
 public:
 
@@ -47,8 +47,8 @@ public:
 
 	//constructors - cannot all be inherited	
 	Ugraph						() : Graph() {}										//creates empty graph
-	Ugraph						(std::size_t n) : Graph(n){}						//creates empty graph of size n=|V|	
-	Ugraph						(std::string filename);								//reads graph from file
+explicit Ugraph					(std::size_t n) : Graph(n){}						//creates empty graph of size n=|V|	
+explicit Ugraph					(std::string filename);								//reads graph from file
 	
 	/*
 	* @brief Creates a graph from an C-style adjacency matrix
@@ -149,10 +149,18 @@ public:
 	* 
 	*		  (applied as pivotal strategy for clique enumeration)
 	* 
-	*  @param bbn input (bit) set of vertices
+	* @param v: input vertex
+	* @param bbn: input (bit) set of vertices
 	*  
 	*/
 	int degree_up				(int v, const BitBoardN& bbn)			const;  //TODO: test (27/4/2016)
+
+	/*
+	* @brief number of neighbors of v that come after v 
+	*
+	* @param v: input vertex
+	*/
+	int degree_up				(int v)									const;  
 	
 	/*
 	*  @brief returns the maximum degree of the graph, 
@@ -190,6 +198,19 @@ public:
 	* @param w endpoint
 	*/
 	void remove_edge			(int v, int w)							override;
+
+	/*
+	* @brief generates undirected edges with probability p.
+	*
+	*		 I. (v, v) not allowed.
+	*		 II. Valid for directed/undirected graphs (TMP design)
+	*
+	* @param v input endpoint
+	* @param w input endpoint
+	* @returns 0 is success, -1 if error
+	*/
+	void gen_random_edges		(double p)								override;
+
 
 //////////////	
 // Induced subgraphs
@@ -256,7 +277,7 @@ public:
 	*  @brief enlarges the graph with a new vertex (provided its neighborhood)
 	*		  TODO - code removed, BUGGY (should not be called , unit tests DISABLED)
 	*/
-	int add_vertex(_bbt* neigh = NULL) = delete;
+	int add_vertex(_bbt* neigh = nullptr) = delete;
 
 };
 

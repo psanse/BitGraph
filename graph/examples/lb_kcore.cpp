@@ -4,7 +4,7 @@
 #include <iostream>
 #include <stdio.h>
 #include <stdlib.h>
-#include "../kcore.h"
+#include "graph/algorithms/kcore.h"
 #include "utils/common.h"  //to print collections
 #include "utils/prec_timer.h"
 
@@ -25,7 +25,7 @@ int main(int argc, char** argv){
 	//find initial clique
 	sparse_ugraph ug(filename);
 	KCore<sparse_ugraph> kc(ug);
-	kc.kcore();
+	kc.find_kcore();
 	vector<int> initial_clique;
 	PrecisionTimer pt;
 	pt.wall_tic();

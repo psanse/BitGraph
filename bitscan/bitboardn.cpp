@@ -193,9 +193,9 @@ BitBoardN::BitBoardN(const BitBoardN& bbN){
 // copy constructor
 
 	//allcoates memory
-	if(bbN.m_aBB==NULL || bbN.m_nBB<0 ){
+	if(bbN.m_aBB==nullptr || bbN.m_nBB<0 ){
 		m_nBB=-1;
-		m_aBB=NULL;
+		m_aBB=nullptr;
 	return;
 	}
 	
@@ -231,10 +231,10 @@ BitBoardN::BitBoardN(const vector<int>& v){
 }
 
 BitBoardN::~BitBoardN(){
-	if(m_aBB!=NULL){	
+	if(m_aBB!=nullptr){	
 		delete [] m_aBB;
 	}
-	m_aBB=NULL;
+	m_aBB=nullptr;
 }
 
 BitBoardN::BitBoardN (const std::vector<int>& v, int popsize){
@@ -269,13 +269,13 @@ void BitBoardN::init(int popsize, const vector<int> &v){
 ///////////////////////////
 // values in vector are 1-bits in the bitboard (0 based)
 	
-	if(m_aBB!=NULL){
+	if(m_aBB!=nullptr){
 #ifndef _MEM_ALIGNMENT
 		delete [] m_aBB;
 #else
 		_aligned_free(m_aBB);
 #endif
-		m_aBB=NULL;
+		m_aBB=nullptr;
 	}
 	
 	m_nBB=INDEX_1TO1(popsize); //((popsize-1)/WORD_SIZE)+1;
@@ -312,13 +312,13 @@ void BitBoardN::init(int popsize, bool reset){
 //////////////////////
 // only way to change storage space once constructed
 
-	if(m_aBB!=NULL){
+	if(m_aBB!=nullptr){
 #ifndef _MEM_ALIGNMENT
 		delete [] m_aBB;
 #else
 		_aligned_free(m_aBB);
 #endif
-		m_aBB=NULL;
+		m_aBB=nullptr;
 	}
 
 	//nBBs
