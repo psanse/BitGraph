@@ -53,6 +53,7 @@ TEST_F(KcoreWTest, width) {
 }
 
 TEST(KCore, kcore_decomposition_sparse){
+	
 	sparse_ugraph ug(PATH_GRAPH_TESTS_CMAKE_SRC_CODE "star.clq");
 	
 	KCore<sparse_ugraph> kc(ug);
@@ -76,12 +77,14 @@ TEST(KCore, kcore_decomposition_sparse){
 	kc1.find_kcore();
 	
 	v= kc1.get_kcore_set(1);
-	for(int i=0; i<6; i++)
+	for (int i = 0; i < 6; i++) {
 		EXPECT_EQ(i, v[i]);
+	}
 	
 }
 
 TEST(KCoreUB, kcore_example){
+
 	ugraph ug(PATH_GRAPH_TESTS_CMAKE_SRC_CODE "brock200_1.clq");
 	
 	//test with real kcore number
@@ -96,9 +99,10 @@ TEST(KCoreUB, kcore_example){
 	//test with UB on kcore number
 	KCore<ugraph> kc1(ug);
 	kc1.find_kcore();
-	kcn=kc1.get_max_kcore();
+	kcn = kc1.get_max_kcore();
 	UB_corr=kc1.find_kcore_UB(kcn);
 	kcUBn=kc1.get_max_kcore();
+
 	EXPECT_EQ(UB_corr, kcUBn);	
 	EXPECT_EQ(kcUBn, kc.minimum_width(true)); //checks width (real degrees)
 
@@ -109,12 +113,14 @@ TEST(KCoreUB, kcore_example){
 	kcn=kc2.get_max_kcore();
 	UB_corr=kc2.find_kcore_UB(kcn);
 	kcUBn=kc2.get_max_kcore();
+
 	EXPECT_EQ(UB_corr, kcUBn);	
 	EXPECT_EQ(kcUBn, kc.minimum_width(true)); //checks width (real degrees)
 }
 
 
 TEST(KCoreUB, kcore_example_I){
+
 	ugraph ug(PATH_GRAPH_TESTS_CMAKE_SRC_CODE "ia-southernwomen.edges");
 	
 	//test with real kcore number
@@ -123,12 +129,14 @@ TEST(KCoreUB, kcore_example_I){
 	int kcn=kc.get_max_kcore();
 	int UB_corr=kc.find_kcore_UB(kcn);
 	int kcUBn=kc.get_max_kcore();
+
 	EXPECT_EQ(UB_corr, kcUBn);
 	EXPECT_EQ(kcUBn, kc.minimum_width(true)); //checks width (real degrees)
 
 }
 
 TEST(KCoreUB, kcore_example_II){
+
 	ugraph ug(PATH_GRAPH_TESTS_CMAKE_SRC_CODE "r10_0.2_23.txt");
 	
 	//test with real kcore number
@@ -137,6 +145,7 @@ TEST(KCoreUB, kcore_example_II){
 	int kcn=kc.get_max_kcore();
 	int UB_corr=kc.find_kcore_UB(kcn);
 	int kcUBn=kc.get_max_kcore();
+
 	EXPECT_EQ(UB_corr, kcUBn);
 	EXPECT_EQ(kcUBn, kc.minimum_width(true)); //checks width (real degrees)
 }
