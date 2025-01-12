@@ -78,7 +78,7 @@ public:
 //construction
 public:
 
-	KCore	(T& g, typename T::_bbt* bbset = NULL);
+	KCore	(T& g, typename T::_bbt* bbset = nullptr);
 	
 	//TODO - destructor, copies, moves...
 	 
@@ -105,10 +105,11 @@ public:
 	int get_kcore_size					(std::size_t k)					const;
 	
 	/*
-	* @brief Set of vertices with kcore number greater than a given k >=0
+	* @brief Set of vertices with kcore number equal or greater than a given k >=0, the k-core set of vertices
 	*		 (must be called afer kcore()).
 	* 
-	*		 I. K==0: all vertices V
+	*		 I. K=0: all vertices in V
+	*		II. K=1: vertices in the 1-core etc...
 	*/
 	vint get_kcore_set					(std::size_t k)					const;
 
@@ -134,28 +135,40 @@ public:
 //////////////
 // Main operations
 
-	////////////
-	// RETURNS: 
-	// A) min width ordering pos_[OLD_INDEX]=NEW_INDEX (lowest index, lowest degree) or ver_[NEW_INDEX] = OLD_INDEX
-	// B) The resulting (k-core) degree for each vertex 
-	// C) The k-core upper bound for the graph is the degree of the last vertex
-
-	/*
+/*
 	* @brief Computes maximum core and coreness (core algorithm). 
 	*		 After its execution: 
 	*	
-	*		 I. @ver_ contains the vertices in non-decreasing kcore order
+	*		 I. @ver_ contains the vertices in non-decreasing kcore order (new-to-old format)
 	*		II. @deg_ contains the coreness of each vertex
+	*		III.The maximum core number of the graph is @deg_[last_vertex]
 	*/
-	void find_kcore							();										
+	void find_kcore						();										
 
 
-	int kcore_UB						(int UB);								//new kcore (vertices with kcore=UB (or nearest real degree > UB) are placed last in ver_)
+	int find_kcore_UB					(int UB);								//new kcore (vertices with kcore=UB (or nearest real degree > UB) are placed last in ver_)
 	
+	/*
+	* @brief width(v) = maximum number of neighbours of v that come AFTER v given the ordering in @vder_ 
+	*		 Computes the maximum width value of the vertices in @vder_ 
+	* 
+	*		 I. The real width is provided by rev = TRUE (related to vertices that PRECEDE v)
+	*		 II.Heavy computationally - use only for tests
+	* 
+	* @param rev TRUE: computes width in reverse order (last-to-first) 
+	* @return maximum width of the graph / subgraph
+	*/
+	int minimum_width							(bool rev = false);						//computes width of the graph using ver_ list 
 	
-	int width							(bool rev=false);						//computes width of the graph using ver_ list and real degrees
+	/*
+	* @brief Width of the graph / subgraph as the degree of the last vertex 
+	*		 in the non-decreasing kcore ordering in @ver_ (CHECK)
+	* 
+	* @return  width of the graph / subgraph		
+	*/
+	int minimum_width_fast						();						
 	
-	//sparse specific
+	//clique heuristics
 	vint find_heur_clique				(int num_iter = EMPTY_ELEM);			//greedy clique heuristic based on KCore ordering
 inline	vint find_heur_clique_opt		(int num_iter=EMPTY_ELEM);				//only available for sparse graphs
 vint find_heur_clique_sparse			(int num_iter = EMPTY_ELEM);			//only available for sparse graphs	
@@ -171,7 +184,7 @@ vint find_heur_clique_sparse			(int num_iter = EMPTY_ELEM);			//only available f
 private:
 
 	//k-core init steps
-	void init_kcore						();										//inits degrees and bin
+	void init_kcore						();										//inits degrees and bins
 	void init_bin						();										//inits just the bin
 	void bin_sort						();										//default bin sort
 	void bin_sort						(vint& lv, bool rev);					//bin sort according to vertex set lv (rev TRUE: vertices taken in reverse order)
@@ -185,12 +198,12 @@ private:
 
 	T& g_;																		//the one and only graph G=(V, E)			
 	const int NV_;																//size of graph |V| - for convenience, possibly remove
-	_bbt* psg_;																	//to manage kcore in subgraphs (default NULL)	
+	_bbt* psg_;																	//to manage kcore in subgraphs (default nullptr)	
 	
 	//algo data structures
 	vint deg_;																	//coreness of vertices																
 	vint bin_;																	//bins of differente degrees, implements bin sort algorithm
-	vint ver_;
+	vint ver_;																	//vertices in non-decreasing kcore order (new to old format)
 	vint pos_;
 };
 
@@ -229,64 +242,72 @@ void KCore<T>::find_kcore(){
 	//inits data structures
 	init_kcore();
 	bin_sort();
-	int u,v;
+	
+	auto u = EMPTY_ELEM;
+	auto v = EMPTY_ELEM;
 
-	if(psg_==NULL){
-		//kcore of the full graph
-		for(int i=0; i<ver_.size(); i++){
-			v=ver_[i];
-			//iteracion sobre vecinos
-			if(g_.get_neighbors(v).init_scan(bbo::NON_DESTRUCTIVE)!=EMPTY_ELEM){
-				while(1){
-					u=g_.get_neighbors(v).next_bit();
-					if(u==EMPTY_ELEM) break;
+	if(psg_ == nullptr){
 
-					int dv=deg_[v];
-					if(deg_[u]>deg_[v]){
-						SWAP_BIN(u);				//swap movement in ver_
-						deg_[u]--;				//decrease degree of swapped vertex
+		//kcore computation for the full graph
+		for(auto v : ver_){		
+
+			//iterates over N(v)
+			_bbt& neigh = g_.get_neighbors(v); 
+			if (neigh.init_scan(bbo::NON_DESTRUCTIVE) != EMPTY_ELEM) {			//CHECK MUST BE - for sparse_bitarrays
+								
+				while ((u = neigh.next_bit()) != EMPTY_ELEM) {
+
+					if (deg_[u] > deg_[v]) {
+						SWAP_BIN(u);			//swap bin movement for v (also sorted in ver_)
+						--deg_[u];				//decrease degree of swapped vertex
 					}
 				}
-			}//endif
+
+			}			
+
 		}//vertex iteration
+
 	}else{
-		//kcore of the subgraph
-		typename T::_bbt neigh(NV_);
+
+		//kcore computation for the induced subgraph by the (bit)set of vertices in psg_
+		_bbt neigh(NV_);
 
 		//sorts by degree and computes degeneracy
-		for(int i=0; i<ver_.size(); i++){
-			v=ver_[i];
-			//iteracion sobre vecinos
-			AND(g_.get_neighbors(v), *psg_, neigh);
-			if(neigh.init_scan(bbo::NON_DESTRUCTIVE)!=EMPTY_ELEM){
-				while(true){
-					u=neigh.next_bit();
-					if(u==EMPTY_ELEM) break;
+		for (auto v : ver_) {
 
-					int dv=deg_[v];
-					if(deg_[u]>deg_[v]){
-						SWAP_BIN(u);				//swap movement in ver_
-						deg_[u]--;				//decrease degree of swapped vertex
+			//computes neightbors of v in the subgraph
+			AND(g_.get_neighbors(v), *psg_, neigh);
+			
+			//iterates over the neighbors of v in the subgraph
+			if(neigh.init_scan(bbo::NON_DESTRUCTIVE) != EMPTY_ELEM){			//CHECK MUST BE - for sparse_bitarrays
+				
+				while ((u = neigh.next_bit()) != EMPTY_ELEM) {
+
+					if (deg_[u] > deg_[v]) {
+						SWAP_BIN(u);			//swap bin movement for v (also sorted in ver_)
+						--deg_[u];				//decrease degree of swapped vertex
 					}
 				}
+
 			}//endif
+
 		}//vertex iteration
 	}
 }	
 
 template<class T>
-int KCore<T>::kcore_UB(int UB_out){
+int KCore<T>::find_kcore_UB (int UB_out){
 ////////////
 //  date of creation: 5/3/16
 //  last update: 5/3/16
 //	
 //  Degeneracy ordering assuming a known upper bound for the kcore number (UB_out): 
-//  Vertices with degree UB_out (or closest real degree>UB are placed last in ver_)
+//  Vertices with degree UB_out (or closest real degree > UB are placed last in ver_)
 //  Note that this IS a degeneracy ordering assuming that UB_out is >= kcore(G)
 //
 //  Compared with kcore, here the way vertices are ordered is:
 //  1-Start with vertices with kcore = UB 2-For each kcore set, remove vertices iteratively
-//  3-Select any vertex with kcore=UB as a consequence of 2, and remove iteratively
+//  3-Select any vertex with kcore = UB as a consequence of 2, and remove iteratively
 //  4-Goto step 1
 //
 //  OUTPUT:   A degeneracy ordering in ver_ (reverse order).
@@ -308,29 +329,29 @@ int KCore<T>::kcore_UB(int UB_out){
 	init_kcore();
 	bin_sort();
 
-	//Check subgraph us empty
-	if(psg_!=NULL){
-		LOG_INFO("KCore<T>::kcore_UB- attempted with subgraph information. Currently only implemented for the full graph");
+	//Check subgraph is empty
+	if(psg_ != nullptr){
+		LOG_INFO("Subgraph variant not implemented yet - KCore<T>::kcore_UB");
 		return -1;
 	}
 	
 	//check that UB_out is not the maximum graph degree
-	if(bin_.size()<=UB_out+1){																		//i.e. deg=1 , bin has size 2 (0 and 1)
-		LOG_INFO("UB is not worse than maximum graph degree: vertices left as is");
+	//i.e. deg = 1 , bin has size 2 (0 and 1)
+	if(bin_.size() <= UB_out + 1){																		
+		LOG_INFO("UB is not worse than maximum graph degree: vertices left as is - KCore<T>::kcore_UB");
 		return UB_out;						
 	}
 
 	//variables / update UB to the nearest existing degree
-	int u,v;
-	int UB=UB_out;
-	int w=ver_[bin_[UB]];
-	if(deg_[w]!=UB){UB=deg_[w];}
-	
-	
+	auto u = EMPTY_ELEM, v = EMPTY_ELEM;
+	auto UB = UB_out;
+	int w = ver_[bin_[UB]];
+	if(deg_[w] != UB){ UB = deg_[w];}
+		
 	//main loop
-	int deg=UB; int p_iter; int p_newUB; 
-	bool first_time_newLB=true;
-	while(deg>=1){
+	int deg = UB; int p_iter; int p_newUB; 
+	bool first_time_newLB = true;
+	while(deg >= 1){
 		p_iter=bin_[deg];
 		do{
 			//classical kcore loop for vertices with degree deg
@@ -401,10 +422,10 @@ int KCore<T>::kcore_UB(int UB_out){
 	}//end of main loop
 	
 
-	//new bin sort over ver_ in reverese order for final sorting
+	//new bin sort over ver_ in reverse order for final sorting
 	init_bin();
-	vint lv(ver_);		//requires a copy
-	bin_sort(lv,true);	//reverse order
+	vint lv(ver_);				//requires a copy
+	bin_sort(lv,true);			//reverse order
 	
 	return UB;
 }	
@@ -414,7 +435,7 @@ void KCore<T>::init_kcore(){
 
 	int max_gdeg=0, v=EMPTY_ELEM;
 
-	if(psg_==NULL){
+	if(psg_==nullptr){
 		//kcore of the whole graph
 		for(int v=0; v<NV_; v++){
 			deg_[v]=g_.degree(v);
@@ -466,7 +487,7 @@ void KCore<T>::init_bin(){
 
 	int max_gdeg=0, v=EMPTY_ELEM;
 
-	if(psg_==NULL){
+	if(psg_==nullptr){
 		//kcore of the whole graph
 		for(int v=0; v<NV_; v++){
 			//deg_[v]=g_.degree(v);			//degrees already computed
@@ -499,7 +520,7 @@ void KCore<T>::bin_sort(){
 		start+=num;
 	}
 
-	if(psg_==NULL){
+	if(psg_==nullptr){
 		//bin_sort of all the graph
 		for(int v=0; v<ver_.size(); v++){
 			pos_[v]=bin_[deg_[v]];			//stores the new position of v (pos_ is not strictly needed for bin_sort, but it is for kcore)
@@ -580,38 +601,72 @@ void KCore<T>::bin_sort(vint& lv, bool rev){
 }
 
 template<class T>
-int KCore<T>::width(bool rev){
+int KCore<T>::minimum_width (bool rev){
 ///////////////////
 // Width of the ordering in ver_ using real degrees (rev=TRUE reverse direction)
-// Use for checking purposes
+// HEAVY COMPUTATIONALLY - use only for checking purposes	
 
-	int max_w=EMPTY_ELEM; int w=EMPTY_ELEM;
-	typename T::_bbt bb_unsel(NV_); typename T::_bbt bb_sel(NV_);
+	int max_width = EMPTY_ELEM;
+	int	width = EMPTY_ELEM;
+	_bbt bb_unsel(NV_); 
+	_bbt bb_sel(NV_);
 
 	if(rev){
-		for(vint::reverse_iterator it=ver_.rbegin(); it!=ver_.rend(); it++){
-			//computes subgraph population (TODO: optimize)
-			bb_unsel=g_.get_neighbors(*it);
-			bb_unsel.erase_bit(bb_sel);
-			w=bb_unsel.popcn64();
 
-			if(max_w<w) max_w=w;
+		for(auto it = ver_.rbegin(); it != ver_.rend(); ++it){
+
+			//computes subgraph population (TODO: optimize)
+			bb_unsel = g_.get_neighbors(*it);
+			bb_unsel.erase_bit(bb_sel);
+			
+			///////////////////////////////
+			width = bb_unsel.popcn64();
+			if (max_width < width) { max_width = width; }
+			////////////////////////////////
+
 			bb_sel.set_bit(*it);
 		}
 
 	}else{
-		for(vint::iterator it=ver_.begin(); it!=ver_.end(); it++){
-			///computes subgraph population (TODO: optimize)
-			bb_unsel=g_.get_neighbors(*it);
-			bb_unsel.erase_bit(bb_sel);
-			w=bb_unsel.popcn64();
 
-			if(max_w<w) max_w=w;
+		for(auto it = ver_.begin(); it != ver_.end(); ++it){
+
+			///computes subgraph population (TODO: optimize)
+			bb_unsel = g_.get_neighbors(*it);
+			bb_unsel.erase_bit(bb_sel);
+			
+			///////////////////////////////
+			width = bb_unsel.popcn64();
+			if (max_width < width) { max_width = width; }
+			///////////////////////////////
+
 			bb_sel.set_bit(*it);
 		}
 	}
 
-	return max_w;
+	return max_width;
+}
+
+template<class T>
+int KCore<T>::minimum_width_fast() {
+	
+	//assert DEBUG
+	if (lv.empty()) {
+		LOG_ERROR("degree information not available - KCore<T>::width_fast");
+		return -1;
+	}
+	
+	auto v = ver_.back();
+	auto count = 0;
+
+	//counts the number of neighbours of v in vdeg_
+	for (auto it = ver_.rbegin() + 1; it != ver_(); ++it) {
+		if (g_.is_edge(*it, v)) {
+			count++;						
+		}
+	}
+
+	return count;	
 }
 
 
@@ -956,7 +1011,7 @@ void KCore<T>::print(print_t type, ostream& o){
 
 template<class T>
 void KCore<T>::print_kcore(bool real_deg, ostream& o)	const{
-	if(psg_==NULL){	//whole graph
+	if(psg_==nullptr){	//whole graph
 		for(vint::const_iterator it=ver_.begin(); it!=ver_.end(); it++){
 			cout<<"["<<*it<<":"<<deg_[*it];
 			if(real_deg){

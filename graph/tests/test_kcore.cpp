@@ -54,29 +54,29 @@ TEST(KCoreUB, kcore_example){
 	KCore<ugraph> kc(ug);	
 	kc.find_kcore();
 	int kcn=kc.get_max_kcore();
-	int UB_corr=kc.kcore_UB(kcn);
+	int UB_corr=kc.find_kcore_UB(kcn);
 	int kcUBn=kc.get_max_kcore();
 	EXPECT_EQ(UB_corr, kcUBn);
-	EXPECT_EQ(kcUBn, kc.width(true));   //checks width (real degrees)
+	EXPECT_EQ(kcUBn, kc.minimum_width(true));   //checks width (real degrees)
 	
 	//test with UB on kcore number
 	KCore<ugraph> kc1(ug);
 	kc1.find_kcore();
 	kcn=kc1.get_max_kcore();
-	UB_corr=kc1.kcore_UB(kcn);
+	UB_corr=kc1.find_kcore_UB(kcn);
 	kcUBn=kc1.get_max_kcore();
 	EXPECT_EQ(UB_corr, kcUBn);	
-	EXPECT_EQ(kcUBn, kc.width(true)); //checks width (real degrees)
+	EXPECT_EQ(kcUBn, kc.minimum_width(true)); //checks width (real degrees)
 
 	
 	//test with UB on kcore number
 	KCore<ugraph> kc2(ug);
 	kc2.find_kcore();
 	kcn=kc2.get_max_kcore();
-	UB_corr=kc2.kcore_UB(kcn);
+	UB_corr=kc2.find_kcore_UB(kcn);
 	kcUBn=kc2.get_max_kcore();
 	EXPECT_EQ(UB_corr, kcUBn);	
-	EXPECT_EQ(kcUBn, kc.width(true)); //checks width (real degrees)
+	EXPECT_EQ(kcUBn, kc.minimum_width(true)); //checks width (real degrees)
 }
 
 
@@ -87,10 +87,10 @@ TEST(KCoreUB, kcore_example_I){
 	KCore<ugraph> kc(ug);
 	kc.find_kcore();
 	int kcn=kc.get_max_kcore();
-	int UB_corr=kc.kcore_UB(kcn);
+	int UB_corr=kc.find_kcore_UB(kcn);
 	int kcUBn=kc.get_max_kcore();
 	EXPECT_EQ(UB_corr, kcUBn);
-	EXPECT_EQ(kcUBn, kc.width(true)); //checks width (real degrees)
+	EXPECT_EQ(kcUBn, kc.minimum_width(true)); //checks width (real degrees)
 
 }
 
@@ -101,10 +101,10 @@ TEST(KCoreUB, kcore_example_II){
 	KCore<ugraph> kc(ug);
 	kc.find_kcore();
 	int kcn=kc.get_max_kcore();
-	int UB_corr=kc.kcore_UB(kcn);
+	int UB_corr=kc.find_kcore_UB(kcn);
 	int kcUBn=kc.get_max_kcore();
 	EXPECT_EQ(UB_corr, kcUBn);
-	EXPECT_EQ(kcUBn, kc.width(true)); //checks width (real degrees)
+	EXPECT_EQ(kcUBn, kc.minimum_width(true)); //checks width (real degrees)
 }
 
 ///////////////
@@ -150,10 +150,10 @@ TEST(KCoreUB, DISABLED_random){
 				int kcn=kc.get_max_kcore();
 
 				KCore<ugraph> kcUB(ug);
-				int UB_corr= kcUB.kcore_UB(kcn);	
+				int UB_corr= kcUB.find_kcore_UB(kcn);
 				int kcUBn=kcUB.get_max_kcore();
 				EXPECT_EQ(UB_corr, kcUBn);
-				EXPECT_EQ(kcUBn, kcUB.width(true));		//checks width (real degrees)
+				EXPECT_EQ(kcUBn, kcUB.minimum_width(true));		//checks width (real degrees)
 				
 				
 				if(kcn!=kcUBn){
@@ -202,10 +202,10 @@ TEST(KCoreUB, DISABLED_random){
 //		
 //	ugraph ugn(1);
 //	Decode d;
-//	gs.reorder_edge_based(ord,ugn,d,NULL);								/*slightly faster than reordering in place (much faster for big graphs) */
-//	//gs.reorder(ord,gn,d,NULL);									
-//	//gs.reorder_edge_based(ord,d,NULL);
-//	//gs.reorder_edge_based(ord,NULL);								
+//	gs.reorder_edge_based(ord,ugn,d,nullptr);								/*slightly faster than reordering in place (much faster for big graphs) */
+//	//gs.reorder(ord,gn,d,nullptr);									
+//	//gs.reorder_edge_based(ord,d,nullptr);
+//	//gs.reorder_edge_based(ord,nullptr);								
 //	
 //	r.toc();
 //	LOGG_INFO("kc:[" , r.get_user_time() , "]");

@@ -24,7 +24,7 @@ int mm_read_unsymmetric_sparse(const char *fname, int *M_, int *N_, int *nz_,
     double *val;
     int *I, *J;
  
-    if ((f = fopen(fname, "r")) == NULL)
+    if ((f = fopen(fname, "r")) == nullptr)
             return -1;
  
  
@@ -105,7 +105,7 @@ int mm_read_banner(FILE *f, MM_typecode *matcode)
 
     mm_clear_typecode(matcode);  
 
-    if (fgets(line, MM_MAX_LINE_LENGTH, f) == NULL) 
+    if (fgets(line, MM_MAX_LINE_LENGTH, f) == nullptr) 
         return MM_PREMATURE_EOF;
 
     if (sscanf(line, "%s %s %s %s %s", banner, mtx, crd, data_type, 
@@ -198,7 +198,7 @@ int mm_read_mtx_crd_size(FILE *f, int *M, int *N, int *nz )
     /* now continue scanning until you reach the end-of-comments */
     do 
     {
-        if (fgets(line,MM_MAX_LINE_LENGTH,f) == NULL) 
+        if (fgets(line,MM_MAX_LINE_LENGTH,f) == nullptr) 
             return MM_PREMATURE_EOF;
     }while (line[0] == '%');
 
@@ -228,7 +228,7 @@ int mm_read_mtx_array_size(FILE *f, int *M, int *N)
     /* now continue scanning until you reach the end-of-comments */
     do 
     {
-        if (fgets(line,MM_MAX_LINE_LENGTH,f) == NULL) 
+        if (fgets(line,MM_MAX_LINE_LENGTH,f) == nullptr) 
             return MM_PREMATURE_EOF;
     }while (line[0] == '%');
 
@@ -339,7 +339,7 @@ int mm_read_mtx_crd(char *fname, int *M, int *N, int *nz, int **I, int **J,
 
     if (strcmp(fname, "stdin") == 0) f=stdin;
     else
-    if ((f = fopen(fname, "r")) == NULL)
+    if ((f = fopen(fname, "r")) == nullptr)
         return MM_COULD_NOT_READ_FILE;
 
 
@@ -356,7 +356,7 @@ int mm_read_mtx_crd(char *fname, int *M, int *N, int *nz, int **I, int **J,
 
     *I = (int *)  malloc(*nz * sizeof(int));
     *J = (int *)  malloc(*nz * sizeof(int));
-    *val = NULL;
+    *val = nullptr;
 
     if (mm_is_complex(*matcode))
     {
@@ -406,7 +406,7 @@ int mm_write_mtx_crd(char fname[], int M, int N, int nz, int I[], int J[],
     if (strcmp(fname, "stdout") == 0) 
         f = stdout;
     else
-    if ((f = fopen(fname, "w")) == NULL)
+    if ((f = fopen(fname, "w")) == nullptr)
         return MM_COULD_NOT_WRITE_FILE;
     
     /* print banner followed by typecode */
@@ -476,7 +476,7 @@ char  *mm_typecode_to_str(MM_typecode matcode)
        // types[1] = MM_DENSE_STR;
 		strcpy(types[1], MM_DENSE_STR);
     else
-        return NULL;
+        return nullptr;
 
     /* check for element data type */
     if (mm_is_real(matcode))
@@ -495,7 +495,7 @@ char  *mm_typecode_to_str(MM_typecode matcode)
         //types[2] = MM_INT_STR;
 		strcpy(types[2], MM_INT_STR);
     else
-        return NULL;
+        return nullptr;
 
 
     /* check for symmetry type */
@@ -515,7 +515,7 @@ char  *mm_typecode_to_str(MM_typecode matcode)
        // types[3] = MM_SKEW_STR;
 		strcpy(types[3], MM_SKEW_STR);
     else
-        return NULL;
+        return nullptr;
 
     sprintf(buffer,"%s %s %s %s", types[0], types[1], types[2], types[3]);
     return mm_strdup(buffer);

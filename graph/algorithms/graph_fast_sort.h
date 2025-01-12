@@ -80,7 +80,7 @@ public:
 	explicit GraphFastRootSort(Graph_t& gout) :
 		g_(gout),  
 		NV_(g_.number_of_vertices()),
-		nb_neigh_(NULL), deg_neigh_(NULL) 
+		nb_neigh_(nullptr), deg_neigh_(nullptr) 
 	{
 		nb_neigh_.assign(NV_, 0);
 		deg_neigh_.assign(NV_, 0);
@@ -741,7 +741,7 @@ int GraphFastRootSort<Graph_t>::reorder(const vint& new_order, Graph_t& gn, Deco
 
 ///////////////
 //stores decoding information [NEW]->[OLD]
-	if (d != NULL) {
+	if (d != nullptr) {
 		vint aux(new_order);						//new_order is in format [OLD]->[NEW]
 		Decode::reverse_in_place(aux);				//aux is in format [NEW]->[OLD]		
 		d->insert_ordering(aux);

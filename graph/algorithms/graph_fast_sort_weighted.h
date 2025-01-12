@@ -180,7 +180,7 @@ int GraphFastRootSort_W<GraphW_t>::reorder(const vint& new_order, GraphW_t& gn, 
 	//g = gn;
 
 	////new order to stream if available
-	//if (o != NULL)
+	//if (o != nullptr)
 	//	copy(new_order.begin(), new_order.end(), ostream_iterator<int>(*o, " "));
 
 	return 0;

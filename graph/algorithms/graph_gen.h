@@ -327,7 +327,7 @@ int SparseRandomGen<sparse_ugraph, logSizeTable>::create_ugraph(sparse_ugraph& g
 
 	default_random_engine generator;
 	uniform_int_distribution<int> distribution(0, logSizeTable - 1);
-	generator.seed((unsigned)time(NULL));
+	generator.seed((unsigned)time(nullptr));
 
 	g.init(n);
 	do {

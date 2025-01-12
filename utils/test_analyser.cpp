@@ -266,7 +266,7 @@ int TestAnalyser::analyser(info_t* info){
 	}
 	
 	//analyse similitude between algorithms (specially for comparison of two algorithms)
-	if(info!=NULL){
+	if(info!=nullptr){
 		if(com::stl::all_equal(arrayOfAvSol)) info->same_sol=true;
 		if(com::stl::all_equal(arrayOfAvSteps))	info->same_steps=true;
 		if(com::stl::all_equal(arrayOfAvLB)) info->same_lb=true;
