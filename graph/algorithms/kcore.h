@@ -145,7 +145,7 @@ public:
 	*/
 	void find_kcore						();										
 
-
+	//CHECK - refactor
 	int find_kcore_UB					(int UB);								//new kcore (vertices with kcore=UB (or nearest real degree > UB) are placed last in ver_)
 	
 	/*
@@ -158,7 +158,7 @@ public:
 	* @param rev TRUE: computes width in reverse order (last-to-first) 
 	* @return maximum width of the graph / subgraph
 	*/
-	int minimum_width							(bool rev = false);						//computes width of the graph using ver_ list 
+	int minimum_width					(bool rev = false);						//computes width of the graph using ver_ list 
 	
 	/*
 	* @brief Width of the graph / subgraph as the degree of the last vertex 
@@ -166,7 +166,7 @@ public:
 	* 
 	* @return  width of the graph / subgraph		
 	*/
-	int minimum_width_fast						();						
+	int minimum_width_fast				();						
 	
 	//////////////////////
 	//clique heuristics
@@ -194,7 +194,8 @@ private:
 	int init_kcore						();										
 
 	/*
-	* @brief Inits bin_ data structure for graph / subgraph 
+	* @brief Inits bin_ data structure for graph / subgraph
+	*		 (bin[deg] = number of vertices with degree deg)
 	*				 
 	*      I. @deg_ MUST already be set
 	* 
@@ -203,10 +204,18 @@ private:
 	* @created 13/3/16
 	* @last_update 12/01/25
 	*/
-	int init_bin						();										//inits just the bin
+	int init_bin						();										
+		
+	/*
+	* @brief Bin sorts vertices in non-decreasing degree in @ver_ (new-to-old format)
+	*		  (init_kcore() must be called first)
+	* 
+	*		 I. Involves @bin_ @deg_ and @ver_	
+	*		II. Updates @pos_ to call later the kcore() algorithm 	
+	*/
+	void bin_sort						();										
 	
-	void bin_sort						();										//default bin sort
-	
+	//experimental
 	void bin_sort						(vint& lv, bool rev);					//bin sort according to vertex set lv (rev TRUE: vertices taken in reverse order)
 	
 	//I/O
@@ -222,7 +231,7 @@ private:
 	
 	//algo data structures
 	vint deg_;																	//coreness of vertices																
-	vint bin_;																	//bins [deg[v]] = number of vertices with deg[v] - for bin sort sorting algorithm
+	vint bin_;																	//bins [deg[v]] for bin sort sorting algorithm
 	vint ver_;																	//vertices in non-decreasing kcore order (new to old format)
 	vint pos_;
 };
@@ -231,10 +240,13 @@ private:
 // IMPLEMENTATION - in header for generic code
 
 template<class Graph_t>
-KCore<Graph_t>::KCore(Graph_t& g, _bbt* bbset): g_(g), NV_(g.number_of_vertices()), deg_(NV_), pos_(NV_){
-	//*** check empty bbset
-	//*** check id bbset may hold NV_/64 bitblocks
-	set_subgraph(bbset);
+KCore<Graph_t>::KCore(Graph_t& g, _bbt* bbset): g_(g), NV_(g.number_of_vertices()), deg_(NV_), pos_(NV_) {
+
+	if (set_subgraph(bbset) == -1) {
+		LOG_ERROR("Error in KCore<Graph_t>::KCore - set_subgraph");
+		LOG_ERROR("Exiting...");
+		std::exit(-1);
+	}
 }
 
 template<class Graph_t>
@@ -563,14 +575,12 @@ int KCore<Graph_t>::init_bin(){
 
 template<class Graph_t>
 void KCore<Graph_t>::bin_sort(){
-////////////////
-// sorts vertices in bbset by non decreasing degree in linear time
-//
-// REMARKS: init_k_core has to be called first
+
 
 	//sets bin_ with the position in the new ordering (I): 
 	//based on the number of vertices with that degree previously stored with init_bin()
 	//Example  bin_ = {3, 4, 2, 1} -> bin_ = {0, 3, 7, 9}
+
 	auto start = 0;
 	for (auto& bval : bin_) {
 		auto num = bval;
@@ -602,6 +612,7 @@ void KCore<Graph_t>::bin_sort(){
 	//restores the bin indexes with the position in the new ordering (I)
 	//after fixing: bin[0] = 0 always, bin[1] = 0 if there are no isolani etc.
 	//bin_ = {1, 4, 8, 10} -> bin_ = {0, 1, 4, 8}
+
 	for(auto d = bin_.size() - 1; d >= 1 ; --d){
 		bin_[d] = bin_[d - 1];
 	}
