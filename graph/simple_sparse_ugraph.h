@@ -35,6 +35,7 @@ BITBOARD Ugraph<sparse_bitarray>::number_of_edges(bool lazy) {
 	return ptype::NE_;
 }
 
+
 template<>
 int Ugraph<sparse_bitarray>::degree(int v) const {
 

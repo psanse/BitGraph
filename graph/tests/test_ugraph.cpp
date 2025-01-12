@@ -164,6 +164,27 @@ TEST(Ugraph, degree) {
 
 }
 
+TEST(Ugraph, degree_up) {
+
+	const int NV = 40;
+	ugraph ug(NV);
+
+	ug.add_edge(2, 3);
+	ug.add_edge(2, 5);
+	ug.add_edge(27, 30);
+	ug.add_edge(38, 39);
+
+	///////////////////////////////
+	EXPECT_EQ(2, ug.degree_up(2));
+	EXPECT_EQ(0, ug.degree_up(10));
+	EXPECT_EQ(1, ug.degree_up(38));
+	EXPECT_EQ(1, ug.degree_up(27));
+	////////////////////////////////
+
+}
+
+
+
 TEST(Ugraph, degree_dimacs) {
 	
 	string path = PATH_GRAPH_TESTS_CMAKE_SRC_CODE;

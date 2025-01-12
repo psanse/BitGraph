@@ -149,10 +149,19 @@ public:
 	* 
 	*		  (applied as pivotal strategy for clique enumeration)
 	* 
-	*  @param bbn input (bit) set of vertices
+	* @param v: input vertex
+	* @param bbn: input (bit) set of vertices
 	*  
 	*/
 	int degree_up				(int v, const BitBoardN& bbn)			const;  //TODO: test (27/4/2016)
+
+	/*
+	* @brief number of neighbors of v that come after v 
+	*
+	* @param v: input vertex
+	*
+	*/
+	int degree_up				(int v)									const;  
 	
 	/*
 	*  @brief returns the maximum degree of the graph, 
