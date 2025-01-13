@@ -79,8 +79,7 @@ public:
 	//construction / allocation
 	explicit GraphFastRootSort(Graph_t& gout) :
 		g_(gout),  
-		NV_(g_.number_of_vertices()),
-		nb_neigh_(nullptr), deg_neigh_(nullptr) 
+		NV_(g_.number_of_vertices())
 	{
 		nb_neigh_.assign(NV_, 0);
 		deg_neigh_.assign(NV_, 0);

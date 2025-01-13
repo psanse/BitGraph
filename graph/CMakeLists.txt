@@ -74,14 +74,11 @@ if (graph_build_tests)
 add_executable ( test_graph  tests/gtest_main.cpp
 			
 #  tests/test_graph_sort.cpp   
-#  tests/test_kcore_in_folder.cpp
 
 #  TESTS UNDER DEVELOPMENT  / CHECKING
-   tests/test_kcore.cpp
-#   tests/test_ugraph.cpp
-#   tests/test_sparse_graph.cpp 
- 
+    
 #  TESTS CHECKED
+#  tests/test_kcore.cpp
 #  tests/test_func.cpp
 #  tests/test_graph.cpp
 #  tests/test_ugraph.cpp

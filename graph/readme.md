@@ -1,11 +1,8 @@
-[![Build Status](https://webapi.biicode.com/v1/badges/pablodev/pablodev/graph/master)](https://www.biicode.com/pablodev/graph) 
 
 GRAPH library for bit-encoded graphs
 ===================
 
-GRAPH is a currenty a  small  C++ library which manages basic functionality of **bit-encoded** simple **unweighted** graphs. At the heart of GRAPH is BITSCAN, an efficient library to manage bit strings. GRAPH's main class is Graph, a template for generic simple graphs. Ugraph is a specialization of the Graph template for undirected graphs only. Graph can also manage undirected graphs, but Ugraph implements some operations  more efficiently (such as counting edges or equality checks).
-
-Also recently available in GRAPH is a graph analyser which gives useful information for unweighted graphs (currently **minimum and maximum graph degree**, **k-core analysis** and a reasonably tight **lower bound for the clique number** based on cores). The analyser is wrapped inside the `KCore` class template. 
+GRAPH is a small efficient  C++ library which manages basic functionality of **bit-encoded** simple graphs, either unweighted or with weights. At the heart of GRAPH is BITSCAN, an efficient library to manage bit strings. GRAPH's main class is Graph, a template for generic simple graphs. Ugraph is a specialization of the Graph template for undirected graphs only. 
 
 GETTING STARTED
 -------------------------------

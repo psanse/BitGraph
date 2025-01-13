@@ -1,3 +1,11 @@
+/*
+* test_kcore.cpp  tests for class Kcore which manages the k-core number of undirected graphs
+* @created ?
+* @last_update 13/01/24
+* @dev pss
+*/
+
+
 #include <iostream>
 #include <fstream>
 #include <string>
@@ -9,16 +17,11 @@
 #include "utils/logger.h"
 #include "utils/result.h"
 
-//#include "../../copt/common/common_clq.h"
-
-
-//#define TEST_PATH_BIG_GRAPHS		"C:/Users/i7/Desktop/bigGraphs/"
-//#define TEST_PATH_DIMACS_GRAPHS		"C:/Users/i7/Desktop/dimacs/"
-
 using namespace std;
 
 //aliases
 using vint =  vector<int>;
+
 
 class KcoreWTest : public ::testing::Test {
 protected:
@@ -36,10 +39,86 @@ protected:
 	ugraph ug;												//undirected graph with integer weights
 };
 
-TEST_F(KcoreWTest, width) {
+TEST_F(KcoreWTest, constructor) {
 
 	KCore<ugraph> kc(ug);
+
+	EXPECT_EQ(4, kc.get_graph().number_of_vertices());
+	EXPECT_EQ(nullptr, kc.get_subgraph());
+
+
+}
+
+TEST_F(KcoreWTest, set_subgraph) {
+
+	//bitset that induces a subgraph in G
+	decltype(ug)::_bbt bbset(4);
+	bbset.set_bit(0);
+	bbset.set_bit(2);
+	
+	//KCore with subgraph
+	KCore<ugraph> kc(ug, &bbset);
+	auto psg = kc.get_subgraph();
+
+	EXPECT_TRUE	(kc.get_subgraph()->is_bit(0));
+	EXPECT_TRUE	(kc.get_subgraph()->is_bit(2));
+	EXPECT_FALSE(kc.get_subgraph()->is_bit(1));
+	EXPECT_FALSE(kc.get_subgraph()->is_bit(3));
+
+}
+
+TEST_F(KcoreWTest, kcore_decomp_full_graph) {
+
+	KCore<ugraph> kc(ug);
+
+	/////////////////
 	kc.find_kcore();
+	/////////////////
+
+	EXPECT_EQ(1, kc.get_max_kcore());						//1-core is the maximum core number in a star graph
+
+	EXPECT_EQ(1, kc.coreness(0));
+	EXPECT_EQ(1, kc.coreness(1));
+	EXPECT_EQ(1, kc.coreness(2));
+	EXPECT_EQ(1, kc.coreness(3));
+
+	vint kcore_num = kc.coreness_numbers();					//coreness of all vertices
+	EXPECT_EQ(1, kcore_num[0]);
+	EXPECT_EQ(1, kcore_num[1]);
+	EXPECT_EQ(1, kcore_num[2]);
+	EXPECT_EQ(1, kcore_num[3]);
+
+	//size of k-cores
+	EXPECT_EQ(0, kc.get_kcore_size(0));						//number of vertices in the 0-core (isolani in disconnected graphs)
+	EXPECT_EQ(4, kc.get_kcore_size(1));						//number of vertices in the 1-core (and not in the 2-core)
+	EXPECT_EQ(0, kc.get_kcore_size(2));						//number of vertices in the 2-core (and not in the 3-core)
+
+	//set of vertices in k-cores
+	vint kcore_set = kc.get_kcore_set(1);					//vertices in the 1-core
+	EXPECT_EQ(4, kcore_set.size());
+
+	kcore_set = kc.get_kcore_set(0);						//vertices in the 0-core: all vertices
+	EXPECT_EQ(4, kcore_set.size());
+
+	//k-core sorting (new-to-old format)
+	vint kcore_ord = kc.get_kcore_ordering();				//arrangement of vertices in non-decreasing kcore order
+
+	vint kcore_ord_exp = { 1, 2, 3, 0 };					//0 is the last because it was placed in the last bin	
+	EXPECT_EQ(kcore_ord_exp, kcore_ord);
+
+	//I/O
+	kc.print_kcore(false, cout);							//prints the coreness of each vertex
+	kc.print_kcore(true, cout);								//prints the coreness and degree of each vertex
+}
+
+
+TEST_F(KcoreWTest, minimum_width) {
+
+	KCore<ugraph> kc(ug);
+
+	//////////////////
+	kc.find_kcore();
+	//////////////////
 	
 	auto min_width	= kc.minimum_width	(false);			//1 - minimum width of the graph 
 	auto width		= kc.minimum_width	(true);				//3 - a width but not minimum
@@ -52,36 +131,81 @@ TEST_F(KcoreWTest, width) {
 	//kc.print_kcore(true, cout);							//prints the coreness and degree of each vertex
 }
 
-TEST(KCore, kcore_decomposition_sparse){
-	
-	sparse_ugraph ug(PATH_GRAPH_TESTS_CMAKE_SRC_CODE "star.clq");
-	
-	KCore<sparse_ugraph> kc(ug);
-	kc.find_kcore();
-	vector<int> v= kc.get_kcore_set(2);
-	EXPECT_EQ(1, count(v.begin(), v.end(), 0));
-	EXPECT_EQ(1, count(v.begin(), v.end(), 1));
-	EXPECT_EQ(1, count(v.begin(), v.end(), 6));
-	EXPECT_EQ(0, count(v.begin(), v.end(), 7));
-	
-	////////////
-	v.clear();
-	sparse_ugraph ug1(100);							//an empty graph
-	ug1.add_edge(0,1);
-	ug1.add_edge(0,2);
-	ug1.add_edge(0,3);
-	ug1.add_edge(0,4);
-	ug1.add_edge(0,5);
 
-	KCore<sparse_ugraph> kc1(ug1);
-	kc1.find_kcore();
+TEST(KCoreSparse, kcore_decomp_full_graph){
 	
-	v= kc1.get_kcore_set(1);
-	for (int i = 0; i < 6; i++) {
-		EXPECT_EQ(i, v[i]);
-	}
+	//star graph with 11 vertices and a clique {1, 2, 7}
+	sparse_ugraph sug(PATH_GRAPH_TESTS_CMAKE_SRC_CODE "star.clq");		
+	
+	KCore<sparse_ugraph> kc(sug);
+
+	EXPECT_EQ(11, kc.get_graph().number_of_vertices());
+	EXPECT_EQ(nullptr, kc.get_subgraph());
+
+	////////////////////
+	kc.find_kcore();
+	///////////////////
+
+	//1-core = V \ {0, 1, 6}
+	EXPECT_EQ(8, kc.get_kcore_size(1));
+
+	//2-core = {0, 1, 6}
+	vint core2	= kc.get_kcore_set(2);
+	EXPECT_EQ(1, count(core2.begin(), core2.end(), 0));
+	EXPECT_EQ(1, count(core2.begin(), core2.end(), 1));
+	EXPECT_EQ(1, count(core2.begin(), core2.end(), 6));
+	EXPECT_EQ(0, count(core2.begin(), core2.end(), 7));
 	
 }
+
+TEST(KCoreSparse, kcore_decomp_subgraph) {
+
+	//star graph with 11 vertices and a clique {0, 1, 6}
+	sparse_ugraph sug(PATH_GRAPH_TESTS_CMAKE_SRC_CODE "star.clq");
+
+	//bitset that induces a 3-clique in G
+	decltype(sug)::_bbt bbset(sug.number_of_vertices());
+	bbset.set_bit(0);
+	bbset.set_bit(1);
+	bbset.set_bit(6);
+
+	KCore<sparse_ugraph> kc(sug, &bbset);
+
+	EXPECT_EQ(11, kc.get_graph().number_of_vertices());
+	EXPECT_TRUE(kc.get_subgraph()->is_bit(0));
+	EXPECT_TRUE(kc.get_subgraph()->is_bit(1));
+	EXPECT_TRUE(kc.get_subgraph()->is_bit(6));
+	EXPECT_EQ(3, kc.get_subgraph()->popcn64());
+
+	////////////////////
+	kc.find_kcore();											//on G[{0, 1, 6}]			
+	///////////////////
+
+	//1-core = V \ {0, 1, 6}
+	EXPECT_EQ(0, kc.get_kcore_size(1));
+
+
+	//2-core = {0, 1, 6}
+	vint core2 = kc.get_kcore_set(2);
+	EXPECT_EQ(3, kc.get_kcore_size(2));
+	EXPECT_EQ(1, count(core2.begin(), core2.end(), 0));
+	EXPECT_EQ(1, count(core2.begin(), core2.end(), 1));
+	EXPECT_EQ(1, count(core2.begin(), core2.end(), 6));
+	EXPECT_EQ(0, count(core2.begin(), core2.end(), 7));
+
+	//I/O
+	//kc.print_kcore(false, cout);								//prints the coreness of each vertex
+	//kc.print_kcore(true, cout);								//prints the coreness and degree of each vertex
+
+}
+
+/////////////////
+//
+// Examples with synthetic graphs
+// 
+// TODO - CHECK
+//
+/////////////////
 
 TEST(KCoreUB, kcore_example){
 

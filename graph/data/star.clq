@@ -1,4 +1,4 @@
-c starred graph with a 2 clique
+c starred graph with a 3-clique {1, 2, 7}
 p edge 11 11
 e 1 2
 e 1 3
