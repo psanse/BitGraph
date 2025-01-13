@@ -327,41 +327,65 @@ template<class Graph_t>
 inline
 const vint& GraphFastRootSort<Graph_t>::sort_degen_non_decreasing_deg(bool rev){
 	
+	int min_deg = NV_, deg = 0;
 	node_active_state_.set_bit(0, NV_ - 1);					//all active, pending to be ordered
-	int min_deg = NV_, v = EMPTY_ELEM;
 	nodes_.clear();
 
 	//main loop
-	while(true){
-		min_deg = NV_;
-				
-		//selects an active vertex with minimum degree
-		for (auto j = 0; j < NV_; ++j) {
-			if (node_active_state_.is_bit(j) && (nb_neigh_[j] < min_deg)) {
-				min_deg = nb_neigh_[j];
-				v = j;
-			}
-		}
-
-		////////////////////////////////
-		nodes_.emplace_back(v);
-		if (nodes_.size() == NV_) { break; }		//exit condition - all vertices ordered
-
-		node_active_state_.erase_bit(v);
-		////////////////////////////////
-
-		//updates neighborhood info in remaining vertices
-		bb_type& bbn = g_.get_neighbors(v);
-		bbn.init_scan(bbo::NON_DESTRUCTIVE);
+	do{
+		
+		min_deg = NV_;		
 		int w = EMPTY_ELEM;
-		while ((w = bbn.next_bit()) != EMPTY_ELEM) {
+		int v = EMPTY_ELEM;
 
-			if (node_active_state_.is_bit(w)) {
-				nb_neigh_[w]--;
+		//selects an active vertex with minimum degree
+		node_active_state_.init_scan(bbo::NON_DESTRUCTIVE);
+		while ((w = node_active_state_.next_bit()) != EMPTY_ELEM) {
+			deg = g_.degree (w, node_active_state_);
+			if (min_deg > deg) {											// >= is possible
+				min_deg = deg;
+				v = w;
 			}
 		}
 
-	} //endWhile
+		/////////////////////////
+		nodes_.emplace_back(v);
+		/////////////////////////
+
+		//////////////////////////////////
+		node_active_state_.erase_bit(v);
+		//////////////////////////////////
+		
+		/////////////////////////
+		//OLD implementation using chached degree values
+		
+		//selects an active vertex with minimum degree
+		//for (auto j = 0; j < NV_; ++j) {
+		//	if (node_active_state_.is_bit(j) && (nb_neigh_[j] < min_deg)) {
+		//		min_deg = nb_neigh_[j];
+		//		v = j;
+		//	}
+		//}
+
+		//////////////////////////////////
+		//nodes_.emplace_back(v);
+		//if (nodes_.size() == NV_) { break; }		//exit condition - all vertices ordered
+
+		//node_active_state_.erase_bit(v);
+		//////////////////////////////////
+
+		////updates neighborhood info in remaining vertices
+		//bb_type& bbn = g_.get_neighbors(v);
+		//bbn.init_scan(bbo::NON_DESTRUCTIVE);
+		//int w = EMPTY_ELEM;
+		//while ((w = bbn.next_bit()) != EMPTY_ELEM) {
+
+		//	if (node_active_state_.is_bit(w)) {
+		//		nb_neigh_[w]--;
+		//	}
+		//}
+
+	} while (nodes_.size() < NV_);
 	
 
 	if(rev){

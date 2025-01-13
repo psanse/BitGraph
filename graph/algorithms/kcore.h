@@ -297,8 +297,6 @@ inline int KCore<Graph_t>::find_kcore(Graph_t& g)
 			}
 		}
 
-		cout << "Vertex " << degen_order[j] << " has width " << width << endl;
-
 		//update max_width
 		if (max_width < width) {
 			max_width = width;		
@@ -306,7 +304,7 @@ inline int KCore<Graph_t>::find_kcore(Graph_t& g)
 		
 		//no early exit if the width does not increase monotonically? CHECK ()
 	}
-	cin.get();
+
 	return max_width;
 }
 
