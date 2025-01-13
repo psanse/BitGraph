@@ -41,7 +41,6 @@
 
 //////////////////////////
 
-
 //useful alias
 using sparse_ugraph = Ugraph<sparse_bitarray>;			//simple sparse undirected graph
 		
@@ -67,6 +66,17 @@ class KCore{
 public:	
 	friend ostream& operator<< (std::ostream& o, const KCore& kc){ kc.print_kcore(o); return o;}
 
+	enum print_t { DEG, BIN, VER, POS };
+
+	//alias types
+	using basic_type = Graph_t;						//a graph from GRAPH, typically sparse_ugraph
+	using type = KCore;
+
+	//alias types for backward compatibility
+	using _bbt = typename basic_type::_bbt;			//bitset type
+	using _gt = basic_type;							//graph type
+
+	//////////////
 	//globals
 
 	/*
@@ -78,18 +88,8 @@ public:
 	* 
 	* @returns maximum core of the graph
 	*/
-	static int find_kcore(Graph_t& g);				//computes kcore number of the graph - O(|V|*|V|)
+	static int find_kcore				(Graph_t& g);				
 	
-	enum print_t { DEG, BIN, VER, POS };
-
-	//alias types
-	using basic_type = Graph_t;						//a graph from GRAPH, typically sparse_ugraph
-	using type = KCore;
-
-	//alias types for backward compatibility
-	using _bbt = typename basic_type::_bbt;			//bitset type
-	using _gt = basic_type;							//graph type
-
 //////////////////////////////
 //construction / destruction
 public:
@@ -98,13 +98,13 @@ public:
 	KCore								(Graph_t& g, _bbt* pSubg = nullptr);
 		
 	//copies or moves not allowed
-	KCore								(const KCore& kc)	= delete;	
-	KCore&  operator =					(const KCore& kc)	= delete;
-	KCore								(KCore&& kc)		= delete;
-	KCore& operator =					(KCore&& kc)		= delete;
+	KCore								(const KCore& kc)				= delete;	
+	KCore&  operator =					(const KCore& kc)				= delete;
+	KCore								(KCore&& kc)					= delete;
+	KCore& operator =					(KCore&& kc)					= delete;
 
 	//destructor - default
-	virtual ~KCore						()					= default;
+	virtual ~KCore						()								= default;
 	 
 ////////////////
 //setters and getters 
