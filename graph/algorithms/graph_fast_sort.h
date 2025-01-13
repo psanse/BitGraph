@@ -347,7 +347,7 @@ const vint& GraphFastRootSort<Graph_t>::sort_degen_non_decreasing_deg(bool rev){
 				v = w;
 			}
 		}
-
+		
 		/////////////////////////
 		nodes_.emplace_back(v);
 		/////////////////////////
@@ -386,7 +386,6 @@ const vint& GraphFastRootSort<Graph_t>::sort_degen_non_decreasing_deg(bool rev){
 		//}
 
 	} while (nodes_.size() < NV_);
-	
 
 	if(rev){
 		std::reverse(nodes_.begin(), nodes_.end());

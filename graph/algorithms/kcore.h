@@ -87,6 +87,8 @@ public:
 	*		I. Use for middle and small graphs (not for sparse graphs)
 	* 
 	* @returns maximum core of the graph
+	* 
+	* TO NOTE: it is not possible an early exit (13/01/25)
 	*/
 	static int find_kcore				(Graph_t& g);				
 	
@@ -165,7 +167,7 @@ private:
 	*		 If nullptr, the subgraph is the graph itself.
 	* @returns 0 if success, -1 if memory allocation fails
 	*/
-	int set_subgraph(_bbt* psg = nullptr);
+	int set_subgraph					(_bbt* psg = nullptr);
 
 //////////////
 // Main operations
@@ -287,10 +289,9 @@ inline int KCore<Graph_t>::find_kcore(Graph_t& g)
 	//I. count maximum of the neighbors of each vertex v that precedes v in the ordering
 	//II.find the maximum count
 	int max_width = 0;
-	int width = 0;
-
 	for (auto j = 1; j < degen_order.size(); ++j) {
-		width = 0;
+
+		auto width = 0;
 		for (auto i = j - 1; i >= 0; --i) {
 			if (g.is_edge(degen_order[j], degen_order[i])) {
 				++width;
@@ -302,7 +303,11 @@ inline int KCore<Graph_t>::find_kcore(Graph_t& g)
 			max_width = width;		
 		}
 		
-		//no early exit if the width does not increase monotonically? CHECK ()
+		//TO NOTE: no early exit if width decreases in two subseqent vertices - 
+		//the values are not guaranteed to increase monotonically and then
+		//decrease monotonically after the maxmium core (as seen in tests with brock200_1.clq 13/01/25)
+
+		//ON THE OTHER HAND, the maximum width value is the maximum core number 
 	}
 
 	return max_width;
