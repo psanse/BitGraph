@@ -1,4 +1,3 @@
-[![Build Status](https://webapi.biicode.com/v1/badges/pablodev/pablodev/graph/master)](https://www.biicode.com/pablodev/graph) 
 
 GRAPH library for bit-encoded graphs
 ===================
