@@ -5,7 +5,8 @@
  * @last_update 11/01/25
  * @dev pss
  *
- * //TODO - mention reference paper to determine KCore
+ * TODO - mention reference paper to determine KCore
+ * TODO - consider changing the bitset of vertices that induces the subgraph to a vector of vertices (13/01/25)
  */
 
 #ifndef __KCORE_H__
