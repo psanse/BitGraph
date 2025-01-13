@@ -160,9 +160,10 @@ public:
 	* @brief Degenerate non-decreasing degree ordering
 	* @comments deg info is not restored after the call
 	* @return output ordering in [OLD]->[NEW] format
+	* TODO - optimize
 	*/
-	const vint&  sort_degen_non_decreasing_degree(bool rev);				
-	const vint&  sort_degen_non_increasing_degree(bool rev);				
+	const vint&  sort_degen_non_decreasing_deg(bool rev);				
+	const vint&  sort_degen_non_increasing_deg(bool rev);				
 	
 	/*
 	*@brief Composite non-decreasing degree degenerate ordering based on a prior given ordering 
@@ -170,7 +171,7 @@ public:
 	*@comments the vertex ordering has to be set (with set_ordering(...)) prior to the call
 	*@return output ordering in [OLD]->[NEW] format
 	*/
-	const vint& sort_degen_composite_non_decreasing_degree( bool rev);	
+	const vint& sort_degen_composite_non_decreasing_deg( bool rev);	
 
 
 	/*
@@ -179,7 +180,7 @@ public:
 	*@comments the vertex ordering has to be set (with set_ordering(...)) prior to the call
 	*@return output ordering in [OLD]->[NEW] format
 	*/
-	const vint& sort_degen_composite_non_increasing_degree( bool rev );	
+	const vint& sort_degen_composite_non_increasing_deg( bool rev );	
 	
 	/////////////////
 	// Subgrah ordering 
@@ -274,24 +275,24 @@ vint GraphFastRootSort<Graph_t>::new_order (int alg, bool ltf, bool o2n)
 	case MIN_DEGEN:
 		set_ordering();
 		compute_deg_root();
-		sort_degen_non_decreasing_degree(ltf);			//checked with framework - (20/12/19 - what does this mean?)
+		sort_degen_non_decreasing_deg(ltf);			//checked with framework - (20/12/19 - what does this mean?)
 		break;
 	case MIN_DEGEN_COMPO:
 		compute_deg_root();
 		compute_support_root();
 		sort_non_decreasing_deg_with_support_tb(false /* MUST BE*/);
-		sort_degen_composite_non_decreasing_degree(ltf);
+		sort_degen_composite_non_decreasing_deg(ltf);
 		break;
 	case MAX_DEGEN:
 		set_ordering();
 		compute_deg_root();
-		sort_degen_non_increasing_degree(ltf);
+		sort_degen_non_increasing_deg(ltf);
 		break;
 	case MAX_DEGEN_COMPO:
 		compute_deg_root();
 		compute_support_root();
 		sort_non_increasing_deg_with_support_tb(false /* MUST BE*/);
-		sort_degen_composite_non_increasing_degree(ltf);
+		sort_degen_composite_non_increasing_deg(ltf);
 		break;
 	case MAX:
 		compute_deg_root();
@@ -324,40 +325,55 @@ vint GraphFastRootSort<Graph_t>::new_order (int alg, bool ltf, bool o2n)
 
 template<class Graph_t>
 inline
-const vint& GraphFastRootSort<Graph_t>::sort_degen_non_decreasing_degree(bool rev){
-	node_active_state_.set_bit(0, NV_-1);					//all active, pending to be ordered
-	int min_deg=NV_, v=EMPTY_ELEM;
+const vint& GraphFastRootSort<Graph_t>::sort_degen_non_decreasing_deg(bool rev){
+	
+	node_active_state_.set_bit(0, NV_ - 1);					//all active, pending to be ordered
+	int min_deg = NV_, v = EMPTY_ELEM;
 	nodes_.clear();
 
-	for(int i=0; i<NV_; i++){
-		min_deg=NV_;
-		for(int j=0; j<NV_; j++){
-			if(node_active_state_.is_bit(j) && nb_neigh_[j] < min_deg){
-				min_deg=nb_neigh_[j];
-				v=j;
+	//main loop
+	while(true){
+		min_deg = NV_;
+				
+		//selects an active vertex with minimum degree
+		for (auto j = 0; j < NV_; ++j) {
+			if (node_active_state_.is_bit(j) && (nb_neigh_[j] < min_deg)) {
+				min_deg = nb_neigh_[j];
+				v = j;
 			}
 		}
-		nodes_.push_back(v);
+
+		////////////////////////////////
+		nodes_.emplace_back(v);
+		if (nodes_.size() == NV_) { break; }		//exit condition - all vertices ordered
+
 		node_active_state_.erase_bit(v);
-		bb_type& bbn=g_.get_neighbors(v);
+		////////////////////////////////
+
+		//updates neighborhood info in remaining vertices
+		bb_type& bbn = g_.get_neighbors(v);
 		bbn.init_scan(bbo::NON_DESTRUCTIVE);
-		while(true){
-			int w=bbn.next_bit();
-			if(w==EMPTY_ELEM) break;
-			if(node_active_state_.is_bit(w))
+		int w = EMPTY_ELEM;
+		while ((w = bbn.next_bit()) != EMPTY_ELEM) {
+
+			if (node_active_state_.is_bit(w)) {
 				nb_neigh_[w]--;
+			}
 		}
-	}//endFor
+
+	} //endWhile
+	
 
 	if(rev){
 		std::reverse(nodes_.begin(), nodes_.end());
 	}
+
 	return nodes_;
 }
 
 template<class Graph_t>
 inline
-const vint& GraphFastRootSort<Graph_t>::sort_degen_non_increasing_degree(bool rev){
+const vint& GraphFastRootSort<Graph_t>::sort_degen_non_increasing_deg(bool rev){
 	node_active_state_.set_bit(0, NV_-1);											//all active, pending to be ordered
 	int max_deg=0, v=EMPTY_ELEM;
 	nodes_.clear();
@@ -390,7 +406,7 @@ const vint& GraphFastRootSort<Graph_t>::sort_degen_non_increasing_degree(bool re
 
 template<class Graph_t>
 inline 
-const vint& GraphFastRootSort<Graph_t>::sort_degen_composite_non_decreasing_degree(bool rev)
+const vint& GraphFastRootSort<Graph_t>::sort_degen_composite_non_decreasing_deg(bool rev)
 {
 	node_active_state_.set_bit(0, NV_ - 1);			//all active, pending to be ordered
 	int min_deg = NV_, v = EMPTY_ELEM;
@@ -431,7 +447,7 @@ const vint& GraphFastRootSort<Graph_t>::sort_degen_composite_non_decreasing_degr
 
 template<class Graph_t>
 inline 
-const vint& GraphFastRootSort<Graph_t>::sort_degen_composite_non_increasing_degree(bool rev)
+const vint& GraphFastRootSort<Graph_t>::sort_degen_composite_non_increasing_deg(bool rev)
 {
 	node_active_state_.set_bit(0, NV_ - 1);											//all active, pending to be ordered
 	int max_deg = 0, v = EMPTY_ELEM;
@@ -641,9 +657,11 @@ const vint& GraphFastRootSort<Graph_t>::sort_non_decreasing_deg_with_support_tb(
 template<class Graph_t>
 inline
 const vint& GraphFastRootSort<Graph_t>::compute_deg_root(){
-	for(int elem=0; elem<NV_; elem++){		
-		nb_neigh_[elem]=g_.get_neighbors(elem).popcn64();
+
+	for(auto elem = 0; elem < NV_;  ++elem){		
+		nb_neigh_[elem] = g_.get_neighbors(elem).popcn64();
 	}
+
 	return nb_neigh_;
 }
 

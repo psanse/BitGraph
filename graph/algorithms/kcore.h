@@ -291,16 +291,22 @@ inline int KCore<Graph_t>::find_kcore(Graph_t& g)
 
 	for (auto j = 1; j < degen_order.size(); ++j) {
 		width = 0;
-		for (auto i = j - 1; i>= 0; --i) {
+		for (auto i = j - 1; i >= 0; --i) {
 			if (g.is_edge(degen_order[j], degen_order[i])) {
 				++width;
 			}
 		}
+
+		cout << "Vertex " << degen_order[j] << " has width " << width << endl;
+
+		//update max_width
 		if (max_width < width) {
 			max_width = width;		
 		}
+		
+		//no early exit if the width does not increase monotonically? CHECK ()
 	}
-
+	cin.get();
 	return max_width;
 }
 
