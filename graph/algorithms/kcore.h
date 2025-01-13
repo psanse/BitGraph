@@ -19,7 +19,6 @@
 #include <map> 
 #include "utils/logger.h"
 #include "graph/simple_sparse_ugraph.h"
-#include "graph/algorithms/graph_fast_sort.h"
 
 /////////////////////////
 //SWAP-MACRO: places vertex u as last vertex in the bin with one less degree. Updates bin but not degree of u
@@ -64,31 +63,18 @@ using map_it = std::map<int, int>::iterator;
 
 template<class Graph_t>
 class KCore{
-public:	
+	
 	friend ostream& operator<< (std::ostream& o, const KCore& kc){ kc.print_kcore(o); return o;}
-
-	//globals
-
-	/*
-	* @brief maximum core of a graph in O(|V|*|V|), by determining
-	*		the width of a graph according to a minimum degenerate 
-	*		ordering.
-	*	
-	*		I. Use for middle and small graphs (not for sparse graphs)
-	* 
-	* @returns maximum core of the graph
-	*/
-	static int find_kcore(Graph_t& g);				//computes kcore number of the graph - O(|V|*|V|)
 	
 	enum print_t { DEG, BIN, VER, POS };
 
-	//alias types
+public:
 	using basic_type = Graph_t;						//a graph from GRAPH, typically sparse_ugraph
 	using type = KCore;
 
-	//alias types for backward compatibility
-	using _bbt = typename basic_type::_bbt;			//bitset type
-	using _gt = basic_type;							//graph type
+	//alias for backward compatibility
+	using _bbt = typename basic_type::_bbt;		//bitset type
+	using _gt = basic_type;						//graph type
 
 //////////////////////////////
 //construction / destruction
@@ -257,7 +243,7 @@ private:
 	void bin_sort						(vint& lv, bool rev);					//bin sort according to vertex set lv (rev TRUE: vertices taken in reverse order)
 	
 	//I/O
-	std::ostream& print					(print_t = VER, std::ostream& o = std::cout);
+	std::ostream& print							(print_t = VER, std::ostream& o = std::cout);
 							
 ///////////
 // data members
@@ -276,33 +262,6 @@ private:
 
 //////////////////////////////////////////////////////
 // IMPLEMENTATION - in header for generic code
-
-template<class Graph_t>
-inline int KCore<Graph_t>::find_kcore(Graph_t& g)
-{
-	//degenerate minimum degree ordering
-	GraphFastRootSort<Graph_t> gfs(g);
-	vint degen_order = gfs.new_order(GraphFastRootSort<Graph_t>::MIN_DEGEN, ::com::sort::LAST_TO_FIRST);		//MUST BE LAST-TO-FIRST!
-	
-	//I. count maximum of the neighbors of each vertex v that precedes v in the ordering
-	//II.find the maximum count
-	int max_width = 0;
-	int width = 0;
-
-	for (auto j = 1; j < degen_order.size(); ++j) {
-		width = 0;
-		for (auto i = j - 1; i>= 0; --i) {
-			if (g.is_edge(degen_order[j], degen_order[i])) {
-				++width;
-			}
-		}
-		if (max_width < width) {
-			max_width = width;		
-		}
-	}
-
-	return max_width;
-}
 
 template<class Graph_t>
 inline KCore<Graph_t>::KCore(Graph_t& g, _bbt* bbset): g_(g), NV_(g.number_of_vertices()), deg_(NV_), pos_(NV_) {
