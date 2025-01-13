@@ -61,7 +61,7 @@ using vint_cit = vector<int>::const_iterator;
 
 template<class Graph_t>
 class KCore{
-
+	
 	friend ostream& operator<< (std::ostream& o, const KCore& kc){ kc.print_kcore(o); return o;}
 	
 	enum print_t { DEG, BIN, VER, POS };
@@ -74,16 +74,24 @@ public:
 	using _bbt = typename basic_type::_bbt;		//bitset type
 	using _gt = basic_type;						//graph type
 
-///////////////
-//construction
+//////////////////////////////
+//construction / destruction
 public:
 
-	KCore	(Graph_t& g, _bbt* bbset = nullptr);
-	
-	//TODO - destructor, copies, moves...
+	//one-and-only constructor
+	KCore								(Graph_t& g, _bbt* pSubg = nullptr);
+		
+	//copies or moves not allowed
+	KCore								(const KCore& kc)	= delete;	
+	KCore&  operator =					(const KCore& kc)	= delete;
+	KCore								(KCore&& kc)		= delete;
+	KCore& operator =					(KCore&& kc)		= delete;
+
+	//destructor - default
+	virtual ~KCore						()					= default;
 	 
 ////////////////
-//setters and getters
+//setters and getters 
 
 	/*
 	* @brief Maximum core number of the graph
@@ -99,7 +107,7 @@ public:
 	int coreness						(std::size_t v)					const { return deg_[v]; }
 	
 	/*
-	* @brief Size of tke kcore for a given k >=0, number of vertices with core number k
+	* @brief Size of tke kcore for a given k >=0 , number of vertices with core number k
 	*		 (must be called afer kcore())
 	*/
 	int get_kcore_size					(std::size_t k)					const;
@@ -117,8 +125,8 @@ public:
 	* @brief Coreness of all vertices
 	*		 (must be called afer kcore()).
 	*/
-	const vint& get_kcore_numbers		()								const	{ return deg_;}
-		
+	const vint& coreness_numbers		()								const	{ return deg_;}
+			
 	/*
 	* @brief Sorting of the vertices according to non-decreasing kcore number
 	*		 (must be called afer kcore()).
@@ -132,6 +140,10 @@ public:
 	*/
 	int set_subgraph					(_bbt * psg = nullptr);
 
+
+	const _gt& get_graph				()								const { return g_; }
+	_bbt*	get_subgraph				()								const { return psg_; }
+
 //////////////
 // Main operations
 
@@ -142,10 +154,12 @@ public:
 	*		 I. @ver_ contains the vertices in non-decreasing kcore order (new-to-old format)
 	*		II. @deg_ contains the coreness of each vertex
 	*		III.The maximum core number of the graph is @deg_[last_vertex]
+	* 
+	* @returns 0 if success, -1 if memory allocation fails
 	*/
-	void find_kcore						();										
+	int find_kcore						();										
 
-	//CHECK - refactor
+	//CHECK and  refactor
 	int find_kcore_UB					(int UB);								//new kcore (vertices with kcore=UB (or nearest real degree > UB) are placed last in ver_)
 	
 	/*
@@ -164,18 +178,24 @@ public:
 	int minimum_width					(bool rev = false);						//computes width of the graph using ver_ list 
 	
 	//////////////////////
-	//clique heuristics
+	//clique heuristics - to refactor
 	vint find_heur_clique				(int num_iter = EMPTY_ELEM);			//greedy clique heuristic based on KCore ordering
 inline	vint find_heur_clique_opt		(int num_iter = EMPTY_ELEM);			//only available for sparse graphs
 vint find_heur_clique_sparse			(int num_iter = EMPTY_ELEM);			//only available for sparse graphs	
 
 ////////////////
-//Experimental 
+//Experimental - to refactor 
 	int make_kcore_filter				(map_t& filter, bool reverse=true);		//applied to clique, probably remove
 
 ///////////////
 //I/O
-	void print_kcore					(bool real_deg = false, std::ostream& o = std::cout)		const;
+
+	/*
+	* @brief streams k-core information
+	* @param add_real_deg if TRUE prints also the real degree of vertices
+	* @param o output stream
+	*/
+	std::ostream& print_kcore			(bool add_real_deg = false, std::ostream& o = std::cout)	const;
 
 //////////////
 // private interface
@@ -221,14 +241,14 @@ private:
 private:
 
 	Graph_t& g_;																//the one and only graph G=(V, E)			
-	const int NV_;																//size of graph |V| - for convenience, possibly remove
+	const int NV_;																//size of graph |V| - for convenience
 	_bbt* psg_;																	//to manage kcore in subgraphs (default nullptr)	
 	
 	//algo data structures
 	vint deg_;																	//coreness of vertices																
 	vint bin_;																	//bins [deg[v]] for bin sort sorting algorithm
-	vint ver_;																	//vertices in non-decreasing kcore order (new to old format)
-	vint pos_;
+	vint ver_;																	//vertices in non-decreasing kcore order (mapping in new-to-old format)
+	vint pos_;																	//position of vertices in ver_ (old-to-new format)
 };
 
 //////////////////////////////////////////////////////
@@ -266,10 +286,13 @@ int KCore<Graph_t>::set_subgraph(_bbt* psg) {
 }
 
 template<class Graph_t>
-void KCore<Graph_t>::find_kcore(){
+int KCore<Graph_t>::find_kcore(){
 
 	//inits data structures
-	init_kcore();
+	if (init_kcore() == -1) {
+		LOG_ERROR("Error during memory allocation - KCore<Graph_t>::init_kcore");
+		return -1;
+	}
 	bin_sort();
 	
 	auto u = EMPTY_ELEM;
@@ -322,6 +345,8 @@ void KCore<Graph_t>::find_kcore(){
 
 		}//vertex iteration
 	}
+
+	return 0;
 }	
 
 template<class Graph_t>
@@ -1024,29 +1049,32 @@ vint KCore<sparse_ugraph>::find_heur_clique_sparse(int num_iter){
 //
 ///////////////////////
 
-
 template<class Graph_t>
 void KCore<Graph_t>::print(print_t type, ostream& o){
 	switch(type){
 	case DEG:
-		for(int i=0; i<deg_.size();i++)
-			o<<deg_[i]<<" ";
-		o<<endl;
+		for (auto i = 0; i < deg_.size(); ++i) {
+			o << deg_[i] << " ";
+		}
+		o << endl;
 		break;
 	case BIN:
-		for(int i=0; i<bin_.size();i++)
-			o<<bin_[i]<<" ";
-	    o<<endl;
+		for (auto i = 0; i < bin_.size(); ++i) {
+			o << bin_[i] << " ";
+		}
+		o<<endl;
 		break;
 	case VER:
-		for(int i=0; i<ver_.size();i++)
-			o<<ver_[i]<<" ";
-		o<<endl;
+		for (auto i = 0; i < ver_.size(); ++i) {
+			o << ver_[i] << " ";
+		}
+		o << endl;
 		break;
 	case POS:
-		for(int i=0; i<pos_.size();i++)
-			o<<pos_[i]<<" ";
-		o<<endl;
+		for (auto i = 0; i < pos_.size(); ++i) {
+			o << pos_[i] << " ";
+		}
+		o << endl;
 		break;
 	default:
 		;
@@ -1054,31 +1082,39 @@ void KCore<Graph_t>::print(print_t type, ostream& o){
 }
 
 template<class Graph_t>
-void KCore<Graph_t>::print_kcore(bool real_deg, ostream& o)	const{
-	if(psg_==nullptr){	//whole graph
-		for(vint::const_iterator it=ver_.begin(); it!=ver_.end(); it++){
-			cout<<"["<<*it<<":"<<deg_[*it];
-			if(real_deg){
-				cout<<":"<<g_.degree(*it)<<"] ";
-			}else  cout<<"] ";
-		}
+std::ostream& KCore<Graph_t>::print_kcore (bool real_deg, ostream& o)	const{
 
-		/*for(vint_cit it=deg_.begin(); it!=deg_.end(); ++it){
-			o<<"["<<it-deg_.begin()<<","<<*it<<"] ";
-		}*/
-	}else{				//subgraph
-		int v=EMPTY_ELEM;
-		if(psg_->init_scan(bbo::NON_DESTRUCTIVE)!=EMPTY_ELEM){
-			while(true){
-				v= psg_->next_bit();
-				if(v==EMPTY_ELEM) break;
-				o<<"["<<v<<","<<deg_[v];
-				if(real_deg){
-					cout<<":"<<g_.degree(v)<<"] ";
-				}else  cout<<"] ";
+	if(psg_== nullptr){
+
+		//whole graph
+		for(auto it = ver_.begin(); it != ver_.end(); ++it){
+			o << "[" << *it << ":" << deg_[*it];
+			if (real_deg) {
+				o << ":" << g_.degree(*it) << "] ";
+			}
+			else {
+				o << "] "; 
 			}
 		}
+	}else{	
+
+		//subgraph
+		auto v=EMPTY_ELEM;			
+		psg_ -> init_scan(bbo::NON_DESTRUCTIVE); 					//should not be empty - sparse graphs will produce an error
+		
+		while ((v = psg_->next_bit()) != EMPTY_ELEM ) {
+			o << "[" << v << "," << deg_[v];
+			if (real_deg) {
+				o << ":" << g_.degree(v) << "] ";
+			}
+			else {
+				o << "] ";
+			}
+		}
+		
 	}
+
+	return o;
 }
 
 
