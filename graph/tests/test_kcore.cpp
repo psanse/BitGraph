@@ -107,8 +107,8 @@ TEST_F(KcoreWTest, kcore_decomp_full_graph) {
 	EXPECT_EQ(kcore_ord_exp, kcore_ord);
 
 	//I/O
-	kc.print_kcore(false, cout);							//prints the coreness of each vertex
-	kc.print_kcore(true, cout);								//prints the coreness and degree of each vertex
+	//kc.print_kcore(false, cout);							//prints the coreness of each vertex
+	//kc.print_kcore(true, cout);								//prints the coreness and degree of each vertex
 }
 
 
@@ -131,6 +131,45 @@ TEST_F(KcoreWTest, minimum_width) {
 	//kc.print_kcore(true, cout);							//prints the coreness and degree of each vertex
 }
 
+
+TEST_F(KcoreWTest, kcore_decomp_static) {
+
+	KCore<ugraph> kc(ug);
+
+	//////////////////
+	kc.find_kcore();
+	int max_kcore_quad = KCore<ugraph>::find_kcore(ug);
+	//////////////////
+
+	EXPECT_EQ(max_kcore_quad, kc.get_max_kcore());			//minimum width = k in the max k-core 
+	
+
+	//I/O
+	//kc.print_kcore(false, cout);							//prints the coreness of each vertex
+	//kc.print_kcore(true, cout);							//prints the coreness and degree of each vertex
+}
+
+TEST(KCore, kcore_decomp_static_brock) {
+
+	ugraph ug(PATH_GRAPH_TESTS_CMAKE_SRC_CODE "brock200_1.clq");
+
+	//core number in O(|V|*|V|)
+	int max_core_quad = KCore<ugraph>::find_kcore(ug);								
+	///////////////////////////////////////////////////
+
+	//core number in O(|E|)
+	KCore<ugraph> kc(ug);									
+	kc.find_kcore();
+	
+
+	///////////////////////////////////////////////////
+	EXPECT_EQ(max_core_quad, kc.get_max_kcore());			 
+	///////////////////////////////////////////////////
+
+	//I/O
+	//kc.print_kcore(true, cout);								
+
+}
 
 TEST(KCoreSparse, kcore_decomp_full_graph){
 	
@@ -210,7 +249,7 @@ TEST(KCoreSparse, kcore_decomp_subgraph) {
 TEST(KCoreUB, kcore_example){
 
 	ugraph ug(PATH_GRAPH_TESTS_CMAKE_SRC_CODE "brock200_1.clq");
-	
+		
 	//test with real kcore number
 	KCore<ugraph> kc(ug);	
 	kc.find_kcore();
@@ -220,6 +259,7 @@ TEST(KCoreUB, kcore_example){
 	EXPECT_EQ(UB_corr, kcUBn);
 	EXPECT_EQ(kcUBn, kc.minimum_width(true));   //checks width (real degrees)
 	
+
 	//test with UB on kcore number
 	KCore<ugraph> kc1(ug);
 	kc1.find_kcore();
@@ -243,22 +283,6 @@ TEST(KCoreUB, kcore_example){
 }
 
 
-TEST(KCoreUB, kcore_example_I){
-
-	ugraph ug(PATH_GRAPH_TESTS_CMAKE_SRC_CODE "ia-southernwomen.edges");
-	
-	//test with real kcore number
-	KCore<ugraph> kc(ug);
-	kc.find_kcore();
-	int kcn=kc.get_max_kcore();
-	int UB_corr=kc.find_kcore_UB(kcn);
-	int kcUBn=kc.get_max_kcore();
-
-	EXPECT_EQ(UB_corr, kcUBn);
-	EXPECT_EQ(kcUBn, kc.minimum_width(true)); //checks width (real degrees)
-
-}
-
 TEST(KCoreUB, kcore_example_II){
 
 	ugraph ug(PATH_GRAPH_TESTS_CMAKE_SRC_CODE "r10_0.2_23.txt");
@@ -279,6 +303,23 @@ TEST(KCoreUB, kcore_example_II){
 // DISABLED TESTS
 //
 ////////////////
+
+
+TEST(KCoreUB, DISABLED_kcore_example_I) {
+
+	ugraph ug(PATH_GRAPH_TESTS_CMAKE_SRC_CODE "ia-southernwomen.edges");
+
+	//test with real kcore number
+	KCore<ugraph> kc(ug);
+	kc.find_kcore();
+	int kcn = kc.get_max_kcore();
+	int UB_corr = kc.find_kcore_UB(kcn);
+	int kcUBn = kc.get_max_kcore();
+
+	EXPECT_EQ(UB_corr, kcUBn);
+	EXPECT_EQ(kcUBn, kc.minimum_width(true)); //checks width (real degrees)
+
+}
 
 TEST(KCoreUB, DISABLED_random){
 	random_attr_t rd(10, 100, .05, .20, 50, 10, .05);

@@ -76,7 +76,8 @@ add_executable ( test_graph  tests/gtest_main.cpp
 #  tests/test_graph_sort.cpp   
 
 #  TESTS UNDER DEVELOPMENT  / CHECKING
-    
+    tests/test_kcore.cpp
+
 #  TESTS CHECKED
 #  tests/test_kcore.cpp
 #  tests/test_func.cpp
