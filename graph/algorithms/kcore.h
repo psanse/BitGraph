@@ -364,7 +364,6 @@ inline int KCore<Graph_t>::reset_subgraph(_bbt* psg) {
 }
 
 
-
 template<class Graph_t>
 inline int KCore<Graph_t>::find_kcore(){
 
