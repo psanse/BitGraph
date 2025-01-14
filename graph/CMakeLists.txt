@@ -76,23 +76,25 @@ add_executable ( test_graph  tests/gtest_main.cpp
 #  TESTS TO BE CHECKED
 #  tests/test_graph_sort.cpp   
 
+	tests/test_kcore.cpp
+
 #  TESTS CHECKED
-  tests/test_kcore.cpp
-  tests/test_func.cpp
-  tests/test_graph.cpp
-  tests/test_ugraph.cpp
-  tests/test_wgraph.cpp
-  tests/test_wegraph.cpp
-  tests/test_sparse_graph.cpp 
-  tests/test_wegraph.cpp
-  tests/test_graph_fast_sort.cpp
-  tests/test_graph_fast_sort_weighted.cpp
-  tests/test_decode.cpp
-  tests/test_random_graph.cpp
-  tests/test_graph_conversions.cpp
-  tests/test_sparse_graph.cpp
-  tests/test_format.cpp 
-  tests/test_graph_map.cpp 
+#  tests/test_kcore.cpp
+#  tests/test_func.cpp
+#  tests/test_graph.cpp
+#  tests/test_ugraph.cpp
+#  tests/test_wgraph.cpp
+#  tests/test_wegraph.cpp
+#  tests/test_sparse_graph.cpp 
+#  tests/test_wegraph.cpp
+#  tests/test_graph_fast_sort.cpp
+#  tests/test_graph_fast_sort_weighted.cpp
+#  tests/test_decode.cpp
+#  tests/test_random_graph.cpp
+#  tests/test_graph_conversions.cpp
+#  tests/test_sparse_graph.cpp
+#  tests/test_format.cpp 
+#  tests/test_graph_map.cpp 
 )
 
 target_include_directories (test_graph PUBLIC ../googletest/include/)

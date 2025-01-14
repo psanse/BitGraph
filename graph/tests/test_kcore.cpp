@@ -217,7 +217,7 @@ TEST(KCoreSparse, kcore_decomp_subgraph) {
 	EXPECT_EQ(3, kc.get_subgraph()->popcn64());
 
 	////////////////////
-	kc.find_kcore();											//on G[{0, 1, 6}]			
+	kc.find_kcore(true);											//on G[{0, 1, 6}]			
 	///////////////////
 
 	//1-core = V \ {0, 1, 6}
