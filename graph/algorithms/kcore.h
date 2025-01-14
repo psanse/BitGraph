@@ -118,7 +118,7 @@ public:
 	*		 (must be called afer kcore())
 	* @returns Maximum core number of the graph or -1 if error
 	*/
-	int get_max_kcore					()								const;																	
+	int max_core_number					()								const;																	
 	
 	/*
 	* @brief Core number of a given vertex
@@ -127,19 +127,19 @@ public:
 	int coreness						(std::size_t v)					const { return deg_[v]; }
 	
 	/*
-	* @brief Size of tke kcore for a given k >=0 , number of vertices with core number k
+	* @brief Size of the kcore for a given k >=0 , number of vertices with core number k
 	*		 (must be called afer kcore())
 	*/
-	int get_kcore_size					(std::size_t k)					const;
+	int core_size						(std::size_t k)					const;
 	
 	/*
-	* @brief Set of vertices with kcore number equal or greater than a given k >=0, the k-core set of vertices
+	* @brief Returns the k-core set of vertices for a given k >=0 
 	*		 (must be called afer kcore()).
 	* 
-	*		 I. K=0: all vertices in V
-	*		II. K=1: vertices in the 1-core etc...
+	*		 I. k = 0: all vertices in V
+	*		II. k = 1: vertices in the 1-core etc...
 	*/
-	vint get_kcore_set					(std::size_t k)					const;
+	vint core_set						(std::size_t k)					const;
 
 	/*
 	* @brief Coreness of all vertices
@@ -148,10 +148,10 @@ public:
 	const vint& coreness_numbers		()								const	{ return deg_;}
 			
 	/*
-	* @brief Sorting of the vertices according to non-decreasing kcore number
+	* @brief Arrangement of the vertices according to non-decreasing kcore number
 	*		 (must be called afer kcore()).
 	*/
-	const vint& get_kcore_ordering		()								const	{ return ver_;}
+	const vint& kcore_ordering			()								const	{ return ver_;}
 
 
 	const _gt& get_graph				()								const { return g_; }
@@ -334,7 +334,7 @@ inline KCore<Graph_t>::KCore(Graph_t& g, _bbt subg): g_(g), NV_(g.number_of_vert
 	subg_ = std::move(subg);
 
 	try {
-		ver_.assign(subg_.popcn64(), EMPTY_ELEM);		//nullptr - operates on the subgraph induced by the bitset of vertices (*psg)
+		ver_.assign(subg_.popcn64(), EMPTY_ELEM);
 	}
 	catch (std::bad_alloc& ba) {
 		LOGG_ERROR("bad_alloc exception - KCore<T>::reset_subgraph", ba.what());
@@ -345,12 +345,13 @@ inline KCore<Graph_t>::KCore(Graph_t& g, _bbt subg): g_(g), NV_(g.number_of_vert
 }
 
 template<class Graph_t>
-inline KCore<Graph_t>::KCore(Graph_t& g, vint subg) : g_(g), NV_(g.number_of_vertices()), deg_(NV_), pos_(NV_) {
+inline KCore<Graph_t>::KCore(Graph_t& g, vint set) : g_(g), NV_(g.number_of_vertices()), deg_(NV_), pos_(NV_) {
 
-	subg_ = _bbt(subg, NV_);
+	//builds a  bitset from a vector of vertices (population size NV_)
+	subg_ = _bbt(set, NV_);
 
 	try {
-		ver_.assign(subg_.popcn64(), EMPTY_ELEM);		//nullptr - operates on the subgraph induced by the bitset of vertices (*psg)
+		ver_.assign(subg_.popcn64(), EMPTY_ELEM);		
 	}
 	catch (std::bad_alloc& ba) {
 		LOGG_ERROR("bad_alloc exception - KCore<T>::reset_subgraph", ba.what());
@@ -366,7 +367,7 @@ inline int KCore<Graph_t>::reset_subgraph(_bbt subg) {
 	subg_ = std::move(subg);
 
 	try {
-		ver_.assign (subg_.popcn64(), EMPTY_ELEM);		//nullptr - operates on the subgraph induced by the bitset of vertices (*psg)
+		ver_.assign (subg_.popcn64(), EMPTY_ELEM);		
 	}
 	catch (std::bad_alloc& ba) {
 		LOGG_ERROR("bad_alloc exception - KCore<T>::reset_subgraph", ba.what());
@@ -828,7 +829,7 @@ inline int KCore<Graph_t>::minimum_width (bool rev){
 
 
 template<class Graph_t>
-inline int KCore<Graph_t>::get_max_kcore() const{
+inline int KCore<Graph_t>::max_core_number() const{
 
 	//assert
 	if (ver_.empty()) {
@@ -839,7 +840,7 @@ inline int KCore<Graph_t>::get_max_kcore() const{
 }
 
 template<class Graph_t>
-vint KCore<Graph_t>::get_kcore_set (std::size_t k) const {
+vint KCore<Graph_t>::core_set (std::size_t k) const {
 
 	vint res;
 	
@@ -853,7 +854,7 @@ vint KCore<Graph_t>::get_kcore_set (std::size_t k) const {
 }
 
 template<class Graph_t>
-inline int KCore<Graph_t>::get_kcore_size (std::size_t k) const	{
+inline int KCore<Graph_t>::core_size (std::size_t k) const	{
 
 	auto count = 0;
 	
@@ -1060,14 +1061,14 @@ struct less_kcore{
 };
 
 struct remove_kcore{
-	remove_kcore(vector<int>& pos, vector<int>& ver, vector<int>& deg, int max_clique):pos(pos), ver(ver), deg(deg), max_kcore(max_clique){}
+	remove_kcore(vector<int>& pos, vector<int>& ver, vector<int>& deg, int max_clique):pos(pos), ver(ver), deg(deg), max_core_number(max_clique){}
 	bool operator()(int data) const{
-		return(deg[ver[pos[data]]]<max_kcore);
+		return(deg[ver[pos[data]]]<max_core_number);
 	}
 	vector<int>& pos;
 	vector<int>& ver;
 	vector<int>& deg;
-	int max_kcore;
+	int max_core_number;
 };
 
 template<>
