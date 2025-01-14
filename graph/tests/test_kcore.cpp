@@ -44,7 +44,7 @@ TEST_F(KcoreWTest, constructor) {
 	KCore<ugraph> kc(ug);
 
 	EXPECT_EQ(4, kc.get_graph().number_of_vertices());
-	EXPECT_EQ(nullptr, kc.get_subgraph());
+	EXPECT_TRUE(kc.get_subgraph().is_empty());
 
 
 }
@@ -57,13 +57,29 @@ TEST_F(KcoreWTest, set_subgraph) {
 	bbset.set_bit(2);
 	
 	//KCore with subgraph
-	KCore<ugraph> kc(ug, &bbset);
+	KCore<ugraph> kc(ug, bbset);
 	auto psg = kc.get_subgraph();
 
-	EXPECT_TRUE	(kc.get_subgraph()->is_bit(0));
-	EXPECT_TRUE	(kc.get_subgraph()->is_bit(2));
-	EXPECT_FALSE(kc.get_subgraph()->is_bit(1));
-	EXPECT_FALSE(kc.get_subgraph()->is_bit(3));
+	EXPECT_TRUE	(kc.get_subgraph().is_bit(0));
+	EXPECT_TRUE	(kc.get_subgraph().is_bit(2));
+	EXPECT_FALSE(kc.get_subgraph().is_bit(1));
+	EXPECT_FALSE(kc.get_subgraph().is_bit(3));
+
+}
+
+TEST_F(KcoreWTest, set_subgraph_from_vector) {
+
+	//bitset that induces a subgraph in G
+	vint vset = { 0, 2, 4 };
+
+	//KCore with subgraph
+	KCore<ugraph> kc(ug, vset);
+	auto psg = kc.get_subgraph();
+
+	EXPECT_TRUE(kc.get_subgraph().is_bit(0));
+	EXPECT_TRUE(kc.get_subgraph().is_bit(2));
+	EXPECT_FALSE(kc.get_subgraph().is_bit(1));
+	EXPECT_FALSE(kc.get_subgraph().is_bit(3));
 
 }
 
@@ -178,8 +194,8 @@ TEST(KCoreSparse, kcore_decomp_full_graph){
 	
 	KCore<sparse_ugraph> kc(sug);
 
-	EXPECT_EQ(11, kc.get_graph().number_of_vertices());
-	EXPECT_EQ(nullptr, kc.get_subgraph());
+	EXPECT_EQ	(11, kc.get_graph().number_of_vertices());
+	EXPECT_TRUE	( kc.get_subgraph().is_empty());
 
 	////////////////////
 	kc.find_kcore();
@@ -208,13 +224,13 @@ TEST(KCoreSparse, kcore_decomp_subgraph) {
 	bbset.set_bit(1);
 	bbset.set_bit(6);
 
-	KCore<sparse_ugraph> kc(sug, &bbset);
+	KCore<sparse_ugraph> kc(sug, bbset);
 
 	EXPECT_EQ(11, kc.get_graph().number_of_vertices());
-	EXPECT_TRUE(kc.get_subgraph()->is_bit(0));
-	EXPECT_TRUE(kc.get_subgraph()->is_bit(1));
-	EXPECT_TRUE(kc.get_subgraph()->is_bit(6));
-	EXPECT_EQ(3, kc.get_subgraph()->popcn64());
+	EXPECT_TRUE(kc.get_subgraph().is_bit(0));
+	EXPECT_TRUE(kc.get_subgraph().is_bit(1));
+	EXPECT_TRUE(kc.get_subgraph().is_bit(6));
+	EXPECT_EQ(3, kc.get_subgraph().popcn64());
 
 	////////////////////
 	kc.find_kcore(true);											//on G[{0, 1, 6}]			

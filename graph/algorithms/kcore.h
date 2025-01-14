@@ -96,11 +96,12 @@ public:
 //construction / destruction
 public:
 
-	//one-and-only constructor
+	//constructors
 	KCore								(Graph_t& g);
-	KCore								(Graph_t& g, _bbt* pSubg);
+	KCore								(Graph_t& g, _bbt subg);
+	KCore								(Graph_t& g, vint subg);
 		
-	//copies or moves not allowed
+	//copies or moves disallowed
 	KCore								(const KCore& kc)				= delete;	
 	KCore&  operator =					(const KCore& kc)				= delete;
 	KCore								(KCore&& kc)					= delete;
@@ -153,16 +154,17 @@ public:
 	const vint& get_kcore_ordering		()								const	{ return ver_;}
 
 
-
 	const _gt& get_graph				()								const { return g_; }
-	_bbt*	get_subgraph				()								const { return subg_; }
+   const _bbt& get_subgraph				()								const { return subg_; }
 
 	/*
-	* @brief Construction specific to set the induced subgraph.
-	*		 If nullptr, the subgraph is the graph itself.
+	* @brief sets a new induced subgraph.
+	* 
+	*		 I. allocates @ver_ only
+	*		 
 	* @returns 0 if success, -1 if memory allocation fails
 	*/
-	int reset_subgraph					(_bbt* psg);
+	int reset_subgraph					(_bbt psg);
 
 //////////////
 // Main operations
@@ -177,7 +179,7 @@ public:
 	* 
 	* @returns 0 if success, -1 if memory allocation fails
 	*/
-	int find_kcore						(bool subg = false);										
+	int find_kcore						(bool is_subg = false);										
 
 	//CHECK and  refactor
 	int find_kcore_UB					(int UB);								//new kcore (vertices with kcore=UB (or nearest real degree > UB) are placed last in ver_)
@@ -216,7 +218,7 @@ vint find_heur_clique_sparse			(int num_iter = EMPTY_ELEM);			//only available f
 	* @param add_real_deg if TRUE prints also the real degree of vertices
 	* @param o output stream
 	*/
-	std::ostream& print_kcore			(bool add_real_deg = false, bool subg = false, std::ostream& o = std::cout)	const;
+	std::ostream& print_kcore			(bool add_real_deg = false, bool is_subg = false, std::ostream& o = std::cout)	const;
 
 //////////////
 // private interface
@@ -228,7 +230,7 @@ private:
 	* @param subg: if TRUE, the subgraph induced by the bitset of vertices (@subg_) is considered
 	* @returns 0 if success, -1 if memory allocation fails
 	*/
-	int init_kcore						(bool subg = false);										
+	int init_kcore						(bool is_subg = false);
 
 	/*
 	* @brief Inits bin_ data structure for graph / subgraph
@@ -242,7 +244,7 @@ private:
 	* @created 13/3/16
 	* @last_update 12/01/25
 	*/
-	int init_bin						(bool subg = false);
+	int init_bin						(bool is_subg = false);
 		
 	/*
 	* @brief Bin sorts vertices in non-decreasing degree in @ver_ (new-to-old format)
@@ -253,7 +255,7 @@ private:
 	* 
 	* @param subg: if TRUE, the subgraph induced by the bitset of vertices (@subg_) is considered
 	*/
-	void bin_sort						(bool subg = false);
+	void bin_sort						(bool is_subg = false);
 	
 	//experimental
 	void bin_sort						(vint& lv, bool rev);					//bin sort according to vertex set lv (rev TRUE: vertices taken in reverse order)
@@ -267,8 +269,7 @@ private:
 
 	Graph_t& g_;																//the one and only graph G=(V, E)			
 	const int NV_;																//size of graph |V| - for convenience
-	_bbt* subg_;																	//to manage kcore in subgraphs (default nullptr) - TODO CHANGE (read header - 13/01/2025)
-	
+	_bbt subg_;																	//reference induced subgraph to study coreness 
 	
 	//data structures
 	vint deg_;																	//coreness of vertices																
@@ -315,7 +316,7 @@ inline int KCore<Graph_t>::find_kcore(Graph_t& g)
 }
 
 template<class Graph_t>
-inline KCore<Graph_t>::KCore(Graph_t& g) : g_(g), NV_(g.number_of_vertices()), deg_(NV_), pos_(NV_), subg_(nullptr) {
+inline KCore<Graph_t>::KCore(Graph_t& g) : g_(g), NV_(g.number_of_vertices()), deg_(NV_), pos_(NV_) {
 
 	try {
 		ver_.assign(NV_, EMPTY_ELEM);					
@@ -328,22 +329,44 @@ inline KCore<Graph_t>::KCore(Graph_t& g) : g_(g), NV_(g.number_of_vertices()), d
 }
 
 template<class Graph_t>
-inline KCore<Graph_t>::KCore(Graph_t& g, _bbt* bbset): g_(g), NV_(g.number_of_vertices()), deg_(NV_), pos_(NV_) {
+inline KCore<Graph_t>::KCore(Graph_t& g, _bbt subg): g_(g), NV_(g.number_of_vertices()), deg_(NV_), pos_(NV_) {
 
-	if (reset_subgraph(bbset) == -1) {
-		LOG_ERROR("Error in KCore<Graph_t>::KCore - reset_subgraph");
+	subg_ = std::move(subg);
+
+	try {
+		ver_.assign(subg_.popcn64(), EMPTY_ELEM);		//nullptr - operates on the subgraph induced by the bitset of vertices (*psg)
+	}
+	catch (std::bad_alloc& ba) {
+		LOGG_ERROR("bad_alloc exception - KCore<T>::reset_subgraph", ba.what());
 		LOG_ERROR("Exiting...");
 		std::exit(-1);
 	}
+
 }
 
 template<class Graph_t>
-inline int KCore<Graph_t>::reset_subgraph(_bbt* psg) {
+inline KCore<Graph_t>::KCore(Graph_t& g, vint subg) : g_(g), NV_(g.number_of_vertices()), deg_(NV_), pos_(NV_) {
 
-	subg_ = psg;
+	subg_ = _bbt(subg, NV_);
 
 	try {
-		ver_.assign (subg_ -> popcn64(), EMPTY_ELEM);		//nullptr - operates on the subgraph induced by the bitset of vertices (*psg)
+		ver_.assign(subg_.popcn64(), EMPTY_ELEM);		//nullptr - operates on the subgraph induced by the bitset of vertices (*psg)
+	}
+	catch (std::bad_alloc& ba) {
+		LOGG_ERROR("bad_alloc exception - KCore<T>::reset_subgraph", ba.what());
+		LOG_ERROR("Exiting...");
+		std::exit(-1);
+	}
+
+}
+
+template<class Graph_t>
+inline int KCore<Graph_t>::reset_subgraph(_bbt subg) {
+
+	subg_ = std::move(subg);
+
+	try {
+		ver_.assign (subg_.popcn64(), EMPTY_ELEM);		//nullptr - operates on the subgraph induced by the bitset of vertices (*psg)
 	}
 	catch (std::bad_alloc& ba) {
 		LOGG_ERROR("bad_alloc exception - KCore<T>::reset_subgraph", ba.what());
@@ -356,19 +379,19 @@ inline int KCore<Graph_t>::reset_subgraph(_bbt* psg) {
 
 
 template<class Graph_t>
-inline int KCore<Graph_t>::find_kcore(bool subg){
+inline int KCore<Graph_t>::find_kcore(bool is_subg){
 
 	//inits data structures
-	if (init_kcore(subg) == -1) {
+	if (init_kcore(is_subg) == -1) {
 		LOG_ERROR("Error during memory allocation - KCore<Graph_t>::init_kcore");
 		return -1;
 	}
-	bin_sort(subg);
+	bin_sort(is_subg);
 	
 	auto u = EMPTY_ELEM;
 	auto v = EMPTY_ELEM;
 
-	if(!subg){
+	if(!is_subg){
 
 		//kcore computation for the full graph
 		for(auto& v : ver_){		
@@ -398,7 +421,7 @@ inline int KCore<Graph_t>::find_kcore(bool subg){
 		for (auto v : ver_) {
 
 			//computes neightbors of v in the subgraph
-			AND(g_.get_neighbors(v), *subg_, neigh);
+			AND(g_.get_neighbors(v), subg_, neigh);
 			
 			//iterates over the neighbors of v in the subgraph
 			if(neigh.init_scan(bbo::NON_DESTRUCTIVE) != EMPTY_ELEM){			//CHECK MUST BE - for sparse_bitarrays
@@ -450,14 +473,9 @@ inline int KCore<Graph_t>::find_kcore_UB (int UB_out){
 //  COMMENTS: Implemented ONLY for the full graph, not subgraphs
 
 	//inits data structures
-	init_kcore();
-	bin_sort();
-
-	//Check subgraph is empty
-	if(subg_ != nullptr){
-		LOG_INFO("Subgraph variant not implemented yet - KCore<Graph_t>::kcore_UB");
-		return -1;
-	}
+	init_kcore(false);
+	bin_sort(false);
+		
 	
 	//check that UB_out is not the maximum graph degree
 	//i.e. deg = 1 , bin has size 2 (0 and 1)
@@ -556,11 +574,11 @@ inline int KCore<Graph_t>::find_kcore_UB (int UB_out){
 }	
 
 template<class Graph_t>
-inline int KCore<Graph_t>::init_kcore(bool subg){
+inline int KCore<Graph_t>::init_kcore(bool is_subg){
 
 	int max_deg = 0, v = EMPTY_ELEM;
 
-	if(!subg){									//kcore of the whole graph
+	if(!is_subg){									//kcore of the whole graph
 		
 		//sets degrees and finds maximum degree of G
 		for (auto v = 0; v < NV_; ++v){
@@ -589,12 +607,12 @@ inline int KCore<Graph_t>::init_kcore(bool subg){
 	}else{
 
 		//kcore for the subgraph induced by subg_
-		subg_ -> init_scan(bbo::NON_DESTRUCTIVE);					//subg_ cannot be empty, no empty check condition
+		subg_.init_scan(bbo::NON_DESTRUCTIVE);						//subg_ cannot be empty, no empty check condition
 		
-		while ((v = subg_ -> next_bit()) != EMPTY_ELEM) {
+		while ((v = subg_.next_bit()) != EMPTY_ELEM) {
 
 			//sets degree values with endoints in the set
-			deg_[v] = g_.degree (v, *subg_);
+			deg_[v] = g_.degree (v, subg_);
 			if (max_deg < deg_[v]) {
 				max_deg = deg_[v];
 			}
@@ -612,9 +630,9 @@ inline int KCore<Graph_t>::init_kcore(bool subg){
 		}
 
 		//sets bins values for the induced subgraph
-		subg_->init_scan(bbo::NON_DESTRUCTIVE);
+		subg_.init_scan(bbo::NON_DESTRUCTIVE);
 		v=EMPTY_ELEM;
-		while( (v = subg_ -> next_bit()) != EMPTY_ELEM ){			
+		while( (v = subg_.next_bit()) != EMPTY_ELEM ){			
 			bin_[deg_[v]] += 1;	
 		}
 	}
@@ -623,7 +641,7 @@ inline int KCore<Graph_t>::init_kcore(bool subg){
 }
 
 template<class Graph_t>
-inline int KCore<Graph_t>::init_bin(bool subg){
+inline int KCore<Graph_t>::init_bin(bool is_subg){
 	
 	//finds maximum degree of G
 	int max_deg = EMPTY_ELEM;
@@ -642,7 +660,7 @@ inline int KCore<Graph_t>::init_bin(bool subg){
 
 	//sets bins values as required
 	int v = EMPTY_ELEM;
-	if (!subg) {
+	if (!is_subg) {
 
 		//full graph
 		for (auto v = 0; v < NV_; ++v) {
@@ -653,10 +671,10 @@ inline int KCore<Graph_t>::init_bin(bool subg){
 	else {
 
 		//induced subgraph
-		subg_ -> init_scan(bbo::NON_DESTRUCTIVE);				//subg_ cannot be empty, no empty check condition
+		subg_.init_scan(bbo::NON_DESTRUCTIVE);				//subg_ cannot be empty, no empty check condition
 
 		v = EMPTY_ELEM;
-		while ((v = subg_->next_bit()) != EMPTY_ELEM) {
+		while ((v = subg_.next_bit()) != EMPTY_ELEM) {
 			bin_[deg_[v]] += 1;
 		}
 
@@ -666,7 +684,7 @@ inline int KCore<Graph_t>::init_bin(bool subg){
 }
 
 template<class Graph_t>
-inline void KCore<Graph_t>::bin_sort(bool subg){
+inline void KCore<Graph_t>::bin_sort(bool is_subg){
 
 
 	//sets bin_ with the position in the new ordering (I): 
@@ -680,7 +698,7 @@ inline void KCore<Graph_t>::bin_sort(bool subg){
 		start += num;
 	}	
 
-	if(!subg){
+	if(!is_subg){
 
 		//bin_sort full graph
 		for(auto v = 0; v < ver_.size(); ++v){
@@ -691,10 +709,10 @@ inline void KCore<Graph_t>::bin_sort(bool subg){
 	}else{
 
 		//bin_sort subgraph induced by subg_
-		subg_->init_scan(bbo::NON_DESTRUCTIVE);			//subg_ cannot be empty, no empty check condition
+		subg_.init_scan(bbo::NON_DESTRUCTIVE);			//subg_ cannot be empty, no empty check condition
 
 		auto v = EMPTY_ELEM;
-		while( (v = subg_->next_bit())!= EMPTY_ELEM ){
+		while( (v = subg_.next_bit())!= EMPTY_ELEM ){
 			pos_[v] = bin_[deg_[v]];			
 			ver_[pos_[v]] = v;		
 			bin_[deg_[v]]++;
@@ -907,7 +925,7 @@ inline int KCore<Graph_t>::make_kcore_filter (map_t& filter, bool reverse) {
 		}
 	}
 
-return filter.size();
+	return filter.size();
 }
 
 template<class Graph_t>
@@ -1152,9 +1170,9 @@ inline std::ostream& KCore<Graph_t>::print(print_t type, ostream& o){
 }
 
 template<class Graph_t>
-inline std::ostream& KCore<Graph_t>::print_kcore (bool real_deg, bool subg_,  ostream& o)	const{
+inline std::ostream& KCore<Graph_t>::print_kcore (bool real_deg, bool subgraph,  ostream& o)	const{
 
-	if(!subg_){
+	if(!subgraph){
 
 		//whole graph
 		for(auto it = ver_.begin(); it != ver_.end(); ++it){
@@ -1170,9 +1188,9 @@ inline std::ostream& KCore<Graph_t>::print_kcore (bool real_deg, bool subg_,  os
 
 		//subgraph
 		auto v=EMPTY_ELEM;			
-		subg_ -> init_scan(bbo::NON_DESTRUCTIVE); 					//should not be empty - sparse graphs will produce an error
+		subg_.init_scan(bbo::NON_DESTRUCTIVE); 					//should not be empty - sparse graphs will produce an error
 		
-		while ((v = subg_->next_bit()) != EMPTY_ELEM ) {
+		while ((v = subg_.next_bit()) != EMPTY_ELEM ) {
 			o << "[" << v << "," << deg_[v];
 			if (real_deg) {
 				o << ":" << g_.degree(v) << "] ";
