@@ -468,7 +468,8 @@ const vint& GraphFastRootSort<Graph_t>::sort_degen_composite_non_decreasing_deg(
 	nodes_.clear();
 
 	for (int i = 0; i < NV_; i++) {
-		//finds vertex with minimum degree
+
+		//finds vertex with minimum degree with TB according to the given ordering in nodes_ori 
 		min_deg = NV_;
 		for (int j = 0; j < NV_; j++) {
 			int u = nodes_ori[j];
@@ -526,11 +527,11 @@ const vint& GraphFastRootSort<Graph_t>::sort_degen_composite_non_increasing_deg(
 		//updates neighborhood info in remaining vertices
 		bb_type& bbn = g_.get_neighbors(v);
 		bbn.init_scan(bbo::NON_DESTRUCTIVE);
-		while (true) {
-			int w = bbn.next_bit();
-			if (w == EMPTY_ELEM) break;
-			if (node_active_state_.is_bit(w))
+		int w = EMPTY_ELEM;	
+		while ( (w = bbn.next_bit()) != EMPTY_ELEM) {
+			if (node_active_state_.is_bit(w)) {
 				nb_neigh_[w]--;
+			}
 		}
 	}
 
@@ -723,13 +724,12 @@ template<class Graph_t>
 inline
 const vint& GraphFastRootSort<Graph_t>::compute_support_root()
 {
-	for(int elem=0; elem<NV_; elem++){
-		deg_neigh_[elem]=0;
-		bb_type& bbn=g_.get_neighbors(elem);
+	for(auto elem = 0; elem < NV_; ++elem){
+		deg_neigh_[elem] = 0;
+		bb_type& bbn = g_.get_neighbors(elem);
 		bbn.init_scan(bbo::NON_DESTRUCTIVE);
-		while(true){
-			int w=bbn.next_bit();
-			if(w==EMPTY_ELEM) break;
+		int w = EMPTY_ELEM;	
+		while ((w = bbn.next_bit()) != EMPTY_ELEM )  {
 			deg_neigh_[elem]+=nb_neigh_[w];	
 		}
 	}
