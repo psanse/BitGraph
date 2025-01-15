@@ -163,7 +163,9 @@ public:
 	* TODO - optimize
 	*/
 	const vint&  sort_degen_non_decreasing_deg(bool rev);				
-	const vint&  sort_degen_non_increasing_deg(bool rev);				
+	const vint&  sort_degen_non_increasing_deg(bool rev);
+
+	const vint& sort_degen_non_decreasing_deg_B(bool rev);				//Expermimental alternative implementation - CHECK efficiency	
 	
 	/*
 	*@brief Composite non-decreasing degree degenerate ordering based on a prior given ordering 
@@ -327,58 +329,41 @@ template<class Graph_t>
 inline
 const vint& GraphFastRootSort<Graph_t>::sort_degen_non_decreasing_deg(bool rev){
 	
-	int min_deg = NV_, deg = 0;
-	node_active_state_.set_bit(0, NV_ - 1);					//all active, pending to be ordered
+	//initialization
+	node_active_state_.set_bit(0, NV_ - 1);					//all vertices active, pending to be ordered
 	nodes_.clear();
+	nodes_.reserve(NV_);
 
-	//main loop
+	int max_deg = NV_, v = EMPTY_ELEM	;
 	do{
-		
-		min_deg = NV_;		
-		int w = EMPTY_ELEM;
-		int v = EMPTY_ELEM;
+		max_deg = NV_;
 
 		//selects an active vertex with minimum degree
-		node_active_state_.init_scan(bbo::NON_DESTRUCTIVE);
-		while ((w = node_active_state_.next_bit()) != EMPTY_ELEM) {
-			deg = g_.degree (w, node_active_state_);
-			if (min_deg > deg) {											// >= is possible
-				min_deg = deg;
-				v = w;
+		for (auto j = 0; j < NV_; j++) {
+			if (node_active_state_.is_bit(j) && nb_neigh_[j] < max_deg) {			 
+				max_deg = nb_neigh_[j];
+				v = j;
 			}
 		}
-		
+
 		//////////////////////////////////
-		node_active_state_.erase_bit(v);
 		nodes_.emplace_back(v);
-		//////////////////////////////////
+		if ( nodes_.size() == NV_) { break; }			//exit condition
 
-	} while (nodes_.size() < NV_);
+		node_active_state_.erase_bit(v);
+		///////////////////////////////////
 
+		//update degree info of the remaining active vertices
+		bb_type& bbn = g_.get_neighbors(v);
+		bbn.init_scan(bbo::NON_DESTRUCTIVE);
+		int w = EMPTY_ELEM;
+		while ( (w = bbn.next_bit()) != EMPTY_ELEM) {
+			if (node_active_state_.is_bit(w)) {
+				nb_neigh_[w]--;
+			}
+		}
 
-/////////////
-//alternative implementation with CHACHED degree info
-// TODO - CHECK which is fastest
-
-	//for (int i = 0; i < NV_; i++) {
-	//	max_deg = -1;
-	//	for (int j = 0; j < NV_; j++) {
-	//		if (node_active_state_.is_bit(j) && nb_neigh_[j] < max_deg) {			 /* MUST BE >=  (20/12/24) TODO- CHECK*/
-	//			max_deg = nb_neigh_[j];
-	//			v = j;
-	//		}
-	//	}
-	//	nodes_.push_back(v);
-	//	node_active_state_.erase_bit(v);
-	//	bb_type& bbn = g_.get_neighbors(v);
-	//	bbn.init_scan(bbo::NON_DESTRUCTIVE);
-	//	while (true) {
-	//		int w = bbn.next_bit();
-	//		if (w == EMPTY_ELEM) break;
-	//		if (node_active_state_.is_bit(w))
-	//			nb_neigh_[w]--;
-	//	}
-	//}//endFor
+	} while (true);
 
 
 	if(rev){
@@ -392,33 +377,84 @@ template<class Graph_t>
 inline
 const vint& GraphFastRootSort<Graph_t>::sort_degen_non_increasing_deg(bool rev){
 	
-	node_active_state_.set_bit(0, NV_-1);											//all active, pending to be ordered
-	int max_deg=0, v=EMPTY_ELEM;
+	//initialization
+	node_active_state_.set_bit(0, NV_ - 1);										//all vertices active, pending to be ordered
 	nodes_.clear();
+	nodes_.reserve(NV_);
 
-	for(int i=0; i<NV_; i++){
-		max_deg=-1;
-		for(int j=0; j<NV_; j++){
-			if(node_active_state_.is_bit(j) && nb_neigh_[j] > max_deg){			 /* MUST BE >=  (20/12/24) TODO- CHECK*/
-				max_deg=nb_neigh_[j];
-				v=j;
+	//main loop
+	int max_deg = 0, v = EMPTY_ELEM;
+	do{
+		//finds vertex with maximum degree
+		max_deg = -1;
+		for(auto j = 0; j < NV_; j++){
+			if(node_active_state_.is_bit(j) && nb_neigh_[j] > max_deg){			 
+				max_deg = nb_neigh_[j];
+				v = j;
 			}
 		}
-		nodes_.push_back(v);
+
+		//////////////////////////////////
+		nodes_.emplace_back(v);
+		if ( nodes_.size() == NV_) { break; }			//exit condition
+
 		node_active_state_.erase_bit(v);
-		bb_type& bbn=g_.get_neighbors(v);
+		//////////////////////////////////
+
+		//updates neighborhood info in remaining vertices
+		bb_type& bbn = g_.get_neighbors(v);
 		bbn.init_scan(bbo::NON_DESTRUCTIVE);
-		while(true){
-			int w=bbn.next_bit();
-			if(w==EMPTY_ELEM) break;
-			if(node_active_state_.is_bit(w))
+		int w = EMPTY_ELEM;
+		while ((w = bbn.next_bit()) != EMPTY_ELEM) {
+			if (node_active_state_.is_bit(w)) {
 				nb_neigh_[w]--;
+			}
 		}
-	}//endFor
+
+	} while (true);
 
 	if(rev){
 		std::reverse(nodes_.begin(), nodes_.end());
 	}
+	return nodes_;
+}
+
+template<class Graph_t>
+inline const vint& GraphFastRootSort<Graph_t>::sort_degen_non_decreasing_deg_B(bool rev)
+{
+
+	int min_deg = NV_, deg = 0;
+	node_active_state_.set_bit(0, NV_ - 1);					//all active, pending to be ordered
+	nodes_.clear();
+
+	//main loop
+	do {
+
+		min_deg = NV_;
+		int w = EMPTY_ELEM;
+		int v = EMPTY_ELEM;
+
+		//selects an active vertex with minimum degree
+		node_active_state_.init_scan(bbo::NON_DESTRUCTIVE);
+		while ((w = node_active_state_.next_bit()) != EMPTY_ELEM) {
+			deg = g_.degree(w, node_active_state_);
+			if (min_deg > deg) {											// >= is possible
+				min_deg = deg;
+				v = w;
+			}
+		}
+
+		//////////////////////////////////
+		node_active_state_.erase_bit(v);
+		nodes_.emplace_back(v);
+		//////////////////////////////////
+
+	} while (nodes_.size() < NV_);
+
+	if (rev) {
+		std::reverse(nodes_.begin(), nodes_.end());
+	}
+
 	return nodes_;
 }
 
@@ -477,7 +513,7 @@ const vint& GraphFastRootSort<Graph_t>::sort_degen_composite_non_increasing_deg(
 		max_deg = -1;
 		for (int j = 0; j < NV_; j++) {
 			int u = nodes_ori[j];
-			if (node_active_state_.is_bit(u) && nb_neigh_[u] > max_deg) {			 /* MUST BE >=  (20/12/24) TODO- CHECK*/
+			if (node_active_state_.is_bit(u) && nb_neigh_[u] > max_deg) {			 
 				max_deg = nb_neigh_[u];
 				v = u;
 			}
