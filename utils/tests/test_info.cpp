@@ -7,6 +7,7 @@
 
 #include "gtest/gtest.h"
 #include "utils/info/info_base.h"
+#include "utils/info/info_clq.h"
 #include <thread>
 
 using namespace com;
@@ -24,13 +25,26 @@ protected:
 	}
 };
 
+class InfoCLQTest : public ::testing::Test {
+protected:
+	infoCLQ<int> infoCLQ;
+
+	void SetUp() override {
+		// Initialize any necessary data here
+	}
+
+	void TearDown() override {
+		// Clean up any necessary data here
+	}
+};
+
 TEST_F(InfoBaseTest, DefaultConstructor) {
 	
 	EXPECT_EQ(info.nameInstance_, "");
 	EXPECT_EQ(info.N_, 0);
 	EXPECT_EQ(info.M_, 0);
 	EXPECT_EQ(info.K_, 0);
-	EXPECT_EQ(info.TIME_OUT_, std::numeric_limits<double>::max());
+	EXPECT_EQ(info.TIME_OUT_	 , std::numeric_limits<double>::max());
 	EXPECT_EQ(info.TIME_OUT_HEUR_, std::numeric_limits<double>::max());
 	EXPECT_EQ(info.idAlg_, -1);
 	EXPECT_EQ(info.idHeur_, -1);
@@ -129,6 +143,39 @@ TEST_F(InfoBaseTest, printReport) {
 	info.printReport(oss);
 
 	EXPECT_FALSE(oss.str().empty());
+}
+
+///////////////////////
+//
+// infoCLQ TESTS
+//
+//////////////////////
+
+
+TEST_F(InfoCLQTest, DefaultConstructor) {
+
+	//infoBase part
+	EXPECT_EQ	(infoCLQ.nameInstance_, "");
+	EXPECT_EQ	(infoCLQ.N_, 0);
+	EXPECT_EQ	(infoCLQ.M_, 0);
+	EXPECT_EQ	(infoCLQ.K_, 0);
+	EXPECT_EQ	(infoCLQ.TIME_OUT_, std::numeric_limits<double>::max());
+	EXPECT_EQ	(infoCLQ.TIME_OUT_HEUR_, std::numeric_limits<double>::max());
+	EXPECT_EQ	(infoCLQ.idAlg_, -1);
+	EXPECT_EQ	(infoCLQ.idHeur_, -1);
+	EXPECT_EQ	(infoCLQ.idSort_, -1);
+
+	//infoCLQ part
+	EXPECT_EQ	(infoCLQ.lbRootNoHeur, 0);
+	EXPECT_EQ	(infoCLQ.lbRootHeur, 0);
+	EXPECT_EQ	(infoCLQ.branchingRootSize_, 0);
+	EXPECT_EQ	(infoCLQ.idSortReal_, -1);
+	EXPECT_EQ	(infoCLQ.isDegOrd_, -1);
+	EXPECT_EQ	(infoCLQ.incumbent_, 0);
+	EXPECT_EQ	(infoCLQ.optimum_, 0);
+	EXPECT_EQ	(infoCLQ.nSteps_, 0);
+	EXPECT_FALSE(infoCLQ.isTimeOutReached_);
+	
 }
 
 

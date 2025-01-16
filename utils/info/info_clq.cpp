@@ -28,8 +28,9 @@ std::ostream& infoCLQ<W_t>::printSummary(std::ostream& o) const
 template<class W_t>
 std::ostream& infoCLQ<W_t>::printReport(std::ostream& o, bool is_endl) const
 {
-	o << nameInstance_.c_str() << "\t" << N_ << "\t" << M_ << "\t" << TIME_OUT_ << "\t" << TIME_OUT_HEUR_ << "\t" << idAlg_ << "\t"
-		<< idSort_ << "\t" << idSortReal_ << "\t"
+	 o  << nameInstance_.c_str() << "\t" << N_ << "\t" << M_ << "\t" 
+		<< TIME_OUT_ << "\t" << TIME_OUT_HEUR_ << "\t" 
+		<< idAlg_ << "\t" << idSort_ << "\t" << idSortReal_ << "\t"
 		<< isDegOrd_ << "\t" << idHeur_ << "\t"
 		<< lbRootNoHeur << "\t" << lbRootHeur << "\t"
 		<< incumbent_ << "\t" << optimum_ << "\t"
@@ -114,8 +115,8 @@ std::ostream& infoCliSAT::printReport(std::ostream& o, bool is_endl) const
 	infoCLQ<int>::printReport(o, false);
 
 	o << nLastIsetCalls_ << "\t" << nsLastIsetCalls_ << "\t" << nLastIsetPreFilterCalls_ << "\t" << nsLastIsetPreFilterCalls_ << "\t"
-		<< nCurrIsetCalls_ << "\t" << nsCurrIsetCalls_ << "\t"
-		<< nVertexCalls_ << "\t" << nsVertexCalls_ << "\t" << nUBpartCalls_ << "\t" << nsUBpartCalls_ << "\t" << K_;
+	  << nCurrIsetCalls_ << "\t" << nsCurrIsetCalls_ << "\t"
+	  << nVertexCalls_ << "\t" << nsVertexCalls_ << "\t" << nUBpartCalls_ << "\t" << nsUBpartCalls_ << "\t" << K_;
 
 	if (is_endl) {
 		o << std::endl;

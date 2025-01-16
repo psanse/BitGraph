@@ -2,7 +2,7 @@
  *info_base.cpp: implementation of info_base class for result logs of clique and clique-based algorithms
  *@date 12/12/2012
  *@last_update 13/23/2024
- *@dev pss
+ *@author pss
  */
 
 #include "info_base.h"
@@ -20,8 +20,7 @@ namespace com {
 
 	std::ostream& infoBase::printParams(std::ostream& o) const
 	{	
-		o << endl;
-		o << "*****************************";
+		o << "\n*****************************";
 		o << "DATA:" << nameInstance_.c_str() << "\t N:" << N_ << "\t M:" << M_ << "\t D:" << 2 * M_ / (float)((N_ - 1) * N_) << endl;
 		o << "TIME_LIMIT:" << TIME_OUT_ << endl;
 		o << "TIME_LIMIT_HEUR:" << TIME_OUT_HEUR_ << endl;
@@ -38,8 +37,7 @@ namespace com {
 	}
 	std::ostream& infoBase::printTimers(std::ostream& o) const
 	{
-		o << endl;
-		o << "*****************************";
+		o << "\n*****************************";
 		o << "time_parse:"		<< timeParse_		<< endl;
 		o << "time_preproc:"	<< timePreproc_		<< endl;
 		o << "time_incumbent:"	<< timeIncumbent_	<< endl;
@@ -178,7 +176,7 @@ namespace com {
 	void infoBase::clear(bool lazy) {
 		clearTimers();
 		if (!lazy) {
-			clearGeneralInfo();					//CHECK comment "manually at the start of every run"
+			clearGeneralInfo();					//CHECK comment: "manually at the start of every run"
 		}
 	}
 }

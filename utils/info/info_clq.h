@@ -25,10 +25,10 @@
 template<class W_t = int>
 struct infoCLQ : public com::infoBase 
 {
-	/*
-	*@brief clears context
-	*@param lazy - if true general info is not cleared
-	*/
+	/**
+	* @brief clears context
+	* @param lazy - if true general info is not cleared
+	**/
 	void clear(bool lazy = false) override;
 		
 protected:
@@ -37,8 +37,24 @@ virtual void clearSearchInfo	();
 
 ///////////
 //I/O
-
+public:
+	/**
+	* 
+	* @brief streams main search info: sol value, times and number of steps
+	* @param o: output stream 
+	* @returns output stream
+	* 
+	**/ 
 	std::ostream& printSummary	(std::ostream & = std::cout) const;										//results (summary) in nice format for console			
+	
+	/**
+	*
+	* @brief streams all data
+	* @param o: output stream 
+	* @param is_endl: if true, adds a new line at the end
+	* @returns output stream
+	* 
+	**/
 	std::ostream& printReport	(std::ostream & = std::cout, bool is_endl = false) const override;		//results in table format for output file
 
 /////////////////////
@@ -53,21 +69,21 @@ virtual void clearSearchInfo	();
 	W_t lbRootHeur = 0;							//LB at root node (sophisticated heur, e.g. AMTS)
 
 	//UB bounds root
-	std::size_t branchingRootSize_;				//size of Branching set at ROOT	
+	std::size_t branchingRootSize_ = 0;			//size of Branching set at ROOT	
 
 	//sorting
 	int idSortReal_ = -1;						//sorting policy really used by the algorithm
-	int isDegOrd_ = -1;							//FALSE - sorting partition based (COLOR_SORT), TRUE- sorting degree based (DEGREE_SORT)
+	int isDegOrd_ = -1;							//0 - (COLOR_SORT), 1 - (DEGREE_SORT), -1 NONE ...  CHECK, looks redundant with idsortReal (16/01/2025)
 
 	/////////////////////
 	//search (main params)
 	////////////////////
 
 	W_t incumbent_ = 0;							//best solution value found during search (not in preproc)
-	W_t optimum_ = 0;							//best solution value (omega) - will be the same as incumbent is time out limit is not reached
+	W_t optimum_ = 0;							//solution value - incumbent if problem is solved within the time limit
 	uint64_t nSteps_ =0;						//recursive calls to the algorithm		
 	bool  isTimeOutReached_= false;				//flag time out	
-	std::vector<int> sol_;						//solution (vertices)
+	std::vector<int> sol_;						//solution found (set of vertices)
 	
 };
 
@@ -81,10 +97,20 @@ virtual void clearSearchInfo	();
 
 struct infoCliSAT : public infoCLQ<int> {
 
-	//clear
+	/**
+	* @brief clears search data.
+	* @comment uses the Template Method Pattern 
+	**/
 	void clearSearchInfo		() override;
 
-	//I/O
+	/**
+	*
+	* @brief streams all data
+	* @param o: output stream
+	* @param is_endl: if true, adds a new line at the end
+	* @returns output stream
+	*
+	**/
 	std::ostream& printReport	(std::ostream & = std::cout, bool is_endl = false) const override;
 
 /////////////////////
