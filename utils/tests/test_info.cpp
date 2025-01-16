@@ -9,6 +9,8 @@
 #include "utils/info/info_base.h"
 #include "utils/info/info_clq.h"
 #include <thread>
+#include <iostream>
+#include <sstream>
 
 using namespace com;
 
@@ -176,6 +178,24 @@ TEST_F(InfoCLQTest, DefaultConstructor) {
 	EXPECT_EQ	(infoCLQ.nSteps_, 0);
 	EXPECT_FALSE(infoCLQ.isTimeOutReached_);
 	
+}
+
+TEST_F(InfoCLQTest, printSummary) {
+
+	std::ostringstream ostr;
+	infoCLQ.printSummary(ostr);
+
+	EXPECT_FALSE(ostr.str().empty());
+}
+
+TEST_F(InfoCLQTest, DISABLED_IO) {
+
+	//I/O - DISABLE, just shows the output
+	infoCLQ.printParams();
+	infoCLQ.printSummary();
+	infoCLQ.printTimers();
+	infoCLQ.printReport(std::cout, true);
+
 }
 
 
