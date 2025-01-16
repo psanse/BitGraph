@@ -5,7 +5,7 @@
  *@dev pss
  */
 
- //TODO - move to COPT lib (remove from ::com namespace)
+ //TODO - move infoCliSAT to COPT lib (remove from ::com namespace)
 
 #ifndef __INFO_CLIQUE_H__
 #define __INFO_CLIQUE_H__
@@ -89,7 +89,7 @@ public:
 
 //////////////////////
 //
-//	infoCLQ struct
+//	infoCliSAT struct
 // 
 //  @brief CliSAT algorithm specific
 //
@@ -99,7 +99,7 @@ struct infoCliSAT : public infoCLQ<int> {
 
 	/**
 	* @brief clears search data.
-	* @comment uses the Template Method Pattern 
+	* @comment infoCLQ::clear() uses the Template Method Pattern 
 	**/
 	void clearSearchInfo		() override;
 
