@@ -313,11 +313,11 @@ return consistent_sol;
 ////////////////////////
 // E/S
 
-void print_current_time	(ostream& o){
+void TestAnalyser::print_current_time	(ostream& o){
 	o<<PrecisionTimer::local_timestamp();
 }
 
-void print_line	(const string str, ostream& o){
+void TestAnalyser::print_line	(const string str, ostream& o){
 	o<<str;
 }
 

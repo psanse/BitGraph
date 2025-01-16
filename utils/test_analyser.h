@@ -27,7 +27,8 @@ class TestAnalyser{
 public:
 	struct info_t{
 		info_t():	same_lb(false), same_sol(false), same_steps(false),
-					steps_first_greater(false), steps_lhs(0), steps_rhs(0) {}
+					steps_first_greater(false), steps_lhs(0), steps_rhs(0) 
+		{}
 		bool same_steps;
 		bool same_sol;
 		bool same_lb;
@@ -40,10 +41,11 @@ public:
 						SIZE=0x400, EDGES=0x800, SORT =0x1000, TIMEOUT=0x2000, ALG=0x4000, TIMEPRE= 0x8000};
 	
 	// E/S
-	static void print_current_time	(ostream& = cout);
-	static void print_line			(const string line, ostream& = cout);
+	static void print_current_time		(ostream& = cout);
+	static void print_line				(const string line, ostream& = cout);
 	
-	TestAnalyser();
+	//constructor
+	TestAnalyser						();
 	
 	//setters/getters
 	void clear							();														//does not change print_mode
@@ -52,24 +54,24 @@ public:
 	void remove_print_mode				(int mode)	{m_print_mode&=~mode;}
 	vector<vres_t>	get_tests			()			{return arrayOfTests;} 
 	vector<double>	get_times			()			{return arrayOfAvTimes;}
-	vector<double>	get_times_preproc	()			{ return arrayOfAvPreProcTimes; }
+	vector<double>	get_times_preproc	()			{return arrayOfAvPreProcTimes; }
 	vector<double>	get_sol				()			{return arrayOfAvSol;}
 	vector<double>	get_steps			()			{return arrayOfAvSteps;}
 	vector<vector<double> >get_counters ()			{return arrayOfCounters;}
-	Result			get_result			(int idAlg)	{ return arrayOfTests[0][idAlg];}		//returns the result of the first instance of the idAlg run
+	Result			get_result			(int idAlg)	{return arrayOfTests[0][idAlg];}		//returns the result of the first instance of the idAlg run
 	
 /////////////
 // Basic operations
-	void add_test					(bool isNewRep, Result);
-	bool is_consistent_sol			(int& num_error);	
-	int analyser					(info_t* = NULL);									//main driver
+	void add_test						(bool isNewRep, Result);
+	bool is_consistent_sol				(int& num_error);	
+	int analyser						(info_t* = NULL);									//main driver
 	
 	//E/S
-	void print_single				(ostream &, int idAlg=-1 /*all alg*/);					//prints individual results of alg
-	void print_single_rep			(ostream &, int nRep=0 /* 1 based*/, int idAlg=-1);	
+	void print_single					(ostream &, int idAlg=-1 /*all alg*/);					//prints individual results of alg
+	void print_single_rep				(ostream &, int nRep=0 /* 1 based*/, int idAlg=-1);	
 	
 private:
-	int update_sizes				();	
+	int update_sizes					();	
 ///////////////		
 //data members
 	vector<vres_t>					arrayOfTests;			//[rep][algorithm], main DB
