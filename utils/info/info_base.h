@@ -22,7 +22,7 @@ namespace com {
 	//
 	//	infoBase
 	// 
-	//  @brief base class to report results of graph algorithms.
+	//  @brief base struct to report results of graph algorithms.
 	// 
 	//  Supports basic configuration parameters and timers.
 	// 
