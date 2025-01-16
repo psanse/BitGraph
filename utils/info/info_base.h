@@ -122,7 +122,7 @@ virtual std::ostream& printReport		(std::ostream & o = std::cout, bool is_endl =
 
 	};
 	
-}
+}//namespace com
 
 
 
