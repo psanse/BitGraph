@@ -76,7 +76,7 @@ public:
 	int isDegOrd_ = -1;							//0 - (COLOR_SORT), 1 - (DEGREE_SORT), -1 NONE ...  CHECK, looks redundant with idsortReal (16/01/2025)
 
 	/////////////////////
-	//search (main params)
+	// Search info (main params)
 	////////////////////
 
 	W_t incumbent_ = 0;							//best solution value found during search (not in preproc)
@@ -116,6 +116,7 @@ struct infoCliSAT : public infoCLQ<int> {
 /////////////////////
 //data members
 
+	//search info extension
 	uint64_t nLastIsetPreFilterCalls_ = 0;
 	uint64_t nLastIsetCalls_ = 0;
 	uint64_t nCurrIsetCalls_ = 0;
