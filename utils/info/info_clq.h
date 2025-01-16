@@ -24,8 +24,9 @@
 
 template<class W_t = int>
 struct infoCLQ : public com::infoBase {
+
 	infoCLQ() :infoBase(),
-		incumbent_(0), optimum_(0), nSteps_(0), isTimeOutReached_(false),
+		incumbent_(), optimum_(0), nSteps_(0), isTimeOutReached_(false),
 		lbRootNoHeur(0), lbRootHeur(0),
 		branchingRootSize_(0),
 		idSortReal_(-1),
