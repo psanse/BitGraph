@@ -25,8 +25,10 @@ namespace com {
 	//
 	//	infoBase
 	// 
-	//  @brief base class to report results of graph algorithms
-	//
+	//  @brief base class to report results of graph algorithms.
+	// 
+	//  Supports basic configuration parameters and timers.
+	// 
 	///////////////////////
 
 	struct infoBase {
@@ -47,7 +49,7 @@ namespace com {
 		//algorithms
 		////////////////////
 		int idAlg_;								//algorithm identifier
-		int idHeur_;							//root heuristic policy (currently AMTS, no AMTS or combined with other heuristics)	
+		int idHeur_;							//root heuristic policy (e.g. AMTS, no AMTS or combined with other heuristics)	
 		int idSort_;							//sorting policy selected as input configuration parameter (might not be the final choice)
 
 		//////////////////////
@@ -78,7 +80,7 @@ namespace com {
 		{}
 
 		//timers
-		void startTimer(phase_t t);
+		void startTimer	(phase_t t);
 		double readTimer(phase_t t);
 
 		/*
@@ -100,16 +102,17 @@ namespace com {
 			clearSearchInfo();					//virtual call - does nothing at this level
 		}
 
+		//to override - Template Method Pattern
 		virtual void clearPreprocInfo() {}
 		virtual void clearSearchInfo() {}
 
 		/////////////
 		//I/O
-		friend std::ostream& operator<<(std::ostream&, const infoBase&);
+		friend std::ostream& operator<<	(std::ostream&, const infoBase&);
 		virtual std::ostream& printTable(std::ostream & = std::cout) const;								//results in table format for output file
 
-		std::ostream& printParams(std::ostream & = std::cout) const;
-		std::ostream& printTimers(std::ostream & = std::cout) const;
+		std::ostream& printParams		(std::ostream & = std::cout) const;
+		std::ostream& printTimers		(std::ostream & = std::cout) const;
 
 		virtual std::ostream& printResults(std::ostream& o = std::cout)  const { return o; }			//Does nothing at this level
 	};

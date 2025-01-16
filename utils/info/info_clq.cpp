@@ -17,7 +17,8 @@ using namespace com;
 //
 // DERIVED CLASS
 
-std::ostream& infoCLQ::printResults(std::ostream& o) const
+template<class W_t>
+std::ostream& infoCLQ<W_t>::printResults(std::ostream& o) const
 {
 	o << "*****************************" << endl;
 	o << "w:" << optimum_ << "\tt_par: " << timeParse_ << "\tt_pp: " << timePreproc_ << "\tt_search: " << timeSearch_ << "\t#steps: " << nSteps_ << endl;
@@ -25,7 +26,8 @@ std::ostream& infoCLQ::printResults(std::ostream& o) const
 	return o;
 }
 
-std::ostream& infoCLQ::printTable(std::ostream& o) const
+template<class W_t>
+std::ostream& infoCLQ<W_t>::printTable(std::ostream& o) const
 {
 	  o	<< nameInstance_.c_str() << "\t" << N_ << "\t" << M_ << "\t" << TIME_OUT_ << "\t" << TIME_OUT_HEUR_ << "\t" << idAlg_ << "\t"
 		<< idSort_ << "\t" << idSortReal_ << "\t"
@@ -42,7 +44,8 @@ std::ostream& infoCLQ::printTable(std::ostream& o) const
 	return o;
 }
 
-void infoCLQ::clearPreprocInfo()
+template<class W_t>
+void infoCLQ<W_t>::clearPreprocInfo()
 {	
 	LB_0_no_AMTS_ = 0.0; LB_0_AMTS_ = 0.0;
 	branchingRootSize_ = 0;
@@ -53,7 +56,8 @@ void infoCLQ::clearPreprocInfo()
 	sol_.clear();								//candidate solution found during preprocessing
 }
 
-void infoCLQ::clearSearchInfo() 
+template<class W_t>
+void infoCLQ<W_t>::clearSearchInfo()
 {
 	incumbent_ = 0;
 	optimum_ = 0;

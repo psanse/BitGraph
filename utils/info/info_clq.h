@@ -18,11 +18,12 @@
 //
 //	infoCLQ
 // 
-//  @brief info on results for MCP algorithms
+//  @brief info on results for MCP / MWCP algorithms
 //		   (some are CliSAT specific)
 //
 ///////////////////////
 
+template<class W_t = int>
 struct infoCLQ : public com::infoBase {
 	infoCLQ() :infoBase(),
 		incumbent_(0), optimum_(0), nSteps_(0), isTimeOutReached_(false),
@@ -61,23 +62,22 @@ struct infoCLQ : public com::infoBase {
 	/////////////////////
 	//search
 	////////////////////
-	uint32_t incumbent_;					//best solution value found during search (not in preproc)
-	uint32_t optimum_;						//best solution value (omega) - will be the same as incumbent is time out limit is not reached
+	W_t incumbent_;							//best solution value found during search (not in preproc)
+	W_t optimum_;							//best solution value (omega) - will be the same as incumbent is time out limit is not reached
 	uint64_t nSteps_;						//recursive calls to the algorithm		
 	bool  isTimeOutReached_;				//flag time out	
-	std::vector<int> sol_;					//best solution (vertices)
-
+	std::vector<int> sol_;					//solution (vertices)
 
 	//////////////////////
 	//  Preproc info  
 	//////////////////////
 
 	//LB bounds - root
-	double LB_0_no_AMTS_;					//LB_0 without AMTS
-	double LB_0_AMTS_;						//LB_0 with AMTS
+	W_t LB_0_no_AMTS_;						//LB_0 without AMTS
+	W_t LB_0_AMTS_;							//LB_0 with AMTS
 
 	//UB bounds root
-	int branchingRootSize_;					//size of Branching set at ROOT	
+	std::size_t branchingRootSize_;			//size of Branching set at ROOT	
 
 	//sorting
 	int idSortReal_;						//sorting policy really used by the algorithm
@@ -100,6 +100,8 @@ struct infoCLQ : public com::infoBase {
 	uint64_t nsUBpartCalls_;
 
 };
+
+
 
 
 #endif
