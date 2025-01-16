@@ -10,16 +10,13 @@
 
 #include "../prec_timer.h"
 #include <iostream>
+#include <string>
 #include <limits>
 #include <vector>
 
 namespace com {
 
 	using tpoint_t = PrecisionTimer::timepoint_t;
-
-	/////////////////////////////////////////////////////////
-	constexpr char* FILE_LOG = "info_clique.txt";
-	/////////////////////////////////////////////////////////
 
 	//////////////////////
 	//
@@ -32,78 +29,75 @@ namespace com {
 	///////////////////////
 
 	struct infoBase {
+
+		static const std::string FILE_DEFAULT_LOG;
+
 		enum class phase_t { SEARCH = 0, PREPROC, LAST_INCUMBENT, PARSE };
 
 		/*
 		* @brief elapsed time from start_time to now
 		*/
 		static double elapsedTime(tpoint_t start_time);
-
-		/////////////////////
-		//general info
-		////////////////////
-		std::string nameFileLog_;				//log file name
-		std::string nameInstance_;				//instance name
-		uint32_t N_;							//number of vertices
-		uint64_t M_;							//number of edges		
-		uint32_t K_;							//for k-clique search- EXPERIMENTAL, TODO@add to output
-		double TIME_OUT_;						//in seconds
-		double TIME_OUT_HEUR_;					//in seconds
 			
-		//algorithms		
-		int idAlg_;								//algorithm identifier
-		int idHeur_;							//root heuristic policy (e.g. AMTS, no AMTS or combined with other heuristics)	
-		int idSort_;							//sorting policy selected as input configuration parameter (might not be the final choice)
-
-		//////////////////////
-		// timers
-		//////////////////////
-
-		tpoint_t startTimeParse_;
-		double timeParse_;						//parsing time(in seconds)
-
-		tpoint_t startTimePreproc_;
-		double timePreproc_;					//preprocessing time(in seconds)
-
-		tpoint_t startTimeSearch_;
-		double timeSearch_;						//search time(in seconds)
-
-		tpoint_t startTimeIncumbent_;
-		double timeIncumbent_;					//time when last new incumbent was found (in seconds)
-
-		/////////////////////////////
-		//interface
-
-		infoBase() :
-			nameFileLog_(FILE_LOG), nameInstance_(""),
-			N_(0), M_(0), K_(0),
-			TIME_OUT_(std::numeric_limits<double>::max()), TIME_OUT_HEUR_(std::numeric_limits<double>::max()),
-			timeParse_(0.0), timePreproc_(0.0), timeSearch_(0.0), timeIncumbent_(0.0),
-			idAlg_(-1), idHeur_(-1), idSort_(-1)
-		{}
-
 		//timers
-		void startTimer	(phase_t t);
-		double readTimer(phase_t t);
+		void startTimer		(phase_t t);
+		double readTimer	(phase_t t);
 	
-		//context 
+		//clear context 
+		virtual void clear (bool lazy = false);
+
+	protected:	
 		void clearGeneralInfo();					//CHECK comment: "manually at the start of every run"	
-		void clearTimers	 ();					//clears all timers
+		void clearTimers	 ();					
 		void clearTimer		 (phase_t t);
-
-		virtual void clear	 (bool lazy = false);
-
-
-		/////////////
+		
 		//I/O
 	public:
 		friend std::ostream& operator<<	(std::ostream&, const infoBase&);
-		virtual std::ostream& printTable(std::ostream & = std::cout, bool is_endl=false) const;								//results in table format for output file
+
+		//results in table format for output file
+		//TODO Add @K_ to ouput conditionally
+virtual std::ostream& printReport		(std::ostream & = std::cout, bool is_endl = true) const;
 
 		std::ostream& printParams		(std::ostream & = std::cout) const;
 		std::ostream& printTimers		(std::ostream & = std::cout) const;
-	
+
+//////////////////////
+//data members
+ 
+		/////////////////////
+		//general info
+				
+		std::string nameInstance_	= "";								//instance name
+		uint32_t N_ = 0;												//number of vertices
+		uint64_t M_ = 0;												//number of edges		
+		uint32_t K_ = 0;												//for k-clique search
+		double TIME_OUT_		= std::numeric_limits<double>::max();	//seconds
+		double TIME_OUT_HEUR_	= std::numeric_limits<double>::max();	//seconds
+
+		//algorithms
+		 		
+		int idAlg_  = -1;							//algorithm identifier
+		int idHeur_ = -1;							//root heuristic policy (e.g. AMTS, no AMTS or combined with other heuristics)	
+		int idSort_ = -1;							//sorting policy selected as input configuration parameter (might not be the final choice)
+
+		
+		// timers		
+
+		tpoint_t startTimeParse_;
+		double timeParse_ = 0 ;						//parsing time(in seconds)
+
+		tpoint_t startTimePreproc_;
+		double timePreproc_ = 0;					//preprocessing time(in seconds)
+
+		tpoint_t startTimeSearch_;
+		double timeSearch_ = 0;						//search time(in seconds)
+
+		tpoint_t startTimeIncumbent_;
+		double timeIncumbent_ = 0 ;					//time when last new incumbent was found (in seconds)
+
 	};
+	
 }
 
 
