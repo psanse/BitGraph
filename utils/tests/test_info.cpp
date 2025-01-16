@@ -77,9 +77,22 @@ TEST_F(InfoBaseTest, ClearTimers) {
 TEST_F(InfoBaseTest, Clear) {
 	info.N_ = 10;
 	info.M_ = 20;
-	info.clear();
+
+	//clears all - lazy = false
+	info.clear();	
+
 	EXPECT_EQ(info.N_, 0);
 	EXPECT_EQ(info.M_, 0);	
+
+	info.N_ = 10;
+	info.M_ = 20;
+
+	//preserves general info - lazy = true
+	info.clear(true);
+
+	EXPECT_EQ(info.N_, 10);
+	EXPECT_EQ(info.M_, 20);
+
 
 	//test other members...
 }

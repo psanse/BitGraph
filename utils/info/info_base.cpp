@@ -56,14 +56,18 @@ namespace com {
 	}
 
 
-	std::ostream& infoBase::printTable(std::ostream& o) const
+	std::ostream& infoBase::printTable(std::ostream& o, bool is_endl) const
 	{
 		o << nameInstance_.c_str() << "\t" << N_ << "\t" << M_ << "\t" << TIME_OUT_ << "\t" << TIME_OUT_HEUR_ << "\t"
 			<< idAlg_ << "\t"
-			<< idSort_ << "\t" 
+			<< idSort_ << "\t"
 			<< idHeur_ << "\t"
-			<< timeParse_ << "\t" << timePreproc_ << "\t" << timeIncumbent_ << "\t" << timeSearch_ << "\t"
-			<< std::endl;
+			<< timeParse_ << "\t" << timePreproc_ << "\t" << timeIncumbent_ << "\t" << timeSearch_ << "\t";
+
+			if (is_endl) {
+				o << std::endl;
+			}
+		
 
 		return o;
 	}
@@ -178,6 +182,13 @@ namespace com {
 		idAlg_ = -1;
 		idHeur_ = -1;
 		idSort_ = -1;
+	}
+
+	void infoBase::clear(bool lazy) {
+		clearTimers();
+		if (!lazy) {
+			clearGeneralInfo();					//CHECK comment "manually at the start of every run"
+		}
 	}
 }
 

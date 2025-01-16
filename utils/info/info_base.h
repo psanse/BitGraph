@@ -34,6 +34,11 @@ namespace com {
 	struct infoBase {
 		enum class phase_t { SEARCH = 0, PREPROC, LAST_INCUMBENT, PARSE };
 
+		/*
+		* @brief elapsed time from start_time to now
+		*/
+		static double elapsedTime(tpoint_t start_time);
+
 		/////////////////////
 		//general info
 		////////////////////
@@ -44,10 +49,8 @@ namespace com {
 		uint32_t K_;							//for k-clique search- EXPERIMENTAL, TODO@add to output
 		double TIME_OUT_;						//in seconds
 		double TIME_OUT_HEUR_;					//in seconds
-
-		/////////////////////
-		//algorithms
-		////////////////////
+			
+		//algorithms		
 		int idAlg_;								//algorithm identifier
 		int idHeur_;							//root heuristic policy (e.g. AMTS, no AMTS or combined with other heuristics)	
 		int idSort_;							//sorting policy selected as input configuration parameter (might not be the final choice)
@@ -82,42 +85,26 @@ namespace com {
 		//timers
 		void startTimer	(phase_t t);
 		double readTimer(phase_t t);
-
-		/*
-		* @brief elapsed time from start_time to now
-		*/
-		static double elapsedTime(tpoint_t start_time);		
-
+	
 		//context 
-		void clearGeneralInfo();				//CHECK comment: "manually at the start of every run"	
-		void clearTimers();						//clears all timers
-		void clearTimer(phase_t t);
+		void clearGeneralInfo();					//CHECK comment: "manually at the start of every run"	
+		void clearTimers	 ();					//clears all timers
+		void clearTimer		 (phase_t t);
 
-		void clear() {
-			clearGeneralInfo();					//CHECK comment "manually at the start of every run"
-			clearTimers();
+		virtual void clear	 (bool lazy = false);
 
-			//other info in derived classes
-			clearPreprocInfo();					//virtual call - does nothing at this level
-			clearSearchInfo();					//virtual call - does nothing at this level
-		}
-
-		//to override - Template Method Pattern
-		virtual void clearPreprocInfo() {}
-		virtual void clearSearchInfo() {}
 
 		/////////////
 		//I/O
+	public:
 		friend std::ostream& operator<<	(std::ostream&, const infoBase&);
-		virtual std::ostream& printTable(std::ostream & = std::cout) const;								//results in table format for output file
+		virtual std::ostream& printTable(std::ostream & = std::cout, bool is_endl=false) const;								//results in table format for output file
 
 		std::ostream& printParams		(std::ostream & = std::cout) const;
 		std::ostream& printTimers		(std::ostream & = std::cout) const;
-
-		virtual std::ostream& printResults(std::ostream& o = std::cout)  const { return o; }			//Does nothing at this level
+	
 	};
 }
-
 
 
 
