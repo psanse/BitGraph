@@ -165,7 +165,9 @@ public:
 	const vint&  sort_degen_non_decreasing_deg(bool rev);				
 	const vint&  sort_degen_non_increasing_deg(bool rev);
 
-	const vint& sort_degen_non_decreasing_deg_B(bool rev);				//Expermimental alternative implementation - CHECK efficiency	
+	//Expermimental alternative implementation - CHECK efficiency
+	//Does not required cached degree info of vertices in @nb_neigh_
+	const vint& sort_degen_non_decreasing_deg_B(bool rev);					
 	
 	/*
 	*@brief Composite non-decreasing degree degenerate ordering based on a prior given ordering 
@@ -245,10 +247,10 @@ protected:
 protected:
 
 	Graph_t& g_;											//ideally CONST but some operations like get_neighbors are non-const (TODO!)
-	std::size_t NV_;
+	std::size_t NV_;										//number of vertices cached - g_.number_of_vertices()  
 
-	vint nb_neigh_;
-	vint deg_neigh_;
+	vint nb_neigh_;											//stores the degree of the vertices		
+	vint deg_neigh_;										//stores the support of the vertices (degree of neighbors)
 	bb_type node_active_state_;								//bitset for active vertices: 1bit-active, 0bit-passive. Used in degenerate orderings	
 	vint nodes_;											//stores the ordering
 };
