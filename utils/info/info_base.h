@@ -29,9 +29,7 @@ namespace com {
 	///////////////////////
 
 	struct infoBase {
-
-		static const std::string FILE_DEFAULT_LOG;
-
+		
 		enum class phase_t { SEARCH = 0, PREPROC, LAST_INCUMBENT, PARSE };
 
 		/*
@@ -41,9 +39,17 @@ namespace com {
 			
 		//timers
 		void startTimer		(phase_t t);
+
+		/*
+		* @brief reads time in timer t (previously set with startTimer(...))
+		*/
 		double readTimer	(phase_t t);
 	
 		//clear context 
+		/*
+		* @brief clears context 
+		* @param lazy - if true general info is NOT cleared, only timers
+		*/
 		virtual void clear (bool lazy = false);
 
 	protected:	
@@ -54,17 +60,35 @@ namespace com {
 		//I/O
 	public:
 		friend std::ostream& operator<<	(std::ostream&, const infoBase&);
+						
+		/*
+		* @brief streams all info
+		* @param o: output stream 
+		* @param is_endl: if true adds endl at the end
+		* @returns output stream
+		* 
+		* TODO Add @K_ to ouput conditionally
+		*/
+virtual std::ostream& printReport		(std::ostream & o = std::cout, bool is_endl = true) const;
 
-		//results in table format for output file
-		//TODO Add @K_ to ouput conditionally
-virtual std::ostream& printReport		(std::ostream & = std::cout, bool is_endl = true) const;
-
-		std::ostream& printParams		(std::ostream & = std::cout) const;
-		std::ostream& printTimers		(std::ostream & = std::cout) const;
+		/*
+		* @brief streams gereral info
+		* @param o: output stream
+		* @returns output stream
+		*/
+		std::ostream& printParams		(std::ostream & o = std::cout) const;
+		
+		/*
+		* @brief streams timer info
+		* @param o output stream
+		* @returns output stream
+		*/
+		std::ostream& printTimers		(std::ostream & o = std::cout) const;
 
 //////////////////////
 //data members
  
+		
 		/////////////////////
 		//general info
 				
