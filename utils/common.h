@@ -7,10 +7,8 @@
 
 
 //uncomment to disable assert() 
-//#define NDEBUG
-#include <cassert>
-
-#ifndef  NDEBUG
+#define	NDEBUG
+#ifndef NDEBUG
 	#define DEBUG_STACKS		//checks stack sizes (important to debug SAT engine in DEBUG mode)
 #endif 
 //////////////////
