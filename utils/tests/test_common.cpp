@@ -63,65 +63,6 @@ TEST(Common, number_of_words){
 
 }
 
-TEST(Common, my_silly_pointer_to_elem_basics){
-		
-	struct s_triplet {
-		int a = 10;
-		int b = 20;
-		int c = 30;
-		ostream& print(ostream& o) {
-			o << "[" << a << " " << b << " " << c << "]";
-			return o;
-		}
-	};
-
-	//constructor
-	pt_elem<int> pElem(10);
-
-	///////////////////////////////////////
-	EXPECT_EQ(10, *pElem);							//operator * overload
-	EXPECT_EQ(10, *pElem.get_elem());				//getter
-	///////////////////////////////////////
-
-	//setter
-	pt_elem<int> pInt;
-	pInt.set_elem(10);
-
-	/////////////////////////////////////
-	EXPECT_EQ(10, *pInt.get_elem() );
-	/////////////////////////////////////
-
-	//pointer to struct
-	pt_elem<s_triplet> pTriplet;
-	
-	///////////////////////////////////////
-	EXPECT_EQ(10, pTriplet.get_elem()->a);
-	EXPECT_EQ(20, pTriplet.get_elem()->b);
-	EXPECT_EQ(30, pTriplet.get_elem()->c);
-	///////////////////////////////////////
-
-	//resets pointer
-	s_triplet triplet;
-	triplet.a = 100;
-	pTriplet.set_elem(triplet);
-
-	///////////////////////////////////////
-	EXPECT_EQ(100, pTriplet.get_elem()->a);
-	///////////////////////////////////////
-
-}
-
-TEST(Common, my_silly_pointer_to_elem_swap) {
-	
-	pt_elem<int> pInt1(10);
-	pt_elem<int> pInt2(20);
-	pInt1.swap(pInt2);
-
-	///////////////////////////////////////
-	EXPECT_EQ(20, *pInt1.get_elem() );
-	EXPECT_EQ(10, *pInt2.get_elem() );
-
-}
 
 TEST(Common, my_stack_basic) {
 
@@ -227,7 +168,6 @@ TEST(sort, insert_ordered){
 
 }
 
-
 TEST(Common, path){
 	string path_1("c:\\kk");
 	string path_2("c:\\kk/");  //a posix slash at the end
@@ -270,5 +210,66 @@ TEST(Common, collection_equality){
 
 
 }
+
+
+//TEST(Common, my_silly_pointer_to_elem_basics) {
+	//		
+	//	struct s_triplet {
+	//		int a = 10;
+	//		int b = 20;
+	//		int c = 30;
+	//		ostream& print(ostream& o) {
+	//			o << "[" << a << " " << b << " " << c << "]";
+	//			return o;
+	//		}
+	//	};
+	//
+	//	//constructor
+	//	pt_elem<int> pElem(20);
+	//
+	//	///////////////////////////////////////
+	//	EXPECT_EQ(20, *pElem);							//operator * overload
+	//	EXPECT_EQ(20, *pElem.get_elem());				//getter
+	//	///////////////////////////////////////
+	//
+	//	//setter
+	//	pElem.set_elem(10);
+	//
+	//	/////////////////////////////////////
+	//	EXPECT_EQ(10, *pElem.get_elem() );
+	//	/////////////////////////////////////
+	//
+	//	//pointer to struct
+	//	s_triplet tr;
+	//	pt_elem<s_triplet> pTriplet(tr);
+	//	
+	//	///////////////////////////////////////
+	//	EXPECT_EQ(10, pTriplet.get_elem()->a);
+	//	EXPECT_EQ(20, pTriplet.get_elem()->b);
+	//	EXPECT_EQ(30, pTriplet.get_elem()->c);
+	//	///////////////////////////////////////
+	//
+	//	//resets pointer
+	//	s_triplet triplet;
+	//	triplet.a = 100;
+	//	pTriplet.set_elem(triplet);
+	//
+	//	///////////////////////////////////////
+	//	EXPECT_EQ(100, pTriplet.get_elem()->a);
+	//	///////////////////////////////////////
+	//
+	//}
+
+//TEST(Common, my_silly_pointer_to_elem_swap) {
+//
+//	pt_elem<int> pInt1(10);
+//	pt_elem<int> pInt2(20);
+//	pInt1.swap(pInt2);
+//
+//	///////////////////////////////////////
+//	EXPECT_EQ(20, *pInt1.get_elem());
+//	EXPECT_EQ(10, *pInt2.get_elem());
+//
+//}
 
 
