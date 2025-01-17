@@ -5,11 +5,18 @@
 #ifndef __COMMON_H__
 #define	__COMMON_H__
 
-///////////
-//switches
+
+//uncomment to disable assert() 
+//#define NDEBUG
+#include <cassert>
+
+#ifndef  NDEBUG
+	#define DEBUG_STACKS		//checks stack sizes (important to debug SAT engine in DEBUG mode)
+#endif 
+//////////////////
 
 
-//#define DEBUG_STACKS		//checks stack sizes (important to debug SAT engine in DEBUG mode)
+#include <iostream>
 
 
 #include "logger.h"
@@ -566,23 +573,23 @@ namespace com {
 	//
 	// struct stack_t
 	//
-	// (my efficient stack)
+	// (my simple efficient stack)
 	//
 	////////////////////////
 
 	template <class T>
 	struct stack_t {
 		static const int EMPTY_VAL = -1;
-		int pt_;				//stack pointer[0, MAX_SIZE-1], always points to a free position (top of the stack) 
+		int pt_;							//stack pointer[0, MAX_SIZE-1], always points to a free position (top of the stack) 
 		T* stack;
 #ifdef DEBUG_STACKS
-		int MAX;
+		int MAX_;
 #endif
 
 		//construction
 		stack_t() :pt_(0), stack(nullptr) {
 #ifdef DEBUG_STACKS
-			int MAX = EMPTY_VAL;
+			int MAX_ = EMPTY_VAL;
 #endif   
 		}
 		stack_t(int MAX_SIZE) :stack(nullptr) {
@@ -596,13 +603,25 @@ namespace com {
 			}
 			pt_ = 0;
 #ifdef DEBUG_STACKS
-			MAX = MAX_SIZE;
+			MAX_ = MAX_SIZE;
 #endif
 		}
+
+		//TODO other constructors, assignment operations....
 
 		//destruction
 		~stack_t() { clear(); }
 
+		//setters and getters
+		T get_elem(int pos) const	{ return stack[pos]; }
+		T first() const				{ return stack[0]; }										//TODO@assert correct size in DEBUG
+		T last() const				{ return stack[pt_ - 1]; }									//TODO@assert correct size in DEBUG
+
+		unsigned int size()			{ return pt_; }
+
+		////////////////
+		// allocation
+		 
 		//for backward compatibility
 		void init (int MAX_SIZE) {
 			delete[] stack;
@@ -619,13 +638,14 @@ namespace com {
 
 			
 #ifdef DEBUG_STACKS
-			MAX = MAX_SIZE;
+			MAX_ = MAX_SIZE;
 #endif
 			return 0;
 		}
 
+		
 		//use instead of init 
-		void reset(int MAX_SIZE) {
+		void reset (int MAX_SIZE) {
 			pt_ = 0;
 			delete[] stack;
 			try {
@@ -638,7 +658,7 @@ namespace com {
 			}
 		
 #ifdef DEBUG_STACKS
-			MAX = MAX_SIZE;
+			MAX_ = MAX_SIZE;
 #endif
 		}
 
@@ -647,15 +667,15 @@ namespace com {
 			stack = nullptr; 
 			pt_ = 0;
 #ifdef DEBUG_STACKS
-			MAX = EMPTY_VAL;
+			MAX_ = EMPTY_VAL;
 #endif
 		}
 
 		void push(T d) {
 			stack[pt_++] = d;   
 #ifdef DEBUG_STACKS
-			if (pt_ > MAX) {
-				LOG_INFO("bizarre stack with size: " << pt_ << " and max size: " << MAX);
+			if (pt_ > MAX_) {
+				LOG_INFO("bizarre stack with size: " , pt_ , " and max size: " , MAX_);
 				cin.get();
 			}
 #endif
@@ -670,8 +690,8 @@ namespace com {
 				stack[pt_++] = t;
 			}
 #ifdef DEBUG_STACKS
-			if (pt_ > MAX) {    //*** no checking against N
-				LOG_INFO("bizarre stack with size: " << pt_ << " and max size: " << MAX);
+			if (pt_ > MAX_) {    //*** no checking against N
+				LOG_INFO("bizarre stack with size: " , pt_ , " and max size: " , MAX_);
 				cin.get();
 			}
 #endif
@@ -690,17 +710,12 @@ namespace com {
 				return pt_;
 			}
 		}	
-		
-			
+					
 		 /* removes the last NB elements from the stack (lost!) */
 		int pop(int nb) { 
 			pt_ -= nb; 
 			return nb; 
 		}				
-
-		T get_elem(int pos) const				{ return stack[pos]; }
-		T first() const							{ return stack[0]; }										//TODO@assert correct size in DEBUG
-		T last() const							{ return stack[pt_ - 1]; }									//TODO@assert correct size in DEBUG
 
 		//removes a single element at pos (holds when deleting singleton pos=0, pt=1)
 		void erase(int pos) { 
@@ -714,12 +729,10 @@ namespace com {
 	   
 		//clears nb elements from the stack-TODO@, REFACTOR
 		// void erase_pop (int nb)			{pt_-=nb;}																	
-		
-		unsigned int size()					{ return pt_; }
+				
 		bool empty() const					{ return (pt_ == 0); }										
-
-		//TODO@operator ==
-
+		
+		//I/O
 		std::ostream& print(std::ostream& o) const {
 			o << "[";  
 			for (int i = 0; i < pt_; i++) {
@@ -758,7 +771,7 @@ namespace com {
 	//
 	// my old C_array wrraper
 	// 
-	// TODO - deprecated, remove (17(01/25)
+	// TODO - deprecated, possibly remove (17(01/25)
 	//
 	////////////////////////
 
