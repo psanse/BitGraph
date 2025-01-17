@@ -72,8 +72,8 @@ public:
 	std::size_t branchingRootSize_ = 0;			//size of Branching set at ROOT	
 
 	//sorting
-	int idSortReal_ = -1;						//sorting policy really used by the algorithm
-	int isDegOrd_ = -1;							//0 - (COLOR_SORT), 1 - (DEGREE_SORT), -1 NONE ...  CHECK, looks redundant with idsortReal (16/01/2025)
+	int idSortReal_ = -1;						//sorting policy actually used by the algorithm (infoBase::idSort_ is the configuration parameter)
+	bool isDegOrd_ = false;						//flag to indicate if any varaint of  DEG-SORT has been used.  CHECK, looksidSO redundant with idsortReal (16/01/2025)
 
 	/////////////////////
 	// Search info (main params)

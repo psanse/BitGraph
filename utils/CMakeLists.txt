@@ -36,7 +36,7 @@ if (utils_build_tests)
 add_executable (test_utils ./tests/gtest_main.cc
 #./tests/test_batch.cpp
 #./tests/test_benchmark.cpp
-#./tests/test_common.cpp
+ ./tests/test_common.cpp
 #./tests/test_file.cpp
 # ./tests/test_logger.cpp
 # ./tests/test_result.cpp
@@ -44,7 +44,7 @@ add_executable (test_utils ./tests/gtest_main.cc
 #./tests/test_tanal.cpp
 #./tests/test_thread.cpp
 #./test_analyser.cpp
- ./tests/test_info.cpp
+# ./tests/test_info.cpp
 #  ./tests/test_info_clq.cpp
 )
 

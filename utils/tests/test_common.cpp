@@ -1,42 +1,76 @@
+/**
+* @file test_common.cpp 
+* @brief Testing of common utilities
+* @date ?
+* @last_update 17/01/25
+* @author pss
+* 
+* TODO - CHECK and refactor tests (17/01/25)
+**/
+
+#include "utils/common.h"
+#include "gtest/gtest.h"
+#include "logger.h"
 #include <iostream>
 #include <sstream>
-#include "gtest/gtest.h"
-#include "../common.h"
 #include <string>
 #include <vector>
-#include "logger.h"
 
 using namespace std;
 using namespace com;
 
-#define PATH "C:/Users/i7/Desktop/"
+using vdob = std::vector<double>;
 
-TEST(Common, counting_words){
+TEST(Common, mean_and_stdev) {
+
+	//collection
+	vdob col = { 2.7, 2.8, 2.9, 3, 3.1, 3.2, 3.3 };
+	
+	//compute mean - implicit cast to double on return, MUST USE for_each
+	double mean = for_each(col.begin(), col.end(), com::mat::MeanValue());					
+
+	/////////////////////////////
+	EXPECT_DOUBLE_EQ(3, mean);
+	/////////////////////////////
+
+	//compute standard deviation - implicit cast to double on return, MUST USE for_each
+	double stdDev = for_each(col.begin(), col.end(), com::mat::StdDevValue(mean));			//implicit cast to double
+	
+	//compute the standard deviation in a more traditional way
+	double stdDevExp = 0;
+	for (auto elem : col) {
+		stdDevExp += (mean - elem) * (mean - elem);
+	}
+	stdDevExp /= col.size();	
+	stdDevExp = std::sqrt(stdDevExp);
+
+	/////////////////////////////////////
+	EXPECT_DOUBLE_EQ(stdDevExp, stdDev);
+	/////////////////////////////////////
+}
+
+
+TEST(Common, number_of_words){
 /////////////////
 // Testing my simple pointer to elem
 // date@30/09/18
-	LOG_INFO("Common:counting_words-----------------------");
 
 
 	string str1("hello my 2 3 4");
-	int nw=counting::count_words(str1);
+	int nw=counting::number_of_words(str1);
 	EXPECT_EQ(5,nw);
 
 	string str2("e 1 2 25");
-	nw=counting::count_words(str2);
+	nw=counting::number_of_words(str2);
 	EXPECT_EQ(4,nw);
 
-	LOG_INFO("--------------------------------------------");
-	/*LOG_INFO("PRESS ANY KEY");
-	cin.get();*/
+
 }
 
 TEST(Common, pt_elem_basic){
 /////////////////
 // Testing my simple pointer to elem
 // date@17/09/18
-
-	LOG_INFO("Common:my pt_elem_basic-----------------------");
 
 	//TEST_A
 	pt_elem<int> myp;
@@ -68,9 +102,6 @@ TEST(Common, pt_elem_basic){
 	EXPECT_EQ(100, myp1.get_elem()->a);
 	
 
-	LOG_INFO("----------------------------------------------");
-	LOG_INFO("PRESS ANY KEY");
-	cin.get();
 }
 
 TEST(Common, my_stack_pop){
@@ -78,7 +109,7 @@ TEST(Common, my_stack_pop){
 // Fixed popped so that i really is multi-type
 // date@10/3/18
 
-	LOG_INFO("Common:my stack-----------------------");
+
 	const int N=10;
 	struct dato_t{
 		dato_t():a(-1),b(-1){}
@@ -131,13 +162,10 @@ TEST(Common, my_stack_pop){
 	EXPECT_TRUE(s.empty());
 	EXPECT_TRUE(s1.empty());
 
-	LOG_INFO("Common:my stack-END-----------------------");
-	LOG_INFO("Pres any key");
-	cin.get();
 }
 
 TEST(sort, insert_ordered){
-	LOG_INFO("sort:insert_ordered-----------------------");
+
 	int data[4]; data[0]=0; data[1]=1; data[2]=2;				/* items sorted non-increasing score  */
 	int score[4]; score[0]=30;  score[1]=20;  score[2]=5;		/* sorting criteria */
 	
@@ -148,14 +176,13 @@ TEST(sort, insert_ordered){
 	}
 	cout<<"inserted at: "<<pos<<endl;
 
-	LOG_INFO("------------------------------------------");
-	cin.get();
+
 }
 
-TEST(Common, read_FF_file_interdicted_nodes){
-	LOG_INFO("Common:read_FF_file_interdicted_nodes-----------------------");
+TEST(Common, DISABLED_read_FF_file_interdicted_nodes){
+	
 
-	string filename=PATH;
+	string filename=PATH_GRAPH_TESTS_CMAKE_SRC_CODE;
 	filename+="interdictionBUG.txt";
 
 	vector<int> vread;
@@ -163,8 +190,6 @@ TEST(Common, read_FF_file_interdicted_nodes){
 
 	com::stl::print_collection(vread);
 
-	cin.get();
-	LOG_INFO("-------------------------------------------------------------");
 }
 
 TEST(Common, path){
@@ -190,7 +215,7 @@ TEST(Common, path){
 
 TEST(Common, collection_equality){
 //***FIXME THIS TEST BREAKS
-	cout<<"Common:collection_equality-----------------------"<<endl;
+
 	vector<int> v(10, 1);
 	EXPECT_TRUE(com::stl::all_equal(v));
 	com::stl::print_collection(v);
@@ -207,11 +232,11 @@ TEST(Common, collection_equality){
 	/*v.push_back(1);
 	EXPECT_TRUE(com::stl::all_equal(v));*/
 
-	cout<<"-------------------------------------------------"<<endl;
+
 }
 
 TEST(Common, my_stack){
-cout<<"Common:my stack-----------------------"<<endl;
+
 	const int N=10;
 	com::stack_t<int> s(N);
 	
@@ -237,6 +262,5 @@ cout<<"Common:my stack-----------------------"<<endl;
 	s.erase();
 	EXPECT_TRUE(s.empty());
 
-cout<<"Common:my stack-----------------------"<<endl;
 
 }

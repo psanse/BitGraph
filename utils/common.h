@@ -143,6 +143,53 @@ namespace com {
 			T min3(T x, T y, T z) {
 			return std::min<T>(std::min<T>(x, y), z);
 		}
+
+		/**
+		*  @brief functor to compute the mean of a collection
+		*		   (use a for-each loop)
+		**/
+		class MeanValue {
+		private:
+			std::size_t num = 0;		// number of elements
+			double sum = 0;				// sum of all element values
+		public:
+
+			void operator() (double elem) {
+				num++;
+				sum += elem;
+			}
+
+			// return mean value (implicit cast)
+			operator double() {
+				return sum / static_cast<double>(num);
+			}
+		};
+			
+		/**
+		*  @brief functor to compute the standard deviation of a collection
+		*		   given its mean (use a for-each loop)
+		**/
+		class StdDevValue {
+		private:
+			const double MEAN;			//given mean of the collection
+			std::size_t num = 0;		// number of elements
+			double sumDiff = 0;			// sum of power2(all element values
+		public:
+			StdDevValue(double mean_out) : MEAN(mean_out) {}
+
+			void operator() (double elem) {
+				num++;
+				sumDiff += (MEAN - elem) * (MEAN - elem);
+			}
+
+			// return std diff value (implicit cast)
+			operator double() {
+				return std::sqrt(sumDiff / static_cast<double>(num));
+			}
+		};
+
+
+
 	}
 //////////////////////
 	

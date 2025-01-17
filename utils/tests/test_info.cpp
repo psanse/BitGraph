@@ -172,7 +172,7 @@ TEST_F(InfoCLQTest, DefaultConstructor) {
 	EXPECT_EQ	(infoCLQ.lbRootHeur, 0);
 	EXPECT_EQ	(infoCLQ.branchingRootSize_, 0);
 	EXPECT_EQ	(infoCLQ.idSortReal_, -1);
-	EXPECT_EQ	(infoCLQ.isDegOrd_, -1);
+	EXPECT_EQ	(infoCLQ.isDegOrd_, false);
 	EXPECT_EQ	(infoCLQ.incumbent_, 0);
 	EXPECT_EQ	(infoCLQ.optimum_, 0);
 	EXPECT_EQ	(infoCLQ.nSteps_, 0);
