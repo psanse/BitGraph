@@ -49,7 +49,6 @@ TEST(Common, mean_and_stdev) {
 	/////////////////////////////////////
 }
 
-
 TEST(Common, number_of_words){
 
 	string str1("hello my 2 3 4");
@@ -64,9 +63,8 @@ TEST(Common, number_of_words){
 
 }
 
-TEST(Common, my_silly_pointer_to_elem){
-	
-	int data = 10;
+TEST(Common, my_silly_pointer_to_elem_basics){
+		
 	struct s_triplet {
 		int a = 10;
 		int b = 20;
@@ -78,9 +76,12 @@ TEST(Common, my_silly_pointer_to_elem){
 	};
 
 	//constructor
-	pt_elem<int> pElem(data);
-	EXPECT_EQ(10, *pElem.get_elem());
+	pt_elem<int> pElem(10);
 
+	///////////////////////////////////////
+	EXPECT_EQ(10, *pElem);							//operator * overload
+	EXPECT_EQ(10, *pElem.get_elem());				//getter
+	///////////////////////////////////////
 
 	//setter
 	pt_elem<int> pInt;
@@ -107,6 +108,18 @@ TEST(Common, my_silly_pointer_to_elem){
 	///////////////////////////////////////
 	EXPECT_EQ(100, pTriplet.get_elem()->a);
 	///////////////////////////////////////
+
+}
+
+TEST(Common, my_silly_pointer_to_elem_swap) {
+	
+	pt_elem<int> pInt1(10);
+	pt_elem<int> pInt2(20);
+	pInt1.swap(pInt2);
+
+	///////////////////////////////////////
+	EXPECT_EQ(20, *pInt1.get_elem() );
+	EXPECT_EQ(10, *pInt2.get_elem() );
 
 }
 

@@ -661,21 +661,40 @@ namespace com {
 	//
 	// my silly pointer to any type 
 	//(type requires a print method)
+	// 
+	// TODO - deprecated, remove (17(01/25)
 	////////////////////////
 
 	template<class T>
 	class pt_elem {
-		T* pt;
+				
 	public:
-		pt_elem() { pt = new T; }
-		pt_elem(T& data) { pt = new T(data); }
-		~pt_elem() { delete pt; }
+		using type = T;
 
-		const T* get_elem() const { return pt; }
-		T* get_elem() { return pt; }
-		void set_elem(const T& data) { *pt = data; }							//deep copy
-		void swap(pt_elem& out) { T* temp = pt; pt = out.pt; out.pt = temp; }
-		std::ostream& print_elem(std::ostream& o = std::cout) { pt->print(o); return o; }
+		//constructors
+		pt_elem		()				{ pt_ = new T; }
+		pt_elem		(const T& data)	{ pt_ = new T(data); }
+		
+		~pt_elem	()				{ delete pt_; }
+
+		//setters and getters
+		const T* get_elem	() const			{ return pt_; }
+		T* get_elem			()					{ return pt_; }
+		void set_elem		(const T& data)		{ *pt_ = data; }
+
+		operator T* ()							{ return pt_; }
+
+		//swap - use std::swap 
+		void swap (pt_elem& out)									{ T* temp = pt_; pt_ = out.pt_; out.pt_ = temp; }
+		
+		//I/O - type T must have a print method
+		std::ostream& print_elem	(std::ostream& o = std::cout)	{ pt_->print(o); return o; }
+
+	//////////////
+	// data members
+	private:
+
+		T* pt_;
 	};
 
 
@@ -684,6 +703,8 @@ namespace com {
 	// class my_array
 	//
 	// my old C_array wrraper
+	// 
+	// TODO - deprecated, remove (17(01/25)
 	//
 	////////////////////////
 
