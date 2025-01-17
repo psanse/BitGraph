@@ -171,20 +171,20 @@ namespace com {
 		**/
 		class StdDevValue {
 		private:
-			const double MEAN;			//given mean of the collection
-			std::size_t num = 0;		// number of elements
-			double sumDiff = 0;			// sum of power2(all element values
+			const double MEAN;					//given mean of the collection
+			std::size_t num = 0;				//number of elements
+			double sumSqrDiff = 0;				
 		public:
 			StdDevValue(double mean_out) : MEAN(mean_out) {}
 
 			void operator() (double elem) {
 				num++;
-				sumDiff += (MEAN - elem) * (MEAN - elem);
+				sumSqrDiff += (MEAN - elem) * (MEAN - elem);
 			}
 
 			// return std diff value (implicit cast)
 			operator double() {
-				return std::sqrt(sumDiff / static_cast<double>(num));
+				return std::sqrt(sumSqrDiff / static_cast<double>(num));
 			}
 		};
 

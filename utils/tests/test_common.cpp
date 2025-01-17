@@ -26,15 +26,15 @@ TEST(Common, mean_and_stdev) {
 	//collection
 	vdob col = { 2.7, 2.8, 2.9, 3, 3.1, 3.2, 3.3 };
 	
-	//compute mean - implicit cast to double on return, MUST USE for_each
+	//compute mean - implicit cast to double on return, MUST USE for_each and return double
 	double mean = for_each(col.begin(), col.end(), com::mat::MeanValue());					
 
 	/////////////////////////////
 	EXPECT_DOUBLE_EQ(3, mean);
 	/////////////////////////////
 
-	//compute standard deviation - implicit cast to double on return, MUST USE for_each
-	double stdDev = for_each(col.begin(), col.end(), com::mat::StdDevValue(mean));			//implicit cast to double
+	//compute standard deviation - implicit cast to double on return, MUST USE for_each and return double
+	double stdDev = for_each(col.begin(), col.end(), com::mat::StdDevValue(mean));			
 	
 	//compute the standard deviation in a more traditional way
 	double stdDevExp = 0;
