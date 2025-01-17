@@ -5,6 +5,13 @@
 #ifndef __COMMON_H__
 #define	__COMMON_H__
 
+///////////
+//switches
+
+
+//#define DEBUG_STACKS		//checks stack sizes (important to debug SAT engine in DEBUG mode)
+
+
 #include "logger.h"
 #include <chrono>
 #include <ctime>
@@ -22,10 +29,6 @@
 using vint = std::vector<int>;
 using vdob = std::vector<double>;
 
-///////////
-//switches
-
-//#define DEBUG_STACKS					//[DEF-OFF] in relese- checks stack sizes (important to debug SAT engine)
 
 namespace com {
 	
@@ -570,7 +573,7 @@ namespace com {
 	template <class T>
 	struct stack_t {
 		static const int EMPTY_VAL = -1;
-		int pt_;																		//stack pointer[0, MAX_SIZE-1], always points to a free position (top of the stack) 
+		int pt_;				//stack pointer[0, MAX_SIZE-1], always points to a free position (top of the stack) 
 		T* stack;
 #ifdef DEBUG_STACKS
 		int MAX;
@@ -658,8 +661,14 @@ namespace com {
 #endif
 		}
 		void push_front(T d) {
-			if (pt_ == 0) { stack[pt_++] = d; }
-			else { T t = stack[0]; stack[0] = d; stack[pt_++] = t; }
+			if (pt_ == 0) {
+				stack[pt_++] = d;
+			}
+			else {
+				T t = stack[0];
+				stack[0] = d;
+				stack[pt_++] = t;
+			}
 #ifdef DEBUG_STACKS
 			if (pt_ > MAX) {    //*** no checking against N
 				LOG_INFO("bizarre stack with size: " << pt_ << " and max size: " << MAX);
