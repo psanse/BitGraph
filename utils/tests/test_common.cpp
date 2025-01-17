@@ -64,7 +64,7 @@ TEST(Common, number_of_words){
 }
 
 
-TEST(Common, my_stack_basic) {
+TEST(Common, stack_basic) {
 
 	const int N = 10;
 	com::stack_t<int> s(N);
@@ -93,7 +93,7 @@ TEST(Common, my_stack_basic) {
 
 }
 
-TEST(Common, my_stack_pop){
+TEST(Common, stack_pop){
 /////////////////
 // Fixed popped so that i really is multi-type
 // date@10/3/18

@@ -570,78 +570,160 @@ namespace com {
 	template <class T>
 	struct stack_t {
 		static const int EMPTY_VAL = -1;
-		int pt;																		//stack pointer[0, MAX_SIZE-1], always points to a free position (top of the stack) 
+		int pt_;																		//stack pointer[0, MAX_SIZE-1], always points to a free position (top of the stack) 
 		T* stack;
 #ifdef DEBUG_STACKS
 		int MAX;
 #endif
 
-		stack_t() :pt(EMPTY_VAL), stack(nullptr) {
+		//construction
+		stack_t() :pt_(0), stack(nullptr) {
 #ifdef DEBUG_STACKS
 			int MAX = EMPTY_VAL;
 #endif   
 		}
 		stack_t(int MAX_SIZE) :stack(nullptr) {
-			init(MAX_SIZE);
+			try {
+				stack = new T[MAX_SIZE];
+			}
+			catch (std::bad_alloc& ba) {
+				LOGG_ERROR("bad_alloc caught: ", ba.what());
+				LOG_ERROR("exiting - stack_t::stack_t");
+				std::exit(-1);
+			}
+			pt_ = 0;
 #ifdef DEBUG_STACKS
 			MAX = MAX_SIZE;
 #endif
 		}
+
+		//destruction
 		~stack_t() { clear(); }
-		void init(int MAX_SIZE) {
-			clear(); stack = new T[MAX_SIZE]; pt = 0;
+
+		//for backward compatibility
+		void init (int MAX_SIZE) {
+			delete[] stack;
+			pt_ = 0;
+
+			try {
+				stack = new T[MAX_SIZE];
+			}
+			catch (std::bad_alloc& ba) {
+				LOGG_ERROR("bad_alloc caught: " , ba.what());
+				LOG_ERROR("exiting  - stack_t::init");
+				std::exit(-1);			
+			}
+
+			
+#ifdef DEBUG_STACKS
+			MAX = MAX_SIZE;
+#endif
+			return 0;
+		}
+
+		//use instead of init 
+		void reset(int MAX_SIZE) {
+			pt_ = 0;
+			delete[] stack;
+			try {
+				stack = new T[MAX_SIZE];
+			}
+			catch (std::bad_alloc& ba) {
+				LOGG_ERROR("bad_alloc caught: ", ba.what());
+				LOG_ERROR("exiting  - stack_t::reset");
+				std::exit(-1);
+			}
+		
 #ifdef DEBUG_STACKS
 			MAX = MAX_SIZE;
 #endif
 		}
+
 		void clear() {
-			if (stack) { delete[] stack; } stack = nullptr;  pt = EMPTY_VAL;
+			delete[] stack; 
+			stack = nullptr; 
+			pt_ = 0;
 #ifdef DEBUG_STACKS
 			MAX = EMPTY_VAL;
 #endif
 		}
 
 		void push(T d) {
-			stack[pt++] = d;   //*** no checking against N
+			stack[pt_++] = d;   
 #ifdef DEBUG_STACKS
-			if (pt > MAX) {
-				LOG_INFO("bizarre stack with size: " << pt << " and max size: " << MAX);
+			if (pt_ > MAX) {
+				LOG_INFO("bizarre stack with size: " << pt_ << " and max size: " << MAX);
 				cin.get();
 			}
 #endif
 		}
 		void push_front(T d) {
-			if (pt == 0) { stack[pt++] = d; }
-			else { T t = stack[0]; stack[0] = d; stack[pt++] = t; }
+			if (pt_ == 0) { stack[pt_++] = d; }
+			else { T t = stack[0]; stack[0] = d; stack[pt_++] = t; }
 #ifdef DEBUG_STACKS
-			if (pt > MAX) {    //*** no checking against N
-				LOG_INFO("bizarre stack with size: " << pt << " and max size: " << MAX);
+			if (pt_ > MAX) {    //*** no checking against N
+				LOG_INFO("bizarre stack with size: " << pt_ << " and max size: " << MAX);
 				cin.get();
 			}
 #endif
 		}
 
-		T pop() { if (pt == 0) return T(); else return stack[--pt]; }
-		int pop_first() { if (pt <= 1) return (pt = 0); else { stack[0] = stack[--pt]; return pt; } }		/* removes the first element from the stack (lost!), swaps last elememt */
-		int pop(int nb) { pt -= nb; return nb; }															/* removes the last NB elements from the stack (lost!) */
-		T get_elem(int pos) const { return stack[pos]; }
-		T first() const { return stack[0]; }																//TODO@assert correct size in DEBUG
-		T last() const { return stack[pt - 1]; }															//TODO@assert correct size in DEBUG
-		void erase(int pos) { if (pt > 0) { stack[pos] = stack[--pt]; stack[pt] = EMPTY_VAL; } }			//removes a single element at pos (holds when deleting singleton pos=0, pt=1)	
-		void erase() { pt = 0; }																			//clears the stack
-	   // void erase_pop(int nb){pt-=nb;}																	//clears nb elements from the stack-TODO@, REFACTOR
-		unsigned int size() { return pt; }
-		bool empty() const { return(pt == 0); }																// no elements in the stack (allocated space)
+		T pop() { 
+			if (pt_ == 0) {	return T();	}
+			else {	return stack[--pt_]; }
+		}
+
+		/* removes the first element from the stack (lost!), swaps last elememt */
+		int pop_first() {
+			if (pt_ <= 1) { return (pt_ = nullptr); }
+			else {
+				stack[0] = stack[--pt_];
+				return pt_;
+			}
+		}	
+		
+			
+		 /* removes the last NB elements from the stack (lost!) */
+		int pop(int nb) { 
+			pt_ -= nb; 
+			return nb; 
+		}				
+
+		T get_elem(int pos) const				{ return stack[pos]; }
+		T first() const							{ return stack[0]; }										//TODO@assert correct size in DEBUG
+		T last() const							{ return stack[pt_ - 1]; }									//TODO@assert correct size in DEBUG
+
+		//removes a single element at pos (holds when deleting singleton pos=0, pt=1)
+		void erase(int pos) { 
+			if (pt_ > 0) {
+				stack[pos] = stack[--pt_]; 
+				stack[pt_] = EMPTY_VAL; }
+		}	
+
+		//clears the stack
+		void erase()						 { pt_ = 0; }																			
+	   
+		//clears nb elements from the stack-TODO@, REFACTOR
+		// void erase_pop (int nb)			{pt_-=nb;}																	
+		
+		unsigned int size()					{ return pt_; }
+		bool empty() const					{ return (pt_ == 0); }										
 
 		//TODO@operator ==
 
-
 		std::ostream& print(std::ostream& o) const {
-			o << "[";   for (int i = 0; i < pt; i++) { o << stack[i] << " "; } o << "]" << "[" << pt << "]" << endl;
+			o << "[";  
+			for (int i = 0; i < pt_; i++) {
+				o << stack[i] << " ";
+			} 
+			o << "]" << "[" << pt_ << "]" << endl;			
 			return o;
 		}
 		friend std::ostream& operator <<(std::ostream& o, const stack_t & s) {
-			o << "[";   for (int i = 0; i < s.pt; i++) { o << s.stack[i] << " "; } o << "]" << "[" << s.pt << "]" << endl;
+			o << "[";   
+			for (int i = 0; i < s.pt_; i++) {
+				o << s.stack[i] << " "; } 
+			o << "]" << "[" << s.pt_ << "]" << endl;
 			return o;
 		}
 	};
@@ -651,7 +733,14 @@ namespace com {
 
 	template<>
 	inline
-	int stack_t<int>::pop() { if (pt == 0) return EMPTY_VAL; else return stack[--pt]; }
+	int stack_t<int>::pop() { 
+		if (pt_ == 0) { 
+			return EMPTY_VAL; 
+		}
+		else {
+			return stack[--pt_];
+		}
+	}
 	
 
 	///////////////////////
