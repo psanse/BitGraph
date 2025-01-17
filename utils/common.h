@@ -145,7 +145,7 @@ namespace com {
 		}
 
 		/**
-		*  @brief functor to compute the mean of a collection
+		*  @brief Functor to compute the mean of a collection
 		*		   (use a for-each loop)
 		**/
 		class MeanValue {
@@ -166,7 +166,7 @@ namespace com {
 		};
 			
 		/**
-		*  @brief functor to compute the standard deviation of a collection
+		*  @brief Functor to compute the standard deviation of a collection
 		*		   given its mean (use a for-each loop)
 		**/
 		class StdDevValue {
