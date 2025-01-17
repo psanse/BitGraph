@@ -51,56 +51,91 @@ TEST(Common, mean_and_stdev) {
 
 
 TEST(Common, number_of_words){
-/////////////////
-// Testing my simple pointer to elem
-// date@30/09/18
-
 
 	string str1("hello my 2 3 4");
-	int nw=counting::number_of_words(str1);
+	int nw = counting::number_of_words(str1);
+	
 	EXPECT_EQ(5,nw);
 
-	string str2("e 1 2 25");
-	nw=counting::number_of_words(str2);
+	string str2 ("e 1 2 25");
+	nw = counting::number_of_words(str2);
+	
 	EXPECT_EQ(4,nw);
-
 
 }
 
-TEST(Common, pt_elem_basic){
-/////////////////
-// Testing my simple pointer to elem
-// date@17/09/18
-
-	//TEST_A
-	pt_elem<int> myp;
-	myp.set_elem(10);	
-	EXPECT_EQ(10, *(myp.get_elem()));
-
-	//TEST_B
-	struct s_triplet{
-		s_triplet():a(10), b(20),c(30){}
-		int a;
-		int b;
-		int c;
-		ostream& print(ostream& o){o<<"["<<a<<" "<<b<<" "<<c<<"]"; return o;}
+TEST(Common, my_silly_pointer_to_elem){
+	
+	int data = 10;
+	struct s_triplet {
+		int a = 10;
+		int b = 20;
+		int c = 30;
+		ostream& print(ostream& o) {
+			o << "[" << a << " " << b << " " << c << "]";
+			return o;
+		}
 	};
 
-	pt_elem<s_triplet> myp1;
-	stringstream sstr;
-	myp1.print_elem(sstr); sstr << endl;		//takes default values
-	LOG_INFO(sstr.str().c_str());
-	   	
+	//constructor
+	pt_elem<int> pElem(data);
+	EXPECT_EQ(10, *pElem.get_elem());
 
-	EXPECT_EQ(10, myp1.get_elem()->a);
-	EXPECT_EQ(20, myp1.get_elem()->b);
-	EXPECT_EQ(30, myp1.get_elem()->c);
 
-	//sets values 
-	s_triplet data; data.a=100;
-	myp1.set_elem(data);	
-	EXPECT_EQ(100, myp1.get_elem()->a);
+	//setter
+	pt_elem<int> pInt;
+	pInt.set_elem(10);
+
+	/////////////////////////////////////
+	EXPECT_EQ(10, *pInt.get_elem() );
+	/////////////////////////////////////
+
+	//pointer to struct
+	pt_elem<s_triplet> pTriplet;
 	
+	///////////////////////////////////////
+	EXPECT_EQ(10, pTriplet.get_elem()->a);
+	EXPECT_EQ(20, pTriplet.get_elem()->b);
+	EXPECT_EQ(30, pTriplet.get_elem()->c);
+	///////////////////////////////////////
+
+	//resets pointer
+	s_triplet triplet;
+	triplet.a = 100;
+	pTriplet.set_elem(triplet);
+
+	///////////////////////////////////////
+	EXPECT_EQ(100, pTriplet.get_elem()->a);
+	///////////////////////////////////////
+
+}
+
+TEST(Common, my_stack_basic) {
+
+	const int N = 10;
+	com::stack_t<int> s(N);
+
+	EXPECT_EQ(0, s.size());
+
+	s.push(10);
+	s.push(20);
+	s.push(30);
+
+	EXPECT_EQ(3, s.size());
+	EXPECT_EQ(30, s.pop());
+	EXPECT_EQ(20, s.pop());
+	EXPECT_EQ(10, s.pop());
+	EXPECT_EQ(0, s.size());
+	EXPECT_TRUE(s.empty());
+
+	s.push(10);
+	s.push(20);
+	s.push(30);
+
+	cout << s;
+
+	s.erase();
+	EXPECT_TRUE(s.empty());
 
 }
 
@@ -179,18 +214,6 @@ TEST(sort, insert_ordered){
 
 }
 
-TEST(Common, DISABLED_read_FF_file_interdicted_nodes){
-	
-
-	string filename=PATH_GRAPH_TESTS_CMAKE_SRC_CODE;
-	filename+="interdictionBUG.txt";
-
-	vector<int> vread;
-	com::fileproc::READ_SET_OF_INTERDICTED_NODES(filename.c_str(), vread);
-
-	com::stl::print_collection(vread);
-
-}
 
 TEST(Common, path){
 	string path_1("c:\\kk");
@@ -235,32 +258,4 @@ TEST(Common, collection_equality){
 
 }
 
-TEST(Common, my_stack){
 
-	const int N=10;
-	com::stack_t<int> s(N);
-	
-	EXPECT_EQ(0, s.size());
-
-	s.push(10);
-	s.push(20);
-	s.push(30);
-
-	EXPECT_EQ(3, s.size());
-	EXPECT_EQ(30, s.pop());
-	EXPECT_EQ(20, s.pop());
-	EXPECT_EQ(10, s.pop());
-	EXPECT_EQ(0, s.size());
-	EXPECT_TRUE(s.empty());
-
-	s.push(10);
-	s.push(20);
-	s.push(30);
-
-	cout<<s;
-
-	s.erase();
-	EXPECT_TRUE(s.empty());
-
-
-}
