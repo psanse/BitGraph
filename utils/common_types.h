@@ -93,8 +93,7 @@ explicit stack_t	(int MAX_SIZE);
 		*	     (the element is lost)
 		**/
 		void pop		();
-
-				
+						
 		/**
 		* @brief Removes the top nb elements from the top of the stack.
 		*		 (the elements are lost)
@@ -102,8 +101,7 @@ explicit stack_t	(int MAX_SIZE);
 		*	   
 		**/
 		void pop		(std::size_t nb);
-
-	
+			
 		/**
 		* @brief Removes the bottom element of the stack.  from the top of the stack.
 		*		 (the element is lost)
@@ -111,8 +109,7 @@ explicit stack_t	(int MAX_SIZE);
 		*		 I. The top element is moved to the bottomof the stack
 		**/
 		void pop_bottom	();
-		
-		
+				
 		/**
 		* @brief Removes the element at position pos form the underlying array.
 		*		 (the element is lost)
@@ -121,8 +118,7 @@ explicit stack_t	(int MAX_SIZE);
 		* @param pos: position of the element to remove
 		**/
 		void erase		(int pos);
-
-			
+					
 		/**
 		* @brief Removes all elements from the stack.
 		*		 (no deallocation)
