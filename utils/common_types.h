@@ -1,6 +1,6 @@
 /**
  * @file common_types.h  
- * @brief set of common types 
+ * @brief set of useful types 
  * @date ?
  * @last_update 17/01/25
  * @author pss
@@ -25,7 +25,6 @@ namespace com {
 	template <class T>
 	struct stack_t {
 	
-
 		///////
 		//construction / destruction
 		stack_t		();
@@ -115,7 +114,7 @@ explicit stack_t	(int MAX_SIZE);
 	//
 	////////////////////////
 
-	template<class T>
+	/*template<class T>
 	class my_array {
 		T* pt;
 		size_t sz;
@@ -127,7 +126,7 @@ explicit stack_t	(int MAX_SIZE);
 		T at(int idx) { return pt[idx]; }
 		T* get_array() { return pt; };
 		size_t size() { return sz; }
-	};
+	};*/
 
 }
 

@@ -102,7 +102,7 @@ namespace com {
 		   return o;
 	   }
 	   	   
-	/*   inline
+		/*inline
 	   ostream& print_collection(const vector<vint>& c, ostream&  o = cout) {
 		   o << "printing " << c.size() << " elements" << endl;
 		   for (int i = 0; i < c.size(); i++) {
@@ -196,8 +196,6 @@ namespace com {
 				return std::sqrt(sumSqrDiff / static_cast<double>(num));
 			}
 		};
-
-
 
 	}
 //////////////////////
