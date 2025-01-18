@@ -1,6 +1,7 @@
 #set useful headers 
 set(useful_headers_for_IDE 
 common.h
+common_types.h
 prec_timer.h
 logger.h
 info/info_base.h
@@ -12,6 +13,7 @@ benchmark.cpp
 result.cpp
 test_analyser.cpp
 common.cpp
+common_types.cpp
 info/info_base.cpp
 info/info_clq.cpp                                   #move to clq algorithms and remove from here
 #logger.cpp 

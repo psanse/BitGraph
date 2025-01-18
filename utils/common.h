@@ -1,21 +1,21 @@
-//common.h: common utilities for the framework
-//
-//@last_update: 2024/10/31 - some heavy refactoring; also reimplemented functors and all_equal. Added common.cpp file
+/*
+ * @file common.h
+ * @brief common utilities for the framework
+ * @date ?
+ * @last_update 17/01/25
+ * @author pss
+ *
+ */
 
-#ifndef __COMMON_H__
-#define	__COMMON_H__
-
-
-//uncomment to disable assert() 
+ //comment in release mode - disable checks
 #define	NDEBUG
 #ifndef NDEBUG
 	#define DEBUG_STACKS		//checks stack sizes (important to debug SAT engine in DEBUG mode)
 #endif 
-//////////////////
 
 
-#include <iostream>
-
+#ifndef __COMMON_H__
+#define	__COMMON_H__
 
 #include "logger.h"
 #include <chrono>
@@ -25,11 +25,12 @@
 #include <iostream>
 #include <random>
 #include <string>
-#include <type_traits>
 #include <vector>
 
+#include "common_types.h"				//common types additional utilities, to be included e
+
 ///////////////////////
-// useful aliases 
+// aliases 
 
 using vint = std::vector<int>;
 using vdob = std::vector<double>;
@@ -97,7 +98,7 @@ namespace com {
 	   std::ostream& print_collection(const Col_t& c, std::ostream&  o= std::cout, bool with_endl=false){
 		   std::copy(c.cbegin(), c.cend(), std::ostream_iterator<typename Col_t::value_type>(o," " ));
 		   o<<" ["<<c.size()<<"]";
-		   if(with_endl) o<<endl;
+		   if(with_endl) o<< std::endl;
 		   return o;
 	   }
 	   	   
@@ -560,234 +561,7 @@ namespace com {
 	}
 }
 
-//////////////////////////////
-//
-// WRAPPER TYPES 
-//
-//////////////////////////////
 
-namespace com {
-	////////////////////////
-	//
-	// struct stack_t
-	//
-	// (my simple efficient stack)
-	//
-	////////////////////////
-
-	template <class T>
-	struct stack_t {
-		static const int EMPTY_VAL = -1;
-		int pt_;							//stack pointer[0, MAX_SIZE-1], always points to a free position (top of the stack) 
-		T* stack;
-#ifdef DEBUG_STACKS
-		int MAX_;
-#endif
-
-		//construction
-		stack_t() :pt_(0), stack(nullptr) {
-#ifdef DEBUG_STACKS
-			int MAX_ = EMPTY_VAL;
-#endif   
-		}
-		stack_t(int MAX_SIZE) :stack(nullptr) {
-			try {
-				stack = new T[MAX_SIZE];
-			}
-			catch (std::bad_alloc& ba) {
-				LOGG_ERROR("bad_alloc caught: ", ba.what());
-				LOG_ERROR("exiting - stack_t::stack_t");
-				std::exit(-1);
-			}
-			pt_ = 0;
-#ifdef DEBUG_STACKS
-			MAX_ = MAX_SIZE;
-#endif
-		}
-
-		//TODO other constructors, assignment operations....
-
-		//destruction
-		~stack_t() { clear(); }
-
-		//setters and getters
-		T get_elem(int pos) const	{ return stack[pos]; }
-		T first() const				{ return stack[0]; }										//TODO@assert correct size in DEBUG
-		T last() const				{ return stack[pt_ - 1]; }									//TODO@assert correct size in DEBUG
-
-		unsigned int size()			{ return pt_; }
-
-		////////////////
-		// allocation
-		 
-		//for backward compatibility
-		void init (int MAX_SIZE) {
-			delete[] stack;
-			pt_ = 0;
-
-			try {
-				stack = new T[MAX_SIZE];
-			}
-			catch (std::bad_alloc& ba) {
-				LOGG_ERROR("bad_alloc caught: " , ba.what());
-				LOG_ERROR("exiting  - stack_t::init");
-				std::exit(-1);			
-			}
-
-			
-#ifdef DEBUG_STACKS
-			MAX_ = MAX_SIZE;
-#endif
-			return 0;
-		}
-
-		
-		//use instead of init 
-		void reset (int MAX_SIZE) {
-			pt_ = 0;
-			delete[] stack;
-			try {
-				stack = new T[MAX_SIZE];
-			}
-			catch (std::bad_alloc& ba) {
-				LOGG_ERROR("bad_alloc caught: ", ba.what());
-				LOG_ERROR("exiting  - stack_t::reset");
-				std::exit(-1);
-			}
-		
-#ifdef DEBUG_STACKS
-			MAX_ = MAX_SIZE;
-#endif
-		}
-
-		void clear() {
-			delete[] stack; 
-			stack = nullptr; 
-			pt_ = 0;
-#ifdef DEBUG_STACKS
-			MAX_ = EMPTY_VAL;
-#endif
-		}
-
-		void push(T d) {
-			stack[pt_++] = d;   
-#ifdef DEBUG_STACKS
-			if (pt_ > MAX_) {
-				LOG_INFO("bizarre stack with size: " , pt_ , " and max size: " , MAX_);
-				cin.get();
-			}
-#endif
-		}
-		void push_front(T d) {
-			if (pt_ == 0) {
-				stack[pt_++] = d;
-			}
-			else {
-				T t = stack[0];
-				stack[0] = d;
-				stack[pt_++] = t;
-			}
-#ifdef DEBUG_STACKS
-			if (pt_ > MAX_) {    //*** no checking against N
-				LOG_INFO("bizarre stack with size: " , pt_ , " and max size: " , MAX_);
-				cin.get();
-			}
-#endif
-		}
-
-		T pop() { 
-			if (pt_ == 0) {	return T();	}
-			else {	return stack[--pt_]; }
-		}
-
-		/* removes the first element from the stack (lost!), swaps last elememt */
-		int pop_first() {
-			if (pt_ <= 1) { return (pt_ = nullptr); }
-			else {
-				stack[0] = stack[--pt_];
-				return pt_;
-			}
-		}	
-					
-		 /* removes the last NB elements from the stack (lost!) */
-		int pop(int nb) { 
-			pt_ -= nb; 
-			return nb; 
-		}				
-
-		//removes a single element at pos (holds when deleting singleton pos=0, pt=1)
-		void erase(int pos) { 
-			if (pt_ > 0) {
-				stack[pos] = stack[--pt_]; 
-				stack[pt_] = EMPTY_VAL; }
-		}	
-
-		//clears the stack
-		void erase()						 { pt_ = 0; }																			
-	   
-		//clears nb elements from the stack-TODO@, REFACTOR
-		// void erase_pop (int nb)			{pt_-=nb;}																	
-				
-		bool empty() const					{ return (pt_ == 0); }										
-		
-		//I/O
-		std::ostream& print(std::ostream& o) const {
-			o << "[";  
-			for (int i = 0; i < pt_; i++) {
-				o << stack[i] << " ";
-			} 
-			o << "]" << "[" << pt_ << "]" << endl;			
-			return o;
-		}
-		friend std::ostream& operator <<(std::ostream& o, const stack_t & s) {
-			o << "[";   
-			for (int i = 0; i < s.pt_; i++) {
-				o << s.stack[i] << " "; } 
-			o << "]" << "[" << s.pt_ << "]" << endl;
-			return o;
-		}
-	};
-
-	//////////////////
-	// specializations of stack_t
-
-	template<>
-	inline
-	int stack_t<int>::pop() { 
-		if (pt_ == 0) { 
-			return EMPTY_VAL; 
-		}
-		else {
-			return stack[--pt_];
-		}
-	}
-	
-
-	///////////////////////
-	//
-	// class my_array
-	//
-	// my old C_array wrraper
-	// 
-	// TODO - deprecated, possibly remove (17(01/25)
-	//
-	////////////////////////
-
-	template<class T>
-	class my_array {
-		T* pt;
-		size_t sz;
-	public:
-		my_array(size_t size, T val) :sz(size) { pt = new T[sz];  for (int i = 0; i < sz; i++) { pt[i] = val; } }
-		~my_array() { delete[] pt; }
-		T& operator [](int idx) { return pt[idx]; }
-		const T& operator [](int idx) const { return pt[idx]; }
-		T at(int idx) { return pt[idx]; }
-		T* get_array() { return pt; };
-		size_t size() { return sz; }
-	};
-
-}
 
 //////////////////////////////
 //
