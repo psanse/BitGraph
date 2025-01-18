@@ -27,9 +27,9 @@ namespace com {
 		try {
 			stack_ = new T[MAX_SIZE];
 		}
-		catch (std::bad_alloc& ba) {
+		catch (...) {
 			LOGG_ERROR("bad_alloc - stack_t<T>::stack_t");
-			throw ba;
+			throw;
 		}
 		nE_ = 0;
 #ifdef DEBUG_STACKS
@@ -73,9 +73,9 @@ namespace com {
 		try {
 			stack_ = new T[MAX_SIZE];
 		}
-		catch (std::bad_alloc& ba) {
+		catch (...) {
 			LOGG_ERROR("bad_alloc - stack_t<T>::reset");
-			throw ba;
+			throw;
 		}
 
 #ifdef DEBUG_STACKS
@@ -112,7 +112,7 @@ namespace com {
 		}
 		else {
 			T temp = stack_[0];
-			stack_[0] = d;
+			stack_[0] = std::move(d);
 			stack_[nE_++] = std::move(temp);
 		}
 #ifdef DEBUG_STACKS
@@ -133,6 +133,17 @@ namespace com {
 		else {
 			return stack_[nE_ - 1];
 		}		
+	}
+
+	template<class T>
+	T& stack_t<T>::top() 
+	{
+		if (nE_ == 0) {
+			return stack_[0];
+		}
+		else {
+			return stack_[nE_ - 1];
+		}
 	}
 
 	template<class T>

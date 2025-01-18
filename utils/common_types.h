@@ -42,12 +42,16 @@ explicit stack_t	(int MAX_SIZE);
 	const T& at			(int pos)	const			{ return stack_[pos]; }
 	const T& top		()			const;
 	const T& bottom		()			const			{ return stack_[0]; }
+
+		 T& at			(int pos)					{ return stack_[pos]; }
+		 T& top			();
+		 T& bottom		()							{ return stack_[0]; }
+
 		
-		//T first		()			const		{ return stack_[0]; }										
+		//T first		()			const			{ return stack_[0]; }										
 		//T last		()			const; 
 		
-
-		unsigned int size()				{ return nE_; }
+		std::size_t size()							{ return nE_; }
 
 		////////////
 		// allocation
@@ -58,24 +62,29 @@ explicit stack_t	(int MAX_SIZE);
 		void reset		(int MAX_SIZE);
 
 	private:
+		//deallocates memory - use erase to clean the stack without deallocating memory
 		void clear		();					
 		
 		//////////////
 		//basic operations
 	public:
+
+		//places element at the top of the stack
 		void push		(T d);
+
+		//places element at the bottom of the stack, and moves the bottom element to the top 
 		void push_bottom(T d);
 				
 		/* removes the top element from the stack (lost!) */
 		void pop		();
 
-		/* removes the top NB elements from the stack (lost!) */
+		/* removes the top NB elements from the top of the stack (lost!) */
 		void pop		(std::size_t nb);
 
-		/* removes the bottom element from the stack (lost!), swaps last elememt */
+		/* removes the bottom element from the top of the stack (lost!), swaps last elememt */
 		void pop_bottom	();
 		
-		//removes a single element at pos (pos must be grater than 0)
+		//removes a single element at pos (pos must be grater than 0), moves the last element to pos
 		void erase		(int pos);
 
 		//removes all elements from the stack
@@ -93,13 +102,11 @@ explicit stack_t	(int MAX_SIZE);
 
 		std::ostream& print(std::ostream& o) const;
 		friend std::ostream& operator << (std::ostream& o, const stack_t& s)	{ s.print(o); return o; }
-			
-
+	
 		/////////////////////
 		// data members
 		
-		//static const int EMPTY_VAL = -1;
-		int nE_;							//stack pointer[0, MAX_SIZE-1], always points to a free position (top of the stack) 
+		std::size_t nE_;								//number of elements, used as internal index
 		T* stack_;
 #ifdef DEBUG_STACKS
 		int MAX_;
