@@ -5,7 +5,7 @@
 * @last_update 17/01/25
 * @author pss
 * 
-* TODO - CHECK and refactor tests (17/01/25)
+* TODO - add tests, check disabled tests  (18/01/25)
 **/
 
 #include "utils/common.h"
@@ -33,11 +33,9 @@ TEST(Common_stack, constructor) {
 	EXPECT_EQ(20, s2.top());
 	EXPECT_EQ(10, s2.bottom());
 
-
-
 }
 
-TEST(Common, mean_and_stdev) {
+TEST(Common_mat, mean_and_stdev) {
 
 	//collection
 	vdob col = { 2.7, 2.8, 2.9, 3, 3.1, 3.2, 3.3 };
@@ -65,7 +63,7 @@ TEST(Common, mean_and_stdev) {
 	/////////////////////////////////////
 }
 
-TEST(Common, number_of_words){
+TEST(Common_counting, number_of_words){
 
 	std::string str1("hello my 2 3 4");
 	int nw = counting::number_of_words(str1);
@@ -138,12 +136,10 @@ TEST(Common, stack_pop){
 
 }
 
-
-TEST(Common, path){
+TEST(Common_dir, path){
 	std::string path_1("c:/kk/");		//POSIX
 	std::string path_2("c:\\kk");		//WINDOWS	
 	
-
 	com::dir::append_slash(path_1);
 	com::dir::append_slash(path_2);
 
@@ -152,7 +148,7 @@ TEST(Common, path){
 
 }
 
-TEST(Common, all_equal){
+TEST(Common_stl, all_equal){
 
 	std::vector<int> v(10, 1);
 	EXPECT_TRUE(com::stl::all_equal(v));
@@ -167,7 +163,7 @@ TEST(Common, all_equal){
 //
 /////////////
 
-TEST(sort, DISABLED_insert_ordered) {
+TEST(Common_sort, DISABLED_insert_ordered) {
 
 	const int N = 4;
 
