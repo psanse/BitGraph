@@ -109,7 +109,7 @@ namespace com {
 namespace com {
 	namespace fileproc {
 				
-		int READ_SET_OF_INTERDICTED_NODES (const char* filename, vector<int>& interdicted_nodes) {
+		int READ_SET_OF_INTERDICTED_VERTICES (const char* filename, vector<int>& interdicted_nodes) {
 			
 			//opens a file in binary mode
 			std::ifstream f(filename, ios::binary | ios::in);

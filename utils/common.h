@@ -196,45 +196,59 @@ namespace com {
 	
    namespace fileproc{
 	
-
 	   /**
-		* @brief reads a line of 0s and 1s from a file and provides the position of the 0s
+		* @brief reads a mask of 0s and 1s from a file and provides the position of the 0s
 		* @param interdicted_nodes: output vector of integers to store the positions of the 0s
 		* @returns 0 if success, -1 if error
 		**/
-	   int READ_SET_OF_INTERDICTED_NODES(const char* filename, std::vector<int>& interdicted_nodes);
+	   int READ_SET_OF_INTERDICTED_VERTICES (const char* filename, std::vector<int>& interdicted_nodes);
 
+	   /**
+	   * @brief writes a set of vertices in a collection to file in the format:
+	   *		size <SIZE>
+	   *		elem1
+	   *		elem2 ...
+	   * @param filename: name of the output file
+	   * @param nodes: collection of elements to be written
+	   * @param plus_one: flag to add 1 to each element before writing
+	   * @returns 0 if success, -1 if error
+	   **/
 	   template<class Col_t>
 	   inline
-		   int WRITE_SET_OF_NODES(const char* filename, const Col_t& nodes, bool plus_one = true) {
-		   //writes a set of elements to file in the format:
-		   //size <SIZE>
-		   //elem1
-		  //elem2 ...
+	   int WRITE_SET_OF_VERTICES (const char* filename, const Col_t& nodes, bool plus_one = true)
+	   {
 		   std::ofstream f(filename, std::ofstream::out);
 		   if (!f) {
 			   LOG_ERROR("Could not open file: " << filename);
 			   return -1;
 		   }
-		   int SIZE = nodes.size();
-		   f << "size " << SIZE << endl;
-		   for (int i = 0; i < SIZE; i++) {
-			   f << ((plus_one) ? nodes[i] + 1 : nodes[i]) << endl;
+
+		   auto SIZE = nodes.size();
+		   f << "size " << SIZE << std::endl;
+		   for (auto i = 0; i < SIZE; ++i) {
+			   f << ((plus_one)? nodes[i] + 1 : nodes[i]) << std::endl;
 		   }
+
 		   f.close();
 		   return 0;
 	   }
    }
 
     namespace counting {
+
+		/**
+		* @brief counts the number of words in a string
+		**/
 		inline
-		int number_of_words(std::string str){
+		int number_of_words(std::string str)
+		{
 			auto word_count = 0;
 			std::stringstream sstr(str);
 			std::string word;
 			while (sstr >> word) {
 				++word_count;
 			}
+
 			return word_count;
 		}
 	}
@@ -242,15 +256,13 @@ namespace com {
 
 //////////////////////////////
 //
-// Useful FUNCTORS
-//
-// (simplified with copilot suggestions :-))
+// FUNCTORS for sorting
 //
 //////////////////////////////
 
 namespace com {
 
-	//functors which use a global external critera which evaluates to a number
+	//functors to sort by a global external critera 
 	template<class T, class ColCrit_t, bool Greater, typename Enable = void>
 	struct has_val {
 		explicit has_val(const ColCrit_t& c) : crit(c) {}
@@ -267,7 +279,7 @@ namespace com {
 		const ColCrit_t& crit;
 	};
 
-	// Especialización para punteros
+	//pointer specialization
 	template<class T, class ColCrit_t, bool Greater>
 	struct has_val<T*, ColCrit_t, Greater, typename std::enable_if< std::is_pointer<T>::value>::type > {
 		explicit has_val(const ColCrit_t& c) : crit(c) {}
@@ -284,7 +296,7 @@ namespace com {
 		const ColCrit_t& crit;
 	};
 
-	// Para comparaciones de productos
+	//functors to sort by product of value and critera
 	template<class T, class ColCrit_t, bool Greater>
 	struct has_val_prod {
 		explicit has_val_prod(const ColCrit_t& c) : crit(c) {}
@@ -303,7 +315,7 @@ namespace com {
 		const ColCrit_t& crit;
 	};
 
-	// Para comparaciones de diferencias
+	//functors to sort by difference between value and criteria
 	template<class T, class ColCrit_t, bool Greater>
 	struct has_val_diff {
 		explicit has_val_diff(const ColCrit_t& c) : crit(c) {}
@@ -322,7 +334,7 @@ namespace com {
 		const ColCrit_t& crit;
 	};
 
-	// Alias para simplificar la creación de instancias
+	//useful aliases binders
 	template<class T, class ColCrit_t>
 	using has_greater_val = has_val<T, ColCrit_t, true>;
 
@@ -342,7 +354,7 @@ namespace com {
 	using has_smaller_val_diff = has_val_diff<T, ColCrit_t, false>;
 
 	   
-	//functors which use two (1.main, 2.tiebreak) global external critera which evaluates to a number
+	//functors which use two global external critera (1.main, 2.tiebreak) 
 	template<class T, class ColCrit_t, bool Greater>
 	struct has_val_with_tb {
 		explicit has_val_with_tb(const ColCrit_t& ref, const ColCrit_t& tb)
@@ -364,7 +376,7 @@ namespace com {
 		const ColCrit_t& crit2;  // Tiebreak
 	};
 
-	// Alias para simplificar la creación de estructuras específicas
+	//useful aliases binders
 	template<class T, class ColCrit_t>
 	using has_smaller_val_with_tb = has_val_with_tb<T, ColCrit_t, false>;
 
@@ -372,11 +384,12 @@ namespace com {
 	using has_greater_val_with_tb = has_val_with_tb<T, ColCrit_t, true>;
 
 
-	//functors for collections of elements 
+	//functors for sorting sets of collections 
 	template< typename Col_t >
 	struct has_bigger_size {
 		bool operator()(const Col_t& lhs, const Col_t& rhs) const { return lhs.size() > rhs.size(); }
 	};
+
 	template<typename Col_t	>
 	struct has_smaller_size {
 		bool operator()(const Col_t& lhs, const Col_t& rhs) const { return lhs.size() < rhs.size(); }
