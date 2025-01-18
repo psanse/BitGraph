@@ -16,62 +16,62 @@ namespace com {
 	
 
 	template<class T>
-	stack_t<T>::stack_t() :pt_(0), stack(nullptr) {
+	stack_t<T>::stack_t() :nE_(0), stack_(nullptr) {
 #ifdef DEBUG_STACKS
 		int MAX_ = 0;
 #endif   
 	}
 
 	template<class T>
-	stack_t<T>::stack_t(int MAX_SIZE) :stack(nullptr) {
+	stack_t<T>::stack_t(int MAX_SIZE) : stack_(nullptr) {
 		try {
-			stack = new T[MAX_SIZE];
+			stack_ = new T[MAX_SIZE];
 		}
 		catch (std::bad_alloc& ba) {
 			LOGG_ERROR("bad_alloc - stack_t<T>::stack_t");
 			throw ba;
 		}
-		pt_ = 0;
+		nE_ = 0;
 #ifdef DEBUG_STACKS
 		MAX_ = MAX_SIZE;
 #endif
 	}
 
-	template<class T>
-	T stack_t<T>::last() const
-	{
-		if (pt_ == 0) { 
-			return stack[0];
-		}
-		else {
-			return stack[pt_ - 1];
-		}
-	}
+	//template<class T>
+	//T stack_t<T>::last() const
+	//{
+	//	if (nE_ == 0) { 
+	//		return stack[0];
+	//	}
+	//	else {
+	//		return stack[nE_ - 1];
+	//	}
+	//}
 		
+//	template<class T>
+//	void stack_t<T>::init (int MAX_SIZE) {
+//		delete[] stack;
+//		nE_ = 0;
+//
+//		try {
+//			stack = new T[MAX_SIZE];
+//		}
+//		catch (std::bad_alloc& ba) {
+//			LOGG_ERROR("bad_alloc - stack_t<T>::init");
+//			throw ba;
+//		}
+//
+//#ifdef DEBUG_STACKS
+//		MAX_ = MAX_SIZE;
+//#endif
+//	}
+
 	template<class T>
-	void stack_t<T>::init(int MAX_SIZE) {
-		delete[] stack;
-		pt_ = 0;
-
+	void stack_t<T>::reset (int MAX_SIZE) {
+		nE_ = 0;
+		delete[] stack_;
 		try {
-			stack = new T[MAX_SIZE];
-		}
-		catch (std::bad_alloc& ba) {
-			LOGG_ERROR("bad_alloc - stack_t<T>::init");
-			throw ba;
-		}
-
-#ifdef DEBUG_STACKS
-		MAX_ = MAX_SIZE;
-#endif
-	}
-
-	template<class T>
-	void stack_t<T>::reset(int MAX_SIZE) {
-		pt_ = 0;
-		delete[] stack;
-		try {
-			stack = new T[MAX_SIZE];
+			stack_ = new T[MAX_SIZE];
 		}
 		catch (std::bad_alloc& ba) {
 			LOGG_ERROR("bad_alloc - stack_t<T>::reset");
@@ -85,20 +85,20 @@ namespace com {
 
 	template<class T>
 	void stack_t<T>::clear() {
-		delete[] stack;
-		stack = nullptr;
-		pt_ = 0;
+		delete[] stack_;
+		stack_ = nullptr;
+		nE_ = 0;
 #ifdef DEBUG_STACKS
 		MAX_ = 0;
 #endif
 	}
 
 	template<class T>
-	void stack_t<T>::push_back(T d) {
-		stack[pt_++] = d;
+	void stack_t<T>::push(T d) {
+		stack_[nE_++] = std::move(d);
 #ifdef DEBUG_STACKS
-		if (pt_ > MAX_) {
-			LOG_INFO("bizarre stack with size: ", pt_, " and max size: ", MAX_);
+		if (nE_ > MAX_) {
+			LOG_INFO("bizarre stack with size: ", nE_, " and max size: ", MAX_);
 			LOG_INFO("press any key to continue");
 			std::cin.get();
 		}
@@ -106,18 +106,18 @@ namespace com {
 	}
 
 	template<class T>
-	void stack_t<T>::push_front(T d) {
-		if (pt_ == 0) {
-			stack[pt_++] = d;
+	void stack_t<T>::push_bottom(T d) {
+		if (nE_ == 0) {
+			stack_[nE_++] = std::move(d);
 		}
 		else {
-			T t = stack[0];
-			stack[0] = d;
-			stack[pt_++] = t;
+			T temp = stack_[0];
+			stack_[0] = d;
+			stack_[nE_++] = std::move(temp);
 		}
 #ifdef DEBUG_STACKS
-		if (pt_ > MAX_) {    //*** no checking against N
-			LOG_INFO("bizarre stack with size: ", pt_, " and max size: ", MAX_);
+		if (nE_ > MAX_) {    //*** no checking against N
+			LOG_INFO("bizarre stack with size: ", nE_, " and max size: ", MAX_);
 			LOG_INFO("press any key to continue");
 			std::cin.get();
 		}
@@ -125,38 +125,51 @@ namespace com {
 	}
 
 	template<class T>
-	T stack_t<T>::pop() {
-		assert(pt_ > 0);
-		return stack[--pt_];	
+	const T& stack_t<T>::top() const
+	{
+		if (nE_ == 0) {
+			return stack_[0];
+		}
+		else {
+			return stack_[nE_ - 1];
+		}		
+	}
+
+	template<class T>
+	void stack_t<T>::pop() {
+		assert(nE_ > 0);
+		--nE_;
+		//return stack_[--nE_];	
+	}
+
+	template<class T>
+	void stack_t<T>::pop (std::size_t nb) {
+		assert(nE_ >= nb);
+		nE_ -= nb;
+		//return nb;
 	}
 		
 	template<class T>
-	int stack_t<T>::pop_swap () {
-		assert(pt_ > 0);
-		stack[0] = stack[--pt_];
-		return pt_;
+	void stack_t<T>::pop_bottom () {
+		assert(nE_ > 0);
+		stack_[0] = stack_[--nE_];
+		//return nE_;
 
-		/*if (pt_ <= 1) { return (pt_ = 0); }
+		/*if (nE_ <= 1) { return (nE_ = 0); }
 		else {
-			stack[0] = stack[--pt_];
-			return pt_;
+			stack_[0] = stack_[--nE_];
+			return nE_;
 		}*/
 	}
 
-	template<class T>
-	int stack_t<T>::pop (std::size_t nb) {
-		assert(pt_ >= nb);
-		pt_ -= nb;
-		return nb;
-	}
 
 	template<class T>
 	void stack_t<T>::erase(int pos) {
 		assert(pos > 0);
-		stack[pos] = stack[--pt_];
-		//if (pt_ > 0) {
-		//	stack[pos] = stack[--pt_];
-		//	//stack[pt_] = EMPTY_VAL;
+		stack_[pos] = stack_[--nE_];
+		//if (nE_ > 0) {
+		//	stack_[pos] = stack_[--nE_];
+		//	//stack_[nE_] = EMPTY_VAL;
 		//}
 	}
 
@@ -164,10 +177,10 @@ namespace com {
 	template<class T>
 	std::ostream& stack_t<T>::print(std::ostream& o) const {
 		o << "[";
-		for (int i = 0; i < pt_; i++) {
-			o << stack[i] << " ";
+		for (int i = 0; i < nE_; i++) {
+			o << stack_[i] << " ";
 		}
-		o << "]" << "[" << pt_ << "]" << std::endl;
+		o << "]" << "[" << nE_ << "]" << std::endl;
 		return o;
 	}
 

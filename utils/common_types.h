@@ -18,7 +18,7 @@ namespace com {
 	//
 	// struct stack_t
 	//
-	// (my simple stack)
+	// (simple stack implemented as a std::vector)
 	//
 	////////////////////////
 
@@ -39,18 +39,21 @@ explicit stack_t	(int MAX_SIZE);
 		~stack_t	()					{ clear(); }
 
 		//setters and getters
-		T get_elem	(int pos)	const			{ return stack[pos]; }
-		T first		()			const			{ return stack[0]; }										
-		T last		()			const; 
+	const T& at			(int pos)	const			{ return stack_[pos]; }
+	const T& top		()			const;
+	const T& bottom		()			const			{ return stack_[0]; }
+		
+		//T first		()			const		{ return stack_[0]; }										
+		//T last		()			const; 
 		
 
-		unsigned int size()				{ return pt_; }
+		unsigned int size()				{ return nE_; }
 
 		////////////
 		// allocation
 
 		//for backward compatibility
-		void init		(int MAX_SIZE);
+		//void init		(int MAX_SIZE);
 
 		void reset		(int MAX_SIZE);
 
@@ -60,29 +63,30 @@ explicit stack_t	(int MAX_SIZE);
 		//////////////
 		//basic operations
 	public:
-		void push_back	(T d);
-		void push_front	(T d);
+		void push		(T d);
+		void push_bottom(T d);
+				
+		/* removes the top element from the stack (lost!) */
+		void pop		();
 
-		T pop			();
+		/* removes the top NB elements from the stack (lost!) */
+		void pop		(std::size_t nb);
 
-		/* removes the last NB elements from the stack (lost!) */
-		int pop			(std::size_t nb);
-
-		/* removes the first element from the stack (lost!), swaps last elememt */
-		int pop_swap	();
+		/* removes the bottom element from the stack (lost!), swaps last elememt */
+		void pop_bottom	();
 		
 		//removes a single element at pos (pos must be grater than 0)
 		void erase		(int pos);
 
-		//clears the stack
-		void erase		()					{ pt_ = 0; }
+		//removes all elements from the stack
+		void erase		()					{ nE_ = 0; }
 
 		//clears nb elements from the stack-TODO@, REFACTOR
-		// void erase_pop (int nb)			{pt_-=nb;}																	
+		// void erase_pop (int nb)			{nE_-=nb;}																	
 
 		/////////////////
 		//boolean operations
-		bool empty		()		const		{ return (pt_ == 0); }
+		bool empty		()		const		{ return (nE_ == 0); }
 
 		/////
 		//I/O
@@ -95,8 +99,8 @@ explicit stack_t	(int MAX_SIZE);
 		// data members
 		
 		//static const int EMPTY_VAL = -1;
-		int pt_;							//stack pointer[0, MAX_SIZE-1], always points to a free position (top of the stack) 
-		T* stack;
+		int nE_;							//stack pointer[0, MAX_SIZE-1], always points to a free position (top of the stack) 
+		T* stack_;
 #ifdef DEBUG_STACKS
 		int MAX_;
 #endif

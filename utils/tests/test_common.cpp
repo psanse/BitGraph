@@ -70,25 +70,33 @@ TEST(Common, stack_basic) {
 
 	EXPECT_EQ(0, s.size());
 
-	s.push_back(10);
-	s.push_back(20);
-	s.push_back(30);
+	s.push(10);
+	s.push(20);
+	s.push(30);
 
 	EXPECT_EQ(3, s.size());
-	EXPECT_EQ(30, s.pop());
-	EXPECT_EQ(20, s.pop());
-	EXPECT_EQ(10, s.pop());
-	EXPECT_EQ(0, s.size());
-	EXPECT_TRUE(s.empty());
 
-	s.push_back(10);
-	s.push_back(20);
-	s.push_back(30);
+	EXPECT_EQ(30, s.top());
+	s.pop();
+	EXPECT_EQ(20, s.top());
+	s.pop();
+	EXPECT_EQ(10, s.top());
+	s.pop();
+
+	EXPECT_EQ(0, s.size());
+	EXPECT_TRUE( s.empty());
+
+	///////////////////
+
+	s.push(10);
+	s.push(20);
+	s.push(30);
 
 	//I/O
 	//std::cout << s;
 	
 	s.erase();
+
 	EXPECT_TRUE(s.empty());
 
 }
@@ -97,15 +105,15 @@ TEST(Common, stack_pop){
 
 	const int N=10;		
 	com::stack_t<int> s(N);
-	s.push_back(10);
-	s.push_back(30);
+	s.push(10);
+	s.push(30);
 
-
-	int popped = s.pop();
-	EXPECT_EQ(30, popped);
+		
+	EXPECT_EQ(30, s.top());
 	
-	popped = s.pop();
-	EXPECT_EQ(10, popped);
+	s.pop();
+
+	EXPECT_EQ(10, s.top());
 	
 	//note:popping another element should cause an assertion failure in DEBUG MODE
 

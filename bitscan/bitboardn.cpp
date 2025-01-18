@@ -480,7 +480,7 @@ void BitBoardN::to_stack(com::stack_t<int>& s)	const {
 		v = next_bit(v);
 		if (v == EMPTY_ELEM) break;
 
-		s.push_back(v);
+		s.push(v);
 	}
 
 }
