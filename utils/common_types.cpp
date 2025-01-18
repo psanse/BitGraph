@@ -64,18 +64,6 @@ namespace com {
 		return *this;
 	}
 
-	//template<class T>
-	//T stack_t<T>::last() const
-	//{
-	//	if (nE_ == 0) { 
-	//		return stack[0];
-	//	}
-	//	else {
-	//		return stack[nE_ - 1];
-	//	}
-	//}
-
-
 	template<class T>
 	void stack_t<T>::reset (int MAX_SIZE) {
 		nE_ = 0;
@@ -198,7 +186,7 @@ namespace com {
 	template<class T>
 	std::ostream& stack_t<T>::print(std::ostream& o) const {
 		o << "[";
-		for (int i = 0; i < nE_; i++) {
+		for (auto i = 0; i < nE_; ++i) {
 			o << stack_[i] << " ";
 		}
 		o << "]" << "[" << nE_ << "]" << std::endl;

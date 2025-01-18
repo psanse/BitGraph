@@ -47,11 +47,7 @@ explicit stack_t	(int MAX_SIZE);
 		 T& at			(int pos)					{ return stack_[pos]; }
 		 T& top			();
 		 T& bottom		()							{ return stack_[0]; }
-
-		
-		//T first		()			const			{ return stack_[0]; }										
-		//T last		()			const; 
-		
+		 	
 		std::size_t size()							{ return nE_; }
 
 		////////////
