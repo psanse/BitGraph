@@ -74,24 +74,7 @@ namespace com {
 	//		return stack[nE_ - 1];
 	//	}
 	//}
-		
-//	template<class T>
-//	void stack_t<T>::init (int MAX_SIZE) {
-//		delete[] stack;
-//		nE_ = 0;
-//
-//		try {
-//			stack = new T[MAX_SIZE];
-//		}
-//		catch (std::bad_alloc& ba) {
-//			LOGG_ERROR("bad_alloc - stack_t<T>::init");
-//			throw ba;
-//		}
-//
-//#ifdef DEBUG_STACKS
-//		MAX_ = MAX_SIZE;
-//#endif
-//	}
+
 
 	template<class T>
 	void stack_t<T>::reset (int MAX_SIZE) {

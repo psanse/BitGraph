@@ -6,7 +6,6 @@
  * @author pss
  **/
 
-
 #ifndef __COMMON_TYPES_H__
 #define	__COMMON_TYPES_H__
 
@@ -40,7 +39,7 @@ explicit stack_t	(int MAX_SIZE);
 			
 		~stack_t	()					{ clear(); }
 
-		//setters and getters
+		//setters and getters 
 	const T& at			(int pos)	const			{ return stack_[pos]; }
 	const T& top		()			const;
 	const T& bottom		()			const			{ return stack_[0]; }
@@ -56,47 +55,83 @@ explicit stack_t	(int MAX_SIZE);
 		std::size_t size()							{ return nE_; }
 
 		////////////
-		// allocation
-
-		//for backward compatibility
-		//void init		(int MAX_SIZE);
-
+		// memory
+		
+		/**
+		* @brief Resets the stack to a new size, previos elements are destroyed. 
+		*        The new elements are constructed with the default constructor
+		**/
 		void reset		(int MAX_SIZE);
 
 	private:
-		//deallocates memory - use erase to clean the stack without deallocating memory
+		/**
+		* @brief Deallocates memory (used by the destructor)
+		*	     Use erase to clean the stack without deallocating memory
+		**/
 		void clear		();					
 		
 		//////////////
-		//basic operations
+		//basic operations (no memory management)
 	public:
-
-		//places element at the top of the stack
-		void push		(T d);
-
-		//places element at the bottom of the stack, and moves the bottom element to the top 
-		void push_bottom(T d);
 				
-		/* removes the top element from the stack (lost!) */
+		/**
+		* @brief Places element at the top of the stack
+		*	     (last position in the underlying array)
+		**/
+		void push		(T d);
+				
+		/**
+		* @brief Places element at the bottom of the stack
+		*	     (first position in the underlying array)
+		* 
+		*		 I. The bottom element is moved to the top of the stack
+		**/
+		void push_bottom(T d);
+					
+		/**
+		* @brief Rremoves the top element from the stack 
+		*	     (the element is lost)
+		**/
 		void pop		();
 
-		/* removes the top NB elements from the top of the stack (lost!) */
+				
+		/**
+		* @brief Removes the top nb elements from the top of the stack.
+		*		 (the elements are lost)
+		* @param nb: number of elements to remove
+		*	   
+		**/
 		void pop		(std::size_t nb);
 
-		/* removes the bottom element from the top of the stack (lost!), swaps last elememt */
+	
+		/**
+		* @brief Removes the bottom element of the stack.  from the top of the stack.
+		*		 (the element is lost)
+		*
+		*		 I. The top element is moved to the bottomof the stack
+		**/
 		void pop_bottom	();
 		
-		//removes a single element at pos (pos must be grater than 0), moves the last element to pos
+		
+		/**
+		* @brief Removes the element at position pos form the underlying array.
+		*		 (the element is lost)
+		*
+		*		 I. The top element is moved to position pos
+		* @param pos: position of the element to remove
+		**/
 		void erase		(int pos);
 
-		//removes all elements from the stack
-		void erase		()					{ nE_ = 0; }
-
-		//clears nb elements from the stack-TODO@, REFACTOR
-		// void erase_pop (int nb)			{nE_-=nb;}																	
+			
+		/**
+		* @brief Removes all elements from the stack.
+		*		 (no deallocation)
+		**/
+		void erase		()					{ nE_ = 0; }									
 
 		/////////////////
 		//boolean operations
+		
 		bool empty		()		const		{ return (nE_ == 0); }
 
 		/////
@@ -109,9 +144,9 @@ explicit stack_t	(int MAX_SIZE);
 		// data members
 		
 		std::size_t nE_;								//number of elements, used as internal index
-		T* stack_;
+		T* stack_;										//underlying C-array (TODO - raw pointer ¿change to a std::vector?)		
 #ifdef DEBUG_STACKS
-		int MAX_;
+		int MAX_;										//maximum number of elements	
 #endif
 
 	};
