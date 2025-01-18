@@ -14,6 +14,7 @@
 	#define DEBUG_STACKS		//checks stack sizes (important to debug SAT engine in DEBUG mode)
 #endif 
 
+
 #ifndef __COMMON_H__
 #define	__COMMON_H__
 
@@ -40,29 +41,22 @@ namespace com {
 	
 
  namespace dir {
-	 /**********************
+	 /**
+	   * @brief Appends a slash at the end of the path if no slash is present.
+	   *		   The type of slash depends on the SO (Linux '/', Windows '\')
+	   * @param path: string containing a path to be modified 
 	   *
-	   *	append_slash(...)
-	   *
-	   *	@comments: appends a slash at the end of the path if no slash is present.
-	   *			   The type of slash depends on the SO (Linux '/', Windows '\')
-	   *
-	   *	@param path: string containing a path to be modified 
-	   *
-	   **********************/
+	   **/
 	 void append_slash(std::string & path);
 
-	 /**********************
+	 /**
+	   * @brief	removes the path from a filename
+	   * @param path: input string
 	   *
-	   *	remove_path(...)
-	   *
-	   *	@returns: substring after the last slash of the path.
-	   *			  If no slash, path is returned
-	   *
-	   *	@param path: input string
-	   *
-	   **********************/
-	 std::string remove_path(const std::string & path);
+	   * @returns: substring after the last slash of the filename.
+	   *		   (if no slash the filename is returned)
+	   **/
+	 std::string remove_path (const std::string & path);
   }
 
    namespace stl {
@@ -201,8 +195,13 @@ namespace com {
 //////////////////////
 	
    namespace fileproc{
-		  
-	   int READ_EMPTY_LINES(std::fstream& f);
+	
+
+	   /**
+		* @brief reads a line of 0s and 1s from a file and provides the position of the 0s
+		* @param interdicted_nodes: output vector of integers to store the positions of the 0s
+		* @returns 0 if success, -1 if error
+		**/
 	   int READ_SET_OF_INTERDICTED_NODES(const char* filename, std::vector<int>& interdicted_nodes);
 
 	   template<class Col_t>
@@ -225,18 +224,18 @@ namespace com {
 		   f.close();
 		   return 0;
 	   }
-
    }
 
-    namespace counting{
+    namespace counting {
 		inline
 		int number_of_words(std::string str){
-			int word_count( 0 );
-			std::stringstream ss(str);
+			auto word_count = 0;
+			std::stringstream sstr(str);
 			std::string word;
-			while (ss >> word) { ++word_count; }
+			while (sstr >> word) {
+				++word_count;
+			}
 			return word_count;
-
 		}
 	}
 }

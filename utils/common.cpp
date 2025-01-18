@@ -67,12 +67,10 @@ namespace com {
 
 namespace com {
 	namespace dir {
-
+		
 		 void append_slash(std::string & path) {
-			/////////////////
-			// appends slash at the end of a path string if required taking into account SO
-
-			size_t pos;
+		
+			std::size_t pos;
 
 			pos = path.find_last_of("\\/");
 			if (pos == path.length() - 1) {
@@ -95,46 +93,43 @@ namespace com {
 #endif
 			}
 		}
-		 		
-		 string remove_path(const std::string & path) {
-			 size_t pos = path.find_last_of("\\/");
-			 if (pos == string::npos) return path;
-			 else return path.substr(pos + 1);
+				
+		 string remove_path(const std::string & filename) {
+
+			 size_t pos = filename.find_last_of("\\/");
+
+			 if (pos == string::npos) {
+				 return filename;
+			 }
+			 else { return filename.substr(pos + 1); }
 		 }
 	}
 }
 
 namespace com {
 	namespace fileproc {
-
-		int READ_EMPTY_LINES(fstream& f) {
-			/* experimental */
-			char line[250], c;
-			do {
-				c = f.peek();
-				if (c == '\n') {
-					f.getline(line, 250);
-					continue;
-				}
-				break;
-			} while (true);
-
-			return 0;
-		}
-
-		int READ_SET_OF_INTERDICTED_NODES(const char* filename, vector<int>& interdicted_nodes) {
-			/*reads a line of 0s and 1s and provides the position of the 0s  */
-
+				
+		int READ_SET_OF_INTERDICTED_NODES (const char* filename, vector<int>& interdicted_nodes) {
+			
+			//opens a file in binary mode
 			std::ifstream f(filename, ios::binary | ios::in);
 			if (!f) {
-				LOG_ERROR("Could not open file: ", filename);
+				LOG_ERROR("File could not be opened: ", filename, "- ::com::READ_SET_OF_INTERDICTED_NODES");
 				return -1;
 			}
+
+			//reads the file and stores the positions of the 0s
 			interdicted_nodes.clear();
-			int index = 0;
+			std::size_t index = 0;
 			char c;
 			while (f.get(c)) {
-				if (c == '0') { interdicted_nodes.push_back(index); }
+
+				if (c == '0') { 
+					/////////////////////////////////////
+					interdicted_nodes.push_back(index);
+					////////////////////////////////////
+				}
+
 				index++;
 			}
 
