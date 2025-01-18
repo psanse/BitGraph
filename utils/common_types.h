@@ -30,11 +30,13 @@ namespace com {
 		stack_t		();
 explicit stack_t	(int MAX_SIZE);
 
-		//TODO other constructors, assignment operations...
+		//copy semantics are disallowed
 		stack_t				(const stack_t& )	= delete;
 		stack_t& operator = (const stack_t& )	= delete;
-		stack_t				(stack_t&&)			= default;			//CHECK
-		stack_t& operator = (stack_t&&)			= default;
+
+		//move semantics are allowed
+		stack_t				(stack_t&&)	 noexcept;
+		stack_t& operator = (stack_t&&)	 noexcept;
 			
 		~stack_t	()					{ clear(); }
 

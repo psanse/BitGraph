@@ -21,6 +21,22 @@ using namespace com;
 
 using vdob = std::vector<double>;
 
+TEST(Common_stack, constructor) {
+
+	stack_t<int> s(3);
+	s.push(10);
+	s.push(20);
+		
+	stack_t<int> s2 = std::move(s);
+
+	EXPECT_EQ(2, s2.size());
+	EXPECT_EQ(20, s2.top());
+	EXPECT_EQ(10, s2.bottom());
+
+
+
+}
+
 TEST(Common, mean_and_stdev) {
 
 	//collection

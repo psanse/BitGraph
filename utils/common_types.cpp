@@ -37,6 +37,33 @@ namespace com {
 #endif
 	}
 
+	template<class T>
+	stack_t<T>::stack_t(stack_t&& s) noexcept :
+		nE_(s.nE_),
+		stack_(s.stack_)
+#ifdef DEBUG_STACKS
+		, MAX_(s.MAX_)
+#endif
+	{
+		s.stack_ = nullptr;
+		s.nE_ = 0;
+
+	}
+
+	template<class T>
+	stack_t<T>& stack_t<T>::operator = (stack_t&& s) noexcept
+	{
+		nE_ = s.nE_;
+		stack_ = s.stack_;
+#ifdef DEBUG_STACKS
+		MAX = s.MAX_;
+#endif
+		s.stack_ = nullptr;
+		s.nE_ = 0;
+
+		return *this;
+	}
+
 	//template<class T>
 	//T stack_t<T>::last() const
 	//{
