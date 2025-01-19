@@ -1,23 +1,23 @@
 #set useful headers 
 set(useful_headers_for_IDE 
-common.h
-common_types.h
-prec_timer.h
-logger.h
-info/info_base.h
+    common.h
+    common_types.h
+    prec_timer.h
+    logger.h
+    info/info_base.h
 )
 
 #created utils library
 add_library (utils
-benchmark.cpp 
-result.cpp
-test_analyser.cpp
-common.cpp
-common_types.cpp
-info/info_base.cpp
-info/info_clq.cpp                                   #move to clq algorithms and remove from here
-#logger.cpp 
-${useful_headers_for_IDE}
+    benchmark.cpp 
+    result.cpp
+    test_analyser.cpp
+    common.cpp
+    common_types.cpp
+    info/info_base.cpp
+    info/info_clq.cpp                                   #move to clq algorithms and remove from here
+    #logger.cpp 
+    ${useful_headers_for_IDE}
 )
 
 # Make sure the compiler can find include files for our utils library
