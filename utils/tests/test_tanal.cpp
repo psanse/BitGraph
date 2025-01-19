@@ -1,14 +1,14 @@
 #include "gtest/gtest.h"
-#include "../test_analyser.h"
-#include "../file.h"
+#include "utils/test_analyser.h"
+#include "utils/file.h"
+#include <thread>
 
 #define NUM_REP	5
 #define NUM_ALG	2
 #define INSTANCE_NAME	"graph"
 
 TEST(TestAnalyser, basic){
-	cout<<"TestAnalyser::basic------------------"<<endl;
-	
+		
 	TestAnalyser ta;
 	for(int r=0; r<NUM_REP; r++){
 		bool new_rep=true;
@@ -19,7 +19,7 @@ TEST(TestAnalyser, basic){
 			res.set_LB(10);
 			res.tic();
 #ifdef _MSC_VER 
-			Sleep(200);
+			std::this_thread::sleep_for(std::chrono::milliseconds(100));  
 #elif __linux__
 			sleep(0.2);
 #endif
@@ -39,11 +39,11 @@ TEST(TestAnalyser, basic){
 	EXPECT_EQ(-1, error);				//no valid error index
 	cout<<ta<<endl;
 	
-	cout<<"-------------------------------"<<endl;
+	
 }
 
 TEST(TestAnalyser, info){
-	cout<<"TestAnalyser::info------------------"<<endl;
+	
 	
 	TestAnalyser ta;
 	for(int r=0; r<NUM_REP; r++){
@@ -75,11 +75,11 @@ TEST(TestAnalyser, info){
 	EXPECT_FALSE(info.same_steps);
 	EXPECT_TRUE(info.same_lb);
 
-	cout<<"-------------------------------"<<endl;
+	
 }
 
 TEST(TestAnalyser, all_fail){
-	cout<<"TestAnalyser::all_fail------------------"<<endl;
+	
 	
 	TestAnalyser ta;
 	for(int r=0; r<NUM_REP; r++){
@@ -103,11 +103,11 @@ TEST(TestAnalyser, all_fail){
 	EXPECT_TRUE(ta.is_consistent_sol(error));			//2 algorithms all fail
 	cout<<ta<<endl;										//nothing is shown becuase there are more than
 	
-	cout<<"-------------------------------"<<endl;
+	
 }
 
 TEST(TestAnalyser, only_one_test_and_fails){
-	cout<<"TestAnalyser::only_one_and_fails------------------"<<endl;
+	
 	
 	TestAnalyser ta;
 	for(int r=0; r<1; r++){			//one test only
@@ -131,5 +131,5 @@ TEST(TestAnalyser, only_one_test_and_fails){
 	EXPECT_TRUE(ta.is_consistent_sol(error));			//1 algorithm only
 	cout<<ta<<endl;										//shows results 
 	
-	cout<<"-------------------------------"<<endl;
+	
 }

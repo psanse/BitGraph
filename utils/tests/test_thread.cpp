@@ -1,5 +1,5 @@
 #include "gtest/gtest.h"
-#include "../thread.h"
+#include "utils/thread.h"
 
 class ThreadExample{
 public:
@@ -20,7 +20,7 @@ public:
 	//function wrapper to run thread
 	int Start(DWORD tout_ms){
 		int res = Thread<ThreadExample, int>::Start(&ThreadExample::task_mul_by_2,this,tout_ms);
-		LOG_INFO("result:"<<data);	
+		LOGG_INFO("result:" , data);	
 		return res;
 	}
 
@@ -29,7 +29,7 @@ public:
 };
 
 TEST(Thread, basic){
-	cout<<"Thread::basic------------------"<<endl;
+	
 	ThreadExample t(5);
 	int res= t.Start(1000);
 	EXPECT_EQ(-1, res);			//time out
@@ -37,5 +37,5 @@ TEST(Thread, basic){
 	int res1= t.Start(4000);
 	EXPECT_EQ(0, res1);			//finished correctly
 
-	cout<<"T------------------------------"<<endl;
+
 }
