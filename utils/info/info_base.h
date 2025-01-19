@@ -5,10 +5,10 @@
  *@dev pss
  */
 
-#ifndef _INFO_BASE_GRAPH_H_
-#define _INFO_BASE_GRAPH_H_
+#ifndef _INFO_BASE_H_
+#define _INFO_BASE_H_
 
-#include "../prec_timer.h"
+#include "utils/prec_timer.h"
 #include <iostream>
 #include <string>
 #include <limits>

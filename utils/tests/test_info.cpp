@@ -1,13 +1,12 @@
-/*
+/**
 * test_info.cpp: tests the info_base class
  *
  *@date: 15/12/2024
  * 
- */
+ **/
 
 #include "gtest/gtest.h"
 #include "utils/info/info_base.h"
-#include "utils/info/info_clq.h"
 #include <thread>
 #include <iostream>
 #include <sstream>
@@ -27,18 +26,6 @@ protected:
 	}
 };
 
-class InfoCLQTest : public ::testing::Test {
-protected:
-	infoCLQ<int> infoCLQ;
-
-	void SetUp() override {
-		// Initialize any necessary data here
-	}
-
-	void TearDown() override {
-		// Clean up any necessary data here
-	}
-};
 
 TEST_F(InfoBaseTest, DefaultConstructor) {
 	
@@ -145,57 +132,6 @@ TEST_F(InfoBaseTest, printReport) {
 	info.printReport(oss);
 
 	EXPECT_FALSE(oss.str().empty());
-}
-
-///////////////////////
-//
-// infoCLQ TESTS
-//
-//////////////////////
-
-
-TEST_F(InfoCLQTest, DefaultConstructor) {
-
-	//infoBase part
-	EXPECT_EQ	(infoCLQ.nameInstance_, "");
-	EXPECT_EQ	(infoCLQ.N_, 0);
-	EXPECT_EQ	(infoCLQ.M_, 0);
-	EXPECT_EQ	(infoCLQ.K_, 0);
-	EXPECT_EQ	(infoCLQ.TIME_OUT_, std::numeric_limits<double>::max());
-	EXPECT_EQ	(infoCLQ.TIME_OUT_HEUR_, std::numeric_limits<double>::max());
-	EXPECT_EQ	(infoCLQ.idAlg_, -1);
-	EXPECT_EQ	(infoCLQ.idHeur_, -1);
-	EXPECT_EQ	(infoCLQ.idSort_, -1);
-
-	//infoCLQ part
-	EXPECT_EQ	(infoCLQ.lbRootNoHeur, 0);
-	EXPECT_EQ	(infoCLQ.lbRootHeur, 0);
-	EXPECT_EQ	(infoCLQ.branchingRootSize_, 0);
-	EXPECT_EQ	(infoCLQ.idSortReal_, -1);
-	EXPECT_EQ	(infoCLQ.isDegOrd_, false);
-	EXPECT_EQ	(infoCLQ.incumbent_, 0);
-	EXPECT_EQ	(infoCLQ.optimum_, 0);
-	EXPECT_EQ	(infoCLQ.nSteps_, 0);
-	EXPECT_FALSE(infoCLQ.isTimeOutReached_);
-	
-}
-
-TEST_F(InfoCLQTest, printSummary) {
-
-	std::ostringstream ostr;
-	infoCLQ.printSummary(ostr);
-
-	EXPECT_FALSE(ostr.str().empty());
-}
-
-TEST_F(InfoCLQTest, DISABLED_IO) {
-
-	//I/O - DISABLE, just shows the output
-	infoCLQ.printParams();
-	infoCLQ.printSummary();
-	infoCLQ.printTimers();
-	infoCLQ.printReport(std::cout, true);
-
 }
 
 

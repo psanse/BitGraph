@@ -3,9 +3,9 @@
 
 #define PATH "c:\\path"
 
-class Bk:public Benchmark{
+class Bk : public Benchmark{
 public:
-	Bk(string path):Benchmark(path){}
+	Bk(string path) : Benchmark(path){}
 };
 
 TEST(Benchmark, basic){
