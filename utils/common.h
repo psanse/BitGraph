@@ -61,16 +61,12 @@ namespace com {
 
    namespace stl {
 	   	   
-	   /**********************
+	   /**
 	   *
-	   *	all_equal(...)
+	   * @brief Returns true if all elements of a collection are equal
+	   *        or the collection is empty
 	   *
-	   *	@returns: true if all elements of a collection
-	   *			  are equal
-	   *
-	   *    @comments: empty collection returns true
-	   *
-	   **********************/
+	   **/
 	   template<class Col_t>
 	   inline bool all_equal(const Col_t& col) {
 		   return (	std::adjacent_find(	col.cbegin(), col.cend(),
@@ -78,43 +74,34 @@ namespace com {
 					== col.cend()									);
 	   }
 
-	   /**********************
-	   *
-	   *	print_collection(...)
-	   *
-	   *	@returns: stream with all the elements of the collection
-	   *
-	   *    @comments: not valid for C-arrays 
-	   *
-	   ***********************/
+	   /**
+	   * @brief  Streams all the elements of an STL collection
+	   *  		
+	   * @param c: input collection
+	   * @param	o: output stream
+	   * @param	with_endl: flag to include a new line at the end of the stream
+	   * @returns: stream with all the elements of the collection
+	   **/
 	   template <class Col_t>
 	   inline
-	   std::ostream& print_collection(const Col_t& c, std::ostream&  o= std::cout, bool with_endl=false){
+	   std::ostream& print_collection(const Col_t& c, std::ostream&  o= std::cout, bool with_endl=false)
+	   {
 		   std::copy(c.cbegin(), c.cend(), std::ostream_iterator<typename Col_t::value_type>(o," " ));
-		   o<<" ["<<c.size()<<"]";
-		   if(with_endl) o<< std::endl;
-		   return o;
-	   }
-	   	   
-		/*inline
-	   ostream& print_collection(const vector<vint>& c, ostream&  o = cout) {
-		   o << "printing " << c.size() << " elements" << endl;
-		   for (int i = 0; i < c.size(); i++) {
-			   print_collection<vint>(c[i], o, true);			  
+		   o << " [" << c.size() << "]";
+		   if (with_endl) {
+			   o << std::endl;
 		   }
 		   return o;
-	   }*/
-	   	 
-	   /**********************
-	   *
-	   *	print_collection(...)
-	   *
-	   *	@returns: stream with the elements inside a range
-	   *	@param with_index: flag to include the index of each element	
-	   *
-	   *    @comments: valid for C-arrays as well
-	   *
-	   **********************/
+	   }   	   
+		   	 
+	   /**
+		* @brief  Streams all the elements of an STL collection inside a range
+		*  		 
+		* @param begin, end: iterators to the beginning and end of the collection
+		* @param o: output stream
+		* @param with_endl: flag to include a new line at the end of the stream
+		* @returns: stream with all the elements of the collection
+		**/
 	   template <class ForwardIterator>
 	   inline
 		std::ostream& print_collection(	const ForwardIterator begin, const ForwardIterator end,
@@ -195,14 +182,7 @@ namespace com {
 //////////////////////
 	
    namespace fileproc{
-	
-	   /**
-		* @brief reads a mask of 0s and 1s from a file and provides the position of the 0s
-		* @param interdicted_nodes: output vector of integers to store the positions of the 0s
-		* @returns 0 if success, -1 if error
-		**/
-	   int READ_SET_OF_INTERDICTED_VERTICES (const char* filename, std::vector<int>& interdicted_nodes);
-
+		   
 	   /**
 	   * @brief writes a set of vertices in a collection to file in the format:
 	   *		size <SIZE>
@@ -232,6 +212,14 @@ namespace com {
 		   f.close();
 		   return 0;
 	   }
+
+	   /**
+		* @brief reads a mask of 0s and 1s from a file and provides the position of the 0s
+		* @param interdicted_nodes: output vector of integers to store the positions of the 0s
+		* @returns 0 if success, -1 if error
+		**/
+	   int READ_SET_OF_INTERDICTED_VERTICES (const char* filename, std::vector<int>& interdicted_nodes);
+
    }
 
     namespace counting {
@@ -257,13 +245,19 @@ namespace com {
 //////////////////////////////
 //
 // FUNCTORS for sorting
+// (substitute by lambdas if possible - 18/01/2025)
 //
 //////////////////////////////
 
 namespace com {
 
-	//functors to sort by a global external critera 
-	template<class T, class ColCrit_t, bool Greater, typename Enable = void>
+	/**
+	* @brief Functor to sort a collection of elements by a criterion
+	* 
+	*		 I. Enable type is for SFINAE handling of special cases
+	*
+	**/
+	template<class T, class ColCrit_t, bool Greater, typename Enable = void >
 	struct has_val {
 		explicit has_val(const ColCrit_t& c) : crit(c) {}
 
@@ -279,8 +273,11 @@ namespace com {
 		const ColCrit_t& crit;
 	};
 
-	//pointer specialization
-	template<class T, class ColCrit_t, bool Greater>
+	/**
+	* @brief functor to sort a collection of pointers by a criterion
+	*		 (specialization)
+	**/
+	template<class T, class ColCrit_t, bool Greater >
 	struct has_val<T*, ColCrit_t, Greater, typename std::enable_if< std::is_pointer<T>::value>::type > {
 		explicit has_val(const ColCrit_t& c) : crit(c) {}
 
@@ -296,7 +293,10 @@ namespace com {
 		const ColCrit_t& crit;
 	};
 
-	//functors to sort by product of value and critera
+	/**
+	* @brief functor to sort a collection according to a product of value and criterion
+	*		 
+	**/
 	template<class T, class ColCrit_t, bool Greater>
 	struct has_val_prod {
 		explicit has_val_prod(const ColCrit_t& c) : crit(c) {}
@@ -315,7 +315,10 @@ namespace com {
 		const ColCrit_t& crit;
 	};
 
-	//functors to sort by difference between value and criteria
+	/**
+	* @brief functor to sort a collection according to a difference of value and criterion
+	*
+	**/
 	template<class T, class ColCrit_t, bool Greater>
 	struct has_val_diff {
 		explicit has_val_diff(const ColCrit_t& c) : crit(c) {}
@@ -352,9 +355,13 @@ namespace com {
 
 	template<class T, class ColCrit_t>
 	using has_smaller_val_diff = has_val_diff<T, ColCrit_t, false>;
-
-	   
-	//functors which use two global external critera (1.main, 2.tiebreak) 
+		   
+	
+	/**
+	* @brief functor to sort a collection according to two criteria
+	*		  (1.main, 2.tiebreak) 
+	*
+	**/
 	template<class T, class ColCrit_t, bool Greater>
 	struct has_val_with_tb {
 		explicit has_val_with_tb(const ColCrit_t& ref, const ColCrit_t& tb)
@@ -411,35 +418,30 @@ namespace com {
 		enum { FIRST_TO_LAST = 0, LAST_TO_FIRST };		
 		enum { NEW_TO_OLD = 0, OLD_TO_NEW };			//format of the ordering - old-to-new in the space of the original graph, new-to-old in the space of the new graph
  		
-		/********************************************************************************************************************************
-		*
-		*		 Sorting of n items (integer) according to non-increasing values of their scores (double)
-		*
-		********************************************************************************************************************************/
+		/**
+		* @brief Sorting of n items (integer) according to non-increasing values of their scores (double)
+		*		
+		**/
 		void SORT_NON_INCR(int *item, double *score, int n);
 		
 		
-		/********************************************************************************************************************************
-		*
-		*		Sorting of n items (integer) according to non-increasing values of their scores (double)
-		*
-		********************************************************************************************************************************/
+		/**
+		* @brief Sorting of n items (integer) according to non-decreasing values of their scores (double)
+		*		
+		**/
 		void SORT_NON_DECR(int *item, double *score, int n);
 		
 		
-		/********************************************************************************************************************************
+		/**
+		* @brief Inserts an element into n-SORTED items (type T) according to non-decreasing values of their scores (type T)
+		*		 After insertion, there are n sorted items
+		* @returns: the position of insertion
 		*
-		*	Insert an element into n-SORTED items (type T) according to non-decreasing values of their scores (type T)
-		*	After insertion, there are n sorted items
-		*
-		*	@returns: the position of insertion
-		*
-		********************************************************************************************************************************/
+		**/
 		template<class T>
 		inline
-			int INSERT_ORDERED_SORT_NON_INCR(T* item, T* score, int n, T target, T target_val) {
-			/********************************************************************************************************************************/
-
+		int INSERT_ORDERED_SORT_NON_INCR(T* item, T* score, int n, T target, T target_val) {
+		
 			int i = n - 1;
 			for (; i >= 1; i--) {
 				// if( target_val>score[item[i-1]] ){
@@ -550,11 +552,10 @@ namespace com {
 		using iugen = RandomUniformGen< std::uniform_int_distribution<int>, std::mt19937 >;
 		using rugen = RandomUniformGen< std::uniform_real_distribution<double>, std::mt19937 >;
 		////////////////////////////////////////////////////////////////
-
-	
+		
 		
 		inline
-			bool uniform_dist(double p) {
+		bool uniform_dist(double p) {
 			//returns true with prob p, 0 with 1-p
 
 			//c- windows generator (deprecated)
@@ -566,12 +567,8 @@ namespace com {
 			return r(0.0, 1.0) <= p;
 			////////////////////////////
 		}
-
-
 	}
 }
-
-
 
 //////////////////////////////
 //
@@ -580,13 +577,11 @@ namespace com {
 //////////////////////////////
 namespace com {
 	namespace time {
-		//////////////////////////////////////
-		//
-		// I/O for durations
-		// (shows ratio and ticks)
-		//
-		/////////////////////////////////////
 
+		/**
+		* @brief Streams a time duration 
+		*		 (shows ratio and ticks)
+		**/
 		template <typename V, typename R>
 		inline
 			std::ostream& operator << (std::ostream& s, const std::chrono::duration<V, R>& d)
@@ -597,31 +592,19 @@ namespace com {
 			return s;
 		}
 
-
-
-		//////////////////////////////////////
-		//
-		// toDouble (duration)
-		//
-		// returns the duration in seconds 
-		//
-		/////////////////////////////////////
-
+		/**
+		* @brief returns the duration in seconds 
+		**/
 		template <typename T, typename R>
 		inline
 			double toDouble(const std::chrono::duration<T, R>& d) noexcept
 		{
 			return std::chrono::duration_cast<std::chrono::duration<double>>(d).count();
 		}
-
-		//////////////////////////////////////
-		//
-		// tp2string
-		//
-		// std::chrono::timepoint to string
-		//
-		/////////////////////////////////////
-
+			
+		/**
+		* @brief converts a timepoint to string 
+		**/
 		template<typename TP_t>
 		inline std::string tp2string(const TP_t& tp, bool date = true) {
 			std::time_t t = TP_t::clock::to_time_t(tp); // Convert to POSIX system time
@@ -674,13 +657,9 @@ namespace com {
 		//	return tstr;
 		//}
 
-		//////////////////////////////////////
-		//
-		// makeTimePoint(...)
-		// 
-		// converts calendar time to timepoint of system clock
-		//
-		/////////////////////////////////////
+		/**
+		* @brief converts calendar time to timepoint of system clock
+		**/
 		std::chrono::system_clock::time_point
 		makeTimePoint(	int year, int mon, int day,
 						int hour, int min, int sec = 0		);
