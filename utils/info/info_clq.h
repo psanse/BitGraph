@@ -65,7 +65,7 @@ public:
 	//////////////////////
 
 	//LB bounds - root
-	W_t lbRootNoHeur = 0;						//LB at root node (without a sophisticated heur, can use a simple heur)
+	W_t lbRootNoHeur_ = 0;						//LB at root node (without a sophisticated heur, can use a simple heur)
 	W_t lbRootHeur = 0;							//LB at root node (sophisticated heur, e.g. AMTS)
 
 	//UB bounds root

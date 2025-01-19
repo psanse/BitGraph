@@ -1,9 +1,14 @@
-//test_logger.cpp: unit tests for LOGY logger in logger.h file
-//
-//@date: 06/11/2024
-//@comments: done by copilot
+/**
+* @file test_logger.cpp
+* @brief Unit tests for the basic logy v1.2 logger in logger.h file
+*		 Giovanni Squillero <giovanni.squillero@polito.it> (Summer 2018)
+* @date 06/11/2024
+* @last_update 17/01/25
+* @author copilot
+*
+**/
 
-#include "../logger.h"
+#include "utils/logger.h"
 #include "gtest/gtest.h"
 #include <string>
 #include <iostream>
@@ -15,9 +20,12 @@ using namespace std;
 class LoggerTest : public ::testing::Test {
 protected:
 	void SetUp() override {
-		// Redirect stderr to a temporary file for capturing output
+		// Redirect stderr to a temporary file to capture its output
 		tmp_filename = "temp_log_output.txt";
-		freopen(tmp_filename.c_str(), "w", stderr);
+		if (freopen(tmp_filename.c_str(), "w", stderr) == nullptr) {
+			perror("freopen failed");
+			exit(EXIT_FAILURE);
+		}
 	}
 
 	void TearDown() override {
@@ -35,8 +43,8 @@ protected:
 		std::string content((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
 		file.close();
 
-		// Reopen stderr to the console to avoid affecting other tests
-		freopen("/dev/tty", "a", stderr);
+		// Redirect stderr to the console to avoid affecting other tests
+		freopen("/dev/tty", "a", stderr);	
 
 		return content;
 	}

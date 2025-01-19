@@ -1,3 +1,12 @@
+/**
+* @file test_file.cpp
+* @brief Tests for class File with a macro FILE_LOG to stream to a file conveniently
+* @date ?
+* @last_update 17/01/25
+* @author done by copilot
+*
+**/
+
 #include <iostream>
 #include <sstream>
 #include "gtest/gtest.h"

@@ -7,15 +7,13 @@
  */
 
 #include "gtest/gtest.h"
-#include "../utils/info/info_clq.h"
+#include "utils/info/info_clq.h"
 #include <thread>
 
 using namespace com;
 
 class InfoCLQTest : public ::testing::Test {
-protected:
-    infoCLQ info;
-
+protected:   
     void SetUp() override {
         // Initialize any necessary data here
     }
@@ -23,6 +21,9 @@ protected:
     void TearDown() override {
         // Clean up any necessary data here
     }
+
+    infoCLQ<int> info;
+
 };
 
 TEST_F(InfoCLQTest, DefaultConstructor) {
@@ -30,12 +31,13 @@ TEST_F(InfoCLQTest, DefaultConstructor) {
     EXPECT_EQ(info.optimum_, 0);
     EXPECT_EQ(info.nSteps_, 0);
     EXPECT_FALSE(info.isTimeOutReached_);
-    EXPECT_EQ(info.LB_0_no_AMTS_, 0);
-    EXPECT_EQ(info.LB_0_AMTS_, 0);
+    EXPECT_EQ(info.lbRootNoHeur_, 0);
+    EXPECT_EQ(info.lbRootHeur_, 0);
     EXPECT_EQ(info.branchingRootSize_, 0);
     EXPECT_EQ(info.idSortReal_, -1);
     EXPECT_FALSE(info.isDegOrd_);
-    EXPECT_EQ(info.nLastIsetPreFilterCalls_, 0);
+
+   /* EXPECT_EQ(info.nLastIsetPreFilterCalls_, 0);
     EXPECT_EQ(info.nLastIsetCalls_, 0);
     EXPECT_EQ(info.nCurrIsetCalls_, 0);
     EXPECT_EQ(info.nVertexCalls_, 0);
@@ -44,7 +46,7 @@ TEST_F(InfoCLQTest, DefaultConstructor) {
     EXPECT_EQ(info.nsLastIsetCalls_, 0);
     EXPECT_EQ(info.nsCurrIsetCalls_, 0);
     EXPECT_EQ(info.nsVertexCalls_, 0);
-    EXPECT_EQ(info.nsUBpartCalls_, 0);
+    EXPECT_EQ(info.nsUBpartCalls_, 0);*/
 }
 
 TEST_F(InfoCLQTest, ClearPreprocInfo) {

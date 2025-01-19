@@ -1,10 +1,15 @@
-//file.h: a simple wrapper to read/write from a filestream safely 
-//example: FILE_LOG("foo.txt",WRITE)<<"hello world"
-//last update: 24/02/15
-///////////////////////////////////
+/**
+* @file file..h
+* @brief A basic wrapper to read/write from a filestream safely
+*		 Has a macr FILE_LOG for easy logging
+* @date 24/02/15
+* @last_update 19/01/25
+* @author pss
+*
+**/
 
-#ifndef __FILE_H__
-#define __FILE_H__
+#ifndef __FILE_LOG_H__
+#define __FILE_LOG_H__
 
 #include <iostream>
 #include <fstream>

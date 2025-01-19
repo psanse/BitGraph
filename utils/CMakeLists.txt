@@ -38,22 +38,23 @@ if (utils_build_tests)
 add_executable (test_utils ./tests/gtest_main.cc
 #./tests/test_batch.cpp
 #./tests/test_benchmark.cpp
- ./tests/test_file.cpp
-# ./tests/test_logger.cpp
+
 # ./tests/test_result.cpp
 # ./tests/test_precise_timer.cpp
 #./tests/test_tanal.cpp
 #./tests/test_thread.cpp
 #./test_analyser.cpp
-# ./tests/test_info.cpp
-#  ./tests/test_info_clq.cpp
+
 
 
     #  TESTS TO BE CHECKED
-    ./tests/test_file.cpp
+    ./tests/test_info.cpp
+    ./tests/test_info_clq.cpp
 
     # TESTS CHECKED
-    #./tests/test_common.cpp
+    # ./tests/test_common.cpp
+    #./tests/test_file.cpp
+    #./tests/test_logger.cpp
 )
 
 target_include_directories (test_utils PUBLIC ../googletest/include/)
