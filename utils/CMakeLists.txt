@@ -37,23 +37,24 @@ if (utils_build_tests)
 # "demo.cxx" and "demo_b.cxx". The extensions are automatically found.
 add_executable (test_utils ./tests/gtest_main.cc
 
-    #./tests/test_batch.cpp
-    #./tests/test_result.cpp
-    #./tests/test_tanal.cpp
-    #./tests/test_thread.cpp
-    #./test_analyser.cpp
-    #./tests/test_benchmark.cpp
+    #tests/test_batch.cpp
+    # tests/test_result.cpp
+    #tests/test_tanal.cpp
+    #tests/test_thread.cpp
+    #test_analyser.cpp
+   
 
     #  TESTS TO BE CHECKED
-     
+    
 
     # TESTS CHECKED
-    # ./tests/test_common.cpp
-    # ./tests/test_file.cpp
-    # ./tests/test_logger.cpp
-    # ./tests/test_info.cpp
-    # ./tests/test_info_clq.cpp
-    # ./tests/test_precise_timer.cpp
+     tests/test_common.cpp
+     tests/test_file.cpp
+     tests/test_logger.cpp
+     tests/test_info.cpp
+     tests/test_info_clq.cpp
+     tests/test_precise_timer.cpp
+     tests/test_benchmark.cpp
 )
 
 target_include_directories (test_utils PUBLIC ../googletest/include/)
