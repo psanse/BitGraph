@@ -34,15 +34,15 @@ TEST_F(InfoCLQTest, DefaultConstructor) {
     //preproc info
     EXPECT_EQ(info.lbRootNoHeur_, 0);
     EXPECT_EQ(info.lbRootHeur_, 0);
-    EXPECT_EQ(info.branchingRootSize_, 0);
-    EXPECT_EQ(info.idSortReal_, -1);
-    EXPECT_FALSE(info.isDegOrd_);
+    EXPECT_EQ(info.branchingFactorRoot_, 0);
+    EXPECT_EQ(info.algSortReal_, -1);
+    EXPECT_FALSE(info.isAlgSortRealDeg_);
 
     //search info
-    EXPECT_EQ(info.incumbent_, 0);
-    EXPECT_EQ(info.optimum_, 0);
+    EXPECT_EQ(info.lb_, 0);
+    EXPECT_EQ(info.ub_, 0);
     EXPECT_EQ(info.nSteps_, 0);
-    EXPECT_FALSE(info.isTimeOutReached_);
+    EXPECT_FALSE(info.isTimeOut_);
 	EXPECT_TRUE(info.sol_.empty());   
 
    /* EXPECT_EQ(info.nLastIsetPreFilterCalls_, 0);
@@ -61,14 +61,14 @@ TEST_F(InfoCLQTest, Clear) {
 
     info.lbRootNoHeur_ = 10.0;
     info.lbRootHeur_ = 20.0;
-    info.branchingRootSize_ = 5;
-    info.idSortReal_ = 1;
-    info.isDegOrd_ = true;
+    info.branchingFactorRoot_ = 5;
+    info.algSortReal_ = 1;
+    info.isAlgSortRealDeg_= true;
     
-    info.incumbent_ = 10;
-    info.optimum_ = 20;
+    info.lb_ = 10;
+    info.ub_ = 20;
     info.nSteps_ = 100;
-    info.isTimeOutReached_ = true;
+    info.isTimeOut_ = true;
     info.sol_ = { 1, 2, 3 };
 
 	//lazy cleaning - does not clean general info
@@ -76,14 +76,14 @@ TEST_F(InfoCLQTest, Clear) {
 
     EXPECT_EQ(info.lbRootNoHeur_, 0);
     EXPECT_EQ(info.lbRootHeur_, 0);
-    EXPECT_EQ(info.branchingRootSize_, 0);
-    EXPECT_EQ(info.idSortReal_, -1);
-    EXPECT_FALSE(info.isDegOrd_);
+    EXPECT_EQ(info.branchingFactorRoot_, 0);
+    EXPECT_EQ(info.algSortReal_, -1);
+    EXPECT_FALSE(info.isAlgSortRealDeg_);
 
-    EXPECT_EQ(info.incumbent_, 0);
-    EXPECT_EQ(info.optimum_, 0);
+    EXPECT_EQ(info.lb_, 0);
+    EXPECT_EQ(info.ub_, 0);
     EXPECT_EQ(info.nSteps_, 0);
-    EXPECT_FALSE(info.isTimeOutReached_);
+    EXPECT_FALSE(info.isTimeOut_);
     EXPECT_TRUE(info.sol_.empty());
 
 	//general info available

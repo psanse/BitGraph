@@ -25,21 +25,21 @@ using namespace std;
 		//general information
 		if(t.print_mode_ & TestAnalyser::NAME){					//assumes the same instance for all tests
 			//o<<left<<setw(30)<<t.arrayOfTests_[0][0].get_name()<<" ";
-			o<<left<<setw(30)<<t.arrayOfTests_[0][0].get_name();
+			o << left << setw(30) << t.arrayOfTests_[0][0].get_name();
 		}
 
 		if(t.print_mode_ & TestAnalyser::SIZE){
 			//o<<setw(5)<<right<<setprecision(0)<<t.arrayOfTests_[0][0].get_d1()<<" ";  
-			o<<right<<"\t"<<t.arrayOfTests_[0][0].get_d1();
+			o <<right <<"\t" << t.arrayOfTests_[0][0].get_d1();
 		}
 
 		if(t.print_mode_ & TestAnalyser::EDGES){
 			//o<<setw(5)<<right<<setprecision(0)<<t.arrayOfTests_[0][0].get_d2()<<" ";  
-			o<< right<<"\t"<<t.arrayOfTests_[0][0].get_d2();
+			o << right <<"\t" << t.arrayOfTests_[0][0].get_d2();
 		}
 
 		if (t.print_mode_ & TestAnalyser::TIMEOUT) {
-			o << right<< setw(10)<< "\t" <<(int)t.arrayOfTests_[0][0].get_tout();
+			o << right<< setw(10)<< "\t" << (int)t.arrayOfTests_[0][0].get_tout();
 		}
 
 		if (t.print_mode_ & TestAnalyser::ALG) {
@@ -56,7 +56,7 @@ using namespace std;
 				
 		//information common to all tests
 		o.setf(ios::fixed);										
-		for(int i=0; i<t.nAlg_; i++){
+		for(auto i = 0; i < t.nAlg_; ++i){
 
 			if (t.print_mode_ & TestAnalyser::LOWER_BOUND) {
 				//o << setw(4) << right << setprecision(2) << t.arrayOfAvLB[i] << " ";
@@ -81,13 +81,13 @@ using namespace std;
 			
 			if(t.print_mode_ & TestAnalyser::STEPS){
 				//o<<setw(15)<<right<<setprecision(0)<<t.arrayOfAvSteps[i]<<" ";  
-				o << right<<setw(10)<<setprecision(0) << "\t" << t.arrayOfAvSteps[i];
+				o << right << setw(10) << setprecision(0) << "\t" << t.arrayOfAvSteps[i];
 				
 			}
 																			
 			if(t.print_mode_ & TestAnalyser::TIME){
 				//o<<setw(12)<<right<<setprecision(3)<<t.arrayOfAvTimes[i]<<" "; 
-				o << right<< setw(7)<<setprecision(3) << "\t" << t.arrayOfAvTimes[i];
+				o << right<< setw(7) << setprecision(3) << "\t" << t.arrayOfAvTimes[i];
 				
 			}
 
@@ -103,18 +103,18 @@ using namespace std;
 			}
 
 			if(t.print_mode_ & TestAnalyser::NCONT){
-				for(int j=0; j<t.arrayOfCounters[i].size(); j++){
-						o<<right<<setw(10)<<setprecision(4)<<t.arrayOfCounters[i][j]<<" ";  
+				for(auto j = 0; j < t.arrayOfCounters[i].size(); ++j){
+					o << right << setw(10) << setprecision(4) << t.arrayOfCounters[i][j]<<" ";  
 				}
 			}		
 
 			
 			//separator for diffent algs of same instance
 			if(i < (t.nAlg_ - 1) ){				
-				o<<"| ";
+				o << "| ";
 			}
 		}
-		o<<endl;
+		o << endl;
 	
 	}catch(exception e){
 		LOG_ERROR("Error when printing data", e.what(), "- Test_Analyser::operator << ");

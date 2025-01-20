@@ -35,9 +35,9 @@ TEST_F(InfoBaseTest, DefaultConstructor) {
 	EXPECT_EQ(info.K_, 0);
 	EXPECT_EQ(info.TIME_OUT_	 , std::numeric_limits<double>::max());
 	EXPECT_EQ(info.TIME_OUT_HEUR_, std::numeric_limits<double>::max());
-	EXPECT_EQ(info.idAlg_, -1);
-	EXPECT_EQ(info.idHeur_, -1);
-	EXPECT_EQ(info.idSort_, -1);
+	EXPECT_EQ(info.algSearch_, -1);
+	EXPECT_EQ(info.algHeur_, -1);
+	EXPECT_EQ(info.algSort_, -1);
 }
 
 TEST_F(InfoBaseTest, StartTimer) {

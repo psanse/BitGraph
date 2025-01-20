@@ -6,6 +6,9 @@
  * @date  2013
  * @last_update 20/01/2025
  * @author pss  
+ * 
+ * TODO - generic for other types different from Result (20/01/25)
+ * 
  */
 
 #ifndef __TEST_ANALYSER_H__
