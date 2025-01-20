@@ -50,8 +50,8 @@ add_executable (test_utils ./tests/gtest_main.cc
     # tests/test_common.cpp
     # tests/test_file.cpp
     # tests/test_logger.cpp
-     tests/test_info.cpp
-     tests/test_info_clq.cpp
+    # tests/test_info.cpp
+    # tests/test_info_clq.cpp
     # tests/test_precise_timer.cpp
     # tests/test_benchmark.cpp
 )

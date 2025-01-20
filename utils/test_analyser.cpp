@@ -6,16 +6,12 @@
  * @author pss
  */
 
+#include "common.h"
+#include "logger.h"
+#include "test_analyser.h"
+#include <iomanip>
 #include <math.h>
 #include <string>
-#include <fstream>
-#include <iomanip>
-#include <algorithm>
-
-#include "test_analyser.h"
-#include "prec_timer.h"
-#include "logger.h"
-#include "common.h"
 
 using namespace std;
 

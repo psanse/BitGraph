@@ -37,7 +37,7 @@ public:
 	static string get_current_local_time();
 	const usint MAX_NUM_SOL;	
 
-	Result(usint max_sol = DEFAULT_MAX_NUM_SOL):MAX_NUM_SOL(max_sol){clear();}
+	Result(usint max_sol = DEFAULT_MAX_NUM_SOL) : MAX_NUM_SOL(max_sol){clear();}
 	virtual ~Result(){}
 
 	void  operator =								(const Result& res);			

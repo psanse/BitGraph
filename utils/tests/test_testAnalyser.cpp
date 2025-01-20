@@ -4,6 +4,8 @@
  * @date  2013
  * @last_update 20/01/2025
  * @author pss
+ * 
+ * TODO - change Result class to new class infoCLQ	
  */
 
 #include "gtest/gtest.h"
@@ -21,7 +23,7 @@ TEST(TestAnalyser, basic){
 		
 	TestAnalyser ta;
 	for(auto r = 0; r < NUM_REP; ++r){
-		bool new_rep=true;
+		bool new_rep = true;
 		for(auto a = 0;  a < NUM_ALG; ++a){
 			Result res;
 			res.set_number_of_steps(10);
@@ -38,16 +40,27 @@ TEST(TestAnalyser, basic){
 			res.set_name(INSTANCE_NAME);				//same instance
 			res.inc_counter(0);
 			res.inc_counter(1,7);
-			ta.add_test(new_rep, res);
-			new_rep = false;
+			ta.add_test(new_rep, res);					//first time in the loop new repetition
+			new_rep = false;							//rest of times in the loop same repetition, different algorithm
 		}
 	}
 	
+	//////////////////
 	ta.analyser();
-	int errorIdx;
+	/////////////////
 
+	int errorIdx = -1;
+
+	//////////////////////////////////////////////////
 	EXPECT_TRUE(ta.consistent_sol_val(errorIdx) );
-	EXPECT_EQ(-1, errorIdx);							//no valid error index
+	EXPECT_EQ(-1, errorIdx);							//no error, all solutions are the same, with default values
+	EXPECT_DOUBLE_EQ(10, ta.get_steps()[0]);
+	EXPECT_DOUBLE_EQ(10, ta.get_steps()[1]);
+	EXPECT_DOUBLE_EQ(1, ta.get_counters()[0][0]);		//alg 0, counter 0
+	EXPECT_DOUBLE_EQ(7, ta.get_counters()[0][1]);		//alg 0, counter 1
+	EXPECT_DOUBLE_EQ(1, ta.get_counters()[1][0]);		//alg 1, counter 0
+	EXPECT_DOUBLE_EQ(7, ta.get_counters()[1][1]);		//alg 1, counter 1
+	///////////////////////////////////////////////////
 
 	//I/O
 	/////////////////////
@@ -82,7 +95,11 @@ TEST(TestAnalyser, info){
 	}
 				
 	TestAnalyser::info_t info;
+
+	///////////////////
 	ta.analyser(&info);
+	///////////////////
+
 	EXPECT_TRUE(info.same_sol);
 	EXPECT_FALSE(info.same_steps);
 	EXPECT_TRUE(info.same_lb);
@@ -108,9 +125,12 @@ TEST(TestAnalyser, all_fail){
 		}
 	}
 	
+	//////////////////
 	ta.analyser();
-	int errorIdx;
-	EXPECT_TRUE(ta.consistent_sol_val(errorIdx));			//2 algorithms all fail
+	/////////////////
+
+	int errorIdx = -1;
+	EXPECT_TRUE(ta.consistent_sol_val( errorIdx) );			//2 algorithms all fail
 
 	//I/O
 	/////////////////////
@@ -138,9 +158,12 @@ TEST(TestAnalyser, only_one_test_and_fails){
 		}
 	}
 	
+	//////////////////
 	ta.analyser();
-	int errorIdx;
-	EXPECT_TRUE(ta.consistent_sol_val(errorIdx));		//1 algorithm only
+	/////////////////
+
+	int errorIdx = -1;
+	EXPECT_TRUE(ta.consistent_sol_val( errorIdx) );		//1 algorithm only
 	
 	//I/O
 	/////////////////////
