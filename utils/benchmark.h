@@ -82,7 +82,7 @@ public:
 protected:
 	const std::string		PATH_;		//FIXED path for all filenames
 	vstr_t					lf_;		//list of filemanes (PATH_ + name) 
-	mstri_t					mf_;		//mapping filenames -> value
+	mstri_t					mf_;		//mapping filenames -> value (typically the optimal solution value or a bound)
 };
 
 #endif
