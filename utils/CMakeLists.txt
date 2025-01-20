@@ -40,8 +40,6 @@ add_executable (test_utils ./tests/gtest_main.cc
   #  TESTS TO BE CHECKED (19/01/2025)
 
     #tests/test_batch.cpp    
-    #tests/test_tanal.cpp
-   
     #tests/test_thread.cpp
     #tests/test_result.cpp
    

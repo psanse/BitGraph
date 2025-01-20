@@ -6,7 +6,6 @@
  * @author pss
  */
 
-
 #include "gtest/gtest.h"
 #include "utils/test_analyser.h"
 #include "utils/file.h"
@@ -60,9 +59,9 @@ TEST(TestAnalyser, info){
 	
 	
 	TestAnalyser ta;
-	for(int r=0; r<NUM_REP; r++){
-		bool new_rep=true;
-		for(int a=0; a<NUM_ALG-1; a++){
+	for(int r = 0; r < NUM_REP; ++r){
+		bool new_rep = true;
+		for(int a = 0; a < NUM_ALG - 1; ++a){
 			Result res;
 			res.set_number_of_steps(10);
 			res.set_UB(50);
@@ -70,7 +69,7 @@ TEST(TestAnalyser, info){
 
 			res.set_name(INSTANCE_NAME);				//same instance
 			ta.add_test(new_rep, res);
-			new_rep=false;
+			new_rep = false;
 		}
 
 		//last algorithm (change the number of steps)
@@ -94,9 +93,9 @@ TEST(TestAnalyser, info){
 TEST(TestAnalyser, all_fail){
 		
 	TestAnalyser ta;
-	for(int r=0; r<NUM_REP; r++){
-		bool new_rep=true;
-		for(int a=0; a<NUM_ALG; a++){
+	for(auto r = 0; r < NUM_REP; ++r){
+		bool new_rep = true;
+		for(auto a = 0; a < NUM_ALG; ++a){
 			Result res;
 			res.set_number_of_steps(10);
 			res.set_UB(50);
@@ -124,9 +123,9 @@ TEST(TestAnalyser, all_fail){
 TEST(TestAnalyser, only_one_test_and_fails){
 		
 	TestAnalyser ta;
-	for(int r=0; r<1; r++){			//one test only
-		bool new_rep=true;
-		for(int a=0; a<NUM_ALG; a++){
+	for(auto r = 0; r < 1; ++r){			//one test only
+		bool new_rep = true;
+		for(auto a = 0; a < NUM_ALG; ++a){
 			Result res;
 			res.set_number_of_steps(10);
 			res.set_UB(50);
@@ -136,7 +135,7 @@ TEST(TestAnalyser, only_one_test_and_fails){
 			res.inc_counter(0);
 			res.inc_counter(1,7);
 			ta.add_test(new_rep, res);
-			new_rep=false;
+			new_rep = false;
 		}
 	}
 	
