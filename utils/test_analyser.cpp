@@ -1,7 +1,7 @@
 /*
  * @file tests_analyser.cpp
  * @brief implementation of the TestAnalyser class (tests_analyser.h) to manage benchmarking of graph algorithms
- * @date ?
+ * @date 2013
  * @last_update 20/01/2025
  * @author pss
  */
@@ -19,8 +19,8 @@
 
 using namespace std;
 
-
- ostream& operator << (ostream& o,const TestAnalyser& t){
+ ostream& operator << (ostream& o,const TestAnalyser& t)
+ {
 	try{
 		//general information
 		if(t.print_mode_ & TestAnalyser::NAME){					//assumes the same instance for all tests
@@ -110,21 +110,22 @@ using namespace std;
 
 			
 			//separator for diffent algs of same instance
-			if(i < (t.nAlg_-1)){				
+			if(i < (t.nAlg_ - 1) ){				
 				o<<"| ";
 			}
 		}
 		o<<endl;
 	
 	}catch(exception e){
-		LOG_ERROR("Test_Analyser::Error when printing data");
-		o<<"Test_Analyser::Error when printing data"<<endl;
+		LOG_ERROR("Error when printing data", e.what(), "- Test_Analyser::operator << ");
+		o << "Error when printing data" << e.what() << "- Test_Analyser::operator<< " << endl;
 	}
 
 	return o;
 }
 
-void TestAnalyser::clear(){
+void TestAnalyser::clear()
+{
 	arrayOfTests_.clear();				//[nRep][nAlg]
 	arrayOfAvTimes.clear();
 	arrayOfAvPreProcTimes.clear();
@@ -349,87 +350,85 @@ bool TestAnalyser::is_consistent_array_of_tests()
 
 }
 
-////////////////////////
-// E/S
+ostream& TestAnalyser::print_single(ostream & o, int idAlg){
 
-void TestAnalyser::print_current_time	(ostream& o){
-	o<<PrecisionTimer::local_timestamp();
-}
-
-void TestAnalyser::print_line	(const string str, ostream& o){
-	o<<str;
-}
-
-void TestAnalyser::print_single(ostream & o, int idAlg){
-///////////////////////////
-// date: 2/7/13
-// prints individual results of algorithms 
-// nAlg==-1 all algs (DEFAULT)
-
-	//fills nRep_ and nAlg_ appropiately
+	//update nRep_ and nAlg_ appropiately
 	make_consistent();
-	if(nRep_==0 || nAlg_==0 ){
-		LOG_ERROR("empty tests");
-		return;
+	if(nRep_ == 0 || nAlg_ == 0 ){
+		LOG_ERROR("Empty tests - TestAnalyser::print_single");
+		return o;
 	}
 
-	//bounds parameters
-	if(idAlg==-1) idAlg=nAlg_;
-	else (idAlg>nAlg_)? idAlg=nAlg_: 1;
+	//default cases
+	if (idAlg == -1) {
+		idAlg = nAlg_;
+	}
+	else {
+		(idAlg > nAlg_) ? idAlg = nAlg_ : 1;
+	}
 	
-	o<<"------------------------------------------"<<endl;
+	o << "------------------------------------------" << endl;
 	
-	for(int r=0; r<nRep_;r++){
-		for(int a=0; a<idAlg; a++){
+	for(auto r = 0; r < nRep_; ++r){
+		for(auto a = 0; a < idAlg; ++a){
+
+			/////////////////////////////////
 			o<<arrayOfTests_[r][a]<<" ";
+			/////////////////////////////////
 		}
-		o<<endl;
+		o << endl;
 	}
 
-	o<<"-------------------------------------------------"<<endl;
+	o << "------------------------------------------" << endl;
+
+	return o;
 }
 
-void TestAnalyser::print_single_rep	(ostream & o, int nRep, int idAlg){
-///////////////////////////
-// date: 2/7/13
-// prints individual results results of algorithms up to nAlg in a single repetition
-// DEFAULTS: nRep==0 all repetitions (default parameter) idAlg==-1 all algs (DEFAULT)
-// 
+std::ostream& TestAnalyser::print_single_rep	(ostream & o, int nRep, int idAlg){
 
-	//control
+	//assert
 	if (nRep < 0) {
-		LOG_ERROR("number of repetitions cannot be negative");
-		return;
+		LOG_ERROR("incorrect number of repetitions", nRep, "-TestAnalyser::print_single_rep");
+		return o;
 	}
 	
-	//fills nRep_ and nAlg_ appropiately
+	//update nRep_ and nAlg_ appropiately
 	make_consistent();
 	if(nRep_==0 || nAlg_==0 ){
-		LOG_ERROR("empty tests");
-		return;
-	}
-	
+		LOG_ERROR("Empty tests - TestAnalyser::print_single_rep");
+		return o;
+	}	
 
-	//bounds parameters
-	if(idAlg==-1) idAlg=nAlg_;
-	else if(idAlg>nAlg_) idAlg=nAlg_;
-	if(nRep > nRep_) nRep = nRep_;
+	//default cases
+	if (idAlg == -1){
+		idAlg = nAlg_; 
+	}
+	else if (idAlg > nAlg_) {
+		idAlg = nAlg_;
+	}
+	if (nRep > nRep_) {
+		nRep = nRep_;
+	}
+		
+	//Streams data: Exception possible because nRep is not Synchro
+	o << "------------------------------------------" << endl;
 	
-	
-	//E/S: Exception possible because nRep is not Synchro
-	o<<endl;
-	
-	for(int a=0; a<idAlg; a++){
+	for(int a = 0; a < idAlg; ++a){
+
 		try{
-			o<<arrayOfTests_[nRep - 1][a]<<" ";
+
+			////////////////////////////////////////
+			o << arrayOfTests_[nRep - 1][a]<<" ";				//nRep is 1-based
+			////////////////////////////////////////
+
 		}catch(exception e){
-			/*stringstream sstr("");
-			sstr<<"Bad output"<<"Test:"<<a<<" Rep:"<<nRep<<endl;
-			LOG_INFO(sstr.str().c_str()<<endl);*/
-			LOG_ERROR("Bad output", " Test:", a, " Rep:", nRep);
+			LOGG_ERROR("Bad output", " Test:", a, " Rep:", nRep,  "-TestAnalyser::print_single_rep");
 			break;
 		}
 	}
+
+	o << "------------------------------------------" << endl;
+	return o;
 }
 
 int TestAnalyser::make_consistent(){

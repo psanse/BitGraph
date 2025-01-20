@@ -2,7 +2,8 @@
  * @file test_analyser.h
  * @brief TestAnalyser class to manage benchmarking of graph algorithms.
  *		  Manages a matrix of test results:	columns are algorithms, rows are repetitions
- * @date ?
+ *		  Takes into account tests which timed-out in the reported results
+ * @date  2013
  * @last_update 20/01/2025
  * @author pss  
  */
@@ -26,7 +27,9 @@ using  itres_t = std::vector<Result>::iterator;
 
 class TestAnalyser{
 	
+	//streams the report of the TestAnalyser - main driver
 	friend std::ostream& operator << (std::ostream&, const TestAnalyser& );
+
 	enum { ERR = -1, OK = 0 };
 
 public:
@@ -132,11 +135,22 @@ public:
 //////////////	
 // I/O
 
-	void print_single					(ostream &, int idAlg=-1 /*all alg*/);				//prints individual results of alg
-	void print_single_rep				(ostream &, int nRep=0 /* 1 based*/, int idAlg=-1);	
-			
-	static void print_current_time		(ostream & = cout);
-	static void print_line				(const std::string line, std::ostream & = std::cout);
+	/**
+	* @brief Streams individual results of algorithm idAlg 
+	* @param idAlg: algorithm number, if -1 all algorithms are reported (default value)
+	* @param o: input / output stream
+	* @returns the output stream
+	**/
+std::ostream& print_single				(std::ostream& o, int idAlg = -1 /*all alg*/);					//prints individual results of alg
+	
+	/**
+	* @brief Reports a specific repetition nRep of an algorith idAlg
+	* @param o: input / output stream* 
+	* @param nRep: repetition number (1 based), if 0 all repetitions are reported (default value)
+	* @param idAlg: algorithm number, if -1 all algorithms are reported (default value) 
+	* @returns the output stream
+	**/
+std::ostream& print_single_rep			(std::ostream & o, int nRep = 0 /* 1 based*/, int idAlg = -1);
 
 //////////////	
 // Private interface
@@ -161,10 +175,11 @@ private:
 	std::vector<double>					arrayOfAvTimes;			//[alg]	
 	std::vector<double>					arrayOfAvPreProcTimes;	//[alg]	
 	std::vector<double>					arrayOfAvSol;
-	std::vector<double>					arrayOfMaxSol;
 	std::vector<double>					arrayOfAvLB;
-	std::vector<int>					arrayOfFails;			//random
 	std::vector<double>					arrayOfAvSteps;			//random
+	
+	std::vector<double>					arrayOfMaxSol;	
+	std::vector<int>					arrayOfFails;			
 	std::vector<std::vector<double> >	arrayOfCounters;		//[alg][counter]
 
 	//E/S
