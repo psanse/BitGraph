@@ -24,9 +24,9 @@ namespace com {
 		o << "DATA:" << nameInstance_.c_str() << "\t N:" << N_ << "\t M:" << M_ << "\t D:" << 2 * M_ / (float)((N_ - 1) * N_) << endl;
 		o << "TIME_LIMIT:" << TIME_OUT_ << endl;
 		o << "TIME_LIMIT_HEUR:" << TIME_OUT_HEUR_ << endl;
-		o << "ALG:" << idAlg_ << endl;
-		o << "SORTING:" << idSort_ << endl;
-		o << "HEUR:" << idHeur_ << endl;
+		o << "ALG:" << algSearch_ << endl;
+		o << "SORTING:" << algSort_ << endl;
+		o << "HEUR:" << algHeur_ << endl;
 		o << "*****************************" << endl;
 		
 		if (K_ != 0) {
@@ -52,9 +52,9 @@ namespace com {
 	std::ostream& infoBase::printReport(std::ostream& o, bool is_endl) const
 	{
 		o << nameInstance_.c_str() << "\t" << N_ << "\t" << M_ << "\t" << TIME_OUT_ << "\t" << TIME_OUT_HEUR_ << "\t"
-		  << idAlg_ << "\t"
-		  << idSort_ << "\t"
-		  << idHeur_ << "\t"
+		  << algSearch_ << "\t"
+		  << algSort_ << "\t"
+		  << algHeur_ << "\t"
 		  << timeParse_ << "\t" << timePreproc_ << "\t" << timeIncumbent_ << "\t" << timeSearch_ << "\t";
 
 		if (is_endl) {
@@ -168,9 +168,9 @@ namespace com {
 		K_ = 0;
 		TIME_OUT_		= std::numeric_limits<double>::max();
 		TIME_OUT_HEUR_  = std::numeric_limits<double>::max();
-		idAlg_ = -1;
-		idHeur_ = -1;
-		idSort_ = -1;
+		algSearch_ = -1;
+		algHeur_ = -1;
+		algSort_ = -1;
 	}
 
 	void infoBase::clear(bool lazy) {

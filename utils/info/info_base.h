@@ -30,7 +30,8 @@ namespace com {
 
 	struct infoBase {
 		
-		enum class phase_t { SEARCH = 0, PREPROC, LAST_INCUMBENT, PARSE };
+		enum phase_t { SEARCH = 0, PREPROC, LAST_INCUMBENT, PARSE };
+		
 
 		/*
 		* @brief elapsed time from start_time to now
@@ -101,9 +102,9 @@ virtual std::ostream& printReport		(std::ostream & o = std::cout, bool is_endl =
 
 		//algorithms
 		 		
-		int idAlg_  = -1;							//algorithm identifier
-		int idHeur_ = -1;							//root heuristic policy (e.g. AMTS, no AMTS or combined with other heuristics)	
-		int idSort_ = -1;							//sorting policy selected as input configuration parameter (might not be the final choice)
+		int algSearch_  = -1;						//algorithm identifier
+		int algHeur_ = -1;							//root heuristic policy (e.g. AMTS, no AMTS or combined with other heuristics)	
+		int algSort_ = -1;							//sorting policy selected as input configuration parameter (might not be the final choice)
 
 		
 		// timers		

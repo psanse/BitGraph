@@ -56,8 +56,7 @@ TEST(TestAnalyser, basic){
 }
 
 TEST(TestAnalyser, info){
-	
-	
+		
 	TestAnalyser ta;
 	for(int r = 0; r < NUM_REP; ++r){
 		bool new_rep = true;

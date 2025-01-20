@@ -21,7 +21,7 @@ namespace com {
 	std::ostream& infoCLQ<W_t>::printSummary(std::ostream& o) const
 	{
 		o << "*****************************" << endl;
-		o << "w:" << optimum_ << "\tt_par: " << timeParse_ << "\tt_pp: " << timePreproc_ << "\tt_search: " << timeSearch_ << "\t#steps: " << nSteps_ << endl;
+		o << "w:" << lb_ << "\tt_par: " << timeParse_ << "\tt_pp: " << timePreproc_ << "\tt_search: " << timeSearch_ << "\t#steps: " << nSteps_ << endl;
 		o << "*****************************" << endl;
 		return o;
 	}
@@ -29,13 +29,15 @@ namespace com {
 	template<class W_t>
 	std::ostream& infoCLQ<W_t>::printReport(std::ostream& o, bool is_endl) const
 	{
-		o << nameInstance_.c_str() << "\t" << N_ << "\t" << M_ << "\t"
+		o   << nameInstance_.c_str() << "\t" << N_ << "\t" << M_ << "\t"
 			<< TIME_OUT_ << "\t" << TIME_OUT_HEUR_ << "\t"
-			<< idAlg_ << "\t" << idSort_ << "\t" << idSortReal_ << "\t"
-			<< isDegOrd_ << "\t" << idHeur_ << "\t"
-			<< lbRootNoHeur_ << "\t" << lbRootHeur_ << "\t"
-			<< incumbent_ << "\t" << optimum_ << "\t"
-			<< timeParse_ << "\t" << timePreproc_ << "\t" << timeIncumbent_ << "\t" << timeSearch_ << "\t" << isTimeOutReached_ << "\t"
+			<< algSearch_ << "\t"
+			<< algSort_ << "\t" << algSortReal_ << "\t" << isAlgSortRealDeg_ << "\t"
+			<< algHeur_ << "\t"
+			<< branchingFactorRoot_ << "\t" 
+			<< lbRootNoHeur_ << "\t" << lbRootHeur_ << "\t" 
+			<< lb_ << "\t" << ub_ << "\t" << ubRoot_ << "\t"
+			<< timeParse_ << "\t" << timePreproc_ << "\t" << timeIncumbent_ << "\t" << timeSearch_ << "\t" << isTimeOut_ << "\t"
 			<< nSteps_ << "\t";
 		/*<< nLastIsetCalls_ << "\t" << nsLastIsetCalls_ << "\t" << nLastIsetPreFilterCalls_ << "\t" << nsLastIsetPreFilterCalls_ << "\t"
 		<< nCurrIsetCalls_ << "\t" << nsCurrIsetCalls_ << "\t"
@@ -52,10 +54,11 @@ namespace com {
 	template<class W_t>
 	void infoCLQ<W_t>::clearPreprocInfo()
 	{
-		lbRootNoHeur_ = 0.0; lbRootHeur_ = 0.0;
-		branchingRootSize_ = 0;
-		idSortReal_ = -1;
-		isDegOrd_ = false;
+		lbRootNoHeur_ = 0.0; 
+		lbRootHeur_ = 0.0;
+		branchingFactorRoot_ = 0;
+		algSortReal_ = -1;
+		isAlgSortRealDeg_ = false;
 
 		clearTimer(com::infoBase::phase_t::PREPROC);
 		sol_.clear();									//candidate solution found during preprocessing
@@ -64,10 +67,10 @@ namespace com {
 	template<class W_t>
 	void infoCLQ<W_t>::clearSearchInfo()
 	{
-		incumbent_ = 0;
-		optimum_ = 0;
+		lb_ = 0;
+		ub_ = 0;
 		nSteps_ = 0;
-		isTimeOutReached_ = false;
+		isTimeOut_ = false;
 		sol_.clear();
 
 		clearTimer(com::infoBase::phase_t::SEARCH);

@@ -25,8 +25,7 @@ namespace com{
 
 	template<class W_t = int>
 	struct infoCLQ : public com::infoBase
-	{
-	public:
+	{		
 		/**
 		* @brief clears context
 		* @param lazy - if true general info is not cleared
@@ -62,30 +61,31 @@ namespace com{
 		/////////////////////
 		//data members
 
-			//////////////////////
-			//  Preproc info  
-			//////////////////////
+		//////////////////////
+		//  Preproc info  
+		//////////////////////
 
-			//LB bounds - root
+		//LB bounds - root
 		W_t lbRootNoHeur_ = 0;						//LB at root node (without a sophisticated heur, can use a simple heur)
-		W_t lbRootHeur_ = 0;							//LB at root node (sophisticated heur, e.g. AMTS)
-
+		W_t lbRootHeur_ = 0;						//LB at root node (sophisticated heur, e.g. AMTS)
+				
 		//UB bounds root
-		std::size_t branchingRootSize_ = 0;			//size of Branching set at ROOT	
+		W_t ubRoot_ = 0;							//UB at root node (size of the graph) 
+		std::size_t branchingFactorRoot_ = 0;		//size of Branching set at ROOT	
 
 		//sorting
-		int idSortReal_ = -1;						//sorting policy actually used by the algorithm (infoBase::idSort_ is the configuration parameter)
-		bool isDegOrd_ = false;						//flag to indicate if any varaint of  DEG-SORT has been used.  CHECK, looksidSO redundant with idsortReal (16/01/2025)
+		int algSortReal_ = -1;						//sorting policy actually used by the algorithm (infoBase::idSort_ is the configuration parameter)
+		bool isAlgSortRealDeg_ = false;				//flag to indicate if any varaint of  DEG-SORT has been used.  CHECK, looksidSO redundant with idsortReal (16/01/2025)
 
 		/////////////////////
 		// Search info (main params)
 		////////////////////
 
-		W_t incumbent_ = 0;							//best solution value found during search (not in preproc)
-		W_t optimum_ = 0;							//solution value - incumbent if problem is solved within the time limit
+		W_t lb_ = 0;								//incumbent solution value found during search (initially - max(lbRootHeur_, lbRootNoHeur_), optimum if isTimeOut_=false)
+		W_t ub_ = 0;								//upper bound found during search (initially - ubRoot_)
 		uint64_t nSteps_ = 0;						//recursive calls to the algorithm		
-		bool  isTimeOutReached_ = false;				//flag time out	
-		std::vector<int> sol_;						//solution found (set of vertices)
+		bool  isTimeOut_ = false;					//flag time out	
+		std::vector<int> sol_;						//solution found (set of vertices) - TODO - change to a set of maximum cliques?
 
 	};
 
@@ -118,7 +118,7 @@ namespace com{
 		/////////////////////
 		//data members
 
-			//search info extension
+		//search info CliSAT specific
 		uint64_t nLastIsetPreFilterCalls_ = 0;
 		uint64_t nLastIsetCalls_ = 0;
 		uint64_t nCurrIsetCalls_ = 0;
