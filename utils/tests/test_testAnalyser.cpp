@@ -1,7 +1,18 @@
+/*
+ * @file test_testAnalyzer.cpp
+ * @brief Unit tests for the TestAnalyser class that manages benchmarking graph algorithms. *		  
+ * @date  2013
+ * @last_update 20/01/2025
+ * @author pss
+ */
+
+
 #include "gtest/gtest.h"
 #include "utils/test_analyser.h"
 #include "utils/file.h"
 #include <thread>
+
+using namespace std;
 
 #define NUM_REP	5
 #define NUM_ALG	2
@@ -10,9 +21,9 @@
 TEST(TestAnalyser, basic){
 		
 	TestAnalyser ta;
-	for(int r=0; r<NUM_REP; r++){
+	for(auto r = 0; r < NUM_REP; ++r){
 		bool new_rep=true;
-		for(int a=0; a<NUM_ALG; a++){
+		for(auto a = 0;  a < NUM_ALG; ++a){
 			Result res;
 			res.set_number_of_steps(10);
 			res.set_UB(50);
@@ -29,17 +40,20 @@ TEST(TestAnalyser, basic){
 			res.inc_counter(0);
 			res.inc_counter(1,7);
 			ta.add_test(new_rep, res);
-			new_rep=false;
+			new_rep = false;
 		}
 	}
 	
 	ta.analyser();
-	int error;
-	EXPECT_TRUE(ta.consistent_sol_val(error));
-	EXPECT_EQ(-1, error);									//no valid error index
-	cout << ta << endl;
-	
-	
+	int errorIdx;
+
+	EXPECT_TRUE(ta.consistent_sol_val(errorIdx) );
+	EXPECT_EQ(-1, errorIdx);							//no valid error index
+
+	//I/O
+	/////////////////////
+	cout << ta << endl;									//reports results 
+	////////////////////
 }
 
 TEST(TestAnalyser, info){
@@ -74,13 +88,11 @@ TEST(TestAnalyser, info){
 	EXPECT_TRUE(info.same_sol);
 	EXPECT_FALSE(info.same_steps);
 	EXPECT_TRUE(info.same_lb);
-
 	
 }
 
 TEST(TestAnalyser, all_fail){
-	
-	
+		
 	TestAnalyser ta;
 	for(int r=0; r<NUM_REP; r++){
 		bool new_rep=true;
@@ -99,16 +111,18 @@ TEST(TestAnalyser, all_fail){
 	}
 	
 	ta.analyser();
-	int error;
-	EXPECT_TRUE(ta.consistent_sol_val(error));			//2 algorithms all fail
-	cout<<ta<<endl;										//nothing is shown becuase there are more than
-	
+	int errorIdx;
+	EXPECT_TRUE(ta.consistent_sol_val(errorIdx));			//2 algorithms all fail
+
+	//I/O
+	/////////////////////
+	cout << ta << endl;									//reports results - no report expected here
+	/////////////////////
 	
 }
 
 TEST(TestAnalyser, only_one_test_and_fails){
-	
-	
+		
 	TestAnalyser ta;
 	for(int r=0; r<1; r++){			//one test only
 		bool new_rep=true;
@@ -127,9 +141,11 @@ TEST(TestAnalyser, only_one_test_and_fails){
 	}
 	
 	ta.analyser();
-	int error;
-	EXPECT_TRUE(ta.consistent_sol_val(error));			//1 algorithm only
-	cout<<ta<<endl;										//shows results 
+	int errorIdx;
+	EXPECT_TRUE(ta.consistent_sol_val(errorIdx));		//1 algorithm only
 	
-	
+	//I/O
+	/////////////////////
+	cout << ta << endl;									//reports results 
+	/////////////////////
 }

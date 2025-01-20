@@ -46,7 +46,7 @@ add_executable (test_utils ./tests/gtest_main.cc
     #tests/test_result.cpp
    
     #  TESTS BEING CHECKED
-      tests/test_tanal.cpp
+      tests/test_testAnalyser.cpp
     
     # TESTS CHECKED
     # tests/test_common.cpp
