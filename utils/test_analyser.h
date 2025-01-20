@@ -121,8 +121,15 @@ public:
 
 //////////////
 // Boolean operations
+// 
 
-	bool is_consistent_sol				(int& num_error);
+	/**
+	* @brief Determines if the solutions of the algorithms are consistent
+	* @param num_error: -1 ok, 0 - no solution available for any algorithm (returns FALSE),
+						[1...nAlg_] the first algorithm with a different solution from the one first reported
+	* @results TRUE if all the solution values are the same for all algorithms, FALSE otherwise
+	**/
+	bool consistent_sol_val (int& num_error);
 
 	/**
 	* @brief TRUE if the number of repetitions and algorithms is consistent with the main DB

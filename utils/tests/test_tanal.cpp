@@ -35,9 +35,9 @@ TEST(TestAnalyser, basic){
 	
 	ta.analyser();
 	int error;
-	EXPECT_TRUE(ta.is_consistent_sol(error));
-	EXPECT_EQ(-1, error);				//no valid error index
-	cout<<ta<<endl;
+	EXPECT_TRUE(ta.consistent_sol_val(error));
+	EXPECT_EQ(-1, error);									//no valid error index
+	cout << ta << endl;
 	
 	
 }
@@ -100,7 +100,7 @@ TEST(TestAnalyser, all_fail){
 	
 	ta.analyser();
 	int error;
-	EXPECT_TRUE(ta.is_consistent_sol(error));			//2 algorithms all fail
+	EXPECT_TRUE(ta.consistent_sol_val(error));			//2 algorithms all fail
 	cout<<ta<<endl;										//nothing is shown becuase there are more than
 	
 	
@@ -128,7 +128,7 @@ TEST(TestAnalyser, only_one_test_and_fails){
 	
 	ta.analyser();
 	int error;
-	EXPECT_TRUE(ta.is_consistent_sol(error));			//1 algorithm only
+	EXPECT_TRUE(ta.consistent_sol_val(error));			//1 algorithm only
 	cout<<ta<<endl;										//shows results 
 	
 	

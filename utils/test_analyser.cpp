@@ -313,34 +313,33 @@ int TestAnalyser::analyser(info_t* info){
 return OK;
 }
 
-bool TestAnalyser::is_consistent_sol(int& num_error){
-/////////////////
-// Returns TRUE if at least one solution (or just one solution) exists and it is consistent
-// Returns num_error: -1 ok, 0 nothing to compare with, 1-N the first algorithm different from the one run first
+bool TestAnalyser::consistent_sol_val(int& num_error){
 
-	num_error=-1;
-	bool consistent_sol=true;
+	num_error = -1;
+	bool same_sol = true;
 
-	//test emptyness
+	//check no reported solutions
 	if (arrayOfAvSol.empty()){
-		LOG_ERROR("no solutions available");
-		num_error=0;
+		LOG_ERROR("No reported solutions, possibly all timed -  TestAnalyser::is_consistent_sol");
+		num_error = 0;	
 		return false;
 	}
 
-	consistent_sol = true;
+	//iterates over the array of avergaed solutions
+	same_sol = true;
 	double firstItem = arrayOfAvSol.front();
-	int count=0;
-	for (vector<double>::const_iterator it = arrayOfAvSol.begin()+1; it != arrayOfAvSol.end() ; it++) {
-		count++;
+	for (auto it = arrayOfAvSol.begin() + 1; it != arrayOfAvSol.end() ; it++) {
+		
+		//finds a different solution
 		if(*it != firstItem) {
-			consistent_sol = false;
-			num_error=count;
+			same_sol = false;
+			num_error = std::distance (arrayOfAvSol.begin(), it);		//CHECK (20/01/2015)
 			break;
 		}
+
 	}
 
-return consistent_sol;
+	return same_sol;
 }
 
 bool TestAnalyser::is_consistent_array_of_tests()
