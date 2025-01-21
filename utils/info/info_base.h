@@ -18,6 +18,7 @@ namespace com {
 
 	using tpoint_t = PrecisionTimer::timepoint_t;
 
+
 	//////////////////////
 	//
 	//	infoBase
@@ -31,7 +32,25 @@ namespace com {
 	struct infoBase {
 		
 		enum phase_t { SEARCH = 0, PREPROC, LAST_INCUMBENT, PARSE };
+
+	/////////////////////
+	// getters
+
+		std::string name			() const { return name_; }
+		uint32_t number_of_vertices	() const { return N_; }
+		uint64_t number_of_edges	() const { return M_; };
+		uint32_t K					() const { return K_; };
+		double time_out				() const { return TIME_OUT_; };
+		double time_out_heur		() const { return TIME_OUT_HEUR_; }
+		int search_algorithm		() const { return algSearch_; }
+		int heuristic_algorithm		() const { return algHeur_; }
+		int sorting_algorithm		() const { return algSort_; }
+		double parsing_time			() const { return timeParse_; }
+		double preprocessing_time	() const { return timePreproc_; }
+		double search_time			() const { return timeSearch_; }
+		double incumbent_time		() const { return timeIncumbent_; }
 		
+		//////////////////////
 
 		/*
 		* @brief elapsed time from start_time to now
@@ -93,7 +112,7 @@ virtual std::ostream& printReport		(std::ostream & o = std::cout, bool is_endl =
 		/////////////////////
 		//general info
 				
-		std::string nameInstance_	= "";								//instance name
+		std::string name_	= "";								//instance name
 		uint32_t N_ = 0;												//number of vertices
 		uint64_t M_ = 0;												//number of edges		
 		uint32_t K_ = 0;												//for k-clique search

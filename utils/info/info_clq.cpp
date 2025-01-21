@@ -29,13 +29,13 @@ namespace com {
 	template<class W_t>
 	std::ostream& infoCLQ<W_t>::printReport(std::ostream& o, bool is_endl) const
 	{
-		o   << nameInstance_.c_str() << "\t" << N_ << "\t" << M_ << "\t"
+		o   << name_.c_str() << "\t" << N_ << "\t" << M_ << "\t"
 			<< TIME_OUT_ << "\t" << TIME_OUT_HEUR_ << "\t"
 			<< algSearch_ << "\t"
 			<< algSort_ << "\t" << algSortReal_ << "\t" << isAlgSortRealDeg_ << "\t"
 			<< algHeur_ << "\t"
 			<< branchingFactorRoot_ << "\t" 
-			<< lbRootNoHeur_ << "\t" << lbRootHeur_ << "\t" 
+			<< lbRootBasicHeur_ << "\t" << lbRootStrongHeur_ << "\t" 
 			<< lb_ << "\t" << ub_ << "\t" << ubRoot_ << "\t"
 			<< timeParse_ << "\t" << timePreproc_ << "\t" << timeIncumbent_ << "\t" << timeSearch_ << "\t" << isTimeOut_ << "\t"
 			<< nSteps_ << "\t";
@@ -54,8 +54,8 @@ namespace com {
 	template<class W_t>
 	void infoCLQ<W_t>::clearPreprocInfo()
 	{
-		lbRootNoHeur_ = 0.0; 
-		lbRootHeur_ = 0.0;
+		lbRootBasicHeur_ = 0.0; 
+		lbRootStrongHeur_ = 0.0;
 		branchingFactorRoot_ = 0;
 		algSortReal_ = -1;
 		isAlgSortRealDeg_ = false;

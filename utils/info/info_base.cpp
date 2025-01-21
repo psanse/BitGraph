@@ -21,7 +21,7 @@ namespace com {
 	std::ostream& infoBase::printParams(std::ostream& o) const
 	{	
 		o << "*****************************\n";
-		o << "DATA:" << nameInstance_.c_str() << "\t N:" << N_ << "\t M:" << M_ << "\t D:" << 2 * M_ / (float)((N_ - 1) * N_) << endl;
+		o << "DATA:" << name_.c_str() << "\t N:" << N_ << "\t M:" << M_ << "\t D:" << 2 * M_ / (float)((N_ - 1) * N_) << endl;
 		o << "TIME_LIMIT:" << TIME_OUT_ << endl;
 		o << "TIME_LIMIT_HEUR:" << TIME_OUT_HEUR_ << endl;
 		o << "ALG:" << algSearch_ << endl;
@@ -51,7 +51,7 @@ namespace com {
 
 	std::ostream& infoBase::printReport(std::ostream& o, bool is_endl) const
 	{
-		o << nameInstance_.c_str() << "\t" << N_ << "\t" << M_ << "\t" << TIME_OUT_ << "\t" << TIME_OUT_HEUR_ << "\t"
+		o << name_.c_str() << "\t" << N_ << "\t" << M_ << "\t" << TIME_OUT_ << "\t" << TIME_OUT_HEUR_ << "\t"
 		  << algSearch_ << "\t"
 		  << algSort_ << "\t"
 		  << algHeur_ << "\t"
@@ -162,7 +162,7 @@ namespace com {
 
 	void infoBase::clearGeneralInfo() {
 	
-		nameInstance_.clear();
+		name_.clear();
 		N_ = 0;
 		M_ = 0;
 		K_ = 0;

@@ -25,16 +25,38 @@ namespace com{
 
 	template<class W_t = int>
 	struct infoCLQ : public com::infoBase
-	{		
+	{	
+
+	/////////////////////
+	// getters
+
+		//preprocessing
+		W_t lb_root										() const { return std::max(lbRootBasicHeur_, lbRootStrongHeur_); }
+		W_t lb_root_basic_heur							() const { return lbRootBasicHeur_; }
+		W_t lb_root_strong_heur							() const { return lbRootStrongHeur_; }
+		W_t ub_root										() const { return ubRoot_; }
+		std::size_t branching_factor_root				() const { return branchingFactorRoot_; }
+		int real_sorting_algorithm						() const { return algSortReal_; }
+		bool is_real_sorting_algorithm_degree_based		() const { return isAlgSortRealDeg_; }
+
+		//search
+		W_t lb							 () const { return lb_; }
+		W_t ub							 () const { return ub_; }
+		uint64_t number_of_steps		 () const { return nSteps_; }
+		bool is_time_out				 () const { return isTimeOut_; }
+		const std::vector<int>& solution () const { return sol_; }
+
+		///////////////////////
+
 		/**
 		* @brief clears context
 		* @param lazy - if true general info is not cleared
 		**/
-		void clear(bool lazy = false) override;
+		void clear						(bool lazy = false) override;
 
 	protected:
-		void clearPreprocInfo();
-		virtual void clearSearchInfo();
+		void clearPreprocInfo			();
+		virtual void clearSearchInfo	();
 
 		///////////
 		//I/O
@@ -46,7 +68,7 @@ namespace com{
 		* @returns output stream
 		*
 		**/
-		std::ostream& printSummary(std::ostream & = std::cout) const;										//results (summary) in nice format for console			
+		std::ostream& printSummary		(std::ostream & = std::cout) const;										//results (summary) in nice format for console			
 
 		/**
 		*
@@ -56,7 +78,7 @@ namespace com{
 		* @returns output stream
 		*
 		**/
-		std::ostream& printReport(std::ostream & = std::cout, bool is_endl = false) const override;		//results in table format for output file
+		std::ostream& printReport		(std::ostream & = std::cout, bool is_endl = false) const override;		//results in table format for output file
 
 		/////////////////////
 		//data members
@@ -66,8 +88,8 @@ namespace com{
 		//////////////////////
 
 		//LB bounds - root
-		W_t lbRootNoHeur_ = 0;						//LB at root node (without a sophisticated heur, can use a simple heur)
-		W_t lbRootHeur_ = 0;						//LB at root node (sophisticated heur, e.g. AMTS)
+		W_t lbRootBasicHeur_ = 0;						//LB at root node (without a sophisticated heur, can use a simple heur)
+		W_t lbRootStrongHeur_ = 0;						//LB at root node (sophisticated heur, e.g. AMTS)
 				
 		//UB bounds root
 		W_t ubRoot_ = 0;							//UB at root node (size of the graph) 
@@ -81,7 +103,7 @@ namespace com{
 		// Search info (main params)
 		////////////////////
 
-		W_t lb_ = 0;								//incumbent solution value found during search (initially - max(lbRootHeur_, lbRootNoHeur_), optimum if isTimeOut_=false)
+		W_t lb_ = 0;								//incumbent solution value found during search (initially - max(lbRootStrongHeur_, lbRootNoHeur_), optimum if isTimeOut_=false)
 		W_t ub_ = 0;								//upper bound found during search (initially - ubRoot_)
 		uint64_t nSteps_ = 0;						//recursive calls to the algorithm		
 		bool  isTimeOut_ = false;					//flag time out	
