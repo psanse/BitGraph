@@ -12,6 +12,7 @@ add_library (utils
     benchmark.cpp 
     result.cpp
     test_analyser.cpp
+    info_analyser.cpp
     common.cpp
     common_types.cpp
     info/info_base.cpp
@@ -44,7 +45,8 @@ add_executable (test_utils ./tests/gtest_main.cc
     #tests/test_result.cpp
    
     #  TESTS BEING CHECKED
-      tests/test_testAnalyser.cpp
+    #  tests/test_testAnalyser.cpp
+       tests/test_infoAnalyser.cpp
     
     # TESTS CHECKED
     # tests/test_common.cpp

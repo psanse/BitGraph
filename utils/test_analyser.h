@@ -20,7 +20,7 @@
 
 //aliases
 using  vres_t = std::vector<Result>;
-using  itres_t = std::vector<Result>::iterator;
+//using  itres_t = std::vector<Result>::iterator;
 
 //////////////////////////
 // 

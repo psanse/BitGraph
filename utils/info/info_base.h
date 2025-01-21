@@ -112,7 +112,7 @@ virtual std::ostream& printReport		(std::ostream & o = std::cout, bool is_endl =
 		/////////////////////
 		//general info
 				
-		std::string name_	= "";								//instance name
+		std::string name_	= "";										//instance name
 		uint32_t N_ = 0;												//number of vertices
 		uint64_t M_ = 0;												//number of edges		
 		uint32_t K_ = 0;												//for k-clique search

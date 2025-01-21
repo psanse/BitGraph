@@ -15,6 +15,7 @@
 #include <vector>
 
 namespace com{
+
 	//////////////////////
 	//
 	//	infoCLQ struct
@@ -26,6 +27,7 @@ namespace com{
 	template<class W_t = int>
 	struct infoCLQ : public com::infoBase
 	{	
+		using basic_type = W_t;
 
 	/////////////////////
 	// getters
@@ -88,8 +90,8 @@ namespace com{
 		//////////////////////
 
 		//LB bounds - root
-		W_t lbRootBasicHeur_ = 0;						//LB at root node (without a sophisticated heur, can use a simple heur)
-		W_t lbRootStrongHeur_ = 0;						//LB at root node (sophisticated heur, e.g. AMTS)
+		W_t lbRootBasicHeur_ = 0;					//LB at root node (without a sophisticated heur, can use a simple heur)
+		W_t lbRootStrongHeur_ = 0;					//LB at root node (sophisticated heur, e.g. AMTS)
 				
 		//UB bounds root
 		W_t ubRoot_ = 0;							//UB at root node (size of the graph) 
