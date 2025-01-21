@@ -29,26 +29,30 @@
 template<class AlgInfo_t>
 class InfoAnalyser {
 
+	//potentially useful types
 	using vInfo_t = std::vector<AlgInfo_t>;
 	using basic_type = AlgInfo_t;
 	using type = InfoAnalyser<AlgInfo_t>;
 	using W_t = typename AlgInfo_t::basic_type;
-
-	enum { ERR = -1, OK = 0 };
-	
-	//streams the report of the InfoAnalyser
+		
+	/**
+	* @brief Streams the report of the InfoAnalyser - main driver for the class
+	* param o: input/output stream
+	* param t: InfoAnalyser object
+	**/
 	template<class AlgInfo_t> 
 	friend std::ostream& operator << (std::ostream& o, const InfoAnalyser<AlgInfo_t>& t);
 	
 public:
 
-	//printing options
+	//streaming options
 	enum  {
 		NAME = 0x01, STEPS = 0x02, SOL = 0x04, STDDEV_SOL = 0x08, MAX_SOL = 0x10,
 		STDDEV_STEPS = 0x20, TIME = 0x40, NFAIL = 0x80, NCONT = 0x100, LOWER_BOUND = 0x200,
 		SIZE = 0x400, EDGES = 0x800, SORT = 0x1000, TIMEOUT = 0x2000, ALG = 0x4000, TIMEPRE = 0x8000
 	};
 
+	//streaming configurations
 	static const int DEFAULT_PRINT_MODE = NAME | SIZE | EDGES | SORT | TIMEOUT | SOL | LOWER_BOUND | STEPS/*|NFAIL*/ | TIME/*|NCONT*/ | TIMEPRE	;
 	//static const int DEFAULT_PRINT_MODE = NAME | SOL | LOWER_BOUND | STEPS | NFAIL | TIME | NCONT;
 	
@@ -195,15 +199,15 @@ private:
 	std::vector<double>					arrayOfAvSol;
 	std::vector<double>					arrayOfAvLB;
 	std::vector<double>					arrayOfAvSteps;			//random
-	
+	std::vector<std::vector<double>>	arrayOfCounters;		//[alg][counter] - currently not used
 	std::vector<double>					arrayOfMaxSol;	
 	std::vector<int>					arrayOfFails;			
-	std::vector<std::vector<double> >	arrayOfCounters;		//[alg][counter]
-
+	
 	//E/S
 	int print_mode_;
 
 	//TODO
+	
 	//std::vector<double>				arrayOfSdTime;			//for std deviations analysis
 	//std::vector<double>				arrayOfSdSol;			//for std deviations analysis	
 

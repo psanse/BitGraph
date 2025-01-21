@@ -165,14 +165,14 @@ template<class AlgInfo_t>
 int InfoAnalyser<AlgInfo_t>::analyser(info_t* info){
 
 	//updates nRep_, nAlg_ values / checks consistency
-	if(make_consistent() == ERR){
+	if(make_consistent() == -1){
 		if (nRep_ <= 0) {
 			LOGG_ERROR("Error in number of repetitions: ", nRep_, "InfoAnalyser<AlgInfo_t>::analyser");
 		}
 		if(nAlg_ <= 0){
 			LOGG_ERROR("Error in number of algorithms: ", nAlg_, "InfoAnalyser<AlgInfo_t>::analyser");
 		}
-		return ERR;
+		return -1;
 	}
 
 	///////////////////////////
@@ -313,7 +313,7 @@ int InfoAnalyser<AlgInfo_t>::analyser(info_t* info){
 
 	//TODO - STANDARD DEVIATION ANALYSIS
 	
-return OK;
+return 0;
 }
 
 template<class AlgInfo_t>
@@ -440,14 +440,14 @@ std::ostream& InfoAnalyser<AlgInfo_t>::print_single_rep	(ostream & o, int nRep, 
 template<class AlgInfo_t>
 int InfoAnalyser<AlgInfo_t>::make_consistent(){
 		
-	int retVal = OK;
+	int retVal = 0;
 
 	///////////////////////////////////////////////////////////////
 	nRep_ = arrayOfTests_.size();
 	(nRep_ > 0)?  nAlg_ = arrayOfTests_[0].size() :  nAlg_=0;
 	///////////////////////////////////////////////////////////////	
 	
-	(nRep_ > 0 && nAlg_ > 0)? retVal = OK : retVal = ERR;
+	(nRep_ > 0 && nAlg_ > 0)? retVal = 0 : retVal = -1;
 	return retVal;
 }
 
