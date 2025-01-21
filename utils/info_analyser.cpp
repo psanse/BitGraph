@@ -109,7 +109,7 @@ std::ostream& operator << (std::ostream& o, const InfoAnalyser<AlgInfo_t>& t)
 			}	*/
 
 
-			//separator for diffent algs of same instance
+			//separator for different algorithms
 			if (i < (t.nAlg_ - 1)) {
 				o << "| ";
 			}
