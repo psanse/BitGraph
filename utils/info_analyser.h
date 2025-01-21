@@ -23,10 +23,12 @@
 //////////////////////////
 // 
 // InfoAnalyser class
+// 
+// Analyses the result of an algorithm (AlgInfo_t type)
 //
 //////////////////////////
 
-template<class AlgInfo_t>
+template<class AlgInfo_t>								
 class InfoAnalyser {
 
 	//potentially useful types
