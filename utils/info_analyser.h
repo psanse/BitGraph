@@ -28,17 +28,18 @@
 
 template<class AlgInfo_t>
 class InfoAnalyser {
-	
-	//streams the report of the InfoAnalyser - main driver
-	template<class AlgInfo_t> 
-	friend std::ostream& operator << (std::ostream& o, const InfoAnalyser<AlgInfo_t>& t);
-
-	enum { ERR = -1, OK = 0 };
 
 	using vInfo_t = std::vector<AlgInfo_t>;
 	using basic_type = AlgInfo_t;
+	using type = InfoAnalyser<AlgInfo_t>;
 	using W_t = typename AlgInfo_t::basic_type;
 
+	enum { ERR = -1, OK = 0 };
+	
+	//streams the report of the InfoAnalyser
+	template<class AlgInfo_t> 
+	friend std::ostream& operator << (std::ostream& o, const InfoAnalyser<AlgInfo_t>& t);
+	
 public:
 
 	//printing options

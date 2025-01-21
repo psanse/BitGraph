@@ -17,6 +17,7 @@
 
 using namespace std;
 
+
 template<class AlgInfo_t>
 std::ostream& operator << (std::ostream& o, const InfoAnalyser<AlgInfo_t>& t)
 {
