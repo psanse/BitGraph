@@ -86,13 +86,13 @@ public:
 /////////////////////
 //setters/getters
 	
-	std::vector<vInfo_t> get_tests			()			{ return arrayOfTests_; }
-	std::vector<double>	get_times			()			{ return arrayOfAvTimes; }
-	std::vector<double>	get_times_preproc	()			{ return arrayOfAvPreProcTimes; }
-	std::vector<double>	get_sol				()			{ return arrayOfAvSol; }
-	std::vector<double>	get_steps			()			{ return arrayOfAvSteps; }
-	std::vector<vector<double>>get_counters	()			{ return arrayOfCounters; }
-	AlgInfo_t			get_result			(int idAlg) { return arrayOfTests_[0][idAlg]; }		//returns the result of the first instance of the idAlg run
+	std::vector<vInfo_t>& get_tests				()			{ return arrayOfTests_; }
+	std::vector<double> & get_times				()			{ return arrayOfAvTimes; }
+	std::vector<double> & get_times_preproc		()			{ return arrayOfAvPreProcTimes; }
+	std::vector<double> & get_sol				()			{ return arrayOfAvSol; }
+	std::vector<double> & get_steps				()			{ return arrayOfAvSteps; }
+	std::vector<vector<double>> &get_counters 	()			{ return arrayOfCounters; }
+	AlgInfo_t&			get_result				(int idAlg) { return arrayOfTests_[0][idAlg]; }		//returns the result of the first instance of the idAlg run
 
 	int number_of_repetitions				()			{ return nRep_; }
 	int number_of_algorithms				()			{ return nAlg_; }		
