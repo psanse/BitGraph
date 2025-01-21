@@ -135,7 +135,7 @@ void InfoAnalyser< AlgInfo_t>::clear()
 	arrayOfFails.clear();
 	arrayOfAvLB.clear();
 	arrayOfAvSteps.clear();
-	arrayOfCounters.clear();
+	arrayOfCounters.clear();			//[nAlg][nCounters] - currently not used
 	arrayOfMaxSol.clear();
 	nAlg_ = 0;
 	nRep_ = 0;
