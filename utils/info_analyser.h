@@ -48,10 +48,11 @@ class InfoAnalyser {
 public:
 
 	//streaming options
-	enum  {
+	enum : uint64_t  {
 		NAME = 0x01, STEPS = 0x02, SOL = 0x04, STDDEV_SOL = 0x08, MAX_SOL = 0x10,
 		STDDEV_STEPS = 0x20, TIME = 0x40, NFAIL = 0x80, NCONT = 0x100, LOWER_BOUND = 0x200,
-		SIZE = 0x400, EDGES = 0x800, SORT = 0x1000, TIMEOUT = 0x2000, ALG = 0x4000, TIMEPRE = 0x8000
+		SIZE = 0x400, EDGES = 0x800, SORT = 0x1000, TIMEOUT = 0x2000, ALG = 0x4000, TIMEPRE = 0x8000,
+		NREP = 0x10000 
 	};
 
 	//streaming configurations
@@ -160,21 +161,22 @@ public:
 // I/O
 
 	/**
-	* @brief Streams individual results of algorithm idAlg 
-	* @param idAlg: algorithm number, if -1 all algorithms are reported (default value)
+	* @brief Streams individual results of algorithm algID 
+	* @param algID: algorithm number, if -1 all algorithms are reported (default value)
 	* @param o: input / output stream
 	* @returns the output stream
 	**/
-std::ostream& print_single				(std::ostream& o, int idAlg = -1 /*all alg*/);					//prints individual results of alg
+std::ostream& print_alg				(std::ostream& o, int algID = -1 /*all alg*/);					//prints individual results of alg
 	
 	/**
-	* @brief Reports a specific repetition nRep of an algorith idAlg
+	* @brief Reports a specific repetition nRep of an algorith algID
 	* @param o: input / output stream* 
 	* @param nRep: repetition number (1 based), if 0 all repetitions are reported (default value)
-	* @param idAlg: algorithm number, if -1 all algorithms are reported (default value) 
+	* @param algID: algorithm id, if -1 all algorithms are reported (default value) 
 	* @returns the output stream
 	**/
-std::ostream& print_single_rep			(std::ostream & o, int nRep = 0 /* 1 based*/, int idAlg = -1);
+std::ostream& print_rep				(std::ostream & o, int nRep = 0 /* 1 based*/, int algID = -1);
+
 
 //////////////	
 // Private interface

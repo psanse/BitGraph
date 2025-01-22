@@ -122,6 +122,7 @@ namespace com{
 	///////////////////////
 
 	struct infoCliSAT : public infoCLQ<int> {
+			
 
 		/**
 		* @brief clears search data.

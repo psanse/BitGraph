@@ -9,11 +9,12 @@
 #include "common.h"
 #include "logger.h"
 #include "info_analyser.h"
+#include "utils/info/info_clq.h"
 #include <iomanip>
 #include <math.h>
 #include <string>
 
-#include "utils/info/info_clq.h"
+
 
 using namespace std;
 
@@ -355,85 +356,118 @@ bool InfoAnalyser<AlgInfo_t>::is_consistent_array_of_tests()
 }
 
 template<class AlgInfo_t>
-ostream& InfoAnalyser<AlgInfo_t>::print_single(ostream & o, int idAlg){
+ostream& InfoAnalyser<AlgInfo_t>::print_alg (ostream & o, int algID){
 
 	//update nRep_ and nAlg_ appropiately
 	make_consistent();
 	if(nRep_ == 0 || nAlg_ == 0 ){
-		LOG_ERROR("Empty tests - InfoAnalyser<AlgInfo_t>::print_single");
+		LOG_ERROR("Empty tests - InfoAnalyser<AlgInfo_t>::print_alg");
 		return o;
 	}
 
-	//default cases
-	if (idAlg == -1) {
-		idAlg = nAlg_;
+	//streams appropiate data
+	if  ( (algID == -1) || (algID > nAlg_) ) 	{
+
+		//all data
+
+		for (auto a = 0; a < nAlg_; ++a) {
+			for (auto r = 0; r < nRep_; ++r) {
+
+				try {
+					/////////////////////////////////
+					o << r << '\t';
+					o << arrayOfTests_[r][a];					//streams full data for each result, adds endl
+					/////////////////////////////////
+				}
+				catch (exception e) {
+					LOGG_ERROR("Bad output", " Test:", algID, " Rep:", r, "-InfoAnalyser<AlgInfo_t>::print_alg");
+					break;
+				}
+
+			}			
+		}
+		
 	}
 	else {
-		(idAlg > nAlg_) ? idAlg = nAlg_ : 1;
-	}
-	
-	o << "------------------------------------------" << endl;
-	
-	for(auto r = 0; r < nRep_; ++r){
-		for(auto a = 0; a < idAlg; ++a){
 
-			/////////////////////////////////
-			o<<arrayOfTests_[r][a]<<" ";
-			/////////////////////////////////
+		//single algorithm
+
+		for (auto r = 0; r < nRep_; ++r) {
+
+			try {
+
+				/////////////////////////////////
+				o << r << '\t';
+				o << arrayOfTests_[r][algID];						//streams full data for each result, adds endl
+				/////////////////////////////////
+				
+			}
+			catch (exception e) {
+				LOGG_ERROR("Bad output", " Test:", algID, " Rep:", r, "-InfoAnalyser<AlgInfo_t>::print_single");
+				break;
+			}
+
 		}
-		o << endl;
 	}
-
-	o << "------------------------------------------" << endl;
-
+	
 	return o;
 }
 
 template<class AlgInfo_t>
-std::ostream& InfoAnalyser<AlgInfo_t>::print_single_rep	(ostream & o, int nRep, int idAlg){
+std::ostream& InfoAnalyser<AlgInfo_t>::print_rep(ostream& o, int nRep, int algID) {
 
-	//assert
-	if (nRep < 0) {
-		LOG_ERROR("incorrect number of repetitions", nRep, "-InfoAnalyser<AlgInfo_t>::print_single_rep");
-		return o;
-	}
-	
 	//update nRep_ and nAlg_ appropiately
 	make_consistent();
-	if(nRep_==0 || nAlg_==0 ){
-		LOG_ERROR("Empty tests - InfoAnalyser<AlgInfo_t>::print_single_rep");
+
+	////////////////
+	//assertions
+	if (nRep < 1 || nRep > nRep_) {
+		LOG_ERROR("incorrect number of repetitions", nRep, "-InfoAnalyser<AlgInfo_t>::print_rep");
 		return o;
-	}	
-
-	//default cases
-	if (idAlg == -1){
-		idAlg = nAlg_; 
 	}
-	else if (idAlg > nAlg_) {
-		idAlg = nAlg_;
+
+	if (nRep_ == 0 || nAlg_ == 0) {
+		LOG_WARNING("Empty tests - InfoAnalyser<AlgInfo_t>::print_single_rep");
+		return o;
 	}
-	if (nRep > nRep_) {
-		nRep = nRep_;
-	}
-		
-	//Streams data: Exception possible because nRep is not Synchro
-	o << "------------------------------------------" << endl;
-	
-	for(int a = 0; a < idAlg; ++a){
+	/////////////////
 
-		try{
+	//streams appropiate data
+	if ((algID == -1) || (algID > nAlg_)) {
 
-			////////////////////////////////////////
-			o << arrayOfTests_[nRep - 1][a]<<" ";				//nRep is 1-based
-			////////////////////////////////////////
+		//all algorithms - single repetition (index 1-based) 
 
-		}catch(exception e){
-			LOGG_ERROR("Bad output", " Test:", a, " Rep:", nRep,  "-InfoAnalyser<AlgInfo_t>::print_single_rep");
-			break;
+		for (auto a = 0; a < nAlg_; ++a) {
+
+			try {
+				/////////////////////////////////
+				o << nRep << '\t';
+				o << arrayOfTests_[nRep - 1][algID];					//streams full data for each result, adds endl
+				/////////////////////////////////
+			}
+			catch (exception e) {
+				LOGG_ERROR("Bad output", " Test:", algID, " Rep:", nRep, "-InfoAnalyser<AlgInfo_t>::print_rep");
+				break;
+			}
 		}
+
+	}
+	else {
+
+		//single algorithm, single repetition (jndex 1-based)
+
+		try {
+			/////////////////////////////////
+			o << nRep << '\t';
+			o << arrayOfTests_[nRep - 1][algID];							//streams full data for each result, adds endl
+			/////////////////////////////////
+		}
+		catch (exception e) {
+			LOGG_ERROR("Bad output", " Test:", algID, " Rep:", nRep, "-InfoAnalyser<AlgInfo_t>::print_single");
+		}
+
 	}
 
-	o << "------------------------------------------" << endl;
 	return o;
 }
 
