@@ -43,8 +43,7 @@ protected:
 		}
 	}
 	void TearDown() override {}
-
-	//directed graph instance	
+		
 	InfoAnalyser<com::infoCLQ<int>> ta;
 };
 
@@ -143,7 +142,7 @@ TEST(InfoAnalyser, info){
 }
 
 
-TEST(TestAnalyser, all_fail){
+TEST(TestAnalyser, all_timeout){
 		
 	InfoAnalyser<com::infoCLQ<int>> ta;
 
