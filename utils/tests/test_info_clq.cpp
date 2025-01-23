@@ -17,7 +17,7 @@ class InfoCLQTest : public ::testing::Test {
 protected:   
     void SetUp() override {
         // Initialize any necessary data here
-        info.nameInstance_ = "test";
+        info.name_ = "test";
 		info.N_ = 10;
 		info.M_ = 20;
     }
@@ -32,8 +32,8 @@ protected:
 TEST_F(InfoCLQTest, DefaultConstructor) {
 	
     //preproc info
-    EXPECT_EQ(info.lbRootNoHeur_, 0);
-    EXPECT_EQ(info.lbRootHeur_, 0);
+    EXPECT_EQ(info.lbRootBasicHeur_, 0);
+    EXPECT_EQ(info.lbRootStrongHeur_, 0);
     EXPECT_EQ(info.branchingFactorRoot_, 0);
     EXPECT_EQ(info.algSortReal_, -1);
     EXPECT_FALSE(info.isAlgSortRealDeg_);
@@ -59,8 +59,8 @@ TEST_F(InfoCLQTest, DefaultConstructor) {
 
 TEST_F(InfoCLQTest, Clear) {
 
-    info.lbRootNoHeur_ = 10.0;
-    info.lbRootHeur_ = 20.0;
+    info.lbRootBasicHeur_ = 10.0;
+    info.lbRootStrongHeur_ = 20.0;
     info.branchingFactorRoot_ = 5;
     info.algSortReal_ = 1;
     info.isAlgSortRealDeg_= true;
@@ -74,8 +74,8 @@ TEST_F(InfoCLQTest, Clear) {
 	//lazy cleaning - does not clean general info
     info.clear(true);
 
-    EXPECT_EQ(info.lbRootNoHeur_, 0);
-    EXPECT_EQ(info.lbRootHeur_, 0);
+    EXPECT_EQ(info.lbRootBasicHeur_, 0);
+    EXPECT_EQ(info.lbRootStrongHeur_, 0);
     EXPECT_EQ(info.branchingFactorRoot_, 0);
     EXPECT_EQ(info.algSortReal_, -1);
     EXPECT_FALSE(info.isAlgSortRealDeg_);
@@ -89,7 +89,7 @@ TEST_F(InfoCLQTest, Clear) {
 	//general info available
     EXPECT_EQ(10, info.N_);
 	EXPECT_EQ(20, info.M_);
-	EXPECT_STREQ("test", info.nameInstance_.c_str());
+	EXPECT_STREQ("test", info.name_.c_str());
   
     //cleans general info
     info.clear(false);
@@ -97,7 +97,7 @@ TEST_F(InfoCLQTest, Clear) {
     //general info unavailable
     EXPECT_EQ(0, info.N_);
     EXPECT_EQ(0, info.M_);
-    EXPECT_TRUE(info.nameInstance_.empty());
+    EXPECT_TRUE(info.name_.empty());
 }
 
 

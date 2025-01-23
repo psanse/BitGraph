@@ -27,11 +27,7 @@ namespace com {
 		o << "ALG:" << algSearch_ << endl;
 		o << "SORTING:" << algSort_ << endl;
 		o << "HEUR:" << algHeur_ << endl;
-		o << "*****************************" << endl;
-		
-		if (K_ != 0) {
-			o << "MAX UB:" << K_ << endl;
-		}
+		o << "*****************************" << endl;		
 			
 		return o;
 	}
@@ -165,7 +161,6 @@ namespace com {
 		name_.clear();
 		N_ = 0;
 		M_ = 0;
-		K_ = 0;
 		TIME_OUT_		= std::numeric_limits<double>::max();
 		TIME_OUT_HEUR_  = std::numeric_limits<double>::max();
 		algSearch_ = -1;

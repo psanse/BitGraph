@@ -46,7 +46,7 @@ add_executable (test_utils ./tests/gtest_main.cc
    
     #  TESTS BEING CHECKED
     #  tests/test_testAnalyser.cpp
-       tests/test_infoAnalyser.cpp
+      tests/test_infoAnalyser.cpp
     
     # TESTS CHECKED
     # tests/test_common.cpp

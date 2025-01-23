@@ -32,6 +32,13 @@ namespace com{
 	/////////////////////
 	// getters
 
+		////////
+		//additional configuration params
+
+		//for k-clique search
+		W_t k_value										()	const { return K_; }			
+
+		//////////
 		//preprocessing
 		W_t lb_root										() const { return std::max(lbRootBasicHeur_, lbRootStrongHeur_); }
 		W_t lb_root_basic_heur							() const { return lbRootBasicHeur_; }
@@ -41,12 +48,13 @@ namespace com{
 		int real_sorting_algorithm						() const { return algSortReal_; }
 		bool is_real_sorting_algorithm_degree_based		() const { return isAlgSortRealDeg_; }
 
+		//////////
 		//search
-		W_t lb							 () const { return lb_; }
-		W_t ub							 () const { return ub_; }
-		uint64_t number_of_steps		 () const { return nSteps_; }
-		bool is_time_out				 () const { return isTimeOut_; }
-		const std::vector<int>& solution () const { return sol_; }
+		W_t lb											() const { return lb_; }
+		W_t ub											() const { return ub_; }
+		uint64_t number_of_steps						() const { return nSteps_; }
+		bool is_time_out								() const { return isTimeOut_; }
+		const std::vector<int>& solution				() const { return sol_; }
 
 		///////////////////////
 
@@ -63,6 +71,15 @@ namespace com{
 		///////////
 		//I/O
 	public:
+
+		/*
+		* @brief streams additional general info wrt to infobase::printParams
+		* @param o: output stream
+		* @returns output stream
+		*/
+		std::ostream& printParams(std::ostream& o = std::cout) const override;
+
+
 		/**
 		*
 		* @brief streams main search info: sol value, times and number of steps
@@ -82,8 +99,12 @@ namespace com{
 		**/
 		std::ostream& printReport		(std::ostream & = std::cout, bool is_endl = false) const override;		//results in table format for output file
 
-		/////////////////////
-		//data members
+/////////////////////
+//data members
+
+		//////////////////////
+		//  Additional configuration params 
+		uint32_t K_ = 0;							//for k-clique search
 
 		//////////////////////
 		//  Preproc info  

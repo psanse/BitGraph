@@ -47,6 +47,41 @@ protected:
 	InfoAnalyser<com::infoCLQ<int>> ta;
 };
 
+TEST_F(InfoAnalyserTest, toFile) {
+
+	string strReport("infoAnalyser.txt");
+
+	EXPECT_EQ(NUM_REP, ta.number_of_repetitions());
+	EXPECT_EQ(NUM_ALG, ta.number_of_algorithms());
+
+	//streaming of the tests results 
+
+	//I/O
+	//ta.print_alg(FILE_LOG(strReport.c_str(), WRITE), -1);
+	//ta.print_alg(FILE_LOG(strReport.c_str(), WRITE), 1);
+	//ta.print_rep(FILE_LOG(strReport.c_str(), WRITE), 7 );
+
+	//streaming of the analyser results (summary of averages for all the algorithms)
+	ta.analyser();
+
+	///////////////////////////////////////
+	int algDiffId = -1;
+	EXPECT_TRUE(ta.check_test_consistency());
+	EXPECT_TRUE(ta.check_solution_values(algDiffId));
+	//////////////////////////////////////
+
+	///////////////////////////////////////
+	EXPECT_EQ(10, ta.get_steps().at(0));
+	EXPECT_EQ(11, ta.get_steps().at(1));
+	///////////////////////////////////////
+
+	//I/O
+	//ta.print_analyser_summary(FILE_LOG(strReport.c_str(), WRITE));
+
+	//streams to console the print_analyser_summary
+	//cout << ta << endl;											
+}
+
 TEST(InfoAnalyser, basic){
 		
 	auto duration = std::chrono::milliseconds(50);
@@ -82,6 +117,7 @@ TEST(InfoAnalyser, basic){
 	//////////////////
 	int retVal = ta.analyser();
 	EXPECT_EQ(0, retVal);
+	EXPECT_TRUE(ta.check_test_consistency());			//similar to the previous test
 	/////////////////
 
 	int errorIdx = -1;
@@ -116,7 +152,6 @@ TEST(InfoAnalyser, info){
 			new_rep = false;
 		}
 				
-		EXPECT_TRUE(ta.check_test_consistency());
 
 		//last algorithm (change the number of steps)
 		com::infoCLQ<int> info;
@@ -133,6 +168,7 @@ TEST(InfoAnalyser, info){
 	////////////////
 	int retVal = ta.analyser(&info);
 	EXPECT_EQ(0, retVal);
+	EXPECT_TRUE(ta.check_test_consistency());			//similar to the previous test
 	///////////////////
 
 	EXPECT_TRUE(info.same_sol);
@@ -142,7 +178,7 @@ TEST(InfoAnalyser, info){
 }
 
 
-TEST(TestAnalyser, all_timeout){
+TEST(InfoAnalyser, all_timeout){
 		
 	InfoAnalyser<com::infoCLQ<int>> ta;
 
@@ -165,11 +201,12 @@ TEST(TestAnalyser, all_timeout){
 	//////////////////
 	int retVal = ta.analyser();
 	EXPECT_EQ(0, retVal);
+	EXPECT_TRUE(ta.check_test_consistency());				//similar to the previous test
 	/////////////////
 
 
-	int errorIdx = -1;
-	EXPECT_TRUE(ta.check_solution_values( errorIdx) );			//2 algorithms all fail
+	int algDiffId = -1;
+	EXPECT_TRUE(ta.check_solution_values(algDiffId) );			//2 algorithms all fail
 
 	//I/O
 	/////////////////////
@@ -178,7 +215,7 @@ TEST(TestAnalyser, all_timeout){
 	
 }
 
-TEST(TestAnalyser, only_one_test_and_fails){
+TEST(InfoAnalyser, only_one_test_and_fails){
 		
 	InfoAnalyser<com::infoCLQ<int>> ta;
 	
@@ -203,8 +240,8 @@ TEST(TestAnalyser, only_one_test_and_fails){
 	EXPECT_EQ(0, retVal);
 	////////////////
 
-	int errorIdx = -1;
-	EXPECT_TRUE(ta.check_solution_values( errorIdx) );		//1 algorithm only
+	int algDiffId = -1;
+	EXPECT_TRUE(ta.check_solution_values(algDiffId) );		//1 algorithm only
 	
 	//I/O
 	/////////////////////
@@ -212,31 +249,3 @@ TEST(TestAnalyser, only_one_test_and_fails){
 	/////////////////////
 }
 
-TEST_F(InfoAnalyserTest, toFile) {
-
-	string strReport("infoAnalyser.txt");
-
-	EXPECT_EQ(NUM_REP, ta.number_of_repetitions());
-	EXPECT_EQ(NUM_ALG, ta.number_of_algorithms());
-
-	//streaming of the tests results 
-	 
-	//I/O
-	//ta.print_alg(FILE_LOG(strReport.c_str(), WRITE), -1);
-	//ta.print_alg(FILE_LOG(strReport.c_str(), WRITE), 1);
-	//ta.print_rep(FILE_LOG(strReport.c_str(), WRITE), 7 );
-
-	//streaming of the analyser results (summary of averages in a single line for all the algorithms)
-	ta.analyser();
-
-	///////////////////////////////////////
-	EXPECT_EQ(10, ta.get_steps().at(0));
-	EXPECT_EQ(11, ta.get_steps().at(1));
-	///////////////////////////////////////
-
-	//I/O
-	//ta.print_analyser_summary(FILE_LOG(strReport.c_str(), WRITE));
-	 
-	//streams to console the print_analyser_summary
-	//cout << ta << endl;											
-}

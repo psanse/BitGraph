@@ -18,6 +18,25 @@ namespace com {
 	// DERIVED CLASS
 
 	template<class W_t>
+	std::ostream& infoCLQ<W_t>::printParams(std::ostream& o ) const  {
+
+		o << "*****************************\n";
+		o << "DATA:" << name_.c_str() << "\t N:" << N_ << "\t M:" << M_ << "\t D:" << 2 * M_ / (float)((N_ - 1) * N_) << endl;
+		if (K_) {
+			o << "K-CLIQUE SEARCH:" << K_ << endl;
+		}
+		o << "TIME_LIMIT:" << TIME_OUT_ << endl;
+		o << "TIME_LIMIT_HEUR:" << TIME_OUT_HEUR_ << endl;
+		o << "ALG:" << algSearch_ << endl;
+		o << "SORTING:" << algSort_ << endl;
+		o << "HEUR:" << algHeur_ << endl;
+		o << "*****************************" << endl;
+
+		return o;
+
+	}
+
+	template<class W_t>
 	std::ostream& infoCLQ<W_t>::printSummary(std::ostream& o) const
 	{
 		o << "*****************************" << endl;
@@ -29,8 +48,11 @@ namespace com {
 	template<class W_t>
 	std::ostream& infoCLQ<W_t>::printReport(std::ostream& o, bool is_endl) const
 	{
-		o   << name_.c_str() << "\t" << N_ << "\t" << M_ << "\t"
-			<< TIME_OUT_ << "\t" << TIME_OUT_HEUR_ << "\t"
+		o << name_.c_str() << "\t" << N_ << "\t" << M_ << "\t";
+		if (K_) {
+			o << K_ << '\t';
+		}
+		o	<< TIME_OUT_ << "\t" << TIME_OUT_HEUR_ << "\t"
 			<< algSearch_ << "\t"
 			<< algSort_ << "\t" << algSortReal_ << "\t" << isAlgSortRealDeg_ << "\t"
 			<< algHeur_ << "\t"
@@ -83,10 +105,13 @@ namespace com {
 		clearPreprocInfo();
 		clearSearchInfo();
 
+		//additional config params
+		if (!lazy) { K_ = 0; }
+
 		::com::infoBase::clear(lazy);
+
+		
 	}
-
-
 
 
 
