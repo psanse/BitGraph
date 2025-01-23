@@ -15,11 +15,10 @@
 #include <string>
 
 
-
 using namespace std;
 
 template<class AlgInfo_t>
-std::ostream& operator << (std::ostream& o, const InfoAnalyser<AlgInfo_t>& t) { t.print_summary(o); return o; }
+std::ostream& operator << (std::ostream& o, const InfoAnalyser<AlgInfo_t>& t) { t.print_analyser_summary(o); return o; }
 
 template<class AlgInfo_t>
 void InfoAnalyser< AlgInfo_t>::clear()
@@ -33,8 +32,7 @@ void InfoAnalyser< AlgInfo_t>::clear()
 	arrayOfAvSteps.clear();
 	arrayOfCounters.clear();			//[nAlg][nCounters] - currently not used
 	arrayOfMaxSol.clear();
-	nAlg_ = 0;
-	nRep_ = 0;
+	
 	print_mode_ = DEFAULT_PRINT_MODE;
 
 	//arrayOfSdTime.clear();			//std dev reports - currently not implemented		
@@ -49,32 +47,37 @@ void InfoAnalyser<AlgInfo_t>::add_test(bool isNewRep, AlgInfo_t res){
 		vInfo_t v;
 		v.push_back(std::move(res));
 		arrayOfTests_.push_back(std::move(v));	
-		
-		nRep_=1;
-		nAlg_++;
 
 	}
 	else {
 
 		arrayOfTests_.back().push_back(std::move(res));		//new result in a current repetition/test
-		nRep_++;
+		
 	}
 }
 
 template<class AlgInfo_t>
-int InfoAnalyser<AlgInfo_t>::analyser(info_t* info){
+inline
+int InfoAnalyser<AlgInfo_t>::number_of_algorithms() const
+{ 
+	if (number_of_repetitions() > 0) {
+		return arrayOfTests_[0].size();
+	}
+	else {
+		return 0;
+	}
+}
 
-	//updates nRep_, nAlg_ values / checks consistency
-	if(make_consistent() == -1){
-		if (nRep_ <= 0) {
-			LOGG_ERROR("Error in number of repetitions: ", nRep_, "InfoAnalyser<AlgInfo_t>::analyser");
-		}
-		if(nAlg_ <= 0){
-			LOGG_ERROR("Error in number of algorithms: ", nAlg_, "InfoAnalyser<AlgInfo_t>::analyser");
-		}
+template<class AlgInfo_t>
+int InfoAnalyser<AlgInfo_t>::analyser (comp_t* pComp){
+	
+	auto nRep_ = number_of_repetitions();
+	auto nAlg_ = number_of_algorithms();
+	if(!check_test_consistency()){ 
+		LOGG_ERROR("Error in tests: - InfoAnalyser<AlgInfo_t>::analyser");
 		return -1;
 	}
-
+		
 	///////////////////////////
 	//analysis of the results
 	double avSol, avTimes, avPreProcTimes, avSteps, avLB;	
@@ -200,15 +203,15 @@ int InfoAnalyser<AlgInfo_t>::analyser(info_t* info){
 	}//endFor algorithms
 
 	//compares algorithms (use for comparison of two algorithms)
-	if(info != nullptr){
+	if(pComp != nullptr){
 
-		if (com::stl::all_equal(arrayOfAvSol))		{ info -> same_sol = true; }
-		if (com::stl::all_equal(arrayOfAvSteps))	{ info -> same_steps = true; }
-		if (com::stl::all_equal(arrayOfAvLB))		{ info -> same_lb = true; }
-		if (arrayOfAvSteps[0] > arrayOfAvSteps[1])	{ info -> steps_first_greater = true; }
+		if (com::stl::all_equal(arrayOfAvSol))		{ pComp-> same_sol = true; }
+		if (com::stl::all_equal(arrayOfAvSteps))	{ pComp-> same_steps = true; }
+		if (com::stl::all_equal(arrayOfAvLB))		{ pComp-> same_lb = true; }
+		if (arrayOfAvSteps[0] > arrayOfAvSteps[1])	{ pComp-> steps_first_greater = true; }
 		
-		info -> steps_lhs = arrayOfAvSteps[0]; 
-		info -> steps_rhs = arrayOfAvSteps[1]; 
+		pComp-> steps_lhs = arrayOfAvSteps[0];
+		pComp-> steps_rhs = arrayOfAvSteps[1];
 	}
 
 	//TODO - STANDARD DEVIATION ANALYSIS
@@ -247,32 +250,37 @@ bool InfoAnalyser<AlgInfo_t>::check_solution_values(int& num_error){
 }
 
 template<class AlgInfo_t>
-bool InfoAnalyser<AlgInfo_t>::check_array_of_tests()
+bool InfoAnalyser<AlgInfo_t>::check_test_consistency()
 {
-	return (	(nRep_ == arrayOfTests_.size())		&& 
-				(nAlg_ == arrayOfTests_[0].size())		);
+	auto nRep_ = number_of_repetitions();
+	auto nAlg_ = number_of_algorithms();
+	if (nRep_ <= 0 || nAlg_ <= 0) {
+		LOGG_ERROR("Error in tests: - InfoAnalyser<AlgInfo_t>::check_consistency_of_tests");
+		return false;
+	}
 
+	return true;
 }
 
 template<class AlgInfo_t>
 ostream& InfoAnalyser<AlgInfo_t>::print_alg (ostream & o, int algID) const{
 		
-	if(nRep_ == 0 || nAlg_ == 0 ){
-		LOG_ERROR("Empty tests - InfoAnalyser<AlgInfo_t>::print_alg");
-		return o;
-	}
-
+	auto nRep_ = number_of_repetitions();
+	auto nAlg_ = number_of_algorithms();
+	
+	///////////////
 	//streams appropiate data
 	if  ( (algID == -1) || (algID > nAlg_) ) 	{
 
 		//all data
 
+		algID = nAlg_;
 		for (auto a = 0; a < nAlg_; ++a) {
 			for (auto r = 0; r < nRep_; ++r) {
 
 				try {
 					/////////////////////////////////
-					o << r << '\t';
+					o << (a + 1) << '\t' << r << '\t';
 					o << arrayOfTests_[r][a];					//streams full data for each result, adds endl
 					/////////////////////////////////
 				}
@@ -294,8 +302,8 @@ ostream& InfoAnalyser<AlgInfo_t>::print_alg (ostream & o, int algID) const{
 			try {
 
 				/////////////////////////////////
-				o << r << '\t';
-				o << arrayOfTests_[r][algID];						//streams full data for each result, adds endl
+				o << algID << '\t' << r << '\t';
+				o << arrayOfTests_[r][algID - 1];						//streams full data for each result, adds endl
 				/////////////////////////////////
 				
 			}
@@ -313,18 +321,18 @@ ostream& InfoAnalyser<AlgInfo_t>::print_alg (ostream & o, int algID) const{
 template<class AlgInfo_t>
 std::ostream& InfoAnalyser<AlgInfo_t>::print_rep (ostream& o, int nRep, int algID) const {
 
-	////////////////
-	//assertions
-	if (nRep < 1 || nRep > nRep_) {
-		LOG_ERROR("incorrect number of repetitions", nRep, "-InfoAnalyser<AlgInfo_t>::print_rep");
-		return o;
+	auto nRep_ = number_of_repetitions();
+	auto nAlg_ = number_of_algorithms();
+
+	//assert / check nRep value
+	if (nRep <= 0) { 
+		LOG_WARNING("no repetitions available - InfoAnalyser<AlgInfo_t>::print_rep");
+		return o; 
 	}
 
-	if (nRep_ == 0 || nAlg_ == 0) {
-		LOG_WARNING("Empty tests - InfoAnalyser<AlgInfo_t>::print_single_rep");
-		return o;
-	}
-	/////////////////
+	//upper bound nRep_
+	if (nRep > nRep_) { nRep = nRep_; }
+	
 
 	//streams appropiate data
 	if ((algID == -1) || (algID > nAlg_)) {
@@ -335,8 +343,8 @@ std::ostream& InfoAnalyser<AlgInfo_t>::print_rep (ostream& o, int nRep, int algI
 
 			try {
 				/////////////////////////////////
-				o << nRep << '\t';
-				o << arrayOfTests_[nRep - 1][algID];					//streams full data for each result, adds endl
+				o << a << '\t' << nRep << '\t';
+				o << arrayOfTests_[nRep - 1][a];					//streams full data for each result, adds endl
 				/////////////////////////////////
 			}
 			catch (exception e) {
@@ -352,7 +360,7 @@ std::ostream& InfoAnalyser<AlgInfo_t>::print_rep (ostream& o, int nRep, int algI
 
 		try {
 			/////////////////////////////////
-			o << nRep << '\t';
+			o << algID << '\t' << nRep << '\t';
 			o << arrayOfTests_[nRep - 1][algID];							//streams full data for each result, adds endl
 			/////////////////////////////////
 		}
@@ -366,54 +374,62 @@ std::ostream& InfoAnalyser<AlgInfo_t>::print_rep (ostream& o, int nRep, int algI
 }
 
 template<class AlgInfo_t>
-std::ostream& InfoAnalyser<AlgInfo_t>::print_summary(std::ostream& o) const
+std::ostream& InfoAnalyser<AlgInfo_t>::print_analyser_summary(std::ostream& o) const
 {
+	auto nRep_ = number_of_repetitions();
+	auto nAlg_ = number_of_algorithms();
+
 	try {
-		//general information
-		if (print_mode_ & InfoAnalyser<AlgInfo_t>::NAME) {					//assumes the same instance for all tests
-			//o<<left<<setw(30)<<t.arrayOfTests_[0][0].get_name()<<" ";
-			o << left << setw(30) << arrayOfTests_[0][0].name();
-		}
-
-		if (print_mode_ & InfoAnalyser<AlgInfo_t>::SIZE) {
-			//o<<setw(5)<<right<<setprecision(0)<<t.arrayOfTests_[0][0].get_d1()<<" ";  
-			o << right << "\t" << arrayOfTests_[0][0].number_of_vertices();
-		}
-
-		if (print_mode_ & InfoAnalyser<AlgInfo_t>::EDGES) {
-			//o<<setw(5)<<right<<setprecision(0)<<t.arrayOfTests_[0][0].get_d2()<<" ";  
-			o << right << "\t" << arrayOfTests_[0][0].number_of_edges();
-		}
-
-		if (print_mode_ & InfoAnalyser<AlgInfo_t>::TIMEOUT) {
-			o << right << setw(10) << "\t" << (int)arrayOfTests_[0][0].time_out();
-		}
-
-		if (print_mode_ & InfoAnalyser<AlgInfo_t>::ALG) {
-			o << right << "\t" << arrayOfTests_[0][0].search_algorithm();
-		}
-
-		if (print_mode_ & InfoAnalyser<AlgInfo_t>::SORT) {
-			//TODO@decode SORT_TYPE!
-			//o << setw(5) << right << setprecision(0) << t.arrayOfTests_[0][0].get_d3() << " ";
-			o << right << "\t" << arrayOfTests_[0][0].sorting_algorithm();
-		}
-
-		//TODO - ADD TIMEOUT (check this comment 20/01/2025)
+		
 
 		//information common to all tests
 		o.setf(ios::fixed);
-		for (auto i = 0; i < nAlg_; ++i) {
+		for (auto a = 0; a < nAlg_; ++a) {
 
+			//algorithm ID
+			o << a << '\t';
+
+			////////////////////////
+			//general information
+			if (print_mode_ & InfoAnalyser<AlgInfo_t>::NAME) {					//assumes the same instance for all tests
+				//o<<left<<setw(30)<<t.arrayOfTests_[0][0].get_name()<<" ";
+				o << left << setw(30) << arrayOfTests_[0][0].name();
+			}
+
+			if (print_mode_ & InfoAnalyser<AlgInfo_t>::SIZE) {
+				//o<<setw(5)<<right<<setprecision(0)<<t.arrayOfTests_[0][0].get_d1()<<" ";  
+				o << right << "\t" << arrayOfTests_[0][0].number_of_vertices();
+			}
+
+			if (print_mode_ & InfoAnalyser<AlgInfo_t>::EDGES) {
+				//o<<setw(5)<<right<<setprecision(0)<<t.arrayOfTests_[0][0].get_d2()<<" ";  
+				o << right << "\t" << arrayOfTests_[0][0].number_of_edges();
+			}
+
+			if (print_mode_ & InfoAnalyser<AlgInfo_t>::TIMEOUT) {
+				o << right << setw(10) << "\t" << (int)arrayOfTests_[0][0].time_out();
+			}
+
+			if (print_mode_ & InfoAnalyser<AlgInfo_t>::ALG) {
+				o << right << "\t" << arrayOfTests_[0][0].search_algorithm();
+			}
+
+			if (print_mode_ & InfoAnalyser<AlgInfo_t>::SORT) {
+				//TODO@decode SORT_TYPE!
+				//o << setw(5) << right << setprecision(0) << t.arrayOfTests_[0][0].get_d3() << " ";
+				o << right << "\t" << arrayOfTests_[0][0].sorting_algorithm();
+			}
+			
+			////////////////////////////
+			//specific information
 			if (print_mode_ & InfoAnalyser<AlgInfo_t>::LOWER_BOUND) {
-				//o << setw(4) << right << setprecision(2) << t.arrayOfAvLB[i] << " ";
-				o << right << setw(7) << setprecision(2) << "\t" << arrayOfAvLB[i];
-
+				//o << setw(4) << right << setprecision(2) << t.arrayOfAvLB[i] << " ";									
+				o << right << setw(7) << setprecision(2) << "\t" << arrayOfAvLB.at(a);
 			}
 
 			if (print_mode_ & InfoAnalyser<AlgInfo_t>::SOL) {
 				//o << setw(5) << right << setprecision(2) << t.arrayOfAvSol[i] << " ";
-				o << right << setw(7) << setprecision(2) << "\t" << arrayOfAvSol[i];
+				o << right << setw(7) << setprecision(2) << "\t" << arrayOfAvSol.at(a);
 			}
 
 			//if(print_mode_& InfoAnalyser::STDDEV_SOL){
@@ -428,25 +444,25 @@ std::ostream& InfoAnalyser<AlgInfo_t>::print_summary(std::ostream& o) const
 
 			if (print_mode_ & InfoAnalyser<AlgInfo_t>::STEPS) {
 				//o<<setw(15)<<right<<setprecision(0)<<t.arrayOfAvSteps[i]<<" ";  
-				o << right << setw(10) << setprecision(0) << "\t" << arrayOfAvSteps[i];
+				o << right << setw(10) << setprecision(0) << "\t" << arrayOfAvSteps.at(a);
 
 			}
 
 			if (print_mode_ & InfoAnalyser<AlgInfo_t>::TIME) {
 				//o<<setw(12)<<right<<setprecision(3)<<t.arrayOfAvTimes[i]<<" "; 
-				o << right << setw(7) << setprecision(3) << "\t" << arrayOfAvTimes[i];
+				o << right << setw(7) << setprecision(3) << "\t" << arrayOfAvTimes.at(a);
 
 			}
 
 			if (print_mode_ & InfoAnalyser<AlgInfo_t>::TIMEPRE) {
 				//o<<setw(12)<<right<<setprecision(3)<<t.arrayOfAvTimes[i]<<" "; 
-				o << right << setw(7) << setprecision(3) << "\t" << arrayOfAvPreProcTimes[i];
+				o << right << setw(7) << setprecision(3) << "\t" << arrayOfAvPreProcTimes.at(a);
 
 			}
 
 			if (print_mode_ & InfoAnalyser<AlgInfo_t>::NFAIL) {
 				//o << setw(5) << t.arrayOfFails[i] << " ";
-				o << right << "\t" << arrayOfFails[i];
+				o << right << "\t" << arrayOfFails.at(a);
 			}
 
 			/*if(print_mode_ & InfoAnalyser<AlgInfo_t>::NCONT){
@@ -455,38 +471,22 @@ std::ostream& InfoAnalyser<AlgInfo_t>::print_summary(std::ostream& o) const
 				}
 			}	*/
 
-
-			//separator for different algorithms
-			if (i < (nAlg_ - 1)) {
-				o << "| ";
-			}
+			o << endl;
 		}
 		o << endl;
 
 	}
 	catch (const std::ios::failure& ex) {
-		LOG_ERROR("Error when streaming data", ex.what(), "- Test_Analyser::print_summary ");
-		o << "Error when streaming data" << ex.what() << "- Test_Analyser::print_summary " << endl;
+		LOG_ERROR("Error when streaming data", ex.what(), "- Test_Analyser::print_analyser_summary ");
+		o << "Error when streaming data" << ex.what() << "- Test_Analyser::print_analyser_summary " << endl;
+	}
+	catch (...) {
+		LOG_ERROR("Error when streaming data - check if analyser has been called - Test_Analyser::print_analyser_summary ");
+		o << "Error when streaming data, check if analyser has been called - Test_Analyser::print_analyser_summary " << endl;
 	}
 
 	return o;
 
-
-
-}
-
-template<class AlgInfo_t>
-int InfoAnalyser<AlgInfo_t>::make_consistent(){
-		
-	int retVal = 0;
-
-	///////////////////////////////////////////////////////////////
-	nRep_ = arrayOfTests_.size();
-	(nRep_ > 0)?  nAlg_ = arrayOfTests_[0].size() :  nAlg_=0;
-	///////////////////////////////////////////////////////////////	
-	
-	(nRep_ > 0 && nAlg_ > 0)? retVal = 0 : retVal = -1;
-	return retVal;
 }
 
 

@@ -31,30 +31,30 @@ public:
 		 case READ:			
 			 fs.open(filename, std::fstream::in);
 			 if(fs.fail()){
-				 LOG_ERROR("unable to open reading file: " , filename, "-File::File ");
+				 LOGG_ERROR("unable to open reading file: " , filename, "-File::File ");
 			 }
 			 break;
 		 case WRITE:			
 			 fs.open(filename, std::fstream::out);
 			 if(fs.fail()){
-				 LOG_ERROR("unable to open writing file: ", filename, "-File::File ");				
+				 LOGG_ERROR("unable to open writing file: ", filename, "-File::File ");				
 			 }
 			 break;
 		 case READ_WRITE:			
 			 fs.open(filename, std::fstream::in | std::fstream::out);
 			 if(fs.fail()){
-				 LOG_ERROR("unable to open reading/writing file: ", filename, "-File::File ");
+				 LOGG_ERROR("unable to open reading/writing file: ", filename, "-File::File ");
 			 }
 			 break;
 		 case APPEND:																//Considered only for writing purposes
 			 fs.open(filename, std::fstream::out | std::fstream::app);
 			 if(fs.fail()){
-				 LOG_ERROR("unable to open appending file: ", filename, "-File::File ");
+				 LOGG_ERROR("unable to open appending file: ", filename, "-File::File ");
 			 }
 			 break;
 
 		 default:
-			 LOG_ERROR("unknonw mode for operating on a file -File::File ");			
+			 LOG_ERROR("unknown mode for operating on a file -File::File ");			
 		 }
 	}
 

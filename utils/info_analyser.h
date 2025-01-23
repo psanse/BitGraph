@@ -1,15 +1,16 @@
-/*
+/**
  * @file  result_analyser.h
- * @brief InfoAnalyser class to manage benchmarking of graph algorithms.
+ * @brief InfoAnalyser class to manage benchmarking of graph algorithms 
+ *		  (number of repetitions for the same instance for a set of different algorithms).
+ * 
  *		  Manages a matrix of test results:	columns are algorithms, rows are repetitions
- *		  Takes into account tests which timed-out in the reported results
+ * 
  * @date  2013
  * @last_update 20/01/2025
  * @author pss  
  * 
- * TODO - generic for other types different from Result (20/01/25)
  * 
- */
+ **/
 
 #ifndef __INFO_ANALYSER_H__
 #define __INFO_ANALYSER_H__
@@ -17,7 +18,6 @@
 #include <iostream>
 #include <vector>
 #include "result.h"
-
 
 
 //////////////////////////
@@ -60,8 +60,8 @@ public:
 	//static const int DEFAULT_PRINT_MODE = NAME | SOL | LOWER_BOUND | STEPS | NFAIL | TIME | NCONT;
 	
 	//nested struct for comparison purposes in tests with two algorithms
-	struct info_t{
-		info_t():	same_lb(false), same_sol(false), same_steps(false),
+	struct comp_t{
+		comp_t():	same_lb(false), same_sol(false), same_steps(false),
 					steps_first_greater(false), steps_lhs(0), steps_rhs(0) 
 		{}
 		bool same_steps;
@@ -74,29 +74,49 @@ public:
 			
 ////////////////////	
 //construction / destruction
-	InfoAnalyser						() : print_mode_(DEFAULT_PRINT_MODE), nAlg_(0), nRep_(0) {}
+	InfoAnalyser								() : print_mode_ (DEFAULT_PRINT_MODE) {}
 	
 	//copy and move semantics disallowed
-	InfoAnalyser			(const InfoAnalyser&)	= delete;
-	InfoAnalyser& operator= (const InfoAnalyser&)	= delete;
-	InfoAnalyser			(InfoAnalyser&&)		= delete;
-	InfoAnalyser& operator= (InfoAnalyser&&)		= delete;
+	InfoAnalyser								(const InfoAnalyser&)	= delete;
+	InfoAnalyser& operator=						(const InfoAnalyser&)	= delete;
+	InfoAnalyser								(InfoAnalyser&&)		= delete;
+	InfoAnalyser& operator=						(InfoAnalyser&&)		= delete;
 	
-	~InfoAnalyser			()						= default;
+	~InfoAnalyser								()						= default;
 
 /////////////////////
 //setters/getters
 	
-	std::vector<vInfo_t>& get_tests				()			{ return arrayOfTests_; }
-	std::vector<double> & get_times				()			{ return arrayOfAvTimes; }
-	std::vector<double> & get_times_preproc		()			{ return arrayOfAvPreProcTimes; }
+	/**
+	* @brief getter for the full results added to the analyser
+	**/
+	std::vector<vInfo_t>& get_results			()			{ return arrayOfTests_; }
+
+	/**
+	* @brief getter for the info of the first repetition of the algorithm algID
+	* @param algID: algorithm id
+	**/
+	AlgInfo_t& get_results						(int algID)	{ return arrayOfTests_[0][algID]; }
+
+	/**
+	* @brief getters according to the main DB (requires analyser() to be executed)
+	**/
+	std::vector<double> & get_search_times		()			{ return arrayOfAvTimes; }
+	std::vector<double> & get_preproc_times		()			{ return arrayOfAvPreProcTimes; }
 	std::vector<double> & get_sol				()			{ return arrayOfAvSol; }
 	std::vector<double> & get_steps				()			{ return arrayOfAvSteps; }
-	std::vector<vector<double>> &get_counters 	()			{ return arrayOfCounters; }
-	AlgInfo_t&			get_result				(int idAlg) { return arrayOfTests_[0][idAlg]; }		//returns the result of the first instance of the idAlg run
+	//std::vector<vector<double>> &get_counters 	()			{ return arrayOfCounters; }
+	
+	/**
+	* @brief getter for the number of repetitions according to the main DB
+	**/
+	int number_of_repetitions			()	const			{ return arrayOfTests_.size(); }
+	
 
-	int number_of_repetitions				()			{ return nRep_; }
-	int number_of_algorithms				()			{ return nAlg_; }		
+	/**
+	* @brief getter for the number of algorithms according to the main DB
+	**/
+	int number_of_algorithms			()  const;
 
 	//I/O
 	void set_print_mode					(int mode)	{print_mode_ = mode;}
@@ -115,13 +135,13 @@ public:
 	 *		
 	 *		TODO: Standard deviation analysis
 	 * 
-	 * @param info: output information that compares tests with only two algorithms
+	 * @param pComp: passed by reference information that serves to compare tests with only two algorithms
 	 *				(if NULL, no output)
 	 * 
 	 * @returns ERR(-1) if the dataset is empty / inconsistent, OK(0) otherwise
 	 * 
 	 **/
-	int analyser						(info_t* info = NULL);									
+	int analyser						(comp_t* pComp = NULL);
 
 	/**
 	 * @brief  adds a new result to the matrix of results
@@ -149,83 +169,78 @@ public:
 						[1...nAlg_] the first algorithm with a different solution from the one first reported
 	* @results TRUE if all the solution values are the same for all algorithms, FALSE otherwise
 	**/
-	bool check_solution_values(int& num_error);
+	bool check_solution_values			(int& num_error);
 
 	/**
 	* @brief TRUE if the number of repetitions and algorithms is consistent with the main DB,	 
-	*		 FALSE otherwise (for empty main DB, TRUE if nAlg_ = 0, and nRep_ = 0)
+	*		 FALSE otherwise (TRUE if nAlg == 0 or nRep == 0)
 	* 
 	* 		I. If FALSE, run make_consistent() to update the number of repetitions and algorithms
 	*		II.  analyser() has to be executed first
 	**/
-	bool check_array_of_tests();
+	bool check_test_consistency			();
 
 //////////////	
 // I/O
 
 	/**
 	* @brief Streams all results available for the algorithm algID 
-	* @param algID: algorithm id; if -1 all algorithms are reported (default value)
+	*		 (Checks consistency of input params). 
+	* 
+	* @param algID: algorithm id [1...nAlg]; if -1 all algorithms are reported (default value)
 	* @param o: input / output stream
 	* @returns the output stream
 	**/
-std::ostream& print_alg				(std::ostream& o, int algID = -1 /*all alg*/) const;					//prints individual results of alg
+std::ostream& print_alg					(std::ostream& o, int algID = -1 /*all alg*/) const;					//prints individual results of alg
 	
 	/**
-	* @brief Reports a specific repetition nRep of the algorith algID 
+	* @brief Reports a specific repetition nRep of the algorith algID. 
+	*		 (Checks consistency of input params). 
 	* 
 	* @param o: input / output stream* 
-	* @param nRep: repetition number (1 based), if 0 all repetitions are reported (default value)
+	* @param nRep: repetition number [1... nRep], if 0 all repetitions are reported (default value)
 	* @param algID: algorithm id, if -1 all algorithms are reported (default value) 
 	* @returns the output stream
 	**/
-std::ostream& print_rep				(std::ostream & o, int nRep = 0 /* 1 based*/, int algID = -1) const;
+std::ostream& print_rep					(std::ostream & o, int nRep = 0 /* 1 based*/, int algID = -1) const;
 
 	/**
-	* @brief Streams the summary of the results as produced by analyser()
+	* @brief Streams the summary of the results as produced by analyser(). 
 	*		
-	*		 I. It is more oriented for console / file quick reports, not for Excel sheet analysis
-	*		 II. The summary includes the average values of the results of the algs which DID NOT time_out
+	*		 I.  It is more oriented for console / file quick reports, not for Excel sheet analysis.
+	*   	 II. The summary includes the average values of the results of the algs which DID NOT time_out
 	*		III. It prints the general information of the tests (name, size, edges, timeout, algorithm,...)
-	*			 according to the configuration predefined in@print_mode_rt
+	*			 according to the configuration predefined in@print_mode_
+	*		IV.  Each line of the output includes averaged values for all repetitions of all the algorithms reported
+	*			 which DID NOT time out.
 	*
 	* @param o: input / output stream
 	* @param mode: print mode (default value = print_mode_)
 	* @returns the output stream
+	* 
+	* TODO - ADD TIMEOUT (check this comment 20/01/2025)
 	**/	
-std::ostream& print_summary			(std::ostream& o) const;
+std::ostream& print_analyser_summary	(std::ostream& o) const;
 
-
-//////////////	
-// Private interface
-public:
-		
-	/**
-	* @brief updates number of repetitions @nRep_ and number of algorithms @nAlg_ based on the dataset @arrayOfTests_
-	*		  
-	* @returns ERR if the dataset is empty, OK otherwise
-	**/
-	int make_consistent					();
 
 ///////////////		
 //data members
 private:
 	////////////////////////////////////////////////////
-	vector<vInfo_t>						arrayOfTests_;			//[rep][algorithm] - main DB  (matrix of results - main data to be processed)
-	int									nRep_;					//number of repetitions (convenient, redundant with main DB info)									
-	int									nAlg_;					//number of algorithms	(convenient, redundant with main DB info)			
+	vector<vInfo_t>						arrayOfTests_;			//[rep][alg] - main DB  (matrix of results - main data to be processed)
 	////////////////////////////////////////////////////
 
-	std::vector<double>					arrayOfAvTimes;			//[alg]	
-	std::vector<double>					arrayOfAvPreProcTimes;	//[alg]	
-	std::vector<double>					arrayOfAvSol;
-	std::vector<double>					arrayOfAvLB;
-	std::vector<double>					arrayOfAvSteps;			//random
-	std::vector<std::vector<double>>	arrayOfCounters;		//[alg][counter] - currently not used
-	std::vector<double>					arrayOfMaxSol;	
-	std::vector<int>					arrayOfFails;			
+	std::vector<double>					arrayOfAvTimes;			//[alg] - search times	
+	std::vector<double>					arrayOfAvPreProcTimes;	//[alg] - preprocessing times
+	std::vector<double>					arrayOfAvSol;			//[alg] - solution values
+	std::vector<double>					arrayOfAvLB;			//[alg] - lower bounds
+	std::vector<double>					arrayOfAvSteps;			//[alg] - number of steps (recursive calls)
+	std::vector<std::vector<double>>	arrayOfCounters;		//[alg] - counters, currently not used
 	
-	//E/S
+	std::vector<double>					arrayOfMaxSol;			//[alg] - maximum solution value	
+	std::vector<int>					arrayOfFails;			//[alg]	- number of time outs / fails for each algorithm	
+	
+	//I/O
 	int print_mode_;
 
 	//TODO

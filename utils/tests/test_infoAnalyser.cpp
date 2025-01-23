@@ -4,7 +4,10 @@
  * @date  2013
  * @last_update 20/01/2025
  * @author pss
-  **/
+ * 
+ * TODO - add more tests... (23/01/25)
+ * 
+ **/
 
 #include "gtest/gtest.h"
 #include "utils/info_analyser.h"
@@ -16,9 +19,38 @@
 #define NUM_ALG	2
 #define INSTANCE_NAME	"graph"
 
+class InfoAnalyserTest : public ::testing::Test {
+protected:
+	void SetUp() override {
+		for (int r = 0; r < NUM_REP; ++r) {
+			bool new_rep = true;
+
+			for (int a = 0; a < NUM_ALG; ++a) {
+
+				com::infoCLQ<int> info;
+				info.N_ = 5;
+				info.M_ = 7;
+				info.TIME_OUT_ = 1000;
+				info.TIME_OUT_HEUR_ = 200;
+				info.nSteps_ = 10 + a;						//diff number of steps for each algorithm in all rep.
+				info.ub_ = 50;
+				info.lb_ = 10;
+
+				info.name_ = INSTANCE_NAME;					//same instance
+				ta.add_test(new_rep, info);
+				new_rep = false;
+			}			
+		}
+	}
+	void TearDown() override {}
+
+	//directed graph instance	
+	InfoAnalyser<com::infoCLQ<int>> ta;
+};
 
 TEST(InfoAnalyser, basic){
 		
+	auto duration = std::chrono::milliseconds(50);
 	InfoAnalyser<com::infoCLQ<int>> ta;
 
 	for(auto r = 0; r < NUM_REP; ++r){
@@ -32,7 +64,7 @@ TEST(InfoAnalyser, basic){
 			info.startTimer(com::infoBase::SEARCH);
 			
 #ifdef _MSC_VER 
-			std::this_thread::sleep_for(std::chrono::milliseconds(100));  
+			std::this_thread::sleep_for(duration);
 #elif __linux__
 			sleep(0.2);
 #endif
@@ -49,7 +81,8 @@ TEST(InfoAnalyser, basic){
 	}
 	
 	//////////////////
-	ta.analyser();
+	int retVal = ta.analyser();
+	EXPECT_EQ(0, retVal);
 	/////////////////
 
 	int errorIdx = -1;
@@ -63,10 +96,9 @@ TEST(InfoAnalyser, basic){
 
 	//I/O
 	/////////////////////
-	cout << ta << endl;									//reports results 
+	//cout << ta << endl;									//reports results 
 	////////////////////
 }
-
 
 TEST(InfoAnalyser, info){
 		
@@ -84,6 +116,8 @@ TEST(InfoAnalyser, info){
 			ta.add_test(new_rep, info);
 			new_rep = false;
 		}
+				
+		EXPECT_TRUE(ta.check_test_consistency());
 
 		//last algorithm (change the number of steps)
 		com::infoCLQ<int> info;
@@ -95,10 +129,11 @@ TEST(InfoAnalyser, info){
 		ta.add_test(new_rep, info);
 	}
 				
-	decltype(ta)::info_t info;
+	decltype(ta)::comp_t info;
 
-	///////////////////
-	ta.analyser(&info);
+	////////////////
+	int retVal = ta.analyser(&info);
+	EXPECT_EQ(0, retVal);
 	///////////////////
 
 	EXPECT_TRUE(info.same_sol);
@@ -126,17 +161,20 @@ TEST(TestAnalyser, all_fail){
 			new_rep=false;
 		}
 	}
+		
 	
 	//////////////////
-	ta.analyser();
+	int retVal = ta.analyser();
+	EXPECT_EQ(0, retVal);
 	/////////////////
+
 
 	int errorIdx = -1;
 	EXPECT_TRUE(ta.check_solution_values( errorIdx) );			//2 algorithms all fail
 
 	//I/O
 	/////////////////////
-	cout << ta << endl;									//reports results - no report expected here
+	//cout << ta << endl;									//reports results - no report expected here
 	/////////////////////
 	
 }
@@ -162,14 +200,44 @@ TEST(TestAnalyser, only_one_test_and_fails){
 	}
 	
 	//////////////////
-	ta.analyser();
-	/////////////////
+	int retVal = ta.analyser();
+	EXPECT_EQ(0, retVal);
+	////////////////
 
 	int errorIdx = -1;
 	EXPECT_TRUE(ta.check_solution_values( errorIdx) );		//1 algorithm only
 	
 	//I/O
 	/////////////////////
-	cout << ta << endl;									//reports results 
+	//cout << ta << endl;									//reports results 
 	/////////////////////
+}
+
+TEST_F(InfoAnalyserTest, toFile) {
+
+	string strReport("infoAnalyser.txt");
+
+	EXPECT_EQ(NUM_REP, ta.number_of_repetitions());
+	EXPECT_EQ(NUM_ALG, ta.number_of_algorithms());
+
+	//streaming of the tests results 
+	 
+	//I/O
+	//ta.print_alg(FILE_LOG(strReport.c_str(), WRITE), -1);
+	//ta.print_alg(FILE_LOG(strReport.c_str(), WRITE), 1);
+	//ta.print_rep(FILE_LOG(strReport.c_str(), WRITE), 7 );
+
+	//streaming of the analyser results (summary of averages in a single line for all the algorithms)
+	ta.analyser();
+
+	///////////////////////////////////////
+	EXPECT_EQ(10, ta.get_steps().at(0));
+	EXPECT_EQ(11, ta.get_steps().at(1));
+	///////////////////////////////////////
+
+	//I/O
+	//ta.print_analyser_summary(FILE_LOG(strReport.c_str(), WRITE));
+	 
+	//streams to console the print_analyser_summary
+	//cout << ta << endl;											
 }
