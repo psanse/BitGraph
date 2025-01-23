@@ -38,7 +38,7 @@ class InfoAnalyser {
 	using W_t = typename AlgInfo_t::basic_type;
 		
 	/**
-	* @brief Streams the report of the InfoAnalyser - main driver for the class
+	* @brief Streams the report of the InfoAnalyser, based on the current @print_mode_ - main driver for the class
 	* param o: input/output stream
 	* param t: InfoAnalyser object
 	**/
@@ -48,7 +48,7 @@ class InfoAnalyser {
 public:
 
 	//streaming options
-	enum : uint64_t  {
+	enum  : uint64_t  {
 		NAME = 0x01, STEPS = 0x02, SOL = 0x04, STDDEV_SOL = 0x08, MAX_SOL = 0x10,
 		STDDEV_STEPS = 0x20, TIME = 0x40, NFAIL = 0x80, NCONT = 0x100, LOWER_BOUND = 0x200,
 		SIZE = 0x400, EDGES = 0x800, SORT = 0x1000, TIMEOUT = 0x2000, ALG = 0x4000, TIMEPRE = 0x8000,
@@ -139,43 +139,61 @@ public:
 
 //////////////
 // Boolean operations
-// 
 
 	/**
-	* @brief Determines if the solutions of the algorithms are consistent
+	* @brief Determines if the solutions of the NON-FAILED algorithms are consistent
+	*				
+	*		I.analyser() has to be executed first		
+	* 
 	* @param num_error: -1 ok, 0 - no solution available for any algorithm (returns FALSE),
 						[1...nAlg_] the first algorithm with a different solution from the one first reported
 	* @results TRUE if all the solution values are the same for all algorithms, FALSE otherwise
 	**/
-	bool consistent_sol_val (int& num_error);
+	bool check_solution_values(int& num_error);
 
 	/**
-	* @brief TRUE if the number of repetitions and algorithms is consistent with the main DB
+	* @brief TRUE if the number of repetitions and algorithms is consistent with the main DB,	 
 	*		 FALSE otherwise (for empty main DB, TRUE if nAlg_ = 0, and nRep_ = 0)
 	* 
-	*		I. If FALSE, run make_consistent() to update the number of repetitions and algorithms
+	* 		I. If FALSE, run make_consistent() to update the number of repetitions and algorithms
+	*		II.  analyser() has to be executed first
 	**/
-	bool is_consistent_array_of_tests	();
+	bool check_array_of_tests();
 
 //////////////	
 // I/O
 
 	/**
-	* @brief Streams individual results of algorithm algID 
-	* @param algID: algorithm number, if -1 all algorithms are reported (default value)
+	* @brief Streams all results available for the algorithm algID 
+	* @param algID: algorithm id; if -1 all algorithms are reported (default value)
 	* @param o: input / output stream
 	* @returns the output stream
 	**/
-std::ostream& print_alg				(std::ostream& o, int algID = -1 /*all alg*/);					//prints individual results of alg
+std::ostream& print_alg				(std::ostream& o, int algID = -1 /*all alg*/) const;					//prints individual results of alg
 	
 	/**
-	* @brief Reports a specific repetition nRep of an algorith algID
+	* @brief Reports a specific repetition nRep of the algorith algID 
+	* 
 	* @param o: input / output stream* 
 	* @param nRep: repetition number (1 based), if 0 all repetitions are reported (default value)
 	* @param algID: algorithm id, if -1 all algorithms are reported (default value) 
 	* @returns the output stream
 	**/
-std::ostream& print_rep				(std::ostream & o, int nRep = 0 /* 1 based*/, int algID = -1);
+std::ostream& print_rep				(std::ostream & o, int nRep = 0 /* 1 based*/, int algID = -1) const;
+
+	/**
+	* @brief Streams the summary of the results as produced by analyser()
+	*		
+	*		 I. It is more oriented for console / file quick reports, not for Excel sheet analysis
+	*		 II. The summary includes the average values of the results of the algs which DID NOT time_out
+	*		III. It prints the general information of the tests (name, size, edges, timeout, algorithm,...)
+	*			 according to the configuration predefined in@print_mode_rt
+	*
+	* @param o: input / output stream
+	* @param mode: print mode (default value = print_mode_)
+	* @returns the output stream
+	**/	
+std::ostream& print_summary			(std::ostream& o) const;
 
 
 //////////////	

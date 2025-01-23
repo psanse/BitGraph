@@ -55,7 +55,7 @@ TEST(InfoAnalyser, basic){
 	int errorIdx = -1;
 
 	//////////////////////////////////////////////////
-	EXPECT_TRUE(ta.consistent_sol_val(errorIdx) );
+	EXPECT_TRUE(ta.check_solution_values(errorIdx) );
 	EXPECT_EQ(-1, errorIdx);							//no error, all solutions are the same, with default values
 	EXPECT_DOUBLE_EQ(10, ta.get_steps()[0]);
 	EXPECT_DOUBLE_EQ(10, ta.get_steps()[1]);
@@ -132,7 +132,7 @@ TEST(TestAnalyser, all_fail){
 	/////////////////
 
 	int errorIdx = -1;
-	EXPECT_TRUE(ta.consistent_sol_val( errorIdx) );			//2 algorithms all fail
+	EXPECT_TRUE(ta.check_solution_values( errorIdx) );			//2 algorithms all fail
 
 	//I/O
 	/////////////////////
@@ -166,7 +166,7 @@ TEST(TestAnalyser, only_one_test_and_fails){
 	/////////////////
 
 	int errorIdx = -1;
-	EXPECT_TRUE(ta.consistent_sol_val( errorIdx) );		//1 algorithm only
+	EXPECT_TRUE(ta.check_solution_values( errorIdx) );		//1 algorithm only
 	
 	//I/O
 	/////////////////////

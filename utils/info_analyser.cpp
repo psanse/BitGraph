@@ -18,113 +18,8 @@
 
 using namespace std;
 
-
 template<class AlgInfo_t>
-std::ostream& operator << (std::ostream& o, const InfoAnalyser<AlgInfo_t>& t)
-{
-	try {
-		//general information
-		if (t.print_mode_ & InfoAnalyser<AlgInfo_t>::NAME) {					//assumes the same instance for all tests
-			//o<<left<<setw(30)<<t.arrayOfTests_[0][0].get_name()<<" ";
-			o << left << setw(30) << t.arrayOfTests_[0][0].name();
-		}
-
-		if (t.print_mode_ & InfoAnalyser<AlgInfo_t>::SIZE) {
-			//o<<setw(5)<<right<<setprecision(0)<<t.arrayOfTests_[0][0].get_d1()<<" ";  
-			o << right << "\t" << t.arrayOfTests_[0][0].number_of_vertices();
-		}
-
-		if (t.print_mode_ & InfoAnalyser<AlgInfo_t>::EDGES) {
-			//o<<setw(5)<<right<<setprecision(0)<<t.arrayOfTests_[0][0].get_d2()<<" ";  
-			o << right << "\t" << t.arrayOfTests_[0][0].number_of_edges();
-		}
-
-		if (t.print_mode_ & InfoAnalyser<AlgInfo_t>::TIMEOUT) {
-			o << right << setw(10) << "\t" << (int)t.arrayOfTests_[0][0].time_out();
-		}
-
-		if (t.print_mode_ & InfoAnalyser<AlgInfo_t>::ALG) {
-			o << right << "\t" << t.arrayOfTests_[0][0].search_algorithm();
-		}
-
-		if (t.print_mode_ & InfoAnalyser<AlgInfo_t>::SORT) {
-			//TODO@decode SORT_TYPE!
-			//o << setw(5) << right << setprecision(0) << t.arrayOfTests_[0][0].get_d3() << " ";
-			o << right << "\t" << t.arrayOfTests_[0][0].sorting_algorithm();
-		}
-
-		//TODO - ADD TIMEOUT (check this comment 20/01/2025)
-
-		//information common to all tests
-		o.setf(ios::fixed);
-		for (auto i = 0; i < t.nAlg_; ++i) {
-
-			if (t.print_mode_ & InfoAnalyser<AlgInfo_t>::LOWER_BOUND) {
-				//o << setw(4) << right << setprecision(2) << t.arrayOfAvLB[i] << " ";
-				o << right << setw(7) << setprecision(2) << "\t" << t.arrayOfAvLB[i];
-
-			}
-
-			if (t.print_mode_ & InfoAnalyser<AlgInfo_t>::SOL) {
-				//o << setw(5) << right << setprecision(2) << t.arrayOfAvSol[i] << " ";
-				o << right << setw(7) << setprecision(2) << "\t" << t.arrayOfAvSol[i];
-			}
-
-			//if(t.print_mode_& InfoAnalyser::STDDEV_SOL){
-			//	o<<setw(5)<<right<<setprecision(2)<<t.arrayOfSdSol[i]<<" ";  
-			//}
-
-			//if(t.print_mode_ & InfoAnalyser::MAX_SOL){
-			//	//o<<setw(5)<<right<<setprecision(0)<<t.arrayOfMaxSol[i]<<" ";  
-			//	o << setprecision(0) << "\t" << t.arrayOfMaxSol[i];				
-			//}
-
-
-			if (t.print_mode_ & InfoAnalyser<AlgInfo_t>::STEPS) {
-				//o<<setw(15)<<right<<setprecision(0)<<t.arrayOfAvSteps[i]<<" ";  
-				o << right << setw(10) << setprecision(0) << "\t" << t.arrayOfAvSteps[i];
-
-			}
-
-			if (t.print_mode_ & InfoAnalyser<AlgInfo_t>::TIME) {
-				//o<<setw(12)<<right<<setprecision(3)<<t.arrayOfAvTimes[i]<<" "; 
-				o << right << setw(7) << setprecision(3) << "\t" << t.arrayOfAvTimes[i];
-
-			}
-
-			if (t.print_mode_ & InfoAnalyser<AlgInfo_t>::TIMEPRE) {
-				//o<<setw(12)<<right<<setprecision(3)<<t.arrayOfAvTimes[i]<<" "; 
-				o << right << setw(7) << setprecision(3) << "\t" << t.arrayOfAvPreProcTimes[i];
-
-			}
-
-			if (t.print_mode_ & InfoAnalyser<AlgInfo_t>::NFAIL) {
-				//o << setw(5) << t.arrayOfFails[i] << " ";
-				o << right << "\t" << t.arrayOfFails[i];
-			}
-
-			/*if(t.print_mode_ & InfoAnalyser<AlgInfo_t>::NCONT){
-				for(auto j = 0; j < t.arrayOfCounters[i].size(); ++j){
-					o << right << setw(10) << setprecision(4) << t.arrayOfCounters[i][j]<<" ";
-				}
-			}	*/
-
-
-			//separator for different algorithms
-			if (i < (t.nAlg_ - 1)) {
-				o << "| ";
-			}
-		}
-		o << endl;
-
-	}
-	catch (exception e) {
-		LOG_ERROR("Error when printing data", e.what(), "- Test_Analyser::operator << ");
-		o << "Error when printing data" << e.what() << "- Test_Analyser::operator<< " << endl;
-	}
-
-	return o;
-}
+std::ostream& operator << (std::ostream& o, const InfoAnalyser<AlgInfo_t>& t) { t.print_summary(o); return o; }
 
 template<class AlgInfo_t>
 void InfoAnalyser< AlgInfo_t>::clear()
@@ -153,12 +48,16 @@ void InfoAnalyser<AlgInfo_t>::add_test(bool isNewRep, AlgInfo_t res){
 
 		vInfo_t v;
 		v.push_back(std::move(res));
-		arrayOfTests_.push_back(std::move(v));		
+		arrayOfTests_.push_back(std::move(v));	
+		
+		nRep_=1;
+		nAlg_++;
 
-	}else{
+	}
+	else {
 
 		arrayOfTests_.back().push_back(std::move(res));		//new result in a current repetition/test
-
+		nRep_++;
 	}
 }
 
@@ -318,7 +217,7 @@ return 0;
 }
 
 template<class AlgInfo_t>
-bool InfoAnalyser<AlgInfo_t>::consistent_sol_val(int& num_error){
+bool InfoAnalyser<AlgInfo_t>::check_solution_values(int& num_error){
 
 	num_error = -1;
 	bool same_sol = true;
@@ -348,7 +247,7 @@ bool InfoAnalyser<AlgInfo_t>::consistent_sol_val(int& num_error){
 }
 
 template<class AlgInfo_t>
-bool InfoAnalyser<AlgInfo_t>::is_consistent_array_of_tests()
+bool InfoAnalyser<AlgInfo_t>::check_array_of_tests()
 {
 	return (	(nRep_ == arrayOfTests_.size())		&& 
 				(nAlg_ == arrayOfTests_[0].size())		);
@@ -356,10 +255,8 @@ bool InfoAnalyser<AlgInfo_t>::is_consistent_array_of_tests()
 }
 
 template<class AlgInfo_t>
-ostream& InfoAnalyser<AlgInfo_t>::print_alg (ostream & o, int algID){
-
-	//update nRep_ and nAlg_ appropiately
-	make_consistent();
+ostream& InfoAnalyser<AlgInfo_t>::print_alg (ostream & o, int algID) const{
+		
 	if(nRep_ == 0 || nAlg_ == 0 ){
 		LOG_ERROR("Empty tests - InfoAnalyser<AlgInfo_t>::print_alg");
 		return o;
@@ -414,10 +311,7 @@ ostream& InfoAnalyser<AlgInfo_t>::print_alg (ostream & o, int algID){
 }
 
 template<class AlgInfo_t>
-std::ostream& InfoAnalyser<AlgInfo_t>::print_rep(ostream& o, int nRep, int algID) {
-
-	//update nRep_ and nAlg_ appropiately
-	make_consistent();
+std::ostream& InfoAnalyser<AlgInfo_t>::print_rep (ostream& o, int nRep, int algID) const {
 
 	////////////////
 	//assertions
@@ -469,6 +363,116 @@ std::ostream& InfoAnalyser<AlgInfo_t>::print_rep(ostream& o, int nRep, int algID
 	}
 
 	return o;
+}
+
+template<class AlgInfo_t>
+std::ostream& InfoAnalyser<AlgInfo_t>::print_summary(std::ostream& o) const
+{
+	try {
+		//general information
+		if (print_mode_ & InfoAnalyser<AlgInfo_t>::NAME) {					//assumes the same instance for all tests
+			//o<<left<<setw(30)<<t.arrayOfTests_[0][0].get_name()<<" ";
+			o << left << setw(30) << arrayOfTests_[0][0].name();
+		}
+
+		if (print_mode_ & InfoAnalyser<AlgInfo_t>::SIZE) {
+			//o<<setw(5)<<right<<setprecision(0)<<t.arrayOfTests_[0][0].get_d1()<<" ";  
+			o << right << "\t" << arrayOfTests_[0][0].number_of_vertices();
+		}
+
+		if (print_mode_ & InfoAnalyser<AlgInfo_t>::EDGES) {
+			//o<<setw(5)<<right<<setprecision(0)<<t.arrayOfTests_[0][0].get_d2()<<" ";  
+			o << right << "\t" << arrayOfTests_[0][0].number_of_edges();
+		}
+
+		if (print_mode_ & InfoAnalyser<AlgInfo_t>::TIMEOUT) {
+			o << right << setw(10) << "\t" << (int)arrayOfTests_[0][0].time_out();
+		}
+
+		if (print_mode_ & InfoAnalyser<AlgInfo_t>::ALG) {
+			o << right << "\t" << arrayOfTests_[0][0].search_algorithm();
+		}
+
+		if (print_mode_ & InfoAnalyser<AlgInfo_t>::SORT) {
+			//TODO@decode SORT_TYPE!
+			//o << setw(5) << right << setprecision(0) << t.arrayOfTests_[0][0].get_d3() << " ";
+			o << right << "\t" << arrayOfTests_[0][0].sorting_algorithm();
+		}
+
+		//TODO - ADD TIMEOUT (check this comment 20/01/2025)
+
+		//information common to all tests
+		o.setf(ios::fixed);
+		for (auto i = 0; i < nAlg_; ++i) {
+
+			if (print_mode_ & InfoAnalyser<AlgInfo_t>::LOWER_BOUND) {
+				//o << setw(4) << right << setprecision(2) << t.arrayOfAvLB[i] << " ";
+				o << right << setw(7) << setprecision(2) << "\t" << arrayOfAvLB[i];
+
+			}
+
+			if (print_mode_ & InfoAnalyser<AlgInfo_t>::SOL) {
+				//o << setw(5) << right << setprecision(2) << t.arrayOfAvSol[i] << " ";
+				o << right << setw(7) << setprecision(2) << "\t" << arrayOfAvSol[i];
+			}
+
+			//if(print_mode_& InfoAnalyser::STDDEV_SOL){
+			//	o<<setw(5)<<right<<setprecision(2)<<t.arrayOfSdSol[i]<<" ";  
+			//}
+
+			//if(print_mode_ & InfoAnalyser::MAX_SOL){
+			//	//o<<setw(5)<<right<<setprecision(0)<<t.arrayOfMaxSol[i]<<" ";  
+			//	o << setprecision(0) << "\t" << t.arrayOfMaxSol[i];				
+			//}
+
+
+			if (print_mode_ & InfoAnalyser<AlgInfo_t>::STEPS) {
+				//o<<setw(15)<<right<<setprecision(0)<<t.arrayOfAvSteps[i]<<" ";  
+				o << right << setw(10) << setprecision(0) << "\t" << arrayOfAvSteps[i];
+
+			}
+
+			if (print_mode_ & InfoAnalyser<AlgInfo_t>::TIME) {
+				//o<<setw(12)<<right<<setprecision(3)<<t.arrayOfAvTimes[i]<<" "; 
+				o << right << setw(7) << setprecision(3) << "\t" << arrayOfAvTimes[i];
+
+			}
+
+			if (print_mode_ & InfoAnalyser<AlgInfo_t>::TIMEPRE) {
+				//o<<setw(12)<<right<<setprecision(3)<<t.arrayOfAvTimes[i]<<" "; 
+				o << right << setw(7) << setprecision(3) << "\t" << arrayOfAvPreProcTimes[i];
+
+			}
+
+			if (print_mode_ & InfoAnalyser<AlgInfo_t>::NFAIL) {
+				//o << setw(5) << t.arrayOfFails[i] << " ";
+				o << right << "\t" << arrayOfFails[i];
+			}
+
+			/*if(print_mode_ & InfoAnalyser<AlgInfo_t>::NCONT){
+				for(auto j = 0; j < t.arrayOfCounters[i].size(); ++j){
+					o << right << setw(10) << setprecision(4) << t.arrayOfCounters[i][j]<<" ";
+				}
+			}	*/
+
+
+			//separator for different algorithms
+			if (i < (nAlg_ - 1)) {
+				o << "| ";
+			}
+		}
+		o << endl;
+
+	}
+	catch (const std::ios::failure& ex) {
+		LOG_ERROR("Error when streaming data", ex.what(), "- Test_Analyser::print_summary ");
+		o << "Error when streaming data" << ex.what() << "- Test_Analyser::print_summary " << endl;
+	}
+
+	return o;
+
+
+
 }
 
 template<class AlgInfo_t>
