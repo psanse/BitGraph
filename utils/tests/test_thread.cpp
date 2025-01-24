@@ -1,5 +1,6 @@
 #include "gtest/gtest.h"
 #include "utils/thread.h"
+#include <thread>
 
 class ThreadExample{
 public:
@@ -8,12 +9,13 @@ public:
 	//function member to be run as thread (prototype is fixed)
 	int task_mul_by_2 (){
 		LOG_INFO("Thread running");
-#ifdef _MSC_VER
-		Sleep(3000);
-#elif __GNUC__
-		sleep(3);
-#endif
-		data*=2;
+
+		//sleep
+		std::this_thread::sleep_for(std::chrono::seconds(3));
+
+		//task
+		data *= 2;
+
 	return 0;
 	};
 

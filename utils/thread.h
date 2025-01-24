@@ -48,6 +48,16 @@ public:
 	/////////////////////
 	// Controlled thread launcher: Returns -1 if tout, 0 if OK
 
+		/////////////////////////
+		std::thread t(f, pthis);
+		//////////////////////////
+
+
+		t.join();
+
+
+
+
 		//Copy the data into the structure
 		result_t result=OK;
 		thread_data_t data={f, pthis};
