@@ -41,12 +41,12 @@ add_executable (test_utils ./tests/gtest_main.cc
   #  TESTS TO BE CHECKED (19/01/2025)
 
     #tests/test_batch.cpp    
-    #tests/test_thread.cpp
-    #tests/test_result.cpp
+   #tests/test_result.cpp
    
     #  TESTS BEING CHECKED
-    #  tests/test_testAnalyser.cpp
-      tests/test_infoAnalyser.cpp
+      tests/test_thread.cpp
+   
+   
     
     # TESTS CHECKED
     # tests/test_common.cpp
@@ -56,6 +56,8 @@ add_executable (test_utils ./tests/gtest_main.cc
     # tests/test_info_clq.cpp
     # tests/test_precise_timer.cpp
     # tests/test_benchmark.cpp
+    # tests/test_testAnalyser.cpp
+    # tests/test_infoAnalyser.cpp
 )
 
 target_include_directories (test_utils PUBLIC ../googletest/include/)
