@@ -1,9 +1,9 @@
 /**
 * @file batch.h
-* @brief A templatized batch class to run tests of type Alg_t with Params Param_t
+* @brief A templatized batch class to run tests of type Alg_t (or derived) with Params Param_t
 * 
 *		I. Alg_t must have a constructor for Param_t
-* 		II. AlgVariant_t should derive from Alg_t (base of the hierarchy of algorithms)	
+* 		II. AlgVar_t should derive from Alg_t (base of the hierarchy of algorithms)	
 **/
 
 #ifndef __BATCH_H__
@@ -26,7 +26,7 @@ public:
 //basic operations
 
 	/**
-	* @brief adds tests - dallocates memory
+	* @brief adds tests of type AlgVar_t (derived from Alg_t)  - deallocates memory
 	**/
 	template<class AlgVar_t =  Alg_t>
 	void add_test			(Param_t p)	{ tests.emplace_back( new AlgVar_t(p) ); }
