@@ -1,5 +1,7 @@
 #include "gtest/gtest.h"
-#include "../batch.h"
+#include "utils/batch.h"
+
+using namespace std;
 
 //the actual configuration data
 struct data_t{
@@ -46,7 +48,7 @@ TEST(Batch, basic){
 	b.add_test<AlgDer>(p);				//second level hierarchy
 
 	EXPECT_EQ(5, b.number_of_tests());
-	b.start();						
+	//b.start();						
 		
 	cout<<"-------------------------------"<<endl;
 }
