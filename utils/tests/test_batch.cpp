@@ -1,55 +1,75 @@
 #include "gtest/gtest.h"
 #include "utils/batch.h"
+#include "utils/logger.h"
 
 using namespace std;
 
-//the actual configuration data
-struct data_t{
-	data_t(int j_out=0, int k_out=12):j(j_out), k(k_out){}
-	int j;
-	int k;
+//configuration data for the hierarchy of algorithms
+struct param_t{
+	int i_ = 0 ;
+	int j_ = 0;
 };
 
-//wrapper for the data and interface for all algorithms
-class AlgParam{
+//base class representing an algorithm
+class AlgBase{
 public:
-	AlgParam(data_t d):data(d){}
-	AlgParam(){}
-	virtual void setup(){}
-	virtual void run(){}
-	virtual void tear_down(){}
+explicit AlgBase(param_t d): result_(d){}
+	AlgBase(){}
+	virtual param_t start() { return result_; }
+	param_t data() const { return result_; }
 protected:
-	data_t data;
+	param_t result_;
 };
 
-//algorithms
-class Alg:public AlgParam{
+//derived classes
+class AlgDer1 : public AlgBase {
 public:
-	Alg(AlgParam d):AlgParam(d){}
-	void run(){ cout<<"params "<<"("<<data.j<<","<<data.k<<")"<<endl;}
+	using AlgBase::AlgBase;
+	param_t start() override{
+		LOGG_DEBUG("params of AlgDer1: ", "(", result_.i_, ",", result_.j_, ")");		
+		return result_;
+	}
 };
 
-class AlgDer:public Alg{
+class AlgDer2 : public AlgDer1 {
 public:
-	AlgDer(AlgParam d):Alg(d){}
-	void run(){ cout<<"params "<<"("<<data.j<<","<<data.k<<")"<<endl;}
+	using AlgDer1::AlgDer1;
+	param_t start() override{
+		LOGG_DEBUG("params of AlgDer2: " , "(" , result_.i_ , "," , result_.j_ , ")");		
+		return result_;
+	}
 };
+
 
 TEST(Batch, basic){
-	cout<<"Batch::basic------------------"<<endl;
 
-	data_t d(30, 20);
-	AlgParam p(d);
-	Batch<Alg, AlgParam> b;
-	b.add_test<Alg>(p);					//factory of tests with parameters
-	b.add_test<Alg>(p);
-	b.add_test<AlgDer>(p);
-	b.add_test<AlgDer>(p);
-	b.add_test<AlgDer>(p);				//second level hierarchy
+	//configuration data
+	param_t d = { 30, 20 };
+	
+	//builds tests
+	Batch<AlgBase, param_t> b;
 
+	b.add_test<AlgBase>(d);					
+	b += d;								//same as above
+	b.add_test<AlgDer1>(d);
+	b.add_test<AlgDer2>(d);
+	b.add_test<AlgDer2>(d);				//second level hierarchy
+
+	//check tests
 	EXPECT_EQ(5, b.number_of_tests());
-	//b.start();						
-		
-	cout<<"-------------------------------"<<endl;
+
+	//check test construction
+	for (auto i = 0; i< 5; i++) {
+		EXPECT_EQ(30, b.get_test(i)->data().i_);
+		EXPECT_EQ(20, b.get_test(i)->data().j_);
+	}
+
+	//excute tests...
+	b.run_all_tests();
+
+	//check cleaning
+	b.clear();
+	EXPECT_EQ(0, b.number_of_tests());						
+
 }
 

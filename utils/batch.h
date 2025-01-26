@@ -1,6 +1,7 @@
 /**
 * @file batch.h
 * @brief A templatized batch class to run tests of type Alg_t (or derived) with Params Param_t
+*		 (Factory of tests)
 * 
 *		I. Alg_t must have a constructor for Param_t
 * 		II. AlgVar_t should derive from Alg_t (base of the hierarchy of algorithms)	
@@ -46,13 +47,16 @@ public:
 		tests.clear();
 	}
 	
-	/*void start(){
+	/**
+	* @brief runs all tests
+	**/
+	virtual void run_all_tests(){
 		for (auto& pTest : tests) {
-			pTest->setup();
-			pTest->run();
-			pTest->tear_down();
+			//pTest->setup();
+			pTest->start();
+			//pTest->tear_down();
 		}
-	}*/
+	}
 	
 
 /////////
