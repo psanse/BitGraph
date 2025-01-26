@@ -38,24 +38,21 @@ if (utils_build_tests)
 # "demo.cxx" and "demo_b.cxx". The extensions are automatically found.
 add_executable (test_utils ./tests/gtest_main.cc
 
-  #  TESTS TO BE CHECKED (19/01/2025)
-   
-    #  TESTS BEING CHECKED
-      tests/test_batch.cpp 
-     
-    
-    # TESTS CHECKED
-    # tests/test_common.cpp
-    # tests/test_file.cpp    
-    # tests/test_info.cpp
-    # tests/test_info_clq.cpp
-    # tests/test_precise_timer.cpp
-    # tests/test_thread.cpp
-    # tests/test_logger.cpp
-    # tests/test_benchmark.cpp
-    # tests/test_infoAnalyser.cpp
-    # tests/test_result.cpp
-    # tests/test_testAnalyser.cpp
+    # TESTS CHECKED  (26/01/2025)
+     tests/test_common.cpp
+     tests/test_file.cpp    
+     tests/test_info.cpp
+     tests/test_info_clq.cpp
+     tests/test_precise_timer.cpp
+     tests/test_thread.cpp
+     tests/test_logger.cpp
+     tests/test_benchmark.cpp
+     tests/test_infoAnalyser.cpp
+     tests/test_result.cpp     
+     tests/test_batch.cpp 
+
+     #test working but deprecated / or expect to be deprecated
+     #tests/test_testAnalyser.cpp
    
 )
 
