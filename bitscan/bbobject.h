@@ -39,7 +39,7 @@ protected:
 	////////
 	// bit scanning
 	
-	virtual int init_scan(scan_types)										{return 0;}
+	virtual int init_scan(scan_types)   { return 0; }
 };
 
 #endif

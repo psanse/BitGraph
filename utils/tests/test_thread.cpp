@@ -1,41 +1,56 @@
 #include "gtest/gtest.h"
-#include "../thread.h"
+#include "utils/thread.h"
+#include <thread>
 
 class ThreadExample{
+	
 public:
-	ThreadExample(int d):data(d){};
-
-	//function member to be run as thread (prototype is fixed)
+	ThreadExample(int d):res_(d){};
+		
+	/**
+	* @brief Mock task to be run by the thread
+	**/
 	int task_mul_by_2 (){
-		LOG_INFO("Thread running");
-#ifdef _MSC_VER
-		Sleep(3000);
-#elif __GNUC__
-		sleep(3);
-#endif
-		data*=2;
+
+		LOG_DEBUG("Thread running");
+		
+		//task
+		res_ *= 2;
+
+		//sleep for 0.2s
+		std::this_thread::sleep_for(std::chrono::milliseconds(200));
+
+		LOG_DEBUG("Thread finished");
+
 	return 0;
 	};
 
-	//function wrapper to run thread
-	int Start(DWORD tout_ms){
-		int res = Thread<ThreadExample, int>::Start(&ThreadExample::task_mul_by_2,this,tout_ms);
-		LOG_INFO("result:"<<data);	
-		return res;
+	
+	/**
+	* @brief driver to execute member function  task_mul_by_2 in a new thread
+	*		 and wait for the thread to finish
+	* @returns 0 if successful, -1 otherwise
+	**/
+	int Start(double tout_ms){
+		using Tf = int(ThreadExample::*)();
+		int retVal = com::Thread<ThreadExample, Tf>::Start(&ThreadExample::task_mul_by_2, this);
+		return retVal;
 	}
 
 //////////
-	int data;
-};
+	int res_;
+};	
 
 TEST(Thread, basic){
-	cout<<"Thread::basic------------------"<<endl;
+	
 	ThreadExample t(5);
-	int res= t.Start(1000);
-	EXPECT_EQ(-1, res);			//time out
+	int retVal= t.Start(1000);
+	EXPECT_EQ(0, retVal);			//finished correctly
 
-	int res1= t.Start(4000);
-	EXPECT_EQ(0, res1);			//finished correctly
+	LOG_DEBUG("passed through here");
 
-	cout<<"T------------------------------"<<endl;
+	//retVal = t.Start(4000);
+	//EXPECT_EQ(0, retVal);			//finished correctly
+
+
 }

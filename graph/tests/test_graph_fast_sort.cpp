@@ -152,12 +152,12 @@ TEST_F(GraphFastRootSortTest, sort_non_increasing_deg_with_support_tb) {
 	sorter.print(gt::PRINT_NODES, cout);*/
 }
 
-TEST_F(GraphFastRootSortTest, sort_degen_non_decreasing_degree) {
+TEST_F(GraphFastRootSortTest, sort_degen_non_decreasing_deg) {
 
 	using gt = GraphFastRootSort<ugraph>;
 	gt sorter(ug);
 	sorter.compute_deg_root();	
-	vint mapping = sorter.sort_degen_non_decreasing_degree(false);
+	vint mapping = sorter.sort_degen_non_decreasing_deg(false);
 
 	////////////////////////////////////////////
 	vint mapping_exp = { 0, 2, 4, 1, 3, 5 };
@@ -169,12 +169,12 @@ TEST_F(GraphFastRootSortTest, sort_degen_non_decreasing_degree) {
 	sorter.print(gt::PRINT_NODES, cout);*/
 }
 
-TEST_F(GraphFastRootSortTest, sort_degen_non_decreasing_degree_ltf) {
+TEST_F(GraphFastRootSortTest, sort_degen_non_decreasing_deg_ltf) {
 
 	using gt = GraphFastRootSort<ugraph>;
 	gt sorter(ug);
 	sorter.compute_deg_root();	
-	vint mapping = sorter.sort_degen_non_decreasing_degree(true);
+	vint mapping = sorter.sort_degen_non_decreasing_deg(true);
 
 	////////////////////////////////////////////
 	vint mapping_exp = { 0, 2, 4, 1, 3, 5 };						//taken from previous test
@@ -188,12 +188,12 @@ TEST_F(GraphFastRootSortTest, sort_degen_non_decreasing_degree_ltf) {
 }
 
 
-TEST_F(GraphFastRootSortTest, sort_degen_non_increasing_degree) {
+TEST_F(GraphFastRootSortTest, sort_degen_non_increasing_deg) {
 
 	using gt = GraphFastRootSort<ugraph>;
 	gt sorter(ug);
 	sorter.compute_deg_root();	
-	vint mapping = sorter.sort_degen_non_increasing_degree(false);
+	vint mapping = sorter.sort_degen_non_increasing_deg(false);
 
 	//TODO - complete test
 
@@ -207,12 +207,12 @@ TEST_F(GraphFastRootSortTest, sort_degen_non_increasing_degree) {
 	sorter.print(gt::PRINT_NODES, cout);*/
 }
 
-TEST_F(GraphFastRootSortTest, sort_degen_non_increasing_degree_ltf) {
+TEST_F(GraphFastRootSortTest, sort_degen_non_increasing_deg_ltf) {
 
 	using gt = GraphFastRootSort<ugraph>;
 	gt sorter(ug);
 	sorter.compute_deg_root();	
-	vint mapping = sorter.sort_degen_non_increasing_degree(true);
+	vint mapping = sorter.sort_degen_non_increasing_deg(true);
 
 	////////////////////////////////////////////
 	vint mapping_exp = { 1, 3, 0, 2, 4, 5 };							//taken from previous test
@@ -231,13 +231,13 @@ TEST_F(GraphFastRootSortTest, sort_degen_non_increasing_degree_ltf) {
 //
 /////////////////
 
-TEST_F(GraphFastRootSortTest, sort_degen_composite_non_decreasing_degree) {
+TEST_F(GraphFastRootSortTest, sort_degen_composite_non_decreasing_deg) {
 
 	using gt = GraphFastRootSort<ugraph>;
 	gt sorter(ug);
 	sorter.compute_deg_root();
 	sorter.sort_non_decreasing_deg(false);										//ordering I
-	vint mapping = sorter.sort_degen_composite_non_decreasing_degree(false);		//ordering II (tbs are based on ordering I)
+	vint mapping = sorter.sort_degen_composite_non_decreasing_deg(false);		//ordering II (tbs are based on ordering I)
 
 	////////////////////////////////////////////
 	vint mapping_exp = { 0, 2, 4, 5, 3, 1 };
@@ -249,13 +249,13 @@ TEST_F(GraphFastRootSortTest, sort_degen_composite_non_decreasing_degree) {
 	sorter.print(gt::PRINT_NODES, cout);*/
 }
 
-TEST_F(GraphFastRootSortTest, sort_degen_composite_non_decreasing_degree_ltf) {
+TEST_F(GraphFastRootSortTest, sort_degen_composite_non_decreasing_deg_ltf) {
 
 	using gt = GraphFastRootSort<ugraph>;
 	gt sorter(ug);
 	sorter.compute_deg_root();
 	sorter.sort_non_decreasing_deg(false);											//ordering I
-	vint mapping = sorter.sort_degen_composite_non_decreasing_degree(true);		//ordering II (tbs are based on ordering I)
+	vint mapping = sorter.sort_degen_composite_non_decreasing_deg(true);		//ordering II (tbs are based on ordering I)
 
 	////////////////////////////////////////////
 	vint mapping_exp = { 0, 2, 4, 5, 3, 1 };
@@ -268,13 +268,13 @@ TEST_F(GraphFastRootSortTest, sort_degen_composite_non_decreasing_degree_ltf) {
 	sorter.print(gt::PRINT_NODES, cout);*/
 }
 
-TEST_F(GraphFastRootSortTest, sort_degen_composite_non_increasing_degree) {
+TEST_F(GraphFastRootSortTest, sort_degen_composite_non_increasing_deg) {
 
 	using gt = GraphFastRootSort<ugraph>;
 	gt sorter(ug);
 	sorter.compute_deg_root();
 	sorter.sort_non_increasing_deg(false);										//ordering I
-	vint mapping = sorter.sort_degen_composite_non_increasing_degree(false);		//ordering II (tbs are based on ordering I)
+	vint mapping = sorter.sort_degen_composite_non_increasing_deg(false);		//ordering II (tbs are based on ordering I)
 
 	////////////////////////////////////////////
 	vint mapping_exp = { 1, 3, 2, 4, 5, 0 };
@@ -286,13 +286,13 @@ TEST_F(GraphFastRootSortTest, sort_degen_composite_non_increasing_degree) {
 	//sorter.print(gt::PRINT_NODES, cout);
 }
 
-TEST_F(GraphFastRootSortTest, sort_degen_composite_non_increasing_degree_ltf) {
+TEST_F(GraphFastRootSortTest, sort_degen_composite_non_increasing_deg_ltf) {
 
 	using gt = GraphFastRootSort<ugraph>;
 	gt sorter(ug);
 	sorter.compute_deg_root();
 	sorter.sort_non_increasing_deg(false);											//ordering I
-	vint mapping = sorter.sort_degen_composite_non_increasing_degree(true);		//ordering II (tbs are based on ordering I)
+	vint mapping = sorter.sort_degen_composite_non_increasing_deg(true);		//ordering II (tbs are based on ordering I)
 
 	////////////////////////////////////////////
 	vint mapping_exp = { 1, 3, 2, 4, 5, 0 };

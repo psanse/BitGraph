@@ -44,7 +44,7 @@ TEST_F(KcoreWTest, constructor) {
 	KCore<ugraph> kc(ug);
 
 	EXPECT_EQ(4, kc.get_graph().number_of_vertices());
-	EXPECT_EQ(nullptr, kc.get_subgraph());
+	EXPECT_TRUE(kc.get_subgraph().is_empty());
 
 
 }
@@ -57,13 +57,29 @@ TEST_F(KcoreWTest, set_subgraph) {
 	bbset.set_bit(2);
 	
 	//KCore with subgraph
-	KCore<ugraph> kc(ug, &bbset);
+	KCore<ugraph> kc(ug, bbset);
 	auto psg = kc.get_subgraph();
 
-	EXPECT_TRUE	(kc.get_subgraph()->is_bit(0));
-	EXPECT_TRUE	(kc.get_subgraph()->is_bit(2));
-	EXPECT_FALSE(kc.get_subgraph()->is_bit(1));
-	EXPECT_FALSE(kc.get_subgraph()->is_bit(3));
+	EXPECT_TRUE	(kc.get_subgraph().is_bit(0));
+	EXPECT_TRUE	(kc.get_subgraph().is_bit(2));
+	EXPECT_FALSE(kc.get_subgraph().is_bit(1));
+	EXPECT_FALSE(kc.get_subgraph().is_bit(3));
+
+}
+
+TEST_F(KcoreWTest, set_subgraph_from_vector) {
+
+	//bitset that induces a subgraph in G
+	vint vset = { 0, 2, 4 };
+
+	//KCore with subgraph
+	KCore<ugraph> kc(ug, vset);
+	auto psg = kc.get_subgraph();
+
+	EXPECT_TRUE(kc.get_subgraph().is_bit(0));
+	EXPECT_TRUE(kc.get_subgraph().is_bit(2));
+	EXPECT_FALSE(kc.get_subgraph().is_bit(1));
+	EXPECT_FALSE(kc.get_subgraph().is_bit(3));
 
 }
 
@@ -75,7 +91,7 @@ TEST_F(KcoreWTest, kcore_decomp_full_graph) {
 	kc.find_kcore();
 	/////////////////
 
-	EXPECT_EQ(1, kc.get_max_kcore());						//1-core is the maximum core number in a star graph
+	EXPECT_EQ(1, kc.max_core_number());						//1-core is the maximum core number in a star graph
 
 	EXPECT_EQ(1, kc.coreness(0));
 	EXPECT_EQ(1, kc.coreness(1));
@@ -89,19 +105,19 @@ TEST_F(KcoreWTest, kcore_decomp_full_graph) {
 	EXPECT_EQ(1, kcore_num[3]);
 
 	//size of k-cores
-	EXPECT_EQ(0, kc.get_kcore_size(0));						//number of vertices in the 0-core (isolani in disconnected graphs)
-	EXPECT_EQ(4, kc.get_kcore_size(1));						//number of vertices in the 1-core (and not in the 2-core)
-	EXPECT_EQ(0, kc.get_kcore_size(2));						//number of vertices in the 2-core (and not in the 3-core)
+	EXPECT_EQ(0, kc.core_size(0));							//number of vertices in the 0-core (isolani in disconnected graphs)
+	EXPECT_EQ(4, kc.core_size(1));							//number of vertices in the 1-core (and not in the 2-core)
+	EXPECT_EQ(0, kc.core_size(2));							//number of vertices in the 2-core (and not in the 3-core)
 
 	//set of vertices in k-cores
-	vint kcore_set = kc.get_kcore_set(1);					//vertices in the 1-core
+	vint kcore_set = kc.core_set(1);						//vertices in the 1-core
 	EXPECT_EQ(4, kcore_set.size());
 
-	kcore_set = kc.get_kcore_set(0);						//vertices in the 0-core: all vertices
+	kcore_set = kc.core_set(0);								//vertices in the 0-core: all vertices
 	EXPECT_EQ(4, kcore_set.size());
 
 	//k-core sorting (new-to-old format)
-	vint kcore_ord = kc.get_kcore_ordering();				//arrangement of vertices in non-decreasing kcore order
+	vint kcore_ord = kc.kcore_ordering();					//arrangement of vertices in non-decreasing kcore order
 
 	vint kcore_ord_exp = { 1, 2, 3, 0 };					//0 is the last because it was placed in the last bin	
 	EXPECT_EQ(kcore_ord_exp, kcore_ord);
@@ -123,8 +139,8 @@ TEST_F(KcoreWTest, minimum_width) {
 	auto min_width	= kc.minimum_width	(false);			//1 - minimum width of the graph 
 	auto width		= kc.minimum_width	(true);				//3 - a width but not minimum
 	
-	EXPECT_EQ(min_width, kc.get_max_kcore());				//minimum width = k in the max k-core 
-	EXPECT_NE(width, kc.get_max_kcore());
+	EXPECT_EQ(min_width, kc.max_core_number());				//minimum width = k in the max k-core 
+	EXPECT_NE(width, kc.max_core_number());
 
 	//I/O
 	//kc.print_kcore(false, cout);							//prints the coreness of each vertex
@@ -132,6 +148,87 @@ TEST_F(KcoreWTest, minimum_width) {
 }
 
 
+<<<<<<< .mine
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+=======
+TEST_F(KcoreWTest, kcore_decomp_static) {
+
+	KCore<ugraph> kc(ug);
+
+	//////////////////
+	kc.find_kcore();
+	int max_kcore_quad = KCore<ugraph>::find_kcore(ug);
+	//////////////////
+
+	EXPECT_EQ(max_kcore_quad, kc.max_core_number());			//minimum width = k in the max k-core 
+	
+
+	//I/O
+	//kc.print_kcore(false, cout);							//prints the coreness of each vertex
+	//kc.print_kcore(true, cout);							//prints the coreness and degree of each vertex
+}
+
+TEST(KCore, kcore_decomp_static_brock) {
+
+	ugraph ug(PATH_GRAPH_TESTS_CMAKE_SRC_CODE "brock200_1.clq");
+
+	//core number in O(|V|*|V|)
+	int max_core_quad = KCore<ugraph>::find_kcore(ug);								
+	///////////////////////////////////////////////////
+
+	//core number in O(|E|)
+	KCore<ugraph> kc(ug);									
+	kc.find_kcore();
+	
+
+	///////////////////////////////////////////////////
+	EXPECT_EQ(max_core_quad, kc.max_core_number());			 
+	///////////////////////////////////////////////////
+
+	//I/O
+	//kc.print_kcore(true, cout);								
+
+}
+
+>>>>>>> .theirs
 TEST(KCoreSparse, kcore_decomp_full_graph){
 	
 	//star graph with 11 vertices and a clique {1, 2, 7}
@@ -140,17 +237,17 @@ TEST(KCoreSparse, kcore_decomp_full_graph){
 	KCore<sparse_ugraph> kc(sug);
 
 	EXPECT_EQ(11, kc.get_graph().number_of_vertices());
-	EXPECT_EQ(nullptr, kc.get_subgraph());
+	EXPECT_TRUE	( kc.get_subgraph().is_empty());
 
 	////////////////////
 	kc.find_kcore();
 	///////////////////
 
 	//1-core = V \ {0, 1, 6}
-	EXPECT_EQ(8, kc.get_kcore_size(1));
+	EXPECT_EQ(8, kc.core_size(1));
 
 	//2-core = {0, 1, 6}
-	vint core2	= kc.get_kcore_set(2);
+	vint core2	= kc.core_set(2);
 	EXPECT_EQ(1, count(core2.begin(), core2.end(), 0));
 	EXPECT_EQ(1, count(core2.begin(), core2.end(), 1));
 	EXPECT_EQ(1, count(core2.begin(), core2.end(), 6));
@@ -169,25 +266,25 @@ TEST(KCoreSparse, kcore_decomp_subgraph) {
 	bbset.set_bit(1);
 	bbset.set_bit(6);
 
-	KCore<sparse_ugraph> kc(sug, &bbset);
+	KCore<sparse_ugraph> kc(sug, bbset);
 
 	EXPECT_EQ(11, kc.get_graph().number_of_vertices());
-	EXPECT_TRUE(kc.get_subgraph()->is_bit(0));
-	EXPECT_TRUE(kc.get_subgraph()->is_bit(1));
-	EXPECT_TRUE(kc.get_subgraph()->is_bit(6));
-	EXPECT_EQ(3, kc.get_subgraph()->popcn64());
+	EXPECT_TRUE(kc.get_subgraph().is_bit(0));
+	EXPECT_TRUE(kc.get_subgraph().is_bit(1));
+	EXPECT_TRUE(kc.get_subgraph().is_bit(6));
+	EXPECT_EQ(3, kc.get_subgraph().popcn64());
 
 	////////////////////
-	kc.find_kcore();											//on G[{0, 1, 6}]			
+	kc.find_kcore(true);											//on G[{0, 1, 6}]			
 	///////////////////
 
 	//1-core = V \ {0, 1, 6}
-	EXPECT_EQ(0, kc.get_kcore_size(1));
+	EXPECT_EQ(0, kc.core_size(1));
 
 
 	//2-core = {0, 1, 6}
-	vint core2 = kc.get_kcore_set(2);
-	EXPECT_EQ(3, kc.get_kcore_size(2));
+	vint core2 = kc.core_set(2);
+	EXPECT_EQ(3, kc.core_size(2));
 	EXPECT_EQ(1, count(core2.begin(), core2.end(), 0));
 	EXPECT_EQ(1, count(core2.begin(), core2.end(), 1));
 	EXPECT_EQ(1, count(core2.begin(), core2.end(), 6));
@@ -214,18 +311,18 @@ TEST(KCoreUB, kcore_example){
 	//test with real kcore number
 	KCore<ugraph> kc(ug);	
 	kc.find_kcore();
-	int kcn=kc.get_max_kcore();
+	int kcn=kc.max_core_number();
 	int UB_corr=kc.find_kcore_UB(kcn);
-	int kcUBn=kc.get_max_kcore();
+	int kcUBn=kc.max_core_number();
 	EXPECT_EQ(UB_corr, kcUBn);
 	EXPECT_EQ(kcUBn, kc.minimum_width(true));   //checks width (real degrees)
 	
 	//test with UB on kcore number
 	KCore<ugraph> kc1(ug);
 	kc1.find_kcore();
-	kcn = kc1.get_max_kcore();
+	kcn = kc1.max_core_number();
 	UB_corr=kc1.find_kcore_UB(kcn);
-	kcUBn=kc1.get_max_kcore();
+	kcUBn=kc1.max_core_number();
 
 	EXPECT_EQ(UB_corr, kcUBn);	
 	EXPECT_EQ(kcUBn, kc.minimum_width(true)); //checks width (real degrees)
@@ -234,9 +331,9 @@ TEST(KCoreUB, kcore_example){
 	//test with UB on kcore number
 	KCore<ugraph> kc2(ug);
 	kc2.find_kcore();
-	kcn=kc2.get_max_kcore();
+	kcn=kc2.max_core_number();
 	UB_corr=kc2.find_kcore_UB(kcn);
-	kcUBn=kc2.get_max_kcore();
+	kcUBn=kc2.max_core_number();
 
 	EXPECT_EQ(UB_corr, kcUBn);	
 	EXPECT_EQ(kcUBn, kc.minimum_width(true)); //checks width (real degrees)
@@ -250,9 +347,9 @@ TEST(KCoreUB, kcore_example_I){
 	//test with real kcore number
 	KCore<ugraph> kc(ug);
 	kc.find_kcore();
-	int kcn=kc.get_max_kcore();
+	int kcn=kc.max_core_number();
 	int UB_corr=kc.find_kcore_UB(kcn);
-	int kcUBn=kc.get_max_kcore();
+	int kcUBn=kc.max_core_number();
 
 	EXPECT_EQ(UB_corr, kcUBn);
 	EXPECT_EQ(kcUBn, kc.minimum_width(true)); //checks width (real degrees)
@@ -266,9 +363,9 @@ TEST(KCoreUB, kcore_example_II){
 	//test with real kcore number
 	KCore<ugraph> kc(ug);
 	kc.find_kcore();
-	int kcn=kc.get_max_kcore();
+	int kcn = kc.max_core_number();
 	int UB_corr=kc.find_kcore_UB(kcn);
-	int kcUBn=kc.get_max_kcore();
+	int kcUBn = kc.max_core_number();
 
 	EXPECT_EQ(UB_corr, kcUBn);
 	EXPECT_EQ(kcUBn, kc.minimum_width(true)); //checks width (real degrees)
@@ -314,17 +411,17 @@ TEST(KCoreUB, DISABLED_random){
 			
 				KCore<ugraph> kc(ug);
 				kc.find_kcore();
-				int kcn=kc.get_max_kcore();
+				int kcn=kc.max_core_number();
 
 				KCore<ugraph> kcUB(ug);
 				int UB_corr= kcUB.find_kcore_UB(kcn);
-				int kcUBn=kcUB.get_max_kcore();
+				int kcUBn=kcUB.max_core_number();
 				EXPECT_EQ(UB_corr, kcUBn);
 				EXPECT_EQ(kcUBn, kcUB.minimum_width(true));		//checks width (real degrees)
 				
 				
 				if(kcn!=kcUBn){
-					sstr<<":"<<"kcore: "<<kc.get_max_kcore()<<" kcore_UB: "<<kcUB.get_max_kcore();
+					sstr<<":"<<"kcore: "<<kc.max_core_number()<<" kcore_UB: "<<kcUB.max_core_number();
 					LOGG_INFO(sstr.str());
 				}
 	

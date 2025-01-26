@@ -1,16 +1,18 @@
-// log.h: logy v1.2 -- A simplistic, light-weight, single-header C++ logger
-//		  (!) Summer 2018 by Giovanni Squillero <giovanni.squillero@polito.it>
-//		  This code has been dedicated to the public domain
-//
-//		  Project page: https://github.com/squillero/logy
-//
-//@comments: 
-//1.vectors & initializer_list are supported using SFINAE
-//2.C++11 compliant
-//3.Refined with the help of copilot (06/11/2024)
-//
-//@first_update: 03/11/2024
-//@last_update: 06/11/2024
+/**
+* @file logger.h
+* @brief  A simplistic, light-weight, single-header C++ logger  "logy v1.2"
+*		  Dev: Giovanni Squillero <giovanni.squillero@polito.it> (Summer 2018)
+*		  URL: https://github.com/squillero/logy
+*		  This code has been dedicated to the public domain
+* @date 03/11/2024
+* @last_update 19/01/25
+* @author Slight talioring by pss + copilot
+* 
+* @comments: 
+* 1.vectors & initializer_list are supported using SFINAE
+* 2.C++11 compliant
+* 3.Refined with the help of copilot (06/11/2024)
+**/
 
 #ifndef	__LOGY_H__
 #define __LOGY_H__
@@ -28,11 +30,10 @@
 #include <ctime>
 #include <initializer_list>
 
-
 //////////////////////////////////////////////
 //logger level manual setting - [Warning and ERROR only - default] 
 //
-// (uncomment one to the options to change default)
+// (uncomment one to the options to change default, alternatively use CMake GUI)
 //
 //#define LOGGER_ERROR_LEVEL		//only ERROR (minimum priority)
 //#define LOGGER_VERBOSE_LEVEL		//all except DEBUG (second priority)

@@ -1,21 +1,24 @@
 #set useful headers 
 set(useful_headers_for_IDE 
-common.h
-prec_timer.h
-logger.h
-info/info_base.h
+    common.h
+    common_types.h
+    prec_timer.h
+    logger.h
+    info/info_base.h
 )
 
 #created utils library
 add_library (utils
-benchmark.cpp 
-result.cpp
-test_analyser.cpp
-common.cpp
-info/info_base.cpp
-info/info_clq.cpp                                   #move to clq algorithms and remove from here
-#logger.cpp 
-${useful_headers_for_IDE}
+    benchmark.cpp 
+    result.cpp
+    test_analyser.cpp
+    info_analyser.cpp
+    common.cpp
+    common_types.cpp
+    info/info_base.cpp
+    info/info_clq.cpp                                   #move to clq algorithms and remove from here
+    #logger.cpp 
+    ${useful_headers_for_IDE}
 )
 
 # Make sure the compiler can find include files for our utils library
@@ -34,18 +37,23 @@ if (utils_build_tests)
 # Add executable called "helloDemo" that is built from the source files
 # "demo.cxx" and "demo_b.cxx". The extensions are automatically found.
 add_executable (test_utils ./tests/gtest_main.cc
-#./tests/test_batch.cpp
-#./tests/test_benchmark.cpp
-#./tests/test_common.cpp
-#./tests/test_file.cpp
-# ./tests/test_logger.cpp
- ./tests/test_result.cpp
-# ./tests/test_precise_timer.cpp
-#./tests/test_tanal.cpp
-#./tests/test_thread.cpp
-#./test_analyser.cpp
-#./tests/test_info.cpp
-#  ./tests/test_info_clq.cpp
+
+    # TESTS CHECKED  (26/01/2025)
+     tests/test_common.cpp
+     tests/test_file.cpp    
+     tests/test_info.cpp
+     tests/test_info_clq.cpp
+     tests/test_precise_timer.cpp
+     tests/test_thread.cpp
+     tests/test_logger.cpp
+     tests/test_benchmark.cpp
+     tests/test_infoAnalyser.cpp
+     tests/test_result.cpp     
+     tests/test_batch.cpp 
+
+     #test working but deprecated / or expect to be deprecated
+     #tests/test_testAnalyser.cpp
+   
 )
 
 target_include_directories (test_utils PUBLIC ../googletest/include/)

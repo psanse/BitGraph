@@ -7,10 +7,10 @@
 #include <algorithm>
 
 using namespace std;
-typedef unsigned long long ull;
+using ull = unsigned long long;
 
 TEST(Result, time){
-	cout<<"Result::time------------------"<<endl;
+	
 	Result r;
 	r.tic();
 	for( ull i=0; i<5e8; i++){}
@@ -18,11 +18,11 @@ TEST(Result, time){
 	cout<<"elapsed time: "<<elapsed_time<<endl;
 	EXPECT_TRUE(r.get_user_time()==elapsed_time);
 	EXPECT_TRUE(elapsed_time>0);
-	cout<<"--------------------------------------"<<endl;
+	
 }
 
 TEST(Result, solutions){
-	cout<<"Result::solutions------------------"<<endl;
+	
 	Result r;
 	vector<usint> sol1(10,1);
 	vector<usint> sol2(10,2);
@@ -37,11 +37,10 @@ TEST(Result, solutions){
 	vector<vector<usint> > vsol=r.get_all_solutions();
 	EXPECT_EQ(vsol[2],sol3);
 	
-	cout<<"--------------------------------------"<<endl;
 }
 
 TEST(Result, counters){
-	cout<<"Result::counters------------------"<<endl;
+	
 	Result r;
 	usint index=r.inc_counter();
 	EXPECT_EQ(index, 0);
@@ -57,5 +56,4 @@ TEST(Result, counters){
 	r.inc_counter(index_2, 3);
 	EXPECT_EQ(8, r.get_counter_value(index_2));
 	
-	cout<<"--------------------------------------"<<endl;
 }

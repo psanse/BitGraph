@@ -1,405 +1,440 @@
-//tests_analyser.cpp: implementation of test_analyser in test_analyser.h
+/*
+ * @file tests_analyser.cpp
+ * @brief implementation of the TestAnalyser class (tests_analyser.h) to manage benchmarking of graph algorithms
+ * @date 2013
+ * @last_update 20/01/2025
+ * @author pss
+ */
 
-
+#include "common.h"
+#include "logger.h"
+#include "test_analyser.h"
+#include <iomanip>
 #include <math.h>
 #include <string>
-#include <fstream>
-#include <iomanip>
-#include <algorithm>
 
-#include "test_analyser.h"
-#include "prec_timer.h"
-#include "logger.h"
-#include "common.h"
+using namespace std;
 
-
- ostream& operator <<(ostream& o,const TestAnalyser& t){
+ ostream& operator << (ostream& o,const TestAnalyser& t)
+ {
 	try{
 		//general information
-		if(t.m_print_mode & TestAnalyser::NAME){					//assumes the same instance for all tests
-			//o<<left<<setw(30)<<t.arrayOfTests[0][0].get_name()<<" ";
-			o<<left<<setw(30)<<t.arrayOfTests[0][0].get_name();
+		if(t.print_mode_ & TestAnalyser::NAME){					//assumes the same instance for all tests
+			//o<<left<<setw(30)<<t.arrayOfTests_[0][0].get_name()<<" ";
+			o << left << setw(30) << t.arrayOfTests_[0][0].get_name();
 		}
 
-		if(t.m_print_mode & TestAnalyser::SIZE){
-			//o<<setw(5)<<right<<setprecision(0)<<t.arrayOfTests[0][0].get_d1()<<" ";  
-			o<<right<<"\t"<<t.arrayOfTests[0][0].get_d1();
+		if(t.print_mode_ & TestAnalyser::SIZE){
+			//o<<setw(5)<<right<<setprecision(0)<<t.arrayOfTests_[0][0].get_d1()<<" ";  
+			o <<right <<"\t" << t.arrayOfTests_[0][0].get_d1();
 		}
 
-		if(t.m_print_mode & TestAnalyser::EDGES){
-			//o<<setw(5)<<right<<setprecision(0)<<t.arrayOfTests[0][0].get_d2()<<" ";  
-			o<< right<<"\t"<<t.arrayOfTests[0][0].get_d2();
+		if(t.print_mode_ & TestAnalyser::EDGES){
+			//o<<setw(5)<<right<<setprecision(0)<<t.arrayOfTests_[0][0].get_d2()<<" ";  
+			o << right <<"\t" << t.arrayOfTests_[0][0].get_d2();
 		}
 
-		if (t.m_print_mode & TestAnalyser::TIMEOUT) {
-			o << right<< setw(10)<< "\t" <<(int)t.arrayOfTests[0][0].get_tout();
+		if (t.print_mode_ & TestAnalyser::TIMEOUT) {
+			o << right<< setw(10)<< "\t" << (int)t.arrayOfTests_[0][0].get_tout();
 		}
 
-		if (t.m_print_mode & TestAnalyser::ALG) {
-			o << right<< "\t" << t.arrayOfTests[0][0].get_alg();
+		if (t.print_mode_ & TestAnalyser::ALG) {
+			o << right<< "\t" << t.arrayOfTests_[0][0].get_alg();
 		}
 		
-		if (t.m_print_mode & TestAnalyser::SORT) {
+		if (t.print_mode_ & TestAnalyser::SORT) {
 			//TODO@decode SORT_TYPE!
-			//o << setw(5) << right << setprecision(0) << t.arrayOfTests[0][0].get_d3() << " ";
-			o << right<< "\t" << t.arrayOfTests[0][0].get_d3();
+			//o << setw(5) << right << setprecision(0) << t.arrayOfTests_[0][0].get_d3() << " ";
+			o << right<< "\t" << t.arrayOfTests_[0][0].get_d3();
 		}
 
-		//ADD TIMEOUT
+		//TODO - ADD TIMEOUT (check this comment 20/01/2025)
 				
 		//information common to all tests
 		o.setf(ios::fixed);										
-		for(int i=0; i<t.m_nAlg; i++){
+		for(auto i = 0; i < t.nAlg_; ++i){
 
-			if (t.m_print_mode & TestAnalyser::LOWER_BOUND) {
+			if (t.print_mode_ & TestAnalyser::LOWER_BOUND) {
 				//o << setw(4) << right << setprecision(2) << t.arrayOfAvLB[i] << " ";
 				o << right<< setw(7)<<setprecision(2)<<"\t" << t.arrayOfAvLB[i];
 
 			}
 
-			if (t.m_print_mode & TestAnalyser::SOL) {
+			if (t.print_mode_ & TestAnalyser::SOL) {
 				//o << setw(5) << right << setprecision(2) << t.arrayOfAvSol[i] << " ";
 				o << right<< setw(7)<<setprecision(2) << "\t" << t.arrayOfAvSol[i];
 			}
 									
-			//if(t.m_print_mode& TestAnalyser::STDDEV_SOL){
+			//if(t.print_mode_& TestAnalyser::STDDEV_SOL){
 			//	o<<setw(5)<<right<<setprecision(2)<<t.arrayOfSdSol[i]<<" ";  
 			//}
 
-			//if(t.m_print_mode & TestAnalyser::MAX_SOL){
+			//if(t.print_mode_ & TestAnalyser::MAX_SOL){
 			//	//o<<setw(5)<<right<<setprecision(0)<<t.arrayOfMaxSol[i]<<" ";  
 			//	o << setprecision(0) << "\t" << t.arrayOfMaxSol[i];				
 			//}
 									
 			
-			if(t.m_print_mode & TestAnalyser::STEPS){
+			if(t.print_mode_ & TestAnalyser::STEPS){
 				//o<<setw(15)<<right<<setprecision(0)<<t.arrayOfAvSteps[i]<<" ";  
-				o << right<<setw(10)<<setprecision(0) << "\t" << t.arrayOfAvSteps[i];
+				o << right << setw(10) << setprecision(0) << "\t" << t.arrayOfAvSteps[i];
 				
 			}
 																			
-			if(t.m_print_mode & TestAnalyser::TIME){
+			if(t.print_mode_ & TestAnalyser::TIME){
 				//o<<setw(12)<<right<<setprecision(3)<<t.arrayOfAvTimes[i]<<" "; 
-				o << right<< setw(7)<<setprecision(3) << "\t" << t.arrayOfAvTimes[i];
+				o << right<< setw(7) << setprecision(3) << "\t" << t.arrayOfAvTimes[i];
 				
 			}
 
-			if (t.m_print_mode & TestAnalyser::TIMEPRE) {
+			if (t.print_mode_ & TestAnalyser::TIMEPRE) {
 				//o<<setw(12)<<right<<setprecision(3)<<t.arrayOfAvTimes[i]<<" "; 
 				o << right << setw(7) << setprecision(3) << "\t" << t.arrayOfAvPreProcTimes[i];
 
 			}
 				
-			if (t.m_print_mode & TestAnalyser::NFAIL) {
+			if (t.print_mode_ & TestAnalyser::NFAIL) {
 				//o << setw(5) << t.arrayOfFails[i] << " ";
 				o << right<< "\t" << t.arrayOfFails[i];
 			}
 
-			if(t.m_print_mode & TestAnalyser::NCONT){
-				for(int j=0; j<t.arrayOfCounters[i].size(); j++){
-						o<<right<<setw(10)<<setprecision(4)<<t.arrayOfCounters[i][j]<<" ";  
+			if(t.print_mode_ & TestAnalyser::NCONT){
+				for(auto j = 0; j < t.arrayOfCounters[i].size(); ++j){
+					o << right << setw(10) << setprecision(4) << t.arrayOfCounters[i][j]<<" ";  
 				}
 			}		
 
 			
 			//separator for diffent algs of same instance
-			if(i < (t.m_nAlg-1)){				
-				o<<"| ";
+			if(i < (t.nAlg_ - 1) ){				
+				o << "| ";
 			}
 		}
-		o<<endl;
+		o << endl;
 	
 	}catch(exception e){
-		LOG_ERROR("Test_Analyser::Error when printing data");
-		o<<"Test_Analyser::Error when printing data"<<endl;
+		LOG_ERROR("Error when printing data", e.what(), "- Test_Analyser::operator << ");
+		o << "Error when printing data" << e.what() << "- Test_Analyser::operator<< " << endl;
 	}
-return o;
+
+	return o;
 }
 
-
-TestAnalyser::TestAnalyser(void){
-	clear();
-	m_print_mode=DEFAULT_PRINT_MODE;
-}
-
-void TestAnalyser::clear(){
-	arrayOfTests.clear();				//[Nª rep][Algorithm]
+void TestAnalyser::clear()
+{
+	arrayOfTests_.clear();				//[nRep][nAlg]
 	arrayOfAvTimes.clear();
 	arrayOfAvPreProcTimes.clear();
-	arrayOfAvSol.clear();				//nAlg
-//	arrayOfSdTime.clear();		
-	arrayOfSdSol.clear();	
+	arrayOfAvSol.clear();				//[nAlg]	
 	arrayOfFails.clear();
 	arrayOfAvLB.clear();
 	arrayOfAvSteps.clear();
 	arrayOfCounters.clear();
 	arrayOfMaxSol.clear();
-	m_nAlg=0;
-	m_nRep=0;
-	m_print_mode=DEFAULT_PRINT_MODE;
+	nAlg_ = 0;
+	nRep_ = 0;
+	print_mode_ = DEFAULT_PRINT_MODE;
+
+	//arrayOfSdTime.clear();			//std dev reports - currently not implemented		
+	//arrayOfSdSol.clear();
 }
 
 void TestAnalyser::add_test(bool isNewRep, Result res){
-////////////////////
-//Appends new repetition/test (isNewRep=TRUE) or inserts value of a new algorithm with current repetition/test (isNewRep=FALSE)
-		
-	if(isNewRep||arrayOfTests.empty() ){
+			
+	if(isNewRep || arrayOfTests_.empty() ){					//new repetition/test
+
 		vres_t v;
-		v.push_back(res);
-		arrayOfTests.push_back(v);				//new repetition/test
+		v.push_back(std::move(res));
+		arrayOfTests_.push_back(std::move(v));		
+
 	}else{
-		arrayOfTests.back().push_back(res);		//new alg result in current repetition/test
+
+		arrayOfTests_.back().push_back(std::move(res));		//new result in a current repetition/test
+
 	}
 }
 
 int TestAnalyser::analyser(info_t* info){
-////////////////////////////////
-// Analyses average results of all algorithms (average values for each repetition etc.)
-// RETURN 0 OK, -1 ERROR
-//
-// TODO: Standard deviation analysis
-//
-// COMMENTS
-// 1-A test is each repetition of an algorithm
-// 2-All algorithms are assumed to have the same number of counters for each test
-// 3-Averages only consider NOT FAILED tests (if there is only one test results will be shown)
-// 4-Obvioulsy if all tests FAIL no results are shown
 
-	//updates m_nRep, m_nAlg
-	if(update_sizes()==ERR){
-		if(m_nRep<=0)
-			LOG_ERROR("TestAnalyser::Error in number of repetitions: ",m_nRep);
-		if(m_nAlg<=0){
-			LOG_ERROR("TestAnalyser::Error en number of algorithms: ",m_nAlg);
+	//updates nRep_, nAlg_ values / checks consistency
+	if(make_consistent() == ERR){
+		if (nRep_ <= 0) {
+			LOGG_ERROR("Error in number of repetitions: ", nRep_, "TestAnalyser::analyser");
+		}
+		if(nAlg_ <= 0){
+			LOGG_ERROR("Error in number of algorithms: ", nAlg_, "TestAnalyser::analyser");
 		}
 		return ERR;
 	}
 
-	double avSol, avTimes, avPreProcTimes, avSteps, avLB;		
-	int nFails=0; double maxSol=0;
+	///////////////////////////
+	//analysis of the results
+	double avSol, avTimes, avPreProcTimes, avSteps, avLB;	
+	double maxSol = 0;
+	int nFails = 0; 
 	
 	//main outer loop over algorithms
 	vector<double> avnCounters;			
-	for(int j=0; j<m_nAlg; j++){
-		nFails=0, maxSol=0.0, avSol=0.0, avTimes=0.0, avPreProcTimes=0.0, avSteps=0.0, avLB=0.0;
+	for(auto j = 0; j < nAlg_; ++j){
 
-		/////////////////////////////
-		//initiliazes counter results for current algorithm
-		avnCounters.clear();
-		usint nMaxCounters=0;
-		for(int rep=0; rep<m_nRep; rep++){
-			if(nMaxCounters<arrayOfTests[rep].at(j).number_of_counters())
-				nMaxCounters=arrayOfTests[rep].at(j).number_of_counters();
+		////////////
+		//initializes context for current algorithm j
+		avSol = 0.0;
+		avTimes = 0.0; 
+		avPreProcTimes = 0.0;
+		avSteps = 0.0;
+		avLB = 0.0;
+		maxSol = 0.0;
+		nFails = 0;
+			
+
+		//determines the maximum number of counters of any algorithm and repetition
+		usint nMaxCounters = 0;						
+		for(int rep = 0; rep < nRep_; ++rep)
+		{
+			if (nMaxCounters < arrayOfTests_[rep].at(j).number_of_counters()) {
+				nMaxCounters = arrayOfTests_[rep].at(j).number_of_counters();
+			}
 		}
-		//assigns initial value cero to avnCounters
+
+		//allocates nMaxCounters with initial value 0.0
 		avnCounters.assign(nMaxCounters,0.0);	
 
 		////////////////////////////////
-		//inner loop of repetitions
-		for(int rep=0; rep<m_nRep; rep++){
-			Result res=arrayOfTests[rep].at(j);
+		//inner loop repetitions for algorithm j
 
-			//counters are always shown independent of FAIL
-			for(int i=0; i<res.number_of_counters(); i++)
-				avnCounters[i]+=res.get_counters()[i];
+		for(auto rep = 0; rep < nRep_; ++rep){
+			Result res = arrayOfTests_[rep].at(j);				 
 
-			if(!res.is_time_out()){
-				double sol=res.get_upper_bound();
-				avSol+=sol;
-				if(sol>maxSol)
-					maxSol=sol;
-				avTimes+=res.get_user_time();
-				avPreProcTimes += res.get_pre_time();
-				avSteps+=res.number_of_steps();
-				avLB+=res.get_lower_bound();
-
-			}else{
-				//timeout
-				if(m_nRep==1){
-					//si no hay mas que un ensayo se muestran los resultados
-					avSol+=res.get_upper_bound();
-					maxSol=avSol;
-					//arrayOfMaxSol[j]=avSol;
-					avSteps+=res.number_of_steps();
-					avLB+=res.get_lower_bound();
-				}
-				nFails++;
+			//extracts counter info - always reported independent of TIMEOUT
+			for (auto i = 0; i < res.number_of_counters(); i++) {
+				avnCounters[i] += res.get_counters()[i];
 			}
-		}//end of test analysis for current algorithm
+						
+			if(!res.is_time_out())
+			{	
+				//no time_out
+				double sol = res.get_upper_bound();
+				avSol += sol;
+				if (sol > maxSol) {
+					maxSol = sol;
+				}
+				avTimes += res.get_user_time();
+				avPreProcTimes += res.get_pre_time();
+				avSteps += res.number_of_steps();
+				avLB += res.get_lower_bound();
+
+			}
+			else {			
+				//time_out
+				if(nRep_== 1){									//if only one test, time out results are reported anyway
+				
+					avSol += res.get_upper_bound();
+					maxSol = avSol;			
+					avSteps += res.number_of_steps();
+					avLB += res.get_lower_bound();
+				}
+
+				nFails++;										//if more than one test, time out results are not reported
+			}
+		}//endFor repetitions for algorithm j
 
 		///////////////////////////
-		//Computes Counters (indep. of FAILS)
-		for(int i=0; i<avnCounters.size(); i++){
-			avnCounters[i]/=m_nRep;
+		// Report results for algorithm j
+		 
+		//counter info (indep. of FAILS)
+		for(auto i = 0; i < avnCounters.size(); ++i){
+			avnCounters[i] /= nRep_;
 		}
 		arrayOfCounters.push_back(avnCounters);
 
-		////////////////////////////
-		//Computes averages taking into account FAILS
+	
+		//average info - taking into account FAILS
 		arrayOfFails.push_back(nFails);
-		if(nFails!=m_nRep){
-			//Existe al menos un caso no fail
-			arrayOfAvSol.push_back(avSol/(float)(m_nRep-nFails));
-			arrayOfAvTimes.push_back(avTimes/(m_nRep-nFails));	
+
+		if(nFails != nRep_){
 			
-			arrayOfAvPreProcTimes.push_back(avPreProcTimes / (m_nRep - nFails));
+			auto nonFailedReps = nRep_ - nFails;
 
-			arrayOfAvSteps.push_back(avSteps/(m_nRep-nFails));
-			arrayOfAvLB.push_back(avLB/(m_nRep-nFails));
-			arrayOfMaxSol.push_back(maxSol);
-		}else{ //Todos los intentos con time_out 
-			arrayOfAvTimes.push_back(-1.0);	
-			arrayOfAvPreProcTimes.push_back(-1.0);
+			//At least one case in which algorithm j did not time out exists
+			arrayOfAvSol.push_back			(avSol   / nonFailedReps);
+			arrayOfAvTimes.push_back		(avTimes / nonFailedReps);
+			
+			arrayOfAvPreProcTimes.push_back	(avPreProcTimes / nonFailedReps);
 
-			if(m_nRep==1){ //single execution: show values
-				arrayOfAvSol.push_back(avSol);
-				arrayOfAvSteps.push_back(avSteps);
-				arrayOfAvLB.push_back(avLB);
-				arrayOfMaxSol.push_back(maxSol);
-			}else{	//multiple repetitions: do not show values
-				arrayOfAvSol.push_back(0.0);
-				arrayOfAvSteps.push_back(0.0);
-				arrayOfAvLB.push_back(0.0);
-				arrayOfMaxSol.push_back(0);
+			arrayOfAvSteps.push_back		(avSteps / nonFailedReps);
+			arrayOfAvLB.push_back			(avLB / nonFailedReps);
+			arrayOfMaxSol.push_back			(maxSol);
+		}
+		else
+		{ 
+			//Algorithm j timed-out in all cases
+			arrayOfAvTimes.push_back		(-1.0);	
+			arrayOfAvPreProcTimes.push_back	(-1.0);
+
+			if(nRep_ == 1)
+			{ 
+				//single execution: report values anyway
+				arrayOfAvSol.push_back		(avSol);
+				arrayOfAvSteps.push_back	(avSteps);
+				arrayOfAvLB.push_back		(avLB);
+				arrayOfMaxSol.push_back		(maxSol);
+			}
+			else
+			{
+				//multiple repetitions: do not show values
+				arrayOfAvSol.push_back		(0.0);
+				arrayOfAvSteps.push_back	(0.0);
+				arrayOfAvLB.push_back		(0.0);
+				arrayOfMaxSol.push_back		(0);
 			}
 		}
+
+	}//endFor algorithms
+
+	//compares algorithms (use for comparison of two algorithms)
+	if(info != nullptr){
+
+		if (com::stl::all_equal(arrayOfAvSol))		{ info -> same_sol = true; }
+		if (com::stl::all_equal(arrayOfAvSteps))	{ info -> same_steps = true; }
+		if (com::stl::all_equal(arrayOfAvLB))		{ info -> same_lb = true; }
+		if (arrayOfAvSteps[0] > arrayOfAvSteps[1])	{ info -> steps_first_greater = true; }
+		
+		info -> steps_lhs = arrayOfAvSteps[0]; 
+		info -> steps_rhs = arrayOfAvSteps[1]; 
 	}
+
+	//TODO - STANDARD DEVIATION ANALYSIS
 	
-	//analyse similitude between algorithms (specially for comparison of two algorithms)
-	if(info!=nullptr){
-		if(com::stl::all_equal(arrayOfAvSol)) info->same_sol=true;
-		if(com::stl::all_equal(arrayOfAvSteps))	info->same_steps=true;
-		if(com::stl::all_equal(arrayOfAvLB)) info->same_lb=true;
-		if(arrayOfAvSteps[0]>arrayOfAvSteps[1])	info->steps_first_greater=true;
-		info->steps_lhs=arrayOfAvSteps[0]; 
-		info->steps_rhs=arrayOfAvSteps[1]; 
-	}
-
-	//***STANDARD DEVIATION ****
-
 return OK;
 }
 
-bool TestAnalyser::is_consistent_sol(int& num_error){
-/////////////////
-// Returns TRUE if at least one solution (or just one solution) exists and it is consistent
-// Returns num_error: -1 ok, 0 nothing to compare with, 1-N the first algorithm different from the one run first
+bool TestAnalyser::consistent_sol_val(int& num_error){
 
-	num_error=-1;
-	bool consistent_sol=true;
+	num_error = -1;
+	bool same_sol = true;
 
-	//test emptyness
+	//check no reported solutions
 	if (arrayOfAvSol.empty()){
-		LOG_ERROR("no solutions available");
-		num_error=0;
+		LOG_ERROR("No reported solutions, possibly all timed -  TestAnalyser::is_consistent_sol");
+		num_error = 0;	
 		return false;
 	}
 
-	consistent_sol = true;
+	//iterates over the array of avergaed solutions
+	same_sol = true;
 	double firstItem = arrayOfAvSol.front();
-	int count=0;
-	for (vector<double>::const_iterator it = arrayOfAvSol.begin()+1; it != arrayOfAvSol.end() ; it++) {
-		count++;
+	for (auto it = arrayOfAvSol.begin() + 1; it != arrayOfAvSol.end() ; it++) {
+		
+		//finds a different solution
 		if(*it != firstItem) {
-			consistent_sol = false;
-			num_error=count;
+			same_sol = false;
+			num_error = std::distance (arrayOfAvSol.begin(), it);		//CHECK (20/01/2015)
 			break;
 		}
+
 	}
 
-return consistent_sol;
+	return same_sol;
 }
 
-////////////////////////
-// E/S
+bool TestAnalyser::is_consistent_array_of_tests()
+{
+	return (	(nRep_ == arrayOfTests_.size())		&& 
+				(nAlg_ == arrayOfTests_[0].size())		);
 
-void print_current_time	(ostream& o){
-	o<<PrecisionTimer::local_timestamp();
 }
 
-void print_line	(const string str, ostream& o){
-	o<<str;
-}
+ostream& TestAnalyser::print_single(ostream & o, int idAlg){
 
-void TestAnalyser::print_single(ostream & o, int idAlg){
-///////////////////////////
-// date: 2/7/13
-// prints individual results of algorithms 
-// nAlg==-1 all algs (DEFAULT)
-
-	//fills m_nRep and m_nAlg appropiately
-	update_sizes();
-	if(m_nRep==0 || m_nAlg==0 ){
-		LOG_ERROR("empty tests");
-		return;
+	//update nRep_ and nAlg_ appropiately
+	make_consistent();
+	if(nRep_ == 0 || nAlg_ == 0 ){
+		LOG_ERROR("Empty tests - TestAnalyser::print_single");
+		return o;
 	}
 
-	//bounds parameters
-	if(idAlg==-1) idAlg=m_nAlg;
-	else (idAlg>m_nAlg)? idAlg=m_nAlg: 1;
+	//default cases
+	if (idAlg == -1) {
+		idAlg = nAlg_;
+	}
+	else {
+		(idAlg > nAlg_) ? idAlg = nAlg_ : 1;
+	}
 	
-	o<<"------------------------------------------"<<endl;
+	o << "------------------------------------------" << endl;
 	
-	for(int r=0; r<m_nRep;r++){
-		for(int a=0; a<idAlg; a++){
-			o<<arrayOfTests[r][a]<<" ";
+	for(auto r = 0; r < nRep_; ++r){
+		for(auto a = 0; a < idAlg; ++a){
+
+			/////////////////////////////////
+			o<<arrayOfTests_[r][a]<<" ";
+			/////////////////////////////////
 		}
-		o<<endl;
+		o << endl;
 	}
 
-	o<<"-------------------------------------------------"<<endl;
+	o << "------------------------------------------" << endl;
+
+	return o;
 }
 
-void TestAnalyser::print_single_rep	(ostream & o, int nRep, int idAlg){
-///////////////////////////
-// date: 2/7/13
-// prints individual results results of algorithms up to nAlg in a single repetition
-// DEFAULTS: nRep==0 all repetitions (default parameter) idAlg==-1 all algs (DEFAULT)
-// 
+std::ostream& TestAnalyser::print_single_rep	(ostream & o, int nRep, int idAlg){
 
-	//control
-	if (nRep<0) {
-		LOG_ERROR("number of repetitions cannot be negative");
-		return;
+	//assert
+	if (nRep < 0) {
+		LOG_ERROR("incorrect number of repetitions", nRep, "-TestAnalyser::print_single_rep");
+		return o;
 	}
 	
-	//fills m_nRep and m_nAlg appropiately
-	update_sizes();
-	if(m_nRep==0 || m_nAlg==0 ){
-		LOG_ERROR("empty tests");
-		return;
-	}
-	
+	//update nRep_ and nAlg_ appropiately
+	make_consistent();
+	if(nRep_==0 || nAlg_==0 ){
+		LOG_ERROR("Empty tests - TestAnalyser::print_single_rep");
+		return o;
+	}	
 
-	//bounds parameters
-	if(idAlg==-1) idAlg=m_nAlg;
-	else if(idAlg>m_nAlg) idAlg=m_nAlg;
-	if(nRep>m_nRep) nRep=m_nRep;
+	//default cases
+	if (idAlg == -1){
+		idAlg = nAlg_; 
+	}
+	else if (idAlg > nAlg_) {
+		idAlg = nAlg_;
+	}
+	if (nRep > nRep_) {
+		nRep = nRep_;
+	}
+		
+	//Streams data: Exception possible because nRep is not Synchro
+	o << "------------------------------------------" << endl;
 	
-	
-	//E/S: Exception possible because nRep is not Synchro
-	o<<endl;
-	
-	for(int a=0; a<idAlg; a++){
+	for(int a = 0; a < idAlg; ++a){
+
 		try{
-			o<<arrayOfTests[nRep-1][a]<<" ";
+
+			////////////////////////////////////////
+			o << arrayOfTests_[nRep - 1][a]<<" ";				//nRep is 1-based
+			////////////////////////////////////////
+
 		}catch(exception e){
-			/*stringstream sstr("");
-			sstr<<"Bad output"<<"Test:"<<a<<" Rep:"<<nRep<<endl;
-			LOG_INFO(sstr.str().c_str()<<endl);*/
-			LOG_ERROR("Bad output", " Test:", a, " Rep:", nRep);
+			LOGG_ERROR("Bad output", " Test:", a, " Rep:", nRep,  "-TestAnalyser::print_single_rep");
 			break;
 		}
 	}
+
+	o << "------------------------------------------" << endl;
+	return o;
 }
 
+int TestAnalyser::make_consistent(){
+		
+	int retVal = OK;
 
-
-int TestAnalyser::update_sizes(){
-//updates number of repetitions and number of algorithms based on array of tests	
-	int retVal=OK;
-	m_nRep=arrayOfTests.size();
-	(m_nRep>0)?  m_nAlg=arrayOfTests[0].size() :  m_nAlg=0;
-	(m_nRep>0 && m_nAlg>0)? retVal=OK : retVal=ERR;
-return retVal;
+	///////////////////////////////////////////////////////////////
+	nRep_ = arrayOfTests_.size();
+	(nRep_ > 0)?  nAlg_ = arrayOfTests_[0].size() :  nAlg_=0;
+	///////////////////////////////////////////////////////////////	
+	
+	(nRep_ > 0 && nAlg_ > 0)? retVal = OK : retVal = ERR;
+	return retVal;
 }

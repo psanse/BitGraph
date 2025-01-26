@@ -37,7 +37,7 @@ public:
 	static string get_current_local_time();
 	const usint MAX_NUM_SOL;	
 
-	Result(usint max_sol = DEFAULT_MAX_NUM_SOL):MAX_NUM_SOL(max_sol){clear();}
+	Result(usint max_sol = DEFAULT_MAX_NUM_SOL) : MAX_NUM_SOL(max_sol){clear();}
 	virtual ~Result(){}
 
 	void  operator =								(const Result& res);			
@@ -45,7 +45,7 @@ public:
 // setters and getters
 
 	//getters
-	ull	 number_of_steps							()	const{return m_steps;}
+	ull	 number_of_steps							()	const {return m_steps;}
 	bound_t get_lower_bound							()	const {return m_LB;}
 	bound_t get_upper_bound							()	const {return m_UB;}
 	bool is_sol_found								()	const {return m_is_sol;}
@@ -53,8 +53,8 @@ public:
 	double get_pre_time								()  const {return m_pT;}
 	bool is_time_out								()	const {return m_is_tout;}
 	string get_name									()	const {return m_name;}	
-	double get_tout									()  const { return m_tout; }
-	int get_alg										()  const { return m_alg; }
+	double get_tout									()  const {return m_tout; }
+	int get_alg										()  const {return m_alg; }
 
 	int	 get_d1										()	const {return m_d1;}	
 	int	 get_d2										()	const {return m_d2;}	
@@ -125,7 +125,7 @@ private:
 	double m_uT;							//running time interval in seconds with prec. up to milliseconds (user time)
 	double m_pT;							//running time interval in seconds with prec. up to milliseconds (pre-processing time)
 	double m_tout;
-	int 	m_alg;							//algorithm variant	
+	int  m_alg;								//algorithm variant	
 
 	string m_name;			
 	int m_d1;								//extra data 1

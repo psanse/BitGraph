@@ -2,7 +2,7 @@
  *info_base.cpp: implementation of info_base class for result logs of clique and clique-based algorithms
  *@date 12/12/2012
  *@last_update 13/23/2024
- *@dev pss
+ *@author pss
  */
 
 #include "info_base.h"
@@ -14,64 +14,54 @@ using namespace std;
 
 namespace com {
 
-	ostream& operator<<(ostream& o, const infoBase& info) {
-		return info.printTable(o);
+	ostream& operator<< (ostream& o, const infoBase& info) {
+		return info.printReport(o);
 	}
 
 	std::ostream& infoBase::printParams(std::ostream& o) const
 	{	
-		o << endl;
-		o << "*****************************";
-		o << "DATA:" << nameInstance_.c_str() << "\t N:" << N_ << "\t M:" << M_ << "\t D:" << 2 * M_ / (float)((N_ - 1) * N_) << endl;
+		o << "*****************************\n";
+		o << "DATA:" << name_.c_str() << "\t N:" << N_ << "\t M:" << M_ << "\t D:" << 2 * M_ / (float)((N_ - 1) * N_) << endl;
 		o << "TIME_LIMIT:" << TIME_OUT_ << endl;
 		o << "TIME_LIMIT_HEUR:" << TIME_OUT_HEUR_ << endl;
-		o << "ALG:" << idAlg_ << endl;
-		o << "SORTING:" << idSort_ << endl;
-		o << "HEUR:" << idHeur_ << endl;
-		o << "*****************************" << endl;
-		
-		if (this->K_ != 0) {
-			o << "MAX UB:" << K_ << endl;
-		}
+		o << "ALG:" << algSearch_ << endl;
+		o << "SORTING:" << algSort_ << endl;
+		o << "HEUR:" << algHeur_ << endl;
+		o << "*****************************" << endl;		
 			
 		return o;
 	}
 	std::ostream& infoBase::printTimers(std::ostream& o) const
 	{
-		o << endl;
-		o << "*****************************";
-		//LOG_INFO("start_time_parse:" << startTimeParse_ / (float)CLOCKS_PER_SEC);
-		//LOG_INFO("start_time_preproc:" << startTimePreproc_ / (float)CLOCKS_PER_SEC);
-		//LOG_INFO("start_time_incumbent:" << startTimeIncumbent_ / (float)CLOCKS_PER_SEC);
-		//LOG_INFO("start_time_search:" << startTimeSearch_ / (float)CLOCKS_PER_SEC);
-		o << "time_parse:" << timeParse_ << endl;
-		o << "time_preproc:" << timePreproc_ << endl;
-		o << "time_incumbent:" << timeIncumbent_ << endl;
-		o << "time_search:" << timeSearch_ << endl;
-		o << "TIME_LIMIT:" << TIME_OUT_ << endl;
-		o << "TIME_LIMIT_HEUR:" << TIME_OUT_HEUR_ << endl;
-		o << "*****************************" << endl;
+		o << "*****************************\n";
+		o << "time_parse:"		<< timeParse_		<< endl;
+		o << "time_preproc:"	<< timePreproc_		<< endl;
+		o << "time_incumbent:"	<< timeIncumbent_	<< endl;
+		o << "time_search:"		<< timeSearch_		<< endl;
+		o << "TIME_LIMIT:"		<< TIME_OUT_		<< endl;
+		o << "TIME_LIMIT_HEUR:" << TIME_OUT_HEUR_	<< endl;
+		o << "*****************************"		<< endl;
 			
 		return o;
 	}
 
-
-	std::ostream& infoBase::printTable(std::ostream& o) const
+	std::ostream& infoBase::printReport(std::ostream& o, bool is_endl) const
 	{
-		o << nameInstance_.c_str() << "\t" << N_ << "\t" << M_ << "\t" << TIME_OUT_ << "\t" << TIME_OUT_HEUR_ << "\t"
-			<< idAlg_ << "\t"
-			<< idSort_ << "\t" 
-			<< idHeur_ << "\t"
-			<< timeParse_ << "\t" << timePreproc_ << "\t" << timeIncumbent_ << "\t" << timeSearch_ << "\t"
-			<< std::endl;
+		o << name_.c_str() << "\t" << N_ << "\t" << M_ << "\t" << TIME_OUT_ << "\t" << TIME_OUT_HEUR_ << "\t"
+		  << algSearch_ << "\t"
+		  << algSort_ << "\t"
+		  << algHeur_ << "\t"
+		  << timeParse_ << "\t" << timePreproc_ << "\t" << timeIncumbent_ << "\t" << timeSearch_ << "\t";
+
+		if (is_endl) {
+			o << std::endl;
+		}		
 
 		return o;
 	}
 
 	void infoBase::startTimer(phase_t t)
 	{
-		//TODO -here: reset data for search and preprocessing selectively in this function (i.e. reset_preproc_info(); reset_search_info(); reset_bound_info())....
-
 		switch (t) {
 		case phase_t::SEARCH:
 			startTimeSearch_ = PrecisionTimer::clock_t::now();
@@ -87,7 +77,6 @@ namespace com {
 		case phase_t::LAST_INCUMBENT:
 			startTimeIncumbent_ = PrecisionTimer::clock_t::now();
 			break;
-
 		default:
 			LOG_ERROR("bizarre timer type, exiting... - com::infoCLQ::start_timer");
 			LOG_ERROR("timer type: ", (int)t, " - com::infoBase::start_timer");
@@ -152,9 +141,9 @@ namespace com {
 			break;
 
 		default:
-			LOG_ERROR("bizarre timer type, exiting...-infoCLQ::read_time");
-			cout << "timer type: " << (int)t << endl;
-			std::exit(-1);
+			LOG_ERROR	("bizarre timer type, exiting... - infoCLQ::read_time");
+			LOGG_ERROR	("timer type : " , (int)t);
+			std::exit	(-1);
 		}
 
 		return elapsedTime;
@@ -168,16 +157,22 @@ namespace com {
 	}
 
 	void infoBase::clearGeneralInfo() {
-		nameFileLog_.clear();
-		nameInstance_.clear();
+	
+		name_.clear();
 		N_ = 0;
 		M_ = 0;
-		K_ = 0;
-		TIME_OUT_ = DBL_MAX;
-		TIME_OUT_HEUR_ = DBL_MAX;
-		idAlg_ = -1;
-		idHeur_ = -1;
-		idSort_ = -1;
+		TIME_OUT_		= std::numeric_limits<double>::max();
+		TIME_OUT_HEUR_  = std::numeric_limits<double>::max();
+		algSearch_ = -1;
+		algHeur_ = -1;
+		algSort_ = -1;
+	}
+
+	void infoBase::clear(bool lazy) {
+		clearTimers();
+		if (!lazy) {
+			clearGeneralInfo();					//CHECK comment: "manually at the start of every run"
+		}
 	}
 }
 

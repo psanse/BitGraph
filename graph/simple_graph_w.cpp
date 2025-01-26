@@ -1,13 +1,16 @@
-/*
- * simple_graph_w.cpp implementation file of the classes BaseGraph_W and Graph_W Ugraph (header simple_graph_w.h)
- *
- * @created 16/01/2019
- * @last_update 06/01/2025
- * @dev pss
- *
- * @comments see end of file for valid template types
- *
- */
+ /**
+   * @file simple_graph_w.cpp
+   * @brief implementation of classes Base_Graph_W and Graph_W for simple weighted graphs
+   *
+   * @created 16/01/19
+   * @last_update 06/01/25
+   * @author pss
+   *
+   * @comments see end of file for valid template types
+   *
+   * This code is part of the GRAPH 1.0 C++ library
+   *
+   **/
 
 #include "bitscan/bitscan.h"
 #include "graph/formats/dimacs_format.h"
@@ -420,17 +423,17 @@ ostream& Base_Graph_W<Graph_t, W>::print_data(bool lazy, std::ostream& o, bool e
 template <class Graph_t, class W>
 ostream& Base_Graph_W<Graph_t, W>::print_weights (com::stack_t<int>& lv, ostream& o) const{
 
-	for(std::size_t i=0; i<lv.pt; i++){
-		o << "[" << lv.get_elem(i) << "," << w_[lv.get_elem(i)] << "] ";
+	for(auto i = 0; i < lv.nE_; ++i){
+		o << "[" << lv.at(i) << "," << w_[lv.at(i)] << "] ";
 	}
-	o << "(" << lv.pt << ")" <<endl;
+	o << "(" << lv.nE_ << ")" <<endl;
 	return o;
 }
 
 template <class Graph_t, class W>
 ostream& Base_Graph_W<Graph_t, W>::print_weights (int* lv, int NV, ostream& o) const{
 
-	for(std::size_t i=0; i< NV; i++){
+	for(auto i = 0; i < NV; ++i){
 		o << "[" << lv[i] << "," << w_[lv[i]] << "] ";
 	}
 	o << "(" << NV << ")" << endl;
@@ -440,17 +443,17 @@ ostream& Base_Graph_W<Graph_t, W>::print_weights (int* lv, int NV, ostream& o) c
 template <class Graph_t, class W>
 ostream& Base_Graph_W<Graph_t, W>::print_weights (com::stack_t<int>& lv, const vint& mapping, ostream& o) const{
 
-	for(std::size_t i=0; i<lv.pt; i++){
-		o << "[" << mapping[lv.get_elem(i)] << "," << w_[mapping[lv.get_elem(i)]] << "] ";
+	for(auto i = 0; i < lv.nE_; ++i){
+		o << "[" << mapping[lv.at(i)] << "," << w_[mapping[lv.at(i)]] << "] ";
 	}
-	o << "(" << lv.pt << ")" << endl;
+	o << "(" << lv.nE_ << ")" << endl;
 	return o;
 }
 
 template <class Graph_t, class W>
 ostream& Base_Graph_W<Graph_t, W>::print_weights (vint& lv, ostream& o) const{
 	
-	for(std::size_t i=0; i<lv.size(); i++){
+	for(auto i = 0; i < lv.size(); i++){
 		o << "[" << lv[i] << "," << w_[lv[i]] << "] ";
 	}
 	o << "(" << lv.size() << ")" << endl;

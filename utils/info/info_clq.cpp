@@ -9,63 +9,161 @@
 #include "utils/logger.h"
 #include <iostream>
 
-
 using namespace std;
-using namespace com;
 
-///////////////////////////
-//
-// DERIVED CLASS
+namespace com {
 
-std::ostream& infoCLQ::printResults(std::ostream& o) const
-{
-	o << "*****************************" << endl;
-	o << "w:" << optimum_ << "\tt_par: " << timeParse_ << "\tt_pp: " << timePreproc_ << "\tt_search: " << timeSearch_ << "\t#steps: " << nSteps_ << endl;
-	o << "*****************************" << endl;
-	return o;
-}
+	///////////////////////////
+	//
+	// DERIVED CLASS
 
-std::ostream& infoCLQ::printTable(std::ostream& o) const
-{
-	  o	<< nameInstance_.c_str() << "\t" << N_ << "\t" << M_ << "\t" << TIME_OUT_ << "\t" << TIME_OUT_HEUR_ << "\t" << idAlg_ << "\t"
-		<< idSort_ << "\t" << idSortReal_ << "\t"
-		<< isDegOrd_ << "\t" << idHeur_ << "\t"
-		<< LB_0_no_AMTS_ << "\t" << LB_0_AMTS_ << "\t"
-		<< incumbent_ << "\t" << optimum_ << "\t"
-		<< timeParse_ << "\t" << timePreproc_ << "\t" << timeIncumbent_ << "\t" << timeSearch_ << "\t" << isTimeOutReached_ << "\t"
-		<< nSteps_ << "\t"
-		<< nLastIsetCalls_ << "\t" << nsLastIsetCalls_ << "\t" << nLastIsetPreFilterCalls_ << "\t" << nsLastIsetPreFilterCalls_ << "\t"
+	template<class W_t>
+	std::ostream& infoCLQ<W_t>::printParams(std::ostream& o ) const  {
+
+		o << "*****************************\n";
+		o << "DATA:" << name_.c_str() << "\t N:" << N_ << "\t M:" << M_ << "\t D:" << 2 * M_ / (float)((N_ - 1) * N_) << endl;
+		if (K_) {
+			o << "K-CLIQUE SEARCH:" << K_ << endl;
+		}
+		o << "TIME_LIMIT:" << TIME_OUT_ << endl;
+		o << "TIME_LIMIT_HEUR:" << TIME_OUT_HEUR_ << endl;
+		o << "ALG:" << algSearch_ << endl;
+		o << "SORTING:" << algSort_ << endl;
+		o << "HEUR:" << algHeur_ << endl;
+		o << "*****************************" << endl;
+
+		return o;
+
+	}
+
+	template<class W_t>
+	std::ostream& infoCLQ<W_t>::printSummary(std::ostream& o) const
+	{
+		o << "*****************************" << endl;
+		o << "w:" << lb_ << "\tt_par: " << timeParse_ << "\tt_pp: " << timePreproc_ << "\tt_search: " << timeSearch_ << "\t#steps: " << nSteps_ << endl;
+		o << "*****************************" << endl;
+		return o;
+	}
+
+	template<class W_t>
+	std::ostream& infoCLQ<W_t>::printReport(std::ostream& o, bool is_endl) const
+	{
+		o << name_.c_str() << "\t" << N_ << "\t" << M_ << "\t";
+		if (K_) {
+			o << K_ << '\t';
+		}
+		o	<< TIME_OUT_ << "\t" << TIME_OUT_HEUR_ << "\t"
+			<< algSearch_ << "\t"
+			<< algSort_ << "\t" << algSortReal_ << "\t" << isAlgSortRealDeg_ << "\t"
+			<< algHeur_ << "\t"
+			<< branchingFactorRoot_ << "\t" 
+			<< lbRootBasicHeur_ << "\t" << lbRootStrongHeur_ << "\t" 
+			<< lb_ << "\t" << ub_ << "\t" << ubRoot_ << "\t"
+			<< timeParse_ << "\t" << timePreproc_ << "\t" << timeIncumbent_ << "\t" << timeSearch_ << "\t" << isTimeOut_ << "\t"
+			<< nSteps_ << "\t";
+		/*<< nLastIsetCalls_ << "\t" << nsLastIsetCalls_ << "\t" << nLastIsetPreFilterCalls_ << "\t" << nsLastIsetPreFilterCalls_ << "\t"
 		<< nCurrIsetCalls_ << "\t" << nsCurrIsetCalls_ << "\t"
 		<< nVertexCalls_ << "\t" << nsVertexCalls_ << "\t" << nUBpartCalls_ << "\t" << nsUBpartCalls_ << "\t" << K_
-		<< std::endl;
+		<< std::endl;*/
 
-	return o;
-}
+		if (is_endl) {
+			o << std::endl;
+		}
 
-void infoCLQ::clearPreprocInfo()
-{	
-	LB_0_no_AMTS_ = 0.0; LB_0_AMTS_ = 0.0;
-	branchingRootSize_ = 0;
-	idSortReal_ = -1;
-	isDegOrd_ = false;
+		return o;
+	}
+
+	template<class W_t>
+	void infoCLQ<W_t>::clearPreprocInfo()
+	{
+		lbRootBasicHeur_ = 0.0; 
+		lbRootStrongHeur_ = 0.0;
+		branchingFactorRoot_ = 0;
+		algSortReal_ = -1;
+		isAlgSortRealDeg_ = false;
+
+		clearTimer(com::infoBase::phase_t::PREPROC);
+		sol_.clear();									//candidate solution found during preprocessing
+	}
+
+	template<class W_t>
+	void infoCLQ<W_t>::clearSearchInfo()
+	{
+		lb_ = 0;
+		ub_ = 0;
+		nSteps_ = 0;
+		isTimeOut_ = false;
+		sol_.clear();
+
+		clearTimer(com::infoBase::phase_t::SEARCH);
+		clearTimer(com::infoBase::phase_t::LAST_INCUMBENT);
+	}
+
+	template<class W_t>
+	void infoCLQ<W_t>::clear(bool lazy)
+	{
+		clearPreprocInfo();
+		clearSearchInfo();
+
+		//additional config params
+		if (!lazy) { K_ = 0; }
+
+		::com::infoBase::clear(lazy);
+
 		
-	clearTimer(com::infoBase::phase_t::PREPROC);
-	sol_.clear();								//candidate solution found during preprocessing
-}
+	}
 
-void infoCLQ::clearSearchInfo() 
-{
-	incumbent_ = 0;
-	optimum_ = 0;
-	nSteps_ = 0;
-	isTimeOutReached_ = false;
-	sol_.clear();
 
-	nLastIsetCalls_ = 0; nUBpartCalls_ = 0; nCurrIsetCalls_ = 0; nVertexCalls_ = 0; nLastIsetPreFilterCalls_ = 0;
-	nsLastIsetCalls_ = 0;  nsUBpartCalls_ = 0; nsCurrIsetCalls_ = 0; nsVertexCalls_ = 0; nsLastIsetPreFilterCalls_ = 0;
-	clearTimer(com::infoBase::phase_t::SEARCH); 
-	clearTimer(com::infoBase::phase_t::LAST_INCUMBENT);
-}
+
+	/////////////////
+	// infoCliSAT
+
+
+	void infoCliSAT::clearSearchInfo()
+	{
+		infoCLQ<int>::clearSearchInfo();
+
+		nLastIsetCalls_ = 0;
+		nUBpartCalls_ = 0;
+		nCurrIsetCalls_ = 0;
+		nVertexCalls_ = 0;
+		nLastIsetPreFilterCalls_ = 0;
+		nsLastIsetCalls_ = 0;
+		nsUBpartCalls_ = 0;
+		nsCurrIsetCalls_ = 0;
+		nsVertexCalls_ = 0;
+		nsLastIsetPreFilterCalls_ = 0;
+	}
+
+
+	std::ostream& infoCliSAT::printReport(std::ostream& o, bool is_endl) const
+	{
+		infoCLQ<int>::printReport(o, false);
+
+		o << nLastIsetCalls_ << "\t" << nsLastIsetCalls_ << "\t" << nLastIsetPreFilterCalls_ << "\t" << nsLastIsetPreFilterCalls_ << "\t"
+			<< nCurrIsetCalls_ << "\t" << nsCurrIsetCalls_ << "\t"
+			<< nVertexCalls_ << "\t" << nsVertexCalls_ << "\t" << nUBpartCalls_ << "\t" << nsUBpartCalls_ << "\t" << K_;
+
+		if (is_endl) {
+			o << std::endl;
+		}
+
+
+		return o;
+	}
+}//namespace com	
+
+////////////////////////////////////////////
+//list of valid types for infoCLQ to allow generic code in *.cpp files 
+
+template struct  com::infoCLQ<int>;
+template struct  com::infoCLQ<double>;
+
+
+
+
+
+
 
 
 

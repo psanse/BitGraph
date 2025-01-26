@@ -1,9 +1,14 @@
-/*  
- * simple_sparse_graph.h stores specializations of the methods of the Graph class for the sparse_bitarray type (sparse graphs)
- * @creation 30/12/2024
- * @last_update 30/12/2024
- * @dev pss
- */
+ /**
+   * @file simple_sparse_graph.h 
+   * @brief contains specializations the class Graph for sparse graphs
+   *
+   * @created 30/12/2024
+   * @last_update 30/12/2024
+   * @author pss
+   *
+   * This code is part of the GRAPH 1.0 C++ library
+   *
+   **/
 
 #ifndef __SIMPLE_SPARSE_GRAPH_H__
 #define __SIMPLE_SPARSE_GRAPH_H__

@@ -1,66 +1,95 @@
-//benchmark.cpp: implementation of Benchmark class in benchmark.h
+/**
+ * @file benchmark.cpp
+ * @brief implementation of Benchmark class in benchmark.h
+ * @date ?
+ * @last_update 17/01/25
+ * @author pss
+ **/
 
 #include "benchmark.h"
 #include "logger.h"
 #include <string>
+#include "utils/common.h"
 
-ostream& operator <<(ostream& o,  Benchmark& b ){
-	b.print(o);
-	return o;
-}
 
-Benchmark::Benchmark(const string& pathname):m_PATH(pathname){
-	
+using namespace std;
+
+Benchmark::Benchmark(const string& pathname):
+	PATH_(pathname)
+{
 	if(pathname.empty()){
-		LOG_WARNING("Path for benchmark files empty");
-		return;
+		LOG_WARNING("Path for benchmark files empty - Benchmark::Benchmark");
 	}
-	LOG_INFO("Path for benchmark files: ", m_PATH.c_str());
+	else {
+		LOGG_DEBUG("Path for benchmark files: ", PATH_.c_str(), "-Benchmark::Benchmark");
+	}
 }
 
 void Benchmark::add_test(const string str_file){
-//test without values
+	
 	string str("");
-	if(m_PATH.empty()) str=str_file;
-	else{
-#ifdef _WIN32
-		str=m_PATH+"\\"+str_file;		
-#elif __GNUC__
-		str=m_PATH+"/"+str_file;
-#endif
+
+	if (PATH_.empty()) {
+		str = str_file;
 	}
-	m_lf.push_back(str);
+	else {								//appends slash to PATH_ if not present		
+		str = PATH_;
+		com::dir::append_slash(str);
+		str += str_file;
+
+		//#ifdef _WIN32
+		//		str=PATH_+"\\"+str_file;		
+		//#elif __GNUC__
+		//		str=PATH_+"/"+str_file;
+		//#endif
+	}
+
+	lf_.push_back(str);
 }
 
 void Benchmark::add_test(const string str_file, int val){
-//test with values
+
 	string str("");
-	if(m_PATH.empty()) str=str_file;
-	else{
-#ifdef _WIN32
-		str=m_PATH+"\\"+str_file;		
-#elif __GNUC__
-		str=m_PATH+"/"+str_file;
-#endif
+
+	if (PATH_.empty()) {
+		str = str_file;
 	}
-			
-	m_lf.push_back(str);
-	m_mf[str]=val;
+	else{								//appends slash to PATH_ if not present		
+		str = PATH_;
+		com::dir::append_slash(str);
+		str += str_file;	
+
+//#ifdef _WIN32
+//		str=PATH_+"\\"+str_file;		
+//#elif __GNUC__
+//		str=PATH_+"/"+str_file;
+//#endif
+	}
+				
+	lf_.push_back(str);
+	mf_[str]=val;
 }
 
-int Benchmark::get_Value (string filename){
-	if(m_mf.count(filename)) return m_mf[filename];
-	else return -1;
+int Benchmark::get_value (string filename){
+
+	if (mf_.count(filename)) {
+		return mf_[filename];
+	}
+	
+	return -1;
+	
 }
 
 ///////////////////
 // E/S
-void Benchmark::print(ostream& o) {
-	 for(int i=0; i<m_lf.size(); i++){
-		 o<<m_lf[i];
-		 if(m_mf.count(m_lf[i])){
-			 o<<":"<<m_mf[m_lf[i]];
+std::ostream& Benchmark::print(ostream& o) {
+	 for(auto i = 0; i < lf_.size(); ++i){
+		 o << lf_[i];
+		 if(mf_.count(lf_[i])){
+			 o << ":" << mf_[lf_[i]];
 		 }
-		 o<<endl;
+		 o << endl;
 	 }
+
+	 return o;
 }

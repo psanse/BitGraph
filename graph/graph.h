@@ -1,13 +1,16 @@
-/*  
- * graph.h file from the GRAPH library, a C++ library for bit encoded 
- * simple unweighted graphs. GRAPH stores the adjacency matrix un full 
- * but each row is encoded as a bitstring. GRAPH is at the core of  BBMC, a 
- * state of the art leading exact maximum clique algorithm. 
- * (see license file (legal.txt) for references)
+/** 
+ * @file graph.h
+ * @brief  The one and only header file for the GRAPH 1.0 library
+ *		    simple graphs (encoded as BITSCAN bitstrings)
  *
- * Copyright (C)
- * Author: Pablo San Segundo
- * Intelligent Control Research Group CAR(UPM-CSIC) 
+ * @comment: The GRAPH 1.0 library is an efficient C++ library for simple graphs
+ *			 GRAPH stores the adjacency matrix un full and each row is encoded as a
+ *			 bitstring. GRAPH is at the core of a number of state-of-the-art-leading 
+ *			 exact algorithms for NP-hard problems. 
+ *
+ * @author: Pablo San Segundo (main developper)
+ * @version: 1.0 
+ * 
  *
  * Permission to use, modify and distribute this software is
  * granted provided that this copyright notice appears in all 
@@ -19,15 +22,13 @@
  * suitability for any purpose.
  *
  *
- * The one and only header file for simple graphs (encoded as BITSCAN bitstrings)
- */
+ **/
 
-#ifndef __GRAPH_H__
-#define __GRAPH_H__
+#ifndef __GRAPH_INCLUDE_H__
+#define __GRAPH_INCLUDE_H__
 
 #include "simple_ugraph.h"
 
-//currently	the only possible graph types
 
 typedef Graph<bitarray> graph;						//simple graph
 typedef Ugraph<bitarray> ugraph;					//simple undirected graph

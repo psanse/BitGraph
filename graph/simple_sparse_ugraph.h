@@ -1,9 +1,14 @@
-/*  
- * simple_sparse_ugraph.h contains specializations of the methods of the Ugraph class
-						 for the sparse_bitarray type (sparse graphs)
- * @creation 03/01/2025  
- * @dev pss
- */
+/**
+  * @file simple_sparse_ugraph.h
+  * @brief contains specializations the class Ugraph for sparse graphs
+  *
+  * @created 03/01/2025 
+  * @last_update 26/01/2025
+  * @author pss
+  *
+  * This code is part of the GRAPH 1.0 C++ library
+  *
+  **/
 
 #ifndef __SIMPLE_SPARSE_UGRAPH_H__
 #define __SIMPLE_SPARSE_UGRAPH_H__
