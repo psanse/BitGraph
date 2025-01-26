@@ -1,19 +1,14 @@
-/*
- * simple_ugraph.h file for the class Ugraph for simple undirected graphs
- *						(no self loops)
+/**
+ * @file simple_ugraph.h 
+ * @brief class Ugraph for simple undirected graphs	(no self loops)
  *
- * @creation_date 17/6/10
+ * @created 17/6/10
  * @last_update 03/01/25
- * @dev pss
+ * @author pss
  *
- * This code is part of the GRAPH C++ library for bit encoded
- * simple graphs. GRAPH stores the adjacency matrix in full, each
- * row encoded as a bitstring.
+ * This code is part of the GRAPH 1.0 C++ library 
  *
- * GRAPH is at the core many state of the art leading exact clique
- * algorithms.
- *
- */
+ **/
 
 #ifndef __SIMPLE_UGRAPH_H__
 #define __SIMPLE_UGRAPH_H__

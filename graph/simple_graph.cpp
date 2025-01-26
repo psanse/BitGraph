@@ -1,12 +1,16 @@
-/*  
- * simple_graph.cpp implementation file of the class Graph (header simple_graph.h)
- * 
+/**
+ * @file simple_graph.cpp
+ * @brief implementation of Graph class for simple graphs
+ *
+ * @created ?
  * @last_update 31/12/2024
- * @dev pss
- * 
- * @comments see end of file for valid template types
- * 
- */
+ * @author pss
+ *
+ * This code is part of the GRAPH 1.0 C++ library
+ *
+ * TODO use SFINAE to filter types(10 / 01 / 2025)
+ *
+ **/
 
  //////////////////
  //switches 

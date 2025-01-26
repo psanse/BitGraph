@@ -1,17 +1,20 @@
- /*
-  * simple_ugraph.cpp implementation file of the class Ugraph (header simple_ugraph.h)
-  *
-  * @created 02/01/2024
-  * @dev pss
-  *
-  * @comments see end of file for valid template types
-  *
-  */
+/**
+ * @file simple_ugraph.cpp 
+ * @brief implementation file of the class Ugraph (header simple_ugraph.h)
+ *
+ * @created 02/01/2024
+ * @last_update 26/01/2025
+ * @author pss
+ *
+ * This code is part of the GRAPH 1.0 C++ library 
+ *
+ **/
 
 #include "simple_ugraph.h"
 #include "utils/prec_timer.h"
 
-#include "simple_sparse_ugraph.h"				//specializations for sparse graphs
+//specializations for sparse graphs
+#include "simple_sparse_ugraph.h"				
 
 using namespace std;
 

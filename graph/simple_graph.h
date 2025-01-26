@@ -3,23 +3,24 @@
  * 
  * @creation_date 17/6/10 
  * @last_update 31/12/24
- * @dev pss
- *
- * This code is part of the GRAPH C++ library for bit encoded 
- * simple graphs. GRAPH stores the adjacency matrix in full, each 
- * row encoded as a bitstring. 
- * 
- * GRAPH is at the core many state of the art leading exact clique 
- * algorithms. 
- * 
- * TODO use SFINAE to filter types (10/01/2025)
- * 
- */
+ /**
+   * @file simple_graph.h
+   * @brief class Graph for simple graphs 
+   *
+   * @created 17/6/10
+   * @last_update 06/01/25
+   * @author pss
+   *
+   * This code is part of the GRAPH 1.0 C++ library
+   * 
+   * TODO use SFINAE to filter types (10/01/2025)
+   *
+   **/
 
 #ifndef __SIMPLE_GRAPH_H__
 #define __SIMPLE_GRAPH_H__
 
-#include "filter_graph_encoding_type.h"			//contains #include "bitscan/bitscan.h"
+#include "filter_graph_encoding_type.h"			//contains #include "bitscan/bitscan.h" - TODO use SFINAE to filter types (10/01/2025)
 #include <iostream>
 #include <string>
 #include <vector>

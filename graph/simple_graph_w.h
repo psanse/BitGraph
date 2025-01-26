@@ -1,19 +1,14 @@
-/*
- * simple_graph_w.h file for the classes Base_Graph_W and Graph_W for weighted graphs 
- *
- * @creation_date 16/01/19
- * @last_update 06/01/25
- * @dev pss
- *
- * This code is part of the GRAPH C++ library for bit encoded
- * simple graphs. GRAPH stores the adjacency matrix in full, each
- * row encoded as a bitstring.
- *
- * GRAPH is at the core many state of the art leading exact clique
- * algorithms.
- *
- * TODO - specialization for sparse graphs (06/01/2025)
- */
+ /**
+   * @file simple_graph_w.h
+   * @brief classes Base_Graph_W and Graph_W for simple weighted graphs 
+   *
+   * @created 16/01/19
+   * @last_update 06/01/25
+   * @author pss
+   *
+   * This code is part of the GRAPH 1.0 C++ library
+   *
+   **/
 
 #ifndef __SIMPLE_GRAPH_WEIGHTED_H__
 #define __SIMPLE_GRAPH_WEIGHTED_H__

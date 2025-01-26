@@ -1,13 +1,16 @@
-/*
- * simple_graph_w.cpp implementation file of the classes BaseGraph_W and Graph_W Ugraph (header simple_graph_w.h)
- *
- * @created 16/01/2019
- * @last_update 06/01/2025
- * @dev pss
- *
- * @comments see end of file for valid template types
- *
- */
+ /**
+   * @file simple_graph_w.cpp
+   * @brief implementation of classes Base_Graph_W and Graph_W for simple weighted graphs
+   *
+   * @created 16/01/19
+   * @last_update 06/01/25
+   * @author pss
+   *
+   * @comments see end of file for valid template types
+   *
+   * This code is part of the GRAPH 1.0 C++ library
+   *
+   **/
 
 #include "bitscan/bitscan.h"
 #include "graph/formats/dimacs_format.h"
