@@ -19,6 +19,7 @@
 #include <map> 
 #include "utils/logger.h"
 #include "graph/simple_sparse_ugraph.h"
+#include "graph/algorithms/graph_fast_sort.h"
 
 /////////////////////////
 //SWAP-MACRO: places vertex u as last vertex in the bin with one less degree. Updates bin but not degree of u
@@ -62,37 +63,9 @@ using map_it = std::map<int, int>::iterator;
 
 template<class Graph_t>
 class KCore{
-	
+public:	
 	friend ostream& operator<< (std::ostream& o, const KCore& kc){ kc.print_kcore(o); return o;}
-	
-<<<<<<< .mine
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-=======
 	enum print_t { DEG, BIN, VER, POS };
 
 	//alias types
@@ -119,30 +92,6 @@ class KCore{
 	*/
 	static int find_kcore				(Graph_t& g);				
 	
->>>>>>> .theirs
-<<<<<<< .mine
-	enum print_t { DEG, BIN, VER, POS };
-
-public:
-	using basic_type = Graph_t;						//a graph from GRAPH, typically sparse_ugraph
-	using type = KCore;
-
-	//alias for backward compatibility
-	using _bbt = typename basic_type::_bbt;		//bitset type
-	using _gt = basic_type;						//graph type
-
-=======
-
-
-
-
-
-
-
-
-
-
->>>>>>> .theirs
 //////////////////////////////
 //construction / destruction
 public:
@@ -153,13 +102,13 @@ public:
 	KCore								(Graph_t& g, vint subg);
 		
 	//copies or moves disallowed
-	KCore								(const KCore& kc)	= delete;	
-	KCore&  operator =					(const KCore& kc)	= delete;
-	KCore								(KCore&& kc)		= delete;
-	KCore& operator =					(KCore&& kc)		= delete;
+	KCore								(const KCore& kc)				= delete;	
+	KCore&  operator =					(const KCore& kc)				= delete;
+	KCore								(KCore&& kc)					= delete;
+	KCore& operator =					(KCore&& kc)					= delete;
 
 	//destructor - default
-	virtual ~KCore						()					= default;
+	virtual ~KCore						()								= default;
 	 
 ////////////////
 //setters and getters 
@@ -203,7 +152,7 @@ public:
 	*		 (must be called afer kcore()).
 	*/
 	const vint& kcore_ordering			()								const	{ return ver_;}
-	
+
 
 	const _gt& get_graph				()								const { return g_; }
    const _bbt& get_subgraph				()								const { return subg_; }
@@ -274,7 +223,7 @@ vint find_heur_clique_sparse			(int num_iter = EMPTY_ELEM);			//only available f
 //////////////
 // private interface
 private:
-
+		
 	/*
 	* @brief Inits deg_ and bins_ data structures (graph or induced subgraph depending on @subg_)
 	* 
@@ -312,7 +261,7 @@ private:
 	void bin_sort						(vint& lv, bool rev);					//bin sort according to vertex set lv (rev TRUE: vertices taken in reverse order)
 	
 	//I/O
-	std::ostream& print							(print_t = VER, std::ostream& o = std::cout);
+	std::ostream& print					(print_t = VER, std::ostream& o = std::cout);
 							
 ///////////
 // data members
@@ -333,42 +282,6 @@ private:
 // IMPLEMENTATION - in header for generic code
 
 template<class Graph_t>
-<<<<<<< .mine
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-=======
 inline int KCore<Graph_t>::find_kcore(Graph_t& g)
 {
 	//degenerate minimum degree ordering
@@ -403,7 +316,6 @@ inline int KCore<Graph_t>::find_kcore(Graph_t& g)
 }
 
 template<class Graph_t>
->>>>>>> .theirs
 inline KCore<Graph_t>::KCore(Graph_t& g) : g_(g), NV_(g.number_of_vertices()), deg_(NV_), pos_(NV_) {
 
 	try {
@@ -423,14 +335,14 @@ inline KCore<Graph_t>::KCore(Graph_t& g, _bbt subg): g_(g), NV_(g.number_of_vert
 
 	try {
 		ver_.assign(subg_.popcn64(), EMPTY_ELEM);
-		}
+	}
 	catch (std::bad_alloc& ba) {
 		LOGG_ERROR("bad_alloc exception - KCore<T>::reset_subgraph", ba.what());
 		LOG_ERROR("Exiting...");
 		std::exit(-1);
-		}
-
 	}
+
+}
 
 template<class Graph_t>
 inline KCore<Graph_t>::KCore(Graph_t& g, vint set) : g_(g), NV_(g.number_of_vertices()), deg_(NV_), pos_(NV_) {
@@ -456,7 +368,7 @@ inline int KCore<Graph_t>::reset_subgraph(_bbt subg) {
 
 	try {
 		ver_.assign (subg_.popcn64(), EMPTY_ELEM);		
-		}
+	}
 	catch (std::bad_alloc& ba) {
 		LOGG_ERROR("bad_alloc exception - KCore<T>::reset_subgraph", ba.what());
 		return -1;
@@ -564,7 +476,7 @@ inline int KCore<Graph_t>::find_kcore_UB (int UB_out){
 	//inits data structures
 	init_kcore(false);
 	bin_sort(false);
-
+		
 	
 	//check that UB_out is not the maximum graph degree
 	//i.e. deg = 1 , bin has size 2 (0 and 1)
@@ -1014,7 +926,7 @@ inline int KCore<Graph_t>::make_kcore_filter (map_t& filter, bool reverse) {
 		}
 	}
 
-return filter.size();
+	return filter.size();
 }
 
 template<class Graph_t>
