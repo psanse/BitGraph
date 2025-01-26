@@ -11,7 +11,7 @@
 #ifdef _MSC_VER
 #define _CRT_SECURE_NO_WARNINGS		//for std::localtime Windows (VS)
 #elif __GNUC__
-#include <sys/time.h>				//TODO@ CHECK if it is necessary with the new code
+#include <sys/time.h>				//TODO@ CHECK if it is necessary after the refactoring (26/01/2025)
 #endif
 
 #include "common.h"
