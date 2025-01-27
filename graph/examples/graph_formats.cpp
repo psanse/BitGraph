@@ -1,55 +1,68 @@
-//writes a simple udirected graph to file in different formats
-//author:pss
-//date: 12/12/2014
+/**
+* @file graph_formats.cpp
+* @brief writes a simple udirected graph to file in different formats
+* @created 12/12/2014
+* @updated 27/01/25
+* @author pss
+*/
 
 #include <iostream>
 #include <string.h>
 #include <string>
-#include "../graph.h"
+#include "graph/graph.h"
+#include "utils/logger.h"
 
 using namespace std;
 
-enum file_t{DIMACS=1, MTX, EDGELIST};
+enum class file_t{DIMACS=1, MTX, EDGELIST};
 
 int main(int argc, char** argv){
-	if(argc!=3){
-		cerr<<"please introduce filename and format: 1-DIMACS, 2-MTX, 3-EDGES"<<endl;
+	if(argc != 3){
+		LOG_ERROR("Introduce <filename> <ouput format number [1...3]> 1-DIMACS, 2-MTX, 3-EDGES");
+		LOG_ERROR("exiting...");
 		return -1;
 	}
 
-	string filename=argv[1];
-	int type=atoi(argv[2]);
+	/////////////////////////
+	//read input params
+	string filename = argv[1];
+	file_t ftype = (file_t) atoi(argv[2]);
 
-	
-	cout<<"READING: "<<filename<<"-----------------------"<<endl;
+	//parse file with format
+	LOGG_INFO("reading graph from ", filename);
+
 	sparse_ugraph g1(filename);
 	g1.print_data();
 
-	filename=filename.substr(0,filename.find_last_of("."));	
-	filename=filename.substr(filename.find_last_of("\\ /")+1);
-	cout<<"writing to:"<<filename<<endl;
+	///////////////////
+	//write to file
+
+	//extract filename (remove path and extension)
+	filename = filename.substr(0,filename.find_last_of("."));	
+	filename = filename.substr(filename.find_last_of("\\ /") + 1);
+	LOGG_INFO("writing to:", filename);
 
 	ofstream f;
-	switch(type){
-	case DIMACS:
-		f.open(filename+"_u.clq");
-		g1.write_dimacs(f);
-		f.close();
+	switch(ftype){
+	case file_t::DIMACS:
+		f.open(filename + "_u.clq");
+		g1.write_dimacs(f);		
 		break;
-	case MTX:
+	case file_t::MTX:
 		f.open(filename+"_u.mtx");
-		g1.write_mtx(f);
-		f.close();
+		g1.write_mtx(f);	
 		break;
-	case EDGELIST:
+	case file_t::EDGELIST:
 		f.open(filename+"_u.edges");
-		g1.write_EDGES(f);
-		f.close();
+		g1.write_EDGES(f);		
 		break;
 	default:
-		cerr<<"incorrect file type"<<endl;
+		LOG_ERROR("unknown output graph format type");
+		LOG_ERROR("exiting...");
 		return -1;
 	}
+
+	f.close();
 
 }
 

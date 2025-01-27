@@ -9,8 +9,9 @@
 #include "graph/algorithms/graph_gen.h"
 #include "utils/logger.h"
 
-
-//#define LOGGER_VERBOSE_LEVEL		//all except DEBUG (second priority) -  CMake option by default
+//comment in release mode - to disable assertions
+#define	NDEBUG
+#include <cassert>
 
 using namespace std;
 
@@ -23,6 +24,7 @@ struct input_t{
 	int incN;
 	double incP;
 
+	//I/O
 	friend ostream & operator<<(ostream& o, const input_t& i) {
 		o << "RANGE N: " << "[" << i.nLB << "," << i.nUB << "]" << endl
 		  << "RANGE P: " << "[" << i.pLB << "," << i.pUB << "]" << endl
@@ -33,84 +35,76 @@ struct input_t{
 		return o;
 	}
 
-}input;
+}info;
 
 int main(int argc, char** argv){
+		
+	if (argc != 9) {
+		LOG_ERROR("Enter <range of sizes>, <range of densities> <num of instances> <inc size> <inc density> <output dir>");
+		LOG_ERROR("exiting...");
+		return -1;
+	}
+
+	//////////////////////////
+	//parse input params
 	stringstream sstr;
 	string str_path_benchmark;
-	//Logger::SetInformationLevel(LOGGER_INFO);
-
-	if (argc != 9) {
-		LOG_ERROR("please enter the range of sizes [nLB, nUB], the range of densities [pLB, pUB], the number of instances per G(N,P), the size increment, the density increment and the path, exiting...");
-		exit(-1);
-	}
-	////////////////////////////////////////////////////////////////////////
-	//READ INPUT DATA
+		
 	sstr = std::stringstream();
 	sstr << argv[1];
-	sstr >> input.nLB;
+	sstr >> info.nLB;
 	sstr = std::stringstream();
 	sstr << argv[2];
-	sstr >> input.nUB;
+	sstr >> info.nUB;
 	sstr = std::stringstream();
 	sstr << argv[3];
-	sstr >> input.pLB;
+	sstr >> info.pLB;
 	sstr = std::stringstream();
 	sstr << argv[4];
-	sstr >> input.pUB;
+	sstr >> info.pUB;
 	sstr = std::stringstream();
 	sstr << argv[5];
-	sstr >> input.nRep;
+	sstr >> info.nRep;
 	sstr = std::stringstream();
 	sstr << argv[6];
-	sstr >> input.incN;
+	sstr >> info.incN;
 	sstr = std::stringstream();
 	sstr << argv[7];
-	sstr >> input.incP;
+	sstr >> info.incP;
 
 	str_path_benchmark = argv[8];
 
-	//ASSERT
-	if (input.nLB > input.nUB || input.nLB < 0 ) {
-		LOG_ERROR("please enter different values the range of sizes [nLB, nUB] (note that both ends are included, exiting...");
-		exit(-1);
-	}
-	if (input.pLB > input.pUB || input.pLB < 0) {
-		LOG_ERROR("please enter different values the range of densities [nLB, nUB] (note that both ends are included, exiting...");
-		exit(-1);
-	}
-	if (input.nRep <=0 ) {
-		LOGG_ERROR("number of repetitions invalid: ", input.nRep, " exiting...");
-		exit(-1);
-	}
-	if (input.incN <= 0) {
-		LOGG_ERROR("size of  graphs increment invalid: ", input.incN,  " exiting...");
-		exit(-1);
-	}
-	if (input.incP <= 0) {
-		LOGG_ERROR("density of  graphs increment invalid: ", input.incP, " exiting...");
-		exit(-1);
-	}
+	//assertions
+	assert(info.nLB > info.nUB || info.nLB < 0);
+	assert(info.pLB > info.pUB || info.pLB < 0);
+	assert(info.nRep <= 0);
+	assert(info.incN <= 0);
+	assert(info.incP <= 0);
 
+
+	//I/O
 	LOG_INFO("*******************************");
 	LOG_INFO("Generating random graph benchmark");
 	LOG_INFO("PATH: ", str_path_benchmark);
 	sstr = std::stringstream();
-	sstr << input;
+	sstr << info;
 	LOGG_INFO(sstr.str());	
 	LOG_INFO("*******************************");
-	/////////////////////////////////////////////////////////////////////////
-		
+	
+	/////////////////////////////	
 	//create the benchmark
-	random_attr_t rt(input.nLB, input.nUB, input.pLB, input.pUB, input.nRep, input.incN, input.incP);
+	random_attr_t rt(info.nLB, info.nUB, info.pLB, info.pUB, info.nRep, info.incN, info.incP);
+
+	/////////////////////////////////////////////////////////////////////////////
 	RandomGen<ugraph>::create_graph_benchmark(str_path_benchmark.c_str(), rt);
+	/////////////////////////////////////////////////////////////////////////////
 
 
 	//////////////////////////////////
 	//create a single graph
 	//ugraph g;
 	//RandomGen<ugraph>::create_ugraph(g,100,.1);
-	//g.print_data();
+	//g.print_info();
 	//////////////////////////////////
 
 }
