@@ -16,35 +16,9 @@ algorithms/graph_fast_sort.h
 algorithms/graph_fast_sort_weighted.h
 )
 
-#### SCRIPT to add LEDA to graph library(only Win32)#####
-set(LEDA_ON OFF CACHE BOOL "config")
-	
-if(LEDA_ON)
-add_definitions(-DLEDA_ON)				#my switch	
-set(CMAKE_CXX_FLAGS "-DLEDA_DLL")		#leda switch
-
-#set root depending on installation
-set(LEDA_ROOT C:/Leda63/)
-
-#external libraries
-include_directories(${LEDA_ROOT}/incl)
-link_directories(${LEDA_ROOT})
-
-add_library (graph simple_graph.cpp
-simple_ugraph.cpp
-simple_graph_w.cpp
-simple_graph_ew.cpp
-formats/mmio.cpp 
-algorithms/decode.cpp
-${useful_headers_for_IDE} 
-draw/ldraw.cpp
-)
-
-TARGET_LINK_LIBRARIES (graph debug leda_mdd.lib)
-TARGET_LINK_LIBRARIES( graph optimized leda_md.lib)
-
-else()
-
+#####################
+#GRAPH lib
+####################
 add_library (graph simple_graph.cpp
 simple_ugraph.cpp
 simple_graph_w.cpp
@@ -58,8 +32,6 @@ set_target_properties(graph
      ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
 )
 
-endif()
-###END LEDA ##########
 
 
 # Make sure the compiler can find include files for our bitscan library
