@@ -1,16 +1,21 @@
 /*
-* test_graph.cpp  tests for class Graph for directed graphs
+* @file test_graph.cpp  
+* @brief Unit tests for the Graph class for directed graphs
 * @created ?
 * @updated 29/12/20
 * @last_update 31/12/24
-* @dev pss
+* @author pss
+* 
 * @TODO - ADD TESTS, e.g. operator =, move operator =,...
 */
 
-#include "../graph.h"
+
 #include "gtest/gtest.h"
-//#include "utils/common_paths.h"
+#include "graph/simple_graph.h"
 #include <iostream>
+
+//useful alias
+using graph = Graph<bitarray>;						//simple graph
 
 using namespace std;
 using vint = vector<int>;

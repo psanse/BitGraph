@@ -1,6 +1,8 @@
 /*
-* @brief Tests for class Decode, which unwinds a composition of orderings
+* @file test_decode.cpp
+* @brief Unit tests for class Decode, which unwinds a composition of orderings
 * @date 17/12/2024
+* @last_update 27/01/25
 * @comments based on previous tests in test_graph_sort.cpp
 */
 

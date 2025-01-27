@@ -1,10 +1,11 @@
-/*
-* test_graph_conversions.cpp  tests for class GraphConversion to convert between different graph types
+/**
+* @file test_graph_conversions.cpp  
+* @brief tests for class GraphConversion to convert between different graph types
 * @created 04/01/2025 (from older tests)
-* @last_update 11/01/2025
-* @dev pss
+* @last_update 27/01/2025
+* @author pss
 * 
-*/
+**/
 
 #include "graph/algorithms/graph_conversions.h"			
 #include "gtest/gtest.h"

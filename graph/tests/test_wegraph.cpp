@@ -1,8 +1,9 @@
 /*
-* test_wegraph.cpp  tests for edge-weighted graphs
+* @file test_wegraph.cpp
+* @brief Unit tests for edge-weighted graphs
 * @created 20/7/18
-* @last_update 08/01/25
-* @dev pss
+* @last_update 27/01/25
+* @author pss
 *
 * @TODO - ADD TESTS, CHECK DISABLED (08/01/2025)
 */

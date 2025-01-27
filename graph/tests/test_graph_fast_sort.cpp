@@ -1,13 +1,16 @@
-/*
-* test_graph_fast_sort.cpp Unit tests for Class GraphFastRootSort for non-weighted graphs (graph_fast_sort.h)
-* @big refactoring december 2024  
+/**
+* @file test_graph_fast_sort.cpp
+* @brief Unit tests for Class GraphFastRootSort for non-weighted graphs (header in graph_fast_sort.h)
+* @update 12/24 - big refactoring
 * @last_update 27/12/24
-* @TODO - SUBGRAPH ORDERING TESTS DISABLED  (27/12/2024)
-*/ 
+* @author pss
+* 
+* @TODO - SUBGRAPH ORDERING TESTS DISABLED - CHECK  (27/12/2024)
+**/ 
 
-#include "../algorithms/graph_fast_sort.h"
-#include "../algorithms/graph_fast_sort_weighted.h"
-#include "../graph.h"
+#include "graph/algorithms/graph_fast_sort.h"
+#include "graph/algorithms/graph_fast_sort_weighted.h"
+#include "simple_ugraph.h"
 #include "gtest/gtest.h"
 #include <iostream>
 #include "utils/common.h"
@@ -15,6 +18,14 @@
 #include "utils/logger.h"
 #include "utils/file.h"
 #include <string>
+
+#include "simple_graph_w.h"							//MUST BE AFTER ugraph type 
+typedef Graph_W<ugraph, double> ugraph_w;			//simple vertex weighted graph with double weights
+typedef Graph_W<ugraph, int> ugraph_wi;				//simple vertex weighted graph with int weights
+
+//useful alias
+using graph = Graph<bitarray>;						//simple graph
+using ugraph = Ugraph<bitarray>;					//simple undirected graph
 
 using namespace std;
 using namespace ::com::sort;

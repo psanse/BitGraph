@@ -1,13 +1,17 @@
-//graph_gen.h header for Erdos-Renyi sparse and non sparse bitstring unidrected graph generation 
-//author: pablo san segundo
+/**
+* @file graph_gen.h
+* @brief header for Erdos-Renyi sparse and non sparse bitstring unidrected graph generation 
+* @author pss
+* @date ?
+* @last_update 27/01/25
+**/
 
 #ifndef __GRAPH_GEN_H__
 #define __GRAPH_GEN_H__
 
 #include <iostream>
 #include <sstream>
-#include <random>					//uses uniform int random generator
-
+#include <random>								
 
 #include "utils/common.h"
 #include "graph/simple_ugraph.h"
@@ -25,7 +29,6 @@ typedef Graph_W<ugraph, int> ugraph_wi;
 typedef Graph_EW<ugraph, double> ugraph_ew;
 typedef Graph_EW<ugraph, int> ugraph_ewi;
 	
-using namespace std;
 
 //////////////////////////////////////////////////////////////
 constexpr int DEFAULT_WEIGHT_MODULUS = 200;							//for modulus weight generation  [Pullman 2008]					
@@ -186,7 +189,7 @@ public:
 	* @returns -1 if error, 0 if OK
 	*/
 	static int create_weights (Graph_t& g, type_t, int wmod = DEFAULT_WEIGHT_MODULUS,
-								string FILE_EXTENSION = "", string FILE_PATH = ""		);
+								std::string FILE_EXTENSION = "", std::string FILE_PATH = ""		);
 };
 
 /////////////////
@@ -220,7 +223,7 @@ public:
 	* @returns -1 if error, 0 if OK
 	*/
 	static int create_weights (Graph_t& g, type_t, int wmod = DEFAULT_WEIGHT_MODULUS,
-								string FILE_EXTENSION = "", string FILE_PATH = ""			);
+								std::string FILE_EXTENSION = "", std::string FILE_PATH = ""			);
 
 };
 
@@ -256,14 +259,14 @@ int RandomGen<Graph_t>::create_graph(Graph_t& g, std::size_t n, double p) {
 }
 
 template<class Graph_t>
-int RandomGen<Graph_t>::create_graph_benchmark(const string& path, const random_attr_t& rd) {
+int RandomGen<Graph_t>::create_graph_benchmark(const std::string& path, const random_attr_t& rd) {
 
 	std::ostringstream o;
 	Graph_t g;
 	std::ofstream f;
 
 	//add slash '/' at the end to the path if required
-	string mypath(path);
+	std::string mypath(path);
 	com::dir::append_slash(mypath);
 
 	for (int i = rd.nLB; i <= rd.nUB; i += rd.incN) {
@@ -363,7 +366,7 @@ int SparseRandomGen<sparse_ugraph, logSizeTable>::create_ugraph(sparse_ugraph& g
 
 template<class Graph_t>
 inline
-int WeightGen<Graph_t>::create_weights (Graph_t& g, type_t type, int wmod, string FILE_EXTENSION, string FILE_PATH){
+int WeightGen<Graph_t>::create_weights (Graph_t& g, type_t type, int wmod, std::string FILE_EXTENSION, std::string FILE_PATH){
 
 	const int NV = g.graph().number_of_vertices();		
 	
@@ -390,12 +393,12 @@ int WeightGen<Graph_t>::create_weights (Graph_t& g, type_t type, int wmod, strin
 	if (!FILE_EXTENSION.empty() && !FILE_PATH.empty()) {
 		
 		//determines the filename
-		string path = FILE_PATH;
+		std::string path = FILE_PATH;
 		com::dir::append_slash(path);
-		string filename = path + g.graph().get_name() + FILE_EXTENSION;
+		std::string filename = path + g.graph().get_name() + FILE_EXTENSION;
 
 		//streams weights to file
-		ofstream f(filename);
+		std::ofstream f(filename);
 		if (!f) {
 			LOGG_INFO("WeightGen<Graph_t>::create_weights () - cannot write weights to file ", filename);
 			return -1;
@@ -413,7 +416,7 @@ int WeightGen<Graph_t>::create_weights (Graph_t& g, type_t type, int wmod, strin
 
 template<class Graph_t>
 inline
-int EdgeWeightGen<Graph_t>::create_weights (Graph_t& g, type_t type, int wmod, string FILE_EXTENSION = "", string FILE_PATH = ""){
+int EdgeWeightGen<Graph_t>::create_weights (Graph_t& g, type_t type, int wmod, std::string FILE_EXTENSION = "", string FILE_PATH = ""){
 
 	switch (type) {
 	case WMOD:
@@ -430,12 +433,12 @@ int EdgeWeightGen<Graph_t>::create_weights (Graph_t& g, type_t type, int wmod, s
 	if (!FILE_EXTENSION.empty() && !FILE_PATH.empty()) {
 
 		//determines the filename
-		string path = FILE_PATH;
+		std::string path = FILE_PATH;
 		com::dir::append_slash(path);
-		string filename = path + g.graph().get_name() + FILE_EXTENSION;
+		std::string filename = path + g.graph().get_name() + FILE_EXTENSION;
 
 		//streams weights to file
-		ofstream f(filename);
+		std::ofstream f(filename);
 		if (!f) {
 			LOGG_INFO("cannot write edge-weights to file ", filename, " - EdgeWeightGen<Graph_t>::create_weights");
 			return -1;

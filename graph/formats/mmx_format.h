@@ -1,11 +1,11 @@
-/*
-* mmx_format.h header of class MMI to read MMX format in GRAPH
-*			 Currently only reads matrix format for configuration MCPS
-* @creation_date 6/10/2014
-* @last_update 30/12/2024
-* @dev pss
-*/
-
+/**
+* @file mmx_format.h
+* @brief header of class MMI to read MMX format in GRAPH
+*		 Currently only reads matrix format for configuration MCPS
+* @created 6/10/2014
+* @last_update 27/01/2025
+* @author pss
+**/
 
 #include "mmio.h"
 #include <cstdio>

@@ -1,9 +1,10 @@
-/*
-* graph_fast_sort_weighted.h: header for GraphFastRootSort_W_W class which sorts weighted graphs by different criteria
+/**
+* @file graph_fast_sort_weighted.h
+* @brief header for GraphFastRootSort_W_W class which sorts weighted graphs by different criteria
 * @created 12/03/21
 * @last_update 20/12/24
-* @dev pss
-*/
+* @author pss
+**/
 
 #ifndef __GRAPH_FAST_SORT_WEIGHTED_H__
 #define __GRAPH_FAST_SORT_WEIGHTED_H__

@@ -1,10 +1,12 @@
 /*
-* test_format.cpp  tests for reading different graph ASCII formats
+* @file test_format.cpp  
+* @brief Unit tests for reading different graph ASCII formats
 * @created ?
 * @update 23/01/19 (checked with new Graph_t types)
 * @update 29/10/22 (gml format)
 * @last_update 05/01/25
-* @dev pss
+* @author pss
+* 
 * @TODO - CHECK disabled tests
 */
 

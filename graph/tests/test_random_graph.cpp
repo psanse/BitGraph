@@ -1,11 +1,12 @@
 /*
-* test_random_graph.cpp  tests for random graph and weight generators
+* @file test_random_graph.cpp
+* @brief Unit tests for random graph and weight generators
 * @created ?
-* @updated @23/01/19 (check with the new Graph types)
-* @last_update 09/01/25
-* @dev pss
+* @updated @23/01/19 
+* @last_update 27/01/25
+* @author pss
 * 
-* TODO - ADD TESTS, weights...
+* TODO - ADD TESTS, weights...(09/01/2025)
 */
 
 #include "graph/graph.h"

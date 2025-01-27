@@ -1,18 +1,26 @@
 /*
-* test_graph_fast_sort_weighted.cpp Unit tests for Class GraphFastRootSort_W for vertex weighted graphs (graph_fast_sort_weighted.h)
-* @created 
-* @last_update 26/12/24
+* @file test_graph_fast_sort_weighted.cpp 
+* @biref Unit tests for Class GraphFastRootSort_W for vertex-weighted graphs (header graph_fast_sort_weighted.h)
+* @created ?
+* @last_update 27/01/25
 */ 
 
-#include "../algorithms/graph_fast_sort.h"
-#include "../algorithms/graph_fast_sort_weighted.h"
-#include "../graph.h"
+#include "graph/algorithms/graph_fast_sort.h"
+#include "graph/algorithms/graph_fast_sort_weighted.h"
+#include "simple_graph_w.h"							//MUST BE AFTER ugraph type 
 #include "gtest/gtest.h"
 #include <iostream>
 #include "utils/common.h"
 #include "utils/logger.h"
 #include "utils/file.h"
 #include <string>
+
+
+//useful alias
+using graph = Graph<bitarray>;						//simple graph
+using ugraph = Ugraph<bitarray>;					//simple undirected graph
+using ugraph_w = Graph_W < ugraph, double>;			//simple vertex weighted graph with double weights
+using ugraph_wi = Graph_W < ugraph, int>;			//simple vertex weighted graph with integer weights
 
 using namespace std;
 

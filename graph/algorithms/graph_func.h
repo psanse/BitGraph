@@ -1,12 +1,13 @@
-/*
-* graph_func.h: main header for namespace gfunc providing general purpose functions for graphs
+/**
+* @file graph_func.h
+* @brief main header for namespace gfunc providing general purpose functions for graphs
 * @created 07/3/17
 * @update 12/3/17
-* @last_update 09/01/25
+* @last_update 27/01/25
 * @dev pss
 *
 * TODO CHECK edgeW::ew_shift_2_highest_index function  (09/01/25)
-*/
+**/
 
 #ifndef __GRAPH_FUNC_H__
 #define __GRAPH_FUNC_H__
@@ -20,21 +21,20 @@
 #include "graph/simple_graph_w.h"				// must be after ugraph include
 #include "graph/simple_graph_ew.h"				// must beafter ugraph include
 
-using namespace std;				//TODO - remove from global namespace in the header
+//using namespace std;				//TODO - remove from global namespace in the header
 
-//////
-//aliases
-using vint = std::vector<int>;
 
 //aliases for graph types (see graph.h)
-typedef Graph<bitarray> graph;						//simple graph
-typedef Ugraph<bitarray> ugraph;					//simple undirected graph
-//typedef Graph<sparse_bitarray> sparse_graph;		//simple sparse graph
-//typedef Ugraph<sparse_bitarray> sparse_ugraph;	//simple sparse undirected graph
-typedef Graph_W<ugraph, double> ugraph_w;
-typedef Graph_W<ugraph, int> ugraph_wi;
-typedef Graph_EW<ugraph, double> ugraph_ew;
-typedef Graph_EW<ugraph, int> ugraph_ewi;
+using vint = std::vector<int>;
+using graph = Graph<bitarray>;
+using ugraph = Ugraph<bitarray>;	
+//using sparse_graph = Graph<sparse_bitarray>;
+//using sparse_ugraph = Ugraph<sparse_bitarray>;
+using ugraph_w = Graph_W<ugraph, double>;
+using ugraph_wi = Graph_W<ugraph, int>;
+using ugraph_ew = Graph_EW<ugraph, double>;
+using ugraph_ewi = Graph_EW<ugraph, int>;
+
 
 ///////////////////////
 // namespace gfunc 

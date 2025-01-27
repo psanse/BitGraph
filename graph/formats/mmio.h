@@ -1,18 +1,19 @@
-/* 
-*   Matrix Market I/O library for ANSI C
-*
-*   See http://math.nist.gov/MatrixMarket for details.
-*
-*
-*/
+/**
+* @file mmio.h
+* @brief Matrix Market I/O library for ANSI C
+*        See http://math.nist.gov/MatrixMarket for details.
+* @created ?
+* @last_update 27/01/2025
+**/
 
-#ifndef MM_IO_H
-#define MM_IO_H
+#ifndef __MM_IO_H__
+#define __MM_IO_H__
 
-#define MM_MAX_LINE_LENGTH 1025
+constexpr int MM_MAX_LINE_LENGTH = 1025;
+constexpr int MM_MAX_TOKEN_LENGTH = 64;
 #define MatrixMarketBanner "%%MatrixMarket"
 #define MatrixMarketSmallBanner "%MatrixMarket"
-#define MM_MAX_TOKEN_LENGTH 64
+
 
 typedef char MM_typecode[4];
 
