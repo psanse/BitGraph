@@ -43,7 +43,7 @@ struct input_t{
 int main(int argc, char** argv){
 		
 	if (argc != 9) {
-		LOG_ERROR("Enter <range of sizes>, <range of densities> <num of instances> <inc size> <inc density> <output dir>");
+		LOG_ERROR("Enter <range of sizes> <range of densities> <num of instances> <inc size> <inc density> <output dir>"						);
 		LOG_ERROR("exiting...");
 		return -1;
 	}
