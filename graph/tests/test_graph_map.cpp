@@ -1,11 +1,12 @@
 /*
-* test_graph_map.cpp  tests for GraphMap class which manages a pair of vertex orderings
+* @file test_graph_map.cpp  
+* @brief Unit tests for GraphMap class which manages a pair of vertex orderings
 * @created  14/8/17
 * @update 03/01/20 - adapted to the new GraphFastRootSort class
 * @last_update 10/01/25
-* @dev pss
+* @author pss
 *
-* TODO - check deprecated tests 
+* TODO - check deprecated tests (27/01/25)
 */
 
 #include "graph/algorithms/graph_fast_sort.h"

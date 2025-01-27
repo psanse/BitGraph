@@ -1,11 +1,13 @@
-/*
-* test_sparse_graph.cpp  tests for sparse directed and undirected graphs
+/**
+* @file test_sparse_graph.cpp
+* @brief tests for sparse directed and undirected graphs
 * @created ?
 * @updated 29/12/20
-* @last_update 05/01/25
-* @dev pss
-* @TODO - ADD TESTS
-*/
+* @last_update 27/01/2025
+* @author pss
+* 
+* @TODO - ADD TESTS (05/01/25)
+**/
 
 #include "graph/graph.h"
 #include "graph/algorithms/graph_gen.h"

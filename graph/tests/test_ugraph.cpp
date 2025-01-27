@@ -1,15 +1,19 @@
-/*
-* test_ugraph.cpp  tests for class Ugraph for undirected graphs
+/**
+* @file test_ugraph.cpp
+* @brief Unit tests for the Ugraph class for undirected graphs
 * @created ?
 * @updated 29/12/20
-* @last_update 31/12/24
-* @dev pss
-*/
+* @last_update 27/01/25
+* @author pss
+**/
 
-#include "../graph.h"
+#include "simple_ugraph.h"
 #include "gtest/gtest.h"
-//#include "utils/common_paths.h"
 #include <iostream>
+
+//alias
+using graph = Graph<bitarray>;						//simple graph
+using ugraph = Ugraph<bitarray>;					//simple undirected graph	
 
 using namespace std;
 

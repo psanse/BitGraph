@@ -1,19 +1,24 @@
 /*
-* test_wgraph.cpp  tests for vertex weighted graphs
+* @file test_wgraph.cpp  
+* @brief tests for vertex-weighted graphs
 * @created 9/10/16
-* @last_update 09/01/25
-* @dev pss
+* @last_update 27/01/25
+* @author pss
 * 
 * @TODO - ADD TESTS and check disabled / commented out tests at the end of file (09/01/25)
 */
 
-#include "graph/graph.h"						//contains all relevant graph types
+#include "simple_graph_w.h"							 
 #include "graph/algorithms/graph_gen.h"
 #include "gtest/gtest.h"
 #include "utils/common_paths.h";
 #include "utils/logger.h"
 #include <iostream>
-//#include "../algorithms/graph_sort.h"
+
+//useful alias
+using ugrah_w = Graph_W<ugraph, double>;			//simple vertex weighted graph with double weights
+using ugraph_wi = Graph_W<ugraph, int>;				//simple vertex weighted graph with int weights	
+
 
 using namespace std;
 

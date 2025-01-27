@@ -1,9 +1,10 @@
-/*
-* test_kcore.cpp  tests for class Kcore which manages the k-core number of undirected graphs
+/**
+* @file test_kcore.cpp 
+* @brief Unit tests for class Kcore which manages the k-core number of undirected graphs
 * @created ?
 * @last_update 13/01/24
-* @dev pss
-*/
+* @author pss
+**/
 
 
 #include <iostream>
@@ -11,7 +12,6 @@
 #include <string>
 #include "gtest/gtest.h"
 #include "graph/algorithms/graph_gen.h"
-//#include "graph/algorithms/graph_sort.h"
 #include "graph/algorithms/kcore.h"
 #include "utils/common.h"
 #include "utils/logger.h"
@@ -20,8 +20,7 @@
 using namespace std;
 
 //aliases
-using vint =  vector<int>;
-
+using vint = std::vector<int>;
 
 class KcoreWTest : public ::testing::Test {
 protected:
