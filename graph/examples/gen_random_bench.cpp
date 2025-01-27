@@ -1,7 +1,10 @@
-//gen_random.cpp: an example to generate a benchmark of simple undirected middle-size graphs  
-//author:pablo san segundo
-//inital_date@24/05/2015
-//last_update@20/12/22 -- changed to a proper random generator executable
+/**
+* @file gen_random.cpp
+* @brief Generates a benchmark of simple uniform random undirected graphs
+* @created 24/05/2015
+* @tagOne 20/12/22 -- changed to a proper random generator executable
+* @last_update 27/01/25
+**/
 
 #include <iostream>
 #include <string.h>

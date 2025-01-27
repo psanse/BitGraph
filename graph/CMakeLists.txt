@@ -87,7 +87,7 @@ endif()
 option(graph_build_examples "Build graph examples." OFF)
 if (graph_build_examples)
 
-add_executable ( gen_random_benchmark ./examples/gen_random.cpp)
+add_executable ( gen_random_benchmark ./examples/gen_random_bench.cpp)
 target_link_libraries (gen_random_benchmark LINK_PUBLIC graph bitscan utils)
 add_executable ( graph_formats ./examples/graph_formats.cpp)
 target_link_libraries (graph_formats LINK_PUBLIC graph bitscan utils)
