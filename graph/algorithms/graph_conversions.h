@@ -1,9 +1,10 @@
 /*
- * graph_conversions.h conversions between different graph types of the GRAPH library 
+ * @file graph_conversions.h 
+ * @brief sconversions between different graph types of the GRAPH library 
  *
  * @creation_date 25/11/16
- * @last_update 11/01/25
- * @dev pss
+ * @last_update 27/01/25
+ * @author pss
  *
  */
 

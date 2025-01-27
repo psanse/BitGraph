@@ -1,5 +1,11 @@
-//graph_map.h: conversions between two isomporphic graphs encoded by GRAPH (14/8/17)
-//			   extended to inlcude mapping to a single sorting (1/10/17)
+/**
+* @file graph_map.h
+* @brief header for GraphMap class which manages pairs of vertex orderings
+* @update conversions between two isomporphic graphs encoded by GRAPH (14/8/17)
+* @update extended to inlcude mapping to a single sorting (1/10/17)
+* @last_update 27/01/25
+* @author pss
+**/
 
 #ifndef __GRAPH_MAPPINGS_H__
 #define	__GRAPH_MAPPINGS_H__

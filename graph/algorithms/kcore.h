@@ -1,14 +1,15 @@
-/*
- * kcore.h file for the classes Base_Graph_W and Graph_W for weighted graphs
+/**
+ * @file kcore.h
+ * @brief declaration of the KCore class which manages coreness of vertices in a graph
  *
- * @creation_date 6/6/14
- * @last_update 11/01/25
- * @dev pss
+ * @created 6/6/14
+ * @last_update 27/01/25
+ * @author pss
  *
  * TODO - mention reference paper to determine KCore
  * TODO - using pointer to external bitset as set of vertices of the induced subgraph. Change to an owned bitset or vector of vertices (13/01/25)
  *		  Add different types to define the set of vertices that induces the subgraph (13/01/25)
- */
+ **/
 
 #ifndef __KCORE_H__
 #define __KCORE_H__

@@ -1,13 +1,14 @@
-/*
-* graph_fast_sort.h: header for GraphFastRootSort class which sorts graphs by different criteria
+/**
+* @file graph_fast_sort.h
+* @brief header for GraphFastRootSort class which sorts graphs by different criteria
 * @created 12/03/15
-* @tag_1 changed nodes_ stack to vector (18/03/19)
-* @last_update 29/12/24
-* @dev pss
+* @update changed nodes_ stack to vector (18/03/19)
+* @last_update 27/01/25
+* @author pss
 * 
-* @TODO add.further primitives for composite orderings in subgraphs (29/12/24)
+* @TODO add further primitives for composite orderings in subgraphs (29/12/24)
 * @TOD0 add new_order(...) for subgraphs (29/12/24)
-*/
+**/
 
 #ifndef __GRAPH_FAST_SORT_H__
 #define __GRAPH_FAST_SORT_H__
@@ -22,6 +23,8 @@
 //#include "filter_graph_sort_type.h"			//limits template Graph_t to undirected types
 
 using namespace std;
+
+//alias
 using vint = std::vector<int>;
 
 ///////////////////////////

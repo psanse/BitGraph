@@ -1,6 +1,11 @@
-//graph_fast_sort_edge_weighted.h: header for GraphFastRootSort_EW_W class which sorts weighted graphs by different criteria
-//date: 08/12/2021
-//authors: pss
+/**
+* @file graph_fast_sort_edge_weighted.h
+* @brief header for GraphFastRootSort_EW_W class which sorts
+*		 weighted graphs according to different criteria
+* @date 08/12/2021
+* @last_update 27/01/2025
+* @author pss
+**/
 
 #ifndef __GRAPH_FAST_SORT_EDGE_WEIGHTED_H__
 #define __GRAPH_FAST_SORT_EDGE_WEIGHTED_H__
@@ -9,9 +14,8 @@
 #include <algorithm>
 #include <vector>
 #include <iterator>
-#include "../graph.h"
-#include "../algorithms/graph_fast_sort.h"
-#include "../kcore.h"
+#include "graph/algorithms/graph_fast_sort.h"
+#include "graph/kcore.h"
 #include "filter_graph_sort_type.h"			//limits template Graph_t to undirected types
 #include "utils/logger.h"
 #include "utils/common.h"					//sort functors
