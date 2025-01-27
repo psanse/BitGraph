@@ -1,6 +1,7 @@
 # Create a library called "Hello" which includes the source file "hello.cxGRBx".
 # The extension is already found. Any number of sources could be listed here.
-set(useful_headers_for_IDE graph.h
+set(useful_headers_for_IDE
+graph.h
 simple_graph.h
 simple_sparse_graph.h
 simple_sparse_ugraph.h
@@ -16,10 +17,11 @@ algorithms/graph_fast_sort.h
 algorithms/graph_fast_sort_weighted.h
 )
 
-#####################
-#GRAPH lib
-####################
-add_library (graph simple_graph.cpp
+###################
+# GRAPH lib
+###################
+add_library  (graph
+simple_graph.cpp
 simple_ugraph.cpp
 simple_graph_w.cpp
 simple_graph_ew.cpp
@@ -27,17 +29,20 @@ formats/mmio.cpp
 algorithms/decode.cpp
 ${useful_headers_for_IDE}
 )
+
 set_target_properties(graph 
     PROPERTIES
      ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
 )
 
 
-
 # Make sure the compiler can find include files for our bitscan library
 # when other libraries or executables link to bitscan
 target_include_directories (graph PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
+###################
+# GRAPH lib - UNIT TESTS
+###################
 option(graph_build_tests "Build graph tests." OFF)
 if (graph_build_tests)
 
@@ -76,6 +81,9 @@ target_link_libraries (test_graph LINK_PUBLIC graph bitscan utils gtest)
 
 endif()
 
+###################
+# GRAPH lib - Example targets
+###################
 option(graph_build_examples "Build graph examples." OFF)
 if (graph_build_examples)
 
@@ -87,17 +95,13 @@ add_executable ( lb_kcore ./examples/lb_kcore.cpp)
 target_link_libraries (lb_kcore LINK_PUBLIC graph bitscan utils)
 
 
-set_target_properties( gen_random_benchmark #graph_formats #lb_kcore
+set_target_properties( gen_random_benchmark graph_formats lb_kcore
 		PROPERTIES
 	#    ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
 	#    LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
 		RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
 )
 
-if(LEDA_ON)
-add_executable ( gwin_main ./examples/gwin_main.cpp)
-target_link_libraries (gwin_main LINK_PUBLIC graph bitscan utils)
-endif()
 
 endif()
 
