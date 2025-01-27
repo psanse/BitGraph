@@ -1,11 +1,10 @@
-/* 
-*   Matrix Market I/O library for ANSI C
-*
-*   See http://math.nist.gov/MatrixMarket for details.
-*
-*
-*/
-
+/**
+* @file mmio.cpp
+* @brief Implementation of Matrix Market I/O library for ANSI C
+*        (see http://math.nist.gov/MatrixMarket for details).
+* @created ?
+* @last_update 27/01/2025
+**/ 
 
 #include <stdio.h>
 #include <string.h>

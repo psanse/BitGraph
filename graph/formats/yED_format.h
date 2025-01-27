@@ -1,13 +1,17 @@
 /*
-* graph_inout.h: stateless functions for io operations on graphs
-* @date 10/07/2019
-* @last_update 30/12/2022
-* @dev pss
-* TODO@: this code contains only yED format - possibly change name of file
+* @file graph_inout.h
+* @brief stateless functions for I/O operations on graphs
+* @created 10/07/2019
+* @last_update 27/01/25
+* @author pss
+* 
+* @comment generic code for graph types in the GRAPH lib
+* 
+* TODO@: this code contains only yED format - possibly change name of file (30/12/2022)
 */
 
-#ifndef	_GRAPH_INPUT_OUTPUT_H_
-#define _GRAPH_INPUT_OUTPUT_H_
+#ifndef	__GRAPH_INPUT_OUTPUT_H__
+#define __GRAPH_INPUT_OUTPUT_H__
 
 #include <fstream>
 #include <sstream>
@@ -17,7 +21,7 @@
 #include "utils/file.h"
 #include "utils/logger.h"
 #include "utils/common.h"
-#include "../graph.h"
+//#include graph/graph.h"
 
 
 #define  _USE_MATH_DEFINES				//for PI

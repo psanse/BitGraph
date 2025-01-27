@@ -1,10 +1,11 @@
-/*
-* edges_format.h header of class MMXI to read MMX format in GRAPH
-* 				   Currently only reads matrix from a configuration MCPS
-* @creation_date 19/11/2014
-* @last_update 30/12/2024
-* @dev pss
-*/
+/**
+* @file edges_format.h
+* @bried header of class MMXI to read MMX format in GRAPH
+* 		 Currently only reads matrix from a configuration MCPS
+* @created 19/11/2014
+* @last_update 27/01/2025
+* @author pss
+**/
 
 #include "stdio.h"
 #include <fstream>
@@ -14,7 +15,7 @@
 #ifndef _EDGES_READER_H_
 #define	_EDGES_READER_H_
 
-#define EDGES_MAX_LINE_LENGTH 255
+constexpr int EDGES_MAX_LINE_LENGTH = 255;
 
 template<class T>
 class EDGES{
