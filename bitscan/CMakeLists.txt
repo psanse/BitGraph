@@ -10,6 +10,9 @@ set_target_properties(bitscan
 # when other libraries or executables link to bitscan
 target_include_directories (bitscan PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
+###################
+# BITSCAN lib - UNIT TESTS
+###################
 option(bitscan_build_tests "Build bitscan tests." OFF)
 if (bitscan_build_tests)
 

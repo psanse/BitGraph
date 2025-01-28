@@ -1,6 +1,6 @@
 #cmake_minimum_required (VERSION 3.4)
 cmake_minimum_required (VERSION 2.8)   #for VENUS server
-project (clique)
+project (graphlib)
 
 #############
 #
@@ -91,13 +91,32 @@ if(WIN32)
   set(CMAKE_SHARED_LINKER_FLAGS "-Wl,--export-all-symbols")
 endif()
 
-# add_library(copt_full SHARED copt graph bitscan utils)
-# set_target_properties(copt_full PROPERTIES LINKER_LANGUAGE CXX)
-# install(TARGETS copt_full DESTINATION lib)
-                                   
-# file(GLOB_RECURSE DEPLOY_FILES_AND_DIRS "${PROJECT_SOURCE_DIR}/*.h")
-# foreach(ITEM ${DEPLOY_FILES_AND_DIRS})
-	# get_filename_component(absdir ${ITEM} DIRECTORY)
-	  # file(RELATIVE_PATH dir ${PROJECT_SOURCE_DIR} ${absdir})
-      # install( FILES ${ITEM} DESTINATION include/${dir})
-# endforeach()
+#############
+#
+# Install BITSCAN and GRAPH libraries
+# (set CMAKE_INSTALL_PREFIX)
+#
+#############
+
+set(INSTALL_PATH "${CMAKE_CURRENT_SOURCE_DIR}/example" CACHE PATH "Directory chosen to deploy project")
+set(CMAKE_INSTALL_PREFIX ${INSTALL_PATH})
+
+# Install BITSCAN library
+install(TARGETS bitscan
+        ARCHIVE DESTINATION lib
+        LIBRARY DESTINATION lib
+        RUNTIME DESTINATION bin)
+
+# Install GRAPH library
+install(TARGETS graph
+        ARCHIVE DESTINATION lib
+        LIBRARY DESTINATION lib
+        RUNTIME DESTINATION bin)
+ 
+#deploy header files in include directory preserving internal structure
+ file(GLOB_RECURSE DEPLOY_FILES_AND_DIRS "${PROJECT_SOURCE_DIR}/*.h")
+ foreach(ITEM ${DEPLOY_FILES_AND_DIRS})
+    file(RELATIVE_PATH REL_PATH ${PROJECT_SOURCE_DIR} ${ITEM})
+    get_filename_component(DIR_PATH ${REL_PATH} DIRECTORY)
+    install(FILES ${ITEM} DESTINATION include/${DIR_PATH})	 
+ endforeach()
