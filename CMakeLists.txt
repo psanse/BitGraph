@@ -84,10 +84,10 @@ endif (APPLE)
 
 include_directories (PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
-add_subdirectory (googletest)
+add_subdirectory (googletest)       #TODO - import some other way
 add_subdirectory (utils)
 add_subdirectory (bitscan)
-add_subdirectory (tclap)
+add_subdirectory (tclap)            #TODO - possibly remove
 add_subdirectory (graph)
  
 if(WIN32)
