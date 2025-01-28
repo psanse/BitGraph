@@ -36,7 +36,7 @@ set(PATH_COPT_TESTS_CMAKE_GUI ${CMAKE_SOURCE_DIR}/copt/data CACHE PATH "PATH for
 #message("PATH_COPT_TESTS_CMAKE_GUI='${PATH_COPT_TESTS_CMAKE_GUI}'")
 add_definitions (-DPATH_COPT_TESTS_CMAKE_SRC_CODE=\"${PATH_COPT_TESTS_CMAKE_GUI}/\") 
 
-#old definitions
+#old definitions - deprecated
 #add_definitions (-D_PATH_FOR_COPT_TESTS_DATA_IN_SRC_CODE=\"${CMAKE_SOURCE_DIR}/copt/data/\") 
 #add_definitions (-D_PATH_FOR_GRAPH_TESTS_DATA_IN_SRC_CODE=\"${CMAKE_SOURCE_DIR}/graph/data/\") 
 
@@ -61,8 +61,8 @@ endif()
 
 #############
 #
-# OpenMP (VSTUDIO)
-# For VSTUDIO found nothing better than to set it globally for all targets
+# OpenMP (Windows)
+# note: found nothing better than to set it globally for all targets
 #############
 
 if (WIN32)
