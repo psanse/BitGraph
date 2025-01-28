@@ -1,5 +1,4 @@
-cmake_minimum_required (VERSION 2.8...3.4)
-#cmake_minimum_required (VERSION 2.8)   #for VENUS server
+cmake_minimum_required (VERSION 2.8...3.4)  		#version 2.8 for VENUS server
 project (graphlib
     VERSION 1.0
     DESCRIPTION "library to work with graphs efficiently"
