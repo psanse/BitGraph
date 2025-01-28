@@ -105,12 +105,4 @@ set_target_properties( gen_random_benchmark graph_formats lb_kcore
 
 endif()
 
-#file(GLOB_RECURSE DEPLOY_FILES_AND_DIRS "${PROJECT_SOURCE_DIR}/*.h")
-#foreach(ITEM ${DEPLOY_FILES_AND_DIRS})
-#	  file(RELATIVE_PATH dir ${PROJECT_SOURCE_DIR} ${ITEM})
-#      get_filename_component( dir ${ITEM} DIRECTORY )
-#      install( FILES ${ITEM} DESTINATION include/graph/${dir} )
-#endforeach()
-
-install(TARGETS graph DESTINATION lib)
 

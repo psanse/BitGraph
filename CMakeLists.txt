@@ -97,8 +97,7 @@ endif()
 
 #############
 #
-# Install BITSCAN and GRAPH libraries
-# (set CMAKE_INSTALL_PREFIX)
+# Deploy BITSCAN and GRAPH libraries
 #
 #############
 

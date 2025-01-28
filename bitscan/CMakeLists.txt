@@ -36,4 +36,5 @@ target_link_libraries (test_bitscan LINK_PUBLIC bitscan gtest utils)
 
 
 endif()
-install(TARGETS bitscan DESTINATION lib)
+
+

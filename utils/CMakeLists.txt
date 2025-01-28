@@ -61,4 +61,3 @@ target_link_libraries (test_utils LINK_PUBLIC utils gtest)
 
 endif()
 
-install(TARGETS utils DESTINATION lib)
