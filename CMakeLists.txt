@@ -100,8 +100,15 @@ endif()
 #
 #############
 
+
 set(INSTALL_PATH "${CMAKE_CURRENT_SOURCE_DIR}/example" CACHE PATH "Directory chosen to deploy project")
 set(CMAKE_INSTALL_PREFIX ${INSTALL_PATH})
+
+# Install utils library
+install(TARGETS utils
+        ARCHIVE DESTINATION lib
+        LIBRARY DESTINATION lib
+        RUNTIME DESTINATION bin)
 
 # Install BITSCAN library
 install(TARGETS bitscan
