@@ -1,6 +1,10 @@
-#cmake_minimum_required (VERSION 3.4)
-cmake_minimum_required (VERSION 2.8)   #for VENUS server
-project (graphlib)
+cmake_minimum_required (VERSION 2.8...3.4)
+#cmake_minimum_required (VERSION 2.8)   #for VENUS server
+project (graphlib
+    VERSION 1.0
+    DESCRIPTION "library to work with graphs efficiently"
+    HOMEPAGE_URL https://github.com/psanse/BITSCAN_plus
+)
 
 #############
 #
@@ -29,7 +33,7 @@ endif()
 # (use inside the code)
 #############
 set(PATH_GRAPH_TESTS_CMAKE_GUI ${CMAKE_SOURCE_DIR}/graph/data CACHE PATH "PATH for GRAPH unit tests")
-message("PATH_GRAPH_TESTS_CMAKE_GUI='${PATH_GRAPH_TESTS_CMAKE_GUI}'")
+#message("PATH_GRAPH_TESTS_CMAKE_GUI='${PATH_GRAPH_TESTS_CMAKE_GUI}'")
 add_definitions (-DPATH_GRAPH_TESTS_CMAKE_SRC_CODE=\"${PATH_GRAPH_TESTS_CMAKE_GUI}/\") 
 
 set(PATH_COPT_TESTS_CMAKE_GUI ${CMAKE_SOURCE_DIR}/copt/data CACHE PATH "PATH for COPT unit tests")
@@ -48,15 +52,15 @@ set_property(CACHE LOG_LEVEL PROPERTY STRINGS debug verbose error)
 message("LOGGER_LEVEL='${LOG_LEVEL}'")
 
 if( ${LOG_LEVEL} STREQUAL "debug")
-add_definitions(-DLOGGER_DEBUG_LEVEL)				#all messages (logger.h) 
+    add_definitions(-DLOGGER_DEBUG_LEVEL)				#all messages (logger.h) 
 endif()
 
 if( ${LOG_LEVEL}  STREQUAL "verbose")
-add_definitions(-DLOGGER_VERBOSE_LEVEL)				#all messages (logger.h)  	
+    add_definitions(-DLOGGER_VERBOSE_LEVEL)				#all messages (logger.h)  	
 endif()
 
 if( ${LOG_LEVEL}  STREQUAL "error")
-add_definitions(-DLOGGER_ERROR_LEVEL)				#all messages (logger.h)  	
+    add_definitions(-DLOGGER_ERROR_LEVEL)				#all messages (logger.h)  	
 endif()
 
 #############
@@ -68,8 +72,8 @@ endif()
 if (WIN32)
 #find_package(OpenMP)
 #IF (OPENMP_FOUND)
-    SET (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
-    SET (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS} -D_VARIADIC_MAX=10")
+    set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
+    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS} -D_VARIADIC_MAX=10")
 #endif()
 endif (WIN32)
 
