@@ -6,6 +6,23 @@
 #include <iostream>
 
 using namespace std;
+
+inline 
+int BitBoard::popc64_lup(const BITBOARD bb_dato) {
+	//////////////////////////////
+	// Lookup implementation 
+	//
+	// COMMENTS
+	// more compact than lookup without union but similar in time
+	register union x {
+		U16 c[4];
+		BITBOARD b;
+	} val;
+
+	val.b = bb_dato; //Carga unisn
+
+	return (Tables::pc[val.c[0]] + Tables::pc[val.c[1]] + Tables::pc[val.c[2]] + Tables::pc[val.c[3]]); //Suma de poblaciones 
+}
 	
 //ostream & operator<<(ostream& o, const BITBOARD& bb_data){
 //	BITBOARD bb=bb_data;
@@ -152,7 +169,7 @@ return EMPTY_ELEM;									//should not reach here
 //
 ///////////////////////
 
-void BitBoard::print(const BITBOARD bb_data, std::ostream& o){
+std::ostream& BitBoard::print(const BITBOARD bb_data, std::ostream& o) {
 ///////////////////////
 // Shows bits and popcount
 
@@ -169,6 +186,8 @@ void BitBoard::print(const BITBOARD bb_data, std::ostream& o){
 	}
 
 	o<<"["<<BitBoard::popc64(bb_data)<<"]"<<endl;
+
+	return o;
 
 }
 

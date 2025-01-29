@@ -1,13 +1,13 @@
-/*  
- * bitboard.h file from the BITSCAN library, a C++ library for bit set
- * optimization. BITSCAN has been used to implement BBMC, a very
- * succesful bit-parallel algorithm for exact maximum clique. 
- * (see license file for references)
- *
- * Copyright (C)
- * Author: Pablo San Segundo
- * Intelligent Control Research Group (CSIC-UPM) 
- *
+/** 
+ * @file bitboard.h
+ * @brief Header file for the class BitBoard of the BITSCAN library
+ * @details The BitBoard class manages bitsets of 64-bit length
+ * @created ?
+ * @last_update 29/01/2025
+ * @author pss
+ * 
+ * TODO -  consider moving implementations to the corresponding source file (29/01/2025)
+ * 
  * Permission to use, modify and distribute this software is
  * granted provided that this copyright notice appears in all 
  * copies, in source code or in binaries. For precise terms 
@@ -17,7 +17,7 @@
  * kind, express or implied, and with no claim as to its
  * suitability for any purpose.
  *
- */
+ **/
 
 #ifndef __BITBOARD_H__
 #define __BITBOARD_H__
@@ -66,30 +66,42 @@
 
 #include <iostream>
 
-#define DEBRUIJN_MN_64_ISOL		0x07EDD5E59A4E28C2
-#define DEBRUIJN_MN_64_SEP		0x03f79d71b4cb0a89
-#define DEBRUIJN_MN_64_SHIFT	58
+//////////////////////////////////////////////////////////////////////////
+//compile time globals
+constexpr unsigned long long DEBRUIJN_MN_64_ISOL	 = 0x07EDD5E59A4E28C2;
+constexpr unsigned long long DEBRUIJN_MN_64_SEP		 = 0x03f79d71b4cb0a89;
+constexpr unsigned long long DEBRUIJN_MN_64_SHIFT	 = 58;
+//////////////////////////////////////////////////////////////////////////
+
+//#define DEBRUIJN_MN_64_ISOL		0x07EDD5E59A4E28C2
+//#define DEBRUIJN_MN_64_SEP		0x03f79d71b4cb0a89
+//#define DEBRUIJN_MN_64_SHIFT	58
 
 /////////////////////////////////
 //
 // BITBOARD CLASS
-// (contains different implementations of msb and lsb and popcount functions to test HW)
+// 
+// (manages bitset optimizations in 64-bitsets)
+// 
+// TODO - consider using a namespace instead of a class (29/01/2025)
+// 
 ///////////////////////////////////
 
 class BitBoard {
-	
-private:							//hidden constructor 
-	BitBoard(){};
 
+	//constructor / destructor
+	BitBoard() = delete;
+	
+	
 public:
 /////////////////////
 // BitScanning
 		
-	static int  lsb64_mod				(const BITBOARD);			//modulus of magic number perfect hashing	
-    static int  lsb64_lup				(const BITBOARD);			//lookup implementations
-	static int  lsb64_lup_1				(const BITBOARD);
-	static int	msb64_lup				(const BITBOARD);
-	static int  lsb64_pc				(const BITBOARD);			//popcount based implementation (2008)
+	static int  lsb64_mod			(const BITBOARD);			//modulus of magic number perfect hashing	
+    static int  lsb64_lup			(const BITBOARD);			//lookup implementations
+	static int  lsb64_lup_1			(const BITBOARD);
+	static int	msb64_lup			(const BITBOARD);
+	static int  lsb64_pc			(const BITBOARD);			//popcount based implementation (2008)
 	
 	//ref
 inline	static int  lsb64_de_Bruijn	(const BITBOARD bb_dato);		//De Bruijn magic word (2008)
@@ -106,12 +118,14 @@ inline  static int popc64			(const BITBOARD);				//Recommended default popcount 
 
 //////////////////////
 //  Masks
-inline static BITBOARD MASK_1		(int low, int high);		//1-bit mask in the CLOSED range
-inline static BITBOARD MASK_0		(int low, int high);		//0-bit mask in the CLOSED range
+inline static BITBOARD MASK_1		(int low, int high);			//1-bit mask in the CLOSED range
+inline static BITBOARD MASK_0		(int low, int high);			//0-bit mask in the CLOSED range
+
+//TODO - add trimming masks (29/01/25) 
 
 /////////////////////
 // I/O
-	static void print(const BITBOARD, std::ostream&  = std::cout);
+	static std::ostream& print		(const BITBOARD, std::ostream&  = std::cout) ;
 };
 
 
@@ -121,21 +135,7 @@ inline static BITBOARD MASK_0		(int low, int high);		//0-bit mask in the CLOSED 
 //
 /////////////////////////
 
- inline int BitBoard::popc64_lup (	const BITBOARD bb_dato){
-//////////////////////////////
-// Lookup implementation 
-//
-// COMMENTS
-// more compact than lookup without union but similar in time
-	register union x {
-		U16 c[4];
-		BITBOARD b;
-	} val;				
 
-	val.b = bb_dato; //Carga unisn
-
-return (Tables::pc[val.c[0]] + Tables::pc[val.c[1]] + Tables::pc[val.c[2]] + Tables::pc[val.c[3]]); //Suma de poblaciones 
-}
 
 
 inline int BitBoard::popc64(const BITBOARD bb_dato){
