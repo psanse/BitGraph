@@ -21,9 +21,9 @@ if (bitscan_build_tests)
 add_executable (test_bitscan tests/gtest_main.cc 
 #tests/test_bitstrings.cpp 
 #tests/test_algorithms.cpp 
- tests/test_masking.cpp 
+#tests/test_masking.cpp 
 #tests/test_sparse.cpp
-#tests/test_bitblock.cpp
+ tests/test_bitblock.cpp
 #tests/test_example.cpp
 #tests/test_sentinels.cpp
 )
