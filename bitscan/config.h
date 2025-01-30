@@ -19,10 +19,12 @@
  *
  */
 
-#define WORD_SIZE					64								//DO NOT CHANGE
+//Size of the register word in bits - DO NOT CHANGE!
+constexpr int WORD_SIZE = 64;							
+
 
 //popcount
-#define POPCOUNT_64										//will use intrinsic _popcn64 function (DEFAULT)
+#define POPCOUNT_64												//will use intrinsic _popcn64 function (DEFAULT)
 //#undef  POPCOUNT_64											//will use lookup table popcount function
 
 //bitscanning implementation choice
