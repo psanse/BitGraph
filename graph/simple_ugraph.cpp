@@ -101,7 +101,7 @@ int Ugraph<T>::degree (int v, const BitBoardN& bbn) const {
 
 	int ndeg = 0;
 	for (int i = 0; i < ptype::NBB_; i++) {
-		ndeg += bitblock::popc64(ptype::adj_[v].get_bitboard(i) & bbn.get_bitboard(i));
+		ndeg += bblock::popc64(ptype::adj_[v].get_bitboard(i) & bbn.get_bitboard(i));
 	}
 
 	return ndeg;
@@ -289,11 +289,11 @@ int Ugraph<T>::degree_up (int v, const BitBoardN& bbn) const	{
 	int nDeg = 0, nBB = WDIV(v);
 
 	for (auto i = nBB + 1; i < ptype::NBB_; ++i) {
-		nDeg += bitblock::popc64( _mypt::adj_[v].get_bitboard(i) & bbn.get_bitboard(i) );
+		nDeg += bblock::popc64( _mypt::adj_[v].get_bitboard(i) & bbn.get_bitboard(i) );
 	}
 
 	//truncate the bitblock of v
-	nDeg += bitblock::popc64 ( bitblock::MASK_1( WMOD(v) + 1, 63 ) &
+	nDeg += bblock::popc64 ( bblock::MASK_1( WMOD(v) + 1, 63 ) &
 							   ptype::adj_[v].get_bitboard(nBB) & bbn.get_bitboard(nBB)	
 							 );
 	
@@ -306,11 +306,11 @@ int Ugraph<T>::degree_up(int v) const
 	int nDeg = 0, nBB = WDIV(v);
 
 	for (auto i = nBB + 1; i < ptype::NBB_; ++i) {
-		nDeg += bitblock::popc64( _mypt::adj_[v].get_bitboard(i) );
+		nDeg += bblock::popc64( _mypt::adj_[v].get_bitboard(i) );
 	}
 
 	//truncate the bitblock of v
-	nDeg += bitblock::popc64( bitblock::MASK_1(WMOD(v) + 1, 63) &
+	nDeg += bblock::popc64( bblock::MASK_1(WMOD(v) + 1, 63) &
 							  ptype::adj_[v].get_bitboard(nBB)	   );
 
 	return nDeg;
@@ -322,7 +322,7 @@ int Ugraph<T>::degree (int v, int UB, const BitBoardN& bbn) const	{
 	int nDeg = 0;
 	for(auto i = 0; i < _mypt::NBB_; ++i){
 
-		nDeg += bitblock::popc64(_mypt::adj_[v].get_bitboard(i) & bbn.get_bitboard(i));
+		nDeg += bblock::popc64(_mypt::adj_[v].get_bitboard(i) & bbn.get_bitboard(i));
 
 		if (nDeg >= UB) { return UB; }
 	}

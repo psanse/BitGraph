@@ -57,12 +57,12 @@ inline int Ugraph<sparse_bitarray>::degree_up(int v) const
 	}
 
 	//truncate the bitblock of v and count the number of neighbors
-	nDeg += bitblock::popc64(	bitblock::MASK_1(WMOD(v) + 1, 63) &	it->bb );
+	nDeg += bblock::popc64(	bblock::MASK_1(WMOD(v) + 1, 63) &	it->bb );
 
 	//add the rest of neighbours in the bitblocks that follow
 	++it;
 	for (; it != adj_[v].end(); ++it) {
-		nDeg += bitblock::popc64(it->bb);
+		nDeg += bblock::popc64(it->bb);
 	}
 	
 	return nDeg;
@@ -83,7 +83,7 @@ int Ugraph<sparse_bitarray>::degree(int v, const BitBoardN& bbn) const {
 	
 	int ndeg = 0;
 	for (auto it = adj_[v].begin(); it != adj_[v].end(); ++it) {
-		ndeg += bitblock::popc64(it->bb & bbn.get_bitboard(it->index));
+		ndeg += bblock::popc64(it->bb & bbn.get_bitboard(it->index));
 	}
 
 	return ndeg;
@@ -106,7 +106,7 @@ int Ugraph<sparse_bitarray>::degree(int v, const BitBoardS& bbs) const {
 			++itbb;
 		}
 		else { //same index
-			ndeg += bitblock::popc64(itv->bb & itbb->bb);
+			ndeg += bblock::popc64(itv->bb & itbb->bb);
 			++itv; ++itbb;
 		}
 	}
@@ -120,7 +120,7 @@ int Ugraph<sparse_bitarray>::degree(int v, int UB, const BitBoardN& bbn) const {
 	
 	int ndeg = 0;
 	for (auto it = adj_[v].begin(); it != adj_[v].end(); ++it) {
-		ndeg += bitblock::popc64(it->bb & bbn.get_bitboard(it->index));
+		ndeg += bblock::popc64(it->bb & bbn.get_bitboard(it->index));
 		if (ndeg >= UB) return UB;
 	}
 
@@ -144,7 +144,7 @@ int Ugraph<sparse_bitarray>::degree(int v, int UB, const BitBoardS& bbs) const {
 			++itbb;
 		}
 		else { //same index
-			ndeg += bitblock::popc64(itv -> bb & itbb -> bb);
+			ndeg += bblock::popc64(itv -> bb & itbb -> bb);
 			if (ndeg >= UB) return UB;
 			++itv; ++itbb;
 		}

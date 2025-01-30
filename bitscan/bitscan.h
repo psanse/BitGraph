@@ -25,7 +25,7 @@
 #include "bbintrinsic_sparse.h"	
 
 //useful aliases
-using bitblock = BitBoard;
+//using bitblock = BitBoard;
 using bitarray = BBIntrin;
 using watched_bitarray = BBSentinel;
 using sparse_bitarray = BBIntrinS;

@@ -185,7 +185,7 @@ int BitBoardN::first_found	(const BitBoardN& rhs) const{
 	for(int i=0; i<this->m_nBB; i++){
 		bb=this->m_aBB[i] & rhs.m_aBB[i];
 		if(bb=(this->m_aBB[i] & rhs.m_aBB[i])){
-			return BitBoard::lsb64_intrinsic(bb) + WMUL(i);
+			return bblock::lsb64_intrinsic(bb) + WMUL(i);
 		}
 	}
 	return EMPTY_ELEM;
@@ -231,14 +231,14 @@ inline int BitBoardN::next_bit(int nBit/* 0 based*/) const{
 		index=WDIV(nBit);
 
 		//looks in same BB as nBit
-		npos=BitBoard::lsb64_de_Bruijn(Tables::mask_left[WMOD(nBit) /*-WORD_SIZE*index*/] & m_aBB[index] );
+		npos=bblock::lsb64_de_Bruijn(Tables::mask_left[WMOD(nBit) /*-WORD_SIZE*index*/] & m_aBB[index] );
 		if(npos>=0)
 			return (WMUL(index)/*WORD_SIZE*index*/ + npos);
 
 		//looks in remaining BBs
 		for(int i=index+1; i<m_nBB; i++){
 			if(m_aBB[i])
-				return(BitBoard::lsb64_de_Bruijn(m_aBB[i])+WMUL(i)/*WORD_SIZE*i*/ );
+				return(bblock::lsb64_de_Bruijn(m_aBB[i])+WMUL(i)/*WORD_SIZE*i*/ );
 		}
 	}
 	
@@ -255,7 +255,7 @@ inline int BitBoardN::next_bit_if_del(int nBit/* 0 based*/) const{
 	else{
 		for(int i=WDIV(nBit); i<m_nBB; i++){
 			if(m_aBB[i]){
-				return(BitBoard::lsb64_de_Bruijn(m_aBB[i])+WMUL(i) );
+				return(bblock::lsb64_de_Bruijn(m_aBB[i])+WMUL(i) );
 			}
 		}
 	}
@@ -286,7 +286,7 @@ inline int BitBoardN::previous_bit(int nBit/* 0 bsed*/) const{
 		
 	
 	//BitBoard pos
-	npos=BitBoard::msb64_lup( Tables::mask_right[WMOD(nBit) /*nBit-WMUL(index)*/] & m_aBB[index] );
+	npos=bblock::msb64_lup( Tables::mask_right[WMOD(nBit) /*nBit-WMUL(index)*/] & m_aBB[index] );
 	if(npos!=EMPTY_ELEM)
 			return (WMUL(index) + npos);
 
@@ -373,7 +373,7 @@ inline int BitBoardN::init_bit(int low, int high){
 	}
 
 	if(bbl==bbh){
-		m_aBB[bbh]=BitBoard::MASK_1(low-WMUL(bbl), high-WMUL(bbh));
+		m_aBB[bbh]=bblock::MASK_1(low-WMUL(bbl), high-WMUL(bbh));
 	}else{
 		for(int i=bbl+1; i<=bbh-1; i++)	
 			m_aBB[i]=ONE;
@@ -406,7 +406,7 @@ int BitBoardN::init_bit (int high, const BitBoardN& bb_add){
 	}
 
 	//trim last bit block up to high
-	m_aBB[bbh]&=BitBoard::MASK_1(0, high-WMUL(bbh)); 
+	m_aBB[bbh]&=bblock::MASK_1(0, high-WMUL(bbh)); 
 
 
 return 0;
@@ -423,22 +423,22 @@ int  BitBoardN::is_singleton (int low, int high) const{
 	
 	//both ends
 	if(nbbl==nbbh){
-		BITBOARD bbl= m_aBB[nbbl] & BitBoard::MASK_1(WMOD(low),WMOD(high));
-		pc=BitBoard::popc64(bbl);
+		BITBOARD bbl= m_aBB[nbbl] & bblock::MASK_1(WMOD(low),WMOD(high));
+		pc=bblock::popc64(bbl);
 	}else{
-		BITBOARD bbl= m_aBB[nbbl] & BitBoard::MASK_1(WMOD(low),WORD_SIZE-1);
-		pc=BitBoard::popc64(bbl);
+		BITBOARD bbl= m_aBB[nbbl] & bblock::MASK_1(WMOD(low),WORD_SIZE-1);
+		pc=bblock::popc64(bbl);
 		if(pc>1){
 			return -1;
 		}
 		for(int i=nbbl+1; i<nbbh; i++){
-			pc+=BitBoard::popc64(m_aBB[i]);
+			pc+=bblock::popc64(m_aBB[i]);
 			if(pc>1){
 				return -1;
 			}
 		}
-		BITBOARD bbh= m_aBB[nbbh] & BitBoard::MASK_1(0,WMOD(high));
-		pc+=BitBoard::popc64(bbh);
+		BITBOARD bbh= m_aBB[nbbh] & bblock::MASK_1(0,WMOD(high));
+		pc+=bblock::popc64(bbh);
 	}
 
 	if(pc==0) return 0;
@@ -461,34 +461,34 @@ int  BitBoardN::find_singleton (int low, int high, int& singleton) const{
 	
 	//both ends
 	if(nbbl==nbbh){
-		BITBOARD bbl= m_aBB[nbbl] & BitBoard::MASK_1(posl,posh);
-		pc=BitBoard::popc64(bbl);
+		BITBOARD bbl= m_aBB[nbbl] & bblock::MASK_1(posl,posh);
+		pc=bblock::popc64(bbl);
 		if(pc==1){
-			singleton=BitBoard::lsb64_intrinsic(bbl)+WMUL(nbbl);
+			singleton=bblock::lsb64_intrinsic(bbl)+WMUL(nbbl);
 			return 1;
 		}
 	}else{
-		BITBOARD bbl= m_aBB[nbbl] & BitBoard::MASK_1(posl,WORD_SIZE-1);
-		pc=BitBoard::popc64(bbl);
+		BITBOARD bbl= m_aBB[nbbl] & bblock::MASK_1(posl,WORD_SIZE-1);
+		pc=bblock::popc64(bbl);
 		if(pc>1){
 			return -1;
 		}else if(pc==1){
 			first_vertex_flag=false;
-			singleton=BitBoard::lsb64_intrinsic(bbl)+WMUL(nbbl);
+			singleton=bblock::lsb64_intrinsic(bbl)+WMUL(nbbl);
 		}
 		for(int i=nbbl+1; i<nbbh; i++){
-			pc+=BitBoard::popc64(m_aBB[i]);
+			pc+=bblock::popc64(m_aBB[i]);
 			if(pc>1){
 				return -1;
 			}else if(first_vertex_flag && (pc==1)){
-				singleton=BitBoard::lsb64_intrinsic(m_aBB[i])+WMUL(i);
+				singleton=bblock::lsb64_intrinsic(m_aBB[i])+WMUL(i);
 				first_vertex_flag=false;
 			}
 		}
 		BITBOARD bbh= m_aBB[nbbh] &~ Tables::mask_left[posh];	
-		pc+=BitBoard::popc64(bbh);
+		pc+=bblock::popc64(bbh);
 		if(first_vertex_flag && (pc==1))
-			singleton=BitBoard::lsb64_intrinsic(bbh)+WMUL(nbbh);
+			singleton=bblock::lsb64_intrinsic(bbh)+WMUL(nbbh);
 	}
 
 	if(pc==0) return 0;
@@ -628,7 +628,7 @@ inline int BitBoardN::lsbn64() const{
 #ifdef ISOLANI_LSB
 			return(Tables::indexDeBruijn64_ISOL[((m_aBB[i] & -m_aBB[i]) * DEBRUIJN_MN_64_ISOL/*magic num*/) >> DEBRUIJN_MN_64_SHIFT]+ WMUL(i));	
 #else
-			return(Tables::indexDeBruijn64_SEP[((m_aBB[i]^ (m_aBB[i]-1)) * DEBRUIJN_MN_64_SEP/*magic num*/) >> DEBRUIJN_MN_64_SHIFT]+ WMUL(i));	
+			return(Tables::indexDeBruijn64_SEP[((m_aBB[i]^ (m_aBB[i]-1)) * bblock::DEBRUIJN_MN_64_SEP/*magic num*/) >> bblock::DEBRUIJN_MN_64_SHIFT]+ WMUL(i));
 #endif
 	}
 #elif LOOKUP
@@ -659,7 +659,7 @@ inline bool BitBoardN::is_singleton()const{
 // optimized for dense graphs
 	int pc=0;
 	for(int i=0; i<m_nBB; i++){
-		if((pc+= BitBoard::popc64(m_aBB[i]))>1) return false; 
+		if((pc+= bblock::popc64(m_aBB[i]))>1) return false; 
 	}
 	if(pc) return true;
 return false;
@@ -719,12 +719,12 @@ inline int BitBoardN::single_disjoint (const BitBoardN& rhs, int& vertex) const{
 	bool first_time=true;
 	
 	for(int i=0; i<m_nBB; i++){
-		pc+=BitBoard::popc64(this->m_aBB[i] & rhs.m_aBB[i]);
+		pc+=bblock::popc64(this->m_aBB[i] & rhs.m_aBB[i]);
 		if(pc>1){
 			vertex=EMPTY_ELEM;
 			return EMPTY_ELEM;
 		}else if(pc==1 && first_time ){  //store vertex position
-			vertex=BitBoard::lsb64_intrinsic(this->m_aBB[i] & rhs.m_aBB[i])+ WMUL(i);
+			vertex=bblock::lsb64_intrinsic(this->m_aBB[i] & rhs.m_aBB[i])+ WMUL(i);
 			first_time=false;
 		}
 	}
@@ -747,12 +747,12 @@ inline	int	BitBoardN::single_disjoint (int first_block, int last_block, const Bi
 	bool first_time=true;
 	
 	for(int i=first_block; i<=last_block; i++){
-		pc+=BitBoard::popc64(this->m_aBB[i] & rhs.m_aBB[i]);
+		pc+=bblock::popc64(this->m_aBB[i] & rhs.m_aBB[i]);
 		if(pc>1){
 			vertex=EMPTY_ELEM;
 			return EMPTY_ELEM;
 		}else if(pc==1 && first_time ){  //store vertex position
-			vertex=BitBoard::lsb64_intrinsic(this->m_aBB[i] & rhs.m_aBB[i] )+ WMUL(i);
+			vertex=bblock::lsb64_intrinsic(this->m_aBB[i] & rhs.m_aBB[i] )+ WMUL(i);
 			first_time=false;
 		}
 	}
@@ -777,12 +777,12 @@ inline int BitBoardN::single_joint (const BitBoardN& rhs, int& vertex) const{
 	bool first_time=true;
 	
 	for(int i=0; i<m_nBB; i++){
-		pc+=BitBoard::popc64(this->m_aBB[i] &~ rhs.m_aBB[i]);
+		pc+=bblock::popc64(this->m_aBB[i] &~ rhs.m_aBB[i]);
 		if(pc>1){
 			vertex=EMPTY_ELEM;
 			return EMPTY_ELEM;
 		}else if(pc==1 && first_time ){  //store vertex position
-			vertex=BitBoard::lsb64_intrinsic(this->m_aBB[i] &~ rhs.m_aBB[i] )+ WMUL(i);
+			vertex=bblock::lsb64_intrinsic(this->m_aBB[i] &~ rhs.m_aBB[i] )+ WMUL(i);
 			first_time=false;
 		}
 	}
@@ -806,21 +806,21 @@ inline int BitBoardN::double_joint (const BitBoardN& rhs, int& v, int& w) const{
 	bool first_time=true; bool second_time=true;
 	
 	for(int i=0; i<m_nBB; i++){
-		pc+=BitBoard::popc64(this->m_aBB[i] &~ rhs.m_aBB[i]);
+		pc+=bblock::popc64(this->m_aBB[i] &~ rhs.m_aBB[i]);
 		if(pc>2){
 			v=EMPTY_ELEM; w=EMPTY_ELEM;
 			return EMPTY_ELEM;
 		}else if(pc==1 && first_time ){  //store vertex position
-			v=BitBoard::lsb64_intrinsic(this->m_aBB[i] &~ rhs.m_aBB[i] )+ WMUL(i);
+			v=bblock::lsb64_intrinsic(this->m_aBB[i] &~ rhs.m_aBB[i] )+ WMUL(i);
 			first_time=false;
 		}else if(pc==2 && second_time ){  //store vertex position
 			BITBOARD bb=this->m_aBB[i] &~ rhs.m_aBB[i];
 			if(first_time){
-				v=BitBoard::lsb64_intrinsic(bb);
-				w=BitBoard::lsb64_intrinsic(bb^Tables::mask[v])+WMUL(i);
+				v=bblock::lsb64_intrinsic(bb);
+				w=bblock::lsb64_intrinsic(bb^Tables::mask[v])+WMUL(i);
 				v+=WMUL(i);
 			}else{
-				w=BitBoard::lsb64_intrinsic(this->m_aBB[i] &~ rhs.m_aBB[i] )+ WMUL(i);
+				w=bblock::lsb64_intrinsic(this->m_aBB[i] &~ rhs.m_aBB[i] )+ WMUL(i);
 			}
 			second_time=false;
 		}
@@ -933,7 +933,7 @@ int FIRST_SHARED (const BitBoardN& lhs, const BitBoardN& rhs){
 	for(int i=0; i<lhs.m_nBB; i++){
 		BITBOARD bb=lhs.m_aBB[i] & rhs.m_aBB[i];
 		if(bb){
-			return BitBoard::lsb64_intrinsic(bb)+WMUL(i);
+			return bblock::lsb64_intrinsic(bb)+WMUL(i);
 		}
 	}
 	
@@ -948,7 +948,7 @@ int FIRST_SHARED(int first_block, const BitBoardN& lhs, const BitBoardN& rhs) {
 	for (int i = first_block; i < lhs.m_nBB; i++) {
 		BITBOARD bb = lhs.m_aBB[i] & rhs.m_aBB[i];
 		if (bb) {
-			return BitBoard::lsb64_intrinsic(bb) + WMUL(i);
+			return bblock::lsb64_intrinsic(bb) + WMUL(i);
 		}
 	}
 

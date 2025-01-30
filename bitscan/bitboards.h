@@ -403,14 +403,14 @@ int BitBoardS::previous_bit	(int nBit){
 			return msbn64(nElem);		//updates nElem with the corresponding bitblock
 	
 	int index=WDIV(nBit);
-	int npos=BitBoard::msb64_lup(Tables::mask_right[WMOD(nBit) /*nBit-WMUL(index)*/] & m_aBB[nElem].bb);
+	int npos=bblock::msb64_lup(Tables::mask_right[WMOD(nBit) /*nBit-WMUL(index)*/] & m_aBB[nElem].bb);
 	if(npos!=EMPTY_ELEM)
 		return (WMUL(index) + npos);
 	
 	for(int i=nElem-1; i>=0; i--){  //new bitblock
 		if( m_aBB[i].bb){
 			nElem=i;
-			return BitBoard::msb64_de_Bruijn(m_aBB[i].bb) + WMUL(m_aBB[i].index);
+			return bblock::msb64_de_Bruijn(m_aBB[i].bb) + WMUL(m_aBB[i].index);
 		}
 	}
 return EMPTY_ELEM;
@@ -425,7 +425,7 @@ int BitBoardS::next_bit(int nBit){
 		return lsbn64(nElem);		//updates nElem with the corresponding bitblock
 	
 	int index=WDIV(nBit);
-	int npos=BitBoard::lsb64_de_Bruijn(Tables::mask_left[WMOD(nBit) /*-WORD_SIZE*index*/] & m_aBB[nElem].bb);
+	int npos=bblock::lsb64_de_Bruijn(Tables::mask_left[WMOD(nBit) /*-WORD_SIZE*index*/] & m_aBB[nElem].bb);
 	if(npos!=EMPTY_ELEM)
 		return (WMUL(index) + npos);
 	
@@ -433,7 +433,7 @@ int BitBoardS::next_bit(int nBit){
 		//new bitblock
 		if(m_aBB[i].bb){
 			nElem=i;
-			return BitBoard::lsb64_de_Bruijn(m_aBB[i].bb) + WMUL(m_aBB[i].index);
+			return bblock::lsb64_de_Bruijn(m_aBB[i].bb) + WMUL(m_aBB[i].index);
 		}
 	}
 return EMPTY_ELEM;
@@ -479,7 +479,7 @@ int BitBoardS::lsbn64 (int& nElem)		const	{
 #ifdef ISOLANI_LSB
 			return(Tables::indexDeBruijn64_ISOL[((m_aBB[i].bb & -m_aBB[i].bb) * DEBRUIJN_MN_64_ISOL/*magic num*/) >> DEBRUIJN_MN_64_SHIFT]+ WMUL(m_aBB[i].index));	
 #else
-			return(Tables::indexDeBruijn64_SEP[((m_aBB[i].bb^ (m_aBB[i].bb-1)) * DEBRUIJN_MN_64_SEP/*magic num*/) >> DEBRUIJN_MN_64_SHIFT]+ WMUL(m_aBB[i].index));	
+			return(Tables::indexDeBruijn64_SEP[((m_aBB[i].bb ^ (m_aBB[i].bb - 1)) * bblock::DEBRUIJN_MN_64_SEP/*magic num*/) >> bblock::DEBRUIJN_MN_64_SHIFT] + WMUL(m_aBB[i].index));
 #endif
 		}
 	}
@@ -957,7 +957,7 @@ int  BitBoardS::init_bit (int low, int high,  const BitBoardS& bb_add){
 	if(itl!=bb_add.end()){
 		if(itl->index==bbl){	//lower block exists
 			if(bbh==bbl){		//case update in the same bitblock
-				m_aBB.push_back(elem( bbh, itl->bb & BitBoard::MASK_1(low-WMUL(bbl), high-WMUL(bbh)) ));
+				m_aBB.push_back(elem( bbh, itl->bb & bblock::MASK_1(low-WMUL(bbl), high-WMUL(bbh)) ));
 				return 0;
 			}else{
 				//add lower block

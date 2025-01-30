@@ -137,7 +137,7 @@ int* AND (const BitBoardN& lhs, const BitBoardN& rhs, int last_vertex, int* res,
 		bb=rhs.m_aBB[i] & lhs.m_aBB[i];
 		offset=WMUL(i);
 		while(bb){
-			int v=BitBoard::lsb64_intrinsic(bb);
+			int v=bblock::lsb64_intrinsic(bb);
 			res[size++]=offset+v;
 			bb^=Tables::mask[v];
 		}
@@ -146,7 +146,7 @@ int* AND (const BitBoardN& lhs, const BitBoardN& rhs, int last_vertex, int* res,
 	//trim last
 	bb= rhs.m_aBB[nbb] & lhs.m_aBB[nbb] & Tables::mask_right[WMOD(last_vertex)];
 	while(bb){
-		int v=BitBoard::lsb64_intrinsic(bb);
+		int v=bblock::lsb64_intrinsic(bb);
 		res[size++]=WMUL(nbb)+v;
 		bb^=Tables::mask[v];
 	}

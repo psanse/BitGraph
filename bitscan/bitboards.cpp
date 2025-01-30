@@ -607,7 +607,7 @@ int BitBoardS::lsbn64() const{
 #ifdef ISOLANI_LSB
 			return(Tables::indexDeBruijn64_ISOL[((m_aBB[i].bb & -m_aBB[i].bb) * DEBRUIJN_MN_64_ISOL/*magic num*/) >> DEBRUIJN_MN_64_SHIFT]+ WMUL(m_aBB[i].index));	
 #else
-			return(Tables::indexDeBruijn64_SEP[((m_aBB[i].bb^ (m_aBB[i].bb-1)) * DEBRUIJN_MN_64_SEP/*magic num*/) >> DEBRUIJN_MN_64_SHIFT]+ WMUL(m_aBB[i].index));	
+			return(Tables::indexDeBruijn64_SEP[((m_aBB[i].bb^ (m_aBB[i].bb-1)) * bblock::DEBRUIJN_MN_64_SEP/*magic num*/) >> bblock::DEBRUIJN_MN_64_SHIFT]+ WMUL(m_aBB[i].index));
 #endif
 	}
 #elif LOOKUP
@@ -677,13 +677,13 @@ int BitBoardS::next_bit(int nBit/* 0 based*/)  const {
 	for(int i=0; i<m_aBB.size(); i++){
 		if(m_aBB[i].index<index) continue;					//(*)
 		if(m_aBB[i].index==index){
-			int npos=BitBoard::lsb64_de_Bruijn(Tables::mask_left[WMOD(nBit) /*-WORD_SIZE*index*/] & m_aBB[i].bb);
+			int npos=bblock::lsb64_de_Bruijn(Tables::mask_left[WMOD(nBit) /*-WORD_SIZE*index*/] & m_aBB[i].bb);
 			if(npos!=EMPTY_ELEM) return (WMUL(index) + npos);
 			continue;
 		}
 		//new bitblock
 		if( m_aBB[i].bb){
-			return BitBoard::lsb64_de_Bruijn(m_aBB[i].bb) + WMUL(m_aBB[i].index);
+			return bblock::lsb64_de_Bruijn(m_aBB[i].bb) + WMUL(m_aBB[i].index);
 		}
 	}
 	
@@ -709,12 +709,12 @@ int BitBoardS::previous_bit(int nBit/* 0 bsed*/) const{
 	for(int i=m_aBB.size()-1; i>=0; i--){
 		if(m_aBB[i].index>index) continue;							//(*)
 		if(m_aBB[i].index==index){
-			int npos=BitBoard::msb64_lup(Tables::mask_right[WMOD(nBit) /*-WORD_SIZE*index*/] & m_aBB[i].bb);
+			int npos=bblock::msb64_lup(Tables::mask_right[WMOD(nBit) /*-WORD_SIZE*index*/] & m_aBB[i].bb);
 			if(npos!=EMPTY_ELEM) return (WMUL(index) + npos);
 			continue;
 		}
 		if(m_aBB[i].bb ){
-			return BitBoard::msb64_lup(m_aBB[i].bb) + WMUL(m_aBB[i].index);
+			return bblock::msb64_lup(m_aBB[i].bb) + WMUL(m_aBB[i].index);
 		}
 	}
 	
