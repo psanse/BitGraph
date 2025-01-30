@@ -3,7 +3,7 @@
  * @brief Header file for the class BitBoard of the BITSCAN 1.0 library
  * @details The BitBoard class manages bitsets of 64-bit length
  * @created ?
- * @last_update 29/01/2025
+ * @last_update 30/01/2025 (refactored, added trimming functions, Doxygen tags)
  * @author pss
  * 
  **/
@@ -201,12 +201,21 @@ public:
 // Bit population
 	
 	/**
-	* @brief population count in bb implemented with lookup tables
+	* @brief population count in bb implemented with 16-bit lookup tables
+	*		 (default lookup table implementation)
 	* @param bb: input 64-bit bitblock
 	* @returns number of 1-bits in the bitblock 
 	**/
+	static int popc64_lup		(const BITBOARD bb);		
+
+	/**
+	* @brief population count in bb implemented with 16-bit lookup tables
+	*	     but no intermediate storage
+	* @param bb: input 64-bit bitblock
+	* @returns number of 1-bits in the bitblock
+	**/
 	static int popc64_lup_1		(const BITBOARD bb);	
-	static int popc64_lup		(const BITBOARD bb);				//Lookup
+	
 	
 	/**
 	* @brief Default population count in bb (RECOMMENDED) 
@@ -225,24 +234,50 @@ public:
 //////////////////////
 //  Masks
 
-//1-bit mask in the CLOSED range
+
+	/**
+	* @brief Sets to 1 the bits inside the closed range [low, high], sets to 0 the rest
+	* @param low, high: positions in the bitblock [0...63]
+	* @returns 64-bit bitblock mask
+	**/
 	static BITBOARD MASK_1(int low, int high) { return ~Tables::mask_right[low] & ~Tables::mask_left[high]; }
 
-//0-bit mask in the CLOSED range
-	static BITBOARD MASK_0(int low, int high) { return Tables::mask_right[low] | Tables::mask_left[high]; }
 
-//TODO - add trimming masks (29/01/25) 
+	/**
+	* @brief Sets to 0 the bits inside the closed range [low, high], sets to 1 the rest
+	* @param low, high: positions in the bitblock [0...63]
+	* @returns 64-bit bitblock mask
+	**/
+	static BITBOARD MASK_0(int low, int high) { return Tables::mask_right[low] | Tables::mask_left[high]; }
+	
+	/**
+	* @brief sets to 0 the bits of the bitblock bb to the right of index (the index-bit is not trimmed)
+	* @param bb: input 64-bit bitblock
+	* @param idx: position in the bitblock [0...63]
+	* @returns the trimmed bitblock
+	* @date 30/01/2015 
+	**/
+	static BITBOARD trim_right	(BITBOARD bb, int idx) { return bb &~ Tables::mask_right[idx]; }
+
+	/**
+	* @brief sets to 0 the bits of the bitblock bb to the left side of index (the index-bit is not trimmed)
+	* @param bb: input 64-bit bitblock
+	* @param idx: position in the bitblock [0...63]
+	* @returns the trimmed bitblock
+	* @date 30/01/2015 
+	**/
+	static BITBOARD trim_left	(BITBOARD bb, int idx) { return bb &~ Tables::mask_left[idx]; }
 
 /////////////////////
 // I/O
 
 	/**
-	* @brief Prints the bitblock  and the popcount to the output stream
+	* @brief streams bb and its popcount to the output stream
+	*		 (format ...000111 [3])
 	**/
-	static std::ostream& print		(const BITBOARD, std::ostream&  = std::cout) ;
+	static std::ostream& print		(const BITBOARD bb, std::ostream&  = std::cout) ;
 };
 
-//aliases
 
 //////////////////////////////
 // Necessary implementations in header file (inlining)

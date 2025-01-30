@@ -88,8 +88,8 @@ return EMPTY_ELEM;		//Should not reach
 ////////////////////////////
 
 int BitBoard::popc64_lup_1(const BITBOARD bb_dato){  
-//uses 16 bit look up table
-	return (Tables::pc[(U16)bb_dato]+Tables::pc[(U16)(bb_dato>>16)]+Tables::pc[(U16)(bb_dato>>32)]+Tables::pc[(U16)(bb_dato>>48)]); 
+	return (	Tables::pc[(U16)bb_dato]			+ Tables::pc[(U16)(bb_dato >> 16)] + 
+			    Tables::pc[(U16)(bb_dato >> 32)]	+ Tables::pc[(U16)(bb_dato >> 48)]		); 
 }
 
 /////////////////////
