@@ -7,6 +7,49 @@
 
 using namespace std;
 
+
+
+inline int BitBoard::lsb64_de_Bruijn(const BITBOARD bb_dato) {
+	////////////////////////
+	// Uses de Bruijn perfect hashing in two versions:
+	// a) ISOLANI_LSB with hashing bb &(-bb)
+	// b) All 1 bits to LSB with hashing bb^(bb-1)
+	// 
+	//	Option b) would seem to exploit the CPU HW better on average and is defined as default
+	//  To change this option go to config.h file
+
+
+#ifdef ISOLANI_LSB
+	return (bb_dato == 0) ? EMPTY_ELEM : Tables::indexDeBruijn64_ISOL[((bb_dato & -bb_dato) * DEBRUIJN_MN_64_ISOL) >> DEBRUIJN_MN_64_SHIFT];
+#else
+	return (bb_dato == 0) ? EMPTY_ELEM : Tables::indexDeBruijn64_SEP[((bb_dato ^ (bb_dato - 1)) * DEBRUIJN_MN_64_SEP) >> DEBRUIJN_MN_64_SHIFT];
+#endif
+}
+
+inline
+int BitBoard::msb64_de_Bruijn(const BITBOARD bb_dato) {
+	////////////////////////
+	// date: 27/7/2014
+	// Uses de Bruijn perfect hashing but first has to create 1-bits from the least significant to MSB
+	//
+	// More practical than LUPs of 65535 entries, but requires efficiency tests for a precise comparison
+
+	if (bb_dato == 0) return EMPTY_ELEM;
+
+	//creates all 1s up to MSB position
+	BITBOARD bb = bb_dato;
+	bb |= bb >> 1;
+	bb |= bb >> 2;
+	bb |= bb >> 4;
+	bb |= bb >> 8;
+	bb |= bb >> 16;
+	bb |= bb >> 32;
+
+	//applys same computation as for LSB-de Bruijn
+	return Tables::indexDeBruijn64_SEP[(bb * DEBRUIJN_MN_64_SEP) >> DEBRUIJN_MN_64_SHIFT];
+}
+
+
 inline 
 int BitBoard::popc64_lup(const BITBOARD bb_dato) {
 	//////////////////////////////
