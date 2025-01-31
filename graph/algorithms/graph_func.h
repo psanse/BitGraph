@@ -146,7 +146,7 @@ namespace gfunc{
 			//decodes vertices from the bitblock and appends to vertex list
 			int offset = WMUL(nBB);
 			while(bb != 0){
-				int v64 = BitBoard::lsb64_intrinsic(bb);
+				int v64 =bblock::lsb64_intrinsic(bb);
 
 				///////////////////////////////
 				lv.emplace_back(v64 + offset);
@@ -190,7 +190,7 @@ namespace gfunc{
 
 		//decodes block of v (appends to lv)	
 		while (bb != 0) {
-			int v64 = BitBoard::lsb64_intrinsic(bb);			
+			int v64 = bblock::lsb64_intrinsic(bb);			
 
 			///////////////////////////////
 			lv.emplace_back(v64 + nBBv);
@@ -210,7 +210,7 @@ namespace gfunc{
 			//decodes vertices from the bitblock and appends to vertex list
 			int offset = WMUL(nBB);
 			while (bb != 0) {
-				int v64 = BitBoard::lsb64_intrinsic(bb);
+				int v64 = bblock::lsb64_intrinsic(bb);
 				
 				///////////////////////////////
 				lv.emplace_back(v64 + offset);
