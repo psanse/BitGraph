@@ -145,6 +145,7 @@ TEST(BBNtest, setters_and_getters) {
 }
 
 TEST(BBNtest, boolean_disjoint){
+
 	BitBoardN bb(130);
 	bb.set_bit(10);
 	bb.set_bit(20);
@@ -172,6 +173,7 @@ TEST(BBNtest, boolean_disjoint){
 }
 
 TEST(BBNtest, boolean_joint){
+
 	BitBoardN bb(130);
 	bb.set_bit(10);
 	bb.set_bit(20);
@@ -295,15 +297,11 @@ TEST(BBNtest, to_vector){
 	bb.to_old_vector(v,size);
 	EXPECT_EQ(3, size);
 	copy(v, v+size, vint.begin());
-	EXPECT_EQ(sol, vint);
-
-		
+	EXPECT_EQ(sol, vint);		
 }
 
 
-
-
-TEST(BitBoardTests, vector) {
+TEST(BBNtest, vector) {
 	BitBoardN bbn1(50);
 	int aux[] = {10,20,45,62};
 	vector<int> v1(aux, aux + sizeof(aux) / sizeof(int));
@@ -350,7 +348,7 @@ TEST(BitBoardTests, vector) {
 	//bbn5.print();
 }
 
-TEST(BitBoardTests, BitBoardNTo0) {
+TEST(BBNtest, BitBoardNTo0) {
 	BitBoardN bb1(25);
 	BitBoardN bb2(bb1);
 
@@ -370,7 +368,7 @@ TEST(BitBoardTests, BitBoardNTo0) {
 
 }
 
-TEST(BITBOARDTest, GenRandom){
+TEST(BBNtest, GenRandom){
 ///////////
 // deterministic test, unless the seed is changed 
 // date: 2/6/14
@@ -502,7 +500,7 @@ TEST(BBNtest,is_singleton){
 
 }
 
-TEST(BitScanning, first_found){
+TEST(BBNtest, first_found){
 //////////////////////
 // testing first element in common between sets 
 
@@ -530,7 +528,7 @@ TEST(BitScanning, first_found){
 	EXPECT_EQ(72, ff);
 }
 
-TEST(BitBoardN, ArraySubscripOperator) {
+TEST(BBNtest, ArraySubscripOperator) {
 
 	BitBoardN bb(32);
 	bb.set_bit(10);
