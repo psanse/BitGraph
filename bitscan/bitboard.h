@@ -150,7 +150,7 @@ namespace bblock {
 	**/
 	///////////////////////////////////////////////////////////////////////////////////
 	inline
-	 int lsb64			(const BITBOARD bb) { return 	lsb64_intrinsic(bb); }
+	int lsb64				(const BITBOARD bb) { return 	lsb64_intrinsic(bb); }
 	///////////////////////////////////////////////////////////////////////////////////
 
 	/**
@@ -191,7 +191,7 @@ namespace bblock {
 	* @returns index of the most significant bit or -1 if empty
 	**/
 	 inline
-	 int msb64			(const BITBOARD bb)		{ return msb64_intrinsic(bb); }
+	 int msb64				(const BITBOARD bb)		{ return msb64_intrinsic(bb); }
 
 /////////////////////
 // Bit population
@@ -201,8 +201,8 @@ namespace bblock {
 	*		 (default lookup table implementation)
 	* @param bb: input 64-bit bitblock
 	* @returns number of 1-bits in the bitblock 
-	**/
-	 int popc64_lup		(const BITBOARD bb);		
+	**/	
+	 int popc64_lup			(const BITBOARD bb);		
 
 	/**
 	* @brief population count in bb implemented with 16-bit lookup tables
@@ -224,7 +224,7 @@ namespace bblock {
 	* @return number of 1-bits in the bitblock 
 	**/
 	////////////////////////////////////////////////
-	 int popc64			(const BITBOARD bb);	
+	 int popc64				(const BITBOARD bb);	
 	////////////////////////////////////////////////
 
 //////////////////////
@@ -237,7 +237,7 @@ namespace bblock {
 	* @returns 64-bit bitblock mask
 	**/
 	 inline
-	 BITBOARD MASK_1(int low, int high) { return ~Tables::mask_right[low] & ~Tables::mask_left[high]; }
+	 BITBOARD MASK_1		(int low, int high) { return ~Tables::mask_right[low] & ~Tables::mask_left[high]; }
 
 
 	/**
@@ -246,7 +246,7 @@ namespace bblock {
 	* @returns 64-bit bitblock mask
 	**/
 	 inline
-	 BITBOARD MASK_0(int low, int high) { return Tables::mask_right[low] | Tables::mask_left[high]; }
+	 BITBOARD MASK_0		(int low, int high) { return Tables::mask_right[low] | Tables::mask_left[high]; }
 	
 	/**
 	* @brief sets to 0 the bits of the bitblock bb to the right of index (the index-bit is not trimmed)
@@ -266,7 +266,7 @@ namespace bblock {
 	* @date 30/01/2015 
 	**/
 	 inline
-	 BITBOARD trim_left	(BITBOARD bb, int idx) { return bb &~ Tables::mask_left[idx]; }
+	 BITBOARD trim_left		(BITBOARD bb, int idx) { return bb &~ Tables::mask_left[idx]; }
 
 /////////////////////
 // I/O
@@ -275,7 +275,7 @@ namespace bblock {
 	* @brief streams bb and its popcount to the output stream
 	*		 (format ...000111 [3])
 	**/
-	 std::ostream& print		(const BITBOARD bb, std::ostream&  = std::cout) ;
+	 std::ostream& print	(const BITBOARD bb, std::ostream&  = std::cout) ;
 
 } //end namespace bblock
 

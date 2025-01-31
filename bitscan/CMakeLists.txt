@@ -19,13 +19,18 @@ if (bitscan_build_tests)
 # Add executable called "helloDemo" that is built from the source files
 # "demo.cxx" and "demo_b.cxx". The extensions are automatically found.
 add_executable (test_bitscan tests/gtest_main.cc 
-#tests/test_bitstrings.cpp 
-#tests/test_algorithms.cpp 
-#tests/test_masking.cpp 
-#tests/test_sparse.cpp
- tests/test_bitblock.cpp
-#tests/test_example.cpp
-#tests/test_sentinels.cpp
+
+    #tests/test_bitstrings.cpp 
+    #tests/test_algorithms.cpp 
+    #tests/test_masking.cpp 
+    #tests/test_sparse.cpp
+    #tests/test_example.cpp
+    #tests/test_sentinels.cpp
+
+
+    #TESTS CHECKED (31/01/2025)
+    tests/test_bitblock.cpp
+
 )
 
 target_include_directories (test_bitscan PUBLIC ../googletest/include/)

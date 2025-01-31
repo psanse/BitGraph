@@ -86,7 +86,7 @@ TEST(bblockTest, print) {
 
 }
 
-TEST(bblockTest, DISABLED_preformance) {
+TEST(bblockTest, DISABLED_performance) {
 	BITBOARD bb1 = 0xf0f0f0f0;
 	BITBOARD bb2 = 0x070f0f0f;
 	// check time ?
