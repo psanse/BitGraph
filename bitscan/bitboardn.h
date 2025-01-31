@@ -31,10 +31,10 @@ using vint = std::vector<int>;
 
 /////////////////////////////////
 //
-// class BitBoardN 
+// BitBoardN class 
 //
 // Manages bit strings greater than WORD_SIZE 
-// Does not use intrinsics nor does it cache information for very fast bitscanning
+// @details Does not use HW dependent instructions (intrinsics), nor does it cache information for very fast bitscanning
 //
 ///////////////////////////////////
 class BitBoardN:public BBObject{
