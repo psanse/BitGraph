@@ -103,11 +103,13 @@ inline int previous_bit				(int nbit)	const;					//lookup
 	
 /////////////////
 // Popcount
+
 virtual	inline int popcn64			()						const;		//lookup 
 virtual	inline int popcn64			(int nBit/* 0 based*/)	const;
 
 /////////////////////
 //Set/Delete Bits 
+
 inline	void  init_bit				(int bit);	
 inline	int   init_bit				(int lbit, int rbit);
 		int   init_bit				(int high, const BitBoardN& bb_add);						    //copies bb_add in range [0, high] *** rename probably
@@ -155,6 +157,7 @@ inline int first_found				(const BitBoardN& rhs)						const;						//first vertex
 
 /////////////////////////////
 //Boolean functions
+
 	inline bool is_bit				(int nbit)							const;
 inline virtual bool is_empty		()									const;	
 inline virtual bool is_empty		(int nBBL, int nBBH)				const;						
@@ -210,8 +213,8 @@ const BITBOARD& operator[]			(std::size_t index) const { return m_aBB[index]; }
 //data members
 
 protected:
-	BITBOARD* m_aBB;
-	int m_nBB;							//number of bitblocks (1 based)
+	BITBOARD* m_aBB;			//array of bitblocks - not using std::vector because of memory allignment
+	int m_nBB;					//number of bitblocks (1-based)
 };
 
 inline 
@@ -219,10 +222,10 @@ int BitBoardN::first_found	(const BitBoardN& rhs) const{
 //returns first vertex in common with rhs that (7/17)	
 //returns -1 if they are disjoint
 
-	BITBOARD bb=0;
-	for(int i=0; i<this->m_nBB; i++){
-		bb=this->m_aBB[i] & rhs.m_aBB[i];
-		if(bb=(this->m_aBB[i] & rhs.m_aBB[i])){
+	BITBOARD bb = 0;
+	for(auto i = 0; i < this -> m_nBB; ++i){
+		bb = this->m_aBB[i] & rhs.m_aBB[i];
+		if(bb = (this->m_aBB[i] & rhs.m_aBB[i])){
 			return bblock::lsb64_intrinsic(bb) + WMUL(i);
 		}
 	}
@@ -233,24 +236,23 @@ inline int BitBoardN::msbn64() const{
 ///////////////////////
 // Look up table implementation (best found so far)
 
-	union u {
+	register union u {
 		U16 c[4];
 		BITBOARD b;
-	};
-
-	u val;
-
-	for(int i=m_nBB-1; i>=0; i--){
-		val.b=m_aBB[i];
+	} val;
+	
+	//reverse loop (most significant bit block early exit)
+	for(auto i = m_nBB - 1; i >= 0; i--){
+		val.b = m_aBB[i];
 		if(val.b){
-			if(val.c[3]) return (Tables::msba[3][val.c[3]]+WMUL(i));
-			if(val.c[2]) return (Tables::msba[2][val.c[2]]+WMUL(i));
-			if(val.c[1]) return (Tables::msba[1][val.c[1]]+WMUL(i));
-			if(val.c[0]) return (Tables::msba[0][val.c[0]]+WMUL(i));
+			if(val.c[3]) return (Tables::msba[3][val.c[3]] + WMUL(i));
+			if(val.c[2]) return (Tables::msba[2][val.c[2]] + WMUL(i));
+			if(val.c[1]) return (Tables::msba[1][val.c[1]] + WMUL(i));
+			if(val.c[0]) return (Tables::msba[0][val.c[0]] + WMUL(i));
 		}
 	}
 
-return EMPTY_ELEM;		//should not reach here
+	return EMPTY_ELEM;		//should not reach here
 }
 
 
