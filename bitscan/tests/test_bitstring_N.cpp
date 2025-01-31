@@ -545,6 +545,23 @@ TEST(BBNtest, ArraySubscripOperator) {
 
 }
 
+TEST(BBNtest, IO) {
+
+	BitBoardN bb(32);
+	bb.set_bit(10);
+	bb.set_bit(20);
+	bb.set_bit(63);
+
+	string s = bb.to_string();
+	EXPECT_FALSE(s.empty());
+
+	//I/O
+	//bb.print(std::cout, true, true);
+	//cout << s.c_str() << endl;
+}
+
+
+
 ////////////////////////
 //
 // DISABLED TESTS

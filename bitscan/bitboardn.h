@@ -162,16 +162,40 @@ inline virtual bool is_empty		(int nBBL, int nBBH)				const;
 	inline bool is_disjoint			(const BitBoardN& rhs)				const;
 	inline bool is_disjoint			(int first_block, int last_block,const BitBoardN& rhs)	const;
 	inline bool is_disjoint			(const BitBoardN& a, const  BitBoardN& b)		const;		//no bit in common with both a and b (not available in sparse bitsets)
+
 /////////////////////
 // I/O 
-	std::ostream& print				(std::ostream& = std::cout, bool show_pc = true) const;
+	/**
+	* @brief streams bb and its popcount to the output stream o
+	* @details format example [...000111 (3)]
+	* @param o: output stream
+	* @param show_pc: if true, shows popcount
+	* @returns output stream
+	**/
+	std::ostream& print				(std::ostream& o= std::cout, bool show_pc = true, bool endl = true) const;
+	
+	/**
+	* @brief converts bb and its popcount to a readable string
+	* @details format example [...000111 (3)]
+	* @returns string
+	**/
 	std::string to_string			();
 	
 ///////////////////////
 //conversions
 
-	void to_vector					(vint& )							const;						//with allocation 
-	void to_stack					(com::stack_t<int>&)				const;						//no allocation! stack must have adequate size
+	/**
+	* @brief converts the bitstring to a vector of non-negative integers
+	* @details the vector is cleared and filled, its size is the number of bits in the bitstring
+	* @param lv: vector to be filled
+	* 
+	* TODO - implement the cast operator
+	**/
+	void to_vector					(vint& lv)							const;						
+	
+	//no allocation! stack must have adequate size
+	void to_stack					(com::stack_t<int>&)				const;						
+
 virtual	int* to_old_vector			(int* lv, int& size);
 virtual	int* to_old_vector_reverse	(int* lv, int& size);
 

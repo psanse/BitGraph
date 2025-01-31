@@ -434,18 +434,17 @@ BitBoardN& BitBoardN::flip	(){
 //
 //////////////////////////
 
-
-std::ostream& BitBoardN::print(std::ostream& o, bool show_pc ) const {
-/////////////////////////
-// shows bit string as [bit1 bit2 bit3 ... <(pc)>]  (if empty: [ ]) (<pc> optional)
-	
+std::ostream& BitBoardN::print(std::ostream& o, bool show_pc, bool endl ) const
+{
 	o << "[";
-		
+	
+	//scans de bitstring and serializes it to the output stream
 	int nBit = EMPTY_ELEM;
 	while( (nBit = next_bit(nBit)) != EMPTY_ELEM ){
 		o << nBit << " ";
 	}
 
+	//adds popcount if required
 	if(show_pc){
 		int pc = popcn64();
 		if (pc) {
@@ -453,14 +452,20 @@ std::ostream& BitBoardN::print(std::ostream& o, bool show_pc ) const {
 		}
 	}
 	
-	o<<"]";
+	o << "]";
 
+	if (endl) { o << std::endl; }
 	return o;
 }
 
-string BitBoardN::to_string (){
+string BitBoardN::to_string ()
+{
 	ostringstream sstr;
-	sstr<<"[";
+
+	print(sstr);
+
+	/*sstr << "[";
+
 	this->print();
 	int nBit = EMPTY_ELEM;
 	while ((nBit = next_bit(nBit)) != EMPTY_ELEM) {
@@ -468,21 +473,20 @@ string BitBoardN::to_string (){
 	}
 
 	sstr << "(" << popcn64() << ")";
-	sstr << "]";
+	sstr << "]";*/
 
 	return sstr.str();
 }
 
 
-void BitBoardN::to_vector(vint& vl ) const {
-//////////////////////
-// copies bit string to vector 
+void BitBoardN::to_vector (vint& lv ) const {
 
-	vl.clear();
+	lv.clear();
+	lv.reserve(popcn64());		
 
 	int v = EMPTY_ELEM;
 	while( (v = next_bit(v)) != EMPTY_ELEM){
-		vl.emplace_back(v);
+		lv.emplace_back(v);
 	}
 }
 
