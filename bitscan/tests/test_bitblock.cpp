@@ -64,13 +64,34 @@ TEST(bblockTest, trimming) {
 	EXPECT_TRUE(bb_trim_extreme_right & Tables::mask[0]);
 }
 
-TEST(bblockTest, basic_operations) {
+TEST(bblockTest, bitscan) {
 
 	BITBOARD bb = 0xf0f0f0f0;
-	EXPECT_EQ(16, bblock::popc64(bb));
-	EXPECT_EQ(4,  bblock::lsb64_intrinsic(bb));
+	
+	//least significant bit variants
+	EXPECT_EQ(4, bblock::lsb64(bb));
+	EXPECT_EQ(4, bblock::lsb64_intrinsic(bb));
+	EXPECT_EQ(4, bblock::lsb64_lup(bb));
+	EXPECT_EQ(4, bblock::lsb64_lup_eff(bb));
+	EXPECT_EQ(4, bblock::lsb64_de_Bruijn(bb));
+		
+	//most significant bit variants
+	EXPECT_EQ(31, bblock::msb64(bb));
 	EXPECT_EQ(31, bblock::msb64_intrinsic(bb));
+	EXPECT_EQ(31, bblock::msb64_de_Bruijn(bb));
 }
+
+TEST(bblockTest, popcount) {
+
+	BITBOARD bb = 0xf0f0f0f0;
+
+	//population count variants
+	EXPECT_EQ(16, bblock::popc64(bb));
+	EXPECT_EQ(16, bblock::popc64_lup(bb));
+	EXPECT_EQ(16, bblock::popc64_lup_1(bb));
+
+}
+
 
 TEST(bblockTest, print) {
 

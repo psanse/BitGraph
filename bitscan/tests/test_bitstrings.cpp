@@ -3,7 +3,7 @@
 #include <iostream>
 #include <set>
 
-#include "../bitscan.h"				//bit string library
+#include "bitscan/bitscan.h"				
 #include "gtest/gtest.h"
 
 using namespace std;
@@ -12,15 +12,16 @@ class BitScanningTest: public ::testing::Test{
 protected:
 	BitScanningTest():bbn(301), bbi(301), bbs(301){}
 	virtual void SetUp(){
-	  for(int i=0; i<=300; i+=50){
+	  for(int i = 0; i <= 300; i += 50){
 		  bbn.set_bit(i);
 		  bbi.set_bit(i);
 		  bbs.set_bit(i);
 		  sol.insert(i); 
 	  }
 	}
+
 //////////////////////
-// Objects to be acessed by all tests
+//data members
 	BitBoardN bbn;
 	BBIntrin bbi;
 	BBSentinel bbs;
@@ -28,11 +29,6 @@ protected:
 };
 
 
-
-TEST(BitBoard, de_Bruijn) {
-	BITBOARD bb=0x100F0010;
-	EXPECT_EQ(BitBoard::msb64_de_Bruijn(bb),BitBoard::msb64_lup(bb));
-}
 
 TEST(Bitstrings, setters_and_getters) {
 	BitBoardN bb(130);
@@ -185,9 +181,9 @@ TEST(Bitstrings, algorithms) {
 
 	////get_first_k_bits
 	//BITBOARD b8=bb.get_bitstring()[0];
-	//EXPECT_EQ(BitBoard::popc64_lup(get_first_k_bits(b8, 1)), 1);
-	//EXPECT_EQ(BitBoard::popc64_lup(get_first_k_bits(b8, 2)), 2);
-	//EXPECT_EQ(BitBoard::popc64_lup(get_first_k_bits(b8, 3)), 0);
+	//EXPECT_EQ(bblock::popc64_lup(get_first_k_bits(b8, 1)), 1);
+	//EXPECT_EQ(bblock::popc64_lup(get_first_k_bits(b8, 2)), 2);
+	//EXPECT_EQ(bblock::popc64_lup(get_first_k_bits(b8, 3)), 0);
 }
 
 TEST(Bitstrings, population_count){
@@ -588,7 +584,7 @@ TEST(BITBOARDTest, GenRandom){
 
 	for(int i=0; i<NUM_TRIES; i++){
 		BITBOARD bb=gen_random_bitboard(DENSITY);  //random bits
-		vd.push_back(BitBoard::popc64(bb)/(double)WORD_SIZE);
+		vd.push_back(bblock::popc64(bb)/(double)WORD_SIZE);
 	}
 
 	//average value
