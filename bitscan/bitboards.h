@@ -168,7 +168,7 @@ inline	bool is_empty				()						const;				//lax: considers empty blocks for empt
 		bool is_disjoint			(int first_block, int last_block, const BitBoardS& bb)   const;
 /////////////////////
 // I/O 
-virtual	void print					(ostream& = cout, bool show_pc = true) const;
+virtual	ostream& print				(ostream& = cout, bool show_pc = true) const;
 	string to_string				();
 	
 	void to_vector					(std::vector<int>& )	const;

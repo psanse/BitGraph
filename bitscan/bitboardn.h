@@ -1,12 +1,10 @@
-/*  
- * bitboardn.h file from the BITSCAN library, a C++ library for bit set
- * optimization. BITSCAN has been used to implement BBMC, a very
- * succesful bit-parallel algorithm for exact maximum clique. 
- * (see license file for references)
- *
- * Copyright (C)
- * Author: Pablo San Segundo
- * Intelligent Control Research Group (CSIC-UPM) 
+/**  
+ * @file bitboardn.h file 
+ * @brief header file of the BitBoardN class from the BITSCAN library.
+ *		  Manages bitstrings of any size as an array of bitblocks (64-bit numbers)
+ * @authos pss
+ * 
+ * TODO - refactoring and testing (31/01/2025)
  *
  * Permission to use, modify and distribute this software is
  * granted provided that this copyright notice appears in all 
@@ -17,7 +15,7 @@
  * kind, express or implied, and with no claim as to its
  * suitability for any purpose.
  *
- */
+ **/
 
 #ifndef __BITBOARDN__H_
 #define __BITBOARDN__H_
@@ -27,7 +25,9 @@
 #include <vector>	
 #include "utils/common.h"			//stack
 
-using namespace std;
+
+//alias
+using vint = std::vector<int>;
 
 /////////////////////////////////
 //
@@ -39,15 +39,17 @@ using namespace std;
 ///////////////////////////////////
 class BitBoardN:public BBObject{
 public:	
-	
-//non standard independent operators (no allocation or copies)
+
+/////////////////////////////
+// independent operators (no allocation or copies)
+
 	friend bool operator==			(const BitBoardN& lhs, const BitBoardN& rhs);
 	friend bool operator!=			(const BitBoardN& lhs, const BitBoardN& rhs);
 
 	friend BitBoardN&  AND			(const BitBoardN& lhs, const BitBoardN& rhs,  BitBoardN& res);							
 	friend BitBoardN&  AND			(int first_block, const BitBoardN& lhs, const BitBoardN& rhs,  BitBoardN& res);
 	friend BitBoardN&  AND			(int first_block, int last_block, const BitBoardN& lhs, const BitBoardN& rhs,  BitBoardN& res);
-	friend BitBoardN&  AND			(const BitBoardN& lhs, const BitBoardN& rhs,  BitBoardN& res, int last_vertex, bool lazy);		//up to and excluding last_vertex
+	friend BitBoardN&  AND			(const BitBoardN& lhs, const BitBoardN& rhs,  BitBoardN& res, int last_vertex, bool lazy);			//up to and excluding last_vertex
 	friend int*	       AND			(const BitBoardN& lhs, const BitBoardN& rhs, int last_vertex, int res[], int& size);				//returns the operation as a set of vertices	
 
 	friend BitBoardN&  OR			(const BitBoardN& lhs, const BitBoardN& rhs,  BitBoardN& res);
@@ -57,46 +59,53 @@ public:
 	friend BitBoardN&  ERASE		(const BitBoardN& lhs, const BitBoardN& rhs,  BitBoardN& res);										//removes rhs from lhs
 	friend int FIRST_SHARED			(const BitBoardN& lhs, const BitBoardN& rhs);
 	friend int FIRST_SHARED			(int first_block, const BitBoardN& lhs, const BitBoardN& rhs);	//first elem in common
-	
-	//constructors, initialization, assignment
-	 BitBoardN						(): m_nBB(EMPTY_ELEM),m_aBB(NULL){};										
+
+////////////
+//construction / destruction 
+
+	 BitBoardN						(): m_nBB(EMPTY_ELEM),m_aBB(NULL)		{};	
+	 BitBoardN						(const vint& v, int popsize);
 explicit  BitBoardN					(int popsize /*1 based*/, bool reset=true);	
-	 BitBoardN						(const BitBoardN& bbN);
-     BitBoardN						(const std::vector<int>& v);
-	 BitBoardN						(const std::vector<int>& v, int popsize);
+explicit  BitBoardN					(const std::vector<int>& v);
+	
 	 	 
+	 //TODO - move and copy semantics...
+	 BitBoardN						(const BitBoardN& bbN);
+	 BitBoardN& operator =			(const BitBoardN&);
 
 virtual	~BitBoardN					();
-		 
-	void init						(int popsize, bool reset=true);										
-	void init						(int popsize, const vector<int> & );								
-	BitBoardN& operator =			(const BitBoardN& );	
+
+////////////
+//memory allocation 
+	void init						(int popsize, bool reset = true);										
+	void init						(int popsize, const vint& );
 	
 /////////////////////
 //setters and getters (will not allocate memory)
 	
 	BITBOARD* get_bitstring			();
 	const BITBOARD* get_bitstring	()			const;
-	int number_of_bitblocks			()			const {return m_nBB;}
-const BITBOARD get_bitboard			(int block) const {return m_aBB[block];}
-	BITBOARD& get_bitboard			(int block)		  {return m_aBB[block];}
+	int number_of_bitblocks			()			const					{ return m_nBB; }
+const BITBOARD get_bitboard			(int block) const					{ return m_aBB[block]; }
+	BITBOARD& get_bitboard			(int block)							{ return m_aBB[block]; }
 
 //////////////////////////////
 // Bitscanning
 
 	//find least/most signinficant bit
-inline virtual int msbn64		()	const;		//lookup
-inline virtual int lsbn64		()	const; 		//de Bruijn	/ lookup								
+inline virtual int msbn64			()	const;		//lookup
+inline virtual int lsbn64			()	const; 		//de Bruijn	/ lookup								
 
 	//for looping (does not use state info)	
-inline int next_bit			(int nBit)	const;					//de Bruijn
-inline int next_bit_if_del	(int nBit)	const;					//de Bruijn
-inline int previous_bit		(int nbit)	const;					//lookup 
+inline int next_bit					(int nBit)	const;					//de Bruijn
+inline int next_bit_if_del			(int nBit)	const;					//de Bruijn
+inline int previous_bit				(int nbit)	const;					//lookup 
 	
 /////////////////
 // Popcount
-virtual	inline int popcn64	()						const;		//lookup 
-virtual	inline int popcn64	(int nBit/* 0 based*/)	const;
+virtual	inline int popcn64			()						const;		//lookup 
+virtual	inline int popcn64			(int nBit/* 0 based*/)	const;
+
 /////////////////////
 //Set/Delete Bits 
 inline	void  init_bit				(int bit);	
@@ -108,7 +117,7 @@ inline	void  copy_up_to_block		(int last_block, const BitBoardN& bb_add);						/
 inline  int	 set_bit				(int low, int high);											//closed range
 inline  void  set_bit				();
 	   void  set_bit				(const BitBoardN& bb_add);										//similar to OR, experimental
-	  void set_bit					(const std::vector<int>& v, bool override=false);		
+	  void set_bit					(const vint& v, bool override=false);
 
 		void set_block				(int first_block, const BitBoardN& bb_add);						//OR:closed range
 		void set_block				(int first_block, int last_block,  const BitBoardN& bb_add);	//OR:closed range
@@ -127,22 +136,22 @@ inline	BitBoardN& erase_block_reverse	(int last_block, const BitBoardN& bb_del);
 ////////////////////////
 //member operators (must have same block size)
 				
-	BitBoardN& operator &=	(const BitBoardN& );													//bitset_intersection
-	BitBoardN& operator |=	(const BitBoardN& );													//bitset_union
-	BitBoardN& operator ^=	(const BitBoardN& );													//bitet symmetric_difference
+	BitBoardN& operator &=			(const BitBoardN& );													//bitset_intersection
+	BitBoardN& operator |=			(const BitBoardN& );													//bitset_union
+	BitBoardN& operator ^=			(const BitBoardN& );													//bitet symmetric_difference
 
-	BitBoardN&  AND_EQ		(int first_block, const BitBoardN& rhs );								//AND: range
-	BitBoardN&  OR_EQ		(int first_block, const BitBoardN& rhs );								//OR:  range
+	BitBoardN&  AND_EQ				(int first_block, const BitBoardN& rhs );								//AND: range
+	BitBoardN&  OR_EQ				(int first_block, const BitBoardN& rhs );								//OR:  range
 		
-	BitBoardN& flip			();
-inline	int	single_disjoint		(const BitBoardN& rhs, int& vertex)			const;						//non-disjoint by single element
-inline	int	single_disjoint		(int first_block, int last_block, const BitBoardN& rhs, int& vertex) const;
-inline	int	single_joint		(const BitBoardN& rhs, int& vertex)			const;						//non-joint by single element (this\rhs)
-inline int double_joint			(const BitBoardN& rhs, int& v, int& w)		const;						//non_joint by one or two elements (this\rhs)
-inline int  is_singleton		(int vlhs, int vrhs)						const;						//single vertex inside range
-inline int  find_singleton		(int low, int high, int& singleton)		    const;
+	BitBoardN& flip					();
+inline	int	single_disjoint			(const BitBoardN& rhs, int& vertex)			const;						//non-disjoint by single element
+inline	int	single_disjoint			(int first_block, int last_block, const BitBoardN& rhs, int& vertex) const;
+inline	int	single_joint			(const BitBoardN& rhs, int& vertex)			const;						//non-joint by single element (this\rhs)
+inline int double_joint				(const BitBoardN& rhs, int& v, int& w)		const;						//non_joint by one or two elements (this\rhs)
+inline int  is_singleton			(int vlhs, int vrhs)						const;						//single vertex inside range
+inline int  find_singleton			(int low, int high, int& singleton)		    const;
 
-inline int first_found			(const BitBoardN& rhs)						const;						//first vertex in common with rhs  (7/17)
+inline int first_found				(const BitBoardN& rhs)						const;						//first vertex in common with rhs  (7/17)
 
 /////////////////////////////
 //Boolean functions
@@ -155,25 +164,30 @@ inline virtual bool is_empty		(int nBBL, int nBBH)				const;
 	inline bool is_disjoint			(const BitBoardN& a, const  BitBoardN& b)		const;		//no bit in common with both a and b (not available in sparse bitsets)
 /////////////////////
 // I/O 
-	void print				(std::ostream& = std::cout, bool show_pc = true) const;
-	string to_string		();
+	std::ostream& print				(std::ostream& = std::cout, bool show_pc = true) const;
+	std::string to_string			();
 	
 ///////////////////////
 //conversions
-	void to_vector					(std::vector<int>& )				const;						//with allocation 
+
+	void to_vector					(vint& )							const;						//with allocation 
 	void to_stack					(com::stack_t<int>&)				const;						//no allocation! stack must have adequate size
 virtual	int* to_old_vector			(int* lv, int& size);
 virtual	int* to_old_vector_reverse	(int* lv, int& size);
+
 ////////////////////////
 // operator [] - 0 based index, returns/modify a complete BITBOARD
 //TODO: Check limits!!!!!!
-BITBOARD& operator[](std::size_t index) { return m_aBB[index]; }
-const BITBOARD& operator[](std::size_t index) const { return m_aBB[index]; }
+
+BITBOARD& operator[]				(std::size_t index) { return m_aBB[index]; }
+const BITBOARD& operator[]			(std::size_t index) const { return m_aBB[index]; }
+
 ////////////////////////
-//Member data
+//data members
+
 protected:
 	BITBOARD* m_aBB;
-	int m_nBB;				//number of BITBOARDS (1 based)
+	int m_nBB;							//number of bitblocks (1 based)
 };
 
 inline 
@@ -368,7 +382,7 @@ inline int BitBoardN::init_bit(int low, int high){
 
 	//checks consistency (***use ASSERT)
 	if(bbh<bbl || bbl<0 || low>high || low<0){
-		cerr<<"Error in set bit in range"<<endl;
+		std::cerr << "Error in set bit in range" << std::endl;
 		return -1;
 	}
 
@@ -406,7 +420,7 @@ int BitBoardN::init_bit (int high, const BitBoardN& bb_add){
 	}
 
 	//trim last bit block up to high
-	m_aBB[bbh]&=bblock::MASK_1(0, high-WMUL(bbh)); 
+	m_aBB[bbh] &= bblock::MASK_1(0, high-WMUL(bbh)); 
 
 
 return 0;
@@ -424,10 +438,10 @@ int  BitBoardN::is_singleton (int low, int high) const{
 	//both ends
 	if(nbbl==nbbh){
 		BITBOARD bbl= m_aBB[nbbl] & bblock::MASK_1(WMOD(low),WMOD(high));
-		pc=bblock::popc64(bbl);
+		pc = bblock::popc64(bbl);
 	}else{
 		BITBOARD bbl= m_aBB[nbbl] & bblock::MASK_1(WMOD(low),WORD_SIZE-1);
-		pc=bblock::popc64(bbl);
+		pc = bblock::popc64(bbl);
 		if(pc>1){
 			return -1;
 		}
@@ -530,7 +544,7 @@ inline int  BitBoardN::set_bit (int low, int high){
 	
 	//checks consistency (ASSERT)
 	if(bbh<bbl || bbl<0 || low>high || low<0){
-		cerr<<"Error in set bit in range"<<endl;
+		std::cerr << "Error in set bit in range" << std::endl;
 		return -1;
 	}
 
@@ -598,7 +612,7 @@ inline int  BitBoardN::erase_bit (int low, int high){
 	
 	//checks consistency (ASSERT)
 	if(bbh<bbl || bbl<0 || low>high || low<0){
-		cerr<<"Error in set bit in range"<<endl;
+		std::cerr << "Error in set bit in range" << std::endl;
 		return -1;
 	}
 

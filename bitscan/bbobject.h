@@ -20,26 +20,28 @@
  */
 
 
-#ifndef __BB_OBJECT_H__
+#ifndef  __BB_OBJECT_H__
 #define  __BB_OBJECT_H__
 
 #include <iostream>
-using namespace std;
 
 
 class BBObject{
 public:
-	enum scan_types	{NON_DESTRUCTIVE, NON_DESTRUCTIVE_REVERSE, DESTRUCTIVE, DESTRUCTIVE_REVERSE};				//types of bit scans
-	friend ostream& operator<<(ostream& o , const BBObject& bb){bb.print(o); return o;}
+
+	//types of bit scans
+	enum scan_types	{NON_DESTRUCTIVE, NON_DESTRUCTIVE_REVERSE, DESTRUCTIVE, DESTRUCTIVE_REVERSE};				
+
+	friend std::ostream& operator<< (std::ostream& o , const BBObject& bb)			{ bb.print(o); return o;}
 
 protected:
 	BBObject(){}	
-	virtual void print(ostream &o, bool show_pc=true) const {this->print(o, show_pc);}
+	virtual std::ostream& print		(std::ostream& o, bool show_pc = true) const	{ this->print(o, show_pc); return o; }
 	
 	////////
 	// bit scanning
 	
-	virtual int init_scan(scan_types)   { return 0; }
+	virtual int init_scan			(scan_types)									 { return 0; }
 };
 
 #endif
