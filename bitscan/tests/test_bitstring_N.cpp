@@ -115,6 +115,33 @@ TEST_F(BBNScanningTest, reverse_destructive) {
 
 }
 
+
+TEST(BBNtest, set_bit_range) {
+
+	BitBoardN bb(130);
+
+	bb.set_bit(0, 64);
+	EXPECT_TRUE(bb.is_bit(0));
+	EXPECT_TRUE(bb.is_bit(64));
+
+	BitBoardN bb1(130);
+	bb1.set_bit(0, 0);
+	EXPECT_TRUE(bb1.is_bit(0));
+
+	bb1.set_bit(64, 64);
+	EXPECT_TRUE(bb1.is_bit(64));
+	EXPECT_TRUE(bb1.is_bit(0));
+
+	bb1.set_bit(55, 56);					//bb1={0...55 56...64}
+	EXPECT_TRUE(bb1.popcn64(4));	
+	EXPECT_TRUE(bb1.is_bit(0));
+	EXPECT_TRUE(bb1.is_bit(55));
+	EXPECT_TRUE(bb1.is_bit(56));
+	EXPECT_TRUE(bb1.is_bit(64));
+}
+
+
+
 TEST(BBNtest, setters_and_getters) {
 	BitBoardN bb(130);
 	bb.set_bit(10);
@@ -207,24 +234,7 @@ TEST(BBNtest, boolean_joint){
 	EXPECT_EQ(EMPTY_ELEM,w);
 }
 
-TEST(BBNtest, set_bit_range){
 
-	BitBoardN bb(130);
-	bb.set_bit(0, 64);
-	EXPECT_TRUE(bb.is_bit(0));
-	EXPECT_TRUE(bb.is_bit(64));
-	
-	BitBoardN bb1(130);
-	bb1.set_bit(0, 0);
-	EXPECT_TRUE(bb1.is_bit(0));
-	
-	bb1.set_bit(64, 64);
-	EXPECT_TRUE(bb1.is_bit(64));
-	EXPECT_TRUE(bb1.is_bit(0));
-	
-	bb1.set_bit(55, 56);
-	EXPECT_TRUE(bb1.popcn64(4));
-}
 
 TEST(BBNtest, erase_bit_range){
 	BitBoardN bb(130);
@@ -385,6 +395,7 @@ TEST(BBNtest, vector_operations) {
 	EXPECT_TRUE(bbN5.is_bit(62));
 	EXPECT_FALSE(bbN5.is_bit(63));
 
+	
 	//I/O
 	//bbN5.print();
 }

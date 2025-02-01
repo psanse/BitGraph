@@ -2,7 +2,9 @@
  * @file bitboardn.h file 
  * @brief header file of the BitBoardN class from the BITSCAN library.
  *		  Manages bitstrings of any size as an array of bitblocks (64-bit numbers)
- * @authos pss
+ * @author pss
+ * @created 2014
+ * @last_update 01/02/2025
  * 
  * TODO - refactoring and testing (31/01/2025)
  *
@@ -117,19 +119,40 @@ inline	int   init_bit				(int lbit, int rbit);
 		int   init_bit				(int high, const BitBoardN& bb_add);						    //copies bb_add in range [0, high] *** rename probably
 inline	void  copy_from_block		(int first_block, const BitBoardN& bb_add);						//copies from first_block (included) onwards
 inline	void  copy_up_to_block		(int last_block, const BitBoardN& bb_add);						//copies up to last_block (included)
-		 void  set_bit				(int bit);
-inline  int	 set_bit				(int low, int high);											//closed range
-inline  void  set_bit				();
-	   void  set_bit				(const BitBoardN& bb_add);										//similar to OR, experimental
+	
+		/**
+		* @brief sets bit to 1 in the bitstring
+		* @param  bit: index of the bit to set
+		**/
+		BitBoardN&  set_bit			(int bit);
+
+		/**
+		* @brief sets the bits in the closed range [low, high] to 1 in the bitstring
+		* @params low, high: range to be set
+		* @date 22/9/14
+		* @last_update 01/02/25
+		**/
+inline  BitBoardN&	 set_bit		(int low, int high);											
+
+		/**
+		* @brief sets all bits to 1
+		**/
+inline  BitBoardN&  set_bit			();
+	 
+		void  set_bit				(const BitBoardN& bb_add);										//similar to OR, experimental
 	 
 	   /**
-	   * @brief adds elements from a vector of non-negative integers lv as 1-bit
-	   *	    up to the maximum capacity of the bitstring. Elements out of popsize range are ignored.
-	   * @param v: vector of non-negative integers
+	   * @brief Adds elements from a vector of non-negative integers lv as 1-bit
+	   *	    up to the maximum capacity of the bitstring. Values greater than the
+	   *		maximum population size are ignored.
+	   * 
+	   * @param lv: vector of non-negative integers
 	   * @param reset: if true, deletes the rest of bits in the bitstring
-	   * @details negative elements will cause an assertion if NDEBUG is not defined
+	   * @returns reference to the modified bitstring
+	   * @details negative elements will cause an assertion if NDEBUG is not defined, 
+	   *		  else the behaviour is undefined.
 	   **/
-	   void set_bit					(const vint& lv, bool reset = false);
+	   BitBoardN& set_bit			(const vint& lv, bool reset = false);
 
 		void set_block				(int first_block, const BitBoardN& bb_add);						//OR:closed range
 		void set_block				(int first_block, int last_block,  const BitBoardN& bb_add);	//OR:closed range
@@ -235,7 +258,7 @@ protected:
 	BITBOARD* m_aBB;				//array of bitblocks - not using std::vector because of memory allignment
 	int m_nBB;						//number of bitblocks (1-based)
 
-}; //end class
+}; //end BitBoardN class
 
 
 
@@ -581,46 +604,54 @@ inline void  BitBoardN::copy_up_to_block (int last_block, const BitBoardN& bb_ad
 	}
 }
 
-inline void BitBoardN::set_bit	(int nbit /*0 based*/){
+inline BitBoardN& BitBoardN::set_bit	(int nbit /*0 based*/){
 
 	m_aBB[WDIV(nbit)] |= Tables::mask[WMOD(nbit)];
+	return *this;
 }	
 
-inline int  BitBoardN::set_bit (int low, int high){
-/////////////////////
-// Set all bits (0 based)  to 1 in the closed range (including both ends)
-// date: 22/9/14
+inline 
+BitBoardN&  BitBoardN::set_bit (int low, int high){
 
 	int bbl= WDIV(low);
 	int bbh= WDIV(high); 
-	
-	//checks consistency (ASSERT)
-	if(bbh<bbl || bbl<0 || low>high || low<0){
-		std::cerr << "Error in set bit in range" << std::endl;
-		return -1;
-	}
+		
+	/////////////////////////////////
+	assert(low < high || low > 0);
+	/////////////////////////////////
 
-	if(bbl==bbh){
-		BITBOARD bb1= m_aBB[bbh] | ~Tables::mask_left[high-WMUL(bbh)];
-		BITBOARD bb2=m_aBB[bbl] | ~Tables::mask_right[low-WMUL(bbl)];
-		m_aBB[bbh]=bb1 & bb2;
+	if(bbl == bbh){
+				
+		m_aBB[bbh] |= bblock::MASK_1(low - WMUL(bbl), high - WMUL(bbh));			//low - WMUL(bbl) = WMOD(bbl) but less expensive (CHECK 01/02/25)
+
+	/*	BITBOARD bb1 = m_aBB[bbh] | ~Tables::mask_left[high-WMUL(bbh)];
+		BITBOARD bb2 = m_aBB[bbl] | ~Tables::mask_right[low-WMUL(bbl)];
+		m_aBB[bbh] = bb1 & bb2;*/
 	}
 	else{
-		for(int i=bbl+1; i<=bbh-1; i++)	
-			m_aBB[i]=ONE;
+		//set to one the intermediate blocks
+		for (int i = bbl + 1; i < bbh; ++i) {
+			m_aBB[i] = ONE;
+		}
+		
+		//deal with the first and last blocks
+		m_aBB[bbh] |= bblock::MASK_1_RIGHT	(high - WMUL(bbh));
+		m_aBB[bbl] |= bblock::MASK_1_LEFT	(low - WMUL(bbl));
 
-		//lower
-		m_aBB[bbh]|=~Tables::mask_left[high-WMUL(bbh)];			
-		m_aBB[bbl]|=~Tables::mask_right[low-WMUL(bbl)];
+		/*m_aBB[bbh] |= ~Tables::mask_left[high - WMUL(bbh)];			
+		m_aBB[bbl] |= ~Tables::mask_right[low - WMUL(bbl)];*/
 	}
-return 0;
+
+	return *this;
 }
 
-inline void	BitBoardN::set_bit (){
-///////////////
-// sets all bit blocks to ONE
-	for(int i=0; i<m_nBB; i++)	
-				m_aBB[i]=ONE;
+inline
+BitBoardN& BitBoardN::set_bit (){
+
+	for (auto i = 0; i < m_nBB; ++i) {
+		m_aBB[i] = ONE;
+	}
+	return *this;
 }
 
 inline

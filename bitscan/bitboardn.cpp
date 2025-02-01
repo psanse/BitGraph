@@ -540,7 +540,7 @@ BitBoardN& BitBoardN::operator =  (const BitBoardN& bbN){
 	return *this;
 }
 
-void BitBoardN::set_bit (const vint& lv, bool reset) {
+BitBoardN& BitBoardN::set_bit (const vint& lv, bool reset) {
 
 	//cleans the bitstring if required
 	if (reset) {
@@ -559,6 +559,8 @@ void BitBoardN::set_bit (const vint& lv, bool reset) {
 			set_bit(lv[i]);
 		}
 	}
+
+	return *this;
 
 }
 
