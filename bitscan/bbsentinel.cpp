@@ -153,9 +153,11 @@ void BBSentinel::update_sentinels_to_v(int v){
 	}
 }
 
-void BBSentinel::print(std::ostream& o){
-	BitBoardN::print(o);
+std::ostream& BBSentinel::print(std::ostream& o, bool show_pc, bool endl ) const{
+	BitBoardN::print(o, show_pc, endl);
 	o<<"("<<m_BBL<<","<<m_BBH<<")";
+
+	return o;
 }
 
 

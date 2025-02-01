@@ -25,6 +25,8 @@
 #include <vector>	
 #include "utils/common.h"			//stack
 
+//uncomment NDEBUG in config.h to enable assertions
+#include <cassert>
 
 //alias
 using vint = std::vector<int>;
@@ -41,7 +43,7 @@ class BitBoardN:public BBObject{
 public:	
 
 /////////////////////////////
-// independent operators (no allocation or copies)
+// independent operators / services (no allocation or copies)
 
 	friend bool operator==			(const BitBoardN& lhs, const BitBoardN& rhs);
 	friend bool operator!=			(const BitBoardN& lhs, const BitBoardN& rhs);
@@ -66,7 +68,7 @@ public:
 	 BitBoardN						(): m_nBB(EMPTY_ELEM),m_aBB(NULL)		{};	
 	 BitBoardN						(const vint& v, int popsize);
 explicit  BitBoardN					(int popsize /*1 based*/, bool reset=true);	
-explicit  BitBoardN					(const std::vector<int>& v);
+explicit  BitBoardN					(const vint& v);
 	
 	 	 
 	 //TODO - move and copy semantics...
@@ -119,7 +121,15 @@ inline	void  copy_up_to_block		(int last_block, const BitBoardN& bb_add);						/
 inline  int	 set_bit				(int low, int high);											//closed range
 inline  void  set_bit				();
 	   void  set_bit				(const BitBoardN& bb_add);										//similar to OR, experimental
-	  void set_bit					(const vint& v, bool override=false);
+	 
+	   /**
+	   * @brief adds elements from a vector of non-negative integers lv as 1-bit
+	   *	    up to the maximum capacity of the bitstring. Elements out of popsize range are ignored.
+	   * @param v: vector of non-negative integers
+	   * @param reset: if true, deletes the rest of bits in the bitstring
+	   * @details negative elements will cause an assertion if NDEBUG is not defined
+	   **/
+	   void set_bit					(const vint& lv, bool reset = false);
 
 		void set_block				(int first_block, const BitBoardN& bb_add);						//OR:closed range
 		void set_block				(int first_block, int last_block,  const BitBoardN& bb_add);	//OR:closed range
@@ -175,7 +185,7 @@ inline virtual bool is_empty		(int nBBL, int nBBH)				const;
 	* @param show_pc: if true, shows popcount
 	* @returns output stream
 	**/
-	std::ostream& print				(std::ostream& o= std::cout, bool show_pc = true, bool endl = true) const;
+	std::ostream& print				(std::ostream& o= std::cout, bool show_pc = true, bool endl = true) const override;
 	
 	/**
 	* @brief converts bb and its popcount to a readable string
@@ -188,34 +198,50 @@ inline virtual bool is_empty		(int nBBL, int nBBH)				const;
 //conversions
 
 	/**
-	* @brief converts the bitstring to a vector of non-negative integers
-	* @details the vector is cleared and filled, its size is the number of bits in the bitstring
-	* @param lv: vector to be filled
-	* 
-	* TODO - implement the cast operator
+	* @brief Converts the bitstring to a std::vector of non-negative integers.
+	*		 The size of the vector is the number of bits in the bitstring. 
+	* @param lv: output vector 
 	**/
-	void to_vector					(vint& lv)							const;						
+	void to_vector					(vint& lv)							const;
+
+	/**
+	* @brief Casts the bitstring to a vector of non-negative integers
+	* @details calls to_vector
+	**/
+	operator						vint()								const;
+
 	
-	//no allocation! stack must have adequate size
-	void to_stack					(com::stack_t<int>&)				const;						
+	/**
+	* @brief Converts the bitstring to a stack object s 
+	* @details no allocation! stack MUST BE of adequate size to hold all 1-bits
+	* @param s: output stack 
+	**/
+	void to_stack					(com::stack_t<int>& s)				const;						
+	
 
-virtual	int* to_old_vector			(int* lv, int& size);
-virtual	int* to_old_vector_reverse	(int* lv, int& size);
-
-////////////////////////
-// operator [] - 0 based index, returns/modify a complete BITBOARD
-//TODO: Check limits!!!!!!
-
-BITBOARD& operator[]				(std::size_t index) { return m_aBB[index]; }
-const BITBOARD& operator[]			(std::size_t index) const { return m_aBB[index]; }
+	/**
+	* @brief Converts the bitstring to a C array
+	* @param lv: output C-array as pointer
+	* @param size: output size of the array
+	* @param rev: if true, the array is filled in reverse order
+	* @returns pointer to the array, size of the array
+	**/
+virtual	int* to_C_array				(int* lv, std::size_t& size, bool rev = false);
 
 ////////////////////////
 //data members
 
 protected:
-	BITBOARD* m_aBB;			//array of bitblocks - not using std::vector because of memory allignment
-	int m_nBB;					//number of bitblocks (1-based)
-};
+	BITBOARD* m_aBB;				//array of bitblocks - not using std::vector because of memory allignment
+	int m_nBB;						//number of bitblocks (1-based)
+
+}; //end class
+
+
+
+//////////////////////////////////
+// Inline functions implementations - necessary in header file
+
 
 inline 
 int BitBoardN::first_found	(const BitBoardN& rhs) const{
@@ -293,7 +319,7 @@ inline int BitBoardN::next_bit_if_del(int nBit/* 0 based*/) const{
 	if(nBit==EMPTY_ELEM)
 		return lsbn64();
 	else{
-		for(int i=WDIV(nBit); i<m_nBB; i++){
+		for(int i = WDIV(nBit); i<m_nBB; i++){
 			if(m_aBB[i]){
 				return(bblock::lsb64_de_Bruijn(m_aBB[i])+WMUL(i) );
 			}
@@ -947,23 +973,7 @@ inline BitBoardN & BitBoardN::erase_block_reverse(int last_block, const BitBoard
 	return *this;
 }
 
-inline
-void BitBoardN::set_bit (const std::vector<int>& v, bool overrride){
-/////////////////
-// sets bits in bitstring taking into account the poprange
-//
-// overrides bitstring contents if flag is set
-	
-	if(overrride) 
-			erase_bit();
 
-	int ub=WMUL(m_nBB);					
-	for(int i=0; i<v.size(); i++){
-		if(v[i]>=0 && v[i]<ub /* 1 based*/)
-				set_bit(v[i]);
-	}
-	
-}
 
 inline
 int FIRST_SHARED (const BitBoardN& lhs, const BitBoardN& rhs){

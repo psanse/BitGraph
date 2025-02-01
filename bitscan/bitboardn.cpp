@@ -8,7 +8,7 @@
 #include <algorithm>
 #include <cstdio>
 #include <utils/logger.h>
-//#include "utils/common.h"
+
  
 using namespace std;
 
@@ -218,12 +218,13 @@ BitBoardN::BitBoardN(const BitBoardN& bbN){
 	}
  }
 
-BitBoardN::BitBoardN(const vector<int>& v){
+BitBoardN::BitBoardN(const vint& v){
 ///////////////////
 // vector elements should be zero based (i.e v[0]=3, bit-index 3=1)
 
 	//Getting BB Size
 	m_nBB = INDEX_0TO1(*(max_element(v.begin(), v.end())) ) ; 
+
 #ifndef _MEM_ALIGNMENT
 	m_aBB = new BITBOARD[m_nBB];
 #else
@@ -243,7 +244,7 @@ BitBoardN::~BitBoardN(){
 	m_aBB = nullptr;
 }
 
-BitBoardN::BitBoardN (const std::vector<int>& v, int popsize){
+BitBoardN::BitBoardN (const vint& v, int popsize){
 ///////////////////
 // vector elements should be zero based (i.e v[0]=3, bit-index 3=1)
 // first_update: 12/11/16
@@ -257,7 +258,7 @@ BitBoardN::BitBoardN (const std::vector<int>& v, int popsize){
 	if(!(m_aBB = (BITBOARD*)_aligned_malloc(sizeof(BITBOARD)*m_nBB,_MEM_ALIGNMENT))){
 #endif
 			LOG_ERROR("Error during bitset allocation - BitBoardN()");
-			m_nBB=-1;
+			m_nBB = -1;
 			return;
 	}
 	
@@ -273,18 +274,18 @@ BitBoardN::BitBoardN (const std::vector<int>& v, int popsize){
 	}
 }
 
-void BitBoardN::init(int popsize, const vector<int> &v){
+void BitBoardN::init(int popsize, const vint&v){
 ///////////////////////////
 // values in vector are 1-bits in the bitboard (0 based)
 	
-	if(m_aBB!=nullptr){
+	//if(m_aBB != nullptr){
 #ifndef _MEM_ALIGNMENT
 		delete [] m_aBB;
 #else
 		_aligned_free(m_aBB);
 #endif
-		m_aBB=nullptr;
-	}
+		m_aBB = nullptr;
+//	}
 	
 	m_nBB = INDEX_1TO1(popsize); //((popsize-1)/WORD_SIZE)+1;
 	 
@@ -328,7 +329,7 @@ void BitBoardN::init(int popsize, bool reset){
 #else
 		_aligned_free(m_aBB);
 #endif
-		m_aBB=nullptr;
+		m_aBB = nullptr;
 	}
 
 	//nBBs
@@ -490,6 +491,13 @@ void BitBoardN::to_vector (vint& lv ) const {
 	}
 }
 
+BitBoardN::operator vint() const {
+	vint result;
+	to_vector (result);
+	return result;
+}
+
+
 void BitBoardN::to_stack(com::stack_t<int>& s)	const {
 	s.erase();
 
@@ -499,35 +507,24 @@ void BitBoardN::to_stack(com::stack_t<int>& s)	const {
 	}
 }
 
-int* BitBoardN::to_old_vector (int* lv, int& size) 	{
+
+int* BitBoardN::to_C_array (int* lv, std::size_t& size, bool rev) 	{
 	size = 0;
 	int v = EMPTY_ELEM;
-	while ( ( v = next_bit(v) ) != EMPTY_ELEM ) {
-		lv[size++] = v;
-	}
 
-	/*while(true){
-		if( (v=next_bit(v))!=EMPTY_ELEM ){
-			lv[size++]=v;
-		}else break;
-	}*/
+	if (rev) {
+		while ((v = previous_bit(v)) != EMPTY_ELEM) {
+			lv[size++] = v;
+		}
+	}
+	else {
+		while ((v = next_bit(v)) != EMPTY_ELEM) {
+			lv[size++] = v;
+		}
+	}
 	return lv;
 }
 
-int* BitBoardN::to_old_vector_reverse (int* lv, int& size) 	{
-	size = 0;
-	int v = EMPTY_ELEM;
-	while ((v = previous_bit(v)) != EMPTY_ELEM) {
-		lv[size++] = v;
-	}
-
-	/*while(true){
-		if( (v=previous_bit(v))!=EMPTY_ELEM ){
-			lv[size++]=v;
-		}else break;
-	}*/
-	return lv;
-}
 
 BitBoardN& BitBoardN::operator =  (const BitBoardN& bbN){
 
@@ -541,6 +538,28 @@ BitBoardN& BitBoardN::operator =  (const BitBoardN& bbN){
 	}
 
 	return *this;
+}
+
+void BitBoardN::set_bit (const vint& lv, bool reset) {
+
+	//cleans the bitstring if required
+	if (reset) {
+		erase_bit();
+	}
+
+	//copies elements up to the maximum capacity of the bitstring
+	auto POPSIZE = WMUL(m_nBB);
+	for (auto i = 0; i < lv.size(); ++i) {
+
+		/////////////////////
+		assert(lv[i] >= 0);
+		////////////////////
+
+		if (lv[i] < POPSIZE /* 1-based*/) {
+			set_bit(lv[i]);
+		}
+	}
+
 }
 
 

@@ -236,12 +236,12 @@ TEST(Bitstrings, to_vector){
 
 ///////////////
 // old vector interface (4/7/16)
-	int v[130]; int size=0;
+	int v[130]; std::size_t size=0;
 	for(int i=0; i<130; i++){
 		v[i]=EMPTY_ELEM;
 	}
 		
-	bb.to_old_vector(v,size);
+	bb.to_C_array(v, size);
 	EXPECT_EQ(3, size);
 	copy(v, v+size, vint.begin());
 	EXPECT_EQ(sol, vint);
@@ -251,7 +251,7 @@ TEST(Bitstrings, to_vector){
 	bbi.set_bit(10);
 	bbi.set_bit(20);
 	bbi.set_bit(64);
-	bbi.to_old_vector(v,size);
+	bbi.to_C_array(v,size);
 	EXPECT_EQ(3, size);
 	copy(v, v+size, vint.begin());
 	EXPECT_EQ(3, vint.size());
@@ -801,22 +801,6 @@ TEST(BitScanning, first_found){
 	bb.set_bit(72);
 	ff=bb.first_found(bb1);
 	EXPECT_EQ(72, ff);
-}
-
-TEST(BitBoardN, ArraySubscripOperator) {
-	BitBoardN bb(32);
-	bb.set_bit(10);
-	bb.set_bit(20);
-	bb.set_bit(64);
-
-	//assignment
-	BitBoardN bb1(32);
-
-	bb1[0] = bb[0];
-	EXPECT_TRUE(bb1.is_bit(10));
-	EXPECT_TRUE(bb1.is_bit(20));
-	EXPECT_FALSE(bb1.is_bit(30));
-
 }
 
 

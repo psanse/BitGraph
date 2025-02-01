@@ -1,20 +1,19 @@
 //tests with masks for sparse and normal (non-sparse) graphs
 
+#include <vector>
 #include <algorithm>
 #include <iterator>
 #include <iostream>
 #include <set>
 
-#include "../bitscan.h"					//bit string library
+#include "bitscan/bitscan.h"					//bit string library
 #include "gtest/gtest.h"
 
-
-#include <vector>
 
 using namespace std;
 
 
-TEST(Masks, OR_from) { 
+TEST(Masks, OR_from) {
 // date: 14/11/2017
 
 	LOG_INFO("Masks-OR_from()----------------");
@@ -68,14 +67,20 @@ TEST(Masks, AND_OR) {
 	bb1.set_bit(64);
 	bb1.set_bit(100);
 
+	bb.print();
+	bb1.print();
+
+
 	//AND
-	cout<<AND(bb, bb1, bbresAND)<<endl;
+//	cout<<AND(bb, bb1, bbresAND)<<endl;
+	AND(bb, bb1, bbresAND);
 	EXPECT_TRUE(bbresAND.is_bit(10));
 	EXPECT_TRUE(bbresAND.is_bit(64));
 	EXPECT_EQ(2, bbresAND.popcn64());
 
 	//OR
-	cout<<OR(bb, bb1, bbresOR)<<endl;
+	//cout<<OR(bb, bb1, bbresOR)<<endl;
+	OR(bb, bb1, bbresOR);
 	EXPECT_EQ(4, bbresOR.popcn64());
 
 	//&=
@@ -114,13 +119,15 @@ TEST(Masks, AND_OR_sparse) {
 	bb1.set_bit(100);
 
 	//AND
-	cout<<AND(bb, bb1, bbresAND)<<endl;
+	//cout<<AND(bb, bb1, bbresAND)<<endl;
+	AND(bb, bb1, bbresAND);
 	EXPECT_TRUE(bbresAND.is_bit(10));
 	EXPECT_TRUE(bbresAND.is_bit(64));
 	EXPECT_EQ(2, bbresAND.popcn64());
 
 	//OR
-	cout<<OR(bb, bb1, bbresOR)<<endl;
+	//cout<<OR(bb, bb1, bbresOR)<<endl;
+	OR(bb, bb1, bbresOR);
 	EXPECT_EQ(4, bbresOR.popcn64());
 
 	//&=
@@ -135,7 +142,7 @@ TEST(Masks, AND_OR_sparse) {
 	bb3.set_bit(64);
 	bb3.set_bit(100);
 
-	bb2&=bb3;
+	bb2 &= bb3;
 	EXPECT_TRUE(bb2.is_bit(10));
 	EXPECT_TRUE(bb2.is_bit(64));
 	EXPECT_EQ(2,bb2.popcn64());
@@ -177,7 +184,8 @@ TEST(Masks, set_bits){
 	EXPECT_FALSE(bb.is_bit(100));
 	EXPECT_FALSE(bb.is_bit(64));
 
-	cout<<bb.erase_block(0, bb1)<<endl;
+	//cout<<bb.erase_block(0, bb1)<<endl;
+	bb.erase_block(0, bb1);
 	EXPECT_TRUE(bb.is_bit(20));
 }
 
@@ -206,7 +214,7 @@ TEST(Masks, set_bits_sparse){
 	EXPECT_TRUE(bb.is_bit(129));
 
 	//erase range
-	cout<<bb<<endl;
+	//cout<<bb<<endl;
 	bb.erase_block(2, bb1);
 	EXPECT_FALSE(bb.is_bit(129));
 
@@ -214,7 +222,8 @@ TEST(Masks, set_bits_sparse){
 	EXPECT_FALSE(bb.is_bit(100));
 	EXPECT_FALSE(bb.is_bit(64));
 
-	cout<<bb.erase_block(0, bb1)<<endl;
+	//cout<<bb.erase_block(0, bb1)<<endl;
+	bb.erase_block(0, bb1);
 	EXPECT_TRUE(bb.is_bit(20));
 }
 
@@ -289,7 +298,8 @@ TEST(Masks, ERASE){
 	bb1.set_bit(100);
 
 	//ERASE
-	cout<<ERASE(bb, bb1, bbERASE)<<endl;
+	//cout<<ERASE(bb, bb1, bbERASE)<<endl;
+	ERASE(bb, bb1, bbERASE);
 	EXPECT_TRUE(bbERASE.is_bit(20));
 	EXPECT_FALSE(bbERASE.is_bit(10));
 	EXPECT_FALSE(bbERASE.is_bit(64));
@@ -310,7 +320,8 @@ TEST(Masks, ERASE){
 	bbs1.set_bit(100);
 
 	//ERASE
-	cout<<ERASE(bbs, bbs1, bbsERASE)<<endl;
+	//cout<<ERASE(bbs, bbs1, bbsERASE)<<endl;
+	ERASE(bbs, bbs1, bbsERASE);
 	EXPECT_TRUE(bbsERASE.is_bit(20));
 	EXPECT_FALSE(bbsERASE.is_bit(10));
 	EXPECT_FALSE(bbsERASE.is_bit(64));
@@ -332,7 +343,8 @@ TEST(Masks, ERASE_extreme_cases){
 	bb.set_bit(64);	
 	
 	//ERASE
-	cout<<ERASE(bb, bb1, bbERASE)<<endl;
+	//cout<<ERASE(bb, bb1, bbERASE)<<endl;
+	ERASE(bb, bb1, bbERASE);
 	EXPECT_TRUE(bb==bbERASE);
 
 //sparse
@@ -347,7 +359,8 @@ TEST(Masks, ERASE_extreme_cases){
 
 	
 	//ERASE
-	cout<<ERASE(bbs, bbs1, bbsERASE)<<endl;
+	//cout<<ERASE(bbs, bbs1, bbsERASE)<<endl;
+	ERASE(bbs, bbs1, bbsERASE);
 	EXPECT_TRUE(bbs==bbsERASE);
 
 //erase when no blocks in same index: simple copy
@@ -359,7 +372,8 @@ TEST(Masks, ERASE_extreme_cases){
 	bbs1.print();
 
 	//ERASE
-	cout<<ERASE(bbs, bbs1, bbsERASE)<<endl;
+	//cout<<ERASE(bbs, bbs1, bbsERASE)<<endl;
+	ERASE(bbs, bbs1, bbsERASE);
 	EXPECT_TRUE(bbsERASE.is_bit(10));
 	EXPECT_TRUE(bbsERASE.is_bit(64));
 	EXPECT_EQ(2, bbsERASE.popcn64());

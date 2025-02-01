@@ -22,9 +22,9 @@
 #define __TABLES_H__
 
 #include "bbtypes.h"
-#include "config.h"
+#include "bbconfig.h"
 
-#define MASK_LIM	WORD_SIZE+1							    //mask limit for bitscan operations of a single BITBOARD
+constexpr int MASK_LIM = WORD_SIZE + 1;							    //mask limit for bitscan operations of a single BITBOARD
 
 #ifdef  CACHED_INDEX_OPERATIONS 
 	#define WDIV(i) (Tables::t_wdindex[(i)])

@@ -802,7 +802,7 @@ return res;
 ////
 ////////////////////////////
 
-ostream& BitBoardS::print (std::ostream& o, bool show_pc ) const  {
+ostream& BitBoardS::print (std::ostream& o, bool show_pc, bool endl ) const  {
 /////////////////////////
 // shows bit string as [bit1 bit2 bit3 ... <(pc)>]  (if empty: [ ]) (<pc> optional)
 	
@@ -821,6 +821,10 @@ ostream& BitBoardS::print (std::ostream& o, bool show_pc ) const  {
 	}
 	
 	o<<"]";
+
+	if (endl) {
+		o << std::endl;
+	}
 
 	return o;
 }

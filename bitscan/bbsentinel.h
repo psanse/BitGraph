@@ -77,7 +77,8 @@ virtual	bool is_empty				(int nBBL, int nBBH) const;					//is empty in range
 
 //////////////
 // I/O
-	void print(ostream& o=cout);
+	
+	std::ostream& print(ostream& o=cout, bool show_pc = true, bool endl = true) const override;
 
 /////////////////
 // bit scanning operations 

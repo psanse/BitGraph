@@ -90,8 +90,8 @@ inline int previous_bit_del			(int& nBB,  BBIntrin& del );
 
 //////////
 //conversions
-virtual	int* to_old_vector				(int* lv, int& size);
-virtual int* to_old_vector_reverse		(int* lv, int& size);
+
+inline	int* to_C_array				(int* lv, std::size_t& size, bool rev) override;
 
 /////////////////
 // Popcount
@@ -477,28 +477,34 @@ return 0;
 }
 
 inline
-int* BBIntrin::to_old_vector (int* lv, int& size){
-	int v; size=0;
-	init_scan(BBObject::NON_DESTRUCTIVE);
-	while(true){
-		if( (v=next_bit())!=EMPTY_ELEM ){
-			lv[size++]=v;
-		}else break;
+int* BBIntrin::to_C_array(int* lv, std::size_t& size, bool rev){
+	int v = EMPTY_ELEM;
+	size = 0;
+
+	if (rev) {
+		init_scan(BBObject::NON_DESTRUCTIVE_REVERSE);
+	}
+	else {
+		init_scan(BBObject::NON_DESTRUCTIVE);
+	}
+	
+	while( (v = next_bit())!= EMPTY_ELEM ){
+		lv[size++] = v;
 	}
 	return lv;
 }
 
-inline
-int* BBIntrin::to_old_vector_reverse (int* lv, int& size){
-	int v; size=0;
-	init_scan(BBObject::NON_DESTRUCTIVE_REVERSE);
-	while(true){
-		if( (v=previous_bit())!=EMPTY_ELEM ){
-			lv[size++]=v;
-		}else break;
-	}
-	return lv;
-}
+//inline
+//int* BBIntrin::to_old_vector_reverse (int* lv, int& size){
+//	int v; size=0;
+//	init_scan(BBObject::NON_DESTRUCTIVE_REVERSE);
+//	while(true){
+//		if( (v=previous_bit())!=EMPTY_ELEM ){
+//			lv[size++]=v;
+//		}else break;
+//	}
+//	return lv;
+//}
 
 
 

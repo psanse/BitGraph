@@ -1,12 +1,9 @@
-/*  
- * bbobject.h file from the BITSCAN library, a C++ library for bit set
- * optimization. BITSCAN has been used to implement BBMC, a very
- * succesful bit-parallel algorithm for exact maximum clique. 
- * (see license file for references)
- *
- * Copyright (C)
- * Author: Pablo San Segundo
- * Intelligent Control Research Group (CSIC-UPM) 
+/**  
+ * @file bbobject.h
+ * @brief Interface for the BITSCAN library hierarchy of classes
+ * @created ?
+ * @last_update 01/02/2025
+ * @author: pss
  *
  * Permission to use, modify and distribute this software is
  * granted provided that this copyright notice appears in all 
@@ -17,14 +14,12 @@
  * kind, express or implied, and with no claim as to its
  * suitability for any purpose.
  *
- */
-
+ **/
 
 #ifndef  __BB_OBJECT_H__
 #define  __BB_OBJECT_H__
 
 #include <iostream>
-
 
 class BBObject{
 public:
@@ -32,16 +27,22 @@ public:
 	//types of bit scans
 	enum scan_types	{NON_DESTRUCTIVE, NON_DESTRUCTIVE_REVERSE, DESTRUCTIVE, DESTRUCTIVE_REVERSE};				
 
-	friend std::ostream& operator<< (std::ostream& o , const BBObject& bb)			{ bb.print(o); return o;}
+	friend std::ostream& operator<< (std::ostream& o , const BBObject& bb)		{ bb.print(o); return o;}
 
 protected:
-	BBObject(){}	
-	virtual std::ostream& print		(std::ostream& o, bool show_pc = true) const	{ this->print(o, show_pc); return o; }
+//////////////
+//construction / destruction
+	BBObject() = default;
 	
-	////////
-	// bit scanning
-	
-	virtual int init_scan			(scan_types)									 { return 0; }
+//////////////////	
+//bit scanning
+	virtual int init_scan			(scan_types)								 { return 0; }
+
+///////////////////
+//I/O
+	virtual std::ostream& print(	std::ostream& o = std::cout, 
+									bool show_pc = true,
+									bool endl = true					) const = 0;
 };
 
 #endif

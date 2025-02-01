@@ -87,15 +87,15 @@ TEST_F(BBNScanningTest, reverse_non_destructive_with_starting_point) {
 TEST_F(BBNScanningTest, destructive) {
 	std::set<int> res;
 
-	BitBoardN bbn1(bbn);
+	BitBoardN bbN1(bbn);
 	int nBit = EMPTY_ELEM;
-	while ((nBit = bbn1.next_bit_if_del(nBit)) != EMPTY_ELEM) {
+	while ((nBit = bbN1.next_bit_if_del(nBit)) != EMPTY_ELEM) {
 		res.insert(nBit);
-		bbn1.erase_bit(nBit);
+		bbN1.erase_bit(nBit);
 	}
 
 	EXPECT_TRUE(res == sol);
-	EXPECT_EQ(0, bbn1.popcn64());
+	EXPECT_EQ(0, bbN1.popcn64());
 
 }
 
@@ -103,15 +103,15 @@ TEST_F(BBNScanningTest, destructive) {
 TEST_F(BBNScanningTest, reverse_destructive) {
 	std::set<int> res;
 
-	BitBoardN bbn1(bbn);
+	BitBoardN bbN1(bbn);
 	int nBit = EMPTY_ELEM;
-	while ((nBit = bbn1.previous_bit(nBit)) != EMPTY_ELEM) {
+	while ((nBit = bbN1.previous_bit(nBit)) != EMPTY_ELEM) {
 		res.insert(nBit);
-		bbn1.erase_bit(nBit);
+		bbN1.erase_bit(nBit);
 	}
 
 	EXPECT_TRUE(res == sol);
-	EXPECT_EQ(0, bbn1.popcn64());
+	EXPECT_EQ(0, bbN1.popcn64());
 
 }
 
@@ -261,6 +261,7 @@ TEST(BBNtest, erase_bit_joint){
 
 
 TEST(BBNtest, population_count){
+
 	BitBoardN bb(130);
 	bb.set_bit(10);
 	bb.set_bit(20);
@@ -273,79 +274,119 @@ TEST(BBNtest, population_count){
 	EXPECT_EQ(1, bb.popcn64(64));
 }
 
-TEST(BBNtest, to_vector){
+TEST(BBNtest, to_vector) {
+
+	const int POPULATION_SIZE = 130;
+
+	BitBoardN bb(POPULATION_SIZE);
+	bb.set_bit(10);
+	bb.set_bit(20);
+	bb.set_bit(64);
+
+	vector<int> lv_exp;
+	lv_exp.emplace_back(10);
+	lv_exp.emplace_back(20);
+	lv_exp.emplace_back(64);
+
+	//conversion to vector
+	vector<int> lv;
+	bb.to_vector(lv);
+
+	////////////////////////////
+	EXPECT_EQ(lv_exp, lv);
+	///////////////////////////
+
+///////////////
+// C-array interface (4/7/16)
+
+	int c_array[POPULATION_SIZE];
+	for (auto i = 0; i < POPULATION_SIZE; ++i) {
+		c_array[i] = EMPTY_ELEM;
+	}
+
+	//conversion to C-array
+	std::size_t size = 0;
+	bb.to_C_array(c_array, size);
+	
+	////////////////////////
+	EXPECT_EQ(3, size);
+	EXPECT_TRUE(std::find(std::begin(c_array), std::end(c_array), 10) != std::end(c_array)) ;
+	EXPECT_TRUE(std::find(std::begin(c_array), std::end(c_array), 20) != std::end(c_array));
+	EXPECT_TRUE(std::find(std::begin(c_array), std::end(c_array), 64) != std::end(c_array));
+	/////////////////////////
+}
+
+TEST(BBNtest, cast_to_vector) {
+
 	BitBoardN bb(130);
 	bb.set_bit(10);
 	bb.set_bit(20);
 	bb.set_bit(64);
 
-	vector<int> sol;
-	sol.push_back(10);  sol.push_back(20); sol.push_back(64);
+	//cast to vector
+	vint lv = bb;	
 
-	vector<int> vint;
-	bb.to_vector(vint);
-	EXPECT_EQ(sol, vint);
+	//expected lv
+	vint lv_exp = { 10, 20, 64 };
 
-	
-///////////////
-// old vector interface (4/7/16)
-	int v[130]; int size=0;
-	for(int i=0; i<130; i++){
-		v[i]=EMPTY_ELEM;
-	}
-		
-	bb.to_old_vector(v,size);
-	EXPECT_EQ(3, size);
-	copy(v, v+size, vint.begin());
-	EXPECT_EQ(sol, vint);		
+	/////////////////////////
+	EXPECT_EQ(lv_exp, lv);
+	////////////////////////
 }
 
+TEST(BBNtest, vector_operations) {
 
-TEST(BBNtest, vector) {
-	BitBoardN bbn1(50);
-	int aux[] = {10,20,45,62};
-	vector<int> v1(aux, aux + sizeof(aux) / sizeof(int));
+	const int POPULATION_SIZE = 50;
 
-	bbn1.set_bit(v1[0]);
-	bbn1.set_bit(v1[1]);
-	bbn1.set_bit(v1[2]);
-	bbn1.set_bit(v1[3]);
+	BitBoardN bbN1(POPULATION_SIZE);
+	vector<int> lv = {10, 20, 45, 62};
 
-	BitBoardN bbn2(v1);
+	bbN1.set_bit(lv[0]);
+	bbN1.set_bit(lv[1]);
+	bbN1.set_bit(lv[2]);
+	bbN1.set_bit(lv[3]);
 
-	vector<int> v2=to_vector(bbn1);
-	vector<int> v3=to_vector(bbn2);
+	////////////////////////
+	//construction from vector (bitset with lv.size)
+	BitBoardN bbN2(lv);
 
-	EXPECT_EQ(to_vector(bbn2), v1);
-	EXPECT_EQ(to_vector(bbn1), v1);
-	EXPECT_EQ(to_vector(bbn1), to_vector(bbn2));
+	vector<int> lvN1 = to_vector(bbN1);
+	vector<int> lvN2 = to_vector(bbN2);
 
-	//construction with vector and popsize (12/11/16)
-	vector<int> v4(aux, aux + sizeof(aux) / sizeof(int));
-	BitBoardN bbn3(v4, 30);
-	EXPECT_EQ(2,bbn3.popcn64());
-	EXPECT_TRUE(bbn3.is_bit(10));
-	EXPECT_TRUE(bbn3.is_bit(20));
+	EXPECT_EQ(lv, lvN1);
+	EXPECT_EQ(lv, lvN2);
+	
+	///////////////
+	//construction from vector and popsize (12/11/16)
+	lv = {10, 20};
+	BitBoardN bbN3(lv, POPULATION_SIZE);
+	EXPECT_EQ(2,bbN3.popcn64());
+	EXPECT_TRUE(bbN3.is_bit(10));
+	EXPECT_TRUE(bbN3.is_bit(20));
 
-	//vector elements are 0-based
-	BitBoardN bbn4(v4, 20);				/*vector element 20 will not make part of the bitstring*/
-	EXPECT_EQ(1,bbn4.popcn64());
-	EXPECT_TRUE(bbn4.is_bit(10));
-	EXPECT_FALSE(bbn4.is_bit(20));
+	//bitstring with population size 20 
+	BitBoardN bbN4(lv, 20);						//vector element 20 will not make part of the bitstring
+	EXPECT_EQ(1, bbN4.popcn64());
+	EXPECT_TRUE(bbN4.is_bit(10));
+	EXPECT_FALSE(bbN4.is_bit(20));
 
-//operator equal
-	int aux1[] = {10,20,45,62,250};
-	vector<int> v5(aux1, aux1 + sizeof(aux1) / sizeof(int));
+	////////////////////////
+	//setting bits from vector
+	lv = { 10, 20, 45, 62, 250 };
+	
+	//bbN5 = {10, 20, 45, 62}
+	BitBoardN bbN5(100);						//max population size 100						
+	bbN5.set_bit(lv);
 
-	BitBoardN bbn5(100);					//only 250 will not be copied						
-	bbn5.set_bit(v5);
-
-	EXPECT_EQ(4,bbn5.popcn64());
-	EXPECT_TRUE(bbn5.is_bit(10));
-	EXPECT_TRUE(bbn5.is_bit(20));
+	EXPECT_EQ(4, bbN5.popcn64());
+	EXPECT_TRUE(bbN5.is_bit(10));
+	EXPECT_TRUE(bbN5.is_bit(20));
+	EXPECT_TRUE(bbN5.is_bit(45));
+	EXPECT_TRUE(bbN5.is_bit(62));
+	EXPECT_FALSE(bbN5.is_bit(63));
 
 	//I/O
-	//bbn5.print();
+	//bbN5.print();
 }
 
 TEST(BBNtest, BitBoardNTo0) {
@@ -528,22 +569,6 @@ TEST(BBNtest, first_found){
 	EXPECT_EQ(72, ff);
 }
 
-TEST(BBNtest, ArraySubscripOperator) {
-
-	BitBoardN bb(32);
-	bb.set_bit(10);
-	bb.set_bit(20);
-	bb.set_bit(64);
-
-	//assignment
-	BitBoardN bb1(32);
-
-	bb1[0] = bb[0];
-	EXPECT_TRUE(bb1.is_bit(10));
-	EXPECT_TRUE(bb1.is_bit(20));
-	EXPECT_FALSE(bb1.is_bit(30));
-
-}
 
 TEST(BBNtest, IO) {
 

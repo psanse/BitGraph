@@ -10,6 +10,7 @@ project (graphlib
 # c++11 flag
 #
 #############
+
 include(CheckCXXCompilerFlag)
 CHECK_CXX_COMPILER_FLAG("-std=c++11" COMPILER_SUPPORTS_CXX11)
 CHECK_CXX_COMPILER_FLAG("-std=c++0x" COMPILER_SUPPORTS_CXX0X)
@@ -30,13 +31,13 @@ endif()
 #
 # USEFUL GLOBAL DEFINITIONS
 # (use inside the code)
+#
 #############
+
 set(PATH_GRAPH_TESTS_CMAKE_GUI ${CMAKE_SOURCE_DIR}/graph/data CACHE PATH "PATH for GRAPH unit tests")
-#message("PATH_GRAPH_TESTS_CMAKE_GUI='${PATH_GRAPH_TESTS_CMAKE_GUI}'")
 add_definitions (-DPATH_GRAPH_TESTS_CMAKE_SRC_CODE=\"${PATH_GRAPH_TESTS_CMAKE_GUI}/\") 
 
 set(PATH_COPT_TESTS_CMAKE_GUI ${CMAKE_SOURCE_DIR}/copt/data CACHE PATH "PATH for COPT unit tests")
-#message("PATH_COPT_TESTS_CMAKE_GUI='${PATH_COPT_TESTS_CMAKE_GUI}'")
 add_definitions (-DPATH_COPT_TESTS_CMAKE_SRC_CODE=\"${PATH_COPT_TESTS_CMAKE_GUI}/\") 
 
 #old definitions - deprecated
@@ -44,8 +45,11 @@ add_definitions (-DPATH_COPT_TESTS_CMAKE_SRC_CODE=\"${PATH_COPT_TESTS_CMAKE_GUI}
 #add_definitions (-D_PATH_FOR_GRAPH_TESTS_DATA_IN_SRC_CODE=\"${CMAKE_SOURCE_DIR}/graph/data/\") 
 
 ##############
-#logger level (see utils/logger.h) configurable from CMake at run time
-#to note: there is no checking of the value if it is not set from the CMake GUI
+#
+# LOGGER LEVEL (see utils/logger.h) configurable from CMake at run time
+# comments: there is no checking of the value if it is not set from the CMake GUI
+##############
+
 set(LOG_LEVEL "debug" CACHE STRING "LOG_LEVEL chosen in CMake at run time")
 set_property(CACHE LOG_LEVEL PROPERTY STRINGS debug verbose error)
 message("LOGGER_LEVEL='${LOG_LEVEL}'")
@@ -65,7 +69,7 @@ endif()
 #############
 #
 # OpenMP (Windows)
-# note: found nothing better than to set it globally for all targets
+# comments: found nothing better than to set it globally for all targets
 #############
 
 if (WIN32)
@@ -99,7 +103,6 @@ endif()
 # Deploy BITSCAN and GRAPH libraries
 #
 #############
-
 
 set(INSTALL_PATH "${CMAKE_CURRENT_SOURCE_DIR}/example" CACHE PATH "Directory chosen to deploy project")
 set(CMAKE_INSTALL_PREFIX ${INSTALL_PATH})
