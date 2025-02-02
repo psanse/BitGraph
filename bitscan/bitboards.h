@@ -93,7 +93,7 @@ virtual ~BitBoardS					(){clear();}
 //setters and getters (will not allocate memory)
 											
 	int number_of_bitblocks			()						const {return m_aBB.size();}
-	BITBOARD get_bitboard			(int index)				const {return m_aBB[index].bb;}			//index in the collection			
+	BITBOARD get_bitblock			(int index)				const {return m_aBB[index].bb;}			//index in the collection			
 	BITBOARD find_bitboard			(int block_index)		const;									//O(log) operation
 	pair<bool, int>	 find_pos		(int block_index)		const;									//O(log) operation
 	pair<bool, velem_it> find_block	(int block_index, bool is_lb=true);	

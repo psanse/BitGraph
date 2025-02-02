@@ -9,7 +9,7 @@ BBSentinel&  AND (const BitBoardN& lhs, const BBSentinel& rhs,  BBSentinel& res)
 	res.m_BBL=rhs.m_BBL;
 	res.m_BBH=rhs.m_BBH;
 	for(int i=rhs.m_BBL; i<=rhs.m_BBH; i++){
-		res.m_aBB[i]=lhs.get_bitboard(i)&rhs.m_aBB[i];
+		res.m_aBB[i]=lhs.get_bitblock(i)&rhs.m_aBB[i];
 	}
 return res;
 }
@@ -208,7 +208,7 @@ BBSentinel& BBSentinel::erase_bit (const BitBoardN& bbn){
 // 1.Has to be careful with BitBoardN cast to int in constructor
 	
 	for(int i=m_BBL; i<=m_BBH; i++)
-		m_aBB[i] &= ~ bbn.get_bitboard(i);		//**access
+		m_aBB[i] &= ~ bbn.get_bitblock(i);		//**access
 
 return *this;
 }
@@ -283,7 +283,7 @@ BBSentinel& BBSentinel::operator&=	(const  BitBoardN& bbn){
 // AND operation in the range of the sentinels
 
 	for(int i=m_BBL; i<=m_BBH; i++){
-		this->m_aBB[i] &= bbn.get_bitboard(i);
+		this->m_aBB[i] &= bbn.get_bitblock(i);
 	}
 
 	return  *this;

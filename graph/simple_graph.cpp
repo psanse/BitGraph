@@ -206,15 +206,15 @@ Graph<T>& Graph<T>::create_subgraph (std::size_t first_k, Graph<T>& newg) const 
 		return newg;
 	}
 
-	std::size_t bbh = WDIV (first_k - 1);
+	auto bbh = WDIV (first_k - 1);
 	
 	//copy the relevant vertices of the adjacency matrix
-	for(std::size_t i=0; i<newg.NV_; i++){
-		for(std::size_t j=0; j<=bbh; j++){
-			newg.adj_[i].get_bitboard(j)=adj_[i].get_bitboard(j);
+	for(auto i = 0; i < newg.NV_; ++i){
+		for(auto j = 0; j <= bbh; ++j){
+			newg.adj_[i].get_bitblock(j)=adj_[i].get_bitblock(j);
 		}
 		//trims last bitblock
-		newg.adj_[i].get_bitboard(bbh)&=~Tables::mask_left[WMOD(first_k - 1)];
+		newg.adj_[i].get_bitblock(bbh) &= ~Tables::mask_left[WMOD(first_k - 1)];
 	}
 	
 	return newg;
@@ -618,7 +618,7 @@ double Graph<T>::block_density	()	const {
 	size_t nBB = 0;
 	for(int v = 0; v < NV_; ++v){
 		for(int bb = 0; bb < NBB_; bb++){
-			if(adj_[v].get_bitboard(bb))		//non-empty bitblock				
+			if(adj_[v].get_bitblock(bb))		//non-empty bitblock				
 				nBB++;						
 		}
 	}
@@ -887,7 +887,7 @@ void  Graph<T>::write_EDGES	(ostream& o){
 //	for (int v = 0; v < NV_; ++v) {
 //		nBBt += adj_[v].number_of_bitblocks();
 //		for (int bb = 0; bb < adj_[v].number_of_bitblocks(); bb++) {
-//			if (adj_[v].get_bitboard(bb))
+//			if (adj_[v].get_bitblock(bb))
 //				nBB++;
 //		}
 //	}

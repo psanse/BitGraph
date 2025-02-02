@@ -87,11 +87,11 @@ virtual	~BitBoardN					();
 /////////////////////
 //setters and getters (will not allocate memory)
 	
-	BITBOARD* get_bitstring			();
-	const BITBOARD* get_bitstring	()			const;
+	BITBOARD* get_bitstring			()									{ return m_aBB; }
+	const BITBOARD* get_bitstring	()			const					{ return m_aBB; }
 	int number_of_bitblocks			()			const					{ return m_nBB; }
-const BITBOARD get_bitboard			(int block) const					{ return m_aBB[block]; }
-	BITBOARD& get_bitboard			(int block)							{ return m_aBB[block]; }
+const BITBOARD get_bitblock			(int block) const					{ return m_aBB[block]; }
+	BITBOARD& get_bitblock			(int block)							{ return m_aBB[block]; }
 
 //////////////////////////////
 // Bitscanning

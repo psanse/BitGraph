@@ -83,7 +83,7 @@ inline double Graph<sparse_bitarray>::block_density()	const {
 	for (std::size_t v = 0; v < NV_; ++v) {
 		nBBt += adj_[v].number_of_bitblocks();
 		for (std::size_t bb = 0; bb < adj_[v].number_of_bitblocks(); bb++) {
-			if (adj_[v].get_bitboard(bb)) {
+			if (adj_[v].get_bitblock(bb)) {
 				nBB++;								//nBB should be equal to nBBt
 			}
 		}

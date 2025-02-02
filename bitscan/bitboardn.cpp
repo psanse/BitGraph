@@ -311,14 +311,6 @@ void BitBoardN::init(int popsize, const vint&v){
 }
 
 
-BITBOARD* BitBoardN::get_bitstring (){
-	return m_aBB;
-}
-
-const BITBOARD* BitBoardN::get_bitstring ()	const{
-	return m_aBB;
-}
-
 void BitBoardN::init(int popsize, bool reset){
 //////////////////////
 // only way to change storage space once constructed
