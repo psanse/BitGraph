@@ -279,16 +279,33 @@ inline int  find_singleton			(int low, int high, int& singleton)				const;
 inline int first_found				(const BitBoardN& rhs)							const;					//first vertex in common with rhs  (7/17)
 
 /////////////////////////////
-//Boolean functions
+//Boolean functions - CHECK UNIT TESTS
 
 	inline bool is_bit				(int bit)										const;
 inline virtual bool is_empty		()												const;	
 inline virtual bool is_empty		(int firstBlock, int lastBlock)					const;
 	inline bool is_singleton		()												const;					//only one element- /*TODO (15/3/17) -extend to a range of bits*/
+	
+	/**
+	* @brief TRUE if this bitstring has no bits in common with rhs
+	**/
 	inline bool is_disjoint			(const BitBoardN& rhs)							const;
-	inline bool is_disjoint			(int firstBlock, int lastBlock,
-										const BitBoardN& rhs			)			const;
-	inline bool is_disjoint			(const BitBoardN& lhs, const  BitBoardN& rhs)	const;					//no bit in common with both a and b (not available in sparse bitsets)
+	
+	/**
+	* @brief TRUE if this bitstring has no bits in common with neither lhs NOR rhs bitstrings
+	* @details Currently not available for sparse bitsets
+	**/
+	inline bool is_disjoint			(const BitBoardN& lhs, const  BitBoardN& rhs)	const;
+	
+	/**
+	* @brief TRUE if this bitstring has no bits in common with rhs
+	*		 in the closed range [firstBlock, lastBlock].
+	* 
+	*		If lastBlock == -1, the range is [firstBlock, m_nBB]
+	**/
+	inline bool is_disjoint_block_range	(int firstBlock, int lastBlock,
+											const BitBoardN& rhs		)			const;
+			
 
 /////////////////////
 // I/O 
@@ -531,10 +548,16 @@ bool BitBoardN::is_disjoint	(const BitBoardN& lhs,  const BitBoardN& rhs)	const
 	return true;
 }
 
-inline bool BitBoardN::is_disjoint (int first_block, int last_block,const BitBoardN& rhs)	const{
-///////////////////
-// no checking of block indexes
-	for (auto i = first_block; i <= last_block; ++i) {
+inline 
+bool BitBoardN::is_disjoint_block_range (int firstBlock, int lastBlock, const BitBoardN& rhs)	const{
+
+	///////////////////////////////////////////////////////////////////////////////
+	assert((firstBlock >= 0) && (lastBlock < m_nBB) && (firstBlock <= lastBlock));
+	///////////////////////////////////////////////////////////////////////////////
+
+	int last_block = ((lastBlock == -1) ? m_nBB - 1 : lastBlock);
+
+	for (auto i = firstBlock; i <= last_block; ++i) {
 		if (m_aBB[i] & rhs.m_aBB[i]) {
 			return false;
 		}
