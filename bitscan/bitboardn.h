@@ -230,7 +230,7 @@ inline	BitBoardN& erase_bit		(int FirstBlock, const BitBoardN& bb_del_lhs, const
 //BitBlock operations 
 
 	/**
-	* @brief Copies the 1-bits from the bitstring bb_add in the closde range [FirstBlock, LastBlock]
+	* @brief Copies the 1-bits from the bitstring bb_add in the closed range [FirstBlock, LastBlock]
 	*		 If LastBlock == -1, the range is the whole bitstring.
 	* 
 	*		 0 <= FirstBlock <= LastBLock < the number of bitblocks in the bitstring
