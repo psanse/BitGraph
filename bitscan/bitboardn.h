@@ -213,37 +213,48 @@ inline	BitBoardN& erase_bit		(const BitBoardN& bb_del);
 		* @last_update: 02/02/2025
 		**/
 inline	BitBoardN& erase_bit		(const BitBoardN& bb_del_lhs, const BitBoardN& bb_del_rhs);
-
-		/**
-		* @brief Removes the 1-bits from both input bitstrings (their union)
-		*		inside the population range, starting from FirstBlock until the end.
-		* @param FirstBlock: the first bitblock to be modified
-		* @param bb_del_lhs, bb_del_rhs : bitstrings to be removed
-		* @returns reference to the modified bitstring
-		* @details: created 30/7/2017, for the MWCP
-		* 
-		* TODO - possibly too specific (index block parameter). REMOVE or REFACTOR to a block operation (02/02/25)
-		**/
-inline	BitBoardN& erase_bit		(int FirstBlock, const BitBoardN& bb_del_lhs, const BitBoardN& bb_del_rhs);		
-				
+						
 /////////////////////
 //BitBlock operations 
 
 	/**
 	* @brief Copies the 1-bits from the bitstring bb_add in the closed range [FirstBlock, LastBlock]
-	*		 If LastBlock == -1, the range is the whole bitstring.
+	*		 If LastBlock == -1, the range is [FirstBlock, m_nBB]
 	* 
 	*		 0 <= FirstBlock <= LastBLock < the number of bitblocks in the bitstring
 	* 
 	* @param bb_add: input bitstring to be copied
 	* @param FirstBlock: the first bitblock to be modified
+	* @param LastBLock: the last bitblock to be modified
 	* @returns reference to the modified bitstring
 	**/
 	BitBoardN& set_block			(int FirstBlock, int LastBlock, const BitBoardN& bb_add);
+	
+	/**
+	* @brief Deletes the 1-bits from the bitstring bb_del in the closed range [FirstBlock, LastBlock]
+	*		 If LastBlock == -1, the range is the whole bitstring.
+	*
+	*		 0 <= FirstBlock <= LastBLock < the number of bitblocks in the bitstring
+	*
+	* @param bb_del: input bitstring whose 1-bits are to be removed	
+	* @param FirstBlock: the first bitblock to be modified
+	* @param LastBLock: the last bitblock to be modified
+	* @returns reference to the modified bitstring
+	**/
+	inline	BitBoardN& erase_block	(int FirstBlock, int LastBlock, const BitBoardN& bb_del);
 
-inline	BitBoardN& erase_block(int FirstBlock, const BitBoardN& bb_del);								//range versions
-inline	BitBoardN& erase_block(int FirstBlock, int LastBlock, const BitBoardN& bb_del);					//range versions
-inline	BitBoardN& erase_block_reverse(int LastBlock, const BitBoardN& bb_del);
+	/**
+	* @brief Removes the 1-bits from both input bitstrings (their union)
+	*		in the closed range of bitblocks [FirstBlock, LastBlock]
+	*		If LastBlock == -1, the range is [FirstBlock, m_nBB]
+	* 
+	* @param FirstBlock: the first bitblock to be modified
+	* @param bb_del_lhs, bb_del_rhs : bitstrings whose 1-bits are to be removed
+	* @returns reference to the modified bitstring
+	* @date: 02/02/2025 during a refactorization of BITSCAN
+	*
+	**/
+	inline	BitBoardN& erase_block (int FirstBlock, int LastBlock, const BitBoardN& bb_del_lhs, const BitBoardN& bb_del_rhs);
 
 ////////////////////////
 //operators
@@ -1017,9 +1028,16 @@ BitBoardN& BitBoardN::erase_bit (const BitBoardN& bb_lhs, const BitBoardN& bb_rh
 }
 
 inline
-BitBoardN& BitBoardN::erase_bit (int FirstBlock, const BitBoardN& bb_lhs, const BitBoardN& bb_rhs ){
+BitBoardN& BitBoardN::erase_block (int FirstBlock, int LastBlock, const BitBoardN& bb_lhs, const BitBoardN& bb_rhs ){
 
-	for (auto i = FirstBlock; i < m_nBB; ++i) {
+	///////////////////////////////////////////////////////////////////////////////
+	assert((FirstBlock >= 0) && (LastBlock < m_nBB) && (FirstBlock <= LastBlock));
+	///////////////////////////////////////////////////////////////////////////////
+
+	int last_block;
+	(LastBlock == -1) ? last_block = m_nBB - 1 : last_block = LastBlock;
+
+	for (auto i = FirstBlock; i <= LastBlock; ++i) {
 		m_aBB[i] &= ~(bb_lhs.m_aBB[i] | bb_rhs.m_aBB[i]);
 	}
 
@@ -1027,37 +1045,21 @@ BitBoardN& BitBoardN::erase_bit (int FirstBlock, const BitBoardN& bb_lhs, const 
 }
 
 inline
-BitBoardN& BitBoardN::erase_block	(int first_block, const BitBoardN& bb_del){
-/////////////////////////////
-// deletes from block_first (included) to the end of the bitsring
-	for(int i=first_block; i<m_nBB; i++)
-			m_aBB[i] &= ~ bb_del.m_aBB[i];
-return *this;
-}
+BitBoardN& BitBoardN::erase_block(int FirstBlock, int LastBlock, const BitBoardN& bb_del){
 
-inline
-BitBoardN& BitBoardN::erase_block(int block_first, int block_last, const BitBoardN& bb_del){
-/////////////////////////////
-// deletes from block_first (CLOSED RANGE) the 1-bits in bb_del
-// assert(block_first<=block_last) 
-// 
-// REMARKS: population size not checked
+	///////////////////////////////////////////////////////////////////////////////
+	assert((FirstBlock >= 0) && (LastBlock < m_nBB) && (FirstBlock <= LastBlock));
+	///////////////////////////////////////////////////////////////////////////////
 
-	for(int i=block_first; i<=block_last; i++)
-			m_aBB[i] &= ~ bb_del.m_aBB[i];
+	int last_block;
+	(LastBlock == -1) ? last_block = m_nBB - 1 : last_block = LastBlock;
 
-return *this;
-}
-
-inline BitBoardN & BitBoardN::erase_block_reverse(int last_block, const BitBoardN & bb_del)
-{
-	/////////////////////////////
-// deletes from block_first (included) to the end of the bitsring
-	for (int i = last_block; i >=0; i--)
+	for (auto i = FirstBlock; i <= last_block; ++i) {
 		m_aBB[i] &= ~bb_del.m_aBB[i];
+	}
+
 	return *this;
 }
-
 
 
 inline

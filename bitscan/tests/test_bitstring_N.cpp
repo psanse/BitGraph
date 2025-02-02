@@ -529,10 +529,8 @@ TEST(BBNtest, GenRandom){
 	EXPECT_TRUE(abs(av_of_elems-DENSITY)<TOLERANCE);
 }
 
+TEST(BBNtest, set_block){
 
-
-TEST(BBNtest, block_copying){
-//date: 21/12/14
 	BitBoardN bb(130);
 	bb.set_bit<true>(0,54);
 	BitBoardN bb1(130);
@@ -549,6 +547,20 @@ TEST(BBNtest, block_copying){
 	EXPECT_TRUE(bb.is_bit(50));
 	EXPECT_TRUE(bb.is_bit(63));
 	EXPECT_FALSE(bb.is_bit(64));
+}
+
+TEST(BBNtest, erase_block) {
+	
+	BitBoardN bb(130);
+	bb.set_bit<true>(49, 54);
+	BitBoardN bb1(130);
+	bb1.set_bit<true>(50, 100);
+		
+	bb.erase_block(0, -1, bb1);			//bb={49}
+	EXPECT_FALSE(bb.is_bit(50));
+	EXPECT_TRUE(bb.is_bit(49));
+	EXPECT_EQ(1, bb.popcn64());
+
 }
 
 TEST(BBNtest, single_disjoint){
