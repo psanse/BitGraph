@@ -27,8 +27,7 @@
 #include <vector>	
 #include "utils/common.h"			//stack
 
-//uncomment NDEBUG in config.h to enable assertions
-#include <cassert>
+#include <cassert>					//uncomment NDEBUG in config.h to enable run-time assertions
 
 //alias
 using vint = std::vector<int>;
@@ -368,8 +367,9 @@ protected:
 
 }; //end BitBoardN class
 
-//////////////////////////////////
-// Inline functions implementations - necessary in header file
+////////////////////////////////////////////////////////////////////////////////////////
+// 
+// Inline function implementations - must be in header file
 
 inline 
 int BitBoardN::first_found	(const BitBoardN& rhs) const{
