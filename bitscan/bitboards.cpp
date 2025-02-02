@@ -50,6 +50,7 @@ void BitBoardS::sort (){
 	std::sort(m_aBB.begin(), m_aBB.end(), elem_less());
 }	
 
+
 int	 BitBoardS::set_bit	(int low, int high){
 ///////////////////
 // sets bits to one in the corresponding CLOSED range

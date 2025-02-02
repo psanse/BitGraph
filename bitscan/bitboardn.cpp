@@ -540,29 +540,6 @@ BitBoardN& BitBoardN::operator =  (const BitBoardN& bbN){
 	return *this;
 }
 
-BitBoardN& BitBoardN::set_bit (const vint& lv, bool reset) {
-
-	//cleans the bitstring if required
-	if (reset) {
-		erase_bit();
-	}
-
-	//copies elements up to the maximum capacity of the bitstring
-	auto POPSIZE = WMUL(m_nBB);
-	for (auto i = 0; i < lv.size(); ++i) {
-
-		/////////////////////
-		assert(lv[i] >= 0);
-		////////////////////
-
-		if (lv[i] < POPSIZE /* 1-based*/) {
-			set_bit(lv[i]);
-		}
-	}
-
-	return *this;
-
-}
 
 
 

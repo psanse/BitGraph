@@ -112,34 +112,48 @@ virtual	inline int popcn64			()						const;		//lookup
 virtual	inline int popcn64			(int nBit/* 0 based*/)	const;
 
 /////////////////////
-//Set/Delete Bits 
-
-inline	void  init_bit				(int bit);	
-inline	int   init_bit				(int lbit, int rbit);
-		int   init_bit				(int high, const BitBoardN& bb_add);						    //copies bb_add in range [0, high] *** rename probably
-inline	void  copy_from_block		(int first_block, const BitBoardN& bb_add);						//copies from first_block (included) onwards
-inline	void  copy_up_to_block		(int last_block, const BitBoardN& bb_add);						//copies up to last_block (included)
-	
+//Setting / Deletion 
+			
 		/**
-		* @brief sets bit to 1 in the bitstring
-		* @param  bit: index of the bit to set
+		* @brief sets bit in position idx to 1 in the bitstring
+		* @param  idx: index of the bit to set (nBit >= 0)
 		**/
-		BitBoardN&  set_bit			(int bit);
+		
+		template<bool EraseAll = false>
+		BitBoardN&  set_bit			(int nBit);
 
 		/**
 		* @brief sets the bits in the closed range [low, high] to 1 in the bitstring
-		* @params low, high: range to be set
+		* @params low, high: range to be set (>= 0)
 		* @date 22/9/14
 		* @last_update 01/02/25
 		**/
+		template<bool EraseAll = false>
 inline  BitBoardN&	 set_bit		(int low, int high);											
 
 		/**
 		* @brief sets all bits to 1
 		**/
 inline  BitBoardN&  set_bit			();
-	 
-		void  set_bit				(const BitBoardN& bb_add);										//similar to OR, experimental
+	 	
+		/**
+		* @brief Adds the bits from the bitstring bb_add in the population
+		*		 range of the bitstring (bitblocks are copied).
+		* 
+		*		 I. The bitblock size of bb_add must be at least as large as the bitstring.
+		*		
+		* @details  Equivalent to OR operation / set union
+		* @returns reference to the modified bitstring
+		* 
+		**/
+inline	BitBoardN& set_bit			(const BitBoardN& bb_add);
+		
+		/**
+		* @brief Adds the bits from the bitstring bb_add in the range [0, lastBit] 
+		* @param lastBit : the last bit in the range to be copied
+		* @returns reference to the modified bitstring
+		**/
+inline BitBoardN& set_bit			(int lastBit, const BitBoardN& bb_add);
 	 
 	   /**
 	   * @brief Adds elements from a vector of non-negative integers lv as 1-bit
@@ -147,29 +161,86 @@ inline  BitBoardN&  set_bit			();
 	   *		maximum population size are ignored.
 	   * 
 	   * @param lv: vector of non-negative integers
-	   * @param reset: if true, deletes the rest of bits in the bitstring
+	   * @param EraseAll <template>: if true, deletes the rest of bits in the bitstring
 	   * @returns reference to the modified bitstring
 	   * @details negative elements will cause an assertion if NDEBUG is not defined, 
 	   *		  else the behaviour is undefined.
 	   **/
-	   BitBoardN& set_bit			(const vint& lv, bool reset = false);
+		template<bool EraseAll = false>	
+	   BitBoardN& set_bit			(const vint& lv);
 
-		void set_block				(int first_block, const BitBoardN& bb_add);						//OR:closed range
-		void set_block				(int first_block, int last_block,  const BitBoardN& bb_add);	//OR:closed range
+		/**
+		* @brief sets bit number nBit to 0 in the bitstring
+		* @param  nBit: index of the bit to set (>=0)
+		* @returns reference to the modified bitstring
+		**/
+inline	BitBoardN& erase_bit		(int nBit);
 
-inline void  erase_bit				(int nbit);
-inline int   erase_bit				(int low, int high);
-inline void  erase_bit				();
+		/**
+		* @brief sets the bits in the closed range [low, high] to 0 in the bitstring
+		* @params low, high: range to be set (>= 0)	
+		* @created 22/9/14
+		* @last_update 01/02/25
+		**/
+inline BitBoardN& erase_bit			(int low, int high);
+
+		/**
+		* @brief sets all bits to 0
+		* @returns reference to the modified bitstring
+		**/
+inline BitBoardN& erase_bit			();
+
+		/**
+		* @brief Removes the bits from the bitstring bb_del inside the population
+		*		 range.
+		*
+		*		 I. bb_del must have a maximum population
+		*			greater or equal than the bitstring.
+		*
+		* @details  Equivalent to a set minus operation
+		* @returns reference to the modified bitstring
+		*
+		**/
 inline	BitBoardN& erase_bit		(const BitBoardN& bb_del);	
-inline	BitBoardN& erase_bit_joint	(const BitBoardN& bb_del_lhs, const BitBoardN& bb_del_rhs);					//erase (lhs U rhs)
-inline	BitBoardN& erase_bit_joint	(int low, const BitBoardN& bb_del_lhs, const BitBoardN& bb_del_rhs);		//erase (lhs U rhs)
 
-inline	BitBoardN& erase_block			(int first_block, const BitBoardN& bb_del);						//range versions
-inline	BitBoardN& erase_block			(int first_block, int last_block, const BitBoardN& bb_del);		//range versions
-inline	BitBoardN& erase_block_reverse	(int last_block, const BitBoardN& bb_del);						
+		/**
+		* @brief Removes the 1-bits from both input bitstrings (their union) 
+		*		inside the population range. The sizes of both input bitstrings
+		*		must be greater than the destination bitstring (*this)
+		* @param bb_del_lhs, bb_del_rhs : bitstrings to be removed
+		* @returns reference to the modified bitstring
+		* @created: 30/7/2017  for the MWCP
+		* @last_update: 02/02/2025
+		**/
+inline	BitBoardN& erase_bit		(const BitBoardN& bb_del_lhs, const BitBoardN& bb_del_rhs);
+
+		/**
+		* @brief Removes the 1-bits from both input bitstrings (their union)
+		*		inside the population range, starting from FirstBlock until the end.
+		* @param FirstBlock: the first bitblock to be modified
+		* @param bb_del_lhs, bb_del_rhs : bitstrings to be removed
+		* @returns reference to the modified bitstring
+		* @details: created 30/7/2017, for the MWCP
+		* 
+		* TODO - possibly too specific (index block parameter). REMOVE or REFACTOR to a block operation (02/02/25)
+		**/
+inline	BitBoardN& erase_bit		(int FirstBlock, const BitBoardN& bb_del_lhs, const BitBoardN& bb_del_rhs);		
+				
+/////////////////////
+//BitBlock operations 
+
+inline	void  copy_from_block(int first_block, const BitBoardN& bb_add);						//copies from first_block (included) onwards
+inline	void  copy_up_to_block(int last_block, const BitBoardN& bb_add);						//copies up to last_block (included)
+
+void set_block(int first_block, const BitBoardN& bb_add);										//OR:closed range
+void set_block(int first_block, int last_block, const BitBoardN& bb_add);						//OR:closed range
+
+inline	BitBoardN& erase_block(int first_block, const BitBoardN& bb_del);						//range versions
+inline	BitBoardN& erase_block(int first_block, int last_block, const BitBoardN& bb_del);		//range versions
+inline	BitBoardN& erase_block_reverse(int last_block, const BitBoardN& bb_del);
 
 ////////////////////////
-//member operators (must have same block size)
+//operators
 				
 	BitBoardN& operator &=			(const BitBoardN& );													//bitset_intersection
 	BitBoardN& operator |=			(const BitBoardN& );													//bitset_union
@@ -179,25 +250,27 @@ inline	BitBoardN& erase_block_reverse	(int last_block, const BitBoardN& bb_del);
 	BitBoardN&  OR_EQ				(int first_block, const BitBoardN& rhs );								//OR:  range
 		
 	BitBoardN& flip					();
-inline	int	single_disjoint			(const BitBoardN& rhs, int& vertex)			const;						//non-disjoint by single element
-inline	int	single_disjoint			(int first_block, int last_block, const BitBoardN& rhs, int& vertex) const;
-inline	int	single_joint			(const BitBoardN& rhs, int& vertex)			const;						//non-joint by single element (this\rhs)
-inline int double_joint				(const BitBoardN& rhs, int& v, int& w)		const;						//non_joint by one or two elements (this\rhs)
-inline int  is_singleton			(int vlhs, int vrhs)						const;						//single vertex inside range
-inline int  find_singleton			(int low, int high, int& singleton)		    const;
+inline	int	single_disjoint			(const BitBoardN& rhs, int& vertex)				const;					//non-disjoint by single element
+inline	int	single_disjoint			(int first_block, int last_block, 
+										const BitBoardN& rhs, int& vertex)			const;
+inline	int	single_joint			(const BitBoardN& rhs, int& vertex)				const;					//non-joint by single element (this\rhs)
+inline int double_joint				(const BitBoardN& rhs, int& v, int& w)			const;					//non_joint by one or two elements (this\rhs)
+inline int  is_singleton			(int vlhs, int vrhs)							const;					//single vertex inside range
+inline int  find_singleton			(int low, int high, int& singleton)				const;
 
-inline int first_found				(const BitBoardN& rhs)						const;						//first vertex in common with rhs  (7/17)
+inline int first_found				(const BitBoardN& rhs)							const;					//first vertex in common with rhs  (7/17)
 
 /////////////////////////////
 //Boolean functions
 
-	inline bool is_bit				(int nbit)							const;
-inline virtual bool is_empty		()									const;	
-inline virtual bool is_empty		(int nBBL, int nBBH)				const;						
-	inline bool is_singleton		()									const;						//only one element- /*TODO (15/3/17) -extend to a range of bits*/
-	inline bool is_disjoint			(const BitBoardN& rhs)				const;
-	inline bool is_disjoint			(int first_block, int last_block,const BitBoardN& rhs)	const;
-	inline bool is_disjoint			(const BitBoardN& a, const  BitBoardN& b)		const;		//no bit in common with both a and b (not available in sparse bitsets)
+	inline bool is_bit				(int nbit)										const;
+inline virtual bool is_empty		()												const;	
+inline virtual bool is_empty		(int nBBL, int nBBH)							const;						
+	inline bool is_singleton		()												const;					//only one element- /*TODO (15/3/17) -extend to a range of bits*/
+	inline bool is_disjoint			(const BitBoardN& rhs)							const;
+	inline bool is_disjoint			(int first_block, int last_block,
+										const BitBoardN& rhs			)			const;
+	inline bool is_disjoint			(const BitBoardN& a, const  BitBoardN& b)		const;					//no bit in common with both a and b (not available in sparse bitsets)
 
 /////////////////////
 // I/O 
@@ -260,11 +333,8 @@ protected:
 
 }; //end BitBoardN class
 
-
-
 //////////////////////////////////
 // Inline functions implementations - necessary in header file
-
 
 inline 
 int BitBoardN::first_found	(const BitBoardN& rhs) const{
@@ -352,7 +422,6 @@ inline int BitBoardN::next_bit_if_del(int nBit/* 0 based*/) const{
 return -1;	
 }
 
-
 inline int BitBoardN::previous_bit(int nBit/* 0 bsed*/) const{
 ////////////////////////////
 // Gets the previous bit to nBit. If nBits is -10 is a MSB
@@ -402,103 +471,69 @@ inline bool BitBoardN::is_bit (int nbit/*0 based*/) const{
  
 inline bool BitBoardN::is_empty() const
 {
-	for(int i=0; i<m_nBB; i++)
-			if(m_aBB[i]) return false;
+	for (auto i = 0; i < m_nBB; ++i) {
+		if (m_aBB[i]) {
+			return false;
+		}
+	}
 
-return true;	
+	return true;	
 }
 
-inline bool BitBoardN::is_empty	(int nBBL, int nBBH) const{
-	for(int i=nBBL; i<=nBBH; ++i)
-			if(m_aBB[i]) return false;
+inline bool BitBoardN::is_empty	(int nBBL, int nBBH) const
+{
+	for (auto i = nBBL; i <= nBBH; ++i) {
+		if (m_aBB[i]) {
+			return false;
+		}
+	}
 
-return true;	
+	return true;	
 }
 
-inline bool BitBoardN::is_disjoint	(const BitBoardN& rhs) const{
-	for(int i=0; i<m_nBB; ++i)
-		if(m_aBB[i]& rhs.m_aBB[i]) return false;
-return true;
+inline 
+bool BitBoardN::is_disjoint	(const BitBoardN& rhs) const
+{
+	for (auto i = 0; i < m_nBB; ++i) {
+		if (m_aBB[i] & rhs.m_aBB[i]) {
+			return false;
+		}
+	}
+	return true;
 }
 
-inline bool BitBoardN::is_disjoint	(const BitBoardN& lhs,  const BitBoardN& rhs)	const{
-	for(int i=0; i<m_nBB; ++i)
+inline 
+bool BitBoardN::is_disjoint	(const BitBoardN& lhs,  const BitBoardN& rhs)	const
+{
+	for(auto i = 0; i < m_nBB; ++i)
 		if(m_aBB[i] & lhs.m_aBB[i] & rhs.m_aBB[i]) return false;
 return true;
 }
 
-
-
 inline bool BitBoardN::is_disjoint (int first_block, int last_block,const BitBoardN& rhs)	const{
 ///////////////////
 // no checking of block indexes
-	for(int i=first_block; i<=last_block; ++i)
-			if(m_aBB[i]& rhs.m_aBB[i]) return false;
-return true;
-}
-
-inline void BitBoardN::erase_bit (int nbit /*0 based*/){
-
-	m_aBB[WDIV(nbit)] &= ~Tables::mask[WMOD(nbit)];
-}
-
-inline void  BitBoardN::init_bit(int nbit){
-///////////////////
-// sets nbit and clears the rest
-	erase_bit();
-	set_bit(nbit);
-}
-
-inline int BitBoardN::init_bit(int low, int high){
-///////////////////
-// sets bits to 1 from lbit to rbit included and clears the rest
-	int bbl= WDIV(low);
-	int bbh= WDIV(high);
-
-	//checks consistency (***use ASSERT)
-	if(bbh<bbl || bbl<0 || low>high || low<0){
-		std::cerr << "Error in set bit in range" << std::endl;
-		return -1;
+	for (auto i = first_block; i <= last_block; ++i) {
+		if (m_aBB[i] & rhs.m_aBB[i]) {
+			return false;
+		}
 	}
-
-	if(bbl==bbh){
-		m_aBB[bbh]=bblock::MASK_1(low-WMUL(bbl), high-WMUL(bbh));
-	}else{
-		for(int i=bbl+1; i<=bbh-1; i++)	
-			m_aBB[i]=ONE;
-
-		m_aBB[bbl]=~Tables::mask_right[low-WMUL(bbl)];
-		m_aBB[bbh]=~Tables::mask_left[high-WMUL(bbh)];	
-	}
-
-	//clears the rest
-	for(int i=0; i<bbl; i++)	
-		m_aBB[i]=ZERO;
-
-	for(int i=bbh+1; i<m_nBB; i++)	
-		m_aBB[i]=ZERO;
-
-	return 0;
+	return true;
 }
 
 inline
-int BitBoardN::init_bit (int high, const BitBoardN& bb_add){
-//////////////////////////////////
-// fast copying of bb_add up to, and including, high bit
+BitBoardN& BitBoardN::set_bit (int high, const BitBoardN& bb_add){
 
-	int bbh= WDIV(high);
+	int bbh = WDIV(high);	
 
-	//***checks consistency (***use ASSERT)
-
-	for(int i=0; i<=bbh; i++){
-		m_aBB[i]=bb_add.m_aBB[i];
+	for(auto i = 0; i <= bbh; ++i){
+		m_aBB[i] = bb_add.m_aBB[i];
 	}
 
-	//trim last bit block up to high
-	m_aBB[bbh] &= bblock::MASK_1(0, high-WMUL(bbh)); 
-
-
-return 0;
+	//trim last bit block up to, and exluding, high
+	m_aBB[bbh] &= bblock::MASK_1_RIGHT(high - WMUL(bbh));			//also m_aBB[bbh] &= bblock::MASK_1(0, high - WMUL(bbh)); 
+	
+	return *this;
 }
 
 inline
@@ -603,43 +638,49 @@ inline void  BitBoardN::copy_up_to_block (int last_block, const BitBoardN& bb_ad
 		m_aBB[i]=bb_add.m_aBB[i];
 	}
 }
-
-inline BitBoardN& BitBoardN::set_bit	(int nbit /*0 based*/){
+template<bool EraseAll>
+inline BitBoardN& BitBoardN::set_bit	(int nbit ){
+	
+	if (EraseAll) {
+		erase_bit();
+	}
 
 	m_aBB[WDIV(nbit)] |= Tables::mask[WMOD(nbit)];
 	return *this;
 }	
 
+template<bool EraseAll>
 inline 
 BitBoardN&  BitBoardN::set_bit (int low, int high){
 
+	//////////////////////////////
+	assert(low < high || low > 0);
+	//////////////////////////////
+
 	int bbl= WDIV(low);
 	int bbh= WDIV(high); 
-		
-	/////////////////////////////////
-	assert(low < high || low > 0);
-	/////////////////////////////////
+	
 
-	if(bbl == bbh){
-				
+	//clears all bits if required
+	if (EraseAll) {
+		erase_bit();
+	}	
+
+	if(bbl == bbh)
+	{			
 		m_aBB[bbh] |= bblock::MASK_1(low - WMUL(bbl), high - WMUL(bbh));			//low - WMUL(bbl) = WMOD(bbl) but less expensive (CHECK 01/02/25)
-
-	/*	BITBOARD bb1 = m_aBB[bbh] | ~Tables::mask_left[high-WMUL(bbh)];
-		BITBOARD bb2 = m_aBB[bbl] | ~Tables::mask_right[low-WMUL(bbl)];
-		m_aBB[bbh] = bb1 & bb2;*/
 	}
-	else{
+	else
+	{
 		//set to one the intermediate blocks
 		for (int i = bbl + 1; i < bbh; ++i) {
 			m_aBB[i] = ONE;
 		}
 		
-		//deal with the first and last blocks
+		//sets the first and last blocks
 		m_aBB[bbh] |= bblock::MASK_1_RIGHT	(high - WMUL(bbh));
 		m_aBB[bbl] |= bblock::MASK_1_LEFT	(low - WMUL(bbl));
 
-		/*m_aBB[bbh] |= ~Tables::mask_left[high - WMUL(bbh)];			
-		m_aBB[bbl] |= ~Tables::mask_right[low - WMUL(bbl)];*/
 	}
 
 	return *this;
@@ -655,11 +696,17 @@ BitBoardN& BitBoardN::set_bit (){
 }
 
 inline
-void  BitBoardN::set_bit (const BitBoardN& bb_add){
-//////////////
-// copies 1-bits (equivalent to OR, set_union etc)
-	for(int i=0; i<m_nBB; i++)	
-		m_aBB[i]|=bb_add.m_aBB[i];
+BitBoardN&  BitBoardN::set_bit (const BitBoardN& bb_add){
+
+	/////////////////////////////////
+	assert(m_nBB <= bb_add.m_nBB);
+	/////////////////////////////////
+
+	for (auto i = 0; i < m_nBB; ++i) {
+		m_aBB[i] |= bb_add.m_aBB[i];
+	}
+
+	return *this;
 }
 
 inline
@@ -678,41 +725,51 @@ void  BitBoardN::set_block (int first_block, int last_block, const BitBoardN& bb
 				m_aBB[i]|=bb_add.m_aBB[i];
 }
 
-inline void	BitBoardN::erase_bit (){
-///////////////
-// sets all bit blocks to ZERO
-	for(int i=0; i<m_nBB; i++)	
-				m_aBB[i]=ZERO;
+inline
+BitBoardN& BitBoardN::erase_bit (){
+
+	for (auto i = 0; i < m_nBB; ++i) {
+		m_aBB[i] = ZERO;
+	}
+
+	return *this;
 }
 
-inline int  BitBoardN::erase_bit (int low, int high){
-/////////////////////
-// Set all bits (0 based)  to 0 in the closed range (including both ends)
-// date: 22/9/14	
+inline
+BitBoardN& BitBoardN::erase_bit(int nBit) {
 
-	int bbl= WDIV(low);
-	int bbh= WDIV(high); 
-	
-	//checks consistency (ASSERT)
-	if(bbh<bbl || bbl<0 || low>high || low<0){
-		std::cerr << "Error in set bit in range" << std::endl;
-		return -1;
+	m_aBB[WDIV(nBit)] &= ~Tables::mask[WMOD(nBit)]; 
+	return *this;
+}
+
+inline 
+BitBoardN&  BitBoardN::erase_bit (int low, int high){
+
+	/////////////////////////////////////////////
+	assert(low < high || low > 0 );
+	/////////////////////////////////////////////
+
+	int bbl = WDIV(low);
+	int bbh = WDIV(high);
+
+
+	if (bbl == bbh)
+	{
+		m_aBB[bbh] &= bblock::MASK_0(low - WMUL(bbl), high - WMUL(bbh));			//low - WMUL(bbl) = WMOD(bbl) but less expensive (CHECK 01/02/25)
+	}
+	else
+	{
+		//set to one the intermediate blocks
+		for (int i = bbl + 1; i < bbh; ++i) {
+			m_aBB[i] = ZERO;
+		}
+				
+		m_aBB[bbh] &= bblock::MASK_0_RIGHT	(high - WMUL(bbh));					//Tables::mask_left
+		m_aBB[bbl] &= bblock::MASK_0_LEFT	(low - WMUL(bbl));					//Tables::mask_right	
 	}
 
-	if(bbl==bbh){
-		BITBOARD bb1=m_aBB[bbh] & Tables::mask_left[high-WMUL(bbh)];
-		BITBOARD bb2=m_aBB[bbl] & Tables::mask_right[low-WMUL(bbl)];
-		m_aBB[bbh]=bb1 | bb2;
-	}
-	else{
-		for(int i=bbl+1; i<=bbh-1; i++)	
-			m_aBB[i]=ZERO;
+	return *this;
 
-		//lower
-		m_aBB[bbh] &= Tables::mask_left[high-WMUL(bbh)];			
-		m_aBB[bbl] &= Tables::mask_right[low-WMUL(bbl)];
-	}
-return 0;
 }
 
 inline int BitBoardN::lsbn64() const{
@@ -942,34 +999,32 @@ bool operator!=	(const BitBoardN& lhs, const BitBoardN& rhs){
 
 inline
 BitBoardN& BitBoardN::erase_bit (const BitBoardN& bbn){
-//////////////////////////////
-// deletes bbn from current bitstring
 
-	for(int i=0; i<m_nBB; i++)
-			m_aBB[i] &= ~ bbn.m_aBB[i];
-return *this;
+	for (auto i = 0; i < m_nBB; ++i) {
+		m_aBB[i] &= ~bbn.m_aBB[i];
+	}
+
+	return *this;
 }
 
 inline
-BitBoardN& BitBoardN::erase_bit_joint (const BitBoardN& bb_lhs, const BitBoardN& bb_rhs ){
-//////////////////////////////
-// deletes (lhs U rhs) from current bitstring
-// date_of_creation: 30/7/2017  for MWCP 
+BitBoardN& BitBoardN::erase_bit (const BitBoardN& bb_lhs, const BitBoardN& bb_rhs ){
 
-	for(int i=0; i<m_nBB; i++)
-			m_aBB[i] &= ~ (bb_lhs.m_aBB[i] | bb_rhs.m_aBB[i]);
-return *this;
+	for (auto i = 0; i < m_nBB; i++) {
+		m_aBB[i] &= ~(bb_lhs.m_aBB[i] | bb_rhs.m_aBB[i]);
+	}
+
+	return *this;
 }
 
 inline
-BitBoardN& BitBoardN::erase_bit_joint (int low, const BitBoardN& bb_lhs, const BitBoardN& bb_rhs ){
-//////////////////////////////
-// deletes (lhs U rhs) from current bitstring
-// date_of_creation: 30/7/2017  for MWCP 
+BitBoardN& BitBoardN::erase_bit (int FirstBlock, const BitBoardN& bb_lhs, const BitBoardN& bb_rhs ){
 
-	for(int i=low; i<m_nBB; i++)
-			m_aBB[i] &= ~ (bb_lhs.m_aBB[i] | bb_rhs.m_aBB[i]);
-return *this;
+	for (auto i = FirstBlock; i < m_nBB; ++i) {
+		m_aBB[i] &= ~(bb_lhs.m_aBB[i] | bb_rhs.m_aBB[i]);
+	}
+
+	return *this;
 }
 
 inline
@@ -1034,6 +1089,32 @@ int FIRST_SHARED(int first_block, const BitBoardN& lhs, const BitBoardN& rhs) {
 	}
 
 	return EMPTY_ELEM;		//disjoint
+}
+
+template<bool EraseAll>
+inline
+BitBoardN& BitBoardN::set_bit(const vint& lv) {
+
+	//cleans the bitstring if required
+	if (EraseAll) {
+		erase_bit();
+	}
+
+	//copies elements up to the maximum capacity of the bitstring
+	auto POPSIZE = WMUL(m_nBB);
+	for (auto i = 0; i < lv.size(); ++i) {
+
+		/////////////////////
+		assert(lv[i] >= 0);
+		////////////////////
+
+		if (lv[i] < POPSIZE /* 1-based*/) {
+			set_bit(lv[i]);
+		}
+	}
+
+	return *this;
+
 }
 
 

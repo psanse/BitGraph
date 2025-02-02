@@ -239,7 +239,7 @@ namespace bblock {
 	 BITBOARD MASK_1		(int low, int high) { return ~Tables::mask_right[low] & ~Tables::mask_left[high]; }
 	
 	 /**
-	 * @brief Sets to 1 all bits less significant than idx
+	 * @brief Sets to 1 all bits in the closed range [0, 63]
 	 * @param idx: input reference bit position [0...63]
 	 * @returns 64-bit bitblock mask
 	 **/
@@ -247,7 +247,7 @@ namespace bblock {
 	 BITBOARD MASK_1_RIGHT	(int idx)			{ return ~Tables::mask_left[idx]; }
 	
 	 /**
-	 * @brief Sets to 1 all bits more significant than idx
+	 * @brief Sets to 1 all bits in the closed range [idx, 63]
 	 * @param idx: input reference bit position [0...63]
 	 * @returns 64-bit bitblock mask
 	 **/
@@ -264,20 +264,20 @@ namespace bblock {
 	 BITBOARD MASK_0		(int low, int high) { return Tables::mask_right[low] | Tables::mask_left[high]; }
 	
 	 /**
-	* @brief Sets to 0 all bits less significant than idx
+	* @brief Sets to 0 all bits in the closed range [0, idx]
 	* @param idx: input reference bit position [0...63]
 	* @returns 64-bit bitblock mask
 	**/
 	 inline
-	 BITBOARD MASK_0_RIGHT	(int idx)			{ return ~Tables::mask_right[idx]; }
+	 BITBOARD MASK_0_RIGHT	(int idx)			{ return Tables::mask_left[idx]; }
 	 
 	 /**
-	* @brief Sets to 0 all bits more significant than idx
+	* @brief Sets to 0 all bits in the closed range [idx, 63]
 	* @param idx: input reference bit position [0...63]
 	* @returns 64-bit bitblock mask
 	**/
 	 inline
-	 BITBOARD MASK_0_LEFT	(int idx)			{ return ~Tables::mask_left[idx]; }
+	 BITBOARD MASK_0_LEFT	(int idx)			{ return Tables::mask_right[idx]; }
 	
 	/**
 	* @brief sets to 0 the bits of the bitblock bb to the right of index (the index-bit is not trimmed)

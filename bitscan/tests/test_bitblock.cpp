@@ -12,7 +12,7 @@
 
 using namespace std;
 
-TEST(bblockTest, masks) {
+TEST(bblockTest, masks_in_range) {
 
 	//sets the mask all 1s except[10...15]
 	BITBOARD bb = bblock::MASK_0(10, 15);
@@ -28,6 +28,48 @@ TEST(bblockTest, masks) {
 	EXPECT_FALSE(bb1 & Tables::mask[9]);
 	EXPECT_FALSE(bb1 & Tables::mask[16]);
 }
+
+
+TEST(bblockTest, masks_single_argument) {
+
+	//sets all 1s from 10 [10...63]
+	BITBOARD bb = bblock::MASK_1_LEFT(10);
+	EXPECT_TRUE(bb & Tables::mask[10]);
+	EXPECT_TRUE(bb & Tables::mask[11]);
+	EXPECT_TRUE(bb & Tables::mask[12]);
+	EXPECT_TRUE(bb & Tables::mask[63]);
+
+	//sets all 1s from 10 [0...10]
+	bb = bblock::MASK_1_RIGHT(10);
+	EXPECT_TRUE(bb & Tables::mask[10]);
+	EXPECT_TRUE(bb & Tables::mask[9]);
+	EXPECT_TRUE(bb & Tables::mask[8]);
+	EXPECT_TRUE(bb & Tables::mask[7]);
+	EXPECT_FALSE(bb & Tables::mask[11]);
+	EXPECT_FALSE(bb & Tables::mask[63]);
+
+	//sets all 0s from 10 [10...63]
+	bb = bblock::MASK_0_LEFT(10);
+	EXPECT_FALSE(bb & Tables::mask[10]);
+	EXPECT_FALSE(bb & Tables::mask[11]);
+	EXPECT_FALSE(bb & Tables::mask[12]);
+	EXPECT_FALSE(bb & Tables::mask[63]);
+
+	//sets all 0s from 10 [0...10]
+	bb = bblock::MASK_0_RIGHT(10);
+	EXPECT_FALSE(bb & Tables::mask[10]);
+	EXPECT_FALSE(bb & Tables::mask[9]);
+	EXPECT_FALSE(bb & Tables::mask[8]);
+	EXPECT_FALSE(bb & Tables::mask[7]);
+	EXPECT_FALSE(bb & Tables::mask[0]);
+	EXPECT_TRUE(bb & Tables::mask[11]);
+	EXPECT_TRUE(bb & Tables::mask[63]);
+		
+
+
+	
+}
+
 
 
 TEST(bblockTest, trimming) {
