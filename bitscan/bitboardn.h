@@ -229,15 +229,21 @@ inline	BitBoardN& erase_bit		(int FirstBlock, const BitBoardN& bb_del_lhs, const
 /////////////////////
 //BitBlock operations 
 
-inline	void  copy_from_block(int first_block, const BitBoardN& bb_add);						//copies from first_block (included) onwards
-inline	void  copy_up_to_block(int last_block, const BitBoardN& bb_add);						//copies up to last_block (included)
+	/**
+	* @brief Copies the 1-bits from the bitstring bb_add in the closde range [FirstBlock, LastBlock]
+	*		 If LastBlock == -1, the range is the whole bitstring.
+	* 
+	*		 0 <= FirstBlock <= LastBLock < the number of bitblocks in the bitstring
+	* 
+	* @param bb_add: input bitstring to be copied
+	* @param FirstBlock: the first bitblock to be modified
+	* @returns reference to the modified bitstring
+	**/
+	BitBoardN& set_block			(int FirstBlock, int LastBlock, const BitBoardN& bb_add);
 
-void set_block(int first_block, const BitBoardN& bb_add);										//OR:closed range
-void set_block(int first_block, int last_block, const BitBoardN& bb_add);						//OR:closed range
-
-inline	BitBoardN& erase_block(int first_block, const BitBoardN& bb_del);						//range versions
-inline	BitBoardN& erase_block(int first_block, int last_block, const BitBoardN& bb_del);		//range versions
-inline	BitBoardN& erase_block_reverse(int last_block, const BitBoardN& bb_del);
+inline	BitBoardN& erase_block(int FirstBlock, const BitBoardN& bb_del);								//range versions
+inline	BitBoardN& erase_block(int FirstBlock, int LastBlock, const BitBoardN& bb_del);					//range versions
+inline	BitBoardN& erase_block_reverse(int LastBlock, const BitBoardN& bb_del);
 
 ////////////////////////
 //operators
@@ -620,24 +626,16 @@ int  BitBoardN::find_singleton (int low, int high, int& singleton) const{
 	return -1;					//more than one vertex
 }
 
-inline void BitBoardN::copy_from_block (int first_block, const BitBoardN& bb_add){
-//////////////
-// copies from first_bit included onwards 
 
-	for(int i=first_block; i<m_nBB; i++){
-			m_aBB[i]=bb_add.m_aBB[i];
-	}
-}
-
-inline void  BitBoardN::copy_up_to_block (int last_block, const BitBoardN& bb_add){
-//////////////
-// copies up to last_bit included and clears t
-// OBSERVATIONS: No out-of-bounds check for last_bit (will throw exception)
-
-	for(int i=0; i<=last_block; i++){
-		m_aBB[i]=bb_add.m_aBB[i];
-	}
-}
+//inline void  BitBoardN::copy_up_to_block (int last_block, const BitBoardN& bb_add){
+////////////////
+//// copies up to last_bit included and clears t
+//// OBSERVATIONS: No out-of-bounds check for last_bit (will throw exception)
+//
+//	for(int i=0; i<=last_block; i++){
+//		m_aBB[i]=bb_add.m_aBB[i];
+//	}
+//}
 template<bool EraseAll>
 inline BitBoardN& BitBoardN::set_bit	(int nbit ){
 	
@@ -710,19 +708,20 @@ BitBoardN&  BitBoardN::set_bit (const BitBoardN& bb_add){
 }
 
 inline
-void  BitBoardN::set_block (int first_block, const BitBoardN& bb_add){
-//////////////
-// copies bb_add 1-bits (equibvalent to OR, set_union etc) from the first block onwards
-	for(int i=first_block; i<m_nBB; i++)	
-				m_aBB[i]|=bb_add.m_aBB[i];
-}
+BitBoardN&  BitBoardN::set_block (int FirstBlock, int LastBlock, const BitBoardN& bb_add){
 
-inline
-void  BitBoardN::set_block (int first_block, int last_block, const BitBoardN& bb_add){
-//////////////
-// copies bb_add 1-bits (equibvalent to OR, set_union etc) in CLOSED RANGE
-	for(int i=first_block; i<=last_block; i++)	
-				m_aBB[i]|=bb_add.m_aBB[i];
+	///////////////////////////////////////////////////////////////////////////////
+	assert((FirstBlock >= 0) && (LastBlock < m_nBB) && (FirstBlock <= LastBlock));
+	///////////////////////////////////////////////////////////////////////////////
+
+	int last_block;
+	(LastBlock == -1) ? last_block = m_nBB - 1 : last_block = LastBlock;	
+
+	for (auto i = FirstBlock; i <= last_block; ++i) {
+		m_aBB[i] |= bb_add.m_aBB[i];
+	}
+
+	return *this;
 }
 
 inline

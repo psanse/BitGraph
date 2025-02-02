@@ -539,13 +539,13 @@ TEST(BBNtest, block_copying){
 	bb1.set_bit<true>(50,100);
 
 	bb.erase_bit();
-	bb.copy_from_block(1,bb1);			//second block
+	bb.set_block(1, -1, bb1);			//second block
 	EXPECT_FALSE(bb.is_bit(33));
 	EXPECT_FALSE(bb.is_bit(50));
 	EXPECT_TRUE(bb.is_bit(64));
 
 	bb.erase_bit();
-	bb.copy_up_to_block(0,bb1);	
+	bb.set_block(0, 0, bb1);	
 	EXPECT_TRUE(bb.is_bit(50));
 	EXPECT_TRUE(bb.is_bit(63));
 	EXPECT_FALSE(bb.is_bit(64));
