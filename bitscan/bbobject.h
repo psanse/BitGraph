@@ -33,6 +33,8 @@ protected:
 //////////////
 //construction / destruction
 	BBObject() = default;
+
+	virtual ~BBObject() = default;
 	
 //////////////////	
 //bit scanning
