@@ -256,17 +256,38 @@ inline	BitBoardN& erase_bit		(const BitBoardN& bb_del_lhs, const BitBoardN& bb_d
 	inline	BitBoardN& erase_block (int firstBlock, int lastBlock, const BitBoardN& bb_del_lhs, const BitBoardN& bb_del_rhs);
 
 ////////////////////////
-//operators
-				
-	BitBoardN& operator &=			(const BitBoardN& );													//bitset_intersection
-	BitBoardN& operator |=			(const BitBoardN& );													//bitset_union
-	BitBoardN& operator ^=			(const BitBoardN& );													//bitet symmetric_difference
+// operators
+	
+	/**
+	* @brief Bitwise AND operator with bbn
+	* @details For set intersection
+	**/
+	BitBoardN& operator &=			(const BitBoardN& bbn);													
+	
+	/**
+	* @brief Bitwise OR operator with bbn
+	* @details For set union
+	**/
+	BitBoardN& operator |=			(const BitBoardN& bbn);
+	
+	/**
+	* @brief Bitwise XOR operator with bbn
+	* @details For symmetric_difference
+	**/
+	BitBoardN& operator ^=			(const BitBoardN& bbn);
 
-	BitBoardN&  AND_EQ				(int first_block, const BitBoardN& rhs );								//AND: range
-	BitBoardN&  OR_EQ				(int first_block, const BitBoardN& rhs );								//OR:  range
-		
-	BitBoardN& flip					();
+	/**
+	* @brief flips 1-bits to 0 and 0-bits to 1
+	* 
+	* TODO - add block ranges
+	**/
+	BitBoardN& flip();
 
+	//range operators
+	BitBoardN&  AND_EQ				(int firstBlock, int lastBlock, const BitBoardN& rhs );								
+	BitBoardN&  OR_EQ				(int firstBlock, int lastBlock, const BitBoardN& rhs );								
+
+	
 inline	int	single_disjoint			(const BitBoardN& rhs, int& vertex)				const;					//non-disjoint by single element
 inline	int	single_disjoint			(int first_block, int last_block, 
 										const BitBoardN& rhs, int& vertex)			const;

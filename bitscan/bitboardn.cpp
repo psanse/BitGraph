@@ -363,6 +363,7 @@ return ;
 /////////////////////////
 
 BitBoardN& BitBoardN::operator &=	(const BitBoardN& bbn){
+
 	for (auto i = 0; i < m_nBB; ++i) {
 		m_aBB[i] &= bbn.m_aBB[i];
 	}
@@ -371,46 +372,58 @@ BitBoardN& BitBoardN::operator &=	(const BitBoardN& bbn){
 }
 
 BitBoardN& BitBoardN::operator |=	(const BitBoardN& bbn){
+	
 	for (auto i = 0; i < m_nBB; ++i) {
 		m_aBB[i] |= bbn.m_aBB[i];
 	}
+
 	return *this;
 }
 
-BitBoardN&  BitBoardN::AND_EQ (int first_block, const BitBoardN& rhs ){
-//////////////////////
-// mask in range [first_block , END[
-	for (auto i = first_block; i < m_nBB; ++i) {
+BitBoardN& BitBoardN::operator ^=	(const BitBoardN& bbn) {
+	
+	for (auto i = 0; i < m_nBB; ++i) {
+		m_aBB[i] ^= bbn.m_aBB[i];
+	}
+
+	return *this;
+}
+
+BitBoardN&  BitBoardN::AND_EQ (int firstBlock, int lastBlock, const BitBoardN& rhs ){
+
+	////////////////////////////////////////////////////
+	assert(firstBlock >= 0 && firstBlock <= lastBlock);
+	////////////////////////////////////////////////////
+
+	auto last_block = ((lastBlock == -1) ? m_nBB - 1 : lastBlock);
+
+	for (auto i = firstBlock; i <= last_block; ++i) {
 		m_aBB[i] &= rhs.m_aBB[i];
 	}
+
 	return *this;
 }
 
+BitBoardN&  BitBoardN::OR_EQ (int firstBlock, int lastBlock, const BitBoardN& rhs ){
 
-BitBoardN&  BitBoardN::OR_EQ (int first_block, const BitBoardN& rhs ){
-//////////////////////
-// mask in range [first_block , END[
+	////////////////////////////////////////////////
+	assert(firstBlock >= 0 && firstBlock <= lastBlock);
+	///////////////////////////////////////////////
 
-	for (auto i = first_block; i < m_nBB; ++i) {
+	auto last_block = ((lastBlock == -1) ? m_nBB - 1 : lastBlock);
+
+	for (auto i = firstBlock; i < last_block; ++i) {
 		m_aBB[i] |= rhs.m_aBB[i];
 	}
 	return *this;
 }
 
+BitBoardN& BitBoardN::flip (){
 
-
-BitBoardN& BitBoardN::operator ^=	(const BitBoardN& bbn){
-	for (auto i = 0; i < m_nBB; ++i) {
-		m_aBB[i] ^= bbn.m_aBB[i];
-	}
-	return *this;
-}
-
-
-BitBoardN& BitBoardN::flip	(){
 	for (auto i = 0; i < m_nBB; ++i) {
 		m_aBB[i] = ~m_aBB[i];
 	}
+
 	return *this;
 }
 
