@@ -282,7 +282,7 @@ TEST(BBNtest, boolean_disjoint){
 	EXPECT_FALSE(bb.is_disjoint(bb1, bb2));
 }
 
-TEST(BBNtest, boolean_joint){
+TEST(BBNtest, find_set_difference){
 
 	BitBoardN bb(130);
 	bb.set_bit(10);
@@ -296,23 +296,23 @@ TEST(BBNtest, boolean_joint){
 
 	//single_joint
 	int v;
-	EXPECT_EQ(0, bb.single_joint(bb1,v));		//same set
+	EXPECT_EQ(0, bb.find_diff_singleton(bb1,v));		//same set
 	EXPECT_EQ(EMPTY_ELEM,v);
 	
 	bb.set_bit(65);
 	bb.print();
-	EXPECT_EQ(1, bb.single_joint(bb1,v));
+	EXPECT_EQ(1, bb.find_diff_singleton(bb1,v));
 	EXPECT_EQ(65,v);
 
 	bb.set_bit(123);
 	int w;
-	EXPECT_EQ(2, bb.double_joint(bb1,v,w));
+	EXPECT_EQ(2, bb.find_diff_singleton(bb1,v,w));
 	EXPECT_EQ(65,v);
 	EXPECT_EQ(123,w);
 
 	//non-joint by more than 2 vertices
 	bb.set_bit(125);
-	EXPECT_EQ(EMPTY_ELEM, bb.double_joint(bb1,v,w));
+	EXPECT_EQ(EMPTY_ELEM, bb.find_diff_singleton(bb1,v,w));
 	EXPECT_EQ(EMPTY_ELEM,v);
 	EXPECT_EQ(EMPTY_ELEM,w);
 }
@@ -563,13 +563,17 @@ TEST(BBNtest, erase_block) {
 
 }
 
-TEST(BBNtest, single_disjoint){
+TEST(BBNtest, find_single_bit_intersection){
+
 	BitBoardN bb(130);
 	BitBoardN bb1(130);
 	bb.set_bit(1,10);
 	bb1.set_bit(10,20);
 	int v = EMPTY_ELEM;
-	int res = bb.find_single_disjoint(bb1, v);
+
+	////////////////////////////////////////////
+	int res = bb.find_common_singleton(bb1, v);
+	////////////////////////////////////////////
 
 	EXPECT_EQ(10, v);
 	EXPECT_EQ(1, res);
