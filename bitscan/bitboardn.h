@@ -3,8 +3,7 @@
  * @brief header file of the BitBoardN class from the BITSCAN library.
  *		  Manages bitstrings of any size as an array of bitblocks (64-bit numbers)
  * @author pss
- * @created 2014
- * @last_update 01/02/2025
+ * @details: created 2014, last_update 01/02/2025
  * 
  * TODO - refactoring and testing (31/01/2025)
  *
@@ -103,13 +102,23 @@ const BITBOARD bitblock				(int block) const					{ return m_aBB[block]; }
 	BITBOARD& bitblock				(int block)							{ return m_aBB[block]; }
 
 //////////////////////////////
-// Bitscanning
+// Bitscanning (no HW operations)
+		
+	/**
+	* @brief returns the index of the most significant bit in the bitstring
+	* @details implemented as a lookup table
+	**/
+inline virtual int msbn64			()	const;		//lookup 
 
-	//find least/most signinficant bit
-inline virtual int msbn64			()	const;		//lookup
+	/**
+	* @brief returns the index of the least significant bit in the bitstring
+	* @details  implemented as a de Bruijn hashing or a lookup table depending on 
+	*			an internal switch (see config.h)
+	**/
 inline virtual int lsbn64			()	const; 		//de Bruijn	/ lookup								
 
-	//for looping (does not use state info)	
+	//primitive bitscanning (does not use internal state)
+	//TODO - fix design	
 inline int next_bit					(int nBit)	const;					//de Bruijn
 inline int next_bit_if_del			(int nBit)	const;					//de Bruijn
 inline int previous_bit				(int nbit)	const;					//lookup 
@@ -970,12 +979,13 @@ inline int BitBoardN::lsbn64() const{
 // different implementations of lsbn depending on configuration
 
 #ifdef DE_BRUIJN
-	for(int i=0; i<m_nBB; i++){
+	for(auto i = 0; i < m_nBB; ++i){
 		if(m_aBB[i])
 #ifdef ISOLANI_LSB
 			return(Tables::indexDeBruijn64_ISOL[((m_aBB[i] & -m_aBB[i]) * DEBRUIJN_MN_64_ISOL/*magic num*/) >> DEBRUIJN_MN_64_SHIFT]+ WMUL(i));	
 #else
-			return(Tables::indexDeBruijn64_SEP[((m_aBB[i]^ (m_aBB[i]-1)) * bblock::DEBRUIJN_MN_64_SEP/*magic num*/) >> bblock::DEBRUIJN_MN_64_SHIFT]+ WMUL(i));
+			return(Tables::indexDeBruijn64_SEP[ ( (m_aBB[i]^ (m_aBB[i]-1) ) * bblock::DEBRUIJN_MN_64_SEP/*magic num*/) >>
+												bblock::DEBRUIJN_MN_64_SHIFT	]	+	WMUL(i)							);
 #endif
 	}
 #elif LOOKUP
