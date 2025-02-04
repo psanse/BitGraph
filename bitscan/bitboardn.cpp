@@ -389,11 +389,11 @@ BitBoardN& BitBoardN::operator ^=	(const BitBoardN& bbn) {
 	return *this;
 }
 
-BitBoardN&  BitBoardN::AND_EQ (int firstBlock, int lastBlock, const BitBoardN& rhs ){
+BitBoardN&  BitBoardN::AND_EQUAL_block (int firstBlock, int lastBlock, const BitBoardN& rhs ){
 
-	////////////////////////////////////////////////////
-	assert(firstBlock >= 0 && firstBlock <= lastBlock);
-	////////////////////////////////////////////////////
+	///////////////////////////////////////////////////////////////////////////////////
+	assert( (firstBlock >= 0) && (firstBlock <= lastBlock) && (lastBlock < m_nBB));
+	/////////////////////////////////////////////////////////////////////////////////
 
 	auto last_block = ((lastBlock == -1) ? m_nBB - 1 : lastBlock);
 
@@ -404,11 +404,11 @@ BitBoardN&  BitBoardN::AND_EQ (int firstBlock, int lastBlock, const BitBoardN& r
 	return *this;
 }
 
-BitBoardN&  BitBoardN::OR_EQ (int firstBlock, int lastBlock, const BitBoardN& rhs ){
+BitBoardN&  BitBoardN::OR_EQUAL_block (int firstBlock, int lastBlock, const BitBoardN& rhs ){
 
-	////////////////////////////////////////////////
-	assert(firstBlock >= 0 && firstBlock <= lastBlock);
-	///////////////////////////////////////////////
+	///////////////////////////////////////////////////////////////////////////////////
+	assert((firstBlock >= 0) && (firstBlock <= lastBlock) && (lastBlock < m_nBB));
+	/////////////////////////////////////////////////////////////////////////////////
 
 	auto last_block = ((lastBlock == -1) ? m_nBB - 1 : lastBlock);
 
@@ -421,6 +421,20 @@ BitBoardN&  BitBoardN::OR_EQ (int firstBlock, int lastBlock, const BitBoardN& rh
 BitBoardN& BitBoardN::flip (){
 
 	for (auto i = 0; i < m_nBB; ++i) {
+		m_aBB[i] = ~m_aBB[i];
+	}
+
+	return *this;
+}
+
+BitBoardN& BitBoardN::flip_block(int firstBlock, int lastBlock)
+{
+	
+	///////////////////////////////////////////////////////////////////////////////////
+	assert((firstBlock >= 0) && (firstBlock <= lastBlock) && (lastBlock < m_nBB));
+	/////////////////////////////////////////////////////////////////////////////////
+
+	for (auto i = firstBlock; i < lastBlock; ++i) {
 		m_aBB[i] = ~m_aBB[i];
 	}
 

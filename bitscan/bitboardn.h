@@ -46,8 +46,8 @@ public:
 /////////////////////////////
 // independent operators / services (no allocation or copies)
 
-	friend bool operator==			(const BitBoardN& lhs, const BitBoardN& rhs);
-	friend bool operator!=			(const BitBoardN& lhs, const BitBoardN& rhs);
+	friend bool operator ==			(const BitBoardN& lhs, const BitBoardN& rhs);
+	friend bool operator !=			(const BitBoardN& lhs, const BitBoardN& rhs);
 
 	friend BitBoardN&  AND			(const BitBoardN& lhs, const BitBoardN& rhs,  BitBoardN& res);							
 	friend BitBoardN&  AND			(int first_block, const BitBoardN& lhs, const BitBoardN& rhs,  BitBoardN& res);
@@ -206,12 +206,12 @@ inline	BitBoardN& erase_bit		(const BitBoardN& bb_del);
 		* @brief Removes the 1-bits from both input bitstrings (their union) 
 		*		inside the population range. The sizes of both input bitstrings
 		*		must be greater than the destination bitstring (*this)
-		* @param bb_del_lhs, bb_del_rhs : bitstrings to be removed
+		* @param lhs, rhs: input bitstrings  
 		* @returns reference to the modified bitstring
 		* @created: 30/7/2017  for the MWCP
 		* @last_update: 02/02/2025
 		**/
-inline	BitBoardN& erase_bit		(const BitBoardN& bb_del_lhs, const BitBoardN& bb_del_rhs);
+inline	BitBoardN& erase_bit		(const BitBoardN& lhs, const BitBoardN& rhs);
 						
 /////////////////////
 //BitBlock operations 
@@ -251,7 +251,6 @@ inline	BitBoardN& erase_bit		(const BitBoardN& bb_del_lhs, const BitBoardN& bb_d
 	* @param bb_del_lhs, bb_del_rhs : bitstrings whose 1-bits are to be removed
 	* @returns reference to the modified bitstring
 	* @date: 02/02/2025 during a refactorization of BITSCAN
-	*
 	**/
 	inline	BitBoardN& erase_block (int firstBlock, int lastBlock, const BitBoardN& bb_del_lhs, const BitBoardN& bb_del_rhs);
 
@@ -278,55 +277,131 @@ inline	BitBoardN& erase_bit		(const BitBoardN& bb_del_lhs, const BitBoardN& bb_d
 
 	/**
 	* @brief flips 1-bits to 0 and 0-bits to 1
-	* 
-	* TODO - add block ranges
 	**/
-	BitBoardN& flip();
+	BitBoardN& flip					();
 
-	//range operators
-	BitBoardN&  AND_EQ				(int firstBlock, int lastBlock, const BitBoardN& rhs );								
-	BitBoardN&  OR_EQ				(int firstBlock, int lastBlock, const BitBoardN& rhs );								
+	/**
+	* @brief flips 1-bits to 0 and 0-bits to 1 in the 
+	*		 closed block range [firstBlock, lastBlock]
+	**/
+	BitBoardN& flip_block			(int firstBlock, int lastBlock);
+
+	/**
+	* @brief AND between rhs and caller bitstring in the closed range of bitblocks [firstBlock, lastBlock]
+	*		 If lastBlock == -1 the range is [firstBlock, m_nBB]
+	*
+	* @param firstBlock, lastBlock: range of blocks (0<=firstBlock<=lastBlock<m_nBB). 
+	* @param rhs: bitstring 
+	* @returns reference to the modified bitstring
+	* @date: 04/02/2025 during a refactorization of BITSCAN
+	**/
+	BitBoardN&  AND_EQUAL_block		(int firstBlock, int lastBlock, const BitBoardN& rhs );								
+	
+	/**
+	* @brief OR between rhs and caller bitstring in the closed range of bitblocks [firstBlock, lastBlock]
+	*		 If lastBlock == -1 the range is [firstBlock, m_nBB]
+	*
+	* @param firstBlock, lastBlock: range of blocks (0<=firstBlock<=lastBlock<m_nBB)
+	* @param rhs: bitstring
+	* @returns reference to the modified bitstring
+	**/
+	BitBoardN&  OR_EQUAL_block			(int firstBlock, int lastBlock, const BitBoardN& rhs );								
+		
+	/**
+	* @brief Determines the lowest bit (least-significant) in common between rhs and caller
+	* @param rhs: input bitstring
+	* @returns the first bit in common, -1 if they are disjoint
+	* @created 7/17
+	* @last_update 02/02/2025
+	**/
+	inline int find_first_common_bit	(const BitBoardN& rhs)								const;	
+
+	/////////////////////////////
+	// Determines if there is only one vertex inside the closed range (both ends included)
+	// and returns the singleton (or EMPTY_ELEM)
+	//
+	// RETURNS 0 if range is empty, 1 if singleton (including singleton vertex), -1 
+	//			if more than one
+	//TODO - CHANGE - return bit, and state as a param? 
+	inline  int  find_singleton			(int firstBit, int lastBit, int& singleton_bit)		const;
+
 
 	
-inline	int	single_disjoint			(const BitBoardN& rhs, int& vertex)				const;					//non-disjoint by single element
+inline	int	single_disjoint			(const BitBoardN& rhs, int& vertex)					const;					//non-disjoint by single element
 inline	int	single_disjoint			(int first_block, int last_block, 
-										const BitBoardN& rhs, int& vertex)			const;
-inline	int	single_joint			(const BitBoardN& rhs, int& vertex)				const;					//non-joint by single element (this\rhs)
-inline int double_joint				(const BitBoardN& rhs, int& v, int& w)			const;					//non_joint by one or two elements (this\rhs)
-inline int  is_singleton			(int vlhs, int vrhs)							const;					//single vertex inside range
-inline int  find_singleton			(int low, int high, int& singleton)				const;
+										const BitBoardN& rhs, int& vertex)				const;
+inline	int	single_joint			(const BitBoardN& rhs, int& vertex)					const;					//non-joint by single element (this\rhs)
+inline  int double_joint			(const BitBoardN& rhs, int& v, int& w)				const;					//non_joint by one or two elements (this\rhs)
 
-inline int first_found				(const BitBoardN& rhs)							const;					//first vertex in common with rhs  (7/17)
 
 /////////////////////////////
 //Boolean functions - CHECK UNIT TESTS
 
-	inline bool is_bit				(int bit)										const;
-inline virtual bool is_empty		()												const;	
-inline virtual bool is_empty		(int firstBlock, int lastBlock)					const;
-	inline bool is_singleton		()												const;					//only one element- /*TODO (15/3/17) -extend to a range of bits*/
+	inline bool is_bit					(int bit)										const;
+
+	/**
+	* @brief TRUE if the bitstring has all 0-bits
+	**/
+	inline virtual bool is_empty		()												const;	
+
+	/**
+	* @brief Determines if the bitstring has all 0-bits in the closed range [firstBlock, lastBlock]
+	*		  If lastBlock == -1 the range is [firstBlock, m_nBB]
+	*
+	* @param firstBlock, lastBlock: range of blocks (0<=firstBlock<=lastBlock<m_nBB).
+	* @returns TRUE if the bitstring has all 0-bits in the given range
+	* @details optimized for non-sparse bitsets - early exit
+	**/	
+	inline virtual bool is_empty_block	(int firstBlock, int lastBlock)					const;
 	
+	/**
+	* @brief TRUE if caller bitstring has a single 1-bit
+	* @returns 1 if singleton, 0 if empty, -1 if more than one bit
+	* @created (15/3/17) 
+	* @details optimized for non-sparse bitsets - early exit
+	**/
+	inline int is_singleton				()												const;	
+			
+	/**
+	* @brief Determines if the caller bitstring has a single 1-bit in the 
+	*		 closed bit-range [firstBit, lastBit]
+	*
+	* @param firstBlock, lastBlock: range of blocks (0<=firstBlock<=lastBlock<m_nBB).
+	* @returns 1 if singleton, 0 if empty, -1 if more than one bit in the specifed range
+	* @details optimized for non-sparse bitsets - early exit
+	**/
+	inline int  is_singleton			(int firstBit, int lastBit)						const;					
+
+	/**
+	* @brief TRUE if caller bitstring has a single 1-bit in the closed range [firstBlock, lastBlock]
+	*		  If lastBlock == -1 the range is [firstBlock, m_nBB]
+	* 
+	* @param firstBlock, lastBlock: range of blocks (0<=firstBlock<=lastBlock<m_nBB). 
+	* @returns 1 if singleton, 0 if empty, -1 if more than one bit.
+	* @details optimized for non-sparse bitsets - early exit
+	**/
+	inline int is_singleton_block		(int firstBlock, int lastBlock)					const;
+
 	/**
 	* @brief TRUE if this bitstring has no bits in common with rhs
 	**/
-	inline bool is_disjoint			(const BitBoardN& rhs)							const;
-	
+	inline bool is_disjoint				(const BitBoardN& rhs)							const;
+		
+	/**
+	* @brief TRUE if this bitstring has no bits in common with rhs
+	*		 in the closed range [firstBlock, lastBlock].
+	*
+	*		If lastBlock == -1, the range is [firstBlock, m_nBB]
+	**/
+	inline bool is_disjoint_block		(int firstBlock, int lastBlock,
+												const BitBoardN& rhs		)			const;
 	/**
 	* @brief TRUE if this bitstring has no bits in common with neither lhs NOR rhs bitstrings
 	* @details Currently not available for sparse bitsets
 	**/
-	inline bool is_disjoint			(const BitBoardN& lhs, const  BitBoardN& rhs)	const;
+	inline bool is_disjoint				(const BitBoardN& lhs, const  BitBoardN& rhs)	const;
 	
-	/**
-	* @brief TRUE if this bitstring has no bits in common with rhs
-	*		 in the closed range [firstBlock, lastBlock].
-	* 
-	*		If lastBlock == -1, the range is [firstBlock, m_nBB]
-	**/
-	inline bool is_disjoint_block_range	(int firstBlock, int lastBlock,
-											const BitBoardN& rhs		)			const;
-			
-
+	
 /////////////////////
 // I/O 
 	/**
@@ -336,7 +411,8 @@ inline virtual bool is_empty		(int firstBlock, int lastBlock)					const;
 	* @param show_pc: if true, shows popcount
 	* @returns output stream
 	**/
-	std::ostream& print				(std::ostream& o= std::cout, bool show_pc = true, bool endl = true) const override;
+	std::ostream& print				( std::ostream& o = std::cout,
+									  bool show_pc = true, bool endl = true	)		const override;
 	
 	/**
 	* @brief converts bb and its popcount to a readable string
@@ -346,7 +422,7 @@ inline virtual bool is_empty		(int firstBlock, int lastBlock)					const;
 	std::string to_string			();
 	
 ///////////////////////
-//conversions
+//Conversions / Casts
 
 	/**
 	* @brief Converts the bitstring to a std::vector of non-negative integers.
@@ -383,7 +459,7 @@ virtual	int* to_C_array				(int* lv, std::size_t& size, bool rev = false);
 //data members
 
 protected:
-	BITBOARD* m_aBB;				//array of bitblocks - not using std::vector because of memory allignment
+	BITBOARD* m_aBB;				//array of bitblocks - not using std::vector because of memory allignment, TODO-CHANGE TO VECTOR (04/02/2025)
 	int m_nBB;						//number of bitblocks (1-based)
 
 }; //end BitBoardN class
@@ -393,18 +469,15 @@ protected:
 // Inline function implementations - must be in header file
 
 inline 
-int BitBoardN::first_found	(const BitBoardN& rhs) const{
-//returns first vertex in common with rhs that (7/17)	
-//returns -1 if they are disjoint
+int BitBoardN::find_first_common_bit	(const BitBoardN& rhs) const {
 
 	BITBOARD bb = 0;
-	for(auto i = 0; i < this -> m_nBB; ++i){
-		bb = this->m_aBB[i] & rhs.m_aBB[i];
-		if(bb = (this->m_aBB[i] & rhs.m_aBB[i])){
+	for(auto i = 0; i < m_nBB; ++i){
+		if( (bb = (m_aBB[i] & rhs.m_aBB[i])) ){
 			return bblock::lsb64_intrinsic(bb) + WMUL(i);
 		}
 	}
-	return EMPTY_ELEM;
+	return -1;
 }
 
 inline int BitBoardN::msbn64() const{
@@ -536,9 +609,16 @@ inline bool BitBoardN::is_empty() const
 	return true;	
 }
 
-inline bool BitBoardN::is_empty	(int nBBL, int nBBH) const
+inline bool BitBoardN::is_empty_block (int firstBlock, int lastBlock) const
 {
-	for (auto i = nBBL; i <= nBBH; ++i) {
+
+	///////////////////////////////////////////////////////////////////////////////
+	assert((firstBlock >= 0) && (lastBlock < m_nBB) && (firstBlock <= lastBlock));
+	///////////////////////////////////////////////////////////////////////////////
+
+	int last_block = ((lastBlock == -1) ? m_nBB - 1 : lastBlock);
+
+	for (auto i = firstBlock; i <= last_block; ++i) {
 		if (m_aBB[i]) {
 			return false;
 		}
@@ -570,7 +650,7 @@ bool BitBoardN::is_disjoint	(const BitBoardN& lhs,  const BitBoardN& rhs)	const
 }
 
 inline 
-bool BitBoardN::is_disjoint_block_range (int firstBlock, int lastBlock, const BitBoardN& rhs)	const{
+bool BitBoardN::is_disjoint_block (int firstBlock, int lastBlock, const BitBoardN& rhs)	const{
 
 	///////////////////////////////////////////////////////////////////////////////
 	assert((firstBlock >= 0) && (lastBlock < m_nBB) && (firstBlock <= lastBlock));
@@ -602,99 +682,110 @@ BitBoardN& BitBoardN::set_bit (int high, const BitBoardN& bb_add){
 }
 
 inline
-int  BitBoardN::is_singleton (int low, int high) const{
-/////////////////////////////
-// Determines if there is only one vertex inside the range (both ends included)
-//
-// RETURNS 0 if range is empty, 1 if singleton, -1 if more than one
-	int nbbl=WDIV(low), nbbh=WDIV(high);
-	int pc=0;
+int  BitBoardN::is_singleton (int firstBit, int lastBit) const{
+
+	int nbbl = WDIV(firstBit);
+	int nbbh = WDIV(lastBit);
+	int pc = 0;
 	
 	//both ends
-	if(nbbl==nbbh){
-		BITBOARD bbl= m_aBB[nbbl] & bblock::MASK_1(WMOD(low),WMOD(high));
-		pc = bblock::popc64(bbl);
-	}else{
-		BITBOARD bbl= m_aBB[nbbl] & bblock::MASK_1(WMOD(low),WORD_SIZE-1);
-		pc = bblock::popc64(bbl);
-		if(pc>1){
+	if(nbbl == nbbh){
+		if ( (pc = bblock::popc64( m_aBB[nbbl] & bblock::MASK_1(firstBit - WMUL(nbbl), lastBit - WMUL(nbbh))) ) > 1) {
 			return -1;
 		}
-		for(int i=nbbl+1; i<nbbh; i++){
-			pc+=bblock::popc64(m_aBB[i]);
-			if(pc>1){
+	}
+	else {
+
+		//checks first block
+		if( (pc = bblock::popc64( m_aBB[nbbl] & bblock::MASK_1_LEFT(firstBit - WMUL(nbbl)  /* eq. to WMOD(nbbl) */ ))) > 1) {
+			return -1;
+		}
+
+		//checks intermediate blocks
+		for(auto i = nbbl + 1; i < nbbh; ++i){
+			if (pc += bblock::popc64(m_aBB[i]) > 1){
 				return -1;
 			}
 		}
-		BITBOARD bbh= m_aBB[nbbh] & bblock::MASK_1(0,WMOD(high));
-		pc+=bblock::popc64(bbh);
+
+		//checks last block
+		if ((pc += bblock::popc64(m_aBB[nbbh] & bblock::MASK_1_RIGHT(lastBit - WMUL(nbbh)  /* eq. to WMOD(nbbl) */ ))) > 1) {
+			return -1;
+		}
 	}
 
-	if(pc==0) return 0;
-	else if(pc==1) return 1;
-	return -1;					//more than one vertex
+	//reasons on return value - 0 empty, 1 singleton (-1 early exit)
+	if (pc == 0) { return 0; }
+	return 1;						//MUST BE singleton
 }
 
 inline
-int  BitBoardN::find_singleton (int low, int high, int& singleton) const{
-/////////////////////////////
-// Determines if there is only one vertex inside the range (both ends included)
-// and returns the singleton (or EMPTY_ELEM)
-//
-// RETURNS 0 if range is empty, 1 if singleton (including singleton vertex), -1 
-//			if more than one
+int  BitBoardN::find_singleton (int firstBit, int lastBit, int& singleton) const{
 
-	int nbbl=WDIV(low), nbbh=WDIV(high), posl=WMOD(low), posh=WMOD(high),pc=0;
-	bool first_vertex_flag=true;
-	singleton=EMPTY_ELEM;
+	int nbbl = WDIV(firstBit);
+	int	nbbh = WDIV(lastBit);
+	int posl = firstBit - WMUL(nbbl);		//equiv. WMOD(low);
+	int posh = lastBit - WMOD(nbbh);		//equiv. WMOD(high);
+	int pc = 0;
+	bool vertex_not_found = true;
+	singleton = EMPTY_ELEM;
 	
 	//both ends
-	if(nbbl==nbbh){
-		BITBOARD bbl= m_aBB[nbbl] & bblock::MASK_1(posl,posh);
-		pc=bblock::popc64(bbl);
-		if(pc==1){
-			singleton=bblock::lsb64_intrinsic(bbl)+WMUL(nbbl);
+	if(nbbl == nbbh){
+		BITBOARD bbl= m_aBB[nbbl] & bblock::MASK_1(posl, posh);
+		pc = bblock::popc64(bbl);
+		if( (pc = bblock::popc64(bbl)) == 1){
+			singleton = bblock::lsb64_intrinsic(bbl) + WMUL(nbbl);
+			/////////
 			return 1;
+			////////
 		}
-	}else{
-		BITBOARD bbl= m_aBB[nbbl] & bblock::MASK_1(posl,WORD_SIZE-1);
-		pc=bblock::popc64(bbl);
-		if(pc>1){
+	}
+	else{
+
+		//checks first block
+		BITBOARD bbl = m_aBB[nbbl] & bblock::MASK_1_LEFT(posl);
+
+		if( (pc = bblock::popc64(bbl)) > 1){
+			/////////
 			return -1;
-		}else if(pc==1){
-			first_vertex_flag=false;
-			singleton=bblock::lsb64_intrinsic(bbl)+WMUL(nbbl);
+			/////////
+		}else if(pc == 1){
+			vertex_not_found = false;
+			singleton = bblock::lsb64_intrinsic(bbl) + WMUL(nbbl);
 		}
-		for(int i=nbbl+1; i<nbbh; i++){
-			pc+=bblock::popc64(m_aBB[i]);
-			if(pc>1){
+
+		//checks intermediate blocks
+		for(auto i = nbbl + 1; i < nbbh; ++i){			
+			if( (pc += bblock::popc64(m_aBB[i])) > 1){
+				/////////
 				return -1;
-			}else if(first_vertex_flag && (pc==1)){
-				singleton=bblock::lsb64_intrinsic(m_aBB[i])+WMUL(i);
-				first_vertex_flag=false;
+				/////////
+			}else if( vertex_not_found && (pc ==1 ) ){
+				singleton = bblock::lsb64_intrinsic(m_aBB[i]) + WMUL(i);
+				vertex_not_found = false;
 			}
 		}
-		BITBOARD bbh= m_aBB[nbbh] &~ Tables::mask_left[posh];	
-		pc+=bblock::popc64(bbh);
-		if(first_vertex_flag && (pc==1))
-			singleton=bblock::lsb64_intrinsic(bbh)+WMUL(nbbh);
+
+		//checks last block
+		BITBOARD bbh = m_aBB[nbbh] & bblock::MASK_1_RIGHT(posh);
+			
+		if ( (pc += bblock::popc64(bbh)) > 1) {
+			/////////
+			return -1;
+			/////////
+		}else if (vertex_not_found && (pc == 1)) {
+			singleton = bblock::lsb64_intrinsic(bbh) + WMUL(nbbh);
+		}
 	}
 
-	if(pc==0) return 0;
-	else if(pc==1) return 1;
-	return -1;					//more than one vertex
+	//reason with pc
+	if (pc == 0) { return 0; }
+
+	//must be singleton
+	return 1;
 }
 
-
-//inline void  BitBoardN::copy_up_to_block (int last_block, const BitBoardN& bb_add){
-////////////////
-//// copies up to last_bit included and clears t
-//// OBSERVATIONS: No out-of-bounds check for last_bit (will throw exception)
-//
-//	for(int i=0; i<=last_block; i++){
-//		m_aBB[i]=bb_add.m_aBB[i];
-//	}
-//}
 template<bool EraseAll>
 inline BitBoardN& BitBoardN::set_bit	(int nbit ){
 	
@@ -767,15 +858,15 @@ BitBoardN&  BitBoardN::set_bit (const BitBoardN& bb_add){
 }
 
 inline
-BitBoardN&  BitBoardN::set_block (int FirstBlock, int LastBlock, const BitBoardN& bb_add){
+BitBoardN&  BitBoardN::set_block (int firstBlock, int lastBlock, const BitBoardN& bb_add){
 
 	///////////////////////////////////////////////////////////////////////////////
-	assert((FirstBlock >= 0) && (LastBlock < m_nBB) && (FirstBlock <= LastBlock));
+	assert((firstBlock >= 0) && (LastBlock < m_nBB) && (firstBlock <= lastBlock));
 	///////////////////////////////////////////////////////////////////////////////
 
-	int last_block = ((LastBlock == -1) ? m_nBB - 1 : LastBlock);
+	int last_block = ((lastBlock == -1) ? m_nBB - 1 : lastBlock);
 
-	for (auto i = FirstBlock; i <= last_block; ++i) {
+	for (auto i = firstBlock; i <= last_block; ++i) {
 		m_aBB[i] |= bb_add.m_aBB[i];
 	}
 
@@ -864,16 +955,44 @@ inline int BitBoardN::lsbn64() const{
 return EMPTY_ELEM;	
 }
 
+inline
+int BitBoardN::is_singleton() const {
 
-inline bool BitBoardN::is_singleton()const{
-/////////////////////////////
-// optimized for dense graphs
-	int pc=0;
-	for(int i=0; i<m_nBB; i++){
-		if((pc+= bblock::popc64(m_aBB[i]))>1) return false; 
+	int pc = 0;
+	for(auto i = 0; i < m_nBB; ++i){
+		if ((pc += bblock::popc64(m_aBB[i])) > 1) {
+			return -1;
+		}
 	}
-	if(pc) return true;
-return false;
+
+	//reasons with pc: 1-singleton, 0-empty
+	if (pc == 1) {	return 1;}
+
+	//must be empty bitset
+	return 0;		
+}
+
+inline 
+int BitBoardN::is_singleton_block(int firstBlock, int lastBlock) const
+{
+	///////////////////////////////////////////////////////////////////////////////////
+	assert((firstBlock >= 0) && (firstBlock <= lastBlock) && (lastBlock < m_nBB));
+	/////////////////////////////////////////////////////////////////////////////////
+
+	int last_block = ((lastBlock == -1) ? m_nBB - 1 : lastBlock);
+
+	int pc = 0;
+	for (auto i = firstBlock; i < last_block; ++i) {
+		if ((pc += bblock::popc64(m_aBB[i])) > 1) {
+			return -1;
+		}
+	}
+
+	//reasons with pc: 1- singleton, 0-empty
+	if (pc == 1) { return 1; }
+
+	//must be empty bitset
+	return 0;
 }
 
 
@@ -922,7 +1041,7 @@ inline int BitBoardN::single_disjoint (const BitBoardN& rhs, int& vertex) const{
 // PARAMS 
 // vertex: Single vertex which is in lhs (this) and not in rhs (this) and rhs 
 // 
-// RETURN value: 0 if disjoint, 1 if single_disjoint, EMPTY_ELEM otherwise 
+// RETURN value: 0 if disjoint, 1 if single_disjoint, -1 otherwise 
 
 
 	int pc=0;

@@ -595,7 +595,7 @@ TEST(BBNtest,is_singleton){
 
 }
 
-TEST(BBNtest, first_found){
+TEST(BBNtest, find_first_common_bit){
 //////////////////////
 // testing first element in common between sets 
 
@@ -611,16 +611,43 @@ TEST(BBNtest, first_found){
 	bb1.set_bit(64);
 	bb1.set_bit(72);
 
-	int ff=bb.first_found(bb1);
+	int ff=bb.find_first_common_bit(bb1);
 	EXPECT_EQ(64, ff);
 
 	bb.erase_bit(64);
-	ff=bb.first_found(bb1);
+	ff=bb.find_first_common_bit(bb1);
 	EXPECT_EQ(EMPTY_ELEM, ff);
 
 	bb.set_bit(72);
-	ff=bb.first_found(bb1);
+	ff=bb.find_first_common_bit(bb1);
 	EXPECT_EQ(72, ff);
+}
+
+
+TEST(BBNtest, find_singleton) {
+	
+	BitBoardN bb(130);
+	bb.set_bit(10);
+	bb.set_bit(20);
+	bb.set_bit(64);
+
+	int singleton_bit = EMPTY_ELEM;
+	int retVal = -1;
+
+	//tests {0, 15] - singleton 10
+	retVal = bb.find_singleton(0, 15, singleton_bit);
+	EXPECT_EQ(1, retVal);
+	EXPECT_EQ(10, singleton_bit);
+
+	//tests {21, 63] - empty
+	retVal = bb.find_singleton(21, 63, singleton_bit);
+	EXPECT_EQ(0, retVal);
+	EXPECT_EQ(-1, singleton_bit);
+
+	//tests {63, 64] - singleton 64
+	retVal = bb.find_singleton(63, 64, singleton_bit);
+	EXPECT_EQ(1, retVal);
+	EXPECT_EQ(64, singleton_bit);
 }
 
 

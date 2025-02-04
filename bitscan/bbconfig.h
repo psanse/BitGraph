@@ -23,7 +23,9 @@
 //#undef NDEBUG												// uncomment for assertions in debug mode
 
 //Size of the register word in bits - DO NOT CHANGE!
-constexpr int WORD_SIZE = 64;							
+constexpr int WORD_SIZE = 64;	
+constexpr int WORD_SIZE_MINUS_ONE = WORD_SIZE - 1;
+
 
 /////////////
 //Popcount
