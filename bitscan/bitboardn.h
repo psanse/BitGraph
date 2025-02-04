@@ -128,10 +128,23 @@ inline int previous_bit				(int nbit)	const;					//lookup
 
 	/**
 	* @brief returns the number of 1-bits in the bitstring
+	* @details alias to popcn64, calls the function
 	**/
-std::size_t	size					()						const		{(std::size_t)popcn64();}
-virtual	inline int popcn64			()						const;		//lookup 
-virtual	inline int popcn64			(int nBit/* 0 based*/)	const;
+std::size_t	size					()							const		{(std::size_t) popcn64();}
+
+	/**
+	* @brief returns the number of 1-bits in the bitstring
+	* @details implemented as a lookup table	
+	**/
+virtual	inline int popcn64			()							const;		 
+
+	/**
+	* @brief returns the number of 1-bits in the bitstring
+	*	 	in the closed range [firstBit, lastBit]
+	* @details efficiently implemented as a lookup table or
+	*		   with HW instructions depending  on an internal switch (see config.h)
+	**/
+virtual	inline int popcn64			(int firstBit, int lastBit)	const;
 
 /////////////////////
 //Setting / Erasing bits 
@@ -142,7 +155,7 @@ virtual	inline int popcn64			(int nBit/* 0 based*/)	const;
 	**/
 		
 	template<bool EraseAll = false>
-	BitBoardN&  set_bit			(int nBit);
+	BitBoardN&  set_bit				(int nBit);
 
 	/**
 	* @brief sets the bits in the closed range [firstBit, lastBit] to 1 in the bitstring
@@ -1071,28 +1084,38 @@ int BitBoardN::popcn64() const{
 	return pc;
 }
 
-int BitBoardN::popcn64(int nBit) const{
-/////////////////////////
-// Population size from nBit(included) onwards
+inline int BitBoardN::popcn64(int firstBit, int lastBit) const
+{
 
-	int npc=0;
-	union u	{
-		U16 c[4];
-		BITBOARD b;
-	}val;
-
-	int nBB=WDIV(nBit);
-
-	for(int i=nBB+1; i<m_nBB; i++){
-		val.b = m_aBB[i]; //Loads union
-		npc+= Tables::pc[val.c[0]] + Tables::pc[val.c[1]] + Tables::pc[val.c[2]] + Tables::pc[val.c[3]];
-	}
-
-	//special case of nBit bit block
-	val.b = m_aBB[nBB]&~Tables::mask_right[WMOD(nBit)];		//Loads union
-	npc+= Tables::pc[val.c[0]] + Tables::pc[val.c[1]] + Tables::pc[val.c[2]] + Tables::pc[val.c[3]];
+	/////////////////////////////////////////////
+	assert( firstBit > 0 && firstBit <= lastBit);
+	/////////////////////////////////////////////
+		
+	int pc = 0;
+	int bbl = WDIV(firstBit);
+	int bbh = WDIV(lastBit);
 	
-return npc;
+
+	if (bbl == bbh)
+	{
+		//same block
+		pc = bblock::popc64(m_aBB[bbl] & bblock::MASK_1(firstBit - WMUL(bbl), lastBit - WMUL(bbh)));		
+					
+	}
+	else
+	{
+		//count the population of the intermediate blocks
+		for (auto i = bbl + 1; i < bbh; ++i) {
+			pc += bblock::popc64( m_aBB[i]);
+		}
+
+		//count the population of the first and last blocks
+		pc += bblock::popc64(m_aBB[bbh] & bblock::MASK_1_RIGHT(lastBit - WMUL(bbh)));
+		pc += bblock::popc64(m_aBB[bbl] & bblock::MASK_1_LEFT(firstBit - WMUL(bbl)));
+	
+	}
+		
+	return pc;
 }
 
 

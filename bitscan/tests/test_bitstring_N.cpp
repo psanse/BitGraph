@@ -178,7 +178,7 @@ TEST(BBNtest, set_bit_range) {
 	EXPECT_TRUE(bb1.is_bit(0));
 
 	bb1.set_bit(55, 56);					//bb1={0...55 56...64}
-	EXPECT_TRUE(bb1.popcn64(4));	
+	EXPECT_TRUE(bb1.popcn64(4, 130));	
 	EXPECT_TRUE(bb1.is_bit(0));
 	EXPECT_TRUE(bb1.is_bit(55));
 	EXPECT_TRUE(bb1.is_bit(56));
@@ -366,10 +366,14 @@ TEST(BBNtest, population_count){
 	bb.set_bit(64);
 
 	EXPECT_EQ(3, bb.popcn64());
-	EXPECT_EQ(2, bb.popcn64(11));
-	EXPECT_EQ(1, bb.popcn64(21));
-	EXPECT_EQ(0, bb.popcn64(65));
-	EXPECT_EQ(1, bb.popcn64(64));
+	EXPECT_EQ(2, bb.popcn64(11, 130));
+	EXPECT_EQ(1, bb.popcn64(21, 130));
+	EXPECT_EQ(0, bb.popcn64(65, 130));
+	EXPECT_EQ(1, bb.popcn64(64, 130));
+
+	//same bit index
+	EXPECT_EQ(1, bb.popcn64(10, 10));
+	EXPECT_EQ(1, bb.popcn64(20, 20));
 }
 
 TEST(BBNtest, to_vector) {
