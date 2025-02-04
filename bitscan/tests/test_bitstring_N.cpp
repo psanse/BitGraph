@@ -569,7 +569,7 @@ TEST(BBNtest, single_disjoint){
 	bb.set_bit(1,10);
 	bb1.set_bit(10,20);
 	int v = EMPTY_ELEM;
-	int res = bb.single_disjoint(bb1, v);
+	int res = bb.find_single_disjoint(bb1, v);
 
 	EXPECT_EQ(10, v);
 	EXPECT_EQ(1, res);

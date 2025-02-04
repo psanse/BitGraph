@@ -315,23 +315,43 @@ inline	BitBoardN& erase_bit		(const BitBoardN& lhs, const BitBoardN& rhs);
 	* @last_update 02/02/2025
 	**/
 	inline int find_first_common_bit	(const BitBoardN& rhs)								const;	
-
-	/////////////////////////////
-	// Determines if there is only one vertex inside the closed range (both ends included)
-	// and returns the singleton (or EMPTY_ELEM)
-	//
-	// RETURNS 0 if range is empty, 1 if singleton (including singleton vertex), -1 
-	//			if more than one
-	//TODO - CHANGE - return bit, and state as a param? 
+		
+	/**
+	* @brief Determines if the bitstring has a single 1-bit in the closed range [firstBit, lastBit]	
+	*		 in singleton_bit
+	* @param firstBit, lastBit: closed range of bits (0<=firstBit<=lastBit)
+	* @param singleton_bit: contains the singleton bit if it exists or -1
+	* @returns  0 if range is empty, 1 if singleton, -1 if more than one bit exists in the range
+	**/
 	inline  int  find_singleton			(int firstBit, int lastBit, int& singleton_bit)		const;
 
+	/**
+	* @brief Determines if the single bit in this bitstring that is not in rhs
+	* @param vertex:  1-bit index or -1 if not single disjoint
+	* @returns 0 if disjoint, 1 if single disjoint, -1 otherwise (more than 1-bit in common)
+	**/
+	inline int	find_single_disjoint	(const BitBoardN& rhs, int& vertex)					const;					
 
-	
-inline	int	single_disjoint			(const BitBoardN& rhs, int& vertex)					const;					//non-disjoint by single element
-inline	int	single_disjoint			(int first_block, int last_block, 
-										const BitBoardN& rhs, int& vertex)				const;
-inline	int	single_joint			(const BitBoardN& rhs, int& vertex)					const;					//non-joint by single element (this\rhs)
-inline  int double_joint			(const BitBoardN& rhs, int& v, int& w)				const;					//non_joint by one or two elements (this\rhs)
+	//////////////////////
+	// single_disjoint including both end blocks (*** TODO: perhaps semi-open range?)
+	// date_of_creation: 14/8/16 
+	//
+	// Application: single_disjoint operation with bitstrings of different size (max clique)
+	// 
+	// REMARKS: does not check block range
+	/**
+	* @brief  Determines if the single bit in this bitstring that is not in rhs in the 
+	*		  closed range [firstBlock, lastBlock].
+	*		  If lastBlock == -1 the range is [firstBlock, m_nBB]
+	* 
+	* @param vertex:  1-bit index or -1 if not single disjoint
+	* @returns 0 if disjoint, 1 if single disjoint, -1 otherwise (more than 1-bit in common)
+	**/
+	inline	int	find_single_disjoint_block (int first_block, int last_block,
+												const BitBoardN& rhs, int& vertex)			const;
+
+	inline	int	single_joint			(const BitBoardN& rhs, int& vertex)					const;					//non-joint by single element (this\rhs)
+	inline  int double_joint			(const BitBoardN& rhs, int& v, int& w)				const;					//non_joint by one or two elements (this\rhs)
 
 
 /////////////////////////////
@@ -1036,58 +1056,57 @@ return npc;
 }
 
 
-inline int BitBoardN::single_disjoint (const BitBoardN& rhs, int& vertex) const{
-/////////////////////
-// PARAMS 
-// vertex: Single vertex which is in lhs (this) and not in rhs (this) and rhs 
-// 
-// RETURN value: 0 if disjoint, 1 if single_disjoint, -1 otherwise 
+inline int BitBoardN::find_single_disjoint (const BitBoardN& rhs, int& vertex) const{
 
-
-	int pc=0;
-	vertex=EMPTY_ELEM;
-	bool first_time=true;
+	int pc = 0;
+	bool is_first_vertex = true;
+	vertex = EMPTY_ELEM;
 	
-	for(int i=0; i<m_nBB; i++){
-		pc+=bblock::popc64(this->m_aBB[i] & rhs.m_aBB[i]);
-		if(pc>1){
-			vertex=EMPTY_ELEM;
-			return EMPTY_ELEM;
-		}else if(pc==1 && first_time ){  //store vertex position
-			vertex=bblock::lsb64_intrinsic(this->m_aBB[i] & rhs.m_aBB[i])+ WMUL(i);
-			first_time=false;
+	//main loop
+	for(auto i = 0; i < m_nBB; ++i){
+		pc += bblock::popc64 (m_aBB[i] & rhs.m_aBB[i]);
+		if(pc > 1){
+			vertex = EMPTY_ELEM;
+			return -1;
+		}else if(is_first_vertex && pc == 1 ) { //stores bit the first time pc == 1 
+						
+			vertex = bblock::lsb64_intrinsic ( m_aBB[i] & rhs.m_aBB[i] )+ WMUL(i);
+			is_first_vertex = false;
 		}
 	}
 	
-	return pc;		//disjoint
+	//disjoint - pc = 0
+	return pc;		
 }
 
 
-inline	int	BitBoardN::single_disjoint (int first_block, int last_block, const BitBoardN& rhs, int& vertex) const{
-//////////////////////
-// single_disjoint including both end blocks (*** TODO: perhaps semi-open range?)
-// date_of_creation: 14/8/16 
-//
-// Application: single_disjoint operation with bitstrings of different size (max clique)
-// 
-// REMARKS: does not check block range
+inline	int	BitBoardN::find_single_disjoint_block (int firstBlock, int lastBlock, const BitBoardN& rhs, int& vertex) const{
 
-	int pc=0;
-	vertex=EMPTY_ELEM;
-	bool first_time=true;
+	///////////////////////////////////////////////////////////////////////////////
+	assert((firstBlock >= 0) && (lastBlock < m_nBB) && (firstBlock <= lastBlock));
+	///////////////////////////////////////////////////////////////////////////////
+
+	int last_block;
+	(lastBlock == -1) ? last_block = m_nBB - 1 : last_block = lastBlock;
+
+	int pc = 0;
+	vertex = EMPTY_ELEM;
+	bool is_first_vertex = true;
 	
-	for(int i=first_block; i<=last_block; i++){
-		pc+=bblock::popc64(this->m_aBB[i] & rhs.m_aBB[i]);
-		if(pc>1){
-			vertex=EMPTY_ELEM;
-			return EMPTY_ELEM;
-		}else if(pc==1 && first_time ){  //store vertex position
-			vertex=bblock::lsb64_intrinsic(this->m_aBB[i] & rhs.m_aBB[i] )+ WMUL(i);
-			first_time=false;
+	for(auto i= firstBlock; i <= last_block; ++i){
+		pc += bblock::popc64(m_aBB[i] & rhs.m_aBB[i]);
+		if(pc > 1){
+			vertex = EMPTY_ELEM;
+			return -1;
+		}else if(is_first_vertex && pc == 1 ){	//stores bit the first time pc == 1 
+			
+			vertex = bblock::lsb64_intrinsic(m_aBB[i] & rhs.m_aBB[i] )+ WMUL(i);
+			is_first_vertex = false;
 		}
 	}
-	
-	return pc;		//disjoint
+
+	//disjoint - pc = 0	
+	return pc;		
 }
 
 
