@@ -83,7 +83,7 @@ int Ugraph<sparse_bitarray>::degree(int v, const BitBoardN& bbn) const {
 	
 	int ndeg = 0;
 	for (auto it = adj_[v].begin(); it != adj_[v].end(); ++it) {
-		ndeg += bblock::popc64 (it->bb & bbn.get_bitblock(it->index) );
+		ndeg += bblock::popc64 (it->bb & bbn.bitblock(it->index) );
 	}
 
 	return ndeg;
@@ -120,7 +120,7 @@ int Ugraph<sparse_bitarray>::degree(int v, int UB, const BitBoardN& bbn) const {
 	
 	int ndeg = 0;
 	for (auto it = adj_[v].begin(); it != adj_[v].end(); ++it) {
-		ndeg += bblock::popc64(it->bb & bbn.get_bitblock(it->index));
+		ndeg += bblock::popc64(it->bb & bbn.bitblock(it->index));
 		if (ndeg >= UB) return UB;
 	}
 
