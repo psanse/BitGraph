@@ -113,104 +113,101 @@ virtual	inline int popcn64			(int nBit/* 0 based*/)	const;
 /////////////////////
 //Setting / Deletion 
 			
-		/**
-		* @brief sets bit in position idx to 1 in the bitstring
-		* @param  idx: index of the bit to set (nBit >= 0)
-		**/
+	/**
+	* @brief sets bit in position idx to 1 in the bitstring
+	* @param  idx: index of the bit to set (nBit >= 0)
+	**/
 		
-		template<bool EraseAll = false>
-		BitBoardN&  set_bit			(int nBit);
+	template<bool EraseAll = false>
+	BitBoardN&  set_bit			(int nBit);
 
-		/**
-		* @brief sets the bits in the closed range [firstBit, lastBit] to 1 in the bitstring
-		* @params firstBit, lastBit:  0 < firstBit <= lastBit
-		* @date 22/9/14
-		* @last_update 01/02/25
-		**/
+	/**
+	* @brief sets the bits in the closed range [firstBit, lastBit] to 1 in the bitstring
+	* @params firstBit, lastBit:  0 < firstBit <= lastBit
+	* @date 22/9/14
+	* @last_update 01/02/25
+	**/
 		template<bool EraseAll = false>
 inline  BitBoardN&	 set_bit		(int firstBit, int lastBit);
 
-		/**
-		* @brief sets all bits to 1
-		**/
+	/**
+	* @brief sets all bits to 1
+	**/
 inline  BitBoardN&  set_bit			();
 	 	
-		/**
-		* @brief Adds the bits from the bitstring bb_add in the population
-		*		 range of the bitstring (bitblocks are copied).
-		* 
-		*		 I. The bitblock size of bb_add must be at least as large as the bitstring.
-		*		
-		* @details  Equivalent to OR operation / set union
-		* @returns reference to the modified bitstring
-		* 
-		**/
+	/**
+	* @brief Adds the bits from the bitstring bb_add in the population
+	*		 range of the bitstring (bitblocks are copied).
+	* 
+	*		 I. The bitblock size of bb_add must be at least as large as the bitstring.
+	*		
+	* @details  Equivalent to OR operation / set union
+	* @returns reference to the modified bitstring
+	**/
 inline	BitBoardN& set_bit			(const BitBoardN& bb_add);
 		
-		/**
-		* @brief Adds the bits from the bitstring bb_add in the range [0, lastBit] 
-		* @param lastBit : the last bit in the range to be copied
-		* @returns reference to the modified bitstring
-		**/
+	/**
+	* @brief Adds the bits from the bitstring bb_add in the range [0, lastBit] 
+	* @param lastBit : the last bit in the range to be copied
+	* @returns reference to the modified bitstring
+	**/
 inline BitBoardN& set_bit			(int lastBit, const BitBoardN& bb_add);
 	 
-	   /**
-	   * @brief Adds elements from a vector of non-negative integers lv as 1-bit
-	   *	    up to the maximum capacity of the bitstring. Values greater than the
-	   *		maximum population size are ignored.
-	   * 
-	   * @param lv: vector of non-negative integers
-	   * @param EraseAll <template>: if true, deletes the rest of bits in the bitstring
-	   * @returns reference to the modified bitstring
-	   * @details negative elements will cause an assertion if NDEBUG is not defined, 
-	   *		  else the behaviour is undefined.
-	   **/
-		template<bool EraseAll = false>	
-	   BitBoardN& set_bit			(const vint& lv);
+	/**
+	* @brief Adds elements from a vector of non-negative integers lv as 1-bit
+	*	    up to the maximum capacity of the bitstring. Values greater than the
+	*		maximum population size are ignored.
+	* 
+	* @param lv: vector of non-negative integers
+	* @param EraseAll <template>: if true, deletes the rest of bits in the bitstring
+	* @returns reference to the modified bitstring
+	* @details negative elements will cause an assertion if NDEBUG is not defined, 
+	*		  else the behaviour is undefined.
+	**/
+	template<bool EraseAll = false>	
+	BitBoardN& set_bit				(const vint& lv);
 
-		/**
-		* @brief sets bit number bit to 0 in the bitstring
-		* @param  bit: position of the 1-bit to set (>=0)
-		* @returns reference to the modified bitstring
-		**/
+	/**
+	* @brief sets bit number bit to 0 in the bitstring
+	* @param  bit: position of the 1-bit to set (>=0)
+	* @returns reference to the modified bitstring
+	**/
 inline	BitBoardN& erase_bit		(int bit);
 
-		/**
-		* @brief sets the bits in the closed range [firstBit, lastBit] to 0 in the bitstring
-		* @params firstBit, lastBit: 0 < firstBit <= lastBit
-		* @created 22/9/14
-		* @last_update 01/02/25
-		**/
+	/**
+	* @brief sets the bits in the closed range [firstBit, lastBit] to 0 in the bitstring
+	* @params firstBit, lastBit: 0 < firstBit <= lastBit
+	* @created 22/9/14
+	* @last_update 01/02/25
+	**/
 inline BitBoardN& erase_bit			(int firstBit, int lastBit);
 
-		/**
-		* @brief sets all bits to 0
-		* @returns reference to the modified bitstring
-		**/
+	/**
+	* @brief sets all bits to 0
+	* @returns reference to the modified bitstring
+	**/
 inline BitBoardN& erase_bit			();
 
-		/**
-		* @brief Removes the bits from the bitstring bb_del inside the population
-		*		 range.
-		*
-		*		 I. bb_del must have a maximum population
-		*			greater or equal than the bitstring.
-		*
-		* @details  Equivalent to a set minus operation
-		* @returns reference to the modified bitstring
-		*
-		**/
+	/**
+	* @brief Removes the bits from the bitstring bb_del inside the population range.
+	*
+	*		 I. bb_del must have a maximum population
+	*			greater or equal than the bitstring.
+	*
+	* @details  Equivalent to a set minus operation
+	* @returns reference to the modified bitstring
+	**/
 inline	BitBoardN& erase_bit		(const BitBoardN& bb_del);	
 
-		/**
-		* @brief Removes the 1-bits from both input bitstrings (their union) 
-		*		inside the population range. The sizes of both input bitstrings
-		*		must be greater than the destination bitstring (*this)
-		* @param lhs, rhs: input bitstrings  
-		* @returns reference to the modified bitstring
-		* @created: 30/7/2017  for the MWCP
-		* @last_update: 02/02/2025
-		**/
+	/**
+	* @brief Removes the 1-bits from both input bitstrings (their union) 
+	*		inside the population range. The sizes of both input bitstrings
+	*		must be greater than the destination bitstring (*this)
+	* @param lhs, rhs: input bitstrings  
+	* @returns reference to the modified bitstring
+	* @created: 30/7/2017  for the MWCP
+	* @last_update: 02/02/2025
+	**/
 inline	BitBoardN& erase_bit		(const BitBoardN& lhs, const BitBoardN& rhs);
 						
 /////////////////////
@@ -274,6 +271,9 @@ inline	BitBoardN& erase_bit		(const BitBoardN& lhs, const BitBoardN& rhs);
 	* @details For symmetric_difference
 	**/
 	BitBoardN& operator ^=			(const BitBoardN& bbn);
+
+////////////////////////
+// Basic operations
 
 	/**
 	* @brief flips 1-bits to 0 and 0-bits to 1
@@ -346,21 +346,29 @@ inline	BitBoardN& erase_bit		(const BitBoardN& lhs, const BitBoardN& rhs);
 	inline	int	find_common_singleton_block		(int first_block, int last_block,
 													const BitBoardN& rhs, int& bit)		const;
 	
-	/////////////////////
-	// singleton in this\rhs
-	// date: 27/7/16 
-	// PARAMS 
-	// vertex: Single vertex from lhs (this) which does not belong to rhs or EMPTY_ELEM (return value MUST BE 1)
-	// note that this operation studies the cardinality of a set-difference operator, and is thus not 
-	// conmutative.
-	// 
-	// 
-	// RETURN value: 0 if rhs is a superset of this, 1 if this has 1-bit not in rhs, EMPTY_ELEM otherwise (more than 1 bit)
-	inline	int	find_diff_singleton		(const BitBoardN& rhs, int& bit)				const;					
+	/**
+	* @brief Determines the single 1-bit in this bitstring of to the set difference
+	*		 bitset this \ rhs.
+	* @param bit:  1-bit index or -1 if the set difference is not a single bit
+	* @returns 0 if the set difference is empty, 1 if a singleton and -1 otherwise (more than 1-bit)
+	* @created 27/7/16
+	* @last_update 04/02/2025
+	**/
+	inline	int	find_diff_singleton				(const BitBoardN& rhs, int& bit)		const;					
 	
-	//non_joint by one or two elements (this\rhs)
-	inline  int find_diff_singleton		(const BitBoardN& rhs, int& bit1, int& bit2)	const;
-
+	/**
+	* @brief Determines the pair of bits bit1 and bit2 the set difference  bitset this \ rhs.
+	*		 If the set difference is a singleton, bit1 = singleton bit and bit2 = -1.
+	*		 If the set diference is empty or larger than 2 bits, bit1 = bit2 = -1.	
+	*						 
+	* @param bit1, bit2: output pair of bits of the set difference.
+	* 
+	* @returns 0 if the set difference is empty, 1 if it is a singleton, 2 a pair 
+	*		  and -1 otherwise (more than 1-bit)
+	* @details: created  27/7/16, last_update 04/02/2025
+	**/
+	inline  int find_diff_pair					(const BitBoardN& rhs, 
+														int& bit1, int& bit2	)		const;
 
 /////////////////////////////
 //Boolean functions - CHECK UNIT TESTS
@@ -428,8 +436,7 @@ inline	BitBoardN& erase_bit		(const BitBoardN& lhs, const BitBoardN& rhs);
 	* @details Currently not available for sparse bitsets
 	**/
 	inline bool is_disjoint				(const BitBoardN& lhs, const  BitBoardN& rhs)	const;
-	
-	
+		
 /////////////////////
 // I/O 
 	/**
@@ -441,7 +448,6 @@ inline	BitBoardN& erase_bit		(const BitBoardN& lhs, const BitBoardN& rhs);
 	**/
 	std::ostream& print				( std::ostream& o = std::cout,
 									  bool show_pc = true, bool endl = true	)		const override;
-	
 	/**
 	* @brief converts bb and its popcount to a readable string
 	* @details format example [...000111 (3)]
@@ -464,8 +470,7 @@ inline	BitBoardN& erase_bit		(const BitBoardN& lhs, const BitBoardN& rhs);
 	* @details calls to_vector
 	**/
 	operator						vint()								const;
-
-	
+		
 	/**
 	* @brief Converts the bitstring to a stack object s 
 	* @details no allocation! stack MUST BE of adequate size to hold all 1-bits
@@ -473,7 +478,6 @@ inline	BitBoardN& erase_bit		(const BitBoardN& lhs, const BitBoardN& rhs);
 	**/
 	void to_stack					(com::stack_t<int>& s)				const;						
 	
-
 	/**
 	* @brief Converts the bitstring to a C array
 	* @param lv: output C-array as pointer
@@ -487,8 +491,8 @@ virtual	int* to_C_array				(int* lv, std::size_t& size, bool rev = false);
 //data members
 
 protected:
-	BITBOARD* m_aBB;				//array of bitblocks - not using std::vector because of memory allignment, TODO-CHANGE TO VECTOR (04/02/2025)
-	int m_nBB;						//number of bitblocks (1-based)
+	BITBOARD* m_aBB;				//C-array of bitblocks - not using std::vector because of memory allignment, TODO-CHANGE TO VECTOR (04/02/2025)
+	int m_nBB;						//number of bitblocks 
 
 }; //end BitBoardN class
 
@@ -945,7 +949,6 @@ BitBoardN&  BitBoardN::erase_bit (int low, int high){
 	}
 
 	return *this;
-
 }
 
 inline int BitBoardN::lsbn64() const{
@@ -980,7 +983,8 @@ inline int BitBoardN::lsbn64() const{
 	}
 
 #endif
-return EMPTY_ELEM;	
+
+	return EMPTY_ELEM;	
 }
 
 inline
@@ -1023,20 +1027,24 @@ int BitBoardN::is_singleton_block(int firstBlock, int lastBlock) const
 	return 0;
 }
 
-
 int BitBoardN::popcn64() const{
-	int npc=0;
+
+	int pc = 0;
 	union u	{
 		U16 c[4];
 		BITBOARD b;
 	}val;
 
-	for(int i=0; i<m_nBB; i++){
-		val.b = m_aBB[i]; //Loads union
-		npc+= Tables::pc[val.c[0]] + Tables::pc[val.c[1]] + Tables::pc[val.c[2]] + Tables::pc[val.c[3]];
+	for(auto i = 0; i < m_nBB; ++i){
+
+		//loads union
+		val.b = m_aBB[i]; 
+
+		//counts population
+		pc += Tables::pc[val.c[0]] + Tables::pc[val.c[1]] + Tables::pc[val.c[2]] + Tables::pc[val.c[3]];
 	}
 
-return npc;
+	return pc;
 }
 
 int BitBoardN::popcn64(int nBit) const{
@@ -1115,7 +1123,7 @@ int	BitBoardN::find_common_singleton_block (int firstBlock, int lastBlock, const
 		}
 	}
 
-	//disjoint - pc = 0	
+	//pc = 0 (disjoint) /pc = 1 (intersection between *this and rhs a single bit)	
 	return pc;		
 }
 
@@ -1127,7 +1135,10 @@ int BitBoardN::find_diff_singleton(const BitBoardN& rhs, int& bit) const{
 	bool is_first_vertex = true;
 	
 	for(auto i = 0; i < m_nBB; ++i){
+
+		//popcount of set difference - removes bits of rhs from *this
 		pc += bblock::popc64(m_aBB[i] &~ rhs.m_aBB[i]);
+
 		if(pc > 1){
 			bit = EMPTY_ELEM;
 			return -1;
@@ -1138,48 +1149,61 @@ int BitBoardN::find_diff_singleton(const BitBoardN& rhs, int& bit) const{
 		}
 	}
 	
-	//pc = 0, *this is a subset of rhs
+	//pc = 0 (*this subset of rhs, empty setdiff) / pc = 1 (singleton setdiff)
 	return pc;		
 }
 
-inline 
-int BitBoardN::find_diff_singleton (const BitBoardN& rhs, int& v, int& w) const{
-/////////////////////
-// date: 27/7/16 
-// PARAMS 
-// v, w: vertices from lhs (this) which do not belong to rhs or EMPTY_ELEM (return value MUST BE 1 or 2)
-// note that this operation studies the cardinality of a set-difference operator, and is thus not 
-// conmutative.
-// 
-// 
-// RETURN value: 0 if joint, 1 if single_joint (v is the vertex, w=EMPTY_ELEM), 2 if double_joint (v, w are the vertices, EMPTY_ELEM otherwise 
-	
-	int pc=0;
-	v=EMPTY_ELEM; w=EMPTY_ELEM;
-	bool first_time=true; bool second_time=true;
-	
-	for(int i=0; i<m_nBB; i++){
-		pc+=bblock::popc64(this->m_aBB[i] &~ rhs.m_aBB[i]);
-		if(pc>2){
-			v=EMPTY_ELEM; w=EMPTY_ELEM;
+inline
+int BitBoardN::find_diff_pair(const BitBoardN& rhs, int& bit1, int& bit2) const {
+
+	int pc = 0;
+	bool is_first_bit = true;
+	bool is_second_bit = true;
+	bit1 = EMPTY_ELEM;
+	bit2 = EMPTY_ELEM;
+
+	//main loop
+	for (auto i = 0; i < m_nBB; ++i) {
+
+		//popcount of set difference - removes bits of rhs from *this
+		BITBOARD bb = m_aBB[i] & ~rhs.m_aBB[i];
+		pc += bblock::popc64(bb);
+
+		if (pc > 2) {
+
+			bit1 = EMPTY_ELEM;
+			bit2 = EMPTY_ELEM;
 			return EMPTY_ELEM;
-		}else if(pc==1 && first_time ){  //store vertex position
-			v=bblock::lsb64_intrinsic(this->m_aBB[i] &~ rhs.m_aBB[i] )+ WMUL(i);
-			first_time=false;
-		}else if(pc==2 && second_time ){  //store vertex position
-			BITBOARD bb=this->m_aBB[i] &~ rhs.m_aBB[i];
-			if(first_time){
-				v=bblock::lsb64_intrinsic(bb);
-				w=bblock::lsb64_intrinsic(bb^Tables::mask[v])+WMUL(i);
-				v+=WMUL(i);
-			}else{
-				w=bblock::lsb64_intrinsic(this->m_aBB[i] &~ rhs.m_aBB[i] )+ WMUL(i);
+
+		}
+		else if (pc == 1 && is_first_bit) {  //stores bit the first time pc == 1 
+
+			bit1 = bblock::lsb64_intrinsic(bb) + WMUL(i);
+			is_first_bit = false;
+
+		}
+		else if (pc == 2 && is_second_bit) {  //stores the two bits the first time pc == 2 
+
+			if (is_first_bit) {
+
+				//determines the two bits in the same block
+				bit1 = bblock::lsb64_intrinsic(bb) + WMUL(i);
+				bit2 = bblock::msb64_intrinsic(bb) + WMUL(i);
+
 			}
-			second_time=false;
+			else {
+
+				//determines the second bit directly since the
+				//two bits of the set difference are in different bitblocks
+				bit2 = bblock::lsb64_intrinsic(bb) + WMUL(i);
+			}
+
+			is_second_bit = false;
 		}
 	}
-	
-	return pc;		//measure of jointness
+
+	//pc=0, 1, 2 (size of the set difference)
+	return pc;
 }
 
 inline

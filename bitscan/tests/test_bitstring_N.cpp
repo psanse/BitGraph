@@ -294,27 +294,31 @@ TEST(BBNtest, find_set_difference){
 	bb1.set_bit(20);
 	bb1.set_bit(64);
 
-	//single_joint
-	int v;
-	EXPECT_EQ(0, bb.find_diff_singleton(bb1,v));		//same set
-	EXPECT_EQ(EMPTY_ELEM,v);
-	
+	int bit1 = EMPTY_ELEM;
+	int bit2 = EMPTY_ELEM;	
+
+	//empty set difference 
+	//bb1 is contained in bb (since bb1 = bb)
+	EXPECT_EQ(0, bb.find_diff_singleton(bb1, bit1));		
+	EXPECT_EQ(EMPTY_ELEM, bit1);
+		
+	//set difference is the singleton {65}
 	bb.set_bit(65);
-	bb.print();
-	EXPECT_EQ(1, bb.find_diff_singleton(bb1,v));
-	EXPECT_EQ(65,v);
+	EXPECT_EQ(1, bb.find_diff_singleton(bb1, bit1));
+	EXPECT_EQ(65, bit1);
 
+	//set difference is the pair {65, 123}
 	bb.set_bit(123);
-	int w;
-	EXPECT_EQ(2, bb.find_diff_singleton(bb1,v,w));
-	EXPECT_EQ(65,v);
-	EXPECT_EQ(123,w);
+	EXPECT_EQ(2, bb.find_diff_pair(bb1, bit1, bit2));
+	EXPECT_EQ(65, bit1);
+	EXPECT_EQ(123, bit2);
 
-	//non-joint by more than 2 vertices
+	//set difference is the triplet {65, 123, 125}
+	//returns -1, bit1 and bit2 = EMPTY_ELEM
 	bb.set_bit(125);
-	EXPECT_EQ(EMPTY_ELEM, bb.find_diff_singleton(bb1,v,w));
-	EXPECT_EQ(EMPTY_ELEM,v);
-	EXPECT_EQ(EMPTY_ELEM,w);
+	EXPECT_EQ(EMPTY_ELEM, bb.find_diff_pair(bb1, bit1, bit2));
+	EXPECT_EQ(EMPTY_ELEM, bit1);
+	EXPECT_EQ(EMPTY_ELEM, bit2);
 }
 
 TEST(BBNtest, erase_bit_range){
