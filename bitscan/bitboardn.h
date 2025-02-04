@@ -66,13 +66,14 @@ public:
 ////////////
 //construction / destruction 
 
-	 BitBoardN						(): m_nBB(EMPTY_ELEM),m_aBB(NULL)		{};	
+	 BitBoardN						(): m_nBB(EMPTY_ELEM), m_aBB(NULL)		{};	
 	 BitBoardN						(const vint& v, int popsize);
 explicit  BitBoardN					(int popsize /*1 based*/, bool reset=true);	
 explicit  BitBoardN					(const vint& v);
 	
 	 	 
 	 //TODO - move and copy semantics...
+
 	 BitBoardN						(const BitBoardN& bbN);
 	 BitBoardN& operator =			(const BitBoardN&);
 
@@ -83,12 +84,21 @@ virtual	~BitBoardN					();
 	void init						(int popsize, bool reset = true);										
 	void init						(int popsize, const vint& );
 	
+	//TODO- add reset(...) with the same semantics as init (04/02/2025)
+
 /////////////////////
 //setters and getters (will not allocate memory)
 	
-	BITBOARD* get_bitstring			()									{ return m_aBB; }
-	const BITBOARD* get_bitstring	()			const					{ return m_aBB; }
-	int number_of_bitblocks			()			const					{ return m_nBB; }
+	int number_of_bitblocks()					const					{ return m_nBB; }
+	
+	/**
+	* @brief alternative syntax for number_of_bitblocks
+	**/
+	int capacity()								const					{ return m_nBB; }
+
+	BITBOARD* bitstring				()									{ return m_aBB; }
+	const BITBOARD* bitstring		()			const					{ return m_aBB; }
+	
 const BITBOARD bitblock				(int block) const					{ return m_aBB[block]; }
 	BITBOARD& bitblock				(int block)							{ return m_aBB[block]; }
 
@@ -107,11 +117,15 @@ inline int previous_bit				(int nbit)	const;					//lookup
 /////////////////
 // Popcount
 
+	/**
+	* @brief returns the number of 1-bits in the bitstring
+	**/
+std::size_t	size					()						const		{(std::size_t)popcn64();}
 virtual	inline int popcn64			()						const;		//lookup 
 virtual	inline int popcn64			(int nBit/* 0 based*/)	const;
 
 /////////////////////
-//Setting / Deletion 
+//Setting / Erasing bits 
 			
 	/**
 	* @brief sets bit in position idx to 1 in the bitstring
