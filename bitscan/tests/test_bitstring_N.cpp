@@ -469,22 +469,22 @@ TEST(BBNtest, vector_operations) {
 	EXPECT_TRUE(bbN3.is_bit(20));
 
 	//bitstring with population size 20 
-	BitBoardN bbN4(lv, 20);						//vector element 20 will not make part of the bitstring
-	EXPECT_EQ(1, bbN4.popcn64());
+	BitBoardN bbN4(lv, 21);						//vector element 20 will not make part of the bitstring
+	EXPECT_EQ(2, bbN4.popcn64());
 	EXPECT_TRUE(bbN4.is_bit(10));
-	EXPECT_FALSE(bbN4.is_bit(20));
+	EXPECT_TRUE(bbN4.is_bit(20));
 
 	////////////////////////
 	//setting bits from vector
-	lv = { 10, 20, 45, 62, 250 };
+	lv = { 10, 19, 45, 62, 250 };
 	
-	//bbN5 = {10, 20, 45, 62}
+	//bbN5 = {10, 19, 45, 62}
 	BitBoardN bbN5(100);						//max population size 100						
 	bbN5.set_bit(lv);
 
 	EXPECT_EQ(4, bbN5.popcn64());
 	EXPECT_TRUE(bbN5.is_bit(10));
-	EXPECT_TRUE(bbN5.is_bit(20));
+	EXPECT_TRUE(bbN5.is_bit(19));
 	EXPECT_TRUE(bbN5.is_bit(45));
 	EXPECT_TRUE(bbN5.is_bit(62));
 	EXPECT_FALSE(bbN5.is_bit(63));
@@ -617,11 +617,12 @@ TEST(BBNtest, find_first_common_bit){
 	bb.set_bit(64);
 
 	//assignment
-	BitBoardN bb1(34);
+	BitBoardN bb1(130);
 	bb1.set_bit(22);
 	bb1.set_bit(23);
 	bb1.set_bit(64);
 	bb1.set_bit(72);
+	
 
 	int ff=bb.find_first_common_bit(bb1);
 	EXPECT_EQ(64, ff);

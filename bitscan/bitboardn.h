@@ -21,6 +21,7 @@
 
 //alias
 using vint = std::vector<int>;
+using vBS = std::vector<BITBOARD>;	
 
 /////////////////////////////////
 //
@@ -57,7 +58,7 @@ public:
 //construction / destruction 
 
 	 BitBoardN						(): nBB_(EMPTY_ELEM)	{};	
- explicit  BitBoardN				(int popsize);
+ explicit	 BitBoardN				(int popsize);
  explicit  BitBoardN				(const vint& v);
 	 BitBoardN						(const vint& v, int popsize);
 
@@ -73,7 +74,7 @@ virtual	~BitBoardN					()									= default;
 
 ////////////
 //memory allocation 
-	void init						(int popsize, bool reset = true);										
+	void init						(int popsize);										
 	void init						(int popsize, const vint& );
 	
 	//TODO- add reset(...) with the same semantics as init (04/02/2025)
@@ -88,8 +89,8 @@ virtual	~BitBoardN					()									= default;
 	**/
 	int capacity()								const					{ return nBB_; }
 
-	BITBOARD* bitstring				()									{ return vBB_; }
-	const BITBOARD* bitstring		()			const					{ return vBB_; }
+	vBS& bitstring					()									{ return vBB_; }
+const vBS& bitstring				()			const					{ return vBB_; }
 	
 const BITBOARD bitblock				(int block) const					{ return vBB_[block]; }
 	BITBOARD& bitblock				(int block)							{ return vBB_[block]; }
@@ -559,9 +560,9 @@ virtual	int* to_C_array				(int* lv, std::size_t& size, bool rev = false);
 //data members
 
 protected:
-	
-	std::vector<BITBOARD> vBB_;	//vector of bitblocks		
 	int nBB_;					//number of bitblocks 
+	std::vector<BITBOARD> vBB_;	//vector of bitblocks		
+	
 
 	//deprecated
 	//BITBOARD* vBB_;			//C-array of bitblocks - not using std::vector because of memory allignment, TODO-CHANGE TO VECTOR (04/02/2025)
@@ -889,13 +890,13 @@ int  BitBoardN::find_singleton (int firstBit, int lastBit, int& singleton) const
 }
 
 template<bool EraseAll>
-inline BitBoardN& BitBoardN::set_bit	(int nbit ){
+inline BitBoardN& BitBoardN::set_bit	(int bit ){
 	
 	if (EraseAll) {
 		erase_bit();
 	}
 
-	vBB_[WDIV(nbit)] |= Tables::mask[WMOD(nbit)];
+	vBB_[WDIV(bit)] |= Tables::mask[ WMOD(bit) ];
 	return *this;
 }	
 
