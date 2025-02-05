@@ -694,7 +694,7 @@ return -1;
 
 
 
-int BitBoardS::previous_bit(int nBit/* 0 bsed*/) const{
+int BitBoardS::prev_bit(int nBit/* 0 bsed*/) const{
 ////////////////////////////
 // Gets the previous bit to nBit. 
 // If nBits is FIRST_BITSCAN is a MSB

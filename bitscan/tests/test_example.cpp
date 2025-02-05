@@ -77,7 +77,7 @@ TEST(Example, scanning){
 	res.clear();
 	if(mysb.init_scan_from(51,bbo::NON_DESTRUCTIVE_REVERSE)!=EMPTY_ELEM){
 		while(true){
-			nBit=mysb.previous_bit();
+			nBit=mysb.prev_bit();
 			if(nBit==EMPTY_ELEM)
 				break;
 			res.push_back(nBit);

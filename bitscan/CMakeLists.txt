@@ -3,8 +3,10 @@ set(useful_headers_for_IDE
 bbconfig.h
 bbtypes.h
 bitboard.h
+bitboards.h
 bbintrinsic.h
 bbintrinsic_sparse.h
+bbsentinel.h
 bbobject.h
 bitboardn.h
 )

@@ -64,11 +64,11 @@ virtual inline int next_bit			();
 inline int next_bit					(int & nBB);							//nBB: index of bitblock in the bitstring	(not in the collection)				
 
 	//bit scan backwards (non destructive)
-virtual inline int previous_bit		(); 
+virtual inline int prev_bit		(); 
 
 	//bit scan backwards (destructive)
-inline int previous_bit_del			(); 
-inline int previous_bit_del			(int& nBB);
+inline int prev_bit_del			(); 
+inline int prev_bit_del			(int& nBB);
 				
 /////////////////
 // Popcount
@@ -246,7 +246,7 @@ return EMPTY_ELEM;
 }
 
 
-inline int BBIntrinS::previous_bit	() {
+inline int BBIntrinS::prev_bit	() {
 ////////////////////////////
 // date:5/9/2014
 // Non destructive bitscan for sparse bitstrings using intrinsics
@@ -370,7 +370,7 @@ return EMPTY_ELEM;
 }
 
 
-inline int BBIntrinS::previous_bit_del() {
+inline int BBIntrinS::prev_bit_del() {
 ////////////////////////////
 //
 // date: 23/3/12
@@ -392,7 +392,7 @@ inline int BBIntrinS::previous_bit_del() {
 return EMPTY_ELEM;  
 }
 
-inline int BBIntrinS::previous_bit_del(int & bb_index) {
+inline int BBIntrinS::prev_bit_del(int & bb_index) {
 ////////////////////////////
 //
 // date: 23/3/12

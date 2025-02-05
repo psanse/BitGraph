@@ -116,11 +116,11 @@ virtual	int lsbn64						()						const; 		//de Bruijn	/ lookup
 	//for scanning all bits
 	
 virtual inline	int next_bit			(int nBit)				;				//uses cached elem position for fast bitscanning
-virtual inline	int previous_bit		(int nBit)				;				//uses cached elem position for fast bitscanning
+virtual inline	int prev_bit		(int nBit)				;				//uses cached elem position for fast bitscanning
 
 private:
 	int next_bit					(int nBit)				const;			//de Bruijn 
-	int previous_bit				(int nbit)				const;			//lookup
+	int prev_bit				(int nbit)				const;			//lookup
 
 public:	
 /////////////////
@@ -396,7 +396,7 @@ return 0;
 //
 /////////////////
 
-int BitBoardS::previous_bit	(int nBit){
+int BitBoardS::prev_bit	(int nBit){
 /////////////////
 // Uses cache of last index position for fast bit scanning
 //

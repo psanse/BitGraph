@@ -165,7 +165,7 @@ TEST(Masks, set_bits){
 	bb1.set_bit(100);
 	
 	//set range
-	bb.set_block(0,bb1);
+	bb.set_block(0,-1,bb1);
 	EXPECT_TRUE(bb.is_bit(100));
 	EXPECT_TRUE(bb.is_bit(20));
 		
@@ -177,15 +177,15 @@ TEST(Masks, set_bits){
 	EXPECT_TRUE(bb.is_bit(129));
 
 	//erase range
-	bb.erase_block(2, bb1);
+	bb.erase_block(2, -1, bb1);
 	EXPECT_FALSE(bb.is_bit(129));
 
-	bb.erase_block(1, bb1);
+	bb.erase_block(1, -1,  bb1);
 	EXPECT_FALSE(bb.is_bit(100));
 	EXPECT_FALSE(bb.is_bit(64));
 
 	//cout<<bb.erase_block(0, bb1)<<endl;
-	bb.erase_block(0, bb1);
+	bb.erase_block(0, -1, bb1);
 	EXPECT_TRUE(bb.is_bit(20));
 }
 

@@ -532,7 +532,7 @@ int* BitBoardN::to_C_array (int* lv, std::size_t& size, bool rev) 	{
 	int v = EMPTY_ELEM;
 
 	if (rev) {
-		while ((v = previous_bit(v)) != EMPTY_ELEM) {
+		while ((v = prev_bit(v)) != EMPTY_ELEM) {
 			lv[size++] = v;
 		}
 	}

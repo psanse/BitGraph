@@ -39,7 +39,6 @@ TEST_F(BBNScanningTest, non_destructive) {
 	}
 
 	EXPECT_TRUE(res == sol);
-
 }
 
 TEST_F(BBNScanningTest, non_destructive_with_starting_point) {
@@ -53,35 +52,30 @@ TEST_F(BBNScanningTest, non_destructive_with_starting_point) {
 	EXPECT_EQ(5, res.size());
 	EXPECT_EQ(1, res.count(100));
 	EXPECT_EQ(0, res.count(50));
-
-
 }
 
 TEST_F(BBNScanningTest, reverse_non_destructive) {
 	std::set<int> res;
 
 	int nBit = EMPTY_ELEM;
-	while ((nBit = bbn.previous_bit(nBit)) != EMPTY_ELEM) {
+	while ((nBit = bbn.prev_bit(nBit)) != EMPTY_ELEM) {
 		res.insert(nBit);
 	}
 
 	EXPECT_TRUE(res == sol);
-
 }
 
 TEST_F(BBNScanningTest, reverse_non_destructive_with_starting_point) {
 	std::set<int> res;
 
 	int nBit = 50;
-	while ((nBit = bbn.previous_bit(nBit)) != EMPTY_ELEM) {
+	while ((nBit = bbn.prev_bit(nBit)) != EMPTY_ELEM) {
 		res.insert(nBit);
 	}
 
 	EXPECT_EQ(1, res.size());
 	EXPECT_EQ(1, res.count(0));
 	EXPECT_EQ(0, res.count(50));
-
-
 }
 
 TEST_F(BBNScanningTest, destructive) {
@@ -96,23 +90,20 @@ TEST_F(BBNScanningTest, destructive) {
 
 	EXPECT_TRUE(res == sol);
 	EXPECT_EQ(0, bbN1.popcn64());
-
 }
-
 
 TEST_F(BBNScanningTest, reverse_destructive) {
 	std::set<int> res;
 
 	BitBoardN bbN1(bbn);
 	int nBit = EMPTY_ELEM;
-	while ((nBit = bbN1.previous_bit(nBit)) != EMPTY_ELEM) {
+	while ((nBit = bbN1.prev_bit(nBit)) != EMPTY_ELEM) {
 		res.insert(nBit);
 		bbN1.erase_bit(nBit);
 	}
 
 	EXPECT_TRUE(res == sol);
 	EXPECT_EQ(0, bbN1.popcn64());
-
 }
 
 TEST(BBNtest, set_bit_basic) {
@@ -148,9 +139,7 @@ TEST(BBNtest, set_bit_basic) {
 	EXPECT_TRUE(bb2.is_bit(22));
 	EXPECT_TRUE(bb2.is_bit(23));
 	EXPECT_EQ(1, bb2.number_of_bitblocks());
-
 }
-
 
 TEST(BBNtest, set_bit_range) {
 
@@ -189,9 +178,7 @@ TEST(BBNtest, set_bit_range) {
 	bb2.set_bit(5, 5);
 	EXPECT_TRUE(1, bb2.popcn64());
 	EXPECT_TRUE(bb2.is_bit(5));
-
 }
-
 
 TEST(BBNtest, set_bit_with_reset) {
 
@@ -243,7 +230,6 @@ TEST(BBNtest, set_bit_with_reset) {
 	bb.erase_bit();
 	bb.set_bit(49, bb3);
 	EXPECT_TRUE(bb.is_empty());
-
 }
 
 TEST(BBNtest, set_bit_from_another_bitstring) {
@@ -351,8 +337,6 @@ TEST(BBNtest, erase_bit_range){
 
 	EXPECT_FALSE(bb.is_bit(5));
 	EXPECT_EQ(129, bb.popcn64());
-
-
 }
 
 TEST(BBNtest, erase_bit_union){
@@ -375,7 +359,6 @@ TEST(BBNtest, erase_bit_union){
 	EXPECT_TRUE(bb.is_bit(64));
 	EXPECT_EQ(1,bb.popcn64());
 }
-
 
 TEST(BBNtest, population_count){
 
@@ -505,8 +488,7 @@ TEST(BBNtest, vector_operations) {
 	EXPECT_TRUE(bbN5.is_bit(45));
 	EXPECT_TRUE(bbN5.is_bit(62));
 	EXPECT_FALSE(bbN5.is_bit(63));
-
-	
+		
 	//I/O
 	//bbN5.print();
 }
@@ -528,7 +510,6 @@ TEST(BBNtest, BitBoardNTo0) {
 	EXPECT_LT(25, bb1.popcn64());
 	EXPECT_EQ(to_vector(bb2), v1);
 	EXPECT_EQ(25, bb2.popcn64());
-
 }
 
 TEST(BBNtest, GenRandom){

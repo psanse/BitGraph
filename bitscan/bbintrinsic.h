@@ -74,19 +74,19 @@ virtual inline int next_bit_del		(int& nBB,  BBIntrin& bbN_del);
 virtual inline int next_bit			();
 
 	//bit scan backwards (non destructive)
-virtual inline int previous_bit		(); 
-virtual inline int previous_bit		(int& nBB);
+virtual inline int prev_bit		(); 
+virtual inline int prev_bit		(int& nBB);
 
 	//bit scan backwards (destructive)
- virtual inline int previous_bit_del		(); 
+ virtual inline int prev_bit_del		(); 
 
 
 virtual inline int next_bit			(int &); 
 virtual	inline int next_bit			(int &,  BBIntrin& ); 
 
 
-inline int previous_bit_del			(int& nBB);
-inline int previous_bit_del			(int& nBB,  BBIntrin& del ); 
+inline int prev_bit_del			(int& nBB);
+inline int prev_bit_del			(int& nBB,  BBIntrin& del ); 
 
 //////////
 //conversions
@@ -318,7 +318,7 @@ return EMPTY_ELEM;
 }
 
 
-inline int BBIntrin::previous_bit		() {
+inline int BBIntrin::prev_bit		() {
 ////////////////////////////
 // Date:13/4/2012
 // BitScan not destructive in reverse order (end-->begin)
@@ -345,7 +345,7 @@ inline int BBIntrin::previous_bit		() {
 return EMPTY_ELEM;
 }
 
-inline int BBIntrin::previous_bit	(int& nBB) {
+inline int BBIntrin::prev_bit	(int& nBB) {
 ////////////////////////////
 // Date:13/4/2012
 // BitScan not destructive in reverse order (end-->begin)
@@ -374,7 +374,7 @@ inline int BBIntrin::previous_bit	(int& nBB) {
 return EMPTY_ELEM;
 }
 
-inline int BBIntrin::previous_bit_del() {
+inline int BBIntrin::prev_bit_del() {
 //////////////
 // BitScan DI 
 	unsigned long posInBB;
@@ -389,7 +389,7 @@ inline int BBIntrin::previous_bit_del() {
 return EMPTY_ELEM;  
 }
 
-inline int BBIntrin::previous_bit_del(int& nBB, BBIntrin& del) {
+inline int BBIntrin::prev_bit_del(int& nBB, BBIntrin& del) {
 //////////////
 // BitScan DI it also erase the returned bit of the table passed
 	unsigned long posInBB;
@@ -407,7 +407,7 @@ inline int BBIntrin::previous_bit_del(int& nBB, BBIntrin& del) {
 return EMPTY_ELEM;  
 }
 
-inline int BBIntrin::previous_bit_del(int& nBB) {
+inline int BBIntrin::prev_bit_del(int& nBB) {
 //////////////
 // BitScan DI 
 	unsigned long posInBB;
@@ -499,7 +499,7 @@ int* BBIntrin::to_C_array(int* lv, std::size_t& size, bool rev){
 //	int v; size=0;
 //	init_scan(BBObject::NON_DESTRUCTIVE_REVERSE);
 //	while(true){
-//		if( (v=previous_bit())!=EMPTY_ELEM ){
+//		if( (v=prev_bit())!=EMPTY_ELEM ){
 //			lv[size++]=v;
 //		}else break;
 //	}

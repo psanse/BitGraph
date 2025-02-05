@@ -85,7 +85,7 @@ virtual	bool is_empty				(int nBBL, int nBBH) const;					//is empty in range
 
 virtual	int init_scan(scan_types sct);
 
-virtual inline int previous_bit_del();							//**TODO- empty bitstring
+virtual inline int prev_bit_del();							//**TODO- empty bitstring
 virtual inline	int next_bit_del ();
 virtual inline	int next_bit_del (BBSentinel& bbN_del);
 	
@@ -112,7 +112,7 @@ return pc;
 
 //specializes the only bitscan function used
 inline
-int BBSentinel::previous_bit_del(){
+int BBSentinel::prev_bit_del(){
 //////////////
 // BitScan reverse order and distructive
 //

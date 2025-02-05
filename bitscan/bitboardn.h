@@ -7,15 +7,6 @@
  * 
  * TODO - refactoring and testing (31/01/2025)
  *
- * Permission to use, modify and distribute this software is
- * granted provided that this copyright notice appears in all 
- * copies, in source code or in binaries. For precise terms 
- * see the accompanying LICENSE file.
- *
- * This software is provided "AS IS" with no warranty of any 
- * kind, express or implied, and with no claim as to its
- * suitability for any purpose.
- *
  **/
 
 #ifndef __BITBOARDN__H_
@@ -116,12 +107,34 @@ inline virtual int msbn64			()	const;		//lookup
 	*			an internal switch (see config.h)
 	**/
 inline virtual int lsbn64			()	const; 		//de Bruijn	/ lookup								
+	
+	/**
+	* @brief Computes the next least significant 1-bit in the bitstring after bit
+	*		 If bit == EMPTY_ELEM, returns the lest significant bit in the bitstring
+	* 
+	* @param bit: position from which to start the search
+	* @returns the next 1-bit in the bitstring after bit, EMPTY_ELEM if there are no more bits
+	* @details: no internal state is used, NOT EFFICIENT since it has to compute the offset and
+	*		    current bitblock of bit in each call. It does not cache the last bit found.
+	* @details: Uses a DeBrijn implementation for lsbn64()
+	* @details: Deprecated in favour of the bitscanning with state of BBIntrinsic class
+	**/
+inline int next_bit					(int bit)	const;					
 
-	//primitive bitscanning (does not use internal state)
-	//TODO - fix design	
-inline int next_bit					(int nBit)	const;					//de Bruijn
-inline int next_bit_if_del			(int nBit)	const;					//de Bruijn
-inline int previous_bit				(int nbit)	const;					//lookup 
+inline int next_bit_if_del			(int bit)	const;					//de Bruijn
+	
+	/**
+	* @brief Computes the next most significant  1-bit in the bitstring after bit
+	*		 If bit == EMPTY_ELEM, returns the most significant bit in the bitstring
+	*
+	* @param bit: position from which to start the search
+	* @returns the next msb 1-bit in the bitstring after bit, EMPTY_ELEM if there are no more bits
+	* @details: no internal state is used, NOT EFFICIENT since it has to compute the offset and
+	*		    current bitblock of bit in each call. It does not cache the last bit found.
+	* @details: Uses a lookup table implementation for msbn64()
+	* @details: Deprecated in favour of the bitscanning with state of BBIntrinsic class
+	**/
+inline int prev_bit					(int bit)	const;					
 	
 /////////////////
 // Popcount
@@ -150,12 +163,13 @@ virtual	inline int popcn64			(int firstBit, int lastBit)	const;
 //Setting / Erasing bits 
 			
 	/**
-	* @brief sets bit in position idx to 1 in the bitstring
-	* @param  idx: index of the bit to set (nBit >= 0)
+	* @brief sets a 1-bit in the bitstring
+	* @param  bit: position of the 1-bit to set (nBit >= 0)
+	* @returns reference to the modified bitstring
 	**/
 		
 	template<bool EraseAll = false>
-	BitBoardN&  set_bit				(int nBit);
+	BitBoardN&  set_bit				(int bit);
 
 	/**
 	* @brief sets the bits in the closed range [firstBit, lastBit] to 1 in the bitstring
@@ -545,7 +559,7 @@ int BitBoardN::find_first_common_bit	(const BitBoardN& rhs) const {
 			return bblock::lsb64_intrinsic(bb) + WMUL(i);
 		}
 	}
-	return -1;
+	return EMPTY_ELEM;
 }
 
 inline int BitBoardN::msbn64() const{
@@ -571,34 +585,36 @@ inline int BitBoardN::msbn64() const{
 	return EMPTY_ELEM;		//should not reach here
 }
 
+inline
+int BitBoardN::next_bit(int bit) const{
 
-inline int BitBoardN::next_bit(int nBit/* 0 based*/) const{
-////////////////////////////
-//
-// Returns next bit from nBit in the bitstring (to be used in a bitscan loop)
-//
-// NOTES: if nBit is FIRST_BITSCAN returns lsb
+	//bit = -1 is a special case of early exit
+	//typically used in a loop, in the first bitscan call.
+	//Determines the least significant bit in the bitsring
+	if (bit == EMPTY_ELEM) {
+		return lsbn64();
+	}
 
-	int index, npos;
+	//compute bitlbock of the bit
+	int bbl = WDIV(bit);
 
-	if(nBit==EMPTY_ELEM)
-				return lsbn64();
-	else{
-		index=WDIV(nBit);
+	//looks for the next bit in the current block
+	int npos = bblock::lsb64_de_Bruijn(Tables::mask_left[bit - WMUL(bbl) /*WMOD(bit)*/] & m_aBB[bbl]);
+	if (npos >= 0) {
+		//////////////////////////////
+		return (npos + WMUL(bbl));
+		////////////////////////////
+	}
 
-		//looks in same BB as nBit
-		npos=bblock::lsb64_de_Bruijn(Tables::mask_left[WMOD(nBit) /*-WORD_SIZE*index*/] & m_aBB[index] );
-		if(npos>=0)
-			return (WMUL(index)/*WORD_SIZE*index*/ + npos);
-
-		//looks in remaining BBs
-		for(int i=index+1; i<m_nBB; i++){
-			if(m_aBB[i])
-				return(bblock::lsb64_de_Bruijn(m_aBB[i])+WMUL(i)/*WORD_SIZE*i*/ );
+	//looks in remaining biblocks
+	for (auto i = bbl + 1; i < m_nBB; ++i) {
+		if (m_aBB[i]) {
+			return( bblock::lsb64_de_Bruijn(m_aBB[i]) + WMUL(i));
 		}
 	}
 	
-return -1;	
+	//should not reach here
+	return EMPTY_ELEM;
 }
 
 inline int BitBoardN::next_bit_if_del(int nBit/* 0 based*/) const{
@@ -606,47 +622,43 @@ inline int BitBoardN::next_bit_if_del(int nBit/* 0 based*/) const{
 // Returns next bit assuming, when used in a loop, that the last bit
 // scanned is deleted prior to the call
 		
-	if(nBit==EMPTY_ELEM)
+	if(nBit == EMPTY_ELEM)
 		return lsbn64();
 	else{
-		for(int i = WDIV(nBit); i<m_nBB; i++){
+		for(auto i = WDIV(nBit); i<m_nBB; ++i){
 			if(m_aBB[i]){
-				return(bblock::lsb64_de_Bruijn(m_aBB[i])+WMUL(i) );
+				return(bblock::lsb64_de_Bruijn(m_aBB[i]) + WMUL(i) );
 			}
 		}
-	}
-	
-return -1;	
+	}	
+	return EMPTY_ELEM;		//should not reach here
 }
 
-inline int BitBoardN::previous_bit(int nBit/* 0 bsed*/) const{
-////////////////////////////
-// Gets the previous bit to nBit. If nBits is -10 is a MSB
-//
-// COMMENTS
-// 1-There is no control of EMPTY_ELEM
+inline int BitBoardN::prev_bit(int bit) const{
 
-	if(nBit==EMPTY_ELEM) 
-			return msbn64();
+	//special case - first bitscan,
+	//calls for the most-significant bit in the bitstring
+	if (bit == EMPTY_ELEM) {
+		return msbn64();
+	}
 	
+	//bitblock of input bit
+	int bbh = WDIV(bit);
+	
+	//looks for the msb in the (trimmed) current block
+	int npos = bblock::msb64_lup( Tables::mask_right[bit - WMUL(bbh) /* WMOD(bit) */] & m_aBB[bbh]);
+	if (npos != EMPTY_ELEM) {
+		return ( npos + WMUL(bbh) );
+	}
 
-	int index=WDIV(nBit);
-	int npos;
-
-	union u {
+	//looks for the msb in the remaining blocks
+	register union u {
 		U16 c[4];
 		BITBOARD b;
-	};
-	u val;
-		
-	
-	//BitBoard pos
-	npos=bblock::msb64_lup( Tables::mask_right[WMOD(nBit) /*nBit-WMUL(index)*/] & m_aBB[index] );
-	if(npos!=EMPTY_ELEM)
-			return (WMUL(index) + npos);
+	}val;
 
-	for(int i=index-1; i>=0; i--){
-		val.b=m_aBB[i];
+	for(auto i = bbh - 1; i >= 0; --i){
+		val.b = m_aBB[i];
 		if(val.b){
 			if(val.c[3]) return (Tables::msba[3][val.c[3]]+ WMUL(i));
 			if(val.c[2]) return (Tables::msba[2][val.c[2]]+ WMUL(i));
@@ -655,7 +667,7 @@ inline int BitBoardN::previous_bit(int nBit/* 0 bsed*/) const{
 		}
 	}
 
-return -1;		//should not reach here
+	return EMPTY_ELEM;		//should not reach here
 }
 
 inline bool BitBoardN::is_bit (int nbit/*0 based*/) const{
