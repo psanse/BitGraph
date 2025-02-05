@@ -183,6 +183,13 @@ TEST(BBNtest, set_bit_range) {
 	EXPECT_TRUE(bb1.is_bit(55));
 	EXPECT_TRUE(bb1.is_bit(56));
 	EXPECT_TRUE(bb1.is_bit(64));
+
+	//same range
+	BitBoardN bb2(130);
+	bb2.set_bit(5, 5);
+	EXPECT_TRUE(1, bb2.popcn64());
+	EXPECT_TRUE(bb2.is_bit(5));
+
 }
 
 
@@ -333,6 +340,18 @@ TEST(BBNtest, erase_bit_range){
 	bb.erase_bit(115, 116);
 	EXPECT_TRUE(bb.is_bit(114));
 	EXPECT_FALSE(bb.is_bit(115));
+
+	//same range
+	BitBoardN bb1(130);
+	bb.set_bit(0, 129);
+
+	/////////////////////
+	bb.erase_bit(5, 5);
+	/////////////////////
+
+	EXPECT_FALSE(bb.is_bit(5));
+	EXPECT_EQ(129, bb.popcn64());
+
 
 }
 
