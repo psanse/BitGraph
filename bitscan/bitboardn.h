@@ -56,7 +56,7 @@ public:
 ////////////
 //construction / destruction 
 
-	 BitBoardN						(): m_nBB(EMPTY_ELEM), m_aBB(NULL)		{};	
+	 BitBoardN						(): nBB_(EMPTY_ELEM), vBB_(NULL)		{};	
 	 BitBoardN						(const vint& v, int popsize);
 explicit  BitBoardN					(int popsize /*1 based*/, bool reset=true);	
 explicit  BitBoardN					(const vint& v);
@@ -79,18 +79,18 @@ virtual	~BitBoardN					();
 /////////////////////
 //setters and getters (will not allocate memory)
 	
-	int number_of_bitblocks()					const					{ return m_nBB; }
+	int number_of_bitblocks()					const					{ return nBB_; }
 	
 	/**
 	* @brief alternative syntax for number_of_bitblocks
 	**/
-	int capacity()								const					{ return m_nBB; }
+	int capacity()								const					{ return nBB_; }
 
-	BITBOARD* bitstring				()									{ return m_aBB; }
-	const BITBOARD* bitstring		()			const					{ return m_aBB; }
+	BITBOARD* bitstring				()									{ return vBB_; }
+	const BITBOARD* bitstring		()			const					{ return vBB_; }
 	
-const BITBOARD bitblock				(int block) const					{ return m_aBB[block]; }
-	BITBOARD& bitblock				(int block)							{ return m_aBB[block]; }
+const BITBOARD bitblock				(int block) const					{ return vBB_[block]; }
+	BITBOARD& bitblock				(int block)							{ return vBB_[block]; }
 
 //////////////////////////////
 // Bitscanning (no HW operations)
@@ -281,7 +281,7 @@ inline	BitBoardN& erase_bit		(const BitBoardN& lhs, const BitBoardN& rhs);
 
 	/**
 	* @brief Copies the 1-bits from the bitstring bb_add in the closed range [firstBlock, lastBlock]
-	*		 If LastBlock == -1, the range is [firstBlock, m_nBB]
+	*		 If LastBlock == -1, the range is [firstBlock, nBB_]
 	* 
 	*		 0 <= FirstBlock <= LastBLock < the number of bitblocks in the bitstring
 	* 
@@ -308,7 +308,7 @@ inline	BitBoardN& erase_bit		(const BitBoardN& lhs, const BitBoardN& rhs);
 	/**
 	* @brief Removes the 1-bits from both input bitstrings (their union)
 	*		in the closed range of bitblocks [firstBlock, lastBlock]
-	*		If lastBlock == -1, the range is [firstBlock, m_nBB]
+	*		If lastBlock == -1, the range is [firstBlock, nBB_]
 	* 
 	* @param firstBlock: the first bitblock to be modified
 	* @param bb_del_lhs, bb_del_rhs : bitstrings whose 1-bits are to be removed
@@ -354,9 +354,9 @@ inline	BitBoardN& erase_bit		(const BitBoardN& lhs, const BitBoardN& rhs);
 
 	/**
 	* @brief AND between rhs and caller bitstring in the closed range of bitblocks [firstBlock, lastBlock]
-	*		 If lastBlock == -1 the range is [firstBlock, m_nBB]
+	*		 If lastBlock == -1 the range is [firstBlock, nBB_]
 	*
-	* @param firstBlock, lastBlock: range of blocks (0<=firstBlock<=lastBlock<m_nBB). 
+	* @param firstBlock, lastBlock: range of blocks (0<=firstBlock<=lastBlock<nBB_). 
 	* @param rhs: bitstring 
 	* @returns reference to the modified bitstring
 	* @date: 04/02/2025 during a refactorization of BITSCAN
@@ -365,9 +365,9 @@ inline	BitBoardN& erase_bit		(const BitBoardN& lhs, const BitBoardN& rhs);
 	
 	/**
 	* @brief OR between rhs and caller bitstring in the closed range of bitblocks [firstBlock, lastBlock]
-	*		 If lastBlock == -1 the range is [firstBlock, m_nBB]
+	*		 If lastBlock == -1 the range is [firstBlock, nBB_]
 	*
-	* @param firstBlock, lastBlock: range of blocks (0<=firstBlock<=lastBlock<m_nBB)
+	* @param firstBlock, lastBlock: range of blocks (0<=firstBlock<=lastBlock<nBB_)
 	* @param rhs: bitstring
 	* @returns reference to the modified bitstring
 	**/
@@ -402,7 +402,7 @@ inline	BitBoardN& erase_bit		(const BitBoardN& lhs, const BitBoardN& rhs);
 	/**
 	* @brief  Determines the single 1-bit common to both this and rhs bitstring in the 
 	*		  closed range [firstBlock, lastBlock].
-	*		  If lastBlock == -1 the range is [firstBlock, m_nBB]
+	*		  If lastBlock == -1 the range is [firstBlock, nBB_]
 	* 
 	* @param bit:  1-bit index or -1 if not single disjoint
 	* @returns 0 if disjoint, 1 if intersection is a single bit, -1 otherwise (more than 1-bit in common)
@@ -448,9 +448,9 @@ inline	BitBoardN& erase_bit		(const BitBoardN& lhs, const BitBoardN& rhs);
 
 	/**
 	* @brief Determines if the bitstring has all 0-bits in the closed range [firstBlock, lastBlock]
-	*		  If lastBlock == -1 the range is [firstBlock, m_nBB]
+	*		  If lastBlock == -1 the range is [firstBlock, nBB_]
 	*
-	* @param firstBlock, lastBlock: range of blocks (0<=firstBlock<=lastBlock<m_nBB).
+	* @param firstBlock, lastBlock: range of blocks (0<=firstBlock<=lastBlock<nBB_).
 	* @returns TRUE if the bitstring has all 0-bits in the given range
 	* @details optimized for non-sparse bitsets - early exit
 	**/	
@@ -468,7 +468,7 @@ inline	BitBoardN& erase_bit		(const BitBoardN& lhs, const BitBoardN& rhs);
 	* @brief Determines if the caller bitstring has a single 1-bit in the 
 	*		 closed bit-range [firstBit, lastBit]
 	*
-	* @param firstBlock, lastBlock: range of blocks (0<=firstBlock<=lastBlock<m_nBB).
+	* @param firstBlock, lastBlock: range of blocks (0<=firstBlock<=lastBlock<nBB_).
 	* @returns 1 if singleton, 0 if empty, -1 if more than one bit in the specifed range
 	* @details optimized for non-sparse bitsets - early exit
 	**/
@@ -476,9 +476,9 @@ inline	BitBoardN& erase_bit		(const BitBoardN& lhs, const BitBoardN& rhs);
 
 	/**
 	* @brief TRUE if caller bitstring has a single 1-bit in the closed range [firstBlock, lastBlock]
-	*		  If lastBlock == -1 the range is [firstBlock, m_nBB]
+	*		  If lastBlock == -1 the range is [firstBlock, nBB_]
 	* 
-	* @param firstBlock, lastBlock: range of blocks (0<=firstBlock<=lastBlock<m_nBB). 
+	* @param firstBlock, lastBlock: range of blocks (0<=firstBlock<=lastBlock<nBB_). 
 	* @returns 1 if singleton, 0 if empty, -1 if more than one bit.
 	* @details optimized for non-sparse bitsets - early exit
 	**/
@@ -493,7 +493,7 @@ inline	BitBoardN& erase_bit		(const BitBoardN& lhs, const BitBoardN& rhs);
 	* @brief TRUE if this bitstring has no bits in common with rhs
 	*		 in the closed range [firstBlock, lastBlock].
 	*
-	*		If lastBlock == -1, the range is [firstBlock, m_nBB]
+	*		If lastBlock == -1, the range is [firstBlock, nBB_]
 	**/
 	inline bool is_disjoint_block		(int firstBlock, int lastBlock,
 												const BitBoardN& rhs		)			const;
@@ -557,8 +557,8 @@ virtual	int* to_C_array				(int* lv, std::size_t& size, bool rev = false);
 //data members
 
 protected:
-	BITBOARD* m_aBB;				//C-array of bitblocks - not using std::vector because of memory allignment, TODO-CHANGE TO VECTOR (04/02/2025)
-	int m_nBB;						//number of bitblocks 
+	BITBOARD* vBB_;				//C-array of bitblocks - not using std::vector because of memory allignment, TODO-CHANGE TO VECTOR (04/02/2025)
+	int nBB_;						//number of bitblocks 
 
 }; //end BitBoardN class
 
@@ -570,8 +570,8 @@ inline
 int BitBoardN::find_first_common_bit	(const BitBoardN& rhs) const {
 
 	BITBOARD bb = 0;
-	for(auto i = 0; i < m_nBB; ++i){
-		if( (bb = (m_aBB[i] & rhs.m_aBB[i])) ){
+	for(auto i = 0; i < nBB_; ++i){
+		if( (bb = (vBB_[i] & rhs.vBB_[i])) ){
 			return bblock::lsb64_intrinsic(bb) + WMUL(i);
 		}
 	}
@@ -588,8 +588,8 @@ inline int BitBoardN::msbn64() const{
 	} val;
 	
 	//reverse loop (most significant bit block early exit)
-	for(auto i = m_nBB - 1; i >= 0; i--){
-		val.b = m_aBB[i];
+	for(auto i = nBB_ - 1; i >= 0; i--){
+		val.b = vBB_[i];
 		if(val.b){
 			if(val.c[3]) return (Tables::msba[3][val.c[3]] + WMUL(i));
 			if(val.c[2]) return (Tables::msba[2][val.c[2]] + WMUL(i));
@@ -615,7 +615,7 @@ int BitBoardN::next_bit(int bit) const{
 	int bbl = WDIV(bit);
 
 	//looks for the next bit in the current block
-	int npos = bblock::lsb64_de_Bruijn(Tables::mask_left[bit - WMUL(bbl) /*WMOD(bit)*/] & m_aBB[bbl]);
+	int npos = bblock::lsb64_de_Bruijn(Tables::mask_left[bit - WMUL(bbl) /*WMOD(bit)*/] & vBB_[bbl]);
 	if (npos >= 0) {
 		//////////////////////////////
 		return (npos + WMUL(bbl));
@@ -623,9 +623,9 @@ int BitBoardN::next_bit(int bit) const{
 	}
 
 	//looks in remaining biblocks
-	for (auto i = bbl + 1; i < m_nBB; ++i) {
-		if (m_aBB[i]) {
-			return( bblock::lsb64_de_Bruijn(m_aBB[i]) + WMUL(i));
+	for (auto i = bbl + 1; i < nBB_; ++i) {
+		if (vBB_[i]) {
+			return( bblock::lsb64_de_Bruijn(vBB_[i]) + WMUL(i));
 		}
 	}
 	
@@ -641,9 +641,9 @@ inline int BitBoardN::next_bit_if_del(int bit) const{
 		return lsbn64();
 	}
 			
-	for (auto i = WDIV(bit); i < m_nBB; ++i) {
-		if (m_aBB[i]) {
-			return(bblock::lsb64_de_Bruijn(m_aBB[i]) + WMUL(i));
+	for (auto i = WDIV(bit); i < nBB_; ++i) {
+		if (vBB_[i]) {
+			return(bblock::lsb64_de_Bruijn(vBB_[i]) + WMUL(i));
 		}
 	}
 		
@@ -662,7 +662,7 @@ inline int BitBoardN::prev_bit(int bit) const{
 	int bbh = WDIV(bit);
 	
 	//looks for the msb in the (trimmed) current block
-	int npos = bblock::msb64_lup( Tables::mask_right[bit - WMUL(bbh) /* WMOD(bit) */] & m_aBB[bbh]);
+	int npos = bblock::msb64_lup( Tables::mask_right[bit - WMUL(bbh) /* WMOD(bit) */] & vBB_[bbh]);
 	if (npos != EMPTY_ELEM) {
 		return ( npos + WMUL(bbh) );
 	}
@@ -674,7 +674,7 @@ inline int BitBoardN::prev_bit(int bit) const{
 	}val;
 
 	for(auto i = bbh - 1; i >= 0; --i){
-		val.b = m_aBB[i];
+		val.b = vBB_[i];
 		if(val.b){
 			if(val.c[3]) return (Tables::msba[3][val.c[3]]+ WMUL(i));
 			if(val.c[2]) return (Tables::msba[2][val.c[2]]+ WMUL(i));
@@ -690,14 +690,14 @@ inline bool BitBoardN::is_bit (int nbit/*0 based*/) const{
 //////////////////////////////
 // RETURNS: TRUE if the bit is 1 in the position nbit, FALSE if opposite case or ERROR
 
-	return (m_aBB[WDIV(nbit)] & Tables::mask[WMOD(nbit)]);
+	return (vBB_[WDIV(nbit)] & Tables::mask[WMOD(nbit)]);
 
 }
  
 inline bool BitBoardN::is_empty() const
 {
-	for (auto i = 0; i < m_nBB; ++i) {
-		if (m_aBB[i]) {
+	for (auto i = 0; i < nBB_; ++i) {
+		if (vBB_[i]) {
 			return false;
 		}
 	}
@@ -709,13 +709,13 @@ inline bool BitBoardN::is_empty_block (int firstBlock, int lastBlock) const
 {
 
 	///////////////////////////////////////////////////////////////////////////////
-	assert((firstBlock >= 0) && (lastBlock < m_nBB) && (firstBlock <= lastBlock));
+	assert((firstBlock >= 0) && (lastBlock < nBB_) && (firstBlock <= lastBlock));
 	///////////////////////////////////////////////////////////////////////////////
 
-	int last_block = ((lastBlock == -1) ? m_nBB - 1 : lastBlock);
+	int last_block = ((lastBlock == -1) ? nBB_ - 1 : lastBlock);
 
 	for (auto i = firstBlock; i <= last_block; ++i) {
-		if (m_aBB[i]) {
+		if (vBB_[i]) {
 			return false;
 		}
 	}
@@ -726,8 +726,8 @@ inline bool BitBoardN::is_empty_block (int firstBlock, int lastBlock) const
 inline 
 bool BitBoardN::is_disjoint	(const BitBoardN& rhs) const
 {
-	for (auto i = 0; i < m_nBB; ++i) {
-		if (m_aBB[i] & rhs.m_aBB[i]) {
+	for (auto i = 0; i < nBB_; ++i) {
+		if (vBB_[i] & rhs.vBB_[i]) {
 			return false;
 		}
 	}
@@ -737,8 +737,8 @@ bool BitBoardN::is_disjoint	(const BitBoardN& rhs) const
 inline 
 bool BitBoardN::is_disjoint	(const BitBoardN& lhs,  const BitBoardN& rhs)	const
 {
-	for (auto i = 0; i < m_nBB; ++i) {
-		if (m_aBB[i] & lhs.m_aBB[i] & rhs.m_aBB[i]) {
+	for (auto i = 0; i < nBB_; ++i) {
+		if (vBB_[i] & lhs.vBB_[i] & rhs.vBB_[i]) {
 			return false;
 		}
 	}
@@ -749,13 +749,13 @@ inline
 bool BitBoardN::is_disjoint_block (int firstBlock, int lastBlock, const BitBoardN& rhs)	const{
 
 	///////////////////////////////////////////////////////////////////////////////
-	assert((firstBlock >= 0) && (lastBlock < m_nBB) && (firstBlock <= lastBlock));
+	assert((firstBlock >= 0) && (lastBlock < nBB_) && (firstBlock <= lastBlock));
 	///////////////////////////////////////////////////////////////////////////////
 
-	int last_block = ((lastBlock == -1) ? m_nBB - 1 : lastBlock);
+	int last_block = ((lastBlock == -1) ? nBB_ - 1 : lastBlock);
 
 	for (auto i = firstBlock; i <= last_block; ++i) {
-		if (m_aBB[i] & rhs.m_aBB[i]) {
+		if (vBB_[i] & rhs.vBB_[i]) {
 			return false;
 		}
 	}
@@ -768,11 +768,11 @@ BitBoardN& BitBoardN::set_bit (int high, const BitBoardN& bb_add){
 	int bbh = WDIV(high);	
 
 	for(auto i = 0; i <= bbh; ++i){
-		m_aBB[i] = bb_add.m_aBB[i];
+		vBB_[i] = bb_add.vBB_[i];
 	}
 
 	//trim last bit block up to, and exluding, high
-	m_aBB[bbh] &= bblock::MASK_1_RIGHT(high - WMUL(bbh));			//also m_aBB[bbh] &= bblock::MASK_1(0, high - WMUL(bbh)); 
+	vBB_[bbh] &= bblock::MASK_1_RIGHT(high - WMUL(bbh));			//also vBB_[bbh] &= bblock::MASK_1(0, high - WMUL(bbh)); 
 	
 	return *this;
 }
@@ -786,26 +786,26 @@ int  BitBoardN::is_singleton (int firstBit, int lastBit) const{
 	
 	//both ends
 	if(nbbl == nbbh){
-		if ( (pc = bblock::popc64( m_aBB[nbbl] & bblock::MASK_1(firstBit - WMUL(nbbl), lastBit - WMUL(nbbh))) ) > 1) {
+		if ( (pc = bblock::popc64( vBB_[nbbl] & bblock::MASK_1(firstBit - WMUL(nbbl), lastBit - WMUL(nbbh))) ) > 1) {
 			return -1;
 		}
 	}
 	else {
 
 		//checks first block
-		if( (pc = bblock::popc64( m_aBB[nbbl] & bblock::MASK_1_LEFT(firstBit - WMUL(nbbl)  /* eq. to WMOD(nbbl) */ ))) > 1) {
+		if( (pc = bblock::popc64( vBB_[nbbl] & bblock::MASK_1_LEFT(firstBit - WMUL(nbbl)  /* eq. to WMOD(nbbl) */ ))) > 1) {
 			return -1;
 		}
 
 		//checks intermediate blocks
 		for(auto i = nbbl + 1; i < nbbh; ++i){
-			if (pc += bblock::popc64(m_aBB[i]) > 1){
+			if (pc += bblock::popc64(vBB_[i]) > 1){
 				return -1;
 			}
 		}
 
 		//checks last block
-		if ((pc += bblock::popc64(m_aBB[nbbh] & bblock::MASK_1_RIGHT(lastBit - WMUL(nbbh)  /* eq. to WMOD(nbbl) */ ))) > 1) {
+		if ((pc += bblock::popc64(vBB_[nbbh] & bblock::MASK_1_RIGHT(lastBit - WMUL(nbbh)  /* eq. to WMOD(nbbl) */ ))) > 1) {
 			return -1;
 		}
 	}
@@ -828,7 +828,7 @@ int  BitBoardN::find_singleton (int firstBit, int lastBit, int& singleton) const
 	
 	//both ends
 	if(nbbl == nbbh){
-		BITBOARD bbl= m_aBB[nbbl] & bblock::MASK_1(posl, posh);
+		BITBOARD bbl= vBB_[nbbl] & bblock::MASK_1(posl, posh);
 		pc = bblock::popc64(bbl);
 		if( (pc = bblock::popc64(bbl)) == 1){
 			singleton = bblock::lsb64_intrinsic(bbl) + WMUL(nbbl);
@@ -840,7 +840,7 @@ int  BitBoardN::find_singleton (int firstBit, int lastBit, int& singleton) const
 	else{
 
 		//checks first block
-		BITBOARD bbl = m_aBB[nbbl] & bblock::MASK_1_LEFT(posl);
+		BITBOARD bbl = vBB_[nbbl] & bblock::MASK_1_LEFT(posl);
 
 		if( (pc = bblock::popc64(bbl)) > 1){
 			/////////
@@ -853,18 +853,18 @@ int  BitBoardN::find_singleton (int firstBit, int lastBit, int& singleton) const
 
 		//checks intermediate blocks
 		for(auto i = nbbl + 1; i < nbbh; ++i){			
-			if( (pc += bblock::popc64(m_aBB[i])) > 1){
+			if( (pc += bblock::popc64(vBB_[i])) > 1){
 				/////////
 				return -1;
 				/////////
 			}else if( vertex_not_found && (pc ==1 ) ){
-				singleton = bblock::lsb64_intrinsic(m_aBB[i]) + WMUL(i);
+				singleton = bblock::lsb64_intrinsic(vBB_[i]) + WMUL(i);
 				vertex_not_found = false;
 			}
 		}
 
 		//checks last block
-		BITBOARD bbh = m_aBB[nbbh] & bblock::MASK_1_RIGHT(posh);
+		BITBOARD bbh = vBB_[nbbh] & bblock::MASK_1_RIGHT(posh);
 			
 		if ( (pc += bblock::popc64(bbh)) > 1) {
 			/////////
@@ -889,7 +889,7 @@ inline BitBoardN& BitBoardN::set_bit	(int nbit ){
 		erase_bit();
 	}
 
-	m_aBB[WDIV(nbit)] |= Tables::mask[WMOD(nbit)];
+	vBB_[WDIV(nbit)] |= Tables::mask[WMOD(nbit)];
 	return *this;
 }	
 
@@ -914,18 +914,18 @@ BitBoardN&  BitBoardN::set_bit (int firstBit, int lastBit){
 
 	if(bbl == bbh)
 	{			
-		m_aBB[bbh] |= bblock::MASK_1(firstBit - WMUL(bbl), lastBit - WMUL(bbh));		
+		vBB_[bbh] |= bblock::MASK_1(firstBit - WMUL(bbl), lastBit - WMUL(bbh));		
 	}
 	else
 	{
 		//set to one the intermediate blocks
 		for (int i = bbl + 1; i < bbh; ++i) {
-			m_aBB[i] = ONE;
+			vBB_[i] = ONE;
 		}
 		
 		//sets the first and last blocks
-		m_aBB[bbh] |= bblock::MASK_1_RIGHT	(lastBit - WMUL(bbh));
-		m_aBB[bbl] |= bblock::MASK_1_LEFT	(firstBit - WMUL(bbl));
+		vBB_[bbh] |= bblock::MASK_1_RIGHT	(lastBit - WMUL(bbh));
+		vBB_[bbl] |= bblock::MASK_1_LEFT	(firstBit - WMUL(bbl));
 
 	}
 
@@ -935,8 +935,8 @@ BitBoardN&  BitBoardN::set_bit (int firstBit, int lastBit){
 inline
 BitBoardN& BitBoardN::set_bit (){
 
-	for (auto i = 0; i < m_nBB; ++i) {
-		m_aBB[i] = ONE;
+	for (auto i = 0; i < nBB_; ++i) {
+		vBB_[i] = ONE;
 	}
 	return *this;
 }
@@ -945,11 +945,11 @@ inline
 BitBoardN&  BitBoardN::set_bit (const BitBoardN& bb_add){
 
 	/////////////////////////////////
-	assert(m_nBB <= bb_add.m_nBB);
+	assert(nBB_ <= bb_add.nBB_);
 	/////////////////////////////////
 
-	for (auto i = 0; i < m_nBB; ++i) {
-		m_aBB[i] |= bb_add.m_aBB[i];
+	for (auto i = 0; i < nBB_; ++i) {
+		vBB_[i] |= bb_add.vBB_[i];
 	}
 
 	return *this;
@@ -959,13 +959,13 @@ inline
 BitBoardN&  BitBoardN::set_block (int firstBlock, int lastBlock, const BitBoardN& bb_add){
 
 	///////////////////////////////////////////////////////////////////////////////
-	assert((firstBlock >= 0) && (LastBlock < m_nBB) && (firstBlock <= lastBlock));
+	assert((firstBlock >= 0) && (LastBlock < nBB_) && (firstBlock <= lastBlock));
 	///////////////////////////////////////////////////////////////////////////////
 
-	int last_block = ((lastBlock == -1) ? m_nBB - 1 : lastBlock);
+	int last_block = ((lastBlock == -1) ? nBB_ - 1 : lastBlock);
 
 	for (auto i = firstBlock; i <= last_block; ++i) {
-		m_aBB[i] |= bb_add.m_aBB[i];
+		vBB_[i] |= bb_add.vBB_[i];
 	}
 
 	return *this;
@@ -974,8 +974,8 @@ BitBoardN&  BitBoardN::set_block (int firstBlock, int lastBlock, const BitBoardN
 inline
 BitBoardN& BitBoardN::erase_bit (){
 
-	for (auto i = 0; i < m_nBB; ++i) {
-		m_aBB[i] = ZERO;
+	for (auto i = 0; i < nBB_; ++i) {
+		vBB_[i] = ZERO;
 	}
 
 	return *this;
@@ -984,7 +984,7 @@ BitBoardN& BitBoardN::erase_bit (){
 inline
 BitBoardN& BitBoardN::erase_bit(int nBit) {
 
-	m_aBB[WDIV(nBit)] &= ~Tables::mask[WMOD(nBit)]; 
+	vBB_[WDIV(nBit)] &= ~Tables::mask[WMOD(nBit)]; 
 	return *this;
 }
 
@@ -1003,17 +1003,17 @@ BitBoardN&  BitBoardN::erase_bit (int firstBit, int lastBit){
 
 	if (bbl == bbh)
 	{
-		m_aBB[bbh] &= bblock::MASK_0(firstBit - WMUL(bbl), lastBit - WMUL(bbh));		
+		vBB_[bbh] &= bblock::MASK_0(firstBit - WMUL(bbl), lastBit - WMUL(bbh));		
 	}
 	else
 	{
 		//set to one the intermediate blocks
 		for (int i = bbl + 1; i < bbh; ++i) {
-			m_aBB[i] = ZERO;
+			vBB_[i] = ZERO;
 		}
 				
-		m_aBB[bbh] &= bblock::MASK_0_RIGHT	(lastBit - WMUL(bbh));					//Tables::mask_left
-		m_aBB[bbl] &= bblock::MASK_0_LEFT	(firstBit - WMUL(bbl));					//Tables::mask_right	
+		vBB_[bbh] &= bblock::MASK_0_RIGHT	(lastBit - WMUL(bbh));					//Tables::mask_left
+		vBB_[bbl] &= bblock::MASK_0_LEFT	(firstBit - WMUL(bbl));					//Tables::mask_right	
 	}
 
 	return *this;
@@ -1024,12 +1024,12 @@ inline int BitBoardN::lsbn64() const{
 // different implementations of lsbn depending on configuration
 
 #ifdef DE_BRUIJN
-	for(auto i = 0; i < m_nBB; ++i){
-		if(m_aBB[i])
+	for(auto i = 0; i < nBB_; ++i){
+		if(vBB_[i])
 #ifdef ISOLANI_LSB
-			return(Tables::indexDeBruijn64_ISOL[((m_aBB[i] & -m_aBB[i]) * DEBRUIJN_MN_64_ISOL/*magic num*/) >> DEBRUIJN_MN_64_SHIFT]+ WMUL(i));	
+			return(Tables::indexDeBruijn64_ISOL[((vBB_[i] & -vBB_[i]) * DEBRUIJN_MN_64_ISOL/*magic num*/) >> DEBRUIJN_MN_64_SHIFT]+ WMUL(i));	
 #else
-			return(Tables::indexDeBruijn64_SEP[ ( (m_aBB[i]^ (m_aBB[i]-1) ) * bblock::DEBRUIJN_MN_64_SEP/*magic num*/) >>
+			return(Tables::indexDeBruijn64_SEP[ ( (vBB_[i]^ (vBB_[i]-1) ) * bblock::DEBRUIJN_MN_64_SEP/*magic num*/) >>
 												bblock::DEBRUIJN_MN_64_SHIFT	]	+	WMUL(i)							);
 #endif
 	}
@@ -1041,8 +1041,8 @@ inline int BitBoardN::lsbn64() const{
 
 	u val;
 
-	for(int i=0; i<m_nBB; i++){
-		val.b=m_aBB[i];
+	for(int i=0; i<nBB_; i++){
+		val.b=vBB_[i];
 		if(val.b){
 			if(val.c[0]) return (Tables::lsba[0][val.c[0]]+WMUL(i));
 			if(val.c[1]) return (Tables::lsba[1][val.c[1]]+WMUL(i));
@@ -1060,8 +1060,8 @@ inline
 int BitBoardN::is_singleton() const {
 
 	int pc = 0;
-	for(auto i = 0; i < m_nBB; ++i){
-		if ((pc += bblock::popc64(m_aBB[i])) > 1) {
+	for(auto i = 0; i < nBB_; ++i){
+		if ((pc += bblock::popc64(vBB_[i])) > 1) {
 			return -1;
 		}
 	}
@@ -1077,14 +1077,14 @@ inline
 int BitBoardN::is_singleton_block(int firstBlock, int lastBlock) const
 {
 	///////////////////////////////////////////////////////////////////////////////////
-	assert((firstBlock >= 0) && (firstBlock <= lastBlock) && (lastBlock < m_nBB));
+	assert((firstBlock >= 0) && (firstBlock <= lastBlock) && (lastBlock < nBB_));
 	/////////////////////////////////////////////////////////////////////////////////
 
-	int last_block = ((lastBlock == -1) ? m_nBB - 1 : lastBlock);
+	int last_block = ((lastBlock == -1) ? nBB_ - 1 : lastBlock);
 
 	int pc = 0;
 	for (auto i = firstBlock; i < last_block; ++i) {
-		if ((pc += bblock::popc64(m_aBB[i])) > 1) {
+		if ((pc += bblock::popc64(vBB_[i])) > 1) {
 			return -1;
 		}
 	}
@@ -1104,10 +1104,10 @@ int BitBoardN::popcn64() const{
 		BITBOARD b;
 	}val;
 
-	for(auto i = 0; i < m_nBB; ++i){
+	for(auto i = 0; i < nBB_; ++i){
 
 		//loads union
-		val.b = m_aBB[i]; 
+		val.b = vBB_[i]; 
 
 		//counts population
 		pc += Tables::pc[val.c[0]] + Tables::pc[val.c[1]] + Tables::pc[val.c[2]] + Tables::pc[val.c[3]];
@@ -1131,19 +1131,19 @@ inline int BitBoardN::popcn64(int firstBit, int lastBit) const
 	if (bbl == bbh)
 	{
 		//same block
-		pc = bblock::popc64(m_aBB[bbl] & bblock::MASK_1(firstBit - WMUL(bbl), lastBit - WMUL(bbh)));		
+		pc = bblock::popc64(vBB_[bbl] & bblock::MASK_1(firstBit - WMUL(bbl), lastBit - WMUL(bbh)));		
 					
 	}
 	else
 	{
 		//count the population of the intermediate blocks
 		for (auto i = bbl + 1; i < bbh; ++i) {
-			pc += bblock::popc64( m_aBB[i]);
+			pc += bblock::popc64( vBB_[i]);
 		}
 
 		//count the population of the first and last blocks
-		pc += bblock::popc64(m_aBB[bbh] & bblock::MASK_1_RIGHT(lastBit - WMUL(bbh)));
-		pc += bblock::popc64(m_aBB[bbl] & bblock::MASK_1_LEFT(firstBit - WMUL(bbl)));
+		pc += bblock::popc64(vBB_[bbh] & bblock::MASK_1_RIGHT(lastBit - WMUL(bbh)));
+		pc += bblock::popc64(vBB_[bbl] & bblock::MASK_1_LEFT(firstBit - WMUL(bbl)));
 	
 	}
 		
@@ -1159,14 +1159,14 @@ int BitBoardN::find_common_singleton (const BitBoardN& rhs, int& bit) const{
 	bit = EMPTY_ELEM;
 	
 	//main loop
-	for(auto i = 0; i < m_nBB; ++i){
-		pc += bblock::popc64 (m_aBB[i] & rhs.m_aBB[i]);
+	for(auto i = 0; i < nBB_; ++i){
+		pc += bblock::popc64 (vBB_[i] & rhs.vBB_[i]);
 		if(pc > 1){
 			bit = EMPTY_ELEM;
 			return -1;
 		}else if(is_first_vertex && pc == 1 ) { //stores bit the first time pc == 1 
 						
-			bit = bblock::lsb64_intrinsic ( m_aBB[i] & rhs.m_aBB[i] )+ WMUL(i);
+			bit = bblock::lsb64_intrinsic ( vBB_[i] & rhs.vBB_[i] )+ WMUL(i);
 			is_first_vertex = false;
 		}
 	}
@@ -1180,24 +1180,24 @@ inline
 int	BitBoardN::find_common_singleton_block (int firstBlock, int lastBlock, const BitBoardN& rhs, int& bit) const{
 
 	///////////////////////////////////////////////////////////////////////////////
-	assert((firstBlock >= 0) && (lastBlock < m_nBB) && (firstBlock <= lastBlock));
+	assert((firstBlock >= 0) && (lastBlock < nBB_) && (firstBlock <= lastBlock));
 	///////////////////////////////////////////////////////////////////////////////
 
 	int last_block;
-	(lastBlock == -1) ? last_block = m_nBB - 1 : last_block = lastBlock;
+	(lastBlock == -1) ? last_block = nBB_ - 1 : last_block = lastBlock;
 
 	int pc = 0;
 	bit = EMPTY_ELEM;
 	bool is_first_vertex = true;
 	
 	for(auto i= firstBlock; i <= last_block; ++i){
-		pc += bblock::popc64(m_aBB[i] & rhs.m_aBB[i]);
+		pc += bblock::popc64(vBB_[i] & rhs.vBB_[i]);
 		if(pc > 1){
 			bit = EMPTY_ELEM;
 			return -1;
 		}else if(is_first_vertex && pc == 1 ){	//stores bit the first time pc == 1 
 			
-			bit = bblock::lsb64_intrinsic(m_aBB[i] & rhs.m_aBB[i] )+ WMUL(i);
+			bit = bblock::lsb64_intrinsic(vBB_[i] & rhs.vBB_[i] )+ WMUL(i);
 			is_first_vertex = false;
 		}
 	}
@@ -1213,17 +1213,17 @@ int BitBoardN::find_diff_singleton(const BitBoardN& rhs, int& bit) const{
 	bit = EMPTY_ELEM;
 	bool is_first_vertex = true;
 	
-	for(auto i = 0; i < m_nBB; ++i){
+	for(auto i = 0; i < nBB_; ++i){
 
 		//popcount of set difference - removes bits of rhs from *this
-		pc += bblock::popc64(m_aBB[i] &~ rhs.m_aBB[i]);
+		pc += bblock::popc64(vBB_[i] &~ rhs.vBB_[i]);
 
 		if(pc > 1){
 			bit = EMPTY_ELEM;
 			return -1;
 		}else if( pc == 1 && is_first_vertex){ //stores bit the first time pc == 1 
 			
-			bit = bblock::lsb64_intrinsic(m_aBB[i] &~ rhs.m_aBB[i] ) + WMUL(i);
+			bit = bblock::lsb64_intrinsic(vBB_[i] &~ rhs.vBB_[i] ) + WMUL(i);
 			is_first_vertex = false;
 		}
 	}
@@ -1242,10 +1242,10 @@ int BitBoardN::find_diff_pair(const BitBoardN& rhs, int& bit1, int& bit2) const 
 	bit2 = EMPTY_ELEM;
 
 	//main loop
-	for (auto i = 0; i < m_nBB; ++i) {
+	for (auto i = 0; i < nBB_; ++i) {
 
 		//popcount of set difference - removes bits of rhs from *this
-		BITBOARD bb = m_aBB[i] & ~rhs.m_aBB[i];
+		BITBOARD bb = vBB_[i] & ~rhs.vBB_[i];
 		pc += bblock::popc64(bb);
 
 		if (pc > 2) {
@@ -1288,8 +1288,8 @@ int BitBoardN::find_diff_pair(const BitBoardN& rhs, int& bit1, int& bit2) const 
 inline
 bool operator==	(const BitBoardN& lhs, const BitBoardN& rhs){
 	
-	for(int i=0; i<lhs.m_nBB; i++)
-		if( lhs.m_aBB[i]!=rhs.m_aBB[i] ) return false;
+	for(int i=0; i<lhs.nBB_; i++)
+		if( lhs.vBB_[i]!=rhs.vBB_[i] ) return false;
 
 return true;
 }
@@ -1302,8 +1302,8 @@ bool operator!=	(const BitBoardN& lhs, const BitBoardN& rhs){
 inline
 BitBoardN& BitBoardN::erase_bit (const BitBoardN& bbn){
 
-	for (auto i = 0; i < m_nBB; ++i) {
-		m_aBB[i] &= ~bbn.m_aBB[i];
+	for (auto i = 0; i < nBB_; ++i) {
+		vBB_[i] &= ~bbn.vBB_[i];
 	}
 
 	return *this;
@@ -1312,8 +1312,8 @@ BitBoardN& BitBoardN::erase_bit (const BitBoardN& bbn){
 inline
 BitBoardN& BitBoardN::erase_bit (const BitBoardN& bb_lhs, const BitBoardN& bb_rhs ){
 
-	for (auto i = 0; i < m_nBB; i++) {
-		m_aBB[i] &= ~(bb_lhs.m_aBB[i] | bb_rhs.m_aBB[i]);
+	for (auto i = 0; i < nBB_; i++) {
+		vBB_[i] &= ~(bb_lhs.vBB_[i] | bb_rhs.vBB_[i]);
 	}
 
 	return *this;
@@ -1323,14 +1323,14 @@ inline
 BitBoardN& BitBoardN::erase_block (int FirstBlock, int LastBlock, const BitBoardN& bb_lhs, const BitBoardN& bb_rhs ){
 
 	///////////////////////////////////////////////////////////////////////////////
-	assert((FirstBlock >= 0) && (LastBlock < m_nBB) && (FirstBlock <= LastBlock));
+	assert((FirstBlock >= 0) && (LastBlock < nBB_) && (FirstBlock <= LastBlock));
 	///////////////////////////////////////////////////////////////////////////////
 
 	int last_block;
-	(LastBlock == -1) ? last_block = m_nBB - 1 : last_block = LastBlock;
+	(LastBlock == -1) ? last_block = nBB_ - 1 : last_block = LastBlock;
 
 	for (auto i = FirstBlock; i <= LastBlock; ++i) {
-		m_aBB[i] &= ~(bb_lhs.m_aBB[i] | bb_rhs.m_aBB[i]);
+		vBB_[i] &= ~(bb_lhs.vBB_[i] | bb_rhs.vBB_[i]);
 	}
 
 	return *this;
@@ -1340,13 +1340,13 @@ inline
 BitBoardN& BitBoardN::erase_block(int FirstBlock, int LastBlock, const BitBoardN& bb_del){
 
 	///////////////////////////////////////////////////////////////////////////////
-	assert((FirstBlock >= 0) && (LastBlock < m_nBB) && (FirstBlock <= LastBlock));
+	assert((FirstBlock >= 0) && (LastBlock < nBB_) && (FirstBlock <= LastBlock));
 	///////////////////////////////////////////////////////////////////////////////
 
-	int last_block = ((LastBlock == -1) ? m_nBB - 1 : LastBlock);
+	int last_block = ((LastBlock == -1) ? nBB_ - 1 : LastBlock);
 
 	for (auto i = FirstBlock; i <= last_block; ++i) {
-		m_aBB[i] &= ~bb_del.m_aBB[i];
+		vBB_[i] &= ~bb_del.vBB_[i];
 	}
 
 	return *this;
@@ -1358,8 +1358,8 @@ int FIRST_SHARED (const BitBoardN& lhs, const BitBoardN& rhs){
 /////////////////////
 // RETURNS first bit common to lhs and rhs, EMPTY ELEM if sets are disjoint
 	
-	for(int i=0; i<lhs.m_nBB; i++){
-		BITBOARD bb=lhs.m_aBB[i] & rhs.m_aBB[i];
+	for(int i=0; i<lhs.nBB_; i++){
+		BITBOARD bb=lhs.vBB_[i] & rhs.vBB_[i];
 		if(bb){
 			return bblock::lsb64_intrinsic(bb)+WMUL(i);
 		}
@@ -1373,8 +1373,8 @@ int FIRST_SHARED(int first_block, const BitBoardN& lhs, const BitBoardN& rhs) {
 	/////////////////////
 	// RETURNS first bit common to lhs and rhs, EMPTY ELEM if sets are disjoint
 
-	for (int i = first_block; i < lhs.m_nBB; i++) {
-		BITBOARD bb = lhs.m_aBB[i] & rhs.m_aBB[i];
+	for (int i = first_block; i < lhs.nBB_; i++) {
+		BITBOARD bb = lhs.vBB_[i] & rhs.vBB_[i];
 		if (bb) {
 			return bblock::lsb64_intrinsic(bb) + WMUL(i);
 		}
@@ -1393,7 +1393,7 @@ BitBoardN& BitBoardN::set_bit(const vint& lv) {
 	}
 
 	//copies elements up to the maximum capacity of the bitstring
-	auto POPSIZE = WMUL(m_nBB);
+	auto POPSIZE = WMUL(nBB_);
 	for (auto i = 0; i < lv.size(); ++i) {
 
 		/////////////////////

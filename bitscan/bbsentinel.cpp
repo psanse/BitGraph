@@ -9,7 +9,7 @@ BBSentinel&  AND (const BitBoardN& lhs, const BBSentinel& rhs,  BBSentinel& res)
 	res.m_BBL=rhs.m_BBL;
 	res.m_BBH=rhs.m_BBH;
 	for(int i=rhs.m_BBL; i<=rhs.m_BBH; i++){
-		res.m_aBB[i]=lhs.bitblock(i)&rhs.m_aBB[i];
+		res.vBB_[i]=lhs.bitblock(i)&rhs.vBB_[i];
 	}
 return res;
 }
@@ -17,8 +17,8 @@ return res;
 void BBSentinel::init_sentinels(bool update){
 ////////////////
 //sets sentinels to maximum scope of current bit string
-	m_BBL=0; 
-	m_BBH=m_nBB-1;
+	m_BBL = 0; 
+	m_BBH = nBB_ - 1;
 	if(update) update_sentinels();
 }
 
@@ -42,9 +42,9 @@ int BBSentinel::update_sentinels(){
 	if(m_BBL==EMPTY_ELEM || m_BBH==EMPTY_ELEM) return EMPTY_ELEM;
 
 	//Low sentinel
-	if(!m_aBB[m_BBL]){
+	if(!vBB_[m_BBL]){
 		for(m_BBL=m_BBL+1; m_BBL<=m_BBH; m_BBL++){
-			if(m_aBB[m_BBL])
+			if(vBB_[m_BBL])
 					goto high;
 		}
 		m_BBL=EMPTY_ELEM;
@@ -54,9 +54,9 @@ int BBSentinel::update_sentinels(){
 
 	//High sentinel
 high:	;
-	if(!m_aBB[m_BBH]){
+	if(!vBB_[m_BBH]){
 		for(m_BBH=m_BBH-1; m_BBH>=m_BBL; m_BBH--){
-			if(m_aBB[m_BBH])
+			if(vBB_[m_BBH])
 					return 0;
 			}
 		m_BBL=EMPTY_ELEM;
@@ -79,9 +79,9 @@ int BBSentinel::update_sentinels(int bbl, int bbh){
 	m_BBH=bbh;
 
 	//Low
-	if(!m_aBB[m_BBL]){
+	if(!vBB_[m_BBL]){
 		for(m_BBL=m_BBL+1; m_BBL<=m_BBH; m_BBL++){
-			if(m_aBB[m_BBL])
+			if(vBB_[m_BBL])
 					goto high;
 		}
 		m_BBL=EMPTY_ELEM;
@@ -91,9 +91,9 @@ int BBSentinel::update_sentinels(int bbl, int bbh){
 
 	//High
 high:	;
-		if(!m_aBB[m_BBH]){
+		if(!vBB_[m_BBH]){
 		for(m_BBH=m_BBH-1; m_BBH>=m_BBL; m_BBH--){
-			if(m_aBB[m_BBH])
+			if(vBB_[m_BBH])
 					return 0;
 		}
 		m_BBL=EMPTY_ELEM;
@@ -109,9 +109,9 @@ int BBSentinel::update_sentinels_high(){
 	if(m_BBH==EMPTY_ELEM) return EMPTY_ELEM;
 
 	//Update High
-	if(!m_aBB[m_BBH]){
+	if(!vBB_[m_BBH]){
 		for(m_BBH=m_BBH-1; m_BBH>=m_BBL; m_BBH--){
-			if(m_aBB[m_BBH])
+			if(vBB_[m_BBH])
 					return 0;
 		}
 
@@ -128,9 +128,9 @@ int BBSentinel::update_sentinels_low(){
 	if(m_BBL==EMPTY_ELEM) return EMPTY_ELEM ;
 
 	//Update High
-	if(!m_aBB[m_BBL]){
+	if(!vBB_[m_BBL]){
 		for(m_BBL=m_BBL+1; m_BBL<=m_BBH; m_BBL++){
-			if(m_aBB[m_BBL])
+			if(vBB_[m_BBL])
 					return 0;
 		}
 		m_BBL=EMPTY_ELEM;
@@ -196,7 +196,7 @@ void  BBSentinel::erase_bit	(){
 	if(m_BBL==EMPTY_ELEM || m_BBH==EMPTY_ELEM) return; 
 
 	for(int i=m_BBL; i<=m_BBH; i++)	
-				m_aBB[i]=ZERO;
+				vBB_[i]=ZERO;
 }
 
 
@@ -208,7 +208,7 @@ BBSentinel& BBSentinel::erase_bit (const BitBoardN& bbn){
 // 1.Has to be careful with BitBoardN cast to int in constructor
 	
 	for(int i=m_BBL; i<=m_BBH; i++)
-		m_aBB[i] &= ~ bbn.bitblock(i);		//**access
+		vBB_[i] &= ~ bbn.bitblock(i);		//**access
 
 return *this;
 }
@@ -217,13 +217,13 @@ void  BBSentinel::erase_bit_and_update(int nBit) {
 	if(m_BBL==EMPTY_ELEM || m_BBH==EMPTY_ELEM ) return;		//empty bitsring
 	
 	int bb=WDIV(nBit);
-	m_aBB[bb] &= ~Tables::mask[WMOD(nBit)];
+	vBB_[bb] &= ~Tables::mask[WMOD(nBit)];
 
 	//update watched literals if necessary
-	if(!m_aBB[bb]){
+	if(!vBB_[bb]){
 		if(m_BBL==bb){
 			for(m_BBL=m_BBL+1; m_BBL<=m_BBH; m_BBL++){
-				if(m_aBB[m_BBL])
+				if(vBB_[m_BBL])
 						return;
 			}
 			m_BBL=EMPTY_ELEM;
@@ -233,7 +233,7 @@ void  BBSentinel::erase_bit_and_update(int nBit) {
 		
 		if(m_BBH==bb){
 			for(m_BBH=m_BBH-1; m_BBH>=m_BBL; m_BBH--){
-				if(m_aBB[m_BBH])
+				if(vBB_[m_BBH])
 						return;
 			}
 			m_BBL=EMPTY_ELEM;
@@ -258,7 +258,7 @@ bool BBSentinel::is_empty (int nBBL, int nBBH) const{
 	int bbh=min(nBBH, m_BBH);
 
 	for(int i=bbl; i<=bbh; ++i)
-			if(m_aBB[i]) return false;
+			if(vBB_[i]) return false;
 
 return true;	
 }
@@ -271,7 +271,7 @@ BBSentinel& BBSentinel::operator= (const  BBSentinel& bbs){
 	m_BBH=bbs.m_BBH;
 
 	for(int i=m_BBL; i<=m_BBH; i++){
-		this->m_aBB[i]=bbs.m_aBB[i];
+		this->vBB_[i]=bbs.vBB_[i];
 	}
 
 	return *this;
@@ -283,7 +283,7 @@ BBSentinel& BBSentinel::operator&=	(const  BitBoardN& bbn){
 // AND operation in the range of the sentinels
 
 	for(int i=m_BBL; i<=m_BBH; i++){
-		this->m_aBB[i] &= bbn.bitblock(i);
+		this->vBB_[i] &= bbn.bitblock(i);
 	}
 
 	return  *this;
