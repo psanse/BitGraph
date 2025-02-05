@@ -867,14 +867,16 @@ inline BitBoardN& BitBoardN::set_bit	(int nbit ){
 
 template<bool EraseAll>
 inline 
-BitBoardN&  BitBoardN::set_bit (int low, int high){
+BitBoardN&  BitBoardN::set_bit (int firstBit, int lastBit){
+
+	//general comment: low - WMUL(bbl) = WMOD(bbl) but supposed to be less expensive (CHECK 01/02/25)
 
 	//////////////////////////////
-	assert(low < high || low > 0);
+	assert(firstBit <= lastBit && firstBit > 0);
 	//////////////////////////////
 
-	int bbl= WDIV(low);
-	int bbh= WDIV(high); 
+	int bbl= WDIV(firstBit);
+	int bbh= WDIV(lastBit);
 	
 
 	//clears all bits if required
@@ -884,7 +886,7 @@ BitBoardN&  BitBoardN::set_bit (int low, int high){
 
 	if(bbl == bbh)
 	{			
-		m_aBB[bbh] |= bblock::MASK_1(low - WMUL(bbl), high - WMUL(bbh));			//low - WMUL(bbl) = WMOD(bbl) but less expensive (CHECK 01/02/25)
+		m_aBB[bbh] |= bblock::MASK_1(firstBit - WMUL(bbl), lastBit - WMUL(bbh));		
 	}
 	else
 	{
@@ -894,8 +896,8 @@ BitBoardN&  BitBoardN::set_bit (int low, int high){
 		}
 		
 		//sets the first and last blocks
-		m_aBB[bbh] |= bblock::MASK_1_RIGHT	(high - WMUL(bbh));
-		m_aBB[bbl] |= bblock::MASK_1_LEFT	(low - WMUL(bbl));
+		m_aBB[bbh] |= bblock::MASK_1_RIGHT	(lastBit - WMUL(bbh));
+		m_aBB[bbl] |= bblock::MASK_1_LEFT	(firstBit - WMUL(bbl));
 
 	}
 
@@ -959,19 +961,21 @@ BitBoardN& BitBoardN::erase_bit(int nBit) {
 }
 
 inline 
-BitBoardN&  BitBoardN::erase_bit (int low, int high){
+BitBoardN&  BitBoardN::erase_bit (int firstBit, int lastBit){
+	
+	//general comment: low - WMUL(bbl) = WMOD(bbl) but supposed to be less expensive (CHECK 01/02/25)
 
-	/////////////////////////////////////////////
-	assert(low < high || low > 0 );
-	/////////////////////////////////////////////
+	//////////////////////////////
+	assert(firstBit <= lastBit && firstBit > 0);
+	//////////////////////////////
 
-	int bbl = WDIV(low);
-	int bbh = WDIV(high);
+	int bbl = WDIV(firstBit);
+	int bbh = WDIV(lastBit);
 
 
 	if (bbl == bbh)
 	{
-		m_aBB[bbh] &= bblock::MASK_0(low - WMUL(bbl), high - WMUL(bbh));			//low - WMUL(bbl) = WMOD(bbl) but less expensive (CHECK 01/02/25)
+		m_aBB[bbh] &= bblock::MASK_0(firstBit - WMUL(bbl), lastBit - WMUL(bbh));		
 	}
 	else
 	{
@@ -980,8 +984,8 @@ BitBoardN&  BitBoardN::erase_bit (int low, int high){
 			m_aBB[i] = ZERO;
 		}
 				
-		m_aBB[bbh] &= bblock::MASK_0_RIGHT	(high - WMUL(bbh));					//Tables::mask_left
-		m_aBB[bbl] &= bblock::MASK_0_LEFT	(low - WMUL(bbl));					//Tables::mask_right	
+		m_aBB[bbh] &= bblock::MASK_0_RIGHT	(lastBit - WMUL(bbh));					//Tables::mask_left
+		m_aBB[bbl] &= bblock::MASK_0_LEFT	(firstBit - WMUL(bbl));					//Tables::mask_right	
 	}
 
 	return *this;
