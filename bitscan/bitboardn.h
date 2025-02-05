@@ -56,18 +56,20 @@ public:
 ////////////
 //construction / destruction 
 
-	 BitBoardN						(): nBB_(EMPTY_ELEM), vBB_(NULL)		{};	
+	 BitBoardN						(): nBB_(EMPTY_ELEM)	{};	
+ explicit  BitBoardN				(int popsize);
+ explicit  BitBoardN				(const vint& v);
 	 BitBoardN						(const vint& v, int popsize);
-explicit  BitBoardN					(int popsize /*1 based*/, bool reset=true);	
-explicit  BitBoardN					(const vint& v);
+
 	
 	 	 
-	 //TODO - move and copy semantics...
+	 //Move and copy semantics allowed
+	BitBoardN						(const BitBoardN& bbN)				= default;
+	BitBoardN						(BitBoardN&&)			noexcept	= default;
+	BitBoardN& operator =			(const BitBoardN&)					= default;
+	BitBoardN& operator =			(BitBoardN&&)			noexcept	= default;
 
-	 BitBoardN						(const BitBoardN& bbN);
-	 BitBoardN& operator =			(const BitBoardN&);
-
-virtual	~BitBoardN					();
+virtual	~BitBoardN					()									= default;
 
 ////////////
 //memory allocation 
@@ -557,8 +559,12 @@ virtual	int* to_C_array				(int* lv, std::size_t& size, bool rev = false);
 //data members
 
 protected:
-	BITBOARD* vBB_;				//C-array of bitblocks - not using std::vector because of memory allignment, TODO-CHANGE TO VECTOR (04/02/2025)
-	int nBB_;						//number of bitblocks 
+	
+	std::vector<BITBOARD> vBB_;	//vector of bitblocks		
+	int nBB_;					//number of bitblocks 
+
+	//deprecated
+	//BITBOARD* vBB_;			//C-array of bitblocks - not using std::vector because of memory allignment, TODO-CHANGE TO VECTOR (04/02/2025)
 
 }; //end BitBoardN class
 
