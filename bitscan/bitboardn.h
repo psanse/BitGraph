@@ -9,8 +9,8 @@
  *
  **/
 
-#ifndef __BITBOARDN__H_
-#define __BITBOARDN__H_
+#ifndef __BITBOARDN_H__
+#define __BITBOARDN_H__
 
 #include "bbobject.h"
 #include "bitboard.h"	
@@ -137,7 +137,7 @@ inline int next_bit					(int bit)	const;
 	* @details Uses a De Bruijn hashing implementation for lsbn64()
 	* @details Preliminary attempt for bitscanning with state information
 	**/
-inline int next_bit_if_del		(int bit)	const;					
+inline int next_bit_if_del			(int bit)	const;					
 	
 	/**
 	* @brief Computes the next most significant  1-bit in the bitstring after bit

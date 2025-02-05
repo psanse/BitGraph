@@ -91,7 +91,7 @@ inline int prev_bit_del			(int& nBB,  BBIntrin& del );
 //////////
 //conversions
 
-inline	int* to_C_array				(int* lv, std::size_t& size, bool rev) override;
+inline	int* to_C_array				(int* lv, std::size_t& size, bool rev= false) override;
 
 /////////////////
 // Popcount
