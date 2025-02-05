@@ -121,7 +121,23 @@ inline virtual int lsbn64			()	const; 		//de Bruijn	/ lookup
 	**/
 inline int next_bit					(int bit)	const;					
 
-inline int next_bit_if_del			(int bit)	const;					//de Bruijn
+////////////////////////////
+// Returns next bit assuming, when used in a loop, that the last bit
+// scanned is deleted prior to the call
+	/**
+	* @brief Computes the least significant 1-bit in the bitstring starting from the
+	*		 bitblock that contains the input bit. 
+	*		 If bit == EMPTY_ELEM, returns the lest significant bit in the bitstring.
+	* 
+	* @param bit: position of the bitblock where to start the search
+	* @returns The lsb starting from the bitblock of bit, EMPTY_ELEM if there are no more bits
+	* 
+	* @details To be used inside a bitscanning loop, where the last bit scanned 
+	*		   is deleted prior to the call.
+	* @details Uses a De Bruijn hashing implementation for lsbn64()
+	* @details Preliminary attempt for bitscanning with state information
+	**/
+inline int next_bit_if_del		(int bit)	const;					
 	
 	/**
 	* @brief Computes the next most significant  1-bit in the bitstring after bit
@@ -617,20 +633,20 @@ int BitBoardN::next_bit(int bit) const{
 	return EMPTY_ELEM;
 }
 
-inline int BitBoardN::next_bit_if_del(int nBit/* 0 based*/) const{
-////////////////////////////
-// Returns next bit assuming, when used in a loop, that the last bit
-// scanned is deleted prior to the call
-		
-	if(nBit == EMPTY_ELEM)
+inline int BitBoardN::next_bit_if_del(int bit) const{
+	
+	//special case - first bitscan,
+	//calls for the least significant bit in the bitstring
+	if (bit == EMPTY_ELEM) {
 		return lsbn64();
-	else{
-		for(auto i = WDIV(nBit); i<m_nBB; ++i){
-			if(m_aBB[i]){
-				return(bblock::lsb64_de_Bruijn(m_aBB[i]) + WMUL(i) );
-			}
+	}
+			
+	for (auto i = WDIV(bit); i < m_nBB; ++i) {
+		if (m_aBB[i]) {
+			return(bblock::lsb64_de_Bruijn(m_aBB[i]) + WMUL(i));
 		}
-	}	
+	}
+		
 	return EMPTY_ELEM;		//should not reach here
 }
 
