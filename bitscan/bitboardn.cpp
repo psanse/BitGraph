@@ -13,11 +13,50 @@
 using namespace std;
 
 BitBoardN&  AND (const BitBoardN& lhs, const BitBoardN& rhs,  BitBoardN& res){
+
 	for(auto i = 0; i < lhs.nBB_; ++i){
 		res.vBB_[i] = lhs.vBB_[i] & rhs.vBB_[i];
 	}
 
 	return res;
+}
+
+template<bool EraseAll = false>
+BitBoardN& AND(int firstBit, int lastBit, const BitBoardN& lhs, const BitBoardN& rhs, BitBoardN& res)
+{
+
+	//////////////////////////////
+	assert(firstBit <= lastBit && firstBit > 0);
+	//////////////////////////////
+
+	int bbl = WDIV(firstBit);
+	int bbh = WDIV(lastBit);
+
+
+	//clears all bits if required - could be optimized
+	if (EraseAll) {
+		erase_bit();
+	}
+
+	if (bbl == bbh)
+	{
+		res.vBB_[bbh] = lhs.vBB_[bbh] & rhs.vBB_[bbh] & bblock::MASK_1(firstBit - WMUL(bbl), lastBit - WMUL(bbh));
+	}
+	else
+	{
+		//set to one the intermediate blocks
+		for (int i = bbl + 1; i < bbh; ++i) {
+			res.vBB_[i] = lhs.vBB_[i] & rhs.vBB_[i];
+		}
+
+		//sets the first and last blocks
+		res.vBB_[bbh] = lhs.vBB_[bbh] & rhs.vBB_[bbh] &  bblock::MASK_1_RIGHT(lastBit - WMUL(bbh));
+		res.vBB_[bbl] = lhs.vBB_[bbh] & rhs.vBB_[bbh] &  bblock::MASK_1_LEFT(firstBit - WMUL(bbl));
+
+	}
+
+	return res;
+
 }
 
 BitBoardN&  OR	(const BitBoardN& lhs, const BitBoardN& rhs,  BitBoardN& res){

@@ -75,6 +75,10 @@ public:
 	template<bool Erase>
 	friend BitBoardN&  AND			(int lastBit,  const BitBoardN& lhs, const BitBoardN& rhs,  BitBoardN& res );		
 	
+	//closed range
+	template<bool EraseAll>
+	friend BitBoardN&  AND			(int firstBit, int lastBit, const BitBoardN& lhs, const BitBoardN& rhs, BitBoardN& res);
+
 	friend int*	       AND			(int last_vertex, const BitBoardN& lhs, const BitBoardN& rhs,  int bitset[], int& size);				//returns a bitset	
 
 	//OR
