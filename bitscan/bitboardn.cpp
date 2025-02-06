@@ -178,17 +178,6 @@ BitBoardN&  ERASE(const BitBoardN& lhs, const BitBoardN& rhs,  BitBoardN& res){
 BitBoardN::BitBoardN(int popsize) :
 	nBB_(INDEX_1TO1(popsize))
 {
-			
-//	nBB_ = INDEX_1TO1(popsize);
-
-//#ifndef _MEM_ALIGNMENT
-//	if(!(vBB_= new BITBOARD[nBB_])){
-//#else
-//	if(!(vBB_ = (BITBOARD*)_aligned_malloc(sizeof(BITBOARD)*nBB_,_MEM_ALIGNMENT))){
-//#endif
-//			LOG_ERROR("Error during bitset allocation - BitBoardN()");
-//			nBB_=-1;
-//	}
 	
 	try {
 		vBB_.resize(nBB_, 0);
@@ -197,32 +186,13 @@ BitBoardN::BitBoardN(int popsize) :
 		LOG_ERROR("Error during construction - BitBoardN::BitBoardN");
 		LOG_ERROR("exiting...");
 		std::exit(-1);
-	}	
-	
-	//Sets to 0 all bits
-	/*if (reset) {
-		erase_bit();
-	}*/
+	}
 }
 
 
 BitBoardN::BitBoardN(const vint& v):
 	nBB_(EMPTY_ELEM)
 {
-///////////////////
-// vector elements should be zero based (i.e v[0]=3, bit-index 3=1)
-
-//	//Getting BB Size
-//	nBB_ = INDEX_0TO1(*(max_element(v.begin(), v.end())) ) ; 
-//
-//#ifndef _MEM_ALIGNMENT
-//	vBB_ = new BITBOARD[nBB_];
-//#else
-//	vBB_ = (BITBOARD*)_aligned_malloc(sizeof(BITBOARD)*nBB_, _MEM_ALIGNMENT );
-//#endif
-//
-//	erase_bit();
-
 	try {
 		nBB_ = INDEX_0TO1(*(max_element(v.begin(), v.end())));
 		vBB_.resize(nBB_, 0);
@@ -241,37 +211,12 @@ BitBoardN::BitBoardN(const vint& v):
 		LOG_ERROR("Error during construction - BitBoardN::BitBoardN()");
 		LOG_ERROR("exiting...");
 		std::exit(-1);
-	}	
-
-	/*for(auto i = 0; i < v.size(); ++i){
-		if(v[i]>=0){
-			set_bit(v[i]);
-		}
-	}*/
+	}
 }
 
 BitBoardN::BitBoardN (int popsize, const vint& lv):
 	nBB_(INDEX_1TO1(popsize))
 {
-///////////////////
-// vector elements should be zero based (i.e v[0]=3, bit-index 3=1)
-// first_update: 12/11/16
-// last_update: 12/11/16
-//
-//	nBB_ = INDEX_1TO1(popsize);
-//
-//#ifndef _MEM_ALIGNMENT
-//	if(!(vBB_ = new BITBOARD[nBB_])){
-//#else
-//	if(!(vBB_ = (BITBOARD*)_aligned_malloc(sizeof(BITBOARD)*nBB_,_MEM_ALIGNMENT))){
-//#endif
-//			LOG_ERROR("Error during bitset allocation - BitBoardN()");
-//			nBB_ = -1;
-//			return;
-//	}
-	
-	//Sets to 0 all bits
-	//erase_bit();
 
 	try {
 		vBB_.resize(nBB_, 0);
@@ -294,38 +239,9 @@ BitBoardN::BitBoardN (int popsize, const vint& lv):
 		LOG_ERROR("exiting...");
 		std::exit(-1);
 	}
-
-	/*for(auto i = 0; i < v.size(); ++i){
-		if (v[i] >= 0 && v[i] < popsize) {
-			set_bit(v[i]);
-		}
-		else{
-			LOG_ERROR("BitBoardN::vector element:", v[i], "lost during construction");
-		}
-	}*/
 }
 
 void BitBoardN::init(int popsize) {
-	//////////////////////
-	// only way to change storage space once constructed
-
-	//	if(vBB_!=nullptr){
-	//#ifndef _MEM_ALIGNMENT
-	//		delete [] vBB_;
-	//#else
-	//		_aligned_free(vBB_);
-	//#endif
-	//		vBB_ = nullptr;
-	//	}
-	//
-	//	//nBBs
-	//	nBB_=INDEX_1TO1(popsize); 
-	//	
-	//#ifndef _MEM_ALIGNMENT
-	//	vBB_= new BITBOARD[nBB_];
-	//#else
-	//	vBB_ = (BITBOARD*)_aligned_malloc(sizeof(BITBOARD)*nBB_,_MEM_ALIGNMENT);
-	//#endif
 
 	try {
 		nBB_ = INDEX_1TO1(popsize);
@@ -337,36 +253,13 @@ void BitBoardN::init(int popsize) {
 		std::exit(-1);
 	}
 
-	//Sets to 0
-	/*if (reset) {
-		erase_bit();
-	}*/
-
-	//return ;
 }
 
 void BitBoardN::init(int popsize, const vint& lv){
-///////////////////////////
-// values in vector are 1-bits in the bitboard (0 based)
-	
-//	//if(vBB_ != nullptr){
-//#ifndef _MEM_ALIGNMENT
-//		delete [] vBB_;
-//#else
-//		_aligned_free(vBB_);
-//#endif
-//		vBB_ = nullptr;
-////	}
-	
+		
 	try {
-		nBB_ = INDEX_1TO1(popsize); //((popsize-1)/WORD_SIZE)+1;
+		nBB_ = INDEX_1TO1(popsize); 
 		vBB_.resize(nBB_, 0);
-
-		//#ifndef _MEM_ALIGNMENT
-		//	vBB_ = new BITBOARD[nBB_];
-		//#else
-		//	vBB_ = (BITBOARD*)_aligned_malloc(sizeof(BITBOARD)*nBB_,_MEM_ALIGNMENT);
-		//#endif
 
 		//sets bit conveniently
 		for (auto& bit : lv) {
@@ -384,21 +277,45 @@ void BitBoardN::init(int popsize, const vint& lv){
 		LOG_ERROR("Error during allocation - BitBoardN::init");
 		LOG_ERROR("exiting...");
 		std::exit(-1);
+	}	
+}
+
+void BitBoardN::reset(int popsize) {
+
+	try {
+		nBB_ = INDEX_1TO1(popsize);
+		vBB_.resize(nBB_, 0);
 	}
-	 
-	 
-	//erase_bit();
-	//for(auto i = 0; i < v.size(); ++i){
-	//	if (v[i] >= 0 && v[i] < popsize)
-	//	{
-	//		set_bit(v[i]);
-	//	}						
-	//	else{
-	//		erase_bit();		//Errr. exit
-	//		LOG_ERROR("Error during initialization - BitBoardN::init");
-	//		break;
-	//	}
-	//}
+	catch (...) {
+		LOG_ERROR("Error during allocation - BitBoardN::reset");
+		LOG_ERROR("exiting...");
+		std::exit(-1);
+	}
+
+}
+void BitBoardN::reset(int popsize, const vint& lv) {
+
+	try {
+		nBB_ = INDEX_1TO1(popsize);
+		vBB_.resize(nBB_, 0);
+
+		//sets bit conveniently
+		for (auto& bit : lv) {
+
+			//////////////////
+			assert(bit >= 0 && bit < popsize);
+			/////////////////
+
+			//sets bits - no prior erasing
+			set_bit<false>(bit);
+
+		}
+	}
+	catch (...) {
+		LOG_ERROR("Error during allocation - BitBoardN::reset");
+		LOG_ERROR("exiting...");
+		std::exit(-1);
+	}
 }
 
 

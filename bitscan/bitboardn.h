@@ -35,34 +35,52 @@ class BitBoardN:public BBObject{
 public:	
 
 /////////////////////////////
-// independent operators / services (no allocation or copies)
-
-	friend bool operator ==			(const BitBoardN& lhs, const BitBoardN& rhs);
-	friend bool operator !=			(const BitBoardN& lhs, const BitBoardN& rhs);
-
+// Independent operators / masks  
+// comment: do not modify this bitset
+		
 	friend BitBoardN&  AND			(const BitBoardN& lhs, const BitBoardN& rhs,  BitBoardN& res);							
-	friend BitBoardN&  AND			(int first_block, const BitBoardN& lhs, const BitBoardN& rhs,  BitBoardN& res);
-	friend BitBoardN&  AND			(int first_block, int last_block, const BitBoardN& lhs, const BitBoardN& rhs,  BitBoardN& res);
-	friend BitBoardN&  AND			(const BitBoardN& lhs, const BitBoardN& rhs,  BitBoardN& res, int last_vertex, bool lazy);			//up to and excluding last_vertex
-	friend int*	       AND			(const BitBoardN& lhs, const BitBoardN& rhs, int last_vertex, int res[], int& size);				//returns the operation as a set of vertices	
+	friend BitBoardN&  AND			(int firstBlock, const BitBoardN& lhs, const BitBoardN& rhs,  BitBoardN& res);
+	friend BitBoardN&  AND			(int firstBlock, int lastBlock, const BitBoardN& lhs, const BitBoardN& rhs,  BitBoardN& res);
+	friend BitBoardN&  AND			(const BitBoardN& lhs, const BitBoardN& rhs,  BitBoardN& res, int lastBit, bool lazy);				//up to and excluding last_vertex
+	friend int*	       AND			(const BitBoardN& lhs, const BitBoardN& rhs, int last_vertex, int bitset[], int& size);				//returns a bitset	
 
 	friend BitBoardN&  OR			(const BitBoardN& lhs, const BitBoardN& rhs,  BitBoardN& res);
-	friend BitBoardN&  OR			(int from, const BitBoardN& lhs, const BitBoardN& rhs,  BitBoardN& res);	
-	friend BitBoardN&  OR			(int v, bool from /* to */, const BitBoardN& lhs, const BitBoardN& rhs, BitBoardN& res);
+	friend BitBoardN&  OR			(int firstBit, const BitBoardN& lhs, const BitBoardN& rhs,  BitBoardN& res);	
+	friend BitBoardN&  OR			(int bit, bool firstBit /* to */, const BitBoardN& lhs, const BitBoardN& rhs, BitBoardN& res);
 
 	friend BitBoardN&  ERASE		(const BitBoardN& lhs, const BitBoardN& rhs,  BitBoardN& res);										//removes rhs from lhs
 	friend int FIRST_SHARED			(const BitBoardN& lhs, const BitBoardN& rhs);
-	friend int FIRST_SHARED			(int first_block, const BitBoardN& lhs, const BitBoardN& rhs);	//first elem in common
+	friend int FIRST_SHARED			(int firstBlock, const BitBoardN& lhs, const BitBoardN& rhs);	//first elem in common
 
 ////////////
 //construction / destruction 
 
-	 BitBoardN						(): nBB_(EMPTY_ELEM)	{};	
-explicit  BitBoardN					(int popsize);
-explicit  BitBoardN					(const vint& v);
-explicit  BitBoardN					(int popsize, const vint& v);
-	
-	 	 
+	 BitBoardN						(): nBB_(0)				{};	
+
+	 /**
+	 * @brief Constructor of an EMPTY bitset given a population size nPop
+	 *		  The capacity of the bitset is set according to the population size
+	 * @param nBits : population size		
+	 **/
+	 explicit  BitBoardN			(int nBits);
+
+	 /**
+	 * @brief Constructor of an EMPTY bitset given an initial vector lv of 1-bit elements 
+	 *		  The population size is the maximum value of lv
+	 *		  The capacity of the bitset is set according to the population size
+	 * @param lv : vector of integers representing 1-bits in the bitset
+	 **/
+	explicit  BitBoardN				(const vint& lv);
+
+	/**
+	 * @brief Constructor of an EMPTY bitset given an initial vector lv of 1-bit elements
+	 *		  and a population size nPop
+	 *		  The capacity of the bitset is set according to nPop
+	 * @param nPop: population size
+	 * @param lv : vector of integers representing 1-bits in the bitset
+	 **/
+	explicit  BitBoardN				(int nPop, const vint& v);
+		 	 
 	 //Move and copy semantics allowed
 	BitBoardN						(const BitBoardN& bbN)				= default;
 	BitBoardN						(BitBoardN&&)			noexcept	= default;
@@ -72,13 +90,31 @@ explicit  BitBoardN					(int popsize, const vint& v);
 virtual	~BitBoardN					()									= default;
 
 ////////////
-//memory allocation 
+//Reset / init (memory allocation)
 	void init						(int popsize);										
 	void init						(int popsize, const vint& );
 	
-	//TODO- add reset(...) with the same semantics as init (04/02/2025)
-//	void reset						(int popsize);						//deletes all bits
-//	void reset						(int popsize, const vint&);			//deletes all bits and sets new ones
+	/**
+	* @brief Resets this bitset given to a vector lv of 1-bit elements
+	 *		  and a population size nPop.
+	 * 
+	 *		  I. The capacity of the bitset is set according to nPop.
+	 *		  II. Memory is deallocated and reallocated as required	
+	 * @param nPop: population size
+	 * @param lv : vector of integers representing 1-bits in the bitset	
+	**/
+	void reset						(int nPop, const vint& lv);
+
+	/**
+	* @brief Resets this bitset to an EMPTY BITSET given to a population size nPop.
+	*
+	*		  I. The capacity of the bitset is set according to nPop.
+	*		  II. Memory is deallocated and reallocated as required
+	* 
+	* @param nPop: population size
+	**/
+	void reset						(int nPop);
+			
 
 /////////////////////
 //setters and getters (will not allocate memory)
@@ -341,6 +377,11 @@ inline	BitBoardN& erase_bit		(const BitBoardN& lhs, const BitBoardN& rhs);
 	* @details For symmetric_difference
 	**/
 	BitBoardN& operator ^=			(const BitBoardN& bbn);
+
+	
+	friend bool operator ==			(const BitBoardN& lhs, const BitBoardN& rhs);
+	friend bool operator !=			(const BitBoardN& lhs, const BitBoardN& rhs);
+
 
 ////////////////////////
 // Basic operations
@@ -1296,10 +1337,13 @@ int BitBoardN::find_diff_pair(const BitBoardN& rhs, int& bit1, int& bit2) const 
 inline
 bool operator==	(const BitBoardN& lhs, const BitBoardN& rhs){
 	
-	for(int i=0; i<lhs.nBB_; i++)
-		if( lhs.vBB_[i]!=rhs.vBB_[i] ) return false;
+	for (auto i = 0; i < lhs.nBB_; ++i) {
+		if (lhs.vBB_[i] != rhs.vBB_[i]) {
+			return false;
+		}
+	}
 
-return true;
+	return true;
 }
 
 inline
