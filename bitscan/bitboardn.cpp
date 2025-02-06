@@ -160,7 +160,6 @@ int* AND (const BitBoardN& lhs, const BitBoardN& rhs, int last_vertex, int* res,
 }
 
 
-
 BitBoardN&  ERASE(const BitBoardN& lhs, const BitBoardN& rhs,  BitBoardN& res){
 /////////////
 // removes rhs FROM lhs
@@ -251,8 +250,6 @@ BitBoardN::BitBoardN(const vint& v):
 	}*/
 }
 
-
-
 BitBoardN::BitBoardN (int popsize, const vint& lv):
 	nBB_(INDEX_1TO1(popsize))
 {
@@ -306,9 +303,7 @@ BitBoardN::BitBoardN (int popsize, const vint& lv):
 			LOG_ERROR("BitBoardN::vector element:", v[i], "lost during construction");
 		}
 	}*/
-
 }
-
 
 void BitBoardN::init(int popsize) {
 	//////////////////////
