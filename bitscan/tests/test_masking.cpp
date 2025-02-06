@@ -398,31 +398,30 @@ TEST(Masks, AND_trimming){
 	bb1.set_bit(100);
 
 	//AND
-	AND(bb, bb1, bbresAND,11, true);
+	AND(11, bb, bb1, bbresAND, true);
 	//AND(1,bb, bb1, bbresAND);
 	EXPECT_TRUE(bbresAND.is_bit(10));
 	EXPECT_FALSE(bbresAND.is_bit(64));
 	EXPECT_EQ(1, bbresAND.popcn64());
 
 	bbresAND.erase_bit();
-	AND(bb, bb1, bbresAND,10, true);
+	AND(10, bb, bb1, bbresAND, true);
 	//AND(10,bb, bb1, bbresAND);
 	EXPECT_FALSE(bbresAND.is_bit(10));
 
 	bbresAND.erase_bit();
-	AND(bb, bb1, bbresAND,64, true);
+	AND(64, bb, bb1, bbresAND, true);
 	//AND(64,bb, bb1, bbresAND);
 	EXPECT_FALSE(bbresAND.is_bit(64));
 
 	bbresAND.erase_bit();
-	AND(bb, bb1, bbresAND,65, true);
+	AND(65, bb, bb1, bbresAND, true);
 	//AND(65,bb, bb1, bbresAND);
 	EXPECT_TRUE(bbresAND.is_bit(64));
 		
-
 	//AND
 	bbresAND.erase_bit();
-	AND(bb, bb1, bbresAND, 5, true);
+	AND(5, bb, bb1, bbresAND, true);
 	//AND(5,bb, bb1, bbresAND);
 	EXPECT_FALSE(bbresAND.is_bit(10));
 	EXPECT_FALSE(bbresAND.is_bit(64));

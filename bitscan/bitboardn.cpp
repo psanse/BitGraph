@@ -85,33 +85,35 @@ BitBoardN&  OR(int v, bool from, const BitBoardN& lhs, const BitBoardN& rhs, Bit
 }
 
 
-BitBoardN&   AND (int first_block, const BitBoardN& lhs, const BitBoardN& rhs,  BitBoardN& res){
-	for(auto i = first_block; i < lhs.nBB_; ++i){
-		res.vBB_[i] = rhs.vBB_[i] & lhs.vBB_[i];
-	}
-return res;
-}
+BitBoardN&   AND_block (int firstBlock, int lastBlock, const BitBoardN& lhs, const BitBoardN& rhs,  BitBoardN& res){
+		
+	//////////////////////////////////////////////////////////////////
+	assert( (firstBlock >= 0) && (LastBlock < lhs.nBB_) && 
+			(firstBlock <= lastBlock) && (rhs.nBB_ == lhs.nBB_) );
+	//////////////////////////////////////////////////////////////////
 
-BitBoardN&   AND (int first_block, int last_block, const BitBoardN& lhs, const BitBoardN& rhs,  BitBoardN& res){
-	for(auto i = first_block; i <= last_block; ++i){
+	int last_block = ((lastBlock == -1) ? lhs.nBB_ - 1 : lastBlock);
+
+	for (auto i = firstBlock; i <= last_block; ++i) {
 		res.vBB_[i] = rhs.vBB_[i] & lhs.vBB_[i];
 	}
+
 	return res;
 }
 
-BitBoardN&  AND	(const BitBoardN& lhs, const BitBoardN& rhs,  BitBoardN& res, int last_vertex, bool lazy = true){
+BitBoardN&  AND	(int lastBit, const BitBoardN& lhs, const BitBoardN& rhs,  BitBoardN& res,  bool lazy = true){
 ///////////////
 // AND circumscribed to vertices [0,last_vertex(
 //
 // A non-lazy operations cleans the remaining blocks after last-vertex as well
 
-	int nbb = WDIV(last_vertex);
+	int nbb = WDIV(lastBit);
 	for(auto i = 0; i <= nbb; ++i){
 		res.vBB_[i] = rhs.vBB_[i] & lhs.vBB_[i];
 	}
 
 	//trim last
-	res.vBB_[nbb] &= Tables::mask_right[WMOD(last_vertex)];
+	res.vBB_[nbb] &= Tables::mask_right[WMOD(lastBit)];
 	
 	//delete the rest of bitstring if the operation is not lazy
 	if(!lazy){

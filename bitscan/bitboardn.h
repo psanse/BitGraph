@@ -37,11 +37,26 @@ public:
 /////////////////////////////
 // Independent operators / masks  
 // comment: do not modify this bitset
-		
+	
+	/**
+	* @brief AND between lhs and rhs bitsets, stores the result in res
+	* @returns reference to the resulting bitstring res
+	**/
 	friend BitBoardN&  AND			(const BitBoardN& lhs, const BitBoardN& rhs,  BitBoardN& res);							
-	friend BitBoardN&  AND			(int firstBlock, const BitBoardN& lhs, const BitBoardN& rhs,  BitBoardN& res);
-	friend BitBoardN&  AND			(int firstBlock, int lastBlock, const BitBoardN& lhs, const BitBoardN& rhs,  BitBoardN& res);
-	friend BitBoardN&  AND			(const BitBoardN& lhs, const BitBoardN& rhs,  BitBoardN& res, int lastBit, bool lazy);				//up to and excluding last_vertex
+		
+	/**
+	* @brief AND between lhs and rhs bitsets in the closed
+	*		 block range [firstBlock, lastBlock]. Stores the result in res.
+	*		 If lastBock==-1, the range is the full bitset
+	*		 
+	*		I.The capacity of lhs and rhs must be the same. 
+	*		II. The capacity of res must be at least the same as lhs nand rhs
+	
+	* @returns reference to the resulting bitstring res
+	**/
+	friend BitBoardN&  AND_block	(int firstBlock, int lastBlock, const BitBoardN& lhs, const BitBoardN& rhs,  BitBoardN& res);
+	
+	friend BitBoardN&  AND			(int lastBit,  const BitBoardN& lhs, const BitBoardN& rhs,  BitBoardN& res,  bool lazy);				//up to and excluding last_vertex
 	friend int*	       AND			(const BitBoardN& lhs, const BitBoardN& rhs, int last_vertex, int bitset[], int& size);				//returns a bitset	
 
 	friend BitBoardN&  OR			(const BitBoardN& lhs, const BitBoardN& rhs,  BitBoardN& res);
