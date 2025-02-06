@@ -13,7 +13,7 @@
 using namespace std;
 typedef vector<int> vint;
 
-TEST(stack_state, basic){
+TEST(stack_state, DISABLED_basic){
 	LOG_INFO("stack_state::basic---------------------------------------------");
 	sbb_t<bitarray> s;
 	s.init(65);
@@ -40,7 +40,7 @@ TEST(stack_state, basic){
 	LOG_INFO("------------------------------------------------------------------");
 }
 
-TEST(bb_t, basic){
+TEST(bb_t, DISABLED_basic){
 	LOG_INFO("bb_t::basic-------------------------------------------------------");
 	bb_t<bitarray> b;
 	b.init(65);

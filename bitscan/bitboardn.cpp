@@ -177,8 +177,7 @@ BitBoardN&  ERASE(const BitBoardN& lhs, const BitBoardN& rhs,  BitBoardN& res){
 //////////////////////////////////////////////////////////////////////
 
 BitBoardN::BitBoardN(int popsize) :
-	nBB_(INDEX_1TO1(popsize)),
-	vBB_(nBB_, 0)
+	nBB_(INDEX_1TO1(popsize))
 {
 			
 //	nBB_ = INDEX_1TO1(popsize);
@@ -191,7 +190,15 @@ BitBoardN::BitBoardN(int popsize) :
 //			LOG_ERROR("Error during bitset allocation - BitBoardN()");
 //			nBB_=-1;
 //	}
-		
+	
+	try {
+		vBB_.resize(nBB_, 0);
+	}
+	catch (...) {
+		LOG_ERROR("Error during construction - BitBoardN::BitBoardN");
+		LOG_ERROR("exiting...");
+		std::exit(-1);
+	}	
 	
 	//Sets to 0 all bits
 	/*if (reset) {
@@ -201,8 +208,7 @@ BitBoardN::BitBoardN(int popsize) :
 
 
 BitBoardN::BitBoardN(const vint& v):
-	nBB_ ( INDEX_0TO1(*(max_element(v.begin(), v.end()))) ),
-	vBB_ (nBB_, 0)
+	nBB_(EMPTY_ELEM)
 {
 ///////////////////
 // vector elements should be zero based (i.e v[0]=3, bit-index 3=1)
@@ -218,15 +224,25 @@ BitBoardN::BitBoardN(const vint& v):
 //
 //	erase_bit();
 
-	for (auto& bit : v) {
+	try {
+		nBB_ = INDEX_0TO1(*(max_element(v.begin(), v.end())));
+		vBB_.resize(nBB_, 0);
 
-		//////////////////
-		assert(bit >= 0);
-		/////////////////
+		for (auto& bit : v) {
 
-		//bits are alredy set to 0 - no need to do it again
-		set_bit<false>(bit);		
+			//////////////////
+			assert(bit >= 0);
+			/////////////////
+
+			//bits are alredy set to 0 - no need to do it again
+			set_bit<false>(bit);
+		}
 	}
+	catch (...) {
+		LOG_ERROR("Error during construction - BitBoardN::BitBoardN()");
+		LOG_ERROR("exiting...");
+		std::exit(-1);
+	}	
 
 	/*for(auto i = 0; i < v.size(); ++i){
 		if(v[i]>=0){
@@ -237,10 +253,8 @@ BitBoardN::BitBoardN(const vint& v):
 
 
 
-BitBoardN::BitBoardN (const vint& lv, int popsize):
-	nBB_(INDEX_1TO1(popsize)),
-	vBB_(nBB_, 0)
-
+BitBoardN::BitBoardN (int popsize, const vint& lv):
+	nBB_(INDEX_1TO1(popsize))
 {
 ///////////////////
 // vector elements should be zero based (i.e v[0]=3, bit-index 3=1)
@@ -262,14 +276,25 @@ BitBoardN::BitBoardN (const vint& lv, int popsize):
 	//Sets to 0 all bits
 	//erase_bit();
 
-	for (auto& bit : lv) {
+	try {
+		vBB_.resize(nBB_, 0);
+		
+		//sets bit conveniently
+		for (auto& bit : lv) {
 
-		//////////////////
-		assert(bit >= 0 && bit < popsize);
-		/////////////////
+			//////////////////
+			assert(bit >= 0 && bit < popsize);
+			/////////////////
 
-		set_bit(bit);
+			set_bit(bit);
 
+		}
+
+	}
+	catch (...) {
+		LOG_ERROR("Error during construction - BitBoardN::BitBoardN()");
+		LOG_ERROR("exiting...");
+		std::exit(-1);
 	}
 
 	/*for(auto i = 0; i < v.size(); ++i){
@@ -296,24 +321,31 @@ void BitBoardN::init(int popsize, const vint& lv){
 //		vBB_ = nullptr;
 ////	}
 	
-	nBB_ = INDEX_1TO1(popsize); //((popsize-1)/WORD_SIZE)+1;
-	vBB_.resize(nBB_, 0);
+	try {
+		nBB_ = INDEX_1TO1(popsize); //((popsize-1)/WORD_SIZE)+1;
+		vBB_.resize(nBB_, 0);
 
-//#ifndef _MEM_ALIGNMENT
-//	vBB_ = new BITBOARD[nBB_];
-//#else
-//	vBB_ = (BITBOARD*)_aligned_malloc(sizeof(BITBOARD)*nBB_,_MEM_ALIGNMENT);
-//#endif
+		//#ifndef _MEM_ALIGNMENT
+		//	vBB_ = new BITBOARD[nBB_];
+		//#else
+		//	vBB_ = (BITBOARD*)_aligned_malloc(sizeof(BITBOARD)*nBB_,_MEM_ALIGNMENT);
+		//#endif
 
-	//sets bit conveniently
-	for (auto bit : lv) {
+		//sets bit conveniently
+		for (auto& bit : lv) {
 
-		//////////////////
-		assert(bit >= 0 && bit < popsize);
-		/////////////////
+			//////////////////
+			assert(bit >= 0 && bit < popsize);
+			/////////////////
 
-		set_bit(bit);
+			set_bit(bit);
 
+		}
+	}
+	catch (...) {
+		LOG_ERROR("Error during allocation - BitBoardN::init");
+		LOG_ERROR("exiting...");
+		std::exit(-1);
 	}
 	 
 	 
@@ -353,8 +385,16 @@ void BitBoardN::init(int popsize){
 //#else
 //	vBB_ = (BITBOARD*)_aligned_malloc(sizeof(BITBOARD)*nBB_,_MEM_ALIGNMENT);
 //#endif
-
-	vBB_.resize(INDEX_1TO1(popsize), 0);
+	
+	try {
+		nBB_ = INDEX_1TO1(popsize);
+		vBB_.resize(nBB_, 0);
+	}
+	catch (...) {
+		LOG_ERROR("Error during allocation - BitBoardN::init");
+		LOG_ERROR("exiting...");
+		std::exit(-1);
+	}	
 
 	//Sets to 0
 	/*if (reset) {

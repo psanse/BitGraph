@@ -64,9 +64,6 @@ TEST(bblockTest, masks_single_argument) {
 	EXPECT_FALSE(bb & Tables::mask[0]);
 	EXPECT_TRUE(bb & Tables::mask[11]);
 	EXPECT_TRUE(bb & Tables::mask[63]);
-		
-
-
 	
 }
 

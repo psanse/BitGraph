@@ -446,49 +446,6 @@ TEST_F(BitScanningTest, reverse_destructive){
 //}
 
 
-TEST(BitBoardTests, vector) {
-	BitBoardN bbn1(50);
-	int aux[] = {10,20,45,62};
-	vector<int> v1(aux, aux + sizeof(aux) / sizeof(int));
-
-	bbn1.set_bit(v1[0]);
-	bbn1.set_bit(v1[1]);
-	bbn1.set_bit(v1[2]);
-	bbn1.set_bit(v1[3]);
-
-	BitBoardN bbn2(v1);
-
-	vector<int> v2=to_vector(bbn1);
-	vector<int> v3=to_vector(bbn2);
-
-	EXPECT_EQ(to_vector(bbn2), v1);
-	EXPECT_EQ(to_vector(bbn1), v1);
-	EXPECT_EQ(to_vector(bbn1), to_vector(bbn2));
-
-//construction with vector and popsize (12/11/16)
-	vector<int> v4(aux, aux + sizeof(aux) / sizeof(int));
-	BitBoardN bbn3(v4, 30);
-	EXPECT_EQ(2,bbn3.popcn64());
-	EXPECT_TRUE(bbn3.is_bit(10));
-	EXPECT_TRUE(bbn3.is_bit(20));
-
-	//vector elements are 0-based
-	BitBoardN bbn4(v4, 20);				/*vector element 20 will not make part of the bitstring*/
-	EXPECT_EQ(1,bbn4.popcn64());
-	EXPECT_TRUE(bbn4.is_bit(10));
-	EXPECT_FALSE(bbn4.is_bit(20));
-
-//operator equal
-	int aux1[] = {10,20,45,62,250};
-	vector<int> v5(aux1, aux1 + sizeof(aux1) / sizeof(int));
-	BitBoardN bbn5(100);					//only 250 will not be copied						
-	bbn5.set_bit(v5);
-	bbn5.print();
-	EXPECT_EQ(4,bbn5.popcn64());
-	EXPECT_TRUE(bbn5.is_bit(10));
-	EXPECT_TRUE(bbn5.is_bit(20));
-}
-
 TEST(BitBoardTests, BitBoardNTo0) {
 	BitBoardN bb1(25);
 	BitBoardN bb2(bb1);

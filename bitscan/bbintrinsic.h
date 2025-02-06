@@ -47,7 +47,7 @@ public:
 explicit  BBIntrin					(int popsize /*1 based*/):BitBoardN(popsize){}	
 	 BBIntrin						(const BBIntrin& bbN):BitBoardN(bbN){}
 	 BBIntrin						(const std::vector<int>& v): BitBoardN(v){}
-	 BBIntrin						(const std::vector<int>& v, int popsize):BitBoardN(v, popsize){}
+	 BBIntrin						(int popsize, const std::vector<int>& v):BitBoardN(popsize, v){}
 virtual ~BBIntrin					(){}
 
 	 void set_bbindex				(int bbindex){m_scan.bbi=bbindex;}	

@@ -463,13 +463,13 @@ TEST(BBNtest, vector_operations) {
 	///////////////
 	//construction from vector and popsize (12/11/16)
 	lv = {10, 20};
-	BitBoardN bbN3(lv, POPULATION_SIZE);
+	BitBoardN bbN3(POPULATION_SIZE, lv);
 	EXPECT_EQ(2,bbN3.popcn64());
 	EXPECT_TRUE(bbN3.is_bit(10));
 	EXPECT_TRUE(bbN3.is_bit(20));
 
 	//bitstring with population size 20 
-	BitBoardN bbN4(lv, 21);						//vector element 20 will not make part of the bitstring
+	BitBoardN bbN4(21, lv);						//vector element 20 will not make part of the bitstring
 	EXPECT_EQ(2, bbN4.popcn64());
 	EXPECT_TRUE(bbN4.is_bit(10));
 	EXPECT_TRUE(bbN4.is_bit(20));

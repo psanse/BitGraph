@@ -58,10 +58,9 @@ public:
 //construction / destruction 
 
 	 BitBoardN						(): nBB_(EMPTY_ELEM)	{};	
- explicit	 BitBoardN				(int popsize);
- explicit  BitBoardN				(const vint& v);
-	 BitBoardN						(const vint& v, int popsize);
-
+explicit  BitBoardN					(int popsize);
+explicit  BitBoardN					(const vint& v);
+explicit  BitBoardN					(int popsize, const vint& v);
 	
 	 	 
 	 //Move and copy semantics allowed
@@ -78,6 +77,8 @@ virtual	~BitBoardN					()									= default;
 	void init						(int popsize, const vint& );
 	
 	//TODO- add reset(...) with the same semantics as init (04/02/2025)
+//	void reset						(int popsize);						//deletes all bits
+//	void reset						(int popsize, const vint&);			//deletes all bits and sets new ones
 
 /////////////////////
 //setters and getters (will not allocate memory)

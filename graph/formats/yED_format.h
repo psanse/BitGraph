@@ -171,7 +171,7 @@ namespace gio {
 			std::string filenameExt =path + filename + ".gml";
 			std::ofstream grafo(filenameExt);
 			if (!grafo) { LOG_ERROR("file: " , filenameExt , "could no be opened" , " -graph_to_gml(...)"); return -1; }
-			typename Graph_t::_bbt bbclq(vset, N);
+			typename Graph_t::_bbt bbclq(N, vset);
 			//bbclq.print(cout, true);
 
 
@@ -224,7 +224,7 @@ namespace gio {
 			std::string filenameExt = path + filename + ".gml";
 			std::ofstream grafo(filenameExt);
 			if (!grafo) { LOG_ERROR("file: " , filenameExt , " could no be opened" , " -gio::yed::graph_to_gml_clique(...)"); return -1; }
-			typename Graph_t::_bbt bbclq(clq, N);
+			typename Graph_t::_bbt bbclq(N, clq);
 			//bbclq.print(cout, true);
 
 
