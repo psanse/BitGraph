@@ -101,29 +101,7 @@ BitBoardN&   AND_block (int firstBlock, int lastBlock, const BitBoardN& lhs, con
 	return res;
 }
 
-BitBoardN&  AND	(int lastBit, const BitBoardN& lhs, const BitBoardN& rhs,  BitBoardN& res,  bool lazy = true){
-///////////////
-// AND circumscribed to vertices [0,last_vertex(
-//
-// A non-lazy operations cleans the remaining blocks after last-vertex as well
 
-	int nbb = WDIV(lastBit);
-	for(auto i = 0; i <= nbb; ++i){
-		res.vBB_[i] = rhs.vBB_[i] & lhs.vBB_[i];
-	}
-
-	//trim last
-	res.vBB_[nbb] &= Tables::mask_right[WMOD(lastBit)];
-	
-	//delete the rest of bitstring if the operation is not lazy
-	if(!lazy){
-		for(int i = nbb + 1; i < lhs.nBB_; ++i){
-			res.vBB_[i] = ZERO;
-		}
-	}
-
-return res;
-}
 
 int* AND (const BitBoardN& lhs, const BitBoardN& rhs, int last_vertex, int* res, int& size){
 ///////////////

@@ -56,7 +56,13 @@ public:
 	**/
 	friend BitBoardN&  AND_block	(int firstBlock, int lastBlock, const BitBoardN& lhs, const BitBoardN& rhs,  BitBoardN& res);
 	
-	friend BitBoardN&  AND			(int lastBit,  const BitBoardN& lhs, const BitBoardN& rhs,  BitBoardN& res,  bool lazy);				//up to and excluding last_vertex
+	///////////////
+	// AND circumscribed to vertices [0,last_vertex(
+	// UP to and excluding the last vertex, CHECK! 
+	// A non-lazy operations cleans the remaining blocks after last-vertex as well
+	template<bool Erase>
+	friend BitBoardN&  AND			(int lastBit,  const BitBoardN& lhs, const BitBoardN& rhs,  BitBoardN& res );		
+	
 	friend int*	       AND			(const BitBoardN& lhs, const BitBoardN& rhs, int last_vertex, int bitset[], int& size);				//returns a bitset	
 
 	friend BitBoardN&  OR			(const BitBoardN& lhs, const BitBoardN& rhs,  BitBoardN& res);
@@ -1476,6 +1482,26 @@ BitBoardN& BitBoardN::set_bit(const vint& lv) {
 
 }
 
+template<bool Erase = false>
+inline
+BitBoardN& AND(int lastBit, const BitBoardN& lhs, const BitBoardN& rhs, BitBoardN& res) {
 
+	int nbb = WDIV(lastBit);
+	for (auto i = 0; i <= nbb; ++i) {
+		res.vBB_[i] = rhs.vBB_[i] & lhs.vBB_[i];
+	}
+
+	//trim last
+	res.vBB_[nbb] &= Tables::mask_right[WMOD(lastBit)];
+
+	//delete the rest of bitstring if the operation is not lazy
+	if (Erase) {
+		for (int i = nbb + 1; i < lhs.nBB_; ++i) {
+			res.vBB_[i] = ZERO;
+		}
+	}
+
+	return res;
+}
 
 #endif
