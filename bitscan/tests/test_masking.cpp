@@ -387,8 +387,7 @@ TEST(Masks, AND_trimming){
 	bitarray bb(130);
 	bitarray bb1(130);
 	bitarray bbresAND(130);
-
-	
+		
 	bb.set_bit(10);
 	bb.set_bit(20);
 	bb.set_bit(64);
@@ -433,9 +432,10 @@ TEST(Masks, AND_trimming_2_vertex_set){
 ///////////
 //date: 26/6/16
 // Note: AND works in a half open range (excludes limiting bit)
+	const int POPSIZE = 130;	
 
-	bitarray bb(130);
-	bitarray bb1(130);
+	bitarray bb(POPSIZE);
+	bitarray bb1(POPSIZE);
 		
 	bb.set_bit(10);
 	bb.set_bit(20);
@@ -445,20 +445,20 @@ TEST(Masks, AND_trimming_2_vertex_set){
 	bb1.set_bit(64);
 	bb1.set_bit(100);
 
-	int v[130];
-	int size=0;
+	int v[POPSIZE];
+	int size = 0;
 
 	//AND
-	AND(bb, bb1, 11, v, size);			//v[0]=10;
+	AND(11, bb, bb1,  v, size);			//v[0]=10;
 	vector<int> vset(v, v+size);
 	EXPECT_TRUE(find(vset.begin(), vset.end(), 10)!=vset.end());
 	EXPECT_FALSE(find(vset.begin(), vset.end(), 64)!=vset.end());
 	EXPECT_EQ(1, size);
 	
-	AND(bb, bb1, 10, v, size);			//v=[];
+	AND(10, bb, bb1,  v, size);			//v=[];
 	EXPECT_EQ(0, size);
 
-	AND(bb, bb1, 65,v,size);			//v={10,64}
+	AND(65, bb, bb1, v,size);			//v={10,64}
 	vector<int> vset2(v, v+size);
 	EXPECT_TRUE(find(vset2.begin(), vset2.end(), 64)!=vset2.end());
 

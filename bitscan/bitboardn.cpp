@@ -102,8 +102,7 @@ BitBoardN&   AND_block (int firstBlock, int lastBlock, const BitBoardN& lhs, con
 }
 
 
-
-int* AND (const BitBoardN& lhs, const BitBoardN& rhs, int last_vertex, int* res, int& size){
+int* AND (int lastBit, const BitBoardN& lhs, const BitBoardN& rhs,  int* res, int& size){
 ///////////////
 // AND circumscribed to vertices [0,last_vertex(
 //
@@ -115,7 +114,7 @@ int* AND (const BitBoardN& lhs, const BitBoardN& rhs, int last_vertex, int* res,
 	int offset;
 	size = 0;
 	
-	int nbb = WDIV(last_vertex);
+	int nbb = WDIV(lastBit);
 	for(auto i = 0; i < nbb; ++i){
 		bb = rhs.vBB_[i] & lhs.vBB_[i];
 		offset = WMUL(i);
@@ -129,7 +128,7 @@ int* AND (const BitBoardN& lhs, const BitBoardN& rhs, int last_vertex, int* res,
 	}
 
 	//trim last
-	bb = rhs.vBB_[nbb] & lhs.vBB_[nbb] & Tables::mask_right[WMOD(last_vertex)];
+	bb = rhs.vBB_[nbb] & lhs.vBB_[nbb] & Tables::mask_right[WMOD(lastBit)];
 	while(bb){
 		int v = bblock::lsb64_intrinsic(bb);
 		res[size++] = WMUL(nbb) + v;

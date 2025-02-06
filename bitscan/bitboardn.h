@@ -19,9 +19,9 @@
 
 #include <cassert>					//uncomment NDEBUG in config.h to enable run-time assertions
 
-//alias
+//useful alias
 using vint = std::vector<int>;
-using vBS = std::vector<BITBOARD>;	
+using vbset  = std::vector<BITBOARD>;	
 
 /////////////////////////////////
 //
@@ -51,27 +51,43 @@ public:
 	*		 
 	*		I.The capacity of lhs and rhs must be the same. 
 	*		II. The capacity of res must be at least the same as lhs nand rhs
-	
+	*
 	* @returns reference to the resulting bitstring res
 	**/
 	friend BitBoardN&  AND_block	(int firstBlock, int lastBlock, const BitBoardN& lhs, const BitBoardN& rhs,  BitBoardN& res);
 	
-	///////////////
-	// AND circumscribed to vertices [0,last_vertex(
-	// UP to and excluding the last vertex, CHECK! 
-	// A non-lazy operations cleans the remaining blocks after last-vertex as well
+	/**
+	* @brief AND between lhs and rhs bitsets in the semi-open range [0, last_vertex)
+	*		
+	*		 I. Sets to 0 the remaining bits after, and including lastBit of the bitblock lbBLOCK containing lastBit
+	*		 II.If template Erase is true, the rest of the bitblocks after  lbBLOCK are also set to 0
+	* 
+	* @param lastBit:  position that determines the range of the AND mask
+	* @param lhs, rhs: input bitsets
+	* @param res: output bitset
+	* @returns reference to the resulting bitstring res
+	* @details: The capacity of lhs and rhs must be the same. 
+	*			The capacity of res must be greater or equal than lhs / rhs
+	* 
+	* TODO: slightly weird behaviour, check if it is necessary
+	* TODO: add firstBit logic  (06/02/2025)
+	**/
 	template<bool Erase>
 	friend BitBoardN&  AND			(int lastBit,  const BitBoardN& lhs, const BitBoardN& rhs,  BitBoardN& res );		
 	
-	friend int*	       AND			(const BitBoardN& lhs, const BitBoardN& rhs, int last_vertex, int bitset[], int& size);				//returns a bitset	
+	friend int*	       AND			(int last_vertex, const BitBoardN& lhs, const BitBoardN& rhs,  int bitset[], int& size);				//returns a bitset	
 
+	//OR
 	friend BitBoardN&  OR			(const BitBoardN& lhs, const BitBoardN& rhs,  BitBoardN& res);
 	friend BitBoardN&  OR			(int firstBit, const BitBoardN& lhs, const BitBoardN& rhs,  BitBoardN& res);	
 	friend BitBoardN&  OR			(int bit, bool firstBit /* to */, const BitBoardN& lhs, const BitBoardN& rhs, BitBoardN& res);
 
+	//bit deletion
 	friend BitBoardN&  ERASE		(const BitBoardN& lhs, const BitBoardN& rhs,  BitBoardN& res);										//removes rhs from lhs
+	
+	//first elem in common
 	friend int FIRST_SHARED			(const BitBoardN& lhs, const BitBoardN& rhs);
-	friend int FIRST_SHARED			(int firstBlock, const BitBoardN& lhs, const BitBoardN& rhs);	//first elem in common
+	friend int FIRST_SHARED			(int firstBlock, const BitBoardN& lhs, const BitBoardN& rhs);	
 
 ////////////
 //construction / destruction 
@@ -147,8 +163,8 @@ virtual	~BitBoardN					()									= default;
 	**/
 	int capacity()								const					{ return nBB_; }
 
-	vBS& bitstring					()									{ return vBB_; }
-const vBS& bitstring				()			const					{ return vBB_; }
+	vbset& bitstring				()									{ return vBB_; }
+const vbset& bitstring				()			const					{ return vBB_; }
 	
 const BITBOARD bitblock				(int block) const					{ return vBB_[block]; }
 	BITBOARD& bitblock				(int block)							{ return vBB_[block]; }
@@ -1425,7 +1441,6 @@ BitBoardN& BitBoardN::erase_block(int FirstBlock, int LastBlock, const BitBoardN
 	return *this;
 }
 
-
 inline
 int FIRST_SHARED (const BitBoardN& lhs, const BitBoardN& rhs){
 /////////////////////
@@ -1486,13 +1501,15 @@ template<bool Erase = false>
 inline
 BitBoardN& AND(int lastBit, const BitBoardN& lhs, const BitBoardN& rhs, BitBoardN& res) {
 
+	//determine bitblock
 	int nbb = WDIV(lastBit);
+
 	for (auto i = 0; i <= nbb; ++i) {
 		res.vBB_[i] = rhs.vBB_[i] & lhs.vBB_[i];
 	}
 
-	//trim last
-	res.vBB_[nbb] &= Tables::mask_right[WMOD(lastBit)];
+	//trim last part of the bitblock - including lastBit
+	res.vBB_[nbb] &= Tables::mask_right[lastBit - WMUL(nbb) /* WMOD(lastBit)*/];
 
 	//delete the rest of bitstring if the operation is not lazy
 	if (Erase) {
@@ -1504,4 +1521,4 @@ BitBoardN& AND(int lastBit, const BitBoardN& lhs, const BitBoardN& rhs, BitBoard
 	return res;
 }
 
-#endif
+#endif	
