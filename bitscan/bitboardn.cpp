@@ -234,8 +234,8 @@ BitBoardN::BitBoardN(const vint& v):
 			assert(bit >= 0);
 			/////////////////
 
-			//bits are alredy set to 0 - no need to do it again
-			set_bit<false>(bit);
+			//sets bits - no prior erasing
+			set_bit(bit);
 		}
 	}
 	catch (...) {
@@ -286,6 +286,7 @@ BitBoardN::BitBoardN (int popsize, const vint& lv):
 			assert(bit >= 0 && bit < popsize);
 			/////////////////
 
+			//sets bits - no prior erasing
 			set_bit(bit);
 
 		}
@@ -306,6 +307,47 @@ BitBoardN::BitBoardN (int popsize, const vint& lv):
 		}
 	}*/
 
+}
+
+
+void BitBoardN::init(int popsize) {
+	//////////////////////
+	// only way to change storage space once constructed
+
+	//	if(vBB_!=nullptr){
+	//#ifndef _MEM_ALIGNMENT
+	//		delete [] vBB_;
+	//#else
+	//		_aligned_free(vBB_);
+	//#endif
+	//		vBB_ = nullptr;
+	//	}
+	//
+	//	//nBBs
+	//	nBB_=INDEX_1TO1(popsize); 
+	//	
+	//#ifndef _MEM_ALIGNMENT
+	//	vBB_= new BITBOARD[nBB_];
+	//#else
+	//	vBB_ = (BITBOARD*)_aligned_malloc(sizeof(BITBOARD)*nBB_,_MEM_ALIGNMENT);
+	//#endif
+
+	try {
+		nBB_ = INDEX_1TO1(popsize);
+		vBB_.resize(nBB_, 0);
+	}
+	catch (...) {
+		LOG_ERROR("Error during allocation - BitBoardN::init");
+		LOG_ERROR("exiting...");
+		std::exit(-1);
+	}
+
+	//Sets to 0
+	/*if (reset) {
+		erase_bit();
+	}*/
+
+	//return ;
 }
 
 void BitBoardN::init(int popsize, const vint& lv){
@@ -338,6 +380,7 @@ void BitBoardN::init(int popsize, const vint& lv){
 			assert(bit >= 0 && bit < popsize);
 			/////////////////
 
+			//sets bits - no prior erasing
 			set_bit(bit);
 
 		}
@@ -364,61 +407,6 @@ void BitBoardN::init(int popsize, const vint& lv){
 }
 
 
-void BitBoardN::init(int popsize){
-//////////////////////
-// only way to change storage space once constructed
-
-//	if(vBB_!=nullptr){
-//#ifndef _MEM_ALIGNMENT
-//		delete [] vBB_;
-//#else
-//		_aligned_free(vBB_);
-//#endif
-//		vBB_ = nullptr;
-//	}
-//
-//	//nBBs
-//	nBB_=INDEX_1TO1(popsize); 
-//	
-//#ifndef _MEM_ALIGNMENT
-//	vBB_= new BITBOARD[nBB_];
-//#else
-//	vBB_ = (BITBOARD*)_aligned_malloc(sizeof(BITBOARD)*nBB_,_MEM_ALIGNMENT);
-//#endif
-	
-	try {
-		nBB_ = INDEX_1TO1(popsize);
-		vBB_.resize(nBB_, 0);
-	}
-	catch (...) {
-		LOG_ERROR("Error during allocation - BitBoardN::init");
-		LOG_ERROR("exiting...");
-		std::exit(-1);
-	}	
-
-	//Sets to 0
-	/*if (reset) {
-		erase_bit();
-	}*/
-
-	//return ;
-}
-
-
-//void BitBoardN::add_bitstring_left(){
-/////////////////////
-////
-//// Adds 1 bit to MSB
-////
-//// Date of creation: 26/4/2010
-//// Date last modified: 26/4/2010
-//// Autor:PSS
-//
-//	int nvertex=this->msbn64();		//is -1 if empty
-//	if(nvertex!=(WMUL(nvertex)-1)){
-//			set_bit(nvertex+1);				//add bit 0 if BB empty
-//	}
-//}
 
 //////////////////////////
 //
