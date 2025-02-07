@@ -397,7 +397,7 @@ inline	BitBoardN& set_bit			(const BitBoardN& bb_add);
 	* @param lastBit : the last bit in the range to be copied
 	* @returns reference to the modified bitstring
 	**/
-template<bool Erase=false>
+template<bool Erase = false>
 inline BitBoardN& set_bit			(int lastBit, const BitBoardN& bb_add);
 	 
 	/**
@@ -959,17 +959,18 @@ inline
 BitBoardN& BitBoardN::set_bit (int bitH, const BitBoardN& bb_add){
 
 	int bbh = WDIV(bitH);
+	int offsetH = bitH - WMUL(bbh);
 
-	for(auto i = 0; i <= bbh; ++i){
+	for(auto i = 0; i < bbh; ++i){
 		vBB_[i] = bb_add.vBB_[i];
 	}
-
+	
 	//set the appropiate part of the bbh bitblock (including high)
 	if (Erase) {
-		vBB_[bbh] &= bblock::MASK_1_RIGHT(bitH - WMUL(bbh));			//also vBB_[bbh] &= bblock::MASK_1(0, high - WMUL(bbh)); 
+		vBB_[bbh] &= bblock::MASK_1_RIGHT(offsetH);			//also vBB_[bbh] &= bblock::MASK_1(0, high - WMUL(bbh)); 
 	}
 	else {
-		bblock::copy_right(bitH, bb_add.vBB_[bbh], this->vBB_[bbh]);
+		bblock::copy_right(offsetH, bb_add.vBB_[bbh], this->vBB_[bbh]);
 	}
 
 	//set remaining bits to 0 if required

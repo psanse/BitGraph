@@ -216,20 +216,23 @@ TEST(BBNtest, set_bit_with_reset) {
 	BitBoardN bb3(130);
 	bb3.set_bit(50);
 	bb3.set_bit(80);
-	bb.set_bit(79, bb3);
+
+	//bb{0...64, 100}	
+	bb.set_bit(100);
+	
+	///////////////////////////////
+	bb.set_bit<false>(79, bb3);			//bb3={50, 80}  bb={50, 100}
+	////////////////////////////////
 	EXPECT_TRUE(bb.is_bit(50));
-	EXPECT_FALSE(bb.is_bit(80));
+	EXPECT_TRUE(bb.is_bit(100));
+	EXPECT_EQ(2, bb.popcn64());
+
+	////////////////////////////////
+	bb.set_bit<true>(79, bb3);			//bb3={50, 80}  bb={50}
+	///////////////////////////////
+	EXPECT_TRUE(bb.is_bit(50));
+	EXPECT_FALSE(bb.is_bit(100));
 	EXPECT_EQ(1, bb.popcn64());
-
-	bb.set_bit(80, bb3);
-	EXPECT_EQ(2, bb.popcn64());
-
-	bb.set_bit(80, bb3);
-	EXPECT_EQ(2, bb.popcn64());
-
-	bb.erase_bit();
-	bb.set_bit(49, bb3);
-	EXPECT_TRUE(bb.is_empty());
 }
 
 TEST(BBNtest, set_bit_from_another_bitstring) {
