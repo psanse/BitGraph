@@ -397,6 +397,7 @@ inline	BitBoardN& set_bit			(const BitBoardN& bb_add);
 	* @param lastBit : the last bit in the range to be copied
 	* @returns reference to the modified bitstring
 	**/
+template<bool Erase=false>
 inline BitBoardN& set_bit			(int lastBit, const BitBoardN& bb_add);
 	 
 	/**
@@ -410,7 +411,7 @@ inline BitBoardN& set_bit			(int lastBit, const BitBoardN& bb_add);
 	* @details negative elements will cause an assertion if NDEBUG is not defined, 
 	*		  else the behaviour is undefined.
 	**/
-	template<bool EraseAll = false>	
+	template<bool Erase = false>	
 	BitBoardN& set_bit				(const vint& lv);
 
 	/**
@@ -953,17 +954,31 @@ bool BitBoardN::is_disjoint_block (int firstBlock, int lastBlock, const BitBoard
 	return true;
 }
 
+template<bool Erase>
 inline
-BitBoardN& BitBoardN::set_bit (int high, const BitBoardN& bb_add){
+BitBoardN& BitBoardN::set_bit (int bitH, const BitBoardN& bb_add){
 
-	int bbh = WDIV(high);	
+	int bbh = WDIV(bitH);
 
 	for(auto i = 0; i <= bbh; ++i){
 		vBB_[i] = bb_add.vBB_[i];
 	}
 
-	//trim last bit block up to, and exluding, high
-	vBB_[bbh] &= bblock::MASK_1_RIGHT(high - WMUL(bbh));			//also vBB_[bbh] &= bblock::MASK_1(0, high - WMUL(bbh)); 
+	//set the appropiate part of the bbh bitblock (including high)
+	if (Erase) {
+		vBB_[bbh] &= bblock::MASK_1_RIGHT(bitH - WMUL(bbh));			//also vBB_[bbh] &= bblock::MASK_1(0, high - WMUL(bbh)); 
+	}
+	else {
+		bblock::copy_right(bitH, bb_add.vBB_[bbh], this->vBB_[bbh]);
+	}
+
+	//set remaining bits to 0 if required
+	if (Erase) {
+		for (auto i = bbh + 1; i < nBB_; ++i) {
+			vBB_[i] = ZERO;
+		}
+	}
+			
 	
 	return *this;
 }
@@ -1576,12 +1591,12 @@ int FIRST_SHARED(int first_block, const BitBoardN& lhs, const BitBoardN& rhs) {
 	return EMPTY_ELEM;		//disjoint
 }
 
-template<bool EraseAll>
+template<bool Erase>
 inline
 BitBoardN& BitBoardN::set_bit(const vint& lv) {
 
 	//cleans the bitstring if required
-	if (EraseAll) {
+	if (Erase) {
 		erase_bit();
 	}
 
