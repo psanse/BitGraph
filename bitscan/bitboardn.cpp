@@ -21,10 +21,20 @@ BitBoardN&  AND (const BitBoardN& lhs, const BitBoardN& rhs,  BitBoardN& res){
 	return res;
 }
 
-template<bool EraseAll = false>
-BitBoardN& AND(int firstBit, int lastBit, const BitBoardN& lhs, const BitBoardN& rhs, BitBoardN& res)
-{
 
+
+
+BitBoardN&  OR	(const BitBoardN& lhs, const BitBoardN& rhs,  BitBoardN& res){
+
+	for(auto i = 0; i < lhs.nBB_; ++i){
+		res.vBB_[i] = lhs.vBB_[i] | rhs.vBB_[i];
+	}
+
+	return res;
+}
+
+BitBoardN& OR(int firstBit, int lastBit, const BitBoardN& lhs, const BitBoardN& rhs, BitBoardN& res)
+{
 	//////////////////////////////
 	assert(firstBit <= lastBit && firstBit > 0);
 	//////////////////////////////
@@ -33,43 +43,35 @@ BitBoardN& AND(int firstBit, int lastBit, const BitBoardN& lhs, const BitBoardN&
 	int bbh = WDIV(lastBit);
 
 
-	//clears all bits if required - could be optimized
-	if (EraseAll) {
-		erase_bit();
-	}
-
 	if (bbl == bbh)
 	{
-		res.vBB_[bbh] = lhs.vBB_[bbh] & rhs.vBB_[bbh] & bblock::MASK_1(firstBit - WMUL(bbl), lastBit - WMUL(bbh));
+		res.vBB_[bbh] = (lhs.vBB_[bbh] | rhs.vBB_[bbh]) & bblock::MASK_1(firstBit - WMUL(bbl), lastBit - WMUL(bbh));
 	}
 	else
 	{
-		//set to one the intermediate blocks
+		//AND intermediate blocks
 		for (int i = bbl + 1; i < bbh; ++i) {
-			res.vBB_[i] = lhs.vBB_[i] & rhs.vBB_[i];
+			res.vBB_[i] = lhs.vBB_[i] | rhs.vBB_[i];
 		}
 
-		//sets the first and last blocks
-		res.vBB_[bbh] = lhs.vBB_[bbh] & rhs.vBB_[bbh] &  bblock::MASK_1_RIGHT(lastBit - WMUL(bbh));
-		res.vBB_[bbl] = lhs.vBB_[bbh] & rhs.vBB_[bbh] &  bblock::MASK_1_LEFT(firstBit - WMUL(bbl));
-
+		//trims the first and last blocks
+		res.vBB_[bbh] = (lhs.vBB_[bbh] | rhs.vBB_[bbh]) & bblock::MASK_1_RIGHT(lastBit - WMUL(bbh));
+		res.vBB_[bbl] = (lhs.vBB_[bbh] | rhs.vBB_[bbh]) & bblock::MASK_1_LEFT(firstBit - WMUL(bbl));
 	}
 
-	return res;
-
-}
-
-BitBoardN&  OR	(const BitBoardN& lhs, const BitBoardN& rhs,  BitBoardN& res){
-	for(auto i = 0; i < lhs.nBB_; ++i){
-		res.vBB_[i] = lhs.vBB_[i] | rhs.vBB_[i];
+	//erase the rest of blocks of res
+	for (int i = 0; i < bbl; ++i) {
+		res.vBB_[i] = ZERO;
+	}
+	for (int i = bbh + 1; i < res.nBB_; ++i) {
+		res.vBB_[i] = ZERO;
 	}
 
 	return res;
 }
 
 BitBoardN&  OR (int from, const BitBoardN& lhs, const BitBoardN& rhs,  BitBoardN& res){
-////////////////////////
-// lhs OR rhs, (rhs [from, END[)
+
 	int first_block = WDIV(from);
 
 	for(auto i = 0; i < first_block; ++i){
@@ -87,10 +89,7 @@ BitBoardN&  OR (int from, const BitBoardN& lhs, const BitBoardN& rhs,  BitBoardN
 }
 
 BitBoardN&  OR(int v, bool from, const BitBoardN& lhs, const BitBoardN& rhs, BitBoardN& res) {
-	////////////////////////
-	// lhs OR rhs, (rhs [v, END[ if from = TRUE,  rhs [0, v[ if from = false)
-	//
-	// date@26/10/19
+	
 	
 	int nBB = WDIV(v);
 	int pos = WMOD(v);
@@ -123,44 +122,45 @@ BitBoardN&  OR(int v, bool from, const BitBoardN& lhs, const BitBoardN& rhs, Bit
 	return res;
 }
 
-
-BitBoardN&   AND_block (int firstBlock, int lastBlock, const BitBoardN& lhs, const BitBoardN& rhs,  BitBoardN& res){
-		
+BitBoardN AND_block(int firstBlock, int lastBlock, BitBoardN lhs, const BitBoardN& rhs)
+{
 	//////////////////////////////////////////////////////////////////
-	assert( (firstBlock >= 0) && (LastBlock < lhs.nBB_) && 
-			(firstBlock <= lastBlock) && (rhs.nBB_ == lhs.nBB_) );
+	assert((firstBlock >= 0) && (LastBlock < lhs.nBB_) &&
+		(firstBlock <= lastBlock) && (rhs.nBB_ == lhs.nBB_));
 	//////////////////////////////////////////////////////////////////
 
 	int last_block = ((lastBlock == -1) ? lhs.nBB_ - 1 : lastBlock);
 
 	for (auto i = firstBlock; i <= last_block; ++i) {
-		res.vBB_[i] = rhs.vBB_[i] & lhs.vBB_[i];
+		lhs.vBB_[i] &= rhs.vBB_[i];
 	}
 
-	return res;
+	//set bits to 0 outside the range if required
+	for (int i = lastBlock + 1; i < lhs.nBB_; ++i) {
+		lhs.vBB_[i] = ZERO;
+	}
+	for (int i = 0; i < firstBlock; ++i) {
+		lhs.vBB_[i] = ZERO;
+	}
+
+
+	return lhs;
 }
 
+int* AND (int lastBit, const BitBoardN& lhs, const BitBoardN& rhs, int bitset[], int& size){
 
-int* AND (int lastBit, const BitBoardN& lhs, const BitBoardN& rhs,  int* res, int& size){
-///////////////
-// AND circumscribed to vertices [0,last_vertex(
-//
-// RETURNS result as a set of vertices (res) and number of vertices in the set (size)
-//
-// OBSERVATIONS: ***Experimental-efficiency
-		
 	BITBOARD bb;
 	int offset;
 	size = 0;
-	
 	int nbb = WDIV(lastBit);
+
 	for(auto i = 0; i < nbb; ++i){
 		bb = rhs.vBB_[i] & lhs.vBB_[i];
 		offset = WMUL(i);
 
 		while(bb){
 			int v = bblock::lsb64_intrinsic(bb);
-			res[size++] = offset + v;
+			bitset[size++] = offset + v;
 			bb ^= Tables::mask[v];
 		}
 
@@ -170,11 +170,11 @@ int* AND (int lastBit, const BitBoardN& lhs, const BitBoardN& rhs,  int* res, in
 	bb = rhs.vBB_[nbb] & lhs.vBB_[nbb] & Tables::mask_right[WMOD(lastBit)];
 	while(bb){
 		int v = bblock::lsb64_intrinsic(bb);
-		res[size++] = WMUL(nbb) + v;
+		bitset[size++] = WMUL(nbb) + v;
 		bb ^= Tables::mask[v];
 	}
 
-	return res;
+	return bitset;
 }
 
 

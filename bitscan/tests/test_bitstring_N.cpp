@@ -636,7 +636,6 @@ TEST(BBNtest, find_first_common_bit){
 	EXPECT_EQ(72, ff);
 }
 
-
 TEST(BBNtest, find_singleton) {
 	
 	BitBoardN bb(130);
@@ -663,7 +662,6 @@ TEST(BBNtest, find_singleton) {
 	EXPECT_EQ(64, singleton_bit);
 }
 
-
 TEST(BBNtest, IO) {
 
 	BitBoardN bb(32);
@@ -678,6 +676,96 @@ TEST(BBNtest, IO) {
 	//bb.print(std::cout, true, true);
 	//cout << s.c_str() << endl;
 }
+
+TEST(BBNtest, AND) {
+
+	BitBoardN bb(130);
+	BitBoardN bb1(130);
+	BitBoardN bbresAND(130);
+
+	bb.set_bit(10);
+	bb.set_bit(20);
+	bb.set_bit(64);
+	bb1.set_bit(10);
+	bb1.set_bit(64);
+	bb1.set_bit(100);
+
+	//AND
+	AND(bb, bb1, bbresAND);
+	EXPECT_TRUE(bbresAND.is_bit(10));
+	EXPECT_TRUE(bbresAND.is_bit(64));
+	EXPECT_EQ(2, bbresAND.popcn64());
+
+	//AND bit-range [10, 63], bits to 0 outside the range
+	AND<true>(10, 63, bb, bb1, bbresAND);				//bbresAND={10}
+	EXPECT_TRUE(bbresAND.is_bit(10));
+	EXPECT_EQ(1, bbresAND.popcn64());
+
+	//AND bit-range [10, 63], preserving bits outside the range
+	bbresAND.set_bit(100);								//sets a bit outside the range
+	AND<false> (10, 63, bb, bb1, bbresAND);				//bbresAND={10}
+	EXPECT_TRUE(bbresAND.is_bit(10));
+	EXPECT_TRUE(bbresAND.is_bit(100));
+	EXPECT_EQ(2, bbresAND.size());
+
+}
+
+TEST(BBNtest, AND_by_blocks) {
+
+	BitBoardN bb(130);
+	BitBoardN bb1(130);
+	
+	bb.set_bit(10);
+	bb.set_bit(20);
+	bb.set_bit(64);
+	bb1.set_bit(10);
+	bb1.set_bit(64);
+	bb1.set_bit(100);
+
+	//AND of third block - rest of bits are always removed
+	BitBoardN bbresAND = AND_block(2, 2, bb, bb1);
+
+	////////////////////////////////
+	EXPECT_EQ(0, bbresAND.size());
+	////////////////////////////////
+	
+	bbresAND.erase_bit();
+	bbresAND.set_bit(3);
+
+	//AND of third block - rest of bits not removed
+	AND_block (2, 2, bb, bb1, bbresAND);					//resAND = {3}, since the first two blocks remain the same
+	EXPECT_EQ(1, bbresAND.size());
+	EXPECT_TRUE(bbresAND.is_bit(3));
+
+	//AND of third block - rest of bits not removed
+	AND_block<true>(2, 2, bb, bb1, bbresAND);				//resAND empty
+	EXPECT_EQ(0, bbresAND.size());
+
+}
+
+
+TEST(BBNtest, AND_with_allocation) {
+
+	BitBoardN bb(130);
+	BitBoardN bb1(130);	
+
+	bb.set_bit(10);
+	bb.set_bit(20);
+	bb.set_bit(64);
+	bb1.set_bit(10);
+	bb1.set_bit(64);
+	bb1.set_bit(100);
+
+	//AND
+	BitBoardN bbresAND  =  AND(bb, bb1);
+	EXPECT_TRUE(bbresAND.is_bit(10));
+	EXPECT_TRUE(bbresAND.is_bit(64));
+	EXPECT_EQ(2, bbresAND.popcn64());
+	EXPECT_EQ(3, bbresAND.capacity());									//capacity = number of bitblocks	
+	EXPECT_EQ(3, bbresAND.number_of_bitblocks());
+
+}
+
 
 
 

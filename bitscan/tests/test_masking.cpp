@@ -51,6 +51,7 @@ TEST(Masks, OR_from) {
 	LOG_INFO("--------------------------------");	
 }
 
+
 TEST(Masks, AND_OR) {
 
 //non sparse
@@ -66,10 +67,6 @@ TEST(Masks, AND_OR) {
 	bb1.set_bit(10);
 	bb1.set_bit(64);
 	bb1.set_bit(100);
-
-	bb.print();
-	bb1.print();
-
 
 	//AND
 //	cout<<AND(bb, bb1, bbresAND)<<endl;
