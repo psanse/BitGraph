@@ -131,6 +131,74 @@ TEST(bblockTest, popcount) {
 
 }
 
+TEST(bblockTest, copy_bits) {
+
+	//sets the mask all 1s except[10...15]
+	BITBOARD bbsrc =  bblock::MASK_1(10, 15);
+	BITBOARD bbdest = bblock::MASK_0(5, 20);
+	
+	////////////////////////////////
+	bblock::copy(10, 15, bbsrc, bbdest);
+	////////////////////////////////
+
+	//check bits copied
+	EXPECT_TRUE(bbdest & Tables::mask[10]);
+	EXPECT_TRUE(bbdest & Tables::mask[11]);
+	EXPECT_TRUE(bbdest & Tables::mask[12]);
+	EXPECT_TRUE(bbdest & Tables::mask[13]);
+	EXPECT_TRUE(bbdest & Tables::mask[14]);
+	EXPECT_TRUE(bbdest & Tables::mask[15]);
+
+	//check bits not copied
+	EXPECT_FALSE(bbdest & Tables::mask[9]);
+	EXPECT_FALSE(bbdest & Tables::mask[16]);
+
+}
+
+TEST(bblockTest, copy_left_bits) {
+
+	//sets the mask all 1s except[10...15]
+	BITBOARD bbsrc = bblock::MASK_1(10, 15);
+	BITBOARD bbdest = bblock::MASK_1(20, 25);
+
+	////////////////////////////////
+	bblock::copy_right(11, bbsrc, bbdest);
+	////////////////////////////////
+
+	//check bits copied
+	EXPECT_TRUE(bbdest & Tables::mask[10]);
+	EXPECT_TRUE(bbdest & Tables::mask[11]);
+	EXPECT_TRUE(bbdest & Tables::mask[20]);
+	EXPECT_TRUE(bbdest & Tables::mask[25]);
+
+	//check bits not copied
+	EXPECT_FALSE(bbdest & Tables::mask[9]);
+	EXPECT_FALSE(bbdest & Tables::mask[12]);
+}
+
+TEST(bblockTest, copy_right_bits) {
+
+	//sets the mask all 1s except[10...15]
+	BITBOARD bbsrc = bblock::MASK_1(10, 15);
+	BITBOARD bbdest = bblock::MASK_1(8, 10);
+
+	////////////////////////////////
+	bblock::copy_left(14, bbsrc, bbdest);
+	////////////////////////////////
+	
+	//check bits copied
+	EXPECT_TRUE(bbdest & Tables::mask[14]);
+	EXPECT_TRUE(bbdest & Tables::mask[15]);
+	EXPECT_TRUE(bbdest & Tables::mask[8]);
+	EXPECT_TRUE(bbdest & Tables::mask[10]);
+
+	//check bits not copied
+	EXPECT_FALSE(bbdest & Tables::mask[13]);
+	EXPECT_FALSE(bbdest & Tables::mask[16]);
+
+
+}
+
 
 TEST(bblockTest, print) {
 

@@ -22,8 +22,6 @@ BitBoardN&  AND (const BitBoardN& lhs, const BitBoardN& rhs,  BitBoardN& res){
 }
 
 
-
-
 BitBoardN&  OR	(const BitBoardN& lhs, const BitBoardN& rhs,  BitBoardN& res){
 
 	for(auto i = 0; i < lhs.nBB_; ++i){

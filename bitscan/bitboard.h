@@ -236,7 +236,8 @@ namespace bblock {
 	* @returns 64-bit bitblock mask
 	**/
 	 inline
-	 BITBOARD MASK_1		(int low, int high) { return ~Tables::mask_right[low] & ~Tables::mask_left[high]; }
+	 BITBOARD MASK_1(int low, int high) { return Tables::mask_entre[low][high]; 
+												/* [low] return ~Tables::mask_right[low] & ~Tables::mask_left[high];*/ }
 	
 	 /**
 	 * @brief Sets to 1 all bits in the closed range [0, 63]
@@ -261,7 +262,8 @@ namespace bblock {
 	* @returns 64-bit bitblock mask
 	**/
 	 inline
-	 BITBOARD MASK_0		(int low, int high) { return Tables::mask_right[low] | Tables::mask_left[high]; }
+	 BITBOARD MASK_0		(int low, int high) {  return ~Tables::mask_entre[low][high];
+													/*return Tables::mask_right[low] | Tables::mask_left[high];*/ }
 	
 	 /**
 	* @brief Sets to 0 all bits in the closed range [0, idx]
@@ -298,6 +300,31 @@ namespace bblock {
 	**/
 	 inline
 	 BITBOARD trim_left		(BITBOARD bb, int idx) { return bb &~ Tables::mask_left[idx]; }
+
+
+	 /**
+	 * @brief replaces bits in the closed range [firstBit, lastBit] of source bitblock (source)
+	 *		  in destination bitblock (dest)
+	 * @param firstBit, lastBit: closed range of bits [0...63]
+	 * @param source, dest: input bitblocks
+	 **/
+	 void copy				(int firstBit, int lastBit, const BITBOARD& source,  BITBOARD& dest);
+	
+	 /**
+	 * @brief replaces bits in the range [bit, 63] of source bitblock (source)
+	 *		  in destination bitblock (dest)
+	 * @param firstBit, lastBit: closed range of bits [0...63]
+	 * @param source, dest: input bitblocks
+	 **/
+	 void copy_left			(int bit, const BITBOARD& source, BITBOARD& dest);
+	
+	 /**
+	 * @brief replaces bits in the range [0, bit] of source bitblock (source)
+	 *		  in destination bitblock (dest)
+	 * @param firstBit, lastBit: closed range of bits [0...63]
+	 * @param source, dest: input bitblocks
+	 **/
+	 void copy_right		(int bit, const BITBOARD& source, BITBOARD& dest);
 
 /////////////////////
 // I/O
