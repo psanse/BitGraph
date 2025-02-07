@@ -6,6 +6,7 @@
  * @details: created 2014, last_update 01/02/2025
  * 
  * TODO - refactoring and testing (31/01/2025)
+ * TODO optimize Erase policies in setters (06/02/2025)
  *
  **/
 
@@ -357,6 +358,8 @@ virtual	inline int popcn64			(int firstBit, int lastBit)	const;
 
 /////////////////////
 //Setting / Erasing bits 
+
+	//TODO optimize Erase policies in setters, or REMOVE (06/02/2025)
 			
 	/**
 	* @brief sets a 1-bit in the bitstring
@@ -364,7 +367,7 @@ virtual	inline int popcn64			(int firstBit, int lastBit)	const;
 	* @returns reference to the modified bitstring
 	**/
 		
-	template<bool EraseAll = false>
+	template<bool Erase = false>
 	BitBoardN&  set_bit				(int bit);
 
 	/**
@@ -373,7 +376,7 @@ virtual	inline int popcn64			(int firstBit, int lastBit)	const;
 	* @date 22/9/14
 	* @last_update 01/02/25
 	**/
-		template<bool EraseAll = false>
+		template<bool Erase = false>
 inline  BitBoardN&	 set_bit		(int firstBit, int lastBit);
 
 	/**
@@ -1089,10 +1092,10 @@ int  BitBoardN::find_singleton (int firstBit, int lastBit, int& singleton) const
 	return 1;
 }
 
-template<bool EraseAll>
+template<bool Erase>
 inline BitBoardN& BitBoardN::set_bit	(int bit ){
 	
-	if (EraseAll) {
+	if (Erase) {
 		erase_bit();
 	}
 
@@ -1100,7 +1103,7 @@ inline BitBoardN& BitBoardN::set_bit	(int bit ){
 	return *this;
 }	
 
-template<bool EraseAll>
+template<bool Erase>
 inline 
 BitBoardN&  BitBoardN::set_bit (int firstBit, int lastBit){
 
@@ -1113,9 +1116,8 @@ BitBoardN&  BitBoardN::set_bit (int firstBit, int lastBit){
 	int bbl= WDIV(firstBit);
 	int bbh= WDIV(lastBit);
 	
-
 	//clears all bits if required
-	if (EraseAll) {
+	if (Erase) {
 		erase_bit();
 	}	
 
