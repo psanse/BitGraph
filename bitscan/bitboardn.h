@@ -74,7 +74,9 @@ public:
 	*		 
 	*		I.  The capacity of lhs and rhs must be the same. 
 	*		II. The capacity of res must be at least the same as lhs nand rhs
-	*
+	* @param template<Erase>: if true, the bits of res outside [firstBit, lastBit] are set to 0
+	* @param lhs, rhs: input bitsets
+	* @param res: output bitset
 	* @returns reference to the resulting bitstring res
 	**/
 	template<bool Erase>
@@ -85,40 +87,8 @@ public:
 	*		 If lastBock==-1, the range is the full bitset. The bits outside the range are set to 0.
 	* @returns the new resulting bitset
 	**/	
-	friend BitBoardN AND_block		(int firstBlock, int lastBlock, BitBoardN lhs, const BitBoardN& rhs);
-
-
-	/////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// DEPRECATED AND, TO BE REMOVED (06/02/2025)
-	/**
-	* @brief AND between lhs and rhs bitsets in the SEMI-OPEN range [0, last_vertex)
-	*
-	*		 I. Sets to 0 the remaining bits after, and including lastBit of the bitblock lbBLOCK containing lastBit
-	*		 II.If template Erase is true, the rest of the bitblocks after  lbBLOCK are also set to 0
-	*
-	* @param lastBit:  position that determines the range of the AND mask
-	* @param lhs, rhs: input bitsets
-	* @param res: output bitset
-	* @returns reference to the resulting bitstring res
-	* @details: The capacity of lhs and rhs must be the same.
-	*			The capacity of res must be greater or equal than lhs / rhs
-	*
-	* TODO: slightly weird behaviour, check if it is necessary
-	* TODO: add firstBit logic  (06/02/2025)
-	* TODO: deprecated - remove after checking optimization algorithms (06/02/2025)
-	**/
-	template<bool Erase>
-	friend BitBoardN&  AND			(int lastBit, const BitBoardN& lhs, const BitBoardN& rhs, BitBoardN& res);
-		
-	/**
-	* @brief AND between lhs and rhs bitsets in the SEMI-OPEN range [0, last_vertex)
-	*		 For C-array compatibility, the result is stored in bitset res
-	* @returns C-array of integers representing the resulting bitstring res, array size is stored in size
-	* @details: Experimental, not efficient
-	* TODO: deprecated - REMOVE after checking optimization algorithms (06/02/2025)
-	**/
-	friend int*	       AND			(int lastBit, const BitBoardN& lhs, const BitBoardN& rhs, int bitset[], int& size);				
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	friend BitBoardN AND_block		(int firstBlock, int lastBlock, 
+										BitBoardN lhs, const BitBoardN& rhs		)					{ return lhs.AND_EQUAL_block<true>(firstBlock, lastBlock, rhs);}
 
 	/**
 	* @brief OR between lhs and rhs bitsets, stores the result in an existing bitset res
@@ -143,10 +113,67 @@ public:
 	*			The capacity of res must be greater or equal than lhs / rhs
 	* @details: created 06/02/2025
 	**/
+	template<bool Erase>
 	friend BitBoardN&  OR			(int firstBit, int lastBit, const BitBoardN& lhs, const BitBoardN& rhs, BitBoardN& res);
 
+
+	/**
+	* @brief OR between lhs and rhs bitsets in the closed block- range [firstBlock, lastBlock].
+	*		 Stores the result in res. The remaining bits of res outside the range
+	*		 are set to 0 if the template parameter Erase is true.
+	*		 If lastBock==-1, the range is til the end of the bitset, i.e., [firstBlock, capacity())
+	*
+	*		I.  The capacity of lhs and rhs must be the same.
+	*		II. The capacity of res must be at least the same as lhs nand rhs
+	* @param template<Erase>: if true, the bits of res outside [firstBit, lastBit] are set to 0
+	* @param lhs, rhs: input bitsets
+	* @param res: output bitset
+	* @returns reference to the resulting bitstring res
+	**/
+	template<bool Erase>
+	friend BitBoardN& OR_block		(int firstBlock, int lastBlock, const BitBoardN& lhs, const BitBoardN& rhs, BitBoardN& res);
+
+
+	/**
+	* @brief OR between lhs and rhs bitsets in the closed block-range [firstBlock, lastBlock].
+	*		 If lastBock==-1, the range is the full bitset. The bits outside the range are set to 0.
+	* @returns the new resulting bitset
+	**/
+	friend BitBoardN OR_block		(int firstBlock, int lastBlock,
+										BitBoardN lhs, const BitBoardN& rhs)	{	return lhs.OR_EQUAL_block<true>(firstBlock, lastBlock, rhs); }
+
+
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// DEPRECATED OR, TO BE REMOVED (06/02/2025)
+	// DEPRECATED, TO BE REMOVED. NOT CHECKED!! (06/02/2025)
+
+	/**
+	* @brief AND between lhs and rhs bitsets in the SEMI-OPEN range [0, last_vertex)
+	*
+	*		 I. Sets to 0 the remaining bits after, and including lastBit of the bitblock lbBLOCK containing lastBit
+	*		 II.If template Erase is true, the rest of the bitblocks after  lbBLOCK are also set to 0
+	*
+	* @param lastBit:  position that determines the range of the AND mask
+	* @param lhs, rhs: input bitsets
+	* @param res: output bitset
+	* @returns reference to the resulting bitstring res
+	* @details: The capacity of lhs and rhs must be the same.
+	*			The capacity of res must be greater or equal than lhs / rhs
+	*
+	* TODO: slightly weird behaviour, check if it is necessary
+	* TODO: add firstBit logic  (06/02/2025)
+	* TODO: deprecated - remove after checking optimization algorithms (06/02/2025)
+	**/
+	template<bool Erase>
+	friend BitBoardN& AND(int lastBit, const BitBoardN& lhs, const BitBoardN& rhs, BitBoardN& res);
+
+	/**
+	* @brief AND between lhs and rhs bitsets in the SEMI-OPEN range [0, last_vertex)
+	*		 For C-array compatibility, the result is stored in bitset res
+	* @returns C-array of integers representing the resulting bitstring res, array size is stored in size
+	* @details: Experimental, not efficient
+	* TODO: deprecated - REMOVE after checking optimization algorithms (06/02/2025)
+	**/
+	friend int* AND(int lastBit, const BitBoardN& lhs, const BitBoardN& rhs, int bitset[], int& size);
 		
 	// lhs OR rhs in semiopen range (rhs [from, END)
 	friend BitBoardN&  OR			(int firstBit, const BitBoardN& lhs, const BitBoardN& rhs,  BitBoardN& res);	
@@ -154,6 +181,8 @@ public:
 	// lhs OR rhs - ranges (rhs [v, END[ if left = TRUE,  rhs [0, v[ if left = false)
 	// date@26/10/19
 	friend BitBoardN&  OR			(int bit, bool left /* to */, const BitBoardN& lhs, const BitBoardN& rhs, BitBoardN& res);
+	
+	
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	//bit deletion
@@ -517,6 +546,7 @@ inline	BitBoardN& erase_bit		(const BitBoardN& lhs, const BitBoardN& rhs);
 	* @returns reference to the modified bitstring
 	* @date: 04/02/2025 during a refactorization of BITSCAN
 	**/
+	template<bool Erase = false>
 	BitBoardN&  AND_EQUAL_block		(int firstBlock, int lastBlock, const BitBoardN& rhs );								
 	
 	/**
@@ -527,6 +557,7 @@ inline	BitBoardN& erase_bit		(const BitBoardN& lhs, const BitBoardN& rhs);
 	* @param rhs: bitstring
 	* @returns reference to the modified bitstring
 	**/
+	template<bool Erase = false>
 	BitBoardN&  OR_EQUAL_block			(int firstBlock, int lastBlock, const BitBoardN& rhs );								
 		
 	/**
@@ -1695,6 +1726,163 @@ BitBoardN& AND_block(int firstBlock, int lastBlock, const BitBoardN& lhs, const 
 	}
 
 	return res;
+}
+
+template<bool Erase>
+inline
+BitBoardN& BitBoardN::AND_EQUAL_block(int firstBlock, int lastBlock, const BitBoardN& rhs) {
+
+	///////////////////////////////////////////////////////////////////////////////////
+	assert((firstBlock >= 0) && (firstBlock <= lastBlock) && (lastBlock < nBB_));
+	/////////////////////////////////////////////////////////////////////////////////
+
+	auto last_block = ((lastBlock == -1) ? nBB_ - 1 : lastBlock);
+
+	for (auto i = firstBlock; i <= last_block; ++i) {
+		this->vBB_[i] &= rhs.vBB_[i];
+	}
+
+	//set bits to 0 outside the range if required
+	if (Erase) {
+		for (int i = last_block + 1; i < nBB_; ++i) {
+			vBB_[i] = ZERO;
+		}
+		for (int i = 0; i < firstBlock; ++i) {
+			vBB_[i] = ZERO;
+		}
+	}
+
+	return *this;
+}
+
+template<bool Erase = false>
+inline
+BitBoardN& OR(int firstBit, int lastBit, const BitBoardN& lhs, const BitBoardN& rhs, BitBoardN& res)
+{
+	//////////////////////////////
+	assert(firstBit <= lastBit && firstBit > 0);
+	//////////////////////////////
+
+	int bbl = WDIV(firstBit);
+	int bbh = WDIV(lastBit);
+	int bith = lastBit - WMUL(bbh);
+	int bitl = firstBit - WMUL(bbl);
+
+	//////////////////////////////////
+	//Blocks within the range
+
+	//special case - single block
+	if (bbl == bbh)
+	{
+		if (Erase) {
+			//overwrites
+			res.vBB_[bbh] = (lhs.vBB_[bbh] | rhs.vBB_[bbh]) & bblock::MASK_1(bitl, bith);
+		}
+		else {
+			//overwrites partially in the closed range
+			bblock::copy(bitl, bith, lhs.vBB_[bbh] | rhs.vBB_[bbh], res.vBB_[bbh]);
+		}
+	}
+	else
+	{
+		//AND intermediate blocks
+		for (int i = bbl + 1; i < bbh; ++i) {
+			//overwrites
+			res.vBB_[i] = lhs.vBB_[i] | rhs.vBB_[i];
+		}
+
+		//updates the last block bbh in the range
+		if (Erase) {
+			//overwrites
+			res.vBB_[bbh] = (lhs.vBB_[bbh] | rhs.vBB_[bbh]) & bblock::MASK_1_RIGHT(bith);
+		}
+		else {
+			//overwrites bbh partially inside the range (including bith)
+			bblock::copy_right(bith, lhs.vBB_[bbh] | rhs.vBB_[bbh], res.vBB_[bbh]);
+		}
+
+		//updates the first block bbl in the range
+		if (Erase) {
+			//overwrites
+			res.vBB_[bbl] = (lhs.vBB_[bbl] | rhs.vBB_[bbl]) & bblock::MASK_1_LEFT(bitl);
+		}
+		else {
+			//overwrites bbl partially inside the range (including bitl)
+			bblock::copy_left(bitl, lhs.vBB_[bbl] | rhs.vBB_[bbl], res.vBB_[bbl]);
+		}
+	}
+
+	//////////////////////////////////
+	//Blocks outside the range
+
+	//set to 0 all bits outside the bitblock range if required
+	if (Erase) {
+		for (int i = bbh + 1; i < res.nBB_; ++i) {
+			res.vBB_[i] = ZERO;
+		}
+
+		for (int i = 0; i < bbl; ++i) {
+			res.vBB_[i] = ZERO;
+		}
+	}
+
+	return res;
+}
+
+template<bool Erase>
+inline
+BitBoardN& OR_block(int firstBlock, int lastBlock, const BitBoardN& lhs, const BitBoardN& rhs, BitBoardN& res)
+{
+	//////////////////////////////////////////////////////////////////
+	assert((firstBlock >= 0) && (LastBlock < lhs.nBB_) &&
+		(firstBlock <= lastBlock) && (rhs.nBB_ == lhs.nBB_));
+	//////////////////////////////////////////////////////////////////
+
+	int last_block = ((lastBlock == -1) ? lhs.nBB_ - 1 : lastBlock);
+
+	//AND mask in the range
+	for (auto i = firstBlock; i <= last_block; ++i) {
+		res.vBB_[i] = rhs.vBB_[i] | lhs.vBB_[i];
+	}
+
+	//set bits to 0 outside the range if required
+	if (Erase) {
+		for (int i = lastBlock + 1; i < lhs.nBB_; ++i) {
+			res.vBB_[i] = ZERO;
+		}
+		for (int i = 0; i < firstBlock; ++i) {
+			res.vBB_[i] = ZERO;
+		}
+	}
+
+	return res;
+}
+
+template<bool Erase>
+inline
+BitBoardN& BitBoardN::OR_EQUAL_block(int firstBlock, int lastBlock, const BitBoardN& rhs) {
+
+	///////////////////////////////////////////////////////////////////////////////////
+	assert((firstBlock >= 0) && (firstBlock <= lastBlock) && (lastBlock < nBB_));
+	/////////////////////////////////////////////////////////////////////////////////
+
+	auto last_block = ((lastBlock == -1) ? nBB_ - 1 : lastBlock);
+
+	for (auto i = firstBlock; i <= last_block; ++i) {
+		vBB_[i] |= rhs.vBB_[i];
+	}
+
+	//set bits to 0 outside the range if required
+	if (Erase) {
+		for (int i = last_block + 1; i < nBB_; ++i) {
+			vBB_[i] = ZERO;
+		}
+		for (int i = 0; i < firstBlock; ++i) {
+			vBB_[i] = ZERO;
+		}
+	}
+
+	return *this;
 }
 
 

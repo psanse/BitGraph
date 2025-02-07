@@ -31,42 +31,6 @@ BitBoardN&  OR	(const BitBoardN& lhs, const BitBoardN& rhs,  BitBoardN& res){
 	return res;
 }
 
-BitBoardN& OR(int firstBit, int lastBit, const BitBoardN& lhs, const BitBoardN& rhs, BitBoardN& res)
-{
-	//////////////////////////////
-	assert(firstBit <= lastBit && firstBit > 0);
-	//////////////////////////////
-
-	int bbl = WDIV(firstBit);
-	int bbh = WDIV(lastBit);
-
-
-	if (bbl == bbh)
-	{
-		res.vBB_[bbh] = (lhs.vBB_[bbh] | rhs.vBB_[bbh]) & bblock::MASK_1(firstBit - WMUL(bbl), lastBit - WMUL(bbh));
-	}
-	else
-	{
-		//AND intermediate blocks
-		for (int i = bbl + 1; i < bbh; ++i) {
-			res.vBB_[i] = lhs.vBB_[i] | rhs.vBB_[i];
-		}
-
-		//trims the first and last blocks
-		res.vBB_[bbh] = (lhs.vBB_[bbh] | rhs.vBB_[bbh]) & bblock::MASK_1_RIGHT(lastBit - WMUL(bbh));
-		res.vBB_[bbl] = (lhs.vBB_[bbh] | rhs.vBB_[bbh]) & bblock::MASK_1_LEFT(firstBit - WMUL(bbl));
-	}
-
-	//erase the rest of blocks of res
-	for (int i = 0; i < bbl; ++i) {
-		res.vBB_[i] = ZERO;
-	}
-	for (int i = bbh + 1; i < res.nBB_; ++i) {
-		res.vBB_[i] = ZERO;
-	}
-
-	return res;
-}
 
 BitBoardN&  OR (int from, const BitBoardN& lhs, const BitBoardN& rhs,  BitBoardN& res){
 
@@ -120,30 +84,29 @@ BitBoardN&  OR(int v, bool from, const BitBoardN& lhs, const BitBoardN& rhs, Bit
 	return res;
 }
 
-BitBoardN AND_block(int firstBlock, int lastBlock, BitBoardN lhs, const BitBoardN& rhs)
-{
-	//////////////////////////////////////////////////////////////////
-	assert((firstBlock >= 0) && (LastBlock < lhs.nBB_) &&
-		(firstBlock <= lastBlock) && (rhs.nBB_ == lhs.nBB_));
-	//////////////////////////////////////////////////////////////////
-
-	int last_block = ((lastBlock == -1) ? lhs.nBB_ - 1 : lastBlock);
-
-	for (auto i = firstBlock; i <= last_block; ++i) {
-		lhs.vBB_[i] &= rhs.vBB_[i];
-	}
-
-	//set bits to 0 outside the range if required
-	for (int i = lastBlock + 1; i < lhs.nBB_; ++i) {
-		lhs.vBB_[i] = ZERO;
-	}
-	for (int i = 0; i < firstBlock; ++i) {
-		lhs.vBB_[i] = ZERO;
-	}
-
-
-	return lhs;
-}
+//BitBoardN AND_block(int firstBlock, int lastBlock, BitBoardN lhs, const BitBoardN& rhs)
+//{
+//	////////////////////////////////////////////////////////////////////
+//	//assert((firstBlock >= 0) && (LastBlock < lhs.nBB_) &&
+//	//	(firstBlock <= lastBlock) && (rhs.nBB_ == lhs.nBB_));
+//	////////////////////////////////////////////////////////////////////
+//
+//	//int last_block = ((lastBlock == -1) ? lhs.nBB_ - 1 : lastBlock);
+//
+//	//for (auto i = firstBlock; i <= last_block; ++i) {
+//	//	lhs.vBB_[i] &= rhs.vBB_[i];
+//	//}
+//
+//	////set bits to 0 outside the range 
+//	//for (int i = lastBlock + 1; i < lhs.nBB_; ++i) {
+//	//	lhs.vBB_[i] = ZERO;
+//	//}
+//	//for (int i = 0; i < firstBlock; ++i) {
+//	//	lhs.vBB_[i] = ZERO;
+//	//}
+//
+//	//return lhs;
+//}
 
 int* AND (int lastBit, const BitBoardN& lhs, const BitBoardN& rhs, int bitset[], int& size){
 
@@ -369,34 +332,6 @@ BitBoardN& BitBoardN::operator ^=	(const BitBoardN& bbn) {
 	return *this;
 }
 
-BitBoardN&  BitBoardN::AND_EQUAL_block (int firstBlock, int lastBlock, const BitBoardN& rhs ){
-
-	///////////////////////////////////////////////////////////////////////////////////
-	assert( (firstBlock >= 0) && (firstBlock <= lastBlock) && (lastBlock < nBB_));
-	/////////////////////////////////////////////////////////////////////////////////
-
-	auto last_block = ((lastBlock == -1) ? nBB_ - 1 : lastBlock);
-
-	for (auto i = firstBlock; i <= last_block; ++i) {
-		vBB_[i] &= rhs.vBB_[i];
-	}
-
-	return *this;
-}
-
-BitBoardN&  BitBoardN::OR_EQUAL_block (int firstBlock, int lastBlock, const BitBoardN& rhs ){
-
-	///////////////////////////////////////////////////////////////////////////////////
-	assert((firstBlock >= 0) && (firstBlock <= lastBlock) && (lastBlock < nBB_));
-	/////////////////////////////////////////////////////////////////////////////////
-
-	auto last_block = ((lastBlock == -1) ? nBB_ - 1 : lastBlock);
-
-	for (auto i = firstBlock; i < last_block; ++i) {
-		vBB_[i] |= rhs.vBB_[i];
-	}
-	return *this;
-}
 
 BitBoardN& BitBoardN::flip (){
 

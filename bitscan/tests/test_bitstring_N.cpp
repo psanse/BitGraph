@@ -767,6 +767,78 @@ TEST(BBNtest, AND_with_allocation) {
 
 }
 
+TEST(BBNtest, OR) {
+
+	BitBoardN bb(130);
+	BitBoardN bb1(130);
+	BitBoardN bbresOR(130);
+
+	bb.set_bit(10);
+	bb.set_bit(20);
+	bb.set_bit(64);
+	bb1.set_bit(10);
+	bb1.set_bit(64);
+	bb1.set_bit(100);
+
+	//OR
+	OR(bb, bb1, bbresOR);
+	EXPECT_TRUE(bbresOR.is_bit(10));
+	EXPECT_TRUE(bbresOR.is_bit(20));
+	EXPECT_TRUE(bbresOR.is_bit(64));
+	EXPECT_TRUE(bbresOR.is_bit(100));
+	EXPECT_EQ(4, bbresOR.size());
+
+	//OR bit-range [10, 20], preserving bits outside the range							
+	OR<false>(10, 20, bb, bb1, bbresOR);			//bbresOR={10, 20, 64, 100}		
+	EXPECT_TRUE(bbresOR.is_bit(10));
+	EXPECT_TRUE(bbresOR.is_bit(20));
+	EXPECT_TRUE(bbresOR.is_bit(64));
+	EXPECT_TRUE(bbresOR.is_bit(100));
+	EXPECT_EQ(4, bbresOR.size());
+
+	//OR bit-range [10, 20], setting to 0 bits outside the range
+	OR<true>(10, 20, bb, bb1, bbresOR);				//bbresOR={10, 20}
+	EXPECT_TRUE(bbresOR.is_bit(10));
+	EXPECT_TRUE(bbresOR.is_bit(20));
+	EXPECT_EQ(2, bbresOR.size());
+}
+
+TEST(BBNtest, OR_by_blocks) {
+
+	BitBoardN bb(130);
+	BitBoardN bb1(130);
+
+	bb.set_bit(10);
+	bb.set_bit(20);
+	bb.set_bit(64);
+	bb1.set_bit(10);
+	bb1.set_bit(64);
+	bb1.set_bit(100);
+
+	//OR creating a new bitset - rest of bits are always removed
+	BitBoardN bbresOR = OR_block(1, 1, bb, bb1);
+
+	////////////////////////////////
+	EXPECT_TRUE(bbresOR.is_bit(64));
+	EXPECT_TRUE(bbresOR.is_bit(100));
+	EXPECT_EQ(2, bbresOR.size());
+	////////////////////////////////
+		
+	//adds bit 129
+	bb.set_bit(129);
+
+	//OR setting a bitset - rest of bits NOT removed
+	OR_block<false>(2, 2, bb, bb1, bbresOR);					//bbresOR = {64, 100, 129}, since the first two blocks remain the same
+	EXPECT_TRUE(bbresOR.is_bit(64));
+	EXPECT_TRUE(bbresOR.is_bit(100));
+	EXPECT_TRUE(bbresOR.is_bit(129));
+	EXPECT_EQ(3, bbresOR.size());
+	
+	//OR setting a bitset - rest of bits ARE removed
+	OR_block<true>(2, 2, bb, bb1, bbresOR);					//bbresAND={129}, {64, 100} are removed, since they are outside the block range
+	EXPECT_TRUE(bbresOR.is_bit(129));
+	EXPECT_EQ(1, bbresOR.size());
+}
 
 
 
