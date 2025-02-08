@@ -71,7 +71,7 @@ public:
 	//commonly used tables
 	static BITBOARD	mask[64];						//masks for 64 bit block of a single bit
 	static U8 mask8[8];								//masks for 8 bit block of a single bit
-	static BITBOARD mask_low[65];					//1_bit to the right of index (less significant bits, excluding index)
+	static BITBOARD mask_low[65];					//1_bit to the right of index (less significant bits, excluding index) - mask_low[WORD_SIZE] = ONE
 	static BITBOARD mask_high[66];					//1_bit to the left of index (more significant bits, excluding index)
 
 //private:

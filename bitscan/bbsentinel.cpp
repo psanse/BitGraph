@@ -160,8 +160,6 @@ std::ostream& BBSentinel::print(std::ostream& o, bool show_pc, bool endl ) const
 	return o;
 }
 
-
-
 int BBSentinel::init_scan(scan_types sct){
 	switch(sct){
 	case NON_DESTRUCTIVE:

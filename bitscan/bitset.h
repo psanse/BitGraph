@@ -251,8 +251,8 @@ virtual	~BitSet					()									= default;
 
 ////////////
 //Reset / init (memory allocation)
-	void init						(int popsize);										
-	void init						(int popsize, const vint& );
+	void init						(int nPop);
+	void init						(int nPop, const vint& lv);
 	
 	/**
 	* @brief Resets this bitset given to a vector lv of 1-bit elements

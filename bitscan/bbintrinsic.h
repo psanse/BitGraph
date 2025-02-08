@@ -31,20 +31,45 @@ public:
 	using BitSet::BitSet;			//inherit constructors	
 
 	virtual ~BBIntrin				() = default;
-	
+
+///////////////////////////////
 //setters and getters
-	 void set_bbindex				(int bbindex)		{ m_scan.bbi=bbindex;}	
-	 void set_posbit				(int posbit)		{ m_scan.pos=posbit;}	
+	
+	void set_scan_block				(int bbindex)		{ m_scan.bbi = bbindex;}	
+	void set_scan_bit				(int posbit)		{ m_scan.pos = posbit;}	
  	
 //////////////////////////////
-// bitscanning
+// Bitscanning
 
-inline virtual int lsbn64			() const;
-inline virtual int msbn64			() const; 
+	/**
+	* @brief least significant bit in the bitstring
+	* @details 30/3/12, last update 08/02/2025
+	* @details implemented with intrinsic functions
+	**/
+inline int lsbn64					() const override;
 
-	//bit scan forward (destructive)
-virtual	int init_scan				(scan_types);	
-virtual	int init_scan_from			(int from, scan_types);
+	/**
+	* @brief most significant bit in the bitstring
+	* @details 30/3/12, last update 08/02/2025
+	* @details implemented with intrinsic functions
+	**/
+inline int msbn64					() const override; 
+
+	
+	/**
+	* @brief configures the initial block and bit position for bitscanning
+	*		 according to one of the 4 scan types passed as argument
+	* @param sc: type of scan
+	* @returns 0 if successful, -1 otherwise
+	**/
+	int init_scan				(scan_types sc);	
+	
+	/////////////////
+// scans from 'from' onwards, excluding from
+//
+// COMMENTS: if you want to scan from the beginning, use from=EMPTY_ELEM
+// 
+	int init_scan				(int firstBit, scan_types);
 
 virtual inline int next_bit_del		(); 												
 virtual inline int next_bit_del		(int& nBB /* table index*/); 
@@ -127,6 +152,37 @@ int BBIntrin::popcn64(int nBit) const{
 
 #endif
 
+
+inline
+int BBIntrin::msbn64() const {
+
+	U32 posInBB;
+
+	for (auto i = nBB_ - 1; i >= 0; --i) {
+
+		if (_BitScanReverse64(&posInBB, vBB_[i])) {
+			return (posInBB + WMUL(i));
+		}
+	}
+
+	return EMPTY_ELEM;
+}
+
+
+inline
+int BBIntrin::lsbn64() const {
+
+	U32 posInBB;
+
+	for (auto i = 0; i < nBB_; ++i) {
+		if (_BitScanForward64(&posInBB, vBB_[i])) {
+			return(posInBB + WMUL(i));
+		}
+	}
+
+	return EMPTY_ELEM;
+}
+
 inline 
 int BBIntrin::next_bit(int &nBB_new)  {
 ////////////////////////////
@@ -185,38 +241,6 @@ int BBIntrin::next_bit(int &nBB_new,  BBIntrin& bbN_del ) {
 				return (posInBB+ WMUL(i));
 			}
 		}
-	}
-	return EMPTY_ELEM;
-}
-
-
-inline 
-int BBIntrin::msbn64() const{
-////////////////////////////
-//
-// Date: 30/3/12
-// Return the last bit
-// 
-// COMMENTS: New variable static scan which stores index of every BB
-
-	 unsigned long posInBB;
-
-	for(int i=nBB_-1; i>=0; i--){
-		//Siempre me queda la duda mas de si es mas eficiente comparar con 0
-		if(_BitScanReverse64(&posInBB,vBB_[i]))
-			return (posInBB+WMUL(i));
-	}
-	
-	return EMPTY_ELEM;  
-}
-
-	
-inline
-int BBIntrin::lsbn64() const{
-	unsigned long posBB;
-	for(int i=0; i<nBB_; i++){
-		if(_BitScanForward64(&posBB, vBB_[i]))
-			return(posBB+ WMUL(i));	
 	}
 	return EMPTY_ELEM;
 }
@@ -428,51 +452,51 @@ inline
 int BBIntrin::init_scan(scan_types sct){
 	switch(sct){
 	case NON_DESTRUCTIVE:
-		set_bbindex(0);
-		set_posbit(MASK_LIM);
+		set_scan_block	(0);
+		set_scan_bit	(MASK_LIM);
 		break;
 	case NON_DESTRUCTIVE_REVERSE:
-		set_bbindex(nBB_-1);
-		set_posbit(WORD_SIZE);		//mask_low[WORD_SIZE]=ONE
+		set_scan_block	(nBB_ - 1);
+		set_scan_bit	(WORD_SIZE);		//mask_low[WORD_SIZE] = ONE
 		break;
 	case DESTRUCTIVE:
-		set_bbindex(0); 
+		set_scan_block	(0); 
 		break;
 	case DESTRUCTIVE_REVERSE:
-		set_bbindex(nBB_-1);
+		set_scan_block	(nBB_ - 1);
 		break;
 	default:
-		cerr<<"bad scan type"<<endl;
+		LOG_ERROR("unknown scan type - BBIntrin::::init_scan");
 		return -1;
 	}
+
 	return 0;
 }
 
 inline
-int BBIntrin::init_scan_from (int from, scan_types sct){
-/////////////////
-// scans from 'from' onwards, excluding from
-//
-// COMMENTS: if you want to scan from the beginning, use from=EMPTY_ELEM
-// 
-	if(from==EMPTY_ELEM) 
-			init_scan(sct);
+int BBIntrin::init_scan (int firstBit, scan_types sct){
+
+	if (firstBit == EMPTY_ELEM) {
+		init_scan(sct);
+	}
 	else{
+		int bbh = WDIV(firstBit);
 		switch(sct){
 		case NON_DESTRUCTIVE:
 		case NON_DESTRUCTIVE_REVERSE:
-			set_bbindex(WDIV(from));
-			set_posbit(WMOD(from));
+			set_scan_block	(bbh);
+			set_scan_bit	(firstBit - WMUL(bbh) /* WMOD(firstBit) */);
 			break;
 		case DESTRUCTIVE:
 		case DESTRUCTIVE_REVERSE:
-			set_bbindex(WDIV(from)); 
+			set_scan_block	(bbh);
 			break;
 		default:
-			cerr<<"bad scan type"<<endl;
+			LOG_ERROR("unknown scan type - BBIntrin::::init_scan");
 			return -1;
 		}
 	}
+
 	return 0;
 }
 
