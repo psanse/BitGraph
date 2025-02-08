@@ -1,28 +1,14 @@
-/*  
- * bbintrinsic.h file from the BITSCAN library, a C++ library for bit set
- * optimization. BITSCAN has been used to implement BBMC, a very
- * succesful bit-parallel algorithm for exact maximum clique. 
- * (see license file for references)
- *
- * Copyright (C)
- * Author: Pablo San Segundo
- * Intelligent Control Research Group (CSIC-UPM) 
- *
- * Permission to use, modify and distribute this software is
- * granted provided that this copyright notice appears in all 
- * copies, in source code or in binaries. For precise terms 
- * see the accompanying LICENSE file.
- *
- * This software is provided "AS IS" with no warranty of any 
- * kind, express or implied, and with no claim as to its
- * suitability for any purpose.
- *
- */
+ /**
+  * @file bbintrinsic.h file
+  * @brief header file of the BBIntrin class from the BITSCAN library.
+  *		  Manages efficient bitscanning 
+  * @author pss
+  **/
 
-#pragma once
+#ifndef __BBINTRINSIC_H__
+#define __BBINTRINSIC_H__
 
 #include "bitset.h"	
-#include <vector>			//I/O
 
 using namespace std;
 
@@ -30,7 +16,10 @@ using namespace std;
 /////////////////////////////////
 //
 // Class BBIntrin
-// (Uses a number of optimizations for bit scanning)
+// 
+// (Efficient bit scanning)
+// 
+// TODO- rename 08/02/2025
 //
 ///////////////////////////////////
 
@@ -106,16 +95,18 @@ virtual	 inline int popcn64				(int nBit/*0 based*/)	const;
 // 
 ////////////////////////
 #ifdef POPCOUNT_64
-inline int BBIntrin::popcn64() const{
-	BITBOARD pc=0;
-	for(int i=0; i<nBB_; i++){
-		pc+=__popcnt64(vBB_[i]);
+inline 
+int BBIntrin::popcn64() const{
+	BITBOARD pc = 0;
+	for(int i = 0; i < nBB_; ++i){
+		pc += __popcnt64(vBB_[i]);
 	}
 return pc;
 }
 
 
-inline int BBIntrin::popcn64(int nBit) const{
+inline
+int BBIntrin::popcn64(int nBit) const{
 /////////////////////////
 // Population size from nBit(included) onwards
 	
@@ -135,7 +126,8 @@ return pc;
 
 #endif
 
-inline int BBIntrin::next_bit(int &nBB_new)  {
+inline 
+int BBIntrin::next_bit(int &nBB_new)  {
 ////////////////////////////
 // Date:23/3/2012
 // BitScan not destructive
@@ -164,7 +156,8 @@ inline int BBIntrin::next_bit(int &nBB_new)  {
 return EMPTY_ELEM;
 }
 
-inline int BBIntrin::next_bit(int &nBB_new,  BBIntrin& bbN_del ) {
+inline
+int BBIntrin::next_bit(int &nBB_new,  BBIntrin& bbN_del ) {
 ////////////////////////////
 // Date:30/3/2012
 // BitScan not destructive
@@ -196,7 +189,8 @@ return EMPTY_ELEM;
 }
 
 
-inline int BBIntrin::msbn64() const{
+inline 
+int BBIntrin::msbn64() const{
 ////////////////////////////
 //
 // Date: 30/3/12
@@ -216,7 +210,8 @@ return EMPTY_ELEM;
 }
 
 	
-inline int BBIntrin::lsbn64() const{
+inline
+int BBIntrin::lsbn64() const{
 	unsigned long posBB;
 	for(int i=0; i<nBB_; i++){
 		if(_BitScanForward64(&posBB, vBB_[i]))
@@ -227,7 +222,8 @@ return EMPTY_ELEM;
 
 
 
-inline int BBIntrin::next_bit_del() {
+inline
+int BBIntrin::next_bit_del() {
 ////////////////////////////
 //
 // Date: 23/3/12
@@ -249,7 +245,8 @@ return EMPTY_ELEM;
 }
 
 
-inline int BBIntrin::next_bit_del(int& nBB) {
+inline 
+int BBIntrin::next_bit_del(int& nBB) {
 //////////////
 // Also return the number of table
 	unsigned long posInBB;
@@ -266,7 +263,8 @@ inline int BBIntrin::next_bit_del(int& nBB) {
 return EMPTY_ELEM;  
 }
 
-inline int BBIntrin::next_bit_del(int& nBB, BBIntrin& bbN_del) {
+inline
+int BBIntrin::next_bit_del(int& nBB, BBIntrin& bbN_del) {
 //////////////
 // BitScan DI it also erase the returned bit of the table passed
 	unsigned long posInBB;
@@ -284,7 +282,8 @@ inline int BBIntrin::next_bit_del(int& nBB, BBIntrin& bbN_del) {
 return EMPTY_ELEM;  
 }
 
-inline int BBIntrin::next_bit() {
+inline
+int BBIntrin::next_bit() {
 ////////////////////////////
 // Date:23/3/2012
 // BitScan not destructive
@@ -313,7 +312,8 @@ return EMPTY_ELEM;
 }
 
 
-inline int BBIntrin::prev_bit		() {
+inline
+int BBIntrin::prev_bit		() {
 ////////////////////////////
 // Date:13/4/2012
 // BitScan not destructive in reverse order (end-->begin)
@@ -340,7 +340,8 @@ inline int BBIntrin::prev_bit		() {
 return EMPTY_ELEM;
 }
 
-inline int BBIntrin::prev_bit	(int& nBB) {
+inline
+int BBIntrin::prev_bit	(int& nBB) {
 ////////////////////////////
 // Date:13/4/2012
 // BitScan not destructive in reverse order (end-->begin)
@@ -369,7 +370,8 @@ inline int BBIntrin::prev_bit	(int& nBB) {
 return EMPTY_ELEM;
 }
 
-inline int BBIntrin::prev_bit_del() {
+inline
+int BBIntrin::prev_bit_del() {
 //////////////
 // BitScan DI 
 	unsigned long posInBB;
@@ -384,7 +386,8 @@ inline int BBIntrin::prev_bit_del() {
 return EMPTY_ELEM;  
 }
 
-inline int BBIntrin::prev_bit_del(int& nBB, BBIntrin& del) {
+inline
+int BBIntrin::prev_bit_del(int& nBB, BBIntrin& del) {
 //////////////
 // BitScan DI it also erase the returned bit of the table passed
 	unsigned long posInBB;
@@ -402,7 +405,8 @@ inline int BBIntrin::prev_bit_del(int& nBB, BBIntrin& del) {
 return EMPTY_ELEM;  
 }
 
-inline int BBIntrin::prev_bit_del(int& nBB) {
+inline
+int BBIntrin::prev_bit_del(int& nBB) {
 //////////////
 // BitScan DI 
 	unsigned long posInBB;
@@ -472,7 +476,7 @@ return 0;
 }
 
 inline
-int* BBIntrin::to_C_array(int* lv, std::size_t& size, bool rev){
+int* BBIntrin::to_C_array  (int* lv, std::size_t& size, bool rev)  {
 	int v = EMPTY_ELEM;
 	size = 0;
 
@@ -502,7 +506,7 @@ int* BBIntrin::to_C_array(int* lv, std::size_t& size, bool rev){
 //}
 
 
-
+#endif
 
 
 
