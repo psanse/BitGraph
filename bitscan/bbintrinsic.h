@@ -21,7 +21,7 @@
 
 #pragma once
 
-#include "bitboardn.h"	
+#include "bitset.h"	
 #include <vector>			//I/O
 
 using namespace std;

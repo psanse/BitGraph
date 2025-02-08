@@ -3,7 +3,7 @@ set(useful_headers_for_IDE
 bbconfig.h
 bbtypes.h
 bitblock.h
-bitboardn.h
+bitset.h
 bitboards.h
 bbintrinsic.h
 bbintrinsic_sparse.h
@@ -17,7 +17,7 @@ bbobject.h
 add_library (bitscan 
 bbsentinel.cpp 
 bitblock.cpp 
-bitboardn.cpp  
+bitset.cpp  
 bitboards.cpp 
 tables.cpp
 ${useful_headers_for_IDE}

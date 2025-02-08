@@ -1,14 +1,15 @@
-// BitSet.cpp: implementation of the BitSet class.
-//
-//////////////////////////////////////////////////////////////////////
+/**
+ * @file bitset.cpp file
+ * @brief implementation of the BitSet class for non-sparsearrays of bit
+ * @author pss
+ **/
 
-#include "bitboardn.h"
+#include "bitset.h"
 #include <iostream>
 #include <sstream>
 #include <algorithm>
 #include <cstdio>
 #include <utils/logger.h>
-
  
 using namespace std;
 
@@ -21,7 +22,6 @@ BitSet&  AND (const BitSet& lhs, const BitSet& rhs,  BitSet& res){
 	return res;
 }
 
-
 BitSet&  OR	(const BitSet& lhs, const BitSet& rhs,  BitSet& res){
 
 	for(auto i = 0; i < lhs.nBB_; ++i){
@@ -30,7 +30,6 @@ BitSet&  OR	(const BitSet& lhs, const BitSet& rhs,  BitSet& res){
 
 	return res;
 }
-
 
 BitSet&  OR (int from, const BitSet& lhs, const BitSet& rhs,  BitSet& res){
 

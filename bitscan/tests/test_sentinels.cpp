@@ -3,9 +3,9 @@
 #include <iostream>
 #include <set>
 
-#include "../bitscan.h"				//bit string library
+#include "bitscan/bitscan.h"				//bit string library
 #include "gtest/gtest.h"
-#include "../bitboardn.h"
+#include "bitscan/bitset.h"
 
 using namespace std;
 

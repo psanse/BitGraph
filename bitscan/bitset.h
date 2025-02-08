@@ -1,5 +1,5 @@
 /**  
- * @file bitboardn.h file 
+ * @file bitset.h file 
  * @brief header file of the BitSet class from the BITSCAN library.
  *		  Manages bitstrings of any size as an array of bitblocks (64-bit numbers)
  * @author pss
@@ -10,8 +10,8 @@
  *
  **/
 
-#ifndef __BITBOARDN_H__
-#define __BITBOARDN_H__
+#ifndef __BITSET_H__
+#define __BITSET_H__
 
 #include "bbobject.h"
 #include "bitblock.h"	
@@ -117,7 +117,6 @@ public:
 	template<bool Erase>
 	friend BitSet&  OR			(int firstBit, int lastBit, const BitSet& lhs, const BitSet& rhs, BitSet& res);
 
-
 	/**
 	* @brief OR between lhs and rhs bitsets in the closed block- range [firstBlock, lastBlock].
 	*		 Stores the result in res. The remaining bits of res outside the range
@@ -133,7 +132,6 @@ public:
 	**/
 	template<bool Erase>
 	friend BitSet& OR_block		(int firstBlock, int lastBlock, const BitSet& lhs, const BitSet& rhs, BitSet& res);
-
 
 	/**
 	* @brief OR between lhs and rhs bitsets in the closed block-range [firstBlock, lastBlock].
