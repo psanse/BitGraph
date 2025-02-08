@@ -141,12 +141,12 @@ namespace gfunc{
 		for(decltype(MAXNBB) nBB = 0; nBB < MAXNBB; ++nBB){
 
 			//block NBB of the intersection of N(v) and bbref
-			BITBOARD bb = g.get_neighbors(v).get_bitboard(nBB) & bbref.get_bitboard(nBB);		
+			BITBOARD bb = g.get_neighbors(v).bitblock(nBB) & bbref.bitblock(nBB);		
 			
 			//decodes vertices from the bitblock and appends to vertex list
 			int offset = WMUL(nBB);
 			while(bb != 0){
-				int v64 = BitBoard::lsb64_intrinsic(bb);
+				int v64 =bblock::lsb64_intrinsic(bb);
 
 				///////////////////////////////
 				lv.emplace_back(v64 + offset);
@@ -183,14 +183,14 @@ namespace gfunc{
 		int nBBv = WDIV(v);				
 
 		//first block of the intersection of N(v) and bbref from v		
-		BITBOARD bb = g.get_neighbors(v).get_bitboard(nBBv) & bbref.get_bitboard(nBBv);
+		BITBOARD bb = g.get_neighbors(v).bitblock(nBBv) & bbref.bitblock(nBBv);
 
 		//trims preceding vertices
 		bb &= Tables::mask_left[WMOD(v)];							
 
 		//decodes block of v (appends to lv)	
 		while (bb != 0) {
-			int v64 = BitBoard::lsb64_intrinsic(bb);			
+			int v64 = bblock::lsb64_intrinsic(bb);			
 
 			///////////////////////////////
 			lv.emplace_back(v64 + nBBv);
@@ -205,12 +205,12 @@ namespace gfunc{
 		for (decltype(MAXNBB) nBB = nBBv + 1; nBB < MAXNBB; ++nBB) {
 
 			//block NBB of the intersection of N(v) and bbref
-			BITBOARD bb = g.get_neighbors(v).get_bitboard(nBB) & bbref.get_bitboard(nBB);
+			BITBOARD bb = g.get_neighbors(v).bitblock(nBB) & bbref.bitblock(nBB);
 
 			//decodes vertices from the bitblock and appends to vertex list
 			int offset = WMUL(nBB);
 			while (bb != 0) {
-				int v64 = BitBoard::lsb64_intrinsic(bb);
+				int v64 = bblock::lsb64_intrinsic(bb);
 				
 				///////////////////////////////
 				lv.emplace_back(v64 + offset);

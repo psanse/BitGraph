@@ -17,7 +17,7 @@ namespace com {
 	//
 	// struct stack_t
 	//
-	// (simple stack implemented as a std::vector)
+	// (simple stack implemented by a C-array)
 	//
 	////////////////////////
 

@@ -31,7 +31,7 @@ class BBSentinel : public BBIntrin{
 	friend BBSentinel&  AND	(const BitBoardN& lhs, const BBSentinel& rhs,  BBSentinel& res);		//updates sentinels
 public:
 	BBSentinel():m_BBH(EMPTY_ELEM), m_BBL(EMPTY_ELEM){init_sentinels(false);}
-explicit BBSentinel(int popsize, bool bits_to_0=true): BBIntrin(popsize, bits_to_0){ init_sentinels(false);}
+explicit BBSentinel(int popsize): BBIntrin(popsize){ init_sentinels(false);}
 	BBSentinel(const BBSentinel& bbN) : BBIntrin(bbN){ m_BBH=bbN.m_BBH; m_BBL=bbN.m_BBL;}
 	~BBSentinel(){};
 
@@ -77,14 +77,15 @@ virtual	bool is_empty				(int nBBL, int nBBH) const;					//is empty in range
 
 //////////////
 // I/O
-	void print(ostream& o=cout);
+	
+	std::ostream& print(ostream& o=cout, bool show_pc = true, bool endl = true) const override;
 
 /////////////////
 // bit scanning operations 
 
 virtual	int init_scan(scan_types sct);
 
-virtual inline int previous_bit_del();							//**TODO- empty bitstring
+virtual inline int prev_bit_del();							//**TODO- empty bitstring
 virtual inline	int next_bit_del ();
 virtual inline	int next_bit_del (BBSentinel& bbN_del);
 	
@@ -102,7 +103,7 @@ protected:
 inline int BBSentinel::popcn64() const{
 	BITBOARD pc=0;
 	for(int i=m_BBL; i<=m_BBH; i++){
-		pc+=__popcnt64(m_aBB[i]);
+		pc+=__popcnt64(vBB_[i]);
 	}
 return pc;
 }
@@ -111,7 +112,7 @@ return pc;
 
 //specializes the only bitscan function used
 inline
-int BBSentinel::previous_bit_del(){
+int BBSentinel::prev_bit_del(){
 //////////////
 // BitScan reverse order and distructive
 //
@@ -121,9 +122,9 @@ int BBSentinel::previous_bit_del(){
 	unsigned long posInBB;
 
 	for(int i=m_BBH; i>=m_BBL; i--){
-		if(_BitScanReverse64(&posInBB,m_aBB[i])){
+		if(_BitScanReverse64(&posInBB,vBB_[i])){
 			m_BBH=i;
-			m_aBB[i]&=~Tables::mask[posInBB];			//erase before the return
+			vBB_[i]&=~Tables::mask[posInBB];			//erase before the return
 			return (posInBB+WMUL(i));
 		}
 	}
@@ -141,9 +142,9 @@ int BBSentinel::next_bit_del (){
 	unsigned long posInBB;
 
 	for(int i=m_BBL; i<=m_BBH; i++){
-		if(_BitScanForward64(&posInBB,m_aBB[i]) ){
+		if(_BitScanForward64(&posInBB,vBB_[i]) ){
 			m_BBL=i;
-			m_aBB[i]&=~Tables::mask[posInBB];					//erase before the return
+			vBB_[i]&=~Tables::mask[posInBB];					//erase before the return
 			return (posInBB+ WMUL(i));
 		}
 	}
@@ -161,10 +162,10 @@ int BBSentinel::next_bit_del (BBSentinel& bbN_del){
 	unsigned long posInBB;
 
 	for(int i=m_BBL; i<=m_BBH; i++){
-		if(_BitScanForward64(&posInBB, m_aBB[i]) ){
+		if(_BitScanForward64(&posInBB, vBB_[i]) ){
 			m_BBL=i;
-			m_aBB[i]&=~Tables::mask[posInBB];					//erase before the return
-			bbN_del.m_aBB[i]&=~Tables::mask[posInBB];
+			vBB_[i]&=~Tables::mask[posInBB];					//erase before the return
+			bbN_del.vBB_[i]&=~Tables::mask[posInBB];
 			return (posInBB+ WMUL(i));
 		}
 	}
@@ -184,12 +185,12 @@ int BBSentinel::next_bit(){
 
 	unsigned long posInBB;
 				
-	if(_BitScanForward64(&posInBB, m_aBB[m_scan.bbi] & Tables::mask_left[m_scan.pos])){
+	if(_BitScanForward64(&posInBB, vBB_[m_scan.bbi] & Tables::mask_left[m_scan.pos])){
 		m_scan.pos =posInBB;
 		return (posInBB + WMUL(m_scan.bbi));
 	}else{													
 		for(int i=m_scan.bbi+1; i<=m_BBH; i++){
-			if(_BitScanForward64(&posInBB,m_aBB[i])){
+			if(_BitScanForward64(&posInBB,vBB_[i])){
 				m_scan.bbi=i;
 				m_scan.pos=posInBB;
 				return (posInBB+ WMUL(i));
@@ -211,13 +212,13 @@ int BBSentinel::next_bit(int& nBB){
 	unsigned long posInBB;
 			
 	//look uo in the last table
-	if(_BitScanForward64(&posInBB, m_aBB[m_scan.bbi] & Tables::mask_left[m_scan.pos])){
+	if(_BitScanForward64(&posInBB, vBB_[m_scan.bbi] & Tables::mask_left[m_scan.pos])){
 		m_scan.pos =posInBB;
 		nBB=m_scan.bbi;
 		return (posInBB + WMUL(m_scan.bbi));
 	}else{											//not found in the last table. look up in the rest
 		for(int i=(m_scan.bbi+1); i<=m_BBH; i++){
-			if(_BitScanForward64(&posInBB,m_aBB[i])){
+			if(_BitScanForward64(&posInBB,vBB_[i])){
 				m_scan.bbi=i;
 				m_scan.pos=posInBB;
 				nBB=i;

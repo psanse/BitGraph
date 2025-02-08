@@ -1,23 +1,12 @@
-/*  
- * bitboard.h file from the BITSCAN library, a C++ library for bit set
- * optimization. BITSCAN has been used to implement BBMC, a very
- * succesful bit-parallel algorithm for exact maximum clique. 
- * (see license file for references)
- *
- * Copyright (C)
- * Author: Pablo San Segundo
- * Intelligent Control Research Group (CSIC-UPM) 
- *
- * Permission to use, modify and distribute this software is
- * granted provided that this copyright notice appears in all 
- * copies, in source code or in binaries. For precise terms 
- * see the accompanying LICENSE file.
- *
- * This software is provided "AS IS" with no warranty of any 
- * kind, express or implied, and with no claim as to its
- * suitability for any purpose.
- *
- */
+/** 
+ * @file bitboard.h
+ * @brief Header file for the class BitBoard of the BITSCAN 1.0 library
+ * @details The BitBoard class manages bitsets of 64-bit length
+ * @created ?
+ * @last_update 30/01/2025 (refactored, added trimming functions, Doxygen tags)
+ * @author pss
+ * 
+ **/
 
 #ifndef __BITBOARD_H__
 #define __BITBOARD_H__
@@ -61,172 +50,366 @@
 
 
 #else
-#include <intrin.h>										//windows specific
+	#include <intrin.h>										//windows specific
 #endif
 
 #include <iostream>
 
-#define DEBRUIJN_MN_64_ISOL		0x07EDD5E59A4E28C2
-#define DEBRUIJN_MN_64_SEP		0x03f79d71b4cb0a89
-#define DEBRUIJN_MN_64_SHIFT	58
+
+
 
 /////////////////////////////////
 //
-// BITBOARD CLASS
-// (contains different implementations of msb and lsb and popcount functions to test HW)
+// namespace bblock
+// 
+// (manages bitset optimizations in 64-bitsets)
+//
 ///////////////////////////////////
 
-class BitBoard {
-	
-private:							//hidden constructor 
-	BitBoard(){};
+namespace bblock {
 
-public:
+	//compile time globals for bitscanning operations in bitblocks
+	constexpr unsigned long long DEBRUIJN_MN_64_ISOL = 0x07EDD5E59A4E28C2;
+	constexpr unsigned long long DEBRUIJN_MN_64_SEP = 0x03f79d71b4cb0a89;
+	constexpr unsigned long long DEBRUIJN_MN_64_SHIFT = 58;
+
 /////////////////////
 // BitScanning
-		
-	static int  lsb64_mod				(const BITBOARD);			//modulus of magic number perfect hashing	
-    static int  lsb64_lup				(const BITBOARD);			//lookup implementations
-	static int  lsb64_lup_1				(const BITBOARD);
-	static int	msb64_lup				(const BITBOARD);
-	static int  lsb64_pc				(const BITBOARD);			//popcount based implementation (2008)
+	/**
+	* @brief Index of the least significant bit of bb implemented
+	*		 with perfect hashing according to modulo 
+	* @param bb: input 64-bit bitblock
+	* @returns index of the least significant bit or -1 if empty
+	* 
+	* @details T_64[67] returns the index of the single 1-bit
+	*		   in the family of bitblocks 000...1...000
+	* @returns index of the least significant bit or -1 if empty
+	* @comment Modulus operation is not efficient.
+	**/
+	 int  lsb64_mod		(const BITBOARD bb);				
+   
+	/**
+	* @brief Index of the least significant bit of bb implemented
+	*		 with a 16-bit lookup table
+	* @param bb: input 64-bit bitblock
+	* @returns index of the least significant bit or -1 if empty
+	**/
+	 int  lsb64_lup		(const BITBOARD bb);
+
+	/**
+	* @brief Index of the least significant bit of bb implemented
+	*		 with a 16-bit lookup table 
+	* @param bb: input 64-bit bitblock
+	* @returns index of the least significant bit or -1 if empty
+	* @details Best implementation for 32 bits on x86 on average. Is is worse than LSB_32x only for sparse BB with
+	*			1bits in the final BB
+	**/
+	 int  lsb64_lup_eff	(const BITBOARD bb);
 	
-	//ref
-inline	static int  lsb64_de_Bruijn	(const BITBOARD bb_dato);		//De Bruijn magic word (2008)
-inline	static int  msb64_de_Bruijn	(const BITBOARD bb_dato);		//De Bruijn magic word 
-inline static  int lsb64_intrinsic	(const BITBOARD bb_dato);		//intrinsics	
-inline static  int msb64_intrinsic	(const BITBOARD bb_dato);		//intrinsics	
+	/**
+	* @brief Index of the least significant bit of bb function implemented
+	*		 as a population count operation 
+	* @param bb: input 64-bit bitblock
+	* @returns index of the least significant bit or -1 if empty
+	* @date 2008
+	**/
+	 int  lsb64_pc		(const BITBOARD bb);
+
+	/**
+	* @brief Index of the least significant bit of bb function implemented
+	*		 with a De Bruijn magic word for perfect hashing as 
+	*		 a product and a shift operation.
+	* @param bb: input 64-bit bitblock
+	* @returns index of the least significant bit or -1 if empty
+	* @date 2008
+	* @details There are two implementations:
+	*		    a) ISOLANI_LSB with hashing bb &(-bb)
+	*			b) All 1-bits to LSB with hashing bb^(bb-1)
+	* 
+	*			Option b) would seem to exploit the CPU HW better on average
+	*			and is defined as default.
+	*			To change this option go to config.h file
+	**/ 
+	 int  lsb64_de_Bruijn	(const BITBOARD bb);		
+	
+	/**
+	* @brief Index of the least significant bit of bb (default)
+	*		(intrin.h WIN / x86intrin.h Linux lib)	
+	* @param bb: input 64-bit bitblock
+	* @details implemented by calling processor instructions
+	* @returns index of the least significant bit or -1 if empty
+	**/
+	 int lsb64_intrinsic	(const BITBOARD bb);
+
+
+	/**
+	* @brief Index of the least significant bit in bb
+	*		 (RECOMMENDED to use - calls lsb64_intrinsic)
+	* @param bb: input 64-bit bitblock
+	* @returns index of the least significant bit or -1 if empty
+	**/
+	///////////////////////////////////////////////////////////////////////////////////
+	inline
+	int lsb64				(const BITBOARD bb) { return 	lsb64_intrinsic(bb); }
+	///////////////////////////////////////////////////////////////////////////////////
+
+	/**
+	* @brief Index of the most significant bit in bb implemented
+	*		 with a 16-bit lookup table
+	* @param bb: input 64-bit bitblock
+	* @returns Index of the most least significant bit or -1 if empty
+	**/
+	 int msb64_lup			(const BITBOARD bb);
 		
+	/**
+	* @brief Index of the most significant bit of bb implemented
+	*		 with a De Bruijn magic word for perfect hashing as 
+	*		 a product and a shift operation.
+	* 
+	*		I. Does not require lookup tables
+	*		II. It first creates 1-bits from the least significant to MSB
+	* @param bb: input 64-bit bitblock
+	* @details Nice to not require LUPs of 65535 entries
+	*
+	* TODO - efficiency tests 
+	**/
+	 int  msb64_de_Bruijn	(const BITBOARD bb);		//De Bruijn magic word 
+   
+	/**
+	* @brief Index of the most significant bit of bb which uses processor instructions
+	*		(intrin.h WIN / x86intrin.h Linux lib)
+	* @param bb: input 64-bit bitblock
+	* @returns index of the most significant bit or -1 if empty
+	**/
+	/////////////////////////////////////////////////////////
+     int msb64_intrinsic	(const BITBOARD bb);
+	/////////////////////////////////////////////////////////
+
+	/**
+	* @brief Index of themost significant bit of in bb
+	* @param bb: input 64-bit bitblock
+	* @returns index of the most significant bit or -1 if empty
+	**/
+	 inline
+	 int msb64				(const BITBOARD bb)		{ return msb64_intrinsic(bb); }
+
 /////////////////////
 // Bit population
-		
-		static int popc64_lup_1		(const BITBOARD);	
-inline	static int popc64_lup		(const BITBOARD);				//Lookup
-inline  static int popc64			(const BITBOARD);				//Recommended default popcount which uses intrinsics if POPCOUNT_64 switch is ON (config.h)
+	
+	/**
+	* @brief population count in bb implemented with 16-bit lookup tables
+	*		 (default lookup table implementation)
+	* @param bb: input 64-bit bitblock
+	* @returns number of 1-bits in the bitblock 
+	**/	
+	 int popc64_lup			(const BITBOARD bb);		
+
+	/**
+	* @brief population count in bb implemented with 16-bit lookup tables
+	*	     but no intermediate storage
+	* @param bb: input 64-bit bitblock
+	* @returns number of 1-bits in the bitblock
+	**/
+	 int popc64_lup_1		(const BITBOARD bb);	
+	
+	
+	/**
+	* @brief Default population count in bb (RECOMMENDED) 
+	* @param bb: input 64-bit bitblock
+	* @details Calls assembler processor instructions if POPCOUNT_64 switch is ON (see config.h)
+	*		   else uses a table lookup implementation.
+	* 
+	*			I. By default POPCOUNT_64 switch is ON
+	* 
+	* @return number of 1-bits in the bitblock 
+	**/
+	////////////////////////////////////////////////
+	 int popc64				(const BITBOARD bb);	
+	////////////////////////////////////////////////
 
 //////////////////////
 //  Masks
-inline static BITBOARD MASK_1		(int low, int high);		//1-bit mask in the CLOSED range
-inline static BITBOARD MASK_0		(int low, int high);		//0-bit mask in the CLOSED range
+
+	/**
+	* @brief Sets to 1 the bits inside the closed range [low, high], sets to 0 the rest
+	* @param low, high: positions in the bitblock [0...63]
+	* @returns 64-bit bitblock mask
+	**/
+	 inline
+	 BITBOARD MASK_1(int low, int high) { return Tables::mask_entre[low][high]; 
+												/* [low] return ~Tables::mask_right[low] & ~Tables::mask_left[high];*/ }
+	
+	 /**
+	 * @brief Sets to 1 all bits in the closed range [0, 63]
+	 * @param idx: input reference bit position [0...63]
+	 * @returns 64-bit bitblock mask
+	 **/
+	 inline
+	 BITBOARD MASK_1_RIGHT	(int idx)			{ return ~Tables::mask_left[idx]; }
+	
+	 /**
+	 * @brief Sets to 1 all bits in the closed range [idx, 63]
+	 * @param idx: input reference bit position [0...63]
+	 * @returns 64-bit bitblock mask
+	 **/
+	 inline
+	 BITBOARD MASK_1_LEFT	(int idx)			{ return ~Tables::mask_right[idx]; }
+
+
+	/**
+	* @brief Sets to 0 the bits inside the closed range [low, high], sets to 1 the rest
+	* @param low, high: positions in the bitblock [0...63]
+	* @returns 64-bit bitblock mask
+	**/
+	 inline
+	 BITBOARD MASK_0		(int low, int high) {  return ~Tables::mask_entre[low][high];
+													/*return Tables::mask_right[low] | Tables::mask_left[high];*/ }
+	
+	 /**
+	* @brief Sets to 0 all bits in the closed range [0, idx]
+	* @param idx: input reference bit position [0...63]
+	* @returns 64-bit bitblock mask
+	**/
+	 inline
+	 BITBOARD MASK_0_RIGHT	(int idx)			{ return Tables::mask_left[idx]; }
+	 
+	 /**
+	* @brief Sets to 0 all bits in the closed range [idx, 63]
+	* @param idx: input reference bit position [0...63]
+	* @returns 64-bit bitblock mask
+	**/
+	 inline
+	 BITBOARD MASK_0_LEFT	(int idx)			{ return Tables::mask_right[idx]; }
+	
+	/**
+	* @brief sets to 0 the bits of the bitblock bb to the right of index (the index-bit is not trimmed)
+	* @param bb: input 64-bit bitblock
+	* @param idx: position in the bitblock [0...63]
+	* @returns the trimmed bitblock
+	* @date 30/01/2015 
+	**/
+	 inline
+	 BITBOARD trim_right	(BITBOARD bb, int idx) { return bb &~ Tables::mask_right[idx]; }
+
+	/**
+	* @brief sets to 0 the bits of the bitblock bb to the left side of index (the index-bit is not trimmed)
+	* @param bb: input 64-bit bitblock
+	* @param idx: position in the bitblock [0...63]
+	* @returns the trimmed bitblock
+	* @date 30/01/2015 
+	**/
+	 inline
+	 BITBOARD trim_left		(BITBOARD bb, int idx) { return bb &~ Tables::mask_left[idx]; }
+
+
+	 /**
+	 * @brief replaces bits in the closed range [firstBit, lastBit] of source bitblock (source)
+	 *		  in destination bitblock (dest)
+	 * @param firstBit, lastBit: closed range of bits [0...63]
+	 * @param source, dest: input bitblocks
+	 **/
+	 void copy				(int firstBit, int lastBit, const BITBOARD& source,  BITBOARD& dest);
+	
+	 /**
+	 * @brief replaces bits in the range [bit, 63] of source bitblock (source)
+	 *		  in destination bitblock (dest)
+	 * @param firstBit, lastBit: closed range of bits [0...63]
+	 * @param source, dest: input bitblocks
+	 **/
+	 void copy_left			(int bit, const BITBOARD& source, BITBOARD& dest);
+	
+	 /**
+	 * @brief replaces bits in the range [0, bit] of source bitblock (source)
+	 *		  in destination bitblock (dest)
+	 * @param firstBit, lastBit: closed range of bits [0...63]
+	 * @param source, dest: input bitblocks
+	 **/
+	 void copy_right		(int bit, const BITBOARD& source, BITBOARD& dest);
 
 /////////////////////
 // I/O
-	static void print(const BITBOARD, std::ostream&  = std::cout);
-};
+
+	/**
+	* @brief streams bb and its popcount to the output stream
+	*		 (format ...000111 [3])
+	**/
+	 std::ostream& print	(const BITBOARD bb, std::ostream&  = std::cout) ;
+
+} //end namespace bblock
 
 
-/////////////////////////
-//
-// INLINE FUNCTIONS
-//
-/////////////////////////
 
- inline int BitBoard::popc64_lup (	const BITBOARD bb_dato){
 //////////////////////////////
-// Lookup implementation 
-//
-// COMMENTS
-// more compact than lookup without union but similar in time
-	register union x {
-		U16 c[4];
-		BITBOARD b;
-	} val;				
+// inline implementations in header file 
 
-	val.b = bb_dato; //Carga unisn
+namespace bblock {
+	inline
+	int lsb64_intrinsic(const BITBOARD bb_dato) {
+		unsigned long index;
+		if (_BitScanForward64(&index, bb_dato))
+			return(index);
 
-return (Tables::pc[val.c[0]] + Tables::pc[val.c[1]] + Tables::pc[val.c[2]] + Tables::pc[val.c[3]]); //Suma de poblaciones 
-}
+		return EMPTY_ELEM;
+	}
 
+	inline
+	int msb64_intrinsic(const BITBOARD bb_dato) {
+		unsigned long index;
+		if (_BitScanReverse64(&index, bb_dato))
+			return(index);
 
-inline int BitBoard::popc64(const BITBOARD bb_dato){
-///////////////////////////////
-// Default implementation for population count. Uses intrinsics if  POPCOUNT_64 switch is ON (config.h)
+		return EMPTY_ELEM;
+	}
+
+	inline
+	int popc64(const BITBOARD bb_dato) {
 
 #ifdef POPCOUNT_64
-	return __popcnt64(bb_dato);
+		return __popcnt64(bb_dato);
 #else
-	//lookup table popcount
-	register union x {
-		U16 c[4];
-		BITBOARD b;
-	} val;				
+		//lookup table popcount
+		register union x {
+			U16 c[4];
+			BITBOARD b;
+		} val;
 
-	val.b = bb_dato; //Carga unisn
+		val.b = bb_dato; //Carga unisn
 
-	return (Tables::pc[val.c[0]] + Tables::pc[val.c[1]] + Tables::pc[val.c[2]] + Tables::pc[val.c[3]]); //Suma de poblaciones  
+		return (Tables::pc[val.c[0]] + Tables::pc[val.c[1]] + Tables::pc[val.c[2]] + Tables::pc[val.c[3]]); //Suma de poblaciones  
 #endif
-}
+
+	}
 
 
-inline int BitBoard:: lsb64_de_Bruijn(const BITBOARD bb_dato){
-////////////////////////
-// Uses de Bruijn perfect hashing in two versions:
-// a) ISOLANI_LSB with hashing bb &(-bb)
-// b) All 1 bits to LSB with hashing bb^(bb-1)
-// 
-//	Option b) would seem to exploit the CPU HW better on average and is defined as default
-//  To change this option go to config.h file
-
+	inline
+	int lsb64_de_Bruijn(const BITBOARD bb_dato) {
 
 #ifdef ISOLANI_LSB
-	return (bb_dato==0)? EMPTY_ELEM : Tables::indexDeBruijn64_ISOL[((bb_dato & -bb_dato) * DEBRUIJN_MN_64_ISOL) >> DEBRUIJN_MN_64_SHIFT];
+		return (bb_dato == 0) ? EMPTY_ELEM : Tables::indexDeBruijn64_ISOL[((bb_dato & -bb_dato) * DEBRUIJN_MN_64_ISOL) >> DEBRUIJN_MN_64_SHIFT];
 #else
-	return (bb_dato==0)? EMPTY_ELEM : Tables::indexDeBruijn64_SEP[((bb_dato ^ (bb_dato-1)) * DEBRUIJN_MN_64_SEP) >> DEBRUIJN_MN_64_SHIFT];
+		return (bb_dato == 0) ? EMPTY_ELEM : Tables::indexDeBruijn64_SEP[((bb_dato ^ (bb_dato - 1)) * DEBRUIJN_MN_64_SEP) >> DEBRUIJN_MN_64_SHIFT];
 #endif
-}
 
-inline	int BitBoard::msb64_de_Bruijn (const BITBOARD bb_dato){
-////////////////////////
-// date: 27/7/2014
-// Uses de Bruijn perfect hashing but first has to create 1-bits from the least significant to MSB
-//
-// More practical than LUPs of 65535 entries, but requires efficiency tests for a precise comparison
+	}
 
-	if(bb_dato==0) return EMPTY_ELEM;
+	inline
+	int msb64_de_Bruijn(const BITBOARD bb_dato) {
 
-   //creates all 1s up to MSB position
-   BITBOARD bb=bb_dato;
-   bb |= bb >> 1; 
-   bb |= bb >> 2;
-   bb |= bb >> 4;
-   bb |= bb >> 8;
-   bb |= bb >> 16;
-   bb |= bb >> 32;
+		if (bb_dato == 0) return EMPTY_ELEM;
 
-   //applys same computation as for LSB-de Bruijn
-   return Tables::indexDeBruijn64_SEP[(bb*DEBRUIJN_MN_64_SEP)>>DEBRUIJN_MN_64_SHIFT];
-}
+		//creates all 1s up to MSB position
+		BITBOARD bb = bb_dato;
+		bb |= bb >> 1;
+		bb |= bb >> 2;
+		bb |= bb >> 4;
+		bb |= bb >> 8;
+		bb |= bb >> 16;
+		bb |= bb >> 32;
 
-inline int BitBoard::lsb64_intrinsic( const BITBOARD bb_dato){
-	unsigned long index;
-	if(_BitScanForward64(&index,bb_dato))
-		return(index);
-	
-return EMPTY_ELEM;
-}
+		//applys same computation as for LSB-de Bruijn
+		return Tables::indexDeBruijn64_SEP[(bb * DEBRUIJN_MN_64_SEP) >> DEBRUIJN_MN_64_SHIFT];
+	}
+}//end namespace bblock
 
-inline  int BitBoard::msb64_intrinsic (const BITBOARD bb_dato){
-	unsigned long index;
-	if(_BitScanReverse64(&index,bb_dato))
-		return(index);
-	
-return EMPTY_ELEM;
-	
-}
-
-
-inline BITBOARD BitBoard::MASK_1(int low, int high){
-//////////////
-// returns 1-bit mask (remaining bits to 0) in the CLOSED range (high and low must be numbers between 0 and 63 and low<=high)
-
-	return ~Tables::mask_right[low] & ~Tables::mask_left[high];
-}
-
-inline BITBOARD BitBoard::MASK_0(int low, int high){
-//////////////
-// returns 0-bit mask (remaining bits to 1) in the CLOSED range (high and low must be numbers between 0 and 63 and low<=high)
-
-	return Tables::mask_right[low] | Tables::mask_left[high];
-}
 
 #endif

@@ -7,7 +7,7 @@ set(useful_headers_for_IDE
     info/info_base.h
 )
 
-#created utils library
+#creates utils library
 add_library (utils
     benchmark.cpp 
     result.cpp
@@ -61,4 +61,3 @@ target_link_libraries (test_utils LINK_PUBLIC utils gtest)
 
 endif()
 
-install(TARGETS utils DESTINATION lib)

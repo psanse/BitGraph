@@ -433,7 +433,7 @@ TEST(Sparse_non_instrinsic, scanning){
 
 	nBit=EMPTY_ELEM;
 	while(true){
-		nBit=bbsp.previous_bit(nBit);
+		nBit=bbsp.prev_bit(nBit);
 		if(nBit==EMPTY_ELEM) break;
 		v.push_back(nBit);
 	}
@@ -476,7 +476,7 @@ TEST(Sparse_intrinsic, non_destructive_scanning){
 
 	if(bbsp.init_scan(BBObject::NON_DESTRUCTIVE_REVERSE)!=EMPTY_ELEM){
 		while(true){
-			nBit=bbsp.previous_bit();
+			nBit=bbsp.prev_bit();
 			if(nBit==EMPTY_ELEM) break;
 			v.push_back(nBit);
 		}
@@ -515,7 +515,7 @@ TEST(Sparse_intrinsic, non_destructive_scanning_with_starting_point){
 	v.clear();
 	if(bbsp.init_scan_from(20,BBObject::NON_DESTRUCTIVE_REVERSE)!=EMPTY_ELEM){
 		while(true){
-			nBit=bbsp.previous_bit();
+			nBit=bbsp.prev_bit();
 			if(nBit==EMPTY_ELEM) break;
 			v.push_back(nBit);
 		}
@@ -555,7 +555,7 @@ TEST(Sparse_intrinsic, destructive_scanning){
 	v.clear();
 	if(bbsp.init_scan(BBObject::NON_DESTRUCTIVE_REVERSE)!=EMPTY_ELEM){
 		while(true){
-			nBit=bbsp.previous_bit_del();
+			nBit=bbsp.prev_bit_del();
 			if(nBit==EMPTY_ELEM) break;
 			v.push_back(nBit);
 		}

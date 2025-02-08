@@ -7,351 +7,296 @@
 #include <sstream>
 #include <algorithm>
 #include <cstdio>
-//#include "utils/common.h"
+#include <utils/logger.h>
+
  
 using namespace std;
 
 BitBoardN&  AND (const BitBoardN& lhs, const BitBoardN& rhs,  BitBoardN& res){
-	for(int i=0; i<lhs.m_nBB; i++){
-		res.m_aBB[i]=lhs.m_aBB[i] & rhs.m_aBB[i];
+
+	for(auto i = 0; i < lhs.nBB_; ++i){
+		res.vBB_[i] = lhs.vBB_[i] & rhs.vBB_[i];
 	}
-return res;
+
+	return res;
 }
+
 
 BitBoardN&  OR	(const BitBoardN& lhs, const BitBoardN& rhs,  BitBoardN& res){
-	for(int i=0; i<lhs.m_nBB; i++){
-		res.m_aBB[i]=lhs.m_aBB[i] | rhs.m_aBB[i];
-	}
-return res;
-}
 
+	for(auto i = 0; i < lhs.nBB_; ++i){
+		res.vBB_[i] = lhs.vBB_[i] | rhs.vBB_[i];
+	}
+
+	return res;
+}
 
 
 BitBoardN&  OR (int from, const BitBoardN& lhs, const BitBoardN& rhs,  BitBoardN& res){
-////////////////////////
-// lhs OR rhs, (rhs [from, END[)
-	int first_block=WDIV(from);
 
-	for(int i=0; i<first_block; i++){
-		res.m_aBB[i]=lhs.m_aBB[i];
+	int first_block = WDIV(from);
+
+	for(auto i = 0; i < first_block; ++i){
+		res.vBB_[i]=lhs.vBB_[i];
 	}
 		
-	for(int i=first_block+1; i<lhs.m_nBB; i++){
-		res.m_aBB[i]=rhs.m_aBB[i] | lhs.m_aBB[i];
+	for(auto i = first_block + 1; i < lhs.nBB_; ++i){
+		res.vBB_[i] = rhs.vBB_[i] | lhs.vBB_[i];
 	}		
 
 	//special case-first block
-	res.m_aBB[first_block]=lhs.m_aBB[first_block] | (rhs.m_aBB[first_block] & ~Tables::mask_right[from-WMUL(first_block)]);
+	res.vBB_[first_block] = lhs.vBB_[first_block] | ( rhs.vBB_[first_block] & ~Tables::mask_right[from - WMUL(first_block)] );
 	
-return res;
+	return res;
 }
 
 BitBoardN&  OR(int v, bool from, const BitBoardN& lhs, const BitBoardN& rhs, BitBoardN& res) {
-	////////////////////////
-	// lhs OR rhs, (rhs [v, END[ if from = TRUE,  rhs [0, v[ if from = false)
-	//
-	// date@26/10/19
+	
 	
 	int nBB = WDIV(v);
 	int pos = WMOD(v);
 
 	if (from) {
-		for (int i = 0; i < nBB; i++) {
-			res.m_aBB[i] = lhs.m_aBB[i];
+		for (auto i = 0; i < nBB; i++) {
+			res.vBB_[i] = lhs.vBB_[i];
 		}
-		for (int i = nBB + 1; i < lhs.m_nBB; i++) {
-			res.m_aBB[i] = lhs.m_aBB[i] | rhs.m_aBB[i];
+		for (auto i = nBB + 1; i < lhs.nBB_; i++) {
+			res.vBB_[i] = lhs.vBB_[i] | rhs.vBB_[i];
 		}
 
 		//critical block
-		res.m_aBB[nBB] = lhs.m_aBB[nBB] | (rhs.m_aBB[nBB] & ~Tables::mask_right[pos]);
+		res.vBB_[nBB] = lhs.vBB_[nBB] | (rhs.vBB_[nBB] & ~Tables::mask_right[pos]);
 
 	}
 	else {
-		for (int i = nBB+1; i < lhs.m_nBB; i++) {
-			res.m_aBB[i] = lhs.m_aBB[i];
+		for (auto i = nBB+1; i < lhs.nBB_; i++) {
+			res.vBB_[i] = lhs.vBB_[i];
 		}
 
-		for (int i = 0; i < nBB; i++) {
-			res.m_aBB[i] = lhs.m_aBB[i] | rhs.m_aBB[i];
+		for (auto i = 0; i < nBB; i++) {
+			res.vBB_[i] = lhs.vBB_[i] | rhs.vBB_[i];
 		}
 
 		//critical block
-		res.m_aBB[nBB] = lhs.m_aBB[nBB] | (rhs.m_aBB[nBB] & ~Tables::mask_left[pos]);
+		res.vBB_[nBB] = lhs.vBB_[nBB] | (rhs.vBB_[nBB] & ~Tables::mask_left[pos]);
 	}
 		
 	return res;
 }
 
-
-BitBoardN&   AND (int first_block, const BitBoardN& lhs, const BitBoardN& rhs,  BitBoardN& res){
-	for(int i=first_block; i<lhs.m_nBB; i++){
-		res.m_aBB[i]=rhs.m_aBB[i] & lhs.m_aBB[i];
-	}
-return res;
-}
-
-BitBoardN&   AND (int first_block, int last_block, const BitBoardN& lhs, const BitBoardN& rhs,  BitBoardN& res){
-	for(int i=first_block; i<=last_block; i++){
-		res.m_aBB[i]=rhs.m_aBB[i] & lhs.m_aBB[i];
-	}
-return res;
-}
-
-BitBoardN&  AND	(const BitBoardN& lhs, const BitBoardN& rhs,  BitBoardN& res, int last_vertex, bool lazy = true){
-///////////////
-// AND circumscribed to vertices [0,last_vertex(
+//BitBoardN AND_block(int firstBlock, int lastBlock, BitBoardN lhs, const BitBoardN& rhs)
+//{
+//	////////////////////////////////////////////////////////////////////
+//	//assert((firstBlock >= 0) && (LastBlock < lhs.nBB_) &&
+//	//	(firstBlock <= lastBlock) && (rhs.nBB_ == lhs.nBB_));
+//	////////////////////////////////////////////////////////////////////
 //
-// A non-lazy operations cleans the remaining blocks after last-vertex as well
-
-	int nbb=WDIV(last_vertex);
-	for(int i=0; i<=nbb; i++){
-		res.m_aBB[i]=rhs.m_aBB[i] & lhs.m_aBB[i];
-	}
-
-	//trim last
-	res.m_aBB[nbb] &= Tables::mask_right[WMOD(last_vertex)];
-	
-	//delete the rest of bitstring if the operation is not lazy
-	if(!lazy){
-		for(int i=nbb+1; i<lhs.m_nBB; i++){
-			res.m_aBB[i]=ZERO;
-		}
-	}
-
-return res;
-}
-
-int* AND (const BitBoardN& lhs, const BitBoardN& rhs, int last_vertex, int* res, int& size){
-///////////////
-// AND circumscribed to vertices [0,last_vertex(
+//	//int last_block = ((lastBlock == -1) ? lhs.nBB_ - 1 : lastBlock);
 //
-// RETURNS result as a set of vertices (res) and number of vertices in the set (size)
+//	//for (auto i = firstBlock; i <= last_block; ++i) {
+//	//	lhs.vBB_[i] &= rhs.vBB_[i];
+//	//}
 //
-// OBSERVATIONS: ***Experimental-efficiency
-	
-	size=0; BITBOARD bb; int offset;
-	
-	int nbb=WDIV(last_vertex);
-	for(int i=0; i<nbb; i++){
-		bb=rhs.m_aBB[i] & lhs.m_aBB[i];
-		offset=WMUL(i);
+//	////set bits to 0 outside the range 
+//	//for (int i = lastBlock + 1; i < lhs.nBB_; ++i) {
+//	//	lhs.vBB_[i] = ZERO;
+//	//}
+//	//for (int i = 0; i < firstBlock; ++i) {
+//	//	lhs.vBB_[i] = ZERO;
+//	//}
+//
+//	//return lhs;
+//}
+
+int* AND (int lastBit, const BitBoardN& lhs, const BitBoardN& rhs, int bitset[], int& size){
+
+	BITBOARD bb;
+	int offset;
+	size = 0;
+	int nbb = WDIV(lastBit);
+
+	for(auto i = 0; i < nbb; ++i){
+		bb = rhs.vBB_[i] & lhs.vBB_[i];
+		offset = WMUL(i);
+
 		while(bb){
-			int v=BitBoard::lsb64_intrinsic(bb);
-			res[size++]=offset+v;
-			bb^=Tables::mask[v];
+			int v = bblock::lsb64_intrinsic(bb);
+			bitset[size++] = offset + v;
+			bb ^= Tables::mask[v];
 		}
+
 	}
 
 	//trim last
-	bb= rhs.m_aBB[nbb] & lhs.m_aBB[nbb] & Tables::mask_right[WMOD(last_vertex)];
+	bb = rhs.vBB_[nbb] & lhs.vBB_[nbb] & Tables::mask_right[WMOD(lastBit)];
 	while(bb){
-		int v=BitBoard::lsb64_intrinsic(bb);
-		res[size++]=WMUL(nbb)+v;
-		bb^=Tables::mask[v];
+		int v = bblock::lsb64_intrinsic(bb);
+		bitset[size++] = WMUL(nbb) + v;
+		bb ^= Tables::mask[v];
 	}
 
-return res;
+	return bitset;
 }
 
 
+BitBoardN&  erase_bit(const BitBoardN& lhs, const BitBoardN& rhs,  BitBoardN& res){
 
-BitBoardN&  ERASE(const BitBoardN& lhs, const BitBoardN& rhs,  BitBoardN& res){
-/////////////
-// removes rhs FROM lhs
 
-	for(int i=0; i<lhs.m_nBB; i++){
-		res.m_aBB[i]=lhs.m_aBB[i] &~ rhs.m_aBB[i];
+	for(auto i = 0; i < lhs.nBB_; ++i){
+		res.vBB_[i] = lhs.vBB_[i] &~ rhs.vBB_[i];
 	}
 
-return res;
+	return res;
 }
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
-BitBoardN::BitBoardN(int popsize /*1 based*/ , bool reset){
-			
-	m_nBB=INDEX_1TO1(popsize);
-
-#ifndef _MEM_ALIGNMENT
-	if(!(m_aBB= new BITBOARD[m_nBB])){
-#else
-	if(!(m_aBB = (BITBOARD*)_aligned_malloc(sizeof(BITBOARD)*m_nBB,_MEM_ALIGNMENT))){
-#endif
-			printf("Error al reservar memoria");
-			m_nBB=-1;
-	}
+BitBoardN::BitBoardN(int popsize) :
+	nBB_(INDEX_1TO1(popsize))
+{
 	
-	//Sets to 0 all bits
-	if(reset) erase_bit();
-}
-
-BitBoardN::BitBoardN(const BitBoardN& bbN){
-///////////////////////////
-// copy constructor
-
-	//allcoates memory
-	if(bbN.m_aBB==nullptr || bbN.m_nBB<0 ){
-		m_nBB=-1;
-		m_aBB=nullptr;
-	return;
+	try {
+		vBB_.resize(nBB_, 0);
 	}
-	
- 	m_nBB=bbN.m_nBB;
-
-#ifndef _MEM_ALIGNMENT
-	m_aBB=new BITBOARD[m_nBB];
-#else
-	m_aBB = (BITBOARD*)_aligned_malloc(sizeof(BITBOARD)*m_nBB, _MEM_ALIGNMENT );
-#endif
- 
-	//copies bitblocks
-	for(int i=0; i<m_nBB; i++)
- 				m_aBB[i]=bbN.m_aBB[i];
- }
-
-BitBoardN::BitBoardN(const vector<int>& v){
-///////////////////
-// vector elements should be zero based (i.e v[0]=3, bit-index 3=1)
-
-	//Getting BB Size
-	m_nBB=INDEX_0TO1(*(max_element(v.begin(), v.end())) ) ; 
-#ifndef _MEM_ALIGNMENT
-	m_aBB=new BITBOARD[m_nBB];
-#else
-	m_aBB = (BITBOARD*)_aligned_malloc(sizeof(BITBOARD)*m_nBB, _MEM_ALIGNMENT );
-#endif
-	erase_bit();
-	for(int i=0; i<v.size(); i++){
-		if(v[i]>=0)
-			set_bit(v[i]);
+	catch (...) {
+		LOG_ERROR("Error during construction - BitBoardN::BitBoardN");
+		LOG_ERROR("exiting...");
+		std::exit(-1);
 	}
 }
 
-BitBoardN::~BitBoardN(){
-	if(m_aBB!=nullptr){	
-		delete [] m_aBB;
-	}
-	m_aBB=nullptr;
-}
 
-BitBoardN::BitBoardN (const std::vector<int>& v, int popsize){
-///////////////////
-// vector elements should be zero based (i.e v[0]=3, bit-index 3=1)
-// first_update: 12/11/16
-// last_update: 12/11/16
+BitBoardN::BitBoardN(const vint& v):
+	nBB_(EMPTY_ELEM)
+{
+	try {
+		nBB_ = INDEX_0TO1(*(max_element(v.begin(), v.end())));
+		vBB_.resize(nBB_, 0);
 
-	m_nBB=INDEX_1TO1(popsize);
+		for (auto& bit : v) {
 
-#ifndef _MEM_ALIGNMENT
-	if(!(m_aBB= new BITBOARD[m_nBB])){
-#else
-	if(!(m_aBB = (BITBOARD*)_aligned_malloc(sizeof(BITBOARD)*m_nBB,_MEM_ALIGNMENT))){
-#endif
-			printf("BitBoardN()::Error in allocation");
-			m_nBB=-1;
-			return;
-	}
-	
-	//Sets to 0 all bits
-	erase_bit();
-	for(int i=0; i<v.size(); i++){
-		if(v[i]>=0 && v[i]<popsize)	set_bit(v[i]);
-		else{
-			cout<<"BitBoardN::vector element:"<<v[i]<<" lost during construction"<<endl;
+			//////////////////
+			assert(bit >= 0);
+			/////////////////
+
+			//sets bits - no prior erasing
+			set_bit(bit);
 		}
 	}
+	catch (...) {
+		LOG_ERROR("Error during construction - BitBoardN::BitBoardN()");
+		LOG_ERROR("exiting...");
+		std::exit(-1);
+	}
 }
 
-void BitBoardN::init(int popsize, const vector<int> &v){
-///////////////////////////
-// values in vector are 1-bits in the bitboard (0 based)
-	
-	if(m_aBB!=nullptr){
-#ifndef _MEM_ALIGNMENT
-		delete [] m_aBB;
-#else
-		_aligned_free(m_aBB);
-#endif
-		m_aBB=nullptr;
-	}
-	
-	m_nBB=INDEX_1TO1(popsize); //((popsize-1)/WORD_SIZE)+1;
-	 
-#ifndef _MEM_ALIGNMENT
-	m_aBB= new BITBOARD[m_nBB];
-#else
-	m_aBB = (BITBOARD*)_aligned_malloc(sizeof(BITBOARD)*m_nBB,_MEM_ALIGNMENT);
-#endif
+BitBoardN::BitBoardN (int popsize, const vint& lv):
+	nBB_(INDEX_1TO1(popsize))
+{
 
-	//sets bit conveniently
-	erase_bit();
-	for(int i=0; i<v.size(); i++){
-		if(v[i]>=0 && v[i]<popsize)
-						set_bit(v[i]);
-		else{
-			erase_bit();		//Errr. exit
-			cout<<"Error en valor.BitBoardN.New(...)"<<endl;
-			break;
+	try {
+		vBB_.resize(nBB_, 0);
+		
+		//sets bit conveniently
+		for (auto& bit : lv) {
+
+			//////////////////
+			assert(bit >= 0 && bit < popsize);
+			/////////////////
+
+			//sets bits - no prior erasing
+			set_bit(bit);
+
+		}
+
+	}
+	catch (...) {
+		LOG_ERROR("Error during construction - BitBoardN::BitBoardN()");
+		LOG_ERROR("exiting...");
+		std::exit(-1);
+	}
+}
+
+void BitBoardN::init(int popsize) {
+
+	try {
+		nBB_ = INDEX_1TO1(popsize);
+		vBB_.resize(nBB_, 0);
+	}
+	catch (...) {
+		LOG_ERROR("Error during allocation - BitBoardN::init");
+		LOG_ERROR("exiting...");
+		std::exit(-1);
+	}
+
+}
+
+void BitBoardN::init(int popsize, const vint& lv){
+		
+	try {
+		nBB_ = INDEX_1TO1(popsize); 
+		vBB_.resize(nBB_, 0);
+
+		//sets bit conveniently
+		for (auto& bit : lv) {
+
+			//////////////////
+			assert(bit >= 0 && bit < popsize);
+			/////////////////
+
+			//sets bits - no prior erasing
+			set_bit(bit);
+
 		}
 	}
+	catch (...) {
+		LOG_ERROR("Error during allocation - BitBoardN::init");
+		LOG_ERROR("exiting...");
+		std::exit(-1);
+	}	
 }
 
+void BitBoardN::reset(int popsize) {
 
-BITBOARD* BitBoardN::get_bitstring (){
-	return m_aBB;
-}
-
-const BITBOARD* BitBoardN::get_bitstring ()	const{
-	return m_aBB;
-}
-
-void BitBoardN::init(int popsize, bool reset){
-//////////////////////
-// only way to change storage space once constructed
-
-	if(m_aBB!=nullptr){
-#ifndef _MEM_ALIGNMENT
-		delete [] m_aBB;
-#else
-		_aligned_free(m_aBB);
-#endif
-		m_aBB=nullptr;
+	try {
+		nBB_ = INDEX_1TO1(popsize);
+		vBB_.resize(nBB_, 0);
+	}
+	catch (...) {
+		LOG_ERROR("Error during allocation - BitBoardN::reset");
+		LOG_ERROR("exiting...");
+		std::exit(-1);
 	}
 
-	//nBBs
-	m_nBB=INDEX_1TO1(popsize); 
-	
-#ifndef _MEM_ALIGNMENT
-	m_aBB= new BITBOARD[m_nBB];
-#else
-	m_aBB = (BITBOARD*)_aligned_malloc(sizeof(BITBOARD)*m_nBB,_MEM_ALIGNMENT);
-#endif
+}
+void BitBoardN::reset(int popsize, const vint& lv) {
 
-	//Sets to 0
-	if(reset)
-		erase_bit();
+	try {
+		nBB_ = INDEX_1TO1(popsize);
+		vBB_.resize(nBB_, 0);
 
-return ;
+		//sets bit conveniently
+		for (auto& bit : lv) {
+
+			//////////////////
+			assert(bit >= 0 && bit < popsize);
+			/////////////////
+
+			//sets bits - no prior erasing
+			set_bit(bit);
+
+		}
+	}
+	catch (...) {
+		LOG_ERROR("Error during allocation - BitBoardN::reset");
+		LOG_ERROR("exiting...");
+		std::exit(-1);
+	}
 }
 
 
-//void BitBoardN::add_bitstring_left(){
-/////////////////////
-////
-//// Adds 1 bit to MSB
-////
-//// Date of creation: 26/4/2010
-//// Date last modified: 26/4/2010
-//// Autor:PSS
-//
-//	int nvertex=this->msbn64();		//is -1 if empty
-//	if(nvertex!=(WMUL(nvertex)-1)){
-//			set_bit(nvertex+1);				//add bit 0 if BB empty
-//	}
-//}
 
 //////////////////////////
 //
@@ -360,48 +305,54 @@ return ;
 /////////////////////////
 
 BitBoardN& BitBoardN::operator &=	(const BitBoardN& bbn){
-	for(int i=0; i<m_nBB; i++)
-				m_aBB[i]&=bbn.m_aBB[i];
-return *this;
+
+	for (auto i = 0; i < nBB_; ++i) {
+		vBB_[i] &= bbn.vBB_[i];
+	}
+				
+	return *this;
 }
 
 BitBoardN& BitBoardN::operator |=	(const BitBoardN& bbn){
-	for(int i=0; i<m_nBB; i++)
-				m_aBB[i]|=bbn.m_aBB[i];
-return *this;
+	
+	for (auto i = 0; i < nBB_; ++i) {
+		vBB_[i] |= bbn.vBB_[i];
+	}
+
+	return *this;
 }
 
-BitBoardN&  BitBoardN::AND_EQ (int first_block, const BitBoardN& rhs ){
-//////////////////////
-// mask in range [first_block , END[
-	for(int i=first_block; i<m_nBB; i++)
-				m_aBB[i]&=rhs.m_aBB[i];
-return *this;
-}
+BitBoardN& BitBoardN::operator ^=	(const BitBoardN& bbn) {
+	
+	for (auto i = 0; i < nBB_; ++i) {
+		vBB_[i] ^= bbn.vBB_[i];
+	}
 
-
-BitBoardN&  BitBoardN::OR_EQ (int first_block, const BitBoardN& rhs ){
-//////////////////////
-// mask in range [first_block , END[
-
-	for(int i=first_block; i<m_nBB; i++)
-				m_aBB[i]|=rhs.m_aBB[i];
-return *this;
+	return *this;
 }
 
 
+BitBoardN& BitBoardN::flip (){
 
-BitBoardN& BitBoardN::operator ^=	(const BitBoardN& bbn){
-	for(int i=0; i<m_nBB; i++)
-				m_aBB[i]^=bbn.m_aBB[i];
-return *this;
+	for (auto i = 0; i < nBB_; ++i) {
+		vBB_[i] = ~vBB_[i];
+	}
+
+	return *this;
 }
 
+BitBoardN& BitBoardN::flip_block(int firstBlock, int lastBlock)
+{
+	
+	///////////////////////////////////////////////////////////////////////////////////
+	assert((firstBlock >= 0) && (firstBlock <= lastBlock) && (lastBlock < nBB_));
+	/////////////////////////////////////////////////////////////////////////////////
 
-BitBoardN& BitBoardN::flip	(){
-	for(int i=0; i<m_nBB; i++)
-			m_aBB[i]=~m_aBB[i];
-return *this;
+	for (auto i = firstBlock; i < lastBlock; ++i) {
+		vBB_[i] = ~vBB_[i];
+	}
+
+	return *this;
 }
 
 //////////////////////////
@@ -417,107 +368,161 @@ return *this;
 //
 //////////////////////////
 
-
-void BitBoardN::print(std::ostream& o, bool show_pc ) const {
-/////////////////////////
-// shows bit string as [bit1 bit2 bit3 ... <(pc)>]  (if empty: [ ]) (<pc> optional)
+std::ostream& BitBoardN::print(std::ostream& o, bool show_pc, bool endl ) const
+{
+	o << "[";
 	
-	o<<"[";
-		
-	int nBit=EMPTY_ELEM;
-	while(1){
-		nBit=next_bit(nBit);
-		if(nBit==EMPTY_ELEM) break;
-		o<<nBit<<" ";
+	//scans de bitstring and serializes it to the output stream
+	int nBit = EMPTY_ELEM;
+	while( (nBit = next_bit(nBit)) != EMPTY_ELEM ){
+		o << nBit << " ";
 	}
 
+	//adds popcount if required
 	if(show_pc){
-		int pc=popcn64();
-		if(pc)	o<<"("<<popcn64()<<")";
+		int pc = popcn64();
+		if (pc) {
+			o << "(" << popcn64() << ")";
+		}
 	}
 	
-	o<<"]";
+	o << "]";
+
+	if (endl) { o << std::endl; }
+	return o;
 }
 
-string BitBoardN::to_string (){
+string BitBoardN::to_string ()
+{
 	ostringstream sstr;
-	sstr<<"[";
+
+	print(sstr);
+
+	/*sstr << "[";
+
 	this->print();
-	int nBit=EMPTY_ELEM;
-	while(true){
-		nBit=next_bit(nBit);
-		if(nBit==EMPTY_ELEM) break;
-		sstr<<nBit<<" ";
+	int nBit = EMPTY_ELEM;
+	while ((nBit = next_bit(nBit)) != EMPTY_ELEM) {
+		sstr << nBit << " ";
 	}
 
-	sstr<<"("<<popcn64()<<")";
-	sstr<<"]";
+	sstr << "(" << popcn64() << ")";
+	sstr << "]";*/
 
-return sstr.str();
+	return sstr.str();
 }
 
 
-void BitBoardN::to_vector(vector<int>& vl ) const {
-//////////////////////
-// copies bit string to vector 
+void BitBoardN::to_vector (vint& lv ) const {
 
-	vl.clear();
+	lv.clear();
+	lv.reserve(popcn64());		
 
-	int v=EMPTY_ELEM;
-	while(true){
-		v=next_bit(v);
-		if(v==EMPTY_ELEM) break;
-
-		vl.push_back(v);
+	int v = EMPTY_ELEM;
+	while( (v = next_bit(v)) != EMPTY_ELEM){
+		lv.emplace_back(v);
 	}
 }
+
+BitBoardN::operator vint() const {
+	vint result;
+	to_vector (result);
+	return result;
+}
+
 
 void BitBoardN::to_stack(com::stack_t<int>& s)	const {
 	s.erase();
 
 	int v = EMPTY_ELEM;
-	while (true) {
-		v = next_bit(v);
-		if (v == EMPTY_ELEM) break;
-
+	while ((v = next_bit(v)) != EMPTY_ELEM) {
 		s.push(v);
 	}
-
 }
 
-int* BitBoardN::to_old_vector (int* lv, int& size) 	{
-	size=0;
-	int v=EMPTY_ELEM;
-	while(true){
-		if( (v=next_bit(v))!=EMPTY_ELEM ){
-			lv[size++]=v;
-		}else break;
+
+int* BitBoardN::to_C_array (int* lv, std::size_t& size, bool rev) 	{
+	size = 0;
+	int v = EMPTY_ELEM;
+
+	if (rev) {
+		while ((v = prev_bit(v)) != EMPTY_ELEM) {
+			lv[size++] = v;
+		}
+	}
+	else {
+		while ((v = next_bit(v)) != EMPTY_ELEM) {
+			lv[size++] = v;
+		}
 	}
 	return lv;
 }
 
-int* BitBoardN::to_old_vector_reverse (int* lv, int& size) 	{
-	size=0;
-	int v=EMPTY_ELEM;
-	while(true){
-		if( (v=previous_bit(v))!=EMPTY_ELEM ){
-			lv[size++]=v;
-		}else break;
+BitBoardN& BitBoardN::set_bit(const vint& lv) {
+
+	//copies elements up to the maximum capacity of the bitstring
+	auto maxPopSize = WMUL(nBB_);
+	for (auto i = 0; i < lv.size(); ++i) {
+
+		/////////////////////
+		assert(lv[i] >= 0);
+		////////////////////
+
+		if (lv[i] < maxPopSize /* 1-based*/) {
+			set_bit(lv[i]);
+		}
 	}
-	return lv;
+
+	return *this;
+
+}
+
+int find_first_common(const BitBoardN& lhs, const BitBoardN& rhs) {
+
+	for (auto i = 0; i < lhs.nBB_; ++i) {
+		BITBOARD bb = lhs.vBB_[i] & rhs.vBB_[i];
+		if (bb) {
+			return bblock::lsb64_intrinsic(bb) + WMUL(i);
+		}
+	}
+
+	return EMPTY_ELEM;		//disjoint
+}
+
+int find_first_common_block(int firstBlock, int lastBlock, const BitBoardN& lhs, const BitBoardN& rhs) {
+	
+	///////////////////////////////////////////////////////////////////////////////
+	assert((firstBlock >= 0) && (LastBlock < nBB_) && (firstBlock <= lastBlock));
+	///////////////////////////////////////////////////////////////////////////////
+
+	int last_block = ((lastBlock == -1) ? rhs.nBB_ - 1 : lastBlock);
+
+	for (auto i = firstBlock; i < last_block; i++) {
+		BITBOARD bb = lhs.vBB_[i] & rhs.vBB_[i];
+		if (bb) {
+			return bblock::lsb64_intrinsic(bb) + WMUL(i);
+		}
+	}
+
+	return EMPTY_ELEM;		//disjoint
 }
 
 
-BitBoardN& BitBoardN::operator =  (const BitBoardN& bbN){
-	if(m_nBB!=bbN.m_nBB){
-		//allocates memory
-		init(bbN.m_nBB,false);		
-	}
 
-	for(int i=0; i<m_nBB; i++)
-			m_aBB[i]=bbN.m_aBB[i];
-return *this;
-}
+//BitBoardN& BitBoardN::operator =  (const BitBoardN& bbN){
+//
+//	if(nBB_ != bbN.nBB_){
+//		//allocates memory
+//		init(bbN.nBB_);		
+//	}
+//
+//	for (auto i = 0; i < nBB_; ++i) {
+//		vBB_[i] = bbN.vBB_[i];
+//	}
+//
+//	return *this;
+//}
+
 
 
 

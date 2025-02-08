@@ -17,7 +17,7 @@ BITBOARD	Tables::mask0_1W;
 BITBOARD	Tables::mask0_2W;
 BITBOARD	Tables::mask0_3W;
 BITBOARD	Tables::mask0_4W;
-U8	Tables::mask8[8];						//masks for 8 bit block of a single bit
+U8			Tables::mask8[8];						//masks for 8 bit block of a single bit
 BITBOARD	Tables::mask_entre[64/*a*/][64/*b*/];	//1-bits between intervals
 
 #ifdef CACHED_INDEX_OPERATIONS 

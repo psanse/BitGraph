@@ -93,7 +93,7 @@ virtual ~BitBoardS					(){clear();}
 //setters and getters (will not allocate memory)
 											
 	int number_of_bitblocks			()						const {return m_aBB.size();}
-	BITBOARD get_bitboard			(int index)				const {return m_aBB[index].bb;}			//index in the collection			
+	BITBOARD bitblock				(int index)				const {return m_aBB[index].bb;}			//index in the collection			
 	BITBOARD find_bitboard			(int block_index)		const;									//O(log) operation
 	pair<bool, int>	 find_pos		(int block_index)		const;									//O(log) operation
 	pair<bool, velem_it> find_block	(int block_index, bool is_lb=true);	
@@ -116,11 +116,11 @@ virtual	int lsbn64						()						const; 		//de Bruijn	/ lookup
 	//for scanning all bits
 	
 virtual inline	int next_bit			(int nBit)				;				//uses cached elem position for fast bitscanning
-virtual inline	int previous_bit		(int nBit)				;				//uses cached elem position for fast bitscanning
+virtual inline	int prev_bit		(int nBit)				;				//uses cached elem position for fast bitscanning
 
 private:
 	int next_bit					(int nBit)				const;			//de Bruijn 
-	int previous_bit				(int nbit)				const;			//lookup
+	int prev_bit				(int nbit)				const;			//lookup
 
 public:	
 /////////////////
@@ -168,7 +168,9 @@ inline	bool is_empty				()						const;				//lax: considers empty blocks for empt
 		bool is_disjoint			(int first_block, int last_block, const BitBoardS& bb)   const;
 /////////////////////
 // I/O 
-virtual	void print					(ostream& = cout, bool show_pc = true) const;
+	ostream& print					(ostream& = cout, bool show_pc = true, bool endl = true ) const override;
+
+
 	string to_string				();
 	
 	void to_vector					(std::vector<int>& )	const;
@@ -394,7 +396,7 @@ return 0;
 //
 /////////////////
 
-int BitBoardS::previous_bit	(int nBit){
+int BitBoardS::prev_bit	(int nBit){
 /////////////////
 // Uses cache of last index position for fast bit scanning
 //
@@ -403,14 +405,14 @@ int BitBoardS::previous_bit	(int nBit){
 			return msbn64(nElem);		//updates nElem with the corresponding bitblock
 	
 	int index=WDIV(nBit);
-	int npos=BitBoard::msb64_lup(Tables::mask_right[WMOD(nBit) /*nBit-WMUL(index)*/] & m_aBB[nElem].bb);
+	int npos=bblock::msb64_lup(Tables::mask_right[WMOD(nBit) /*nBit-WMUL(index)*/] & m_aBB[nElem].bb);
 	if(npos!=EMPTY_ELEM)
 		return (WMUL(index) + npos);
 	
 	for(int i=nElem-1; i>=0; i--){  //new bitblock
 		if( m_aBB[i].bb){
 			nElem=i;
-			return BitBoard::msb64_de_Bruijn(m_aBB[i].bb) + WMUL(m_aBB[i].index);
+			return bblock::msb64_de_Bruijn(m_aBB[i].bb) + WMUL(m_aBB[i].index);
 		}
 	}
 return EMPTY_ELEM;
@@ -425,7 +427,7 @@ int BitBoardS::next_bit(int nBit){
 		return lsbn64(nElem);		//updates nElem with the corresponding bitblock
 	
 	int index=WDIV(nBit);
-	int npos=BitBoard::lsb64_de_Bruijn(Tables::mask_left[WMOD(nBit) /*-WORD_SIZE*index*/] & m_aBB[nElem].bb);
+	int npos=bblock::lsb64_de_Bruijn(Tables::mask_left[WMOD(nBit) /*-WORD_SIZE*index*/] & m_aBB[nElem].bb);
 	if(npos!=EMPTY_ELEM)
 		return (WMUL(index) + npos);
 	
@@ -433,7 +435,7 @@ int BitBoardS::next_bit(int nBit){
 		//new bitblock
 		if(m_aBB[i].bb){
 			nElem=i;
-			return BitBoard::lsb64_de_Bruijn(m_aBB[i].bb) + WMUL(m_aBB[i].index);
+			return bblock::lsb64_de_Bruijn(m_aBB[i].bb) + WMUL(m_aBB[i].index);
 		}
 	}
 return EMPTY_ELEM;
@@ -479,7 +481,7 @@ int BitBoardS::lsbn64 (int& nElem)		const	{
 #ifdef ISOLANI_LSB
 			return(Tables::indexDeBruijn64_ISOL[((m_aBB[i].bb & -m_aBB[i].bb) * DEBRUIJN_MN_64_ISOL/*magic num*/) >> DEBRUIJN_MN_64_SHIFT]+ WMUL(m_aBB[i].index));	
 #else
-			return(Tables::indexDeBruijn64_SEP[((m_aBB[i].bb^ (m_aBB[i].bb-1)) * DEBRUIJN_MN_64_SEP/*magic num*/) >> DEBRUIJN_MN_64_SHIFT]+ WMUL(m_aBB[i].index));	
+			return(Tables::indexDeBruijn64_SEP[((m_aBB[i].bb ^ (m_aBB[i].bb - 1)) * bblock::DEBRUIJN_MN_64_SEP/*magic num*/) >> bblock::DEBRUIJN_MN_64_SHIFT] + WMUL(m_aBB[i].index));
 #endif
 		}
 	}
@@ -957,7 +959,7 @@ int  BitBoardS::init_bit (int low, int high,  const BitBoardS& bb_add){
 	if(itl!=bb_add.end()){
 		if(itl->index==bbl){	//lower block exists
 			if(bbh==bbl){		//case update in the same bitblock
-				m_aBB.push_back(elem( bbh, itl->bb & BitBoard::MASK_1(low-WMUL(bbl), high-WMUL(bbh)) ));
+				m_aBB.push_back(elem( bbh, itl->bb & bblock::MASK_1(low-WMUL(bbl), high-WMUL(bbh)) ));
 				return 0;
 			}else{
 				//add lower block

@@ -1,13 +1,11 @@
-
-/*  
- * This is the one and only header file required to use the BITSCAN library,
- * a C++ library for bit set optimization. It has been used to implement BBMC, 
- * a very succesful bit-parallel algorithm for exact maximum clique. 
- * (see license file for references)
- *
- * Copyright (C) 2014
- * Author: Pablo San Segundo
- * Intelligent Control Research Group (CSIC-UPM) 
+/**
+ * @file bitscan.h
+ * @brief Main header file for the BITSCAN library
+ * @details The BITSCAN library is a C++ library for bit set optimization.
+ * @version 1.0
+ * @created 2014
+ * @author pss
+ * @last_update 29/01/2025
  *
  * Permission to use, modify and distribute this software is granted
  * provided that this copyright notice appears in all copies, in source code or
@@ -23,12 +21,13 @@
 #include "bbsentinel.h"			
 #include "bbintrinsic_sparse.h"	
 
-//client data types
-typedef BitBoard bitblock;
-typedef BBIntrin bitarray;
-typedef BBSentinel watched_bitarray;
-typedef BBIntrinS sparse_bitarray;
-typedef BitBoardN simple_bitarray;
-typedef BitBoardS simple_sparse_bitarray;
-typedef BBObject  bbo;
+//useful aliases
+using bitarray = BBIntrin;
+using watched_bitarray = BBSentinel;
+using sparse_bitarray = BBIntrinS;
+using simple_bitarray = BitBoardN;
+using simple_sparse_bitarray = BitBoardS;
+using bbo = BBObject;
+
+
 
