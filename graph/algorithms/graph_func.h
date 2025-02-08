@@ -186,7 +186,7 @@ namespace gfunc{
 		BITBOARD bb = g.get_neighbors(v).bitblock(nBBv) & bbref.bitblock(nBBv);
 
 		//trims preceding vertices
-		bb &= Tables::mask_left[WMOD(v)];							
+		bb &= Tables::mask_high[WMOD(v)];							
 
 		//decodes block of v (appends to lv)	
 		while (bb != 0) {

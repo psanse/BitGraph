@@ -77,13 +77,13 @@ int	 BitBoardS::set_bit	(int low, int high){
 	pair<bool,velem_it> p=find_block(bbl);
 	if(bbh==bbl){
 		if(p.first){
-			BITBOARD bb_high=p.second->bb| ~Tables::mask_left[high-WMUL(bbh)];
-			BITBOARD bb_low=p.second->bb| ~Tables::mask_right[low-WMUL(bbl)];
+			BITBOARD bb_high=p.second->bb| ~Tables::mask_high[high-WMUL(bbh)];
+			BITBOARD bb_low=p.second->bb| ~Tables::mask_low[low-WMUL(bbl)];
 			p.second->bb=bb_low & bb_high;
 			return 0;		//no need for sorting
 		}else{
-			BITBOARD bb_high= ~Tables::mask_left[high-WMUL(bbh)];
-			m_aBB.push_back(elem(bbl,bb_high&~ Tables::mask_right[low-WMUL(bbl)]));
+			BITBOARD bb_high= ~Tables::mask_high[high-WMUL(bbh)];
+			m_aBB.push_back(elem(bbl,bb_high&~ Tables::mask_low[low-WMUL(bbl)]));
 			return 0;
 		}
 	}
@@ -91,11 +91,11 @@ int	 BitBoardS::set_bit	(int low, int high){
 	//B) bbl outside range 
 	if(p.second==m_aBB.end()){
 		//append blocks at the end
-		m_aBB.push_back(elem(bbl,~Tables::mask_right[low-WMUL(bbl)]));
+		m_aBB.push_back(elem(bbl,~Tables::mask_low[low-WMUL(bbl)]));
 		for(int i=low+1; i<bbh; ++i){
 				m_aBB.push_back(elem(i,ONE));
 		}
-		m_aBB.push_back(elem(bbh,~Tables::mask_left[high-WMUL(bbh)]));
+		m_aBB.push_back(elem(bbh,~Tables::mask_high[high-WMUL(bbh)]));
 		return 0;
 	}
 	
@@ -103,10 +103,10 @@ int	 BitBoardS::set_bit	(int low, int high){
 	//C) bbl  
 	int block=bbl;
 	if(p.first){	//block exists	
-		p.second->bb|=~Tables::mask_right[low-WMUL(bbl)];
+		p.second->bb|=~Tables::mask_low[low-WMUL(bbl)];
 		++p.second;
 	}else{ //block does not exist:marked for append
-		vapp.push_back(elem(bbl,~Tables::mask_right[low-WMUL(bbl)]));
+		vapp.push_back(elem(bbl,~Tables::mask_low[low-WMUL(bbl)]));
 	}
 	++block;
 	
@@ -118,7 +118,7 @@ int	 BitBoardS::set_bit	(int low, int high){
 			for(int i=block; i<bbh; ++i){
 				m_aBB.push_back(elem(i,ONE));
 			}
-			m_aBB.push_back(elem(bbh,~Tables::mask_left[high-WMUL(bbh)]));
+			m_aBB.push_back(elem(bbh,~Tables::mask_high[high-WMUL(bbh)]));
 			req_sorting=true;
 			break;
 		}
@@ -126,10 +126,10 @@ int	 BitBoardS::set_bit	(int low, int high){
 		//exit condition II
 		if(block==bbh){
 			if(p.second->index==block){ //block exists: trim and overwrite
-				p.second->bb|=~Tables::mask_left[high-WMUL(bbh)];
+				p.second->bb|=~Tables::mask_high[high-WMUL(bbh)];
 				break;
 			}else{ //block doesn't exist, trim and append
-				m_aBB.push_back(elem(bbh,~Tables::mask_left[high-WMUL(bbh)]));
+				m_aBB.push_back(elem(bbh,~Tables::mask_high[high-WMUL(bbh)]));
 				req_sorting=true;
 				break;
 			}
@@ -168,13 +168,13 @@ int BitBoardS::init_bit (int low, int high){
 	
 	//same bitblock
 	if(bbh==bbl){
-		BITBOARD bb= ~Tables::mask_right[low-WMUL(bbl)];
-		m_aBB.push_back(elem(bbl, bb & ~Tables::mask_left[high-WMUL(bbh)]));
+		BITBOARD bb= ~Tables::mask_low[low-WMUL(bbl)];
+		m_aBB.push_back(elem(bbl, bb & ~Tables::mask_high[high-WMUL(bbh)]));
 		return 0;
 	}
 
 	//first
-	m_aBB.push_back(elem(bbl, ~Tables::mask_right[low-WMUL(bbl)]));
+	m_aBB.push_back(elem(bbl, ~Tables::mask_low[low-WMUL(bbl)]));
 
 	//middle
 	for(int block=bbl+1; block<bbh; ++block){
@@ -182,7 +182,7 @@ int BitBoardS::init_bit (int low, int high){
 	}
 
 	//last
-	m_aBB.push_back(elem(bbh, ~Tables::mask_left[high-WMUL(bbh)]));
+	m_aBB.push_back(elem(bbh, ~Tables::mask_high[high-WMUL(bbh)]));
 	
 return 0;
 }
@@ -379,7 +379,7 @@ int BitBoardS::clear_bit (int low, int high){
 		if(pl.second==m_aBB.end()) return 0;
 
 		if(pl.first){	//lower block exists
-			pl.second->bb&=Tables::mask_right[low-WMUL(bbl)];
+			pl.second->bb&=Tables::mask_low[low-WMUL(bbl)];
 			++pl.second;
 		}
 
@@ -390,7 +390,7 @@ int BitBoardS::clear_bit (int low, int high){
 		bbh=WDIV(high); 
 		ph=find_block(bbh);
 		if(ph.first){	//upper block exists
-			ph.second->bb&=Tables::mask_left[high-WMUL(bbh)];
+			ph.second->bb&=Tables::mask_high[high-WMUL(bbh)];
 		}
 
 		//remaining
@@ -419,28 +419,28 @@ int BitBoardS::clear_bit (int low, int high){
 		//updates lower bitblock
 		if(pl.first){	//lower block exists
 			if(bbh==bbl){		//case update in the same bitblock
-				BITBOARD bb_low=pl.second->bb & Tables::mask_left[high-WMUL(bbh)];
-				BITBOARD bb_high=pl.second->bb &Tables::mask_right[low-WMUL(bbl)];
+				BITBOARD bb_low=pl.second->bb & Tables::mask_high[high-WMUL(bbh)];
+				BITBOARD bb_high=pl.second->bb &Tables::mask_low[low-WMUL(bbl)];
 				pl.second->bb=bb_low | bb_high;
 				return 0;
 			}
 
 			//update lower block
-			pl.second->bb&=Tables::mask_right[low-WMUL(bbl)];
+			pl.second->bb&=Tables::mask_low[low-WMUL(bbl)];
 			++pl.second;
 		}
 
 		//updates upper bitblock
 		if(ph.first){	//lower block exists
 			if(bbh==bbl){		//case update in the same bitblock
-				BITBOARD bb_low=pl.second->bb & Tables::mask_left[high-WMUL(bbh)];
-				BITBOARD bb_high=pl.second->bb &Tables::mask_right[low-WMUL(bbl)];
+				BITBOARD bb_low=pl.second->bb & Tables::mask_high[high-WMUL(bbh)];
+				BITBOARD bb_high=pl.second->bb &Tables::mask_low[low-WMUL(bbl)];
 				pl.second->bb=bb_low | bb_high;
 				return 0;
 			}
 
 			//update lower block
-			ph.second->bb&=Tables::mask_left[high-WMUL(bbh)];
+			ph.second->bb&=Tables::mask_high[high-WMUL(bbh)];
 		}
 
 		//remaining
@@ -678,7 +678,7 @@ int BitBoardS::next_bit(int nBit/* 0 based*/)  const {
 	for(int i=0; i<m_aBB.size(); i++){
 		if(m_aBB[i].index<index) continue;					//(*)
 		if(m_aBB[i].index==index){
-			int npos=bblock::lsb64_de_Bruijn(Tables::mask_left[WMOD(nBit) /*-WORD_SIZE*index*/] & m_aBB[i].bb);
+			int npos=bblock::lsb64_de_Bruijn(Tables::mask_high[WMOD(nBit) /*-WORD_SIZE*index*/] & m_aBB[i].bb);
 			if(npos!=EMPTY_ELEM) return (WMUL(index) + npos);
 			continue;
 		}
@@ -710,7 +710,7 @@ int BitBoardS::prev_bit(int nBit/* 0 bsed*/) const{
 	for(int i=m_aBB.size()-1; i>=0; i--){
 		if(m_aBB[i].index>index) continue;							//(*)
 		if(m_aBB[i].index==index){
-			int npos=bblock::msb64_lup(Tables::mask_right[WMOD(nBit) /*-WORD_SIZE*index*/] & m_aBB[i].bb);
+			int npos=bblock::msb64_lup(Tables::mask_low[WMOD(nBit) /*-WORD_SIZE*index*/] & m_aBB[i].bb);
 			if(npos!=EMPTY_ELEM) return (WMUL(index) + npos);
 			continue;
 		}

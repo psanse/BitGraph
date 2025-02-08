@@ -45,7 +45,7 @@ BitBoardN&  OR (int from, const BitBoardN& lhs, const BitBoardN& rhs,  BitBoardN
 	}		
 
 	//special case-first block
-	res.vBB_[first_block] = lhs.vBB_[first_block] | ( rhs.vBB_[first_block] & ~Tables::mask_right[from - WMUL(first_block)] );
+	res.vBB_[first_block] = lhs.vBB_[first_block] | ( rhs.vBB_[first_block] & ~Tables::mask_low[from - WMUL(first_block)] );
 	
 	return res;
 }
@@ -65,7 +65,7 @@ BitBoardN&  OR(int v, bool from, const BitBoardN& lhs, const BitBoardN& rhs, Bit
 		}
 
 		//critical block
-		res.vBB_[nBB] = lhs.vBB_[nBB] | (rhs.vBB_[nBB] & ~Tables::mask_right[pos]);
+		res.vBB_[nBB] = lhs.vBB_[nBB] | (rhs.vBB_[nBB] & ~Tables::mask_low[pos]);
 
 	}
 	else {
@@ -78,7 +78,7 @@ BitBoardN&  OR(int v, bool from, const BitBoardN& lhs, const BitBoardN& rhs, Bit
 		}
 
 		//critical block
-		res.vBB_[nBB] = lhs.vBB_[nBB] | (rhs.vBB_[nBB] & ~Tables::mask_left[pos]);
+		res.vBB_[nBB] = lhs.vBB_[nBB] | (rhs.vBB_[nBB] & ~Tables::mask_high[pos]);
 	}
 		
 	return res;
@@ -128,7 +128,7 @@ int* AND (int lastBit, const BitBoardN& lhs, const BitBoardN& rhs, int bitset[],
 	}
 
 	//trim last
-	bb = rhs.vBB_[nbb] & lhs.vBB_[nbb] & Tables::mask_right[WMOD(lastBit)];
+	bb = rhs.vBB_[nbb] & lhs.vBB_[nbb] & Tables::mask_low[WMOD(lastBit)];
 	while(bb){
 		int v = bblock::lsb64_intrinsic(bb);
 		bitset[size++] = WMUL(nbb) + v;

@@ -405,7 +405,7 @@ int BitBoardS::prev_bit	(int nBit){
 			return msbn64(nElem);		//updates nElem with the corresponding bitblock
 	
 	int index=WDIV(nBit);
-	int npos=bblock::msb64_lup(Tables::mask_right[WMOD(nBit) /*nBit-WMUL(index)*/] & m_aBB[nElem].bb);
+	int npos=bblock::msb64_lup(Tables::mask_low[WMOD(nBit) /*nBit-WMUL(index)*/] & m_aBB[nElem].bb);
 	if(npos!=EMPTY_ELEM)
 		return (WMUL(index) + npos);
 	
@@ -427,7 +427,7 @@ int BitBoardS::next_bit(int nBit){
 		return lsbn64(nElem);		//updates nElem with the corresponding bitblock
 	
 	int index=WDIV(nBit);
-	int npos=bblock::lsb64_de_Bruijn(Tables::mask_left[WMOD(nBit) /*-WORD_SIZE*index*/] & m_aBB[nElem].bb);
+	int npos=bblock::lsb64_de_Bruijn(Tables::mask_high[WMOD(nBit) /*-WORD_SIZE*index*/] & m_aBB[nElem].bb);
 	if(npos!=EMPTY_ELEM)
 		return (WMUL(index) + npos);
 	
@@ -538,7 +538,7 @@ int BitBoardS::popcn64(int nBit) const{
 	velem_cit it=lower_bound(m_aBB.begin(), m_aBB.end(), elem(nBB), elem_less());
 	if(it!=m_aBB.end()){
 		if(it->index==nBB){
-			val.b= it->bb&~Tables::mask_right[WMOD(nBit)];
+			val.b= it->bb&~Tables::mask_low[WMOD(nBit)];
 			npc+= Tables::pc[val.c[0]] + Tables::pc[val.c[1]] + Tables::pc[val.c[2]] + Tables::pc[val.c[3]];
 			it++;
 		}
@@ -887,14 +887,14 @@ int	 BitBoardS::erase_bit (int low, int high){
 	if(itl!=m_aBB.end()){
 		if(itl->index==bbl){	//lower block exists
 			if(bbh==bbl){		//case update in the same bitblock
-				BITBOARD bb_low=itl->bb & Tables::mask_left[high-WMUL(bbh)];
-				BITBOARD bb_high=itl->bb &Tables::mask_right[low-WMUL(bbl)];
+				BITBOARD bb_low=itl->bb & Tables::mask_high[high-WMUL(bbh)];
+				BITBOARD bb_high=itl->bb &Tables::mask_low[low-WMUL(bbl)];
 				itl->bb=bb_low | bb_high;
 				return 0;
 			}
 
 			//update lower block
-			itl->bb&=Tables::mask_right[low-WMUL(bbl)];
+			itl->bb&=Tables::mask_low[low-WMUL(bbl)];
 			++itl;
 		}
 
@@ -903,13 +903,13 @@ int	 BitBoardS::erase_bit (int low, int high){
 			if(itl->index>=bbh){		//exit condition
 				if(itl->index==bbh){	//extra processing if the end block exists
 					if(bbh==bbl){		
-						BITBOARD bb_low=itl->bb & Tables::mask_left[high-WMUL(bbh)];
-						BITBOARD bb_high=itl->bb &Tables::mask_right[low-WMUL(bbl)];
+						BITBOARD bb_low=itl->bb & Tables::mask_high[high-WMUL(bbh)];
+						BITBOARD bb_high=itl->bb &Tables::mask_low[low-WMUL(bbl)];
 						itl->bb=bb_low | bb_high;
 						return 0;
 					}
 
-					itl->bb &=Tables::mask_left[high-WMUL(bbh)];
+					itl->bb &=Tables::mask_high[high-WMUL(bbh)];
 				}
 			return 0;
 			}
@@ -933,7 +933,7 @@ int BitBoardS::init_bit (int high, const BitBoardS& bb_add){
 	else{
 		if(p.first){
 			copy(bb_add.begin(), p.second, insert_iterator<velem>(m_aBB,m_aBB.begin()));
-			m_aBB.push_back(elem(bbh, p.second->bb & ~Tables::mask_left[high-WMUL(bbh)]));
+			m_aBB.push_back(elem(bbh, p.second->bb & ~Tables::mask_high[high-WMUL(bbh)]));
 		}else{
 			copy(bb_add.begin(), ++p.second, insert_iterator<velem>(m_aBB,m_aBB.begin()));
 		}
@@ -963,7 +963,7 @@ int  BitBoardS::init_bit (int low, int high,  const BitBoardS& bb_add){
 				return 0;
 			}else{
 				//add lower block
-				m_aBB.push_back(elem(bbl, itl->bb &~ Tables::mask_right[low-WMUL(bbl)] ));
+				m_aBB.push_back(elem(bbl, itl->bb &~ Tables::mask_low[low-WMUL(bbl)] ));
 				++itl;
 			}
 		}
@@ -972,7 +972,7 @@ int  BitBoardS::init_bit (int low, int high,  const BitBoardS& bb_add){
 		for(; itl!=bb_add.end(); ++itl){
 			if(itl->index>=bbh){		//exit condition
 				if(itl->index==bbh){	
-					m_aBB.push_back(elem(bbh, itl->bb&~Tables::mask_left[high-WMUL(bbh)]));
+					m_aBB.push_back(elem(bbh, itl->bb&~Tables::mask_high[high-WMUL(bbh)]));
 				}
 			return 0;
 			}

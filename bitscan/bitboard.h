@@ -236,8 +236,8 @@ namespace bblock {
 	* @returns 64-bit bitblock mask
 	**/
 	 inline
-	 BITBOARD MASK_1(int low, int high) { return Tables::mask_mid[low][high]; 
-												/* [low] return ~Tables::mask_right[low] & ~Tables::mask_left[high];*/ }
+	 BITBOARD MASK_1(int low, int high)			{ return Tables::mask_mid[low][high]; 
+												/* [low] return ~Tables::mask_low[low] & ~Tables::mask_high[high];*/ }
 	
 	 /**
 	 * @brief Sets to 1 all bits in the closed range [0, 63]
@@ -245,7 +245,7 @@ namespace bblock {
 	 * @returns 64-bit bitblock mask
 	 **/
 	 inline
-	 BITBOARD MASK_1_RIGHT	(int idx)			{ return ~Tables::mask_left[idx]; }
+	 BITBOARD MASK_1_RIGHT	(int idx)			{ return ~Tables::mask_high[idx]; }
 	
 	 /**
 	 * @brief Sets to 1 all bits in the closed range [idx, 63]
@@ -253,7 +253,7 @@ namespace bblock {
 	 * @returns 64-bit bitblock mask
 	 **/
 	 inline
-	 BITBOARD MASK_1_LEFT	(int idx)			{ return ~Tables::mask_right[idx]; }
+	 BITBOARD MASK_1_LEFT	(int idx)			{ return ~Tables::mask_low[idx]; }
 
 
 	/**
@@ -263,7 +263,7 @@ namespace bblock {
 	**/
 	 inline
 	 BITBOARD MASK_0		(int low, int high) {  return ~Tables::mask_mid[low][high];
-													/*return Tables::mask_right[low] | Tables::mask_left[high];*/ }
+													/*return Tables::mask_low[low] | Tables::mask_high[high];*/ }
 	
 	 /**
 	* @brief Sets to 0 all bits in the closed range [0, idx]
@@ -271,7 +271,7 @@ namespace bblock {
 	* @returns 64-bit bitblock mask
 	**/
 	 inline
-	 BITBOARD MASK_0_RIGHT	(int idx)			{ return Tables::mask_left[idx]; }
+	 BITBOARD MASK_0_RIGHT	(int idx)			{ return Tables::mask_high[idx]; }
 	 
 	 /**
 	* @brief Sets to 0 all bits in the closed range [idx, 63]
@@ -279,7 +279,7 @@ namespace bblock {
 	* @returns 64-bit bitblock mask
 	**/
 	 inline
-	 BITBOARD MASK_0_LEFT	(int idx)			{ return Tables::mask_right[idx]; }
+	 BITBOARD MASK_0_LEFT	(int idx)			{ return Tables::mask_low[idx]; }
 	
 	/**
 	* @brief sets to 0 the bits of the bitblock bb to the right of index (the index-bit is not trimmed)
@@ -289,7 +289,7 @@ namespace bblock {
 	* @date 30/01/2015 
 	**/
 	 inline
-	 BITBOARD trim_right	(BITBOARD bb, int idx) { return bb &~ Tables::mask_right[idx]; }
+	 BITBOARD trim_right	(BITBOARD bb, int idx) { return bb &~ Tables::mask_low[idx]; }
 
 	/**
 	* @brief sets to 0 the bits of the bitblock bb to the left side of index (the index-bit is not trimmed)
@@ -299,7 +299,7 @@ namespace bblock {
 	* @date 30/01/2015 
 	**/
 	 inline
-	 BITBOARD trim_left		(BITBOARD bb, int idx) { return bb &~ Tables::mask_left[idx]; }
+	 BITBOARD trim_left		(BITBOARD bb, int idx) { return bb &~ Tables::mask_high[idx]; }
 
 
 	 /**

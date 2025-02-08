@@ -821,7 +821,7 @@ int BitBoardN::next_bit(int bit) const{
 	int bbl = WDIV(bit);
 
 	//looks for the next bit in the current block
-	int npos = bblock::lsb64_de_Bruijn(Tables::mask_left[bit - WMUL(bbl) /*WMOD(bit)*/] & vBB_[bbl]);
+	int npos = bblock::lsb64_de_Bruijn(Tables::mask_high[bit - WMUL(bbl) /*WMOD(bit)*/] & vBB_[bbl]);
 	if (npos >= 0) {
 		//////////////////////////////
 		return (npos + WMUL(bbl));
@@ -868,7 +868,7 @@ inline int BitBoardN::prev_bit(int bit) const{
 	int bbh = WDIV(bit);
 	
 	//looks for the msb in the (trimmed) current block
-	int npos = bblock::msb64_lup( Tables::mask_right[bit - WMUL(bbh) /* WMOD(bit) */] & vBB_[bbh]);
+	int npos = bblock::msb64_lup( Tables::mask_low[bit - WMUL(bbh) /* WMOD(bit) */] & vBB_[bbh]);
 	if (npos != EMPTY_ELEM) {
 		return ( npos + WMUL(bbh) );
 	}
@@ -1209,8 +1209,8 @@ BitBoardN&  BitBoardN::erase_bit (int firstBit, int lastBit){
 			vBB_[i] = ZERO;
 		}
 				
-		vBB_[bbh] &= bblock::MASK_0_RIGHT	(lastBit - WMUL(bbh));					//Tables::mask_left
-		vBB_[bbl] &= bblock::MASK_0_LEFT	(firstBit - WMUL(bbl));					//Tables::mask_right	
+		vBB_[bbh] &= bblock::MASK_0_RIGHT	(lastBit - WMUL(bbh));					//Tables::mask_high
+		vBB_[bbl] &= bblock::MASK_0_LEFT	(firstBit - WMUL(bbl));					//Tables::mask_low	
 	}
 
 	return *this;
@@ -1568,7 +1568,7 @@ BitBoardN& AND(int lastBit, const BitBoardN& lhs, const BitBoardN& rhs, BitBoard
 	}
 
 	//trim last part of the bitblock - including lastBit
-	res.vBB_[nbb] &= Tables::mask_right[lastBit - WMUL(nbb) /* WMOD(lastBit)*/];
+	res.vBB_[nbb] &= Tables::mask_low[lastBit - WMUL(nbb) /* WMOD(lastBit)*/];
 
 	//delete the rest of bitstring if the operation is not lazy
 	if (Erase) {

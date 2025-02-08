@@ -214,7 +214,7 @@ Graph<T>& Graph<T>::create_subgraph (std::size_t first_k, Graph<T>& newg) const 
 			newg.adj_[i].bitblock(j)=adj_[i].bitblock(j);
 		}
 		//trims last bitblock
-		newg.adj_[i].bitblock(bbh) &= ~Tables::mask_left[WMOD(first_k - 1)];
+		newg.adj_[i].bitblock(bbh) &= ~Tables::mask_high[WMOD(first_k - 1)];
 	}
 	
 	return newg;

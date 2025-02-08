@@ -167,8 +167,8 @@ namespace bblock {
 		dest = source & MASK_1(firstBit, lastBit);
 		
 		//add left of lastBit and right of firstBit
-		dest |= destOri & Tables::mask_left [lastBit];
-		dest |= destOri & Tables::mask_right[firstBit];
+		dest |= destOri & Tables::mask_high [lastBit];
+		dest |= destOri & Tables::mask_low[firstBit];
 	}
 
 	void copy_left (int bit, const BITBOARD& source, BITBOARD& dest)
@@ -179,7 +179,7 @@ namespace bblock {
 		dest = source & MASK_1_LEFT(bit);
 
 		//add right part of the block (excluding bit)
-		dest |= destOri & Tables::mask_right[bit];
+		dest |= destOri & Tables::mask_low[bit];
 
 	}
 
@@ -191,7 +191,7 @@ namespace bblock {
 		dest = source & MASK_1_RIGHT(bit);
 
 		//add right part of the block (excluding bit)
-		dest |= destOri & Tables::mask_left[bit];
+		dest |= destOri & Tables::mask_high[bit];
 	}
 
 }//end namespace bblock

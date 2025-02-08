@@ -117,7 +117,7 @@ int BBIntrinS::popcn64(int nBit) const{
 	velem_cit it=lower_bound(m_aBB.begin(), m_aBB.end(), elem(nBB), elem_less());
 	if(it!=m_aBB.end()){
 		if(it->index==nBB){
-			BITBOARD bb= it->bb&~Tables::mask_right[WMOD(nBit)];
+			BITBOARD bb= it->bb&~Tables::mask_low[WMOD(nBit)];
 			pc+= __popcnt64(bb);
 			it++;
 		}
@@ -198,7 +198,7 @@ inline int BBIntrinS::next_bit() {
 	unsigned long posbb;
 			
 	//search for next bit in the last block
-	if(_BitScanForward64(&posbb, m_aBB[m_scan.bbi].bb & Tables::mask_left[m_scan.pos])){
+	if(_BitScanForward64(&posbb, m_aBB[m_scan.bbi].bb & Tables::mask_high[m_scan.pos])){
 		m_scan.pos =posbb;
 		return (posbb + WMUL(m_aBB[m_scan.bbi].index));
 	}else{											//search in the remaining blocks
@@ -227,7 +227,7 @@ inline int BBIntrinS::next_bit(int& block_index) {
 	unsigned long posbb;
 			
 	//search for next bit in the last block
-	if(_BitScanForward64(&posbb, m_aBB[m_scan.bbi].bb & Tables::mask_left[m_scan.pos])){
+	if(_BitScanForward64(&posbb, m_aBB[m_scan.bbi].bb & Tables::mask_high[m_scan.pos])){
 		m_scan.pos =posbb;
 		block_index= m_aBB[m_scan.bbi].index;
 		return (posbb + WMUL(m_aBB[m_scan.bbi].index));
@@ -258,7 +258,7 @@ inline int BBIntrinS::prev_bit	() {
 	unsigned long posbb;
 				
 	//search int the last table
-	if(_BitScanReverse64(&posbb, m_aBB[m_scan.bbi].bb & Tables::mask_right[m_scan.pos])){
+	if(_BitScanReverse64(&posbb, m_aBB[m_scan.bbi].bb & Tables::mask_low[m_scan.pos])){
 		m_scan.pos =posbb;
 		return (posbb + WMUL(m_aBB[m_scan.bbi].index));
 	}else{											//not found in the last table. search in the rest
