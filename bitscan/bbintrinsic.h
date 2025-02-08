@@ -34,12 +34,12 @@ using namespace std;
 //
 ///////////////////////////////////
 
-class BBIntrin: public BitBoardN{
+class BBIntrin: public BitSet{
 public:	
 
 //constructors / destructors
 	
-	using BitBoardN::BitBoardN;			//inherit constructors	
+	using BitSet::BitSet;			//inherit constructors	
 
 	virtual ~BBIntrin				() = default;
 	
@@ -142,7 +142,7 @@ inline int BBIntrin::next_bit(int &nBB_new)  {
 // Version that use static data of the last bit position and the last table
 //
 // COMMENTS
-// 1-Require previous assignment BitBoardN::scan=0 and BBIntrin::scanv=MASK_LIM
+// 1-Require previous assignment BitSet::scan=0 and BBIntrin::scanv=MASK_LIM
 
 	unsigned long posInBB;
 			
@@ -171,7 +171,7 @@ inline int BBIntrin::next_bit(int &nBB_new,  BBIntrin& bbN_del ) {
 // Version that use static data of the last bit position and the last table
 //
 // COMMENTS
-// 1-Require previous assignment BitBoardN::scan=0 and BitBoardN::scanv=MASK_LIM
+// 1-Require previous assignment BitSet::scan=0 and BitSet::scanv=MASK_LIM
 
 	unsigned long posInBB;
 			
@@ -319,7 +319,7 @@ inline int BBIntrin::prev_bit		() {
 // BitScan not destructive in reverse order (end-->begin)
 //
 // COMMENTS
-// 1-Require previous assignment BitBoardN::scan=0 and BitBoardN::scanv=MASK_LIM
+// 1-Require previous assignment BitSet::scan=0 and BitSet::scanv=MASK_LIM
 
 	unsigned long posInBB;
 				
@@ -346,7 +346,7 @@ inline int BBIntrin::prev_bit	(int& nBB) {
 // BitScan not destructive in reverse order (end-->begin)
 //
 // COMMENTS
-// 1-Require previous assignment BitBoardN::scan=0 and BitBoardN::scanv=MASK_LIM
+// 1-Require previous assignment BitSet::scan=0 and BitSet::scanv=MASK_LIM
 
 	unsigned long posInBB;
 				

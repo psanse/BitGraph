@@ -278,11 +278,11 @@ virtual	Graph& create_subgraph			(std::size_t first_k, Graph& g) const;
 	* @param set input set of vertices
 	* @param g ouptut induced subgraph
 	*/
-	void remove_vertices				(const BitBoardN& set, Graph& g);
+	void remove_vertices				(const BitSet& set, Graph& g);
 
 //////////////	
 // deleted - CHECK	
-	virtual void remove_vertices		(const BitBoardN& set) = delete;	//commented out implementation - EXPERIMENTAL
+	virtual void remove_vertices		(const BitSet& set) = delete;	//commented out implementation - EXPERIMENTAL
 	
 /////////////
 // Boolean properties

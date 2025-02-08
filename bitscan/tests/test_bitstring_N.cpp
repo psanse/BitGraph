@@ -1,6 +1,6 @@
 /**
 * @file test_bitstring_N.cpp
-* @brief Unit tests of the BitBoardN class
+* @brief Unit tests of the BitSet class
 * @details Taken from the original test_bitstring.cpp (2014), filtering out other bitstring classes in the hierarchy
 * @created 31/01/2025
 * @authos pss
@@ -26,7 +26,7 @@ protected:
 
 //////////////////////
 //data members
-	BitBoardN bbn;
+	BitSet bbn;
 	set<int> sol;
 };
 
@@ -81,7 +81,7 @@ TEST_F(BBNScanningTest, reverse_non_destructive_with_starting_point) {
 TEST_F(BBNScanningTest, destructive) {
 	std::set<int> res;
 
-	BitBoardN bbN1(bbn);
+	BitSet bbN1(bbn);
 	int nBit = EMPTY_ELEM;
 	while ((nBit = bbN1.next_bit_if_del(nBit)) != EMPTY_ELEM) {
 		res.insert(nBit);
@@ -95,7 +95,7 @@ TEST_F(BBNScanningTest, destructive) {
 TEST_F(BBNScanningTest, reverse_destructive) {
 	std::set<int> res;
 
-	BitBoardN bbN1(bbn);
+	BitSet bbN1(bbn);
 	int nBit = EMPTY_ELEM;
 	while ((nBit = bbN1.prev_bit(nBit)) != EMPTY_ELEM) {
 		res.insert(nBit);
@@ -107,7 +107,7 @@ TEST_F(BBNScanningTest, reverse_destructive) {
 }
 
 TEST(BBNtest, set_bit_basic) {
-	BitBoardN bb(130);
+	BitSet bb(130);
 	bb.set_bit(10);
 	bb.set_bit(20);
 	bb.set_bit(64);
@@ -126,7 +126,7 @@ TEST(BBNtest, set_bit_basic) {
 	EXPECT_FALSE(bb.is_bit(63));
 
 	//assignment
-	BitBoardN bb1(34);
+	BitSet bb1(34);
 	bb1.set_bit(22);
 	bb1.set_bit(23);
 	bb = bb1;
@@ -136,7 +136,7 @@ TEST(BBNtest, set_bit_basic) {
 	EXPECT_EQ(1, bb.number_of_bitblocks());
 
 	//copy constructor
-	BitBoardN bb2(bb);
+	BitSet bb2(bb);
 	EXPECT_TRUE(bb2.is_bit(22));
 	EXPECT_TRUE(bb2.is_bit(23));
 	EXPECT_EQ(1, bb2.number_of_bitblocks());
@@ -144,7 +144,7 @@ TEST(BBNtest, set_bit_basic) {
 
 TEST(BBNtest, set_bit_range) {
 
-	BitBoardN bb(130);
+	BitSet bb(130);
 
 	bb.set_bit(0, 64);
 	EXPECT_TRUE(bb.is_bit(0));
@@ -160,7 +160,7 @@ TEST(BBNtest, set_bit_range) {
 	EXPECT_FALSE(bb.is_bit(62));
 
 
-	BitBoardN bb1(130);
+	BitSet bb1(130);
 	bb1.set_bit(0, 0);
 	EXPECT_TRUE(bb1.is_bit(0));
 
@@ -176,7 +176,7 @@ TEST(BBNtest, set_bit_range) {
 	EXPECT_TRUE(bb1.is_bit(64));
 
 	//same range
-	BitBoardN bb2(130);
+	BitSet bb2(130);
 	bb2.set_bit(5, 5);
 	EXPECT_TRUE(1, bb2.popcn64());
 	EXPECT_TRUE(bb2.is_bit(5));
@@ -185,8 +185,8 @@ TEST(BBNtest, set_bit_range) {
 
 TEST(BBNtest, set_bit_from_another_bitstring) {
 
-	BitBoardN bb(130);
-	BitBoardN bb3(130);
+	BitSet bb(130);
+	BitSet bb3(130);
 	bb3.set_bit(50);
 	bb3.set_bit(80);
 	
@@ -200,12 +200,12 @@ TEST(BBNtest, set_bit_from_another_bitstring) {
 
 TEST(BBNtest, boolean_disjoint){
 
-	BitBoardN bb(130);
+	BitSet bb(130);
 	bb.set_bit(10);
 	bb.set_bit(20);
 	bb.set_bit(64);
 
-	BitBoardN bb1(130);
+	BitSet bb1(130);
 	bb1.set_bit(11);
 	bb1.set_bit(21);
 	bb1.set_bit(65);
@@ -216,7 +216,7 @@ TEST(BBNtest, boolean_disjoint){
 	bb1.set_bit(64);
 	EXPECT_FALSE(bb.is_disjoint(bb1));
 
-	BitBoardN bb2(130);
+	BitSet bb2(130);
 	bb2.set_bit(11);				//in common in bb1 and bb2 but not bb
 	bb2.set_bit(22);
 	bb2.set_bit(66);
@@ -228,12 +228,12 @@ TEST(BBNtest, boolean_disjoint){
 
 TEST(BBNtest, find_set_difference){
 
-	BitBoardN bb(130);
+	BitSet bb(130);
 	bb.set_bit(10);
 	bb.set_bit(20);
 	bb.set_bit(64);
 
-	BitBoardN bb1(130);
+	BitSet bb1(130);
 	bb1.set_bit(10);
 	bb1.set_bit(20);
 	bb1.set_bit(64);
@@ -266,7 +266,7 @@ TEST(BBNtest, find_set_difference){
 }
 
 TEST(BBNtest, erase_bit_range){
-	BitBoardN bb(130);
+	BitSet bb(130);
 	bb.set_bit(0, 129);
 
 	bb.erase_bit(0, 64);
@@ -279,7 +279,7 @@ TEST(BBNtest, erase_bit_range){
 	EXPECT_FALSE(bb.is_bit(115));
 
 	//same range
-	BitBoardN bb1(130);
+	BitSet bb1(130);
 	bb.set_bit(0, 129);
 
 	/////////////////////
@@ -294,13 +294,13 @@ TEST(BBNtest, erase_bit_union){
 /////////////
 // erases the union of two sets from bitset caller
 
-	BitBoardN bb(130);
+	BitSet bb(130);
 	bb.set_bit(0, 129);
 
-	BitBoardN bb1(130);
+	BitSet bb1(130);
 	bb1.set_bit(0, 63);
 
-	BitBoardN bb2(130);
+	BitSet bb2(130);
 	bb2.set_bit(65, 129);
 	
 	//////////////////////////
@@ -313,7 +313,7 @@ TEST(BBNtest, erase_bit_union){
 
 TEST(BBNtest, population_count){
 
-	BitBoardN bb(130);
+	BitSet bb(130);
 	bb.set_bit(10);
 	bb.set_bit(20);
 	bb.set_bit(64);
@@ -333,7 +333,7 @@ TEST(BBNtest, to_vector) {
 
 	const int POPULATION_SIZE = 130;
 
-	BitBoardN bb(POPULATION_SIZE);
+	BitSet bb(POPULATION_SIZE);
 	bb.set_bit(10);
 	bb.set_bit(20);
 	bb.set_bit(64);
@@ -373,7 +373,7 @@ TEST(BBNtest, to_vector) {
 
 TEST(BBNtest, cast_to_vector) {
 
-	BitBoardN bb(130);
+	BitSet bb(130);
 	bb.set_bit(10);
 	bb.set_bit(20);
 	bb.set_bit(64);
@@ -393,7 +393,7 @@ TEST(BBNtest, vector_operations) {
 
 	const int POPULATION_SIZE = 50;
 
-	BitBoardN bbN1(POPULATION_SIZE);
+	BitSet bbN1(POPULATION_SIZE);
 	vector<int> lv = {10, 20, 45, 62};
 
 	bbN1.set_bit(lv[0]);
@@ -403,7 +403,7 @@ TEST(BBNtest, vector_operations) {
 
 	////////////////////////
 	//construction from vector (bitset with lv.size)
-	BitBoardN bbN2(lv);
+	BitSet bbN2(lv);
 
 	vector<int> lvN1 = to_vector(bbN1);
 	vector<int> lvN2 = to_vector(bbN2);
@@ -414,13 +414,13 @@ TEST(BBNtest, vector_operations) {
 	///////////////
 	//construction from vector and popsize (12/11/16)
 	lv = {10, 20};
-	BitBoardN bbN3(POPULATION_SIZE, lv);
+	BitSet bbN3(POPULATION_SIZE, lv);
 	EXPECT_EQ(2,bbN3.popcn64());
 	EXPECT_TRUE(bbN3.is_bit(10));
 	EXPECT_TRUE(bbN3.is_bit(20));
 
 	//bitstring with population size 20 
-	BitBoardN bbN4(21, lv);						//vector element 20 will not make part of the bitstring
+	BitSet bbN4(21, lv);						//vector element 20 will not make part of the bitstring
 	EXPECT_EQ(2, bbN4.popcn64());
 	EXPECT_TRUE(bbN4.is_bit(10));
 	EXPECT_TRUE(bbN4.is_bit(20));
@@ -430,7 +430,7 @@ TEST(BBNtest, vector_operations) {
 	lv = { 10, 19, 45, 62, 250 };
 	
 	//bbN5 = {10, 19, 45, 62}
-	BitBoardN bbN5(100);						//max population size 100						
+	BitSet bbN5(100);						//max population size 100						
 	bbN5.set_bit(lv);
 
 	EXPECT_EQ(4, bbN5.popcn64());
@@ -444,9 +444,9 @@ TEST(BBNtest, vector_operations) {
 	//bbN5.print();
 }
 
-TEST(BBNtest, BitBoardNTo0) {
-	BitBoardN bb1(25);
-	BitBoardN bb2(bb1);
+TEST(BBNtest, BitSetTo0) {
+	BitSet bb1(25);
+	BitSet bb2(bb1);
 
 	bb1.set_bit();			//sets to ONE the whole bitblock
 	bb2.set_bit(0,24);
@@ -490,9 +490,9 @@ TEST(BBNtest, GenRandom){
 
 TEST(BBNtest, set_block){
 
-	BitBoardN bb(130);
+	BitSet bb(130);
 	bb.set_bit(0,54);
-	BitBoardN bb1(130);
+	BitSet bb1(130);
 	bb1.set_bit(50,100);
 
 	bb.erase_bit();
@@ -510,9 +510,9 @@ TEST(BBNtest, set_block){
 
 TEST(BBNtest, erase_block) {
 	
-	BitBoardN bb(130);
+	BitSet bb(130);
 	bb.set_bit(49, 54);
-	BitBoardN bb1(130);
+	BitSet bb1(130);
 	bb1.set_bit(50, 100);
 		
 	bb.erase_block(0, -1, bb1);			//bb={49}
@@ -524,8 +524,8 @@ TEST(BBNtest, erase_block) {
 
 TEST(BBNtest, find_single_bit_intersection){
 
-	BitBoardN bb(130);
-	BitBoardN bb1(130);
+	BitSet bb(130);
+	BitSet bb1(130);
 	bb.set_bit(1,10);
 	bb1.set_bit(10,20);
 	int v = EMPTY_ELEM;
@@ -544,7 +544,7 @@ TEST(BBNtest,is_singleton){
 // Determines if there is 0 or 1 bit in a range,
 // both included
  
-	BitBoardN bb(130);
+	BitSet bb(130);
 	bb.set_bit(62); bb.set_bit(63); bb.set_bit(64);
 	EXPECT_EQ(0,bb.is_singleton(10, 20));
 	EXPECT_EQ(1,bb.is_singleton(60, 62));
@@ -562,13 +562,13 @@ TEST(BBNtest, find_first_common_bit){
 //////////////////////
 // testing first element in common between sets 
 
-	BitBoardN bb(130);
+	BitSet bb(130);
 	bb.set_bit(10);
 	bb.set_bit(20);
 	bb.set_bit(64);
 
 	//assignment
-	BitBoardN bb1(130);
+	BitSet bb1(130);
 	bb1.set_bit(22);
 	bb1.set_bit(23);
 	bb1.set_bit(64);
@@ -589,7 +589,7 @@ TEST(BBNtest, find_first_common_bit){
 
 TEST(BBNtest, find_singleton) {
 	
-	BitBoardN bb(130);
+	BitSet bb(130);
 	bb.set_bit(10);
 	bb.set_bit(20);
 	bb.set_bit(64);
@@ -615,7 +615,7 @@ TEST(BBNtest, find_singleton) {
 
 TEST(BBNtest, IO) {
 
-	BitBoardN bb(32);
+	BitSet bb(32);
 	bb.set_bit(10);
 	bb.set_bit(20);
 	bb.set_bit(63);
@@ -630,9 +630,9 @@ TEST(BBNtest, IO) {
 
 TEST(BBNtest, AND) {
 
-	BitBoardN bb(130);
-	BitBoardN bb1(130);
-	BitBoardN bbresAND(130);
+	BitSet bb(130);
+	BitSet bb1(130);
+	BitSet bbresAND(130);
 
 	bb.set_bit(10);
 	bb.set_bit(20);
@@ -663,8 +663,8 @@ TEST(BBNtest, AND) {
 
 TEST(BBNtest, AND_by_blocks) {
 
-	BitBoardN bb(130);
-	BitBoardN bb1(130);
+	BitSet bb(130);
+	BitSet bb1(130);
 
 	bb.set_bit(10);
 	bb.set_bit(20);
@@ -674,7 +674,7 @@ TEST(BBNtest, AND_by_blocks) {
 	bb1.set_bit(100);
 
 	//AND of third block - rest of bits are always removed
-	BitBoardN bbresAND = AND_block(2, 2, bb, bb1);
+	BitSet bbresAND = AND_block(2, 2, bb, bb1);
 
 	////////////////////////////////
 	EXPECT_EQ(0, bbresAND.size());
@@ -698,8 +698,8 @@ TEST(BBNtest, AND_by_blocks) {
 
 TEST(BBNtest, AND_with_allocation) {
 
-	BitBoardN bb(130);
-	BitBoardN bb1(130);	
+	BitSet bb(130);
+	BitSet bb1(130);	
 
 	bb.set_bit(10);
 	bb.set_bit(20);
@@ -709,7 +709,7 @@ TEST(BBNtest, AND_with_allocation) {
 	bb1.set_bit(100);
 
 	//AND
-	BitBoardN bbresAND  =  AND(bb, bb1);
+	BitSet bbresAND  =  AND(bb, bb1);
 	EXPECT_TRUE(bbresAND.is_bit(10));
 	EXPECT_TRUE(bbresAND.is_bit(64));
 	EXPECT_EQ(2, bbresAND.popcn64());
@@ -720,9 +720,9 @@ TEST(BBNtest, AND_with_allocation) {
 
 TEST(BBNtest, OR) {
 
-	BitBoardN bb(130);
-	BitBoardN bb1(130);
-	BitBoardN bbresOR(130);
+	BitSet bb(130);
+	BitSet bb1(130);
+	BitSet bbresOR(130);
 
 	bb.set_bit(10);
 	bb.set_bit(20);
@@ -756,8 +756,8 @@ TEST(BBNtest, OR) {
 
 TEST(BBNtest, OR_by_blocks) {
 
-	BitBoardN bb(130);
-	BitBoardN bb1(130);
+	BitSet bb(130);
+	BitSet bb1(130);
 
 	bb.set_bit(10);
 	bb.set_bit(20);
@@ -767,7 +767,7 @@ TEST(BBNtest, OR_by_blocks) {
 	bb1.set_bit(100);
 
 	//OR creating a new bitset - rest of bits are always removed
-	BitBoardN bbresOR = OR_block(1, 1, bb, bb1);
+	BitSet bbresOR = OR_block(1, 1, bb, bb1);
 
 	////////////////////////////////
 	EXPECT_TRUE(bbresOR.is_bit(64));
@@ -802,7 +802,7 @@ TEST(BBNtest, OR_by_blocks) {
 TEST(BBNtest, DISABLED_algorithms) {
 	//simple test for algorithms in bbalg.h
 
-	BitBoardN bb(130);
+	BitSet bb(130);
 	bb.set_bit(10);
 	bb.set_bit(20);
 	bb.set_bit(64);

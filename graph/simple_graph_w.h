@@ -265,7 +265,7 @@ public:
 	
 	int max_graph_degree	()													{ return ptype::g_.max_graph_degree(); }
 	int degree				(int v)							const				{ return ptype::g_.degree(v); }
-	int degree				(int v, const BitBoardN& bbn)	const				{ return ptype::g_.degree(v, bbn); }
+	int degree				(int v, const BitSet& bbn)		const				{ return ptype::g_.degree(v, bbn); }
 
 	/*
 	* @brief Complement graph (currently name info of original graph is lost)

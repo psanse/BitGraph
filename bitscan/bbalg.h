@@ -219,7 +219,7 @@ void sbb_t<bitstring_t>::update_stack(){
 	}
 }
 
-inline std::vector<int> to_vector(const BitBoardN& bbn){
+inline std::vector<int> to_vector(const BitSet& bbn){
 	vector<int> res;
 
 	int v=EMPTY_ELEM;

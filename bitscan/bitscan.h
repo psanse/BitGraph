@@ -25,7 +25,7 @@
 using bitarray = BBIntrin;
 using watched_bitarray = BBSentinel;
 using sparse_bitarray = BBIntrinS;
-using simple_bitarray = BitBoardN;
+using simple_bitarray = BitSet;
 using simple_sparse_bitarray = BitBoardS;
 using bbo = BBObject;
 

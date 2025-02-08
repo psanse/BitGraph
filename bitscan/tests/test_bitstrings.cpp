@@ -22,7 +22,7 @@ protected:
 
 //////////////////////
 //data members
-	BitBoardN bbn;
+	BitSet bbn;
 	BBIntrin bbi;
 	BBSentinel bbs;
 	set<int> sol;
@@ -31,7 +31,7 @@ protected:
 
 
 TEST(Bitstrings, setters_and_getters) {
-	BitBoardN bb(130);
+	BitSet bb(130);
 	bb.set_bit(10);
 	bb.set_bit(20);
 	bb.set_bit(64);
@@ -42,7 +42,7 @@ TEST(Bitstrings, setters_and_getters) {
 	EXPECT_FALSE(bb.is_bit(63));
 
 	//assignment
-	BitBoardN bb1(34);
+	BitSet bb1(34);
 	bb1.set_bit(22);
 	bb1.set_bit(23);
 	bb=bb1;
@@ -52,7 +52,7 @@ TEST(Bitstrings, setters_and_getters) {
 	EXPECT_EQ(1,bb.number_of_bitblocks());
 
 	//copy constructor
-	BitBoardN bb2(bb);
+	BitSet bb2(bb);
 	EXPECT_TRUE(bb2.is_bit(22));
 	EXPECT_TRUE(bb2.is_bit(23));
 	EXPECT_EQ(1,bb2.number_of_bitblocks());
@@ -60,12 +60,12 @@ TEST(Bitstrings, setters_and_getters) {
 }
 
 TEST(Bitstrings, boolean_disjoint){
-	BitBoardN bb(130);
+	BitSet bb(130);
 	bb.set_bit(10);
 	bb.set_bit(20);
 	bb.set_bit(64);
 
-	BitBoardN bb1(130);
+	BitSet bb1(130);
 	bb1.set_bit(11);
 	bb1.set_bit(21);
 	bb1.set_bit(65);
@@ -76,7 +76,7 @@ TEST(Bitstrings, boolean_disjoint){
 	bb1.set_bit(64);
 	EXPECT_FALSE(bb.is_disjoint(bb1));
 
-	BitBoardN bb2(130);
+	BitSet bb2(130);
 	bb2.set_bit(11);				//in common in bb1 and bb2 but not bb
 	bb2.set_bit(22);
 	bb2.set_bit(66);
@@ -87,12 +87,12 @@ TEST(Bitstrings, boolean_disjoint){
 }
 
 TEST(Bitstrings, set_bit_range){
-	BitBoardN bb(130);
+	BitSet bb(130);
 	bb.set_bit(0, 64);
 	EXPECT_TRUE(bb.is_bit(0));
 	EXPECT_TRUE(bb.is_bit(64));
 	
-	BitBoardN bb1(130);
+	BitSet bb1(130);
 	bb1.set_bit(0, 0);
 	EXPECT_TRUE(bb1.is_bit(0));
 	
@@ -105,7 +105,7 @@ TEST(Bitstrings, set_bit_range){
 }
 
 TEST(Bitstrings, erase_bit_range){
-	BitBoardN bb(130);
+	BitSet bb(130);
 	bb.set_bit(0, 129);
 
 	bb.erase_bit(0, 64);
@@ -123,7 +123,7 @@ TEST(Bitstrings, erase_bit_range){
 TEST(Bitstrings, algorithms) {
 //simple test for algorithms in bbalg.h
 
-	BitBoardN bb(130);
+	BitSet bb(130);
 	bb.set_bit(10);
 	bb.set_bit(20);
 	bb.set_bit(64);
@@ -150,7 +150,7 @@ TEST(Bitstrings, population_count){
 }
 
 TEST(Bitstrings, to_vector){
-	BitBoardN bb(130);
+	BitSet bb(130);
 	bb.set_bit(10);
 	bb.set_bit(20);
 	bb.set_bit(64);
@@ -354,7 +354,7 @@ TEST_F(BitScanningTest, reverse_non_destructive_with_starting_point){
 TEST_F(BitScanningTest, destructive){
 	std::set<int> res;
 	
-	BitBoardN bbn1(bbn);
+	BitSet bbn1(bbn);
 	int nBit=EMPTY_ELEM;
 	while(true){
 		nBit=bbn1.next_bit_if_del(nBit);
@@ -398,7 +398,7 @@ TEST_F(BitScanningTest, destructive){
 TEST_F(BitScanningTest, reverse_destructive){
 	std::set<int> res;
 	
-	BitBoardN bbn1(bbn);
+	BitSet bbn1(bbn);
 	int nBit=EMPTY_ELEM;
 	while(true){
 		nBit=bbn1.prev_bit(nBit);		
@@ -446,9 +446,9 @@ TEST_F(BitScanningTest, reverse_destructive){
 //}
 
 
-TEST(BitBoardTests, BitBoardNTo0) {
-	BitBoardN bb1(25);
-	BitBoardN bb2(bb1);
+TEST(BitBoardTests, BitSetTo0) {
+	BitSet bb1(25);
+	BitSet bb2(bb1);
 
 	bb1.set_bit();			//sets to ONE the whole bitblock
 	bb2.set_bit(0,24);
@@ -503,7 +503,7 @@ protected:
 	}
 
 	vector<int> val;
-	BitBoardN bbn;
+	BitSet bbn;
 	BBIntrin bbi;
 	BBSentinel bbs;
 };
@@ -522,7 +522,7 @@ TEST(Bitstrings,is_singleton){
 // Determines if there is 0 or 1 bit in a range,
 // both included
  
-	BitBoardN bb(130);
+	BitSet bb(130);
 	bb.set_bit(62); bb.set_bit(63); bb.set_bit(64);
 	EXPECT_EQ(0,bb.is_singleton(10, 20));
 	EXPECT_EQ(1,bb.is_singleton(60, 62));

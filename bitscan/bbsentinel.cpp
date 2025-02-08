@@ -5,7 +5,7 @@
 
 using namespace std;
 
-BBSentinel&  AND (const BitBoardN& lhs, const BBSentinel& rhs,  BBSentinel& res){
+BBSentinel&  AND (const BitSet& lhs, const BBSentinel& rhs,  BBSentinel& res){
 	res.m_BBL=rhs.m_BBL;
 	res.m_BBH=rhs.m_BBH;
 	for(int i=rhs.m_BBL; i<=rhs.m_BBH; i++){
@@ -154,7 +154,7 @@ void BBSentinel::update_sentinels_to_v(int v){
 }
 
 std::ostream& BBSentinel::print(std::ostream& o, bool show_pc, bool endl ) const{
-	BitBoardN::print(o, show_pc, endl);
+	BitSet::print(o, show_pc, endl);
 	o<<"("<<m_BBL<<","<<m_BBH<<")";
 
 	return o;
@@ -200,12 +200,12 @@ void  BBSentinel::erase_bit	(){
 }
 
 
-BBSentinel& BBSentinel::erase_bit (const BitBoardN& bbn){
+BBSentinel& BBSentinel::erase_bit (const BitSet& bbn){
 //////////////////////////////
 // deletes 1-bits in bbn in current sentinel range
 // 
 // REMARKS:
-// 1.Has to be careful with BitBoardN cast to int in constructor
+// 1.Has to be careful with BitSet cast to int in constructor
 	
 	for(int i=m_BBL; i<=m_BBH; i++)
 		vBB_[i] &= ~ bbn.bitblock(i);		//**access
@@ -278,7 +278,7 @@ BBSentinel& BBSentinel::operator= (const  BBSentinel& bbs){
 
 }
 
-BBSentinel& BBSentinel::operator&=	(const  BitBoardN& bbn){
+BBSentinel& BBSentinel::operator&=	(const  BitSet& bbn){
 //////////////////
 // AND operation in the range of the sentinels
 

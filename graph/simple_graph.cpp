@@ -651,7 +651,7 @@ bool Graph<T>::is_self_loop () const{
 }
 
 template<class T>
-void Graph<T>::remove_vertices (const BitBoardN& bbn, Graph& g){
+void Graph<T>::remove_vertices (const BitSet& bbn, Graph& g){
 
 	//determine the size of the graph g
 	int pc = bbn.popcn64();
@@ -690,7 +690,7 @@ void Graph<T>::remove_vertices (const BitBoardN& bbn, Graph& g){
 }
 
 //template<class T>
-//void Graph<T>::remove_vertices (const BitBoardN& bbn){
+//void Graph<T>::remove_vertices (const BitSet& bbn){
 /////////////////
 //// Experimental: deletes input list of nodes by creating a temporal graph
 ////
