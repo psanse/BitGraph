@@ -6,7 +6,7 @@
 * TODO - add more tests, Check performance disable test (30/01/25)
 **/
 
-#include "bitscan/bitboard.h"
+#include "bitscan/bitblock.h"
 #include "gtest/gtest.h"
 #include <iostream>
 

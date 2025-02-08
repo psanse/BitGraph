@@ -3,7 +3,7 @@
 * @brief Implementation of the BitBoard class 
 **/
 
-#include "bitboard.h"
+#include "bitblock.h"
 #include <iostream>
 
 using namespace std;

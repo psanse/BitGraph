@@ -22,7 +22,7 @@
 #define __BITBOARDS_H__
 
 #include "bbobject.h"
-#include "bitboard.h"	
+#include "bitblock.h"	
 #include <vector>	
 #include <algorithm>
 #include <functional>
