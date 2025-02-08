@@ -20,6 +20,7 @@
 #define  __BB_OBJECT_H__
 
 #include <iostream>
+#include "bbtypes.h"
 
 class BBObject{
 public:
@@ -29,7 +30,17 @@ public:
 
 	friend std::ostream& operator<< (std::ostream& o , const BBObject& bb)		{ bb.print(o); return o;}
 
-protected:
+	//Data structure for bitscanning optimization
+	struct scan_t {																			
+		
+		int bbi;								//bitboard index 	
+		int pos;								//bit position for bitscan
+
+		scan_t() :bbi(EMPTY_ELEM), pos(MASK_LIM) {}
+	};
+
+
+
 //////////////
 //construction / destruction
 	BBObject() = default;

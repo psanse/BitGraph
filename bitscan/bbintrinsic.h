@@ -37,21 +37,15 @@ using namespace std;
 class BBIntrin: public BitBoardN{
 public:	
 
-	struct scan_t{																			//For bitscanning optimization
-		scan_t():bbi(EMPTY_ELEM), pos(MASK_LIM){}
-		int bbi;	//bitboard index 	
-		int pos;	//bit position for bitscan		
-	};
-		
-	 BBIntrin						(){};										
-explicit  BBIntrin					(int popsize /*1 based*/):BitBoardN(popsize){}	
-	 BBIntrin						(const BBIntrin& bbN):BitBoardN(bbN){}
-	 BBIntrin						(const std::vector<int>& v): BitBoardN(v){}
-	 BBIntrin						(int popsize, const std::vector<int>& v):BitBoardN(popsize, v){}
-virtual ~BBIntrin					(){}
+//constructors / destructors
+	
+	using BitBoardN::BitBoardN;			//inherit constructors	
 
-	 void set_bbindex				(int bbindex){m_scan.bbi=bbindex;}	
-	 void set_posbit				(int posbit){m_scan.pos=posbit;}	
+	virtual ~BBIntrin				() = default;
+	
+//setters and getters
+	 void set_bbindex				(int bbindex)		{ m_scan.bbi=bbindex;}	
+	 void set_posbit				(int posbit)		{ m_scan.pos=posbit;}	
  
 	
 //////////////////////////////
@@ -94,7 +88,8 @@ inline int prev_bit_del			(int& nBB,  BBIntrin& del );
 inline	int* to_C_array				(int* lv, std::size_t& size, bool rev= false) override;
 
 /////////////////
-// Popcount
+// Popcount - CHECK if required (08/02/2025)
+
 #ifdef POPCOUNT_64
 virtual	 inline int popcn64				()						const;
 virtual	 inline int popcn64				(int nBit/*0 based*/)	const;

@@ -239,6 +239,9 @@ public:
 	 * @param lv : vector of integers representing 1-bits in the bitset
 	 **/
 	explicit  BitBoardN				(int nPop, const vint& v);
+
+	
+
 		 	 
 	 //Move and copy semantics allowed
 	BitBoardN						(const BitBoardN& bbN)				= default;

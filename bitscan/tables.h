@@ -24,7 +24,6 @@
 #include "bbtypes.h"
 #include "bbconfig.h"
 
-constexpr int MASK_LIM = WORD_SIZE + 1;							   //mask limit for bitscan operations of a single BITBOARD
 
 #ifdef  CACHED_INDEX_OPERATIONS 
 	#define WDIV(i) (Tables::t_wdindex[(i)])
