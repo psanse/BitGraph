@@ -760,12 +760,8 @@ virtual	int* to_C_array				(int* lv, std::size_t& size, bool rev = false);
 //data members
 
 protected:
-	int nBB_;					//number of bitblocks 
-	std::vector<BITBOARD> vBB_;	//vector of bitblocks		
-	
-
-	//deprecated
-	//BITBOARD* vBB_;			//C-array of bitblocks - not using std::vector because of memory allignment, TODO-CHANGE TO VECTOR (04/02/2025)
+	int nBB_;							//number of bitblocks 
+	std::vector<BITBOARD> vBB_;			//bitset		
 
 }; //end BitBoardN class
 
