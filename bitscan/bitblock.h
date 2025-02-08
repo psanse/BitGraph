@@ -8,11 +8,14 @@
  * 
  **/
 
-#ifndef __BITBOARD_H__
-#define __BITBOARD_H__
+#ifndef __BITBLOCK_H__
+#define __BITBLOCK_H__
 
+#include <iostream>
 #include "tables.h"
 
+///////////////////////////
+//Platform-dependent dependency settings for basic lsb, msb and popcount bitblcok operations
 
 #ifdef __GNUC__
 
@@ -52,10 +55,6 @@
 #else
 	#include <intrin.h>										//windows specific
 #endif
-
-
-
-#include <iostream>
 
 
 /////////////////////////////////
