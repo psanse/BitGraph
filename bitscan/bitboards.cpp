@@ -646,13 +646,13 @@ return EMPTY_ELEM;
 
 	u val;
 
-	for(int i=m_aBB.size()-1; i>=0; i--){
-		val.b=m_aBB[i].bb;
+	for(auto i = m_aBB.size() - 1; i >= 0; --i){
+		val.b = m_aBB[i].bb;
 		if(val.b){
-			if(val.c[3]) return (Tables::msba[3][val.c[3]]+WMUL(m_aBB[i].index));
-			if(val.c[2]) return (Tables::msba[2][val.c[2]]+WMUL(m_aBB[i].index));
-			if(val.c[1]) return (Tables::msba[1][val.c[1]]+WMUL(m_aBB[i].index));
-			if(val.c[0]) return (Tables::msba[0][val.c[0]]+WMUL(m_aBB[i].index));
+			if(val.c[3]) return (Tables::msba[3][val.c[3]] + WMUL(m_aBB[i].index));
+			if(val.c[2]) return (Tables::msba[2][val.c[2]] + WMUL(m_aBB[i].index));
+			if(val.c[1]) return (Tables::msba[1][val.c[1]] + WMUL(m_aBB[i].index));
+			if(val.c[0]) return (Tables::msba[0][val.c[0]] + WMUL(m_aBB[i].index));
 		}
 	}
 

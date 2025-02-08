@@ -978,7 +978,7 @@ BitBoardN& BitBoardN::set_bit (int lastBit, const BitBoardN& bb_add){
 	}
 	
 	//copy the appropiate part of the bbh bitblock (including high)
-	bblock::copy_right(lastBit - WMUL(bbh), bb_add.vBB_[bbh], this->vBB_[bbh]);
+	bblock::copy_low(lastBit - WMUL(bbh), bb_add.vBB_[bbh], this->vBB_[bbh]);
 		
 	
 	return *this;
@@ -1000,7 +1000,7 @@ int  BitBoardN::is_singleton (int firstBit, int lastBit) const{
 	else {
 
 		//checks first block
-		if( (pc = bblock::popc64( vBB_[nbbl] & bblock::MASK_1_LEFT(firstBit - WMUL(nbbl)  /* eq. to WMOD(nbbl) */ ))) > 1) {
+		if( (pc = bblock::popc64( vBB_[nbbl] & bblock::MASK_1_HIGH(firstBit - WMUL(nbbl)  /* eq. to WMOD(nbbl) */ ))) > 1) {
 			return -1;
 		}
 
@@ -1012,7 +1012,7 @@ int  BitBoardN::is_singleton (int firstBit, int lastBit) const{
 		}
 
 		//checks last block
-		if ((pc += bblock::popc64(vBB_[nbbh] & bblock::MASK_1_RIGHT(lastBit - WMUL(nbbh)  /* eq. to WMOD(nbbl) */ ))) > 1) {
+		if ((pc += bblock::popc64(vBB_[nbbh] & bblock::MASK_1_LOW(lastBit - WMUL(nbbh)  /* eq. to WMOD(nbbl) */ ))) > 1) {
 			return -1;
 		}
 	}
@@ -1047,7 +1047,7 @@ int  BitBoardN::find_singleton (int firstBit, int lastBit, int& singleton) const
 	else{
 
 		//checks first block
-		BITBOARD bbl = vBB_[nbbl] & bblock::MASK_1_LEFT(posl);
+		BITBOARD bbl = vBB_[nbbl] & bblock::MASK_1_HIGH(posl);
 
 		if( (pc = bblock::popc64(bbl)) > 1){
 			/////////
@@ -1071,7 +1071,7 @@ int  BitBoardN::find_singleton (int firstBit, int lastBit, int& singleton) const
 		}
 
 		//checks last block
-		BITBOARD bbh = vBB_[nbbh] & bblock::MASK_1_RIGHT(posh);
+		BITBOARD bbh = vBB_[nbbh] & bblock::MASK_1_LOW(posh);
 			
 		if ( (pc += bblock::popc64(bbh)) > 1) {
 			/////////
@@ -1121,8 +1121,8 @@ BitBoardN&  BitBoardN::set_bit (int firstBit, int lastBit){
 		}
 		
 		//sets the first and last blocks
-		vBB_[bbh] |= bblock::MASK_1_RIGHT	(lastBit - WMUL(bbh));
-		vBB_[bbl] |= bblock::MASK_1_LEFT	(firstBit - WMUL(bbl));
+		vBB_[bbh] |= bblock::MASK_1_LOW		(lastBit - WMUL(bbh));
+		vBB_[bbl] |= bblock::MASK_1_HIGH	(firstBit - WMUL(bbl));
 
 	}
 
@@ -1209,8 +1209,8 @@ BitBoardN&  BitBoardN::erase_bit (int firstBit, int lastBit){
 			vBB_[i] = ZERO;
 		}
 				
-		vBB_[bbh] &= bblock::MASK_0_RIGHT	(lastBit - WMUL(bbh));					//Tables::mask_high
-		vBB_[bbl] &= bblock::MASK_0_LEFT	(firstBit - WMUL(bbl));					//Tables::mask_low	
+		vBB_[bbh] &= bblock::MASK_0_LOW		(lastBit - WMUL(bbh));					
+		vBB_[bbl] &= bblock::MASK_0_HIGH	(firstBit - WMUL(bbl));						
 	}
 
 	return *this;
@@ -1341,8 +1341,8 @@ int BitBoardN::popcn64(int firstBit, int lastBit) const
 		}
 
 		//count the population of the first and last blocks
-		pc += bblock::popc64(vBB_[bbh] & bblock::MASK_1_RIGHT(lastBit - WMUL(bbh)));
-		pc += bblock::popc64(vBB_[bbl] & bblock::MASK_1_LEFT(firstBit - WMUL(bbl)));
+		pc += bblock::popc64(vBB_[bbh] & bblock::MASK_1_LOW(lastBit - WMUL(bbh)));
+		pc += bblock::popc64(vBB_[bbl] & bblock::MASK_1_HIGH(firstBit - WMUL(bbl)));
 	
 	}
 		
@@ -1620,21 +1620,21 @@ BitBoardN& AND(int firstBit, int lastBit, const BitBoardN& lhs, const BitBoardN&
 		//updates the last block bbh in the range
 		if (Erase) {
 			//overwrites
-			res.vBB_[bbh] = lhs.vBB_[bbh] & rhs.vBB_[bbh] & bblock::MASK_1_RIGHT(bith);
+			res.vBB_[bbh] = lhs.vBB_[bbh] & rhs.vBB_[bbh] & bblock::MASK_1_LOW(bith);
 		}
 		else {
 			//overwrites bbh partially inside the range (including bith)
-			bblock::copy_right(bith, lhs.vBB_[bbh] & rhs.vBB_[bbh], res.vBB_[bbh]);
+			bblock::copy_low(bith, lhs.vBB_[bbh] & rhs.vBB_[bbh], res.vBB_[bbh]);
 		}
 
 		//updates the first block bbl in the range
 		if (Erase) {
 			//overwrites
-			res.vBB_[bbl] = lhs.vBB_[bbl] & rhs.vBB_[bbl] & bblock::MASK_1_LEFT(bitl);
+			res.vBB_[bbl] = lhs.vBB_[bbl] & rhs.vBB_[bbl] & bblock::MASK_1_HIGH(bitl);
 		}
 		else {
 			//overwrites bbl partially inside the range (including bitl)
-			bblock::copy_left(bitl, lhs.vBB_[bbl] & rhs.vBB_[bbl], res.vBB_[bbl]);
+			bblock::copy_high(bitl, lhs.vBB_[bbl] & rhs.vBB_[bbl], res.vBB_[bbl]);
 		}
 	}
 
@@ -1750,21 +1750,21 @@ BitBoardN& OR(int firstBit, int lastBit, const BitBoardN& lhs, const BitBoardN& 
 		//updates the last block bbh in the range
 		if (Erase) {
 			//overwrites
-			res.vBB_[bbh] = (lhs.vBB_[bbh] | rhs.vBB_[bbh]) & bblock::MASK_1_RIGHT(bith);
+			res.vBB_[bbh] = (lhs.vBB_[bbh] | rhs.vBB_[bbh]) & bblock::MASK_1_LOW(bith);
 		}
 		else {
 			//overwrites bbh partially inside the range (including bith)
-			bblock::copy_right(bith, lhs.vBB_[bbh] | rhs.vBB_[bbh], res.vBB_[bbh]);
+			bblock::copy_low(bith, lhs.vBB_[bbh] | rhs.vBB_[bbh], res.vBB_[bbh]);
 		}
 
 		//updates the first block bbl in the range
 		if (Erase) {
 			//overwrites
-			res.vBB_[bbl] = (lhs.vBB_[bbl] | rhs.vBB_[bbl]) & bblock::MASK_1_LEFT(bitl);
+			res.vBB_[bbl] = (lhs.vBB_[bbl] | rhs.vBB_[bbl]) & bblock::MASK_1_HIGH(bitl);
 		}
 		else {
 			//overwrites bbl partially inside the range (including bitl)
-			bblock::copy_left(bitl, lhs.vBB_[bbl] | rhs.vBB_[bbl], res.vBB_[bbl]);
+			bblock::copy_high(bitl, lhs.vBB_[bbl] | rhs.vBB_[bbl], res.vBB_[bbl]);
 		}
 	}
 

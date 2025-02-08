@@ -53,9 +53,9 @@
 	#include <intrin.h>										//windows specific
 #endif
 
+
+
 #include <iostream>
-
-
 
 
 /////////////////////////////////
@@ -245,7 +245,7 @@ namespace bblock {
 	 * @returns 64-bit bitblock mask
 	 **/
 	 inline
-	 BITBOARD MASK_1_RIGHT	(int idx)			{ return ~Tables::mask_high[idx]; }
+	 BITBOARD MASK_1_LOW	(int idx)			{ return ~Tables::mask_high[idx]; }
 	
 	 /**
 	 * @brief Sets to 1 all bits in the closed range [idx, 63]
@@ -253,7 +253,7 @@ namespace bblock {
 	 * @returns 64-bit bitblock mask
 	 **/
 	 inline
-	 BITBOARD MASK_1_LEFT	(int idx)			{ return ~Tables::mask_low[idx]; }
+	 BITBOARD MASK_1_HIGH	(int idx)			{ return ~Tables::mask_low[idx]; }
 
 
 	/**
@@ -271,7 +271,7 @@ namespace bblock {
 	* @returns 64-bit bitblock mask
 	**/
 	 inline
-	 BITBOARD MASK_0_RIGHT	(int idx)			{ return Tables::mask_high[idx]; }
+	 BITBOARD MASK_0_LOW	(int idx)			{ return Tables::mask_high[idx]; }
 	 
 	 /**
 	* @brief Sets to 0 all bits in the closed range [idx, 63]
@@ -279,7 +279,7 @@ namespace bblock {
 	* @returns 64-bit bitblock mask
 	**/
 	 inline
-	 BITBOARD MASK_0_LEFT	(int idx)			{ return Tables::mask_low[idx]; }
+	 BITBOARD MASK_0_HIGH	(int idx)			{ return Tables::mask_low[idx]; }
 	
 	/**
 	* @brief sets to 0 the bits of the bitblock bb to the right of index (the index-bit is not trimmed)
@@ -289,7 +289,7 @@ namespace bblock {
 	* @date 30/01/2015 
 	**/
 	 inline
-	 BITBOARD trim_right	(BITBOARD bb, int idx) { return bb &~ Tables::mask_low[idx]; }
+	 BITBOARD trim_low	(BITBOARD bb, int idx) { return bb &~ Tables::mask_low[idx]; }
 
 	/**
 	* @brief sets to 0 the bits of the bitblock bb to the left side of index (the index-bit is not trimmed)
@@ -299,7 +299,7 @@ namespace bblock {
 	* @date 30/01/2015 
 	**/
 	 inline
-	 BITBOARD trim_left		(BITBOARD bb, int idx) { return bb &~ Tables::mask_high[idx]; }
+	 BITBOARD trim_high		(BITBOARD bb, int idx) { return bb &~ Tables::mask_high[idx]; }
 
 
 	 /**
@@ -316,7 +316,7 @@ namespace bblock {
 	 * @param firstBit, lastBit: closed range of bits [0...63]
 	 * @param source, dest: input bitblocks
 	 **/
-	 void copy_left			(int bit, const BITBOARD& source, BITBOARD& dest);
+	 void copy_high			(int bit, const BITBOARD& source, BITBOARD& dest);
 	
 	 /**
 	 * @brief replaces bits in the range [0, bit] of source bitblock (source)
@@ -324,7 +324,7 @@ namespace bblock {
 	 * @param firstBit, lastBit: closed range of bits [0...63]
 	 * @param source, dest: input bitblocks
 	 **/
-	 void copy_right		(int bit, const BITBOARD& source, BITBOARD& dest);
+	 void copy_low		(int bit, const BITBOARD& source, BITBOARD& dest);
 
 /////////////////////
 // I/O
