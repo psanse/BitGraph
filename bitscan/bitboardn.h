@@ -640,7 +640,7 @@ inline	BitBoardN& erase_bit		(const BitBoardN& lhs, const BitBoardN& rhs);
 														int& bit1, int& bit2	)		const;
 
 /////////////////////////////
-//Boolean functions - CHECK UNIT TESTS
+//Boolean functions 
 
 	inline bool is_bit					(int bit)										const;
 
