@@ -509,6 +509,10 @@ int find_first_common_block(int firstBlock, int lastBlock, const BitBoardN& lhs,
 
 
 
+
+
+
+
 //BitBoardN& BitBoardN::operator =  (const BitBoardN& bbN){
 //
 //	if(nBB_ != bbN.nBB_){

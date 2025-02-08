@@ -892,9 +892,8 @@ inline int BitBoardN::prev_bit(int bit) const{
 	return EMPTY_ELEM;		//should not reach here
 }
 
-inline bool BitBoardN::is_bit (int nbit/*0 based*/) const{
-//////////////////////////////
-// RETURNS: TRUE if the bit is 1 in the position nbit, FALSE if opposite case or ERROR
+inline
+bool BitBoardN::is_bit (int nbit/*0 based*/) const{
 
 	return (vBB_[WDIV(nbit)] & Tables::mask[WMOD(nbit)]);
 
@@ -1294,6 +1293,7 @@ int BitBoardN::is_singleton_block(int firstBlock, int lastBlock) const
 	return 0;
 }
 
+inline
 int BitBoardN::popcn64() const{
 
 	int pc = 0;
@@ -1314,7 +1314,8 @@ int BitBoardN::popcn64() const{
 	return pc;
 }
 
-inline int BitBoardN::popcn64(int firstBit, int lastBit) const
+inline
+int BitBoardN::popcn64(int firstBit, int lastBit) const
 {
 
 	/////////////////////////////////////////////
@@ -1580,6 +1581,7 @@ BitBoardN& AND(int lastBit, const BitBoardN& lhs, const BitBoardN& rhs, BitBoard
 }
 
 template<bool Erase = false>
+inline
 BitBoardN& AND(int firstBit, int lastBit, const BitBoardN& lhs, const BitBoardN& rhs, BitBoardN& res)
 {
 
@@ -1589,12 +1591,12 @@ BitBoardN& AND(int firstBit, int lastBit, const BitBoardN& lhs, const BitBoardN&
 
 	int bbl = WDIV(firstBit);
 	int bbh = WDIV(lastBit);
-	int bith = lastBit - WMUL(bbh);	
+	int bith = lastBit - WMUL(bbh);
 	int bitl = firstBit - WMUL(bbl);
-	
+
 	//////////////////////////////////
 	//Blocks within the range
-	 
+
 	//special case - single block
 	if (bbl == bbh)
 	{
@@ -1604,7 +1606,7 @@ BitBoardN& AND(int firstBit, int lastBit, const BitBoardN& lhs, const BitBoardN&
 		}
 		else {
 			//overwrites partially in the closed range
-			bblock::copy(bitl, bith, lhs.vBB_[bbh] & rhs.vBB_[bbh], res.vBB_[bbh]);		
+			bblock::copy(bitl, bith, lhs.vBB_[bbh] & rhs.vBB_[bbh], res.vBB_[bbh]);
 		}
 	}
 	else
@@ -1642,7 +1644,7 @@ BitBoardN& AND(int firstBit, int lastBit, const BitBoardN& lhs, const BitBoardN&
 	//set to 0 all bits outside the bitblock range if required
 	if (Erase) {
 		for (int i = bbh + 1; i < res.nBB_; ++i) {
-			res.vBB_[i] = ZERO;	
+			res.vBB_[i] = ZERO;
 		}
 
 		for (int i = 0; i < bbl; ++i) {
@@ -1654,6 +1656,7 @@ BitBoardN& AND(int firstBit, int lastBit, const BitBoardN& lhs, const BitBoardN&
 }
 
 template<bool Erase = false>
+inline
 BitBoardN& AND_block(int firstBlock, int lastBlock, const BitBoardN& lhs, const BitBoardN& rhs, BitBoardN& res) {
 
 	//////////////////////////////////////////////////////////////////
