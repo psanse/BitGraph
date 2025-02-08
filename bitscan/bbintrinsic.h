@@ -132,7 +132,7 @@ inline int BBIntrin::popcn64(int nBit) const{
 	}
 
 	//special case of nBit bit block
-	BITBOARD bb=vBB_[nBB]&~Tables::mask_right[WMOD(nBit)];
+	BITBOARD bb=vBB_[nBB]&~Tables::mask_low[WMOD(nBit)];
 	pc+=__popcnt64(bb);
 
 return pc;
@@ -152,7 +152,7 @@ inline int BBIntrin::next_bit(int &nBB_new)  {
 	unsigned long posInBB;
 			
 	//Search int the last table
-	if(_BitScanForward64(&posInBB, vBB_[m_scan.bbi] & Tables::mask_left[m_scan.pos])){
+	if(_BitScanForward64(&posInBB, vBB_[m_scan.bbi] & Tables::mask_high[m_scan.pos])){
 		m_scan.pos =posInBB;
 		nBB_new=m_scan.bbi;
 		return (posInBB + WMUL(m_scan.bbi));
@@ -181,7 +181,7 @@ inline int BBIntrin::next_bit(int &nBB_new,  BBIntrin& bbN_del ) {
 	unsigned long posInBB;
 			
 	//Search int the last table
-	if(_BitScanForward64(&posInBB, vBB_[m_scan.bbi] & Tables::mask_left[m_scan.pos])){
+	if(_BitScanForward64(&posInBB, vBB_[m_scan.bbi] & Tables::mask_high[m_scan.pos])){
 		m_scan.pos =posInBB;
 		nBB_new=m_scan.bbi;
 		bbN_del.vBB_[m_scan.bbi]&=~Tables::mask[posInBB];
@@ -301,7 +301,7 @@ inline int BBIntrin::next_bit() {
 	unsigned long posInBB;
 			
 	//Search for next bit in the last block
-	if(_BitScanForward64(&posInBB, vBB_[m_scan.bbi] & Tables::mask_left[m_scan.pos])){
+	if(_BitScanForward64(&posInBB, vBB_[m_scan.bbi] & Tables::mask_high[m_scan.pos])){
 		m_scan.pos =posInBB;
 		return (posInBB + WMUL(m_scan.bbi));
 	}else{											//Search in the remaining blocks
@@ -329,7 +329,7 @@ inline int BBIntrin::prev_bit		() {
 	unsigned long posInBB;
 				
 	//Search int the last table
-	if(_BitScanReverse64(&posInBB, vBB_[m_scan.bbi] & Tables::mask_right[m_scan.pos])){
+	if(_BitScanReverse64(&posInBB, vBB_[m_scan.bbi] & Tables::mask_low[m_scan.pos])){
 		m_scan.pos =posInBB;
 		return (posInBB + WMUL(m_scan.bbi));
 	}else{											//Not found in the last table. Search in the rest
@@ -356,7 +356,7 @@ inline int BBIntrin::prev_bit	(int& nBB) {
 	unsigned long posInBB;
 				
 	//Search int the last table
-	if(_BitScanReverse64(&posInBB, vBB_[m_scan.bbi] & Tables::mask_right[m_scan.pos])){
+	if(_BitScanReverse64(&posInBB, vBB_[m_scan.bbi] & Tables::mask_low[m_scan.pos])){
 		m_scan.pos =posInBB;
 		nBB=m_scan.bbi;
 		return (posInBB + WMUL(m_scan.bbi));
@@ -433,7 +433,7 @@ int BBIntrin::init_scan(scan_types sct){
 		break;
 	case NON_DESTRUCTIVE_REVERSE:
 		set_bbindex(nBB_-1);
-		set_posbit(WORD_SIZE);		//mask_right[WORD_SIZE]=ONE
+		set_posbit(WORD_SIZE);		//mask_low[WORD_SIZE]=ONE
 		break;
 	case DESTRUCTIVE:
 		set_bbindex(0); 

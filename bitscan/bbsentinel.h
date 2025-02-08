@@ -185,7 +185,7 @@ int BBSentinel::next_bit(){
 
 	unsigned long posInBB;
 				
-	if(_BitScanForward64(&posInBB, vBB_[m_scan.bbi] & Tables::mask_left[m_scan.pos])){
+	if(_BitScanForward64(&posInBB, vBB_[m_scan.bbi] & Tables::mask_high[m_scan.pos])){
 		m_scan.pos =posInBB;
 		return (posInBB + WMUL(m_scan.bbi));
 	}else{													
@@ -212,7 +212,7 @@ int BBSentinel::next_bit(int& nBB){
 	unsigned long posInBB;
 			
 	//look uo in the last table
-	if(_BitScanForward64(&posInBB, vBB_[m_scan.bbi] & Tables::mask_left[m_scan.pos])){
+	if(_BitScanForward64(&posInBB, vBB_[m_scan.bbi] & Tables::mask_high[m_scan.pos])){
 		m_scan.pos =posInBB;
 		nBB=m_scan.bbi;
 		return (posInBB + WMUL(m_scan.bbi));

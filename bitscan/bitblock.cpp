@@ -3,7 +3,7 @@
 * @brief Implementation of the BitBoard class 
 **/
 
-#include "bitboard.h"
+#include "bitblock.h"
 #include <iostream>
 
 using namespace std;
@@ -167,31 +167,31 @@ namespace bblock {
 		dest = source & MASK_1(firstBit, lastBit);
 		
 		//add left of lastBit and right of firstBit
-		dest |= destOri & Tables::mask_left [lastBit];
-		dest |= destOri & Tables::mask_right[firstBit];
+		dest |= destOri & Tables::mask_high [lastBit];
+		dest |= destOri & Tables::mask_low[firstBit];
 	}
 
-	void copy_left (int bit, const BITBOARD& source, BITBOARD& dest)
+	void copy_high (int bit, const BITBOARD& source, BITBOARD& dest)
 	{
 		auto destOri = dest;
 
 		//copy the good part of the block (bit included)
-		dest = source & MASK_1_LEFT(bit);
+		dest = source & MASK_1_HIGH(bit);
 
 		//add right part of the block (excluding bit)
-		dest |= destOri & Tables::mask_right[bit];
+		dest |= destOri & Tables::mask_low[bit];
 
 	}
 
-	void copy_right(int bit, const BITBOARD& source, BITBOARD& dest)
+	void copy_low(int bit, const BITBOARD& source, BITBOARD& dest)
 	{
 		auto destOri = dest;
 
 		//copy the good part of the block (bit included)
-		dest = source & MASK_1_RIGHT(bit);
+		dest = source & MASK_1_LOW(bit);
 
 		//add right part of the block (excluding bit)
-		dest |= destOri & Tables::mask_left[bit];
+		dest |= destOri & Tables::mask_high[bit];
 	}
 
 }//end namespace bblock

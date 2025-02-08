@@ -10,15 +10,15 @@ int Tables::msba[4][65536];							//MSB lookup table 16 bits con pos index
 int Tables::lsba[4][65536];							//LSB lookup table 16 bits con pos index
 
 BITBOARD	Tables::mask[64];						//masks for 64 bit block of a single bit
-BITBOARD	Tables::mask_right[65];					//1_bit to the right of index (less significant bits, excluding index)
-BITBOARD	Tables::mask_left[66];			
+BITBOARD	Tables::mask_low[65];					//1_bit to the right of index (less significant bits, excluding index)
+BITBOARD	Tables::mask_high[66];			
 
 BITBOARD	Tables::mask0_1W;						
 BITBOARD	Tables::mask0_2W;
 BITBOARD	Tables::mask0_3W;
 BITBOARD	Tables::mask0_4W;
 U8			Tables::mask8[8];						//masks for 8 bit block of a single bit
-BITBOARD	Tables::mask_entre[64/*a*/][64/*b*/];	//1-bits between intervals
+BITBOARD	Tables::mask_mid[64/*a*/][64/*b*/];		//1-bits between intervals
 
 #ifdef CACHED_INDEX_OPERATIONS 
 int Tables::t_wdindex[MAX_CACHED_INDEX];
@@ -100,39 +100,39 @@ void Tables::init_masks(){
 				mask8[c]= uno8<<c;
 
 	////////////////////////////
-	//mask_right[65]
+	//mask_low[65]
 	BITBOARD aux=0;
 	for (int c=0;c<64;c++)
 	{
 		for ( int j=0; j<c /* not included the element itself*/; j++)
 		{
-			mask_right[c] |= mask[j];
+			mask_low[c] |= mask[j];
 
 		}
 	}
-	//mask_right[0]=ZERO;
-	mask_right[64]=ONE;
+	//mask_low[0]=ZERO;
+	mask_low[64]=ONE;
 
 	////////////////////////////
-	//mask_left[64] (from mask_right)
+	//mask_high[64] (from mask_low)
 	for (int c=0;c<64;c++)
 	{
-		mask_left[c]= ~mask_right[c] ^ mask[c]/*erase the element itself*/;
+		mask_high[c]= ~mask_low[c] ^ mask[c]/*erase the element itself*/;
 	}
 	
-	mask_left[64]=ZERO;
-	mask_left[MASK_LIM]=ONE;
+	mask_high[64]=ZERO;
+	mask_high[MASK_LIM]=ONE;
 
 	
 	////////////////////////////
-	//mask_entre[64][64] 
+	//mask_mid[64][64] 
 	
 	for (int c=0;c<64;c++)	{
 		for ( int j=0; j<64 ; j++ )		{
 			if(j<c) continue; 
 
-			if(j==c) mask_entre[c][j]=mask[c];
-			else mask_entre[c][j]= mask_right[j] & mask_left[c] | mask[c] | mask[j];
+			if(j==c) mask_mid[c][j]=mask[c];
+			else mask_mid[c][j]= mask_low[j] & mask_high[c] | mask[c] | mask[j];
 		}
 	}
 
