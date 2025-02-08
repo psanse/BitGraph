@@ -35,14 +35,12 @@ public:
 //setters and getters
 	 void set_bbindex				(int bbindex)		{ m_scan.bbi=bbindex;}	
 	 void set_posbit				(int posbit)		{ m_scan.pos=posbit;}	
- 
-	
+ 	
 //////////////////////////////
 // bitscanning
 
 inline virtual int lsbn64			() const;
 inline virtual int msbn64			() const; 
-
 
 	//bit scan forward (destructive)
 virtual	int init_scan				(scan_types);	
@@ -52,36 +50,36 @@ virtual inline int next_bit_del		();
 virtual inline int next_bit_del		(int& nBB /* table index*/); 
 virtual inline int next_bit_del		(int& nBB,  BBIntrin& bbN_del); 	 
 
-
 	//bit scan forward (non destructive)
 virtual inline int next_bit			();
 
 	//bit scan backwards (non destructive)
-virtual inline int prev_bit		(); 
-virtual inline int prev_bit		(int& nBB);
+virtual inline int prev_bit			(); 
+virtual inline int prev_bit			(int& nBB);
 
 	//bit scan backwards (destructive)
- virtual inline int prev_bit_del		(); 
-
+ virtual inline int prev_bit_del	(); 
 
 virtual inline int next_bit			(int &); 
 virtual	inline int next_bit			(int &,  BBIntrin& ); 
 
-
-inline int prev_bit_del			(int& nBB);
-inline int prev_bit_del			(int& nBB,  BBIntrin& del ); 
+inline int prev_bit_del				(int& nBB);
+inline int prev_bit_del				(int& nBB,  BBIntrin& del ); 
 
 //////////
-//conversions
+//conversions (requiring bitscanning)
 
 inline	int* to_C_array				(int* lv, std::size_t& size, bool rev= false) override;
+
+
+#ifdef POPCOUNT_64
 
 /////////////////
 // Popcount - CHECK if required (08/02/2025)
 
-#ifdef POPCOUNT_64
-virtual	 inline int popcn64				()						const;
-virtual	 inline int popcn64				(int nBit/*0 based*/)	const;
+virtual	 inline int popcn64			()						const;
+virtual	 inline int popcn64			(int nBit/*0 based*/)	const;
+
 #endif
 
 //////////////////
@@ -94,16 +92,19 @@ virtual	 inline int popcn64				(int nBit/*0 based*/)	const;
 // INLINE FUNCTIONS
 // 
 ////////////////////////
+
 #ifdef POPCOUNT_64
+
 inline 
 int BBIntrin::popcn64() const{
+
 	BITBOARD pc = 0;
 	for(int i = 0; i < nBB_; ++i){
 		pc += __popcnt64(vBB_[i]);
 	}
-return pc;
-}
 
+	return pc;
+}
 
 inline
 int BBIntrin::popcn64(int nBit) const{
@@ -121,7 +122,7 @@ int BBIntrin::popcn64(int nBit) const{
 	BITBOARD bb=vBB_[nBB]&~Tables::mask_low[WMOD(nBit)];
 	pc+=__popcnt64(bb);
 
-return pc;
+	return pc;
 }
 
 #endif
@@ -153,7 +154,7 @@ int BBIntrin::next_bit(int &nBB_new)  {
 			}
 		}
 	}
-return EMPTY_ELEM;
+	return EMPTY_ELEM;
 }
 
 inline
@@ -185,7 +186,7 @@ int BBIntrin::next_bit(int &nBB_new,  BBIntrin& bbN_del ) {
 			}
 		}
 	}
-return EMPTY_ELEM;
+	return EMPTY_ELEM;
 }
 
 
@@ -206,7 +207,7 @@ int BBIntrin::msbn64() const{
 			return (posInBB+WMUL(i));
 	}
 	
-return EMPTY_ELEM;  
+	return EMPTY_ELEM;  
 }
 
 	
@@ -217,7 +218,7 @@ int BBIntrin::lsbn64() const{
 		if(_BitScanForward64(&posBB, vBB_[i]))
 			return(posBB+ WMUL(i));	
 	}
-return EMPTY_ELEM;
+	return EMPTY_ELEM;
 }
 
 
@@ -241,7 +242,7 @@ int BBIntrin::next_bit_del() {
 		}
 	}
 	
-return EMPTY_ELEM;  
+	return EMPTY_ELEM;  
 }
 
 
@@ -260,7 +261,7 @@ int BBIntrin::next_bit_del(int& nBB) {
 		}
 	}
 	
-return EMPTY_ELEM;  
+	return EMPTY_ELEM;  
 }
 
 inline
@@ -279,7 +280,7 @@ int BBIntrin::next_bit_del(int& nBB, BBIntrin& bbN_del) {
 		}
 	}
 	
-return EMPTY_ELEM;  
+	return EMPTY_ELEM;  
 }
 
 inline
@@ -308,7 +309,7 @@ int BBIntrin::next_bit() {
 		}
 	}
 	
-return EMPTY_ELEM;
+	return EMPTY_ELEM;
 }
 
 
@@ -337,7 +338,7 @@ int BBIntrin::prev_bit		() {
 		}
 	}
 	
-return EMPTY_ELEM;
+	return EMPTY_ELEM;
 }
 
 inline
@@ -367,7 +368,7 @@ int BBIntrin::prev_bit	(int& nBB) {
 		}
 	}
 	
-return EMPTY_ELEM;
+	return EMPTY_ELEM;
 }
 
 inline
@@ -383,7 +384,7 @@ int BBIntrin::prev_bit_del() {
 			return (posInBB+WMUL(i));
 		}
 	}
-return EMPTY_ELEM;  
+	return EMPTY_ELEM;  
 }
 
 inline
@@ -402,7 +403,7 @@ int BBIntrin::prev_bit_del(int& nBB, BBIntrin& del) {
 		}
 	}
 	
-return EMPTY_ELEM;  
+	return EMPTY_ELEM;  
 }
 
 inline
@@ -420,7 +421,7 @@ int BBIntrin::prev_bit_del(int& nBB) {
 		}
 	}
 	
-return EMPTY_ELEM;  
+	return EMPTY_ELEM;  
 }
 
 inline
@@ -444,7 +445,7 @@ int BBIntrin::init_scan(scan_types sct){
 		cerr<<"bad scan type"<<endl;
 		return -1;
 	}
-return 0;
+	return 0;
 }
 
 inline
@@ -472,7 +473,7 @@ int BBIntrin::init_scan_from (int from, scan_types sct){
 			return -1;
 		}
 	}
-return 0;
+	return 0;
 }
 
 inline
@@ -492,19 +493,6 @@ int* BBIntrin::to_C_array  (int* lv, std::size_t& size, bool rev)  {
 	}
 	return lv;
 }
-
-//inline
-//int* BBIntrin::to_old_vector_reverse (int* lv, int& size){
-//	int v; size=0;
-//	init_scan(BBObject::NON_DESTRUCTIVE_REVERSE);
-//	while(true){
-//		if( (v=prev_bit())!=EMPTY_ELEM ){
-//			lv[size++]=v;
-//		}else break;
-//	}
-//	return lv;
-//}
-
 
 #endif
 
