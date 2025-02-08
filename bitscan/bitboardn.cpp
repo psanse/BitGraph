@@ -139,9 +139,8 @@ int* AND (int lastBit, const BitBoardN& lhs, const BitBoardN& rhs, int bitset[],
 }
 
 
-BitBoardN&  ERASE(const BitBoardN& lhs, const BitBoardN& rhs,  BitBoardN& res){
-/////////////
-// removes rhs FROM lhs
+BitBoardN&  erase_bit(const BitBoardN& lhs, const BitBoardN& rhs,  BitBoardN& res){
+
 
 	for(auto i = 0; i < lhs.nBB_; ++i){
 		res.vBB_[i] = lhs.vBB_[i] &~ rhs.vBB_[i];
@@ -286,7 +285,7 @@ void BitBoardN::reset(int popsize, const vint& lv) {
 			/////////////////
 
 			//sets bits - no prior erasing
-			set_bit<false>(bit);
+			set_bit(bit);
 
 		}
 	}
@@ -458,6 +457,56 @@ int* BitBoardN::to_C_array (int* lv, std::size_t& size, bool rev) 	{
 	}
 	return lv;
 }
+
+BitBoardN& BitBoardN::set_bit(const vint& lv) {
+
+	//copies elements up to the maximum capacity of the bitstring
+	auto maxPopSize = WMUL(nBB_);
+	for (auto i = 0; i < lv.size(); ++i) {
+
+		/////////////////////
+		assert(lv[i] >= 0);
+		////////////////////
+
+		if (lv[i] < maxPopSize /* 1-based*/) {
+			set_bit(lv[i]);
+		}
+	}
+
+	return *this;
+
+}
+
+int find_first_common(const BitBoardN& lhs, const BitBoardN& rhs) {
+
+	for (auto i = 0; i < lhs.nBB_; ++i) {
+		BITBOARD bb = lhs.vBB_[i] & rhs.vBB_[i];
+		if (bb) {
+			return bblock::lsb64_intrinsic(bb) + WMUL(i);
+		}
+	}
+
+	return EMPTY_ELEM;		//disjoint
+}
+
+int find_first_common_block(int firstBlock, int lastBlock, const BitBoardN& lhs, const BitBoardN& rhs) {
+	
+	///////////////////////////////////////////////////////////////////////////////
+	assert((firstBlock >= 0) && (LastBlock < nBB_) && (firstBlock <= lastBlock));
+	///////////////////////////////////////////////////////////////////////////////
+
+	int last_block = ((lastBlock == -1) ? rhs.nBB_ - 1 : lastBlock);
+
+	for (auto i = firstBlock; i < last_block; i++) {
+		BITBOARD bb = lhs.vBB_[i] & rhs.vBB_[i];
+		if (bb) {
+			return bblock::lsb64_intrinsic(bb) + WMUL(i);
+		}
+	}
+
+	return EMPTY_ELEM;		//disjoint
+}
+
 
 
 //BitBoardN& BitBoardN::operator =  (const BitBoardN& bbN){

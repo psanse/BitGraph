@@ -295,8 +295,7 @@ TEST(Masks, ERASE){
 	bb1.set_bit(100);
 
 	//ERASE
-	//cout<<ERASE(bb, bb1, bbERASE)<<endl;
-	ERASE(bb, bb1, bbERASE);
+	erase_bit(bb, bb1, bbERASE);
 	EXPECT_TRUE(bbERASE.is_bit(20));
 	EXPECT_FALSE(bbERASE.is_bit(10));
 	EXPECT_FALSE(bbERASE.is_bit(64));
@@ -340,8 +339,7 @@ TEST(Masks, ERASE_extreme_cases){
 	bb.set_bit(64);	
 	
 	//ERASE
-	//cout<<ERASE(bb, bb1, bbERASE)<<endl;
-	ERASE(bb, bb1, bbERASE);
+	erase_bit(bb, bb1, bbERASE);
 	EXPECT_TRUE(bb==bbERASE);
 
 //sparse

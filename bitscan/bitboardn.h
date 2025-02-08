@@ -142,10 +142,34 @@ public:
 	**/
 	friend BitBoardN OR_block		(int firstBlock, int lastBlock,
 										BitBoardN lhs, const BitBoardN& rhs)	{	return lhs.OR_EQUAL_block<true>(firstBlock, lastBlock, rhs); }
+	
+	/**
+	* @brief Removes the bits from the bitstring rhs in the bitstring lhs. Stores
+	*		 the result in res.
+	* @returns reference to the resulting bitstring res
+	**/
+	friend BitBoardN&  erase_bit	(const BitBoardN& lhs, const BitBoardN& rhs,  BitBoardN& res);										//removes rhs from lhs
+	
+	
+	/**
+	* @brief Determines the first bit of the itersection between bitsets lhs and rhs
+	* @param lhs, rhs: input bitsets
+	* @returns the first bit of the intersection or EMPTY_ELEM if the sets are disjoint
+	**/
+	friend int find_first_common	(const BitBoardN& lhs, const BitBoardN& rhs);
+	
+	/**
+	* @brief Determines the first bit of the itersection between bitsets lhs and rhs
+	*		 in the closed block-range [firstBlock, lastBlock]. 
+	*		 If lastBock == -1, the range [firstBlock, END OF BITSET)
+	* @param lhs, rhs: input bitsets
+	* @returns the first bit of the intersection or EMPTY_ELEM if the sets are disjoint
+	**/
+	friend int find_first_common_block	(int firstBlock, int lastBlock,  const BitBoardN& lhs, const BitBoardN& rhs);
 
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// DEPRECATED, TO BE REMOVED. NOT CHECKED!! (06/02/2025)
+	// DEPRECATED friend operations, TO BE REMOVED. NOT CHECKED!! (06/02/2025)
 
 	/**
 	* @brief AND between lhs and rhs bitsets in the SEMI-OPEN range [0, last_vertex)
@@ -175,23 +199,17 @@ public:
 	* TODO: deprecated - REMOVE after checking optimization algorithms (06/02/2025)
 	**/
 	friend int* AND(int lastBit, const BitBoardN& lhs, const BitBoardN& rhs, int bitset[], int& size);
-		
+
 	// lhs OR rhs in semiopen range (rhs [from, END)
-	friend BitBoardN&  OR			(int firstBit, const BitBoardN& lhs, const BitBoardN& rhs,  BitBoardN& res);	
-	
+	friend BitBoardN& OR(int firstBit, const BitBoardN& lhs, const BitBoardN& rhs, BitBoardN& res);
+
 	// lhs OR rhs - ranges (rhs [v, END[ if left = TRUE,  rhs [0, v[ if left = false)
 	// date@26/10/19
-	friend BitBoardN&  OR			(int bit, bool left /* to */, const BitBoardN& lhs, const BitBoardN& rhs, BitBoardN& res);
-	
-	
+	friend BitBoardN& OR(int bit, bool left /* to */, const BitBoardN& lhs, const BitBoardN& rhs, BitBoardN& res);
+
+
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	//bit deletion
-	friend BitBoardN&  ERASE		(const BitBoardN& lhs, const BitBoardN& rhs,  BitBoardN& res);										//removes rhs from lhs
-	
-	//first elem in common
-	friend int FIRST_SHARED			(const BitBoardN& lhs, const BitBoardN& rhs);
-	friend int FIRST_SHARED			(int firstBlock, const BitBoardN& lhs, const BitBoardN& rhs);	
 
 ////////////
 //construction / destruction 
@@ -366,9 +384,7 @@ virtual	inline int popcn64			(int firstBit, int lastBit)	const;
 	* @param  bit: position of the 1-bit to set (nBit >= 0)
 	* @returns reference to the modified bitstring
 	**/
-		
-	template<bool Erase = false>
-	BitBoardN&  set_bit				(int bit);
+inline	BitBoardN&  set_bit			(int bit);
 
 	/**
 	* @brief sets the bits in the closed range [firstBit, lastBit] to 1 in the bitstring
@@ -376,7 +392,6 @@ virtual	inline int popcn64			(int firstBit, int lastBit)	const;
 	* @date 22/9/14
 	* @last_update 01/02/25
 	**/
-		template<bool Erase = false>
 inline  BitBoardN&	 set_bit		(int firstBit, int lastBit);
 
 	/**
@@ -400,21 +415,18 @@ inline	BitBoardN& set_bit			(const BitBoardN& bb_add);
 	* @param lastBit : the last bit in the range to be copied
 	* @returns reference to the modified bitstring
 	**/
-template<bool Erase = false>
 inline BitBoardN& set_bit			(int lastBit, const BitBoardN& bb_add);
 	 
 	/**
 	* @brief Adds elements from a vector of non-negative integers lv as 1-bit
 	*	    up to the maximum capacity of the bitstring. Values greater than the
-	*		maximum population size are ignored.
+	*		maximum capacity of the biset are ignored.
 	* 
 	* @param lv: vector of non-negative integers
-	* @param EraseAll <template>: if true, deletes the rest of bits in the bitstring
 	* @returns reference to the modified bitstring
 	* @details negative elements will cause an assertion if NDEBUG is not defined, 
 	*		  else the behaviour is undefined.
 	**/
-	template<bool Erase = false>	
 	BitBoardN& set_bit				(const vint& lv);
 
 	/**
@@ -571,7 +583,7 @@ inline	BitBoardN& erase_bit		(const BitBoardN& lhs, const BitBoardN& rhs);
 	* @created 7/17
 	* @last_update 02/02/2025
 	**/
-	inline int find_first_common_bit	(const BitBoardN& rhs)						const;	
+	inline int find_first_common	(const BitBoardN& rhs)						const;	
 		
 	/**
 	* @brief Determines if the bitstring has a single 1-bit in the closed range [firstBit, lastBit]	
@@ -757,12 +769,15 @@ protected:
 
 }; //end BitBoardN class
 
+
+
 ////////////////////////////////////////////////////////////////////////////////////////
 // 
 // Inline function implementations - must be in header file
 
+
 inline 
-int BitBoardN::find_first_common_bit	(const BitBoardN& rhs) const {
+int BitBoardN::find_first_common	(const BitBoardN& rhs) const {
 
 	BITBOARD bb = 0;
 	for(auto i = 0; i < nBB_; ++i){
@@ -957,32 +972,19 @@ bool BitBoardN::is_disjoint_block (int firstBlock, int lastBlock, const BitBoard
 	return true;
 }
 
-template<bool Erase>
+
 inline
-BitBoardN& BitBoardN::set_bit (int bitH, const BitBoardN& bb_add){
+BitBoardN& BitBoardN::set_bit (int lastBit, const BitBoardN& bb_add){
 
-	int bbh = WDIV(bitH);
-	int offsetH = bitH - WMUL(bbh);
-
+	int bbh = WDIV(lastBit);
+	
 	for(auto i = 0; i < bbh; ++i){
 		vBB_[i] = bb_add.vBB_[i];
 	}
 	
-	//set the appropiate part of the bbh bitblock (including high)
-	if (Erase) {
-		vBB_[bbh] &= bblock::MASK_1_RIGHT(offsetH);			//also vBB_[bbh] &= bblock::MASK_1(0, high - WMUL(bbh)); 
-	}
-	else {
-		bblock::copy_right(offsetH, bb_add.vBB_[bbh], this->vBB_[bbh]);
-	}
-
-	//set remaining bits to 0 if required
-	if (Erase) {
-		for (auto i = bbh + 1; i < nBB_; ++i) {
-			vBB_[i] = ZERO;
-		}
-	}
-			
+	//copy the appropiate part of the bbh bitblock (including high)
+	bblock::copy_right(lastBit - WMUL(bbh), bb_add.vBB_[bbh], this->vBB_[bbh]);
+		
 	
 	return *this;
 }
@@ -1092,18 +1094,13 @@ int  BitBoardN::find_singleton (int firstBit, int lastBit, int& singleton) const
 	return 1;
 }
 
-template<bool Erase>
-inline BitBoardN& BitBoardN::set_bit	(int bit ){
-	
-	if (Erase) {
-		erase_bit();
-	}
-
+inline 
+BitBoardN& BitBoardN::set_bit	(int bit ){
+		
 	vBB_[WDIV(bit)] |= Tables::mask[ WMOD(bit) ];
 	return *this;
 }	
 
-template<bool Erase>
 inline 
 BitBoardN&  BitBoardN::set_bit (int firstBit, int lastBit){
 
@@ -1116,10 +1113,6 @@ BitBoardN&  BitBoardN::set_bit (int firstBit, int lastBit){
 	int bbl= WDIV(firstBit);
 	int bbh= WDIV(lastBit);
 	
-	//clears all bits if required
-	if (Erase) {
-		erase_bit();
-	}	
 
 	if(bbl == bbh)
 	{			
@@ -1564,61 +1557,7 @@ BitBoardN& BitBoardN::erase_block(int FirstBlock, int LastBlock, const BitBoardN
 	return *this;
 }
 
-inline
-int FIRST_SHARED (const BitBoardN& lhs, const BitBoardN& rhs){
-/////////////////////
-// RETURNS first bit common to lhs and rhs, EMPTY ELEM if sets are disjoint
-	
-	for(int i=0; i<lhs.nBB_; i++){
-		BITBOARD bb=lhs.vBB_[i] & rhs.vBB_[i];
-		if(bb){
-			return bblock::lsb64_intrinsic(bb)+WMUL(i);
-		}
-	}
-	
-	return EMPTY_ELEM;		//disjoint
-}
 
-inline
-int FIRST_SHARED(int first_block, const BitBoardN& lhs, const BitBoardN& rhs) {
-	/////////////////////
-	// RETURNS first bit common to lhs and rhs, EMPTY ELEM if sets are disjoint
-
-	for (int i = first_block; i < lhs.nBB_; i++) {
-		BITBOARD bb = lhs.vBB_[i] & rhs.vBB_[i];
-		if (bb) {
-			return bblock::lsb64_intrinsic(bb) + WMUL(i);
-		}
-	}
-
-	return EMPTY_ELEM;		//disjoint
-}
-
-template<bool Erase>
-inline
-BitBoardN& BitBoardN::set_bit(const vint& lv) {
-
-	//cleans the bitstring if required
-	if (Erase) {
-		erase_bit();
-	}
-
-	//copies elements up to the maximum capacity of the bitstring
-	auto POPSIZE = WMUL(nBB_);
-	for (auto i = 0; i < lv.size(); ++i) {
-
-		/////////////////////
-		assert(lv[i] >= 0);
-		////////////////////
-
-		if (lv[i] < POPSIZE /* 1-based*/) {
-			set_bit(lv[i]);
-		}
-	}
-
-	return *this;
-
-}
 
 template<bool Erase = false>
 inline

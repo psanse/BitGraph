@@ -238,11 +238,13 @@ TEST(Ugraph, max_subgraph_degree) {
 	EXPECT_EQ(3, g.max_subgraph_degree(bbset));		
 
 	//induced subgraph by {0, 1, 2}
-	bbset.set_bit<true>(0, 2);									//clears the rest of bits
+	bbset.erase_bit();
+	bbset.set_bit(0, 2);									//clears the rest of bits
 	EXPECT_EQ(2, g.max_subgraph_degree(bbset));		
 
 	//induced subgraph by {78, 79}
-	bbset.set_bit<true>(78, 79);									//clears the rest of bits				
+	bbset.erase_bit();
+	bbset.set_bit(78, 79);									//clears the rest of bits				
 	EXPECT_EQ(1, g.max_subgraph_degree(bbset));
 
 }

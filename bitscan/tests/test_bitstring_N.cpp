@@ -118,7 +118,8 @@ TEST(BBNtest, set_bit_basic) {
 	EXPECT_FALSE(bb.is_bit(63));
 
 	//erases all and sets bit 64
-	bb.set_bit<true>(64);			
+	bb.erase_bit();
+	bb.set_bit(64);			
 	EXPECT_TRUE(bb.is_bit(64));
 	EXPECT_FALSE(bb.is_bit(10));
 	EXPECT_FALSE(bb.is_bit(20));
@@ -150,7 +151,8 @@ TEST(BBNtest, set_bit_range) {
 	EXPECT_TRUE(bb.is_bit(64));
 
 	//erases all and sets bit 64
-	bb.set_bit<true>(63, 65);
+	bb.erase_bit();
+	bb.set_bit(63, 65);
 	EXPECT_TRUE(bb.is_bit(63));
 	EXPECT_TRUE(bb.is_bit(64));
 	EXPECT_TRUE(bb.is_bit(65));
@@ -180,60 +182,6 @@ TEST(BBNtest, set_bit_range) {
 	EXPECT_TRUE(bb2.is_bit(5));
 }
 
-TEST(BBNtest, set_bit_with_reset) {
-
-	BitBoardN bb(130);
-	bb.set_bit<true>(0, 64);
-	EXPECT_TRUE(bb.is_bit(0));
-	EXPECT_TRUE(bb.is_bit(64));
-
-
-	BitBoardN bb1(130);
-	bb1.set_bit<true>(0, 0);
-	EXPECT_TRUE(bb1.is_bit(0));
-	EXPECT_EQ(1, bb1.popcn64());
-
-
-	bb1.set_bit<true>(64, 64);
-	EXPECT_TRUE(bb1.is_bit(64));
-	EXPECT_EQ(1, bb1.popcn64());
-
-
-	bb1.set_bit<true>(55, 56);
-	EXPECT_TRUE(bb1.is_bit(55));
-	EXPECT_TRUE(bb1.is_bit(56));
-	EXPECT_EQ(2, bb1.popcn64());
-
-
-	BitBoardN bb2(130);
-	bb2.set_bit<true>(43);
-	bb2.set_bit<true>(44);
-	bb2.set_bit<true>(129);					//this is the only one that counts
-	EXPECT_TRUE(bb2.is_bit(129));
-	EXPECT_EQ(1, bb2.popcn64());
-
-	//copy a bitstring in range (change names)
-	BitBoardN bb3(130);
-	bb3.set_bit(50);
-	bb3.set_bit(80);
-
-	//bb{0...64, 100}	
-	bb.set_bit(100);
-	
-	///////////////////////////////
-	bb.set_bit<false>(79, bb3);			//bb3={50, 80}  bb={50, 100}
-	////////////////////////////////
-	EXPECT_TRUE(bb.is_bit(50));
-	EXPECT_TRUE(bb.is_bit(100));
-	EXPECT_EQ(2, bb.popcn64());
-
-	////////////////////////////////
-	bb.set_bit<true>(79, bb3);			//bb3={50, 80}  bb={50}
-	///////////////////////////////
-	EXPECT_TRUE(bb.is_bit(50));
-	EXPECT_FALSE(bb.is_bit(100));
-	EXPECT_EQ(1, bb.popcn64());
-}
 
 TEST(BBNtest, set_bit_from_another_bitstring) {
 
@@ -543,9 +491,9 @@ TEST(BBNtest, GenRandom){
 TEST(BBNtest, set_block){
 
 	BitBoardN bb(130);
-	bb.set_bit<true>(0,54);
+	bb.set_bit(0,54);
 	BitBoardN bb1(130);
-	bb1.set_bit<true>(50,100);
+	bb1.set_bit(50,100);
 
 	bb.erase_bit();
 	bb.set_block(1, -1, bb1);			//second block
@@ -563,9 +511,9 @@ TEST(BBNtest, set_block){
 TEST(BBNtest, erase_block) {
 	
 	BitBoardN bb(130);
-	bb.set_bit<true>(49, 54);
+	bb.set_bit(49, 54);
 	BitBoardN bb1(130);
-	bb1.set_bit<true>(50, 100);
+	bb1.set_bit(50, 100);
 		
 	bb.erase_block(0, -1, bb1);			//bb={49}
 	EXPECT_FALSE(bb.is_bit(50));
@@ -627,15 +575,15 @@ TEST(BBNtest, find_first_common_bit){
 	bb1.set_bit(72);
 	
 
-	int ff=bb.find_first_common_bit(bb1);
+	int ff=bb.find_first_common(bb1);
 	EXPECT_EQ(64, ff);
 
 	bb.erase_bit(64);
-	ff=bb.find_first_common_bit(bb1);
+	ff=bb.find_first_common(bb1);
 	EXPECT_EQ(EMPTY_ELEM, ff);
 
 	bb.set_bit(72);
-	ff=bb.find_first_common_bit(bb1);
+	ff=bb.find_first_common(bb1);
 	EXPECT_EQ(72, ff);
 }
 

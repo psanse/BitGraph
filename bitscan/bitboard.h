@@ -159,7 +159,7 @@ namespace bblock {
 	* @param bb: input 64-bit bitblock
 	* @returns Index of the most least significant bit or -1 if empty
 	**/
-	 int	msb64_lup		(const BITBOARD bb);
+	 int msb64_lup			(const BITBOARD bb);
 		
 	/**
 	* @brief Index of the most significant bit of bb implemented
