@@ -18,7 +18,7 @@ BITBOARD	Tables::mask0_2W;
 BITBOARD	Tables::mask0_3W;
 BITBOARD	Tables::mask0_4W;
 U8			Tables::mask8[8];						//masks for 8 bit block of a single bit
-BITBOARD	Tables::mask_entre[64/*a*/][64/*b*/];	//1-bits between intervals
+BITBOARD	Tables::mask_mid[64/*a*/][64/*b*/];		//1-bits between intervals
 
 #ifdef CACHED_INDEX_OPERATIONS 
 int Tables::t_wdindex[MAX_CACHED_INDEX];
@@ -125,14 +125,14 @@ void Tables::init_masks(){
 
 	
 	////////////////////////////
-	//mask_entre[64][64] 
+	//mask_mid[64][64] 
 	
 	for (int c=0;c<64;c++)	{
 		for ( int j=0; j<64 ; j++ )		{
 			if(j<c) continue; 
 
-			if(j==c) mask_entre[c][j]=mask[c];
-			else mask_entre[c][j]= mask_right[j] & mask_left[c] | mask[c] | mask[j];
+			if(j==c) mask_mid[c][j]=mask[c];
+			else mask_mid[c][j]= mask_right[j] & mask_left[c] | mask[c] | mask[j];
 		}
 	}
 

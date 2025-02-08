@@ -236,7 +236,7 @@ namespace bblock {
 	* @returns 64-bit bitblock mask
 	**/
 	 inline
-	 BITBOARD MASK_1(int low, int high) { return Tables::mask_entre[low][high]; 
+	 BITBOARD MASK_1(int low, int high) { return Tables::mask_mid[low][high]; 
 												/* [low] return ~Tables::mask_right[low] & ~Tables::mask_left[high];*/ }
 	
 	 /**
@@ -262,7 +262,7 @@ namespace bblock {
 	* @returns 64-bit bitblock mask
 	**/
 	 inline
-	 BITBOARD MASK_0		(int low, int high) {  return ~Tables::mask_entre[low][high];
+	 BITBOARD MASK_0		(int low, int high) {  return ~Tables::mask_mid[low][high];
 													/*return Tables::mask_right[low] | Tables::mask_left[high];*/ }
 	
 	 /**

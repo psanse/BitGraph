@@ -76,7 +76,7 @@ public:
 	static BITBOARD mask_left[66];					//1_bit to the left of index (more significant bits, excluding index)
 
 //private:
-	static BITBOARD mask_entre[64/*a*/][64/*b*/];	//1-bits between intervals (a<=b)
+	static BITBOARD mask_mid[64/*a*/][64/*b*/];	//1-bits between intervals (a<=b)
 
 	//0 but word masks
 	static BITBOARD  mask0_1W;						
