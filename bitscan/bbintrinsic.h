@@ -39,7 +39,7 @@ public:
 	void set_scan_bit				(int posbit)		{ m_scan.pos = posbit;}	
  	
 //////////////////////////////
-// Bitscanning
+// Bitscanning (with cached info)
 
 	/**
 	* @brief least significant bit in the bitstring
@@ -54,39 +54,145 @@ inline int lsbn64					() const override;
 	* @details implemented with intrinsic functions
 	**/
 inline int msbn64					() const override; 
-
 	
 	/**
-	* @brief configures the initial block and bit position for bitscanning
+	* @brief Configures the initial block and bit position for bitscanning
 	*		 according to one of the 4 scan types passed as argument
 	* @param sc: type of scan
 	* @returns 0 if successful, -1 otherwise
 	**/
-	int init_scan				(scan_types sc);	
-	
-	/////////////////
-// scans from 'from' onwards, excluding from
-//
-// COMMENTS: if you want to scan from the beginning, use from=EMPTY_ELEM
-// 
-	int init_scan				(int firstBit, scan_types);
+virtual	int init_scan				(scan_types sc);	
 
-virtual inline int next_bit_del		(); 												
-virtual inline int next_bit_del		(int& nBB /* table index*/); 
-virtual inline int next_bit_del		(int& nBB,  BBIntrin& bbN_del); 	 
+	/**
+	* @brief Configures the initial block and bit position for bitscanning
+	*		 starting from the bit 'firstBit' onwards, excluding 'firstBit'
+	*		 according to one of the 4 scan types passed as argument.
+	*		 If firstBit is -1 (EMPTY_ELEM), the scan starts from the beginning.
+	* @param firstBit: starting bit
+	* @param sc: type of scan
+	* @returns 0 if successful, -1 otherwise
+	* 
+	* TODO - no firstBit information is configured for DESTRUCTIVE scan types (08/02/2025) 
+	**/
+	int init_scan					(int firstBit, scan_types);
 
-	//bit scan forward (non destructive)
+
+	////////////////
+	// bitscan forwards
+	/**
+	* @brief next bit in the bitstring, starting from the block 
+	*		 in the last call to next_bit.
+	*		 Scan type: destructive
+	* 
+	*		 I. caches the current block for the next call
+	*		II. erases the current scanned bit
+	*		III. First call requires initialization with init_scan(DESTRUCTIVE)
+	* 
+	* @returns the next bit in the bitstring, EMPTY_ELEM if there are no more bits
+	* @details Created   23/3/12, last update 09/02/2025
+	**/
+virtual inline int next_bit_del		(); 	
+
+	/**
+	* @brief next bit in the bitstring, starting from the block
+	*		 in the last call to next_bit. 
+	*		 Returns in block the current bitblock  of the returned bit.
+	*		 Scan type: destructive
+	*
+	*		 I. caches the current block for the next call
+	*		II. erases the current scanned bit
+	* 		III. First call requires initialization with init_scan(DESTRUCTIVE)
+	* 
+	* @param block: output parameter with the current bitblock
+	* @returns the next bit in the bitstring, EMPTY_ELEM if there are no more bits
+	**/
+virtual inline int next_bit_del		(int& block ); 
+
+	/**
+	* @brief next bit in the bitstring, starting from the block
+	*		 in the last call to next_bit.
+	*		 Returns in block the current bitblock of the returned bit and deletes from
+	*		 the input bitset the current bit scanned (returned).
+	*		 Erases the current scanned bit from the bitblock bitset passed as argument
+	*		 Scan type: destructive
+	*
+	*		 I. caches the current block for the next call
+	*		II. erases the current scanned bit
+	* 		III. First call requires initialization with init_scan(DESTRUCTIVE)
+	* 
+	* @param bitset: bitblock where the scanned bit is erased
+	* @param block: output parameter with the current bitblock
+	* @returns the next bit in the bitstring, EMPTY_ELEM if there are no more bits
+	**/
+virtual inline int next_bit_del		(int& nBB,  BBIntrin& bitset); 	 
+
+	/**
+	* @brief next bit in the bitstring, starting from the block
+	*		 in the last call to next_bit. 
+	*		 Scan type: non-destructive
+	*
+	*		 I. caches the current block for the next call
+	*		II. DOES NOT erase the current scanned bit 
+	*		III. caches the scanned bit for the next call
+	* 		IV. First call requires initialization with init_scan(NON-DESTRUCTIVE)
+	*
+	* @returns the next bit in the bitstring, EMPTY_ELEM if there are no more bits
+	* @details Created   23/3/12, last update 09/02/2025
+	* @details Since the scan does not delete the scanned bit from the bitstring,
+	*		   it has to cache the last scanned bit for the next call
+	**/
 virtual inline int next_bit			();
 
+	/**
+	* @brief next bit in the bitstring, starting from the block
+	*		 in the last call to next_bit.
+	*		 Returns in block the current bitblock  of the returned bit.
+	*		 Scan type: non-destructive
+	*
+	*		 I. caches the current block for the next call
+	*		II. DOES NOT erase the current scanned bit
+	*		III. caches the scanned bit for the next call
+	* 		IV. First call requires initialization with init_scan(NON-DESTRUCTIVE)
+	* 
+	* @param block: output parameter with the current bitblock
+	* @returns the next bit in the bitstring, EMPTY_ELEM if there are no more bits
+	* @details Created   23/3/12, last update 09/02/2025
+	* @details Since the scan does not delete the scanned bit from the bitstring,
+	*		   it has to cache the last scanned bit for the next call
+	**/
+virtual inline int next_bit			(int& block);
+
+/**
+	* @brief next bit in the bitstring, starting from the block
+	*		 in the last call to next_bit.
+	*		 Returns in block the current bitblock of the returned bit and deletes from
+	*		 the input bitset the current bit scanned (returned).
+	*		 Erases the current scanned bit from the bitblock bitset passed as argument
+	*		 Scan type: non-destructive
+	*
+	*		 I. caches the current block for the next call
+	*		II. DOES NOT erase the current scanned bit
+	*		III.caches the scanned bit for the next call
+	* 		IV. First call requires initialization with init_scan(NON-DESTRUCTIVE)
+	*
+	* @param bitset: bitblock where the scanned bit is erased
+	* @param block: output parameter with the current bitblock
+	* @returns the next bit in the bitstring, EMPTY_ELEM if there are no more bits
+	* @details Created   23/3/12, last update 09/02/2025
+	* @details Since the scan does not delete the scanned bit from the bitstring,
+	*		   it has to cache the last scanned bit for the next call
+	**/
+virtual	inline int next_bit			(int& block, BBIntrin& bitset);
+
+	////////////////
+	// bitscan backwards
+	 
 	//bit scan backwards (non destructive)
 virtual inline int prev_bit			(); 
 virtual inline int prev_bit			(int& nBB);
 
 	//bit scan backwards (destructive)
  virtual inline int prev_bit_del	(); 
-
-virtual inline int next_bit			(int &); 
-virtual	inline int next_bit			(int &,  BBIntrin& ); 
 
 inline int prev_bit_del				(int& nBB);
 inline int prev_bit_del				(int& nBB,  BBIntrin& del ); 
@@ -183,105 +289,46 @@ int BBIntrin::lsbn64() const {
 	return EMPTY_ELEM;
 }
 
-inline 
-int BBIntrin::next_bit(int &nBB_new)  {
-////////////////////////////
-// Date:23/3/2012
-// BitScan not destructive
-// Version that use static data of the last bit position and the last table
-//
-// COMMENTS
-// 1-Require previous assignment BitSet::scan=0 and BBIntrin::scanv=MASK_LIM
-
-	unsigned long posInBB;
-			
-	//Search int the last table
-	if(_BitScanForward64(&posInBB, vBB_[m_scan.bbi] & Tables::mask_high[m_scan.pos])){
-		m_scan.pos =posInBB;
-		nBB_new=m_scan.bbi;
-		return (posInBB + WMUL(m_scan.bbi));
-	}else{											//Not found in the last table. Search in the rest
-		for(int i=m_scan.bbi+1; i<nBB_; i++){
-			if(_BitScanForward64(&posInBB,vBB_[i])){
-				m_scan.bbi=i;
-				m_scan.pos=posInBB;
-				nBB_new=i;
-				return (posInBB+ WMUL(i));
-			}
-		}
-	}
-	return EMPTY_ELEM;
-}
-
-inline
-int BBIntrin::next_bit(int &nBB_new,  BBIntrin& bbN_del ) {
-////////////////////////////
-// Date:30/3/2012
-// BitScan not destructive
-// Version that use static data of the last bit position and the last table
-//
-// COMMENTS
-// 1-Require previous assignment BitSet::scan=0 and BitSet::scanv=MASK_LIM
-
-	unsigned long posInBB;
-			
-	//Search int the last table
-	if(_BitScanForward64(&posInBB, vBB_[m_scan.bbi] & Tables::mask_high[m_scan.pos])){
-		m_scan.pos =posInBB;
-		nBB_new=m_scan.bbi;
-		bbN_del.vBB_[m_scan.bbi]&=~Tables::mask[posInBB];
-		return (posInBB + WMUL(m_scan.bbi));
-	}else{											//Not found in the last table. Search in the rest
-		for(int i=m_scan.bbi+1; i<nBB_; i++){
-			if(_BitScanForward64(&posInBB,vBB_[i])){
-				m_scan.bbi=i;
-				m_scan.pos=posInBB;
-				nBB_new=i;
-				bbN_del.vBB_[i]&=~Tables::mask[posInBB];
-				return (posInBB+ WMUL(i));
-			}
-		}
-	}
-	return EMPTY_ELEM;
-}
-
 
 
 inline
 int BBIntrin::next_bit_del() {
-////////////////////////////
-//
-// Date: 23/3/12
-// BitScan with Delete (D- erase the bit scanned) and Intrinsic
-// 
-// COMMENTS: New variable static scan which stores index of every BB
 
-	 unsigned long posInBB;
+	 U32 posInBB;
 
-	for(int i=m_scan.bbi; i<nBB_; i++)	{
-		if(_BitScanForward64(&posInBB,vBB_[i])){
-			m_scan.bbi=i;
-			vBB_[i]&=~Tables::mask[posInBB];			//Deletes the current bit before returning
-			return (posInBB+WMUL(i));
+	for(auto i = m_scan.bbi; i < nBB_; ++i)	{
+
+		if(_BitScanForward64(&posInBB, vBB_[i])){
+			//stores the current block
+			m_scan.bbi = i;
+
+			//deletes the current bit before returning
+			vBB_[i] &= ~Tables::mask[posInBB];			
+
+			return (posInBB + WMUL(i));
 		}
+
 	}
 	
 	return EMPTY_ELEM;  
 }
 
-
 inline 
-int BBIntrin::next_bit_del(int& nBB) {
-//////////////
-// Also return the number of table
-	unsigned long posInBB;
+int BBIntrin::next_bit_del(int& block) {
 
-	for(int i=m_scan.bbi; i<nBB_; i++)	{
+	U32 posInBB;
+
+	for(auto i = m_scan.bbi; i < nBB_; ++i)	{
+
 		if(_BitScanForward64(&posInBB,vBB_[i])){
-			m_scan.bbi=i;
-			vBB_[i]&=~Tables::mask[posInBB];			//Deleting before the return
-			nBB=i;
-			return (posInBB+WMUL(i));
+			//stores the current block and copies to output
+			m_scan.bbi = i;
+			block = i;
+
+			//deletes the current bit before returning
+			vBB_[i] &= ~Tables::mask[posInBB];			
+			
+			return (posInBB + WMUL(i));
 		}
 	}
 	
@@ -289,17 +336,23 @@ int BBIntrin::next_bit_del(int& nBB) {
 }
 
 inline
-int BBIntrin::next_bit_del(int& nBB, BBIntrin& bbN_del) {
-//////////////
-// BitScan DI it also erase the returned bit of the table passed
-	unsigned long posInBB;
+int BBIntrin::next_bit_del(int& block, BBIntrin& bbN_del) {
 
-	for(int i=m_scan.bbi; i<nBB_; i++){
+	U32 posInBB;
+
+	for(auto i = m_scan.bbi; i < nBB_; ++i){
+
 		if(_BitScanForward64(&posInBB,vBB_[i])){
+			//stores the current block and copies to output
 			m_scan.bbi=i;
-			vBB_[i]&=~Tables::mask[posInBB];					//Deleting before the return
-			bbN_del.vBB_[i]&=~Tables::mask[posInBB];
-			nBB=i;
+			block = i;
+
+			//deletes the current bit before returning
+			vBB_[i] &= ~Tables::mask[posInBB];				
+
+			//erases from the bitset passed the scanned bit
+			bbN_del.vBB_[i] &= ~Tables::mask[posInBB];
+			
 			return (posInBB+WMUL(i));
 		}
 	}
@@ -309,25 +362,27 @@ int BBIntrin::next_bit_del(int& nBB, BBIntrin& bbN_del) {
 
 inline
 int BBIntrin::next_bit() {
-////////////////////////////
-// Date:23/3/2012
-// BitScan not destructive
-// Version that use static data of the last bit position and the last table
-//
-// COMMENTS
-// 1-Require previous assignment m_scan_bbl=0 and m_scan.pos=MASK_LIM
 
-	unsigned long posInBB;
+	U32 posInBB;
 			
-	//Search for next bit in the last block
-	if(_BitScanForward64(&posInBB, vBB_[m_scan.bbi] & Tables::mask_high[m_scan.pos])){
-		m_scan.pos =posInBB;
+	//Search for next bit in the last scanned block
+	if( _BitScanForward64(&posInBB, vBB_[m_scan.bbi] & Tables::mask_high[m_scan.pos]) ){
+
+		//stores the current bit for next call
+		m_scan.pos = posInBB;									//current block has not changed, so not stored
+
 		return (posInBB + WMUL(m_scan.bbi));
-	}else{											//Search in the remaining blocks
-		for(int i=m_scan.bbi+1; i<nBB_; i++){
-			if(_BitScanForward64(&posInBB,vBB_[i])){
-				m_scan.bbi=i;
-				m_scan.pos=posInBB;
+
+	}else{	
+
+		//Searches for next bit in the remaining blocks
+		for(auto i = m_scan.bbi + 1; i < nBB_; ++i){
+			if( _BitScanForward64(&posInBB,vBB_[i]) ){
+
+				//stores the current block and bit for next call
+				m_scan.bbi = i;
+				m_scan.pos = posInBB;
+
 				return (posInBB+ WMUL(i));
 			}
 		}
@@ -335,6 +390,87 @@ int BBIntrin::next_bit() {
 	
 	return EMPTY_ELEM;
 }
+
+inline
+int BBIntrin::next_bit(int& block) {
+
+	U32 posInBB;
+
+	//Search for next bit in the last scanned block
+	if (_BitScanForward64(&posInBB, vBB_[m_scan.bbi] & Tables::mask_high[m_scan.pos])) {
+
+		//stores the current bit for next call
+		m_scan.pos = posInBB;									//current block has not changed, so not stored
+
+		//outputs the current block
+		block = m_scan.bbi;
+
+		return (posInBB + WMUL(m_scan.bbi));
+	}
+	else {		
+
+		//Searches for next bit in the remaining blocks
+		for (int i = m_scan.bbi + 1; i < nBB_; i++) {
+
+			if (_BitScanForward64(&posInBB, vBB_[i])) {
+
+				//stores the current block and bit for next call
+				m_scan.bbi = i;
+				m_scan.pos = posInBB;
+
+				//outputs the current block
+				block = i;
+
+				return (posInBB + WMUL(i));
+			}
+		}
+	}
+
+	return EMPTY_ELEM;
+}
+
+inline
+int BBIntrin::next_bit(int& block, BBIntrin& bitset) {
+
+	U32 posInBB;
+
+	//Search for next bit in the last scanned block
+	if (_BitScanForward64(&posInBB, vBB_[m_scan.bbi] & Tables::mask_high[m_scan.pos])) {
+		
+		//stores the current bit for next call
+		m_scan.pos = posInBB;									//current block has not changed, so not stored	
+
+		//outputs the current block
+		block = m_scan.bbi;
+
+		//deletes the bit from the input bitset
+		bitset.vBB_[m_scan.bbi] &= ~Tables::mask[posInBB];
+
+		return (posInBB + WMUL(m_scan.bbi));
+	}
+	else {											
+		//Searches for next bit in the remaining blocks
+		for (auto i = m_scan.bbi + 1; i < nBB_; i++) {
+			if (_BitScanForward64(&posInBB, vBB_[i])) {
+
+				//stores the current block and bit for next call
+				m_scan.bbi = i;
+				m_scan.pos = posInBB;
+
+				//outputs the current block
+				block = i;
+
+				//deletes the bit from the input bitset
+				bitset.vBB_[i] &= ~Tables::mask[posInBB];
+
+				return (posInBB + WMUL(i));
+			}
+		}
+	}
+
+	return EMPTY_ELEM;
+}
+
 
 
 inline
@@ -450,6 +586,7 @@ int BBIntrin::prev_bit_del(int& nBB) {
 
 inline
 int BBIntrin::init_scan(scan_types sct){
+
 	switch(sct){
 	case NON_DESTRUCTIVE:
 		set_scan_block	(0);
