@@ -164,13 +164,13 @@ int BBSentinel::init_scan(scan_types sct){
 	switch(sct){
 	case NON_DESTRUCTIVE:
 		update_sentinels();
-		m_scan.bbi=m_BBL;
-		m_scan.pos=MASK_LIM; 
+		scan_.bbi=m_BBL;
+		scan_.pos=MASK_LIM; 
 		break;
 	case NON_DESTRUCTIVE_REVERSE:
 		update_sentinels();
-		m_scan.bbi=m_BBH;
-		m_scan.pos=WORD_SIZE;		//mask_right[WORD_SIZE]=ONE
+		scan_.bbi=m_BBH;
+		scan_.pos=WORD_SIZE;		//mask_right[WORD_SIZE]=ONE
 		break;
 	case DESTRUCTIVE:				//uses sentinels to iterate and updates them on the fly
 		update_sentinels();
