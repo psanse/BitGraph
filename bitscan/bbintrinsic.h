@@ -288,10 +288,22 @@ inline	int* to_C_array				(int* lv, std::size_t& size, bool rev = false) overrid
 #ifdef POPCOUNT_64
 
 /////////////////
-// Popcount - CHECK if required (08/02/2025)
+// Popcount with intrinsifc primitives 
 
+	/**
+	* @brief returns the number of 1-bits in the bitstring
+	* @details implemented with intrinsic functions
+	**/
 virtual	 inline int popcn64			()						const;
-virtual	 inline int popcn64			(int nBit/*0 based*/)	const;
+
+	/**
+	* @brief returns the number of 1-bits in the bitstring in the closed range [firstBit, END]
+	* @param firstBit: first bit to consider in the count, included
+	* @details implemented with intrinsic functions
+	**/
+virtual	 inline int popcn64			(int firstBit)			const;
+
+
 
 #endif
 
@@ -302,9 +314,8 @@ virtual	 inline int popcn64			(int nBit/*0 based*/)	const;
 
 ///////////////////////
 //
-// INLINE FUNCTIONS
-// 
-////////////////////////
+// INLINE Implementation, must be in header file
+
 
 #ifdef POPCOUNT_64
 
@@ -312,7 +323,8 @@ inline
 int BBIntrin::popcn64() const{
 
 	BITBOARD pc = 0;
-	for(int i = 0; i < nBB_; ++i){
+
+	for(auto i = 0; i < nBB_; ++i){
 		pc += __popcnt64(vBB_[i]);
 	}
 
@@ -320,20 +332,21 @@ int BBIntrin::popcn64() const{
 }
 
 inline
-int BBIntrin::popcn64(int nBit) const{
-/////////////////////////
-// Population size from nBit(included) onwards
+int BBIntrin::popcn64(int firstBit) const{
 	
-	BITBOARD pc=0;
+	BITBOARD pc = 0;
 	
-	int nBB=WDIV(nBit);
-	for(int i=nBB+1; i<nBB_; i++){
-		pc+=__popcnt64(vBB_[i]);
-	}
+	auto bb = WDIV(firstBit);
 
-	//special case of nBit bit block
-	BITBOARD bb=vBB_[nBB]&~Tables::mask_low[WMOD(nBit)];
-	pc+=__popcnt64(bb);
+	//population of the block of the bit
+	pc += __popcnt64( vBB_[bb] & bblock::MASK_1_HIGH(firstBit - WMUL(bb) /* WMOD(bb)*/ ) );
+
+
+	//population after the block of the bit
+	for(int i= bb + 1; i < nBB_; ++i){
+		pc += __popcnt64(vBB_[i]);
+	}
+		
 
 	return pc;
 }
