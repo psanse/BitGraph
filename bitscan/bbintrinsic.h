@@ -19,7 +19,7 @@ using namespace std;
 // 
 // (Efficient bit scanning)
 // 
-// TODO- rename 08/02/2025
+// TODO - rename 08/02/2025
 //
 ///////////////////////////////////
 
@@ -302,8 +302,6 @@ virtual	 inline int popcn64			()						const;
 	* @details implemented with intrinsic functions
 	**/
 virtual	 inline int popcn64			(int firstBit)			const;
-
-
 
 #endif
 
