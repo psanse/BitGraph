@@ -25,11 +25,14 @@
 
 
 
+
 /////////////
 //Popcount
+//(switch in case processors do not support operations for population count)
 
 #define POPCOUNT_64											//uses HW assembler operation _popcn64 function (most efficient - DEFAULT)
 //#undef  POPCOUNT_64										//will use other population-count functions (lookup table...)
+
 
 
 
