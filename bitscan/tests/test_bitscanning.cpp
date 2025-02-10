@@ -49,22 +49,21 @@ TEST(BitScanningFeatureTest, basic) {
 	bb.set_bit(1);
 	bb.set_bit(64);
 
-	auto sc1 = make_scan_rev(bb);
-	int bit = BBObject::NOBIT;
-	while ((bit = sc1.next_bit()) != EMPTY_ELEM) {
+	auto sc1 = bscan::make_scan_rev(bb);
+	int bit = bscan::noBit;
+	while ((bit = sc1.next_bit()) != bscan::noBit) {
 		cout << "bit: " << bit << endl;
 	}
 
-	auto sc2 = make_scan(bb);
+	auto sc2 = bscan::make_scan(bb);
 	bit = BBObject::NOBIT;
-	while ((bit = sc2.next_bit()) != EMPTY_ELEM) {
+	while ((bit = sc2.next_bit()) != bscan::noBit) {
 		cout << "bit: " << bit << endl;
 	}
 
-
-	auto sc3 = make_scan_dest(bb);
-	bit = BBObject::NOBIT;
-	while ((bit = sc3.next_bit()) != EMPTY_ELEM) {
+	auto sc3 = bscan::make_scan_dest(bb);
+	bit = bscan::noBit;
+	while ((bit = sc3.next_bit()) != bscan::noBit) {
 		cout << "bit: " << bit << endl;
 	}
 
@@ -75,9 +74,9 @@ TEST(BitScanningFeatureTest, basic) {
 	bb.set_bit(1);
 	bb.set_bit(64);
 
-	auto sc4 = make_scan_rev_dest(bb);
-	bit = BBObject::NOBIT;
-	while ((bit = sc4.next_bit()) != EMPTY_ELEM) {
+	auto sc4 = bscan::make_scan_rev_dest(bb);
+	bit = bscan::noBit;
+	while ((bit = sc4.next_bit()) != bscan::noBit) {
 		cout << "bit: " << bit << endl;
 	}
 

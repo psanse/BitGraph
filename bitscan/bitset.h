@@ -13,6 +13,7 @@
 #ifndef __BITSET_H__
 #define __BITSET_H__
 
+
 #include "bbobject.h"
 #include "bitblock.h"	
 #include <vector>	
@@ -24,6 +25,7 @@
 using vint = std::vector<int>;
 using vbset  = std::vector<BITBOARD>;	
 
+
 /////////////////////////////////
 //
 // BitSet class 
@@ -33,19 +35,9 @@ using vbset  = std::vector<BITBOARD>;
 //
 ///////////////////////////////////
 class BitSet:public BBObject{
-
-	template<typename U>
-	friend class Scan;
-
-	template<typename U>
-	friend class ScanRev;
-
-	template<typename U>
-	friend class ScanDest;
-
-	template<typename U>
-	friend class ScanRevDest;
-
+			
+	friend class bscan;
+		
 public:	
 
 /////////////////////////////

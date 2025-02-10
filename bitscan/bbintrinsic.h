@@ -25,19 +25,9 @@ using namespace std;
 
 class BBIntrin: public BitSet{
 public:
-
-	template<typename U>
-	friend class Scan;
-
-	template<typename U>
-	friend class ScanRev;
-
-	template<typename U>
-	friend class ScanDest;
-
-	template<typename U>
-	friend class ScanRevDest;
-
+		
+	friend class bscan;
+		
 //constructors / destructors
 	
 	using BitSet::BitSet;			//inherit constructors	
