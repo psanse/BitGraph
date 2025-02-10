@@ -18,24 +18,24 @@ TEST(BitScanningTest, basic) {
 	bb.set_bit(1);
 	bb.set_bit(64);
 	
-	SCAN<> scan(bb);
+	SCAN<> sc1(bb);
 
-	int bit = -1;
-	while ( (bit= scan.next_bit()) != EMPTY_ELEM) {
+	int bit = BBObject::NOBIT;
+	while ( (bit= sc1.next_bit()) != EMPTY_ELEM) {
 		cout << "bit: " << bit << endl;	
 	}
 
-	SCAN_REV<> scanRev(bb);
+	SCAN_REV<> sc2(bb);
 
-	bit = -1;
-	while ((bit = scanRev.next_bit()) != EMPTY_ELEM) {
+	bit = BBObject::NOBIT;
+	while ((bit = sc2.next_bit()) != EMPTY_ELEM) {
 		cout << "bit: " << bit << endl;
 	}
 
-	SCAN_DEST<> scanDest(bb);
+	SCAN_DEST<> sc3(bb);
 
-	bit = -1;
-	while ((bit = scanDest.next_bit()) != EMPTY_ELEM) {
+	bit = BBObject::NOBIT;
+	while ((bit = sc3.next_bit()) != EMPTY_ELEM) {
 		cout << "bit: " << bit << endl;
 	}
 
@@ -49,25 +49,38 @@ TEST(BitScanningFeatureTest, basic) {
 	bb.set_bit(1);
 	bb.set_bit(64);
 
-	DirectRevScan<> scanRev(bb);
+	scanRev<> scr(bb);
 
 	int bit = -1;
-	while ((bit = scanRev.next_bit()) != EMPTY_ELEM) {
+	while ((bit = scr.next_bit()) != EMPTY_ELEM) {
 		cout << "bit: " << bit << endl;
 	}
 
-	DirectScan<> scan(bb);
+	scan<> sc(bb);
 
 	bit = -1;
-	while ((bit = scan.next_bit()) != EMPTY_ELEM) {
+	while ((bit = sc.next_bit()) != EMPTY_ELEM) {
 		cout << "bit: " << bit << endl;
 	}
 
 
-	DestructiveScan<> scanDest(bb);
+	scanDest<> scd(bb);
+	bit = -1;
+	while ((bit = scd.next_bit()) != EMPTY_ELEM) {
+		cout << "bit: " << bit << endl;
+	}
+
+	EXPECT_TRUE(bb.is_empty());
+
+	//restores original bitset
+	bb.set_bit(0);
+	bb.set_bit(1);
+	bb.set_bit(64);
+
+	scanRevDest<> scrd(bb);
 
 	bit = -1;
-	while ((bit = scanDest.next_bit()) != EMPTY_ELEM) {
+	while ((bit = scrd.next_bit()) != EMPTY_ELEM) {
 		cout << "bit: " << bit << endl;
 	}
 

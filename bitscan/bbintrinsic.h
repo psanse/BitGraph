@@ -27,13 +27,16 @@ class BBIntrin: public BitSet{
 public:
 
 	template<typename U>
-	friend class DirectRevScan;
+	friend class Scan;
 
 	template<typename U>
-	friend class DirectScan;
+	friend class ScanRev;
 
 	template<typename U>
-	friend class DestructiveScan;
+	friend class ScanDest;
+
+	template<typename U>
+	friend class ScanRevDest;
 
 //constructors / destructors
 	

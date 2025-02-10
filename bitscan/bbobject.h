@@ -24,6 +24,7 @@
 
 class BBObject{
 public:
+	static const int NOBIT = -1;
 
 	//types of bit scans
 	enum scan_types	{NON_DESTRUCTIVE, NON_DESTRUCTIVE_REVERSE, DESTRUCTIVE, DESTRUCTIVE_REVERSE};				
