@@ -33,6 +33,19 @@ using vbset  = std::vector<BITBOARD>;
 //
 ///////////////////////////////////
 class BitSet:public BBObject{
+
+	template<typename U>
+	friend class Scan;
+
+	template<typename U>
+	friend class ScanRev;
+
+	template<typename U>
+	friend class ScanDest;
+
+	template<typename U>
+	friend class ScanRevDest;
+
 public:	
 
 /////////////////////////////
