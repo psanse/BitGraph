@@ -49,22 +49,22 @@ TEST(BitScanningFeatureTest, basic) {
 	bb.set_bit(1);
 	bb.set_bit(64);
 
-	scanRev<BitSet> scr(bb);
+	auto sc1 = make_scan_rev(bb);
 	int bit = BBObject::NOBIT;
-	while ((bit = scr.next_bit()) != EMPTY_ELEM) {
+	while ((bit = sc1.next_bit()) != EMPTY_ELEM) {
 		cout << "bit: " << bit << endl;
 	}
 
-	scan<BitSet> sc(bb);
+	auto sc2 = make_scan(bb);
 	bit = BBObject::NOBIT;
-	while ((bit = sc.next_bit()) != EMPTY_ELEM) {
+	while ((bit = sc2.next_bit()) != EMPTY_ELEM) {
 		cout << "bit: " << bit << endl;
 	}
 
 
-	scanDest<BitSet> scd(bb);
+	auto sc3 = make_scan_dest(bb);
 	bit = BBObject::NOBIT;
-	while ((bit = scd.next_bit()) != EMPTY_ELEM) {
+	while ((bit = sc3.next_bit()) != EMPTY_ELEM) {
 		cout << "bit: " << bit << endl;
 	}
 
@@ -75,9 +75,9 @@ TEST(BitScanningFeatureTest, basic) {
 	bb.set_bit(1);
 	bb.set_bit(64);
 
-	scanRevDest<BitSet> scrd(bb);
+	auto sc4 = make_scan_rev_dest(bb);
 	bit = BBObject::NOBIT;
-	while ((bit = scrd.next_bit()) != EMPTY_ELEM) {
+	while ((bit = sc4.next_bit()) != EMPTY_ELEM) {
 		cout << "bit: " << bit << endl;
 	}
 

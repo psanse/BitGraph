@@ -226,5 +226,17 @@ using scanDest	= ScanDest<BitSet_t>;
 template<class BitSet_t = BBIntrin>
 using scanRevDest	= ScanRevDest<BitSet_t>;
 
+//convenient make functions
+template<class BitSet_t = BBIntrin>
+scan< BitSet_t> make_scan(BitSet_t& bb) { return scan<BitSet_t>(bb); }
+
+template<class BitSet_t = BBIntrin>
+scanRev< BitSet_t> make_scan_rev(BitSet_t& bb) { return scanRev<BitSet_t>(bb); }
+
+template<class BitSet_t = BBIntrin>
+scanDest< BitSet_t> make_scan_dest(BitSet_t& bb) { return scanDest<BitSet_t>(bb); }
+
+template<class BitSet_t = BBIntrin>
+scanRevDest< BitSet_t> make_scan_rev_dest(BitSet_t& bb) { return scanRevDest<BitSet_t>(bb); }
 
 #endif
