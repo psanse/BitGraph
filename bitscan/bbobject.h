@@ -36,7 +36,9 @@ public:
 		int bbi;								//bitboard index 	
 		int pos;								//bit position for bitscan
 
-		scan_t() :bbi(EMPTY_ELEM), pos(MASK_LIM) {}
+		scan_t() :bbi(EMPTY_ELEM), pos(MASK_LIM)	{}
+		void set_block(int block)					{ bbi = block; }	
+		void set_bit(int bit)						{ pos = bit; }
 	};
 
 

@@ -24,7 +24,16 @@ using namespace std;
 ///////////////////////////////////
 
 class BBIntrin: public BitSet{
-public:	
+public:
+
+	template<typename U>
+	friend class DirectRevScan;
+
+	template<typename U>
+	friend class DirectScan;
+
+	template<typename U>
+	friend class DestructiveScan;
 
 //constructors / destructors
 	
