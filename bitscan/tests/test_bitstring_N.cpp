@@ -6,7 +6,7 @@
 * @authos pss
 **/
 
-#include "bitscan/bitboardn.h"	
+#include "bitscan/bitset.h"	
 #include "bitscan/bbalg.h"
 #include "gtest/gtest.h"
 #include <iostream>
