@@ -56,7 +56,7 @@ TEST(BitScanningFeatureTest, basic) {
 	}
 
 	auto sc2 = bscan::make_scan(bb);
-	bit = BBObject::NOBIT;
+	bit = bscan::noBit;
 	while ((bit = sc2.next_bit()) != bscan::noBit) {
 		cout << "bit: " << bit << endl;
 	}
