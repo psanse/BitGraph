@@ -17,10 +17,9 @@ public:
 	/**
 	* @brief Converts the bitstring bb to a C-array of integers
 	* @param bb: input bitstring
-	* @param lv: output array
-	* @param size: output size of the array (number of bits in the bitstring),
-	*			   must be initialized previously to at least the number of 1-bits 
+	* @param lv: output array which must be initialized previously to at least the number of 1-bits 
 	*			   of the bitstring bb.
+	* @param size: output size of the array (number of bits in the bitstring)			   
 	* @param rev: if true, the bits are stored in reverse order
 	* @returns the C-array of integers
 	* @details created 11/02/2025  
@@ -42,6 +41,11 @@ public:
 			init_scan(firstBit);
 		}
 
+		/**
+		* @brief Scans the bitset from [firstBit , end of the bitset)
+		*		 If firstBit = -1 scans the whole bitset
+		* @param firstBit: starting position of the scan
+		**/
 		void init_scan(int firstBit = -1) {
 
 			if (firstBit == -1) {
@@ -53,6 +57,9 @@ public:
 			}
 		}
 
+		/**
+		* @brief returns the next bit in the bitset during a reverse bitscanning operation
+		**/
 		int next_bit() {
 			
 			U32 posInBB;
@@ -86,8 +93,17 @@ public:
 
 		}
 
-		int next_bit(BitSet_t&);
+		/**
+		* @brief scans the next bit in the bitset and deletes it from the
+		*		 bitset bb_del
+		* @param bbdel: bitset to delete the bit from
+		**/
+		int next_bit(BitSet_t& bb_del);
 
+
+		/**
+		* @brief returns the index of the current bitblock being scanned
+		**/
 		int get_block() { return  scan_.bbi_; }
 
 	private:
@@ -110,6 +126,11 @@ public:
 			init_scan(firstBit);
 		}
 
+		/**
+		* @brief Scans the bitset from [firstBit , end of the bitset)
+		*		 If firstBit = -1 scans the whole bitset
+		* @param firstBit: starting position of the scan
+		**/
 		void init_scan(int firstBit = -1) {
 
 
@@ -123,6 +144,10 @@ public:
 			
 		}
 
+
+		/**
+		* @brief returns the next bit in the bitset during a direct bitscanning operation
+		**/
 		int next_bit() {
 			
 			U32 posInBB;
@@ -155,8 +180,17 @@ public:
 
 		}
 
-		int next_bit(BitSet_t&);
+		/**
+		* @brief scans the next bit in the bitset and deletes it from the
+		*		 bitset bb_del
+		* @param bbdel: bitset to delete the bit from
+		**/
+		int next_bit(BitSet_t&  bb_del);
 
+
+		/**
+		* @brief returns the index of the current bitblock being scanned
+		**/
 		int get_block() { return  scan_.bbi_; }
 
 	private:
@@ -185,6 +219,9 @@ public:
 			scan_.set_block(0);			
 		}
 
+		/**
+		* @brief returns the next bit in the bitset during a direct bitscanning operation
+		**/
 		int next_bit() {
 			
 			U32 posInBB;
@@ -208,8 +245,16 @@ public:
 
 		}
 
-		int next_bit(BitSet_t&);
+		/**
+		* @brief scans the next bit in the bitset and deletes it from the
+		*		 bitset bb_del
+		* @param bbdel: bitset to delete the bit from
+		**/
+		int next_bit(BitSet_t& bb_del);
 
+		/**
+		* @brief returns the index of the current bitblock being scanned
+		**/
 		int get_block() { return scan_.bbi_; }
 
 	private:
@@ -236,6 +281,9 @@ public:
 			scan_.set_block(bb_.nBB_ - 1);			
 		}
 
+		/**
+		* @brief returns the next bit in the bitset during a reverse bitscanning operation
+		**/
 		int next_bit() {
 
 			U32 posInBB;
@@ -258,8 +306,18 @@ public:
 
 		}
 
-		int next_bit(BitSet_t&);
 
+		/**
+		* @brief scans the next bit in the bitset and deletes it from the
+		*		 bitset bb_del
+		* @param bbdel: bitset to delete the bit from
+		**/
+		int next_bit(BitSet_t& bb_del);
+
+
+		/**
+		* @brief returns the index of the current bitblock being scanned
+		**/
 		int get_block() { return scan_.bbi_; }
 
 	private:
