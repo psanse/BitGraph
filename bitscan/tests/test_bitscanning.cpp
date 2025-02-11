@@ -4,84 +4,92 @@
 * @details created 10/02/2025
 **/
 
-#include "bitscan/bbscanning.h"
-#include "bitscan/bbscanningFeature.h"
+#include "bitscan/bbscanFeature.h"
 #include "gtest/gtest.h"
 #include <iostream>
+#include <vector>
 
 using namespace std;
 
-TEST(BitScanningTest, basic) {
+class BitScanningTest : public ::testing::Test {
+protected:
+	BitScanningTest() :bb(65) {}
+	virtual void SetUp() {
+		bb.set_bit(0);
+		bb.set_bit(1);
+		bb.set_bit(64);
+	}
 
-	BBIntrin bb(65);
-	bb.set_bit(0);
-	bb.set_bit(1);
-	bb.set_bit(64);
+	BitSet bb;
+};
 	
-	SCAN<> sc1(bb);
-
-	int bit = BBObject::NOBIT;
-	while ( (bit= sc1.next_bit()) != EMPTY_ELEM) {
-		cout << "bit: " << bit << endl;	
-	}
-
-	SCAN_REV<> sc2(bb);
-
-	bit = BBObject::NOBIT;
-	while ((bit = sc2.next_bit()) != EMPTY_ELEM) {
-		cout << "bit: " << bit << endl;
-	}
-
-	SCAN_DEST<> sc3(bb);
-
-	bit = BBObject::NOBIT;
-	while ((bit = sc3.next_bit()) != EMPTY_ELEM) {
-		cout << "bit: " << bit << endl;
-	}
-
-	EXPECT_TRUE(bb.is_empty());
-}
-
-TEST(BitScanningFeatureTest, basic) {
-
-	BitSet bb(65);
-	bb.set_bit(0);
-	bb.set_bit(1);
-	bb.set_bit(64);
-
-	auto sc1 = bscan::make_scan_rev(bb);
+//tests the 4 types of scanning
+TEST_F(BitScanningTest, basic) {
+	
 	int bit = bscan::noBit;
-	while ((bit = sc1.next_bit()) != bscan::noBit) {
-		cout << "bit: " << bit << endl;
-	}
+	std::vector<int> lbits;
+	std::vector<int> lbits_exp;
 
-	auto sc2 = bscan::make_scan(bb);
+	//direct scanning
+	auto sc1 = bscan::make_scan(bb);
 	bit = bscan::noBit;
-	while ((bit = sc2.next_bit()) != bscan::noBit) {
-		cout << "bit: " << bit << endl;
+	while ((bit = sc1.next_bit()) != bscan::noBit) {
+		lbits.emplace_back(bit);
 	}
 
+	//////////////////////////////
+	lbits_exp = { 0, 1, 64 };
+	EXPECT_EQ(lbits_exp, lbits);
+	//////////////////////////////
+
+	//direct reverse scanning
+	auto sc2 = bscan::make_scan_rev(bb);
+	bit = bscan::noBit;
+
+	lbits.clear();
+	while ((bit = sc2.next_bit()) != bscan::noBit) {
+		lbits.emplace_back(bit);
+	}
+
+	//////////////////////////////
+	lbits_exp = { 64, 1, 0 };
+	EXPECT_EQ(lbits_exp, lbits);
+	//////////////////////////////
+	
+	//destructive scanning
 	auto sc3 = bscan::make_scan_dest(bb);
 	bit = bscan::noBit;
+
+	lbits.clear();
 	while ((bit = sc3.next_bit()) != bscan::noBit) {
-		cout << "bit: " << bit << endl;
+		lbits.emplace_back(bit);
 	}
 
+	///////////////////////////////
+	lbits_exp = { 0, 1, 64};
+	EXPECT_EQ(lbits_exp, lbits);
 	EXPECT_TRUE(bb.is_empty());
+	////////////////////////////////
 
 	//restores original bitset
 	bb.set_bit(0);
 	bb.set_bit(1);
 	bb.set_bit(64);
 
+	//destructive reverse scanning
 	auto sc4 = bscan::make_scan_rev_dest(bb);
 	bit = bscan::noBit;
+
+	lbits.clear();
 	while ((bit = sc4.next_bit()) != bscan::noBit) {
-		cout << "bit: " << bit << endl;
+		lbits.emplace_back(bit);
 	}
 
+	///////////////////////////////
+	lbits_exp = { 64, 1, 0 };
+	EXPECT_EQ(lbits_exp, lbits);
 	EXPECT_TRUE(bb.is_empty());
-
+	////////////////////////////////
 	
 }
 

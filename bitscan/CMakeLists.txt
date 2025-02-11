@@ -9,8 +9,7 @@ bbintrinsic.h
 bbintrinsic_sparse.h
 bbsentinel.h
 bbobject.h
-bbscanning.h
-bbscanningFeature.h
+bbscanFeature.h
 )
 
 ###################

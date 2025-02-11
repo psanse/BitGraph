@@ -229,13 +229,13 @@ public:
 	using scan = Scan<BitSet_t>;
 
 	template<class BitSet_t = BBIntrin>
-	using scanRev = ScanRev<BitSet_t>;
+	using scanReverse = ScanRev<BitSet_t>;
 
 	template<class BitSet_t = BBIntrin>
-	using scanDest = ScanDest<BitSet_t>;
+	using scanDestructive = ScanDest<BitSet_t>;
 
 	template<class BitSet_t = BBIntrin>
-	using scanRevDest = ScanRevDest<BitSet_t>;
+	using scanReverseDestructive = ScanRevDest<BitSet_t>;
 
 
 	///////////////////////////////////
@@ -246,15 +246,15 @@ public:
 
 	template<class BitSet_t = BBIntrin>
 	static
-	scanRev<BitSet_t> make_scan_rev(BitSet_t& bb) { return scanRev<BitSet_t>(bb); }
+	scanReverse<BitSet_t> make_scan_rev(BitSet_t& bb) { return scanReverse<BitSet_t>(bb); }
 
 	template<class BitSet_t = BBIntrin>
 	static
-	scanDest<BitSet_t> make_scan_dest(BitSet_t& bb) { return scanDest<BitSet_t>(bb); }
+	scanDestructive<BitSet_t> make_scan_dest(BitSet_t& bb) { return scanDestructive<BitSet_t>(bb); }
 
 	template<class BitSet_t = BBIntrin>
 	static
-	scanRevDest<BitSet_t> make_scan_rev_dest(BitSet_t& bb) { return scanRevDest<BitSet_t>(bb); }
+	scanReverseDestructive<BitSet_t> make_scan_rev_dest(BitSet_t& bb) { return scanReverseDestructive<BitSet_t>(bb); }
 
 }; //end class BitScan	
 
