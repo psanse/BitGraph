@@ -37,8 +37,8 @@ public:
 ///////////////////////////////
 //setters and getters
 	
-	void set_scan_block				(int bbindex)		{ scan_.bbi = bbindex;}	
-	void set_scan_bit				(int posbit)		{ scan_.pos = posbit;}	
+	void set_scan_block				(int bbindex)		{ scan_.bbi_ = bbindex;}	
+	void set_scan_bit				(int posbit)		{ scan_.pos_ = posbit;}	
  	
 //////////////////////////////
 // Bitscanning (with cached info)
@@ -391,11 +391,11 @@ int BBIntrin::next_bit_del() {
 
 	 U32 posInBB;
 
-	for(auto i = scan_.bbi; i < nBB_; ++i)	{
+	for(auto i = scan_.bbi_; i < nBB_; ++i)	{
 
 		if(_BitScanForward64(&posInBB, vBB_[i])){
 			//stores the current block
-			scan_.bbi = i;
+			scan_.bbi_ = i;
 
 			//deletes the current bit before returning
 			vBB_[i] &= ~Tables::mask[posInBB];			
@@ -413,11 +413,11 @@ int BBIntrin::next_bit_del(int& block) {
 
 	U32 posInBB;
 
-	for(auto i = scan_.bbi; i < nBB_; ++i)	{
+	for(auto i = scan_.bbi_; i < nBB_; ++i)	{
 
 		if(_BitScanForward64(&posInBB,vBB_[i])){
 			//stores the current block and copies to output
-			scan_.bbi = i;
+			scan_.bbi_ = i;
 			block = i;
 
 			//deletes the current bit before returning
@@ -435,11 +435,11 @@ int BBIntrin::next_bit_del(int& block, BBIntrin& bbN_del) {
 
 	U32 posInBB;
 
-	for(auto i = scan_.bbi; i < nBB_; ++i){
+	for(auto i = scan_.bbi_; i < nBB_; ++i){
 
 		if(_BitScanForward64(&posInBB,vBB_[i])){
 			//stores the current block and copies to output
-			scan_.bbi=i;
+			scan_.bbi_=i;
 			block = i;
 
 			//deletes the current bit before returning
@@ -461,22 +461,22 @@ int BBIntrin::next_bit() {
 	U32 posInBB;
 			
 	//Search for next bit in the last scanned block
-	if( _BitScanForward64(&posInBB, vBB_[scan_.bbi] & Tables::mask_high[scan_.pos]) ){
+	if( _BitScanForward64(&posInBB, vBB_[scan_.bbi_] & Tables::mask_high[scan_.pos_]) ){
 
 		//stores the current bit for next call
-		scan_.pos = posInBB;									//current block has not changed, so not stored
+		scan_.pos_ = posInBB;									//current block has not changed, so not stored
 
-		return (posInBB + WMUL(scan_.bbi));
+		return (posInBB + WMUL(scan_.bbi_));
 
 	}else{	
 
 		//Searches for next bit in the remaining blocks
-		for(auto i = scan_.bbi + 1; i < nBB_; ++i){
+		for(auto i = scan_.bbi_ + 1; i < nBB_; ++i){
 			if( _BitScanForward64(&posInBB,vBB_[i]) ){
 
 				//stores the current block and bit for next call
-				scan_.bbi = i;
-				scan_.pos = posInBB;
+				scan_.bbi_ = i;
+				scan_.pos_ = posInBB;
 
 				return (posInBB+ WMUL(i));
 			}
@@ -492,26 +492,26 @@ int BBIntrin::next_bit(int& block) {
 	U32 posInBB;
 
 	//Search for next bit in the last scanned block
-	if (_BitScanForward64(&posInBB, vBB_[scan_.bbi] & Tables::mask_high[scan_.pos])) {
+	if (_BitScanForward64(&posInBB, vBB_[scan_.bbi_] & Tables::mask_high[scan_.pos_])) {
 
 		//stores the current bit for next call
-		scan_.pos = posInBB;									//current block has not changed, so not stored
+		scan_.pos_ = posInBB;									//current block has not changed, so not stored
 
 		//outputs the current block
-		block = scan_.bbi;
+		block = scan_.bbi_;
 
-		return (posInBB + WMUL(scan_.bbi));
+		return (posInBB + WMUL(scan_.bbi_));
 	}
 	else {		
 
 		//Searches for next bit in the remaining blocks
-		for (int i = scan_.bbi + 1; i < nBB_; i++) {
+		for (int i = scan_.bbi_ + 1; i < nBB_; i++) {
 
 			if (_BitScanForward64(&posInBB, vBB_[i])) {
 
 				//stores the current block and bit for next call
-				scan_.bbi = i;
-				scan_.pos = posInBB;
+				scan_.bbi_ = i;
+				scan_.pos_ = posInBB;
 
 				//outputs the current block
 				block = i;
@@ -530,27 +530,27 @@ int BBIntrin::next_bit(int& block, BBIntrin& bitset) {
 	U32 posInBB;
 
 	//Search for next bit in the last scanned block
-	if (_BitScanForward64(&posInBB, vBB_[scan_.bbi] & Tables::mask_high[scan_.pos])) {
+	if (_BitScanForward64(&posInBB, vBB_[scan_.bbi_] & Tables::mask_high[scan_.pos_])) {
 		
 		//stores the current bit for next call
-		scan_.pos = posInBB;									//current block has not changed, so not stored	
+		scan_.pos_ = posInBB;									//current block has not changed, so not stored	
 
 		//outputs the current block
-		block = scan_.bbi;
+		block = scan_.bbi_;
 
 		//deletes the bit from the input bitset
-		bitset.vBB_[scan_.bbi] &= ~Tables::mask[posInBB];
+		bitset.vBB_[scan_.bbi_] &= ~Tables::mask[posInBB];
 
-		return (posInBB + WMUL(scan_.bbi));
+		return (posInBB + WMUL(scan_.bbi_));
 	}
 	else {											
 		//Searches for next bit in the remaining blocks
-		for (auto i = scan_.bbi + 1; i < nBB_; i++) {
+		for (auto i = scan_.bbi_ + 1; i < nBB_; i++) {
 			if (_BitScanForward64(&posInBB, vBB_[i])) {
 
 				//stores the current block and bit for next call
-				scan_.bbi = i;
-				scan_.pos = posInBB;
+				scan_.bbi_ = i;
+				scan_.pos_ = posInBB;
 
 				//outputs the current block
 				block = i;
@@ -572,23 +572,23 @@ int BBIntrin::prev_bit		() {
 	U32 posInBB;
 
 	//Searches for previous bit in the last scanned block
-	if( _BitScanReverse64(&posInBB, vBB_[scan_.bbi] & Tables::mask_low[scan_.pos]) ){
+	if( _BitScanReverse64(&posInBB, vBB_[scan_.bbi_] & Tables::mask_low[scan_.pos_]) ){
 
 		//stores the current bit for next call
-		scan_.pos = posInBB;									//current block has not changed, so not stored			
+		scan_.pos_ = posInBB;									//current block has not changed, so not stored			
 
-		return (posInBB + WMUL(scan_.bbi));
+		return (posInBB + WMUL(scan_.bbi_));
 
 	}else{		
 
 		//Searches for previous bit in the remaining blocks
-		for(auto i = scan_.bbi - 1; i >= 0; --i){
+		for(auto i = scan_.bbi_ - 1; i >= 0; --i){
 
 			if(_BitScanReverse64(&posInBB,vBB_[i])){
 
 				//stores the current block and bit for next call
-				scan_.bbi = i;
-				scan_.pos = posInBB;
+				scan_.bbi_ = i;
+				scan_.pos_ = posInBB;
 
 				return (posInBB + WMUL(i));
 			}
@@ -604,26 +604,26 @@ int BBIntrin::prev_bit	(int& block) {
 	U32 posInBB;
 				
 	//Searches for previous bit in the last scanned block
-	if( _BitScanReverse64(&posInBB, vBB_[scan_.bbi] & Tables::mask_low[scan_.pos]) ){
+	if( _BitScanReverse64(&posInBB, vBB_[scan_.bbi_] & Tables::mask_low[scan_.pos_]) ){
 
 		//stores the current bit for next call
-		scan_.pos = posInBB;									//current block has not changed, so not stored
+		scan_.pos_ = posInBB;									//current block has not changed, so not stored
 
 		//outputs the current block
-		block = scan_.bbi;
+		block = scan_.bbi_;
 
-		return (posInBB + WMUL(scan_.bbi));
+		return (posInBB + WMUL(scan_.bbi_));
 
 	}else{											
 
 		//Searches for previous bit in the remaining blocks
-		for(auto i = scan_.bbi - 1; i >= 0; --i){
+		for(auto i = scan_.bbi_ - 1; i >= 0; --i){
 
 			if(_BitScanReverse64(&posInBB,vBB_[i])){
 
 				//stores the current block and bit for next call
-				scan_.bbi=i;
-				scan_.pos=posInBB;
+				scan_.bbi_=i;
+				scan_.pos_=posInBB;
 
 				//outputs the current block
 				block = i;
@@ -641,12 +641,12 @@ int BBIntrin::prev_bit_del() {
  
 	U32 posInBB;
 
-	for(auto i = scan_.bbi; i >= 0; --i){
+	for(auto i = scan_.bbi_; i >= 0; --i){
 
 		if(_BitScanReverse64(&posInBB,vBB_[i])){
 
 			//stores the current block for the next call
-			scan_.bbi=i;
+			scan_.bbi_=i;
 
 			//deletes the current bit from the bitset before returning
 			vBB_[i] &= ~Tables::mask[posInBB];		
@@ -662,12 +662,12 @@ int BBIntrin::prev_bit_del(int& block) {
 
 	U32 posInBB;
 
-	for(auto i = scan_.bbi; i >= 0; --i){
+	for(auto i = scan_.bbi_; i >= 0; --i){
 
 		if(_BitScanReverse64(&posInBB,vBB_[i])){
 
 			//stores the current block for the next call
-			scan_.bbi=i;
+			scan_.bbi_=i;
 
 			//deletes the current bit from the bitset before returning
 			vBB_[i]&=~Tables::mask[posInBB];			
@@ -687,12 +687,12 @@ int BBIntrin::prev_bit_del(int& block, BBIntrin& bitset) {
 
 	U32 posInBB;
 
-	for (auto i = scan_.bbi; i >= 0; --i) {
+	for (auto i = scan_.bbi_; i >= 0; --i) {
 
 		if (_BitScanReverse64(&posInBB, vBB_[i])) {
 
 			//stores the current block for the next call
-			scan_.bbi = i;
+			scan_.bbi_ = i;
 
 			//deletes the current bit from the bitset before returning
 			vBB_[i] &= ~Tables::mask[posInBB];			

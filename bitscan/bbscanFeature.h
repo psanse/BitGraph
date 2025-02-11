@@ -14,6 +14,21 @@ class bscan {
 public:
 	static const int noBit = -1;
 
+	/**
+	* @brief Converts the bitstring bb to a C-array of integers
+	* @param bb: input bitstring
+	* @param lv: output array
+	* @param size: output size of the array (number of bits in the bitstring),
+	*			   must be initialized previously to at least the number of 1-bits 
+	*			   of the bitstring bb.
+	* @param rev: if true, the bits are stored in reverse order
+	* @returns the C-array of integers
+	* @details created 11/02/2025  
+	* @details preserved for backward compatibility of the opt algorithm code - TO REMOVE 09/02/2025
+	**/
+	template<class BitSet_t>
+	static int* to_C_array (BitSet_t& bb, int* lv, std::size_t& size, bool rev = false) ;
+
 	template< class BitSet_t = BBIntrin>
 	struct ScanRev {
 		using basic_type = BitSet_t;
@@ -21,15 +36,21 @@ public:
 
 	public:
 
-		ScanRev(BitSet_t& bb) :
+		ScanRev(BitSet_t& bb, int firstBit=-1) :
 			bb_(bb)
 		{
-			init_scan();
+			init_scan(firstBit);
 		}
 
-		void init_scan() {
-			scan_.set_block(bb_.nBB_ - 1);
-			scan_.set_bit(WORD_SIZE);
+		void init_scan(int firstBit = -1) {
+
+			if (firstBit == -1) {
+				scan_.set_block(bb_.nBB_ - 1);
+				scan_.set_pos(WORD_SIZE);
+			}
+			else {
+				scan_.set_bit(firstBit);	
+			}
 		}
 
 		int next_bit() {
@@ -37,24 +58,24 @@ public:
 			U32 posInBB;
 
 			//Searches for previous bit in the last scanned block
-			if (_BitScanReverse64(&posInBB, bb_.vBB_[scan_.bbi] & Tables::mask_low[scan_.pos])) {
+			if (_BitScanReverse64(&posInBB, bb_.vBB_[scan_.bbi_] & Tables::mask_low[scan_.pos_])) {
 
 				//stores the current bit for next call
-				scan_.pos = posInBB;									//current block has not changed, so not stored			
+				scan_.pos_ = posInBB;									//current block has not changed, so not stored			
 
-				return (posInBB + WMUL(scan_.bbi));
+				return (posInBB + WMUL(scan_.bbi_));
 
 			}
 			else {
 
 				//Searches for previous bit in the remaining blocks
-				for (auto i = scan_.bbi - 1; i >= 0; --i) {
+				for (auto i = scan_.bbi_ - 1; i >= 0; --i) {
 
 					if (_BitScanReverse64(&posInBB, bb_.vBB_[i])) {
 
 						//stores the current block and bit for next call
-						scan_.bbi = i;
-						scan_.pos = posInBB;
+						scan_.bbi_ = i;
+						scan_.pos_ = posInBB;
 
 						return (posInBB + WMUL(i));
 					}
@@ -64,6 +85,10 @@ public:
 			return noBit;
 
 		}
+
+		int next_bit(BitSet_t&);
+
+		int get_block() { return  scan_.bbi_; }
 
 	private:
 		BBObject::scan_t scan_;
@@ -79,15 +104,23 @@ public:
 
 	public:
 
-		Scan(BitSet_t& bb) :
+		Scan(BitSet_t& bb, int firstBit = -1) :
 			bb_(bb)
 		{
-			init_scan();
+			init_scan(firstBit);
 		}
 
-		void init_scan() {
-			scan_.set_block(0);
-			scan_.set_bit(MASK_LIM);
+		void init_scan(int firstBit = -1) {
+
+
+			if (firstBit == -1) {
+				scan_.set_block(0);
+				scan_.set_pos(MASK_LIM);
+			}
+			else {
+				scan_.set_bit(firstBit);
+			}
+			
 		}
 
 		int next_bit() {
@@ -95,23 +128,23 @@ public:
 			U32 posInBB;
 
 			//Search for next bit in the last scanned block
-			if (_BitScanForward64(&posInBB, bb_.vBB_[scan_.bbi] & Tables::mask_high[scan_.pos])) {
+			if (_BitScanForward64(&posInBB, bb_.vBB_[scan_.bbi_] & Tables::mask_high[scan_.pos_])) {
 
 				//stores the current bit for next call
-				scan_.pos = posInBB;									//current block has not changed, so not stored
+				scan_.pos_ = posInBB;									//current block has not changed, so not stored
 
-				return (posInBB + WMUL(scan_.bbi));
+				return (posInBB + WMUL(scan_.bbi_));
 
 			}
 			else {
 
 				//Searches for next bit in the remaining blocks
-				for (auto i = scan_.bbi + 1; i < bb_.nBB_; ++i) {
+				for (auto i = scan_.bbi_ + 1; i < bb_.nBB_; ++i) {
 					if (_BitScanForward64(&posInBB, bb_.vBB_[i])) {
 
 						//stores the current block and bit for next call
-						scan_.bbi = i;
-						scan_.pos = posInBB;
+						scan_.bbi_ = i;
+						scan_.pos_ = posInBB;
 
 						return (posInBB + WMUL(i));
 					}
@@ -121,6 +154,10 @@ public:
 			return noBit;
 
 		}
+
+		int next_bit(BitSet_t&);
+
+		int get_block() { return  scan_.bbi_; }
 
 	private:
 		BBObject::scan_t scan_;
@@ -145,7 +182,7 @@ public:
 		}
 
 		void init_scan() {
-			scan_.set_block(0);
+			scan_.set_block(0);			
 		}
 
 		int next_bit() {
@@ -153,11 +190,11 @@ public:
 			U32 posInBB;
 
 			//Searches for next bit from the last scanned block
-			for (auto i = scan_.bbi; i < bb_.nBB_; ++i) {
+			for (auto i = scan_.bbi_; i < bb_.nBB_; ++i) {
 
 				if (_BitScanForward64(&posInBB, bb_.vBB_[i])) {
 					//stores the current block
-					scan_.bbi = i;
+					scan_.bbi_ = i;
 
 					//deletes the current bit before returning
 					bb_.vBB_[i] &= ~Tables::mask[posInBB];
@@ -171,11 +208,14 @@ public:
 
 		}
 
+		int next_bit(BitSet_t&);
+
+		int get_block() { return scan_.bbi_; }
+
 	private:
 		BBObject::scan_t scan_;
 		BitSet_t& bb_;
 	};
-
 
 	////////////////////////////////
 
@@ -193,7 +233,7 @@ public:
 		}
 
 		void init_scan() {
-			scan_.set_block(bb_.nBB_ - 1);
+			scan_.set_block(bb_.nBB_ - 1);			
 		}
 
 		int next_bit() {
@@ -201,12 +241,12 @@ public:
 			U32 posInBB;
 
 			//Searches for previous bit from the last scanned block
-			for (auto i = scan_.bbi; i >= 0; --i) {
+			for (auto i = scan_.bbi_; i >= 0; --i) {
 
 				if (_BitScanReverse64(&posInBB, bb_.vBB_[i])) {
 
 					//stores the current block for the next call
-					scan_.bbi = i;
+					scan_.bbi_ = i;
 
 					//deletes the current bit from the bitset before returning
 					bb_.vBB_[i] &= ~Tables::mask[posInBB];
@@ -217,6 +257,10 @@ public:
 			return noBit;
 
 		}
+
+		int next_bit(BitSet_t&);
+
+		int get_block() { return scan_.bbi_; }
 
 	private:
 		BBObject::scan_t scan_;
@@ -242,11 +286,11 @@ public:
 	//convenient make functions
 	template<class BitSet_t = BBIntrin>
 	static
-		scan<BitSet_t> make_scan(BitSet_t& bb) { return scan<BitSet_t>(bb); }
+		scan<BitSet_t> make_scan(BitSet_t& bb, int firstBit=-1) { return scan<BitSet_t>(bb, firstBit); }
 
 	template<class BitSet_t = BBIntrin>
 	static
-	scanReverse<BitSet_t> make_scan_rev(BitSet_t& bb) { return scanReverse<BitSet_t>(bb); }
+	scanReverse<BitSet_t> make_scan_rev(BitSet_t& bb, int firstBit = -1) { return scanReverse<BitSet_t>(bb, firstBit); }
 
 	template<class BitSet_t = BBIntrin>
 	static
@@ -261,3 +305,4 @@ public:
 
 
 #endif
+

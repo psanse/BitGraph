@@ -178,8 +178,8 @@ void Ugraph<sparse_bitarray>::write_dimacs(ostream& o) {
 		//non destructive scan starting from the vertex onwards
 		pair<bool, int> p = Graph<sparse_bitarray>::adj_[v].find_pos(WDIV(v));
 		if (p.second == EMPTY_ELEM) continue;					//no more bitblocks
-		Graph<sparse_bitarray>::adj_[v].m_scan.bbi = p.second;
-		(p.first) ? Graph<sparse_bitarray>::adj_[v].m_scan.pos = WMOD(v) : Graph<sparse_bitarray>::adj_[v].m_scan.pos = MASK_LIM;		//if bitblock contains v, start from that position onwards
+		Graph<sparse_bitarray>::adj_[v].m_scan.bbi_ = p.second;
+		(p.first) ? Graph<sparse_bitarray>::adj_[v].m_scan.pos_ = WMOD(v) : Graph<sparse_bitarray>::adj_[v].m_scan.pos_ = MASK_LIM;		//if bitblock contains v, start from that position onwards
 		while (1) {
 			int w = Graph<sparse_bitarray>::adj_[v].next_bit();
 			if (w == EMPTY_ELEM)
@@ -209,8 +209,8 @@ void Ugraph<sparse_bitarray>::write_EDGES(ostream& o) {
 		//non destructive scan starting from the vertex onwards
 		pair<bool, int> p = Graph<sparse_bitarray>::adj_[v].find_pos(WDIV(v));
 		if (p.second == EMPTY_ELEM) continue;										//no more bitblocks
-		Graph<sparse_bitarray>::adj_[v].m_scan.bbi = p.second;
-		(p.first) ? Graph<sparse_bitarray>::adj_[v].m_scan.pos = WMOD(v) : Graph<sparse_bitarray>::adj_[v].m_scan.pos = MASK_LIM;			//if bitblock contains v, start from that position onwards
+		Graph<sparse_bitarray>::adj_[v].m_scan.bbi_ = p.second;
+		(p.first) ? Graph<sparse_bitarray>::adj_[v].m_scan.pos_ = WMOD(v) : Graph<sparse_bitarray>::adj_[v].m_scan.pos_ = MASK_LIM;			//if bitblock contains v, start from that position onwards
 		while (1) {
 			int w = Graph<sparse_bitarray>::adj_[v].next_bit();
 			if (w == EMPTY_ELEM)
@@ -246,8 +246,8 @@ void Ugraph<sparse_bitarray>::write_mtx(ostream& o) {
 		//non destructive scan starting from the vertex onwards
 		pair<bool, int> p = Graph<sparse_bitarray>::adj_[v].find_pos(WDIV(v));
 		if (p.second == EMPTY_ELEM) continue;										//no more bitblocks
-		Graph<sparse_bitarray>::adj_[v].m_scan.bbi = p.second;
-		(p.first) ? Graph<sparse_bitarray>::adj_[v].m_scan.pos = WMOD(v) : Graph<sparse_bitarray>::adj_[v].m_scan.pos = MASK_LIM;			//if bitblock contains v, start from that position onwards
+		Graph<sparse_bitarray>::adj_[v].m_scan.bbi_ = p.second;
+		(p.first) ? Graph<sparse_bitarray>::adj_[v].m_scan.pos_ = WMOD(v) : Graph<sparse_bitarray>::adj_[v].m_scan.pos_ = MASK_LIM;			//if bitblock contains v, start from that position onwards
 		while (1) {
 			int w = Graph<sparse_bitarray>::adj_[v].next_bit();
 			if (w == EMPTY_ELEM)

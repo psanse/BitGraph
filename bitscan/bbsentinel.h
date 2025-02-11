@@ -181,18 +181,18 @@ int BBSentinel::next_bit(){
 // BitScan non destructive
 //
 // COMMENTS
-// 1- update sentinels, set scan_.bbi to m_BBL and set scan_.pos to MASK_LIM at the start of loop
+// 1- update sentinels, set scan_.bbi_ to m_BBL and set scan_.pos_ to MASK_LIM at the start of loop
 
 	unsigned long posInBB;
 				
-	if(_BitScanForward64(&posInBB, vBB_[scan_.bbi] & Tables::mask_high[scan_.pos])){
-		scan_.pos =posInBB;
-		return (posInBB + WMUL(scan_.bbi));
+	if(_BitScanForward64(&posInBB, vBB_[scan_.bbi_] & Tables::mask_high[scan_.pos_])){
+		scan_.pos_ =posInBB;
+		return (posInBB + WMUL(scan_.bbi_));
 	}else{													
-		for(int i=scan_.bbi+1; i<=m_BBH; i++){
+		for(int i=scan_.bbi_+1; i<=m_BBH; i++){
 			if(_BitScanForward64(&posInBB,vBB_[i])){
-				scan_.bbi=i;
-				scan_.pos=posInBB;
+				scan_.bbi_=i;
+				scan_.pos_=posInBB;
 				return (posInBB+ WMUL(i));
 			}
 		}
@@ -207,20 +207,20 @@ int BBSentinel::next_bit(int& nBB){
 // BitScan non destructive
 //
 // COMMENTS
-// 1- update sentinels, set scan_.bbi to m_BBL and set scan_.pos to MASK_LIM at the start of loop
+// 1- update sentinels, set scan_.bbi_ to m_BBL and set scan_.pos_ to MASK_LIM at the start of loop
 
 	unsigned long posInBB;
 			
 	//look uo in the last table
-	if(_BitScanForward64(&posInBB, vBB_[scan_.bbi] & Tables::mask_high[scan_.pos])){
-		scan_.pos =posInBB;
-		nBB=scan_.bbi;
-		return (posInBB + WMUL(scan_.bbi));
+	if(_BitScanForward64(&posInBB, vBB_[scan_.bbi_] & Tables::mask_high[scan_.pos_])){
+		scan_.pos_ =posInBB;
+		nBB=scan_.bbi_;
+		return (posInBB + WMUL(scan_.bbi_));
 	}else{											//not found in the last table. look up in the rest
-		for(int i=(scan_.bbi+1); i<=m_BBH; i++){
+		for(int i=(scan_.bbi_+1); i<=m_BBH; i++){
 			if(_BitScanForward64(&posInBB,vBB_[i])){
-				scan_.bbi=i;
-				scan_.pos=posInBB;
+				scan_.bbi_=i;
+				scan_.pos_=posInBB;
 				nBB=i;
 				return (posInBB+ WMUL(i));
 			}

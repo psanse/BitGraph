@@ -21,6 +21,7 @@ bitblock.cpp
 bitset.cpp  
 bitboards.cpp 
 tables.cpp
+bbscanFeature.cpp
 ${useful_headers_for_IDE}
 )
 

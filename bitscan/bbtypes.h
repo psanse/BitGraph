@@ -35,9 +35,9 @@ using BOOL		= int;								//Deprecated: use bool instead (CHECK 08/02/25)
 #define EVEN_8  0x55						    	//1 bits in even positions: 8 bits
 #define ZERO	0x0000000000000000					//0 64 bit mask
 
-constexpr int EMPTY_ELEM = -1;						//empty table element, bitboard or bit string 	
+constexpr int EMPTY_ELEM = -1;						//empty table element, bitboard or bitstring 	
 
-//Size of the register word - DO NOT CHANGE!
+//size of the register word - DO NOT CHANGE!
 constexpr int WORD_SIZE = 64;
 constexpr int WORD_SIZE_MINUS_ONE = WORD_SIZE - 1;
 constexpr int MASK_LIM = WORD_SIZE + 1;				  //mask limit for bitscan operations of a single BITBOARD

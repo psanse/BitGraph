@@ -21,6 +21,7 @@
 
 #include <iostream>
 #include "bbtypes.h"
+#include "tables.h"
 
 class BBObject{
 public:
@@ -34,12 +35,18 @@ public:
 	//Data structure for bitscanning optimization
 	struct scan_t {																			
 		
-		int bbi;								//bitboard index 	
-		int pos;								//bit position for bitscan
+		int bbi_;								//bitboard index 	
+		int pos_;								//bit position [0...63] for bitscan
 
-		scan_t() :bbi(EMPTY_ELEM), pos(MASK_LIM)	{}
-		void set_block(int block)					{ bbi = block; }	
-		void set_bit(int bit)						{ pos = bit; }
+		scan_t() :bbi_(EMPTY_ELEM), pos_(MASK_LIM)	{}
+				
+		void set_block(int block)					{ bbi_ = block; }
+		void set_pos(int bit)						{ pos_ = bit; }
+		void set_bit(int bit) {
+			int bbh = WDIV(bit);
+			bbi_ = bbh;
+			pos_ = bit - WMUL(bbh);
+		}
 	};
 
 
