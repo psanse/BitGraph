@@ -1,5 +1,5 @@
 /**
- * @file bitset.cpp file
+ * @file bbset.cpp file
  * @brief implementation of the BitSet class for non-sparsearrays of bit
  * @author pss
  **/

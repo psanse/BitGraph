@@ -1,5 +1,5 @@
 /**  
- * @file bitset.h file 
+ * @file bbset.h file 
  * @brief header file of the BitSet class from the BITSCAN library.
  *		  Manages bitstrings of any size as an array of bitblocks (64-bit numbers)
  * @author pss
@@ -10,8 +10,8 @@
  *			 namespace bbscan.
  **/
 
-#ifndef __BITSET_H__
-#define __BITSET_H__
+#ifndef __BBSET_H__
+#define __BBSET_H__
 
 
 #include "bbobject.h"

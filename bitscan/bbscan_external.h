@@ -1,12 +1,12 @@
 /**
- * @file bbscanning.h
+ * @file bbscan_external.h
  * @brief implements bitscanning as feature for the bitstring hierarchy
  * @details created 29/01/2025
  * author pss
  **/
 
-#ifndef __BBSCANNING_FEATURE_H__
-#define __BBSCANNING_FEATURE_H__
+#ifndef __BBSCAN_EXTERNAL_H__
+#define __BBSCAN_EXTERNAL_H__
 
 #include "bbset.h"
 
