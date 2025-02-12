@@ -142,11 +142,19 @@ TEST(Bitstrings, population_count){
 	bbi.set_bit(20);
 	bbi.set_bit(64);
 
+	//no range
 	EXPECT_EQ(3, bbi.popcn64());
+	
+	//[firstBit, endOfBitset)
 	EXPECT_EQ(2, bbi.popcn64(11));
 	EXPECT_EQ(1, bbi.popcn64(21));
 	EXPECT_EQ(0, bbi.popcn64(65));
 	EXPECT_EQ(1, bbi.popcn64(64));
+
+	//[firstBit, lastBit]
+	EXPECT_EQ(1, bbi.popcn64(0, 10));
+	EXPECT_EQ(1, bbi.popcn64(20, 63));
+	EXPECT_EQ(2, bbi.popcn64(20, 64));
 }
 
 TEST(Bitstrings, to_vector){

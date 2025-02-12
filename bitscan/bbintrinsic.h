@@ -9,6 +9,7 @@
 #define __BBINTRINSIC_H__
 
 #include "bitset.h"	
+#include <utility>
 
 using namespace std;
 
@@ -291,26 +292,6 @@ inline	int* to_C_array				(int* lv, std::size_t& size, bool rev = false) overrid
 inline	operator std::pair<int*, std::size_t> ();
 
 
-#ifdef POPCOUNT_64
-
-/////////////////
-// Popcount with intrinsifc primitives 
-
-	/**
-	* @brief returns the number of 1-bits in the bitstring
-	* @details implemented with intrinsic functions
-	**/
-virtual	 inline int popcn64			()						const;
-
-	/**
-	* @brief returns the number of 1-bits in the bitstring in the closed range [firstBit, END]
-	* @param firstBit: first bit to consider in the count, included
-	* @details implemented with intrinsic functions
-	**/
-virtual	 inline int popcn64			(int firstBit)			const;
-
-#endif
-
 //////////////////
 /// data members
 	 scan_t scan_;
@@ -319,43 +300,6 @@ virtual	 inline int popcn64			(int firstBit)			const;
 ///////////////////////
 //
 // INLINE Implementation, must be in header file
-
-
-#ifdef POPCOUNT_64
-
-inline 
-int BBIntrin::popcn64() const{
-
-	BITBOARD pc = 0;
-
-	for(auto i = 0; i < nBB_; ++i){
-		pc += __popcnt64(vBB_[i]);
-	}
-
-	return pc;
-}
-
-inline
-int BBIntrin::popcn64(int firstBit) const{
-	
-	BITBOARD pc = 0;
-	
-	auto bb = WDIV(firstBit);
-
-	//population of the block of the bit
-	pc += __popcnt64( vBB_[bb] & bblock::MASK_1_HIGH(firstBit - WMUL(bb) /* WMOD(bb)*/ ) );
-
-
-	//population after the block of the bit
-	for(int i= bb + 1; i < nBB_; ++i){
-		pc += __popcnt64(vBB_[i]);
-	}
-		
-
-	return pc;
-}
-
-#endif
 
 
 inline
@@ -789,7 +733,8 @@ int* BBIntrin::to_C_array  (int* lv, std::size_t& nPop, bool rev)  {
 	return lv;
 }
 
-inline BBIntrin::operator std::pair<int*, std::size_t> ()
+inline 
+BBIntrin::operator std::pair<int*, std::size_t> () 
 {
 	std::size_t nPop = 0;
 	int bit = EMPTY_ELEM;

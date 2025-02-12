@@ -373,12 +373,15 @@ std::size_t	size					()							const		{return (std::size_t) popcn64();}
 virtual	inline int popcn64			()							const;		 
 
 	/**
-	* @brief returns the number of 1-bits in the bitstring
-	*	 	in the closed range [firstBit, lastBit]
+	* @brief Returns the number of 1-bits in the bitstring
+	*	 	 in the closed range [firstBit, lastBit]
+	*		 If lastBit == -1, the range is [firstBit, endOfBitset)
+	* 
 	* @details efficiently implemented as a lookup table or
 	*		   with HW instructions depending  on an internal switch (see config.h)
 	**/
-virtual	inline int popcn64			(int firstBit, int lastBit)	const;
+virtual	inline int popcn64			(int firstBit, int lastBit = -1)	const;
+
 
 /////////////////////
 //Setting / Erasing bits 
@@ -398,7 +401,7 @@ inline	BitSet&  set_bit			(int bit);
 	* @date 22/9/14
 	* @last_update 01/02/25
 	**/
-inline  BitSet&	 set_bit		(int firstBit, int lastBit);
+inline  BitSet&	 set_bit			(int firstBit, int lastBit);
 
 	/**
 	* @brief sets all bits to 1
@@ -1325,12 +1328,13 @@ int BitSet::popcn64(int firstBit, int lastBit) const
 {
 
 	/////////////////////////////////////////////
-	assert( firstBit > 0 && firstBit <= lastBit);
+	assert( firstBit > 0 && (firstBit <= lastBit || lastBit ==-1) );
 	/////////////////////////////////////////////
+
 		
 	int pc = 0;
 	int bbl = WDIV(firstBit);
-	int bbh = WDIV(lastBit);
+	int bbh = (lastBit == -1)? nBB_-1 :  WDIV(lastBit);
 	
 
 	if (bbl == bbh)
@@ -1354,6 +1358,7 @@ int BitSet::popcn64(int firstBit, int lastBit) const
 		
 	return pc;
 }
+
 
 
 inline
@@ -1846,7 +1851,6 @@ BitSet& BitSet::OR_EQUAL_block(int firstBlock, int lastBlock, const BitSet& rhs)
 
 	return *this;
 }
-
 
 
 #endif	
