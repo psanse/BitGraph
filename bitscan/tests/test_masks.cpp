@@ -14,37 +14,50 @@
 #include "bitscan/bitscan.h"					//bit string library
 #include "gtest/gtest.h"
 
-
 using namespace std;
 
-// date: 14/11/2017
-TEST(Masks, OR_from) {
+class MasksTest : public ::testing::Test {
+protected:
+	MasksTest() : bb(130), bb1(130) {}
+	virtual void SetUp() {
+		bb.set_bit(10);
+		bb.set_bit(20);
+		bb.set_bit(63);
 
-	bitarray bb(130);
-	bitarray bb1(130);
-	bitarray res(130);
+		bb1.set_bit(10);
+		bb1.set_bit(64);
+		bb1.set_bit(100);
+	}
 
-	bb.set_bit(10);
-	bb.set_bit(20);
-	bb.set_bit(63);
+	//////////////////////
+	//data members
+	simple_bitarray bb;
+	simple_bitarray bb1;
+	
+};
 
-	bb1.set_bit(10);
-	bb1.set_bit(64);
-	bb1.set_bit(100);
 
-	//tests-OR from 
-	OR(65, bb, bb1, res);
-	EXPECT_TRUE(res.is_bit(100));
-	EXPECT_FALSE(res.is_bit(64));
+TEST_F(MasksTest, OR_from) {
+	
+	simple_bitarray res(130);
+		
+	OR(65, bb, bb1, res);					// res = {10, 20, 63, 100}
+	EXPECT_TRUE(res.is_bit(10));
+	EXPECT_TRUE(res.is_bit(20));
 	EXPECT_TRUE(res.is_bit(63));
-
-	res.erase_bit();
-	OR(101, bb, bb1, res);
-	EXPECT_FALSE(res.is_bit(100));
+	EXPECT_TRUE	(res.is_bit(100));
 	EXPECT_FALSE(res.is_bit(64));
-
+	
 	res.erase_bit();
-	OR(9, bb, bb1, res);
+	OR(101, bb, bb1, res);					// res = {10, 20, 63}		
+	EXPECT_TRUE(res.is_bit(10));
+	EXPECT_TRUE(res.is_bit(20));
+	EXPECT_TRUE(res.is_bit(63));
+	EXPECT_FALSE(res.is_bit(64));
+	EXPECT_FALSE(res.is_bit(100));
+	
+	res.erase_bit();
+	OR(9, bb, bb1, res);					// res = {10, 20, 63, 64 100}
 	EXPECT_TRUE(res.is_bit(10));
 	EXPECT_TRUE(res.is_bit(20));
 	EXPECT_TRUE(res.is_bit(63));
@@ -147,7 +160,6 @@ TEST(Masks, AND_OR_sparse) {
 	EXPECT_EQ(2,bb2.size());
 
 }
-
 
 TEST(Masks, set_bits){
 

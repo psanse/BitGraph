@@ -203,7 +203,14 @@ public:
 	**/
 	friend int* AND(int lastBit, const BitSet& lhs, const BitSet& rhs, int bitset[], int& size);
 
-	// lhs OR rhs in semiopen range (rhs [from, END)
+	/**
+	* @brief OR between lhs and rhs bitsets in the SEMI-OPEN range [firstBit, END).
+	*		 Stores the result in bitset res.
+	*		 Outside the range the bits are set to lhs.
+	* @param lhs, rhs: input bitsets
+	* @param res: output bitset 
+	* @returns reference to the resulting bitstring res 
+	**/
 	friend BitSet& OR(int firstBit, const BitSet& lhs, const BitSet& rhs, BitSet& res);
 
 	// lhs OR rhs - ranges (rhs [v, END[ if left = TRUE,  rhs [0, v[ if left = false)
