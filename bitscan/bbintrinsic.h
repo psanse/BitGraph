@@ -1,7 +1,9 @@
  /**
   * @file bbintrinsic.h file
   * @brief header file of the BBIntrin class from the BITSCAN library.
-  *		  Manages efficient bitscanning 
+  *		   Manages efficient bitscanning 
+  * @details Use external scanning feature for commodity. Use this class for specific tuning of bitscans
+  * @details last_updated 12/02/2025
   * @author pss
   **/
 
