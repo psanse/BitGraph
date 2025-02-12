@@ -130,7 +130,7 @@ virtual inline int next_bit_del		(int& nBB,  BBIntrin& bitset);
 	* @details Since the scan does not delete the scanned bit from the bitstring,
 	*		   it has to cache the last scanned bit for the next call
 	**/
-virtual inline int next_bit			();
+virtual inline int next_bit			()  ;
 
 	/**
 	* @brief next bit in the bitstring, starting from the bit retrieved
@@ -190,7 +190,7 @@ virtual	inline int next_bit			(int& block, BBIntrin& bitset);
 	* @details Since the scan does not delete the scanned bit from the bitstring,
 	*		   it has to cache the last scanned bit for the next call
 	**/
-virtual inline int prev_bit			(); 
+virtual	 inline int prev_bit			() ;
 
 	/**
 	* @brief next least-significant bit in the bitstring, starting from the bit retrieved
@@ -238,7 +238,7 @@ virtual inline int prev_bit			(int& block);
 	 * @returns the next lsb bit in the bitstring, EMPTY_ELEM if there are no more bits
 	 * @details Created   23/3/12, last update 09/02/2025
 	 **/
-inline int prev_bit_del				(int& block);
+ virtual inline int prev_bit_del				(int& block);
 
 	/**
 	* @brief next least-significant bit in the bitstring, starting from the bit retrieved
@@ -257,22 +257,7 @@ inline int prev_bit_del				(int& block);
 	* @returns the next lsb bit in the bitstring, EMPTY_ELEM if there are no more bits
 	* @details Created   23/3/12, last update 09/02/2025
 	**/
-inline int prev_bit_del				(int& block,  BBIntrin& bitset ); 
-
-//////////
-//conversions (requiring bitscanning)
-
-	/**
-	* @brief Converts the bitstring to a C array of integers
-	* @param lv: output array
-	* @param size: output size of the array (number of bits in the bitstring)
-	* @param rev: if true, the bits are stored in reverse order
-	* @returns the C-array of integers
-	* @details Created  23/3/12, last update 09/02/2025
-	* @details Uses non-destructive bitscanning
-	* @detials overrides the virtual function in the base class using the intrinsic bitscanning
-	**/
-inline	int* to_C_array				(int* lv, std::size_t& size, bool rev = false) override;
+ virtual inline int prev_bit_del				(int& block,  BBIntrin& bitset );
 
 
 
@@ -665,26 +650,6 @@ int BBIntrin::init_scan (int firstBit, scan_types sct){
 	return 0;
 }
 
-inline
-int* BBIntrin::to_C_array  (int* lv, std::size_t& nPop, bool rev)  {
-
-	int bit = EMPTY_ELEM;
-	nPop = 0;
-
-	if (rev) {
-		init_scan(BBObject::NON_DESTRUCTIVE_REVERSE);
-	}
-	else {
-		init_scan(BBObject::NON_DESTRUCTIVE);
-	}
-	
-	//bitscanning loop
-	while( (bit = next_bit())!= EMPTY_ELEM ){
-		lv[nPop ++] = bit;
-	}
-
-	return lv;
-}
 
 
 

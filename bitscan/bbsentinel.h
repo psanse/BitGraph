@@ -83,15 +83,17 @@ virtual	bool is_empty				(int nBBL, int nBBH) const;					//is empty in range
 /////////////////
 // bit scanning operations 
 
-virtual	int init_scan(scan_types sct);
+	int init_scan(scan_types sct) override;
 
-virtual inline int prev_bit_del();							//**TODO- empty bitstring
-virtual inline	int next_bit_del ();
-virtual inline	int next_bit_del (BBSentinel& bbN_del);
+ inline int prev_bit_del() override;							//**TODO- empty bitstring
+ inline	int next_bit_del () override;
+ inline	int next_bit_del (BBSentinel& bbN_del) ;				//Does not override! CHECK (12/02/2025)
 	
-virtual inline	int next_bit();
-virtual inline	int next_bit(int& nBB);
+ inline	int next_bit() override;
+ inline	int next_bit(int& nBB) override;
 
+ //////////////////////////////////
+ //data members - sentinel information
 protected:	
 	 int m_BBH;										//explicit storage for sentinel high index
 	 int m_BBL;										//explicit storage for sentinel low index

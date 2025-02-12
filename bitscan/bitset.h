@@ -327,7 +327,7 @@ public:
 	* @brief Computes the next least significant 1-bit in the bitstring after bit
 	*		 If bit == BBObject::noBit, returns the lest significant bit in the bitstring.
 	*		
-	*		 I.Primitive scanning stateless feature at this level. 
+	*		 I.Primitive scanning stateless feature at this level. Require a bit position as argument always.
 	*		II. Use bitscanning with state for proper bitscanning (derived class or external feature)
 	* 
 	* @param bit: position from which to start the search
@@ -337,13 +337,13 @@ public:
 	* @details: Uses a DeBruijn implementation for lsb()
 	* @details: DEPRECATED in favour of the bitscanning with state of BBIntrinsic class
 	**/
-inline int next_bit					(int bit)	const;					
+	inline int next_bit					(int bit)	const;					
 	
 	/**
 	* @brief Computes the next most significant  1-bit in the bitstring after bit
 	*		 If bit == BBObject::noBit, returns the most significant bit in the bitstring
 	* 
-	*		 I. Primitive scanning stateless feature at this level. Use bitscanning with state for proper bitscanning
+	*		 I. Primitive scanning stateless feature at this level. Require a bit position as argument always.
 	*		II. Use bitscanning with state for proper bitscanning (derived class or external feature)
 	*
 	* @param bit: position from which to start the search
@@ -353,7 +353,7 @@ inline int next_bit					(int bit)	const;
 	* @details: Uses a lookup table implementation for msb()
 	* @details: Not recommended. DEPRECATED in favour of the bitscanning with state of BBIntrinsic class
 	**/
-inline int prev_bit					(int bit)	const;					
+	inline int prev_bit					(int bit)	const;					
 	
 /////////////////
 // Popcount
