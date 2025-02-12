@@ -392,8 +392,6 @@ virtual	inline int popcn64			(int firstBit, int lastBit = -1)	const;
 	* @brief sets a 1-bit in the bitstring
 	* @param  bit: position of the 1-bit to set (nBit >= 0)
 	* @returns reference to the modified bitstring
-	* 
-	* TODO - consider REMOVING for safety (12/02/2025)
 	**/
 inline	BitSet&  set_bit			(int bit);
 
@@ -413,7 +411,7 @@ inline  BitSet&	 set_bit			(int firstBit, int lastBit);
 	* 
 	* TODO - consider REMOVING for safety (12/02/2025)
 	**/
-inline  BitSet&  set_bit			();
+//inline  BitSet&  set_bit			();
 	 	
 	/**
 	* @brief Adds the bits from the bitstring bb_add in the population
@@ -1146,14 +1144,14 @@ BitSet&  BitSet::set_bit (int firstBit, int lastBit){
 	return *this;
 }
 
-inline
-BitSet& BitSet::set_bit (){
-
-	for (auto i = 0; i < nBB_; ++i) {
-		vBB_[i] = ONE;
-	}
-	return *this;
-}
+//inline
+//BitSet& BitSet::set_bit (){
+//
+//	for (auto i = 0; i < nBB_; ++i) {
+//		vBB_[i] = ONE;
+//	}
+//	return *this;
+//}
 
 inline
 BitSet&  BitSet::set_bit (const BitSet& bb_add){

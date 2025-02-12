@@ -284,7 +284,7 @@ TEST(BBNtest, erase_bit_range){
 	EXPECT_FALSE(bb.is_bit(128));
 	EXPECT_FALSE(bb.is_bit(127));
 	EXPECT_FALSE(bb.is_bit(126));
-	EXPECT_TRUE(bb.is_bit(125));
+	EXPECT_TRUE	(bb.is_bit(125));
 
 
 	//same range
@@ -453,23 +453,23 @@ TEST(BBNtest, vector_operations) {
 	//bbN5.print();
 }
 
-TEST(BBNtest, BitSetTo0) {
+TEST(BBNtest, conversion_to_vector) {
 	BitSet bb1(25);
-	BitSet bb2(bb1);
+	bb1.set_bit(0,24);
 
-	bb1.set_bit();			//sets to ONE the whole bitblock
-	bb2.set_bit(0,24);
+	//////////////////////////////
+	EXPECT_EQ(25, bb1.size());
+	//////////////////////////////
 
-	vector<int> v1(25,0);
-	
+	vector<int> lv_exp(25,0);	
 	for(auto i = 0; i < 25; ++i){
-		v1[i]=i;
+		lv_exp[i]=i;
 	}
 
-	EXPECT_LT(v1, to_vector(bb1));
-	EXPECT_LT(25, bb1.popcn64());
-	EXPECT_EQ(to_vector(bb2), v1);
-	EXPECT_EQ(25, bb2.popcn64());
+	////////////////////////////////////
+	EXPECT_EQ(lv_exp, to_vector(bb1));
+	///////////////////////////////////
+
 }
 
 TEST(BBNtest, GenRandom){
