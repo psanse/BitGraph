@@ -66,7 +66,7 @@ virtual	void  erase_bit				(int nBit) {BitSet::erase_bit(nBit);}	//required beca
 virtual	bool is_empty				()const;
 virtual	bool is_empty				(int nBBL, int nBBH) const;					//is empty in range
 
-#ifdef POPCOUNT_64
+#ifdef POPCOUNT_INTRINSIC_64
 	int popcn64					() const;
 #endif
 
@@ -99,7 +99,7 @@ protected:
 
 
 
-#ifdef POPCOUNT_64
+#ifdef POPCOUNT_INTRINSIC_64
 inline int BBSentinel::popcn64() const{
 	BITBOARD pc=0;
 	for(int i=m_BBL; i<=m_BBH; i++){

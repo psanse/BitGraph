@@ -72,7 +72,7 @@ inline int prev_bit_del			(int& nBB);
 				
 /////////////////
 // Popcount
-#ifdef POPCOUNT_64
+#ifdef POPCOUNT_INTRINSIC_64
 virtual	 inline int popcn64				()	const;
 virtual	 inline int popcn64				(int nBit)	const;							//population size from (and including) nBit
 #endif
@@ -95,7 +95,7 @@ public:
 // 
 ////////////////////////
 
-#ifdef POPCOUNT_64
+#ifdef POPCOUNT_INTRINSIC_64
 inline 
 int BBIntrinS::popcn64() const{
 	BITBOARD pc=0;

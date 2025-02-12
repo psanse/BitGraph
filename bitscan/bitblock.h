@@ -363,7 +363,7 @@ namespace bblock {
 	inline
 	int popc64(const BITBOARD bb_dato) {
 
-#ifdef POPCOUNT_64
+#ifdef POPCOUNT_INTRINSIC_64
 		return __popcnt64(bb_dato);
 #else
 		//lookup table popcount

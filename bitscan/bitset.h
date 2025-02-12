@@ -776,7 +776,7 @@ inline	BitSet& erase_bit		(const BitSet& lhs, const BitSet& rhs);
 	* @param rev: if true, the array is filled in reverse order
 	* @returns pointer to the array, size of the array
 	**/
-virtual	int* to_C_array				(int* lv, std::size_t& size, bool rev = false);
+virtual	int* to_C_array					(int* lv, std::size_t& size, bool rev = false);
 
 ////////////////////////
 //data members

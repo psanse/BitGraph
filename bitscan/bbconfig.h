@@ -24,17 +24,12 @@
 
 
 
-
-
 /////////////
 //Popcount
 //(switch in case processors do not support operations for population count)
 
-#define POPCOUNT_64											//uses HW assembler operation _popcn64 function (most efficient - DEFAULT)
-//#undef  POPCOUNT_64										//will use other population-count functions (lookup table...)
-
-
-
+#define POPCOUNT_INTRINSIC_64								//uses HW assembler operation _popcn64 function (most efficient - DEFAULT)
+//#undef  POPCOUNT_INTRINSIC_64								//will use other population-count functions (lookup table...)
 
 
 /////////////
@@ -49,7 +44,6 @@
 	#define ISOLANI_LSB										//b&(-b) implementation
     #undef  ISOLANI_LSB										//b^(b-1) implementation (DEFAULT)
 #endif
-
 
 
 
