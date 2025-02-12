@@ -48,7 +48,7 @@ if (bitscan_build_tests)
 add_executable (test_bitscan tests/gtest_main.cc 
 
     tests/test_bitstrings.cpp 
-    tests/test_bitstring_N.cpp 
+    tests/test_bitset.cpp 
     tests/test_algorithms.cpp          #CHECK (05/02/2025)
     
     tests/test_sparse.cpp
