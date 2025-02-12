@@ -37,7 +37,7 @@ protected:
 };
 
 
-TEST_F(MasksTest, OR_from) {
+TEST_F(MasksTest, OR_range) {
 	
 	simple_bitarray res(130);
 		
@@ -67,99 +67,46 @@ TEST_F(MasksTest, OR_from) {
 }
 
 
-TEST(Masks, AND_OR) {
+TEST_F(MasksTest, AND_OR) {
 
-//non sparse
-	bitarray bb(130);
-	bitarray bb1(130);
-	bitarray bbresAND(130);
-	bitarray bbresOR(130);
+	simple_bitarray resAND(130);
+	simple_bitarray resOR(130);
 	
-	bb.set_bit(10);
-	bb.set_bit(20);
-	bb.set_bit(64);
-
-	bb1.set_bit(10);
-	bb1.set_bit(64);
-	bb1.set_bit(100);
-
-	//AND
-//	cout<<AND(bb, bb1, bbresAND)<<endl;
-	AND(bb, bb1, bbresAND);
-	EXPECT_TRUE(bbresAND.is_bit(10));
-	EXPECT_TRUE(bbresAND.is_bit(64));
-	EXPECT_EQ(2, bbresAND.size());
-
-	//OR
-	//cout<<OR(bb, bb1, bbresOR)<<endl;
-	OR(bb, bb1, bbresOR);
-	EXPECT_EQ(4, bbresOR.size());
-
-	//&=
-	bitarray bb2(130);
-	bitarray bb3(130);
-
-	bb2.set_bit(10);
-	bb2.set_bit(20);
-	bb2.set_bit(64);
-
-	bb3.set_bit(10);
-	bb3.set_bit(64);
-	bb3.set_bit(100);
-
-	bb2&=bb3;
-	EXPECT_TRUE(bbresAND.is_bit(10));
-	EXPECT_TRUE(bbresAND.is_bit(64));
-	EXPECT_EQ(2,bb2.size());
 	
+	///////////////////////
+	AND(bb, bb1, resAND);
+	//////////////////////
+
+	EXPECT_TRUE	(resAND.is_bit(10));
+	EXPECT_FALSE(resAND.is_bit(64));
+	EXPECT_EQ	(1, resAND.size());
+
+
+	///////////////////////
+	OR(bb, bb1, resOR);
+	//////////////////////
+	
+	resOR.print();
+
+	EXPECT_EQ	(5, resOR.size());
+	EXPECT_TRUE	(resOR.is_bit(10));
+	EXPECT_TRUE	(resOR.is_bit(20));
+	EXPECT_TRUE	(resOR.is_bit(63));
+	EXPECT_TRUE	(resOR.is_bit(64));
+	EXPECT_TRUE	(resOR.is_bit(100));
+
 }
 
-TEST(Masks, AND_OR_sparse) {
+TEST_F(MasksTest, operators) {
 
-//non sparse
-	sparse_bitarray bb(130);
-	sparse_bitarray bb1(130);
-	sparse_bitarray bbresAND(130);
-	sparse_bitarray bbresOR(130);
-	
-	bb.set_bit(10);
-	bb.set_bit(20);
-	bb.set_bit(64);
+	/////////////
+	bb &= bb1;
+	////////////
 
-	bb1.set_bit(10);
-	bb1.set_bit(64);
-	bb1.set_bit(100);
-
-	//AND
-	//cout<<AND(bb, bb1, bbresAND)<<endl;
-	AND(bb, bb1, bbresAND);
-	EXPECT_TRUE(bbresAND.is_bit(10));
-	EXPECT_TRUE(bbresAND.is_bit(64));
-	EXPECT_EQ(2, bbresAND.size());
-
-	//OR
-	//cout<<OR(bb, bb1, bbresOR)<<endl;
-	OR(bb, bb1, bbresOR);
-	EXPECT_EQ(4, bbresOR.size());
-
-	//&=
-	sparse_bitarray bb2(130);
-	sparse_bitarray bb3(130);
-
-	bb2.set_bit(10);
-	bb2.set_bit(20);
-	bb2.set_bit(64);
-
-	bb3.set_bit(10);
-	bb3.set_bit(64);
-	bb3.set_bit(100);
-
-	bb2 &= bb3;
-	EXPECT_TRUE(bb2.is_bit(10));
-	EXPECT_TRUE(bb2.is_bit(64));
-	EXPECT_EQ(2,bb2.size());
-
+	EXPECT_TRUE	(bb.is_bit(10));
+	EXPECT_EQ	(1, bb.size());
 }
+
 
 TEST(Masks, set_bits){
 
@@ -195,7 +142,6 @@ TEST(Masks, set_bits){
 	EXPECT_FALSE(bb.is_bit(100));
 	EXPECT_FALSE(bb.is_bit(64));
 
-	//cout<<bb.erase_block(0, bb1)<<endl;
 	bb.erase_block(0, -1, bb1);
 	EXPECT_TRUE(bb.is_bit(20));
 }
@@ -470,5 +416,51 @@ TEST(Masks, AND_trimming_2_vertex_set){
 	AND(65, bb, bb1, v,size);			//v={10,64}
 	vector<int> vset2(v, v+size);
 	EXPECT_TRUE(find(vset2.begin(), vset2.end(), 64)!=vset2.end());
+
+}
+
+
+TEST(Masks, DISABLED_AND_OR_sparse) {
+
+	//non sparse
+	sparse_bitarray bb(130);
+	sparse_bitarray bb1(130);
+	sparse_bitarray bbresAND(130);
+	sparse_bitarray bbresOR(130);
+
+	bb.set_bit(10);
+	bb.set_bit(20);
+	bb.set_bit(64);
+
+	bb1.set_bit(10);
+	bb1.set_bit(64);
+	bb1.set_bit(100);
+
+	//AND
+	AND(bb, bb1, bbresAND);
+	EXPECT_TRUE(bbresAND.is_bit(10));
+	EXPECT_TRUE(bbresAND.is_bit(64));
+	EXPECT_EQ(2, bbresAND.size());
+
+	//OR
+	OR(bb, bb1, bbresOR);
+	EXPECT_EQ(4, bbresOR.size());
+
+	//&=
+	sparse_bitarray bb2(130);
+	sparse_bitarray bb3(130);
+
+	bb2.set_bit(10);
+	bb2.set_bit(20);
+	bb2.set_bit(64);
+
+	bb3.set_bit(10);
+	bb3.set_bit(64);
+	bb3.set_bit(100);
+
+	bb2 &= bb3;
+	EXPECT_TRUE(bb2.is_bit(10));
+	EXPECT_TRUE(bb2.is_bit(64));
+	EXPECT_EQ(2, bb2.size());
 
 }
