@@ -12,12 +12,19 @@
 #include "bbintrinsic_sparse.h"	
 
 //useful aliases
+
+//base of the hierarchy
+using bbo = BBObject;
+
+//non-sparse
+using simple_bitarray = BitSet;
 using bitarray = BBScan;
 using watched_bitarray = BBSentinel;
-using sparse_bitarray = BBIntrinS;
-using simple_bitarray = BitSet;
+
+//sparse
 using simple_sparse_bitarray = BitBoardS;
-using bbo = BBObject;
+using sparse_bitarray = BBIntrinS;
+
 
 
 

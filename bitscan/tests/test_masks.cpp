@@ -1,4 +1,9 @@
-//tests with masks for sparse and normal (non-sparse) graphs
+/**
+* @file test_masks.cpp
+* @brief unit tests for masks for sparse and non-sparse graphs
+* @created 14/11/2017, last_update 12/02/2025
+* @authos pss
+**/
 
 #include <vector>
 #include <algorithm>
@@ -12,11 +17,9 @@
 
 using namespace std;
 
-
-TEST(Masks, OR_from) {
 // date: 14/11/2017
+TEST(Masks, OR_from) {
 
-	LOG_INFO("Masks-OR_from()----------------");
 	bitarray bb(130);
 	bitarray bb1(130);
 	bitarray res(130);
@@ -48,7 +51,6 @@ TEST(Masks, OR_from) {
 	EXPECT_TRUE(res.is_bit(64));
 	EXPECT_TRUE(res.is_bit(100));
 
-	LOG_INFO("--------------------------------");	
 }
 
 
