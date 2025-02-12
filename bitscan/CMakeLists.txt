@@ -58,7 +58,7 @@ add_executable (test_bitscan tests/gtest_main.cc
     tests/test_bbsentinel.cpp 
 
     #TESTS CHECKED (31/01/2025)
-    #tests/test_bitblock.cpp
+    tests/test_bitblock.cpp
 
 )
 
