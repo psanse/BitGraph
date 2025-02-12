@@ -392,6 +392,8 @@ virtual	inline int popcn64			(int firstBit, int lastBit = -1)	const;
 	* @brief sets a 1-bit in the bitstring
 	* @param  bit: position of the 1-bit to set (nBit >= 0)
 	* @returns reference to the modified bitstring
+	* 
+	* TODO - consider REMOVING for safety (12/02/2025)
 	**/
 inline	BitSet&  set_bit			(int bit);
 
@@ -404,7 +406,12 @@ inline	BitSet&  set_bit			(int bit);
 inline  BitSet&	 set_bit			(int firstBit, int lastBit);
 
 	/**
-	* @brief sets all bits to 1
+	* @brief Sets all bitblocks up to the bitstring capacity to 1.
+	* 
+	* @details Might set more bits than the maximum population size conceived by 
+	*		  the client user during construction (i.e. bitset constructed with 64 bits, has 2 bitblocks)
+	* 
+	* TODO - consider REMOVING for safety (12/02/2025)
 	**/
 inline  BitSet&  set_bit			();
 	 	
@@ -447,17 +454,18 @@ inline	BitSet& erase_bit		(int bit);
 
 	/**
 	* @brief sets the bits in the closed range [firstBit, lastBit] to 0 in the bitstring
+	*		 If lastBit == -1, the range is [firstBit, endOfBitset)
 	* @params firstBit, lastBit: 0 < firstBit <= lastBit
 	* @created 22/9/14
 	* @last_update 01/02/25
 	**/
-inline BitSet& erase_bit			(int firstBit, int lastBit);
+inline BitSet& erase_bit		(int firstBit, int lastBit);
 
 	/**
 	* @brief sets all bits to 0
 	* @returns reference to the modified bitstring
 	**/
-inline BitSet& erase_bit			();
+inline BitSet& erase_bit		();
 
 	/**
 	* @brief Removes the bits from the bitstring bb_del inside the population range.
@@ -1200,16 +1208,21 @@ BitSet&  BitSet::erase_bit (int firstBit, int lastBit){
 	//general comment: low - WMUL(bbl) = WMOD(bbl) but supposed to be less expensive (CHECK 01/02/25)
 
 	//////////////////////////////
-	assert(firstBit <= lastBit && firstBit > 0);
+	assert(firstBit > 0 && (firstBit <= lastBit || lastBit = -1) );
 	//////////////////////////////
 
 	int bbl = WDIV(firstBit);
-	int bbh = WDIV(lastBit);
+	int bbh = (lastBit == -1)? nBB_-1 : WDIV(lastBit);
 
 
 	if (bbl == bbh)
-	{
-		vBB_[bbh] &= bblock::MASK_0(firstBit - WMUL(bbl), lastBit - WMUL(bbh));		
+	{	
+		if (lastBit == -1) {
+			vBB_[bbh] &= bblock::MASK_0_HIGH(firstBit - WMUL(bbl));
+		}
+		else {
+			vBB_[bbh] &= bblock::MASK_0(firstBit - WMUL(bbl), lastBit - WMUL(bbh));
+		}
 	}
 	else
 	{
@@ -1217,9 +1230,17 @@ BitSet&  BitSet::erase_bit (int firstBit, int lastBit){
 		for (int i = bbl + 1; i < bbh; ++i) {
 			vBB_[i] = ZERO;
 		}
-				
-		vBB_[bbh] &= bblock::MASK_0_LOW		(lastBit - WMUL(bbh));					
-		vBB_[bbl] &= bblock::MASK_0_HIGH	(firstBit - WMUL(bbl));						
+		
+		//last bitblock
+		if (lastBit == -1) {
+			vBB_[bbh] = ZERO;
+		}
+		else {
+			vBB_[bbh] &= bblock::MASK_0_LOW(lastBit - WMUL(bbh));
+		}
+			
+		//first  bitblock
+		vBB_[bbl] &= bblock::MASK_0_HIGH (firstBit - WMUL(bbl));						
 	}
 
 	return *this;

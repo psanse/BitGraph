@@ -294,6 +294,7 @@ inline	operator std::pair<int*, std::size_t> ();
 
 //////////////////
 /// data members
+protected:
 	 scan_t scan_;
 };
 

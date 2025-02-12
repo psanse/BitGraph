@@ -267,7 +267,7 @@ TEST(BBNtest, find_set_difference){
 
 TEST(BBNtest, erase_bit_range){
 	BitSet bb(130);
-	bb.set_bit(0, 129);
+	bb.set_bit(0, 129);				//all bits to 1
 
 	bb.erase_bit(0, 64);
 	EXPECT_TRUE(bb.is_bit(65));
@@ -277,6 +277,15 @@ TEST(BBNtest, erase_bit_range){
 	bb.erase_bit(115, 116);
 	EXPECT_TRUE(bb.is_bit(114));
 	EXPECT_FALSE(bb.is_bit(115));
+
+	//range till the end
+	bb.erase_bit(126, -1);
+	EXPECT_FALSE(bb.is_bit(129));
+	EXPECT_FALSE(bb.is_bit(128));
+	EXPECT_FALSE(bb.is_bit(127));
+	EXPECT_FALSE(bb.is_bit(126));
+	EXPECT_TRUE(bb.is_bit(125));
+
 
 	//same range
 	BitSet bb1(130);
