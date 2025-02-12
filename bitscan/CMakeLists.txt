@@ -40,13 +40,11 @@ target_include_directories (bitscan
 )
 
 ###################
-# UNIT TESTS - BITSCAN lib  
+# UNIT TESTS for BITSCAN lib  
 ###################
 option(bitscan_build_tests "Build bitscan tests." OFF)
 if (bitscan_build_tests)
 
-# Add executable called "helloDemo" that is built from the source files
-# "demo.cxx" and "demo_b.cxx". The extensions are automatically found.
 add_executable (test_bitscan tests/gtest_main.cc 
   
     #tests/test_algorithms.cpp          #CHECK (05/02/2025)    
@@ -65,9 +63,7 @@ add_executable (test_bitscan tests/gtest_main.cc
 )
 
 target_include_directories (test_bitscan PUBLIC ../googletest/include/)
-# Link the executable to the Hello library. Since the Hello library has
-# public include directories we will use those link directories when building
-# helloDemo
+
 target_link_libraries (test_bitscan LINK_PUBLIC bitscan gtest utils)
 
 
