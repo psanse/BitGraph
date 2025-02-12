@@ -719,7 +719,7 @@ inline
 const vint& GraphFastRootSort<Graph_t>::compute_deg_root(){
 
 	for(auto elem = 0; elem < NV_;  ++elem){		
-		nb_neigh_[elem] = g_.get_neighbors(elem).popcn64();
+		nb_neigh_[elem] = g_.get_neighbors(elem).size();
 	}
 
 	return nb_neigh_;
@@ -775,7 +775,7 @@ inline int GraphFastRootSort<Graph_t>::compute_deg(const Graph_t & g, vint & deg
 	int NV_ = g_.number_of_vertices();	
 	deg.assign(NV_, -1);
 	for (int v = 0; v < NV_; v++) {
-		deg[v] = g_.get_neighbors(v).popcn64();
+		deg[v] = g_.get_neighbors(v).size();
 	}
 	return 0;
 }

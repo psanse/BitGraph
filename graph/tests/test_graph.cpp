@@ -267,10 +267,10 @@ TEST(Graph, neighbors){
 	g.add_edge(0,3);
 	
 	//compute vertices adjacent to {1}
-	BBIntrin& neigh_to_one =g.get_neighbors(1);
+	BitSet& neigh_to_one =g.get_neighbors(1);
 		
 	//////////////////////////////////////
-	EXPECT_EQ	(1, neigh_to_one.popcn64());	//{2} is the only neighbor of 1 and has degree 2
+	EXPECT_EQ	(1, neigh_to_one.size());	//{2} is the only neighbor of 1 and has degree 2
 	EXPECT_TRUE	( neigh_to_one.is_bit(2) );
 	///////////////////////////////////////
 }
