@@ -90,7 +90,8 @@ virtual	bool is_empty				(int nBBL, int nBBH) const;					//is empty in range
  inline	int next_bit_del (BBSentinel& bbN_del) ;				//Does not override! CHECK (12/02/2025)
 	
  inline	int next_bit() override;
- inline	int next_bit(int& nBB) override;
+
+ //inline	int next_bit(int& nBB) override;
 
  //////////////////////////////////
  //data members - sentinel information
@@ -202,34 +203,34 @@ int BBSentinel::next_bit(){
 return EMPTY_ELEM;
 }
 
-inline
-int BBSentinel::next_bit(int& nBB){
-////////////////////////////
-// last update:31/12/2013
-// BitScan non destructive
+//inline
+//int BBSentinel::next_bit(int& nBB){
+//////////////////////////////
+//// last update:31/12/2013
+//// BitScan non destructive
+////
+//// COMMENTS
+//// 1- update sentinels, set scan_.bbi_ to m_BBL and set scan_.pos_ to MASK_LIM at the start of loop
 //
-// COMMENTS
-// 1- update sentinels, set scan_.bbi_ to m_BBL and set scan_.pos_ to MASK_LIM at the start of loop
-
-	unsigned long posInBB;
-			
-	//look uo in the last table
-	if(_BitScanForward64(&posInBB, vBB_[scan_.bbi_] & Tables::mask_high[scan_.pos_])){
-		scan_.pos_ =posInBB;
-		nBB=scan_.bbi_;
-		return (posInBB + WMUL(scan_.bbi_));
-	}else{											//not found in the last table. look up in the rest
-		for(int i=(scan_.bbi_+1); i<=m_BBH; i++){
-			if(_BitScanForward64(&posInBB,vBB_[i])){
-				scan_.bbi_=i;
-				scan_.pos_=posInBB;
-				nBB=i;
-				return (posInBB+ WMUL(i));
-			}
-		}
-	}
-return EMPTY_ELEM;
-}
+//	unsigned long posInBB;
+//			
+//	//look uo in the last table
+//	if(_BitScanForward64(&posInBB, vBB_[scan_.bbi_] & Tables::mask_high[scan_.pos_])){
+//		scan_.pos_ =posInBB;
+//		nBB=scan_.bbi_;
+//		return (posInBB + WMUL(scan_.bbi_));
+//	}else{											//not found in the last table. look up in the rest
+//		for(int i=(scan_.bbi_+1); i<=m_BBH; i++){
+//			if(_BitScanForward64(&posInBB,vBB_[i])){
+//				scan_.bbi_=i;
+//				scan_.pos_=posInBB;
+//				nBB=i;
+//				return (posInBB+ WMUL(i));
+//			}
+//		}
+//	}
+//return EMPTY_ELEM;
+//}
 
 #endif 
 
