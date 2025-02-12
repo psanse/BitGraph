@@ -22,7 +22,7 @@
 #include "bbintrinsic_sparse.h"	
 
 //useful aliases
-using bitarray = BBIntrin;
+using bitarray = BBScan;
 using watched_bitarray = BBSentinel;
 using sparse_bitarray = BBIntrinS;
 using simple_bitarray = BitSet;

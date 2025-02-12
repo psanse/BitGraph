@@ -3,13 +3,14 @@ set(useful_headers_for_IDE
 bbconfig.h
 bbtypes.h
 bitblock.h
-bitset.h
+bbset.h
 bitboards.h
-bbintrinsic.h
+bbscan.h
 bbintrinsic_sparse.h
 bbsentinel.h
 bbobject.h
 bbscanFeature.h
+bitscan.h
 )
 
 ###################
@@ -18,7 +19,7 @@ bbscanFeature.h
 add_library (bitscan 
 bbsentinel.cpp 
 bitblock.cpp 
-bitset.cpp  
+bbset.cpp  
 bitboards.cpp 
 tables.cpp
 bbscanFeature.cpp

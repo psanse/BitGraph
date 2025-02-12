@@ -24,7 +24,7 @@
 
 #include "utils/common.h"
 #include "utils/logger.h"
-#include "bitscan/bitset.h"
+#include "bitscan/bbset.h"
 
 using namespace std;
 

@@ -1,16 +1,16 @@
  /**
-  * @file bbintrinsic.h file
-  * @brief header file of the BBIntrin class from the BITSCAN library.
+  * @file bbscan.h file
+  * @brief header file of the BBScan class from the BITSCAN library.
   *		   Manages efficient bitscanning 
   * @details Use external scanning feature for commodity. Use this class for specific tuning of bitscans
   * @details last_updated 12/02/2025
   * @author pss
   **/
 
-#ifndef __BBINTRINSIC_H__
-#define __BBINTRINSIC_H__
+#ifndef __BBSCAN_H__
+#define __BBSCAN_H__
 
-#include "bitset.h"	
+#include "bbset.h"	
 
 
 using namespace std;
@@ -18,15 +18,13 @@ using namespace std;
 
 /////////////////////////////////
 //
-// Class BBIntrin
+// Class BBScan
 // 
 // (Efficient bit scanning)
 // 
-// TODO - rename 08/02/2025
-//
-///////////////////////////////////
+/////////////////////////////////
 
-class BBIntrin: public BitSet{
+class BBScan: public BitSet{
 public:
 		
 	friend class bscan;
@@ -39,7 +37,7 @@ public:
 	
 	//TODO...check copy and move assignments 
 	
-	virtual	~BBIntrin				()								 = default;
+	virtual	~BBScan				()								 = default;
 
 
 ///////////////////////////////
@@ -120,7 +118,7 @@ virtual inline int next_bit_del		(int& block );
 	* @param block: output parameter with the current bitblock
 	* @returns the next bit in the bitstring, EMPTY_ELEM if there are no more bits
 	**/
-virtual inline int next_bit_del		(int& nBB,  BBIntrin& bitset); 	 
+virtual inline int next_bit_del		(int& nBB,  BBScan& bitset); 	 
 
 	/**
 	* @brief next bit in the bitstring, starting from the bit retrieved
@@ -178,7 +176,7 @@ virtual inline int next_bit			(int& block);
 	* @details Since the scan does not delete the scanned bit from the bitstring,
 	*		   it has to cache the last scanned bit for the next call
 	**/
-virtual	inline int next_bit			(int& block, BBIntrin& bitset);
+virtual	inline int next_bit			(int& block, BBScan& bitset);
 
 	////////////////
 	// bitscan backwards
@@ -264,8 +262,7 @@ virtual inline int prev_bit			(int& block);
 	* @returns the next lsb bit in the bitstring, EMPTY_ELEM if there are no more bits
 	* @details Created   23/3/12, last update 09/02/2025
 	**/
- virtual inline int prev_bit_del				(int& block,  BBIntrin& bitset );
-
+ virtual inline int prev_bit_del				(int& block,  BBScan& bitset );
 
 
 //////////////////
@@ -280,7 +277,7 @@ protected:
 
 
 inline
-int BBIntrin::next_bit_del() {
+int BBScan::next_bit_del() {
 
 	 U32 posInBB;
 
@@ -302,7 +299,7 @@ int BBIntrin::next_bit_del() {
 }
 
 inline 
-int BBIntrin::next_bit_del(int& block) {
+int BBScan::next_bit_del(int& block) {
 
 	U32 posInBB;
 
@@ -324,7 +321,7 @@ int BBIntrin::next_bit_del(int& block) {
 }
 
 inline
-int BBIntrin::next_bit_del(int& block, BBIntrin& bbN_del) {
+int BBScan::next_bit_del(int& block, BBScan& bbN_del) {
 
 	U32 posInBB;
 
@@ -349,7 +346,7 @@ int BBIntrin::next_bit_del(int& block, BBIntrin& bbN_del) {
 }
 
 inline
-int BBIntrin::next_bit() {
+int BBScan::next_bit() {
 
 	U32 posInBB;
 			
@@ -380,7 +377,7 @@ int BBIntrin::next_bit() {
 }
 
 inline
-int BBIntrin::next_bit(int& block) {
+int BBScan::next_bit(int& block) {
 
 	U32 posInBB;
 
@@ -418,7 +415,7 @@ int BBIntrin::next_bit(int& block) {
 }
 
 inline
-int BBIntrin::next_bit(int& block, BBIntrin& bitset) {
+int BBScan::next_bit(int& block, BBScan& bitset) {
 
 	U32 posInBB;
 
@@ -460,7 +457,7 @@ int BBIntrin::next_bit(int& block, BBIntrin& bitset) {
 }
 
 inline
-int BBIntrin::prev_bit		() {
+int BBScan::prev_bit		() {
 
 	U32 posInBB;
 
@@ -492,7 +489,7 @@ int BBIntrin::prev_bit		() {
 }
 
 inline
-int BBIntrin::prev_bit	(int& block) {
+int BBScan::prev_bit	(int& block) {
 
 	U32 posInBB;
 				
@@ -530,7 +527,7 @@ int BBIntrin::prev_bit	(int& block) {
 }
 
 inline
-int BBIntrin::prev_bit_del() {
+int BBScan::prev_bit_del() {
  
 	U32 posInBB;
 
@@ -551,7 +548,7 @@ int BBIntrin::prev_bit_del() {
 }
 
 inline
-int BBIntrin::prev_bit_del(int& block) {
+int BBScan::prev_bit_del(int& block) {
 
 	U32 posInBB;
 
@@ -576,7 +573,7 @@ int BBIntrin::prev_bit_del(int& block) {
 }
 
 inline
-int BBIntrin::prev_bit_del(int& block, BBIntrin& bitset) {
+int BBScan::prev_bit_del(int& block, BBScan& bitset) {
 
 	U32 posInBB;
 
@@ -605,7 +602,7 @@ int BBIntrin::prev_bit_del(int& block, BBIntrin& bitset) {
 }
 
 inline
-int BBIntrin::init_scan(scan_types sct){
+int BBScan::init_scan(scan_types sct){
 
 	switch(sct){
 	case NON_DESTRUCTIVE:
@@ -623,7 +620,7 @@ int BBIntrin::init_scan(scan_types sct){
 		set_scan_block	(nBB_ - 1);
 		break;
 	default:
-		LOG_ERROR("unknown scan type - BBIntrin::::init_scan");
+		LOG_ERROR("unknown scan type - BBScan::::init_scan");
 		return -1;
 	}
 
@@ -631,7 +628,7 @@ int BBIntrin::init_scan(scan_types sct){
 }
 
 inline
-int BBIntrin::init_scan (int firstBit, scan_types sct){
+int BBScan::init_scan (int firstBit, scan_types sct){
 
 	if (firstBit == EMPTY_ELEM) {
 		init_scan(sct);
@@ -649,7 +646,7 @@ int BBIntrin::init_scan (int firstBit, scan_types sct){
 			set_scan_block	(bbh);
 			break;
 		default:
-			LOG_ERROR("unknown scan type - BBIntrin::::init_scan");
+			LOG_ERROR("unknown scan type - BBScan::::init_scan");
 			return -1;
 		}
 	}

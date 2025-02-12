@@ -8,7 +8,7 @@
 #ifndef __BBSCANNING_FEATURE_H__
 #define __BBSCANNING_FEATURE_H__
 
-#include "bbintrinsic.h"
+#include "bbset.h"
 
 class bscan {
 public:
@@ -29,7 +29,7 @@ public:
 	static int* to_C_array (BitSet_t& bb, int* lv, std::size_t& size, bool rev = false) ;
 
 
-	template< class BitSet_t = BBIntrin>
+	template< class BitSet_t = BitSet>
 	struct ScanRev {
 		using basic_type = BitSet_t;
 		using type = ScanRev<BitSet_t>;

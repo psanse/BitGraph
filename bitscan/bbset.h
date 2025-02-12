@@ -3,11 +3,11 @@
  * @brief header file of the BitSet class from the BITSCAN library.
  *		  Manages bitstrings of any size as an array of bitblocks (64-bit numbers)
  * @author pss
- * @details: created 2014, last_update 01/02/2025
- * 
- * TODO - refactoring and testing (31/01/2025)
- * TODO optimize Erase policies in setters (06/02/2025)
- *
+ * @details: Created 2014, last_update 01/02/2025
+ * @details: This type has all the abilities except efficient bitscanning,which requires 
+ *			 an additional data structure. It does have a basic bitscanning feature.
+ * @details  For efficient bitscanning use the BBScan class or the external feature in the
+ *			 namespace bbscan.
  **/
 
 #ifndef __BITSET_H__
@@ -16,10 +16,10 @@
 
 #include "bbobject.h"
 #include "bitblock.h"	
+#include "utils/common.h"			//for the primitive stack type
 #include <vector>	
-#include "utils/common.h"			//stack
 
-#include <cassert>					//uncomment NDEBUG in config.h to enable run-time assertions
+#include <cassert>					//uncomment #undef NDEBUG in bbconfig.h to enable run-time assertions
 
 //useful alias
 using vint = std::vector<int>;

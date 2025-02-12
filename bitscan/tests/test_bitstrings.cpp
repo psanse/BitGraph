@@ -23,7 +23,7 @@ protected:
 //////////////////////
 //data members
 	BitSet bbn;
-	BBIntrin bbi;
+	BBScan bbi;
 	BBSentinel bbs;
 	set<int> sol;
 };
@@ -188,7 +188,7 @@ TEST_F(BitStringsTest, destructive) {
 
 	//intrinsic
 	res.clear();
-	BBIntrin bbi1(bbi);
+	BBScan bbi1(bbi);
 	bbi1.init_scan(BBObject::DESTRUCTIVE);
 	while (true) {
 		nBit = bbi1.next_bit_del();
@@ -232,7 +232,7 @@ TEST_F(BitStringsTest, reverse_destructive) {
 
 	//intrinsic
 	res.clear();
-	BBIntrin bbi1(bbi);
+	BBScan bbi1(bbi);
 	bbi1.init_scan(BBObject::DESTRUCTIVE_REVERSE);
 	while (true) {
 		nBit = bbi1.prev_bit_del();
@@ -374,7 +374,7 @@ TEST(Bitstrings, algorithms) {
 
 TEST(Bitstrings, population_count){
 	
-	BBIntrin bbi(130);
+	BBScan bbi(130);
 	bbi.set_bit(10);
 	bbi.set_bit(20);
 	bbi.set_bit(64);
@@ -429,8 +429,8 @@ TEST(Bitstrings, to_vector){
 	copy(v, v+size, vint.begin());
 	EXPECT_EQ(sol, vint);
 
-	//BBIntrin redefinition
-	BBIntrin bbi(130);
+	//BBScan redefinition
+	BBScan bbi(130);
 	bbi.set_bit(10);
 	bbi.set_bit(20);
 	bbi.set_bit(64);
@@ -441,9 +441,6 @@ TEST(Bitstrings, to_vector){
 	EXPECT_EQ(sol, vint);
 		
 }
-
-
-
 
 
 TEST(BITBOARDTest, GenRandom){
@@ -484,7 +481,7 @@ protected:
 
 	vector<int> val;
 	BitSet bbn;
-	BBIntrin bbi;
+	BBScan bbi;
 	BBSentinel bbs;
 };
 
@@ -520,13 +517,13 @@ TEST(BitScanning, init_scan_specific){
 //added specifically because some doubts were creeping during CSP implementation
 //
 
-	BBIntrin bbi(100);
+	BBScan bbi(100);
 	bbi.set_bit(10);
 	bbi.set_bit(50);
 	bbi.set_bit(64);
 	bbi.init_scan(10, bbo::NON_DESTRUCTIVE);
 
-	BBIntrin bbres(100);
+	BBScan bbres(100);
 	while(true){
 		int v=bbi.next_bit();
 		if(v==EMPTY_ELEM) break;

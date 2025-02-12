@@ -3,9 +3,9 @@
 #include <iostream>
 #include <set>
 
-#include "bitscan/bitscan.h"				//bit string library
+#include "bitscan/bitscan.h"				//bit string library - REMOVE DEPENDENCY (12/02/2025)
 #include "gtest/gtest.h"
-#include "bitscan/bitset.h"
+#include "bitscan/bbset.h"
 
 using namespace std;
 
