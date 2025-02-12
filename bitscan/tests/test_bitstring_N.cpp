@@ -89,7 +89,7 @@ TEST_F(BBNScanningTest, destructive) {
 	}
 
 	EXPECT_TRUE(res == sol);
-	EXPECT_EQ(0, bbN1.popcn64());
+	EXPECT_EQ(0, bbN1.size());
 }
 
 TEST_F(BBNScanningTest, reverse_destructive) {
@@ -103,7 +103,7 @@ TEST_F(BBNScanningTest, reverse_destructive) {
 	}
 
 	EXPECT_TRUE(res == sol);
-	EXPECT_EQ(0, bbN1.popcn64());
+	EXPECT_EQ(0, bbN1.size());
 }
 
 TEST(BBNtest, set_bit_basic) {
@@ -169,7 +169,7 @@ TEST(BBNtest, set_bit_range) {
 	EXPECT_TRUE(bb1.is_bit(0));
 
 	bb1.set_bit(55, 56);					//bb1={0...55 56...64}
-	EXPECT_TRUE(bb1.popcn64(4, 130));	
+	EXPECT_TRUE(bb1.size(4, 130));	
 	EXPECT_TRUE(bb1.is_bit(0));
 	EXPECT_TRUE(bb1.is_bit(55));
 	EXPECT_TRUE(bb1.is_bit(56));
@@ -178,7 +178,7 @@ TEST(BBNtest, set_bit_range) {
 	//same range
 	BitSet bb2(130);
 	bb2.set_bit(5, 5);
-	EXPECT_TRUE(1, bb2.popcn64());
+	EXPECT_TRUE(1, bb2.size());
 	EXPECT_TRUE(bb2.is_bit(5));
 }
 
@@ -195,7 +195,7 @@ TEST(BBNtest, set_bit_from_another_bitstring) {
 
 	EXPECT_TRUE(bb.is_bit(50));
 	EXPECT_FALSE(bb.is_bit(80));
-	EXPECT_EQ(1, bb.popcn64());
+	EXPECT_EQ(1, bb.size());
 }
 
 TEST(BBNtest, boolean_disjoint){
@@ -296,7 +296,7 @@ TEST(BBNtest, erase_bit_range){
 	/////////////////////
 
 	EXPECT_FALSE(bb.is_bit(5));
-	EXPECT_EQ(129, bb.popcn64());
+	EXPECT_EQ(129, bb.size());
 }
 
 TEST(BBNtest, erase_bit_union){
@@ -317,7 +317,7 @@ TEST(BBNtest, erase_bit_union){
 	//////////////////////////
 
 	EXPECT_TRUE(bb.is_bit(64));
-	EXPECT_EQ(1,bb.popcn64());
+	EXPECT_EQ(1,bb.size());
 }
 
 TEST(BBNtest, population_count){
@@ -327,15 +327,15 @@ TEST(BBNtest, population_count){
 	bb.set_bit(20);
 	bb.set_bit(64);
 
-	EXPECT_EQ(3, bb.popcn64());
-	EXPECT_EQ(2, bb.popcn64(11, 130));
-	EXPECT_EQ(1, bb.popcn64(21, 130));
-	EXPECT_EQ(0, bb.popcn64(65, 130));
-	EXPECT_EQ(1, bb.popcn64(64, 130));
+	EXPECT_EQ(3, bb.size());
+	EXPECT_EQ(2, bb.size(11, 130));
+	EXPECT_EQ(1, bb.size(21, 130));
+	EXPECT_EQ(0, bb.size(65, 130));
+	EXPECT_EQ(1, bb.size(64, 130));
 
 	//same bit index
-	EXPECT_EQ(1, bb.popcn64(10, 10));
-	EXPECT_EQ(1, bb.popcn64(20, 20));
+	EXPECT_EQ(1, bb.size(10, 10));
+	EXPECT_EQ(1, bb.size(20, 20));
 }
 
 TEST(BBNtest, to_vector) {
@@ -424,13 +424,13 @@ TEST(BBNtest, vector_operations) {
 	//construction from vector and popsize (12/11/16)
 	lv = {10, 20};
 	BitSet bbN3(POPULATION_SIZE, lv);
-	EXPECT_EQ(2,bbN3.popcn64());
+	EXPECT_EQ(2,bbN3.size());
 	EXPECT_TRUE(bbN3.is_bit(10));
 	EXPECT_TRUE(bbN3.is_bit(20));
 
 	//bitstring with population size 20 
 	BitSet bbN4(21, lv);						//vector element 20 will not make part of the bitstring
-	EXPECT_EQ(2, bbN4.popcn64());
+	EXPECT_EQ(2, bbN4.size());
 	EXPECT_TRUE(bbN4.is_bit(10));
 	EXPECT_TRUE(bbN4.is_bit(20));
 
@@ -442,7 +442,7 @@ TEST(BBNtest, vector_operations) {
 	BitSet bbN5(100);						//max population size 100						
 	bbN5.set_bit(lv);
 
-	EXPECT_EQ(4, bbN5.popcn64());
+	EXPECT_EQ(4, bbN5.size());
 	EXPECT_TRUE(bbN5.is_bit(10));
 	EXPECT_TRUE(bbN5.is_bit(19));
 	EXPECT_TRUE(bbN5.is_bit(45));
@@ -527,7 +527,7 @@ TEST(BBNtest, erase_block) {
 	bb.erase_block(0, -1, bb1);			//bb={49}
 	EXPECT_FALSE(bb.is_bit(50));
 	EXPECT_TRUE(bb.is_bit(49));
-	EXPECT_EQ(1, bb.popcn64());
+	EXPECT_EQ(1, bb.size());
 
 }
 
@@ -654,7 +654,7 @@ TEST(BBNtest, AND) {
 	AND(bb, bb1, bbresAND);
 	EXPECT_TRUE(bbresAND.is_bit(10));
 	EXPECT_TRUE(bbresAND.is_bit(64));
-	EXPECT_EQ(2, bbresAND.popcn64());
+	EXPECT_EQ(2, bbresAND.size());
 
 	//AND bit-range [10, 63], bits to 0 outside the range
 	AND<true>(10, 63, bb, bb1, bbresAND);				//bbresAND={10}
@@ -721,7 +721,7 @@ TEST(BBNtest, AND_with_allocation) {
 	BitSet bbresAND  =  AND(bb, bb1);
 	EXPECT_TRUE(bbresAND.is_bit(10));
 	EXPECT_TRUE(bbresAND.is_bit(64));
-	EXPECT_EQ(2, bbresAND.popcn64());
+	EXPECT_EQ(2, bbresAND.size());
 	EXPECT_EQ(3, bbresAND.capacity());									//capacity = number of bitblocks	
 	EXPECT_EQ(3, bbresAND.number_of_bitblocks());
 

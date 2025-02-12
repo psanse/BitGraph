@@ -52,13 +52,13 @@ struct bb_t{
 	int  erase_bit(int elem){bb.erase_bit(elem); pc--; return pc;}
 
 	//useful func
-	int sync_pc() { pc = bb.popcn64(); return pc; }
+	int sync_pc() { pc = bb.size(); return pc; }
 	int pop()	  { if (pc > 0) { int v = bb.msbn64(); bb.erase_bit(v); pc--; return v; } else return EMPTY_ELEM; }
 	int front()   {	if (pc > 0) { return bb.lsbn64();	} else return EMPTY_ELEM;	}
 
 	//bool
 	bool is_empty() const {return (pc ==0);}
-	bool test_pc()  const {return pc == bb.popcn64();}	
+	bool test_pc()  const {return pc == bb.size();}	
 
 	//operators
 	friend bool operator ==(const bb_t& lhs, const bb_t& rhs) { return (lhs.pc == rhs.pc) && (lhs.bb == rhs.bb);}
@@ -117,7 +117,7 @@ struct bba_t{
 	void erase_bit(int pos, int bit)	{pbb[pos].erase_bit(bit);}
 	void erase_bit(int pos)				{pbb[pos].erase_bit();}
 	void erase_bit();					
-	int popcn(int pos)					{return pbb[pos].popcn64();}
+	int popcn(int pos)					{return pbb[pos].size();}
 	bool is_bit(int pos, int bit)		{return pbb[pos].is_bit(bit);}
 
 	int get_number_of_bitblocks()		{return pbb[0].number_of_bitblocks();}
@@ -187,7 +187,7 @@ inline
 bool sbb_t<bitstring_t>::is_synchro(){
 //checks if the contents is the same in STACK and BB
 	
-	int pc=bb.popcn64();
+	int pc=bb.size();
 	if(pc!=size) return false;
 
 	for(int i=0; i<size; i++){

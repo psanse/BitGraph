@@ -469,7 +469,7 @@ ostream& Base_Graph_W<Graph_t, W>::print_weights (_bbt& bbsg, ostream& o) const{
 		if(v == EMPTY_ELEM) break;
 		o << "[" << v << "," << w_[v] << "] ";
 	}
-	o << "(" << bbsg.popcn64() << ")" << endl;
+	o << "(" << bbsg.size() << ")" << endl;
 	return o;
 }
 

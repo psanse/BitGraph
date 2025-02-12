@@ -99,7 +99,7 @@ public:
 	/*
 	* @brief Computes the number of neighbors of v (deg(v))	*		
 	*/
-	int degree					(int v)									const { return ptype::adj_[v].popcn64(); }
+	int degree					(int v)									const { return ptype::adj_[v].size(); }
 	
 	/*
 	*  @brief number of neighbors of v in a set of vertices

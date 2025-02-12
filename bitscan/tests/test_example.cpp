@@ -34,7 +34,7 @@ TEST(Example, scanning){
 		res.push_back(nBit);
 	}
 
-	EXPECT_EQ(mysimple.popcn64(),res.size());
+	EXPECT_EQ(mysimple.size(),res.size());
 
 	//scanning from a specific position in simple_array
 	res.clear();

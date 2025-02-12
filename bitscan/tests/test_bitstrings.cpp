@@ -8,9 +8,9 @@
 
 using namespace std;
 
-class BitScanningTest: public ::testing::Test{
+class BitStringsTest: public ::testing::Test{
 protected:
-	BitScanningTest():bbn(301), bbi(301), bbs(301){}
+	BitStringsTest():bbn(301), bbi(301), bbs(301){}
 	virtual void SetUp(){
 	  for(int i = 0; i <= 300; i += 50){
 		  bbn.set_bit(i);
@@ -27,6 +27,254 @@ protected:
 	BBSentinel bbs;
 	set<int> sol;
 };
+
+TEST_F(BitStringsTest, non_destructive) {
+	std::set<int> res;
+
+	int nBit = EMPTY_ELEM;
+	while (true) {
+		nBit = bbn.next_bit(nBit);
+		if (nBit == EMPTY_ELEM) break;
+		res.insert(nBit);
+	}
+
+	EXPECT_TRUE(res == sol);
+
+	res.clear();
+	bbi.init_scan(BBObject::NON_DESTRUCTIVE);
+	while (true) {
+		nBit = bbi.next_bit();
+		if (nBit == EMPTY_ELEM) break;
+		res.insert(nBit);
+	}
+
+	EXPECT_TRUE(res == sol);
+	/////////////////////
+	res.clear();
+
+	if (bbs.init_scan(BBObject::NON_DESTRUCTIVE) != EMPTY_ELEM) {	//it is necessary to check if the bitstring is empty
+		while (true) {
+			nBit = bbs.next_bit();
+			if (nBit == EMPTY_ELEM) break;
+			res.insert(nBit);
+		}
+		EXPECT_TRUE(res == sol);
+	}
+}
+
+TEST_F(BitStringsTest, non_destructive_with_starting_point) {
+	std::set<int> res;
+
+	int nBit = 50;
+	while (true) {
+		nBit = bbn.next_bit(nBit);
+		if (nBit == EMPTY_ELEM) break;
+		res.insert(nBit);
+	}
+
+	EXPECT_EQ(5, res.size());
+	EXPECT_EQ(1, res.count(100));
+	EXPECT_EQ(0, res.count(50));
+
+	res.clear();
+	bbi.init_scan(50, BBObject::NON_DESTRUCTIVE);
+	while (true) {
+		nBit = bbi.next_bit();
+		if (nBit == EMPTY_ELEM) break;
+		res.insert(nBit);
+	}
+
+	EXPECT_EQ(5, res.size());
+	EXPECT_EQ(1, res.count(100));
+	EXPECT_EQ(0, res.count(50));
+	/////////////////////
+	res.clear();
+
+	/*bbs.init_scan(50, BBObject::NON_DESTRUCTIVE);
+		while(true){
+			nBit=bbs.next_bit();
+			if(nBit==EMPTY_ELEM) break;
+			res.insert(nBit);
+		}
+
+	EXPECT_EQ(5, res.size() );
+	EXPECT_EQ(1, res.count(100));
+	EXPECT_EQ(0, res.count(50));*/
+
+}
+
+TEST_F(BitStringsTest, reverse_non_destructive) {
+	std::set<int> res;
+
+	int nBit = EMPTY_ELEM;
+	while (true) {
+		nBit = bbn.prev_bit(nBit);
+		if (nBit == EMPTY_ELEM) break;
+		res.insert(nBit);
+	}
+
+	EXPECT_TRUE(res == sol);
+
+	res.clear();
+	bbi.init_scan(BBObject::NON_DESTRUCTIVE_REVERSE);
+	while (true) {
+		nBit = bbi.prev_bit();
+		if (nBit == EMPTY_ELEM) break;
+		res.insert(nBit);
+	}
+
+	EXPECT_TRUE(res == sol);
+	/////////////////////
+	res.clear();
+	bbs.init_scan(BBObject::NON_DESTRUCTIVE_REVERSE);
+	while (true) {
+		nBit = bbs.prev_bit();
+		if (nBit == EMPTY_ELEM) break;
+		res.insert(nBit);
+	}
+	// CTG: eliminar salida a pantalla de los test
+	//for(set<int>::iterator it=res.begin(); it!=res.end(); ++it){
+	//	cout<<*it<<" ";
+	//}
+	//cout<<"----------------------------------------------"<<endl;
+
+	EXPECT_TRUE(res == sol);
+}
+
+TEST_F(BitStringsTest, reverse_non_destructive_with_starting_point) {
+	std::set<int> res;
+
+	int nBit = 50;
+	while (true) {
+		nBit = bbn.prev_bit(nBit);
+		if (nBit == EMPTY_ELEM) break;
+		res.insert(nBit);
+	}
+
+	EXPECT_EQ(1, res.size());
+	EXPECT_EQ(1, res.count(0));
+	EXPECT_EQ(0, res.count(50));
+
+	res.clear();
+	bbi.init_scan(50, BBObject::NON_DESTRUCTIVE_REVERSE);
+	while (true) {
+		nBit = bbi.prev_bit();
+		if (nBit == EMPTY_ELEM) break;
+		res.insert(nBit);
+	}
+
+	EXPECT_EQ(1, res.size());
+	EXPECT_EQ(1, res.count(0));
+	EXPECT_EQ(0, res.count(50));
+	/////////////////////
+	res.clear();
+
+	/*bbs.init_scan(50, BBObject::NON_DESTRUCTIVE_REVERSE);
+	while(true){
+		nBit=bbs.prev_bit();
+		if(nBit==EMPTY_ELEM) break;
+		res.insert(nBit);
+	}
+
+	EXPECT_EQ(1, res.size() );
+	EXPECT_EQ(1, res.count(0));
+	EXPECT_EQ(0, res.count(50));*/
+
+}
+
+TEST_F(BitStringsTest, destructive) {
+	std::set<int> res;
+
+	BitSet bbn1(bbn);
+	int nBit = EMPTY_ELEM;
+	while (true) {
+		nBit = bbn1.next_bit_if_del(nBit);
+		if (nBit == EMPTY_ELEM) break;
+		res.insert(nBit);
+		bbn1.erase_bit(nBit);
+	}
+
+	EXPECT_TRUE(res == sol);
+	EXPECT_EQ(0, bbn1.size());
+
+	//intrinsic
+	res.clear();
+	BBIntrin bbi1(bbi);
+	bbi1.init_scan(BBObject::DESTRUCTIVE);
+	while (true) {
+		nBit = bbi1.next_bit_del();
+		if (nBit == EMPTY_ELEM) break;
+		res.insert(nBit);
+	}
+
+	EXPECT_TRUE(res == sol);
+	EXPECT_EQ(0, bbi1.size());
+
+	//sentinels
+	res.clear();
+	BBSentinel bbs1(bbs);
+	if (bbs1.init_scan(BBObject::DESTRUCTIVE) != EMPTY_ELEM) {
+		while (true) {
+			nBit = bbs1.next_bit_del();
+			if (nBit == EMPTY_ELEM) break;
+			res.insert(nBit);
+		}
+	}
+
+	EXPECT_TRUE(res == sol);
+	EXPECT_EQ(0, bbs1.size());
+}
+
+
+TEST_F(BitStringsTest, reverse_destructive) {
+	std::set<int> res;
+
+	BitSet bbn1(bbn);
+	int nBit = EMPTY_ELEM;
+	while (true) {
+		nBit = bbn1.prev_bit(nBit);
+		if (nBit == EMPTY_ELEM) break;
+		res.insert(nBit);
+		bbn1.erase_bit(nBit);
+	}
+
+	EXPECT_TRUE(res == sol);
+	EXPECT_EQ(0, bbn1.size());
+
+	//intrinsic
+	res.clear();
+	BBIntrin bbi1(bbi);
+	bbi1.init_scan(BBObject::DESTRUCTIVE_REVERSE);
+	while (true) {
+		nBit = bbi1.prev_bit_del();
+		if (nBit == EMPTY_ELEM) break;
+		res.insert(nBit);
+	}
+
+	EXPECT_TRUE(res == sol);
+	EXPECT_EQ(0, bbi1.size());
+
+	//sentinels
+	res.clear();
+	BBSentinel bbs1(bbs);
+	if (bbs1.init_scan(BBObject::DESTRUCTIVE_REVERSE) != EMPTY_ELEM) {
+		while (true) {
+			nBit = bbs1.prev_bit_del();
+			if (nBit == EMPTY_ELEM) break;
+			res.insert(nBit);
+		}
+	}
+	EXPECT_TRUE(res == sol);
+	EXPECT_EQ(0, bbs1.size());
+}
+
+//TEST_F (BitScanningTest, algorithms){
+//	EXPECT_TRUE(similar(bbn, bbi, 0));
+//	EXPECT_TRUE(subsumes(bbn, bbi));
+//	bbn.erase_bit(bbn.lsbn64());
+//	EXPECT_FALSE(subsumes(bbn, bbi));
+//	EXPECT_TRUE(subsumes(bbi, bbn));
+//}
 
 
 
@@ -101,7 +349,7 @@ TEST(Bitstrings, set_bit_range){
 	EXPECT_TRUE(bb1.is_bit(0));
 	
 	bb1.set_bit(55, 56);
-	EXPECT_TRUE(bb1.popcn64(4, 129));
+	EXPECT_TRUE(bb1.size(4, 129));
 }
 
 TEST(Bitstrings, erase_bit_range){
@@ -143,18 +391,18 @@ TEST(Bitstrings, population_count){
 	bbi.set_bit(64);
 
 	//no range
-	EXPECT_EQ(3, bbi.popcn64());
+	EXPECT_EQ(3, bbi.size());
 	
 	//[firstBit, endOfBitset)
-	EXPECT_EQ(2, bbi.popcn64(11));
-	EXPECT_EQ(1, bbi.popcn64(21));
-	EXPECT_EQ(0, bbi.popcn64(65));
-	EXPECT_EQ(1, bbi.popcn64(64));
+	EXPECT_EQ(2, bbi.size(11));
+	EXPECT_EQ(1, bbi.size(21));
+	EXPECT_EQ(0, bbi.size(65));
+	EXPECT_EQ(1, bbi.size(64));
 
 	//[firstBit, lastBit]
-	EXPECT_EQ(1, bbi.popcn64(0, 10));
-	EXPECT_EQ(1, bbi.popcn64(20, 63));
-	EXPECT_EQ(2, bbi.popcn64(20, 64));
+	EXPECT_EQ(1, bbi.size(0, 10));
+	EXPECT_EQ(1, bbi.size(20, 63));
+	EXPECT_EQ(2, bbi.size(20, 64));
 }
 
 TEST(Bitstrings, to_vector){
@@ -205,274 +453,9 @@ TEST(Bitstrings, to_vector){
 		
 }
 
-TEST_F(BitScanningTest, non_destructive){
-	std::set<int> res;
-			
-	int nBit=EMPTY_ELEM;
-	while(true){
-		nBit=bbn.next_bit(nBit);
-		if(nBit==EMPTY_ELEM) break;
-		res.insert(nBit);	
-	}
-	
-	EXPECT_TRUE(res==sol);
-
-	res.clear();
-	bbi.init_scan(BBObject::NON_DESTRUCTIVE);
-	while(true){
-		nBit=bbi.next_bit();
-		if(nBit==EMPTY_ELEM) break;
-		res.insert(nBit);	
-	}
-	
-	EXPECT_TRUE(res==sol);
-/////////////////////
-	res.clear();
-	
-	if(bbs.init_scan(BBObject::NON_DESTRUCTIVE)!=EMPTY_ELEM){	//it is necessary to check if the bitstring is empty
-		while(true){
-			nBit=bbs.next_bit();
-			if(nBit==EMPTY_ELEM) break;
-			res.insert(nBit);	
-		}
-		EXPECT_TRUE(res==sol);
-	}
-}
-
-TEST_F(BitScanningTest, non_destructive_with_starting_point){
-	std::set<int> res;
-			
-	int nBit=50;
-	while(true){
-		nBit=bbn.next_bit(nBit);
-		if(nBit==EMPTY_ELEM) break;
-		res.insert(nBit);	
-	}
-	
-	EXPECT_EQ(5, res.size() );
-	EXPECT_EQ(1, res.count(100));
-	EXPECT_EQ(0, res.count(50));
-
-	res.clear();
-	bbi.init_scan(50,BBObject::NON_DESTRUCTIVE);
-	while(true){
-		nBit=bbi.next_bit();
-		if(nBit==EMPTY_ELEM) break;
-		res.insert(nBit);	
-	}
-	
-	EXPECT_EQ(5, res.size() );
-	EXPECT_EQ(1, res.count(100));
-	EXPECT_EQ(0, res.count(50));
-/////////////////////
-	res.clear();
-	
-	/*bbs.init_scan(50, BBObject::NON_DESTRUCTIVE);
-		while(true){
-			nBit=bbs.next_bit();
-			if(nBit==EMPTY_ELEM) break;
-			res.insert(nBit);	
-		}
-
-	EXPECT_EQ(5, res.size() );
-	EXPECT_EQ(1, res.count(100));
-	EXPECT_EQ(0, res.count(50));*/
-	
-}
-
-TEST_F(BitScanningTest, reverse_non_destructive){
-	std::set<int> res;
-			
-	int nBit=EMPTY_ELEM;
-	while(true){
-		nBit=bbn.prev_bit(nBit);
-		if(nBit==EMPTY_ELEM) break;
-		res.insert(nBit);	
-	}
-	
-	EXPECT_TRUE(res==sol);
-
-	res.clear();
-	bbi.init_scan(BBObject::NON_DESTRUCTIVE_REVERSE);
-	while(true){
-		nBit=bbi.prev_bit();
-		if(nBit==EMPTY_ELEM) break;
-		res.insert(nBit);	
-	}
-	
-	EXPECT_TRUE(res==sol);
-/////////////////////
-	res.clear();
-	bbs.init_scan(BBObject::NON_DESTRUCTIVE_REVERSE);
-	while(true){
-		nBit=bbs.prev_bit();
-		if(nBit==EMPTY_ELEM) break;
-		res.insert(nBit);	
-	}
-	// CTG: eliminar salida a pantalla de los test
-	//for(set<int>::iterator it=res.begin(); it!=res.end(); ++it){
-	//	cout<<*it<<" ";
-	//}
-	//cout<<"----------------------------------------------"<<endl;
-
-	EXPECT_TRUE(res==sol);
-}
-
-TEST_F(BitScanningTest, reverse_non_destructive_with_starting_point){
-	std::set<int> res;
-			
-	int nBit=50;
-	while(true){
-		nBit=bbn.prev_bit(nBit);
-		if(nBit==EMPTY_ELEM) break;
-		res.insert(nBit);	
-	}
-	
-	EXPECT_EQ(1, res.size() );
-	EXPECT_EQ(1, res.count(0));
-	EXPECT_EQ(0, res.count(50));
-
-	res.clear();
-	bbi.init_scan(50,BBObject::NON_DESTRUCTIVE_REVERSE);
-	while(true){
-		nBit=bbi.prev_bit();
-		if(nBit==EMPTY_ELEM) break;
-		res.insert(nBit);	
-	}
-	
-	EXPECT_EQ(1, res.size() );
-	EXPECT_EQ(1, res.count(0));
-	EXPECT_EQ(0, res.count(50));
-/////////////////////
-	res.clear();
-	
-	/*bbs.init_scan(50, BBObject::NON_DESTRUCTIVE_REVERSE);
-	while(true){
-		nBit=bbs.prev_bit();
-		if(nBit==EMPTY_ELEM) break;
-		res.insert(nBit);	
-	}
-
-	EXPECT_EQ(1, res.size() );
-	EXPECT_EQ(1, res.count(0));
-	EXPECT_EQ(0, res.count(50));*/
-	
-}
-
-TEST_F(BitScanningTest, destructive){
-	std::set<int> res;
-	
-	BitSet bbn1(bbn);
-	int nBit=EMPTY_ELEM;
-	while(true){
-		nBit=bbn1.next_bit_if_del(nBit);
-		if(nBit==EMPTY_ELEM) break;
-		res.insert(nBit);
-	bbn1.erase_bit(nBit);
-	}
-	
-	EXPECT_TRUE(res==sol);
-	EXPECT_EQ(0,bbn1.popcn64());
-
-	//intrinsic
-	res.clear();
-	BBIntrin bbi1(bbi);
-	bbi1.init_scan(BBObject::DESTRUCTIVE);
-	while(true){
-		nBit=bbi1.next_bit_del();
-		if(nBit==EMPTY_ELEM) break;
-		res.insert(nBit);	
-	}
-	
-	EXPECT_TRUE(res==sol);
-	EXPECT_EQ(0,bbi1.popcn64());
-
-	//sentinels
-	res.clear();
-	BBSentinel bbs1(bbs);
-	if(bbs1.init_scan(BBObject::DESTRUCTIVE)!=EMPTY_ELEM){
-		while(true){
-			nBit=bbs1.next_bit_del();
-			if(nBit==EMPTY_ELEM) break;
-			res.insert(nBit);	
-		}
-	}
-
-	EXPECT_TRUE(res==sol);
-	EXPECT_EQ(0,bbs1.popcn64());
-}
 
 
-TEST_F(BitScanningTest, reverse_destructive){
-	std::set<int> res;
-	
-	BitSet bbn1(bbn);
-	int nBit=EMPTY_ELEM;
-	while(true){
-		nBit=bbn1.prev_bit(nBit);		
-		if(nBit==EMPTY_ELEM) break;
-		res.insert(nBit);
-	bbn1.erase_bit(nBit);
-	}
-	
-	EXPECT_TRUE(res==sol);
-	EXPECT_EQ(0,bbn1.popcn64());
 
-	//intrinsic
-	res.clear();
-	BBIntrin bbi1(bbi);
-	bbi1.init_scan(BBObject::DESTRUCTIVE_REVERSE);
-	while(true){
-		nBit=bbi1.prev_bit_del();
-		if(nBit==EMPTY_ELEM) break;
-		res.insert(nBit);	
-	}
-	
-	EXPECT_TRUE(res==sol);
-	EXPECT_EQ(0,bbi1.popcn64());
-
-	//sentinels
-	res.clear();
-	BBSentinel bbs1(bbs);
-	if(bbs1.init_scan(BBObject::DESTRUCTIVE_REVERSE) != EMPTY_ELEM){
-		while(true){
-			nBit = bbs1.prev_bit_del();
-			if(nBit == EMPTY_ELEM) break;
-			res.insert(nBit);	
-		}
-	}
-	EXPECT_TRUE(res == sol);
-	EXPECT_EQ(0,bbs1.popcn64());
-}
-
-//TEST_F (BitScanningTest, algorithms){
-//	EXPECT_TRUE(similar(bbn, bbi, 0));
-//	EXPECT_TRUE(subsumes(bbn, bbi));
-//	bbn.erase_bit(bbn.lsbn64());
-//	EXPECT_FALSE(subsumes(bbn, bbi));
-//	EXPECT_TRUE(subsumes(bbi, bbn));
-//}
-
-
-TEST(BitBoardTests, BitSetTo0) {
-	BitSet bb1(25);
-	BitSet bb2(bb1);
-
-	bb1.set_bit();			//sets to ONE the whole bitblock
-	bb2.set_bit(0,24);
-
-	vector<int> v1(25,0);
-	
-	for(int i=0;i<25;i++){
-		v1[i]=i;
-	}
-
-	EXPECT_LT(v1, to_vector(bb1));
-	EXPECT_LT(25, bb1.popcn64());
-	EXPECT_EQ(to_vector(bb2), v1);
-	EXPECT_EQ(25, bb2.popcn64());
-
-}
 
 TEST(BITBOARDTest, GenRandom){
 ///////////
@@ -517,9 +500,9 @@ protected:
 };
 
 TEST_F(BasicFunctionsTest, miscellanous){
-	EXPECT_EQ(bbn.popcn64(),bbi.popcn64());
+	EXPECT_EQ(bbn.size(),bbi.size());
 	bbs.init_sentinels(true);
-	EXPECT_EQ(bbn.popcn64(),bbs.popcn64());
+	EXPECT_EQ(bbn.size(),bbs.size());
 	EXPECT_EQ(to_vector(bbn), to_vector(bbi));
 	EXPECT_EQ(to_vector(bbn), to_vector(bbs));
 }
@@ -564,7 +547,7 @@ TEST(BitScanning, init_scan_specific){
 	EXPECT_FALSE(bbres.is_bit(10));
 	EXPECT_TRUE(bbres.is_bit(50));
 	EXPECT_TRUE(bbres.is_bit(64));
-	EXPECT_EQ(2,bbres.popcn64());
+	EXPECT_EQ(2,bbres.size());
 
 	//scan from the beginning
 	bbres.erase_bit();
@@ -576,7 +559,7 @@ TEST(BitScanning, init_scan_specific){
 		bbres.set_bit(v);
 	}
 
-	EXPECT_EQ(4,bbres.popcn64());
+	EXPECT_EQ(4,bbres.size());
 	EXPECT_TRUE(bbres.is_bit(0));
 	EXPECT_TRUE(bbres.is_bit(10));
 

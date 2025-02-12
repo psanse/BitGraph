@@ -26,6 +26,8 @@ protected:
 //tests the 4 types of scanning
 TEST_F(BitScanningTest, basic) {
 	
+	bb.print();
+
 	int bit = bscan::noBit;
 	std::vector<int> lbits;
 	std::vector<int> lbits_exp;

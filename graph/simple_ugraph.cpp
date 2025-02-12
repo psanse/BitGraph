@@ -58,7 +58,7 @@ BITBOARD Ugraph<T>::number_of_edges(bool lazy) {
 
 		//adds all edges and divides by 2 for efficiency - checks for self loops	
 		for (std::size_t i = 0; i < NV_; i++) {
-			ptype::NE_ += adj_[i].popcn64();
+			ptype::NE_ += adj_[i].size();
 		}
 
 		//////////////////////////////

@@ -73,12 +73,12 @@ TEST(Masks, AND_OR) {
 	AND(bb, bb1, bbresAND);
 	EXPECT_TRUE(bbresAND.is_bit(10));
 	EXPECT_TRUE(bbresAND.is_bit(64));
-	EXPECT_EQ(2, bbresAND.popcn64());
+	EXPECT_EQ(2, bbresAND.size());
 
 	//OR
 	//cout<<OR(bb, bb1, bbresOR)<<endl;
 	OR(bb, bb1, bbresOR);
-	EXPECT_EQ(4, bbresOR.popcn64());
+	EXPECT_EQ(4, bbresOR.size());
 
 	//&=
 	bitarray bb2(130);
@@ -95,7 +95,7 @@ TEST(Masks, AND_OR) {
 	bb2&=bb3;
 	EXPECT_TRUE(bbresAND.is_bit(10));
 	EXPECT_TRUE(bbresAND.is_bit(64));
-	EXPECT_EQ(2,bb2.popcn64());
+	EXPECT_EQ(2,bb2.size());
 	
 }
 
@@ -120,12 +120,12 @@ TEST(Masks, AND_OR_sparse) {
 	AND(bb, bb1, bbresAND);
 	EXPECT_TRUE(bbresAND.is_bit(10));
 	EXPECT_TRUE(bbresAND.is_bit(64));
-	EXPECT_EQ(2, bbresAND.popcn64());
+	EXPECT_EQ(2, bbresAND.size());
 
 	//OR
 	//cout<<OR(bb, bb1, bbresOR)<<endl;
 	OR(bb, bb1, bbresOR);
-	EXPECT_EQ(4, bbresOR.popcn64());
+	EXPECT_EQ(4, bbresOR.size());
 
 	//&=
 	sparse_bitarray bb2(130);
@@ -142,7 +142,7 @@ TEST(Masks, AND_OR_sparse) {
 	bb2 &= bb3;
 	EXPECT_TRUE(bb2.is_bit(10));
 	EXPECT_TRUE(bb2.is_bit(64));
-	EXPECT_EQ(2,bb2.popcn64());
+	EXPECT_EQ(2,bb2.size());
 
 }
 
@@ -238,7 +238,7 @@ TEST(Masks, erase_bits){
 	bb1.set_bit(100);
 
 	bb.erase_block(2,2,bb1);		//nothing deleted
-	EXPECT_EQ(3, bb.popcn64());
+	EXPECT_EQ(3, bb.size());
 
 	bb.erase_block(1,1,bb1);		//nothing deleted
 	EXPECT_TRUE(bb.is_bit(10));
@@ -247,7 +247,7 @@ TEST(Masks, erase_bits){
 	EXPECT_FALSE(bb.is_bit(100));
 
 	bb.erase_block(0,2,bb1);		//nothing deleted
-	EXPECT_EQ(1, bb.popcn64());
+	EXPECT_EQ(1, bb.size());
 }
 
 TEST(Masks, erase_bits_sparse){
@@ -264,7 +264,7 @@ TEST(Masks, erase_bits_sparse){
 	bb1.set_bit(100);
 
 	bb.erase_block(2,2,bb1);		//nothing deleted
-	EXPECT_EQ(3, bb.popcn64());
+	EXPECT_EQ(3, bb.size());
 
 	bb.erase_block(1,1,bb1);		//nothing deleted
 	EXPECT_TRUE(bb.is_bit(10));
@@ -273,7 +273,7 @@ TEST(Masks, erase_bits_sparse){
 	EXPECT_FALSE(bb.is_bit(100));
 
 	bb.erase_block(0,2,bb1);		//nothing deleted
-	EXPECT_EQ(1, bb.popcn64());
+	EXPECT_EQ(1, bb.size());
 }
 
 TEST(Masks, ERASE){					
@@ -299,7 +299,7 @@ TEST(Masks, ERASE){
 	EXPECT_TRUE(bbERASE.is_bit(20));
 	EXPECT_FALSE(bbERASE.is_bit(10));
 	EXPECT_FALSE(bbERASE.is_bit(64));
-	EXPECT_EQ(1, bbERASE.popcn64());
+	EXPECT_EQ(1, bbERASE.size());
 
 //sparse
 	sparse_bitarray bbs(130);
@@ -321,7 +321,7 @@ TEST(Masks, ERASE){
 	EXPECT_TRUE(bbsERASE.is_bit(20));
 	EXPECT_FALSE(bbsERASE.is_bit(10));
 	EXPECT_FALSE(bbsERASE.is_bit(64));
-	EXPECT_EQ(1, bbsERASE.popcn64());
+	EXPECT_EQ(1, bbsERASE.size());
 }
 
 TEST(Masks, ERASE_extreme_cases){
@@ -371,7 +371,7 @@ TEST(Masks, ERASE_extreme_cases){
 	ERASE(bbs, bbs1, bbsERASE);
 	EXPECT_TRUE(bbsERASE.is_bit(10));
 	EXPECT_TRUE(bbsERASE.is_bit(64));
-	EXPECT_EQ(2, bbsERASE.popcn64());
+	EXPECT_EQ(2, bbsERASE.size());
 }
 
 TEST(Masks, AND_trimming){
@@ -396,7 +396,7 @@ TEST(Masks, AND_trimming){
 	//AND(1,bb, bb1, bbresAND);
 	EXPECT_TRUE(bbresAND.is_bit(10));
 	EXPECT_FALSE(bbresAND.is_bit(64));
-	EXPECT_EQ(1, bbresAND.popcn64());
+	EXPECT_EQ(1, bbresAND.size());
 
 	bbresAND.erase_bit();
 	AND<false>(10, bb, bb1, bbresAND);

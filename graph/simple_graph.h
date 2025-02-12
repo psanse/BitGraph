@@ -192,7 +192,7 @@ virtual	double density					(bool lazy=true);
 	* @brief number of outgoing edges from v
 	* @param v input vertex
 	*/
-	int degree_out						(int v)					const { return adj_[v].popcn64(); }
+	int degree_out						(int v)					const { return adj_[v].size(); }
 	
 	/*
 	* @brief number edges incident to v
