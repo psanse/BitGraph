@@ -9,7 +9,7 @@ bbscan.h
 bbintrinsic_sparse.h
 bbsentinel.h
 bbobject.h
-bbscanFeature.h
+bbscan_external.h
 bitscan.h
 )
 
@@ -22,7 +22,7 @@ bitblock.cpp
 bbset.cpp  
 bitboards.cpp 
 tables.cpp
-bbscanFeature.cpp
+bbscan_external.cpp
 ${useful_headers_for_IDE}
 )
 

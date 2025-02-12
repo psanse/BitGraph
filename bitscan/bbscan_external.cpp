@@ -5,7 +5,7 @@
  * author pss
  **/
 
-#include "bbscanFeature.h"
+#include "bbscan_external.h"
 
 template<class BitSet_t>
 int bscan::ScanRev<BitSet_t>::next_bit(BitSet_t& bb_del)

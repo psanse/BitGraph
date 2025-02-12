@@ -4,7 +4,7 @@
 * @details created 10/02/2025
 **/
 
-#include "bitscan/bbscanFeature.h"
+#include "bitscan/bbscan_external.h"
 #include "gtest/gtest.h"
 #include <iostream>
 #include <vector>
