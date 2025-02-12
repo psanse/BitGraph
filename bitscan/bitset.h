@@ -243,16 +243,14 @@ public:
 	 **/
 	explicit  BitSet				(int nPop, const vint& v);
 
-	
-
-		 	 
+			 	 
 	 //Move and copy semantics allowed
 	BitSet						(const BitSet& bbN)				= default;
 	BitSet						(BitSet&&)			noexcept	= default;
 	BitSet& operator =			(const BitSet&)					= default;
 	BitSet& operator =			(BitSet&&)			noexcept	= default;
 
-virtual	~BitSet					()									= default;
+virtual	~BitSet					()								= default;
 
 ////////////
 //Reset / init (memory allocation)

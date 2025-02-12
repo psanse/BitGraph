@@ -9,7 +9,7 @@
 #define __BBINTRINSIC_H__
 
 #include "bitset.h"	
-#include <utility>
+
 
 using namespace std;
 
@@ -28,12 +28,17 @@ class BBIntrin: public BitSet{
 public:
 		
 	friend class bscan;
-		
-//constructors / destructors
-	
-	using BitSet::BitSet;			//inherit constructors	
 
-	virtual ~BBIntrin				() = default;
+//////////////////////////////
+//construction / destruction
+	
+	//inherit constructors	
+	using BitSet::BitSet;		
+	
+	//TODO...check copy and move assignments 
+	
+	virtual	~BBIntrin				()								 = default;
+
 
 ///////////////////////////////
 //setters and getters
