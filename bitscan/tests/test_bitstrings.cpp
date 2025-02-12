@@ -184,18 +184,7 @@ TEST_F(BitStringsTest, reverse_non_destructive_with_starting_point) {
 
 TEST_F(BitStringsTest, destructive) {
 	std::set<int> res;
-
-	BitSet bbn1(bbn);
 	int nBit = EMPTY_ELEM;
-	while (true) {
-		nBit = bbn1.next_bit_if_del(nBit);
-		if (nBit == EMPTY_ELEM) break;
-		res.insert(nBit);
-		bbn1.erase_bit(nBit);
-	}
-
-	EXPECT_TRUE(res == sol);
-	EXPECT_EQ(0, bbn1.size());
 
 	//intrinsic
 	res.clear();

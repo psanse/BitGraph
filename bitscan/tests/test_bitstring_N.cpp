@@ -78,19 +78,6 @@ TEST_F(BBNScanningTest, reverse_non_destructive_with_starting_point) {
 	EXPECT_EQ(0, res.count(50));
 }
 
-TEST_F(BBNScanningTest, destructive) {
-	std::set<int> res;
-
-	BitSet bbN1(bbn);
-	int nBit = EMPTY_ELEM;
-	while ((nBit = bbN1.next_bit_if_del(nBit)) != EMPTY_ELEM) {
-		res.insert(nBit);
-		bbN1.erase_bit(nBit);
-	}
-
-	EXPECT_TRUE(res == sol);
-	EXPECT_EQ(0, bbN1.size());
-}
 
 TEST_F(BBNScanningTest, reverse_destructive) {
 	std::set<int> res;

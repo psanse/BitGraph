@@ -304,14 +304,24 @@ const BITBOARD bitblock				(int block) const					{ return vBB_[block]; }
 	* @brief returns the index of the most significant bit in the bitstring
 	* @details implemented as a lookup table
 	**/
-inline virtual int msbn64			()	const;		//lookup 
+protected:
+inline  int msbn64_lup				()	const;	
+inline  int msbn64_intrin			()	const;
+
+public:
+		int msb						()	const				{ return msbn64_intrin(); }
 
 	/**
 	* @brief returns the index of the least significant bit in the bitstring
 	* @details  implemented as a de Bruijn hashing or a lookup table depending on 
 	*			an internal switch (see config.h)
 	**/
-inline virtual int lsbn64			()	const; 		//de Bruijn	/ lookup								
+protected:
+inline  int lsbn64_non_intrin		()	const; 
+inline  int lsbn64_intrin			()	const;
+
+public:
+		int lsb						()	const				 { return lsbn64_intrin(); }	
 	
 	/**
 	* @brief Computes the next least significant 1-bit in the bitstring after bit
@@ -325,24 +335,6 @@ inline virtual int lsbn64			()	const; 		//de Bruijn	/ lookup
 	* @details: Deprecated in favour of the bitscanning with state of BBIntrinsic class
 	**/
 inline int next_bit					(int bit)	const;					
-
-////////////////////////////
-// Returns next bit assuming, when used in a loop, that the last bit
-// scanned is deleted prior to the call
-	/**
-	* @brief Computes the least significant 1-bit in the bitstring starting from the
-	*		 bitblock that contains the input bit. 
-	*		 If bit == EMPTY_ELEM, returns the lest significant bit in the bitstring.
-	* 
-	* @param bit: position of the bitblock where to start the search
-	* @returns The lsb starting from the bitblock of bit, EMPTY_ELEM if there are no more bits
-	* 
-	* @details To be used inside a bitscanning loop, where the last bit scanned 
-	*		   is deleted prior to the call.
-	* @details Uses a De Bruijn hashing implementation for lsbn64()
-	* @details Preliminary attempt for bitscanning with state information
-	**/
-inline int next_bit_if_del			(int bit)	const;					
 	
 	/**
 	* @brief Computes the next most significant  1-bit in the bitstring after bit
@@ -806,7 +798,7 @@ int BitSet::find_first_common	(const BitSet& rhs) const {
 	return EMPTY_ELEM;
 }
 
-inline int BitSet::msbn64() const{
+inline int BitSet::msbn64_lup() const{
 ///////////////////////
 // Look up table implementation (best found so far)
 
@@ -829,6 +821,20 @@ inline int BitSet::msbn64() const{
 	return EMPTY_ELEM;		//should not reach here
 }
 
+inline int BitSet::msbn64_intrin() const
+{
+	U32 posInBB;
+
+	for (auto i = nBB_ - 1; i >= 0; --i) {
+
+		if (_BitScanReverse64(&posInBB, vBB_[i])) {
+			return (posInBB + WMUL(i));
+		}
+	}
+
+	return EMPTY_ELEM;
+}
+
 inline
 int BitSet::next_bit(int bit) const{
 
@@ -836,7 +842,7 @@ int BitSet::next_bit(int bit) const{
 	//typically used in a loop, in the first bitscan call.
 	//Determines the least significant bit in the bitsring
 	if (bit == EMPTY_ELEM) {
-		return lsbn64();
+		return lsb();
 	}
 
 	//compute bitlbock of the bit
@@ -861,29 +867,13 @@ int BitSet::next_bit(int bit) const{
 	return EMPTY_ELEM;
 }
 
-inline int BitSet::next_bit_if_del(int bit) const{
-	
-	//special case - first bitscan,
-	//calls for the least significant bit in the bitstring
-	if (bit == EMPTY_ELEM) {
-		return lsbn64();
-	}
-			
-	for (auto i = WDIV(bit); i < nBB_; ++i) {
-		if (vBB_[i]) {
-			return(bblock::lsb64_de_Bruijn(vBB_[i]) + WMUL(i));
-		}
-	}
-		
-	return EMPTY_ELEM;		//should not reach here
-}
 
 inline int BitSet::prev_bit(int bit) const{
 
 	//special case - first bitscan,
 	//calls for the most-significant bit in the bitstring
 	if (bit == EMPTY_ELEM) {
-		return msbn64();
+		return msb();
 	}
 	
 	//bitblock of input bit
@@ -1251,7 +1241,7 @@ BitSet&  BitSet::erase_bit (int firstBit, int lastBit){
 	return *this;
 }
 
-inline int BitSet::lsbn64() const{
+inline int BitSet::lsbn64_non_intrin() const{
 /////////////////
 // different implementations of lsbn depending on configuration
 
@@ -1286,6 +1276,19 @@ inline int BitSet::lsbn64() const{
 #endif
 
 	return EMPTY_ELEM;	
+}
+
+inline int BitSet::lsbn64_intrin() const
+{
+	U32 posInBB;
+
+	for (auto i = 0; i < nBB_; ++i) {
+		if (_BitScanForward64(&posInBB, vBB_[i])) {
+			return(posInBB + WMUL(i));
+		}
+	}
+
+	return EMPTY_ELEM;
 }
 
 inline

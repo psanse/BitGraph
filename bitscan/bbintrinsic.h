@@ -49,14 +49,14 @@ public:
 	* @details 30/3/12, last update 08/02/2025
 	* @details implemented with intrinsic functions
 	**/
-inline int lsbn64					() const override;
+//inline int lsbn64					() const override;
 
 	/**
 	* @brief most significant bit in the bitstring
 	* @details 30/3/12, last update 08/02/2025
 	* @details implemented with intrinsic functions
 	**/
-inline int msbn64					() const override; 
+//inline int msbn64					() const override; 
 	
 	/**
 	* @brief Configures the initial block and bit position for bitscanning
@@ -303,35 +303,35 @@ protected:
 // INLINE Implementation, must be in header file
 
 
-inline
-int BBIntrin::msbn64() const {
+//inline
+//int BBIntrin::msbn64() const {
+//
+//	U32 posInBB;
+//
+//	for (auto i = nBB_ - 1; i >= 0; --i) {
+//
+//		if (_BitScanReverse64(&posInBB, vBB_[i])) {
+//			return (posInBB + WMUL(i));
+//		}
+//	}
+//
+//	return EMPTY_ELEM;
+//}
 
-	U32 posInBB;
 
-	for (auto i = nBB_ - 1; i >= 0; --i) {
-
-		if (_BitScanReverse64(&posInBB, vBB_[i])) {
-			return (posInBB + WMUL(i));
-		}
-	}
-
-	return EMPTY_ELEM;
-}
-
-
-inline
-int BBIntrin::lsbn64() const {
-
-	U32 posInBB;
-
-	for (auto i = 0; i < nBB_; ++i) {
-		if (_BitScanForward64(&posInBB, vBB_[i])) {
-			return(posInBB + WMUL(i));
-		}
-	}
-
-	return EMPTY_ELEM;
-}
+//inline
+//int BBIntrin::lsbn64() const {
+//
+//	U32 posInBB;
+//
+//	for (auto i = 0; i < nBB_; ++i) {
+//		if (_BitScanForward64(&posInBB, vBB_[i])) {
+//			return(posInBB + WMUL(i));
+//		}
+//	}
+//
+//	return EMPTY_ELEM;
+//}
 
 
 

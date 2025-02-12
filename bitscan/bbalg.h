@@ -53,8 +53,8 @@ struct bb_t{
 
 	//useful func
 	int sync_pc() { pc = bb.size(); return pc; }
-	int pop()	  { if (pc > 0) { int v = bb.msbn64(); bb.erase_bit(v); pc--; return v; } else return EMPTY_ELEM; }
-	int front()   {	if (pc > 0) { return bb.lsbn64();	} else return EMPTY_ELEM;	}
+	int pop()	  { if (pc > 0) { int v = bb.msb(); bb.erase_bit(v); pc--; return v; } else return EMPTY_ELEM; }
+	int front()   {	if (pc > 0) { return bb.lsb();	} else return EMPTY_ELEM;	}
 
 	//bool
 	bool is_empty() const {return (pc ==0);}
