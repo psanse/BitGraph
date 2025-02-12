@@ -325,27 +325,33 @@ public:
 	
 	/**
 	* @brief Computes the next least significant 1-bit in the bitstring after bit
-	*		 If bit == EMPTY_ELEM, returns the lest significant bit in the bitstring
+	*		 If bit == EMPTY_ELEM, returns the lest significant bit in the bitstring.
+	*		
+	*		 I.Primitive scanning stateless feature at this level. 
+	*		II. Use bitscanning with state for proper bitscanning (derived class or external feature)
 	* 
 	* @param bit: position from which to start the search
 	* @returns the next 1-bit in the bitstring after bit, EMPTY_ELEM if there are no more bits
 	* @details: no internal state is used, NOT EFFICIENT since it has to compute the offset and
 	*		    current bitblock of bit in each call. It does not cache the last bit found.
-	* @details: Uses a DeBrijn implementation for lsbn64()
-	* @details: Deprecated in favour of the bitscanning with state of BBIntrinsic class
+	* @details: Uses a DeBruijn implementation for lsb()
+	* @details: DEPRECATED in favour of the bitscanning with state of BBIntrinsic class
 	**/
 inline int next_bit					(int bit)	const;					
 	
 	/**
 	* @brief Computes the next most significant  1-bit in the bitstring after bit
 	*		 If bit == EMPTY_ELEM, returns the most significant bit in the bitstring
+	* 
+	*		 I. Primitive scanning stateless feature at this level. Use bitscanning with state for proper bitscanning
+	*		II. Use bitscanning with state for proper bitscanning (derived class or external feature)
 	*
 	* @param bit: position from which to start the search
 	* @returns the next msb 1-bit in the bitstring after bit, EMPTY_ELEM if there are no more bits
 	* @details: no internal state is used, NOT EFFICIENT since it has to compute the offset and
 	*		    current bitblock of bit in each call. It does not cache the last bit found.
-	* @details: Uses a lookup table implementation for msbn64()
-	* @details: Deprecated in favour of the bitscanning with state of BBIntrinsic class
+	* @details: Uses a lookup table implementation for msb()
+	* @details: Not recommended. DEPRECATED in favour of the bitscanning with state of BBIntrinsic class
 	**/
 inline int prev_bit					(int bit)	const;					
 	
