@@ -1,7 +1,7 @@
 /**
-* @file test_bitscanning.cpp
-* @brief attempt to simplify syntax of bitscans with generic programming
-* @details created 10/02/2025
+* @file test_bbscan_external.cpp
+* @brief unit tests for efficient bitscanning implemented as an external feature
+* @details created 10/02/2025, last_update 12/02/2025
 **/
 
 #include "bitscan/bbscan_external.h"
@@ -11,9 +11,9 @@
 
 using namespace std;
 
-class BitScanningTest : public ::testing::Test {
+class BitScanExternalTest : public ::testing::Test {
 protected:
-	BitScanningTest() :bb(65) {}
+	BitScanExternalTest() :bb(65) {}
 	virtual void SetUp() {
 		bb.set_bit(0);
 		bb.set_bit(1);
@@ -24,7 +24,7 @@ protected:
 };
 	
 //tests the 4 types of scanning
-TEST_F(BitScanningTest, basic) {
+TEST_F(BitScanExternalTest, basic) {
 	
 	bb.print();
 
@@ -98,7 +98,7 @@ TEST_F(BitScanningTest, basic) {
 
 //tests the 2 types of non-destructive scanning
 //note: destructive scans cannot fix the initial bit, for efficiency reasons
-TEST_F(BitScanningTest, firstBit) {
+TEST_F(BitScanExternalTest, firstBit) {
 
 	int bit = bscan::noBit;
 	std::vector<int> lbits;
@@ -132,7 +132,7 @@ TEST_F(BitScanningTest, firstBit) {
 
 }
 
-TEST_F(BitScanningTest, block_info) {
+TEST_F(BitScanExternalTest, block_info) {
 
 	int bit = bscan::noBit;
 	std::vector<int> lblocks;
@@ -153,7 +153,7 @@ TEST_F(BitScanningTest, block_info) {
 
 }
 
-TEST_F(BitScanningTest, delete_additional_bitstring) {
+TEST_F(BitScanExternalTest, delete_additional_bitstring) {
 
 	int bit = bscan::noBit;
 	std::vector<int> lblocks;
@@ -212,7 +212,7 @@ TEST_F(BitScanningTest, delete_additional_bitstring) {
 
 }
 
-TEST_F(BitScanningTest, to_C_array) {
+TEST_F(BitScanExternalTest, to_C_array) {
 
 	int lv[10];
 	std::size_t nPop =0;

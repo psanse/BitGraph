@@ -1,7 +1,7 @@
 /**
  * @file bbscan_external.h
- * @brief implements bitscanning as feature for the bitstring hierarchy
- * @details created 29/01/2025
+ * @brief implements efficient bitscanning as an external feature for the bitstring hierarchy
+ * @details created 29/01/2025, last_updated 12/02/2025
  * author pss
  **/
 
