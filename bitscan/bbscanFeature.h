@@ -28,6 +28,7 @@ public:
 	template<class BitSet_t>
 	static int* to_C_array (BitSet_t& bb, int* lv, std::size_t& size, bool rev = false) ;
 
+
 	template< class BitSet_t = BBIntrin>
 	struct ScanRev {
 		using basic_type = BitSet_t;

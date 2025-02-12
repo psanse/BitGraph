@@ -287,6 +287,10 @@ inline int prev_bit_del				(int& block,  BBIntrin& bitset );
 	**/
 inline	int* to_C_array				(int* lv, std::size_t& size, bool rev = false) override;
 
+	//cast operator to C-array
+inline	operator std::pair<int*, std::size_t> ();
+
+
 #ifdef POPCOUNT_64
 
 /////////////////
@@ -784,6 +788,31 @@ int* BBIntrin::to_C_array  (int* lv, std::size_t& nPop, bool rev)  {
 
 	return lv;
 }
+
+inline BBIntrin::operator std::pair<int*, std::size_t> ()
+{
+	std::size_t nPop = 0;
+	int bit = EMPTY_ELEM;
+	int* lv = nullptr;
+
+	try {
+		lv = new int[size()];
+	}
+	catch (std::bad_alloc& ba) {
+		LOG_ERROR("bad allocation in BBIntrin::operator std::pair<int*, std::size_t>");
+	}
+
+	//scans the bitset
+	init_scan(BBObject::NON_DESTRUCTIVE);
+	while ((bit = next_bit()) != EMPTY_ELEM) {
+		lv[nPop++] = bit;
+	}
+
+
+	return std::make_pair(lv, nPop);
+}
+
+
 
 #endif
 
