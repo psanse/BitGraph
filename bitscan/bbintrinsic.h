@@ -43,20 +43,6 @@ public:
  	
 //////////////////////////////
 // Bitscanning (with cached info)
-
-	/**
-	* @brief least significant bit in the bitstring
-	* @details 30/3/12, last update 08/02/2025
-	* @details implemented with intrinsic functions
-	**/
-//inline int lsbn64					() const override;
-
-	/**
-	* @brief most significant bit in the bitstring
-	* @details 30/3/12, last update 08/02/2025
-	* @details implemented with intrinsic functions
-	**/
-//inline int msbn64					() const override; 
 	
 	/**
 	* @brief Configures the initial block and bit position for bitscanning
@@ -288,8 +274,6 @@ inline int prev_bit_del				(int& block,  BBIntrin& bitset );
 	**/
 inline	int* to_C_array				(int* lv, std::size_t& size, bool rev = false) override;
 
-	//cast operator to C-array
-inline	operator std::pair<int*, std::size_t> ();
 
 
 //////////////////
@@ -301,38 +285,6 @@ protected:
 ///////////////////////
 //
 // INLINE Implementation, must be in header file
-
-
-//inline
-//int BBIntrin::msbn64() const {
-//
-//	U32 posInBB;
-//
-//	for (auto i = nBB_ - 1; i >= 0; --i) {
-//
-//		if (_BitScanReverse64(&posInBB, vBB_[i])) {
-//			return (posInBB + WMUL(i));
-//		}
-//	}
-//
-//	return EMPTY_ELEM;
-//}
-
-
-//inline
-//int BBIntrin::lsbn64() const {
-//
-//	U32 posInBB;
-//
-//	for (auto i = 0; i < nBB_; ++i) {
-//		if (_BitScanForward64(&posInBB, vBB_[i])) {
-//			return(posInBB + WMUL(i));
-//		}
-//	}
-//
-//	return EMPTY_ELEM;
-//}
-
 
 
 inline
@@ -734,29 +686,7 @@ int* BBIntrin::to_C_array  (int* lv, std::size_t& nPop, bool rev)  {
 	return lv;
 }
 
-inline 
-BBIntrin::operator std::pair<int*, std::size_t> () 
-{
-	std::size_t nPop = 0;
-	int bit = EMPTY_ELEM;
-	int* lv = nullptr;
 
-	try {
-		lv = new int[size()];
-	}
-	catch (std::bad_alloc& ba) {
-		LOG_ERROR("bad allocation in BBIntrin::operator std::pair<int*, std::size_t>");
-	}
-
-	//scans the bitset
-	init_scan(BBObject::NON_DESTRUCTIVE);
-	while ((bit = next_bit()) != EMPTY_ELEM) {
-		lv[nPop++] = bit;
-	}
-
-
-	return std::make_pair(lv, nPop);
-}
 
 
 

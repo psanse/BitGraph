@@ -564,26 +564,7 @@ TEST(BitScanning, init_scan_specific){
 	EXPECT_FALSE(bbres.is_bit(0));
 }
 
-TEST(Conversion, C_array) {
 
-	BBIntrin bb(130);
-	bb.set_bit(10);
-	bb.set_bit(20);
-	bb.set_bit(30);
-
-	//allocates memory for the array	
-	auto pair = static_cast<std::pair<int*, std::size_t>>(bb);	
-
-	////////////////////////////////
-	EXPECT_EQ(3, pair.second);
-	EXPECT_EQ(10, pair.first[0]);
-	EXPECT_EQ(20, pair.first[1]);
-	EXPECT_EQ(30, pair.first[2]);
-	////////////////////////////////
-	
-	delete pair.first;			//do not forget to delete the array
-
-}
 
 
 

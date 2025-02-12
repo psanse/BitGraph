@@ -25,7 +25,7 @@
 
 class BBObject{
 public:
-	static const int NOBIT = -1;
+	static const int noBit = -1;
 
 	//types of bit scans
 	enum scan_types	{NON_DESTRUCTIVE, NON_DESTRUCTIVE_REVERSE, DESTRUCTIVE, DESTRUCTIVE_REVERSE};				
@@ -36,16 +36,16 @@ public:
 	struct scan_t {																			
 		
 		int bbi_;								//bitboard index 	
-		int pos_;								//bit position [0...63] for bitscan
+		int pos_;								//bit index [0...63] 
 
-		scan_t() :bbi_(EMPTY_ELEM), pos_(MASK_LIM)	{}
+		scan_t() :bbi_(noBit), pos_(MASK_LIM)		{}
 				
 		void set_block(int block)					{ bbi_ = block; }
 		void set_pos(int bit)						{ pos_ = bit; }
 		void set_bit(int bit) {
 			int bbh = WDIV(bit);
 			bbi_ = bbh;
-			pos_ = bit - WMUL(bbh);
+			pos_ = bit - WMUL(bbh);					/* equiv. to WMOD(bit)*/
 		}
 	};
 

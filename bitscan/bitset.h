@@ -157,7 +157,7 @@ public:
 	/**
 	* @brief Determines the first bit of the itersection between bitsets lhs and rhs
 	* @param lhs, rhs: input bitsets
-	* @returns the first bit of the intersection or EMPTY_ELEM if the sets are disjoint
+	* @returns the first bit of the intersection or BBObject::noBit if the sets are disjoint
 	**/
 	friend int find_first_common	(const BitSet& lhs, const BitSet& rhs);
 	
@@ -166,7 +166,7 @@ public:
 	*		 in the closed block-range [firstBlock, lastBlock]. 
 	*		 If lastBock == -1, the range [firstBlock, END OF BITSET)
 	* @param lhs, rhs: input bitsets
-	* @returns the first bit of the intersection or EMPTY_ELEM if the sets are disjoint
+	* @returns the first bit of the intersection or BBObject::noBit if the sets are disjoint
 	**/
 	friend int find_first_common_block	(int firstBlock, int lastBlock,  const BitSet& lhs, const BitSet& rhs);
 
@@ -325,13 +325,13 @@ public:
 	
 	/**
 	* @brief Computes the next least significant 1-bit in the bitstring after bit
-	*		 If bit == EMPTY_ELEM, returns the lest significant bit in the bitstring.
+	*		 If bit == BBObject::noBit, returns the lest significant bit in the bitstring.
 	*		
 	*		 I.Primitive scanning stateless feature at this level. 
 	*		II. Use bitscanning with state for proper bitscanning (derived class or external feature)
 	* 
 	* @param bit: position from which to start the search
-	* @returns the next 1-bit in the bitstring after bit, EMPTY_ELEM if there are no more bits
+	* @returns the next 1-bit in the bitstring after bit, BBObject::noBit if there are no more bits
 	* @details: no internal state is used, NOT EFFICIENT since it has to compute the offset and
 	*		    current bitblock of bit in each call. It does not cache the last bit found.
 	* @details: Uses a DeBruijn implementation for lsb()
@@ -341,13 +341,13 @@ inline int next_bit					(int bit)	const;
 	
 	/**
 	* @brief Computes the next most significant  1-bit in the bitstring after bit
-	*		 If bit == EMPTY_ELEM, returns the most significant bit in the bitstring
+	*		 If bit == BBObject::noBit, returns the most significant bit in the bitstring
 	* 
 	*		 I. Primitive scanning stateless feature at this level. Use bitscanning with state for proper bitscanning
 	*		II. Use bitscanning with state for proper bitscanning (derived class or external feature)
 	*
 	* @param bit: position from which to start the search
-	* @returns the next msb 1-bit in the bitstring after bit, EMPTY_ELEM if there are no more bits
+	* @returns the next msb 1-bit in the bitstring after bit, BBObject::noBit if there are no more bits
 	* @details: no internal state is used, NOT EFFICIENT since it has to compute the offset and
 	*		    current bitblock of bit in each call. It does not cache the last bit found.
 	* @details: Uses a lookup table implementation for msb()
@@ -390,8 +390,7 @@ virtual	inline int popcn64			(int firstBit, int lastBit = -1)	const;
 /////////////////////
 //Setting / Erasing bits 
 public:
-
-	//TODO optimize Erase policies in setters, or REMOVE (06/02/2025)
+	
 			
 	/**
 	* @brief sets a 1-bit in the bitstring
@@ -414,7 +413,7 @@ inline  BitSet&	 set_bit			(int firstBit, int lastBit);
 	* @details Might set more bits than the maximum population size conceived by 
 	*		  the client user during construction (i.e. bitset constructed with 64 bits, has 2 bitblocks)
 	* 
-	* TODO - consider REMOVING for safety (12/02/2025)
+	* TODO - REMOVED for safety (12/02/2025)
 	**/
 //inline  BitSet&  set_bit			();
 	 	
@@ -801,7 +800,7 @@ int BitSet::find_first_common	(const BitSet& rhs) const {
 			return bblock::lsb64_intrinsic(bb) + WMUL(i);
 		}
 	}
-	return EMPTY_ELEM;
+	return BBObject::noBit;
 }
 
 inline int BitSet::msbn64_lup() const{
@@ -824,7 +823,7 @@ inline int BitSet::msbn64_lup() const{
 		}
 	}
 
-	return EMPTY_ELEM;		//should not reach here
+	return BBObject::noBit;		//should not reach here
 }
 
 inline int BitSet::msbn64_intrin() const
@@ -838,7 +837,7 @@ inline int BitSet::msbn64_intrin() const
 		}
 	}
 
-	return EMPTY_ELEM;
+	return BBObject::noBit;
 }
 
 inline
@@ -847,7 +846,7 @@ int BitSet::next_bit(int bit) const{
 	//bit = -1 is a special case of early exit
 	//typically used in a loop, in the first bitscan call.
 	//Determines the least significant bit in the bitsring
-	if (bit == EMPTY_ELEM) {
+	if (bit == BBObject::noBit) {
 		return lsb();
 	}
 
@@ -870,7 +869,7 @@ int BitSet::next_bit(int bit) const{
 	}
 	
 	//should not reach here
-	return EMPTY_ELEM;
+	return BBObject::noBit;
 }
 
 
@@ -878,7 +877,7 @@ inline int BitSet::prev_bit(int bit) const{
 
 	//special case - first bitscan,
 	//calls for the most-significant bit in the bitstring
-	if (bit == EMPTY_ELEM) {
+	if (bit == BBObject::noBit) {
 		return msb();
 	}
 	
@@ -887,7 +886,7 @@ inline int BitSet::prev_bit(int bit) const{
 	
 	//looks for the msb in the (trimmed) current block
 	int npos = bblock::msb64_lup( Tables::mask_low[bit - WMUL(bbh) /* WMOD(bit) */] & vBB_[bbh]);
-	if (npos != EMPTY_ELEM) {
+	if (npos != BBObject::noBit) {
 		return ( npos + WMUL(bbh) );
 	}
 
@@ -907,7 +906,7 @@ inline int BitSet::prev_bit(int bit) const{
 		}
 	}
 
-	return EMPTY_ELEM;		//should not reach here
+	return BBObject::noBit;		//should not reach here
 }
 
 inline
@@ -1049,7 +1048,7 @@ int  BitSet::find_singleton (int firstBit, int lastBit, int& singleton) const{
 	int posh = lastBit - WMOD(nbbh);		//equiv. WMOD(high);
 	int pc = 0;
 	bool vertex_not_found = true;
-	singleton = EMPTY_ELEM;
+	singleton = BBObject::noBit;
 	
 	//both ends
 	if(nbbl == nbbh){
@@ -1281,7 +1280,7 @@ inline int BitSet::lsbn64_non_intrin() const{
 
 #endif
 
-	return EMPTY_ELEM;	
+	return BBObject::noBit;	
 }
 
 inline int BitSet::lsbn64_intrin() const
@@ -1294,7 +1293,7 @@ inline int BitSet::lsbn64_intrin() const
 		}
 	}
 
-	return EMPTY_ELEM;
+	return BBObject::noBit;
 }
 
 inline
@@ -1340,19 +1339,10 @@ int BitSet::is_singleton_block(int firstBlock, int lastBlock) const
 inline
 int BitSet::popcn64() const{
 
-	int pc = 0;
-	union u	{
-		U16 c[4];
-		BITBOARD b;
-	}val;
+	BITBOARD pc = 0;
 
-	for(auto i = 0; i < nBB_; ++i){
-
-		//loads union
-		val.b = vBB_[i]; 
-
-		//counts population
-		pc += Tables::pc[val.c[0]] + Tables::pc[val.c[1]] + Tables::pc[val.c[2]] + Tables::pc[val.c[3]];
+	for (auto i = 0; i < nBB_; ++i) {
+		pc += bblock::popc64(vBB_[i]);
 	}
 
 	return pc;
@@ -1401,13 +1391,13 @@ int BitSet::find_common_singleton (const BitSet& rhs, int& bit) const{
 
 	int pc = 0;
 	bool is_first_vertex = true;
-	bit = EMPTY_ELEM;
+	bit = BBObject::noBit;
 	
 	//main loop
 	for(auto i = 0; i < nBB_; ++i){
 		pc += bblock::popc64 (vBB_[i] & rhs.vBB_[i]);
 		if(pc > 1){
-			bit = EMPTY_ELEM;
+			bit = BBObject::noBit;
 			return -1;
 		}else if(is_first_vertex && pc == 1 ) { //stores bit the first time pc == 1 
 						
@@ -1432,13 +1422,13 @@ int	BitSet::find_common_singleton_block (int firstBlock, int lastBlock, const Bi
 	(lastBlock == -1) ? last_block = nBB_ - 1 : last_block = lastBlock;
 
 	int pc = 0;
-	bit = EMPTY_ELEM;
+	bit = BBObject::noBit;
 	bool is_first_vertex = true;
 	
 	for(auto i= firstBlock; i <= last_block; ++i){
 		pc += bblock::popc64(vBB_[i] & rhs.vBB_[i]);
 		if(pc > 1){
-			bit = EMPTY_ELEM;
+			bit = BBObject::noBit;
 			return -1;
 		}else if(is_first_vertex && pc == 1 ){	//stores bit the first time pc == 1 
 			
@@ -1455,7 +1445,7 @@ inline
 int BitSet::find_diff_singleton(const BitSet& rhs, int& bit) const{
 	
 	int pc = 0;
-	bit = EMPTY_ELEM;
+	bit = BBObject::noBit;
 	bool is_first_vertex = true;
 	
 	for(auto i = 0; i < nBB_; ++i){
@@ -1464,7 +1454,7 @@ int BitSet::find_diff_singleton(const BitSet& rhs, int& bit) const{
 		pc += bblock::popc64(vBB_[i] &~ rhs.vBB_[i]);
 
 		if(pc > 1){
-			bit = EMPTY_ELEM;
+			bit = BBObject::noBit;
 			return -1;
 		}else if( pc == 1 && is_first_vertex){ //stores bit the first time pc == 1 
 			
@@ -1483,8 +1473,8 @@ int BitSet::find_diff_pair(const BitSet& rhs, int& bit1, int& bit2) const {
 	int pc = 0;
 	bool is_first_bit = true;
 	bool is_second_bit = true;
-	bit1 = EMPTY_ELEM;
-	bit2 = EMPTY_ELEM;
+	bit1 = BBObject::noBit;
+	bit2 = BBObject::noBit;
 
 	//main loop
 	for (auto i = 0; i < nBB_; ++i) {
@@ -1495,9 +1485,9 @@ int BitSet::find_diff_pair(const BitSet& rhs, int& bit1, int& bit2) const {
 
 		if (pc > 2) {
 
-			bit1 = EMPTY_ELEM;
-			bit2 = EMPTY_ELEM;
-			return EMPTY_ELEM;
+			bit1 = BBObject::noBit;
+			bit2 = BBObject::noBit;
+			return BBObject::noBit;
 
 		}
 		else if (pc == 1 && is_first_bit) {  //stores bit the first time pc == 1 
