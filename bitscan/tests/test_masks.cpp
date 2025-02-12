@@ -11,7 +11,7 @@
 #include <iostream>
 #include <set>
 
-#include "bitscan/bitscan.h"					//bit string library
+#include "bitscan/bitscan.h"					//bit string library - REMOVE DEPENDENCY (12/02/2025)
 #include "gtest/gtest.h"
 
 using namespace std;
