@@ -1,3 +1,14 @@
+/**
+ * @file bbsentinel.cpp file
+ * @brief Source file of the BBSentinel class (header bbsentinel.h)
+ *		   Manages efficient bitset operations by circumscribing them to the range [low_sentinel, high_sentinel]
+ * @details The lower sentinel is the first non-zero bitblock in the bitstring
+ * @detials The higher sentinel is the last non-zero bitblock in the bitstring
+ * @details created?,  last_updated 13/02/2025
+ * @author pss
+ *
+ * TODO- EXPERIMENTAL - NOT CHECKED (13/02/2025)
+ **/
 
 #include "bbsentinel.h"
 #include <algorithm>			//std::max

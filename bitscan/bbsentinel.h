@@ -1,23 +1,14 @@
-/*  
- * A file from the BITSCAN library, a C++ library for bit set
- * optimization. BITSCAN has been used to implement BBMC, a very
- * succesful bit-parallel algorithm for exact maximum clique. 
- * (see license file for references)
- *
- * Copyright (C)
- * Author: Pablo San Segundo
- * Intelligent Control Research Group (CSIC-UPM) 
- *
- * Permission to use, modify and distribute this software is
- * granted provided that this copyright notice appears in all 
- * copies, in source code or in binaries. For precise terms 
- * see the accompanying LICENSE file.
- *
- * This software is provided "AS IS" with no warranty of any 
- * kind, express or implied, and with no claim as to its
- * suitability for any purpose.
- *
- */
+ /**
+  * @file bbsentinel.h file
+  * @brief header file of the BBSentinel class.
+  *		   Manages efficient bitset operations by circumscribing them to the range [low_sentinel, high_sentinel] 
+  * @details The lower sentinel is the first non-zero bitblock in the bitstring
+  * @detials The higher sentinel is the last non-zero bitblock in the bitstring
+  * @details created?,  last_updated 13/02/2025
+  * @author pss
+  *
+  * TODO- EXPERIMENTAL - NOT CHECKED (13/02/2025)
+  **/
 
 #ifndef __BB_SENTINEL_H__
 #define __BB_SENTINEL_H__
@@ -67,7 +58,7 @@ virtual	bool is_empty				()const;
 virtual	bool is_empty				(int nBBL, int nBBH) const;					//is empty in range
 
 #ifdef POPCOUNT_INTRINSIC_64
-	int popcn64					() const;
+	int popcn64						() const;
 #endif
 
 ////////////////
