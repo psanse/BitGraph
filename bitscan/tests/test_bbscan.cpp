@@ -474,7 +474,82 @@ TEST(BBScanClass, init_scan_specific){
 }
 
 
+TEST_F(BBScanClassTest, nested_implementation) {
 
+	BitSet bb(65);
+	bb.set_bit(0);
+	bb.set_bit(1);
+	bb.set_bit(64);
+	
+
+	int bit = BBObject::noBit;
+	std::vector<int> lbits;
+	std::vector<int> lbits_exp;
+
+	//direct scanning
+
+	BitSet::scan sc1(bb);
+	bit = BitSet::noBit;
+
+	while ((bit = sc1.next_bit()) != BitSet::noBit) {
+		lbits.emplace_back(bit);
+	}
+
+	//////////////////////////////
+	lbits_exp = { 0, 1, 64 };
+	EXPECT_EQ(lbits_exp, lbits);
+	//////////////////////////////
+
+	//direct reverse scanning
+	BitSet::scanR sc2(bb);
+	bit = BitSet::noBit;
+
+	lbits.clear();
+	while ((bit = sc2.next_bit()) != BitSet::noBit) {
+		lbits.emplace_back(bit);
+	}
+
+	//////////////////////////////
+	lbits_exp = { 64, 1, 0 };
+	EXPECT_EQ(lbits_exp, lbits);
+	//////////////////////////////
+
+	//destructive scanning
+	BitSet::scanD sc3(bb);
+	bit = BitSet::noBit;
+
+	lbits.clear();
+	while ((bit = sc3.next_bit()) != BitSet::noBit) {
+		lbits.emplace_back(bit);
+	}
+
+	///////////////////////////////
+	lbits_exp = { 0, 1, 64 };
+	EXPECT_EQ(lbits_exp, lbits);
+	EXPECT_TRUE(bb.is_empty());
+	////////////////////////////////
+
+	//restores original bitset
+	bb.set_bit(0);
+	bb.set_bit(1);
+	bb.set_bit(64);
+
+	//destructive reverse scanning
+	BitSet::scanDR sc4(bb);
+	bit = BitSet::noBit;
+
+	lbits.clear();
+	while ((bit = sc4.next_bit()) != BitSet::noBit) {
+		lbits.emplace_back(bit);
+	}
+
+	///////////////////////////////
+	lbits_exp = { 64, 1, 0 };
+	EXPECT_EQ(lbits_exp, lbits);
+	EXPECT_TRUE(bb.is_empty());
+	////////////////////////////////
+
+}
 
 
 

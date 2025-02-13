@@ -39,12 +39,22 @@ class BitSet:public BBObject{
 	friend class bscan;
 
 	template <class U>
+	friend class BBObject::Scan;
+	template <class U>
+	friend class BBObject::ScanDest;
+	template <class U>
 	friend class BBObject::ScanRev;
+	template <class U>
+	friend class BBObject::ScanDestRev;
 		
 public:	
 
-	//aliases for bitscanning in this class
-	using myScanRev = typename BBObject::ScanRev<BitSet>;
+	//aliases for bitscanning 
+	using scan = typename BBObject::Scan<BitSet>;
+	using scanR = typename BBObject::ScanRev<BitSet>;
+	using scanD = typename BBObject::ScanDest<BitSet>;
+	using scanDR = typename BBObject::ScanDestRev<BitSet>;
+	
 
 /////////////////////////////
 // Independent operators / masks  

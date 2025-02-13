@@ -933,7 +933,7 @@ TEST(BitSetClass, nested_scanning) {
 	bb.set_bit(20);
 	bb.set_bit(64);
 
-	BitSet::myScanRev scan(bb);
+	BitSet::scanR scan(bb);
 	int bit = BBObject::noBit;
 
 	while ((bit = scan.next_bit()) != BBObject::noBit) {

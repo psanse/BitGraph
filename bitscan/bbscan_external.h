@@ -114,7 +114,7 @@ public:
 
 	////////////////////////////////
 
-	template< class BitSet_t = BBIntrin>
+	template< class BitSet_t = BitSet>
 	struct Scan {
 		using basic_type = BitSet_t;
 		using type = Scan<BitSet_t>;
