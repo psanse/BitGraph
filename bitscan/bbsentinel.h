@@ -20,7 +20,8 @@
 
 class BBSentinel : public BBScan{
 	friend BBSentinel&  AND	(const BitSet& lhs, const BBSentinel& rhs,  BBSentinel& res);		//updates sentinels
-public:
+
+	public:
 	BBSentinel():m_BBH(EMPTY_ELEM), m_BBL(EMPTY_ELEM){init_sentinels(false);}
 explicit BBSentinel(int popsize): BBScan(popsize){ init_sentinels(false);}
 	BBSentinel(const BBSentinel& bbN) : BBScan(bbN){ m_BBH=bbN.m_BBH; m_BBL=bbN.m_BBL;}

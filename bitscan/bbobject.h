@@ -199,6 +199,9 @@ public:
 	};
 
 
+	//Possibly specialize the bitscanning classes for specific BitSet_t types, i.e., sparse, sentinels, etc...
+
+
 //////////////
 //construction / destruction
 	BBObject() = default;
