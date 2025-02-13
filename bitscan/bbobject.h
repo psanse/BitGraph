@@ -28,8 +28,8 @@ public:
 	//types of bit scans
 	enum scan_types	{NON_DESTRUCTIVE, NON_DESTRUCTIVE_REVERSE, DESTRUCTIVE, DESTRUCTIVE_REVERSE};				
 
+	//to stream
 	friend std::ostream& operator<< (std::ostream& o , const BBObject& bb)		{ bb.print(o); return o;}
-
 
 //////////////////
 // Efficient nested data structures for bitscanning 
@@ -186,8 +186,8 @@ public:
 		int next_bit();
 
 		/**
-		* @brief scans the next bit in the bitset and deletes it from the
-		*		 bitset bb_del
+		* @brief scans the next bit in the bitset during a reverse bitscanning operation
+		*		 and deletes it from the bitset bb_del
 		* @param bbdel: bitset to delete the bit from
 		**/
 		int next_bit(BitSet_t& bb_del);
