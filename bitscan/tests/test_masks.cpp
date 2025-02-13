@@ -59,33 +59,35 @@ protected:
 
 };
 
-
 TEST_F(MasksTest, OR_range) {
-	
-	simple_bitarray res(130);
+
+	const int POPSIZE = 130;
+	simple_bitarray res(POPSIZE);
 		
-	OR(65, bb, bb1, res);					// res = {10, 20, 63, 100}
+	OR(0, 65, bb, bb1, res);						// res = {10, 20, 63, 64}
 	EXPECT_TRUE(res.is_bit(10));
 	EXPECT_TRUE(res.is_bit(20));
-	EXPECT_TRUE(res.is_bit(63));
-	EXPECT_TRUE	(res.is_bit(100));
-	EXPECT_FALSE(res.is_bit(64));
+	EXPECT_TRUE(res.is_bit(63));	
+	EXPECT_TRUE(res.is_bit(64));
+	EXPECT_EQ(4, res.size());
 	
-	res.erase_bit();
-	OR(101, bb, bb1, res);					// res = {10, 20, 63}		
-	EXPECT_TRUE(res.is_bit(10));
-	EXPECT_TRUE(res.is_bit(20));
-	EXPECT_TRUE(res.is_bit(63));
-	EXPECT_FALSE(res.is_bit(64));
-	EXPECT_FALSE(res.is_bit(100));
-	
-	res.erase_bit();
-	OR(9, bb, bb1, res);					// res = {10, 20, 63, 64 100}
+	//cleans res outside the range
+	OR<true>(0, 100, bb, bb1, res);					// res = {10, 20, 63, 64, 100}		
 	EXPECT_TRUE(res.is_bit(10));
 	EXPECT_TRUE(res.is_bit(20));
 	EXPECT_TRUE(res.is_bit(63));
 	EXPECT_TRUE(res.is_bit(64));
 	EXPECT_TRUE(res.is_bit(100));
+	EXPECT_EQ(5, res.size());
+	
+	//cleans res outside the range
+	OR<true>(12, POPSIZE-1, bb, bb1, res);				// res = { 20, 63, 64 100}
+	EXPECT_FALSE(res.is_bit(10));
+	EXPECT_TRUE(res.is_bit(20));
+	EXPECT_TRUE(res.is_bit(63));
+	EXPECT_TRUE(res.is_bit(64));
+	EXPECT_TRUE(res.is_bit(100));
+	EXPECT_EQ(4, res.size());
 
 }
 
@@ -120,64 +122,58 @@ TEST_F(MasksTest, AND_OR) {
 
 }
 
-////////////////////////////////
-// CHECK BEHAVIOUR OF stateless AND . change to closed range (12/02/2025)
-
 TEST_F(MasksTest_1, AND_stateless){
 
-// Note: AND works in a half open range (excludes limiting bit)
-// CHANGE!
-
-	bitarray bbresAND(130);
+	bitarray resAND(130);
 	
-	AND<false>(11, bb, bb1, bbresAND);		//bbresAND = {10, 64}
-	EXPECT_TRUE	(bbresAND.is_bit(10));
-	EXPECT_FALSE(bbresAND.is_bit(64));
-	EXPECT_EQ	(1, bbresAND.size());
+	AND<false>(0, 11, bb, bb1, resAND);				//resAND = {10, 64}
+	EXPECT_TRUE	(resAND.is_bit(10));
+	EXPECT_EQ	(1, resAND.size());
 
-	bbresAND.erase_bit();
-	AND<false>(10, bb, bb1, bbresAND);		//bbresAND = {}
-	EXPECT_FALSE(bbresAND.is_bit(10));
+	//cleans resAND outside the range
+	AND<true>(0, 10, bb, bb1, resAND);				//resAND = {10}
+	EXPECT_TRUE	(resAND.is_bit(10));
+	EXPECT_EQ	(1, resAND.size());
 
-	bbresAND.erase_bit();
-	AND<false>(64, bb, bb1, bbresAND);
-	EXPECT_FALSE(bbresAND.is_bit(64));
+	//cleans resAND outside the range
+	AND<true>(0, 63, bb, bb1, resAND);				//resAND = {10}
+	EXPECT_FALSE(resAND.is_bit(64));
+	EXPECT_EQ(1, resAND.size());
 
-	bbresAND.erase_bit();
-	AND<false>(65, bb, bb1, bbresAND);
-	EXPECT_TRUE(bbresAND.is_bit(64));
+	//cleans resAND outside the range
+	AND<true>(0, 64, bb, bb1, resAND);				//resAND = {10, 64}
+	EXPECT_TRUE (resAND.is_bit(64));
+	EXPECT_TRUE (resAND.is_bit(10));
+	EXPECT_EQ	(2, resAND.size());
 		
-	bbresAND.erase_bit();
-	AND<false>(5, bb, bb1, bbresAND);
-	EXPECT_FALSE (bbresAND.is_bit(10));
-	EXPECT_FALSE (bbresAND.is_bit(64));
-	EXPECT_TRUE	 (1, bbresAND.is_empty());
-	
+	//cleans resAND outside the range				
+	AND<true>(0, 5, bb, bb1, resAND);				//resAND = {0}	
+	EXPECT_TRUE	 (resAND.is_empty());
 }
 
-TEST_F(MasksTest_1, AND_stateless_2_vertex_set){
-
-// Note: AND works in a half open range (excludes limiting bit)
-// CHANGE!
-	
-	int v[130];
-	int size = 0;
-
-	//AND
-	AND(11, bb, bb1,  v, size);			//v[0]=10;
-	vector<int> vset(v, v+size);
-	EXPECT_TRUE(find(vset.begin(), vset.end(), 10)!=vset.end());
-	EXPECT_FALSE(find(vset.begin(), vset.end(), 64)!=vset.end());
-	EXPECT_EQ(1, size);
-	
-	AND(10, bb, bb1,  v, size);			//v=[];
-	EXPECT_EQ(0, size);
-
-	AND(65, bb, bb1, v,size);			//v={10,64}
-	vector<int> vset2(v, v+size);
-	EXPECT_TRUE(find(vset2.begin(), vset2.end(), 64)!=vset2.end());
-
-}
+//TEST_F(MasksTest_1, AND_stateless_2_vertex_set){
+//
+//// Note: AND works in a half open range (excludes limiting bit)
+//// CHANGE!
+//	
+//	int v[130];
+//	int size = 0;
+//
+//	//AND
+//	AND(11, bb, bb1,  v, size);			//v[0]=10;
+//	vector<int> vset(v, v+size);
+//	EXPECT_TRUE(find(vset.begin(), vset.end(), 10)!=vset.end());
+//	EXPECT_FALSE(find(vset.begin(), vset.end(), 64)!=vset.end());
+//	EXPECT_EQ(1, size);
+//	
+//	AND(10, bb, bb1,  v, size);			//v=[];
+//	EXPECT_EQ(0, size);
+//
+//	AND(65, bb, bb1, v,size);			//v={10,64}
+//	vector<int> vset2(v, v+size);
+//	EXPECT_TRUE(find(vset2.begin(), vset2.end(), 64)!=vset2.end());
+//
+//}
 
 TEST(Masks, DISABLED_AND_OR_sparse) {
 

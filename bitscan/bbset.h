@@ -76,7 +76,7 @@ public:
 	* @brief AND between lhs and rhs bitsets in the closed block- range [firstBlock, lastBlock]. 
 	*		 Stores the result in res. The remaining bits of res outside the range
 	*		 are set to 0 if the template parameter Erase is true.
-	*		 If lastBock==-1, the range is til the end of the bitset, i.e., [firstBlock, capacity())
+	*		 If lastBock==-1, the range is till the end of the bitset, i.e., [firstBlock, capacity())
 	*		 
 	*		I.  The capacity of lhs and rhs must be the same. 
 	*		II. The capacity of res must be at least the same as lhs nand rhs
@@ -111,7 +111,7 @@ public:
 	/**
 	* @brief OR between lhs and rhs bitsets in the CLOSED bit-range [firstBit, lastBit]
 	*		 The result is stored in bitset res. The remaining bits of res outside the range
-	*		 are set to 0.
+	*		 are set to 0 if the template parameter Erase is true, else res is not modified.
 	* @param lhs, rhs: input bitsets
 	* @param res: output bitset
 	* @returns reference to the resulting bitstring res
@@ -125,7 +125,7 @@ public:
 	/**
 	* @brief OR between lhs and rhs bitsets in the closed block- range [firstBlock, lastBlock].
 	*		 Stores the result in res. The remaining bits of res outside the range
-	*		 are set to 0 if the template parameter Erase is true.
+	*		 are set to 0 if the template parameter Erase is true, else res is not modified.
 	*		 If lastBock==-1, the range is til the end of the bitset, i.e., [firstBlock, capacity())
 	*
 	*		I.  The capacity of lhs and rhs must be the same.
@@ -171,67 +171,17 @@ public:
 	friend int find_first_common_block	(int firstBlock, int lastBlock,  const BitSet& lhs, const BitSet& rhs);
 
 
-	/////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// DEPRECATED friend operations, TO BE REMOVED. NOT CHECKED!! (06/02/2025)
-
-	/**
-	* @brief AND between lhs and rhs bitsets in the SEMI-OPEN range [0, last_vertex)
-	*
-	*		 I. Sets to 0 the remaining bits after, and including lastBit of the bitblock lbBLOCK containing lastBit
-	*		 II.If template Erase is true, the rest of the bitblocks after  lbBLOCK are also set to 0
-	*
-	* @param lastBit:  position that determines the range of the AND mask
-	* @param lhs, rhs: input bitsets
-	* @param res: output bitset
-	* @returns reference to the resulting bitstring res
-	* @details: The capacity of lhs and rhs must be the same.
-	*			The capacity of res must be greater or equal than lhs / rhs
-	*
-	* TODO: slightly weird behaviour, check if it is necessary
-	* TODO: add firstBit logic  (06/02/2025)
-	* TODO: deprecated - remove after checking optimization algorithms (06/02/2025)
-	**/
-	template<bool Erase>
-	friend BitSet& AND(int lastBit, const BitSet& lhs, const BitSet& rhs, BitSet& res);
-
-	/**
-	* @brief AND between lhs and rhs bitsets in the SEMI-OPEN range [0, last_vertex)
-	*		 For C-array compatibility, the result is stored in bitset res
-	* @returns C-array of integers representing the resulting bitstring res, array size is stored in size
-	* @details: Experimental, not efficient
-	* TODO: deprecated - REMOVE after checking optimization algorithms (06/02/2025)
-	**/
-	friend int* AND(int lastBit, const BitSet& lhs, const BitSet& rhs, int bitset[], int& size);
-
-	/**
-	* @brief OR between lhs and rhs bitsets in the SEMI-OPEN range [firstBit, END).
-	*		 Stores the result in bitset res.
-	*		 Outside the range the bits are set to lhs.
-	* @param lhs, rhs: input bitsets
-	* @param res: output bitset 
-	* @returns reference to the resulting bitstring res 
-	**/
-	friend BitSet& OR(int firstBit, const BitSet& lhs, const BitSet& rhs, BitSet& res);
-
-	// lhs OR rhs - ranges (rhs [v, END[ if left = TRUE,  rhs [0, v[ if left = false)
-	// date@26/10/19
-	friend BitSet& OR(int bit, bool left /* to */, const BitSet& lhs, const BitSet& rhs, BitSet& res);
-
-
-	//////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-
 ////////////
 //construction / destruction 
 
-	 BitSet						(): nBB_(0)				{};	
+	 BitSet							(): nBB_(0)				{};	
 
 	 /**
 	 * @brief Constructor of an EMPTY bitset given a population size nPop
 	 *		  The capacity of the bitset is set according to the population size
 	 * @param nBits : population size		
 	 **/
-	 explicit  BitSet			(int nBits);
+	 explicit  BitSet				(int nBits);
 
 	 /**
 	 * @brief Constructor of an EMPTY bitset given an initial vector lv of 1-bit elements 
@@ -252,12 +202,12 @@ public:
 
 			 	 
 	 //Move and copy semantics allowed
-	BitSet						(const BitSet& bbN)				= default;
-	BitSet						(BitSet&&)			noexcept	= default;
-	BitSet& operator =			(const BitSet&)					= default;
-	BitSet& operator =			(BitSet&&)			noexcept	= default;
+	BitSet							(const BitSet& bbN)				= default;
+	BitSet							(BitSet&&)			noexcept	= default;
+	BitSet& operator =				(const BitSet&)					= default;
+	BitSet& operator =				(BitSet&&)			noexcept	= default;
 
-virtual	~BitSet					()								= default;
+virtual	~BitSet						()								= default;
 
 ////////////
 //Reset / init (memory allocation)
@@ -342,7 +292,7 @@ public:
 	* @details: Uses a DeBruijn implementation for lsb()
 	* @details: DEPRECATED in favour of the bitscanning with state of BBIntrinsic class
 	**/
-	inline int next_bit					(int bit)	const;					
+	inline int next_bit				(int bit)	const;					
 	
 	/**
 	* @brief Computes the next most significant  1-bit in the bitstring after bit
@@ -358,7 +308,7 @@ public:
 	* @details: Uses a lookup table implementation for msb()
 	* @details: Not recommended. DEPRECATED in favour of the bitscanning with state of BBIntrinsic class
 	**/
-	inline int prev_bit					(int bit)	const;					
+	inline int prev_bit				(int bit)	const;					
 	
 /////////////////
 // Popcount
@@ -780,12 +730,64 @@ inline	BitSet& erase_bit		(const BitSet& lhs, const BitSet& rhs);
 	**/
 virtual	int* to_C_array					(int* lv, std::size_t& size, bool rev = false);
 
+
 ////////////////////////
 //data members
 
 protected:
 	int nBB_;							//number of bitblocks 
-	std::vector<BITBOARD> vBB_;			//bitset		
+	std::vector<BITBOARD> vBB_;			//bitset
+
+
+
+
+	/////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// DEPRECATED friend operations, TO BE REMOVED. NOT CHECKED!! (06/02/2025)
+
+	/**
+	* @brief AND between lhs and rhs bitsets in the SEMI-OPEN range [0, last_vertex)
+	*
+	*		 I. Sets to 0 the remaining bits after, and including lastBit of the bitblock lbBLOCK containing lastBit
+	*		 II.If template Erase is true, the rest of the bitblocks after  lbBLOCK are also set to 0
+	*
+	* @param lastBit:  position that determines the range of the AND mask
+	* @param lhs, rhs: input bitsets
+	* @param res: output bitset
+	* @returns reference to the resulting bitstring res
+	* @details: The capacity of lhs and rhs must be the same.
+	*			The capacity of res must be greater or equal than lhs / rhs
+	*
+	* TODO: slightly weird behaviour, check if it is necessary
+	* TODO: add firstBit logic  (06/02/2025)
+	* TODO: deprecated - remove after checking optimization algorithms (06/02/2025)
+	**/
+	//template<bool Erase>
+	//friend BitSet& AND(int lastBit, const BitSet& lhs, const BitSet& rhs, BitSet& res);
+
+	/**
+	* @brief AND between lhs and rhs bitsets in the SEMI-OPEN range [0, last_vertex)
+	*		 For C-array compatibility, the result is stored in bitset res
+	* @returns C-array of integers representing the resulting bitstring res, array size is stored in size
+	* @details: Experimental, not efficient
+	* TODO: deprecated - REMOVE after checking optimization algorithms (06/02/2025)
+	**/
+	//friend int* AND(int lastBit, const BitSet& lhs, const BitSet& rhs, int bitset[], int& size);
+
+	/**
+	* @brief OR between lhs and rhs bitsets in the SEMI-OPEN range [firstBit, END).
+	*		 Stores the result in bitset res.
+	*		 Outside the range the bits are set to lhs.
+	* @param lhs, rhs: input bitsets
+	* @param res: output bitset
+	* @returns reference to the resulting bitstring res
+	**/
+	//friend BitSet& OR(int firstBit, const BitSet& lhs, const BitSet& rhs, BitSet& res);
+
+	// lhs OR rhs - ranges (rhs [v, END[ if left = TRUE,  rhs [0, v[ if left = false)
+	// date@26/10/19
+	//friend BitSet& OR(int bit, bool left /* to */, const BitSet& lhs, const BitSet& rhs, BitSet& res);
+
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 }; //end BitSet class
 
@@ -1597,29 +1599,7 @@ BitSet& BitSet::erase_block(int FirstBlock, int LastBlock, const BitSet& bb_del)
 
 
 
-template<bool Erase = false>
-inline
-BitSet& AND(int lastBit, const BitSet& lhs, const BitSet& rhs, BitSet& res) {
 
-	//determine bitblock
-	int nbb = WDIV(lastBit);
-
-	for (auto i = 0; i <= nbb; ++i) {
-		res.vBB_[i] = rhs.vBB_[i] & lhs.vBB_[i];
-	}
-
-	//trim last part of the bitblock - including lastBit
-	res.vBB_[nbb] &= Tables::mask_low[lastBit - WMUL(nbb) /* WMOD(lastBit)*/];
-
-	//delete the rest of bitstring if the operation is not lazy
-	if (Erase) {
-		for (int i = nbb + 1; i < lhs.nBB_; ++i) {
-			res.vBB_[i] = ZERO;
-		}
-	}
-
-	return res;
-}
 
 template<bool Erase = false>
 inline
@@ -1831,8 +1811,8 @@ inline
 BitSet& OR_block(int firstBlock, int lastBlock, const BitSet& lhs, const BitSet& rhs, BitSet& res)
 {
 	//////////////////////////////////////////////////////////////////
-	assert((firstBlock >= 0) && (LastBlock < lhs.nBB_) &&
-		(firstBlock <= lastBlock) && (rhs.nBB_ == lhs.nBB_));
+	assert(		(firstBlock >= 0) && (LastBlock < lhs.nBB_) &&
+				(firstBlock <= lastBlock) && (rhs.nBB_ == lhs.nBB_)			);
 	//////////////////////////////////////////////////////////////////
 
 	int last_block = ((lastBlock == -1) ? lhs.nBB_ - 1 : lastBlock);
@@ -1882,5 +1862,35 @@ BitSet& BitSet::OR_EQUAL_block(int firstBlock, int lastBlock, const BitSet& rhs)
 	return *this;
 }
 
+
+/////////////////
+//
+// DEPRECATED STATELESS MASKING FUNCTIONS
+//
+//////////////////
+
+//template<bool Erase = false>
+//inline
+//BitSet& AND(int lastBit, const BitSet& lhs, const BitSet& rhs, BitSet& res) {
+//
+//	//determine bitblock
+//	int nbb = WDIV(lastBit);
+//
+//	for (auto i = 0; i <= nbb; ++i) {
+//		res.vBB_[i] = rhs.vBB_[i] & lhs.vBB_[i];
+//	}
+//
+//	//trim last part of the bitblock - including lastBit
+//	res.vBB_[nbb] &= Tables::mask_low[lastBit - WMUL(nbb) /* WMOD(lastBit)*/];
+//
+//	//delete the rest of bitstring if the operation is not lazy
+//	if (Erase) {
+//		for (int i = nbb + 1; i < lhs.nBB_; ++i) {
+//			res.vBB_[i] = ZERO;
+//		}
+//	}
+//
+//	return res;
+//}
 
 #endif	

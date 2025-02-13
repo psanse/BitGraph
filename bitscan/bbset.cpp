@@ -31,57 +31,9 @@ BitSet&  OR	(const BitSet& lhs, const BitSet& rhs,  BitSet& res){
 	return res;
 }
 
-BitSet&  OR (int from, const BitSet& lhs, const BitSet& rhs,  BitSet& res){
 
-	int first_block = WDIV(from);
 
-	for(auto i = 0; i < first_block; ++i){
-		res.vBB_[i]=lhs.vBB_[i];
-	}
-		
-	for(auto i = first_block + 1; i < lhs.nBB_; ++i){
-		res.vBB_[i] = rhs.vBB_[i] | lhs.vBB_[i];
-	}		
 
-	//special case-first block
-	res.vBB_[first_block] = lhs.vBB_[first_block] | ( rhs.vBB_[first_block] & ~Tables::mask_low[from - WMUL(first_block)] );
-	
-	return res;
-}
-
-BitSet&  OR(int v, bool from, const BitSet& lhs, const BitSet& rhs, BitSet& res) {
-	
-	
-	int nBB = WDIV(v);
-	int pos = WMOD(v);
-
-	if (from) {
-		for (auto i = 0; i < nBB; i++) {
-			res.vBB_[i] = lhs.vBB_[i];
-		}
-		for (auto i = nBB + 1; i < lhs.nBB_; i++) {
-			res.vBB_[i] = lhs.vBB_[i] | rhs.vBB_[i];
-		}
-
-		//critical block
-		res.vBB_[nBB] = lhs.vBB_[nBB] | (rhs.vBB_[nBB] & ~Tables::mask_low[pos]);
-
-	}
-	else {
-		for (auto i = nBB+1; i < lhs.nBB_; i++) {
-			res.vBB_[i] = lhs.vBB_[i];
-		}
-
-		for (auto i = 0; i < nBB; i++) {
-			res.vBB_[i] = lhs.vBB_[i] | rhs.vBB_[i];
-		}
-
-		//critical block
-		res.vBB_[nBB] = lhs.vBB_[nBB] | (rhs.vBB_[nBB] & ~Tables::mask_high[pos]);
-	}
-		
-	return res;
-}
 
 //BitSet AND_block(int firstBlock, int lastBlock, BitSet lhs, const BitSet& rhs)
 //{
@@ -107,35 +59,6 @@ BitSet&  OR(int v, bool from, const BitSet& lhs, const BitSet& rhs, BitSet& res)
 //	//return lhs;
 //}
 
-int* AND (int lastBit, const BitSet& lhs, const BitSet& rhs, int bitset[], int& size){
-
-	BITBOARD bb;
-	int offset;
-	size = 0;
-	int nbb = WDIV(lastBit);
-
-	for(auto i = 0; i < nbb; ++i){
-		bb = rhs.vBB_[i] & lhs.vBB_[i];
-		offset = WMUL(i);
-
-		while(bb){
-			int v = bblock::lsb64_intrinsic(bb);
-			bitset[size++] = offset + v;
-			bb ^= Tables::mask[v];
-		}
-
-	}
-
-	//trim last
-	bb = rhs.vBB_[nbb] & lhs.vBB_[nbb] & Tables::mask_low[WMOD(lastBit)];
-	while(bb){
-		int v = bblock::lsb64_intrinsic(bb);
-		bitset[size++] = WMUL(nbb) + v;
-		bb ^= Tables::mask[v];
-	}
-
-	return bitset;
-}
 
 
 BitSet&  erase_bit(const BitSet& lhs, const BitSet& rhs,  BitSet& res){
@@ -506,26 +429,92 @@ int find_first_common_block(int firstBlock, int lastBlock, const BitSet& lhs, co
 	return EMPTY_ELEM;		//disjoint
 }
 
-
-
-
-
-
-
-//BitSet& BitSet::operator =  (const BitSet& bbN){
+/////////////////
 //
-//	if(nBB_ != bbN.nBB_){
-//		//allocates memory
-//		init(bbN.nBB_);		
+// DEPRECATED STATELESS MASKING FUNCTIONS
+//
+//////////////////
+
+//int* AND(int lastBit, const BitSet& lhs, const BitSet& rhs, int bitset[], int& size) {
+//
+//	BITBOARD bb;
+//	int offset;
+//	size = 0;
+//	int nbb = WDIV(lastBit);
+//
+//	for (auto i = 0; i < nbb; ++i) {
+//		bb = rhs.vBB_[i] & lhs.vBB_[i];
+//		offset = WMUL(i);
+//
+//		while (bb) {
+//			int v = bblock::lsb64_intrinsic(bb);
+//			bitset[size++] = offset + v;
+//			bb ^= Tables::mask[v];
+//		}
+//
 //	}
 //
-//	for (auto i = 0; i < nBB_; ++i) {
-//		vBB_[i] = bbN.vBB_[i];
+//	//trim last
+//	bb = rhs.vBB_[nbb] & lhs.vBB_[nbb] & Tables::mask_low[WMOD(lastBit)];
+//	while (bb) {
+//		int v = bblock::lsb64_intrinsic(bb);
+//		bitset[size++] = WMUL(nbb) + v;
+//		bb ^= Tables::mask[v];
 //	}
 //
-//	return *this;
+//	return bitset;
 //}
 
 
+//BitSet& OR(int from, const BitSet& lhs, const BitSet& rhs, BitSet& res) {
+//
+//	int first_block = WDIV(from);
+//
+//	for (auto i = 0; i < first_block; ++i) {
+//		res.vBB_[i] = lhs.vBB_[i];
+//	}
+//
+//	for (auto i = first_block + 1; i < lhs.nBB_; ++i) {
+//		res.vBB_[i] = rhs.vBB_[i] | lhs.vBB_[i];
+//	}
+//
+//	//special case-first block
+//	res.vBB_[first_block] = lhs.vBB_[first_block] | (rhs.vBB_[first_block] & ~Tables::mask_low[from - WMUL(first_block)]);
+//
+//	return res;
+//}
 
 
+//BitSet& OR(int v, bool from, const BitSet& lhs, const BitSet& rhs, BitSet& res) {
+//
+//
+//	int nBB = WDIV(v);
+//	int pos = WMOD(v);
+//
+//	if (from) {
+//		for (auto i = 0; i < nBB; i++) {
+//			res.vBB_[i] = lhs.vBB_[i];
+//		}
+//		for (auto i = nBB + 1; i < lhs.nBB_; i++) {
+//			res.vBB_[i] = lhs.vBB_[i] | rhs.vBB_[i];
+//		}
+//
+//		//critical block
+//		res.vBB_[nBB] = lhs.vBB_[nBB] | (rhs.vBB_[nBB] & ~Tables::mask_low[pos]);
+//
+//	}
+//	else {
+//		for (auto i = nBB + 1; i < lhs.nBB_; i++) {
+//			res.vBB_[i] = lhs.vBB_[i];
+//		}
+//
+//		for (auto i = 0; i < nBB; i++) {
+//			res.vBB_[i] = lhs.vBB_[i] | rhs.vBB_[i];
+//		}
+//
+//		//critical block
+//		res.vBB_[nBB] = lhs.vBB_[nBB] | (rhs.vBB_[nBB] & ~Tables::mask_high[pos]);
+//	}
+//
+//	return res;
+//}
