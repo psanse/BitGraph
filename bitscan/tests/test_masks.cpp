@@ -1,8 +1,11 @@
 /**
 * @file test_masks.cpp
-* @brief unit tests for masks for sparse and non-sparse graphs
-* @created 14/11/2017, last_update 12/02/2025
+* @brief unit tests for (logic) masks for sparse and non-sparse graphs
+* @created 17/12/2015, last_update 13/02/2025
 * @authos pss
+* 
+* TODO- CHECK BEHAVIOUR OF AND_stateless tests,  change to closed range of bits (12/02/2025)
+* TODO- CHECK DISABLED sparse tests - first refactor sparse bitset classes (13/02/2025)
 **/
 
 #include <vector>
@@ -34,6 +37,26 @@ protected:
 	simple_bitarray bb;
 	simple_bitarray bb1;
 	
+};
+
+class MasksTest_1 : public ::testing::Test {
+protected:
+	MasksTest_1() : bb(130), bb1(130) {}
+	virtual void SetUp() {
+		bb.set_bit(10);
+		bb.set_bit(20);
+		bb.set_bit(64);
+
+		bb1.set_bit(10);
+		bb1.set_bit(64);
+		bb1.set_bit(100);
+	}
+
+	//////////////////////
+	//data members
+	simple_bitarray bb;
+	simple_bitarray bb1;
+
 };
 
 
@@ -97,310 +120,47 @@ TEST_F(MasksTest, AND_OR) {
 
 }
 
-TEST_F(MasksTest, operators) {
+////////////////////////////////
+// CHECK BEHAVIOUR OF stateless AND . change to closed range (12/02/2025)
 
-	/////////////
-	bb &= bb1;
-	////////////
+TEST_F(MasksTest_1, AND_stateless){
 
-	EXPECT_TRUE	(bb.is_bit(10));
-	EXPECT_EQ	(1, bb.size());
-}
-
-
-TEST(Masks, set_bits){
-
-	bitarray bb(130);
-	bitarray bb1(130);
-	bitarray bbres(130);
-	
-	bb.set_bit(10);
-	bb.set_bit(20);
-	bb.set_bit(64);
-
-	bb1.set_bit(10);
-	bb1.set_bit(64);
-	bb1.set_bit(100);
-	
-	//set range
-	bb.set_block(0,-1,bb1);
-	EXPECT_TRUE(bb.is_bit(100));
-	EXPECT_TRUE(bb.is_bit(20));
-		
-	bb1.set_bit(129);
-	bb.set_block(0,1,bb1);
-	EXPECT_FALSE(bb.is_bit(129));
-		
-	bb.set_block(0,2,bb1);
-	EXPECT_TRUE(bb.is_bit(129));
-
-	//erase range
-	bb.erase_block(2, -1, bb1);
-	EXPECT_FALSE(bb.is_bit(129));
-
-	bb.erase_block(1, -1,  bb1);
-	EXPECT_FALSE(bb.is_bit(100));
-	EXPECT_FALSE(bb.is_bit(64));
-
-	bb.erase_block(0, -1, bb1);
-	EXPECT_TRUE(bb.is_bit(20));
-}
-
-TEST(Masks, set_bits_sparse){	
-	sparse_bitarray bb(130);
-	sparse_bitarray bb1(130);
-	sparse_bitarray bbres(130);
-	
-	bb.set_bit(10);
-	bb.set_bit(20);
-	bb.set_bit(64);
-
-	bb1.set_bit(10);
-	bb1.set_bit(64);
-	bb1.set_bit(100);
-	
-	//set range
-	bb.set_block(0,bb1);
-	EXPECT_TRUE(bb.is_bit(100));
-	
-	bb1.set_bit(129);
-	bb.set_block(0,1,bb1);
-	EXPECT_FALSE(bb.is_bit(129));
-
-	bb.set_block(0,2,bb1);
-	EXPECT_TRUE(bb.is_bit(129));
-
-	//erase range
-	//cout<<bb<<endl;
-	bb.erase_block(2, bb1);
-	EXPECT_FALSE(bb.is_bit(129));
-
-	bb.erase_block(1, bb1);
-	EXPECT_FALSE(bb.is_bit(100));
-	EXPECT_FALSE(bb.is_bit(64));
-
-	//cout<<bb.erase_block(0, bb1)<<endl;
-	bb.erase_block(0, bb1);
-	EXPECT_TRUE(bb.is_bit(20));
-}
-
-TEST(Masks, erase_bits){
-	bitarray bb(130);
-	bitarray bb1(130);
-	bitarray bbres(130);
-	
-	bb.set_bit(10);
-	bb.set_bit(20);
-	bb.set_bit(64);
-
-	bb1.set_bit(10);
-	bb1.set_bit(64);
-	bb1.set_bit(100);
-
-	bb.erase_block(2,2,bb1);		//nothing deleted
-	EXPECT_EQ(3, bb.size());
-
-	bb.erase_block(1,1,bb1);		//nothing deleted
-	EXPECT_TRUE(bb.is_bit(10));
-	EXPECT_FALSE(bb.is_bit(64));
-	EXPECT_TRUE(bb.is_bit(20));
-	EXPECT_FALSE(bb.is_bit(100));
-
-	bb.erase_block(0,2,bb1);		//nothing deleted
-	EXPECT_EQ(1, bb.size());
-}
-
-TEST(Masks, erase_bits_sparse){
-	sparse_bitarray bb(130);
-	sparse_bitarray bb1(130);
-	sparse_bitarray bbres(130);
-	
-	bb.set_bit(10);
-	bb.set_bit(20);
-	bb.set_bit(64);
-
-	bb1.set_bit(10);
-	bb1.set_bit(64);
-	bb1.set_bit(100);
-
-	bb.erase_block(2,2,bb1);		//nothing deleted
-	EXPECT_EQ(3, bb.size());
-
-	bb.erase_block(1,1,bb1);		//nothing deleted
-	EXPECT_TRUE(bb.is_bit(10));
-	EXPECT_FALSE(bb.is_bit(64));
-	EXPECT_TRUE(bb.is_bit(20));
-	EXPECT_FALSE(bb.is_bit(100));
-
-	bb.erase_block(0,2,bb1);		//nothing deleted
-	EXPECT_EQ(1, bb.size());
-}
-
-TEST(Masks, ERASE){					
-///////////
-// date: 17/12/15
-
-//non-sparse
-	bitarray bb(130);
-	bitarray bb1(130);
-	bitarray bbERASE(130);
-	
-	
-	bb.set_bit(10);
-	bb.set_bit(20);
-	bb.set_bit(64);
-
-	bb1.set_bit(10);
-	bb1.set_bit(64);
-	bb1.set_bit(100);
-
-	//ERASE
-	erase_bit(bb, bb1, bbERASE);
-	EXPECT_TRUE(bbERASE.is_bit(20));
-	EXPECT_FALSE(bbERASE.is_bit(10));
-	EXPECT_FALSE(bbERASE.is_bit(64));
-	EXPECT_EQ(1, bbERASE.size());
-
-//sparse
-	sparse_bitarray bbs(130);
-	sparse_bitarray bbs1(130);
-	sparse_bitarray bbsERASE(130);
-	
-	
-	bbs.set_bit(10);
-	bbs.set_bit(20);
-	bbs.set_bit(64);
-
-	bbs1.set_bit(10);
-	bbs1.set_bit(64);
-	bbs1.set_bit(100);
-
-	//ERASE
-	//cout<<ERASE(bbs, bbs1, bbsERASE)<<endl;
-	ERASE(bbs, bbs1, bbsERASE);
-	EXPECT_TRUE(bbsERASE.is_bit(20));
-	EXPECT_FALSE(bbsERASE.is_bit(10));
-	EXPECT_FALSE(bbsERASE.is_bit(64));
-	EXPECT_EQ(1, bbsERASE.size());
-}
-
-TEST(Masks, ERASE_extreme_cases){
-///////////
-// date: 21/12/15
-
-//non-sparse
-	bitarray bb(130);				
-	bitarray bb1(130);				//empty
-	bitarray bbERASE(130);
-	bbERASE.set_bit(129);			
-	
-	bb.set_bit(10);
-	bb.set_bit(20);
-	bb.set_bit(64);	
-	
-	//ERASE
-	erase_bit(bb, bb1, bbERASE);
-	EXPECT_TRUE(bb==bbERASE);
-
-//sparse
-	sparse_bitarray bbs(130);
-	sparse_bitarray bbs1(130);			//empty
-	sparse_bitarray bbsERASE(130);
-
-
-	bbs.set_bit(10);
-	bbs.set_bit(64);
-	bbs.set_bit(100);
-
-	
-	//ERASE
-	//cout<<ERASE(bbs, bbs1, bbsERASE)<<endl;
-	ERASE(bbs, bbs1, bbsERASE);
-	EXPECT_TRUE(bbs==bbsERASE);
-
-//erase when no blocks in same index: simple copy
-
-	bbs1.erase_bit();
-	bbs1.set_bit(100);
-
-	bbs.print();
-	bbs1.print();
-
-	//ERASE
-	//cout<<ERASE(bbs, bbs1, bbsERASE)<<endl;
-	ERASE(bbs, bbs1, bbsERASE);
-	EXPECT_TRUE(bbsERASE.is_bit(10));
-	EXPECT_TRUE(bbsERASE.is_bit(64));
-	EXPECT_EQ(2, bbsERASE.size());
-}
-
-TEST(Masks, AND_trimming){
-///////////
-//date: 22/6/16
 // Note: AND works in a half open range (excludes limiting bit)
+// CHANGE!
 
-	bitarray bb(130);
-	bitarray bb1(130);
 	bitarray bbresAND(130);
-		
-	bb.set_bit(10);
-	bb.set_bit(20);
-	bb.set_bit(64);
-
-	bb1.set_bit(10);
-	bb1.set_bit(64);
-	bb1.set_bit(100);
-
-	//AND
-	AND<false>(11, bb, bb1, bbresAND);
-	//AND(1,bb, bb1, bbresAND);
-	EXPECT_TRUE(bbresAND.is_bit(10));
+	
+	AND<false>(11, bb, bb1, bbresAND);		//bbresAND = {10, 64}
+	EXPECT_TRUE	(bbresAND.is_bit(10));
 	EXPECT_FALSE(bbresAND.is_bit(64));
-	EXPECT_EQ(1, bbresAND.size());
+	EXPECT_EQ	(1, bbresAND.size());
 
 	bbresAND.erase_bit();
-	AND<false>(10, bb, bb1, bbresAND);
-	//AND(10,bb, bb1, bbresAND);
+	AND<false>(10, bb, bb1, bbresAND);		//bbresAND = {}
 	EXPECT_FALSE(bbresAND.is_bit(10));
 
 	bbresAND.erase_bit();
 	AND<false>(64, bb, bb1, bbresAND);
-	//AND(64,bb, bb1, bbresAND);
 	EXPECT_FALSE(bbresAND.is_bit(64));
 
 	bbresAND.erase_bit();
 	AND<false>(65, bb, bb1, bbresAND);
-	//AND(65,bb, bb1, bbresAND);
 	EXPECT_TRUE(bbresAND.is_bit(64));
 		
-	//AND
 	bbresAND.erase_bit();
 	AND<false>(5, bb, bb1, bbresAND);
-	//AND(5,bb, bb1, bbresAND);
-	EXPECT_FALSE(bbresAND.is_bit(10));
-	EXPECT_FALSE(bbresAND.is_bit(64));
-	EXPECT_TRUE(1, bbresAND.is_empty());
+	EXPECT_FALSE (bbresAND.is_bit(10));
+	EXPECT_FALSE (bbresAND.is_bit(64));
+	EXPECT_TRUE	 (1, bbresAND.is_empty());
 	
 }
 
-TEST(Masks, AND_trimming_2_vertex_set){
-///////////
-//date: 26/6/16
+TEST_F(MasksTest_1, AND_stateless_2_vertex_set){
+
 // Note: AND works in a half open range (excludes limiting bit)
-	const int POPSIZE = 130;	
-
-	bitarray bb(POPSIZE);
-	bitarray bb1(POPSIZE);
-		
-	bb.set_bit(10);
-	bb.set_bit(20);
-	bb.set_bit(64);
-
-	bb1.set_bit(10);
-	bb1.set_bit(64);
-	bb1.set_bit(100);
-
-	int v[POPSIZE];
+// CHANGE!
+	
+	int v[130];
 	int size = 0;
 
 	//AND
@@ -418,7 +178,6 @@ TEST(Masks, AND_trimming_2_vertex_set){
 	EXPECT_TRUE(find(vset2.begin(), vset2.end(), 64)!=vset2.end());
 
 }
-
 
 TEST(Masks, DISABLED_AND_OR_sparse) {
 
@@ -463,4 +222,129 @@ TEST(Masks, DISABLED_AND_OR_sparse) {
 	EXPECT_TRUE(bb2.is_bit(64));
 	EXPECT_EQ(2, bb2.size());
 
+}
+
+TEST(Masks, DISABLED_set_bits_sparse) {
+	sparse_bitarray bb(130);
+	sparse_bitarray bb1(130);
+	sparse_bitarray bbres(130);
+
+	bb.set_bit(10);
+	bb.set_bit(20);
+	bb.set_bit(64);
+
+	bb1.set_bit(10);
+	bb1.set_bit(64);
+	bb1.set_bit(100);
+
+	//set range
+	bb.set_block(0, bb1);
+	EXPECT_TRUE(bb.is_bit(100));
+
+	bb1.set_bit(129);
+	bb.set_block(0, 1, bb1);
+	EXPECT_FALSE(bb.is_bit(129));
+
+	bb.set_block(0, 2, bb1);
+	EXPECT_TRUE(bb.is_bit(129));
+
+	//erase range
+	//cout<<bb<<endl;
+	bb.erase_block(2, bb1);
+	EXPECT_FALSE(bb.is_bit(129));
+
+	bb.erase_block(1, bb1);
+	EXPECT_FALSE(bb.is_bit(100));
+	EXPECT_FALSE(bb.is_bit(64));
+
+	//cout<<bb.erase_block(0, bb1)<<endl;
+	bb.erase_block(0, bb1);
+	EXPECT_TRUE(bb.is_bit(20));
+}
+
+
+TEST(Masks, DISABLED_erase_block_sparse) {
+	sparse_bitarray bb(130);
+	sparse_bitarray bb1(130);
+	sparse_bitarray bbres(130);
+
+	bb.set_bit(10);
+	bb.set_bit(20);
+	bb.set_bit(64);
+
+	bb1.set_bit(10);
+	bb1.set_bit(64);
+	bb1.set_bit(100);
+
+	bb.erase_block(2, 2, bb1);		//nothing deleted
+	EXPECT_EQ(3, bb.size());
+
+	bb.erase_block(1, 1, bb1);		//nothing deleted
+	EXPECT_TRUE(bb.is_bit(10));
+	EXPECT_FALSE(bb.is_bit(64));
+	EXPECT_TRUE(bb.is_bit(20));
+	EXPECT_FALSE(bb.is_bit(100));
+
+	bb.erase_block(0, 2, bb1);		//nothing deleted
+	EXPECT_EQ(1, bb.size());
+}
+
+TEST(Masks, DISABLED_erase_bit_stateless) {
+
+	//sparse
+	sparse_bitarray bbs(130);
+	sparse_bitarray bbs1(130);
+	sparse_bitarray bbsERASE(130);
+
+
+	bbs.set_bit(10);
+	bbs.set_bit(20);
+	bbs.set_bit(64);
+
+	bbs1.set_bit(10);
+	bbs1.set_bit(64);
+	bbs1.set_bit(100);
+
+	//////////////////////////////	
+	ERASE(bbs, bbs1, bbsERASE);
+	//////////////////////////////
+
+	EXPECT_TRUE(bbsERASE.is_bit(20));
+	EXPECT_FALSE(bbsERASE.is_bit(10));
+	EXPECT_FALSE(bbsERASE.is_bit(64));
+	EXPECT_EQ(1, bbsERASE.size());
+}
+
+TEST(Masks, DISABLED_ERASE_extreme_cases) {
+
+	//sparse
+	sparse_bitarray bbs(130);
+	sparse_bitarray bbs1(130);			//empty
+	sparse_bitarray bbsERASE(130);
+
+
+	bbs.set_bit(10);
+	bbs.set_bit(64);
+	bbs.set_bit(100);
+
+
+	//ERASE
+	//cout<<ERASE(bbs, bbs1, bbsERASE)<<endl;
+	ERASE(bbs, bbs1, bbsERASE);
+	EXPECT_TRUE(bbs == bbsERASE);
+
+	//erase when no blocks in same index: simple copy
+
+	bbs1.erase_bit();
+	bbs1.set_bit(100);
+
+	bbs.print();
+	bbs1.print();
+
+	//ERASE
+	//cout<<ERASE(bbs, bbs1, bbsERASE)<<endl;
+	ERASE(bbs, bbs1, bbsERASE);
+	EXPECT_TRUE(bbsERASE.is_bit(10));
+	EXPECT_TRUE(bbsERASE.is_bit(64));
+	EXPECT_EQ(2, bbsERASE.size());
 }

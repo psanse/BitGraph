@@ -50,15 +50,15 @@ add_executable (test_bitscan tests/gtest_main.cc
     #tests/test_algorithms.cpp          #CHECK (05/02/2025)    
     #tests/test_sparse.cpp
     #tests/test_example.cpp   
-    tests/test_masks.cpp 
-
-    #tests/test_bbscan_external.cpp 
-    #tests/test_bbscan.cpp 
-    #tests/test_bitset.cpp 
     #tests/test_bbsentinel.cpp 
 
     #TESTS CHECKED (31/01/2025)
-    #tests/test_bitblock.cpp
+    tests/test_bitblock.cpp
+    tests/test_masks.cpp 
+    tests/test_bbscan_external.cpp 
+    tests/test_bbscan.cpp 
+    tests/test_bitset.cpp 
+   
 
 )
 

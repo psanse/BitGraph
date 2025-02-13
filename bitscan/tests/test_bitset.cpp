@@ -2,7 +2,7 @@
 * @file test_bitset.cpp
 * @brief Unit tests of the BitSet class
 * @details Taken from the original test_bitstring.cpp (2014), filtering out other bitstring classes in the hierarchy
-* @created 31/01/2025
+* @created 31/01/2025, last_update 13/02/2025
 * @authos pss
 **/
 
@@ -29,6 +29,28 @@ protected:
 	BitSet bbn;
 	set<int> sol;
 };
+
+class BitSetClassTest_1 : public ::testing::Test {
+protected:
+	BitSetClassTest_1() : bb(130), bb1(130) {}
+	virtual void SetUp() {
+		bb.set_bit(10);
+		bb.set_bit(20);
+		bb.set_bit(64);
+
+		bb1.set_bit(10);
+		bb1.set_bit(64);
+		bb1.set_bit(100);
+	}
+
+	//////////////////////
+	//data members
+	BitSet bb;
+	BitSet bb1;
+
+};
+
+
 
 TEST_F(BitSetClassTest, non_destructive) {
 	std::set<int> res;
@@ -518,6 +540,23 @@ TEST(BitSetClass, erase_block) {
 
 }
 
+TEST_F(BitSetClassTest_1, erase_block_2) {
+
+	BitSet bbres(130);
+
+	bb.erase_block(2, 2, bb1);		//nothing deleted
+	EXPECT_EQ(3, bb.size());
+
+	bb.erase_block(1, 1, bb1);		//nothing deleted
+	EXPECT_TRUE(bb.is_bit(10));
+	EXPECT_FALSE(bb.is_bit(64));
+	EXPECT_TRUE(bb.is_bit(20));
+	EXPECT_FALSE(bb.is_bit(100));
+
+	bb.erase_block(0, 2, bb1);		//nothing deleted
+	EXPECT_EQ(1, bb.size());
+}
+
 TEST(BitSetClass, find_single_bit_intersection){
 
 	BitSet bb(130);
@@ -787,7 +826,106 @@ TEST(BitSetClass, OR_by_blocks) {
 	EXPECT_EQ(1, bbresOR.size());
 }
 
+TEST(BitSetClass, set_bits) {
 
+	BitSet bb(130);
+	BitSet bb1(130);
+	BitSet bbres(130);
+
+	bb.set_bit(10);
+	bb.set_bit(20);
+	bb.set_bit(64);
+
+	bb1.set_bit(10);
+	bb1.set_bit(64);
+	bb1.set_bit(100);
+
+	//set range
+	bb.set_block(0, -1, bb1);
+	EXPECT_TRUE(bb.is_bit(100));
+	EXPECT_TRUE(bb.is_bit(20));
+
+	bb1.set_bit(129);
+	bb.set_block(0, 1, bb1);
+	EXPECT_FALSE(bb.is_bit(129));
+
+	bb.set_block(0, 2, bb1);
+	EXPECT_TRUE(bb.is_bit(129));
+
+	//erase range
+	bb.erase_block(2, -1, bb1);
+	EXPECT_FALSE(bb.is_bit(129));
+
+	bb.erase_block(1, -1, bb1);
+	EXPECT_FALSE(bb.is_bit(100));
+	EXPECT_FALSE(bb.is_bit(64));
+
+	bb.erase_block(0, -1, bb1);
+	EXPECT_TRUE(bb.is_bit(20));
+}
+
+
+TEST_F(BitSetClassTest_1, erase_bit_stateless) {
+
+	BitSet bbERASE(130);
+
+	//////////////////////////////	
+	erase_bit(bb, bb1, bbERASE);			//bb = {20}
+	///////////////////////////////
+
+	EXPECT_TRUE	(bbERASE.is_bit(20));
+	EXPECT_EQ	(1, bbERASE.size());
+
+}
+
+TEST(BitSetClass, erase_bit_stateless) {
+	
+	BitSet bb(130);
+	BitSet bb1(130);				//empty
+
+	bb.set_bit(10);
+	bb.set_bit(20);
+	bb.set_bit(64);
+
+	BitSet bbERASE(130);
+	bbERASE.set_bit(129);
+
+	
+	///////////////////////////////
+	erase_bit(bb, bb1, bbERASE);		//erases empty bitset, result is bb
+	///////////////////////////////
+
+	EXPECT_TRUE(bb == bbERASE);
+}
+
+TEST_F(BitSetClassTest_1, operators) {
+
+	/////////////
+	bb &= bb1;			//bb={10, 64}
+	/////////////
+
+	EXPECT_TRUE(bb.is_bit(10));
+	EXPECT_TRUE(bb.is_bit(64));
+	EXPECT_EQ(2, bb.size());
+
+	////////////////////////////////
+	bb.AND_EQUAL_block(1, 1, bb1);		//bb={10, 64}
+	////////////////////////////////
+
+	EXPECT_TRUE	(bb.is_bit(10));
+	EXPECT_TRUE	(bb.is_bit(64));
+	EXPECT_EQ	(2, bb.size());
+
+	/////////////
+	bb |= bb1;			//bb={10, 64, 100}
+	/////////////
+
+	EXPECT_EQ(3, bb.size());
+	EXPECT_TRUE(bb.is_bit(10));
+	EXPECT_TRUE(bb.is_bit(64));
+	EXPECT_TRUE(bb.is_bit(100));
+	
+}
 
 ////////////////////////
 //

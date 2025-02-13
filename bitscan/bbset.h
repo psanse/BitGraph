@@ -147,7 +147,7 @@ public:
 										BitSet lhs, const BitSet& rhs)	{	return lhs.OR_EQUAL_block<true>(firstBlock, lastBlock, rhs); }
 	
 	/**
-	* @brief Removes the bits from the bitstring rhs in the bitstring lhs. Stores
+	* @brief Removes the 1-bits in the bitstring rhs from the bitstring lhs. Stores
 	*		 the result in res.
 	* @returns reference to the resulting bitstring res
 	**/
