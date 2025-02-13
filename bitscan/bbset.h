@@ -37,8 +37,14 @@ using vbset  = std::vector<BITBOARD>;
 class BitSet:public BBObject{
 			
 	friend class bscan;
+
+	template <class U>
+	friend class BBObject::ScanRev;
 		
 public:	
+
+	//aliases for bitscanning in this class
+	using myScanRev = typename BBObject::ScanRev<BitSet>;
 
 /////////////////////////////
 // Independent operators / masks  

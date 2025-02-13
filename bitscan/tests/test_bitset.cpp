@@ -927,6 +927,20 @@ TEST_F(BitSetClassTest_1, operators) {
 	
 }
 
+TEST(BitSetClass, nested_scanning) {
+	BitSet bb(130);
+	bb.set_bit(10);
+	bb.set_bit(20);
+	bb.set_bit(64);
+
+	BitSet::myScanRev scan(bb);
+	int bit = BBObject::noBit;
+
+	while ((bit = scan.next_bit()) != BBObject::noBit) {
+		std::cout << "bit: " << bit << std::endl;
+	}
+}
+
 ////////////////////////
 //
 // DISABLED TESTS
