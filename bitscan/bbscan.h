@@ -1,10 +1,12 @@
  /**
   * @file bbscan.h file
   * @brief header file of the BBScan class from the BITSCAN library.
-  *		   Manages efficient bitscanning 
+  *		   Manages efficient bitscanning. An alternative is using the nested bitscanning classes in BBObject
   * @details Use external scanning feature for commodity. Use this class for specific tuning of bitscans
-  * @details last_updated 12/02/2025
+  * @details last_updated 13/02/2025
   * @author pss
+  * 
+  * TODO - Compare efficiency with nested bitscanning classes in BBObject (13/02/2025)
   **/
 
 #ifndef __BBSCAN_H__
@@ -26,8 +28,6 @@ using namespace std;
 
 class BBScan: public BitSet{
 public:
-		
-	friend class bscan;
 
 //////////////////////////////
 //construction / destruction
@@ -37,7 +37,7 @@ public:
 	
 	//TODO...check copy and move assignments 
 	
-	virtual	~BBScan				()								 = default;
+	virtual	~BBScan					()	 = default;
 
 
 ///////////////////////////////
@@ -89,20 +89,6 @@ virtual	int init_scan				(scan_types sc);
 	**/
 virtual inline int next_bit_del		(); 	
 
-	/**
-	* @brief next bit in the bitstring, starting from the block
-	*		 in the last call to next_bit. 
-	*		 Returns in block the current bitblock  of the returned bit.
-	*		 Scan type: destructive
-	*
-	*		 I. caches the current block for the next call
-	*		II. erases the current scanned bit
-	* 		III. First call requires initialization with init_scan(DESTRUCTIVE)
-	* 
-	* @param block: output parameter with the current bitblock
-	* @returns the next bit in the bitstring, EMPTY_ELEM if there are no more bits
-	**/
-//virtual inline int next_bit_del		(int& block ); 
 
 	/**
 	* @brief next bit in the bitstring, starting from the block
@@ -120,7 +106,7 @@ virtual inline int next_bit_del		();
 	* @param block: output parameter with the current bitblock
 	* @returns the next bit in the bitstring, EMPTY_ELEM if there are no more bits
 	**/
-virtual inline int next_bit_del		(int& nBB,  BBScan& bitset); 	 
+virtual inline int next_bit_del		( BBScan& bitset); 	 
 
 	/**
 	* @brief next bit in the bitstring, starting from the bit retrieved
@@ -142,28 +128,8 @@ virtual inline int next_bit			()  ;
 	/**
 	* @brief next bit in the bitstring, starting from the bit retrieved
 	*		 in the last call to next_bit.
-	*		 Returns in block the current bitblock  of the returned bit.
-	*		 Scan type: non-destructive
-	*
-	*		 I. caches the current block for the next call
-	*		II. DOES NOT erase the current scanned bit
-	*		III. caches the scanned bit for the next call
-	* 		IV. First call requires initialization with init_scan(NON-DESTRUCTIVE)
-	* 
-	* @param block: output bitblock of the retrieved bit
-	* @returns the next bit in the bitstring, EMPTY_ELEM if there are no more bits
-	* @details Created   23/3/12, last update 09/02/2025
-	* @details Since the scan does not delete the scanned bit from the bitstring,
-	*		   it has to cache the last scanned bit for the next call
-	**/
-//virtual inline int next_bit			(int& block);
-
-	/**
-	* @brief next bit in the bitstring, starting from the bit retrieved
-	*		 in the last call to next_bit.
-	*		 Returns in block the current bitblock of the returned bit and deletes from
-	*		 the input bitset the current bit scanned (returned).
-	*		 Erases the current scanned bit from the bitblock bitset passed as argument
+	*		 Deletes from the input bitset the current bit scanned (returned).
+	*		 Deletes the current scanned bit from the bitblock bitset passed as argument
 	*		 Scan type: non-destructive
 	*
 	*		 I. caches the current block for the next call
@@ -172,13 +138,12 @@ virtual inline int next_bit			()  ;
 	* 		IV. First call requires initialization with init_scan(NON-DESTRUCTIVE)
 	*
 	* @param bitset: bitblock where the scanned bit is erased
-	* @param block: output parameter with the current bitblock
 	* @returns the next bit in the bitstring, EMPTY_ELEM if there are no more bits
 	* @details Created   23/3/12, last update 09/02/2025
 	* @details Since the scan does not delete the scanned bit from the bitstring,
 	*		   it has to cache the last scanned bit for the next call
 	**/
-virtual	inline int next_bit			(/* int& block,*/ BBScan& bitset);
+virtual	inline int next_bit			( BBScan& bitset);
 
 	////////////////
 	// bitscan backwards
@@ -197,25 +162,9 @@ virtual	inline int next_bit			(/* int& block,*/ BBScan& bitset);
 	* @details Since the scan does not delete the scanned bit from the bitstring,
 	*		   it has to cache the last scanned bit for the next call
 	**/
-virtual	 inline int prev_bit			() ;
+virtual	 inline int prev_bit			();
+virtual	 inline int prev_bit			(BBScan& bitset);
 
-	/**
-	* @brief next least-significant bit in the bitstring, starting from the bit retrieved
-	*		 in the last call to next_bit.
-	*		 Returns in block the current bitblock  of the returned bit.	
-	*		 Scan type: non-destructive, reverse
-	*
-	*		 I. caches the current block for the next call
-	*		II. caches the scanned bit for the next call
-	* 		III. First call requires initialization with init_scan(NON-DESTRUCTIVE, REVERSE)
-	* 
-	* @param block: output bitblock of the retrieved bit
-	* @returns the next lsb bit in the bitstring, EMPTY_ELEM if there are no more bits
-	* @details Created   23/3/12, last update 09/02/2025
-	* @details Since the scan does not delete the scanned bit from the bitstring,
-	*		   it has to cache the last scanned bit for the next call
-	**/
-//virtual inline int prev_bit			(int& block);
 
 	/**
 	* @brief next least-significant bit in the bitstring, starting from the bit retrieved
@@ -231,21 +180,6 @@ virtual	 inline int prev_bit			() ;
 	**/
  virtual inline int prev_bit_del	(); 
 
-	 /**
-	 * @brief next least-significant bit in the bitstring, starting from the bit retrieved
-	 *		 in the last call to next_bit.
-	 *		 Returns in block the current bitblock  of the returned bit.
-	 *		 Scan type: destructive, reverse
-	 *
-	 *		 I. caches the current block for the next call
-	 *		II. erases the current scanned bit
-	 * 		III. First call requires initialization with init_scan(DESTRUCTIVE, REVERSE)
-	 *
-	 * @param block: output bitblock of the retrieved bit
-	 * @returns the next lsb bit in the bitstring, EMPTY_ELEM if there are no more bits
-	 * @details Created   23/3/12, last update 09/02/2025
-	 **/
- //virtual inline int prev_bit_del				(int& block);
 
 	/**
 	* @brief next least-significant bit in the bitstring, starting from the bit retrieved
@@ -264,7 +198,7 @@ virtual	 inline int prev_bit			() ;
 	* @returns the next lsb bit in the bitstring, EMPTY_ELEM if there are no more bits
 	* @details Created   23/3/12, last update 09/02/2025
 	**/
- virtual inline int prev_bit_del				(/* int& block ,*/ BBScan& bitset);
+ virtual inline int prev_bit_del				( BBScan& bitset);
 
 
 //////////////////
@@ -300,30 +234,10 @@ int BBScan::next_bit_del() {
 	return EMPTY_ELEM;  
 }
 
-//inline 
-//int BBScan::next_bit_del(int& block) {
-//
-//	U32 posInBB;
-//
-//	for(auto i = scan_.bbi_; i < nBB_; ++i)	{
-//
-//		if(_BitScanForward64(&posInBB,vBB_[i])){
-//			//stores the current block and copies to output
-//			scan_.bbi_ = i;
-//			block = i;
-//
-//			//deletes the current bit before returning
-//			vBB_[i] &= ~Tables::mask[posInBB];			
-//			
-//			return (posInBB + WMUL(i));
-//		}
-//	}
-//	
-//	return EMPTY_ELEM;  
-//}
+
 
 inline
-int BBScan::next_bit_del(int& block, BBScan& bbN_del) {
+int BBScan::next_bit_del( BBScan& bbN_del) {
 
 	U32 posInBB;
 
@@ -332,8 +246,7 @@ int BBScan::next_bit_del(int& block, BBScan& bbN_del) {
 		if(_BitScanForward64(&posInBB,vBB_[i])){
 			//stores the current block and copies to output
 			scan_.bbi_=i;
-			block = i;
-
+			
 			//deletes the current bit before returning
 			vBB_[i] &= ~Tables::mask[posInBB];				
 
@@ -378,46 +291,10 @@ int BBScan::next_bit() {
 	return EMPTY_ELEM;
 }
 
-//inline
-//int BBScan::next_bit(int& block) {
-//
-//	U32 posInBB;
-//
-//	//Search for next bit in the last scanned block
-//	if (_BitScanForward64(&posInBB, vBB_[scan_.bbi_] & Tables::mask_high[scan_.pos_])) {
-//
-//		//stores the current bit for next call
-//		scan_.pos_ = posInBB;									//current block has not changed, so not stored
-//
-//		//outputs the current block
-//		block = scan_.bbi_;
-//
-//		return (posInBB + WMUL(scan_.bbi_));
-//	}
-//	else {		
-//
-//		//Searches for next bit in the remaining blocks
-//		for (int i = scan_.bbi_ + 1; i < nBB_; i++) {
-//
-//			if (_BitScanForward64(&posInBB, vBB_[i])) {
-//
-//				//stores the current block and bit for next call
-//				scan_.bbi_ = i;
-//				scan_.pos_ = posInBB;
-//
-//				//outputs the current block
-//				block = i;
-//
-//				return (posInBB + WMUL(i));
-//			}
-//		}
-//	}
-//
-//	return EMPTY_ELEM;
-//}
+
 
 inline
-int BBScan::next_bit(/*int& block,*/ BBScan& bitset) {
+int BBScan::next_bit( BBScan& bitset) {
 
 	U32 posInBB;
 
@@ -490,43 +367,45 @@ int BBScan::prev_bit		() {
 	return EMPTY_ELEM;
 }
 
-//inline
-//int BBScan::prev_bit	(int& block) {
-//
-//	U32 posInBB;
-//				
-//	//Searches for previous bit in the last scanned block
-//	if( _BitScanReverse64(&posInBB, vBB_[scan_.bbi_] & Tables::mask_low[scan_.pos_]) ){
-//
-//		//stores the current bit for next call
-//		scan_.pos_ = posInBB;									//current block has not changed, so not stored
-//
-//		//outputs the current block
-//		block = scan_.bbi_;
-//
-//		return (posInBB + WMUL(scan_.bbi_));
-//
-//	}else{											
-//
-//		//Searches for previous bit in the remaining blocks
-//		for(auto i = scan_.bbi_ - 1; i >= 0; --i){
-//
-//			if(_BitScanReverse64(&posInBB,vBB_[i])){
-//
-//				//stores the current block and bit for next call
-//				scan_.bbi_=i;
-//				scan_.pos_=posInBB;
-//
-//				//outputs the current block
-//				block = i;
-//
-//				return (posInBB+ WMUL(i));
-//			}
-//		}
-//	}
-//	
-//	return EMPTY_ELEM;
-//}
+inline int BBScan::prev_bit(BBScan& bitset)
+{
+
+	U32 posInBB;
+
+	//Searches for previous bit in the last scanned block
+	if (_BitScanReverse64(&posInBB, vBB_[scan_.bbi_] & Tables::mask_low[scan_.pos_])) {
+
+		//stores the current bit for next call
+		scan_.pos_ = posInBB;									//current block has not changed, so not stored			
+		
+		//deletes the bit from the input bitset
+		bitset.vBB_[scan_.bbi_] &= ~Tables::mask[posInBB];
+
+		return (posInBB + WMUL(scan_.bbi_));
+
+	}
+	else {
+
+		//Searches for previous bit in the remaining blocks
+		for (auto i = scan_.bbi_ - 1; i >= 0; --i) {
+
+			if (_BitScanReverse64(&posInBB, vBB_[i])) {
+
+				//stores the current block and bit for next call
+				scan_.bbi_ = i;
+				scan_.pos_ = posInBB;
+
+				//deletes the bit from the input bitset
+				bitset.vBB_[scan_.bbi_] &= ~Tables::mask[posInBB];
+
+				return (posInBB + WMUL(i));
+			}
+		}
+	}
+
+	return EMPTY_ELEM;
+}
+
 
 inline
 int BBScan::prev_bit_del() {
@@ -549,33 +428,9 @@ int BBScan::prev_bit_del() {
 	return EMPTY_ELEM;  
 }
 
-//inline
-//int BBScan::prev_bit_del(int& block) {
-//
-//	U32 posInBB;
-//
-//	for(auto i = scan_.bbi_; i >= 0; --i){
-//
-//		if(_BitScanReverse64(&posInBB,vBB_[i])){
-//
-//			//stores the current block for the next call
-//			scan_.bbi_=i;
-//
-//			//deletes the current bit from the bitset before returning
-//			vBB_[i]&=~Tables::mask[posInBB];			
-//
-//			//outputs the current block
-//			block = i;
-//
-//			return (posInBB + WMUL(i));
-//		}
-//	}
-//	
-//	return EMPTY_ELEM;  
-//}
 
 inline
-int BBScan::prev_bit_del(/*int& block,*/ BBScan& bitset) {
+int BBScan::prev_bit_del( BBScan& bitset) {
 
 	U32 posInBB;
 

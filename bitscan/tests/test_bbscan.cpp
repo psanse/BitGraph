@@ -17,11 +17,11 @@ using namespace std;
 
 class BBScanClassTest: public ::testing::Test{
 protected:
-	BBScanClassTest():bbn(301), bbi(301){}
+	BBScanClassTest():bbn(301), bbsc(301){}
 	virtual void SetUp(){
 	  for(int i = 0; i <= 300; i += 50){
 		  bbn.set_bit(i);
-		  bbi.set_bit(i);
+		  bbsc.set_bit(i);
 		  sol.insert(i); 
 	  }
 	}
@@ -29,7 +29,7 @@ protected:
 //////////////////////
 //data members
 	BitSet bbn;
-	BBScan bbi;
+	BBScan bbsc;
 	set<int> sol;
 };
 
@@ -46,9 +46,9 @@ TEST_F(BBScanClassTest, non_destructive) {
 	EXPECT_TRUE(res == sol);
 
 	res.clear();
-	bbi.init_scan(BBObject::NON_DESTRUCTIVE);
+	bbsc.init_scan(BBObject::NON_DESTRUCTIVE);
 	while (true) {
-		nBit = bbi.next_bit();
+		nBit = bbsc.next_bit();
 		if (nBit == EMPTY_ELEM) break;
 		res.insert(nBit);
 	}
@@ -72,9 +72,9 @@ TEST_F(BBScanClassTest, non_destructive_with_starting_point) {
 	EXPECT_EQ(0, res.count(50));
 
 	res.clear();
-	bbi.init_scan(50, BBObject::NON_DESTRUCTIVE);
+	bbsc.init_scan(50, BBObject::NON_DESTRUCTIVE);
 	while (true) {
-		nBit = bbi.next_bit();
+		nBit = bbsc.next_bit();
 		if (nBit == EMPTY_ELEM) break;
 		res.insert(nBit);
 	}
@@ -101,9 +101,9 @@ TEST_F(BBScanClassTest, reverse_non_destructive) {
 	EXPECT_TRUE(res == sol);
 
 	res.clear();
-	bbi.init_scan(BBObject::NON_DESTRUCTIVE_REVERSE);
+	bbsc.init_scan(BBObject::NON_DESTRUCTIVE_REVERSE);
 	while (true) {
-		nBit = bbi.prev_bit();
+		nBit = bbsc.prev_bit();
 		if (nBit == EMPTY_ELEM) break;
 		res.insert(nBit);
 	}
@@ -128,9 +128,9 @@ TEST_F(BBScanClassTest, reverse_non_destructive_with_starting_point) {
 	EXPECT_EQ(0, res.count(50));
 
 	res.clear();
-	bbi.init_scan(50, BBObject::NON_DESTRUCTIVE_REVERSE);
+	bbsc.init_scan(50, BBObject::NON_DESTRUCTIVE_REVERSE);
 	while (true) {
-		nBit = bbi.prev_bit();
+		nBit = bbsc.prev_bit();
 		if (nBit == EMPTY_ELEM) break;
 		res.insert(nBit);
 	}
@@ -149,16 +149,16 @@ TEST_F(BBScanClassTest, destructive) {
 
 	//intrinsic
 	res.clear();
-	BBScan bbi1(bbi);
-	bbi1.init_scan(BBObject::DESTRUCTIVE);
+	BBScan bbsc1(bbsc);
+	bbsc1.init_scan(BBObject::DESTRUCTIVE);
 	while (true) {
-		nBit = bbi1.next_bit_del();
+		nBit = bbsc1.next_bit_del();
 		if (nBit == EMPTY_ELEM) break;
 		res.insert(nBit);
 	}
 
 	EXPECT_TRUE(res == sol);
-	EXPECT_EQ(0, bbi1.size());
+	EXPECT_EQ(0, bbsc1.size());
 
 	
 }
@@ -181,16 +181,16 @@ TEST_F(BBScanClassTest, reverse_destructive) {
 
 	//intrinsic
 	res.clear();
-	BBScan bbi1(bbi);
-	bbi1.init_scan(BBObject::DESTRUCTIVE_REVERSE);
+	BBScan bbsc1(bbsc);
+	bbsc1.init_scan(BBObject::DESTRUCTIVE_REVERSE);
 	while (true) {
-		nBit = bbi1.prev_bit_del();
+		nBit = bbsc1.prev_bit_del();
 		if (nBit == EMPTY_ELEM) break;
 		res.insert(nBit);
 	}
 
 	EXPECT_TRUE(res == sol);
-	EXPECT_EQ(0, bbi1.size());
+	EXPECT_EQ(0, bbsc1.size());
 }
 
 TEST(BBScanClass, setters_and_getters) {
@@ -300,24 +300,24 @@ TEST(BBScanClass, algorithms) {
 
 TEST(BBScanClass, population_count){
 	
-	BBScan bbi(130);
-	bbi.set_bit(10);
-	bbi.set_bit(20);
-	bbi.set_bit(64);
+	BBScan bbsc(130);
+	bbsc.set_bit(10);
+	bbsc.set_bit(20);
+	bbsc.set_bit(64);
 
 	//no range
-	EXPECT_EQ(3, bbi.size());
+	EXPECT_EQ(3, bbsc.size());
 	
 	//[firstBit, endOfBitset)
-	EXPECT_EQ(2, bbi.size(11));
-	EXPECT_EQ(1, bbi.size(21));
-	EXPECT_EQ(0, bbi.size(65));
-	EXPECT_EQ(1, bbi.size(64));
+	EXPECT_EQ(2, bbsc.size(11));
+	EXPECT_EQ(1, bbsc.size(21));
+	EXPECT_EQ(0, bbsc.size(65));
+	EXPECT_EQ(1, bbsc.size(64));
 
 	//[firstBit, lastBit]
-	EXPECT_EQ(1, bbi.size(0, 10));
-	EXPECT_EQ(1, bbi.size(20, 63));
-	EXPECT_EQ(2, bbi.size(20, 64));
+	EXPECT_EQ(1, bbsc.size(0, 10));
+	EXPECT_EQ(1, bbsc.size(20, 63));
+	EXPECT_EQ(2, bbsc.size(20, 64));
 }
 
 TEST(BBScanClass, to_vector){
@@ -347,11 +347,11 @@ TEST(BBScanClass, to_vector){
 	EXPECT_EQ(sol, vint);
 
 	//BBScan redefinition
-	BBScan bbi(130);
-	bbi.set_bit(10);
-	bbi.set_bit(20);
-	bbi.set_bit(64);
-	bbi.to_C_array(v,size, false);
+	BBScan bbsc(130);
+	bbsc.set_bit(10);
+	bbsc.set_bit(20);
+	bbsc.set_bit(64);
+	bbsc.to_C_array(v,size, false);
 	EXPECT_EQ(3, size);
 	copy(v, v+size, vint.begin());
 	EXPECT_EQ(3, vint.size());
@@ -392,17 +392,17 @@ protected:
 		int aux[] = {4,8,15,16,23,42};
 		val.assign (aux,aux+6);
 		bbn.init(45,val);
-		bbi.init(45,val);
+		bbsc.init(45,val);
 	}
 
 	vector<int> val;
 	BitSet bbn;
-	BBScan bbi;	
+	BBScan bbsc;	
 };
 
 TEST_F(BBScanClassTest_1, miscellanous){
-	EXPECT_EQ(bbn.size(),bbi.size());
-	EXPECT_EQ(to_vector(bbn), to_vector(bbi));
+	EXPECT_EQ(bbn.size(),bbsc.size());
+	EXPECT_EQ(to_vector(bbn), to_vector(bbsc));
 }
 
 
@@ -429,15 +429,15 @@ TEST(BBScanClass, init_scan_specific){
 //added specifically because some doubts were creeping during CSP implementation
 //
 
-	BBScan bbi(100);
-	bbi.set_bit(10);
-	bbi.set_bit(50);
-	bbi.set_bit(64);
-	bbi.init_scan(10, bbo::NON_DESTRUCTIVE);
+	BBScan bbsc(100);
+	bbsc.set_bit(10);
+	bbsc.set_bit(50);
+	bbsc.set_bit(64);
+	bbsc.init_scan(10, bbo::NON_DESTRUCTIVE);
 
 	BBScan bbres(100);
 	while(true){
-		int v=bbi.next_bit();
+		int v=bbsc.next_bit();
 		if(v==EMPTY_ELEM) break;
 		bbres.set_bit(v);
 	}
@@ -449,10 +449,10 @@ TEST(BBScanClass, init_scan_specific){
 
 	//scan from the beginning
 	bbres.erase_bit();
-	bbi.set_bit(0);
-	bbi.init_scan(EMPTY_ELEM, bbo::NON_DESTRUCTIVE);  /* note bi.init_scan(0, ..) is not the same */
+	bbsc.set_bit(0);
+	bbsc.init_scan(EMPTY_ELEM, bbo::NON_DESTRUCTIVE);  /* note bi.init_scan(0, ..) is not the same */
 	while(true){
-		int v=bbi.next_bit();
+		int v=bbsc.next_bit();
 		if(v==EMPTY_ELEM) break;
 		bbres.set_bit(v);
 	}
@@ -463,9 +463,9 @@ TEST(BBScanClass, init_scan_specific){
 
 	//incorrect scan from the beginning
 	bbres.erase_bit();
-	bbi.init_scan(0, bbo::NON_DESTRUCTIVE);  /* note bi.init_scan(0, ..) is not the same */
+	bbsc.init_scan(0, bbo::NON_DESTRUCTIVE);  /* note bi.init_scan(0, ..) is not the same */
 	while(true){
-		int v=bbi.next_bit();
+		int v=bbsc.next_bit();
 		if(v==EMPTY_ELEM) break;
 		bbres.set_bit(v);
 	}

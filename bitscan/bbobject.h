@@ -75,6 +75,7 @@ public:
 		* @brief returns the next bit in the bitset during a reverse bitscanning operation
 		**/
 		int next_bit();
+			
 
 		/**
 		* @brief scans the next bit in the bitset and deletes it from the
@@ -249,9 +250,12 @@ int BBObject::ScanRev< BitSet_t>::next_bit() {
 	return noBit;
 }
 
+
+
 template<class BitSet_t>
 inline
 int BBObject::ScanRev< BitSet_t>::next_bit(BitSet_t& bb_del) {
+	
 	U32 posInBB;
 
 	//Searches for previous bit in the last scanned block
