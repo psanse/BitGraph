@@ -28,7 +28,7 @@ ${useful_headers_for_IDE}
 
 set_target_properties(bitscan 
     PROPERTIES
-     ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
+    ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
 )
 
 # Make sure the compiler can find include files for our bitscan library
@@ -45,7 +45,8 @@ if (bitscan_build_tests)
 
 add_executable (test_bitscan tests/gtest_main.cc 
   
-    #tests/test_algorithms.cpp          #CHECK (05/02/2025)    
+    #TESTS TO CHECK (14/02/2025)   
+    #tests/test_algorithms.cpp           
     #tests/test_sparse.cpp
     #tests/test_example.cpp   
     #tests/test_bbsentinel.cpp 
@@ -56,7 +57,6 @@ add_executable (test_bitscan tests/gtest_main.cc
     tests/test_bbscan_nested.cpp 
     tests/test_bbscan.cpp 
     tests/test_bitset.cpp 
-   
 
 )
 

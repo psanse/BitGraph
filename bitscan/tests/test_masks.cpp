@@ -1,7 +1,7 @@
 /**
 * @file test_masks.cpp
 * @brief unit tests for (logic) masks for sparse and non-sparse graphs
-* @created 17/12/2015, last_update 13/02/2025
+* @created 17/12/2015, last_update 14/02/2025
 * @authos pss
 * 
 * TODO- CHECK BEHAVIOUR OF AND_stateless tests,  change to closed range of bits (12/02/2025)
@@ -110,8 +110,6 @@ TEST_F(MasksTest, AND_OR) {
 	///////////////////////
 	OR(bb, bb1, resOR);
 	//////////////////////
-	
-	resOR.print();
 
 	EXPECT_EQ	(5, resOR.size());
 	EXPECT_TRUE	(resOR.is_bit(10));
@@ -221,6 +219,7 @@ TEST(Masks, DISABLED_AND_OR_sparse) {
 }
 
 TEST(Masks, DISABLED_set_bits_sparse) {
+
 	sparse_bitarray bb(130);
 	sparse_bitarray bb1(130);
 	sparse_bitarray bbres(130);
@@ -245,21 +244,20 @@ TEST(Masks, DISABLED_set_bits_sparse) {
 	EXPECT_TRUE(bb.is_bit(129));
 
 	//erase range
-	//cout<<bb<<endl;
 	bb.erase_block(2, bb1);
 	EXPECT_FALSE(bb.is_bit(129));
 
 	bb.erase_block(1, bb1);
 	EXPECT_FALSE(bb.is_bit(100));
 	EXPECT_FALSE(bb.is_bit(64));
-
-	//cout<<bb.erase_block(0, bb1)<<endl;
+		
 	bb.erase_block(0, bb1);
 	EXPECT_TRUE(bb.is_bit(20));
 }
 
 
 TEST(Masks, DISABLED_erase_block_sparse) {
+
 	sparse_bitarray bb(130);
 	sparse_bitarray bb1(130);
 	sparse_bitarray bbres(130);

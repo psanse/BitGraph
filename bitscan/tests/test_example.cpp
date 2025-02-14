@@ -1,11 +1,12 @@
 
-#include "../bitscan.h"
+#include "bitscan/bitscan.h"			//global dependency
 #include "gtest/gtest.h"
 #include <iostream>
 
 using namespace std;
 
 TEST(Example, scanning){
+
 	vector<int> res;
 	int nBit=EMPTY_ELEM;
 	BITBOARD bbn(0x100);
