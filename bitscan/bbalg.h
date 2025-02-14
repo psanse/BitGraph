@@ -242,6 +242,7 @@ inline BITBOARD gen_random_bitboard(double p){
 return bb;
 }
 
+
 template<class bitstring_t, class array_t>
 inline
 int first_k_bits (int k, bitstring_t &bb, array_t &lv){

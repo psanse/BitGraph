@@ -1,6 +1,6 @@
 /**
 * @file test_bbscan.cpp
-* @brief Unit tests of the BBScan class
+* @brief Unit tests of the BBScan class - only related to non-nested bitscanning
 * @details Taken from the unit tests in test_bitstring.cpp (2014), filtering out other bitstring classes in the hierarchy
 * @created 12/02/2025
 * @author pss
@@ -282,108 +282,54 @@ TEST(BBScanClass, erase_bit_range){
 
 }
 
+TEST(BBScanClass, init_scan_specific) {
 
-TEST(BBScanClass, algorithms) {
-//simple test for algorithms in bbalg.h
-
-	BitSet bb(130);
-	bb.set_bit(10);
-	bb.set_bit(20);
-	bb.set_bit(64);
-
-	////get_first_k_bits
-	//BITBOARD b8=bb.get_bitstring()[0];
-	//EXPECT_EQ(bblock::popc64_lup(get_first_k_bits(b8, 1)), 1);
-	//EXPECT_EQ(bblock::popc64_lup(get_first_k_bits(b8, 2)), 2);
-	//EXPECT_EQ(bblock::popc64_lup(get_first_k_bits(b8, 3)), 0);
-}
-
-TEST(BBScanClass, population_count){
-	
-	BBScan bbsc(130);
+	BBScan bbsc(100);
 	bbsc.set_bit(10);
-	bbsc.set_bit(20);
+	bbsc.set_bit(50);
 	bbsc.set_bit(64);
 
-	//no range
-	EXPECT_EQ(3, bbsc.size());
-	
-	//[firstBit, endOfBitset)
-	EXPECT_EQ(2, bbsc.size(11));
-	EXPECT_EQ(1, bbsc.size(21));
-	EXPECT_EQ(0, bbsc.size(65));
-	EXPECT_EQ(1, bbsc.size(64));
+	bbsc.init_scan(10, bbo::NON_DESTRUCTIVE);
 
-	//[firstBit, lastBit]
-	EXPECT_EQ(1, bbsc.size(0, 10));
-	EXPECT_EQ(1, bbsc.size(20, 63));
-	EXPECT_EQ(2, bbsc.size(20, 64));
-}
-
-TEST(BBScanClass, to_vector){
-	BitSet bb(130);
-	bb.set_bit(10);
-	bb.set_bit(20);
-	bb.set_bit(64);
-
-	vector<int> sol;
-	sol.push_back(10);  sol.push_back(20); sol.push_back(64);
-
-	vector<int> vint;
-	bb.to_vector(vint);
-	EXPECT_EQ(sol, vint);
-
-	
-///////////////
-// old vector interface (4/7/16)
-	int v[130]; std::size_t size=0;
-	for(int i=0; i<130; i++){
-		v[i]=EMPTY_ELEM;
+	BBScan bbres(100);
+	while (true) {
+		int v = bbsc.next_bit();
+		if (v == EMPTY_ELEM) break;
+		bbres.set_bit(v);
 	}
-		
-	bb.to_C_array(v, size);
-	EXPECT_EQ(3, size);
-	copy(v, v+size, vint.begin());
-	EXPECT_EQ(sol, vint);
 
-	//BBScan redefinition
-	BBScan bbsc(130);
-	bbsc.set_bit(10);
-	bbsc.set_bit(20);
-	bbsc.set_bit(64);
-	bbsc.to_C_array(v,size, false);
-	EXPECT_EQ(3, size);
-	copy(v, v+size, vint.begin());
-	EXPECT_EQ(3, vint.size());
-	EXPECT_EQ(sol, vint);
-		
+	EXPECT_FALSE(bbres.is_bit(10));
+	EXPECT_TRUE(bbres.is_bit(50));
+	EXPECT_TRUE(bbres.is_bit(64));
+	EXPECT_EQ(2, bbres.size());
+
+	//scan from the beginning
+	bbres.erase_bit();
+	bbsc.set_bit(0);
+	bbsc.init_scan(EMPTY_ELEM, bbo::NON_DESTRUCTIVE);  /* note bi.init_scan(0, ..) is not the same */
+	while (true) {
+		int v = bbsc.next_bit();
+		if (v == EMPTY_ELEM) break;
+		bbres.set_bit(v);
+	}
+
+	EXPECT_EQ(4, bbres.size());
+	EXPECT_TRUE(bbres.is_bit(0));
+	EXPECT_TRUE(bbres.is_bit(10));
+
+	//incorrect scan from the beginning
+	bbres.erase_bit();
+	bbsc.init_scan(0, bbo::NON_DESTRUCTIVE);  /* note bi.init_scan(0, ..) is not the same */
+	while (true) {
+		int v = bbsc.next_bit();
+		if (v == EMPTY_ELEM) break;
+		bbres.set_bit(v);
+	}
+
+	EXPECT_FALSE(bbres.is_bit(0));
 }
 
 
-TEST(BBScanClass, GenRandom){
-///////////
-// deterministic test, unless the seed is changed 
-// date: 2/6/14
-
-	//srand(time(NULL));
-	vector<double> vd;
-	const int NUM_TRIES=100;
-	const double DENSITY=.7;
-	const double TOLERANCE=.05;
-
-	for(int i=0; i<NUM_TRIES; i++){
-		BITBOARD bb=gen_random_bitboard(DENSITY);  //random bits
-		vd.push_back(bblock::popc64(bb)/(double)WORD_SIZE);
-	}
-
-	//average value
-	double sum_of_elems=0;
-	for(vector<double>::iterator j=vd.begin();j!=vd.end();j++){
-		sum_of_elems += *j;
-	}
-	double av_of_elems=sum_of_elems/NUM_TRIES;
-	EXPECT_TRUE(abs(av_of_elems-DENSITY)<TOLERANCE);
-}
 
 
 class BBScanClassTest_1 : public ::testing::Test {
@@ -404,152 +350,5 @@ TEST_F(BBScanClassTest_1, miscellanous){
 	EXPECT_EQ(bbn.size(),bbsc.size());
 	EXPECT_EQ(to_vector(bbn), to_vector(bbsc));
 }
-
-
-TEST(BBScanClass,is_singleton){
-///////////////////////
-// Determines if there is 0 or 1 bit in a range,
-// both included
- 
-	BitSet bb(130);
-	bb.set_bit(62); bb.set_bit(63); bb.set_bit(64);
-	EXPECT_EQ(0,bb.is_singleton(10, 20));
-	EXPECT_EQ(1,bb.is_singleton(60, 62));
-	EXPECT_EQ(-1,bb.is_singleton(62, 64));
-	EXPECT_NE(0,bb.is_singleton(64, 65));
-	EXPECT_EQ(-1, bb.is_singleton(63, 64));
-	EXPECT_EQ(1, bb.is_singleton(64, 65));
-
-	bb.erase_bit(64);
-	EXPECT_EQ(0, bb.is_singleton(64, 65));
-
-}
-
-TEST(BBScanClass, init_scan_specific){
-//added specifically because some doubts were creeping during CSP implementation
-//
-
-	BBScan bbsc(100);
-	bbsc.set_bit(10);
-	bbsc.set_bit(50);
-	bbsc.set_bit(64);
-	bbsc.init_scan(10, bbo::NON_DESTRUCTIVE);
-
-	BBScan bbres(100);
-	while(true){
-		int v=bbsc.next_bit();
-		if(v==EMPTY_ELEM) break;
-		bbres.set_bit(v);
-	}
-
-	EXPECT_FALSE(bbres.is_bit(10));
-	EXPECT_TRUE(bbres.is_bit(50));
-	EXPECT_TRUE(bbres.is_bit(64));
-	EXPECT_EQ(2,bbres.size());
-
-	//scan from the beginning
-	bbres.erase_bit();
-	bbsc.set_bit(0);
-	bbsc.init_scan(EMPTY_ELEM, bbo::NON_DESTRUCTIVE);  /* note bi.init_scan(0, ..) is not the same */
-	while(true){
-		int v=bbsc.next_bit();
-		if(v==EMPTY_ELEM) break;
-		bbres.set_bit(v);
-	}
-
-	EXPECT_EQ(4,bbres.size());
-	EXPECT_TRUE(bbres.is_bit(0));
-	EXPECT_TRUE(bbres.is_bit(10));
-
-	//incorrect scan from the beginning
-	bbres.erase_bit();
-	bbsc.init_scan(0, bbo::NON_DESTRUCTIVE);  /* note bi.init_scan(0, ..) is not the same */
-	while(true){
-		int v=bbsc.next_bit();
-		if(v==EMPTY_ELEM) break;
-		bbres.set_bit(v);
-	}
-
-	EXPECT_FALSE(bbres.is_bit(0));
-}
-
-
-TEST_F(BBScanClassTest, nested_implementation) {
-
-	BitSet bb(65);
-	bb.set_bit(0);
-	bb.set_bit(1);
-	bb.set_bit(64);
-	
-
-	int bit = BBObject::noBit;
-	std::vector<int> lbits;
-	std::vector<int> lbits_exp;
-
-	//direct scanning
-
-	BitSet::scan sc1(bb);
-	bit = BitSet::noBit;
-
-	while ((bit = sc1.next_bit()) != BitSet::noBit) {
-		lbits.emplace_back(bit);
-	}
-
-	//////////////////////////////
-	lbits_exp = { 0, 1, 64 };
-	EXPECT_EQ(lbits_exp, lbits);
-	//////////////////////////////
-
-	//direct reverse scanning
-	BitSet::scanR sc2(bb);
-	bit = BitSet::noBit;
-
-	lbits.clear();
-	while ((bit = sc2.next_bit()) != BitSet::noBit) {
-		lbits.emplace_back(bit);
-	}
-
-	//////////////////////////////
-	lbits_exp = { 64, 1, 0 };
-	EXPECT_EQ(lbits_exp, lbits);
-	//////////////////////////////
-
-	//destructive scanning
-	BitSet::scanD sc3(bb);
-	bit = BitSet::noBit;
-
-	lbits.clear();
-	while ((bit = sc3.next_bit()) != BitSet::noBit) {
-		lbits.emplace_back(bit);
-	}
-
-	///////////////////////////////
-	lbits_exp = { 0, 1, 64 };
-	EXPECT_EQ(lbits_exp, lbits);
-	EXPECT_TRUE(bb.is_empty());
-	////////////////////////////////
-
-	//restores original bitset
-	bb.set_bit(0);
-	bb.set_bit(1);
-	bb.set_bit(64);
-
-	//destructive reverse scanning
-	BitSet::scanDR sc4(bb);
-	bit = BitSet::noBit;
-
-	lbits.clear();
-	while ((bit = sc4.next_bit()) != BitSet::noBit) {
-		lbits.emplace_back(bit);
-	}
-
-	///////////////////////////////
-	lbits_exp = { 64, 1, 0 };
-	EXPECT_EQ(lbits_exp, lbits);
-	EXPECT_TRUE(bb.is_empty());
-	////////////////////////////////
-
-}
-
 
 

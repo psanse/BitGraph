@@ -91,7 +91,7 @@ BitSet::BitSet(int popsize) :
 
 
 BitSet::BitSet(const vint& v):
-	nBB_(EMPTY_ELEM)
+	nBB_(BBObject::noBit)
 {
 	try {
 		nBB_ = INDEX_0TO1(*(max_element(v.begin(), v.end())));
@@ -295,8 +295,8 @@ std::ostream& BitSet::print(std::ostream& o, bool show_pc, bool endl ) const
 	o << "[";
 	
 	//scans de bitstring and serializes it to the output stream
-	int nBit = EMPTY_ELEM;
-	while( (nBit = next_bit(nBit)) != EMPTY_ELEM ){
+	int nBit = BBObject::noBit;
+	while( (nBit = next_bit(nBit)) != BBObject::noBit ){
 		o << nBit << " ";
 	}
 
@@ -323,8 +323,8 @@ string BitSet::to_string ()
 	/*sstr << "[";
 
 	this->print();
-	int nBit = EMPTY_ELEM;
-	while ((nBit = next_bit(nBit)) != EMPTY_ELEM) {
+	int nBit = BBObject::noBit;
+	while ((nBit = next_bit(nBit)) != BBObject::noBit) {
 		sstr << nBit << " ";
 	}
 
@@ -340,8 +340,8 @@ void BitSet::to_vector (vint& lv ) const {
 	lv.clear();
 	lv.reserve(popcn64());		
 
-	int v = EMPTY_ELEM;
-	while( (v = next_bit(v)) != EMPTY_ELEM){
+	int v = BBObject::noBit;
+	while( (v = next_bit(v)) != BBObject::noBit){
 		lv.emplace_back(v);
 	}
 }
@@ -356,8 +356,8 @@ BitSet::operator vint() const {
 void BitSet::to_stack(com::stack_t<int>& s)	const {
 	s.erase();
 
-	int v = EMPTY_ELEM;
-	while ((v = next_bit(v)) != EMPTY_ELEM) {
+	int v = BBObject::noBit;
+	while ((v = next_bit(v)) != BBObject::noBit) {
 		s.push(v);
 	}
 }
@@ -365,15 +365,15 @@ void BitSet::to_stack(com::stack_t<int>& s)	const {
 
 int* BitSet::to_C_array (int* lv, std::size_t& size, bool rev) 	{
 	size = 0;
-	int v = EMPTY_ELEM;
+	int v = BBObject::noBit;
 
 	if (rev) {
-		while ((v = prev_bit(v)) != EMPTY_ELEM) {
+		while ((v = prev_bit(v)) != BBObject::noBit) {
 			lv[size++] = v;
 		}
 	}
 	else {
-		while ((v = next_bit(v)) != EMPTY_ELEM) {
+		while ((v = next_bit(v)) != BBObject::noBit) {
 			lv[size++] = v;
 		}
 	}
@@ -408,7 +408,7 @@ int find_first_common(const BitSet& lhs, const BitSet& rhs) {
 		}
 	}
 
-	return EMPTY_ELEM;		//disjoint
+	return BBObject::noBit;		//disjoint
 }
 
 int find_first_common_block(int firstBlock, int lastBlock, const BitSet& lhs, const BitSet& rhs) {
@@ -426,7 +426,7 @@ int find_first_common_block(int firstBlock, int lastBlock, const BitSet& lhs, co
 		}
 	}
 
-	return EMPTY_ELEM;		//disjoint
+	return BBObject::noBit;		//disjoint
 }
 
 /////////////////

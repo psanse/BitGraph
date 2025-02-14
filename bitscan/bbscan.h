@@ -63,7 +63,7 @@ virtual	int init_scan				(scan_types sc);
 	* @brief Configures the initial block and bit position for bitscanning
 	*		 starting from the bit 'firstBit' onwards, excluding 'firstBit'
 	*		 according to one of the 4 scan types passed as argument.
-	*		 If firstBit is -1 (EMPTY_ELEM), the scan starts from the beginning.
+	*		 If firstBit is -1 (BBObject::noBit), the scan starts from the beginning.
 	* @param firstBit: starting bit
 	* @param sc: type of scan
 	* @returns 0 if successful, -1 otherwise
@@ -84,7 +84,7 @@ virtual	int init_scan				(scan_types sc);
 	*		II. erases the current scanned bit
 	*		III. First call requires initialization with init_scan(DESTRUCTIVE)
 	* 
-	* @returns the next bit in the bitstring, EMPTY_ELEM if there are no more bits
+	* @returns the next bit in the bitstring, BBObject::noBit if there are no more bits
 	* @details Created   23/3/12, last update 09/02/2025
 	**/
 virtual inline int next_bit_del		(); 	
@@ -104,7 +104,7 @@ virtual inline int next_bit_del		();
 	* 
 	* @param bitset: bitblock where the scanned bit is erased
 	* @param block: output parameter with the current bitblock
-	* @returns the next bit in the bitstring, EMPTY_ELEM if there are no more bits
+	* @returns the next bit in the bitstring, BBObject::noBit if there are no more bits
 	**/
 virtual inline int next_bit_del		( BBScan& bitset); 	 
 
@@ -118,7 +118,7 @@ virtual inline int next_bit_del		( BBScan& bitset);
 	*		III. caches the scanned bit for the next call
 	* 		IV. First call requires initialization with init_scan(NON-DESTRUCTIVE)
 	*
-	* @returns the next bit in the bitstring, EMPTY_ELEM if there are no more bits
+	* @returns the next bit in the bitstring, BBObject::noBit if there are no more bits
 	* @details Created   23/3/12, last update 09/02/2025
 	* @details Since the scan does not delete the scanned bit from the bitstring,
 	*		   it has to cache the last scanned bit for the next call
@@ -138,7 +138,7 @@ virtual inline int next_bit			()  ;
 	* 		IV. First call requires initialization with init_scan(NON-DESTRUCTIVE)
 	*
 	* @param bitset: bitblock where the scanned bit is erased
-	* @returns the next bit in the bitstring, EMPTY_ELEM if there are no more bits
+	* @returns the next bit in the bitstring, BBObject::noBit if there are no more bits
 	* @details Created   23/3/12, last update 09/02/2025
 	* @details Since the scan does not delete the scanned bit from the bitstring,
 	*		   it has to cache the last scanned bit for the next call
@@ -157,7 +157,7 @@ virtual	inline int next_bit			( BBScan& bitset);
 	*		II. caches the scanned bit for the next call
 	* 		III. First call requires initialization with init_scan(NON-DESTRUCTIVE, REVERSE)
 	*
-	* @returns the next lsb bit in the bitstring, EMPTY_ELEM if there are no more bits
+	* @returns the next lsb bit in the bitstring, BBObject::noBit if there are no more bits
 	* @details Created   23/3/12, last update 09/02/2025
 	* @details Since the scan does not delete the scanned bit from the bitstring,
 	*		   it has to cache the last scanned bit for the next call
@@ -175,7 +175,7 @@ virtual	 inline int prev_bit			(BBScan& bitset);
 	*		II. erases the current scanned bit
 	* 		III. First call requires initialization with init_scan(DESTRUCTIVE, REVERSE)
 	*
-	* @returns the next lsb bit in the bitstring, EMPTY_ELEM if there are no more bits
+	* @returns the next lsb bit in the bitstring, BBObject::noBit if there are no more bits
 	* @details Created   23/3/12, last update 09/02/2025
 	**/
  virtual inline int prev_bit_del	(); 
@@ -195,7 +195,7 @@ virtual	 inline int prev_bit			(BBScan& bitset);
 	* 
 	* @param block: output bitblock of the retrieved bit
 	* @param bitset: bitset from which the retrieved bit is erased
-	* @returns the next lsb bit in the bitstring, EMPTY_ELEM if there are no more bits
+	* @returns the next lsb bit in the bitstring, BBObject::noBit if there are no more bits
 	* @details Created   23/3/12, last update 09/02/2025
 	**/
  virtual inline int prev_bit_del				( BBScan& bitset);
@@ -231,7 +231,7 @@ int BBScan::next_bit_del() {
 
 	}
 	
-	return EMPTY_ELEM;  
+	return BBObject::noBit;  
 }
 
 
@@ -257,7 +257,7 @@ int BBScan::next_bit_del( BBScan& bbN_del) {
 		}
 	}
 	
-	return EMPTY_ELEM;  
+	return BBObject::noBit;  
 }
 
 inline
@@ -288,7 +288,7 @@ int BBScan::next_bit() {
 		}
 	}
 	
-	return EMPTY_ELEM;
+	return BBObject::noBit;
 }
 
 
@@ -332,7 +332,7 @@ int BBScan::next_bit( BBScan& bitset) {
 		}
 	}
 
-	return EMPTY_ELEM;
+	return BBObject::noBit;
 }
 
 inline
@@ -364,7 +364,7 @@ int BBScan::prev_bit		() {
 		}
 	}
 	
-	return EMPTY_ELEM;
+	return BBObject::noBit;
 }
 
 inline int BBScan::prev_bit(BBScan& bitset)
@@ -403,7 +403,7 @@ inline int BBScan::prev_bit(BBScan& bitset)
 		}
 	}
 
-	return EMPTY_ELEM;
+	return BBObject::noBit;
 }
 
 
@@ -425,7 +425,7 @@ int BBScan::prev_bit_del() {
 			return (posInBB+WMUL(i));
 		}
 	}
-	return EMPTY_ELEM;  
+	return BBObject::noBit;  
 }
 
 
@@ -455,7 +455,7 @@ int BBScan::prev_bit_del( BBScan& bitset) {
 		}
 	}
 
-	return EMPTY_ELEM;
+	return BBObject::noBit;
 }
 
 inline
@@ -487,7 +487,7 @@ int BBScan::init_scan(scan_types sct){
 inline
 int BBScan::init_scan (int firstBit, scan_types sct){
 
-	if (firstBit == EMPTY_ELEM) {
+	if (firstBit == BBObject::noBit) {
 		init_scan(sct);
 	}
 	else{

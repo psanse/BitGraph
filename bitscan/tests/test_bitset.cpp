@@ -345,7 +345,10 @@ TEST(BitSetClass, population_count){
 	//same bit index
 	EXPECT_EQ(1, bb.size(10, 10));
 	EXPECT_EQ(1, bb.size(20, 20));
+
 }
+
+
 
 TEST(BitSetClass, to_vector) {
 
@@ -575,23 +578,24 @@ TEST(BitSetClass, find_single_bit_intersection){
 
 
 TEST(BitSetClass, is_singleton){
-///////////////////////
-// Determines if there is 0 or 1 bit in a range,
-// both included
- 
+
 	BitSet bb(130);
-	bb.set_bit(62); bb.set_bit(63); bb.set_bit(64);
-	EXPECT_EQ(0,bb.is_singleton(10, 20));
-	EXPECT_EQ(1,bb.is_singleton(60, 62));
-	EXPECT_EQ(-1,bb.is_singleton(62, 64));
-	EXPECT_NE(0,bb.is_singleton(64, 65));
-	EXPECT_EQ(-1, bb.is_singleton(63, 64));
+	bb.set_bit(62);
+	bb.set_bit(63);
+	bb.set_bit(64);
+
+	EXPECT_EQ(0,bb.is_singleton(10, 20));			//no 1-bit in the range
+	EXPECT_EQ(1, bb.is_singleton(60, 62));
+	EXPECT_EQ(-1, bb.is_singleton(62, 64));			//more than one 1-bit in the range
+	EXPECT_NE(0, bb.is_singleton(64, 65));
+	EXPECT_EQ(-1, bb.is_singleton(63, 64));			//more than one 1-bit in the range
 	EXPECT_EQ(1, bb.is_singleton(64, 65));
 
 	bb.erase_bit(64);
-	EXPECT_EQ(0, bb.is_singleton(64, 65));
+	EXPECT_EQ(0, bb.is_singleton(64, 65));			//no 1-bit in the range
 
 }
+
 
 TEST(BitSetClass, find_first_common_bit){
 //////////////////////
@@ -926,6 +930,9 @@ TEST_F(BitSetClassTest_1, operators) {
 	EXPECT_TRUE(bb.is_bit(100));
 	
 }
+
+
+
 
 
 ////////////////////////
