@@ -29,6 +29,23 @@ using namespace std;
 class BBScan: public BitSet{
 public:
 
+	template <class U>
+	friend class BBObject::Scan;
+	template <class U>
+	friend class BBObject::ScanDest;
+	template <class U>
+	friend class BBObject::ScanRev;
+	template <class U>
+	friend class BBObject::ScanDestRev;
+
+public:
+
+	//aliases for bitscanning 
+	using scan = typename BBObject::Scan<BBScan>;
+	using scanR = typename BBObject::ScanRev<BBScan>;
+	using scanD = typename BBObject::ScanDest<BBScan>;
+	using scanDR = typename BBObject::ScanDestRev<BBScan>;
+
 //////////////////////////////
 //construction / destruction
 	

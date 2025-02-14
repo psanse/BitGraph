@@ -1,37 +1,38 @@
 /**
 * @file test_bbscan_external.cpp
-* @brief unit tests for efficient bitscanning implemented as an external feature
+* @brief unit tests for efficient bitscanning implemented with nested scanning classes as wrappers
 * @details created 10/02/2025, last_update 12/02/2025
 **/
 
 #include "bitscan/bbset.h"
+#include "bitscan/bbscan.h"
 #include "gtest/gtest.h"
 #include <iostream>
 #include <vector>
 
 using namespace std;
 
-class BitScanInternalTest : public ::testing::Test {
+class BitScanNestedTest : public ::testing::Test {
 protected:
-	BitScanInternalTest() :bb(65) {}
+	BitScanNestedTest() :bb(65) {}
 	virtual void SetUp() {
 		bb.set_bit(0);
 		bb.set_bit(1);
 		bb.set_bit(64);
 	}
 
-	BitSet bb;
+	BBScan bb;
 };
 	
 //tests the 4 types of scanning
-TEST_F(BitScanInternalTest, basic) {
+TEST_F(BitScanNestedTest, basic) {
 		
 	int bit = BBObject::noBit;
 	std::vector<int> lbits;
 	std::vector<int> lbits_exp;
 
 	//direct scanning
-	BitSet::scan sc1(bb);
+	BBScan::scan sc1(bb);
 	bit = BBObject::noBit;
 	while ((bit = sc1.next_bit()) != BBObject::noBit) {
 		lbits.emplace_back(bit);
@@ -43,7 +44,7 @@ TEST_F(BitScanInternalTest, basic) {
 	//////////////////////////////
 
 	//direct reverse scanning
-	BitSet::scanR sc2(bb);
+	BBScan::scanR sc2(bb);
 	bit = BBObject::noBit;
 
 	lbits.clear();
@@ -57,7 +58,7 @@ TEST_F(BitScanInternalTest, basic) {
 	//////////////////////////////
 	
 	//destructive scanning
-	BitSet::scanD sc3(bb);
+	BBScan::scanD sc3(bb);
 	bit = BBObject::noBit;
 
 	lbits.clear();
@@ -77,7 +78,7 @@ TEST_F(BitScanInternalTest, basic) {
 	bb.set_bit(64);
 
 	//destructive reverse scanning
-	BitSet::scanDR sc4(bb);
+	BBScan::scanDR sc4(bb);
 	bit = BBObject::noBit;
 
 	lbits.clear();
@@ -95,14 +96,14 @@ TEST_F(BitScanInternalTest, basic) {
 
 //tests the 2 types of non-destructive scanning
 //note: destructive scans cannot fix the initial bit, for efficiency reasons
-TEST_F(BitScanInternalTest, firstBit) {
+TEST_F(BitScanNestedTest, firstBit) {
 
 	int bit = BBObject::noBit;
 	std::vector<int> lbits;
 	std::vector<int> lbits_exp;
 
 	//direct scanning
-	BitSet::scan sc1(bb, 10);
+	BBScan::scan sc1(bb, 10);
 	bit = BBObject::noBit;
 	while ((bit = sc1.next_bit()) != BBObject::noBit) {
 		lbits.emplace_back(bit);
@@ -114,7 +115,7 @@ TEST_F(BitScanInternalTest, firstBit) {
 	//////////////////////////////
 
 	//direct reverse scanning
-	BitSet::scanR sc2(bb, 10);
+	BBScan::scanR sc2(bb, 10);
 	bit = BBObject::noBit;
 
 	lbits.clear();
@@ -129,7 +130,7 @@ TEST_F(BitScanInternalTest, firstBit) {
 
 }
 
-TEST_F(BitScanInternalTest, block_info) {
+TEST_F(BitScanNestedTest, block_info) {
 
 	int bit = BBObject::noBit;
 	std::vector<int> lblocks;
@@ -137,7 +138,7 @@ TEST_F(BitScanInternalTest, block_info) {
 
 
 	//direct scanning
-	BitSet::scan sc1(bb);	
+	BBScan::scan sc1(bb);	
 	bit = BBObject::noBit;
 	while ((bit = sc1.next_bit()) != BBObject::noBit) {
 		lblocks.push_back(sc1.get_block());
@@ -150,20 +151,20 @@ TEST_F(BitScanInternalTest, block_info) {
 
 }
 
-TEST_F(BitScanInternalTest, delete_additional_bitstring) {
+TEST_F(BitScanNestedTest, delete_additional_bitstring) {
 
 	int bit = BBObject::noBit;
 	std::vector<int> lblocks;
 	std::vector<int> lblocks_exp;
 
-	BitSet bb_del(65);
+	BBScan bb_del(65);
 	bb_del.set_bit(0);
 	bb_del.set_bit(3);
 	bb_del.set_bit(10);
 
 
 	//direct scanning
-	BitSet::scan sc1(bb);
+	BBScan::scan sc1(bb);
 	bit = BBObject::noBit;
 	while ((bit = sc1.next_bit(bb_del)) != BBObject::noBit) { ; }
 	
@@ -174,7 +175,7 @@ TEST_F(BitScanInternalTest, delete_additional_bitstring) {
 	//////////////////////////////
 
 	//reverse scanning
-	BitSet::scanR sc2(bb);
+	BBScan::scanR sc2(bb);
 	bit = BBObject::noBit;
 	while ((bit = sc2.next_bit(bb_del)) != BBObject::noBit) { ; }
 
@@ -185,7 +186,7 @@ TEST_F(BitScanInternalTest, delete_additional_bitstring) {
 	//////////////////////////////
 
 	//destructive scanning
-	BitSet::scanD sc3(bb);
+	BBScan::scanD sc3(bb);
 	bit = BBObject::noBit;
 	while ((bit = sc3.next_bit(bb_del)) != BBObject::noBit) { ; }
 
@@ -197,7 +198,7 @@ TEST_F(BitScanInternalTest, delete_additional_bitstring) {
 
 
 	//destructive reverse scanning
-	BitSet::scanDR sc4(bb);
+	BBScan::scanDR sc4(bb);
 	bit = BBObject::noBit;
 	while ((bit = sc4.next_bit(bb_del)) != BBObject::noBit) { ; }
 

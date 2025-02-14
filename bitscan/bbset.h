@@ -36,7 +36,7 @@ using vbset  = std::vector<BITBOARD>;
 ///////////////////////////////////
 class BitSet:public BBObject{
 			
-	friend class bscan;
+	//friend class bscan;
 
 	template <class U>
 	friend class BBObject::Scan;
