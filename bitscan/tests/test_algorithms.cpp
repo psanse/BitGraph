@@ -1,21 +1,26 @@
-//test_algorithms.cpp: tests for bitstring algs implemented in bbalg.h
-//date_of_creation: 28/3/17
+/**
+* @file test_algorithms.cpp
+* @brief Unit tests for the bitstring algorithms and data strcutures in bbalgorithm.h
+* @details created 28/3/17, last_update 14/02/2025
+* @detials added while working on the MWCP algorithm
+* @author pss
+**/
 
+#include "bitscan/bbalgorithm.h"				
+#include "bitscan/bbscan.h"
+#include "gtest/gtest.h"
 #include <algorithm>
 #include <iterator>
 #include <iostream>
-#include <set>
-
-#include "../bitscan.h"				//bit string library
-#include "gtest/gtest.h"
-#include "utils/logger.h"
 
 using namespace std;
-typedef vector<int> vint;
+
+//aliases
+using vint = vector<int>;
 
 TEST(stack_state, DISABLED_basic){
-	LOG_INFO("stack_state::basic---------------------------------------------");
-	sbb_t<bitarray> s;
+	
+	sbb_t<BBScan> s;
 	s.init(65);
 	s.push(10);
 	s.push(64);
@@ -37,12 +42,12 @@ TEST(stack_state, DISABLED_basic){
 	EXPECT_EQ(2, s.get_size());
 	s.print(); 
 
-	LOG_INFO("------------------------------------------------------------------");
+	
 }
 
 TEST(bb_t, DISABLED_basic){
-	LOG_INFO("bb_t::basic-------------------------------------------------------");
-	bb_t<bitarray> b;
+	
+	bb_t<BBScan> b;
 	b.init(65);
 /*	b.push(10);
 	b.push(64);
@@ -82,13 +87,13 @@ TEST(bb_t, DISABLED_basic){
 
 	b.print(); cout<<endl;
 
-	LOG_INFO("------------------------------------------------------------------");
+	
 }
 
 TEST(bba_t, basic){
 //date: 9/8/17 for MWCP upper bound computation
-	LOG_INFO("bba_t::basic-------------------------------------------------------");
-	bba_t<bitarray> b;
+	
+	bba_t<BBScan> b;
 		
 	b.init(10, 65);
 	b.set_bit(0,10);
@@ -116,15 +121,14 @@ TEST(bba_t, basic){
 
 	EXPECT_TRUE(b.is_bit(0,10));
 	EXPECT_EQ(1, b.capacity);
-			
-	LOG_INFO("------------------------------------------------------------------");
+	
 }
 
 TEST(k_bits, basic){
 //date: 18/8/17 during MWCP upper bound computation
-	LOG_INFO("bba_t::basic-------------------------------------------------------");
+	
 
-	bitarray bb(100);
+	BBScan bb(100);
 	
 	bb.set_bit(10);
 	bb.set_bit(64);
@@ -144,5 +148,4 @@ TEST(k_bits, basic){
 	copy(cbits, cbits+3,back_inserter(vbits));
 	EXPECT_EQ(sol, vbits);
 	
-	LOG_INFO("------------------------------------------------------------------");
 }
