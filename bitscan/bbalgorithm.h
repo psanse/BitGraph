@@ -1,23 +1,9 @@
-/*  
- * bbalg.h file from the BITSCAN library, a C++ library for bit set
- * optimization. BITSCAN has been used to implement BBMC, a very
- * succesful bit-parallel algorithm for exact maximum clique. 
- * (see license file for references)
- *
- * Copyright (C)
- * Author: Pablo San Segundo
- * Intelligent Control Research Group (CSIC-UPM) 
- *
- * Permission to use, modify and distribute this software is
- * granted provided that this copyright notice appears in all 
- * copies, in source code or in binaries. For precise terms 
- * see the accompanying LICENSE file.
- *
- * This software is provided "AS IS" with no warranty of any 
- * kind, express or implied, and with no claim as to its
- * suitability for any purpose.
- *
- */
+ /**
+  * @file bbalgorithm.h
+  * @brief header for the algorithms and data structures for bitstrings and bitblocks
+  * @author pss
+  * @details created ?, @last_update 14/02/2025
+  **/
 
 #ifndef  __BBALG_H__
 #define  __BBALG_H__

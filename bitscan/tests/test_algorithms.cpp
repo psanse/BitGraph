@@ -93,8 +93,7 @@ TEST(bb_t, DISABLED_basic){
 TEST(bba_t, basic){
 //date: 9/8/17 for MWCP upper bound computation
 	
-	bba_t<BBScan> b;
-		
+	bba_t<BBScan> b;		
 	b.init(10, 65);
 	b.set_bit(0,10);
 	b.set_bit(0,64);
@@ -127,9 +126,7 @@ TEST(bba_t, basic){
 TEST(k_bits, basic){
 //date: 18/8/17 during MWCP upper bound computation
 	
-
-	BBScan bb(100);
-	
+	BBScan bb(100);	
 	bb.set_bit(10);
 	bb.set_bit(64);
 	bb.set_bit(65);
