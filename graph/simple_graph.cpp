@@ -598,7 +598,7 @@ BITBOARD Graph<T>::number_of_edges	(bool lazy) {
 	if (!lazy || NE_ == 0) {					//no lazy evaluation if NE_ = 0
 		NE_ = 0;
 		for (std::size_t i = 0; i < NV_; i++) {
-			NE_ += adj_[i].popcn64();			
+			NE_ += adj_[i].size();			
 		}
 	}
 	
@@ -651,10 +651,10 @@ bool Graph<T>::is_self_loop () const{
 }
 
 template<class T>
-void Graph<T>::remove_vertices (const BitBoardN& bbn, Graph& g){
+void Graph<T>::remove_vertices (const BitSet& bbn, Graph& g){
 
 	//determine the size of the graph g
-	int pc = bbn.popcn64();
+	int pc = bbn.size();
 	int new_size= NV_ - pc;
 
 	if (new_size <= 0) {
@@ -690,7 +690,7 @@ void Graph<T>::remove_vertices (const BitBoardN& bbn, Graph& g){
 }
 
 //template<class T>
-//void Graph<T>::remove_vertices (const BitBoardN& bbn){
+//void Graph<T>::remove_vertices (const BitSet& bbn){
 /////////////////
 //// Experimental: deletes input list of nodes by creating a temporal graph
 ////
@@ -869,7 +869,7 @@ void  Graph<T>::write_EDGES	(ostream& o){
 //
 //	BITBOARD  edges = 0;
 //	for (int i = 0; i < NV_; i++) {
-//		edges += adj_[i].popcn64();
+//		edges += adj_[i].size();
 //	}
 //	NE_ = edges;
 //

@@ -125,6 +125,7 @@ private:
 public:	
 /////////////////
 // Popcount
+		inline   int size			()						const			{ return popcn64(); }
 virtual inline	 int popcn64		()						const;			//lookup 
 virtual inline	 int popcn64		(int nBit)				const;			
 

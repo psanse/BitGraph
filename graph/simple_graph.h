@@ -192,7 +192,7 @@ virtual	double density					(bool lazy=true);
 	* @brief number of outgoing edges from v
 	* @param v input vertex
 	*/
-	int degree_out						(int v)					const { return adj_[v].popcn64(); }
+	int degree_out						(int v)					const { return adj_[v].size(); }
 	
 	/*
 	* @brief number edges incident to v
@@ -278,11 +278,11 @@ virtual	Graph& create_subgraph			(std::size_t first_k, Graph& g) const;
 	* @param set input set of vertices
 	* @param g ouptut induced subgraph
 	*/
-	void remove_vertices				(const BitBoardN& set, Graph& g);
+	void remove_vertices				(const BitSet& set, Graph& g);
 
 //////////////	
 // deleted - CHECK	
-	virtual void remove_vertices		(const BitBoardN& set) = delete;	//commented out implementation - EXPERIMENTAL
+	virtual void remove_vertices		(const BitSet& set) = delete;	//commented out implementation - EXPERIMENTAL
 	
 /////////////
 // Boolean properties

@@ -1,18 +1,19 @@
-// BitBoardN.cpp: implementation of the BitBoardN class.
-//
-//////////////////////////////////////////////////////////////////////
+/**
+ * @file bbset.cpp file
+ * @brief implementation of the BitSet class for non-sparsearrays of bit
+ * @author pss
+ **/
 
-#include "bitboardn.h"
+#include "bbset.h"
 #include <iostream>
 #include <sstream>
 #include <algorithm>
 #include <cstdio>
 #include <utils/logger.h>
-
  
 using namespace std;
 
-BitBoardN&  AND (const BitBoardN& lhs, const BitBoardN& rhs,  BitBoardN& res){
+BitSet&  AND (const BitSet& lhs, const BitSet& rhs,  BitSet& res){
 
 	for(auto i = 0; i < lhs.nBB_; ++i){
 		res.vBB_[i] = lhs.vBB_[i] & rhs.vBB_[i];
@@ -21,8 +22,7 @@ BitBoardN&  AND (const BitBoardN& lhs, const BitBoardN& rhs,  BitBoardN& res){
 	return res;
 }
 
-
-BitBoardN&  OR	(const BitBoardN& lhs, const BitBoardN& rhs,  BitBoardN& res){
+BitSet&  OR	(const BitSet& lhs, const BitSet& rhs,  BitSet& res){
 
 	for(auto i = 0; i < lhs.nBB_; ++i){
 		res.vBB_[i] = lhs.vBB_[i] | rhs.vBB_[i];
@@ -32,59 +32,10 @@ BitBoardN&  OR	(const BitBoardN& lhs, const BitBoardN& rhs,  BitBoardN& res){
 }
 
 
-BitBoardN&  OR (int from, const BitBoardN& lhs, const BitBoardN& rhs,  BitBoardN& res){
 
-	int first_block = WDIV(from);
 
-	for(auto i = 0; i < first_block; ++i){
-		res.vBB_[i]=lhs.vBB_[i];
-	}
-		
-	for(auto i = first_block + 1; i < lhs.nBB_; ++i){
-		res.vBB_[i] = rhs.vBB_[i] | lhs.vBB_[i];
-	}		
 
-	//special case-first block
-	res.vBB_[first_block] = lhs.vBB_[first_block] | ( rhs.vBB_[first_block] & ~Tables::mask_low[from - WMUL(first_block)] );
-	
-	return res;
-}
-
-BitBoardN&  OR(int v, bool from, const BitBoardN& lhs, const BitBoardN& rhs, BitBoardN& res) {
-	
-	
-	int nBB = WDIV(v);
-	int pos = WMOD(v);
-
-	if (from) {
-		for (auto i = 0; i < nBB; i++) {
-			res.vBB_[i] = lhs.vBB_[i];
-		}
-		for (auto i = nBB + 1; i < lhs.nBB_; i++) {
-			res.vBB_[i] = lhs.vBB_[i] | rhs.vBB_[i];
-		}
-
-		//critical block
-		res.vBB_[nBB] = lhs.vBB_[nBB] | (rhs.vBB_[nBB] & ~Tables::mask_low[pos]);
-
-	}
-	else {
-		for (auto i = nBB+1; i < lhs.nBB_; i++) {
-			res.vBB_[i] = lhs.vBB_[i];
-		}
-
-		for (auto i = 0; i < nBB; i++) {
-			res.vBB_[i] = lhs.vBB_[i] | rhs.vBB_[i];
-		}
-
-		//critical block
-		res.vBB_[nBB] = lhs.vBB_[nBB] | (rhs.vBB_[nBB] & ~Tables::mask_high[pos]);
-	}
-		
-	return res;
-}
-
-//BitBoardN AND_block(int firstBlock, int lastBlock, BitBoardN lhs, const BitBoardN& rhs)
+//BitSet AND_block(int firstBlock, int lastBlock, BitSet lhs, const BitSet& rhs)
 //{
 //	////////////////////////////////////////////////////////////////////
 //	//assert((firstBlock >= 0) && (LastBlock < lhs.nBB_) &&
@@ -108,38 +59,9 @@ BitBoardN&  OR(int v, bool from, const BitBoardN& lhs, const BitBoardN& rhs, Bit
 //	//return lhs;
 //}
 
-int* AND (int lastBit, const BitBoardN& lhs, const BitBoardN& rhs, int bitset[], int& size){
-
-	BITBOARD bb;
-	int offset;
-	size = 0;
-	int nbb = WDIV(lastBit);
-
-	for(auto i = 0; i < nbb; ++i){
-		bb = rhs.vBB_[i] & lhs.vBB_[i];
-		offset = WMUL(i);
-
-		while(bb){
-			int v = bblock::lsb64_intrinsic(bb);
-			bitset[size++] = offset + v;
-			bb ^= Tables::mask[v];
-		}
-
-	}
-
-	//trim last
-	bb = rhs.vBB_[nbb] & lhs.vBB_[nbb] & Tables::mask_low[WMOD(lastBit)];
-	while(bb){
-		int v = bblock::lsb64_intrinsic(bb);
-		bitset[size++] = WMUL(nbb) + v;
-		bb ^= Tables::mask[v];
-	}
-
-	return bitset;
-}
 
 
-BitBoardN&  erase_bit(const BitBoardN& lhs, const BitBoardN& rhs,  BitBoardN& res){
+BitSet&  erase_bit(const BitSet& lhs, const BitSet& rhs,  BitSet& res){
 
 
 	for(auto i = 0; i < lhs.nBB_; ++i){
@@ -153,7 +75,7 @@ BitBoardN&  erase_bit(const BitBoardN& lhs, const BitBoardN& rhs,  BitBoardN& re
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
-BitBoardN::BitBoardN(int popsize) :
+BitSet::BitSet(int popsize) :
 	nBB_(INDEX_1TO1(popsize))
 {
 	
@@ -161,15 +83,15 @@ BitBoardN::BitBoardN(int popsize) :
 		vBB_.resize(nBB_, 0);
 	}
 	catch (...) {
-		LOG_ERROR("Error during construction - BitBoardN::BitBoardN");
+		LOG_ERROR("Error during construction - BitSet::BitSet");
 		LOG_ERROR("exiting...");
 		std::exit(-1);
 	}
 }
 
 
-BitBoardN::BitBoardN(const vint& v):
-	nBB_(EMPTY_ELEM)
+BitSet::BitSet(const vint& v):
+	nBB_(BBObject::noBit)
 {
 	try {
 		nBB_ = INDEX_0TO1(*(max_element(v.begin(), v.end())));
@@ -186,13 +108,13 @@ BitBoardN::BitBoardN(const vint& v):
 		}
 	}
 	catch (...) {
-		LOG_ERROR("Error during construction - BitBoardN::BitBoardN()");
+		LOG_ERROR("Error during construction - BitSet::BitSet()");
 		LOG_ERROR("exiting...");
 		std::exit(-1);
 	}
 }
 
-BitBoardN::BitBoardN (int popsize, const vint& lv):
+BitSet::BitSet (int popsize, const vint& lv):
 	nBB_(INDEX_1TO1(popsize))
 {
 
@@ -213,27 +135,27 @@ BitBoardN::BitBoardN (int popsize, const vint& lv):
 
 	}
 	catch (...) {
-		LOG_ERROR("Error during construction - BitBoardN::BitBoardN()");
+		LOG_ERROR("Error during construction - BitSet::BitSet()");
 		LOG_ERROR("exiting...");
 		std::exit(-1);
 	}
 }
 
-void BitBoardN::init(int popsize) {
+void BitSet::init(int popsize) {
 
 	try {
 		nBB_ = INDEX_1TO1(popsize);
 		vBB_.resize(nBB_, 0);
 	}
 	catch (...) {
-		LOG_ERROR("Error during allocation - BitBoardN::init");
+		LOG_ERROR("Error during allocation - BitSet::init");
 		LOG_ERROR("exiting...");
 		std::exit(-1);
 	}
 
 }
 
-void BitBoardN::init(int popsize, const vint& lv){
+void BitSet::init(int popsize, const vint& lv){
 		
 	try {
 		nBB_ = INDEX_1TO1(popsize); 
@@ -252,26 +174,26 @@ void BitBoardN::init(int popsize, const vint& lv){
 		}
 	}
 	catch (...) {
-		LOG_ERROR("Error during allocation - BitBoardN::init");
+		LOG_ERROR("Error during allocation - BitSet::init");
 		LOG_ERROR("exiting...");
 		std::exit(-1);
 	}	
 }
 
-void BitBoardN::reset(int popsize) {
+void BitSet::reset(int popsize) {
 
 	try {
 		nBB_ = INDEX_1TO1(popsize);
 		vBB_.resize(nBB_, 0);
 	}
 	catch (...) {
-		LOG_ERROR("Error during allocation - BitBoardN::reset");
+		LOG_ERROR("Error during allocation - BitSet::reset");
 		LOG_ERROR("exiting...");
 		std::exit(-1);
 	}
 
 }
-void BitBoardN::reset(int popsize, const vint& lv) {
+void BitSet::reset(int popsize, const vint& lv) {
 
 	try {
 		nBB_ = INDEX_1TO1(popsize);
@@ -290,7 +212,7 @@ void BitBoardN::reset(int popsize, const vint& lv) {
 		}
 	}
 	catch (...) {
-		LOG_ERROR("Error during allocation - BitBoardN::reset");
+		LOG_ERROR("Error during allocation - BitSet::reset");
 		LOG_ERROR("exiting...");
 		std::exit(-1);
 	}
@@ -304,7 +226,7 @@ void BitBoardN::reset(int popsize, const vint& lv) {
 // (size is determined by *this)
 /////////////////////////
 
-BitBoardN& BitBoardN::operator &=	(const BitBoardN& bbn){
+BitSet& BitSet::operator &=	(const BitSet& bbn){
 
 	for (auto i = 0; i < nBB_; ++i) {
 		vBB_[i] &= bbn.vBB_[i];
@@ -313,7 +235,7 @@ BitBoardN& BitBoardN::operator &=	(const BitBoardN& bbn){
 	return *this;
 }
 
-BitBoardN& BitBoardN::operator |=	(const BitBoardN& bbn){
+BitSet& BitSet::operator |=	(const BitSet& bbn){
 	
 	for (auto i = 0; i < nBB_; ++i) {
 		vBB_[i] |= bbn.vBB_[i];
@@ -322,7 +244,7 @@ BitBoardN& BitBoardN::operator |=	(const BitBoardN& bbn){
 	return *this;
 }
 
-BitBoardN& BitBoardN::operator ^=	(const BitBoardN& bbn) {
+BitSet& BitSet::operator ^=	(const BitSet& bbn) {
 	
 	for (auto i = 0; i < nBB_; ++i) {
 		vBB_[i] ^= bbn.vBB_[i];
@@ -332,7 +254,7 @@ BitBoardN& BitBoardN::operator ^=	(const BitBoardN& bbn) {
 }
 
 
-BitBoardN& BitBoardN::flip (){
+BitSet& BitSet::flip (){
 
 	for (auto i = 0; i < nBB_; ++i) {
 		vBB_[i] = ~vBB_[i];
@@ -341,7 +263,7 @@ BitBoardN& BitBoardN::flip (){
 	return *this;
 }
 
-BitBoardN& BitBoardN::flip_block(int firstBlock, int lastBlock)
+BitSet& BitSet::flip_block(int firstBlock, int lastBlock)
 {
 	
 	///////////////////////////////////////////////////////////////////////////////////
@@ -368,13 +290,13 @@ BitBoardN& BitBoardN::flip_block(int firstBlock, int lastBlock)
 //
 //////////////////////////
 
-std::ostream& BitBoardN::print(std::ostream& o, bool show_pc, bool endl ) const
+std::ostream& BitSet::print(std::ostream& o, bool show_pc, bool endl ) const
 {
 	o << "[";
 	
 	//scans de bitstring and serializes it to the output stream
-	int nBit = EMPTY_ELEM;
-	while( (nBit = next_bit(nBit)) != EMPTY_ELEM ){
+	int nBit = BBObject::noBit;
+	while( (nBit = next_bit(nBit)) != BBObject::noBit ){
 		o << nBit << " ";
 	}
 
@@ -392,7 +314,7 @@ std::ostream& BitBoardN::print(std::ostream& o, bool show_pc, bool endl ) const
 	return o;
 }
 
-string BitBoardN::to_string ()
+string BitSet::to_string ()
 {
 	ostringstream sstr;
 
@@ -401,8 +323,8 @@ string BitBoardN::to_string ()
 	/*sstr << "[";
 
 	this->print();
-	int nBit = EMPTY_ELEM;
-	while ((nBit = next_bit(nBit)) != EMPTY_ELEM) {
+	int nBit = BBObject::noBit;
+	while ((nBit = next_bit(nBit)) != BBObject::noBit) {
 		sstr << nBit << " ";
 	}
 
@@ -413,52 +335,52 @@ string BitBoardN::to_string ()
 }
 
 
-void BitBoardN::to_vector (vint& lv ) const {
+void BitSet::to_vector (vint& lv ) const {
 
 	lv.clear();
 	lv.reserve(popcn64());		
 
-	int v = EMPTY_ELEM;
-	while( (v = next_bit(v)) != EMPTY_ELEM){
+	int v = BBObject::noBit;
+	while( (v = next_bit(v)) != BBObject::noBit){
 		lv.emplace_back(v);
 	}
 }
 
-BitBoardN::operator vint() const {
+BitSet::operator vint() const {
 	vint result;
 	to_vector (result);
 	return result;
 }
 
 
-void BitBoardN::to_stack(com::stack_t<int>& s)	const {
+void BitSet::to_stack(com::stack_t<int>& s)	const {
 	s.erase();
 
-	int v = EMPTY_ELEM;
-	while ((v = next_bit(v)) != EMPTY_ELEM) {
+	int v = BBObject::noBit;
+	while ((v = next_bit(v)) != BBObject::noBit) {
 		s.push(v);
 	}
 }
 
 
-int* BitBoardN::to_C_array (int* lv, std::size_t& size, bool rev) 	{
+int* BitSet::to_C_array (int* lv, std::size_t& size, bool rev) 	{
 	size = 0;
-	int v = EMPTY_ELEM;
+	int v = BBObject::noBit;
 
 	if (rev) {
-		while ((v = prev_bit(v)) != EMPTY_ELEM) {
+		while ((v = prev_bit(v)) != BBObject::noBit) {
 			lv[size++] = v;
 		}
 	}
 	else {
-		while ((v = next_bit(v)) != EMPTY_ELEM) {
+		while ((v = next_bit(v)) != BBObject::noBit) {
 			lv[size++] = v;
 		}
 	}
 	return lv;
 }
 
-BitBoardN& BitBoardN::set_bit(const vint& lv) {
+BitSet& BitSet::set_bit(const vint& lv) {
 
 	//copies elements up to the maximum capacity of the bitstring
 	auto maxPopSize = WMUL(nBB_);
@@ -477,7 +399,7 @@ BitBoardN& BitBoardN::set_bit(const vint& lv) {
 
 }
 
-int find_first_common(const BitBoardN& lhs, const BitBoardN& rhs) {
+int find_first_common(const BitSet& lhs, const BitSet& rhs) {
 
 	for (auto i = 0; i < lhs.nBB_; ++i) {
 		BITBOARD bb = lhs.vBB_[i] & rhs.vBB_[i];
@@ -486,10 +408,10 @@ int find_first_common(const BitBoardN& lhs, const BitBoardN& rhs) {
 		}
 	}
 
-	return EMPTY_ELEM;		//disjoint
+	return BBObject::noBit;		//disjoint
 }
 
-int find_first_common_block(int firstBlock, int lastBlock, const BitBoardN& lhs, const BitBoardN& rhs) {
+int find_first_common_block(int firstBlock, int lastBlock, const BitSet& lhs, const BitSet& rhs) {
 	
 	///////////////////////////////////////////////////////////////////////////////
 	assert((firstBlock >= 0) && (LastBlock < nBB_) && (firstBlock <= lastBlock));
@@ -504,29 +426,95 @@ int find_first_common_block(int firstBlock, int lastBlock, const BitBoardN& lhs,
 		}
 	}
 
-	return EMPTY_ELEM;		//disjoint
+	return BBObject::noBit;		//disjoint
 }
 
-
-
-
-
-
-
-//BitBoardN& BitBoardN::operator =  (const BitBoardN& bbN){
+/////////////////
 //
-//	if(nBB_ != bbN.nBB_){
-//		//allocates memory
-//		init(bbN.nBB_);		
+// DEPRECATED STATELESS MASKING FUNCTIONS
+//
+//////////////////
+
+//int* AND(int lastBit, const BitSet& lhs, const BitSet& rhs, int bitset[], int& size) {
+//
+//	BITBOARD bb;
+//	int offset;
+//	size = 0;
+//	int nbb = WDIV(lastBit);
+//
+//	for (auto i = 0; i < nbb; ++i) {
+//		bb = rhs.vBB_[i] & lhs.vBB_[i];
+//		offset = WMUL(i);
+//
+//		while (bb) {
+//			int v = bblock::lsb64_intrinsic(bb);
+//			bitset[size++] = offset + v;
+//			bb ^= Tables::mask[v];
+//		}
+//
 //	}
 //
-//	for (auto i = 0; i < nBB_; ++i) {
-//		vBB_[i] = bbN.vBB_[i];
+//	//trim last
+//	bb = rhs.vBB_[nbb] & lhs.vBB_[nbb] & Tables::mask_low[WMOD(lastBit)];
+//	while (bb) {
+//		int v = bblock::lsb64_intrinsic(bb);
+//		bitset[size++] = WMUL(nbb) + v;
+//		bb ^= Tables::mask[v];
 //	}
 //
-//	return *this;
+//	return bitset;
 //}
 
 
+//BitSet& OR(int from, const BitSet& lhs, const BitSet& rhs, BitSet& res) {
+//
+//	int first_block = WDIV(from);
+//
+//	for (auto i = 0; i < first_block; ++i) {
+//		res.vBB_[i] = lhs.vBB_[i];
+//	}
+//
+//	for (auto i = first_block + 1; i < lhs.nBB_; ++i) {
+//		res.vBB_[i] = rhs.vBB_[i] | lhs.vBB_[i];
+//	}
+//
+//	//special case-first block
+//	res.vBB_[first_block] = lhs.vBB_[first_block] | (rhs.vBB_[first_block] & ~Tables::mask_low[from - WMUL(first_block)]);
+//
+//	return res;
+//}
 
 
+//BitSet& OR(int v, bool from, const BitSet& lhs, const BitSet& rhs, BitSet& res) {
+//
+//
+//	int nBB = WDIV(v);
+//	int pos = WMOD(v);
+//
+//	if (from) {
+//		for (auto i = 0; i < nBB; i++) {
+//			res.vBB_[i] = lhs.vBB_[i];
+//		}
+//		for (auto i = nBB + 1; i < lhs.nBB_; i++) {
+//			res.vBB_[i] = lhs.vBB_[i] | rhs.vBB_[i];
+//		}
+//
+//		//critical block
+//		res.vBB_[nBB] = lhs.vBB_[nBB] | (rhs.vBB_[nBB] & ~Tables::mask_low[pos]);
+//
+//	}
+//	else {
+//		for (auto i = nBB + 1; i < lhs.nBB_; i++) {
+//			res.vBB_[i] = lhs.vBB_[i];
+//		}
+//
+//		for (auto i = 0; i < nBB; i++) {
+//			res.vBB_[i] = lhs.vBB_[i] | rhs.vBB_[i];
+//		}
+//
+//		//critical block
+//		res.vBB_[nBB] = lhs.vBB_[nBB] | (rhs.vBB_[nBB] & ~Tables::mask_high[pos]);
+//	}
+//
+//	return res;
+//}

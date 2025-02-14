@@ -1,3 +1,14 @@
+/**
+ * @file bbsentinel.cpp file
+ * @brief Source file of the BBSentinel class (header bbsentinel.h)
+ *		   Manages efficient bitset operations by circumscribing them to the range [low_sentinel, high_sentinel]
+ * @details The lower sentinel is the first non-zero bitblock in the bitstring
+ * @detials The higher sentinel is the last non-zero bitblock in the bitstring
+ * @details created?,  last_updated 13/02/2025
+ * @author pss
+ *
+ * TODO- EXPERIMENTAL - NOT CHECKED (13/02/2025)
+ **/
 
 #include "bbsentinel.h"
 #include <algorithm>			//std::max
@@ -5,7 +16,7 @@
 
 using namespace std;
 
-BBSentinel&  AND (const BitBoardN& lhs, const BBSentinel& rhs,  BBSentinel& res){
+BBSentinel&  AND (const BitSet& lhs, const BBSentinel& rhs,  BBSentinel& res){
 	res.m_BBL=rhs.m_BBL;
 	res.m_BBH=rhs.m_BBH;
 	for(int i=rhs.m_BBL; i<=rhs.m_BBH; i++){
@@ -154,25 +165,23 @@ void BBSentinel::update_sentinels_to_v(int v){
 }
 
 std::ostream& BBSentinel::print(std::ostream& o, bool show_pc, bool endl ) const{
-	BitBoardN::print(o, show_pc, endl);
+	BitSet::print(o, show_pc, endl);
 	o<<"("<<m_BBL<<","<<m_BBH<<")";
 
 	return o;
 }
 
-
-
 int BBSentinel::init_scan(scan_types sct){
 	switch(sct){
 	case NON_DESTRUCTIVE:
 		update_sentinels();
-		m_scan.bbi=m_BBL;
-		m_scan.pos=MASK_LIM; 
+		scan_.bbi_=m_BBL;
+		scan_.pos_=MASK_LIM; 
 		break;
 	case NON_DESTRUCTIVE_REVERSE:
 		update_sentinels();
-		m_scan.bbi=m_BBH;
-		m_scan.pos=WORD_SIZE;		//mask_right[WORD_SIZE]=ONE
+		scan_.bbi_=m_BBH;
+		scan_.pos_=WORD_SIZE;		//mask_right[WORD_SIZE]=ONE
 		break;
 	case DESTRUCTIVE:				//uses sentinels to iterate and updates them on the fly
 		update_sentinels();
@@ -200,12 +209,12 @@ void  BBSentinel::erase_bit	(){
 }
 
 
-BBSentinel& BBSentinel::erase_bit (const BitBoardN& bbn){
+BBSentinel& BBSentinel::erase_bit (const BitSet& bbn){
 //////////////////////////////
 // deletes 1-bits in bbn in current sentinel range
 // 
 // REMARKS:
-// 1.Has to be careful with BitBoardN cast to int in constructor
+// 1.Has to be careful with BitSet cast to int in constructor
 	
 	for(int i=m_BBL; i<=m_BBH; i++)
 		vBB_[i] &= ~ bbn.bitblock(i);		//**access
@@ -278,7 +287,7 @@ BBSentinel& BBSentinel::operator= (const  BBSentinel& bbs){
 
 }
 
-BBSentinel& BBSentinel::operator&=	(const  BitBoardN& bbn){
+BBSentinel& BBSentinel::operator&=	(const  BitSet& bbn){
 //////////////////
 // AND operation in the range of the sentinels
 

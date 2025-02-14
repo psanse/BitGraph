@@ -335,7 +335,7 @@ inline KCore<Graph_t>::KCore(Graph_t& g, _bbt subg): g_(g), NV_(g.number_of_vert
 	subg_ = std::move(subg);
 
 	try {
-		ver_.assign(subg_.popcn64(), EMPTY_ELEM);
+		ver_.assign(subg_.size(), EMPTY_ELEM);
 	}
 	catch (std::bad_alloc& ba) {
 		LOGG_ERROR("bad_alloc exception - KCore<T>::reset_subgraph", ba.what());
@@ -352,7 +352,7 @@ inline KCore<Graph_t>::KCore(Graph_t& g, vint set) : g_(g), NV_(g.number_of_vert
 	subg_ = _bbt(NV_, set);
 
 	try {
-		ver_.assign(subg_.popcn64(), EMPTY_ELEM);		
+		ver_.assign(subg_.size(), EMPTY_ELEM);		
 	}
 	catch (std::bad_alloc& ba) {
 		LOGG_ERROR("bad_alloc exception - KCore<T>::reset_subgraph", ba.what());
@@ -368,7 +368,7 @@ inline int KCore<Graph_t>::reset_subgraph(_bbt subg) {
 	subg_ = std::move(subg);
 
 	try {
-		ver_.assign (subg_.popcn64(), EMPTY_ELEM);		
+		ver_.assign (subg_.size(), EMPTY_ELEM);		
 	}
 	catch (std::bad_alloc& ba) {
 		LOGG_ERROR("bad_alloc exception - KCore<T>::reset_subgraph", ba.what());
@@ -800,7 +800,7 @@ inline int KCore<Graph_t>::minimum_width (bool rev){
 			bb_unsel.erase_bit(bb_sel);
 			
 			///////////////////////////////
-			numNeigh = bb_unsel.popcn64();
+			numNeigh = bb_unsel.size();
 			if (maxNumNeigh < numNeigh) { maxNumNeigh = numNeigh; }
 			////////////////////////////////
 
@@ -816,7 +816,7 @@ inline int KCore<Graph_t>::minimum_width (bool rev){
 			bb_unsel.erase_bit(bb_sel);
 			
 			///////////////////////////////
-			numNeigh = bb_unsel.popcn64();
+			numNeigh = bb_unsel.size();
 			if (maxNumNeigh < numNeigh) { maxNumNeigh = numNeigh; }
 			///////////////////////////////
 

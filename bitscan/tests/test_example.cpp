@@ -1,11 +1,12 @@
 
-#include "../bitscan.h"
+#include "bitscan/bitscan.h"			//global dependency
 #include "gtest/gtest.h"
 #include <iostream>
 
 using namespace std;
 
 TEST(Example, scanning){
+
 	vector<int> res;
 	int nBit=EMPTY_ELEM;
 	BITBOARD bbn(0x100);
@@ -34,7 +35,7 @@ TEST(Example, scanning){
 		res.push_back(nBit);
 	}
 
-	EXPECT_EQ(mysimple.popcn64(),res.size());
+	EXPECT_EQ(mysimple.size(),res.size());
 
 	//scanning from a specific position in simple_array
 	res.clear();

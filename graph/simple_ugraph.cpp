@@ -58,7 +58,7 @@ BITBOARD Ugraph<T>::number_of_edges(bool lazy) {
 
 		//adds all edges and divides by 2 for efficiency - checks for self loops	
 		for (std::size_t i = 0; i < NV_; i++) {
-			ptype::NE_ += adj_[i].popcn64();
+			ptype::NE_ += adj_[i].size();
 		}
 
 		//////////////////////////////
@@ -97,7 +97,7 @@ BITBOARD Ugraph<T>::number_of_edges(const T& bbn) const{
 }
 
 template<class T>
-int Ugraph<T>::degree (int v, const BitBoardN& bbn) const {
+int Ugraph<T>::degree (int v, const BitSet& bbn) const {
 
 	int ndeg = 0;
 	for (int i = 0; i < ptype::NBB_; i++) {
@@ -204,7 +204,7 @@ ostream& Ugraph<T>::print_matrix(std::ostream& o) const
 }
 
 //template<class T>
-//void Ugraph<T>::remove_vertices (const BitBoardN& bbn){
+//void Ugraph<T>::remove_vertices (const BitSet& bbn){
 ////////////////////////////
 //// Experimental: inefficient implementation: allocating memory twice 
 //	Ugraph g;
@@ -284,7 +284,7 @@ void Ugraph<T>::write_mtx(ostream & o){
 }
 
 template<class T>
-int Ugraph<T>::degree_up (int v, const BitBoardN& bbn) const	{
+int Ugraph<T>::degree_up (int v, const BitSet& bbn) const	{
 
 	int nDeg = 0, nBB = WDIV(v);
 
@@ -317,7 +317,7 @@ int Ugraph<T>::degree_up(int v) const
 }
 
 template<class T>
-int Ugraph<T>::degree (int v, int UB, const BitBoardN& bbn) const	{
+int Ugraph<T>::degree (int v, int UB, const BitSet& bbn) const	{
 
 	int nDeg = 0;
 	for(auto i = 0; i < _mypt::NBB_; ++i){

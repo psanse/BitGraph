@@ -1,33 +1,30 @@
 /**
  * @file bitscan.h
  * @brief Main header file for the BITSCAN library
- * @details The BITSCAN library is a C++ library for bit set optimization.
  * @version 1.0
- * @created 2014
+ * @details The BITSCAN library is a C++ library for bit set optimization. *
+ * @details created 2014, last update 12/02/2025
  * @author pss
- * @last_update 29/01/2025
- *
- * Permission to use, modify and distribute this software is granted
- * provided that this copyright notice appears in all copies, in source code or
-*  in binaries. For precise terms see the accompanying LICENSE file.
- *
- * This software is provided "AS IS" with no warranty of any kind,
- * express or implied, and with no claim as to its suitability for any
- * purpose.
- *
- */
+ **/
 
 #include "bbalg.h"
 #include "bbsentinel.h"			
 #include "bbintrinsic_sparse.h"	
 
 //useful aliases
-using bitarray = BBIntrin;
-using watched_bitarray = BBSentinel;
-using sparse_bitarray = BBIntrinS;
-using simple_bitarray = BitBoardN;
-using simple_sparse_bitarray = BitBoardS;
+
+//base of the hierarchy
 using bbo = BBObject;
+
+//non-sparse
+using simple_bitarray = BitSet;
+using bitarray = BBScan;
+using watched_bitarray = BBSentinel;
+
+//sparse
+using simple_sparse_bitarray = BitBoardS;
+using sparse_bitarray = BBIntrinS;
+
 
 
 
