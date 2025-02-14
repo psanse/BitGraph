@@ -7,7 +7,7 @@
  * @author pss
  **/
 
-#include "bbalg.h"
+#include "bbalgorithm.h"
 #include "bbsentinel.h"			
 #include "bbscan_sparse.h"	
 

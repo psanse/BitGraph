@@ -11,6 +11,7 @@ bbscan.h
 bbscan_sparse.h
 bbsentinel.h
 bbobject.h
+bbalgorithm.h
 bitscan.h
 )
 

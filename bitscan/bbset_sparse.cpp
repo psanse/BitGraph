@@ -3,7 +3,7 @@
 //////////////////////////////////////////////////////////////////////
 
 #include "bbset_sparse.h"
-#include "bbalg.h"
+#include "bbalgorithm.h"
 #include <iostream>
 #include <sstream>
 
