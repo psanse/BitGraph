@@ -19,10 +19,10 @@
  *
  */
 
-#ifndef __BBINTRINSIC_SPARSE_H__
-#define __BBINTRINSIC_SPARSE_H__
+#ifndef __BBSCAN_SPARSE_H__
+#define __BBSCAN_SPARSE_H__
 
-#include "bitboards.h"
+#include "bbset_sparse.h"
 using namespace std;
 
 /////////////////////////////////

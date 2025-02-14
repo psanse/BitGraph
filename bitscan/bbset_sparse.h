@@ -18,8 +18,8 @@
  * suitability for any purpose.
  */
 
-#ifndef __BITBOARDS_H__
-#define __BITBOARDS_H__
+#ifndef __BBSET_SPARSE_H__
+#define __BBSET_SPARSE_H__
 
 #include "bbobject.h"
 #include "bitblock.h"	
@@ -30,10 +30,8 @@
 
 using namespace std;
 
-#define DEFAULT_CAPACITY	 2		//initial reserve of bit blocks for any new sparse bitstring (possibly remove)
+constexpr int DEFAULT_CAPACITY = 2;								//initial reserve of bit blocks for any new sparse bitstring (possibly remove)
 
-/*template<class T>
-class Graph;*/
  
 /////////////////////////////////
 //

@@ -323,7 +323,6 @@ TEST(Masks, DISABLED_ERASE_extreme_cases) {
 
 
 	//ERASE
-	//cout<<ERASE(bbs, bbs1, bbsERASE)<<endl;
 	ERASE(bbs, bbs1, bbsERASE);
 	EXPECT_TRUE(bbs == bbsERASE);
 
@@ -336,7 +335,6 @@ TEST(Masks, DISABLED_ERASE_extreme_cases) {
 	bbs1.print();
 
 	//ERASE
-	//cout<<ERASE(bbs, bbs1, bbsERASE)<<endl;
 	ERASE(bbs, bbs1, bbsERASE);
 	EXPECT_TRUE(bbsERASE.is_bit(10));
 	EXPECT_TRUE(bbsERASE.is_bit(64));

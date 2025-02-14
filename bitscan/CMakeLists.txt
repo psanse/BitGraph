@@ -6,9 +6,9 @@ bbconfig.h
 bbtypes.h
 bitblock.h
 bbset.h
-bitboards.h
+bbset_sparse.h
 bbscan.h
-bbintrinsic_sparse.h
+bbscan_sparse.h
 bbsentinel.h
 bbobject.h
 bitscan.h
@@ -21,7 +21,7 @@ add_library (bitscan
 bbsentinel.cpp 
 bitblock.cpp 
 bbset.cpp  
-bitboards.cpp 
+bbset_sparse.cpp 
 tables.cpp
 ${useful_headers_for_IDE}
 )

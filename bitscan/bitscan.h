@@ -9,7 +9,7 @@
 
 #include "bbalg.h"
 #include "bbsentinel.h"			
-#include "bbintrinsic_sparse.h"	
+#include "bbscan_sparse.h"	
 
 //useful aliases
 

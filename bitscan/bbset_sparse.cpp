@@ -1,8 +1,8 @@
-// BitBoardS.cpp: implementation of the BitBoardS classd, wrapper for sparse bitstrings
+// bbset_sparse.cpp: implementation of the BitBoardS classd, wrapper for sparse bitstrings
 //
 //////////////////////////////////////////////////////////////////////
 
-#include "bitboards.h"
+#include "bbset_sparse.h"
 #include "bbalg.h"
 #include <iostream>
 #include <sstream>
