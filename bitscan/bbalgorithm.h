@@ -3,6 +3,8 @@
   * @brief header for the algorithms and data structures for bitstrings and bitblocks
   * @author pss
   * @details created ?, @last_update 14/02/2025
+  * 
+  * TODO refactoring and testing 15/02/2025
   **/
 
 #ifndef  __BBALG_H__

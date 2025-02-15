@@ -1,22 +1,11 @@
-/*  
- * bitboards.h file from the BITSCAN library, a C++ library for bit set
- * optimization. BITSCAN has been used to implement BBMC, a very
- * succesful bit-parallel algorithm for exact maximum clique. 
- * (see license file for references)
- *
- * Copyright (C)
- * Author: Pablo San Segundo
- * Intelligent Control Research Group (CSIC-UPM) 
- *
- * Permission to use, modify and distribute this software is
- * granted provided that this copyright notice appears in all 
- * copies, in source code or in binaries. For precise terms 
- * see the accompanying LICENSE file.
- *
- * This software is provided "AS IS" with no warranty of any 
- * kind, express or implied, and with no claim as to its
- * suitability for any purpose.
- */
+ /**
+  * @file bbset_sparse.h
+  * @brief header for sparse class equivalent to the BitSet class
+  * @author pss
+  * @details created ?, @last_update 15/02/2025
+  *
+  * TODO refactoring and testing 15/02/2025 - follow the interface of the refactored BitSet
+  **/
 
 #ifndef __BBSET_SPARSE_H__
 #define __BBSET_SPARSE_H__
@@ -41,16 +30,18 @@ constexpr int DEFAULT_CAPACITY = 2;								//initial reserve of bit blocks for a
 ///////////////////////////////////
 
 class BitBoardS: public BBObject{
-	//template <class T> friend  class Graph;
+	
 public:
 	struct elem_t{
 		int index;
 		BITBOARD bb;
-		elem_t(int index=EMPTY_ELEM, BITBOARD bb=0):index(index), bb(bb){}
-		bool operator ==(const elem_t& e) const { return (index==e.index && bb==e.bb);}
-		bool operator !=(const elem_t& e) const { return (index!=e.index || bb!=e.bb);}
-		bool test_not_0()const {return bb!=0;}
-		void clear_bb() {bb=0;}
+
+		elem_t(int index = BBObject::noBit, BITBOARD bb = 0):index(index), bb(bb){}
+
+		bool operator ==	(const elem_t& e) const { return (index == e.index && bb == e.bb); }
+		bool operator !=	(const elem_t& e) const { return (index != e.index || bb != e.bb); }
+		bool test_not_0		()const					{ return bb != 0; }
+		void clear_bb		()						{ bb = 0;}
 	};
 
 	typedef struct elem_t elem;
@@ -78,7 +69,7 @@ public:
 	friend BitBoardS&  ERASE		(const BitBoardS& lhs, const BitBoardS& rhs,  BitBoardS& res);			//removes rhs from lhs
 
 
-	BitBoardS						():m_MAXBB(EMPTY_ELEM){}												//is this necessary?											
+	BitBoardS						():m_MAXBB(BBObject::noBit){}												//is this necessary?											
 explicit BitBoardS					(int size, bool is_popsize=true );										//popsize is 1-based
 	BitBoardS						(const BitBoardS& );	
 virtual ~BitBoardS					(){clear();}	
@@ -114,11 +105,11 @@ virtual	int lsbn64						()						const; 		//de Bruijn	/ lookup
 	//for scanning all bits
 	
 virtual inline	int next_bit			(int nBit)				;				//uses cached elem position for fast bitscanning
-virtual inline	int prev_bit		(int nBit)				;				//uses cached elem position for fast bitscanning
+virtual inline	int prev_bit			(int nBit)				;				//uses cached elem position for fast bitscanning
 
 private:
 	int next_bit					(int nBit)				const;			//de Bruijn 
-	int prev_bit				(int nbit)				const;			//lookup
+	int prev_bit					(int nbit)				const;			//lookup
 
 public:	
 /////////////////
@@ -143,9 +134,9 @@ BitBoardS&  set_block				(int first_block, int last_block, const BitBoardS& rhs)
 inline	void  erase_bit				(int nbit);	
 inline	velem_it  erase_bit			(int nbit, velem_it from_it);
 		int	  erase_bit				(int lbit, int rbit);
-		int	  clear_bit				(int lbit, int rbit);					//deallocates blocks
+		int	  clear_bit				(int lbit, int rbit);											//deallocates blocks
 		void  shrink_to_fit			(){m_aBB.shrink_to_fit();}
-		void  erase_bit				() {m_aBB.clear();}						//clears all bit blocks
+		void  erase_bit				() {m_aBB.clear();}												//clears all bit blocks
 BitBoardS&    erase_bit				(const BitBoardS&);				
 
 BitBoardS&    erase_block			(int first_block, const BitBoardS& rhs );
@@ -156,28 +147,29 @@ BitBoardS&    erase_block_pos		(int first_pos_of_block, const BitBoardS& rhs );
 //Operators 
  BitBoardS& operator &=				(const BitBoardS& );					
  BitBoardS& operator |=				(const BitBoardS& );
- BitBoardS& AND_EQ					(int first_block, const BitBoardS& rhs );	//in range
- BitBoardS& OR_EQ					(int first_block, const BitBoardS& rhs );	//in range
+ BitBoardS& AND_EQ					(int first_block, const BitBoardS& rhs );						//in range
+ BitBoardS& OR_EQ					(int first_block, const BitBoardS& rhs );						//in range
   		
 /////////////////////////////
 //Boolean functions
-inline	bool is_bit					(int nbit)				const;				//nbit is 0 based
-inline	bool is_empty				()						const;				//lax: considers empty blocks for emptyness
+inline	bool is_bit					(int nbit)				const;									//nbit is 0 based
+inline	bool is_empty				()						const;									//lax: considers empty blocks for emptyness
 		bool is_disjoint			(const BitBoardS& bb)   const;
 		bool is_disjoint			(int first_block, int last_block, const BitBoardS& bb)   const;
 /////////////////////
-// I/O 
+//I/O 
 	ostream& print					(ostream& = cout, bool show_pc = true, bool endl = true ) const override;
 
-
-	string to_string				();
-	
+/////////////////////
+//Conversions
+	string to_string				();	
 	void to_vector					(std::vector<int>& )	const;
+
 ////////////////////////
-//Member data
+//data members
 protected:
-	velem m_aBB;					//a vector of sorted non-empty bit blocks
-	int m_MAXBB;					//maximum possible number of elements
+	velem m_aBB;					//a vector of sorted pairs of a non-empty bitblock and its index in a non-sparse bitstring
+	int m_MAXBB;					//maximum number of bitblocks
 };
 
 
@@ -267,7 +259,7 @@ bool BitBoardS::is_disjoint	(int first_block, int last_block, const BitBoardS& r
 		pair<bool, int> p2=rhs.find_pos(first_block);
 
 		//checks whether both sparse bitstrings have at least one block greater or equal to first_block
-		if(p1.second==EMPTY_ELEM || p2.second==EMPTY_ELEM) return true;
+		if(p1.second==BBObject::noBit || p2.second==BBObject::noBit) return true;
 		i1=p1.second; i2=p2.second;
 	}
 
@@ -400,12 +392,12 @@ int BitBoardS::prev_bit	(int nBit){
 // Uses cache of last index position for fast bit scanning
 //
 
-	if(nBit==EMPTY_ELEM)
+	if(nBit==BBObject::noBit)
 			return msbn64(nElem);		//updates nElem with the corresponding bitblock
 	
 	int index=WDIV(nBit);
 	int npos=bblock::msb64_lup(Tables::mask_low[WMOD(nBit) /*nBit-WMUL(index)*/] & m_aBB[nElem].bb);
-	if(npos!=EMPTY_ELEM)
+	if(npos!=BBObject::noBit)
 		return (WMUL(index) + npos);
 	
 	for(int i=nElem-1; i>=0; i--){  //new bitblock
@@ -414,7 +406,7 @@ int BitBoardS::prev_bit	(int nBit){
 			return bblock::msb64_de_Bruijn(m_aBB[i].bb) + WMUL(m_aBB[i].index);
 		}
 	}
-return EMPTY_ELEM;
+return BBObject::noBit;
 }
 
 
@@ -422,12 +414,12 @@ int BitBoardS::next_bit(int nBit){
 /////////////////
 // Uses cache of last index position for fast bit scanning
 //	
-	if(nBit==EMPTY_ELEM)
+	if(nBit==BBObject::noBit)
 		return lsbn64(nElem);		//updates nElem with the corresponding bitblock
 	
 	int index=WDIV(nBit);
 	int npos=bblock::lsb64_de_Bruijn(Tables::mask_high[WMOD(nBit) /*-WORD_SIZE*index*/] & m_aBB[nElem].bb);
-	if(npos!=EMPTY_ELEM)
+	if(npos!=BBObject::noBit)
 		return (WMUL(index) + npos);
 	
 	for(int i=nElem+1; i<m_aBB.size(); i++){
@@ -437,7 +429,7 @@ int BitBoardS::next_bit(int nBit){
 			return bblock::lsb64_de_Bruijn(m_aBB[i].bb) + WMUL(m_aBB[i].index);
 		}
 	}
-return EMPTY_ELEM;
+return BBObject::noBit;
 }
 
 int BitBoardS::msbn64	(int& nElem)	const{
@@ -464,7 +456,7 @@ int BitBoardS::msbn64	(int& nElem)	const{
 		}
 	}
 
-return EMPTY_ELEM;		//should not reach here
+return BBObject::noBit;		//should not reach here
 }
 
 int BitBoardS::lsbn64 (int& nElem)		const	{
@@ -504,7 +496,7 @@ int BitBoardS::lsbn64 (int& nElem)		const	{
 	}
 
 #endif
-return EMPTY_ELEM;	
+return BBObject::noBit;	
 }
 
 inline
@@ -562,7 +554,7 @@ BitBoardS& AND (const BitBoardS& lhs, const BitBoardS& rhs,  BitBoardS& res){
 	const int MAX=rhs.m_aBB.size()-1;
 
 	//empty check of rhs required, the way it is implemented
-	if(MAX==EMPTY_ELEM) return res;
+	if(MAX==BBObject::noBit) return res;
 	
 	//optimization which works if lhs has less 1-bits than rhs
 	int lhs_SIZE=lhs.m_aBB.size();
@@ -602,7 +594,7 @@ BitBoardS& AND (int first_block, const BitBoardS& lhs, const BitBoardS& rhs,  Bi
 	res.erase_bit();
 	pair<bool, int> p1=lhs.find_pos(first_block);
 	pair<bool, int> p2=rhs.find_pos(first_block);
-	if(p1.second!=EMPTY_ELEM && p2.second!=EMPTY_ELEM){
+	if(p1.second!=BBObject::noBit && p2.second!=BBObject::noBit){
 		int i1=p1.second, i2=p2.second;
 		while( i1!=lhs.m_aBB.size() && i2!=rhs.m_aBB.size() ){
 			
@@ -651,7 +643,7 @@ BitBoardS& AND (int first_block, int last_block, const BitBoardS& lhs, const Bit
 		pair<bool, int> p2=rhs.find_pos(first_block);
 
 		//checks whether both sparse bitstrings have at least one block greater or equal to first_block
-		if(p1.second==EMPTY_ELEM || p2.second==EMPTY_ELEM) return res;
+		if(p1.second==BBObject::noBit || p2.second==BBObject::noBit) return res;
 		i1=p1.second; i2=p2.second;
 	}
 
@@ -693,7 +685,7 @@ BitBoardS&  ERASE (const BitBoardS& lhs, const BitBoardS& rhs,  BitBoardS& res){
 
 	
 	const int MAX=rhs.m_aBB.size()-1;
-	if(MAX==EMPTY_ELEM){ return (res=lhs);  }		//copy before returning
+	if(MAX==BBObject::noBit){ return (res=lhs);  }		//copy before returning
 	res.erase_bit();
 
 	//this works better if lhs is as sparse as possible (iterating first over rhs is illogical here becuase the operation is not symmetrical)

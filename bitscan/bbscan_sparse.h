@@ -1,23 +1,12 @@
-/*  
- * bbintrinsic_sparse.h file from the BITSCAN library, a C++ library
- * for bit set optimization. BITSCAN has been used to implement BBMC,
- * a very succesful bit-parallel algorithm for exact maximum clique. 
- * (see license file for references)
+/**
+ * @file bbscan_sparse.h
+ * @brief header for sparse class equivalent to the BBScan class
+ *		  manages sparse bit strings with bitscanning capabilities
+ * @author pss
+ * @details created ?, @last_update 15/02/2025
  *
- * Copyright (C)
- * Author: Pablo San Segundo
- * Intelligent Control Research Group (CSIC-UPM) 
- *
- * Permission to use, modify and distribute this software is
- * granted provided that this copyright notice appears in all 
- * copies, in source code or in binaries. For precise terms 
- * see the accompanying LICENSE file.
- *
- * This software is provided "AS IS" with no warranty of any 
- * kind, express or implied, and with no claim as to its
- * suitability for any purpose.
- *
- */
+ * TODO refactoring and testing 15/02/2025
+ **/
 
 #ifndef __BBSCAN_SPARSE_H__
 #define __BBSCAN_SPARSE_H__
@@ -36,11 +25,11 @@ class BBIntrinS: public BitBoardS{
 public:	
 				
 	 BBIntrinS						(){};										
-explicit BBIntrinS					(int popsize /*1 based*/, bool reset=true):BitBoardS(popsize,reset){}	
-	 BBIntrinS						(const BBIntrinS& bbN):BitBoardS(bbN){}
+explicit BBIntrinS					(int popsize /*1 based*/, bool reset=true):BitBoardS(popsize,reset)	{}	
+	 BBIntrinS						(const BBIntrinS& bbN):BitBoardS(bbN)	{}
 
-	 void set_bbindex				(int bbindex){m_scan.bbi_=bbindex;}			//refers to the position in the collection (not in the bitstring)
-	 void set_posbit				(int posbit){m_scan.pos_=posbit;}	
+	 void set_bbindex				(int bbindex)	{m_scan.bbi_=bbindex;}			//refers to the position in the collection (not in the bitstring)
+	 void set_posbit				(int posbit)	{m_scan.pos_=posbit;}	
 	
 //////////////////////////////
 // bitscanning
@@ -64,17 +53,17 @@ virtual inline int next_bit			();
 inline int next_bit					(int & nBB);							//nBB: index of bitblock in the bitstring	(not in the collection)				
 
 	//bit scan backwards (non destructive)
-virtual inline int prev_bit		(); 
+virtual inline int prev_bit			(); 
 
 	//bit scan backwards (destructive)
-inline int prev_bit_del			(); 
-inline int prev_bit_del			(int& nBB);
+inline int prev_bit_del				(); 
+inline int prev_bit_del				(int& nBB);
 				
 /////////////////
 // Popcount
 #ifdef POPCOUNT_INTRINSIC_64
-virtual	 inline int popcn64				()	const;
-virtual	 inline int popcn64				(int nBit)	const;							//population size from (and including) nBit
+virtual	 inline int popcn64			()	const;
+virtual	 inline int popcn64			(int nBit)	const;							//population size from (and including) nBit
 #endif
 
 //////////////////
