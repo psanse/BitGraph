@@ -4,7 +4,7 @@
 * @details created  ?, last_update 12/02/2025
 * @author pss
 * 
-* TODO - refactor (15/02/2025)
+* TODO - refactor (15/02/2025), separate possible sparse scanning tests from the rest
 * 
 **/
 
