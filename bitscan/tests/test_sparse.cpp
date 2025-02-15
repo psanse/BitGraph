@@ -8,7 +8,6 @@
 * 
 **/
 
-
 #include "bitscan/bbscan_sparse.h"
 #include "gtest/gtest.h"
 #include <iostream>
@@ -171,7 +170,6 @@ TEST(Sparse, population_count){
 	BBIntrinS bbs_empty1(130);
 	EXPECT_EQ(0, bbs_empty1.popcn64(5));	
 }
-
 
 TEST(Sparse, set_bits) {
 	
@@ -410,7 +408,6 @@ TEST(Sparse, clear_bits) {
 	EXPECT_TRUE(bbsp.is_empty());
 
 }
-
 
 TEST(Sparse_non_instrinsic, scanning){
 	BitBoardS bbsp(130);
