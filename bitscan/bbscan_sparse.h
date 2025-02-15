@@ -68,13 +68,8 @@ virtual	 inline int popcn64			(int nBit)	const;							//population size from (an
 
 //////////////////
 /// data members
-public:
-	//struct scan_t{																			//Cache memory for bitscanning optimization
-	//	scan_t():bbi(EMPTY_ELEM), pos(MASK_LIM){}
-	//	int bbi;	//bitboard index in the collection (not in the bitstring) 	
-	//	int pos;	//bit position for bitscan		
-	//};
 
+public:
 	 scan_t m_scan;
 };
 
