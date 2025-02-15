@@ -1,12 +1,17 @@
-#include <algorithm>
-#include <iterator>
-#include <iostream>
-#include <set>
+/**
+* @file test_sparse.cpp
+* @brief Unit tests for sparse classes
+* @details created  ?, last_update 12/02/2025
+* @author pss
+* 
+* TODO - refactor (15/02/2025)
+* 
+**/
 
-#include "../bitscan.h"				//bit string library
+
+#include "bitscan/bbscan_sparse.h"
 #include "gtest/gtest.h"
-
-#include "../bbintrinsic_sparse.h"
+#include <iostream>
 
 using namespace std;
 
@@ -28,7 +33,7 @@ TEST(Sparse, construction){
 }
 
 TEST(Sparse, basics) {
-	//sparse 
+
 	BitBoardS bbsp(130);
 	bbsp.set_bit(10);
 	bbsp.set_bit(20);
@@ -58,6 +63,7 @@ TEST(Sparse, basics) {
 }
 
 TEST(Sparse, member_masks) {
+
 	BitBoardS lhs;
 	lhs.init(200);
 	lhs.set_bit(63);
@@ -79,7 +85,7 @@ TEST(Sparse, member_masks) {
 } 
 
 TEST(Sparse_intrinsic, basics_2) {
-	//sparse 
+
 	BBIntrinS bbsp(130);
 	bbsp.set_bit(10);
 	bbsp.set_bit(20);
@@ -116,7 +122,8 @@ TEST(Sparse_intrinsic, basics_2) {
 }
 
 TEST(Sparse_intrinsic, set_clear_bit_in_intervals) {
-	sparse_bitarray bba(1000000);
+
+	BBIntrinS bba(1000000);
 	bba.set_bit(1200,1230);
 
 	EXPECT_EQ(31, bba.popcn64());		
@@ -130,6 +137,7 @@ TEST(Sparse_intrinsic, set_clear_bit_in_intervals) {
 }
 
 TEST(Sparse, population_count){
+
 	BitBoardS bb(130);
 	bb.set_bit(10);
 	bb.set_bit(20);
@@ -207,7 +215,7 @@ TEST(Sparse, set_bits) {
 
 
 //init member functions
-	sparse_bitarray sb(150);
+	BBIntrinS sb(150);
 	sb.init_bit(30,40);
 	EXPECT_TRUE(sb.is_bit(30));
 	EXPECT_TRUE(sb.is_bit(40));
@@ -220,12 +228,13 @@ TEST(Sparse, set_bits) {
 }
 
 TEST(Sparse, boolean_properties){
-	sparse_bitarray bb(130);
+
+	BBIntrinS bb(130);
 	bb.set_bit(10);
 	bb.set_bit(20);
 	bb.set_bit(64);
 
-	sparse_bitarray bb1(130);
+	BBIntrinS bb1(130);
 	bb1.set_bit(11);
 	bb1.set_bit(21);
 	bb1.set_bit(65);
@@ -319,7 +328,7 @@ TEST(Sparse, erase_bits) {
 
 	//erase in a sequential loop
 	int nBit=0;
-	sparse_bitarray::velem_it it=bbsp.begin();
+	BBIntrinS::velem_it it=bbsp.begin();
 	while(true){
 		it=bbsp.erase_bit(nBit++,it);
 		if(nBit>1000) break;
@@ -399,7 +408,6 @@ TEST(Sparse, clear_bits) {
 
 	bbsp.clear_bit(EMPTY_ELEM, EMPTY_ELEM);
 	EXPECT_TRUE(bbsp.is_empty());
-	cout<<"----------------------------"<<endl;
 
 }
 
@@ -445,6 +453,7 @@ TEST(Sparse_non_instrinsic, scanning){
 
 
 TEST(Sparse_intrinsic, non_destructive_scanning){
+
 	BBIntrinS bbsp(130);
 	bbsp.set_bit(10);
 	bbsp.set_bit(20);
@@ -488,6 +497,7 @@ TEST(Sparse_intrinsic, non_destructive_scanning){
 }
 
 TEST(Sparse_intrinsic, non_destructive_scanning_with_starting_point){
+
 	BBIntrinS bbsp(130);
 	bbsp.set_bit(10);
 	bbsp.set_bit(20);
@@ -527,6 +537,7 @@ TEST(Sparse_intrinsic, non_destructive_scanning_with_starting_point){
 }
 
 TEST(Sparse_intrinsic, destructive_scanning){
+
 	BBIntrinS bbsp(130);
 	bbsp.set_bit(10);
 	bbsp.set_bit(20);
@@ -569,6 +580,7 @@ TEST(Sparse_intrinsic, destructive_scanning){
 }
 
 TEST(Sparse, operators){
+
 	BitBoardS bbsp(130);
 	bbsp.set_bit(10);
 	bbsp.set_bit(20);
@@ -599,6 +611,7 @@ TEST(Sparse, operators){
 }
 
 TEST(Sparse, insertion) {
+
 	BitBoardS bbsp(130);					
 	bbsp.set_bit(64);
 	bbsp.set_bit(65);
@@ -608,6 +621,7 @@ TEST(Sparse, insertion) {
 }
 
 TEST(Sparse, integration) {
+
 	BitBoardS bbs(10000);
 	bbs.set_bit(10);
 	bbs.set_bit(1000);
@@ -637,7 +651,7 @@ TEST(Sparse, integration) {
 }
 
 TEST(Sparse, next_bit_del_pos) {
-	cout<<"----------------------------------"<<endl;
+
 	BBIntrinS bbsp(10000);
 
 	bbsp.set_bit(0);
@@ -649,7 +663,7 @@ TEST(Sparse, next_bit_del_pos) {
 	bbsp.set_bit(9000);
 
 	//bitscannning loop
-	bbsp.init_scan(bbo::DESTRUCTIVE);
+	bbsp.init_scan(BBObject::DESTRUCTIVE);
 	int posBB=EMPTY_ELEM;
 	while(true){
 		int	nBit=bbsp.next_bit_del_pos(posBB);
@@ -658,11 +672,11 @@ TEST(Sparse, next_bit_del_pos) {
 		cout<<"nBit: "<<nBit<<" pos: "<<posBB<<endl;
 		
 	}
-
-	cout<<"----------------------------------"<<endl;
+	
 }
 
 TEST(Sparse, erase_block_pos) {
+
 	BBIntrinS bbsp(10000);
 	BBIntrinS bberase(10000);
 	bbsp.set_bit(0);
@@ -693,6 +707,7 @@ TEST(Sparse, erase_block_pos) {
 }
 
 TEST(Sparse, copy_up_to_some_bit) {
+
 	BBIntrinS bbsp(10000);
 	BBIntrinS bbcopy(10000);
 	bbsp.set_bit(0);
@@ -721,6 +736,7 @@ TEST(Sparse, copy_up_to_some_bit) {
 }
 
 TEST(Sparse, copy_in_closed_range){
+
 	BBIntrinS bbsp(10000);
 	BBIntrinS bbcopy(10000);
 	bbsp.set_bit(0);
@@ -766,6 +782,7 @@ TEST(Sparse, copy_in_closed_range){
 }
 
 TEST(Sparse, copy_in_closed_range_special_cases){
+
 	BBIntrinS bbsp(120);
 	BBIntrinS bbcopy(120);
 	bbsp.set_bit(64);
@@ -785,6 +802,7 @@ TEST(Sparse, copy_in_closed_range_special_cases){
 }
 
 TEST(Sparse, keep_operations) {
+
 	BBIntrinS bbsp(10000);
 	BBIntrinS bbkeep(10000);
 	BBIntrinS bbkeep2(10000);
@@ -814,7 +832,7 @@ TEST(Sparse, keep_operations) {
 	bbkeep3.set_bit(0);
 
 	//tests
-	bbsp&=bbkeep;
+	bbsp &= bbkeep;
 	EXPECT_TRUE(bbsp==bbkeep);
 
 	bbsp.AND_EQ(1, bbkeep2);
@@ -825,7 +843,7 @@ TEST(Sparse, keep_operations) {
 	EXPECT_EQ(5, bbsp.popcn64());
 
 	
-	bbsp&=bbkeep3;
+	bbsp &= bbkeep3;
 	EXPECT_TRUE(bbsp.is_bit(0));
 	EXPECT_EQ(1, bbsp.popcn64());
 

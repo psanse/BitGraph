@@ -60,7 +60,7 @@ public:
 			for (auto it = sug.adj_[v].begin(); it != sug.adj_[v].end(); ++it) {
 
 				////////////////////////////////////////////////////
-				ug.adj_[v].bitblock(it->index) = it->bb;
+				ug.adj_[v].bitblock(it->idx_) = it->bb_;
 				////////////////////////////////////////////////////
 
 			}

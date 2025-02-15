@@ -48,7 +48,7 @@ inline int Ugraph<sparse_bitarray>::degree_up(int v) const
 	//find the bitblock of v
 	auto it = adj_[v].begin();
 	for (; it != adj_[v].end(); ++it) {
-		if (it->index == nBB) break;
+		if (it->idx_ == nBB) break;
 	}
 
 	//check no neighbors
@@ -57,12 +57,12 @@ inline int Ugraph<sparse_bitarray>::degree_up(int v) const
 	}
 
 	//truncate the bitblock of v and count the number of neighbors
-	nDeg += bblock::popc64(	bblock::MASK_1(WMOD(v) + 1, 63) &	it->bb );
+	nDeg += bblock::popc64(	bblock::MASK_1(WMOD(v) + 1, 63) &	it->bb_ );
 
 	//add the rest of neighbours in the bitblocks that follow
 	++it;
 	for (; it != adj_[v].end(); ++it) {
-		nDeg += bblock::popc64(it->bb);
+		nDeg += bblock::popc64(it->bb_);
 	}
 	
 	return nDeg;
@@ -83,7 +83,7 @@ int Ugraph<sparse_bitarray>::degree(int v, const BitSet& bbn) const {
 	
 	int ndeg = 0;
 	for (auto it = adj_[v].begin(); it != adj_[v].end(); ++it) {
-		ndeg += bblock::popc64 (it->bb & bbn.bitblock(it->index) );
+		ndeg += bblock::popc64 (it->bb_ & bbn.bitblock(it->idx_) );
 	}
 
 	return ndeg;
@@ -99,14 +99,14 @@ int Ugraph<sparse_bitarray>::degree(int v, const BitBoardS& bbs) const {
 
 	while (itv != adj_[v].end() && itbb != bbs.end()) {
 
-		if (itv->index < itbb->index) {
+		if (itv->idx_ < itbb->idx_) {
 			++itv;
 		}
-		else if (itv->index > itbb->index) {
+		else if (itv->idx_ > itbb->idx_) {
 			++itbb;
 		}
 		else { //same index
-			ndeg += bblock::popc64(itv->bb & itbb->bb);
+			ndeg += bblock::popc64(itv->bb_ & itbb->bb_);
 			++itv; ++itbb;
 		}
 	}
@@ -120,7 +120,7 @@ int Ugraph<sparse_bitarray>::degree(int v, int UB, const BitSet& bbn) const {
 	
 	int ndeg = 0;
 	for (auto it = adj_[v].begin(); it != adj_[v].end(); ++it) {
-		ndeg += bblock::popc64(it->bb & bbn.bitblock(it->index));
+		ndeg += bblock::popc64(it->bb_ & bbn.bitblock(it->idx_));
 		if (ndeg >= UB) return UB;
 	}
 
@@ -137,14 +137,14 @@ int Ugraph<sparse_bitarray>::degree(int v, int UB, const BitBoardS& bbs) const {
 
 	while (itv != adj_[v].end() && itbb != bbs.end()) {
 
-		if (itv -> index < itbb -> index) {
+		if (itv -> idx_ < itbb -> idx_) {
 			++itv;
 		}
-		else if (itv -> index > itbb -> index) {
+		else if (itv -> idx_ > itbb -> idx_) {
 			++itbb;
 		}
 		else { //same index
-			ndeg += bblock::popc64(itv -> bb & itbb -> bb);
+			ndeg += bblock::popc64(itv -> bb_ & itbb -> bb_);
 			if (ndeg >= UB) return UB;
 			++itv; ++itbb;
 		}

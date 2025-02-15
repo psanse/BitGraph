@@ -48,7 +48,7 @@ add_executable (test_bitscan tests/gtest_main.cc
   
     #TESTS TO CHECK (14/02/2025)   
     tests/test_algorithms.cpp           
-    #tests/test_sparse.cpp
+    tests/test_sparse.cpp
     #tests/test_example.cpp   
     #tests/test_bbsentinel.cpp 
 
