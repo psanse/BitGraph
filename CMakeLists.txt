@@ -101,33 +101,67 @@ endif()
 #############
 #
 # Deploy BITSCAN and GRAPH libraries
-#
+# (old CMake - currently best solution found to preserve public header internal structure)
 #############
 
-set(INSTALL_PATH "${CMAKE_CURRENT_SOURCE_DIR}/example" CACHE PATH "Directory chosen to deploy project")
+set(INSTALL_PATH "${CMAKE_CURRENT_SOURCE_DIR}/example_external_linkage" CACHE PATH "Directory chosen to deploy project")
 set(CMAKE_INSTALL_PREFIX ${INSTALL_PATH})
 
 # Install utils library
 install(TARGETS utils
-	ARCHIVE DESTINATION lib
+	#ARCHIVE DESTINATION lib
 	LIBRARY DESTINATION lib
-	RUNTIME DESTINATION bin
-	PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_PREFIX}/include/utils
+	#RUNTIME DESTINATION bin
+	#PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_PREFIX}/include/utils        //header files deployed without internal structure
 )
 
-# Install BITSCAN library
-#install(TARGETS bitscan
-#        ARCHIVE DESTINATION lib
-#        LIBRARY DESTINATION lib
-#        RUNTIME DESTINATION bin)
+#Install BITSCAN library
+install(TARGETS bitscan
+   #ARCHIVE DESTINATION lib
+   LIBRARY DESTINATION lib
+   #RUNTIME DESTINATION bin
+   #PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_PREFIX}/include/bitscan        //header files deployed without internal structure
+)
 
 # Install GRAPH library
-#install(TARGETS graph
-#        ARCHIVE DESTINATION lib
-#        LIBRARY DESTINATION lib
-#       RUNTIME DESTINATION bin)
+install(TARGETS graph
+  # ARCHIVE DESTINATION lib
+   LIBRARY DESTINATION lib
+  # RUNTIME DESTINATION bin
+  #PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_PREFIX}/include/graph        //header files deployed without internal structure
+)
+
+ #############
+# Deploy UTILS, BITSCAN and GRAPH libraries manually
+# (old CMake)
+#############
+
+file(GLOB_RECURSE DEPLOY_FILES_AND_DIRS "${PROJECT_SOURCE_DIR}/bitscan/*.h")
+foreach(ITEM ${DEPLOY_FILES_AND_DIRS})
+    file(RELATIVE_PATH REL_PATH ${PROJECT_SOURCE_DIR} ${ITEM})
+    get_filename_component(DIR_PATH ${REL_PATH} DIRECTORY)
+    install(FILES ${ITEM} DESTINATION include/${DIR_PATH})	 
+ endforeach()
+
+ file(GLOB_RECURSE DEPLOY_FILES_AND_DIRS "${PROJECT_SOURCE_DIR}/graph/*.h")
+ foreach(ITEM ${DEPLOY_FILES_AND_DIRS})
+    file(RELATIVE_PATH REL_PATH ${PROJECT_SOURCE_DIR} ${ITEM})
+    get_filename_component(DIR_PATH ${REL_PATH} DIRECTORY)
+    install(FILES ${ITEM} DESTINATION include/${DIR_PATH})	 
+ endforeach()
+
+ file(GLOB_RECURSE DEPLOY_FILES_AND_DIRS "${PROJECT_SOURCE_DIR}/utils/*.h")
+ foreach(ITEM ${DEPLOY_FILES_AND_DIRS})
+    file(RELATIVE_PATH REL_PATH ${PROJECT_SOURCE_DIR} ${ITEM})
+    get_filename_component(DIR_PATH ${REL_PATH} DIRECTORY)
+    install(FILES ${ITEM} DESTINATION include/${DIR_PATH})	 
+ endforeach()
  
-#deploy header files in include directory preserving internal structure
+####################
+# deploy all header files (inlcuding gtest) in include directory preserving internal structure
+# (old CMake)
+###################
+
 #file(GLOB_RECURSE DEPLOY_FILES_AND_DIRS "${PROJECT_SOURCE_DIR}/*.h")
 # foreach(ITEM ${DEPLOY_FILES_AND_DIRS})
 #    file(RELATIVE_PATH REL_PATH ${PROJECT_SOURCE_DIR} ${ITEM})
@@ -135,7 +169,7 @@ install(TARGETS utils
 #    install(FILES ${ITEM} DESTINATION include/${DIR_PATH})	 
 # endforeach()
 
- #############
+#############
 #
 # Deploy UTILS,  BITSCAN and GRAPH libraries with EXPORT
 # (using modern CMake)
@@ -159,27 +193,3 @@ install(TARGETS utils
 
 
 
- #############
-# Deploy UTILS, BITSCAN and GRAPH libraries manually
-# (old CMake)
-#############
-#file(GLOB_RECURSE DEPLOY_FILES_AND_DIRS "${PROJECT_SOURCE_DIR}/bitscan/*.h")
-#foreach(ITEM ${DEPLOY_FILES_AND_DIRS})
-#    file(RELATIVE_PATH REL_PATH ${PROJECT_SOURCE_DIR} ${ITEM})
-#    get_filename_component(DIR_PATH ${REL_PATH} DIRECTORY)
-#    install(FILES ${ITEM} DESTINATION include/${DIR_PATH})	 
-# endforeach()
-
-# file(GLOB_RECURSE DEPLOY_FILES_AND_DIRS "${PROJECT_SOURCE_DIR}/graph/*.h")
-# foreach(ITEM ${DEPLOY_FILES_AND_DIRS})
-#    file(RELATIVE_PATH REL_PATH ${PROJECT_SOURCE_DIR} ${ITEM})
-#    get_filename_component(DIR_PATH ${REL_PATH} DIRECTORY)
-#    install(FILES ${ITEM} DESTINATION include/${DIR_PATH})	 
-# endforeach()
-
-# file(GLOB_RECURSE DEPLOY_FILES_AND_DIRS "${PROJECT_SOURCE_DIR}/utils/*.h")
-# foreach(ITEM ${DEPLOY_FILES_AND_DIRS})
-#    file(RELATIVE_PATH REL_PATH ${PROJECT_SOURCE_DIR} ${ITEM})
-#    get_filename_component(DIR_PATH ${REL_PATH} DIRECTORY)
-#    install(FILES ${ITEM} DESTINATION include/${DIR_PATH})	 
-# endforeach()

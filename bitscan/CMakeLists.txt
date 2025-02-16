@@ -2,17 +2,17 @@
 #set useful headers for IDE
 ###################
 set(useful_headers_for_IDE
-bbconfig.h
-bbtypes.h
-bitblock.h
-bbset.h
-bbset_sparse.h
-bbscan.h
-bbscan_sparse.h
-bbsentinel.h
-bbobject.h
-bbalgorithm.h
-bitscan.h
+ ${CMAKE_CURRENT_SOURCE_DIR}/bbconfig.h
+ ${CMAKE_CURRENT_SOURCE_DIR}/bbtypes.h
+ ${CMAKE_CURRENT_SOURCE_DIR}/bitblock.h
+ ${CMAKE_CURRENT_SOURCE_DIR}/bbset.h
+ ${CMAKE_CURRENT_SOURCE_DIR}/bbset_sparse.h
+ ${CMAKE_CURRENT_SOURCE_DIR}/bbscan.h
+ ${CMAKE_CURRENT_SOURCE_DIR}/bbscan_sparse.h
+ ${CMAKE_CURRENT_SOURCE_DIR}/bbsentinel.h
+ ${CMAKE_CURRENT_SOURCE_DIR}/bbobject.h
+ ${CMAKE_CURRENT_SOURCE_DIR}/bbalgorithm.h
+ ${CMAKE_CURRENT_SOURCE_DIR}/bitscan.h
 )
 
 ###################
@@ -30,6 +30,7 @@ ${useful_headers_for_IDE}
 set_target_properties(bitscan 
     PROPERTIES
     ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
+    #PUBLIC_HEADER   "${useful_headers_for_IDE}"        #does not preserve internal structure  
 )
 
 # Make sure the compiler can find include files for our bitscan library

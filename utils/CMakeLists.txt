@@ -23,6 +23,7 @@ add_library (utils
 
 # Make sure the compiler can find include files for our utils library
 # when other libraries or executables link to bitscan
+
 #target_include_directories (utils PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
 target_include_directories(utils PUBLIC 
@@ -33,7 +34,7 @@ target_include_directories(utils PUBLIC
 set_target_properties(utils 
     PROPERTIES
     ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
-    PUBLIC_HEADER   "${useful_headers_for_IDE}"
+    #PUBLIC_HEADER   "${useful_headers_for_IDE}"        #does not preserve internal structure       
 )
 
 option(utils_build_tests "Build utils tests." OFF)
