@@ -32,7 +32,7 @@ ${useful_headers_for_IDE}
 
 set_target_properties(graph 
     PROPERTIES
-     ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
+    ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
 )
 
 

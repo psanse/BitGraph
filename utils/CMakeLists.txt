@@ -26,15 +26,15 @@ add_library (utils
 #target_include_directories (utils PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
 target_include_directories(utils PUBLIC 
-  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
   $<INSTALL_INTERFACE:include/utils>    # <prefix>/include/mylib
 )
 
 set_target_properties(utils 
     PROPERTIES
-     ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
+    ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
+    #PUBLIC_HEADER   "${useful_headers_for_IDE}"
 )
-
 
 option(utils_build_tests "Build utils tests." OFF)
 #set(utils_build_tests ON)
