@@ -1,10 +1,10 @@
 #set useful headers 
 set(useful_headers_for_IDE 
-    common.h
-    common_types.h
-    prec_timer.h
-    logger.h
-    info/info_base.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/common.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/common_types.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/prec_timer.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/logger.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/info/info_base.h
 )
 
 #creates utils library
@@ -33,7 +33,7 @@ target_include_directories(utils PUBLIC
 set_target_properties(utils 
     PROPERTIES
     ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
-    #PUBLIC_HEADER   "${useful_headers_for_IDE}"
+    PUBLIC_HEADER   "${useful_headers_for_IDE}"
 )
 
 option(utils_build_tests "Build utils tests." OFF)
