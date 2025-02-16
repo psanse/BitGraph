@@ -108,25 +108,69 @@ set(INSTALL_PATH "${CMAKE_CURRENT_SOURCE_DIR}/example" CACHE PATH "Directory cho
 set(CMAKE_INSTALL_PREFIX ${INSTALL_PATH})
 
 # Install utils library
-install(TARGETS utils
-        ARCHIVE DESTINATION lib
-        LIBRARY DESTINATION lib
-        RUNTIME DESTINATION bin)
+#install(TARGETS utils
+#        ARCHIVE DESTINATION lib
+#        LIBRARY DESTINATION lib
+#        RUNTIME DESTINATION bin)
 
 # Install BITSCAN library
-install(TARGETS bitscan
-        ARCHIVE DESTINATION lib
-        LIBRARY DESTINATION lib
-        RUNTIME DESTINATION bin)
+#install(TARGETS bitscan
+#        ARCHIVE DESTINATION lib
+#        LIBRARY DESTINATION lib
+#        RUNTIME DESTINATION bin)
 
 # Install GRAPH library
-install(TARGETS graph
-        ARCHIVE DESTINATION lib
-        LIBRARY DESTINATION lib
-        RUNTIME DESTINATION bin)
+#install(TARGETS graph
+#        ARCHIVE DESTINATION lib
+#        LIBRARY DESTINATION lib
+#       RUNTIME DESTINATION bin)
  
 #deploy header files in include directory preserving internal structure
- file(GLOB_RECURSE DEPLOY_FILES_AND_DIRS "${PROJECT_SOURCE_DIR}/*.h")
+#file(GLOB_RECURSE DEPLOY_FILES_AND_DIRS "${PROJECT_SOURCE_DIR}/*.h")
+# foreach(ITEM ${DEPLOY_FILES_AND_DIRS})
+#    file(RELATIVE_PATH REL_PATH ${PROJECT_SOURCE_DIR} ${ITEM})
+#    get_filename_component(DIR_PATH ${REL_PATH} DIRECTORY)
+#    install(FILES ${ITEM} DESTINATION include/${DIR_PATH})	 
+# endforeach()
+
+ #############
+#
+# Deploy BITSCAN and GRAPH libraries 
+# (using modern CMake)
+#
+#############
+
+# Install utils library
+install(TARGETS utils bitscan graph EXPORT allConfig)
+
+export(TARGETS utils bitscan graph
+    #NAMESPACE allConfig::
+    FILE "${CMAKE_BINARY_DIR}/allConfig.cmake"
+)
+
+set(CMAKE_INSTALL_PREFIX ${CMAKE_CURRENT_SOURCE_DIR}/kk)
+#message("CMAKE_INSTALL_PREFIX='${CMAKE_INSTALL_PREFIX}'")
+
+install(EXPORT allConfig
+    DESTINATION "${CMAKE_INSTALL_PREFIX}/allConfig/cmake"
+    #NAMESPACE allConfig::
+)
+
+file(GLOB_RECURSE DEPLOY_FILES_AND_DIRS "${PROJECT_SOURCE_DIR}/bitscan/*.h")
+ foreach(ITEM ${DEPLOY_FILES_AND_DIRS})
+    file(RELATIVE_PATH REL_PATH ${PROJECT_SOURCE_DIR} ${ITEM})
+    get_filename_component(DIR_PATH ${REL_PATH} DIRECTORY)
+    install(FILES ${ITEM} DESTINATION include/${DIR_PATH})	 
+ endforeach()
+
+ file(GLOB_RECURSE DEPLOY_FILES_AND_DIRS "${PROJECT_SOURCE_DIR}/graph/*.h")
+ foreach(ITEM ${DEPLOY_FILES_AND_DIRS})
+    file(RELATIVE_PATH REL_PATH ${PROJECT_SOURCE_DIR} ${ITEM})
+    get_filename_component(DIR_PATH ${REL_PATH} DIRECTORY)
+    install(FILES ${ITEM} DESTINATION include/${DIR_PATH})	 
+ endforeach()
+
+  file(GLOB_RECURSE DEPLOY_FILES_AND_DIRS "${PROJECT_SOURCE_DIR}/utils/*.h")
  foreach(ITEM ${DEPLOY_FILES_AND_DIRS})
     file(RELATIVE_PATH REL_PATH ${PROJECT_SOURCE_DIR} ${ITEM})
     get_filename_component(DIR_PATH ${REL_PATH} DIRECTORY)

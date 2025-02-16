@@ -38,7 +38,12 @@ set_target_properties(graph
 
 # Make sure the compiler can find include files for our bitscan library
 # when other libraries or executables link to bitscan
-target_include_directories (graph PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+#target_include_directories (graph PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+
+target_include_directories(graph PUBLIC 
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+  $<INSTALL_INTERFACE:include/graph>    # <prefix>/include/bitscan
+)
 
 ###################
 # GRAPH lib - UNIT TESTS

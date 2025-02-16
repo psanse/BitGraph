@@ -34,8 +34,13 @@ set_target_properties(bitscan
 
 # Make sure the compiler can find include files for our bitscan library
 # when other libraries or executables link to bitscan
-target_include_directories (bitscan 
-    PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}
+#target_include_directories (bitscan 
+#    PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}
+#)
+
+target_include_directories(bitscan PUBLIC 
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+  $<INSTALL_INTERFACE:include/bitscan>    # <prefix>/include/bitscan
 )
 
 ###################
