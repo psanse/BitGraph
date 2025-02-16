@@ -8,7 +8,7 @@
 * @TODO - ADD TESTS and check disabled / commented out tests at the end of file (09/01/25)
 */
 
-#include "simple_graph_w.h"							 
+#include "graph/simple_graph_w.h"							 
 #include "graph/algorithms/graph_gen.h"
 #include "gtest/gtest.h"
 #include "utils/common_paths.h";

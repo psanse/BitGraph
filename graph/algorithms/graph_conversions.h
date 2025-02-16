@@ -11,7 +11,7 @@
 #ifndef __GRAPH_TYPE_CONVERSIONS_H__
 #define	__GRAPH_TYPE_CONVERSIONS_H__
 
-#include "simple_ugraph.h"								//currently, contains the only converted graph types
+#include "graph/simple_ugraph.h"								//currently, contains the only converted graph types
 #include "utils/common.h"
 #include "utils/logger.h"
 #include <iostream>

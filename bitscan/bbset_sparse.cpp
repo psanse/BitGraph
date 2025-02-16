@@ -83,7 +83,7 @@ int	 BitBoardS::set_bit	(int low, int high){
 			return 0;		//no need for sorting
 		}else{
 			BITBOARD bb_high= ~Tables::mask_high[high-WMUL(bbh)];
-			m_aBB.push_back(elem_t(bbl,bb_high&~ Tables::mask_low[low-WMUL(bbl)]));
+			m_aBB.push_back(pBlock_t(bbl,bb_high&~ Tables::mask_low[low-WMUL(bbl)]));
 			return 0;
 		}
 	}
@@ -91,11 +91,11 @@ int	 BitBoardS::set_bit	(int low, int high){
 	//B) bbl outside range 
 	if(p.second==m_aBB.end()){
 		//append blocks at the end
-		m_aBB.push_back(elem_t(bbl,~Tables::mask_low[low-WMUL(bbl)]));
+		m_aBB.push_back(pBlock_t(bbl,~Tables::mask_low[low-WMUL(bbl)]));
 		for(int i=low+1; i<bbh; ++i){
-				m_aBB.push_back(elem_t(i,ONE));
+				m_aBB.push_back(pBlock_t(i,ONE));
 		}
-		m_aBB.push_back(elem_t(bbh,~Tables::mask_high[high-WMUL(bbh)]));
+		m_aBB.push_back(pBlock_t(bbh,~Tables::mask_high[high-WMUL(bbh)]));
 		return 0;
 	}
 	
@@ -106,7 +106,7 @@ int	 BitBoardS::set_bit	(int low, int high){
 		p.second->bb_|=~Tables::mask_low[low-WMUL(bbl)];
 		++p.second;
 	}else{ //block does not exist:marked for append
-		vapp.push_back(elem_t(bbl,~Tables::mask_low[low-WMUL(bbl)]));
+		vapp.push_back(pBlock_t(bbl,~Tables::mask_low[low-WMUL(bbl)]));
 	}
 	++block;
 	
@@ -116,9 +116,9 @@ int	 BitBoardS::set_bit	(int low, int high){
 		if(p.second==m_aBB.end()){
 			//append blocks at the end
 			for(int i=block; i<bbh; ++i){
-				m_aBB.push_back(elem_t(i,ONE));
+				m_aBB.push_back(pBlock_t(i,ONE));
 			}
-			m_aBB.push_back(elem_t(bbh,~Tables::mask_high[high-WMUL(bbh)]));
+			m_aBB.push_back(pBlock_t(bbh,~Tables::mask_high[high-WMUL(bbh)]));
 			req_sorting=true;
 			break;
 		}
@@ -129,7 +129,7 @@ int	 BitBoardS::set_bit	(int low, int high){
 				p.second->bb_|=~Tables::mask_high[high-WMUL(bbh)];
 				break;
 			}else{ //block doesn't exist, trim and append
-				m_aBB.push_back(elem_t(bbh,~Tables::mask_high[high-WMUL(bbh)]));
+				m_aBB.push_back(pBlock_t(bbh,~Tables::mask_high[high-WMUL(bbh)]));
 				req_sorting=true;
 				break;
 			}
@@ -141,8 +141,8 @@ int	 BitBoardS::set_bit	(int low, int high){
 			p.second->bb_=ONE;
 			++p.second; ++block; 
 		}else if(block<p.second->idx_){				//m_aBB[pos].idx_<block cannot occur
-			vapp.push_back(elem_t(block,ONE));			//not added in place to avoid loosing indexes
-		//	m_aBB.push_back(elem_t(block,ONE));
+			vapp.push_back(pBlock_t(block,ONE));			//not added in place to avoid loosing indexes
+		//	m_aBB.push_back(pBlock_t(block,ONE));
 			req_sorting=true;
 			++block;
 		}
@@ -169,20 +169,20 @@ int BitBoardS::init_bit (int low, int high){
 	//same bitblock
 	if(bbh==bbl){
 		BITBOARD bb= ~Tables::mask_low[low-WMUL(bbl)];
-		m_aBB.push_back(elem_t(bbl, bb & ~Tables::mask_high[high-WMUL(bbh)]));
+		m_aBB.push_back(pBlock_t(bbl, bb & ~Tables::mask_high[high-WMUL(bbh)]));
 		return 0;
 	}
 
 	//first
-	m_aBB.push_back(elem_t(bbl, ~Tables::mask_low[low-WMUL(bbl)]));
+	m_aBB.push_back(pBlock_t(bbl, ~Tables::mask_low[low-WMUL(bbl)]));
 
 	//middle
 	for(int block=bbl+1; block<bbh; ++block){
-		m_aBB.push_back(elem_t(block,ONE));
+		m_aBB.push_back(pBlock_t(block,ONE));
 	}
 
 	//last
-	m_aBB.push_back(elem_t(bbh, ~Tables::mask_high[high-WMUL(bbh)]));
+	m_aBB.push_back(pBlock_t(bbh, ~Tables::mask_high[high-WMUL(bbh)]));
 	
 return 0;
 }
@@ -548,7 +548,7 @@ return *this;
 BITBOARD BitBoardS::find_bitboard (int block_index) const{
 ///////////////////
 // returns the bitblock of the block index or EMPTY_ELEM if it does not exist
-	velem_cit it=lower_bound(m_aBB.begin(), m_aBB.end(), elem_t(block_index), elem_less());
+	velem_cit it=lower_bound(m_aBB.begin(), m_aBB.end(), pBlock_t(block_index), elem_less());
 	if(it!=m_aBB.end()){
 		if(it->idx_==block_index){
 			return it->bb_;
@@ -561,7 +561,7 @@ pair<bool, int>	BitBoardS::find_pos (int block_index) const{
 ////////////////
 // returns first:true if block exists second:lower bound index in the collection or EMPTY_ELEM if no block exists above the index
 	pair<bool, int> res(false, EMPTY_ELEM);
-	velem_cit it=lower_bound(m_aBB.begin(), m_aBB.end(), elem_t(block_index), elem_less());
+	velem_cit it=lower_bound(m_aBB.begin(), m_aBB.end(), pBlock_t(block_index), elem_less());
 	if(it!=m_aBB.end()){
 		res.second=it-m_aBB.begin();
 		if(it->idx_==block_index){
@@ -574,9 +574,9 @@ return res;
 pair<bool, BitBoardS::velem_it> BitBoardS::find_block (int block_index, bool is_lower_bound) 	{
 	pair<bool, BitBoardS::velem_it>res;
 	if(is_lower_bound)
-		res.second=lower_bound(m_aBB.begin(), m_aBB.end(), elem_t(block_index), elem_less());
+		res.second=lower_bound(m_aBB.begin(), m_aBB.end(), pBlock_t(block_index), elem_less());
 	else
-		res.second=upper_bound(m_aBB.begin(), m_aBB.end(), elem_t(block_index), elem_less());
+		res.second=upper_bound(m_aBB.begin(), m_aBB.end(), pBlock_t(block_index), elem_less());
 	res.first= (res.second!=m_aBB.end()) && (res.second->idx_==block_index);
 return res;
 }
@@ -584,9 +584,9 @@ return res;
 pair<bool, BitBoardS::velem_cit> BitBoardS::find_block (int block_index, bool is_lower_bound) const 	{
 	pair<bool, BitBoardS::velem_cit>res;
 	if(is_lower_bound)
-		res.second=lower_bound(m_aBB.begin(), m_aBB.end(), elem_t(block_index), elem_less());
+		res.second=lower_bound(m_aBB.begin(), m_aBB.end(), pBlock_t(block_index), elem_less());
 	else
-		res.second=upper_bound(m_aBB.begin(), m_aBB.end(), elem_t(block_index), elem_less());
+		res.second=upper_bound(m_aBB.begin(), m_aBB.end(), pBlock_t(block_index), elem_less());
 	res.first= res.second!=m_aBB.end() && res.second->idx_==block_index;
 return res;
 }
@@ -766,29 +766,29 @@ BitBoardS&  OR	(const BitBoardS& lhs, const BitBoardS& rhs,  BitBoardS& res){
 		
 		//update before either of the bitstrings has reached its end
 		if(lhs.m_aBB[i1].idx_<rhs.m_aBB[i2].idx_){
-			BitBoardS::elem_t e(lhs.m_aBB[i1].idx_, lhs.m_aBB[i1].bb_ );
+			BitBoardS::pBlock_t e(lhs.m_aBB[i1].idx_, lhs.m_aBB[i1].bb_ );
 			res.m_aBB.push_back(e);
 			++i1;
 		}else if(rhs.m_aBB[i2].idx_<lhs.m_aBB[i1].idx_){
-			BitBoardS::elem_t e(rhs.m_aBB[i2].idx_, rhs.m_aBB[i2].bb_ );
+			BitBoardS::pBlock_t e(rhs.m_aBB[i2].idx_, rhs.m_aBB[i2].bb_ );
 			res.m_aBB.push_back(e);
 			++i2;
 		}else{
-			BitBoardS::elem_t e(lhs.m_aBB[i1].idx_, lhs.m_aBB[i1].bb_ | rhs.m_aBB[i2].bb_);
+			BitBoardS::pBlock_t e(lhs.m_aBB[i1].idx_, lhs.m_aBB[i1].bb_ | rhs.m_aBB[i2].bb_);
 			res.m_aBB.push_back(e);
 			++i1, ++i2; 
 		}
 
 	/*	if(lhs.m_aBB[i1].idx_==rhs.m_aBB[i2].idx_){
-			BitBoardS::elem_t e(lhs.m_aBB[i1].idx_, lhs.m_aBB[i1].bb_ | rhs.m_aBB[i2].bb_);
+			BitBoardS::pBlock_t e(lhs.m_aBB[i1].idx_, lhs.m_aBB[i1].bb_ | rhs.m_aBB[i2].bb_);
 			res.m_aBB.push_back(e);
 			++i1, ++i2; 
 		}else if(lhs.m_aBB[i1].idx_<rhs.m_aBB[i2].idx_){
-			BitBoardS::elem_t e(lhs.m_aBB[i1].idx_, lhs.m_aBB[i1].bb_ );
+			BitBoardS::pBlock_t e(lhs.m_aBB[i1].idx_, lhs.m_aBB[i1].bb_ );
 			res.m_aBB.push_back(e);
 			++i1;
 		}else if(rhs.m_aBB[i2].idx_<lhs.m_aBB[i1].idx_){
-			BitBoardS::elem_t e(rhs.m_aBB[i2].idx_, rhs.m_aBB[i2].bb_ );
+			BitBoardS::pBlock_t e(rhs.m_aBB[i2].idx_, rhs.m_aBB[i2].bb_ );
 			res.m_aBB.push_back(e);
 			++i2;
 		}*/

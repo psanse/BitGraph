@@ -32,27 +32,27 @@ constexpr int DEFAULT_CAPACITY = 2;								//initial reserve of bit blocks for a
 class BitBoardS: public BBObject{
 	
 public:
-	struct elem_t{
+	struct pBlock_t{
 		int idx_;
 		BITBOARD bb_;
 
-		elem_t(int idx = BBObject::noBit, BITBOARD bb = 0):idx_(idx), bb_(bb){}
+		pBlock_t(int idx = BBObject::noBit, BITBOARD bb = 0):idx_(idx), bb_(bb){}
 
-		bool operator ==	(const elem_t& e)	const	{ return (idx_ == e.idx_ && bb_ == e.bb_); }
-		bool operator !=	(const elem_t& e)	const	{ return (idx_ != e.idx_ || bb_ != e.bb_); }
+		bool operator ==	(const pBlock_t& e)	const	{ return (idx_ == e.idx_ && bb_ == e.bb_); }
+		bool operator !=	(const pBlock_t& e)	const	{ return (idx_ != e.idx_ || bb_ != e.bb_); }
 		bool operator !		()					const	{ return !bb_ ; }
 		bool is_empty		()					const	{ return !bb_ ; }
 		void clear			()							{ bb_ = 0;}
 	};
 
 	//aliases
-	using velem = vector<elem_t>;
-	using velem_it = vector<elem_t>::iterator;
-	using velem_cit = vector<elem_t>::const_iterator;
+	using velem = vector<pBlock_t>;
+	using velem_it = vector<pBlock_t>::iterator;
+	using velem_cit = vector<pBlock_t>::const_iterator;
 		
 	//functor for sorting - check if it is necessary
 	struct elem_less {
-		bool operator()(const elem_t& lhs, const elem_t& rhs) {
+		bool operator()(const pBlock_t& lhs, const pBlock_t& rhs) {
 			return lhs.idx_ < rhs.idx_;
 		}
 	};
@@ -188,7 +188,7 @@ bool BitBoardS::is_bit(int nbit)	const{
 
 	//lower_bound implementation
 	int idx=WDIV(nbit);
-	velem_cit it=lower_bound(m_aBB.begin(), m_aBB.end(), elem_t(idx), elem_less());
+	velem_cit it=lower_bound(m_aBB.begin(), m_aBB.end(), pBlock_t(idx), elem_less());
 	if(it!=m_aBB.end()){
 		if((*it).idx_==idx)
 			return ((*it).bb_ & Tables::mask[WMOD(nbit)]);
@@ -314,7 +314,7 @@ void BitBoardS::erase_bit(int nbit /*0 based*/){
 	}*/
 	
 	//lower_bound implementation
-	velem_it it=lower_bound(m_aBB.begin(), m_aBB.end(), elem_t(idx), elem_less());
+	velem_it it=lower_bound(m_aBB.begin(), m_aBB.end(), pBlock_t(idx), elem_less());
 	if(it!=m_aBB.end()){
 		//check if the element exists already
 		if (it->idx_ == idx) {
@@ -328,7 +328,7 @@ BitBoardS::velem_it  BitBoardS::erase_bit (int nbit, BitBoardS::velem_it from_it
 	int idx=WDIV(nbit);
 		
 	//lower_bound implementation
-	velem_it it=lower_bound(from_it, m_aBB.end(), elem_t(idx), elem_less());
+	velem_it it=lower_bound(from_it, m_aBB.end(), pBlock_t(idx), elem_less());
 	if(it!=m_aBB.end()){
 		//check if the element exists already
 		if(it->idx_== idx)
@@ -355,17 +355,17 @@ int  BitBoardS::set_bit (int nbit ){
 	}
 
 	//lower_bound implementation
-	velem_it it=lower_bound(m_aBB.begin(), m_aBB.end(), elem_t(idx), elem_less());
+	velem_it it=lower_bound(m_aBB.begin(), m_aBB.end(), pBlock_t(idx), elem_less());
 	if(it!=m_aBB.end()){
 		//check if the element exists already
 		if(it->idx_== idx){
 			it->bb_|=Tables::mask[WMOD(nbit)];
 		}else 	//new inserted element
-			m_aBB.insert(it, elem_t(idx,Tables::mask[WMOD(nbit)]));
+			m_aBB.insert(it, pBlock_t(idx,Tables::mask[WMOD(nbit)]));
 	
 	}else{
 		//insertion at the end
-		m_aBB.push_back(elem_t(idx,Tables::mask[WMOD(nbit)]));
+		m_aBB.push_back(pBlock_t(idx,Tables::mask[WMOD(nbit)]));
 	}
 	
 return 0;  //ok
@@ -379,7 +379,7 @@ int BitBoardS::init_bit (int nBit){
 	//**assert MAXSIZE: return -1
 
 	m_aBB.clear();
-	m_aBB.push_back(elem_t(WDIV(nBit), Tables::mask[WMOD(nBit)]));
+	m_aBB.push_back(pBlock_t(WDIV(nBit), Tables::mask[WMOD(nBit)]));
 
 return 0;
 }	
@@ -529,7 +529,7 @@ int BitBoardS::popcn64(int nBit) const{
 	int nBB=WDIV(nBit);
 
 	//find the biblock if it exists
-	velem_cit it=lower_bound(m_aBB.begin(), m_aBB.end(), elem_t(nBB), elem_less());
+	velem_cit it=lower_bound(m_aBB.begin(), m_aBB.end(), pBlock_t(nBB), elem_less());
 	if(it!=m_aBB.end()){
 		if(it->idx_==nBB){
 			val.b= it->bb_&~Tables::mask_low[WMOD(nBit)];
@@ -566,7 +566,7 @@ BitBoardS& AND (const BitBoardS& lhs, const BitBoardS& rhs,  BitBoardS& res){
 		
 		//update before either of the bitstrings has reached its end
 		if(lhs.m_aBB[i1].idx_ == rhs.m_aBB[i2].idx_){
-				res.m_aBB.push_back(BitBoardS::elem_t(lhs.m_aBB[i1].idx_, lhs.m_aBB[i1].bb_ & rhs.m_aBB[i2].bb_));
+				res.m_aBB.push_back(BitBoardS::pBlock_t(lhs.m_aBB[i1].idx_, lhs.m_aBB[i1].bb_ & rhs.m_aBB[i2].bb_));
 		}
 	}
 
@@ -607,7 +607,7 @@ BitBoardS& AND (int first_block, const BitBoardS& lhs, const BitBoardS& rhs,  Bi
 			}else if(rhs.m_aBB[i2].idx_<lhs.m_aBB[i1].idx_){
 				i2++;
 			}else{
-				BitBoardS::elem_t e(lhs.m_aBB[i1].idx_, lhs.m_aBB[i1].bb_ & rhs.m_aBB[i2].bb_);
+				BitBoardS::pBlock_t e(lhs.m_aBB[i1].idx_, lhs.m_aBB[i1].bb_ & rhs.m_aBB[i2].bb_);
 				res.m_aBB.push_back(e);
 				i1++, i2++; 
 			}
@@ -661,7 +661,7 @@ BitBoardS& AND (int first_block, int last_block, const BitBoardS& lhs, const Bit
 		}else if(rhs.m_aBB[i2].idx_<lhs.m_aBB[i1].idx_){
 			i2++;
 		}else{
-			BitBoardS::elem_t e(lhs.m_aBB[i1].idx_, lhs.m_aBB[i1].bb_ & rhs.m_aBB[i2].bb_);
+			BitBoardS::pBlock_t e(lhs.m_aBB[i1].idx_, lhs.m_aBB[i1].bb_ & rhs.m_aBB[i2].bb_);
 			res.m_aBB.push_back(e);
 			i1++, i2++; 
 		}
@@ -699,9 +699,9 @@ BitBoardS&  ERASE (const BitBoardS& lhs, const BitBoardS& rhs,  BitBoardS& res){
 		
 		//update before either of the bitstrings has reached its end
 		if(lhs.m_aBB[i1].idx_==rhs.m_aBB[i2].idx_){
-				res.m_aBB.push_back(BitBoardS::elem_t(lhs.m_aBB[i1].idx_, lhs.m_aBB[i1].bb_ &~ rhs.m_aBB[i2].bb_));
+				res.m_aBB.push_back(BitBoardS::pBlock_t(lhs.m_aBB[i1].idx_, lhs.m_aBB[i1].bb_ &~ rhs.m_aBB[i2].bb_));
 		}else{
-			res.m_aBB.push_back(BitBoardS::elem_t(lhs.m_aBB[i1].idx_, lhs.m_aBB[i1].bb_));
+			res.m_aBB.push_back(BitBoardS::pBlock_t(lhs.m_aBB[i1].idx_, lhs.m_aBB[i1].bb_));
 		}
 	}
 return res;
@@ -877,7 +877,7 @@ int	 BitBoardS::erase_bit (int low, int high){
 	}
 		
 	//finds low bitblock and updates forward
-	velem_it itl=lower_bound(m_aBB.begin(), m_aBB.end(), elem_t(bbl), elem_less());
+	velem_it itl=lower_bound(m_aBB.begin(), m_aBB.end(), pBlock_t(bbl), elem_less());
 	if(itl!=m_aBB.end()){
 		if(itl->idx_==bbl){	//lower block exists
 			if(bbh==bbl){		//case update in the same bitblock
@@ -927,7 +927,7 @@ int BitBoardS::init_bit (int high, const BitBoardS& bb_add){
 	else{
 		if(p.first){
 			copy(bb_add.begin(), p.second, insert_iterator<velem>(m_aBB,m_aBB.begin()));
-			m_aBB.push_back(elem_t(bbh, p.second->bb_ & ~Tables::mask_high[high-WMUL(bbh)]));
+			m_aBB.push_back(pBlock_t(bbh, p.second->bb_ & ~Tables::mask_high[high-WMUL(bbh)]));
 		}else{
 			copy(bb_add.begin(), ++p.second, insert_iterator<velem>(m_aBB,m_aBB.begin()));
 		}
@@ -949,15 +949,15 @@ int  BitBoardS::init_bit (int low, int high,  const BitBoardS& bb_add){
 
 
 	//finds low bitblock and updates forward
-	velem_cit itl=lower_bound(bb_add.begin(), bb_add.end(), elem_t(bbl), elem_less());
+	velem_cit itl=lower_bound(bb_add.begin(), bb_add.end(), pBlock_t(bbl), elem_less());
 	if(itl!=bb_add.end()){
 		if(itl->idx_==bbl){	//lower block exists
 			if(bbh==bbl){		//case update in the same bitblock
-				m_aBB.push_back(elem_t( bbh, itl->bb_ & bblock::MASK_1(low-WMUL(bbl), high-WMUL(bbh)) ));
+				m_aBB.push_back(pBlock_t( bbh, itl->bb_ & bblock::MASK_1(low-WMUL(bbl), high-WMUL(bbh)) ));
 				return 0;
 			}else{
 				//add lower block
-				m_aBB.push_back(elem_t(bbl, itl->bb_ &~ Tables::mask_low[low-WMUL(bbl)] ));
+				m_aBB.push_back(pBlock_t(bbl, itl->bb_ &~ Tables::mask_low[low-WMUL(bbl)] ));
 				++itl;
 			}
 		}
@@ -966,7 +966,7 @@ int  BitBoardS::init_bit (int low, int high,  const BitBoardS& bb_add){
 		for(; itl!=bb_add.end(); ++itl){
 			if(itl->idx_>=bbh){		//exit condition
 				if(itl->idx_==bbh){	
-					m_aBB.push_back(elem_t(bbh, itl->bb_&~Tables::mask_high[high-WMUL(bbh)]));
+					m_aBB.push_back(pBlock_t(bbh, itl->bb_&~Tables::mask_high[high-WMUL(bbh)]));
 				}
 			return 0;
 			}

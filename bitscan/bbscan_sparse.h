@@ -98,7 +98,7 @@ int BBIntrinS::popcn64(int nBit) const{
 	int nBB=WDIV(nBit);
 
 	//find the biblock if it exists
-	velem_cit it=lower_bound(m_aBB.begin(), m_aBB.end(), elem_t(nBB), elem_less());
+	velem_cit it=lower_bound(m_aBB.begin(), m_aBB.end(), pBlock_t(nBB), elem_less());
 	if(it!=m_aBB.end()){
 		if(it->idx_==nBB){
 			BITBOARD bb= it->bb_&~Tables::mask_low[WMOD(nBit)];

@@ -12,7 +12,7 @@
 #include "graph/algorithms/graph_fast_sort.h"
 #include "graph/algorithms/graph_map.h"
 #include "gtest/gtest.h"
-#include "simple_ugraph.h"
+#include "graph/simple_ugraph.h"
 #include "utils/common.h"
 #include <iostream>
 

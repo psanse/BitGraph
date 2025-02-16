@@ -1,5 +1,6 @@
-# Create a library called "Hello" which includes the source file "hello.cxGRBx".
-# The extension is already found. Any number of sources could be listed here.
+#########################
+#headers for GRAPH lib
+########################
 set(useful_headers_for_IDE
 ${CMAKE_CURRENT_SOURCE_DIR}/graph.h
 ${CMAKE_CURRENT_SOURCE_DIR}/simple_graph.h

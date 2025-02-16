@@ -1,4 +1,6 @@
-#set useful headers 
+#########################
+#headers for UTILS lib
+#########################
 set(useful_headers_for_IDE 
     ${CMAKE_CURRENT_SOURCE_DIR}/common.h
     ${CMAKE_CURRENT_SOURCE_DIR}/common_types.h

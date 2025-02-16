@@ -1,6 +1,6 @@
-###################
-#set useful headers for IDE
-###################
+#########################
+#headers for BITSCAN lib
+#########################
 set(useful_headers_for_IDE
  ${CMAKE_CURRENT_SOURCE_DIR}/bbconfig.h
  ${CMAKE_CURRENT_SOURCE_DIR}/bbtypes.h
