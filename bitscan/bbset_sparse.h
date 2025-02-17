@@ -81,7 +81,7 @@ public:
 	friend inline BitSetSp&  AND	(int first_block, const BitSetSp& lhs, const BitSetSp& rhs,  BitSetSp& res);
 	friend inline BitSetSp&  AND	(int first_block, int last_block, const BitSetSp& lhs, const BitSetSp& rhs,  BitSetSp& res);
 	friend BitSetSp&  OR			(const BitSetSp& lhs, const BitSetSp& rhs,  BitSetSp& res);
-	friend BitSetSp&  ERASE		(const BitSetSp& lhs, const BitSetSp& rhs,  BitSetSp& res);			//removes rhs from lhs
+	friend BitSetSp&  ERASE			(const BitSetSp& lhs, const BitSetSp& rhs,  BitSetSp& res);			//removes rhs from lhs
 
 /////////////////////
 // constructors / destructors
@@ -113,7 +113,7 @@ explicit BitSetSp					(int nPop, bool is_popsize = true );
 	virtual ~BitSetSp				() = default;
 
 ////////////
-//Reset / init (memory allocation)
+//reset / init (heap allocation)
 
 	/**
 	* @brief resets the sparse bitset to a new population size
@@ -129,7 +129,7 @@ explicit BitSetSp					(int nPop, bool is_popsize = true );
 	**/
 	void init						(int nPop, bool is_popsize = true);
 	
-	//void clear						();
+	
 
 /////////////////////
 //setters and getters (will not allocate memory)
