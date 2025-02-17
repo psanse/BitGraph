@@ -118,7 +118,7 @@ TEST(Sparse, basics) {
 	EXPECT_FALSE(bbsp.find_pos(WDIV(129)).first);
 	EXPECT_EQ(EMPTY_ELEM, bbsp.find_pos(WDIV(129)).second);
 
-	EXPECT_EQ(0x01, bbsp.find_bitblock(WDIV(64)));
+	EXPECT_EQ(0x01, bbsp.find_block(WDIV(64)));
 }
 
 TEST(Sparse, member_masks) {

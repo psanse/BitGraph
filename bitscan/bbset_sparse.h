@@ -139,8 +139,6 @@ explicit BitSetSp					(int nPop, bool is_popsize = true );
 	**/
 	void init						(int nPop, bool is_popsize = true);
 	
-	
-
 /////////////////////
 //setters and getters (will not allocate memory)
 	
@@ -164,14 +162,23 @@ explicit BitSetSp					(int nPop, bool is_popsize = true );
 	**/
 	BITBOARD  block					(int blockID)			const {return vBB_[blockID].bb_;}			
 	BITBOARD& block					(int blockID)				  {return vBB_[blockID].bb_;}
-	
-	//O(log) operation
-	// returns the bitblock of the block index or EMPTY_ELEM if it does not exist
-	BITBOARD find_bitblock			(int block)				const;	
+		
+	/**
+	* @brief finds the bitblock of the block index 
+	* @returns bitblock of the block index or BBOjbect::noBit if it does not exist, i.e., it is empty
+	* @details O(log) complexity
+	**/
+	BITBOARD find_block				(int blockID)			const;	
 
-	pair<bool, int>	 find_pos		(int block)		const;											//O(log) operation
-	pair<bool, vPB_it> find_block	(int block, bool is_lb=true);	
-	pair<bool, vPB_cit>find_block (int block, bool is_lb=true)	const;	
+	std::pair<bool, vPB_it>  
+	find_block						(int blockID, bool is_lb);
+	std::pair<bool, vPB_cit> 
+	find_block						(int blockID, bool is_lb)	const;
+
+	//O(log) operation
+	// returns first:true if block exists second:lower bound index in the collection or EMPTY_ELEM if no block exists above the index
+	pair<bool, int>	 find_pos		(int blockID)			const;											
+	
 	vPB_it  begin					(){return vBB_.begin();}
 	vPB_it  end					(){return vBB_.end();}
 	vPB_cit  begin				()	const {return vBB_.cbegin();}
@@ -815,8 +822,8 @@ BitSetSp&  BitSetSp::erase_block (int first_block, const BitSetSp& rhs ){
 ////////////////////
 // removes 1-bits from current object (equialent to set_difference) from first_block (included) onwards			
 
-	pair<bool, BitSetSp::vPB_it> p1=find_block(first_block);
-	pair<bool, BitSetSp::vPB_cit> p2=rhs.find_block(first_block);
+	pair<bool, BitSetSp::vPB_it> p1=find_block(first_block, true);
+	pair<bool, BitSetSp::vPB_cit> p2=rhs.find_block(first_block, true);
 	
 	//optimization based on the size of rhs being greater
 	//for (int i1 = 0; i1 < lhs.vBB_.size();i1++){
@@ -848,8 +855,8 @@ BitSetSp&  BitSetSp::AND_EQ(int first_block, const BitSetSp& rhs ){
 //////////////////////
 // left intersection (AND). bits in rhs remain starting from closed range [first_block, END[
 
-	pair<bool, BitSetSp::vPB_it> p1=find_block(first_block);
-	pair<bool, BitSetSp::vPB_cit> p2=rhs.find_block(first_block);
+	pair<bool, BitSetSp::vPB_it> p1 = this->find_block(first_block, true);
+	pair<bool, BitSetSp::vPB_cit> p2 = rhs.find_block(first_block, true);
 	
 	//optimization based on the size of rhs being greater
 	//for (int i1 = 0; i1 < lhs.vBB_.size();i1++){...}
@@ -886,8 +893,8 @@ BitSetSp&  BitSetSp::OR_EQ(int first_block, const BitSetSp& rhs ){
 //////////////////////
 // left union (OR). Bits in rhs are added starting from closed range [first_block, END[
 
-	pair<bool, BitSetSp::vPB_it> p1=find_block(first_block);
-	pair<bool, BitSetSp::vPB_cit> p2=rhs.find_block(first_block);
+	pair<bool, BitSetSp::vPB_it> p1=find_block(first_block, true);
+	pair<bool, BitSetSp::vPB_cit> p2=rhs.find_block(first_block, true);
 	
 	//iteration
 	while(true){
@@ -938,8 +945,8 @@ BitSetSp&  BitSetSp::erase_block (int first_block, int last_block, const BitSetS
 ////////////////////
 // removes 1-bits from current object (equialent to set_difference) from CLOSED RANGE of blocks	
 
-	pair<bool, BitSetSp::vPB_it> p1=find_block(first_block);
-	pair<bool, BitSetSp::vPB_cit> p2=rhs.find_block(first_block);
+	pair<bool, BitSetSp::vPB_it> p1 = find_block(first_block, true);
+	pair<bool, BitSetSp::vPB_cit> p2 = rhs.find_block(first_block, true);
 	if(p1.second==vBB_.end() || p2.second==rhs.vBB_.end() )
 		 return *this;
 
@@ -1024,7 +1031,7 @@ int BitSetSp::init_bit (int high, const BitSetSp& bb_add){
 	
 	vBB_.clear();
 	int	bbh=WDIV(high); 
-	pair<bool, BitSetSp::vPB_cit> p=bb_add.find_block(bbh);
+	pair<bool, BitSetSp::vPB_cit> p = bb_add.find_block(bbh, true);
 	if(p.second==bb_add.end())
 		copy(bb_add.begin(), bb_add.end(),insert_iterator<vPB>(vBB_,vBB_.begin()));
 	else{
