@@ -116,11 +116,21 @@ explicit BitSetSp					(int nPop, bool is_popsize = true );
 //reset / init (heap allocation)
 
 	/**
-	* @brief resets the sparse bitset to a new population size
+	* @brief resets the sparse bitset to a new population size if is_popsize is true, 
+	*	     otherwise the maximum number of bitblocks of the bitset
+	* @param nPop: population size 
+	* @param is_popsize: if true, the population size is set to nPop, otherwise the 
+	*					  it is the maximum number of bitblocks of the bitset
+	* @details: if exception is thrown, the program exits
 	**/
 	void reset						(int nPop, bool is_popsize = true);
 	
-	//TODO - 17/02/2025
+	/**
+	* @brief resets the sparse bitset to a new population size with lv 1-bits
+	* @param nPop: population size
+	* @param lv: vector of 1-bits to set
+	* @details: if exception is thrown, the program exits
+	**/
 	void reset						(int nPop, const vint& lv);
 
 	/**
@@ -133,10 +143,32 @@ explicit BitSetSp					(int nPop, bool is_popsize = true );
 
 /////////////////////
 //setters and getters (will not allocate memory)
-											
+	
+	/**
+	* @brief number of non-zero bitblocks in the bitstring
+	* @details As opposed to the non-sparse case, it can be zero if there are no 1-bits
+	*		   even though the maximum number of bitblocks determined in construction nBB_
+	*		   can be anything.
+	**/
 	int number_of_bitblocks			()						const {return vBB_.size();}
-	BITBOARD bitblock				(int idx_)				const {return vBB_[idx_].bb_;}			//index in the collection			
-	BITBOARD find_bitboard			(int block)		const;											//O(log) operation
+	
+	/**
+	* @brief alternative syntax for number_of_bitblocks
+	**/
+	int capacity					()						const {return vBB_.size(); }
+	
+	/**
+	* @brief returns the bitblock at position blockID, not the id-th block of the
+	*		 equivalent non-sparse bitset in the general case. To find the id-th block
+	*		 use find_bitblock function.
+	**/
+	BITBOARD  block					(int blockID)			const {return vBB_[blockID].bb_;}			
+	BITBOARD& block					(int blockID)				  {return vBB_[blockID].bb_;}
+	
+	//O(log) operation
+	// returns the bitblock of the block index or EMPTY_ELEM if it does not exist
+	BITBOARD find_bitblock			(int block)				const;	
+
 	pair<bool, int>	 find_pos		(int block)		const;											//O(log) operation
 	pair<bool, vPB_it> find_block	(int block, bool is_lb=true);	
 	pair<bool, vPB_cit>find_block (int block, bool is_lb=true)	const;	

@@ -55,12 +55,12 @@ public:
 			return -1;
 		}
 
-		//copies adjacency (non-empty) bitblock array
+		//copies adjacency (non-empty) block array
 		for (auto v = 0; v < NV; ++v) {
 			for (auto it = sug.adj_[v].begin(); it != sug.adj_[v].end(); ++it) {
 
 				////////////////////////////////////////////////////
-				ug.adj_[v].bitblock(it->idx_) = it->bb_;
+				ug.adj_[v].block(it->idx_) = it->bb_;
 				////////////////////////////////////////////////////
 
 			}
@@ -93,7 +93,7 @@ public:
 		for (auto v = 0; v < NV; ++v) {
 			for (auto nBB = 0; nBB < NBB; ++nBB) {
 
-				BITBOARD bb = ug.adj_[v].bitblock(nBB);
+				BITBOARD bb = ug.adj_[v].block(nBB);
 				if (bb != 0) {
 					////////////////////////////////////////////////////
 					sug.adj_[v].get_elem_set().emplace_back(nBB, bb);

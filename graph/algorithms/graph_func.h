@@ -141,7 +141,7 @@ namespace gfunc{
 		for(decltype(MAXNBB) nBB = 0; nBB < MAXNBB; ++nBB){
 
 			//block NBB of the intersection of N(v) and bbref
-			BITBOARD bb = g.get_neighbors(v).bitblock(nBB) & bbref.bitblock(nBB);		
+			BITBOARD bb = g.get_neighbors(v).block(nBB) & bbref.block(nBB);		
 			
 			//decodes vertices from the bitblock and appends to vertex list
 			int offset = WMUL(nBB);
@@ -183,7 +183,7 @@ namespace gfunc{
 		int nBBv = WDIV(v);				
 
 		//first block of the intersection of N(v) and bbref from v		
-		BITBOARD bb = g.get_neighbors(v).bitblock(nBBv) & bbref.bitblock(nBBv);
+		BITBOARD bb = g.get_neighbors(v).block(nBBv) & bbref.block(nBBv);
 
 		//trims preceding vertices
 		bb &= Tables::mask_high[WMOD(v)];							
@@ -205,7 +205,7 @@ namespace gfunc{
 		for (decltype(MAXNBB) nBB = nBBv + 1; nBB < MAXNBB; ++nBB) {
 
 			//block NBB of the intersection of N(v) and bbref
-			BITBOARD bb = g.get_neighbors(v).bitblock(nBB) & bbref.bitblock(nBB);
+			BITBOARD bb = g.get_neighbors(v).block(nBB) & bbref.block(nBB);
 
 			//decodes vertices from the bitblock and appends to vertex list
 			int offset = WMUL(nBB);

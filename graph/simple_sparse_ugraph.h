@@ -83,7 +83,7 @@ int Ugraph<sparse_bitarray>::degree(int v, const BitSet& bbn) const {
 	
 	int ndeg = 0;
 	for (auto it = adj_[v].begin(); it != adj_[v].end(); ++it) {
-		ndeg += bblock::popc64 (it->bb_ & bbn.bitblock(it->idx_) );
+		ndeg += bblock::popc64 (it->bb_ & bbn.block(it->idx_) );
 	}
 
 	return ndeg;
@@ -120,7 +120,7 @@ int Ugraph<sparse_bitarray>::degree(int v, int UB, const BitSet& bbn) const {
 	
 	int ndeg = 0;
 	for (auto it = adj_[v].begin(); it != adj_[v].end(); ++it) {
-		ndeg += bblock::popc64(it->bb_ & bbn.bitblock(it->idx_));
+		ndeg += bblock::popc64(it->bb_ & bbn.block(it->idx_));
 		if (ndeg >= UB) return UB;
 	}
 
@@ -227,7 +227,7 @@ void Ugraph<sparse_bitarray>::write_mtx(ostream& o) {
 	// writes simple unweighted grafs  in edge list format 
 	// note: loops are not allowed
 
-		//header
+	//header
 	o << "%%MatrixMarket matrix coordinate pattern symmetric" << endl;
 
 	//timestamp

@@ -244,11 +244,11 @@ virtual	~BitSet						()								= default;
 	**/
 	int capacity()								const					{ return nBB_; }
 
-	vbset& bitstring				()									{ return vBB_; }
-const vbset& bitstring				()			const					{ return vBB_; }
+	vbset& bitset					()									{ return vBB_; }
+const vbset& bitset					()			const					{ return vBB_; }
 	
-const BITBOARD bitblock				(int block) const					{ return vBB_[block]; }
-	BITBOARD& bitblock				(int block)							{ return vBB_[block]; }
+	BITBOARD block					(int blockID) const					{ return vBB_[blockID]; }
+	BITBOARD& block					(int blockID)						{ return vBB_[blockID]; }
 
 //////////////////////////////
 // Bitscanning (no HW operations)

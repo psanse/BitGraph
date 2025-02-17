@@ -20,7 +20,7 @@ BBSentinel&  AND (const BitSet& lhs, const BBSentinel& rhs,  BBSentinel& res){
 	res.m_BBL=rhs.m_BBL;
 	res.m_BBH=rhs.m_BBH;
 	for(int i=rhs.m_BBL; i<=rhs.m_BBH; i++){
-		res.vBB_[i]=lhs.bitblock(i)&rhs.vBB_[i];
+		res.vBB_[i]=lhs.block(i)&rhs.vBB_[i];
 	}
 return res;
 }
@@ -201,7 +201,7 @@ void  BBSentinel::erase_bit	(){
 ///////////////
 // Redefinition of emptyness: in the sentinel range
 // 
-// Remarks: To ensure empty bitblocks in all the range, call init_sentinels(false) first
+// Remarks: To ensure empty blocks in all the range, call init_sentinels(false) first
 	if(m_BBL==EMPTY_ELEM || m_BBH==EMPTY_ELEM) return; 
 
 	for(int i=m_BBL; i<=m_BBH; i++)	
@@ -217,7 +217,7 @@ BBSentinel& BBSentinel::erase_bit (const BitSet& bbn){
 // 1.Has to be careful with BitSet cast to int in constructor
 	
 	for(int i=m_BBL; i<=m_BBH; i++)
-		vBB_[i] &= ~ bbn.bitblock(i);		//**access
+		vBB_[i] &= ~ bbn.block(i);		//**access
 
 return *this;
 }
@@ -274,7 +274,7 @@ return true;
 
 BBSentinel& BBSentinel::operator= (const  BBSentinel& bbs){
 ///////////////
-// redefinition of equality: same sentinels of the copied bbs, same bitblocks in sentinel range
+// redefinition of equality: same sentinels of the copied bbs, same blocks in sentinel range
 
 	m_BBL=bbs.m_BBL;
 	m_BBH=bbs.m_BBH;
@@ -292,7 +292,7 @@ BBSentinel& BBSentinel::operator&=	(const  BitSet& bbn){
 // AND operation in the range of the sentinels
 
 	for(int i=m_BBL; i<=m_BBH; i++){
-		this->vBB_[i] &= bbn.bitblock(i);
+		this->vBB_[i] &= bbn.block(i);
 	}
 
 	return  *this;

@@ -72,6 +72,25 @@ TEST(Sparse, DISABLED_construction_semantics) {
 	//TODO
 }
 
+
+TEST_F(BitSetSpClassTest, reset) {
+
+	//size
+	bbsp.reset(10);
+	EXPECT_EQ(0, bbsp.size());							//number of 1-bis
+	EXPECT_EQ(0, bbsp.capacity());						//number of non_zero bitblocks
+
+	//size and bits
+	vint lv = { 10, 20, 100 };
+	bbsp.reset(200, lv);
+	EXPECT_EQ(3, bbsp.size());							//number of 1-bis
+	EXPECT_EQ(2, bbsp.capacity());						//number of non_zero bitblocks
+	EXPECT_TRUE(bbsp.is_bit(10));						//number of 1-bis		
+	EXPECT_TRUE(bbsp.is_bit(20));						//number of 1-bis		
+	EXPECT_TRUE(bbsp.is_bit(100));						//number of 1-bis		
+
+}
+
 TEST(Sparse, basics) {
 
 	BitSetSp bbsp(130);
@@ -99,7 +118,7 @@ TEST(Sparse, basics) {
 	EXPECT_FALSE(bbsp.find_pos(WDIV(129)).first);
 	EXPECT_EQ(EMPTY_ELEM, bbsp.find_pos(WDIV(129)).second);
 
-	EXPECT_EQ(0x01, bbsp.find_bitboard(WDIV(64)));
+	EXPECT_EQ(0x01, bbsp.find_bitblock(WDIV(64)));
 }
 
 TEST(Sparse, member_masks) {

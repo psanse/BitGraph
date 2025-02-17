@@ -68,11 +68,38 @@ void BitSetSp::reset(int size, bool is_popsize)
 {
 	try {
 		(is_popsize) ? nBB_ = INDEX_1TO1(size) : nBB_ = size;
-		vBB_.clear();
+		decltype(vBB_)().swap(vBB_);
 		vBB_.reserve(DEFAULT_CAPACITY);
 	}
 	catch (...) {
-		LOG_ERROR("Error during initialization - BitSet::init");
+		LOG_ERROR("Error during reset - BitSet::reset");
+		LOG_ERROR("exiting...");
+		std::exit(-1);
+	}
+}
+
+void BitSetSp::reset(int nPop, const vint& lv)
+{
+
+	try {
+		nBB_ = INDEX_1TO1(nPop);
+		decltype(vBB_)().swap(vBB_);
+		vBB_.reserve(DEFAULT_CAPACITY);
+
+		//sets bit conveniently
+		for (auto& bit : lv) {
+
+			//////////////////
+			assert(bit >= 0 && bit < nPop);
+			/////////////////
+
+			//sets bits - adds pBlocks in place
+			assert(set_bit(bit) != -1);
+
+		}
+	}
+	catch (...) {
+		LOG_ERROR("Error during reset - BitSet::reset");
 		LOG_ERROR("exiting...");
 		std::exit(-1);
 	}
@@ -589,17 +616,18 @@ return *this;
 }
 
 
+BITBOARD BitSetSp::find_bitblock (int block_index) const{
 
-BITBOARD BitSetSp::find_bitboard (int block_index) const{
-///////////////////
-// returns the bitblock of the block index or EMPTY_ELEM if it does not exist
-	vPB_cit it=lower_bound(vBB_.begin(), vBB_.end(), pBlock_t(block_index), pBlock_less());
-	if(it!=vBB_.end()){
-		if(it->idx_==block_index){
-			return it->bb_;
-		}
+	////////////////////////////////////////////////////////////////////////////////////////////
+	vPB_cit it = lower_bound(vBB_.begin(), vBB_.end(), pBlock_t(block_index), pBlock_less());
+	////////////////////////////////////////////////////////////////////////////////////////////
+
+	if(it != vBB_.end() && it->idx_ == block_index){
+		return it->bb_;
 	}
-return EMPTY_ELEM;
+	else {
+		return BBObject::noBit;
+	}
 }
 
 pair<bool, int>	BitSetSp::find_pos (int block_index) const{

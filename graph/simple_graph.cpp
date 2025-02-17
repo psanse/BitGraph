@@ -211,10 +211,10 @@ Graph<T>& Graph<T>::create_subgraph (std::size_t first_k, Graph<T>& newg) const 
 	//copy the relevant vertices of the adjacency matrix
 	for(auto i = 0; i < newg.NV_; ++i){
 		for(auto j = 0; j <= bbh; ++j){
-			newg.adj_[i].bitblock(j)=adj_[i].bitblock(j);
+			newg.adj_[i].block(j)=adj_[i].block(j);
 		}
 		//trims last bitblock
-		newg.adj_[i].bitblock(bbh) &= ~Tables::mask_high[WMOD(first_k - 1)];
+		newg.adj_[i].block(bbh) &= ~Tables::mask_high[WMOD(first_k - 1)];
 	}
 	
 	return newg;
@@ -618,7 +618,7 @@ double Graph<T>::block_density	()	const {
 	size_t nBB = 0;
 	for(int v = 0; v < NV_; ++v){
 		for(int bb = 0; bb < NBB_; bb++){
-			if(adj_[v].bitblock(bb))		//non-empty bitblock				
+			if(adj_[v].block(bb))		//non-empty bitblock				
 				nBB++;						
 		}
 	}
@@ -887,7 +887,7 @@ void  Graph<T>::write_EDGES	(ostream& o){
 //	for (int v = 0; v < NV_; ++v) {
 //		nBBt += adj_[v].number_of_bitblocks();
 //		for (int bb = 0; bb < adj_[v].number_of_bitblocks(); bb++) {
-//			if (adj_[v].bitblock(bb))
+//			if (adj_[v].block(bb))
 //				nBB++;
 //		}
 //	}
