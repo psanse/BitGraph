@@ -56,13 +56,12 @@ public:
 	using vPB_it	= vector<pBlock_t>::iterator;
 	using vPB_cit	= vector<pBlock_t>::const_iterator;
 		
-	//functor for sorting - check if it is necessary, maybe use a lambda C++11
+	//functor for sorting - check if it is necessary, or throwing lambdas is enough
 	struct pBlock_less {
 		bool operator()(const pBlock_t& lhs, const pBlock_t& rhs) const {
 			return lhs.idx_ < rhs.idx_;
 		}
 	};
-
 
 /////////////////////
 // static data members 
