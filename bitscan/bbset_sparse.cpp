@@ -618,7 +618,7 @@ return *this;
 BITBOARD BitSetSp::find_block (int blockID) const{
 
 	////////////////////////////////////////////////////////////////////////////////////////////
-	vPB_cit it = lower_bound(vBB_.begin(), vBB_.end(), pBlock_t(blockID), pBlock_less());
+	auto it = lower_bound(vBB_.cbegin(), vBB_.cend(), pBlock_t(blockID), pBlock_less());
 	////////////////////////////////////////////////////////////////////////////////////////////
 
 	if(it != vBB_.end() && it->idx_ == blockID){
@@ -635,13 +635,13 @@ BitSetSp::find_pos (int blockID) const{
 	std::pair<bool, int> res(false, EMPTY_ELEM);
 
 	////////////////////////////////////////////////////////////////////////////////////////////
-	vPB_cit it = lower_bound(vBB_.begin(), vBB_.end(), pBlock_t(blockID), pBlock_less());
+	auto it = lower_bound(vBB_.cbegin(), vBB_.cend(), pBlock_t(blockID), pBlock_less());
 	////////////////////////////////////////////////////////////////////////////////////////////
 
 	if(it != vBB_.end()){
 		res.second = it - vBB_.begin();
 		if(it->idx_ == blockID){
-			res.first=true;
+			res.first = true;
 		}
 	}
 
@@ -649,42 +649,43 @@ BitSetSp::find_pos (int blockID) const{
 }
 
 std::pair<bool, BitSetSp::vPB_it>
-BitSetSp::find_block (int block_index, bool is_lower_bound) 
+BitSetSp::find_block (int blockID, bool is_lower_bound) 
 {
-	pair<bool, BitSetSp::vPB_it>res;
+	pair<bool, BitSetSp::vPB_it> res;
 
 	if (is_lower_bound) {
 		////////////////////////////////////////////////////////////////////////////////////////////
-		res.second = lower_bound(vBB_.begin(), vBB_.end(), pBlock_t(block_index), pBlock_less());
+		res.second = lower_bound(vBB_.begin(), vBB_.end(), pBlock_t(blockID), pBlock_less());
 		////////////////////////////////////////////////////////////////////////////////////////////
 	}
 	else {
 		////////////////////////////////////////////////////////////////////////////////////////////
-		res.second = upper_bound(vBB_.begin(), vBB_.end(), pBlock_t(block_index), pBlock_less());
+		res.second = upper_bound(vBB_.begin(), vBB_.end(), pBlock_t(blockID), pBlock_less());
 		////////////////////////////////////////////////////////////////////////////////////////////
 	}
 
-	res.first = (res.second != vBB_.end()) && (res.second->idx_ == block_index);
+	res.first = (res.second != vBB_.end()) && (res.second->idx_ == blockID);
 	
 	return res;
 }
 
 pair<bool, BitSetSp::vPB_cit> 
-BitSetSp::find_block (int block_index, bool is_lower_bound) const 
+BitSetSp::find_block (int blockID, bool is_lower_bound) const
 {
 	pair<bool, BitSetSp::vPB_cit>res;
+
 	if (is_lower_bound) {
 		////////////////////////////////////////////////////////////////////////////////////////////
-		res.second = lower_bound(vBB_.begin(), vBB_.end(), pBlock_t(block_index), pBlock_less());
+		res.second = lower_bound(vBB_.cbegin(), vBB_.cend(), pBlock_t(blockID), pBlock_less());
 		////////////////////////////////////////////////////////////////////////////////////////////
 	}
 	else {
 		////////////////////////////////////////////////////////////////////////////////////////////
-		res.second = upper_bound(vBB_.begin(), vBB_.end(), pBlock_t(block_index), pBlock_less());
+		res.second = upper_bound(vBB_.cbegin(), vBB_.cend(), pBlock_t(blockID), pBlock_less());
 		////////////////////////////////////////////////////////////////////////////////////////////
 	}
 
-	res.first = (res.second!=vBB_.end()) && (res.second->idx_ == block_index);
+	res.first = (res.second!=vBB_.end()) && (res.second->idx_ == blockID);
 	
 	return res;
 }
