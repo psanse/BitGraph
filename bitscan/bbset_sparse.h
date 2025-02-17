@@ -159,7 +159,7 @@ virtual inline	 int popcn64		()						const;			//lookup
 virtual inline	 int popcn64		(int nBit)				const;			
 
 /////////////////////
-//Setting / Erasing bits 
+//Setting (ordered insertion) / Erasing bits  
 
 		int   init_bit				(int nbit);	
 		int   init_bit				(int lbit, int rbit);	
@@ -171,7 +171,7 @@ virtual inline	 int popcn64		(int nBit)				const;
 	* @param nbit: position of the bit to set
 	* @returns 0 if the bit was set, -1 if error
 	* @details emplaces pBlock in the bitstring or changes an existing bitblock
-	* @detials uses lower_bound for insertion (overhead)
+	* @detials uses lower_bound for insertion (log overhead)
 	* @details uses internal assert macro for error checking
 	**/
 inline	int  set_bit				(int nbit);															
@@ -406,16 +406,18 @@ int BitSetSp::set_bit (int bit ){
 	}
 	/////////////////////////
 		
-	//ordered insertion - lower_bound implementation
+	//ordered insertion - lower_bound implementation which returns the first element NOT LESS than block
 	vPB_it it = std::lower_bound (vBB_.begin(), vBB_.end(), pBlock_t(block), pBlock_less());
 	if(it != vBB_.end()){
 				
 		if(it->idx_ == block){
+
 			//check if the element exists already
 			it->bb_|=Tables::mask[bit - WMUL(block) /* WMOD(bit) */];
 		}
 		else {
-			//new inserted element
+
+			//inserts new pBlock BEFORE iterator
 			vBB_.insert(it, pBlock_t(block, Tables::mask[bit - WMUL(block) /* WMOD(bit) */]));
 		}
 	
