@@ -21,12 +21,12 @@ using namespace std;
 //
 ///////////////////////////////////
 
-class BBIntrinS: public BitBoardS{
+class BBIntrinS: public BitSetSp{
 public:	
 				
 	 BBIntrinS						(){};										
-explicit BBIntrinS					(int popsize /*1 based*/, bool reset=true):BitBoardS(popsize,reset)	{}	
-	 BBIntrinS						(const BBIntrinS& bbN):BitBoardS(bbN)	{}
+explicit BBIntrinS					(int popsize /*1 based*/, bool reset=true):BitSetSp(popsize,reset)	{}	
+	 BBIntrinS						(const BBIntrinS& bbN):BitSetSp(bbN)	{}
 
 	 void set_bbindex				(int bbindex)	{m_scan.bbi_=bbindex;}			//refers to the position in the collection (not in the bitstring)
 	 void set_posbit				(int posbit)	{m_scan.pos_=posbit;}	

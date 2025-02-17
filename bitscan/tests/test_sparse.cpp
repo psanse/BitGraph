@@ -15,7 +15,7 @@
 using namespace std;
 
 TEST(Sparse, construction){
-	BitBoardS bbs;
+	BitSetSp bbs;
 	bbs.init(1000);
 	bbs.set_bit(500);
 	bbs.set_bit(700);
@@ -27,13 +27,13 @@ TEST(Sparse, construction){
 	bbs.set_bit(10);
 	EXPECT_TRUE(bbs.is_bit(10));
 
-	BitBoardS bbs1(bbs);
+	BitSetSp bbs1(bbs);
 	EXPECT_TRUE(bbs1.is_bit(10));
 }
 
 TEST(Sparse, basics) {
 
-	BitBoardS bbsp(130);
+	BitSetSp bbsp(130);
 	bbsp.set_bit(10);
 	bbsp.set_bit(20);
 	bbsp.set_bit(64);
@@ -63,13 +63,13 @@ TEST(Sparse, basics) {
 
 TEST(Sparse, member_masks) {
 
-	BitBoardS lhs;
+	BitSetSp lhs;
 	lhs.init(200);
 	lhs.set_bit(63);
 	lhs.set_bit(126);
 	lhs.set_bit(189);	
 	
-	BitBoardS rhs;
+	BitSetSp rhs;
 	rhs.init(200);
 	rhs.set_bit(63);
 	rhs.set_bit(127);
@@ -137,7 +137,7 @@ TEST(Sparse_intrinsic, set_clear_bit_in_intervals) {
 
 TEST(Sparse, population_count){
 
-	BitBoardS bb(130);
+	BitSetSp bb(130);
 	bb.set_bit(10);
 	bb.set_bit(20);
 	bb.set_bit(64);
@@ -164,7 +164,7 @@ TEST(Sparse, population_count){
 	EXPECT_EQ(0, bbs.popcn64(130));			//at the moment there is no population check
 
 	//empty graphs
-	BitBoardS bbs_empty(130);
+	BitSetSp bbs_empty(130);
 	EXPECT_EQ(0, bbs_empty.popcn64(5));	
 
 	BBIntrinS bbs_empty1(130);
@@ -173,7 +173,7 @@ TEST(Sparse, population_count){
 
 TEST(Sparse, set_bits) {
 	
-	BitBoardS bbsp(10000);
+	BitSetSp bbsp(10000);
 
 	bbsp.set_bit(0);
 	bbsp.set_bit(1);
@@ -259,7 +259,7 @@ TEST(Sparse, boolean_properties){
 
 TEST(Sparse, set_blocks) {
 	
-	BitBoardS bbsp(10000);
+	BitSetSp bbsp(10000);
 
 	bbsp.set_bit(0);
 	bbsp.set_bit(1);
@@ -269,7 +269,7 @@ TEST(Sparse, set_blocks) {
 	bbsp.set_bit(1000);
 	bbsp.set_bit(9000);
 
-	BitBoardS bbsp1(10000);
+	BitSetSp bbsp1(10000);
 
 	bbsp1.set_bit(5);
 	bbsp1.set_bit(8);
@@ -297,7 +297,7 @@ TEST(Sparse, set_blocks) {
 
 TEST(Sparse, erase_bits) {
 	
-	BitBoardS bbsp(10000);
+	BitSetSp bbsp(10000);
 
 	bbsp.set_bit(0);
 	bbsp.set_bit(1);
@@ -360,7 +360,7 @@ TEST(Sparse, erase_bits) {
 
 TEST(Sparse, clear_bits) {
 
-	BitBoardS bbsp(10000);
+	BitSetSp bbsp(10000);
 
 	bbsp.set_bit(0);
 	bbsp.set_bit(1);
@@ -410,7 +410,7 @@ TEST(Sparse, clear_bits) {
 }
 
 TEST(Sparse_non_instrinsic, scanning){
-	BitBoardS bbsp(130);
+	BitSetSp bbsp(130);
 	bbsp.set_bit(10);
 	bbsp.set_bit(20);
 	bbsp.set_bit(64);	
@@ -578,18 +578,18 @@ TEST(Sparse_intrinsic, destructive_scanning){
 
 TEST(Sparse, operators){
 
-	BitBoardS bbsp(130);
+	BitSetSp bbsp(130);
 	bbsp.set_bit(10);
 	bbsp.set_bit(20);
 	bbsp.set_bit(64);
 
-	BitBoardS bbsp1(130);
+	BitSetSp bbsp1(130);
 	bbsp1.set_bit(30);
 	bbsp1.set_bit(54);
 	bbsp1.set_bit(128);
 	
 	//OR
-	BitBoardS resOR(130);
+	BitSetSp resOR(130);
 	OR(bbsp1, bbsp, resOR);
 	EXPECT_EQ(6, resOR.popcn64());
 
@@ -599,9 +599,9 @@ TEST(Sparse, operators){
 	EXPECT_TRUE(bbsp==resOR);
 
 	//AND
-	BitBoardS bbsp2(130,true);
+	BitSetSp bbsp2(130,true);
 	bbsp2.set_bit(54);
-	BitBoardS resAND(130);
+	BitSetSp resAND(130);
 	AND(bbsp1,bbsp2,resAND);
 	EXPECT_TRUE(resAND.is_bit(54));
 	EXPECT_EQ(1, resAND.popcn64());
@@ -609,7 +609,7 @@ TEST(Sparse, operators){
 
 TEST(Sparse, insertion) {
 
-	BitBoardS bbsp(130);					
+	BitSetSp bbsp(130);					
 	bbsp.set_bit(64);
 	bbsp.set_bit(65);
 	bbsp.set_bit(12);					//obligatory
@@ -619,22 +619,22 @@ TEST(Sparse, insertion) {
 
 TEST(Sparse, integration) {
 
-	BitBoardS bbs(10000);
+	BitSetSp bbs(10000);
 	bbs.set_bit(10);
 	bbs.set_bit(1000);
 	bbs.set_bit(70);
 	bbs.set_bit(150);
 	
-	BitBoardS bbs1(10000);
+	BitSetSp bbs1(10000);
 	bbs1.set_bit(1000);
 
-	BitBoardS bbs2(10000);
+	BitSetSp bbs2(10000);
 	AND(bbs1, bbs, bbs2);
 	EXPECT_EQ(1, bbs2.popcn64());
 	EXPECT_TRUE(bbs2.is_bit(1000));
 	EXPECT_TRUE(bbs2==bbs1);
 
-	BitBoardS bbs3(10000);
+	BitSetSp bbs3(10000);
 	OR(bbs1,bbs, bbs3);
 	EXPECT_EQ(4, bbs3.popcn64());
 	EXPECT_TRUE(bbs3.is_bit(1000));

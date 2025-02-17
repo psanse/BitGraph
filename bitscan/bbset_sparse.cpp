@@ -1,4 +1,4 @@
-// bbset_sparse.cpp: implementation of the BitBoardS classd, wrapper for sparse bitstrings
+// bbset_sparse.cpp: implementation of the BitSetSp classd, wrapper for sparse bitstrings
 //
 //////////////////////////////////////////////////////////////////////
 
@@ -12,25 +12,25 @@
  
 using namespace std;
 
-int BitBoardS::nElem=EMPTY_ELEM;
+int BitSetSp::nElem=EMPTY_ELEM;
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
-BitBoardS::BitBoardS(int size /*1 based*/, bool is_popsize ){
+BitSetSp::BitSetSp(int size /*1 based*/, bool is_popsize ){
 	(is_popsize)? nBB_=INDEX_1TO1(size) : nBB_=size;
 	vBB_.reserve(DEFAULT_CAPACITY);							//*** check efficiency
 }
 
-BitBoardS::BitBoardS (const BitBoardS& bbS){
+BitSetSp::BitSetSp (const BitSetSp& bbS){
 //////////////
 // copies state
 	vBB_=bbS.vBB_;
 	nBB_=bbS.nBB_;
 }
 
-int BitBoardS::init (int size, bool is_popsize){
+int BitSetSp::init (int size, bool is_popsize){
 ///////////////
 // allocates memory
 
@@ -41,17 +41,17 @@ int BitBoardS::init (int size, bool is_popsize){
 return 0;	//for API compatibility
 }
 
-void  BitBoardS::clear(){
+void  BitSetSp::clear(){
 	vBB_.clear();
 	nBB_=EMPTY_ELEM;
 }
 
-void BitBoardS::sort (){
+void BitSetSp::sort (){
 	std::sort(vBB_.begin(), vBB_.end(), elem_less());
 }	
 
 
-int	 BitBoardS::set_bit	(int low, int high){
+int	 BitSetSp::set_bit	(int low, int high){
 ///////////////////
 // sets bits to one in the corresponding CLOSED range
 //
@@ -156,7 +156,7 @@ int	 BitBoardS::set_bit	(int low, int high){
 return 0;
 }
 
-int BitBoardS::init_bit (int low, int high){
+int BitSetSp::init_bit (int low, int high){
 /////////////////////////
 // sets bits in the closed range and clears the rest
 	
@@ -189,7 +189,7 @@ return 0;
 
 
 
-BitBoardS& BitBoardS::set_bit (const BitBoardS& rhs){
+BitSetSp& BitSetSp::set_bit (const BitSetSp& rhs){
 /////////////////////////////////
 // sets 1-bits in rhs (equivalent to an |=)
 //
@@ -239,15 +239,15 @@ BitBoardS& BitBoardS::set_bit (const BitBoardS& rhs){
 return *this;		
 }
 
-BitBoardS&  BitBoardS::set_block (int first_block, const BitBoardS& rhs){
+BitSetSp&  BitSetSp::set_block (int first_block, const BitSetSp& rhs){
 /////////////////////////////////
 //
 // REMARKS: experimental, currently only defined for bit strings of same size
 
 	//vBB_.reserve(rhs.vBB_.size()+vBB_.size());						//maximum possible size, to push_back in place without allocation
 	vPB vapp;
-	pair<bool, BitBoardS::vPB_it> p1=find_block(first_block);
-	pair<bool, BitBoardS::vPB_cit> p2=rhs.find_block(first_block);
+	pair<bool, BitSetSp::vPB_it> p1=find_block(first_block);
+	pair<bool, BitSetSp::vPB_cit> p2=rhs.find_block(first_block);
 	bool req_sorting=false;
 		
 
@@ -294,23 +294,23 @@ BitBoardS&  BitBoardS::set_block (int first_block, const BitBoardS& rhs){
 return *this;		
 }
 
-BitBoardS&  BitBoardS::set_block (int first_block, int last_block, const BitBoardS& rhs){
+BitSetSp&  BitSetSp::set_block (int first_block, int last_block, const BitSetSp& rhs){
 /////////////////////////////////
 //
 // REMARKS: experimental, currently only defined for bit strings of same size 
 	
 	//vBB_.reserve(vBB_.size()+ last_block-first_block+1);						//maximum possible size, to push_back in place without allocation
 	vPB vapp;
-	pair<bool, BitBoardS::vPB_it> p1i=find_block(first_block);
-	pair<bool, BitBoardS::vPB_cit> p2i=rhs.find_block(first_block);
-	pair<bool, BitBoardS::vPB_cit> p2f=rhs.find_block(last_block);
+	pair<bool, BitSetSp::vPB_it> p1i=find_block(first_block);
+	pair<bool, BitSetSp::vPB_cit> p2i=rhs.find_block(first_block);
+	pair<bool, BitSetSp::vPB_cit> p2f=rhs.find_block(last_block);
 	bool req_sorting=false;
 		
 	if(p2i.second==rhs.vBB_.end()){ //check in this order (captures rhs empty on init)
 		return *this;
 	}
 
-	BitBoardS::vPB_cit p2it_end=(p2f.first)? p2f.second+1 : p2f.second;			//iterator to the last block +1 in the rhs
+	BitSetSp::vPB_cit p2it_end=(p2f.first)? p2f.second+1 : p2f.second;			//iterator to the last block +1 in the rhs
 	if(p1i.second==vBB_.end()){
 		//append rhs at the end
 		vBB_.insert(vBB_.end(),p2i.second, p2it_end);	
@@ -353,7 +353,7 @@ return *this;
 
 
 
-int BitBoardS::clear_bit (int low, int high){
+int BitSetSp::clear_bit (int low, int high){
 ///////////////////
 // clears bits in the corresponding CLOSED range (effectively deletes bitblocks)
 //
@@ -363,8 +363,8 @@ int BitBoardS::clear_bit (int low, int high){
 	
 	
 	int bbl=EMPTY_ELEM, bbh=EMPTY_ELEM; 
-	pair<bool, BitBoardS::vPB_it> pl;
-	pair<bool, BitBoardS::vPB_it> ph;
+	pair<bool, BitSetSp::vPB_it> pl;
+	pair<bool, BitSetSp::vPB_it> ph;
 
 ////////////////////////
 //special cases
@@ -452,7 +452,7 @@ return 0;
 }
 
 
-BitBoardS&  BitBoardS::erase_bit (const BitBoardS& rhs ){
+BitSetSp&  BitSetSp::erase_bit (const BitSetSp& rhs ){
 ////////////////////
 // removes 1-bits from current object (equialent to set_difference)
 	int i1=0, i2=0;
@@ -476,7 +476,7 @@ BitBoardS&  BitBoardS::erase_bit (const BitBoardS& rhs ){
 return *this;
 }
 
-BitBoardS& BitBoardS::operator &= (const BitBoardS& rhs){
+BitSetSp& BitSetSp::operator &= (const BitSetSp& rhs){
 ///////////////////
 // AND mask in place
 
@@ -516,7 +516,7 @@ BitBoardS& BitBoardS::operator &= (const BitBoardS& rhs){
 return *this;
 }
 
-BitBoardS& BitBoardS::operator |= (const BitBoardS& rhs){
+BitSetSp& BitSetSp::operator |= (const BitSetSp& rhs){
 ///////////////////
 // OR mask in place
 // date:10/02/2015
@@ -545,7 +545,7 @@ return *this;
 
 
 
-BITBOARD BitBoardS::find_bitboard (int block_index) const{
+BITBOARD BitSetSp::find_bitboard (int block_index) const{
 ///////////////////
 // returns the bitblock of the block index or EMPTY_ELEM if it does not exist
 	vPB_cit it=lower_bound(vBB_.begin(), vBB_.end(), pBlock_t(block_index), elem_less());
@@ -557,7 +557,7 @@ BITBOARD BitBoardS::find_bitboard (int block_index) const{
 return EMPTY_ELEM;
 }
 
-pair<bool, int>	BitBoardS::find_pos (int block_index) const{
+pair<bool, int>	BitSetSp::find_pos (int block_index) const{
 ////////////////
 // returns first:true if block exists second:lower bound index in the collection or EMPTY_ELEM if no block exists above the index
 	pair<bool, int> res(false, EMPTY_ELEM);
@@ -571,8 +571,8 @@ pair<bool, int>	BitBoardS::find_pos (int block_index) const{
 return res;
 }
 
-pair<bool, BitBoardS::vPB_it> BitBoardS::find_block (int block_index, bool is_lower_bound) 	{
-	pair<bool, BitBoardS::vPB_it>res;
+pair<bool, BitSetSp::vPB_it> BitSetSp::find_block (int block_index, bool is_lower_bound) 	{
+	pair<bool, BitSetSp::vPB_it>res;
 	if(is_lower_bound)
 		res.second=lower_bound(vBB_.begin(), vBB_.end(), pBlock_t(block_index), elem_less());
 	else
@@ -581,8 +581,8 @@ pair<bool, BitBoardS::vPB_it> BitBoardS::find_block (int block_index, bool is_lo
 return res;
 }
 
-pair<bool, BitBoardS::vPB_cit> BitBoardS::find_block (int block_index, bool is_lower_bound) const 	{
-	pair<bool, BitBoardS::vPB_cit>res;
+pair<bool, BitSetSp::vPB_cit> BitSetSp::find_block (int block_index, bool is_lower_bound) const 	{
+	pair<bool, BitSetSp::vPB_cit>res;
 	if(is_lower_bound)
 		res.second=lower_bound(vBB_.begin(), vBB_.end(), pBlock_t(block_index), elem_less());
 	else
@@ -598,7 +598,7 @@ return res;
 //
 ////////////////////////////////
 
-int BitBoardS::lsbn64() const{
+int BitSetSp::lsbn64() const{
 /////////////////
 // different implementations of lsbn depending on configuration
 
@@ -635,7 +635,7 @@ return EMPTY_ELEM;
 
 
 
- int BitBoardS::msbn64() const{
+ int BitSetSp::msbn64() const{
 ///////////////////////
 // Look up table implementation (best found so far)
 
@@ -660,7 +660,7 @@ return EMPTY_ELEM;		//should not reach here
 }
  
 
-int BitBoardS::next_bit(int nBit/* 0 based*/)  const {
+int BitSetSp::next_bit(int nBit/* 0 based*/)  const {
 ////////////////////////////
 // RETURNS next bit from nBit in the bitstring (to be used in a bitscan loop)
 //			 if nBit is FIRST_BITSCAN returns lsb
@@ -694,7 +694,7 @@ return -1;
 
 
 
-int BitBoardS::prev_bit(int nBit/* 0 bsed*/) const{
+int BitSetSp::prev_bit(int nBit/* 0 bsed*/) const{
 ////////////////////////////
 // Gets the previous bit to nBit. 
 // If nBits is FIRST_BITSCAN is a MSB
@@ -728,7 +728,7 @@ return -1;
 // Operators
 //
 ///////////////
-BitBoardS& BitBoardS::operator = (const BitBoardS& bbs){
+BitSetSp& BitSetSp::operator = (const BitSetSp& bbs){
 ///////////////
 // Deep copy of collection 
 
@@ -743,7 +743,7 @@ return *this;
 
 
 
-BitBoardS&  OR	(const BitBoardS& lhs, const BitBoardS& rhs,  BitBoardS& res){
+BitSetSp&  OR	(const BitSetSp& lhs, const BitSetSp& rhs,  BitSetSp& res){
 ///////////////////////////
 // OR between sparse sets out of place (does not requires sorting)
 // 	
@@ -763,29 +763,29 @@ BitBoardS&  OR	(const BitBoardS& lhs, const BitBoardS& rhs,  BitBoardS& res){
 		
 		//update before either of the bitstrings has reached its end
 		if(lhs.vBB_[i1].idx_<rhs.vBB_[i2].idx_){
-			BitBoardS::pBlock_t e(lhs.vBB_[i1].idx_, lhs.vBB_[i1].bb_ );
+			BitSetSp::pBlock_t e(lhs.vBB_[i1].idx_, lhs.vBB_[i1].bb_ );
 			res.vBB_.push_back(e);
 			++i1;
 		}else if(rhs.vBB_[i2].idx_<lhs.vBB_[i1].idx_){
-			BitBoardS::pBlock_t e(rhs.vBB_[i2].idx_, rhs.vBB_[i2].bb_ );
+			BitSetSp::pBlock_t e(rhs.vBB_[i2].idx_, rhs.vBB_[i2].bb_ );
 			res.vBB_.push_back(e);
 			++i2;
 		}else{
-			BitBoardS::pBlock_t e(lhs.vBB_[i1].idx_, lhs.vBB_[i1].bb_ | rhs.vBB_[i2].bb_);
+			BitSetSp::pBlock_t e(lhs.vBB_[i1].idx_, lhs.vBB_[i1].bb_ | rhs.vBB_[i2].bb_);
 			res.vBB_.push_back(e);
 			++i1, ++i2; 
 		}
 
 	/*	if(lhs.vBB_[i1].idx_==rhs.vBB_[i2].idx_){
-			BitBoardS::pBlock_t e(lhs.vBB_[i1].idx_, lhs.vBB_[i1].bb_ | rhs.vBB_[i2].bb_);
+			BitSetSp::pBlock_t e(lhs.vBB_[i1].idx_, lhs.vBB_[i1].bb_ | rhs.vBB_[i2].bb_);
 			res.vBB_.push_back(e);
 			++i1, ++i2; 
 		}else if(lhs.vBB_[i1].idx_<rhs.vBB_[i2].idx_){
-			BitBoardS::pBlock_t e(lhs.vBB_[i1].idx_, lhs.vBB_[i1].bb_ );
+			BitSetSp::pBlock_t e(lhs.vBB_[i1].idx_, lhs.vBB_[i1].bb_ );
 			res.vBB_.push_back(e);
 			++i1;
 		}else if(rhs.vBB_[i2].idx_<lhs.vBB_[i1].idx_){
-			BitBoardS::pBlock_t e(rhs.vBB_[i2].idx_, rhs.vBB_[i2].bb_ );
+			BitSetSp::pBlock_t e(rhs.vBB_[i2].idx_, rhs.vBB_[i2].bb_ );
 			res.vBB_.push_back(e);
 			++i2;
 		}*/
@@ -800,7 +800,7 @@ return res;
 ////
 ////////////////////////////
 
-ostream& BitBoardS::print (std::ostream& o, bool show_pc, bool endl ) const  {
+ostream& BitSetSp::print (std::ostream& o, bool show_pc, bool endl ) const  {
 /////////////////////////
 // shows bit string as [bit1 bit2 bit3 ... <(pc)>]  (if empty: [ ]) (<pc> optional)
 	
@@ -827,7 +827,7 @@ ostream& BitBoardS::print (std::ostream& o, bool show_pc, bool endl ) const  {
 	return o;
 }
 
-string BitBoardS::to_string (){
+string BitSetSp::to_string (){
 	ostringstream sstr;
 	sstr<<"[";
 	this->print();
@@ -844,7 +844,7 @@ string BitBoardS::to_string (){
 return sstr.str();
 }
 
-void BitBoardS::to_vector (std::vector<int>& vl)const{
+void BitSetSp::to_vector (std::vector<int>& vl)const{
 //////////////////////
 // copies bit string to vector 
 //

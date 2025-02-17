@@ -24,12 +24,12 @@ constexpr int DEFAULT_CAPACITY = 2;								//initial reserve of bit blocks for a
  
 /////////////////////////////////
 //
-// class BitBoardS
+// class BitSetSp
 // (Manages sparse bit strings)
 //
 ///////////////////////////////////
 
-class BitBoardS: public BBObject{
+class BitSetSp: public BBObject{
 	
 public:
 	struct pBlock_t{
@@ -60,25 +60,25 @@ public:
 private:
 	static int nElem;																						//to cache current bitblock position in the collection (not its idx_ ni the bitstring) 
 public:	
-	friend bool	operator ==			(const BitBoardS&, const BitBoardS&);
-	friend bool operator!=			(const BitBoardS& lhs, const BitBoardS& rhs);
+	friend bool	operator ==			(const BitSetSp&, const BitSetSp&);
+	friend bool operator!=			(const BitSetSp& lhs, const BitSetSp& rhs);
 
-    friend inline BitBoardS&  AND	(const BitBoardS& lhs, const BitBoardS& rhs,  BitBoardS& res);
-	friend inline BitBoardS&  AND	(int first_block, const BitBoardS& lhs, const BitBoardS& rhs,  BitBoardS& res);
-	friend inline BitBoardS&  AND	(int first_block, int last_block, const BitBoardS& lhs, const BitBoardS& rhs,  BitBoardS& res);
-	friend BitBoardS&  OR			(const BitBoardS& lhs, const BitBoardS& rhs,  BitBoardS& res);
-	friend BitBoardS&  ERASE		(const BitBoardS& lhs, const BitBoardS& rhs,  BitBoardS& res);			//removes rhs from lhs
+    friend inline BitSetSp&  AND	(const BitSetSp& lhs, const BitSetSp& rhs,  BitSetSp& res);
+	friend inline BitSetSp&  AND	(int first_block, const BitSetSp& lhs, const BitSetSp& rhs,  BitSetSp& res);
+	friend inline BitSetSp&  AND	(int first_block, int last_block, const BitSetSp& lhs, const BitSetSp& rhs,  BitSetSp& res);
+	friend BitSetSp&  OR			(const BitSetSp& lhs, const BitSetSp& rhs,  BitSetSp& res);
+	friend BitSetSp&  ERASE		(const BitSetSp& lhs, const BitSetSp& rhs,  BitSetSp& res);			//removes rhs from lhs
 
 
-	BitBoardS						():nBB_(BBObject::noBit){}												//is this necessary?											
-explicit BitBoardS					(int size, bool is_popsize=true );										//popsize is 1-based
-	BitBoardS						(const BitBoardS& );	
-virtual ~BitBoardS					(){clear();}	
+	BitSetSp						():nBB_(BBObject::noBit){}												//is this necessary?											
+explicit BitSetSp					(int size, bool is_popsize=true );										//popsize is 1-based
+	BitSetSp						(const BitSetSp& );	
+virtual ~BitSetSp					(){clear();}	
 
 	int init						(int size, bool is_popsize=true);					
 	void clear						();
 	void sort						();
-	BitBoardS& operator =			(const BitBoardS& );	
+	BitSetSp& operator =			(const BitSetSp& );	
 /////////////////////
 //setters and getters (will not allocate memory)
 											
@@ -123,14 +123,14 @@ virtual inline	 int popcn64		(int nBit)				const;
 //Set/Delete Bits (nbit is always 0 based)
 		int   init_bit				(int nbit);	
 		int   init_bit				(int lbit, int rbit);	
-		int   init_bit				(int last_bit, const BitBoardS& bb_add);							//copies up to last_bit included
-		int   init_bit				(int lbit, int rbit, const BitBoardS& bb_add);						//copies up to last_bit included
+		int   init_bit				(int last_bit, const BitSetSp& bb_add);							//copies up to last_bit included
+		int   init_bit				(int lbit, int rbit, const BitSetSp& bb_add);						//copies up to last_bit included
 inline	int   set_bit				(int nbit);															//ordered insertion by bit block index
 		int	  set_bit				(int lbit, int rbit);												//CLOSED range
-BitBoardS&    set_bit				(const BitBoardS& bb_add);											//OR
+BitSetSp&    set_bit				(const BitSetSp& bb_add);											//OR
 
-BitBoardS&  set_block				(int first_block, const BitBoardS& bb_add);							//OR:closed range
-BitBoardS&  set_block				(int first_block, int last_block, const BitBoardS& rhs);			//OR:closed range
+BitSetSp&  set_block				(int first_block, const BitSetSp& bb_add);							//OR:closed range
+BitSetSp&  set_block				(int first_block, int last_block, const BitSetSp& rhs);			//OR:closed range
 		
 inline	void  erase_bit				(int nbit);	
 inline	vPB_it  erase_bit			(int nbit, vPB_it from_it);
@@ -138,25 +138,25 @@ inline	vPB_it  erase_bit			(int nbit, vPB_it from_it);
 		int	  clear_bit				(int lbit, int rbit);											//deallocates blocks
 		void  shrink_to_fit			()	{vBB_.shrink_to_fit();}
 		void  erase_bit				()	{vBB_.clear();}												//clears all bit blocks
-BitBoardS&    erase_bit				(const BitBoardS&);				
+BitSetSp&    erase_bit				(const BitSetSp&);				
 
-BitBoardS&    erase_block			(int first_block, const BitBoardS& rhs );
-BitBoardS&    erase_block			(int first_block, int last_block, const BitBoardS& rhs );
-BitBoardS&    erase_block_pos		(int first_pos_of_block, const BitBoardS& rhs );
+BitSetSp&    erase_block			(int first_block, const BitSetSp& rhs );
+BitSetSp&    erase_block			(int first_block, int last_block, const BitSetSp& rhs );
+BitSetSp&    erase_block_pos		(int first_pos_of_block, const BitSetSp& rhs );
 
 ////////////////////////
 //Operators 
- BitBoardS& operator &=				(const BitBoardS& );					
- BitBoardS& operator |=				(const BitBoardS& );
- BitBoardS& AND_EQ					(int first_block, const BitBoardS& rhs );						//in range
- BitBoardS& OR_EQ					(int first_block, const BitBoardS& rhs );						//in range
+ BitSetSp& operator &=				(const BitSetSp& );					
+ BitSetSp& operator |=				(const BitSetSp& );
+ BitSetSp& AND_EQ					(int first_block, const BitSetSp& rhs );						//in range
+ BitSetSp& OR_EQ					(int first_block, const BitSetSp& rhs );						//in range
   		
 /////////////////////////////
 //Boolean functions
 inline	bool is_bit					(int nbit)				const;									//nbit is 0 based
 inline	bool is_empty				()						const;									//lax: considers empty blocks for emptyness
-		bool is_disjoint			(const BitBoardS& bb)   const;
-		bool is_disjoint			(int first_block, int last_block, const BitBoardS& bb)   const;
+		bool is_disjoint			(const BitSetSp& bb)   const;
+		bool is_disjoint			(int first_block, int last_block, const BitSetSp& bb)   const;
 /////////////////////
 //I/O 
 	ostream& print					(ostream& = cout, bool show_pc = true, bool endl = true ) const override;
@@ -182,7 +182,7 @@ protected:
 //
 //////////////////////////
 
-bool BitBoardS::is_bit(int nbit)	const{
+bool BitSetSp::is_bit(int nbit)	const{
 //////////////////////////////
 // RETURNS: TRUE if the bit is 1 in the position nbit, FALSE if opposite case or ERROR
 //
@@ -199,7 +199,7 @@ bool BitBoardS::is_bit(int nbit)	const{
 }
 
 
-bool BitBoardS::is_empty ()	const{
+bool BitSetSp::is_empty ()	const{
 ///////////////////////
 // 
 // REMARKS:	The bit string may be empty either because it is known that there are no blocks (size=0)
@@ -220,7 +220,7 @@ return true;
 }
 
 inline
-bool BitBoardS::is_disjoint	(const BitBoardS& rhs) const{
+bool BitSetSp::is_disjoint	(const BitSetSp& rhs) const{
 ///////////////////
 // true if there are no bits in common 
 	int i1=0, i2=0;
@@ -246,7 +246,7 @@ return true;
 }
 
 inline 
-bool BitBoardS::is_disjoint	(int first_block, int last_block, const BitBoardS& rhs)   const{
+bool BitSetSp::is_disjoint	(int first_block, int last_block, const BitSetSp& rhs)   const{
 ///////////////////
 // true if there are no bits in common in the closed range [first_block, last_block]
 //
@@ -282,7 +282,7 @@ bool BitBoardS::is_disjoint	(int first_block, int last_block, const BitBoardS& r
 		}
 
 		/*if(lhs.vBB_[i1].idx_==rhs.vBB_[i2].idx_){
-		BitBoardS::elem e(lhs.vBB_[i1].idx_, lhs.vBB_[i1].bb_ & rhs.vBB_[i2].bb_);
+		BitSetSp::elem e(lhs.vBB_[i1].idx_, lhs.vBB_[i1].bb_ & rhs.vBB_[i2].bb_);
 		res.vBB_.push_back(e);
 		i1++, i2++; 
 		}else if(lhs.vBB_[i1].idx_<rhs.vBB_[i2].idx_){
@@ -302,7 +302,7 @@ return true;		//disjoint
 //
 /////////////////
 
-void BitBoardS::erase_bit(int nbit /*0 based*/){
+void BitSetSp::erase_bit(int nbit /*0 based*/){
 //////////////
 // clears bitblock information (does not remove bitblock if empty) 
 // REMARKS: range must be sorted
@@ -325,7 +325,7 @@ void BitBoardS::erase_bit(int nbit /*0 based*/){
 	}
 }
 
-BitBoardS::vPB_it  BitBoardS::erase_bit (int nbit, BitBoardS::vPB_it from_it){
+BitSetSp::vPB_it  BitSetSp::erase_bit (int nbit, BitSetSp::vPB_it from_it){
 	
 	int idx=WDIV(nbit);
 		
@@ -339,7 +339,7 @@ BitBoardS::vPB_it  BitBoardS::erase_bit (int nbit, BitBoardS::vPB_it from_it){
 return it;
 }
 
-int  BitBoardS::set_bit (int nbit ){
+int  BitSetSp::set_bit (int nbit ){
 ///////////////
 //  General function for setting bits  
 //
@@ -374,7 +374,7 @@ return 0;  //ok
 }
 
 inline
-int BitBoardS::init_bit (int nBit){
+int BitSetSp::init_bit (int nBit){
 ///////////////////
 // sets bit and clears the rest
 	
@@ -392,7 +392,7 @@ return 0;
 //
 /////////////////
 
-int BitBoardS::prev_bit	(int nBit){
+int BitSetSp::prev_bit	(int nBit){
 /////////////////
 // Uses cache of last index position for fast bit scanning
 //
@@ -415,7 +415,7 @@ return BBObject::noBit;
 }
 
 
-int BitBoardS::next_bit(int nBit){
+int BitSetSp::next_bit(int nBit){
 /////////////////
 // Uses cache of last index position for fast bit scanning
 //	
@@ -437,7 +437,7 @@ int BitBoardS::next_bit(int nBit){
 return BBObject::noBit;
 }
 
-int BitBoardS::msbn64	(int& nElem)	const{
+int BitSetSp::msbn64	(int& nElem)	const{
 ///////////////////////
 // Look up table implementation (best found so far)
 //
@@ -464,7 +464,7 @@ int BitBoardS::msbn64	(int& nElem)	const{
 return BBObject::noBit;		//should not reach here
 }
 
-int BitBoardS::lsbn64 (int& nElem)		const	{
+int BitSetSp::lsbn64 (int& nElem)		const	{
 /////////////////
 // different implementations of lsbn depending on configuration
 //
@@ -505,7 +505,7 @@ return BBObject::noBit;
 }
 
 inline
-int BitBoardS::popcn64() const{
+int BitSetSp::popcn64() const{
 	int npc=0;
 	union u	{
 		U16 c[4];
@@ -521,7 +521,7 @@ return npc;
 }
 
 inline
-int BitBoardS::popcn64(int nBit) const{
+int BitSetSp::popcn64(int nBit) const{
 	int npc=0;
 	union u	{
 		U16 c[4];
@@ -550,7 +550,7 @@ return npc;
 }
 
 inline
-BitBoardS& AND (const BitBoardS& lhs, const BitBoardS& rhs,  BitBoardS& res){
+BitSetSp& AND (const BitSetSp& lhs, const BitSetSp& rhs,  BitSetSp& res){
 ///////////////////////////
 // AND between sparse sets
 //		
@@ -568,7 +568,7 @@ BitBoardS& AND (const BitBoardS& lhs, const BitBoardS& rhs,  BitBoardS& res){
 		
 		//update before either of the bitstrings has reached its end
 		if(lhs.vBB_[i1].idx_ == rhs.vBB_[i2].idx_){
-				res.vBB_.push_back(BitBoardS::pBlock_t(lhs.vBB_[i1].idx_, lhs.vBB_[i1].bb_ & rhs.vBB_[i2].bb_));
+				res.vBB_.push_back(BitSetSp::pBlock_t(lhs.vBB_[i1].idx_, lhs.vBB_[i1].bb_ & rhs.vBB_[i2].bb_));
 		}
 	}
 
@@ -581,7 +581,7 @@ BitBoardS& AND (const BitBoardS& lhs, const BitBoardS& rhs,  BitBoardS& res){
 	//	}else if(rhs.vBB_[i2].idx_<lhs.vBB_[i1].idx_){
 	//		i2++;
 	//	}else{
-	//		BitBoardS::elem e(lhs.vBB_[i1].idx_, lhs.vBB_[i1].bb_ & rhs.vBB_[i2].bb_);
+	//		BitSetSp::elem e(lhs.vBB_[i1].idx_, lhs.vBB_[i1].bb_ & rhs.vBB_[i2].bb_);
 	//		res.vBB_.push_back(e);
 	//		i1++, i2++; 
 	//	}
@@ -591,7 +591,7 @@ return res;
 }
 
 inline
-BitBoardS& AND (int first_block, const BitBoardS& lhs, const BitBoardS& rhs,  BitBoardS& res){
+BitSetSp& AND (int first_block, const BitSetSp& lhs, const BitSetSp& rhs,  BitSetSp& res){
 ///////////////////////////
 // AND between sparse sets from first_block (included) onwards
 //
@@ -609,14 +609,14 @@ BitBoardS& AND (int first_block, const BitBoardS& lhs, const BitBoardS& rhs,  Bi
 			}else if(rhs.vBB_[i2].idx_<lhs.vBB_[i1].idx_){
 				i2++;
 			}else{
-				BitBoardS::pBlock_t e(lhs.vBB_[i1].idx_, lhs.vBB_[i1].bb_ & rhs.vBB_[i2].bb_);
+				BitSetSp::pBlock_t e(lhs.vBB_[i1].idx_, lhs.vBB_[i1].bb_ & rhs.vBB_[i2].bb_);
 				res.vBB_.push_back(e);
 				i1++, i2++; 
 			}
 
 
 		/*	if(lhs.vBB_[i1].idx_==rhs.vBB_[i2].idx_){
-				BitBoardS::elem e(lhs.vBB_[i1].idx_, lhs.vBB_[i1].bb_ & rhs.vBB_[i2].bb_);
+				BitSetSp::elem e(lhs.vBB_[i1].idx_, lhs.vBB_[i1].bb_ & rhs.vBB_[i2].bb_);
 				res.vBB_.push_back(e);
 				i1++, i2++; 
 			}else if(lhs.vBB_[i1].idx_<rhs.vBB_[i2].idx_){
@@ -631,7 +631,7 @@ return res;
 
 
 inline
-BitBoardS& AND (int first_block, int last_block, const BitBoardS& lhs, const BitBoardS& rhs,  BitBoardS& res){
+BitSetSp& AND (int first_block, int last_block, const BitSetSp& lhs, const BitSetSp& rhs,  BitSetSp& res){
 ///////////////////////////
 // AND between sparse sets in closed range
 // last update: 21/3/15 -BUG corrected concerning last_block and first_block value optimization  
@@ -663,13 +663,13 @@ BitBoardS& AND (int first_block, int last_block, const BitBoardS& lhs, const Bit
 		}else if(rhs.vBB_[i2].idx_<lhs.vBB_[i1].idx_){
 			i2++;
 		}else{
-			BitBoardS::pBlock_t e(lhs.vBB_[i1].idx_, lhs.vBB_[i1].bb_ & rhs.vBB_[i2].bb_);
+			BitSetSp::pBlock_t e(lhs.vBB_[i1].idx_, lhs.vBB_[i1].bb_ & rhs.vBB_[i2].bb_);
 			res.vBB_.push_back(e);
 			i1++, i2++; 
 		}
 
 		/*if(lhs.vBB_[i1].idx_==rhs.vBB_[i2].idx_){
-			BitBoardS::elem e(lhs.vBB_[i1].idx_, lhs.vBB_[i1].bb_ & rhs.vBB_[i2].bb_);
+			BitSetSp::elem e(lhs.vBB_[i1].idx_, lhs.vBB_[i1].bb_ & rhs.vBB_[i2].bb_);
 			res.vBB_.push_back(e);
 			i1++, i2++; 
 		}else if(lhs.vBB_[i1].idx_<rhs.vBB_[i2].idx_){
@@ -683,7 +683,7 @@ return res;
 }
 
 inline
-BitBoardS&  ERASE (const BitBoardS& lhs, const BitBoardS& rhs,  BitBoardS& res){
+BitSetSp&  ERASE (const BitSetSp& lhs, const BitSetSp& rhs,  BitSetSp& res){
 /////////////////
 // removes rhs from lhs
 // date of creation: 17/12/15
@@ -701,21 +701,21 @@ BitBoardS&  ERASE (const BitBoardS& lhs, const BitBoardS& rhs,  BitBoardS& res){
 		
 		//update before either of the bitstrings has reached its end
 		if(lhs.vBB_[i1].idx_==rhs.vBB_[i2].idx_){
-				res.vBB_.push_back(BitBoardS::pBlock_t(lhs.vBB_[i1].idx_, lhs.vBB_[i1].bb_ &~ rhs.vBB_[i2].bb_));
+				res.vBB_.push_back(BitSetSp::pBlock_t(lhs.vBB_[i1].idx_, lhs.vBB_[i1].bb_ &~ rhs.vBB_[i2].bb_));
 		}else{
-			res.vBB_.push_back(BitBoardS::pBlock_t(lhs.vBB_[i1].idx_, lhs.vBB_[i1].bb_));
+			res.vBB_.push_back(BitSetSp::pBlock_t(lhs.vBB_[i1].idx_, lhs.vBB_[i1].bb_));
 		}
 	}
 return res;
 }
 
 inline
-BitBoardS&  BitBoardS::erase_block (int first_block, const BitBoardS& rhs ){
+BitSetSp&  BitSetSp::erase_block (int first_block, const BitSetSp& rhs ){
 ////////////////////
 // removes 1-bits from current object (equialent to set_difference) from first_block (included) onwards			
 
-	pair<bool, BitBoardS::vPB_it> p1=find_block(first_block);
-	pair<bool, BitBoardS::vPB_cit> p2=rhs.find_block(first_block);
+	pair<bool, BitSetSp::vPB_it> p1=find_block(first_block);
+	pair<bool, BitSetSp::vPB_cit> p2=rhs.find_block(first_block);
 	
 	//optimization based on the size of rhs being greater
 	//for (int i1 = 0; i1 < lhs.vBB_.size();i1++){
@@ -743,12 +743,12 @@ return *this;
 }
 
 inline
-BitBoardS&  BitBoardS::AND_EQ(int first_block, const BitBoardS& rhs ){
+BitSetSp&  BitSetSp::AND_EQ(int first_block, const BitSetSp& rhs ){
 //////////////////////
 // left intersection (AND). bits in rhs remain starting from closed range [first_block, END[
 
-	pair<bool, BitBoardS::vPB_it> p1=find_block(first_block);
-	pair<bool, BitBoardS::vPB_cit> p2=rhs.find_block(first_block);
+	pair<bool, BitSetSp::vPB_it> p1=find_block(first_block);
+	pair<bool, BitSetSp::vPB_cit> p2=rhs.find_block(first_block);
 	
 	//optimization based on the size of rhs being greater
 	//for (int i1 = 0; i1 < lhs.vBB_.size();i1++){...}
@@ -781,12 +781,12 @@ return *this;
 }
 
 inline
-BitBoardS&  BitBoardS::OR_EQ(int first_block, const BitBoardS& rhs ){
+BitSetSp&  BitSetSp::OR_EQ(int first_block, const BitSetSp& rhs ){
 //////////////////////
 // left union (OR). Bits in rhs are added starting from closed range [first_block, END[
 
-	pair<bool, BitBoardS::vPB_it> p1=find_block(first_block);
-	pair<bool, BitBoardS::vPB_cit> p2=rhs.find_block(first_block);
+	pair<bool, BitSetSp::vPB_it> p1=find_block(first_block);
+	pair<bool, BitSetSp::vPB_cit> p2=rhs.find_block(first_block);
 	
 	//iteration
 	while(true){
@@ -811,7 +811,7 @@ return *this;
 
 
 inline
-BitBoardS&  BitBoardS::erase_block_pos (int first_pos_of_block, const BitBoardS& rhs ){
+BitSetSp&  BitSetSp::erase_block_pos (int first_pos_of_block, const BitSetSp& rhs ){
 /////////////////////
 // erases bits from a starting block in *this (given as the position in the bitstring collection, not its index) till the end of the bitstring, 
 
@@ -833,12 +833,12 @@ return *this;
 
 
 inline
-BitBoardS&  BitBoardS::erase_block (int first_block, int last_block, const BitBoardS& rhs ){
+BitSetSp&  BitSetSp::erase_block (int first_block, int last_block, const BitSetSp& rhs ){
 ////////////////////
 // removes 1-bits from current object (equialent to set_difference) from CLOSED RANGE of blocks	
 
-	pair<bool, BitBoardS::vPB_it> p1=find_block(first_block);
-	pair<bool, BitBoardS::vPB_cit> p2=rhs.find_block(first_block);
+	pair<bool, BitSetSp::vPB_it> p1=find_block(first_block);
+	pair<bool, BitSetSp::vPB_cit> p2=rhs.find_block(first_block);
 	if(p1.second==vBB_.end() || p2.second==rhs.vBB_.end() )
 		 return *this;
 
@@ -865,7 +865,7 @@ return *this;
 
 
 inline
-int	 BitBoardS::erase_bit (int low, int high){
+int	 BitSetSp::erase_bit (int low, int high){
 ///////////////////
 // clears bits in the corresponding CLOSED range
 		
@@ -917,13 +917,13 @@ return 0;
 }
 
 inline
-int BitBoardS::init_bit (int high, const BitBoardS& bb_add){
+int BitSetSp::init_bit (int high, const BitSetSp& bb_add){
 //////////////////////////////////
 // fast copying of bb_add up to and including high bit
 	
 	vBB_.clear();
 	int	bbh=WDIV(high); 
-	pair<bool, BitBoardS::vPB_cit> p=bb_add.find_block(bbh);
+	pair<bool, BitSetSp::vPB_cit> p=bb_add.find_block(bbh);
 	if(p.second==bb_add.end())
 		copy(bb_add.begin(), bb_add.end(),insert_iterator<vPB>(vBB_,vBB_.begin()));
 	else{
@@ -938,7 +938,7 @@ return 0;
 }
 
 inline
-int  BitBoardS::init_bit (int low, int high,  const BitBoardS& bb_add){
+int  BitSetSp::init_bit (int low, int high,  const BitSetSp& bb_add){
 /////////////
 // fast copying of bb_add in the corresponding CLOSED range
 // date of creation: 19/12/15 (bug corrected in 6/01/2016)
@@ -981,7 +981,7 @@ return 0;		//should not reach here
 }
 
 inline
-bool operator == (const BitBoardS& lhs, const BitBoardS& rhs){
+bool operator == (const BitSetSp& lhs, const BitSetSp& rhs){
 /////////////////////
 // Simple equality check which considers exact copy of bit strings 
 // REMARKS: does not take into account information, i.e. bit blocks=0
@@ -990,7 +990,7 @@ bool operator == (const BitBoardS& lhs, const BitBoardS& rhs){
 }
 
 inline
-bool operator!=	(const BitBoardS& lhs, const BitBoardS& rhs){
+bool operator!=	(const BitSetSp& lhs, const BitSetSp& rhs){
 	return ! operator==(lhs, rhs);
 }
 

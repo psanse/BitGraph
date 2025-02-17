@@ -91,7 +91,7 @@ int Ugraph<sparse_bitarray>::degree(int v, const BitSet& bbn) const {
 
 template<>
 inline
-int Ugraph<sparse_bitarray>::degree(int v, const BitBoardS& bbs) const {
+int Ugraph<sparse_bitarray>::degree(int v, const BitSetSp& bbs) const {
 	
 	int ndeg = 0;
 	auto itv = adj_[v].begin();
@@ -129,7 +129,7 @@ int Ugraph<sparse_bitarray>::degree(int v, int UB, const BitSet& bbn) const {
 
 template<>
 inline
-int Ugraph<sparse_bitarray>::degree(int v, int UB, const BitBoardS& bbs) const {
+int Ugraph<sparse_bitarray>::degree(int v, int UB, const BitSetSp& bbs) const {
 	
 	int ndeg = 0;
 	auto itv = adj_[v].begin();
