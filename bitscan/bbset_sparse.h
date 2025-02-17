@@ -24,7 +24,7 @@ constexpr int DEFAULT_CAPACITY = 2;								//initial reserve of bit blocks for a
 /////////////////////////////////
 //
 // class BitSetSp
-// (Manages sparse bit strings)
+// (manages sparse bit strings, except efficient bitscanning)
 //
 ///////////////////////////////////
 

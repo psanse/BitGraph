@@ -17,16 +17,17 @@ using namespace std;
 /////////////////////////////////
 //
 // Class BBScanSp
-// (Uses a number of optimizations for bit scanning)
+// (Uses a number of optimizations for sparse bit scanning)
 //
 ///////////////////////////////////
 
 class BBScanSp: public BitSetSp{
 public:	
-				
-	 BBScanSp						(){};										
-explicit BBScanSp					(int popsize /*1 based*/, bool reset=true):BitSetSp(popsize,reset)	{}	
-	 BBScanSp						(const BBScanSp& bbN):BitSetSp(bbN)	{}
+
+	//inherit constructors
+	using BitSetSp::BitSetSp;
+
+	//TODO...check copy and move assignments - should be forbidden
 
 	 void set_bbindex				(int bbindex)	{m_scan.bbi_=bbindex;}			//refers to the position in the collection (not in the bitstring)
 	 void set_posbit				(int posbit)	{m_scan.pos_=posbit;}	
