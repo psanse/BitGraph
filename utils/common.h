@@ -262,7 +262,7 @@ namespace com {
 		explicit has_val(const ColCrit_t& c) : crit(c) {}
 
 		bool operator()(const T& a, const T& b) const {
-			if constexpr (Greater) {
+			if (Greater) {
 				return crit[a] > crit[b];
 			}
 			else {
@@ -282,7 +282,7 @@ namespace com {
 		explicit has_val(const ColCrit_t& c) : crit(c) {}
 
 		bool operator()(const T* a, const T* b) const {
-			if constexpr (Greater) {
+			if (Greater) {
 				return crit[*a] > crit[*b];
 			}
 			else {

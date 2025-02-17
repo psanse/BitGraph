@@ -326,7 +326,7 @@ TEST(Sparse, erase_bits) {
 
 	//erase in a sequential loop
 	int nBit=0;
-	BBIntrinS::velem_it it=bbsp.begin();
+	BBIntrinS::vPB_it it=bbsp.begin();
 	while(true){
 		it=bbsp.erase_bit(nBit++,it);
 		if(nBit>1000) break;
