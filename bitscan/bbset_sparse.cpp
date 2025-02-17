@@ -50,7 +50,7 @@ BitSetSp::BitSetSp(int nPop, const vint& lv):
 			/////////////////
 
 			//sets bits - adds pBlocks in place
-			assert(set_bit(bit)!=-1);
+			assert(set_bit(bit) != -1);
 
 		}
 
@@ -64,20 +64,31 @@ BitSetSp::BitSetSp(int nPop, const vint& lv):
 }
 
 
-int BitSetSp::init (int size, bool is_popsize){
-///////////////
-// allocates memory
-
-	clear();
-	(is_popsize)? nBB_=INDEX_1TO1(size) : nBB_=size;
-	vBB_.reserve(DEFAULT_CAPACITY);
-
-return 0;	//for API compatibility
+void BitSetSp::reset(int size, bool is_popsize)
+{
+	try {
+		(is_popsize) ? nBB_ = INDEX_1TO1(size) : nBB_ = size;
+		vBB_.clear();
+		vBB_.reserve(DEFAULT_CAPACITY);
+	}
+	catch (...) {
+		LOG_ERROR("Error during initialization - BitSet::init");
+		LOG_ERROR("exiting...");
+		std::exit(-1);
+	}
 }
 
-void  BitSetSp::clear(){
-	vBB_.clear();
-	nBB_=EMPTY_ELEM;
+void BitSetSp::init (int size, bool is_popsize){
+	try {
+		(is_popsize) ? nBB_ = INDEX_1TO1(size) : nBB_ = size;
+		vBB_.clear();
+		vBB_.reserve(DEFAULT_CAPACITY);
+	}
+	catch (...) {
+		LOG_ERROR("Error during initialization - BitSet::init");
+		LOG_ERROR("exiting...");
+		std::exit(-1);
+	}	
 }
 
 void BitSetSp::sort (){

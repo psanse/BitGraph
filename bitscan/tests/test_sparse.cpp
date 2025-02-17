@@ -376,13 +376,13 @@ TEST(Sparse, erase_bits) {
 	EXPECT_EQ(1,bbsp.popcn64());
 	
 	//range trying to erase blocks in higher positions than any existing
-	bbsp.clear();
+	bbsp.reset(10000);
 	bbsp.set_bit(55, 58);		
 	bbsp.erase_bit(77, 100);		//no bits in index>=2 so nothing is done
 	EXPECT_FALSE(bbsp.is_empty());
 	
 	//last bit in range does not correspond to a block but there are blocks with higher index
-	bbsp.clear();
+	bbsp.reset(10000);
 	bbsp.set_bit(1, 5);	
 	bbsp.set_bit(200,205);	
 	bbsp.erase_bit(67, 69);	
@@ -391,7 +391,7 @@ TEST(Sparse, erase_bits) {
 	EXPECT_TRUE(bbsp.is_bit(200));
 
 	//first bit in range does not correspond to a block
-	bbsp.clear();
+	bbsp.reset(10000);
 	bbsp.set_bit(70, 75);	
 	bbsp.erase_bit(63, 70);	
 	EXPECT_EQ(5,bbsp.popcn64());
@@ -793,27 +793,27 @@ TEST(Sparse, copy_in_closed_range){
 	EXPECT_TRUE(bbcopy.is_bit(127));
 	EXPECT_TRUE(bbcopy.is_bit(1000));
 
-	bbcopy.clear();
+	bbcopy.reset(10000);
 	bbcopy.init_bit(127, 129, bbsp);
 	EXPECT_EQ(1, bbcopy.popcn64());
 	EXPECT_TRUE(bbcopy.is_bit(127));
 
-	bbcopy.clear();
+	bbcopy.reset(10000);
 	bbcopy.init_bit(0, 10000, bbsp);
 	EXPECT_TRUE( bbcopy==bbsp);
 
-	bbcopy.clear();
+	bbcopy.reset(10000);
 	bbcopy.init_bit(9000, 9999, bbsp);
 	EXPECT_EQ(2, bbcopy.popcn64());
 	EXPECT_TRUE(bbcopy.is_bit(9000));
 	EXPECT_TRUE(bbcopy.is_bit(9999));
 
-	bbcopy.clear();
+	bbcopy.reset(10000);
 	bbcopy.init_bit(0, 0, bbsp);
 	EXPECT_EQ(1, bbcopy.popcn64());
 	EXPECT_TRUE(bbcopy.is_bit(0));
 
-	bbcopy.clear();
+	bbcopy.reset(10000);
 	bbcopy.init_bit(9999, 9999, bbsp);
 	EXPECT_EQ(1, bbcopy.popcn64());
 	EXPECT_TRUE(bbcopy.is_bit(9999));
@@ -828,12 +828,12 @@ TEST(Sparse, copy_in_closed_range_special_cases){
 	bbcopy.init_bit(0, 51, bbsp);
 	EXPECT_EQ(0, bbcopy.popcn64());
 
-	bbcopy.clear();
+	bbcopy.reset(120);
 	bbcopy.init_bit(64, 65, bbsp);
 	EXPECT_EQ(1, bbcopy.popcn64());
 	EXPECT_TRUE(bbcopy.is_bit(64));
 
-	bbcopy.clear();
+	bbcopy.reset(120);
 	bbcopy.init_bit(63, 64, bbsp);
 	EXPECT_EQ(1, bbcopy.popcn64());
 	EXPECT_TRUE(bbcopy.is_bit(64));

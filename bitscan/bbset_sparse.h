@@ -102,7 +102,7 @@ explicit BitSetSp					(int nPop, bool is_popsize = true );
 	 * @param nPop: population size
 	 * @param lv : vector of integers representing 1-bits in the bitset
 	 **/
-	 BitSetSp					(int nPop, const vint& lv);
+	 BitSetSp						(int nPop, const vint& lv);
 
 	//Allows copy and move semantics
 	BitSetSp				(const BitSetSp& bbN)			= default;
@@ -114,8 +114,22 @@ explicit BitSetSp					(int nPop, bool is_popsize = true );
 
 ////////////
 //Reset / init (memory allocation)
-	int init						(int size, bool is_popsize=true);					
-	void clear						();
+
+	/**
+	* @brief resets the sparse bitset to a new population size
+	**/
+	void reset						(int nPop, bool is_popsize = true);
+	
+	//TODO - 17/02/2025
+	void reset						(int nPop, const vint& lv);
+
+	/**
+	* @brief resets the sparse bitset to a new population size, old syntax
+	*		 now favoured by reset(...).
+	**/
+	void init						(int nPop, bool is_popsize = true);
+	
+	//void clear						();
 
 /////////////////////
 //setters and getters (will not allocate memory)
