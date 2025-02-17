@@ -1,6 +1,6 @@
  /**
   * @file bbset_sparse.h
-  * @brief header for sparse class equivalent to the BitSet class
+  * @brief header for sparse class equivalent to the BitSetSp class
   * @author pss
   * @details created ?, @last_update 15/02/2025
   *
@@ -14,7 +14,6 @@
 #include "bitblock.h"	
 #include <vector>	
 #include <algorithm>
-#include <functional>
 #include <iterator>
 
 using namespace std;
@@ -162,8 +161,8 @@ inline	bool is_empty				()						const;									//lax: considers empty blocks for
 	ostream& print					(ostream& = cout, bool show_pc = true, bool endl = true ) const override;
 
 /////////////////////
-//Conversions
-	string to_string				();	
+//Conversions				
+	string to_string				();																//TODO - operator string	();
 	void to_vector					(std::vector<int>& )	const;
 
 ////////////////////////

@@ -56,22 +56,19 @@ protected:
 	typedef vdeg::iterator					vdeg_it;
 		
 	//sorting criteria
-	struct degreeLess: 
-		public binary_function<deg_t, deg_t, bool>{
+	struct degreeLess /* : public binary_function<deg_t, deg_t, bool>*/ {
 			bool operator() (deg_t i,deg_t j) const { 
 				return (abs(i.deg)<abs(j.deg));
 			} 
 	};
 
-	struct degreeGreater: 
-		public binary_function<deg_t, deg_t, bool>{
+	struct degreeGreater/* : public binary_function<deg_t, deg_t, bool> */{
 			bool operator() (deg_t i,deg_t j) const { 
 				return (i.deg>j.deg);
 			} 
 	};
 
-	struct degreeWithTieBreakLess: 
-		public binary_function<deg_t, deg_t, bool>{
+	struct degreeWithTieBreakLess /* : public binary_function<deg_t, deg_t, bool> */{
 			bool operator() (deg_t i,deg_t j) const {
 				if(i.deg<j.deg) return true;
 				else if(i.deg==j.deg){

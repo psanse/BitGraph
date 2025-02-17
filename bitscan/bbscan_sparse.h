@@ -16,17 +16,17 @@ using namespace std;
 
 /////////////////////////////////
 //
-// Class BBIntrinS
+// Class BBScanSp
 // (Uses a number of optimizations for bit scanning)
 //
 ///////////////////////////////////
 
-class BBIntrinS: public BitSetSp{
+class BBScanSp: public BitSetSp{
 public:	
 				
-	 BBIntrinS						(){};										
-explicit BBIntrinS					(int popsize /*1 based*/, bool reset=true):BitSetSp(popsize,reset)	{}	
-	 BBIntrinS						(const BBIntrinS& bbN):BitSetSp(bbN)	{}
+	 BBScanSp						(){};										
+explicit BBScanSp					(int popsize /*1 based*/, bool reset=true):BitSetSp(popsize,reset)	{}	
+	 BBScanSp						(const BBScanSp& bbN):BitSetSp(bbN)	{}
 
 	 void set_bbindex				(int bbindex)	{m_scan.bbi_=bbindex;}			//refers to the position in the collection (not in the bitstring)
 	 void set_posbit				(int posbit)	{m_scan.pos_=posbit;}	
@@ -45,7 +45,7 @@ inline	int lsbn64					(int& nElem)			const;
 	//bit scan forward (destructive)				
 inline int next_bit_del				(); 												
 inline int next_bit_del				(int& nBB);								//nBB: index of bitblock in the bitstring	(not in the collection)	
-inline int next_bit_del				(int& nBB, BBIntrinS& );				//EXPERIMENTAL! 
+inline int next_bit_del				(int& nBB, BBScanSp& );				//EXPERIMENTAL! 
 inline int next_bit_del_pos			(int& posBB);							//posBB: position of bitblock in the collection (not the index of the element)		
 
 	//bit scan forward (non destructive)
@@ -81,7 +81,7 @@ public:
 
 #ifdef POPCOUNT_INTRINSIC_64
 inline 
-int BBIntrinS::popcn64() const{
+int BBScanSp::popcn64() const{
 	BITBOARD pc=0;
 	for(int i=0; i<vBB_.size(); i++){
 		pc+=__popcnt64(vBB_[i].bb_);
@@ -91,7 +91,7 @@ return pc;
 
 
 inline
-int BBIntrinS::popcn64(int nBit) const{
+int BBScanSp::popcn64(int nBit) const{
 //////////////////////////////
 // population  size from (and including) nBit onwards
 	BITBOARD pc=0;
@@ -117,7 +117,7 @@ return pc;
 
 #endif
 
-inline int BBIntrinS::lsbn64() const{
+inline int BBScanSp::lsbn64() const{
 	
 	unsigned long posbb;
 	for(int i = 0; i < vBB_.size(); ++i){
@@ -128,7 +128,7 @@ inline int BBIntrinS::lsbn64() const{
 	return EMPTY_ELEM;
 }
 
-inline int BBIntrinS::lsbn64(int& nElem) const{
+inline int BBScanSp::lsbn64(int& nElem) const{
 ////////////////////
 // lsbn + returns in nElem the index in the collection if the bit string is not EMPTY
 
@@ -144,7 +144,7 @@ inline int BBIntrinS::lsbn64(int& nElem) const{
 }
 
 
-inline int BBIntrinS::msbn64() const{
+inline int BBScanSp::msbn64() const{
 ////////////////////
 // Returns the index in the collection if bitstring is not EMPTY
 	unsigned long posBB;
@@ -157,7 +157,7 @@ inline int BBIntrinS::msbn64() const{
 return EMPTY_ELEM;  
 }
 
-inline int BBIntrinS::msbn64(int& nElem) const{
+inline int BBScanSp::msbn64(int& nElem) const{
 ////////////////////
 // Returns the index in the collection if bitstring is not EMPTY
 	unsigned long posBB;
@@ -173,7 +173,7 @@ return EMPTY_ELEM;
 }
 
 
-inline int BBIntrinS::next_bit() {
+inline int BBScanSp::next_bit() {
 ////////////////////////////
 // date:5/9/2014
 // non destructive bitscan for sparse bitstrings using intrinsics
@@ -202,7 +202,7 @@ return EMPTY_ELEM;
 }
 
 
-inline int BBIntrinS::next_bit(int& block_index) {
+inline int BBScanSp::next_bit(int& block_index) {
 ////////////////////////////
 // date:5/9/2014
 // non destructive bitscan for sparse bitstrings using intrinsics
@@ -233,7 +233,7 @@ return EMPTY_ELEM;
 }
 
 
-inline int BBIntrinS::prev_bit	() {
+inline int BBScanSp::prev_bit	() {
 ////////////////////////////
 // date:5/9/2014
 // Non destructive bitscan for sparse bitstrings using intrinsics
@@ -262,7 +262,7 @@ return EMPTY_ELEM;
 }
 
 
-inline int BBIntrinS::next_bit_del() {
+inline int BBScanSp::next_bit_del() {
 ////////////////////////////
 //
 // date: 23/3/12
@@ -284,7 +284,7 @@ inline int BBIntrinS::next_bit_del() {
 return EMPTY_ELEM;  
 }
 
-inline int BBIntrinS::next_bit_del(int& block_index) {
+inline int BBScanSp::next_bit_del(int& block_index) {
 ////////////////////////////
 //
 // date: 23/3/12
@@ -308,7 +308,7 @@ return EMPTY_ELEM;
 }
 
 
-inline int BBIntrinS::next_bit_del(int& block_index, BBIntrinS& bbN_del) {
+inline int BBScanSp::next_bit_del(int& block_index, BBScanSp& bbN_del) {
 	////////////////////////////
 	//
 	// date: 06/07/2019 (EXPERIMENTAL)
@@ -333,7 +333,7 @@ inline int BBIntrinS::next_bit_del(int& block_index, BBIntrinS& bbN_del) {
 	return EMPTY_ELEM;
 }
 
-inline int BBIntrinS::next_bit_del_pos (int& posBB){
+inline int BBScanSp::next_bit_del_pos (int& posBB){
 ////////////////////////////
 //
 // date: 29/10/14
@@ -357,7 +357,7 @@ return EMPTY_ELEM;
 }
 
 
-inline int BBIntrinS::prev_bit_del() {
+inline int BBScanSp::prev_bit_del() {
 ////////////////////////////
 //
 // date: 23/3/12
@@ -379,7 +379,7 @@ inline int BBIntrinS::prev_bit_del() {
 return EMPTY_ELEM;  
 }
 
-inline int BBIntrinS::prev_bit_del(int & bb_index) {
+inline int BBScanSp::prev_bit_del(int & bb_index) {
 ////////////////////////////
 //
 // date: 23/3/12
@@ -402,7 +402,7 @@ return EMPTY_ELEM;
 }
 
 inline
-int BBIntrinS::init_scan (scan_types sct){
+int BBScanSp::init_scan (scan_types sct){
 	if(vBB_.empty()) return EMPTY_ELEM;				//necessary check since sparse bitstrings have empty semantics (i.e. sparse graphs)
 
 	switch(sct){
@@ -428,7 +428,7 @@ return 0;
 }
 
 inline
-int BBIntrinS::init_scan_from (int from, scan_types sct){
+int BBScanSp::init_scan_from (int from, scan_types sct){
 ////////////////////////
 // scans starting at from until the end of the bitarray
 //

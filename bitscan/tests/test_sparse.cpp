@@ -85,7 +85,7 @@ TEST(Sparse, member_masks) {
 
 TEST(Sparse_intrinsic, basics_2) {
 
-	BBIntrinS bbsp(130);
+	BBScanSp bbsp(130);
 	bbsp.set_bit(10);
 	bbsp.set_bit(20);
 	bbsp.set_bit(64);
@@ -103,7 +103,7 @@ TEST(Sparse_intrinsic, basics_2) {
 
 
 	//assignment
-	BBIntrinS bbsp1(34);
+	BBScanSp bbsp1(34);
 	bbsp1.set_bit(22);
 	bbsp1.set_bit(23);
 	bbsp=bbsp1;
@@ -113,7 +113,7 @@ TEST(Sparse_intrinsic, basics_2) {
 	EXPECT_EQ(1,bbsp1.number_of_bitblocks());
 
 	//copy constructor
-	BBIntrinS bbsp2(bbsp);
+	BBScanSp bbsp2(bbsp);
 	EXPECT_TRUE(bbsp2.is_bit(22));
 	EXPECT_TRUE(bbsp2.is_bit(23));
 	EXPECT_EQ(1,bbsp2.number_of_bitblocks());
@@ -122,7 +122,7 @@ TEST(Sparse_intrinsic, basics_2) {
 
 TEST(Sparse_intrinsic, set_clear_bit_in_intervals) {
 
-	BBIntrinS bba(1000000);
+	BBScanSp bba(1000000);
 	bba.set_bit(1200,1230);
 
 	EXPECT_EQ(31, bba.popcn64());		
@@ -148,7 +148,7 @@ TEST(Sparse, population_count){
 	EXPECT_EQ(0, bb.popcn64(65));
 	EXPECT_EQ(1, bb.popcn64(64));
 
-	BBIntrinS bbs(130);
+	BBScanSp bbs(130);
 	bbs.set_bit(10);
 	bbs.set_bit(20);
 	bbs.set_bit(64);
@@ -167,7 +167,7 @@ TEST(Sparse, population_count){
 	BitSetSp bbs_empty(130);
 	EXPECT_EQ(0, bbs_empty.popcn64(5));	
 
-	BBIntrinS bbs_empty1(130);
+	BBScanSp bbs_empty1(130);
 	EXPECT_EQ(0, bbs_empty1.popcn64(5));	
 }
 
@@ -213,7 +213,7 @@ TEST(Sparse, set_bits) {
 
 
 //init member functions
-	BBIntrinS sb(150);
+	BBScanSp sb(150);
 	sb.init_bit(30,40);
 	EXPECT_TRUE(sb.is_bit(30));
 	EXPECT_TRUE(sb.is_bit(40));
@@ -227,12 +227,12 @@ TEST(Sparse, set_bits) {
 
 TEST(Sparse, boolean_properties){
 
-	BBIntrinS bb(130);
+	BBScanSp bb(130);
 	bb.set_bit(10);
 	bb.set_bit(20);
 	bb.set_bit(64);
 
-	BBIntrinS bb1(130);
+	BBScanSp bb1(130);
 	bb1.set_bit(11);
 	bb1.set_bit(21);
 	bb1.set_bit(65);
@@ -326,7 +326,7 @@ TEST(Sparse, erase_bits) {
 
 	//erase in a sequential loop
 	int nBit=0;
-	BBIntrinS::vPB_it it=bbsp.begin();
+	BBScanSp::vPB_it it=bbsp.begin();
 	while(true){
 		it=bbsp.erase_bit(nBit++,it);
 		if(nBit>1000) break;
@@ -451,7 +451,7 @@ TEST(Sparse_non_instrinsic, scanning){
 
 TEST(Sparse_intrinsic, non_destructive_scanning){
 
-	BBIntrinS bbsp(130);
+	BBScanSp bbsp(130);
 	bbsp.set_bit(10);
 	bbsp.set_bit(20);
 	bbsp.set_bit(64);	
@@ -495,7 +495,7 @@ TEST(Sparse_intrinsic, non_destructive_scanning){
 
 TEST(Sparse_intrinsic, non_destructive_scanning_with_starting_point){
 
-	BBIntrinS bbsp(130);
+	BBScanSp bbsp(130);
 	bbsp.set_bit(10);
 	bbsp.set_bit(20);
 	bbsp.set_bit(64);	
@@ -535,7 +535,7 @@ TEST(Sparse_intrinsic, non_destructive_scanning_with_starting_point){
 
 TEST(Sparse_intrinsic, destructive_scanning){
 
-	BBIntrinS bbsp(130);
+	BBScanSp bbsp(130);
 	bbsp.set_bit(10);
 	bbsp.set_bit(20);
 	bbsp.set_bit(64);	
@@ -649,7 +649,7 @@ TEST(Sparse, integration) {
 
 TEST(Sparse, next_bit_del_pos) {
 
-	BBIntrinS bbsp(10000);
+	BBScanSp bbsp(10000);
 
 	bbsp.set_bit(0);
 	bbsp.set_bit(1);
@@ -674,8 +674,8 @@ TEST(Sparse, next_bit_del_pos) {
 
 TEST(Sparse, erase_block_pos) {
 
-	BBIntrinS bbsp(10000);
-	BBIntrinS bberase(10000);
+	BBScanSp bbsp(10000);
+	BBScanSp bberase(10000);
 	bbsp.set_bit(0);
 	bbsp.set_bit(1);
 	bbsp.set_bit(2);
@@ -705,8 +705,8 @@ TEST(Sparse, erase_block_pos) {
 
 TEST(Sparse, copy_up_to_some_bit) {
 
-	BBIntrinS bbsp(10000);
-	BBIntrinS bbcopy(10000);
+	BBScanSp bbsp(10000);
+	BBScanSp bbcopy(10000);
 	bbsp.set_bit(0);
 	bbsp.set_bit(1);
 	bbsp.set_bit(2);
@@ -734,8 +734,8 @@ TEST(Sparse, copy_up_to_some_bit) {
 
 TEST(Sparse, copy_in_closed_range){
 
-	BBIntrinS bbsp(10000);
-	BBIntrinS bbcopy(10000);
+	BBScanSp bbsp(10000);
+	BBScanSp bbcopy(10000);
 	bbsp.set_bit(0);
 	bbsp.set_bit(1);
 	bbsp.set_bit(2);
@@ -780,8 +780,8 @@ TEST(Sparse, copy_in_closed_range){
 
 TEST(Sparse, copy_in_closed_range_special_cases){
 
-	BBIntrinS bbsp(120);
-	BBIntrinS bbcopy(120);
+	BBScanSp bbsp(120);
+	BBScanSp bbcopy(120);
 	bbsp.set_bit(64);
 
 	bbcopy.init_bit(0, 51, bbsp);
@@ -800,10 +800,10 @@ TEST(Sparse, copy_in_closed_range_special_cases){
 
 TEST(Sparse, keep_operations) {
 
-	BBIntrinS bbsp(10000);
-	BBIntrinS bbkeep(10000);
-	BBIntrinS bbkeep2(10000);
-	BBIntrinS bbkeep3(10000);
+	BBScanSp bbsp(10000);
+	BBScanSp bbkeep(10000);
+	BBScanSp bbkeep2(10000);
+	BBScanSp bbkeep3(10000);
 
 	bbsp.set_bit(0);
 	bbsp.set_bit(1);

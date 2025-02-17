@@ -23,7 +23,7 @@ using watched_bitarray = BBSentinel;
 
 //sparse
 using simple_sparse_bitarray = BitSetSp;
-using sparse_bitarray = BBIntrinS;
+using sparse_bitarray = BBScanSp;
 
 
 

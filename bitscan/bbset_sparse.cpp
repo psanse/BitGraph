@@ -1,18 +1,24 @@
-// bbset_sparse.cpp: implementation of the BitSetSp classd, wrapper for sparse bitstrings
-//
-//////////////////////////////////////////////////////////////////////
+ /**
+  * @file bbset_sparse.cpp
+  * @brief implementations for the sparse BitSetSp class wrapper for sparse bitstrings (header bbset_sparse.h)
+  * @author pss
+  * @details created ?, @last_update 17/02/2025
+  *
+  * TODO refactoring and testing 15/02/2025 - follow the interface of the refactored BitSet
+  **/
+
 
 #include "bbset_sparse.h"
-#include "bbalgorithm.h"
 #include <iostream>
 #include <sstream>
 
-#include <cstdio>
-#include <iterator>
  
 using namespace std;
 
-int BitSetSp::nElem=EMPTY_ELEM;
+////////////////////
+//static members
+
+int BitSetSp::nElem = EMPTY_ELEM;
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
@@ -841,7 +847,7 @@ string BitSetSp::to_string (){
 	sstr<<"("<<popcn64()<<")";
 	sstr<<"]";
 
-return sstr.str();
+	return sstr.str();
 }
 
 void BitSetSp::to_vector (std::vector<int>& vl)const{
