@@ -150,10 +150,10 @@ explicit BitSetSp					(int nPop, bool is_popsize = true );
 	*		   even though the maximum number of bitblocks determined in construction nBB_
 	*		   can be anything.
 	**/
-	int number_of_bitblocks			()						const {return vBB_.size();}
+	int number_of_blocks			()						const {return vBB_.size();}
 	
 	/**
-	* @brief alternative syntax for number_of_bitblocks
+	* @brief alternative syntax for number_of_blocks
 	**/
 	int capacity					()						const {return vBB_.size(); }
 	

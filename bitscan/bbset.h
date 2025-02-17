@@ -237,10 +237,10 @@ virtual	~BitSet						()								= default;
 /////////////////////
 //setters and getters (will not allocate memory)
 	
-	int number_of_bitblocks()					const					{ return nBB_; }
+	int number_of_blocks()					const					{ return nBB_; }
 	
 	/**
-	* @brief alternative syntax for number_of_bitblocks
+	* @brief alternative syntax for number_of_blocks
 	**/
 	int capacity()								const					{ return nBB_; }
 
@@ -1120,10 +1120,8 @@ BitSet& BitSet::set_bit	(int bit ){
 inline 
 BitSet&  BitSet::set_bit (int firstBit, int lastBit){
 
-	//general comment: low - WMUL(bbl) = WMOD(bbl) but supposed to be less expensive (CHECK 01/02/25)
-
 	//////////////////////////////
-	assert(firstBit <= lastBit && firstBit > 0);
+	assert(firstBit <= lastBit && firstBit >= 0);
 	//////////////////////////////
 
 	int bbl= WDIV(firstBit);

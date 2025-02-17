@@ -210,13 +210,13 @@ TEST(BBScanClass, setters_and_getters) {
 
 	EXPECT_TRUE(bb.is_bit(22));
 	EXPECT_TRUE(bb.is_bit(23));
-	EXPECT_EQ(1,bb.number_of_bitblocks());
+	EXPECT_EQ(1,bb.number_of_blocks());
 
 	//copy constructor
 	BitSet bb2(bb);
 	EXPECT_TRUE(bb2.is_bit(22));
 	EXPECT_TRUE(bb2.is_bit(23));
-	EXPECT_EQ(1,bb2.number_of_bitblocks());
+	EXPECT_EQ(1,bb2.number_of_blocks());
 
 }
 
