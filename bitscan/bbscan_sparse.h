@@ -29,6 +29,8 @@ public:
 
 	//TODO...check copy and move assignments - should be forbidden
 
+///////////////
+// setters and getters
 	 void set_bbindex				(int bbindex)	{m_scan.bbi_=bbindex;}			//refers to the position in the collection (not in the bitstring)
 	 void set_posbit				(int posbit)	{m_scan.pos_=posbit;}	
 	
@@ -46,7 +48,7 @@ inline	int lsbn64					(int& nElem)			const;
 	//bit scan forward (destructive)				
 inline int next_bit_del				(); 												
 inline int next_bit_del				(int& nBB);								//nBB: index of bitblock in the bitstring	(not in the collection)	
-inline int next_bit_del				(int& nBB, BBScanSp& );				//EXPERIMENTAL! 
+inline int next_bit_del				(int& nBB, BBScanSp& );					//EXPERIMENTAL! 
 inline int next_bit_del_pos			(int& posBB);							//posBB: position of bitblock in the collection (not the index of the element)		
 
 	//bit scan forward (non destructive)
