@@ -14,21 +14,62 @@
 
 using namespace std;
 
-TEST(Sparse, construction){
-	BitSetSp bbs;
-	bbs.init(1000);
-	bbs.set_bit(500);
-	bbs.set_bit(700);
-	bbs.set_bit(900);	
-	bbs.set_bit(1100);					//outside popsize range, not added (note the range is the last bitblock)
-	EXPECT_EQ(3, bbs.popcn64());
+class BitSetSpClassTest : public ::testing::Test {
+protected:
+	BitSetSpClassTest() :bbsp(301) {}
+	virtual void SetUp() {
+		for (int i = 0; i <= 300; i += 50) {
+			bbsp.set_bit(i);
+			pSet.push_back(i);
+		}
+	}
 
-	bbs.init(100000);
-	bbs.set_bit(10);
-	EXPECT_TRUE(bbs.is_bit(10));
+	//////////////////////
+	//data members
+	BitSetSp bbsp;	
+	vector<int> pSet;
+};
 
-	BitSetSp bbs1(bbs);
-	EXPECT_TRUE(bbs1.is_bit(10));
+TEST(Sparse, construction_basic){
+
+	BitSetSp bbsp;
+	bbsp.init(1000);
+
+	bbsp.set_bit(500);
+	bbsp.set_bit(700);
+	bbsp.set_bit(900);
+	
+	//////////////////////
+	int retVal=bbsp.set_bit(1100);							//outside popsize range, not added
+	EXPECT_EQ(-1, retVal);
+	//////////////////////
+
+	EXPECT_EQ(3, bbsp.popcn64());							//bbsp = {500, 700, 900}
+
+	bbsp.init(100000);
+	bbsp.set_bit(10);
+	EXPECT_TRUE(bbsp.is_bit(10));
+
+}
+
+TEST(Sparse, construction_from_vector) {
+
+	vector<int> lv = { 100, 200, 300, 400, 500 };
+	BitSetSp bbsp(1000, lv);
+
+	EXPECT_TRUE(bbsp.is_bit(100));
+	EXPECT_TRUE(bbsp.is_bit(200));
+	EXPECT_TRUE(bbsp.is_bit(300));
+	EXPECT_TRUE(bbsp.is_bit(400));
+	EXPECT_TRUE(bbsp.is_bit(500));
+	EXPECT_EQ(5, bbsp.size());
+	EXPECT_EQ(5, bbsp.number_of_bitblocks());			//sparse number of blocks, one per element in this case 
+
+}
+
+TEST(Sparse, DISABLED_construction_semantics) {
+
+	//TODO
 }
 
 TEST(Sparse, basics) {

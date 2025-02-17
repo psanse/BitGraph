@@ -9,9 +9,14 @@
 
 
 #include "bbset_sparse.h"
+#include "utils/logger.h"
 #include <iostream>
 #include <sstream>
 
+//uncomment undef to avoid assertions
+#define NDEBUG
+#undef NDEBUG
+#include <cassert>
  
 using namespace std;
 
@@ -24,17 +29,40 @@ int BitSetSp::nElem = EMPTY_ELEM;
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
-BitSetSp::BitSetSp(int size /*1 based*/, bool is_popsize ){
-	(is_popsize)? nBB_=INDEX_1TO1(size) : nBB_=size;
-	vBB_.reserve(DEFAULT_CAPACITY);							//*** check efficiency
+BitSetSp::BitSetSp(int nPop, bool is_popsize ){
+
+	(is_popsize)? nBB_ = INDEX_1TO1(nPop) : nBB_ = nPop;
+	vBB_.reserve(DEFAULT_CAPACITY);							
 }
 
-BitSetSp::BitSetSp (const BitSetSp& bbS){
-//////////////
-// copies state
-	vBB_=bbS.vBB_;
-	nBB_=bbS.nBB_;
+BitSetSp::BitSetSp(int nPop, const vint& lv):
+	nBB_(INDEX_1TO1(nPop))
+{
+	try {
+		
+		//VBB_ initially empty.. with default capacity
+
+		//sets bit conveniently
+		for (auto& bit : lv) {
+
+			//////////////////
+			assert(bit >= 0 && bit < nPop);
+			/////////////////
+
+			//sets bits - adds pBlocks in place
+			assert(set_bit(bit)!=-1);
+
+		}
+
+	}
+	catch (...) {
+		LOG_ERROR("Error during construction - BitSet::BitSetSp()");
+		LOG_ERROR("exiting...");
+		std::exit(-1);
+	}
+
 }
+
 
 int BitSetSp::init (int size, bool is_popsize){
 ///////////////
@@ -53,7 +81,7 @@ void  BitSetSp::clear(){
 }
 
 void BitSetSp::sort (){
-	std::sort(vBB_.begin(), vBB_.end(), elem_less());
+	std::sort(vBB_.begin(), vBB_.end(), pBlock_less());
 }	
 
 
@@ -554,7 +582,7 @@ return *this;
 BITBOARD BitSetSp::find_bitboard (int block_index) const{
 ///////////////////
 // returns the bitblock of the block index or EMPTY_ELEM if it does not exist
-	vPB_cit it=lower_bound(vBB_.begin(), vBB_.end(), pBlock_t(block_index), elem_less());
+	vPB_cit it=lower_bound(vBB_.begin(), vBB_.end(), pBlock_t(block_index), pBlock_less());
 	if(it!=vBB_.end()){
 		if(it->idx_==block_index){
 			return it->bb_;
@@ -567,7 +595,7 @@ pair<bool, int>	BitSetSp::find_pos (int block_index) const{
 ////////////////
 // returns first:true if block exists second:lower bound index in the collection or EMPTY_ELEM if no block exists above the index
 	pair<bool, int> res(false, EMPTY_ELEM);
-	vPB_cit it=lower_bound(vBB_.begin(), vBB_.end(), pBlock_t(block_index), elem_less());
+	vPB_cit it=lower_bound(vBB_.begin(), vBB_.end(), pBlock_t(block_index), pBlock_less());
 	if(it!=vBB_.end()){
 		res.second=it-vBB_.begin();
 		if(it->idx_==block_index){
@@ -580,9 +608,9 @@ return res;
 pair<bool, BitSetSp::vPB_it> BitSetSp::find_block (int block_index, bool is_lower_bound) 	{
 	pair<bool, BitSetSp::vPB_it>res;
 	if(is_lower_bound)
-		res.second=lower_bound(vBB_.begin(), vBB_.end(), pBlock_t(block_index), elem_less());
+		res.second=lower_bound(vBB_.begin(), vBB_.end(), pBlock_t(block_index), pBlock_less());
 	else
-		res.second=upper_bound(vBB_.begin(), vBB_.end(), pBlock_t(block_index), elem_less());
+		res.second=upper_bound(vBB_.begin(), vBB_.end(), pBlock_t(block_index), pBlock_less());
 	res.first= (res.second!=vBB_.end()) && (res.second->idx_==block_index);
 return res;
 }
@@ -590,9 +618,9 @@ return res;
 pair<bool, BitSetSp::vPB_cit> BitSetSp::find_block (int block_index, bool is_lower_bound) const 	{
 	pair<bool, BitSetSp::vPB_cit>res;
 	if(is_lower_bound)
-		res.second=lower_bound(vBB_.begin(), vBB_.end(), pBlock_t(block_index), elem_less());
+		res.second=lower_bound(vBB_.begin(), vBB_.end(), pBlock_t(block_index), pBlock_less());
 	else
-		res.second=upper_bound(vBB_.begin(), vBB_.end(), pBlock_t(block_index), elem_less());
+		res.second=upper_bound(vBB_.begin(), vBB_.end(), pBlock_t(block_index), pBlock_less());
 	res.first= res.second!=vBB_.end() && res.second->idx_==block_index;
 return res;
 }
@@ -734,20 +762,6 @@ return -1;
 // Operators
 //
 ///////////////
-BitSetSp& BitSetSp::operator = (const BitSetSp& bbs){
-///////////////
-// Deep copy of collection 
-
-	if(this!=&bbs){
-		this->vBB_=bbs.vBB_;
-		this->nBB_=bbs.nBB_;
-	}
-
-return *this;
-}
-
-
-
 
 BitSetSp&  OR	(const BitSetSp& lhs, const BitSetSp& rhs,  BitSetSp& res){
 ///////////////////////////

@@ -11,15 +11,22 @@
 #define __BBSET_SPARSE_H__
 
 #include "bbobject.h"
-#include "bitblock.h"	
+#include "bitblock.h"
+#include "utils/logger.h"
 #include <vector>	
 #include <algorithm>
 #include <iterator>
 
+//uncomment #undef NDEBUG in bbconfig.h to enable run-time assertions
+#include <cassert>
+
 using namespace std;
 
-constexpr int DEFAULT_CAPACITY = 2;								//initial reserve of bit blocks for any new sparse bitstring (possibly remove)
+//initial reserve of bit blocks for any new sparse bitstring - CHECK efficiency (17/02/2025)
+constexpr int DEFAULT_CAPACITY = 2;		
 
+//aliases
+using vint = std::vector<int>; 
  
 /////////////////////////////////
 //
@@ -35,7 +42,7 @@ public:
 		int idx_;
 		BITBOARD bb_;
 
-		pBlock_t(int idx = BBObject::noBit, BITBOARD bb = 0):idx_(idx), bb_(bb){}
+		pBlock_t(int idx = BBObject::noBit, BITBOARD bb = 0) : idx_(idx), bb_(bb){}
 
 		bool operator ==	(const pBlock_t& e)	const	{ return (idx_ == e.idx_ && bb_ == e.bb_); }
 		bool operator !=	(const pBlock_t& e)	const	{ return (idx_ != e.idx_ || bb_ != e.bb_); }
@@ -45,20 +52,29 @@ public:
 	};
 
 	//aliases
-	using vPB = vector<pBlock_t>;
-	using vPB_it = vector<pBlock_t>::iterator;
-	using vPB_cit = vector<pBlock_t>::const_iterator;
+	using vPB		= vector<pBlock_t>;
+	using vPB_it	= vector<pBlock_t>::iterator;
+	using vPB_cit	= vector<pBlock_t>::const_iterator;
 		
-	//functor for sorting - check if it is necessary
-	struct elem_less {
-		bool operator()(const pBlock_t& lhs, const pBlock_t& rhs) {
+	//functor for sorting - check if it is necessary, maybe use a lambda C++11
+	struct pBlock_less {
+		bool operator()(const pBlock_t& lhs, const pBlock_t& rhs) const {
 			return lhs.idx_ < rhs.idx_;
 		}
 	};
 
+
+/////////////////////
+// static data members 
 private:
-	static int nElem;																						//to cache current bitblock position in the collection (not its idx_ ni the bitstring) 
+
+	//Caches current bitblock position in the collection (not its idx_ in the bitstring)  - CHECK arquitecture (17/02/2025)
+	static int nElem;	
+
+/////////////////////
+// independent operators / masks 
 public:	
+
 	friend bool	operator ==			(const BitSetSp&, const BitSetSp&);
 	friend bool operator!=			(const BitSetSp& lhs, const BitSetSp& rhs);
 
@@ -68,16 +84,40 @@ public:
 	friend BitSetSp&  OR			(const BitSetSp& lhs, const BitSetSp& rhs,  BitSetSp& res);
 	friend BitSetSp&  ERASE		(const BitSetSp& lhs, const BitSetSp& rhs,  BitSetSp& res);			//removes rhs from lhs
 
+/////////////////////
+// constructors / destructors
 
-	BitSetSp						():nBB_(BBObject::noBit){}												//is this necessary?											
-explicit BitSetSp					(int size, bool is_popsize=true );										//popsize is 1-based
-	BitSetSp						(const BitSetSp& );	
-virtual ~BitSetSp					(){clear();}	
+	BitSetSp						():nBB_(0)		{}	
 
+	/**
+	* @brief Constructor of an EMPTY bitset given a population size nPop
+	*		  The capacity of the bitset is set according to the population size
+	* @param nBits : population size if is_popsize is true, otherwise the capacity of the bitset
+	**/
+explicit BitSetSp					(int nPop, bool is_popsize = true );
+
+	/**
+	 * @brief Constructor of an bitset given an initial vector lv of 1-bit elements
+	 *		  and a population capacity determined by the population maximum size nPop
+	 *		  The capacity of the bitset is set according to nPop
+	 * @param nPop: population size
+	 * @param lv : vector of integers representing 1-bits in the bitset
+	 **/
+	 BitSetSp					(int nPop, const vint& lv);
+
+	//Allows copy and move semantics
+	BitSetSp				(const BitSetSp& bbN)			= default;
+	BitSetSp				(BitSetSp&&)		noexcept	= default;
+	BitSetSp& operator =	(const BitSetSp&)				= default;
+	BitSetSp& operator =	(BitSetSp&&)		noexcept	= default;
+
+	virtual ~BitSetSp				() = default;
+
+////////////
+//Reset / init (memory allocation)
 	int init						(int size, bool is_popsize=true);					
 	void clear						();
-	void sort						();
-	BitSetSp& operator =			(const BitSetSp& );	
+
 /////////////////////
 //setters and getters (will not allocate memory)
 											
@@ -119,12 +159,23 @@ virtual inline	 int popcn64		()						const;			//lookup
 virtual inline	 int popcn64		(int nBit)				const;			
 
 /////////////////////
-//Set/Delete Bits (nbit is always 0 based)
+//Setting / Erasing bits 
+
 		int   init_bit				(int nbit);	
 		int   init_bit				(int lbit, int rbit);	
 		int   init_bit				(int last_bit, const BitSetSp& bb_add);							//copies up to last_bit included
 		int   init_bit				(int lbit, int rbit, const BitSetSp& bb_add);						//copies up to last_bit included
-inline	int   set_bit				(int nbit);															//ordered insertion by bit block index
+		
+	/**
+	* @brief Sets bit in the sparse bitset
+	* @param nbit: position of the bit to set
+	* @returns 0 if the bit was set, -1 if error
+	* @details emplaces pBlock in the bitstring or changes an existing bitblock
+	* @detials uses lower_bound for insertion (overhead)
+	* @details uses internal assert macro for error checking
+	**/
+inline	int  set_bit				(int nbit);															
+		
 		int	  set_bit				(int lbit, int rbit);												//CLOSED range
 BitSetSp&    set_bit				(const BitSetSp& bb_add);											//OR
 
@@ -149,13 +200,19 @@ BitSetSp&    erase_block_pos		(int first_pos_of_block, const BitSetSp& rhs );
  BitSetSp& operator |=				(const BitSetSp& );
  BitSetSp& AND_EQ					(int first_block, const BitSetSp& rhs );						//in range
  BitSetSp& OR_EQ					(int first_block, const BitSetSp& rhs );						//in range
-  		
+  
+
 /////////////////////////////
 //Boolean functions
 inline	bool is_bit					(int nbit)				const;									//nbit is 0 based
 inline	bool is_empty				()						const;									//lax: considers empty blocks for emptyness
 		bool is_disjoint			(const BitSetSp& bb)   const;
 		bool is_disjoint			(int first_block, int last_block, const BitSetSp& bb)   const;
+
+////////////////////////
+ //Other operations 
+		void sort();
+		
 /////////////////////
 //I/O 
 	ostream& print					(ostream& = cout, bool show_pc = true, bool endl = true ) const override;
@@ -189,7 +246,7 @@ bool BitSetSp::is_bit(int nbit)	const{
 
 	//lower_bound implementation
 	int idx=WDIV(nbit);
-	vPB_cit it=lower_bound(vBB_.begin(), vBB_.end(), pBlock_t(idx), elem_less());
+	vPB_cit it=lower_bound(vBB_.begin(), vBB_.end(), pBlock_t(idx), pBlock_less());
 	if(it!=vBB_.end()){
 		if((*it).idx_==idx)
 			return ((*it).bb_ & Tables::mask[WMOD(nbit)]);
@@ -309,13 +366,13 @@ void BitSetSp::erase_bit(int nbit /*0 based*/){
 	int idx = WDIV(nbit);
 
 	//equal_range implementation 
-	/*pair<vPB_it, vPB_it> p=equal_range(vBB_.begin(), vBB_.end(), elem(WDIV(nbit)), elem_less());
+	/*pair<vPB_it, vPB_it> p=equal_range(vBB_.begin(), vBB_.end(), elem(WDIV(nbit)), pBlock_less());
 	if(distance(p.first,p.second)!=0){
 		(*p.first).bb_&=~Tables::mask[WMOD(nbit)];
 	}*/
 	
 	//lower_bound implementation
-	vPB_it it=lower_bound(vBB_.begin(), vBB_.end(), pBlock_t(idx), elem_less());
+	vPB_it it=lower_bound(vBB_.begin(), vBB_.end(), pBlock_t(idx), pBlock_less());
 	if(it!=vBB_.end()){
 		//check if the element exists already
 		if (it->idx_ == idx) {
@@ -329,7 +386,7 @@ BitSetSp::vPB_it  BitSetSp::erase_bit (int nbit, BitSetSp::vPB_it from_it){
 	int idx=WDIV(nbit);
 		
 	//lower_bound implementation
-	vPB_it it=lower_bound(from_it, vBB_.end(), pBlock_t(idx), elem_less());
+	vPB_it it=lower_bound(from_it, vBB_.end(), pBlock_t(idx), pBlock_less());
 	if(it!=vBB_.end()){
 		//check if the element exists already
 		if(it->idx_== idx)
@@ -338,38 +395,36 @@ BitSetSp::vPB_it  BitSetSp::erase_bit (int nbit, BitSetSp::vPB_it from_it){
 return it;
 }
 
-int  BitSetSp::set_bit (int nbit ){
-///////////////
-//  General function for setting bits  
-//
-//  REMARKS:
-//  1-Penalty cost for insertion
-//  2-The other idea would be to allow unordered insertion and sort afterwards. This would be sensible for initial setting of bits operation (i.e. when reading from file)
+int BitSetSp::set_bit (int bit ){
 
-	int idx = WDIV(nbit);
-
-	//ASSERT
-	if (idx >=nBB_){
-		cout<<"bit outside population limit"<<endl;
-		cout<<"bit: "<<nbit<<" block: "<< idx <<" max block: "<<nBB_<<endl;
+	int block = WDIV(bit);
+		
+	//////////////////////////
+	if (block >= nBB_) {
+		LOGG_ERROR("attempted to set a bit: ", bit, "out of range - BitSetSp::set_bit ");
 		return -1;
 	}
-
-	//lower_bound implementation
-	vPB_it it=lower_bound(vBB_.begin(), vBB_.end(), pBlock_t(idx), elem_less());
-	if(it!=vBB_.end()){
-		//check if the element exists already
-		if(it->idx_== idx){
-			it->bb_|=Tables::mask[WMOD(nbit)];
-		}else 	//new inserted element
-			vBB_.insert(it, pBlock_t(idx,Tables::mask[WMOD(nbit)]));
+	/////////////////////////
+		
+	//ordered insertion - lower_bound implementation
+	vPB_it it = std::lower_bound (vBB_.begin(), vBB_.end(), pBlock_t(block), pBlock_less());
+	if(it != vBB_.end()){
+				
+		if(it->idx_ == block){
+			//check if the element exists already
+			it->bb_|=Tables::mask[bit - WMUL(block) /* WMOD(bit) */];
+		}
+		else {
+			//new inserted element
+			vBB_.insert(it, pBlock_t(block, Tables::mask[bit - WMUL(block) /* WMOD(bit) */]));
+		}
 	
 	}else{
 		//insertion at the end
-		vBB_.push_back(pBlock_t(idx,Tables::mask[WMOD(nbit)]));
+		vBB_.emplace_back(pBlock_t(block,Tables::mask[bit - WMUL(block) /* WMOD(bit) */]));
 	}
 	
-return 0;  //ok
+	return 0;  //ok
 }
 
 inline
@@ -530,7 +585,7 @@ int BitSetSp::popcn64(int nBit) const{
 	int nBB=WDIV(nBit);
 
 	//find the biblock if it exists
-	vPB_cit it=lower_bound(vBB_.begin(), vBB_.end(), pBlock_t(nBB), elem_less());
+	vPB_cit it=lower_bound(vBB_.begin(), vBB_.end(), pBlock_t(nBB), pBlock_less());
 	if(it!=vBB_.end()){
 		if(it->idx_==nBB){
 			val.b= it->bb_&~Tables::mask_low[WMOD(nBit)];
@@ -878,7 +933,7 @@ int	 BitSetSp::erase_bit (int low, int high){
 	}
 		
 	//finds low bitblock and updates forward
-	vPB_it itl=lower_bound(vBB_.begin(), vBB_.end(), pBlock_t(bbl), elem_less());
+	vPB_it itl=lower_bound(vBB_.begin(), vBB_.end(), pBlock_t(bbl), pBlock_less());
 	if(itl!=vBB_.end()){
 		if(itl->idx_==bbl){	//lower block exists
 			if(bbh==bbl){		//case update in the same bitblock
@@ -950,7 +1005,7 @@ int  BitSetSp::init_bit (int low, int high,  const BitSetSp& bb_add){
 
 
 	//finds low bitblock and updates forward
-	vPB_cit itl=lower_bound(bb_add.begin(), bb_add.end(), pBlock_t(bbl), elem_less());
+	vPB_cit itl=lower_bound(bb_add.begin(), bb_add.end(), pBlock_t(bbl), pBlock_less());
 	if(itl!=bb_add.end()){
 		if(itl->idx_==bbl){	//lower block exists
 			if(bbh==bbl){		//case update in the same bitblock

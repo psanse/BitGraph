@@ -101,7 +101,7 @@ int BBScanSp::popcn64(int nBit) const{
 	int nBB=WDIV(nBit);
 
 	//find the biblock if it exists
-	vPB_cit it = lower_bound(vBB_.begin(), vBB_.end(), pBlock_t(nBB), elem_less());
+	vPB_cit it = lower_bound(vBB_.begin(), vBB_.end(), pBlock_t(nBB), pBlock_less());
 	if(it!=vBB_.end()){
 		if(it->idx_==nBB){
 			BITBOARD bb= it->bb_&~Tables::mask_low[WMOD(nBit)];

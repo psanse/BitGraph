@@ -1177,7 +1177,7 @@ inline
 BitSet&  BitSet::set_block (int firstBlock, int lastBlock, const BitSet& bb_add){
 
 	///////////////////////////////////////////////////////////////////////////////
-	assert((firstBlock >= 0) && (LastBlock < nBB_) && (firstBlock <= lastBlock));
+	assert((firstBlock >= 0) && (lastBlock < nBB_) && (firstBlock <= lastBlock));
 	///////////////////////////////////////////////////////////////////////////////
 
 	int last_block = ((lastBlock == -1) ? nBB_ - 1 : lastBlock);
@@ -1212,7 +1212,7 @@ BitSet&  BitSet::erase_bit (int firstBit, int lastBit){
 	//general comment: low - WMUL(bbl) = WMOD(bbl) but supposed to be less expensive (CHECK 01/02/25)
 
 	//////////////////////////////
-	assert(firstBit > 0 && (firstBit <= lastBit || lastBit = -1) );
+	assert(firstBit > 0 && (firstBit <= lastBit || lastBit == -1) );
 	//////////////////////////////
 
 	int bbl = WDIV(firstBit);
