@@ -358,11 +358,11 @@ bool BitSetSp::is_empty ()	const{
 ///////////////////////
 // 
 // REMARKS:	The bit string may be empty either because it is known that there are no blocks (size=0)
-//			or because the blocks contain no 1-bit (we admit this option explicitly for efficiency)
+//			or because the blocks contain no 1-bit (this option is allowed for efficiency)
 
 	if(vBB_.empty()) return true;
 
-	for(int i=0; i<vBB_.size(); i++){
+	for(int i = 0; i < vBB_.size(); ++i){
 		if(vBB_[i].bb_) return false;
 	}
 	
