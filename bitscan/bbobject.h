@@ -37,7 +37,7 @@ public:
 	//cache for bitscanning
 	struct scan_t {																			
 		
-		int bbi_;								//bitboard index 	
+		int bbi_;								//bitblock index 	
 		int pos_;								//bit index [0...63] 
 
 		scan_t() :bbi_(noBit), pos_(MASK_LIM)		{}

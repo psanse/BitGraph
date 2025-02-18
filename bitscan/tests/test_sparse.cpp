@@ -11,6 +11,8 @@
 #include "bitscan/bbscan_sparse.h"
 #include "gtest/gtest.h"
 #include <iostream>
+#include <algorithm>
+
 
 using namespace std;
 
@@ -247,15 +249,17 @@ TEST(Sparse, set_bits) {
 
 	//range
 	bbsp.set_bit(3, 27);
-	cout<<bbsp<<endl;
+	//cout<<bbsp<<endl;
 	EXPECT_TRUE(bbsp.is_bit(3));
 	EXPECT_TRUE(bbsp.is_bit(27));
 	EXPECT_EQ(32, bbsp.popcn64());
+	EXPECT_TRUE(std::is_sorted(bbsp.bitset().begin(), bbsp.bitset().end(), BitSetSp::pBlock_less()));
 	
 
 	bbsp.set_bit(1002,1002);
 	EXPECT_TRUE(bbsp.is_bit(1002));
 	EXPECT_EQ(33, bbsp.popcn64());
+	EXPECT_TRUE(std::is_sorted(bbsp.bitset().begin(), bbsp.bitset().end(), BitSetSp::pBlock_less()));
 
 
 	//range
@@ -263,14 +267,15 @@ TEST(Sparse, set_bits) {
 	EXPECT_FALSE(bbsp.is_bit(28));
 	EXPECT_TRUE(bbsp.is_bit(29));
 	EXPECT_TRUE(bbsp.is_bit(125));
+	EXPECT_TRUE(std::is_sorted(bbsp.bitset().begin(), bbsp.bitset().end(), BitSetSp::pBlock_less()));
 
 	bbsp.set_bit(1001,1100);
 	EXPECT_FALSE(bbsp.is_bit(999));
 	EXPECT_TRUE(bbsp.is_bit(1001));
 	EXPECT_TRUE(bbsp.is_bit(1100));
 	EXPECT_FALSE(bbsp.is_bit(1101));
-	cout<<bbsp<<endl;
-
+	EXPECT_TRUE(std::is_sorted(bbsp.bitset().begin(), bbsp.bitset().end(), BitSetSp::pBlock_less()));
+	
 
 //init member functions
 	BBScanSp sb(150);

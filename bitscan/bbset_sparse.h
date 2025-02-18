@@ -49,6 +49,8 @@ public:
 		bool operator !		()					const	{ return !bb_ ; }
 		bool is_empty		()					const	{ return !bb_ ; }
 		void clear			()							{ bb_ = 0;}
+
+		ostream& print		(ostream& o)		const	{ return o << idx_ << " : " << bb_<< '\n'; }
 	};
 
 	//aliases
@@ -264,9 +266,20 @@ virtual inline	 int popcn64		(int nBit)				const;
 	* @detials uses lower_bound for insertion (log overhead)
 	* @details uses internal assert macro for error checking
 	**/
-inline	int  set_bit				(int nbit);															
+inline	int  set_bit				(int bit);															
 		
-		int	  set_bit				(int lbit, int rbit);												//CLOSED range
+//CLOSED range
+///////////////////
+// sets bits to one in the corresponding CLOSED range
+//
+// REMARKS: 
+// 1.only one binary search is performed for the lower block
+// 2.does not check maximum possible size
+//
+//*** OPTIMIZATION: restrict sorting when required to [low,high] interval
+//returns -1 if error
+
+		int	 set_bit				(int firstBit, int lastBit);									
 BitSetSp&    set_bit				(const BitSetSp& bb_add);											//OR
 
 BitSetSp&  set_block				(int first_block, const BitSetSp& bb_add);							//OR:closed range
@@ -300,8 +313,13 @@ BitSetSp&    erase_block_pos		(int first_pos_of_block, const BitSetSp& rhs );
 	 **/
  inline	bool is_bit					(int bit)				const;								
 
+	 /**
+	 * @brief TRUE if the bitstring has all 0-bits
+	 * @details O(num_bitblocks) complexity. Assumes it is possible that all existing bitblocks are 0, so 
+	 *			all of them need to be checked.
+	 **/
+ inline	bool is_empty				()						const;		
 
-inline	bool is_empty				()						const;									//lax: considers empty blocks for emptyness
 		bool is_disjoint			(const BitSetSp& bb)	const;
 		bool is_disjoint			(int first_block, int last_block, const BitSetSp& bb)   const;
 
@@ -353,23 +371,19 @@ bool BitSetSp::is_bit(int bit)	const{
 
 
 bool BitSetSp::is_empty ()	const{
-///////////////////////
-// 
-// REMARKS:	The bit string may be empty either because it is known that there are no blocks (size=0)
-//			or because the blocks contain no 1-bit (this option is allowed for efficiency)
 
-	if(vBB_.empty()) return true;
-
-	for(int i = 0; i < vBB_.size(); ++i){
-		if(vBB_[i].bb_) return false;
+	//special case, no 1-bits in the bitset
+	if (vBB_.empty()) {
+		return true;
 	}
-	
-	
-	//find if all elements are 0 (check efficiency)
-	/*vPB_cit it=find_if (vBB_.begin(), vBB_.end(), mem_fun_ref(&elem::is_not_empty)); 
-	return (it==vBB_.end());*/
 
-return true;
+	//check if all bitblocks are empty - assumes it is possible
+	for(int i = 0; i < vBB_.size(); ++i){
+		if (vBB_[i].bb_) {
+			return false;
+		}
+	}
+	return true;
 }
 
 inline
@@ -523,7 +537,7 @@ int BitSetSp::set_bit (int bit ){
 		vBB_.emplace_back(pBlock_t(block,Tables::mask[bit - WMUL(block) /* WMOD(bit) */]));
 	}
 	
-	return 0;  //ok
+	return 0;  
 }
 
 inline

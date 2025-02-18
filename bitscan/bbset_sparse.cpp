@@ -123,109 +123,157 @@ void BitSetSp::sort (){
 }	
 
 
-int	 BitSetSp::set_bit	(int low, int high){
-///////////////////
-// sets bits to one in the corresponding CLOSED range
-//
-// REMARKS: 
-// 1.only one binary search is performed for the lower block
-// 2.does not check maximum possible size
-//
-//*** OPTIMIZATION: restrict sorting when required to [low,high] interval
-			
-	int	bbh=WDIV(high); 
-	int bbl=WDIV(low); 
-	bool req_sorting=false;
-	//vBB_.reserve(vBB_.size()+high-low+1);					//maximum possible size, to push_back in place without allocation
-	vPB vapp;
+int	 BitSetSp::set_bit	(int firstBit, int lastBit){
 
-	//checks consistency (ASSERT)
-	if(bbh<bbl || bbl<0 || low>high || low<0){
-		cerr<<"Error in set bit in range"<<endl;
-		return -1;
+	//////////////////////////////
+	assert(firstBit <= lastBit && firstBit >= 0);
+	//////////////////////////////
+
+	int bbl = WDIV(firstBit);
+	int bbh = WDIV(lastBit);
+	int offset_low = firstBit - WMUL(bbl);
+	int offset_high = lastBit - WMUL(bbh);
+		
+	//avoid reallocation when blocks are added and lose the iterator (MUST BE!)
+	try {
+		vBB_.reserve(vBB_.size() + bbh - bbl + 1 /* max num of bitblocks that can be added */);
 	}
+	catch (...) {
+		LOG_ERROR("Error during allocation - BitSetSp::set_bit");
+		return -1;
+	}	
+	
+	//finds block if it exists or returns the iterator to the closest block with higher index ni the bitset
+	auto p = find_block_ext(bbl);
 
-	//A) bbh==bbl
-	pair<bool,vPB_it> p=find_block_ext(bbl);
-	if(bbh==bbl){
-		if(p.first){
-			BITBOARD bb_high=p.second->bb_| ~Tables::mask_high[high-WMUL(bbh)];
-			BITBOARD bb_low=p.second->bb_| ~Tables::mask_low[low-WMUL(bbl)];
-			p.second->bb_=bb_low & bb_high;
+	////////////////////////////////////////
+	//A) special case of singleton range ( bbh == bbl )
+	
+	if(bbh == bbl){
+
+		if(p.first){			//block exists
+						
+			p.second->bb_ |= bblock::MASK_1(offset_low, offset_high);
+
 			return 0;		//no need for sorting
-		}else{
-			BITBOARD bb_high= ~Tables::mask_high[high-WMUL(bbh)];
-			vBB_.push_back(pBlock_t(bbl,bb_high&~ Tables::mask_low[low-WMUL(bbl)]));
+
+		}
+		else {					//block does not exist		
+			
+			vBB_.emplace_back(pBlock_t(bbl, bblock::MASK_1(offset_low, offset_high) )) ;
+
 			return 0;
 		}
 	}
 
-	//B) bbl outside range 
-	if(p.second==vBB_.end()){
-		//append blocks at the end
-		vBB_.push_back(pBlock_t(bbl,~Tables::mask_low[low-WMUL(bbl)]));
-		for(int i=low+1; i<bbh; ++i){
-				vBB_.push_back(pBlock_t(i,ONE));
+	/////////////////////////////////
+	//B) special case all existing blocks are below firstBit index
+
+	if(p.second == vBB_.end()){
+
+		//first block
+		vBB_.emplace_back(pBlock_t(bbl, bblock::MASK_1_HIGH(offset_low) ) );
+
+		//in-between blocks
+		for(int i = firstBit + 1; i < bbh; ++i){
+				vBB_.emplace_back(pBlock_t(i, ONE));
 		}
-		vBB_.push_back(pBlock_t(bbh,~Tables::mask_high[high-WMUL(bbh)]));
+
+		//last block		
+		vBB_.emplace_back(pBlock_t(bbh, bblock::MASK_1_LOW(offset_high) ));
+
 		return 0;
 	}
 	
+	/////////////////////////////////
+	//C) Normal caseblock - bbl  
+								
+	//C.1- first block bbl
 
-	//C) bbl  
-	int block=bbl;
+	int block = bbl;
 	if(p.first){	//block exists	
-		p.second->bb_|=~Tables::mask_low[low-WMUL(bbl)];
+		
+		p.second->bb_ |= bblock::MASK_1_HIGH(offset_low);
+
 		++p.second;
-	}else{ //block does not exist:marked for append
-		vapp.push_back(pBlock_t(bbl,~Tables::mask_low[low-WMUL(bbl)]));
-	}
-	++block;
+
+	}else{ //block does not exist: marked for append		
 	
-	//D) Remaining blocks
+		vBB_.emplace_back(pBlock_t(block, ONE));
+	}
+		
+	//C.2 - remaining blocks in the range
+
+	//flag to sort the array
+	bool req_sorting = false;
+
+	//increments block index
+	++block;
+
 	while(true){
+
 		//exit condition I
-		if(p.second==vBB_.end()){
+		if(p.second == vBB_.end()){
+
 			//append blocks at the end
-			for(int i=block; i<bbh; ++i){
-				vBB_.push_back(pBlock_t(i,ONE));
+			for(int i = block; i < bbh; ++i){
+				vBB_.emplace_back(pBlock_t(i,ONE));
 			}
-			vBB_.push_back(pBlock_t(bbh,~Tables::mask_high[high-WMUL(bbh)]));
-			req_sorting=true;
+
+			//last block
+			vBB_.emplace_back(pBlock_t(bbh, bblock::MASK_1_LOW(offset_high)));		
+		
+			//////////
 			break;
-		}
+			////////
 
-		//exit condition II
-		if(block==bbh){
-			if(p.second->idx_==block){ //block exists: trim and overwrite
-				p.second->bb_|=~Tables::mask_high[high-WMUL(bbh)];
+		}else if(block == bbh)  //exit condition II
+		{			
+			if( p.second->idx_ == block){	//block exists: trim and overwrite				
+
+				p.second->bb_ |= bblock::MASK_1_LOW(offset_high);
+
+				//////////
 				break;
-			}else{ //block doesn't exist, trim and append
-				vBB_.push_back(pBlock_t(bbh,~Tables::mask_high[high-WMUL(bbh)]));
-				req_sorting=true;
+				////////
+			}else{							//block doesn't exist, trim and append
+			
+				vBB_.emplace_back(pBlock_t(bbh, bblock::MASK_1_LOW(offset_high) ));				
+				
+				//////////
 				break;
+				////////
 			}
 		}
-						
+		
+		//loop with block and iterator until one of the exit condtitions are met 
+		if(p.second->idx_ == block){
 
-		//update before either of the bitstrings has reached its end
-		if(p.second->idx_==block){
-			p.second->bb_=ONE;
-			++p.second; ++block; 
-		}else if(block<p.second->idx_){				//vBB_[pos].idx_<block cannot occur
-			vapp.push_back(pBlock_t(block,ONE));			//not added in place to avoid loosing indexes
-		//	vBB_.push_back(pBlock_t(block,ONE));
-			req_sorting=true;
+			p.second->bb_ = ONE;
+
+			++p.second; 
+			++block; 
+
+		}else if(block < p.second->idx_){					
+
+			//appends block, alas not in order
+			vBB_.emplace_back(pBlock_t(block, ONE));
+			
+			//necesary, since a block with lower index than an existing one has been added
+			req_sorting = true;
+
 			++block;
 		}
+
+
+	}//end while loop
+	
+	//sorts the appended blocks if necessary
+	if (req_sorting) {
+		std::sort(vBB_.begin(), vBB_.end(), pBlock_less());		
 	}
 
-	//sorts if necessary
-	vBB_.insert(vBB_.end(), vapp.begin(), vapp.end());
-	if(req_sorting) 
-				sort();				
-
-return 0;
+	return 0;
 }
 
 int BitSetSp::init_bit (int low, int high){
