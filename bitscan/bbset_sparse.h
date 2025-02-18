@@ -303,7 +303,7 @@ BitSetSp&    erase_block_pos		(int first_pos_of_block, const BitSetSp& rhs );
 
 
 inline	bool is_empty				()						const;									//lax: considers empty blocks for emptyness
-		bool is_disjoint			(const BitSetSp& bb)   const;
+		bool is_disjoint			(const BitSetSp& bb)	const;
 		bool is_disjoint			(int first_block, int last_block, const BitSetSp& bb)   const;
 
 ////////////////////////

@@ -82,6 +82,7 @@ void BitSetSp::reset(int nPop, const vint& lv)
 {
 
 	try {
+		
 		nBB_ = INDEX_1TO1(nPop);
 		decltype(vBB_)().swap(vBB_);
 		vBB_.reserve(DEFAULT_CAPACITY);
