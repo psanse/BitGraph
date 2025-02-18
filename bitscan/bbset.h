@@ -1602,7 +1602,7 @@ BitSet& AND(int firstBit, int lastBit, const BitSet& lhs, const BitSet& rhs, Bit
 {
 
 	//////////////////////////////
-	assert(firstBit <= lastBit && firstBit > 0);
+	assert(firstBit <= lastBit && firstBit >= 0);
 	//////////////////////////////
 
 	int bbl = WDIV(firstBit);
@@ -1732,7 +1732,7 @@ inline
 BitSet& OR(int firstBit, int lastBit, const BitSet& lhs, const BitSet& rhs, BitSet& res)
 {
 	//////////////////////////////
-	assert(firstBit <= lastBit && firstBit > 0);
+	assert(firstBit <= lastBit && firstBit >= 0);
 	//////////////////////////////
 
 	int bbl = WDIV(firstBit);

@@ -295,7 +295,13 @@ BitSetSp&    erase_block_pos		(int first_pos_of_block, const BitSetSp& rhs );
 
 /////////////////////////////
 //Boolean functions
-inline	bool is_bit					(int nbit)				const;									//nbit is 0 based
+
+	 /**
+	 * @brief TRUE if there is a 1-bit in the position bit
+	 **/
+ inline	bool is_bit					(int bit)				const;								
+
+
 inline	bool is_empty				()						const;									//lax: considers empty blocks for emptyness
 		bool is_disjoint			(const BitSetSp& bb)   const;
 		bool is_disjoint			(int first_block, int last_block, const BitSetSp& bb)   const;
@@ -333,20 +339,18 @@ protected:
 //
 //////////////////////////
 
-bool BitSetSp::is_bit(int nbit)	const{
-//////////////////////////////
-// RETURNS: TRUE if the bit is 1 in the position nbit, FALSE if opposite case or ERROR
-//
-// REMARKS: could be implemented in terms of find_bitboard
+bool BitSetSp::is_bit(int bit)	const{
+//note: could use find_block, but this implementation is faster
+	int blockID = WDIV(bit);
 
-	//lower_bound implementation
-	int idx=WDIV(nbit);
-	vPB_cit it=lower_bound(vBB_.begin(), vBB_.end(), pBlock_t(idx), pBlock_less());
-	if(it!=vBB_.end()){
-		if((*it).idx_==idx)
-			return ((*it).bb_ & Tables::mask[WMOD(nbit)]);
-	}
-	return false;
+	/////////////////////////////////////////////////////////////////////////////////////
+	vPB_cit it=lower_bound(vBB_.begin(), vBB_.end(), pBlock_t(blockID), pBlock_less());
+	/////////////////////////////////////////////////////////////////////////////////////
+	
+	return ( it != vBB_.end()		&&
+			 it->idx_ == blockID	&& 
+			 (it->bb_ & Tables::mask[bit - WMUL(blockID) /*WMOD(bit)*/])
+			);
 }
 
 
