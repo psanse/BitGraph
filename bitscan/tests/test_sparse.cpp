@@ -109,14 +109,14 @@ TEST(Sparse, basics) {
 	EXPECT_EQ(2,bbsp.popcn64());
 
 	//find functions for blocks (not that the actual bit in WDIV(nBit) is not important, it is the bitblock index that has to exist)
-	EXPECT_EQ(0, bbsp.find_pos(WDIV(10)).second);
-	EXPECT_TRUE(bbsp.find_pos(WDIV(10)).first);
-	EXPECT_EQ(1, bbsp.find_pos(WDIV(64)).second);
-	EXPECT_TRUE(bbsp.find_pos(WDIV(64)).second);
+	EXPECT_EQ(0, bbsp.find_block_pos(WDIV(10)).second);
+	EXPECT_TRUE(bbsp.find_block_pos(WDIV(10)).first);
+	EXPECT_EQ(1, bbsp.find_block_pos(WDIV(64)).second);
+	EXPECT_TRUE(bbsp.find_block_pos(WDIV(64)).second);
 	
 	//test for a block which does not exist
-	EXPECT_FALSE(bbsp.find_pos(WDIV(129)).first);
-	EXPECT_EQ(EMPTY_ELEM, bbsp.find_pos(WDIV(129)).second);
+	EXPECT_FALSE(bbsp.find_block_pos(WDIV(129)).first);
+	EXPECT_EQ(EMPTY_ELEM, bbsp.find_block_pos(WDIV(129)).second);
 
 	EXPECT_EQ(0x01, bbsp.find_block(WDIV(64)));
 }

@@ -57,7 +57,7 @@ public:
 
 		//copies adjacency (non-empty) block array
 		for (auto v = 0; v < NV; ++v) {
-			for (auto it = sug.adj_[v].begin(); it != sug.adj_[v].end(); ++it) {
+			for (auto it = sug.adj_[v].cbegin(); it != sug.adj_[v].cend(); ++it) {
 
 				////////////////////////////////////////////////////
 				ug.adj_[v].block(it->idx_) = it->bb_;
@@ -96,7 +96,7 @@ public:
 				BITBOARD bb = ug.adj_[v].block(nBB);
 				if (bb != 0) {
 					////////////////////////////////////////////////////
-					sug.adj_[v].get_elem_set().emplace_back(nBB, bb);
+					sug.adj_[v].bitset().emplace_back(nBB, bb);
 					////////////////////////////////////////////////////
 				}
 

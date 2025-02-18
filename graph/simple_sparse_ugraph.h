@@ -46,13 +46,13 @@ inline int Ugraph<sparse_bitarray>::degree_up(int v) const
 	int nDeg = 0, nBB = WDIV(v);
 
 	//find the bitblock of v
-	auto it = adj_[v].begin();
-	for (; it != adj_[v].end(); ++it) {
+	auto it = adj_[v].cbegin();
+	for (; it != adj_[v].cend(); ++it) {
 		if (it->idx_ == nBB) break;
 	}
 
 	//check no neighbors
-	if (it == adj_[v].end()) {
+	if (it == adj_[v].cend()) {
 		return 0;							//no neighbors
 	}
 
@@ -61,7 +61,7 @@ inline int Ugraph<sparse_bitarray>::degree_up(int v) const
 
 	//add the rest of neighbours in the bitblocks that follow
 	++it;
-	for (; it != adj_[v].end(); ++it) {
+	for (; it != adj_[v].cend(); ++it) {
 		nDeg += bblock::popc64(it->bb_);
 	}
 	
@@ -82,7 +82,7 @@ inline
 int Ugraph<sparse_bitarray>::degree(int v, const BitSet& bbn) const {
 	
 	int ndeg = 0;
-	for (auto it = adj_[v].begin(); it != adj_[v].end(); ++it) {
+	for (auto it = adj_[v].cbegin(); it != adj_[v].cend(); ++it) {
 		ndeg += bblock::popc64 (it->bb_ & bbn.block(it->idx_) );
 	}
 
@@ -94,10 +94,10 @@ inline
 int Ugraph<sparse_bitarray>::degree(int v, const BitSetSp& bbs) const {
 	
 	int ndeg = 0;
-	auto itv = adj_[v].begin();
-	auto itbb = bbs.begin();
+	auto itv = adj_[v].cbegin();
+	auto itbb = bbs.cbegin();
 
-	while (itv != adj_[v].end() && itbb != bbs.end()) {
+	while (itv != adj_[v].cend() && itbb != bbs.cend()) {
 
 		if (itv->idx_ < itbb->idx_) {
 			++itv;
@@ -119,7 +119,7 @@ inline
 int Ugraph<sparse_bitarray>::degree(int v, int UB, const BitSet& bbn) const {
 	
 	int ndeg = 0;
-	for (auto it = adj_[v].begin(); it != adj_[v].end(); ++it) {
+	for (auto it = adj_[v].cbegin(); it != adj_[v].cend(); ++it) {
 		ndeg += bblock::popc64(it->bb_ & bbn.block(it->idx_));
 		if (ndeg >= UB) return UB;
 	}
@@ -132,10 +132,10 @@ inline
 int Ugraph<sparse_bitarray>::degree(int v, int UB, const BitSetSp& bbs) const {
 	
 	int ndeg = 0;
-	auto itv = adj_[v].begin();
-	auto itbb = bbs.begin();
+	auto itv = adj_[v].cbegin();
+	auto itbb = bbs.cbegin();
 
-	while (itv != adj_[v].end() && itbb != bbs.end()) {
+	while (itv != adj_[v].cend() && itbb != bbs.cend()) {
 
 		if (itv -> idx_ < itbb -> idx_) {
 			++itv;
@@ -176,7 +176,7 @@ void Ugraph<sparse_bitarray>::write_dimacs(ostream& o) {
 	//Escribir nodos
 	for (int v = 0; v < Graph<sparse_bitarray>::NV_ - 1; v++) {
 		//non destructive scan starting from the vertex onwards
-		pair<bool, int> p = Graph<sparse_bitarray>::adj_[v].find_pos(WDIV(v));
+		pair<bool, int> p = Graph<sparse_bitarray>::adj_[v].find_block_pos(WDIV(v));
 		if (p.second == EMPTY_ELEM) continue;					//no more bitblocks
 		Graph<sparse_bitarray>::adj_[v].m_scan.bbi_ = p.second;
 		(p.first) ? Graph<sparse_bitarray>::adj_[v].m_scan.pos_ = WMOD(v) : Graph<sparse_bitarray>::adj_[v].m_scan.pos_ = MASK_LIM;		//if bitblock contains v, start from that position onwards
@@ -207,7 +207,7 @@ void Ugraph<sparse_bitarray>::write_EDGES(ostream& o) {
 	//writes edges
 	for (int v = 0; v < Graph<sparse_bitarray>::NV_ - 1; v++) {
 		//non destructive scan starting from the vertex onwards
-		pair<bool, int> p = Graph<sparse_bitarray>::adj_[v].find_pos(WDIV(v));
+		pair<bool, int> p = Graph<sparse_bitarray>::adj_[v].find_block_pos(WDIV(v));
 		if (p.second == EMPTY_ELEM) continue;										//no more bitblocks
 		Graph<sparse_bitarray>::adj_[v].m_scan.bbi_ = p.second;
 		(p.first) ? Graph<sparse_bitarray>::adj_[v].m_scan.pos_ = WMOD(v) : Graph<sparse_bitarray>::adj_[v].m_scan.pos_ = MASK_LIM;			//if bitblock contains v, start from that position onwards
@@ -244,7 +244,7 @@ void Ugraph<sparse_bitarray>::write_mtx(ostream& o) {
 	//writes edges
 	for (int v = 0; v < Graph<sparse_bitarray>::NV_ - 1; v++) {
 		//non destructive scan starting from the vertex onwards
-		pair<bool, int> p = Graph<sparse_bitarray>::adj_[v].find_pos(WDIV(v));
+		pair<bool, int> p = Graph<sparse_bitarray>::adj_[v].find_block_pos(WDIV(v));
 		if (p.second == EMPTY_ELEM) continue;										//no more bitblocks
 		Graph<sparse_bitarray>::adj_[v].m_scan.bbi_ = p.second;
 		(p.first) ? Graph<sparse_bitarray>::adj_[v].m_scan.pos_ = WMOD(v) : Graph<sparse_bitarray>::adj_[v].m_scan.pos_ = MASK_LIM;			//if bitblock contains v, start from that position onwards

@@ -437,7 +437,7 @@ int BBScanSp::init_scan_from (int from, scan_types sct){
 //
 // REMARKS: at the moment, only working for the NON-DESTRUCTIVE case
 
-	pair<bool, int> p= find_pos(WDIV(from));
+	pair<bool, int> p= find_block_pos(WDIV(from));
 	if(p.second==EMPTY_ELEM) return EMPTY_ELEM;
 	switch(sct){
 	case NON_DESTRUCTIVE:

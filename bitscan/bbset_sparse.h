@@ -160,8 +160,14 @@ explicit BitSetSp					(int nPop, bool is_popsize = true );
 	*		 equivalent non-sparse bitset in the general case. To find the id-th block
 	*		 use find_bitblock function.
 	**/
-	BITBOARD  block					(int blockID)			const {return vBB_[blockID].bb_;}			
-	BITBOARD& block					(int blockID)				  {return vBB_[blockID].bb_;}
+	BITBOARD  block					(int blockID)			const	{return vBB_[blockID].bb_;}			
+	BITBOARD& block					(int blockID)					{return vBB_[blockID].bb_;}
+		
+	pBlock_t  pBlock				(int blockID)			const	{ return vBB_[blockID]; }
+	pBlock_t& pBlock				(int blockID)					{ return vBB_[blockID]; }
+
+	const vPB& bitset				()						const	{ return vBB_; }
+	vPB& bitset						()								{ return vBB_; }
 		
 	/**
 	* @brief finds the bitblock of the block index 
@@ -170,21 +176,53 @@ explicit BitSetSp					(int nPop, bool is_popsize = true );
 	**/
 	BITBOARD find_block				(int blockID)			const;	
 
+	/**
+	* @brief extended version of find_block. The template parameter LB_policy determines
+	*		 the search policy: lower_bound (true) or upper_bound (false). If true, it searches
+	*		 for the block with the same index as blockID, otherwise it searches for the closest
+	*		 block with a greater index than blockID.
+	* 
+	*		By default this function uses lower_bound policy, since with upper_bound policy the block
+	*		cannot be found even if it exists.		
+	*		
+	* @param blockID: input index of the block searched
+	* @returns a pair with first:true if the block exists, and second: the iterator to the block (policy = true) or the
+	*		  iterator closest to the block with a greater index than blockID (policy=false / policy=true the block does not exist).
+	*		  The iterator can return END in the following two cases:
+	*		  a) Policy = true - the block does not exist and all the blocks have index less than blockID
+	*		  b) Policy = false - all the blocks have index lower than OR EQUAL to blockID
+	**/
+	template<bool LB_policy = true>
 	std::pair<bool, vPB_it>  
-	find_block						(int blockID, bool is_lb);
-	std::pair<bool, vPB_cit> 
-	find_block						(int blockID, bool is_lb)	const;
-
-	//O(log) operation
-	// returns first:true if block exists second:lower bound index in the collection or EMPTY_ELEM if no block exists above the index
-	pair<bool, int>	 find_pos		(int blockID)			const;											
+	find_block_ext					(int blockID);
 	
-	vPB_it  begin					(){return vBB_.begin();}
-	vPB_it  end					(){return vBB_.end();}
-	vPB_cit  begin				()	const {return vBB_.cbegin();}
-	vPB_cit  end					()  const {return vBB_.cend();}
-	const vPB& get_elem_set		() const {return vBB_;}
-	vPB&	get_elem_set			()  {return vBB_;}
+	/**
+	* @brief extended version of find_block, returning a const iterator
+	*		 (see non-const function)
+	**/
+	template<bool LB_policy = true>
+	std::pair<bool, vPB_cit> 
+	find_block_ext					(int blockID)			const;
+		
+	/**
+	* @brief finds the position (index) of the bitblock with blockID
+	* @param blockID: input index of the block searched
+	* @returns a pair with first:true if the block exists, and second: the index of the block in the collection
+	*		   In the case the block does not exist (first element of the pair is false),
+	*		   the second element is the closest block index ABOVE the blockID or -1 if no such block exists
+	* @details O(log) complexity
+	**/
+	pair<bool, int>	 find_block_pos(int blockID)			const;
+											
+	/**
+	* @brief commodity iterators / const iterators for the bitset
+	**/
+	vPB_it  begin					()									{return vBB_.begin();}
+	vPB_it  end						()									{return vBB_.end();}
+	vPB_cit cbegin					()						const		{return vBB_.cbegin();}
+	vPB_cit cend					()						const		{return vBB_.cend();}
+	
+
 //////////////////////////////
 // Bitscanning
 
@@ -366,8 +404,8 @@ bool BitSetSp::is_disjoint	(int first_block, int last_block, const BitSetSp& rhs
 	//updates initial element indexes it first_block is defined
 	if(first_block>0){
 
-		pair<bool, int> p1=this->find_pos(first_block);
-		pair<bool, int> p2=rhs.find_pos(first_block);
+		pair<bool, int> p1=this->find_block_pos(first_block);
+		pair<bool, int> p2=rhs.find_block_pos(first_block);
 
 		//checks whether both sparse bitstrings have at least one block greater or equal to first_block
 		if(p1.second==BBObject::noBit || p2.second==BBObject::noBit) return true;
@@ -705,8 +743,8 @@ BitSetSp& AND (int first_block, const BitSetSp& lhs, const BitSetSp& rhs,  BitSe
 //
 			
 	res.erase_bit();
-	pair<bool, int> p1=lhs.find_pos(first_block);
-	pair<bool, int> p2=rhs.find_pos(first_block);
+	pair<bool, int> p1=lhs.find_block_pos(first_block);
+	pair<bool, int> p2=rhs.find_block_pos(first_block);
 	if(p1.second!=BBObject::noBit && p2.second!=BBObject::noBit){
 		int i1=p1.second, i2=p2.second;
 		while( i1!=lhs.vBB_.size() && i2!=rhs.vBB_.size() ){
@@ -752,8 +790,8 @@ BitSetSp& AND (int first_block, int last_block, const BitSetSp& lhs, const BitSe
 	//updates initial element indexes it first_block is defined
 	if(first_block>0){
 
-		pair<bool, int> p1=lhs.find_pos(first_block);
-		pair<bool, int> p2=rhs.find_pos(first_block);
+		pair<bool, int> p1=lhs.find_block_pos(first_block);
+		pair<bool, int> p2=rhs.find_block_pos(first_block);
 
 		//checks whether both sparse bitstrings have at least one block greater or equal to first_block
 		if(p1.second==BBObject::noBit || p2.second==BBObject::noBit) return res;
@@ -822,8 +860,8 @@ BitSetSp&  BitSetSp::erase_block (int first_block, const BitSetSp& rhs ){
 ////////////////////
 // removes 1-bits from current object (equialent to set_difference) from first_block (included) onwards			
 
-	pair<bool, BitSetSp::vPB_it> p1=find_block(first_block, true);
-	pair<bool, BitSetSp::vPB_cit> p2=rhs.find_block(first_block, true);
+	pair<bool, BitSetSp::vPB_it> p1=find_block_ext(first_block);
+	pair<bool, BitSetSp::vPB_cit> p2=rhs.find_block_ext(first_block);
 	
 	//optimization based on the size of rhs being greater
 	//for (int i1 = 0; i1 < lhs.vBB_.size();i1++){
@@ -855,8 +893,8 @@ BitSetSp&  BitSetSp::AND_EQ(int first_block, const BitSetSp& rhs ){
 //////////////////////
 // left intersection (AND). bits in rhs remain starting from closed range [first_block, END[
 
-	pair<bool, BitSetSp::vPB_it> p1 = this->find_block(first_block, true);
-	pair<bool, BitSetSp::vPB_cit> p2 = rhs.find_block(first_block, true);
+	pair<bool, BitSetSp::vPB_it> p1 = this->find_block_ext(first_block);
+	pair<bool, BitSetSp::vPB_cit> p2 = rhs.find_block_ext(first_block);
 	
 	//optimization based on the size of rhs being greater
 	//for (int i1 = 0; i1 < lhs.vBB_.size();i1++){...}
@@ -893,8 +931,8 @@ BitSetSp&  BitSetSp::OR_EQ(int first_block, const BitSetSp& rhs ){
 //////////////////////
 // left union (OR). Bits in rhs are added starting from closed range [first_block, END[
 
-	pair<bool, BitSetSp::vPB_it> p1=find_block(first_block, true);
-	pair<bool, BitSetSp::vPB_cit> p2=rhs.find_block(first_block, true);
+	pair<bool, BitSetSp::vPB_it> p1=find_block_ext(first_block);
+	pair<bool, BitSetSp::vPB_cit> p2=rhs.find_block_ext(first_block);
 	
 	//iteration
 	while(true){
@@ -945,8 +983,8 @@ BitSetSp&  BitSetSp::erase_block (int first_block, int last_block, const BitSetS
 ////////////////////
 // removes 1-bits from current object (equialent to set_difference) from CLOSED RANGE of blocks	
 
-	pair<bool, BitSetSp::vPB_it> p1 = find_block(first_block, true);
-	pair<bool, BitSetSp::vPB_cit> p2 = rhs.find_block(first_block, true);
+	pair<bool, BitSetSp::vPB_it> p1 = find_block_ext(first_block);
+	pair<bool, BitSetSp::vPB_cit> p2 = rhs.find_block_ext(first_block);
 	if(p1.second==vBB_.end() || p2.second==rhs.vBB_.end() )
 		 return *this;
 
@@ -1031,15 +1069,15 @@ int BitSetSp::init_bit (int high, const BitSetSp& bb_add){
 	
 	vBB_.clear();
 	int	bbh=WDIV(high); 
-	pair<bool, BitSetSp::vPB_cit> p = bb_add.find_block(bbh, true);
-	if(p.second==bb_add.end())
-		copy(bb_add.begin(), bb_add.end(),insert_iterator<vPB>(vBB_,vBB_.begin()));
+	pair<bool, BitSetSp::vPB_cit> p = bb_add.find_block_ext(bbh);
+	if(p.second==bb_add.cend())
+		copy(bb_add.cbegin(), bb_add.cend(),insert_iterator<vPB>(vBB_,vBB_.begin()));
 	else{
 		if(p.first){
-			copy(bb_add.begin(), p.second, insert_iterator<vPB>(vBB_,vBB_.begin()));
-			vBB_.push_back(pBlock_t(bbh, p.second->bb_ & ~Tables::mask_high[high-WMUL(bbh)]));
+			copy(bb_add.cbegin(), p.second, insert_iterator<vPB>(vBB_,vBB_.begin()));
+			vBB_.emplace_back(pBlock_t(bbh, p.second->bb_ & ~Tables::mask_high[high-WMUL(bbh)]));
 		}else{
-			copy(bb_add.begin(), ++p.second, insert_iterator<vPB>(vBB_,vBB_.begin()));
+			copy(bb_add.cbegin(), ++p.second, insert_iterator<vPB>(vBB_,vBB_.begin()));
 		}
 	}
 return 0;
@@ -1059,8 +1097,8 @@ int  BitSetSp::init_bit (int low, int high,  const BitSetSp& bb_add){
 
 
 	//finds low bitblock and updates forward
-	vPB_cit itl=lower_bound(bb_add.begin(), bb_add.end(), pBlock_t(bbl), pBlock_less());
-	if(itl!=bb_add.end()){
+	vPB_cit itl=lower_bound(bb_add.cbegin(), bb_add.cend(), pBlock_t(bbl), pBlock_less());
+	if(itl!=bb_add.cend()){
 		if(itl->idx_==bbl){	//lower block exists
 			if(bbh==bbl){		//case update in the same bitblock
 				vBB_.push_back(pBlock_t( bbh, itl->bb_ & bblock::MASK_1(low-WMUL(bbl), high-WMUL(bbh)) ));
@@ -1073,7 +1111,7 @@ int  BitSetSp::init_bit (int low, int high,  const BitSetSp& bb_add){
 		}
 
 		//copied the rest if elements
-		for(; itl!=bb_add.end(); ++itl){
+		for(; itl!=bb_add.cend(); ++itl){
 			if(itl->idx_>=bbh){		//exit condition
 				if(itl->idx_==bbh){	
 					vBB_.push_back(pBlock_t(bbh, itl->bb_&~Tables::mask_high[high-WMUL(bbh)]));

@@ -146,7 +146,7 @@ int	 BitSetSp::set_bit	(int low, int high){
 	}
 
 	//A) bbh==bbl
-	pair<bool,vPB_it> p=find_block(bbl, true);
+	pair<bool,vPB_it> p=find_block_ext(bbl);
 	if(bbh==bbl){
 		if(p.first){
 			BITBOARD bb_high=p.second->bb_| ~Tables::mask_high[high-WMUL(bbh)];
@@ -318,8 +318,8 @@ BitSetSp&  BitSetSp::set_block (int first_block, const BitSetSp& rhs){
 
 	//vBB_.reserve(rhs.vBB_.size()+vBB_.size());						//maximum possible size, to push_back in place without allocation
 	vPB vapp;
-	pair<bool, BitSetSp::vPB_it> p1=find_block(first_block, true);
-	pair<bool, BitSetSp::vPB_cit> p2=rhs.find_block(first_block, true);
+	pair<bool, BitSetSp::vPB_it> p1=find_block_ext(first_block);
+	pair<bool, BitSetSp::vPB_cit> p2=rhs.find_block_ext(first_block);
 	bool req_sorting=false;
 		
 
@@ -373,9 +373,9 @@ BitSetSp&  BitSetSp::set_block (int first_block, int last_block, const BitSetSp&
 	
 	//vBB_.reserve(vBB_.size()+ last_block-first_block+1);						//maximum possible size, to push_back in place without allocation
 	vPB vapp;
-	pair<bool, BitSetSp::vPB_it> p1i=find_block(first_block, true);
-	pair<bool, BitSetSp::vPB_cit> p2i=rhs.find_block(first_block, true);
-	pair<bool, BitSetSp::vPB_cit> p2f=rhs.find_block(last_block, true);
+	pair<bool, BitSetSp::vPB_it> p1i=find_block_ext(first_block);
+	pair<bool, BitSetSp::vPB_cit> p2i=rhs.find_block_ext(first_block);
+	pair<bool, BitSetSp::vPB_cit> p2f=rhs.find_block_ext(last_block);
 	bool req_sorting=false;
 		
 	if(p2i.second==rhs.vBB_.end()){ //check in this order (captures rhs empty on init)
@@ -447,7 +447,7 @@ int BitSetSp::clear_bit (int low, int high){
 
 	if(high==EMPTY_ELEM){
 		bbl=WDIV(low);
-		pl = find_block(bbl, true);
+		pl = find_block_ext(bbl);
 		if(pl.second==vBB_.end()) return 0;
 
 		if(pl.first){	//lower block exists
@@ -460,7 +460,7 @@ int BitSetSp::clear_bit (int low, int high){
 		return 0;
 	}else if(low==EMPTY_ELEM){
 		bbh=WDIV(high); 
-		ph=find_block(bbh, true);
+		ph=find_block_ext(bbh);
 		if(ph.first){	//upper block exists
 			ph.second->bb_&=Tables::mask_high[high-WMUL(bbh)];
 		}
@@ -482,8 +482,8 @@ int BitSetSp::clear_bit (int low, int high){
 
 	bbl=WDIV(low);
 	bbh=WDIV(high); 
-	pl=find_block(bbl, true);
-	ph=find_block(bbh, true);	
+	pl=find_block_ext(bbl);
+	ph=find_block_ext(bbh);	
 
 
 	//tratamiento
@@ -630,7 +630,7 @@ BITBOARD BitSetSp::find_block (int blockID) const{
 }
 
 std::pair<bool, int>
-BitSetSp::find_pos (int blockID) const{
+BitSetSp::find_block_pos (int blockID) const{
 
 	std::pair<bool, int> res(false, EMPTY_ELEM);
 
@@ -648,45 +648,51 @@ BitSetSp::find_pos (int blockID) const{
 	return res;
 }
 
+template<bool LB_policy>
 std::pair<bool, BitSetSp::vPB_it>
-BitSetSp::find_block (int blockID, bool is_lower_bound) 
+BitSetSp::find_block_ext (int blockID) 
 {
 	pair<bool, BitSetSp::vPB_it> res;
 
-	if (is_lower_bound) {
+	if (LB_policy) {
 		////////////////////////////////////////////////////////////////////////////////////////////
 		res.second = lower_bound(vBB_.begin(), vBB_.end(), pBlock_t(blockID), pBlock_less());
 		////////////////////////////////////////////////////////////////////////////////////////////
+
+		res.first = (res.second != vBB_.end()) && (res.second->idx_ == blockID);
 	}
 	else {
 		////////////////////////////////////////////////////////////////////////////////////////////
 		res.second = upper_bound(vBB_.begin(), vBB_.end(), pBlock_t(blockID), pBlock_less());
 		////////////////////////////////////////////////////////////////////////////////////////////
-	}
 
-	res.first = (res.second != vBB_.end()) && (res.second->idx_ == blockID);
+		res.first = false;			//the same block cannot be found with upper_bound, only the closest with greater index
+	}
 	
 	return res;
 }
 
+template<bool LB_policy>
 pair<bool, BitSetSp::vPB_cit> 
-BitSetSp::find_block (int blockID, bool is_lower_bound) const
+BitSetSp::find_block_ext (int blockID) const
 {
 	pair<bool, BitSetSp::vPB_cit>res;
 
-	if (is_lower_bound) {
+	if (LB_policy) {
 		////////////////////////////////////////////////////////////////////////////////////////////
 		res.second = lower_bound(vBB_.cbegin(), vBB_.cend(), pBlock_t(blockID), pBlock_less());
 		////////////////////////////////////////////////////////////////////////////////////////////
+
+		res.first = (res.second != vBB_.end()) && (res.second->idx_ == blockID);
 	}
 	else {
 		////////////////////////////////////////////////////////////////////////////////////////////
-		res.second = upper_bound(vBB_.cbegin(), vBB_.cend(), pBlock_t(blockID), pBlock_less());
+		res.second = upper_bound(vBB_.cbegin(), vBB_.cend(), pBlock_t(blockID), pBlock_less());		
 		////////////////////////////////////////////////////////////////////////////////////////////
-	}
 
-	res.first = (res.second!=vBB_.end()) && (res.second->idx_ == blockID);
-	
+		res.first = false;			//the same block cannot be found with upper_bound, only the closest with greater index
+	}
+		
 	return res;
 }
 
