@@ -308,21 +308,25 @@ return 0;
 }
 
 
-
 BitSetSp& BitSetSp::set_bit (const BitSetSp& rhs){
 /////////////////////////////////
 // sets 1-bits in rhs (equivalent to an |=)
 //
 // REMARKS: experimental, currently only defined for bit strings of same maximum size
 
-	if(rhs.is_empty()) 	return *this;
+	//special case
+	if (rhs.is_empty()) {
+		return *this;
+	}
+	
+	
 	//vBB_.reserve(rhs.vBB_.size()+vBB_.size());		//maximum possible size, to push_back in place without allocation
 	vPB vapp;
 	vPB_cit i2=rhs.vBB_.cbegin();
 	vPB_it i1=vBB_.begin();
 	
 	
-	bool req_sorting;
+	bool req_sorting = false;
 	while(true){
 		//exit condition I
 		if( i2==rhs.vBB_.end() ){		
@@ -353,8 +357,9 @@ BitSetSp& BitSetSp::set_bit (const BitSetSp& rhs){
 
 	//always keep array sorted
 	vBB_.insert(vBB_.end(), vapp.begin(), vapp.end());
-	if(req_sorting)
-				sort();
+	if (req_sorting) {
+		sort();
+	}
 
 return *this;		
 }

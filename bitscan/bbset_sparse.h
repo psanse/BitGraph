@@ -276,8 +276,6 @@ inline	int  set_bit				(int bit);
 	**/
 		int	 set_bit				(int firstBit, int lastBit);									
 
-
-
 	/**
 	* @brief Adds the bits from the bitstring bb_add in the population
 	*		 range of the bitstring (bitblocks are copied).
