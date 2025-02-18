@@ -7,7 +7,6 @@
   * TODO refactoring and testing 15/02/2025 - follow the interface of the refactored BitSet
   **/
 
-
 #include "bbset_sparse.h"
 #include "utils/logger.h"
 #include <iostream>
@@ -82,6 +81,7 @@ void BitSetSp::reset(int nPop, const vint& lv)
 {
 
 	try {
+		
 		nBB_ = INDEX_1TO1(nPop);
 		decltype(vBB_)().swap(vBB_);
 		vBB_.reserve(DEFAULT_CAPACITY);

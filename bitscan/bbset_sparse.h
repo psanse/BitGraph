@@ -294,9 +294,15 @@ BitSetSp&    erase_block_pos		(int first_pos_of_block, const BitSetSp& rhs );
 
 /////////////////////////////
 //Boolean functions
-inline	bool is_bit					(int nbit)				const;									//nbit is 0 based
+
+	 /**
+	 * @brief TRUE if there is a 1-bit in the position bit
+	 **/
+ inline	bool is_bit					(int bit)				const;								
+
+
 inline	bool is_empty				()						const;									//lax: considers empty blocks for emptyness
-		bool is_disjoint			(const BitSetSp& bb)   const;
+		bool is_disjoint			(const BitSetSp& bb)	const;
 		bool is_disjoint			(int first_block, int last_block, const BitSetSp& bb)   const;
 
 ////////////////////////
@@ -330,20 +336,19 @@ protected:
 //
 //////////////////////////
 
-bool BitSetSp::is_bit(int nbit)	const{
-//////////////////////////////
-// RETURNS: TRUE if the bit is 1 in the position nbit, FALSE if opposite case or ERROR
-//
-// REMARKS: could be implemented in terms of find_bitboard
+bool BitSetSp::is_bit(int bit)	const{
+//note: could use find_block as well
 
-	//lower_bound implementation
-	int idx=WDIV(nbit);
-	vPB_cit it=lower_bound(vBB_.begin(), vBB_.end(), pBlock_t(idx), pBlock_less());
-	if(it!=vBB_.end()){
-		if((*it).idx_==idx)
-			return ((*it).bb_ & Tables::mask[WMOD(nbit)]);
-	}
-	return false;
+	int blockID = WDIV(bit);
+
+	/////////////////////////////////////////////////////////////////////////////////////
+	vPB_cit it=lower_bound(vBB_.begin(), vBB_.end(), pBlock_t(blockID), pBlock_less());
+	/////////////////////////////////////////////////////////////////////////////////////
+	
+	return ( it != vBB_.end()		&&
+			 it->idx_ == blockID	&& 
+			 (it->bb_ & Tables::mask[bit - WMUL(blockID) /*WMOD(bit)*/])
+			);
 }
 
 
@@ -351,11 +356,11 @@ bool BitSetSp::is_empty ()	const{
 ///////////////////////
 // 
 // REMARKS:	The bit string may be empty either because it is known that there are no blocks (size=0)
-//			or because the blocks contain no 1-bit (we admit this option explicitly for efficiency)
+//			or because the blocks contain no 1-bit (this option is allowed for efficiency)
 
 	if(vBB_.empty()) return true;
 
-	for(int i=0; i<vBB_.size(); i++){
+	for(int i = 0; i < vBB_.size(); ++i){
 		if(vBB_[i].bb_) return false;
 	}
 	
