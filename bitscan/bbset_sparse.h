@@ -152,8 +152,9 @@ explicit BitSetSp					(int nPop, bool is_popsize = true );
 	
 	/**
 	* @brief alternative syntax for number_of_blocks
+	* REMOVED 17/02/2025 - confusing with the standard notion of capacity in an STL collection
 	**/
-	int capacity					()						const {return vBB_.size(); }
+	int capacity					()						const = delete;								//{ return vBB_.size(); }
 	
 	/**
 	* @brief returns the bitblock at position blockID, not the id-th block of the
@@ -312,12 +313,16 @@ inline	bool is_empty				()						const;									//lax: considers empty blocks for
 	string to_string				();																//TODO - operator string	();
 	void to_vector					(std::vector<int>& )	const;
 
+
+
 ////////////////////////
 //data members
 protected:
 	vPB vBB_;					//a vector of sorted pairs of a non-empty bitblock and its index in a non-sparse bitstring
 	int nBB_;					//maximum number of bitblocks
-};
+
+
+};  //end class BitSetSp
 
 
 

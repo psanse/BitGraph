@@ -78,13 +78,13 @@ TEST_F(BitSetSpClassTest, reset) {
 	//size
 	bbsp.reset(10);
 	EXPECT_EQ(0, bbsp.size());							//number of 1-bis
-	EXPECT_EQ(0, bbsp.capacity());						//number of non_zero bitblocks
+	EXPECT_EQ(0, bbsp.number_of_blocks());						//number of non_zero bitblocks
 
 	//size and bits
 	vint lv = { 10, 20, 100 };
 	bbsp.reset(200, lv);
 	EXPECT_EQ(3, bbsp.size());							//number of 1-bis
-	EXPECT_EQ(2, bbsp.capacity());						//number of non_zero bitblocks
+	EXPECT_EQ(2, bbsp.number_of_blocks());						//number of non_zero bitblocks
 	EXPECT_TRUE(bbsp.is_bit(10));						//number of 1-bis		
 	EXPECT_TRUE(bbsp.is_bit(20));						//number of 1-bis		
 	EXPECT_TRUE(bbsp.is_bit(100));						//number of 1-bis		
