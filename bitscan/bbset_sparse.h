@@ -267,20 +267,31 @@ virtual inline	 int popcn64		(int nBit)				const;
 	* @details uses internal assert macro for error checking
 	**/
 inline	int  set_bit				(int bit);															
-		
-//CLOSED range
-///////////////////
-// sets bits to one in the corresponding CLOSED range
-//
-// REMARKS: 
-// 1.only one binary search is performed for the lower block
-// 2.does not check maximum possible size
-//
-//*** OPTIMIZATION: restrict sorting when required to [low,high] interval
-//returns -1 if error
 
+	/**
+	* @brief sets bits in the closed range [firstBit, lastBit]
+	* @params firstBit, lastBit: range
+	* @returns 0 if the bits were set, -1 if error
+	* @details only one binary search is performed for the lower block
+	**/
 		int	 set_bit				(int firstBit, int lastBit);									
-BitSetSp&    set_bit				(const BitSetSp& bb_add);											//OR
+
+
+
+	/**
+	* @brief Adds the bits from the bitstring bb_add in the population
+	*		 range of the bitstring (bitblocks are copied).
+	*
+	*		 I. The bitblock size of bb_add must be at least as large as the bitstring.
+	*
+	* @details  Equivalent to OR operation / set union
+	* @returns reference to the modified bitstring
+	* 
+	* TODO.. REFACTOR (18/02/2025)
+	**/		
+BitSetSp&    set_bit				(const BitSetSp& bb_add);											
+
+
 
 BitSetSp&  set_block				(int first_block, const BitSetSp& bb_add);							//OR:closed range
 BitSetSp&  set_block				(int first_block, int last_block, const BitSetSp& rhs);			//OR:closed range
