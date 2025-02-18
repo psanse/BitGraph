@@ -154,7 +154,7 @@ explicit BitSetSp					(int nPop, bool is_popsize = true );
 	* @brief alternative syntax for number_of_blocks
 	* REMOVED 17/02/2025 - confusing with the standard notion of capacity in an STL collection
 	**/
-	int capacity					()						const = delete;								//{ return vBB_.size(); }
+	int capacity					()						const = delete;								
 	
 	/**
 	* @brief returns the bitblock at position blockID, not the id-th block of the
@@ -222,7 +222,6 @@ explicit BitSetSp					(int nPop, bool is_popsize = true );
 	vPB_it  end						()									{return vBB_.end();}
 	vPB_cit cbegin					()						const		{return vBB_.cbegin();}
 	vPB_cit cend					()						const		{return vBB_.cend();}
-	
 
 //////////////////////////////
 // Bitscanning
@@ -323,8 +322,6 @@ protected:
 
 
 };  //end class BitSetSp
-
-
 
 
 //////////////////////////
