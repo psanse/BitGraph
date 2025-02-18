@@ -7,7 +7,6 @@
   * TODO refactoring and testing 15/02/2025 - follow the interface of the refactored BitSet
   **/
 
-
 #include "bbset_sparse.h"
 #include "utils/logger.h"
 #include <iostream>

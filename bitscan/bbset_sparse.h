@@ -340,7 +340,8 @@ protected:
 //////////////////////////
 
 bool BitSetSp::is_bit(int bit)	const{
-//note: could use find_block, but this implementation is faster
+//note: could use find_block as well
+
 	int blockID = WDIV(bit);
 
 	/////////////////////////////////////////////////////////////////////////////////////
