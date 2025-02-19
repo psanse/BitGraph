@@ -429,6 +429,10 @@ return *this;
 
 BitSetSp&  BitSetSp::set_block (int firstBlock, int lastBlock, const BitSetSp& rhs){
 	
+	//////////////////////////////////////////////////////////////////////////////////
+	assert(firstBlock >= 0 && firstBlock <= lastBlock && lastBlock < rhs.capacity());
+	//////////////////////////////////////////////////////////////////////////////////
+
 	//auxiliary storage of blocks
 	//vPB vapp;					
 

@@ -315,16 +315,24 @@ BitSetSp&	 set_bit				(int firstBit, int lastBit);
 	**/		
 BitSetSp&    set_bit				(const BitSetSp& bb_add);											
 
+	/**
+	* @brief Copies the bitset in the closed range [firstBlock, lastBlock] to *this
+	* @param bitset input bitstring to be copied
+	* @param firstBlock, lastBlock: input closed range of bitset
+	* @returns reference to the modified bitstring
+	* @details 0 <= firstBlock <= lastBlock < the number of bitblocks in the bitset
+	**/
+BitSetSp&  set_block				(int firstBlock, int lastBlock, const BitSetSp& bitset);
 
+	/**
+	* @brief Copies the bitset in the closed range [firstBlock, END of bitset] to *this
+	* @details small brother of set_block for configurable closed ranges, but more efficient 
+	* 
+	* TODO - CHECK if it really is more efficient than the reference set_block
+	* TODO - refactor
+	**/
+BitSetSp& set_block					(int first_block, const BitSetSp& bitset);							
 
-BitSetSp&  set_block				(int first_block, const BitSetSp& bb_add);							//OR:closed range
-
-	//OR:closed range
-/////////////////////////////////
-//
-// REMARKS: experimental, currently only defined for bit strings of same size 
-
-BitSetSp&  set_block				(int first_block, int last_block, const BitSetSp& rhs);				
 		
 inline	void  erase_bit				(int nbit);	
 inline	vPB_it  erase_bit			(int nbit, vPB_it from_it);
