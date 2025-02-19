@@ -773,36 +773,6 @@ TEST(Sparse, next_bit_del_pos) {
 	
 }
 
-TEST(Sparse, erase_block_pos) {
-
-	BBScanSp bbsp(10000);
-	BBScanSp bberase(10000);
-	bbsp.set_bit(0);
-	bbsp.set_bit(1);
-	bbsp.set_bit(2);
-	bbsp.set_bit(126);
-	bbsp.set_bit(127);
-	bbsp.set_bit(1000);
-	bbsp.set_bit(9000);
-	
-	bberase.set_bit(0);
-	bberase.set_bit(1);
-	bberase.set_bit(2);
-	bberase.set_bit(126);
-	bberase.set_bit(127);
-	bberase.set_bit(1000);
-	bberase.set_bit(9000);
-
-	bbsp.erase_block_pos(1,bberase);
-	EXPECT_FALSE(bbsp.is_bit(126));
-
-	bbsp.erase_block_pos(2,bberase);
-	EXPECT_FALSE(bbsp.is_bit(1000));
-
-
-	bbsp.erase_block_pos(3,bberase);
-	EXPECT_FALSE(bbsp.is_bit(9000));
-}
 
 TEST(Sparse, copy_up_to_some_bit) {
 
@@ -948,3 +918,33 @@ TEST(Sparse, keep_operations) {
 }
 
 
+//TEST(Sparse, erase_block_pos) {
+//
+//	BBScanSp bbsp(10000);
+//	BBScanSp bberase(10000);
+//	bbsp.set_bit(0);
+//	bbsp.set_bit(1);
+//	bbsp.set_bit(2);
+//	bbsp.set_bit(126);
+//	bbsp.set_bit(127);
+//	bbsp.set_bit(1000);
+//	bbsp.set_bit(9000);
+//	
+//	bberase.set_bit(0);
+//	bberase.set_bit(1);
+//	bberase.set_bit(2);
+//	bberase.set_bit(126);
+//	bberase.set_bit(127);
+//	bberase.set_bit(1000);
+//	bberase.set_bit(9000);
+//
+//	bbsp.erase_block_pos(1,bberase);
+//	EXPECT_FALSE(bbsp.is_bit(126));
+//
+//	bbsp.erase_block_pos(2,bberase);
+//	EXPECT_FALSE(bbsp.is_bit(1000));
+//
+//
+//	bbsp.erase_block_pos(3,bberase);
+//	EXPECT_FALSE(bbsp.is_bit(9000));
+//}

@@ -525,13 +525,6 @@ BitSetSp&  BitSetSp::set_block (int firstBlock, int lastBlock, const BitSetSp& r
 }
 
 int BitSetSp::clear_bit (int low, int high){
-///////////////////
-// clears bits in the corresponding CLOSED range (effectively deletes bitblocks)
-//
-// PARTICULAR CASES: low = EMPTY_ELEM, high= EMPTY_ELEM mark bitstring bounds
-//
-// EXPERIMENTAL
-	
 	
 	int bbl=EMPTY_ELEM, bbh=EMPTY_ELEM; 
 	pair<bool, BitSetSp::vPB_it> pl;
