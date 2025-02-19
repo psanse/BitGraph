@@ -2,7 +2,7 @@
   * @file bbset_sparse.h
   * @brief header for sparse class equivalent to the BitSetSp class
   * @author pss
-  * @details created ?, @last_update 15/02/2025
+  * @details created 19/12/2015?, @last_update 15/02/2025
   *
   * TODO refactoring and testing 15/02/2025 - follow the interface of the refactored BitSet
   **/
@@ -140,7 +140,13 @@ explicit BitSetSp					(int nPop, bool is_popsize = true );
 	*		 now favoured by reset(...).
 	**/
 	void init						(int nPop, bool is_popsize = true);
-	
+
+	/**
+	* @brief reallocates memory to the number of blocks of the bitset
+	**/
+	void  shrink_to_fit				()				 { vBB_.shrink_to_fit(); }
+
+
 /////////////////////
 //setters and getters (will not allocate memory)
 	
@@ -263,23 +269,22 @@ virtual inline	 int popcn64		(int nBit)				const;
 	/**
 	* @brief resets the bitset to all 0-bits and then sets bit to 1 in the
 	*		 range [firstBit, lastBit]
-	* TODO- refactor
 	**/
-	int   reset_bit					(int firstBit, int lastBit);	
+	void   reset_bit				(int firstBit, int lastBit);	
 
 	/**
 	* @brief resets the bitset to all 0-bits and then copies bitset in the
 	*		 range [0, lastBit]
-	* TODO- refactor
+	* @details: more efficient than using the more general reset_bit in the
+	*			range [firstBit=0, lastBit]
 	**/
-	int   reset_bit					(int lastBit, const BitSetSp& bitset);	
+	void   reset_bit				(int lastBit, const BitSetSp& bitset);	
 	
 	/**
 	* @brief resets the bitset to all 0-bits and then copies bitset in the
-	*		 range [firstBit, lastBit]
-	* TODO- refactor
+	*		 closed range [firstBit, lastBit]
 	**/
-	int   reset_bit					(int firstBit, int lastBit, const BitSetSp& bitset);
+	void   reset_bit				(int firstBit, int lastBit, const BitSetSp& bitset);
 		
 	/**
 	* @brief Sets bit in the sparse bitset
@@ -313,13 +318,18 @@ BitSetSp&    set_bit				(const BitSetSp& bb_add);
 
 
 BitSetSp&  set_block				(int first_block, const BitSetSp& bb_add);							//OR:closed range
-BitSetSp&  set_block				(int first_block, int last_block, const BitSetSp& rhs);				//OR:closed range
+
+	//OR:closed range
+/////////////////////////////////
+//
+// REMARKS: experimental, currently only defined for bit strings of same size 
+
+BitSetSp&  set_block				(int first_block, int last_block, const BitSetSp& rhs);				
 		
 inline	void  erase_bit				(int nbit);	
 inline	vPB_it  erase_bit			(int nbit, vPB_it from_it);
 		int	  erase_bit				(int lbit, int rbit);
 		int	  clear_bit				(int lbit, int rbit);											//deallocates blocks
-		void  shrink_to_fit			()	{vBB_.shrink_to_fit();}
 		void  erase_bit				()	{vBB_.clear();}												//clears all bit blocks
 BitSetSp&    erase_bit				(const BitSetSp&);				
 
@@ -1112,66 +1122,97 @@ return 0;
 }
 
 inline
-int BitSetSp::reset_bit(int high, const BitSetSp& bb_add){
+void BitSetSp::reset_bit (int lastBit, const BitSetSp& bitset){
 
-	
+	int	bbh = WDIV(lastBit);
+
+	////////////////////////
+	assert(bbh < nBB_);
+	///////////////////////
+
 	vBB_.clear();
-	int	bbh=WDIV(high); 
-	pair<bool, BitSetSp::vPB_cit> p = bb_add.find_block_ext(bbh);
-	if(p.second==bb_add.cend())
-		copy(bb_add.cbegin(), bb_add.cend(),insert_iterator<vPB>(vBB_,vBB_.begin()));
+	
+	//finds block bbh, or closest to with higher index it in bitset
+	auto p = bitset.find_block_ext(bbh);
+
+	if(p.second == bitset.cend())
+		std::copy(bitset.cbegin(), bitset.cend(), insert_iterator<decltype(vBB_)> (vBB_, vBB_.begin()));
 	else{
-		if(p.first){
-			copy(bb_add.cbegin(), p.second, insert_iterator<vPB>(vBB_,vBB_.begin()));
-			vBB_.emplace_back(pBlock_t(bbh, p.second->bb_ & ~Tables::mask_high[high-WMUL(bbh)]));
+		if(p.first)
+		{ 
+			//bbh block exists - copies up to and excluding bbh
+			copy(bitset.cbegin(), p.second, insert_iterator<vPB>(vBB_,vBB_.begin()));
+			
+			//adds bbh block
+			vBB_.emplace_back(pBlock_t(bbh, p.second->bb_ & bblock::MASK_1_LOW(lastBit - WMUL(bbh))));
+
+
 		}else{
-			copy(bb_add.cbegin(), ++p.second, insert_iterator<vPB>(vBB_,vBB_.begin()));
+			//bbh block does not exist - copies up to and including bbh
+			copy(bitset.cbegin(), ++p.second, insert_iterator<vPB>(vBB_,vBB_.begin()));
 		}
 	}
-return 0;
 }
 
 inline
-int  BitSetSp::reset_bit (int low, int high,  const BitSetSp& bb_add){
-/////////////
-// fast copying of bb_add in the corresponding CLOSED range
-// date of creation: 19/12/15 (bug corrected in 6/01/2016)
+void  BitSetSp::reset_bit (int firstBit,  int lastBit,  const BitSetSp& bitset){
 
-	//***ASSERT
+	int	bbl = WDIV(firstBit);
+	int	bbh = WDIV(lastBit);
+
+	////////////////////////////////////////////////////////////////////////////////////
+	assert( (bbl >= 0) && (bbl <= bbh) && (bbh < nBB_) && (bbh < bitset.capacity()) );
+	///////////////////////////////////////////////////////////////////////////////////
 
 	vBB_.clear();
-	int	bbl=WDIV(low);
-	int	bbh=WDIV(high);
 
+	//finds bbl or closest block with greater indx
+	auto it = lower_bound(bitset.cbegin(), bitset.cend(), pBlock_t(bbl), pBlock_less());
 
-	//finds low bitblock and updates forward
-	vPB_cit itl=lower_bound(bb_add.cbegin(), bb_add.cend(), pBlock_t(bbl), pBlock_less());
-	if(itl!=bb_add.cend()){
-		if(itl->idx_==bbl){	//lower block exists
-			if(bbh==bbl){		//case update in the same bitblock
-				vBB_.push_back(pBlock_t( bbh, itl->bb_ & bblock::MASK_1(low-WMUL(bbl), high-WMUL(bbh)) ));
-				return 0;
+	if(it != bitset.cend())			//has 1-bit info to set
+	{
+		if(it->idx_ == bbl)			//lower block exists
+		{	
+			if(bbh == bbl)			//special case, the range is a singleton
+			{		
+				vBB_.emplace_back(pBlock_t( bbh, it->bb_ & bblock::MASK_1(firstBit - WMUL(bbl), lastBit - WMUL(bbh)) ));
+				
+				/////////
+				return;
+				/////////
+
 			}else{
-				//add lower block
-				vBB_.push_back(pBlock_t(bbl, itl->bb_ &~ Tables::mask_low[low-WMUL(bbl)] ));
-				++itl;
-			}
-		}
 
-		//copied the rest if elements
-		for(; itl!=bb_add.cend(); ++itl){
-			if(itl->idx_>=bbh){		//exit condition
-				if(itl->idx_==bbh){	
-					vBB_.push_back(pBlock_t(bbh, itl->bb_&~Tables::mask_high[high-WMUL(bbh)]));
-				}
-			return 0;
+				//add lower block
+				vBB_.emplace_back(pBlock_t(bbl, it->bb_ & bblock::MASK_1_HIGH(firstBit - WMUL(bbl))));
+
+				//next block
+				++it;
 			}
+		} //end lower block exists in bitset
+
+
+		//copies blocks (bbl, bbh]
+		for(; it != bitset.cend(); ++it){
+			if(it->idx_ >= bbh)			//exit condition - last block of range
+			{		
+				if(it->idx_ == bbh){
+
+					//add and trim last block
+					vBB_.push_back(pBlock_t(bbh, it->bb_ & bblock::MASK_1_LOW(lastBit - WMUL(bbh))));
+
+				}
+
+				//////////
+				return;
+				//////////
+			}
+
 			//copies the element as is
-			vBB_.push_back(*itl);
+			vBB_.emplace_back(*it);
 		}
 	}
 
-return 0;		//should not reach here
 }
 
 inline

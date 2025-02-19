@@ -271,35 +271,39 @@ BitSetSp::set_bit	(int firstBit, int lastBit){
 	return *this;
 }
 
-int BitSetSp::reset_bit(int low, int high){
-/////////////////////////
-// sets bits in the closed range and clears the rest
-	
-	//*** ASSERT (MAX SIZE)  
+void BitSetSp::reset_bit(int firstBit, int lastBit){
 
-	int	bbh=WDIV(high); 
-	int bbl=WDIV(low);
+	int	bbh = WDIV(lastBit);
+	int bbl = WDIV(firstBit);
+
+	///////////////////////////////// 
+	assert(bbh < nBB_ && bbl >= 0);
+	/////////////////////////////////
+
 	vBB_.clear();
 	
-	//same bitblock
-	if(bbh==bbl){
-		BITBOARD bb= ~Tables::mask_low[low-WMUL(bbl)];
-		vBB_.push_back(pBlock_t(bbl, bb & ~Tables::mask_high[high-WMUL(bbh)]));
-		return 0;
-	}
-
-	//first
-	vBB_.push_back(pBlock_t(bbl, ~Tables::mask_low[low-WMUL(bbl)]));
-
-	//middle
-	for(int block=bbl+1; block<bbh; ++block){
-		vBB_.push_back(pBlock_t(block,ONE));
-	}
-
-	//last
-	vBB_.push_back(pBlock_t(bbh, ~Tables::mask_high[high-WMUL(bbh)]));
+	//special case: same bitblock
+	if(bbh == bbl){
 	
-return 0;
+		vBB_.emplace_back( pBlock_t( bbl, bblock::MASK_1(firstBit - WMUL(bbl), lastBit - WMUL(bbh))));
+		
+		/////////
+		return;
+		/////////
+	}
+
+	//first block
+	vBB_.emplace_back(pBlock_t(bbl, bblock::MASK_1_HIGH(firstBit - WMUL(bbl))));
+
+	//in-between blocks
+	for(auto block = bbl + 1; block < bbh; ++block){
+		vBB_.emplace_back(pBlock_t(block,ONE));
+	}
+
+	//last block
+	//vBB_.push_back(pBlock_t(bbh, ~Tables::mask_high[lastBit - WMUL(bbh)]));
+	vBB_.emplace_back(pBlock_t(bbl, bblock::MASK_1_LOW(lastBit - WMUL(bbh))));
+
 }
 
 BitSetSp& BitSetSp::set_bit (const BitSetSp& rhs){
@@ -423,59 +427,95 @@ BitSetSp&  BitSetSp::set_block (int first_block, const BitSetSp& rhs){
 return *this;		
 }
 
-BitSetSp&  BitSetSp::set_block (int first_block, int last_block, const BitSetSp& rhs){
-/////////////////////////////////
-//
-// REMARKS: experimental, currently only defined for bit strings of same size 
+BitSetSp&  BitSetSp::set_block (int firstBlock, int lastBlock, const BitSetSp& rhs){
 	
-	//vBB_.reserve(vBB_.size()+ last_block-first_block+1);						//maximum possible size, to push_back in place without allocation
-	vPB vapp;
-	pair<bool, BitSetSp::vPB_it> p1i=find_block_ext(first_block);
-	pair<bool, BitSetSp::vPB_cit> p2i=rhs.find_block_ext(first_block);
-	pair<bool, BitSetSp::vPB_cit> p2f=rhs.find_block_ext(last_block);
-	bool req_sorting=false;
-		
-	if(p2i.second==rhs.vBB_.end()){ //check in this order (captures rhs empty on init)
+	//auxiliary storage of blocks
+	//vPB vapp;					
+
+	//////////////////////////////////////////////////////////
+	vBB_.reserve(vBB_.size() + lastBlock - firstBlock + 1);						//avoid reallocation
+	//////////////////////////////////////////////////////////
+
+	auto p1i = find_block_ext(firstBlock);				//O(log n)
+	auto p2i = rhs.find_block_ext(firstBlock);			//O(log n)
+	auto p2f = rhs.find_block_ext(lastBlock);			//O(log n)
+	bool req_sorting = false;
+
+
+	//special case - bitset rhs has no information in the range
+	if( p2i.second == rhs.vBB_.end()){ 
 		return *this;
 	}
 
-	BitSetSp::vPB_cit p2it_end=(p2f.first)? p2f.second+1 : p2f.second;			//iterator to the last block +1 in the rhs
-	if(p1i.second==vBB_.end()){
+	//iterator to the last block + 1 in the rhs
+	auto p2it_end = (p2f.first)? p2f.second + 1 : p2f.second;			
+
+	//special case  - this bitset has no information to mask in the range
+	//copy operation
+	if(p1i.second == vBB_.end())
+	{
 		//append rhs at the end
-		vBB_.insert(vBB_.end(),p2i.second, p2it_end);	
-		sort();
+		vBB_.insert(vBB_.end(),p2i.second, p2it_end);
+
+		//sort
+		std::sort(vBB_.begin(), vBB_.end(), pBlock_less());
+		
+		///////////////
 		return *this;
+		////////////////
 	}
 
+
+	//Normal case - blocks overlap in the range
 	do{
 		//update before either of the bitstrings has reached its end
-		if(p1i.second->idx_==p2i.second->idx_){
-			p1i.second->bb_|=p2i.second->bb_;
-			++p1i.second, ++p2i.second; 
-		}else if(p1i.second->idx_<p2i.second->idx_){
+		if(p1i.second->idx_ == p2i.second->idx_)
+		{
+			p1i.second->bb_ |= p2i.second->bb_;
 			++p1i.second;
-		}else if(p2i.second->idx_<p1i.second->idx_){
-			vapp.push_back(*p2i.second);
-			//vBB_.push_back(*p2i.second);		//*** iterators!!!
-			req_sorting=true;
 			++p2i.second;
+
+		}else if(p1i.second->idx_ < p2i.second->idx_)
+		{
+			++p1i.second;
+		}else if(p1i.second->idx_ > p2i.second->idx_)
+		{
+			vBB_.emplace_back(*p2i.second);		 //	if realloc is possible vapp.push_back(*p2i.second);
+		
+			++p2i.second;
+			
+			//sorting is necessary since the block added has less index
+			req_sorting=true;
+			
 		}
 						
-		//exit condition   
-		if( p1i.second==vBB_.end() || p1i.second->idx_>last_block ){			
-			vBB_.insert(vBB_.end(),p2i.second, (p2f.first)? p2f.second+1 : p2f.second);
+		//exit conditions   
+		if( p1i.second == vBB_.end() || p1i.second->idx_ > lastBlock )
+		{	
+			//add remaining blocks to *this
+			vBB_.insert(vBB_.end(), p2i.second, (p2f.first)? p2f.second + 1 : p2f.second);
+			
 			req_sorting=true;
-			break;			
-		}else if(p2i.second == p2it_end ){			//exit condition II
+
+			////////////
+			break;		
+			//////////
+		}else if (p2i.second == p2it_end ){			//exit condition II
+			//////
 			break;
+			//////
 		}
 
 	}while(true);
 
-	//always keep array sorted
-	vBB_.insert(vBB_.end(), vapp.begin(), vapp.end());
-	if(req_sorting)
-				sort();
+	//append chosen blocks
+	//vBB_.insert(vBB_.end(), vapp.begin(), vapp.end());
+
+	//sort if required
+	if (req_sorting) {
+		std::sort(vBB_.begin(), vBB_.end(), pBlock_less());
+
+	}
 	
 return *this;		
 }
