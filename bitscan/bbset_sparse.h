@@ -1073,27 +1073,6 @@ BitSetSp&  BitSetSp::OR_EQ(int first_block, const BitSetSp& rhs ){
 return *this;
  }
 
-//inline
-//BitSetSp&  BitSetSp::erase_block_pos (int first_pos_of_block, const BitSetSp& rhs ){
-///////////////////////
-//// erases bits from a starting block in *this (given as the position in the bitstring collection, not its index) till the end of the bitstring, 
-//
-//	int i2 = 0;							//all blocks in rhs are considered
-//	const int MAX = rhs.vBB_.size()-1;
-//	
-//	//optimization which works if rhs has less 1-bits than *this
-//	for (int i1 = first_pos_of_block; i1 < vBB_.size(); ++i1){
-//		for (; i2 < MAX && rhs.vBB_[i2].idx_ < vBB_[i1].idx_; ++i2) {
-//
-//			//update before either of the bitstrings has reached its end
-//			if (vBB_[i1].idx_ == rhs.vBB_[i2].idx_) {
-//				vBB_[i1].bb_ &= ~rhs.vBB_[i2].bb_;
-//			}
-//		}
-//	}
-//
-//	return *this;
-//}
 
 inline
 BitSetSp&  BitSetSp::erase_block (int firstBlock, int lastBlock, const BitSetSp& rhs ){
@@ -1348,6 +1327,27 @@ bool operator == (const BitSetSp& lhs, const BitSetSp& rhs){
 			(lhs.vBB_ == rhs.vBB_)		);
 }
 
+//inline
+//BitSetSp&  BitSetSp::erase_block_pos (int first_pos_of_block, const BitSetSp& rhs ){
+///////////////////////
+//// erases bits from a starting block in *this (given as the position in the bitstring collection, not its index) till the end of the bitstring, 
+//
+//	int i2 = 0;							//all blocks in rhs are considered
+//	const int MAX = rhs.vBB_.size()-1;
+//	
+//	//optimization which works if rhs has less 1-bits than *this
+//	for (int i1 = first_pos_of_block; i1 < vBB_.size(); ++i1){
+//		for (; i2 < MAX && rhs.vBB_[i2].idx_ < vBB_[i1].idx_; ++i2) {
+//
+//			//update before either of the bitstrings has reached its end
+//			if (vBB_[i1].idx_ == rhs.vBB_[i2].idx_) {
+//				vBB_[i1].bb_ &= ~rhs.vBB_[i2].bb_;
+//			}
+//		}
+//	}
+//
+//	return *this;
+//}
 
 
 #endif
