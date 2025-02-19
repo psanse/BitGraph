@@ -49,7 +49,7 @@ BitSetSp::BitSetSp(int nPop, const vint& lv):
 			/////////////////
 
 			//sets bits - adds pBlocks in place
-			assert(set_bit(bit) != -1);
+			set_bit(bit);
 
 		}
 
@@ -94,7 +94,7 @@ void BitSetSp::reset(int nPop, const vint& lv)
 			/////////////////
 
 			//sets bits - adds pBlocks in place
-			assert(set_bit(bit) != -1);
+			set_bit(bit);
 
 		}
 	}
@@ -123,7 +123,8 @@ void BitSetSp::sort (){
 }	
 
 
-int	 BitSetSp::set_bit	(int firstBit, int lastBit){
+BitSetSp& 
+BitSetSp::set_bit	(int firstBit, int lastBit){
 
 	//////////////////////////////
 	assert(firstBit <= lastBit && firstBit >= 0);
@@ -135,14 +136,8 @@ int	 BitSetSp::set_bit	(int firstBit, int lastBit){
 	int offset_high = lastBit - WMUL(bbh);
 		
 	//avoid reallocation when blocks are added and lose the iterator (MUST BE!)
-	try {
-		vBB_.reserve(vBB_.size() + bbh - bbl + 1 /* max num of bitblocks that can be added */);
-	}
-	catch (...) {
-		LOG_ERROR("Error during allocation - BitSetSp::set_bit");
-		return -1;
-	}	
-	
+	vBB_.reserve(vBB_.size() + bbh - bbl + 1 /* max num of bitblocks that can be added */);
+		
 	//finds block if it exists or returns the iterator to the closest block with higher index ni the bitset
 	auto p = find_block_ext(bbl);
 
@@ -155,14 +150,14 @@ int	 BitSetSp::set_bit	(int firstBit, int lastBit){
 						
 			p.second->bb_ |= bblock::MASK_1(offset_low, offset_high);
 
-			return 0;		//no need for sorting
+			return *this;		//no need for sorting
 
 		}
 		else {					//block does not exist		
 			
 			vBB_.emplace_back(pBlock_t(bbl, bblock::MASK_1(offset_low, offset_high) )) ;
 
-			return 0;
+			return *this;
 		}
 	}
 
@@ -182,7 +177,7 @@ int	 BitSetSp::set_bit	(int firstBit, int lastBit){
 		//last block		
 		vBB_.emplace_back(pBlock_t(bbh, bblock::MASK_1_LOW(offset_high) ));
 
-		return 0;
+		return *this;
 	}
 	
 	/////////////////////////////////
@@ -273,7 +268,7 @@ int	 BitSetSp::set_bit	(int firstBit, int lastBit){
 		std::sort(vBB_.begin(), vBB_.end(), pBlock_less());		
 	}
 
-	return 0;
+	return *this;
 }
 
 int BitSetSp::init_bit (int low, int high){
@@ -307,61 +302,70 @@ int BitSetSp::init_bit (int low, int high){
 return 0;
 }
 
-
 BitSetSp& BitSetSp::set_bit (const BitSetSp& rhs){
-/////////////////////////////////
-// sets 1-bits in rhs (equivalent to an |=)
-//
-// REMARKS: experimental, currently only defined for bit strings of same maximum size
+
+	///////////////////////////////////////////////
+	assert(rhs.capacity() == this->capacity());
+	//////////////////////////////////////////////
 
 	//special case
 	if (rhs.is_empty()) {
 		return *this;
 	}
 	
-	
-	//vBB_.reserve(rhs.vBB_.size()+vBB_.size());		//maximum possible size, to push_back in place without allocation
-	vPB vapp;
-	vPB_cit i2=rhs.vBB_.cbegin();
-	vPB_it i1=vBB_.begin();
-	
-	
-	bool req_sorting = false;
-	while(true){
-		//exit condition I
-		if( i2==rhs.vBB_.end() ){		
-					break;		
-		}
+	//avoid reallocation when blocks are added and lose the iterator (MUST BE!)
+	vBB_.reserve( vBB_.size() + rhs.vBB_.size() );
 
-		//exit condition II
-		if(i1==vBB_.end()){
-			//append blocks at the end
-			vBB_.insert(vBB_.end(),i2, rhs.vBB_.end());
-			req_sorting=true;
+	///////////////////////////////////	
+	auto rIt = rhs.vBB_.cbegin();
+	auto lIt = vBB_.begin();
+	auto req_sorting = false;
+	///////////////////////////////////
+	
+	while(true){
+				
+		if (rIt == rhs.vBB_.end()) {		 //exit condition I
+
+			///////
 			break;
+			//////
+		}else if(lIt == vBB_.end())			 //exit condition II
+		{
+			//append blocks at the end
+			vBB_.insert(vBB_.end(), rIt, rhs.vBB_.end());
+
+			///////
+			break;
+			//////
 		}
 		
 		//update before either of the bitstrings has reached its end
-		if(i1->idx_==i2->idx_){
-			i1->bb_|=i2->bb_;
-			++i1, ++i2; 
-		}else if(i1->idx_<i2->idx_){
-			++i1;
-		}else if(i2->idx_<i1->idx_){
-			vapp.push_back(*i2);
-			//vBB_.push_back(*i2);
-			req_sorting=true;
-			++i2;
+		if(lIt->idx_ == rIt->idx_){
+
+			/////////////////////////
+			lIt->bb_|= rIt->bb_;
+			////////////////////////
+
+			++lIt, 
+			++rIt;
+
+		}else if(lIt->idx_< rIt->idx_){
+			++lIt;
+		}else if(rIt->idx_< lIt->idx_){
+			
+			vBB_.push_back(*rIt);
+			req_sorting = true;
+			++rIt;
 		}
 	}
+	//end while
 
 	//always keep array sorted
-	vBB_.insert(vBB_.end(), vapp.begin(), vapp.end());
 	if (req_sorting) {
-		sort();
+		std::sort(vBB_.begin(), vBB_.end(), pBlock_less());
 	}
 
-return *this;		
+	return *this;		
 }
 
 BitSetSp&  BitSetSp::set_block (int first_block, const BitSetSp& rhs){

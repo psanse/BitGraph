@@ -150,13 +150,15 @@ explicit BitSetSp					(int nPop, bool is_popsize = true );
 	*		   even though the maximum number of bitblocks determined in construction nBB_
 	*		   can be anything.
 	**/
-	int number_of_blocks			()						const {return vBB_.size();}
-	
+	int number_of_blocks			()						const { return vBB_.size();}
+			
 	/**
-	* @brief alternative syntax for number_of_blocks
-	* REMOVED 17/02/2025 - confusing with the standard notion of capacity in an STL collection
+	* @brief maximum number of bitblocks in the bitset
+	* @details the capacity is determined by the population size (construction),
+	*		   it is NOT the number_of_blocks(), which are the non-zero bitblocks in the bitset
+	* 
 	**/
-	int capacity					()						const = delete;								
+	int capacity					()						const { return nBB_; }
 	
 	/**
 	* @brief returns the bitblock at position blockID, not the id-th block of the
@@ -253,10 +255,18 @@ virtual inline	 int popcn64		(int nBit)				const;
 /////////////////////
 //Setting (ordered insertion) / Erasing bits  
 
-		int   init_bit				(int nbit);	
-		int   init_bit				(int lbit, int rbit);	
-		int   init_bit				(int last_bit, const BitSetSp& bb_add);							//copies up to last_bit included
-		int   init_bit				(int lbit, int rbit, const BitSetSp& bb_add);						//copies up to last_bit included
+	/**
+	* @brief resets the bitset to all 0-bits ans sets bit to 1
+	**/
+	void   reset_bit				(int bit);	
+		
+	int   init_bit					(int lbit, int rbit);	
+
+	//copies up to last_bit included
+	int   init_bit					(int last_bit, const BitSetSp& bb_add);	
+	
+	//copies up to last_bit included
+	int   init_bit					(int lbit, int rbit, const BitSetSp& bb_add);						
 		
 	/**
 	* @brief Sets bit in the sparse bitset
@@ -266,7 +276,7 @@ virtual inline	 int popcn64		(int nBit)				const;
 	* @detials uses lower_bound for insertion (log overhead)
 	* @details uses internal assert macro for error checking
 	**/
-inline	int  set_bit				(int bit);															
+inline	BitSetSp& set_bit			(int bit);
 
 	/**
 	* @brief sets bits in the closed range [firstBit, lastBit]
@@ -274,25 +284,23 @@ inline	int  set_bit				(int bit);
 	* @returns 0 if the bits were set, -1 if error
 	* @details only one binary search is performed for the lower block
 	**/
-		int	 set_bit				(int firstBit, int lastBit);									
+BitSetSp&	 set_bit				(int firstBit, int lastBit);
 
 	/**
 	* @brief Adds the bits from the bitstring bb_add in the population
 	*		 range of the bitstring (bitblocks are copied).
 	*
-	*		 I. The bitblock size of bb_add must be at least as large as the bitstring.
-	*
+	*		 I. Both bitsets should have the SAME capacity (number of blocks).
+	*		
 	* @details  Equivalent to OR operation / set union
 	* @returns reference to the modified bitstring
-	* 
-	* TODO.. REFACTOR (18/02/2025)
 	**/		
 BitSetSp&    set_bit				(const BitSetSp& bb_add);											
 
 
 
 BitSetSp&  set_block				(int first_block, const BitSetSp& bb_add);							//OR:closed range
-BitSetSp&  set_block				(int first_block, int last_block, const BitSetSp& rhs);			//OR:closed range
+BitSetSp&  set_block				(int first_block, int last_block, const BitSetSp& rhs);				//OR:closed range
 		
 inline	void  erase_bit				(int nbit);	
 inline	vPB_it  erase_bit			(int nbit, vPB_it from_it);
@@ -515,14 +523,15 @@ BitSetSp::vPB_it  BitSetSp::erase_bit (int nbit, BitSetSp::vPB_it from_it){
 return it;
 }
 
-int BitSetSp::set_bit (int bit ){
+inline
+BitSetSp& BitSetSp::set_bit (int bit ){
 
 	int block = WDIV(bit);
 		
 	//////////////////////////
 	if (block >= nBB_) {
 		LOGG_ERROR("attempted to set a bit: ", bit, "out of range - BitSetSp::set_bit ");
-		return -1;
+		return *this;
 	}
 	/////////////////////////
 		
@@ -546,20 +555,17 @@ int BitSetSp::set_bit (int bit ){
 		vBB_.emplace_back(pBlock_t(block,Tables::mask[bit - WMUL(block) /* WMOD(bit) */]));
 	}
 	
-	return 0;  
+	return *this;  
 }
 
 inline
-int BitSetSp::init_bit (int nBit){
-///////////////////
-// sets bit and clears the rest
-	
-	//**assert MAXSIZE: return -1
+void BitSetSp::reset_bit (int bit){
 
 	vBB_.clear();
-	vBB_.push_back(pBlock_t(WDIV(nBit), Tables::mask[WMOD(nBit)]));
 
-return 0;
+	int blockID = WDIV(bit);		
+	vBB_.push_back(pBlock_t(blockID, Tables::mask[bit - blockID /*WMOD(bit)*/]));
+
 }	
 
 ////////////////

@@ -1,7 +1,7 @@
 /**
 * @file test_sparse.cpp
 * @brief Unit tests for sparse classes
-* @details created  ?, last_update 12/02/2025
+* @details created  ?, last_update 19/02/2025
 * @author pss
 * 
 * TODO - refactor (15/02/2025), separate possible sparse scanning tests from the rest
@@ -42,8 +42,8 @@ TEST(Sparse, construction_basic){
 	bbsp.set_bit(900);
 	
 	//////////////////////
-	int retVal=bbsp.set_bit(1100);							//outside popsize range, not added
-	EXPECT_EQ(-1, retVal);
+	bbsp.set_bit(1100);								//outside popsize range, not added
+	EXPECT_FALSE(bbsp.is_bit(1100));;
 	//////////////////////
 
 	EXPECT_EQ(3, bbsp.popcn64());							//bbsp = {500, 700, 900}
@@ -284,11 +284,40 @@ TEST(Sparse, set_bits) {
 	EXPECT_TRUE(sb.is_bit(40));
 	EXPECT_EQ(11, sb.popcn64());
 
-	sb.init_bit(55);
+	sb.reset_bit(55);
 	EXPECT_TRUE(sb.is_bit(55));
-	EXPECT_EQ(1, sb.popcn64());
+	EXPECT_EQ(1, sb.popcn64());	
 
 }
+
+
+TEST(Sparse, set_bits_from_bitset) {
+
+	BitSetSp bbsp(10000);
+	BitSetSp bbsp1(10000);			//same population	
+
+	bbsp.set_bit(0);
+	bbsp.set_bit(1);
+	bbsp.set_bit(2);
+	bbsp.set_bit(126);
+	bbsp.set_bit(127);
+	bbsp.set_bit(1000);
+	bbsp.set_bit(9000);
+
+	bbsp1.set_bit(9150);
+	bbsp1.set_bit(3);
+
+	////////////////////////
+	bbsp.set_bit(bbsp1);
+	////////////////////////
+
+	EXPECT_TRUE(bbsp.is_bit(9150));	
+	EXPECT_TRUE(bbsp.is_bit(3));
+	EXPECT_EQ(9, bbsp.popcn64());
+	EXPECT_TRUE(std::is_sorted(bbsp.bitset().begin(), bbsp.bitset().end(), BitSetSp::pBlock_less()));
+
+}
+
 
 TEST(Sparse, boolean_properties){
 
