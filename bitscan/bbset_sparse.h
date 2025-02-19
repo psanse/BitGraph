@@ -258,15 +258,28 @@ virtual inline	 int popcn64		(int nBit)				const;
 	/**
 	* @brief resets the bitset to all 0-bits ans sets bit to 1
 	**/
-	void   reset_bit				(int bit);	
-		
-	int   init_bit					(int lbit, int rbit);	
-
-	//copies up to last_bit included
-	int   init_bit					(int last_bit, const BitSetSp& bb_add);	
+	void  reset_bit					(int bit);	
 	
-	//copies up to last_bit included
-	int   init_bit					(int lbit, int rbit, const BitSetSp& bb_add);						
+	/**
+	* @brief resets the bitset to all 0-bits and then sets bit to 1 in the
+	*		 range [firstBit, lastBit]
+	* TODO- refactor
+	**/
+	int   reset_bit					(int firstBit, int lastBit);	
+
+	/**
+	* @brief resets the bitset to all 0-bits and then copies bitset in the
+	*		 range [0, lastBit]
+	* TODO- refactor
+	**/
+	int   reset_bit					(int lastBit, const BitSetSp& bitset);	
+	
+	/**
+	* @brief resets the bitset to all 0-bits and then copies bitset in the
+	*		 range [firstBit, lastBit]
+	* TODO- refactor
+	**/
+	int   reset_bit					(int firstBit, int lastBit, const BitSetSp& bitset);
 		
 	/**
 	* @brief Sets bit in the sparse bitset
@@ -1099,9 +1112,8 @@ return 0;
 }
 
 inline
-int BitSetSp::init_bit (int high, const BitSetSp& bb_add){
-//////////////////////////////////
-// fast copying of bb_add up to and including high bit
+int BitSetSp::reset_bit(int high, const BitSetSp& bb_add){
+
 	
 	vBB_.clear();
 	int	bbh=WDIV(high); 
@@ -1120,7 +1132,7 @@ return 0;
 }
 
 inline
-int  BitSetSp::init_bit (int low, int high,  const BitSetSp& bb_add){
+int  BitSetSp::reset_bit (int low, int high,  const BitSetSp& bb_add){
 /////////////
 // fast copying of bb_add in the corresponding CLOSED range
 // date of creation: 19/12/15 (bug corrected in 6/01/2016)

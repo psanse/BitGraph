@@ -271,7 +271,7 @@ BitSetSp::set_bit	(int firstBit, int lastBit){
 	return *this;
 }
 
-int BitSetSp::init_bit (int low, int high){
+int BitSetSp::reset_bit(int low, int high){
 /////////////////////////
 // sets bits in the closed range and clears the rest
 	

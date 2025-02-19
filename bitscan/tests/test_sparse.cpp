@@ -279,7 +279,7 @@ TEST(Sparse, set_bits) {
 
 //init member functions
 	BBScanSp sb(150);
-	sb.init_bit(30,40);
+	sb.reset_bit(30,40);
 	EXPECT_TRUE(sb.is_bit(30));
 	EXPECT_TRUE(sb.is_bit(40));
 	EXPECT_EQ(11, sb.popcn64());
@@ -810,19 +810,19 @@ TEST(Sparse, copy_up_to_some_bit) {
 	bbsp.set_bit(9000);
 	bbsp.set_bit(9999);
 	
-	bbcopy.init_bit(126, bbsp);
+	bbcopy.reset_bit(126, bbsp);
 	EXPECT_EQ(4, bbcopy.popcn64());
 	EXPECT_TRUE(bbcopy.is_bit(126));
 
-	bbcopy.init_bit(1000, bbsp);
+	bbcopy.reset_bit(1000, bbsp);
 	EXPECT_EQ(6, bbcopy.popcn64());
 	EXPECT_TRUE(bbcopy.is_bit(1000));
 
-	bbcopy.init_bit(9000, bbsp);
+	bbcopy.reset_bit(9000, bbsp);
 	EXPECT_EQ(7, bbcopy.popcn64());
 	EXPECT_TRUE(bbcopy.is_bit(9000));
 
-	bbcopy.init_bit(9999, bbsp);
+	bbcopy.reset_bit(9999, bbsp);
 	EXPECT_TRUE(bbcopy==bbsp);
 }
 
@@ -839,7 +839,7 @@ TEST(Sparse, copy_in_closed_range){
 	bbsp.set_bit(9000);
 	bbsp.set_bit(9999);
 
-	bbcopy.init_bit(126, 1000, bbsp);
+	bbcopy.reset_bit(126, 1000, bbsp);
 	bbcopy.print();
 	EXPECT_EQ(3, bbcopy.popcn64());
 	EXPECT_TRUE(bbcopy.is_bit(126));
@@ -847,27 +847,27 @@ TEST(Sparse, copy_in_closed_range){
 	EXPECT_TRUE(bbcopy.is_bit(1000));
 
 	bbcopy.reset(10000);
-	bbcopy.init_bit(127, 129, bbsp);
+	bbcopy.reset_bit(127, 129, bbsp);
 	EXPECT_EQ(1, bbcopy.popcn64());
 	EXPECT_TRUE(bbcopy.is_bit(127));
 
 	bbcopy.reset(10000);
-	bbcopy.init_bit(0, 10000, bbsp);
+	bbcopy.reset_bit(0, 10000, bbsp);
 	EXPECT_TRUE( bbcopy==bbsp);
 
 	bbcopy.reset(10000);
-	bbcopy.init_bit(9000, 9999, bbsp);
+	bbcopy.reset_bit(9000, 9999, bbsp);
 	EXPECT_EQ(2, bbcopy.popcn64());
 	EXPECT_TRUE(bbcopy.is_bit(9000));
 	EXPECT_TRUE(bbcopy.is_bit(9999));
 
 	bbcopy.reset(10000);
-	bbcopy.init_bit(0, 0, bbsp);
+	bbcopy.reset_bit(0, 0, bbsp);
 	EXPECT_EQ(1, bbcopy.popcn64());
 	EXPECT_TRUE(bbcopy.is_bit(0));
 
 	bbcopy.reset(10000);
-	bbcopy.init_bit(9999, 9999, bbsp);
+	bbcopy.reset_bit(9999, 9999, bbsp);
 	EXPECT_EQ(1, bbcopy.popcn64());
 	EXPECT_TRUE(bbcopy.is_bit(9999));
 }
@@ -878,16 +878,16 @@ TEST(Sparse, copy_in_closed_range_special_cases){
 	BBScanSp bbcopy(120);
 	bbsp.set_bit(64);
 
-	bbcopy.init_bit(0, 51, bbsp);
+	bbcopy.reset_bit(0, 51, bbsp);
 	EXPECT_EQ(0, bbcopy.popcn64());
 
 	bbcopy.reset(120);
-	bbcopy.init_bit(64, 65, bbsp);
+	bbcopy.reset_bit(64, 65, bbsp);
 	EXPECT_EQ(1, bbcopy.popcn64());
 	EXPECT_TRUE(bbcopy.is_bit(64));
 
 	bbcopy.reset(120);
-	bbcopy.init_bit(63, 64, bbsp);
+	bbcopy.reset_bit(63, 64, bbsp);
 	EXPECT_EQ(1, bbcopy.popcn64());
 	EXPECT_TRUE(bbcopy.is_bit(64));
 }
