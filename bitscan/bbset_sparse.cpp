@@ -118,9 +118,6 @@ void BitSetSp::init (int size, bool is_popsize){
 	}	
 }
 
-void BitSetSp::sort (){
-	std::sort(vBB_.begin(), vBB_.end(), pBlock_less());
-}	
 
 
 BitSetSp& 
@@ -648,15 +645,28 @@ BitSetSp& BitSetSp::operator &= (const BitSetSp& rhs){
 ///////////////////
 // AND mask in place
 
-	int i1=0, i2=0;
+	auto i1 = 0;
+	auto i2 = 0;
+
 	while(true){
+
 		//exit conditions 
-		if(i1==vBB_.size() ){		//size should be the same
-					return *this;
-		}else if(i2==rhs.vBB_.size()){  //fill with zeros from last block in rhs onwards
-			for(; i1<vBB_.size(); i1++)
-				vBB_[i1].bb_=ZERO;
+		if(i1 == vBB_.size() )		//size should be the same
+		{	
+			////////////////
 			return *this;
+			////////////////
+
+		}else if(i2 == rhs.vBB_.size())
+		{  
+			//fill with zeros from last block in rhs onwards
+			for (; i1 < vBB_.size(); i1++) {
+				vBB_[i1].bb_ = ZERO;
+			}
+
+			///////////////
+			return *this;
+			//////////////
 		}
 
 		//update before either of the bitstrings has reached its end

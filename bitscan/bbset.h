@@ -508,7 +508,7 @@ inline	BitSet& erase_bit		(const BitSet& lhs, const BitSet& rhs);
 
 	
 	friend bool operator ==			(const BitSet& lhs, const BitSet& rhs);
-	friend bool operator !=			(const BitSet& lhs, const BitSet& rhs);
+	friend bool operator !=			(const BitSet& lhs, const BitSet& rhs)		{ return !(lhs == rhs); }
 
 
 ////////////////////////
@@ -1523,21 +1523,13 @@ int BitSet::find_diff_pair(const BitSet& rhs, int& bit1, int& bit2) const {
 }
 
 inline
-bool operator==	(const BitSet& lhs, const BitSet& rhs){
-	
-	for (auto i = 0; i < lhs.nBB_; ++i) {
-		if (lhs.vBB_[i] != rhs.vBB_[i]) {
-			return false;
-		}
-	}
+bool operator==	(const BitSet& lhs, const BitSet& rhs){	
+	return (	( lhs.nBB_ == rhs.nBB_) &&
+				(lhs.vBB_ == rhs.vBB_) 			);
+};
 
-	return true;
-}
 
-inline
-bool operator!=	(const BitSet& lhs, const BitSet& rhs){
-	 return ! operator==(lhs, rhs);
-}
+
 
 inline
 BitSet& BitSet::erase_bit (const BitSet& bbn){

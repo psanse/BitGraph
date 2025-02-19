@@ -415,12 +415,19 @@ BitSetSp& erase_block_pos			(int first_pos_of_block, const BitSetSp& rhs) = dele
 
 ////////////////////////
 //Operators
-// 
- BitSetSp& operator &=				(const BitSetSp& );					
- BitSetSp& operator |=				(const BitSetSp& );
- BitSetSp& AND_EQ					(int first_block, const BitSetSp& rhs );						//in range
- BitSetSp& OR_EQ					(int first_block, const BitSetSp& rhs );						//in range
-  
+
+BitSetSp& operator &=				(const BitSetSp& bitset);					
+BitSetSp& operator |=				(const BitSetSp& bitset);
+BitSetSp& AND_EQ					(int firstBlock, const BitSetSp& bitset);
+BitSetSp& OR_EQ						(int firstBlock, const BitSetSp& bitset);
+
+friend bool operator ==				(const BitSetSp& lhs, const BitSetSp& rhs);
+friend bool operator !=				(const BitSetSp& lhs, const BitSetSp& rhs) { return !(lhs == rhs); }	
+
+	//TODO - (19/02/2025
+BitSetSp& operator ^=				(const BitSetSp& bitset)								= delete;		
+BitSetSp& AND_EQ					(int firstBlock, int lastBlock, const BitSetSp& bitset) = delete;
+BitSetSp& OR_EQ						(int firstBlock, int lastBlock, const BitSetSp& bitset) = delete;
 
 /////////////////////////////
 //Boolean functions
@@ -442,7 +449,8 @@ BitSetSp& erase_block_pos			(int first_pos_of_block, const BitSetSp& rhs) = dele
 
 ////////////////////////
  //Other operations 
-		void sort();
+
+		void sort					()				{ std::sort(vBB_.begin(), vBB_.end(), pBlock_less()); }
 		
 /////////////////////
 //I/O 
@@ -454,7 +462,6 @@ BitSetSp& erase_block_pos			(int first_pos_of_block, const BitSetSp& rhs) = dele
 // 		
 	string to_string				();													//TODO - operator string ();
 	void to_vector					(std::vector<int>& )	const;
-
 
 /////////////////////
 //data members
@@ -1336,16 +1343,11 @@ void  BitSetSp::reset_bit (int firstBit,  int lastBit,  const BitSetSp& bitset){
 
 inline
 bool operator == (const BitSetSp& lhs, const BitSetSp& rhs){
-/////////////////////
-// Simple equality check which considers exact copy of bit strings 
-// REMARKS: does not take into account information, i.e. bit blocks=0
 
-	return(lhs.vBB_==rhs.vBB_);
+	return(	(lhs.nBB_ == rhs.nBB_) &&
+			(lhs.vBB_ == rhs.vBB_)		);
 }
 
-inline
-bool operator!=	(const BitSetSp& lhs, const BitSetSp& rhs){
-	return ! operator==(lhs, rhs);
-}
+
 
 #endif
