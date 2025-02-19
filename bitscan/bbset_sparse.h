@@ -333,20 +333,64 @@ BitSetSp&  set_block				(int firstBlock, int lastBlock, const BitSetSp& bitset);
 	**/
 BitSetSp& set_block					(int first_block, const BitSetSp& bitset);							
 
+	/**
+	* @brief sets bit to 0 in the bitstring
+	* @param  bit: position of the 1-bit to set (>=0)
+	* @returns reference to the modified bitstring
+	* @details: zero blocks are not removed
+	**/
+inline	BitSetSp& erase_bit			(int bit);
+
+	/**
+	* @brief sets the bits in the closed range [firstBit, lastBit] to 0 in the bitstring
+	* @param firstBit:, lastBit: 0 < firstBit <= lastBit
+	* @details: last_update 19/02/25
+	* @details: zero blocks are not removed
+	**/
+BitSetSp& erase_bit					(int lbit, int rbit);
+	
+	/**
+	/* @brief sets bit to 0 in the bitstring and returns t
+	 * @returns the iterator to the block where the bit was set to 0, if it exists, otherwise
+	 *			the iterator to the block with the closest greater index than the bit (can be END).
+	 * @details oriented to basic bitscanning
+	 * @details: zero blocks are not removed
+	 **/
+inline	vPB_it  erase_bit			(int bit, vPB_it from_it);
+
+	/**
+	* @brief sets all bits to 0
+	* @details: As opposed to the non-sparse case, this is an O(1) operation 
+	**/
+	void  erase_bit					()								{ vBB_.clear(); }												
 		
-inline	void  erase_bit				(int nbit);	
-inline	vPB_it  erase_bit			(int nbit, vPB_it from_it);
-		int	  erase_bit				(int lbit, int rbit);
-		int	  clear_bit				(int lbit, int rbit);											//deallocates blocks
-		void  erase_bit				()	{vBB_.clear();}												//clears all bit blocks
-BitSetSp&    erase_bit				(const BitSetSp&);				
+	/**
+	* @brief Removes the 1-bits from bitset (inside *this capacity).
+	*
+	*		 I. bitset must have a maximum population greater or equal than the bitstring (CHECK - 19/02/2025)
+	*
+	* @details Equivalent to a set minus operation
+	* @details: zero blocks are not removed
+	* @returns reference to the modified bitstring
+	**/
+BitSetSp& erase_bit					(const BitSetSp& bitset);
+
+	/**
+	* @brief erase operation which effectively removes the zero blocks
+	* @details EXPERIMENTAL - does not look efficient, 
+	* 
+	* TODO - refactor, possibly REMOVE (19/02/2025)
+	**/
+	int	  clear_bit					(int lbit, int rbit);											
+		
 
 BitSetSp&    erase_block			(int first_block, const BitSetSp& rhs );
 BitSetSp&    erase_block			(int first_block, int last_block, const BitSetSp& rhs );
 BitSetSp&    erase_block_pos		(int first_pos_of_block, const BitSetSp& rhs );
 
 ////////////////////////
-//Operators 
+//Operators
+// 
  BitSetSp& operator &=				(const BitSetSp& );					
  BitSetSp& operator |=				(const BitSetSp& );
  BitSetSp& AND_EQ					(int first_block, const BitSetSp& rhs );						//in range
@@ -377,30 +421,34 @@ BitSetSp&    erase_block_pos		(int first_pos_of_block, const BitSetSp& rhs );
 		
 /////////////////////
 //I/O 
+
 	ostream& print					(ostream& = cout, bool show_pc = true, bool endl = true ) const override;
 
 /////////////////////
-//Conversions				
-	string to_string				();																//TODO - operator string	();
+//Conversions		
+// 		
+	string to_string				();													//TODO - operator string ();
 	void to_vector					(std::vector<int>& )	const;
 
 
-
-////////////////////////
+/////////////////////
 //data members
+
 protected:
 	vPB vBB_;					//a vector of sorted pairs of a non-empty bitblock and its index in a non-sparse bitstring
 	int nBB_;					//maximum number of bitblocks
 
-
 };  //end class BitSetSp
 
 
-//////////////////////////
+/////////////////////////////////////////
 //
+// INLINE FUNCTIONS - implementations of BitSetSP in the header
+
+
+//////////////////////////
 // BOOLEAN FUNCTIONS
-//
-//////////////////////////
+
 
 bool BitSetSp::is_bit(int bit)	const{
 //note: could use find_block as well
@@ -417,7 +465,6 @@ bool BitSetSp::is_bit(int bit)	const{
 			);
 }
 
-
 bool BitSetSp::is_empty ()	const{
 
 	//special case, no 1-bits in the bitset
@@ -425,7 +472,7 @@ bool BitSetSp::is_empty ()	const{
 		return true;
 	}
 
-	//check if all bitblocks are empty - assumes it is possible
+	//check if all bitblocks are empty - assumes it is possible, since erase operations allow it
 	for(int i = 0; i < vBB_.size(); ++i){
 		if (vBB_[i].bb_) {
 			return false;
@@ -511,47 +558,52 @@ bool BitSetSp::is_disjoint	(int first_block, int last_block, const BitSetSp& rhs
 return true;		//disjoint
 }
 
-////////////////
-//
+///////////////////
 // Bit updates
-//
-/////////////////
 
-void BitSetSp::erase_bit(int nbit /*0 based*/){
-//////////////
-// clears bitblock information (does not remove bitblock if empty) 
-// REMARKS: range must be sorted
 
-	int idx = WDIV(nbit);
+BitSetSp& BitSetSp::erase_bit (int bit){
+
+
+	int blockID = WDIV(bit);
+
+	//lower_bound implementation
+	vPB_it it = lower_bound(vBB_.begin(), vBB_.end(), pBlock_t(blockID), pBlock_less());
+	if(it!=vBB_.end() && it->idx_ == blockID){
+			
+		//removes the bit
+		it->bb_ &= ~Tables::mask[bit - WMUL(blockID) /* WMOD(bit) */];
+		
+	}
+
 
 	//equal_range implementation 
-	/*pair<vPB_it, vPB_it> p=equal_range(vBB_.begin(), vBB_.end(), elem(WDIV(nbit)), pBlock_less());
+	/*pair<vPB_it, vPB_it> p = equal_range(vBB_.begin(), vBB_.end(), elem(WDIV(nbit)), pBlock_less());
 	if(distance(p.first,p.second)!=0){
 		(*p.first).bb_&=~Tables::mask[WMOD(nbit)];
 	}*/
-	
-	//lower_bound implementation
-	vPB_it it=lower_bound(vBB_.begin(), vBB_.end(), pBlock_t(idx), pBlock_less());
-	if(it!=vBB_.end()){
-		//check if the element exists already
-		if (it->idx_ == idx) {
-			it->bb_ &= ~Tables::mask[WMOD(nbit)];
-		}
-	}
+
+	return *this;
+
 }
 
-BitSetSp::vPB_it  BitSetSp::erase_bit (int nbit, BitSetSp::vPB_it from_it){
+BitSetSp::vPB_it  BitSetSp::erase_bit (int bit, BitSetSp::vPB_it from_it){
 	
-	int idx=WDIV(nbit);
+	int blockID = WDIV(bit);
 		
-	//lower_bound implementation
-	vPB_it it=lower_bound(from_it, vBB_.end(), pBlock_t(idx), pBlock_less());
-	if(it!=vBB_.end()){
-		//check if the element exists already
-		if(it->idx_== idx)
-			it->bb_&=~Tables::mask[WMOD(nbit)];
+	//iterator to the block of the bit if it exists or the closest non-empty block with greater index
+	auto it=lower_bound(from_it, vBB_.end(), pBlock_t(blockID), pBlock_less());
+
+	if(it != vBB_.end()){
+	
+		if (it->idx_ == blockID) {
+
+			//if element exists already
+			it->bb_ &= ~Tables::mask[bit - WMUL(blockID) /* WMOD(bit) */];
+		}
 	}
-return it;
+
+	return it;
 }
 
 inline
@@ -599,11 +651,9 @@ void BitSetSp::reset_bit (int bit){
 
 }	
 
-////////////////
-//
+///////////////////
 // Bit scanning
-//
-/////////////////
+
 
 int BitSetSp::prev_bit	(int nBit){
 /////////////////
@@ -1078,55 +1128,80 @@ return *this;
 
 
 inline
-int	 BitSetSp::erase_bit (int low, int high){
-///////////////////
-// clears bits in the corresponding CLOSED range
-		
-	int	bbh=WDIV(high); 
-	int bbl=WDIV(low); 
+BitSetSp& BitSetSp::erase_bit (int firstBit, int lastBit){
 
-	//checks consistency (ASSERT)
-	if(bbh<bbl || bbl<0 || low>high || low<0){
-		cerr<<"Error in set bit in range"<<endl;
-		return -1;
+	//////////////////////////////////////////////
+	assert(firstBit >= 0 && firstBit <= lastBit);
+	//////////////////////////////////////////////
+	
+	int	bbh = WDIV(lastBit);
+	int bbl = WDIV(firstBit);
+
+	int offsetl = firstBit - WMUL(bbl);
+	int offseth = lastBit  - WMUL(bbh);
+
+	//determines the block in bbl or the closest one with greater index 
+	auto it = lower_bound( vBB_.begin(), vBB_.end(), pBlock_t(bbl), pBlock_less() );
+
+	//special case - no bits to erase in the closed range
+	if (it == vBB_.end()) {
+		return *this;
 	}
-		
-	//finds low bitblock and updates forward
-	vPB_it itl=lower_bound(vBB_.begin(), vBB_.end(), pBlock_t(bbl), pBlock_less());
-	if(itl!=vBB_.end()){
-		if(itl->idx_==bbl){	//lower block exists
-			if(bbh==bbl){		//case update in the same bitblock
-				BITBOARD bb_low=itl->bb_ & Tables::mask_high[high-WMUL(bbh)];
-				BITBOARD bb_high=itl->bb_ &Tables::mask_low[low-WMUL(bbl)];
-				itl->bb_=bb_low | bb_high;
-				return 0;
-			}
 
-			//update lower block
-			itl->bb_&=Tables::mask_low[low-WMUL(bbl)];
-			++itl;
+	//lower block
+	if (it->idx_ == bbl)				//lower block exists
+	{
+
+		if (bbh == bbl)					//case singleton range
+		{
+			it->bb_ &= bblock::MASK_0(offsetl, offseth);
+
+			//////////////
+			return *this;
+			/////////////
 		}
 
-		//iterate over the rest
-		for(; itl!=vBB_.end(); ++itl){
-			if(itl->idx_>=bbh){		//exit condition
-				if(itl->idx_==bbh){	//extra processing if the end block exists
-					if(bbh==bbl){		
-						BITBOARD bb_low=itl->bb_ & Tables::mask_high[high-WMUL(bbh)];
-						BITBOARD bb_high=itl->bb_ &Tables::mask_low[low-WMUL(bbl)];
-						itl->bb_=bb_low | bb_high;
-						return 0;
-					}
+		//update lower block
+		it->bb_ &= bblock::MASK_0_HIGH(firstBit - WMUL(bbl));
 
-					itl->bb_ &=Tables::mask_high[high-WMUL(bbh)];
+		//next block for processing
+		++it;
+	}
+
+	//rest of pBlocks
+	for (; it != vBB_.end(); ++it) {
+
+		if (it->idx_ >= bbh)			//exit condition
+		{
+			if (it->idx_ == bbh)
+			{
+				//extra processing if the end block exists
+
+				if (bbh == bbl) {
+
+					it->bb_ &= bblock::MASK_0(offsetl, offseth);
+
 				}
-			return 0;
+				else {
+					//add last block and trim
+					it->bb_ &= bblock::MASK_0_LOW(lastBit - WMUL(bbh));
+				}
+
 			}
-			//Deletes block
-			itl->bb_=ZERO;
+
+			//////////////
+			return *this;
+			/////////////
 		}
-	}
-return 0;
+
+		//Deletes intermediate block
+		it->bb_ = ZERO;
+
+	}//end for - pBlock iterations
+
+	
+
+	return *this;
 }
 
 inline

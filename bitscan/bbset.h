@@ -412,7 +412,7 @@ inline	BitSet& erase_bit		(int bit);
 	*		 If lastBit == -1, the range is [firstBit, endOfBitset)
 	* @params firstBit, lastBit: 0 < firstBit <= lastBit
 	* @created 22/9/14
-	* @last_update 01/02/25
+	* @details last_update 01/02/25
 	**/
 inline BitSet& erase_bit		(int firstBit, int lastBit);
 
@@ -423,15 +423,15 @@ inline BitSet& erase_bit		(int firstBit, int lastBit);
 inline BitSet& erase_bit		();
 
 	/**
-	* @brief Removes the bits from the bitstring bb_del inside the population range.
+	* @brief Removes the bits from the bitstring bitset inside the population range.
 	*
-	*		 I. bb_del must have a maximum population
+	*		 I. bitset must have a maximum population
 	*			greater or equal than the bitstring.
 	*
 	* @details  Equivalent to a set minus operation
 	* @returns reference to the modified bitstring
 	**/
-inline	BitSet& erase_bit		(const BitSet& bb_del);	
+inline	BitSet& erase_bit		(const BitSet& bitset);	
 
 	/**
 	* @brief Removes the 1-bits from both input bitstrings (their union) 

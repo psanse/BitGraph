@@ -414,9 +414,16 @@ TEST(Sparse, erase_bits) {
 	
 
 	//range
+	bbsp.print();
+
 	bbsp.erase_bit(1,1);
+	
+	bbsp.print();
+
 	EXPECT_FALSE(bbsp.is_bit(1));
 	EXPECT_EQ(2, bbsp.popcn64());
+
+	
 
 	//erase in a sequential loop
 	int nBit=0;

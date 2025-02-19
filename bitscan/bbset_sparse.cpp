@@ -521,10 +521,8 @@ BitSetSp&  BitSetSp::set_block (int firstBlock, int lastBlock, const BitSetSp& r
 
 	}
 	
-return *this;		
+	return *this;		
 }
-
-
 
 int BitSetSp::clear_bit (int low, int high){
 ///////////////////
@@ -624,29 +622,33 @@ int BitSetSp::clear_bit (int low, int high){
 return 0;
 }
 
+BitSetSp&  BitSetSp::erase_bit (const BitSetSp& bitset ){
 
-BitSetSp&  BitSetSp::erase_bit (const BitSetSp& rhs ){
-////////////////////
-// removes 1-bits from current object (equialent to set_difference)
-	int i1=0, i2=0;
-	while(true){
-		//exit condition I
-		if(i1==vBB_.size() || i2==rhs.vBB_.size() ){		//size should be the same
-					return *this;
-		}
+	auto i = 0;		//*this bitset index
+	auto j = 0;		//bitset index
+		
 
+	while ( i< vBB_.size() && j < vBB_.size() ) {
+		
 		//update before either of the bitstrings has reached its end
-		if(vBB_[i1].idx_==rhs.vBB_[i2].idx_){
-			vBB_[i1].bb_&=~rhs.vBB_[i2].bb_;
-			i1++, i2++; 
-		}else if(vBB_[i1].idx_<rhs.vBB_[i2].idx_){
-			i1++;
-		}else if(rhs.vBB_[i2].idx_<vBB_[i1].idx_){
-			i2++;
+		if(vBB_[i].idx_ == bitset.vBB_[j].idx_){
+
+			/////////////////////////////////////
+			vBB_[i].bb_ &= ~bitset.vBB_[j].bb_;
+			/////////////////////////////////////
+
+			i++;
+			j++;
+		}else if(vBB_[i].idx_ < bitset.vBB_[j].idx_)
+		{
+			i++;
+		}else if( vBB_[i].idx_ > bitset.vBB_[j].idx_ )
+		{
+			j++;
 		}
 	}
 
-return *this;
+	return *this;
 }
 
 BitSetSp& BitSetSp::operator &= (const BitSetSp& rhs){
