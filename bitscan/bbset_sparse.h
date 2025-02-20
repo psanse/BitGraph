@@ -1036,43 +1036,43 @@ BitSetSp&  BitSetSp::AND_block(int firstBlock, const BitSetSp& rhs ){
 
 
 	//determine the closes block to firstBlock
-	auto  p1 = this->find_block_ext(firstBlock);		//*this
-	auto  p2 = rhs.find_block_ext(firstBlock);			//rhs	
+	auto  pairTHIS = this->find_block_ext(firstBlock);		//*this
+	auto  pairR = rhs.find_block_ext(firstBlock);			//rhs	
 	
-	while(p1.second < vBB_.end() && p2.second < rhs.vBB_.end())
+	while(pairTHIS.second < vBB_.end() && pairR.second < rhs.vBB_.end())
 	{
 		//update before either of the bitstrings has reached its end
-		if(p1.second->idx_ < p2.second->idx_)
+		if(pairTHIS.second->idx_ < pairR.second->idx_)
 		{
 			/////////////////////
-			p1.second->bb_ = 0;
+			pairTHIS.second->bb_ = 0;
 			/////////////////////
-			++p1.second;
+			++pairTHIS.second;
 
-		}else if(p2.second->idx_<p1.second->idx_)
+		}else if(pairR.second->idx_<pairTHIS.second->idx_)
 		{
-			++p2.second;
+			++pairR.second;
 
 		}else{
 
 			//must have same indexes
 
 			///////////////////////////////////
-			p1.second->bb_ &= p2.second->bb_;
+			pairTHIS.second->bb_ &= pairR.second->bb_;
 			///////////////////////////////////
 
-			++p1.second;
-			++p2.second;
+			++pairTHIS.second;
+			++pairR.second;
 		}
 	}
 
 	//fill with zeros from last block in *this onwards if rhs has been examined
-	if (p2.second == rhs.vBB_.end()) { 
+	if (pairR.second == rhs.vBB_.end()) { 
 				
-		for (; p1.second != vBB_.end(); ++p1.second) {
+		for (; pairTHIS.second != vBB_.end(); ++pairTHIS.second) {
 
 			///////////////////////
-			p1.second->bb_ = ZERO;
+			pairTHIS.second->bb_ = ZERO;
 			////////////////////////
 		}
 	}
@@ -1082,55 +1082,49 @@ BitSetSp&  BitSetSp::AND_block(int firstBlock, const BitSetSp& rhs ){
 }
 
 inline
-BitSetSp&  BitSetSp::OR_block(int first_block, const BitSetSp& rhs ){
+BitSetSp&  BitSetSp::OR_block(int firstBlock, const BitSetSp& rhs ){
 		
 	//determine the closes block to firstBlock
-	auto  p1 = this->find_block_ext(first_block);		//*this
-	auto  p2 = rhs.find_block_ext(first_block);			 //rhs	
+	auto  pairTHIS = this->find_block_ext(firstBlock);		//*this
+	auto  pairR = rhs.find_block_ext(firstBlock);			 //rhs	
 	
 
-	while (p1.second < vBB_.end() && p2.second < rhs.vBB_.end())
+	while (pairTHIS.second < vBB_.end() && pairR.second < rhs.vBB_.end())
 	{
 		//update before either of the bitstrings has reached its end
-		if (p1.second->idx_ < p2.second->idx_)
+		if (pairTHIS.second->idx_ < pairR.second->idx_)
 		{
-			++p1.second;
+			++pairTHIS.second;
 		}
-		else if (p2.second->idx_ < p1.second->idx_)
+		else if (pairR.second->idx_ < pairTHIS.second->idx_)
 		{
 			//OR - add block from rhs
-			++p2.second;
+			++pairR.second;
 		}
 		else {
 
 			//must have same indexes
 
 			///////////////////////////////////
-			p1.second->bb_ |= p2.second->bb_;
+			pairTHIS.second->bb_ |= pairR.second->bb_;
 			///////////////////////////////////
 
-			++p1.second;
-			++p2.second;
+			++pairTHIS.second;
+			++pairR.second;
 		}
 	}
 
-	////iteration
-	//while(true){
-	//	//exit condition 
-	//	if(p1.second==vBB_.end() || p2.second==rhs.vBB_.end() ){				//size should be the same
-	//				return *this;
-	//	}
+	//rhs unfinished with index below the last block of *this
+	if (pairTHIS.second == vBB_.end()) {
 
-	//	//update before either of the bitstrings has reached its end
-	//	if(p1.second->idx_<p2.second->idx_){
-	//		++p1.second;
-	//	}else if(p2.second->idx_<p1.second->idx_){
-	//		++p2.second;
-	//	}else{
-	//		p1.second->bb_|=p2.second->bb_;
-	//		++p1.second, ++p2.second; 
-	//	}
-	//}
+		for (; pairR.second < rhs.vBB_.end(); ++pairR.second) {
+
+			//////////////////////////////////
+			vBB_.emplace_back(*pairR.second);
+			///////////////////////////////////
+		}
+
+	}
 	
 	return *this;
  }
