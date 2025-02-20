@@ -136,11 +136,11 @@ TEST(Sparse, member_masks) {
 	rhs.set_bit(63);
 	rhs.set_bit(127);
 	
-	lhs.AND_EQ(1,rhs);
+	lhs.AND_block(1,rhs);
 	EXPECT_TRUE(lhs.popcn64()==1);
 	EXPECT_TRUE(lhs.is_bit(63));
 
-	lhs.OR_EQ(1,rhs);
+	lhs.OR_block(1,rhs);
 	EXPECT_TRUE(lhs.is_bit(127));
 	EXPECT_EQ(2, lhs.popcn64());
 } 
@@ -903,7 +903,7 @@ TEST(Sparse, keep_operations) {
 	bbsp &= bbkeep;
 	EXPECT_TRUE(bbsp==bbkeep);
 
-	bbsp.AND_EQ(1, bbkeep2);
+	bbsp.AND_block(1, bbkeep2);
 	bbsp.print();
 	EXPECT_TRUE(bbsp.is_bit(126));
 	EXPECT_TRUE(bbsp.is_bit(0));

@@ -72,12 +72,12 @@ private:
 	//Caches current bitblock position in the collection (not its idx_ in the bitstring)  - CHECK arquitecture (17/02/2025)
 	static int nElem;	
 
-/////////////////////
-// independent operators / masks 
+/////////////////////////////
+// Independent operators / masks  
 public:	
-
-	friend bool	operator ==			(const BitSetSp&, const BitSetSp&);
-	friend bool operator!=			(const BitSetSp& lhs, const BitSetSp& rhs);
+		
+	friend bool operator ==			(const BitSetSp& lhs, const BitSetSp& rhs);
+	friend bool operator !=			(const BitSetSp& lhs, const BitSetSp& rhs) { return !(lhs == rhs); }
 
     friend inline BitSetSp&  AND	(const BitSetSp& lhs, const BitSetSp& rhs,  BitSetSp& res);
 	friend inline BitSetSp&  AND	(int first_block, const BitSetSp& lhs, const BitSetSp& rhs,  BitSetSp& res);
@@ -411,23 +411,41 @@ BitSetSp&  erase_block				(int firstBlock, const BitSetSp& bitset );
 	*		   block index. TO BE REMOVED (19/02/2025)
 	* 
 	**/
-BitSetSp& erase_block_pos			(int first_pos_of_block, const BitSetSp& rhs) = delete;
+BitSetSp& erase_block_pos			(int firstBlockPos, const BitSetSp& rhs) = delete;
 
 ////////////////////////
-//Operators
+//Operators (member functions)
 
-BitSetSp& operator &=				(const BitSetSp& bitset);					
+	/**
+	* @brief Bitwise AND operator with bbn
+	* @details apply for set intersection
+	**/
+BitSetSp& operator &=				(const BitSetSp& bitset);	
+
+	/**
+	* @brief Bitwise OR operator with bbn
+	* @details apply for set union
+	**/
 BitSetSp& operator |=				(const BitSetSp& bitset);
-BitSetSp& AND_EQ					(int firstBlock, const BitSetSp& bitset);
-BitSetSp& OR_EQ						(int firstBlock, const BitSetSp& bitset);
 
-friend bool operator ==				(const BitSetSp& lhs, const BitSetSp& rhs);
-friend bool operator !=				(const BitSetSp& lhs, const BitSetSp& rhs) { return !(lhs == rhs); }	
 
+BitSetSp& AND_block					(int firstBlock, const BitSetSp& bitset);
+BitSetSp& OR_block					(int firstBlock, const BitSetSp& bitset);
+
+
+	/////////////////////////
 	//TODO - (19/02/2025
-BitSetSp& operator ^=				(const BitSetSp& bitset)								= delete;		
-BitSetSp& AND_EQ					(int firstBlock, int lastBlock, const BitSetSp& bitset) = delete;
-BitSetSp& OR_EQ						(int firstBlock, int lastBlock, const BitSetSp& bitset) = delete;
+
+	/**
+	* @brief Bitwise XOR operator with bbn
+	* @details apply for set symmetric difference
+	* 
+	* TODO - 
+	**/
+BitSetSp& operator ^=				(const BitSetSp& bitset)								= delete;	
+
+BitSetSp& AND_block					(int firstBlock, int lastBlock, const BitSetSp& bitset) = delete;
+BitSetSp& OR_block					(int firstBlock, int lastBlock, const BitSetSp& bitset) = delete;
 
 /////////////////////////////
 //Boolean functions
@@ -1005,22 +1023,18 @@ return res;
 }
 
 
-
 inline
-BitSetSp&  BitSetSp::AND_EQ(int first_block, const BitSetSp& rhs ){
+BitSetSp&  BitSetSp::AND_block(int firstBlock, const BitSetSp& rhs ){
 //////////////////////
 // left intersection (AND). bits in rhs remain starting from closed range [first_block, END[
 
-	pair<bool, BitSetSp::vPB_it> p1 = this->find_block_ext(first_block);
-	pair<bool, BitSetSp::vPB_cit> p2 = rhs.find_block_ext(first_block);
+	pair<bool, BitSetSp::vPB_it>  p1 = this->find_block_ext(firstBlock);
+	pair<bool, BitSetSp::vPB_cit> p2 = rhs.find_block_ext(firstBlock);
 	
-	//optimization based on the size of rhs being greater
-	//for (int i1 = 0; i1 < lhs.vBB_.size();i1++){...}
-
-	//iteration
 	while( true ){
+
 		//exit condition 
-		if(p1.second==vBB_.end() ){		//size should be the same
+		if(p1.second == vBB_.end() ){		//size should be the same
 					return *this;
 		}else if( p2.second==rhs.vBB_.end()){  //fill with zeros from last block in rhs onwards
 			for(; p1.second!=vBB_.end(); ++p1.second)
@@ -1041,11 +1055,11 @@ BitSetSp&  BitSetSp::AND_EQ(int first_block, const BitSetSp& rhs ){
 
 	}
 	
-return *this;
+	return *this;
 }
 
 inline
-BitSetSp&  BitSetSp::OR_EQ(int first_block, const BitSetSp& rhs ){
+BitSetSp&  BitSetSp::OR_block(int first_block, const BitSetSp& rhs ){
 //////////////////////
 // left union (OR). Bits in rhs are added starting from closed range [first_block, END[
 
@@ -1070,7 +1084,7 @@ BitSetSp&  BitSetSp::OR_EQ(int first_block, const BitSetSp& rhs ){
 		}
 	}
 	
-return *this;
+	return *this;
  }
 
 

@@ -2,7 +2,7 @@
   * @file bbset_sparse.cpp
   * @brief implementations for the sparse BitSetSp class wrapper for sparse bitstrings (header bbset_sparse.h)
   * @author pss
-  * @details created ?, @last_update 17/02/2025
+  * @details created 10/02/2015?, @last_update 20/02/2025
   *
   * TODO refactoring and testing 15/02/2025 - follow the interface of the refactored BitSet
   **/
@@ -612,29 +612,33 @@ int BitSetSp::clear_bit (int low, int high){
 return 0;
 }
 
-BitSetSp&  BitSetSp::erase_bit (const BitSetSp& bitset ){
+BitSetSp&  BitSetSp::erase_bit (const BitSetSp& rhs ){
 
-	auto i = 0;		//*this bitset index
-	auto j = 0;		//bitset index
-		
-
-	while ( i< vBB_.size() && j < vBB_.size() ) {
+	auto posTHIS = 0;		//block position *this
+	auto posR = 0;			//block position rhs	
+	
+	while ( posTHIS< vBB_.size() && posR < vBB_.size() ) {
 		
 		//update before either of the bitstrings has reached its end
-		if(vBB_[i].idx_ == bitset.vBB_[j].idx_){
+		if (vBB_[posTHIS].idx_ < rhs.vBB_[posR].idx_)
+		{
+			++posTHIS;
+			}
+		else if (vBB_[posTHIS].idx_ > rhs.vBB_[posR].idx_)
+		{
+			++posR;
+		}
+		else{
+
+			//equal indexes
 
 			/////////////////////////////////////
-			vBB_[i].bb_ &= ~bitset.vBB_[j].bb_;
+			vBB_[posTHIS].bb_ &= ~rhs.vBB_[posR].bb_;
 			/////////////////////////////////////
 
-			i++;
-			j++;
-		}else if(vBB_[i].idx_ < bitset.vBB_[j].idx_)
-		{
-			i++;
-		}else if( vBB_[i].idx_ > bitset.vBB_[j].idx_ )
-		{
-			j++;
+			++posTHIS;
+			++posR;
+
 		}
 	}
 
@@ -642,83 +646,81 @@ BitSetSp&  BitSetSp::erase_bit (const BitSetSp& bitset ){
 }
 
 BitSetSp& BitSetSp::operator &= (const BitSetSp& rhs){
-///////////////////
-// AND mask in place
 
-	auto i1 = 0;
-	auto i2 = 0;
 
-	while(true){
+	auto posTHIS = 0;		//block position *this
+	auto posR = 0;			//block position rhs	
 
-		//exit conditions 
-		if(i1 == vBB_.size() )		//size should be the same
-		{	
-			////////////////
-			return *this;
-			////////////////
-
-		}else if(i2 == rhs.vBB_.size())
-		{  
-			//fill with zeros from last block in rhs onwards
-			for (; i1 < vBB_.size(); i1++) {
-				vBB_[i1].bb_ = ZERO;
-			}
-
-			///////////////
-			return *this;
-			//////////////
-		}
-
+	while( (posTHIS < vBB_.size()) && (posR < rhs.vBB_.size()) ){
+	
 		//update before either of the bitstrings has reached its end
-		if(vBB_[i1].idx_<rhs.vBB_[i2].idx_){
-			vBB_[i1].bb_=0;
-			i1++;
-		}else if (rhs.vBB_[i2].idx_<vBB_[i1].idx_){
-			i2++;
-		}else{
-			vBB_[i1].bb_ &= rhs.vBB_[i2].bb_;
-			i1++, i2++; 
-		}
+		if(vBB_[posTHIS].idx_ < rhs.vBB_[posR].idx_)
+		{
+			vBB_[posTHIS].bb_ = 0;
+			++posTHIS;
+		}else if (vBB_[posTHIS].idx_ > rhs.vBB_[posR].idx_ )
+		{
+			++posR;
+		}else
+		{
+			//equal indexes
 
-		/*if(vBB_[i1].idx_==rhs.vBB_[i2].idx_){
-			vBB_[i1].bb_ &= rhs.vBB_[i2].bb_;
-			i1++, i2++; 
-		}else if(vBB_[i1].idx_<rhs.vBB_[i2].idx_){
-			vBB_[i1].bb_=0;
-			i1++;
-		}else if(rhs.vBB_[i2].idx_<vBB_[i1].idx_){
-			i2++;
-		}*/
+			//////////////////////////////////////
+			vBB_[posTHIS].bb_ &= rhs.vBB_[posR].bb_;
+			/////////////////////////////////////
+			
+			++posTHIS;
+			++posR;
+		}
+			
+
+	}//end while
+
+	//if loop terminates because rhs has reached its end then
+	//delete remaining blocks in THIS 
+	if (posR == rhs.vBB_.size()) {
+		
+		for (; posTHIS < vBB_.size(); ++posTHIS) {
+
+			////////////////////////////
+			vBB_[posTHIS].bb_ = ZERO;
+			///////////////////////////
+		}
 	}
 
-return *this;
+
+	return *this;
 }
 
 BitSetSp& BitSetSp::operator |= (const BitSetSp& rhs){
-///////////////////
-// OR mask in place
-// date:10/02/2015
-// last_update: 10/02/2015
 
-	int i1=0, i2=0;
-	while(true){
-		//exit conditions 
-		if(i1==vBB_.size() || i2==rhs.vBB_.size() ){				//size should be the same
-					return *this;
-		}
+	auto posTHIS = 0;		//block position *this
+	auto posR = 0;			//block position rhs
 
-		//update before either of the bitstrings has reached its end
-		if(vBB_[i1].idx_<rhs.vBB_[i2].idx_){
-			i1++;
-		}else if(rhs.vBB_[i2].idx_<vBB_[i1].idx_){
-			i2++;
+	//OR before all the blocks of one of the bitsets have been examined
+	while ((posTHIS < vBB_.size()) && (posR < rhs.vBB_.size())) {
+	
+		
+		if(vBB_[posTHIS].idx_ < rhs.vBB_[posR].idx_)
+		{
+			posTHIS++;
+		}else if(vBB_[posTHIS].idx_ > rhs.vBB_[posR].idx_ )
+		{
+			posR++;
 		}else{
-			vBB_[i1].bb_ |= rhs.vBB_[i2].bb_;
-			i1++, i2++; 
+
+			//equal indexes
+
+			///////////////////////////////////////////
+			vBB_[posTHIS].bb_ |= rhs.vBB_[posR].bb_;
+			///////////////////////////////////////////
+
+			posTHIS++;
+			posR++;
 		}
 	}
 
-return *this;
+	return *this;
 }
 
 BITBOARD BitSetSp::find_block (int blockID) const{
