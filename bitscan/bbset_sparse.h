@@ -311,7 +311,8 @@ inline	BitSetSp& set_bit			(int bit);
 	* @returns 0 if the bits were set, -1 if error
 	* @details only one binary search is performed for the lower block
 	**/
-BitSetSp&	 set_bit				(int firstBit, int lastBit);
+BitSetSp&	set_bit				(int firstBit, int lastBit);
+BitSetSp&	set_bit_EFF			(int firstBit, int lastBit);
 
 	/**
 	* @brief Adds the bits from the bitstring bb_add in the population
