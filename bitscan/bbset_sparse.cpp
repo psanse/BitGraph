@@ -817,6 +817,24 @@ BITBOARD BitSetSp::find_block (int blockID) const{
 	}
 }
 
+BITBOARD BitSetSp::find_block(int blockID, int& pos) const
+{
+
+	////////////////////////////////////////////////////////////////////////////////////////////
+	auto it = lower_bound(vBB_.cbegin(), vBB_.cend(), pBlock_t(blockID), pBlock_less());
+	////////////////////////////////////////////////////////////////////////////////////////////
+
+	if (it != vBB_.end() && it->idx_ == blockID) {
+		pos = it - vBB_.begin();	
+		return it->bb_;
+	}
+	else {
+		pos = BBObject::noBit;
+		return BBObject::noBit;
+	}
+
+}
+
 std::pair<bool, int>
 BitSetSp::find_block_pos (int blockID) const{
 

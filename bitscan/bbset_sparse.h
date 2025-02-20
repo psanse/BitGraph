@@ -186,6 +186,15 @@ explicit BitSetSp					(int nPop, bool is_popsize = true );
 	* @details O(log) complexity
 	**/
 	BITBOARD find_block				(int blockID)			const;	
+	
+	/**
+	* @brief finds the bitblock given its block index blockID and its position in the collection
+	* @param blockID: index of the block
+	* @param pos: output position of the block in the collection
+	* @returns bitblock of the block index or BBOjbect::noBit if it does not exist, i.e., it is empty
+	* @details O(log) complexity
+	**/
+	BITBOARD find_block				(int blockID, int& pos)	const;
 
 	/**
 	* @brief extended version of find_block. The template parameter LB_policy determines
@@ -331,7 +340,7 @@ BitSetSp&  set_block				(int firstBlock, int lastBlock, const BitSetSp& bitset);
 	* TODO - CHECK if it really is more efficient than the reference set_block
 	* TODO - refactor
 	**/
-BitSetSp& set_block					(int first_block, const BitSetSp& bitset);							
+BitSetSp& set_block					(int firstBlock, const BitSetSp& bitset);
 
 	/**
 	* @brief sets bit to 0 in the bitstring
@@ -347,7 +356,7 @@ inline	BitSetSp& erase_bit			(int bit);
 	* @details: last_update 19/02/25
 	* @details: zero blocks are not removed
 	**/
-BitSetSp& erase_bit					(int lbit, int rbit);
+BitSetSp& erase_bit					(int firstBit, int lastBit);
 	
 	/**
 	/* @brief sets bit to 0 in the bitstring and returns t
