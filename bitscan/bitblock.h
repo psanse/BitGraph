@@ -72,6 +72,17 @@ namespace bblock {
 	constexpr unsigned long long DEBRUIJN_MN_64_SEP = 0x03f79d71b4cb0a89;
 	constexpr unsigned long long DEBRUIJN_MN_64_SHIFT = 58;
 
+	////////////////////
+	// Boolean
+
+	/**
+	* @brief Determines if the bit [0...63] is set in the block bb
+	* @returns TRUE if the bit is set, FALSE otherwise
+	**/
+	inline
+	bool is_bit			(const BITBOARD bb, int bit)		 { return (bb & Tables::mask[bit]); }
+
+
 /////////////////////
 // BitScanning
 	/**
