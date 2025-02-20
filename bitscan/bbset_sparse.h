@@ -429,6 +429,12 @@ BitSetSp& operator &=				(const BitSetSp& bitset);
 BitSetSp& operator |=				(const BitSetSp& bitset);
 
 	/**
+	* @brief Bitwise XOR operator with bbn
+	* @details apply for set symmetric difference
+	**/
+BitSetSp& operator ^=				(const BitSetSp& bitset) ;
+
+	/**
 	* @brief Bitwise AND operator with bitset in the semi open range [firstBlock, END)
 	* @details apply for set intersection
 	**/	
@@ -444,13 +450,7 @@ BitSetSp& OR_block					(int firstBlock, const BitSetSp& bitset);
 	/////////////////////////
 	//TODO - (19/02/2025
 
-	/**
-	* @brief Bitwise XOR operator with bbn
-	* @details apply for set symmetric difference
-	* 
-	* TODO - 
-	**/
-BitSetSp& operator ^=				(const BitSetSp& bitset)								= delete;	
+
 
 BitSetSp& AND_block					(int firstBlock, int lastBlock, const BitSetSp& bitset) = delete;
 BitSetSp& OR_block					(int firstBlock, int lastBlock, const BitSetSp& bitset) = delete;

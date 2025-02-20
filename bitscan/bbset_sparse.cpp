@@ -748,6 +748,61 @@ BitSetSp& BitSetSp::operator |= (const BitSetSp& rhs){
 	return *this;
 }
 
+BitSetSp& BitSetSp::operator ^= (const BitSetSp& rhs) {
+
+	auto posTHIS = 0;		//block position *this
+	auto posR = 0;			//block position rhs
+	vPB add;				//stores blocks to be added to *this
+
+	//XOR before all the blocks of one of the bitsets have been examined
+	while ((posTHIS < vBB_.size()) && (posR < rhs.vBB_.size())) {
+
+
+		if (vBB_[posTHIS].idx_ < rhs.vBB_[posR].idx_)
+		{
+			posTHIS++;
+		}
+		else if (vBB_[posTHIS].idx_ > rhs.vBB_[posR].idx_)
+		{
+			//////////////////////////////////
+			add.emplace_back(rhs.vBB_[posR]);
+			///////////////////////////////////
+			posR++;
+		}
+		else {
+
+			//equal indexes
+
+			///////////////////////////////////////////
+			vBB_[posTHIS].bb_ ^= rhs.vBB_[posR].bb_;
+			///////////////////////////////////////////
+
+			posTHIS++;
+			posR++;
+		}
+	}
+
+	//rhs unfinished with index below the last block of *this
+	if (posTHIS == vBB_.size()) {
+
+		for (; posR < rhs.vBB_.size(); ++posR) {
+
+			//////////////////////////////////
+			vBB_.emplace_back(rhs.vBB_[posR]);
+			///////////////////////////////////
+		}
+
+	}
+
+	/////////////////////////////////////////////////
+	vBB_.insert(vBB_.end(), add.begin(), add.end());
+	sort();
+	/////////////////////////////////////////////////
+
+	return *this;
+}
+
+
 BITBOARD BitSetSp::find_block (int blockID) const{
 
 	////////////////////////////////////////////////////////////////////////////////////////////

@@ -705,6 +705,32 @@ TEST(Sparse, member_OR_operator) {
 	
 }
 
+TEST(Sparse, member_XOR_operator) {
+
+	BitSetSp bbsp(130);
+	bbsp.set_bit(10);
+	bbsp.set_bit(30);
+	bbsp.set_bit(64);
+	bbsp.set_bit(128);
+
+	BitSetSp bbsp1(130);
+	bbsp1.set_bit(30);
+	bbsp1.set_bit(54);
+	bbsp1.set_bit(128);
+
+	//XOR- set difference
+	//////////////////
+	bbsp ^= bbsp1;
+	/////////////////
+
+	EXPECT_EQ(3, bbsp.size());
+	EXPECT_TRUE(bbsp.is_bit(10));
+	EXPECT_TRUE(bbsp.is_bit(54));
+	EXPECT_TRUE(bbsp.is_bit(64));
+	EXPECT_TRUE(std::is_sorted(bbsp.bitset().begin(), bbsp.bitset().end(), BitSetSp::pBlock_less()));
+
+}
+
 TEST(Sparse, OR_block) {
 
 	BitSetSp bbsp(130);
