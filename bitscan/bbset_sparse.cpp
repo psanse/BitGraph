@@ -698,12 +698,12 @@ BitSetSp& BitSetSp::operator &= (const BitSetSp& rhs){
 
 BitSetSp& BitSetSp::operator |= (const BitSetSp& rhs){
 
-	auto posTHIS = 0;		//block position *this
-	auto posR = 0;			//block position rhs
-	vPB add;				//stores blocks to be added to *this
-
+	auto posTHIS = 0;				//block position *this
+	auto posR = 0;					//block position rhs
+	auto sizeTHIS = vBB_.size();
+	
 	//OR before all the blocks of one of the bitsets have been examined
-	while ((posTHIS < vBB_.size()) && (posR < rhs.vBB_.size())) {
+	while ((posTHIS < sizeTHIS) && (posR < rhs.vBB_.size())) {
 	
 		
 		if(vBB_[posTHIS].idx_ < rhs.vBB_[posR].idx_)
@@ -712,8 +712,9 @@ BitSetSp& BitSetSp::operator |= (const BitSetSp& rhs){
 		}else if(vBB_[posTHIS].idx_ > rhs.vBB_[posR].idx_ )
 		{
 			//////////////////////////////////
-			add.emplace_back(rhs.vBB_[posR]);
+			vBB_.emplace_back(rhs.vBB_[posR]);
 			///////////////////////////////////
+			
 			posR++;
 		}else{
 
@@ -740,11 +741,9 @@ BitSetSp& BitSetSp::operator |= (const BitSetSp& rhs){
 
 	}
 
-	/////////////////////////////////////////////////
-	vBB_.insert(vBB_.end(), add.begin(), add.end());
+	//keep the collection sorted
 	sort();
-	/////////////////////////////////////////////////
-
+	
 	return *this;
 }
 
@@ -752,8 +751,7 @@ BitSetSp& BitSetSp::operator ^= (const BitSetSp& rhs) {
 
 	auto posTHIS = 0;		//block position *this
 	auto posR = 0;			//block position rhs
-	vPB add;				//stores blocks to be added to *this
-
+	
 	//XOR before all the blocks of one of the bitsets have been examined
 	while ((posTHIS < vBB_.size()) && (posR < rhs.vBB_.size())) {
 
@@ -765,7 +763,7 @@ BitSetSp& BitSetSp::operator ^= (const BitSetSp& rhs) {
 		else if (vBB_[posTHIS].idx_ > rhs.vBB_[posR].idx_)
 		{
 			//////////////////////////////////
-			add.emplace_back(rhs.vBB_[posR]);
+			vBB_.emplace_back(rhs.vBB_[posR]);
 			///////////////////////////////////
 			posR++;
 		}
@@ -794,11 +792,9 @@ BitSetSp& BitSetSp::operator ^= (const BitSetSp& rhs) {
 
 	}
 
-	/////////////////////////////////////////////////
-	vBB_.insert(vBB_.end(), add.begin(), add.end());
+	//keep the collection sorted
 	sort();
-	/////////////////////////////////////////////////
-
+	
 	return *this;
 }
 

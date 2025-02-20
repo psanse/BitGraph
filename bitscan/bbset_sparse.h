@@ -1139,42 +1139,42 @@ BitSetSp&  BitSetSp::OR_block(int firstBlock, const BitSetSp& rhs ){
  }
 
 
-inline
-BitSetSp&  BitSetSp::erase_block (int firstBlock, int lastBlock, const BitSetSp& rhs ){
-
+inline 
+BitSetSp& BitSetSp::erase_block(int firstBlock, int lastBlock, const BitSetSp& rhs)
+{
 	///////////////////////////////////////////////////////////////////////////////////////
-	assert( (firstBlock >= 0) && (firstBlock <= lastBlock) && (lastBlock < rhs.capacity()) );
+	assert((firstBlock >= 0) && (firstBlock <= lastBlock) && (lastBlock < rhs.capacity()));
 	/////////////////////////////////////////////////////////////////////////////////////////
 
 	//determine the closest block in the range for both bitstrings
-	auto p1  = find_block_ext(firstBlock);
-	auto p2  = rhs.find_block_ext(firstBlock);
-		
-	while(	p1.second != vBB_.end()		 && p2.second != rhs.vBB_.end()		&&
-			p1.second->idx_ <= lastBlock && p2.second->idx_ <= lastBlock		)
+	auto pL = find_block_ext(firstBlock);
+	auto pR = rhs.find_block_ext(firstBlock);
+
+	while (	pL.second != vBB_.end()			&&	pR.second != rhs.vBB_.end()		&&
+			pL.second->idx_ <= lastBlock	&&	pR.second->idx_ <= lastBlock		)
 	{
 
 		//update before either of the bitstrings has reached its end
-		if (p1.second->idx_ < p2.second->idx_)
+		if (pL.second->idx_ < pR.second->idx_)
 		{
-			++p1.second;
+			++pL.second;
 		}
-		else if (p1.second->idx_ > p2.second->idx_)
+		else if (pL.second->idx_ > pR.second->idx_)
 		{
-			++p2.second;
+			++pR.second;
 		}
 		else {  //both indexes must be equal
 
 			//////////////////////////////////
-			p1.second->bb_ &= ~p2.second->bb_;			//set minus operation
+			pL.second->bb_ &= ~pR.second->bb_;			//set minus operation
 			//////////////////////////////////
 
-			++p1.second;
-			++p2.second;
+			++pL.second;
+			++pR.second;
 		}
 
-	}
-		
+	}//end while
+
 	return *this;
 }
 

@@ -371,6 +371,33 @@ TEST(Sparse, boolean_properties){
 	EXPECT_TRUE(bb.is_disjoint(1,7,bb1));			
 	EXPECT_TRUE(bb.is_disjoint(3,7,bb1));
 
+}
+
+
+TEST(Sparse, erase_block_range) {
+
+	BitSetSp bbsp(10000);
+
+	bbsp.set_bit(0);
+	bbsp.set_bit(1);
+	bbsp.set_bit(2);
+	bbsp.set_bit(126);
+	bbsp.set_bit(127);
+	bbsp.set_bit(1000);
+	bbsp.set_bit(9000);
+
+	BitSetSp bbsp1(10000);
+		
+	bbsp1.set_bit(2);
+	bbsp1.set_bit(126);
+	bbsp1.set_bit(127);
+	bbsp1.set_bit(1000);
+		
+	//range
+	bbsp.erase_block(0, WDIV(7000), bbsp1);
+	EXPECT_TRUE(bbsp.is_bit(0));
+	EXPECT_TRUE(bbsp.is_bit(1));
+	EXPECT_TRUE(bbsp.is_bit(9000));
 
 }
 
@@ -703,27 +730,26 @@ TEST(Sparse_intrinsic, destructive_scanning){
 TEST(Sparse, member_OR_operator) {
 
 	BitSetSp bbsp(130);
-	bbsp.set_bit(10);
-	bbsp.set_bit(20);
 	bbsp.set_bit(64);
+	bbsp.set_bit(120);
+	bbsp.shrink_to_fit();
+	
 
 	BitSetSp bbsp1(130);
-	bbsp1.set_bit(30);
+	bbsp1.set_bit(5);
 	bbsp1.set_bit(54);
-	bbsp1.set_bit(128);
+	
 	
 	//OR
 	//////////////////
 	bbsp |= bbsp1; 	
 	/////////////////
 		
-	EXPECT_EQ(6, bbsp.size());
-	EXPECT_TRUE(bbsp.is_bit(10));
-	EXPECT_TRUE(bbsp.is_bit(20));
-	EXPECT_TRUE(bbsp.is_bit(30));
+	EXPECT_EQ(4, bbsp.size());
+	EXPECT_TRUE(bbsp.is_bit(5));
 	EXPECT_TRUE(bbsp.is_bit(54));
 	EXPECT_TRUE(bbsp.is_bit(64));
-	EXPECT_TRUE(bbsp.is_bit(128));
+	EXPECT_TRUE(bbsp.is_bit(120));
 	EXPECT_TRUE(std::is_sorted(bbsp.bitset().begin(), bbsp.bitset().end(), BitSetSp::pBlock_less()));
 	
 }
