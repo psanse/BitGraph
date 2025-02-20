@@ -121,7 +121,7 @@ void BitSetSp::init (int size, bool is_popsize){
 
 
 BitSetSp& 
-BitSetSp::set_bit	(int firstBit, int lastBit){
+BitSetSp::set_bit_OLD	(int firstBit, int lastBit){
 
 	//////////////////////////////
 	assert(firstBit <= lastBit && firstBit >= 0);
@@ -268,7 +268,7 @@ BitSetSp::set_bit	(int firstBit, int lastBit){
 	return *this;
 }
 
-BitSetSp& BitSetSp::set_bit_EFF(int firstBit, int lastBit)
+BitSetSp& BitSetSp::set_bit(int firstBit, int lastBit)
 {
 	//////////////////////////////////////////////
 	assert(firstBit <= lastBit && firstBit >= 0);
@@ -289,52 +289,67 @@ BitSetSp& BitSetSp::set_bit_EFF(int firstBit, int lastBit)
 		//take into account trimming
 		return *this;
 	}
-
-	int block = bbl;
+		
+	//Deal with the case bbl== bbh
+	if (bbl == bbh) {
+		if (vBB_[posLow].idx_ == bbl) {
+			vBB_[posLow].bb_ |= bblock::MASK_1(firstBit - WMUL(bbl), lastBit - WMUL(bbh));
+		}
+		else {
+			vBB_.emplace_back(pBlock_t(bbl, bblock::MASK_1(firstBit - WMUL(bbl), lastBit - WMUL(bbh))));
+		}
+		return *this;
+	}
 
 	//Deal with first block
+	if (vBB_[posLow].idx_ == bbl) {
+		vBB_[posLow].bb_ |= bblock::MASK_1_HIGH(firstBit - WMUL(bbl));
+	}
 
 
 	//OR before all the blocks of one of the bitsets have been examined
-	while ( posLow < sizeOri && vBB_[posLow].idx_ <= lastBit ) {
+	++posLow;
+	int blockID = bbl + 1;
+	while ( posLow < sizeOri && vBB_[posLow].idx_ < bbh) {
 
 				
-		if (vBB_[posLow].idx_ != block) {
+		if (vBB_[posLow].idx_ != blockID) {
 
 			//add ONE			
-			if (vBB_[posLow].idx_ == lastBit) {
+			if (vBB_[posLow].idx_ == blockID) {
 
-				vBB_.emplace_back(pBlock_t(lastBit, bblock::MASK_1_LOW(lastBit - WMUL(bbh))));
+				vBB_.emplace_back(pBlock_t(blockID, bblock::MASK_1_LOW(lastBit - WMUL(bbh))));
 			}
 			else {
-				vBB_.emplace_back(pBlock_t(lastBit, ONE));
+				vBB_.emplace_back(pBlock_t(blockID, ONE));
 			}
 
 
 			++posLow;
-			++block;
+			++blockID;
 		}
 		else {
 
-			//set to ONE an existing block with index in the closed range
-			if (vBB_[posLow].idx_ == lastBit) {
-
-				vBB_[posLow++].bb_ = bblock::MASK_1_LOW(lastBit - WMUL(bbh));				
-			}
-			else {
-				vBB_[posLow++].bb_ = ONE;
-			}
-						
+			vBB_[posLow++].bb_ = ONE;
+									
 			++posLow;
-			++block;
+			++blockID;
 
 		}
-	}
+	}//end while
 
-	//rhs unfinished with index below the last block of *this
-	if (posLow == sizeOri) {
 
-		for (int bl = block; bl <= bbh; ++bl) {
+	////case block bbh is reached
+	//if (vBB_[posLow].idx_ == bbh) {
+
+	//	vBB_[posLow++].bb_ |= bblock::MASK_1_LOW(lastBit - WMUL(bbh));
+	//}
+	//
+
+	////case all blocks of *this are consumed
+	//if (posLow == sizeOri) {
+
+		for (int bl = blockID; bl < bbh; ++bl) {
 
 			//////////////////////////////////
 			vBB_.emplace_back(pBlock_t(bl, ONE));
@@ -342,9 +357,9 @@ BitSetSp& BitSetSp::set_bit_EFF(int firstBit, int lastBit)
 		}
 
 		//last block trimmed
-		vBB_.emplace_back(pBlock_t(lastBit, bblock::MASK_1_LOW(lastBit - WMUL(bbh))));
+		vBB_.emplace_back(pBlock_t(bbh, bblock::MASK_1_LOW(lastBit - WMUL(bbh))));
 
-	}
+	//}
 
 	//keep the collection sorted
 	sort();

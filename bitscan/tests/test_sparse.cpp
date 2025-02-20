@@ -293,6 +293,7 @@ TEST(Sparse, set_bits) {
 	EXPECT_TRUE(std::is_sorted(bbsp.bitset().begin(), bbsp.bitset().end(), BitSetSp::pBlock_less()));
 
 	bbsp.set_bit(1001,1100);
+	bbsp.print();
 	EXPECT_FALSE(bbsp.is_bit(999));
 	EXPECT_TRUE(bbsp.is_bit(1001));
 	EXPECT_TRUE(bbsp.is_bit(1100));
