@@ -417,19 +417,27 @@ BitSetSp& erase_block_pos			(int firstBlockPos, const BitSetSp& rhs) = delete;
 //Operators (member functions)
 
 	/**
-	* @brief Bitwise AND operator with bbn
+	* @brief Bitwise AND operator with bitset
 	* @details apply for set intersection
 	**/
 BitSetSp& operator &=				(const BitSetSp& bitset);	
 
 	/**
-	* @brief Bitwise OR operator with bbn
+	* @brief Bitwise OR operator with bitset
 	* @details apply for set union
 	**/
 BitSetSp& operator |=				(const BitSetSp& bitset);
 
-
+	/**
+	* @brief Bitwise AND operator with bitset in the semi open range [firstBlock, END)
+	* @details apply for set intersection
+	**/	
 BitSetSp& AND_block					(int firstBlock, const BitSetSp& bitset);
+
+	/**
+	* @brief Bitwise OR operator with bitset in the semi open range [firstBlock, END)
+	* @details apply for set union
+	**/
 BitSetSp& OR_block					(int firstBlock, const BitSetSp& bitset);
 
 
@@ -1002,7 +1010,7 @@ BitSetSp&  ERASE (const BitSetSp& lhs, const BitSetSp& rhs,  BitSetSp& res){
 // date of creation: 17/12/15
 
 	
-	const int MAX=rhs.vBB_.size()-1;
+	const int MAX=rhs.vBB_.size() - 1;
 	if(MAX==BBObject::noBit){ return (res=lhs);  }		//copy before returning
 	res.erase_bit();
 
@@ -1025,64 +1033,104 @@ return res;
 
 inline
 BitSetSp&  BitSetSp::AND_block(int firstBlock, const BitSetSp& rhs ){
-//////////////////////
-// left intersection (AND). bits in rhs remain starting from closed range [first_block, END[
 
-	pair<bool, BitSetSp::vPB_it>  p1 = this->find_block_ext(firstBlock);
-	pair<bool, BitSetSp::vPB_cit> p2 = rhs.find_block_ext(firstBlock);
+
+	//determine the closes block to firstBlock
+	auto  p1 = this->find_block_ext(firstBlock);		//*this
+	auto  p2 = rhs.find_block_ext(firstBlock);			//rhs	
 	
-	while( true ){
-
-		//exit condition 
-		if(p1.second == vBB_.end() ){		//size should be the same
-					return *this;
-		}else if( p2.second==rhs.vBB_.end()){  //fill with zeros from last block in rhs onwards
-			for(; p1.second!=vBB_.end(); ++p1.second)
-				p1.second->bb_=ZERO;
-			return *this;
-		}
-
+	while(p1.second < vBB_.end() && p2.second < rhs.vBB_.end())
+	{
 		//update before either of the bitstrings has reached its end
-		if(p1.second->idx_<p2.second->idx_){
-			p1.second->bb_=0;
+		if(p1.second->idx_ < p2.second->idx_)
+		{
+			/////////////////////
+			p1.second->bb_ = 0;
+			/////////////////////
 			++p1.second;
-		}else if(p2.second->idx_<p1.second->idx_){
-			++p2.second;
-		}else{
-			p1.second->bb_&=p2.second->bb_;
-			++p1.second, ++p2.second; 
-		}
 
+		}else if(p2.second->idx_<p1.second->idx_)
+		{
+			++p2.second;
+
+		}else{
+
+			//must have same indexes
+
+			///////////////////////////////////
+			p1.second->bb_ &= p2.second->bb_;
+			///////////////////////////////////
+
+			++p1.second;
+			++p2.second;
+		}
 	}
+
+	//fill with zeros from last block in *this onwards if rhs has been examined
+	if (p2.second == rhs.vBB_.end()) { 
+				
+		for (; p1.second != vBB_.end(); ++p1.second) {
+
+			///////////////////////
+			p1.second->bb_ = ZERO;
+			////////////////////////
+		}
+	}
+
 	
 	return *this;
 }
 
 inline
 BitSetSp&  BitSetSp::OR_block(int first_block, const BitSetSp& rhs ){
-//////////////////////
-// left union (OR). Bits in rhs are added starting from closed range [first_block, END[
-
-	pair<bool, BitSetSp::vPB_it> p1=find_block_ext(first_block);
-	pair<bool, BitSetSp::vPB_cit> p2=rhs.find_block_ext(first_block);
+		
+	//determine the closes block to firstBlock
+	auto  p1 = this->find_block_ext(first_block);		//*this
+	auto  p2 = rhs.find_block_ext(first_block);			 //rhs	
 	
-	//iteration
-	while(true){
-		//exit condition 
-		if(p1.second==vBB_.end() || p2.second==rhs.vBB_.end() ){				//size should be the same
-					return *this;
-		}
 
+	while (p1.second < vBB_.end() && p2.second < rhs.vBB_.end())
+	{
 		//update before either of the bitstrings has reached its end
-		if(p1.second->idx_<p2.second->idx_){
+		if (p1.second->idx_ < p2.second->idx_)
+		{
 			++p1.second;
-		}else if(p2.second->idx_<p1.second->idx_){
+		}
+		else if (p2.second->idx_ < p1.second->idx_)
+		{
+			//OR - add block from rhs
 			++p2.second;
-		}else{
-			p1.second->bb_|=p2.second->bb_;
-			++p1.second, ++p2.second; 
+		}
+		else {
+
+			//must have same indexes
+
+			///////////////////////////////////
+			p1.second->bb_ |= p2.second->bb_;
+			///////////////////////////////////
+
+			++p1.second;
+			++p2.second;
 		}
 	}
+
+	////iteration
+	//while(true){
+	//	//exit condition 
+	//	if(p1.second==vBB_.end() || p2.second==rhs.vBB_.end() ){				//size should be the same
+	//				return *this;
+	//	}
+
+	//	//update before either of the bitstrings has reached its end
+	//	if(p1.second->idx_<p2.second->idx_){
+	//		++p1.second;
+	//	}else if(p2.second->idx_<p1.second->idx_){
+	//		++p2.second;
+	//	}else{
+	//		p1.second->bb_|=p2.second->bb_;
+	//		++p1.second, ++p2.second; 
+	//	}
+	//}
 	
 	return *this;
  }
