@@ -95,26 +95,25 @@ TEST_F(BitSetSpClassTest, reset) {
 
 TEST(Sparse, find_block)
 {
-
 	BitSetSp bbsp(1000);
 	bbsp.set_bit(10);
 	bbsp.set_bit(20);
 	bbsp.set_bit(998);
 
-	////////////////////////////////////////////
+	
 	BITBOARD bb = bbsp.find_block(WDIV(1000));		//bb = 998
-	///////////////////////////////////////////
-
 	EXPECT_TRUE(bblock::is_bit(bb, 38));			//the bitset starts at 960, so 998 has offset 38.
 
 
 	//variant returning also the position in the collection (not its real index)
-	auto pos = BBObject::noBit;
-	////////////////////////////////////////////
+	auto pos = BBObject::noBit;	
 	bb = bbsp.find_block(WDIV(1000), pos);		//bb = 998
-	///////////////////////////////////////////
-
 	EXPECT_EQ(1, pos);								//second block in the sparse bitset
+
+	//empty bitset
+	bb = bbsp.find_block(WDIV(650), pos);		
+	EXPECT_EQ(BBObject::noBit, pos);
+
 }
 
 TEST(Sparse, basics) {
