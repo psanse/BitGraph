@@ -367,60 +367,7 @@ BitSetSp& BitSetSp::set_bit (const BitSetSp& rhs){
 	return *this;		
 }
 
-BitSetSp&  BitSetSp::set_block (int first_block, const BitSetSp& rhs){
-/////////////////////////////////
-//
-// REMARKS: experimental, currently only defined for bit strings of same size
 
-	//vBB_.reserve(rhs.vBB_.size()+vBB_.size());						//maximum possible size, to push_back in place without allocation
-	vPB vapp;
-	pair<bool, BitSetSp::vPB_it> p1=find_block_ext(first_block);
-	pair<bool, BitSetSp::vPB_cit> p2=rhs.find_block_ext(first_block);
-	bool req_sorting=false;
-		
-
-	if(p2.second==rhs.vBB_.end()){		//check in this order (captures rhs empty on init)
-		return *this;
-	}
-
-	if(p1.second==vBB_.end()){
-		//append rhs at the end
-		vBB_.insert(vBB_.end(),p2.second, rhs.vBB_.end());	
-		req_sorting=true;
-		sort();
-		return *this;
-	}
-			
-	while(true){
-		if(p2.second==rhs.vBB_.end()){	//exit condition I
-			break;
-		}else if(p1.second==vBB_.end()){	 //exit condition II  		
-			vBB_.insert(vBB_.end(),p2.second, rhs.vBB_.end());
-			req_sorting=true;
-			break;			
-		}
-
-		//update before either of the bitstrings has reached its end
-		if(p1.second->idx_==p2.second->idx_){
-			p1.second->bb_|=p2.second->bb_;
-			++p1.second, ++p2.second; 
-		}else if(p1.second->idx_<p2.second->idx_){
-			++p1.second;
-		}else if(p2.second->idx_<p1.second->idx_){
-			vapp.push_back(*p2.second);	
-			//vBB_.push_back(*p2.second);		
-			req_sorting=true;
-			++p2.second;
-		}
-	}
-
-	//always keep array sorted
-	vBB_.insert(vBB_.end(), vapp.begin(), vapp.end());
-	if(req_sorting)
-				sort();
-	
-return *this;		
-}
 
 BitSetSp&  BitSetSp::set_block (int firstBlock, int lastBlock, const BitSetSp& rhs){
 	
@@ -428,9 +375,9 @@ BitSetSp&  BitSetSp::set_block (int firstBlock, int lastBlock, const BitSetSp& r
 	assert(firstBlock >= 0 && firstBlock <= lastBlock && lastBlock < rhs.capacity());
 	//////////////////////////////////////////////////////////////////////////////////
 	
-	//////////////////////////////////////////////////////////
-	vBB_.reserve(vBB_.size() + lastBlock - firstBlock + 1);						//avoids reallocation - MUST BE PLACED HERE!
-	//////////////////////////////////////////////////////////
+	/////////////////////////////////////////
+	vBB_.reserve(vBB_.size() + rhs.size());								//avoids reallocation - MUST BE PLACED HERE!
+	//////////////////////////////////////////
 
 	auto p1i = find_block_ext(firstBlock);				//O(log n)
 	auto p2i = rhs.find_block_ext(firstBlock);			//O(log n)
@@ -483,7 +430,7 @@ BitSetSp&  BitSetSp::set_block (int firstBlock, int lastBlock, const BitSetSp& r
 	
 	}while( p1i.second < vBB_.end()			&& 
 			p1i.second->idx_ <= lastBlock	&& 
-			(p2i.second <= p2it_end)			);
+			(p2i.second != p2it_end)			);
 	
 	
 	//exit conditions   

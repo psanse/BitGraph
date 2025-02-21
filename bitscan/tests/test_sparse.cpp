@@ -435,7 +435,7 @@ TEST(Sparse, set_blocks) {
 	EXPECT_EQ(7, bbsp.popcn64());
 
 	//range
-	bbsp.set_block(2,bbsp1);
+	bbsp.set_block(2, WDIV(10000) - 1, bbsp1);
 	EXPECT_TRUE(bbsp.is_bit(129));
 	EXPECT_TRUE(bbsp.is_bit(5000));
 }

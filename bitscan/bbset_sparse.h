@@ -343,15 +343,6 @@ BitSetSp&    set_bit				(const BitSetSp& bitset);
 BitSetSp&  set_block				(int firstBlock, int lastBlock, const BitSetSp& bitset);
 
 	/**
-	* @brief Copies the bitset in the closed range [firstBlock, END of bitset] to *this
-	* @details small brother of set_block for configurable closed ranges, but more efficient 
-	* 
-	* TODO - CHECK if it really is more efficient than the reference set_block
-	* TODO - refactor
-	**/
-BitSetSp& set_block					(int firstBlock, const BitSetSp& bitset);
-
-	/**
 	* @brief sets bit to 0 in the bitstring
 	* @param  bit: position of the 1-bit to set (>=0)
 	* @returns reference to the modified bitstring
