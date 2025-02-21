@@ -193,8 +193,10 @@ explicit BitSetSp					(int nPop, bool is_popsize = true );
 	* @param pos: output position of the block in the collection
 	* @returns bitblock of the block index or BBOjbect::noBit if it does not exist, i.e., it is empty
 	* @details O(log) complexity
+	* @details two implementations, read only and read-write
 	**/
-	BITBOARD find_block				(int blockID, int& pos)	const;
+	vPB_cit find_block				(int blockID, int& pos)	const;
+	vPB_it  find_block				(int blockID, int& pos);
 
 	/**
 	* @brief extended version of find_block. The template parameter LB_policy determines
@@ -297,7 +299,7 @@ virtual inline	 int popcn64		(int nBit)				const;
 		
 	/**
 	* @brief Sets bit in the sparse bitset
-	* @param nbit: position of the bit to set
+	* @param  bit: position of the bit to set
 	* @returns 0 if the bit was set, -1 if error
 	* @details emplaces pBlock in the bitstring or changes an existing bitblock
 	* @detials uses lower_bound for insertion (log overhead)
@@ -310,20 +312,24 @@ inline	BitSetSp& set_bit			(int bit);
 	* @params firstBit, lastBit: range
 	* @returns 0 if the bits were set, -1 if error
 	* @details only one binary search is performed for the lower block
+	* @details  I.  O(n) operation to update/add blocks, where n is the number of bitblocks in the closed range
+	* @details  II. O(log n) operation for the binary search to determine the closest lower block to 
+	*				the first block of the range
+	* @details  III.O(n log n) operation for sorting if required
 	**/
-BitSetSp&	set_bit_OLD				(int firstBit, int lastBit);
 BitSetSp&	set_bit					(int firstBit, int lastBit);
 
 	/**
-	* @brief Adds the bits from the bitstring bb_add in the population
-	*		 range of the bitstring (bitblocks are copied).
+	* @brief Adds the bits from the bitstring bitset in the population
+	*		 range of *THIS (bitblocks are copied).
 	*
 	*		 I. Both bitsets should have the SAME capacity (number of blocks).
+	*		II. Should have the same expected maximum population size 
 	*		
 	* @details  Equivalent to OR operation / set union
 	* @returns reference to the modified bitstring
 	**/		
-BitSetSp&    set_bit				(const BitSetSp& bb_add);											
+BitSetSp&    set_bit				(const BitSetSp& bitset);											
 
 	/**
 	* @brief Copies the bitset in the closed range [firstBlock, lastBlock] to *this

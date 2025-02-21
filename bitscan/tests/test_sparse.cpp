@@ -107,11 +107,11 @@ TEST(Sparse, find_block)
 
 	//variant returning also the position in the collection (not its real index)
 	auto pos = BBObject::noBit;	
-	bb = bbsp.find_block(WDIV(1000), pos);		//bb = 998
+	auto it = bbsp.find_block(WDIV(1000), pos);		//bb = 998
 	EXPECT_EQ(1, pos);								//second block in the sparse bitset
 
 	//empty bitset
-	bb = bbsp.find_block(WDIV(650), pos);		
+	it = bbsp.find_block(WDIV(650), pos);		
 	EXPECT_EQ(BBObject::noBit, pos);
 
 }
