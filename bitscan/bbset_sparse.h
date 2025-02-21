@@ -233,6 +233,8 @@ explicit BitSetSp					(int nPop, bool is_popsize = true );
 	*		   In the case the block does not exist (first element of the pair is false),
 	*		   the second element is the closest block index ABOVE the blockID or -1 if no such block exists
 	* @details O(log) complexity
+	* 
+	* TODO - possibly remove - since it can be obained from find_block_ext trivially (21/02/2025)
 	**/
 	pair<bool, int>	 find_block_pos(int blockID)			const;
 											
@@ -458,7 +460,6 @@ BitSetSp& OR_block					(int firstBlock, const BitSetSp& bitset);
 
 	/////////////////////////
 	//TODO - (19/02/2025
-
 
 
 BitSetSp& AND_block					(int firstBlock, int lastBlock, const BitSetSp& bitset) = delete;
