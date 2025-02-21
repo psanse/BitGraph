@@ -281,6 +281,19 @@ BitSetSp& BitSetSp::set_bit(int firstBit, int lastBit)
 	//finds position of block closest to blockID	
 	find_block(bl, posTHIS);
 	
+
+/////////////////////
+// ALGORITHM 	 
+// 1) special case: all existing blocks are outside the range
+// 2) special case: singleton range
+// 3) first block
+// 4) blocks in between analysis
+// 5) last block
+// 6) exit because last block has been reached
+// 7) exit because no more blocks in *this
+//
+////////////////////
+ 
 	//special case: all existing blocks are outside the range
 	if (posTHIS == BBObject::noBit) {
 
@@ -288,15 +301,15 @@ BitSetSp& BitSetSp::set_bit(int firstBit, int lastBit)
 			vBB_.emplace_back(pBlock_t(bl, bblock::MASK_1(offsetl, offseth)));
 		}
 		else {
+
+			//add blocks trimming both ends 
 			vBB_.emplace_back(pBlock_t(bl, bblock::MASK_1_HIGH(offsetl)));
 			vBB_.emplace_back(pBlock_t(bh, bblock::MASK_1_LOW(offseth)));
+			for (int i = bl + 1; i < bh; i++) {
+				vBB_.emplace_back(pBlock_t(i, ONE));
+			}
 		}
-
-		//add all blocks in between range
-		for (int i = bl+1; i < bh; i++) {
-			vBB_.emplace_back(pBlock_t(i, ONE));
-		}
-
+		
 		return *this;
 	}
 
@@ -327,33 +340,25 @@ BitSetSp& BitSetSp::set_bit(int firstBit, int lastBit)
 		}
 	}
 
-
-	//remaining blocks
+	////////////////////////////////////////////
+	//blocks in between analysis - MAIN LOOP
 	auto block = bl + 1;
 	posTHIS++;
-	while (posTHIS < SIZE && block <= bh) {
+	while (posTHIS < SIZE && block < bh) {
 
 		if (vBB_[posTHIS].idx_ < block) {
 
 			//add block
-			if (block == bh) {
-				vBB_.emplace_back(pBlock_t(block, bblock::MASK_1_LOW(offseth)));
-			}
-			else {
-				vBB_.emplace_back(pBlock_t(block, ONE));
-			}
+			vBB_.emplace_back(pBlock_t(block, ONE));
+			
 			
 			posTHIS++;
 		}
 		else if (vBB_[posTHIS].idx_ > block) {
 			
 			//add block
-			if (block == bh) {
-				vBB_.emplace_back(pBlock_t(block, bblock::MASK_1_LOW(offseth)));
-			}
-			else {
-				vBB_.emplace_back(pBlock_t(block, ONE));
-			}
+			vBB_.emplace_back(pBlock_t(block, ONE));
+			
 	
 			block++;
 			flag_sort = true;
@@ -362,12 +367,8 @@ BitSetSp& BitSetSp::set_bit(int firstBit, int lastBit)
 		else {
 
 			//index match - overwrite
-			if (block == bh) {
-				vBB_[posTHIS].bb_ |= bblock::MASK_1_LOW(offseth);				
-			}
-			else {
-				vBB_[posTHIS].bb_ = ONE;				
-			}
+			vBB_[posTHIS].bb_ = ONE;				
+			
 
 			posTHIS++;
 			block++;
@@ -376,7 +377,23 @@ BitSetSp& BitSetSp::set_bit(int firstBit, int lastBit)
 		
 	}//end while
 
-	//rhs unfinished with index below the last block of *this
+	/////////////////////
+	// Treatment depending on exit condition
+	 
+	//I. exit because last block has been reached
+	if (block == bh) {
+		if (vBB_[posTHIS].idx_ == bh) {
+			vBB_[posTHIS].bb_ |= bblock::MASK_1_LOW(offseth);
+		}
+		else {
+			vBB_.emplace_back(pBlock_t(block, bblock::MASK_1_LOW(offseth)));
+			if (vBB_[posTHIS].idx_ > block) {
+				flag_sort = true;
+			}
+		}
+	}
+
+	//II. exit because no more blocks in *this
 	if (posTHIS == SIZE) {
 
 		for (int i = block; i < bh; i++) {
@@ -384,11 +401,12 @@ BitSetSp& BitSetSp::set_bit(int firstBit, int lastBit)
 		}
 
 		vBB_.emplace_back(pBlock_t(bh, bblock::MASK_1_LOW(offseth)));
+
 		flag_sort = true;
 	}
 		
 
-	//keep the collection sorted
+	//keep the collection sorted if required
 	if (flag_sort) {
 		sort();
 	}
