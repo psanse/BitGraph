@@ -135,7 +135,7 @@ BitSetSp& BitSetSp::set_bit(int firstBit, int lastBit)
 
 	//finds position of block closest to blockID (equal or greater index)
 	auto posTHIS = 0;							//block position *this	
-	find_block(bl, posTHIS);
+	auto itbl = find_block(bl, posTHIS);
 	
 	/////////////////////
 	// ALGORITHM 	 
@@ -174,10 +174,17 @@ BitSetSp& BitSetSp::set_bit(int firstBit, int lastBit)
 			vBB_[posTHIS].bb_ |= bblock::MASK_1(offsetl, offseth);
 		}
 		else {
-			vBB_.emplace_back(pBlock_t(bl, bblock::MASK_1(offsetl, offseth)));
+						
 			if (vBB_[posTHIS].idx_ > bl) {
-				sort();
+						
+				//insert block to avoid sorting - special case
+				vBB_.insert(itbl, pBlock_t(bl, bblock::MASK_1(offsetl, offseth)));
 			}
+			else {
+
+				//places at the end - no sorting required
+				vBB_.emplace_back(pBlock_t(bl, bblock::MASK_1(offsetl, offseth)));
+			}			
 		}
 
 		return *this;
