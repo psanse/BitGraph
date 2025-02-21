@@ -328,43 +328,36 @@ BitSetSp& BitSetSp::set_bit (const BitSetSp& rhs){
 	auto req_sorting = false;
 	///////////////////////////////////
 	
-	while(true){
-				
-		if (rIt == rhs.vBB_.end()) {		 //exit condition I
-
-			///////
-			break;
-			//////
-		}else if(lIt == vBB_.end())			 //exit condition II
-		{
-			//append blocks at the end
-			vBB_.insert(vBB_.end(), rIt, rhs.vBB_.end());
-
-			///////
-			break;
-			//////
-		}
+	//MAIN LOOP
+	while(lIt!=vBB_.end() && rIt != rhs.vBB_.end()) {
 		
-		//update before either of the bitstrings has reached its end
-		if(lIt->idx_ == rIt->idx_){
+		if (lIt->idx_ < rIt->idx_) {
+			++lIt;
+		}
+		else if (rIt->idx_ < lIt->idx_) {
 
+			vBB_.push_back(*rIt);					
+			req_sorting = true;
+			++rIt;
+		}
+		else {
 			/////////////////////////
-			lIt->bb_|= rIt->bb_;
+			lIt->bb_ |= rIt->bb_;
 			////////////////////////
 
-			++lIt, 
-			++rIt;
-
-		}else if(lIt->idx_< rIt->idx_){
-			++lIt;
-		}else if(rIt->idx_< lIt->idx_){
-			
-			vBB_.push_back(*rIt);
-			req_sorting = true;
+			++lIt,
 			++rIt;
 		}
 	}
 	//end while
+
+
+	//treatment for exit conditions
+	if (lIt == vBB_.end())			 //exit condition II
+	{
+		//append blocks at the end
+		vBB_.insert(vBB_.end(), rIt, rhs.vBB_.end());
+	}
 
 	//always keep array sorted
 	if (req_sorting) {
@@ -434,12 +427,9 @@ BitSetSp&  BitSetSp::set_block (int firstBlock, int lastBlock, const BitSetSp& r
 	//////////////////////////////////////////////////////////////////////////////////
 	assert(firstBlock >= 0 && firstBlock <= lastBlock && lastBlock < rhs.capacity());
 	//////////////////////////////////////////////////////////////////////////////////
-
-	//auxiliary storage of blocks
-	//vPB vapp;					
-
+	
 	//////////////////////////////////////////////////////////
-	vBB_.reserve(vBB_.size() + lastBlock - firstBlock + 1);						//avoid reallocation
+	vBB_.reserve(vBB_.size() + lastBlock - firstBlock + 1);						//avoids reallocation - MUST BE PLACED HERE!
 	//////////////////////////////////////////////////////////
 
 	auto p1i = find_block_ext(firstBlock);				//O(log n)
@@ -457,65 +447,54 @@ BitSetSp&  BitSetSp::set_block (int firstBlock, int lastBlock, const BitSetSp& r
 	auto p2it_end = (p2f.first)? p2f.second + 1 : p2f.second;			
 
 	//special case  - this bitset has no information to mask in the range
-	//copy operation
-	if(p1i.second == vBB_.end())
+	if (p1i.second == vBB_.end())
 	{
 		//append rhs at the end
-		vBB_.insert(vBB_.end(),p2i.second, p2it_end);
+		vBB_.insert(vBB_.end(), p2i.second, p2it_end);
 
-		//sort
-		std::sort(vBB_.begin(), vBB_.end(), pBlock_less());
-		
-		///////////////
 		return *this;
-		////////////////
 	}
 
-
-	//Normal case - blocks overlap in the range
+	//MAIN LOOP - blocks overlap in the range
 	do{
 		//update before either of the bitstrings has reached its end
-		if(p1i.second->idx_ == p2i.second->idx_)
-		{
-			p1i.second->bb_ |= p2i.second->bb_;
-			++p1i.second;
-			++p2i.second;
-
-		}else if(p1i.second->idx_ < p2i.second->idx_)
+		if(p1i.second->idx_ < p2i.second->idx_)
 		{
 			++p1i.second;
-		}else if(p1i.second->idx_ > p2i.second->idx_)
+		}
+		else if (p1i.second->idx_ > p2i.second->idx_)
 		{
 			vBB_.emplace_back(*p2i.second);		 //	if realloc is possible vapp.push_back(*p2i.second);
-		
+
 			++p2i.second;
-			
+
 			//sorting is necessary since the block added has less index
-			req_sorting=true;
-			
+			req_sorting = true;
 		}
-						
-		//exit conditions   
-		if( p1i.second == vBB_.end() || p1i.second->idx_ > lastBlock )
-		{	
-			//add remaining blocks to *this
-			vBB_.insert(vBB_.end(), p2i.second, (p2f.first)? p2f.second + 1 : p2f.second);
-			
-			req_sorting=true;
+		else {			//must have same indexes		
 
-			////////////
-			break;		
-			//////////
-		}else if (p2i.second == p2it_end ){			//exit condition II
-			//////
-			break;
-			//////
+			//////////////////////////////////////
+			p1i.second->bb_ |= p2i.second->bb_;
+			//////////////////////////////////////
+
+			++p1i.second;
+			++p2i.second;
 		}
+	
+	}while( p1i.second < vBB_.end()			&& 
+			p1i.second->idx_ <= lastBlock	&& 
+			(p2i.second <= p2it_end)			);
+	
+	
+	//exit conditions   
+	if (p1i.second == vBB_.end() || p1i.second->idx_ > lastBlock)
+	{
+		//add remaining blocks to *this
+		vBB_.insert(vBB_.end(), p2i.second, (p2f.first) ? p2f.second + 1 : p2f.second);
 
-	}while(true);
+		req_sorting = true;
+	}
 
-	//append chosen blocks
-	//vBB_.insert(vBB_.end(), vapp.begin(), vapp.end());
 
 	//sort if required
 	if (req_sorting) {

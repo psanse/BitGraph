@@ -134,7 +134,7 @@ namespace bblock {
 	//////
 	// I/O
 	//////
-	std::ostream& print(const BITBOARD bb_data, std::ostream& o)
+	std::ostream& print( BITBOARD bb_data, std::ostream& o)
 	{
 
 		if (bb_data) {

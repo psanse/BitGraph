@@ -299,6 +299,7 @@ virtual inline	 int popcn64		(int nBit)				const;
 		
 	/**
 	* @brief Sets bit in the sparse bitset
+	*		 Bits outside the capacity of the bitset are ignored (feature)
 	* @param  bit: position of the bit to set
 	* @returns 0 if the bit was set, -1 if error
 	* @details emplaces pBlock in the bitstring or changes an existing bitblock
@@ -323,10 +324,11 @@ BitSetSp&	set_bit					(int firstBit, int lastBit);
 	* @brief Adds the bits from the bitstring bitset in the population
 	*		 range of *THIS (bitblocks are copied).
 	*
-	*		 I. Both bitsets should have the SAME capacity (number of blocks).
+	*		 I. Both bitsets MUST have the SAME capacity (number of blocks).
 	*		II. Should have the same expected maximum population size 
 	*		
 	* @details  Equivalent to OR operation / set union
+	* @details  Allocates memory for THIS the size of bitset
 	* @returns reference to the modified bitstring
 	**/		
 BitSetSp&    set_bit				(const BitSetSp& bitset);											
@@ -684,22 +686,22 @@ inline
 BitSetSp& BitSetSp::set_bit (int bit ){
 
 	int block = WDIV(bit);
-		
+			
 	//////////////////////////
 	if (block >= nBB_) {
 		LOGG_ERROR("attempted to set a bit: ", bit, "out of range - BitSetSp::set_bit ");
 		return *this;
 	}
-	/////////////////////////
+	//////////////////////////
 		
 	//ordered insertion - lower_bound implementation which returns the first element NOT LESS than block
 	vPB_it it = std::lower_bound (vBB_.begin(), vBB_.end(), pBlock_t(block), pBlock_less());
 	if(it != vBB_.end()){
 				
-		if(it->idx_ == block){
+		if (it->idx_ == block) {
 
 			//check if the element exists already
-			it->bb_|=Tables::mask[bit - WMUL(block) /* WMOD(bit) */];
+			it->bb_ |= bblock::MASK_BIT(bit - WMUL(block) /* WMOD(bit) */);
 		}
 		else {
 
