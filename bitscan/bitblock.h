@@ -239,6 +239,14 @@ namespace bblock {
 
 //////////////////////
 //  Masks
+	/**
+	* @brief Sets to 1 the bit passed and zero the rest of bits 
+	* @param bit: bit in the bitblock [0...63]
+	* @returns 64-bit bitblock mask with only one bit set
+	**/
+
+	inline 
+	BITBOARD MASK_BIT	(int bit) { return Tables::mask[bit]; }
 
 	/**
 	* @brief Sets to 1 the bits inside the closed range [low, high], sets to 0 the rest
