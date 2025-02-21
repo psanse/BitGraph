@@ -524,7 +524,7 @@ bool BitSetSp::is_bit(int bit)	const{
 	int blockID = WDIV(bit);
 
 	/////////////////////////////////////////////////////////////////////////////////////
-	vPB_cit it=lower_bound(vBB_.begin(), vBB_.end(), pBlock_t(blockID), pBlock_less());
+	vPB_cit it = lower_bound(vBB_.begin(), vBB_.end(), pBlock_t(blockID), pBlock_less());
 	/////////////////////////////////////////////////////////////////////////////////////
 	
 	return ( it != vBB_.end()		&&

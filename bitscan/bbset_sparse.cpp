@@ -270,57 +270,128 @@ BitSetSp::set_bit_OLD	(int firstBit, int lastBit){
 
 BitSetSp& BitSetSp::set_bit(int firstBit, int lastBit)
 {
-	auto posTHIS = 0;				//block position *this
-	auto posR = 0;					//block position rhs
-	auto sizeTHIS = vBB_.size();	//stores the original size of *this since it will be modified
+	auto posTHIS = 0;							//block position *this
+	auto bl = WDIV(firstBit);					//block index fristBit
+	auto bh = WDIV(lastBit);					//block index lastBit
+	const auto SIZE = vBB_.size();				//stores the original size of *this since it will be enlarged
+	auto offsetl = firstBit - WMUL(bl);			//offset in the lower block
+	auto offseth = lastBit - WMUL(bh);			//offset in the upper block
+	bool flag_sort = false;						//flag to sort the collection
 
-	find_block(WDIV(firstBit), posTHIS);
-	find_block(WDIV(lastBit),  posR);
+	//finds position of block closest to blockID	
+	find_block(bl, posTHIS);
+	
+	//special case: all existing blocks are outside the range
+	if (posTHIS == BBObject::noBit) {
+
+		if (bl == bh) {
+			vBB_.emplace_back(pBlock_t(bl, bblock::MASK_1(offsetl, offseth)));
+		}
+		else {
+			vBB_.emplace_back(pBlock_t(bl, bblock::MASK_1_HIGH(offsetl)));
+			vBB_.emplace_back(pBlock_t(bh, bblock::MASK_1_LOW(offseth)));
+		}
+
+		//add all blocks in between range
+		for (int i = bl+1; i < bh; i++) {
+			vBB_.emplace_back(pBlock_t(i, ONE));
+		}
+
+		return *this;
+	}
+
+	//special case - singleton range
+	if (bl == bh) {
+
+		if (vBB_[posTHIS].idx_ == bl) {
+			vBB_[posTHIS].bb_ |= bblock::MASK_1(offsetl, offseth);
+		}
+		else {
+			vBB_.emplace_back(pBlock_t(bl, bblock::MASK_1(offsetl, offseth)));
+			if (vBB_[posTHIS].idx_ > bl) {
+				sort();
+			}
+		}
+
+		return *this;
+	}
+
+	//first block
+	if (vBB_[posTHIS].idx_ == bl) {
+		vBB_[posTHIS].bb_ |= bblock::MASK_1_HIGH(offsetl);		
+	}
+	else {
+		vBB_.emplace_back(pBlock_t(bl, bblock::MASK_1_HIGH(offsetl)));
+		if (vBB_[posTHIS].idx_ > bl) {
+			flag_sort = true;
+		}
+	}
 
 
-	//OR before all the blocks of one of the bitsets have been examined
-	while ((posTHIS < sizeTHIS) && (posR < rhs.vBB_.size())) {
+	//remaining blocks
+	auto block = bl + 1;
+	posTHIS++;
+	while (posTHIS < SIZE && block <= bh) {
 
+		if (vBB_[posTHIS].idx_ < block) {
 
-		if (vBB_[posTHIS].idx_ < rhs.vBB_[posR].idx_)
-		{
+			//add block
+			if (block == bh) {
+				vBB_.emplace_back(pBlock_t(block, bblock::MASK_1_LOW(offseth)));
+			}
+			else {
+				vBB_.emplace_back(pBlock_t(block, ONE));
+			}
+			
 			posTHIS++;
 		}
-		else if (vBB_[posTHIS].idx_ > rhs.vBB_[posR].idx_)
-		{
-			//////////////////////////////////
-			vBB_.emplace_back(rhs.vBB_[posR]);
-			///////////////////////////////////
+		else if (vBB_[posTHIS].idx_ > block) {
+			
+			//add block
+			if (block == bh) {
+				vBB_.emplace_back(pBlock_t(block, bblock::MASK_1_LOW(offseth)));
+			}
+			else {
+				vBB_.emplace_back(pBlock_t(block, ONE));
+			}
+	
+			block++;
+			flag_sort = true;
 
-			posR++;
 		}
 		else {
 
-			//equal indexes
-
-			///////////////////////////////////////////
-			vBB_[posTHIS].bb_ |= rhs.vBB_[posR].bb_;
-			///////////////////////////////////////////
+			//index match - overwrite
+			if (block == bh) {
+				vBB_[posTHIS].bb_ |= bblock::MASK_1_LOW(offseth);				
+			}
+			else {
+				vBB_[posTHIS].bb_ = ONE;				
+			}
 
 			posTHIS++;
-			posR++;
+			block++;
+
 		}
-	}
+		
+	}//end while
 
 	//rhs unfinished with index below the last block of *this
-	if (posTHIS == vBB_.size()) {
+	if (posTHIS == SIZE) {
 
-		for (; posR < rhs.vBB_.size(); ++posR) {
-
-			//////////////////////////////////
-			vBB_.emplace_back(rhs.vBB_[posR]);
-			///////////////////////////////////
+		for (int i = block; i < bh; i++) {
+			vBB_.emplace_back(pBlock_t(i, ONE));
 		}
 
+		vBB_.emplace_back(pBlock_t(bh, bblock::MASK_1_LOW(offseth)));
+		flag_sort = true;
 	}
+		
 
 	//keep the collection sorted
-	sort();
+	if (flag_sort) {
+		sort();
+	}
 
 	return *this;
 }

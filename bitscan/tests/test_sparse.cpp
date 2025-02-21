@@ -495,7 +495,9 @@ TEST(Sparse, erase_bits) {
 	//last bit in range does not correspond to a block but there are blocks with higher index
 	bbsp.reset(10000);
 	bbsp.set_bit(1, 5);	
-	bbsp.set_bit(200,205);	
+	bbsp.print();
+	bbsp.set_bit(200,205);
+	bbsp.print();
 	bbsp.erase_bit(67, 69);	
 	bbsp.print();
 	EXPECT_EQ(11, bbsp.popcn64());
