@@ -333,8 +333,8 @@ BitSetSp&	set_bit					(int firstBit, int lastBit);
 	*		II. Should have the same expected maximum population size 
 	*		
 	* @details  Equivalent to OR operation / set union
-	* @details  Allocates memory for THIS the size of bitset
-	* @returns reference to the modified bitstring
+	* @details  Does not use iterators - not necessary to allocate memory a priori
+	* @returns  reference to the modified bitstring
 	**/		
 BitSetSp&    set_bit				(const BitSetSp& bitset);											
 

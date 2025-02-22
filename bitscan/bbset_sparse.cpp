@@ -127,10 +127,6 @@ BitSetSp& BitSetSp::set_bit(int firstBit, int lastBit)
 	assert(firstBit >= 0 && firstBit <= lastBit && bbh<nBB_ );
 	////////////////////////////////////////////////////////
 
-	////////////////////////////////////////////////
-	vBB_.reserve(vBB_.size() + (bbh - bbl + 1));	
-	////////////////////////////////////////////////
-
 	const auto SIZE_INIT = vBB_.size();			//stores the original size of *this since it will be enlarged
 	auto offsetl = firstBit - WMUL(bbl);			//offset in the lower block
 	auto offseth = lastBit - WMUL(bbh);			//offset in the upper block
@@ -139,7 +135,8 @@ BitSetSp& BitSetSp::set_bit(int firstBit, int lastBit)
 	//finds position of block closest to blockID (equal or greater index)
 	auto posTHIS = 0;							//block position *this	
 	auto itbl = find_block(bbl, posTHIS);
-	
+			
+
 	/////////////////////
 	// ALGORITHM 	 
 	// 1) special case: all existing blocks are outside the range
@@ -318,21 +315,24 @@ BitSetSp& BitSetSp::set_bit (const BitSetSp& rhs){
 	}
 	
 	//avoid reallocation when blocks are added and lose the iterator (MUST BE!)
-	vBB_.reserve( vBB_.size() + rhs.vBB_.size() );
+	//vBB_.reserve( vBB_.size() + rhs.vBB_.size() );
 
 	///////////////////////////////////	
 	auto rIt = rhs.vBB_.cbegin();
 	auto lIt = vBB_.begin();
 	auto req_sorting = false;
 	///////////////////////////////////
+
+	const auto SIZE_INIT = vBB_.size();			//stores the original size of *this since it will be enlarged
+	auto posL = 0;
 	
 	//MAIN LOOP
-	while(lIt!=vBB_.end() && rIt != rhs.vBB_.end()) {
+	while(lIt != vBB_.end() && rIt != rhs.vBB_.end()) {
 		
 		if (lIt->idx_ < rIt->idx_) {
 			++lIt;
 		}
-		else if (rIt->idx_ < lIt->idx_) {
+		else if (lIt->idx_ > rIt->idx_) {
 
 			vBB_.push_back(*rIt);					
 			req_sorting = true;
