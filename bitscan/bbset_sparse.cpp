@@ -572,31 +572,28 @@ return 0;
 
 BitSetSp&  BitSetSp::erase_bit (const BitSetSp& rhs ){
 
-	auto posTHIS = 0;		//block position *this
-	auto posR = 0;			//block position rhs	
+	auto itTHIS = vBB_.begin();		//iterator to *this
+	auto itR = rhs.vBB_.cbegin();	//iterator to rhs
 	
-	while ( posTHIS< vBB_.size() && posR < vBB_.size() ) {
-		
+	
+	while (itTHIS != vBB_.end() && itR != rhs.vBB_.end()) {
+				
 		//update before either of the bitstrings has reached its end
-		if (vBB_[posTHIS].idx_ < rhs.vBB_[posR].idx_)
+		if (itTHIS->idx_ < itR->idx_)
 		{
-			++posTHIS;
-			}
-		else if (vBB_[posTHIS].idx_ > rhs.vBB_[posR].idx_)
+			++itTHIS;
+		}
+		else if (itTHIS->idx_ > itR->idx_)
 		{
-			++posR;
+			++itR;
 		}
 		else{
 
-			//equal indexes
-
-			/////////////////////////////////////
-			vBB_[posTHIS].bb_ &= ~rhs.vBB_[posR].bb_;
-			/////////////////////////////////////
-
-			++posTHIS;
-			++posR;
-
+			//equal indexes - erase bits
+			itTHIS->bb_ &= ~itR->bb_;
+			
+			++itTHIS;
+			++itR;
 		}
 	}
 

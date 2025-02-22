@@ -373,6 +373,8 @@ BitSetSp& erase_bit					(int firstBit, int lastBit);
 	 *			the iterator to the block with the closest greater index than the bit (can be END).
 	 * @details oriented to basic bitscanning
 	 * @details: zero blocks are not removed
+	 * 
+	 * TODO -  improve or remove (19/02/2025)
 	 **/
 inline	vPB_it  erase_bit			(int bit, vPB_it from_it);
 
@@ -655,18 +657,15 @@ BitSetSp& BitSetSp::erase_bit (int bit){
 
 BitSetSp::vPB_it  BitSetSp::erase_bit (int bit, BitSetSp::vPB_it from_it){
 	
-	int blockID = WDIV(bit);
+	int bb = WDIV(bit);
 		
 	//iterator to the block of the bit if it exists or the closest non-empty block with greater index
-	auto it=lower_bound(from_it, vBB_.end(), pBlock_t(blockID), pBlock_less());
+	auto it = lower_bound (from_it, vBB_.end(), pBlock_t(bb), pBlock_less());
 
-	if(it != vBB_.end()){
-	
-		if (it->idx_ == blockID) {
+	if(it != vBB_.end() && it->idx_ == bb ){	
 
-			//if element exists already
-			it->bb_ &= ~Tables::mask[bit - WMUL(blockID) /* WMOD(bit) */];
-		}
+		//erase bit if the block exists
+		it->bb_ &= ~bblock::MASK_BIT(bit - WMUL(bb) /* WMOD(bit) */);		
 	}
 
 	return it;
@@ -1217,6 +1216,10 @@ BitSetSp& BitSetSp::erase_bit (int firstBit, int lastBit){
 	
 	auto bbh = WDIV(lastBit);
 	auto bbl = WDIV(firstBit);
+
+	/////////////////////////
+	assert(bbh < capacity());
+	/////////////////////////
 
 	auto offsetl = firstBit - WMUL(bbl);
 	auto offseth = lastBit  - WMUL(bbh);
