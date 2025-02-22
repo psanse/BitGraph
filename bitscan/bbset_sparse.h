@@ -1208,7 +1208,6 @@ BitSetSp& BitSetSp::erase_block(int firstBlock, const BitSetSp& rhs) {
 	return *this;
 }
 
-
 inline
 BitSetSp& BitSetSp::erase_bit (int firstBit, int lastBit){
 
@@ -1216,11 +1215,11 @@ BitSetSp& BitSetSp::erase_bit (int firstBit, int lastBit){
 	assert(firstBit >= 0 && firstBit <= lastBit);
 	//////////////////////////////////////////////
 	
-	int	bbh = WDIV(lastBit);
-	int bbl = WDIV(firstBit);
+	auto bbh = WDIV(lastBit);
+	auto bbl = WDIV(firstBit);
 
-	int offsetl = firstBit - WMUL(bbl);
-	int offseth = lastBit  - WMUL(bbh);
+	auto offsetl = firstBit - WMUL(bbl);
+	auto offseth = lastBit  - WMUL(bbh);
 
 	//determines the block in bbl or the closest one with greater index 
 	auto it = lower_bound( vBB_.begin(), vBB_.end(), pBlock_t(bbl), pBlock_less() );
@@ -1244,7 +1243,7 @@ BitSetSp& BitSetSp::erase_bit (int firstBit, int lastBit){
 		}
 
 		//update lower block
-		it->bb_ &= bblock::MASK_0_HIGH(firstBit - WMUL(bbl));
+		it->bb_ &= bblock::MASK_0_HIGH(offsetl);
 
 		//next block for processing
 		++it;
@@ -1266,7 +1265,7 @@ BitSetSp& BitSetSp::erase_bit (int firstBit, int lastBit){
 				}
 				else {
 					//add last block and trim
-					it->bb_ &= bblock::MASK_0_LOW(lastBit - WMUL(bbh));
+					it->bb_ &= bblock::MASK_0_LOW(offseth);
 				}
 
 			}
