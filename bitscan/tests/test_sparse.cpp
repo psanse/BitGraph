@@ -968,19 +968,19 @@ TEST(Sparse, copy_up_to_some_bit) {
 	bbsp.set_bit(9000);
 	bbsp.set_bit(9999);
 	
-	bbcopy.reset_bit(126, bbsp);
+	bbcopy.reset_bit(0, 126, bbsp);
 	EXPECT_EQ(4, bbcopy.popcn64());
 	EXPECT_TRUE(bbcopy.is_bit(126));
 
-	bbcopy.reset_bit(1000, bbsp);
+	bbcopy.reset_bit(0, 1000, bbsp);
 	EXPECT_EQ(6, bbcopy.popcn64());
 	EXPECT_TRUE(bbcopy.is_bit(1000));
 
-	bbcopy.reset_bit(9000, bbsp);
+	bbcopy.reset_bit(0, 9000, bbsp);
 	EXPECT_EQ(7, bbcopy.popcn64());
 	EXPECT_TRUE(bbcopy.is_bit(9000));
 
-	bbcopy.reset_bit(9999, bbsp);
+	bbcopy.reset_bit(0, 9999, bbsp);
 	EXPECT_TRUE(bbcopy==bbsp);
 }
 
@@ -1037,6 +1037,7 @@ TEST(Sparse, copy_in_closed_range_special_cases){
 	bbsp.set_bit(64);
 
 	bbcopy.reset_bit(0, 51, bbsp);
+	bbcopy.print();
 	EXPECT_EQ(0, bbcopy.popcn64());
 
 	bbcopy.reset(120);

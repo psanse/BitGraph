@@ -273,39 +273,34 @@ BitSetSp& BitSetSp::set_bit(int firstBit, int lastBit)
 	return *this;
 }
 
-void BitSetSp::reset_bit(int firstBit, int lastBit){
+BitSetSp& BitSetSp::reset_bit(int firstBit, int lastBit){
 
-	int	bbh = WDIV(lastBit);
-	int bbl = WDIV(firstBit);
+	auto bbh = WDIV(lastBit);
+	auto bbl = WDIV(firstBit);
 
 	///////////////////////////////// 
-	assert(bbh < nBB_ && bbl >= 0);
+	assert(bbl >= 0 & bbh < nBB_);
 	/////////////////////////////////
 
 	vBB_.clear();
 	
 	//special case: same bitblock
-	if(bbh == bbl){
-	
+	if(bbh == bbl){	
 		vBB_.emplace_back( pBlock_t( bbl, bblock::MASK_1(firstBit - WMUL(bbl), lastBit - WMUL(bbh))));
-		
-		/////////
-		return;
-		/////////
+	}
+	else {
+
+		//first and last blocks
+		vBB_.emplace_back(pBlock_t(bbl, bblock::MASK_1_HIGH(firstBit - WMUL(bbl))));
+		vBB_.emplace_back(pBlock_t(bbh, bblock::MASK_1_LOW(lastBit - WMUL(bbh))));
+
+		//in-between blocks
+		for (auto block = bbl + 1; block < bbh; ++block) {
+			vBB_.emplace_back(pBlock_t(block, ONE));
+		}
 	}
 
-	//first block
-	vBB_.emplace_back(pBlock_t(bbl, bblock::MASK_1_HIGH(firstBit - WMUL(bbl))));
-
-	//in-between blocks
-	for(auto block = bbl + 1; block < bbh; ++block){
-		vBB_.emplace_back(pBlock_t(block,ONE));
-	}
-
-	//last block
-	//vBB_.push_back(pBlock_t(bbh, ~Tables::mask_high[lastBit - WMUL(bbh)]));
-	vBB_.emplace_back(pBlock_t(bbl, bblock::MASK_1_LOW(lastBit - WMUL(bbh))));
-
+	return *this;
 }
 
 BitSetSp& BitSetSp::set_bit (const BitSetSp& rhs){

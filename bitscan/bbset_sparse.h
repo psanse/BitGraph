@@ -277,13 +277,13 @@ virtual inline	 int popcn64		(int nBit)				const;
 	/**
 	* @brief resets the bitset to all 0-bits ans sets bit to 1
 	**/
-	void  reset_bit					(int bit);	
+BitSetSp&  reset_bit				(int bit);
 	
 	/**
 	* @brief resets the bitset to all 0-bits and then sets bit to 1 in the
 	*		 range [firstBit, lastBit]
 	**/
-	void   reset_bit				(int firstBit, int lastBit);	
+	BitSetSp&   reset_bit			(int firstBit, int lastBit);	
 
 	/**
 	* @brief resets the bitset to all 0-bits and then copies bitset in the
@@ -291,13 +291,15 @@ virtual inline	 int popcn64		(int nBit)				const;
 	* @details: more efficient than using the more general reset_bit in the
 	*			range [firstBit=0, lastBit]
 	**/
-	void   reset_bit				(int lastBit, const BitSetSp& bitset);	
+protected:
+	BitSetSp&   reset_bit			(int lastBit, const BitSetSp& bitset);	
 	
 	/**
 	* @brief resets the bitset to all 0-bits and then copies bitset in the
 	*		 closed range [firstBit, lastBit]
 	**/
-	void   reset_bit				(int firstBit, int lastBit, const BitSetSp& bitset);
+public:
+	BitSetSp&   reset_bit			(int firstBit, int lastBit, const BitSetSp& bitset);
 		
 	/**
 	* @brief Sets bit in the sparse bitset
@@ -701,13 +703,14 @@ BitSetSp& BitSetSp::set_bit (int bit ){
 }
 
 inline
-void BitSetSp::reset_bit (int bit){
+BitSetSp& BitSetSp::reset_bit (int bit){
 
 	vBB_.clear();
 
-	int blockID = WDIV(bit);		
-	vBB_.push_back(pBlock_t(blockID, Tables::mask[bit - blockID /*WMOD(bit)*/]));
+	auto bb = WDIV(bit);		
+	vBB_.push_back(pBlock_t(bb,  bblock::MASK_BIT(bit - WMUL(bb) /*WMOD(bit)*/)));
 
+	return *this;
 }	
 
 ///////////////////
@@ -1277,16 +1280,14 @@ BitSetSp& BitSetSp::erase_bit (int firstBit, int lastBit){
 		it->bb_ = ZERO;
 
 	}//end for - pBlock iterations
-
 	
-
 	return *this;
 }
 
 inline
-void BitSetSp::reset_bit (int lastBit, const BitSetSp& bitset){
+BitSetSp& BitSetSp::reset_bit (int lastBit, const BitSetSp& bitset){
 
-	int	bbh = WDIV(lastBit);
+	auto bbh = WDIV(lastBit);
 
 	////////////////////////
 	assert(bbh < nBB_);
@@ -1294,34 +1295,38 @@ void BitSetSp::reset_bit (int lastBit, const BitSetSp& bitset){
 
 	vBB_.clear();
 	
-	//finds block bbh, or closest to with higher index it in bitset
+	//finds block bbh, or closest with higher index than bbh in bitset
 	auto p = bitset.find_block_ext(bbh);
 
-	if(p.second == bitset.cend())
-		std::copy(bitset.cbegin(), bitset.cend(), insert_iterator<decltype(vBB_)> (vBB_, vBB_.begin()));
-	else{
-		if(p.first)
-		{ 
-			//bbh block exists - copies up to and excluding bbh
-			copy(bitset.cbegin(), p.second, insert_iterator<vPB>(vBB_,vBB_.begin()));
-			
-			//adds bbh block
+	//special case - no bits to set in the closed range
+	if (p.second != bitset.cend()) {
+
+		//copy up to and excluding bbh
+		std::copy(bitset.cbegin(), p.second, insert_iterator<vPB>(vBB_, vBB_.begin()));
+
+		//deal with last block bbh
+		if (p.first) {
 			vBB_.emplace_back(pBlock_t(bbh, p.second->bb_ & bblock::MASK_1_LOW(lastBit - WMUL(bbh))));
 
-
-		}else{
-			//bbh block does not exist - copies up to and including bbh
-			copy(bitset.cbegin(), ++p.second, insert_iterator<vPB>(vBB_,vBB_.begin()));
 		}
 	}
+		
+	return *this;
 }
 
 inline
-void  BitSetSp::reset_bit (int firstBit,  int lastBit,  const BitSetSp& bitset){
+BitSetSp&  BitSetSp::reset_bit (int firstBit,  int lastBit,  const BitSetSp& bitset){
 
-	int	bbl = WDIV(firstBit);
-	int	bbh = WDIV(lastBit);
+	//////////////////////////////
+	//special case - range starts from the beginning, called specialized case
+	if (firstBit == 0) {
+		return reset_bit(lastBit, bitset);	
+	}
+	///////////////////////////////
 
+	auto bbl = WDIV(firstBit);
+	auto bbh = WDIV(lastBit);
+	
 	////////////////////////////////////////////////////////////////////////////////////
 	assert( (bbl >= 0) && (bbl <= bbh) && (bbh < nBB_) && (bbh < bitset.capacity()) );
 	///////////////////////////////////////////////////////////////////////////////////
@@ -1331,50 +1336,49 @@ void  BitSetSp::reset_bit (int firstBit,  int lastBit,  const BitSetSp& bitset){
 	//finds bbl or closest block with greater indx
 	auto it = lower_bound(bitset.cbegin(), bitset.cend(), pBlock_t(bbl), pBlock_less());
 
-	if(it != bitset.cend())			//has 1-bit info to set
-	{
-		if(it->idx_ == bbl)			//lower block exists
-		{	
-			if(bbh == bbl)			//special case, the range is a singleton
-			{		
-				vBB_.emplace_back(pBlock_t( bbh, it->bb_ & bblock::MASK_1(firstBit - WMUL(bbl), lastBit - WMUL(bbh)) ));
-				
-				/////////
-				return;
-				/////////
-
-			}else{
-
-				//add lower block
-				vBB_.emplace_back(pBlock_t(bbl, it->bb_ & bblock::MASK_1_HIGH(firstBit - WMUL(bbl))));
-
-				//next block
-				++it;
-			}
-		} //end lower block exists in bitset
-
-
-		//copies blocks (bbl, bbh]
-		for(; it != bitset.cend(); ++it){
-			if(it->idx_ >= bbh)			//exit condition - last block of range
-			{		
-				if(it->idx_ == bbh){
-
-					//add and trim last block
-					vBB_.push_back(pBlock_t(bbh, it->bb_ & bblock::MASK_1_LOW(lastBit - WMUL(bbh))));
-
-				}
-
-				//////////
-				return;
-				//////////
-			}
-
-			//copies the element as is
-			vBB_.emplace_back(*it);
-		}
+	//special case - no bits to set in the closed range
+	if (it == bitset.cend()) {
+		return *this;
 	}
 
+	//first block exists
+	auto offsetl = firstBit - WMUL(bbl);
+	auto offseth = lastBit - WMUL(bbh);
+	if (it->idx_ == bbl)			
+	{
+		//special case, the range is a singleton, exit condition
+		if (bbh == bbl)			
+		{
+			vBB_.emplace_back(pBlock_t(bbl, it->bb_ & bblock::MASK_1(offsetl, offseth)));
+			
+			return *this;
+		}
+		else {
+
+			//add lower block
+			vBB_.emplace_back(pBlock_t(bbl, it->bb_ & bblock::MASK_1_HIGH(offsetl)));
+
+			//next block
+			++it;
+		}
+	} 
+
+	//main loop copies blocks (bbl, bbh]
+	//alternative implementation - find lower bound for bbh and copy (as in reset(lastBit))
+	while (it->idx_ < bbh && it != bitset.cend()) {
+		vBB_.emplace_back(*it);
+		++it;
+	}	
+
+	//upate due to bbh if it exists
+	if (it != bitset.cend() && it->idx_ == bbh) {
+
+		//add and trim last block
+		vBB_.push_back(pBlock_t(bbh, it->bb_ & bblock::MASK_1_LOW(offseth)));
+
+	}
+
+	return *this;
 }
 
 inline
