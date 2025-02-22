@@ -339,11 +339,12 @@ BitSetSp&	set_bit					(int firstBit, int lastBit);
 BitSetSp&    set_bit				(const BitSetSp& bitset);											
 
 	/**
-	* @brief Copies the bitset in the closed range [firstBlock, lastBlock] to *this
+	* @brief Adds 1-bits in bitset in the closed range [firstBlock, lastBlock] to *this
+	*		 (0 <= firstBlock <= lastBlock < the number of bitblocks in the bitset).
 	* @param bitset input bitstring to be copied
 	* @param firstBlock, lastBlock: input closed range of bitset
 	* @returns reference to the modified bitstring
-	* @details 0 <= firstBlock <= lastBlock < the number of bitblocks in the bitset
+	* @details  Does not use iterators - not necessary to allocate memory a priori
 	**/
 BitSetSp&  set_block				(int firstBlock, int lastBlock, const BitSetSp& bitset);
 

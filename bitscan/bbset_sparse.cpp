@@ -313,37 +313,32 @@ BitSetSp& BitSetSp::set_bit (const BitSetSp& rhs){
 	if (rhs.is_empty()) {
 		return *this;
 	}
-	
-	//avoid reallocation when blocks are added and lose the iterator (MUST BE!)
-	//vBB_.reserve( vBB_.size() + rhs.vBB_.size() );
 
 	///////////////////////////////////	
-	auto rIt = rhs.vBB_.cbegin();
-	auto lIt = vBB_.begin();
-	auto req_sorting = false;
-	///////////////////////////////////
-
+	auto rIt = rhs.vBB_.cbegin();				//iterator to rhs	
 	const auto SIZE_INIT = vBB_.size();			//stores the original size of *this since it will be enlarged
-	auto posL = 0;
-	
-	//MAIN LOOP
-	while(lIt != vBB_.end() && rIt != rhs.vBB_.end()) {
+	auto posL = 0;								//position of bitblocks in  *this
+	auto flag_sort = false;
+	///////////////////////////////////
+			
+	//main loop
+	while( posL != SIZE_INIT && rIt != rhs.vBB_.end()) {
 		
-		if (lIt->idx_ < rIt->idx_) {
-			++lIt;
+		if (vBB_[posL].idx_ < rIt->idx_) {
+			++posL;
 		}
-		else if (lIt->idx_ > rIt->idx_) {
+		else if (vBB_[posL].idx_ > rIt->idx_) {
 
 			vBB_.push_back(*rIt);					
-			req_sorting = true;
+			flag_sort = true;
 			++rIt;
 		}
 		else {
 			/////////////////////////
-			lIt->bb_ |= rIt->bb_;
+			vBB_[posL].bb_ |= rIt->bb_;
 			////////////////////////
 
-			++lIt,
+			++posL,
 			++rIt;
 		}
 	}
@@ -351,14 +346,14 @@ BitSetSp& BitSetSp::set_bit (const BitSetSp& rhs){
 
 
 	//treatment for exit conditions
-	if (lIt == vBB_.end())			 //exit condition II
+	if (posL == SIZE_INIT)			 //exit condition II
 	{
 		//append blocks at the end
 		vBB_.insert(vBB_.end(), rIt, rhs.vBB_.end());
 	}
 
 	//always keep array sorted
-	if (req_sorting) {
+	if (flag_sort) {
 		std::sort(vBB_.begin(), vBB_.end(), pBlock_less());
 	}
 
