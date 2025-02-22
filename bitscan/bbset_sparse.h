@@ -338,7 +338,8 @@ BitSetSp&	set_bit					(int firstBit, int lastBit);
 	* @details  Does not use iterators - not necessary to allocate memory a priori
 	* @returns  reference to the modified bitstring
 	**/		
-BitSetSp&    set_bit				(const BitSetSp& bitset);											
+BitSetSp&   set_bit					(const BitSetSp& bitset);	
+BitSetSp&	set_bit					(int firstBit, int lastBit, const BitSetSp& bitset) = delete;  //TODO
 
 	/**
 	* @brief Adds 1-bits in bitset in the closed range [firstBlock, lastBlock] to *this
@@ -348,7 +349,7 @@ BitSetSp&    set_bit				(const BitSetSp& bitset);
 	* @returns reference to the modified bitstring
 	* @details  Does not use iterators - not necessary to allocate memory a priori
 	* 
-	* TODO - optimize to avoid repeated binary searches for first and last blocks in bitset
+	* TODO - optimize to avoid repeated binary searches for first and last blocks in bitset (19/02/2025)
 	**/
 BitSetSp&  set_block				(int firstBlock, int lastBlock, const BitSetSp& bitset);
 
