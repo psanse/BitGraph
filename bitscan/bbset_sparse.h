@@ -347,9 +347,7 @@ BitSetSp&	set_bit					(int firstBit, int lastBit, const BitSetSp& bitset) = dele
 	* @param bitset input bitstring to be copied
 	* @param firstBlock, lastBlock: input closed range of bitset
 	* @returns reference to the modified bitstring
-	* @details  Does not use iterators - not necessary to allocate memory a priori
-	* 
-	* TODO - optimize to avoid repeated binary searches for first and last blocks in bitset (19/02/2025)
+	* @details Does not require to allocate memory a priori
 	**/
 BitSetSp&  set_block				(int firstBlock, int lastBlock, const BitSetSp& bitset);
 

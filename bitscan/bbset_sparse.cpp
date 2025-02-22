@@ -369,15 +369,12 @@ BitSetSp&  BitSetSp::set_block (int firstBlock, int lastBlock, const BitSetSp& r
 	//this		
 	auto posTHIS = BBObject::noBit;										//position of bitblocks in  *this
 	auto itTHIS = find_block(firstBlock, posTHIS);						//O(log n)
+	(itTHIS != vBB_.end()) ? posTHIS = itTHIS - vBB_.begin() : 1;		//sets posTHIS to itTHIS position
 	const auto SIZE_INIT = vBB_.size();									//stores the original size of *this since it will be enlarged
-
-	//sets posTHIS to itTHIS position
-	(itTHIS != vBB_.end())? posTHIS = itTHIS - vBB_.begin() : 1;
 
 	//rhs
 	auto prLOW = rhs.find_block_ext(firstBlock);			//O(log n)
-	auto prHIGH = rhs.find_block_ext(lastBlock);			//O(log n) - TODO : optimize to avoid double search
-	
+
 	//flag to sort the collection
 	bool flag_sort = false;
 
@@ -386,15 +383,13 @@ BitSetSp&  BitSetSp::set_block (int firstBlock, int lastBlock, const BitSetSp& r
 		return *this;
 	}
 
-	//iterator to the last block + 1 in the rhs
-	const auto rIT_END = (prHIGH.first)? prHIGH.second + 1 : prHIGH.second;			
-
 	//special case  - this bitset has no information to mask in the range
 	if (itTHIS == vBB_.end())
 	{
 		//append rhs at the end
-		vBB_.insert(vBB_.end(), prLOW.second, rIT_END);
-
+		for (; prLOW.second != rhs.vBB_.end() && prLOW.second->idx_ <= lastBlock; ++prLOW.second) {
+			vBB_.emplace_back(*prLOW.second);
+		}
 		return *this;
 	}
 
@@ -428,18 +423,22 @@ BitSetSp&  BitSetSp::set_block (int firstBlock, int lastBlock, const BitSetSp& r
 	
 	}while( posTHIS < SIZE_INIT				&&
 			vBB_[posTHIS].idx_ <= lastBlock	&&
-			(prLOW.second != rIT_END)			);
+			prLOW.second != rhs.vBB_.end()  &&
+			prLOW.second->idx_ <= lastBlock		);
 	
 	
 	//exit conditions   
 	if (posTHIS == SIZE_INIT || vBB_[posTHIS].idx_ > lastBlock)
 	{
 		//add remaining blocks in rhs to *this
-		///////////////////////////////////////////////
-		vBB_.insert(vBB_.end(), prLOW.second, rIT_END);
-		/////////////////////////////////////////////////
+		for (; prLOW.second != rhs.vBB_.end() && prLOW.second->idx_ <= lastBlock; ++prLOW.second) {
+			vBB_.emplace_back(*prLOW.second);
+		}	
 
-		flag_sort = true;
+		if (vBB_[posTHIS].idx_ > lastBlock) {
+			flag_sort = true;
+		}	
+		
 	}
 
 	//sort if required
