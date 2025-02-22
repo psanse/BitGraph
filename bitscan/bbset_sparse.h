@@ -409,7 +409,7 @@ BitSetSp& erase_bit					(const BitSetSp& bitset);
 	* @brief erase operation which effectively removes the zero blocks
 	* @details EXPERIMENTAL - does not look efficient, 
 	* 
-	* TODO - refactor, actually used elsewhere in the code. CHECK!! (19/02/2025)
+	* TODO - refactor, actually used elsewhere in GRAPH. CHECK!! (19/02/2025)
 	**/
 	int	  clear_bit					(int firstBit, int lastBit);											
 		
@@ -475,7 +475,7 @@ BitSetSp& operator ^=				(const BitSetSp& bitset) ;
 BitSetSp& AND_block					(int firstBlock, const BitSetSp& bitset);
 
 	/////////////////////////
-	//TODO - (19/02/2025
+	//TODO - (19/02/2025)
 
 BitSetSp& AND_block					(int firstBlock, int lastBlock, const BitSetSp& bitset) = delete;
 
@@ -510,7 +510,7 @@ BitSetSp& AND_block					(int firstBlock, int lastBlock, const BitSetSp& bitset) 
 /////////////////////
 //Conversions		
 // 		
-	string to_string				();													//TODO - operator string ();
+	string to_string				();													//TODO implement - cast operator;
 	void to_vector					(std::vector<int>& )	const;
 
 /////////////////////
