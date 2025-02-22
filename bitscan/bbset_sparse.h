@@ -304,11 +304,12 @@ public:
 	/**
 	* @brief Sets bit in the sparse bitset
 	*		 Bits outside the capacity of the bitset are ignored (feature)
-	* @param  bit: position of the bit to set
+	* @param bit: position of the bit to set
 	* @returns 0 if the bit was set, -1 if error
 	* @details emplaces pBlock in the bitstring or changes an existing bitblock
-	* @detials uses lower_bound for insertion (log overhead)
-	* @details uses internal assert macro for error checking
+	* @detials O (log n) to determine if the block constaining firstBit is present
+	* @details O (log n) to insert the new block according to index 
+	*		   ( + n potential shifts since it is a vector) 
 	**/
 inline	BitSetSp& set_bit			(int bit);
 
@@ -317,10 +318,10 @@ inline	BitSetSp& set_bit			(int bit);
 	* @params firstBit, lastBit: range
 	* @returns 0 if the bits were set, -1 if error
 	* @details only one binary search is performed for the lower block
-	* @details  I.  O(n) operation to update/add blocks, where n is the number of bitblocks in the closed range
-	* @details  II. O(log n) operation for the binary search to determine the closest lower block to 
+	* @details  I.  O(n)  to update/add blocks, where n = lastBit - firstBit
+	* @details  II. O(log n) to determine the closest block to 
 	*				the first block of the range
-	* @details  III.O(n log n) operation for sorting if required
+	* @details  III.O(n log n) average case for sorting (if required)
 	**/
 BitSetSp&	set_bit					(int firstBit, int lastBit);
 
@@ -670,35 +671,30 @@ BitSetSp::vPB_it  BitSetSp::erase_bit (int bit, BitSetSp::vPB_it from_it){
 inline
 BitSetSp& BitSetSp::set_bit (int bit ){
 
-	int block = WDIV(bit);
-			
-	//////////////////////////
-	if (block >= nBB_) {
-		LOGG_ERROR("attempted to set a bit: ", bit, "out of range - BitSetSp::set_bit ");
-		return *this;
-	}
-	//////////////////////////
-		
-	//ordered insertion - lower_bound implementation which returns the first element NOT LESS than block
-	vPB_it it = std::lower_bound (vBB_.begin(), vBB_.end(), pBlock_t(block), pBlock_less());
-	if(it != vBB_.end()){
-				
-		if (it->idx_ == block) {
+	auto bb = WDIV(bit);
 
-			//check if the element exists already
-			it->bb_ |= bblock::MASK_BIT(bit - WMUL(block) /* WMOD(bit) */);
+	//////////////////////
+	assert(bb < nBB_);
+	//////////////////////
+			
+	//find closest block to bb in THIS
+	auto pB = find_block_ext(bb);
+	
+	if (pB.first) {
+		//bb exists - overwrite
+		pB.second->bb_ |= bblock::MASK_BIT(bit - WMUL(bb) /* WMOD(bit) */);
+	}
+	else {
+		if (pB.second == vBB_.end()) {
+			//there are not blocks with higher index
+			vBB_.emplace_back(pBlock_t(bb, bblock::MASK_BIT(bit - WMUL(bb) /* WMOD(bit) */)));
 		}
 		else {
-
-			//inserts new pBlock BEFORE iterator
-			vBB_.insert(it, pBlock_t(block, Tables::mask[bit - WMUL(block) /* WMOD(bit) */]));
+			//there are blocks with higher index, insert to avoid sorting
+			vBB_.insert(pB.second, pBlock_t(bb, bblock::MASK_BIT(bit - WMUL(bb) /* WMOD(bit) */)));
 		}
-	
-	}else{
-		//insertion at the end
-		vBB_.emplace_back(pBlock_t(block,Tables::mask[bit - WMUL(block) /* WMOD(bit) */]));
 	}
-	
+
 	return *this;  
 }
 

@@ -34,24 +34,20 @@ protected:
 
 TEST(Sparse, construction_basic){
 
-	BitSetSp bbsp;
-	bbsp.init(1000);
-
+	BitSetSp bbsp(1000);
+	
 	bbsp.set_bit(500);
 	bbsp.set_bit(700);
 	bbsp.set_bit(900);
-	
-	//////////////////////
-	bbsp.set_bit(1100);								//outside popsize range, not added
-	EXPECT_FALSE(bbsp.is_bit(1100));;
-	//////////////////////
 
-	EXPECT_EQ(3, bbsp.popcn64());							//bbsp = {500, 700, 900}
+	EXPECT_EQ(3, bbsp.size());						//bbsp = {500, 700, 900}
+	EXPECT_TRUE(bbsp.is_bit(500));
+	EXPECT_TRUE(bbsp.is_bit(700));
+	EXPECT_TRUE(bbsp.is_bit(900));
 
 	bbsp.init(100000);
 	bbsp.set_bit(10);
 	EXPECT_TRUE(bbsp.is_bit(10));
-
 }
 
 TEST(Sparse, construction_from_vector) {
