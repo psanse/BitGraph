@@ -348,7 +348,7 @@ BitSetSp& BitSetSp::set_bit (const BitSetSp& rhs){
 	//treatment for exit conditions
 	if (posL == SIZE_INIT)			 //exit condition II
 	{
-		//append blocks at the end
+		//append rhs blocks at the end
 		vBB_.insert(vBB_.end(), rIt, rhs.vBB_.end());
 	}
 
@@ -360,37 +360,40 @@ BitSetSp& BitSetSp::set_bit (const BitSetSp& rhs){
 	return *this;		
 }
 
-
-
 BitSetSp&  BitSetSp::set_block (int firstBlock, int lastBlock, const BitSetSp& rhs){
 	
 	//////////////////////////////////////////////////////////////////////////////////
 	assert(firstBlock >= 0 && firstBlock <= lastBlock && lastBlock < rhs.capacity());
 	//////////////////////////////////////////////////////////////////////////////////
 	
-	/////////////////////////////////////////
-	vBB_.reserve(vBB_.size() + rhs.size());								//avoids reallocation - MUST BE PLACED HERE!
-	//////////////////////////////////////////
+	//this		
+	auto posTHIS = BBObject::noBit;										//position of bitblocks in  *this
+	auto itTHIS = find_block(firstBlock, posTHIS);						//O(log n)
+	const auto SIZE_INIT = vBB_.size();									//stores the original size of *this since it will be enlarged
 
-	auto p1i = find_block_ext(firstBlock);				//O(log n)
-	auto p2i = rhs.find_block_ext(firstBlock);			//O(log n)
-	auto p2f = rhs.find_block_ext(lastBlock);			//O(log n)
-	bool req_sorting = false;
+	//sets posTHIS to itTHIS position
+	(itTHIS != vBB_.end())? posTHIS = itTHIS - vBB_.begin() : 1;
 
+	//rhs
+	auto prLOW = rhs.find_block_ext(firstBlock);			//O(log n)
+	auto prHIGH = rhs.find_block_ext(lastBlock);			//O(log n) - TODO : optimize to avoid double search
+	
+	//flag to sort the collection
+	bool flag_sort = false;
 
 	//special case - bitset rhs has no information in the range
-	if( p2i.second == rhs.vBB_.end()){ 
+	if( prLOW.second == rhs.vBB_.end()){ 
 		return *this;
 	}
 
 	//iterator to the last block + 1 in the rhs
-	auto p2it_end = (p2f.first)? p2f.second + 1 : p2f.second;			
+	const auto rIT_END = (prHIGH.first)? prHIGH.second + 1 : prHIGH.second;			
 
 	//special case  - this bitset has no information to mask in the range
-	if (p1i.second == vBB_.end())
+	if (itTHIS == vBB_.end())
 	{
 		//append rhs at the end
-		vBB_.insert(vBB_.end(), p2i.second, p2it_end);
+		vBB_.insert(vBB_.end(), prLOW.second, rIT_END);
 
 		return *this;
 	}
@@ -398,46 +401,49 @@ BitSetSp&  BitSetSp::set_block (int firstBlock, int lastBlock, const BitSetSp& r
 	//MAIN LOOP - blocks overlap in the range
 	do{
 		//update before either of the bitstrings has reached its end
-		if(p1i.second->idx_ < p2i.second->idx_)
+		if(vBB_[posTHIS].idx_ < prLOW.second->idx_)
 		{
-			++p1i.second;
+			++posTHIS;
 		}
-		else if (p1i.second->idx_ > p2i.second->idx_)
+		else if (vBB_[posTHIS].idx_ > prLOW.second->idx_)
 		{
-			vBB_.emplace_back(*p2i.second);		 //	if realloc is possible vapp.push_back(*p2i.second);
+			///////////////////////////////////
+			vBB_.emplace_back(*prLOW.second);	
+			//////////////////////////////////
 
-			++p2i.second;
+			++prLOW.second;
 
 			//sorting is necessary since the block added has less index
-			req_sorting = true;
+			flag_sort = true;
 		}
 		else {			//must have same indexes		
 
 			//////////////////////////////////////
-			p1i.second->bb_ |= p2i.second->bb_;
+			vBB_[posTHIS].bb_ |= prLOW.second->bb_;
 			//////////////////////////////////////
 
-			++p1i.second;
-			++p2i.second;
+			++posTHIS;
+			++prLOW.second;
 		}
 	
-	}while( p1i.second < vBB_.end()			&& 
-			p1i.second->idx_ <= lastBlock	&& 
-			(p2i.second != p2it_end)			);
+	}while( posTHIS < SIZE_INIT				&&
+			vBB_[posTHIS].idx_ <= lastBlock	&&
+			(prLOW.second != rIT_END)			);
 	
 	
 	//exit conditions   
-	if (p1i.second == vBB_.end() || p1i.second->idx_ > lastBlock)
+	if (posTHIS == SIZE_INIT || vBB_[posTHIS].idx_ > lastBlock)
 	{
-		//add remaining blocks to *this
-		vBB_.insert(vBB_.end(), p2i.second, (p2f.first) ? p2f.second + 1 : p2f.second);
+		//add remaining blocks in rhs to *this
+		///////////////////////////////////////////////
+		vBB_.insert(vBB_.end(), prLOW.second, rIT_END);
+		/////////////////////////////////////////////////
 
-		req_sorting = true;
+		flag_sort = true;
 	}
 
-
 	//sort if required
-	if (req_sorting) {
+	if (flag_sort) {
 		std::sort(vBB_.begin(), vBB_.end(), pBlock_less());
 
 	}
@@ -447,18 +453,18 @@ BitSetSp&  BitSetSp::set_block (int firstBlock, int lastBlock, const BitSetSp& r
 
 int BitSetSp::clear_bit (int low, int high){
 	
-	int bbl=EMPTY_ELEM, bbh=EMPTY_ELEM; 
+	int bbl = EMPTY_ELEM, bbh = EMPTY_ELEM; 
 	pair<bool, BitSetSp::vPB_it> pl;
 	pair<bool, BitSetSp::vPB_it> ph;
 
 ////////////////////////
 //special cases
-	if(high==EMPTY_ELEM && low==EMPTY_ELEM){
+	if(high == EMPTY_ELEM && low == EMPTY_ELEM){
 		vBB_.clear();
 		return 0;
 	}
 
-	if(high==EMPTY_ELEM){
+	if(high == EMPTY_ELEM){
 		bbl=WDIV(low);
 		pl = find_block_ext(bbl);
 		if(pl.second==vBB_.end()) return 0;
@@ -471,7 +477,7 @@ int BitSetSp::clear_bit (int low, int high){
 		//remaining
 		vBB_.erase(pl.second, vBB_.end());
 		return 0;
-	}else if(low==EMPTY_ELEM){
+	}else if(low == EMPTY_ELEM){
 		bbh=WDIV(high); 
 		ph=find_block_ext(bbh);
 		if(ph.first){	//upper block exists

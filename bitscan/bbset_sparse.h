@@ -190,8 +190,10 @@ explicit BitSetSp					(int nPop, bool is_popsize = true );
 	/**
 	* @brief finds the bitblock given its block index blockID and its position in the collection
 	* @param blockID: index of the block
-	* @param pos: output position of the block in the collection
-	* @returns bitblock of the block index or BBOjbect::noBit if it does not exist, i.e., it is empty
+	* @param pos: OUTPUT position of the block in the collection with index BlockID, 
+	*			  or BBObject::noBit if it does not exist
+	* @returns: iterator to the closest bitblock with index greater or equal to blocKID
+	*			or END() if the block does not exist
 	* @details O(log) complexity
 	* @details two implementations, read only and read-write
 	**/
@@ -327,7 +329,7 @@ BitSetSp&	set_bit					(int firstBit, int lastBit);
 
 	/**
 	* @brief Adds the bits from the bitstring bitset in the population
-	*		 range of *THIS (bitblocks are copied).
+	*		 range of *THIS (bitblocks are copied). 
 	*
 	*		 I. Both bitsets MUST have the SAME capacity (number of blocks).
 	*		II. Should have the same expected maximum population size 
@@ -345,6 +347,8 @@ BitSetSp&    set_bit				(const BitSetSp& bitset);
 	* @param firstBlock, lastBlock: input closed range of bitset
 	* @returns reference to the modified bitstring
 	* @details  Does not use iterators - not necessary to allocate memory a priori
+	* 
+	* TODO - optimize to avoid repeated binary searches for first and last blocks in bitset
 	**/
 BitSetSp&  set_block				(int firstBlock, int lastBlock, const BitSetSp& bitset);
 
