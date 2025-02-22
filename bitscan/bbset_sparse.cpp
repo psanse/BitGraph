@@ -366,14 +366,18 @@ BitSetSp&  BitSetSp::set_block (int firstBlock, int lastBlock, const BitSetSp& r
 	assert(firstBlock >= 0 && firstBlock <= lastBlock && lastBlock < rhs.capacity());
 	//////////////////////////////////////////////////////////////////////////////////
 	
+	///////////
 	//this		
 	auto posTHIS = BBObject::noBit;										//position of bitblocks in  *this
 	auto itTHIS = find_block(firstBlock, posTHIS);						//O(log n)
 	(itTHIS != vBB_.end()) ? posTHIS = itTHIS - vBB_.begin() : 1;		//sets posTHIS to itTHIS position
-	const auto SIZE_INIT = vBB_.size();									//stores the original size of *this since it will be enlarged
+	
+	//stores the original size of THIS since it can be enlarged
+	const auto SIZE_INIT = vBB_.size();									
 
+	///////////
 	//rhs
-	auto prLOW = rhs.find_block_ext(firstBlock);			//O(log n)
+	auto prLOW = rhs.find_block_ext(firstBlock);						//O(log n)
 
 	//flag to sort the collection
 	bool flag_sort = false;
@@ -393,8 +397,33 @@ BitSetSp&  BitSetSp::set_block (int firstBlock, int lastBlock, const BitSetSp& r
 		return *this;
 	}
 
-	//MAIN LOOP - blocks overlap in the range
-	do{
+	//special case first block = last block and the block exists in rhs
+	if (firstBlock == lastBlock && prLOW.second->idx_ == firstBlock) {
+		if (itTHIS->idx_ != firstBlock) {
+
+			//block does not exist in THIS, add and sort
+			vBB_.emplace_back(*prLOW.second);
+			///////////////////////////////////
+
+			//necessary because itTHIS must have an index greatert than firstBlock
+			sort();			
+		}
+		else {
+
+			//block exists in THIS, overwrite
+			vBB_[posTHIS].bb_ |= prLOW.second->bb_;			
+		}			
+		return *this;
+	}	
+
+	///////////////////
+	//main loop
+	while (	posTHIS < SIZE_INIT				&&
+			vBB_[posTHIS].idx_ <= lastBlock &&
+			prLOW.second != rhs.vBB_.end()  &&
+			prLOW.second->idx_ <= lastBlock		)
+	{
+	
 		//update before either of the bitstrings has reached its end
 		if(vBB_[posTHIS].idx_ < prLOW.second->idx_)
 		{
@@ -419,14 +448,9 @@ BitSetSp&  BitSetSp::set_block (int firstBlock, int lastBlock, const BitSetSp& r
 
 			++posTHIS;
 			++prLOW.second;
-		}
-	
-	}while( posTHIS < SIZE_INIT				&&
-			vBB_[posTHIS].idx_ <= lastBlock	&&
-			prLOW.second != rhs.vBB_.end()  &&
-			prLOW.second->idx_ <= lastBlock		);
-	
-	
+		}	
+	}//end while
+		
 	//exit conditions   
 	if (posTHIS == SIZE_INIT || vBB_[posTHIS].idx_ > lastBlock)
 	{
