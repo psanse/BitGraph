@@ -339,7 +339,7 @@ BitSetSp&	set_bit					(int firstBit, int lastBit);
 	* @returns  reference to the modified bitstring
 	**/		
 BitSetSp&   set_bit					(const BitSetSp& bitset);	
-BitSetSp&	set_bit					(int firstBit, int lastBit, const BitSetSp& bitset) = delete;  //TODO
+BitSetSp&	set_bit					(int firstBit, int lastBit, const BitSetSp& bitset) = delete;	 //TODO
 
 	/**
 	* @brief Adds 1-bits in bitset in the closed range [firstBlock, lastBlock] to *this
@@ -639,15 +639,15 @@ return true;		//disjoint
 
 BitSetSp& BitSetSp::erase_bit (int bit){
 
-	int blockID = WDIV(bit);
+	auto bb = WDIV(bit);
 
 	//find closest block to blockID greater or equal
-	vPB_it it = lower_bound(vBB_.begin(), vBB_.end(), pBlock_t(blockID), pBlock_less());
+	auto it = lower_bound(vBB_.begin(), vBB_.end(), pBlock_t(bb), pBlock_less());
 
-	if(it!=vBB_.end() && it->idx_ == blockID){		
+	if(it!=vBB_.end() && it->idx_ == bb){
 
 		//removes the bit
-		it->bb_ &= ~bblock::MASK_BIT(bit - WMUL(blockID) /* WMOD(bit) */);			
+		it->bb_ &= ~bblock::MASK_BIT(bit - WMUL(bb) /* WMOD(bit) */);
 	}
 
 	return *this;

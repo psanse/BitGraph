@@ -366,7 +366,9 @@ BitSetSp&  BitSetSp::set_block (int firstBlock, int lastBlock, const BitSetSp& r
 	assert(firstBlock >= 0 && firstBlock <= lastBlock && lastBlock < rhs.capacity());
 	//////////////////////////////////////////////////////////////////////////////////
 	
-	///////////
+	////////////////////////
+	// Initialization
+
 	//this		
 	auto posTHIS = BBObject::noBit;										//position of bitblocks in  *this
 	auto itTHIS = find_block(firstBlock, posTHIS);						//O(log n)
@@ -382,12 +384,14 @@ BitSetSp&  BitSetSp::set_block (int firstBlock, int lastBlock, const BitSetSp& r
 	//flag to sort the collection
 	bool flag_sort = false;
 
-	//special case - bitset rhs has no information in the range
+	////////////////////////////////////////////
+
+	//I) special case - bitset rhs has no information in the range
 	if( prLOW.second == rhs.vBB_.end()){ 
 		return *this;
 	}
 
-	//special case  - this bitset has no information to mask in the range
+	//II) special case  - this bitset has no information to mask in the range
 	if (itTHIS == vBB_.end())
 	{
 		//append rhs at the end
@@ -397,7 +401,7 @@ BitSetSp&  BitSetSp::set_block (int firstBlock, int lastBlock, const BitSetSp& r
 		return *this;
 	}
 
-	//special case first block = last block and the block exists in rhs
+	//III) special case first block = last block and the block exists in rhs
 	if (firstBlock == lastBlock && prLOW.second->idx_ == firstBlock) {
 		if (itTHIS->idx_ != firstBlock) {
 
@@ -449,6 +453,7 @@ BitSetSp&  BitSetSp::set_block (int firstBlock, int lastBlock, const BitSetSp& r
 			++posTHIS;
 			++prLOW.second;
 		}	
+
 	}//end while
 		
 	//exit conditions   
