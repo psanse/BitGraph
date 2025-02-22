@@ -159,7 +159,7 @@ TEST(Sparse, member_masks) {
 	EXPECT_TRUE(lhs.popcn64()==1);
 	EXPECT_TRUE(lhs.is_bit(63));
 
-	lhs.OR_block(1,rhs);
+	lhs.set_block(1, -1 , rhs);
 	EXPECT_TRUE(lhs.is_bit(127));
 	EXPECT_EQ(2, lhs.popcn64());
 } 
@@ -427,7 +427,7 @@ TEST(Sparse, set_blocks) {
 	bbsp.set_block(2,INDEX_1TO0(5000), bbsp1);
 	EXPECT_TRUE(bbsp.is_bit(5000));
 
-	bbsp.erase_block(0, bbsp1);
+	bbsp.erase_block(0, -1,  bbsp1);
 	EXPECT_EQ(7, bbsp.popcn64());
 
 	//range
@@ -793,7 +793,7 @@ TEST(Sparse, OR_block) {
 
 	//OR
 	//////////////////
-	bbsp.OR_block(1, bbsp1);
+	bbsp.set_block(1, -1, bbsp1);
 	/////////////////
 	
 	EXPECT_EQ(4, bbsp.size());

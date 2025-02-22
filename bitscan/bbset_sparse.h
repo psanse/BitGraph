@@ -351,6 +351,16 @@ BitSetSp&	set_bit					(int firstBit, int lastBit, const BitSetSp& bitset) = dele
 	**/
 BitSetSp&  set_block				(int firstBlock, int lastBlock, const BitSetSp& bitset);
 
+protected:
+	/**
+	* @brief Bitwise OR operator with bitset in the semi open range [firstBlock, END)
+	* @details apply for set union
+	*
+	* TODO - rename to set_bit and call privately with set_bit(firstBit, -1, bb) (22/02/2025)
+	**/
+BitSetSp& set_block					(int firstBlock, const BitSetSp& bitset);
+
+public:
 	/**
 	* @brief sets bit to 0 in the bitstring
 	* @param  bit: position of the 1-bit to set (>=0)
@@ -399,21 +409,23 @@ BitSetSp& erase_bit					(const BitSetSp& bitset);
 	* @brief erase operation which effectively removes the zero blocks
 	* @details EXPERIMENTAL - does not look efficient, 
 	* 
-	* TODO - refactor, possibly REMOVE (19/02/2025)
+	* TODO - refactor, actually used elsewhere in the code. CHECK!! (19/02/2025)
 	**/
 	int	  clear_bit					(int firstBit, int lastBit);											
 		
 	/**
-	* @brief Deletes the 1-bits from the bitstring bb_del in the closed range [firstBlock, lastBlock]
-	*		 (set minus operation)
-	* @details:  0 <= firstBlock <= lastBlock < the number of bitblocks in the bitstring
+	* @brief Deletes the 1-bits from the bitstring bb_del in the closed range [firstBlock, lastBlock].
+	*		 If lastBlock == -1, the range is [firstBlock, END).
+	* @details:  0 <= firstBlock <= lastBlock < the number of bitblocks in the 
+	* @details:  Equivalent to a set minus operation
 	*
 	* @param firstBlock:, lastBlock: input closed range of bitset
 	* @param bitset: input bitstring whose 1-bits are to be removed from *this
 	* @returns reference to the modified bitstring
 	**/
 BitSetSp& erase_block				(int firstBlock, int lastBlock, const BitSetSp& bitset);
-	
+
+protected:
 	/**
 	* @brief Deletes the 1-bits from the bitstring bb_del in the SEMI_OPEN range [firstBlock, min{rhs.nBB_, *this->nBB_})
 	*		 (set minus operation)
@@ -425,11 +437,13 @@ BitSetSp& erase_block				(int firstBlock, int lastBlock, const BitSetSp& bitset)
 	**/
 BitSetSp&  erase_block				(int firstBlock, const BitSetSp& bitset );
 
+public:
 	/**
 	* @brief erase_block in the range [position of the block in the bitset, END)
 	* @details weird function, referring to the position in the bitset and not the
-	*		   block index. TO BE REMOVED (19/02/2025)
+	*		   block index. 
 	* 
+	* TODO - remove after checking calls  (22/02/2025)
 	**/
 BitSetSp& erase_block_pos			(int firstBlockPos, const BitSetSp& rhs) = delete;
 
@@ -460,19 +474,10 @@ BitSetSp& operator ^=				(const BitSetSp& bitset) ;
 	**/	
 BitSetSp& AND_block					(int firstBlock, const BitSetSp& bitset);
 
-	/**
-	* @brief Bitwise OR operator with bitset in the semi open range [firstBlock, END)
-	* @details apply for set union
-	**/
-BitSetSp& OR_block					(int firstBlock, const BitSetSp& bitset);
-
-
 	/////////////////////////
 	//TODO - (19/02/2025
 
-
 BitSetSp& AND_block					(int firstBlock, int lastBlock, const BitSetSp& bitset) = delete;
-BitSetSp& OR_block					(int firstBlock, int lastBlock, const BitSetSp& bitset) = delete;
 
 /////////////////////////////
 //Boolean functions
@@ -1085,7 +1090,7 @@ BitSetSp&  BitSetSp::AND_block(int firstBlock, const BitSetSp& rhs ){
 }
 
 inline
-BitSetSp&  BitSetSp::OR_block(int firstBlock, const BitSetSp& rhs ){
+BitSetSp&  BitSetSp::set_block(int firstBlock, const BitSetSp& rhs ){
 		
 	//determine the closes block to firstBlock
 	auto  pairTHIS = this->find_block_ext(firstBlock);		//*this
@@ -1136,16 +1141,23 @@ BitSetSp&  BitSetSp::OR_block(int firstBlock, const BitSetSp& rhs ){
 inline 
 BitSetSp& BitSetSp::erase_block(int firstBlock, int lastBlock, const BitSetSp& rhs)
 {
-	///////////////////////////////////////////////////////////////////////////////////////
-	assert((firstBlock >= 0) && (firstBlock <= lastBlock) && (lastBlock < rhs.capacity()));
-	/////////////////////////////////////////////////////////////////////////////////////////
+	//special case until the end of the bitset
+	if (lastBlock == -1) {
+		return erase_block(firstBlock, rhs);
+	}
+
+	//////////////////////////////////////////////////////////////////////////////////
+	assert(firstBlock >= 0 && firstBlock <= lastBlock && lastBlock < rhs.capacity());
+	//////////////////////////////////////////////////////////////////////////////////
 
 	//determine the closest block in the range for both bitstrings
 	auto pL = find_block_ext(firstBlock);
 	auto pR = rhs.find_block_ext(firstBlock);
 
-	while (	pL.second != vBB_.end()			&&	pR.second != rhs.vBB_.end()		&&
-			pL.second->idx_ <= lastBlock	&&	pR.second->idx_ <= lastBlock		)
+	while (	pL.second != vBB_.end()			&&	
+			pR.second != rhs.vBB_.end()		&&
+			pL.second->idx_ <= lastBlock	&&	
+			pR.second->idx_ <= lastBlock		)
 	{
 
 		//update before either of the bitstrings has reached its end
@@ -1181,7 +1193,9 @@ BitSetSp& BitSetSp::erase_block(int firstBlock, const BitSetSp& rhs) {
 	auto p2 = rhs.find_block_ext(firstBlock);
 
 	//iteration
-	while ( (p1.second != vBB_.end()) && (p2.second != rhs.vBB_.end()) ) {
+	while (  p1.second != vBB_.end()		&& 
+			 p2.second != rhs.vBB_.end()		) 
+	{
 		
 		//update before either of the bitstrings has reached its end
 		if (p1.second->idx_ < p2.second->idx_) 

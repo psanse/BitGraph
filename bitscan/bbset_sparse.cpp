@@ -361,11 +361,16 @@ BitSetSp& BitSetSp::set_bit (const BitSetSp& rhs){
 }
 
 BitSetSp&  BitSetSp::set_block (int firstBlock, int lastBlock, const BitSetSp& rhs){
-	
+			
+	//special case - the full range
+	if (lastBlock == -1) {
+		return set_block(firstBlock, rhs);
+	}
+
 	//////////////////////////////////////////////////////////////////////////////////
 	assert(firstBlock >= 0 && firstBlock <= lastBlock && lastBlock < rhs.capacity());
 	//////////////////////////////////////////////////////////////////////////////////
-	
+
 	////////////////////////
 	// Initialization
 
