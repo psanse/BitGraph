@@ -522,7 +522,16 @@ BitSetSp& AND_block					(int firstBlock, int lastBlock, const BitSetSp& bitset) 
 /////////////////////
 //I/O 
 
-	ostream& print					(ostream& = cout, bool show_pc = true, bool endl = true ) const override;
+	/**
+	* @brief streams bb and its size to @o  with format 
+	*		 [bit1 bit2 bit3 ... <(pc)>] - (if empty: [ ]) 
+	* @param o: output stream
+	* @param show_pc: if true, shows popcount
+	* @param endl: if true, adds a new line at the end
+	* @returns output stream
+	* @details uses basic bitscanning implementation to enumerate the bits
+	**/
+	ostream& print					(ostream& o = cout, bool show_pc = true, bool endl = true ) const override;
 
 /////////////////////
 //Conversions		

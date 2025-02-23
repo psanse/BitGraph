@@ -1035,25 +1035,28 @@ return res;
 ////////////////////////////
 
 ostream& BitSetSp::print (std::ostream& o, bool show_pc, bool endl ) const  {
-/////////////////////////
-// shows bit string as [bit1 bit2 bit3 ... <(pc)>]  (if empty: [ ]) (<pc> optional)
 	
-	o<<"[";
+	/////////////
+	o << '[';
+	/////////////
 		
-	int nBit=EMPTY_ELEM;
-	while(1){
-		nBit=next_bit(nBit);
-		if(nBit==EMPTY_ELEM) break;
-		o<<nBit<<" ";
+	int nBit = BBObject::noBit;
+	while( (nBit = next_bit(nBit)) != BBObject::noBit) {
+		o << nBit << ' ';
 	}
 
 	if(show_pc){
-		int pc=popcn64();
-		if(pc)	o<<"("<<popcn64()<<")";
+		int pc = popcn64();
+		if (pc) {
+			o << '(' << popcn64() << ')';
+		}
 	}
 	
-	o<<"]";
+	/////////////
+	o << ']';
+	//////////////
 
+	//add eol if requires
 	if (endl) {
 		o << std::endl;
 	}
