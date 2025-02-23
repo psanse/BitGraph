@@ -466,19 +466,19 @@ BitSetSp& operator &=				(const BitSetSp& bitset);
 
 	/**
 	* @brief Bitwise OR operator with bitset
-	* @details apply for set union
+	* @details set union operation
 	**/
 BitSetSp& operator |=				(const BitSetSp& bitset);
 
 	/**
 	* @brief Bitwise XOR operator with bbn
-	* @details apply for set symmetric difference
+	* @details set symmetric difference operation
 	**/
 BitSetSp& operator ^=				(const BitSetSp& bitset) ;
 
 	/**
 	* @brief Bitwise AND operator with bitset in the semi open range [firstBlock, END)
-	* @details apply for set intersection
+	* @details set intersection operation
 	**/	
 BitSetSp& AND_block					(int firstBlock, const BitSetSp& bitset);
 
