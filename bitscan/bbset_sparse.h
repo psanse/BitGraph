@@ -537,7 +537,7 @@ BitSetSp& AND_block					(int firstBlock, int lastBlock, const BitSetSp& bitset) 
 //Conversions		
  		
 	string to_string				();													//TODO implement - cast operator;
-	void to_vector					(std::vector<int>& )	const;
+	void to_vector					(std::vector<int>&)		const;						//TODO implement - cast operator;	
 
 /////////////////////
 //data members
