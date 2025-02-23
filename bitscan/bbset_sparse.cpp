@@ -716,7 +716,6 @@ BitSetSp& BitSetSp::operator ^= (const BitSetSp& rhs) {
 	//XOR before all the blocks of one of the bitsets have been examined
 	while ((posTHIS < vBB_.size()) && (itR !=  rhs.vBB_.end())) {
 
-
 		if (vBB_[posTHIS].idx_ < itR->idx_)
 		{
 			posTHIS++;
