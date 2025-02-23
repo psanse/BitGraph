@@ -364,7 +364,7 @@ protected:
 	* @brief Bitwise OR operator with bitset in the semi open range [firstBlock, END)
 	* @details apply for set union
 	*
-	* TODO - rename to set_bit and call privately with set_bit(firstBit, -1, bb) (22/02/2025)
+	* TODO - CHECK, possible OR operation is missing (23/02/2025)
 	**/
 BitSetSp& set_block					(int firstBlock, const BitSetSp& bitset);
 
@@ -479,6 +479,9 @@ BitSetSp& operator ^=				(const BitSetSp& bitset) ;
 	/**
 	* @brief Bitwise AND operator with bitset in the semi open range [firstBlock, END)
 	* @details set intersection operation
+	* @details Capacities of THIS and bitset should be the same.
+	*
+	* TODO - check semantics when the capacity of bitset is greater than the one of THIS (23/02/2025)
 	**/	
 BitSetSp& AND_block					(int firstBlock, const BitSetSp& bitset);
 
@@ -1046,54 +1049,53 @@ BitSetSp&  ERASE (const BitSetSp& lhs, const BitSetSp& rhs,  BitSetSp& res){
 return res;
 }
 
-
 inline
 BitSetSp&  BitSetSp::AND_block(int firstBlock, const BitSetSp& rhs ){
 
-
 	//determine the closes block to firstBlock
-	auto  pairTHIS = this->find_block_ext(firstBlock);		//*this
-	auto  pairR = rhs.find_block_ext(firstBlock);			//rhs	
+	auto posL		= BBObject::noBit;
+	auto itL		= this->find_block(firstBlock, posL);			//*this
+	auto posR		= BBObject::noBit;
+	auto itR		= rhs.find_block(firstBlock, posR);				//rhs
 	
-	while(pairTHIS.second < vBB_.end() && pairR.second < rhs.vBB_.end())
+	while(itL!= vBB_.end() && itR != rhs.vBB_.end())
 	{
 		//update before either of the bitstrings has reached its end
-		if(pairTHIS.second->idx_ < pairR.second->idx_)
+		if(itL->idx_ < itR->idx_)
 		{
 			/////////////////////
-			pairTHIS.second->bb_ = 0;
+			itL->bb_ = 0;
 			/////////////////////
-			++pairTHIS.second;
+			++itL;
 
-		}else if(pairR.second->idx_<pairTHIS.second->idx_)
+		}else if(itL->idx_ > itR->idx_)
 		{
-			++pairR.second;
+			++itR;
 
 		}else{
 
-			//must have same indexes
+			//blocks with same index
 
 			///////////////////////////////////
-			pairTHIS.second->bb_ &= pairR.second->bb_;
+			itL->bb_ &= itR->bb_;
 			///////////////////////////////////
 
-			++pairTHIS.second;
-			++pairR.second;
+			++itL;
+			++itR;
 		}
 	}
 
 	//fill with zeros from last block in *this onwards if rhs has been examined
-	if (pairR.second == rhs.vBB_.end()) { 
+	if (itR == rhs.vBB_.end()) { 
 				
-		for (; pairTHIS.second != vBB_.end(); ++pairTHIS.second) {
+		for (; itL != vBB_.end(); ++itL) {
 
 			///////////////////////
-			pairTHIS.second->bb_ = ZERO;
+			itL->bb_ = ZERO;
 			////////////////////////
 		}
 	}
-
-	
+		
 	return *this;
 }
 
@@ -1119,7 +1121,7 @@ BitSetSp&  BitSetSp::set_block(int firstBlock, const BitSetSp& rhs ){
 		}
 		else {
 
-			//must have same indexes
+			//blocks with same index
 
 			///////////////////////////////////
 			pairTHIS.second->bb_ |= pairR.second->bb_;
@@ -1410,6 +1412,47 @@ bool operator == (const BitSetSp& lhs, const BitSetSp& rhs){
 
 	return(	(lhs.nBB_ == rhs.nBB_) &&
 			(lhs.vBB_ == rhs.vBB_)		);
+}
+
+
+template<bool Policy_iterPos>
+BitSetSp::vPB_cit
+BitSetSp::find_block(int blockID, int& pos) const
+{
+
+	////////////////////////////////////////////////////////////////////////////////////////////
+	auto it = lower_bound(vBB_.cbegin(), vBB_.cend(), pBlock_t(blockID), pBlock_less());
+	////////////////////////////////////////////////////////////////////////////////////////////
+
+	if (it != vBB_.end() && (it->idx_ == blockID || Policy_iterPos)) {
+		pos = it - vBB_.begin();
+	}
+	else {
+		pos = BBObject::noBit;
+	}
+
+	return it;
+
+}
+
+
+template<bool Policy_iterPos>
+BitSetSp::vPB_it
+BitSetSp::find_block(int blockID, int& pos)
+{
+
+	////////////////////////////////////////////////////////////////////////////////////////////
+	auto it = lower_bound(vBB_.begin(), vBB_.end(), pBlock_t(blockID), pBlock_less());
+	////////////////////////////////////////////////////////////////////////////////////////////
+
+	if (it != vBB_.end() && (it->idx_ == blockID || Policy_iterPos)) {
+		pos = it - vBB_.begin();
+	}
+	else {
+		pos = BBObject::noBit;
+	}
+
+	return it;
 }
 
 //inline
