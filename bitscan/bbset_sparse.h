@@ -497,13 +497,22 @@ BitSetSp& AND_block					(int firstBlock, int lastBlock, const BitSetSp& bitset) 
 
 	 /**
 	 * @brief TRUE if the bitstring has all 0-bits
-	 * @details O(num_bitblocks) complexity. Assumes it is possible that all existing bitblocks are 0, so 
-	 *			all of them need to be checked.
+	 * @details O(num_bitblocks) complexity. Assumes it is possible 
+	 *			that there are blocks with all 0-bits, so all of them need
+	 *			to be checked.
 	 **/
  inline	bool is_empty				()						const;		
 
-		bool is_disjoint			(const BitSetSp& bb)	const;
-		bool is_disjoint			(int first_block, int last_block, const BitSetSp& bb)   const;
+	/**
+	* @brief TRUE if this bitstring has no bits in common with rhs
+	**/
+	bool is_disjoint				(const BitSetSp& bb)	const;
+
+	/**
+	* @brief TRUE if this bitstring has no bits in common with rhs 
+	*		 in the closed range [first_block, last_block]	
+	**/
+	bool is_disjoint_block			(int first_block, int last_block, const BitSetSp& bb)   const;
 
 ////////////////////////
  //Other operations 
@@ -568,24 +577,25 @@ bool BitSetSp::is_empty ()	const{
 
 inline
 bool BitSetSp::is_disjoint	(const BitSetSp& rhs) const{
-///////////////////
-// true if there are no bits in common 
-	int i1=0, i2=0;
-	while(true){
-		//exit condition I
-		if(i1==vBB_.size() || i2==rhs.vBB_.size() ){		//size should be the same
-					return true;
+	
+	auto itL = vBB_.begin();	
+	auto itR = rhs.vBB_.begin();	
+		
+	//main loop
+	while(itL != vBB_.end() && itR != rhs.vBB_.end())
+	{
+		if (itL->idx_ < itR->idx_) {
+			itL++;
 		}
-
-		//update before either of the bitstrings has reached its end
-		if(vBB_[i1].idx_==rhs.vBB_[i2].idx_){
-			if(vBB_[i1].bb_ & rhs.vBB_[i2].bb_)
-							return false;	//bit in common	
-			++i1; ++i2;
-		}else if(vBB_[i1].idx_<rhs.vBB_[i2].idx_){
-			i1++;
-		}else if(rhs.vBB_[i2].idx_<vBB_[i1].idx_){
-			i2++;
+		else if (itL->idx_ > itR->idx_ ) {
+			itR++;
+		}
+		else{		
+			if (itL->bb_ & itR->bb_) {
+				return false;				//bits in common	
+			}
+			++itL; 
+			++itR;
 		}
 	}
 
@@ -593,54 +603,46 @@ return true;
 }
 
 inline 
-bool BitSetSp::is_disjoint	(int first_block, int last_block, const BitSetSp& rhs)   const{
-///////////////////
-// true if there are no bits in common in the closed range [first_block, last_block]
-//
-// REMARKS: 
-// 1) no assertions on valid ranges
+bool BitSetSp::is_disjoint_block (int first_block, int last_block, const BitSetSp& rhs)   const{
 
-	int i1=0, i2=0;
+	////////////////////////////////////////////////////////
+	assert(first_block >= 0 && first_block <= last_block);
+	////////////////////////////////////////////////////////
 
-	//updates initial element indexes it first_block is defined
-	if(first_block>0){
-
-		pair<bool, int> p1=this->find_block_pos(first_block);
-		pair<bool, int> p2=rhs.find_block_pos(first_block);
-
-		//checks whether both sparse bitstrings have at least one block greater or equal to first_block
-		if(p1.second==BBObject::noBit || p2.second==BBObject::noBit) return true;
-		i1=p1.second; i2=p2.second;
-	}
+	auto posL = BBObject::noBit;
+	auto posR = BBObject::noBit;
+	auto itL = find_block(first_block, posL);
+	auto itR = rhs.find_block(first_block, posR);
 
 	//main loop
-	int nElem=this->vBB_.size(); int nElem_rhs=rhs.vBB_.size();
-	while(! ((i1>=nElem || this->vBB_[i1].idx_>last_block ) || (i2>=nElem_rhs || rhs.vBB_[i2].idx_>last_block )) ){
+	while (	itL != vBB_.end()			&&
+			itL->idx_ <= last_block		&&
+			itR != rhs.vBB_.end()		&&
+			itR->idx_ <= last_block			)
+	{
 
-		//update before either of the bitstrings has reached its end
-		if(this->vBB_[i1].idx_<rhs.vBB_[i2].idx_){
-			i1++;
-		}else if(rhs.vBB_[i2].idx_<this->vBB_[i1].idx_){
-			i2++;
-		}else{
-			if(this->vBB_[i1].bb_ & rhs.vBB_[i2].bb_)
-				return false;				
-			i1++, i2++; 
+		if (itL->idx_ < itR->idx_) {
+			++itL;
 		}
+		else if (itL->idx_ > itR->idx_) {
+			++itR;
 
-		/*if(lhs.vBB_[i1].idx_==rhs.vBB_[i2].idx_){
-		BitSetSp::elem e(lhs.vBB_[i1].idx_, lhs.vBB_[i1].bb_ & rhs.vBB_[i2].bb_);
-		res.vBB_.push_back(e);
-		i1++, i2++; 
-		}else if(lhs.vBB_[i1].idx_<rhs.vBB_[i2].idx_){
-		i1++;
-		}else if(rhs.vBB_[i2].idx_<lhs.vBB_[i1].idx_){
-		i2++;
-		}*/
-	}
-	
+		}
+		else {
+			//same block index
+			if (itL->bb_ & itR->bb_) {
+				//////////////
+				return false;					//bits in common	
+				//////////////
+			}
+			++itL;
+			++itR;
+		}	
 
-return true;		//disjoint
+	}//end while
+
+
+	return true;		
 }
 
 ///////////////////
