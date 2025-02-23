@@ -310,7 +310,6 @@ TEST(Sparse, set_bits) {
 
 }
 
-
 TEST(Sparse, set_bits_from_bitset) {
 
 	BitSetSp bbsp(10000);
@@ -337,7 +336,6 @@ TEST(Sparse, set_bits_from_bitset) {
 	EXPECT_TRUE(std::is_sorted(bbsp.bitset().begin(), bbsp.bitset().end(), BitSetSp::pBlock_less()));
 
 }
-
 
 TEST(Sparse, boolean_properties){
 

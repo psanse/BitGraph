@@ -120,15 +120,15 @@ void BitSetSp::init (int size, bool is_popsize){
 
 BitSetSp& BitSetSp::set_bit(int firstBit, int lastBit)
 {
-	auto bbl = WDIV(firstBit);					//block index fristBit
+	auto bbl = WDIV(firstBit);					//block index firstBit
 	auto bbh = WDIV(lastBit);					//block index lastBit
 
 	/////////////////////////////////////////////////////////
 	assert(firstBit >= 0 && firstBit <= lastBit && bbh<nBB_ );
 	////////////////////////////////////////////////////////
 
-	const auto SIZE_INIT = vBB_.size();			//stores the original size of *this since it will be enlarged
-	auto offsetl = firstBit - WMUL(bbl);			//offset in the lower block
+	const auto sizeL = vBB_.size();				//stores the original size of *this since it will be enlarged
+	auto offsetl = firstBit - WMUL(bbl);		//offset in the lower block
 	auto offseth = lastBit - WMUL(bbh);			//offset in the upper block
 	bool flag_sort = false;						//flag to sort the collection
 
@@ -148,7 +148,7 @@ BitSetSp& BitSetSp::set_bit(int firstBit, int lastBit)
 	// 7) exit because no more blocks in *this
 	////////////////////
  
-	//special case: all existing blocks are outside the range
+	//I. special case: all existing blocks are outside the range
 	if (posTHIS == BBObject::noBit) {
 
 		if (bbl == bbh) {
@@ -167,7 +167,7 @@ BitSetSp& BitSetSp::set_bit(int firstBit, int lastBit)
 		return *this;
 	}
 
-	//special case - singleton range
+	//II. special case - singleton range
 	if (bbl == bbh) {
 
 		if (vBB_[posTHIS].idx_ == bbl) {
@@ -190,7 +190,7 @@ BitSetSp& BitSetSp::set_bit(int firstBit, int lastBit)
 		return *this;
 	}
 
-	//first block
+	//III. first block
 	if (vBB_[posTHIS].idx_ == bbl) {
 		vBB_[posTHIS].bb_ |= bblock::MASK_1_HIGH(offsetl);		
 	}
@@ -202,16 +202,15 @@ BitSetSp& BitSetSp::set_bit(int firstBit, int lastBit)
 	}
 
 	////////////////////////////////////////////
-	//blocks in between analysis - MAIN LOOP
+	//main loop
 	auto block = bbl + 1;
 	posTHIS++;
-	while (posTHIS < SIZE_INIT && block < bbh) {
+	while (posTHIS < sizeL && block < bbh) {
 
 		if (vBB_[posTHIS].idx_ < block) {
 
 			//add block
-			vBB_.emplace_back(pBlock_t(block, ONE));
-			
+			vBB_.emplace_back(pBlock_t(block, ONE));			
 			
 			posTHIS++;
 		}
@@ -228,7 +227,6 @@ BitSetSp& BitSetSp::set_bit(int firstBit, int lastBit)
 			//index match - overwrite
 			vBB_[posTHIS].bb_ = ONE;				
 			
-
 			posTHIS++;
 			block++;
 		}
@@ -253,9 +251,9 @@ BitSetSp& BitSetSp::set_bit(int firstBit, int lastBit)
 
 	//II. Exit because no more blocks in *this
 	//	  Note: no sorting required in this case if blocks are appended at the end
-	if (posTHIS == SIZE_INIT) {
+	if (posTHIS == sizeL) {
 
-		//]bbl, bbh[
+		//[block, bbh[
 		for (int i = block; i < bbh; i++) {
 			vBB_.emplace_back(pBlock_t(i, ONE));
 		}
@@ -263,8 +261,7 @@ BitSetSp& BitSetSp::set_bit(int firstBit, int lastBit)
 		//last block - bbh
 		vBB_.emplace_back(pBlock_t(bbh, bblock::MASK_1_LOW(offseth)));
 	}
-		
-
+	
 	//keep the collection sorted if required
 	if (flag_sort) {
 		sort();
@@ -316,13 +313,13 @@ BitSetSp& BitSetSp::set_bit (const BitSetSp& rhs){
 
 	///////////////////////////////////	
 	auto rIt = rhs.vBB_.cbegin();				//iterator to rhs	
-	const auto SIZE_INIT = vBB_.size();			//stores the original size of *this since it will be enlarged
+	const auto sizeL = vBB_.size();			//stores the original size of *this since it will be enlarged
 	auto posL = 0;								//position of bitblocks in  *this
 	auto flag_sort = false;
 	///////////////////////////////////
 			
 	//main loop
-	while( posL != SIZE_INIT && rIt != rhs.vBB_.end()) {
+	while( posL != sizeL && rIt != rhs.vBB_.end()) {
 		
 		if (vBB_[posL].idx_ < rIt->idx_) {
 			++posL;
@@ -345,8 +342,8 @@ BitSetSp& BitSetSp::set_bit (const BitSetSp& rhs){
 	//end while
 
 
-	//treatment for exit conditions
-	if (posL == SIZE_INIT)			 //exit condition II
+	//I. exit condition
+	if (posL == sizeL)			
 	{
 		//append rhs blocks at the end
 		vBB_.insert(vBB_.end(), rIt, rhs.vBB_.end());
@@ -375,16 +372,16 @@ BitSetSp&  BitSetSp::set_block (int firstBlock, int lastBlock, const BitSetSp& r
 	// Initialization
 
 	//this		
-	auto posTHIS = BBObject::noBit;										//position of bitblocks in  *this
-	auto itTHIS = find_block(firstBlock, posTHIS);						//O(log n)
-	(itTHIS != vBB_.end()) ? posTHIS = itTHIS - vBB_.begin() : 1;		//sets posTHIS to itTHIS position
+	auto posL = BBObject::noBit;										//position of firstBlock in THIS or closest block
+	auto itL = find_block(firstBlock, posL);							//iterator for THIS O(log n)
+	(itL != vBB_.end()) ? posL = itL - vBB_.begin() : 1;				//sets posL to itL
 	
 	//stores the original size of THIS since it can be enlarged
-	const auto SIZE_INIT = vBB_.size();									
+	const auto sizeL = vBB_.size();									
 
 	///////////
 	//rhs
-	auto prLOW = rhs.find_block_ext(firstBlock);						//O(log n)
+	auto pRlow = rhs.find_block_ext(firstBlock);						//O(log n)
 
 	//flag to sort the collection
 	bool flag_sort = false;
@@ -392,59 +389,59 @@ BitSetSp&  BitSetSp::set_block (int firstBlock, int lastBlock, const BitSetSp& r
 	////////////////////////////////////////////
 
 	//I) special case - bitset rhs has no information in the range
-	if( prLOW.second == rhs.vBB_.end()){ 
+	if( pRlow.second == rhs.vBB_.end()){ 
 		return *this;
 	}
 
 	//II) special case  - this bitset has no information to mask in the range
-	if (itTHIS == vBB_.end())
+	if (itL == vBB_.end())
 	{
 		//append rhs at the end
-		for (; prLOW.second != rhs.vBB_.end() && prLOW.second->idx_ <= lastBlock; ++prLOW.second) {
-			vBB_.emplace_back(*prLOW.second);
+		for (; pRlow.second != rhs.vBB_.end() && pRlow.second->idx_ <= lastBlock; ++pRlow.second) {
+			vBB_.emplace_back(*pRlow.second);
 		}
 		return *this;
 	}
 
 	//III) special case first block = last block and the block exists in rhs
-	if (firstBlock == lastBlock && prLOW.second->idx_ == firstBlock) {
-		if (itTHIS->idx_ != firstBlock) {
+	if (firstBlock == lastBlock && pRlow.second->idx_ == firstBlock) {
+		if (itL->idx_ != firstBlock) {
 
 			//block does not exist in THIS, add and sort
-			vBB_.emplace_back(*prLOW.second);
+			vBB_.emplace_back(*pRlow.second);
 			///////////////////////////////////
 
-			//necessary because itTHIS must have an index greatert than firstBlock
+			//necessary because itL must have an index greatert than firstBlock
 			sort();			
 		}
 		else {
 
 			//block exists in THIS, overwrite
-			vBB_[posTHIS].bb_ |= prLOW.second->bb_;			
+			vBB_[posL].bb_ |= pRlow.second->bb_;
 		}			
 		return *this;
 	}	
 
 	///////////////////
 	//main loop
-	while (	posTHIS < SIZE_INIT				&&
-			vBB_[posTHIS].idx_ <= lastBlock &&
-			prLOW.second != rhs.vBB_.end()  &&
-			prLOW.second->idx_ <= lastBlock		)
+	while (posL < sizeL				&&
+			vBB_[posL].idx_ <= lastBlock &&
+			pRlow.second != rhs.vBB_.end()  &&
+			pRlow.second->idx_ <= lastBlock		)
 	{
 	
 		//update before either of the bitstrings has reached its end
-		if(vBB_[posTHIS].idx_ < prLOW.second->idx_)
+		if(vBB_[posL].idx_ < pRlow.second->idx_)
 		{
-			++posTHIS;
+			++posL;
 		}
-		else if (vBB_[posTHIS].idx_ > prLOW.second->idx_)
+		else if (vBB_[posL].idx_ > pRlow.second->idx_)
 		{
 			///////////////////////////////////
-			vBB_.emplace_back(*prLOW.second);	
+			vBB_.emplace_back(*pRlow.second);	
 			//////////////////////////////////
 
-			++prLOW.second;
+			++pRlow.second;
 
 			//sorting is necessary since the block added has less index
 			flag_sort = true;
@@ -452,24 +449,24 @@ BitSetSp&  BitSetSp::set_block (int firstBlock, int lastBlock, const BitSetSp& r
 		else {			//must have same indexes		
 
 			//////////////////////////////////////
-			vBB_[posTHIS].bb_ |= prLOW.second->bb_;
+			vBB_[posL].bb_ |= pRlow.second->bb_;
 			//////////////////////////////////////
 
-			++posTHIS;
-			++prLOW.second;
+			++posL;
+			++pRlow.second;
 		}	
 
 	}//end while
 		
 	//exit conditions   
-	if (posTHIS == SIZE_INIT || vBB_[posTHIS].idx_ > lastBlock)
+	if (posL == sizeL || vBB_[posL].idx_ > lastBlock)
 	{
 		//add remaining blocks in rhs to *this
-		for (; prLOW.second != rhs.vBB_.end() && prLOW.second->idx_ <= lastBlock; ++prLOW.second) {
-			vBB_.emplace_back(*prLOW.second);
+		for (; pRlow.second != rhs.vBB_.end() && pRlow.second->idx_ <= lastBlock; ++pRlow.second) {
+			vBB_.emplace_back(*pRlow.second);
 		}	
 
-		if (vBB_[posTHIS].idx_ > lastBlock) {
+		if (vBB_[posL].idx_ > lastBlock) {
 			flag_sort = true;
 		}	
 		
@@ -577,27 +574,27 @@ return 0;
 
 BitSetSp&  BitSetSp::erase_bit (const BitSetSp& rhs ){
 
-	auto itTHIS = vBB_.begin();		//iterator to *this
+	auto itL = vBB_.begin();		//iterator to *this
 	auto itR = rhs.vBB_.cbegin();	//iterator to rhs
 	
 	
-	while (itTHIS != vBB_.end() && itR != rhs.vBB_.end()) {
+	while (itL != vBB_.end() && itR != rhs.vBB_.end()) {
 				
 		//update before either of the bitstrings has reached its end
-		if (itTHIS->idx_ < itR->idx_)
+		if (itL->idx_ < itR->idx_)
 		{
-			++itTHIS;
+			++itL;
 		}
-		else if (itTHIS->idx_ > itR->idx_)
+		else if (itL->idx_ > itR->idx_)
 		{
 			++itR;
 		}
 		else{
 
 			//equal indexes - erase bits
-			itTHIS->bb_ &= ~itR->bb_;
+			itL->bb_ &= ~itR->bb_;
 			
-			++itTHIS;
+			++itL;
 			++itR;
 		}
 	}
@@ -657,18 +654,18 @@ BitSetSp& BitSetSp::operator &= (const BitSetSp& rhs){
 
 BitSetSp& BitSetSp::operator |= (const BitSetSp& rhs){
 
-	auto posTHIS = 0;				//position *this
+	auto posL = 0;					//position *this
 	auto itR = rhs.cbegin();		//iterator to rhs
-	auto sizeTHIS = vBB_.size();	//stores the original size of *this since it will be modified
+	auto sizeL = vBB_.size();		//stores the original size of *this since it will be modified
 	bool flag_sort = false;			//flag to sort the collection
 		
 	//OR before all the blocks of one of the bitsets have been examined
-	while ((posTHIS < sizeTHIS) && (itR != rhs.vBB_.end())) {
+	while (posL < sizeL && itR != rhs.vBB_.end()) {
 			
-		if(vBB_[posTHIS].idx_ < itR->idx_)
+		if(vBB_[posL].idx_ < itR->idx_)
 		{
-			posTHIS++;
-		}else if(vBB_[posTHIS].idx_ > itR->idx_ )
+			posL++;
+		}else if(vBB_[posL].idx_ > itR->idx_ )
 		{
 			//////////////////////////////////
 			vBB_.emplace_back(*itR);
@@ -680,16 +677,16 @@ BitSetSp& BitSetSp::operator |= (const BitSetSp& rhs){
 			//equal indexes
 
 			///////////////////////////////////////////
-			vBB_[posTHIS].bb_ |= itR->bb_;
+			vBB_[posL].bb_ |= itR->bb_;
 			///////////////////////////////////////////
 
-			posTHIS++;
+			posL++;
 			itR++;
 		}
 	}
 
 	//rhs unfinished with index below the last block of *this
-	if (posTHIS == vBB_.size()) {
+	if (posL == sizeL) {
 
 		for (; itR != rhs.vBB_.end(); ++itR) {
 
@@ -709,18 +706,19 @@ BitSetSp& BitSetSp::operator |= (const BitSetSp& rhs){
 
 BitSetSp& BitSetSp::operator ^= (const BitSetSp& rhs) {
 
-	auto posTHIS = 0;			//position *this
-	auto itR = rhs.cbegin();	//iterator to rhs
-	bool flag_sort = false;		//flag to sort the collection
+	auto posL = 0;					//position *this	
+	auto itR = rhs.cbegin();		//iterator to rhs
+	auto sizeL = vBB_.size();		//stores the original size of *this since it will be modified
+	bool flag_sort = false;			//flag to sort the collection
 	
 	//XOR before all the blocks of one of the bitsets have been examined
-	while ((posTHIS < vBB_.size()) && (itR !=  rhs.vBB_.end())) {
+	while ((posL < sizeL) && (itR !=  rhs.vBB_.end())) {
 
-		if (vBB_[posTHIS].idx_ < itR->idx_)
+		if (vBB_[posL].idx_ < itR->idx_)
 		{
-			posTHIS++;
+			posL++;
 		}
-		else if (vBB_[posTHIS].idx_ > itR->idx_)
+		else if (vBB_[posL].idx_ > itR->idx_)
 		{
 			//////////////////////////////////
 			vBB_.emplace_back(*itR);
@@ -732,17 +730,17 @@ BitSetSp& BitSetSp::operator ^= (const BitSetSp& rhs) {
 
 			//equal indexes
 
-			///////////////////////////////////////////
-			vBB_[posTHIS].bb_ ^= itR->bb_;
-			///////////////////////////////////////////
+			/////////////////////////////
+			vBB_[posL].bb_ ^= itR->bb_;
+			/////////////////////////////
 
-			posTHIS++;
+			posL++;
 			itR++;
 		}
 	}
 
 	//rhs unfinished with index below the last block of *this
-	if (posTHIS == vBB_.size()) {
+	if (posL == sizeL) {
 
 		for (; itR != rhs.vBB_.end(); ++itR) {
 
@@ -750,7 +748,6 @@ BitSetSp& BitSetSp::operator ^= (const BitSetSp& rhs) {
 			vBB_.emplace_back(*itR);
 			///////////////////////////////////
 		}
-
 	}
 
 	//keep the collection sorted

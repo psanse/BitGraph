@@ -285,35 +285,32 @@ virtual inline	 int popcn64		(int nBit)				const;
 //Setting (ordered insertion) / Erasing bits  
 
 	/**
-	* @brief resets the bitset to all 0-bits ans sets bit to 1
+	* @brief Sets THIS to the singleton bit 
 	**/
 BitSetSp&  reset_bit				(int bit);
 	
 	/**
-	* @brief resets the bitset to all 0-bits and then sets bit to 1 in the
-	*		 range [firstBit, lastBit]
+	* @brief Sets THIS to 1-bits in the	 range [firstBit, lastBit]
 	**/
 	BitSetSp&   reset_bit			(int firstBit, int lastBit);	
 
 	/**
-	* @brief resets the bitset to all 0-bits and then copies bitset in the
-	*		 range [0, lastBit]
+	* @brief Sets THIS to rhs in the range [0, lastBit]
 	* @details: more efficient than using the more general reset_bit in the
 	*			range [firstBit=0, lastBit]
 	**/
 protected:
-	BitSetSp&   reset_bit			(int lastBit, const BitSetSp& bitset);	
+	BitSetSp&   reset_bit			(int lastBit, const BitSetSp& rhs);	
 	
 	/**
-	* @brief resets the bitset to all 0-bits and then copies bitset in the
-	*		 closed range [firstBit, lastBit]
+	* @brief Sets THIS to rhs in the closed range [firstBit, lastBit]
 	**/
 public:
-	BitSetSp&   reset_bit			(int firstBit, int lastBit, const BitSetSp& bitset);
+	BitSetSp&   reset_bit			(int firstBit, int lastBit, const BitSetSp& rhs);
 		
 	/**
-	* @brief Sets bit in the sparse bitset
-	*		 Bits outside the capacity of the bitset are ignored (feature)
+	* @brief Sets bit in THIS. If bit is outside the capacity of the bitset 
+	*		 it is ignored (feature)
 	* @param bit: position of the bit to set
 	* @returns 0 if the bit was set, -1 if error
 	* @details emplaces pBlock in the bitstring or changes an existing bitblock
@@ -459,33 +456,31 @@ BitSetSp& erase_block_pos			(int firstBlockPos, const BitSetSp& rhs) = delete;
 //Operators (member functions)
 
 	/**
-	* @brief Bitwise AND operator with bitset
+	* @brief Bitwise AND operator with rhs
 	* @details apply for set intersection
 	**/
-BitSetSp& operator &=				(const BitSetSp& bitset);	
+BitSetSp& operator &=				(const BitSetSp& rhs);	
 
 	/**
-	* @brief Bitwise OR operator with bitset
+	* @brief Bitwise OR operator with rhs
 	* @details set union operation
 	**/
-BitSetSp& operator |=				(const BitSetSp& bitset);
+BitSetSp& operator |=				(const BitSetSp& rhs);
 
 	/**
-	* @brief Bitwise XOR operator with bbn
+	* @brief Bitwise XOR operator with rhs
 	* @details set symmetric difference operation
-	* 
-	* TODO - BUG, use SIZE_INIT as limit for the loop (23/02/2025)
 	**/
-BitSetSp& operator ^=				(const BitSetSp& bitset) ;
+BitSetSp& operator ^=				(const BitSetSp& rhs) ;
 
 	/**
-	* @brief Bitwise AND operator with bitset in the semi open range [firstBlock, END)
+	* @brief Bitwise AND operator with rhs in the range [firstBlock, END)
 	* @details set intersection operation
 	* @details Capacities of THIS and bitset should be the same.
 	*
 	* TODO - check semantics when the capacity of bitset is greater than the one of THIS (23/02/2025)
 	**/	
-BitSetSp& AND_block					(int firstBlock, const BitSetSp& bitset);
+BitSetSp& AND_block					(int firstBlock, const BitSetSp& rhs);
 
 	/////////////////////////
 	//TODO - (19/02/2025)
@@ -522,7 +517,7 @@ BitSetSp& AND_block					(int firstBlock, int lastBlock, const BitSetSp& bitset) 
 
 /////////////////////
 //Conversions		
-// 		
+ 		
 	string to_string				();													//TODO implement - cast operator;
 	void to_vector					(std::vector<int>& )	const;
 
@@ -533,46 +528,41 @@ protected:
 	vPB vBB_;					//a vector of sorted pairs of a non-empty bitblock and its index in a non-sparse bitstring
 	int nBB_;					//maximum number of bitblocks
 
-};  //end class BitSetSp
+}; //end BitSetSp class
 
 
 /////////////////////////////////////////
 //
-// INLINE FUNCTIONS - implementations of BitSetSP in the header
+// INLINE FUNCTIONS - necessary implementations of BitSetSP in the header
 
 
-//////////////////////////
-// BOOLEAN FUNCTIONS
-
-
+inline
 bool BitSetSp::is_bit(int bit)	const{
-//note: could use find_block as well
 
-	int blockID = WDIV(bit);
+	int bb = WDIV(bit);
 
 	/////////////////////////////////////////////////////////////////////////////////////
-	vPB_cit it = lower_bound(vBB_.begin(), vBB_.end(), pBlock_t(blockID), pBlock_less());
+	vPB_cit it = lower_bound(vBB_.begin(), vBB_.end(), pBlock_t(bb), pBlock_less());
 	/////////////////////////////////////////////////////////////////////////////////////
 	
-	return ( it != vBB_.end()		&&
-			 it->idx_ == blockID	&& 
-			 (it->bb_ & Tables::mask[bit - WMUL(blockID) /*WMOD(bit)*/])
-			);
+	return ( it != vBB_.end()								&&
+			 it->idx_ == bb									&& 
+			 (it->bb_ & bblock::MASK_BIT(bit - WMUL(bb))) 		);
 }
 
+inline
 bool BitSetSp::is_empty ()	const{
 
-	//special case, no 1-bits in the bitset
-	if (vBB_.empty()) {
-		return true;
-	}
+	if (!vBB_.empty()) {
 
-	//check if all bitblocks are empty - assumes it is possible, since erase operations allow it
-	for(int i = 0; i < vBB_.size(); ++i){
-		if (vBB_[i].bb_) {
-			return false;
+		//check if all bitblocks are empty - assumes it is possible, since erase operations allow it
+		for (int i = 0; i < vBB_.size(); ++i) {
+			if (vBB_[i].bb_) {
+				return false;
+			}
 		}
 	}
+
 	return true;
 }
 
@@ -656,8 +646,9 @@ return true;		//disjoint
 ///////////////////
 // Bit updates
 
-
-BitSetSp& BitSetSp::erase_bit (int bit){
+inline
+BitSetSp& 
+BitSetSp::erase_bit (int bit){
 
 	auto bb = WDIV(bit);
 
@@ -673,7 +664,9 @@ BitSetSp& BitSetSp::erase_bit (int bit){
 	return *this;
 }
 
-BitSetSp::vPB_it  BitSetSp::erase_bit (int bit, BitSetSp::vPB_it from_it){
+inline
+BitSetSp::vPB_it  
+BitSetSp::erase_bit (int bit, BitSetSp::vPB_it from_it){
 	
 	int bb = WDIV(bit);
 		
@@ -690,7 +683,8 @@ BitSetSp::vPB_it  BitSetSp::erase_bit (int bit, BitSetSp::vPB_it from_it){
 }
 
 inline
-BitSetSp& BitSetSp::set_bit (int bit ){
+BitSetSp& 
+BitSetSp::set_bit (int bit ){
 
 	auto bb = WDIV(bit);
 
@@ -699,20 +693,20 @@ BitSetSp& BitSetSp::set_bit (int bit ){
 	//////////////////////
 			
 	//find closest block to bb in THIS
-	auto pB = find_block_ext(bb);
+	auto pL = find_block_ext(bb);
 	
-	if (pB.first) {
+	if (pL.first) {
 		//bb exists - overwrite
-		pB.second->bb_ |= bblock::MASK_BIT(bit - WMUL(bb) /* WMOD(bit) */);
+		pL.second->bb_ |= bblock::MASK_BIT(bit - WMUL(bb) /* WMOD(bit) */);
 	}
 	else {
-		if (pB.second == vBB_.end()) {
+		if (pL.second == vBB_.end()) {
 			//there are not blocks with higher index
 			vBB_.emplace_back(pBlock_t(bb, bblock::MASK_BIT(bit - WMUL(bb) /* WMOD(bit) */)));
 		}
 		else {
 			//there are blocks with higher index, insert to avoid sorting
-			vBB_.insert(pB.second, pBlock_t(bb, bblock::MASK_BIT(bit - WMUL(bb) /* WMOD(bit) */)));
+			vBB_.insert(pL.second, pBlock_t(bb, bblock::MASK_BIT(bit - WMUL(bb) /* WMOD(bit) */)));
 		}
 	}
 
@@ -720,7 +714,8 @@ BitSetSp& BitSetSp::set_bit (int bit ){
 }
 
 inline
-BitSetSp& BitSetSp::reset_bit (int bit){
+BitSetSp& 
+BitSetSp::reset_bit (int bit){
 
 	vBB_.clear();
 
@@ -733,7 +728,7 @@ BitSetSp& BitSetSp::reset_bit (int bit){
 ///////////////////
 // Bit scanning
 
-
+inline
 int BitSetSp::prev_bit	(int nBit){
 /////////////////
 // Uses cache of last index position for fast bit scanning
@@ -756,7 +751,7 @@ int BitSetSp::prev_bit	(int nBit){
 return BBObject::noBit;
 }
 
-
+inline
 int BitSetSp::next_bit(int nBit){
 /////////////////
 // Uses cache of last index position for fast bit scanning
@@ -779,6 +774,7 @@ int BitSetSp::next_bit(int nBit){
 return BBObject::noBit;
 }
 
+inline
 int BitSetSp::msbn64	(int& nElem)	const{
 ///////////////////////
 // Look up table implementation (best found so far)
@@ -806,6 +802,7 @@ int BitSetSp::msbn64	(int& nElem)	const{
 return BBObject::noBit;		//should not reach here
 }
 
+inline
 int BitSetSp::lsbn64 (int& nElem)		const	{
 /////////////////
 // different implementations of lsbn depending on configuration
@@ -1201,31 +1198,31 @@ BitSetSp& BitSetSp::erase_block(int firstBlock, const BitSetSp& rhs) {
 
 
 	//determine the closest block in the range for both bitstrings
-	auto p1 = find_block_ext(firstBlock);
-	auto p2 = rhs.find_block_ext(firstBlock);
+	auto pL = find_block_ext(firstBlock);
+	auto pR = rhs.find_block_ext(firstBlock);
 
 	//iteration
-	while (  p1.second != vBB_.end()		&& 
-			 p2.second != rhs.vBB_.end()		) 
+	while (  pL.second != vBB_.end()		&& 
+			 pR.second != rhs.vBB_.end()		) 
 	{
 		
 		//update before either of the bitstrings has reached its end
-		if (p1.second->idx_ < p2.second->idx_) 
+		if (pL.second->idx_ < pR.second->idx_) 
 		{
-			++p1.second;
+			++pL.second;
 		}
-		else if (p1.second->idx_ > p2.second->idx_ ) 
+		else if (pL.second->idx_ > pR.second->idx_ ) 
 		{
-			++p2.second;
+			++pR.second;
 		}
 		else {  //both indexes must be equal
 
 			//////////////////////////////////
-			p1.second->bb_ &= ~p2.second->bb_;			//set minus operation
+			pL.second->bb_ &= ~pR.second->bb_;			//set minus operation
 			//////////////////////////////////
 
-			++p1.second;
-			++p2.second;
+			++pL.second;
+			++pR.second;
 		}
 
 	}
@@ -1313,7 +1310,7 @@ BitSetSp& BitSetSp::erase_bit (int firstBit, int lastBit){
 }
 
 inline
-BitSetSp& BitSetSp::reset_bit (int lastBit, const BitSetSp& bitset){
+BitSetSp& BitSetSp::reset_bit (int lastBit, const BitSetSp& rhs){
 
 	auto bbh = WDIV(lastBit);
 
@@ -1323,18 +1320,18 @@ BitSetSp& BitSetSp::reset_bit (int lastBit, const BitSetSp& bitset){
 
 	vBB_.clear();
 	
-	//finds block bbh, or closest with higher index than bbh in bitset
-	auto p = bitset.find_block_ext(bbh);
+	//finds block bbh, or closest with higher index than bbh in rhs
+	auto pR = rhs.find_block_ext(bbh);
 
 	//special case - no bits to set in the closed range
-	if (p.second != bitset.cend()) {
+	if (pR.second != rhs.cend()) {
 
 		//copy up to and excluding bbh
-		std::copy(bitset.cbegin(), p.second, insert_iterator<vPB>(vBB_, vBB_.begin()));
+		std::copy(rhs.cbegin(), pR.second, insert_iterator<vPB>(vBB_, vBB_.begin()));
 
 		//deal with last block bbh
-		if (p.first) {
-			vBB_.emplace_back(pBlock_t(bbh, p.second->bb_ & bblock::MASK_1_LOW(lastBit - WMUL(bbh))));
+		if (pR.first) {
+			vBB_.emplace_back(pBlock_t(bbh, pR.second->bb_ & bblock::MASK_1_LOW(lastBit - WMUL(bbh))));
 
 		}
 	}
@@ -1343,12 +1340,12 @@ BitSetSp& BitSetSp::reset_bit (int lastBit, const BitSetSp& bitset){
 }
 
 inline
-BitSetSp&  BitSetSp::reset_bit (int firstBit,  int lastBit,  const BitSetSp& bitset){
+BitSetSp&  BitSetSp::reset_bit (int firstBit,  int lastBit,  const BitSetSp& rhs){
 
 	//////////////////////////////
 	//special case - range starts from the beginning, called specialized case
 	if (firstBit == 0) {
-		return reset_bit(lastBit, bitset);	
+		return reset_bit(lastBit, rhs);	
 	}
 	///////////////////////////////
 
@@ -1356,16 +1353,16 @@ BitSetSp&  BitSetSp::reset_bit (int firstBit,  int lastBit,  const BitSetSp& bit
 	auto bbh = WDIV(lastBit);
 	
 	////////////////////////////////////////////////////////////////////////////////////
-	assert( (bbl >= 0) && (bbl <= bbh) && (bbh < nBB_) && (bbh < bitset.capacity()) );
+	assert( (bbl >= 0) && (bbl <= bbh) && (bbh < nBB_) && (bbh < rhs.capacity()) );
 	///////////////////////////////////////////////////////////////////////////////////
 
 	vBB_.clear();
 
 	//finds bbl or closest block with greater indx
-	auto it = lower_bound(bitset.cbegin(), bitset.cend(), pBlock_t(bbl), pBlock_less());
+	auto it = lower_bound(rhs.cbegin(), rhs.cend(), pBlock_t(bbl), pBlock_less());
 
 	//special case - no bits to set in the closed range
-	if (it == bitset.cend()) {
+	if (it == rhs.cend()) {
 		return *this;
 	}
 
@@ -1393,13 +1390,13 @@ BitSetSp&  BitSetSp::reset_bit (int firstBit,  int lastBit,  const BitSetSp& bit
 
 	//main loop copies blocks (bbl, bbh]
 	//alternative implementation - find lower bound for bbh and copy (as in reset(lastBit))
-	while (it->idx_ < bbh && it != bitset.cend()) {
+	while (it != rhs.cend() && it->idx_ < bbh  ) {
 		vBB_.emplace_back(*it);
 		++it;
 	}	
 
 	//upate due to bbh if it exists
-	if (it != bitset.cend() && it->idx_ == bbh) {
+	if (it != rhs.cend() && it->idx_ == bbh) {
 
 		//add and trim last block
 		vBB_.push_back(pBlock_t(bbh, it->bb_ & bblock::MASK_1_LOW(offseth)));
@@ -1418,6 +1415,7 @@ bool operator == (const BitSetSp& lhs, const BitSetSp& rhs){
 
 
 template<bool Policy_iterPos>
+inline
 BitSetSp::vPB_cit
 BitSetSp::find_block(int blockID, int& pos) const
 {
@@ -1434,11 +1432,10 @@ BitSetSp::find_block(int blockID, int& pos) const
 	}
 
 	return it;
-
 }
 
-
 template<bool Policy_iterPos>
+inline
 BitSetSp::vPB_it
 BitSetSp::find_block(int blockID, int& pos)
 {
@@ -1456,6 +1453,12 @@ BitSetSp::find_block(int blockID, int& pos)
 
 	return it;
 }
+
+//////////////////////////
+//
+// DEPRECATED
+//
+/////////////////////////
 
 //inline
 //BitSetSp&  BitSetSp::erase_block_pos (int first_pos_of_block, const BitSetSp& rhs ){
