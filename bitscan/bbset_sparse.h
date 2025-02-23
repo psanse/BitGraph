@@ -188,16 +188,24 @@ explicit BitSetSp					(int nPop, bool is_popsize = true );
 	BITBOARD find_block				(int blockID)			const;	
 	
 	/**
-	* @brief finds the bitblock given its block index blockID and its position in the collection
+	* @brief Finds the bitblock given its block index blockID and its position in the collection. If it does not exists
+	*		 provides bitblock closes to blockID with greater index. Depending on the Policy parameter, it can also provide
+	*		 the position of the latter bitblock.		
 	* @param blockID: index of the block
-	* @param pos: OUTPUT position of the block in the collection with index BlockID, 
-	*			  or BBObject::noBit if it does not exist
+	* @param pos: OUTPUT param which provides I) the position of the block in the collection with index BlockID, 
+	*			  II) BBObject::noBit depending if the block does not exist or the Policy parameter
+	* param Policy_iterPos: template param which, if true, asks for the position of the block returned
 	* @returns: iterator to the closest bitblock with index greater or equal to blocKID
-	*			or END() if the block does not exist
+	*			or END() if the block does not exist. Depending on the Policy parameter, it can also provide
+	*			the position of the bitblock pointed by the iterator. If the block does not exist, and the Policy iterPos = false
+	*			pos = BBObject::noBit.
 	* @details O(log) complexity
 	* @details two implementations, read only and read-write
 	**/
+	template<bool Policy_iterPos = false>
 	vPB_cit find_block				(int blockID, int& pos)	const;
+
+	template<bool Policy_iterPos = false>
 	vPB_it  find_block				(int blockID, int& pos);
 
 	/**
@@ -229,7 +237,7 @@ explicit BitSetSp					(int nPop, bool is_popsize = true );
 	find_block_ext					(int blockID)			const;
 		
 	/**
-	* @brief finds the position (index) of the bitblock with blockID
+	* @brief finds the position (index) of the bitblock with index blockID
 	* @param blockID: input index of the block searched
 	* @returns a pair with first:true if the block exists, and second: the index of the block in the collection
 	*		   In the case the block does not exist (first element of the pair is false),

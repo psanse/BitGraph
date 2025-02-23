@@ -773,6 +773,7 @@ BITBOARD BitSetSp::find_block (int blockID) const{
 	}
 }
 
+template<bool Policy_iterPos>
 BitSetSp::vPB_cit 
 BitSetSp::find_block(int blockID, int& pos) const
 {
@@ -781,7 +782,7 @@ BitSetSp::find_block(int blockID, int& pos) const
 	auto it = lower_bound(vBB_.cbegin(), vBB_.cend(), pBlock_t(blockID), pBlock_less());
 	////////////////////////////////////////////////////////////////////////////////////////////
 
-	if (it != vBB_.end() && it->idx_ == blockID) {
+	if (it != vBB_.end() && ( it->idx_ == blockID || Policy_iterPos)) {
 		pos = it - vBB_.begin();		
 	}
 	else {
@@ -792,6 +793,7 @@ BitSetSp::find_block(int blockID, int& pos) const
 
 }
 
+template<bool Policy_iterPos>
 BitSetSp::vPB_it
 BitSetSp::find_block(int blockID, int& pos)
 {
@@ -800,7 +802,7 @@ BitSetSp::find_block(int blockID, int& pos)
 	auto it = lower_bound(vBB_.begin(), vBB_.end(), pBlock_t(blockID), pBlock_less());
 	////////////////////////////////////////////////////////////////////////////////////////////
 
-	if (it != vBB_.end() && it->idx_ == blockID) {
+	if (it != vBB_.end() && (it->idx_ == blockID || Policy_iterPos)) {
 		pos = it - vBB_.begin();
 	}
 	else {
