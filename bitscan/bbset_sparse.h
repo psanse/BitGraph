@@ -473,6 +473,8 @@ BitSetSp& operator |=				(const BitSetSp& bitset);
 	/**
 	* @brief Bitwise XOR operator with bbn
 	* @details set symmetric difference operation
+	* 
+	* TODO - BUG, use SIZE_INIT as limit for the loop (23/02/2025)
 	**/
 BitSetSp& operator ^=				(const BitSetSp& bitset) ;
 
