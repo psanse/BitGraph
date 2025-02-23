@@ -606,35 +606,34 @@ BitSetSp&  BitSetSp::erase_bit (const BitSetSp& rhs ){
 }
 
 BitSetSp& BitSetSp::operator &= (const BitSetSp& rhs){
+	
+	auto itL = vBB_.begin();		//iterator to *this	
+	auto itR = rhs.vBB_.cbegin();	//iterator to rhs	
 
-
-	auto posTHIS = 0;		//block position *this
-	auto posR = 0;			//block position rhs	
-
-	while( (posTHIS < vBB_.size()) && (posR < rhs.vBB_.size()) ){
+	while( itL != vBB_.end() && itR != rhs.vBB_.end()  ){
 	
 		//update before either of the bitstrings has reached its end
-		if(vBB_[posTHIS].idx_ < rhs.vBB_[posR].idx_)
+		if(itL->idx_ < itR->idx_)
 		{
 			///////////////////////
-			vBB_[posTHIS].bb_ = 0;
+			itL->bb_ = 0;
 			///////////////////////
 
-			++posTHIS;
+			++itL;
 
-		}else if (vBB_[posTHIS].idx_ > rhs.vBB_[posR].idx_ )
+		}else if (itL->idx_ > itR->idx_ )
 		{
-			++posR;
+			++itR;
 		}else
 		{
 			//equal indexes
 
 			//////////////////////////////////////
-			vBB_[posTHIS].bb_ &= rhs.vBB_[posR].bb_;
+			itL->bb_ &= itR->bb_;
 			/////////////////////////////////////
 			
-			++posTHIS;
-			++posR;
+			++itL;
+			++itR;
 		}
 			
 
@@ -642,12 +641,12 @@ BitSetSp& BitSetSp::operator &= (const BitSetSp& rhs){
 
 	//if loop terminates because rhs has reached its end then
 	//delete remaining blocks in THIS 
-	if (posR == rhs.vBB_.size()) {
+	if (itR == rhs.vBB_.end()) {
 		
-		for (; posTHIS < vBB_.size(); ++posTHIS) {
+		for (; itL != vBB_.end(); ++itL) {
 
 			////////////////////////////
-			vBB_[posTHIS].bb_ = ZERO;
+			itL->bb_ = ZERO;
 			///////////////////////////
 		}
 	}
