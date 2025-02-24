@@ -1065,34 +1065,41 @@ ostream& BitSetSp::print (std::ostream& o, bool show_pc, bool endl ) const  {
 }
 
 string BitSetSp::to_string (){
+
 	ostringstream sstr;
-	sstr<<"[";
-	this->print();
-	int nBit=EMPTY_ELEM;
-	while(true){
-		nBit=next_bit(nBit);
-		if(nBit==EMPTY_ELEM) break;
-		sstr<<nBit<<" ";
+
+	/////////////
+	sstr << '[';
+	/////////////
+		
+	int nBit = BBObject::noBit;
+	while( (nBit = next_bit(nBit)) != BBObject::noBit) {
+		sstr << nBit << ' ';
 	}
 
-	sstr<<"("<<popcn64()<<")";
-	sstr<<"]";
+	sstr << '(' << size() << ')';
+
+	///////////////
+	sstr << ']';
+	///////////////
 
 	return sstr.str();
 }
 
-void BitSetSp::to_vector (std::vector<int>& vl)const{
-//////////////////////
-// copies bit string to vector 
-//
-	vl.clear();
+void BitSetSp::to_vector (std::vector<int>& lb)const{
 
-	int v=EMPTY_ELEM;
-	while(true){
-		v=next_bit(v);
-		if(v==EMPTY_ELEM) break;
+	lb.clear();
 
-		vl.push_back(v);
+	int nBit = BBObject::noBit;
+	while((nBit = next_bit(nBit)) != BBObject::noBit ){
+		lb.push_back(nBit);
 	}
+}
+
+BitSetSp::operator vint() const
+{
+	vint lb;
+	to_vector(lb);
+	return lb;
 }
 

@@ -693,6 +693,8 @@ inline	BitSet& erase_bit		(const BitSet& lhs, const BitSet& rhs);
 	* @brief converts bb and its popcount to a readable string
 	* @details format example [...000111 (3)]
 	* @returns string
+	* 
+	* TODO implement - cast operator	(24/02/2025)
 	**/
 	std::string to_string			();
 	
@@ -702,9 +704,9 @@ inline	BitSet& erase_bit		(const BitSet& lhs, const BitSet& rhs);
 	/**
 	* @brief Converts the bitstring to a std::vector of non-negative integers.
 	*		 The size of the vector is the number of bits in the bitstring. 
-	* @param lv: output vector 
+	* @param lb: output vector 
 	**/
-	void to_vector					(vint& lv)							const;
+	void to_vector					(vint& lb)							const;
 
 	/**
 	* @brief Casts the bitstring to a vector of non-negative integers

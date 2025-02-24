@@ -478,7 +478,7 @@ BitSetSp& operator ^=				(const BitSetSp& rhs) ;
 	* @details set intersection operation
 	* @details Capacities of THIS and bitset should be the same.
 	*
-	* TODO - check semantics when the capacity of bitset is greater than the one of THIS (23/02/2025)
+	* TODO - check semantics when the capacity of bitset is greater than the capacity of THIS (23/02/2025)
 	**/	
 BitSetSp& AND_block					(int firstBlock, const BitSetSp& rhs);
 
@@ -534,10 +534,30 @@ BitSetSp& AND_block					(int firstBlock, int lastBlock, const BitSetSp& bitset) 
 	ostream& print					(ostream& o = cout, bool show_pc = true, bool endl = true ) const override;
 
 /////////////////////
-//Conversions		
- 		
-	string to_string				();													//TODO implement - cast operator;
-	void to_vector					(std::vector<int>&)		const;						//TODO implement - cast operator;	
+//Conversions
+// 		
+ 	/**
+	* @brief converts the bitstring to a string of 1-bits with format
+	*        [bit1 bit2 bit3 ... <(pc)>] - (if empty: [ ]) 
+	* @details same as print, but returns a string
+	* @returns string representation of the bitstring
+	* 
+	* TODO implement - cast operator (24/02/2025)
+	**/
+	string to_string				();													
+	
+	/**
+	* @brief Converts the bitstring to a std::vector of non-negative integers.
+	*		 The size of the vector is the number of bits in the bitstring.
+	* @param lb: output vector
+	**/
+	void to_vector					(std::vector<int>& lb)		const;							
+
+	/**
+	* @brief Casts the bitstring to a vector of non-negative integers
+	* @details calls to_vector
+	**/
+	operator vint()								const;
 
 /////////////////////
 //data members
