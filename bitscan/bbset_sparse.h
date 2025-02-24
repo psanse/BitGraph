@@ -320,6 +320,8 @@ private:
 	*
 	*		 I.Primitive scanning stateless feature at this level. Require a bit position as argument always.
 	*		II. Use bitscanning with state for proper bitscanning (derived class or external feature)
+	* 
+	* @details: DEPRECATED - not efficient
 	**/
 	int next_bit					(int firstBit)			const;			
 	
@@ -329,10 +331,11 @@ private:
 	*
 	*		 I.Primitive scanning stateless feature at this level. Require a bit position as argument always.
 	*		II. Use bitscanning with state for proper bitscanning (derived class or external feature)
+	* 
+	*  @details:DEPRECATED - not efficient
 	**/
 	int prev_bit					(int lastBit)			const;		
-
-	
+		
 
 public:	
 /////////////////
