@@ -1135,10 +1135,9 @@ BitSetSp& AND (const BitSetSp& lhs, const BitSetSp& rhs,  BitSetSp& res){
 	res.vBB_.reserve(lhs.vBB_.size());	
 	///////////////////////////////////
 
-
+	/////////////////	
+	//I. Optimization which works if lhs has less 1-bits than rhs
 	int i2=0;
-	//res.erase_bit();					//experimental (and simplest solution)
-	//res.vBB_.reserve(lhs.vBB_.size());	//optimization
 	const int MAX=rhs.vBB_.size()-1;
 
 	//empty check of rhs required, the way it is implemented
@@ -1155,7 +1154,8 @@ BitSetSp& AND (const BitSetSp& lhs, const BitSetSp& rhs,  BitSetSp& res){
 		}
 	}
 
-	//general purpose code assuming no a priori knowledge about density in lhs and rhs
+	//////////////////
+	//II.General purpose code assuming no a priori knowledge about density in lhs and rhs
 	//int i1=0, i2=0;
 	//while(i1!=lhs.vBB_.size() && i2!=rhs.vBB_.size() ){
 	//	//update before either of the bitstrings has reached its end
