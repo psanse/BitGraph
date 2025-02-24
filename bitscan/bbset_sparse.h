@@ -257,22 +257,61 @@ explicit BitSetSp					(int nPop, bool is_popsize = true );
 	vPB_cit cend					()						const		{return vBB_.cend();}
 
 //////////////////////////////
-// Bitscanning
+// Bitscanning (no HW operations)
 
 	//find least/most signinficant bit
-virtual inline	int msbn64			(int& nElem)			const;				
-virtual inline	int lsbn64			(int& nElem)			const; 	
-virtual	int msbn64					()						const;		//lookup
-virtual	int lsbn64					()						const; 		//de Bruijn	/ lookup
+	///////////////////////
+// Look up table implementation (best found so far)
+//
+// RETURNS element index of the bitblock
 
-	//for scanning all bits
+protected:
+	/**
+	* @brief Determines the most significant bit in the bitstring
+	* @returns index of the most significant bit in the bitstring
+	*  @details implemented as a lookup table
+	**/
+inline	int msbn64_lup				()						const;	
+
+	/**
+	* @brief Determines the most significant bit in the bitstring
+	*		 and returns the bitblock of the last scanned bit
+	**/
+inline	int msbn64_intrin			(int& block)			const;
+inline  int msbn64_intrin			()						const;
+
+public:
+		int msb						()						const				{return msbn64_intrin();}
+		int msb						(int& block)			const				{return msbn64_intrin(block);}
+protected:
 	
-virtual inline	int next_bit		(int nBit)				;				//uses cached elem position for fast bitscanning
-virtual inline	int prev_bit		(int nBit)				;				//uses cached elem position for fast bitscanning
+	/**
+	* @brief Determines the least significant bit in the bitstring
+	* @details  implemented as a de Bruijn hashing or a lookup table depending on
+	*			an internal switch (see config.h)
+	* @returns index of the most significant bit in the bitstring
+	**/
+inline	int lsbn64_non_intrin		()						const; 	
+
+	/**
+	* @brief Determines the most significant bit in the bitstring
+	*		 and returns the bitblock of the last scanned bit
+	**/
+inline	int lsbn64_intrin			(int& block)			const;
+inline  int lsbn64_intrin			()						const;
+
+public:
+		int lsb						()						const				{ return lsbn64_intrin(); }
+		int lsb						(int& block)			const				{ return lsbn64_intrin(block); }		
+		
+		//TODO- refactor bitscanning from here (21/02/2025)
+
+virtual inline	int next_bit		(int bit)				;				//uses cached elem position for fast bitscanning
+virtual inline	int prev_bit		(int bit)				;				//uses cached elem position for fast bitscanning
 
 private:
-	int next_bit					(int nBit)				const;			//de Bruijn 
-	int prev_bit					(int nbit)				const;			//lookup
+	int next_bit					(int bit)				const;			//de Bruijn 
+	int prev_bit					(int bit)				const;			//lookup
 
 public:	
 /////////////////
@@ -784,19 +823,21 @@ inline
 int BitSetSp::prev_bit	(int nBit){
 /////////////////
 // Uses cache of last index position for fast bit scanning
-//
 
-	if(nBit==BBObject::noBit)
-			return msbn64(nElem);		//updates nElem with the corresponding bitblock
+
+	if (nBit == BBObject::noBit) {
+		return msbn64_intrin(nElem);						//updates nElem with the corresponding bitblock
+	}
 	
 	int index = WDIV(nBit);
-	int npos=bblock::msb64_lup(Tables::mask_low[WMOD(nBit) /*nBit-WMUL(index)*/] & vBB_[nElem].bb_);
-	if(npos!=BBObject::noBit)
+	int npos = bblock::msb64_lup(Tables::mask_low[WMOD(nBit) /*nBit-WMUL(index)*/] & vBB_[nElem].bb_);
+	if (npos != BBObject::noBit) {
 		return (WMUL(index) + npos);
+	}
 	
-	for(int i=nElem-1; i>=0; i--){  //new bitblock
+	for(int i = nElem - 1; i >= 0; --i){  //new bitblock
 		if( vBB_[i].bb_){
-			nElem=i;
+			nElem = i;
 			return bblock::msb64_de_Bruijn(vBB_[i].bb_) + WMUL(vBB_[i].idx_);
 		}
 	}
@@ -808,8 +849,9 @@ int BitSetSp::next_bit(int nBit){
 /////////////////
 // Uses cache of last index position for fast bit scanning
 //	
-	if(nBit==BBObject::noBit)
-		return lsbn64(nElem);		//updates nElem with the corresponding bitblock
+	if (nBit == BBObject::noBit) {
+		return lsbn64_intrin(nElem);		//updates nElem with the corresponding bitblock
+	}
 	
 	int idx = WDIV(nBit);
 	int npos=bblock::lsb64_de_Bruijn(Tables::mask_high[WMOD(nBit) /* WORD_SIZE * idx */] & vBB_[nElem].bb_);
@@ -827,72 +869,173 @@ return BBObject::noBit;
 }
 
 inline
-int BitSetSp::msbn64	(int& nElem)	const{
-///////////////////////
-// Look up table implementation (best found so far)
-//
-// RETURNS element index of the bitblock
+int BitSetSp::msbn64_intrin	(int& block)	const {
 
-	union u {
-		U16 c[4];
-		BITBOARD b;
-	};
+	U32 posInBB;
 
-	u val;
+	for (int i = vBB_.size() - 1; i >= 0; --i) {
 
-	for(int i=vBB_.size()-1; i>=0; i--){
-		val.b=vBB_[i].bb_;
-		if(val.b){
-			nElem=i;
-			if(val.c[3]) return (Tables::msba[3][val.c[3]]+WMUL(vBB_[i].idx_));
-			if(val.c[2]) return (Tables::msba[2][val.c[2]]+WMUL(vBB_[i].idx_));
-			if(val.c[1]) return (Tables::msba[1][val.c[1]]+WMUL(vBB_[i].idx_));
-			if(val.c[0]) return (Tables::msba[0][val.c[0]]+WMUL(vBB_[i].idx_));
+		if (_BitScanReverse64(&posInBB, vBB_[i].bb_)) {
+			block = i;
+			return (posInBB + WMUL(vBB_[i].idx_));
 		}
 	}
 
-return BBObject::noBit;		//should not reach here
+	return BBObject::noBit;
+
+	//old lookup version
+	/*register union u {
+		U16 c[4];
+		BITBOARD b;
+	}val;
+	
+
+	for (int i = vBB_.size() - 1; i >= 0; --i)
+	{
+		val.b = vBB_[i].bb_;
+		if(val.b){
+			block = i;
+			if(val.c[3]) return (Tables::msba[3][val.c[3]] + WMUL(vBB_[i].idx_));
+			if(val.c[2]) return (Tables::msba[2][val.c[2]] + WMUL(vBB_[i].idx_));
+			if(val.c[1]) return (Tables::msba[1][val.c[1]] + WMUL(vBB_[i].idx_));
+			if(val.c[0]) return (Tables::msba[0][val.c[0]] + WMUL(vBB_[i].idx_));
+		}
+	}*/
+
+	return BBObject::noBit;		//should not reach here
 }
 
 inline
-int BitSetSp::lsbn64 (int& nElem)		const	{
-/////////////////
-// different implementations of lsbn depending on configuration
-//
-// RETURNS element index of the bitblock
-	
-#ifdef DE_BRUIJN
-	for(int i=0; i<vBB_.size(); i++){
-		if(vBB_[i].bb_){
-			nElem=i;
-#ifdef ISOLANI_LSB
-			return(Tables::indexDeBruijn64_ISOL[((vBB_[i].bb_ & -vBB_[i].bb_) * DEBRUIJN_MN_64_ISOL/*magic num*/) >> DEBRUIJN_MN_64_SHIFT]+ WMUL(vBB_[i].idx_));	
-#else
-			return(Tables::indexDeBruijn64_SEP[((vBB_[i].bb_ ^ (vBB_[i].bb_ - 1)) * bblock::DEBRUIJN_MN_64_SEP/*magic num*/) >> bblock::DEBRUIJN_MN_64_SHIFT] + WMUL(vBB_[i].idx_));
-#endif
-		}
-	}
-#elif LOOKUP
-	union u {
+int BitSetSp::msbn64_lup() const {
+
+	register union u {
 		U16 c[4];
 		BITBOARD b;
-	};
+	}val;
 
-	u val;
+	for (int i = vBB_.size() - 1; i >= 0; --i) {
+		val.b = vBB_[i].bb_;
+		if (val.b) {
+			if (val.c[3]) return (Tables::msba[3][val.c[3]] + WMUL(vBB_[i].idx_));
+			if (val.c[2]) return (Tables::msba[2][val.c[2]] + WMUL(vBB_[i].idx_));
+			if (val.c[1]) return (Tables::msba[1][val.c[1]] + WMUL(vBB_[i].idx_));
+			if (val.c[0]) return (Tables::msba[0][val.c[0]] + WMUL(vBB_[i].idx_));
+		}
+	}
 
-	for(int i=0; i<m_nBB; i++){
-		val.b=vBB_[i].bb_;
-		nElem=i;
-		if(val.b){
-			if(val.c[0]) return (Tables::lsba[0][val.c[0]]+WMUL(vBB_[i].idx_));
-			if(val.c[1]) return (Tables::lsba[1][val.c[1]]+WMUL(vBB_[i].idx_));
-			if(val.c[2]) return (Tables::lsba[2][val.c[2]]+WMUL(vBB_[i].idx_));
-			if(val.c[3]) return (Tables::lsba[3][val.c[3]]+WMUL(vBB_[i].idx_));
+	return BBObject::noBit;		//should not reach here
+}
+
+inline
+int BitSetSp::msbn64_intrin() const
+{
+	U32 posInBB;
+
+	for (int i = vBB_.size() - 1; i >= 0; --i) {
+
+		if (_BitScanReverse64(&posInBB, vBB_[i].bb_)) {
+			return ( posInBB + WMUL(vBB_[i].idx_) );
+		}
+	}
+
+	return BBObject::noBit;
+}
+
+
+inline
+int BitSetSp::lsbn64_intrin (int& block) const	{
+		
+
+	U32 posInBB;
+
+	for (auto i = 0; i < vBB_.size(); ++i) {
+		if (_BitScanForward64(&posInBB, vBB_[i].bb_)) {
+			block = i;
+			return(posInBB + WMUL(vBB_[i].idx_));
+		}
+	}
+
+
+	//old lookup version
+//#ifdef DE_BRUIJN
+//	for(int i = 0; i < vBB_.size(); ++i){
+//		if(vBB_[i].bb_){
+//			block = i;
+//#ifdef ISOLANI_LSB
+//			return(Tables::indexDeBruijn64_ISOL[((vBB_[i].bb_ & -vBB_[i].bb_) * DEBRUIJN_MN_64_ISOL/*magic num*/) >> DEBRUIJN_MN_64_SHIFT]+ WMUL(vBB_[i].idx_));	
+//#else
+//			return(Tables::indexDeBruijn64_SEP[((vBB_[i].bb_ ^ (vBB_[i].bb_ - 1)) * bblock::DEBRUIJN_MN_64_SEP/*magic num*/) >>
+//														bblock::DEBRUIJN_MN_64_SHIFT] + WMUL(vBB_[i].idx_)							);
+//#endif
+//		}
+//	}
+//#elif LOOKUP
+//	union u {
+//		U16 c[4];
+//		BITBOARD b;
+//	}val;
+//
+//	for(int i = 0; i < vBB_.size(); i++){
+//		val.b = vBB_[i].bb_;
+//		block = i;
+//		if(val.b){
+//			if(val.c[0]) return (Tables::lsba[0][val.c[0]] + WMUL(vBB_[i].idx_));
+//			if(val.c[1]) return (Tables::lsba[1][val.c[1]] + WMUL(vBB_[i].idx_));
+//			if(val.c[2]) return (Tables::lsba[2][val.c[2]] + WMUL(vBB_[i].idx_));
+//			if(val.c[3]) return (Tables::lsba[3][val.c[3]] + WMUL(vBB_[i].idx_));
+//		}
+//	}
+//
+//#endif
+
+	return BBObject::noBit;	
+}
+
+inline
+int BitSetSp::lsbn64_non_intrin() const {
+
+#ifdef DE_BRUIJN
+	for (int i = 0; i < vBB_.size(); ++i) {
+		if (vBB_[i].bb_) {
+#ifdef ISOLANI_LSB
+			return(Tables::indexDeBruijn64_ISOL[((vBB_[i].bb_ & -vBB_[i].bb_) * DEBRUIJN_MN_64_ISOL/*magic num*/) >> DEBRUIJN_MN_64_SHIFT] + WMUL(vBB_[i].idx_));
+#else
+			return(Tables::indexDeBruijn64_SEP[((vBB_[i].bb_ ^ (vBB_[i].bb_ - 1)) * bblock::DEBRUIJN_MN_64_SEP/*magic num*/) >>
+				bblock::DEBRUIJN_MN_64_SHIFT] + WMUL(vBB_[i].idx_));
+		}
+#endif
+	}
+#elif LOOKUP
+	register union u {
+		U16 c[4];
+		BITBOARD b;
+	}val;
+
+	for (int i = 0; i < vBB_.size(); ++i) {
+		val.b = vBB_[i].bb_;
+		if (val.b) {
+			if (val.c[0]) return (Tables::lsba[0][val.c[0]] + WMUL(vBB_[i].idx_));
+			if (val.c[1]) return (Tables::lsba[1][val.c[1]] + WMUL(vBB_[i].idx_));
+			if (val.c[2]) return (Tables::lsba[2][val.c[2]] + WMUL(vBB_[i].idx_));
+			if (val.c[3]) return (Tables::lsba[3][val.c[3]] + WMUL(vBB_[i].idx_));
 		}
 	}
 
 #endif
-return BBObject::noBit;	
+	return EMPTY_ELEM;
+}
+
+inline int BitSetSp::lsbn64_intrin() const
+{
+	U32 posInBB;
+
+	for (auto i = 0; i < vBB_.size(); ++i) {
+		if (_BitScanForward64(&posInBB, vBB_[i].bb_)) {
+			return(posInBB + WMUL(vBB_[i].idx_));
+		}
+	}
+
+	return BBObject::noBit;
 }
 
 inline

@@ -848,65 +848,7 @@ BitSetSp::find_block_ext (int blockID) const
 //
 ////////////////////////////////
 
-int BitSetSp::lsbn64() const{
-/////////////////
-// different implementations of lsbn depending on configuration
 
-#ifdef DE_BRUIJN
-	for(int i=0; i<vBB_.size(); i++){
-		if(vBB_[i].bb_)
-#ifdef ISOLANI_LSB
-			return(Tables::indexDeBruijn64_ISOL[((vBB_[i].bb_ & -vBB_[i].bb_) * DEBRUIJN_MN_64_ISOL/*magic num*/) >> DEBRUIJN_MN_64_SHIFT]+ WMUL(vBB_[i].idx_));	
-#else
-			return(Tables::indexDeBruijn64_SEP[((vBB_[i].bb_^ (vBB_[i].bb_-1)) * bblock::DEBRUIJN_MN_64_SEP/*magic num*/) >> bblock::DEBRUIJN_MN_64_SHIFT]+ WMUL(vBB_[i].idx_));
-#endif
-	}
-#elif LOOKUP
-	union u {
-		U16 c[4];
-		BITBOARD b;
-	};
-
-	u val;
-
-	for(int i=0; i<m_nBB; i++){
-		val.b=vBB_[i].bb_;
-		if(val.b){
-			if(val.c[0]) return (Tables::lsba[0][val.c[0]]+WMUL(vBB_[i].idx_));
-			if(val.c[1]) return (Tables::lsba[1][val.c[1]]+WMUL(vBB_[i].idx_));
-			if(val.c[2]) return (Tables::lsba[2][val.c[2]]+WMUL(vBB_[i].idx_));
-			if(val.c[3]) return (Tables::lsba[3][val.c[3]]+WMUL(vBB_[i].idx_));
-		}
-	}
-
-#endif
-return EMPTY_ELEM;	
-}
-
- int BitSetSp::msbn64() const{
-///////////////////////
-// Look up table implementation (best found so far)
-
-	union u {
-		U16 c[4];
-		BITBOARD b;
-	};
-
-	u val;
-
-	for(auto i = vBB_.size() - 1; i >= 0; --i){
-		val.b = vBB_[i].bb_;
-		if(val.b){
-			if(val.c[3]) return (Tables::msba[3][val.c[3]] + WMUL(vBB_[i].idx_));
-			if(val.c[2]) return (Tables::msba[2][val.c[2]] + WMUL(vBB_[i].idx_));
-			if(val.c[1]) return (Tables::msba[1][val.c[1]] + WMUL(vBB_[i].idx_));
-			if(val.c[0]) return (Tables::msba[0][val.c[0]] + WMUL(vBB_[i].idx_));
-		}
-	}
-
-return EMPTY_ELEM;		//should not reach here
-}
- 
 
 int BitSetSp::next_bit(int nBit/* 0 based*/)  const {
 ////////////////////////////
@@ -918,7 +860,7 @@ int BitSetSp::next_bit(int nBit/* 0 based*/)  const {
 	
 	
 	if(nBit==EMPTY_ELEM){
-		return lsbn64();
+		return lsb();
 	}
 		
 	//look in the remaining bitblocks (needs caching last i visited)
@@ -950,8 +892,9 @@ int BitSetSp::prev_bit(int nBit/* 0 bsed*/) const{
 // NOTES: 
 // 1. A  preliminary implementation. It becomes clear the necessity of caching the index of the vector at each iteration (*)
 		
-	if(nBit==EMPTY_ELEM)
-				return msbn64();
+	if (nBit == EMPTY_ELEM) {
+		return msbn64_lup();
+	}
 		
 	//look in the remaining bitblocks
 	int idx = WDIV(nBit);

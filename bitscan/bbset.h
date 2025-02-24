@@ -809,8 +809,6 @@ int BitSet::find_first_common	(const BitSet& rhs) const {
 }
 
 inline int BitSet::msbn64_lup() const{
-///////////////////////
-// Look up table implementation (best found so far)
 
 	register union u {
 		U16 c[4];
