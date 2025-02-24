@@ -252,7 +252,7 @@ explicit BitSetSp					(int nPop, bool is_popsize = true );
 	* @brief commodity iterators / const iterators for the bitset
 	**/
 	vPB_it  begin					()									{return vBB_.begin();}
-	vPB_it  end						()									{return vBB_.end();}
+	vPB_it  end						()									{return vBB_.end(); }
 	vPB_cit cbegin					()						const		{return vBB_.cbegin();}
 	vPB_cit cend					()						const		{return vBB_.cend();}
 
@@ -277,8 +277,29 @@ private:
 public:	
 /////////////////
 // Popcount
+
+	/**
+	* @brief Number of 1-bits in the bitstring
+	*
+	* @details alias to popcn64, calls the function
+	* @details To be used instead of popcn64 (12/02/2025)
+	*
+	**/
 		inline   int size			()						const			{ return popcn64(); }
-virtual inline	 int popcn64		()						const;			//lookup 
+
+	/**
+	* @brief number of 1-bits in THIS
+	* @details implemented as a lookup table
+	* @details implementation depends of POPCN64 switch in bbconfig.h
+	*		   By default - intrinsic HW assembler instructions
+	**/
+virtual inline	 int popcn64		()						const;			 
+	
+	/**
+	* @brief number of 1-bits in the range [nBit, END(
+	* @details implementation depends of POPCN64 switch in bbconfig.h
+	*		   By default - intrinsic HW assembler instructions
+	**/
 virtual inline	 int popcn64		(int nBit)				const;			
 
 /////////////////////
@@ -557,7 +578,7 @@ BitSetSp& AND_block					(int firstBlock, int lastBlock, const BitSetSp& bitset) 
 	* @brief Casts the bitstring to a vector of non-negative integers
 	* @details calls to_vector
 	**/
-	operator vint()								const;
+	operator vint					()							const;
 
 /////////////////////
 //data members
@@ -876,47 +897,37 @@ return BBObject::noBit;
 
 inline
 int BitSetSp::popcn64() const{
-	int npc=0;
-	union u	{
-		U16 c[4];
-		BITBOARD b;
-	}val;
 
-	for(int i=0; i<vBB_.size(); i++){
-		val.b = vBB_[i].bb_; 
-		npc+= Tables::pc[val.c[0]] + Tables::pc[val.c[1]] + Tables::pc[val.c[2]] + Tables::pc[val.c[3]];
+	BITBOARD pc = 0;
+
+	for (auto i = 0; i < vBB_.size(); ++i) {
+		pc += bblock::popc64(vBB_[i].bb_);
 	}
 
-return npc;
+	return pc;
 }
 
 inline
-int BitSetSp::popcn64(int nBit) const{
-	int npc=0;
-	union u	{
-		U16 c[4];
-		BITBOARD b;
-	}val;
+int BitSetSp::popcn64 (int firstBit) const{
 
-	int nBB=WDIV(nBit);
+	auto bbL = WDIV(firstBit);
+	auto it = lower_bound(vBB_.begin(), vBB_.end(), pBlock_t(bbL), pBlock_less());
+	BITBOARD pc = 0;
 
-	//find the biblock if it exists
-	vPB_cit it=lower_bound(vBB_.begin(), vBB_.end(), pBlock_t(nBB), pBlock_less());
-	if(it!=vBB_.end()){
-		if(it->idx_==nBB){
-			val.b= it->bb_&~Tables::mask_low[WMOD(nBit)];
-			npc+= Tables::pc[val.c[0]] + Tables::pc[val.c[1]] + Tables::pc[val.c[2]] + Tables::pc[val.c[3]];
+	if (it != vBB_.end()) {
+
+		if (it->idx_ == bbL) {
+			pc += bblock::popc64(it->bb_ & bblock::MASK_1_HIGH(firstBit - WMUL(bbL)));
 			it++;
 		}
-		
-		//searches in the rest of elements with greater index than nBB
-		for(; it!=vBB_.end(); ++it){
-			val.b = it->bb_; //Loads union
-			npc+= Tables::pc[val.c[0]] + Tables::pc[val.c[1]] + Tables::pc[val.c[2]] + Tables::pc[val.c[3]];
+
+		//counts the population of the rest of bitblocks
+		for (; it != vBB_.end(); ++it) {
+			pc += bblock::popc64(it->bb_);
 		}
 	}
-	
-return npc;
+
+	return pc;
 }
 
 inline

@@ -324,7 +324,6 @@ std::size_t	size					(int firstBit, int lastBit = -1)	const		{ return (std::size
 
 	/**
 	* @brief returns the number of 1-bits in the bitstring
-	* @details implemented as a lookup table	
 	**/
 protected:
 virtual	inline int popcn64			()							const;		 
@@ -334,8 +333,8 @@ virtual	inline int popcn64			()							const;
 	*	 	 in the closed range [firstBit, lastBit]
 	*		 If lastBit == -1, the range is [firstBit, endOfBitset)
 	* 
-	* @details efficiently implemented as a lookup table or
-	*		   with HW instructions depending  on an internal switch (see config.h)
+	* @details efficiently implemented as a lookup table or with HW instructions
+	*			depending  on an internal switch (see config.h)
 	**/
 virtual	inline int popcn64			(int firstBit, int lastBit = -1)	const;
 
@@ -1345,7 +1344,7 @@ int BitSet::popcn64() const{
 
 	BITBOARD pc = 0;
 
-	for (auto i = 0; i < nBB_; ++i) {
+	for (auto i = 0; i < nBB_ /*vBB_.size()*/; ++i) {
 		pc += bblock::popc64(vBB_[i]);
 	}
 
