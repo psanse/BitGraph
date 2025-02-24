@@ -849,79 +849,6 @@ BitSetSp::find_block_ext (int blockID) const
 ////////////////////////////////
 
 
-int BitSetSp::next_bit(int firstBit)  const {
-	
-	//special case - first bitscan
-	if(firstBit == BBObject::noBit){
-		return lsb();
-	}
-		
-	int bbL = WDIV(firstBit);
-
-	/////////////////////////////////
-	//binary search for block bbL or closest to it with higher index
-	auto pos = BBObject::noBit;
-	auto it = find_block(bbL, pos);
-	////////////////////////////////
-
-	//no more 1-bits
-	if (it == vBB_.end()) {
-		return BBObject::noBit;	
-	}
-
-	if (pos != BBObject::noBit) {
-		
-		//block bbL exists - find lsb
-		int npos = bblock::lsb(it->bb_ & Tables::mask_high[firstBit - WMUL(bbL)]);
-		
-		if (npos != BBObject::noBit) {
-			/////////////////////////////////
-			return (npos + WMUL(bbL));
-			//////////////////////////////////
-		}
-		else {
-			return BBObject::noBit;
-		}
-	}
-
-	//return the closest block with greater index
-	return bblock::lsb(it->bb_) + WMUL(it->idx_);
-
-}
-
-int BitSetSp::prev_bit(int lastBit) const{
-
-	//special case - first bitscan
-	if (lastBit == BBObject::noBit) {
-		return msb();
-	}
-		
-	//find the block containing nBit or closest one with less index 
-	int bbL = WDIV(lastBit);
-
-	for(int i = vBB_.size() - 1; i >= 0; --i){
-
-		if(vBB_[i].idx_> bbL) continue;							//(*)
-
-		//block bbL exists - find msb
-		if(vBB_[i].idx_== bbL){
-
-			int npos = bblock::msb64_intrinsic(vBB_[i].bb_ & Tables::mask_low[lastBit - WMUL(bbL)] );
-			if (npos != BBObject::noBit) {
-				return (WMUL(bbL) + npos);
-			}
-			continue;
-		}
-
-		//block with less index than bbL
-		if(vBB_[i].bb_ ){
-			return bblock::msb64_intrinsic(vBB_[i].bb_) + WMUL(vBB_[i].idx_);
-		}
-	}
-	
-	return BBObject::noBit;
-}
-
 
 //////////////
 //
@@ -1016,7 +943,7 @@ ostream& BitSetSp::print (std::ostream& o, bool show_pc, bool endl ) const  {
 	return o;
 }
 
-string BitSetSp::to_string (){
+string BitSetSp::to_string ()  const{
 
 	ostringstream sstr;
 
@@ -1055,3 +982,68 @@ BitSetSp::operator vint() const
 	return lb;
 }
 
+///////////////////////////////
+// 
+// DEPRECATED -  CODE
+//
+///////////////////////////////
+
+///////////////////
+// Bit scanning with cached BitSetSp::block_scanned
+// (UNSAFE)
+
+
+//int BitSetSp::prev_bit(int lastBit) {
+//
+//	//special case - first bitscan
+//	if (lastBit == BBObject::noBit) {
+//
+//		//finds msb AND caches next block to scan
+//		return msb(BitSetSp::block_scanned);
+//	}
+//
+//	//if block of firstBit exists it MUST be  BitSetSp::block_scanned - compute lsb
+//	int npos = bblock::msb(vBB_[BitSetSp::block_scanned].bb_ & Tables::mask_low[lastBit - WMUL(BitSetSp::block_scanned)]);
+//	if (npos != BBObject::noBit) {
+//		return (WMUL(BitSetSp::block_scanned) + npos);
+//	}
+//
+//	//BitSetSp::block_scanned does not exist - finds closest block to BitSetSp::block_scanned
+//	for (int i = BitSetSp::block_scanned - 1; i >= 0; --i) {  //new bitblock
+//		if (vBB_[i].bb_) {
+//			BitSetSp::block_scanned = i;
+//			return bblock::msb(vBB_[i].bb_) + WMUL(vBB_[i].idx_);
+//		}
+//	}
+//
+//	return BBObject::noBit;
+//}
+//
+//int BitSetSp::next_bit(int firstBit) {
+//
+//	//special case - first bitscan
+//	if (firstBit == BBObject::noBit) {
+//
+//		//finds lsb AND caches next block to scan
+//		return lsb(BitSetSp::block_scanned);
+//	}
+//
+//	//if block of firstBit exists it MUST be  BitSetSp::block_scanned - compute lsb
+//	int npos = bblock::lsb(vBB_[BitSetSp::block_scanned].bb_ & Tables::mask_high[firstBit - WMUL(BitSetSp::block_scanned)]);
+//	if (npos != BBObject::noBit) {
+//		return (npos + WMUL(BitSetSp::block_scanned));
+//	}
+//
+//	//bbL does not exist - finds closest block to bbL
+//	for (auto i = BitSetSp::block_scanned + 1; i < vBB_.size(); ++i) {
+//		//new bitblock
+//		if (vBB_[i].bb_) {
+//
+//			//update cached block
+//			BitSetSp::block_scanned = i;
+//			return bblock::lsb64_de_Bruijn(vBB_[i].bb_) + WMUL(vBB_[i].idx_);
+//		}
+//	}
+//
+//	return BBObject::noBit;
+//}

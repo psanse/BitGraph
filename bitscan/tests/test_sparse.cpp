@@ -567,7 +567,7 @@ TEST(Sparse_non_instrinsic, scanning){
 	//direct loop
 	int nBit=EMPTY_ELEM;
 	while(true){
-		nBit=bbsp.next_bit(nBit);
+		nBit = bbsp.next_bit(nBit);
 		if(nBit==EMPTY_ELEM) break;
 		v.push_back(nBit);
 	}

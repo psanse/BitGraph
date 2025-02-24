@@ -304,47 +304,60 @@ inline  int lsbn64_intrin			()						const;
 public:
 		int lsb						()						const				{ return lsbn64_intrin(); }
 		int lsb						(int& block)			const				{ return lsbn64_intrin(block); }		
-		
-	/**
-	* @brief Computes the least significant 1-bit in the bitstring AFTER firstBit
-	*		 If bit == BBObject::noBit, returns the lest significant bit in the bitstring.
-	*
-	*		 I.Basic scanning which caches the block to continue scanning. Requires a bit position as argument always.
-	*		II.Use BBScanSp class specialized in bitscanning which caches block and last bit scanned for maximun efficiency 
-	**/
-inline	int next_bit				(int firstBit);
 
-	/**
-	* @brief Computes the most significant 1-bit in the bitstring BEFORE lastBit
-	*		 If bit == BBObject::noBit, returns the lest significant bit in the bitstring.
-	*
-	*		 I.Basic scanning which caches the block to continue scanning. Requires a bit position as argument always.
-	*		II.Use BBScanSp class specialized in bitscanning which caches block and last bit scanned for maximun efficiency 
-	**/
-inline	int prev_bit				(int lastBit);
-
-private:
+public:
 	/**
 	* @brief Computes the least significant 1-bit in the bitstring AFTER firstBit
 	*		 If bit == BBObject::noBit, returns the lest significant bit in the bitstring.
 	*
 	*		 I.Primitive scanning stateless feature at this level. Require a bit position as argument always.
 	*		II. Use bitscanning with state for proper bitscanning (derived class or external feature)
-	* 
-	* @details: USE ONLY for const scopes - NOT EFFICIENT
+	*
+	* @details: SAFE but not efficient. USE ONLY for basic bitscanning.
+	* @details: O(log n) worst-case complexity, n is the number of blocks in the bitset
 	**/
-	int next_bit					(int firstBit)			const;			
-	
+	int next_bit					(int firstBit)			const;
+
 	/**
 	* @brief Computes the next most significant 1-bit in the bitstring BEFORE  lastBit
 	*		 If bit == BBObject::noBit, returns the most significant bit in the bitstring.
 	*
 	*		 I.Primitive scanning stateless feature at this level. Require a bit position as argument always.
 	*		II. Use bitscanning with state for proper bitscanning (derived class or external feature)
-	* 
-	* @details: USE ONLY for const scopes - NOT EFFICIENT
+	*
+	* @details: SAFE but not efficient. USE ONLY for basic bitscanning.
+	* @details: O(n) worst-case complexity, n is the number of blocks in the bitset
 	**/
-	int prev_bit					(int lastBit)			const;		
+	int prev_bit					(int lastBit)			const;
+
+protected:	
+
+	///////////////////////////////////////////
+	//DEPRECATED next_bit / prev_bit functions
+
+	/**
+	* @brief Computes the least significant 1-bit in the bitstring AFTER firstBit
+	*		 If bit == BBObject::noBit, returns the lest significant bit in the bitstring.
+	*
+	*		 I.Basic scanning which caches the block to continue scanning. Requires a bit position as argument always.
+	*		II.Use BBScanSp class specialized in bitscanning which caches block and last bit scanned for maximun efficiency 
+	* @details: Cached block information is a static variable. May only be used in a single-threaded environment,
+	*			and only one sparse bitset can be scanned simultaneously (DO NOT USE)
+	**/
+	//inline	int next_bit			(int firstBit) = delete;
+
+	/**
+	* @brief Computes the most significant 1-bit in the bitstring BEFORE lastBit
+	*		 If bit == BBObject::noBit, returns the lest significant bit in the bitstring.
+	*
+	*		 I.Basic scanning which caches the block to continue scanning. Requires a bit position as argument always.
+	*		II.Use BBScanSp class specialized in bitscanning which caches block and last bit scanned for maximun efficiency.
+	* @details: Cached block information is a static variable. May only be used in a single-threaded environment,
+	*			and only one sparse bitset can be scanned simultaneously (DO NOT USE).
+	**/
+	//inline	int prev_bit			(int lastBit)  = delete;
+
+	//////////////////////////////////////////////////
 		
 
 public:	
@@ -638,7 +651,7 @@ BitSetSp& AND_block					(int firstBlock, int lastBlock, const BitSetSp& bitset) 
 	* 
 	* TODO implement - cast operator (24/02/2025)
 	**/
-	string to_string				();													
+	string to_string				()							const;													
 	
 	/**
 	* @brief Converts the bitstring to a std::vector of non-negative integers.
@@ -850,60 +863,76 @@ BitSetSp::reset_bit (int bit){
 	return *this;
 }	
 
-///////////////////
-// Bit scanning
 
 inline
-int BitSetSp::prev_bit	(int lastBit){
-
-	//special case - first bitscan
-	if (lastBit == BBObject::noBit) {
-
-		//finds msb AND caches next block to scan
-		return msb(BitSetSp::block_scanned);						
-	}
-	
-	//if block of firstBit exists it MUST be  BitSetSp::block_scanned - compute lsb
-	int npos = bblock::msb(vBB_[BitSetSp::block_scanned].bb_ & Tables::mask_low[lastBit - WMUL(BitSetSp::block_scanned)] );
-	if (npos != BBObject::noBit) {
-		return (WMUL(BitSetSp::block_scanned) + npos);
-	}
-	
-	//BitSetSp::block_scanned does not exist - finds closest block to BitSetSp::block_scanned
-	for(int i = BitSetSp::block_scanned - 1; i >= 0; --i){  //new bitblock
-		if( vBB_[i].bb_){
-			BitSetSp::block_scanned = i;
-			return bblock::msb(vBB_[i].bb_) + WMUL(vBB_[i].idx_);
-		}
-	}
-
-	return BBObject::noBit;
-}
-
-inline
-int BitSetSp::next_bit(int firstBit){
+int BitSetSp::next_bit(int firstBit)  const {
 
 	//special case - first bitscan
 	if (firstBit == BBObject::noBit) {
-		
-		//finds lsb AND caches next block to scan
-		return lsb(BitSetSp::block_scanned);
+		return lsb();
 	}
 
-	//if block of firstBit exists it MUST be  BitSetSp::block_scanned - compute lsb
-	int npos = bblock::lsb(vBB_[BitSetSp::block_scanned].bb_ & Tables::mask_high[firstBit - WMUL(BitSetSp::block_scanned)]);
-	if (npos != BBObject::noBit) {
-		return (npos + WMUL(BitSetSp::block_scanned));
-	}
-	
-	//bbL does not exist - finds closest block to bbL
-	for(auto i = BitSetSp::block_scanned + 1; i < vBB_.size(); ++i){
-		//new bitblock
-		if(vBB_[i].bb_){
+	int bbL = WDIV(firstBit);
 
-			//update cached block
-			BitSetSp::block_scanned = i;
-			return bblock::lsb64_de_Bruijn(vBB_[i].bb_) + WMUL(vBB_[i].idx_);
+	/////////////////////////////////
+	//binary search for block bbL or closest to it with higher index
+	auto pos = BBObject::noBit;
+	auto it = find_block(bbL, pos);
+	////////////////////////////////
+
+	//no more 1-bits
+	if (it == vBB_.end()) {
+		return BBObject::noBit;
+	}
+
+	if (pos != BBObject::noBit) {
+
+		//block bbL exists - find lsb
+		int npos = bblock::lsb(it->bb_ & Tables::mask_high[firstBit - WMUL(bbL)]);
+
+		if (npos != BBObject::noBit) {
+			/////////////////////////////////
+			return (npos + WMUL(bbL));
+			//////////////////////////////////
+		}
+		else {
+			return BBObject::noBit;
+		}
+	}
+
+	//return the closest block with greater index
+	return bblock::lsb(it->bb_) + WMUL(it->idx_);
+
+}
+
+inline
+int BitSetSp::prev_bit(int lastBit) const {
+
+	//special case - first bitscan
+	if (lastBit == BBObject::noBit) {
+		return msb();
+	}
+
+	//find the block containing nBit or closest one with less index 
+	int bbL = WDIV(lastBit);
+
+	for (int i = vBB_.size() - 1; i >= 0; --i) {
+
+		if (vBB_[i].idx_ > bbL) continue;							//(*)
+
+		//block bbL exists - find msb
+		if (vBB_[i].idx_ == bbL) {
+
+			int npos = bblock::msb64_intrinsic(vBB_[i].bb_ & Tables::mask_low[lastBit - WMUL(bbL)]);
+			if (npos != BBObject::noBit) {
+				return (WMUL(bbL) + npos);
+			}
+			continue;
+		}
+
+		//block with less index than bbL
+		if (vBB_[i].bb_) {
+			return bblock::msb64_intrinsic(vBB_[i].bb_) + WMUL(vBB_[i].idx_);
 		}
 	}
 
