@@ -565,13 +565,15 @@ TEST(Sparse_non_instrinsic, scanning){
 	vector<int> v;
 
 	//direct loop
-	int nBit=EMPTY_ELEM;
+	int nBit = BBObject::noBit;
 	while(true){
 		nBit = bbsp.next_bit(nBit);
-		if(nBit==EMPTY_ELEM) break;
+		if (nBit == BBObject::noBit) {
+			break;
+		}
 		v.push_back(nBit);
 	}
-		
+
 	EXPECT_EQ(10, v[0]);
 	EXPECT_EQ(20, v[1]);
 	EXPECT_EQ(64, v[2]);

@@ -306,6 +306,7 @@ public:
 		int lsb						(int& block)			const				{ return lsbn64_intrin(block); }		
 
 public:
+
 	/**
 	* @brief Computes the least significant 1-bit in the bitstring AFTER firstBit
 	*		 If bit == BBObject::noBit, returns the lest significant bit in the bitstring.
@@ -863,7 +864,6 @@ BitSetSp::reset_bit (int bit){
 	return *this;
 }	
 
-
 inline
 int BitSetSp::next_bit(int firstBit)  const {
 
@@ -872,37 +872,32 @@ int BitSetSp::next_bit(int firstBit)  const {
 		return lsb();
 	}
 
+	//find the block containing nBit or closest one with less index 
 	int bbL = WDIV(firstBit);
 
-	/////////////////////////////////
-	//binary search for block bbL or closest to it with higher index
-	auto pos = BBObject::noBit;
-	auto it = find_block(bbL, pos);
-	////////////////////////////////
+	for (int i = 0; i< vBB_.size() ; ++i) {
+				
+		//block bbL exists - find msb
+		if (vBB_[i].idx_ == bbL) {
 
-	//no more 1-bits
-	if (it == vBB_.end()) {
-		return BBObject::noBit;
-	}
+			int npos = bblock::lsb(vBB_[i].bb_ & Tables::mask_high[firstBit - WMUL(bbL)]);
 
-	if (pos != BBObject::noBit) {
-
-		//block bbL exists - find lsb
-		int npos = bblock::lsb(it->bb_ & Tables::mask_high[firstBit - WMUL(bbL)]);
-
-		if (npos != BBObject::noBit) {
-			/////////////////////////////////
-			return (npos + WMUL(bbL));
-			//////////////////////////////////
+			//exits if a bit is found
+			if (npos != BBObject::noBit) {
+				return (WMUL(bbL) + npos);
+			}
+			else {
+				continue;		//next block
+			}			
 		}
-		else {
-			return BBObject::noBit;
+
+		//first non-zero block with greater index than bbL
+		if (vBB_[i].bb_ && vBB_[i].idx_ > bbL) {
+			return bblock::lsb(vBB_[i].bb_) + WMUL(vBB_[i].idx_);
 		}
 	}
 
-	//return the closest block with greater index
-	return bblock::lsb(it->bb_) + WMUL(it->idx_);
-
+	return BBObject::noBit;
 }
 
 inline
@@ -918,21 +913,19 @@ int BitSetSp::prev_bit(int lastBit) const {
 
 	for (int i = vBB_.size() - 1; i >= 0; --i) {
 
-		if (vBB_[i].idx_ > bbL) continue;							//(*)
-
 		//block bbL exists - find msb
 		if (vBB_[i].idx_ == bbL) {
 
-			int npos = bblock::msb64_intrinsic(vBB_[i].bb_ & Tables::mask_low[lastBit - WMUL(bbL)]);
+			int npos = bblock::msb(vBB_[i].bb_ & Tables::mask_low[lastBit - WMUL(bbL)]);
 			if (npos != BBObject::noBit) {
 				return (WMUL(bbL) + npos);
 			}
 			continue;
 		}
 
-		//block with less index than bbL
-		if (vBB_[i].bb_) {
-			return bblock::msb64_intrinsic(vBB_[i].bb_) + WMUL(vBB_[i].idx_);
+		//first block with less index than bbL
+		if (vBB_[i].bb_ && vBB_[i].idx_ < bbL) {
+			return bblock::msb(vBB_[i].bb_) + WMUL(vBB_[i].idx_);
 		}
 	}
 
