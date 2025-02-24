@@ -73,6 +73,9 @@ public:
 	friend bool operator !=			(const BitSetSp& lhs, const BitSetSp& rhs) { return !(lhs == rhs); }
 
 	//TODO - REFACTOR... (24/02/2025)
+
+	
+	// AND between sparse sets
     friend inline BitSetSp&  AND	(const BitSetSp& lhs, const BitSetSp& rhs,  BitSetSp& res);
 	friend inline BitSetSp&  AND	(int firstBlock, const BitSetSp& lhs, const BitSetSp& rhs,  BitSetSp& res);
 	friend inline BitSetSp&  AND	(int firstBlock, int lastBlock, const BitSetSp& lhs, const BitSetSp& rhs,  BitSetSp& res);
@@ -1126,11 +1129,16 @@ int BitSetSp::popcn64 (int firstBit) const{
 
 inline
 BitSetSp& AND (const BitSetSp& lhs, const BitSetSp& rhs,  BitSetSp& res){
-///////////////////////////
-// AND between sparse sets
-//		
+	
+	///////////////////////////////////
+	res.reset(lhs.capacity(), false);
+	res.vBB_.reserve(lhs.vBB_.size());	
+	///////////////////////////////////
+
+
 	int i2=0;
-	res.erase_bit();					//experimental (and simplest solution)
+	//res.erase_bit();					//experimental (and simplest solution)
+	//res.vBB_.reserve(lhs.vBB_.size());	//optimization
 	const int MAX=rhs.vBB_.size()-1;
 
 	//empty check of rhs required, the way it is implemented
