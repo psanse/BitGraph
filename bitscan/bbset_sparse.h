@@ -306,13 +306,33 @@ public:
 		int lsb						(int& block)			const				{ return lsbn64_intrin(block); }		
 		
 		//TODO- refactor bitscanning from here (21/02/2025)
-
-virtual inline	int next_bit		(int bit)				;				//uses cached elem position for fast bitscanning
-virtual inline	int prev_bit		(int bit)				;				//uses cached elem position for fast bitscanning
+		/////////////////
+		// Uses cache of next block to cache for fast bit-scanning, but no the position
+		//	
+virtual inline	int next_bit		(int bit)				;				//uses cached block position for fast bitscanning
+virtual inline	int prev_bit		(int bit)				;				//uses cached block position for fast bitscanning
 
 private:
-	int next_bit					(int bit)				const;			//de Bruijn 
-	int prev_bit					(int bit)				const;			//lookup
+		
+	/**
+	* @brief Computes the least significant 1-bit in the bitstring AFTER firstBit
+	*		 If bit == BBObject::noBit, returns the lest significant bit in the bitstring.
+	*
+	*		 I.Primitive scanning stateless feature at this level. Require a bit position as argument always.
+	*		II. Use bitscanning with state for proper bitscanning (derived class or external feature)
+	**/
+	int next_bit					(int firstBit)			const;			
+	
+	/**
+	* @brief Computes the next most significant 1-bit in the bitstring AFTER  lastBit
+	*		 If bit == BBObject::noBit, returns the most significant bit in the bitstring.
+	*
+	*		 I.Primitive scanning stateless feature at this level. Require a bit position as argument always.
+	*		II. Use bitscanning with state for proper bitscanning (derived class or external feature)
+	**/
+	int prev_bit					(int lastBit)			const;		
+
+	
 
 public:	
 /////////////////
@@ -846,27 +866,35 @@ return BBObject::noBit;
 }
 
 inline
-int BitSetSp::next_bit(int nBit){
-/////////////////
-// Uses cache of last index position for fast bit scanning
-//	
-	if (nBit == BBObject::noBit) {
-		return lsbn64_intrin(nElem);		//updates nElem with the corresponding bitblock
+int BitSetSp::next_bit(int firstBit){
+
+	//special case - first bitscan
+	if (firstBit == BBObject::noBit) {
+		
+		//finds lsb AND caches next block to scan
+		return lsb(nElem);					
 	}
 	
-	int idx = WDIV(nBit);
-	int npos=bblock::lsb64_de_Bruijn(Tables::mask_high[WMOD(nBit) /* WORD_SIZE * idx */] & vBB_[nElem].bb_);
-	if(npos!=BBObject::noBit)
-		return (WMUL(idx) + npos);
+	int bbL = WDIV(firstBit);
+
+	//if bbL exist, computes lsb
+	int npos = bblock::lsb(vBB_[nElem].bb_ & Tables::mask_high[firstBit - WMUL(bbL)]);
+	if (npos != BBObject::noBit) {
+		return (npos + WMUL(bbL));
+	}
 	
-	for(int i=nElem+1; i<vBB_.size(); i++){
+	//bbL does not exist - finds closest block to bbL
+	for(int i= nElem + 1; i < vBB_.size(); ++i){
 		//new bitblock
 		if(vBB_[i].bb_){
-			nElem=i;
+
+			//update cached block
+			nElem = i;
 			return bblock::lsb64_de_Bruijn(vBB_[i].bb_) + WMUL(vBB_[i].idx_);
 		}
 	}
-return BBObject::noBit;
+
+	return BBObject::noBit;
 }
 
 inline

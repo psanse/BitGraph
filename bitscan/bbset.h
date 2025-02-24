@@ -594,7 +594,7 @@ inline	BitSet& erase_bit		(const BitSet& lhs, const BitSet& rhs);
 	* @created 27/7/16
 	* @last_update 04/02/2025
 	**/
-	inline	int	find_diff_singleton				(const BitSet& rhs, int& bit)		const;					
+	inline	int	find_diff_singleton		(const BitSet& rhs, int& bit)				const;					
 	
 	/**
 	* @brief Determines the pair of bits bit1 and bit2 the set difference  bitset this \ rhs.
@@ -607,8 +607,8 @@ inline	BitSet& erase_bit		(const BitSet& lhs, const BitSet& rhs);
 	*		  and -1 otherwise (more than 1-bit)
 	* @details: created  27/7/16, last_update 04/02/2025
 	**/
-	inline  int find_diff_pair					(const BitSet& rhs, 
-														int& bit1, int& bit2	)		const;
+	inline  int find_diff_pair			(const BitSet& rhs, 
+											int& bit1, int& bit2	)					const;
 
 /////////////////////////////
 //Boolean functions 

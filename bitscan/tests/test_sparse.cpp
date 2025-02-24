@@ -289,7 +289,7 @@ TEST(Sparse, set_bits) {
 	EXPECT_TRUE(std::is_sorted(bbsp.bitset().begin(), bbsp.bitset().end(), BitSetSp::pBlock_less()));
 
 	bbsp.set_bit(1001,1100);
-	bbsp.print();
+	//bbsp.print();
 	EXPECT_FALSE(bbsp.is_bit(999));
 	EXPECT_TRUE(bbsp.is_bit(1001));
 	EXPECT_TRUE(bbsp.is_bit(1100));
@@ -459,11 +459,11 @@ TEST(Sparse, erase_bits) {
 	
 
 	//range
-	bbsp.print();
+//	bbsp.print();
 
 	bbsp.erase_bit(1,1);
 	
-	bbsp.print();
+//	bbsp.print();
 
 	EXPECT_FALSE(bbsp.is_bit(1));
 	EXPECT_EQ(2, bbsp.popcn64());
@@ -489,11 +489,11 @@ TEST(Sparse, erase_bits) {
 	//last bit in range does not correspond to a block but there are blocks with higher index
 	bbsp.reset(10000);
 	bbsp.set_bit(1, 5);	
-	bbsp.print();
+//	bbsp.print();
 	bbsp.set_bit(200,205);
-	bbsp.print();
+//	bbsp.print();
 	bbsp.erase_bit(67, 69);	
-	bbsp.print();
+//	bbsp.print();
 	EXPECT_EQ(11, bbsp.popcn64());
 	EXPECT_TRUE(bbsp.is_bit(200));
 

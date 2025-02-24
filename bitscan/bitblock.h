@@ -160,7 +160,7 @@ namespace bblock {
 	**/
 	///////////////////////////////////////////////////////////////////////////////////
 	inline
-	int lsb64				(const BITBOARD bb) { return 	lsb64_intrinsic(bb); }
+	int lsb				(const BITBOARD bb) { return 	lsb64_intrinsic(bb); }
 	///////////////////////////////////////////////////////////////////////////////////
 
 	/**
@@ -201,7 +201,7 @@ namespace bblock {
 	* @returns index of the most significant bit or -1 if empty
 	**/
 	 inline
-	 int msb64				(const BITBOARD bb)		{ return msb64_intrinsic(bb); }
+	 int msb				(const BITBOARD bb)		{ return msb64_intrinsic(bb); }
 
 /////////////////////
 // Bit population

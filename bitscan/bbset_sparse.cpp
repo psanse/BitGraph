@@ -849,68 +849,77 @@ BitSetSp::find_block_ext (int blockID) const
 ////////////////////////////////
 
 
-
-int BitSetSp::next_bit(int nBit/* 0 based*/)  const {
-////////////////////////////
-// RETURNS next bit from nBit in the bitstring (to be used in a bitscan loop)
-//			 if nBit is FIRST_BITSCAN returns lsb
-//
-// NOTES: 
-// 1. A  preliminay implementation. It becomes clear the necessity of caching the index of the vector at each iteration (*)
+int BitSetSp::next_bit(int firstBit)  const {
 	
-	
-	if(nBit==EMPTY_ELEM){
+	//special case - first bitscan
+	if(firstBit == BBObject::noBit){
 		return lsb();
 	}
 		
-	//look in the remaining bitblocks (needs caching last i visited)
-	int idx = WDIV(nBit);
-	for(int i=0; i<vBB_.size(); i++){
-		if(vBB_[i].idx_< idx) continue;					//(*)
-		if(vBB_[i].idx_== idx){
-			int npos=bblock::lsb64_de_Bruijn(Tables::mask_high[WMOD(nBit) /* WORD_SIZE*idx */] & vBB_[i].bb_);
-			if(npos!=EMPTY_ELEM) return (WMUL(idx) + npos);
-			continue;
+	int bbL = WDIV(firstBit);
+
+	/////////////////////////////////
+	//binary search for block bbL or closest to it with higher index
+	auto pos = BBObject::noBit;
+	auto it = find_block(bbL, pos);
+	////////////////////////////////
+
+	//no more 1-bits
+	if (it == vBB_.end()) {
+		return BBObject::noBit;	
+	}
+
+	if (pos != BBObject::noBit) {
+		
+		//block bbL exists - find lsb
+		int npos = bblock::lsb(it->bb_ & Tables::mask_high[firstBit - WMUL(bbL)]);
+		
+		if (npos != BBObject::noBit) {
+			/////////////////////////////////
+			return (npos + WMUL(bbL));
+			//////////////////////////////////
 		}
-		//new bitblock
-		if( vBB_[i].bb_){
-			return bblock::lsb64_de_Bruijn(vBB_[i].bb_) + WMUL(vBB_[i].idx_);
+		else {
+			return BBObject::noBit;
 		}
 	}
-	
-return -1;	
+
+	//return the closest block with greater index
+	return bblock::lsb(it->bb_) + WMUL(it->idx_);
+
 }
 
+int BitSetSp::prev_bit(int lastBit) const{
 
-
-
-int BitSetSp::prev_bit(int nBit/* 0 bsed*/) const{
-////////////////////////////
-// Gets the previous bit to nBit. 
-// If nBits is FIRST_BITSCAN is a MSB
-//
-// NOTES: 
-// 1. A  preliminary implementation. It becomes clear the necessity of caching the index of the vector at each iteration (*)
-		
-	if (nBit == EMPTY_ELEM) {
-		return msbn64_lup();
+	//special case - first bitscan
+	if (lastBit == BBObject::noBit) {
+		return msb();
 	}
 		
-	//look in the remaining bitblocks
-	int idx = WDIV(nBit);
-	for(int i=vBB_.size()-1; i>=0; i--){
-		if(vBB_[i].idx_> idx) continue;							//(*)
-		if(vBB_[i].idx_== idx){
-			int npos=bblock::msb64_lup(Tables::mask_low[WMOD(nBit) /* WORD_SIZE*idx */] & vBB_[i].bb_);
-			if(npos!=EMPTY_ELEM) return (WMUL(idx) + npos);
+	//find the block containing nBit or closest one with less index 
+	int bbL = WDIV(lastBit);
+
+	for(int i = vBB_.size() - 1; i >= 0; --i){
+
+		if(vBB_[i].idx_> bbL) continue;							//(*)
+
+		//block bbL exists - find msb
+		if(vBB_[i].idx_== bbL){
+
+			int npos = bblock::msb64_intrinsic(vBB_[i].bb_ & Tables::mask_low[lastBit - WMUL(bbL)] );
+			if (npos != BBObject::noBit) {
+				return (WMUL(bbL) + npos);
+			}
 			continue;
 		}
+
+		//block with less index than bbL
 		if(vBB_[i].bb_ ){
-			return bblock::msb64_lup(vBB_[i].bb_) + WMUL(vBB_[i].idx_);
+			return bblock::msb64_intrinsic(vBB_[i].bb_) + WMUL(vBB_[i].idx_);
 		}
 	}
 	
-return -1;	
+	return BBObject::noBit;
 }
 
 
