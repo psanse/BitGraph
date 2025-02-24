@@ -19,10 +19,6 @@
  
 using namespace std;
 
-////////////////////
-//static members
-
-int BitSetSp::block_scanned = BBObject::noBit;
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction

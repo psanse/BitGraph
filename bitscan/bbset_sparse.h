@@ -65,13 +65,6 @@ public:
 		}
 	};
 
-/////////////////////
-// static data members 
-private:
-
-	//Caches current bitblock position in the collection (not its idx_ in the bitstring)  - CHECK arquitecture (17/02/2025)
-	static int block_scanned;	
-
 /////////////////////////////
 // Independent operators / masks  
 public:	
@@ -258,13 +251,7 @@ explicit BitSetSp					(int nPop, bool is_popsize = true );
 	vPB_cit cend					()						const		{return vBB_.cend();}
 
 //////////////////////////////
-// Bitscanning (no HW operations)
-
-	//find least/most signinficant bit
-	///////////////////////
-// Look up table implementation (best found so far)
-//
-// RETURNS element index of the bitblock
+// Bitscanning (no cache) 
 
 protected:
 	/**
