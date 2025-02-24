@@ -22,7 +22,7 @@ using namespace std;
 ////////////////////
 //static members
 
-int BitSetSp::nElem = EMPTY_ELEM;
+int BitSetSp::block_scanned = BBObject::noBit;
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
