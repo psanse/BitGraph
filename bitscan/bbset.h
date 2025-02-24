@@ -1584,9 +1584,6 @@ BitSet& BitSet::erase_block(int FirstBlock, int LastBlock, const BitSet& bb_del)
 }
 
 
-
-
-
 template<bool Erase = false>
 inline
 BitSet& AND(int firstBit, int lastBit, const BitSet& lhs, const BitSet& rhs, BitSet& res)
