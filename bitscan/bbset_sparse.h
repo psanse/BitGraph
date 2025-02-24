@@ -332,8 +332,7 @@ private:
 	*		 I.Primitive scanning stateless feature at this level. Require a bit position as argument always.
 	*		II. Use bitscanning with state for proper bitscanning (derived class or external feature)
 	* 
-	* @details: The only advantage is that it can be used in by const objects
-	* @details: DEPRECATED - not efficient
+	* @details: USE ONLY for const scopes - NOT EFFICIENT
 	**/
 	int next_bit					(int firstBit)			const;			
 	
@@ -344,8 +343,7 @@ private:
 	*		 I.Primitive scanning stateless feature at this level. Require a bit position as argument always.
 	*		II. Use bitscanning with state for proper bitscanning (derived class or external feature)
 	* 
-	* @details: The only advantage is that it can be used in by const objects
-	* @details:DEPRECATED - not efficient
+	* @details: USE ONLY for const scopes - NOT EFFICIENT
 	**/
 	int prev_bit					(int lastBit)			const;		
 		
