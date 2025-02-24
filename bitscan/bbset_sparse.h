@@ -310,7 +310,7 @@ public:
 	*		 If bit == BBObject::noBit, returns the lest significant bit in the bitstring.
 	*
 	*		 I.Basic scanning which caches the block to continue scanning. Requires a bit position as argument always.
-	*		II.Use BBScanSp class for bitscanning which caches block and last bit scanned for maximun efficiency 
+	*		II.Use BBScanSp class specialized in bitscanning which caches block and last bit scanned for maximun efficiency 
 	**/
 inline	int next_bit				(int firstBit);
 
@@ -319,12 +319,11 @@ inline	int next_bit				(int firstBit);
 	*		 If bit == BBObject::noBit, returns the lest significant bit in the bitstring.
 	*
 	*		 I.Basic scanning which caches the block to continue scanning. Requires a bit position as argument always.
-	*		II.Use BBScanSp class for bitscanning which caches block and last bit scanned for maximun efficiency 
+	*		II.Use BBScanSp class specialized in bitscanning which caches block and last bit scanned for maximun efficiency 
 	**/
 inline	int prev_bit				(int lastBit);
 
 private:
-		
 	/**
 	* @brief Computes the least significant 1-bit in the bitstring AFTER firstBit
 	*		 If bit == BBObject::noBit, returns the lest significant bit in the bitstring.
