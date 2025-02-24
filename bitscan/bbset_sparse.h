@@ -79,9 +79,10 @@ public:
 	friend bool operator ==			(const BitSetSp& lhs, const BitSetSp& rhs);
 	friend bool operator !=			(const BitSetSp& lhs, const BitSetSp& rhs) { return !(lhs == rhs); }
 
+	//TODO - REFACTOR... (24/02/2025)
     friend inline BitSetSp&  AND	(const BitSetSp& lhs, const BitSetSp& rhs,  BitSetSp& res);
-	friend inline BitSetSp&  AND	(int first_block, const BitSetSp& lhs, const BitSetSp& rhs,  BitSetSp& res);
-	friend inline BitSetSp&  AND	(int first_block, int last_block, const BitSetSp& lhs, const BitSetSp& rhs,  BitSetSp& res);
+	friend inline BitSetSp&  AND	(int firstBlock, const BitSetSp& lhs, const BitSetSp& rhs,  BitSetSp& res);
+	friend inline BitSetSp&  AND	(int firstBlock, int lastBlock, const BitSetSp& lhs, const BitSetSp& rhs,  BitSetSp& res);
 	friend BitSetSp&  OR			(const BitSetSp& lhs, const BitSetSp& rhs,  BitSetSp& res);
 	friend BitSetSp&  ERASE			(const BitSetSp& lhs, const BitSetSp& rhs,  BitSetSp& res);			//removes rhs from lhs
 
@@ -107,10 +108,10 @@ explicit BitSetSp					(int nPop, bool is_popsize = true );
 	 BitSetSp						(int nPop, const vint& lv);
 
 	//Allows copy and move semantics
-	BitSetSp				(const BitSetSp& bbN)			= default;
-	BitSetSp				(BitSetSp&&)		noexcept	= default;
-	BitSetSp& operator =	(const BitSetSp&)				= default;
-	BitSetSp& operator =	(BitSetSp&&)		noexcept	= default;
+	BitSetSp						(const BitSetSp& bbN)			= default;
+	BitSetSp						(BitSetSp&&)		noexcept	= default;
+	BitSetSp& operator =			(const BitSetSp&)				= default;
+	BitSetSp& operator =			(BitSetSp&&)		noexcept	= default;
 
 	virtual ~BitSetSp				() = default;
 
