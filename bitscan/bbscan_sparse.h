@@ -67,8 +67,24 @@ public:
 
 
 
-	//bit scan forward (destructive)				
+	////////////////
+	// bitscan forwards
+
+	/**
+	* @brief next bit in the bitstring, starting from the block
+	*		 in the last call to next_bit.
+	*		 Scan type: destructive
+	*
+	*		 I. caches the current block for the next call
+	*		II. erases the current scanned bit
+	*		III. First call requires initialization with init_scan(DESTRUCTIVE)
+	*
+	* @returns the next bit in the bitstring, BBObject::noBit if there are no more bits
+	* @details created 2015, last update 25/02/2025
+	**/
 inline int next_bit_del				(); 												
+
+
 inline int next_bit_del				(int& nBB);								//nBB: index of bitblock in the bitstring	(not in the collection)	
 inline int next_bit_del				(int& nBB, BBScanSp& );					//EXPERIMENTAL! 
 inline int next_bit_del_pos			(int& posBB);							//posBB: position of bitblock in the collection (not the index of the element)		
@@ -185,25 +201,26 @@ return EMPTY_ELEM;
 
 
 inline int BBScanSp::next_bit_del() {
-////////////////////////////
-//
-// date: 23/3/12
-// Destructive bitscan (scans and deletes each 1-bit) for sparse bitstrings using intrinsics
-//
-// COMMENTS
-// 1-Requires previous assignment scan_.bbi=0 
 
-	unsigned long posbb;
+	U32 posInBB;
 
-	for(int i=scan_.bbi_; i<vBB_.size(); i++)	{
-		if(_BitScanForward64(&posbb,vBB_[i].bb_)){
+	for(auto  i = scan_.bbi_; i < vBB_.size(); ++i)	{
+
+		if(_BitScanForward64(&posInBB, vBB_[i].bb_)){
+
+			//stores the current block
 			scan_.bbi_=i;
-			vBB_[i].bb_&=~Tables::mask[posbb];			//deleting before the return
-			return (posbb + WMUL(vBB_[i].idx_));
+
+			//deletes the current bit before returning
+			vBB_[i].bb_&=~Tables::mask[posInBB];			
+		
+			return (posInBB + WMUL(vBB_[i].idx_));
 		}
+
 	}
 	
-return EMPTY_ELEM;  
+	return BBObject::noBit;
+
 }
 
 inline int BBScanSp::next_bit_del(int& block_index) {
@@ -226,7 +243,7 @@ inline int BBScanSp::next_bit_del(int& block_index) {
 		}
 	}
 	
-return EMPTY_ELEM;  
+	return EMPTY_ELEM;  
 }
 
 
@@ -275,7 +292,7 @@ inline int BBScanSp::next_bit_del_pos (int& posBB){
 		}
 	}
 	
-return EMPTY_ELEM;  
+	return EMPTY_ELEM;  
 }
 
 
@@ -298,7 +315,7 @@ inline int BBScanSp::prev_bit_del() {
 		}
 	}
 	
-return EMPTY_ELEM;  
+	return EMPTY_ELEM;  
 }
 
 inline int BBScanSp::prev_bit_del(int & bb_index) {
