@@ -5,6 +5,7 @@
   * @details created 19/12/2015?, @last_update 15/02/2025
   *
   * TODO - complete BitSet class interface (25/02/2025)	
+  * TODO - check inlining and header / cpp implementations (25/02/2025)
   **/
 
 #ifndef __BBSET_SPARSE_H__

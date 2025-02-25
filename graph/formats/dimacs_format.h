@@ -87,7 +87,7 @@ namespace gio {
 
 				default:
 					LOG_ERROR("bad DIMACS protocol  - DIMACS_READER::read_dimacs_header");
-					LOG_ERROR("first character of new line is: ", c);
+					LOGG_ERROR("first character of new line is: ", c);
 					return -1;
 				}
 

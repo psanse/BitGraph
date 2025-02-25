@@ -159,7 +159,7 @@ template<class T>
 int Graph<T>::reset	(std::size_t NV, string name) {
 
 	if (NV <= 0) {
-		LOG_ERROR("Invalid graph size ", NV," - Graph<T>::reset");
+		LOGG_ERROR("Invalid graph size ", NV," - Graph<T>::reset");
 		return -1;
 	}
 
@@ -237,7 +237,7 @@ int Graph<T>::set_graph (string filename){
 	if(read_dimacs(filename) == -1){
 		if(read_mtx(filename) == -1){
 			if(read_EDGES(filename) == -1){
-				LOG_ERROR("Unable to read a graph form file ", filename, "- Graph<T>::set_graph");
+				LOGG_ERROR("Unable to read a graph form file ", filename, "- Graph<T>::set_graph");
 				LOG_ERROR("Format considered: DIMACS / MTX / EDGES");
 				return -1;
 			}
