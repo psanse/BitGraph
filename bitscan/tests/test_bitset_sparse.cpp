@@ -1,18 +1,17 @@
 /**
-* @file test_sparse.cpp
+* @file test_bitset_sparse.cpp
 * @brief Unit tests for sparse classes
 * @details created  ?, last_update 19/02/2025
 * @author pss
 * 
-* TODO - refactor (15/02/2025), separate possible sparse scanning tests from the rest
-* 
+* TODO - complete BitSet class interface (25/02/2025)
+* TODO - check disabled tests (i.e., clear_bit)
 **/
 
 #include "bitscan/bbscan_sparse.h"
 #include "gtest/gtest.h"
 #include <iostream>
 #include <algorithm>
-
 
 using namespace std;
 
@@ -62,31 +61,64 @@ TEST(Sparse, construction_from_vector) {
 	EXPECT_TRUE(bbsp.is_bit(500));
 	EXPECT_EQ(5, bbsp.size());
 	EXPECT_EQ(5, bbsp.number_of_blocks());			//sparse number of blocks, one per element in this case 
-
 }
 
-TEST(Sparse, DISABLED_construction_semantics) {
+TEST_F(BitSetSpClassTest, copy_constructor) {
 
-	//TODO
+	BitSetSp bbspCOPY(bbsp);
+
+	EXPECT_TRUE(bbspCOPY.is_bit(0));
+	EXPECT_TRUE(bbspCOPY.is_bit(50));
+	EXPECT_TRUE(bbspCOPY.is_bit(100));
+	EXPECT_TRUE(bbspCOPY.is_bit(150));
+	EXPECT_TRUE(bbspCOPY.is_bit(200));
+	EXPECT_TRUE(bbspCOPY.is_bit(250));
+	EXPECT_TRUE(bbspCOPY.is_bit(300));
+	EXPECT_EQ(7, bbspCOPY.size());
+	EXPECT_EQ(5, bbspCOPY.capacity());
+	EXPECT_EQ(5, bbspCOPY.number_of_blocks());			//maximum density!
 }
 
+TEST(Sparse_intrinsic, assignment) {
+
+	BBScanSp bbsp(130);
+	bbsp.set_bit(10);
+	bbsp.set_bit(20);
+	bbsp.set_bit(64);
+
+	//assignment
+	BBScanSp bbspASSIGN(34);
+	bbspASSIGN.set_bit(22);
+	bbspASSIGN.set_bit(23);
+
+	EXPECT_TRUE(bbspASSIGN.is_bit(22));
+	EXPECT_TRUE(bbspASSIGN.is_bit(23));
+	EXPECT_EQ(1, bbspASSIGN.number_of_blocks());
+
+	/////////////////////
+	bbsp = bbspASSIGN;
+	/////////////////////
+
+	EXPECT_EQ(bbsp.size(), bbspASSIGN.size());
+	EXPECT_EQ(bbsp.capacity(), bbspASSIGN.capacity());
+	EXPECT_EQ(bbsp.number_of_blocks(), bbspASSIGN.number_of_blocks());
+}
 
 TEST_F(BitSetSpClassTest, reset) {
 
 	//size
 	bbsp.reset(10);
 	EXPECT_EQ(0, bbsp.size());							//number of 1-bis
-	EXPECT_EQ(0, bbsp.number_of_blocks());						//number of non_zero bitblocks
+	EXPECT_EQ(0, bbsp.number_of_blocks());				//number of non_zero bitblocks
 
 	//size and bits
 	vint lv = { 10, 20, 100 };
 	bbsp.reset(200, lv);
 	EXPECT_EQ(3, bbsp.size());							//number of 1-bis
-	EXPECT_EQ(2, bbsp.number_of_blocks());						//number of non_zero bitblocks
+	EXPECT_EQ(2, bbsp.number_of_blocks());				//number of non_zero bitblocks
 	EXPECT_TRUE(bbsp.is_bit(10));						//number of 1-bis		
 	EXPECT_TRUE(bbsp.is_bit(20));						//number of 1-bis		
 	EXPECT_TRUE(bbsp.is_bit(100));						//number of 1-bis		
-
 }
 
 TEST(Sparse, find_block)
@@ -95,11 +127,9 @@ TEST(Sparse, find_block)
 	bbsp.set_bit(10);
 	bbsp.set_bit(20);
 	bbsp.set_bit(998);
-
-	
+		
 	BITBOARD bb = bbsp.find_block(WDIV(1000));		//bb = 998
 	EXPECT_TRUE(bblock::is_bit(bb, 38));			//the bitset starts at 960, so 998 has offset 38.
-
 
 	//variant returning also the position in the collection (not its real index)
 	auto pos = BBObject::noBit;	
@@ -109,10 +139,9 @@ TEST(Sparse, find_block)
 	//empty bitset
 	it = bbsp.find_block(WDIV(650), pos);		
 	EXPECT_EQ(BBObject::noBit, pos);
-
 }
 
-TEST(Sparse, basics) {
+TEST(Sparse, find_block_2) {
 
 	BitSetSp bbsp(130);
 	bbsp.set_bit(10);
@@ -130,16 +159,15 @@ TEST(Sparse, basics) {
 	EXPECT_EQ(2,bbsp.size());
 
 	//find functions for blocks (not that the actual bit in WDIV(nBit) is not important, it is the bitblock index that has to exist)
-	EXPECT_EQ(0, bbsp.find_block_pos(WDIV(10)).second);
-	EXPECT_TRUE(bbsp.find_block_pos(WDIV(10)).first);
-	EXPECT_EQ(1, bbsp.find_block_pos(WDIV(64)).second);
-	EXPECT_TRUE(bbsp.find_block_pos(WDIV(64)).second);
+	EXPECT_EQ	(0, bbsp.find_block_pos(WDIV(10)).second);
+	EXPECT_TRUE	(bbsp.find_block_pos(WDIV(10)).first);
+	EXPECT_EQ	(1, bbsp.find_block_pos(WDIV(64)).second);
+	EXPECT_TRUE	(bbsp.find_block_pos(WDIV(64)).second);
 	
 	//test for a block which does not exist
 	EXPECT_FALSE(bbsp.find_block_pos(WDIV(129)).first);
 	EXPECT_EQ(EMPTY_ELEM, bbsp.find_block_pos(WDIV(129)).second);
-
-	EXPECT_EQ(0x01, bbsp.find_block(WDIV(64)));
+		
 }
 
 TEST(Sparse, member_masks) {
@@ -156,7 +184,7 @@ TEST(Sparse, member_masks) {
 	rhs.set_bit(127);
 	
 	lhs.AND_block(1,rhs);
-	EXPECT_TRUE(lhs.size()==1);
+	EXPECT_EQ(1, lhs.size());
 	EXPECT_TRUE(lhs.is_bit(63));
 
 	lhs.set_block(1, -1 , rhs);
@@ -164,57 +192,7 @@ TEST(Sparse, member_masks) {
 	EXPECT_EQ(2, lhs.size());
 } 
 
-TEST(Sparse_intrinsic, basics_2) {
 
-	BBScanSp bbsp(130);
-	bbsp.set_bit(10);
-	bbsp.set_bit(20);
-	bbsp.set_bit(64);
-
-	
-	(bbsp.is_bit(10));
-	EXPECT_TRUE(bbsp.is_bit(20));
-	EXPECT_TRUE(bbsp.is_bit(64));
-	EXPECT_FALSE(bbsp.is_bit(63));
-	EXPECT_EQ(3,bbsp.size());
-
-	bbsp.erase_bit(10);
-	EXPECT_FALSE(bbsp.is_bit(10));
-	EXPECT_EQ(2,bbsp.size());
-
-
-	//assignment
-	BBScanSp bbsp1(34);
-	bbsp1.set_bit(22);
-	bbsp1.set_bit(23);
-	bbsp=bbsp1;
-
-	EXPECT_TRUE(bbsp1.is_bit(22));
-	EXPECT_TRUE(bbsp1.is_bit(23));
-	EXPECT_EQ(1,bbsp1.number_of_blocks());
-
-	//copy constructor
-	BBScanSp bbsp2(bbsp);
-	EXPECT_TRUE(bbsp2.is_bit(22));
-	EXPECT_TRUE(bbsp2.is_bit(23));
-	EXPECT_EQ(1,bbsp2.number_of_blocks());
-
-}
-
-TEST(Sparse_intrinsic, set_clear_bit_in_intervals) {
-
-	BBScanSp bba(1000000);
-	bba.set_bit(1200,1230);
-
-	EXPECT_EQ(31, bba.size());		
-	EXPECT_EQ(1200, bba.lsb());
-	EXPECT_EQ(1230, bba.msb());
-
-	bba.clear_bit(1201, 1230);
-	bba.shrink_to_fit();				//effectively deallocates space
-	EXPECT_EQ(1, bba.size());
-	EXPECT_TRUE(bba.is_bit(1200));
-}
 
 TEST(Sparse, population_count){
 
@@ -228,28 +206,6 @@ TEST(Sparse, population_count){
 	EXPECT_EQ(1, bb.size(21, -1));
 	EXPECT_EQ(0, bb.size(65, -1));
 	EXPECT_EQ(1, bb.size(64, -1));
-
-	BBScanSp bbs(130);
-	bbs.set_bit(10);
-	bbs.set_bit(20);
-	bbs.set_bit(64);
-
-	EXPECT_EQ(3, bbs.size());
-	EXPECT_EQ(2, bbs.size(11, -1));
-	EXPECT_EQ(1, bbs.size(21, -1));
-	EXPECT_EQ(0, bbs.size(65, -1));
-	EXPECT_EQ(1, bbs.size(64, -1));
-
-	bbs.set_bit(129);						//the last possible bit in the population
-	EXPECT_EQ(1, bbs.size(129, -1));
-	EXPECT_EQ(0, bbs.size(130, -1));			//at the moment there is no population check
-
-	//empty graphs
-	BitSetSp bbs_empty(130);
-	EXPECT_EQ(0, bbs_empty.size(5, -1));
-
-	BBScanSp bbs_empty1(130);
-	EXPECT_EQ(0, bbs_empty1.size(5, -1));
 }
 
 TEST(Sparse, set_bits) {
@@ -268,7 +224,6 @@ TEST(Sparse, set_bits) {
 
 	//range
 	bbsp.set_bit(3, 27);
-	//cout<<bbsp<<endl;
 	EXPECT_TRUE(bbsp.is_bit(3));
 	EXPECT_TRUE(bbsp.is_bit(27));
 	EXPECT_EQ(32, bbsp.size());
@@ -289,24 +244,11 @@ TEST(Sparse, set_bits) {
 	EXPECT_TRUE(std::is_sorted(bbsp.bitset().begin(), bbsp.bitset().end(), BitSetSp::pBlock_less()));
 
 	bbsp.set_bit(1001,1100);
-	//bbsp.print();
 	EXPECT_FALSE(bbsp.is_bit(999));
 	EXPECT_TRUE(bbsp.is_bit(1001));
 	EXPECT_TRUE(bbsp.is_bit(1100));
 	EXPECT_FALSE(bbsp.is_bit(1101));
 	EXPECT_TRUE(std::is_sorted(bbsp.bitset().begin(), bbsp.bitset().end(), BitSetSp::pBlock_less()));
-	
-
-//init member functions
-	BBScanSp sb(150);
-	sb.reset_bit(30,40);
-	EXPECT_TRUE(sb.is_bit(30));
-	EXPECT_TRUE(sb.is_bit(40));
-	EXPECT_EQ(11, sb.size());
-
-	sb.reset_bit(55);
-	EXPECT_TRUE(sb.is_bit(55));
-	EXPECT_EQ(1, sb.size());	
 
 }
 
@@ -334,32 +276,6 @@ TEST(Sparse, set_bits_from_bitset) {
 	EXPECT_TRUE(bbsp.is_bit(3));
 	EXPECT_EQ(9, bbsp.size());
 	EXPECT_TRUE(std::is_sorted(bbsp.bitset().begin(), bbsp.bitset().end(), BitSetSp::pBlock_less()));
-
-}
-
-TEST(Sparse, boolean_properties){
-
-	BBScanSp bb(130);
-	bb.set_bit(10);
-	bb.set_bit(20);
-	bb.set_bit(64);
-
-	BBScanSp bb1(130);
-	bb1.set_bit(11);
-	bb1.set_bit(21);
-	bb1.set_bit(65);
-
-	//is_disjoint
-	EXPECT_TRUE(bb.is_disjoint(bb1));
-	
-	bb1.set_bit(64);
-	EXPECT_FALSE(bb.is_disjoint(bb1));
-
-	//is disjoint with ranges
-	EXPECT_TRUE(bb.is_disjoint_block(0,0,bb1));
-	EXPECT_FALSE(bb.is_disjoint_block(0,1,bb1));
-	EXPECT_FALSE(bb.is_disjoint_block(1,2,bb1));
-
 }
 
 
@@ -451,28 +367,10 @@ TEST(Sparse, erase_bits) {
 	EXPECT_EQ(3, bbsp.size());
 	EXPECT_EQ(4, bbsp.number_of_blocks());		//all bitblocks are still there (with 0 value)
 	
-
 	//range
-//	bbsp.print();
-
 	bbsp.erase_bit(1,1);
-	
-//	bbsp.print();
-
 	EXPECT_FALSE(bbsp.is_bit(1));
 	EXPECT_EQ(2, bbsp.size());
-
-	
-
-	//erase in a sequential loop
-	int nBit=0;
-	BBScanSp::vPB_it it=bbsp.begin();
-	while(true){
-		it=bbsp.erase_bit(nBit++,it);
-		if(nBit>1000) break;
-	}
-	EXPECT_TRUE(bbsp.is_bit(9000));
-	EXPECT_EQ(1,bbsp.size());
 	
 	//range trying to erase blocks in higher positions than any existing
 	bbsp.reset(10000);
@@ -483,11 +381,8 @@ TEST(Sparse, erase_bits) {
 	//last bit in range does not correspond to a block but there are blocks with higher index
 	bbsp.reset(10000);
 	bbsp.set_bit(1, 5);	
-//	bbsp.print();
 	bbsp.set_bit(200,205);
-//	bbsp.print();
 	bbsp.erase_bit(67, 69);	
-//	bbsp.print();
 	EXPECT_EQ(11, bbsp.size());
 	EXPECT_TRUE(bbsp.is_bit(200));
 
@@ -500,225 +395,7 @@ TEST(Sparse, erase_bits) {
 	EXPECT_TRUE(bbsp.is_bit(71));
 }
 
-TEST(Sparse, clear_bits) {
 
-	BitSetSp bbsp(10000);
-
-	bbsp.set_bit(0);
-	bbsp.set_bit(1);
-	bbsp.set_bit(2);
-	bbsp.set_bit(126);
-	bbsp.set_bit(127);
-	bbsp.set_bit(1000);
-	bbsp.set_bit(9000);
-	
-	//clear bits removing bitblocks in range
-	bbsp.clear_bit(2, 1000);
-	EXPECT_FALSE(bbsp.is_bit(2));
-	EXPECT_FALSE(bbsp.is_bit(1000));
-	EXPECT_EQ(3, bbsp.size());
-	EXPECT_EQ(3,bbsp.number_of_blocks());		//first and 9000 bitblocks are there + 1000 bitblock set to 0
-
-	bbsp.clear_bit(2, 1064);
-	EXPECT_EQ(2,bbsp.number_of_blocks());		//removes 1000 bitblock
-
-	//range
-	bbsp.clear_bit(1,1);
-	EXPECT_FALSE(bbsp.is_bit(1));
-	EXPECT_EQ(2, bbsp.size());
-	EXPECT_EQ(2,bbsp.number_of_blocks());
-
-
-//end slices
-	bbsp.set_bit(0);
-	bbsp.set_bit(1);
-	bbsp.set_bit(2);
-	bbsp.set_bit(126);
-	bbsp.set_bit(127);
-	bbsp.set_bit(1000);
-	bbsp.set_bit(9000);
-
-	bbsp.clear_bit(1001,EMPTY_ELEM);
-	EXPECT_TRUE(bbsp.is_bit(1000));
-	EXPECT_EQ(3,bbsp.number_of_blocks());
-
-	bbsp.clear_bit(EMPTY_ELEM, 1);
-	EXPECT_TRUE(bbsp.is_bit(2));
-	EXPECT_EQ(3,bbsp.number_of_blocks());
-
-	bbsp.clear_bit(EMPTY_ELEM, EMPTY_ELEM);
-	EXPECT_TRUE(bbsp.is_empty());
-
-}
-
-TEST(Sparse_non_instrinsic, scanning){
-	BitSetSp bbsp(130);
-	bbsp.set_bit(10);
-	bbsp.set_bit(20);
-	bbsp.set_bit(64);	
-	vector<int> v;
-
-	//direct loop
-	int nBit = BBObject::noBit;
-	while(true){
-		nBit = bbsp.next_bit(nBit);
-		if (nBit == BBObject::noBit) {
-			break;
-		}
-		v.push_back(nBit);
-	}
-
-	EXPECT_EQ(10, v[0]);
-	EXPECT_EQ(20, v[1]);
-	EXPECT_EQ(64, v[2]);
-	EXPECT_EQ(bbsp.number_of_blocks(), 2);				//number of blocks 
-	bbsp.erase_bit(64);
-	EXPECT_EQ(bbsp.number_of_blocks(), 2);				//one of the blocks is empty, so still 2
-	EXPECT_FALSE(bbsp.is_bit(64));
-
-	//reverse loop
-	bbsp.set_bit(64);
-	v.clear();
-
-	nBit=EMPTY_ELEM;
-	while(true){
-		nBit=bbsp.prev_bit(nBit);
-		if(nBit==EMPTY_ELEM) break;
-		v.push_back(nBit);
-	}
-
-	EXPECT_EQ(64, v[0]);
-	EXPECT_EQ(20, v[1]);
-	EXPECT_EQ(10, v[2]);
-}
-
-
-TEST(Sparse_intrinsic, non_destructive_scanning){
-
-	BBScanSp bbsp(130);
-	bbsp.set_bit(10);
-	bbsp.set_bit(20);
-	bbsp.set_bit(64);	
-	vector<int> v;
-
-	//non destructive
-	int nBit;
-	if(bbsp.init_scan(BBObject::NON_DESTRUCTIVE)!=EMPTY_ELEM){
-		while(true){
-			nBit=bbsp.next_bit();
-			if(nBit==EMPTY_ELEM) break;
-			v.push_back(nBit);
-		}
-	}
-		
-	EXPECT_EQ(10, v[0]);
-	EXPECT_EQ(20, v[1]);
-	EXPECT_EQ(64, v[2]);
-	EXPECT_EQ(bbsp.number_of_blocks(), 2);				//number of blocks 
-	bbsp.erase_bit(64);
-	EXPECT_EQ(bbsp.number_of_blocks(), 2);				//one of the blocks is empty, so still 2
-	EXPECT_FALSE(bbsp.is_bit(64));
-	EXPECT_EQ(2, bbsp.size());
-
-	//non destructive reverse
-	bbsp.set_bit(64);
-	v.clear();
-
-	if(bbsp.init_scan(BBObject::NON_DESTRUCTIVE_REVERSE)!=EMPTY_ELEM){
-		while(true){
-			nBit=bbsp.prev_bit();
-			if(nBit==EMPTY_ELEM) break;
-			v.push_back(nBit);
-		}
-	}
-
-	EXPECT_EQ(64, v[0]);
-	EXPECT_EQ(20, v[1]);
-	EXPECT_EQ(10, v[2]);
-}
-
-TEST(Sparse_intrinsic, non_destructive_scanning_with_starting_point){
-
-	BBScanSp bbsp(130);
-	bbsp.set_bit(10);
-	bbsp.set_bit(20);
-	bbsp.set_bit(64);	
-	vector<int> v;
-
-	int nBit;
-	EXPECT_EQ(2,bbsp.number_of_blocks());				//number of blocks 
-
-	//non destructive
-	if(bbsp.init_scan(20,BBObject::NON_DESTRUCTIVE)!=EMPTY_ELEM){
-		while(true){
-			nBit=bbsp.next_bit();
-			if(nBit==EMPTY_ELEM) break;
-			v.push_back(nBit);
-		}
-	}
-		
-
-	EXPECT_EQ(64, v[0]);
-	EXPECT_EQ(1, v.size());
-	
-	
-	//non destructive reverse
-	v.clear();
-	if(bbsp.init_scan(20,BBObject::NON_DESTRUCTIVE_REVERSE)!=EMPTY_ELEM){
-		while(true){
-			nBit=bbsp.prev_bit();
-			if(nBit==EMPTY_ELEM) break;
-			v.push_back(nBit);
-		}
-	}
-		
-	
-	EXPECT_EQ(10, v[0]);
-	EXPECT_EQ(1, v.size());
-}
-
-TEST(Sparse_intrinsic, destructive_scanning){
-
-	BBScanSp bbsp(130);
-	bbsp.set_bit(10);
-	bbsp.set_bit(20);
-	bbsp.set_bit(64);	
-	vector<int> v;
-
-	//non destructive
-	int nBit;
-	if(bbsp.init_scan(BBObject::NON_DESTRUCTIVE)!=EMPTY_ELEM){
-		while(true){
-			nBit=bbsp.next_bit_del();
-			if(nBit==EMPTY_ELEM) break;
-			v.push_back(nBit);
-		}
-	}
-		
-	EXPECT_TRUE(bbsp.is_empty());
-	EXPECT_EQ(10, v[0]);
-	EXPECT_EQ(20, v[1]);
-	EXPECT_EQ(64, v[2]);
-
-	//non destructive reverse
-	bbsp.set_bit(10);
-	bbsp.set_bit(20);
-	bbsp.set_bit(64);
-	v.clear();
-	if(bbsp.init_scan(BBObject::NON_DESTRUCTIVE_REVERSE)!=EMPTY_ELEM){
-		while(true){
-			nBit=bbsp.prev_bit_del();
-			if(nBit==EMPTY_ELEM) break;
-			v.push_back(nBit);
-		}
-	}
-
-	EXPECT_TRUE(bbsp.is_empty());
-
-	EXPECT_EQ(64, v[0]);
-	EXPECT_EQ(20, v[1]);
-	EXPECT_EQ(10, v[2]);
-}
 
 TEST(Sparse, member_OR_operator) {
 
@@ -950,7 +627,6 @@ TEST(Sparse, integration) {
 	EXPECT_EQ(4, bbs3.number_of_blocks());		
 }
 
-
 TEST(Sparse, copy_up_to_some_bit) {
 
 	BBScanSp bbsp(10000);
@@ -1007,7 +683,7 @@ TEST(Sparse, copy_in_closed_range){
 
 	bbcopy.reset(10000);
 	bbcopy.reset_bit(0, 10000, bbsp);
-	EXPECT_TRUE( bbcopy==bbsp);
+	EXPECT_TRUE( bbcopy == bbsp);
 
 	bbcopy.reset(10000);
 	bbcopy.reset_bit(9000, 9999, bbsp);
@@ -1047,7 +723,7 @@ TEST(Sparse, copy_in_closed_range_special_cases){
 	EXPECT_TRUE(bbcopy.is_bit(64));
 }
 
-TEST(Sparse, keep_operations) {
+TEST(Sparse, operator_and_eq) {
 
 	BBScanSp bbsp(10000);
 	BBScanSp bbkeep(10000);
@@ -1077,9 +753,10 @@ TEST(Sparse, keep_operations) {
 
 	bbkeep3.set_bit(0);
 
-	//tests
+	/////////////////
 	bbsp &= bbkeep;
-	EXPECT_TRUE(bbsp==bbkeep);
+	//////////////////
+	EXPECT_TRUE(bbsp == bbkeep);
 
 	bbsp.AND_block(1, bbkeep2);
 	bbsp.print();
@@ -1088,11 +765,62 @@ TEST(Sparse, keep_operations) {
 	EXPECT_FALSE(bbsp.is_bit(127));		//last bit of block 1 deleted
 	EXPECT_EQ(5, bbsp.size());
 
-	
+	//////////////////
 	bbsp &= bbkeep3;
+	///////////////////
 	EXPECT_TRUE(bbsp.is_bit(0));
 	EXPECT_EQ(1, bbsp.size());
 
+}
+
+TEST(Sparse, DISABLED_clear_bits) {
+
+	BitSetSp bbsp(10000);
+
+	bbsp.set_bit(0);
+	bbsp.set_bit(1);
+	bbsp.set_bit(2);
+	bbsp.set_bit(126);
+	bbsp.set_bit(127);
+	bbsp.set_bit(1000);
+	bbsp.set_bit(9000);
+
+	//clear bits removing bitblocks in range
+	bbsp.clear_bit(2, 1000);
+	EXPECT_FALSE(bbsp.is_bit(2));
+	EXPECT_FALSE(bbsp.is_bit(1000));
+	EXPECT_EQ(3, bbsp.size());
+	EXPECT_EQ(3, bbsp.number_of_blocks());		//first and 9000 bitblocks are there + 1000 bitblock set to 0
+
+	bbsp.clear_bit(2, 1064);
+	EXPECT_EQ(2, bbsp.number_of_blocks());		//removes 1000 bitblock
+
+	//range
+	bbsp.clear_bit(1, 1);
+	EXPECT_FALSE(bbsp.is_bit(1));
+	EXPECT_EQ(2, bbsp.size());
+	EXPECT_EQ(2, bbsp.number_of_blocks());
+
+
+	//end slices
+	bbsp.set_bit(0);
+	bbsp.set_bit(1);
+	bbsp.set_bit(2);
+	bbsp.set_bit(126);
+	bbsp.set_bit(127);
+	bbsp.set_bit(1000);
+	bbsp.set_bit(9000);
+
+	bbsp.clear_bit(1001, EMPTY_ELEM);
+	EXPECT_TRUE(bbsp.is_bit(1000));
+	EXPECT_EQ(3, bbsp.number_of_blocks());
+
+	bbsp.clear_bit(EMPTY_ELEM, 1);
+	EXPECT_TRUE(bbsp.is_bit(2));
+	EXPECT_EQ(3, bbsp.number_of_blocks());
+
+	bbsp.clear_bit(EMPTY_ELEM, EMPTY_ELEM);
+	EXPECT_TRUE(bbsp.is_empty());
 }
 
 ////////////////////

@@ -1172,11 +1172,12 @@ BitSet&  BitSet::set_bit (const BitSet& bb_add){
 inline
 BitSet&  BitSet::set_block (int firstBlock, int lastBlock, const BitSet& bb_add){
 
-	///////////////////////////////////////////////////////////////////////////////
-	assert((firstBlock >= 0) && (lastBlock < nBB_) && (firstBlock <= lastBlock));
-	///////////////////////////////////////////////////////////////////////////////
-
 	int last_block = ((lastBlock == -1) ? nBB_ - 1 : lastBlock);
+
+	////////////////////////////////////////////////////////////////////////////////////////////
+	assert((firstBlock >= 0) && (last_block < bb_add.capacity() ) && (firstBlock <= last_block));
+	///////////////////////////////////////////////////////////////////////////////////////////
+	
 
 	for (auto i = firstBlock; i <= last_block; ++i) {
 		vBB_[i] |= bb_add.vBB_[i];
@@ -1207,9 +1208,9 @@ BitSet&  BitSet::erase_bit (int firstBit, int lastBit){
 	
 	//general comment: low - WMUL(bbl) = WMOD(bbl) but supposed to be less expensive (CHECK 01/02/25)
 
-	//////////////////////////////
-	assert(firstBit > 0 && (firstBit <= lastBit || lastBit == -1) );
-	//////////////////////////////
+	/////////////////////////////////////////////////////////////////
+	assert(firstBit >= 0 && (firstBit <= lastBit || lastBit == -1) );
+	///////////////////////////////////////////////////////////////////
 
 	int bbl = WDIV(firstBit);
 	int bbh = (lastBit == -1)? nBB_-1 : WDIV(lastBit);
@@ -1567,15 +1568,15 @@ BitSet& BitSet::erase_block (int FirstBlock, int LastBlock, const BitSet& bb_lhs
 }
 
 inline
-BitSet& BitSet::erase_block(int FirstBlock, int LastBlock, const BitSet& bb_del){
+BitSet& BitSet::erase_block(int firstBlock, int lastBlock, const BitSet& bb_del){
+
+	int last_block = ((lastBlock == -1) ? nBB_ - 1 : lastBlock);
 
 	///////////////////////////////////////////////////////////////////////////////
-	assert((FirstBlock >= 0) && (LastBlock < nBB_) && (FirstBlock <= LastBlock));
+	assert((firstBlock >= 0) && (last_block < bb_del.capacity()) && (firstBlock <= last_block));
 	///////////////////////////////////////////////////////////////////////////////
-
-	int last_block = ((LastBlock == -1) ? nBB_ - 1 : LastBlock);
-
-	for (auto i = FirstBlock; i <= last_block; ++i) {
+		
+	for (auto i = firstBlock; i <= last_block; ++i) {
 		vBB_[i] &= ~bb_del.vBB_[i];
 	}
 
@@ -1663,7 +1664,7 @@ inline
 BitSet& AND_block(int firstBlock, int lastBlock, const BitSet& lhs, const BitSet& rhs, BitSet& res) {
 
 	//////////////////////////////////////////////////////////////////
-	assert(	(firstBlock >= 0) && (LastBlock < lhs.nBB_) &&
+	assert(	(firstBlock >= 0) && (lastBlock < lhs.nBB_) &&
 			(firstBlock <= lastBlock) && (rhs.nBB_ == lhs.nBB_)		);
 	//////////////////////////////////////////////////////////////////
 
@@ -1793,7 +1794,7 @@ inline
 BitSet& OR_block(int firstBlock, int lastBlock, const BitSet& lhs, const BitSet& rhs, BitSet& res)
 {
 	//////////////////////////////////////////////////////////////////
-	assert(		(firstBlock >= 0) && (LastBlock < lhs.nBB_) &&
+	assert(		(firstBlock >= 0) && (lastBlock < lhs.nBB_) &&
 				(firstBlock <= lastBlock) && (rhs.nBB_ == lhs.nBB_)			);
 	//////////////////////////////////////////////////////////////////
 

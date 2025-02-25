@@ -749,10 +749,10 @@ bool BitSetSp::is_bit(int bit)	const{
 	int bb = WDIV(bit);
 
 	/////////////////////////////////////////////////////////////////////////////////////
-	vPB_cit it = lower_bound(vBB_.begin(), vBB_.end(), pBlock_t(bb), pBlock_less());
+	auto it = lower_bound(vBB_.cbegin(), vBB_.cend(), pBlock_t(bb), pBlock_less());
 	/////////////////////////////////////////////////////////////////////////////////////
 	
-	return ( it != vBB_.end()								&&
+	return ( it != vBB_.cend()								&&
 			 it->idx_ == bb									&& 
 			 (it->bb_ & bblock::MASK_BIT(bit - WMUL(bb))) 		);
 }
