@@ -1,4 +1,4 @@
 # BITSCAN_plus
-Refactoring BITSCAN with modern C++.
-The repo contains also the GRAPH library and other utilities. Initially conceived to refactor BITSCAN only, currently GRAPH is also being refactored.
-The code has been forked from the ADD_FULL_ISET_SETUP branch in the main repository.
+Refactoring the BITSCAN library for efficient operations with bitsets in modern C++.
+The repo also contains the GRAPH library for efficient graph operations and other utilities (UTILS lib), which have also been refactored.
+Current versions in this repository: BITSCAN 1.0, UTILS 1.0 and GRAPH 1.0.
