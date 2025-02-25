@@ -42,11 +42,6 @@ public:
  //////////////////////////////
  // Bitscanning (with cached info)
 
-inline int lsbn64					() const;
-inline int msbn64					() const; 
-inline	int msbn64					(int& nElem)			const;				
-inline	int lsbn64					(int& nElem)			const; 	
-
 	//scan setup
 	int init_scan					(scan_types);
 	int init_scan_from				(int from, scan_types sct);				//currently only for the NON-DESTRUCTIVE case
@@ -77,62 +72,6 @@ protected:
 
 ///////////////////////
 // Inline implementations, necessary in header file
-
-inline int BBScanSp::lsbn64() const{
-	
-	unsigned long posbb;
-	for(int i = 0; i < vBB_.size(); ++i){
-		if(_BitScanForward64(&posbb, vBB_[i].bb_))
-			return(posbb + WMUL(vBB_[i].idx_));	
-	}
-
-	return EMPTY_ELEM;
-}
-
-inline int BBScanSp::lsbn64(int& nElem) const{
-////////////////////
-// lsbn + returns in nElem the index in the collection if the bit string is not EMPTY
-
-	unsigned long posbb;
-	for(int i = 0; i < vBB_.size(); ++i){
-		if(_BitScanForward64(&posbb, vBB_[i].bb_)){
-			nElem = i;
-			return(posbb + WMUL(vBB_[i].idx_));
-		}
-	}
-
-	return EMPTY_ELEM;
-}
-
-
-inline int BBScanSp::msbn64() const{
-////////////////////
-// Returns the index in the collection if bitstring is not EMPTY
-	unsigned long posBB;
-	for(int i=vBB_.size()-1; i>=0; i--){
-		//Siempre me queda la duda mas de si es mas eficiente comparar con 0
-		if(_BitScanReverse64(&posBB,vBB_[i].bb_))
-				return (posBB+WMUL(vBB_[i].idx_));
-	}
-	
-return EMPTY_ELEM;  
-}
-
-inline int BBScanSp::msbn64(int& nElem) const{
-////////////////////
-// Returns the index in the collection if bitstring is not EMPTY
-	unsigned long posBB;
-	for(int i=vBB_.size()-1; i>=0; i--){
-		//Siempre me queda la duda mas de si es mas eficiente comparar con 0
-		if(_BitScanReverse64(&posBB,vBB_[i].bb_)){
-			nElem=i;
-			return (posBB+WMUL(vBB_[i].idx_));
-		}
-	}
-	
-return EMPTY_ELEM;  
-}
-
 
 inline int BBScanSp::next_bit() {
 ////////////////////////////

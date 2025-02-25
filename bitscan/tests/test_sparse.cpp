@@ -207,8 +207,8 @@ TEST(Sparse_intrinsic, set_clear_bit_in_intervals) {
 	bba.set_bit(1200,1230);
 
 	EXPECT_EQ(31, bba.size());		
-	EXPECT_EQ(1200, bba.lsbn64());
-	EXPECT_EQ(1230, bba.msbn64());
+	EXPECT_EQ(1200, bba.lsb());
+	EXPECT_EQ(1230, bba.msb());
 
 	bba.clear_bit(1201, 1230);
 	bba.shrink_to_fit();				//effectively deallocates space
