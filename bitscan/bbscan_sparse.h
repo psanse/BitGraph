@@ -53,12 +53,14 @@ public:
 	/**
 	* @brief Configures the initial block and bit position for bitscanning
 	*		 starting from the bit 'firstBit' onwards, excluding 'firstBit'
-	*		 according to one of the 4 scan types passed as argument.
+	*		 according to one of the 4 scan types passed as argument 
+	*		 (currently ONLY for the NON-DESTRUCTIVE cases).
 	*		 If firstBit is -1 (BBObject::noBit), the scan starts from the beginning.
 	* @param firstBit: starting bit
 	* @param sct: type of scan
 	* @returns 0 if successful, -1 otherwise
-	* @details currently ONLY for the NON-DESTRUCTIVE cases
+	* 
+	* TODO - extend to NON-DESTRUCTIVE cases
 	**/
 	int init_scan					(int firstBit, scan_types sct);
 	
