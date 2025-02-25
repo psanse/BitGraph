@@ -103,6 +103,7 @@ public:
 	* @details created 2015, last update 25/02/2025
 	**/
 inline int next_bit_del				(); 
+inline int next_bit_del				(BBScanSp& bitset);
 
 	/**
 	* @brief next bit in the bitstring, starting from the bit retrieved
@@ -120,7 +121,7 @@ inline int next_bit_del				();
 	*		   it has to cache the last scanned bit for the next call
 	**/
 inline int next_bit					();
-
+inline int next_bit					(BBScanSp& bitset);
 
 	////////////////
 	// bitscan backwards
@@ -138,7 +139,7 @@ inline int next_bit					();
 	* @details Created 23/3/12, last update 09/02/2025
 	**/
 inline int prev_bit_del				();
-	
+inline int prev_bit_del				(BBScanSp& bitset);
 	/**
 	* @brief next least-significant bit in the bitstring, starting from the bit retrieved
 	*		 in the last call to next_bit.
@@ -154,7 +155,7 @@ inline int prev_bit_del				();
 	*		   it has to cache the last scanned bit for the next call
 	**/
  inline int prev_bit				(); 
- 	
+ inline int prev_bit				(BBScanSp& bitset);
 
 	/////////////////
 	//	DEPRECATED
@@ -204,6 +205,42 @@ inline int BBScanSp::next_bit() {
 	
 }
 
+inline int BBScanSp::next_bit(BBScanSp& bitset)
+{
+	U32 posInBB;
+
+	//search for next bit in the last block
+	if (_BitScanForward64(&posInBB, vBB_[scan_.bbi_].bb_ & Tables::mask_high[scan_.pos_])) {
+
+		//stores the current bit for next call
+		scan_.pos_ = posInBB;
+
+		//delete the bit from the input bitset
+		bitset.erase_bit(posInBB);
+
+		return (posInBB + WMUL(vBB_[scan_.bbi_].idx_));
+
+	}
+	else {
+
+		//Searches for next bit in the remaining blocks
+		for (auto i = scan_.bbi_ + 1; i < vBB_.size(); ++i) {
+			if (_BitScanForward64(&posInBB, vBB_[i].bb_)) {
+				//stores the current block and bit for next call
+				scan_.bbi_ = i;
+				scan_.pos_ = posInBB;
+
+				//delete the bit from the input bitset
+				bitset.erase_bit(posInBB);
+
+				return (posInBB + WMUL(vBB_[i].idx_));
+			}
+		}
+	}
+
+	return BBObject::noBit;
+}
+
 inline int BBScanSp::prev_bit () {
 
 	U32 posInBB;
@@ -233,6 +270,41 @@ inline int BBScanSp::prev_bit () {
 
 }
 
+inline int BBScanSp::prev_bit(BBScanSp& bitset)
+{
+	U32 posInBB;
+
+	//searches for previous bit in the last scanned block
+	if (_BitScanReverse64(&posInBB, vBB_[scan_.bbi_].bb_ & Tables::mask_low[scan_.pos_])) {
+		//stores the current bit for next call
+		scan_.pos_ = posInBB;
+
+		//delete the bit from the input bitset
+		bitset.erase_bit(posInBB);
+
+		return (posInBB + WMUL(vBB_[scan_.bbi_].idx_));
+	}
+	else {
+		//Searches for previous bit in the remaining blocks
+		for (auto i = scan_.bbi_ - 1; i >= 0; --i) {
+
+			if (_BitScanReverse64(&posInBB, vBB_[i].bb_)) {
+
+				//stores the current block and bit for next call
+				scan_.bbi_ = i;
+				scan_.pos_ = posInBB;
+
+				//delete the bit from the input bitset
+				bitset.erase_bit(posInBB);
+
+				return (posInBB + WMUL(vBB_[i].idx_));
+			}
+		}
+	}
+
+	return BBObject::noBit;
+}
+
 
 inline int BBScanSp::next_bit_del() {
 
@@ -257,6 +329,31 @@ inline int BBScanSp::next_bit_del() {
 
 }
 
+inline int BBScanSp::next_bit_del(BBScanSp& bitset)
+{
+	U32 posInBB;
+
+	for (auto i = scan_.bbi_; i < vBB_.size(); ++i) {
+
+		if (_BitScanForward64(&posInBB, vBB_[i].bb_)) {
+
+			//stores the current block
+			scan_.bbi_ = i;
+
+			//deletes the current bit before returning
+			vBB_[i].bb_ &= ~Tables::mask[posInBB];
+
+			//delete the bit from the input bitset
+			bitset.erase_bit(posInBB);
+
+			return (posInBB + WMUL(vBB_[i].idx_));
+		}
+
+	}
+
+	return BBObject::noBit;
+}
+
 inline int BBScanSp::prev_bit_del() {
 
 	U32 posInBB;
@@ -275,6 +372,30 @@ inline int BBScanSp::prev_bit_del() {
 		}
 	}
 	
+	return BBObject::noBit;
+}
+
+inline int BBScanSp::prev_bit_del(BBScanSp& bitset)
+{
+	U32 posInBB;
+
+	for (int i = scan_.bbi_; i >= 0; --i) {
+
+		if (_BitScanReverse64(&posInBB, vBB_[i].bb_)) {
+
+			//stores the current block for the next call
+			scan_.bbi_ = i;
+
+			//deletes the current bit from the bitset before returning
+			vBB_[i].bb_ &= ~Tables::mask[posInBB];
+
+			//delete the bit from the input bitset
+			bitset.erase_bit(posInBB);
+
+			return (posInBB + WMUL(vBB_[i].idx_));
+		}
+	}
+
 	return BBObject::noBit;
 }
 
