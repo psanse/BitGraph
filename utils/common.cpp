@@ -118,7 +118,7 @@ namespace com {
 			//opens a file in binary mode
 			std::ifstream f(filename, ios::binary | ios::in);
 			if (!f) {
-				LOG_ERROR("File could not be opened: ", filename, "- ::com::READ_SET_OF_INTERDICTED_NODES");
+				LOGG_ERROR("File could not be opened: ", filename, "- ::com::READ_SET_OF_INTERDICTED_NODES");
 				return -1;
 			}
 

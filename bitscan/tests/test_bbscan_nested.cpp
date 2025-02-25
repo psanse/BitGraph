@@ -1,5 +1,5 @@
 /**
-* @file test_bbscan_external.cpp
+* @file test_bbscan_nested.cpp
 * @brief unit tests for efficient bitscanning implemented with nested scanning classes as wrappers
 * @details created 10/02/2025, last_update 12/02/2025
 **/
