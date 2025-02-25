@@ -118,7 +118,7 @@ virtual inline int next_bit_del		();
 	*		II. erases the current scanned bit
 	* 		III. First call requires initialization with init_scan(DESTRUCTIVE)
 	* 
-	* @param bitset: bitblock where the scanned bit is erased
+	* @param bitset: a bitset from which the scanned bit is erased
 	* @param block: output parameter with the current bitblock
 	* @returns the next bit in the bitstring, BBObject::noBit if there are no more bits
 	**/

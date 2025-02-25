@@ -956,31 +956,6 @@ TEST(Sparse, integration) {
 	EXPECT_EQ(4, bbs3.number_of_blocks());		
 }
 
-TEST(Sparse, next_bit_del_pos) {
-
-	BBScanSp bbsp(10000);
-
-	bbsp.set_bit(0);
-	bbsp.set_bit(1);
-	bbsp.set_bit(2);
-	bbsp.set_bit(126);
-	bbsp.set_bit(127);
-	bbsp.set_bit(1000);
-	bbsp.set_bit(9000);
-
-	//bitscannning loop
-	bbsp.init_scan(BBObject::DESTRUCTIVE);
-	int posBB=EMPTY_ELEM;
-	while(true){
-		int	nBit=bbsp.next_bit_del_pos(posBB);
-		if(nBit==EMPTY_ELEM) 
-				break;
-		cout<<"nBit: "<<nBit<<" pos: "<<posBB<<endl;
-		
-	}
-	
-}
-
 
 TEST(Sparse, copy_up_to_some_bit) {
 
@@ -1126,7 +1101,36 @@ TEST(Sparse, keep_operations) {
 
 }
 
+////////////////////
+//
+// CHECK TESTS
+//
+////////////////////
 
+//TEST(Sparse, next_bit_del_pos) {
+//
+//	BBScanSp bbsp(10000);
+//
+//	bbsp.set_bit(0);
+//	bbsp.set_bit(1);
+//	bbsp.set_bit(2);
+//	bbsp.set_bit(126);
+//	bbsp.set_bit(127);
+//	bbsp.set_bit(1000);
+//	bbsp.set_bit(9000);
+//
+//	//bitscannning loop
+//	bbsp.init_scan(BBObject::DESTRUCTIVE);
+//	int posBB=EMPTY_ELEM;
+//	while(true){
+//		int	nBit=bbsp.next_bit_del_pos(posBB);
+//		if(nBit==EMPTY_ELEM) 
+//				break;
+//		cout<<"nBit: "<<nBit<<" pos: "<<posBB<<endl;
+//		
+//	}
+//	
+//}
 
 
 //TEST(Sparse, erase_block_pos) {

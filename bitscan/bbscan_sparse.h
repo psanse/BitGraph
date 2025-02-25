@@ -82,15 +82,27 @@ public:
 	* @returns the next bit in the bitstring, BBObject::noBit if there are no more bits
 	* @details created 2015, last update 25/02/2025
 	**/
-inline int next_bit_del				(); 												
+inline int next_bit_del				(); 
+
+	/**
+	* @brief next bit in the bitstring, starting from the bit retrieved
+	*		 in the last call to next_bit.
+	*		 Scan type: non-destructive
+	*
+	*		 I. caches the current block for the next call
+	*		II. DOES NOT erase the current scanned bit
+	*		III. caches the scanned bit for the next call
+	* 		IV. First call requires initialization with init_scan(NON-DESTRUCTIVE)
+	*
+	* @returns the next bit in the bitstring, BBObject::noBit if there are no more bits
+	* @details Created 5/9/2014, last update 09/02/2025
+	* @details Since the scan does not delete the scanned bit from the bitstring,
+	*		   it has to cache the last scanned bit for the next call
+	**/
+inline int next_bit					();
 
 
-inline int next_bit_del				(int& nBB);								//nBB: index of bitblock in the bitstring	(not in the collection)	
-inline int next_bit_del				(int& nBB, BBScanSp& );					//EXPERIMENTAL! 
-inline int next_bit_del_pos			(int& posBB);							//posBB: position of bitblock in the collection (not the index of the element)		
 
-	//bit scan forward (non destructive)
-virtual inline int next_bit			();
 inline int next_bit					(int & nBB);							//nBB: index of bitblock in the bitstring	(not in the collection)				
 
 	//bit scan backwards (non destructive)
@@ -99,6 +111,13 @@ virtual inline int prev_bit			();
 	//bit scan backwards (destructive)
 inline int prev_bit_del				(); 
 inline int prev_bit_del				(int& nBB);
+
+	/////////////////
+	//	DEPRECATED
+
+//inline int next_bit_del				(int& nBB);								//nBB: index of bitblock in the bitstring	(not in the collection)	
+//inline int next_bit_del				(int& nBB, BBScanSp& );					//EXPERIMENTAL! 
+//inline int next_bit_del_pos			(int& posBB);							//posBB: position of bitblock in the collection (not the index of the element)		
 
 
 
@@ -112,31 +131,34 @@ protected:
 // Inline implementations, necessary in header file
 
 inline int BBScanSp::next_bit() {
-////////////////////////////
-// date:5/9/2014
-// non destructive bitscan for sparse bitstrings using intrinsics
-// caches index in the collection and pos inside the bitblock
-//
-// comments
-// 1-require previous assignment scan_.bbi=0 and scan_.pos=mask_lim
 
-	unsigned long posbb;
+
+	U32 posInBB;
 			
 	//search for next bit in the last block
-	if(_BitScanForward64(&posbb, vBB_[scan_.bbi_].bb_ & Tables::mask_high[scan_.pos_])){
-		scan_.pos_ =posbb;
-		return (posbb + WMUL(vBB_[scan_.bbi_].idx_));
-	}else{											//search in the remaining blocks
-		for(int i=scan_.bbi_+1; i<vBB_.size(); i++){
-			if(_BitScanForward64(&posbb,vBB_[i].bb_)){
+	if(_BitScanForward64(&posInBB, vBB_[scan_.bbi_].bb_ & Tables::mask_high[scan_.pos_])){
+
+		//stores the current bit for next call
+		scan_.pos_ = posInBB;
+
+		return (posInBB + WMUL(vBB_[scan_.bbi_].idx_));
+
+	}else{	
+
+		//Searches for next bit in the remaining blocks
+		for(auto i= scan_.bbi_ + 1; i < vBB_.size(); ++i){
+			if(_BitScanForward64(&posInBB,vBB_[i].bb_)){
+				//stores the current block and bit for next call
 				scan_.bbi_=i;
-				scan_.pos_=posbb;
-				return (posbb+ WMUL(vBB_[i].idx_));
+				scan_.pos_= posInBB;
+
+				return (posInBB + WMUL(vBB_[i].idx_));
 			}
 		}
 	}
 	
-return EMPTY_ELEM;
+	return BBObject::noBit;
+	
 }
 
 
@@ -223,77 +245,7 @@ inline int BBScanSp::next_bit_del() {
 
 }
 
-inline int BBScanSp::next_bit_del(int& block_index) {
-////////////////////////////
-//
-// date: 23/3/12
-// Destructive bitscan for sparse bitstrings using intrinsics
-//
-// COMMENTS
-// 1-Requires previous assignment scan_.bbi=0 
 
-	unsigned long posbb;
-
-	for(int i=scan_.bbi_; i<vBB_.size(); i++)	{
-		if(_BitScanForward64(&posbb,vBB_[i].bb_)){
-			scan_.bbi_=i;
-			block_index=vBB_[i].idx_;
-			vBB_[i].bb_&=~Tables::mask[posbb];			//deleting before the return
-			return (posbb + WMUL(vBB_[i].idx_));
-		}
-	}
-	
-	return EMPTY_ELEM;  
-}
-
-
-inline int BBScanSp::next_bit_del(int& block_index, BBScanSp& bbN_del) {
-	////////////////////////////
-	//
-	// date: 06/07/2019 (EXPERIMENTAL)
-	// Destructive bitscan for sparse bitstrings using intrinsics
-	//
-	// COMMENTS
-	// 1-added for compatibility with BBIntrin
-	// 1-Requires previous assignment scan_.bbi=0 
-
-	unsigned long posbb;
-
-	for (int i = scan_.bbi_; i < vBB_.size(); i++) {
-		if (_BitScanForward64(&posbb, vBB_[i].bb_)) {
-			scan_.bbi_ = i;
-			block_index = vBB_[i].idx_;
-			vBB_[i].bb_ &= ~Tables::mask[posbb];			//deleting before the return
-			bbN_del.vBB_[i].bb_ &= ~Tables::mask[posbb];
-			return (posbb + WMUL(vBB_[i].idx_));
-		}
-	}
-
-	return EMPTY_ELEM;
-}
-
-inline int BBScanSp::next_bit_del_pos (int& posBB){
-////////////////////////////
-//
-// date: 29/10/14
-// Destructive bitscan which returns the position of the bitblock scanned in the collection
-// (not the index attribute)
-//
-// COMMENTS
-// 1-Requires previous assignment scan_.bbi=0 
-
-	unsigned long posbb;
-
-	for(int i=scan_.bbi_; i<vBB_.size(); i++)	{
-		if(_BitScanForward64(&posbb,vBB_[i].bb_)){
-			posBB=scan_.bbi_=i;
-			vBB_[i].bb_&=~Tables::mask[posbb];			//deleting before the return
-			return (posbb + WMUL(vBB_[i].idx_));
-		}
-	}
-	
-	return EMPTY_ELEM;  
-}
 
 
 inline int BBScanSp::prev_bit_del() {
@@ -407,6 +359,85 @@ int BBScanSp::init_scan (int firstBit, scan_types sct){
 	//nothing to scan or error
 	return 0;
 }
+
+
+////////////////////////////////
+//
+// DEPRECATED
+//
+//////////////////////////////////
+//inline 
+//int BBScanSp::next_bit_del(int& block_index) {
+//	////////////////////////////
+//	//
+//	// date: 23/3/12
+//	// Destructive bitscan for sparse bitstrings using intrinsics
+//	//
+//	// COMMENTS
+//	// 1-Requires previous assignment scan_.bbi=0 
+//
+//	unsigned long posbb;
+//
+//	for (int i = scan_.bbi_; i < vBB_.size(); i++) {
+//		if (_BitScanForward64(&posbb, vBB_[i].bb_)) {
+//			scan_.bbi_ = i;
+//			block_index = vBB_[i].idx_;
+//			vBB_[i].bb_ &= ~Tables::mask[posbb];			//deleting before the return
+//			return (posbb + WMUL(vBB_[i].idx_));
+//		}
+//	}
+//
+//	return EMPTY_ELEM;
+//}
+//
+//
+//inline int BBScanSp::next_bit_del(int& block_index, BBScanSp& bbN_del) {
+//	////////////////////////////
+//	//
+//	// date: 06/07/2019 (EXPERIMENTAL)
+//	// Destructive bitscan for sparse bitstrings using intrinsics
+//	//
+//	// COMMENTS
+//	// 1-added for compatibility with BBIntrin
+//	// 1-Requires previous assignment scan_.bbi=0 
+//
+//	unsigned long posbb;
+//
+//	for (int i = scan_.bbi_; i < vBB_.size(); i++) {
+//		if (_BitScanForward64(&posbb, vBB_[i].bb_)) {
+//			scan_.bbi_ = i;
+//			block_index = vBB_[i].idx_;
+//			vBB_[i].bb_ &= ~Tables::mask[posbb];			//deleting before the return
+//			bbN_del.vBB_[i].bb_ &= ~Tables::mask[posbb];
+//			return (posbb + WMUL(vBB_[i].idx_));
+//		}
+//	}
+//
+//	return EMPTY_ELEM;
+//}
+//
+//inline int BBScanSp::next_bit_del_pos(int& posBB) {
+//	////////////////////////////
+//	//
+//	// date: 29/10/14
+//	// Destructive bitscan which returns the position of the bitblock scanned in the collection
+//	// (not the index attribute)
+//	//
+//	// COMMENTS
+//	// 1-Requires previous assignment scan_.bbi=0 
+//
+//	unsigned long posbb;
+//
+//	for (int i = scan_.bbi_; i < vBB_.size(); i++) {
+//		if (_BitScanForward64(&posbb, vBB_[i].bb_)) {
+//			posBB = scan_.bbi_ = i;
+//			vBB_[i].bb_ &= ~Tables::mask[posbb];			//deleting before the return
+//			return (posbb + WMUL(vBB_[i].idx_));
+//		}
+//	}
+//
+//	return EMPTY_ELEM;
+//}
 
 
 #endif 
