@@ -39,8 +39,9 @@ public:
 	 int  scan_block				()	 const		{ return scan_.bbi_; }
 	 int  scan_bit					()	 const		{ return scan_.pos_; }
 
-//////////////////////////////
-// bitscanning
+ //////////////////////////////
+ // Bitscanning (with cached info)
+
 inline int lsbn64					() const;
 inline int msbn64					() const; 
 inline	int msbn64					(int& nElem)			const;				
@@ -66,13 +67,6 @@ virtual inline int prev_bit			();
 	//bit scan backwards (destructive)
 inline int prev_bit_del				(); 
 inline int prev_bit_del				(int& nBB);
-				
-/////////////////
-// Popcount
-#ifdef POPCOUNT_INTRINSIC_64
-virtual	 inline int popcn64			()	const;
-virtual	 inline int popcn64			(int nBit)	const;							//population size from (and including) nBit
-#endif
 
 //////////////////
 // data members
@@ -82,55 +76,14 @@ protected:
 };
 
 ///////////////////////
-//
-// INLINE FUNCTIONS
-// 
-////////////////////////
-
-#ifdef POPCOUNT_INTRINSIC_64
-inline 
-int BBScanSp::popcn64() const{
-	BITBOARD pc=0;
-	for(int i=0; i<vBB_.size(); i++){
-		pc+=__popcnt64(vBB_[i].bb_);
-	}
-return pc;
-}
-
-
-inline
-int BBScanSp::popcn64(int nBit) const{
-//////////////////////////////
-// population  size from (and including) nBit onwards
-	BITBOARD pc=0;
-	int nBB=WDIV(nBit);
-
-	//find the biblock if it exists
-	vPB_cit it = lower_bound(vBB_.begin(), vBB_.end(), pBlock_t(nBB), pBlock_less());
-	if(it!=vBB_.end()){
-		if(it->idx_==nBB){
-			BITBOARD bb= it->bb_&~Tables::mask_low[WMOD(nBit)];
-			pc+= __popcnt64(bb);
-			it++;
-		}
-
-		//searches in the rest of elements with greater index than nBB
-		for(; it!=vBB_.end(); ++it){
-			pc+=  __popcnt64(it->bb_);
-		}
-	}
-	
-return pc;
-}
-
-#endif
+// Inline implementations, necessary in header file
 
 inline int BBScanSp::lsbn64() const{
 	
 	unsigned long posbb;
 	for(int i = 0; i < vBB_.size(); ++i){
 		if(_BitScanForward64(&posbb, vBB_[i].bb_))
-			return(posbb+ WMUL(vBB_[i].idx_));	
+			return(posbb + WMUL(vBB_[i].idx_));	
 	}
 
 	return EMPTY_ELEM;

@@ -118,7 +118,7 @@ inline double Graph<sparse_bitarray>::average_block_density_sparse() const {
 	for (std::size_t i = 0; i < NV_; ++i) {
 		nBB = adj_[i].number_of_blocks();
 		nBBt += nBB;
-		den += static_cast<double>(adj_[i].popcn64()) /
+		den += static_cast<double>(adj_[i].size()) /
 				( BITBOARD(nBB) * WORD_SIZE );
 	}
 

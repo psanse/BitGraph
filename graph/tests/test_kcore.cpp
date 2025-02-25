@@ -229,7 +229,7 @@ TEST(KCoreSparse, kcore_decomp_subgraph) {
 	EXPECT_TRUE(kc.get_subgraph().is_bit(0));
 	EXPECT_TRUE(kc.get_subgraph().is_bit(1));
 	EXPECT_TRUE(kc.get_subgraph().is_bit(6));
-	EXPECT_EQ(3, kc.get_subgraph().popcn64());
+	EXPECT_EQ(3, kc.get_subgraph().size());
 
 	////////////////////
 	kc.find_kcore(true);											//on G[{0, 1, 6}]			

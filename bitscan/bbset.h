@@ -22,9 +22,8 @@
 #include <cassert>					//uncomment #undef NDEBUG in bbconfig.h to enable run-time assertions
 
 //useful alias
-using vint = std::vector<int>;
-using vbset  = std::vector<BITBOARD>;	
-
+using vint	= std::vector<int>;
+using vbset = std::vector<BITBOARD>;	
 
 /////////////////////////////////
 //

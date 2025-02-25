@@ -224,10 +224,10 @@ TEST(Sparse, population_count){
 	bb.set_bit(64);
 
 	EXPECT_EQ(3, bb.size());
-	EXPECT_EQ(2, bb.popcn64(11));
-	EXPECT_EQ(1, bb.popcn64(21));
-	EXPECT_EQ(0, bb.popcn64(65));
-	EXPECT_EQ(1, bb.popcn64(64));
+	EXPECT_EQ(2, bb.size(11, -1));
+	EXPECT_EQ(1, bb.size(21, -1));
+	EXPECT_EQ(0, bb.size(65, -1));
+	EXPECT_EQ(1, bb.size(64, -1));
 
 	BBScanSp bbs(130);
 	bbs.set_bit(10);
@@ -235,21 +235,21 @@ TEST(Sparse, population_count){
 	bbs.set_bit(64);
 
 	EXPECT_EQ(3, bbs.size());
-	EXPECT_EQ(2, bbs.popcn64(11));
-	EXPECT_EQ(1, bbs.popcn64(21));
-	EXPECT_EQ(0, bbs.popcn64(65));
-	EXPECT_EQ(1, bbs.popcn64(64));
+	EXPECT_EQ(2, bbs.size(11, -1));
+	EXPECT_EQ(1, bbs.size(21, -1));
+	EXPECT_EQ(0, bbs.size(65, -1));
+	EXPECT_EQ(1, bbs.size(64, -1));
 
 	bbs.set_bit(129);						//the last possible bit in the population
-	EXPECT_EQ(1, bbs.popcn64(129));
-	EXPECT_EQ(0, bbs.popcn64(130));			//at the moment there is no population check
+	EXPECT_EQ(1, bbs.size(129, -1));
+	EXPECT_EQ(0, bbs.size(130, -1));			//at the moment there is no population check
 
 	//empty graphs
 	BitSetSp bbs_empty(130);
-	EXPECT_EQ(0, bbs_empty.popcn64(5));	
+	EXPECT_EQ(0, bbs_empty.size(5, -1));
 
 	BBScanSp bbs_empty1(130);
-	EXPECT_EQ(0, bbs_empty1.popcn64(5));	
+	EXPECT_EQ(0, bbs_empty1.size(5, -1));
 }
 
 TEST(Sparse, set_bits) {

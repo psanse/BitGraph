@@ -418,7 +418,8 @@ public:
 	* @details To be used instead of popcn64 (12/02/2025)
 	*
 	**/
-	 int size						()						const			{ return popcn64(); }
+std::size_t size					()							const			{ return (std::size_t) popcn64(); }
+std::size_t size					(int firstBit, int lastBit)	const			{ return (std::size_t) popcn64(firstBit, lastBit); }
 
 protected:
 	/**
@@ -429,14 +430,26 @@ protected:
 	**/
 virtual inline	 int popcn64		()						const;			 
 
-public:
+protected:
+	/**
+	* @brief Returns the number of 1-bits in the bitstring
+	*	 	 in the closed range [firstBit, lastBit]
+	*		 If lastBit == -1, the range is [firstBit, endOfBitset)
+	*
+	* @details efficiently implemented as a lookup table or with HW instructions
+	*			depending  on an internal switch (see config.h)
+	**/
+	virtual	inline int popcn64		(int firstBit, int lastBit)		const;
+
 	/**
 	* @brief number of 1-bits in the range [nBit, END(
 	* @details implementation depends of POPCN64 switch in bbconfig.h
 	*		   By default - intrinsic HW assembler instructions
 	**/
-virtual inline	 int popcn64		(int firstBit)			const;			
+virtual inline	 int popcn64		(int firstBit)					const;
 
+
+public:
 /////////////////////
 //Setting (ordered insertion) / Erasing bits  
 
@@ -900,6 +913,8 @@ BitSetSp::set_bit (int bit ){
 	return *this;  
 }
 
+
+
 inline
 BitSetSp& 
 BitSetSp::reset_bit (int bit){
@@ -1178,6 +1193,35 @@ int BitSetSp::popcn64 (int firstBit) const{
 
 		//counts the population of the rest of bitblocks
 		for (; it != vBB_.end(); ++it) {
+			pc += bblock::popc64(it->bb_);
+		}
+	}
+
+	return pc;
+}
+
+inline 
+int BitSetSp::popcn64 (int firstBit, int lastBit) const
+{
+	////////////////////////////////
+	if (lastBit == -1) {
+		return popcn64(firstBit);
+	}
+	/////////////////////////////////
+
+	auto bbL = WDIV(firstBit);
+	auto it = lower_bound(vBB_.begin(), vBB_.end(), pBlock_t(bbL), pBlock_less());
+	BITBOARD pc = 0;
+
+	if (it != vBB_.end()) {
+
+		if (it->idx_ == bbL) {
+			pc += bblock::popc64(it->bb_ & bblock::MASK_1_HIGH(firstBit - WMUL(bbL)));
+			it++;
+		}
+
+		//counts the population of the rest of bitblocks
+		for (; it != vBB_.end() && it->idx_ <= lastBit; ++it) {
 			pc += bblock::popc64(it->bb_);
 		}
 	}

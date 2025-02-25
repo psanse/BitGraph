@@ -308,7 +308,6 @@ int BBScan::next_bit() {
 }
 
 
-
 inline
 int BBScan::next_bit( BBScan& bitset) {
 
