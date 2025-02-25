@@ -1,10 +1,12 @@
-#set useful headers 
+#########################
+#headers for UTILS lib
+#########################
 set(useful_headers_for_IDE 
-    common.h
-    common_types.h
-    prec_timer.h
-    logger.h
-    info/info_base.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/common.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/common_types.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/prec_timer.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/logger.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/info/info_base.h
 )
 
 #creates utils library
@@ -23,12 +25,19 @@ add_library (utils
 
 # Make sure the compiler can find include files for our utils library
 # when other libraries or executables link to bitscan
-target_include_directories (utils PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
-set_target_properties(utils 
-    PROPERTIES
-     ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
+
+#target_include_directories (utils PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+
+target_include_directories(utils PUBLIC 
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+  $<INSTALL_INTERFACE:include/utils>    # <prefix>/include/mylib
 )
 
+set_target_properties(utils 
+    PROPERTIES
+    ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
+    #PUBLIC_HEADER   "${useful_headers_for_IDE}"        #does not preserve internal structure       
+)
 
 option(utils_build_tests "Build utils tests." OFF)
 #set(utils_build_tests ON)

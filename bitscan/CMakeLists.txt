@@ -1,17 +1,18 @@
-###################
-#set useful headers for IDE
-###################
+#########################
+#headers for BITSCAN lib
+#########################
 set(useful_headers_for_IDE
-bbconfig.h
-bbtypes.h
-bitblock.h
-bbset.h
-bitboards.h
-bbscan.h
-bbintrinsic_sparse.h
-bbsentinel.h
-bbobject.h
-bitscan.h
+ ${CMAKE_CURRENT_SOURCE_DIR}/bbconfig.h
+ ${CMAKE_CURRENT_SOURCE_DIR}/bbtypes.h
+ ${CMAKE_CURRENT_SOURCE_DIR}/bitblock.h
+ ${CMAKE_CURRENT_SOURCE_DIR}/bbset.h
+ ${CMAKE_CURRENT_SOURCE_DIR}/bbset_sparse.h
+ ${CMAKE_CURRENT_SOURCE_DIR}/bbscan.h
+ ${CMAKE_CURRENT_SOURCE_DIR}/bbscan_sparse.h
+ ${CMAKE_CURRENT_SOURCE_DIR}/bbsentinel.h
+ ${CMAKE_CURRENT_SOURCE_DIR}/bbobject.h
+ ${CMAKE_CURRENT_SOURCE_DIR}/bbalgorithm.h
+ ${CMAKE_CURRENT_SOURCE_DIR}/bitscan.h
 )
 
 ###################
@@ -21,7 +22,7 @@ add_library (bitscan
 bbsentinel.cpp 
 bitblock.cpp 
 bbset.cpp  
-bitboards.cpp 
+bbset_sparse.cpp 
 tables.cpp
 ${useful_headers_for_IDE}
 )
@@ -29,12 +30,18 @@ ${useful_headers_for_IDE}
 set_target_properties(bitscan 
     PROPERTIES
     ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
+    #PUBLIC_HEADER   "${useful_headers_for_IDE}"        #does not preserve internal structure  
 )
 
 # Make sure the compiler can find include files for our bitscan library
 # when other libraries or executables link to bitscan
-target_include_directories (bitscan 
-    PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}
+#target_include_directories (bitscan 
+#    PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}
+#)
+
+target_include_directories(bitscan PUBLIC 
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+  $<INSTALL_INTERFACE:include/bitscan>    # <prefix>/include/bitscan
 )
 
 ###################
@@ -46,10 +53,12 @@ if (bitscan_build_tests)
 add_executable (test_bitscan tests/gtest_main.cc 
   
     #TESTS TO CHECK (14/02/2025)   
-    #tests/test_algorithms.cpp           
-    #tests/test_sparse.cpp
-    #tests/test_example.cpp   
-    #tests/test_bbsentinel.cpp 
+    tests/test_algorithms.cpp           
+    tests/test_sparse.cpp
+    tests/test_example.cpp   
+    tests/test_bbsentinel.cpp 
+
+    tests/test_bbscan_sparse_nested.cpp 
 
     #TESTS CHECKED (31/01/2025)
     tests/test_bitblock.cpp

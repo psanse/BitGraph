@@ -81,9 +81,9 @@ inline double Graph<sparse_bitarray>::block_density()	const {
 	std::size_t nBBt = 0;							//number of allocated bitblocks (all should be non-empty in the sparse case)
 
 	for (std::size_t v = 0; v < NV_; ++v) {
-		nBBt += adj_[v].number_of_bitblocks();
-		for (std::size_t bb = 0; bb < adj_[v].number_of_bitblocks(); bb++) {
-			if (adj_[v].bitblock(bb)) {
+		nBBt += adj_[v].number_of_blocks();
+		for (std::size_t bb = 0; bb < adj_[v].number_of_blocks(); bb++) {
+			if (adj_[v].block(bb)) {
 				nBB++;								//nBB should be equal to nBBt
 			}
 		}
@@ -99,7 +99,7 @@ inline double Graph<sparse_bitarray>::block_density_sparse() const {
 	
 	//number of allocated blocks
 	for (std::size_t v = 0; v < NV_; ++v) {
-		nBBt += adj_[v].number_of_bitblocks();
+		nBBt += adj_[v].number_of_blocks();
 	}
 
 	BITBOARD aux = ceil(NV_ / double(WORD_SIZE));
@@ -116,9 +116,9 @@ inline double Graph<sparse_bitarray>::average_block_density_sparse() const {
 	double den = 0.0;
 		
 	for (std::size_t i = 0; i < NV_; ++i) {
-		nBB = adj_[i].number_of_bitblocks();
+		nBB = adj_[i].number_of_blocks();
 		nBBt += nBB;
-		den += static_cast<double>(adj_[i].popcn64()) /
+		den += static_cast<double>(adj_[i].size()) /
 				( BITBOARD(nBB) * WORD_SIZE );
 	}
 

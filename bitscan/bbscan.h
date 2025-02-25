@@ -54,27 +54,26 @@ public:
 	
 	//TODO...check copy and move assignments 
 	
-	virtual	~BBScan					()	 = default;
-
+	~BBScan							()	 = default;
 
 ///////////////////////////////
 //setters and getters
 	
-	void set_scan_block				(int bbindex)		{ scan_.bbi_ = bbindex;}	
-	void set_scan_bit				(int posbit)		{ scan_.pos_ = posbit;}
+	void scan_block				(int bbindex)		{ scan_.bbi_ = bbindex;}	
+	void scan_bit				(int posbit)		{ scan_.pos_ = posbit;}
 
-	int  get_scan_block				()					{ return scan_.bbi_; }	
-
+	int  scan_block				()	 const			{ return scan_.bbi_; }	
+	int  scan_bit				()	 const			{ return scan_.pos_; }
 //////////////////////////////
 // Bitscanning (with cached info)
 	
 	/**
 	* @brief Configures the initial block and bit position for bitscanning
 	*		 according to one of the 4 scan types passed as argument
-	* @param sc: type of scan
+	* @param sct: type of scan
 	* @returns 0 if successful, -1 otherwise
 	**/
-virtual	int init_scan				(scan_types sc);	
+virtual	int init_scan				(scan_types sct);	
 
 	/**
 	* @brief Configures the initial block and bit position for bitscanning
@@ -82,12 +81,12 @@ virtual	int init_scan				(scan_types sc);
 	*		 according to one of the 4 scan types passed as argument.
 	*		 If firstBit is -1 (BBObject::noBit), the scan starts from the beginning.
 	* @param firstBit: starting bit
-	* @param sc: type of scan
+	* @param sct: type of scan
 	* @returns 0 if successful, -1 otherwise
 	* 
 	* TODO - no firstBit information is configured for DESTRUCTIVE scan types (08/02/2025) 
 	**/
-	int init_scan					(int firstBit, scan_types);
+	int init_scan					(int firstBit, scan_types sct);
 
 
 	////////////////
@@ -119,7 +118,7 @@ virtual inline int next_bit_del		();
 	*		II. erases the current scanned bit
 	* 		III. First call requires initialization with init_scan(DESTRUCTIVE)
 	* 
-	* @param bitset: bitblock where the scanned bit is erased
+	* @param bitset: a bitset from which the scanned bit is erased
 	* @param block: output parameter with the current bitblock
 	* @returns the next bit in the bitstring, BBObject::noBit if there are no more bits
 	**/
@@ -309,7 +308,6 @@ int BBScan::next_bit() {
 }
 
 
-
 inline
 int BBScan::next_bit( BBScan& bitset) {
 
@@ -480,18 +478,18 @@ int BBScan::init_scan(scan_types sct){
 
 	switch(sct){
 	case NON_DESTRUCTIVE:
-		set_scan_block	(0);
-		set_scan_bit	(MASK_LIM);
+		scan_block	(0);
+		scan_bit	(MASK_LIM);
 		break;
 	case NON_DESTRUCTIVE_REVERSE:
-		set_scan_block	(nBB_ - 1);
-		set_scan_bit	(WORD_SIZE);		//mask_low[WORD_SIZE] = ONE
+		scan_block	(nBB_ - 1);
+		scan_bit	(WORD_SIZE);		//mask_low[WORD_SIZE] = ONE
 		break;
 	case DESTRUCTIVE:
-		set_scan_block	(0); 
+		scan_block	(0); 
 		break;
 	case DESTRUCTIVE_REVERSE:
-		set_scan_block	(nBB_ - 1);
+		scan_block	(nBB_ - 1);
 		break;
 	default:
 		LOG_ERROR("unknown scan type - BBScan::::init_scan");
@@ -504,25 +502,26 @@ int BBScan::init_scan(scan_types sct){
 inline
 int BBScan::init_scan (int firstBit, scan_types sct){
 
+	//special case - first bitscan
 	if (firstBit == BBObject::noBit) {
-		init_scan(sct);
+		return init_scan(sct);
 	}
-	else{
-		int bbh = WDIV(firstBit);
-		switch(sct){
-		case NON_DESTRUCTIVE:
-		case NON_DESTRUCTIVE_REVERSE:
-			set_scan_block	(bbh);
-			set_scan_bit	(firstBit - WMUL(bbh) /* WMOD(firstBit) */);
-			break;
-		case DESTRUCTIVE:
-		case DESTRUCTIVE_REVERSE:
-			set_scan_block	(bbh);
-			break;
-		default:
-			LOG_ERROR("unknown scan type - BBScan::::init_scan");
-			return -1;
-		}
+
+	
+	int bbh = WDIV(firstBit);
+	switch (sct) {
+	case NON_DESTRUCTIVE:
+	case NON_DESTRUCTIVE_REVERSE:
+		scan_block(bbh);
+		scan_bit(firstBit - WMUL(bbh) /* WMOD(firstBit) */);
+		break;
+	case DESTRUCTIVE:
+	case DESTRUCTIVE_REVERSE:
+		scan_block(bbh);
+		break;
+	default:
+		LOG_ERROR("unknown scan type - BBScan::init_scan");
+		return -1;
 	}
 
 	return 0;

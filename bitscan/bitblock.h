@@ -72,6 +72,17 @@ namespace bblock {
 	constexpr unsigned long long DEBRUIJN_MN_64_SEP = 0x03f79d71b4cb0a89;
 	constexpr unsigned long long DEBRUIJN_MN_64_SHIFT = 58;
 
+	////////////////////
+	// Boolean
+
+	/**
+	* @brief Determines if the bit [0...63] is set in the block bb
+	* @returns TRUE if the bit is set, FALSE otherwise
+	**/
+	inline
+	bool is_bit			(const BITBOARD bb, int bit)		 { return (bb & Tables::mask[bit]); }
+
+
 /////////////////////
 // BitScanning
 	/**
@@ -149,7 +160,7 @@ namespace bblock {
 	**/
 	///////////////////////////////////////////////////////////////////////////////////
 	inline
-	int lsb64				(const BITBOARD bb) { return 	lsb64_intrinsic(bb); }
+	int lsb				(const BITBOARD bb) { return 	lsb64_intrinsic(bb); }
 	///////////////////////////////////////////////////////////////////////////////////
 
 	/**
@@ -190,7 +201,7 @@ namespace bblock {
 	* @returns index of the most significant bit or -1 if empty
 	**/
 	 inline
-	 int msb64				(const BITBOARD bb)		{ return msb64_intrinsic(bb); }
+	 int msb				(const BITBOARD bb)		{ return msb64_intrinsic(bb); }
 
 /////////////////////
 // Bit population
@@ -228,6 +239,13 @@ namespace bblock {
 
 //////////////////////
 //  Masks
+	/**
+	* @brief Sets to 1 the bit passed and zero the rest of bits 
+	* @param bit: bit in the bitblock [0...63]
+	* @returns 64-bit bitblock mask with only one bit set
+	**/
+	inline	
+	BITBOARD MASK_BIT		(int bit)					 { return Tables::mask[bit]; }
 
 	/**
 	* @brief Sets to 1 the bits inside the closed range [low, high], sets to 0 the rest
@@ -235,8 +253,7 @@ namespace bblock {
 	* @returns 64-bit bitblock mask
 	**/
 	 inline
-	 BITBOARD MASK_1(int low, int high)			{ return Tables::mask_mid[low][high]; 
-												/* [low] return ~Tables::mask_low[low] & ~Tables::mask_high[high];*/ }
+	 BITBOARD MASK_1	(int low, int high)				{ return Tables::mask_mid[low][high]; };
 	
 	 /**
 	 * @brief Sets to 1 all bits in the closed range [0, 63]
@@ -244,7 +261,7 @@ namespace bblock {
 	 * @returns 64-bit bitblock mask
 	 **/
 	 inline
-	 BITBOARD MASK_1_LOW	(int idx)			{ return ~Tables::mask_high[idx]; }
+	 BITBOARD MASK_1_LOW	(int idx)					{ return ~Tables::mask_high[idx]; }
 	
 	 /**
 	 * @brief Sets to 1 all bits in the closed range [idx, 63]
@@ -323,7 +340,7 @@ namespace bblock {
 	 * @param firstBit, lastBit: closed range of bits [0...63]
 	 * @param source, dest: input bitblocks
 	 **/
-	 void copy_low		(int bit, const BITBOARD& source, BITBOARD& dest);
+	 void copy_low			(int bit, const BITBOARD& source, BITBOARD& dest);
 
 /////////////////////
 // I/O
@@ -332,7 +349,7 @@ namespace bblock {
 	* @brief streams bb and its popcount to the output stream
 	*		 (format ...000111 [3])
 	**/
-	 std::ostream& print	(const BITBOARD bb, std::ostream&  = std::cout) ;
+	 std::ostream& print	( BITBOARD bb, std::ostream&  = std::cout, bool endofl = true) ;
 
 } //end namespace bblock
 

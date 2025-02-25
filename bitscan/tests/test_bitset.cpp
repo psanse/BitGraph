@@ -7,7 +7,7 @@
 **/
 
 #include "bitscan/bbset.h"	
-#include "bitscan/bbalg.h"
+#include "bitscan/bbalgorithm.h"
 #include "gtest/gtest.h"
 #include <iostream>
 #include <set>		
@@ -142,13 +142,13 @@ TEST(BitSetClass, set_bit_basic) {
 
 	EXPECT_TRUE(bb.is_bit(22));
 	EXPECT_TRUE(bb.is_bit(23));
-	EXPECT_EQ(1, bb.number_of_bitblocks());
+	EXPECT_EQ(1, bb.number_of_blocks());
 
 	//copy constructor
 	BitSet bb2(bb);
 	EXPECT_TRUE(bb2.is_bit(22));
 	EXPECT_TRUE(bb2.is_bit(23));
-	EXPECT_EQ(1, bb2.number_of_bitblocks());
+	EXPECT_EQ(1, bb2.number_of_blocks());
 }
 
 TEST(BitSetClass, set_bit_range) {
@@ -753,7 +753,7 @@ TEST(BitSetClass, AND_with_allocation) {
 	EXPECT_TRUE(bbresAND.is_bit(64));
 	EXPECT_EQ(2, bbresAND.size());
 	EXPECT_EQ(3, bbresAND.capacity());									//capacity = number of bitblocks	
-	EXPECT_EQ(3, bbresAND.number_of_bitblocks());
+	EXPECT_EQ(3, bbresAND.number_of_blocks());
 
 }
 

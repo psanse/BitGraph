@@ -31,9 +31,9 @@ private:
 					v = (*it).at(v);								//will throw exception	
 				}
 				catch (const std::out_of_range& oor) {
-					LOG_ERROR("Out of Range error: ", oor.what());
-					LOG_ERROR("DecodeVertex: operator() - vertex : ", v );
-					LOG_ERROR("exiting...");
+					LOGG_ERROR("Out of Range error: ", oor.what());
+					LOGG_ERROR("DecodeVertex: operator() - vertex : ", v );
+					LOGG_ERROR("exiting...");
 					std::exit(-1);
 				}
 			}

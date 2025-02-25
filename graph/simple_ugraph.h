@@ -117,7 +117,7 @@ public:
 	* 
 	*  @param bbn input sparse (bit) set of vertices
 	*/
-	int degree					(int v, const BitBoardS& bbs)			const;
+	int degree					(int v, const BitSetSp& bbs)			const;
 
 	/*
 	*  @brief truncated number of neighbors of v in a set of vertices
@@ -137,7 +137,7 @@ public:
 	*  @param bbn input sparse (bit) set of vertices
 	*  @returns neighbors of v if <= UB, otherwise UB
 	*/
-	int degree					(int v, int UB, const BitBoardS& bbs)	const;	//truncated degree  (14/2/2016)
+	int degree					(int v, int UB, const BitSetSp& bbs)	const;	//truncated degree  (14/2/2016)
 	
 	/*
 	*  @brief number of neighbors of v in a vertex set with higher index than v

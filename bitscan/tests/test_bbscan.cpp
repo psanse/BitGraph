@@ -7,7 +7,7 @@
 **/
 
 #include "bitscan/bbscan.h"
-#include "bitscan/bbalg.h"
+#include "bitscan/bbalgorithm.h"
 #include "gtest/gtest.h"
 #include <iostream>
 #include <set>
@@ -85,7 +85,6 @@ TEST_F(BBScanClassTest, non_destructive_with_starting_point) {
 	/////////////////////
 	res.clear();
 
-
 }
 
 TEST_F(BBScanClassTest, reverse_non_destructive) {
@@ -114,6 +113,7 @@ TEST_F(BBScanClassTest, reverse_non_destructive) {
 }
 
 TEST_F(BBScanClassTest, reverse_non_destructive_with_starting_point) {
+
 	std::set<int> res;
 
 	int nBit = 50;
@@ -139,7 +139,6 @@ TEST_F(BBScanClassTest, reverse_non_destructive_with_starting_point) {
 	EXPECT_EQ(1, res.count(0));
 	EXPECT_EQ(0, res.count(50));
 	/////////////////////
-	
 
 }
 
@@ -160,11 +159,10 @@ TEST_F(BBScanClassTest, destructive) {
 	EXPECT_TRUE(res == sol);
 	EXPECT_EQ(0, bbsc1.size());
 
-	
 }
 
-
 TEST_F(BBScanClassTest, reverse_destructive) {
+
 	std::set<int> res;
 
 	BitSet bbn1(bbn);
@@ -212,17 +210,18 @@ TEST(BBScanClass, setters_and_getters) {
 
 	EXPECT_TRUE(bb.is_bit(22));
 	EXPECT_TRUE(bb.is_bit(23));
-	EXPECT_EQ(1,bb.number_of_bitblocks());
+	EXPECT_EQ(1,bb.number_of_blocks());
 
 	//copy constructor
 	BitSet bb2(bb);
 	EXPECT_TRUE(bb2.is_bit(22));
 	EXPECT_TRUE(bb2.is_bit(23));
-	EXPECT_EQ(1,bb2.number_of_bitblocks());
+	EXPECT_EQ(1,bb2.number_of_blocks());
 
 }
 
 TEST(BBScanClass, boolean_disjoint){
+
 	BitSet bb(130);
 	bb.set_bit(10);
 	bb.set_bit(20);
@@ -268,6 +267,7 @@ TEST(BBScanClass, set_bit_range){
 }
 
 TEST(BBScanClass, erase_bit_range){
+
 	BitSet bb(130);
 	bb.set_bit(0, 129);
 
@@ -328,8 +328,6 @@ TEST(BBScanClass, init_scan_specific) {
 
 	EXPECT_FALSE(bbres.is_bit(0));
 }
-
-
 
 
 class BBScanClassTest_1 : public ::testing::Test {

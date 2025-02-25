@@ -113,7 +113,7 @@ using namespace std;
 		o << endl;
 	
 	}catch(exception e){
-		LOG_ERROR("Error when printing data", e.what(), "- Test_Analyser::operator << ");
+		LOGG_ERROR("Error when printing data", e.what(), "- Test_Analyser::operator << ");
 		o << "Error when printing data" << e.what() << "- Test_Analyser::operator<< " << endl;
 	}
 
@@ -383,7 +383,7 @@ std::ostream& TestAnalyser::print_single_rep	(ostream & o, int nRep, int idAlg){
 
 	//assert
 	if (nRep < 0) {
-		LOG_ERROR("incorrect number of repetitions", nRep, "-TestAnalyser::print_single_rep");
+		LOGG_ERROR("incorrect number of repetitions", nRep, "-TestAnalyser::print_single_rep");
 		return o;
 	}
 	

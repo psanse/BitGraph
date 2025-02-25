@@ -1,20 +1,21 @@
-# Create a library called "Hello" which includes the source file "hello.cxGRBx".
-# The extension is already found. Any number of sources could be listed here.
+#########################
+#headers for GRAPH lib
+########################
 set(useful_headers_for_IDE
-graph.h
-simple_graph.h
-simple_sparse_graph.h
-simple_sparse_ugraph.h
-simple_ugraph.h
-simple_graph_ew.h
-simple_graph_w.h
-algorithms/kcore.h
-algorithms/graph_gen.h
+${CMAKE_CURRENT_SOURCE_DIR}/graph.h
+${CMAKE_CURRENT_SOURCE_DIR}/simple_graph.h
+${CMAKE_CURRENT_SOURCE_DIR}/simple_sparse_graph.h
+${CMAKE_CURRENT_SOURCE_DIR}/simple_sparse_ugraph.h
+${CMAKE_CURRENT_SOURCE_DIR}/simple_ugraph.h
+${CMAKE_CURRENT_SOURCE_DIR}/simple_graph_ew.h
+${CMAKE_CURRENT_SOURCE_DIR}/simple_graph_w.h
+${CMAKE_CURRENT_SOURCE_DIR}/algorithms/kcore.h
+${CMAKE_CURRENT_SOURCE_DIR}/algorithms/graph_gen.h
+${CMAKE_CURRENT_SOURCE_DIR}/algorithms/graph_map.h
+${CMAKE_CURRENT_SOURCE_DIR}/algorithms/graph_func.h
+${CMAKE_CURRENT_SOURCE_DIR}/algorithms/graph_fast_sort.h
+${CMAKE_CURRENT_SOURCE_DIR}/algorithms/graph_fast_sort_weighted.h
 #algorithms/graph_sort.h
-algorithms/graph_map.h
-algorithms/graph_func.h
-algorithms/graph_fast_sort.h
-algorithms/graph_fast_sort_weighted.h
 )
 
 ###################
@@ -32,13 +33,19 @@ ${useful_headers_for_IDE}
 
 set_target_properties(graph 
     PROPERTIES
-     ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
+    ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
+	#PUBLIC_HEADER   "${useful_headers_for_IDE}"        #does not preserve internal structure 
 )
 
 
 # Make sure the compiler can find include files for our bitscan library
 # when other libraries or executables link to bitscan
-target_include_directories (graph PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+#target_include_directories (graph PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+
+target_include_directories(graph PUBLIC 
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+  $<INSTALL_INTERFACE:include/graph>    # <prefix>/include/bitscan
+)
 
 ###################
 # GRAPH lib - UNIT TESTS

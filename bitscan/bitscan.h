@@ -7,9 +7,9 @@
  * @author pss
  **/
 
-#include "bbalg.h"
+#include "bbalgorithm.h"
 #include "bbsentinel.h"			
-#include "bbintrinsic_sparse.h"	
+#include "bbscan_sparse.h"	
 
 //useful aliases
 
@@ -22,8 +22,8 @@ using bitarray = BBScan;
 using watched_bitarray = BBSentinel;
 
 //sparse
-using simple_sparse_bitarray = BitBoardS;
-using sparse_bitarray = BBIntrinS;
+using simple_sparse_bitarray = BitSetSp;
+using sparse_bitarray = BBScanSp;
 
 
 

@@ -31,17 +31,17 @@ TEST(Graph_sparse, max_subgraph_degree) {
 
 	sparse_bitarray sg(g.number_of_vertices());
 	
-	sg.init_bit(0, 3);
+	sg.reset_bit(0, 3);
 	////////////////////////////////////////
 	EXPECT_EQ(3, g.max_subgraph_degree(sg));	//1(3)
 	////////////////////////////////////////
 
-	sg.init_bit(0, 2);
+	sg.reset_bit(0, 2);
 	////////////////////////////////////////
 	EXPECT_EQ(2, g.max_subgraph_degree(sg));	//1(2)
 	////////////////////////////////////////
 	
-	sg.init_bit(78, 79);						
+	sg.reset_bit(78, 79);						
 	////////////////////////////////////////
 	EXPECT_EQ(1, g.max_subgraph_degree(sg));	//78(1)
 	////////////////////////////////////////
@@ -288,7 +288,7 @@ TEST(Ugraph_sparse, degree_brock){
 	bbset.set_bit(0, g.number_of_vertices()-1);
 	
 	///////////////////////////////////////////////////////////
-	EXPECT_EQ (g.get_neighbors(1).popcn64(),g.degree(1, bbset));
+	EXPECT_EQ (g.get_neighbors(1).size(),g.degree(1, bbset));
 	///////////////////////////////////////////////////////////
 }
 

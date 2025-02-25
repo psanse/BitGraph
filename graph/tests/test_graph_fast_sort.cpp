@@ -10,7 +10,7 @@
 
 #include "graph/algorithms/graph_fast_sort.h"
 #include "graph/algorithms/graph_fast_sort_weighted.h"
-#include "simple_ugraph.h"
+#include "graph/simple_ugraph.h"
 #include "gtest/gtest.h"
 #include <iostream>
 #include "utils/common.h"
@@ -19,7 +19,9 @@
 #include "utils/file.h"
 #include <string>
 
-#include "simple_graph_w.h"							//MUST BE AFTER ugraph type 
+#include "graph/simple_graph_w.h"							//MUST BE AFTER ugraph type 
+
+//useful alias
 typedef Graph_W<ugraph, double> ugraph_w;			//simple vertex weighted graph with double weights
 typedef Graph_W<ugraph, int> ugraph_wi;				//simple vertex weighted graph with int weights
 

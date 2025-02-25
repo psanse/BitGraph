@@ -7,7 +7,7 @@
 
 #include "graph/algorithms/graph_fast_sort.h"
 #include "graph/algorithms/graph_fast_sort_weighted.h"
-#include "simple_graph_w.h"							//MUST BE AFTER ugraph type 
+#include "graph/simple_graph_w.h"							//MUST BE AFTER ugraph type 
 #include "gtest/gtest.h"
 #include <iostream>
 #include "utils/common.h"

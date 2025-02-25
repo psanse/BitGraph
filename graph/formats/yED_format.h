@@ -121,11 +121,11 @@ namespace gio {
 		template<class Graph_t>
 		inline
 			int graph_to_gml(Graph_t& g, std::string filename, double scale = 7.5, int flag_edges=1) {
-			const int N = g.number_of_vertices();
+			const unsigned int N = g.number_of_vertices();
 			if (N == 0) { LOG_INFO("cannot paint the empty graph, will produce no output -gio::yed::graph_to_gml"); return 0; }
 			std::string filenameExt = filename + ".gml";
 			std::ofstream grafo(filenameExt);
-			if (!grafo) { LOG_ERROR("file: " , filenameExt , "could no be opened" , " -gio::yed::graph_to_gml(...)"); return -1; }
+			if (!grafo) { LOGG_ERROR("file: " , filenameExt , "could no be opened" , " -gio::yed::graph_to_gml(...)"); return -1; }
 
 			//////////////////////////////////
 			HEADER(grafo);
@@ -170,7 +170,7 @@ namespace gio {
 			if (N == 0) { LOG_INFO("cannot paint the empty graph, will produce no output- gio::yed::graph_to_gml"); return 0; }
 			std::string filenameExt =path + filename + ".gml";
 			std::ofstream grafo(filenameExt);
-			if (!grafo) { LOG_ERROR("file: " , filenameExt , "could no be opened" , " -graph_to_gml(...)"); return -1; }
+			if (!grafo) { LOGG_ERROR("file: " , filenameExt , "could no be opened" , " -graph_to_gml(...)"); return -1; }
 			typename Graph_t::_bbt bbclq(N, vset);
 			//bbclq.print(cout, true);
 
@@ -223,7 +223,7 @@ namespace gio {
 			if (N == 0) { LOG_INFO("cannot paint the empty graph, will produce no output -gio::yed::graph_to_gml_clique"); return 0; }
 			std::string filenameExt = path + filename + ".gml";
 			std::ofstream grafo(filenameExt);
-			if (!grafo) { LOG_ERROR("file: " , filenameExt , " could no be opened" , " -gio::yed::graph_to_gml_clique(...)"); return -1; }
+			if (!grafo) { LOGG_ERROR("file: " , filenameExt , " could no be opened" , " -gio::yed::graph_to_gml_clique(...)"); return -1; }
 			typename Graph_t::_bbt bbclq(N, clq);
 			//bbclq.print(cout, true);
 
@@ -337,19 +337,19 @@ namespace gio {
 		template<class Graph_t>
 		inline
 			int graph_to_gml_layered(Graph_t& g, vector<int>& layers, string filename, double scale = 20, int flag_edges=1) {
-			const int N = g.number_of_vertices();
+			auto N = g.number_of_vertices();
 			string filenameExt = filename + ".gml";
 			ofstream grafo(filenameExt);
-			if (!grafo) { LOG_ERROR("file: " , filenameExt , "could no be opened" , "--gio::yed::graph_to_gml_layered(...)"); return -1; }
+			if (!grafo) { LOGG_ERROR("file: " , filenameExt , "could no be opened" , "--gio::yed::graph_to_gml_layered(...)"); return -1; }
 
 													   
 			///////////////////////////////
 			gio::yed::HEADER(grafo);
 			//////////////////////////////
 			
-			int i = 0, col = 0 /* RED */;
-			double vx = 0.0, vy = 0.0;
-			for (int v : layers) {
+			auto i = 0, col = 0 /* RED */;
+			auto vx = 0.0, vy = 0.0;
+			for (auto v : layers) {
 				if (v == EMPTY_ELEM) {
 					vx = 0.0;
 					vy+=2;
@@ -363,13 +363,13 @@ namespace gio {
 			}
 			
 			if (i != N) {
-				LOG_ERROR("not all vertices are in the layers, FAILURE" , "--gio::yed::graph_layered_to_gml");
+				LOGG_ERROR("not all vertices are in the layers, FAILURE" , "--gio::yed::graph_layered_to_gml");
 				gio::yed::CLOSE_HEADER(grafo);
 				return -1;
 			}
 
 			if (col > gio::yed::MAX_COL_RGB_GML) {
-				LOG_ERROR("too many colors:" , col , "layered graph not created--gio::yed::graph_to_gml_layered");
+				LOGG_ERROR("too many colors:" , col , "layered graph not created--gio::yed::graph_to_gml_layered");
 				return -1;
 			}
 
@@ -399,31 +399,34 @@ namespace gio {
 		********************/
 		template<class Graph_t>
 		inline
-			int graph_to_gml_circular (Graph_t& g, std::string filename, double radius = 2, double scale = 20, int flag_edges = 1) {
-			const int N = g.number_of_vertices();
+		int graph_to_gml_circular(Graph_t& g, std::string filename, double radius = 2, double scale = 20, int flag_edges = 1) {
+			const unsigned int N = g.number_of_vertices();
 			std::string filenameExt = filename + ".gml";
 			std::ofstream grafo(filenameExt);
-			if (!grafo) { LOG_ERROR("file: " , filenameExt , "could no be opened" , "- graph_to_gml(...)"); return -1; }
-			
+			if (!grafo) {
+				LOGG_ERROR("file: ", filenameExt, "could no be opened", "- graph_to_gml(...)");
+				return -1; 
+			}
+
 			///////////////////////////////
 			gio::yed::HEADER(grafo);
 			//////////////////////////////
-						
+
 			///////////////
 			//vertices
 			double angle = 0, inc = (2 * M_PI) / N;		//rads
 			double x, y;
-			for (int i = 0; i < N; ++i) {
+			for (unsigned int i = 0; i < N; ++i) {
 				x = radius * cos(angle);
 				y = radius * sin(angle);
 				add_vertex(grafo, i, x, y, scale, gio::yed::DEFAULT);
-				angle -= inc ;											//anticlockwise
+				angle -= inc;											//anticlockwise
 			}
-			
+
 			//add edges
 			if (flag_edges) {
-				for (int i = 0; i < N - 1; i++) {
-					for (int j = i + 1; j < N; j++) {
+				for (unsigned int i = 0; i < N - 1; i++) {
+					for (unsigned int j = i + 1; j < N; j++) {
 						if (g.is_edge(i, j)) {
 							///////////////////////////////////////////////
 							gio::yed::add_edge(grafo, i, j);

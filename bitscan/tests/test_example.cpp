@@ -59,7 +59,7 @@ TEST(Example, scanning){
 			break;
 		res.push_back(nBit);
 	}
-	EXPECT_EQ(mywb.popcn64(),res.size());
+	EXPECT_EQ(mywb.size(),res.size());
 
 	//scanning sparse array
 	res.clear();
@@ -71,12 +71,12 @@ TEST(Example, scanning){
 			res.push_back(nBit);
 		}
 	}
-	EXPECT_EQ(mysb.popcn64(),res.size());
+	EXPECT_EQ(mysb.size(),res.size());
 
 	
 	//scanning from a specific position in sparse array
 	res.clear();
-	if(mysb.init_scan_from(51,bbo::NON_DESTRUCTIVE_REVERSE)!=EMPTY_ELEM){
+	if(mysb.init_scan(51, bbo::NON_DESTRUCTIVE_REVERSE) != EMPTY_ELEM){
 		while(true){
 			nBit=mysb.prev_bit();
 			if(nBit==EMPTY_ELEM)
@@ -89,7 +89,7 @@ TEST(Example, scanning){
 
 	//scanning destructive sparse array
 	res.clear();
-	int pc=mysb.popcn64();
+	int pc=mysb.size();
 	cout<<mysb<<endl;
 	if(mysb.init_scan(bbo::DESTRUCTIVE)!=EMPTY_ELEM){
 		while(true){
@@ -101,7 +101,7 @@ TEST(Example, scanning){
 	}
 
 	EXPECT_EQ(pc, res.size());
-	EXPECT_EQ(0, mysb.popcn64());
+	EXPECT_EQ(0, mysb.size());
 }
 
 

@@ -11,7 +11,7 @@
 #ifndef __GRAPH_TYPE_CONVERSIONS_H__
 #define	__GRAPH_TYPE_CONVERSIONS_H__
 
-#include "simple_ugraph.h"								//currently, contains the only converted graph types
+#include "graph/simple_ugraph.h"								//currently, contains the only converted graph types
 #include "utils/common.h"
 #include "utils/logger.h"
 #include <iostream>
@@ -55,12 +55,12 @@ public:
 			return -1;
 		}
 
-		//copies adjacency (non-empty) bitblock array
+		//copies adjacency (non-empty) block array
 		for (auto v = 0; v < NV; ++v) {
-			for (auto it = sug.adj_[v].begin(); it != sug.adj_[v].end(); ++it) {
+			for (auto it = sug.adj_[v].cbegin(); it != sug.adj_[v].cend(); ++it) {
 
 				////////////////////////////////////////////////////
-				ug.adj_[v].bitblock(it->index) = it->bb;
+				ug.adj_[v].block(it->idx_) = it->bb_;
 				////////////////////////////////////////////////////
 
 			}
@@ -93,10 +93,10 @@ public:
 		for (auto v = 0; v < NV; ++v) {
 			for (auto nBB = 0; nBB < NBB; ++nBB) {
 
-				BITBOARD bb = ug.adj_[v].bitblock(nBB);
+				BITBOARD bb = ug.adj_[v].block(nBB);
 				if (bb != 0) {
 					////////////////////////////////////////////////////
-					sug.adj_[v].get_elem_set().emplace_back(nBB, bb);
+					sug.adj_[v].bitset().emplace_back(nBB, bb);
 					////////////////////////////////////////////////////
 				}
 

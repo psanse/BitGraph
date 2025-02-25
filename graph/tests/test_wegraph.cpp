@@ -13,7 +13,7 @@
 #include "utils/logger.h"
 #include "graph/algorithms/graph_gen.h"			
 #include "utils/common_paths.h"
-#include "simple_graph_ew.h"
+#include "graph/simple_graph_ew.h"
 
 using namespace std;
 

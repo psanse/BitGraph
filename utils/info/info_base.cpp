@@ -79,7 +79,7 @@ namespace com {
 			break;
 		default:
 			LOG_ERROR("bizarre timer type, exiting... - com::infoCLQ::start_timer");
-			LOG_ERROR("timer type: ", (int)t, " - com::infoBase::start_timer");
+			LOGG_ERROR("timer type: ", (int)t, " - com::infoBase::start_timer");
 			std::exit(-1);
 		}
 	}
@@ -105,7 +105,7 @@ namespace com {
 			break;
 		default:
 			LOG_ERROR("bizarre timer type, exiting... - com::infoBase::clearTimer");
-			LOG_ERROR("timer type: ", (int)t, " - com::infoBase::clearTimer");
+			LOGG_ERROR("timer type: ", (int)t, " - com::infoBase::clearTimer");
 			std::exit(-1);
 		}
 	}

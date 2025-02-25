@@ -159,7 +159,7 @@ template<class T>
 int Graph<T>::reset	(std::size_t NV, string name) {
 
 	if (NV <= 0) {
-		LOG_ERROR("Invalid graph size ", NV," - Graph<T>::reset");
+		LOGG_ERROR("Invalid graph size ", NV," - Graph<T>::reset");
 		return -1;
 	}
 
@@ -211,10 +211,10 @@ Graph<T>& Graph<T>::create_subgraph (std::size_t first_k, Graph<T>& newg) const 
 	//copy the relevant vertices of the adjacency matrix
 	for(auto i = 0; i < newg.NV_; ++i){
 		for(auto j = 0; j <= bbh; ++j){
-			newg.adj_[i].bitblock(j)=adj_[i].bitblock(j);
+			newg.adj_[i].block(j)=adj_[i].block(j);
 		}
 		//trims last bitblock
-		newg.adj_[i].bitblock(bbh) &= ~Tables::mask_high[WMOD(first_k - 1)];
+		newg.adj_[i].block(bbh) &= ~Tables::mask_high[WMOD(first_k - 1)];
 	}
 	
 	return newg;
@@ -237,7 +237,7 @@ int Graph<T>::set_graph (string filename){
 	if(read_dimacs(filename) == -1){
 		if(read_mtx(filename) == -1){
 			if(read_EDGES(filename) == -1){
-				LOG_ERROR("Unable to read a graph form file ", filename, "- Graph<T>::set_graph");
+				LOGG_ERROR("Unable to read a graph form file ", filename, "- Graph<T>::set_graph");
 				LOG_ERROR("Format considered: DIMACS / MTX / EDGES");
 				return -1;
 			}
@@ -618,7 +618,7 @@ double Graph<T>::block_density	()	const {
 	size_t nBB = 0;
 	for(int v = 0; v < NV_; ++v){
 		for(int bb = 0; bb < NBB_; bb++){
-			if(adj_[v].bitblock(bb))		//non-empty bitblock				
+			if(adj_[v].block(bb))		//non-empty bitblock				
 				nBB++;						
 		}
 	}
@@ -887,7 +887,7 @@ void  Graph<T>::write_EDGES	(ostream& o){
 //	for (int v = 0; v < NV_; ++v) {
 //		nBBt += adj_[v].number_of_bitblocks();
 //		for (int bb = 0; bb < adj_[v].number_of_bitblocks(); bb++) {
-//			if (adj_[v].bitblock(bb))
+//			if (adj_[v].block(bb))
 //				nBB++;
 //		}
 //	}

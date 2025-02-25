@@ -22,9 +22,8 @@
 #include <cassert>					//uncomment #undef NDEBUG in bbconfig.h to enable run-time assertions
 
 //useful alias
-using vint = std::vector<int>;
-using vbset  = std::vector<BITBOARD>;	
-
+using vint	= std::vector<int>;
+using vbset = std::vector<BITBOARD>;	
 
 /////////////////////////////////
 //
@@ -237,18 +236,18 @@ virtual	~BitSet						()								= default;
 /////////////////////
 //setters and getters (will not allocate memory)
 	
-	int number_of_bitblocks()					const					{ return nBB_; }
+	int number_of_blocks()					const					{ return nBB_; }
 	
 	/**
-	* @brief alternative syntax for number_of_bitblocks
+	* @brief alternative syntax for number_of_blocks
 	**/
 	int capacity()								const					{ return nBB_; }
 
-	vbset& bitstring				()									{ return vBB_; }
-const vbset& bitstring				()			const					{ return vBB_; }
+	vbset& bitset					()									{ return vBB_; }
+const vbset& bitset					()			const					{ return vBB_; }
 	
-const BITBOARD bitblock				(int block) const					{ return vBB_[block]; }
-	BITBOARD& bitblock				(int block)							{ return vBB_[block]; }
+	BITBOARD block					(int blockID) const					{ return vBB_[blockID]; }
+	BITBOARD& block					(int blockID)						{ return vBB_[blockID]; }
 
 //////////////////////////////
 // Bitscanning (no HW operations)
@@ -324,7 +323,6 @@ std::size_t	size					(int firstBit, int lastBit = -1)	const		{ return (std::size
 
 	/**
 	* @brief returns the number of 1-bits in the bitstring
-	* @details implemented as a lookup table	
 	**/
 protected:
 virtual	inline int popcn64			()							const;		 
@@ -334,8 +332,8 @@ virtual	inline int popcn64			()							const;
 	*	 	 in the closed range [firstBit, lastBit]
 	*		 If lastBit == -1, the range is [firstBit, endOfBitset)
 	* 
-	* @details efficiently implemented as a lookup table or
-	*		   with HW instructions depending  on an internal switch (see config.h)
+	* @details efficiently implemented as a lookup table or with HW instructions
+	*			depending  on an internal switch (see config.h)
 	**/
 virtual	inline int popcn64			(int firstBit, int lastBit = -1)	const;
 
@@ -412,7 +410,7 @@ inline	BitSet& erase_bit		(int bit);
 	*		 If lastBit == -1, the range is [firstBit, endOfBitset)
 	* @params firstBit, lastBit: 0 < firstBit <= lastBit
 	* @created 22/9/14
-	* @last_update 01/02/25
+	* @details last_update 01/02/25
 	**/
 inline BitSet& erase_bit		(int firstBit, int lastBit);
 
@@ -423,15 +421,15 @@ inline BitSet& erase_bit		(int firstBit, int lastBit);
 inline BitSet& erase_bit		();
 
 	/**
-	* @brief Removes the bits from the bitstring bb_del inside the population range.
+	* @brief Removes the bits from the bitstring bitset inside the population range.
 	*
-	*		 I. bb_del must have a maximum population
+	*		 I. bitset must have a maximum population
 	*			greater or equal than the bitstring.
 	*
 	* @details  Equivalent to a set minus operation
 	* @returns reference to the modified bitstring
 	**/
-inline	BitSet& erase_bit		(const BitSet& bb_del);	
+inline	BitSet& erase_bit		(const BitSet& bitset);	
 
 	/**
 	* @brief Removes the 1-bits from both input bitstrings (their union) 
@@ -508,7 +506,7 @@ inline	BitSet& erase_bit		(const BitSet& lhs, const BitSet& rhs);
 
 	
 	friend bool operator ==			(const BitSet& lhs, const BitSet& rhs);
-	friend bool operator !=			(const BitSet& lhs, const BitSet& rhs);
+	friend bool operator !=			(const BitSet& lhs, const BitSet& rhs)		{ return !(lhs == rhs); }
 
 
 ////////////////////////
@@ -595,7 +593,7 @@ inline	BitSet& erase_bit		(const BitSet& lhs, const BitSet& rhs);
 	* @created 27/7/16
 	* @last_update 04/02/2025
 	**/
-	inline	int	find_diff_singleton				(const BitSet& rhs, int& bit)		const;					
+	inline	int	find_diff_singleton		(const BitSet& rhs, int& bit)				const;					
 	
 	/**
 	* @brief Determines the pair of bits bit1 and bit2 the set difference  bitset this \ rhs.
@@ -608,8 +606,8 @@ inline	BitSet& erase_bit		(const BitSet& lhs, const BitSet& rhs);
 	*		  and -1 otherwise (more than 1-bit)
 	* @details: created  27/7/16, last_update 04/02/2025
 	**/
-	inline  int find_diff_pair					(const BitSet& rhs, 
-														int& bit1, int& bit2	)		const;
+	inline  int find_diff_pair			(const BitSet& rhs, 
+											int& bit1, int& bit2	)					const;
 
 /////////////////////////////
 //Boolean functions 
@@ -693,6 +691,8 @@ inline	BitSet& erase_bit		(const BitSet& lhs, const BitSet& rhs);
 	* @brief converts bb and its popcount to a readable string
 	* @details format example [...000111 (3)]
 	* @returns string
+	* 
+	* TODO implement - cast operator	(24/02/2025)
 	**/
 	std::string to_string			();
 	
@@ -702,9 +702,9 @@ inline	BitSet& erase_bit		(const BitSet& lhs, const BitSet& rhs);
 	/**
 	* @brief Converts the bitstring to a std::vector of non-negative integers.
 	*		 The size of the vector is the number of bits in the bitstring. 
-	* @param lv: output vector 
+	* @param lb: output vector 
 	**/
-	void to_vector					(vint& lv)							const;
+	void to_vector					(vint& lb)							const;
 
 	/**
 	* @brief Casts the bitstring to a vector of non-negative integers
@@ -808,8 +808,6 @@ int BitSet::find_first_common	(const BitSet& rhs) const {
 }
 
 inline int BitSet::msbn64_lup() const{
-///////////////////////
-// Look up table implementation (best found so far)
 
 	register union u {
 		U16 c[4];
@@ -1120,10 +1118,8 @@ BitSet& BitSet::set_bit	(int bit ){
 inline 
 BitSet&  BitSet::set_bit (int firstBit, int lastBit){
 
-	//general comment: low - WMUL(bbl) = WMOD(bbl) but supposed to be less expensive (CHECK 01/02/25)
-
 	//////////////////////////////
-	assert(firstBit <= lastBit && firstBit > 0);
+	assert(firstBit <= lastBit && firstBit >= 0);
 	//////////////////////////////
 
 	int bbl= WDIV(firstBit);
@@ -1177,7 +1173,7 @@ inline
 BitSet&  BitSet::set_block (int firstBlock, int lastBlock, const BitSet& bb_add){
 
 	///////////////////////////////////////////////////////////////////////////////
-	assert((firstBlock >= 0) && (LastBlock < nBB_) && (firstBlock <= lastBlock));
+	assert((firstBlock >= 0) && (lastBlock < nBB_) && (firstBlock <= lastBlock));
 	///////////////////////////////////////////////////////////////////////////////
 
 	int last_block = ((lastBlock == -1) ? nBB_ - 1 : lastBlock);
@@ -1212,7 +1208,7 @@ BitSet&  BitSet::erase_bit (int firstBit, int lastBit){
 	//general comment: low - WMUL(bbl) = WMOD(bbl) but supposed to be less expensive (CHECK 01/02/25)
 
 	//////////////////////////////
-	assert(firstBit > 0 && (firstBit <= lastBit || lastBit = -1) );
+	assert(firstBit > 0 && (firstBit <= lastBit || lastBit == -1) );
 	//////////////////////////////
 
 	int bbl = WDIV(firstBit);
@@ -1345,7 +1341,7 @@ int BitSet::popcn64() const{
 
 	BITBOARD pc = 0;
 
-	for (auto i = 0; i < nBB_; ++i) {
+	for (auto i = 0; i < nBB_ /*vBB_.size()*/; ++i) {
 		pc += bblock::popc64(vBB_[i]);
 	}
 
@@ -1525,21 +1521,13 @@ int BitSet::find_diff_pair(const BitSet& rhs, int& bit1, int& bit2) const {
 }
 
 inline
-bool operator==	(const BitSet& lhs, const BitSet& rhs){
-	
-	for (auto i = 0; i < lhs.nBB_; ++i) {
-		if (lhs.vBB_[i] != rhs.vBB_[i]) {
-			return false;
-		}
-	}
+bool operator==	(const BitSet& lhs, const BitSet& rhs){	
+	return (	( lhs.nBB_ == rhs.nBB_) &&
+				(lhs.vBB_ == rhs.vBB_) 			);
+};
 
-	return true;
-}
 
-inline
-bool operator!=	(const BitSet& lhs, const BitSet& rhs){
-	 return ! operator==(lhs, rhs);
-}
+
 
 inline
 BitSet& BitSet::erase_bit (const BitSet& bbn){
@@ -1595,16 +1583,13 @@ BitSet& BitSet::erase_block(int FirstBlock, int LastBlock, const BitSet& bb_del)
 }
 
 
-
-
-
 template<bool Erase = false>
 inline
 BitSet& AND(int firstBit, int lastBit, const BitSet& lhs, const BitSet& rhs, BitSet& res)
 {
 
 	//////////////////////////////
-	assert(firstBit <= lastBit && firstBit > 0);
+	assert(firstBit <= lastBit && firstBit >= 0);
 	//////////////////////////////
 
 	int bbl = WDIV(firstBit);
@@ -1734,7 +1719,7 @@ inline
 BitSet& OR(int firstBit, int lastBit, const BitSet& lhs, const BitSet& rhs, BitSet& res)
 {
 	//////////////////////////////
-	assert(firstBit <= lastBit && firstBit > 0);
+	assert(firstBit <= lastBit && firstBit >= 0);
 	//////////////////////////////
 
 	int bbl = WDIV(firstBit);

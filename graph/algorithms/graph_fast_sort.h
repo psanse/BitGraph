@@ -320,7 +320,7 @@ vint GraphFastRootSort<Graph_t>::new_order (int alg, bool ltf, bool o2n)
 		sort_non_decreasing_deg_with_support_tb(ltf);
 		break;
 	default:
-		LOG_ERROR("unknown sorting algorithm : ", alg, "- GraphFastRootSort<Graph_t>::new_order");
+		LOGG_ERROR("unknown sorting algorithm : ", alg, "- GraphFastRootSort<Graph_t>::new_order");
 		LOG_ERROR("exiting...");
 		exit(-1);
 	}

@@ -11,7 +11,7 @@
 */
 
 #include "graph/graph.h"
-#include "formats/dimacs_format.h"
+#include "graph/formats/dimacs_format.h"
 #include "graph/formats/yED_format.h"
 #include "gtest/gtest.h"
 #include "utils/common_paths.h"

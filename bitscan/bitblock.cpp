@@ -134,7 +134,7 @@ namespace bblock {
 	//////
 	// I/O
 	//////
-	std::ostream& print(const BITBOARD bb_data, std::ostream& o)
+	std::ostream& print( BITBOARD bb_data, std::ostream& o, bool endofl)
 	{
 
 		if (bb_data) {
@@ -153,7 +153,9 @@ namespace bblock {
 		}
 
 		//adds population count
-		o << "[" << popc64(bb_data) << "]" << endl;
+		o << "[" << popc64(bb_data) << "]";
+		
+		if (endofl) { o << std::endl; }
 
 		return o;
 

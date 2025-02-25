@@ -233,7 +233,7 @@ TEST(Masks, DISABLED_set_bits_sparse) {
 	bb1.set_bit(100);
 
 	//set range
-	bb.set_block(0, bb1);
+	bb.set_block(0, WDIV(130) -1, bb1);
 	EXPECT_TRUE(bb.is_bit(100));
 
 	bb1.set_bit(129);
@@ -244,14 +244,14 @@ TEST(Masks, DISABLED_set_bits_sparse) {
 	EXPECT_TRUE(bb.is_bit(129));
 
 	//erase range
-	bb.erase_block(2, bb1);
+	bb.erase_block(2, WDIV(bb1.number_of_blocks()) -1,  bb1);
 	EXPECT_FALSE(bb.is_bit(129));
 
-	bb.erase_block(1, bb1);
+	bb.erase_block(1, WDIV(bb1.number_of_blocks()) - 1, bb1);
 	EXPECT_FALSE(bb.is_bit(100));
 	EXPECT_FALSE(bb.is_bit(64));
 		
-	bb.erase_block(0, bb1);
+	bb.erase_block(0, WDIV(bb1.number_of_blocks()) - 1, bb1);
 	EXPECT_TRUE(bb.is_bit(20));
 }
 
@@ -300,7 +300,7 @@ TEST(Masks, DISABLED_erase_bit_stateless) {
 	bbs1.set_bit(100);
 
 	//////////////////////////////	
-	ERASE(bbs, bbs1, bbsERASE);
+	erase_bit(bbs, bbs1, bbsERASE);
 	//////////////////////////////
 
 	EXPECT_TRUE(bbsERASE.is_bit(20));
@@ -323,8 +323,7 @@ TEST(Masks, DISABLED_ERASE_extreme_cases) {
 
 
 	//ERASE
-	//cout<<ERASE(bbs, bbs1, bbsERASE)<<endl;
-	ERASE(bbs, bbs1, bbsERASE);
+	erase_bit(bbs, bbs1, bbsERASE);
 	EXPECT_TRUE(bbs == bbsERASE);
 
 	//erase when no blocks in same index: simple copy
@@ -336,8 +335,7 @@ TEST(Masks, DISABLED_ERASE_extreme_cases) {
 	bbs1.print();
 
 	//ERASE
-	//cout<<ERASE(bbs, bbs1, bbsERASE)<<endl;
-	ERASE(bbs, bbs1, bbsERASE);
+	erase_bit(bbs, bbs1, bbsERASE);
 	EXPECT_TRUE(bbsERASE.is_bit(10));
 	EXPECT_TRUE(bbsERASE.is_bit(64));
 	EXPECT_EQ(2, bbsERASE.size());

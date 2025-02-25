@@ -230,7 +230,7 @@ int Base_Graph_W<Graph_t, W>::read_dimacs (string filename, int type){
 	
 	fstream f(filename.c_str());
 	if(!f){
-		LOG_ERROR("error when reading file ", filename, " in DIMACS format - Base_Graph_W<Graph_t, W>::read_dimacs");
+		LOGG_ERROR("error when reading file ", filename, " in DIMACS format - Base_Graph_W<Graph_t, W>::read_dimacs");
 		clear();
 		return -1;
 	}
@@ -396,7 +396,7 @@ int Base_Graph_W<Graph_t, W>::read_weights(string filename) {
 	for (std::size_t i = 0; i < NV; ++i) {
 		f >> w;
 		if (f.fail()) {
-			LOG_ERROR("bad reading of weights in:", filename, "- Base_Graph_W<Graph_t, W>::read_weights");
+			LOGG_ERROR("bad reading of weights in:", filename, "- Base_Graph_W<Graph_t, W>::read_weights");
 			w_.clear();
 			return -1;
 		}
