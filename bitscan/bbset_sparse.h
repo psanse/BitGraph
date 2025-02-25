@@ -13,6 +13,7 @@
 #include "bbobject.h"
 #include "bitblock.h"
 #include "utils/logger.h"
+#include "utils/common.h"
 #include <vector>	
 #include <algorithm>
 #include <iterator>
@@ -50,7 +51,8 @@ public:
 		bool is_empty		()					const	{ return !bb_ ; }
 		void clear			()							{ bb_ = 0;}
 
-		ostream& print		(ostream& o)		const	{ return o << idx_ << " : " << bb_<< '\n'; }
+		ostream& print(ostream& o)		const { o << idx_ << " : "; bblock::print(bb_, o); return o; }
+		friend  ostream& operator<< (ostream& o, const pBlock_t& pB)	{ pB.print(o); return o; }
 	};
 
 	//aliases
@@ -88,17 +90,40 @@ public:
 	**/
 	friend BitSetSp 		AND		(BitSetSp lhs, const BitSetSp& rhs)			{ return lhs &= rhs; }
 	
+	/**
+	* @brief AND between lhs and rhs bitsets in the CLOSED block bit-range [firstBit, lastBit]
+	*		 The result is stored in bitset res. Outside the range, res is set to 0.
+	* @param firstBit, lastBit: closed bit-range 0 < firstBit <= lastBit <= capacity()
+	* @param lhs, rhs: input bitsets
+	* @param res: output bitset
+	* @returns reference to the resulting bitstring res
+	* @details: The capacity of lhs and rhs must be the same.
+	* 
+	* TODO... (25/02/2025)
+	**/
+	friend BitSetSp&			AND	(int firstBit, int lastBit, const BitSetSp& lhs,
+											const BitSetSp& rhs, BitSetSp& res					) = delete;
 
-	///////////////////////////
-// AND between sparse sets in closed range
-// last update: 21/3/15 -BUG corrected concerning last_block and first_block value optimization  
-//
-	friend inline BitSetSp& AND(int firstBlock, int lastBlock, const BitSetSp& lhs, const BitSetSp& rhs, BitSetSp& res);
-
+	/**
+	* @brief AND between lhs and rhs bitsets in the CLOSED block-range [firstBlock, lastBlock]
+	*		 The result is stored in bitset res. Outside the range, res is set to 0. 
+	* @param firstBit, lastBit: closed bit-range 0 < firstBit <= lastBit <= capacity()
+	* @param lhs, rhs: input bitsets
+	* @param res: output bitset
+	* @returns reference to the resulting bitstring res
+	* @details: The capacity of lhs and rhs must be the same.
+	**/
+friend inline BitSetSp& AND_block	(int firstBlock, int lastBlock, const BitSetSp& lhs, const BitSetSp& rhs, BitSetSp& res);
 	
-	friend inline BitSetSp&  AND	(int firstBlock, const BitSetSp& lhs, const BitSetSp& rhs,  BitSetSp& res);
+	/**
+	* @brief OR between lhs and rhs sparse bitsets - stores the result in sparse bitset res
+	* @param lhs, rhs: input bitsets
+	* @param res: output bitset
+	* @returns reference to res
+	**/
+friend inline BitSetSp&  OR			(const BitSetSp& lhs, const BitSetSp& rhs,  BitSetSp& res);
 	
-	friend BitSetSp&  OR			(const BitSetSp& lhs, const BitSetSp& rhs,  BitSetSp& res);
+	
 	friend BitSetSp&  ERASE			(const BitSetSp& lhs, const BitSetSp& rhs,  BitSetSp& res);			//removes rhs from lhs
 
 /////////////////////
@@ -1149,10 +1174,10 @@ int BitSetSp::popcn64 (int firstBit) const{
 inline
 BitSetSp& AND (const BitSetSp& lhs, const BitSetSp& rhs,  BitSetSp& res){
 	
-	///////////////////////////////////
+	/////////////////////////////////////////////////////////////
 	res.reset(lhs.capacity(), false);
-	res.vBB_.reserve(lhs.vBB_.size());	
-	///////////////////////////////////
+	res.vBB_.reserve(std::min(lhs.vBB_.size(), rhs.vBB_.size()));
+	/////////////////////////////////////////////////////////////
 
 	//////////////////
 	//A) General purpose code assuming no a priori knowledge about population size in lhs and rhs
@@ -1199,93 +1224,98 @@ BitSetSp& AND (const BitSetSp& lhs, const BitSetSp& rhs,  BitSetSp& res){
 }
 
 inline
-BitSetSp& AND (int first_block, const BitSetSp& lhs, const BitSetSp& rhs,  BitSetSp& res){
-///////////////////////////
-// AND between sparse sets from first_block (included) onwards
-//
-			
-	res.erase_bit();
-	pair<bool, int> p1=lhs.find_block_pos(first_block);
-	pair<bool, int> p2=rhs.find_block_pos(first_block);
-	if(p1.second!=BBObject::noBit && p2.second!=BBObject::noBit){
-		int i1=p1.second, i2=p2.second;
-		while( i1!=lhs.vBB_.size() && i2!=rhs.vBB_.size() ){
-			
-			//update before either of the bitstrings has reached its end
-			if(lhs.vBB_[i1].idx_<rhs.vBB_[i2].idx_){
-				i1++;
-			}else if(rhs.vBB_[i2].idx_<lhs.vBB_[i1].idx_){
-				i2++;
-			}else{
-				BitSetSp::pBlock_t e(lhs.vBB_[i1].idx_, lhs.vBB_[i1].bb_ & rhs.vBB_[i2].bb_);
-				res.vBB_.push_back(e);
-				i1++, i2++; 
-			}
+BitSetSp& OR(const BitSetSp& lhs, const BitSetSp& rhs, BitSetSp& res) {
 
+	/////////////////////////////////////////////////////////////
+	res.reset(lhs.capacity(), false);
+	res.vBB_.reserve(lhs.vBB_.size() + rhs.vBB_.size());
+	/////////////////////////////////////////////////////////////
+	
+	auto itR = rhs.cbegin();
+	auto itL = lhs.cbegin();
 
-		/*	if(lhs.vBB_[i1].idx_==rhs.vBB_[i2].idx_){
-				BitSetSp::elem e(lhs.vBB_[i1].idx_, lhs.vBB_[i1].bb_ & rhs.vBB_[i2].bb_);
-				res.vBB_.push_back(e);
-				i1++, i2++; 
-			}else if(lhs.vBB_[i1].idx_<rhs.vBB_[i2].idx_){
-				i1++;
-			}else if(rhs.vBB_[i2].idx_<lhs.vBB_[i1].idx_){
-				i2++;
-			}*/
+	while (itL != lhs.vBB_.end() && itR != rhs.vBB_.end()) {
+
+		if (itL->idx_ < itR->idx_) {
+			res.vBB_.push_back(BitSetSp::pBlock_t(itL->idx_, itL->bb_));
+			res.print(cout, true);	
+			itL++;
+		}
+		else if (itL->idx_ > itR->idx_) {
+			res.vBB_.push_back(BitSetSp::pBlock_t(itR->idx_, itR->bb_));
+			res.print(cout, true);
+			itR++;
+		}
+		else {
+
+			////////////////////////////////////////////////////////////////////////
+			res.vBB_.push_back(BitSetSp::pBlock_t(itL->idx_, itL->bb_ | itR->bb_));
+			/////////////////////////////////////////////////////////////////////////
+					
+			itL++;
+			itR++;
 		}
 	}
-return res;
+
+	//add rest of blocks from the bitstring with blocks remaining to be examined
+	if (itL == lhs.vBB_.end() && itR != rhs.vBB_.end()) {
+		res.vBB_.insert(res.vBB_.end(), itR, rhs.vBB_.end());
+	}
+	else if (itR == rhs.vBB_.end() && itL != lhs.vBB_.end()) {
+		res.vBB_.insert(res.vBB_.end(), itL, lhs.vBB_.end());
+	}
+	
+
+	return res;
 }
 
+
 inline
-BitSetSp& AND (int first_block, int last_block, const BitSetSp& lhs, const BitSetSp& rhs,  BitSetSp& res){
+BitSetSp& AND_block (int firstBlock, int lastBlock, const BitSetSp& lhs, const BitSetSp& rhs,  BitSetSp& res){
 		
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	assert(first_block >= 0 && first_block <= last_block && last_block < rhs.capacity() && last_block < lhs.capacity());
+	assert(firstBlock >= 0 && firstBlock <= lastBlock && lastBlock < rhs.capacity() && lastBlock < lhs.capacity());
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	res.erase_bit();
-	int i1=0, i2=0;
+	//////////////////////////////////////////////////////////////
+	res.reset(lhs.capacity(), false);
+	res.vBB_.reserve(std::min(lhs.vBB_.size(), rhs.vBB_.size()));
+	//////////////////////////////////////////////////////////////
 
-	//updates initial element indexes it first_block is defined
-	if(first_block>0){
+	auto posL = BBObject::noBit;	
+	auto posR = BBObject::noBit;	
+	auto itL = lhs.find_block(firstBlock, posL);
+	auto itR = rhs.find_block(firstBlock, posR);
 
-		pair<bool, int> p1=lhs.find_block_pos(first_block);
-		pair<bool, int> p2=rhs.find_block_pos(first_block);
-
-		//checks whether both sparse bitstrings have at least one block greater or equal to first_block
-		if(p1.second==BBObject::noBit || p2.second==BBObject::noBit) return res;
-		i1=p1.second; i2=p2.second;
-	}
-
+	//special case - out of range
+	if (itL == lhs.vBB_.end() || itR == rhs.vBB_.end()) { return res; }
 
 	//main loop	
-	int nElem_lhs=lhs.vBB_.size(); int nElem_rhs=rhs.vBB_.size();
-	while(! ((i1>=nElem_lhs|| lhs.vBB_[i1].idx_>last_block) || (i2>=nElem_rhs || rhs.vBB_[i2].idx_>last_block)) ){
-			
+	while ( itL != lhs.vBB_.end()	&&
+			itL->idx_ <= lastBlock	&&
+			itR != rhs.vBB_.end()	&&
+			itR->idx_ <= lastBlock		)
+	{
+
 		//update before either of the bitstrings has reached its end
-		if(lhs.vBB_[i1].idx_<rhs.vBB_[i2].idx_){
-			i1++;
-		}else if(rhs.vBB_[i2].idx_<lhs.vBB_[i1].idx_){
-			i2++;
-		}else{
-			BitSetSp::pBlock_t e(lhs.vBB_[i1].idx_, lhs.vBB_[i1].bb_ & rhs.vBB_[i2].bb_);
-			res.vBB_.push_back(e);
-			i1++, i2++; 
+		if (itL->idx_ < itR->idx_) {
+			itL++;
 		}
+		else if (itL->idx_ > itR->idx_) {
+			itR++;
+		}
+		else {
+			//blocks with same index
+			///////////////////////////////////
+			res.vBB_.push_back(BitSetSp::pBlock_t(itL->idx_, itL->bb_ & itR->bb_));
+			///////////////////////////////////
+			++itL;
+			++itR;
+		}	
+	
+	}//end while
 
-		/*if(lhs.vBB_[i1].idx_==rhs.vBB_[i2].idx_){
-			BitSetSp::elem e(lhs.vBB_[i1].idx_, lhs.vBB_[i1].bb_ & rhs.vBB_[i2].bb_);
-			res.vBB_.push_back(e);
-			i1++, i2++; 
-		}else if(lhs.vBB_[i1].idx_<rhs.vBB_[i2].idx_){
-			i1++;
-		}else if(rhs.vBB_[i2].idx_<lhs.vBB_[i1].idx_){
-			i2++;
-		}*/
-	}
-
-return res;
+	return res;
 }
 
 inline

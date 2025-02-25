@@ -829,6 +829,37 @@ TEST(Sparse, AND_block) {
 
 }
 
+TEST(Sparse, friend_AND_block_range) {
+
+	BitSetSp bbsp(10000);
+	BitSetSp bbspAND(10000);
+	BitSetSp res(10000);
+
+	bbsp.set_bit(0);
+	bbsp.set_bit(1);
+	bbsp.set_bit(2);
+	bbsp.set_bit(126);
+	bbsp.set_bit(127);
+	bbsp.set_bit(1000);
+	bbsp.set_bit(9000);
+
+	bbspAND.set_bit(0);
+	bbspAND.set_bit(1);
+	bbspAND.set_bit(2);
+	bbspAND.set_bit(126);
+	bbspAND.set_bit(127);
+	bbspAND.set_bit(10001);
+	bbspAND.set_bit(9000);
+
+	/////////////////////////////////////////////////////
+	AND_block(2, WDIV(10000) - 1, bbsp, bbspAND, res);
+	/////////////////////////////////////////////////////
+
+	EXPECT_EQ(1, res.size());
+	EXPECT_TRUE(res.is_bit(9000));
+
+}
+
 TEST(Sparse, member_AND_operator) {
 
 	BitSetSp bbsp(130);
@@ -1094,6 +1125,8 @@ TEST(Sparse, keep_operations) {
 	EXPECT_EQ(1, bbsp.popcn64());
 
 }
+
+
 
 
 //TEST(Sparse, erase_block_pos) {
