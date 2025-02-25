@@ -42,9 +42,25 @@ public:
  //////////////////////////////
  // Bitscanning (with cached info)
 
-	//scan setup
-	int init_scan					(scan_types);
-	int init_scan_from				(int from, scan_types sct);				//currently only for the NON-DESTRUCTIVE case
+	/**
+	* @brief Configures the initial block and bit position for bitscanning
+	*		 according to one of the 4 scan types passed as argument
+	* @param sct: type of scan
+	* @returns 0 if successful, -1 otherwise
+	**/
+	int init_scan					(scan_types sct);
+	
+	/**
+	* @brief Configures the initial block and bit position for bitscanning
+	*		 starting from the bit 'firstBit' onwards, excluding 'firstBit'
+	*		 according to one of the 4 scan types passed as argument.
+	*		 If firstBit is -1 (BBObject::noBit), the scan starts from the beginning.
+	* @param firstBit: starting bit
+	* @param sct: type of scan
+	* @returns 0 if successful, -1 otherwise
+	* @details currently ONLY for the NON-DESTRUCTIVE cases
+	**/
+	int init_scan					(int firstBit, scan_types sct);
 	
 	//bit scan forward (destructive)				
 inline int next_bit_del				(); 												
@@ -322,36 +338,51 @@ int BBScanSp::init_scan (scan_types sct){
 		scan_block(vBB_.size() - 1);
 		break;
 	default:
-		cerr<<"bad scan type"<<endl;
+		LOG_ERROR("unknown scan type - BBScanSp::::init_scan");
 		return -1;
 	}
-return 0;
+
+	return 0;	
 }
 
 inline
-int BBScanSp::init_scan_from (int from, scan_types sct){
-////////////////////////
-// scans starting at from until the end of the bitarray
-//
-// REMARKS: at the moment, only working for the NON-DESTRUCTIVE case
+int BBScanSp::init_scan (int firstBit, scan_types sct){
 
-	pair<bool, int> p= find_block_pos(WDIV(from));
-	if(p.second == BBObject::noBit) return BBObject::noBit;
-	switch(sct){
-	case NON_DESTRUCTIVE:
-	case NON_DESTRUCTIVE_REVERSE:
-		scan_block(p.second); 
-		(p.first)? scan_bit(WMOD(from)) : scan_bit(MASK_LIM);
-		break;
-	/*case DESTRUCTIVE:
-	case DESTRUCTIVE_REVERSE:
-		scan_block(p.second);
-		break;*/
-	default:
-		cerr<<"bad scan type"<<endl;
+	//special case - first bitscan
+	if (firstBit == BBObject::noBit) {
+		return init_scan(sct);
+	}
+
+
+	//determine the index of the starting block (not its ID)
+	auto bbL = WDIV(firstBit);
+	
+	////////////////////////////////////////////////////
+	pair<bool, int> p = find_block_pos(bbL);
+	///////////////////////////////////////////////////
+
+	//no blocks with index greater or equal to bbL, nothing to scan
+	if (p.second == BBObject::noBit) {
 		return -1;
 	}
-return 0;
+
+	switch (sct) {
+	case NON_DESTRUCTIVE:
+	case NON_DESTRUCTIVE_REVERSE:
+		scan_block(p.second);
+		(p.first) ? scan_bit(firstBit - WMUL(bbL)) : scan_bit(MASK_LIM);
+		break;
+		/*case DESTRUCTIVE:
+		case DESTRUCTIVE_REVERSE:
+			scan_block(p.second);
+			break;*/
+	default:
+		LOG_ERROR("unknown scan type - BBScan::init_scan");
+		return -1;
+	}
+		
+	//nothing to scan or error
+	return 0;
 }
 
 

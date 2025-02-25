@@ -483,7 +483,7 @@ int GraphSort<Graph_t>::reorder_edge_based(const vint& new_order, ostream* o){
 
 	for(int v=0; v<NV-1; v++){
 		_bbt& nn=g.get_neighbors(v);
-		nn.init_scan_from(v, bbo::NON_DESTRUCTIVE);
+		nn.init_scan(v, bbo::NON_DESTRUCTIVE);
 		while(true){
 			int w=nn.next_bit();
 			if(w==EMPTY_ELEM) break;
@@ -683,7 +683,7 @@ int GraphSort<Graph_t>::reorder_edge_based (const vint& new_order, Decode& d,  o
 
 	for(int v=0; v<NV-1; v++){
 		_bbt& nn=g.get_neighbors(v);
-		nn.init_scan_from(v, bbo::NON_DESTRUCTIVE);
+		nn.init_scan(v, bbo::NON_DESTRUCTIVE);
 		while(true){
 			int w=nn.next_bit();
 			if(w==EMPTY_ELEM) break;
@@ -801,7 +801,7 @@ int GraphSort<Graph_t>::reorder_edge_based (const vint& new_order, Graph_t& gn, 
 	//edge based
 	for(int v=0; v<NV-1; v++){
 		_bbt& nn=g.get_neighbors(v);
-		nn.init_scan_from(v, bbo::NON_DESTRUCTIVE);
+		nn.init_scan(v, bbo::NON_DESTRUCTIVE);
 		while(true){
 			int w=nn.next_bit();
 			if(w==EMPTY_ELEM) break;
@@ -857,7 +857,7 @@ int GraphSort<sparse_ugraph>::reorder(const vint& new_order, ostream* o){
 	int j=EMPTY_ELEM;
 	for(int i=0; i<size-1; i++){
 		sparse_bitarray neigh=g.get_neighbors(i);
-		if(neigh.init_scan_from(i, bbo::NON_DESTRUCTIVE)!=EMPTY_ELEM){
+		if(neigh.init_scan(i, bbo::NON_DESTRUCTIVE)!=EMPTY_ELEM){
 			while(true){
 				j=neigh.next_bit();
 				if(j==EMPTY_ELEM)
@@ -899,7 +899,7 @@ int GraphSort<sparse_ugraph>::reorder(const vint& new_order, Decode& d, ostream*
 	int j=EMPTY_ELEM;
 	for(int i=0; i<size-1; i++){
 		sparse_bitarray neigh=g.get_neighbors(i);
-		if(neigh.init_scan_from(i, bbo::NON_DESTRUCTIVE)!=EMPTY_ELEM){
+		if(neigh.init_scan(i, bbo::NON_DESTRUCTIVE)!=EMPTY_ELEM){
 			while(true){
 				j=neigh.next_bit();
 				if(j==EMPTY_ELEM)
@@ -1006,7 +1006,7 @@ int GraphSort<sparse_ugraph>::reorder_in_place(const vint& new_order, ostream* o
     for(int i=0; i<N; i++){
         neigh=g.get_neighbors(i);
 		//reorders using upper triangle information
-        if(neigh.init_scan_from(i, bbo::NON_DESTRUCTIVE)!=EMPTY_ELEM){
+        if(neigh.init_scan(i, bbo::NON_DESTRUCTIVE)!=EMPTY_ELEM){
 		    while(true){
                 j=neigh.next_bit();
                 if(j==EMPTY_ELEM)
@@ -1076,7 +1076,7 @@ int GraphSort<sparse_ugraph>::reorder_in_place(const vint& new_order, Decode& d,
     for(int i=0; i<N; i++){
         neigh=g.get_neighbors(i);
 		//reorders using upper triangle information
-        if(neigh.init_scan_from(i, bbo::NON_DESTRUCTIVE)!=EMPTY_ELEM){
+        if(neigh.init_scan(i, bbo::NON_DESTRUCTIVE)!=EMPTY_ELEM){
 		    while(true){
                 j=neigh.next_bit();
                 if(j==EMPTY_ELEM)

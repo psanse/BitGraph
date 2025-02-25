@@ -70,10 +70,10 @@ public:
 	/**
 	* @brief Configures the initial block and bit position for bitscanning
 	*		 according to one of the 4 scan types passed as argument
-	* @param sc: type of scan
+	* @param sct: type of scan
 	* @returns 0 if successful, -1 otherwise
 	**/
-virtual	int init_scan				(scan_types sc);	
+virtual	int init_scan				(scan_types sct);	
 
 	/**
 	* @brief Configures the initial block and bit position for bitscanning
@@ -81,12 +81,12 @@ virtual	int init_scan				(scan_types sc);
 	*		 according to one of the 4 scan types passed as argument.
 	*		 If firstBit is -1 (BBObject::noBit), the scan starts from the beginning.
 	* @param firstBit: starting bit
-	* @param sc: type of scan
+	* @param sct: type of scan
 	* @returns 0 if successful, -1 otherwise
 	* 
 	* TODO - no firstBit information is configured for DESTRUCTIVE scan types (08/02/2025) 
 	**/
-	int init_scan					(int firstBit, scan_types);
+	int init_scan					(int firstBit, scan_types sct);
 
 
 	////////////////
@@ -502,25 +502,26 @@ int BBScan::init_scan(scan_types sct){
 inline
 int BBScan::init_scan (int firstBit, scan_types sct){
 
+	//special case - first bitscan
 	if (firstBit == BBObject::noBit) {
-		init_scan(sct);
+		return init_scan(sct);
 	}
-	else{
-		int bbh = WDIV(firstBit);
-		switch(sct){
-		case NON_DESTRUCTIVE:
-		case NON_DESTRUCTIVE_REVERSE:
-			scan_block	(bbh);
-			scan_bit	(firstBit - WMUL(bbh) /* WMOD(firstBit) */);
-			break;
-		case DESTRUCTIVE:
-		case DESTRUCTIVE_REVERSE:
-			scan_block	(bbh);
-			break;
-		default:
-			LOG_ERROR("unknown scan type - BBScan::::init_scan");
-			return -1;
-		}
+
+	
+	int bbh = WDIV(firstBit);
+	switch (sct) {
+	case NON_DESTRUCTIVE:
+	case NON_DESTRUCTIVE_REVERSE:
+		scan_block(bbh);
+		scan_bit(firstBit - WMUL(bbh) /* WMOD(firstBit) */);
+		break;
+	case DESTRUCTIVE:
+	case DESTRUCTIVE_REVERSE:
+		scan_block(bbh);
+		break;
+	default:
+		LOG_ERROR("unknown scan type - BBScan::init_scan");
+		return -1;
 	}
 
 	return 0;

@@ -655,7 +655,7 @@ TEST(Sparse_intrinsic, non_destructive_scanning_with_starting_point){
 	EXPECT_EQ(2,bbsp.number_of_blocks());				//number of blocks 
 
 	//non destructive
-	if(bbsp.init_scan_from(20,BBObject::NON_DESTRUCTIVE)!=EMPTY_ELEM){
+	if(bbsp.init_scan(20,BBObject::NON_DESTRUCTIVE)!=EMPTY_ELEM){
 		while(true){
 			nBit=bbsp.next_bit();
 			if(nBit==EMPTY_ELEM) break;
@@ -670,7 +670,7 @@ TEST(Sparse_intrinsic, non_destructive_scanning_with_starting_point){
 	
 	//non destructive reverse
 	v.clear();
-	if(bbsp.init_scan_from(20,BBObject::NON_DESTRUCTIVE_REVERSE)!=EMPTY_ELEM){
+	if(bbsp.init_scan(20,BBObject::NON_DESTRUCTIVE_REVERSE)!=EMPTY_ELEM){
 		while(true){
 			nBit=bbsp.prev_bit();
 			if(nBit==EMPTY_ELEM) break;

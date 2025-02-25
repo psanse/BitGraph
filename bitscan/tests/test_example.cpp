@@ -76,7 +76,7 @@ TEST(Example, scanning){
 	
 	//scanning from a specific position in sparse array
 	res.clear();
-	if(mysb.init_scan_from(51,bbo::NON_DESTRUCTIVE_REVERSE)!=EMPTY_ELEM){
+	if(mysb.init_scan(51, bbo::NON_DESTRUCTIVE_REVERSE) != EMPTY_ELEM){
 		while(true){
 			nBit=mysb.prev_bit();
 			if(nBit==EMPTY_ELEM)
