@@ -10,12 +10,13 @@
 #include "gtest/gtest.h"
 #include <iostream>
 #include <algorithm>
+#include <vector>
 
 using namespace std;
 
-class BBScanClassTest : public ::testing::Test {
+class BBScanSpClassTest : public ::testing::Test {
 protected:
-	BBScanClassTest() : bbsc(301) {}
+	BBScanSpClassTest() : bbsc(301) {}
 	virtual void SetUp() {
 		for (int i = 0; i <= 300; i += 50) {
 			bbsc.set_bit(i);
@@ -26,10 +27,10 @@ protected:
 	//////////////////////
 	//data members
 	BBScanSp bbsc;	
-	vector<int> pSet;
+	std::vector<int> pSet;
 };
 
-TEST_F(BBScanClassTest, check_example) {
+TEST_F(BBScanSpClassTest, check_example) {
 
 	EXPECT_EQ(7, bbsc.size());
 	EXPECT_TRUE(bbsc.is_bit(0));
@@ -46,8 +47,8 @@ TEST_F(BBScanClassTest, check_example) {
 	//I/O
 	//bbsc.print();
 }
-
-TEST_F(BBScanClassTest, copy_constructor) {
+//
+TEST_F(BBScanSpClassTest, copy_constructor) {
 
 	BBScanSp bbscCOPY(bbsc);
 
@@ -64,7 +65,7 @@ TEST_F(BBScanClassTest, copy_constructor) {
 	EXPECT_EQ	(5, bbscCOPY.number_of_blocks());
 }
 
-TEST(BBScan, population_count){
+TEST(BBScanSpClass, population_count){
 
 	BBScanSp bbs(130);
 	bbs.set_bit(10);
@@ -78,7 +79,7 @@ TEST(BBScan, population_count){
 	EXPECT_EQ(1, bbs.size(64, -1));
 }
 
-TEST(BBScan, set_bits) {
+TEST(BBScanSpClass, set_bits) {
 	
 	BBScanSp sb(150);
 	sb.reset_bit(30,40);
@@ -91,7 +92,7 @@ TEST(BBScan, set_bits) {
 	EXPECT_EQ(1, sb.size());	
 }
 
-TEST(BBScan, boolean_properties){
+TEST(BBScanSpClass, boolean_properties){
 //Properties, inherited from BitSetSp
 
 	BBScanSp bb(130);
@@ -117,7 +118,7 @@ TEST(BBScan, boolean_properties){
 
 }
 
-TEST(Scanning, non_destructive_direct){
+TEST(BBScanSpClass, non_destructive_direct){
 
 	BBScanSp bbsp(130);
 	bbsp.set_bit(10);
@@ -146,7 +147,7 @@ TEST(Scanning, non_destructive_direct){
 
 }
 
-TEST(Scanning, non_destructive_reverse) {
+TEST(BBScanSpClass, non_destructive_reverse) {
 
 	BBScanSp bbsp(130);
 	bbsp.set_bit(10);
@@ -175,7 +176,7 @@ TEST(Scanning, non_destructive_reverse) {
 		
 }
 
-TEST(Scanning, non_destructive_with_starting_point){
+TEST(BBScanSpClass, non_destructive_with_starting_point){
 
 	BBScanSp bbsp(130);
 	bbsp.set_bit(10);
@@ -202,7 +203,7 @@ TEST(Scanning, non_destructive_with_starting_point){
 	EXPECT_EQ(3, bbsp.capacity());						//number of blocks
 }
 
-TEST(Scanning, non_destructive_reverse_with_starting_point) {
+TEST(BBScanSpClass, non_destructive_reverse_with_starting_point) {
 
 	BBScanSp bbsp(130);
 	bbsp.set_bit(10);
@@ -228,7 +229,7 @@ TEST(Scanning, non_destructive_reverse_with_starting_point) {
 	EXPECT_EQ(3, bbsp.capacity());						//number of blocks
 }
 
-TEST(Scanning, destructive){
+TEST(BBScanSpClass, destructive){
 
 	BBScanSp bbsp(130);
 	bbsp.set_bit(10);
@@ -258,7 +259,7 @@ TEST(Scanning, destructive){
 	EXPECT_EQ(3, bbsp.capacity());						//nBB_ = 3	
 }
 
-TEST(Scanning, destructive_reverse) {
+TEST(BBScanSpClass, destructive_reverse) {
 
 	BBScanSp bbsp(130);
 	bbsp.set_bit(10);
