@@ -267,7 +267,7 @@ BitSet& BitSet::flip_block(int firstBlock, int lastBlock)
 {
 	
 	///////////////////////////////////////////////////////////////////////////////////
-	assert((firstBlock >= 0) && (firstBlock <= lastBlock) && (lastBlock < nBB_));
+	assert((firstBlock >= 0) && (firstBlock <= lastBlock) && (lastBlock < capacity()));
 	/////////////////////////////////////////////////////////////////////////////////
 
 	for (auto i = firstBlock; i < lastBlock; ++i) {

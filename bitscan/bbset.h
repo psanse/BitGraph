@@ -929,14 +929,14 @@ inline bool BitSet::is_empty() const
 	return true;	
 }
 
-inline bool BitSet::is_empty_block (int firstBlock, int lastBlock) const
-{
-
-	///////////////////////////////////////////////////////////////////////////////
-	assert((firstBlock >= 0) && (lastBlock < nBB_) && (firstBlock <= lastBlock));
-	///////////////////////////////////////////////////////////////////////////////
+inline bool BitSet::is_empty_block (int firstBlock, int lastBlock) const {
 
 	int last_block = ((lastBlock == -1) ? nBB_ - 1 : lastBlock);
+
+	///////////////////////////////////////////////////////////////////////////////
+	assert((firstBlock >= 0) && (last_block < capacity()) && (firstBlock <= last_block));
+	///////////////////////////////////////////////////////////////////////////////
+		
 
 	for (auto i = firstBlock; i <= last_block; ++i) {
 		if (vBB_[i]) {
@@ -972,11 +972,12 @@ bool BitSet::is_disjoint	(const BitSet& lhs,  const BitSet& rhs)	const
 inline 
 bool BitSet::is_disjoint_block (int firstBlock, int lastBlock, const BitSet& rhs)	const{
 
-	///////////////////////////////////////////////////////////////////////////////
-	assert((firstBlock >= 0) && (lastBlock < nBB_) && (firstBlock <= lastBlock));
-	///////////////////////////////////////////////////////////////////////////////
-
 	int last_block = ((lastBlock == -1) ? nBB_ - 1 : lastBlock);
+
+	///////////////////////////////////////////////////////////////////////////////
+	assert((firstBlock >= 0) && (last_block < capacity()) && (firstBlock <= last_block));
+	///////////////////////////////////////////////////////////////////////////////
+		
 
 	for (auto i = firstBlock; i <= last_block; ++i) {
 		if (vBB_[i] & rhs.vBB_[i]) {
@@ -1118,9 +1119,9 @@ BitSet& BitSet::set_bit	(int bit ){
 inline 
 BitSet&  BitSet::set_bit (int firstBit, int lastBit){
 
-	//////////////////////////////
-	assert(firstBit <= lastBit && firstBit >= 0);
-	//////////////////////////////
+	////////////////////////////////////////////////
+	assert(firstBit >= 0 && firstBit <= lastBit );
+	///////////////////////////////////////////////
 
 	int bbl= WDIV(firstBit);
 	int bbh= WDIV(lastBit);
@@ -1317,12 +1318,14 @@ int BitSet::is_singleton() const {
 inline 
 int BitSet::is_singleton_block(int firstBlock, int lastBlock) const
 {
-	///////////////////////////////////////////////////////////////////////////////////
-	assert((firstBlock >= 0) && (firstBlock <= lastBlock) && (lastBlock < nBB_));
-	/////////////////////////////////////////////////////////////////////////////////
-
 	int last_block = ((lastBlock == -1) ? nBB_ - 1 : lastBlock);
 
+
+	///////////////////////////////////////////////////////////////////////////////////
+	assert((firstBlock >= 0) && (firstBlock <= last_block) && (last_block < capacity()));
+	/////////////////////////////////////////////////////////////////////////////////
+
+	
 	int pc = 0;
 	for (auto i = firstBlock; i < last_block; ++i) {
 		if ((pc += bblock::popc64(vBB_[i])) > 1) {
@@ -1353,11 +1356,10 @@ inline
 int BitSet::popcn64(int firstBit, int lastBit) const
 {
 
-	/////////////////////////////////////////////
-	assert( firstBit > 0 && (firstBit <= lastBit || lastBit ==-1) );
-	/////////////////////////////////////////////
-
-		
+	/////////////////////////////////////////////////////////////////
+	assert( firstBit > 0 && ( (firstBit <= lastBit) || (lastBit ==-1) )  );
+	////////////////////////////////////////////////////////////////
+			
 	int pc = 0;
 	int bbl = WDIV(firstBit);
 	int bbh = (lastBit == -1)? nBB_-1 :  WDIV(lastBit);
@@ -1415,12 +1417,13 @@ int BitSet::find_common_singleton (const BitSet& rhs, int& bit) const{
 inline	
 int	BitSet::find_common_singleton_block (int firstBlock, int lastBlock, const BitSet& rhs, int& bit) const{
 
-	///////////////////////////////////////////////////////////////////////////////
-	assert((firstBlock >= 0) && (lastBlock < nBB_) && (firstBlock <= lastBlock));
-	///////////////////////////////////////////////////////////////////////////////
 
-	int last_block;
-	(lastBlock == -1) ? last_block = nBB_ - 1 : last_block = lastBlock;
+	int last_block = (lastBlock == -1) ? nBB_ - 1 : lastBlock;
+
+	///////////////////////////////////////////////////////////////////////////////
+	assert((firstBlock >= 0) && (last_block < capacity()) && (firstBlock <= last_block));
+	///////////////////////////////////////////////////////////////////////////////
+	
 
 	int pc = 0;
 	bit = BBObject::noBit;
@@ -1589,9 +1592,9 @@ inline
 BitSet& AND(int firstBit, int lastBit, const BitSet& lhs, const BitSet& rhs, BitSet& res)
 {
 
-	//////////////////////////////
-	assert(firstBit <= lastBit && firstBit >= 0);
-	//////////////////////////////
+	//////////////////////////////////////////////
+	assert(firstBit >= 0 && firstBit <= lastBit);
+	/////////////////////////////////////////////
 
 	int bbl = WDIV(firstBit);
 	int bbh = WDIV(lastBit);
@@ -1663,12 +1666,13 @@ template<bool Erase = false>
 inline
 BitSet& AND_block(int firstBlock, int lastBlock, const BitSet& lhs, const BitSet& rhs, BitSet& res) {
 
-	//////////////////////////////////////////////////////////////////
-	assert(	(firstBlock >= 0) && (lastBlock < lhs.nBB_) &&
-			(firstBlock <= lastBlock) && (rhs.nBB_ == lhs.nBB_)		);
-	//////////////////////////////////////////////////////////////////
-
 	int last_block = ((lastBlock == -1) ? lhs.nBB_ - 1 : lastBlock);
+
+	//////////////////////////////////////////////////////////////////
+	assert(	(firstBlock >= 0) && (last_block < lhs.capacity()) &&
+			(firstBlock <= last_block) && (rhs.capacity() == lhs.capacity())		);
+	//////////////////////////////////////////////////////////////////
+		
 
 	//AND mask in the range
 	for (auto i = firstBlock; i <= last_block; ++i) {
@@ -1692,11 +1696,12 @@ template<bool Erase>
 inline
 BitSet& BitSet::AND_EQUAL_block(int firstBlock, int lastBlock, const BitSet& rhs) {
 
-	///////////////////////////////////////////////////////////////////////////////////
-	assert((firstBlock >= 0) && (firstBlock <= lastBlock) && (lastBlock < nBB_));
-	/////////////////////////////////////////////////////////////////////////////////
-
 	auto last_block = ((lastBlock == -1) ? nBB_ - 1 : lastBlock);
+
+	///////////////////////////////////////////////////////////////////////////////////
+	assert((firstBlock >= 0) && (firstBlock <= last_block) && (last_block < rhs.capacity()));
+	/////////////////////////////////////////////////////////////////////////////////
+	
 
 	for (auto i = firstBlock; i <= last_block; ++i) {
 		this->vBB_[i] &= rhs.vBB_[i];
@@ -1822,11 +1827,11 @@ template<bool Erase>
 inline
 BitSet& BitSet::OR_EQUAL_block(int firstBlock, int lastBlock, const BitSet& rhs) {
 
-	///////////////////////////////////////////////////////////////////////////////////
-	assert((firstBlock >= 0) && (firstBlock <= lastBlock) && (lastBlock < nBB_));
-	/////////////////////////////////////////////////////////////////////////////////
-
 	auto last_block = ((lastBlock == -1) ? nBB_ - 1 : lastBlock);
+
+	///////////////////////////////////////////////////////////////////////////////////
+	assert((firstBlock >= 0) && (firstBlock <= last_block) && (last_block < rhs.capacity()));
+	/////////////////////////////////////////////////////////////////////////////////
 
 	for (auto i = firstBlock; i <= last_block; ++i) {
 		vBB_[i] |= rhs.vBB_[i];

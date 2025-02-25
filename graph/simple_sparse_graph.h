@@ -56,7 +56,7 @@ inline int Graph<sparse_bitarray>::shrink_to_fit (std::size_t size) {
 	
 	//assertions
 	if (NV_ <= size) {
-		LOG_WARNING("Wrong shrinking size ", size, " the graph remains unchanged - Graph<sparse_bitarray>::shrink_to_fit");
+		LOGG_WARNING("Wrong shrinking size ", size, " the graph remains unchanged - Graph<sparse_bitarray>::shrink_to_fit");
 		return -1;
 	}
 

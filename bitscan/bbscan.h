@@ -30,13 +30,13 @@ class BBScan: public BitSet{
 public:
 
 	template <class U>
-	friend class BBObject::Scan;
+	friend struct BBObject::Scan;
 	template <class U>
-	friend class BBObject::ScanDest;
+	friend struct BBObject::ScanDest;
 	template <class U>
-	friend class BBObject::ScanRev;
+	friend struct BBObject::ScanRev;
 	template <class U>
-	friend class BBObject::ScanDestRev;
+	friend struct BBObject::ScanDestRev;
 
 public:
 
