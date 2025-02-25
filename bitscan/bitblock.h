@@ -349,7 +349,7 @@ namespace bblock {
 	* @brief streams bb and its popcount to the output stream
 	*		 (format ...000111 [3])
 	**/
-	 std::ostream& print	( BITBOARD bb, std::ostream&  = std::cout) ;
+	 std::ostream& print	( BITBOARD bb, std::ostream&  = std::cout, bool endofl = true) ;
 
 } //end namespace bblock
 

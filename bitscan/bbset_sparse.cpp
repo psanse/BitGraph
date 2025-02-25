@@ -979,3 +979,19 @@ BitSetSp::operator vint() const
 //
 //	return BBObject::noBit;
 //}
+
+ostream& BitSetSp::pBlock_t::print(ostream& o, bool eofl) const
+{
+
+	o << "[";
+	o << idx_ << " : "; 
+
+	////////////////////////////////
+	bblock::print(bb_, o, false);
+	/////////////////////////////
+	
+	o << "]";
+	if (eofl) {	o << std::endl; }
+	return o;
+
+}

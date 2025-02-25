@@ -52,7 +52,7 @@ public:
 		bool is_empty		()					const	{ return !bb_ ; }
 		void clear			()							{ bb_ = 0;}
 
-		ostream& print(ostream& o)		const { o << idx_ << " : "; bblock::print(bb_, o); return o; }
+		ostream& print		(ostream& o = cout, bool eofl = true)	const;
 		friend  ostream& operator<< (ostream& o, const pBlock_t& pB)	{ pB.print(o); return o; }
 	};
 
