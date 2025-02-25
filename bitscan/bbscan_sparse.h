@@ -64,6 +64,9 @@ public:
 	**/
 	int init_scan					(int firstBit, scan_types sct);
 	
+
+
+
 	//bit scan forward (destructive)				
 inline int next_bit_del				(); 												
 inline int next_bit_del				(int& nBB);								//nBB: index of bitblock in the bitstring	(not in the collection)	
@@ -81,9 +84,10 @@ virtual inline int prev_bit			();
 inline int prev_bit_del				(); 
 inline int prev_bit_del				(int& nBB);
 
+
+
 //////////////////
 // data members
-
 protected:
 	 scan_t scan_;
 };
