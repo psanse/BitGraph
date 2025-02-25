@@ -1,11 +1,11 @@
 /**
  * @file bbscan_sparse.h
  * @brief header for sparse class equivalent to the BBScan class
- *		  manages sparse bit strings with bitscanning capabilities
+ *		  manages sparse bit strings with efficient bitscanning capabilities
  * @author pss
- * @details created ?, @last_update 15/02/2025
+ * @details: created 2015?, last_update 25/02/2025
  *
- * TODO refactoring and testing 15/02/2025
+ * TODO refactoring and testing 25/02/2025
  **/
 
 #ifndef __BBSCAN_SPARSE_H__
