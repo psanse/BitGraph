@@ -53,7 +53,7 @@ public:
 		void clear			()							{ bb_ = 0;}
 
 		ostream& print		(ostream& o = cout, bool eofl = true)	const;
-		friend  ostream& operator<< (ostream& o, const pBlock_t& pB)	{ pB.print(o); return o; }
+friend  ostream& operator<< (ostream& o, const pBlock_t& pB)				{ pB.print(o); return o; }
 	};
 
 	//aliases
@@ -418,8 +418,9 @@ public:
 	* @details To be used instead of popcn64 (12/02/2025)
 	*
 	**/
-		inline   int size			()						const			{ return popcn64(); }
+	 int size						()						const			{ return popcn64(); }
 
+protected:
 	/**
 	* @brief number of 1-bits in THIS
 	* @details implemented as a lookup table
@@ -427,13 +428,14 @@ public:
 	*		   By default - intrinsic HW assembler instructions
 	**/
 virtual inline	 int popcn64		()						const;			 
-	
+
+public:
 	/**
 	* @brief number of 1-bits in the range [nBit, END(
 	* @details implementation depends of POPCN64 switch in bbconfig.h
 	*		   By default - intrinsic HW assembler instructions
 	**/
-virtual inline	 int popcn64		(int nBit)				const;			
+virtual inline	 int popcn64		(int firstBit)			const;			
 
 /////////////////////
 //Setting (ordered insertion) / Erasing bits  

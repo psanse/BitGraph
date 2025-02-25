@@ -272,7 +272,7 @@ BitSetSp& BitSetSp::reset_bit(int firstBit, int lastBit){
 	auto bbl = WDIV(firstBit);
 
 	///////////////////////////////// 
-	assert(bbl >= 0 & bbh < nBB_);
+	assert(bbl >= 0 && bbh < nBB_);
 	/////////////////////////////////
 
 	vBB_.clear();
