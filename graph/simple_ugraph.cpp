@@ -176,8 +176,8 @@ ostream& Ugraph<T>::print_degrees (std::ostream& o) const {
 
 template<class T>
 ostream& Ugraph<T>::print_edges (std::ostream& o) const{
-	for(std::size_t i=0; i< ptype::NV_-1; i++){
-		for(std::size_t j = i + 1; j< ptype::NV_; j++){
+	for(auto i = 0; i< ptype::NV_ - 1; ++i){
+		for(auto j = i + 1; j< ptype::NV_; ++j){
 			if(ptype::is_edge(i, j)){
 				o << "["<<i<<"]" << "--" << "[" << j << "]" << endl;
 			}
