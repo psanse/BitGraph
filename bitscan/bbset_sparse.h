@@ -80,8 +80,8 @@ public:
 	* @param lhs, rhs: input bitsets
 	* @param res: output bitset
 	* @returns reference to res
-	* 
-	* TODO - check optimization based on population density, see friend erase_bit (25/02/2025)
+	* #details: currently two implementations, one optimized for THIS having less population and the other
+	*			assuming both THIS and rhs have similar population
 	**/
     friend inline BitSetSp&  AND	(const BitSetSp& lhs, const BitSetSp& rhs,  BitSetSp& res);
 
@@ -1187,53 +1187,58 @@ int BitSetSp::popcn64 (int firstBit) const{
 
 inline
 BitSetSp& AND (const BitSetSp& lhs, const BitSetSp& rhs,  BitSetSp& res){
-	
+		
+
 	/////////////////////////////////////////////////////////////
 	res.reset(lhs.capacity(), false);
 	res.vBB_.reserve(std::min(lhs.vBB_.size(), rhs.vBB_.size()));
 	/////////////////////////////////////////////////////////////
 
-	//////////////////
-	//A) General purpose code assuming no a priori knowledge about population size in lhs and rhs
-	
+	//special case
+	if (lhs.is_empty() || rhs.is_empty()) {
+		return res;
+	}
+		
 	auto itR = rhs.cbegin();
 	auto itL = lhs.cbegin();
 
-	while(itL != lhs.vBB_.end() && itR != rhs.vBB_.end() ){
-				
-		if(itL->idx_< itR->idx_){
+	//////////////////
+	//A) General purpose code assuming no a priori knowledge about population size in lhs and rhs
+	do {
+		if (itL->idx_ < itR->idx_) {
 			itL++;
-		}else if(itL->idx_ > itR->idx_){
+		}
+		else if (itL->idx_ > itR->idx_) {
 			itR++;
-		}else{
+		}
+		else {
 			////////////////////////////////////////////////////////////////////////
 			res.vBB_.push_back(BitSetSp::pBlock_t(itL->idx_, itL->bb_ & itR->bb_));
 			/////////////////////////////////////////////////////////////////////////
 			itL++;
 			itR++;
-		}		
-	}
+		}
+	} while (itL != lhs.vBB_.end() && itR != rhs.vBB_.end());
+	
 
 	/////////////////	
 	//B) Optimization for the case lhs has less 1-bits than rhs
-	//int i2=0;
-	//const int MAX = rhs.vBB_.size()-1;
+		
+	//for (auto& blockL : lhs.vBB_) {
 
-	////empty check of rhs required, the way it is implemented
-	//if(MAX==BBObject::noBit) return res;
-	//
-	////optimization which works if lhs has less 1-bits than rhs
-	//int lhs_SIZE = lhs.vBB_.size();
-	//for (int i1 = 0; i1 < lhs_SIZE;i1++){
-	//	for(; i2<MAX && rhs.vBB_[i2].idx_<lhs.vBB_[i1].idx_; i2++){}
-	//	
-	//	//update before either of the bitstrings has reached its end
-	//	if(lhs.vBB_[i1].idx_ == rhs.vBB_[i2].idx_){
-	//			res.vBB_.push_back(BitSetSp::pBlock_t(lhs.vBB_[i1].idx_, lhs.vBB_[i1].bb_ & rhs.vBB_[i2].bb_));
+	//	//finds closest
+	//	while (itR != rhs.vBB_.end() && itR->idx_ < blockL.idx_) { itR++; }
+
+	//	//exit condition - rhs has been examined
+	//	if (itR == rhs.vBB_.end()) { break;	}
+
+	//	//blocks remain to be examined in both bitsets
+	//	if (blockL.idx_ == itR->idx_) {
+	//		res.vBB_.push_back(BitSetSp::pBlock_t(blockL.idx_, blockL.bb_ & itR->bb_));
 	//	}
+	//	
 	//}
-
-	
+		
 	return res;
 }
 
@@ -1368,26 +1373,6 @@ BitSetSp&  erase_bit (const BitSetSp& lhs, const BitSetSp& rhs,  BitSetSp& res){
 			res.vBB_.push_back(BitSetSp::pBlock_t(blockL.idx_, blockL.bb_));
 		}		
 	}
-	
-	
-	
-	//
-	//const int MAX = rhs.vBB_.size() - 1;
-	//if (MAX == BBObject::noBit) { return (res = lhs); }		//copy before returning
-
-	////this works better if lhs is as sparse as possible (iterating first over rhs is illogical here becuase the operation is not symmetrical)
-	//int i2=0;
-	//int lhs_SIZE=lhs.vBB_.size();
-	//for (int i1 = 0; i1 < lhs_SIZE; i1++){
-	//	for(; i2<MAX && rhs.vBB_[i2].idx_<lhs.vBB_[i1].idx_; i2++){}
-	//	
-	//	//update before either of the bitstrings has reached its end
-	//	if(lhs.vBB_[i1].idx_==rhs.vBB_[i2].idx_){
-	//			res.vBB_.push_back(BitSetSp::pBlock_t(lhs.vBB_[i1].idx_, lhs.vBB_[i1].bb_ &~ rhs.vBB_[i2].bb_));
-	//	}else{
-	//		res.vBB_.push_back(BitSetSp::pBlock_t(lhs.vBB_[i1].idx_, lhs.vBB_[i1].bb_));
-	//	}
-	//}
 
 	return res;
 }
