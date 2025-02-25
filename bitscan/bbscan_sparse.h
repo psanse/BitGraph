@@ -33,11 +33,11 @@ public:
 
 ///////////////
 // setters and getters
-	 void set_scan_block			(int blockID)	{ scan_.bbi_= blockID; }			//refers to the position in the collection (not in the bitstring)
-	 void set_scan_bit				(int bit)		{ scan_.pos_= bit; }
+	 void scan_block				(int blockID)	{ scan_.bbi_= blockID; }			//refers to the position in the collection (not in the bitstring)
+	 void scan_bit					(int bit)		{ scan_.pos_= bit; }
 	
-	 int  get_scan_block			()	 const		{ return scan_.bbi_; }
-	 int  get_scan_bit				()	 const		{ return scan_.pos_; }
+	 int  scan_block				()	 const		{ return scan_.bbi_; }
+	 int  scan_bit					()	 const		{ return scan_.pos_; }
 
 //////////////////////////////
 // bitscanning
@@ -406,27 +406,28 @@ inline int BBScanSp::prev_bit_del(int & bb_index) {
 			return (posbb+WMUL(vBB_[i].idx_));
 		}
 	}
-return EMPTY_ELEM;  
+
+	return BBObject::noBit;
 }
 
 inline
 int BBScanSp::init_scan (scan_types sct){
-	if(vBB_.empty()) return EMPTY_ELEM;				//necessary check since sparse bitstrings have empty semantics (i.e. sparse graphs)
+	if (vBB_.empty()) { return BBObject::noBit; }			//necessary check since sparse bitstrings have empty semantics (i.e. sparse graphs)
 
 	switch(sct){
 	case NON_DESTRUCTIVE:
-		set_scan_block(0);
-		set_scan_bit(MASK_LIM);
+		scan_block(0);
+		scan_bit(MASK_LIM);
 		break;
 	case NON_DESTRUCTIVE_REVERSE:
-		set_scan_block(vBB_.size()-1);
-		set_scan_bit(WORD_SIZE);
+		scan_block(vBB_.size()-1);
+		scan_bit(WORD_SIZE);
 		break;
 	case DESTRUCTIVE:
-		set_scan_block(0);
+		scan_block(0);
 		break;
 	case DESTRUCTIVE_REVERSE:
-		set_scan_block(vBB_.size() - 1);
+		scan_block(vBB_.size() - 1);
 		break;
 	default:
 		cerr<<"bad scan type"<<endl;
@@ -443,16 +444,16 @@ int BBScanSp::init_scan_from (int from, scan_types sct){
 // REMARKS: at the moment, only working for the NON-DESTRUCTIVE case
 
 	pair<bool, int> p= find_block_pos(WDIV(from));
-	if(p.second==EMPTY_ELEM) return EMPTY_ELEM;
+	if(p.second == BBObject::noBit) return BBObject::noBit;
 	switch(sct){
 	case NON_DESTRUCTIVE:
 	case NON_DESTRUCTIVE_REVERSE:
-		set_scan_block(p.second); 
-		(p.first)? set_scan_bit(WMOD(from)) : set_scan_bit(MASK_LIM);
+		scan_block(p.second); 
+		(p.first)? scan_bit(WMOD(from)) : scan_bit(MASK_LIM);
 		break;
 	/*case DESTRUCTIVE:
 	case DESTRUCTIVE_REVERSE:
-		set_scan_block(p.second);
+		scan_block(p.second);
 		break;*/
 	default:
 		cerr<<"bad scan type"<<endl;

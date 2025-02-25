@@ -59,11 +59,11 @@ public:
 ///////////////////////////////
 //setters and getters
 	
-	void set_scan_block				(int bbindex)		{ scan_.bbi_ = bbindex;}	
-	void set_scan_bit				(int posbit)		{ scan_.pos_ = posbit;}
+	void scan_block				(int bbindex)		{ scan_.bbi_ = bbindex;}	
+	void scan_bit				(int posbit)		{ scan_.pos_ = posbit;}
 
-	int  get_scan_block				()	 const			{ return scan_.bbi_; }	
-	int  get_scan_bit				()	 const			{ return scan_.pos_; }
+	int  scan_block				()	 const			{ return scan_.bbi_; }	
+	int  scan_bit				()	 const			{ return scan_.pos_; }
 //////////////////////////////
 // Bitscanning (with cached info)
 	
@@ -479,18 +479,18 @@ int BBScan::init_scan(scan_types sct){
 
 	switch(sct){
 	case NON_DESTRUCTIVE:
-		set_scan_block	(0);
-		set_scan_bit	(MASK_LIM);
+		scan_block	(0);
+		scan_bit	(MASK_LIM);
 		break;
 	case NON_DESTRUCTIVE_REVERSE:
-		set_scan_block	(nBB_ - 1);
-		set_scan_bit	(WORD_SIZE);		//mask_low[WORD_SIZE] = ONE
+		scan_block	(nBB_ - 1);
+		scan_bit	(WORD_SIZE);		//mask_low[WORD_SIZE] = ONE
 		break;
 	case DESTRUCTIVE:
-		set_scan_block	(0); 
+		scan_block	(0); 
 		break;
 	case DESTRUCTIVE_REVERSE:
-		set_scan_block	(nBB_ - 1);
+		scan_block	(nBB_ - 1);
 		break;
 	default:
 		LOG_ERROR("unknown scan type - BBScan::::init_scan");
@@ -511,12 +511,12 @@ int BBScan::init_scan (int firstBit, scan_types sct){
 		switch(sct){
 		case NON_DESTRUCTIVE:
 		case NON_DESTRUCTIVE_REVERSE:
-			set_scan_block	(bbh);
-			set_scan_bit	(firstBit - WMUL(bbh) /* WMOD(firstBit) */);
+			scan_block	(bbh);
+			scan_bit	(firstBit - WMUL(bbh) /* WMOD(firstBit) */);
 			break;
 		case DESTRUCTIVE:
 		case DESTRUCTIVE_REVERSE:
-			set_scan_block	(bbh);
+			scan_block	(bbh);
 			break;
 		default:
 			LOG_ERROR("unknown scan type - BBScan::::init_scan");

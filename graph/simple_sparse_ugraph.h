@@ -178,8 +178,8 @@ void Ugraph<sparse_bitarray>::write_dimacs(ostream& o) {
 		//non destructive scan starting from the vertex onwards
 		pair<bool, int> p = this->adj_[v].find_block_pos(WDIV(v));
 		if (p.second == EMPTY_ELEM) continue;					//no more bitblocks
-		this->adj_[v].set_scan_block(p.second);
-		(p.first) ? this->adj_[v].set_scan_bit(WMOD(v))  : this->adj_[v].set_scan_bit(MASK_LIM);		//if bitblock contains v, start from that position onwards
+		this->adj_[v].scan_block(p.second);
+		(p.first) ? this->adj_[v].scan_bit(WMOD(v))  : this->adj_[v].scan_bit(MASK_LIM);		//if bitblock contains v, start from that position onwards
 		while (1) {
 			int w = this->adj_[v].next_bit();
 			if (w == EMPTY_ELEM)
@@ -209,8 +209,8 @@ void Ugraph<sparse_bitarray>::write_EDGES(ostream& o) {
 		//non destructive scan starting from the vertex onwards
 		pair<bool, int> p = this->adj_[v].find_block_pos(WDIV(v));
 		if (p.second == EMPTY_ELEM) continue;										//no more bitblocks
-		this->adj_[v].set_scan_block(p.second);
-		(p.first) ? this->adj_[v].set_scan_bit(WMOD(v)) : this->adj_[v].set_scan_bit(MASK_LIM);			//if bitblock contains v, start from that position onwards
+		this->adj_[v].scan_block(p.second);
+		(p.first) ? this->adj_[v].scan_bit(WMOD(v)) : this->adj_[v].scan_bit(MASK_LIM);			//if bitblock contains v, start from that position onwards
 		while (1) {
 			int w = this->adj_[v].next_bit();
 			if (w == EMPTY_ELEM)
@@ -246,8 +246,8 @@ void Ugraph<sparse_bitarray>::write_mtx(ostream& o) {
 		//non destructive scan starting from the vertex onwards
 		pair<bool, int> p = this->adj_[v].find_block_pos(WDIV(v));
 		if (p.second == EMPTY_ELEM) continue;										//no more bitblocks
-		this->adj_[v].set_scan_block(p.second);
-		(p.first) ? this->adj_[v].set_scan_bit(WMOD(v)) : this->adj_[v].set_scan_bit(MASK_LIM);			//if bitblock contains v, start from that position onwards
+		this->adj_[v].scan_block(p.second);
+		(p.first) ? this->adj_[v].scan_bit(WMOD(v)) : this->adj_[v].scan_bit(MASK_LIM);			//if bitblock contains v, start from that position onwards
 		while (1) {
 			int w = this->adj_[v].next_bit();
 			if (w == EMPTY_ELEM)
