@@ -167,21 +167,21 @@ void Ugraph<sparse_bitarray>::write_dimacs(ostream& o) {
 	o << "c File written by GRAPH:" << PrecisionTimer::local_timestamp();
 
 	//name
-	if (!Graph<sparse_bitarray>::name_.empty())
-		o << "c " << Graph<sparse_bitarray>::name_.c_str() << endl;
+	if (!this->name_.empty())
+		o << "c " << this->name_.c_str() << endl;
 
 	//tamaño del grafo
-	o << "p edge " << Graph<sparse_bitarray>::NV_ << " " << number_of_edges() << endl << endl;
+	o << "p edge " << this->NV_ << " " << number_of_edges() << endl << endl;
 
 	//Escribir nodos
-	for (int v = 0; v < Graph<sparse_bitarray>::NV_ - 1; v++) {
+	for (int v = 0; v < this->NV_ - 1; v++) {
 		//non destructive scan starting from the vertex onwards
-		pair<bool, int> p = Graph<sparse_bitarray>::adj_[v].find_block_pos(WDIV(v));
+		pair<bool, int> p = this->adj_[v].find_block_pos(WDIV(v));
 		if (p.second == EMPTY_ELEM) continue;					//no more bitblocks
-		Graph<sparse_bitarray>::adj_[v].m_scan.bbi_ = p.second;
-		(p.first) ? Graph<sparse_bitarray>::adj_[v].m_scan.pos_ = WMOD(v) : Graph<sparse_bitarray>::adj_[v].m_scan.pos_ = MASK_LIM;		//if bitblock contains v, start from that position onwards
+		this->adj_[v].set_scan_block(p.second);
+		(p.first) ? this->adj_[v].set_scan_bit(WMOD(v))  : this->adj_[v].set_scan_bit(MASK_LIM);		//if bitblock contains v, start from that position onwards
 		while (1) {
-			int w = Graph<sparse_bitarray>::adj_[v].next_bit();
+			int w = this->adj_[v].next_bit();
 			if (w == EMPTY_ELEM)
 				break;
 			o << "e " << v + 1 << " " << w + 1 << endl;
@@ -201,18 +201,18 @@ void Ugraph<sparse_bitarray>::write_EDGES(ostream& o) {
 	o << "% File written by GRAPH:" << PrecisionTimer::local_timestamp();
 
 	//name
-	if (!Graph<sparse_bitarray>::name_.empty())
-		o << "% " << Graph<sparse_bitarray>::name_.c_str() << endl;
+	if (!this->name_.empty())
+		o << "% " << this->name_.c_str() << endl;
 
 	//writes edges
-	for (int v = 0; v < Graph<sparse_bitarray>::NV_ - 1; v++) {
+	for (int v = 0; v < this->NV_ - 1; v++) {
 		//non destructive scan starting from the vertex onwards
-		pair<bool, int> p = Graph<sparse_bitarray>::adj_[v].find_block_pos(WDIV(v));
+		pair<bool, int> p = this->adj_[v].find_block_pos(WDIV(v));
 		if (p.second == EMPTY_ELEM) continue;										//no more bitblocks
-		Graph<sparse_bitarray>::adj_[v].m_scan.bbi_ = p.second;
-		(p.first) ? Graph<sparse_bitarray>::adj_[v].m_scan.pos_ = WMOD(v) : Graph<sparse_bitarray>::adj_[v].m_scan.pos_ = MASK_LIM;			//if bitblock contains v, start from that position onwards
+		this->adj_[v].set_scan_block(p.second);
+		(p.first) ? this->adj_[v].set_scan_bit(WMOD(v)) : this->adj_[v].set_scan_bit(MASK_LIM);			//if bitblock contains v, start from that position onwards
 		while (1) {
-			int w = Graph<sparse_bitarray>::adj_[v].next_bit();
+			int w = this->adj_[v].next_bit();
 			if (w == EMPTY_ELEM)
 				break;
 			o << v + 1 << " " << w + 1 << endl;
@@ -234,22 +234,22 @@ void Ugraph<sparse_bitarray>::write_mtx(ostream& o) {
 	o << "% File written by GRAPH:" << PrecisionTimer::local_timestamp();
 
 	//name
-	if (!Graph<sparse_bitarray>::name_.empty())
-		o << "% " << Graph<sparse_bitarray>::name_.c_str() << endl;
+	if (!this->name_.empty())
+		o << "% " << this->name_.c_str() << endl;
 
 	//size and edges
 	NE_ = 0;																	//eliminates lazy evaluation of edge count 
-	o << Graph<sparse_bitarray>::NV_ << " " << Graph<sparse_bitarray>::NV_ << " " << number_of_edges() << endl;
+	o << this->NV_ << " " << this->NV_ << " " << number_of_edges() << endl;
 
 	//writes edges
-	for (int v = 0; v < Graph<sparse_bitarray>::NV_ - 1; v++) {
+	for (int v = 0; v < this->NV_ - 1; v++) {
 		//non destructive scan starting from the vertex onwards
-		pair<bool, int> p = Graph<sparse_bitarray>::adj_[v].find_block_pos(WDIV(v));
+		pair<bool, int> p = this->adj_[v].find_block_pos(WDIV(v));
 		if (p.second == EMPTY_ELEM) continue;										//no more bitblocks
-		Graph<sparse_bitarray>::adj_[v].m_scan.bbi_ = p.second;
-		(p.first) ? Graph<sparse_bitarray>::adj_[v].m_scan.pos_ = WMOD(v) : Graph<sparse_bitarray>::adj_[v].m_scan.pos_ = MASK_LIM;			//if bitblock contains v, start from that position onwards
+		this->adj_[v].set_scan_block(p.second);
+		(p.first) ? this->adj_[v].set_scan_bit(WMOD(v)) : this->adj_[v].set_scan_bit(MASK_LIM);			//if bitblock contains v, start from that position onwards
 		while (1) {
-			int w = Graph<sparse_bitarray>::adj_[v].next_bit();
+			int w = this->adj_[v].next_bit();
 			if (w == EMPTY_ELEM)
 				break;
 			o << v + 1 << " " << w + 1 << endl;

@@ -54,8 +54,7 @@ public:
 	
 	//TODO...check copy and move assignments 
 	
-	virtual	~BBScan					()	 = default;
-
+	~BBScan							()	 = default;
 
 ///////////////////////////////
 //setters and getters
@@ -63,8 +62,8 @@ public:
 	void set_scan_block				(int bbindex)		{ scan_.bbi_ = bbindex;}	
 	void set_scan_bit				(int posbit)		{ scan_.pos_ = posbit;}
 
-	int  get_scan_block				()					{ return scan_.bbi_; }	
-
+	int  get_scan_block				()	 const			{ return scan_.bbi_; }	
+	int  get_scan_bit				()	 const			{ return scan_.pos_; }
 //////////////////////////////
 // Bitscanning (with cached info)
 	

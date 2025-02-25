@@ -29,11 +29,16 @@ public:
 
 	//TODO...check copy and move assignments - should be forbidden
 
+	~BBScanSp() = default;
+
 ///////////////
 // setters and getters
-	 void set_bbindex				(int bbindex)	{m_scan.bbi_=bbindex;}			//refers to the position in the collection (not in the bitstring)
-	 void set_posbit				(int posbit)	{m_scan.pos_=posbit;}	
+	 void set_scan_block			(int blockID)	{ m_scan.bbi_= blockID; }			//refers to the position in the collection (not in the bitstring)
+	 void set_scan_bit				(int bit)		{ m_scan.pos_= bit; }
 	
+	 int  get_scan_block			()	 const		{ return m_scan.bbi_; }
+	 int  get_scan_bit				()	 const		{ return m_scan.pos_; }
+
 //////////////////////////////
 // bitscanning
 inline int lsbn64					() const;
@@ -70,9 +75,9 @@ virtual	 inline int popcn64			(int nBit)	const;							//population size from (an
 #endif
 
 //////////////////
-/// data members
+// data members
 
-public:
+protected:
 	 scan_t m_scan;
 };
 
@@ -410,18 +415,18 @@ int BBScanSp::init_scan (scan_types sct){
 
 	switch(sct){
 	case NON_DESTRUCTIVE:
-		set_bbindex(0);
-		set_posbit(MASK_LIM);
+		set_scan_block(0);
+		set_scan_bit(MASK_LIM);
 		break;
 	case NON_DESTRUCTIVE_REVERSE:
-		set_bbindex(vBB_.size()-1);
-		set_posbit(WORD_SIZE);
+		set_scan_block(vBB_.size()-1);
+		set_scan_bit(WORD_SIZE);
 		break;
 	case DESTRUCTIVE:
-		set_bbindex(0); 
+		set_scan_block(0);
 		break;
 	case DESTRUCTIVE_REVERSE:
-		set_bbindex(vBB_.size() - 1);
+		set_scan_block(vBB_.size() - 1);
 		break;
 	default:
 		cerr<<"bad scan type"<<endl;
@@ -442,12 +447,12 @@ int BBScanSp::init_scan_from (int from, scan_types sct){
 	switch(sct){
 	case NON_DESTRUCTIVE:
 	case NON_DESTRUCTIVE_REVERSE:
-		set_bbindex(p.second); 
-		(p.first)? set_posbit(WMOD(from)) : set_posbit(MASK_LIM);
+		set_scan_block(p.second); 
+		(p.first)? set_scan_bit(WMOD(from)) : set_scan_bit(MASK_LIM);
 		break;
 	/*case DESTRUCTIVE:
 	case DESTRUCTIVE_REVERSE:
-		set_bbindex(p.second);
+		set_scan_block(p.second);
 		break;*/
 	default:
 		cerr<<"bad scan type"<<endl;

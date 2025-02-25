@@ -235,7 +235,7 @@ int Base_Graph_EW<Graph_t, W>::read_dimacs (string filename){
 		
 	fstream f(filename.c_str());
 	if(!f){
-		LOG_ERROR("error when reading file ", filename, " in DIMACS format - Base_Graph_EW<Graph_t, W>");
+		LOGG_ERROR("error when reading file ", filename, " in DIMACS format - Base_Graph_EW<Graph_t, W>");
 		clear();
 		return -1;
 	}
