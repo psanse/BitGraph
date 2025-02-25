@@ -33,11 +33,11 @@ public:
 
 ///////////////
 // setters and getters
-	 void set_scan_block			(int blockID)	{ m_scan.bbi_= blockID; }			//refers to the position in the collection (not in the bitstring)
-	 void set_scan_bit				(int bit)		{ m_scan.pos_= bit; }
+	 void set_scan_block			(int blockID)	{ scan_.bbi_= blockID; }			//refers to the position in the collection (not in the bitstring)
+	 void set_scan_bit				(int bit)		{ scan_.pos_= bit; }
 	
-	 int  get_scan_block			()	 const		{ return m_scan.bbi_; }
-	 int  get_scan_bit				()	 const		{ return m_scan.pos_; }
+	 int  get_scan_block			()	 const		{ return scan_.bbi_; }
+	 int  get_scan_bit				()	 const		{ return scan_.pos_; }
 
 //////////////////////////////
 // bitscanning
@@ -78,7 +78,7 @@ virtual	 inline int popcn64			(int nBit)	const;							//population size from (an
 // data members
 
 protected:
-	 scan_t m_scan;
+	 scan_t scan_;
 };
 
 ///////////////////////
@@ -188,19 +188,19 @@ inline int BBScanSp::next_bit() {
 // caches index in the collection and pos inside the bitblock
 //
 // comments
-// 1-require previous assignment m_scan_bbi=0 and m_scan.pos=mask_lim
+// 1-require previous assignment scan_.bbi=0 and scan_.pos=mask_lim
 
 	unsigned long posbb;
 			
 	//search for next bit in the last block
-	if(_BitScanForward64(&posbb, vBB_[m_scan.bbi_].bb_ & Tables::mask_high[m_scan.pos_])){
-		m_scan.pos_ =posbb;
-		return (posbb + WMUL(vBB_[m_scan.bbi_].idx_));
+	if(_BitScanForward64(&posbb, vBB_[scan_.bbi_].bb_ & Tables::mask_high[scan_.pos_])){
+		scan_.pos_ =posbb;
+		return (posbb + WMUL(vBB_[scan_.bbi_].idx_));
 	}else{											//search in the remaining blocks
-		for(int i=m_scan.bbi_+1; i<vBB_.size(); i++){
+		for(int i=scan_.bbi_+1; i<vBB_.size(); i++){
 			if(_BitScanForward64(&posbb,vBB_[i].bb_)){
-				m_scan.bbi_=i;
-				m_scan.pos_=posbb;
+				scan_.bbi_=i;
+				scan_.pos_=posbb;
 				return (posbb+ WMUL(vBB_[i].idx_));
 			}
 		}
@@ -217,20 +217,20 @@ inline int BBScanSp::next_bit(int& block_index) {
 // caches index in the collection and pos inside the bitblock
 //
 // comments
-// 1-require previous assignment m_scan_bbi=0 and m_scan.pos_=mask_lim
+// 1-require previous assignment scan_.bbi=0 and scan_.pos_=mask_lim
 
 	unsigned long posbb;
 			
 	//search for next bit in the last block
-	if(_BitScanForward64(&posbb, vBB_[m_scan.bbi_].bb_ & Tables::mask_high[m_scan.pos_])){
-		m_scan.pos_ =posbb;
-		block_index= vBB_[m_scan.bbi_].idx_;
-		return (posbb + WMUL(vBB_[m_scan.bbi_].idx_));
+	if(_BitScanForward64(&posbb, vBB_[scan_.bbi_].bb_ & Tables::mask_high[scan_.pos_])){
+		scan_.pos_ =posbb;
+		block_index= vBB_[scan_.bbi_].idx_;
+		return (posbb + WMUL(vBB_[scan_.bbi_].idx_));
 	}else{											//search in the remaining blocks
-		for(int i=m_scan.bbi_+1; i<vBB_.size(); i++){
+		for(int i=scan_.bbi_+1; i<vBB_.size(); i++){
 			if(_BitScanForward64(&posbb,vBB_[i].bb_)){
-				m_scan.bbi_=i;
-				m_scan.pos_=posbb;
+				scan_.bbi_=i;
+				scan_.pos_=posbb;
 				block_index=vBB_[i].idx_;
 				return (posbb+ WMUL(vBB_[i].idx_));
 			}
@@ -248,19 +248,19 @@ inline int BBScanSp::prev_bit	() {
 // caches index in the collection and pos inside the bitblock
 //
 // comments
-// 1-require previous assignment m_scan_bbi=number of bitblocks-1 and m_scan.pos_=WORD_SIZE
+// 1-require previous assignment scan_.bbi=number of bitblocks-1 and scan_.pos_=WORD_SIZE
 
 	unsigned long posbb;
 				
 	//search int the last table
-	if(_BitScanReverse64(&posbb, vBB_[m_scan.bbi_].bb_ & Tables::mask_low[m_scan.pos_])){
-		m_scan.pos_ =posbb;
-		return (posbb + WMUL(vBB_[m_scan.bbi_].idx_));
+	if(_BitScanReverse64(&posbb, vBB_[scan_.bbi_].bb_ & Tables::mask_low[scan_.pos_])){
+		scan_.pos_ =posbb;
+		return (posbb + WMUL(vBB_[scan_.bbi_].idx_));
 	}else{											//not found in the last table. search in the rest
-		for(int i=m_scan.bbi_-1; i>=0; i--){
+		for(int i=scan_.bbi_-1; i>=0; i--){
 			if(_BitScanReverse64(&posbb,vBB_[i].bb_)){
-				m_scan.bbi_=i;
-				m_scan.pos_=posbb;
+				scan_.bbi_=i;
+				scan_.pos_=posbb;
 				return (posbb+ WMUL(vBB_[i].idx_));
 			}
 		}
@@ -277,13 +277,13 @@ inline int BBScanSp::next_bit_del() {
 // Destructive bitscan (scans and deletes each 1-bit) for sparse bitstrings using intrinsics
 //
 // COMMENTS
-// 1-Requires previous assignment m_scan_bbi=0 
+// 1-Requires previous assignment scan_.bbi=0 
 
 	unsigned long posbb;
 
-	for(int i=m_scan.bbi_; i<vBB_.size(); i++)	{
+	for(int i=scan_.bbi_; i<vBB_.size(); i++)	{
 		if(_BitScanForward64(&posbb,vBB_[i].bb_)){
-			m_scan.bbi_=i;
+			scan_.bbi_=i;
 			vBB_[i].bb_&=~Tables::mask[posbb];			//deleting before the return
 			return (posbb + WMUL(vBB_[i].idx_));
 		}
@@ -299,13 +299,13 @@ inline int BBScanSp::next_bit_del(int& block_index) {
 // Destructive bitscan for sparse bitstrings using intrinsics
 //
 // COMMENTS
-// 1-Requires previous assignment m_scan_bbi=0 
+// 1-Requires previous assignment scan_.bbi=0 
 
 	unsigned long posbb;
 
-	for(int i=m_scan.bbi_; i<vBB_.size(); i++)	{
+	for(int i=scan_.bbi_; i<vBB_.size(); i++)	{
 		if(_BitScanForward64(&posbb,vBB_[i].bb_)){
-			m_scan.bbi_=i;
+			scan_.bbi_=i;
 			block_index=vBB_[i].idx_;
 			vBB_[i].bb_&=~Tables::mask[posbb];			//deleting before the return
 			return (posbb + WMUL(vBB_[i].idx_));
@@ -324,13 +324,13 @@ inline int BBScanSp::next_bit_del(int& block_index, BBScanSp& bbN_del) {
 	//
 	// COMMENTS
 	// 1-added for compatibility with BBIntrin
-	// 1-Requires previous assignment m_scan_bbi=0 
+	// 1-Requires previous assignment scan_.bbi=0 
 
 	unsigned long posbb;
 
-	for (int i = m_scan.bbi_; i < vBB_.size(); i++) {
+	for (int i = scan_.bbi_; i < vBB_.size(); i++) {
 		if (_BitScanForward64(&posbb, vBB_[i].bb_)) {
-			m_scan.bbi_ = i;
+			scan_.bbi_ = i;
 			block_index = vBB_[i].idx_;
 			vBB_[i].bb_ &= ~Tables::mask[posbb];			//deleting before the return
 			bbN_del.vBB_[i].bb_ &= ~Tables::mask[posbb];
@@ -349,13 +349,13 @@ inline int BBScanSp::next_bit_del_pos (int& posBB){
 // (not the index attribute)
 //
 // COMMENTS
-// 1-Requires previous assignment m_scan_bbi=0 
+// 1-Requires previous assignment scan_.bbi=0 
 
 	unsigned long posbb;
 
-	for(int i=m_scan.bbi_; i<vBB_.size(); i++)	{
+	for(int i=scan_.bbi_; i<vBB_.size(); i++)	{
 		if(_BitScanForward64(&posbb,vBB_[i].bb_)){
-			posBB=m_scan.bbi_=i;
+			posBB=scan_.bbi_=i;
 			vBB_[i].bb_&=~Tables::mask[posbb];			//deleting before the return
 			return (posbb + WMUL(vBB_[i].idx_));
 		}
@@ -372,13 +372,13 @@ inline int BBScanSp::prev_bit_del() {
 // Destructive bitscan for sparse bitstrings using intrinsics
 //
 // COMMENTS
-// 1-Requires previous assignment m_scan_bbi=number of bitblocks-1
+// 1-Requires previous assignment scan_.bbi=number of bitblocks-1
 
 	unsigned long posbb;
 
-	for(int i=m_scan.bbi_; i>=0; i--){
+	for(int i=scan_.bbi_; i>=0; i--){
 		if(_BitScanReverse64(&posbb,vBB_[i].bb_)){
-			m_scan.bbi_=i;
+			scan_.bbi_=i;
 			vBB_[i].bb_&=~Tables::mask[posbb];			//deleting before the return
 			return (posbb+WMUL(vBB_[i].idx_));
 		}
@@ -394,13 +394,13 @@ inline int BBScanSp::prev_bit_del(int & bb_index) {
 // Destructive bitscan for sparse bitstrings using intrinsics
 //
 // COMMENTS
-// 1-Requires previous assignment m_scan_bbi=number of bitblocks-1
+// 1-Requires previous assignment scan_.bbi=number of bitblocks-1
 
 	unsigned long posbb;
 
-	for(int i=m_scan.bbi_; i>=0; i--){
+	for(int i=scan_.bbi_; i>=0; i--){
 		if(_BitScanReverse64(&posbb,vBB_[i].bb_)){
-			m_scan.bbi_=i;
+			scan_.bbi_=i;
 			bb_index=vBB_[i].idx_;
 			vBB_[i].bb_&=~Tables::mask[posbb];			//deleting before the return
 			return (posbb+WMUL(vBB_[i].idx_));
