@@ -22,7 +22,30 @@ using namespace std;
 ///////////////////////////////////
 
 class BBScanSp: public BitSetSp{
+
+public:
+
+	template <class U>
+	friend class BBObject::Scan;
+	template <class U>
+	friend class BBObject::ScanDest;
+	template <class U>
+	friend class BBObject::ScanRev;
+	template <class U>
+	friend class BBObject::ScanDestRev;
+
+public:
+
+	//aliases for bitscanning 
+	using scan = typename BBObject::Scan<BBScanSp>;
+	using scanR = typename BBObject::ScanRev<BBScanSp>;
+	using scanD = typename BBObject::ScanDest<BBScanSp>;
+	using scanDR = typename BBObject::ScanDestRev<BBScanSp>;
+
 public:	
+
+//////////////////////////////
+//construction / destruction
 
 	//inherit constructors
 	using BitSetSp::BitSetSp;
@@ -152,7 +175,6 @@ protected:
 // Inline implementations, necessary in header file
 
 inline int BBScanSp::next_bit() {
-
 
 	U32 posInBB;
 			

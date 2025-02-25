@@ -170,7 +170,7 @@ namespace gio {
 			if (N == 0) { LOG_INFO("cannot paint the empty graph, will produce no output- gio::yed::graph_to_gml"); return 0; }
 			std::string filenameExt =path + filename + ".gml";
 			std::ofstream grafo(filenameExt);
-			if (!grafo) { LOG_ERROR("file: " , filenameExt , "could no be opened" , " -graph_to_gml(...)"); return -1; }
+			if (!grafo) { LOGG_ERROR("file: " , filenameExt , "could no be opened" , " -graph_to_gml(...)"); return -1; }
 			typename Graph_t::_bbt bbclq(N, vset);
 			//bbclq.print(cout, true);
 
@@ -223,7 +223,7 @@ namespace gio {
 			if (N == 0) { LOG_INFO("cannot paint the empty graph, will produce no output -gio::yed::graph_to_gml_clique"); return 0; }
 			std::string filenameExt = path + filename + ".gml";
 			std::ofstream grafo(filenameExt);
-			if (!grafo) { LOG_ERROR("file: " , filenameExt , " could no be opened" , " -gio::yed::graph_to_gml_clique(...)"); return -1; }
+			if (!grafo) { LOGG_ERROR("file: " , filenameExt , " could no be opened" , " -gio::yed::graph_to_gml_clique(...)"); return -1; }
 			typename Graph_t::_bbt bbclq(N, clq);
 			//bbclq.print(cout, true);
 
@@ -340,7 +340,7 @@ namespace gio {
 			const int N = g.number_of_vertices();
 			string filenameExt = filename + ".gml";
 			ofstream grafo(filenameExt);
-			if (!grafo) { LOG_ERROR("file: " , filenameExt , "could no be opened" , "--gio::yed::graph_to_gml_layered(...)"); return -1; }
+			if (!grafo) { LOGG_ERROR("file: " , filenameExt , "could no be opened" , "--gio::yed::graph_to_gml_layered(...)"); return -1; }
 
 													   
 			///////////////////////////////
@@ -363,13 +363,13 @@ namespace gio {
 			}
 			
 			if (i != N) {
-				LOG_ERROR("not all vertices are in the layers, FAILURE" , "--gio::yed::graph_layered_to_gml");
+				LOGG_ERROR("not all vertices are in the layers, FAILURE" , "--gio::yed::graph_layered_to_gml");
 				gio::yed::CLOSE_HEADER(grafo);
 				return -1;
 			}
 
 			if (col > gio::yed::MAX_COL_RGB_GML) {
-				LOG_ERROR("too many colors:" , col , "layered graph not created--gio::yed::graph_to_gml_layered");
+				LOGG_ERROR("too many colors:" , col , "layered graph not created--gio::yed::graph_to_gml_layered");
 				return -1;
 			}
 
@@ -403,7 +403,7 @@ namespace gio {
 			const int N = g.number_of_vertices();
 			std::string filenameExt = filename + ".gml";
 			std::ofstream grafo(filenameExt);
-			if (!grafo) { LOG_ERROR("file: " , filenameExt , "could no be opened" , "- graph_to_gml(...)"); return -1; }
+			if (!grafo) { LOGG_ERROR("file: " , filenameExt , "could no be opened" , "- graph_to_gml(...)"); return -1; }
 			
 			///////////////////////////////
 			gio::yed::HEADER(grafo);
