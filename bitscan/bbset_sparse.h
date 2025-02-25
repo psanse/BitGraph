@@ -4,7 +4,7 @@
   * @author pss
   * @details created 19/12/2015?, @last_update 15/02/2025
   *
-  * TODO refactoring and testing 15/02/2025 - follow the interface of the refactored BitSet
+  * TODO - complete BitSet class interface (25/02/2025)	
   **/
 
 #ifndef __BBSET_SPARSE_H__
@@ -74,13 +74,13 @@ public:
 	friend bool operator ==			(const BitSetSp& lhs, const BitSetSp& rhs);
 	friend bool operator !=			(const BitSetSp& lhs, const BitSetSp& rhs) { return !(lhs == rhs); }
 
-	//TODO - REFACTOR... (24/02/2025)
-
 	/**
 	* @brief AND between lhs and rhs sparse bitsets - stores the result in sparse bitset res
 	* @param lhs, rhs: input bitsets
 	* @param res: output bitset
 	* @returns reference to res
+	* 
+	* TODO - check optimization based on population density, see friend erase_bit (25/02/2025)
 	**/
     friend inline BitSetSp&  AND	(const BitSetSp& lhs, const BitSetSp& rhs,  BitSetSp& res);
 
@@ -101,7 +101,7 @@ public:
 	* 
 	* TODO... (25/02/2025)
 	**/
-	friend BitSetSp&			AND	(int firstBit, int lastBit, const BitSetSp& lhs,
+	friend BitSetSp&		AND		(int firstBit, int lastBit, const BitSetSp& lhs,
 											const BitSetSp& rhs, BitSetSp& res					) = delete;
 
 	/**
@@ -123,8 +123,19 @@ friend inline BitSetSp& AND_block	(int firstBlock, int lastBlock, const BitSetSp
 	**/
 friend inline BitSetSp&  OR			(const BitSetSp& lhs, const BitSetSp& rhs,  BitSetSp& res);
 	
-	
-	friend BitSetSp&  ERASE			(const BitSetSp& lhs, const BitSetSp& rhs,  BitSetSp& res);			//removes rhs from lhs
+	/**
+	* @brief Removes 1-bits in the bitstring rhs from the bitstring lhs. Stores
+	*		 the result in res 
+	* @returns reference to the resulting bitstring res
+	* @details: set minus operation (res = lhs \ rhs)
+	* @details: optimized for the case when lhs is much less dense than rhs (1)
+	* 
+	* TODO - add optimization policy to allow to choose reference bitset (see (1) - 25/02/2025)
+	**/
+friend BitSetSp&  erase_bit			(const BitSetSp& lhs, const BitSetSp& rhs,  BitSetSp& res);			
+
+
+	//TODO - add same interface as BitSet (25/02/2025)
 
 /////////////////////
 // constructors / destructors
@@ -1257,11 +1268,11 @@ BitSetSp& OR(const BitSetSp& lhs, const BitSetSp& rhs, BitSetSp& res) {
 		}
 	}
 
-	//add rest of blocks from the bitstring with blocks remaining to be examined
-	if (itL == lhs.vBB_.end() && itR != rhs.vBB_.end()) {
+	//add rest of non-examined blocks 
+	if (itR != rhs.vBB_.end()) {
 		res.vBB_.insert(res.vBB_.end(), itR, rhs.vBB_.end());
 	}
-	else if (itR == rhs.vBB_.end() && itL != lhs.vBB_.end()) {
+	else if (itL != lhs.vBB_.end()) {
 		res.vBB_.insert(res.vBB_.end(), itL, lhs.vBB_.end());
 	}
 	
@@ -1319,30 +1330,63 @@ BitSetSp& AND_block (int firstBlock, int lastBlock, const BitSetSp& lhs, const B
 }
 
 inline
-BitSetSp&  ERASE (const BitSetSp& lhs, const BitSetSp& rhs,  BitSetSp& res){
-/////////////////
-// removes rhs from lhs
-// date of creation: 17/12/15
-
-	
-	const int MAX=rhs.vBB_.size() - 1;
-	if(MAX==BBObject::noBit){ return (res=lhs);  }		//copy before returning
-	res.erase_bit();
-
-	//this works better if lhs is as sparse as possible (iterating first over rhs is illogical here becuase the operation is not symmetrical)
-	int i2=0;
-	int lhs_SIZE=lhs.vBB_.size();
-	for (int i1 = 0; i1 < lhs_SIZE; i1++){
-		for(; i2<MAX && rhs.vBB_[i2].idx_<lhs.vBB_[i1].idx_; i2++){}
+BitSetSp&  erase_bit (const BitSetSp& lhs, const BitSetSp& rhs,  BitSetSp& res){
 		
-		//update before either of the bitstrings has reached its end
-		if(lhs.vBB_[i1].idx_==rhs.vBB_[i2].idx_){
-				res.vBB_.push_back(BitSetSp::pBlock_t(lhs.vBB_[i1].idx_, lhs.vBB_[i1].bb_ &~ rhs.vBB_[i2].bb_));
-		}else{
-			res.vBB_.push_back(BitSetSp::pBlock_t(lhs.vBB_[i1].idx_, lhs.vBB_[i1].bb_));
+	//special case - rhs empty bitstring
+	if (rhs.is_empty()) { 
+		return (res = lhs); 
+	}				
+
+	///////////////////////////////////
+	res.reset(lhs.capacity(), false);
+	res.vBB_.reserve(lhs.vBB_.size());
+	///////////////////////////////////
+
+	auto itR = rhs.cbegin();
+	auto itL = lhs.cbegin();
+
+	//optimized races based on the assumption that lhs has less 1-bits than rhs
+	for (auto& blockL : lhs.vBB_) {
+
+		//finds closest
+		while (itR != rhs.vBB_.end() && itR->idx_ < blockL.idx_) { itR++; }
+
+		//exit condition - rhs has been examined
+		if (itR == rhs.vBB_.end()) {
+			res.vBB_.insert(res.vBB_.end(), itL, lhs.vBB_.end());
+			break;
 		}
+
+		//blocks remain to be examined in both bitsets
+		if (blockL.idx_ == itR->idx_) {
+			res.vBB_.push_back(BitSetSp::pBlock_t(blockL.idx_, blockL.bb_ & ~ itR->bb_));
+		}
+		else {
+			res.vBB_.push_back(BitSetSp::pBlock_t(blockL.idx_, blockL.bb_));
+		}		
 	}
-return res;
+	
+	
+	
+	//
+	//const int MAX = rhs.vBB_.size() - 1;
+	//if (MAX == BBObject::noBit) { return (res = lhs); }		//copy before returning
+
+	////this works better if lhs is as sparse as possible (iterating first over rhs is illogical here becuase the operation is not symmetrical)
+	//int i2=0;
+	//int lhs_SIZE=lhs.vBB_.size();
+	//for (int i1 = 0; i1 < lhs_SIZE; i1++){
+	//	for(; i2<MAX && rhs.vBB_[i2].idx_<lhs.vBB_[i1].idx_; i2++){}
+	//	
+	//	//update before either of the bitstrings has reached its end
+	//	if(lhs.vBB_[i1].idx_==rhs.vBB_[i2].idx_){
+	//			res.vBB_.push_back(BitSetSp::pBlock_t(lhs.vBB_[i1].idx_, lhs.vBB_[i1].bb_ &~ rhs.vBB_[i2].bb_));
+	//	}else{
+	//		res.vBB_.push_back(BitSetSp::pBlock_t(lhs.vBB_[i1].idx_, lhs.vBB_[i1].bb_));
+	//	}
+	//}
+
+	return res;
 }
 
 inline
