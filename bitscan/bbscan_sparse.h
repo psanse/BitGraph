@@ -116,10 +116,22 @@ inline int next_bit					();
 	**/
 inline int prev_bit_del				();
 	
-
+	/**
+	* @brief next least-significant bit in the bitstring, starting from the bit retrieved
+	*		 in the last call to next_bit.
+	*		 Scan type: non-destructive, reverse
+	*
+	*		 I. caches the current block for the next call
+	*		II. caches the scanned bit for the next call
+	* 		III. First call requires initialization with init_scan(NON-DESTRUCTIVE, REVERSE)
+	*
+	* @returns the next lsb bit in the bitstring, BBObject::noBit if there are no more bits
+	* @details Created 5/9/2014, last update 09/02/2025
+	* @details Since the scan does not delete the scanned bit from the bitstring,
+	*		   it has to cache the last scanned bit for the next call
+	**/
  inline int prev_bit				(); 
-
-	
+ 	
 
 	/////////////////
 	//	DEPRECATED
@@ -129,9 +141,6 @@ inline int prev_bit_del				();
 //inline int next_bit_del_pos			(int& posBB);							//posBB: position of bitblock in the collection (not the index of the element)		
 //inline int next_bit					(int& nBB);								//nBB: index of bitblock in the bitstring	(not in the collection)				
 //inline int prev_bit_del				(int& nBB);
-
-
-
 
 //////////////////
 // data members
@@ -173,36 +182,33 @@ inline int BBScanSp::next_bit() {
 	
 }
 
+inline int BBScanSp::prev_bit () {
 
-
-
-
-inline int BBScanSp::prev_bit	() {
-////////////////////////////
-// date:5/9/2014
-// Non destructive bitscan for sparse bitstrings using intrinsics
-// caches index in the collection and pos inside the bitblock
-//
-// comments
-// 1-require previous assignment scan_.bbi=number of bitblocks-1 and scan_.pos_=WORD_SIZE
-
-	unsigned long posbb;
+	U32 posInBB;
 				
-	//search int the last table
-	if(_BitScanReverse64(&posbb, vBB_[scan_.bbi_].bb_ & Tables::mask_low[scan_.pos_])){
-		scan_.pos_ =posbb;
-		return (posbb + WMUL(vBB_[scan_.bbi_].idx_));
-	}else{											//not found in the last table. search in the rest
-		for(int i=scan_.bbi_-1; i>=0; i--){
-			if(_BitScanReverse64(&posbb,vBB_[i].bb_)){
+	//searches for previous bit in the last scanned block
+	if(_BitScanReverse64(&posInBB, vBB_[scan_.bbi_].bb_ & Tables::mask_low[scan_.pos_])){
+		//stores the current bit for next call
+		scan_.pos_ = posInBB;
+
+		return (posInBB + WMUL(vBB_[scan_.bbi_].idx_));
+	}else{	
+		//Searches for previous bit in the remaining blocks
+		for(auto i = scan_.bbi_ - 1; i >= 0; --i){
+
+			if(_BitScanReverse64(&posInBB,vBB_[i].bb_)){
+
+				//stores the current block and bit for next call
 				scan_.bbi_=i;
-				scan_.pos_=posbb;
-				return (posbb+ WMUL(vBB_[i].idx_));
+				scan_.pos_= posInBB;
+
+				return (posInBB + WMUL(vBB_[i].idx_));
 			}
 		}
 	}
 	
-return EMPTY_ELEM;
+	return BBObject::noBit;
+
 }
 
 
