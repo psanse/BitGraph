@@ -12,9 +12,7 @@
 #include <iostream>
 #include <sstream>
 
-//uncomment undef to avoid assertions
-#define NDEBUG
-#undef NDEBUG
+//uncomment undef in bbconfig.h to avoid assertions
 #include <cassert>
  
 using namespace std;

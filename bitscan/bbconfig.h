@@ -19,8 +19,8 @@
 ////////////////////
 //DEBUG mode assertions
 
-#define NDEBUG
-#undef NDEBUG												// uncomment for assertions in debug mode
+// uncomment for assertions in debug mode
+//#undef NDEBUG												
 
 
 

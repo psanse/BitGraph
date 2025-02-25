@@ -13,7 +13,7 @@
 
  //comment in release mode - disable checks
  //current impact on stack_t in common_types.h
-#define	NDEBUG
+
 #ifndef NDEBUG
 #define DEBUG_STACKS		//checks stack sizes (important to debug SAT engine in DEBUG mode)
 #endif 

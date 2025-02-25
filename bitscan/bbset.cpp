@@ -414,7 +414,7 @@ int find_first_common(const BitSet& lhs, const BitSet& rhs) {
 int find_first_common_block(int firstBlock, int lastBlock, const BitSet& lhs, const BitSet& rhs) {
 	
 	///////////////////////////////////////////////////////////////////////////////
-	assert((firstBlock >= 0) && (LastBlock < nBB_) && (firstBlock <= lastBlock));
+	assert((firstBlock >= 0) && (firstBlock <= lastBlock) && (lastBlock < lhs.capacity()));
 	///////////////////////////////////////////////////////////////////////////////
 
 	int last_block = ((lastBlock == -1) ? rhs.nBB_ - 1 : lastBlock);

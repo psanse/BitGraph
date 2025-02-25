@@ -477,7 +477,7 @@ std::ostream& InfoAnalyser<AlgInfo_t>::print_analyser_summary(std::ostream& o) c
 
 	}
 	catch (const std::ios::failure& ex) {
-		LOG_ERROR("Error when streaming data", ex.what(), "- Test_Analyser::print_analyser_summary ");
+		LOGG_ERROR("Error when streaming data", ex.what(), "- Test_Analyser::print_analyser_summary ");
 		o << "Error when streaming data" << ex.what() << "- Test_Analyser::print_analyser_summary " << endl;
 	}
 	catch (...) {

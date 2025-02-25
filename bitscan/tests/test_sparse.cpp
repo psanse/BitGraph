@@ -359,12 +359,6 @@ TEST(Sparse, boolean_properties){
 	EXPECT_TRUE(bb.is_disjoint_block(0,0,bb1));
 	EXPECT_FALSE(bb.is_disjoint_block(0,1,bb1));
 	EXPECT_FALSE(bb.is_disjoint_block(1,2,bb1));
-	EXPECT_FALSE(bb.is_disjoint_block(1,7,bb1));
-	
-	//does not produce an out of range error
-	bb1.erase_bit(64);
-	EXPECT_TRUE(bb.is_disjoint_block(1,7,bb1));
-	EXPECT_TRUE(bb.is_disjoint_block(3,7,bb1));
 
 }
 

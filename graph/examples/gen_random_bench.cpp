@@ -13,7 +13,7 @@
 #include "utils/logger.h"
 
 //comment in release mode - to disable assertions
-#define	NDEBUG
+//#undef NDEBUG
 #include <cassert>
 
 using namespace std;
