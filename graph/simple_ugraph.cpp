@@ -173,9 +173,8 @@ ostream& Ugraph<T>::print_degrees (std::ostream& o) const {
 	return o;
 }
 
-
 template<class T>
-ostream& Ugraph<T>::print_edges (std::ostream& o) {
+ostream& Ugraph<T>::print_edges (std::ostream& o = cout) {
 
 	for(auto i = 0; i < ptype::NV_ - 1; ++i){
 		for(auto j = i + 1; j< ptype::NV_; ++j){
@@ -185,6 +184,7 @@ ostream& Ugraph<T>::print_edges (std::ostream& o) {
 			}
 		}
 	}
+
 	return o;
 }
 

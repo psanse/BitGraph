@@ -531,7 +531,6 @@ ostream& Graph<T>::print_data( bool lazy, std::ostream& o, bool endl) {
 }
 
 template<class T>
-
 ostream& Graph<T>::print_edges (std::ostream& o) {
 
 	for(auto i = 0; i < NV_-1; ++i){

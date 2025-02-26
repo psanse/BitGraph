@@ -252,30 +252,27 @@ public:
 	*/
 	void write_mtx				(std::ostream& filename);				//MTX format only for Ugraph? (03/01/2025)
 
-
 /////////////////	
 //	I/O basic operations
 public:
 
 	ostream& print_degrees		(std::ostream& = std::cout)					const;
-	ostream& print_edges		(std::ostream& = std::cout)					 override;
+	ostream& print_edges		(std::ostream& = std::cout)					override;
 	
 	template<class bitset_t = T>
-	ostream& print_edges		(bitset_t& bbsg, std::ostream& = std::cout)	const ;
+	ostream& print_edges		(bitset_t& bbsg, std::ostream&)				const ;
 	ostream& print_matrix		(std::ostream& = std::cout)					const;
 
 //////////////	
 // deleted - CHECK	
 	virtual	void remove_vertices(const BitSet& bbn) = delete;				//commented out implementation - EXPERIMENTAL
 
-	/*
+	/**
 	*  @brief enlarges the graph with a new vertex (provided its neighborhood)
 	*		  TODO - code removed, BUGGY (should not be called , unit tests DISABLED)
-	*/
+	**/
 	int add_vertex(_bbt* neigh = nullptr) = delete;
-
 };
-
 
 /////////////////////////////////////////////////////////////
 // Necessary implementation of template methods in header file

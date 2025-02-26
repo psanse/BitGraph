@@ -186,7 +186,6 @@ void Ugraph<sparse_bitarray>::write_dimacs(ostream& o) {
 				break;
 			o << "e " << v + 1 << " " << w + 1 << endl;
 		}
-
 	}
 }
 
@@ -196,7 +195,7 @@ ostream& Ugraph<sparse_bitarray>::print_edges (std::ostream& o)  {
 
 	for (auto v = 0; v < this->NV_ - 1; ++v) {
 	
-		//skip empty bitsets - must be since currently the scanning object does not check this
+		//skip empty bitsets - MUST BE since currently the scanning object does not check this
 		if (adj_[v].is_empty()) { continue; }
 
 		//scan the bitstring of v

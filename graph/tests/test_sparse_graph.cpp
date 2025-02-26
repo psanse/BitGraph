@@ -13,6 +13,7 @@
 #include "graph/algorithms/graph_gen.h"
 #include "gtest/gtest.h"
 #include <iostream>
+#include <strstream>
 
 using namespace std;
 
@@ -410,7 +411,7 @@ TEST(Ugraph_sparse, DISABLED_adjacency_matrix){
 		}
 	}
 }
-TEST(Graph_sparse, DISABLED_print_edges) {
+TEST(Graph_sparse, print_edges) {
 	//not formulated as a real test, just visual inspection
 	const int NV = 100;
 
@@ -423,6 +424,11 @@ TEST(Graph_sparse, DISABLED_print_edges) {
 	g.add_edge(79, 80);
 
 	//I/O 
-	g.print_edges();
+	stringstream sstr;
+	g.print_edges(sstr);
 
+	EXPECT_FALSE(sstr.str().empty());
+
+	//visual inspection
+	//cout << sstr.str() << endl;
 }
