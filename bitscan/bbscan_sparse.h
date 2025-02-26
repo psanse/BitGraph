@@ -69,7 +69,9 @@ public:
 	* @brief Configures the initial block and bit position for bitscanning
 	*		 according to one of the 4 scan types passed as argument
 	* @param sct: type of scan
-	* @returns 0 if successful, -1 otherwise
+	* @returns 0 if successful, -1 otherwise, or if the bitset is empty
+	* @details : sparse bitsets may have no blocks, in which case the scan is not possible and
+	*		     the function returns -1
 	**/
 	int init_scan					(scan_types sct);
 	
@@ -81,7 +83,9 @@ public:
 	*		 If firstBit is -1 (BBObject::noBit), the scan starts from the beginning.
 	* @param firstBit: starting bit
 	* @param sct: type of scan
-	* @returns 0 if successful, -1 otherwise
+	* @returns 0 if successful, -1 otherwise or if the bitset is empty
+	* @details : sparse bitsets may have no blocks, in which case the scan is not possible and
+	*		     the function returns -1
 	* 
 	* TODO - extend to NON-DESTRUCTIVE cases
 	**/
@@ -403,7 +407,7 @@ inline int BBScanSp::prev_bit_del(BBScanSp& bitset)
 
 inline
 int BBScanSp::init_scan (scan_types sct){
-	if (vBB_.empty()) { return BBObject::noBit; }			//necessary check since sparse bitstrings have empty semantics (i.e. sparse graphs)
+	if (vBB_.empty()) { return -1; }			//necessary check since sparse bitstrings have empty semantics (i.e. sparse graphs)
 
 	switch(sct){
 	case NON_DESTRUCTIVE:
@@ -431,11 +435,15 @@ int BBScanSp::init_scan (scan_types sct){
 inline
 int BBScanSp::init_scan (int firstBit, scan_types sct){
 
+	//necessary check 
+	if (vBB_.empty()) {	return -1;	}
+
 	//special case - first bitscan
 	if (firstBit == BBObject::noBit) {
 		return init_scan(sct);
 	}
 
+	
 
 	//determine the index of the starting block (not its ID)
 	auto bbL = WDIV(firstBit);

@@ -129,6 +129,46 @@ TEST_F(BitScanNestedSparseTest, firstBit) {
 
 }
 
+TEST(BitScanNestedSparse, scanning_empty_bitsets) {
+//sparse bitsets can be empty  and the scanning classes must handle this case
+
+	std::vector<int> lb;
+	BBScanSp bbsp(130);
+	bbsp.set_bit(10);
+	bbsp.set_bit(20);
+	bbsp.set_bit(64);
+
+	//no empty check - necessary if there is a doubt it can be empty 
+	BBScanSp::scan sc1(bbsp);
+	int bit = BBObject::noBit;	
+	while( (bit = sc1.next_bit()) != BBObject::noBit){
+		lb.push_back(bit);
+	}
+
+	///////////////////////
+	EXPECT_EQ(10, lb[0]);
+	EXPECT_EQ(20, lb[1]);
+	EXPECT_EQ(64, lb[2]);
+	///////////////////////
+
+	bbsp.erase_bit();
+	lb.clear();
+	//starts a new scan  - MUST capture the return val of init_scan
+	//if there is a risk the bitset to be scanned is empty
+	if ( sc1.init_scan() == 0 ) {
+		while ((bit = sc1.next_bit()) != BBObject::noBit) {
+			lb.push_back(bit);
+		}
+
+		///////////////////////
+		EXPECT_EQ(10, lb[0]);
+		EXPECT_EQ(20, lb[1]);
+		EXPECT_EQ(64, lb[2]);
+		///////////////////////
+	}
+
+}
+
 TEST_F(BitScanNestedSparseTest, block_info) {
 
 	int bit = BBObject::noBit;

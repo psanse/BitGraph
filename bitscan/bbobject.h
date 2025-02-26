@@ -76,7 +76,7 @@ public:
 		*		 If firstBit = -1 scans the whole bitset
 		* @param firstBit: starting position of the scan
 		**/
-		void init_scan(int firstBit = -1) { bb_.init_scan(firstBit, BBObject::NON_DESTRUCTIVE_REVERSE ); }
+		int init_scan(int firstBit = -1) { return bb_.init_scan(firstBit, BBObject::NON_DESTRUCTIVE_REVERSE ); }
 
 		/**
 		* @brief returns the next bit in the bitset during a reverse bitscanning operation
@@ -112,7 +112,7 @@ public:
 		*		 If firstBit = -1 scans the whole bitset
 		* @param firstBit: starting position of the scan
 		**/
-		void init_scan(int firstBit = -1) { bb_.init_scan(firstBit, BBObject::NON_DESTRUCTIVE); }
+		int init_scan(int firstBit = -1) { return bb_.init_scan(firstBit, BBObject::NON_DESTRUCTIVE); }
 
 		/**
 		* @brief returns the next bit in the bitset during a reverse bitscanning operation
@@ -147,7 +147,7 @@ public:
 		* @brief Scans the bitset in the range [0 , end of the bitset)
 		*		 Removes bits as they are scanned
 		**/
-		void init_scan() { bb_.init_scan(BBObject::DESTRUCTIVE); }
+		int init_scan() { return bb_.init_scan(BBObject::DESTRUCTIVE); }
 
 		/**
 		* @brief returns the next bit in the bitset during a reverse bitscanning operation
@@ -182,7 +182,7 @@ public:
 		* @brief Scans the bitset in the range (end_of_bitset, 0]
 		*		 Removes bits as they are scanned
 		**/
-		void init_scan() { bb_.init_scan(BBObject::DESTRUCTIVE_REVERSE); }
+		int init_scan() { return bb_.init_scan(BBObject::DESTRUCTIVE_REVERSE); }
 
 		/**
 		* @brief returns the next bit in the bitset during a reverse bitscanning operation

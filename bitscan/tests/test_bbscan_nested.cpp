@@ -130,6 +130,7 @@ TEST_F(BitScanNestedTest, firstBit) {
 
 }
 
+
 TEST_F(BitScanNestedTest, block_info) {
 
 	int bit = BBObject::noBit;

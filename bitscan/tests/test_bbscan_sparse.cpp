@@ -118,6 +118,7 @@ TEST(BBScanSpClass, boolean_properties){
 
 }
 
+
 TEST(BBScanSpClass, non_destructive_direct){
 
 	BBScanSp bbsp(130);
