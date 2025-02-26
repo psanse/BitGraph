@@ -31,9 +31,12 @@ inline
 BITBOARD Ugraph<sparse_bitarray>::number_of_edges(bool lazy) {
 		
 	if (lazy || ptype::NE_ == 0) {
+
 		ptype::NE_ = 0;
 		for (int i = 0; i < ptype::NV_ - 1; i++) {
-			ptype::NE_ += adj_[i].size(i + 1, -1);			//popuation count from i + 1 onwards
+
+			//popuation count from i + 1 onwards
+			ptype::NE_ += adj_[i].size(i + 1, -1);			
 		}		
 	}
 
