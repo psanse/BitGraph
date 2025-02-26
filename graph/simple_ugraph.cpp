@@ -250,8 +250,8 @@ void  Ugraph<T>::write_EDGES (ostream& o) {
 		o << "% " << ptype::name_.c_str() << endl;
 	
 	//write edges - 1 based vertex notation
-	for( std::size_t v = 0; v < ptype::NV_ - 1; ++v ){
-		for( std::size_t w = v + 1; w < ptype::NV_; ++w ){
+	for( auto v = 0; v < ptype::NV_ - 1; ++v ){
+		for( auto w = v + 1; w < ptype::NV_; ++w ){
 			if ( ptype::is_edge(v, w) ) {							//O(log) for sparse graphs: specialize
 				o << v + 1 << " " << w + 1 << endl;
 			}
@@ -277,8 +277,8 @@ void Ugraph<T>::write_mtx(ostream & o){
 	o << ptype::NV_ << " " << ptype::NV_ << " " << number_of_edges() << endl;
 	
 	//writes edges 1-based vertex notation
-	for( std::size_t v = 0; v < ptype::NV_ - 1; ++v ){
-		for( std::size_t  w = v + 1; w < ptype::NV_; ++w ){
+	for( auto v = 0; v < ptype::NV_ - 1; ++v ){
+		for( auto  w = v + 1; w < ptype::NV_; ++w ){
 			if ( ptype::is_edge(v, w) ) {														//O(log) for sparse graphs: specialize
 				o << v + 1 << " " << w + 1 << endl;						
 			}
