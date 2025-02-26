@@ -7,8 +7,8 @@
   * TODO refactoring and testing 15/02/2025
   **/
 
-#ifndef  __BBALG_H__
-#define  __BBALG_H__
+#ifndef  _BBALG_H_
+#define  _BBALG_H_
 
 #include "utils/common.h"
 #include "utils/logger.h"
@@ -16,48 +16,74 @@
 
 using namespace std;
 
-typedef BBObject  bbo;
+//aliases
+using bbo = BBObject;
 
-//a basic ADT for managing popcounts
-template <class bitstring_t>
-struct bb_t{
 //////////////////////
-//a simple wrapper for any type of bitstring with popcount 
-//last_update@12/08/19
+// 
+// bb_t class
+// 
+// A simple wrapper for any type of bitset of the BBObject hierarchy (CHECK!) with CACHED size 
+// (@last_update 12/08/19)
+// 
 ///////////////////////
-	int pc;																			//population count
-	bitstring_t bb; 
-////////////////////
-//interface
-	bb_t(int MAX_SIZE):pc(0){bb.init(MAX_SIZE);}									//all bits FALSE
-	bb_t():pc(EMPTY_ELEM){}															//to create a collection
-	void init(int MAX_SIZE){bb.init(MAX_SIZE); pc =0;}
-	int  get_pc() const { return pc; }
-		
-	//bit twiddling
-	void set_bit(int v) {bb.set_bit(v); pc++;}										//push-bitstring interface
-	void erase_bit(bool lazy=false){ if(!lazy) {bb.erase_bit();} pc =0;}			//clears all bits
-	int  erase_bit(int elem){bb.erase_bit(elem); pc--; return pc;}
+template <class BitSet_t>
+struct bb_t{
 
-	//useful func
-	int sync_pc() { pc = bb.size(); return pc; }
-	int pop()	  { if (pc > 0) { int v = bb.msb(); bb.erase_bit(v); pc--; return v; } else return EMPTY_ELEM; }
-	int front()   {	if (pc > 0) { return bb.lsb();	} else return EMPTY_ELEM;	}
+//construction / destruction
+	bb_t			(int MAX_SIZE) : pc_(0), bb_(MAX_SIZE)	{}
+	bb_t			():	pc_ (0)								{}														
+	
+//allocation
+	
+	/**
+	* @brief Resets the original bitset and allocated new capacity
+	**/
+	void reset		(int MAX_SIZE)			{ bb_.reset(MAX_SIZE); pc_ = 0; }
 
-	//bool
-	bool is_empty() const {return (pc ==0);}
-	bool test_pc()  const {return pc == bb.size();}	
+	/**
+	* @brief Equivalent to reset. Preserved for backward compatibility
+	**/
+	void init		(int MAX_SIZE)			{ bb_.reset(MAX_SIZE); pc_ = 0; }							
+	
+	
+//setters and getters
+	BITBOARD  size	()	const				{ return pc_; }
 
-	//operators
-	friend bool operator ==(const bb_t& lhs, const bb_t& rhs) { return (lhs.pc == rhs.pc) && (lhs.bb == rhs.bb);}
-	friend bool operator !=(const bb_t& lhs, const bb_t& rhs) { return !(lhs == rhs); }
 
-	//I/O
-	ostream& print(ostream& o = cout) const { bb.print(o); o << "[" << pc << "]"; return o; }
+//bit twiddling
+	void set_bit	(int bit)				 {bb_.set_bit(bit); ++pc_;}							//push-bitstring interface
+	void erase_bit	(bool lazy = false)		 { if(!lazy) {bb_.erase_bit();} pc_ = 0;}			//clears all bits
+	int  erase_bit	(int bit)				 { bb_.erase_bit(bit); --pc_; return pc_; }
+
+//useful func
+	int sync_pc		()						 { pc_ = bb_.size(); return pc_; }
+	
+	//stack interface - TODO RENAME! (26/02/2025)
+	int pop_msb	()						 { if (pc_ > 0) { int bit = bb_.msb(); bb_.erase_bit(bit); pc_--; return bit; } else return BBObject::noBit; }
+	int lsb		()						 { if (pc_ > 0) { return bb_.lsb(); } else return BBObject::noBit;	}
+
+//bool
+	bool is_empty	() const				{return (pc_ == 0);}
+	bool check_pc	() const				{return (pc_ == bb_.size());}	
+
+//operators
+	friend bool operator ==	(const bb_t& lhs, const bb_t& rhs) { return (lhs.pc_ == rhs.pc_) && (lhs.bb_ == rhs.bb_);}
+	friend bool operator !=	(const bb_t& lhs, const bb_t& rhs) { return !(lhs == rhs); }
+
+//I/O
+	ostream& print(ostream& o = cout) const { bb_.print(o); o << "[" << pc_ << "]"; return o; }
+
+/////////////////
+// data members
+
+	BITBOARD pc_;																	//number of 1-bits
+	BitSet_t bb_;																	//any type of the BBObject hierarchy	
+
 };
 
 
-template <class bitstring_t>
+template <class BitSet_t>
 struct sbb_t{
 ////////////////////
 // stack-state with bitstrings
@@ -68,7 +94,7 @@ struct sbb_t{
 
 	int* stack;
 	int size;
-	bitstring_t bb;
+	BitSet_t bb;
 
 	sbb_t(int MAX_SIZE){init(MAX_SIZE);}	
 	sbb_t():size(-1), stack(NULL){}		
@@ -88,12 +114,12 @@ struct sbb_t{
 	ostream& print(type_t t=STACK, ostream& o= cout);
 };
 
-template <class bitstring_t>
+template <class BitSet_t>
 struct bba_t{
 /////////////////
 //simple ADT for an array of bitstrings (without size information)
 	int capacity;													/* remains fixed */
-	bitstring_t* pbb;
+	BitSet_t* pbb;
 	
 	bba_t():capacity(0), pbb(NULL){}
 	~bba_t(){clear();}
@@ -113,16 +139,16 @@ struct bba_t{
 	//I/O
 	ostream& print(ostream& o=cout) const;		
 };
-template <class bitstring_t>
-void bba_t<bitstring_t>::erase_bit(){
+template <class BitSet_t>
+void bba_t<BitSet_t>::erase_bit(){
 	for(int pos=0; pos<capacity; pos++){
 		pbb[pos].erase_bit();
 	}
 }
 
-template <class bitstring_t>
+template <class BitSet_t>
 inline
-ostream& bba_t<bitstring_t>::print(ostream& o) const{
+ostream& bba_t<BitSet_t>::print(ostream& o) const{
 	for(int i=0; i<capacity; i++){
 		if(!pbb[i].is_empty()){
 			pbb[i].print(o);
@@ -132,26 +158,26 @@ ostream& bba_t<bitstring_t>::print(ostream& o) const{
 	return o;
 }
 
-template <class bitstring_t>
+template <class BitSet_t>
 inline
-void bba_t<bitstring_t>::init(int capacity, int pc){
+void bba_t<BitSet_t>::init(int capacity, int pc){
 	clear();
 	try{
 		this->capacity=capacity;
-		pbb=new bitstring_t[capacity];
+		pbb=new BitSet_t[capacity];
 		for(int i=0; i<capacity; i++){
 			pbb[i].init(pc);
 		}
 	}catch(exception& e){
-		LOG_ERROR("bba_t<bitstring_t>::-init()");
+		LOG_ERROR("bba_t<BitSet_t>::-init()");
 		e.what();
 	}
 }
 
 
-template <class bitstring_t>
+template <class BitSet_t>
 inline
-ostream& sbb_t<bitstring_t>::print(type_t t, ostream& o){
+ostream& sbb_t<BitSet_t>::print(type_t t, ostream& o){
 	switch(t){
 	case STACK:
 		o<<"[";
@@ -170,9 +196,9 @@ ostream& sbb_t<bitstring_t>::print(type_t t, ostream& o){
 	return o;
 }
 
-template <class bitstring_t>
+template <class BitSet_t>
 inline
-bool sbb_t<bitstring_t>::is_synchro(){
+bool sbb_t<BitSet_t>::is_synchro(){
 //checks if the contents is the same in STACK and BB
 	
 	int pc=bb.size();
@@ -185,18 +211,18 @@ bool sbb_t<bitstring_t>::is_synchro(){
 	return true;
 }
 
-template <class bitstring_t>
+template <class BitSet_t>
 inline
-void sbb_t<bitstring_t>::update_bb(){
+void sbb_t<BitSet_t>::update_bb(){
 	bb.erase_bit();
 	for(int i=0; i<size; i++){
 		bb.set_bit(stack[i]);
 	}
 }
 
-template <class bitstring_t>
+template <class BitSet_t>
 inline
-void sbb_t<bitstring_t>::update_stack(){
+void sbb_t<BitSet_t>::update_stack(){
 	size=0;
 	bb.init_scan(BBObject::NON_DESTRUCTIVE);
 	while(true){
@@ -231,9 +257,9 @@ return bb;
 }
 
 
-template<class bitstring_t, class array_t>
+template<class BitSet_t, class array_t>
 inline
-int first_k_bits (int k, bitstring_t &bb, array_t &lv){
+int first_k_bits (int k, BitSet_t &bb, array_t &lv){
 ///////////////////
 // Computes the first 3 nodes of color set 'col' in 'lv'
 //

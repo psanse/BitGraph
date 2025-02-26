@@ -18,7 +18,7 @@ using namespace std;
 //aliases
 using vint = vector<int>;
 
-TEST(stack_state, DISABLED_basic){
+TEST(stack_type, basic){
 	
 	sbb_t<BBScan> s;
 	s.init(65);
@@ -28,27 +28,25 @@ TEST(stack_state, DISABLED_basic){
 
 	EXPECT_EQ(3, s.get_size());
 	EXPECT_EQ(true, s.is_synchro());
-	s.print();
+	//s.print();
 
 	//does not increase size
 	s.push(65);
 	EXPECT_EQ(3, s.get_size());
 	EXPECT_EQ(true, s.is_synchro());
-	s.print();
 
 	s.bb.erase_bit(65);
 	EXPECT_EQ(false, s.is_synchro());
+	
 	s.update_stack();
 	EXPECT_EQ(2, s.get_size());
-	s.print(); 
-
 	
 }
 
-TEST(bb_t, DISABLED_basic){
+TEST(bb_type, basic_operations){
 	
 	bb_t<BBScan> b;
-	b.init(65);
+	b.reset(65);
 /*	b.push(10);
 	b.push(64);
 	b.push(65);
@@ -71,23 +69,19 @@ TEST(bb_t, DISABLED_basic){
 	b.set_bit(10);
 	b.set_bit(64);
 	b.set_bit(65);
-	b.print();
-	EXPECT_EQ(3, b.get_pc());
-	EXPECT_EQ(65, b.pop());
-	EXPECT_EQ(2, b.get_pc());
-
-	EXPECT_EQ(64, b.pop());
-	EXPECT_EQ(1, b.get_pc());
-
-	EXPECT_EQ(10, b.pop());
-	EXPECT_EQ(0, b.get_pc());
-
-	EXPECT_EQ(-1, b.pop());
-	EXPECT_TRUE(b.is_empty());
-
-	b.print(); cout<<endl;
-
 	
+	EXPECT_EQ(3, b.size());
+	EXPECT_EQ(65, b.pop_msb());
+	EXPECT_EQ(2, b.size());
+
+	EXPECT_EQ(64, b.pop_msb());
+	EXPECT_EQ(1, b.size());
+
+	EXPECT_EQ(10, b.pop_msb());
+	EXPECT_EQ(0, b.size());
+
+	EXPECT_EQ(-1, b.pop_msb());
+	EXPECT_TRUE(b.is_empty());	
 }
 
 TEST(bba_t, basic){
@@ -101,8 +95,7 @@ TEST(bba_t, basic){
 	b.set_bit(9,10);
 	b.set_bit(9,20);
 	b.set_bit(9,30);
-	b.print();
-
+	
 	EXPECT_TRUE(b.is_bit(0,10));
 	EXPECT_TRUE(b.is_bit(0,64));
 	EXPECT_TRUE(b.is_bit(9,10));
@@ -116,8 +109,7 @@ TEST(bba_t, basic){
 	//reuse
 	b.init(1, 65);
 	b.set_bit(0,10);
-	b.print();
-
+	
 	EXPECT_TRUE(b.is_bit(0,10));
 	EXPECT_EQ(1, b.capacity);
 	
