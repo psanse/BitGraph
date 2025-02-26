@@ -163,10 +163,8 @@ int Ugraph<sparse_bitarray>::degree(int v, int UB, const BitSetSp& bbs) const {
 template<>
 inline
 void Ugraph<sparse_bitarray>::write_dimacs(ostream& o) {
-	/////////////////////////
-	// writes file in dimacs format 
 
-		//timestamp 
+	//timestamp 
 	o << "c File written by GRAPH:" << PrecisionTimer::local_timestamp();
 
 	//name
@@ -178,15 +176,21 @@ void Ugraph<sparse_bitarray>::write_dimacs(ostream& o) {
 
 	//Escribir nodos
 	for (int v = 0; v < this->NV_ - 1; v++) {
+
 		//non destructive scan starting from the vertex onwards
-		pair<bool, int> p = this->adj_[v].find_block_pos(WDIV(v));
-		if (p.second == EMPTY_ELEM) continue;					//no more bitblocks
+		auto block_v = WDIV(v);
+		pair<bool, int> p = this->adj_[v].find_block_pos(block_v);
+
+		if (p.second == BBObject::noBit) {
+			continue;					
+		}
+
+		//bitscan - if block contains v, start from that position onwards
 		this->adj_[v].scan_block(p.second);
-		(p.first) ? this->adj_[v].scan_bit(WMOD(v))  : this->adj_[v].scan_bit(MASK_LIM);		//if bitblock contains v, start from that position onwards
-		while (1) {
-			int w = this->adj_[v].next_bit();
-			if (w == EMPTY_ELEM)
-				break;
+		(p.first) ? this->adj_[v].scan_bit(v - WMUL(block_v) /*WMOD(v)*/) : this->adj_[v].scan_bit(MASK_LIM);
+		
+		int w = BBObject::noBit;	
+		while ( (w = this->adj_[v].next_bit()) != BBObject::noBit ) {
 			o << "e " << v + 1 << " " << w + 1 << endl;
 		}
 	}
