@@ -104,7 +104,7 @@ endif()
 # (old CMake - currently best solution found to preserve public header internal structure)
 #############
 
-set(INSTALL_PATH "${CMAKE_CURRENT_SOURCE_DIR}/example_external_linkage" CACHE PATH "Directory chosen to deploy project")
+set(INSTALL_PATH "${CMAKE_CURRENT_SOURCE_DIR}/example_external_linking" CACHE PATH "Directory chosen to deploy project")
 set(CMAKE_INSTALL_PREFIX ${INSTALL_PATH})
 
 # Install utils library
