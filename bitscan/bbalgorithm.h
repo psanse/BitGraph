@@ -52,16 +52,16 @@ struct bb_t{
 
 
 //bit twiddling
-	void set_bit	(int bit)				 {bb_.set_bit(bit); ++pc_;}							//push-bitstring interface
-	void erase_bit	(bool lazy = false)		 { if(!lazy) {bb_.erase_bit();} pc_ = 0;}			//clears all bits
-	int  erase_bit	(int bit)				 { bb_.erase_bit(bit); --pc_; return pc_; }
+	void set_bit	(int bit)				{bb_.set_bit(bit); ++pc_;}							//push-bitstring interface
+	void erase_bit	(bool lazy = false)		{ if(!lazy) {bb_.erase_bit();} pc_ = 0;}			//clears all bits
+	int  erase_bit	(int bit)				{ bb_.erase_bit(bit); --pc_; return pc_; }
 
 //useful func
-	int sync_pc		()						 { pc_ = bb_.size(); return pc_; }
+	int sync_pc		()						{ pc_ = bb_.size(); return pc_; }
 	
-	//stack interface - TODO RENAME! (26/02/2025)
-	int pop_msb	()						 { if (pc_ > 0) { int bit = bb_.msb(); bb_.erase_bit(bit); pc_--; return bit; } else return BBObject::noBit; }
-	int lsb		()						 { if (pc_ > 0) { return bb_.lsb(); } else return BBObject::noBit;	}
+	//stack interface 
+	int pop_msb		()						{ if (pc_ > 0) { int bit = bb_.msb(); bb_.erase_bit(bit); pc_--; return bit; } else return BBObject::noBit; }
+	int lsb			()						{ if (pc_ > 0) { return bb_.lsb(); } else return BBObject::noBit;	}
 
 //bool
 	bool is_empty	() const				{return (pc_ == 0);}
