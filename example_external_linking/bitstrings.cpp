@@ -1,3 +1,9 @@
+/**
+* @file bitstring.cpp
+* @brief Example of how to link to the BITSCAN lib.
+* @details created 26/02/2025
+**/
+
 #include <iostream>
 #include <bitscan/bitscan.h>		//the one and only header file for the BITSCAN 1.0 lib
 

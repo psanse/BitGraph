@@ -1,3 +1,9 @@
+/**
+* @file graph.cpp
+* @brief Example of how to link to GRAPH lib.
+* @details created 01/2025, last updated 26/02/2025
+**/
+
 #include <iostream>
 #include <graph/graph.h>		//the one and only header file for the GRAPH 1.0 lib
 
