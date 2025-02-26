@@ -160,6 +160,7 @@ int Ugraph<T>::max_graph_degree () const {
 
 template<class T>
 double Ugraph<T>::density(bool lazy) {
+
 	BITBOARD max_edges = ptype::NV_;
 	max_edges *= (max_edges - 1);
 	return (2 * number_of_edges(lazy) / static_cast<double> (max_edges));
@@ -338,11 +339,13 @@ int Ugraph<T>::create_complement (Ugraph& ug) const	{
 	//resets ug with new allocation
 	if( ug.reset(ptype::NV_) == -1 ) return -1;
 
-	for( std::size_t i=0; i < ptype::NV_ - 1; i++){
-		for(std::size_t j=i+1; j < ptype::NV_; j++){
+	for( auto i = 0; i < ptype::NV_ - 1; ++i){
+		for(auto j = i + 1; j < ptype::NV_; ++j){
+
 			if(!ptype::adj_[i].is_bit(j)){
 				ug.add_edge(i,j);
 			}
+
 		}
 	}
 
