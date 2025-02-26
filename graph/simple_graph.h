@@ -311,10 +311,28 @@ public:
 // Read / write basic operations
 
 public:
-
+	/**
+	* @brief reads a simple directed unweighted graph in DIMACS format
+	* @returns 0 if correct, -1 in case of error 
+	* @details: does not read weights
+	**/
 	int read_dimacs						(const std::string& filename);	
+
+	/**
+	* @brief reads a graph matrix exchange format (at the moment only MCPS)
+	* @returns 0 if correct, -1 in case of error 
+	**/
 	int read_mtx						(const std::string& filename);
+
+	/**
+	* @brief reads a graph in list of edges format  
+	* @returns 0 if correct, -1 in case of error
+	**/
 	int read_EDGES						(const std::string& filename);
+
+	/**
+	* @brief reads 0-1 adjacency matrix (rows) with a first line indicating |V|
+	**/
 	int read_01							(const std::string& filename);
 
 	/*
@@ -326,8 +344,19 @@ public:
 	*/
 	virtual	void  write_dimacs			(std::ostream& o);
 
+	/**
+	* @brief writes timestamp for dimacs format
+	**/
 	std::ostream& timestamp_dimacs		(std::ostream& o = std::cout) const;
+	
+	/**
+	* @brief writes graph name for dimacs format
+	**/
 	std::ostream& name_dimacs			(std::ostream& o = std::cout) const;
+	
+	/**
+	* @brief writes graph header for dimacs format
+	**/
 	std::ostream& header_dimacs			(std::ostream& o = std::cout, bool lazy = true);
 
 	/*
@@ -338,9 +367,24 @@ virtual	void  write_EDGES				(std::ostream& o);
 
 ////////////
 // I/O basic operations
+	
+	/**
+	* @brief prints basic data of the graph to the output stream (n, m and density)
+	* @param lazy if TRUE, reads the number of edges from the cached value @NE_ to compute density
+	* @details Uses the Template Method Pattern (number_of_edges will be overriden in derived classes)
+	* @details Density can be a heavy operation to compute, since it requires the number of edges. 
+	*		   If  @lazy is TRUE the number of edges is read from the cached value @NE_
+	**/
 	ostream& print_data					(bool lazy = true, std::ostream& = std::cout, bool endl = true);
+	
+	/**
+	* @brief Adjacency matrix to the output stream, in a readable 0-1 format
+	**/
 	ostream& print_adj					(std::ostream& = std::cout, bool endl = true);
 	
+	/**
+	* @brief Edges of the graph to the output stream in format [v]-->[w]
+	**/
 	virtual ostream& print_edges		(std::ostream& = std::cout) const;
 
 	/*
@@ -383,12 +427,15 @@ inline double Graph<T>::density(const bitset_t& bbN) {
 template<class T>
 template<class bitset_t>
 ostream& Graph<T>::print_edges(bitset_t& bbsg, ostream& o) const {
-	/////////////
-	// TODO-optimize
+	
 	for (int i = 0; i < NV_ - 1; i++) {
+
 		if (!bbsg.is_bit(i)) continue;
+
 		for (int j = i + 1; j < NV_; j++) {
+
 			if (!bbsg.is_bit(j)) continue;
+
 			if (is_edge(i, j)) {
 				o << "[" << i << "]" << "-->" << "[" << j << "]" << endl;
 			}

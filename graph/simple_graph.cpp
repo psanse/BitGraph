@@ -223,8 +223,6 @@ Graph<T>& Graph<T>::create_subgraph (std::size_t first_k, Graph<T>& newg) const 
 
 template<class T>
 int Graph<T>::shrink_to_fit(std::size_t size){
-/////////////////////
-// shrinks graph to the size passed (must be less than current size)
 	
 	LOG_WARNING("Shrinking is valid only for sparse graphs - Graph<T>::shrink_to_fit");
 	LOG_WARNING("The graph remains unchanged");
@@ -287,28 +285,21 @@ void Graph<T>::remove_edges() {
 }
 
 template <class T>
-ostream& Graph<T>::print_adj(std::ostream& o, bool add_endl) {
-	////////////////////
-	// prints adjacency 1-0 matrix (vertex weights removed, cannot be here!)
-	//
-	// COMMENTS: vertex weights removed! cannot be  here (28/07/19)
-	//
-	// TODO@ test (3/12/17)
-
-
+ostream& Graph<T>::print_adj(std::ostream& o, bool endofl) {
+	
 	for (int i = 0; i < NV_; i++) {
 		for (int j = 0; j < NV_; j++) {
-			/*if(i==j && m_is_wv){
-				o<<m_wv[i]<<" ";
-			}else*/ if (is_edge(i, j)) {
-				o << "1" << " ";
+			if (is_edge(i, j)) {
+				 o << "1" << " ";
 			}
-			else { o << "0" << " "; }
+			else {
+				o << "0" << " ";
+			}
 		}
 		o << endl;
 	}
 
-	if (add_endl) o << endl;
+	if (endofl) o << endl;
 	return o;
 }
 
@@ -333,19 +324,7 @@ std::ostream& Graph<T>::header_dimacs(std::ostream& o, bool lazy){
 
 template<class T>
 int Graph<T>::read_dimacs(const string& filename){
-/////////////////////////////
-// Reads an unweighted simple directed graph in dimacs format
-// 'c' comment
-// 'p' next numbers in the line are size and number of edges
-// 'e' next in the lines is an edge
-// 
-// RETURN VALUE: 0 if correct, -1 in case of error (no memory allocation)
-//
-// Extension (9/10/16): Will awways attempt to read weights for nodes from 
-//						filename.w file
-//
-// Extension (6/09/17): Reading weights in DIMACS format (n <V> <W(V)>)
-//////////////////////
+
 	
 	int size, nEdges, v1, v2, edges=0;
 	//_wt wv=0.0;
@@ -421,9 +400,9 @@ int Graph<T>::read_dimacs(const string& filename){
 	
 
 	//remaining edges
-	for(int e=0 /*1*/; e<nEdges; e++){
-		f>>c;
-		if(c!='e'){
+	for(int e = 0 /*1*/; e < nEdges; e++){
+		f >> c;
+		if(c != 'e'){
 			LOGG_ERROR(filename, ":wrong header for edges reading DIMACS format");
 			clear();
 			f.close();
@@ -431,7 +410,7 @@ int Graph<T>::read_dimacs(const string& filename){
 		}
 
 		//read and add edge
-		f>>v1>>v2;
+		f >> v1 >> v2;
 #ifdef DIMACS_INDEX_0_FORMAT 
 		add_edge(v1,v2);
 #else
@@ -447,8 +426,9 @@ int Graph<T>::read_dimacs(const string& filename){
 			add_edge(v1-1,v2-1);
 			set_we(v1-1, v2-1, wv);
 		}	*/
-			
-		f.getline(line, 250);  //remove remaining part of the line
+		
+		//removes remaining part of the line
+		f.getline(line, 250);  
 	}
 	f.close();
 	
@@ -456,7 +436,7 @@ int Graph<T>::read_dimacs(const string& filename){
 	set_name(filename);
 
 	//extension for weighted files (9/10/16)
-	string str(filename);					//filename contains the full path
+//	string str(filename);					//filename contains the full path
 
 	//read weights from external files if necessary
 //	if(!m_is_wv){
@@ -479,8 +459,7 @@ int Graph<T>::read_dimacs(const string& filename){
 
 template<class T>
 int Graph<T>::read_01(const string& filename) {
-////////////////////////
-// reads 0-1 adjacency matrix (rows) with a first line indicating n
+
 		
 	int size, val;
 	char ch, line[250]; 
@@ -521,8 +500,7 @@ int Graph<T>::read_01(const string& filename) {
 
 template<class T>
 int  Graph<T>::read_mtx	(const string& filename){
-//////////////////
-// reads matrix exchange format (at the moment only MCPS)
+
 
 	MMI<Graph<T> > myreader(*this);
 	return (myreader.read(filename));
@@ -530,8 +508,6 @@ int  Graph<T>::read_mtx	(const string& filename){
 
 template<class T>
 int  Graph<T>::read_EDGES (const string& filename){
-//////////////////
-// reads matrix exchange format (at the moment only MCPS)
 
 	EDGES<Graph<T> > myreader(filename, *this);
 	return (myreader.read());
@@ -539,8 +515,6 @@ int  Graph<T>::read_EDGES (const string& filename){
 
 template<class T>
 ostream& Graph<T>::print_data( bool lazy, std::ostream& o, bool endl) {
-
-	//Uses the Template Method Pattern (number_of_edges is overriden)
 
 	if (!name_.empty()) { o << name_.c_str() << '\t'; }
 
@@ -562,10 +536,10 @@ ostream& Graph<T>::print_edges (std::ostream& o) const{
 	for(int i=0; i<NV_-1; i++){
 		for(int j=i+1; j<NV_; j++){
 			if(is_edge(i,j)){
-				o<<"["<<i<<"]"<<"-->"<<"["<<j<<"]"<<endl;
+				o<< "[" << i << "]" << "-->" << "[" << j << "]" << endl;
 			}
 			if(is_edge(j,i)){
-				o<<"["<<j<<"]"<<"-->"<<"["<<i<<"]"<<endl;
+				o << "[" << j << "]" << "-->" << "[" << i << "]" <<endl;
 			}
 		}
 	}
