@@ -175,9 +175,11 @@ ostream& Ugraph<T>::print_degrees (std::ostream& o) const {
 
 
 template<class T>
-ostream& Ugraph<T>::print_edges (std::ostream& o) const{
-	for(auto i = 0; i< ptype::NV_ - 1; ++i){
+ostream& Ugraph<T>::print_edges (std::ostream& o) {
+
+	for(auto i = 0; i < ptype::NV_ - 1; ++i){
 		for(auto j = i + 1; j< ptype::NV_; ++j){
+
 			if(ptype::is_edge(i, j)){
 				o << "["<<i<<"]" << "--" << "[" << j << "]" << endl;
 			}
@@ -237,7 +239,7 @@ void Ugraph<T>::write_dimacs (ostream & o)  {
 }
 
 template<class T>
-void  Ugraph<T>::write_EDGES (ostream& o){
+void  Ugraph<T>::write_EDGES (ostream& o) {
 
 	//timestamp comment
 	o << "% File written by GRAPH:" << PrecisionTimer::local_timestamp();

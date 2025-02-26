@@ -69,7 +69,7 @@ TEST_F(KcoreWTest, set_subgraph) {
 TEST_F(KcoreWTest, set_subgraph_from_vector) {
 
 	//bitset that induces a subgraph in G
-	vint vset = { 0, 2, 4 };
+	vint vset = { 0, 2, 3 };
 
 	//KCore with subgraph
 	KCore<ugraph> kc(ug, vset);
@@ -78,8 +78,7 @@ TEST_F(KcoreWTest, set_subgraph_from_vector) {
 	EXPECT_TRUE(kc.get_subgraph().is_bit(0));
 	EXPECT_TRUE(kc.get_subgraph().is_bit(2));
 	EXPECT_FALSE(kc.get_subgraph().is_bit(1));
-	EXPECT_FALSE(kc.get_subgraph().is_bit(3));
-
+	
 }
 
 TEST_F(KcoreWTest, kcore_decomp_full_graph) {

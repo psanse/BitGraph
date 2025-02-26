@@ -17,6 +17,7 @@
 using namespace std;
 
 
+
 TEST(Graph_sparse, max_subgraph_degree) {
 	
 	const int NV = 100;
@@ -343,7 +344,6 @@ TEST(Ugraph_sparse,ugraph_from_file){
 }
 
 
-
 ///////////////////////////
 // 
 // DISABLED TESTS -
@@ -410,4 +410,19 @@ TEST(Ugraph_sparse, DISABLED_adjacency_matrix){
 		}
 	}
 }
+TEST(Graph_sparse, DISABLED_print_edges) {
+	//not formulated as a real test, just visual inspection
+	const int NV = 100;
 
+	sparse_ugraph g(NV);
+	g.add_edge(0, 1);
+	g.add_edge(1, 2);
+	g.add_edge(1, 3);
+	g.add_edge(2, 3);
+	g.add_edge(78, 79);
+	g.add_edge(79, 80);
+
+	//I/O 
+	g.print_edges();
+
+}

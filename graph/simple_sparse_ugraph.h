@@ -192,7 +192,30 @@ void Ugraph<sparse_bitarray>::write_dimacs(ostream& o) {
 
 template<>
 inline
-void Ugraph<sparse_bitarray>::write_EDGES(ostream& o) {
+ostream& Ugraph<sparse_bitarray>::print_edges (std::ostream& o)  {
+
+	for (auto v = 0; v < this->NV_ - 1; ++v) {
+	
+		//skip empty bitsets - must be since currently the scanning object does not check this
+		if (adj_[v].is_empty()) { continue; }
+
+		//scan the bitstring of v
+		int w = BBObject::noBit;
+		sparse_bitarray::scan sc(adj_[v]);
+		while ((w = sc.next_bit()) != BBObject::noBit) {
+			if (v < w) {
+				o << "[" << v << "]" << "-->" << "[" << w + WMUL(sc.get_block()) << "]" << std::endl;
+			}
+		}
+	}
+
+	return o;
+}
+
+
+template<>
+inline
+void Ugraph<sparse_bitarray>::write_EDGES(ostream& o)  {
 	/////////////////////////
 	// writes simple unweighted grafs  in edge list format 
 	// note: loops are not allowed

@@ -363,7 +363,7 @@ public:
 	* @brief writes directed graph in edge list format
 	* @param o output stream
 	*/
-virtual	void  write_EDGES				(std::ostream& o);
+virtual	void  write_EDGES				(std::ostream& o) ;
 
 ////////////
 // I/O basic operations
@@ -380,12 +380,12 @@ virtual	void  write_EDGES				(std::ostream& o);
 	/**
 	* @brief Adjacency matrix to the output stream, in a readable 0-1 format
 	**/
-	ostream& print_adj					(std::ostream& = std::cout, bool endl = true);
+	ostream& print_adj					(std::ostream& = std::cout, bool endl = true) const;
 	
 	/**
 	* @brief Edges of the graph to the output stream in format [v]-->[w]
 	**/
-	virtual ostream& print_edges		(std::ostream& = std::cout) const;
+	virtual ostream& print_edges		(std::ostream& = std::cout) ;
 
 	/*
 	* @brief Edges of the subgraph induced by a set of vertices to output stream

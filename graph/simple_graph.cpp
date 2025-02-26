@@ -285,7 +285,7 @@ void Graph<T>::remove_edges() {
 }
 
 template <class T>
-ostream& Graph<T>::print_adj(std::ostream& o, bool endofl) {
+ostream& Graph<T>::print_adj(std::ostream& o, bool endofl) const {
 	
 	for (int i = 0; i < NV_; i++) {
 		for (int j = 0; j < NV_; j++) {
@@ -532,15 +532,18 @@ ostream& Graph<T>::print_data( bool lazy, std::ostream& o, bool endl) {
 
 template<class T>
 
-ostream& Graph<T>::print_edges (std::ostream& o) const{
-	for(int i=0; i<NV_-1; i++){
-		for(int j=i+1; j<NV_; j++){
+ostream& Graph<T>::print_edges (std::ostream& o) {
+
+	for(auto i = 0; i < NV_-1; ++i){
+		for(auto j = i + 1; j < NV_; ++j){
+
 			if(is_edge(i,j)){
 				o<< "[" << i << "]" << "-->" << "[" << j << "]" << endl;
 			}
 			if(is_edge(j,i)){
 				o << "[" << j << "]" << "-->" << "[" << i << "]" <<endl;
 			}
+
 		}
 	}
 	return o;
@@ -758,7 +761,7 @@ void Graph<T>::write_dimacs ( ostream& o)  {
 }
 
 template<class T>
-void  Graph<T>::write_EDGES	(ostream& o){
+void  Graph<T>::write_EDGES	(ostream& o)   {
 
 	//timestamp comment
 	o << "% File written by GRAPH:" << PrecisionTimer::local_timestamp();
