@@ -519,9 +519,9 @@ ostream& Graph<T>::print_data( bool lazy, std::ostream& o, bool endl) {
 	if (!name_.empty()) { o << name_.c_str() << '\t'; }
 
 	////////////////////////////////////////////////////////////////
-	o	<< number_of_vertices() << "\t" 
-		<< std::fixed << number_of_edges (lazy)	<< "\t"
-		<< std::setprecision(3) << density(true);		
+	o	<< "n= " << number_of_vertices() << "\t"
+		<< std::fixed << "m= "<< number_of_edges(lazy) << "\t"
+		<< std::setprecision(3) << "p= "<< density(true);
 	////////////////////////////////////////////////////////////////
 
 	/*Note: lazy comp. of density since the number of edges have already been computed previously */

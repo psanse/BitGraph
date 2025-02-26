@@ -37,7 +37,7 @@ protected:
 };
 
 TEST_F(GraphTest, constructor) {
-	
+
 	EXPECT_EQ(6, g.number_of_vertices());
 	EXPECT_EQ(4, g.number_of_edges(false));
 	EXPECT_EQ(6, g.number_of_vertices());
