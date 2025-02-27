@@ -4,9 +4,6 @@
   *		   includes namespace bbalg at the end with a few algorithms
   * @author pss
   * @details created 2017, last_update 27/02/2025
-  * 
-  * 
-  * TODO refactor and test (15/02/2025)
   **/
 
 #ifndef  _BBALG_H_
@@ -27,7 +24,7 @@ using bbo = BBObject;
 // 
 // bbSize_t class
 // 
-// A simple wrapper for any type of bitset of the BBObject hierarchy with CACHED size 
+// A very simple wrapper for any type of bitset of the BBObject hierarchy with CACHED size 
 // 
 ///////////////////////
 template <class BitSet_t>
@@ -112,9 +109,9 @@ ostream& bbSize_t<BitSet_t>::print(ostream& o = cout, bool show_pc = true, bool 
 // 
 // bbStack_t class	 
 // 
-// @brief: composite vector / bitset with stack interface
+// @brief: a very simple wrapper for a composite vector / bitset with stack interface
 // 
-// @details: created 28/13/17, refactored 27/01/2025)
+// @details: created 28/13/17, refactored 27/01/2025
 // 
 //////////////////////
 
@@ -175,10 +172,8 @@ bbStack_t& operator =	(const bbStack_t& rhs) noexcept	= delete;
 // 
 // bbCol_t class 
 // 
-// @brief Array of bitsets with raw pointers - CHECK if they are still needed (27/02/2025)
-// @details: created 9/8/17 for MWCP upper bound computation
-// 
-// TODO - remove/refactor/rename (27/02/2025)
+// @brief  a very simple wrapper for a collection of bitsets of a fixed size
+// @details: created 9/8/17 for MWCP upper bound computation, refactored 27/02/2025
 // 
 ///////////////////////
 
@@ -215,15 +210,15 @@ struct bbCol_t {
 	int capacity			()												{ return SIZE; }
 
 //basic operations
-	BitSet& set_bit		(int bitsetID, int bit)								{return std::ref((bb_[bitsetID].set_bit(bit))); }
+	BitSet& set_bit			(int bitsetID, int bit)								{return std::ref((bb_[bitsetID].set_bit(bit))); }
 
 	/**
 	* @brief sets the bit in the position pos of the bitset at bitsetID 
 	*		 in the collection
 	* @param bitsetID: the position of the bitset in the array
 	* @param bit: the bit to set
-	* @param is_first_bit: true if the bit is the first bit of the bitset
-	* @returns 0 if OK, -1 if error
+	* @param is_first_bit: true if bit is now the first bit of the bitset
+	* @returns a reference to the bitset modified 
 	**/
 	BitSet& set_bit			(int bitsetID, int bit, bool& is_first_bit);
 	
@@ -250,10 +245,16 @@ struct bbCol_t {
 };
 
 template <class BitSet_t, int SIZE>
-BitSet& set_bit(int bitsetID, int bit, bool& is_first_bit) {
+BitSet& bbCol_t<BitSet_t, SIZE>::set_bit(int bitsetID, int bit, bool& is_first_bit) {
 
-	is_first_bit = (bit == bb_[bitsetID].lsbn64());
-	return 	std::ref(bb_[bitsetID].set_bit(bit));
+	//adds bit
+	bb_[bitsetID].set_bit(bit);
+
+	//checks if the bit added is the first bit of the bitset
+	is_first_bit = (bit == bb_[bitsetID].lsb());
+
+	//returns a reference to the modified bitset
+	return 	std::ref(bb_[bitsetID]);
 }
 
 

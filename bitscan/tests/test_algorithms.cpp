@@ -257,8 +257,7 @@ TEST_F(StackClassTest, basic_operations){
 	EXPECT_EQ(false, bbs.is_sync());
 
 	bbs.sync_stack();
-	EXPECT_EQ(2, bbs.size());
-	
+	EXPECT_EQ(2, bbs.size());	
 }
 
 TEST(bbCol_tClass, basic){
@@ -267,7 +266,7 @@ TEST(bbCol_tClass, basic){
 	bbc.set_bit(0,10);
 	bbc.set_bit(0,64);
 	bbc.set_bit(0,65);
-	(bbc.set_bit(9,10)).size();
+	bbc.set_bit(9,10);
 	bbc.set_bit(9,20);
 	bbc.set_bit(9,30);
 	
@@ -287,6 +286,14 @@ TEST(bbCol_tClass, basic){
 	
 	EXPECT_TRUE(bbc.is_bit(0,10));
 	EXPECT_EQ(20, bbc.capacity());
+
+	//set bit with first bit info
+	bool isFirstBit = BBObject::noBit;
+	bbc.set_bit(0, 1, isFirstBit);
+
+	EXPECT_TRUE(bbc.is_bit(0, 1));
+	EXPECT_TRUE(isFirstBit);
+	EXPECT_FALSE(bbc.is_bit(0, 0));		//not set, since 1 is the first bit
 	
 }
 
