@@ -261,38 +261,37 @@ TEST_F(StackClassTest, basic_operations){
 	
 }
 
-TEST(bba_t, basic){
+TEST(bbCol_tClass, basic){
 	
-	bba_t<BBScan> b;		
-	b.init(10, 65);
-	b.set_bit(0,10);
-	b.set_bit(0,64);
-	b.set_bit(0,65);
-	b.set_bit(9,10);
-	b.set_bit(9,20);
-	b.set_bit(9,30);
+	bbCol_t<BBScan, 20> bbc(130);		
+	bbc.set_bit(0,10);
+	bbc.set_bit(0,64);
+	bbc.set_bit(0,65);
+	(bbc.set_bit(9,10)).size();
+	bbc.set_bit(9,20);
+	bbc.set_bit(9,30);
 	
-	EXPECT_TRUE(b.is_bit(0,10));
-	EXPECT_TRUE(b.is_bit(0,64));
-	EXPECT_TRUE(b.is_bit(9,10));
-	EXPECT_TRUE(b.is_bit(9,30));
-	EXPECT_FALSE(b.is_bit(9,31));
+	EXPECT_TRUE(bbc.is_bit(0,10));
+	EXPECT_TRUE(bbc.is_bit(0,64));
+	EXPECT_TRUE(bbc.is_bit(9,10));
+	EXPECT_TRUE(bbc.is_bit(9,30));
+	EXPECT_FALSE(bbc.is_bit(9,31));
 
-	EXPECT_EQ(3,b.popcn(0));
-	EXPECT_EQ(3,b.popcn(9));
-	EXPECT_NE(3,b.popcn(8));
+	EXPECT_EQ(3, bbc.size(0));
+	EXPECT_EQ(3, bbc.size(9));
+	EXPECT_NE(3, bbc.size(8));
 
 	//reuse
-	b.init(1, 65);
-	b.set_bit(0,10);
+	bbc.reset(25);
+	bbc.set_bit(0,10);
 	
-	EXPECT_TRUE(b.is_bit(0,10));
-	EXPECT_EQ(1, b.capacity);
+	EXPECT_TRUE(bbc.is_bit(0,10));
+	EXPECT_EQ(20, bbc.capacity());
 	
 }
 
-TEST(k_bits, basic){
-//date: 18/8/17 during MWCP upper bound computation
+TEST(algorithms, k_bits){
+//used in BBMWCP for upper bound computation
 	
 	BBScan bb(100);	
 	bb.set_bit(10);
@@ -301,7 +300,7 @@ TEST(k_bits, basic){
 	
 	//solution in vector
 	vint bits (3,-1);
-	first_k_bits(3,bb,bits);			
+	bbalg::first_k_bits(3,bb,bits);			
 
 	vint sol;
 	sol.push_back(10); sol.push_back(64); sol.push_back(65);
@@ -309,8 +308,19 @@ TEST(k_bits, basic){
 
 	//solution in a classical C-array
 	int cbits[3]; vint vbits;
-	first_k_bits(3,bb, cbits);	
+	bbalg::first_k_bits(3,bb, cbits);
 	copy(cbits, cbits+3,back_inserter(vbits));
 	EXPECT_EQ(sol, vbits);
 	
 }
+
+TEST(algorithms, random_bitblock) {
+	
+	//10% of density	
+	BITBOARD bb = bbalg::gen_random_bitblock(0.5);
+
+	//around 30 bits
+	EXPECT_GE(bblock::size(bb), 20);
+
+}
+

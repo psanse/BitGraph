@@ -1,8 +1,10 @@
  /**
   * @file bbalgorithm.h
   * @brief header for the algorithms and data structures for bitstrings and bitblocks
+  *		   includes namespace bbalg at the end with a few algorithms
   * @author pss
   * @details created 2017, last_update 27/02/2025
+  * 
   * 
   * TODO refactor and test (15/02/2025)
   **/
@@ -13,6 +15,8 @@
 #include "utils/common.h"
 #include "utils/logger.h"
 #include "bitscan/bbset.h"
+#include <array>
+#include <functional>
 
 using namespace std;
 
@@ -167,76 +171,101 @@ bbStack_t& operator =	(const bbStack_t& rhs) noexcept	= delete;
 
 }; //end bbStack_t class
 
-
 //////////////////////
 // 
-// bba_t class... (created 9/8/17 for MWCP upper bound computation)
+// bbCol_t class 
 // 
-// Array of bitsets with raw pointers - CHECK if they are still needed (27/02/2025)
+// @brief Array of bitsets with raw pointers - CHECK if they are still needed (27/02/2025)
+// @details: created 9/8/17 for MWCP upper bound computation
 // 
-// TODO - remove/refactor
+// TODO - remove/refactor/rename (27/02/2025)
 // 
 ///////////////////////
 
-template <class BitSet_t>
-struct bba_t{
-/////////////////
-//simple ADT for an array of bitstrings (without size information)
-	int capacity;													/* remains fixed */
-	BitSet_t* pbb;
+template <class BitSet_t, int SIZE>
+struct bbCol_t {
+
+	using basic_type = BitSet_t;
+	using type = bbCol_t<BitSet_t, SIZE>;
+
+//contructors / destructors
+	bbCol_t	(int popCount) {
+		reset(popCount);		
+	}
+
+	//TODO move and copy semantics...
+
+//allocation
+	void reset(int popCount) {
+		try {
+			for (int i = 0; i < SIZE; i++) {
+				bb_[i].reset(popCount);
+			}
+		}
+		catch (exception& e) {
+			LOG_ERROR(e.what());
+			LOG_ERROR("bbCol_t::bbCol_t()");
+			std::exit(-1);
+		}
+	}
+
+//setters and getters
+	int number_of_bitblocks	(int bitsetID)									{ return bb_[bitsetID].number_of_bitblocks(); }
+	int size				(int bitsetID)									{ return bb_[bitsetID].size(); }
+	int capacity			()												{ return SIZE; }
+
+//basic operations
+	BitSet& set_bit		(int bitsetID, int bit)								{return std::ref((bb_[bitsetID].set_bit(bit))); }
+
+	/**
+	* @brief sets the bit in the position pos of the bitset at bitsetID 
+	*		 in the collection
+	* @param bitsetID: the position of the bitset in the array
+	* @param bit: the bit to set
+	* @param is_first_bit: true if the bit is the first bit of the bitset
+	* @returns 0 if OK, -1 if error
+	**/
+	BitSet& set_bit			(int bitsetID, int bit, bool& is_first_bit);
 	
-	bba_t():capacity(0), pbb(NULL){}
-	~bba_t(){clear();}
-	void init(int capacity, int pc);
-	void clear()						{if(pbb){ delete [] pbb; pbb=NULL; capacity=0;}}
+	BitSet& erase_bit		(int bitsetID, int bit)								{ return std::ref((bb_[bitsetID].erase_bit(bit))); }
+	
+	/**
+	* @brief clears all 1-bits in the bitset bb_[bitsetID]
+	**/
+	BitSet& erase_bit			(int bitsetID)									{ return std::ref((bb_[bitsetID].erase_bit())); }
 
-	void set_bit(int pos, int bit)							{pbb[pos].set_bit(bit);}
-	void set_bit(int pos, int bit, bool& is_first_bit)		{pbb[pos].set_bit(bit);  is_first_bit=(bit==pbb[pos].lsbn64());}
-	void erase_bit(int pos, int bit)						{pbb[pos].erase_bit(bit);}
-	void erase_bit(int pos)									{pbb[pos].erase_bit();}
-	void erase_bit();					
-	int popcn(int pos)										{return pbb[pos].size();}
-	bool is_bit(int pos, int bit)							{return pbb[pos].is_bit(bit);}
+//bool
+	bool is_bit				(int pos, int bit)								{ return bb_[pos].is_bit(bit); }
 
-	int get_number_of_bitblocks()							{return pbb[0].number_of_bitblocks();}
 
-	//I/O
-	ostream& print(ostream& o=cout) const;		
+//I/O
+	ostream& print			(ostream& o = cout, bool show_pc = true, bool eofl = true)	 const;
+	//TODO... others
+
+
+/////////////
+// data members
+	static const int capacity_ = SIZE;
+	std::array<BitSet_t, SIZE> bb_;
 };
 
-template <class BitSet_t>
-void bba_t<BitSet_t>::erase_bit(){
-	for(int pos = 0; pos<capacity; pos++){
-		pbb[pos].erase_bit();
-	}
+template <class BitSet_t, int SIZE>
+BitSet& set_bit(int bitsetID, int bit, bool& is_first_bit) {
+
+	is_first_bit = (bit == bb_[bitsetID].lsbn64());
+	return 	std::ref(bb_[bitsetID].set_bit(bit));
 }
 
-template <class BitSet_t>
-inline
-ostream& bba_t<BitSet_t>::print(ostream& o) const{
-	for(int i=0; i<capacity; i++){
-		if(!pbb[i].is_empty()){
-			pbb[i].print(o);
-			o<<endl;
+
+template <class BitSet_t, int SIZE>
+ostream& bbCol_t<BitSet_t, SIZE>::print(ostream& o, bool show_pc, bool eofl)  const{
+	for(auto i = 0; i < bb_.size(); ++i){
+		if(!bb_[i].is_empty()){
+			bb_[i].print(o,  showpc, true);
 		}
 	}
+	if (eofl) { o << endl; }
 	return o;
-}
-
-template <class BitSet_t>
-inline
-void bba_t<BitSet_t>::init(int capacity, int pc){
-	clear();
-	try{
-		this->capacity=capacity;
-		pbb=new BitSet_t[capacity];
-		for(int i=0; i<capacity; i++){
-			pbb[i].init(pc);
-		}
-	}catch(exception& e){
-		LOG_ERROR("bba_t<BitSet_t>::-init()");
-		e.what();
-	}
 }
 
 template <class BitSet_t>
@@ -306,49 +335,6 @@ void bbStack_t<BitSet_t>::sync_stack(){
 
 }
 
-inline std::vector<int> to_vector(const BitSet& bbn){
-	vector<int> res;
-
-	int v=EMPTY_ELEM;
-	while(1){
-		if((v=bbn.next_bit(v))==EMPTY_ELEM)
-			break;
-		res.push_back(v);
-	}
-return res;
-}
-
-inline BITBOARD gen_random_bitboard(double p){
-//generates a random BITBOARD with density p of 1-bits
-	BITBOARD bb=0;
-	for(int i=0; i<WORD_SIZE; i++){
-		if(com::rand::uniform_dist(p)){
-			bb|=Tables::mask[i];
-		}
-	}
-return bb;
-}
-
-
-template<class BitSet_t, class array_t>
-inline
-int first_k_bits (int k, BitSet_t &bb, array_t &lv){
-///////////////////
-// Computes the first 3 nodes of color set 'col' in 'lv'
-//
-// RETURNS the number of bits read [0..k]
-//
-// TODO-change to BITSCAN and extend for k nodes
-
-	bb.init_scan(bbo::NON_DESTRUCTIVE);
-	int POINTER=0;
-	while(true){
-		lv[POINTER]=bb.next_bit();
-		if(lv[POINTER]==EMPTY_ELEM || ++POINTER==k) break;
-	}
-	return POINTER;
-}
-
 template <class BitSet_t>
 void  bbStack_t<BitSet_t>::reset(int MAX_SIZE) {
 
@@ -400,29 +386,81 @@ void bbStack_t<BitSet_t>::erase_bit() {
 	}	
 }				
 
+///////////////////////
+//
+// Stateless functions for BitSets
+// (namespace bbalg)
+//
+//////////////////////
 
+namespace bbalg {
+	inline std::vector<int> to_vector(const BitSet& bbn) {
+		vector<int> res;
 
+		int v = EMPTY_ELEM;
+		while (1) {
+			if ((v = bbn.next_bit(v)) == EMPTY_ELEM)
+				break;
+			res.push_back(v);
+		}
+		return res;
+	}
 
-//inline BITBOARD get_first_k_bits(BITBOARD bb,  BYTE k /*1-64*/){
-////////////////////////////////////
-//// Returns BITBOARD of first k bits to 1 or 0 if k-bits to 1 could not be found
-//
-//	BITBOARD bb_aux, res=0;
-//	int cont=0;
-//
-//	//control
-//	if(k<1 || k>64) return 0;
-//
-//	while(bb){
-//		bb_aux= bb & (-bb);	/*00..010..0*/
-//		res |= bb_aux;
-//		if(++cont==k) break;
-//	
-//	bb ^= bb_aux;
-//	}
-//
-//return (cont==k)? res: 0;
-//}
+	/**
+	* @brief generates a random BITBOARD with density p of 1-bits
+	**/
+	inline BITBOARD gen_random_bitblock (double p) {
+		
+		BITBOARD bb = 0;
+
+		for (auto i = 0; i < WORD_SIZE; i++) {
+			if (com::rand::uniform_dist(p)) {
+				bb |= Tables::mask[i];
+			}
+		}
+		return bb;
+	}
+
+	template<class BitSet_t, class array_t>
+	inline
+		int first_k_bits(int k, BitSet_t& bb, array_t& lv) {
+		///////////////////
+		// Computes the first 3 nodes of color set 'col' in 'lv'
+		//
+		// RETURNS the number of bits read [0..k]
+		//
+		// TODO-change to BITSCAN and extend for k nodes
+
+		bb.init_scan(bbo::NON_DESTRUCTIVE);
+		int POINTER = 0;
+		while (true) {
+			lv[POINTER] = bb.next_bit();
+			if (lv[POINTER] == EMPTY_ELEM || ++POINTER == k) break;
+		}
+		return POINTER;
+	}
+
+	//inline BITBOARD get_first_k_bits(BITBOARD bb,  BYTE k /*1-64*/){
+	////////////////////////////////////
+	//// Returns BITBOARD of first k bits to 1 or 0 if k-bits to 1 could not be found
+	//
+	//	BITBOARD bb_aux, res=0;
+	//	int cont=0;
+	//
+	//	//control
+	//	if(k<1 || k>64) return 0;
+	//
+	//	while(bb){
+	//		bb_aux= bb & (-bb);	/*00..010..0*/
+	//		res |= bb_aux;
+	//		if(++cont==k) break;
+	//	
+	//	bb ^= bb_aux;
+	//	}
+	//
+	//return (cont==k)? res: 0;
+	//}
+}
 
 
 

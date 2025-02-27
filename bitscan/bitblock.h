@@ -396,7 +396,10 @@ namespace bblock {
 
 	}
 
-
+	//alias for population count	
+	inline
+	int size(const BITBOARD bb_dato) { return popc64(bb_dato); }	
+	
 	inline
 	int lsb64_de_Bruijn(const BITBOARD bb_dato) {
 
