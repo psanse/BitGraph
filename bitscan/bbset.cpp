@@ -80,7 +80,7 @@ BitSet::BitSet(int popsize) :
 {
 	
 	try {
-		vBB_.resize(nBB_, 0);
+		vBB_.assign(nBB_, 0);
 	}
 	catch (...) {
 		LOG_ERROR("Error during construction - BitSet::BitSet");
@@ -95,7 +95,7 @@ BitSet::BitSet(const vint& v):
 {
 	try {
 		nBB_ = INDEX_0TO1(*(max_element(v.begin(), v.end())));
-		vBB_.resize(nBB_, 0);
+		vBB_.assign(nBB_, 0);
 
 		for (auto& bit : v) {
 
@@ -119,7 +119,7 @@ BitSet::BitSet (int popsize, const vint& lv):
 {
 
 	try {
-		vBB_.resize(nBB_, 0);
+		vBB_.assign(nBB_, 0);
 		
 		//sets bit conveniently
 		for (auto& bit : lv) {

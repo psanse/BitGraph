@@ -39,6 +39,26 @@ protected:
 	bbSize_t<BBScanSp> bbs;
 };
 
+class StackClassTest : public ::testing::Test {
+protected:
+	StackClassTest() : bb(NV), bbs(NV) {}
+	void SetUp() override {
+		bb.push(10);
+		bb.push(64);
+		bb.push(65);
+
+		bbs.push(10);
+		bbs.push(64);
+		bbs.push(65);
+	}
+	void TearDown() override {}
+
+	//undirected graph instance	
+	const int NV = 65;
+	sbb_t<BBScan> bb;												//undirected graph with integer weights
+	sbb_t<BBScanSp> bbs;
+};
+
 TEST_F(bbSizeClassTest, pop_msb) {
 	
 	//pop_msb non-sparse
@@ -199,28 +219,45 @@ TEST_F(bbSizeClassTest, lazy_bit_erase) {
 
 }
 
-TEST(stack_type, basic){
+TEST_F(StackClassTest, DISABLED_copy_construction) {
 	
-	sbb_t<BBScan> s;
-	s.init(65);
-	s.push(10);
-	s.push(64);
-	s.push(65);
+	//cannot copy
 
-	EXPECT_EQ(3, s.get_size());
-	EXPECT_EQ(true, s.is_synchro());
-	//s.print();
+	//not valid move semantics	
+
+}
+
+TEST_F(StackClassTest, basic_operations){
+	
+	//non-sparse
+	EXPECT_EQ(3, bb.size());
+	EXPECT_EQ(true, bb.is_sync());
+	
+	//does not increase size
+	bb.push(65);
+	EXPECT_EQ(3, bb.size());
+	EXPECT_EQ(true, bb.is_sync());
+
+	bb.bb_.erase_bit(65);
+	EXPECT_EQ(false, bb.is_sync());
+	
+	bb.sync_stack();
+	EXPECT_EQ(2, bb.size());
+
+	//sparse
+	EXPECT_EQ(3, bbs.size());
+	EXPECT_EQ(true, bbs.is_sync());
 
 	//does not increase size
-	s.push(65);
-	EXPECT_EQ(3, s.get_size());
-	EXPECT_EQ(true, s.is_synchro());
+	bbs.push(65);
+	EXPECT_EQ(3, bbs.size());
+	EXPECT_EQ(true, bbs.is_sync());
 
-	s.bb.erase_bit(65);
-	EXPECT_EQ(false, s.is_synchro());
-	
-	s.update_stack();
-	EXPECT_EQ(2, s.get_size());
+	bbs.bb_.erase_bit(65);
+	EXPECT_EQ(false, bbs.is_sync());
+
+	bbs.sync_stack();
+	EXPECT_EQ(2, bbs.size());
 	
 }
 

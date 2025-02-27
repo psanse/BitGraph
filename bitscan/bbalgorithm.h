@@ -106,7 +106,69 @@ ostream& bbSize_t<BitSet_t>::print(ostream& o = cout, bool show_pc = true, bool 
 
 //////////////////////
 // 
-// sbb_t class
+// sbb_t class	 
+// (created 28/13/17 - stack state semantics with bitsets)
+// Not very clear the utility of such class
+// 
+//////////////////////
+
+template <class BitSet_t>
+struct sbb_t{
+
+	enum type_t {STACK=0, BITSTRING};
+
+//construction / destruction
+	sbb_t			(int MAX_SIZE);
+	sbb_t			(): pc_(0), stack_(nullptr)	{}
+	
+	//move and copy semantics - copy and move semantics forbidden
+	sbb_t			(const sbb_t& rhs)			= delete;
+sbb_t& operator =	(const sbb_t& rhs) noexcept	= delete;
+
+	~sbb_t			()							{ delete stack_;}
+
+//allocation
+
+	void reset		(int MAX_SIZE);
+
+//setters and getters
+	int  size		()							{ return pc_; }
+
+//stack
+	void push		(int elem);
+	int pop			();
+
+//basic operations
+
+	//clears bits from bitset according to stack
+	void erase_bit	();
+
+	//synchro stack according to bitset
+	void sync_stack	();		
+
+	//synchro bitset according to stack
+	void sync_bb	();																	
+
+//boolean
+	/* may occur if data is manipulated directly */
+	bool is_sync		();										
+	bool is_empty		()			{return (pc_ ==0);}
+	
+//I/O
+	ostream& print		(type_t t=STACK, ostream& o= cout);
+
+/////////////////
+// data members
+
+	BITBOARD pc_;		//number of bits in stack
+	BitSet_t bb_;
+	int* stack_;
+
+}; //end struct sbb_t
+
+
+//////////////////////
+// 
 // bba_t class... (created 9/8/17 for MWCP upper bound computation)
 // 
 // Wrappers with raw pointers - CHECK if they are still needed (27/02/2025)
@@ -114,37 +176,6 @@ ostream& bbSize_t<BitSet_t>::print(ostream& o = cout, bool show_pc = true, bool 
 // TODO - remove/refactor
 // 
 ///////////////////////
-
-template <class BitSet_t>
-struct sbb_t{
-////////////////////
-// stack-state with bitstrings
-//
-// date_of_creation: 28/3/17
-
-	enum type_t {STACK=0, BITSTRING};
-
-	int* stack;
-	int size;
-	BitSet_t bb;
-
-	sbb_t(int MAX_SIZE){init(MAX_SIZE);}	
-	sbb_t():size(-1), stack(NULL){}		
-	~sbb_t(){if(stack) delete stack; stack=NULL;}
-
-	void init(int MAX_SIZE){bb.init(MAX_SIZE); size=0; stack=new int[MAX_SIZE]; for(int i=0; i<MAX_SIZE; i++) stack[i]=0;}
-	void push(int elem) {if(!bb.is_bit(elem)){bb.set_bit(elem); stack[size++]=elem;}}
-	int pop(){if(size>0) {int elem=stack[--size]; bb.erase_bit(elem); return elem;} else return -1;}
-	
-	void erase(){for(int i=0; i<size; i++) bb.erase_bit(stack[i]); size=0;}				//clears all bit O(SIZE) operation
-	void update_stack();																//synchro according to bitset
-	void update_bb();																	//synchro according to stack
-	bool is_synchro();																	/* may occur if data is manipulated directly */
-	bool is_empty(){return (size==0);}
-	int  get_size(){return size;}
-
-	ostream& print(type_t t=STACK, ostream& o= cout);
-};
 
 template <class BitSet_t>
 struct bba_t{
@@ -233,14 +264,14 @@ ostream& sbb_t<BitSet_t>::print(type_t t, ostream& o){
 
 template <class BitSet_t>
 inline
-bool sbb_t<BitSet_t>::is_synchro(){
+bool sbb_t<BitSet_t>::is_sync(){
 //checks if the contents is the same in STACK and BB
 	
-	int pc=bb.size();
-	if(pc!=size) return false;
+	int pc = bb_.size();
+	if(pc != pc_) return false;
 
-	for(int i=0; i<size; i++){
-		if(!bb.is_bit(stack[i])) return false;
+	for(int i=0; i<pc_; i++){
+		if(!bb_.is_bit(stack_[i])) return false;
 	}
 	
 	return true;
@@ -248,24 +279,30 @@ bool sbb_t<BitSet_t>::is_synchro(){
 
 template <class BitSet_t>
 inline
-void sbb_t<BitSet_t>::update_bb(){
-	bb.erase_bit();
-	for(int i=0; i<size; i++){
-		bb.set_bit(stack[i]);
+void sbb_t<BitSet_t>::sync_bb(){
+
+	bb_.erase_bit();
+	for(auto i = 0; i < pc_; i++){
+		bb_.set_bit(stack_[i]);
 	}
 }
 
 template <class BitSet_t>
 inline
-void sbb_t<BitSet_t>::update_stack(){
-	size=0;
-	bb.init_scan(BBObject::NON_DESTRUCTIVE);
-	while(true){
-		int v=bb.next_bit();
-		if(v==EMPTY_ELEM) break;
+void sbb_t<BitSet_t>::sync_stack(){
 
-		stack[size++]=v;
+	//cleans stack
+	pc_ = 0;
+	
+	//bitscanning with nested data structure
+	BitSet_t::scan sc(bb_);
+	if (sc.init_scan() != -1) {
+		int bit = BBObject::noBit;
+		while ( (bit = bb_.next_bit()) != BBObject::noBit ) {
+			stack_[pc_++] = bit;
+		}
 	}
+
 }
 
 inline std::vector<int> to_vector(const BitSet& bbn){
@@ -310,6 +347,91 @@ int first_k_bits (int k, BitSet_t &bb, array_t &lv){
 	}
 	return POINTER;
 }
+
+template <class BitSet_t>
+sbb_t<BitSet_t>::sbb_t(int MAX_SIZE) :
+	pc_(0),
+	stack_(nullptr) 
+{
+	//allocates memory	
+	try {
+		/////////////////////////////
+		bb_.reset(MAX_SIZE);
+		stack_ = new int[MAX_SIZE];
+		////////////////////////////
+	}
+	catch (exception& e) {
+		LOG_ERROR(e.what());
+		LOG_ERROR("sbb_t<BitSet_t>::-reset()");
+		std::exit(-1);
+	}
+
+	//initialize stack  
+	//(I believe this is not necessary, since the policy is to initialize all basic data types to 0)
+	for (int i = 0; i < MAX_SIZE; i++) {
+		stack_[i] = 0;
+	}
+}
+
+template <class BitSet_t>
+void  sbb_t<BitSet_t>::reset(int MAX_SIZE) {
+
+	//cleans stack
+	pc_ = 0;
+
+	//allocates memory	
+	try {
+		/////////////////////////////
+		bb_.reset(MAX_SIZE);
+		delete stack_;
+		stack_ = new int[MAX_SIZE];
+		////////////////////////////
+	}
+	catch (exception& e) {
+		LOG_ERROR(e.what());
+		LOG_ERROR("sbb_t<BitSet_t>::-reset()");
+		std::exit(-1);
+	}
+
+	//initialize stack  
+	//(I believe this is not necessary, since the policy is to initialize all basic data types to 0)
+	for (int i = 0; i < MAX_SIZE; i++) {
+		stack_[i] = 0;
+	}
+
+}; //end struct
+
+
+
+template <class BitSet_t>
+void sbb_t<BitSet_t>::push(int elem) { 
+
+	if (!bb_.is_bit(elem)) {
+		bb_.set_bit(elem); 
+		stack_[pc_++] = elem;
+	} 
+}
+
+template <class BitSet_t>
+int sbb_t<BitSet_t>::pop() {
+	 
+	if (pc_ > 0) {
+		 int bit = stack_[--pc_]; 
+		 bb_.erase_bit(bit);
+		 return bit;
+	 }
+	 else return BBObject::noBit;
+}
+
+template <class BitSet_t>
+void sbb_t<BitSet_t>::erase_bit() {
+	for (int i = 0; i < pc_; i++) {
+		bb_.erase_bit(stack_[i]);
+	}
+	pc_ = 0;
+}				
+
+
 
 
 //inline BITBOARD get_first_k_bits(BITBOARD bb,  BYTE k /*1-64*/){
