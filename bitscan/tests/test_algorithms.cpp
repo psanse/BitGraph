@@ -55,8 +55,8 @@ protected:
 
 	//undirected graph instance	
 	const int NV = 65;
-	sbb_t<BBScan> bb;												//undirected graph with integer weights
-	sbb_t<BBScanSp> bbs;
+	bbStack_t<BBScan> bb;												//undirected graph with integer weights
+	bbStack_t<BBScanSp> bbs;
 };
 
 TEST_F(bbSizeClassTest, pop_msb) {

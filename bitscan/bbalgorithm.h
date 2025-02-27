@@ -106,48 +106,48 @@ ostream& bbSize_t<BitSet_t>::print(ostream& o = cout, bool show_pc = true, bool 
 
 //////////////////////
 // 
-// sbb_t class	 
+// bbStack_t class	 
 // (created 28/13/17 - stack state semantics with bitsets)
 // Not very clear the utility of such class - possibly change to composite with std::vector
 // 
 //////////////////////
 
 template <class BitSet_t>
-struct sbb_t{
+struct bbStack_t{
 
 	enum print_t {STACK = 0, BITSTRING};
 
 //construction / destruction
-	sbb_t			(int MAX_SIZE);
-	sbb_t			(): pc_(0), stack_(nullptr)	{}
+	bbStack_t			(int MAX_SIZE);
+	bbStack_t			(): pc_(0), stack_(nullptr)	{}
 	
 	//move and copy semantics - copy and move semantics forbidden
-	sbb_t			(const sbb_t& rhs)			= delete;
-sbb_t& operator =	(const sbb_t& rhs) noexcept	= delete;
+	bbStack_t			(const bbStack_t& rhs)			= delete;
+bbStack_t& operator =	(const bbStack_t& rhs) noexcept	= delete;
 
-	~sbb_t			()							{ delete stack_;}
+	~bbStack_t			()							{ delete stack_;}
 
 //allocation
 
 	void reset		(int MAX_SIZE);
 
 //setters and getters
-	int  size		()							{ return pc_; }
+	int  size			()							{ return pc_; }
 
 //stack interface (bits are taken according to the stack)
-	void push		(int elem);
-	int pop			();
+	void push			(int elem);
+	int pop				();
 
 //basic operations
 
 	//clears bits from the bitset according to stack
-	void erase_bit	();
+	void erase_bit		();
 
 	//synchro stack according to bitset (ordered from lsb to msb)
-	void sync_stack	();		
+	void sync_stack		();		
 
 	//synchro bitset according to stack
-	void sync_bb	();																	
+	void sync_bb		();																	
 
 //boolean
 	/* may occur if data is manipulated directly */
@@ -166,7 +166,7 @@ sbb_t& operator =	(const sbb_t& rhs) noexcept	= delete;
 	BITBOARD pc_;		//number of bits in stack
 	int* stack_;
 
-}; //end struct sbb_t
+}; //end struct bbStack_t
 
 
 //////////////////////
@@ -245,7 +245,7 @@ void bba_t<BitSet_t>::init(int capacity, int pc){
 
 template <class BitSet_t>
 inline
-ostream& sbb_t<BitSet_t>::print(print_t t, ostream& o, bool eofl){
+ostream& bbStack_t<BitSet_t>::print(print_t t, ostream& o, bool eofl){
 
 	switch(t){
 	case STACK:
@@ -268,7 +268,7 @@ ostream& sbb_t<BitSet_t>::print(print_t t, ostream& o, bool eofl){
 
 template <class BitSet_t>
 inline
-bool sbb_t<BitSet_t>::is_sync(){
+bool bbStack_t<BitSet_t>::is_sync(){
 		
 	int pcBitSet = bb_.size();
 	if (pcBitSet != pc_) { return false; }
@@ -285,7 +285,7 @@ bool sbb_t<BitSet_t>::is_sync(){
 
 template <class BitSet_t>
 inline
-void sbb_t<BitSet_t>::sync_bb(){
+void bbStack_t<BitSet_t>::sync_bb(){
 
 	bb_.erase_bit();
 	for(auto i = 0; i < pc_; i++){
@@ -295,7 +295,7 @@ void sbb_t<BitSet_t>::sync_bb(){
 
 template <class BitSet_t>
 inline
-void sbb_t<BitSet_t>::sync_stack(){
+void bbStack_t<BitSet_t>::sync_stack(){
 
 	//cleans stack
 	pc_ = 0;
@@ -355,7 +355,7 @@ int first_k_bits (int k, BitSet_t &bb, array_t &lv){
 }
 
 template <class BitSet_t>
-sbb_t<BitSet_t>::sbb_t(int MAX_SIZE) :
+bbStack_t<BitSet_t>::bbStack_t(int MAX_SIZE) :
 	pc_(0),
 	stack_(nullptr) 
 {
@@ -368,7 +368,7 @@ sbb_t<BitSet_t>::sbb_t(int MAX_SIZE) :
 	}
 	catch (exception& e) {
 		LOG_ERROR(e.what());
-		LOG_ERROR("sbb_t<BitSet_t>::-reset()");
+		LOG_ERROR("bbStack_t<BitSet_t>::-reset()");
 		std::exit(-1);
 	}
 
@@ -380,7 +380,7 @@ sbb_t<BitSet_t>::sbb_t(int MAX_SIZE) :
 }
 
 template <class BitSet_t>
-void  sbb_t<BitSet_t>::reset(int MAX_SIZE) {
+void  bbStack_t<BitSet_t>::reset(int MAX_SIZE) {
 
 	//cleans stack
 	pc_ = 0;
@@ -395,7 +395,7 @@ void  sbb_t<BitSet_t>::reset(int MAX_SIZE) {
 	}
 	catch (exception& e) {
 		LOG_ERROR(e.what());
-		LOG_ERROR("sbb_t<BitSet_t>::-reset()");
+		LOG_ERROR("bbStack_t<BitSet_t>::-reset()");
 		std::exit(-1);
 	}
 
@@ -410,7 +410,7 @@ void  sbb_t<BitSet_t>::reset(int MAX_SIZE) {
 
 
 template <class BitSet_t>
-void sbb_t<BitSet_t>::push(int bit) { 
+void bbStack_t<BitSet_t>::push(int bit) { 
 
 	if (!bb_.is_bit(bit)) {
 		bb_.set_bit(bit);
@@ -419,7 +419,7 @@ void sbb_t<BitSet_t>::push(int bit) {
 }
 
 template <class BitSet_t>
-int sbb_t<BitSet_t>::pop() {
+int bbStack_t<BitSet_t>::pop() {
 	 
 	if (pc_ > 0) {
 		 int bit = stack_[--pc_]; 
@@ -430,7 +430,7 @@ int sbb_t<BitSet_t>::pop() {
 }
 
 template <class BitSet_t>
-void sbb_t<BitSet_t>::erase_bit() {
+void bbStack_t<BitSet_t>::erase_bit() {
 	for (int i = 0; i < pc_; i++) {
 		bb_.erase_bit(stack_[i]);
 	}
