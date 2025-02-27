@@ -297,8 +297,8 @@ TEST(bbCol_tClass, basic){
 	
 }
 
-TEST(algorithms, k_bits){
-//used in BBMWCP for upper bound computation
+TEST(algorithms, first_k_bits){
+
 	
 	BBScan bb(100);	
 	bb.set_bit(10);
@@ -306,28 +306,52 @@ TEST(algorithms, k_bits){
 	bb.set_bit(65);
 	
 	//solution in vector
-	vint bits (3,-1);
-	bbalg::first_k_bits(3,bb,bits);			
+	vint lbits (3,-1);
+	bbalg::first_k_bits(3,bb, lbits);
 
-	vint sol;
-	sol.push_back(10); sol.push_back(64); sol.push_back(65);
-	EXPECT_EQ(sol, bits);
-
-	//solution in a classical C-array
-	int cbits[3]; vint vbits;
-	bbalg::first_k_bits(3,bb, cbits);
-	copy(cbits, cbits+3,back_inserter(vbits));
-	EXPECT_EQ(sol, vbits);
+	vint lbits_exp;
+	lbits_exp.push_back(10);
+	lbits_exp.push_back(64);
+	lbits_exp.push_back(65);
+	EXPECT_EQ(lbits_exp, lbits);
 	
 }
 
 TEST(algorithms, random_bitblock) {
 	
 	//10% of density	
-	BITBOARD bb = bbalg::gen_random_bitblock(0.5);
+	BITBOARD bb = bbalg::gen_random_block(0.5);
 
 	//around 30 bits
 	EXPECT_GE(bblock::size(bb), 20);
+
+}
+
+TEST(algorithms, to_vector) {
+
+	BBScan bb(100);
+	bb.set_bit(10);
+	bb.set_bit(64);
+	bb.set_bit(65);
+
+	//stateless conversion to vector
+	auto lv = bbalg::to_vector(bb);
+	EXPECT_EQ(10, lv[0]);
+	EXPECT_EQ(64, lv[1]);
+	EXPECT_EQ(65, lv[2]);
+
+	//sparse bitset
+	BBScanSp bbs(100);
+	bbs.set_bit(10);
+	bbs.set_bit(64);
+	bbs.set_bit(65);
+
+	//stateless conversion to vector
+	auto lvs = bbalg::to_vector(bbs);
+	EXPECT_EQ(10, lvs[0]);
+	EXPECT_EQ(64, lvs[1]);
+	EXPECT_EQ(65, lvs[2]);
+
 
 }
 

@@ -26,15 +26,40 @@ using bbo = BBObject;
 //
 // namespace bbAlg for stateless functions for BitSets
 //
+// TODO - check and refactor these functions (27/02/2025)
+// 
 ///////////////////////
 
 namespace bbalg {
-	std::vector<int> to_vector(const BitSet& bbn);
-	BITBOARD gen_random_bitblock(double p);
 
-	template<class BitSet_t, class array_t>
-	int first_k_bits(int k, BitSet_t& bb, array_t& lv);
-}
+	/**
+	* @brief converts a bitset to a vector of integers
+	*        I. the bitset is not modified
+	*		II. the bitset must be of the efficient scanning type
+	*			in the BBObject hierarchy (BBScan or BBScanSp)
+	*
+	* TODO - use SFINAE for the type of bitset
+	**/
+	template<class BitSet_t>	
+	std::vector<int> to_vector( BitSet_t& bbn);
+
+	/**
+	* @brief generates a random BITBOARD with density p of 1-bits
+	**/
+	BITBOARD gen_random_block(double p);
+
+	/**
+	* @brief determines the first k 1-bits in the bitset bb
+	* @param k: the number of bits to find
+	* @param bb: the input bitset
+	* @param lv: the output vector of integers
+	* @returns the number of bits found in lv
+	* @details: used in BBMWCP for upper bound computation
+	**/
+	template<class BitSet_t>
+	int first_k_bits(int k, BitSet_t& bb, vector<int>& lv);
+
+}//end namespace bbalg
 
 //////////////////////
 // 
@@ -416,25 +441,29 @@ void bbStack_t<BitSet_t>::erase_bit() {
 //////////////////////
 
 namespace bbalg {
+	
+	template<class BitSet_t>
 	inline 
-	std::vector<int> to_vector(const BitSet& bbn) {
+	std::vector<int> to_vector(BitSet_t& bbn) {
 
 		vector<int> res;
-
-		int v = EMPTY_ELEM;
-		while (1) {
-			if ((v = bbn.next_bit(v)) == EMPTY_ELEM)
-				break;
-			res.push_back(v);
+				
+		BitSet_t::scan sc(bbn);
+		if (sc.init_scan(BBObject::NON_DESTRUCTIVE) == -1) {
+			return res;
+		}	
+		//scan if the bitset is empty
+		int bit = BBObject::noBit;
+		while ((bit = sc.next_bit()) != BBObject::noBit ) {
+			res.emplace_back(bit);
 		}
+
 		return res;
 	}
 
-	/**
-	* @brief generates a random BITBOARD with density p of 1-bits
-	**/
+	
 	inline 
-	BITBOARD gen_random_bitblock (double p) {
+	BITBOARD gen_random_block (double p) {
 		
 		BITBOARD bb = 0;
 
@@ -446,47 +475,28 @@ namespace bbalg {
 		return bb;
 	}
 
-	template<class BitSet_t, class array_t>
+	template<class BitSet_t>
 	inline 
-	int first_k_bits(int k, BitSet_t& bb, array_t& lv) {
-		///////////////////
-		// Computes the first 3 nodes of color set 'col' in 'lv'
-		//
-		// RETURNS the number of bits read [0..k]
-		//
-		// TODO-change to BITSCAN and extend for k nodes
+	int first_k_bits(int k, BitSet_t& bb, vector<int>& lv) {
+		
+		lv.clear();
 
-		bb.init_scan(bbo::NON_DESTRUCTIVE);
-		int POINTER = 0;
-		while (true) {
-			lv[POINTER] = bb.next_bit();
-			if (lv[POINTER] == EMPTY_ELEM || ++POINTER == k) break;
+		///////////////////////////////////////////////////////////////
+		if (bb.init_scan(bbo::NON_DESTRUCTIVE) == -1) { return 0; }
+		///////////////////////////////////////////////////////////////
+		
+		int nBits = 0;	
+		int bit = BBObject::noBit;
+		while ( (bit = bb.next_bit()) != BBObject::noBit || nBits < k) {
+			lv.emplace_back(bit);
+			nBits++;
 		}
-		return POINTER;
+
+		//number of bits found (ideally the first-k)
+		return nBits;
 	}
 
-	//inline BITBOARD get_first_k_bits(BITBOARD bb,  BYTE k /*1-64*/){
-	////////////////////////////////////
-	//// Returns BITBOARD of first k bits to 1 or 0 if k-bits to 1 could not be found
-	//
-	//	BITBOARD bb_aux, res=0;
-	//	int cont=0;
-	//
-	//	//control
-	//	if(k<1 || k>64) return 0;
-	//
-	//	while(bb){
-	//		bb_aux= bb & (-bb);	/*00..010..0*/
-	//		res |= bb_aux;
-	//		if(++cont==k) break;
-	//	
-	//	bb ^= bb_aux;
-	//	}
-	//
-	//return (cont==k)? res: 0;
-	//}
-}
-
+}//end namespace bbalg
 
 
 #endif
