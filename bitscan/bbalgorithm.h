@@ -4,7 +4,7 @@
   * @author pss
   * @details created 2017, last_update 27/02/2025
   * 
-  * TODO refactoring and testing 15/02/2025
+  * TODO refactor and test (15/02/2025)
   **/
 
 #ifndef  _BBALG_H_
