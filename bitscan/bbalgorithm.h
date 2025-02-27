@@ -151,11 +151,13 @@ sbb_t& operator =	(const sbb_t& rhs) noexcept	= delete;
 
 //boolean
 	/* may occur if data is manipulated directly */
+	//checks if the contents in the STACK is in BB - currently the opposite is not checked
 	bool is_sync		();										
+	
 	bool is_empty		()			{return (pc_ ==0);}
 	
 //I/O
-	ostream& print		(type_t t=STACK, ostream& o= cout);
+	ostream& print		(type_t t=STACK, ostream& o= cout, bool eofl = true);
 
 /////////////////
 // data members
@@ -243,36 +245,42 @@ void bba_t<BitSet_t>::init(int capacity, int pc){
 
 template <class BitSet_t>
 inline
-ostream& sbb_t<BitSet_t>::print(type_t t, ostream& o){
+ostream& sbb_t<BitSet_t>::print(type_t t, ostream& o, bool eofl){
+
 	switch(t){
 	case STACK:
-		o<<"[";
-		for(int i=0; i<size; i++){
-			o<<stack[i]<<" ";
+		o << "[";
+		for(auto i = 0; i < pc_; ++i){
+			o << stack_[i] << " ";
 		}
-		o<<"]"<<endl;
+		o << "]" << endl;
 		break;
 	case BITSTRING:
-		bb.print(o);
+		bb_.print(o, true, false);		//eofl= true by default
 		break;
 	default:
 		; //error
 	}
 
+	if (eofl) { o << endl; }
 	return o;
 }
 
 template <class BitSet_t>
 inline
 bool sbb_t<BitSet_t>::is_sync(){
-//checks if the contents is the same in STACK and BB
-	
+		
 	int pc = bb_.size();
-	if(pc != pc_) return false;
+	if (pc != pc_) { return false; }
 
-	for(int i=0; i<pc_; i++){
-		if(!bb_.is_bit(stack_[i])) return false;
+	for(auto i = 0; i < pc_; ++i){
+		if (!bb_.is_bit(stack_[i])) {
+			return false;
+		}
 	}
+
+	//TODO *** contents of bb_ is not checked
+	//bitscan bb_
 	
 	return true;
 }
