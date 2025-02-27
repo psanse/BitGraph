@@ -272,15 +272,13 @@ bool sbb_t<BitSet_t>::is_sync(){
 		
 	int pc = bb_.size();
 	if (pc != pc_) { return false; }
-
+	
+	//checks if |BB| elements in the STACK are in BB 
 	for(auto i = 0; i < pc_; ++i){
 		if (!bb_.is_bit(stack_[i])) {
 			return false;
 		}
-	}
-
-	//TODO *** contents of bb_ is not checked
-	//bitscan bb_
+	}	
 	
 	return true;
 }
