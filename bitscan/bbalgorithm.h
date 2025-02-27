@@ -107,34 +107,34 @@ ostream& bbSize_t<BitSet_t>::print(ostream& o = cout, bool show_pc = true, bool 
 //////////////////////
 // 
 // bbStack_t class	 
-// (created 28/13/17 - stack state semantics with bitsets)
-// Not very clear the utility of such class - possibly change to composite with std::vector
+// 
+// @brief: composite vector / bitset with stack interface
+// 
+// @details: created 28/13/17, refactored 27/01/2025)
 // 
 //////////////////////
 
 template <class BitSet_t>
 struct bbStack_t{
 
-	enum print_t {STACK = 0, BITSTRING};
+	enum print_t {STACK = 0, BITSET};
 
 //construction / destruction
-	bbStack_t			(int MAX_SIZE);
-	bbStack_t			(): pc_(0), stack_(nullptr)	{}
+	bbStack_t			(int MAX_SIZE) : bb_(MAX_SIZE) {}
+	bbStack_t			()	{}
 	
 	//move and copy semantics - copy and move semantics forbidden
 	bbStack_t			(const bbStack_t& rhs)			= delete;
 bbStack_t& operator =	(const bbStack_t& rhs) noexcept	= delete;
-
-	~bbStack_t			()							{ delete stack_;}
-
+		
 //allocation
 
 	void reset		(int MAX_SIZE);
 
 //setters and getters
-	int  size			()							{ return pc_; }
+	int  size			()							{ return stack_.size(); }
 
-//stack interface (bits are taken according to the stack)
+//stack interface (bits are added / removed according to the stack)
 	void push			(int elem);
 	int pop				();
 
@@ -163,10 +163,9 @@ bbStack_t& operator =	(const bbStack_t& rhs) noexcept	= delete;
 // data members
 
 	BitSet_t bb_;
-	BITBOARD pc_;		//number of bits in stack
-	int* stack_;
+	std::vector<int> stack_;
 
-}; //end struct bbStack_t
+}; //end bbStack_t class
 
 
 //////////////////////
@@ -240,7 +239,6 @@ void bba_t<BitSet_t>::init(int capacity, int pc){
 	}
 }
 
-
 template <class BitSet_t>
 inline
 ostream& bbStack_t<BitSet_t>::print(print_t t, ostream& o, bool eofl){
@@ -248,13 +246,13 @@ ostream& bbStack_t<BitSet_t>::print(print_t t, ostream& o, bool eofl){
 	switch(t){
 	case STACK:
 		o << "[";
-		for(auto i = 0; i < pc_; ++i){
+		for(auto i = 0; i < stack_.size(); ++i){
 			o << stack_[i] << " ";
 		}
 		o << "]" << endl;
 		break;
-	case BITSTRING:
-		bb_.print(o, true, false);		//eofl= true by default
+	case BITSET:
+		bb_.print(o, true, false);		//size info and no end of line
 		break;
 	default:
 		; //error
@@ -268,11 +266,10 @@ template <class BitSet_t>
 inline
 bool bbStack_t<BitSet_t>::is_sync(){
 		
-	int pcBitSet = bb_.size();
-	if (pcBitSet != pc_) { return false; }
+	if (bb_.size() != stack_.size()) { return false; }
 	
 	//checks if exactly the population of bb_ is in the STACK  
-	for(auto i = 0; i < pc_; ++i){
+	for(auto i = 0; i < stack_.size(); ++i){
 		if (!bb_.is_bit(stack_[i])) {
 			return false;
 		}
@@ -286,7 +283,7 @@ inline
 void bbStack_t<BitSet_t>::sync_bb(){
 
 	bb_.erase_bit();
-	for(auto i = 0; i < pc_; i++){
+	for(auto i = 0; i < stack_.size(); i++){
 		bb_.set_bit(stack_[i]);
 	}
 }
@@ -296,14 +293,14 @@ inline
 void bbStack_t<BitSet_t>::sync_stack(){
 
 	//cleans stack
-	pc_ = 0;
+	stack_.clear();
 	
 	//bitscanning with nested data structure
 	BitSet_t::scan sc(bb_);
 	if (sc.init_scan() != -1) {
 		int bit = BBObject::noBit;
 		while ( (bit = bb_.next_bit()) != BBObject::noBit ) {
-			stack_[pc_++] = bit;
+			stack_.emplace_back(bit);
 		}
 	}
 
@@ -353,31 +350,6 @@ int first_k_bits (int k, BitSet_t &bb, array_t &lv){
 }
 
 template <class BitSet_t>
-bbStack_t<BitSet_t>::bbStack_t(int MAX_SIZE) :
-	pc_(0),
-	stack_(nullptr) 
-{
-	//allocates memory	
-	try {
-		/////////////////////////////
-		bb_.reset(MAX_SIZE);
-		stack_ = new int[MAX_SIZE];
-		////////////////////////////
-	}
-	catch (exception& e) {
-		LOG_ERROR(e.what());
-		LOG_ERROR("bbStack_t<BitSet_t>::-reset()");
-		std::exit(-1);
-	}
-
-	//initialize stack  
-	//(I believe this is not necessary, since the policy is to initialize all basic data types to 0)
-	for (int i = 0; i < MAX_SIZE; i++) {
-		stack_[i] = 0;
-	}
-}
-
-template <class BitSet_t>
 void  bbStack_t<BitSet_t>::reset(int MAX_SIZE) {
 
 	//cleans stack
@@ -387,20 +359,13 @@ void  bbStack_t<BitSet_t>::reset(int MAX_SIZE) {
 	try {
 		/////////////////////////////
 		bb_.reset(MAX_SIZE);
-		delete stack_;
-		stack_ = new int[MAX_SIZE];
+		stack_.clear();
 		////////////////////////////
 	}
 	catch (exception& e) {
 		LOG_ERROR(e.what());
 		LOG_ERROR("bbStack_t<BitSet_t>::-reset()");
 		std::exit(-1);
-	}
-
-	//initialize stack  
-	//(I believe this is not necessary, since the policy is to initialize all basic data types to 0)
-	for (int i = 0; i < MAX_SIZE; i++) {
-		stack_[i] = 0;
 	}
 
 }; //end struct
@@ -412,16 +377,17 @@ void bbStack_t<BitSet_t>::push(int bit) {
 
 	if (!bb_.is_bit(bit)) {
 		bb_.set_bit(bit);
-		stack_[pc_++] = bit;
+		stack_.emplace_back(bit);
 	} 
 }
 
 template <class BitSet_t>
 int bbStack_t<BitSet_t>::pop() {
 	 
-	if (pc_ > 0) {
-		 int bit = stack_[--pc_]; 
-		 bb_.erase_bit(bit);
+	if (stack_.size() > 0) {
+		 int bit = stack_.back();
+		 v.pop_back();
+		 bb_.erase_bit(bit);	
 		 return bit;
 	 }
 	 else return BBObject::noBit;
@@ -429,10 +395,9 @@ int bbStack_t<BitSet_t>::pop() {
 
 template <class BitSet_t>
 void bbStack_t<BitSet_t>::erase_bit() {
-	for (int i = 0; i < pc_; i++) {
+	for (int i = 0; i < stack_.size(); i++) {
 		bb_.erase_bit(stack_[i]);
-	}
-	pc_ = 0;
+	}	
 }				
 
 
