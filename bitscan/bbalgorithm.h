@@ -115,7 +115,7 @@ ostream& bbSize_t<BitSet_t>::print(ostream& o = cout, bool show_pc = true, bool 
 template <class BitSet_t>
 struct sbb_t{
 
-	enum type_t {STACK=0, BITSTRING};
+	enum print_t {STACK = 0, BITSTRING};
 
 //construction / destruction
 	sbb_t			(int MAX_SIZE);
@@ -157,7 +157,7 @@ sbb_t& operator =	(const sbb_t& rhs) noexcept	= delete;
 	bool is_empty		()			{return (pc_ ==0);}
 	
 //I/O
-	ostream& print		(type_t t=STACK, ostream& o= cout, bool eofl = true);
+	ostream& print		(print_t t = STACK, ostream& o= cout, bool eofl = true);
 
 /////////////////
 // data members
@@ -245,7 +245,7 @@ void bba_t<BitSet_t>::init(int capacity, int pc){
 
 template <class BitSet_t>
 inline
-ostream& sbb_t<BitSet_t>::print(type_t t, ostream& o, bool eofl){
+ostream& sbb_t<BitSet_t>::print(print_t t, ostream& o, bool eofl){
 
 	switch(t){
 	case STACK:
