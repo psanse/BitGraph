@@ -2,7 +2,7 @@
   * @file bbalgorithm.h
   * @brief header for the algorithms and data structures for bitstrings and bitblocks
   * @author pss
-  * @details created ?, @last_update 14/02/2025
+  * @details created 2017?, @last_update 27/02/2025
   * 
   * TODO refactoring and testing 15/02/2025
   **/
@@ -21,18 +21,17 @@ using bbo = BBObject;
 
 //////////////////////
 // 
-// bb_t class
+// bbSize_t class
 // 
 // A simple wrapper for any type of bitset of the BBObject hierarchy (CHECK!) with CACHED size 
-// (@last_update 12/08/19)
 // 
 ///////////////////////
 template <class BitSet_t>
-struct bb_t{
+struct bbSize_t{
 
 //construction / destruction
-	bb_t			(int MAX_SIZE) : pc_(0), bb_(MAX_SIZE)	{}
-	bb_t			():	pc_ (0)								{}														
+	bbSize_t			(int MAX_SIZE) : pc_(0), bb_(MAX_SIZE)	{}
+	bbSize_t			():	pc_ (0)								{}														
 	
 //allocation
 	
@@ -44,44 +43,75 @@ struct bb_t{
 	/**
 	* @brief Equivalent to reset. Preserved for backward compatibility
 	**/
-	void init		(int MAX_SIZE)			{ bb_.reset(MAX_SIZE); pc_ = 0; }							
-	
+	void init		(int MAX_SIZE)			{ bb_.reset(MAX_SIZE); pc_ = 0; }		
 	
 //setters and getters
 	BITBOARD  size	()	const				{ return pc_; }
 
-
 //bit twiddling
-	void set_bit	(int bit)				{bb_.set_bit(bit); ++pc_;}							//push-bitstring interface
-	void erase_bit	(bool lazy = false)		{ if(!lazy) {bb_.erase_bit();} pc_ = 0;}			//clears all bits
-	int  erase_bit	(int bit)				{ bb_.erase_bit(bit); --pc_; return pc_; }
-
-//useful func
-	int sync_pc		()						{ pc_ = bb_.size(); return pc_; }
+	void set_bit	(int bit)				{ bb_.set_bit(bit); ++pc_;}		
+	int  erase_bit	(int bit)				{ bb_.erase_bit(bit); return(--pc_); }
 	
-	//stack interface 
-	int pop_msb		()						{ if (pc_ > 0) { int bit = bb_.msb(); bb_.erase_bit(bit); pc_--; return bit; } else return BBObject::noBit; }
-	int lsb			()						{ if (pc_ > 0) { return bb_.lsb(); } else return BBObject::noBit;	}
+	/**
+	* @brief clears all 1-bits. If lazy is true, the bitset is not modified.
+	**/
+	void erase_bit	(bool lazy = false)		{ if(!lazy) {bb_.erase_bit();} pc_ = 0;}			
+	
+
+//useful operations
+	int lsb			()						{ if (pc_ > 0) { return bb_.lsb(); } else return BBObject::noBit; }
+	int msb			()						{ if (pc_ > 0) { return bb_.msb(); } else return BBObject::noBit; }
+
+	/**
+	* @brief pops the most significant bit. If the bitset is empty, returns BBObject::noBit
+	**/
+	int pop_msb		()						{ if (pc_ > 0) { int bit = bb_.msb(); bb_.erase_bit(bit); pc_--; return bit; } \
+											  else return BBObject::noBit;	}
+	/**
+	* @brief pops the least significant bit. If the bitset is empty, returns BBObject::noBit
+	**/
+	int pop_lsb		()						{ if (pc_ > 0) { int bit = bb_.lsb(); bb_.erase_bit(bit); pc_--; return bit; } \
+											  else return BBObject::noBit; }
+
+	int sync_pc		()						{ pc_ = bb_.size(); return pc_; }
 
 //bool
 	bool is_empty	() const				{return (pc_ == 0);}
-	bool check_pc	() const				{return (pc_ == bb_.size());}	
+	bool is_sync_pc	() const				{return (pc_ == bb_.size());}	
 
 //operators
-	friend bool operator ==	(const bb_t& lhs, const bb_t& rhs) { return (lhs.pc_ == rhs.pc_) && (lhs.bb_ == rhs.bb_);}
-	friend bool operator !=	(const bb_t& lhs, const bb_t& rhs) { return !(lhs == rhs); }
+	friend bool operator ==	(const bbSize_t& lhs, const bbSize_t& rhs)			{ return (lhs.pc_ == rhs.pc_) && (lhs.bb_ == rhs.bb_);}
+	friend bool operator !=	(const bbSize_t& lhs, const bbSize_t& rhs)			{ return !(lhs == rhs); }
 
 //I/O
-	ostream& print(ostream& o = cout) const { bb_.print(o); o << "[" << pc_ << "]"; return o; }
+	ostream& print	(ostream& o = cout, bool show_pc = true, bool eofl = true)	const;
 
 /////////////////
 // data members
 
 	BITBOARD pc_;																	//number of 1-bits
 	BitSet_t bb_;																	//any type of the BBObject hierarchy	
-
 };
 
+template <class BitSet_t>
+ostream& bbSize_t<BitSet_t>::print(ostream& o = cout, bool show_pc = true, bool eofl = true) const {
+
+	bb_.print(o, true, false);
+	if (show_pc) { o << "[" << pc_ << "]"; }
+	if (eofl) { o << endl; }
+	return o;
+}
+
+//////////////////////
+// 
+// sbb_t class
+// bba_t class... (created 9/8/17 for MWCP upper bound computation)
+// 
+// Wrappers with raw pointers - CHECK if they are still needed (27/02/2025)
+// 
+// TODO - remove/refactor
+// 
+///////////////////////
 
 template <class BitSet_t>
 struct sbb_t{
@@ -139,9 +169,12 @@ struct bba_t{
 	//I/O
 	ostream& print(ostream& o=cout) const;		
 };
+
+
+
 template <class BitSet_t>
 void bba_t<BitSet_t>::erase_bit(){
-	for(int pos=0; pos<capacity; pos++){
+	for(int pos = 0; pos<capacity; pos++){
 		pbb[pos].erase_bit();
 	}
 }

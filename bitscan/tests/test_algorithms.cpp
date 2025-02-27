@@ -8,6 +8,7 @@
 
 #include "bitscan/bbalgorithm.h"				
 #include "bitscan/bbscan.h"
+#include "bitscan/bbscan_sparse.h"
 #include "gtest/gtest.h"
 #include <algorithm>
 #include <iterator>
@@ -17,6 +18,186 @@ using namespace std;
 
 //aliases
 using vint = vector<int>;
+
+class bbSizeClassTest : public ::testing::Test {
+protected:
+	bbSizeClassTest() : bb(NV), bbs (NV){}
+	void SetUp() override {
+		bb.set_bit(10);
+		bb.set_bit(64);
+		bb.set_bit(65);
+
+		bbs.set_bit(10);
+		bbs.set_bit(64);
+		bbs.set_bit(65);
+	}
+	void TearDown() override {}
+
+	//undirected graph instance	
+	const int NV = 65;
+	bbSize_t<BBScan> bb;												//undirected graph with integer weights
+	bbSize_t<BBScanSp> bbs;
+};
+
+TEST_F(bbSizeClassTest, pop_msb) {
+	
+	//pop_msb non-sparse
+	EXPECT_EQ(3, bb.size());
+	EXPECT_EQ(65,bb.pop_msb());
+	EXPECT_EQ(2, bb.size());
+
+	EXPECT_EQ(64,bb.pop_msb());
+	EXPECT_EQ(1, bb.size());
+
+	EXPECT_EQ(10, bb.pop_msb());
+	EXPECT_EQ(0, bb.size());
+
+	EXPECT_EQ(-1, bb.pop_msb());
+	EXPECT_TRUE(bb.is_empty());
+
+	//pop_msb sparse
+	EXPECT_EQ(3, bbs.size());
+	EXPECT_EQ(65, bbs.pop_msb());
+	EXPECT_EQ(2, bbs.size());
+
+	EXPECT_EQ(64, bbs.pop_msb());
+	EXPECT_EQ(1, bbs.size());
+
+	EXPECT_EQ(10, bbs.pop_msb());
+	EXPECT_EQ(0, bbs.size());
+
+	EXPECT_EQ(-1, bbs.pop_msb());
+	EXPECT_TRUE(bbs.is_empty());
+}
+
+TEST_F(bbSizeClassTest, pop_lsb) {
+
+	//pop_msb
+	EXPECT_EQ(3, bb.size());
+	EXPECT_EQ(10, bb.pop_lsb());
+	EXPECT_EQ(2, bb.size());
+
+	EXPECT_EQ(64, bb.pop_lsb());
+	EXPECT_EQ(1, bb.size());
+
+	EXPECT_EQ(65, bb.pop_lsb());
+	EXPECT_EQ(0, bb.size());
+
+	EXPECT_EQ(-1, bb.pop_lsb());
+	EXPECT_TRUE(bb.is_empty());
+
+	//pop_msb -sparse
+	EXPECT_EQ(3, bbs.size());
+	EXPECT_EQ(10, bbs.pop_lsb());
+	EXPECT_EQ(2, bbs.size());
+
+	EXPECT_EQ(64, bbs.pop_lsb());
+	EXPECT_EQ(1, bbs.size());
+
+	EXPECT_EQ(65, bbs.pop_lsb());
+	EXPECT_EQ(0, bbs.size());
+
+	EXPECT_EQ(-1, bbs.pop_lsb());
+	EXPECT_TRUE(bbs.is_empty());
+}
+
+TEST_F(bbSizeClassTest, reset) {
+
+	//non-sparse
+	bb.reset(100);
+	EXPECT_EQ(0, bb.size());
+	EXPECT_EQ(0, bb.pc_);
+	EXPECT_EQ(2, bb.bb_.capacity());
+
+	//sparse
+	bbs.reset(100);
+	EXPECT_EQ(0, bbs.size());
+	EXPECT_EQ(0, bbs.pc_);
+	EXPECT_EQ(2, bbs.bb_.capacity());
+
+}
+
+TEST_F(bbSizeClassTest, bit_operations) {
+
+	//non-sparse
+	//bb:{10, 64, 65}, size=3
+	EXPECT_EQ(3, bb.size());
+	EXPECT_EQ(65, bb.msb());
+	EXPECT_EQ(10, bb.lsb());
+	EXPECT_EQ(2, bb.erase_bit(65));
+	EXPECT_EQ(2, bb.size());
+	EXPECT_EQ(1, bb.erase_bit(64));
+	EXPECT_EQ(1, bb.size());
+	EXPECT_EQ(0, bb.erase_bit(10));
+	EXPECT_EQ(0, bb.size());
+	EXPECT_TRUE(bb.is_empty());	
+
+	//sparse
+	EXPECT_EQ(3, bbs.size());
+	EXPECT_EQ(65, bbs.msb());
+	EXPECT_EQ(10, bbs.lsb());
+	EXPECT_EQ(2, bbs.erase_bit(65));
+	EXPECT_EQ(2, bbs.size());
+	EXPECT_EQ(1, bbs.erase_bit(64));
+	EXPECT_EQ(1, bbs.size());
+	EXPECT_EQ(0, bbs.erase_bit(10));
+	EXPECT_EQ(0, bbs.size());
+	EXPECT_TRUE( bbs.is_empty());
+}
+
+TEST_F(bbSizeClassTest, lazy_bit_erase) {
+
+	////////////
+	//non-sparse
+	 
+	//cleans the bitset without modifying the bitset
+	bb.erase_bit(true);										//bb:{10, 64, 65}, size=0 (lazy)
+	
+	//empty bitset to all effects
+	EXPECT_EQ(BBObject::noBit, bb.msb());
+	EXPECT_EQ(BBObject::noBit, bb.lsb());
+	EXPECT_EQ(BBObject::noBit, bb.pop_msb());
+	EXPECT_EQ(BBObject::noBit, bb.pop_lsb());
+	EXPECT_TRUE(bb.is_empty());
+	EXPECT_EQ(0, bb.size());
+
+	//not sync
+	EXPECT_FALSE(bb.is_sync_pc());
+
+	//sync cached popcount - restores bb
+	bb.sync_pc();						//restores bb:{10, 64, 65} with size=3	
+	EXPECT_TRUE(bb.is_sync_pc());
+	EXPECT_EQ(3, bb.size());
+	EXPECT_TRUE(bb.bb_.is_bit(10));
+	EXPECT_TRUE(bb.bb_.is_bit(64));
+	EXPECT_TRUE(bb.bb_.is_bit(65));
+
+	////////////
+	//sparse
+
+	//cleans the bitset without modifying the bitset
+	bbs.erase_bit(true);										//bb:{10, 64, 65}, size=0 (lazy)
+
+	//empty bitset to all effects
+	EXPECT_EQ(BBObject::noBit, bbs.msb());
+	EXPECT_EQ(BBObject::noBit, bbs.lsb());
+	EXPECT_EQ(BBObject::noBit, bbs.pop_msb());
+	EXPECT_EQ(BBObject::noBit, bbs.pop_lsb());
+	EXPECT_TRUE(bbs.is_empty());
+	EXPECT_EQ(0, bbs.size());
+
+	//not sync
+	EXPECT_FALSE(bbs.is_sync_pc());
+
+	//sync cached popcount - restores bbs
+	bbs.sync_pc();							//bbs:{10, 64, 65} with size=3	
+	EXPECT_TRUE(bbs.is_sync_pc());
+	EXPECT_EQ(3, bbs.size());
+	EXPECT_TRUE(bbs.bb_.is_bit(10));
+	EXPECT_TRUE(bbs.bb_.is_bit(64));
+	EXPECT_TRUE(bbs.bb_.is_bit(65));
+
+}
 
 TEST(stack_type, basic){
 	
@@ -41,47 +222,6 @@ TEST(stack_type, basic){
 	s.update_stack();
 	EXPECT_EQ(2, s.get_size());
 	
-}
-
-TEST(bb_type, basic_operations){
-	
-	bb_t<BBScan> b;
-	b.reset(65);
-/*	b.push(10);
-	b.push(64);
-	b.push(65);
-	b.print();
-	EXPECT_EQ(3, b.get_size());
-	EXPECT_EQ(65,b.pop());
-	EXPECT_EQ(2, b.get_size());
-
-	EXPECT_EQ(64,b.pop());
-	EXPECT_EQ(1, b.get_size());
-
-	EXPECT_EQ(10,b.pop());
-	EXPECT_EQ(0, b.get_size());
-
-	EXPECT_EQ(-1,b.pop());
-	EXPECT_TRUE(b.is_empty()); */
-	
-	//CTG: sera mas bien asi?
-	
-	b.set_bit(10);
-	b.set_bit(64);
-	b.set_bit(65);
-	
-	EXPECT_EQ(3, b.size());
-	EXPECT_EQ(65, b.pop_msb());
-	EXPECT_EQ(2, b.size());
-
-	EXPECT_EQ(64, b.pop_msb());
-	EXPECT_EQ(1, b.size());
-
-	EXPECT_EQ(10, b.pop_msb());
-	EXPECT_EQ(0, b.size());
-
-	EXPECT_EQ(-1, b.pop_msb());
-	EXPECT_TRUE(b.is_empty());	
 }
 
 TEST(bba_t, basic){
