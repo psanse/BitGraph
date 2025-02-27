@@ -4,6 +4,7 @@
   *		   includes namespace bbalg at the end with a few algorithms
   * @author pss
   * @details created 2017, last_update 27/02/2025
+  * @details no *.cpp file - only headers
   **/
 
 #ifndef  _BBALG_H_
@@ -19,6 +20,21 @@ using namespace std;
 
 //aliases
 using bbo = BBObject;
+
+
+///////////////////////
+//
+// namespace bbAlg for stateless functions for BitSets
+//
+///////////////////////
+
+namespace bbalg {
+	std::vector<int> to_vector(const BitSet& bbn);
+	BITBOARD gen_random_bitblock(double p);
+
+	template<class BitSet_t, class array_t>
+	int first_k_bits(int k, BitSet_t& bb, array_t& lv);
+}
 
 //////////////////////
 // 
@@ -245,6 +261,7 @@ struct bbCol_t {
 };
 
 template <class BitSet_t, int SIZE>
+inline
 BitSet& bbCol_t<BitSet_t, SIZE>::set_bit(int bitsetID, int bit, bool& is_first_bit) {
 
 	//adds bit
@@ -259,6 +276,7 @@ BitSet& bbCol_t<BitSet_t, SIZE>::set_bit(int bitsetID, int bit, bool& is_first_b
 
 
 template <class BitSet_t, int SIZE>
+inline
 ostream& bbCol_t<BitSet_t, SIZE>::print(ostream& o, bool show_pc, bool eofl)  const{
 	for(auto i = 0; i < bb_.size(); ++i){
 		if(!bb_[i].is_empty()){
@@ -337,6 +355,7 @@ void bbStack_t<BitSet_t>::sync_stack(){
 }
 
 template <class BitSet_t>
+inline
 void  bbStack_t<BitSet_t>::reset(int MAX_SIZE) {
 
 	//cleans stack
@@ -358,8 +377,8 @@ void  bbStack_t<BitSet_t>::reset(int MAX_SIZE) {
 }; //end struct
 
 
-
 template <class BitSet_t>
+inline
 void bbStack_t<BitSet_t>::push(int bit) { 
 
 	if (!bb_.is_bit(bit)) {
@@ -369,6 +388,7 @@ void bbStack_t<BitSet_t>::push(int bit) {
 }
 
 template <class BitSet_t>
+inline
 int bbStack_t<BitSet_t>::pop() {
 	 
 	if (stack_.size() > 0) {
@@ -381,6 +401,7 @@ int bbStack_t<BitSet_t>::pop() {
 }
 
 template <class BitSet_t>
+inline
 void bbStack_t<BitSet_t>::erase_bit() {
 	for (int i = 0; i < stack_.size(); i++) {
 		bb_.erase_bit(stack_[i]);
@@ -395,7 +416,9 @@ void bbStack_t<BitSet_t>::erase_bit() {
 //////////////////////
 
 namespace bbalg {
-	inline std::vector<int> to_vector(const BitSet& bbn) {
+	inline 
+	std::vector<int> to_vector(const BitSet& bbn) {
+
 		vector<int> res;
 
 		int v = EMPTY_ELEM;
@@ -410,7 +433,8 @@ namespace bbalg {
 	/**
 	* @brief generates a random BITBOARD with density p of 1-bits
 	**/
-	inline BITBOARD gen_random_bitblock (double p) {
+	inline 
+	BITBOARD gen_random_bitblock (double p) {
 		
 		BITBOARD bb = 0;
 
@@ -423,8 +447,8 @@ namespace bbalg {
 	}
 
 	template<class BitSet_t, class array_t>
-	inline
-		int first_k_bits(int k, BitSet_t& bb, array_t& lv) {
+	inline 
+	int first_k_bits(int k, BitSet_t& bb, array_t& lv) {
 		///////////////////
 		// Computes the first 3 nodes of color set 'col' in 'lv'
 		//
