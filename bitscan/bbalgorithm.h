@@ -173,7 +173,7 @@ bbStack_t& operator =	(const bbStack_t& rhs) noexcept	= delete;
 // 
 // bba_t class... (created 9/8/17 for MWCP upper bound computation)
 // 
-// Wrappers with raw pointers - CHECK if they are still needed (27/02/2025)
+// Array of bitsets with raw pointers - CHECK if they are still needed (27/02/2025)
 // 
 // TODO - remove/refactor
 // 
@@ -193,13 +193,13 @@ struct bba_t{
 
 	void set_bit(int pos, int bit)							{pbb[pos].set_bit(bit);}
 	void set_bit(int pos, int bit, bool& is_first_bit)		{pbb[pos].set_bit(bit);  is_first_bit=(bit==pbb[pos].lsbn64());}
-	void erase_bit(int pos, int bit)	{pbb[pos].erase_bit(bit);}
-	void erase_bit(int pos)				{pbb[pos].erase_bit();}
+	void erase_bit(int pos, int bit)						{pbb[pos].erase_bit(bit);}
+	void erase_bit(int pos)									{pbb[pos].erase_bit();}
 	void erase_bit();					
-	int popcn(int pos)					{return pbb[pos].size();}
-	bool is_bit(int pos, int bit)		{return pbb[pos].is_bit(bit);}
+	int popcn(int pos)										{return pbb[pos].size();}
+	bool is_bit(int pos, int bit)							{return pbb[pos].is_bit(bit);}
 
-	int get_number_of_bitblocks()		{return pbb[0].number_of_bitblocks();}
+	int get_number_of_bitblocks()							{return pbb[0].number_of_bitblocks();}
 
 	//I/O
 	ostream& print(ostream& o=cout) const;		
