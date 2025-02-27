@@ -5,9 +5,11 @@
   * @details The lower sentinel is the first non-zero bitblock in the bitstring
   * @detials The higher sentinel is the last non-zero bitblock in the bitstring
   * @details created?,  last_updated 13/02/2025
+  * @details used to enhance a clique algorithm (results published in [XXX))
+  * 
   * @author pss
   *
-  * TODO- EXPERIMENTAL - NOT CHECKED (13/02/2025)
+  * TODO- PENDING FULL REFACTORING (13/02/2025)
   **/
 
 #ifndef __BB_SENTINEL_H__
