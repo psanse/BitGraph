@@ -205,8 +205,6 @@ struct bba_t{
 	ostream& print(ostream& o=cout) const;		
 };
 
-
-
 template <class BitSet_t>
 void bba_t<BitSet_t>::erase_bit(){
 	for(int pos = 0; pos<capacity; pos++){
