@@ -134,16 +134,16 @@ sbb_t& operator =	(const sbb_t& rhs) noexcept	= delete;
 //setters and getters
 	int  size		()							{ return pc_; }
 
-//stack
+//stack interface (bits are taken according to the stack)
 	void push		(int elem);
 	int pop			();
 
 //basic operations
 
-	//clears bits from bitset according to stack
+	//clears bits from the bitset according to stack
 	void erase_bit	();
 
-	//synchro stack according to bitset
+	//synchro stack according to bitset (ordered from lsb to msb)
 	void sync_stack	();		
 
 	//synchro bitset according to stack
@@ -162,8 +162,8 @@ sbb_t& operator =	(const sbb_t& rhs) noexcept	= delete;
 /////////////////
 // data members
 
-	BITBOARD pc_;		//number of bits in stack
 	BitSet_t bb_;
+	BITBOARD pc_;		//number of bits in stack
 	int* stack_;
 
 }; //end struct sbb_t
@@ -270,10 +270,10 @@ template <class BitSet_t>
 inline
 bool sbb_t<BitSet_t>::is_sync(){
 		
-	int pc = bb_.size();
-	if (pc != pc_) { return false; }
+	int pcBitSet = bb_.size();
+	if (pcBitSet != pc_) { return false; }
 	
-	//checks if |BB| elements in the STACK are in BB 
+	//checks if exactly the population of bb_ is in the STACK  
 	for(auto i = 0; i < pc_; ++i){
 		if (!bb_.is_bit(stack_[i])) {
 			return false;
@@ -410,11 +410,11 @@ void  sbb_t<BitSet_t>::reset(int MAX_SIZE) {
 
 
 template <class BitSet_t>
-void sbb_t<BitSet_t>::push(int elem) { 
+void sbb_t<BitSet_t>::push(int bit) { 
 
-	if (!bb_.is_bit(elem)) {
-		bb_.set_bit(elem); 
-		stack_[pc_++] = elem;
+	if (!bb_.is_bit(bit)) {
+		bb_.set_bit(bit);
+		stack_[pc_++] = bit;
 	} 
 }
 
