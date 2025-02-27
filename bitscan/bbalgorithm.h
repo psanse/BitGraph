@@ -108,7 +108,7 @@ ostream& bbSize_t<BitSet_t>::print(ostream& o = cout, bool show_pc = true, bool 
 // 
 // sbb_t class	 
 // (created 28/13/17 - stack state semantics with bitsets)
-// Not very clear the utility of such class
+// Not very clear the utility of such class - possibly change to composite with std::vector
 // 
 //////////////////////
 
