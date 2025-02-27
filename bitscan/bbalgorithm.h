@@ -23,7 +23,7 @@ using bbo = BBObject;
 // 
 // bbSize_t class
 // 
-// A simple wrapper for any type of bitset of the BBObject hierarchy (CHECK!) with CACHED size 
+// A simple wrapper for any type of bitset of the BBObject hierarchy with CACHED size 
 // 
 ///////////////////////
 template <class BitSet_t>
@@ -33,6 +33,8 @@ struct bbSize_t{
 	bbSize_t			(int MAX_SIZE) : pc_(0), bb_(MAX_SIZE)	{}
 	bbSize_t			():	pc_ (0)								{}														
 	
+	//move and copy semantics allowed
+
 //allocation
 	
 	/**
