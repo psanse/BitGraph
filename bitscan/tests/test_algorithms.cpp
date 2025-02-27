@@ -225,7 +225,6 @@ TEST(stack_type, basic){
 }
 
 TEST(bba_t, basic){
-//date: 9/8/17 for MWCP upper bound computation
 	
 	bba_t<BBScan> b;		
 	b.init(10, 65);
