@@ -66,7 +66,7 @@ Graph<T>::Graph(std::size_t nV, int* adj[], string filename) {
 		LOG_ERROR("bizarre graph construction-Graph<T>::Graph(...), exiting... ");
 		exit(-1); 
 	}
-	set_name(filename);		
+	name(filename);		
 	
 	//add edges
 	for (int i = 0; i < nV; i++) {
@@ -81,7 +81,7 @@ Graph<T>::Graph(std::size_t nV, int* adj[], string filename) {
 
 
 template<class T>
-void Graph<T>::set_name(std::string name){
+void Graph<T>::name(std::string name){
 
 	//update name
 	size_t found = name.find_last_of("/\\");
@@ -187,7 +187,7 @@ int Graph<T>::reset	(std::size_t NV, string name) {
 	//}
 
 	//update instance name
-	set_name(std::move(name));	
+	this->name(std::move(name));	
 
 	return 0;
 }
@@ -433,7 +433,7 @@ int Graph<T>::read_dimacs(const string& filename){
 	f.close();
 	
 	//name (removes path)
-	set_name(filename);
+	name(filename);
 
 	//extension for weighted files (9/10/16)
 //	string str(filename);					//filename contains the full path
@@ -494,7 +494,7 @@ int Graph<T>::read_01(const string& filename) {
 	f.close();
 
 	//name (removes path)
-	set_name(filename);
+	name(filename);
 	return 0;
 }
 
@@ -646,7 +646,7 @@ void Graph<T>::remove_vertices (const BitSet& bbn, Graph& g){
 	}
 	
 	//computes the induced graph in g
-	g.set_name(this->name_);
+	g.name(this->name_);
 	int l = 0;
 	
 	//adds the edges with endpoints not in the bbn set

@@ -29,7 +29,7 @@ protected:
 		ug.add_edge(0, 1);
 		ug.add_edge(0, 2);
 		ug.add_edge(0, 3);
-		ug.set_name("star");
+		ug.name("star");
 	}
 	void TearDown() override {}
 
@@ -354,7 +354,7 @@ TEST(KCoreUB, DISABLED_random){
 				sstr.str(""); sstr.clear();
 				sstr<<tam<<"_"<<den<<"_"<<rep;
 				name+=sstr.str();
-				ug.set_name(name+".txt");		//change name appropiately
+				ug.name(name+".txt");		//change name appropiately
 				
 				//name stamp
 				sstr.str(""); sstr.clear();	

@@ -236,7 +236,7 @@ TEST(Ugraph_sparse, number_of_edges) {
 	g.add_edge(7, 128);
 
 	EXPECT_EQ(5, g.number_of_edges(true));			//uses current value of number of edges	
-	EXPECT_EQ(5, g.get_number_of_edges());			//uses current value of number of edges	
+	EXPECT_EQ(5, g.number_of_edges(true));			//uses current value of number of edges	
 	EXPECT_EQ(5, g.number_of_edges(false));			//recomputes number of edges
 	
 }

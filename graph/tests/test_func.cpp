@@ -25,7 +25,7 @@ protected:
 		ug.add_edge(0, 2);
 		ug.add_edge(0, 3);
 		ug.add_edge(1, 3);
-		ug.set_name("toy");
+		ug.name("toy");
 	}
 	void TearDown() override {}
 
@@ -45,7 +45,7 @@ protected:
 		ugw.set_w(0, 3);
 		ugw.set_w(1, 2);
 		ugw.set_w(2, 1);
-		ugw.set_name("ugraph_VW");
+		ugw.name("ugraph_VW");
 	}
 	void TearDown() override {}
 

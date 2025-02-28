@@ -38,7 +38,7 @@ const W Base_Graph_W <Graph_t, W >::DEFWT = 1.0;
 template<class W>
 int Graph_W<ugraph, W>::create_complement(Graph_W& g) const {
 
-	g.set_name(this->get_name());
+	g.name(this->get_name());
 	g.set_path(this->get_path());
 	g.get_weights() = ptype::w_;
 	ptype::g_.create_complement(g.graph());
@@ -107,7 +107,7 @@ int Base_Graph_W<Graph_t, W>::init(std::size_t NV , W val, bool reset_name){
 	}
 
 	if (reset_name) {
-		g_.set_name("");
+		g_.name("");
 		g_.set_path("");
 	}
 		
@@ -130,7 +130,7 @@ int Base_Graph_W<Graph_t, W>::reset(std::size_t NV, W val, string name)
 		return -1;
 	}
 
-	g_.set_name(name);
+	g_.name(name);
 
 	return 0;
 }
@@ -365,7 +365,7 @@ int Base_Graph_W<Graph_t, W>::read_dimacs (string filename, int type){
 	f.close();
 	
 	//set name 
-	g_.set_name(filename);
+	g_.name(filename);
 		
 	return 0;
 }

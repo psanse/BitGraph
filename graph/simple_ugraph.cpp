@@ -39,7 +39,7 @@ Ugraph<T>::Ugraph(std::size_t NV, int* adj[], string name) {
 		LOG_ERROR("exiting...");
 		exit(-1);
 	}
-	ptype::set_name(name);
+	ptype::name(name);
 
 	for (std::size_t i = 0; i < NV - 1; ++i) {
 		for (std::size_t j = i + 1; j < NV; ++j) {

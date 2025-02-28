@@ -31,7 +31,7 @@ protected:
 		gw.set_w(0, 1);
 		gw.set_w(1, 2);
 		gw.set_w(2, 3);
-		gw.set_name("toy_weighted");
+		gw.name("toy_weighted");
 	}
 	void TearDown() override {}
 
@@ -230,7 +230,7 @@ TEST(GraphW, DISABLED_gen_weights_to_file){
 //	LOG_INFO("Extended_Weighted_Type:sort_by_weight---------------------------------------");
 //	const int NV=5;
 //	ugraph_w ug(NV);
-//	ug.set_name("my_wgraph");
+//	ug.name("my_wgraph");
 //	
 //	//set edges and cliques
 //	ug.add_edge(0,1);
@@ -274,7 +274,7 @@ TEST(GraphW, DISABLED_gen_weights_to_file){
 //	LOG_INFO("Weighted:generate_and_write_weights---------------------------------------");
 //	const int NV=5;
 //	ugraph ug(NV);
-//	ug.set_name("my_wgraph");
+//	ug.name("my_wgraph");
 //	
 //	//set edges and cliques
 //	ug.add_edge(0,1);
@@ -399,7 +399,7 @@ TEST(GraphW, DISABLED_gen_weights_to_file){
 //
 ////new graph: building from scratch 
 //	ug.init(5);
-//	ug.set_name("mygraph");
+//	ug.name("mygraph");
 //	EXPECT_FALSE(ug.is_weighted_v());
 //
 //	//set edges and cliques
@@ -441,7 +441,7 @@ TEST(GraphW, DISABLED_gen_weights_to_file){
 //	LOG_INFO("Weighted:sort_by_weight---------------------------------------");
 //	const int NV=5;
 //	ugraph ug(NV);
-//	ug.set_name("my_wgraph");
+//	ug.name("my_wgraph");
 //	
 //	//set edges and cliques
 //	ug.add_edge(0,1);
@@ -483,7 +483,7 @@ TEST(GraphW, DISABLED_gen_weights_to_file){
 //	LOG_INFO("Weighted:generate_weights---------------------------------------");
 //	const int NV=5;
 //	ugraph ug(NV);
-//	ug.set_name("my_wgraph");
+//	ug.name("my_wgraph");
 //	
 //	//set edges and cliques
 //	ug.add_edge(0,1);

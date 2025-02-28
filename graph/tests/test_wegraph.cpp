@@ -32,7 +32,7 @@ protected:
 		ugew.set_we(0, 1, 1);
 		ugew.set_we(0, 2, 2);
 		ugew.set_we(1, 3, 3);
-		ugew.set_name("toy_weighted");
+		ugew.name("toy_weighted");
 	}
 	void TearDown() override {}
 

@@ -42,7 +42,7 @@ EDGES<T>::EDGES(string filename, T& gout):g(gout){
 	}
 
 	//set name without path
-	g.set_name(filename);
+	g.name(filename);
 }
 
 template<class T>
@@ -90,22 +90,24 @@ int EDGES<T>::read(){
 	cout<<"reading graph from file-----------------------"<<endl;
 	remove_comments();
 
-	for (int i=0; i<M; i++){
-		f>>v>>w;
-		if(v==w){
+	for (auto i = 0; i < M; ++i){
+		f >> v >> w;
+		if(v == w){
 			//cerr<<"loops found in vertex: "<<v<<endl;
-			loops=true;
+			loops = true;
 			continue;
 		}
-		g.add_edge(v-1, w-1);		//0 based
+		g.add_edge(v - 1, w - 1);		//0 based
 	}
 	
 	if(loops){
-		cerr<<"loops found and removed"<<endl;
-	}else {cout<<"graph read correctly-----------------------"<<endl;}
+		LOG_ERROR("loops found and removed - EDGES<T>::read");
+	}else {
+		LOG_INFO("graph read correctly - EDGES<T>::read");
+	}
 
 	//set name (without path)
-	g.set_name(graphname);
+	g.name(graphname);
 	
 return 0;
 }

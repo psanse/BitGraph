@@ -114,7 +114,7 @@ TEST(Ugraph, equal_toy) {
 	g.add_edge(2, 3);
 	g.add_edge(0, 3);
 	g.add_edge(5, 6);
-	g.set_name("toy");
+	g.name("toy");
 
 	ugraph g1(3);
 	g1.add_edge(0, 1);
@@ -323,7 +323,7 @@ TEST(Ugraph, create_subgraph) {
 	////////////////////////////////
 	ASSERT_EQ	(0, status);
 	EXPECT_EQ	(4, ugi.number_of_vertices());
-	EXPECT_EQ	(2, ugi.get_number_of_edges());
+	EXPECT_EQ	(2, ugi.number_of_edges(true));
 	EXPECT_TRUE	(ugi.is_edge(0,1));					//edge (2,3)
 	EXPECT_TRUE	(ugi.is_edge(2,3));					//edge (5,6)
 	////////////////////////////////
@@ -335,7 +335,7 @@ TEST(Ugraph, create_subgraph) {
 	////////////////////////////////
 	ASSERT_EQ	(0, status);
 	EXPECT_EQ	(2, ugi.number_of_vertices());
-	EXPECT_EQ	(0, ugi.get_number_of_edges());
+	EXPECT_EQ	(0, ugi.number_of_edges(true));
 	////////////////////////////////
 
 }

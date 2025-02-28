@@ -252,7 +252,7 @@ int RandomGen<Graph_t>::create_graph(Graph_t& g, std::size_t n, double p) {
 	//name - r<n>_<p>.txt
 	std::stringstream sstr;
 	sstr << "r" << n << "_" << p << ".txt";
-	g.set_name(sstr.str());
+	g.name(sstr.str());
 
 	return 0;
 }

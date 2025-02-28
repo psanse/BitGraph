@@ -46,7 +46,7 @@ int Base_Graph_EW<Graph_t, W>::init(int NV, W val, bool reset_name){
 	}
 
 	if (reset_name) {
-		g_.set_name("");
+		g_.name("");
 		g_.set_path("");
 	}
 
@@ -70,7 +70,7 @@ template<class Graph_t, class W>
 		return -1;
 	}
 
-	g_.set_name(name);
+	g_.name(name);
 
 	return 0;	
 }
@@ -385,7 +385,7 @@ int Base_Graph_EW<Graph_t, W>::read_dimacs (string filename){
 	 }
 
 	 //name (removes path)
-	 g_.set_name(filename);
+	 g_.name(filename);
 
 	 f.close();	
 
@@ -520,7 +520,7 @@ ostream& Base_Graph_EW<Graph_t, W>::print_data (bool lazy, std::ostream& o, bool
 template<class W>
 int Graph_EW<ugraph, W>::create_complement(Graph_EW<ugraph, W>& g) const {
 
-	g.set_name(this->get_name());
+	g.name(this->get_name());
 	g.set_path(this->get_path());
 	g.get_we() = ptype::we_;
 	ptype::g_.create_complement(g.graph());

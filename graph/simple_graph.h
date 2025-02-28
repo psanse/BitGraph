@@ -44,23 +44,21 @@ public:
 	using type = Graph<T>;				//own type
 	using basic_type = T;				//basic type (a type of bitset)
 	using _bbt = basic_type;			//alias for basic type - for backward compatibility
-			
-	//constructors
+
+/////////////			
+//construction / destruction
 	Graph								();															//creates empty graph
 explicit Graph							(std::size_t n);											//creates graph with n=|V| and m=0 	
 explicit Graph							(std::string filename);										//creates graph from file		
 	Graph								(std::size_t n, int* adj[], std::string filename = "");		//old-style adjacency matrix
 
-	
-	Graph								(Graph&& g)	noexcept	= default;							//move constructor
-	Graph								(const Graph& g)		= default;							//copy constructor
-	Graph& operator =					(const Graph& g)		= default;							//copy operator =
-	Graph& operator =					(Graph&& g)	noexcept	= default;							//move operator =
-	
-
-	//destructor	
+	//move and copu semantics allowed
+	Graph								(const Graph& g)				= default;					
+	Graph& operator =					(const Graph& g)				= default;					
+	Graph								(Graph&& g)			noexcept	= default;					
+	Graph& operator =					(Graph&& g)			noexcept	= default;					
+		
 virtual	~Graph()										= default; 
-
 
 /////////////
 // setters and getters
@@ -76,12 +74,11 @@ virtual	~Graph()										= default;
 	*		 Separates path and instance name internally (if applicable
 	* @param instance name of instance
 	*/
-	void set_name						(std::string instance);
+	void name							(std::string instance);
 	
 	void set_path						(std::string path_name)		{ path_ = std::move(path_name); }
 	std::string get_name				()					const	{return name_;}
 	std::string get_path				()					const	{return path_;}
-	int get_number_of_edges				()					const	{ return NE_; }
 
 	std::size_t number_of_vertices		()					const	{return NV_; }
 	std::size_t number_of_blocks		()					const	{return NBB_;}

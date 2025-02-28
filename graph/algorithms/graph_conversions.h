@@ -67,7 +67,7 @@ public:
 		}
 
 		//name
-		ug.set_name(sug.get_name());
+		ug.name(sug.get_name());
 
 		return 0;
 	}
@@ -104,7 +104,7 @@ public:
 		}
 
 		//name
-		sug.set_name(ug.get_name());
+		sug.name(ug.get_name());
 
 		return 0;
 	}
