@@ -8,14 +8,14 @@ The BITSCAN library is at the core of many exact state-of-the-art algorithms for
 - [A new combinatorial branch-and-bound algorithm for the Knapsack Problem with Conflicts, 2021](https://www.sciencedirect.com/science/article/pii/S0377221720306342).
 - [A branch-and-cut algorithm for the Edge Interdiction Clique Problem, 2021](https://www.sciencedirect.com/science/article/pii/S0377221721000606).
 
-BITSCAN has been tested in LINUX and Windows OS. Please note that 64-bit configurations are required. 
+BITSCAN has been tested in LINUX and Windows OS.  
 
 The library currently offers the following types for bitstrings
 
 - `bitblock`: Wrapper for bit manipulation of 64-bit numbers (*lsb*, *msb*, *popcount* etc.).
 - `simple_bitarray`: Extends bit manipulation to bit arrays
 - `bitarray`: Main type for standard bit manipulation. Uses compiler intrinsics (or assembler equivalents) enhancements.
-- `watched_bitarray`: Extends the bitarray type for populations with low density, but not sparse. Empty bit blocks are still stored in full, but two pointers (aka sentinels) which point (alias *watch*) the highest and lowest empty blocks respectively, determine the range of useful bitmasks.
+- `watched_bitarray`: Extends the bitarray type for set populations with low density, but not sparse. Empty bit blocks are still stored in full, but two pointers (aka sentinels) which point (alias *watch*) the highest and lowest empty blocks respectively, determine the range of useful bitmasks.
 - `simple_sparse_bitarray`: General operations for sparse bit arrays.
 - `sparse_bitarray`: Main type for efficient sparse bit arrays.  Uses compiler intrinsics (or assembler equivalents) enhancements.
 
@@ -27,14 +27,21 @@ GETTING STARTED
 -------------------------------
 To include the BITSCAN library in your project, add the dependency to the *bitscan.h file*. In the following example, a bitset of 100 elements is declared and the 11-th bit is set to 1 (index numbering starts at 0). 
 
+    sparse_bitarray bba(100000);
+    	//...
+
+    if(bba.init_scan(bbo::DESTRUCTIVE)!= -1){
+	int nBit = BBObject::nobit;
+   	while( (nBit=bbi.next_bit_del()) != BBObject::noBit ){
+		//Do something with nBit...
+	  }
+	}
+
+
+
 bitarray bba(100);						//set with population size of 100 elements
 //...
 
-bba.init_scan(bbo::NON_DESTRUCTIVE);
-int nBit = BBObject::noBit;
-while( (nBit=bba.next_bit()) != BBObject::noBit ){
-  //Do something with nBit...
-}
  #include "bitscan/bitscan.h"
   //...
   int main(){
