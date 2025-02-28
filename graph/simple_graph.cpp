@@ -57,12 +57,12 @@ template<class T>
 Graph<T>::Graph(std::size_t NV) {
 	name_.clear();
 	path_.clear();
-	init(NV);
+	reset(NV);
 }
 
 template <class T>
 Graph<T>::Graph(std::size_t nV, int* adj[], string filename) {
-	if (init(nV) == -1) {
+	if (reset(nV) == -1) {
 		LOG_ERROR("bizarre graph construction-Graph<T>::Graph(...), exiting... ");
 		exit(-1); 
 	}
@@ -115,45 +115,41 @@ void Graph<T>::clear (){
 	NV_ = 0, NBB_ = 0, NE_ = 0;
 }
 
-template<class T>
-int Graph<T>::init (std::size_t NV, bool reset_name){
-
-	if (NV <= 0) {
-		LOG_ERROR("Invalid graph size - Graph<T>::init");
-		return -1;
-	}
-
-	//initialization
-	NV_ = NV;
-	NBB_ = INDEX_1TO1(NV_);
-	NE_ = 0;
-
-	try{
-		//////////////////////////////
-		adj_.assign(NV, T(NV));				//bitsets initialize to 0		
-		//////////////////////////////
-		
-	}catch(const std::bad_alloc& e){
-		LOG_ERROR("memory for graph not allocated - Graph<T>::init");
-		LOG_ERROR(e.what());		
-		NV_ = 0;
-		NBB_ = 0;			
-		return -1;
-	}
-			
-	//init bitarrays with zero edges - CHECK if needed (should not be)
-	//for(std::size_t i=0; i<NV_; i++){
-	//	adj_[i].init(NV_);					//MUST BE! - CHECK THIS COMMENT (31/12/24)
-	//}
-
-	//clears name if requested
-	if (reset_name) {
-		name_.clear();
-		path_.clear();
-	}
-
-	return 0;
-}
+//template<class T>
+//int Graph<T>::reset (std::size_t NV, bool reset_name){
+//
+//	if (NV <= 0) {
+//		LOG_ERROR("Invalid graph size - Graph<T>::reset");
+//		return -1;
+//	}
+//
+//	//initialization
+//	NV_ = NV;
+//	NBB_ = INDEX_1TO1(NV_);
+//	NE_ = 0;
+//
+//	try{
+//		//////////////////////////////
+//		adj_.assign(NV, T(NV));				//bitsets initialize to 0 - CHECK		
+//		//////////////////////////////
+//		
+//	}catch(const std::bad_alloc& e){
+//		LOG_ERROR("memory for graph not allocated - Graph<T>::reset");
+//		LOG_ERROR(e.what());		
+//		NV_ = 0;
+//		NBB_ = 0;			
+//		return -1;
+//	}
+//		
+//
+//	//clears name if requested
+//	if (reset_name) {
+//		name_.clear();
+//		path_.clear();
+//	}
+//
+//	return 0;
+//}
 
 template<class T>
 int Graph<T>::reset	(std::size_t NV, string name) {
@@ -170,22 +166,17 @@ int Graph<T>::reset	(std::size_t NV, string name) {
 
 	try {
 		//////////////////////////////
-		adj_.assign(NV, T(NV));				//bitsets initialize to 0		
+		adj_.assign(NV, T(NV));				//bitsets initialize to 0 - CHECK 		
 		//////////////////////////////
 	}
 	catch (const std::bad_alloc& e) {
-		LOG_ERROR("memory for graph not allocated - Graph<T>::init");
+		LOG_ERROR("memory for graph not allocated - Graph<T>::reset");
 		LOG_ERROR(e.what());
 		NV_ = 0;
 		NBB_ = 0;
 		return -1;
 	}
-
-	//init bitarrays with zero edges - CHECK if needed (should not be)
-	//for (std::size_t i = 0; i < NV_; i++) {
-	//	adj_[i].init(NV_);					//MUST BE! - CHECK THIS COMMENT (31/12/24)
-	//}
-
+	
 	//update instance name
 	this->name(std::move(name));	
 
@@ -343,14 +334,14 @@ int Graph<T>::read_dimacs(const string& filename){
 		return -1;
 	}	
 	
-	init(size);
+	reset(size);
 	::gio::read_empty_lines(f);
 
 	//read weights format n <x> <w> if they exist
 	//c=f.peek();
 	//if(c=='n' || c=='v' /* used by Zavalnij */){						
 	//	LOG_ERROR("Graph<T>::read_dimacs-DIMACS weights found in file: excluding other weights");
-	//	init_wv();
+	//	reset_wv();
 	//	m_is_wv=true;
 	//	for(int n=0; n<NV_; n++){
 	//		f>>c>>v1>>wv;
@@ -385,7 +376,7 @@ int Graph<T>::read_dimacs(const string& filename){
 	//	clear(); f.close(); 	return -1;
 	//}else if(nw==4){  /* edge weighted case */
 	//	LOG_INFO("reading edge weights from the file"); 
-	//	init_we(0.0);
+	//	reset_we(0.0);
 	//}
 
 	////interpret the first line
@@ -474,7 +465,7 @@ int Graph<T>::read_01(const string& filename) {
 
 	//read size
 	f >> size;
-	if (init(size) == -1) {
+	if (reset(size) == -1) {
 		LOG_ERROR("Graph<T>::read_01-bizarre graph size");
 		f.close();
 		return -1;
@@ -801,7 +792,7 @@ void  Graph<T>::write_EDGES	(ostream& o)   {
 //		return *this;
 //	}
 //
-//	newg.init(size);
+//	newg.reset(size);
 //
 //	//copies to the new graph
 //	for (int i = 0; i < newg.NV_; i++) {
@@ -905,7 +896,7 @@ void  Graph<T>::write_EDGES	(ostream& o)   {
 //	//Escribir nodos
 //	for (int v = 0; v < NV_; v++) {
 //		//non destructive scan of each bitstring
-//		if (adj_[v].init_scan(bbo::NON_DESTRUCTIVE) != EMPTY_ELEM) {
+//		if (adj_[v].reset_scan(bbo::NON_DESTRUCTIVE) != EMPTY_ELEM) {
 //			while (1) {
 //				int w = adj_[v].next_bit();
 //				if (w == EMPTY_ELEM)

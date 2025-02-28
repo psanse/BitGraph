@@ -35,7 +35,7 @@ using namespace ::com::sort;
 class GraphFastRootSortTest : public ::testing::Test {
 protected:
 	void SetUp() override {
-		ug.init(NV);
+		ug.reset(NV);
 		ug.add_edge(1, 2);
 		ug.add_edge(1, 3);
 		ug.add_edge(1, 4);

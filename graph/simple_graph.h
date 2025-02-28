@@ -110,7 +110,7 @@ public:
 	* @updates 18/06/19, 31/12/24
 	* @comment_1 preserved for backward compatibility (use reset(...))
 	*/
-	int init							(std::size_t n, bool reset_name = true);	
+	//int init							(std::size_t n, bool reset_name = true);	
 
 	/*
 	* @brief resets to empty graph given name and number of vertices

@@ -8,6 +8,7 @@
 **/
 
 #include "mmio.h"
+#include "utils/logger.h"
 #include <cstdio>
 #include <fstream>
 #include <sstream>
@@ -37,16 +38,17 @@ int MMI<T>::read(const string& filename){
 
 	//open file
 	FILE* f= fopen(filename.c_str(), "r"); 	
-	if(f==NULL){
-		cerr<<filename.c_str()<<" not found"<<endl;
+	if(f == NULL){
+		LOGG_ERROR(filename.c_str(), " not found - MMI<T>::read");
 		return -1;
 	}
 
 	//read banner	
 	int ret_code=0;
-    if ( (ret_code=mm_read_banner(f, &matcode)) != 0)    {
-        cout<<"Could not process Matrix Market banner."<<endl;
-		what(ret_code);
+    if ( (ret_code = mm_read_banner(f, &matcode)) != 0) {
+
+		LOG_ERROR("Could not process Matrix Market banner-MMI<T>::read");	
+       	what(ret_code);
 		fclose(f);
 		return -1;
     }
@@ -55,9 +57,13 @@ int MMI<T>::read(const string& filename){
 #ifdef ALLOW_DIRECTED_GRAPHS
 
 	if( (!mm_is_sparse(matcode)) ||  (!mm_is_pattern(matcode)) /*|| (!mm_is_symmetric(matcode))*/ )   {
-        cout<<"Sorry, this application does not support ";
+		
+		LOG_ERROR("Sorry, this application does not support Market Market type -MMI<T>::read");
+
 		stringstream sstr("Market Market type: ");
-		sstr<< mm_typecode_to_str(matcode)<<endl;
+		sstr << mm_typecode_to_str(matcode) << endl;
+		LOGG_ERROR(sstr.str());
+	
 		fclose(f);
         return -1;
     }
@@ -82,23 +88,28 @@ int MMI<T>::read(const string& filename){
 	}
 
 	//check it is a square matrix
-	if(M!=N){
-		cerr<<"non-square adjacency matrix"<<endl;
-			fclose(f);
+	if(M != N){
+		LOG_ERROR("non-square adjacency matrix-MMI<T>::read");
+		fclose(f);
 		return -1;
 	}
 		
 	//init size
-	g.init(N);
+	g.reset(N);
 	
 	//read edges
-	for (int i=0; i<nz; i++){
-		fscanf(f, "%d %d", &v, &w);
-		if(v==w){
-			cerr<<"loops found in vertex: "<<v<<endl;
+	for (auto i = 0; i < nz; ++i){
+		if (fscanf(f, "%d %d", &v, &w) != 2) {
+			LOG_ERROR("bad reading protocol-MMI<T>::read");
+			fclose(f);
+			return -1;
+		}
+
+		if(v == w){
+			LOGG_ERROR("loops found in vertex: ", v, " -MMI<T>::read");
 		}
 		
-		g.add_edge(v-1, w-1);		//0 based
+		g.add_edge(v - 1, w - 1);		//0 based
     }
 
 	//name (remove path)

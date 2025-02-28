@@ -331,7 +331,7 @@ int SparseRandomGen<sparse_ugraph, logSizeTable>::create_ugraph(sparse_ugraph& g
 	uniform_int_distribution<int> distribution(0, logSizeTable - 1);
 	generator.seed((unsigned)time(nullptr));
 
-	g.init(n);
+	g.reset(n);
 	do {
 		int l = ceil(log_[distribution(generator)] / logp) - 1;
 		(l > 0) ? skip = l : skip = 0;

@@ -23,7 +23,7 @@ using vint = vector<int>;
 class GraphTest : public ::testing::Test {
 protected:
 	void SetUp() override {
-		g.init(NV);
+		g.reset(NV);
 		g.add_edge(1, 2);
 		g.add_edge(1, 3);
 		g.add_edge(1, 4);
@@ -190,16 +190,16 @@ TEST_F(GraphTest, name) {
 	EXPECT_STREQ("c:\\path\\", g.path().c_str());
 }
 
-TEST_F(GraphTest, init_and_reset) {
+TEST_F(GraphTest, reset_and_reset) {
 
 	const int NV = 10;
 	g.name("new_name");
 
 	////////////////////////////////////
-	g.init(NV, true);							
+	g.reset(NV);							
 	EXPECT_EQ(NV, g.number_of_vertices());
 	EXPECT_EQ(0, g.number_of_edges());
-	EXPECT_TRUE(g.name().empty());						//init(NV, true) clears name
+	EXPECT_TRUE(g.name().empty());						//reset(NV, true) clears name
 	////////////////////////////////////
 	
 	///////////////////////////////////

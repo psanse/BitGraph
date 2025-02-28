@@ -29,29 +29,29 @@ const W Base_Graph_EW <Graph_t, W >::NOWT = 0;					// or 0x1FFFFFFF (best value 
 /////////////////////////////////////////////////
 
 
-template<class Graph_t, class W>
-int Base_Graph_EW<Graph_t, W>::init(int NV, W val, bool reset_name){
-
-	if (g_.reset(NV) == -1) {
-		LOG_ERROR("error during memory graph allocation - Base_Graph_EW<T, W>::init");
-		return -1;
-	}
-	
-	try {
-		we_.assign(NV, vector<W>(NV, val));
-	}
-	catch (...) {
-		LOG_ERROR("bad weight assignment - Base_Graph_EW<Graph_t, W>::init");
-		return -1;
-	}
-
-	if (reset_name) {
-		g_.name("");
-		g_.path("");
-	}
-
-return 0;
-}
+//template<class Graph_t, class W>
+//int Base_Graph_EW<Graph_t, W>::init(int NV, W val, bool reset_name){
+//
+//	if (g_.reset(NV) == -1) {
+//		LOG_ERROR("error during memory graph allocation - Base_Graph_EW<T, W>::init");
+//		return -1;
+//	}
+//	
+//	try {
+//		we_.assign(NV, vector<W>(NV, val));
+//	}
+//	catch (...) {
+//		LOG_ERROR("bad weight assignment - Base_Graph_EW<Graph_t, W>::init");
+//		return -1;
+//	}
+//
+//	if (reset_name) {
+//		g_.name("");
+//		g_.path("");
+//	}
+//
+//return 0;
+//}
 
 
 template<class Graph_t, class W>
@@ -94,7 +94,7 @@ template<class Graph_t, class W>
 template<class Graph_t, class W>
 Base_Graph_EW<Graph_t, W>::Base_Graph_EW(mat_t& lwe) : we_ (lwe) {
 
-	if (g_.init(lwe.size()) == -1) {
+	if (g_.reset(lwe.size()) == -1) {
 		LOG_ERROR("error during memory graph allocation - Base_Graph_EW<T, W>::Base_Graph_EW");
 		LOG_ERROR("exiting...");
 		std::exit(-1);

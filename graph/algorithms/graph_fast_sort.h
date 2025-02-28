@@ -86,7 +86,7 @@ explicit GraphFastRootSort(Graph_t& gout) :
 	{
 		nb_neigh_.assign(NV_, 0);
 		deg_neigh_.assign(NV_, 0);
-		node_active_state_.init(NV_); 
+		node_active_state_.reset(NV_); 
 	}
 
 	//move and copy semantics not allowed
@@ -823,7 +823,7 @@ inline
 int GraphFastRootSort<Graph_t>::reorder(const vint& new_order, Graph_t& gn, Decode* d) 
 {
 	std::size_t NV = g_.number_of_vertices();
-	gn.init(NV);
+	gn.reset(NV);
 	gn.name(g_.name());	
 	gn.path(g_.path());
 	
