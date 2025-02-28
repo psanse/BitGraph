@@ -45,15 +45,13 @@ Efficient DBS loops are easier to control than NDBS ones because LSB / MSB opera
 
 Here is an example of fast bit scan loop syntax in BITSCAN:
 
-bitarray bba(100);						//set with population size of 100 elements
-//...
-
-bba.init_scan(bbo::NON_DESTRUCTIVE);
-int nBit = BBObject::noBit;
-while( (nBit=bba.next_bit()) != BBObject::noBit ){
-  //Do something with nBit...
-}
-
+    bitarray bba(100);
+    	//...
+	bba.init_scan(bbo::NON_DESTRUCTIVE);
+   	  int nBit = BBObject::noBit;;
+  	  while( (nBit=bba.next_bit()) != BBObject::noBit ){
+   	  //Do something with nBit...
+  	}   
 The *init_scan* member function configures cache information appropriately. Currently four types of scans are supported: DESTRUCTIVE, NON\_DESTRUCTIVE and the reverse counterparts (DESTRUCTIVE\_REVERSE and NON\_DESTRUCTIVE\_REVERSE). For each type there is an appropriate family of functions. Here is another example, this time for a sparse bitset of 100000 bits:
 
 
