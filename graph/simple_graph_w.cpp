@@ -38,7 +38,7 @@ const W Base_Graph_W <Graph_t, W >::DEFWT = 1.0;
 template<class W>
 int Graph_W<ugraph, W>::create_complement(Graph_W& g) const {
 
-	g.name(this->get_name());
+	g.name(this->name());
 	g.set_path(this->get_path());
 	g.get_weights() = ptype::w_;
 	ptype::g_.create_complement(g.graph());

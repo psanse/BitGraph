@@ -55,7 +55,7 @@ TEST_F(UGraphWTest, contruction) {
 	EXPECT_TRUE	(gw.is_edge(0, 2));
 	EXPECT_FALSE(gw.is_edge(1, 2));
 
-	EXPECT_STREQ("toy_weighted", gw.get_name().c_str());
+	EXPECT_STREQ("toy_weighted", gw.name().c_str());
 }
 
 TEST_F(UGraphWTest, copy_constructor) {
@@ -76,7 +76,7 @@ TEST_F(UGraphWTest, copy_constructor) {
 	EXPECT_TRUE	(gw_copy.is_edge(0, 2));
 	EXPECT_FALSE(gw_copy.is_edge(1, 2));
 
-	EXPECT_STREQ("toy_weighted", gw_copy.get_name().c_str());
+	EXPECT_STREQ("toy_weighted", gw_copy.name().c_str());
 	//////////////////////////////////
 
 }
@@ -100,7 +100,7 @@ TEST_F(UGraphWTest, assignment) {
 	EXPECT_TRUE(gw1.is_edge(0, 2));
 	EXPECT_FALSE(gw1.is_edge(1, 2));
 
-	EXPECT_STREQ("toy_weighted", gw1.get_name().c_str());
+	EXPECT_STREQ("toy_weighted", gw1.name().c_str());
 	//////////////////////////////////
 
 }
@@ -114,7 +114,7 @@ TEST_F(UGraphWTest, init) {
 	EXPECT_EQ	(1, gw.get_w(0));
 	EXPECT_EQ	(1, gw.get_w(1));
 	EXPECT_EQ	(1, gw.get_w(2));
-	EXPECT_TRUE	(gw.get_name().empty());
+	EXPECT_TRUE	(gw.name().empty());
 	/////////////////////////////////
 }
 
@@ -127,7 +127,7 @@ TEST_F(UGraphWTest, reset) {
 	EXPECT_EQ	(1, gw.get_w(0));
 	EXPECT_EQ	(1, gw.get_w(1));
 	EXPECT_EQ	(1, gw.get_w(2));
-	EXPECT_STREQ("toy", gw.get_name().c_str());
+	EXPECT_STREQ("toy", gw.name().c_str());
 	/////////////////////////////////
 }
 

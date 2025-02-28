@@ -70,10 +70,10 @@ TEST(Graph_sparse,constructor_file){
 	EXPECT_EQ	(13089,g4.number_of_edges());
 
 	//name
-	EXPECT_STREQ("brock200_1.clq", g1.get_name().c_str());
-	EXPECT_STREQ("brock200_2.clq", g2.get_name().c_str());
-	EXPECT_STREQ("brock200_3.clq", g3.get_name().c_str());
-	EXPECT_STREQ("brock200_4.clq", g4.get_name().c_str());
+	EXPECT_STREQ("brock200_1.clq", g1.name().c_str());
+	EXPECT_STREQ("brock200_2.clq", g2.name().c_str());
+	EXPECT_STREQ("brock200_3.clq", g3.name().c_str());
+	EXPECT_STREQ("brock200_4.clq", g4.name().c_str());
 
 	//is directed
 	EXPECT_NE	(g1.is_edge(3,2),g1.is_edge(2,3));
@@ -101,8 +101,8 @@ TEST(Graph_sparse,constructor_copy){
 	////////////////////////////////////////////////////////////
 	EXPECT_EQ	(g.number_of_edges(),g1.number_of_edges());
 	EXPECT_EQ	(g.number_of_vertices(),g1.number_of_vertices());
-	EXPECT_EQ	(g.get_name(),g1.get_name());
-	EXPECT_EQ	("brock200_2.clq",g1.get_name());
+	EXPECT_EQ	(g.name(),g1.name());
+	EXPECT_EQ	("brock200_2.clq",g1.name());
 	EXPECT_TRUE	(g == g1);
 	////////////////////////////////////////////////////////////
 
@@ -333,10 +333,10 @@ TEST(Ugraph_sparse,ugraph_from_file){
 	EXPECT_EQ	(13089,g4.number_of_edges());
 
 	//name
-	EXPECT_STREQ("brock200_1.clq", g1.get_name().c_str());
-	EXPECT_STREQ("brock200_2.clq", g2.get_name().c_str());
-	EXPECT_STREQ("brock200_3.clq", g3.get_name().c_str());
-	EXPECT_STREQ("brock200_4.clq", g4.get_name().c_str());
+	EXPECT_STREQ("brock200_1.clq", g1.name().c_str());
+	EXPECT_STREQ("brock200_2.clq", g2.name().c_str());
+	EXPECT_STREQ("brock200_3.clq", g3.name().c_str());
+	EXPECT_STREQ("brock200_4.clq", g4.name().c_str());
 
 	//is undirected
 	EXPECT_EQ	(g1.is_edge(3,2),g1.is_edge(2,3));

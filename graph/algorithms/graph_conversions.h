@@ -67,7 +67,7 @@ public:
 		}
 
 		//name
-		ug.name(sug.get_name());
+		ug.name(sug.name());
 
 		return 0;
 	}
@@ -89,9 +89,9 @@ public:
 		}
 
 		//add edges	
-		auto NBB = ug.number_of_blocks();
+		auto blockID = ug.number_of_blocks();
 		for (auto v = 0; v < NV; ++v) {
-			for (auto nBB = 0; nBB < NBB; ++nBB) {
+			for (auto nBB = 0; nBB < blockID; ++nBB) {
 
 				BITBOARD bb = ug.adj_[v].block(nBB);
 				if (bb != 0) {
@@ -104,7 +104,7 @@ public:
 		}
 
 		//name
-		sug.name(ug.get_name());
+		sug.name(ug.name());
 
 		return 0;
 	}

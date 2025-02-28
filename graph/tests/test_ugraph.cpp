@@ -44,10 +44,10 @@ TEST(Ugraph_test, constructor_file){
 		
 	//test names 
 	/////////////////////////////////////////////////////
-	EXPECT_STREQ("brock200_1.clq",g1.get_name().c_str());
-	EXPECT_STREQ("brock200_2.clq",g2.get_name().c_str());
-	EXPECT_STREQ("brock200_3.clq",g3.get_name().c_str());
-	EXPECT_STREQ("brock200_4.clq",g4.get_name().c_str());
+	EXPECT_STREQ("brock200_1.clq",g1.name().c_str());
+	EXPECT_STREQ("brock200_2.clq",g2.name().c_str());
+	EXPECT_STREQ("brock200_3.clq",g3.name().c_str());
+	EXPECT_STREQ("brock200_4.clq",g4.name().c_str());
 	/////////////////////////////////////////////////////
 
 }
@@ -82,7 +82,7 @@ TEST(Ugraph, constructor_adj_matrix) {
 	EXPECT_TRUE(ug.is_edge(0, 2));
 	EXPECT_TRUE(ug.is_edge(1, 0));
 	EXPECT_TRUE(ug.is_edge(2, 0));
-	EXPECT_STREQ("mygraph", ug.get_name().c_str());
+	EXPECT_STREQ("mygraph", ug.name().c_str());
 	////////////////////////////////
 
 	//deallcoate memory
@@ -132,7 +132,7 @@ TEST(Ugraph, equal_toy) {
 	EXPECT_TRUE	(g1.is_edge(0, 3));
 	EXPECT_TRUE	(g1.is_edge(5, 6));
 	EXPECT_FALSE(g1.is_edge(0, 2));
-	EXPECT_STREQ("toy", g1.get_name().c_str());
+	EXPECT_STREQ("toy", g1.name().c_str());
 	//////////////////////////////////////////////
 
 }

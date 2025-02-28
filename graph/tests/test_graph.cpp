@@ -43,7 +43,7 @@ TEST_F(GraphTest, constructor) {
 	EXPECT_EQ(6, g.number_of_vertices());
 	EXPECT_EQ(1, g.number_of_blocks());
 	EXPECT_TRUE(g.get_path().empty());
-	EXPECT_TRUE(g.get_name().empty());
+	EXPECT_TRUE(g.name().empty());
 
 	EXPECT_TRUE(g.is_edge(1, 2));
 	EXPECT_TRUE(g.is_edge(1, 3));
@@ -76,7 +76,7 @@ TEST(Graph, constructor_adj_mat) {
 	EXPECT_TRUE(g.is_edge(0, 2));
 	EXPECT_FALSE(g.is_edge(1, 0));
 	EXPECT_FALSE(g.is_edge(2, 0));
-	EXPECT_STREQ("mygraph", g.get_name().c_str());
+	EXPECT_STREQ("mygraph", g.name().c_str());
 	/////////////////////////////////
 
 	//deallocates memory
@@ -125,10 +125,10 @@ TEST(Graph, constructor_file) {
 	EXPECT_EQ(2 * 13089, g4.number_of_edges());
 
 	//test names
-	EXPECT_STREQ("brock200_1.clq", g1.get_name().c_str());
-	EXPECT_STREQ("brock200_2.clq", g2.get_name().c_str());
-	EXPECT_STREQ("brock200_3.clq", g3.get_name().c_str());
-	EXPECT_STREQ("brock200_4.clq", g4.get_name().c_str());
+	EXPECT_STREQ("brock200_1.clq", g1.name().c_str());
+	EXPECT_STREQ("brock200_2.clq", g2.name().c_str());
+	EXPECT_STREQ("brock200_3.clq", g3.name().c_str());
+	EXPECT_STREQ("brock200_4.clq", g4.name().c_str());
 }
 
 TEST(Graph, copy_constructor) {
@@ -143,8 +143,8 @@ TEST(Graph, copy_constructor) {
 	/////////////////////////////////////////////////////////
 	EXPECT_EQ	(g.number_of_edges(), gc.number_of_edges());
 	EXPECT_EQ	(g.number_of_vertices(), gc.number_of_vertices());
-	EXPECT_EQ	(g.get_name(), gc.get_name());
-	EXPECT_EQ	("brock200_2.clq", gc.get_name());
+	EXPECT_EQ	(g.name(), gc.name());
+	EXPECT_EQ	("brock200_2.clq", gc.name());
 	EXPECT_TRUE	(g == gc);
 	/////////////////////////////////////////////////////////
 		
@@ -169,7 +169,7 @@ TEST(Graph, move_constructor) {
 	/////////////////////////////////////////////
 	EXPECT_EQ(NE, gc.number_of_edges());
 	EXPECT_EQ(NV, gc.number_of_vertices());
-	EXPECT_EQ("brock200_2.clq", gc.get_name());	
+	EXPECT_EQ("brock200_2.clq", gc.name());	
 	/////////////////////////////////////////////
 
 }
@@ -178,15 +178,15 @@ TEST(Graph, move_constructor) {
 TEST_F(GraphTest, name) {
 	
 	g.name("test");
-	EXPECT_STREQ("test", g.get_name().c_str());
+	EXPECT_STREQ("test", g.name().c_str());
 	EXPECT_TRUE(g.get_path().empty());
 
 	g.name("c:/path/test");
-	EXPECT_STREQ("test", g.get_name().c_str());
+	EXPECT_STREQ("test", g.name().c_str());
 	EXPECT_STREQ("c:/path/", g.get_path().c_str());
 
 	g.name("c:\\path\\test");
-	EXPECT_STREQ("test", g.get_name().c_str());
+	EXPECT_STREQ("test", g.name().c_str());
 	EXPECT_STREQ("c:\\path\\", g.get_path().c_str());
 }
 
@@ -199,14 +199,14 @@ TEST_F(GraphTest, init_and_reset) {
 	g.init(NV, true);							
 	EXPECT_EQ(NV, g.number_of_vertices());
 	EXPECT_EQ(0, g.number_of_edges());
-	EXPECT_TRUE(g.get_name().empty());						//init(NV, true) clears name
+	EXPECT_TRUE(g.name().empty());						//init(NV, true) clears name
 	////////////////////////////////////
 	
 	///////////////////////////////////
 	g.reset(NV + 1, "new_name");
 	EXPECT_EQ(NV + 1, g.number_of_vertices());
 	EXPECT_EQ(0, g.number_of_edges());
-	EXPECT_STREQ("new_name", g.get_name().c_str());			
+	EXPECT_STREQ("new_name", g.name().c_str());			
 	////////////////////////////////////
 }
 

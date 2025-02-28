@@ -75,9 +75,10 @@ virtual	~Graph()										= default;
 	* @param instance name of instance
 	*/
 	void name							(std::string instance);
+std::string name						()					const { return name_; }
 	
 	void set_path						(std::string path_name)		{ path_ = std::move(path_name); }
-	std::string get_name				()					const	{return name_;}
+	
 	std::string get_path				()					const	{return path_;}
 
 	std::size_t number_of_vertices		()					const	{return NV_; }

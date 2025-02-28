@@ -69,7 +69,7 @@ Graph<T>::Graph(std::size_t nV, int* adj[], string filename) {
 	name(filename);		
 	
 	//add edges
-	for (int i = 0; i < nV; i++) {
+	for (auto i = 0; i < nV; i++) {
 		for (int j = 0; j < nV; j++) {
 			if (adj[i][j] == 1) {
 				add_edge(i, j);

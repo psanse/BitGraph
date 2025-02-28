@@ -358,11 +358,11 @@ TEST(KCoreUB, DISABLED_random){
 				
 				//name stamp
 				sstr.str(""); sstr.clear();	
-				sstr<<ug.get_name();
+				sstr << ug.name();
 				
 				//store instance if desired
 				//if(store_graph){
-				//	if(comclq::graph_to_dimacs(ug, PATH+ug.get_name())==-1){
+				//	if(comclq::graph_to_dimacs(ug, PATH+ug.name())==-1){
 				//		LOG_WARNING("random_test: could not store generated instance");
 				//	}
 				//}

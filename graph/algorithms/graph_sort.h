@@ -341,7 +341,7 @@ int GraphSort<Graph_t>::reorder(const vint& new_order, ostream* o){
 
 	int size=g.number_of_vertices();
 	Graph_t gn(size);
-	gn.name(g.get_name());
+	gn.name(g.name());
 	
 		
 	//only for undirected graphs
@@ -409,7 +409,7 @@ int GraphSort<ugraph_w>::reorder(const vint& new_order, ostream* o) {
 
 	int size = g.number_of_vertices();
 	ugraph_w gn(size);
-	gn.name(g.graph().get_name());
+	gn.name(g.graph().name());
 
 
 	//only for undirected graphs
@@ -478,7 +478,7 @@ int GraphSort<Graph_t>::reorder_edge_based(const vint& new_order, ostream* o){
 	}
 		
 	Graph_t gn(NV);
-	gn.name(g.get_name());
+	gn.name(g.name());
 	
 
 	for(int v=0; v<NV-1; v++){
@@ -534,7 +534,7 @@ int GraphSort<Graph_t>::reorder (const vint& new_order, Decode& d,  ostream* o){
 
 	int size=g.number_of_vertices();
 	Graph_t gn(size);
-	gn.name(g.get_name());
+	gn.name(g.name());
 	
 
 	//only for undirected graphs
@@ -612,7 +612,7 @@ int GraphSort<ugraph_w>::reorder(const vint& new_order, Decode& d, ostream* o) {
 
 	int size = g.number_of_vertices();
 	ugraph_w gn(size);
-	gn.name(g.graph().get_name());
+	gn.name(g.graph().name());
 
 
 	//only for undirected graphs
@@ -678,7 +678,7 @@ int GraphSort<Graph_t>::reorder_edge_based (const vint& new_order, Decode& d,  o
 	}
 		
 	Graph_t gn(NV);
-	gn.name(g.get_name());
+	gn.name(g.name());
 	
 
 	for(int v=0; v<NV-1; v++){
@@ -747,7 +747,7 @@ int GraphSort<Graph_t>::reorder (const vint& new_order, Graph_t& gn, Decode& d, 
 		return -1;
 	}
 	gn.init(NV);
-	gn.name(g.get_name());
+	gn.name(g.name());
 	
 
 	//only for undirected graphs
@@ -796,7 +796,7 @@ int GraphSort<Graph_t>::reorder_edge_based (const vint& new_order, Graph_t& gn, 
 		return -1;
 	}
 	gn.init(NV);
-	gn.name(g.get_name());
+	gn.name(g.name());
 
 	//edge based
 	for(int v=0; v<NV-1; v++){
@@ -851,7 +851,7 @@ int GraphSort<sparse_ugraph>::reorder(const vint& new_order, ostream* o){
 
 	int size=g.number_of_vertices();
 	sparse_ugraph gn(size);
-	gn.name(g.get_name());
+	gn.name(g.name());
 	
 	//only for undirected graphs
 	int j=EMPTY_ELEM;
@@ -893,7 +893,7 @@ int GraphSort<sparse_ugraph>::reorder(const vint& new_order, Decode& d, ostream*
 
 	int size=g.number_of_vertices();
 	sparse_ugraph gn(size);
-	gn.name(g.get_name());
+	gn.name(g.name());
 	
 	//only for undirected graphs
 	int j=EMPTY_ELEM;

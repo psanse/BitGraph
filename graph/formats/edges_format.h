@@ -84,7 +84,7 @@ int EDGES<T>::read(){
 	}
 
 	//reads graph: no error is expected here
-	string graphname(g.get_name());						//stores name of file, already without path before it is initialized
+	string graphname(g.name());						//stores name of file, already without path before it is initialized
 	cout<<"allocating memory for graph size:"<<N<<" --------------"<<endl;
 	g.init(N);
 	cout<<"reading graph from file-----------------------"<<endl;

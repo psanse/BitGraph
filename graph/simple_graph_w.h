@@ -110,7 +110,7 @@ const _bbt& get_neighbors				(int v)		const			{ return g_.get_neighbors(v); }
  	_bbt& get_neighbors					(int v)						{ return g_.get_neighbors(v); }
 	
 	void name							(std::string str)			{ g_.name(str); }
-	std::string get_name				()			const			{ return g_.get_name(); }
+std::string name						()			const			{ return g_.name(); }
 	void set_path						(std::string path_name)		{ g_.set_path(path_name); }
 	std::string get_path				()			const			{ return g_.get_path(); }
 

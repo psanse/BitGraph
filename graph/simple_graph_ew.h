@@ -132,7 +132,7 @@ virtual	~Base_Graph_EW()										= default;
 	_bbt& get_neighbors			(int v)						{ return g_.get_neighbors(v); }
 
 	void name					(std::string str)			{ g_.name(str); }
-	string get_name				()				const		{ return g_.get_name(); }
+  string name					()				const		{ return g_.name(); }
 	string get_path				()				const		{ return g_.get_path(); }
 	void set_path				(std::string path_name)		{ g_.set_path(path_name); }
 

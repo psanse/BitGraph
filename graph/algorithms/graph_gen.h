@@ -394,7 +394,7 @@ int WeightGen<Graph_t>::create_weights (Graph_t& g, type_t type, int wmod, std::
 		//determines the filename
 		std::string path = FILE_PATH;
 		com::dir::append_slash(path);
-		std::string filename = path + g.graph().get_name() + FILE_EXTENSION;
+		std::string filename = path + g.graph().name() + FILE_EXTENSION;
 
 		//streams weights to file
 		std::ofstream f(filename);
@@ -434,7 +434,7 @@ int EdgeWeightGen<Graph_t>::create_weights (Graph_t& g, type_t type, int wmod, s
 		//determines the filename
 		std::string path = FILE_PATH;
 		com::dir::append_slash(path);
-		std::string filename = path + g.graph().get_name() + FILE_EXTENSION;
+		std::string filename = path + g.graph().name() + FILE_EXTENSION;
 
 		//streams weights to file
 		std::ofstream f(filename);
