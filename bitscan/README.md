@@ -30,10 +30,10 @@ To include the BITSCAN library in your project, add the dependency to the *bitsc
      #include "bitscan/bitscan.h"
     	//...
 	int main(){
-   bitarray bbi(100);
-   bbi.set_bit(10);
-   std::cout << bbi;
-  }
+   		bitarray bbi(100);
+  		bbi.set_bit(10);
+   		std::cout << bbi;
+  	}
     
 You will find many more examples in the *tests* folder.  
 
