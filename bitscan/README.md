@@ -31,8 +31,8 @@ To include the BITSCAN library in your project, add the dependency to the *bitsc
 	//...
     int main(){
     	bitarray bbi(100);
-		bbi.set_bit(10);
-		std::cout << bbi;
+	bbi.set_bit(10);
+	std::cout << bbi;
     }
  You will find many more examples in the *tests* folder.  
 
@@ -48,8 +48,8 @@ Here is an example of fast bit scan loop syntax in BITSCAN:
     bitarray bba(100);						//set with population size of 100 elements
 	//...
 
-    bba.init_scan(bbo::NON_DESTRUCTIVE);
-   	 int nBit = BBObject::noBit;
+    	bba.init_scan(bbo::NON_DESTRUCTIVE);
+   	int nBit = BBObject::noBit;
 	while( (nBit=bba.next_bit()) != BBObject::noBit ){
 		//Do something with nBit...
 	}
