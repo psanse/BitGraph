@@ -142,7 +142,7 @@ std::string path						()			const			{ return g_.path(); }
 	/*
 	* @brief deallocates memory and resets to default values
 	*/
-	void clear							()								{ g_.clear(); w_.clear(); }
+	void reset							()								{ g_.reset(); w_.clear(); }
 
 
 /////////////////////////

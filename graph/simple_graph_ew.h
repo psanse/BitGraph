@@ -150,7 +150,7 @@ virtual	~Base_Graph_EW()										= default;
 	*/
 	//int init			(int n, W val = NOWT, bool reset_name = true);
 	
-	void clear			()										{ g_.clear(); we_.clear(); }
+	void reset			()										{ g_.reset(); we_.clear(); }
 		
 	/*
 	* @brief resets to empty graph |V|= n and assigns weight val to all vertices and edges

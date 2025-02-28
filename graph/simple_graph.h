@@ -52,7 +52,7 @@ explicit Graph							(std::size_t n);											//creates graph with n=|V| and m
 explicit Graph							(std::string filename);										//creates graph from file		
 	Graph								(std::size_t n, int* adj[], std::string filename = "");		//old-style adjacency matrix
 
-	//move and copu semantics allowed
+	//move and copy semantics allowed
 	Graph								(const Graph& g)				= default;					
 	Graph& operator =					(const Graph& g)				= default;					
 	Graph								(Graph&& g)			noexcept	= default;					
@@ -129,18 +129,18 @@ public:
 	int reset							(std::string filename);
 
 	/*
-	* @brief deallocates memory and resets to default values
+	* @brief resets to default values (does not deallocate memory)
 	*/
-	void clear							();											 
+	void reset							();											 
 
-	/*
+	/**
 	* @brief reduces the graph to n vertices 
 	*
 	*		(currently only for sparse graphs)
 	* 
 	* @param n number of vertices of the new graph
 	* @returns 0 if success, -1 if memory allocation fails
-	*/
+	**/
 	int shrink_to_fit					(std::size_t n);
 						
 //////////////	

@@ -110,7 +110,7 @@ void Graph<T>::name(std::string name){
 }
 
 template<class T>
-void Graph<T>::clear (){
+void Graph<T>::reset (){
 	adj_.clear(), name_.clear(), path_.clear();
 	NV_ = 0, NBB_ = 0, NE_ = 0;
 }
@@ -324,12 +324,12 @@ int Graph<T>::read_dimacs(const string& filename){
 	fstream f(filename.c_str());
 	if(!f){
 		LOG_ERROR("Graph<T>::read_dimacs-File could not be opened reading DIMACS format");
-		clear();
+		reset();
 		return -1;
 	}
 
 	if(::gio::dimacs::read_dimacs_header(f, size, nEdges) == -1){
-		clear(); 
+		reset(); 
 		f.close(); 
 		return -1;
 	}	
@@ -347,14 +347,14 @@ int Graph<T>::read_dimacs(const string& filename){
 	//		f>>c>>v1>>wv;
 	//		if(!f.good()){
 	//			cerr<<"bad line related to weights"<<endl;
-	//			clear();
+	//			reset();
 	//			f.close();
 	//			return -1;
 	//		}
 	//		m_wv[v1-1]=wv;
 	//		if(wv==0){
 	//			cerr<<filename<<":wrong header for edges reading DIMACS format"<<endl;
-	//			clear();
+	//			reset();
 	//			f.close();
 	//			return -1;
 	//		}
@@ -373,7 +373,7 @@ int Graph<T>::read_dimacs(const string& filename){
 	//int nw=com::counting::count_words(sstr.str());
 	//if(nw< 3 || nw > 4){
 	//	cerr<<filename<<":wrong edge line format reading DIMACS format"<<endl;
-	//	clear(); f.close(); 	return -1;
+	//	reset(); f.close(); 	return -1;
 	//}else if(nw==4){  /* edge weighted case */
 	//	LOG_INFO("reading edge weights from the file"); 
 	//	reset_we(0.0);
@@ -395,7 +395,7 @@ int Graph<T>::read_dimacs(const string& filename){
 		f >> c;
 		if(c != 'e'){
 			LOGG_ERROR(filename, ":wrong header for edges reading DIMACS format");
-			clear();
+			reset();
 			f.close();
 			return -1;
 		}
@@ -458,7 +458,7 @@ int Graph<T>::read_01(const string& filename) {
 	fstream f(filename.c_str());
 	if (!f) {
 		LOG_ERROR("Graph<T>::read_01-File could not be opened reading DIMACS format");
-		clear();
+		reset();
 		f.close();
 		return -1;
 	}
@@ -626,7 +626,7 @@ void Graph<T>::remove_vertices (const BitSet& bbn, Graph& g){
 
 	if (new_size <= 0) {
 		LOG_ERROR("empty graph after deletion - Graph<T>::remove_vertices");
-		g.clear();
+		g.reset();
 		return;
 	}
 

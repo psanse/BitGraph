@@ -236,21 +236,21 @@ int Base_Graph_EW<Graph_t, W>::read_dimacs (string filename){
 	fstream f(filename.c_str());
 	if(!f){
 		LOGG_ERROR("error when reading file ", filename, " in DIMACS format - Base_Graph_EW<Graph_t, W>");
-		clear();
+		reset();
 		return -1;
 	}
 
 	//read header
 	 int nV = -1, nEdges = -1;
 	 if (::gio::dimacs::read_dimacs_header (f, nV, nEdges) == -1) {
-		 clear();
+		 reset();
 		 f.close();
 		 return -1;
 	 }
 
 	 //allocates memory for the graph, assigns default NOWT edge-weights
 	 if (reset(nV) == -1) {
-		 clear();
+		 reset();
 		 f.close();
 		 return -1;
 	 }
@@ -274,7 +274,7 @@ int Base_Graph_EW<Graph_t, W>::read_dimacs (string filename){
 			 //assert
 			 if (f.bad()) {
 				 LOG_ERROR("error when reading vertex-weights - Base_Graph_EW<Graph_t, W>::read_dimacs");
-				 clear();
+				 reset();
 				 f.close();
 				 return -1;
 			 }
@@ -306,7 +306,7 @@ int Base_Graph_EW<Graph_t, W>::read_dimacs (string filename){
 	 c = f.peek();
 	 if (c != 'e') {
 		 LOG_ERROR("Wrong edge format reading edges - Base_Graph_EW<Graph_t, W>::read_dimacs");
-		 clear();
+		 reset();
 		 f.close();
 		 return -1;
 	 }
@@ -327,7 +327,7 @@ int Base_Graph_EW<Graph_t, W>::read_dimacs (string filename){
 		 break;
 	 default:
 		 LOG_ERROR("Wrong edge format - Base_Graph_EW<Graph_t, W>::read_dimacs");
-		 clear();
+		 reset();
 		 f.close();
 		 return -1;
 	 }
@@ -357,7 +357,7 @@ int Base_Graph_EW<Graph_t, W>::read_dimacs (string filename){
 		 f >> c;
 		 if (c != 'e' || f.bad()) {
 			 LOG_ERROR("Wrong edge format reading edges - Base_Graph_EW<Graph_t, W>::read_dimacs");
-			 clear();
+			 reset();
 			 f.close();
 			 return -1;
 		 }
