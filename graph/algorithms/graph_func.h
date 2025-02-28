@@ -146,7 +146,7 @@ namespace gfunc{
 			//decodes vertices from the bitblock and appends to vertex list
 			int offset = WMUL(nBB);
 			while(bb != 0){
-				int v64 =bblock::lsb64_intrinsic(bb);
+				int v64 =bblock::lsb(bb);
 
 				///////////////////////////////
 				lv.emplace_back(v64 + offset);
@@ -190,7 +190,7 @@ namespace gfunc{
 
 		//decodes block of v (appends to lv)	
 		while (bb != 0) {
-			int v64 = bblock::lsb64_intrinsic(bb);			
+			int v64 = bblock::lsb(bb);			
 
 			///////////////////////////////
 			lv.emplace_back(v64 + nBBv);
@@ -210,7 +210,7 @@ namespace gfunc{
 			//decodes vertices from the bitblock and appends to vertex list
 			int offset = WMUL(nBB);
 			while (bb != 0) {
-				int v64 = bblock::lsb64_intrinsic(bb);
+				int v64 = bblock::lsb(bb);
 				
 				///////////////////////////////
 				lv.emplace_back(v64 + offset);
@@ -234,8 +234,8 @@ namespace gfunc{
 
 		if (g.reset(N) == -1) { return -1; }
 
-		for (std::size_t i = 0; i < N; ++i) {
-			for (std::size_t j = 0; i < N; j++) {
+		for (auto i = 0; i < N; ++i) {
+			for (autot j = 0; i < N; j++) {
 				g.add_edge(i, j);
 			}
 		}
@@ -255,8 +255,8 @@ namespace gfunc{
 
 		if (g.reset(N) == -1) { return -1; }
 		
-		for (std::size_t i = 0; i < N-1; ++i) {
-			for (std::size_t j = i + 1; j < N; ++j) {
+		for (auto i = 0; i < N-1; ++i) {
+			for (auto j = i + 1; j < N; ++j) {
 				g.add_edge(i, j);
 			}
 		}
@@ -283,12 +283,12 @@ namespace gfunc{
 		bbsg.to_vector(lv);
 
 		//singleton input bitset - induced subgraph has no edges
-		std::size_t NV = lv.size();
+		auto NV = lv.size();
 		if (NV <= 1) { return true; }
 
 		//searches for an edge in the induced subgraph
-		for (std::size_t i = 0; i < NV - 1; i++) {
-			for (std::size_t j = i + 1; j < NV; j++) {
+		for (auto i = 0; i < NV - 1; i++) {
+			for (auto j = i + 1; j < NV; j++) {
 
 				if (g.is_edge(lv[i], lv[j])) {
 					edge.emplace_back(lv[i]);
@@ -322,16 +322,16 @@ namespace gfunc{
 		bbsg.to_vector(lv);
 
 		//input bitset of size 2 - induced subgraph has no triangles
-		std::size_t NV = lv.size();
+		auto NV = lv.size();
 		if (NV <= 2) { return true; }
 				
 		//searches for an edge in the induced subgraph
-		for (std::size_t i = 0; i < NV - 2; ++i) {
-			for (std::size_t j = i + 1; j < NV - 1; ++j) {
+		for (auto i = 0; i < NV - 2; ++i) {
+			for (auto j = i + 1; j < NV - 1; ++j) {
 
 				if (g.is_edge(lv[i], lv[j])) {		//determines an edge
 
-					for (std::size_t k = j + 1; k < NV; ++k) {
+					for (auto k = j + 1; k < NV; ++k) {
 						
 						if (g.is_edge(lv[j], lv[k]) && g.is_edge(lv[i], lv[k])) {		//determines a triangle with edge (i,j)
 							triangle.emplace_back(lv[i]);
