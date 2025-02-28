@@ -59,16 +59,20 @@ public:
 	int  reorder (const vint& new_order, GraphW_t& gn, Decode* d = nullptr);		
 
 ////////////////////////
-//construction / allocation
+//construction / destruction
 	GraphFastRootSort_W(GraphW_t& gw): gw_(gw), GraphFastRootSort<typename GraphW_t::_gt>(gw.graph()){ }
+	
+	//move and copy semantics
+	GraphFastRootSort_W				(const GraphFastRootSort_W&)				= delete;
+	GraphFastRootSort_W& operator=	(const GraphFastRootSort_W&)				= delete;
+	GraphFastRootSort_W				(GraphFastRootSort_W&&)		noexcept		= delete;
+	GraphFastRootSort_W& operator=	(GraphFastRootSort_W&&)		noexcept		= delete;
+
 	~GraphFastRootSort_W() = default;
 
-	GraphFastRootSort_W	(const GraphFastRootSort_W&) = delete;
-	GraphFastRootSort_W& operator=(const GraphFastRootSort_W&) = delete;
-	GraphFastRootSort_W	(GraphFastRootSort_W&&) = delete;
-	GraphFastRootSort_W& operator=(GraphFastRootSort_W&&) = delete;
-
-	const GraphW_t& get_graph() const { return gw_; }
+//////////
+// setters / getters
+	const GraphW_t&  graph() const { return gw_; }
 	
 private:
 	/*
@@ -134,13 +138,17 @@ inline
 int GraphFastRootSort_W<GraphW_t>::reorder(const vint& new_order, GraphW_t& gn, Decode* d) {
 	
 	int NV = gw_.number_of_vertices();
-	gn.init(NV, 1.0);												//assigns unit weights(1.0) 						
+
+	//assigns unit weights(1.0) 	
+	gn.reset(NV, 1.0);		
+
+	//copy graph data
 	gn.set_name(gw_.get_name());
 	gn.set_path(gw_.get_path());
 
 	//generate isomorphism (only for undirected graphs)
-	for (int i = 0; i < NV - 1; i++) {
-		for (int j = i + 1; j < NV; j++) {
+	for (auto i = 0; i < NV - 1; ++i) {
+		for (auto j = i + 1; j < NV; ++j) {
 			if (gw_.is_edge(i, j)) {								//is_edge is in O(log) for sparse graphs, should be specialized for that case
 				//switch edges according to new numbering
 				gn.add_edge(new_order[i], new_order[j]);
@@ -150,7 +158,7 @@ int GraphFastRootSort_W<GraphW_t>::reorder(const vint& new_order, GraphW_t& gn, 
 	
 	/////////////////////
 	//vertex weights update
-	for (int i = 0; i <NV; i++) {
+	for (auto i = 0; i <NV; i++) {
 		gn.set_w(new_order[i], gw_.get_w(i));
 	}
 
@@ -162,28 +170,6 @@ int GraphFastRootSort_W<GraphW_t>::reorder(const vint& new_order, GraphW_t& gn, 
 		d->insert_ordering(aux);
 	}
 	
-	/////////////////////
-	//weights (edges)- TODO@add to edge-weighted graphs
-	
-	//reorder edge-weights if required (CHECK@-eff)
-	/*if (g.is_edge_weighted()) {
-		gn.init_we();
-		for (int i = 0; i < size - 1; i++) {
-			for (int j = i + 1; j < size; j++) {
-				if (gn.is_edge(new_order[i], new_order[j])) {
-					gn.set_we(new_order[i], new_order[j], g.get_we(i, j));
-					gn.set_we(new_order[j], new_order[i], g.get_we(i, j));
-				}
-			}
-		}
-	}*/
-
-	//g = gn;
-
-	////new order to stream if available
-	//if (o != nullptr)
-	//	copy(new_order.begin(), new_order.end(), ostream_iterator<int>(*o, " "));
-
 	return 0;
 }
 
