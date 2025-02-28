@@ -1,8 +1,7 @@
 /**
 * @file graph_fast_sort_weighted.h
 * @brief header for GraphFastRootSort_W_W class which sorts weighted graphs by different criteria
-* @created 12/03/21
-* @last_update 20/12/24
+* @details: created 12/03/21, last_update 28/02/25
 * @author pss
 **/
 
@@ -14,7 +13,6 @@
 #include "utils/common.h"						
 #include "utils/logger.h"
 #include <vector>
-//#include "filter_graph_sort_type.h"			//limits template Graph_t to undirected types
 
 using namespace std;
 
@@ -74,6 +72,8 @@ public:
 // setters / getters
 	const GraphW_t&  graph() const { return gw_; }
 	
+////////
+//internals
 private:
 	/*
 	* @brief Non-degenerate maximum weight sorting of vertices 
