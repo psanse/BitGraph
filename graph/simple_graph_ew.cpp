@@ -521,7 +521,7 @@ template<class W>
 int Graph_EW<ugraph, W>::create_complement(Graph_EW<ugraph, W>& g) const {
 
 	g.name(this->name());
-	g.path(this->get_path());
+	g.path(this->path());
 	g.get_we() = ptype::we_;
 	ptype::g_.create_complement(g.graph());
 

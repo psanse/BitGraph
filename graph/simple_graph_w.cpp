@@ -39,7 +39,7 @@ template<class W>
 int Graph_W<ugraph, W>::create_complement(Graph_W& g) const {
 
 	g.name(this->name());
-	g.path(this->get_path());
+	g.path(this->path());
 	g.get_weights() = ptype::w_;
 	ptype::g_.create_complement(g.graph());
 

@@ -825,7 +825,7 @@ int GraphFastRootSort<Graph_t>::reorder(const vint& new_order, Graph_t& gn, Deco
 	std::size_t NV = g_.number_of_vertices();
 	gn.init(NV);
 	gn.name(g_.name());	
-	gn.path(g_.get_path());
+	gn.path(g_.path());
 	
 	///generate isomorphism (only for undirected graphs) 
 	for (auto i = 0; i < NV - 1; i++) {

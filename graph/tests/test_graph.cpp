@@ -42,7 +42,7 @@ TEST_F(GraphTest, constructor) {
 	EXPECT_EQ(4, g.number_of_edges(false));
 	EXPECT_EQ(6, g.number_of_vertices());
 	EXPECT_EQ(1, g.number_of_blocks());
-	EXPECT_TRUE(g.get_path().empty());
+	EXPECT_TRUE(g.path().empty());
 	EXPECT_TRUE(g.name().empty());
 
 	EXPECT_TRUE(g.is_edge(1, 2));
@@ -179,15 +179,15 @@ TEST_F(GraphTest, name) {
 	
 	g.name("test");
 	EXPECT_STREQ("test", g.name().c_str());
-	EXPECT_TRUE(g.get_path().empty());
+	EXPECT_TRUE(g.path().empty());
 
 	g.name("c:/path/test");
 	EXPECT_STREQ("test", g.name().c_str());
-	EXPECT_STREQ("c:/path/", g.get_path().c_str());
+	EXPECT_STREQ("c:/path/", g.path().c_str());
 
 	g.name("c:\\path\\test");
 	EXPECT_STREQ("test", g.name().c_str());
-	EXPECT_STREQ("c:\\path\\", g.get_path().c_str());
+	EXPECT_STREQ("c:\\path\\", g.path().c_str());
 }
 
 TEST_F(GraphTest, init_and_reset) {

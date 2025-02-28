@@ -133,8 +133,9 @@ virtual	~Base_Graph_EW()										= default;
 
 	void name					(std::string str)			{ g_.name(str); }
   string name					()				const		{ return g_.name(); }
-	string get_path				()				const		{ return g_.get_path(); }
-	void path					(std::string path_name)		{ g_.path(path_name); }
+    void path					(std::string path_name)		{ g_.path(path_name); }
+  string path					()				const		{ return g_.path(); }
+	
 
 //////////////////////////
 // memory allocation
