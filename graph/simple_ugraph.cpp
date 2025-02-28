@@ -2,8 +2,8 @@
  * @file simple_ugraph.cpp 
  * @brief implementation file of the class Ugraph (header simple_ugraph.h)
  *
- * @created 02/01/2024
- * @last_update 26/01/2025
+ * @details: created 02/01/2024, but based on code from 17/6/10 
+ * @details: last update 26/01/2025
  * @author pss
  *
  * This code is part of the GRAPH 1.0 C++ library 
@@ -65,7 +65,7 @@ BITBOARD Ugraph<T>::number_of_edges(bool lazy) {
 		if (ptype::NE_ % 2 != 0) {
 			LOG_ERROR("odd number of edges found in simple undirected graph - Ugraph<T>::number_of_edges");
 			LOG_ERROR("exiting...");
-			exit(-1);					//TODO: throw exception
+			exit(-1);						
 		}
 		//////////////////////////////
 
@@ -76,7 +76,7 @@ BITBOARD Ugraph<T>::number_of_edges(bool lazy) {
 }
 
 template<class T>
-BITBOARD Ugraph<T>::number_of_edges(const T& bbn) const{
+BITBOARD Ugraph<T>::number_of_edges (const T& bbn) const{
 	BITBOARD NE = 0;
 
 	//reads only the upper triangle of the adjacency matrix
@@ -91,9 +91,6 @@ BITBOARD Ugraph<T>::number_of_edges(const T& bbn) const{
 	}
 	
 	return NE;
-
-// @created 17/6/10 
-// @last_updated 02/01/24
 }
 
 template<class T>

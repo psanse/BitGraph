@@ -265,13 +265,13 @@ public:
 
 //////////////	
 // deleted - CHECK	
-	virtual	void remove_vertices(const BitSet& bbn) = delete;				//commented out implementation - EXPERIMENTAL
+	virtual	void remove_vertices (const BitSet& bbn) = delete;				//commented out implementation - EXPERIMENTAL
 
 	/**
 	*  @brief enlarges the graph with a new vertex (provided its neighborhood)
 	*		  TODO - code removed, BUGGY (should not be called , unit tests DISABLED)
 	**/
-	int add_vertex(_bbt* neigh = nullptr) = delete;
+	int add_vertex (_bbt* neigh = nullptr) = delete;
 };
 
 /////////////////////////////////////////////////////////////

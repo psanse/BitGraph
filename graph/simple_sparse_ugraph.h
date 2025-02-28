@@ -19,6 +19,9 @@
 #include <string>
 #include <vector>
 
+//alias
+using USS = Ugraph<sparse_bitarray>;
+
 ////////////////////////
 //
 // Specializations of class Ugraph<T> methods for sparse graphs
@@ -28,7 +31,7 @@
 
 template<>
 inline
-BITBOARD Ugraph<sparse_bitarray>::number_of_edges(bool lazy) {
+BITBOARD USS::number_of_edges(bool lazy) {
 		
 	if (lazy || ptype::NE_ == 0) {
 
@@ -44,7 +47,8 @@ BITBOARD Ugraph<sparse_bitarray>::number_of_edges(bool lazy) {
 }
 
 template<>
-inline int Ugraph<sparse_bitarray>::degree_up(int v) const
+inline 
+int USS::degree_up(int v) const
 {
 	int nDeg = 0, nBB = WDIV(v);
 
@@ -73,7 +77,8 @@ inline int Ugraph<sparse_bitarray>::degree_up(int v) const
 
 
 template<>
-inline int Ugraph<sparse_bitarray>::degree(int v) const {
+inline 
+int USS::degree(int v) const {
 
 	if (Graph<sparse_bitarray>::adj_[v].is_empty()) return 0;
 
@@ -82,7 +87,7 @@ inline int Ugraph<sparse_bitarray>::degree(int v) const {
 
 template<>
 inline
-int Ugraph<sparse_bitarray>::degree(int v, const BitSet& bbn) const {
+int USS::degree(int v, const BitSet& bbn) const {
 	
 	int ndeg = 0;
 	for (auto it = adj_[v].cbegin(); it != adj_[v].cend(); ++it) {
@@ -94,7 +99,7 @@ int Ugraph<sparse_bitarray>::degree(int v, const BitSet& bbn) const {
 
 template<>
 inline
-int Ugraph<sparse_bitarray>::degree(int v, const BitSetSp& bbs) const {
+int USS::degree(int v, const BitSetSp& bbs) const {
 	
 	int ndeg = 0;
 	auto itv = adj_[v].cbegin();
@@ -119,7 +124,7 @@ int Ugraph<sparse_bitarray>::degree(int v, const BitSetSp& bbs) const {
 
 template<>
 inline
-int Ugraph<sparse_bitarray>::degree(int v, int UB, const BitSet& bbn) const {
+int USS::degree(int v, int UB, const BitSet& bbn) const {
 	
 	int ndeg = 0;
 	for (auto it = adj_[v].cbegin(); it != adj_[v].cend(); ++it) {
@@ -132,7 +137,7 @@ int Ugraph<sparse_bitarray>::degree(int v, int UB, const BitSet& bbn) const {
 
 template<>
 inline
-int Ugraph<sparse_bitarray>::degree(int v, int UB, const BitSetSp& bbs) const {
+int USS::degree(int v, int UB, const BitSetSp& bbs) const {
 	
 	int ndeg = 0;
 	auto itv = adj_[v].cbegin();
@@ -162,7 +167,7 @@ int Ugraph<sparse_bitarray>::degree(int v, int UB, const BitSetSp& bbs) const {
 
 template<>
 inline
-void Ugraph<sparse_bitarray>::write_dimacs(ostream& o) {
+void USS::write_dimacs(ostream& o) {
 
 	//timestamp 
 	o << "c File written by GRAPH:" << PrecisionTimer::local_timestamp();
@@ -198,7 +203,7 @@ void Ugraph<sparse_bitarray>::write_dimacs(ostream& o) {
 
 template<>
 inline
-ostream& Ugraph<sparse_bitarray>::print_edges (std::ostream& o)  {
+ostream& USS::print_edges (std::ostream& o)  {
 
 	for (auto v = 0; v < this->NV_ - 1; ++v) {
 	
@@ -221,7 +226,7 @@ ostream& Ugraph<sparse_bitarray>::print_edges (std::ostream& o)  {
 
 template<>
 inline
-void Ugraph<sparse_bitarray>::write_EDGES(ostream& o)  {
+void USS::write_EDGES(ostream& o)  {
 	/////////////////////////
 	// writes simple unweighted grafs  in edge list format 
 	// note: loops are not allowed
@@ -251,7 +256,7 @@ void Ugraph<sparse_bitarray>::write_EDGES(ostream& o)  {
 
 template<>
 inline
-void Ugraph<sparse_bitarray>::write_mtx(ostream& o) {
+void USS::write_mtx(ostream& o) {
 	/////////////////////////
 	// writes simple unweighted grafs  in edge list format 
 	// note: loops are not allowed

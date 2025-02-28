@@ -18,6 +18,8 @@
 #include <string>
 #include <vector>
 
+//useful aliases
+using GSS = Graph<sparse_bitarray>;
 
 ////////////////////////
 //
@@ -26,17 +28,18 @@
 ////////////////////////
 
 template<>
-inline Graph<sparse_bitarray>& Graph<sparse_bitarray>::create_subgraph(std::size_t first_k, Graph<sparse_bitarray>& newg) const{
+inline 
+GSS& GSS::create_subgraph(std::size_t first_k, GSS& newg) const{
 	
 	//assertions
 	if (first_k >= NV_ || first_k <= 0) {
-		LOGG_WARNING("Bad new size ", first_k, " - graph remains unchanged - Graph<sparse_bitarray>::create_subgraph");
+		LOGG_WARNING("Bad new size ", first_k, " - graph remains unchanged - GSS::create_subgraph");
 		return newg;
 	}
 
 	//allocates memory for the new graph
 	if (newg.reset(first_k) == -1) {
-		LOG_ERROR("memory for graph not allocated - Graph<sparse_bitarray>::create_subgraph");
+		LOG_ERROR("memory for graph not allocated - GSS::create_subgraph");
 		LOG_ERROR("graph remains unchanged");
 		return newg;
 	}
@@ -52,11 +55,11 @@ inline Graph<sparse_bitarray>& Graph<sparse_bitarray>::create_subgraph(std::size
 }
 
 template<>
-inline int Graph<sparse_bitarray>::shrink_to_fit (std::size_t size) {
+inline int GSS::shrink_to_fit (std::size_t size) {
 	
 	//assertions
 	if (NV_ <= size) {
-		LOGG_WARNING("Wrong shrinking size ", size, " the graph remains unchanged - Graph<sparse_bitarray>::shrink_to_fit");
+		LOGG_WARNING("Wrong shrinking size ", size, " the graph remains unchanged - GSS::shrink_to_fit");
 		return -1;
 	}
 
@@ -75,7 +78,7 @@ inline int Graph<sparse_bitarray>::shrink_to_fit (std::size_t size) {
 }
 
 template<>
-inline double Graph<sparse_bitarray>::block_density()	const {
+inline double GSS::block_density()	const {
 
 	std::size_t nBB = 0;							//number of non-empty bitblocks	
 	std::size_t nBBt = 0;							//number of allocated bitblocks (all should be non-empty in the sparse case)
@@ -93,7 +96,7 @@ inline double Graph<sparse_bitarray>::block_density()	const {
 }
 
 template<>
-inline double Graph<sparse_bitarray>::block_density_sparse() const {
+inline double GSS::block_density_sparse() const {
 									
 	std::size_t nBBt = 0;							//number of allocated bitblocks (all should be non-empty in the sparse case)
 	
@@ -109,7 +112,7 @@ inline double Graph<sparse_bitarray>::block_density_sparse() const {
 }
 
 template<>
-inline double Graph<sparse_bitarray>::average_block_density_sparse() const {
+inline double GSS::average_block_density_sparse() const {
 
 	std::size_t nBB = 0;							//number of non-empty bitblocks	
 	std::size_t nBBt = 0;							//number of allocated bitblocks (all should be non-empty in the sparse case)
@@ -126,7 +129,7 @@ inline double Graph<sparse_bitarray>::average_block_density_sparse() const {
 }
 
 template<>
-inline void Graph<sparse_bitarray>::write_dimacs(ostream& o) {
+inline void GSS::write_dimacs(ostream& o) {
 
 
 	//timestamp comment

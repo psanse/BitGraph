@@ -75,6 +75,12 @@ std::string name						()					const	{ return name_; }
 std::string path						()					const	{ return path_;}
 
 	std::size_t number_of_vertices		()					const	{return NV_; }
+
+	/**
+	* @brief number of bitblocks in each bitset (row) of the adjacency matriz
+	*		 In the case of sparse graphs, the value is the maximum capacity
+	*		 of all bitsets.
+	**/
 	std::size_t number_of_blocks		()					const	{return NBB_;}
 	
 	/*
