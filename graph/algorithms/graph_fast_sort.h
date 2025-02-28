@@ -40,13 +40,13 @@ class GraphFastRootSort{
 public:
 	using basic_type = Graph_t;											//graph type
 	using type = typename GraphFastRootSort< Graph_t>;					//own type		
-	using bb_type = typename Graph_t::_bbt;								//bitboard type
+	using bb_type = typename Graph_t::_bbt;								//bitset type
 
 	enum  	{PRINT_DEGREE=0, PRINT_SUPPORT, PRINT_NODES};
 	enum  	{MIN_DEGEN = 0, MAX_DEGEN, MIN_DEGEN_COMPO, MAX_DEGEN_COMPO, MAX, MIN, MAX_WITH_SUPPORT, MIN_WITH_SUPPORT, NONE };
 	
-	////////////////////////
-	//static methods / utilities
+////////////////////////
+//static methods 
 
 	/*
 	* @brief Computes the degree of the vertices of a graph 
@@ -56,9 +56,9 @@ public:
 	static int compute_deg(const Graph_t& g, vint& deg);		
 		
 
-	///////////////
-	// drivers - the real public interface
-	///////////////
+///////////////
+// drivers - the real public interface
+	
 	/*
 	* @brief Computes a new ordering 
 	* @param alg sorting algorithm
@@ -78,8 +78,9 @@ public:
 	*/
 	int reorder(const vint& new_order, Graph_t& gn, Decode* d = nullptr);
 
-	////////////////////////
-	//construction / allocation
+////////////////////////
+//construction/destructions
+
 	explicit GraphFastRootSort(Graph_t& gout) :
 		g_(gout),  
 		NV_(g_.number_of_vertices())
@@ -88,19 +89,25 @@ public:
 		deg_neigh_.assign(NV_, 0);
 		node_active_state_.init(NV_); 
 	}
+
+	//move and copy semantics not allowed
+	GraphFastRootSort				(const GraphFastRootSort&)	= delete;
+	GraphFastRootSort& operator=	(const GraphFastRootSort&)	= delete;
+	GraphFastRootSort				(GraphFastRootSort&&)		= delete;
+	GraphFastRootSort& operator=	(GraphFastRootSort&&)		= delete;
+
 	~GraphFastRootSort() = default;
-	GraphFastRootSort(const GraphFastRootSort&) = delete;
-	GraphFastRootSort& operator=(const GraphFastRootSort&) = delete;
-	GraphFastRootSort(GraphFastRootSort&&) = delete;
-	GraphFastRootSort& operator=(GraphFastRootSort&&) = delete;
+		
+////////////////////////
+//setters / getters
 
-	const vint& get_degree() const { return nb_neigh_; }
-	const vint& get_support() const { return deg_neigh_; }
-	const Graph_t& get_graph() const { return g_; }
-	std::size_t number_of_vertices() const { return NV_; }
+	const vint& get_degree			() const		{ return nb_neigh_; }
+	const vint& get_support			() const		{ return deg_neigh_; }
+	const Graph_t& get_graph		() const		{ return g_; }
+	std::size_t number_of_vertices	() const		{ return NV_; }
 
-	/////////////////////////
-	// useful operations
+/////////////////////////
+// main operations - sorting, etc.
 
 	/*
 	* @brief Sets trivial ordering [1..NV] in @nodes_,
@@ -115,32 +122,32 @@ public:
 	*/
 	void set_ordering(vint& nodes) { nodes_ = nodes; }
 
-	/*
+	/**
 	* @brief Computes the degree of each vertex
-	*/ 
+	**/ 
 	const vint& compute_deg_root();											
 
-	/*
+	/**
 	* @brief Computes support for all vertices (sum of the number of neighbors)
 	* @comments May include the same vertex twice	 
-	*/
+	**/
 	const vint& compute_support_root();									
 		
 	
-	/*
+	/**
 	* @brief Computes a non_increasing_degree (non-degenerate) ordering 
 	* @param rev reverse ordering if TRUE
 	* @important requires prior computation of deg
 	* @return output ordering in [OLD]->[NEW] format
-	*/
+	**/
 	const vint&  sort_non_increasing_deg(bool rev);		
 
-	/*
+	/**
 	* @brief Computes a non-decreasing degree (non-degenerate) ordering 
 	* @param rev reverse ordering if TRUE
 	* @important requires prior computation of deg
 	* @return ouptut ordering in [OLD]->[NEW] format
-	*/
+	**/
 	const vint&  sort_non_decreasing_deg(bool rev);
 
 	/*
@@ -151,20 +158,20 @@ public:
 	*/
 	const vint&  sort_non_increasing_deg_with_support_tb(bool rev);
 
-	/*
+	/**
 	* @brief Computes a non-decreasing degree (non-degenerate) ordering with tiebreak by supprt
 	* @param rev reverse ordering if TRUE
 	* @important requires prior computation of deg and support
 	* @return output ordering in [OLD]->[NEW] format
-	*/
+	**/
 	const vint&  sort_non_decreasing_deg_with_support_tb(bool rev);
 		
-	/*
+	/**
 	* @brief Degenerate non-decreasing degree ordering
 	* @comments deg info is not restored after the call
 	* @return output ordering in [OLD]->[NEW] format
 	* TODO - optimize
-	*/
+	**/
 	const vint&  sort_degen_non_decreasing_deg(bool rev);				
 	const vint&  sort_degen_non_increasing_deg(bool rev);
 
@@ -172,76 +179,77 @@ public:
 	//Does not required cached degree info of vertices in @nb_neigh_
 	const vint& sort_degen_non_decreasing_deg_B(bool rev);					
 	
-	/*
+	/**
 	*@brief Composite non-decreasing degree degenerate ordering based on a prior given ordering 
 	*@param rev reverse ordering if TRUE
 	*@comments the vertex ordering has to be set (with set_ordering(...)) prior to the call
 	*@return output ordering in [OLD]->[NEW] format
-	*/
+	**/
 	const vint& sort_degen_composite_non_decreasing_deg( bool rev);	
 
 
-	/*
+	/**
 	*@brief Composite non-increasing degree degenerate ordering based on a prior given ordering
 	*@param rev reverse ordering if TRUE
 	*@comments the vertex ordering has to be set (with set_ordering(...)) prior to the call
 	*@return output ordering in [OLD]->[NEW] format
-	*/
+	**/
 	const vint& sort_degen_composite_non_increasing_deg( bool rev );	
 	
 	/////////////////
 	// Subgrah ordering 
-	// (TODO - add further primitives for composites..)
+	// 
+	// TODO - add further primitives for composites, etc...
 	
-	/*
+	/**
 	*@brief sorts the first k vertices by non-increasing degree (non-degenerate) 
 	*@param first_k  first k < |V|  vertices to sort ([0..k-1])
 	*@param rev reverse ordering if TRUE
 	*@return output ordering in [OLD]->[NEW] format
-	*/
+	**/
     const vint&  sort_non_increasing_deg(int first_k, bool rev );
 	
-	/*
+	/**
 	*@brief sorts [first, last] consecutive vertices by non-increasing degree (non-degenerate)
 	*@param first  first vertex to sort (0-based index) - in  [0, |V|-1] 
 	*@param last  last vertex to sort	(0-based index)	- in  [0, |V|-1], > first 
 	*@param rev reverse ordering if TRUE
 	*@return output ordering in [OLD]->[NEW] format
-	*/
+	**/
 	const vint& sort_non_increasing_deg(int first, int last, bool rev);
 
-	/*
+	/**
 	*@brief sorts the first k vertices by non-decreasing degree (non-degenerate) 
 	*@param first_k  first k < |V|  vertices to sort ([0..k-1])
 	*@param rev reverse ordering if TRUE
 	*@return output ordering in [OLD]->[NEW] format
-	*/
+	**/
 	const vint&  sort_non_decreasing_deg(int first_k, bool rev);
 
-	/*
+	/**
 	*@brief sorts [first, last] consecutive vertices by non-decreasing degree (non-degenerate)
 	*@param first  first vertex to sort (0-based index) - in  [0, |V|-1]
 	*@param last  last vertex to sort	(0-based index)	- in  [0, |V|-1], > first
 	*@param rev reverse ordering if TRUE
 	*@return output ordering in [OLD]->[NEW] format
-	*/
+	**/
 	const vint& sort_non_decreasing_deg(int first, int last, bool rev);
 
 	//TODO - add tiebreak support for subgraph ordering 
 	//int  sort_non_increasing_deg_with_support_tb(int n, bool rev = false);
 	//int  sort_non_decreasing_deg_with_support_tb(int n, bool rev = false);
 
-	////////////////////////
-	// I/O
+////////////////////////
+// I/O
 	ostream& print(int type, ostream& o) const;
 
 ///////////////////////
 // internal operations
 protected:
 
-	/*
+	/**
 	* @brief Restores context for NV_ vertices
-	*/
+	**/
 	int reset();
 	
 		
@@ -256,9 +264,11 @@ protected:
 	vint deg_neigh_;										//stores the support of the vertices (degree of neighbors)
 	bb_type node_active_state_;								//bitset for active vertices: 1bit-active, 0bit-passive. Used in degenerate orderings	
 	vint nodes_;											//stores the ordering
-};
-/////////////////////////////////////////////////////////////////////////////////////////////
 
+};//end of GraphFastRootSort class
+
+////////////////////////////////////////////////////////////
+// Inline implementations in header file
 
 template<class Graph_t>
 inline
@@ -783,6 +793,7 @@ inline int GraphFastRootSort<Graph_t>::compute_deg(const Graph_t & g, vint & deg
 template<class Graph_t>
 inline
 int GraphFastRootSort<Graph_t>::reset(){
+
 	nb_neigh_.clear();
 	nb_neigh_.resize(NV_);
 	//nb_neigh_.assign(NV_, 0);
