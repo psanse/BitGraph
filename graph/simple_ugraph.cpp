@@ -23,7 +23,7 @@ Ugraph<T>::Ugraph(string filename) : Graph<T>()
 {
 	//cannot call Graph<T>::Graph(filename) because Graph<T>::add_edge is overriden!
 
-	if (ptype::set_graph(filename) == -1 ) {
+	if (ptype::reset(filename) == -1 ) {
 		LOGG_ERROR("error when reading file: ", filename, "Graph<T>::Graph");
 		LOG_ERROR("exiting...");
 		exit(-1);

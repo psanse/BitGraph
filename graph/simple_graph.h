@@ -126,15 +126,13 @@ public:
 	* @param filename file
 	* @returns 0 if success, -1 if file cannot be read
 	*/
-	int set_graph						(std::string filename);
+	int reset							(std::string filename);
 
-protected:
 	/*
 	* @brief deallocates memory and resets to default values
 	*/
 	void clear							();											 
-		
-public:
+
 	/*
 	* @brief reduces the graph to n vertices 
 	*

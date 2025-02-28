@@ -46,7 +46,7 @@ Graph<T>::Graph(string filename) :
 	NV_(0), NBB_(0), NE_(0),
 	name_(""), path_("")
 {
-	if (set_graph(filename) == -1) {
+	if (reset(filename) == -1) {
 		LOGG_ERROR("error when reading file: ", filename, "Graph<T>::Graph");
 		LOG_ERROR("exiting...");
 		exit(-1);
@@ -231,11 +231,11 @@ int Graph<T>::shrink_to_fit(std::size_t size){
 }
 
 template<class T>
-int Graph<T>::set_graph (string filename){
+int Graph<T>::reset (string filename){
 	if(read_dimacs(filename) == -1){
 		if(read_mtx(filename) == -1){
 			if(read_EDGES(filename) == -1){
-				LOGG_ERROR("Unable to read a graph form file ", filename, "- Graph<T>::set_graph");
+				LOGG_ERROR("Unable to read a graph form file ", filename, "- Graph<T>::reset");
 				LOG_ERROR("Format considered: DIMACS / MTX / EDGES");
 				return -1;
 			}
