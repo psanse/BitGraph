@@ -39,9 +39,7 @@ You will find many more examples in the *tests* folder.
 EXAMPLES OF BITSCANNING OPERATIONS
 -------------------------------
 
-The BITSCAN library features specific optimisation techniques for *destructive* and *non-destructive* scans. In a destructive bit scan (DBS), whenever a 1-bit is read, *it is removed from the bitset* (at the end of the process the bit string is empty). In the (conventional) non-destructive case (NDBS), the bitset information remains unchanged. 
-Efficient DBS loops are easier to control than NDBS ones because LSB / MSB operations always work. In contrast, efficient NDBS loops should cache information of the last bit read to find the next 1-bit faster. 
-
+The BITSCAN library features specific optimisation techniques for *destructive* and *non-destructive* scans. In a destructive bit scan (DBS), whenever a 1-bit is read *it is removed from the bitset* (at the end of the process the bit string is empty). In the (conventional) non-destructive case (NDBS), the bitset information remains unchanged. 
 
 Here is an example of fast bit scan loop syntax in BITSCAN:
 
