@@ -27,13 +27,13 @@ GETTING STARTED
 -------------------------------
 To include the BITSCAN library in your project, add the dependency to the *bitscan.h file*. In the following example, a bitset of 100 elements is declared and the 11-th bit is set to 1 (index numbering starts at 0). 
 
-    #include "bitscan/bitscan.h"
-	//...
-    int main(){
-    	bitarray bbi(100);
-	bbi.set_bit(10);
-	std::cout << bbi;
-    }
+#include "bitscan/bitscan.h"
+//...
+int main(){
+   bitarray bbi(100);
+   bbi.set_bit(10);
+   std::cout << bbi;
+}
  You will find many more examples in the *tests* folder.  
 
 EXAMPLES OF BITSCANNING OPERATIONS
