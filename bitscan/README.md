@@ -59,10 +59,10 @@ The *init_scan* member function configures cache information appropriately. Curr
     	//...
 
     if(bba.init_scan(bbo::DESTRUCTIVE)!= -1){
-	int nBit = BBObject::nobit;
-   	while( (nBit=bbi.next_bit_del()) != BBObject::noBit ){
+	   int nBit = BBObject::nobit;
+   	   while( (nBit=bbi.next_bit_del()) != BBObject::noBit ){
 		//Do something with nBit...
-	}
+	   }
 	}
 In this case the *if* clause is necessary because sparse bitsets can have empty semantics (no memory allocation), which is checked in the init_scan function. Moreover, the scanning now differs from the previous case because it deletes each population member from the set once it is found (DESTRUCTIVE type).
 
