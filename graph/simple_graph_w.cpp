@@ -39,7 +39,7 @@ template<class W>
 int Graph_W<ugraph, W>::create_complement(Graph_W& g) const {
 
 	g.name(this->name());
-	g.set_path(this->get_path());
+	g.path(this->get_path());
 	g.get_weights() = ptype::w_;
 	ptype::g_.create_complement(g.graph());
 
@@ -108,7 +108,7 @@ int Base_Graph_W<Graph_t, W>::init(std::size_t NV , W val, bool reset_name){
 
 	if (reset_name) {
 		g_.name("");
-		g_.set_path("");
+		g_.path("");
 	}
 		
 	return 0;

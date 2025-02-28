@@ -825,11 +825,11 @@ int GraphFastRootSort<Graph_t>::reorder(const vint& new_order, Graph_t& gn, Deco
 	std::size_t NV = g_.number_of_vertices();
 	gn.init(NV);
 	gn.name(g_.name());	
-	gn.set_path(g_.get_path());
+	gn.path(g_.get_path());
 	
 	///generate isomorphism (only for undirected graphs) 
-	for (int i = 0; i < NV - 1; i++) {
-		for (int j = i + 1; j < NV; j++) {
+	for (auto i = 0; i < NV - 1; i++) {
+		for (auto j = i + 1; j < NV; j++) {
 			if (g_.is_edge(i, j)) {									//in O(log) for sparse graphs, should be specialized for that case
 				//////////////////////////////////////////////
 				gn.add_edge(new_order[i], new_order[j]);			//maps the new edges according to the new given order

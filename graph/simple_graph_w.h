@@ -111,7 +111,7 @@ const _bbt& get_neighbors				(int v)		const			{ return g_.get_neighbors(v); }
 	
 	void name							(std::string str)			{ g_.name(str); }
 std::string name						()			const			{ return g_.name(); }
-	void set_path						(std::string path_name)		{ g_.set_path(path_name); }
+	void path							(std::string path_name)		{ g_.path(path_name); }
 	std::string get_path				()			const			{ return g_.get_path(); }
 
 	int number_of_vertices				()			const			{ return g_.number_of_vertices(); }

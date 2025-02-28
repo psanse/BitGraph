@@ -144,7 +144,7 @@ int GraphFastRootSort_W<GraphW_t>::reorder(const vint& new_order, GraphW_t& gn, 
 
 	//copy graph data
 	gn.name(gw_.name());
-	gn.set_path(gw_.get_path());
+	gn.path(gw_.get_path());
 
 	//generate isomorphism (only for undirected graphs)
 	for (auto i = 0; i < NV - 1; ++i) {
