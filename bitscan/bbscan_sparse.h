@@ -442,8 +442,7 @@ int BBScanSp::init_scan (int firstBit, scan_types sct){
 	if (firstBit == BBObject::noBit) {
 		return init_scan(sct);
 	}
-
-	
+		
 
 	//determine the index of the starting block (not its ID)
 	auto bbL = WDIV(firstBit);

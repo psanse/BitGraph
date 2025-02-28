@@ -53,7 +53,7 @@ TEST_F(GraphFastRootSortTest, constructor) {
 	gt sorter(ug);
 
 	//unweighted part
-	auto g = sorter.get_graph();
+	auto g = sorter.graph();
 	///////////////////////////////////////////////////////////////////
 	EXPECT_EQ(sorter.number_of_vertices(), g.number_of_vertices());
 	EXPECT_EQ(NV, g.number_of_vertices());
@@ -70,7 +70,7 @@ TEST_F(GraphFastRootSortTest, compute_deg_root) {
 
 	//////////////////////////////////////////
 	vint deg_exp = { 0, 3, 1, 2, 1, 1};
-	EXPECT_EQ(deg_exp, sorter.get_degree());
+	EXPECT_EQ(deg_exp, sorter.degree());
 	//////////////////////////////////////////
 	
 	//I/O
@@ -87,7 +87,7 @@ TEST_F(GraphFastRootSortTest, compute_support_root) {
 
 	//////////////////////////////////////////
 	vint support_exp = { 0, 4, 3, 4, 3, 2 };
-	EXPECT_EQ(support_exp, sorter.get_support());
+	EXPECT_EQ(support_exp, sorter.support());
 	//////////////////////////////////////////
 
 	//I/O
