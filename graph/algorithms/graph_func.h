@@ -1,10 +1,8 @@
 /**
 * @file graph_func.h
 * @brief main header for namespace gfunc providing general purpose functions for graphs
-* @created 07/3/17
-* @update 12/3/17
-* @last_update 27/01/25
-* @dev pss
+* @details: created 07/3/17, update 12/3/17, last_update 28/02/25  
+* @author pss
 *
 * TODO CHECK edgeW::ew_shift_2_highest_index function  (09/01/25)
 **/
@@ -20,8 +18,6 @@
 //#include "graph/simple_sparse_ugraph.h"
 #include "graph/simple_graph_w.h"				// must be after ugraph include
 #include "graph/simple_graph_ew.h"				// must beafter ugraph include
-
-//using namespace std;				//TODO - remove from global namespace in the header
 
 
 //aliases for graph types (see graph.h)
