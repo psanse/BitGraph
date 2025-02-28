@@ -21,7 +21,7 @@ The library currently offers the following types for bitstrings
 
 Normally clients should use just the `bitarray` or `sparse_bitarray` types. Watched bit arrays have proven useful in some combinatorial problems. One such example may be found [here](http://download.springer.com/static/pdf/797/chp%253A10.1007%252F978-3-319-09584-4_12.pdf?auth66=1411550130_ba322f209d8b171722fa67741d3f77e9&ext=.pdf "watched bit arrays"). 
 
-The library features several optimizations for typical enumeration of set members (in this context, *bitscanning*) which have been found useful for fast implementation of algorithms during research, such as  destructive vs non-destructive scans, forward and reverse_forward scans, random starting points, caching indexes etc. A comparison with other well-known implementations (such as BOOST or STL bit strings) can be found [here](http://blog.biicode.com/bitscan-efficiency-at-glance/ "BITSCAN efficiency at a glance ").
+The library features several optimizations for typical enumeration of set members (in this context, *bitscanning*) which have been found useful for fast implementation of algorithms during research, such as  destructive vs non-destructive scans, forward and reverse_forward scans, random starting points, caching indexes etc. 
 
 GETTING STARTED
 -------------------------------
@@ -69,7 +69,7 @@ The *init_scan* member function configures cache information appropriately. Curr
 
 In this case the *if* clause is necessary because sparse bitsets can have empty semantics (no memory allocation), which is checked in the init_scan function. Moreover, the scanning now differs from the previous case because it deletes each population member from the set once it is found (DESTRUCTIVE type).
 
-The interface for other bit string types is the same.
+The interface for other bitset types is the same.
 
 CONFIGURATION PARAMETERS
 -------------------------
