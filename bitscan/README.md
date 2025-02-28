@@ -27,6 +27,14 @@ GETTING STARTED
 -------------------------------
 To include the BITSCAN library in your project, add the dependency to the *bitscan.h file*. In the following example, a bitset of 100 elements is declared and the 11-th bit is set to 1 (index numbering starts at 0). 
 
+bitarray bba(100);						//set with population size of 100 elements
+//...
+
+bba.init_scan(bbo::NON_DESTRUCTIVE);
+int nBit = BBObject::noBit;
+while( (nBit=bba.next_bit()) != BBObject::noBit ){
+  //Do something with nBit...
+}
  #include "bitscan/bitscan.h"
   //...
   int main(){
