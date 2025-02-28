@@ -141,12 +141,13 @@ bitset_t& GraphMap::map_l2r (bitset_t& bbl, bitset_t& bbr, bool overwrite) const
 	if(overwrite) { bbr.erase_bit();}
 
 	//sets bitscanning configuration
-	bbl.init_scan(bbo::NON_DESTRUCTIVE);
+	if ( bbl.init_scan(bbo::NON_DESTRUCTIVE) != -1) {
 
-	//bitscans bbl and sets bits in bbr
-	int v;
-	while(v = bbl.next_bit() != EMPTY_ELEM){
-		bbr.set_bit(l2r_[v]);
+		//bitscans bbl and sets bits in bbr
+		int v = BBObject::noBit;
+		while (v = bbl.next_bit() != BBObject::noBit) {
+			bbr.set_bit(l2r_[v]);
+		}
 	}
 
 	return bbr;
@@ -160,12 +161,13 @@ bitset_t& GraphMap::map_r2l (bitset_t& bbl, bitset_t& bbr, bool overwrite) const
 	if (overwrite) { bbl.erase_bit(); }
 
 	//sets bitscanning configuration
-	bbr.init_scan(bbo::NON_DESTRUCTIVE);
+	if (bbr.init_scan(bbo::NON_DESTRUCTIVE) != -1) {
 
-	//bitscans bbl and sets bits in bbr
-	int v;
-	while (v = bbr.next_bit() != EMPTY_ELEM) {
-		bbl.set_bit(r2l_[v]);
+		//bitscans bbl and sets bits in bbr
+		int v = BBObject::noBit;
+		while (v = bbr.next_bit() != BBObject::noBit) {
+			bbl.set_bit(r2l_[v]);
+		}
 	}
 		
 	return bbl;

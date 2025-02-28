@@ -2,8 +2,7 @@
 * @file graph_gen.h
 * @brief header for Erdos-Renyi sparse and non sparse bitstring unidrected graph generation 
 * @author pss
-* @date ?
-* @last_update 27/01/25
+* @details: created?, last_update 28/02/25
 **/
 
 #ifndef __GRAPH_GEN_H__
