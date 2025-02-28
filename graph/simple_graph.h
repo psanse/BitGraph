@@ -62,18 +62,12 @@ virtual	~Graph()										= default;
 
 /////////////
 // setters and getters
-	/*
-	* @brief sets graph from file in dimacs/MTX/Edges formats (in this order)
-	* @param filename file
-	* @returns 0 if success, -1 if file cannot be read
-	*/
-	int set_graph						(std::string filename);
 
-	/*
+	/**
 	* @brief Sets instance name.
-	*		 Separates path and instance name internally (if applicable
 	* @param instance name of instance
-	*/
+	* @details: Separates path and instance name internally (if applicable)
+	**/
 	void name							(std::string instance);
 std::string name						()					const	{ return name_; }
 	
@@ -93,19 +87,17 @@ std::string path						()					const	{ return path_;}
 	* @returns number of edges 
 	*/
 	virtual	BITBOARD number_of_edges	(bool lazy = true);
-		
-
-	/*
+	
+	/**
 	* @brief Counts the number of edges	in an induced subgraph by a set of vertices
 	* @param set input bitset of vertices that induces the subgraph
 	* @returns number of edges
-	*/
+	**/
 	virtual	BITBOARD number_of_edges	(const T& set )	const;				
 
 const vector<T>& get_adjacency_matrix	()					const		{ return adj_; }
 const T& get_neighbors					(int v)				const		{return adj_[v];}
       T& get_neighbors					(int v)							{return adj_[v];}
-
 
 //////////////////////////
 // memory allocation 
@@ -130,11 +122,19 @@ public:
 	int reset							(std::size_t n, string name = "");
 
 	/*
+	* @brief sets graph from file in dimacs/MTX/Edges formats (in this order)
+	* @param filename file
+	* @returns 0 if success, -1 if file cannot be read
+	*/
+	int set_graph						(std::string filename);
+
+protected:
+	/*
 	* @brief deallocates memory and resets to default values
 	*/
 	void clear							();											 
 		
-
+public:
 	/*
 	* @brief reduces the graph to n vertices 
 	*

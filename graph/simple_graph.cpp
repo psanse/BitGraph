@@ -112,7 +112,7 @@ void Graph<T>::name(std::string name){
 template<class T>
 void Graph<T>::clear (){
 	adj_.clear(), name_.clear(), path_.clear();
-	NV_=0, NBB_=0, NE_=0;
+	NV_ = 0, NBB_ = 0, NE_ = 0;
 }
 
 template<class T>

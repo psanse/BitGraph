@@ -148,7 +148,7 @@ virtual	~Base_Graph_EW()										= default;
 	* 
 	* @comment preserved for backward compatibility (use reset(...))
 	*/
-	int init			(int n, W val = NOWT, bool reset_name = true);															
+	int init			(int n, W val = NOWT, bool reset_name = true);
 	void clear			()										{ g_.clear(); we_.clear(); }
 		
 	/*
