@@ -2,7 +2,10 @@ BITSCAN 1.0
 ===================
 BITSCAN is a C++ library that manipulates bit arrays (alias bit strings, bit sets, etc.) and is specifically oriented toward fast bitscanning operations. BITSCAN results from years of research in combinatorial optimization problems and has been proven very useful when modelling sets. In this application, a bitset represents the set population, with each member encoded as a single 1-bit.
 
-The BITSCAN library is still in alpha but has been used succesfully to implement *[BBMC](https://www.researchgate.net/publication/220472408_An_exact_bit-parallel_algorithm_for_the_maximum_clique_problem?ev=prf_pub "Exact maximum clique algorithm")*, an efficient state of the art maximum clique algorithm. It has also been applied in [PASS](http://phdtree.org/pdf/34678243-a-new-dsatur-based-algorithm-for-exact-vertex-coloring/), an exact, and efficient, vertex coloring DSATUR-based algorithm.  For further references to *BBMC* and *PASS* as well as legal stuff please read the *legal.txt* file. 
+The BITSCAN library is at the core of many exact state-of-the-art algorithms for hard combinatorial problems, such as:
+- fds
+- dfd
+- df 
 
 BITSCAN has been tested in LINUX and Windows OS. Please note that 64-bit configurations are required. 
 
