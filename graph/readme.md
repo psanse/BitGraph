@@ -1,5 +1,5 @@
 
-GRAPH library for bit-encoded graphs
+GRAPH 1.0 library for bit-encoded graphs
 ===================
 
 GRAPH is a small efficient  C++ library which manages basic functionality of **bit-encoded** simple graphs, either unweighted or with weights. At the heart of GRAPH is BITSCAN, an efficient library to manage bit strings. GRAPH's main class is Graph, a template for generic simple graphs. Ugraph is a specialization of the Graph template for undirected graphs only. 
