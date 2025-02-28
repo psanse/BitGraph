@@ -52,6 +52,17 @@ TEST_F(GraphTest, constructor) {
 	EXPECT_TRUE(g.is_edge(3, 5));
 }
 
+TEST_F(GraphTest, deallocate_memory) {
+	
+	//clean memory
+	g = graph();						//std::swap(graph(), g);
+
+	EXPECT_EQ	(0, g.number_of_vertices());
+	EXPECT_TRUE	(g.name().empty());
+	EXPECT_EQ	(0, g.number_of_edges());
+}
+
+
 
 TEST(Graph, constructor_adj_mat) {
 
@@ -173,6 +184,7 @@ TEST(Graph, move_constructor) {
 	/////////////////////////////////////////////
 
 }
+
 
 
 TEST_F(GraphTest, name) {

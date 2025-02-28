@@ -91,30 +91,6 @@ bool Base_Graph_W<Graph_t, W>::is_unit_weighted()
 }
 
 template<class Graph_t, class W>
-int Base_Graph_W<Graph_t, W>::init(std::size_t NV , W val, bool reset_name){
-	
-	if (g_.reset(NV) == -1) {
-		LOG_ERROR("error during memory graph allocation - Base_Graph_W<T, W>::init");
-		return -1;
-	}
-
-	try{
-		w_.assign(NV, val);
-	}
-	catch(...){
-		LOG_ERROR("bad weight assignment - Base_Graph_W<Graph_t, W>::init");
-		return -1;
-	}
-
-	if (reset_name) {
-		g_.name("");
-		g_.path("");
-	}
-		
-	return 0;
-}
-
-template<class Graph_t, class W>
 int Base_Graph_W<Graph_t, W>::reset(std::size_t NV, W val, string name)
 {
 	if (g_.reset(NV) == -1) {

@@ -27,7 +27,7 @@ using namespace std;
 class GraphFastRootSortWeightedTest : public ::testing::Test {
 protected:
 	void SetUp() override {
-		ugw.init(NV);
+		ugw.reset(NV);
 		ugw.add_edge(1, 2);
 		ugw.add_edge(1, 5);
 		ugw.add_edge(2, 4);

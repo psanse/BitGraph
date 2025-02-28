@@ -115,42 +115,6 @@ void Graph<T>::reset (){
 	NV_ = 0, NBB_ = 0, NE_ = 0;
 }
 
-//template<class T>
-//int Graph<T>::reset (std::size_t NV, bool reset_name){
-//
-//	if (NV <= 0) {
-//		LOG_ERROR("Invalid graph size - Graph<T>::reset");
-//		return -1;
-//	}
-//
-//	//initialization
-//	NV_ = NV;
-//	NBB_ = INDEX_1TO1(NV_);
-//	NE_ = 0;
-//
-//	try{
-//		//////////////////////////////
-//		adj_.assign(NV, T(NV));				//bitsets initialize to 0 - CHECK		
-//		//////////////////////////////
-//		
-//	}catch(const std::bad_alloc& e){
-//		LOG_ERROR("memory for graph not allocated - Graph<T>::reset");
-//		LOG_ERROR(e.what());		
-//		NV_ = 0;
-//		NBB_ = 0;			
-//		return -1;
-//	}
-//		
-//
-//	//clears name if requested
-//	if (reset_name) {
-//		name_.clear();
-//		path_.clear();
-//	}
-//
-//	return 0;
-//}
-
 template<class T>
 int Graph<T>::reset	(std::size_t NV, string name) {
 
@@ -276,10 +240,10 @@ void Graph<T>::remove_edges() {
 }
 
 template <class T>
-ostream& Graph<T>::print_adj(std::ostream& o, bool endofl) const {
+ostream& Graph<T>::print_adj(std::ostream& o, bool eofl) const {
 	
-	for (int i = 0; i < NV_; i++) {
-		for (int j = 0; j < NV_; j++) {
+	for (auto i = 0; i < NV_; ++i) {
+		for (auto j = 0; j < NV_; ++j) {
 			if (is_edge(i, j)) {
 				 o << "1" << " ";
 			}
@@ -290,7 +254,7 @@ ostream& Graph<T>::print_adj(std::ostream& o, bool endofl) const {
 		o << endl;
 	}
 
-	if (endofl) o << endl;
+	if (eofl) o << endl;
 	return o;
 }
 
@@ -505,19 +469,19 @@ int  Graph<T>::read_EDGES (const string& filename){
 }
 
 template<class T>
-ostream& Graph<T>::print_data( bool lazy, std::ostream& o, bool endl) {
+ostream& Graph<T>::print_data( bool lazy, std::ostream& o, bool eofl) {
 
 	if (!name_.empty()) { o << name_.c_str() << '\t'; }
 
 	////////////////////////////////////////////////////////////////
-	o	<< "n= " << number_of_vertices() << "\t"
-		<< std::fixed << "m= "<< number_of_edges(lazy) << "\t"
-		<< std::setprecision(3) << "p= "<< density(true);
+	o	<< "n:= " << number_of_vertices() << "\t"
+		<< std::fixed << "m:= "<< number_of_edges(lazy) << "\t"
+		<< std::setprecision(3) << "p:= "<< density(true);
 	////////////////////////////////////////////////////////////////
 
 	/*Note: lazy comp. of density since the number of edges have already been computed previously */
 
-	if (endl) { o << std::endl; }
+	if (eofl) { o << std::endl; }
 	return o;
 }
 

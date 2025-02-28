@@ -117,40 +117,30 @@ std::string path						()			const			{ return g_.path(); }
 	int number_of_vertices				()			const			{ return g_.number_of_vertices(); }
 	int number_of_edges					(bool lazy = true)			{ return g_.number_of_edges(lazy); }
 
-
 //////////////////////////
 // memory allocation 
 
-	/*
-	* @brief resets to empty graph with |V|= n and assigns weight val to all vertices
-	* @param n number of vertices
-	* @param reset_name if true, @name_ and @path_ reset to empty
-	* @returns 0 if success, -1 if memory allocation fails
-	* @comment preserved for backward compatibility (use reset(...))
-	*/
-	int init							(std::size_t n, W val = DEFWT, bool reset_name = true);
-	
-
-	/*
+	/**
 	* @brief resets to empty graph given name and number of vertices
 	* @param n number of vertices
 	* @param name name of the instance
 	* @returns 0 if success, -1 if memory allocation fails
-	*/
+	**/
 	int reset							(std::size_t n, W val = DEFWT,  string name = "");
 
-	/*
-	* @brief deallocates memory and resets to default values
-	*/
+	/**
+	* @brief resets to default values (does not deallocate memory)
+	* @details: to deallocate do g = Base_Graph_W<xx>() 
+	* @detials: should not be called directly in the general case
+	**/
 	void reset							()								{ g_.reset(); w_.clear(); }
-
 
 /////////////////////////
 //basic graph operations
 
-	/*
-	*  @brief adds edge, no self-loops allowed
-	*/
+	/**
+	* @brief adds edge, no self-loops allowed
+	**/
 	void add_edge						(int v, int w)					{ g_.add_edge(v, w); }
 	
 	double density						(bool lazy = true)				{ return g_.density(lazy); }
@@ -168,36 +158,36 @@ std::string path						()			const			{ return g_.path(); }
 ///////////////////////////
 //weight generation
 	
-	/*
+	/**
 	* @brief generates weights based on modulus operation [Pullan 2008, MODE = 200]
 	* 
 	*			w(v) = (v + 1) % MODE	(v 1-based index)
 	*			
 	*			MODE = 1 -> w(v) = 1	(unweighted graph)
-	*/
+	**/
 	int gen_modulus_weights				(int MODE = DEFAULT_WEIGHT_MODULUS);
 	
 ////////////
 // I/O
 public:
 		
-	/*
+	/**
 	* @brief Writes directed graph to stream in dimacs format
 	*
 	*		 (self-loops are not considered)
-	*/
+	**/
 	virtual ostream& write_dimacs		(std::ostream& o = std::cout);												
 	
-	/*
+	/**
 	* @brief Reads weighted undirected graph from file in DIMACS format
 	* @param filename name of the file
 	* @param type extension of additional filename for separate weights (Wext, Dext, WWWext, NOext)
 	*		 default NOext - no additional file
 	* @returns 0 if success, -1 if error
-	*/
+	**/
 	int read_dimacs						(string filename, int type = NOext);
 	
-	/*
+	/**
 	* @brief Reads weights from an external file (only weights) 
 	* 
 	*		 Format: numbers ordered and separated (line, space) 
@@ -207,7 +197,7 @@ public:
 	* 
 	* @param filename name of the file
 	* @returns 0 if success, -1 if error (empty vector of weights)
-	*/
+	**/
 	int read_weights					(string filename);												
 		
 	ostream& print_data					(bool lazy = true, std::ostream& o = std::cout, bool endl = true);	

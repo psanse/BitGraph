@@ -58,7 +58,7 @@ explicit Graph							(std::string filename);										//creates graph from file
 	Graph								(Graph&& g)			noexcept	= default;					
 	Graph& operator =					(Graph&& g)			noexcept	= default;					
 		
-virtual	~Graph()										= default; 
+virtual	~Graph							()								= default; 
 
 /////////////
 // setters and getters
@@ -102,35 +102,28 @@ const T& get_neighbors					(int v)				const		{return adj_[v];}
 //////////////////////////
 // memory allocation 
 public:
-	/*
-	* @brief resets to empty graph with |V|= n
-	* @param n number of vertices
-	* @param reset_name if true, @name_ and @path_ reset to empty
-	* @returns 0 if success, -1 if memory allocation fails
-	* @updates 18/06/19, 31/12/24
-	* @comment_1 preserved for backward compatibility (use reset(...))
-	*/
-	//int init							(std::size_t n, bool reset_name = true);	
-
-	/*
+	
+	/**
 	* @brief resets to empty graph given name and number of vertices
 	* @param n number of vertices
 	* @param name name of the instance 
 	* @returns 0 if success, -1 if memory allocation fails
 	* @creation 31/12/24
-	*/
+	**/
 	int reset							(std::size_t n, string name = "");
 
-	/*
+	/**
 	* @brief sets graph from file in dimacs/MTX/Edges formats (in this order)
 	* @param filename file
 	* @returns 0 if success, -1 if file cannot be read
-	*/
+	**/
 	int reset							(std::string filename);
 
-	/*
+	/**
 	* @brief resets to default values (does not deallocate memory)
-	*/
+	* @details: to deallocate memory -  g = graph()
+	* @details: in general, should not be called directly
+	**/
 	void reset							();											 
 
 	/**
@@ -146,95 +139,95 @@ public:
 //////////////	
 // Basic operations	
 public:
-	/*
+	/**
 	* @brief density of the directed graph
 	* @param lazy reads NE_ cached value if TRUE
-	*/
+	**/
 	
 virtual	double density					(bool lazy=true);	
 	
-	/*
+	/**
 	* @brief density of the subgraph induced by a set of vertices
 	* @param set input (bit) set of vertices 
-	*/
+	**/
 	template <class bitset_t = T>
 	double density						(const bitset_t& set);
 	
-	/*
+	/**
 	* @brief number of non-empty bit blocks / total number of bit blocks
 	*		
 			 Specialized for sparse graphs
 	*		 (in the case of sparse graphs, density is expected to be 1.0)
 	*		
-	*/	
+	**/	
 	double block_density				()						const;
 	
-	/*
+	/**
 	* @brief number of allocated blocks / total possible number of blocks
 	*
-	*		 ONLY for sparse graphs
-	*/	
+	*		 I.ONLY for sparse graphs
+	**/	
 	double block_density_sparse			()						const;					
  	
-	/*
+	/**
 	* @brief average measure of block density (averages the density of each sparse bitset)
 	*
-	*		 ONLY for sparse graphs
-	*/
+	*		 I.ONLY for sparse graphs
+	**/
 	double average_block_density_sparse	()						const;					
 
-	/*
+	/**
 	* @brief number of outgoing edges from v
 	* @param v input vertex
-	*/
+	**/
 	int degree_out						(int v)					const { return adj_[v].size(); }
 	
-	/*
+	/**
 	* @brief number edges incident to v
 	* @param v input vertex
-	*/
+	**/
 	int degree_in						(int v)					const;
 
 //////////////	
 // Modifiers
 
 public:
-	/*
+	/**
 	* @brief adds edge {v -> w} to the graph,
 	*		 no self loops allowed 
 	* @param v outgoing endpoint 
 	* @param w ingoing endpoint
 	* 
-	*/
+	**/
 virtual void add_edge					(int v, int w);		
 
-	/*
+	/**
 	* @brief removes edge {v -> w} from the graph
 	* @param v outgoing endpoint
 	* @param w ingoing endpoint
-	*/
+	**/
 virtual void remove_edge				(int v, int w);
 
-	/*
+	/**
 	* @brief removes edges with endpoint in v (outgoing/ingoing) 		 
 	* @param v input vertex
-	*/
+	**/
 	void remove_edges					(int v);									
 	
-	/*
+	/**
 	* @brief removes all edges
-	*/
+	**/
 	void remove_edges					();
 
 
-	/*
+	/**
 	* @brief makes all edges bidirected (conversion to undirected graph)
-	*/
+	**/
 	void make_bidirected				();	
 
 	//random generation
 
-	/*
+	/**
 	* @brief generates directed edges with probability p.
 	*
 	*		 I. (v, v) not allowed.
@@ -242,10 +235,10 @@ virtual void remove_edge				(int v, int w);
 	* @param v input endpoint
 	* @param w input endpoint
 	* @returns 0 is success, -1 if error
-	*/
+	**/
 	virtual void gen_random_edges		(double p);
 	
-	/*
+	/**
 	* @brief generates edge (v, w) with probability p.
 	* 
 	*		 I. (v, v) not allowed.
@@ -254,25 +247,25 @@ virtual void remove_edge				(int v, int w);
 	* @param v input endpoint
 	* @param w input endpoint
 	* @returns 0 is success, -1 if error 	
-	*/
+	**/
 	int gen_random_edge		(int v, int w, double p);
 
 //////////////	
 // Induced subgraphs
 
-	/*
+	/**
 	* @brief computes the induced subgraph by the first k vertices in the current graph
 	* @param first_k first k vertices to be included in the new graph
 	* @param g output new induced subgraph
 	* @returns the new induced subgraph (if the operation fails, g remains unchanged)
-	*/
+	**/
 virtual	Graph& create_subgraph			(std::size_t first_k, Graph& g) const;
 
-	/*
+	/**
 	* @brief creates the subgraph induced by the vertices NOT in the input set
 	* @param set input set of vertices
 	* @param g ouptut induced subgraph
-	*/
+	**/
 	void remove_vertices				(const BitSet& set, Graph& g);
 
 //////////////	
@@ -285,20 +278,20 @@ public:
 
 virtual	bool is_edge					(int v, int w)			const { return(adj_[v].is_bit(w)); }
 	
-	/*
+	/**
 	* @brief returns TRUE if (v, v) edges are present
-	*/
+	**/
 	bool is_self_loop					()						const;
 
 ////////////////
 //Comparisons
 public:
-	/*
+	/**
 	* @brief determines if two graphs have the same adjacency matrices 
 	* @param lhs left hand side graph
 	* @param rhs right hand side graph
 	* @returns TRUE if lhs.adj_ == rhs.adj_
-	*/
+	**/
 	template <class T>
 	friend bool operator ==				(const Graph<T>& lhs, const Graph<T>& rhs);  
 		
@@ -370,12 +363,12 @@ virtual	void  write_EDGES				(std::ostream& o) ;
 	* @details Density can be a heavy operation to compute, since it requires the number of edges. 
 	*		   If  @lazy is TRUE the number of edges is read from the cached value @NE_
 	**/
-	ostream& print_data					(bool lazy = true, std::ostream& = std::cout, bool endl = true);
+	ostream& print_data					(bool lazy = true, std::ostream& = std::cout, bool eofl = true);
 	
 	/**
 	* @brief Adjacency matrix to the output stream, in a readable 0-1 format
 	**/
-	ostream& print_adj					(std::ostream& = std::cout, bool endl = true) const;
+	ostream& print_adj					(std::ostream& = std::cout, bool eofl = true) const;
 	
 	/**
 	* @brief Edges of the graph to the output stream in format [v]-->[w]
