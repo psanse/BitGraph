@@ -65,13 +65,15 @@ Edges may be added or deleted in constant time (*remove\_edge* member function) 
 
 A MORE COMPLEX EXAMPLE
 -------------------------------
-K-core analysis is wrapped inside the `KCore` class.  It computes core decomposition for the graph as well as for any subgraph. Here is an example:
+K-core analysis in GRAPH has been [optimized](https://www.google.com/url?sa=t&rct=j&q=&esrc=s&source=web&cd=2&cad=rja&uact=8&ved=0CCgQFjAB&url=http%3A%2F%2Fvlado.fmf.uni-lj.si%2Fpub%2Fnetworks%2Fdoc%2Fcores%2Fcores.pdf&ei=Pe8FVJfZD6PIyAO0-IKIAQ&usg=AFQjCNFNFQZTbvdmsjXTqTSH1BFYf1ACKg&sig2=_leTrcnaQKbfFHpSwiZuKQ&bvm=bv.74115972,d.bGQ) and is extremely fast, which makes it ideal for massive sparse graphs.  
+
+Here is an example:
     
     #include "graph/graph.h" 
     #include "graph/kcore.h" 
    				
     void main(){
-	  sparse_ugraph ug("brock200_1.clq");
+	  sparse_ugraph ug("road-belgium-osm");
 	  KCore<sparse_ugraph> kc(ug);				//configures KCore class
       kc.kcore();						//k-core analysis for the full graph
 	  kc.print_kcore();	
@@ -84,27 +86,27 @@ K-core analysis is wrapped inside the `KCore` class.  It computes core decomposi
 	 kc.print_kcore();							
     }
 
-k-core analysis has been [optimized](https://www.google.com/url?sa=t&rct=j&q=&esrc=s&source=web&cd=2&cad=rja&uact=8&ved=0CCgQFjAB&url=http%3A%2F%2Fvlado.fmf.uni-lj.si%2Fpub%2Fnetworks%2Fdoc%2Fcores%2Fcores.pdf&ei=Pe8FVJfZD6PIyAO0-IKIAQ&usg=AFQjCNFNFQZTbvdmsjXTqTSH1BFYf1ACKg&sig2=_leTrcnaQKbfFHpSwiZuKQ&bvm=bv.74115972,d.bGQ) and is extremely fast (i.e. runs in O(|E|). This makes it ideal for very large sparse graphs. Tests on real graphs with millions of vertices have been solved in but a few seconds.
+
 
     
 EXTERNAL SOURCES
 -------------------------------
 
-Currently version GRAPH reads simple undirected unweighted graphs in ASCII DIMACS, Matrix Market Exchange and Edge list formats. A few examples of undirected graphs in different formats may be found in tha *data* folder of the block. To load a graph from file simply pass the appropiate filename to the constructor:
+The current of GRAPH supports ASCII DIMACS, Matrix Market Exchange and Edge list formats. A few examples of undirected graphs in different formats may be found in the *data* folder. To load a graph from file pass the appropriate filename to the constructor:
 
     
-    graph g("foo-filename");				//loads "brock200_2.clq" file in DIMACS/MTX/EDGES in g
+    graph g("brock200_1.clq");				//reads "brock200_1.clq" file in DIMACS, MTX, or EDGES format
     
 OTHERS
 -------------------------------
 
-Other basic functionality includes computing degree, density, comparing graphs etc. Examples can be found in the *tests* folder which uses google *gtest* framework imported from the Biicode Repository.
+Basic functionality also in GRAPH includes sorting, subgraph degree and support,  random generation, subgraph generation,  density, weights on edges and vertices and many others.
 
 
 COMPATIBILITY
 -------------------------------
 
-GRAPH has been tested in Windows 64-bit OS and Linux OS. Please note that a 64-bit OS is mandatory becase of the BITSCAN dependency.
+GRAPH has been tested in Windows 64-bit OS and Linux OS. Please note that a 64-bit OS is mandatory because of the BITSCAN dependency.
 
 Acknowledgements
 -------------------------------
