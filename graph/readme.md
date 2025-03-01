@@ -100,13 +100,13 @@ The current of GRAPH supports ASCII DIMACS, Matrix Market Exchange and Edge list
 OTHERS
 -------------------------------
 
-Basic functionality also in GRAPH includes sorting, subgraph degree and support,  random generation, subgraph generation,  density, weights on edges and vertices and many others.
+Basic functionality in GRAPH includes sorting, subgraph degree and support,  random generation, subgraph generation,  density, weights on edges and vertices and many others.
 
 
 COMPATIBILITY
 -------------------------------
 
-GRAPH has been tested in Windows 64-bit OS and Linux OS. Please note that a 64-bit OS is mandatory because of the BITSCAN dependency.
+GRAPH has been tested in Windows 64-bit OS and Linux OS. Note that a 64-bit OS is mandatory because of the BITSCAN dependency.
 
 Acknowledgements
 -------------------------------
