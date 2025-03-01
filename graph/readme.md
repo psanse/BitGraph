@@ -32,7 +32,7 @@ The following example builds a directed graph with 100 vertices and 3 edges:
     #include "graph/graph.h"
     //...
     
-    graph g(100);					//creates an empty simple graph with 100 vertices
+    graph g(100);					//creates an empty (directed) graph with 100 vertices
     g.add_edge(0,1);				//configures the edges
 	g.add_edge(0,2);
 	g.add_edge(1,2);
@@ -44,7 +44,7 @@ To make the edges bidirected call the *make\_bidirected* function:
 
 A better option for cliques would be the class Ugraph for undirected graphs. Here is the code for the 3-clique subgraph {0, 2, 3} in a graph with 100 vertices:
    
-    ugraph g(100);					//creates an empty simple graph with 100 vertices
+    ugraph g(100);					//creates an empty (undirected) graph with 100 vertices
 	g.add_edge(0,1);				//configures edges (symmetrical)
 	g.add_edge(0,2);
 	g.add_edge(1,2);
