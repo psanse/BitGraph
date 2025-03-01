@@ -32,7 +32,7 @@ The following example builds a directed graph with 100 vertices and 3 edges:
     #include "graph/graph.h"
     //...
     
-    graph g(100);					//creates an empty (directed) graph with 100 vertices
+    graph g(100);				//creates an empty (directed) graph with 100 vertices
     g.add_edge(0,1);				//configures the edges
 	g.add_edge(0,2);
 	g.add_edge(1,2);
