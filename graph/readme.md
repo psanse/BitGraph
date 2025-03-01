@@ -63,16 +63,12 @@ Edges may be added or deleted in constant time (*remove\_edge* member function) 
 	g.remove_edge(1,2);
     if(g.is_empty()) cout<<"empty graph"<<endl;			
 
-GRAPH ANALYSIS
+A MORE COMPLEX EXAMPLE
 -------------------------------
-By Graph Analysis we refer to any type of precomputation which gives useful information about the graph, such as invariants, decompositions etc. The current release includes as major functionality [k-core decomposition analysis](http://en.wikipedia.org/wiki/Degeneracy_(graph_theory)) but also basic info such as density or maximum graph degree. Clique number is implemented in the [pablodev/copt](https://www.biicode.com/pablodev/copt "repo for compbinatorial optimization") block in the Biicode repository.
-
-K-core analysis is wrapped inside the `KCore` class.  It computes core decomposition for the graph as well as for any subgraph. We note that the graph type should be undirected (type `ugraph` or `sparse_ugraph`). 
-
-Here is an example:
+K-core analysis is wrapped inside the `KCore` class.  It computes core decomposition for the graph as well as for any subgraph. Here is an example:
     
-    #include "pablodev/graph/graph.h" 
-    #include "pablodev/graph/kcore.h" 
+    #include "graph/graph.h" 
+    #include "graph/kcore.h" 
    				
     void main(){
 	  sparse_ugraph ug("brock200_1.clq");
@@ -80,10 +76,10 @@ Here is an example:
       kc.kcore();								//computes k-core analysis for the full graph
 	  kc.print_kcore();	
 
-	 sparse_bitarray bbs(ug.number_of_vertices());
+	 sparse_bitarray bbs(ug.number_of_vertices());		//computes k-core for the subgraph induced by the first 30 vertices
 	 bbs.init_bit(0,29);
 	 kc.set_subgraph(&bbs);
-	 kc.kcore();					//computes k-core for the subgraph induced by the first 30 vertices
+	 kc.kcore();					
     
 	 kc.print_kcore();							
     }
