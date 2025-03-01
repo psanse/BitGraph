@@ -15,7 +15,7 @@ To add k-core graph analysis, for example, (see GRAPH ANALYSIS section below) th
 
 	#include "graph/kcore.h"
 
-Additional documentation is under development, amd will be published asap.
+**Additional documentation is under development, and will be published asap.**
 
 BUILDING GRAPHS
 -------------------------------
