@@ -5,6 +5,7 @@ The BITSCAN library is dedicated to bitset manipulation. The GRAPH library is de
 BITSCAN and GRAPH have been tested in LINUX and Windows OS.  The current versions are: BITSCAN 1.0, UTILS 1.0 and GRAPH 1.0.
 
 The BITSCAN and GRAPH libraries are at the core of many exact state-of-the-art algorithms for hard combinatorial problems and their applications, such as:
+- [CliReg: Clique-based robust Point Cloud Registration, 2025](https://ieeexplore.ieee.org/abstract/document/10892261).
 - [CliSAT: A new exact algorithm for hard maximum clique problems, 2023](https://www.sciencedirect.com/science/article/pii/S0377221722008165).
 - [A new branch-and-filter exact algorithm for binary constraint satisfaction problems, 2022](https://www.sciencedirect.com/science/article/pii/S0377221722008165).
 - [A new combinatorial branch-and-bound algorithm for the Knapsack Problem with Conflicts, 2021](https://www.sciencedirect.com/science/article/pii/S0377221720306342).
