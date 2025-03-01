@@ -120,7 +120,7 @@ namespace com {
 			   }
 		   }
 		   o << " [" << nC << "]";
-		   if (eofl) o << endl;
+		   if (eofl) o << std::endl;
 		   return o;
 	   }
    }

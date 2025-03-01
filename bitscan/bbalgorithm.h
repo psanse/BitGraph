@@ -16,8 +16,6 @@
 #include <array>
 #include <functional>
 
-//using namespace std;
-
 //aliases
 using bbo = BBObject;
 
@@ -128,7 +126,7 @@ struct bbSize_t{
 	friend bool operator !=	(const bbSize_t& lhs, const bbSize_t& rhs)			{ return !(lhs == rhs); }
 
 //I/O
-std::ostream& print	(std::ostream& o = cout, bool show_pc = true, bool eofl = true)	const;
+std::ostream& print	(std::ostream& o = std::cout, bool show_pc = true, bool eofl = true)	const;
 
 /////////////////
 // data members
@@ -138,7 +136,7 @@ std::ostream& print	(std::ostream& o = cout, bool show_pc = true, bool eofl = tr
 };
 
 template <class BitSet_t>
-std::ostream& bbSize_t<BitSet_t>::print(std::ostream& o = std::cout, bool show_pc = true, bool eofl = true) const {
+std::ostream& bbSize_t<BitSet_t>::print(std::ostream& o , bool show_pc , bool eofl) const {
 
 	bb_.print(o, true, false);
 	if (show_pc) { o << "[" << pc_ << "]"; }
@@ -238,7 +236,7 @@ struct bbCol_t {
 				bb_[i].reset(popCount);
 			}
 		}
-		catch (exception& e) {
+		catch (std::exception& e) {
 			LOG_ERROR(e.what());
 			LOG_ERROR("bbCol_t::bbCol_t()");
 			std::exit(-1);
@@ -275,7 +273,7 @@ struct bbCol_t {
 
 
 //I/O
-	std::ostream& print			(std::ostream& o = cout, bool show_pc = true, bool eofl = true)	 const;
+	std::ostream& print			(std::ostream& o = std::cout, bool show_pc = true, bool eofl = true)	 const;
 	//TODO... others
 
 
@@ -308,7 +306,7 @@ std::ostream& bbCol_t<BitSet_t, SIZE>::print(std::ostream& o, bool show_pc, bool
 			bb_[i].print(o, show_pc, true);
 		}
 	}
-	if (eofl) { o << endl; }
+	if (eofl) { o << std::endl; }
 	return o;
 }
 
@@ -322,7 +320,7 @@ std::ostream& bbStack_t<BitSet_t>::print(print_t t, std::ostream& o, bool eofl){
 		for(auto i = 0; i < stack_.size(); ++i){
 			o << stack_[i] << " ";
 		}
-		o << "]" << endl;
+		o << "]" << std::endl;
 		break;
 	case BITSET:
 		bb_.print(o, true, false);		//size info and no end of line
@@ -393,7 +391,7 @@ void  bbStack_t<BitSet_t>::reset(int MAX_SIZE) {
 		stack_.clear();
 		////////////////////////////
 	}
-	catch (exception& e) {
+	catch (std::exception& e) {
 		LOG_ERROR(e.what());
 		LOG_ERROR("bbStack_t<BitSet_t>::-reset()");
 		std::exit(-1);
@@ -446,7 +444,7 @@ namespace bbalg {
 	inline 
 	std::vector<int> to_vector(BitSet_t& bbn) {
 
-		vector<int> res;
+		std::vector<int> res;
 				
 		typename BitSet_t::scan sc(bbn);
 		if (sc.init_scan(BBObject::NON_DESTRUCTIVE) == -1) {
