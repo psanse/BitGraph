@@ -52,16 +52,16 @@ A better option for cliques would be the class Ugraph for undirected graphs. Her
 EDITING GRAPHS
 -------------------------------
 
-Edges may be added or deleted in constant time (*remove\_edge* member function) for simple graphs (in the case of sparse graphs complexity increases because it takes logarithmic time to find an edge). Removing vertices is possible as well (member function *remove\_vertices*) but requires memory allocation. Currently GRAPH does not support adding new vertices (the graph order should be passed to the constructor). Here is a trivial example:
+Edges may be added or deleted in constant time (*remove\_edge* member function) for simple graphs (in the case of sparse graphs complexity increases because it takes logarithmic time to find an edge). They may also be generated randomly, as well as uniform random graph benchmarks. Graphs may also be resized and copied. Here is a trivial example of graph editing which involves adding and deleting edges:
    
-    graph g(3);							//creates an empty graph with 100 vertices
-	g.add_edge(0,1);				//configures the edges
+    graph g(3);							
+	g.add_edge(0,1);				
 	g.add_edge(0,2);
 	g.add_edge(1,2);
 	g.remove_edge(0,1);
 	g.remove_edge(0,2);
 	g.remove_edge(1,2);
-    if(g.is_empty()) cout<<"empty graph"<<endl;			//will print the message on the screen
+    if(g.is_empty()) cout<<"empty graph"<<endl;			
 
 GRAPH ANALYSIS
 -------------------------------
