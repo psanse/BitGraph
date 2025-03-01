@@ -82,7 +82,7 @@ Here is an example:
 	  bbs.set_bit(0,29);
 	  kc.set_subgraph(&bbs);
 	 
-  	   kc.kcore();    
+  	  kc.kcore();    
 	  kc.print_kcore();							
     }
 
