@@ -14,6 +14,10 @@ The BITSCAN and GRAPH libraries are at the core of many exact state-of-the-art a
 - [A new branch-and-bound algorithm for the maximum edge-weighted clique problem, 2019](https://www.sciencedirect.com/science/article/pii/S0377221719303054).
 - [A new branch-and-bound algorithm for the Maximum Weighted Clique Problem, 2019](https://www.sciencedirect.com/science/article/pii/S0305054819301303?casa_token=G7GLiCVG0xsAAAAA:pEzTarl2ldBHgkG7PSp9s4Mg-idPrMXgaBkD22mTy9Xn20YrBd7rEPA7Xuoiljq6aekFwrlEeQ).
 - [Efficiently enumerating all maximal cliques with bit-parallelism, 2018](https://www.sciencedirect.com/science/article/pii/S0305054817302988?casa_token=OqTK-OLIIhgAAAAA:aL1pUr8qPNJeYqPqJn6xLiWeEcsBQxeaPL7Sev3MJa3Dk0Mm_ZxjXxVd9XDKkqL8RsUMIxjK6A).
+- [A new exact maximum clique algorithm for large and massive sparse graphs, 2016](https://www.sciencedirect.com/science/article/pii/S0305054815001884).
+- [A novel clique formulation for the visual feature matching problem,2015](https://link.springer.com/article/10.1007/s10489-015-0646-1).
+- [A new DSATUR-based algorithm for exact vertex coloring, 2012](https://www.sciencedirect.com/science/article/pii/S0305054811002966?casa_token=5udkYhvrMEsAAAAA:ygKzz7_FVTd832UxriFawzx1E26R6g6vWGb-Nx5gUMHZpOofl4GnZURf0pEMMMs6JEkBPilZqA).
+- [An exact bit-parallel algorithm for the maximum clique problem, 2011](https://www.sciencedirect.com/science/article/pii/S0305054810001504?casa_token=ss__gBPlWVIAAAAA:-slFv5Gkx-DGHDovu8oguVEqO-eP9dl8xQtQjuUKP8VoOmANOVMh4DoJi6Jj_kkC5xmQ-fIJNg).
 
 and many others. 
 
