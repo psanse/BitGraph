@@ -73,10 +73,10 @@ K-core analysis is wrapped inside the `KCore` class.  It computes core decomposi
     void main(){
 	  sparse_ugraph ug("brock200_1.clq");
 	  KCore<sparse_ugraph> kc(ug);				//configures KCore class
-      kc.kcore();						//computes k-core analysis for the full graph
+      kc.kcore();						//k-core analysis for the full graph
 	  kc.print_kcore();	
 
-	 sparse_bitarray bbs(ug.number_of_vertices());		//computes k-core for the subgraph bbs induced by the first 30 vertices
+	 sparse_bitarray bbs(ug.number_of_vertices());		//k-core analysis for the subgraph bbs induced by the first 30 vertices
 	 bbs.init_bit(0,29);
 	 kc.set_subgraph(&bbs);
 	 kc.kcore();					
