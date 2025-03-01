@@ -54,7 +54,7 @@ EDITING GRAPHS
 
 Edges may be added or deleted in constant time (*remove\_edge* member function) for simple graphs (in the case of sparse graphs complexity increases because it takes logarithmic time to find an edge). They may also be generated randomly, as well as uniform random graph benchmarks. Graphs may also be resized and copied. Here is a trivial example of graph editing which involves adding and deleting edges:
    
-    graph g(3);							
+    graph g(500);							
 	g.add_edge(0,1);				
 	g.add_edge(0,2);
 	g.add_edge(1,2);
