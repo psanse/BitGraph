@@ -100,7 +100,7 @@ GRAPH supports DIMACS, Matrix Market Exchange and Edge list text formats. A few 
 OTHERS
 -------------------------------
 
-Basic functionality in GRAPH includes sorting, subgraph degree and support,  random generation, subgraph generation,  density, weights on edges and vertices and many others.
+Basic functionality in GRAPH includes sorting according to different criteria, subgraph degree and support,  random generation, subgraph generation, density, weights on edges and vertices and many others.
 
 
 COMPATIBILITY
