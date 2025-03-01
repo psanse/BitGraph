@@ -21,4 +21,7 @@ The BITSCAN and GRAPH libraries are at the core of many exact state-of-the-art a
 
 and many others. 
 
-
+Acknowledgements
+-------------------------
+This research has been partially funded by the Spanish Ministry of Economy and Competitiveness (MINECO), national grants DPI 2010-21247-C02-01, 
+DPI 2014-53525-C3-1-R and  DPI2017-86915-C3-3-R.
