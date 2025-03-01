@@ -63,7 +63,4 @@ The file *bbconfig.h* contains customization parameters. An important parameter 
 
 1. POPCOUNT_64: Disable in processor architectures which do not support hardware population count assembly instructions. 
 
-Acknowledgements
--------------------------
-This research has been partially funded by the Spanish Ministry of Economy and Competitiveness (MINECO), national grants DPI 2010-21247-C02-01, 
-DPI 2014-53525-C3-1-R and  DPI2017-86915-C3-3-R.
+
