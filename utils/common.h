@@ -27,6 +27,8 @@
 #include <random>
 #include <string>
 #include <vector>
+#include <algorithm>
+#include <iterator>
 
 #include "common_types.h"				//common types additional utilities, to be included e
 
@@ -70,8 +72,8 @@ namespace com {
 	   template<class Col_t>
 	   inline bool all_equal(const Col_t& col) {
 		   return (	std::adjacent_find(	col.cbegin(), col.cend(),
-										std::not_equal_to<>()	)		
-					== col.cend()									);
+										std::not_equal_to<typename Col_t::value_type>() )			//std::not_equal_to<> is more modern C++
+						== col.cend()														);
 	   }
 
 	   /**
@@ -79,18 +81,17 @@ namespace com {
 	   *  		
 	   * @param c: input collection
 	   * @param	o: output stream
-	   * @param	with_endl: flag to include a new line at the end of the stream
+	   * @param	eofl: flag to include a new line at the end of the stream
 	   * @returns: stream with all the elements of the collection
 	   **/
 	   template <class Col_t>
 	   inline
-	   std::ostream& print_collection(const Col_t& c, std::ostream&  o= std::cout, bool with_endl=false)
+	   std::ostream& print_collection(const Col_t& c, std::ostream&  o = std::cout, bool eofl = false)
 	   {
 		   std::copy(c.cbegin(), c.cend(), std::ostream_iterator<typename Col_t::value_type>(o," " ));
 		   o << " [" << c.size() << "]";
-		   if (with_endl) {
-			   o << std::endl;
-		   }
+
+		   if (eofl) {  o << std::endl;  }
 		   return o;
 	   }   	   
 		   	 
@@ -105,13 +106,13 @@ namespace com {
 	   template <class ForwardIterator>
 	   inline
 		std::ostream& print_collection(	const ForwardIterator begin, const ForwardIterator end,
-										std::ostream&  o = cout,
-										bool with_endl = false,
-										bool with_index = false											)
+										std::ostream&  o = std::cout,
+										bool eofl = false,
+										bool index = false											)
 	   {
 		   int nC = 0;
 		   for (auto it = begin; it != end; ++it) {
-			   if (with_index) {
+			   if (index) {
 				   o << "[" << nC << "]" << *it << " "; nC++;
 			   }
 			   else {
@@ -119,7 +120,7 @@ namespace com {
 			   }
 		   }
 		   o << " [" << nC << "]";
-		   if (with_endl) o << endl;
+		   if (eofl) o << endl;
 		   return o;
 	   }
    }
@@ -199,7 +200,7 @@ namespace com {
 	   {
 		   std::ofstream f(filename, std::ofstream::out);
 		   if (!f) {
-			   LOG_ERROR("Could not open file: " << filename);
+			   LOGG_ERROR("Could not open file: ", filename);
 			   return -1;
 		   }
 
@@ -304,7 +305,7 @@ namespace com {
 		bool operator()(const T& a, const T& b) const {
 			auto prod_a = crit[a] * a;
 			auto prod_b = crit[b] * b;
-			if constexpr (Greater) {
+			if (Greater) {							 //if contexpr in C++17 is the point - removed for C++11 compatibility
 				return prod_a > prod_b;
 			}
 			else {
@@ -326,7 +327,7 @@ namespace com {
 		bool operator()(const T& a, const T& b) const {
 			auto diff_a = crit[a] - a;
 			auto diff_b = crit[b] - b;
-			if constexpr (Greater) {
+			if (Greater) {						 //if contexpr in C++17 is the point - removed for C++11 compatibility
 				return diff_a > diff_b;
 			}
 			else {
@@ -504,7 +505,7 @@ namespace com {
 				result_type b() { return dist_.param().b(); }
 
 				static void set_range(result_type min, result_type max) {
-					dist_.param(D::param_type{ min, max });
+					dist_.param(typename D::param_type{ min, max });
 				}
 
 				static void seed(std::size_t seed) {							//external seed
@@ -529,7 +530,7 @@ namespace com {
 				}
 
 				result_type operator()(result_type min, result_type max) {
-					return dist_(re_, D::param_type{ min, max });
+					return dist_(re_, typename D::param_type{ min, max });
 				}
 
 				//////////////////////////////////////////////////////////////////

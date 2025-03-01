@@ -200,14 +200,14 @@ public:
 	**/
 	int read_weights					(string filename);												
 		
-	ostream& print_data					(bool lazy = true, std::ostream& o = std::cout, bool endl = true);	
+	std::ostream& print_data			(bool lazy = true, std::ostream& o = std::cout, bool endl = true);	
 	
-	ostream& print_weights				(std::ostream& o= std::cout, bool show_v=true)								const;
-	ostream& print_weights				(_bbt & bbsg, std::ostream& o= std::cout)									const;
-	ostream& print_weights				(vint& lnodes, std::ostream& o= std::cout)									const;
-	ostream& print_weights				(com::stack_t<int>& lv, ostream& o= std::cout)								const;
-	ostream& print_weights				(com::stack_t<int>& lv, const vint& mapping, std::ostream& o= std::cout)	const;
-	ostream& print_weights				(int* lv, int n, std::ostream& o= std::cout)								const;
+	std::ostream& print_weights			(std::ostream& o= std::cout, bool show_v=true)								const;
+	std::ostream& print_weights			(_bbt & bbsg, std::ostream& o= std::cout)									const;
+	std::ostream& print_weights			(vint& lnodes, std::ostream& o= std::cout)									const;
+	std::ostream& print_weights			(com::stack_t<int>& lv, ostream& o= std::cout)								const;
+	std::ostream& print_weights			(com::stack_t<int>& lv, const vint& mapping, std::ostream& o= std::cout)	const;
+	std::ostream& print_weights			(int* lv, int n, std::ostream& o= std::cout)								const;
 
 /////////////////////////////////////
 // data members

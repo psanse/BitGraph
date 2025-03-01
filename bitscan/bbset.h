@@ -65,6 +65,7 @@ public:
 	* @details: The capacity of lhs and rhs must be the same.
 	*			The capacity of res must be greater or equal than lhs / rhs
 	* @details: created 06/02/2025
+	* @details: GCC does not allow default template parameters in friend functions
 	**/
 	template<bool Erase>
 	friend BitSet& AND			(int firstBit, int lastBit, const BitSet& lhs, const BitSet& rhs, BitSet& res);
@@ -81,6 +82,7 @@ public:
 	* @param lhs, rhs: input bitsets
 	* @param res: output bitset
 	* @returns reference to the resulting bitstring res
+	* @details: GCC does not allow default template parameters in friend functions
 	**/
 	template<bool Erase>
 	friend BitSet&  AND_block	(int firstBlock, int lastBlock, const BitSet& lhs, const BitSet& rhs,  BitSet& res);
@@ -115,6 +117,7 @@ public:
 	* @details: The capacity of lhs and rhs must be the same.
 	*			The capacity of res must be greater or equal than lhs / rhs
 	* @details: created 06/02/2025
+	* @details: GCC does not allow default template parameters in friend functions
 	**/
 	template<bool Erase>
 	friend BitSet&  OR			(int firstBit, int lastBit, const BitSet& lhs, const BitSet& rhs, BitSet& res);
@@ -1587,7 +1590,7 @@ BitSet& BitSet::erase_block(int firstBlock, int lastBlock, const BitSet& bb_del)
 }
 
 
-template<bool Erase = false>
+template<bool Erase>
 inline
 BitSet& AND(int firstBit, int lastBit, const BitSet& lhs, const BitSet& rhs, BitSet& res)
 {
@@ -1662,7 +1665,7 @@ BitSet& AND(int firstBit, int lastBit, const BitSet& lhs, const BitSet& rhs, Bit
 	return res;
 }
 
-template<bool Erase = false>
+template<bool Erase>
 inline
 BitSet& AND_block(int firstBlock, int lastBlock, const BitSet& lhs, const BitSet& rhs, BitSet& res) {
 
@@ -1720,7 +1723,7 @@ BitSet& BitSet::AND_EQUAL_block(int firstBlock, int lastBlock, const BitSet& rhs
 	return *this;
 }
 
-template<bool Erase = false>
+template<bool Erase>
 inline
 BitSet& OR(int firstBit, int lastBit, const BitSet& lhs, const BitSet& rhs, BitSet& res)
 {

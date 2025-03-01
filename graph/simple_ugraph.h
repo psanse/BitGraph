@@ -256,12 +256,12 @@ public:
 //	I/O basic operations
 public:
 
-	ostream& print_degrees		(std::ostream& = std::cout)					const;
-	ostream& print_edges		(std::ostream& = std::cout)					override;
+	std::ostream& print_degrees		(std::ostream& = std::cout)					const;
+	std::ostream& print_edges		(std::ostream& = std::cout)					override;
 	
 	template<class bitset_t = T>
-	ostream& print_edges		(bitset_t& bbsg, std::ostream&)				const ;
-	ostream& print_matrix		(std::ostream& = std::cout)					const;
+	std::ostream& print_edges		(bitset_t& bbsg, std::ostream&)				const ;
+	std::ostream& print_matrix		(std::ostream& = std::cout)					const;
 
 //////////////	
 // deleted - CHECK	

@@ -393,7 +393,7 @@ int Base_Graph_EW<Graph_t, W>::read_dimacs (string filename){
 }
 
 template<class Graph_t, class W>
-ostream& Base_Graph_EW<Graph_t, W>::write_dimacs (ostream& o) {
+std::ostream& Base_Graph_EW<Graph_t, W>::write_dimacs (std::ostream& o) {
 	
 	auto NV = number_of_vertices();
 
@@ -409,7 +409,7 @@ ostream& Base_Graph_EW<Graph_t, W>::write_dimacs (ostream& o) {
 	//write vertex weights (edge weights of self loops are considered vertex weights)
 	for (std::size_t v = 0; v < NV; ++v) {
 		if (we_[v][v] != NOWT) {
-			o << "n " << v + 1 << " " << we_[v][v] << endl;
+			o << "n " << v + 1 << " " << we_[v][v] << std::endl;
 		}
 	}
 		
@@ -417,7 +417,7 @@ ostream& Base_Graph_EW<Graph_t, W>::write_dimacs (ostream& o) {
 	for(std::size_t v = 0; v < NV; ++v){
 		for(std::size_t w = 0; w < NV; ++w){
 			if (v != w && g_.is_edge(v, w)) {										
-				o << "e " << v + 1 << " " << w + 1 << we_[v][w] << endl;			//1-based vertex notation dimacs format	
+				o << "e " << v + 1 << " " << w + 1 << we_[v][w] << std::endl;			//1-based vertex notation dimacs format	
 			}
 		}
 	}

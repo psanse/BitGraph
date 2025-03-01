@@ -41,9 +41,10 @@ class InfoAnalyser {
 	* @brief Streams the report of the InfoAnalyser, based on the current @print_mode_ - main driver for the class
 	* param o: input/output stream
 	* param t: InfoAnalyser object
+	* @details: VS compiler allows T =  basic_type but not GCC (C++11)
 	**/
-	template<class AlgInfo_t> 
-	friend std::ostream& operator << (std::ostream& o, const InfoAnalyser<AlgInfo_t>& t);
+	template<class T> 
+	friend std::ostream& operator << (std::ostream& o, const InfoAnalyser<T>& t);		
 	
 public:
 

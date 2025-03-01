@@ -16,7 +16,7 @@
 #include <array>
 #include <functional>
 
-using namespace std;
+//using namespace std;
 
 //aliases
 using bbo = BBObject;
@@ -57,7 +57,7 @@ namespace bbalg {
 	* @details: used in BBMWCP for upper bound computation
 	**/
 	template<class BitSet_t>
-	int first_k_bits(int k, BitSet_t& bb, vector<int>& lv);
+	int first_k_bits(int k, BitSet_t& bb, std::vector<int>& lv);
 
 }//end namespace bbalg
 
@@ -128,7 +128,7 @@ struct bbSize_t{
 	friend bool operator !=	(const bbSize_t& lhs, const bbSize_t& rhs)			{ return !(lhs == rhs); }
 
 //I/O
-	ostream& print	(ostream& o = cout, bool show_pc = true, bool eofl = true)	const;
+std::ostream& print	(std::ostream& o = cout, bool show_pc = true, bool eofl = true)	const;
 
 /////////////////
 // data members
@@ -138,11 +138,11 @@ struct bbSize_t{
 };
 
 template <class BitSet_t>
-ostream& bbSize_t<BitSet_t>::print(ostream& o = cout, bool show_pc = true, bool eofl = true) const {
+std::ostream& bbSize_t<BitSet_t>::print(std::ostream& o = std::cout, bool show_pc = true, bool eofl = true) const {
 
 	bb_.print(o, true, false);
 	if (show_pc) { o << "[" << pc_ << "]"; }
-	if (eofl) { o << endl; }
+	if (eofl) { o << std::endl; }
 	return o;
 }
 
@@ -199,7 +199,7 @@ bbStack_t& operator =	(const bbStack_t& rhs) noexcept	= delete;
 	bool is_empty		()			{return (pc_ ==0);}
 	
 //I/O
-	ostream& print		(print_t t = STACK, ostream& o= cout, bool eofl = true);
+	std::ostream& print		(print_t t = STACK, std::ostream& o = std::cout, bool eofl = true);
 
 /////////////////
 // data members
@@ -271,11 +271,11 @@ struct bbCol_t {
 	BitSet& erase_bit			(int bitsetID)									{ return std::ref((bb_[bitsetID].erase_bit())); }
 
 //bool
-	bool is_bit				(int pos, int bit)								{ return bb_[pos].is_bit(bit); }
+	bool is_bit					(int pos, int bit)								{ return bb_[pos].is_bit(bit); }
 
 
 //I/O
-	ostream& print			(ostream& o = cout, bool show_pc = true, bool eofl = true)	 const;
+	std::ostream& print			(std::ostream& o = cout, bool show_pc = true, bool eofl = true)	 const;
 	//TODO... others
 
 
@@ -302,7 +302,7 @@ BitSet& bbCol_t<BitSet_t, SIZE>::set_bit(int bitsetID, int bit, bool& is_first_b
 
 template <class BitSet_t, int SIZE>
 inline
-ostream& bbCol_t<BitSet_t, SIZE>::print(ostream& o, bool show_pc, bool eofl)  const{
+std::ostream& bbCol_t<BitSet_t, SIZE>::print(std::ostream& o, bool show_pc, bool eofl)  const{
 	for(auto i = 0; i < bb_.size(); ++i){
 		if(!bb_[i].is_empty()){
 			bb_[i].print(o,  showpc, true);
@@ -314,7 +314,7 @@ ostream& bbCol_t<BitSet_t, SIZE>::print(ostream& o, bool show_pc, bool eofl)  co
 
 template <class BitSet_t>
 inline
-ostream& bbStack_t<BitSet_t>::print(print_t t, ostream& o, bool eofl){
+std::ostream& bbStack_t<BitSet_t>::print(print_t t, std::ostream& o, bool eofl){
 
 	switch(t){
 	case STACK:
@@ -331,7 +331,7 @@ ostream& bbStack_t<BitSet_t>::print(print_t t, ostream& o, bool eofl){
 		; //error
 	}
 
-	if (eofl) { o << endl; }
+	if (eofl) { o << std::endl; }
 	return o;
 }
 
@@ -477,7 +477,7 @@ namespace bbalg {
 
 	template<class BitSet_t>
 	inline 
-	int first_k_bits(int k, BitSet_t& bb, vector<int>& lv) {
+	int first_k_bits(int k, BitSet_t& bb, std::vector<int>& lv) {
 		
 		lv.clear();
 

@@ -420,7 +420,7 @@ inline double Graph<T>::density(const bitset_t& bbN) {
 
 template<class T>
 template<class bitset_t>
-ostream& Graph<T>::print_edges(bitset_t& bbsg, ostream& o) const {
+std::ostream& Graph<T>::print_edges(bitset_t& bbsg, std::ostream& o) const {
 	
 	for (int i = 0; i < NV_ - 1; i++) {
 

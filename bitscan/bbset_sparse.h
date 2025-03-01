@@ -52,8 +52,8 @@ public:
 		bool is_empty		()					const	{ return !bb_ ; }
 		void clear			()							{ bb_ = 0;}
 
-		ostream& print		(ostream& o = cout, bool eofl = true)	const;
-friend  ostream& operator<< (ostream& o, const pBlock_t& pB)				{ pB.print(o); return o; }
+		std::ostream& print			(std::ostream& o = cout, bool eofl = true)	const;
+friend  std::ostream& operator<<	(std::ostream& o, const pBlock_t& pB)				{ pB.print(o); return o; }
 	};
 
 	//aliases
