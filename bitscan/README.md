@@ -1,6 +1,6 @@
 BITSCAN 1.0
 ===================
-BITSCAN is a C++ library that manipulates bit arrays (alias bit strings, bit sets, etc.) and is specifically oriented toward fast bitscanning operations. BITSCAN results from *more than 20 years of research* in combinatorial optimization problems and has been proven very useful when modelling sets. In this application, a bitset represents the set population, with each member encoded as a single 1-bit.
+BITSCAN is a C++ library that manipulates bit arrays (alias bit strings, bit sets, etc.) and is specifically oriented toward fast bitscanning operations. BITSCAN results from **more than 20 years of research** in combinatorial optimization problems and has been proven very useful when modelling sets. In this application, a bitset represents the set population, with each member encoded as a single 1-bit.
 
 BITSCAN has been tested in LINUX and Windows OS.  
 
@@ -10,7 +10,7 @@ The library currently offers a variety of bitset types, the main ones being:
 - `bitarray`: Main type for standard bit manipulation. 
 - `sparse_bitarray`: Main type for large and massive sets with few elements.
   
-Other types such as `simple_bitarray`, `simple_sparse_bitarray` and `watched_bitarray` are included for specific operations. For example, `watched_bitarray` are intended for set populations with low density, but not sparse. Empty bit blocks are still stored in full, but two pointers (aka sentinels) which point (alias *watch*) the highest and lowest empty blocks respectively, determine the range of useful bitmasks (see [here](http://download.springer.com/static/pdf/797/chp%253A10.1007%252F978-3-319-09584-4_12.pdf?auth66=1411550130_ba322f209d8b171722fa67741d3f77e9&ext=.pdf "watched bit arrays") for an interesting application).
+Other types such as `simple_bitarray`, `simple_sparse_bitarray` and `watched_bitarray` are included for specific operations. For example, the `watched_bitarray` type is intended for set populations with low density, but not sparse. Empty bit blocks are still stored in full, but two pointers (aka sentinels) which point (alias *watch*) the highest and lowest empty blocks respectively, determine the range of useful bitmasks (see [here](http://download.springer.com/static/pdf/797/chp%253A10.1007%252F978-3-319-09584-4_12.pdf?auth66=1411550130_ba322f209d8b171722fa67741d3f77e9&ext=.pdf "watched bit arrays") for an interesting application).
 
 The library features several optimizations for typical enumeration of set members (in this context, *bitscanning*) which have been found useful for fast implementation of algorithms during research, such as  destructive vs non-destructive scans, forward and reverse_forward scans, random starting points, caching indexes etc. 
 
