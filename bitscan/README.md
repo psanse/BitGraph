@@ -12,16 +12,12 @@ The BITSCAN library is at the core of many exact state-of-the-art algorithms for
 
 and many others. BITSCAN has been tested in LINUX and Windows OS.  
 
-The library currently offers the following types for bitstrings
+The library currently offers a variety of btiset types, the main ones being:
 
 - `bitblock`: Wrapper for bit manipulation of 64-bit numbers (*lsb*, *msb*, *popcount* etc.).
-- `simple_bitarray`: Extends bit manipulation to bit arrays
-- `bitarray`: Main type for standard bit manipulation. Uses compiler intrinsics (or assembler equivalents) enhancements.
-- `watched_bitarray`: Extends the bitarray type for set populations with low density, but not sparse. Empty bit blocks are still stored in full, but two pointers (aka sentinels) which point (alias *watch*) the highest and lowest empty blocks respectively, determine the range of useful bitmasks.
-- `simple_sparse_bitarray`: General operations for sparse bit arrays.
-- `sparse_bitarray`: Main type for efficient sparse bit arrays.  Uses compiler intrinsics (or assembler equivalents) enhancements.
-
-Normally clients should use just the `bitarray` or `sparse_bitarray` types. Watched bit arrays have proven useful in some combinatorial problems. One such example may be found [here](http://download.springer.com/static/pdf/797/chp%253A10.1007%252F978-3-319-09584-4_12.pdf?auth66=1411550130_ba322f209d8b171722fa67741d3f77e9&ext=.pdf "watched bit arrays"). 
+- `bitarray`: Main type for standard bit manipulation. 
+- `sparse_bitarray`: Main type for sparse bit manipulation (bit operations for sparse sets).
+Other types such as `simple_bitarray',  `simple_sparse_bitarray` or 'watched_bitarray` are included for specific operations. For example, `watched_bitarray` are intended for set populations with low density, but not sparse. Empty bit blocks are still stored in full, but two pointers (aka sentinels) which point (alias *watch*) the highest and lowest empty blocks respectively, determine the range of useful bitmasks (see [here](http://download.springer.com/static/pdf/797/chp%253A10.1007%252F978-3-319-09584-4_12.pdf?auth66=1411550130_ba322f209d8b171722fa67741d3f77e9&ext=.pdf "watched bit arrays") for an interesting application).
 
 The library features several optimizations for typical enumeration of set members (in this context, *bitscanning*) which have been found useful for fast implementation of algorithms during research, such as  destructive vs non-destructive scans, forward and reverse_forward scans, random starting points, caching indexes etc. 
 
