@@ -24,7 +24,7 @@ The library features several optimizations for typical enumeration of set member
 
 GETTING STARTED
 -------------------------------
-To include the BITSCAN library in your project, add the dependency to the *bitscan.h file*. In the following example, a bitset of 100 elements is declared and the 11-th bit is set to 1 (index numbering starts at 0). 
+To include the BITSCAN library in your project, add the dependency to the *bitscan.h file*. In the following example, a bitset of 100 elements is declared and the 11th bit is set to 1 (index numbering starts at 0). 
 
     #include "bitscan/bitscan.h"
     	//...
@@ -38,7 +38,7 @@ You will find many more examples in the *tests* folder.
 EXAMPLES OF BITSCANNING OPERATIONS
 -------------------------------
 
-The BITSCAN library features specific optimisation techniques for *destructive* and *non-destructive* scans. In a destructive bit scan (DBS), whenever a 1-bit is read *it is removed from the bitset* (at the end of the process the bit string is empty). In the (conventional) non-destructive case (NDBS), the bitset is not modified. 
+The BITSCAN library features specific optimisation techniques for *destructive* and *non-destructive* scans. In a destructive bit scan (DBS), whenever a 1-bit is read *it is removed from the bitset* (at the end of the process the bit string is empty). In the (conventional) non-destructive case (NDBS), the bitset remains unaltered. 
 
 Here is an example of fast bit scan loop syntax in BITSCAN:
 
@@ -61,9 +61,8 @@ The *init_scan* member function configures cache information appropriately. Curr
 		//Do something with nBit...
 	   }
 	}
-In this case the *if* clause is necessary because sparse bitsets can have empty semantics (no memory allocation), which is checked in the init_scan function. Moreover, the scanning now differs from the previous case because it deletes each population member from the set once it is found (DESTRUCTIVE type).
+In this case the *if* clause is necessary because sparse bitsets can have empty semantics (no memory allocation), which is checked in the init_scan function. Moreover, the scanning now differs from the previous case because it deletes each population member from the set once it is found (DESTRUCTIVE type). Finally, it is worth noting that scanning operations from different starting points in the bitset are also supported.
 
-The interface for other bitset types is the same.
 
 CONFIGURATION PARAMETERS
 -------------------------
