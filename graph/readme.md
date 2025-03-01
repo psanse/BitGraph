@@ -2,48 +2,49 @@
 GRAPH 1.0 library for bit-encoded graphs
 ===================
 
-GRAPH is a small efficient  C++ library which manages basic functionality of **bit-encoded** simple graphs, either unweighted or with weights. At the heart of GRAPH is BITSCAN, an efficient library to manage bit strings. GRAPH's main class is Graph, a template for generic simple graphs. Ugraph is a specialization of the Graph template for undirected graphs only. 
+GRAPH is a very efficient C++ library for graphs. At the core of GRAPH is the BITSCAN library (see folder *bitscan*, in this repository). 
 
 GETTING STARTED
 -------------------------------
 
-To use GRAPH's basic functionality for simple graphs in your projects add the following header and execute the command *bii find*; this will download the library in the *deps* folder. 
+To use GRAPH in your projects, add the following header: 
 
-	#include "pablodev/graph/graph.h"
+	#include "graph/graph.h"
 
-To add k-core graph analysis (see GRAPH ANALYSIS section below) the header is:
+To add k-core graph analysis, for example, (see GRAPH ANALYSIS section below) the header is:
 
-	#include "pablodev/graph/kcore.h"
+	#include "graph/kcore.h"
+
+Additional documentation is under development, amd will be published asap.
 
 BUILDING GRAPHS
 -------------------------------
-GRAPH currently distinguishes 4 different types of graph objects:
+GRAPH currently distinguishes 4 main types of graph objects:
 
 - `graph`: for simple graphs
 - `ugraph`: specialization of `graph` for undirected graphs
 - `sparse_graph`: for sparse simple graphs
 - `sparse_ugraph`: specialization of `sparse_graph` for sparse undirected graphs
- 
-Internally these names are specialized typedefs which hide a Graph class template instantiation of the different types of encodings.
 
-To build a graph from scratch an empty graph of the correct order has to be declared first. Functions *add\-edge* and *delete\_edge* allow to customize edges at will. Here is an example:
 
-    #include "pablodev/graph/graph.h"
+The following example builds a directed graph with 100 vertices and 3 edges:
+
+    #include "graph/graph.h"
     //...
     
-    graph g(3);						//creates an empty simple graph with 100 vertices
+    graph g(100);						//creates an empty simple graph with 100 vertices
     g.add_edge(0,1);				//configures the edges
 	g.add_edge(0,2);
 	g.add_edge(1,2);
 
 
-Notice that Graph always adds directed edges, so this is not actually a 3-clique. If a 3-clique is what you need you should call the *make\_bidirected* function.
+To make the edges bidirected call the *make\_bidirected* function:
    
     g.make_bidirected()				//creates a 3-clique
 
-A better option would have been to use the class Ugraph from the beginning to build the clique:
+A better option for cliques would be the class Ugraph for undirected graphs. Here is the code for the 3-clique subgraph {0, 2, 3} in a graph with 100 vertices:
    
-    ugraph g(3);					//creates an empty simple graph with 100 vertices
+    ugraph g(100);					//creates an empty simple graph with 100 vertices
 	g.add_edge(0,1);				//configures edges (symmetrical)
 	g.add_edge(0,2);
 	g.add_edge(1,2);
