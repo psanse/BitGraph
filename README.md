@@ -11,6 +11,8 @@ The BITSCAN and GRAPH libraries are at the core of many exact state-of-the-art a
 - [A branch-and-cut algorithm for the Edge Interdiction Clique Problem, 2021](https://www.sciencedirect.com/science/article/pii/S0377221721000606).
 - [The maximum clique interdiction problem, 2019](https://www.sciencedirect.com/science/article/pii/S0377221719301572).
 - [A new branch-and-bound algorithm for the maximum edge-weighted clique problem, 2019](https://www.sciencedirect.com/science/article/pii/S0377221719303054).
+- [A new branch-and-bound algorithm for the Maximum Weighted Clique Problem, 2019](https://www.sciencedirect.com/science/article/pii/S0305054819301303?casa_token=G7GLiCVG0xsAAAAA:pEzTarl2ldBHgkG7PSp9s4Mg-idPrMXgaBkD22mTy9Xn20YrBd7rEPA7Xuoiljq6aekFwrlEeQ).
+- [Efficiently enumerating all maximal cliques with bit-parallelism, 2018](https://www.sciencedirect.com/science/article/pii/S0305054817302988?casa_token=OqTK-OLIIhgAAAAA:aL1pUr8qPNJeYqPqJn6xLiWeEcsBQxeaPL7Sev3MJa3Dk0Mm_ZxjXxVd9XDKkqL8RsUMIxjK6A).
 
 and many others. 
 
