@@ -41,8 +41,8 @@ public:
 	using _mypt = ptype;				//alias for backward compatibility
 
 	//constructors - cannot all be inherited	
-	Ugraph						() : Graph() {}										//creates empty graph
-explicit Ugraph					(std::size_t n) : Graph(n){}						//creates empty graph of size n=|V|	
+	Ugraph						() : Graph<T>() {}										//creates empty graph
+explicit Ugraph					(std::size_t n) : Graph<T>(n){}						//creates empty graph of size n=|V|	
 explicit Ugraph					(std::string filename);								//reads graph from file
 	
 	/*

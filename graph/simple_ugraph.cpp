@@ -57,8 +57,8 @@ BITBOARD Ugraph<T>::number_of_edges(bool lazy) {
 		ptype::NE_ = 0;
 
 		//adds all edges and divides by 2 for efficiency - checks for self loops	
-		for (std::size_t i = 0; i < NV_; i++) {
-			ptype::NE_ += adj_[i].size();
+		for (std::size_t i = 0; i < ptype::NV_; i++) {
+			ptype::NE_ += ptype::adj_[i].size();
 		}
 
 		//////////////////////////////
@@ -131,8 +131,8 @@ void Ugraph<T>::gen_random_edges(double p){
 	remove_edges();
 
 	//sets undirected edges with probability p
-	for (std::size_t i = 0; i < NV_ - 1; i++) {
-		for (std::size_t j = i + 1; j < NV_; j++) {
+	for (std::size_t i = 0; i < this->NV_ - 1; i++) {
+		for (std::size_t j = i + 1; j < this->NV_; j++) {
 			if (::com::rand::uniform_dist(p)) {
 				add_edge(i, j);
 			}

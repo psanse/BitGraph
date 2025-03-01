@@ -281,7 +281,7 @@ int Base_Graph_EW<Graph_t, W>::read_dimacs (string filename){
 
 			 //non-positive vertex-weight check
 			 if (wv <= 0.0) {
-				 LOG_WARNING("non-positive weight read: ", wv, "- Base_Graph_EW<Graph_t, W>::read_dimacs");
+				 LOGG_WARNING("non-positive weight read: ", wv, "- Base_Graph_EW<Graph_t, W>::read_dimacs");
 			 }
 
 			 //////////////////////////
@@ -296,7 +296,7 @@ int Base_Graph_EW<Graph_t, W>::read_dimacs (string filename){
 
 		 break;
 	 default:
-		 LOG_DEBUG("missing vertex-weights in file ", filename, " setting unit weights - Base_Graph_EW<Graph_t, W>::read_dimacs");
+		 LOGG_DEBUG("missing vertex-weights in file ", filename, " setting unit weights - Base_Graph_EW<Graph_t, W>::read_dimacs");
 	 }
 	 	
 	 /////////////////////	
@@ -534,7 +534,7 @@ int Graph_EW< ugraph, W >::set_we(int v, int w, W val) {
 	if (v == w) {
 		ptype::we_[v][v] = val;
 	}
-	else if (g_.is_edge(v, w)) {
+	else if (ptype::g_.is_edge(v, w)) {
 		ptype::we_[v][w] = val;
 		ptype::we_[w][v] = val;
 	}
@@ -612,12 +612,12 @@ void Graph_EW<ugraph, W>::gen_modulus_weights(int MODULUS)
 	auto NV = number_of_vertices();
 
 	//vertex-weights NOWT
-	set_wv(NOWT);
+	set_wv(this->NOWT);
 
 	//sets weights of undirected edges
 	for (std::size_t v = 0; v < NV - 1; ++v) {
 		for (std::size_t w = v + 1; w < NV; ++w) {
-			if (g_.is_edge(v, w)) {
+			if (ptype::g_.is_edge(v, w)) {
 
 				///////////////////////////////////////
 				set_we(v, w, (1 + ((v + w + 2 /* 0-based index*/) % MODULUS)));
@@ -722,13 +722,13 @@ ostream& Graph_EW<ugraph, W>::write_dimacs (ostream& o) {
 	auto NV = ptype::number_of_vertices();
 
 	//timestamp 
-	g_.timestamp_dimacs(o);
+	ptype::g_.timestamp_dimacs(o);
 	
 	//name
-	g_.name_dimacs(o);
+	ptype::g_.name_dimacs(o);
 
 	//dimacs header - recompute edges
-	g_.header_dimacs(o, false);
+	ptype::g_.header_dimacs(o, false);
 		
 	//write vertex weights
 	for (std::size_t v = 0; v < NV; ++v) {

@@ -19,19 +19,16 @@
 #include "graph/simple_graph_ew.h"				// must beafter ugraph include
 
 //aliases for graph types (see graph.h)
-typedef Graph<bitarray> graph;						//simple graph
-typedef Ugraph<bitarray> ugraph;					//simple undirected graph
-typedef Graph<sparse_bitarray> sparse_graph;		//simple sparse graph
-typedef Ugraph<sparse_bitarray> sparse_ugraph;	//simple sparse undirected graph
-typedef Graph_W<ugraph, double> ugraph_w;
-typedef Graph_W<ugraph, int> ugraph_wi;
-typedef Graph_EW<ugraph, double> ugraph_ew;
-typedef Graph_EW<ugraph, int> ugraph_ewi;
-	
+using graph = Graph<bitarray>;						//simple graph
+using ugraph = Ugraph<bitarray>;					//simple undirected graph
+using sparse_graph = Graph<sparse_bitarray>;		//simple sparse graph
+using sparse_ugraph = Ugraph<sparse_bitarray>;		//simple sparse undirected graph
+using ugraph_w = Graph_W<ugraph, double>;
+using ugraph_wi = Graph_W<ugraph, int>;
+using ugraph_ew = Graph_EW<ugraph, double>;
+using ugraph_ewi = Graph_EW<ugraph, int>;
 
-//////////////////////////////////////////////////////////////
-constexpr int DEFAULT_WEIGHT_MODULUS = 200;							//for modulus weight generation  [Pullman 2008]					
-//////////////////////////////////////////////////////////////
+
 
 /////////////////
 //

@@ -23,6 +23,10 @@
 				
 using namespace std;
 
+//globals
+static const int DEFAULT_WEIGHT_MODULUS = 200;     //for modulus weight generation  [Pullman 2008]		
+
+
 /////////////////////////////////////////////////
 template<class Graph_t, class W>
 const W Base_Graph_W <Graph_t, W >::NOWT = 0.0;			//is 0.0 the best value for empty weight?									
@@ -174,18 +178,18 @@ template<class W>
 ostream& Graph_W<ugraph, W>::write_dimacs(ostream& o) {
 
 	//timestamp comment
-	g_.timestamp_dimacs(o);
+	ptype::g_.timestamp_dimacs(o);
 
 	//name comment
-	g_.name_dimacs(o);
+	ptype::g_.name_dimacs(o);
 
 	//dimacs header - recompute edges
-	g_.header_dimacs(o, false);
+	ptype::g_.header_dimacs(o, false);
 
 	//write DIMACS nodes n <v> <w>
-	const int NV = g_.number_of_vertices();
+	const int NV = ptype::g_.number_of_vertices();
 	for (int v = 0; v < NV; ++v) {
-		o << "n " << v + 1 << " " << get_w(v) << endl;
+		o << "n " << v + 1 << " " << ptype::get_w(v) << endl;
 	}
 
 	//write directed edges (1-based vertex notation dimacs)
@@ -252,7 +256,7 @@ int Base_Graph_W<Graph_t, W>::read_dimacs (string filename, int type){
 
 			//non-positive vertex-weight check
 			if (wv <= 0.0) {
-				LOG_WARNING("non-positive weight read: ", wv, "- Base_Graph_W<Graph_t, W>::read_dimacs");
+				LOGG_WARNING("non-positive weight read: ", wv, "- Base_Graph_W<Graph_t, W>::read_dimacs");
 			}
 
 			////////////////////
@@ -267,7 +271,7 @@ int Base_Graph_W<Graph_t, W>::read_dimacs (string filename, int type){
 
 		break;
 	default:
-		LOG_DEBUG("Bad weights in file ", filename, " setting unit weights - Base_Graph_W<Graph_t, W>::read_dimacs");
+		LOGG_DEBUG("Bad weights in file ", filename, " setting unit weights - Base_Graph_W<Graph_t, W>::read_dimacs");
 	}
 			
 	//read weights from external files if necessary 
@@ -355,12 +359,12 @@ int Base_Graph_W<Graph_t, W>::read_weights(string filename) {
 
 	//assert
 	if (!f) {
-		LOG_WARNING("Weight file ", filename, "could not be found - Base_Graph_W<Graph_t, W>::read_weights");
+		LOGG_WARNING("Weight file ", filename, "could not be found - Base_Graph_W<Graph_t, W>::read_weights");
 		return -1;
 	}
 
 	//debugging IO
-	LOG_DEBUG("reading vertex weights from: ", filename, "- Base_Graph_W<Graph_t, W>::read_weights");
+	LOGG_DEBUG("reading vertex weights from: ", filename, "- Base_Graph_W<Graph_t, W>::read_weights");
 
 	//allocation of memory for weights
 	auto NV = g_.number_of_vertices();

@@ -20,7 +20,11 @@
 #include <vector>
 #include "utils/common.h"
 #include "graph/simple_ugraph.h"
-	
+
+ /////////////////////////////////////////////
+extern const int DEFAULT_WEIGHT_MODULUS;								//for modulus weight generation  [Pullman 2008]					
+///////////////////////////////////////////
+
 
 //aliases
 template<class W>

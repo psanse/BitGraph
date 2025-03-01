@@ -19,9 +19,14 @@
 #include "graph/simple_ugraph.h"
 
 
+////////////////////////////////////////////////////////////////
+extern const int DEFAULT_WEIGHT_MODULUS;								//for modulus weight generation  [Pullman 2008]					
+////////////////////////////////////////////////////////////////
+	
 //alias
 using vint = std::vector<int>;
 using ugraph = Ugraph<bitarray>;
+
 
 ///////////////////////
 //
@@ -53,6 +58,7 @@ public:
 	static const W NOWT;								//empty weight value for weights (0.0)	
 	static const W DEFWT;								//default weight value for weights (1.0)	
 	
+
 	//constructors
 	Base_Graph_W						() {};																				//No memory allocation
 explicit Base_Graph_W					(std::vector<W>& lw);																//creates empty graph with |V|= n with vertex weights
