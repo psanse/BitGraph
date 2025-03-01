@@ -12,11 +12,11 @@ The BITSCAN library is at the core of many exact state-of-the-art algorithms for
 
 and many others. BITSCAN has been tested in LINUX and Windows OS.  
 
-The library currently offers a variety of btiset types, the main ones being:
+The library currently offers a variety of bitset types, the main ones being:
 
 - `bitblock`: Wrapper for bit manipulation of 64-bit numbers (*lsb*, *msb*, *popcount* etc.).
 - `bitarray`: Main type for standard bit manipulation. 
-- `sparse_bitarray`: Main type for sparse bit manipulation (bit operations for sparse sets).
+- `sparse_bitarray`: Main type for large and massive sets with few elements.
   
 Other types such as `simple_bitarray`, `simple_sparse_bitarray` and `watched_bitarray` are included for specific operations. For example, `watched_bitarray` are intended for set populations with low density, but not sparse. Empty bit blocks are still stored in full, but two pointers (aka sentinels) which point (alias *watch*) the highest and lowest empty blocks respectively, determine the range of useful bitmasks (see [here](http://download.springer.com/static/pdf/797/chp%253A10.1007%252F978-3-319-09584-4_12.pdf?auth66=1411550130_ba322f209d8b171722fa67741d3f77e9&ext=.pdf "watched bit arrays") for an interesting application).
 
@@ -38,7 +38,7 @@ You will find many more examples in the *tests* folder.
 EXAMPLES OF BITSCANNING OPERATIONS
 -------------------------------
 
-The BITSCAN library features specific optimisation techniques for *destructive* and *non-destructive* scans. In a destructive bit scan (DBS), whenever a 1-bit is read *it is removed from the bitset* (at the end of the process the bit string is empty). In the (conventional) non-destructive case (NDBS), the bitset information remains unchanged. 
+The BITSCAN library features specific optimisation techniques for *destructive* and *non-destructive* scans. In a destructive bit scan (DBS), whenever a 1-bit is read *it is removed from the bitset* (at the end of the process the bit string is empty). In the (conventional) non-destructive case (NDBS), the bitset is not modified. 
 
 Here is an example of fast bit scan loop syntax in BITSCAN:
 
