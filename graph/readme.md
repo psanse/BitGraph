@@ -79,10 +79,10 @@ Here is an example:
 	  kc.print_kcore();	
 
 	 sparse_bitarray bbs(ug.number_of_vertices());		//k-core analysis for the subgraph bbs induced by the first 30 vertices
-	 bbs.init_bit(0,29);
+	 bbs.set_bit(0,29);
 	 kc.set_subgraph(&bbs);
-	 kc.kcore();					
-    
+	 
+  	kc.kcore();    
 	 kc.print_kcore();							
     }
 
