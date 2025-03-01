@@ -1,5 +1,5 @@
 # BITSCAN_plus
-Refactoring the BITSCAN and GRAPH libraries for efficient operations with bitsets in modern C++.
+Refactoring the BITSCAN and GRAPH libraries for efficient operations with bitsets in modern C++ (restricted to C++11).
 The BITSCAN library is dedicated to bitset manipulation. The GRAPH library is dedicated to efficient graph operations, and uses BITSCAN to represent graphs in memory.  The repo also contains additional utilities (library UTILS), which have also been refactored, and many tests and examples.
 
 BITSCAN and GRAPH have been tested in LINUX and Windows OS.  The current versions are: BITSCAN 1.0, UTILS 1.0 and GRAPH 1.0.
