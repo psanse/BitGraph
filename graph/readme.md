@@ -92,7 +92,7 @@ Here is an example:
 EXTERNAL SOURCES
 -------------------------------
 
-GRAPH supports ASCII DIMACS, Matrix Market Exchange and Edge list formats. A few examples of undirected graphs in different formats may be found in the *data* folder. To load a graph from file pass the appropriate filename to the constructor:
+GRAPH supports DIMACS, Matrix Market Exchange and Edge list text formats. A few examples of undirected graphs in different formats may be found in the *data* folder. To load a graph from file pass the appropriate filename to the constructor:
 
     
     graph g("brock200_1.clq");				//reads "brock200_1.clq" file in DIMACS, MTX, or EDGES format
