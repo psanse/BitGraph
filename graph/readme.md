@@ -32,7 +32,7 @@ The following example builds a directed graph with 100 vertices and 3 edges:
     #include "graph/graph.h"
     //...
     
-    graph g(100);				//creates an empty (directed) graph with 100 vertices
+    graph g(100);					//creates an empty (directed) graph with 100 vertices
     g.add_edge(0,1);				//configures the edges
 	g.add_edge(0,2);
 	g.add_edge(1,2);
@@ -54,7 +54,7 @@ EDITING GRAPHS
 
 Edges may be added or deleted in constant time (*remove\_edge* member function) for simple graphs (in the case of sparse graphs complexity increases because it takes logarithmic time to find an edge). Removing vertices is possible as well (member function *remove\_vertices*) but requires memory allocation. Currently GRAPH does not support adding new vertices (the graph order should be passed to the constructor). Here is a trivial example:
    
-    graph g(3);						//creates an empty graph with 100 vertices
+    graph g(3);							//creates an empty graph with 100 vertices
 	g.add_edge(0,1);				//configures the edges
 	g.add_edge(0,2);
 	g.add_edge(1,2);
