@@ -196,7 +196,7 @@ bbStack_t& operator =	(const bbStack_t& rhs) noexcept	= delete;
 	//checks if the contents in the STACK is in BB - currently the opposite is not checked
 	bool is_sync		();										
 	
-	bool is_empty		()			{return (pc_ ==0);}
+	bool is_empty		()			{return (stack_.empty()); }
 	
 //I/O
 	std::ostream& print		(print_t t = STACK, std::ostream& o = std::cout, bool eofl = true);
@@ -305,7 +305,7 @@ inline
 std::ostream& bbCol_t<BitSet_t, SIZE>::print(std::ostream& o, bool show_pc, bool eofl)  const{
 	for(auto i = 0; i < bb_.size(); ++i){
 		if(!bb_[i].is_empty()){
-			bb_[i].print(o,  showpc, true);
+			bb_[i].print(o, show_pc, true);
 		}
 	}
 	if (eofl) { o << endl; }
@@ -369,7 +369,7 @@ void bbStack_t<BitSet_t>::sync_stack(){
 	stack_.clear();
 	
 	//bitscanning with nested data structure
-	BitSet_t::scan sc(bb_);
+	typename BitSet_t::scan sc(bb_);
 	if (sc.init_scan() != -1) {
 		int bit = BBObject::noBit;
 		while ( (bit = bb_.next_bit()) != BBObject::noBit ) {
@@ -384,7 +384,7 @@ inline
 void  bbStack_t<BitSet_t>::reset(int MAX_SIZE) {
 
 	//cleans stack
-	pc_ = 0;
+	stack_.clear();
 
 	//allocates memory	
 	try {
@@ -418,7 +418,7 @@ int bbStack_t<BitSet_t>::pop() {
 	 
 	if (stack_.size() > 0) {
 		 int bit = stack_.back();
-		 v.pop_back();
+		 stack_.pop_back();
 		 bb_.erase_bit(bit);	
 		 return bit;
 	 }
@@ -448,7 +448,7 @@ namespace bbalg {
 
 		vector<int> res;
 				
-		BitSet_t::scan sc(bbn);
+		typename BitSet_t::scan sc(bbn);
 		if (sc.init_scan(BBObject::NON_DESTRUCTIVE) == -1) {
 			return res;
 		}	
