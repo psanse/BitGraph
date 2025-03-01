@@ -65,7 +65,7 @@ Edges may be added or deleted in constant time (*remove\_edge* member function) 
 
 A MORE COMPLEX EXAMPLE
 -------------------------------
-K-core analysis in GRAPH has been [optimized](https://www.google.com/url?sa=t&rct=j&q=&esrc=s&source=web&cd=2&cad=rja&uact=8&ved=0CCgQFjAB&url=http%3A%2F%2Fvlado.fmf.uni-lj.si%2Fpub%2Fnetworks%2Fdoc%2Fcores%2Fcores.pdf&ei=Pe8FVJfZD6PIyAO0-IKIAQ&usg=AFQjCNFNFQZTbvdmsjXTqTSH1BFYf1ACKg&sig2=_leTrcnaQKbfFHpSwiZuKQ&bvm=bv.74115972,d.bGQ) and is extremely fast, which makes it ideal for massive sparse graphs.  
+[K-core analysis](https://en.wikipedia.org/wiki/Degeneracy_(graph_theory)) in GRAPH is extremely fast, which makes it ideal for massive sparse graphs.  
 
 Here is an example:
     
