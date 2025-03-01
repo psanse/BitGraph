@@ -107,9 +107,3 @@ COMPATIBILITY
 -------------------------------
 
 GRAPH has been tested in Windows 64-bit OS and Linux OS. Note that a 64-bit OS is mandatory because of the BITSCAN dependency.
-
-Acknowledgements
--------------------------------
-
-This research has been partially funded by the Spanish Ministry of Economy and Competitiveness (MINECO), national grant DPI 2010-21247-C02-01.
-
