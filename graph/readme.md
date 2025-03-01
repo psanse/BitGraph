@@ -78,12 +78,12 @@ Here is an example:
       kc.kcore();						//k-core analysis for the full graph
 	  kc.print_kcore();	
 
-	 sparse_bitarray bbs(ug.number_of_vertices());		//k-core analysis for the subgraph bbs induced by the first 30 vertices
-	 bbs.set_bit(0,29);
-	 kc.set_subgraph(&bbs);
+	  sparse_bitarray bbs(ug.number_of_vertices());		//k-core analysis for the subgraph bbs induced by the first 30 vertices
+	  bbs.set_bit(0,29);
+	  kc.set_subgraph(&bbs);
 	 
-  		kc.kcore();    
-		 kc.print_kcore();							
+  	 kc.kcore();    
+	  kc.print_kcore();							
     }
 
 
