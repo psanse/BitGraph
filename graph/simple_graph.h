@@ -27,22 +27,22 @@
 
 //////////////////
 //
-// Generic class Graph<T>
+// Generic class Graph<BitSet_t>
 // 
-// (T is limited to bitarray and sparse_bitarray types)
+// (BitSet_t is limited to BBScan and BBScanSP types)
 // 
 //////////////////
 
-template<class T = bitarray>
-class Graph: public filterGraphTypeError<T> {
+template<class BitSet_t = BBScan>
+class Graph: public filterGraphTypeError<BitSet_t> {
 	
 	friend class GraphConversion;	
 	
 
 public:
 		
-	using type = Graph<T>;				//own type
-	using basic_type = T;				//basic type (a type of bitset)
+	using type = Graph<BitSet_t>;		//own type
+	using basic_type = BitSet_t;		//basic type (a type of bitset)
 	using _bbt = basic_type;			//alias for basic type - for backward compatibility
 
 /////////////			
@@ -99,11 +99,11 @@ std::string path						()					const	{ return path_;}
 	* @param set input bitset of vertices that induces the subgraph
 	* @returns number of edges
 	**/
-	virtual	BITBOARD number_of_edges	(const T& set )	const;				
+	virtual	BITBOARD number_of_edges	(const BitSet_t& set )	const;
 
-const vector<T>& get_adjacency_matrix	()					const		{ return adj_; }
-const T& get_neighbors					(int v)				const		{return adj_[v];}
-      T& get_neighbors					(int v)							{return adj_[v];}
+const vector<BitSet_t>& get_adjacency_matrix	()					const		{ return adj_; }
+const BitSet_t& get_neighbors					(int v)				const		{return adj_[v];}
+BitSet_t& get_neighbors							(int v)							{return adj_[v];}
 
 //////////////////////////
 // memory allocation 
@@ -156,8 +156,8 @@ virtual	double density					(bool lazy=true);
 	* @brief density of the subgraph induced by a set of vertices
 	* @param set input (bit) set of vertices 
 	**/
-	template <class bitset_t = T>
-	double density						(const bitset_t& set);
+	template <class U = BitSet_t>
+	double density						(const U& set);
 	
 	/**
 	* @brief number of non-empty bit blocks / total number of bit blocks
@@ -298,8 +298,8 @@ public:
 	* @param rhs right hand side graph
 	* @returns TRUE if lhs.adj_ == rhs.adj_
 	**/
-	template <class T>
-	friend bool operator ==				(const Graph<T>& lhs, const Graph<T>& rhs);  
+	template <class U>
+	friend bool operator ==				(const Graph<U>& lhs, const Graph<U>& rhs);
 		
 ////////////
 // Read / write basic operations
@@ -386,31 +386,31 @@ virtual	void  write_EDGES				(std::ostream& o) ;
 	* @param bbsg input (bit) set of vertices
 	* @param o output stream
 	*/
-	template <class bitset_t = T>
-	ostream& print_edges				(bitset_t& bbsg, ostream& o = std::cout)	const;	
+	template <class U = BitSet_t>
+	ostream& print_edges				(U& bbsg, ostream& o = std::cout)	const;
 		
 //////////////////////////
 // data members
 protected:
-	std::vector<T> adj_;	//adjacency matrix 
-	std::size_t NV_;		//number of vertices
-	BITBOARD NE_;			//number of edges (updated on the fly)
-	std::size_t NBB_;		//number of bit blocks per row (in the case of sparse graphs this is a maximum value)
+	std::vector<BitSet_t> adj_;		//adjacency matrix 
+	std::size_t NV_;				//number of vertices
+	BITBOARD NE_;					//number of edges (updated on the fly)
+	std::size_t NBB_;				//number of bit blocks per row (in the case of sparse graphs this is a maximum value)
 	
 	//names
-	std::string name_;		//name of instance, without path	
-	std::string path_;		//path of instance
+	std::string name_;				//name of instance, without path	
+	std::string path_;				//path of instance
 };
 
 //////////////////////////////////////////
 // Necessary implementation of template methods in header file
 
-template <class T>
-inline bool operator == (const Graph<T>& lhs, const Graph<T>& rhs) {	return lhs.adj_ == rhs.adj_; }
+template <class BitSet_t>
+inline bool operator == (const Graph<BitSet_t>& lhs, const Graph<BitSet_t>& rhs) {	return lhs.adj_ == rhs.adj_; }
 
-template<class T>
-template <class bitset_t>
-inline double Graph<T>::density(const bitset_t& bbN) {
+template<class BitSet_t>
+template <class U>
+inline double Graph<BitSet_t>::density(const U& bbN) {
 	BITBOARD  edges = number_of_edges(bbN);
 	if (edges == 0) { return 0.0; }
 
@@ -418,9 +418,9 @@ inline double Graph<T>::density(const bitset_t& bbN) {
 	return edges / static_cast<double>(pc * (pc - 1) / 2);
 }
 
-template<class T>
-template<class bitset_t>
-std::ostream& Graph<T>::print_edges(bitset_t& bbsg, std::ostream& o) const {
+template<class BitSet_t>
+template<class U>
+std::ostream& Graph<BitSet_t>::print_edges(U& bbsg, std::ostream& o) const {
 	
 	for (int i = 0; i < NV_ - 1; i++) {
 

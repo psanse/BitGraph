@@ -35,35 +35,35 @@
 using namespace std;
 
 
-template<class T>
-Graph<T>::Graph(void) :
+template<class BitSet_t>
+Graph<BitSet_t>::Graph(void) :
 	NV_(0), NBB_(0), NE_(0),
 	name_(""), path_("")
 {}
 
-template<class T>
-Graph<T>::Graph(string filename) :
+template<class BitSet_t>
+Graph<BitSet_t>::Graph(string filename) :
 	NV_(0), NBB_(0), NE_(0),
 	name_(""), path_("")
 {
 	if (reset(filename) == -1) {
-		LOGG_ERROR("error when reading file: ", filename, "Graph<T>::Graph");
+		LOGG_ERROR("error when reading file: ", filename, "Graph<BitSet_t>::Graph");
 		LOG_ERROR("exiting...");
 		exit(-1);
 	}	
 }
 
-template<class T>
-Graph<T>::Graph(std::size_t NV) {
+template<class BitSet_t>
+Graph<BitSet_t>::Graph(std::size_t NV) {
 	name_.clear();
 	path_.clear();
 	reset(NV);
 }
 
-template <class T>
-Graph<T>::Graph(std::size_t nV, int* adj[], string filename) {
+template <class BitSet_t>
+Graph<BitSet_t>::Graph(std::size_t nV, int* adj[], string filename) {
 	if (reset(nV) == -1) {
-		LOG_ERROR("bizarre graph construction-Graph<T>::Graph(...), exiting... ");
+		LOG_ERROR("bizarre graph construction-Graph<BitSet_t>::Graph(...), exiting... ");
 		exit(-1); 
 	}
 	name(filename);		
@@ -80,8 +80,8 @@ Graph<T>::Graph(std::size_t nV, int* adj[], string filename) {
 
 
 
-template<class T>
-void Graph<T>::name(std::string name){
+template<class BitSet_t>
+void Graph<BitSet_t>::name(std::string name){
 
 	//update name
 	size_t found = name.find_last_of("/\\");
@@ -109,17 +109,17 @@ void Graph<T>::name(std::string name){
 	//}
 }
 
-template<class T>
-void Graph<T>::reset (){
+template<class BitSet_t>
+void Graph<BitSet_t>::reset (){
 	adj_.clear(), name_.clear(), path_.clear();
 	NV_ = 0, NBB_ = 0, NE_ = 0;
 }
 
-template<class T>
-int Graph<T>::reset	(std::size_t NV, string name) {
+template<class BitSet_t>
+int Graph<BitSet_t>::reset	(std::size_t NV, string name) {
 
 	if (NV <= 0) {
-		LOGG_ERROR("Invalid graph size ", NV," - Graph<T>::reset");
+		LOGG_ERROR("Invalid graph size ", NV," - Graph<BitSet_t>::reset");
 		return -1;
 	}
 
@@ -130,11 +130,11 @@ int Graph<T>::reset	(std::size_t NV, string name) {
 
 	try {
 		//////////////////////////////
-		adj_.assign(NV, T(NV));				//bitsets initialize to 0 - CHECK 		
+		adj_.assign(NV, BitSet_t(NV));				//bitsets initialize to 0 - CHECK 		
 		//////////////////////////////
 	}
 	catch (const std::bad_alloc& e) {
-		LOG_ERROR("memory for graph not allocated - Graph<T>::reset");
+		LOG_ERROR("memory for graph not allocated - Graph<BitSet_t>::reset");
 		LOG_ERROR(e.what());
 		NV_ = 0;
 		NBB_ = 0;
@@ -147,17 +147,17 @@ int Graph<T>::reset	(std::size_t NV, string name) {
 	return 0;
 }
 
-template<class T>
-Graph<T>& Graph<T>::create_subgraph (std::size_t first_k, Graph<T>& newg) const  {
+template<class BitSet_t>
+Graph<BitSet_t>& Graph<BitSet_t>::create_subgraph (std::size_t first_k, Graph<BitSet_t>& newg) const  {
 
 	//assert is size required is greater or equal current size
 	if(first_k >= NV_ || first_k <= 0){
-		LOG_ERROR("Bad new size - graph remains unchangedGraph<T>&- Graph<T>::create_subgraph");
+		LOG_ERROR("Bad new size - graph remains unchangedGraph<BitSet_t>&- Graph<BitSet_t>::create_subgraph");
 		return newg;
 	}
 		
 	if (newg.reset(first_k) == -1) {
-		LOG_ERROR("memory for graph not allocated - Graph<T>::create_subgraph");
+		LOG_ERROR("memory for graph not allocated - Graph<BitSet_t>::create_subgraph");
 		return newg;
 	}
 
@@ -176,21 +176,21 @@ Graph<T>& Graph<T>::create_subgraph (std::size_t first_k, Graph<T>& newg) const 
 }
 
 
-template<class T>
-int Graph<T>::shrink_to_fit(std::size_t size){
+template<class BitSet_t>
+int Graph<BitSet_t>::shrink_to_fit(std::size_t size){
 	
-	LOG_WARNING("Shrinking is valid only for sparse graphs - Graph<T>::shrink_to_fit");
+	LOG_WARNING("Shrinking is valid only for sparse graphs - Graph<BitSet_t>::shrink_to_fit");
 	LOG_WARNING("The graph remains unchanged");
 		
 	return -1;
 }
 
-template<class T>
-int Graph<T>::reset (string filename){
+template<class BitSet_t>
+int Graph<BitSet_t>::reset (string filename){
 	if(read_dimacs(filename) == -1){
 		if(read_mtx(filename) == -1){
 			if(read_EDGES(filename) == -1){
-				LOGG_ERROR("Unable to read a graph form file ", filename, "- Graph<T>::reset");
+				LOGG_ERROR("Unable to read a graph form file ", filename, "- Graph<BitSet_t>::reset");
 				LOG_ERROR("Format considered: DIMACS / MTX / EDGES");
 				return -1;
 			}
@@ -199,22 +199,22 @@ int Graph<T>::reset (string filename){
 	return 0;
 }
 
-template<class T>
-void Graph<T>::add_edge (int v, int w){
+template<class BitSet_t>
+void Graph<BitSet_t>::add_edge (int v, int w){
 	if(v != w){
 		adj_[v].set_bit(w);
 		NE_++;
 	}
 }
 
-template<class T>
-void Graph<T>::remove_edge	(int v, int w){
+template<class BitSet_t>
+void Graph<BitSet_t>::remove_edge	(int v, int w){
 	adj_[v].erase_bit(w);
 	NE_--;
 }
 
-template<class T>
-void Graph<T>::remove_edges (int v){
+template<class BitSet_t>
+void Graph<BitSet_t>::remove_edges (int v){
 	
 	//erases all outgoing edges from v
 	adj_[v].erase_bit();
@@ -230,8 +230,8 @@ void Graph<T>::remove_edges (int v){
 	
 }
 
-template<class T>
-void Graph<T>::remove_edges() {
+template<class BitSet_t>
+void Graph<BitSet_t>::remove_edges() {
 	for (std::size_t v = 0; v < NV_; ++v) {
 		adj_[v].erase_bit();
 	}
@@ -239,8 +239,8 @@ void Graph<T>::remove_edges() {
 	NE_ = 0;					
 }
 
-template <class T>
-ostream& Graph<T>::print_adj(std::ostream& o, bool eofl) const {
+template <class BitSet_t>
+ostream& Graph<BitSet_t>::print_adj(std::ostream& o, bool eofl) const {
 	
 	for (auto i = 0; i < NV_; ++i) {
 		for (auto j = 0; j < NV_; ++j) {
@@ -258,27 +258,27 @@ ostream& Graph<T>::print_adj(std::ostream& o, bool eofl) const {
 	return o;
 }
 
-template<class T>
-std::ostream& Graph<T>::timestamp_dimacs(std::ostream& o) const {
+template<class BitSet_t>
+std::ostream& Graph<BitSet_t>::timestamp_dimacs(std::ostream& o) const {
 	o << "c File written by GRAPH:" << PrecisionTimer::local_timestamp();
 	return o;
 }
 
-template<class T>
-std::ostream& Graph<T>::name_dimacs(std::ostream& o) const {
+template<class BitSet_t>
+std::ostream& Graph<BitSet_t>::name_dimacs(std::ostream& o) const {
 	if (!name_.empty())
 		o << "\nc " << name_.c_str() << endl;
 	return o;
 }
 
-template<class T>
-std::ostream& Graph<T>::header_dimacs(std::ostream& o, bool lazy){
+template<class BitSet_t>
+std::ostream& Graph<BitSet_t>::header_dimacs(std::ostream& o, bool lazy){
 	o << "p edge " << NV_ << " " << number_of_edges(lazy) << endl << endl;
 	return o;
 }
 
-template<class T>
-int Graph<T>::read_dimacs(const string& filename){
+template<class BitSet_t>
+int Graph<BitSet_t>::read_dimacs(const string& filename){
 
 	
 	int size, nEdges, v1, v2, edges=0;
@@ -287,7 +287,7 @@ int Graph<T>::read_dimacs(const string& filename){
 	
 	fstream f(filename.c_str());
 	if(!f){
-		LOG_ERROR("Graph<T>::read_dimacs-File could not be opened reading DIMACS format");
+		LOG_ERROR("Graph<BitSet_t>::read_dimacs-File could not be opened reading DIMACS format");
 		reset();
 		return -1;
 	}
@@ -304,7 +304,7 @@ int Graph<T>::read_dimacs(const string& filename){
 	//read weights format n <x> <w> if they exist
 	//c=f.peek();
 	//if(c=='n' || c=='v' /* used by Zavalnij */){						
-	//	LOG_ERROR("Graph<T>::read_dimacs-DIMACS weights found in file: excluding other weights");
+	//	LOG_ERROR("Graph<BitSet_t>::read_dimacs-DIMACS weights found in file: excluding other weights");
 	//	reset_wv();
 	//	m_is_wv=true;
 	//	for(int n=0; n<NV_; n++){
@@ -325,7 +325,7 @@ int Graph<T>::read_dimacs(const string& filename){
 	//		f.getline(line, 250);  //remove remaining part of the line
 	//	}
 
-	//	LOG_INFO("Graph<T>::read_dimacs-Weights read correctly from DIMACS file"<<filename);
+	//	LOG_INFO("Graph<BitSet_t>::read_dimacs-Weights read correctly from DIMACS file"<<filename);
 	//	::gio::dimacs::read_empty_lines(f);
 	//}
 /////////////////////	
@@ -412,8 +412,8 @@ int Graph<T>::read_dimacs(const string& filename){
 	return 0;
 }
 
-template<class T>
-int Graph<T>::read_01(const string& filename) {
+template<class BitSet_t>
+int Graph<BitSet_t>::read_01(const string& filename) {
 
 		
 	int size, val;
@@ -421,7 +421,7 @@ int Graph<T>::read_01(const string& filename) {
 
 	fstream f(filename.c_str());
 	if (!f) {
-		LOG_ERROR("Graph<T>::read_01-File could not be opened reading DIMACS format");
+		LOG_ERROR("Graph<BitSet_t>::read_01-File could not be opened reading DIMACS format");
 		reset();
 		f.close();
 		return -1;
@@ -430,7 +430,7 @@ int Graph<T>::read_01(const string& filename) {
 	//read size
 	f >> size;
 	if (reset(size) == -1) {
-		LOG_ERROR("Graph<T>::read_01-bizarre graph size");
+		LOG_ERROR("Graph<BitSet_t>::read_01-bizarre graph size");
 		f.close();
 		return -1;
 	}
@@ -453,23 +453,23 @@ int Graph<T>::read_01(const string& filename) {
 	return 0;
 }
 
-template<class T>
-int  Graph<T>::read_mtx	(const string& filename){
+template<class BitSet_t>
+int  Graph<BitSet_t>::read_mtx	(const string& filename){
 
 
-	MMI<Graph<T> > myreader(*this);
+	MMI<Graph<BitSet_t> > myreader(*this);
 	return (myreader.read(filename));
 }
 
-template<class T>
-int  Graph<T>::read_EDGES (const string& filename){
+template<class BitSet_t>
+int  Graph<BitSet_t>::read_EDGES (const string& filename){
 
-	EDGES<Graph<T> > myreader(filename, *this);
+	EDGES<Graph<BitSet_t> > myreader(filename, *this);
 	return (myreader.read());
 }
 
-template<class T>
-ostream& Graph<T>::print_data( bool lazy, std::ostream& o, bool eofl) {
+template<class BitSet_t>
+ostream& Graph<BitSet_t>::print_data( bool lazy, std::ostream& o, bool eofl) {
 
 	if (!name_.empty()) { o << name_.c_str() << '\t'; }
 
@@ -485,8 +485,8 @@ ostream& Graph<T>::print_data( bool lazy, std::ostream& o, bool eofl) {
 	return o;
 }
 
-template<class T>
-ostream& Graph<T>::print_edges (std::ostream& o) {
+template<class BitSet_t>
+ostream& Graph<BitSet_t>::print_edges (std::ostream& o) {
 
 	for(auto i = 0; i < NV_-1; ++i){
 		for(auto j = i + 1; j < NV_; ++j){
@@ -505,8 +505,8 @@ ostream& Graph<T>::print_edges (std::ostream& o) {
 
 
 
-template<class T>
-BITBOARD Graph<T>::number_of_edges	(const T& bbn) const{
+template<class BitSet_t>
+BITBOARD Graph<BitSet_t>::number_of_edges	(const BitSet_t& bbn) const{
 	
 	BITBOARD NE = 0;
 
@@ -523,8 +523,8 @@ BITBOARD Graph<T>::number_of_edges	(const T& bbn) const{
 	return NE;
 }
 
-template<class T>
-BITBOARD Graph<T>::number_of_edges	(bool lazy) {
+template<class BitSet_t>
+BITBOARD Graph<BitSet_t>::number_of_edges	(bool lazy) {
 		
 	if (!lazy || NE_ == 0) {					//no lazy evaluation if NE_ = 0
 		NE_ = 0;
@@ -536,15 +536,15 @@ BITBOARD Graph<T>::number_of_edges	(bool lazy) {
 	return NE_;
 }
 
-template<class T>
-double Graph<T>::density (bool lazy) {
+template<class BitSet_t>
+double Graph<BitSet_t>::density (bool lazy) {
 	BITBOARD max_edges = NV_;								//type MUST BE for very large graphs as (I) is bigger than unsigned int
 	max_edges *= (max_edges - 1);							//(I)
 	return (number_of_edges(lazy) / (double)max_edges);		//n*(n-1) edges (since it is a directed graph))
 }
 
-template<class T>
-double Graph<T>::block_density	()	const {
+template<class BitSet_t>
+double Graph<BitSet_t>::block_density	()	const {
 
 	size_t nBB = 0;
 	for(int v = 0; v < NV_; ++v){
@@ -557,23 +557,23 @@ double Graph<T>::block_density	()	const {
 	return (nBB / static_cast<double>(NBB_ * NV_));
 }
 
-//template<class T>
-//double Graph<T>::block_density_index()	const {
+//template<class BitSet_t>
+//double Graph<BitSet_t>::block_density_index()	const {
 //
-//	LOG_ERROR("function only for sparse graphs - Graph<T>::block_density_index");
+//	LOG_ERROR("function only for sparse graphs - Graph<BitSet_t>::block_density_index");
 //	return -1;
 //}
 
-//template<class T>
-//double Graph<T>::average_block_density_index()	const {
+//template<class BitSet_t>
+//double Graph<BitSet_t>::average_block_density_index()	const {
 //
-//	LOG_ERROR("function only for sparse graphs - Graph<T>::average_block_density_index");
+//	LOG_ERROR("function only for sparse graphs - Graph<BitSet_t>::average_block_density_index");
 //	return -1;
 //}
 
 
-template<class T>
-bool Graph<T>::is_self_loop () const{
+template<class BitSet_t>
+bool Graph<BitSet_t>::is_self_loop () const{
 	for(int i = 0; i < NV_; i++)
 		if( adj_[i].is_bit(i)) {			
 			return true;
@@ -581,22 +581,22 @@ bool Graph<T>::is_self_loop () const{
 	return false;
 }
 
-template<class T>
-void Graph<T>::remove_vertices (const BitSet& bbn, Graph& g){
+template<class BitSet_t>
+void Graph<BitSet_t>::remove_vertices (const BitSet& bbn, Graph& g){
 
 	//determine the size of the graph g
 	int pc = bbn.size();
 	int new_size= NV_ - pc;
 
 	if (new_size <= 0) {
-		LOG_ERROR("empty graph after deletion - Graph<T>::remove_vertices");
+		LOG_ERROR("empty graph after deletion - Graph<BitSet_t>::remove_vertices");
 		g.reset();
 		return;
 	}
 
 	//initialize new graph
 	if (g.reset(new_size) == -1) {
-		LOG_ERROR("memory for graph not allocated - Graph<T>::remove_vertices");
+		LOG_ERROR("memory for graph not allocated - Graph<BitSet_t>::remove_vertices");
 		return;
 	}
 	
@@ -620,21 +620,21 @@ void Graph<T>::remove_vertices (const BitSet& bbn, Graph& g){
 
 }
 
-//template<class T>
-//void Graph<T>::remove_vertices (const BitSet& bbn){
+//template<class BitSet_t>
+//void Graph<BitSet_t>::remove_vertices (const BitSet& bbn){
 /////////////////
 //// Experimental: deletes input list of nodes by creating a temporal graph
 ////
 //// OBSERVATIONS:
 //// 1.Inefficient implementation with double allocation of memory
 //
-//	Graph<T> g;
+//	Graph<BitSet_t> g;
 //	this->remove_vertices(bbn,g);			//allocation 1
 //	(*this)=g;								//allocation 2	
 //}
 
-template<class T>
-int Graph<T>::degree_in (int v) const{
+template<class BitSet_t>
+int Graph<BitSet_t>::degree_in (int v) const{
 
 	int res=0;
 	for(int i=0; i<NV_; i++){
@@ -645,8 +645,8 @@ int Graph<T>::degree_in (int v) const{
 	return res;
 }
 
-template<class T>
-void Graph<T>::make_bidirected (){
+template<class BitSet_t>
+void Graph<BitSet_t>::make_bidirected (){
 
 	for (std::size_t i = 0; i < NV_; ++i) {
 		for (std::size_t j = 0; j < NV_; ++j) {
@@ -658,8 +658,8 @@ void Graph<T>::make_bidirected (){
 	NE_ = 0;	//resets edges to avoid lazy evaluation later
 }
 
-template<class T>
-void Graph<T>::gen_random_edges(double p) {
+template<class BitSet_t>
+void Graph<BitSet_t>::gen_random_edges(double p) {
 
 	//removes all edges
 	remove_edges();
@@ -674,12 +674,12 @@ void Graph<T>::gen_random_edges(double p) {
 	}
 }
 
-template<class T>
-int Graph<T>::gen_random_edge(int v, int w, double p){
+template<class BitSet_t>
+int Graph<BitSet_t>::gen_random_edge(int v, int w, double p){
 
 	//assert - TODO condition to DEBUG mode
 	if (v == w || v >= NV_ || w >= NV_ || p < 0 || p > 1) {
-		LOG_ERROR("wrong input params - Graph<T>::gen_random_edge");
+		LOG_ERROR("wrong input params - Graph<BitSet_t>::gen_random_edge");
 		return -1;
 	}
 
@@ -691,8 +691,8 @@ int Graph<T>::gen_random_edge(int v, int w, double p){
 	return 0;
 }
 
-template<class T>
-void Graph<T>::write_dimacs ( ostream& o)  {
+template<class BitSet_t>
+void Graph<BitSet_t>::write_dimacs ( ostream& o)  {
 
 	//timestamp comment
 	timestamp_dimacs(o);
@@ -714,8 +714,8 @@ void Graph<T>::write_dimacs ( ostream& o)  {
 	}
 }
 
-template<class T>
-void  Graph<T>::write_EDGES	(ostream& o)   {
+template<class BitSet_t>
+void  Graph<BitSet_t>::write_EDGES	(ostream& o)   {
 
 	//timestamp comment
 	o << "% File written by GRAPH:" << PrecisionTimer::local_timestamp();
