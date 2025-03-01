@@ -21,10 +21,10 @@ BUILDING GRAPHS
 -------------------------------
 GRAPH currently distinguishes 4 main types of graph objects:
 
-- `graph`: for simple graphs
-- `ugraph`: specialization of `graph` for undirected graphs
-- `sparse_graph`: for sparse simple graphs
-- `sparse_ugraph`: specialization of `sparse_graph` for sparse undirected graphs
+- `graph`: for directed graphs
+- `ugraph`: for undirected graphs
+- `sparse_graph`: for sparse directed graphs
+- `sparse_ugraph`: for sparse undirected graphs
 
 
 The following example builds a directed graph with 100 vertices and 3 edges:
