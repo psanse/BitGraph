@@ -1827,6 +1827,55 @@ BitSetSp::find_block(int blockID, int& pos)
 	return it;
 }
 
+template<bool LB_policy>
+std::pair<bool, BitSetSp::vPB_it>
+BitSetSp::find_block_ext(int blockID)
+{
+	pair<bool, BitSetSp::vPB_it> res;
+
+	if (LB_policy) {
+		////////////////////////////////////////////////////////////////////////////////////////////
+		res.second = lower_bound(vBB_.begin(), vBB_.end(), pBlock_t(blockID), pBlock_less());
+		////////////////////////////////////////////////////////////////////////////////////////////
+
+		res.first = (res.second != vBB_.end()) && (res.second->idx_ == blockID);
+	}
+	else {
+		////////////////////////////////////////////////////////////////////////////////////////////
+		res.second = upper_bound(vBB_.begin(), vBB_.end(), pBlock_t(blockID), pBlock_less());
+		////////////////////////////////////////////////////////////////////////////////////////////
+
+		res.first = false;			//the same block cannot be found with upper_bound, only the closest with greater index
+	}
+
+	return res;
+}
+
+template<bool LB_policy>
+pair<bool, BitSetSp::vPB_cit>
+BitSetSp::find_block_ext(int blockID) const
+{
+	pair<bool, BitSetSp::vPB_cit>res;
+
+	if (LB_policy) {
+		////////////////////////////////////////////////////////////////////////////////////////////
+		res.second = lower_bound(vBB_.cbegin(), vBB_.cend(), pBlock_t(blockID), pBlock_less());
+		////////////////////////////////////////////////////////////////////////////////////////////
+
+		res.first = (res.second != vBB_.end()) && (res.second->idx_ == blockID);
+	}
+	else {
+		////////////////////////////////////////////////////////////////////////////////////////////
+		res.second = upper_bound(vBB_.cbegin(), vBB_.cend(), pBlock_t(blockID), pBlock_less());
+		////////////////////////////////////////////////////////////////////////////////////////////
+
+		res.first = false;			//the same block cannot be found with upper_bound, only the closest with greater index
+	}
+
+	return res;
+}
+
+
 //////////////////////////
 //
 // DEPRECATED
