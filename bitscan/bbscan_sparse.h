@@ -130,10 +130,8 @@ inline int next_bit					(BBScanSp& bitset);
 	/**
 	* @brief for basic bitscanning - they are hidden by next_bit()
 	**/
-	using BitSetSp::next_bit;
-	//int next_bit					(int bit)			{ return BitSetSp::next_bit(bit); }
+	using BitSetSp::next_bit;	
 	
-
 	////////////////
 	// bitscan backwards
 
