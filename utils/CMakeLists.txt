@@ -39,6 +39,14 @@ set_target_properties(utils
     #PUBLIC_HEADER   "${useful_headers_for_IDE}"        #does not preserve internal structure       
 )
 
+# Install utils library
+install(TARGETS utils
+	ARCHIVE DESTINATION lib
+	LIBRARY DESTINATION lib
+	#RUNTIME DESTINATION bin
+	#PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_PREFIX}/include/utils        //header files deployed without internal structure
+)
+
 option(utils_build_tests "Build utils tests." OFF)
 #set(utils_build_tests ON)
 if (utils_build_tests)

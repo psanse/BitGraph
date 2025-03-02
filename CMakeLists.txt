@@ -107,29 +107,7 @@ endif()
 set(INSTALL_PATH "${CMAKE_CURRENT_SOURCE_DIR}/example_external_linking" CACHE PATH "Directory chosen to deploy project")
 set(CMAKE_INSTALL_PREFIX ${INSTALL_PATH})
 
-# Install utils library
-install(TARGETS utils
-	#ARCHIVE DESTINATION lib
-	LIBRARY DESTINATION lib
-	#RUNTIME DESTINATION bin
-	#PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_PREFIX}/include/utils        //header files deployed without internal structure
-)
 
-#Install BITSCAN library
-install(TARGETS bitscan
-   #ARCHIVE DESTINATION lib
-   LIBRARY DESTINATION lib
-   #RUNTIME DESTINATION bin
-   #PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_PREFIX}/include/bitscan        //header files deployed without internal structure
-)
-
-# Install GRAPH library
-install(TARGETS graph
-  # ARCHIVE DESTINATION lib
-   LIBRARY DESTINATION lib
-  # RUNTIME DESTINATION bin
-  #PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_PREFIX}/include/graph        //header files deployed without internal structure
-)
 
  #############
 # Deploy UTILS, BITSCAN and GRAPH libraries manually

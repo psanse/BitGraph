@@ -47,6 +47,14 @@ target_include_directories(graph PUBLIC
   $<INSTALL_INTERFACE:include/graph>    # <prefix>/include/bitscan
 )
 
+# Install GRAPH library
+install(TARGETS graph
+   ARCHIVE DESTINATION lib
+   LIBRARY DESTINATION lib
+  # RUNTIME DESTINATION bin
+  #PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_PREFIX}/include/graph        //header files deployed without internal structure
+)
+
 ###################
 # GRAPH lib - UNIT TESTS
 ###################
