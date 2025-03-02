@@ -445,17 +445,14 @@ namespace bbalg {
 	std::vector<int> to_vector(BitSet_t& bbn) {
 
 		std::vector<int> res;
-				
-		typename BitSet_t::scan sc(bbn);
-		if (sc.init_scan(BBObject::NON_DESTRUCTIVE) == -1) {
-			return res;
-		}	
-		//scan if the bitset is empty
-		int bit = BBObject::noBit;
-		while ((bit = sc.next_bit()) != BBObject::noBit ) {
-			res.emplace_back(bit);
-		}
+		res.reserve(bbn.size());
 
+		//uses primitive bitscanning which is compatible for all bitsets in the hierarchy
+		int v = BBObject::noBit;
+		while ((v = bbn.next_bit(v)) != BBObject::noBit) {
+			res.emplace_back(v);
+		}
+	
 		return res;
 	}
 

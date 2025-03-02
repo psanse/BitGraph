@@ -426,8 +426,8 @@ TEST(BitSetClass, vector_operations) {
 	//construction from vector (bitset with lv.size)
 	BitSet bbN2(lv);
 
-	vector<int> lvN1 = to_vector(bbN1);
-	vector<int> lvN2 = to_vector(bbN2);
+	vector<int> lvN1 = bbalg::to_vector(bbN1);
+	vector<int> lvN2 = bbalg::to_vector(bbN2);
 
 	EXPECT_EQ(lv, lvN1);
 	EXPECT_EQ(lv, lvN2);
@@ -479,7 +479,7 @@ TEST(BitSetClass, conversion_to_vector) {
 	}
 
 	////////////////////////////////////
-	EXPECT_EQ(lv_exp, to_vector(bb1));
+	EXPECT_EQ(lv_exp, bbalg::to_vector(bb1));
 	///////////////////////////////////
 
 }
@@ -496,7 +496,7 @@ TEST(BitSetClass, GenRandom){
 	const double TOLERANCE=.05;
 
 	for(auto i = 0; i < NUM_TRIES; ++i){
-		BITBOARD bb = gen_random_bitboard(DENSITY);  //random bits
+		BITBOARD bb = bbalg::gen_random_block(DENSITY);  //random bits
 		vd.emplace_back(bblock::popc64(bb)/(double)WORD_SIZE);
 	}
 

@@ -139,9 +139,14 @@ virtual inline int next_bit_del		( BBScan& bitset);
 	* @details Since the scan does not delete the scanned bit from the bitstring,
 	*		   it has to cache the last scanned bit for the next call
 	**/
-virtual inline int next_bit			()  ;
-
+virtual	 inline int next_bit				();
+	
 	/**
+	* @brief for basic bitscanning operatins - they are hidden by next_bit()
+	**/
+	int next_bit							(int bit)					{ return BitSet::next_bit(bit); }
+
+	/**	
 	* @brief next bit in the bitstring, starting from the bit retrieved
 	*		 in the last call to next_bit.
 	*		 Deletes from the input bitset the current bit scanned (returned).
@@ -159,7 +164,7 @@ virtual inline int next_bit			()  ;
 	* @details Since the scan does not delete the scanned bit from the bitstring,
 	*		   it has to cache the last scanned bit for the next call
 	**/
-virtual	inline int next_bit			( BBScan& bitset);
+virtual	inline int next_bit					( BBScan& bitset);
 
 	////////////////
 	// bitscan backwards

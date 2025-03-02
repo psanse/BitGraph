@@ -64,7 +64,7 @@ TEST_F(MasksTest, OR_range) {
 	const int POPSIZE = 130;
 	simple_bitarray res(POPSIZE);
 		
-	OR(0, 65, bb, bb1, res);						// res = {10, 20, 63, 64}
+	OR<true>(0, 65, bb, bb1, res);						// res = {10, 20, 63, 64}
 	EXPECT_TRUE(res.is_bit(10));
 	EXPECT_TRUE(res.is_bit(20));
 	EXPECT_TRUE(res.is_bit(63));	
@@ -72,7 +72,7 @@ TEST_F(MasksTest, OR_range) {
 	EXPECT_EQ(4, res.size());
 	
 	//cleans res outside the range
-	OR<true>(0, 100, bb, bb1, res);					// res = {10, 20, 63, 64, 100}		
+	OR<true>(0, 100, bb, bb1, res);						// res = {10, 20, 63, 64, 100}		
 	EXPECT_TRUE(res.is_bit(10));
 	EXPECT_TRUE(res.is_bit(20));
 	EXPECT_TRUE(res.is_bit(63));

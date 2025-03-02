@@ -126,6 +126,12 @@ inline int next_bit_del				(BBScanSp& bitset);
 	**/
 inline int next_bit					();
 inline int next_bit					(BBScanSp& bitset);
+	
+	/**
+	* @brief for basic bitscanning - they are hidden by next_bit()
+	**/
+	int next_bit					(int bit)			{ return BitSetSp::next_bit(bit); }
+	
 
 	////////////////
 	// bitscan backwards

@@ -239,17 +239,17 @@ virtual	~BitSet						()								= default;
 /////////////////////
 //setters and getters (will not allocate memory)
 	
-	int number_of_blocks()					const					{ return nBB_; }
+	int number_of_blocks()							const				{ return nBB_; }
 	
 	/**
 	* @brief alternative syntax for number_of_blocks
 	**/
-	int capacity()								const					{ return nBB_; }
+	int capacity()									const				{ return nBB_; }
 
 	vbset& bitset					()									{ return vBB_; }
-const vbset& bitset					()			const					{ return vBB_; }
+const vbset& bitset					()				const				{ return vBB_; }
 	
-	BITBOARD block					(int blockID) const					{ return vBB_[blockID]; }
+	BITBOARD block					(int blockID)	const				{ return vBB_[blockID]; }
 	BITBOARD& block					(int blockID)						{ return vBB_[blockID]; }
 
 //////////////////////////////
@@ -292,7 +292,7 @@ public:
 	* @details: Uses a DeBruijn implementation for lsb()
 	* @details: DEPRECATED in favour of the bitscanning with state of BBIntrinsic class
 	**/
-	inline int next_bit				(int bit)	const;					
+	 int next_bit					(int bit)	const;					
 	
 	/**
 	* @brief Computes the next most significant  1-bit in the bitstring after bit
@@ -308,7 +308,7 @@ public:
 	* @details: Uses a lookup table implementation for msb()
 	* @details: Not recommended. DEPRECATED in favour of the bitscanning with state of BBIntrinsic class
 	**/
-	inline int prev_bit				(int bit)	const;					
+	 int prev_bit					(int bit)	const;					
 	
 /////////////////
 // Popcount
@@ -878,7 +878,8 @@ int BitSet::next_bit(int bit) const{
 }
 
 
-inline int BitSet::prev_bit(int bit) const{
+inline 
+int BitSet::prev_bit(int bit) const{
 
 	//special case - first bitscan,
 	//calls for the most-significant bit in the bitstring
