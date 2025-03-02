@@ -144,8 +144,8 @@ virtual	 inline int next_bit				();
 	/**
 	* @brief for basic bitscanning operatins - they are hidden by next_bit()
 	**/
-	int next_bit							(int bit)					{ return BitSet::next_bit(bit); }
-
+	using BitSet::next_bit;
+	
 	/**	
 	* @brief next bit in the bitstring, starting from the bit retrieved
 	*		 in the last call to next_bit.
