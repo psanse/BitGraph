@@ -557,19 +557,19 @@ double Graph<BitSet_t>::block_density	()	const {
 	return (nBB / static_cast<double>(NBB_ * NV_));
 }
 
-//template<class BitSet_t>
-//double Graph<BitSet_t>::block_density_index()	const {
-//
-//	LOG_ERROR("function only for sparse graphs - Graph<BitSet_t>::block_density_index");
-//	return -1;
-//}
+template<class BitSet_t>
+double Graph<BitSet_t>::block_density_sparse()	const {
 
-//template<class BitSet_t>
-//double Graph<BitSet_t>::average_block_density_index()	const {
-//
-//	LOG_ERROR("function only for sparse graphs - Graph<BitSet_t>::average_block_density_index");
-//	return -1;
-//}
+	LOG_ERROR("function only for sparse graphs - Graph<BitSet_t>::block_density_sparse");
+	return -1;
+}
+
+template<class BitSet_t>
+double Graph<BitSet_t>::average_block_density_sparse()	const {
+
+	LOG_ERROR("function only for sparse graphs - Graph<BitSet_t>::average_block_density_sparse");
+	return -1;
+}
 
 
 template<class BitSet_t>
@@ -875,8 +875,8 @@ void  Graph<BitSet_t>::write_EDGES	(ostream& o)   {
 ////////////////////////////////////////////
 //list of valid types to allow generic code in *.cpp files 
 
-template class  Graph<bitarray>;
-template class  Graph<sparse_bitarray>;
+template class  Graph<BBScan>;
+template class  Graph<BBScanSp>;
 
 //sparse method specializations (now included in the header simple_sparse_graph.h)
 //template Graph<sparse_bitarray>& Graph<sparse_bitarray>::create_subgraph(int, Graph<sparse_bitarray>&);

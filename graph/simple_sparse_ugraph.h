@@ -20,7 +20,7 @@
 #include <vector>
 
 //alias
-using USS = Ugraph<sparse_bitarray>;
+using USS = Ugraph<BBScanSp>;
 
 ////////////////////////
 //

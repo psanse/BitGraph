@@ -27,22 +27,23 @@
 #ifndef __GRAPH_INCLUDE_H__
 #define __GRAPH_INCLUDE_H__
 
-//#include "simple_ugraph.h"
+
 #include "simple_sparse_graph.h"
 #include "simple_sparse_ugraph.h"
 
-typedef Graph<bitarray> graph;						//simple graph
-typedef Ugraph<bitarray> ugraph;					//simple undirected graph
-typedef Graph<sparse_bitarray> sparse_graph;		//simple sparse graph
-typedef Ugraph<sparse_bitarray> sparse_ugraph;		//simple sparse undirected graph
-
+//#include "simple_ugraph.h"
+using graph = Graph<bitarray>;						//simple graph
+using ugraph = Ugraph<bitarray>;					//simple undirected graph
+using sparse_graph = Graph<sparse_bitarray>;		//simple sparse graph
+using sparse_ugraph = Ugraph<sparse_bitarray>;		//simple sparse undirected graph
 
 #include "simple_graph_w.h"							//MUST BE AFTER ugraph type 
-typedef Graph_W<ugraph, double> ugraph_w;			//simple vertex weighted graph with double weights
-typedef Graph_W<ugraph, int> ugraph_wi;				//simple vertex weighted graph with int weights
+using ugraph_w = Graph_W<ugraph, double>;			//simple vertex weighted graph with double weights
+using ugraph_wi = Graph_W<ugraph, int>;				//simple vertex weighted graph with int weights
 
 #include "simple_graph_ew.h"						//MUST BE AFTER ugraph type 
-typedef Graph_EW<ugraph, double> ugraph_ew;			//simple edge weighted graph with double weights
-typedef Graph_EW<ugraph, int> ugraph_ewi;			//simple edge weighted graph with int weights
+using ugraph_ew = Graph_EW<ugraph, double>;			//simple edge weighted graph with double weights
+using ugraph_ewi = Graph_EW<ugraph, int>;			//simple edge weighted graph with int weights
+
 
 #endif

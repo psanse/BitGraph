@@ -19,7 +19,7 @@
 #include <vector>
 
 //useful aliases
-using GSS = Graph<sparse_bitarray>;
+using GSS = Graph<BBScanSp>;
 
 ////////////////////////
 //
@@ -79,7 +79,8 @@ int GSS::shrink_to_fit (std::size_t size) {
 }
 
 template<>
-inline double GSS::block_density()	const {
+inline 
+double GSS::block_density()	const {
 
 	std::size_t nBB = 0;							//number of non-empty bitblocks	
 	std::size_t nBBt = 0;							//number of allocated bitblocks (all should be non-empty in the sparse case)
@@ -97,7 +98,8 @@ inline double GSS::block_density()	const {
 }
 
 template<>
-inline double GSS::block_density_sparse() const {
+inline
+double GSS::block_density_sparse() const {
 									
 	std::size_t nBBt = 0;							//number of allocated bitblocks (all should be non-empty in the sparse case)
 	
@@ -113,7 +115,8 @@ inline double GSS::block_density_sparse() const {
 }
 
 template<>
-inline double GSS::average_block_density_sparse() const {
+inline 
+double GSS::average_block_density_sparse() const {
 
 	std::size_t nBB = 0;							//number of non-empty bitblocks	
 	std::size_t nBBt = 0;							//number of allocated bitblocks (all should be non-empty in the sparse case)
@@ -130,7 +133,8 @@ inline double GSS::average_block_density_sparse() const {
 }
 
 template<>
-inline void GSS::write_dimacs(ostream& o) {
+inline 
+void GSS::write_dimacs(ostream& o) {
 
 
 	//timestamp comment

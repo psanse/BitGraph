@@ -82,9 +82,9 @@ BITBOARD Ugraph<T>::number_of_edges (const T& bbn) const{
 	//reads only the upper triangle of the adjacency matrix
 	for (std::size_t i = 0; i < ptype::NV_ - 1; ++i) {
 		if ( bbn.is_bit(i) ) {
-			for ( std::size_t j = i + 1; j < _mypt::NV_; ++j) {
+			for ( std::size_t j = i + 1; j < ptype::NV_; ++j) {
 				if ( bbn.is_bit(j) ) { 
-					if (_mypt::adj_[i].is_bit(j)) { ++NE; }
+					if (ptype::adj_[i].is_bit(j)) { ++NE; }
 				}
 			}
 		}
@@ -94,7 +94,7 @@ BITBOARD Ugraph<T>::number_of_edges (const T& bbn) const{
 }
 
 template<class T>
-int Ugraph<T>::degree (int v, const BitSet& bbn) const {
+int Ugraph<T>::degree(int v, const BitSet& bbn) const {
 
 	int ndeg = 0;
 	for (int i = 0; i < ptype::NBB_; i++) {
@@ -102,6 +102,13 @@ int Ugraph<T>::degree (int v, const BitSet& bbn) const {
 	}
 
 	return ndeg;
+}
+
+template<class T>
+int Ugraph<T>::degree(int v, const BitSetSp& bbs)	const  {
+	LOG_ERROR("function not yet implemented, should not be called - Ugraph<T>::degree");
+	LOG_ERROR("exiting...");
+	std::exit(-1);
 }
 
 
@@ -118,9 +125,9 @@ void Ugraph<T>::add_edge (int v, int w){
 template<class T>
 void Ugraph<T>::remove_edge (int v, int w){
 	if(v!=w){
-		_mypt::adj_[v].erase_bit(w);
-		_mypt::adj_[w].erase_bit(v);
-		_mypt::NE_--;
+		ptype::adj_[v].erase_bit(w);
+		ptype::adj_[w].erase_bit(v);
+		ptype::NE_--;
 	}
 }
 
@@ -208,7 +215,7 @@ ostream& Ugraph<T>::print_matrix(std::ostream& o) const
 ////////////////////////////
 //// Experimental: inefficient implementation: allocating memory twice 
 //	Ugraph g;
-//	this->_mypt::remove_vertices(bbn,g);			//allocation 1
+//	this->ptype::remove_vertices(bbn,g);			//allocation 1
 //	(*this)=g;										//allocation 2	
 //}
 
@@ -220,8 +227,8 @@ void Ugraph<T>::write_dimacs (ostream & o)  {
 	o << "c File written by GRAPH:" << PrecisionTimer::local_timestamp();
 
 	//name comment
-	if(!_mypt::name_.empty())
-		o << "c " << _mypt::name_.c_str() << endl;
+	if(!ptype::name_.empty())
+		o << "c " << ptype::name_.c_str() << endl;
 
 	//dimacs header
 	o << "p edge " << ptype::NV_ << " " << number_of_edges (false /* recompute */) << endl << endl;
@@ -289,7 +296,7 @@ int Ugraph<T>::degree_up (int v, const BitSet& bbn) const	{
 	int nDeg = 0, nBB = WDIV(v);
 
 	for (auto i = nBB + 1; i < ptype::NBB_; ++i) {
-		nDeg += bblock::popc64( _mypt::adj_[v].block(i) & bbn.block(i) );
+		nDeg += bblock::popc64( ptype::adj_[v].block(i) & bbn.block(i) );
 	}
 
 	//truncate the bitblock of v
@@ -306,7 +313,7 @@ int Ugraph<T>::degree_up(int v) const
 	int nDeg = 0, nBB = WDIV(v);
 
 	for (auto i = nBB + 1; i < ptype::NBB_; ++i) {
-		nDeg += bblock::popc64( _mypt::adj_[v].block(i) );
+		nDeg += bblock::popc64( ptype::adj_[v].block(i) );
 	}
 
 	//truncate the bitblock of v
@@ -320,15 +327,23 @@ template<class T>
 int Ugraph<T>::degree (int v, int UB, const BitSet& bbn) const	{
 
 	int nDeg = 0;
-	for(auto i = 0; i < _mypt::NBB_; ++i){
+	for(auto i = 0; i < ptype::NBB_; ++i){
 
-		nDeg += bblock::popc64(_mypt::adj_[v].block(i) & bbn.block(i));
+		nDeg += bblock::popc64(ptype::adj_[v].block(i) & bbn.block(i));
 
 		if (nDeg >= UB) { return UB; }
 	}
 
 	return nDeg;
 }
+
+template<class T>
+int Ugraph<T>::degree(int v, int UB, const BitSetSp& bbn) const {
+	LOG_ERROR("function not yet implemented, should not be called - Ugraph<T>::degree");
+	LOG_ERROR("exiting...");
+	std::exit(-1);
+}
+
 
 template<class T>
 int Ugraph<T>::create_complement (Ugraph& ug) const	{
@@ -362,17 +377,17 @@ int Ugraph<T>::create_complement (Ugraph& ug) const	{
 //{
 //
 //	//memory allocation of the new complement graph
-//	if (ug.init(_mypt::NV_) == -1) return -1;
+//	if (ug.init(ptype::NV_) == -1) return -1;
 //
 //	vector<int> vnn;
-//	_mypt::get_neighbors(v).to_vector(vnn);
+//	ptype::get_neighbors(v).to_vector(vnn);
 //	//com::stl::print_collection(vnn);
 //
 //	for (int i = 0; i < vnn.size()-1; i++) {
 //		for (int j = i + 1; j < vnn.size(); j++) {
 //
 //			//add edges accordingly
-//			if (_mypt::is_edge(vnn[i], vnn[j])) {
+//			if (ptype::is_edge(vnn[i], vnn[j])) {
 //					ug.add_edge(vnn[i], vnn[j]);
 //			}
 //		}
@@ -407,7 +422,7 @@ int Ugraph<T>::create_subgraph(Ugraph & ug, vint& lv) const
 	for (std::size_t i = 0; i < NV - 1; i++) {
 		for (std::size_t j = i + 1; j < NV; j++) {
 						
-			if (_mypt::is_edge(lv[i], lv[j])) {
+			if (ptype::is_edge(lv[i], lv[j])) {
 				ug.add_edge(i, j);						//adds bidirected edge
 			}
 		}
@@ -420,11 +435,10 @@ int Ugraph<T>::create_subgraph(Ugraph & ug, vint& lv) const
 ////////////////////////////////////////////
 //list of valid types to allow generic code in *.cpp files 
 
-template class  Ugraph<bitarray>;
-template class  Ugraph<sparse_bitarray>;
+template class  Ugraph<BBScan>;
+template class  Ugraph<BBScanSp>;
 
 //sparse method specializations (now included in the header simple_sparse_graph.h)
-
 
 ////////////////////////////////////////////
 
