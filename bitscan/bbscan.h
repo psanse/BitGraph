@@ -13,6 +13,7 @@
 #define __BBSCAN_H__
 
 #include "bbset.h"	
+#include "tables.h"	
 
 
 using namespace std;
@@ -103,7 +104,7 @@ virtual	int init_scan				(scan_types sct);
 	* @returns the next bit in the bitstring, BBObject::noBit if there are no more bits
 	* @details Created   23/3/12, last update 09/02/2025
 	**/
-virtual inline int next_bit_del		(); 	
+virtual  int next_bit_del		(); 	
 
 
 	/**
@@ -122,7 +123,7 @@ virtual inline int next_bit_del		();
 	* @param block: output parameter with the current bitblock
 	* @returns the next bit in the bitstring, BBObject::noBit if there are no more bits
 	**/
-virtual inline int next_bit_del		( BBScan& bitset); 	 
+virtual  int next_bit_del		( BBScan& bitset); 	 
 
 	/**
 	* @brief next bit in the bitstring, starting from the bit retrieved
@@ -139,7 +140,7 @@ virtual inline int next_bit_del		( BBScan& bitset);
 	* @details Since the scan does not delete the scanned bit from the bitstring,
 	*		   it has to cache the last scanned bit for the next call
 	**/
-virtual	 inline int next_bit				();
+virtual	  int next_bit				();
 	
 	/**
 	* @brief for basic bitscanning operatins - they are hidden by next_bit()
@@ -164,7 +165,7 @@ virtual	 inline int next_bit				();
 	* @details Since the scan does not delete the scanned bit from the bitstring,
 	*		   it has to cache the last scanned bit for the next call
 	**/
-virtual	inline int next_bit					( BBScan& bitset);
+virtual	 int next_bit					( BBScan& bitset);
 
 	////////////////
 	// bitscan backwards
@@ -183,8 +184,8 @@ virtual	inline int next_bit					( BBScan& bitset);
 	* @details Since the scan does not delete the scanned bit from the bitstring,
 	*		   it has to cache the last scanned bit for the next call
 	**/
-virtual	 inline int prev_bit			();
-virtual	 inline int prev_bit			(BBScan& bitset);
+virtual	  int prev_bit					();
+virtual	 int prev_bit					(BBScan& bitset);
 
 
 	/**
@@ -199,7 +200,7 @@ virtual	 inline int prev_bit			(BBScan& bitset);
 	* @returns the next lsb bit in the bitstring, BBObject::noBit if there are no more bits
 	* @details Created   23/3/12, last update 09/02/2025
 	**/
- virtual inline int prev_bit_del	(); 
+ virtual	int prev_bit_del	(); 
 
 
 	/**
@@ -219,7 +220,7 @@ virtual	 inline int prev_bit			(BBScan& bitset);
 	* @returns the next lsb bit in the bitstring, BBObject::noBit if there are no more bits
 	* @details Created   23/3/12, last update 09/02/2025
 	**/
- virtual inline int prev_bit_del				( BBScan& bitset);
+ virtual	 int prev_bit_del				( BBScan& bitset);
 
 
 //////////////////
@@ -387,7 +388,8 @@ int BBScan::prev_bit		() {
 	return BBObject::noBit;
 }
 
-inline int BBScan::prev_bit(BBScan& bitset)
+inline
+int BBScan::prev_bit(BBScan& bitset)
 {
 
 	U32 posInBB;
