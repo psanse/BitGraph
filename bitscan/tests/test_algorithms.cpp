@@ -16,6 +16,12 @@
 
 using namespace std;
 
+///////////////////////////
+//predeclaration for g++
+#ifdef __GNUC__
+	const int BBObject::noBit;
+#endif
+
 //aliases
 using vint = vector<int>;
 

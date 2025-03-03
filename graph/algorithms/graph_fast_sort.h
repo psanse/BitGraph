@@ -19,6 +19,7 @@
 #include "utils/common.h"						
 #include "decode.h"
 #include "bitscan/bbtypes.h"					//for EMPTY_ELEM constant	
+#include "bitscan/bbobject.h"
 //#include "filter_graph_sort_type.h"			//limits template Graph_t to undirected types
 
 using namespace std;
@@ -38,7 +39,7 @@ class GraphFastRootSort{
 	
 public:
 	using basic_type = Graph_t;											//graph type
-	using type = typename GraphFastRootSort< Graph_t>;					//own type		
+	using type = GraphFastRootSort< Graph_t>;							//own type		
 	using bb_type = typename Graph_t::_bbt;								//bitset type
 
 	enum  	{PRINT_DEGREE=0, PRINT_SUPPORT, PRINT_NODES};
@@ -352,7 +353,8 @@ const vint& GraphFastRootSort<Graph_t>::sort_degen_non_decreasing_deg(bool rev){
 	nodes_.clear();
 	nodes_.reserve(NV_);
 
-	int max_deg = NV_, v = BBObject::noBit;
+	int max_deg = NV_;
+	int v = BBObject::noBit;
 	do{
 		max_deg = NV_;
 
@@ -374,7 +376,7 @@ const vint& GraphFastRootSort<Graph_t>::sort_degen_non_decreasing_deg(bool rev){
 		//update degree info of the remaining active vertices
 		bb_type& bbn = g_.get_neighbors(v);
 	
-		if (bbn.init_scan(bbo::NON_DESTRUCTIVE) != -1) {			
+		if (bbn.init_scan(BBObject::NON_DESTRUCTIVE) != -1) {			
 			int w = BBObject::noBit;
 			while ((w = bbn.next_bit()) != BBObject::noBit) {
 				if (node_active_state_.is_bit(w)) {
@@ -423,7 +425,7 @@ const vint& GraphFastRootSort<Graph_t>::sort_degen_non_increasing_deg(bool rev){
 
 		//updates neighborhood info in remaining vertices
 		bb_type& bbn = g_.get_neighbors(v);
-		if (bbn.init_scan(bbo::NON_DESTRUCTIVE) != -1) {
+		if (bbn.init_scan(BBObject::NON_DESTRUCTIVE) != -1) {
 			int w = BBObject::noBit;
 			while ((w = bbn.next_bit()) != BBObject::noBit) {
 				if (node_active_state_.is_bit(w)) {
@@ -456,7 +458,7 @@ inline const vint& GraphFastRootSort<Graph_t>::sort_degen_non_decreasing_deg_B(b
 		int v = BBObject::noBit;
 
 		//selects an active vertex with minimum degree
-		if (node_active_state_.init_scan(bbo::NON_DESTRUCTIVE) != -1) {
+		if (node_active_state_.init_scan(BBObject::NON_DESTRUCTIVE) != -1) {
 			LOG_ERROR("init scan failed -  GraphFastRootSort<Graph_t>::sort_degen_non_decreasing_deg_B");
 			LOG_ERROR("exting");
 			std::exit(-1);
@@ -511,7 +513,7 @@ const vint& GraphFastRootSort<Graph_t>::sort_degen_composite_non_decreasing_deg(
 
 		//updates neighborhood info in remaining vertices
 		bb_type& bbn = g_.get_neighbors(v);
-		if (bbn.init_scan(bbo::NON_DESTRUCTIVE) != -1) {
+		if (bbn.init_scan(BBObject::NON_DESTRUCTIVE) != -1) {
 			int w = BBObject::noBit;
 			while ( (w = bbn.next_bit()) != BBObject::noBit ) {
 				if (node_active_state_.is_bit(w)) {
@@ -553,7 +555,7 @@ const vint& GraphFastRootSort<Graph_t>::sort_degen_composite_non_increasing_deg(
 
 		//updates neighborhood info in remaining vertices
 		bb_type& bbn = g_.get_neighbors(v);
-		if (bbn.init_scan(bbo::NON_DESTRUCTIVE) != -1) {
+		if (bbn.init_scan(BBObject::NON_DESTRUCTIVE) != -1) {
 			int w = BBObject::noBit;
 			while ((w = bbn.next_bit()) != BBObject::noBit) {
 				if (node_active_state_.is_bit(w)) {
@@ -755,7 +757,7 @@ const vint& GraphFastRootSort<Graph_t>::compute_support_root()
 	for(auto elem = 0; elem < NV_; ++elem){
 		deg_neigh_[elem] = 0;
 		bb_type& bbn = g_.get_neighbors(elem);
-		if (bbn.init_scan(bbo::NON_DESTRUCTIVE) != -1) {
+		if (bbn.init_scan(BBObject::NON_DESTRUCTIVE) != -1) {
 			int w = BBObject::noBit;
 			while ((w = bbn.next_bit()) != EMPTY_ELEM) {
 				deg_neigh_[elem] += nb_neigh_[w];
@@ -796,10 +798,10 @@ ostream& GraphFastRootSort<Graph_t>::print (int type, ostream& o, bool eofl) con
 
 template<class Graph_t>
 inline int GraphFastRootSort<Graph_t>::compute_deg(const Graph_t & g, vint & deg){
-	auto NV_ = g_.number_of_vertices();	
-	deg.assign(NV_, -1);
-	for (auto v = 0; v < NV_; v++) {
-		deg[v] = g_.get_neighbors(v).size();
+	auto NV = g.number_of_vertices();	
+	deg.assign(NV, -1);
+	for (auto v = 0; v < NV; v++) {
+		deg[v] = g.get_neighbors(v).size();
 	}
 	return 0;
 }

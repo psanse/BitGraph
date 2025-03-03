@@ -30,7 +30,7 @@ public:
 	using basic_type = GraphW_t;									//weighted graph type
 	using type = GraphFastRootSort_W<GraphW_t>;						//own type	
 	using ugtype = typename basic_type::_gt;						//non-weighted graph type	
-	using ptype = typename GraphFastRootSort <ugtype>;				//parent type
+	using ptype =  GraphFastRootSort <ugtype>;						//parent type
 	using wtype = typename GraphW_t::_wt;							//weight type
 
 	enum  { MAX_WEIGHT = 100, MIN_WEIGHT };							//sorting algorithms for weighted graphs	
@@ -100,7 +100,7 @@ private:
 template <class GraphW_t >
 inline
 vint GraphFastRootSort_W<GraphW_t>::new_order (int alg, bool ltf, bool o2n){
-	nodes_.clear();											//clears the ordering
+	this->nodes_.clear();											//clears the ordering
 
 	switch (alg) {
 	case ptype::NONE:
@@ -118,11 +118,11 @@ vint GraphFastRootSort_W<GraphW_t>::new_order (int alg, bool ltf, bool o2n){
     
 	case MAX_WEIGHT:						//currently the only sorting algorithm for weighted graphs
 		sort_by_non_increasing_weight(ltf);
-		if (!o2n) { Decode::reverse_in_place(nodes_); }
+		if (!o2n) { Decode::reverse_in_place(this->nodes_); }
 		break;
 	case MIN_WEIGHT:						//currently the only sorting algorithm for weighted graphs
 		sort_by_non_decreasing_weight(ltf);
-		if (!o2n) { Decode::reverse_in_place(nodes_); }
+		if (!o2n) { Decode::reverse_in_place(this->nodes_); }
 		break;
 
 	default:
@@ -130,7 +130,7 @@ vint GraphFastRootSort_W<GraphW_t>::new_order (int alg, bool ltf, bool o2n){
 		LOG_ERROR("exiting...");
 		exit(-1);
 	}
-	return nodes_;
+	return this->nodes_;
 }
 
 template <class GraphW_t >
@@ -182,13 +182,13 @@ const vint& GraphFastRootSort_W<GraphW_t>::sort_by_non_increasing_weight(bool lt
 
 	/////////////////////////////////////////////////////////////////////////////
 	com::has_greater_val< int, std::vector<wtype> > pred(gw_.get_weights());
-	std::stable_sort(nodes_.begin(), nodes_.end(), pred);
+	std::stable_sort(this->nodes_.begin(), this->nodes_.end(), pred);
 	/////////////////////////////////////////////////////////////////////////////
 	
 	//reverse order if required
-	if (ltf) { std::reverse(nodes_.begin(), nodes_.end());  }
+	if (ltf) { std::reverse(this->nodes_.begin(), this->nodes_.end());  }
 
-	return nodes_;
+	return this->nodes_;
 }
 
 template<class GraphW_t>
@@ -199,13 +199,13 @@ inline const vint& GraphFastRootSort_W<GraphW_t>::sort_by_non_decreasing_weight(
 
 	/////////////////////////////////////////////////////////////////////////////
 	com::has_smaller_val< int, std::vector<wtype> > pred(gw_.get_weights());
-	std::stable_sort(nodes_.begin(), nodes_.end(), pred);
+	std::stable_sort(this->nodes_.begin(), this->nodes_.end(), pred);
 	/////////////////////////////////////////////////////////////////////////////
 
 	//reverse order if required
-	if (ltf) { std::reverse(nodes_.begin(), nodes_.end()); }
+	if (ltf) { std::reverse(this->nodes_.begin(), this->nodes_.end()); }
 
-	return nodes_;
+	return this->nodes_;
 }
 
 #endif

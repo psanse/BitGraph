@@ -84,7 +84,7 @@ TEST_F(UGraphEWTest, set_weight) {
 
 	ugew.set_we(1, 3, 7);
 
-	EXPECT_TRUE(7, ugew.get_we(1, 4) );
+	EXPECT_EQ(7, ugew.get_we(1, 3) );
 
 }
 

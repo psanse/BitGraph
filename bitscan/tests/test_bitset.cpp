@@ -187,7 +187,7 @@ TEST(BitSetClass, set_bit_range) {
 	//same range
 	BitSet bb2(130);
 	bb2.set_bit(5, 5);
-	EXPECT_TRUE(1, bb2.size());
+	EXPECT_EQ(1, bb2.size());
 	EXPECT_TRUE(bb2.is_bit(5));
 }
 

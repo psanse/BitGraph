@@ -896,7 +896,7 @@ inline int KCore<Graph_t>::make_kcore_filter (map_t& filter, bool reverse) {
 	//***assert existence of kcore decomposition
 	
 	filter.clear();
-	int next_kcore_pos = 0
+	int next_kcore_pos = 0;
 	int current_k = EMPTY_ELEM;
 
 	if(reverse){
@@ -1004,9 +1004,9 @@ inline vint KCore<Graph_t>::find_heur_clique(int num_iter){
 	}
 
 	if (num_iter != EMPTY_ELEM) {
-		LOG_PRINT("kc[" << "it:" << iter << "," << " lb:" << max_size << "]");
+		LOGG_PRINT("kc[" , "it:" , iter , "," , " lb:" , max_size , "]");
 	}
-	else LOG_PRINT("kc[lb:" << max_size << "]");
+	else LOGG_PRINT("kc[lb:" , max_size , "]");
 
 	return largest_clique;
 }
@@ -1067,9 +1067,9 @@ inline vint KCore<sparse_ugraph>::find_heur_clique_opt(int num_iter){
 	}
 
 	if (num_iter != EMPTY_ELEM) {
-		LOG_INFO("kc[", "it:", iter, ",", " lb:", max_size, "]");
+		LOGG_INFO("kc[", "it:", iter, ",", " lb:", max_size, "]");
 	}
-	else { LOG_INFO("kc[lb:", max_size, "]"); }
+	else { LOGG_INFO("kc[lb:", max_size, "]"); }
 
 	return largest_clique;
 }
@@ -1165,9 +1165,9 @@ inline vint KCore<sparse_ugraph>::find_heur_clique_sparse(int num_iter){
 
 	//log
 	if (num_iter != EMPTY_ELEM) {
-		LOG_INFO("kc[", "it:", iter, ",", " lb:", max_size, "]");
+		LOGG_INFO("kc[", "it:", iter, ",", " lb:", max_size, "]");
 	}
-	else { LOG_INFO("kc[lb:", max_size, "]"); }
+	else { LOGG_INFO("kc[lb:", max_size, "]"); }
 	
 	return largest_clique;
 }

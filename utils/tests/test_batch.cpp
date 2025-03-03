@@ -6,8 +6,8 @@ using namespace std;
 
 //configuration data for the hierarchy of algorithms
 struct param_t{
-	int i_ = 0 ;
-	int j_ = 0;
+	int i_;
+	int j_;
 };
 
 //base class representing an algorithm

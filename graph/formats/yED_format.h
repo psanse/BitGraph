@@ -280,7 +280,10 @@ namespace gio {
 			if (N == 0) { LOG_INFO("cannot paint the empty graph, will produce no output -gio::yed::graph_to_gml_color"); return 0; }
 			std::string filenameExt = filename + ".gml";
 			std::ofstream grafo(filenameExt);
-			if (!grafo) { LOG_ERROR("file: " << filenameExt << "could no be opened" << " -gio::yed::graph_to_gml_color(...)"); return -1; }
+			if (!grafo) { 
+				LOGG_ERROR("file: " , filenameExt , "could no be opened" , " -gio::yed::graph_to_gml_color(...)");
+				return -1;
+			}
 			
 
 			////////////////////////

@@ -1300,7 +1300,7 @@ vint GraphSort<Graph_t>::new_order_furini (gbbs::sort_t alg, gbbs::place_t place
 	}
 	
 	for (int ii = 0; ii < NV; ii++){
-		com::mat::SORT_NON_DECR(order,degree, NV);
+		com::sort::SORT_NON_DECR(order,degree, NV);
 
 		for (int iii = 0; iii < NV; iii++){
 			position[order[iii]] = iii;

@@ -231,7 +231,7 @@ namespace gfunc{
 		if (g.reset(N) == -1) { return -1; }
 
 		for (auto i = 0; i < N; ++i) {
-			for (autot j = 0; i < N; j++) {
+			for (auto j = 0; j < N; j++) {
 				g.add_edge(i, j);
 			}
 		}
@@ -441,10 +441,11 @@ namespace gfunc{
 			const auto& bbn = g.get_neighbors(v);
 
 			//bitscanning configuration
-			bbn.init_scan(bbo::NON_DESTRUCTIVE);
-
-			while ((u = bbn.next_bit()) != EMPTY_ELEM) {
-				total_weight += g.get_w(u);
+			if (bbn.init_scan(bbo::NON_DESTRUCTIVE) != -1) {
+				int u = BBObject::noBit;
+				while ((u = bbn.next_bit()) != BBObject::noBit) {
+					total_weight += g.get_w(u);
+				}
 			}
 
 			return total_weight;
@@ -610,10 +611,10 @@ namespace gfunc{
 
 			//sorting according to ldeg
 			if (min_sort) {
-				std::sort(lv.begin(), lv.end(), my_struct_smaller_diff);
+				std::sort(lv.begin(), lv.end(), compare_smaller);
 			}
 			else {
-				std::sort(lv.begin(), lv.end(), my_struct_greater_diff);
+				std::sort(lv.begin(), lv.end(), compare_greater);
 			}
 			return lv;
 		}
@@ -715,19 +716,19 @@ namespace gfunc{
 		template<typename Graph_t>
 		typename Graph_t::_wt wesum(const Graph_t& g, vint& lv, bool only_we = false) {
 			
-			double total_weight = 0.0;
+			typename Graph_t::_wt total_weight = 0.0;
 			const auto NV = lv.size();
 			
 			for (auto i = 0; i < NV - 1; i++) {
 				for (auto j = (only_we ? i + 1 : i); j < NV; ++j) {
 
-					if (g.get_we(i, j) != Graph_t::NOWT) {		//Checks grahp consistency - perhaps remove or do it in DEBUG mode only
-						res += g.get_we(lv[i], lv[j]);			//no edge-checking!
+					if (g.get_we(i, j) != Graph_t::NOWT) {				//Checks graph consistency - perhaps remove or do it in DEBUG mode only
+						total_weight += g.get_we(lv[i], lv[j]);			//no edge-checking!
 					}
 				}
 			}
 			
-			return res;
+			return total_weight;
 		}
 
 		template<class Graph_t, class _wt>

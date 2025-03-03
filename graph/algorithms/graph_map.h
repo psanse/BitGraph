@@ -86,7 +86,7 @@ public:
 	* @param lhs_name, rhs_name: fancy names for the orderings
 	* @returns -1 if error, 0 otherwise
 	*/
-	template< typename Alg_t , typename G_t = Alg_t::_gt >
+	template< typename Alg_t , typename G_t = typename Alg_t::_gt >
 	int build_mapping		(G_t&, int lhs_s, int lhs_p, int rhs_s, int rhs_p,
 								string lhs_name = "", string rhs_name = ""				);
 
@@ -94,7 +94,7 @@ public:
 
 	//////////////////////
 	//single ordering
-	template< typename Alg_t, typename G_t = Alg_t::_gt >
+	template< typename Alg_t, typename G_t = typename Alg_t::_gt >
 	int build_mapping		(G_t&, int lhs_s, int lhs_p, string lhs_name = ""			);
 		
 	int build_mapping		(const vint& lhs_o2n, string lhs_name = "");
@@ -141,7 +141,7 @@ bitset_t& GraphMap::map_l2r (bitset_t& bbl, bitset_t& bbr, bool overwrite) const
 	if(overwrite) { bbr.erase_bit();}
 
 	//sets bitscanning configuration
-	if ( bbl.init_scan(bbo::NON_DESTRUCTIVE) != -1) {
+	if ( bbl.init_scan(BBObject::NON_DESTRUCTIVE) != -1) {
 
 		//bitscans bbl and sets bits in bbr
 		int v = BBObject::noBit;
@@ -161,7 +161,7 @@ bitset_t& GraphMap::map_r2l (bitset_t& bbl, bitset_t& bbr, bool overwrite) const
 	if (overwrite) { bbl.erase_bit(); }
 
 	//sets bitscanning configuration
-	if (bbr.init_scan(bbo::NON_DESTRUCTIVE) != -1) {
+	if (bbr.init_scan(BBObject::NON_DESTRUCTIVE) != -1) {
 
 		//bitscans bbl and sets bits in bbr
 		int v = BBObject::noBit;
