@@ -45,9 +45,7 @@
 
 
 class Tables{
-	friend class BitBoard;
-	friend class BitBoardN;
-	
+		
 private:
 	Tables(){};
 	virtual ~Tables(){};
