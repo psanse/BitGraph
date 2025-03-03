@@ -1,9 +1,11 @@
 cmake_minimum_required (VERSION 2.8...3.4)  		#version 2.8 for VENUS server
 project (graphlib
-    VERSION 1.0
-    DESCRIPTION "libraries BITSCAN, GRAPH (and UTILS) to work with graphs efficiently"
-    HOMEPAGE_URL https://github.com/psanse/BITSCAN_plus
+   VERSION 1.0
+   DESCRIPTION "Utils, Bitscan and Graph libraries"
+   HOMEPAGE_URL "https://github.com/psanse/BITSCAN_plus"
+   LANGUAGES CXX
 )
+
 
 #############
 # C++11 flag
