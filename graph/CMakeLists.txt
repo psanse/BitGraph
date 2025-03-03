@@ -47,7 +47,12 @@ target_include_directories(graph PUBLIC
   $<INSTALL_INTERFACE:include/graph>    # <prefix>/include/bitscan
 )
 
-# Install GRAPH library
+#############
+# Install GRAPH lib
+# GRAPH lib header files are deployed manually
+# (to preserve internal structure)
+#############
+
 install(TARGETS graph
    ARCHIVE DESTINATION lib
    LIBRARY DESTINATION lib
@@ -55,8 +60,15 @@ install(TARGETS graph
   #PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_PREFIX}/include/graph        //header files deployed without internal structure
 )
 
+ file(GLOB_RECURSE DEPLOY_FILES_AND_DIRS "${PROJECT_SOURCE_DIR}/graph/*.h")
+ foreach(ITEM ${DEPLOY_FILES_AND_DIRS})
+    file(RELATIVE_PATH REL_PATH ${PROJECT_SOURCE_DIR} ${ITEM})
+    get_filename_component(DIR_PATH ${REL_PATH} DIRECTORY)
+    install(FILES ${ITEM} DESTINATION include/${DIR_PATH})	 
+ endforeach()
+
 ###################
-# GRAPH lib - UNIT TESTS
+# UNIT TESTS for GRAPH lib
 ###################
 option(graph_build_tests "Build graph tests." OFF)
 if (graph_build_tests)

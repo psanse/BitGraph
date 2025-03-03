@@ -46,6 +46,12 @@ target_include_directories(bitscan PUBLIC
   $<INSTALL_INTERFACE:include/bitscan>    # <prefix>/include/bitscan
 )
 
+#############
+# Install BITSCAN lib
+# BITSCAN lib header files are deployed manually
+# (to preserve internal structure)
+#############
+
 #Install BITSCAN library
 install(TARGETS bitscan
    ARCHIVE DESTINATION lib
@@ -53,6 +59,13 @@ install(TARGETS bitscan
    #RUNTIME DESTINATION bin
    #PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_PREFIX}/include/bitscan        //header files deployed without internal structure
 )
+
+file(GLOB_RECURSE DEPLOY_FILES_AND_DIRS "${PROJECT_SOURCE_DIR}/bitscan/*.h")
+foreach(ITEM ${DEPLOY_FILES_AND_DIRS})
+    file(RELATIVE_PATH REL_PATH ${PROJECT_SOURCE_DIR} ${ITEM})
+    get_filename_component(DIR_PATH ${REL_PATH} DIRECTORY)
+    install(FILES ${ITEM} DESTINATION include/${DIR_PATH})	 
+ endforeach()
 
 ###################
 # UNIT TESTS for BITSCAN lib  

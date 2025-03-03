@@ -39,7 +39,12 @@ set_target_properties(utils
     #PUBLIC_HEADER   "${useful_headers_for_IDE}"        #does not preserve internal structure       
 )
 
-# Install utils library
+#############
+# Install UTILS lib
+# UTILS lib header files are deployed manually
+# (to preserve internal structure)
+#############
+
 install(TARGETS utils
 	ARCHIVE DESTINATION lib
 	LIBRARY DESTINATION lib
@@ -47,6 +52,17 @@ install(TARGETS utils
 	#PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_PREFIX}/include/utils        //header files deployed without internal structure
 )
 
+ file(GLOB_RECURSE DEPLOY_FILES_AND_DIRS "${PROJECT_SOURCE_DIR}/utils/*.h")
+ foreach(ITEM ${DEPLOY_FILES_AND_DIRS})
+    file(RELATIVE_PATH REL_PATH ${PROJECT_SOURCE_DIR} ${ITEM})
+    get_filename_component(DIR_PATH ${REL_PATH} DIRECTORY)
+    install(FILES ${ITEM} DESTINATION include/${DIR_PATH})	 
+ endforeach()
+
+
+#############
+# UNIT TESTS for UTILS lib
+#############
 option(utils_build_tests "Build utils tests." OFF)
 #set(utils_build_tests ON)
 if (utils_build_tests)

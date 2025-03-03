@@ -107,33 +107,6 @@ endif()
 set(INSTALL_PATH "${CMAKE_CURRENT_SOURCE_DIR}/example_external_linking" CACHE PATH "Directory chosen to deploy project")
 set(CMAKE_INSTALL_PREFIX ${INSTALL_PATH})
 
-
-
- #############
-# Deploy UTILS, BITSCAN and GRAPH libraries manually
-# (old CMake)
-#############
-
-file(GLOB_RECURSE DEPLOY_FILES_AND_DIRS "${PROJECT_SOURCE_DIR}/bitscan/*.h")
-foreach(ITEM ${DEPLOY_FILES_AND_DIRS})
-    file(RELATIVE_PATH REL_PATH ${PROJECT_SOURCE_DIR} ${ITEM})
-    get_filename_component(DIR_PATH ${REL_PATH} DIRECTORY)
-    install(FILES ${ITEM} DESTINATION include/${DIR_PATH})	 
- endforeach()
-
- file(GLOB_RECURSE DEPLOY_FILES_AND_DIRS "${PROJECT_SOURCE_DIR}/graph/*.h")
- foreach(ITEM ${DEPLOY_FILES_AND_DIRS})
-    file(RELATIVE_PATH REL_PATH ${PROJECT_SOURCE_DIR} ${ITEM})
-    get_filename_component(DIR_PATH ${REL_PATH} DIRECTORY)
-    install(FILES ${ITEM} DESTINATION include/${DIR_PATH})	 
- endforeach()
-
- file(GLOB_RECURSE DEPLOY_FILES_AND_DIRS "${PROJECT_SOURCE_DIR}/utils/*.h")
- foreach(ITEM ${DEPLOY_FILES_AND_DIRS})
-    file(RELATIVE_PATH REL_PATH ${PROJECT_SOURCE_DIR} ${ITEM})
-    get_filename_component(DIR_PATH ${REL_PATH} DIRECTORY)
-    install(FILES ${ITEM} DESTINATION include/${DIR_PATH})	 
- endforeach()
  
 ####################
 # deploy all header files (inlcuding gtest) in include directory preserving internal structure
