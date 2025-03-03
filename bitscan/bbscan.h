@@ -72,7 +72,7 @@ public:
 	* @param sct: type of scan
 	* @returns 0 if successful, -1 otherwise
 	**/
-virtual	int init_scan				(scan_types sct);	
+virtual inline	int init_scan		(scan_types sct);
 
 	/**
 	* @brief Configures the initial block and bit position for bitscanning
@@ -85,7 +85,7 @@ virtual	int init_scan				(scan_types sct);
 	* 
 	* TODO - no firstBit information is configured for DESTRUCTIVE scan types (08/02/2025) 
 	**/
-	int init_scan					(int firstBit, scan_types sct);
+inline	int init_scan				(int firstBit, scan_types sct);
 
 
 	////////////////
@@ -102,7 +102,7 @@ virtual	int init_scan				(scan_types sct);
 	* @returns the next bit in the bitstring, BBObject::noBit if there are no more bits
 	* @details Created   23/3/12, last update 09/02/2025
 	**/
-virtual  int next_bit_del		(); 	
+virtual inline  int next_bit_del	();
 
 
 	/**
@@ -121,7 +121,7 @@ virtual  int next_bit_del		();
 	* @param block: output parameter with the current bitblock
 	* @returns the next bit in the bitstring, BBObject::noBit if there are no more bits
 	**/
-virtual  int next_bit_del		( BBScan& bitset); 	 
+virtual inline int next_bit_del		( BBScan& bitset);
 
 	/**
 	* @brief next bit in the bitstring, starting from the bit retrieved
@@ -138,7 +138,7 @@ virtual  int next_bit_del		( BBScan& bitset);
 	* @details Since the scan does not delete the scanned bit from the bitstring,
 	*		   it has to cache the last scanned bit for the next call
 	**/
-virtual	  int next_bit				();
+virtual	inline  int next_bit		();
 	
 	/**
 	* @brief for basic bitscanning operatins - they are hidden by next_bit()
@@ -163,7 +163,7 @@ virtual	  int next_bit				();
 	* @details Since the scan does not delete the scanned bit from the bitstring,
 	*		   it has to cache the last scanned bit for the next call
 	**/
-virtual	 int next_bit					( BBScan& bitset);
+virtual inline	 int next_bit		( BBScan& bitset);
 
 	////////////////
 	// bitscan backwards
@@ -182,8 +182,8 @@ virtual	 int next_bit					( BBScan& bitset);
 	* @details Since the scan does not delete the scanned bit from the bitstring,
 	*		   it has to cache the last scanned bit for the next call
 	**/
-virtual	  int prev_bit					();
-virtual	 int prev_bit					(BBScan& bitset);
+virtual  inline int prev_bit		();
+virtual	inline int prev_bit			(BBScan& bitset);
 
 
 	/**
@@ -198,7 +198,7 @@ virtual	 int prev_bit					(BBScan& bitset);
 	* @returns the next lsb bit in the bitstring, BBObject::noBit if there are no more bits
 	* @details Created   23/3/12, last update 09/02/2025
 	**/
- virtual	int prev_bit_del	(); 
+ virtual inline	int prev_bit_del	();
 
 
 	/**
@@ -218,7 +218,7 @@ virtual	 int prev_bit					(BBScan& bitset);
 	* @returns the next lsb bit in the bitstring, BBObject::noBit if there are no more bits
 	* @details Created   23/3/12, last update 09/02/2025
 	**/
- virtual	 int prev_bit_del				( BBScan& bitset);
+ virtual inline int prev_bit_del	( BBScan& bitset);
 
 
 //////////////////
@@ -232,7 +232,7 @@ protected:
 // INLINE Implementation, must be in header file
 
 
-inline
+
 int BBScan::next_bit_del() {
 
 	 U32 posInBB;
@@ -256,7 +256,7 @@ int BBScan::next_bit_del() {
 
 
 
-inline
+
 int BBScan::next_bit_del( BBScan& bbN_del) {
 
 	U32 posInBB;
@@ -280,7 +280,7 @@ int BBScan::next_bit_del( BBScan& bbN_del) {
 	return BBObject::noBit;  
 }
 
-inline
+
 int BBScan::next_bit() {
 
 	U32 posInBB;
@@ -312,7 +312,7 @@ int BBScan::next_bit() {
 }
 
 
-inline
+
 int BBScan::next_bit( BBScan& bitset) {
 
 	U32 posInBB;
@@ -354,7 +354,7 @@ int BBScan::next_bit( BBScan& bitset) {
 	return BBObject::noBit;
 }
 
-inline
+
 int BBScan::prev_bit		() {
 
 	U32 posInBB;
@@ -386,7 +386,7 @@ int BBScan::prev_bit		() {
 	return BBObject::noBit;
 }
 
-inline
+
 int BBScan::prev_bit(BBScan& bitset)
 {
 
@@ -427,7 +427,7 @@ int BBScan::prev_bit(BBScan& bitset)
 }
 
 
-inline
+
 int BBScan::prev_bit_del() {
  
 	U32 posInBB;
@@ -449,7 +449,7 @@ int BBScan::prev_bit_del() {
 }
 
 
-inline
+
 int BBScan::prev_bit_del( BBScan& bitset) {
 
 	U32 posInBB;
@@ -478,7 +478,7 @@ int BBScan::prev_bit_del( BBScan& bitset) {
 	return BBObject::noBit;
 }
 
-inline
+
 int BBScan::init_scan(scan_types sct){
 
 	switch(sct){
@@ -504,7 +504,7 @@ int BBScan::init_scan(scan_types sct){
 	return 0;
 }
 
-inline
+
 int BBScan::init_scan (int firstBit, scan_types sct){
 
 	//special case - first bitscan

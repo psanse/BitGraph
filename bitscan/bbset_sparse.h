@@ -83,7 +83,7 @@ public:
 	* #details: currently two implementations, one optimized for THIS having less population and the other
 	*			assuming both THIS and rhs have similar population
 	**/
-    friend inline BitSetSp&  AND	(const BitSetSp& lhs, const BitSetSp& rhs,  BitSetSp& res);
+    friend  BitSetSp&		AND		(const BitSetSp& lhs, const BitSetSp& rhs,  BitSetSp& res);
 
 	/**
 	* @brief AND between lhs and rhs bitsets
@@ -114,7 +114,7 @@ public:
 	* @returns reference to the resulting bitstring res
 	* @details: The capacity of lhs and rhs must be the same.
 	**/
-friend inline BitSetSp& AND_block	(int firstBlock, int lastBlock, const BitSetSp& lhs, const BitSetSp& rhs, BitSetSp& res);
+friend  BitSetSp&	AND_block		(int firstBlock, int lastBlock, const BitSetSp& lhs, const BitSetSp& rhs, BitSetSp& res);
 	
 	/**
 	* @brief OR between lhs and rhs sparse bitsets - stores the result in sparse bitset res
@@ -122,7 +122,7 @@ friend inline BitSetSp& AND_block	(int firstBlock, int lastBlock, const BitSetSp
 	* @param res: output bitset
 	* @returns reference to res
 	**/
-friend inline BitSetSp&  OR			(const BitSetSp& lhs, const BitSetSp& rhs,  BitSetSp& res);
+friend  BitSetSp&  OR				(const BitSetSp& lhs, const BitSetSp& rhs,  BitSetSp& res);
 	
 	/**
 	* @brief Removes 1-bits in the bitstring rhs from the bitstring lhs. Stores
@@ -363,7 +363,7 @@ public:
 	* @details: SAFE but not efficient. USE ONLY for basic bitscanning.
 	* @details: O(log n) worst-case complexity, n is the number of blocks in the bitset
 	**/
-	int next_bit					(int firstBit)			const;
+inline	int next_bit				(int firstBit)			const;
 
 	/**
 	* @brief Computes the next most significant 1-bit in the bitstring BEFORE  lastBit
@@ -375,7 +375,7 @@ public:
 	* @details: SAFE but not efficient. USE ONLY for basic bitscanning.
 	* @details: O(n) worst-case complexity, n is the number of blocks in the bitset
 	**/
-	int prev_bit					(int lastBit)			const;
+inline	int prev_bit				(int lastBit)			const;
 
 protected:	
 
@@ -456,7 +456,7 @@ public:
 	/**
 	* @brief Sets THIS to the singleton bit 
 	**/
-BitSetSp&  reset_bit				(int bit);
+	inline BitSetSp&  reset_bit		(int bit);
 	
 	/**
 	* @brief Sets THIS to 1-bits in the	 range [firstBit, lastBit]
@@ -469,13 +469,13 @@ BitSetSp&  reset_bit				(int bit);
 	*			range [firstBit=0, lastBit]
 	**/
 protected:
-	BitSetSp&   reset_bit			(int lastBit, const BitSetSp& rhs);	
+	inline	BitSetSp&   reset_bit	(int lastBit, const BitSetSp& rhs);
 	
 	/**
 	* @brief Sets THIS to rhs in the closed range [firstBit, lastBit]
 	**/
 public:
-	BitSetSp&   reset_bit			(int firstBit, int lastBit, const BitSetSp& rhs);
+	inline	BitSetSp&   reset_bit	(int firstBit, int lastBit, const BitSetSp& rhs);
 		
 	/**
 	* @brief Sets bit in THIS. If bit is outside the capacity of the bitset 
@@ -532,7 +532,7 @@ protected:
 	*
 	* TODO - CHECK, possible OR operation is missing (23/02/2025)
 	**/
-BitSetSp& set_block					(int firstBlock, const BitSetSp& bitset);
+	inline BitSetSp& set_block		(int firstBlock, const BitSetSp& bitset);
 
 public:
 	/**
@@ -549,7 +549,7 @@ inline	BitSetSp& erase_bit			(int bit);
 	* @details: last_update 19/02/25
 	* @details: zero blocks are not removed
 	**/
-BitSetSp& erase_bit					(int firstBit, int lastBit);
+inline BitSetSp& erase_bit					(int firstBit, int lastBit);
 	
 	/**
 	/* @brief sets bit to 0 in the bitstring and returns t
@@ -597,7 +597,7 @@ BitSetSp& erase_bit					(const BitSetSp& bitset);
 	* @param bitset: input bitstring whose 1-bits are to be removed from *this
 	* @returns reference to the modified bitstring
 	**/
-BitSetSp& erase_block				(int firstBlock, int lastBlock, const BitSetSp& bitset);
+	inline  BitSetSp& erase_block	(int firstBlock, int lastBlock, const BitSetSp& bitset);
 
 protected:
 	/**
@@ -609,7 +609,7 @@ protected:
 	* @param bitset: input bitstring whose 1-bits are to be removed from *this
 	* @returns reference to the modified bitstring
 	**/
-BitSetSp&  erase_block				(int firstBlock, const BitSetSp& bitset );
+	inline BitSetSp&  erase_block	(int firstBlock, const BitSetSp& bitset );
 
 public:
 	/**
@@ -649,7 +649,7 @@ BitSetSp& operator ^=				(const BitSetSp& rhs) ;
 	*
 	* TODO - check semantics when the capacity of bitset is greater than the capacity of THIS (23/02/2025)
 	**/	
-BitSetSp& AND_block					(int firstBlock, const BitSetSp& rhs);
+inline BitSetSp& AND_block			(int firstBlock, const BitSetSp& rhs);
 
 	/////////////////////////
 	//TODO - (19/02/2025)
@@ -675,13 +675,13 @@ BitSetSp& AND_block					(int firstBlock, int lastBlock, const BitSetSp& bitset) 
 	/**
 	* @brief TRUE if this bitstring has no bits in common with rhs
 	**/
-	bool is_disjoint				(const BitSetSp& bb)	const;
+ inline	bool is_disjoint			(const BitSetSp& bb)	const;
 
 	/**
 	* @brief TRUE if this bitstring has no bits in common with rhs 
 	*		 in the closed range [first_block, last_block]	
 	**/
-	bool is_disjoint_block			(int first_block, int last_block, const BitSetSp& bb)   const;
+ inline	bool is_disjoint_block		(int first_block, int last_block, const BitSetSp& bb)   const;
 
 ////////////////////////
  //Other operations 
@@ -743,7 +743,7 @@ protected:
 // INLINE FUNCTIONS - necessary implementations of BitSetSP in the header
 
 
-inline
+
 bool BitSetSp::is_bit(int bit)	const{
 
 	int bb = WDIV(bit);
@@ -757,7 +757,7 @@ bool BitSetSp::is_bit(int bit)	const{
 			 (it->bb_ & bblock::MASK_BIT(bit - WMUL(bb))) 		);
 }
 
-inline
+
 bool BitSetSp::is_empty ()	const{
 
 	if (!vBB_.empty()) {
@@ -773,7 +773,7 @@ bool BitSetSp::is_empty ()	const{
 	return true;
 }
 
-inline
+
 bool BitSetSp::is_disjoint	(const BitSetSp& rhs) const{
 	
 	auto itL = vBB_.begin();	
@@ -800,7 +800,7 @@ bool BitSetSp::is_disjoint	(const BitSetSp& rhs) const{
 return true;
 }
 
-inline 
+ 
 bool BitSetSp::is_disjoint_block (int first_block, int last_block, const BitSetSp& rhs)   const{
 		
 	///////////////////////////////////////////////////////////////////////////////////
@@ -846,7 +846,7 @@ bool BitSetSp::is_disjoint_block (int first_block, int last_block, const BitSetS
 ///////////////////
 // Bit updates
 
-inline
+
 BitSetSp& 
 BitSetSp::erase_bit (int bit){
 
@@ -864,7 +864,7 @@ BitSetSp::erase_bit (int bit){
 	return *this;
 }
 
-inline
+
 BitSetSp::vPB_it  
 BitSetSp::erase_bit (int bit, BitSetSp::vPB_it from_it){
 	
@@ -882,7 +882,7 @@ BitSetSp::erase_bit (int bit, BitSetSp::vPB_it from_it){
 	return it;
 }
 
-inline
+
 BitSetSp& 
 BitSetSp::set_bit (int bit ){
 
@@ -915,7 +915,7 @@ BitSetSp::set_bit (int bit ){
 
 
 
-inline
+
 BitSetSp& 
 BitSetSp::reset_bit (int bit){
 
@@ -927,7 +927,7 @@ BitSetSp::reset_bit (int bit){
 	return *this;
 }	
 
-inline
+
 int BitSetSp::next_bit(int firstBit)  const {
 
 	//special case - first bitscan
@@ -963,7 +963,7 @@ int BitSetSp::next_bit(int firstBit)  const {
 	return BBObject::noBit;
 }
 
-inline
+
 int BitSetSp::prev_bit(int lastBit) const {
 
 	//special case - first bitscan
@@ -995,7 +995,7 @@ int BitSetSp::prev_bit(int lastBit) const {
 	return BBObject::noBit;
 }
 
-inline
+
 int BitSetSp::msbn64_intrin	(int& block)	const {
 
 	U32 posInBB;
@@ -1032,7 +1032,7 @@ int BitSetSp::msbn64_intrin	(int& block)	const {
 	return BBObject::noBit;		//should not reach here
 }
 
-inline
+
 int BitSetSp::msbn64_lup() const {
 
 	register union u {
@@ -1053,7 +1053,7 @@ int BitSetSp::msbn64_lup() const {
 	return BBObject::noBit;		//should not reach here
 }
 
-inline
+
 int BitSetSp::msbn64_intrin() const
 {
 	U32 posInBB;
@@ -1069,7 +1069,7 @@ int BitSetSp::msbn64_intrin() const
 }
 
 
-inline
+
 int BitSetSp::lsbn64_intrin (int& block) const	{
 		
 
@@ -1118,7 +1118,7 @@ int BitSetSp::lsbn64_intrin (int& block) const	{
 	return BBObject::noBit;	
 }
 
-inline
+
 int BitSetSp::lsbn64_non_intrin() const {
 
 #ifdef DE_BRUIJN
@@ -1152,7 +1152,7 @@ int BitSetSp::lsbn64_non_intrin() const {
 	return EMPTY_ELEM;
 }
 
-inline int BitSetSp::lsbn64_intrin() const
+int BitSetSp::lsbn64_intrin() const
 {
 	U32 posInBB;
 
@@ -1165,7 +1165,7 @@ inline int BitSetSp::lsbn64_intrin() const
 	return BBObject::noBit;
 }
 
-inline
+
 int BitSetSp::popcn64() const{
 
 	BITBOARD pc = 0;
@@ -1177,7 +1177,7 @@ int BitSetSp::popcn64() const{
 	return pc;
 }
 
-inline
+
 int BitSetSp::popcn64 (int firstBit) const{
 
 	auto bbL = WDIV(firstBit);
@@ -1200,7 +1200,7 @@ int BitSetSp::popcn64 (int firstBit) const{
 	return pc;
 }
 
-inline 
+
 int BitSetSp::popcn64 (int firstBit, int lastBit) const
 {
 	////////////////////////////////
@@ -1421,7 +1421,7 @@ BitSetSp&  erase_bit (const BitSetSp& lhs, const BitSetSp& rhs,  BitSetSp& res){
 	return res;
 }
 
-inline
+
 BitSetSp&  BitSetSp::AND_block(int firstBlock, const BitSetSp& rhs ){
 
 	//determine the closes block to firstBlock
@@ -1471,7 +1471,7 @@ BitSetSp&  BitSetSp::AND_block(int firstBlock, const BitSetSp& rhs ){
 	return *this;
 }
 
-inline
+
 BitSetSp&  BitSetSp::set_block(int firstBlock, const BitSetSp& rhs ){
 		
 	//determine the closes block to firstBlock
@@ -1520,7 +1520,7 @@ BitSetSp&  BitSetSp::set_block(int firstBlock, const BitSetSp& rhs ){
  }
 
 
-inline 
+
 BitSetSp& BitSetSp::erase_block(int firstBlock, int lastBlock, const BitSetSp& rhs)
 {
 	//special case until the end of the bitset
@@ -1566,7 +1566,7 @@ BitSetSp& BitSetSp::erase_block(int firstBlock, int lastBlock, const BitSetSp& r
 	return *this;
 }
 
-inline
+
 BitSetSp& BitSetSp::erase_block(int firstBlock, const BitSetSp& rhs) {
 
 
@@ -1603,7 +1603,7 @@ BitSetSp& BitSetSp::erase_block(int firstBlock, const BitSetSp& rhs) {
 	return *this;
 }
 
-inline
+
 BitSetSp& BitSetSp::erase_bit (int firstBit, int lastBit){
 
 	//////////////////////////////////////////////
@@ -1682,7 +1682,7 @@ BitSetSp& BitSetSp::erase_bit (int firstBit, int lastBit){
 	return *this;
 }
 
-inline
+
 BitSetSp& BitSetSp::reset_bit (int lastBit, const BitSetSp& rhs){
 
 	auto bbh = WDIV(lastBit);
@@ -1712,7 +1712,7 @@ BitSetSp& BitSetSp::reset_bit (int lastBit, const BitSetSp& rhs){
 	return *this;
 }
 
-inline
+
 BitSetSp&  BitSetSp::reset_bit (int firstBit,  int lastBit,  const BitSetSp& rhs){
 
 	//////////////////////////////

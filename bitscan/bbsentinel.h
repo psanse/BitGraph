@@ -108,7 +108,7 @@ return pc;
 #endif
 
 //specializes the only bitscan function used
-inline
+
 int BBSentinel::prev_bit_del(){
 //////////////
 // BitScan reverse order and distructive
@@ -128,7 +128,7 @@ int BBSentinel::prev_bit_del(){
 return EMPTY_ELEM;  
 }
 
-inline
+
 int BBSentinel::next_bit_del (){
 //////////////
 // Bitscan distructive between sentinels
@@ -148,7 +148,7 @@ int BBSentinel::next_bit_del (){
 return EMPTY_ELEM;  
 }
 
-inline
+
 int BBSentinel::next_bit_del (BBSentinel& bbN_del){
 //////////////
 // Bitscan distructive between sentinels
@@ -171,7 +171,7 @@ return EMPTY_ELEM;
 }
 
 
-inline
+
 int BBSentinel::next_bit(){
 ////////////////////////////
 // last update:31/12/2013

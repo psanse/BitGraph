@@ -292,7 +292,7 @@ public:
 	* @details: Uses a DeBruijn implementation for lsb()
 	* @details: DEPRECATED in favour of the bitscanning with state of BBIntrinsic class
 	**/
-	 int next_bit					(int bit)	const;					
+inline	 int next_bit					(int bit)	const;					
 	
 	/**
 	* @brief Computes the next most significant  1-bit in the bitstring after bit
@@ -308,7 +308,7 @@ public:
 	* @details: Uses a lookup table implementation for msb()
 	* @details: Not recommended. DEPRECATED in favour of the bitscanning with state of BBIntrinsic class
 	**/
-	 int prev_bit					(int bit)	const;					
+inline 	 int prev_bit				(int bit)	const;
 	
 /////////////////
 // Popcount
@@ -380,14 +380,14 @@ inline  BitSet&	 set_bit			(int firstBit, int lastBit);
 	* @details  Equivalent to OR operation / set union
 	* @returns reference to the modified bitstring
 	**/
-inline	BitSet& set_bit			(const BitSet& bb_add);
+inline	BitSet& set_bit				(const BitSet& bb_add);
 		
 	/**
 	* @brief Adds the bits from the bitstring bb_add in the range [0, lastBit] 
 	* @param lastBit : the last bit in the range to be copied
 	* @returns reference to the modified bitstring
 	**/
-inline BitSet& set_bit			(int lastBit, const BitSet& bb_add);
+inline BitSet& set_bit				(int lastBit, const BitSet& bb_add);
 	 
 	/**
 	* @brief Adds elements from a vector of non-negative integers lv as 1-bit
@@ -459,7 +459,7 @@ inline	BitSet& erase_bit		(const BitSet& lhs, const BitSet& rhs);
 	* @param LastBLock: the last bitblock to be modified
 	* @returns reference to the modified bitstring
 	**/
-	BitSet& set_block			(int firstBlock, int lastBlock, const BitSet& bb_add);
+inline	BitSet& set_block		(int firstBlock, int lastBlock, const BitSet& bb_add);
 	
 	/**
 	* @brief Deletes the 1-bits from the bitstring bb_del in the closed range [firstBlock, lastBlock]
@@ -472,7 +472,7 @@ inline	BitSet& erase_bit		(const BitSet& lhs, const BitSet& rhs);
 	* @param lastBlock: the last bitblock to be modified
 	* @returns reference to the modified bitstring
 	**/
-	inline	BitSet& erase_block	(int firstBlock, int lastBlock, const BitSet& bb_del);
+inline	BitSet& erase_block		(int firstBlock, int lastBlock, const BitSet& bb_del);
 
 	/**
 	* @brief Removes the 1-bits from both input bitstrings (their union)
@@ -484,7 +484,7 @@ inline	BitSet& erase_bit		(const BitSet& lhs, const BitSet& rhs);
 	* @returns reference to the modified bitstring
 	* @date: 02/02/2025 during a refactorization of BITSCAN
 	**/
-	inline	BitSet& erase_block (int firstBlock, int lastBlock, const BitSet& bb_del_lhs, const BitSet& bb_del_rhs);
+inline	BitSet& erase_block		(int firstBlock, int lastBlock, const BitSet& bb_del_lhs, const BitSet& bb_del_rhs);
 
 ////////////////////////
 // operators
@@ -493,19 +493,19 @@ inline	BitSet& erase_bit		(const BitSet& lhs, const BitSet& rhs);
 	* @brief Bitwise AND operator with bbn
 	* @details For set intersection
 	**/
-	BitSet& operator &=			(const BitSet& bbn);													
+	BitSet& operator &=				(const BitSet& bbn);													
 	
 	/**
 	* @brief Bitwise OR operator with bbn
 	* @details For set union
 	**/
-	BitSet& operator |=			(const BitSet& bbn);
+	BitSet& operator |=				(const BitSet& bbn);
 	
 	/**
 	* @brief Bitwise XOR operator with bbn
 	* @details For symmetric_difference
 	**/
-	BitSet& operator ^=			(const BitSet& bbn);
+	BitSet& operator ^=				(const BitSet& bbn);
 
 	
 	friend bool operator ==			(const BitSet& lhs, const BitSet& rhs);
@@ -536,6 +536,7 @@ inline	BitSet& erase_bit		(const BitSet& lhs, const BitSet& rhs);
 	* @date: 04/02/2025 during a refactorization of BITSCAN
 	**/
 	template<bool Erase = false>
+	inline
 	BitSet&  AND_EQUAL_block		(int firstBlock, int lastBlock, const BitSet& rhs );								
 	
 	/**
@@ -547,6 +548,7 @@ inline	BitSet& erase_bit		(const BitSet& lhs, const BitSet& rhs);
 	* @returns reference to the modified bitstring
 	**/
 	template<bool Erase = false>
+	inline
 	BitSet&  OR_EQUAL_block			(int firstBlock, int lastBlock, const BitSet& rhs );								
 		
 	/**
@@ -798,7 +800,7 @@ protected:
 // Inline function implementations - must be in header file
 
 
-inline 
+
 int BitSet::find_first_common	(const BitSet& rhs) const {
 
 	BITBOARD bb = 0;
@@ -810,7 +812,7 @@ int BitSet::find_first_common	(const BitSet& rhs) const {
 	return BBObject::noBit;
 }
 
-inline int BitSet::msbn64_lup() const{
+int BitSet::msbn64_lup() const{
 
 	register union u {
 		U16 c[4];
@@ -831,7 +833,7 @@ inline int BitSet::msbn64_lup() const{
 	return BBObject::noBit;		//should not reach here
 }
 
-inline int BitSet::msbn64_intrin() const
+int BitSet::msbn64_intrin() const
 {
 	U32 posInBB;
 
@@ -845,7 +847,7 @@ inline int BitSet::msbn64_intrin() const
 	return BBObject::noBit;
 }
 
-inline
+
 int BitSet::next_bit(int bit) const{
 
 	//bit = -1 is a special case of early exit
@@ -878,7 +880,7 @@ int BitSet::next_bit(int bit) const{
 }
 
 
-inline 
+
 int BitSet::prev_bit(int bit) const{
 
 	//special case - first bitscan,
@@ -915,14 +917,14 @@ int BitSet::prev_bit(int bit) const{
 	return BBObject::noBit;		//should not reach here
 }
 
-inline
+
 bool BitSet::is_bit (int nbit/*0 based*/) const{
 
 	return (vBB_[WDIV(nbit)] & Tables::mask[WMOD(nbit)]);
 
 }
  
-inline bool BitSet::is_empty() const
+ bool BitSet::is_empty() const
 {
 	for (auto i = 0; i < nBB_; ++i) {
 		if (vBB_[i]) {
@@ -933,7 +935,7 @@ inline bool BitSet::is_empty() const
 	return true;	
 }
 
-inline bool BitSet::is_empty_block (int firstBlock, int lastBlock) const {
+bool BitSet::is_empty_block (int firstBlock, int lastBlock) const {
 
 	int last_block = ((lastBlock == -1) ? nBB_ - 1 : lastBlock);
 
@@ -951,7 +953,7 @@ inline bool BitSet::is_empty_block (int firstBlock, int lastBlock) const {
 	return true;	
 }
 
-inline 
+
 bool BitSet::is_disjoint	(const BitSet& rhs) const
 {
 	for (auto i = 0; i < nBB_; ++i) {
@@ -962,7 +964,7 @@ bool BitSet::is_disjoint	(const BitSet& rhs) const
 	return true;
 }
 
-inline 
+
 bool BitSet::is_disjoint	(const BitSet& lhs,  const BitSet& rhs)	const
 {
 	for (auto i = 0; i < nBB_; ++i) {
@@ -973,7 +975,7 @@ bool BitSet::is_disjoint	(const BitSet& lhs,  const BitSet& rhs)	const
 	return true;
 }
 
-inline 
+
 bool BitSet::is_disjoint_block (int firstBlock, int lastBlock, const BitSet& rhs)	const{
 
 	int last_block = ((lastBlock == -1) ? nBB_ - 1 : lastBlock);
@@ -992,7 +994,7 @@ bool BitSet::is_disjoint_block (int firstBlock, int lastBlock, const BitSet& rhs
 }
 
 
-inline
+
 BitSet& BitSet::set_bit (int lastBit, const BitSet& bb_add){
 
 	int bbh = WDIV(lastBit);
@@ -1008,7 +1010,7 @@ BitSet& BitSet::set_bit (int lastBit, const BitSet& bb_add){
 	return *this;
 }
 
-inline
+
 int  BitSet::is_singleton (int firstBit, int lastBit) const{
 
 	int nbbl = WDIV(firstBit);
@@ -1046,7 +1048,7 @@ int  BitSet::is_singleton (int firstBit, int lastBit) const{
 	return 1;						//MUST BE singleton
 }
 
-inline
+
 int  BitSet::find_singleton (int firstBit, int lastBit, int& singleton) const{
 
 	int nbbl = WDIV(firstBit);
@@ -1113,14 +1115,14 @@ int  BitSet::find_singleton (int firstBit, int lastBit, int& singleton) const{
 	return 1;
 }
 
-inline 
+
 BitSet& BitSet::set_bit	(int bit ){
 		
 	vBB_[WDIV(bit)] |= Tables::mask[ WMOD(bit) ];
 	return *this;
 }	
 
-inline 
+
 BitSet&  BitSet::set_bit (int firstBit, int lastBit){
 
 	////////////////////////////////////////////////
@@ -1160,7 +1162,6 @@ BitSet&  BitSet::set_bit (int firstBit, int lastBit){
 //	return *this;
 //}
 
-inline
 BitSet&  BitSet::set_bit (const BitSet& bb_add){
 
 	/////////////////////////////////
@@ -1174,7 +1175,7 @@ BitSet&  BitSet::set_bit (const BitSet& bb_add){
 	return *this;
 }
 
-inline
+
 BitSet&  BitSet::set_block (int firstBlock, int lastBlock, const BitSet& bb_add){
 
 	int last_block = ((lastBlock == -1) ? nBB_ - 1 : lastBlock);
@@ -1191,7 +1192,7 @@ BitSet&  BitSet::set_block (int firstBlock, int lastBlock, const BitSet& bb_add)
 	return *this;
 }
 
-inline
+
 BitSet& BitSet::erase_bit (){
 
 	for (auto i = 0; i < nBB_; ++i) {
@@ -1201,14 +1202,13 @@ BitSet& BitSet::erase_bit (){
 	return *this;
 }
 
-inline
 BitSet& BitSet::erase_bit(int nBit) {
 
 	vBB_[WDIV(nBit)] &= ~Tables::mask[WMOD(nBit)]; 
 	return *this;
 }
 
-inline 
+
 BitSet&  BitSet::erase_bit (int firstBit, int lastBit){
 	
 	//general comment: low - WMUL(bbl) = WMOD(bbl) but supposed to be less expensive (CHECK 01/02/25)
@@ -1252,7 +1252,7 @@ BitSet&  BitSet::erase_bit (int firstBit, int lastBit){
 	return *this;
 }
 
-inline int BitSet::lsbn64_non_intrin() const{
+int BitSet::lsbn64_non_intrin() const{
 /////////////////
 // different implementations of lsbn depending on configuration
 
@@ -1289,7 +1289,7 @@ inline int BitSet::lsbn64_non_intrin() const{
 	return BBObject::noBit;	
 }
 
-inline int BitSet::lsbn64_intrin() const
+int BitSet::lsbn64_intrin() const
 {
 	U32 posInBB;
 
@@ -1302,7 +1302,6 @@ inline int BitSet::lsbn64_intrin() const
 	return BBObject::noBit;
 }
 
-inline
 int BitSet::is_singleton() const {
 
 	int pc = 0;
@@ -1319,7 +1318,7 @@ int BitSet::is_singleton() const {
 	return 0;		
 }
 
-inline 
+
 int BitSet::is_singleton_block(int firstBlock, int lastBlock) const
 {
 	int last_block = ((lastBlock == -1) ? nBB_ - 1 : lastBlock);
@@ -1344,7 +1343,7 @@ int BitSet::is_singleton_block(int firstBlock, int lastBlock) const
 	return 0;
 }
 
-inline
+
 int BitSet::popcn64() const{
 
 	BITBOARD pc = 0;
@@ -1356,7 +1355,7 @@ int BitSet::popcn64() const{
 	return pc;
 }
 
-inline
+
 int BitSet::popcn64(int firstBit, int lastBit) const
 {
 
@@ -1393,7 +1392,7 @@ int BitSet::popcn64(int firstBit, int lastBit) const
 
 
 
-inline
+
 int BitSet::find_common_singleton (const BitSet& rhs, int& bit) const{
 
 	int pc = 0;
@@ -1418,7 +1417,7 @@ int BitSet::find_common_singleton (const BitSet& rhs, int& bit) const{
 }
 
 
-inline	
+	
 int	BitSet::find_common_singleton_block (int firstBlock, int lastBlock, const BitSet& rhs, int& bit) const{
 
 
@@ -1449,7 +1448,7 @@ int	BitSet::find_common_singleton_block (int firstBlock, int lastBlock, const Bi
 	return pc;		
 }
 
-inline 
+
 int BitSet::find_diff_singleton(const BitSet& rhs, int& bit) const{
 	
 	int pc = 0;
@@ -1475,7 +1474,7 @@ int BitSet::find_diff_singleton(const BitSet& rhs, int& bit) const{
 	return pc;		
 }
 
-inline
+
 int BitSet::find_diff_pair(const BitSet& rhs, int& bit1, int& bit2) const {
 
 	int pc = 0;
@@ -1537,7 +1536,7 @@ bool operator==	(const BitSet& lhs, const BitSet& rhs){
 
 
 
-inline
+
 BitSet& BitSet::erase_bit (const BitSet& bbn){
 
 	for (auto i = 0; i < nBB_; ++i) {
@@ -1547,7 +1546,7 @@ BitSet& BitSet::erase_bit (const BitSet& bbn){
 	return *this;
 }
 
-inline
+
 BitSet& BitSet::erase_bit (const BitSet& bb_lhs, const BitSet& bb_rhs ){
 
 	for (auto i = 0; i < nBB_; i++) {
@@ -1557,7 +1556,7 @@ BitSet& BitSet::erase_bit (const BitSet& bb_lhs, const BitSet& bb_rhs ){
 	return *this;
 }
 
-inline
+
 BitSet& BitSet::erase_block (int FirstBlock, int LastBlock, const BitSet& bb_lhs, const BitSet& bb_rhs ){
 
 	///////////////////////////////////////////////////////////////////////////////
@@ -1574,7 +1573,7 @@ BitSet& BitSet::erase_block (int FirstBlock, int LastBlock, const BitSet& bb_lhs
 	return *this;
 }
 
-inline
+
 BitSet& BitSet::erase_block(int firstBlock, int lastBlock, const BitSet& bb_del){
 
 	int last_block = ((lastBlock == -1) ? nBB_ - 1 : lastBlock);
@@ -1697,7 +1696,6 @@ BitSet& AND_block(int firstBlock, int lastBlock, const BitSet& lhs, const BitSet
 }
 
 template<bool Erase>
-inline
 BitSet& BitSet::AND_EQUAL_block(int firstBlock, int lastBlock, const BitSet& rhs) {
 
 	auto last_block = ((lastBlock == -1) ? nBB_ - 1 : lastBlock);
@@ -1828,7 +1826,6 @@ BitSet& OR_block(int firstBlock, int lastBlock, const BitSet& lhs, const BitSet&
 }
 
 template<bool Erase>
-inline
 BitSet& BitSet::OR_EQUAL_block(int firstBlock, int lastBlock, const BitSet& rhs) {
 
 	auto last_block = ((lastBlock == -1) ? nBB_ - 1 : lastBlock);
