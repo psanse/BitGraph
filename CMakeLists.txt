@@ -6,9 +6,7 @@ project (graphlib
 )
 
 #############
-#
-# c++11 flag
-#
+# C++11 flag
 #############
 
 include(CheckCXXCompilerFlag)
@@ -22,16 +20,22 @@ else()
         message(STATUS "The compiler ${CMAKE_CXX_COMPILER} has no C++11 support. Please use a different C++ compiler.")
 endif()
 
+##################
+# specific flags  
+###################
+
 CHECK_CXX_COMPILER_FLAG("-fpermissive" COMPILER_SUPPORTS_FPERMISSIVE)
 if(COMPILER_SUPPORTS_FPERMISSIVE)
     add_compile_options("-fpermissive")
 endif()
 
+if(WIN32)
+  set(CMAKE_SHARED_LINKER_FLAGS "-Wl,--export-all-symbols")
+endif()
+
 #############
-#
 # USEFUL GLOBAL DEFINITIONS
 # (use inside the code)
-#
 #############
 
 set(PATH_GRAPH_TESTS_CMAKE_GUI ${CMAKE_SOURCE_DIR}/graph/data CACHE PATH "PATH for GRAPH unit tests")
@@ -45,7 +49,6 @@ add_definitions (-DPATH_COPT_TESTS_CMAKE_SRC_CODE=\"${PATH_COPT_TESTS_CMAKE_GUI}
 #add_definitions (-D_PATH_FOR_GRAPH_TESTS_DATA_IN_SRC_CODE=\"${CMAKE_SOURCE_DIR}/graph/data/\") 
 
 ##############
-#
 # LOGGER LEVEL (see utils/logger.h) configurable from CMake at run time
 # comments: there is no checking of the value if it is not set from the CMake GUI
 ##############
@@ -67,7 +70,6 @@ if( ${LOG_LEVEL}  STREQUAL "error")
 endif()
 
 #############
-#
 # OpenMP (Windows)
 # comments: found nothing better than to set it globally for all targets
 #############
@@ -86,6 +88,11 @@ if (APPLE)
     #add_compile_options(-arch arm64)
 endif (APPLE)
 
+
+#########################################
+# Subdirectories for the different libs
+#########################################
+
 include_directories (PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
 add_subdirectory (googletest)       #TODO - import some other way
@@ -93,14 +100,10 @@ add_subdirectory (utils)
 add_subdirectory (bitscan)
 add_subdirectory (tclap)            #TODO - possibly remove
 add_subdirectory (graph)
- 
-if(WIN32)
-  set(CMAKE_SHARED_LINKER_FLAGS "-Wl,--export-all-symbols")
-endif()
 
-#############
+#####################################
 # Set install prefix path for all libs
-#############
+######################################
 
 set(INSTALL_PATH "${CMAKE_CURRENT_SOURCE_DIR}/example_external_linking" CACHE PATH "Directory chosen to deploy project")
 set(CMAKE_INSTALL_PREFIX ${INSTALL_PATH})
@@ -108,10 +111,10 @@ set(CMAKE_INSTALL_PREFIX ${INSTALL_PATH})
  
 
 
+
 #####################################################
 # DEPRECATED CODE
 ####################################################
-
 
 ####################
 # deploy all header files (inlcuding gtest) in include directory preserving internal structure
