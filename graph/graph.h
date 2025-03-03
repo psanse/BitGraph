@@ -27,8 +27,9 @@
 #ifndef __GRAPH_INCLUDE_H__
 #define __GRAPH_INCLUDE_H__
 
-#include "simple_ugraph.h"
-
+//#include "simple_ugraph.h"
+#include "simple_sparse_graph.h"
+#include "simple_sparse_ugraph.h"
 
 typedef Graph<bitarray> graph;						//simple graph
 typedef Ugraph<bitarray> ugraph;					//simple undirected graph

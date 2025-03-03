@@ -55,7 +55,8 @@ GSS& GSS::create_subgraph(std::size_t first_k, GSS& newg) const{
 }
 
 template<>
-inline int GSS::shrink_to_fit (std::size_t size) {
+inline 
+int GSS::shrink_to_fit (std::size_t size) {
 	
 	//assertions
 	if (NV_ <= size) {

@@ -88,7 +88,7 @@ int main(int argc, char** argv){
 	//I/O
 	LOG_INFO("*******************************");
 	LOG_INFO("Generating random graph benchmark");
-	LOG_INFO("PATH: ", str_path_benchmark);
+	LOGG_INFO("PATH: ", str_path_benchmark);
 	sstr = std::stringstream();
 	sstr << info;
 	LOGG_INFO(sstr.str());	
