@@ -123,7 +123,7 @@ namespace bblock {
 	* @returns index of the least significant bit or -1 if empty
 	* @date 2008
 	**/
-	 int  lsb64_pc		(const BITBOARD bb);
+	 int  lsb64_pc			(const BITBOARD bb);
 
 	/**
 	* @brief Index of the least significant bit of bb function implemented
@@ -140,7 +140,7 @@ namespace bblock {
 	*			and is defined as default.
 	*			To change this option go to config.h file
 	**/ 
-	 int  lsb64_de_Bruijn	(const BITBOARD bb);		
+ inline	 int lsb64_de_Bruijn (const BITBOARD bb);
 	
 	/**
 	* @brief Index of the least significant bit of bb (default)
@@ -149,7 +149,7 @@ namespace bblock {
 	* @details implemented by calling processor instructions
 	* @returns index of the least significant bit or -1 if empty
 	**/
-	 int lsb64_intrinsic	(const BITBOARD bb);
+ inline int lsb64_intrinsic	(const BITBOARD bb);
 
 
 	/**
@@ -158,10 +158,9 @@ namespace bblock {
 	* @param bb: input 64-bit bitblock
 	* @returns index of the least significant bit or -1 if empty
 	**/
-	///////////////////////////////////////////////////////////////////////////////////
 	inline
-	int lsb				(const BITBOARD bb) { return 	lsb64_intrinsic(bb); }
-	///////////////////////////////////////////////////////////////////////////////////
+	int lsb					(const BITBOARD bb) { return 	lsb64_intrinsic(bb); }
+	
 
 	/**
 	* @brief Index of the most significant bit in bb implemented
@@ -191,17 +190,15 @@ namespace bblock {
 	* @param bb: input 64-bit bitblock
 	* @returns index of the most significant bit or -1 if empty
 	**/
-	/////////////////////////////////////////////////////////
-     int msb64_intrinsic	(const BITBOARD bb);
-	/////////////////////////////////////////////////////////
+	 inline  int msb64_intrinsic (const BITBOARD bb);
+	
 
 	/**
 	* @brief Index of themost significant bit of in bb
 	* @param bb: input 64-bit bitblock
 	* @returns index of the most significant bit or -1 if empty
 	**/
-	 inline
-	 int msb				(const BITBOARD bb)		{ return msb64_intrinsic(bb); }
+	 inline  int msb		(const BITBOARD bb)		{ return msb64_intrinsic(bb); }
 
 /////////////////////
 // Bit population
@@ -221,8 +218,7 @@ namespace bblock {
 	* @returns number of 1-bits in the bitblock
 	**/
 	 int popc64_lup_1		(const BITBOARD bb);	
-	
-	
+		
 	/**
 	* @brief Default population count in bb (RECOMMENDED) 
 	* @param bb: input 64-bit bitblock
@@ -234,7 +230,7 @@ namespace bblock {
 	* @return number of 1-bits in the bitblock 
 	**/
 	////////////////////////////////////////////////
-	 int popc64				(const BITBOARD bb);	
+	 inline	 int popc64		(const BITBOARD bb);
 	////////////////////////////////////////////////
 
 //////////////////////
@@ -243,8 +239,8 @@ namespace bblock {
 	* @brief Sets to 1 the bit passed and zero the rest of bits 
 	* @param bit: bit in the bitblock [0...63]
 	* @returns 64-bit bitblock mask with only one bit set
-	**/
-	inline	
+	**/	  
+	 inline
 	BITBOARD MASK_BIT		(int bit)					 { return Tables::mask[bit]; }
 
 	/**
@@ -271,21 +267,19 @@ namespace bblock {
 	 inline
 	 BITBOARD MASK_1_HIGH	(int idx)			{ return ~Tables::mask_low[idx]; }
 
-
 	/**
 	* @brief Sets to 0 the bits inside the closed range [low, high], sets to 1 the rest
 	* @param low, high: positions in the bitblock [0...63]
 	* @returns 64-bit bitblock mask
-	**/
+	**/	
 	 inline
-	 BITBOARD MASK_0		(int low, int high) {  return ~Tables::mask_mid[low][high];
-													/*return Tables::mask_low[low] | Tables::mask_high[high];*/ }
+	 BITBOARD MASK_0		(int low, int high) {  return ~Tables::mask_mid[low][high];	 }
 	
 	 /**
 	* @brief Sets to 0 all bits in the closed range [0, idx]
 	* @param idx: input reference bit position [0...63]
 	* @returns 64-bit bitblock mask
-	**/
+	**/	
 	 inline
 	 BITBOARD MASK_0_LOW	(int idx)			{ return Tables::mask_high[idx]; }
 	 
@@ -293,7 +287,7 @@ namespace bblock {
 	* @brief Sets to 0 all bits in the closed range [idx, 63]
 	* @param idx: input reference bit position [0...63]
 	* @returns 64-bit bitblock mask
-	**/
+	**/	
 	 inline
 	 BITBOARD MASK_0_HIGH	(int idx)			{ return Tables::mask_low[idx]; }
 	
@@ -303,7 +297,7 @@ namespace bblock {
 	* @param idx: position in the bitblock [0...63]
 	* @returns the trimmed bitblock
 	* @date 30/01/2015 
-	**/
+	**/	
 	 inline
 	 BITBOARD trim_low	(BITBOARD bb, int idx) { return bb &~ Tables::mask_low[idx]; }
 
@@ -313,10 +307,9 @@ namespace bblock {
 	* @param idx: position in the bitblock [0...63]
 	* @returns the trimmed bitblock
 	* @date 30/01/2015 
-	**/
+	**/	
 	 inline
 	 BITBOARD trim_high		(BITBOARD bb, int idx) { return bb &~ Tables::mask_high[idx]; }
-
 
 	 /**
 	 * @brief replaces bits in the closed range [firstBit, lastBit] of source bitblock (source)
@@ -359,7 +352,7 @@ namespace bblock {
 // inline implementations in header file 
 
 namespace bblock {
-	inline
+
 	int lsb64_intrinsic(const BITBOARD bb_dato) {
 		unsigned long index;
 		if (_BitScanForward64(&index, bb_dato))
@@ -368,7 +361,7 @@ namespace bblock {
 		return EMPTY_ELEM;
 	}
 
-	inline
+	
 	int msb64_intrinsic(const BITBOARD bb_dato) {
 		unsigned long index;
 		if (_BitScanReverse64(&index, bb_dato))
@@ -377,7 +370,7 @@ namespace bblock {
 		return EMPTY_ELEM;
 	}
 
-	inline
+	
 	int popc64(const BITBOARD bb_dato) {
 
 #ifdef POPCOUNT_INTRINSIC_64
@@ -400,7 +393,7 @@ namespace bblock {
 	inline
 	int size(const BITBOARD bb_dato) { return popc64(bb_dato); }	
 	
-	inline
+	
 	int lsb64_de_Bruijn(const BITBOARD bb_dato) {
 
 #ifdef ISOLANI_LSB
