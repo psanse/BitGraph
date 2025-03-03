@@ -5,7 +5,7 @@
 **/
 
 #include <iostream>
-#include <graph/graph.h>		//the one and only header file for the GRAPH 1.0 lib
+#include "graph/graph.h"		//the one and only header file for the GRAPH 1.0 lib
 
 int main() {
 

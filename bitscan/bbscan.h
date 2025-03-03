@@ -13,8 +13,6 @@
 #define __BBSCAN_H__
 
 #include "bbset.h"	
-#include "tables.h"	
-
 
 using namespace std;
 
