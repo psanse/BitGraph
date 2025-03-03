@@ -99,15 +99,20 @@ if(WIN32)
 endif()
 
 #############
-#
-# Deploy BITSCAN and GRAPH libraries
-# (old CMake - currently best solution found to preserve public header internal structure)
+# Set install prefix path for all libs
 #############
 
 set(INSTALL_PATH "${CMAKE_CURRENT_SOURCE_DIR}/example_external_linking" CACHE PATH "Directory chosen to deploy project")
 set(CMAKE_INSTALL_PREFIX ${INSTALL_PATH})
 
  
+
+
+#####################################################
+# DEPRECATED CODE
+####################################################
+
+
 ####################
 # deploy all header files (inlcuding gtest) in include directory preserving internal structure
 # (old CMake)
