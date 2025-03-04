@@ -11,7 +11,7 @@
 #ifndef __BBSCAN_SPARSE_H__
 #define __BBSCAN_SPARSE_H__
 
-#include "bbset_sparse.h"
+#include "bitscan/bbset_sparse.h"
 using namespace std;
 
 /////////////////////////////////

@@ -8,8 +8,8 @@
  **/
 
 //#include "bbalgorithm.h"
-#include "bbsentinel.h"			//base of the non-sparse hierarchy
-#include "bbscan_sparse.h"	
+#include "bitscan/bbsentinel.h"			//base of the non-sparse hierarchy
+#include "bitscan/bbscan_sparse.h"	
 
 //useful aliases
 

@@ -20,12 +20,11 @@
 #ifndef __SIMPLE_GRAPH_H__
 #define __SIMPLE_GRAPH_H__
 
-#include "filter_graph_encoding_type.h"			//contains #include "bitscan/bitscan.h" - TODO use SFINAE to filter types (10/01/2025)
+#include "graph/filter_graph_encoding_type.h"			//contains #include "bitscan/bitscan.h" - TODO use SFINAE to filter types (10/01/2025)
 #include "graph/formats/dimacs_format.h"
 #include "graph/formats/mmio.h"
 #include "graph/formats/edges_format.h"
 #include "graph/formats/mmx_format.h"
-#include "graph/simple_graph.h"
 #include "utils/logger.h"
 #include "utils/prec_timer.h"
 #include <fstream>

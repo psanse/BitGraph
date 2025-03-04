@@ -7,7 +7,7 @@
 * @author pss
 **/
 
-#include "stdio.h"
+#include <cstdio>
 #include <fstream>
 #include <sstream>
 #include <iostream>

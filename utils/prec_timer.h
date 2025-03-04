@@ -14,7 +14,7 @@
 #include <sys/time.h>				//TODO@ CHECK if it is necessary after the refactoring (26/01/2025)
 #endif
 
-#include "common.h"
+#include "utils/common.h"
 
 /******************
 *

@@ -11,7 +11,6 @@
 #include <iostream>
 
 #include "utils/file.h"
-#include "utils/logger.h"
 #include "utils/common.h"
 
 #ifndef	__DIMACS_READER_H__

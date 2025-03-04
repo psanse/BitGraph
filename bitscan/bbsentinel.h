@@ -15,8 +15,8 @@
 #ifndef __BB_SENTINEL_H__
 #define __BB_SENTINEL_H__
 
-#include "bbscan.h"
-#include "bbalgorithm.h"			//MIN, MAX
+#include "bitscan/bbscan.h"
+#include "bitscan/bbalgorithm.h"			//MIN, MAX
 
  using namespace std;
 
