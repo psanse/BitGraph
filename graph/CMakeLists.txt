@@ -4,8 +4,6 @@
 set(useful_headers_for_IDE
 ${CMAKE_CURRENT_SOURCE_DIR}/graph.h
 ${CMAKE_CURRENT_SOURCE_DIR}/simple_graph.h
-${CMAKE_CURRENT_SOURCE_DIR}/simple_sparse_graph.h
-${CMAKE_CURRENT_SOURCE_DIR}/simple_sparse_ugraph.h
 ${CMAKE_CURRENT_SOURCE_DIR}/simple_ugraph.h
 ${CMAKE_CURRENT_SOURCE_DIR}/simple_graph_ew.h
 ${CMAKE_CURRENT_SOURCE_DIR}/simple_graph_w.h
@@ -22,8 +20,6 @@ ${CMAKE_CURRENT_SOURCE_DIR}/algorithms/graph_fast_sort_weighted.h
 # GRAPH lib
 ###################
 add_library  (graph
-simple_graph.cpp
-simple_ugraph.cpp
 simple_graph_w.cpp
 simple_graph_ew.cpp
 formats/mmio.cpp

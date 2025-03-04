@@ -28,10 +28,10 @@
 #define __GRAPH_INCLUDE_H__
 
 
-#include "simple_sparse_graph.h"
-#include "simple_sparse_ugraph.h"
+//#include "simple_sparse_graph.h"
+//#include "simple_sparse_ugraph.h"
 
-//#include "simple_ugraph.h"
+#include "simple_ugraph.h"
 using graph = Graph<bitarray>;						//simple graph
 using ugraph = Ugraph<bitarray>;					//simple undirected graph
 using sparse_graph = Graph<sparse_bitarray>;		//simple sparse graph

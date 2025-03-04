@@ -14,9 +14,12 @@
 #define __SIMPLE_UGRAPH_H__
 
 #include "simple_graph.h"
+#include "utils/prec_timer.h"
 
 //useful alias
 using vint = std::vector<int>;
+template<class T> class Ugraph;
+using USS = Ugraph<BBScanSp>;
 
  //////////////////
  //
@@ -320,7 +323,702 @@ ostream& Ugraph<T>::print_edges(bitset_t& bbsg, std::ostream& o) const
 	return o;
 }
 
+
+
+/////////////////////////////////////
+
+
+template<class T>
+inline
+Ugraph<T>::Ugraph(string filename) : Graph<T>()
+{
+	//cannot call Graph<T>::Graph(filename) because Graph<T>::add_edge is overriden!
+
+	if (ptype::reset(filename) == -1) {
+		LOGG_ERROR("error when reading file: ", filename, "Graph<T>::Graph");
+		LOG_ERROR("exiting...");
+		exit(-1);
+	}
+
+}
+
+template <class T>
+inline
+Ugraph<T>::Ugraph(std::size_t NV, int* adj[], string name) {
+
+	if (ptype::reset(NV) == -1) {
+		LOG_ERROR("Bad graph construction - Ugraph<T>::Ugraph(std::size_t , int* adj[], string)");
+		LOG_ERROR("exiting...");
+		exit(-1);
+	}
+	ptype::name(name);
+
+	for (std::size_t i = 0; i < NV - 1; ++i) {
+		for (std::size_t j = i + 1; j < NV; ++j) {
+			if (adj[i][j] == 1) {
+				add_edge(i, j);
+			}
+		}
+	}
+}
+
+template<class T>
+inline
+BITBOARD Ugraph<T>::number_of_edges(bool lazy) {
+
+	if (!lazy || ptype::NE_ == 0) {
+		ptype::NE_ = 0;
+
+		//adds all edges and divides by 2 for efficiency - checks for self loops	
+		for (std::size_t i = 0; i < ptype::NV_; i++) {
+			ptype::NE_ += ptype::adj_[i].size();
+		}
+
+		//////////////////////////////
+		if (ptype::NE_ % 2 != 0) {
+			LOG_ERROR("odd number of edges found in simple undirected graph - Ugraph<T>::number_of_edges");
+			LOG_ERROR("exiting...");
+			exit(-1);
+		}
+		//////////////////////////////
+
+		ptype::NE_ /= 2;						//MUST be even at this point			
+	}
+
+	return ptype::NE_;
+}
+
+template<class T>
+inline
+BITBOARD Ugraph<T>::number_of_edges(const T& bbn) const {
+	BITBOARD NE = 0;
+
+	//reads only the upper triangle of the adjacency matrix
+	for (std::size_t i = 0; i < ptype::NV_ - 1; ++i) {
+		if (bbn.is_bit(i)) {
+			for (std::size_t j = i + 1; j < ptype::NV_; ++j) {
+				if (bbn.is_bit(j)) {
+					if (ptype::adj_[i].is_bit(j)) { ++NE; }
+				}
+			}
+		}
+	}
+
+	return NE;
+}
+
+template<class T>
+inline
+int Ugraph<T>::degree(int v, const BitSet& bbn) const {
+
+	int ndeg = 0;
+	for (int i = 0; i < ptype::NBB_; i++) {
+		ndeg += bblock::popc64(ptype::adj_[v].block(i) & bbn.block(i));
+	}
+
+	return ndeg;
+}
+
+template<class T>
+inline
+int Ugraph<T>::degree(int v, const BitSetSp& bbs)	const {
+	LOG_ERROR("function not yet implemented, should not be called - Ugraph<T>::degree");
+	LOG_ERROR("exiting...");
+	std::exit(-1);
+}
+
+
+template<class T>
+inline
+void Ugraph<T>::add_edge(int v, int w) {
+
+	if (v != w) {
+		ptype::adj_[v].set_bit(w);
+		ptype::adj_[w].set_bit(v);
+		ptype::NE_++;
+	}
+}
+
+template<class T>
+inline
+void Ugraph<T>::remove_edge(int v, int w) {
+	if (v != w) {
+		ptype::adj_[v].erase_bit(w);
+		ptype::adj_[w].erase_bit(v);
+		ptype::NE_--;
+	}
+}
+
+template<class T>
+inline
+void Ugraph<T>::gen_random_edges(double p) {
+
+	//removes all edges
+	remove_edges();
+
+	//sets undirected edges with probability p
+	for (std::size_t i = 0; i < this->NV_ - 1; i++) {
+		for (std::size_t j = i + 1; j < this->NV_; j++) {
+			if (::com::rand::uniform_dist(p)) {
+				add_edge(i, j);
+			}
+		}
+	}
+
+}
+
+template<class T>
+inline
+int Ugraph<T>::max_graph_degree() const {
+
+	int max_degree = 0, temp = 0;
+
+	for (int i = 0; i < ptype::NV_; ++i) {
+		temp = degree(i);
+		if (temp > max_degree)
+			max_degree = temp;
+	}
+
+	return max_degree;
+}
+
+template<class T>
+inline
+double Ugraph<T>::density(bool lazy) {
+
+	BITBOARD max_edges = ptype::NV_;
+	max_edges *= (max_edges - 1);
+	return (2 * number_of_edges(lazy) / static_cast<double> (max_edges));
+}
+
+template<class T>
+inline
+ostream& Ugraph<T>::print_degrees(std::ostream& o) const {
+	for (std::size_t i = 0; i < ptype::NV_; ++i) {
+		o << "deg(" << i << ")" << ":" << degree(i) << " ";
+	}
+	return o;
+}
+
+template<class T>
+inline
+ostream& Ugraph<T>::print_edges(std::ostream& o = cout) {
+
+	for (auto i = 0; i < ptype::NV_ - 1; ++i) {
+		for (auto j = i + 1; j < ptype::NV_; ++j) {
+
+			if (ptype::is_edge(i, j)) {
+				o << "[" << i << "]" << "--" << "[" << j << "]" << endl;
+			}
+		}
+	}
+
+	return o;
+}
+
+template<class T>
+inline
+ostream& Ugraph<T>::print_matrix(std::ostream& o) const
+{
+	for (std::size_t i = 0; i < ptype::NV_; ++i) {
+		for (std::size_t j = 0; j < ptype::NV_; ++j) {
+			if (ptype::is_edge(i, j)) {
+				o << "1";
+			}
+			else {
+				o << "0";
+			}
+		}
+		o << endl;
+	}
+	return o;
+}
+
+
+
+
+template<class T>
+inline
+void Ugraph<T>::write_dimacs(ostream& o) {
+
+	//timestamp comment 
+	o << "c File written by GRAPH:" << PrecisionTimer::local_timestamp();
+
+	//name comment
+	if (!ptype::name_.empty())
+		o << "c " << ptype::name_.c_str() << endl;
+
+	//dimacs header
+	o << "p edge " << ptype::NV_ << " " << number_of_edges(false /* recompute */) << endl << endl;
+
+	//bidirectional edges (1 based in dimacs)
+	for (std::size_t v = 0; v < ptype::NV_ - 1; ++v) {
+		for (std::size_t w = v + 1; w < ptype::NV_; ++w) {
+			if (ptype::is_edge(v, w)) {										//O(log) for sparse graphs: specialize
+				o << "e " << v + 1 << " " << w + 1 << endl;
+			}
+		}
+	}
+}
+
+template<class T>
+inline
+void  Ugraph<T>::write_EDGES(ostream& o) {
+
+	//timestamp comment
+	o << "% File written by GRAPH:" << PrecisionTimer::local_timestamp();
+
+	//name coment
+	if (!ptype::name_.empty())
+		o << "% " << ptype::name_.c_str() << endl;
+
+	//write edges - 1 based vertex notation
+	for (auto v = 0; v < ptype::NV_ - 1; ++v) {
+		for (auto w = v + 1; w < ptype::NV_; ++w) {
+			if (ptype::is_edge(v, w)) {							//O(log) for sparse graphs: specialize
+				o << v + 1 << " " << w + 1 << endl;
+			}
+		}
+	}
+}
+
+template<class T>
+inline
+void Ugraph<T>::write_mtx(ostream& o) {
+
+	//header comment
+	o << "%%MatrixMarket matrix coordinate pattern symmetric" << endl;
+
+	//timestamp comment
+	o << "% File written by GRAPH:" << PrecisionTimer::local_timestamp();
+
+	//name comment
+	if (!ptype::name_.empty())
+		o << "% " << ptype::name_.c_str() << endl;
+
+	//number of vertices and edges
+	ptype::NE_ = 0;																			//eliminates lazy evaluation of edge count 
+	o << ptype::NV_ << " " << ptype::NV_ << " " << number_of_edges() << endl;
+
+	//writes edges 1-based vertex notation
+	for (auto v = 0; v < ptype::NV_ - 1; ++v) {
+		for (auto w = v + 1; w < ptype::NV_; ++w) {
+			if (ptype::is_edge(v, w)) {														//O(log) for sparse graphs: specialize
+				o << v + 1 << " " << w + 1 << endl;
+			}
+		}
+	}
+}
+
+template<class T>
+inline
+int Ugraph<T>::degree_up(int v, const BitSet& bbn) const {
+
+	int nDeg = 0, nBB = WDIV(v);
+
+	for (auto i = nBB + 1; i < ptype::NBB_; ++i) {
+		nDeg += bblock::popc64(ptype::adj_[v].block(i) & bbn.block(i));
+	}
+
+	//truncate the bitblock of v
+	nDeg += bblock::popc64(bblock::MASK_1(WMOD(v) + 1, 63) &
+		ptype::adj_[v].block(nBB) & bbn.block(nBB)
+	);
+
+	return nDeg;
+}
+
+template<class T>
+inline
+int Ugraph<T>::degree_up(int v) const
+{
+	int nDeg = 0, nBB = WDIV(v);
+
+	for (auto i = nBB + 1; i < ptype::NBB_; ++i) {
+		nDeg += bblock::popc64(ptype::adj_[v].block(i));
+	}
+
+	//truncate the bitblock of v
+	nDeg += bblock::popc64(bblock::MASK_1(WMOD(v) + 1, 63) &
+		ptype::adj_[v].block(nBB));
+
+	return nDeg;
+}
+
+template<class T>
+inline
+int Ugraph<T>::degree(int v, int UB, const BitSet& bbn) const {
+
+	int nDeg = 0;
+	for (auto i = 0; i < ptype::NBB_; ++i) {
+
+		nDeg += bblock::popc64(ptype::adj_[v].block(i) & bbn.block(i));
+
+		if (nDeg >= UB) { return UB; }
+	}
+
+	return nDeg;
+}
+
+template<class T>
+int Ugraph<T>::degree(int v, int UB, const BitSetSp& bbn) const {
+	LOG_ERROR("function not yet implemented, should not be called - Ugraph<T>::degree");
+	LOG_ERROR("exiting...");
+	std::exit(-1);
+}
+
+
+template<class T>
+int Ugraph<T>::create_complement(Ugraph& ug) const {
+
+	//resets ug with new allocation
+	if (ug.reset(ptype::NV_) == -1) return -1;
+
+	for (auto i = 0; i < ptype::NV_ - 1; ++i) {
+		for (auto j = i + 1; j < ptype::NV_; ++j) {
+
+			if (!ptype::adj_[i].is_bit(j)) {
+				ug.add_edge(i, j);
+			}
+
+		}
+	}
+
+	return 0;
+}
+
+
+template<class T>
+int Ugraph<T>::create_subgraph(Ugraph& ug, int v) const
+{
+	vector<int> vnn;
+	ptype::get_neighbors(v).to_vector(vnn);
+
+	return create_subgraph(ug, vnn);
+}
+
+template<class T>
+int Ugraph<T>::create_subgraph(Ugraph& ug, vint& lv) const
+{
+	if (lv.empty()) {
+		LOG_ERROR("empty set found while creating an induced graph - Ugraph<T>::create_induced");
+		return -1;
+	}
+
+	const int NV = lv.size();
+	if (ug.reset(NV) == -1) {
+		LOG_ERROR("bad allocation - Ugraph<T>::create_induced");
+		return -1;
+	}
+
+	//add appropiate edges
+	for (std::size_t i = 0; i < NV - 1; i++) {
+		for (std::size_t j = i + 1; j < NV; j++) {
+
+			if (ptype::is_edge(lv[i], lv[j])) {
+				ug.add_edge(i, j);						//adds bidirected edge
+			}
+		}
+	}
+
+	return 0;
+}
+
+////////////////////////
+//
+// Specializations of class Ugraph<T> methods for sparse graphs
+// (T = sparse_bitarray)
+//
+////////////////////////
+
+template<>
+inline
+BITBOARD USS::number_of_edges(bool lazy) {
+
+	if (lazy || ptype::NE_ == 0) {
+
+		ptype::NE_ = 0;
+		for (int i = 0; i < ptype::NV_ - 1; i++) {
+
+			//popuation count from i + 1 onwards
+			ptype::NE_ += adj_[i].size(i + 1, -1);
+		}
+	}
+
+	return ptype::NE_;
+}
+
+template<>
+inline
+int USS::degree_up(int v) const
+{
+	int nDeg = 0, nBB = WDIV(v);
+
+	//find the bitblock of v
+	auto it = adj_[v].cbegin();
+	for (; it != adj_[v].cend(); ++it) {
+		if (it->idx_ == nBB) break;
+	}
+
+	//check no neighbors
+	if (it == adj_[v].cend()) {
+		return 0;							//no neighbors
+	}
+
+	//truncate the bitblock of v and count the number of neighbors
+	nDeg += bblock::popc64(bblock::MASK_1(WMOD(v) + 1, 63) & it->bb_);
+
+	//add the rest of neighbours in the bitblocks that follow
+	++it;
+	for (; it != adj_[v].cend(); ++it) {
+		nDeg += bblock::popc64(it->bb_);
+	}
+
+	return nDeg;
+}
+
+
+template<>
+inline
+int USS::degree(int v) const {
+
+	if (Graph<sparse_bitarray>::adj_[v].is_empty()) return 0;
+
+	return Graph<sparse_bitarray>::adj_[v].size();
+}
+
+template<>
+inline
+int USS::degree(int v, const BitSet& bbn) const {
+
+	int ndeg = 0;
+	for (auto it = adj_[v].cbegin(); it != adj_[v].cend(); ++it) {
+		ndeg += bblock::popc64(it->bb_ & bbn.block(it->idx_));
+	}
+
+	return ndeg;
+}
+
+template<>
+inline
+int USS::degree(int v, const BitSetSp& bbs) const {
+
+	int ndeg = 0;
+	auto itv = adj_[v].cbegin();
+	auto itbb = bbs.cbegin();
+
+	while (itv != adj_[v].cend() && itbb != bbs.cend()) {
+
+		if (itv->idx_ < itbb->idx_) {
+			++itv;
+		}
+		else if (itv->idx_ > itbb->idx_) {
+			++itbb;
+		}
+		else { //same index
+			ndeg += bblock::popc64(itv->bb_ & itbb->bb_);
+			++itv; ++itbb;
+		}
+	}
+
+	return ndeg;
+}
+
+template<>
+inline
+int USS::degree(int v, int UB, const BitSet& bbn) const {
+
+	int ndeg = 0;
+	for (auto it = adj_[v].cbegin(); it != adj_[v].cend(); ++it) {
+		ndeg += bblock::popc64(it->bb_ & bbn.block(it->idx_));
+		if (ndeg >= UB) return UB;
+	}
+
+	return ndeg;
+}
+
+template<>
+inline
+int USS::degree(int v, int UB, const BitSetSp& bbs) const {
+
+	int ndeg = 0;
+	auto itv = adj_[v].cbegin();
+	auto itbb = bbs.cbegin();
+
+	while (itv != adj_[v].cend() && itbb != bbs.cend()) {
+
+		if (itv->idx_ < itbb->idx_) {
+			++itv;
+		}
+		else if (itv->idx_ > itbb->idx_) {
+			++itbb;
+		}
+		else { //same index
+			ndeg += bblock::popc64(itv->bb_ & itbb->bb_);
+			if (ndeg >= UB) return UB;
+			++itv; ++itbb;
+		}
+	}
+
+	return ndeg;
+}
+
+//////////////////////
+// I/O specialized functions
+
+
+template<>
+inline
+void USS::write_dimacs(ostream& o) {
+
+	//timestamp 
+	o << "c File written by GRAPH:" << PrecisionTimer::local_timestamp();
+
+	//name
+	if (!this->name_.empty())
+		o << "c " << this->name_.c_str() << endl;
+
+	//tamaño del grafo
+	o << "p edge " << this->NV_ << " " << number_of_edges() << endl << endl;
+
+	//Escribir nodos
+	for (int v = 0; v < this->NV_ - 1; v++) {
+
+		//non destructive scan starting from the vertex onwards
+		auto block_v = WDIV(v);
+		pair<bool, int> p = this->adj_[v].find_block_pos(block_v);
+
+		if (p.second == BBObject::noBit) {
+			continue;
+		}
+
+		//bitscan - if block contains v, start from that position onwards
+		this->adj_[v].scan_block(p.second);
+		(p.first) ? this->adj_[v].scan_bit(v - WMUL(block_v) /*WMOD(v)*/) : this->adj_[v].scan_bit(MASK_LIM);
+
+		int w = BBObject::noBit;
+		while ((w = this->adj_[v].next_bit()) != BBObject::noBit) {
+			o << "e " << v + 1 << " " << w + 1 << endl;
+		}
+	}
+}
+
+template<>
+inline
+ostream& USS::print_edges(std::ostream& o) {
+
+	for (auto v = 0; v < this->NV_ - 1; ++v) {
+
+		//skip empty bitsets - MUST BE since currently the scanning object does not check this
+		if (adj_[v].is_empty()) { continue; }
+
+		//scan the bitstring of v
+		int w = BBObject::noBit;
+		sparse_bitarray::scan sc(adj_[v]);
+		while ((w = sc.next_bit()) != BBObject::noBit) {
+			if (v < w) {
+				o << "[" << v << "]" << "-->" << "[" << w + WMUL(sc.get_block()) << "]" << std::endl;
+			}
+		}
+	}
+
+	return o;
+}
+
+
+template<>
+inline
+void USS::write_EDGES(ostream& o) {
+	/////////////////////////
+	// writes simple unweighted grafs  in edge list format 
+	// note: loops are not allowed
+
+		//timestamp
+	o << "% File written by GRAPH:" << PrecisionTimer::local_timestamp();
+
+	//name
+	if (!this->name_.empty())
+		o << "% " << this->name_.c_str() << endl;
+
+	//writes edges
+	for (int v = 0; v < this->NV_ - 1; v++) {
+		//non destructive scan starting from the vertex onwards
+		pair<bool, int> p = this->adj_[v].find_block_pos(WDIV(v));
+		if (p.second == EMPTY_ELEM) continue;										//no more bitblocks
+		this->adj_[v].scan_block(p.second);
+		(p.first) ? this->adj_[v].scan_bit(WMOD(v)) : this->adj_[v].scan_bit(MASK_LIM);			//if bitblock contains v, start from that position onwards
+		while (1) {
+			int w = this->adj_[v].next_bit();
+			if (w == EMPTY_ELEM)
+				break;
+			o << v + 1 << " " << w + 1 << endl;
+		}
+	}
+}
+
+template<>
+inline
+void USS::write_mtx(ostream& o) {
+	/////////////////////////
+	// writes simple unweighted grafs  in edge list format 
+	// note: loops are not allowed
+
+	//header
+	o << "%%MatrixMarket matrix coordinate pattern symmetric" << endl;
+
+	//timestamp
+	o << "% File written by GRAPH:" << PrecisionTimer::local_timestamp();
+
+	//name
+	if (!this->name_.empty())
+		o << "% " << this->name_.c_str() << endl;
+
+	//size and edges
+	NE_ = 0;																	//eliminates lazy evaluation of edge count 
+	o << this->NV_ << " " << this->NV_ << " " << number_of_edges() << endl;
+
+	//writes edges
+	for (int v = 0; v < this->NV_ - 1; v++) {
+		//non destructive scan starting from the vertex onwards
+		pair<bool, int> p = this->adj_[v].find_block_pos(WDIV(v));
+		if (p.second == EMPTY_ELEM) continue;										//no more bitblocks
+		this->adj_[v].scan_block(p.second);
+		(p.first) ? this->adj_[v].scan_bit(WMOD(v)) : this->adj_[v].scan_bit(MASK_LIM);			//if bitblock contains v, start from that position onwards
+		while (1) {
+			int w = this->adj_[v].next_bit();
+			if (w == EMPTY_ELEM)
+				break;
+			o << v + 1 << " " << w + 1 << endl;
+		}
+	}
+}
+
+
 #endif
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

@@ -19,7 +19,7 @@
 #include <algorithm>
 #include <map> 
 #include "utils/logger.h"
-#include "graph/simple_sparse_ugraph.h"
+#include "graph/simple_ugraph.h"
 #include "graph/algorithms/graph_fast_sort.h"
 
  //undef NDEBUG to avoid assertions
