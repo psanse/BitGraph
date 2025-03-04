@@ -12,6 +12,8 @@
 #define __BITBLOCK_H__
 
 #include <iostream>
+#include "bbtypes.h"
+#include "bbconfig.h"
 #include "tables.h"
 
 ///////////////////////////

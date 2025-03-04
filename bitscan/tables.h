@@ -22,26 +22,6 @@
 #define __TABLES_H__
 
 #include "bbtypes.h"
-#include "bbconfig.h"
-
-
-#ifdef  CACHED_INDEX_OPERATIONS 
-	#define WDIV(i) (Tables::t_wdindex[(i)])
-	#define WMOD(i) (Tables::t_wmodindex[(i)])
-	#define WMUL(i) (Tables::t_wxindex[(i)])
-#else 
-	#define WDIV(i) ((i)/WORD_SIZE)
-	#define WMOD(i) ((i)%WORD_SIZE)
-	#define WMUL(i) ((i)*WORD_SIZE)
-	#define WMOD_MUL(i) ((i)-WMUL(WDIV(i)))						  //WMOD without modulo operation
-#endif 
-
-////////////////////
-//MACROS for mapping bit index to bitblock index (0 or 1 based)
-#define INDEX_0TO0(p)			(WDIV(p))					//p>0
-#define INDEX_0TO1(p)			(WDIV(p)+1)					//p>0
-#define INDEX_1TO1(p)			((((p)-1)/WORD_SIZE)+1)		//p>0
-#define INDEX_1TO0(p)			((((p)-1)/WORD_SIZE))		//p>0
 
 
 class Tables{

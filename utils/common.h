@@ -39,6 +39,8 @@ using vint = std::vector<int>;
 using vdob = std::vector<double>;
 
 
+
+
 namespace com {
 	
 
@@ -554,6 +556,12 @@ namespace com {
 		using rugen = RandomUniformGen< std::uniform_real_distribution<double>, std::mt19937 >;
 		////////////////////////////////////////////////////////////////
 		
+		////////////////
+		// Global declarations for RandomUniformGen class
+		template<typename D, typename RE> RE RandomUniformGen<D, RE>::re_;
+		template<typename D, typename RE> D RandomUniformGen<D, RE>::dist_;
+			
+
 		
 		inline
 		bool uniform_dist(double p) {
@@ -667,6 +675,7 @@ namespace com {
 	
 	}
 }
+
 
 
 #endif

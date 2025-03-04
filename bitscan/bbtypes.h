@@ -42,4 +42,6 @@ constexpr int WORD_SIZE = 64;
 constexpr int WORD_SIZE_MINUS_ONE = WORD_SIZE - 1;
 constexpr int MASK_LIM = WORD_SIZE + 1;				  //mask limit for bitscan operations of a single BITBOARD
 
+
+
 #endif

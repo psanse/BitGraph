@@ -10,7 +10,8 @@
 #define  __BB_OBJECT_H__
 
 #include <iostream>
-#include "tables.h"
+#include "bbtypes.h"
+#include "bbconfig.h"
 
 //////////////////
 //

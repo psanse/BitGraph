@@ -10,14 +10,9 @@
 
 using namespace std;
 
-///////////////////////////////////////
-// Global declarations for RandomUniformGen class
-
+//gloabl template variables
 namespace com {
 	namespace rand {
-
-		template<typename D, typename RE> RE RandomUniformGen<D, RE>::re_;
-		template<typename D, typename RE> D RandomUniformGen<D, RE>::dist_;
 		template<typename D, typename RE>
 		std::size_t RandomUniformGen<D, RE>::seed_ = RandomUniformGen<D, RE>::FIXED_RANDOM_SEED;
 	}
