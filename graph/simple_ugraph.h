@@ -454,7 +454,7 @@ inline
 void Ugraph<T>::gen_random_edges(double p) {
 
 	//removes all edges
-	remove_edges();
+	this->remove_edges();
 
 	//sets undirected edges with probability p
 	for (std::size_t i = 0; i < this->NV_ - 1; i++) {
@@ -502,7 +502,7 @@ ostream& Ugraph<T>::print_degrees(std::ostream& o) const {
 
 template<class T>
 inline
-ostream& Ugraph<T>::print_edges(std::ostream& o = cout) {
+ostream& Ugraph<T>::print_edges(std::ostream& o ) {
 
 	for (auto i = 0; i < ptype::NV_ - 1; ++i) {
 		for (auto j = i + 1; j < ptype::NV_; ++j) {
