@@ -28,7 +28,7 @@ extern const int DEFAULT_WEIGHT_MODULUS;								//for modulus weight generation 
 
 //aliases
 template<class W>
-using vecw = vector<W>;	
+using vecw = std::vector<W>;	
 
 using  ugraph = Ugraph<bitarray> ;
 
@@ -121,12 +121,12 @@ virtual	~Base_Graph_EW()										= default;
 	/*
 	*  @brief getter for vertex weights
 	*/
-	vecw<W> get_wv		()						const;
+	vecw<W> get_wv			()						const;
 	
-	mat_t& get_we		()									{ return we_; }	
-	const mat_t& get_we	()						const		{ return we_; }
-	Graph_t& graph		()									{ return g_; }
-	const Graph_t& graph()						const		{ return g_; }
+	mat_t& get_we			()								{ return we_; }	
+	const mat_t& get_we		()						const	{ return we_; }
+	Graph_t& graph			()								{ return g_; }
+	const Graph_t& graph	()						const	{ return g_; }
 
 	int number_of_vertices	()					const		{ return g_.number_of_vertices(); }
 	int number_of_edges		(bool lazy = true)				{ return g_.number_of_edges(lazy); }

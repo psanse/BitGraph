@@ -7,8 +7,8 @@
  * @author pss
  **/
 
-#include "bbalgorithm.h"
-#include "bbsentinel.h"			
+//#include "bbalgorithm.h"
+#include "bbsentinel.h"			//base of the non-sparse hierarchy
 #include "bbscan_sparse.h"	
 
 //useful aliases

@@ -41,7 +41,7 @@ public:
 	using _mypt = ptype;				//alias for backward compatibility
 
 	//constructors - cannot all be inherited	
-	Ugraph						() : Graph<T>() {}										//creates empty graph
+	Ugraph						() : Graph<T>() {}									//creates empty graph
 explicit Ugraph					(std::size_t n) : Graph<T>(n){}						//creates empty graph of size n=|V|	
 explicit Ugraph					(std::string filename);								//reads graph from file
 	
@@ -52,7 +52,7 @@ explicit Ugraph					(std::string filename);								//reads graph from file
 	**/
 	Ugraph						(std::size_t n, int* adj[], string name);			//old-style adjacency matrix
    	
-	//TODO copy constructor, move constructor, copy operator =, move operator = (1/1/2025)
+	//TODO- copy constructor, move constructor, copy operator =, move operator = (1/1/2025)
 
 	//destructor
 	~Ugraph						() = default;										
@@ -288,16 +288,14 @@ int Ugraph<T>::max_subgraph_degree (bitset_t& sg) const {
 	
 	int max_degree = 0, temp = 0;
 
-	int v = EMPTY_ELEM;
-	if (sg.init_scan(bbo::NON_DESTRUCTIVE) != EMPTY_ELEM) {
-		while (true) {
-			v = sg.next_bit();
-			if (v == EMPTY_ELEM) break;
-
+	int v = BBObject::noBit;
+	if (sg.init_scan(bbo::NON_DESTRUCTIVE) != BBObject::noBit) {
+		while ((v = sg.next_bit())!= BBObject::noBit) {
+			
 			//compute max_degree circumscribed to subgraph
-			temp = degree (v, sg);
-			if (temp > max_degree)
-				max_degree = temp;
+			if (max_degree < degree(v, sg)) {
+				max_degree = degree(v, sg);
+			}			
 		}
 	}
 
@@ -306,6 +304,7 @@ int Ugraph<T>::max_subgraph_degree (bitset_t& sg) const {
 
 template<class T>
 template<class bitset_t>
+inline
 ostream& Ugraph<T>::print_edges(bitset_t& bbsg, std::ostream& o) const
 {
 	for (std::size_t i = 0; i < ptype::NV_ - 1; ++i) {

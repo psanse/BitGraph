@@ -408,11 +408,13 @@ protected:
 // Necessary implementation of template methods in header file
 
 template <class BitSet_t>
-inline bool operator == (const Graph<BitSet_t>& lhs, const Graph<BitSet_t>& rhs) {	return lhs.adj_ == rhs.adj_; }
+inline 
+bool operator == (const Graph<BitSet_t>& lhs, const Graph<BitSet_t>& rhs) {	return lhs.adj_ == rhs.adj_; }
 
 template<class BitSet_t>
 template <class U>
-inline double Graph<BitSet_t>::density(const U& bbN) {
+inline 
+double Graph<BitSet_t>::density(const U& bbN) {
 	BITBOARD  edges = number_of_edges(bbN);
 	if (edges == 0) { return 0.0; }
 
@@ -422,6 +424,7 @@ inline double Graph<BitSet_t>::density(const U& bbN) {
 
 template<class BitSet_t>
 template<class U>
+inline
 std::ostream& Graph<BitSet_t>::print_edges(U& bbsg, std::ostream& o) const {
 	
 	for (int i = 0; i < NV_ - 1; i++) {

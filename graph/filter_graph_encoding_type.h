@@ -6,14 +6,15 @@
 
 #include "bitscan/bitscan.h"
 
+
 template <class T>
 struct filterGraphTypeError;		//error at compile time with invalid specializations and a nice name
 
 //valid specializations
 template <>
-struct filterGraphTypeError<bitarray>{};
+struct filterGraphTypeError<BBScan>{};
 template <>
-struct filterGraphTypeError<sparse_bitarray>{};
+struct filterGraphTypeError<BBScanSp>{};
 
 
 #endif
