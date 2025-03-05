@@ -16,24 +16,28 @@ else()
         message(STATUS "The compiler ${CMAKE_CXX_COMPILER} has no C++11 support. Please use a different C++ compiler.")
 endif()
 
+#common directories for all the targets
+#(ideally use target_link_directories for each target, but not available in CMake versions prior 3.13)
+link_directories (PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/lib)
+
 #######################
 # target graph_example
 #######################
+
 
 add_executable(graph_example graph.cpp)
 
 target_include_directories(graph_example PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 target_link_libraries (graph_example LINK_PUBLIC graph bitscan utils)
-link_directories (graph_example PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/lib)
+
 
 ####################
-# target bitset
+# target bitset_example
 ####################
+
 
 add_executable(bitset_example bitstrings.cpp)
 
 target_include_directories(bitset_example PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
-
 target_link_libraries (bitset_example LINK_PUBLIC bitscan utils)
-link_directories (bitset_example PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/lib)
