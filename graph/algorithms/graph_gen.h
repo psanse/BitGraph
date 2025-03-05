@@ -14,7 +14,6 @@
 
 #include "utils/common.h"
 #include "graph/simple_ugraph.h"
-//#include "graph/simple_sparse_ugraph.h"
 #include "graph/simple_graph_w.h"				// must be after ugraph include
 #include "graph/simple_graph_ew.h"				// must beafter ugraph include
 

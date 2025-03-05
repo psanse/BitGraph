@@ -39,7 +39,7 @@ set_target_properties(graph
 #target_include_directories (graph PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
 target_include_directories(graph PUBLIC 
-  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
   $<INSTALL_INTERFACE:include/graph>    # <prefix>/include/bitscan
 )
 

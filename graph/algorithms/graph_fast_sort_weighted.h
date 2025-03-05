@@ -9,7 +9,7 @@
 #define __GRAPH_FAST_SORT_WEIGHTED_H__
 
 #include "graph/algorithms/graph_fast_sort.h"
-#include "decode.h"
+#include "graph/algorithms/decode.h"
 #include "utils/common.h"						
 #include "utils/logger.h"
 #include <vector>
