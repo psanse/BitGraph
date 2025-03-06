@@ -113,7 +113,7 @@ std::string path						()					const	{ return path_;}
 	**/
 	virtual	BITBOARD number_of_edges	(const BitSet_t& set )	const;
 
-const vector<BitSet_t>& get_adjacency_matrix	()					const		{ return adj_; }
+const vector<BitSet_t>&	adjacency_matrix		()					const		{return adj_; }
 const BitSet_t& neighbors						(int v)				const		{return adj_[v];}
 BitSet_t& neighbors								(int v)							{return adj_[v];}
 
