@@ -163,8 +163,8 @@ int Base_Graph_EW< Graph_t, W>::set_we(mat_t& lw) {
 	}
 
 	//set to empty wv and non-edges
-	for (std::size_t v = 0; v < NV; ++v) {
-		for (std::size_t w = 0; w < NV; ++w) {
+	for (auto v = 0; v < NV; ++v) {
+		for (auto w = 0; w < NV; ++w) {
 			if (v == w || g_.is_edge(v, w)) {
 				we_[v][w] = lw[v][w];
 			}

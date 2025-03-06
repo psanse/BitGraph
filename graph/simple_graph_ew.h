@@ -85,7 +85,7 @@ virtual	~Base_Graph_EW()										= default;
 	void set_wv			(int v, W val)						{ we_[v][v] = val; }					
 	
 	/*
-	*  @brief sets all self-loop edge weights to the same weigth value
+	*  @brief sets all self-loop edge weights to the same weight value
 	*/
 	void set_wv			( W val = NOWT);
 
