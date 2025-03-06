@@ -425,10 +425,10 @@ int GraphSort<ugraph_w>::reorder(const vint& new_order, ostream* o) {
 	//reorder weights if required
 	//if (g.is_weighted_v()) {
 		//gn.init_wv();
-		gn.set_w();												//allocates and sets unit weights
+		gn.add_weight();												//allocates and sets unit weights
 		for (int i = 0; i < size; i++) {
-			//gn.set_wv(new_order[i], g.get_wv(i));
-			gn.set_w(new_order[i], g.get_w(i));
+			//gn.add_weightv(new_order[i], g.get_wv(i));
+			gn.add_weight(new_order[i], g.get_w(i));
 		}
 	//}
 
@@ -628,10 +628,10 @@ int GraphSort<ugraph_w>::reorder(const vint& new_order, Decode& d, ostream* o) {
 	//reorder weights if required
 	//if (g.is_weighted_v()) {
 		//gn.init_wv();
-		gn.set_w();											//allocates weight space and assigns unit weights
+		gn.add_weight();											//allocates weight space and assigns unit weights
 		for (int i = 0; i < size; i++) {
 			//gn.set_wv(new_order[i], g.get_wv(i));
-			gn.set_w(new_order[i], g.get_w(i));
+			gn.add_weight(new_order[i], g.get_w(i));
 		}
 	//}
 

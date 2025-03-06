@@ -18,7 +18,7 @@ set(useful_headers_for_IDE
 ###################
 #creates BITSCAN lib
 ###################
-add_library (bitscan 
+add_library (bitscan STATIC
 bbsentinel.cpp 
 bitblock.cpp 
 bbset.cpp  
@@ -70,7 +70,7 @@ foreach(ITEM ${DEPLOY_FILES_AND_DIRS})
 ###################
 # UNIT TESTS for BITSCAN lib  
 ###################
-option(bitscan_build_tests "Build bitscan tests." OFF)
+option(bitscan_build_tests "Build bitscan tests." ON)
 if (bitscan_build_tests)
 
 add_executable (test_bitscan tests/gtest_main.cc 

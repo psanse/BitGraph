@@ -10,21 +10,18 @@
 #ifndef __GRAPH_FUNC_H__
 #define __GRAPH_FUNC_H__
 
+#include "simple_ugraph.h"
+#include "simple_graph_w.h"				// must be after ugraph include
+#include "simple_graph_ew.h"				// must beafter ugraph include
 #include "utils/common.h"
 #include "utils/logger.h"
 #include <algorithm>
 #include <iostream>
-#include "graph/simple_ugraph.h"
-#include "graph/simple_graph_w.h"				// must be after ugraph include
-#include "graph/simple_graph_ew.h"				// must beafter ugraph include
-
 
 //aliases for graph types (see graph.h)
 using vint = std::vector<int>;
 using graph = Graph<bitarray>;
 using ugraph = Ugraph<bitarray>;	
-//using sparse_graph = Graph<sparse_bitarray>;
-//using sparse_ugraph = Ugraph<sparse_bitarray>;
 using ugraph_w = Graph_W<ugraph, double>;
 using ugraph_wi = Graph_W<ugraph, int>;
 using ugraph_ew = Graph_EW<ugraph, double>;
@@ -395,7 +392,7 @@ namespace gfunc{
 			typename Graph_t::_wt total_weight = 0;
 
 			// Obtiene el vector de pesos de los vértices
-			const auto& weights = g.get_weights();
+			const auto& weights = g.weights();
 
 			// Recorre todos los pesos y los suma
 			for (const auto& weight : weights) {
@@ -461,7 +458,7 @@ namespace gfunc{
 		vint& sort_w(const Graph_t& g, vint& lv, bool min_sort = true) {
 
 			//sorting criteria
-			const auto& weights = g.get_weights();
+			const auto& weights = g.weights();
 
 			//sorting lambdas
 			auto compare_smaller = [&weights](int a, int b) {
@@ -495,7 +492,7 @@ namespace gfunc{
 		int* sort_w(const Graph_t& g, int *lv, std::size_t size, bool min_sort = true) {
 			
 			//sorting criteria
-			const auto& weights = g.get_weights();
+			const auto& weights = g.weights();
 
 			//sorting lambdas
 			auto compare_smaller = [&weights](int a, int b) {
@@ -527,7 +524,7 @@ namespace gfunc{
 		vint& sort_wdProd(const Graph_t& g, vint& lv, bool min_sort = true) {
 
 			//weights as part of the sorting criteria
-			const auto& weights = g.get_weights();
+			const auto& weights = g.weights();
 
 			//sorting lambdas - degree * weight criteria
 			auto compare_smaller = [&g, &weights](int a, int b) {
@@ -561,7 +558,7 @@ namespace gfunc{
 		int* sort_wdProd(const Graph_t& g, int* lv, int size, bool min_sort = true) {
 
 			//weights as part of the sorting criteria
-			const auto& weights = g.get_weights();
+			const auto& weights = g.weights();
 
 			//sorting lambdas - degree * weight criteria
 			auto compare_smaller = [&g, &weights](int a, int b) {
@@ -594,7 +591,7 @@ namespace gfunc{
 		vint& sort_wdDif(const Graph_t& g, vint& lv, bool min_sort = true) {
 
 			//weights as part of the sorting criteria
-			const auto& weights = g.get_weights();
+			const auto& weights = g.weights();
 		
 			//sorting lambdas - weight - degree criteria
 			auto compare_smaller = [&g, &weights](int a, int b) {
@@ -605,8 +602,8 @@ namespace gfunc{
 				return (weights[a] - g.degree(a)) > (weights[b] - g.degree(b));
 			};
 
-			/*com::has_smaller_val_diff<int, typename vector<Graph_t::_wt>> my_struct_smaller_diff(g.get_weights());
-			com::has_greater_val_diff<int, typename vector<Graph_t::_wt>> my_struct_greater_diff(g.get_weights());*/
+			/*com::has_smaller_val_diff<int, typename vector<Graph_t::_wt>> my_struct_smaller_diff(g.weights());
+			com::has_greater_val_diff<int, typename vector<Graph_t::_wt>> my_struct_greater_diff(g.weights());*/
 
 			//sorting according to ldeg
 			if (min_sort) {
@@ -630,7 +627,7 @@ namespace gfunc{
 		int* sort_wdDif(const Graph_t& g, int* lv, int size, bool min_sort = true) {
 
 			//weights as part of the sorting criteria
-			const auto& weights = g.get_weights();
+			const auto& weights = g.weights();
 
 			//sorting lambdas - weight - degree criteria
 			auto compare_smaller = [&g, &weights](int a, int b) {

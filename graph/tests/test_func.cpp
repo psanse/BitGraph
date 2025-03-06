@@ -42,9 +42,9 @@ protected:
 		ugw.add_edge(1, 2);
 		ugw.add_edge(0, 2);
 
-		ugw.set_w(0, 3);
-		ugw.set_w(1, 2);
-		ugw.set_w(2, 1);
+		ugw.add_weight(0, 3);
+		ugw.add_weight(1, 2);
+		ugw.add_weight(2, 1);
 		ugw.name("ugraph_VW");
 	}
 	void TearDown() override {}

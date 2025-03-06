@@ -12,14 +12,16 @@
 #ifndef __GRAPH_FAST_SORT_H__
 #define __GRAPH_FAST_SORT_H__
 
-#include <algorithm>
-#include <iostream>
-#include <vector>
+
 #include "utils/logger.h"
 #include "utils/common.h"						
 #include "decode.h"
 #include "bitscan/bbtypes.h"					//for EMPTY_ELEM constant	
 #include "bitscan/bbobject.h"
+#include <algorithm>
+#include <iostream>
+#include <vector>
+
 //#include "filter_graph_sort_type.h"			//limits template Graph_t to undirected types
 
 using namespace std;

@@ -1,5 +1,5 @@
 cmake_minimum_required (VERSION 2.8...3.4)  		#version 2.8 for VENUS server
-project (graphlib CXX)
+project (bitscan_graph_libs CXX)
 
 #############
 # C++11 flag

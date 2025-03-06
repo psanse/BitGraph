@@ -8,8 +8,8 @@
 #ifndef __GRAPH_FAST_SORT_WEIGHTED_H__
 #define __GRAPH_FAST_SORT_WEIGHTED_H__
 
-#include "graph/algorithms/graph_fast_sort.h"
-#include "graph/algorithms/decode.h"
+#include "algorithms/graph_fast_sort.h"
+#include "algorithms/decode.h"
 #include "utils/common.h"						
 #include "utils/logger.h"
 #include <vector>
@@ -159,7 +159,7 @@ int GraphFastRootSort_W<GraphW_t>::reorder(const vint& new_order, GraphW_t& gn, 
 	/////////////////////
 	//vertex weights update
 	for (auto i = 0; i <NV; i++) {
-		gn.set_w(new_order[i], gw_.get_w(i));
+		gn.add_weight(new_order[i], gw_.get_w(i));
 	}
 
 	///////////////
@@ -181,7 +181,7 @@ const vint& GraphFastRootSort_W<GraphW_t>::sort_by_non_increasing_weight(bool lt
 	ptype::set_ordering();
 
 	/////////////////////////////////////////////////////////////////////////////
-	com::has_greater_val< int, std::vector<wtype> > pred(gw_.get_weights());
+	com::has_greater_val< int, std::vector<wtype> > pred(gw_.weights());
 	std::stable_sort(this->nodes_.begin(), this->nodes_.end(), pred);
 	/////////////////////////////////////////////////////////////////////////////
 	
@@ -198,7 +198,7 @@ inline const vint& GraphFastRootSort_W<GraphW_t>::sort_by_non_decreasing_weight(
 	ptype::set_ordering();
 
 	/////////////////////////////////////////////////////////////////////////////
-	com::has_smaller_val< int, std::vector<wtype> > pred(gw_.get_weights());
+	com::has_smaller_val< int, std::vector<wtype> > pred(gw_.weights());
 	std::stable_sort(this->nodes_.begin(), this->nodes_.end(), pred);
 	/////////////////////////////////////////////////////////////////////////////
 

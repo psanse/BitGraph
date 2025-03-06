@@ -13,7 +13,7 @@
 #ifndef __SIMPLE_UGRAPH_H__
 #define __SIMPLE_UGRAPH_H__
 
-#include "graph/simple_graph.h"
+#include "simple_graph.h"
 #include "utils/prec_timer.h"
 
 //useful alias
@@ -29,7 +29,7 @@ using USS = Ugraph<BBScanSp>;
  // 
  //////////////////
 
-template<class T = bitarray>
+template<class T = BBScan>
 class Ugraph : public Graph<T> {
 
 	friend class GraphConversion;		

@@ -44,7 +44,7 @@ int Graph_W<ugraph, W>::create_complement(Graph_W& g) const {
 
 	g.name(this->name());
 	g.path(this->path());
-	g.get_weights() = ptype::w_;
+	g.weights() = ptype::w_;
 	ptype::g_.create_complement(g.graph());
 
 	return 0;
@@ -116,7 +116,7 @@ int Base_Graph_W<Graph_t, W>::reset(std::size_t NV, W val, string name)
 }
 
 template <class Graph_t, class W>
-int	Base_Graph_W<Graph_t,W >::set_w (vector<W>& lw){
+int	Base_Graph_W<Graph_t,W >::add_weight (vector<W>& lw){
 
 	//assert
 	if( g_.number_of_vertices() != lw.size() ){

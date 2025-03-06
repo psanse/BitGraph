@@ -13,10 +13,11 @@
 #ifndef __SIMPLE_GRAPH_WEIGHTED_H__
 #define __SIMPLE_GRAPH_WEIGHTED_H__
 
+#include "utils/common.h"
+#include "simple_ugraph.h"
 #include <iostream>
 #include <vector>
-#include "utils/common.h"
-#include "graph/simple_ugraph.h"
+
 
 
 ////////////////////////////////////////////////////////////////
@@ -88,22 +89,22 @@ explicit Base_Graph_W					(int n, W val = DEFWT)				  { reset(n, val); }							/
 /////////////
 // setters and getters
 	
-	void set_w							(int v, W val)				{ w_.at(v)=val;}				
-	void set_w							(W val = DEFWT)				{ w_.assign(g_.number_of_vertices(), val);}		
+	void add_weight							(int v, W val)				{ w_.at(v)=val;}				
+	void add_weight							(W val = DEFWT)				{ w_.assign(g_.number_of_vertices(), val);}		
 	
 	/*
 	* @brief sets vertex weights to all vertices
 	* @param lw vector of weights of size |V|
 	* @returns 0 if success, -1 if error
 	*/
-	int	 set_w							(std::vector<W>& lw);
+	int	 add_weight						(std::vector<W>& lw);
 	
 	Graph_t& graph						()							{ return g_;}
 const Graph_t& graph					()			const			{ return g_; }
 
 	W get_w								(int v)		const			{ return w_[v];}	
-const vector<W>& get_weights			()			const			{ return w_;}	
-	vector<W>& get_weights				()							{ return w_;}	
+const vector<W>& weights				()			const			{ return w_;}	
+	vector<W>& weights					()							{ return w_;}	
 	
 	/*
 	* @brief Determines weight and vertex of maximum weight

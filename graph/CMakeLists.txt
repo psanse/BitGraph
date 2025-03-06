@@ -19,7 +19,7 @@ ${CMAKE_CURRENT_SOURCE_DIR}/algorithms/graph_fast_sort_weighted.h
 ###################
 # GRAPH lib
 ###################
-add_library  (graph
+add_library  (graph STATIC
 simple_graph_w.cpp
 simple_graph_ew.cpp
 formats/mmio.cpp
@@ -66,7 +66,7 @@ install(TARGETS graph
 ###################
 # UNIT TESTS for GRAPH lib
 ###################
-option(graph_build_tests "Build graph tests." OFF)
+option(graph_build_tests "Build graph tests." ON)
 if (graph_build_tests)
 
 # Add executable called "helloDemo" that is built from the source files
@@ -107,7 +107,7 @@ endif()
 ###################
 # GRAPH lib - Example targets
 ###################
-option(graph_build_examples "Build graph examples." OFF)
+option(graph_build_examples "Build graph examples." ON)
 if (graph_build_examples)
 
 add_executable ( gen_random_benchmark ./examples/gen_random_bench.cpp)

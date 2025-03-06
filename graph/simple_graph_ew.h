@@ -16,10 +16,11 @@
 #ifndef __SIMPLE_GRAPH_EDGE_WEIGHTED_H__
 #define __SIMPLE_GRAPH_EDGE_WEIGHTED_H__
 
+#include "utils/common.h"
+#include "simple_ugraph.h"
 #include <iostream>
 #include <vector>
-#include "utils/common.h"
-#include "graph/simple_ugraph.h"
+
 
  /////////////////////////////////////////////
 extern const int DEFAULT_WEIGHT_MODULUS;								//for modulus weight generation  [Pullman 2008]					

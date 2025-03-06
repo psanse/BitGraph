@@ -1,14 +1,8 @@
-/* 
- * simple_graph.h file for the class Graph for simple graphs  
- * 
- * @creation_date 17/6/10 
- * @last_update 31/12/24
  /**
    * @file simple_graph.h
    * @brief class Graph for simple graphs 
    *
-   * @created 17/6/10
-   * @last_update 06/01/25
+   * @details: created 17/6/10, last_update 06/01/25
    * @author pss
    *
    * This code is part of the GRAPH 1.0 C++ library
@@ -20,11 +14,12 @@
 #ifndef __SIMPLE_GRAPH_H__
 #define __SIMPLE_GRAPH_H__
 
-#include "graph/filter_graph_encoding_type.h"			//contains #include "bitscan/bitscan.h" - TODO use SFINAE to filter types (10/01/2025)
-#include "graph/formats/dimacs_format.h"
-#include "graph/formats/mmio.h"
-#include "graph/formats/edges_format.h"
-#include "graph/formats/mmx_format.h"
+#include "bitscan/bitscan.h"					//dependency to BITSCAN lib				
+#include "filter_graph_encoding_type.h"			//TODO use SFINAE to filter types (10/01/2025)
+#include "formats/dimacs_format.h"
+#include "formats/mmio.h"
+#include "formats/edges_format.h"
+#include "formats/mmx_format.h"
 #include "utils/logger.h"
 #include "utils/prec_timer.h"
 #include <fstream>
@@ -40,7 +35,6 @@
 template<class BitSet_t>
 class Graph;	
 using GSS = Graph<BBScanSp>;
-
 
 
 //////////////////

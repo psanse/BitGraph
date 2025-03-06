@@ -28,9 +28,9 @@ protected:
 		gw.reset(NV, 0.0);
 		gw.graph().add_edge(0, 1);
 		gw.graph().add_edge(0, 2);
-		gw.set_w(0, 1);
-		gw.set_w(1, 2);
-		gw.set_w(2, 3);
+		gw.add_weight(0, 1);
+		gw.add_weight(1, 2);
+		gw.add_weight(2, 3);
 		gw.name("toy_weighted");
 	}
 	void TearDown() override {}

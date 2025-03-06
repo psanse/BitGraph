@@ -10,12 +10,13 @@
 #ifndef __GRAPH_MAPPINGS_H__
 #define	__GRAPH_MAPPINGS_H__
 
+#include "utils/logger.h"
+#include "utils/common.h"
+#include "algorithms/decode.h"
 #include <iostream>
 #include <vector>
 #include <string>
-#include "utils/logger.h"
-#include "utils/common.h"
-#include "graph/algorithms/decode.h"
+
 
 using namespace std;
 

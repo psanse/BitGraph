@@ -10,7 +10,7 @@ set(useful_headers_for_IDE
 )
 
 #creates utils library
-add_library (utils
+add_library (utils STATIC
     benchmark.cpp 
     result.cpp
     test_analyser.cpp
@@ -63,7 +63,7 @@ install(TARGETS utils
 #############
 # UNIT TESTS for UTILS lib
 #############
-option(utils_build_tests "Build utils tests." OFF)
+option(utils_build_tests "Build utils tests." ON)
 #set(utils_build_tests ON)
 if (utils_build_tests)
 

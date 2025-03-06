@@ -20,16 +20,11 @@
  * This software is provided "AS IS" with no warranty of any 
  * kind, express or implied, and with no claim as to its
  * suitability for any purpose.
- *
- *
  **/
 
 #ifndef __GRAPH_INCLUDE_H__
 #define __GRAPH_INCLUDE_H__
 
-
-//#include "simple_sparse_graph.h"
-//#include "simple_sparse_ugraph.h"
 
 #include "simple_ugraph.h"
 using graph = Graph<bitarray>;						//simple graph

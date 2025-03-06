@@ -18,8 +18,8 @@ int main() {
 	
 	cout << "****************************" << endl;
 
-	//massive graph with 50 million vertices
-	sparse_ugraph sg(50000000);
+	//massive graph with 10 million vertices
+	sparse_ugraph sg(10000000);
 	sg.add_edge(0, 1);
 	sg.add_edge(0, 2);
 	sg.print_data();
@@ -33,6 +33,11 @@ int main() {
 	sgCOPY.print_edges();
 
 	cout << "****************************" << endl;
+
+	//weighted graph with 10 vertices
+	ugraph_wi gw(10);	
+	gw.add_edge(0, 1);
+
 
 	return 0;
 }

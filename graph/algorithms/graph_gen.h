@@ -13,9 +13,9 @@
 #include <random>								
 
 #include "utils/common.h"
-#include "graph/simple_ugraph.h"
-#include "graph/simple_graph_w.h"				// must be after ugraph include
-#include "graph/simple_graph_ew.h"				// must beafter ugraph include
+#include "simple_ugraph.h"
+#include "simple_graph_w.h"				// must be after ugraph include
+#include "simple_graph_ew.h"				// must beafter ugraph include
 
 //aliases for graph types (see graph.h)
 using graph = Graph<bitarray>;						//simple graph
@@ -370,12 +370,12 @@ int WeightGen<Graph_t>::create_weights (Graph_t& g, type_t type, int wmod, std::
 	switch (type) {
 	case WDEG:
 		for (std::size_t v = 0; v < NV; ++v) {
-			g.set_w(v, g.graph().degree(v));
+			g.add_weight(v, g.graph().degree(v));
 		}
 		break;
 	case WMOD:
 		for (std::size_t v = 0; v < NV; ++v) {
-			g.set_w(v, (1 + ((v + 1) % wmod)));
+			g.add_weight(v, (1 + ((v + 1) % wmod)));
 		}
 		break;
 	default:
