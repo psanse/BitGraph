@@ -113,8 +113,8 @@ const vector<W>& weights				()			const			{ return w_;}
 	*/
 	W maximum_weight					(int& v)	const;	
 	
-const _bbt& get_neighbors				(int v)		const			{ return g_.get_neighbors(v); }
- 	_bbt& get_neighbors					(int v)						{ return g_.get_neighbors(v); }
+const _bbt& neighbors					(int v)		const			{ return g_.neighbors(v); }
+ 	_bbt& neighbors						(int v)						{ return g_.neighbors(v); }
 	
 	void name							(std::string str)			{ g_.name(str); }
 std::string name						()			const			{ return g_.name(); }

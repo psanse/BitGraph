@@ -58,22 +58,22 @@ protected:
 TEST_F(GFuncTest, is_triangleFree_subgraph) {
 		
 	vint triangle;	
-	EXPECT_TRUE(gfunc::is_triangleFree_subgraph(ug, ug.get_neighbors(0), triangle));			
+	EXPECT_TRUE(gfunc::is_triangleFree_subgraph(ug, ug.neighbors(0), triangle));			
 
 	//adds a triangle
 	ug.add_edge(1, 2);
 	ug.add_edge(2, 3);
-	EXPECT_FALSE(gfunc::is_triangleFree_subgraph(ug, ug.get_neighbors(0), triangle));
+	EXPECT_FALSE(gfunc::is_triangleFree_subgraph(ug, ug.neighbors(0), triangle));
 }
 
 TEST_F(GFuncTest, is_edgeFree_subgraph) {
 		
 	vint edge;
-	EXPECT_FALSE(gfunc::is_edgeFree_subgraph(ug, ug.get_neighbors(0), edge) );				//{1, 3} is in G[{1, 2, 3}]					
+	EXPECT_FALSE(gfunc::is_edgeFree_subgraph(ug, ug.neighbors(0), edge) );				//{1, 3} is in G[{1, 2, 3}]					
 	
 	//removes the only edge 
 	ug.remove_edge(1, 3);
-	EXPECT_TRUE(gfunc::is_edgeFree_subgraph(ug, ug.get_neighbors(0), edge));
+	EXPECT_TRUE(gfunc::is_edgeFree_subgraph(ug, ug.neighbors(0), edge));
 
 }
 

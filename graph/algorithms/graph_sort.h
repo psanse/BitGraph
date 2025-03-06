@@ -280,9 +280,9 @@ int GraphSort<Graph_t>::sum_of_neighbor_deg(int v){
 //Sum of degrees of neighbors to v in the current graph considered
 
 	int ndeg=0,vadj=EMPTY_ELEM;
-	if(g.get_neighbors(v).init_scan(BBObject::NON_DESTRUCTIVE)!=EMPTY_ELEM){
+	if(g.neighbors(v).init_scan(BBObject::NON_DESTRUCTIVE)!=EMPTY_ELEM){
 		while(true){
-			vadj=((g.get_neighbors(v)).next_bit());
+			vadj=((g.neighbors(v)).next_bit());
 			if(vadj==EMPTY_ELEM) break;
 			ndeg+=g.degree(vadj);
 		}
@@ -297,7 +297,7 @@ int GraphSort<Graph_t>::sum_of_neighbor_deg(int v, const _bbt& sg){
 
 	int ndeg=0,vadj=EMPTY_ELEM;
 	_bbt nset(g.number_of_vertices());
-	AND(sg, g.get_neighbors(v), nset);
+	AND(sg, g.neighbors(v), nset);
 	if(nset.init_scan(BBObject::NON_DESTRUCTIVE)!=EMPTY_ELEM){
 		while(true){
 			vadj=nset.next_bit();
@@ -482,7 +482,7 @@ int GraphSort<Graph_t>::reorder_edge_based(const vint& new_order, ostream* o){
 	
 
 	for(int v=0; v<NV-1; v++){
-		_bbt& nn=g.get_neighbors(v);
+		_bbt& nn=g.neighbors(v);
 		nn.init_scan(v, bbo::NON_DESTRUCTIVE);
 		while(true){
 			int w=nn.next_bit();
@@ -682,7 +682,7 @@ int GraphSort<Graph_t>::reorder_edge_based (const vint& new_order, Decode& d,  o
 	
 
 	for(int v=0; v<NV-1; v++){
-		_bbt& nn=g.get_neighbors(v);
+		_bbt& nn=g.neighbors(v);
 		nn.init_scan(v, bbo::NON_DESTRUCTIVE);
 		while(true){
 			int w=nn.next_bit();
@@ -800,7 +800,7 @@ int GraphSort<Graph_t>::reorder_edge_based (const vint& new_order, Graph_t& gn, 
 
 	//edge based
 	for(int v=0; v<NV-1; v++){
-		_bbt& nn=g.get_neighbors(v);
+		_bbt& nn=g.neighbors(v);
 		nn.init_scan(v, bbo::NON_DESTRUCTIVE);
 		while(true){
 			int w=nn.next_bit();
@@ -856,7 +856,7 @@ int GraphSort<sparse_ugraph>::reorder(const vint& new_order, ostream* o){
 	//only for undirected graphs
 	int j=EMPTY_ELEM;
 	for(int i=0; i<size-1; i++){
-		sparse_bitarray neigh=g.get_neighbors(i);
+		sparse_bitarray neigh=g.neighbors(i);
 		if(neigh.init_scan(i, bbo::NON_DESTRUCTIVE)!=EMPTY_ELEM){
 			while(true){
 				j=neigh.next_bit();
@@ -898,7 +898,7 @@ int GraphSort<sparse_ugraph>::reorder(const vint& new_order, Decode& d, ostream*
 	//only for undirected graphs
 	int j=EMPTY_ELEM;
 	for(int i=0; i<size-1; i++){
-		sparse_bitarray neigh=g.get_neighbors(i);
+		sparse_bitarray neigh=g.neighbors(i);
 		if(neigh.init_scan(i, bbo::NON_DESTRUCTIVE)!=EMPTY_ELEM){
 			while(true){
 				j=neigh.next_bit();
@@ -996,15 +996,15 @@ int GraphSort<sparse_ugraph>::reorder_in_place(const vint& new_order, ostream* o
 	//Deletes lower triangle of adjacency matrix
 	LOG_DEBUG("deleting low triangle--------------------");
     for(int i=0; i<N; i++){
-        g.get_neighbors(i).clear_bit(0,i);
-		g.get_neighbors(i).shrink_to_fit();
+        g.neighbors(i).clear_bit(0,i);
+		g.neighbors(i).shrink_to_fit();
 	}
 		
 	LOG_DEBUG("new order upper to lower triangle--------------");		
 	sparse_bitarray neigh;
     int j=EMPTY_ELEM;
     for(int i=0; i<N; i++){
-        neigh=g.get_neighbors(i);
+        neigh=g.neighbors(i);
 		//reorders using upper triangle information
         if(neigh.init_scan(i, bbo::NON_DESTRUCTIVE)!=EMPTY_ELEM){
 		    while(true){
@@ -1014,27 +1014,27 @@ int GraphSort<sparse_ugraph>::reorder_in_place(const vint& new_order, ostream* o
 			
 				//writes new edge in lower triangle
                 if(new_order[i]>new_order[j]){
-					g.get_neighbors(new_order[i]).set_bit(new_order[j]);
+					g.neighbors(new_order[i]).set_bit(new_order[j]);
 				} else{
-                    g.get_neighbors(new_order[j]).set_bit(new_order[i]);
+                    g.neighbors(new_order[j]).set_bit(new_order[i]);
 				}
             }
         }
 		//Deletes each neighborhood once read
-		g.get_neighbors(i).clear_bit(i, N-1);
-		g.get_neighbors(i).shrink_to_fit();
+		g.neighbors(i).clear_bit(i, N-1);
+		g.neighbors(i).shrink_to_fit();
     }
 
     //Makes the graph bidirected: copies information from lower to upper triangle of the adjacency matrix
 	LOG_DEBUG("making graph bidirected--------------------");	
     for(int i=0; i<N; i++){
-        neigh=g.get_neighbors(i);
+        neigh=g.neighbors(i);
         if(neigh.init_scan(bbo::NON_DESTRUCTIVE)!=EMPTY_ELEM){ 
             while(true){
                 j=neigh.next_bit();
                 if((j==EMPTY_ELEM) || (j>i))
                         break;
-				g.get_neighbors(j).set_bit(i);
+				g.neighbors(j).set_bit(i);
 	        }
         }
     }
@@ -1066,15 +1066,15 @@ int GraphSort<sparse_ugraph>::reorder_in_place(const vint& new_order, Decode& d,
 	//Deletes lower triangle of adjacency matrix
 	LOG_DEBUG("deleting low triangle--------------------");
     for(int i=0; i<N; i++){
-        g.get_neighbors(i).clear_bit(0,i);
-		g.get_neighbors(i).shrink_to_fit();
+        g.neighbors(i).clear_bit(0,i);
+		g.neighbors(i).shrink_to_fit();
 	}
 		
 	LOG_DEBUG("new order upper to lower triangle--------------");		
 	sparse_bitarray neigh;
     int j=EMPTY_ELEM;
     for(int i=0; i<N; i++){
-        neigh=g.get_neighbors(i);
+        neigh=g.neighbors(i);
 		//reorders using upper triangle information
         if(neigh.init_scan(i, bbo::NON_DESTRUCTIVE)!=EMPTY_ELEM){
 		    while(true){
@@ -1084,27 +1084,27 @@ int GraphSort<sparse_ugraph>::reorder_in_place(const vint& new_order, Decode& d,
 			
 				//writes new edge in lower triangle
                 if(new_order[i]>new_order[j]){
-					g.get_neighbors(new_order[i]).set_bit(new_order[j]);
+					g.neighbors(new_order[i]).set_bit(new_order[j]);
 				} else{
-                    g.get_neighbors(new_order[j]).set_bit(new_order[i]);
+                    g.neighbors(new_order[j]).set_bit(new_order[i]);
 				}
             }
         }
 		//Deletes each neighborhood once read
-		g.get_neighbors(i).clear_bit(i, N-1);
-		g.get_neighbors(i).shrink_to_fit();
+		g.neighbors(i).clear_bit(i, N-1);
+		g.neighbors(i).shrink_to_fit();
     }
 
     //Makes the graph bidirected: copies in54.-51kl,.5formation from lower to upper triangle
 	LOG_DEBUG("making graph bidirected--------------------");	
     for(int i=0; i<N; i++){
-        neigh=g.get_neighbors(i);
+        neigh=g.neighbors(i);
         if(neigh.init_scan(bbo::NON_DESTRUCTIVE)!=EMPTY_ELEM){ 
             while(true){
                 j=neigh.next_bit();
                 if((j==EMPTY_ELEM) || (j>i))
                         break;
-				g.get_neighbors(j).set_bit(i);
+				g.neighbors(j).set_bit(i);
 	        }
         }
     }
@@ -1157,7 +1157,7 @@ vint GraphSort<Graph_t>::new_order_fast (gbbs::sort_t alg, gbbs::place_t place){
 		//	bbn.erase_bit(v);
 				
 			//recompute degrees-A
-			//AND(g.get_neighbors(v),bbn, neigh);
+			//AND(g.neighbors(v),bbn, neigh);
 			//neigh.init_scan(bbo::DESTRUCTIVE);
 			//while(true){
 			//	int w=neigh.next_bit_del();
@@ -1170,9 +1170,9 @@ vint GraphSort<Graph_t>::new_order_fast (gbbs::sort_t alg, gbbs::place_t place){
 			//}
 			
 			//recompute degrees-B
-		/*	AND(g.get_neighbors(v),bbn, neigh);
+		/*	AND(g.neighbors(v),bbn, neigh);
 			neigh.init_scan(bbo::DESTRUCTIVE);*/
-			_bbt& vneigh=g.get_neighbors(v);
+			_bbt& vneigh=g.neighbors(v);
 			vneigh.init_scan(bbo::NON_DESTRUCTIVE);
 			while(true){
 				int w=vneigh.next_bit();
@@ -1243,7 +1243,7 @@ vint GraphSort<Graph_t>::new_order_fast_II (gbbs::sort_t alg){
 			//	com::stl::print_collection(position_in_deg); cout<<endl;
 
 			//sparse update of degrees selectively
-			_bbt& vneigh=g.get_neighbors(v);
+			_bbt& vneigh=g.neighbors(v);
 			bool first_time=false;
 			if(degs[v].deg>counter || first_time ){
 			//	LOG_INFO("updating by degrees");
@@ -1309,7 +1309,7 @@ vint GraphSort<Graph_t>::new_order_furini (gbbs::sort_t alg, gbbs::place_t place
 		degree[0] = NV+1;
 		new_order[order[0]]= ((place==gbbs::PLACE_FL)? pos++ : pos--);
 
-		bitarray& bbnn = g.get_neighbors(order[0]);
+		bitarray& bbnn = g.neighbors(order[0]);
 		bbnn.init_scan(bbo::NON_DESTRUCTIVE);
 		while (true){
 			int v = bbnn.next_bit();
@@ -1972,7 +1972,7 @@ int GraphSort<Graph_t>::get_v (_bbt& sgfrom, const _bbt& sgref, gbbs::pick_t pic
 		while(true){
 			int v=sgfrom.next_bit();
 			if(v==EMPTY_ELEM) break;
-			AND(g.get_neighbors(v), sgref, neigh);
+			AND(g.neighbors(v), sgref, neigh);
 			int deg=neigh.popcn64();
 			if(deg<opt_val){
 				opt_val=deg;
@@ -1986,7 +1986,7 @@ int GraphSort<Graph_t>::get_v (_bbt& sgfrom, const _bbt& sgref, gbbs::pick_t pic
 		while(true){
 			int v=sgfrom.previous_bit();
 			if(v==EMPTY_ELEM) break;
-			AND(g.get_neighbors(v), sgref, neigh);
+			AND(g.neighbors(v), sgref, neigh);
 			int deg=neigh.popcn64();
 			if(deg<opt_val){
 				opt_val=deg;
@@ -2000,7 +2000,7 @@ int GraphSort<Graph_t>::get_v (_bbt& sgfrom, const _bbt& sgref, gbbs::pick_t pic
 		while(true){
 			int v=sgfrom.next_bit();
 			if(v==EMPTY_ELEM) break;
-			AND(g.get_neighbors(v),sgref, neigh);
+			AND(g.neighbors(v),sgref, neigh);
 			int deg=neigh.popcn64();
 			if(deg>opt_val){
 				opt_val=deg;
@@ -2014,7 +2014,7 @@ int GraphSort<Graph_t>::get_v (_bbt& sgfrom, const _bbt& sgref, gbbs::pick_t pic
 		while(true){
 			int v=sgfrom.previous_bit();
 			if(v==EMPTY_ELEM) break;
-			AND(g.get_neighbors(v),sgref, neigh);
+			AND(g.neighbors(v),sgref, neigh);
 			int deg=neigh.popcn64();
 			if(deg>opt_val){
 				opt_val=deg;

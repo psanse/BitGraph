@@ -290,7 +290,7 @@ TEST(Ugraph_sparse, degree_brock){
 	bbset.set_bit(0, g.number_of_vertices()-1);
 	
 	///////////////////////////////////////////////////////////
-	EXPECT_EQ (g.get_neighbors(1).size(),g.degree(1, bbset));
+	EXPECT_EQ (g.neighbors(1).size(),g.degree(1, bbset));
 	///////////////////////////////////////////////////////////
 }
 
@@ -391,7 +391,7 @@ TEST(Ugraph_sparse, DISABLED_adjacency_matrix){
 
 				//deletes higher triangle
 				for(int i=0; i<N; i++){
-					ug.get_neighbors(i).erase_bit(i, N-1);
+					ug.neighbors(i).erase_bit(i, N-1);
 				}
 
 				//expected number of edges is 0 because it is only reading upper triangle
@@ -400,7 +400,7 @@ TEST(Ugraph_sparse, DISABLED_adjacency_matrix){
 				//deletes lower triangle
 				BITBOARD E=ug2.number_of_edges(false);
 				for(int i=0; i<N; i++){
-					ug2.get_neighbors(i).erase_bit(0, i);
+					ug2.neighbors(i).erase_bit(0, i);
 				}
 
 				//expected number of edges is the same as before (only reading upper triangle)

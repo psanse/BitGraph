@@ -133,7 +133,7 @@ namespace gfunc{
 		for(decltype(MAXNBB) nBB = 0; nBB < MAXNBB; ++nBB){
 
 			//block NBB of the intersection of N(v) and bbref
-			BITBOARD bb = g.get_neighbors(v).block(nBB) & bbref.block(nBB);		
+			BITBOARD bb = g.neighbors(v).block(nBB) & bbref.block(nBB);		
 			
 			//decodes vertices from the bitblock and appends to vertex list
 			int offset = WMUL(nBB);
@@ -175,7 +175,7 @@ namespace gfunc{
 		int nBBv = WDIV(v);				
 
 		//first block of the intersection of N(v) and bbref from v		
-		BITBOARD bb = g.get_neighbors(v).block(nBBv) & bbref.block(nBBv);
+		BITBOARD bb = g.neighbors(v).block(nBBv) & bbref.block(nBBv);
 
 		//trims preceding vertices
 		bb &= Tables::mask_high[WMOD(v)];							
@@ -197,7 +197,7 @@ namespace gfunc{
 		for (decltype(MAXNBB) nBB = nBBv + 1; nBB < MAXNBB; ++nBB) {
 
 			//block NBB of the intersection of N(v) and bbref
-			BITBOARD bb = g.get_neighbors(v).block(nBB) & bbref.block(nBB);
+			BITBOARD bb = g.neighbors(v).block(nBB) & bbref.block(nBB);
 
 			//decodes vertices from the bitblock and appends to vertex list
 			int offset = WMUL(nBB);
@@ -434,7 +434,7 @@ namespace gfunc{
 		typename Graph_t::_wt wsum(Graph_t& g, int v) {
 			
 			auto total_weight = g.get_w(v);
-			const auto& bbn = g.get_neighbors(v);
+			const auto& bbn = g.neighbors(v);
 
 			//bitscanning configuration
 			if (bbn.init_scan(bbo::NON_DESTRUCTIVE) != -1) {

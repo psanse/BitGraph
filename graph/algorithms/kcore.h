@@ -403,7 +403,7 @@ inline int KCore<Graph_t>::find_kcore(bool is_subg){
 		for(auto& v : ver_){		
 
 			//iterates over N(v)
-			_bbt& neigh = g_.get_neighbors(v); 
+			_bbt& neigh = g_.neighbors(v); 
 			if (neigh.init_scan(bbo::NON_DESTRUCTIVE) != -1) {			//CHECK MUST BE - for sparse_bitarrays
 								
 				while ((u = neigh.next_bit()) != BBObject::noBit) {
@@ -427,7 +427,7 @@ inline int KCore<Graph_t>::find_kcore(bool is_subg){
 		for (auto v : ver_) {
 
 			//computes neightbors of v in the subgraph
-			AND(g_.get_neighbors(v), subg_, neigh);
+			AND(g_.neighbors(v), subg_, neigh);
 			
 			//iterates over the neighbors of v in the subgraph
 			if(neigh.init_scan(bbo::NON_DESTRUCTIVE) != -1){			//CHECK MUST BE - for sparse_bitarrays
@@ -511,8 +511,8 @@ inline int KCore<Graph_t>::find_kcore_UB (int UB_out){
 			p_newUB = -1;
 
 			//loop over neighbors of v with degree greater than UB
-			if(g_.get_neighbors(v).init_scan(bbo::NON_DESTRUCTIVE) != -1){
-				while((u = g_.get_neighbors(v).next_bit()) != BBObject::noBit){
+			if(g_.neighbors(v).init_scan(bbo::NON_DESTRUCTIVE) != -1){
+				while((u = g_.neighbors(v).next_bit()) != BBObject::noBit){
 									
 					if(deg_[u] > UB){
 
@@ -542,9 +542,9 @@ inline int KCore<Graph_t>::find_kcore_UB (int UB_out){
 					v=ver_[p_newUB];
 
 					//loop over neighbors of v with degree greater than UB
-					if(g_.get_neighbors(v).init_scan(bbo::NON_DESTRUCTIVE) != -1){
+					if(g_.neighbors(v).init_scan(bbo::NON_DESTRUCTIVE) != -1){
 
-						while((u = g_.get_neighbors(v).next_bit()) != BBObject::noBit){
+						while((u = g_.neighbors(v).next_bit()) != BBObject::noBit){
 							if(deg_[u]>UB){
 								
 								/////////////////
@@ -807,7 +807,7 @@ inline int KCore<Graph_t>::minimum_width (bool rev){
 		for(auto it = ver_.rbegin(); it != ver_.rend(); ++it){
 
 			//computes subgraph population (TODO: optimize)
-			bb_unsel = g_.get_neighbors(*it);
+			bb_unsel = g_.neighbors(*it);
 			bb_unsel.erase_bit(bb_sel);
 			
 			///////////////////////////////
@@ -823,7 +823,7 @@ inline int KCore<Graph_t>::minimum_width (bool rev){
 		for(auto it = ver_.begin(); it != ver_.end(); ++it){
 
 			//computes subgraph population (TODO: optimize)
-			bb_unsel = g_.get_neighbors(*it);
+			bb_unsel = g_.neighbors(*it);
 			bb_unsel.erase_bit(bb_sel);
 			
 			///////////////////////////////
@@ -967,7 +967,7 @@ inline vint KCore<Graph_t>::find_heur_clique(int num_iter){
 		//determines neighbor set in degeneracy order
 		neighbors.clear();
 		for(int j = i - 1; j >= 0; --j){
-			if(deg_[ver_[j]] >= max_size && g_.get_neighbors(v).is_bit(ver_[j])){
+			if(deg_[ver_[j]] >= max_size && g_.neighbors(v).is_bit(ver_[j])){
 				neighbors.push_back(ver_[j]);									//vertices are placed in neighbor in degeneracy order (I)
 			}
 		}
@@ -977,7 +977,7 @@ inline vint KCore<Graph_t>::find_heur_clique(int num_iter){
 		for(int n = 0; n < neighbors.size(); ++n){	//vertices selected in degeneracy order (I)							
 			bool good_vertex = true;
 			for(auto l = 0; l < curr_clique.size(); ++l){
-				if( !g_.get_neighbors(curr_clique[l]).is_bit(neighbors[n]) ){
+				if( !g_.neighbors(curr_clique[l]).is_bit(neighbors[n]) ){
 					good_vertex = false;
 					break;
 				}
@@ -1038,7 +1038,7 @@ inline vint KCore<sparse_ugraph>::find_heur_clique_opt(int num_iter){
 
 		//determines neighbor set
 		curr_clique.clear();
-		bbneigh=g_.get_neighbors(ver_[i]);
+		bbneigh=g_.neighbors(ver_[i]);
 		
 		//iterates over all vertices to pick them in degeneracy ordering
 		for(auto j = i - 1; j >= 0; --j){
@@ -1047,7 +1047,7 @@ inline vint KCore<sparse_ugraph>::find_heur_clique_opt(int num_iter){
 			
 			if(bbneigh.is_bit(ver_[j])){				//adjacent
 				curr_clique.push_back(ver_[j]);								
-				bbneigh &= g_.get_neighbors(ver_[j]);
+				bbneigh &= g_.neighbors(ver_[j]);
 			}
 		}
 
@@ -1129,7 +1129,7 @@ inline vint KCore<sparse_ugraph>::find_heur_clique_sparse(int num_iter){
 
 		//determines neighbor set
 		curr_clique.clear();
-		bbneigh = g_.get_neighbors(ver_[i]);
+		bbneigh = g_.neighbors(ver_[i]);
 		bbneigh.to_vector(candidates);
 
 		//sort degeneracy
@@ -1144,7 +1144,7 @@ inline vint KCore<sparse_ugraph>::find_heur_clique_sparse(int num_iter){
 			if(bbneigh.is_bit(candidates[n])){				//adjacent
 				
 				curr_clique.push_back(candidates[n]);	
-				bbneigh&=g_.get_neighbors(candidates[n]);
+				bbneigh&=g_.neighbors(candidates[n]);
 			}
 		}
 

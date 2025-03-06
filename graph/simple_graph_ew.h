@@ -133,8 +133,8 @@ virtual	~Base_Graph_EW()										= default;
 	int number_of_edges		(bool lazy = true)				{ return g_.number_of_edges(lazy); }
 
 
-	const _bbt& get_neighbors	(int v)			const		{ return g_.get_neighbors(v); }
-	_bbt& get_neighbors			(int v)						{ return g_.get_neighbors(v); }
+	const _bbt& neighbors		(int v)			const		{ return g_.neighbors(v); }
+	_bbt& neighbors				(int v)						{ return g_.neighbors(v); }
 
 	void name					(std::string str)			{ g_.name(str); }
   string name					()				const		{ return g_.name(); }

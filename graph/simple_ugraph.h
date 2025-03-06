@@ -692,7 +692,7 @@ template<class T>
 int Ugraph<T>::create_subgraph(Ugraph& ug, int v) const
 {
 	vector<int> vnn;
-	ptype::get_neighbors(v).to_vector(vnn);
+	ptype::neighbors(v).to_vector(vnn);
 
 	return create_subgraph(ug, vnn);
 }

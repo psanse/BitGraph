@@ -263,7 +263,7 @@ public:
 // data members	
 protected:
 
-	Graph_t& g_;											//ideally CONST but some operations like get_neighbors are non-const (TODO!)
+	Graph_t& g_;											//ideally CONST but some operations like neighbors are non-const (TODO!)
 	std::size_t NV_;										//number of vertices cached - g_.number_of_vertices()  
 
 	vint nb_neigh_;											//stores the degree of the vertices		
@@ -376,7 +376,7 @@ const vint& GraphFastRootSort<Graph_t>::sort_degen_non_decreasing_deg(bool rev){
 		///////////////////////////////////
 
 		//update degree info of the remaining active vertices
-		bb_type& bbn = g_.get_neighbors(v);
+		bb_type& bbn = g_.neighbors(v);
 	
 		if (bbn.init_scan(BBObject::NON_DESTRUCTIVE) != -1) {			
 			int w = BBObject::noBit;
@@ -426,7 +426,7 @@ const vint& GraphFastRootSort<Graph_t>::sort_degen_non_increasing_deg(bool rev){
 		//////////////////////////////////
 
 		//updates neighborhood info in remaining vertices
-		bb_type& bbn = g_.get_neighbors(v);
+		bb_type& bbn = g_.neighbors(v);
 		if (bbn.init_scan(BBObject::NON_DESTRUCTIVE) != -1) {
 			int w = BBObject::noBit;
 			while ((w = bbn.next_bit()) != BBObject::noBit) {
@@ -514,7 +514,7 @@ const vint& GraphFastRootSort<Graph_t>::sort_degen_composite_non_decreasing_deg(
 		node_active_state_.erase_bit(v);
 
 		//updates neighborhood info in remaining vertices
-		bb_type& bbn = g_.get_neighbors(v);
+		bb_type& bbn = g_.neighbors(v);
 		if (bbn.init_scan(BBObject::NON_DESTRUCTIVE) != -1) {
 			int w = BBObject::noBit;
 			while ( (w = bbn.next_bit()) != BBObject::noBit ) {
@@ -556,7 +556,7 @@ const vint& GraphFastRootSort<Graph_t>::sort_degen_composite_non_increasing_deg(
 		node_active_state_.erase_bit(v);
 
 		//updates neighborhood info in remaining vertices
-		bb_type& bbn = g_.get_neighbors(v);
+		bb_type& bbn = g_.neighbors(v);
 		if (bbn.init_scan(BBObject::NON_DESTRUCTIVE) != -1) {
 			int w = BBObject::noBit;
 			while ((w = bbn.next_bit()) != BBObject::noBit) {
@@ -746,7 +746,7 @@ inline
 const vint& GraphFastRootSort<Graph_t>::compute_deg_root(){
 
 	for(auto elem = 0; elem < NV_;  ++elem){		
-		nb_neigh_[elem] = g_.get_neighbors(elem).size();
+		nb_neigh_[elem] = g_.neighbors(elem).size();
 	}
 
 	return nb_neigh_;
@@ -758,7 +758,7 @@ const vint& GraphFastRootSort<Graph_t>::compute_support_root()
 {
 	for(auto elem = 0; elem < NV_; ++elem){
 		deg_neigh_[elem] = 0;
-		bb_type& bbn = g_.get_neighbors(elem);
+		bb_type& bbn = g_.neighbors(elem);
 		if (bbn.init_scan(BBObject::NON_DESTRUCTIVE) != -1) {
 			int w = BBObject::noBit;
 			while ((w = bbn.next_bit()) != EMPTY_ELEM) {
@@ -803,7 +803,7 @@ inline int GraphFastRootSort<Graph_t>::compute_deg(const Graph_t & g, vint & deg
 	auto NV = g.number_of_vertices();	
 	deg.assign(NV, -1);
 	for (auto v = 0; v < NV; v++) {
-		deg[v] = g.get_neighbors(v).size();
+		deg[v] = g.neighbors(v).size();
 	}
 	return 0;
 }
