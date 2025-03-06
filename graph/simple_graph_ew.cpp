@@ -152,7 +152,7 @@ void Base_Graph_EW< Graph_t, W>::add_edge_weight(W val) {
 	//set to empty weight the non-edges
 	for (int v = 0; v < NV; v++) {
 		for (int w = 0; w < NV; w++) {
-			if (v == w || g_.is_edge(v, w)) {
+			if (g_.is_edge(v, w)) {
 				we_[v][w] = val;
 			}
 			else {
@@ -200,7 +200,7 @@ template<class Graph_t, class W>
 
 
 template<class Graph_t, class W>
-vecw<W> Base_Graph_EW<Graph_t, W>::vertex_weights()  const {
+const vecw<W>& Base_Graph_EW<Graph_t, W>::vertex_weights()  const {
 
 	auto NV = number_of_vertices();
 

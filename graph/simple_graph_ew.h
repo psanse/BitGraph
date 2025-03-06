@@ -114,6 +114,7 @@ virtual	~Base_Graph_EW()										= default;
 	
 	/*
 	*  @brief sets all edge-weights to val
+	*  @details:  non-edge weights are set to NOWT
 	*  @details: vertex weights are not modified
 	*/
 	virtual	void add_edge_weight	(W val = NOWT);																	//sets all weights to val 
@@ -125,7 +126,7 @@ virtual	~Base_Graph_EW()										= default;
 	/*
 	*  @brief getter for vertex weights
 	*/
-	vecw<W> vertex_weights		()						const;
+const vecw<W>& vertex_weights	()						const;
 	
 	mat_t& edge_weights			()								{ return we_; }	
 	const mat_t& edge_weights	()						const	{ return we_; }
