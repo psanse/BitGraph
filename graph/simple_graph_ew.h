@@ -1,6 +1,8 @@
 /**
   * @file simple_graph_ew.h
-  * @brief classes Base_Graph_EW and Graph_EW for edge-weighted graphs 
+  * @brief classes Base_Graph_EW and Graph_EW for edge-weighted graphs, 
+  *			where self_loops are considered as vertex weights. Thus IT IS
+  *			NOT for both vertex and edge-weighted GRAPHS
   *
   * @created 16/01/19
   * @milestoneA 10/11/2021 - train application
@@ -82,38 +84,36 @@ virtual	~Base_Graph_EW()										= default;
 	/*
 	*  @brief sets self-loop edge weight (considered as vertex-weight)
 	*/
-	void set_wv			(int v, W val)						{ we_[v][v] = val; }					
+	void add_vertex_weight			(int v, W val)						{ we_[v][v] = val; }					
 	
 	/*
 	*  @brief sets all self-loop edge weights to the same weight value
 	*/
-	void set_wv			( W val = NOWT);
+	void add_vertex_weight			( W val = NOWT);
 
 	/*
 	*  @brief sets edge weight given a directed edge (v, w)
 	*  @param v input vertex
 	*  @param w input vertex
 	*  @param we input weight value
-	*
-	*	(weights in self-loops can be added - considered vertex weights)
-	*
-	*  @returns 0 if success or -1 if called for a non-edge
+	
+	*  @details: asserts it REALLY is an edge.
 	*/
-	virtual	int set_we	(int v, int w,  W val);															 					
+	virtual	void add_edge_weight	(int v, int w,  W val);
 	
 	/*
-	*  @brief sets edge weight given an edge
+	*  @brief sets edge weights in @lw  if there is a corresponding edge
 	*
-	*	(weights in self-loops are included)
+	*	(weights in self-loops (vertices) are always set)
 	*
-	*  @returns 0 if success or -1 if a weight is added to a non-edge
+	*  @details: causses an assertion error if @lw.size() != |V|
 	*/
-	virtual	int	set_we	(mat_t& lw);
+	virtual	void add_edge_weight	(mat_t& lw);
 	
 	/*
 	*  @brief sets all weights to val
 	*/
-	virtual	void set_we	(W val = NOWT);																	//sets all weights to val 
+	virtual	void add_edge_weight	(W val = NOWT);																	//sets all weights to val 
 
 	
 	W get_we			(int v, int w)			const		{ return we_[v][w]; }
@@ -319,27 +319,29 @@ public:
 	*
 	*	(weights in self-loops are always added - considered vertex weights)
 	*
-	*  @returns 0 if success or -1 if called for a non-edge
+	*  @details: asserts it is a real edge 
 	*/
-	int set_we	(int v, int w, W we)	override;
+	void add_edge_weight(int v, int w, W we)	override;
 
-	/*
+	/**
 	*  @brief sets edge-weight val to all vertices (_we[v, v]) and edge weights
 	* 
 	*		I. NOWT is set as weight value to non-edges
+	*		II. Weights in self-loops (vertices) are NOT modified
 	* 
 	* @param val weight value
-	*/
-	void set_we	(W val = 0.0)			override;
+	**/
+	void add_edge_weight(W val = 0.0)			override;
 	
 	/*
 	*  @brief sets edge-weights in lw consistently to the graph
 	*
 	*		I. NOWT is set as weight value to non-edges in lw
+	*		II. Weights in self-loops (vertices) are NOT modified
 	*
-	* @param lw input vertex and edge weights
+	*  @details: causses an assertion error if @lw.size() != |V|
 	*/
-	int set_we	(mat_t& lw)				override;
+	void add_edge_weight(mat_t& lw)				override;
 
 /////////////
 // weight operations

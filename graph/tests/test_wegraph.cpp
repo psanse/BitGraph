@@ -29,9 +29,9 @@ protected:
 		ugew.graph().add_edge(0, 1);
 		ugew.graph().add_edge(0, 2);
 		ugew.graph().add_edge(1, 3);
-		ugew.set_we(0, 1, 1);
-		ugew.set_we(0, 2, 2);
-		ugew.set_we(1, 3, 3);
+		ugew.add_edge_weight(0, 1, 1);
+		ugew.add_edge_weight(0, 2, 2);
+		ugew.add_edge_weight(1, 3, 3);
 		ugew.name("toy_weighted");
 	}
 	void TearDown() override {}
@@ -80,9 +80,9 @@ TEST_F(UGraphEWTest, add_edge) {
 
 }
 
-TEST_F(UGraphEWTest, set_weight) {
+TEST_F(UGraphEWTest, add_edge_weights) {
 
-	ugew.set_we(1, 3, 7);
+	ugew.add_edge_weight(1, 3, 7);
 
 	EXPECT_EQ(7, ugew.get_we(1, 3) );
 
@@ -340,14 +340,14 @@ TEST(UGraphEW, DISABLED_write_to_file) {
 //	g.add_edge(4,5);	
 //		
 //	g.init_we();			
-//	g.set_we(0, 1, 7);		
-//	g.set_we(0, 3, 1);
-//	g.set_we(1, 2, 2);
-//	g.set_we(1, 3, 9);
-//	g.set_we(2, 4, 6);
-//	g.set_we(3, 4, 4);		
-//	g.set_we(3, 5, 2);
-//	g.set_we(4, 5, 5);
+//	g.add_edge_weight(0, 1, 7);		
+//	g.add_edge_weight(0, 3, 1);
+//	g.add_edge_weight(1, 2, 2);
+//	g.add_edge_weight(1, 3, 9);
+//	g.add_edge_weight(2, 4, 6);
+//	g.add_edge_weight(3, 4, 4);		
+//	g.add_edge_weight(3, 5, 2);
+//	g.add_edge_weight(4, 5, 5);
 //
 //	//I/O: edge-weights
 //	stringstream sstrw;
@@ -412,9 +412,9 @@ TEST(UGraphEW, DISABLED_write_to_file) {
 //	g.add_edge(3,4);
 //	
 //	g.init_we();
-//	g.set_we(0, 1, 3);		
-//	g.set_we(0, 2, 8);
-//	g.set_we(1, 2, 7);
+//	g.add_edge_weight(0, 1, 3);		
+//	g.add_edge_weight(0, 2, 8);
+//	g.add_edge_weight(1, 2, 7);
 //	
 //	//I/O: edge-weights
 //	stringstream sstrw;
@@ -477,11 +477,11 @@ TEST(UGraphEW, DISABLED_write_to_file) {
 //	g.add_edge(1,2);
 //
 //	g.init_we();
-//	g.set_we(0, 1, 3.0);		//weights are truncated to int (ugraph has W=INT)
-//	g.set_we(1, 2, 4);
-//	g.set_we(1, 2, 8);
-//	g.set_we(1, 3, 75);			//no weight added: no edge
-//	g.set_we(2, 2, 75);			//no loops, weight is set to 0.0
+//	g.add_edge_weight(0, 1, 3.0);		//weights are truncated to int (ugraph has W=INT)
+//	g.add_edge_weight(1, 2, 4);
+//	g.add_edge_weight(1, 2, 8);
+//	g.add_edge_weight(1, 3, 75);			//no weight added: no edge
+//	g.add_edge_weight(2, 2, 75);			//no loops, weight is set to 0.0
 //
 //
 //	g.print_edge_weights(cout);	
