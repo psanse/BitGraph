@@ -35,9 +35,11 @@ int main() {
 	cout << "****************************" << endl;
 
 	//weighted graph with 10 vertices
-	ugraph_wi gw(10);	
+	ugraph_w gw(10);	
 	gw.add_edge(0, 1);
-
+	gw.add_edge(0, 2);
+	gw.print_data();
+	gw.print_edges();
 
 	return 0;
 }
