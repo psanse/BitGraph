@@ -87,6 +87,7 @@ std::string name						()					const	{ return name_; }
 std::string path						()					const	{ return path_;}
 
 	std::size_t number_of_vertices		()					const	{return NV_; }
+	std::size_t size					()					const	{ return NV_; }
 
 	/**
 	* @brief number of bitblocks in each bitset (row) of the adjacency matriz

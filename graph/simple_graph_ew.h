@@ -133,7 +133,9 @@ const vecw<W>& vertex_weights	()						const;
 	Graph_t& graph				()								{ return g_; }
 	const Graph_t& graph		()						const	{ return g_; }
 
-	int number_of_vertices		()					const		{ return g_.number_of_vertices(); }
+	int number_of_vertices		()						const	{ return g_.number_of_vertices(); }
+	int size					()						const	{ return g_.number_of_vertices(); }
+
 	int number_of_edges			(bool lazy = true)				{ return g_.number_of_edges(lazy); }
 
 
