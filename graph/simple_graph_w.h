@@ -102,7 +102,7 @@ explicit Base_Graph_W					(int n, W val = DEFWT)				  { reset(n, val); }							/
 	Graph_t& graph						()							{ return g_;}
 const Graph_t& graph					()			const			{ return g_; }
 
-	W get_w								(int v)		const			{ return w_[v];}	
+	W weight							(int v)		const			{ return w_[v];}	
 const vector<W>& weights				()			const			{ return w_;}	
 	vector<W>& weights					()							{ return w_;}	
 	

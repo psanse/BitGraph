@@ -361,7 +361,7 @@ namespace gfunc{
 			//bitscan to sum weights
 			int v;
 			while ( (v = bbref.next_bit() ) != EMPTY_ELEM) {
-				total_weight += g.get_w(v);
+				total_weight += g.weight(v);
 			}
 					
 			return total_weight;
@@ -377,7 +377,7 @@ namespace gfunc{
 
 			//iterate and add
 			for (int v : lv) {
-				total_weight += g.get_w(v);
+				total_weight += g.weight(v);
 			}
 
 			return total_weight;
@@ -410,7 +410,7 @@ namespace gfunc{
 		template<typename Graph_t>
 		typename Graph_t::_wt wsum(const Graph_t& g, int v, typename Graph_t::_bbt& bbref) {
 		
-			auto total_weight = g.get_w(v);
+			auto total_weight = g.weight(v);
 
 			//bitscanning configuration
 			bbref.init_scan(bbo::NON_DESTRUCTIVE);
@@ -419,7 +419,7 @@ namespace gfunc{
 			int w;
 			while ((w = bbref.next_bit()) != EMPTY_ELEM) {
 				if (g.is_edge(v, w)) {
-					total_weight += g.get_w(w);
+					total_weight += g.weight(w);
 				}
 			}
 					
@@ -433,14 +433,14 @@ namespace gfunc{
 		template<typename Graph_t>
 		typename Graph_t::_wt wsum(Graph_t& g, int v) {
 			
-			auto total_weight = g.get_w(v);
+			auto total_weight = g.weight(v);
 			const auto& bbn = g.neighbors(v);
 
 			//bitscanning configuration
 			if (bbn.init_scan(bbo::NON_DESTRUCTIVE) != -1) {
 				int u = BBObject::noBit;
 				while ((u = bbn.next_bit()) != BBObject::noBit) {
-					total_weight += g.get_w(u);
+					total_weight += g.weight(u);
 				}
 			}
 

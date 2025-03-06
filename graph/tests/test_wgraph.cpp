@@ -46,9 +46,9 @@ TEST_F(UGraphWTest, contruction) {
 	EXPECT_EQ	(2,  gw.number_of_edges());
 
 	//vertex weights
-	EXPECT_EQ	(1, gw.get_w(0));
-	EXPECT_EQ	(2, gw.get_w(1));
-	EXPECT_EQ	(3, gw.get_w(2));
+	EXPECT_EQ	(1, gw.weight(0));
+	EXPECT_EQ	(2, gw.weight(1));
+	EXPECT_EQ	(3, gw.weight(2));
 
 	//edges
 	EXPECT_TRUE	(gw.is_edge(0, 1));
@@ -67,9 +67,9 @@ TEST_F(UGraphWTest, copy_constructor) {
 	EXPECT_EQ	(2, gw_copy.number_of_edges());
 
 	//vertex weights
-	EXPECT_EQ	(1, gw_copy.get_w(0));
-	EXPECT_EQ	(2, gw_copy.get_w(1));
-	EXPECT_EQ	(3, gw_copy.get_w(2));
+	EXPECT_EQ	(1, gw_copy.weight(0));
+	EXPECT_EQ	(2, gw_copy.weight(1));
+	EXPECT_EQ	(3, gw_copy.weight(2));
 
 	//edges
 	EXPECT_TRUE	(gw_copy.is_edge(0, 1));
@@ -91,9 +91,9 @@ TEST_F(UGraphWTest, assignment) {
 	EXPECT_EQ(2, gw1.number_of_edges());
 
 	//vertex weights
-	EXPECT_EQ(1, gw1.get_w(0));
-	EXPECT_EQ(2, gw1.get_w(1));
-	EXPECT_EQ(3, gw1.get_w(2));
+	EXPECT_EQ(1, gw1.weight(0));
+	EXPECT_EQ(2, gw1.weight(1));
+	EXPECT_EQ(3, gw1.weight(2));
 
 	//edges
 	EXPECT_TRUE(gw1.is_edge(0, 1));
@@ -111,9 +111,9 @@ TEST_F(UGraphWTest, init) {
 	gw.reset(3);
 
 	///////////////////////////////
-	EXPECT_EQ	(1, gw.get_w(0));
-	EXPECT_EQ	(1, gw.get_w(1));
-	EXPECT_EQ	(1, gw.get_w(2));
+	EXPECT_EQ	(1, gw.weight(0));
+	EXPECT_EQ	(1, gw.weight(1));
+	EXPECT_EQ	(1, gw.weight(2));
 	EXPECT_TRUE	(gw.name().empty());
 	/////////////////////////////////
 }
@@ -124,9 +124,9 @@ TEST_F(UGraphWTest, reset) {
 	gw.reset(3, 1, "toy");
 
 	///////////////////////////////
-	EXPECT_EQ	(1, gw.get_w(0));
-	EXPECT_EQ	(1, gw.get_w(1));
-	EXPECT_EQ	(1, gw.get_w(2));
+	EXPECT_EQ	(1, gw.weight(0));
+	EXPECT_EQ	(1, gw.weight(1));
+	EXPECT_EQ	(1, gw.weight(2));
 	EXPECT_STREQ("toy", gw.name().c_str());
 	/////////////////////////////////
 }
@@ -139,9 +139,9 @@ TEST(UGraphW, constructor_from_file) {
 	const int NV = ugw.graph().number_of_vertices();
 
 	EXPECT_EQ(7, NV);
-	EXPECT_EQ(1, ugw.get_w(0));
-	EXPECT_EQ(1, ugw.get_w(1));
-	EXPECT_EQ(1, ugw.get_w(6));
+	EXPECT_EQ(1, ugw.weight(0));
+	EXPECT_EQ(1, ugw.weight(1));
+	EXPECT_EQ(1, ugw.weight(6));
 
 }
 
@@ -153,17 +153,17 @@ TEST(UGraphW, gen_weights_dimacs){
 	const int NV = ugw.graph().number_of_vertices();
 
 	EXPECT_EQ(200, NV);
-	EXPECT_EQ(ugraph_wi::DEFWT, ugw.get_w(0));
-	EXPECT_EQ(ugraph_wi::DEFWT, ugw.get_w(1));
-	EXPECT_EQ(ugraph_wi::DEFWT, ugw.get_w(199));
+	EXPECT_EQ(ugraph_wi::DEFWT, ugw.weight(0));
+	EXPECT_EQ(ugraph_wi::DEFWT, ugw.weight(1));
+	EXPECT_EQ(ugraph_wi::DEFWT, ugw.weight(199));
 
 	//generate modulus weights 
 	WeightGen< ugraph_wi >::create_weights(ugw, WeightGen<ugraph_wi>::WMOD, 200);
 		
-	EXPECT_EQ(2, ugw.get_w(0));
-	EXPECT_EQ(3, ugw.get_w(1));
-	EXPECT_EQ(200, ugw.get_w(198));
-	EXPECT_EQ(1, ugw.get_w(199));			//unit weight - check!
+	EXPECT_EQ(2, ugw.weight(0));
+	EXPECT_EQ(3, ugw.weight(1));
+	EXPECT_EQ(200, ugw.weight(198));
+	EXPECT_EQ(1, ugw.weight(199));			//unit weight - check!
 }
 
 TEST(UGraphW, gen_random) {

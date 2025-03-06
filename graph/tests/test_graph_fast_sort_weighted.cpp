@@ -62,12 +62,12 @@ TEST_F(GraphFastRootSortWeightedTest, constructor) {
 
 	//test weights
 	////////////////////////////////////////////
-	EXPECT_DOUBLE_EQ(4.0, gw.get_w(0));
-	EXPECT_DOUBLE_EQ(5.0, gw.get_w(1));
-	EXPECT_DOUBLE_EQ(3.0, gw.get_w(2));
-	EXPECT_DOUBLE_EQ(1.0, gw.get_w(3));
-	EXPECT_DOUBLE_EQ(1.0, gw.get_w(4));
-	EXPECT_DOUBLE_EQ(1.0, gw.get_w(5));
+	EXPECT_DOUBLE_EQ(4.0, gw.weight(0));
+	EXPECT_DOUBLE_EQ(5.0, gw.weight(1));
+	EXPECT_DOUBLE_EQ(3.0, gw.weight(2));
+	EXPECT_DOUBLE_EQ(1.0, gw.weight(3));
+	EXPECT_DOUBLE_EQ(1.0, gw.weight(4));
+	EXPECT_DOUBLE_EQ(1.0, gw.weight(5));
 	////////////////////////////////////////////
 }
 
@@ -125,12 +125,12 @@ TEST_F(GraphFastRootSortWeightedTest, reorder) {
 	sorter.reorder(mapping_weight, ugw_sorted);						//mapping_weight MUST BE in old-to-new format
 
 	////////////////////////////////////////////
-	EXPECT_DOUBLE_EQ(5, ugw_sorted.get_w(0));						//w(1)=5.0,  w(0)=4.0, w(2)=3.0,  w(3)=1.0, w(4)=1.0, w(5)=1.0
-	EXPECT_DOUBLE_EQ(4, ugw_sorted.get_w(1));
-	EXPECT_DOUBLE_EQ(3, ugw_sorted.get_w(2));
-	EXPECT_DOUBLE_EQ(1, ugw_sorted.get_w(3));
-	EXPECT_DOUBLE_EQ(1, ugw_sorted.get_w(4));
-	EXPECT_DOUBLE_EQ(1, ugw_sorted.get_w(5));
+	EXPECT_DOUBLE_EQ(5, ugw_sorted.weight(0));						//w(1)=5.0,  w(0)=4.0, w(2)=3.0,  w(3)=1.0, w(4)=1.0, w(5)=1.0
+	EXPECT_DOUBLE_EQ(4, ugw_sorted.weight(1));
+	EXPECT_DOUBLE_EQ(3, ugw_sorted.weight(2));
+	EXPECT_DOUBLE_EQ(1, ugw_sorted.weight(3));
+	EXPECT_DOUBLE_EQ(1, ugw_sorted.weight(4));
+	EXPECT_DOUBLE_EQ(1, ugw_sorted.weight(5));
 	////////////////////////////////////////////
 
 	//I/O

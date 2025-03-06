@@ -171,7 +171,7 @@ vint GraphSort<Graph_t>::new_order_weighted (gbbs::place_t place, bool max_weigh
 	vector<wset_t> lv(NV);
 	for(int i=0; i<NV; i++){
 		lv[i].v=i;
-		lv[i].wv=g.get_w(i);
+		lv[i].wv=g.weight(i);
 		
 	}
 
@@ -230,7 +230,7 @@ vint GraphSort<Graph_t>::new_order_weighted_deg	(gbbs::place_t place, bool max_w
 	vector<wset_t> lv(NV);
 	for(int i=0; i<NV; i++){
 		lv[i].v=i;
-		lv[i].wv=g.get_w(i);
+		lv[i].wv=g.weight(i);
 		lv[i].degv=g.degree(i);
 	}
 
@@ -428,7 +428,7 @@ int GraphSort<ugraph_w>::reorder(const vint& new_order, ostream* o) {
 		gn.add_weight();												//allocates and sets unit weights
 		for (int i = 0; i < size; i++) {
 			//gn.add_weightv(new_order[i], g.get_wv(i));
-			gn.add_weight(new_order[i], g.get_w(i));
+			gn.add_weight(new_order[i], g.weight(i));
 		}
 	//}
 
@@ -631,7 +631,7 @@ int GraphSort<ugraph_w>::reorder(const vint& new_order, Decode& d, ostream* o) {
 		gn.add_weight();											//allocates weight space and assigns unit weights
 		for (int i = 0; i < size; i++) {
 			//gn.set_wv(new_order[i], g.get_wv(i));
-			gn.add_weight(new_order[i], g.get_w(i));
+			gn.add_weight(new_order[i], g.weight(i));
 		}
 	//}
 

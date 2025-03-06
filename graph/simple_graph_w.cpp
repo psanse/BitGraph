@@ -158,7 +158,7 @@ ostream& Base_Graph_W<Graph_t, W>::write_dimacs(ostream& o) {
 	//write DIMACS nodes n <v> <w>
 	const int NV = g_.number_of_vertices();
 	for (int v = 0; v < NV; ++v ) {
-		o << "n " << v + 1 << " " << get_w(v) << endl;
+		o << "n " << v + 1 << " " << weight(v) << endl;
 	}
 	
 	//write undirected edges (1-based vertex notation dimacs)
@@ -189,7 +189,7 @@ ostream& Graph_W<ugraph, W>::write_dimacs(ostream& o) {
 	//write DIMACS nodes n <v> <w>
 	const int NV = ptype::g_.number_of_vertices();
 	for (int v = 0; v < NV; ++v) {
-		o << "n " << v + 1 << " " << ptype::get_w(v) << endl;
+		o << "n " << v + 1 << " " << ptype::weight(v) << endl;
 	}
 
 	//write directed edges (1-based vertex notation dimacs)

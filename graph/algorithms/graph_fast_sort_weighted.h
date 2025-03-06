@@ -159,7 +159,7 @@ int GraphFastRootSort_W<GraphW_t>::reorder(const vint& new_order, GraphW_t& gn, 
 	/////////////////////
 	//vertex weights update
 	for (auto i = 0; i <NV; i++) {
-		gn.add_weight(new_order[i], gw_.get_w(i));
+		gn.add_weight(new_order[i], gw_.weight(i));
 	}
 
 	///////////////
