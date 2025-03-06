@@ -53,9 +53,8 @@ int main() {
 
 	//edge-weighted graph with 10 vertices
 	ugraph_ew gew(10);
-	gew.add_edge(0, 1);
-	gew.add_edge(0, 2);
-	gew.add_edge_weight(0, 2, 5.3);
+	gew.add_edge(0, 1, 4.5);
+	gew.add_edge(0, 2, 5.3);
 	gew.print_data();
 	gew.print_weights();
 	gew.print_edges();
