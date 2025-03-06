@@ -13,32 +13,40 @@ int main() {
 	ugraph g(10);
 	g.add_edge(0, 1);
 	g.add_edge(0, 2);
+	g.add_edge(7, 8);
 	g.print_data();
 	g.print_edges();	
+
+	cout << "****************************" << endl;
+
+	g.shrink_to_fit(5);		//graph induced by the first 5 vertices	
+	g.print_data();
+	g.print_edges();
 	
 	cout << "****************************" << endl;
 
-	//massive graph with 10 million vertices
-	sparse_ugraph sg(10000000);
-	sg.add_edge(0, 1);
-	sg.add_edge(0, 2);
-	sg.print_data();
-	sg.print_edges();	
-	
-	cout << "****************************" << endl;
+	////massive graph with 10 million vertices
+	//sparse_ugraph sg(10000000);
+	//sg.add_edge(0, 1);
+	//sg.add_edge(0, 2);
+	//sg.print_data();
+	//sg.print_edges();	
+	//
+	//cout << "****************************" << endl;
 
-	//make a copy of the massive graph
-	sparse_ugraph sgCOPY(sg);
-	sgCOPY.print_data();
-	sgCOPY.print_edges();
+	////make a copy of the massive graph
+	//sparse_ugraph sgCOPY(sg);
+	//sgCOPY.print_data();
+	//sgCOPY.print_edges();
 
-	cout << "****************************" << endl;
+	//cout << "****************************" << endl;
 
-	//weighted graph with 10 vertices
+	//unit weighted graph with 10 vertices
 	ugraph_w gw(10);	
 	gw.add_edge(0, 1);
 	gw.add_edge(0, 2);
 	gw.print_data();
+	gw.print_weights();
 	gw.print_edges();
 
 	cout << "****************************" << endl;
@@ -47,7 +55,9 @@ int main() {
 	ugraph_ew gew(10);
 	gew.add_edge(0, 1);
 	gew.add_edge(0, 2);
+	gew.add_edge_weight(0, 2, 5.3);
 	gew.print_data();
+	gew.print_weights();
 	gew.print_edges();
 
 	return 0;

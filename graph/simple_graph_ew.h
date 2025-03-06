@@ -92,12 +92,12 @@ virtual	~Base_Graph_EW()										= default;
 	void add_vertex_weight			( W val = NOWT);
 
 	/*
-	*  @brief sets edge weight given a directed edge (v, w)
+	*  @brief sets edge weight given a directed edge (v, w) IF the edge exists
 	*  @param v input vertex
 	*  @param w input vertex
 	*  @param we input weight value
 	
-	*  @details: asserts it REALLY is an edge.
+	*  @details: asserts it REALLY is an edge (and not a self-loop)
 	*/
 	virtual	void add_edge_weight	(int v, int w,  W val);
 	
@@ -321,7 +321,7 @@ public:
 	std::ostream& print_edges(std::ostream& o = std::cout, bool eofl = false)  override;
 
 	/*
-	*  @brief sets edge weight given an undirected edge {v, w}
+	*  @brief sets edge weight given an undirected edge {v, w} if the undirected edge exists
 	*  @param v input vertex
 	*  @param w input vertex
 	*  @param we input weight value
@@ -440,6 +440,9 @@ void Base_Graph_EW< Graph_t, W>::add_edge_weight (mat_t& lw) {
 	//set to empty wv and non-edges
 	for (auto v = 0; v < NV; ++v) {
 		for (auto w = 0; w < NV; ++w) {
+			
+			if (v == w) continue;			//skips self-loops
+
 			if (g_.is_edge(v, w)) {
 				we_[v][w] = lw[v][w];
 			}

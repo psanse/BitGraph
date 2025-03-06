@@ -422,7 +422,6 @@ TEST(Graph, create_subgraph){
 	
 }
 
-
 //////////////////
 //
 // CHECK THE FOLLOWING TESTS

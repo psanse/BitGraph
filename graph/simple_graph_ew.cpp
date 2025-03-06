@@ -129,8 +129,12 @@ void Base_Graph_EW<Graph_t, W >::add_edge_weight(int v, int w, W val) {
 	assert(v != w);
 	////////////////
 
-	we_[v][w] = val;
-	we_[w][v] = val;
+	if (g_.is_edge(v, w)) {
+		we_[v][w] = val;
+	}
+	else {
+		LOGG_WARNING("edge-weight cannot be added to a non-edge", "(", v, ",", w, ")", "- Base_Graph_EW<Graph_t,W >::add_edge_weight");
+	}
 
 	/*if (v == w || g_.is_edge(v, w)) {		
 		we_[v][w] = val;
@@ -564,8 +568,13 @@ void Graph_EW< ugraph, W >::add_edge_weight(int v, int w, W val) {
 	assert(v != w);
 	//////////////////
 
-	ptype::we_[v][w] = val;
-	ptype::we_[w][v] = val;
+	if (ptype::g_.is_edge(v, w)) {
+		ptype::we_[v][w] = val;
+		ptype::we_[w][v] = val;
+	}
+	else {
+		LOGG_WARNING("edge-weight cannot be added to a non-edge", "(", v, ",", w, ")", "- Graph_EW<Graph_t,W >::add_edge_weight");
+	}
 
 	/*if (v == w) {
 		ptype::we_[v][v] = val;
