@@ -228,7 +228,7 @@ const vecw<W>& vertex_weights	()						const;
 // I/O 
 
 	virtual std::ostream& print_data (bool lazy = true, std::ostream& o = std::cout, bool endl = true);
-	virtual std::ostream& print_edges (std::ostream& o = std::cout, bool endl = true) const;
+	virtual std::ostream& print_edges (std::ostream& o = std::cout, bool endl = true) ;
 
 	/*
 	* @brief Reads weighted directed graph from file in DIMACS format
@@ -316,7 +316,7 @@ public:
 /////////////
 //setters and getters
 
-	std::ostream& print_edges(std::ostream& o = std::cout, bool eofl = false) const override;
+	std::ostream& print_edges(std::ostream& o = std::cout, bool eofl = false)  override;
 
 	/*
 	*  @brief sets edge weight given an undirected edge {v, w}
@@ -363,7 +363,7 @@ public:
 	* 
 	*			II.we(v, v) and non-edge weights are set to NOWT
 	*		
-	*			III. non-edges are not overritten
+	*			III. non-edges are not overwritten
 	*/
 	void gen_modulus_weights(int MODULUS = DEFAULT_WEIGHT_MODULUS)  override;
 

@@ -39,7 +39,16 @@ int main() {
 	gw.add_edge(0, 1);
 	gw.add_edge(0, 2);
 	gw.print_data();
-	//gw.print_edges();
+	gw.print_edges();
+
+	cout << "****************************" << endl;
+
+	//edge-weighted graph with 10 vertices
+	ugraph_ew gew(10);
+	gew.add_edge(0, 1);
+	gew.add_edge(0, 2);
+	gew.print_data();
+	gew.print_edges();
 
 	return 0;
 }

@@ -12,9 +12,10 @@
    *
    **/
 
+#include "graph/simple_graph_w.h"
+
 #include "bitscan/bitscan.h"
-#include "graph/formats/dimacs_format.h"
-#include "graph/simple_graph_w.h"			
+#include "graph/formats/dimacs_format.h"			
 #include "utils/common.h"
 #include "utils/logger.h"
 #include "utils/prec_timer.h"
@@ -395,7 +396,7 @@ int Base_Graph_W<Graph_t, W>::read_weights(string filename) {
 template<class Graph_t, class W>
 ostream& Base_Graph_W<Graph_t, W>::print_data(bool lazy, std::ostream& o, bool endl) {
 	g_.print_data(lazy, o, false);
-	o << "\t w";								//adds tag to indicate it is weighted		
+	o << " [type:w]";								//adds tag to indicate it is weighted		
 	if (endl) { o << std::endl; }
 	return o;
 }

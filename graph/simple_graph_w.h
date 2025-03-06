@@ -177,7 +177,7 @@ std::string path						()			const			{ return g_.path(); }
 ////////////
 // I/O
 public:
-		
+
 	/**
 	* @brief Writes directed graph to stream in dimacs format
 	*
@@ -208,7 +208,11 @@ public:
 	int read_weights					(string filename);												
 		
 	std::ostream& print_data			(bool lazy = true, std::ostream& o = std::cout, bool endl = true);	
+	std::ostream& print_edges			(std::ostream& o = std::cout, bool eofl = true)							{ g_.print_edges(o, eofl); return o; }
 	
+	/**
+	* @brief streams different queries of vertex-weights
+	**/
 	std::ostream& print_weights			(std::ostream& o= std::cout, bool show_v=true)								const;
 	std::ostream& print_weights			(_bbt & bbsg, std::ostream& o= std::cout)									const;
 	std::ostream& print_weights			(vint& lnodes, std::ostream& o= std::cout)									const;

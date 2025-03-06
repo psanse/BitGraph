@@ -267,7 +267,7 @@ public:
 	std::ostream& print_edges		(std::ostream& = std::cout, bool eofl = false)	override;
 	
 	template<class bitset_t = T>
-	std::ostream& print_edges		(bitset_t& bbsg, std::ostream&)					const ;
+	std::ostream& print_edges		(bitset_t& bbsg, std::ostream&)	;
 	std::ostream& print_matrix		(std::ostream& = std::cout)						const;
 
 //////////////	
@@ -308,7 +308,7 @@ int Ugraph<T>::max_subgraph_degree (bitset_t& sg) const {
 template<class T>
 template<class bitset_t>
 inline
-ostream& Ugraph<T>::print_edges(bitset_t& bbsg, std::ostream& o) const
+ostream& Ugraph<T>::print_edges(bitset_t& bbsg, std::ostream& o) 
 {
 	for (std::size_t i = 0; i < ptype::NV_ - 1; ++i) {
 		if (!bbsg.is_bit(i)) continue;
@@ -906,7 +906,7 @@ void USS::write_dimacs(ostream& o) {
 
 template<>
 inline
-ostream& USS::print_edges (std::ostream& o, bool eofl) {
+ostream& USS::print_edges (std::ostream& o, bool eofl)  {
 
 	for (auto v = 0; v < this->NV_ - 1; ++v) {
 

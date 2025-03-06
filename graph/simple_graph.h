@@ -388,10 +388,10 @@ virtual	void  write_EDGES				(std::ostream& o) ;
 	**/
 	ostream& print_adj					(std::ostream& = std::cout, bool eofl = true) const;
 	
-	/**
+	/**º
 	* @brief Edges of the graph to the output stream in format [v]-->[w]
 	**/
-	virtual ostream& print_edges		(std::ostream& = std::cout, bool eofl = false ) ;
+	virtual ostream& print_edges		(std::ostream& = std::cout, bool eofl = false )  ;
 
 	/*
 	* @brief Edges of the subgraph induced by a set of vertices to output stream
@@ -938,7 +938,7 @@ ostream& Graph<BitSet_t>::print_data(bool lazy, std::ostream& o, bool eofl) {
 
 template<class BitSet_t>
 inline
-ostream& Graph<BitSet_t>::print_edges(std::ostream& o, bool eofl) {
+ostream& Graph<BitSet_t>::print_edges(std::ostream& o, bool eofl)  {
 
 	for (auto i = 0; i < NV_ - 1; ++i) {
 		for (auto j = i + 1; j < NV_; ++j) {

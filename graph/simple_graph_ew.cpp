@@ -495,14 +495,14 @@ ostream& Base_Graph_EW<Graph_t, W>::print_weights (vint& lv, ostream& o, bool on
 template<class Graph_t, class W>
 ostream& Base_Graph_EW<Graph_t, W>::print_data (bool lazy, std::ostream& o, bool endl) {
 	g_.print_data(lazy, o, false);
-	o << " ew";								//"w" for vertex-weighted graphs in GRAPH lib
+	o << " [type:ew]";								//"w" for vertex-weighted graphs in GRAPH lib
 	if (endl) { o << std::endl; }
 	return o;
 }
 
 template<class Graph_t, class W>
-std::ostream& Base_Graph_EW<Graph_t, W>::print_edges(std::ostream& o, bool eofl) const
-{	
+std::ostream& Base_Graph_EW<Graph_t, W>::print_edges(std::ostream& o, bool eofl) {
+
 	const int NV = g_.number_of_vertices();
 	for (auto i = 0; i < NV - 1; ++i) {
 		for (auto j = i + 1; j < NV; ++j) {
@@ -540,7 +540,7 @@ int Graph_EW<ugraph, W>::create_complement(Graph_EW<ugraph, W>& g) const {
 }
 
 template<class W>
-std::ostream& Graph_EW<ugraph, W>::print_edges(std::ostream& o, bool eofl) const
+std::ostream& Graph_EW<ugraph, W>::print_edges(std::ostream& o, bool eofl) 
 {
 	// TODO: Insertar una instrucción "return" aquí
 	const int NV = g_.number_of_vertices();	
@@ -548,7 +548,7 @@ std::ostream& Graph_EW<ugraph, W>::print_edges(std::ostream& o, bool eofl) const
 		for (auto j = i + 1; j < NV; ++j) {
 
 			if (is_edge(i, j)) {
-				o << "[" << i << "]" << "-->" << "[" << j << "]" << endl;
+				o << "[" << i << "]" << "-" << edge_weight(i, j)  << "->" << "[" << j << "]" << endl;
 			}
 		}
 	}
