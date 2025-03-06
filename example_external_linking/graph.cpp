@@ -39,7 +39,7 @@ int main() {
 	gw.add_edge(0, 1);
 	gw.add_edge(0, 2);
 	gw.print_data();
-	gw.print_edges();
+	//gw.print_edges();
 
 	return 0;
 }

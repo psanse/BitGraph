@@ -500,6 +500,27 @@ ostream& Base_Graph_EW<Graph_t, W>::print_data (bool lazy, std::ostream& o, bool
 	return o;
 }
 
+template<class Graph_t, class W>
+std::ostream& Base_Graph_EW<Graph_t, W>::print_edges(std::ostream& o, bool eofl) const
+{	
+	const int NV = g_.number_of_vertices();
+	for (auto i = 0; i < NV - 1; ++i) {
+		for (auto j = i + 1; j < NV; ++j) {
+
+			if (is_edge(i, j)) {
+				o << "[" << i << "]" << "-(" << edge_weight(i, j) << ")->" << "[" << j << "]" << endl;
+			}
+			if (is_edge(j, i)) {
+				o << "[" << j << "]" << "-(" << edge_weight(i, j) << ")->" <<  "[" << i << "]" << endl;
+			}
+
+		}
+	}
+
+	if (eofl) {	o << std::endl;	}
+	return o;
+}
+
 
 ///////////////////////////
 //
@@ -516,6 +537,24 @@ int Graph_EW<ugraph, W>::create_complement(Graph_EW<ugraph, W>& g) const {
 	ptype::g_.create_complement(g.graph());
 
 	return 0;
+}
+
+template<class W>
+std::ostream& Graph_EW<ugraph, W>::print_edges(std::ostream& o, bool eofl) const
+{
+	// TODO: Insertar una instrucción "return" aquí
+	const int NV = g_.number_of_vertices();	
+	for (auto i = 0; i < NV - 1; ++i) {
+		for (auto j = i + 1; j < NV; ++j) {
+
+			if (is_edge(i, j)) {
+				o << "[" << i << "]" << "-->" << "[" << j << "]" << endl;
+			}
+		}
+	}
+
+	if (eofl) { o << std::endl; }
+	return o;
 }
 
 template <class W>

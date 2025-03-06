@@ -228,6 +228,7 @@ const vecw<W>& vertex_weights	()						const;
 // I/O 
 
 	virtual std::ostream& print_data (bool lazy = true, std::ostream& o = std::cout, bool endl = true);
+	virtual std::ostream& print_edges (std::ostream& o = std::cout, bool endl = true) const;
 
 	/*
 	* @brief Reads weighted directed graph from file in DIMACS format
@@ -314,6 +315,8 @@ public:
 
 /////////////
 //setters and getters
+
+	std::ostream& print_edges(std::ostream& o = std::cout, bool eofl = false) const override;
 
 	/*
 	*  @brief sets edge weight given an undirected edge {v, w}

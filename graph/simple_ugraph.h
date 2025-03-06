@@ -263,12 +263,12 @@ public:
 //	I/O basic operations
 public:
 
-	std::ostream& print_degrees		(std::ostream& = std::cout)					const;
-	std::ostream& print_edges		(std::ostream& = std::cout)					override;
+	std::ostream& print_degrees		(std::ostream& = std::cout)						const;
+	std::ostream& print_edges		(std::ostream& = std::cout, bool eofl = false)	override;
 	
 	template<class bitset_t = T>
-	std::ostream& print_edges		(bitset_t& bbsg, std::ostream&)				const ;
-	std::ostream& print_matrix		(std::ostream& = std::cout)					const;
+	std::ostream& print_edges		(bitset_t& bbsg, std::ostream&)					const ;
+	std::ostream& print_matrix		(std::ostream& = std::cout)						const;
 
 //////////////	
 // deleted - CHECK	
@@ -502,7 +502,7 @@ ostream& Ugraph<T>::print_degrees(std::ostream& o) const {
 
 template<class T>
 inline
-ostream& Ugraph<T>::print_edges(std::ostream& o ) {
+ostream& Ugraph<T>::print_edges(std::ostream& o, bool eofl ) {
 
 	for (auto i = 0; i < ptype::NV_ - 1; ++i) {
 		for (auto j = i + 1; j < ptype::NV_; ++j) {
@@ -513,6 +513,7 @@ ostream& Ugraph<T>::print_edges(std::ostream& o ) {
 		}
 	}
 
+	if (eofl) { o << std::endl; }	
 	return o;
 }
 
@@ -905,7 +906,7 @@ void USS::write_dimacs(ostream& o) {
 
 template<>
 inline
-ostream& USS::print_edges(std::ostream& o) {
+ostream& USS::print_edges (std::ostream& o, bool eofl) {
 
 	for (auto v = 0; v < this->NV_ - 1; ++v) {
 
@@ -922,6 +923,7 @@ ostream& USS::print_edges(std::ostream& o) {
 		}
 	}
 
+	if (eofl) { o << std::endl; }	
 	return o;
 }
 
