@@ -49,18 +49,18 @@ TEST(UGraphEW, constructor_file) {
 	EXPECT_EQ(5, ugew.number_of_edges());
 
 	//all vertex weights 
-	EXPECT_EQ(10, ugew.get_we(0, 0));
-	EXPECT_EQ(20, ugew.get_we(1, 1));
-	EXPECT_EQ(30, ugew.get_we(2, 2));
-	EXPECT_EQ(40, ugew.get_we(3, 3));
-	EXPECT_EQ(50, ugew.get_we(4, 4));
+	EXPECT_EQ(10, ugew.edge_weight(0, 0));
+	EXPECT_EQ(20, ugew.edge_weight(1, 1));
+	EXPECT_EQ(30, ugew.edge_weight(2, 2));
+	EXPECT_EQ(40, ugew.edge_weight(3, 3));
+	EXPECT_EQ(50, ugew.edge_weight(4, 4));
 
 	//all (undirected) edge weights
-	EXPECT_EQ(27, ugew.get_we(0, 1));
-	EXPECT_EQ(37, ugew.get_we(0, 2));
-	EXPECT_EQ(47, ugew.get_we(0, 3));
-	EXPECT_EQ(57, ugew.get_we(2, 4));
-	EXPECT_EQ(67, ugew.get_we(3, 4));
+	EXPECT_EQ(27, ugew.edge_weight(0, 1));
+	EXPECT_EQ(37, ugew.edge_weight(0, 2));
+	EXPECT_EQ(47, ugew.edge_weight(0, 3));
+	EXPECT_EQ(57, ugew.edge_weight(2, 4));
+	EXPECT_EQ(67, ugew.edge_weight(3, 4));
 }
 
 TEST_F(UGraphEWTest, copy_constructor) {
@@ -84,7 +84,7 @@ TEST_F(UGraphEWTest, add_edge_weights) {
 
 	ugew.add_edge_weight(1, 3, 7);
 
-	EXPECT_EQ(7, ugew.get_we(1, 3) );
+	EXPECT_EQ(7, ugew.edge_weight(1, 3) );
 
 }
 
@@ -96,9 +96,9 @@ TEST_F(UGraphEWTest, generate_weights) {
 												DEFAULT_WEIGHT_MODULUS					);		
 
 	EXPECT_EQ(NV, ugew.graph().number_of_vertices());
-	EXPECT_EQ(4, ugew.get_we(0, 1));
-	EXPECT_EQ(5, ugew.get_we(0, 2));
-	EXPECT_EQ(7, ugew.get_we(1, 3));
+	EXPECT_EQ(4, ugew.edge_weight(0, 1));
+	EXPECT_EQ(5, ugew.edge_weight(0, 2));
+	EXPECT_EQ(7, ugew.edge_weight(1, 3));
 	EXPECT_TRUE(ugew.is_consistent());
 
 	//I/O
@@ -488,12 +488,12 @@ TEST(UGraphEW, DISABLED_write_to_file) {
 //
 //	//TESTS
 //	EXPECT_TRUE(g.is_edge_weighted());
-//	EXPECT_EQ(3, g.get_we(0,1));
-//	EXPECT_EQ(8, g.get_we(1,2));
-//	EXPECT_EQ(3, g.get_we(1,0));
-//	EXPECT_EQ(8, g.get_we(2,1));
-//	EXPECT_EQ(0, g.get_we(1,3));
-//	EXPECT_EQ(0, g.get_we(2,2));	//no loops, weigh is 0
+//	EXPECT_EQ(3, g.edge_weights(0,1));
+//	EXPECT_EQ(8, g.edge_weights(1,2));
+//	EXPECT_EQ(3, g.edge_weights(1,0));
+//	EXPECT_EQ(8, g.edge_weights(2,1));
+//	EXPECT_EQ(0, g.edge_weights(1,3));
+//	EXPECT_EQ(0, g.edge_weights(2,2));	//no loops, weigh is 0
 //	
 //	//I/O
 //	g.write_edge_weights(FILE_LOG("log.txt",WRITE));

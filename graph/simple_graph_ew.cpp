@@ -162,30 +162,7 @@ void Base_Graph_EW< Graph_t, W>::add_edge_weight(W val) {
 	}
 }
 
-template <class Graph_t, class W>
-void Base_Graph_EW< Graph_t, W>::add_edge_weight(mat_t& lw) {
-	
-	auto NV = number_of_vertices();
 
-	/////////////////////////
-	assert(lw.size() == NV);
-	/////////////////////////
-
-	/*if (lw.size() != NV) {
-		LOG_ERROR("bizarre matrix of weights-Base_Graph_EW<Graph_t,W >::add_edge_weight(mat_t...)");
-		return -1;
-	}*/
-
-	//set to empty wv and non-edges
-	for (auto v = 0; v < NV; ++v) {
-		for (auto w = 0; w < NV; ++w) {
-			if (v == w || g_.is_edge(v, w)) {
-				we_[v][w] = lw[v][w];
-			}
-		}
-	}
-
-}
 
 template<class Graph_t, class W>
  void Base_Graph_EW<Graph_t, W>::neg_w(){
@@ -223,7 +200,7 @@ template<class Graph_t, class W>
 
 
 template<class Graph_t, class W>
-vecw<W> Base_Graph_EW<Graph_t, W>::get_wv()  const {
+vecw<W> Base_Graph_EW<Graph_t, W>::vertex_weights()  const {
 
 	auto NV = number_of_vertices();
 
@@ -535,7 +512,7 @@ int Graph_EW<ugraph, W>::create_complement(Graph_EW<ugraph, W>& g) const {
 
 	g.name(this->name());
 	g.path(this->path());
-	g.get_we() = ptype::we_;
+	g.edge_weights() = ptype::we_;
 	ptype::g_.create_complement(g.graph());
 
 	return 0;
@@ -593,6 +570,7 @@ void Graph_EW< ugraph, W >::add_edge_weight(W val) {
 }
 
 template <class W>
+template<bool Erase>
 void Graph_EW< ugraph, W >::add_edge_weight(typename Graph_EW<ugraph, W>::mat_t& lw) {
 
 	auto NV = ptype::number_of_vertices();
@@ -616,8 +594,10 @@ void Graph_EW< ugraph, W >::add_edge_weight(typename Graph_EW<ugraph, W>::mat_t&
 				ptype::we_[w][v] = lw[w][v];
 			}
 			else {
-				ptype::we_[v][w] = ptype::NOWT;
-				ptype::we_[w][v] = ptype::NOWT;
+				if (Erase) {
+					ptype::we_[v][w] = ptype::NOWT;
+					ptype::we_[w][v] = ptype::NOWT;
+				}				
 			}
 		}
 	}
@@ -650,7 +630,6 @@ void Graph_EW<ugraph, W>::gen_modulus_weights(int MODULUS)
 		}
 	}
 }
-
 
 template <class W>
 ostream& Graph_EW<ugraph, W>::print_weights (ostream& o, bool line_format, bool only_vertex_weights) const{

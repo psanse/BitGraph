@@ -102,35 +102,38 @@ virtual	~Base_Graph_EW()										= default;
 	virtual	void add_edge_weight	(int v, int w,  W val);
 	
 	/*
-	*  @brief sets edge weights in @lw  if there is a corresponding edge
-	*
-	*	(weights in self-loops (vertices) are always set)
-	*
+	*  @brief sets edge weights in @lw  if there is a corresponding edge.
+	*		  Vertex weights are not modified. 
+	*  @param lw matrix of edge weights
+	*  @param template Erase: if TRUE weights of non-edges are set to NOWT
+	*						  (aditional cleaning)
 	*  @details: causses an assertion error if @lw.size() != |V|
 	*/
-	virtual	void add_edge_weight	(mat_t& lw);
+	template<bool Erase = false>
+	void add_edge_weight		(mat_t& lw);
 	
 	/*
-	*  @brief sets all weights to val
+	*  @brief sets all edge-weights to val
+	*  @details: vertex weights are not modified
 	*/
 	virtual	void add_edge_weight	(W val = NOWT);																	//sets all weights to val 
 
 	
-	W get_we			(int v, int w)			const		{ return we_[v][w]; }
-	W get_wv			(int v)					const		{ return we_[v][v]; }									
+	W edge_weight				(int v, int w)			const		{ return we_[v][w]; }
+	W vertex_weight				(int v)					const		{ return we_[v][v]; }									
 	
 	/*
 	*  @brief getter for vertex weights
 	*/
-	vecw<W> get_wv			()						const;
+	vecw<W> vertex_weights		()						const;
 	
-	mat_t& get_we			()								{ return we_; }	
-	const mat_t& get_we		()						const	{ return we_; }
-	Graph_t& graph			()								{ return g_; }
-	const Graph_t& graph	()						const	{ return g_; }
+	mat_t& edge_weights			()								{ return we_; }	
+	const mat_t& edge_weights	()						const	{ return we_; }
+	Graph_t& graph				()								{ return g_; }
+	const Graph_t& graph		()						const	{ return g_; }
 
-	int number_of_vertices	()					const		{ return g_.number_of_vertices(); }
-	int number_of_edges		(bool lazy = true)				{ return g_.number_of_edges(lazy); }
+	int number_of_vertices		()					const		{ return g_.number_of_vertices(); }
+	int number_of_edges			(bool lazy = true)				{ return g_.number_of_edges(lazy); }
 
 
 	const _bbt& neighbors		(int v)			const		{ return g_.neighbors(v); }
@@ -321,7 +324,7 @@ public:
 	*
 	*  @details: asserts it is a real edge 
 	*/
-	void add_edge_weight(int v, int w, W we)	override;
+	void add_edge_weight	(int v, int w, W we)	override;
 
 	/**
 	*  @brief sets edge-weight val to all vertices (_we[v, v]) and edge weights
@@ -331,17 +334,20 @@ public:
 	* 
 	* @param val weight value
 	**/
-	void add_edge_weight(W val = 0.0)			override;
+	void add_edge_weight	(W val = 0.0)			override;
 	
 	/*
 	*  @brief sets edge-weights in lw consistently to the graph
 	*
 	*		I. NOWT is set as weight value to non-edges in lw
 	*		II. Weights in self-loops (vertices) are NOT modified
-	*
+	* 
+	*  @param lw matrix of edge weights
+	*  @param template Erase: if TRUE weights of non-edges are set to NOWT
 	*  @details: causses an assertion error if @lw.size() != |V|
 	*/
-	void add_edge_weight(mat_t& lw)				override;
+	template<bool Erase = false>
+	void add_edge_weight	(mat_t& lw);
 
 /////////////
 // weight operations
@@ -410,5 +416,34 @@ public:
 	virtual	std::ostream& write_dimacs	(std::ostream& o);
 };
 
+template <class Graph_t, class W>
+template <bool Erase>
+void Base_Graph_EW< Graph_t, W>::add_edge_weight (mat_t& lw) {
+
+	auto NV = number_of_vertices();
+
+	/////////////////////////
+	assert(lw.size() == NV);
+	/////////////////////////
+
+	/*if (lw.size() != NV) {
+		LOG_ERROR("bizarre matrix of weights-Base_Graph_EW<Graph_t,W >::add_edge_weight(mat_t...)");
+		return -1;
+	}*/
+
+	//set to empty wv and non-edges
+	for (auto v = 0; v < NV; ++v) {
+		for (auto w = 0; w < NV; ++w) {
+			if (g_.is_edge(v, w)) {
+				we_[v][w] = lw[v][w];
+			}
+			else {
+				//cleans non-edge weights if required
+				if (Erase) { we_[v][w] = NOWT; }
+			}
+		}
+	}
+
+}
 
 #endif
