@@ -12,7 +12,6 @@
   * @comments  edge weights in self-loops are possible, and are considered as vertex weights
   *
   * This code is part of the GRAPH 1.0 C++ library
-  *
   **/
 
 #ifndef __SIMPLE_GRAPH_EDGE_WEIGHTED_H__
@@ -23,11 +22,9 @@
 #include <iostream>
 #include <vector>
 
-
- /////////////////////////////////////////////
+/////////////////////////////////////////////
 extern const int DEFAULT_WEIGHT_MODULUS;								//for modulus weight generation  [Pullman 2008]					
 ///////////////////////////////////////////
-
 
 //aliases
 template<class W>
@@ -81,44 +78,6 @@ virtual	~Base_Graph_EW()										= default;
 /////////////
 // setters and getters	
 
-	/*
-	*  @brief sets self-loop edge weight (considered as vertex-weight)
-	*/
-	void add_vertex_weight			(int v, W val)						{ we_[v][v] = val; }					
-	
-	/*
-	*  @brief sets all self-loop edge weights to the same weight value
-	*/
-	void add_vertex_weight			( W val = NOWT);
-
-	/*
-	*  @brief sets edge weight given a directed edge (v, w) IF the edge exists
-	*  @param v input vertex
-	*  @param w input vertex
-	*  @param we input weight value
-	
-	*  @details: asserts it REALLY is an edge (and not a self-loop)
-	*/
-	virtual	void add_edge_weight	(int v, int w,  W val);
-	
-	/*
-	*  @brief sets edge weights in @lw  if there is a corresponding edge.
-	*		  Vertex weights are not modified. 
-	*  @param lw matrix of edge weights
-	*  @param template Erase: if TRUE weights of non-edges are set to NOWT
-	*						  (aditional cleaning)
-	*  @details: causses an assertion error if @lw.size() != |V|
-	*/
-	template<bool Erase = false>
-	void add_edge_weight		(mat_t& lw);
-	
-	/*
-	*  @brief sets all edge-weights to val
-	*  @details:  non-edge weights are set to NOWT
-	*  @details: vertex weights are not modified
-	*/
-	virtual	void add_edge_weight	(W val = NOWT);																	//sets all weights to val 
-
 	
 	W edge_weight				(int v, int w)			const		{ return we_[v][w]; }
 	W vertex_weight				(int v)					const		{ return we_[v][v]; }									
@@ -147,6 +106,7 @@ const vecw<W>& vertex_weights	()						const;
     void path					(std::string path_name)		{ g_.path(path_name); }
   string path					()				const		{ return g_.path(); }
 	
+  double density				(bool lazy = true)			{ return g_.density(lazy); }
 
 //////////////////////////
 // memory allocation
@@ -172,33 +132,71 @@ const vecw<W>& vertex_weights	()						const;
 	int reset			(std::size_t n, W val = NOWT, string name = "");
 
 /////////////////////////
-//basic graph operations
-
+// basic operations
+	
 	/*
 	*  @brief adds edge, no self-loops allowed
 	*/
-	void add_edge		(int v, int w)							{ g_.add_edge(v, w); }
+	void add_edge						(int v, int w) { g_.add_edge(v, w); }
 
-	double density		(bool lazy = true)						{ return g_.density(lazy); }
+	/**
+	* @ brief adds an edge (v, w) with weight val
+	**/
+	virtual	void add_edge				(int v, int w, W val);
 
-	void gen_random_edges(double p)								{ g_.gen_random_edges(p); }
+	/*
+	*  @brief sets self-loop edge weight (considered as vertex-weight)
+	*/
+	void add_vertex_weight				(int v, W val) { we_[v][v] = val; }
 
+	/*
+	*  @brief sets all self-loop edge weights to the same weight value
+	*/
+	void add_vertex_weight				(W val = NOWT);
 
-	
+	/*
+	*  @brief sets edge weight given a directed edge (v, w) IF the edge exists
+	*  @param v input vertex
+	*  @param w input vertex
+	*  @param we input weight value
+
+	*  @details: asserts it REALLY is an edge (and not a self-loop)
+	*/
+	virtual	void add_edge_weight		(int v, int w, W val);
+
+	/*
+	*  @brief sets edge weights in @lw  if there is a corresponding edge.
+	*		  Vertex weights are not modified.
+	*  @param lw matrix of edge weights
+	*  @param template Erase: if TRUE weights of non-edges are set to NOWT
+	*						  (aditional cleaning)
+	*  @details: causses an assertion error if @lw.size() != |V|
+	*/
+	template<bool Erase = false>
+	void add_edge_weight				(mat_t& lw);
+
+	/*
+	*  @brief sets all edge-weights to val
+	*  @details:  non-edge weights are set to NOWT
+	*  @details: vertex weights are not modified
+	*/
+	virtual	void add_edge_weight		(W val = NOWT);		 
 
 /////////////////////////
 // boolean properties
 
-	bool is_edge		(int v, int w)			const			{ return g_.is_edge(v, w); }
+	bool is_edge						(int v, int w)			const			{ return g_.is_edge(v, w); }
 	
 	/*
 	* @brief consistency check 
 	* 
 	*		 I. edges with default weights 
-	*		 TODO...
+	*		
 	* @returns true if consistent, false otherwise
+	* 
+	*  TODO... other checks
 	*/
-	bool is_consistent	();																				
+	bool is_consistent					();																				
 	
 ////////////////////////
 //weight operations
@@ -209,7 +207,7 @@ const vecw<W>& vertex_weights	()						const;
 	*		 
 	* @returns true if consistent, false otherwise
 	*/
-	void neg_w();	
+	void neg_w							();	
 
 
 	///////////////////////////
@@ -224,13 +222,18 @@ const vecw<W>& vertex_weights	()						const;
 	* 
 	*			III. non-edges are not overritten
 	*/
-	virtual void gen_modulus_weights (int MODULUS = DEFAULT_WEIGHT_MODULUS);
+	virtual void gen_modulus_weights	(int MODULUS = DEFAULT_WEIGHT_MODULUS);
+
+////////////////////////
+// other operations
+	
+	void gen_random_edges				(double p)		{ g_.gen_random_edges(p); }
 
 ////////////
 // I/O 
 
-	virtual std::ostream& print_data (bool lazy = true, std::ostream& o = std::cout, bool endl = true);
-	virtual std::ostream& print_edges (std::ostream& o = std::cout, bool endl = true) ;
+virtual std::ostream& print_data		(bool lazy = true, std::ostream& o = std::cout, bool endl = true);
+virtual std::ostream& print_edges		(std::ostream& o = std::cout, bool endl = true) ;
 
 	/*
 	* @brief Reads weighted directed graph from file in DIMACS format

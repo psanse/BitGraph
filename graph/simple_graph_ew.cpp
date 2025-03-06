@@ -112,6 +112,13 @@ Base_Graph_EW<Graph_t, W>::Base_Graph_EW(string filename){
 
 
 template<class Graph_t, class W>
+void Base_Graph_EW<Graph_t, W>::add_edge(int v, int w, W val)
+{
+	g_.add_edge(v, w);
+	we_[v][w] = val;	
+}
+
+template<class Graph_t, class W>
 void Base_Graph_EW<Graph_t, W>::add_vertex_weight( W val) {
 
 	auto NV = number_of_vertices();
