@@ -14,7 +14,7 @@ int main() {
 	g.add_edge(0, 1);
 	g.add_edge(0, 2);
 	g.print_data();
-	g.print_edges();
+	g.print_edges();	
 	
 	cout << "****************************" << endl;
 
@@ -23,7 +23,7 @@ int main() {
 	sg.add_edge(0, 1);
 	sg.add_edge(0, 2);
 	sg.print_data();
-	sg.print_edges();
+	sg.print_edges();	
 	
 	cout << "****************************" << endl;
 
