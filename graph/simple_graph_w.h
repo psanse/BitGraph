@@ -208,7 +208,7 @@ public:
 	int read_weights					(string filename);												
 		
 	std::ostream& print_data			(bool lazy = true, std::ostream& o = std::cout, bool endl = true);	
-	std::ostream& print_edges			(std::ostream& o = std::cout, bool eofl = true)							{ g_.print_edges(o, eofl); return o; }
+	std::ostream& print_edges			(std::ostream& o = std::cout, bool eofl = false)							{ g_.print_edges(o, eofl); return o; }
 	
 	/**
 	* @brief streams different queries of vertex-weights
