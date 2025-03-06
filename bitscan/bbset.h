@@ -234,7 +234,11 @@ virtual	~BitSet						()								= default;
 	* @param nPop: population size
 	**/
 	void reset						(int nPop);
-			
+		
+	/**
+	* @brief reallocates memory to the number of blocks of the bitset
+	**/
+	void  shrink_to_fit				()									{ vBB_.shrink_to_fit(); }
 
 /////////////////////
 //setters and getters (will not allocate memory)

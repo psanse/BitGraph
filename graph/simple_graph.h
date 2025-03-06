@@ -114,9 +114,9 @@ std::string path						()					const	{ return path_;}
 	**/
 	virtual	BITBOARD number_of_edges	(const T& set )	const;
 
-const vector<T>&	adjacency_matrix		()					const		{return adj_; }
+const vector<T>&	adjacency_matrix	()					const		{return adj_; }
 const T& neighbors						(int v)				const		{return adj_[v];}
-T& neighbors								(int v)							{return adj_[v];}
+T& neighbors							(int v)							{return adj_[v];}
 
 //////////////////////////
 // memory allocation 
@@ -146,14 +146,23 @@ public:
 	void reset							();											 
 
 	/**
-	* @brief reduces the graph to n vertices 
+	* @brief reduces the capacity to the size of the bitsets that make
+	*		 the adjacency matrix. 
+	* @details: calls the STL shrink_to_fit function for each bitset
+	*			of the adjacency matrix
+	**/
+	void shrink_to_fit					();
+
+	/**
+	* @brief reduces the graph to the first N vertices (deallocation takes place)
 	*
 	*		(currently only for sparse graphs)
-	* 
-	* @param n number of vertices of the new graph
-	* @returns 0 if success, -1 if memory allocation fails
+	*
+	* @param N: number of vertices of the new graph, which must be strictly less
+	*		    than the current number of vertices NV_
+	* @returns 0 if success, otherwise -1 (graph unchanged)
 	**/
-	int shrink_to_fit					(std::size_t n);
+	 int shrink_to_fit					(std::size_t N);
 						
 //////////////	
 // Basic operations	
@@ -612,15 +621,42 @@ Graph<T>& Graph<T>::create_subgraph(std::size_t first_k, Graph<T>& newg) const {
 	return newg;
 }
 
+template<class T>
+inline
+void Graph<T>::shrink_to_fit() {
+
+	for (auto v = 0; v < NV_; ++v) {
+		adj_[v].shrink_to_fit();	
+	}
+	
+}
 
 template<class T>
 inline
-int Graph<T>::shrink_to_fit(std::size_t size) {
+int Graph<T>::shrink_to_fit(std::size_t N) {
+		
+	/*LOG_ERROR("not yet implemented for non-sparse graphs - Graph<T>::shrink_to_fit");
+	LOG_ERROR("graph remains unchanged");*/
 
-	LOG_WARNING("Shrinking is valid only for sparse graphs - Graph<T>::shrink_to_fit");
-	LOG_WARNING("The graph remains unchanged");
+	//assertions
+	if (NV_ <= N) {
+		LOGG_WARNING("Wrong shrinking size ", N, " the graph remains unchanged - Graph<T>::shrink_to_fit");
+		return -1;
+	}
 
-	return -1;
+	//sets to 0 bitblocks outside the range but
+	//does not remove the empty bitbloks
+	for (auto v = 0; v < NV_; ++v) {
+		adj_[v].erase_bit(NV_, -1);
+	}
+
+	//resizes adjacency matrix
+	adj_.resize(N);
+	NV_ = N;
+	NE_ = 0;												//so that when required, the value will be recomputed
+	NBB_ = INDEX_1TO1(N);								//maximum number of bitblocks per row (for sparse graphs)		
+		
+	return 0;
 }
 
 template<class T>
@@ -1246,24 +1282,32 @@ GSS& GSS::create_subgraph(std::size_t first_k, GSS& newg) const {
 
 template<>
 inline
-int GSS::shrink_to_fit(std::size_t size) {
-
+int GSS::shrink_to_fit(std::size_t N) {
+		
 	//assertions
-	if (NV_ <= size) {
-		LOGG_WARNING("Wrong shrinking size ", size, " the graph remains unchanged - GSS::shrink_to_fit");
+	if (NV_ <= N) {
+		LOGG_WARNING("Wrong shrinking size ", N, " the graph remains unchanged - GSS::shrink_to_fit");
 		return -1;
 	}
-
-	//trims vertices 
-	for (int i = 0; i < size; i++) {
-		adj_[i].clear_bit(size, EMPTY_ELEM);				//closed range
+	
+	//A) sets to 0 bitblocks outside the range but
+	//does not remove the empty bitbloks
+	for (auto v = 0; v < NV_; ++v) {
+		adj_[v].erase_bit(N, NV_);
 	}
 
+	//B) EXPERIMENTAL - sets to 0 bitblocks and removes the empty bitblocks 
+	//for (auto v = 0; v < size; v++) {
+	//	adj_[v].clear_bit(size, EMPTY_ELEM);			
+	//}
+
+
 	//resizes adjacency matrix
-	adj_.resize(size);
-	NV_ = size;
-	NE_ = 0;												//so that when required, the value will be recomputed
-	NBB_ = INDEX_1TO1(size);								//maximum number of bitblocks per row (for sparse graphs)		
+	adj_.resize(N);
+	NV_ = N;
+	NE_ = 0;											//so that when required, the value will be recomputed
+	NBB_ = INDEX_1TO1(N);								//maximum number of bitblocks per row (for sparse graphs)		
+		
 
 	return 0;
 }

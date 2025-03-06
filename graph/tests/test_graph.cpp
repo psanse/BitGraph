@@ -351,11 +351,43 @@ TEST(Graph, shrink_to_fit) {
 	g.add_edge(88, 90);
 	g.add_edge(89, 90);
 
-	//shrinking not possible in non-sparse graphs
+	//shrinking to first 50 vertices
 	int status = g.shrink_to_fit(50);
 
 	////////////////////////////
-	ASSERT_EQ(-1, status);
+	ASSERT_EQ(0, status);
+	EXPECT_EQ(50, g.number_of_vertices());
+	EXPECT_EQ(4, g.number_of_edges());			//0->1, 1->2, 2->3, 0->3
+	EXPECT_TRUE(g.is_edge(0, 1));
+	EXPECT_TRUE(g.is_edge(1, 2));
+	EXPECT_TRUE(g.is_edge(2, 3));
+	EXPECT_TRUE(g.is_edge(0, 3));
+	////////////////////////////
+
+}
+
+TEST(Graph, shrink_to_fit_only_capacity) {
+
+	graph g(100);
+	g.add_edge(0, 1);
+	g.add_edge(1, 2);
+	g.add_edge(2, 3);
+	g.add_edge(0, 3);
+	g.add_edge(54, 55);
+	g.add_edge(88, 89);
+	g.add_edge(88, 90);
+	g.add_edge(89, 90);
+
+	//shrinking capacity if required
+	g.shrink_to_fit();
+
+	////////////////////////////
+	EXPECT_EQ(100, g.number_of_vertices());
+	EXPECT_EQ(8, g.number_of_edges());			//all of them
+	EXPECT_TRUE(g.is_edge(0, 1));
+	EXPECT_TRUE(g.is_edge(1, 2));
+	EXPECT_TRUE(g.is_edge(2, 3));
+	EXPECT_TRUE(g.is_edge(0, 3));
 	////////////////////////////
 
 }
