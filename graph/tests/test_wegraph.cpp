@@ -181,11 +181,12 @@ TEST(UGraphEW, create_an_edge_weighted_graph) {
 //
 //////////////////
 
-TEST_F(UGraphEWTest, DISABLED_printing) {
+TEST_F(UGraphEWTest, printing) {
 	//visual test - DISABLE by default
 
 		//I/O
-	ugew.print_weights(cout, false, decltype(ugew)::BOTH);
+	ugew.print_weights(cout, true, decltype(ugew)::EDGE);
+	cin.get();
 
 }
 

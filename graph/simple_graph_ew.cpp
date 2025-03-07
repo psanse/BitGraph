@@ -409,13 +409,14 @@ std::ostream& Base_Graph_EW<Graph_t, W>::print_edge_weights(std::ostream& o, boo
 
 	//streams edge-weights 
 	if (line_format) {
-		for (auto i = 0; i < NV; ++i) {
+		print_edges(o, false);
+		/*for (auto i = 0; i < NV; ++i) {
 			for (auto j = 0; j < NV; ++j) {
 				if (we_[i][j] != Base_Graph_EW<Graph_t, W>::NO_WEIGHT) {
 					o << "[" << i << "->" << j << " (" << we_[i][j] << ")] " << endl;
 				}
 			}
-		}
+		}*/
 	}
 	else {								//outputs to stream edge-weights in matrix form
 		for (auto i = 0; i < NV; ++i) {
@@ -514,17 +515,17 @@ ostream& Base_Graph_EW<Graph_t, W>::print_data (bool lazy, std::ostream& o, bool
 }
 
 template<class Graph_t, class W>
-std::ostream& Base_Graph_EW<Graph_t, W>::print_edges(std::ostream& o, bool eofl) {
+std::ostream& Base_Graph_EW<Graph_t, W>::print_edges(std::ostream& o, bool eofl) const{
 
 	const int NV = g_.number_of_vertices();
 	for (auto i = 0; i < NV - 1; ++i) {
 		for (auto j = i + 1; j < NV; ++j) {
 
 			if (is_edge(i, j)) {
-				o << "[" << i << "]" << "-(" << weight(i, j) << ")->" << "[" << j << "]" << endl;
+				o << "[" << i << "]" << "--" << weight(i, j) << "-->" << "[" << j << "]" << endl;
 			}
 			if (is_edge(j, i)) {
-				o << "[" << j << "]" << "-(" << weight(i, j) << ")->" <<  "[" << i << "]" << endl;
+				o << "[" << j << "]" << "--" << weight(i, j) << "--->" <<  "[" << i << "]" << endl;
 			}
 
 		}
@@ -541,17 +542,16 @@ std::ostream& Base_Graph_EW<Graph_t, W>::print_edges(std::ostream& o, bool eofl)
 //
 ///////////////////////////
 
-
 template<class W>
-std::ostream& Graph_EW<ugraph, W>::print_edges(std::ostream& o, bool eofl) 
-{	
+std::ostream& Graph_EW<ugraph, W>::print_edges(std::ostream& o, bool eofl)  const {	
+
 	const int NV = g_.number_of_vertices();	
 
 	for (auto i = 0; i < NV - 1; ++i) {
 		for (auto j = i + 1; j < NV; ++j) {
 
 			if (is_edge(i, j)) {
-				o << "[" << i << "]" << "-" << weight(i, j)  << "->" << "[" << j << "]" << endl;
+				o << "[" << i << "]" << "--" << weight(i, j)  << "-->" << "[" << j << "]" << endl;
 			}
 		}
 	}
@@ -670,13 +670,14 @@ std::ostream& Graph_EW<ugraph, W>::print_edge_weights(std::ostream& o, bool line
 
 	//streams edge-weights 
 	if (line_format) {
-		for (auto i = 0; i < NV - 1; ++i) {
+		print_edges(o, false);
+		/*for (auto i = 0; i < NV - 1; ++i) {
 			for (auto j = i + 1; j < NV; ++j) {
 				if (we_[i][j] != NO_WEIGHT) {
 					o << "[" << i << "->" << j << " (" << we_[i][j] << ")] " << endl;
 				}
 			}
-		}
+		}*/
 	}
 	else {								//outputs to stream edge-weights in matrix form
 		for (auto i = 0; i < NV - 1; ++i) {

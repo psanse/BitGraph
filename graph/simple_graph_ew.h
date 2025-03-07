@@ -154,8 +154,8 @@ public:
 	* @returns 0 if success, -1 if memory allocation fails
 	**/
 	template<bool EdgeWeightedGraph = false>
-	int reset					(std::size_t n, W val = ZERO_WEIGHT, string name = "");
-	//int init					(int n, W val = NO_WEIGHT, bool reset_name = true);
+	int reset					(std::size_t n, W val = ZERO_WEIGHT, string name = "");					//before: int init (int n, W val = NO_WEIGHT, bool reset_name = true);
+	
 
 /////////////////////////
 // basic operations
@@ -282,7 +282,11 @@ public:
 // I/O 
 
 virtual std::ostream& print_data		(bool lazy = true, std::ostream& o = std::cout, bool endl = true);
-virtual std::ostream& print_edges		(std::ostream& o = std::cout, bool endl = true) ;
+
+	/**
+	* @brief prints the edges of the graph in line format [v]-(val)->[w], one edge per line
+	**/
+virtual std::ostream& print_edges		(std::ostream& o = std::cout, bool endl = true)  const;
 
 	/**
 	* @brief Reads weighted directed graph from file in DIMACS format
@@ -452,7 +456,7 @@ public:
 /////////////
 // I/O operations
 
-	std::ostream& print_edges			(std::ostream& o = std::cout, bool eofl = false)			override;
+	std::ostream& print_edges			(std::ostream& o = std::cout, bool eofl = false)			 const 	override;
 
 protected:
 	std::ostream& print_edge_weights	(std::ostream& o = std::cout, bool line_format = true)		const override;
