@@ -314,7 +314,8 @@ virtual std::ostream& print_edges		(std::ostream& o = std::cout, bool endl = tru
 protected:
 	Graph_t g_;
 	mat_t   we_;			//extended for vertex and edge weights (20_/11/21))																	
-};
+
+}; //end of class Base_Graph_EW
 
 ////////////////////////
 //
@@ -351,15 +352,14 @@ public:
 	//constructors (inherited)
 	using Base_Graph_EW<ugraph, W>::Base_Graph_EW;
 
-/////////////
-//setters and getters
 
+/////////////////////////
+// basic operations
 	/**
 	* @ brief adds an edge (v, w) with weight val
 	**/
 	void add_edge			(int v, int w, W val = NOWT)						override;
-
-	
+		
 	/**
 	*  @brief sets edge weight given an undirected edge {v, w} if the undirected edge exists
 	*  @param v input vertex
@@ -411,7 +411,7 @@ public:
 			
 
 /////////////
-//useful framework-specific interface for undirected weighted graphs
+//useful interface for graph operations
 	
 	int max_graph_degree	()														{ return ptype::g_.max_graph_degree(); }
 	int degree				(int v)										const		{ return ptype::g_.degree(v); }
@@ -430,6 +430,10 @@ public:
 	* @returns 0 if success, -1 if error
 	*/
 	int create_complement	(ugraph& g)									const		{ return ptype::g_.create_complement(g); }
+
+
+/////////////
+//other operations
 
 	/**
 	* @brief generates random edges uniformly with probability p and weight val
@@ -468,7 +472,13 @@ public:
 	* @returns output stream
 	**/
 	virtual	std::ostream& write_dimacs	(std::ostream& o);
-};
+
+}; //end of class Graph_EW<ugraph, W>
+
+
+//////////////////////////////////////////////////////////////////
+//  
+// Implementation in header file
 
 template <class Graph_t, class W>
 template <bool Erase>
