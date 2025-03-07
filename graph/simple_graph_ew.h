@@ -468,7 +468,7 @@ public:
 	**/
 	virtual	std::ostream& write_dimacs	(std::ostream& o);
 
-}; //end of class Graph_EW<ugraph, W>
+}; //end of Graph_EW class
 
 
 //////////////////////////////////////////////////////////////////

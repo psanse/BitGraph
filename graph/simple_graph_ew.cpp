@@ -573,22 +573,12 @@ std::ostream& Base_Graph_EW<Graph_t, W>::print_edges(std::ostream& o, bool eofl)
 //
 ///////////////////////////
 
-//template<class W>
-//int Graph_EW<ugraph, W>::create_complement(Graph_EW<ugraph, W>& g) const {
-//
-//	g.name(this->name());
-//	g.path(this->path());
-//	g.weights() = ptype::we_;
-//	ptype::g_.create_complement(g.graph());
-//
-//	return 0;
-//}
 
 template<class W>
 std::ostream& Graph_EW<ugraph, W>::print_edges(std::ostream& o, bool eofl) 
-{
-	// TODO: Insertar una instrucción "return" aquí
+{	
 	const int NV = g_.number_of_vertices();	
+
 	for (auto i = 0; i < NV - 1; ++i) {
 		for (auto j = i + 1; j < NV; ++j) {
 
