@@ -26,7 +26,7 @@ using vint = vector<int>;
 class UGraphEWTest : public ::testing::Test {
 protected:
 	void SetUp() override {
-		ugew.reset(NV, ugraph_ewi::NO_WEIGHT);						//all weights to NO_WEIGHT
+		ugew.reset(NV, ugraph_ewi::ZERO_WEIGHT);						//all weights to NO_WEIGHT
 		ugew.add_edge(0, 1, 1);
 		ugew.add_edge(0, 2, 2);
 		ugew.add_edge(1, 3, 3);
@@ -41,7 +41,7 @@ protected:
 
 TEST_F(UGraphEWTest, basic_setup) {
 	
-	EXPECT_EQ(ugraph_ewi::NO_WEIGHT, ugew.weight(1, 4));
+	EXPECT_EQ(ugraph_ewi::ZERO_WEIGHT, ugew.weight(1, 4));
 	EXPECT_EQ(1, ugew.weight(0, 1));
 	EXPECT_EQ(2, ugew.weight(0, 2));
 	EXPECT_EQ(3, ugew.weight(1, 3));
@@ -84,6 +84,21 @@ TEST_F(UGraphEWTest, complement_weights) {
 	EXPECT_EQ(-3, ugew.weight(1, 3));
 }
 
+TEST_F(UGraphEWTest, create_complement) {
+
+	ugraph_ewi ugcomp;
+
+	///////////////////////////////
+	ugew.create_complement(ugcomp);
+	///////////////////////////////
+
+	EXPECT_EQ(ugew.size(), ugcomp.size());
+	EXPECT_FALSE(ugcomp.is_edge(0,1));
+	EXPECT_FALSE(ugcomp.is_edge(0, 2));
+	EXPECT_FALSE(ugcomp.is_edge(1, 3));
+	EXPECT_TRUE(ugcomp.is_edge(0, 3));
+}
+
 TEST_F(UGraphEWTest, transform_weights) {
 
 	//multiply all weigths (vertex and edge-weights) by 5
@@ -92,10 +107,10 @@ TEST_F(UGraphEWTest, transform_weights) {
 	EXPECT_EQ(5,  ugew.weight(0, 1));
 	EXPECT_EQ(10, ugew.weight(0, 2));
 	EXPECT_EQ(15, ugew.weight(1, 3));
-	EXPECT_EQ(decltype(ugew)::NO_WEIGHT, ugew.weight(1, 4));		//NO_WEIGHT - non-edge
+	EXPECT_EQ(decltype(ugew)::ZERO_WEIGHT, ugew.weight(1, 4));		//NO_WEIGHT - non-edge
 	
 
-	EXPECT_EQ(decltype(ugew)::NO_WEIGHT, ugew.weight(1, 4));		//NO_WEIGHT - non-edge
+	EXPECT_EQ(decltype(ugew)::ZERO_WEIGHT, ugew.weight(1, 4));		//NO_WEIGHT - non-edge
 
 	//same using the scale functor utility
 	ugew.transform_weights(com::scale<decltype(ugew)::_wt>(5));
@@ -122,6 +137,7 @@ TEST_F(UGraphEWTest, generate_weights) {
 	//ugew.print_weights()
 }
 
+
 TEST(UGraphEW, constructor_file) {
 
 	ugraph_ewi ugew(PATH_GRAPH_TESTS_CMAKE_SRC_CODE "toy_ew_dimacs.txt");
@@ -144,31 +160,39 @@ TEST(UGraphEW, constructor_file) {
 	EXPECT_EQ(67, ugew.weight(3, 4));
 }
 
+
+
 //////////////////
 //
 // DISABLED TESTS - CHECK
 //
 //////////////////
 
+TEST_F(UGraphEWTest, DISABLED_printing) {
+	//visual test - DISABLE by default
+
+		//I/O
+	ugew.print_weights(cout, false, decltype(ugew)::BOTH);
+
+}
+
 TEST(UGraphEW, DISABLED_gen_random ){
 ////////////////
 // generates a random graph and adds random edge weights
 //
 // TODO@do real test queries
-	
-	LOG_INFO("EdgeWeighted_New:gen_random----------------------------");
 
 	ugraph_ewi ugew;
-	const int NV=10;
+	const int NV = 10;
 
-	RandomGen<ugraph_ewi>::create_graph(ugew, NV, .3);										/* NO_WEIGHT edge weights */
+	RandomGen<ugraph_ewi>::create_graph(ugew, NV, .3);										
 	EdgeWeightGen< ugraph_ewi >::create_weights(ugew, EdgeWeightGen<ugraph_ewi>::WMOD);
 
 	//QUERIES....
 
 	//I/O
-	ugew.print_data();
-	ugew.print_weights();
+	/*ugew.print_data();
+	ugew.print_weights();*/
 
 //////////////////
 //directed graph
@@ -184,12 +208,7 @@ TEST(UGraphEW, DISABLED_gen_random ){
 	////I/O
 	//gew.print_data();
 	//gew.print_weights();
-	
-	LOG_INFO("EdgeWeighted_New: END gen_random-----------------------");
-#ifdef	TEST_GRAPH_FAST_SORT_STEP_BY_STEP
-	LOG_ERROR("press any key to continue");
-	cin.get();
-#endif
+
 }
 
 TEST(UGraphEW, DISABLED_write_to_file) {

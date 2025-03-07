@@ -2,7 +2,9 @@
 * @file graph_gen.h
 * @brief header for Erdos-Renyi sparse and non sparse bitstring unidrected graph generation 
 * @author pss
-* @details: created?, last_update 28/02/25
+* @details: created?, last_update 07/03/25
+* 
+* TODO - simplify class architecture for graph generation (07/03/25)
 **/
 
 #ifndef __GRAPH_GEN_H__
@@ -14,10 +16,10 @@
 
 #include "utils/common.h"
 #include "simple_ugraph.h"
-#include "simple_graph_w.h"				// must be after ugraph include
-#include "simple_graph_ew.h"				// must beafter ugraph include
+#include "simple_graph_w.h"							// must be after simple_ugraph include
+#include "simple_graph_ew.h"						// must be after simple_ugraph include
 
-//aliases for graph types (see graph.h)
+//aliases for graph types (see also graph.h)
 using graph = Graph<bitarray>;						//simple graph
 using ugraph = Ugraph<bitarray>;					//simple undirected graph
 using sparse_graph = Graph<sparse_bitarray>;		//simple sparse graph
@@ -27,12 +29,10 @@ using ugraph_wi = Graph_W<ugraph, int>;
 using ugraph_ew = Graph_EW<ugraph, double>;
 using ugraph_ewi = Graph_EW<ugraph, int>;
 
-
-
 /////////////////
 //
 // struct random_attr_t
-// (data for random generation)
+// (data for random graph generation)
 //
 //////////////////
 
@@ -70,7 +70,7 @@ struct random_attr_t {
 /////////////////
 //
 // class RandomGen
-// (random generation of generic non-sparse graphs)
+// (random generation of generic non-sparse and unweighted graphs)
 //
 //////////////////
 
@@ -110,7 +110,7 @@ public:
 /////////////////
 //
 // class SparseRandomGen
-// (random generation of generic sparse graphs)
+// (random generation of generic sparse unweighted graphs)
 // 
 // Currently only for undirected graphs
 //
@@ -173,7 +173,7 @@ template <class Graph_t>
 class WeightGen
 {
 public:
-	enum type_t {WMOD=0, WDEG};
+	enum type_t {WMOD = 0, WDEG};
 
 	/*
 	* @brief Overrites new vertex weights in the graph
@@ -419,7 +419,7 @@ int EdgeWeightGen<Graph_t>::create_weights (Graph_t& g, type_t type, int wmod, s
 
 	switch (type) {
 	case WMOD:
-		g.set_modulus_edge_weights(wmod);		//overrites all weights, no need to clear them previously
+		g.set_modulus_edge_weights(wmod);		//overwrites all weights, no need to clear them previously
 		break;
 	default:
 		LOG_INFO("bad weight generation mode - EdgeWeightGen<Graph_t>::create_weights");

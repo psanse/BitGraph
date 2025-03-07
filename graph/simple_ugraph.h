@@ -90,7 +90,7 @@ public:
 	* @param g output complement graph
 	* @return 0 if success, -1 if error 
 	**/
-	int create_complement		(Ugraph& g)									const;	
+	int create_complement		(Ugraph& g)								const;	
 
 
 /////////////

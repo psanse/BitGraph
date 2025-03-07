@@ -216,6 +216,13 @@ virtual	double density					(bool lazy=true);
 	**/
 	int degree_in						(int v)					const;
 
+	/**
+	* @brief Computes complement graph
+	* @param g: output complement graph
+	* @return 0 if success, -1 if error
+	**/
+	 int create_complement			(Graph& g)					 const;
+
 //////////////	
 // Modifiers
 
@@ -1143,6 +1150,29 @@ int Graph<T>::degree_in(int v) const {
 
 	}
 	return res;
+}
+
+template<class T>
+inline 
+int Graph<T>::create_complement(Graph& g) const
+{
+	//resets g with new allocation
+	if (g.reset(NV_) == -1) return -1;
+
+	for (auto i = 0; i < ptype::NV_ - 1; ++i) {
+		for (auto j = i + 1; j < ptype::NV_; ++j) {
+
+			if (!adj_[i].is_bit(j)) {
+				g.add_edge(i, j);
+			}
+
+			if (!adj_[j].is_bit(i)) {
+				g.add_edge(j, i);
+			}
+		}
+	}
+
+	return 0;
 }
 
 template<class T>

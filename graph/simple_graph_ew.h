@@ -264,19 +264,24 @@ public:
 // other operations
 	
 	/**
+	* @brief created complement graph in @g
+	* @param g output graph
+	* @returns 0 if success, -1 if error
+	**/
+	int create_complement				(Base_Graph_EW<Graph_t, W>& g)					const;
+
+	/**
 	* @brief generates random edges uniformly with probability p and weight val
 	**/
-	virtual void gen_random_edges			(double , W val); 
+	virtual void gen_random_edges		(double , W val); 
 
 ////////////
 // I/O 
 
-// TODO - CHECK
-
 virtual std::ostream& print_data		(bool lazy = true, std::ostream& o = std::cout, bool endl = true);
 virtual std::ostream& print_edges		(std::ostream& o = std::cout, bool endl = true) ;
 
-	/*
+	/**
 	* @brief Reads weighted directed graph from file in DIMACS format
 	* 
 	*			I. vertex weights are read in lines n <v> <w>, if missing, weights are set to NO_WEIGHT
@@ -285,10 +290,10 @@ virtual std::ostream& print_edges		(std::ostream& o = std::cout, bool endl = tru
 	* 
 	* @param filename name of the file	 
 	* @returns 0 if success, -1 if error
-	*/
+	**/
 	int read_dimacs						(std::string filename);
 
-	/*
+	/**
 	* @brief Writes directed graph to stream in dimacs format
 	*
 	*		 I. weights in self-loops are considered vertex weights
@@ -299,29 +304,34 @@ virtual std::ostream& print_edges		(std::ostream& o = std::cout, bool endl = tru
 	* 
 	* @param o output stream
 	* @returns output stream
-	*/
+	**/
 	virtual	std::ostream& write_dimacs	(std::ostream& o);
 		
-	/*
-	* @brief streams non-empty (weight value not NO_WEIGHT) weights
-	*		 of all directed edges. 
-	*/
-	virtual	std::ostream& print_weights	(std::ostream& o = std::cout, bool line_format = true,
-											bool only_vertex_weights = false		)					const;
-	
-	/*
-	* @brief streams non-empty (weight value not NO_WEIGHT) weights 
-	*		 of directed edges with endpoints in vertices in lv
-	*/
-	virtual	std::ostream& print_weights	(vint& lv, std::ostream& o = std::cout, 
-											bool only_vertex_weights = false		)					const;
+	/**
+	* @brief streams non-empty (excluding NO_WEIGHT value) weight info
+	*		 for all directed edges. 
+	**/
+	std::ostream& print_weights				(std::ostream& o = std::cout, bool line_format = true,	
+														int type = BOTH		)								const;
+	/**
+	* @brief streams non-empty (excluding NO_WEIGHT value)  weights
+	*		 of directed edges with both endpoints in vertices in @lv
+	**/
+	std::ostream& print_weights					(vint& lv, std::ostream& o = std::cout, int type = BOTH)	const;
+
+protected:	
+	virtual	std::ostream& print_edge_weights	(std::ostream& o = std::cout, bool line_format = true)		const;
+			std::ostream& print_vertex_weights  (std::ostream& o = std::cout)								const;
+
+	virtual	std::ostream& print_edge_weights	(vint& lv, std::ostream& o = std::cout )					const;
+	std::ostream& print_vertex_weights			(vint& lv, std::ostream& o = std::cout)						const;
 
 ///////////////////
 //data members
 
 protected:
 	Graph_t g_;
-	mat_t   we_;					//matrix of vertex and edge-weights 																
+	mat_t   we_;								//matrix of vertex and edge-weights 																
 
 }; //end of class Base_Graph_EW
 
@@ -420,30 +430,15 @@ public:
 			
 
 /////////////
-//useful interface for graph operations
+//useful interface for graph operations (no weights)
 	
 	int max_graph_degree	()														{ return ptype::g_.max_graph_degree(); }
 	int degree				(int v)										const		{ return ptype::g_.degree(v); }
 	int degree				(int v, const typename ptype::_bbt & bbn)	const		{ return ptype::g_.degree(v, bbn); }
-
-	/*
-	* @brief Complement graph (currently name info of original graph is lost)
-	* @param g output graph
-	* @returns 0 if success, -1 if error
-	*/
-	int create_complement	(Graph_EW<ugraph, W>& g)					const;				
 	
-	/*
-	* @brief Complement undirected graph (weights are lost)
-	* @param g output complement undirected unweighted graph
-	* @returns 0 if success, -1 if error
-	*/
-	int create_complement	(ugraph& g)									const		{ return ptype::g_.create_complement(g); }
-
-
 /////////////
 //other operations
-
+	
 	/**
 	* @brief generates random edges uniformly with probability p and weight val
 	**/
@@ -452,22 +447,13 @@ public:
 /////////////
 // I/O operations
 
-	 std::ostream& print_edges			(std::ostream& o = std::cout, bool eofl = false)  override;
+	std::ostream& print_edges			(std::ostream& o = std::cout, bool eofl = false)			override;
 
-	/**
-	* @brief streams non-empty (weight value not NO_WEIGHT) weights
-	*		 of all undirected edges.
-	**/
-	virtual	std::ostream& print_weights	(std::ostream& o = std::cout, bool line_format = true,
-											bool only_vertex_weights = false					)	const override;
-	
-	/**
-	* @brief streams non-empty (weight value not NO_WEIGHT) weights
-	*		 of undirected edges with endpoints in vertices in lv
-	**/
-	virtual	std::ostream& print_weights	(vint& lv, std::ostream& o = std::cout,
-												bool only_vertex_weights = false				)	const override;
+protected:
+	std::ostream& print_edge_weights	(std::ostream& o = std::cout, bool line_format = true)		const override;
+	std::ostream& print_edge_weights	(vint& lv, std::ostream& o = std::cout)						const override;
 
+public:	
 	/**
 	* @brief Writes undirected graph to stream in dimacs format
 	*
