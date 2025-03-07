@@ -2,14 +2,13 @@
   * @file simple_graph_ew.h
   * @brief classes Base_Graph_EW and Graph_EW for edge-weighted graphs, 
   *			where self_loops are considered as vertex weights. Thus IT IS
-  *			NOT for both vertex and edge-weighted GRAPHS
+  *			NOT for the most general case of vertex and edge-weighted GRAPHS,
+  *		    but could suffice also for vertices in both vertices and egdes
+  *			in many applications.
   *
-  * @created 16/01/19
-  * @milestoneA 10/11/2021 - train application
-  * @last_update 06/01/25
+  * @details: created 16/01/19, last_update 06/01/25
+  * @details: milestone train application (10/11/2021)
   * @author pss
-  *
-  * @comments  edge weights in self-loops are possible, and are considered as vertex weights
   *
   * This code is part of the GRAPH 1.0 C++ library
   **/
@@ -57,16 +56,19 @@ public:
 	using _wt = W;																					
 	
 	//enum to distinguish between vertex and edge weights
-	enum { VERTEX, EDGE, BOTH };						
+	enum { VERTEX, EDGE, BOTH };	
 
-	//constants - globals
+////////////////////////////
+//constants / globals
 	static const W NO_WEIGHT;								//default/no weight value for weights (0.0)	
-																				
-	//constructors
+	static const W ZERO_WEIGHT;
+
+//////////////////////////
+//constructors
 	Base_Graph_EW				()										{};											//no memory allocation
 explicit Base_Graph_EW			(mat_t& lwe);																		//creates empty graph with edge weights
 	Base_Graph_EW				(_gt& g, mat_t& lwe) : g_(g), we_(lwe)	{}											//creates graph with edge weights
-explicit Base_Graph_EW			(int n, W val = NO_WEIGHT)					{ reset(n, val); }							//creates empty graph with |V|= n and val weights	
+explicit Base_Graph_EW			(int n, W val = ZERO_WEIGHT)			{ reset(n, val); }							//creates empty graph with |V|= n and val weights	
 explicit Base_Graph_EW			(std::string filename);																//read weighted ASCII file or generate weights using formula- CHECK! (21/11/2021))
 			
 	//copy constructor, move constructor, copy operator =, move operator =
@@ -137,26 +139,29 @@ virtual	~Base_Graph_EW()										= default;
 
 //////////////////////////
 // memory allocation
- 
+
+protected:
+	/**
+	* @brief clearing without deallocation - internal use only	
+	**/
+	void reset					()								{ g_.reset(); we_.clear(); }
+
+public:
 	/*
-	* @brief resets to empty graph with |V|= n and assigns weight val to all vertices and edges
-	* @param n number of vertices
-	* @param reset_name if true, @name_ and @path_ reset to empty
-	* @returns 0 if success, -1 if memory allocation fails
-	* 
-	* @comment preserved for backward compatibility (use reset(...))
-	*/
-	//int init			(int n, W val = NO_WEIGHT, bool reset_name = true);
-	
-	void reset			()										{ g_.reset(); we_.clear(); }
-		
-	/*
-	* @brief resets to empty graph |V|= n and assigns weight val to all vertices and edges
+	* @brief resets to a graph with |V|= n with weight val in everey vertex and edge
 	* @param n number of vertices
 	* @param name name of the instance
 	* @returns 0 if success, -1 if memory allocation fails
 	*/
-	int reset			(std::size_t n, W val = NO_WEIGHT, string name = "");
+	int reset					(std::size_t n, W val = ZERO_WEIGHT, string name = "");
+	//int init			(int n, W val = NO_WEIGHT, bool reset_name = true);
+
+
+	/*
+	* @brief specific reset for edge-weighted graphs - vertex weights are set to NO_WEIGHT
+	*/
+	int reset_edge_weighted		(std::size_t n, W val = ZERO_WEIGHT, string name = "");
+		
 
 /////////////////////////
 // basic operations
@@ -165,7 +170,7 @@ virtual	~Base_Graph_EW()										= default;
 	/**
 	* @ brief adds an edge (v, w) with weight val
 	**/
-	virtual	void add_edge				(int v, int w, W val = NO_WEIGHT);
+	virtual	void add_edge				(int v, int w, W val = ZERO_WEIGHT);
 
 	/*
 	*  @brief sets vertex-weight
@@ -176,7 +181,7 @@ virtual	~Base_Graph_EW()										= default;
 	/*
 	*  @brief sets all vertex-weights (self-loop edge weights) to the same weight @val
 	*/
-	void add_vertex_weight				(W val = NO_WEIGHT);
+	void add_vertex_weight				(W val = ZERO_WEIGHT);
 
 	/*
 	*  @brief sets edge-weight to an EXISTNG given directed edge (v, w) 
@@ -204,7 +209,7 @@ virtual	~Base_Graph_EW()										= default;
 	*  @details:  non-edge weights are set to NO_WEIGHT
 	*  @details: vertex weights are not modified
 	*/
-	virtual	void add_edge_weight		(W val = NO_WEIGHT);		 
+	virtual	void add_edge_weight		(W val = ZERO_WEIGHT);
 
 /////////////////////////
 // boolean properties
@@ -229,7 +234,7 @@ virtual	~Base_Graph_EW()										= default;
 	* @brief transforms weights using functor F
 	**/
 	template<class Func>
-	void transform_weights					(Func& f, int type = BOTH);
+	void transform_weights				(Func& f, int type = BOTH);
 
 	/**
 	* @brief specific transformationn which changes the sign of the weights 
@@ -238,7 +243,7 @@ virtual	~Base_Graph_EW()										= default;
 	* 
 	* TODO.. create more specific transformation functions (07/03/25)
 	**/
-	void complement_weights					(int type = BOTH);	
+	void complement_weights				(int type = BOTH);	
 
 	///////////////////////////
 	//weight generation
@@ -313,7 +318,7 @@ virtual std::ostream& print_edges		(std::ostream& o = std::cout, bool endl = tru
 
 protected:
 	Graph_t g_;
-	mat_t   we_;			//extended for vertex and edge weights (20_/11/21))																	
+	mat_t   we_;					//matrix of vertex and edge-weights 																
 
 }; //end of class Base_Graph_EW
 
@@ -358,7 +363,7 @@ public:
 	/**
 	* @ brief adds an edge (v, w) with weight val
 	**/
-	void add_edge			(int v, int w, W val = NO_WEIGHT)						override;
+	void add_edge			(int v, int w, W val = ZERO_WEIGHT)						override;
 		
 	/**
 	*  @brief sets edge weight given an undirected edge {v, w} if the undirected edge exists
@@ -438,7 +443,7 @@ public:
 	/**
 	* @brief generates random edges uniformly with probability p and weight val
 	**/
-	 void gen_random_edges	(double, W val = NO_WEIGHT)						override;
+	 void gen_random_edges	(double, W val = ZERO_WEIGHT)						override;
 
 /////////////
 // I/O operations
@@ -553,7 +558,8 @@ inline void Base_Graph_EW<Graph_t, W>::transform_weights(Func& f, int type)
 	default:	
 		//should not happen	
 		LOG_ERROR("unknown type -  Base_Graph_EW<Graph_t, W>::transform_weights");
-		assert(0 == 1);		
+		LOG_ERROR("exiting");
+		std::exit(-1);
 	}
 
 }

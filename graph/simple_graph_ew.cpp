@@ -21,40 +21,19 @@
 #include <fstream>
 #include <iostream>
 
-//works when NDEBUG is undefined - normally when the compiler is working in DEBUG mode
+//works when NDEBUG is undefined - (normally when in compiler DEBUG mode)
 #include <cassert>
 
 using namespace std;	
 
 /////////////////////////////////////////////////
 template<class Graph_t, class W>
-const W Base_Graph_EW <Graph_t, W >::NO_WEIGHT = 0;					// or 0x1FFFFFFF (best value for empty weight?)									
+const W Base_Graph_EW <Graph_t, W >::NO_WEIGHT =  -1;					// or 0x1FFFFFFF (best value for empty weight?)	
+
+template<class Graph_t, class W>
+const W Base_Graph_EW <Graph_t, W >::ZERO_WEIGHT = 0;
 /////////////////////////////////////////////////
 
-
-//template<class Graph_t, class W>
-//int Base_Graph_EW<Graph_t, W>::init(int NV, W val, bool reset_name){
-//
-//	if (g_.reset(NV) == -1) {
-//		LOG_ERROR("error during memory graph allocation - Base_Graph_EW<T, W>::init");
-//		return -1;
-//	}
-//	
-//	try {
-//		we_.assign(NV, vector<W>(NV, val));
-//	}
-//	catch (...) {
-//		LOG_ERROR("bad weight assignment - Base_Graph_EW<Graph_t, W>::init");
-//		return -1;
-//	}
-//
-//	if (reset_name) {
-//		g_.name("");
-//		g_.path("");
-//	}
-//
-//return 0;
-//}
 
 
 template<class Graph_t, class W>
@@ -69,7 +48,7 @@ template<class Graph_t, class W>
 		we_.assign(NV, vector<W>(NV, val));
 	}
 	catch (...) {
-		LOG_ERROR("bad weight assignment - Base_Graph_EW<Graph_t, W>::init");
+		LOG_ERROR("bad weight assignment - Base_Graph_EW<Graph_t, W>::reset");
 		return -1;
 	}
 
@@ -77,6 +56,21 @@ template<class Graph_t, class W>
 
 	return 0;	
 }
+
+ template<class Graph_t, class W>
+ int Base_Graph_EW<Graph_t, W>::reset_edge_weighted(std::size_t NV, W val, string name)
+ {
+	 int retVal = reset(NV, val, name);
+	 if (retVal != -1) {
+
+		 //sets to NO_WEIGHT the vertex weights
+		 for (auto i = 0; i < NV; ++i) {
+			 we_[i][i] = NO_WEIGHT;	
+		 }
+	 }
+
+	 return 0;
+ }
 
 template<class Graph_t, class W>
  bool Base_Graph_EW<Graph_t, W>::is_consistent(){
@@ -205,9 +199,9 @@ template<class Graph_t, class W>
 		break;
 	default:	
 		LOG_ERROR("unknown type -  Base_Graph_EW<Graph_t, W>::complement_weights");
-		assert(0 == 1);
+		LOG_ERROR("exiting");
+		std::exit(-1);
 	}
-
 	
 }
 
@@ -261,7 +255,7 @@ int Base_Graph_EW<Graph_t, W>::read_dimacs (string filename){
 		
 	fstream f(filename.c_str());
 	if(!f){
-		LOGG_ERROR("error when reading file ", filename, " in DIMACS format - Base_Graph_EW<Graph_t, W>");
+		LOGG_ERROR("error when reading file ", filename, " in DIMACS format - Base_Graph_EW<Graph_t, W>::read_dimacs");
 		reset();
 		return -1;
 	}
