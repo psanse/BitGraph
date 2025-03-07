@@ -60,13 +60,13 @@ public:
 	enum { VERTEX, EDGE, BOTH };						
 
 	//constants - globals
-	static const W NOWT;								//default/no weight value for weights (0.0)	
+	static const W NO_WEIGHT;								//default/no weight value for weights (0.0)	
 																				
 	//constructors
 	Base_Graph_EW				()										{};											//no memory allocation
 explicit Base_Graph_EW			(mat_t& lwe);																		//creates empty graph with edge weights
 	Base_Graph_EW				(_gt& g, mat_t& lwe) : g_(g), we_(lwe)	{}											//creates graph with edge weights
-explicit Base_Graph_EW			(int n, W val = NOWT)					{ reset(n, val); }							//creates empty graph with |V|= n and val weights	
+explicit Base_Graph_EW			(int n, W val = NO_WEIGHT)					{ reset(n, val); }							//creates empty graph with |V|= n and val weights	
 explicit Base_Graph_EW			(std::string filename);																//read weighted ASCII file or generate weights using formula- CHECK! (21/11/2021))
 			
 	//copy constructor, move constructor, copy operator =, move operator =
@@ -146,7 +146,7 @@ virtual	~Base_Graph_EW()										= default;
 	* 
 	* @comment preserved for backward compatibility (use reset(...))
 	*/
-	//int init			(int n, W val = NOWT, bool reset_name = true);
+	//int init			(int n, W val = NO_WEIGHT, bool reset_name = true);
 	
 	void reset			()										{ g_.reset(); we_.clear(); }
 		
@@ -156,7 +156,7 @@ virtual	~Base_Graph_EW()										= default;
 	* @param name name of the instance
 	* @returns 0 if success, -1 if memory allocation fails
 	*/
-	int reset			(std::size_t n, W val = NOWT, string name = "");
+	int reset			(std::size_t n, W val = NO_WEIGHT, string name = "");
 
 /////////////////////////
 // basic operations
@@ -165,7 +165,7 @@ virtual	~Base_Graph_EW()										= default;
 	/**
 	* @ brief adds an edge (v, w) with weight val
 	**/
-	virtual	void add_edge				(int v, int w, W val = NOWT);
+	virtual	void add_edge				(int v, int w, W val = NO_WEIGHT);
 
 	/*
 	*  @brief sets vertex-weight
@@ -176,7 +176,7 @@ virtual	~Base_Graph_EW()										= default;
 	/*
 	*  @brief sets all vertex-weights (self-loop edge weights) to the same weight @val
 	*/
-	void add_vertex_weight				(W val = NOWT);
+	void add_vertex_weight				(W val = NO_WEIGHT);
 
 	/*
 	*  @brief sets edge-weight to an EXISTNG given directed edge (v, w) 
@@ -192,19 +192,19 @@ virtual	~Base_Graph_EW()										= default;
 	*  @brief sets edge weights in @lw  if there is a corresponding edge.
 	*		  Vertex weights are not modified.
 	*  @param lw matrix of edge weights
-	*  @param template Erase: if TRUE weights of non-edges are set to NOWT
+	*  @param template Erase: if TRUE weights of non-edges are set to NO_WEIGHT
 	*						  (aditional cleaning)
-	*  @details: causses an assertion error if @lw.size() != |V|
+	*  @details: asserts  @lw.size() == |V|
 	*/
 	template<bool Erase = false>
 	void add_edge_weight				(mat_t& lw);
 
 	/*
 	*  @brief sets all edge-weights to val
-	*  @details:  non-edge weights are set to NOWT
+	*  @details:  non-edge weights are set to NO_WEIGHT
 	*  @details: vertex weights are not modified
 	*/
-	virtual	void add_edge_weight		(W val = NOWT);		 
+	virtual	void add_edge_weight		(W val = NO_WEIGHT);		 
 
 /////////////////////////
 // boolean properties
@@ -248,7 +248,7 @@ virtual	~Base_Graph_EW()										= default;
 	*
 	*			I. we(v, w) = 1 + ((v + w) % MODULUS)	(1-based index)
 	* 
-	*			II.we(v, v) are set to NOWT
+	*			II.we(v, v) are set to NO_WEIGHT
 	* 
 	*			III. non-edges are not overritten
 	*/
@@ -271,9 +271,9 @@ virtual std::ostream& print_edges		(std::ostream& o = std::cout, bool endl = tru
 	/*
 	* @brief Reads weighted directed graph from file in DIMACS format
 	* 
-	*			I. vertex weights are read in lines n <v> <w>, if missing, weights are set to NOWT
+	*			I. vertex weights are read in lines n <v> <w>, if missing, weights are set to NO_WEIGHT
 	* 
-	*			II. if the file has edges with no edge weights, weights are set to NOWT
+	*			II. if the file has edges with no edge weights, weights are set to NO_WEIGHT
 	* 
 	* @param filename name of the file	 
 	* @returns 0 if success, -1 if error
@@ -285,9 +285,9 @@ virtual std::ostream& print_edges		(std::ostream& o = std::cout, bool endl = tru
 	*
 	*		 I. weights in self-loops are considered vertex weights
 	* 
-	*		II. vertex weights with value NOWT are not written to file
+	*		II. vertex weights with value NO_WEIGHT are not written to file
 	* 
-	*		III.For every edge, a weight is written (including NOWT)
+	*		III.For every edge, a weight is written (including NO_WEIGHT)
 	* 
 	* @param o output stream
 	* @returns output stream
@@ -295,14 +295,14 @@ virtual std::ostream& print_edges		(std::ostream& o = std::cout, bool endl = tru
 	virtual	std::ostream& write_dimacs	(std::ostream& o);
 		
 	/*
-	* @brief streams non-empty (weight value not NOWT) weights
+	* @brief streams non-empty (weight value not NO_WEIGHT) weights
 	*		 of all directed edges. 
 	*/
 	virtual	std::ostream& print_weights	(std::ostream& o = std::cout, bool line_format = true,
 											bool only_vertex_weights = false		)					const;
 	
 	/*
-	* @brief streams non-empty (weight value not NOWT) weights 
+	* @brief streams non-empty (weight value not NO_WEIGHT) weights 
 	*		 of directed edges with endpoints in vertices in lv
 	*/
 	virtual	std::ostream& print_weights	(vint& lv, std::ostream& o = std::cout, 
@@ -358,7 +358,7 @@ public:
 	/**
 	* @ brief adds an edge (v, w) with weight val
 	**/
-	void add_edge			(int v, int w, W val = NOWT)						override;
+	void add_edge			(int v, int w, W val = NO_WEIGHT)						override;
 		
 	/**
 	*  @brief sets edge weight given an undirected edge {v, w} if the undirected edge exists
@@ -375,7 +375,7 @@ public:
 	/**
 	*  @brief sets edge-weight val to all vertices (_we[v, v]) and edge weights
 	* 
-	*		I. NOWT is set as weight value to non-edges
+	*		I. NO_WEIGHT is set as weight value to non-edges
 	*		II. Weights in self-loops (vertices) are NOT modified
 	* 
 	* @param val weight value
@@ -385,11 +385,11 @@ public:
 	/**
 	*  @brief sets edge-weights in lw consistently to the graph
 	*
-	*		I. NOWT is set as weight value to non-edges in lw
+	*		I. NO_WEIGHT is set as weight value to non-edges in lw
 	*		II. Weights in self-loops (vertices) are NOT modified
 	* 
 	*  @param lw matrix of edge weights
-	*  @param template Erase: if TRUE weights of non-edges are set to NOWT
+	*  @param template Erase: if TRUE weights of non-edges are set to NO_WEIGHT
 	*  @details: asserts lw.size() == |V|
 	**/
 	template<bool Erase = false>
@@ -401,13 +401,13 @@ public:
 	/**
 	* @brief generates weights based on modulus operation [Pullan 2008, MODULUS = 200]
 	*
-	*			I. we(v, w) = 1 + ((v + w) % MODULUS)	(1-based index)
+	*			I.  we(v, w) = 1 + ((v + w) % MODULUS)	(1-based index)
 	* 
-	*			II.we(v, v) are set to NOWT
+	*			II. we(v, v) are set to NO_WEIGHT
 	*		
-	*			III. non-edges are not modified (assumed NOWT)
+	*			III.Non-edges are not modified (assumed NO_WEIGHT)
 	**/
-	void gen_modulus_edge_weights(int MODULUS = DEFAULT_WEIGHT_MODULUS)  override;
+	void gen_modulus_edge_weights	(int MODULUS = DEFAULT_WEIGHT_MODULUS)  override;
 			
 
 /////////////
@@ -438,7 +438,7 @@ public:
 	/**
 	* @brief generates random edges uniformly with probability p and weight val
 	**/
-	 void gen_random_edges	(double, W val = NOWT)						override;
+	 void gen_random_edges	(double, W val = NO_WEIGHT)						override;
 
 /////////////
 // I/O operations
@@ -446,14 +446,14 @@ public:
 	 std::ostream& print_edges			(std::ostream& o = std::cout, bool eofl = false)  override;
 
 	/**
-	* @brief streams non-empty (weight value not NOWT) weights
+	* @brief streams non-empty (weight value not NO_WEIGHT) weights
 	*		 of all undirected edges.
 	**/
 	virtual	std::ostream& print_weights	(std::ostream& o = std::cout, bool line_format = true,
 											bool only_vertex_weights = false					)	const override;
 	
 	/**
-	* @brief streams non-empty (weight value not NOWT) weights
+	* @brief streams non-empty (weight value not NO_WEIGHT) weights
 	*		 of undirected edges with endpoints in vertices in lv
 	**/
 	virtual	std::ostream& print_weights	(vint& lv, std::ostream& o = std::cout,
@@ -464,9 +464,9 @@ public:
 	*
 	*		 I. weights in self-loops are considered vertex weights
 	*
-	*		II. vertex weights with value NOWT are not written to file
+	*		II. vertex weights with value NO_WEIGHT are not written to file
 	*
-	*		III.for every edge, a weight is written (including NOWT)
+	*		III.for every edge, a weight is written (including NO_WEIGHT)
 	*
 	* @param o output stream
 	* @returns output stream
@@ -506,11 +506,10 @@ void Base_Graph_EW< Graph_t, W>::add_edge_weight (mat_t& lw) {
 			}
 			else {
 				//cleans non-edge weights if required
-				if (Erase) { we_[v][w] = NOWT; }
+				if (Erase) { we_[v][w] = NO_WEIGHT; }
 			}
 		}
 	}
-
 }
 
 template<class Graph_t, class W>
@@ -524,10 +523,10 @@ inline void Base_Graph_EW<Graph_t, W>::transform_weights(Func& f, int type)
 	case EDGE:
 		for (auto i = 0; i < NV - 1; ++i) {
 			for (auto j = i + 1; j < NV; ++j) {
-				if (we_[i][j] != NOWT) {
+				if (we_[i][j] != NO_WEIGHT) {
 					we_[i][j] = f(we_[i][j]);
 				}
-				if (we_[j][i] != NOWT) {
+				if (we_[j][i] != NO_WEIGHT) {
 					we_[j][i] = f(we_[j][i]);
 				}
 			}
@@ -536,7 +535,7 @@ inline void Base_Graph_EW<Graph_t, W>::transform_weights(Func& f, int type)
 		//vertex-weights
 	case VERTEX:
 		for (auto i = 0; i < NV; ++i) {
-			if (we_[i][i] != NOWT) {
+			if (we_[i][i] != NO_WEIGHT) {
 				we_[i][i] = f(we_[i][i]);	
 			}	
 		}
@@ -545,7 +544,7 @@ inline void Base_Graph_EW<Graph_t, W>::transform_weights(Func& f, int type)
 		//vertex and edge-weights
 		for (auto i = 0; i < NV ; ++i) {
 			for (auto j = 0; j < NV; ++j) {
-				if (we_[i][j] != NOWT) {
+				if (we_[i][j] != NO_WEIGHT) {
 					we_[i][j] = f(we_[i][j]);
 				}			
 			}

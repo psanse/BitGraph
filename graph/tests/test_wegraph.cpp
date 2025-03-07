@@ -26,7 +26,7 @@ using vint = vector<int>;
 class UGraphEWTest : public ::testing::Test {
 protected:
 	void SetUp() override {
-		ugew.reset(NV, ugraph_ewi::NOWT);						//all weights to NOWT
+		ugew.reset(NV, ugraph_ewi::NO_WEIGHT);						//all weights to NO_WEIGHT
 		ugew.add_edge(0, 1, 1);
 		ugew.add_edge(0, 2, 2);
 		ugew.add_edge(1, 3, 3);
@@ -41,7 +41,7 @@ protected:
 
 TEST_F(UGraphEWTest, basic_setup) {
 	
-	EXPECT_EQ(ugraph_ewi::NOWT, ugew.weight(1, 4));
+	EXPECT_EQ(ugraph_ewi::NO_WEIGHT, ugew.weight(1, 4));
 	EXPECT_EQ(1, ugew.weight(0, 1));
 	EXPECT_EQ(2, ugew.weight(0, 2));
 	EXPECT_EQ(3, ugew.weight(1, 3));
@@ -92,10 +92,10 @@ TEST_F(UGraphEWTest, transform_weights) {
 	EXPECT_EQ(5,  ugew.weight(0, 1));
 	EXPECT_EQ(10, ugew.weight(0, 2));
 	EXPECT_EQ(15, ugew.weight(1, 3));
-	EXPECT_EQ(decltype(ugew)::NOWT, ugew.weight(1, 4));		//NOWT - non-edge
+	EXPECT_EQ(decltype(ugew)::NO_WEIGHT, ugew.weight(1, 4));		//NO_WEIGHT - non-edge
 	
 
-	EXPECT_EQ(decltype(ugew)::NOWT, ugew.weight(1, 4));		//NOWT - non-edge
+	EXPECT_EQ(decltype(ugew)::NO_WEIGHT, ugew.weight(1, 4));		//NO_WEIGHT - non-edge
 
 	//same using the scale functor utility
 	ugew.transform_weights(com::scale<decltype(ugew)::_wt>(5));
@@ -161,7 +161,7 @@ TEST(UGraphEW, DISABLED_gen_random ){
 	ugraph_ewi ugew;
 	const int NV=10;
 
-	RandomGen<ugraph_ewi>::create_graph(ugew, NV, .3);										/* NOWT edge weights */
+	RandomGen<ugraph_ewi>::create_graph(ugew, NV, .3);										/* NO_WEIGHT edge weights */
 	EdgeWeightGen< ugraph_ewi >::create_weights(ugew, EdgeWeightGen<ugraph_ewi>::WMOD);
 
 	//QUERIES....
