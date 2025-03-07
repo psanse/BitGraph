@@ -153,13 +153,9 @@ public:
 	* @param name name of the instance
 	* @returns 0 if success, -1 if memory allocation fails
 	**/
+	template<bool EdgeWeightedGraph = false>
 	int reset					(std::size_t n, W val = ZERO_WEIGHT, string name = "");
-	//int init			(int n, W val = NO_WEIGHT, bool reset_name = true);
-
-	/**
-	* @brief specific reset for edge-weighted graphs - vertex weights are set to NO_WEIGHT
-	**/
-	int reset_edge_weighted		(std::size_t n, W val = ZERO_WEIGHT, string name = "");
+	//int init					(int n, W val = NO_WEIGHT, bool reset_name = true);
 
 /////////////////////////
 // basic operations
@@ -181,12 +177,14 @@ public:
 	void set_vertex_weight				(W val = ZERO_WEIGHT);
 
 	/**
-	*  @brief sets edge-weight to an EXISTNG given directed edge (v, w) 
+	*  @brief sets edge-weight to an EXISTNG given directed edge (v, w)
+	*		  (in a non-edge it can only set weight to NO_WEIGHT)
 	*  @param v input vertex
 	*  @param w input vertex
 	*  @param val input weight value
 
 	*  @details: asserts it REALLY is an edge (and not a self-loop)
+	*  @details: in a non-edge it can only set weight to NO_WEIGHT
 	**/
 	virtual	void set_edge_weight		(int v, int w, W val);
 
@@ -210,6 +208,11 @@ public:
 	**/
 	template<bool EraseNonEdges = false>
 	void set_edge_weight				(W val = ZERO_WEIGHT);
+
+	/**
+	* @brief sets all non-edges to weight NO_WEIGHT.
+	**/
+	void erase_non_edge_weights			();
 
 /////////////////////////
 // boolean properties
@@ -379,23 +382,25 @@ public:
 	void add_edge			(int v, int w, W val = ptype::ZERO_WEIGHT)	override;
 		
 	/**
-	*  @brief sets edge weight given an undirected edge {v, w} if the undirected edge exists
+	*  @brief sets edge-weight val to the undirected edge {v, w} if the edge exists
+	*		  (in a non-edge it can only set the weight to NO_WEIGHT)
 	*  @param v input vertex
 	*  @param w input vertex
 	*  @param we input weight value
 	*
 	*	(weights in self-loops are always added - considered vertex weights)
 	*
-	*  @details: asserts it is a real edge 
+	*  @details: asserts v!=w
+	*  @details: in a non-edge it can only set weight to NO_WEIGHT
 	**/
-	void set_edge_weight	(int v, int w, W we)					override;
+	void set_edge_weight	(int v, int w, W val)					override;
 
 	/**
-	*  @brief sets edge-weight val to all vertices (_we[v, v]) and edge weights
+	*  @brief sets edge-weight val to existing edges
+	* 			
+	*		I. Weights in self-loops (vertices) are NOT modified
 	* 
-	*		I. NO_WEIGHT is set as weight value to non-edges
-	*		II. Weights in self-loops (vertices) are NOT modified
-	* 
+	* @param template EraseNonEdges: if TRUE weights of non-edges are set to NO_WEIGHT
 	* @param val weight value
 	**/
 	template <bool EraseNonEdges = false>
@@ -408,7 +413,7 @@ public:
 	*		II. Weights in self-loops (vertices) are NOT modified
 	* 
 	*  @param lw matrix of edge weights
-	*  @param template Erase: if TRUE weights of non-edges are set to NO_WEIGHT
+	*  @param template EraseNonEdges: if TRUE weights of non-edges are set to NO_WEIGHT
 	*  @details: asserts lw.size() == |V|
 	**/
 	template<bool EraseNonEdges = false>
@@ -578,6 +583,8 @@ void Base_Graph_EW< Graph_t, W>::set_edge_weight(W val) {
 
 
 
+
+
 template<class Graph_t, class W>
 template <bool EraseNonEdges>
 inline
@@ -702,6 +709,35 @@ void Graph_EW<ugraph, W>::set_modulus_edge_weights(int MODULUS) {
 			}
 		}
 	}
+}
+
+template<class Graph_t, class W>
+template<bool EdgeWeightedGraph>
+int Base_Graph_EW<Graph_t, W>::reset(std::size_t NV, W val, string name)
+{
+	if (g_.reset(NV) == -1) {
+		LOG_ERROR("error during memory graph allocation - Base_Graph_W<T, W>::reset");
+		return -1;
+	}
+
+	try {
+		we_.assign(NV, vector<W>(NV, val));
+	}
+	catch (...) {
+		LOG_ERROR("bad weight assignment - Base_Graph_EW<Graph_t, W>::reset");
+		return -1;
+	}
+
+	//set vertex weights to NO_WEIGHT if required
+	if (EdgeWeightedGraph) {
+		for (auto i = 0; i < NV; ++i) {
+			we_[i][i] = NO_WEIGHT;
+		}
+	}
+
+	g_.name(name);
+
+	return 0;
 }
 
 

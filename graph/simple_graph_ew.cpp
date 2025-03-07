@@ -35,54 +35,19 @@ const W Base_Graph_EW <Graph_t, W >::ZERO_WEIGHT = 0;
 /////////////////////////////////////////////////
 
 
-
-template<class Graph_t, class W>
- int Base_Graph_EW<Graph_t, W>::reset(std::size_t NV, W val, string name)
-{
-	if (g_.reset(NV) == -1) {
-		LOG_ERROR("error during memory graph allocation - Base_Graph_W<T, W>::reset");
-		return -1;
-	}
-
-	try {
-		we_.assign(NV, vector<W>(NV, val));
-	}
-	catch (...) {
-		LOG_ERROR("bad weight assignment - Base_Graph_EW<Graph_t, W>::reset");
-		return -1;
-	}
-
-	g_.name(name);
-
-	return 0;	
-}
-
- template<class Graph_t, class W>
- int Base_Graph_EW<Graph_t, W>::reset_edge_weighted(std::size_t NV, W val, string name)
- {
-	 int retVal = reset(NV, val, name);
-	 if (retVal != -1) {
-
-		 //sets to NO_WEIGHT the vertex weights
-		 for (auto i = 0; i < NV; ++i) {
-			 we_[i][i] = NO_WEIGHT;	
-		 }
-	 }
-
-	 return 0;
- }
-
 template<class Graph_t, class W>
  bool Base_Graph_EW<Graph_t, W>::is_consistent(){
 
 	auto NV = number_of_vertices();
 
-	for (std::size_t i = 0; i < NV; ++i) {
-		for (std::size_t j = 0; j < NV; ++j) {
+	for (auto i = 0; i < NV; ++i) {
+		for (auto j = 0; j < NV; ++j) {
+
 			if ( we_[i][j] == NO_WEIGHT &&  g_.is_edge(i, j) ) {
 				LOGG_WARNING ("edge [", i, ", ", j ,")] with NO_WEIGHT - Base_Graph_EW<Graph_t, W>::is_consistent()");
 				return false;
 			}
+
 		}
 	}
 	return true;
@@ -130,11 +95,14 @@ void Base_Graph_EW<Graph_t, W >::set_edge_weight(int v, int w, W val) {
 	assert(v != w);
 	////////////////
 
-	if (g_.is_edge(v, w)) {
+	bool is_edge = g_.is_edge(v, w);	
+
+	if (is_edge || (val == Base_Graph_EW<Graph_t, W >::NO_WEIGHT && !is_edge)) {
 		we_[v][w] = val;
 	}
 	else {
-		LOGG_WARNING("attempting to set an edge-weight to a non-edge", "(", v, ",", w, ")", "- Base_Graph_EW<Graph_t,W >::set_edge_weight");
+		LOGG_WARNING("attempting to set an edge-weight to a non-edge", "(", v, ",", w, ")",
+						 "- Base_Graph_EW<Graph_t,W >::set_edge_weight"							);		
 	}
 }
 
@@ -610,28 +578,18 @@ void Graph_EW< ugraph, W >::set_edge_weight(int v, int w, W val) {
 	assert(v != w);
 	//////////////////
 
-	if (ptype::g_.is_edge(v, w)) {
+	auto is_edge = ptype::g_.is_edge(v, w);
+
+
+	if (is_edge || (val == ptype::NO_WEIGHT && !is_edge)) {
 		ptype::we_[v][w] = val;
 		ptype::we_[w][v] = val;
 	}
 	else {
-		LOGG_WARNING("edge-weight cannot be added to a non-edge", "(", v, ",", w, ")", "- Graph_EW<Graph_t,W >::set_edge_weight");
+		LOGG_WARNING("edge-weight cannot be added to a non-edge", 
+					  "(", v, ",", w, ")", "- Graph_EW<Graph_t,W >::set_edge_weight" );	
 	}
-
-	/*if (v == w) {
-		ptype::we_[v][v] = val;
-	}
-	else if (ptype::g_.is_edge(v, w)) {
-		ptype::we_[v][w] = val;
-		ptype::we_[w][v] = val;
-	}
-	else {
-		LOGG_DEBUG	("bizarre petition to add weight to the non-edge", "(", v, ",", w, ")", " - Graph_EW<Graph_t,W >::set_edge_weight");
-		LOG_DEBUG	("weight not added");
-		return -1;
-	}*/
-
-	//return 0;
+	
 }
 
 template<class W>
@@ -822,6 +780,21 @@ void Base_Graph_EW<Graph_t, W>::gen_random_edges(double p, W val)
 			}
 			if (::com::rand::uniform_dist(p)) {
 				add_edge(j, i, val);
+			}
+		}
+	}
+}
+
+template<class Graph_t, class W>
+void Base_Graph_EW<Graph_t, W>::erase_non_edge_weights() {
+
+	const int NV = g_.number_of_vertices();
+
+	for (auto i = 0; i < NV - 1; ++i) {
+		for (auto j = i + 1; j < NV; ++j) {
+
+			if (!g_.is_edge(i, j)) {
+				this->set_edge_weight(i, j, Base_Graph_EW<Graph_t, W>::NO_WEIGHT);
 			}
 		}
 	}

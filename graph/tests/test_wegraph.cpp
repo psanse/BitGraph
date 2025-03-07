@@ -160,7 +160,20 @@ TEST(UGraphEW, constructor_file) {
 	EXPECT_EQ(67, ugew.weight(3, 4));
 }
 
+TEST(UGraphEW, create_an_edge_weighted_graph) {
 
+	ugraph_ewi ug (10);	
+	ug.set_vertex_weight(ugraph_ewi::NO_WEIGHT);			//sets all vertex weights to NO_WEIGHT
+	ug.erase_non_edge_weights();							//sets all non-edge weights to NO_WEIGHT
+	
+	ug.add_edge(0, 1, 1);
+	ug.add_edge(0, 2, 2);
+
+	///////////////////////////////////////////////////
+	EXPECT_EQ(ugraph_ewi::NO_WEIGHT, ug.weight(0, 3));
+	//...
+	///////////////////////////////////////////////////
+}
 
 //////////////////
 //
