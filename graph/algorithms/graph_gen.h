@@ -163,6 +163,9 @@ private:
 // (generates weights for vertex-weighted graphs)
 // 
 // TODO specialize for sparse-graphs
+// TODO SFINAE to control template graph type deduction (07/03/2025)
+// 
+// TODO - in general revise the whole logic of the generator classes for different graph types (07/03/2025)
 //
 ////////////////
 
@@ -195,6 +198,7 @@ public:
 // TODO refactor to the new type (22/01/19)
 // TODO specialize for sparse-graphs (08/01/2025)
 // TODO add more weight generation modes (08/01/2025)
+// TODO SFINAE to control template graph type deduction (07/03/2025)
 //
 ////////////////
 
