@@ -142,17 +142,6 @@ void Base_Graph_EW<Graph_t, W >::add_edge_weight(int v, int w, W val) {
 	else {
 		LOGG_WARNING("edge-weight cannot be added to a non-edge", "(", v, ",", w, ")", "- Base_Graph_EW<Graph_t,W >::add_edge_weight");
 	}
-
-	/*if (v == w || g_.is_edge(v, w)) {		
-		we_[v][w] = val;
-	}
-	else {
-		LOGG_WARNING ("edge weight cannot be added to the non-edge" , "(" , v , "," , w , ")" , "- Base_Graph_EW<Graph_t,W >::add_edge_weight");
-		LOG_WARNING ("weight not added");
-		return -1;
-	}	*/
-
-//	return 0;
 }
 
 template <class Graph_t, class W>
@@ -174,22 +163,57 @@ void Base_Graph_EW< Graph_t, W>::add_edge_weight(W val) {
 }
 
 
-
 template<class Graph_t, class W>
- void Base_Graph_EW<Graph_t, W>::neg_w(){
+ void Base_Graph_EW<Graph_t, W>::complement_weights(int type){
 
 	auto NV = number_of_vertices();	
 
-	for(int i=0; i<NV; i++)
-		for (int j = 0; j < NV; j++) {
-			if(we_[i][j] != NOWT)
-				we_[i][j] = -we_[i][j];
+	switch (type) {
+	case EDGE:
+		for (auto i = 0; i < NV-1; ++i) {
+			for (auto j = i + 1; j < NV; ++j) {
+				if (we_[i][j] != NOWT) {
+
+					////////////////////////
+					we_[i][j] = - we_[i][j];
+					////////////////////////
+				}
+			}
 		}
+		break;
+	case VERTEX:
+		for (auto i = 0; i < NV; ++i) {
+			if (we_[i][i] != NOWT) {
+
+				////////////////////////
+				we_[i][i] = - we_[i][i];
+				////////////////////////
+			}
+		}	
+		break;
+	case BOTH:
+		//vertex and edge-weights
+		for (auto i = 0; i < NV; ++i) {
+			for (auto j = 0; j < NV; ++j) {
+				if (we_[i][j] != NOWT) {
+					//////////////////////////
+					we_[i][j] = - we_[i][j];
+					///////////////////////////
+				}
+			}
+		}
+		break;
+	default:	
+		LOG_ERROR("unknown type -  Base_Graph_EW<Graph_t, W>::complement_weights");
+		assert(0 == 1);
+	}
+
+	
 }
 
 
 template<class Graph_t, class W>
- void Base_Graph_EW<Graph_t, W>::gen_modulus_weights(int MODULUS) {
+ void Base_Graph_EW<Graph_t, W>::gen_modulus_edge_weights(int MODULUS) {
 
 	auto NV = number_of_vertices();
 
@@ -211,15 +235,16 @@ template<class Graph_t, class W>
 
 
 template<class Graph_t, class W>
-const vecw<W>& Base_Graph_EW<Graph_t, W>::vertex_weights()  const {
+vecw<W> Base_Graph_EW<Graph_t, W>::vertex_weights()  const {
 
 	auto NV = number_of_vertices();
 
 	vector<W> res;
 	res.reserve(NV);
-		for (int v = 0; v < NV; v++) {
-			res.emplace_back(we_[v][v]);
-		}
+	for (auto v = 0; v < NV; ++v) {
+		res.emplace_back(we_[v][v]);
+	}
+
 	return res;
 }
 
@@ -519,10 +544,10 @@ std::ostream& Base_Graph_EW<Graph_t, W>::print_edges(std::ostream& o, bool eofl)
 		for (auto j = i + 1; j < NV; ++j) {
 
 			if (is_edge(i, j)) {
-				o << "[" << i << "]" << "-(" << edge_weight(i, j) << ")->" << "[" << j << "]" << endl;
+				o << "[" << i << "]" << "-(" << weight(i, j) << ")->" << "[" << j << "]" << endl;
 			}
 			if (is_edge(j, i)) {
-				o << "[" << j << "]" << "-(" << edge_weight(i, j) << ")->" <<  "[" << i << "]" << endl;
+				o << "[" << j << "]" << "-(" << weight(i, j) << ")->" <<  "[" << i << "]" << endl;
 			}
 
 		}
@@ -544,7 +569,7 @@ int Graph_EW<ugraph, W>::create_complement(Graph_EW<ugraph, W>& g) const {
 
 	g.name(this->name());
 	g.path(this->path());
-	g.edge_weights() = ptype::we_;
+	g.weights() = ptype::we_;
 	ptype::g_.create_complement(g.graph());
 
 	return 0;
@@ -559,13 +584,24 @@ std::ostream& Graph_EW<ugraph, W>::print_edges(std::ostream& o, bool eofl)
 		for (auto j = i + 1; j < NV; ++j) {
 
 			if (is_edge(i, j)) {
-				o << "[" << i << "]" << "-" << edge_weight(i, j)  << "->" << "[" << j << "]" << endl;
+				o << "[" << i << "]" << "-" << weight(i, j)  << "->" << "[" << j << "]" << endl;
 			}
 		}
 	}
 
 	if (eofl) { o << std::endl; }
 	return o;
+}
+
+template<class W>
+void Graph_EW<ugraph, W>::add_edge(int v, int w, W val)
+{
+	//sets undirected edge
+	g_.add_edge(v, w);
+
+	//sets both weights
+	we_[v][w] = val;
+	we_[w][v] = val;
 }
 
 template <class W>
@@ -665,7 +701,7 @@ void Graph_EW< ugraph, W >::add_edge_weight(typename Graph_EW<ugraph, W>::mat_t&
 }
 
 template<class W>
-void Graph_EW<ugraph, W>::gen_modulus_weights(int MODULUS)
+void Graph_EW<ugraph, W>::gen_modulus_edge_weights(int MODULUS)
 {
 	auto NV = number_of_vertices();
 
@@ -686,6 +722,27 @@ void Graph_EW<ugraph, W>::gen_modulus_weights(int MODULUS)
 	}
 }
 
+template<class W>
+void Graph_EW<ugraph, W>::gen_random_edges(double p, W val)
+{
+
+	const int NV = g_.number_of_vertices();
+
+	//removes all edges
+	g_.remove_edges();
+
+	//sets directed edges with probability p
+	for (auto i = 0; i < NV - 1; ++i) {
+		for (auto j = i + 1; j < NV; ++j) {
+						
+			if (::com::rand::uniform_dist(p)) {
+				add_edge(i, j, val);					
+			}
+		}
+	}
+
+}
+
 template <class W>
 ostream& Graph_EW<ugraph, W>::print_weights (ostream& o, bool line_format, bool only_vertex_weights) const{
 
@@ -697,13 +754,13 @@ ostream& Graph_EW<ugraph, W>::print_weights (ostream& o, bool line_format, bool 
 
 		//streams edge-weights 
 		if (line_format) {
-			for (int v = 0; v < NV; v++) {
+			for (auto v = 0; v < NV; v++) {
 				if (ptype::we_[v][v] != ptype::NOWT) {
 					o << "[" << v << " (" << ptype::we_[v][v] << ")] " << endl;
 				}
 			}
 
-			for (int i = 0; i < NV - 1; i++) {
+			for (auto i = 0; i < NV - 1; i++) {
 				for (int j = i + 1; j < NV; j++) {
 					if (ptype::we_[i][j] != ptype::NOWT) {
 						o << "[" << i << "-" << j << " (" << ptype::we_[i][j] << ")] " << endl;
@@ -712,8 +769,8 @@ ostream& Graph_EW<ugraph, W>::print_weights (ostream& o, bool line_format, bool 
 			}
 		}
 		else {																			//outputs to stream edge-weights in matrix form
-			for (int i = 0; i < NV; i++) {
-				for (int j = i; j < NV; j++) {
+			for (auto i = 0; i < NV; ++i) {
+				for (auto j = i; j < NV; ++j) {
 					if (ptype::we_[i][j] != ptype::NOWT) {
 						o << "[" << i << "-" << j << " (" << ptype::we_[i][j] << ")] ";
 					}
@@ -726,7 +783,7 @@ ostream& Graph_EW<ugraph, W>::print_weights (ostream& o, bool line_format, bool 
 		}
 	}else{
 		//streams vertex weights (weights in self-loops)
-		for (int v = 0; v < NV; v++) {
+		for (auto v = 0; v < NV; v++) {
 			if (ptype::we_[v][v] != ptype::NOWT) {
 				o << "[" << v << " (" << ptype::we_[v][v] << ")] " << endl;
 			}
@@ -746,14 +803,14 @@ ostream& Graph_EW<ugraph, W>::print_weights (vint& ln, ostream& o, bool only_ver
 	if (only_vertex_weights == false) {
 
 		//streams edge-weights 
-		for (int i = 0; i < ln.size(); i++) {
+		for (auto i = 0; i < ln.size(); i++) {
 			if (ptype::we_[ln[i]][ln[i]] != ptype::NOWT) {
 				o << "[" << ln[i] << " (" << ptype::we_[ln[i]][ln[i]] << ")] " << endl;
 			}
 		}
 
-		for (int i = 0; i < ln.size() - 1; i++) {
-			for (int j = i + 1; j < ln.size(); j++) {
+		for (auto i = 0; i < ln.size() - 1; ++i) {
+			for (auto j = i + 1; j < ln.size(); ++j) {
 				if (ptype::we_[ln[i]][ln[j]] != ptype::NOWT) {
 					o << "[" << ln[i] << "-" << ln[j] << " (" << ptype::we_[ln[i]][ln[j]] << ")] " << endl;
 				}
@@ -762,7 +819,7 @@ ostream& Graph_EW<ugraph, W>::print_weights (vint& ln, ostream& o, bool only_ver
 	}
 	else {
 		//streams vertex weights (weights in self-loops)
-		for (int i = 0; i < ln.size(); i++) {
+		for (auto i = 0; i < ln.size(); ++i) {
 			if (ptype::we_[ln[i]][ln[i]] != ptype::NOWT) {
 				o << "[" << ln[i] << " (" << ptype::we_[ln[i]][ln[i]] << ")] " << endl;
 			}
@@ -804,6 +861,30 @@ ostream& Graph_EW<ugraph, W>::write_dimacs (ostream& o) {
 	}
 
 	return o;
+}
+
+
+template<class Graph_t, class W>
+void Base_Graph_EW<Graph_t, W>::gen_random_edges(double p, W val)
+{
+	const int NV = g_.number_of_vertices();
+
+	//removes all edges
+	g_.remove_edges();
+
+	//sets directed edges with probability p
+	for (auto i = 0; i < NV-1; ++i) {
+		for (auto j = i + 1; j < NV; ++j) {
+
+			//considers both directed edges separately
+			if (::com::rand::uniform_dist(p)) {
+				add_edge(i, j, val);				
+			}
+			if (::com::rand::uniform_dist(p)) {
+				add_edge(j, i, val);
+			}
+		}
+	}
 }
 
 

@@ -241,7 +241,7 @@ int RandomGen<Graph_t>::create_graph(Graph_t& g, std::size_t n, double p) {
 	}
 
 	//////////////////
-	g.gen_random_edges(p);		//generate edges appriopriately (undirected / directed)
+	g.gen_random_edges(p);		//generate edges apprpiately (undirected / directed)
 	//////////////////
 	
 
@@ -415,7 +415,7 @@ int EdgeWeightGen<Graph_t>::create_weights (Graph_t& g, type_t type, int wmod, s
 
 	switch (type) {
 	case WMOD:
-		g.gen_modulus_weights(wmod);		//overrites all weights, no need to clear them previously
+		g.gen_modulus_edge_weights(wmod);		//overrites all weights, no need to clear them previously
 		break;
 	default:
 		LOG_INFO("bad weight generation mode - EdgeWeightGen<Graph_t>::create_weights");

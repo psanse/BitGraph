@@ -148,9 +148,9 @@ TEST(GtoDimacs, DISABLED_read_RTN_edge_weighted){
 	
 	Graph_EW<ugraph, double> gew(TEST_GRAPH_DESKTOP_ETSIDI_I9 + instance);
 	gew.print_data();
-	EXPECT_EQ(3, gew.edge_weight(0,8));
-	EXPECT_EQ(3, gew.edge_weight(0,9));
-	EXPECT_EQ(4, gew.edge_weight(737,738));
+	EXPECT_EQ(3, gew.weight(0,8));
+	EXPECT_EQ(3, gew.weight(0,9));
+	EXPECT_EQ(4, gew.weight(737,738));
 	
 	string clq("in-SCi-r-t2-peel-f.clq");	
 	gew.write_dimacs(FILE_LOG(clq.c_str(), WRITE));			

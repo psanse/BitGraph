@@ -13,6 +13,7 @@
 #include "utils/logger.h"
 #include "graph/algorithms/graph_gen.h"			
 #include "utils/common_paths.h"
+#include "utils/common.h"
 #include "graph/simple_graph_ew.h"
 
 using namespace std;
@@ -25,13 +26,10 @@ using vint = vector<int>;
 class UGraphEWTest : public ::testing::Test {
 protected:
 	void SetUp() override {
-		ugew.reset(NV, 0.0);
-		ugew.graph().add_edge(0, 1);
-		ugew.graph().add_edge(0, 2);
-		ugew.graph().add_edge(1, 3);
-		ugew.add_edge_weight(0, 1, 1);
-		ugew.add_edge_weight(0, 2, 2);
-		ugew.add_edge_weight(1, 3, 3);
+		ugew.reset(NV, ugraph_ewi::NOWT);						//all weights to NOWT
+		ugew.add_edge(0, 1, 1);
+		ugew.add_edge(0, 2, 2);
+		ugew.add_edge(1, 3, 3);
 		ugew.name("toy_weighted");
 	}
 	void TearDown() override {}
@@ -41,26 +39,15 @@ protected:
 	ugraph_ewi ugew;											//undirected graph with integer weights
 };
 
-TEST(UGraphEW, constructor_file) {
-		
-	ugraph_ewi ugew(PATH_GRAPH_TESTS_CMAKE_SRC_CODE "toy_ew_dimacs.txt");
+TEST_F(UGraphEWTest, basic_setup) {
 	
-	EXPECT_EQ(5, ugew.number_of_vertices());
-	EXPECT_EQ(5, ugew.number_of_edges());
-
-	//all vertex weights 
-	EXPECT_EQ(10, ugew.edge_weight(0, 0));
-	EXPECT_EQ(20, ugew.edge_weight(1, 1));
-	EXPECT_EQ(30, ugew.edge_weight(2, 2));
-	EXPECT_EQ(40, ugew.edge_weight(3, 3));
-	EXPECT_EQ(50, ugew.edge_weight(4, 4));
-
-	//all (undirected) edge weights
-	EXPECT_EQ(27, ugew.edge_weight(0, 1));
-	EXPECT_EQ(37, ugew.edge_weight(0, 2));
-	EXPECT_EQ(47, ugew.edge_weight(0, 3));
-	EXPECT_EQ(57, ugew.edge_weight(2, 4));
-	EXPECT_EQ(67, ugew.edge_weight(3, 4));
+	EXPECT_EQ(ugraph_ewi::NOWT, ugew.weight(1, 4));
+	EXPECT_EQ(1, ugew.weight(0, 1));
+	EXPECT_EQ(2, ugew.weight(0, 2));
+	EXPECT_EQ(3, ugew.weight(1, 3));
+	EXPECT_EQ(3, ugew.number_of_edges());
+	EXPECT_EQ(5, ugew.size());
+	
 }
 
 TEST_F(UGraphEWTest, copy_constructor) {
@@ -73,36 +60,88 @@ TEST_F(UGraphEWTest, copy_constructor) {
 }
 
 TEST_F(UGraphEWTest, add_edge) {
+		
+	ugew.add_edge(1, 4, 6);					//(1,4) is a new edge
 
-	ugew.add_edge(1, 4);
-
-	EXPECT_TRUE(ugew.is_edge(1, 4));
-
+	EXPECT_TRUE	(ugew.is_edge(1, 4));
+	EXPECT_EQ	(6, ugew.weight(1, 4));
+	EXPECT_EQ	(4, ugew.number_of_edges());
 }
 
 TEST_F(UGraphEWTest, add_edge_weights) {
 
-	ugew.add_edge_weight(1, 3, 7);
+	ugew.add_edge_weight(1, 3, 7);			//(1,3) is an existing edge	
 
-	EXPECT_EQ(7, ugew.edge_weight(1, 3) );
+	EXPECT_EQ(7, ugew.weight(1, 3) );
+}
+
+TEST_F(UGraphEWTest, complement_weights) {
+
+	ugew.complement_weights();			
+
+	EXPECT_EQ(-1, ugew.weight(0, 1));
+	EXPECT_EQ(-2, ugew.weight(0, 2));
+	EXPECT_EQ(-3, ugew.weight(1, 3));
+}
+
+TEST_F(UGraphEWTest, transform_weights) {
+
+	//multiply all weigths (vertex and edge-weights) by 5
+	ugew.transform_weights([](int a) {return 5 * a;});
+
+	EXPECT_EQ(5,  ugew.weight(0, 1));
+	EXPECT_EQ(10, ugew.weight(0, 2));
+	EXPECT_EQ(15, ugew.weight(1, 3));
+	EXPECT_EQ(decltype(ugew)::NOWT, ugew.weight(1, 4));		//NOWT - non-edge
+	
+
+	EXPECT_EQ(decltype(ugew)::NOWT, ugew.weight(1, 4));		//NOWT - non-edge
+
+	//same using the scale functor utility
+	ugew.transform_weights(com::scale<decltype(ugew)::_wt>(5));
+	EXPECT_EQ(25, ugew.weight(0, 1));
+	EXPECT_EQ(50, ugew.weight(0, 2));
+	EXPECT_EQ(75, ugew.weight(1, 3));
 
 }
 
 TEST_F(UGraphEWTest, generate_weights) {
 
-	//generate modulus-weights 
+	//generate modulus-weights on the edges 
 	EdgeWeightGen<ugraph_ewi>::create_weights(	ugew,
 												EdgeWeightGen<ugraph_ewi>::WMOD,
 												DEFAULT_WEIGHT_MODULUS					);		
 
 	EXPECT_EQ(NV, ugew.graph().number_of_vertices());
-	EXPECT_EQ(4, ugew.edge_weight(0, 1));
-	EXPECT_EQ(5, ugew.edge_weight(0, 2));
-	EXPECT_EQ(7, ugew.edge_weight(1, 3));
+	EXPECT_EQ(4, ugew.weight(0, 1));
+	EXPECT_EQ(5, ugew.weight(0, 2));
+	EXPECT_EQ(7, ugew.weight(1, 3));
 	EXPECT_TRUE(ugew.is_consistent());
 
 	//I/O
 	//ugew.print_weights()
+}
+
+TEST(UGraphEW, constructor_file) {
+
+	ugraph_ewi ugew(PATH_GRAPH_TESTS_CMAKE_SRC_CODE "toy_ew_dimacs.txt");
+
+	EXPECT_EQ(5, ugew.number_of_vertices());
+	EXPECT_EQ(5, ugew.number_of_edges());
+
+	//all vertex weights 
+	EXPECT_EQ(10, ugew.weight(0, 0));
+	EXPECT_EQ(20, ugew.weight(1, 1));
+	EXPECT_EQ(30, ugew.weight(2, 2));
+	EXPECT_EQ(40, ugew.weight(3, 3));
+	EXPECT_EQ(50, ugew.weight(4, 4));
+
+	//all (undirected) edge weights
+	EXPECT_EQ(27, ugew.weight(0, 1));
+	EXPECT_EQ(37, ugew.weight(0, 2));
+	EXPECT_EQ(47, ugew.weight(0, 3));
+	EXPECT_EQ(57, ugew.weight(2, 4));
+	EXPECT_EQ(67, ugew.weight(3, 4));
 }
 
 //////////////////
@@ -122,7 +161,7 @@ TEST(UGraphEW, DISABLED_gen_random ){
 	ugraph_ewi ugew;
 	const int NV=10;
 
-	RandomGen<ugraph_ewi>::create_graph(ugew, NV, .3);										/* 0.0 edge weights */
+	RandomGen<ugraph_ewi>::create_graph(ugew, NV, .3);										/* NOWT edge weights */
 	EdgeWeightGen< ugraph_ewi >::create_weights(ugew, EdgeWeightGen<ugraph_ewi>::WMOD);
 
 	//QUERIES....

@@ -405,6 +405,14 @@ namespace com {
 		bool operator()(const Col_t& lhs, const Col_t& rhs) const { return lhs.size() < rhs.size(); }
 	};
 
+	//scale functor
+	template< typename T >
+	struct scale {
+		scale(T s) : scale_(s) {}
+		T operator()(T x) const { return x * scale_; }
+		T scale_;
+	};	
+
 }
 ////////////////////////////////////////////
 

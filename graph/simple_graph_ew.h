@@ -56,6 +56,9 @@ public:
 	using _bbt = basic_type;
 	using _wt = W;																					
 	
+	//enum to distinguish between vertex and edge weights
+	enum { VERTEX, EDGE, BOTH };						
+
 	//constants - globals
 	static const W NOWT;								//default/no weight value for weights (0.0)	
 																				
@@ -77,36 +80,60 @@ virtual	~Base_Graph_EW()										= default;
 
 /////////////
 // setters and getters	
-
 	
-	W edge_weight				(int v, int w)			const		{ return we_[v][w]; }
-	W vertex_weight				(int v)					const		{ return we_[v][v]; }									
+	/**
+	* @brief getter for edge-weights
+	* @param v, w: edge
+	* @details: no check for vertex existence
+	**/
+	W weight					(int v, int w)			const	{ return we_[v][w]; }
+	
+	/**
+	* @brief getter for vertex-weights
+	* @param v: vertex	
+	* @details: no check for vertex existence
+	**/
+	W weight					(int v)					const	{ return we_[v][v]; }									
 	
 	/*
-	*  @brief getter for vertex weights
+	*  @brief getter for the specific subset of vertex-weights
 	*/
-const vecw<W>& vertex_weights	()						const;
+ vecw<W> vertex_weights			()						const;
 	
-	mat_t& edge_weights			()								{ return we_; }	
-	const mat_t& edge_weights	()						const	{ return we_; }
+	/**
+	*  @brief getter for the all the weights (vertex and edge-weights)
+	**/
+	mat_t& weights				()								{ return we_; }	
+	const mat_t& weights		()						const	{ return we_; }
+	
+	/**
+	*  @brief getter for the graph (no weight information just edges)
+	**/
 	Graph_t& graph				()								{ return g_; }
 	const Graph_t& graph		()						const	{ return g_; }
 
 	int number_of_vertices		()						const	{ return g_.number_of_vertices(); }
+	
+	/**
+	* @brief alias for the number_of_vertices function
+	**/
 	int size					()						const	{ return g_.number_of_vertices(); }
 
 	int number_of_edges			(bool lazy = true)				{ return g_.number_of_edges(lazy); }
 
+	/**
+	* @brief neighbor set of vertex @v
+	* @param v input vertex
+	**/
+	const _bbt& neighbors		(int v)			const			{ return g_.neighbors(v); }
+	_bbt& neighbors				(int v)							{ return g_.neighbors(v); }
 
-	const _bbt& neighbors		(int v)			const		{ return g_.neighbors(v); }
-	_bbt& neighbors				(int v)						{ return g_.neighbors(v); }
-
-	void name					(std::string str)			{ g_.name(str); }
-  string name					()				const		{ return g_.name(); }
-    void path					(std::string path_name)		{ g_.path(path_name); }
-  string path					()				const		{ return g_.path(); }
+	void name					(std::string str)				{ g_.name(str); }
+  string name					()				const			{ return g_.name(); }
+    void path					(std::string path_name)			{ g_.path(path_name); }
+  string path					()				const			{ return g_.path(); }
 	
-  double density				(bool lazy = true)			{ return g_.density(lazy); }
+  double density				(bool lazy = true)				{ return g_.density(lazy); }
 
 //////////////////////////
 // memory allocation
@@ -133,32 +160,29 @@ const vecw<W>& vertex_weights	()						const;
 
 /////////////////////////
 // basic operations
-	
-	/*
-	*  @brief adds edge, no self-loops allowed
-	*/
-	void add_edge						(int v, int w) { g_.add_edge(v, w); }
+		
 
 	/**
 	* @ brief adds an edge (v, w) with weight val
 	**/
-	virtual	void add_edge				(int v, int w, W val);
+	virtual	void add_edge				(int v, int w, W val = NOWT);
 
 	/*
-	*  @brief sets self-loop edge weight (considered as vertex-weight)
+	*  @brief sets vertex-weight
+	*  @details: vertex-weights are stored as self-loop edge-weights
 	*/
-	void add_vertex_weight				(int v, W val) { we_[v][v] = val; }
+	void add_vertex_weight				(int v, W val)		{ we_[v][v] = val; }
 
 	/*
-	*  @brief sets all self-loop edge weights to the same weight value
+	*  @brief sets all vertex-weights (self-loop edge weights) to the same weight @val
 	*/
 	void add_vertex_weight				(W val = NOWT);
 
 	/*
-	*  @brief sets edge weight given a directed edge (v, w) IF the edge exists
+	*  @brief sets edge-weight to an EXISTNG given directed edge (v, w) 
 	*  @param v input vertex
 	*  @param w input vertex
-	*  @param we input weight value
+	*  @param val input weight value
 
 	*  @details: asserts it REALLY is an edge (and not a self-loop)
 	*/
@@ -201,14 +225,20 @@ const vecw<W>& vertex_weights	()						const;
 ////////////////////////
 //weight operations
 	
-	/*
-	* @brief changes the sign of the weights 
-	*		we(i, j) = -we(i, j)
-	*		 
-	* @returns true if consistent, false otherwise
-	*/
-	void neg_w							();	
+	/**
+	* @brief transforms weights using functor F
+	**/
+	template<class Func>
+	void transform_weights					(Func& f, int type = BOTH);
 
+	/**
+	* @brief specific transformationn which changes the sign of the weights 
+	*		we(i, j) = - we(i, j)
+	* 
+	* 
+	* TODO.. create more specific transformation functions (07/03/25)
+	**/
+	void complement_weights					(int type = BOTH);	
 
 	///////////////////////////
 	//weight generation
@@ -222,12 +252,15 @@ const vecw<W>& vertex_weights	()						const;
 	* 
 	*			III. non-edges are not overritten
 	*/
-	virtual void gen_modulus_weights	(int MODULUS = DEFAULT_WEIGHT_MODULUS);
+	virtual void gen_modulus_edge_weights	(int MODULUS = DEFAULT_WEIGHT_MODULUS);
 
 ////////////////////////
 // other operations
 	
-	void gen_random_edges				(double p)		{ g_.gen_random_edges(p); }
+	/**
+	* @brief generates random edges uniformly with probability p and weight val
+	**/
+	virtual void gen_random_edges			(double , W val); 
 
 ////////////
 // I/O 
@@ -321,9 +354,13 @@ public:
 /////////////
 //setters and getters
 
-	std::ostream& print_edges(std::ostream& o = std::cout, bool eofl = false)  override;
+	/**
+	* @ brief adds an edge (v, w) with weight val
+	**/
+	void add_edge			(int v, int w, W val = NOWT)						override;
 
-	/*
+	
+	/**
 	*  @brief sets edge weight given an undirected edge {v, w} if the undirected edge exists
 	*  @param v input vertex
 	*  @param w input vertex
@@ -332,7 +369,7 @@ public:
 	*	(weights in self-loops are always added - considered vertex weights)
 	*
 	*  @details: asserts it is a real edge 
-	*/
+	**/
 	void add_edge_weight	(int v, int w, W we)	override;
 
 	/**
@@ -345,7 +382,7 @@ public:
 	**/
 	void add_edge_weight	(W val = 0.0)			override;
 	
-	/*
+	/**
 	*  @brief sets edge-weights in lw consistently to the graph
 	*
 	*		I. NOWT is set as weight value to non-edges in lw
@@ -353,24 +390,25 @@ public:
 	* 
 	*  @param lw matrix of edge weights
 	*  @param template Erase: if TRUE weights of non-edges are set to NOWT
-	*  @details: causses an assertion error if @lw.size() != |V|
-	*/
+	*  @details: asserts lw.size() == |V|
+	**/
 	template<bool Erase = false>
 	void add_edge_weight	(mat_t& lw);
 
 /////////////
 // weight operations
 
-	/*
+	/**
 	* @brief generates weights based on modulus operation [Pullan 2008, MODULUS = 200]
 	*
 	*			I. we(v, w) = 1 + ((v + w) % MODULUS)	(1-based index)
 	* 
-	*			II.we(v, v) and non-edge weights are set to NOWT
+	*			II.we(v, v) are set to NOWT
 	*		
-	*			III. non-edges are not overwritten
-	*/
-	void gen_modulus_weights(int MODULUS = DEFAULT_WEIGHT_MODULUS)  override;
+	*			III. non-edges are not modified (assumed NOWT)
+	**/
+	void gen_modulus_edge_weights(int MODULUS = DEFAULT_WEIGHT_MODULUS)  override;
+			
 
 /////////////
 //useful framework-specific interface for undirected weighted graphs
@@ -393,24 +431,31 @@ public:
 	*/
 	int create_complement	(ugraph& g)									const		{ return ptype::g_.create_complement(g); }
 
+	/**
+	* @brief generates random edges uniformly with probability p and weight val
+	**/
+	 void gen_random_edges	(double, W val = NOWT)						override;
+
 /////////////
 // I/O operations
 
-	/*
+	 std::ostream& print_edges			(std::ostream& o = std::cout, bool eofl = false)  override;
+
+	/**
 	* @brief streams non-empty (weight value not NOWT) weights
 	*		 of all undirected edges.
-	*/
+	**/
 	virtual	std::ostream& print_weights	(std::ostream& o = std::cout, bool line_format = true,
 											bool only_vertex_weights = false					)	const override;
 	
-	/*
+	/**
 	* @brief streams non-empty (weight value not NOWT) weights
 	*		 of undirected edges with endpoints in vertices in lv
-	*/
+	**/
 	virtual	std::ostream& print_weights	(vint& lv, std::ostream& o = std::cout,
 												bool only_vertex_weights = false				)	const override;
 
-	/*
+	/**
 	* @brief Writes undirected graph to stream in dimacs format
 	*
 	*		 I. weights in self-loops are considered vertex weights
@@ -421,7 +466,7 @@ public:
 	*
 	* @param o output stream
 	* @returns output stream
-	*/
+	**/
 	virtual	std::ostream& write_dimacs	(std::ostream& o);
 };
 
@@ -454,6 +499,52 @@ void Base_Graph_EW< Graph_t, W>::add_edge_weight (mat_t& lw) {
 				if (Erase) { we_[v][w] = NOWT; }
 			}
 		}
+	}
+
+}
+
+template<class Graph_t, class W>
+template<class Func>
+inline void Base_Graph_EW<Graph_t, W>::transform_weights(Func& f, int type)
+{
+	auto NV = number_of_vertices();
+		
+	switch (type) {
+		//edge-weights
+	case EDGE:
+		for (auto i = 0; i < NV - 1; ++i) {
+			for (auto j = i + 1; j < NV; ++j) {
+				if (we_[i][j] != NOWT) {
+					we_[i][j] = f(we_[i][j]);
+				}
+				if (we_[j][i] != NOWT) {
+					we_[j][i] = f(we_[j][i]);
+				}
+			}
+		}
+		break;
+		//vertex-weights
+	case VERTEX:
+		for (auto i = 0; i < NV; ++i) {
+			if (we_[i][i] != NOWT) {
+				we_[i][i] = f(we_[i][i]);	
+			}	
+		}
+		break;
+	case BOTH:
+		//vertex and edge-weights
+		for (auto i = 0; i < NV ; ++i) {
+			for (auto j = 0; j < NV; ++j) {
+				if (we_[i][j] != NOWT) {
+					we_[i][j] = f(we_[i][j]);
+				}			
+			}
+		}
+		break;
+	default:	
+		//should not happen	
+		LOG_ERROR("unknown type -  Base_Graph_EW<Graph_t, W>::transform_weights");
+		assert(0 == 1);		
 	}
 
 }
