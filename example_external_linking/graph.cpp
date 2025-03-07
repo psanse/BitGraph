@@ -41,8 +41,8 @@ int main() {
 
 	//cout << "****************************" << endl;
 
-	//unit weighted graph with 10 vertices
-	ugraph_w gw(10);	
+	//unit weighted graph with 10 vertices and vertex and edge-weights 3.0
+	ugraph_w gw(10, 3.0);	
 	gw.add_edge(0, 1);
 	gw.add_edge(0, 2);
 	gw.print_data();
@@ -51,8 +51,8 @@ int main() {
 
 	cout << "****************************" << endl;
 
-	//edge-weighted graph with 10 vertices
-	ugraph_ew gew(10);
+	//edge-weighted graph with 10 vertices and vertex and edge-weights 1.0
+	ugraph_ew gew(10, 1.0);
 	gew.add_edge(0, 1, 4.5);
 	gew.add_edge(0, 2, 5.3);
 	gew.print_data();
