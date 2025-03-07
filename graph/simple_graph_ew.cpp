@@ -80,7 +80,7 @@ template<class Graph_t, class W>
 	for (std::size_t i = 0; i < NV; ++i) {
 		for (std::size_t j = 0; j < NV; ++j) {
 			if ( we_[i][j] == NO_WEIGHT &&  g_.is_edge(i, j) ) {
-				LOGG_WARNING ("edge [", i, ", ", j ,")] with def. weight - Base_Graph_EW<Graph_t, W>::is_consistent()");
+				LOGG_WARNING ("edge [", i, ", ", j ,")] with NO_WEIGHT - Base_Graph_EW<Graph_t, W>::is_consistent()");
 				return false;
 			}
 		}
@@ -113,7 +113,7 @@ void Base_Graph_EW<Graph_t, W>::add_edge(int v, int w, W val)
 }
 
 template<class Graph_t, class W>
-void Base_Graph_EW<Graph_t, W>::add_vertex_weight( W val) {
+void Base_Graph_EW<Graph_t, W>::set_vertex_weight( W val) {
 
 	auto NV = number_of_vertices();
 
@@ -124,7 +124,7 @@ void Base_Graph_EW<Graph_t, W>::add_vertex_weight( W val) {
 }
 
 template <class Graph_t, class W>
-void Base_Graph_EW<Graph_t, W >::add_edge_weight(int v, int w, W val) {
+void Base_Graph_EW<Graph_t, W >::set_edge_weight(int v, int w, W val) {
 	
 	////////////////
 	assert(v != w);
@@ -134,27 +134,10 @@ void Base_Graph_EW<Graph_t, W >::add_edge_weight(int v, int w, W val) {
 		we_[v][w] = val;
 	}
 	else {
-		LOGG_WARNING("edge-weight cannot be added to a non-edge", "(", v, ",", w, ")", "- Base_Graph_EW<Graph_t,W >::add_edge_weight");
+		LOGG_WARNING("attempting to set an edge-weight to a non-edge", "(", v, ",", w, ")", "- Base_Graph_EW<Graph_t,W >::set_edge_weight");
 	}
 }
 
-template <class Graph_t, class W>
-void Base_Graph_EW< Graph_t, W>::add_edge_weight(W val) {
-	   
-	auto NV = number_of_vertices();
-
-	//set to empty weight the non-edges
-	for (int v = 0; v < NV; v++) {
-		for (int w = 0; w < NV; w++) {
-			if (g_.is_edge(v, w)) {
-				we_[v][w] = val;
-			}
-			else {
-				we_[v][w] = NO_WEIGHT;
-			}
-		}
-	}
-}
 
 
 template<class Graph_t, class W>
@@ -206,26 +189,6 @@ template<class Graph_t, class W>
 }
 
 
-template<class Graph_t, class W>
- void Base_Graph_EW<Graph_t, W>::gen_modulus_edge_weights(int MODULUS) {
-
-	auto NV = number_of_vertices();
-
-	//vertex-weights NO_WEIGHT
-	add_vertex_weight(NO_WEIGHT);
-
-	for (std::size_t v = 0; v < NV; ++v) {
-		for (std::size_t w = 0; w < NV; ++w) {
-			
-			if (g_.is_edge(v, w)) {
-
-				///////////////////////////////////////
-				add_edge_weight(v, w, ( 1 + ( (v + w + 2 /* 0-based index*/) % MODULUS) )   );
-				///////////////////////////////////////
-			}			
-		}
-	}
-}
 
 
 template<class Graph_t, class W>
@@ -360,7 +323,7 @@ int Base_Graph_EW<Graph_t, W>::read_dimacs (string filename){
 		 ////////////////////////////
 
 		 g_.add_edge(v1 - 1, v2 - 1);
-		 add_edge_weight (v1 - 1, v2 - 1, we);
+		 set_edge_weight (v1 - 1, v2 - 1, we);
 	 }
 	 else {	
 
@@ -369,7 +332,7 @@ int Base_Graph_EW<Graph_t, W>::read_dimacs (string filename){
 		 ///////////////////////
 
 		 g_.add_edge(v1 - 1, v2 - 1);
-		 add_edge_weight (v1 - 1, v2 - 1, NO_WEIGHT);				//no edge-weights in file - set NO_WEIGHT value
+		 set_edge_weight (v1 - 1, v2 - 1, NO_WEIGHT);				//no edge-weights in file - set NO_WEIGHT value
 	 }
 	 
 	 //remaining edges
@@ -390,7 +353,7 @@ int Base_Graph_EW<Graph_t, W>::read_dimacs (string filename){
 			 /////////////////////
 
 			 g_.add_edge (v1 - 1, v2 - 1);
-			 add_edge_weight (v1 - 1, v2 - 1, we);
+			 set_edge_weight (v1 - 1, v2 - 1, we);
 		 }
 		 else {
 			 ///////////////
@@ -398,7 +361,7 @@ int Base_Graph_EW<Graph_t, W>::read_dimacs (string filename){
 			 ///////////////
 
 			 g_.add_edge(v1 - 1, v2 - 1);
-			 add_edge_weight (v1 - 1, v2 - 1, NO_WEIGHT);			//no edge-weights in file - set NO_WEIGHT value
+			 set_edge_weight (v1 - 1, v2 - 1, NO_WEIGHT);			//no edge-weights in file - set NO_WEIGHT value
 		 }
 
 		 std::getline(f, line);  //remove remaining part of the line
@@ -599,7 +562,7 @@ void Graph_EW<ugraph, W>::add_edge(int v, int w, W val)
 }
 
 template <class W>
-void Graph_EW< ugraph, W >::add_edge_weight(int v, int w, W val) {
+void Graph_EW< ugraph, W >::set_edge_weight(int v, int w, W val) {
 
 	//////////////////
 	assert(v != w);
@@ -610,7 +573,7 @@ void Graph_EW< ugraph, W >::add_edge_weight(int v, int w, W val) {
 		ptype::we_[w][v] = val;
 	}
 	else {
-		LOGG_WARNING("edge-weight cannot be added to a non-edge", "(", v, ",", w, ")", "- Graph_EW<Graph_t,W >::add_edge_weight");
+		LOGG_WARNING("edge-weight cannot be added to a non-edge", "(", v, ",", w, ")", "- Graph_EW<Graph_t,W >::set_edge_weight");
 	}
 
 	/*if (v == w) {
@@ -621,7 +584,7 @@ void Graph_EW< ugraph, W >::add_edge_weight(int v, int w, W val) {
 		ptype::we_[w][v] = val;
 	}
 	else {
-		LOGG_DEBUG	("bizarre petition to add weight to the non-edge", "(", v, ",", w, ")", " - Graph_EW<Graph_t,W >::add_edge_weight");
+		LOGG_DEBUG	("bizarre petition to add weight to the non-edge", "(", v, ",", w, ")", " - Graph_EW<Graph_t,W >::set_edge_weight");
 		LOG_DEBUG	("weight not added");
 		return -1;
 	}*/
@@ -629,92 +592,9 @@ void Graph_EW< ugraph, W >::add_edge_weight(int v, int w, W val) {
 	//return 0;
 }
 
-template <class W>
-void Graph_EW< ugraph, W >::add_edge_weight(W val) {
 
-	auto NV = ptype::number_of_vertices();
 
-	//set to empty wv and non-edges UPPER-T
-	for (auto v = 0; v < NV - 1; v++) {
-		for (auto w = v + 1; w < NV; w++) {
-			if (ptype::g_.is_edge(v, w)) {
-				ptype::we_[v][w] = val;
-				ptype::we_[w][v] = val;
-			}
-			else {
-				ptype::we_[v][w] = ptype::NO_WEIGHT;
-				ptype::we_[w][v] = ptype::NO_WEIGHT;
-			}
-		}
-	}
 
-	//vertex weights
-	/*for (int v = 0; v < NV; v++) {
-		ptype::we_[v][v] = val;
-	}*/
-}
-
-template <class W>
-template<bool Erase>
-void Graph_EW< ugraph, W >::add_edge_weight(typename Graph_EW<ugraph, W>::mat_t& lw) {
-
-	auto NV = ptype::number_of_vertices();
-
-	/////////////////////////
-	assert(lw.size() == NV);
-	/////////////////////////
-
-	////assert
-	//if (lw.size() != NV) {
-	//	LOG_ERROR("bizarre matrix of weights - Graph_EW< ugraph, W >::add_edge_weight");
-	//	LOG_ERROR("weights remain unchanged");
-	//	return -1;
-	//}
-
-	//sets edge-weights
-	for (auto v = 0; v < NV - 1; ++v) {
-		for (auto w = v + 1; w < NV; ++w) {
-			if (ptype::g_.is_edge(v, w)) {
-				ptype::we_[v][w] = lw[v][w];
-				ptype::we_[w][v] = lw[w][v];
-			}
-			else {
-				if (Erase) {
-					ptype::we_[v][w] = ptype::NO_WEIGHT;
-					ptype::we_[w][v] = ptype::NO_WEIGHT;
-				}				
-			}
-		}
-	}
-
-	//vertex weights
-	/*for (int v = 0; v < NV; v++) {
-		ptype::we_[v][v] = lw[v][v];
-	}*/
-
-}
-
-template<class W>
-void Graph_EW<ugraph, W>::gen_modulus_edge_weights(int MODULUS)
-{
-	auto NV = number_of_vertices();
-
-	//vertex-weights NO_WEIGHT
-	add_vertex_weight(this->NO_WEIGHT);
-
-	//sets weights of undirected edges
-	for (std::size_t v = 0; v < NV - 1; ++v) {
-		for (std::size_t w = v + 1; w < NV; ++w) {
-			if (ptype::g_.is_edge(v, w)) {
-
-				///////////////////////////////////////
-				add_edge_weight(v, w, (1 + ((v + w + 2 /* 0-based index*/) % MODULUS)));
-				///////////////////////////////////////
-
-			}			
-		}
-	}
-}
 
 template<class W>
 void Graph_EW<ugraph, W>::gen_random_edges(double p, W val)

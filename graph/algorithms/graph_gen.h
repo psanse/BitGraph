@@ -415,7 +415,7 @@ int EdgeWeightGen<Graph_t>::create_weights (Graph_t& g, type_t type, int wmod, s
 
 	switch (type) {
 	case WMOD:
-		g.gen_modulus_edge_weights(wmod);		//overrites all weights, no need to clear them previously
+		g.set_modulus_edge_weights(wmod);		//overrites all weights, no need to clear them previously
 		break;
 	default:
 		LOG_INFO("bad weight generation mode - EdgeWeightGen<Graph_t>::create_weights");

@@ -68,9 +68,9 @@ TEST_F(UGraphEWTest, add_edge) {
 	EXPECT_EQ	(4, ugew.number_of_edges());
 }
 
-TEST_F(UGraphEWTest, add_edge_weights) {
+TEST_F(UGraphEWTest, set_edge_weights) {
 
-	ugew.add_edge_weight(1, 3, 7);			//(1,3) is an existing edge	
+	ugew.set_edge_weight(1, 3, 7);			//(1,3) is an existing edge	
 
 	EXPECT_EQ(7, ugew.weight(1, 3) );
 }
@@ -379,14 +379,14 @@ TEST(UGraphEW, DISABLED_write_to_file) {
 //	g.add_edge(4,5);	
 //		
 //	g.init_we();			
-//	g.add_edge_weight(0, 1, 7);		
-//	g.add_edge_weight(0, 3, 1);
-//	g.add_edge_weight(1, 2, 2);
-//	g.add_edge_weight(1, 3, 9);
-//	g.add_edge_weight(2, 4, 6);
-//	g.add_edge_weight(3, 4, 4);		
-//	g.add_edge_weight(3, 5, 2);
-//	g.add_edge_weight(4, 5, 5);
+//	g.set_edge_weight(0, 1, 7);		
+//	g.set_edge_weight(0, 3, 1);
+//	g.set_edge_weight(1, 2, 2);
+//	g.set_edge_weight(1, 3, 9);
+//	g.set_edge_weight(2, 4, 6);
+//	g.set_edge_weight(3, 4, 4);		
+//	g.set_edge_weight(3, 5, 2);
+//	g.set_edge_weight(4, 5, 5);
 //
 //	//I/O: edge-weights
 //	stringstream sstrw;
@@ -451,9 +451,9 @@ TEST(UGraphEW, DISABLED_write_to_file) {
 //	g.add_edge(3,4);
 //	
 //	g.init_we();
-//	g.add_edge_weight(0, 1, 3);		
-//	g.add_edge_weight(0, 2, 8);
-//	g.add_edge_weight(1, 2, 7);
+//	g.set_edge_weight(0, 1, 3);		
+//	g.set_edge_weight(0, 2, 8);
+//	g.set_edge_weight(1, 2, 7);
 //	
 //	//I/O: edge-weights
 //	stringstream sstrw;
@@ -516,11 +516,11 @@ TEST(UGraphEW, DISABLED_write_to_file) {
 //	g.add_edge(1,2);
 //
 //	g.init_we();
-//	g.add_edge_weight(0, 1, 3.0);		//weights are truncated to int (ugraph has W=INT)
-//	g.add_edge_weight(1, 2, 4);
-//	g.add_edge_weight(1, 2, 8);
-//	g.add_edge_weight(1, 3, 75);			//no weight added: no edge
-//	g.add_edge_weight(2, 2, 75);			//no loops, weight is set to 0.0
+//	g.set_edge_weight(0, 1, 3.0);		//weights are truncated to int (ugraph has W=INT)
+//	g.set_edge_weight(1, 2, 4);
+//	g.set_edge_weight(1, 2, 8);
+//	g.set_edge_weight(1, 3, 75);			//no weight added: no edge
+//	g.set_edge_weight(2, 2, 75);			//no loops, weight is set to 0.0
 //
 //
 //	g.print_edge_weights(cout);	
