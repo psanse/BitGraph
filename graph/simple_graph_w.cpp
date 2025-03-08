@@ -43,15 +43,16 @@ const W Base_Graph_W <Graph_t, W >::DEFAULT_WEIGHT = 1.0;
 ////////////////////////////////////////////////////////////////
 // Necessary implementation of template methods in header file
 
-template<class W>
-int Graph_W<ugraph, W>::create_complement(Graph_W& g) const {
+template<class Graph_t, class W>
+int Base_Graph_W<Graph_t, W>::create_complement(Base_Graph_W<Graph_t, W>& g) const {
 
 	g.name(this->name());
 	g.path(this->path());
-	g.weight() = ptype::w_;
-	ptype::g_.create_complement(g.graph());
-
-	return 0;
+	g.weight() = w_;
+		
+	////////////////////////////////////////
+	return g_.create_complement(g.graph());
+	////////////////////////////////////////
 }
 
 template<class Graph_t, class W>
@@ -75,7 +76,7 @@ Base_Graph_W<Graph_t, W>::Base_Graph_W(std::string filename){
 }
 
 template<class Graph_t, class W>
- int Base_Graph_W<Graph_t, W>::gen_modulus_weights(int MODE){
+ int Base_Graph_W<Graph_t, W>::set_modulus_weight(int MODE){
 
 	const std::size_t NV = g_.number_of_vertices();
 
@@ -89,7 +90,8 @@ template<class Graph_t, class W>
 	return 0;
 }
 
-template<class Graph_t, class W>
+
+ template<class Graph_t, class W>
 bool Base_Graph_W<Graph_t, W>::is_unit_weighted()
 {
 	for (W v : w_) {
