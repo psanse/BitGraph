@@ -458,7 +458,7 @@ namespace gfunc{
 		vint& sort_w(const Graph_t& g, vint& lv, bool min_sort = true) {
 
 			//sorting criteria
-			const auto& weights = g.weights();
+			const auto& weights = g.weight();
 
 			//sorting lambdas
 			auto compare_smaller = [&weights](int a, int b) {
@@ -492,7 +492,7 @@ namespace gfunc{
 		int* sort_w(const Graph_t& g, int *lv, std::size_t size, bool min_sort = true) {
 			
 			//sorting criteria
-			const auto& weights = g.weights();
+			const auto& weights = g.weight();
 
 			//sorting lambdas
 			auto compare_smaller = [&weights](int a, int b) {

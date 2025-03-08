@@ -30,10 +30,13 @@ static const int DEFAULT_WEIGHT_MODULUS = 200;     //for modulus weight generati
 
 /////////////////////////////////////////////////
 template<class Graph_t, class W>
-const W Base_Graph_W <Graph_t, W >::NOWT = 0.0;			//is 0.0 the best value for empty weight?									
+const W Base_Graph_W <Graph_t, W >::NO_WEIGHT = -1;		
 
 template<class Graph_t, class W>
-const W Base_Graph_W <Graph_t, W >::DEFWT = 1.0;												
+const W Base_Graph_W <Graph_t, W >::ZERO_WEIGHT = 0;
+
+template<class Graph_t, class W>
+const W Base_Graph_W <Graph_t, W >::DEFAULT_WEIGHT = 1.0;												
 /////////////////////////////////////////////////
 
 
@@ -45,7 +48,7 @@ int Graph_W<ugraph, W>::create_complement(Graph_W& g) const {
 
 	g.name(this->name());
 	g.path(this->path());
-	g.weights() = ptype::w_;
+	g.weight() = ptype::w_;
 	ptype::g_.create_complement(g.graph());
 
 	return 0;
@@ -117,7 +120,7 @@ int Base_Graph_W<Graph_t, W>::reset(std::size_t NV, W val, string name)
 }
 
 template <class Graph_t, class W>
-int	Base_Graph_W<Graph_t,W >::add_weight (vector<W>& lw){
+int	Base_Graph_W<Graph_t,W >::set_weight (vector<W>& lw){
 
 	//assert
 	if( g_.number_of_vertices() != lw.size() ){

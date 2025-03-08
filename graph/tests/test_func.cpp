@@ -37,14 +37,14 @@ protected:
 class GFuncTestW : public ::testing::Test {
 protected:
 	void SetUp() override {
-		ugw.reset(NV, ugraph_wi::NOWT);
+		ugw.reset(NV, ugraph_wi::NO_WEIGHT);
 		ugw.add_edge(0, 1);
 		ugw.add_edge(1, 2);
 		ugw.add_edge(0, 2);
 
-		ugw.add_weight(0, 3);
-		ugw.add_weight(1, 2);
-		ugw.add_weight(2, 1);
+		ugw.set_weight(0, 3);
+		ugw.set_weight(1, 2);
+		ugw.set_weight(2, 1);
 		ugw.name("ugraph_VW");
 	}
 	void TearDown() override {}

@@ -56,16 +56,17 @@ public:
 	using _wt =	 W;	
 
 	//constants - globals
-	static const W NOWT;								//empty weight value for weights (0.0)	
-	static const W DEFWT;								//default weight value for weights (1.0)	
+	static const W NO_WEIGHT;							
+	static const W ZERO_WEIGHT;
+	static const W DEFAULT_WEIGHT;								//default weight value for weights (1.0)	
 	
 
 	//constructors
-	Base_Graph_W						() {};																				//No memory allocation
-explicit Base_Graph_W					(std::vector<W>& lw);																//creates empty graph with |V|= n with vertex weights
-	Base_Graph_W						(_gt& g, vector<W>& lw)		:g_(g), w_(lw) {}										//creates graph with vertex weights	
-	Base_Graph_W						(_gt& g)					:g_(g), w_(g.number_of_vertices(), 1) {}				//creates graph with unit weights
-explicit Base_Graph_W					(int n, W val = DEFWT)				  { reset(n, val); }							//creates empty graph with |V|= n with unit weights	
+	Base_Graph_W			() {};																				//No memory allocation
+explicit Base_Graph_W		(std::vector<W>& lw);																//creates empty graph with |V|= n with vertex weights
+	Base_Graph_W			(_gt& g, vector<W>& lw) :g_(g), w_(lw)  { assert(w_.size() == g_.size()); }			//creates graph with vertex weights	
+	Base_Graph_W			(_gt& g)				:g_(g), w_(g.size(), DEFAULT_WEIGHT) {}						//creates graph with DEFAULT_WEIGHTs
+explicit Base_Graph_W		(int N, W val = DEFAULT_WEIGHT)			{ assert(reset(N, val) != -1); }			//creates empty graph with |V|= N with weight value val	
 	
 	/*
 	* @brief Reads weighted graph from ASCII file in DIMACS format
@@ -77,10 +78,10 @@ explicit Base_Graph_W					(int n, W val = DEFWT)				  { reset(n, val); }							/
 	Base_Graph_W						(std::string filename);															
 
 	//copy constructor, move constructor, copy operator =, move operator =
-	Base_Graph_W						(const Base_Graph_W& g) = default;												
-	Base_Graph_W						(Base_Graph_W&& g)		= default;												
-	Base_Graph_W& operator =			(const Base_Graph_W& g) = default;												
-	Base_Graph_W& operator =			(Base_Graph_W&& g)		= default;												
+	Base_Graph_W						(const Base_Graph_W& g)			= default;												
+	Base_Graph_W						(Base_Graph_W&& g)   noexcept	= default;												
+	Base_Graph_W& operator =			(const Base_Graph_W& g)			= default;												
+	Base_Graph_W& operator =			(Base_Graph_W&& g)	 noexcept	= default;												
 
 
 	//destructor
@@ -89,22 +90,22 @@ explicit Base_Graph_W					(int n, W val = DEFWT)				  { reset(n, val); }							/
 /////////////
 // setters and getters
 	
-	void add_weight							(int v, W val)				{ w_.at(v)=val;}				
-	void add_weight							(W val = DEFWT)				{ w_.assign(g_.number_of_vertices(), val);}		
+	void set_weight						(int v, W val)				{ w_.at(v) = val;}				
+	void set_weight						(W val = DEFAULT_WEIGHT)	{ w_.assign(g_.number_of_vertices(), val);}		
 	
 	/*
 	* @brief sets vertex weights to all vertices
 	* @param lw vector of weights of size |V|
 	* @returns 0 if success, -1 if error
 	*/
-	int	 add_weight						(std::vector<W>& lw);
+	int	 set_weight						(std::vector<W>& lw);
 	
 	Graph_t& graph						()							{ return g_;}
 const Graph_t& graph					()			const			{ return g_; }
 
 	W weight							(int v)		const			{ return w_[v];}	
-const vector<W>& weights				()			const			{ return w_;}	
-	vector<W>& weights					()							{ return w_;}	
+const vector<W>& weight					()			const			{ return w_;}	
+	vector<W>& weight					()							{ return w_;}	
 	
 	/*
 	* @brief Determines weight and vertex of maximum weight
@@ -135,7 +136,7 @@ std::string path						()			const			{ return g_.path(); }
 	* @param name name of the instance
 	* @returns 0 if success, -1 if memory allocation fails
 	**/
-	int reset							(std::size_t n, W val = DEFWT,  string name = "");
+	int reset							(std::size_t n, W val = DEFAULT_WEIGHT,  string name = "");
 
 	/**
 	* @brief resets to default values (does not deallocate memory)

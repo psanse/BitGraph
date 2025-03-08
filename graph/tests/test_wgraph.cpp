@@ -19,7 +19,6 @@
 using ugrah_w = Graph_W<ugraph, double>;			//simple vertex weighted graph with double weights
 using ugraph_wi = Graph_W<ugraph, int>;				//simple vertex weighted graph with int weights	
 
-
 using namespace std;
 
 class UGraphWTest : public ::testing::Test {
@@ -28,9 +27,9 @@ protected:
 		gw.reset(NV, 0.0);
 		gw.graph().add_edge(0, 1);
 		gw.graph().add_edge(0, 2);
-		gw.add_weight(0, 1);
-		gw.add_weight(1, 2);
-		gw.add_weight(2, 3);
+		gw.set_weight(0, 1);
+		gw.set_weight(1, 2);
+		gw.set_weight(2, 3);
 		gw.name("toy_weighted");
 	}
 	void TearDown() override {}
@@ -153,9 +152,9 @@ TEST(UGraphW, gen_weights_dimacs){
 	const int NV = ugw.graph().number_of_vertices();
 
 	EXPECT_EQ(200, NV);
-	EXPECT_EQ(ugraph_wi::DEFWT, ugw.weight(0));
-	EXPECT_EQ(ugraph_wi::DEFWT, ugw.weight(1));
-	EXPECT_EQ(ugraph_wi::DEFWT, ugw.weight(199));
+	EXPECT_EQ(ugraph_wi::DEFAULT_WEIGHT, ugw.weight(0));
+	EXPECT_EQ(ugraph_wi::DEFAULT_WEIGHT, ugw.weight(1));
+	EXPECT_EQ(ugraph_wi::DEFAULT_WEIGHT, ugw.weight(199));
 
 	//generate modulus weights 
 	WeightGen< ugraph_wi >::create_weights(ugw, WeightGen<ugraph_wi>::WMOD, 200);
