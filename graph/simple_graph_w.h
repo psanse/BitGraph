@@ -56,16 +56,17 @@ public:
 	using _wt =	 W;	
 
 	//constants - globals
-	static const W NOWT;								//empty weight value for weights (0.0)	
-	static const W DEFWT;								//default weight value for weights (1.0)	
+	static const W NO_WEIGHT;							
+	static const W ZERO_WEIGHT;
+	static const W DEFAULT_WEIGHT;								//default weight value for weights (1.0)	
 	
 
 	//constructors
-	Base_Graph_W						() {};																				//No memory allocation
-explicit Base_Graph_W					(std::vector<W>& lw);																//creates empty graph with |V|= n with vertex weights
-	Base_Graph_W						(_gt& g, vector<W>& lw)		:g_(g), w_(lw) {}										//creates graph with vertex weights	
-	Base_Graph_W						(_gt& g)					:g_(g), w_(g.number_of_vertices(), 1) {}				//creates graph with unit weights
-explicit Base_Graph_W					(int n, W val = DEFWT)				  { reset(n, val); }							//creates empty graph with |V|= n with unit weights	
+	Base_Graph_W			() {};																				//No memory allocation
+explicit Base_Graph_W		(std::vector<W>& lw);																//creates empty graph with |V|= n with vertex weights
+	Base_Graph_W			(_gt& g, vector<W>& lw) :g_(g), w_(lw)  { assert(w_.size() == g_.size()); }			//creates graph with vertex weights	
+	Base_Graph_W			(_gt& g)				:g_(g), w_(g.size(), DEFAULT_WEIGHT) {}						//creates graph with DEFAULT_WEIGHTs
+explicit Base_Graph_W		(int N, W val = DEFAULT_WEIGHT)			{ assert(reset(N, val) != -1); }			//creates empty graph with |V|= N with weight value val	
 	
 	/*
 	* @brief Reads weighted graph from ASCII file in DIMACS format
@@ -77,10 +78,10 @@ explicit Base_Graph_W					(int n, W val = DEFWT)				  { reset(n, val); }							/
 	Base_Graph_W						(std::string filename);															
 
 	//copy constructor, move constructor, copy operator =, move operator =
-	Base_Graph_W						(const Base_Graph_W& g) = default;												
-	Base_Graph_W						(Base_Graph_W&& g)		= default;												
-	Base_Graph_W& operator =			(const Base_Graph_W& g) = default;												
-	Base_Graph_W& operator =			(Base_Graph_W&& g)		= default;												
+	Base_Graph_W						(const Base_Graph_W& g)			= default;												
+	Base_Graph_W						(Base_Graph_W&& g)   noexcept	= default;												
+	Base_Graph_W& operator =			(const Base_Graph_W& g)			= default;												
+	Base_Graph_W& operator =			(Base_Graph_W&& g)	 noexcept	= default;												
 
 
 	//destructor
@@ -89,22 +90,22 @@ explicit Base_Graph_W					(int n, W val = DEFWT)				  { reset(n, val); }							/
 /////////////
 // setters and getters
 	
-	void add_weight							(int v, W val)				{ w_.at(v)=val;}				
-	void add_weight							(W val = DEFWT)				{ w_.assign(g_.number_of_vertices(), val);}		
+	void set_weight						(int v, W val)				{ w_.at(v) = val;}				
+	void set_weight						(W val = DEFAULT_WEIGHT)	{ w_.assign(g_.number_of_vertices(), val);}		
 	
 	/*
 	* @brief sets vertex weights to all vertices
 	* @param lw vector of weights of size |V|
 	* @returns 0 if success, -1 if error
 	*/
-	int	 add_weight						(std::vector<W>& lw);
+	int	 set_weight						(std::vector<W>& lw);
 	
 	Graph_t& graph						()							{ return g_;}
 const Graph_t& graph					()			const			{ return g_; }
 
 	W weight							(int v)		const			{ return w_[v];}	
-const vector<W>& weights				()			const			{ return w_;}	
-	vector<W>& weights					()							{ return w_;}	
+const vector<W>& weight					()			const			{ return w_;}	
+	vector<W>& weight					()							{ return w_;}	
 	
 	/*
 	* @brief Determines weight and vertex of maximum weight
@@ -135,8 +136,9 @@ std::string path						()			const			{ return g_.path(); }
 	* @param name name of the instance
 	* @returns 0 if success, -1 if memory allocation fails
 	**/
-	int reset							(std::size_t n, W val = DEFWT,  string name = "");
+	int reset							(std::size_t n, W val = DEFAULT_WEIGHT,  string name = "");
 
+protected:
 	/**
 	* @brief resets to default values (does not deallocate memory)
 	* @details: to deallocate do g = Base_Graph_W<xx>() 
@@ -145,22 +147,36 @@ std::string path						()			const			{ return g_.path(); }
 	void reset							()								{ g_.reset(); w_.clear(); }
 
 /////////////////////////
-//basic graph operations
+//basic graph operations for simplicity
+//(calls directly graph services)
 
+public:
 	/**
-	* @brief adds edge, no self-loops allowed
+	* @brief adds edge (no self-loops allowed)
 	**/
 	void add_edge						(int v, int w)					{ g_.add_edge(v, w); }
 	
 	double density						(bool lazy = true)				{ return g_.density(lazy); }
 	
-	void gen_random_edges				(double p)						{ g_.gen_random_edges(p); }
+	/**
+	* @brief generates edges with probability p
+	* @details: graph operation, no weights involved since
+	*			edges are unweighted
+	**/
+	void gen_random_edges				(double p)						 { g_.gen_random_edges(p); }
 
 
 /////////////
 // boolean properties
 
 	bool is_edge						(int v, int w)		const		{ return g_.is_edge(v, w); }
+	
+	/**
+	* @brief checks if the graph is unit-weighted
+	* @returns true if all weights are 1.0, otherwise false
+	* @details: a unit-weighted graph is equivalent to an unweighted graph
+	*		    from a theoretical perspective
+	**/
 	bool is_unit_weighted				();
 
 
@@ -174,8 +190,18 @@ std::string path						()			const			{ return g_.path(); }
 	*			
 	*			MODE = 1 -> w(v) = 1	(unweighted graph)
 	**/
-	int gen_modulus_weights				(int MODE = DEFAULT_WEIGHT_MODULUS);
+	int set_modulus_weight				(int MODE = DEFAULT_WEIGHT_MODULUS);
 	
+////////////////////////
+// other operations
+
+	/*
+	* @brief Complement graph (currently name info of original graph is lost)
+	* @param g output graph
+	* @returns 0 if success, -1 if error
+	*/
+	int create_complement				(Base_Graph_W& g)					const;
+
 ////////////
 // I/O
 public:
@@ -213,14 +239,38 @@ public:
 	std::ostream& print_edges			(std::ostream& o = std::cout, bool eofl = false)							{ g_.print_edges(o, eofl); return o; }
 	
 	/**
-	* @brief streams different queries of vertex-weights
+	* @brief treams vertex-weights in the graph
+	* @param o output stream
+	* @param show_vert: if TRUE, prints also the vertex index (default value)
 	**/
-	std::ostream& print_weights			(std::ostream& o= std::cout, bool show_v=true)								const;
-	std::ostream& print_weights			(_bbt & bbsg, std::ostream& o= std::cout)									const;
-	std::ostream& print_weights			(vint& lnodes, std::ostream& o= std::cout)									const;
-	std::ostream& print_weights			(com::stack_t<int>& lv, ostream& o= std::cout)								const;
-	std::ostream& print_weights			(com::stack_t<int>& lv, const vint& mapping, std::ostream& o= std::cout)	const;
-	std::ostream& print_weights			(int* lv, int n, std::ostream& o= std::cout)								const;
+	std::ostream& print_weights			(std::ostream& o = std::cout, bool show_vert = true)						const;
+	
+	/**
+	* @brief streams vertex-weights in the subset of vertices  bbsg
+	**/
+	std::ostream& print_weights			(_bbt & bbsg, std::ostream& o = std::cout)									const;
+	
+	/**
+	* @brief prints the weights of the vertices in the stack lv
+	* @param lv: a set of vertices with a stack interface
+	**/
+	std::ostream& print_weights			(com::stack_t<int>& lv, ostream& o = std::cout)								const;
+	
+	/**
+	* @brief prints the weights of the vertices in the stack lv
+	*		 given a mapping of the vertices
+	* @param mapping: input mapping of the vertices with at least the same size as
+	*				  the stack lv
+	* @param lv: a set of vertices with a stack interface
+	**/
+	std::ostream& print_weights			(com::stack_t<int>& lv, const vint& mapping, std::ostream& o = std::cout)	const;
+
+	/**
+	* @brief prints the weights of the vertices in lv
+	* @supports C-arrays
+	**/
+	std::ostream& print_weights			(vint& lv, std::ostream& o = std::cout)										const;
+	std::ostream& print_weights			(int* lv, int n, std::ostream& o = std::cout)								const;
 
 /////////////////////////////////////
 // data members
@@ -270,19 +320,7 @@ public:
 	int degree				(int v)							const				{ return ptype::g_.degree(v); }
 	int degree				(int v, const BitSet& bbn)		const				{ return ptype::g_.degree(v, bbn); }
 
-	/*
-	* @brief Complement graph (currently name info of original graph is lost)
-	* @param g output graph
-	* @returns 0 if success, -1 if error
-	*/
-	int create_complement	(Graph_W& g)					const;	
-
-	/*
-	* @brief Complement undirected graph (weights are lost)
-	* @param g output complement undirected unweighted graph
-	* @returns 0 if success, -1 if error
-	*/
-	int create_complement	(ugraph& g)					    const				{ return ptype::g_.create_complement(g);}		 
+		
 
 ///////////
 //I/O operations

@@ -363,7 +363,7 @@ protected:
 	/**
 	* @brief prints the edges of the graph in line format [v]-(val)->[w], one edge per line
 	**/
-	virtual std::ostream& print_edges			(std::ostream& o = std::cout, bool endl = true)				const;
+	virtual std::ostream& print_edges			(std::ostream& o = std::cout, bool eofl = true)				const;
 	
 	/**
 	* @brief prints edges in different formats

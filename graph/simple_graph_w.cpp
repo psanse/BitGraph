@@ -30,25 +30,29 @@ static const int DEFAULT_WEIGHT_MODULUS = 200;     //for modulus weight generati
 
 /////////////////////////////////////////////////
 template<class Graph_t, class W>
-const W Base_Graph_W <Graph_t, W >::NOWT = 0.0;			//is 0.0 the best value for empty weight?									
+const W Base_Graph_W <Graph_t, W >::NO_WEIGHT = -1;		
 
 template<class Graph_t, class W>
-const W Base_Graph_W <Graph_t, W >::DEFWT = 1.0;												
+const W Base_Graph_W <Graph_t, W >::ZERO_WEIGHT = 0;
+
+template<class Graph_t, class W>
+const W Base_Graph_W <Graph_t, W >::DEFAULT_WEIGHT = 1.0;												
 /////////////////////////////////////////////////
 
 
 ////////////////////////////////////////////////////////////////
 // Necessary implementation of template methods in header file
 
-template<class W>
-int Graph_W<ugraph, W>::create_complement(Graph_W& g) const {
+template<class Graph_t, class W>
+int Base_Graph_W<Graph_t, W>::create_complement(Base_Graph_W<Graph_t, W>& g) const {
 
 	g.name(this->name());
 	g.path(this->path());
-	g.weights() = ptype::w_;
-	ptype::g_.create_complement(g.graph());
-
-	return 0;
+	g.weight() = w_;
+		
+	////////////////////////////////////////
+	return g_.create_complement(g.graph());
+	////////////////////////////////////////
 }
 
 template<class Graph_t, class W>
@@ -72,7 +76,7 @@ Base_Graph_W<Graph_t, W>::Base_Graph_W(std::string filename){
 }
 
 template<class Graph_t, class W>
- int Base_Graph_W<Graph_t, W>::gen_modulus_weights(int MODE){
+ int Base_Graph_W<Graph_t, W>::set_modulus_weight(int MODE){
 
 	const std::size_t NV = g_.number_of_vertices();
 
@@ -86,7 +90,8 @@ template<class Graph_t, class W>
 	return 0;
 }
 
-template<class Graph_t, class W>
+
+ template<class Graph_t, class W>
 bool Base_Graph_W<Graph_t, W>::is_unit_weighted()
 {
 	for (W v : w_) {
@@ -117,7 +122,7 @@ int Base_Graph_W<Graph_t, W>::reset(std::size_t NV, W val, string name)
 }
 
 template <class Graph_t, class W>
-int	Base_Graph_W<Graph_t,W >::add_weight (vector<W>& lw){
+int	Base_Graph_W<Graph_t,W >::set_weight (vector<W>& lw){
 
 	//assert
 	if( g_.number_of_vertices() != lw.size() ){

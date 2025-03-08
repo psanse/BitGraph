@@ -34,9 +34,9 @@ protected:
 		ugw.add_edge(2, 5);
 		ugw.add_edge(3, 5);		
 
-		ugw.add_weight(0, 4.0);
-		ugw.add_weight(1, 5.0);
-		ugw.add_weight(2, 3.0);
+		ugw.set_weight(0, 4.0);
+		ugw.set_weight(1, 5.0);
+		ugw.set_weight(2, 3.0);
 
 		//rest of vertices have default weight 1.0
 	}

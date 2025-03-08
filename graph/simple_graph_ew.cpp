@@ -785,10 +785,8 @@ int Base_Graph_EW<Graph_t, W>::create_complement(Base_Graph_EW<Graph_t, W>& g) c
 	g.weights() = we_;
 
 	/////////////////////////////////////////
-	g_.create_complement(g.graph());
+	return g_.create_complement(g.graph());
 	/////////////////////////////////////////
-
-	return 0;
 }
 
 template<class Graph_t, class W>
