@@ -154,7 +154,6 @@ TEST_F(UGraphEWTest, generate_weights) {
 	//ugew.print_weights()
 }
 
-
 TEST(UGraphEW, constructor_file) {
 
 	ugraph_ewi ugew(PATH_GRAPH_TESTS_CMAKE_SRC_CODE "toy_ew_dimacs.txt");
@@ -198,18 +197,17 @@ TEST(UGraphEW, create_an_edge_weighted_graph) {
 //
 //////////////////
 
-TEST_F(UGraphEWTest, printing) {
+TEST_F(UGraphEWTest, DISABLE_printing) {
 	//visual test - DISABLE by default
 
-		//I/O
+	//I/O
 	ugew.print_data();
 	ugew.print_vertex(1);	
 	ugew.print_edge(0, 1);
 	ugew.print_weights(cout, true, decltype(ugew)::EDGE);
 
-	LOG_INFO("push any key to continue...");	
-	cin.get();
-
+	/*LOG_INFO("push any key to continue...");	
+	cin.get();*/
 }
 
 TEST(UGraphEW, DISABLED_gen_random ){
