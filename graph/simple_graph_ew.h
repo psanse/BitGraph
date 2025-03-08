@@ -170,7 +170,7 @@ public:
 	* @returns 0 if success, -1 if memory allocation fails
 	**/
 	template<bool EdgeWeightedGraph = false>
-	int reset					(std::size_t n, W val = ZERO_WEIGHT, string name = "");					//before: int init (int n, W val = NO_WEIGHT, bool reset_name = true);
+	int reset									(std::size_t n, W val = ZERO_WEIGHT, string name = "");					//before: int init (int n, W val = NO_WEIGHT, bool reset_name = true);
 	
 
 /////////////////////////
@@ -180,13 +180,13 @@ public:
 	* @brief Adds an edge (v, w) with weight val 
 	*	      (if the edge exists, sets val)
 	**/
-	virtual	void add_edge				(int v, int w, W val = ZERO_WEIGHT);
+	virtual	void add_edge						(int v, int w, W val = ZERO_WEIGHT);
 
 	/**
 	*  @brief sets vertex-weight
 	*  @details: vertex-weights are stored as self-loop edge-weights
 	**/
-	void set_weight						(int v, W val)		{ we_[v][v] = val; }
+	void set_weight								(int v, W val)		{ we_[v][v] = val; }
 
 	/**
 	*  @brief sets edge-weight to an EXISTNG given directed edge (v, w)
@@ -198,7 +198,7 @@ public:
 	*  @details: asserts it REALLY is an edge (and not a self-loop)
 	*  @details: in a non-edge it can only set weight to NO_WEIGHT
 	**/
-	virtual	void set_weight(int v, int w, W val);
+	virtual	void set_weight						(int v, int w, W val);
 
 	/**
 	*  @brief sets edge weights in @lw  if there is a corresponding edge.
@@ -214,7 +214,7 @@ public:
 	/**
 	*  @brief sets all vertex-weights (self-loop edge weights) to the same weight @val
 	**/
-	void set_vertex_weight				(W val = ZERO_WEIGHT);
+	void set_vertex_weight						(W val = ZERO_WEIGHT);
 		
 	/**
 	*  @brief sets all edge-weights to val IF there is a corresponding edge.
@@ -224,7 +224,7 @@ public:
 	*						  (aditional cleaning)
 	**/
 	template<bool EraseNonEdges = false>
-	void set_edge_weight				(W val = ZERO_WEIGHT);
+	void set_edge_weight						(W val = ZERO_WEIGHT);
 
 	/**
 	* @brief sets new edge-weights based on modulus operation [Pullan 2008, MODULUS = 200]
@@ -236,7 +236,7 @@ public:
 	* @param MODULUS: modulus value [Pullan 2008, DEFAULT_WEIGHT_MODULUS = 200]
 	**/
 	template <bool EraseNonEdges = false>
-	void set_modulus_edge_weight		(int MODULUS = DEFAULT_WEIGHT_MODULUS);
+	void set_modulus_edge_weight				(int MODULUS = DEFAULT_WEIGHT_MODULUS);
 
 
 ////////////////
@@ -246,17 +246,17 @@ public:
 	* @brief sets all vertex weights to NO_WEIGHT
 	* @param erase_non_edges if TRUE, sets non-edges to NO_WEIGHT
 	**/
-	void make_edge_weighted				(bool erase_non_edges = false);
+	void make_edge_weighted						(bool erase_non_edges = false);
 
 	/**
 	* @brief sets all non-edges to weight NO_WEIGHT.
 	**/
-	void erase_non_edge_weights			();
+	void erase_non_edge_weights					();
 
 /////////////////////////
 // boolean properties
 
-	bool is_edge						(int v, int w)			const			{ return g_.is_edge(v, w); }
+	bool is_edge								(int v, int w)			const			{ return g_.is_edge(v, w); }
 	
 	/*
 	* @brief consistency check 
@@ -267,7 +267,7 @@ public:
 	* 
 	*  TODO... other checks
 	*/
-	bool is_consistent					();																				
+	bool is_consistent							();																				
 	
 ////////////////////////
 //weight operations
@@ -278,14 +278,14 @@ public:
 	* @param type: EDGE (edge-weights), VERTEX (vertex-weights) or BOTH
 	**/
 	template<class Func>
-	void transform_weights				(const Func& f, int type = BOTH);
+	void transform_weights						(const Func& f, int type = BOTH);
 
 	/**
 	* @brief specific transformation of weights (excluding NO_WEIGHT values)
 	*		 from positive to negative, i.e.,  we(i, j) = - we(i, j)
 	* @param type: EDGE, VERTEX or BOTH
 	**/
-	void complement_weights				(int type = BOTH);	
+	void complement_weights						(int type = BOTH);	
 		
 ////////////////////////
 // other operations
@@ -295,32 +295,32 @@ public:
 	* @param g output graph
 	* @returns 0 if success, -1 if error
 	**/
-	int create_complement				(Base_Graph_EW<Graph_t, W>& g)					const;
+	int create_complement						(Base_Graph_EW<Graph_t, W>& g)					const;
 
 	/**
 	* @brief generates random edges uniformly with probability p and weight val
 	**/
-	virtual void gen_random_edges		(double , W val); 
+	virtual void gen_random_edges				(double , W val); 
 
 ////////////
 // I/O 
 
-virtual std::ostream& print_data		(bool lazy = true, std::ostream& o = std::cout, bool endl = true);
+virtual std::ostream& print_data				(bool lazy = true, std::ostream& o = std::cout, bool endl = true);
 
 	/**
 	* @brief prints the edge (v, w) in line format: [v]-(val)->[w], one edge per line
-	**/
-std::ostream& print_edge				(int v, int w, std::ostream& o = std::cout, bool endl = true) const;
+	**/	
+std::ostream& print_edge						(int v, int w, std::ostream& o = std::cout, bool endl = true) const;
 	/**
 	* @brief streams the vertex @v in format [v:(val)]	
 	**/
-std::ostream& print_vertex				(int v, std::ostream& o = std::cout, bool endl = true)		 const;
+std::ostream& print_vertex						(int v, std::ostream& o = std::cout, bool endl = true)		 const;
 	/**
 	* @brief streams non-empty (excluding NO_WEIGHT value) weight info
 	*		 for all directed edges.
 	**/
-	std::ostream& print_weights			(std::ostream& o = std::cout, bool line_format = true,
-											int type = BOTH				)							const;
+	std::ostream& print_weights					(std::ostream& o = std::cout, bool line_format = true,
+															int type = BOTH				)					const;
 	/**
 	* @brief streams non-empty (excluding NO_WEIGHT value)  weights
 	*		 of directed edges induced by the subgraph of vertices in lv
@@ -510,8 +510,7 @@ protected:
 	std::ostream& print_edges			(std::ostream& o = std::cout, bool eofl = false)					const override;
 
 	std::ostream& print_edge_weights	(std::ostream& o = std::cout, bool line_format = true)				const override;
-	
-	
+		
 	std::ostream& print_edge_weights	(vint& lv, std::ostream& o = std::cout)								const override;
 
 public:	
