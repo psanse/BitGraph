@@ -66,18 +66,20 @@ public:
 //////////////////////////
 //constructors / destructor
 
-	Base_Graph_EW				()										{};											//no memory allocation
-	Base_Graph_EW				(_gt& g, mat_t& lwe) : g_(g), we_(lwe)	{}											//creates graph from a non-weighted graph and a set of weights
+	Base_Graph_EW					()										{};										//no memory allocation
+	Base_Graph_EW					(_gt& g, mat_t& lwe) : g_(g), we_(lwe)	{}										//creates graph from a non-weighted graph and a set of weights
 
 	/**
-	* @brief creates a graph with |V|= n and val weights
+	* @brief creates a graph with |V|= n and val weights as base line.
 	* @param n number of vertices
 	* @param val weight value
 	* @param edge_weighted if TRUE creates an edge-weighted graph 
-	*			(self-loops are considered as vertex weights and set to NO_WEIGHT)
+	*			(vertex weights are set to NO_WEIGHT, instead of val)
+	* @details: base line for all weights is set to val, i.e. vertex weights are 
+	*			set to val, but edge-weights will be overwritten when edges are added
 	**/
-	explicit Base_Graph_EW			(int n, W val = ZERO_WEIGHT, bool edge_weighted = false);									//creates empty graph with |V|= n and val weights	
-
+	Base_Graph_EW					(int n,  W val = ZERO_WEIGHT, bool edge_weighted = false);						//creates empty graph with |V|= n and val weights	
+	
 	/**
 	* @brief reads graph from file. If ewights are not found it generated them 
 	*		 automatically based on the Pullman 2008 formula
@@ -276,7 +278,7 @@ public:
 	* @param type: EDGE (edge-weights), VERTEX (vertex-weights) or BOTH
 	**/
 	template<class Func>
-	void transform_weights				(Func& f, int type = BOTH);
+	void transform_weights				(const Func& f, int type = BOTH);
 
 	/**
 	* @brief specific transformation of weights (excluding NO_WEIGHT values)
@@ -570,7 +572,7 @@ void Base_Graph_EW< Graph_t, W>::set_weight (mat_t& lw, bool edges_only) {
 template<class Graph_t, class W>
 template<class Func>
 inline
-void Base_Graph_EW<Graph_t, W>::transform_weights(Func& f, int type)
+void Base_Graph_EW<Graph_t, W>::transform_weights(const Func& f, int type)
 {
 	auto NV = number_of_vertices();
 		
@@ -738,7 +740,7 @@ template<bool EraseNonEdges>
 inline
 void Graph_EW<ugraph, W>::set_modulus_edge_weight(int MODULUS) {
 
-	auto NV = number_of_vertices();
+	auto NV = ptype::g_.number_of_vertices();
 
 	//vertex-weights NO_WEIGHT
 	//set_vertex_weight(ptype::NO_WEIGHT);
@@ -780,8 +782,8 @@ int Base_Graph_EW<Graph_t, W>::reset(std::size_t NV, W val, string name)
 
 	//set vertex weights to NO_WEIGHT if required
 	if (EdgeWeightedGraph) {
-		for (auto i = 0; i < NV; ++i) {
-			we_[i][i] = NO_WEIGHT;
+		for (auto v = 0; v < NV; ++v) {
+			we_[v][v] = NO_WEIGHT;
 		}
 	}
 

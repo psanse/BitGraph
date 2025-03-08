@@ -388,7 +388,7 @@ std::ostream& Base_Graph_EW<Graph_t, W>::write_dimacs (std::ostream& o) {
 template <class Graph_t, class W>
 ostream& Base_Graph_EW<Graph_t, W>::print_weights (ostream& o, bool line_format, int type) const{
 
-	o << endl << "**************************" << endl;
+	//o << endl << "**************************" << endl;
 	switch (type) {
 	case EDGE:
 		print_edge_weights(o, line_format);
@@ -398,7 +398,7 @@ ostream& Base_Graph_EW<Graph_t, W>::print_weights (ostream& o, bool line_format,
 		break;
 	case BOTH:
 		print_edge_weights(o, line_format);
-		o << endl << "**************************" << endl;
+		//o << endl << "**************************" << endl;
 		print_vertex_weights(o);
 		break;
 	default:
@@ -406,7 +406,7 @@ ostream& Base_Graph_EW<Graph_t, W>::print_weights (ostream& o, bool line_format,
 		LOG_ERROR("exiting");
 		std::exit(-1);
 	}
-	o << endl << "**************************" << endl;
+	//o << endl << "**************************" << endl;
 	return o;
 }
 template<class Graph_t, class W>
@@ -458,7 +458,7 @@ std::ostream& Base_Graph_EW<Graph_t, W>::print_vertex_weights(std::ostream& o) c
 template <class Graph_t, class W>
 ostream& Base_Graph_EW<Graph_t, W>::print_weights (vint& lv, ostream& o, int type) const{
 
-	o << endl << "**************************" << endl;
+	//o << endl << "**************************" << endl;
 	switch (type) {
 	case EDGE:
 		print_edge_weights(lv, o);
@@ -468,7 +468,7 @@ ostream& Base_Graph_EW<Graph_t, W>::print_weights (vint& lv, ostream& o, int typ
 		break;
 	case BOTH:
 		print_edge_weights(lv, o);
-		o << endl << "**************************" << endl;
+		//o << endl << "**************************" << endl;
 		print_vertex_weights(lv, o);
 		break;
 	default:
@@ -476,7 +476,7 @@ ostream& Base_Graph_EW<Graph_t, W>::print_weights (vint& lv, ostream& o, int typ
 		LOG_ERROR("exiting");
 		std::exit(-1);
 	}
-	o << endl << "**************************" << endl;
+	//o << endl << "**************************" << endl;
 
 	return o;
 }
@@ -576,7 +576,7 @@ std::ostream& Base_Graph_EW<Graph_t, W>::print_edges(std::ostream& o, bool eofl)
 template<class W>
 std::ostream& Graph_EW<ugraph, W>::print_edges(std::ostream& o, bool eofl)  const {	
 
-	const int NV = g_.number_of_vertices();	
+	const int NV = ptype::g_.number_of_vertices();	
 
 	for (auto i = 0; i < NV - 1; ++i) {
 		for (auto j = i + 1; j < NV; ++j) {
@@ -595,11 +595,11 @@ template<class W>
 void Graph_EW<ugraph, W>::add_edge(int v, int w, W val)
 {
 	//sets undirected edge
-	g_.add_edge(v, w);
+	ptype::g_.add_edge(v, w);
 
 	//sets both weights
-	we_[v][w] = val;
-	we_[w][v] = val;
+	ptype::we_[v][w] = val;
+	ptype::we_[w][v] = val;
 }
 
 template <class W>
@@ -626,10 +626,10 @@ void Graph_EW< ugraph, W >::set_weight(int v, int w, W val) {
 template<class W>
 void Graph_EW<ugraph, W>::gen_random_edges(double p, W val){
 
-	const int NV = g_.number_of_vertices();
+	const int NV = ptype::g_.number_of_vertices();
 
 	//removes all edges
-	g_.remove_edges();
+	ptype::g_.remove_edges();
 
 	//sets directed edges with probability p
 	for (auto i = 0; i < NV - 1; ++i) {
@@ -706,8 +706,8 @@ std::ostream& Graph_EW<ugraph, W>::print_edge_weights(std::ostream& o, bool line
 	else {								//outputs to stream edge-weights in matrix form
 		for (auto i = 0; i < NV - 1; ++i) {
 			for (auto j = i + 1; j < NV; ++j) {
-				if (we_[i][j] != NO_WEIGHT) {
-					o << we_[i][j] << '\t';
+				if (ptype::we_[i][j] != ptype::NO_WEIGHT) {
+					o << ptype::we_[i][j] << '\t';
 				}
 				else {
 					o << "--" << '\t';

@@ -1159,8 +1159,8 @@ int Graph<T>::create_complement(Graph& g) const
 	//resets g with new allocation
 	if (g.reset(NV_) == -1) return -1;
 
-	for (auto i = 0; i < ptype::NV_ - 1; ++i) {
-		for (auto j = i + 1; j < ptype::NV_; ++j) {
+	for (auto i = 0; i < NV_ - 1; ++i) {
+		for (auto j = i + 1; j < NV_; ++j) {
 
 			if (!adj_[i].is_bit(j)) {
 				g.add_edge(i, j);
