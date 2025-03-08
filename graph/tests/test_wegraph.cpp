@@ -185,6 +185,8 @@ TEST_F(UGraphEWTest, printing) {
 	//visual test - DISABLE by default
 
 		//I/O
+	ugew.print_data();
+	ugew.print_edge(0, 1);
 	ugew.print_weights(cout, true, decltype(ugew)::EDGE);
 	cin.get();
 

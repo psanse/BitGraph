@@ -72,13 +72,13 @@ explicit Base_Graph_EW			(int n, W val = ZERO_WEIGHT)			{ reset(n, val); }						
 explicit Base_Graph_EW			(std::string filename);																//read weighted ASCII file or generate weights using formula- CHECK! (21/11/2021))
 			
 	//copy constructor, move constructor, copy operator =, move operator =
-	Base_Graph_EW					(const Base_Graph_EW& g)	= default;
-	Base_Graph_EW					(Base_Graph_EW&& g)			= default;
-	Base_Graph_EW& operator =		(const Base_Graph_EW& g)	= default;
-	Base_Graph_EW& operator =		(Base_Graph_EW&& g)			= default;
+	Base_Graph_EW					(const Base_Graph_EW& g)			= default;
+	Base_Graph_EW					(Base_Graph_EW&& g)		noexcept	= default;
+	Base_Graph_EW& operator =		(const Base_Graph_EW& g)			= default;
+	Base_Graph_EW& operator =		(Base_Graph_EW&& g)		noexcept	= default;
 
 	//destructor
-virtual	~Base_Graph_EW()										= default;
+virtual	~Base_Graph_EW()												= default;
 
 /////////////
 // setters and getters	
@@ -284,9 +284,23 @@ public:
 virtual std::ostream& print_data		(bool lazy = true, std::ostream& o = std::cout, bool endl = true);
 
 	/**
-	* @brief prints the edges of the graph in line format [v]-(val)->[w], one edge per line
+	* @brief prints the edges of the graph in line format: [v]-(val)->[w], one edge per line
 	**/
-virtual std::ostream& print_edges		(std::ostream& o = std::cout, bool endl = true)  const;
+std::ostream& print_edge				(int v, int w, std::ostream& o = std::cout, bool endl = true) const;
+	/**
+	* @brief streams non-empty (excluding NO_WEIGHT value) weight info
+	*		 for all directed edges.
+	**/
+	std::ostream& print_weights			(std::ostream& o = std::cout, bool line_format = true,
+											int type = BOTH				)							const;
+	/**
+	* @brief streams non-empty (excluding NO_WEIGHT value)  weights
+	*		 of directed edges induced by the subgraph of vertices in lv
+	**/
+	std::ostream& print_weights			(vint& lv, std::ostream& o = std::cout, int type = BOTH)	const;
+
+	///////////
+	// read/write operations
 
 	/**
 	* @brief Reads weighted directed graph from file in DIMACS format
@@ -313,24 +327,33 @@ virtual std::ostream& print_edges		(std::ostream& o = std::cout, bool endl = tru
 	* @returns output stream
 	**/
 	virtual	std::ostream& write_dimacs	(std::ostream& o);
-		
-	/**
-	* @brief streams non-empty (excluding NO_WEIGHT value) weight info
-	*		 for all directed edges. 
-	**/
-	std::ostream& print_weights				(std::ostream& o = std::cout, bool line_format = true,	
-														int type = BOTH		)								const;
-	/**
-	* @brief streams non-empty (excluding NO_WEIGHT value)  weights
-	*		 of directed edges with both endpoints in vertices in @lv
-	**/
-	std::ostream& print_weights					(vint& lv, std::ostream& o = std::cout, int type = BOTH)	const;
+
+	/////////////////////
+	//private I/O
 
 protected:	
+	/**
+	* @brief prints the edges of the graph in line format [v]-(val)->[w], one edge per line
+	**/
+	virtual std::ostream& print_edges			(std::ostream& o = std::cout, bool endl = true)				const;
+	
+	/**
+	* @brief prints edges in different formats
+	* @param line_format: if TRUE, prints one edge per line, otherwise in matrix format
+	**/
 	virtual	std::ostream& print_edge_weights	(std::ostream& o = std::cout, bool line_format = true)		const;
 			std::ostream& print_vertex_weights  (std::ostream& o = std::cout)								const;
-
+	
+	/**
+	* @brief prints the edges of the graph induced by the vertices of lv in line format
+	* @param lv: input set of vertices of the induced subgraph
+	**/
 	virtual	std::ostream& print_edge_weights	(vint& lv, std::ostream& o = std::cout )					const;
+	
+	/**
+	* @brief prints the vertices of the vertices of lv 
+	* @param lv: input set of vertices 
+	**/
 	std::ostream& print_vertex_weights			(vint& lv, std::ostream& o = std::cout)						const;
 
 ///////////////////
@@ -455,12 +478,16 @@ public:
 
 /////////////
 // I/O operations
-
-	std::ostream& print_edges			(std::ostream& o = std::cout, bool eofl = false)			 const 	override;
-
 protected:
-	std::ostream& print_edge_weights	(std::ostream& o = std::cout, bool line_format = true)		const override;
-	std::ostream& print_edge_weights	(vint& lv, std::ostream& o = std::cout)						const override;
+	/**
+	* @brief prints the edges of the graph in line format [v]-(val)->[w], one edge per line
+	**/
+	std::ostream& print_edges			(std::ostream& o = std::cout, bool eofl = false)					const override;
+
+	std::ostream& print_edge_weights	(std::ostream& o = std::cout, bool line_format = true)				const override;
+	
+	
+	std::ostream& print_edge_weights	(vint& lv, std::ostream& o = std::cout)								const override;
 
 public:	
 	/**
