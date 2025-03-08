@@ -10,11 +10,11 @@
 
 #include <iostream>
 #include "gtest/gtest.h"
-#include "utils/logger.h"
-#include "graph/algorithms/graph_gen.h"			
+#include "graph/algorithms/graph_gen.h"		
+#include "graph/simple_graph_ew.h"
+#include "utils/logger.h"	
 #include "utils/common_paths.h"
 #include "utils/common.h"
-#include "graph/simple_graph_ew.h"
 
 using namespace std;
 
@@ -186,8 +186,11 @@ TEST_F(UGraphEWTest, printing) {
 
 		//I/O
 	ugew.print_data();
+	ugew.print_vertex(1);	
 	ugew.print_edge(0, 1);
 	ugew.print_weights(cout, true, decltype(ugew)::EDGE);
+
+	LOG_INFO("push any key to continue...");	
 	cin.get();
 
 }

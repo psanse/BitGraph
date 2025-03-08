@@ -284,9 +284,13 @@ public:
 virtual std::ostream& print_data		(bool lazy = true, std::ostream& o = std::cout, bool endl = true);
 
 	/**
-	* @brief prints the edges of the graph in line format: [v]-(val)->[w], one edge per line
+	* @brief prints the edge (v, w) in line format: [v]-(val)->[w], one edge per line
 	**/
 std::ostream& print_edge				(int v, int w, std::ostream& o = std::cout, bool endl = true) const;
+	/**
+	* @brief streams the vertex @v in format [v:(val)]	
+	**/
+std::ostream& print_vertex				(int v, std::ostream& o = std::cout, bool endl = true)		 const;
 	/**
 	* @brief streams non-empty (excluding NO_WEIGHT value) weight info
 	*		 for all directed edges.

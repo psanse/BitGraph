@@ -376,7 +376,6 @@ std::ostream& Base_Graph_EW<Graph_t, W>::write_dimacs (std::ostream& o) {
 	return o;
 }
 
-
 template <class Graph_t, class W>
 ostream& Base_Graph_EW<Graph_t, W>::print_weights (ostream& o, bool line_format, int type) const{
 
@@ -399,7 +398,6 @@ ostream& Base_Graph_EW<Graph_t, W>::print_weights (ostream& o, bool line_format,
 		std::exit(-1);
 	}
 	o << endl << "**************************" << endl;
-
 	return o;
 }
 template<class Graph_t, class W>
@@ -526,6 +524,15 @@ std::ostream& Base_Graph_EW<Graph_t, W>::print_edge(int v, int w, std::ostream& 
 
 	if (eofl) { o << std::endl; }	
 	return o;
+}
+
+template<class Graph_t, class W>
+std::ostream& Base_Graph_EW<Graph_t, W>::print_vertex(int v, std::ostream& o, bool eofl) const
+{
+	o << "[" << v << ":(" << we_[v][v] << ")" << "]"; 
+	
+	if (eofl) { o << std::endl; }
+	return o; 
 }
 
 template<class Graph_t, class W>
