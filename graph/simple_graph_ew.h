@@ -64,12 +64,26 @@ public:
 	static const W ZERO_WEIGHT;
 
 //////////////////////////
-//constructors
+//constructors / destructor
+
 	Base_Graph_EW				()										{};											//no memory allocation
-explicit Base_Graph_EW			(mat_t& lwe);																		//creates empty graph with edge weights
-	Base_Graph_EW				(_gt& g, mat_t& lwe) : g_(g), we_(lwe)	{}											//creates graph with edge weights
-explicit Base_Graph_EW			(int n, W val = ZERO_WEIGHT)			{ reset(n, val); }							//creates empty graph with |V|= n and val weights	
-explicit Base_Graph_EW			(std::string filename);																//read weighted ASCII file or generate weights using formula- CHECK! (21/11/2021))
+	Base_Graph_EW				(_gt& g, mat_t& lwe) : g_(g), we_(lwe)	{}											//creates graph from a non-weighted graph and a set of weights
+
+	/**
+	* @brief creates a graph with |V|= n and val weights
+	* @param n number of vertices
+	* @param val weight value
+	* @param edge_weighted if TRUE creates an edge-weighted graph 
+	*			(self-loops are considered as vertex weights and set to NO_WEIGHT)
+	**/
+	explicit Base_Graph_EW			(int n, W val = ZERO_WEIGHT, bool edge_weighted = false);									//creates empty graph with |V|= n and val weights	
+
+	/**
+	* @brief reads graph from file. If ewights are not found it generated them 
+	*		 automatically based on the Pullman 2008 formula
+	* @details currently only reads dimacs format (with or without weights)
+	**/
+	explicit Base_Graph_EW			(std::string filename);															//read weighted ASCII file or generate weights using formula- CHECK! (21/11/2021))
 			
 	//copy constructor, move constructor, copy operator =, move operator =
 	Base_Graph_EW					(const Base_Graph_EW& g)			= default;
@@ -161,7 +175,8 @@ public:
 // basic operations
 		
 	/**
-	* @ brief adds an edge (v, w) with weight val
+	* @brief Adds an edge (v, w) with weight val 
+	*	      (if the edge exists, sets val)
 	**/
 	virtual	void add_edge				(int v, int w, W val = ZERO_WEIGHT);
 
@@ -169,12 +184,7 @@ public:
 	*  @brief sets vertex-weight
 	*  @details: vertex-weights are stored as self-loop edge-weights
 	**/
-	void set_vertex_weight				(int v, W val)		{ we_[v][v] = val; }
-
-	/**
-	*  @brief sets all vertex-weights (self-loop edge weights) to the same weight @val
-	**/
-	void set_vertex_weight				(W val = ZERO_WEIGHT);
+	void set_weight						(int v, W val)		{ we_[v][v] = val; }
 
 	/**
 	*  @brief sets edge-weight to an EXISTNG given directed edge (v, w)
@@ -186,7 +196,7 @@ public:
 	*  @details: asserts it REALLY is an edge (and not a self-loop)
 	*  @details: in a non-edge it can only set weight to NO_WEIGHT
 	**/
-	virtual	void set_edge_weight		(int v, int w, W val);
+	virtual	void set_weight(int v, int w, W val);
 
 	/**
 	*  @brief sets edge weights in @lw  if there is a corresponding edge.
@@ -197,8 +207,13 @@ public:
 	*  @details: asserts  @lw.size() == |V|
 	**/
 	template<bool EraseNonEdges = false>
-	void set_edge_weight				(mat_t& lw);
+	void set_weight(mat_t& lw, bool edges_only = true);
 
+	/**
+	*  @brief sets all vertex-weights (self-loop edge weights) to the same weight @val
+	**/
+	void set_vertex_weight				(W val = ZERO_WEIGHT);
+		
 	/**
 	*  @brief sets all edge-weights to val IF there is a corresponding edge.
 	*		  Vertex weights are not modified.
@@ -208,6 +223,28 @@ public:
 	**/
 	template<bool EraseNonEdges = false>
 	void set_edge_weight				(W val = ZERO_WEIGHT);
+
+	/**
+	* @brief sets new edge-weights based on modulus operation [Pullan 2008, MODULUS = 200]
+	*
+	*			I. we(v, w) = 1 + ((v + w) % MODULUS)	(1-based index)
+	*
+	*			II. vertex-weigths are not changed
+	* @param template EraseNonEdges:  if TRUE, non-edges are set to NO_WEIGHT
+	* @param MODULUS: modulus value [Pullan 2008, DEFAULT_WEIGHT_MODULUS = 200]
+	**/
+	template <bool EraseNonEdges = false>
+	void set_modulus_edge_weight		(int MODULUS = DEFAULT_WEIGHT_MODULUS);
+
+
+////////////////
+// Conversions 
+
+	/**
+	* @brief sets all vertex weights to NO_WEIGHT
+	* @param erase_non_edges if TRUE, sets non-edges to NO_WEIGHT
+	**/
+	void make_edge_weighted				(bool erase_non_edges = false);
 
 	/**
 	* @brief sets all non-edges to weight NO_WEIGHT.
@@ -247,22 +284,7 @@ public:
 	* @param type: EDGE, VERTEX or BOTH
 	**/
 	void complement_weights				(int type = BOTH);	
-
-	///////////////////////////
-	//weight generation
-
-	/*
-	* @brief sets new edge-weights based on modulus operation [Pullan 2008, MODULUS = 200]
-	*
-	*			I. we(v, w) = 1 + ((v + w) % MODULUS)	(1-based index)
-	*			
-	*			II. vertex-weigths are not changed
-	* @param template EraseNonEdges:  if TRUE, non-edges are set to NO_WEIGHT
-	* @param MODULUS: modulus value [Pullan 2008, DEFAULT_WEIGHT_MODULUS = 200]
-	*/
-	template <bool EraseNonEdges = false>
-	void set_modulus_edge_weights	(int MODULUS = DEFAULT_WEIGHT_MODULUS);
-
+		
 ////////////////////////
 // other operations
 	
@@ -301,7 +323,7 @@ std::ostream& print_vertex				(int v, std::ostream& o = std::cout, bool endl = t
 	* @brief streams non-empty (excluding NO_WEIGHT value)  weights
 	*		 of directed edges induced by the subgraph of vertices in lv
 	**/
-	std::ostream& print_weights			(vint& lv, std::ostream& o = std::cout, int type = BOTH)	const;
+	std::ostream& print_weights					(vint& lv, std::ostream& o = std::cout, int type = BOTH)	const;
 
 	///////////
 	// read/write operations
@@ -316,7 +338,7 @@ std::ostream& print_vertex				(int v, std::ostream& o = std::cout, bool endl = t
 	* @param filename name of the file	 
 	* @returns 0 if success, -1 if error
 	**/
-	int read_dimacs						(std::string filename);
+	int read_dimacs								(std::string filename);
 
 	/**
 	* @brief Writes directed graph to stream in dimacs format
@@ -330,7 +352,7 @@ std::ostream& print_vertex				(int v, std::ostream& o = std::cout, bool endl = t
 	* @param o output stream
 	* @returns output stream
 	**/
-	virtual	std::ostream& write_dimacs	(std::ostream& o);
+	virtual	std::ostream& write_dimacs			(std::ostream& o);
 
 	/////////////////////
 	//private I/O
@@ -410,7 +432,7 @@ public:
 	/**
 	* @ brief adds an edge (v, w) with weight val
 	**/
-	void add_edge			(int v, int w, W val = ptype::ZERO_WEIGHT)	override;
+	void add_edge					(int v, int w, W val = ptype::ZERO_WEIGHT)	override;
 		
 	/**
 	*  @brief sets edge-weight val to the undirected edge {v, w} if the edge exists
@@ -424,7 +446,20 @@ public:
 	*  @details: asserts v!=w
 	*  @details: in a non-edge it can only set weight to NO_WEIGHT
 	**/
-	void set_edge_weight	(int v, int w, W val)					override;
+	void set_weight					(int v, int w, W val)					override;
+
+	/**
+	*  @brief sets edge-weights in lw consistently to the graph
+	*
+	*		I. NO_WEIGHT is set as weight value to non-edges in lw
+	*		II. Weights in self-loops (vertices) are NOT modified
+	*
+	*  @param lw matrix of edge weights
+	*  @param template EraseNonEdges: if TRUE weights of non-edges are set to NO_WEIGHT
+	*  @details: asserts lw.size() == |V|
+	**/
+	template<bool EraseNonEdges = false>
+	void set_weight					(mat_t& lw, bool edges_only = true);
 
 	/**
 	*  @brief sets edge-weight val to existing edges
@@ -435,23 +470,7 @@ public:
 	* @param val weight value
 	**/
 	template <bool EraseNonEdges = false>
-	void set_edge_weight	(W val = ptype::ZERO_WEIGHT);
-	
-	/**
-	*  @brief sets edge-weights in lw consistently to the graph
-	*
-	*		I. NO_WEIGHT is set as weight value to non-edges in lw
-	*		II. Weights in self-loops (vertices) are NOT modified
-	* 
-	*  @param lw matrix of edge weights
-	*  @param template EraseNonEdges: if TRUE weights of non-edges are set to NO_WEIGHT
-	*  @details: asserts lw.size() == |V|
-	**/
-	template<bool EraseNonEdges = false>
-	void set_edge_weight	(mat_t& lw);
-
-/////////////
-// weight operations
+	void set_edge_weight			(W val = ptype::ZERO_WEIGHT);	
 
 	/**
 	* @brief sets new edge-weights based on modulus operation [Pullan 2008, MODULUS = 200]
@@ -462,7 +481,7 @@ public:
 	* @param MODULUS: modulus value [Pullan 2008, DEFAULT_WEIGHT_MODULUS = 200]
 	**/
 	template<bool EraseNonEdges = false>
-	void set_modulus_edge_weights	(int MODULUS = DEFAULT_WEIGHT_MODULUS);
+	void set_modulus_edge_weight	(int MODULUS = DEFAULT_WEIGHT_MODULUS);
 			
 
 /////////////
@@ -518,7 +537,7 @@ public:
 template <class Graph_t, class W>
 template <bool EraseNonEdges>
 inline
-void Base_Graph_EW< Graph_t, W>::set_edge_weight (mat_t& lw) {
+void Base_Graph_EW< Graph_t, W>::set_weight (mat_t& lw, bool edges_only) {
 
 	auto NV = number_of_vertices();
 
@@ -535,7 +554,7 @@ void Base_Graph_EW< Graph_t, W>::set_edge_weight (mat_t& lw) {
 	for (auto v = 0; v < NV; ++v) {
 		for (auto w = 0; w < NV; ++w) {
 			
-			if (v == w) continue;			//skips vertex weights
+			if (edges_only && v == w) continue;			//skips vertex weights if required
 
 			if (g_.is_edge(v, w)) {
 				we_[v][w] = lw[v][w];
@@ -593,7 +612,6 @@ void Base_Graph_EW<Graph_t, W>::transform_weights(Func& f, int type)
 		LOG_ERROR("exiting");
 		std::exit(-1);
 	}
-
 }
 
 template <class Graph_t, class W>
@@ -616,14 +634,10 @@ void Base_Graph_EW< Graph_t, W>::set_edge_weight(W val) {
 	}
 }
 
-
-
-
-
 template<class Graph_t, class W>
 template <bool EraseNonEdges>
 inline
-void Base_Graph_EW<Graph_t, W>::set_modulus_edge_weights(int MODULUS) {
+void Base_Graph_EW<Graph_t, W>::set_modulus_edge_weight(int MODULUS) {
 
 	auto NV = number_of_vertices();
 
@@ -636,7 +650,7 @@ void Base_Graph_EW<Graph_t, W>::set_modulus_edge_weights(int MODULUS) {
 			if (g_.is_edge(v, w)) {
 
 				///////////////////////////////////////
-				set_edge_weight(v, w, (1 + ((v + w + 2 /* 0-based index*/) % MODULUS)));
+				set_weight(v, w, (1 + ((v + w + 2 /* 0-based index*/) % MODULUS)));
 				///////////////////////////////////////
 			}
 			else {
@@ -677,11 +691,10 @@ void Graph_EW< ugraph, W >::set_edge_weight(W val) {
 	}*/
 }
 
-
 template <class W>
 template<bool EraseNonEdges>
 inline
-void Graph_EW< ugraph, W >::set_edge_weight(typename Graph_EW<ugraph, W>::mat_t& lw) {
+void Graph_EW< ugraph, W >::set_weight(typename Graph_EW<ugraph, W>::mat_t& lw, bool edges_only) {
 
 	auto NV = ptype::number_of_vertices();
 
@@ -713,16 +726,17 @@ void Graph_EW< ugraph, W >::set_edge_weight(typename Graph_EW<ugraph, W>::mat_t&
 	}
 
 	//vertex weights
-	/*for (int v = 0; v < NV; v++) {
-		ptype::we_[v][v] = lw[v][v];
-	}*/
-
+	if (!edges_only) {
+		for (auto v = 0; v < NV; v++) {
+			ptype::we_[v][v] = lw[v][v];
+		}
+	}	
 }
 
 template<class W>
 template<bool EraseNonEdges>
 inline
-void Graph_EW<ugraph, W>::set_modulus_edge_weights(int MODULUS) {
+void Graph_EW<ugraph, W>::set_modulus_edge_weight(int MODULUS) {
 
 	auto NV = number_of_vertices();
 
@@ -735,12 +749,12 @@ void Graph_EW<ugraph, W>::set_modulus_edge_weights(int MODULUS) {
 			if (ptype::g_.is_edge(v, w)) {
 
 				///////////////////////////////////////
-				set_edge_weight(v, w, (1 + ((v + w + 2 /* 0-based index*/) % MODULUS)));
+				set_weight(v, w, (1 + ((v + w + 2 /* 0-based index*/) % MODULUS)));
 				///////////////////////////////////////
 
 			}
 			else {
-				if (EraseNonEdges) { set_edge_weight(v, w, ptype::NO_WEIGHT); }
+				if (EraseNonEdges) { set_weight(v, w, ptype::NO_WEIGHT); }
 			}
 		}
 	}
@@ -748,6 +762,7 @@ void Graph_EW<ugraph, W>::set_modulus_edge_weights(int MODULUS) {
 
 template<class Graph_t, class W>
 template<bool EdgeWeightedGraph>
+inline
 int Base_Graph_EW<Graph_t, W>::reset(std::size_t NV, W val, string name)
 {
 	if (g_.reset(NV) == -1) {

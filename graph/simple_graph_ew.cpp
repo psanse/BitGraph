@@ -34,7 +34,6 @@ template<class Graph_t, class W>
 const W Base_Graph_EW <Graph_t, W >::ZERO_WEIGHT = 0;
 /////////////////////////////////////////////////
 
-
 template<class Graph_t, class W>
  bool Base_Graph_EW<Graph_t, W>::is_consistent(){
 
@@ -53,18 +52,28 @@ template<class Graph_t, class W>
 	return true;
 }
 
-template<class Graph_t, class W>
-Base_Graph_EW<Graph_t, W>::Base_Graph_EW(mat_t& lwe) : we_ (lwe) {
+ template<class Graph_t, class W>
+ Base_Graph_EW<Graph_t, W>::Base_Graph_EW(int NV, W val, bool edge_weighted)
+ {
+	 if (edge_weighted) {
 
-	if (g_.reset(lwe.size()) == -1) {
-		LOG_ERROR("error during memory graph allocation - Base_Graph_EW<T, W>::Base_Graph_EW");
-		LOG_ERROR("exiting...");
-		std::exit(-1);
+		if (reset<true>(NV, val) == -1) {
+			LOG_ERROR("error during memory graph allocation - Base_Graph_EW<T, W>::Base_Graph_EW");
+			LOG_ERROR("exiting...");
+			std::exit(-1);
+		}
 	}
-}
+	else {
 
+		if (reset<false>(NV, val) == -1) {
+			LOG_ERROR("error during memory graph allocation - Base_Graph_EW<T, W>::Base_Graph_EW");
+			LOG_ERROR("exiting...");
+			std::exit(-1);
+		}
+	}
+ }
 
-template<class Graph_t, class W>
+ template<class Graph_t, class W>
 Base_Graph_EW<Graph_t, W>::Base_Graph_EW(string filename){
 	read_dimacs	(filename);							
 }
@@ -89,7 +98,7 @@ void Base_Graph_EW<Graph_t, W>::set_vertex_weight( W val) {
 }
 
 template <class Graph_t, class W>
-void Base_Graph_EW<Graph_t, W >::set_edge_weight(int v, int w, W val) {
+void Base_Graph_EW<Graph_t, W >::set_weight(int v, int w, W val) {
 	
 	////////////////
 	assert(v != w);
@@ -102,7 +111,7 @@ void Base_Graph_EW<Graph_t, W >::set_edge_weight(int v, int w, W val) {
 	}
 	else {
 		LOGG_WARNING("attempting to set an edge-weight to a non-edge", "(", v, ",", w, ")",
-						 "- Base_Graph_EW<Graph_t,W >::set_edge_weight"							);		
+						 "- Base_Graph_EW<Graph_t,W >::set_weight"							);		
 	}
 }
 
@@ -291,7 +300,7 @@ int Base_Graph_EW<Graph_t, W>::read_dimacs (string filename){
 		 ////////////////////////////
 
 		 g_.add_edge(v1 - 1, v2 - 1);
-		 set_edge_weight (v1 - 1, v2 - 1, we);
+		 set_weight (v1 - 1, v2 - 1, we);
 	 }
 	 else {	
 
@@ -300,7 +309,7 @@ int Base_Graph_EW<Graph_t, W>::read_dimacs (string filename){
 		 ///////////////////////
 
 		 g_.add_edge(v1 - 1, v2 - 1);
-		 set_edge_weight (v1 - 1, v2 - 1, NO_WEIGHT);				//no edge-weights in file - set NO_WEIGHT value
+		 set_weight (v1 - 1, v2 - 1, NO_WEIGHT);				//no edge-weights in file - set NO_WEIGHT value
 	 }
 	 
 	 //remaining edges
@@ -321,7 +330,7 @@ int Base_Graph_EW<Graph_t, W>::read_dimacs (string filename){
 			 /////////////////////
 
 			 g_.add_edge (v1 - 1, v2 - 1);
-			 set_edge_weight (v1 - 1, v2 - 1, we);
+			 set_weight (v1 - 1, v2 - 1, we);
 		 }
 		 else {
 			 ///////////////
@@ -329,7 +338,7 @@ int Base_Graph_EW<Graph_t, W>::read_dimacs (string filename){
 			 ///////////////
 
 			 g_.add_edge(v1 - 1, v2 - 1);
-			 set_edge_weight (v1 - 1, v2 - 1, NO_WEIGHT);			//no edge-weights in file - set NO_WEIGHT value
+			 set_weight (v1 - 1, v2 - 1, NO_WEIGHT);			//no edge-weights in file - set NO_WEIGHT value
 		 }
 
 		 std::getline(f, line);  //remove remaining part of the line
@@ -594,7 +603,7 @@ void Graph_EW<ugraph, W>::add_edge(int v, int w, W val)
 }
 
 template <class W>
-void Graph_EW< ugraph, W >::set_edge_weight(int v, int w, W val) {
+void Graph_EW< ugraph, W >::set_weight(int v, int w, W val) {
 
 	//////////////////
 	assert(v != w);
@@ -609,7 +618,7 @@ void Graph_EW< ugraph, W >::set_edge_weight(int v, int w, W val) {
 	}
 	else {
 		LOGG_WARNING("edge-weight cannot be added to a non-edge", 
-					  "(", v, ",", w, ")", "- Graph_EW<Graph_t,W >::set_edge_weight" );	
+					  "(", v, ",", w, ")", "- Graph_EW<Graph_t,W >::set_weight" );	
 	}
 	
 }
@@ -814,9 +823,22 @@ void Base_Graph_EW<Graph_t, W>::erase_non_edge_weights() {
 		for (auto j = i + 1; j < NV; ++j) {
 
 			if (!g_.is_edge(i, j)) {
-				this->set_edge_weight(i, j, Base_Graph_EW<Graph_t, W>::NO_WEIGHT);
+				this->set_weight(i, j, Base_Graph_EW<Graph_t, W>::NO_WEIGHT);
 			}
 		}
+	}
+}
+
+template<class Graph_t, class W>
+void Base_Graph_EW<Graph_t, W>::make_edge_weighted(bool erase_non_edges)
+{
+	//sets all vertex weights to NO_WEIGHT
+	for (auto v = 0; v < g_.size(); ++v) {
+		we_[v][v] = Base_Graph_EW<Graph_t, W>::NO_WEIGHT;	
+	}
+
+	if (erase_non_edges) {
+		erase_non_edge_weights();
 	}
 }
 
