@@ -335,8 +335,7 @@ public:
 	int max_graph_degree	()													{ return ptype::g_.max_graph_degree(); }
 	int degree				(int v)							const				{ return ptype::g_.degree(v); }
 	int degree				(int v, const BitSet& bbn)		const				{ return ptype::g_.degree(v, bbn); }
-
-		
+			
 
 ///////////
 //I/O operations
