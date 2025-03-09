@@ -89,6 +89,14 @@ add_executable (test_utils ./tests/gtest_main.cc
    
 )
 
+set_target_properties(test_utils 
+    PROPERTIES
+    ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
+    LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
+    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin/tests"
+    #PUBLIC_HEADER   "${useful_headers_for_IDE}"        #does not preserve internal structure  
+)
+
 target_include_directories (test_utils PUBLIC ../googletest/include/)
 target_link_libraries (test_utils LINK_PUBLIC utils gtest)
 

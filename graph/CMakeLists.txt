@@ -96,6 +96,14 @@ add_executable ( test_graph  tests/gtest_main.cpp
 
 )
 
+set_target_properties(test_graph 
+    PROPERTIES
+    ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
+    LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
+    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin/tests"
+    #PUBLIC_HEADER   "${useful_headers_for_IDE}"        #does not preserve internal structure  
+)
+
 target_include_directories (test_graph PUBLIC ../googletest/include/)
 # Link the executable to the Hello library. Since the Hello library has
 # public include directories we will use those link directories when building
