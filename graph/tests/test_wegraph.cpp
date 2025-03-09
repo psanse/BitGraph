@@ -197,7 +197,7 @@ TEST(UGraphEW, create_an_edge_weighted_graph) {
 //
 //////////////////
 
-TEST_F(UGraphEWTest, DISABLE_printing) {
+TEST_F(UGraphEWTest, DISABLED_printing) {
 	//visual test - DISABLE by default
 
 	//I/O
@@ -206,8 +206,8 @@ TEST_F(UGraphEWTest, DISABLE_printing) {
 	ugew.print_edge(0, 1);
 	ugew.print_weights(cout, true, decltype(ugew)::EDGE);
 
-	/*LOG_INFO("push any key to continue...");	
-	cin.get();*/
+	LOG_INFO("push any key to continue...");	
+	cin.get();
 }
 
 TEST(UGraphEW, DISABLED_gen_random ){

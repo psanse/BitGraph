@@ -410,7 +410,7 @@ template <class Graph_t, class W>
 ostream& Base_Graph_W<Graph_t, W>::print_weights (com::stack_t<int>& lv, ostream& o) const{
 
 	for(auto i = 0; i < lv.nE_; ++i){
-		o << "[" << lv.at(i) << "," << w_[lv.at(i)] << "] ";
+		o << "[" << lv.at(i) << ":(" << w_[lv.at(i)] << ")] ";
 	}
 	o << "(" << lv.nE_ << ")" <<endl;
 	return o;
@@ -420,7 +420,7 @@ template <class Graph_t, class W>
 ostream& Base_Graph_W<Graph_t, W>::print_weights (int* lv, int NV, ostream& o) const{
 
 	for(auto i = 0; i < NV; ++i){
-		o << "[" << lv[i] << "," << w_[lv[i]] << "] ";
+		o << "[" << lv[i] << ":(" << w_[lv[i]] << ")] ";
 	}
 	o << "(" << NV << ")" << endl;
 	return o;
@@ -430,7 +430,7 @@ template <class Graph_t, class W>
 ostream& Base_Graph_W<Graph_t, W>::print_weights (com::stack_t<int>& lv, const vint& mapping, ostream& o) const{
 
 	for(auto i = 0; i < lv.nE_; ++i){
-		o << "[" << mapping[lv.at(i)] << "," << w_[mapping[lv.at(i)]] << "] ";
+		o << "[" << mapping[lv.at(i)] << ":(" << w_[mapping[lv.at(i)]] << ")] ";
 	}
 	o << "(" << lv.nE_ << ")" << endl;
 	return o;
@@ -440,7 +440,7 @@ template <class Graph_t, class W>
 ostream& Base_Graph_W<Graph_t, W>::print_weights (vint& lv, ostream& o) const{
 	
 	for(auto i = 0; i < lv.size(); i++){
-		o << "[" << lv[i] << "," << w_[lv[i]] << "] ";
+		o << "[" << lv[i] << ":(" << w_[lv[i]] << ")] ";
 	}
 	o << "(" << lv.size() << ")" << endl;
 	return o;
@@ -453,7 +453,7 @@ ostream& Base_Graph_W<Graph_t, W>::print_weights (_bbt& bbsg, ostream& o) const{
 	while(true){
 		int v = bbsg.next_bit();
 		if(v == EMPTY_ELEM) break;
-		o << "[" << v << "," << w_[v] << "] ";
+		o << "[" << v << ":(" << w_[v] << ")] ";
 	}
 	o << "(" << bbsg.size() << ")" << endl;
 	return o;
@@ -466,7 +466,7 @@ ostream& Base_Graph_W<Graph_t, W>::print_weights (ostream& o, bool show_v) const
 
 	if(show_v){
 		for(std::size_t i = 0; i < NV; ++i){
-			o << "[" << i << "," << w_[i] << "] ";
+			o << "[" << i << ":(" << w_[i] << ")] ";
 		}
 		o << endl;
 	}else{

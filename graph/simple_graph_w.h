@@ -239,9 +239,10 @@ public:
 	std::ostream& print_edges			(std::ostream& o = std::cout, bool eofl = false)							{ g_.print_edges(o, eofl); return o; }
 	
 	/**
-	* @brief treams vertex-weights in the graph
+	* @brief streams vertex-weights in the format [v:(val)]	
 	* @param o output stream
-	* @param show_vert: if TRUE, prints also the vertex index (default value)
+	* @param show_vert: if FALSE does not show vertex info but the collection of weights
+	*					in order 
 	**/
 	std::ostream& print_weights			(std::ostream& o = std::cout, bool show_vert = true)						const;
 	
