@@ -278,7 +278,7 @@ public:
 	* @param type: EDGE (edge-weights), VERTEX (vertex-weights) or BOTH
 	**/
 	template<class Func>
-	void transform_weights				(const Func& f, int type = BOTH);
+	void transform_weights				(Func f, int type = BOTH);
 
 	/**
 	* @brief specific transformation of weights (excluding NO_WEIGHT values)
@@ -572,7 +572,7 @@ void Base_Graph_EW< Graph_t, W>::set_weight (mat_t& lw, bool edges_only) {
 template<class Graph_t, class W>
 template<class Func>
 inline
-void Base_Graph_EW<Graph_t, W>::transform_weights(const Func& f, int type)
+void Base_Graph_EW<Graph_t, W>::transform_weights(Func f, int type)
 {
 	auto NV = number_of_vertices();
 		

@@ -44,6 +44,18 @@ const W Base_Graph_W <Graph_t, W >::DEFAULT_WEIGHT = 1.0;
 // Necessary implementation of template methods in header file
 
 template<class Graph_t, class W>
+void Base_Graph_W<Graph_t, W>::complement_weights()
+{
+	auto NV = size();
+
+	for (auto v = 0; v < NV; ++v) {
+		if (weight(v) != NO_WEIGHT) {
+			w_[v] = - w_[v];	
+		}
+	}
+}
+
+template<class Graph_t, class W>
 int Base_Graph_W<Graph_t, W>::create_complement(Base_Graph_W<Graph_t, W>& g) const {
 
 	g.name(this->name());

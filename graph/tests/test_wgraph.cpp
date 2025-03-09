@@ -39,6 +39,17 @@ protected:
 	ugraph_wi gw;											//undirected graph with integer weights
 };
 
+
+TEST_F(UGraphWTest, scale_transformation) {
+
+	//scale transformation (mul by *5 all the weights)
+	gw.transform_weights(com::scale<decltype(gw)::_wt>(5));
+
+	EXPECT_EQ(5,  gw.weight(0));
+	EXPECT_EQ(10, gw.weight(1));
+	
+}
+
 TEST_F(UGraphWTest, contruction) {
 
 	EXPECT_EQ	(NV, gw.number_of_vertices());

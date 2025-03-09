@@ -17,7 +17,7 @@
 #include "simple_ugraph.h"
 #include <iostream>
 #include <vector>
-
+#include <algorithm>
 
 
 ////////////////////////////////////////////////////////////////
@@ -99,6 +99,16 @@ explicit Base_Graph_W		(int N, W val = DEFAULT_WEIGHT)			{ assert(reset(N, val) 
 	* @returns 0 if success, -1 if error
 	*/
 	int	 set_weight						(std::vector<W>& lw);
+
+	/**
+	* @brief generates weights based on modulus operation [Pullan 2008, MODE = 200]
+	*
+	*			w(v) = (v + 1) % MODE	(v 1-based index)
+	*
+	*			MODE = 1 -> w(v) = 1	(unweighted graph)
+	**/
+	int set_modulus_weight				(int MODE = DEFAULT_WEIGHT_MODULUS);
+
 	
 	Graph_t& graph						()							{ return g_;}
 const Graph_t& graph					()			const			{ return g_; }
@@ -181,16 +191,21 @@ public:
 
 
 ///////////////////////////
-//weight generation
+//weight operations
 	
 	/**
-	* @brief generates weights based on modulus operation [Pullan 2008, MODE = 200]
-	* 
-	*			w(v) = (v + 1) % MODE	(v 1-based index)
-	*			
-	*			MODE = 1 -> w(v) = 1	(unweighted graph)
+	* @brief transforms (vertex) weights (excluding NO_WEIGHT values) using functor f
+	* @param f functor
 	**/
-	int set_modulus_weight				(int MODE = DEFAULT_WEIGHT_MODULUS);
+	template<class Func>
+	void transform_weights				(Func f);
+
+	/**
+	* @brief specific transformation of weights (excluding NO_WEIGHT values)
+	*		 from positive to negative, i.e.,  w(i) = - w(i)
+	**/
+	void complement_weights				();
+
 	
 ////////////////////////
 // other operations
@@ -333,6 +348,25 @@ public:
 	*/
 	ostream& write_dimacs	(ostream& o = std::cout)		override;								
 };
+
+
+
+/////////////////////////////////////////////
+//
+// Necessary implementations in header file	
+
+template<class Graph_t, class W>
+template<class Func>
+inline 
+void Base_Graph_W<Graph_t, W>::transform_weights(Func f)
+{
+	auto NV = number_of_vertices();
+
+	///////////////////////////////////////////////////////
+	std::transform(w_.begin(), w_.end(), w_.begin(), f);
+	///////////////////////////////////////////////////////
+
+}
 
 
 #endif
