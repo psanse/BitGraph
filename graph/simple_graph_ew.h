@@ -511,7 +511,6 @@ protected:
 
 	std::ostream& print_edge_weights	(std::ostream& o = std::cout, bool line_format = true)				const override;
 	
-	
 	std::ostream& print_edge_weights	(vint& lv, std::ostream& o = std::cout)								const override;
 
 public:	
