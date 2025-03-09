@@ -136,14 +136,16 @@ TEST(Common, stack_pop){
 }
 
 TEST(Common_dir, path){
-	std::string path_1("c:/kk/");		//POSIX
-	std::string path_2("c:\\kk");		//WINDOWS	
-	
-	com::dir::append_slash(path_1);
-	com::dir::append_slash(path_2);
 
+	std::string path_1("c:/kk/");		//POSIX
+	com::dir::append_slash(path_1);
 	EXPECT_STREQ("c:/kk/", path_1.c_str());
+
+#ifdef _MSC_VER
+	std::string path_2("c:\\kk");		//WINDOWS	
+	com::dir::append_slash(path_2);
 	EXPECT_STREQ("c:\\kk\\", path_2.c_str());
+#endif
 
 }
 
