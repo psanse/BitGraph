@@ -449,7 +449,7 @@ std::ostream& Base_Graph_EW<Graph_t, W>::print_vertex_weights(std::ostream& o) c
 
 	for (auto v = 0; v < NV; v++) {
 		if (we_[v][v] != Base_Graph_EW<Graph_t, W>::NO_WEIGHT) {
-			o << "[" << v << " (" << we_[v][v] << ")] " << endl;
+			o << "[" << v << ":(" << we_[v][v] << ")] " << endl;
 		}
 	}
 	return o;
@@ -505,7 +505,7 @@ std::ostream& Base_Graph_EW<Graph_t, W>::print_vertex_weights(vint& lv, std::ost
 		if (we_[lv[i]][lv[i]] != Base_Graph_EW<Graph_t, W>::NO_WEIGHT) {
 
 			/////////////////////////////////////////////////////////////////
-			o << "[" << lv[i] << " (" << we_[lv[i]][lv[i]] << ")] " << endl;
+			o << "[" << lv[i] << ":(" << we_[lv[i]][lv[i]] << ")] " << endl;
 			/////////////////////////////////////////////////////////////////
 		}
 	}
@@ -641,58 +641,6 @@ void Graph_EW<ugraph, W>::gen_random_edges(double p, W val){
 		}
 	}
 }
-
-//template <class W>
-//ostream& Graph_EW<ugraph, W>::print_weights (ostream& o, bool line_format, int type) const{
-//
-//	auto NV = ptype::number_of_vertices();
-//	
-//	o << "\n**********non-empty edge-weights*************************" << endl;
-//
-//	if (only_vertex_weights == false) {
-//
-//		//streams edge-weights 
-//		if (line_format) {
-//			for (auto v = 0; v < NV; v++) {
-//				if (ptype::we_[v][v] != ptype::NO_WEIGHT) {
-//					o << "[" << v << " (" << ptype::we_[v][v] << ")] " << endl;
-//				}
-//			}
-//
-//			for (auto i = 0; i < NV - 1; i++) {
-//				for (int j = i + 1; j < NV; j++) {
-//					if (ptype::we_[i][j] != ptype::NO_WEIGHT) {
-//						o << "[" << i << "-" << j << " (" << ptype::we_[i][j] << ")] " << endl;
-//					}
-//				}
-//			}
-//		}
-//		else {																			//outputs to stream edge-weights in matrix form
-//			for (auto i = 0; i < NV; ++i) {
-//				for (auto j = i; j < NV; ++j) {
-//					if (ptype::we_[i][j] != ptype::NO_WEIGHT) {
-//						o << "[" << i << "-" << j << " (" << ptype::we_[i][j] << ")] ";
-//					}
-//					else {
-//						o << "--" << " ";
-//					}
-//				}
-//				o << endl;
-//			}
-//		}
-//	}else{
-//		//streams vertex weights (weights in self-loops)
-//		for (auto v = 0; v < NV; v++) {
-//			if (ptype::we_[v][v] != ptype::NO_WEIGHT) {
-//				o << "[" << v << " (" << ptype::we_[v][v] << ")] " << endl;
-//			}
-//		}
-//	}
-//
-//	o << "**********************************************************" << endl;
-//
-//	return o;
-//}
 
 template<class W>
 std::ostream& Graph_EW<ugraph, W>::print_edge_weights(std::ostream& o, bool line_format) const

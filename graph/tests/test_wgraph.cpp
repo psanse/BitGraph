@@ -130,6 +130,17 @@ TEST_F(UGraphWTest, reset) {
 	/////////////////////////////////
 }
 
+TEST_F(UGraphWTest, DISABLED_printing) {
+//visual test - default disabled
+
+	gw.print_data();
+	gw.print_edges();
+	gw.print_weights();
+	LOG_INFO("press any key to continue");	
+	cin.get();
+
+}
+
 TEST(UGraphW, constructor_from_file) {
 
 	//read DIMACS graph from file - no DIMACS weights, sets default weights 
