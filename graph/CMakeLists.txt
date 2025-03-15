@@ -30,6 +30,8 @@ ${useful_headers_for_IDE}
 set_target_properties(graph 
     PROPERTIES
     ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
+    LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
+    #RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
 	#PUBLIC_HEADER   "${useful_headers_for_IDE}"        #does not preserve internal structure 
 )
 

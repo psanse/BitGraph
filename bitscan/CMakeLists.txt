@@ -30,8 +30,11 @@ ${useful_headers_for_IDE}
 set_target_properties(bitscan 
     PROPERTIES
     ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
+    LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
+    #RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
     #PUBLIC_HEADER   "${useful_headers_for_IDE}"        #does not preserve internal structure  
 )
+
 
 # Make sure the compiler can find include files for our bitscan library
 # when other libraries or executables link to bitscan
@@ -45,6 +48,10 @@ target_include_directories(bitscan PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
   $<INSTALL_INTERFACE:include/bitscan>    # <prefix>/include/bitscan
 )
+
+#message("CMAKE_BINARY_DIR: '${CMAKE_BINARY_DIR}'")
+#message("CMAKE_CURRENT_SOURCE_DIR: '${CMAKE_CURRENT_SOURCE_DIR}'")
+#message("CMAKE_SOURCE_DIR: '${CMAKE_SOURCE_DIR}'")
 
 #############
 # Install BITSCAN lib
