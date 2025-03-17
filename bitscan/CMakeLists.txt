@@ -80,37 +80,7 @@ foreach(ITEM ${DEPLOY_FILES_AND_DIRS})
 option(bitscan_build_tests "Build bitscan tests." ON)
 if (bitscan_build_tests)
 
-add_executable (test_bitscan tests/gtest_main.cc 
-  
-    #TESTS TO CHECK (26/02/2025)   
-    tests/test_algorithms.cpp   
-    #tests/test_example.cpp   
-    #tests/test_bbsentinel.cpp 
-
-    #TESTS CHECKED (26/02/2025)
-    tests/test_bitblock.cpp
-    tests/test_masks.cpp 
-    tests/test_bbscan_nested.cpp 
-    tests/test_bbscan.cpp 
-    tests/test_bitset.cpp 
-    tests/test_bbscan_sparse.cpp 
-    tests/test_bitset_sparse.cpp
-    tests/test_bbscan_sparse_nested.cpp 
-
-)
-
-set_target_properties(test_bitscan 
-    PROPERTIES
-    ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
-    LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
-    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin/tests"
-    #PUBLIC_HEADER   "${useful_headers_for_IDE}"        #does not preserve internal structure  
-)
-
-target_include_directories (test_bitscan PUBLIC ../googletest/include/)
-
-target_link_libraries (test_bitscan LINK_PUBLIC bitscan gtest utils)
-
+	add_subdirectory(tests)
 
 endif()
 

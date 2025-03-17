@@ -66,41 +66,9 @@ install(TARGETS utils
 # UNIT TESTS for UTILS lib
 #############
 option(utils_build_tests "Build utils tests." ON)
-#set(utils_build_tests ON)
 if (utils_build_tests)
 
-# Add executable called "helloDemo" that is built from the source files
-# "demo.cxx" and "demo_b.cxx". The extensions are automatically found.
-add_executable (test_utils ./tests/gtest_main.cc
-
-    # TESTS CHECKED  (26/01/2025)
-     tests/test_common.cpp
-     tests/test_file.cpp    
-     tests/test_info.cpp
-     tests/test_info_clq.cpp
-     tests/test_precise_timer.cpp
-     tests/test_thread.cpp
-     tests/test_logger.cpp
-     tests/test_benchmark.cpp
-     tests/test_infoAnalyser.cpp
-     tests/test_result.cpp     
-     tests/test_batch.cpp 
-
-     #test working but deprecated / or expect to be deprecated
-     #tests/test_testAnalyser.cpp
-   
-)
-
-set_target_properties(test_utils 
-    PROPERTIES
-    ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
-    LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
-    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin/tests"
-    #PUBLIC_HEADER   "${useful_headers_for_IDE}"        #does not preserve internal structure  
-)
-
-target_include_directories (test_utils PUBLIC ../googletest/include/)
-target_link_libraries (test_utils LINK_PUBLIC utils gtest)
+	add_subdirectory(tests)
 
 endif()
 
