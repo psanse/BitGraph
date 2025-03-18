@@ -1,19 +1,32 @@
-cmake_minimum_required (VERSION 2.8...3.4)  		#version 2.8 for old servers
+cmake_minimum_required (VERSION 2.8...3.13)  	
 
-#####################################
-# Set install prefix path for all libs (prior to project)
-######################################
+###########################
+# Set install prefix default path 
+###########################
 
-set(CMAKE_INSTALL_PREFIX ${CMAKE_CURRENT_SOURCE_DIR}/example_external_linking CACHE PATH "Directory chosen to deploy project")
+set(CMAKE_INSTALL_PREFIX ${CMAKE_CURRENT_SOURCE_DIR}/example_external_linking CACHE PATH "Directory to deploy the project")
 
 ###########
 # project
 ############
+set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)	
 
-project (bitscan_graph_libs LANGUAGES CXX C)
+set(LIBNAME "BitGraph")
+set(LIB_MAJOR_VERS "1")
+set(LIB_MINOR_VERS "0")
+set(LIB_PATCH_VERS "3")
+
+#build source
+project(${LIBNAME} 
+    VERSION  ${LIB_MAJOR_VERS}.${LIB_MINOR_VERS}.${LIB_PATCH_VERS}
+	LANGUAGES CXX C
+)
+
+#project (bitscan_graph_libs LANGUAGES CXX C)
 
 #############
-# C++ flag (not for VS)
+# C++ flags 
 #############
 
 if(UNIX)
@@ -45,6 +58,27 @@ if(WIN32)
   set(CMAKE_SHARED_LINKER_FLAGS "-Wl,--export-all-symbols")
 endif()
 
+#################
+# Google tests (requires C++14)
+#################
+option(BUILD_TESTS "makes tests available" ON)
+if (BUILD_TESTS)
+    include(FetchContent)
+
+    FetchContent_Declare(
+        googletest
+        URL https://github.com/google/googletest/archive/refs/tags/release-1.12.1.zip
+    )
+
+    set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+	set(BUILD_GMOCK OFF CACHE BOOL "" FORCE)
+    FetchContent_MakeAvailable(googletest)
+	
+	set(CMAKE_CXX_STANDARD 14)					#required for googletest 
+	set(CMAKE_CXX_STANDARD_REQUIRED ON)		
+	message(STATUS "Building tests with GoogleTest framework")
+endif()
+
 #############
 # USEFUL GLOBAL DEFINITIONS
 # (use inside the code)
@@ -61,23 +95,23 @@ add_definitions (-DPATH_COPT_TESTS_CMAKE_SRC_CODE=\"${PATH_COPT_TESTS_CMAKE_GUI}
 #add_definitions (-D_PATH_FOR_GRAPH_TESTS_DATA_IN_SRC_CODE=\"${CMAKE_SOURCE_DIR}/graph/data/\") 
 
 ##############
-# LOGGER LEVEL (see utils/logger.h) configurable from CMake at run time
-# comments: there is no checking of the value if it is not set from the CMake GUI
+# LOGGER LEVEL (see utils/logger.h) employed at runtime
+# comments: default level debug
 ##############
 
-set(LOG_LEVEL "debug" CACHE STRING "Logger level used at run time")
-set_property(CACHE LOG_LEVEL PROPERTY STRINGS debug verbose error)
-message("LOGGER_LEVEL='${LOG_LEVEL}'")
+set(LOGGER_LEVEL "debug" CACHE STRING "Logger level used at run time")
+set_property(CACHE LOGGER_LEVEL PROPERTY STRINGS debug verbose error)
+message(STATUS "LOGGER_LEVEL set to '${LOGGER_LEVEL}'")
 
-if( ${LOG_LEVEL} STREQUAL "debug")
+if( ${LOGGER_LEVEL} STREQUAL "debug")
     add_definitions(-DLOGGER_DEBUG_LEVEL)				#all messages (logger.h) 
 endif()
 
-if( ${LOG_LEVEL}  STREQUAL "verbose")
+if( ${LOGGER_LEVEL}  STREQUAL "verbose")
     add_definitions(-DLOGGER_VERBOSE_LEVEL)				#all messages (logger.h)  	
 endif()
 
-if( ${LOG_LEVEL}  STREQUAL "error")
+if( ${LOGGER_LEVEL}  STREQUAL "error")
     add_definitions(-DLOGGER_ERROR_LEVEL)				#all messages (logger.h)  	
 endif()
 
@@ -87,11 +121,12 @@ endif()
 #############
 
 if (WIN32)
-#find_package(OpenMP)
-#IF (OPENMP_FOUND)
+find_package(OpenMP)
+IF (OPENMP_FOUND)
     set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
     set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS} -D_VARIADIC_MAX=10")
-#endif()
+	message(STATUS "OpenMP found")
+endif()
 endif (WIN32)
 
 if (APPLE)
@@ -100,14 +135,11 @@ if (APPLE)
     #add_compile_options(-arch arm64)
 endif (APPLE)
 
-
-#########################################
-# Subdirectories for the different libs
-#########################################
-
+####################
+# Subdirectories 
+####################
 include_directories (PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
-add_subdirectory (googletest)       #TODO - import some other way
 add_subdirectory (utils)
 add_subdirectory (bitscan)
 add_subdirectory (tclap)            #TODO - possibly remove

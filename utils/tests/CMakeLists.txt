@@ -2,7 +2,9 @@
 # UTILS lib - Unit test targets
 ###################
 
-add_executable (test_utils gtest_main.cc
+add_executable (test_utils 
+
+	#gtest_main.cc
 
     # TESTS CHECKED  (26/01/2025)
      test_common.cpp
@@ -31,7 +33,7 @@ set_target_properties(test_utils
 
 target_include_directories (test_utils PUBLIC ../googletest/include/)
 
-target_link_libraries (test_utils LINK_PUBLIC utils gtest)
+target_link_libraries (test_utils LINK_PUBLIC utils gtest_main)
 
 
 

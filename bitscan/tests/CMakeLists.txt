@@ -2,7 +2,9 @@
 # BITSCAN lib - Unit test targets
 ###################
 
-add_executable (test_bitscan gtest_main.cc 
+add_executable (test_bitscan 
+
+	#gtest_main.cc 
   
     #TESTS TO CHECK (26/02/2025)   
     test_algorithms.cpp   
@@ -30,7 +32,7 @@ set_target_properties(test_bitscan
 
 target_include_directories (test_bitscan PUBLIC ../googletest/include/)
 
-target_link_libraries (test_bitscan LINK_PUBLIC bitscan gtest utils)
+target_link_libraries (test_bitscan LINK_PUBLIC bitscan gtest_main utils)
 
 
 

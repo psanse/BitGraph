@@ -1,6 +1,9 @@
 cmake_minimum_required (VERSION 3.4)
 project (examples_GRAPH_BITSCAN)
 
+find_package(bitscan REQUIRED) # REQUIRED: will stop compilation if package is missing
+include_directories(${BITSCAN_INCLUDE_DIRS})
+
 ############
 # c++11 flag
 ############
