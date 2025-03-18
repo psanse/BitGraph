@@ -31,7 +31,7 @@ set_target_properties(bitscan
     PROPERTIES
     ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
     LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
-    #RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
+    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
     #PUBLIC_HEADER   "${useful_headers_for_IDE}"        #does not preserve internal structure  
 )
 
@@ -79,8 +79,8 @@ foreach(ITEM ${DEPLOY_FILES_AND_DIRS})
 ###################
 # UNIT TESTS for BITSCAN lib  
 ###################
-option(bitscan_build_tests "Build bitscan tests." ON)
-if (bitscan_build_tests)
+#option(bitscan_build_tests "Build bitscan tests." ON)
+if (BUILD_TESTS)
 
 	add_subdirectory(tests)
 

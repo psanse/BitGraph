@@ -31,7 +31,7 @@ set_target_properties(graph
     PROPERTIES
     ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
     LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
-    #RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
+    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
 	#PUBLIC_HEADER   "${useful_headers_for_IDE}"        #does not preserve internal structure 
 )
 
@@ -46,8 +46,8 @@ target_include_directories(graph PUBLIC
 ###################
 # UNIT TESTS for GRAPH lib
 ###################
-option(graph_build_tests "Build graph tests." ON)
-if (graph_build_tests)
+#option(graph_build_tests "Build graph tests." ON)
+if (BUILD_TESTS)
 
     add_subdirectory(tests)
 
