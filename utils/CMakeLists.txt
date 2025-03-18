@@ -61,7 +61,6 @@ install(TARGETS utils
     install(FILES ${ITEM} DESTINATION include/${DIR_PATH})	 
  endforeach()
 
-
 #############
 # UNIT TESTS for UTILS lib
 #############

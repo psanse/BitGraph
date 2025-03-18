@@ -1,9 +1,21 @@
 cmake_minimum_required (VERSION 2.8...3.4)  		#version 2.8 for VENUS server
+
+#####################################
+# Set install prefix path for all libs (prior to project)
+######################################
+
+set(CMAKE_INSTALL_PREFIX ${CMAKE_CURRENT_SOURCE_DIR}/example_external_linking CACHE PATH "Directory chosen to deploy project")
+
+###########
+# project
+############
+
 project (bitscan_graph_libs LANGUAGES CXX C)
 
 #############
 # C++ flag (not for VS)
 #############
+
 if(UNIX)
 
     include(CheckCXXCompilerFlag)
@@ -100,55 +112,6 @@ add_subdirectory (utils)
 add_subdirectory (bitscan)
 add_subdirectory (tclap)            #TODO - possibly remove
 add_subdirectory (graph)
-
-#####################################
-# Set install prefix path for all libs
-######################################
-
-set(INSTALL_PATH "${CMAKE_CURRENT_SOURCE_DIR}/example_external_linking" CACHE PATH "Directory chosen to deploy project")
-set(CMAKE_INSTALL_PREFIX ${INSTALL_PATH})
-
- 
-
-
-
-#####################################################
-# DEPRECATED CODE
-####################################################
-
-####################
-# deploy all header files (inlcuding gtest) in include directory preserving internal structure
-# (old CMake)
-###################
-
-#file(GLOB_RECURSE DEPLOY_FILES_AND_DIRS "${PROJECT_SOURCE_DIR}/*.h")
-# foreach(ITEM ${DEPLOY_FILES_AND_DIRS})
-#    file(RELATIVE_PATH REL_PATH ${PROJECT_SOURCE_DIR} ${ITEM})
-#    get_filename_component(DIR_PATH ${REL_PATH} DIRECTORY)
-#    install(FILES ${ITEM} DESTINATION include/${DIR_PATH})	 
-# endforeach()
-
-#############
-#
-# Deploy UTILS,  BITSCAN and GRAPH libraries with EXPORT
-# (using modern CMake)
-#
-#############
-
-# Install utils library
-#install(TARGETS utils bitscan graph EXPORT allConfig)
-
-#export(TARGETS utils bitscan graph
-#    #NAMESPACE allConfig::
-#    FILE "${CMAKE_BINARY_DIR}/allConfig.cmake"
-#)
-
-#set(CMAKE_INSTALL_PREFIX ${CMAKE_CURRENT_SOURCE_DIR}/example)
-
-#install(EXPORT allConfig
-#    DESTINATION "${CMAKE_INSTALL_PREFIX}/allConfig/cmake"
-#   #NAMESPACE allConfig::
-#)
 
 
 
