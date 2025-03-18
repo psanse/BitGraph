@@ -1,4 +1,4 @@
-cmake_minimum_required (VERSION 2.8...3.4)  		#version 2.8 for VENUS server
+cmake_minimum_required (VERSION 2.8...3.4)  		#version 2.8 for old servers
 
 #####################################
 # Set install prefix path for all libs (prior to project)
@@ -65,7 +65,7 @@ add_definitions (-DPATH_COPT_TESTS_CMAKE_SRC_CODE=\"${PATH_COPT_TESTS_CMAKE_GUI}
 # comments: there is no checking of the value if it is not set from the CMake GUI
 ##############
 
-set(LOG_LEVEL "debug" CACHE STRING "LOG_LEVEL chosen in CMake at run time")
+set(LOG_LEVEL "debug" CACHE STRING "Logger level used at run time")
 set_property(CACHE LOG_LEVEL PROPERTY STRINGS debug verbose error)
 message("LOGGER_LEVEL='${LOG_LEVEL}'")
 
