@@ -69,10 +69,11 @@ endif()
 # (to preserve internal structure)
 #############
 
-install(TARGETS graph
+install(
+   TARGETS graph
    ARCHIVE DESTINATION lib
    LIBRARY DESTINATION lib
-  # RUNTIME DESTINATION bin
+   RUNTIME DESTINATION bin
   #PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_PREFIX}/include/graph        //header files deployed without internal structure
 )
 

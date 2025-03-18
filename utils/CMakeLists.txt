@@ -47,10 +47,11 @@ set_target_properties(utils
 # (to preserve internal structure)
 #############
 
-install(TARGETS utils
+install(
+    TARGETS utils
 	ARCHIVE DESTINATION lib
 	LIBRARY DESTINATION lib
-	#RUNTIME DESTINATION bin
+	RUNTIME DESTINATION bin
 	#PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_PREFIX}/include/utils        //header files deployed without internal structure
 )
 

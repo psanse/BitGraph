@@ -6,6 +6,7 @@ cmake_minimum_required (VERSION 2.8...3.4)  		#version 2.8 for old servers
 
 set(CMAKE_INSTALL_PREFIX ${CMAKE_CURRENT_SOURCE_DIR}/example_external_linking CACHE PATH "Directory chosen to deploy project")
 
+
 ###########
 # project
 ############
@@ -107,11 +108,47 @@ endif (APPLE)
 
 include_directories (PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
-add_subdirectory (googletest)       #TODO - import some other way
+#add_subdirectory (googletest)       #TODO - import some other way
+
+#if (BUILD_TESTING)
+#  include(FetchContent)
+#  FetchContent_Declare(
+#    googletest
+#    URL https://github.com/google/googletest/archive/refs/tags/release-1.12.1.zip
+#  )
+#FetchContent_MakeAvailable(googletest)
+
+#enable_testing()
+#  add_subdirectory(tests)
+#  message(STATUS "Building tests with GoogleTest")
+#endif()
+
 add_subdirectory (utils)
 add_subdirectory (bitscan)
 add_subdirectory (tclap)            #TODO - possibly remove
 add_subdirectory (graph)
 
+#########################################
+# manage install in Config Mode
+#########################################
+install(
+    EXPORT bitscanTargets 
+    FILE   bitscanTargets.cmake
+    DESTINATION "${CMAKE_INSTALL_PREFIX}/bitscanLib/cmake"
+    NAMESPACE bitscan::
+)
 
+include(CMakePackageConfigHelpers)
+configure_package_config_file(
+    cmake/bitscanConfig.cmake.in
+    "${CMAKE_CURRENT_BINARY_DIR}/bitscanConfig.cmake"
+    INSTALL_DESTINATION "${CMAKE_INSTALL_PREFIX}/bitscanLib/cmake"
+)
+
+install(
+    FILES "${CMAKE_CURRENT_BINARY_DIR}/bitscanConfig.cmake"
+    DESTINATION "${CMAKE_INSTALL_PREFIX}/bitscanLib/cmake"
+)
+
+message("CMAKE_INSTALL_PREFIX:'${CMAKE_INSTALL_PREFIX}'")
 

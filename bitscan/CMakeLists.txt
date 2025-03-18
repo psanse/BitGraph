@@ -60,10 +60,12 @@ target_include_directories(bitscan PUBLIC
 #############
 
 #Install BITSCAN library
-install(TARGETS bitscan
+install(
+   TARGETS bitscan
+   EXPORT  bitscanTargets
    ARCHIVE DESTINATION lib
    LIBRARY DESTINATION lib
-   #RUNTIME DESTINATION bin
+   RUNTIME DESTINATION bin
    #PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_PREFIX}/include/bitscan        //header files deployed without internal structure
 )
 
