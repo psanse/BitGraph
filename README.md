@@ -1,9 +1,14 @@
 # BitGraph
+<<<<<<< HEAD
 This repo contains a refactoring of the **BITSCAN** and **GRAPH** libraries for efficient operations with bitsets in modern C++ (restricted to C++11).
 The **BITSCAN** library is dedicated to **bitset manipulation**. The **GRAPH** library is devoted to **efficient graph operations**, and uses BITSCAN to represent graphs in memory.  The repo also contains additional utilities (library UTILS), which have also been refactored, and **many unit tests and examples**.
 
 BITSCAN and GRAPH have been tested in LINUX and Windows OS.  
 The current versions are BITSCAN 1.0 and GRAPH 1.0.
+=======
+This repo contains a refactoring of the **BITSCAN 1.0** and **GRAPH 1.0** libraries for efficient operations with bitsets in modern C++ (restricted to C++11).
+The **BITSCAN** library is devoted to **bitset manipulation**. The **GRAPH** library is devoted to **efficient graph operations**, and uses BITSCAN to represent graphs in memory.  The repo also contains additional utilities (library UTILS), which have also been refactored, and **many unit tests and examples**.
+>>>>>>> master
 
 The C++ BITSCAN and GRAPH libraries result from **more than 20 years of research in combinatorial optimization**. They are at the core of many exact state-of-the-art algorithms for hard combinatorial problems and their applications, such as:
 - [CliReg: Clique-based robust Point Cloud Registration, 2025](https://ieeexplore.ieee.org/abstract/document/10892261).
@@ -21,6 +26,8 @@ The C++ BITSCAN and GRAPH libraries result from **more than 20 years of research
 - [An exact bit-parallel algorithm for the maximum clique problem, 2011](https://www.sciencedirect.com/science/article/pii/S0305054810001504?casa_token=ss__gBPlWVIAAAAA:-slFv5Gkx-DGHDovu8oguVEqO-eP9dl8xQtQjuUKP8VoOmANOVMh4DoJi6Jj_kkC5xmQ-fIJNg).
 
 and many others. 
+
+The repo has been tested in LINUX and Windows OS.  
 
 Acknowledgements
 -------------------------
