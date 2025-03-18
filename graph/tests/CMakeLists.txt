@@ -2,7 +2,9 @@
 # GRAPH lib - Example targets
 ###################
 
-add_executable (test_graph  gtest_main.cpp
+add_executable (test_graph 
+
+ # gtest_main.cpp
 
 #  TESTS CHECKED  (26/01/2025)
   test_kcore.cpp
@@ -37,7 +39,7 @@ set_target_properties(test_graph
 
 target_include_directories (test_graph PUBLIC ../googletest/include/)
 
-target_link_libraries (test_graph LINK_PUBLIC graph bitscan utils gtest)
+target_link_libraries (test_graph LINK_PUBLIC graph bitscan utils gtest_main)
 
 
 
