@@ -23,7 +23,6 @@ project(${LIBNAME}
 	LANGUAGES CXX C
 )
 
-#project (bitscan_graph_libs LANGUAGES CXX C)
 
 #############
 # C++ flags 
@@ -142,8 +141,9 @@ include_directories (PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
 add_subdirectory (utils)
 add_subdirectory (bitscan)
-add_subdirectory (tclap)            #TODO - possibly remove
 add_subdirectory (graph)
+
+add_subdirectory (tclap)            #TODO - possibly remove
 
 
 
