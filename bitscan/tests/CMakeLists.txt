@@ -30,9 +30,9 @@ set_target_properties(test_bitscan
     RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin/tests"
 )
 
-target_include_directories (test_bitscan PUBLIC ../googletest/include/)
+#target_include_directories (test_bitscan PRIVATE ../googletest/include/)
 
-target_link_libraries (test_bitscan LINK_PUBLIC bitscan gtest_main utils)
+target_link_libraries (test_bitscan LINK_PRIVATE bitscan gtest_main utils)
 
 
 

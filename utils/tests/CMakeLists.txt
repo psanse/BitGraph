@@ -31,7 +31,7 @@ set_target_properties(test_utils
     RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin/tests"
 )
 
-target_include_directories (test_utils PUBLIC ../googletest/include/)
+#target_include_directories (test_utils PUBLIC ../googletest/include/)
 
 target_link_libraries (test_utils LINK_PUBLIC utils gtest_main)
 

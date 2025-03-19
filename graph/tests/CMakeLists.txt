@@ -37,7 +37,7 @@ set_target_properties(test_graph
    
 )
 
-target_include_directories (test_graph PUBLIC ../googletest/include/)
+#target_include_directories (test_graph PUBLIC ../googletest/include/)
 
 target_link_libraries (test_graph LINK_PUBLIC graph bitscan utils gtest_main)
 

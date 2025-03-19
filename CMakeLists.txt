@@ -6,23 +6,22 @@ cmake_minimum_required (VERSION 2.8...3.13)
 
 set(CMAKE_INSTALL_PREFIX ${CMAKE_CURRENT_SOURCE_DIR}/example_external_linking CACHE PATH "Directory to deploy the project")
 
-###########
-# project
-############
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)	
+
+############
+# project 
+###########
 
 set(LIBNAME "BitGraph")
 set(LIB_MAJOR_VERS "1")
 set(LIB_MINOR_VERS "0")
-set(LIB_PATCH_VERS "3")
+set(LIB_PATCH_VERS "1")
 
 #build source
 project(${LIBNAME} 
     VERSION  ${LIB_MAJOR_VERS}.${LIB_MINOR_VERS}.${LIB_PATCH_VERS}
-	LANGUAGES CXX C
-)
-
+	LANGUAGES CXX C	)
 
 #############
 # C++ flags 
@@ -31,6 +30,7 @@ project(${LIBNAME}
 if(UNIX)
 
     include(CheckCXXCompilerFlag)
+	
     CHECK_CXX_COMPILER_FLAG("-std=c++11" COMPILER_SUPPORTS_CXX11)
     #CHECK_CXX_COMPILER_FLAG("-std=c++0x" COMPILER_SUPPORTS_CXX0X)
     if(COMPILER_SUPPORTS_CXX11)
@@ -70,11 +70,17 @@ if (BUILD_TESTS)
     )
 
     set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+	set(INSTALL_GTEST OFF CACHE BOOL "" FORCE)
 	set(BUILD_GMOCK OFF CACHE BOOL "" FORCE)
     FetchContent_MakeAvailable(googletest)
 	
-	set(CMAKE_CXX_STANDARD 14)					#required for googletest 
+	#C++14 is required for googletest 
+	set(CMAKE_CXX_STANDARD 14)					
 	set(CMAKE_CXX_STANDARD_REQUIRED ON)		
+	
+	#for tests to be run with make test or ctest
+	enable_testing()	
+	
 	message(STATUS "Building tests with GoogleTest framework")
 endif()
 
