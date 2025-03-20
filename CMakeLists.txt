@@ -24,20 +24,19 @@ project(${LIBNAME}
 	LANGUAGES CXX C	)
 
 #################
+# Export layout (config mode - find_package)
+# Valid for all platforms:
+#   * <prefix>/lib*/cmake/<PROJECT_NAME>
+#   * <prefix>/lib*/
+#   * <prefix>/include/
+#################
+
+#################
 # Introduce variables:
 # * CMAKE_INSTALL_LIBDIR		#lib
 # * CMAKE_INSTALL_BINDIR		#bin
 # * CMAKE_INSTALL_INCLUDEDIR	#include
 include(GNUInstallDirs)
-
-#################
-# Export layout (config mode - find_package)
-# Valid for all platforms:
-#   * <prefix>/lib*/cmake/<PROJECT-NAME>
-#   * <prefix>/lib*/
-#   * <prefix>/include/
-#################
-
 
 set(TARGETS_EXPORT_NAME "${PROJECT_NAME}Targets")
 set(namespace "${PROJECT_NAME}::")
