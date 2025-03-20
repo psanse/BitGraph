@@ -69,20 +69,6 @@ endif()
 # (to preserve internal structure)
 #############
 
- # Layout. This works for all platforms:
-#   * <prefix>/lib*/cmake/<PROJECT-NAME>
-#   * <prefix>/lib*/
-#   * <prefix>/include/
-set(config_install_dir "lib/cmake/graph")
-set(generated_dir "${CMAKE_CURRENT_BINARY_DIR}/generated")
-
- # Configuration
-set(version_config "${generated_dir}/graphConfigVersion.cmake")
-set(project_config "${generated_dir}/graphConfig.cmake")
-set(TARGETS_EXPORT_NAME "graphTargets")
-set(namespace "${PROJECT_NAME}::")
-
-
 #Install GRAPH library
 install(
    TARGETS graph
@@ -102,41 +88,7 @@ foreach(ITEM ${DEPLOY_FILES_AND_DIRS})
 endforeach()
  
  
- # Config
-#   * <prefix>/lib/cmake/Foo/FooConfig.cmake
-#   * <prefix>/lib/cmake/Foo/FooConfigVersion.cmake
-install(
-    FILES "${project_config}" "${version_config}"
-    DESTINATION "${config_install_dir}"
-)
-
-# Config
-#   * <prefix>/lib/cmake/Foo/FooTargets.cmake
-install(
-    EXPORT "${TARGETS_EXPORT_NAME}"
-    NAMESPACE "${namespace}"
-    DESTINATION "${config_install_dir}"
-)
-
-# Include module with function 'write_basic_package_version_file'
-include(CMakePackageConfigHelpers)
-
-# Configure '<PROJECT-NAME>ConfigVersion.cmake'
-# Use:
-#   * PROJECT_VERSION
-write_basic_package_version_file(
-    "${version_config}" COMPATIBILITY SameMajorVersion
-)
-
-# Configure '<PROJECT-NAME>Config.cmake'
-# Use variables:
-#   * TARGETS_EXPORT_NAME
-#   * PROJECT_NAME
-configure_package_config_file(
-    "cmake/graphConfig.cmake.in"
-    "${project_config}"
-    INSTALL_DESTINATION "${config_install_dir}"
-)
+ 
  
 
 
