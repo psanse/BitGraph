@@ -4,7 +4,7 @@ cmake_minimum_required (VERSION 2.8...3.13)
 # Set layout 
 ##############
 
-set(CMAKE_INSTALL_PREFIX ${CMAKE_SOURCE_DIR}/myInstall CACHE PATH "prefix directory to deploy the project")
+set(CMAKE_INSTALL_PREFIX ${CMAKE_CURRENT_SOURCE_DIR}/myInstall CACHE PATH "prefix directory to deploy the project")
 
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)	
@@ -114,10 +114,10 @@ endif()
 # (to be used inside the code)
 #############
 
-set(PATH_GRAPH_TESTS_CMAKE_GUI ${CMAKE_SOURCE_DIR}/graph/data CACHE PATH "PATH for GRAPH unit tests")
+set(PATH_GRAPH_TESTS_CMAKE_GUI ${CMAKE_CURRENT_SOURCE_DIR}/graph/data CACHE PATH "PATH for GRAPH unit tests")
 add_definitions (-DPATH_GRAPH_TESTS_CMAKE_SRC_CODE=\"${PATH_GRAPH_TESTS_CMAKE_GUI}/\") 
 
-set(PATH_COPT_TESTS_CMAKE_GUI ${CMAKE_SOURCE_DIR}/copt/data CACHE PATH "PATH for COPT unit tests")
+set(PATH_COPT_TESTS_CMAKE_GUI ${CMAKE_CURRENT_SOURCE_DIR}/copt/data CACHE PATH "PATH for COPT unit tests")
 add_definitions (-DPATH_COPT_TESTS_CMAKE_SRC_CODE=\"${PATH_COPT_TESTS_CMAKE_GUI}/\") 
 
 #old definitions - deprecated
