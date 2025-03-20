@@ -1,16 +1,13 @@
 cmake_minimum_required (VERSION 2.8...3.13)  	
 
-###########################
+##############
 # Set layout 
-###########################
+##############
 
-set(CMAKE_INSTALL_PREFIX ${CMAKE_CURRENT_SOURCE_DIR}/example_external_linking CACHE PATH "Directory to deploy the project")
+set(CMAKE_INSTALL_PREFIX ${CMAKE_SOURCE_DIR}/myInstall CACHE PATH "prefix directory to deploy the project")
 
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)	
-
-#to export targets for find_package
-set(TARGETS_EXPORT_NAME "BitGraphTargets")
 
 ############
 # project 
@@ -25,6 +22,32 @@ set(LIB_PATCH_VERS "1")
 project(${LIBNAME} 
     VERSION  ${LIB_MAJOR_VERS}.${LIB_MINOR_VERS}.${LIB_PATCH_VERS}
 	LANGUAGES CXX C	)
+
+#################
+# Introduce variables:
+# * CMAKE_INSTALL_LIBDIR		#lib
+# * CMAKE_INSTALL_BINDIR		#bin
+# * CMAKE_INSTALL_INCLUDEDIR	#include
+include(GNUInstallDirs)
+
+#################
+# Export layout (config mode - find_package)
+# Valid for all platforms:
+#   * <prefix>/lib*/cmake/<PROJECT-NAME>
+#   * <prefix>/lib*/
+#   * <prefix>/include/
+#################
+
+
+set(TARGETS_EXPORT_NAME "${PROJECT_NAME}Targets")
+set(namespace "${PROJECT_NAME}::")
+set(config_install_dir "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}")
+set(include_install_dir "${CMAKE_INSTALL_INCLUDEDIR}/${PROJECT_NAME}")
+
+#directory for the <PROJECT-NAME>Targets.cmake file during the build - will be installed later on
+set(generated_dir "${CMAKE_CURRENT_BINARY_DIR}/generated")
+set(version_config "${generated_dir}/${PROJECT_NAME}ConfigVersion.cmake")
+set(project_config "${generated_dir}/${PROJECT_NAME}Config.cmake")
 
 #############
 # C++ flags 
@@ -89,7 +112,7 @@ endif()
 
 #############
 # USEFUL GLOBAL DEFINITIONS
-# (use inside the code)
+# (to be used inside the code)
 #############
 
 set(PATH_GRAPH_TESTS_CMAKE_GUI ${CMAKE_SOURCE_DIR}/graph/data CACHE PATH "PATH for GRAPH unit tests")
@@ -127,22 +150,25 @@ endif()
 # OpenMP (Windows)
 # comments: found nothing better than to set it globally for all targets
 #############
-
-if (WIN32)
+option(INCLUDE_OpenMP "makes OpenMP available in Windows platforms" OFF)
+if (WIN32 AND INCLUDE_OpenMP)
 find_package(OpenMP)
 IF (OPENMP_FOUND)
     set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
     set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS} -D_VARIADIC_MAX=10")
-	message(STATUS "OpenMP found")
+	message(STATUS "OpenMP found in Windows OS")
 endif()
-endif (WIN32)
+endif (WIN32 AND INCLUDE_OpenMP)
 
+
+#############
+# APPLE options (check)
+#############
 if (APPLE)
     set(CMAKE_OSX_ARCHITECTURES "x86_64")
     set(CMAKE_PREFIX_PATH "/usr/local/homebrew")
     #add_compile_options(-arch arm64)
 endif (APPLE)
-
 
 ####################
 # Subdirectories 
@@ -155,39 +181,26 @@ add_subdirectory (graph)
 
 add_subdirectory (tclap)            #TODO - possibly remove
 
-
 ###################
 #INSTALL
+#(find_package, config mode)
 ###################
 
-# Layout. This works for all platforms:
-#   * <prefix>/lib*/cmake/<PROJECT-NAME>
-#   * <prefix>/lib*/
-#   * <prefix>/include/
-set(config_install_dir "lib/cmake/${PROJECT_NAME}")
-set(generated_dir "${CMAKE_CURRENT_BINARY_DIR}/generated")
-
-# Configuration
-set(version_config "${generated_dir}/${PROJECT_NAME}ConfigVersion.cmake")
-set(project_config "${generated_dir}/${PROJECT_NAME}Config.cmake")
-set(namespace "${PROJECT_NAME}::")
-
 # Config
-#   * <prefix>/lib/cmake/Foo/FooConfig.cmake
-#   * <prefix>/lib/cmake/Foo/FooConfigVersion.cmake
+#   * <prefix>/lib/cmake/<PROJECT_NAME>/<PROJECT_NAME>Config.cmake
+#   * <prefix>/lib/cmake/<PROJECT_NAME>/<PROJECT_NAME>ConfigVersion.cmake
 install(
     FILES "${project_config}" "${version_config}"
-    DESTINATION "${config_install_dir}"
+    DESTINATION "${config_install_dir}"					#<prefix>/lib/cmake/<PROJECT_NAME>
 )
 
 # Config
-#   * <prefix>/lib/cmake/Foo/FooTargets.cmake
+#   * <prefix>/lib/cmake/<PROJECT_NAME>/<PROJECT_NAME>Targets.cmake
 install(
     EXPORT "${TARGETS_EXPORT_NAME}"
     NAMESPACE "${namespace}"
     DESTINATION "${config_install_dir}"
 )
-
 
 # Include module with function 'write_basic_package_version_file'
 include(CMakePackageConfigHelpers)
@@ -205,8 +218,8 @@ write_basic_package_version_file(
 #   * PROJECT_NAME
 configure_package_config_file(
     "cmake/${PROJECT_NAME}Config.cmake.in"
-    "${project_config}"
-    INSTALL_DESTINATION "${config_install_dir}"
+    "${project_config}"									#"${generated_dir}/${PROJECT_NAME}Config.cmake")
+    INSTALL_DESTINATION "${config_install_dir}"			#<prefix>/lib/cmake/<PROJECT_NAME>
 )
 
 

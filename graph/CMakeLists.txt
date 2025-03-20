@@ -39,9 +39,8 @@ set_target_properties(graph
 # when other libraries or executables link to it
 target_include_directories(graph PUBLIC 
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
-  $<INSTALL_INTERFACE:include/graph>    # <prefix>/include/graph
+  $<INSTALL_INTERFACE:include>    # <prefix>/include/<PROJECT_NAME>/graph
 )
-
 
 ###################
 # UNIT TESTS for GRAPH lib
@@ -76,7 +75,7 @@ install(
    ARCHIVE DESTINATION lib
    LIBRARY DESTINATION lib
    RUNTIME DESTINATION bin
-   INCLUDES DESTINATION include
+   INCLUDES DESTINATION "${include_install_dir}"
 )
 
 #install header files
@@ -84,7 +83,7 @@ file(GLOB_RECURSE DEPLOY_FILES_AND_DIRS "${PROJECT_SOURCE_DIR}/graph/*.h")
 foreach(ITEM ${DEPLOY_FILES_AND_DIRS})
     file(RELATIVE_PATH REL_PATH ${PROJECT_SOURCE_DIR} ${ITEM})
     get_filename_component(DIR_PATH ${REL_PATH} DIRECTORY)
-    install(FILES ${ITEM} DESTINATION include/${DIR_PATH})	 
+    install(FILES ${ITEM} DESTINATION ${include_install_dir}/${DIR_PATH})	 
 endforeach()
  
  

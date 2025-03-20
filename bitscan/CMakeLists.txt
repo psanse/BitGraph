@@ -46,7 +46,7 @@ set_target_properties(bitscan
 # when other libraries or executables link to bitscan
 target_include_directories(bitscan PUBLIC 
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
-  $<INSTALL_INTERFACE:include/bitscan>    # <prefix>/include/bitscan
+  $<INSTALL_INTERFACE:${include_install_dir}>    # <prefix>/include/<PROJECT_NAME>
 )
 
 #############
@@ -63,7 +63,6 @@ install(
    LIBRARY DESTINATION lib
    RUNTIME DESTINATION bin
    INCLUDES DESTINATION include
-   #PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_PREFIX}/include/bitscan        //header files deployed without internal structure
 )
 
 #install header files
@@ -71,7 +70,7 @@ file(GLOB_RECURSE DEPLOY_FILES_AND_DIRS "${PROJECT_SOURCE_DIR}/bitscan/*.h")
 foreach(ITEM ${DEPLOY_FILES_AND_DIRS})
     file(RELATIVE_PATH REL_PATH ${PROJECT_SOURCE_DIR} ${ITEM})
     get_filename_component(DIR_PATH ${REL_PATH} DIRECTORY)
-    install(FILES ${ITEM} DESTINATION include/${DIR_PATH})	 
+    install(FILES ${ITEM} DESTINATION ${include_install_dir}/${DIR_PATH})	 
  endforeach()
 
 
