@@ -3,9 +3,7 @@ project (examples_GRAPH_BITSCAN LANGUAGES CXX C)
 
 ##############################
 # using find_package to locate the BitGraph libraries
-find_package(bitscan REQUIRED) 
-find_package(graph REQUIRED) 
-find_package(utils REQUIRED) 
+find_package(BitGraph REQUIRED) 
 
 #common directories for all the targets
 #(ideally use target_link_directories for each target, but not available in CMake versions prior 3.13)
@@ -26,7 +24,6 @@ target_link_libraries (graph_example LINK_PUBLIC BitGraph::graph BitGraph::bitsc
 ####################
 # target bitset_example
 ####################
-
 
 add_executable(bitset_example bitstrings.cpp)
 
