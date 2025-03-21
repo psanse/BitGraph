@@ -149,15 +149,15 @@ endif()
 # OpenMP (Windows)
 # comments: found nothing better than to set it globally for all targets
 #############
-option(INCLUDE_OpenMP "makes OpenMP available in Windows platforms" OFF)
-if (WIN32 AND INCLUDE_OpenMP)
+option(INCLUDE_OPENMP "makes OpenMP available (only for Windows platforms)" OFF)
+if (WIN32 AND INCLUDE_OPENMP)
 find_package(OpenMP)
 IF (OPENMP_FOUND)
     set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
     set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS} -D_VARIADIC_MAX=10")
 	message(STATUS "OpenMP found in Windows OS")
 endif()
-endif (WIN32 AND INCLUDE_OpenMP)
+endif (WIN32 AND INCLUDE_OPENMP)
 
 
 #############
@@ -184,6 +184,9 @@ add_subdirectory (tclap)            #TODO - possibly remove
 #INSTALL
 #(find_package, config mode)
 ###################
+option(INSTALL_BITGRAPH "Enable installation of BitGraph. (Projects embedding BitGraph may want to turn this OFF.)" ON)
+
+if(INSTALL_BITGRAPH)
 
 # Config
 #   * <prefix>/lib/cmake/<PROJECT_NAME>/<PROJECT_NAME>Config.cmake
@@ -220,6 +223,8 @@ configure_package_config_file(
     "${project_config}"									#"${generated_dir}/${PROJECT_NAME}Config.cmake")
     INSTALL_DESTINATION "${config_install_dir}"			#<prefix>/lib/cmake/<PROJECT_NAME>
 )
+
+endif(INSTALL_BITGRAPH)
 
 
 

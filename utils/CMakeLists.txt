@@ -47,6 +47,7 @@ set_target_properties(utils
 # (to preserve internal structure)
 #############
 
+if(INSTALL_BITGRAPH)
 
 #Install UTILS library
 install(
@@ -64,7 +65,8 @@ install(
     get_filename_component(DIR_PATH ${REL_PATH} DIRECTORY)
     install(FILES ${ITEM} DESTINATION ${include_install_dir}/${DIR_PATH})	 
  endforeach()
-
+ 
+endif(INSTALL_BITGRAPH)
 
 
  

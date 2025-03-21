@@ -55,6 +55,8 @@ target_include_directories(bitscan PUBLIC
 # to preserve internal structure
 #############
 
+if(INSTALL_BITGRAPH)
+
 #Install BITSCAN library
 install(
    TARGETS bitscan
@@ -73,6 +75,7 @@ foreach(ITEM ${DEPLOY_FILES_AND_DIRS})
     install(FILES ${ITEM} DESTINATION ${include_install_dir}/${DIR_PATH})	 
  endforeach()
 
+endif(INSTALL_BITGRAPH)
 
 ###################
 # UNIT TESTS for BITSCAN lib  
