@@ -1,0 +1,14 @@
+c toy example for unit tests
+c date 2010
+p edge 7 11
+e 2 1
+e 3 1
+e 3 2
+e 4 1
+e 4 2
+e 4 3
+e 5 4
+e 6 4
+e 6 5
+e 7 5
+e 7 6

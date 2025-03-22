@@ -1,0 +1,10 @@
+^C:\USERS\PABLO\DESKTOP\BITGRAPH\GRAPH\TESTS\CMAKELISTS.TXT
+setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/Users/Pablo/Desktop/BitGraph -BC:/Users/Pablo/Desktop/BitGraph --check-stamp-file C:/Users/Pablo/Desktop/BitGraph/graph/tests/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
