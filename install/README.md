@@ -1,4 +1,5 @@
-#Example of linking to a CMake installation of BitGraph
+# Linking example to a CMake Installation
+
 The project includes a CMakeLists.txt and a main.cpp source file
 
 
