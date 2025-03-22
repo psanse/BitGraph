@@ -28,7 +28,12 @@ include(GNUInstallDirs)
 
 #################
 # Google tests 
-option(BUILD_TESTS "builds tests with googletest" ON)
+option(BUILD_TESTS "builds tests for BitGraph (uses googletest)" OFF)
+
+if(CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
+    # We're in the root, add tests
+	SET(BUILD_TESTS ON CACHE BOOL "builds tests for BitGraph (uses googletest)" FORCE)
+endif()
 
 ###################
 # INSTALL BitGraph (find_package, config mode)
