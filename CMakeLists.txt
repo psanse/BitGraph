@@ -31,8 +31,12 @@ include(GNUInstallDirs)
 option(BUILD_TESTS "builds tests with googletest" ON)
 
 ###################
-# INSTALL (find_package, config mode)
+# INSTALL BitGraph (find_package, config mode)
 option(INSTALL_BITGRAPH "Enable installation of BitGraph. (Projects embedding BitGraph may want to turn this OFF.)" ON)
+
+###################
+# INSTALL googletest - default off
+set(INSTALL_GTEST "BitGraph embeds googletest, no installation required" OFF CACHE BOOL "" FORCE)
 
 #############
 # OpenMP (Windows)
