@@ -1,5 +1,5 @@
 @date: 28/01/2025
-Example of project that links with BitScanPlus repo
+Example of project that links with BitGraph installed with CMake
 Includes a CMakeLists.txt and a main.cpp source file
 
 I. Deploy BitScanPlus using CMake install command. 
