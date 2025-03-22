@@ -36,7 +36,7 @@ option(INSTALL_BITGRAPH "Enable installation of BitGraph. (Projects embedding Bi
 
 ###################
 # INSTALL googletest - default off
-option(INSTALL_GTEST "BitGraph embeds googletest, no installation required" ON)
+option(INSTALL_GTEST "BitGraph embeds googletest, no installation required" OFF)
 
 #############
 # OpenMP (Windows)
