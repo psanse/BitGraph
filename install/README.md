@@ -1,6 +1,6 @@
-# Linking example to a CMake Installation
+# Linking example (CMake Install)
 
-The project includes a CMakeLists.txt and a main.cpp source file
+The project includes a CMakeLists.txt and a main.cpp source file.
 
 
 
