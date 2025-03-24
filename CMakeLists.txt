@@ -30,11 +30,14 @@ include(GNUInstallDirs)
 # unit tests (with googletest) 
 
 #tests are not built by default in Projects which embed BitGraph
-option(BUILD_TESTS "builds tests for BitGraph (uses googletest)" OFF)
+#option(BUILD_TESTS "builds tests for BitGraph (uses googletest)" OFF)
 
-#Root dir - BitGraph project, build tests
-if(CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
+#Tests are not built by default in Projects which embed BitGraph
+if(CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)	
+	#Root dir - BitGraph project, build tests									
 	SET(BUILD_TESTS ON CACHE BOOL "builds tests for BitGraph (uses googletest)" FORCE)
+else()
+	SET(BUILD_TESTS OFF CACHE BOOL "builds tests for BitGraph (uses googletest)" FORCE)
 endif()
 
 ###################
