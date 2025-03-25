@@ -1,6 +1,3 @@
 # Linking example (after installing BitGraph)
 
-The project includes an appropiate CMakeLists.txt and a target main.cpp file in the *src* folder.
-
-
-
+The project includes an appropriate CMakeLists.txt and a target _main.cpp_ file in the _src_ folder.
