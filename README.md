@@ -33,7 +33,11 @@ The C++ BITSCAN and GRAPH libraries result from **more than 20 years of research
 
 and many others.
 
-The repo has been tested on LINUX and Windows OS.
+## Main features
+
+### System platforms
+
+The repo has been tested on Linux (24.x.x) and Windows 10 OS.
 
 ## Acknowledgements
 
