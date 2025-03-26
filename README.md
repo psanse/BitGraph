@@ -37,6 +37,9 @@ and many others.
 
 The repo has been tested on Linux (24.x.x) and Windows 10 OS.
 
+## Releases 
+The current release is v1.1.0 and is still compatible with C++11 except for googletest, which requires C++14. In future releases compilation will be restricted to C++14.
+
 ## Acknowledgements
 
 This research has been partially funded by the Spanish Ministry of Economy and Competitiveness (MINECO), national grants DPI 2010-21247-C02-01, DPI 2014-53525-C3-1-R and DPI2017-86915-C3-3-R.
