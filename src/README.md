@@ -27,4 +27,4 @@ make
 sudo make install    # Install in ~/BitGraph/install by default
 ```
 
-If you use Windows and have Visual Studio installed, a `BitGraph.sln` file and several `.vcproj` files will be created. You can then build them using Visual Studio. Building the INSTALL project is equivalent to installing BitGraph.
+If you use Windows and have Visual Studio installed, a `BitGraph.sln` file and several `.vcproj` files will be created such `INSTALL.vproj`. You can then build them using Visual Studio.. Note that building the INSTALL project is equivalent to installing BitGraph..
