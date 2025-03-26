@@ -6,7 +6,7 @@
 using namespace std;
 
 #include <iostream>
-#include "Bitgraph/graph/graph.h"		//the one and only header file for the GRAPH 1.0 lib
+#include "BitGraph/graph/graph.h"		//the one and only header file for the GRAPH 1.0 lib
 
 int main() {
 
