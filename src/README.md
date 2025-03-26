@@ -21,7 +21,7 @@ cmake ..      # Generate native build scripts for BitGraph.
 
 ```
 
-If you are on a Linux OS, you should now see a Makefile in the current directory. Just type `make` to build BitGraph. You can then proceed to install BitGraph if you are a system admin. The installation default directory of libraries and headers is the _install_ folder in the root directory of BitGraph.
+If you are on a Linux OS, you should now see a Makefile in the current directory. Just type `make` to build BitGraph. You can then proceed to install BitGraph if you are a system admin. The installation default directory of libraries and headers is the [install](https://github.com/psanse/BitGraph/tree/master/install) folder in the root directory of BitGraph.
 
 ```plaintext
 make
@@ -33,4 +33,4 @@ If you use Windows and have Visual Studio installed, a `BitGraph.sln` file and s
 
 ## Linking BitGraph Into An Existing CMake Project
 
-If you want to use BitGraph in a project that already uses CMake, the easiest way is to first install libraries and headers as explained above.
+If you want to use BitGraph in a project that already uses CMake, the easiest way is to first install libraries and headers as explained above. Import BitGraph by using `find_package`. For example, if `find_package(BitGraph CONFIG REQUIRED)` succeeds, you can use the libraries as `BitGraph::utils`, `BitGraph::bitscan` and `BitGraph::graph`. The folder [install](https://github.com/psanse/BitGraph/tree/master/install) includes a CMakeLists.txt and a target source file example.
