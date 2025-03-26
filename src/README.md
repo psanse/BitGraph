@@ -34,3 +34,21 @@ If you use Windows and have Visual Studio installed, a `BitGraph.sln` file and s
 ## Linking BitGraph Into An Existing CMake Project
 
 If you want to use BitGraph in a project that already uses CMake, the easiest way is to first install libraries and headers as explained above. Import BitGraph by using `find_package`. For example, if `find_package(BitGraph CONFIG REQUIRED)` succeeds, you can use the libraries as `BitGraph::utils`, `BitGraph::bitscan` and `BitGraph::graph`. The folder [install](https://github.com/psanse/BitGraph/tree/master/install) includes a CMakeLists.txt and a target source file example.
+
+An alternative approach is to use CMake to download BitGraph as part of the build's configure step. Here is a basic example CMake code:
+
+```javascript
+include(FetchContent)
+
+FetchContent_Declare(
+  BitGraph
+  GIT_REPOSITORY https://github.com/psanse/BitGraph
+  GIT_TAG branch_dev_dir 				# Cambia 'main' por la rama o tag que desees usar
+)
+FetchContent_MakeAvailable(BitGraph)
+include_directories (PUBLIC ${FETCHCONTENT_BASE_DIR}/bitgraph-src/src)
+
+# Now simply link against BitGraph.
+add_executable(example main.cpp)
+target_link_libraries(example graph bitscan utils)
+```
