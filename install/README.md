@@ -15,11 +15,11 @@ target_link_libraries (graph_example LINK_PUBLIC
 
 ```
 
-For `find_package` to succeed the installation path of BitGraph has to be provided to the CMake build in the variable `BitGraph_DIR`, e.g. in the build
+For `find_package` to succeed the installation path of BitGraph has to be provided to the CMake build in the CMake variable `BitGraph_DIR`, e.g. in the build
 
-```javascript
+```plaintext
 cmake .. -DBitGraph_DIR=<PATH_BitGraph>
 
 ```
 
-By default, the installation folder is [this](https://github.com/psanse/BitGraph/tree/master/install) folder and the `BitGraph_DIR` should be set in the default case to <this\_folder>/lib/cmake/BitGraph
+This example is also the default installation folder of BitGraph. In this setup, `BitGraph_DIR` should be set to <path\_to\_this\_folder>/lib/cmake/BitGraph.
