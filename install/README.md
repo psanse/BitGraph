@@ -1,6 +1,6 @@
 # Linking to an existing CMake project
 
-The project includes an appropriate CMakeLists.txt and two target source code files in the [src](https://github.com/psanse/BitGraph/tree/master/install/src) folder. The CMake code uses `find_package(BitGraph CONFIG REQUIRED)` to look for the BitGraph root folder containing the installed libraries.
+This folder is an independent CMake project that illustrates how to use the default installation of BitGraph. The installation of Bitgraph is configured by default in this [install](https://github.com/psanse/BitGraph/tree/master/install) folder. The project contains two target source code files in the [src](https://github.com/psanse/BitGraph/tree/master/install/src) folder. The CMake code uses `find_package(BitGraph CONFIG REQUIRED)` to look for the BitGraph root folder containing the installed libraries.
 
 ```plaintext
 find_package(BitGraph CONFIG REQUIRED)     #set the install path of BitGraph in the variable BitGraph_dir
