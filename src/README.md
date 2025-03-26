@@ -18,6 +18,7 @@ cd BitGraph	 # Main directory of the cloned repository.
 mkdir build  # Create a directory to hold the build output.
 cd build
 cmake ..     # Generate native build scripts for BitGraph.
+
 ```
 
 If you are on a Linux OS, you should now see a Makefile in the current directory. Just type `make` to build BitGraph. You can then proceed to install BitGraph if you are a system admin.
@@ -26,3 +27,5 @@ If you are on a Linux OS, you should now see a Makefile in the current directory
 make
 sudo make install    # Install in ~/BitGraph/install by default
 ```
+
+If you use Windows and have Visual Studio installed, a `BitGraph.sln` file and several `.vcproj` files will be created. You can then build them using Visual Studio. Building the INSTALL project is equivalent to installing BitGraph.
