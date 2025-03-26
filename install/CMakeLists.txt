@@ -1,7 +1,7 @@
 cmake_minimum_required (VERSION 2.8...3.15)
 project (main LANGUAGES CXX C)
 
-find_package(BitGraph REQUIRED) 
+find_package(BitGraph CONFIG REQUIRED) 
 
 #######################
 # target graph_example
