@@ -14,8 +14,8 @@ CMake works by generating native makefiles or build projects that can be used in
 
 ```javascript
 git clone https://github.com/psanse/BitGraph.git 
-cd BitGraph			 # Main directory of the cloned repository.
-mkdir build          # Create a directory to hold the build output.
+cd BitGraph	 # Main directory of the cloned repository.
+mkdir build  # Create a directory to hold the build output.
 cd build
-cmake ..             # Generate native build scripts for BitGraph.
+cmake ..     # Generate native build scripts for BitGraph.
 ```
