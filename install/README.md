@@ -9,13 +9,17 @@ find_package(BitGraph CONFIG REQUIRED)     #set the install path of BitGraph in 
 add_executable(graph_example src/graph.cpp)
 
 target_link_libraries (graph_example LINK_PUBLIC 
-	BitGraph::graph
-	BitGraph::bitscan
-	BitGraph::utils				)
+    BitGraph::graph
+    BitGraph::bitscan
+    BitGraph::utils				)
+
 ```
 
 For `find_package` to succeed the installation path of BitGraph has to be provided to the CMake build in the variable `BitGraph_DIR`, e.g. in the build
 
 ```javascript
 cmake .. -DBitGraph_DIR=<PATH_BitGraph>
+
 ```
+
+By default, the installation folder is [this](https://github.com/psanse/BitGraph/tree/master/install) folder and the `BitGraph_DIR` should be set in the default case to <this\_folder>/lib/cmake/BitGraph
