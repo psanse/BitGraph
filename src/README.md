@@ -37,13 +37,13 @@ If you want to use BitGraph in a project that already uses CMake, the easiest wa
 
 An alternative approach is to use CMake to download BitGraph as part of the build's configure step. Here is a basic example CMake code:
 
-```javascript
+```plaintext
 include(FetchContent)
 
 FetchContent_Declare(
   BitGraph
   GIT_REPOSITORY https://github.com/psanse/BitGraph
-  GIT_TAG branch_dev_dir 				# Cambia 'main' por la rama o tag que desees usar
+  GIT_TAG master			# A fixed release source will be provided shortly
 )
 FetchContent_MakeAvailable(BitGraph)
 include_directories (PUBLIC ${FETCHCONTENT_BASE_DIR}/bitgraph-src/src)
@@ -51,4 +51,5 @@ include_directories (PUBLIC ${FETCHCONTENT_BASE_DIR}/bitgraph-src/src)
 # Now simply link against BitGraph.
 add_executable(example main.cpp)
 target_link_libraries(example graph bitscan utils)
+
 ```
