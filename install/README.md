@@ -15,7 +15,7 @@ target_link_libraries (graph_example LINK_PUBLIC
 
 ```
 # Standalone CMake Project
-For `find_package` to succeed, the CMake variable `BitGraph_DIR` must be set to the installation path (*~/install/lib/cmake/BitGraph* in this example). To build the appropiate CMake scripts for this CMake project, from the BitGraph ROOT folder (and after installing BitGraph) proceed as follows: 
+For `find_package` to succeed, the CMake variable `BitGraph_DIR` must be set to the installation path (*~/install/lib/cmake/BitGraph* in this example). To build the appropiate CMake scripts for this CMake project, from the BitGraph ROOT folder (and after the default installation of BitGraph) proceed as follows: 
 
 ```plaintext
 cd src
