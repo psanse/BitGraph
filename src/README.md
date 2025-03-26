@@ -1,3 +1,4 @@
+
 ## Generic Build Instructions
 
 ### Setup
@@ -12,7 +13,7 @@ CMake works by generating native makefiles or build projects that can be used in
 
 ## Standalone CMake Project
 
-```javascript
+```plaintext
 git clone https://github.com/psanse/BitGraph.git 
 cd BitGraph   # Main directory of the cloned repository.
 mkdir build   # Create a directory to hold the build output.
@@ -23,7 +24,7 @@ cmake ..      # Generate native build scripts for BitGraph.
 
 If you are on a Linux OS, you should now see a Makefile in the current directory. Just type `make` to build BitGraph. You can then proceed to install BitGraph if you are a system admin.
 
-```javascript
+```plaintext
 make
 sudo make install    # Install in ~/BitGraph/install by default
 
