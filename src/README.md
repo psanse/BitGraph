@@ -53,3 +53,5 @@ add_executable(example main.cpp)
 target_link_libraries(example graph bitscan utils)
 
 ```
+
+Note that this approach requires CMake 3.14 or later due to its use of the `FetchContent_MakeAvailable()` command.
