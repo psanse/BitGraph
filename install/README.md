@@ -20,7 +20,7 @@ For `find_package` to succeed, the CMake variable `BitGraph_DIR` must be set to 
 ```plaintext
 cd install
 mkdir build
-cmake .. -DBitGraph_DIR=../lib/cmake/BitGraph
+cmake .. -DBitGraph_DIR=./lib/cmake/BitGraph
 
 ```
 Finally, compile the code appropiately in Windows (building the corresponding projects with extension`.vproj`) or in *nix systems with `make`.
