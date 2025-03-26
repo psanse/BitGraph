@@ -19,3 +19,10 @@ mkdir build  # Create a directory to hold the build output.
 cd build
 cmake ..     # Generate native build scripts for BitGraph.
 ```
+
+If you are on a Linux OS, you should now see a Makefile in the current directory. Just type `make` to build BitGraph. You can then proceed to install BitGraph if you are a system admin.
+
+```javascript
+make
+sudo make install    # Install in ~/BitGraph/install by default
+```
