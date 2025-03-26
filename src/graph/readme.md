@@ -1,5 +1,5 @@
 
-GRAPH 1.0 library for bit-encoded graphs
+GRAPH DOCUMENTATION UNDER DEVELOPMENT
 ===================
 
 GRAPH is a very efficient C++ library for graphs. At the core of GRAPH is the BITSCAN library (see folder *bitscan*, in this repository). 
