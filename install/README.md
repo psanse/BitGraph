@@ -24,4 +24,4 @@ mkdir build
 cmake .. -DBitGraph_DIR=../lib/cmake/BitGraph
 
 ```
-Finally, compile the code appropiately in Windows (building the corresponding projects with extension`.vproj`) or in *nix systems with make.
+Finally, compile the code appropiately in Windows (building the corresponding projects with extension`.vproj`) or in *nix systems with `make`.
