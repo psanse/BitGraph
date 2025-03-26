@@ -46,7 +46,7 @@ FetchContent_Declare(
   GIT_TAG master			# A fixed release source will be provided shortly
 )
 FetchContent_MakeAvailable(BitGraph)
-include_directories (PUBLIC ${FETCHCONTENT_BASE_DIR}/bitgraph-src/src)
+include_directories (PUBLIC ${FETCHCONTENT_BASE_DIR}/BitGraph-src/src)
 
 # Now simply link against BitGraph.
 add_executable(example main.cpp)
