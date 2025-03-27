@@ -134,7 +134,6 @@ add_subdirectory (utils)
 add_subdirectory (bitscan)
 add_subdirectory (graph)
 
-add_subdirectory (tclap)            #TODO - possibly remove
 
 ###################
 # INSTALL (find_package - config mode)
