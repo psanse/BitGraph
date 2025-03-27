@@ -63,7 +63,6 @@ TEST_F(GraphTest, deallocate_memory) {
 }
 
 
-
 TEST(Graph, constructor_adj_mat) {
 
 	const int NV = 3;

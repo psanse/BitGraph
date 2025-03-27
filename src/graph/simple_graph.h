@@ -36,7 +36,6 @@ template<class T>
 class Graph;	
 using GSS = Graph<BBScanSp>;
 
-
 //////////////////
 //
 // Generic class Graph<T>
@@ -46,8 +45,12 @@ using GSS = Graph<BBScanSp>;
 //////////////////
 
 template<class T = BBScan>
-class Graph: public filterGraphTypeError<T> {
+class Graph /* : public filterGraphTypeError<T> */{
 	
+	//filter out invalid types
+	static_assert(	std::is_same<BBScan, T>::value	||
+					std::is_same<BBScanSp, T>::value	, "is not a valid Graph type");
+
 	friend class GraphConversion;	
 	
 

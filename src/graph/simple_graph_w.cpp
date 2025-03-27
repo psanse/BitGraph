@@ -25,7 +25,7 @@
 using namespace std;
 
 //globals
-static const int DEFAULT_WEIGHT_MODULUS = 200;     //for modulus weight generation  [Pullman 2008]		
+const int DEFAULT_WEIGHT_MODULUS = 200;     //for modulus weight generation  [Pullman 2008]		
 
 
 /////////////////////////////////////////////////
