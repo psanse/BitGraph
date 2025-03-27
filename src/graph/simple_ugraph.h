@@ -40,8 +40,9 @@ public:
 	static Ugraph make_triangle	();
 	static Ugraph make_clique	(std::size_t n);	
 	static Ugraph make_cycle	(std::size_t n);
+	static Ugraph make_star		(std::size_t n);
 	
-	//TODO - implement make_star (03/01/2025)
+	//TODO... others (03/01/2025)
 
 public:
 
@@ -377,6 +378,18 @@ Ugraph<T> Ugraph<T>::make_cycle(std::size_t NV)
 
 	return cycle;
 }
+
+template<class T>
+inline
+Ugraph<T> Ugraph<T>::make_star(std::size_t NV) {
+	Ugraph<T> star(NV);
+	for (std::size_t v = 1; v < NV; ++v) {
+		star.add_edge(0, v);
+	}
+
+	return star;	
+}
+
 
 template<class T>
 inline

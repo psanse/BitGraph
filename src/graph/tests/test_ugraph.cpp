@@ -1,12 +1,9 @@
 /**
 * @file test_ugraph.cpp
 * @brief Unit tests for the Ugraph class for undirected graphs
-* @created ?
-* @updated 29/12/20
-* @last_update 27/01/25
+* @details created ?, last_updated 27/03/25
 * @author pss
 **/
-
 
 #include "graph/simple_ugraph.h"
 #include "gtest/gtest.h"
@@ -390,10 +387,12 @@ TEST(Ugraph, make_graphs) {
 	auto tri = Ugraph<bitarray>::make_triangle();
 	auto clique = Ugraph<bitarray>::make_clique(4);
 	auto cycle = Ugraph<bitarray>::make_cycle(4);
+	auto star = Ugraph<bitarray>::make_star(4);				//vertex 0 is the center of the star
 
 	EXPECT_EQ(3, tri.size());
 	EXPECT_EQ(4, clique.size());
 	EXPECT_EQ(4, cycle.size());
+	EXPECT_EQ(4, star.size());
 
 	EXPECT_TRUE(tri.is_edge(0, 1));
 	EXPECT_TRUE(tri.is_edge(1, 2));
@@ -409,7 +408,11 @@ TEST(Ugraph, make_graphs) {
 	EXPECT_TRUE(cycle.is_edge(0, 1));
 	EXPECT_TRUE(cycle.is_edge(1, 2));
 	EXPECT_TRUE(cycle.is_edge(2, 3));
-	EXPECT_TRUE(clique.is_edge(3, 0));
+	EXPECT_TRUE(cycle.is_edge(3, 0));
+
+	EXPECT_TRUE(star.is_edge(0, 1));
+	EXPECT_TRUE(star.is_edge(0, 2));
+	EXPECT_TRUE(star.is_edge(0, 3));
 }
 
 
