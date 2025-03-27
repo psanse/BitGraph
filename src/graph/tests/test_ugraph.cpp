@@ -388,15 +388,28 @@ TEST(Ugraph, remove_edges){
 
 TEST(Ugraph, make_graphs) {
 	auto tri = Ugraph<bitarray>::make_triangle();
-	auto clique = Ugraph<bitarray>::make_clique(3);
-	auto cycle = Ugraph<bitarray>::make_cycle(3);
+	auto clique = Ugraph<bitarray>::make_clique(4);
+	auto cycle = Ugraph<bitarray>::make_cycle(4);
 
 	EXPECT_EQ(3, tri.size());
-	EXPECT_EQ(3, clique.size());
-	EXPECT_EQ(3, cycle.size());
+	EXPECT_EQ(4, clique.size());
+	EXPECT_EQ(4, cycle.size());
 
-	//TODO... add more tests
+	EXPECT_TRUE(tri.is_edge(0, 1));
+	EXPECT_TRUE(tri.is_edge(1, 2));
+	EXPECT_TRUE(tri.is_edge(0, 2));
+		
+	EXPECT_TRUE(clique.is_edge(0, 1));
+	EXPECT_TRUE(clique.is_edge(0, 2));
+	EXPECT_TRUE(clique.is_edge(0, 3));
+	EXPECT_TRUE(clique.is_edge(1, 2));
+	EXPECT_TRUE(clique.is_edge(1, 3));
+	EXPECT_TRUE(clique.is_edge(2, 3));
 
+	EXPECT_TRUE(cycle.is_edge(0, 1));
+	EXPECT_TRUE(cycle.is_edge(1, 2));
+	EXPECT_TRUE(cycle.is_edge(2, 3));
+	EXPECT_TRUE(clique.is_edge(3, 0));
 }
 
 
