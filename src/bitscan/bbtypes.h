@@ -29,11 +29,11 @@ using BITBOARD	= unsigned long long;
 using BYTE		= unsigned char;	
 using BOOL		= int;								//Deprecated: use bool instead (CHECK 08/02/25)
 
-#define ONE		0xFFFFFFFFFFFFFFFF					//1 bit mask	
-#define EVEN    0x5555555555555555					//1 bits in even positions: 64 bits
-#define EVEN_32 0x55555555							//1 bits in even positions: 32 bits
-#define EVEN_8  0x55						    	//1 bits in even positions: 8 bits
-#define ZERO	0x0000000000000000					//0 64 bit mask
+constexpr BITBOARD ONE = 0xFFFFFFFFFFFFFFFF;		//1 bit mask	
+constexpr BITBOARD EVEN = 0x5555555555555555;		//1 bits in even positions: 64 bits
+constexpr U32 EVEN_32 = 0x55555555;					//1 bits in even positions: 32 bits
+constexpr U8 EVEN_8 = 0x55;						    //1 bits in even positions: 8 bits
+constexpr BITBOARD ZERO = 0x0000000000000000;		//0 64 bit mask
 
 constexpr int EMPTY_ELEM = -1;						//empty table element, bitboard or bitstring 	
 
