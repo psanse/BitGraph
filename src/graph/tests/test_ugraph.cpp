@@ -386,6 +386,20 @@ TEST(Ugraph, remove_edges){
 
 }
 
+TEST(Ugraph, make_graphs) {
+	auto tri = Ugraph<bitarray>::make_triangle();
+	auto clique = Ugraph<bitarray>::make_clique(3);
+	auto cycle = Ugraph<bitarray>::make_cycle(3);
+
+	EXPECT_EQ(3, tri.size());
+	EXPECT_EQ(3, clique.size());
+	EXPECT_EQ(3, cycle.size());
+
+	//TODO... add more tests
+
+}
+
+
 /////////////////////////////
 //
 // DISABLED TESTS

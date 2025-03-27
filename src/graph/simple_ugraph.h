@@ -32,7 +32,16 @@ using USS = Ugraph<BBScanSp>;
 template<class T = BBScan>
 class Ugraph : public Graph<T> {
 
-	friend class GraphConversion;		
+	friend class GraphConversion;
+
+public:
+
+	//set of (static) methods to create simple graphs
+	static Ugraph make_triangle	();
+	static Ugraph make_clique	(std::size_t n);	
+	static Ugraph make_cycle	(std::size_t n);
+	
+	//TODO - implement make_star (03/01/2025)
 
 public:
 
@@ -327,6 +336,47 @@ ostream& Ugraph<T>::print_edges(bitset_t& bbsg, std::ostream& o)
 
 /////////////////////////////////////
 
+
+template<class T>
+inline 
+Ugraph<T> Ugraph<T>::make_triangle()
+{
+	Ugraph<T> tri(3);
+	tri.add_edge(0, 1);
+	tri.add_edge(0, 2);
+	tri.add_edge(1, 2);
+	
+	return tri;
+}
+
+template<class T>
+inline
+Ugraph<T> Ugraph<T>::make_clique(std::size_t NV)
+{
+	Ugraph<T> clique(NV);
+
+	//sets the adjacency matrix to ONE except for the main diagonal
+	for (std::size_t v = 0; v < NV; ++v) {
+		clique.neighbors(v).set_bit(0, NV - 1);
+		clique.neighbors(v).erase_bit(v);
+	}
+	
+	return clique;
+}
+
+template<class T>
+inline
+Ugraph<T> Ugraph<T>::make_cycle(std::size_t NV)
+{
+	Ugraph<T> cycle(NV);
+
+	for (std::size_t v = 0; v < NV - 1; ++v) {
+		cycle.add_edge(v, v + 1);
+	}	
+	cycle.add_edge(NV - 1, 0);
+
+	return cycle;
+}
 
 template<class T>
 inline
