@@ -8,9 +8,9 @@
 * @TODO - SUBGRAPH ORDERING TESTS DISABLED - CHECK  (27/12/2024)
 **/ 
 
-#include "graph/algorithms/graph_fast_sort.h"
+#include "graph/algorithms/graph_fast_sort.h"				//includes #include "graph/simple_ugraph.h"
 #include "graph/algorithms/graph_fast_sort_weighted.h"
-#include "graph/simple_ugraph.h"
+
 #include "gtest/gtest.h"
 #include <iostream>
 #include "utils/common.h"

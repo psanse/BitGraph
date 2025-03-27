@@ -11,7 +11,9 @@
 
 #ifndef __GRAPH_FAST_SORT_H__
 #define __GRAPH_FAST_SORT_H__
+							
 
+#include "graph/simple_ugraph.h"				//to limit template Graph_t to undirected types - types must be known
 
 #include "utils/logger.h"
 #include "utils/common.h"						
@@ -22,8 +24,6 @@
 #include <iostream>
 #include <vector>
 
-//#include "filter_graph_sort_type.h"			//limits template Graph_t to undirected types
-
 using namespace std;
 
 //alias
@@ -32,12 +32,16 @@ using vint = std::vector<int>;
 ///////////////////////////
 //
 // GraphFastRootSort class
-// (Graph_t restricted to ugraph and sparse_ugraph)
+// (Graph_t should be restricted to ugraph and sparse_ugraph types)
 //
 ////////////////////////////
 
+
 template <class Graph_t>
 class GraphFastRootSort{
+	//restrict to ugraph and sparse_ugraph types
+	static_assert(	std::is_same<Ugraph<BBScan>, Graph_t>::value	||
+					std::is_same<Ugraph<BBScanSp>, Graph_t>::value		, "is not a valid GraphFastRootSort type");
 	
 public:
 	using basic_type = Graph_t;											//graph type

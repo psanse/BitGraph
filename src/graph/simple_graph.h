@@ -15,7 +15,6 @@
 #define __SIMPLE_GRAPH_H__
 
 #include "bitscan/bitscan.h"					//dependency to BITSCAN lib				
-//#include "filter_graph_encoding_type.h"		//TODO use SFINAE to filter types (10/01/2025)
 #include "formats/dimacs_format.h"
 #include "formats/mmio.h"
 #include "formats/edges_format.h"
@@ -45,7 +44,7 @@ using GSS = Graph<BBScanSp>;
 //////////////////
 
 template<class T = BBScan>
-class Graph /* : public filterGraphTypeError<T> */{
+class Graph{
 	
 	//filter out invalid types
 	static_assert(	std::is_same<BBScan, T>::value	||
