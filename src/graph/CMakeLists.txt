@@ -55,8 +55,8 @@ endif()
 ###################
 # GRAPH lib - Example targets
 ###################
-option(graph_build_examples "Build graph examples." ON)
-if (graph_build_examples)
+#option(graph_build_examples "Build graph examples." ON)
+if (BUILD_EXAMPLES)
 
 	add_subdirectory(examples)
 
