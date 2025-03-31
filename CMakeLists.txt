@@ -34,14 +34,18 @@ if(CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
 	#Root dir - BitGraph project, build tests									
 	SET(BUILD_TESTS ON CACHE BOOL "builds tests for BitGraph (uses googletest)" FORCE)
 	SET(BUILD_EXAMPLES ON CACHE BOOL "builds examples for BitGraph " FORCE)
+	SET(INSTALL_BITGRAPH ON CACHE BOOL "installs BitGraph if required" FORCE)
+
 else()
+	#not Root dir - Project embedding BitGraph, building tests / examples and installing BitGraph is not enabled
 	SET(BUILD_TESTS OFF CACHE BOOL "builds tests for BitGraph (uses googletest)" FORCE)
 	SET(BUILD_EXAMPLES OFF CACHE BOOL "builds examples for BitGraph " FORCE)
+	SET(INSTALL_BITGRAPH OFF CACHE BOOL "installs BitGraph if required" FORCE)
 endif()
 
 ###################
 # INSTALL BitGraph (find_package, config mode)
-option(INSTALL_BITGRAPH "Enable installation of BitGraph. (Projects embedding BitGraph may want to turn this OFF.)" ON)
+#option(INSTALL_BITGRAPH "Enable installation of BitGraph. (Projects embedding BitGraph may want to turn this OFF.)" ON)
 
 ###################
 # INSTALL googletest - default off
