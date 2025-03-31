@@ -45,14 +45,14 @@ option(INSTALL_BITGRAPH "Enable installation of BitGraph. (Projects embedding Bi
 
 ###################
 # INSTALL googletest - default off
-option(INSTALL_GTEST "BitGraph embeds googletest, no installation required by default of googletest" OFF)
+option(INSTALL_GTEST "Enable installation of googletest (disabled by default)" OFF)
 
 #############
 # OpenMP (Windows)
-option(INCLUDE_OPENMP "makes OpenMP available (only for Windows platforms)" OFF)
+option(INCLUDE_OPENMP "Makes OpenMP available (only for Windows platforms)" OFF)
 
 #############
-# APPLE options 
+# APPLE options  - extend to other SO
 if (APPLE)
     set(CMAKE_OSX_ARCHITECTURES "x86_64")
     set(CMAKE_PREFIX_PATH "/usr/local/homebrew")
