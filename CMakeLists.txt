@@ -4,7 +4,7 @@ if(${CMAKE_VERSION} VERSION_GREATER "3.24.0")
    cmake_policy(SET CMP0135 NEW) 
 endif()
 	
-set(CMAKE_INSTALL_PREFIX ${CMAKE_SOURCE_DIR}/install CACHE PATH "prefix directory to install hte BitGraph libraries")	
+set(CMAKE_INSTALL_PREFIX ${CMAKE_SOURCE_DIR}/install CACHE PATH "prefix directory to install BitGraph - default set to a local dir in the package")	
 
 ############
 # project 
