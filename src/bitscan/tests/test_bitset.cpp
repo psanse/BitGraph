@@ -115,6 +115,17 @@ TEST_F(BitSetClassTest, reverse_destructive) {
 	EXPECT_EQ(0, bbN1.size());
 }
 
+TEST(BitSetClass, construction_val) {
+
+	BitSet bb_1(130, true);				//starts to ONE - currently one bits populate also the last bitblock until the end
+	BitSet bb_0(130, false);			//starts to ZERO	
+	BitSet bb_default(130);				//starts to ZERO
+
+	EXPECT_TRUE(bb_1.is_bit(129));
+	EXPECT_FALSE(bb_0.is_bit(129));
+	EXPECT_FALSE(bb_0.is_bit(129));
+}
+
 TEST(BitSetClass, set_bit_basic) {
 	BitSet bb(130);
 	bb.set_bit(10);

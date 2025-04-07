@@ -181,7 +181,7 @@ public:
 	 *		  The capacity of the bitset is set according to the population size
 	 * @param nBits : population size		
 	 **/
-	 explicit  BitSet				(int nBits);
+	 explicit  BitSet				(int nBits, bool val = false);
 
 	 /**
 	 * @brief Constructor of an EMPTY bitset given an initial vector lv of 1-bit elements 

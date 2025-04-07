@@ -75,12 +75,15 @@ BitSet&  erase_bit(const BitSet& lhs, const BitSet& rhs,  BitSet& res){
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
-BitSet::BitSet(int popsize) :
+BitSet::BitSet(int popsize, bool val) :
 	nBB_(INDEX_1TO1(popsize))
 {
 	
 	try {
-		vBB_.assign(nBB_, 0);
+		vBB_.assign(nBB_, val ? ONE : 0);
+		if (val) {
+			//TODO...trim the last bitblock to the population size			
+		}
 	}
 	catch (...) {
 		LOG_ERROR("Error during construction - BitSet::BitSet");
