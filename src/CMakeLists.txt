@@ -93,25 +93,6 @@ add_definitions (-DPATH_GRAPH_TESTS_CMAKE_SRC_CODE=\"${PATH_GRAPH_TESTS_CMAKE_GU
 set(PATH_COPT_TESTS_CMAKE_GUI ${CMAKE_CURRENT_SOURCE_DIR}/copt/data CACHE PATH "PATH for COPT unit tests")
 add_definitions (-DPATH_COPT_TESTS_CMAKE_SRC_CODE=\"${PATH_COPT_TESTS_CMAKE_GUI}/\") 
 
-##############
-# LOGGER LEVEL - default level debug
-# (utils/logger.h) 
-
-set(LOGGER_LEVEL "debug" CACHE STRING "Logger level used at run time")
-set_property(CACHE LOGGER_LEVEL PROPERTY STRINGS debug verbose error)
-message(STATUS "LOGGER_LEVEL set to '${LOGGER_LEVEL}'")
-
-if( ${LOGGER_LEVEL} STREQUAL "debug")
-    add_definitions(-DLOGGER_DEBUG_LEVEL)				#all messages (logger.h) 
-endif()
-
-if( ${LOGGER_LEVEL}  STREQUAL "verbose")
-    add_definitions(-DLOGGER_VERBOSE_LEVEL)				#all messages (logger.h)  	
-endif()
-
-if( ${LOGGER_LEVEL}  STREQUAL "error")
-    add_definitions(-DLOGGER_ERROR_LEVEL)				#all messages (logger.h)  	
-endif()
 
 #############
 # OpenMP (Windows)

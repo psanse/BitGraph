@@ -23,10 +23,28 @@ add_library (utils STATIC
     ${useful_headers_for_IDE}
 )
 
+##############
+# LOGGER LEVEL - default level debug
+# (utils/logger.h) 
+
+set(LOGGER_LEVEL "debug" CACHE STRING "Logger level used at run time")
+set_property(CACHE LOGGER_LEVEL PROPERTY STRINGS debug verbose error)
+message(STATUS "LOGGER_LEVEL is '${LOGGER_LEVEL}'")
+
+#if( ${LOGGER_LEVEL} STREQUAL "debug")
+#    add_definitions(-DLOGGER_DEBUG_LEVEL)				#all messages (logger.h) 
+#endif()
+
+#if( ${LOGGER_LEVEL}  STREQUAL "verbose")
+#    add_definitions(-DLOGGER_VERBOSE_LEVEL)				#all messages (logger.h)  	
+#endif()
+
+#if( ${LOGGER_LEVEL}  STREQUAL "error")
+#    add_definitions(-DLOGGER_ERROR_LEVEL)				#all messages (logger.h)  	
+#endif()
+
 # Make sure the compiler can find include files for our utils library
 # when other libraries or executables link to bitscan
-
-#target_include_directories (utils PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
 target_include_directories(utils PUBLIC 
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
@@ -35,7 +53,9 @@ target_include_directories(utils PUBLIC
 
 target_compile_definitions(utils
     PUBLIC
-    LOGGER_DEBUG_LEVEL
+    $<$<STREQUAL:${LOGGER_LEVEL},"debug">:LOGGER_DEBUG_LEVEL>         #all messages (logger.h)
+    $<$<STREQUAL:${LOGGER_LEVEL},"verbose">:LOGGER_VERBOSE_LEVEL>     #all except debug (logger.h)                     
+    $<$<STREQUAL:${LOGGER_LEVEL},"error">:LOGGER_ERROR_LEVEL>         #warning and error (logger.h)
 )
 
 set_target_properties(utils 
