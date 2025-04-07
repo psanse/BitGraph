@@ -53,9 +53,9 @@ target_include_directories(utils PUBLIC
 
 target_compile_definitions(utils
     PUBLIC
-    $<$<STREQUAL:${LOGGER_LEVEL},"debug">:LOGGER_DEBUG_LEVEL>         #all messages (logger.h)
-    $<$<STREQUAL:${LOGGER_LEVEL},"verbose">:LOGGER_VERBOSE_LEVEL>     #all except debug (logger.h)                     
-    $<$<STREQUAL:${LOGGER_LEVEL},"error">:LOGGER_ERROR_LEVEL>         #warning and error (logger.h)
+    $<$<STREQUAL:${LOGGER_LEVEL},debug>:LOGGER_DEBUG_LEVEL>         #all messages (logger.h)
+    $<$<STREQUAL:${LOGGER_LEVEL},verbose>:LOGGER_VERBOSE_LEVEL>     #all except debug (logger.h)                     
+    $<$<STREQUAL:${LOGGER_LEVEL},error>:LOGGER_ERROR_LEVEL>         #warning and error (logger.h)
 )
 
 set_target_properties(utils 
