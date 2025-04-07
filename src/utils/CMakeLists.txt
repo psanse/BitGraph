@@ -35,7 +35,7 @@ target_include_directories(utils PUBLIC
 
 target_compile_definitions(utils
     PUBLIC
-    LOGER_DEBUG_LEVEL
+    LOGGER_DEBUG_LEVEL
 )
 
 set_target_properties(utils 
