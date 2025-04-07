@@ -33,6 +33,11 @@ target_include_directories(utils PUBLIC
   $<INSTALL_INTERFACE:include>    # <prefix>/include/<PROJECT_NAME>/mylib
 )
 
+target_compile_definitions(utils
+    PUBLIC
+    LOGER_DEBUG_DEBUG_LEVEL
+)
+
 set_target_properties(utils 
     PROPERTIES
     ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
