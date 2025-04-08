@@ -136,7 +136,7 @@ inline int next_bit					(BBScanSp& bitset);
 	// bitscan backwards
 
 	/**
-	* @brief next least-significant bit in the bitstring, starting from the bit retrieved
+	* @brief previous bit (next less significant bit) in the bitstring, starting from the bit retrieved
 	*		 in the last call to next_bit.
 	*		 Scan type: destructive, reverse
 	*
@@ -150,7 +150,7 @@ inline int next_bit					(BBScanSp& bitset);
 inline int prev_bit_del				();
 inline int prev_bit_del				(BBScanSp& bitset);
 	/**
-	* @brief next least-significant bit in the bitstring, starting from the bit retrieved
+	* @brief previous bit (next less significant bit)) in the bitstring, starting from the bit retrieved
 	*		 in the last call to next_bit.
 	*		 Scan type: non-destructive, reverse
 	*
@@ -158,7 +158,7 @@ inline int prev_bit_del				(BBScanSp& bitset);
 	*		II. caches the scanned bit for the next call
 	* 		III. First call requires initialization with init_scan(NON-DESTRUCTIVE, REVERSE)
 	*
-	* @returns the next lsb bit in the bitstring, BBObject::noBit if there are no more bits
+	* @returns the previous bit (next less significant bit) in the bitstring, BBObject::noBit if there are no more bits
 	* @details Created 5/9/2014, last update 09/02/2025
 	* @details Since the scan does not delete the scanned bit from the bitstring,
 	*		   it has to cache the last scanned bit for the next call
@@ -407,8 +407,6 @@ inline int BBScanSp::prev_bit_del(BBScanSp& bitset)
 
 	return BBObject::noBit;
 }
-
-
 
 inline
 int BBScanSp::init_scan (scan_types sct){
