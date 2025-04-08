@@ -192,14 +192,22 @@ public:
 	explicit  BitSet				(const vint& lv);
 
 	/**
-	 * @brief Constructor of an EMPTY bitset given an initial vector lv of 1-bit elements
+	 * @brief Creates a bitset with an initial vector lv of 1-bit elements
 	 *		  and a population size nPop
 	 *		  The capacity of the bitset is set according to nPop
 	 * @param nPop: population size
 	 * @param lv : vector of integers representing 1-bits in the bitset
 	 **/
-	explicit  BitSet				(int nPop, const vint& v);
-	explicit  BitSet				(int nPop, std::initializer_list<int> l);
+	explicit  BitSet				(int nPop, const vint& lv);
+	
+	/**
+	 * @brief Creates a bitset with an initialez list of 1-bit elements
+	 *		  and a population size nPop
+	 *		  The capacity of the bitset is set according to nPop
+	 * @param nPop: population size
+	 * @param lv : set of integers representing 1-bits in the bitset
+	 **/
+	explicit  BitSet				(int nPop, std::initializer_list<int> lv);
 
 			 	 
 	 //Move and copy semantics allowed
