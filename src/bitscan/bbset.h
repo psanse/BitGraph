@@ -199,6 +199,7 @@ public:
 	 * @param lv : vector of integers representing 1-bits in the bitset
 	 **/
 	explicit  BitSet				(int nPop, const vint& v);
+	explicit  BitSet				(int nPop, std::initializer_list<int> l);
 
 			 	 
 	 //Move and copy semantics allowed

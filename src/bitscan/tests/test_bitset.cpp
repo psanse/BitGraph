@@ -133,6 +133,15 @@ TEST(BitSetClass, construction_val) {
 	EXPECT_FALSE(bb_default.is_bit(130));
 }
 
+TEST(BitSetClass, initializer_list) {
+	BitSet bb{130, {1, 5, 7}};
+
+	EXPECT_TRUE(bb.is_bit(1));
+	EXPECT_TRUE(bb.is_bit(5));		//last bit of the population size
+	EXPECT_TRUE(bb.is_bit(7));
+	EXPECT_EQ(3, bb.size());
+}
+
 TEST(BitSetClass, set_bit_basic) {
 	BitSet bb(130);
 	bb.set_bit(10);
