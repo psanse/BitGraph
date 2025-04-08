@@ -144,20 +144,29 @@ friend BitSetSp&  erase_bit			(const BitSetSp& lhs, const BitSetSp& rhs,  BitSet
 	BitSetSp						():nBB_(0)		{}	
 
 	/**
-	* @brief Constructor of an EMPTY bitset given a population size nPop
+	* @brief Creates an EMPTY bitset given a population size nPop
 	*		  The capacity of the bitset is set according to the population size
 	* @param nBits : population size if is_popsize is true, otherwise the capacity of the bitset
 	**/
 explicit BitSetSp					(int nPop, bool is_popsize = true );
 
 	/**
-	 * @brief Constructor of an bitset given an initial vector lv of 1-bit elements
+	 * @brief Creates a bitset given an initial vector lv of 1-bit elements
 	 *		  and a population capacity determined by the population maximum size nPop
 	 *		  The capacity of the bitset is set according to nPop
 	 * @param nPop: population size
 	 * @param lv : vector of integers representing 1-bits in the bitset
 	 **/
 	 BitSetSp						(int nPop, const vint& lv);
+
+	 /**
+	 * @brief Creates a bitset with an initial list of 1-bit elements
+	 *		  and a population size nPop
+	 *		  The capacity of the bitset is set according to nPop
+	 * @param nPop: population size
+	 * @param lv : set of integers representing 1-bits in the bitset
+	 **/
+	 explicit  BitSetSp				(int nPop, std::initializer_list<int> lv);
 
 	//Allows copy and move semantics
 	BitSetSp						(const BitSetSp& bbN)			= default;

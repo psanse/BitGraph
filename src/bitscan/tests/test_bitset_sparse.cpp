@@ -63,6 +63,15 @@ TEST(Sparse, construction_from_vector) {
 	EXPECT_EQ(5, bbsp.number_of_blocks());			//sparse number of blocks, one per element in this case 
 }
 
+TEST(Sparse, construction_initalizer_list) {
+	BitSetSp bbsp{ 1000, {1, 7, 10} };
+
+	EXPECT_TRUE(bbsp.is_bit(1));
+	EXPECT_TRUE(bbsp.is_bit(7));
+	EXPECT_TRUE(bbsp.is_bit(10));
+	EXPECT_EQ(3, bbsp.size());
+}
+
 TEST_F(BitSetSpClassTest, copy_constructor) {
 
 	BitSetSp bbspCOPY(bbsp);

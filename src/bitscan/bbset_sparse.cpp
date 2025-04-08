@@ -53,7 +53,33 @@ BitSetSp::BitSetSp(int nPop, const vint& lv):
 		LOG_ERROR("exiting...");
 		std::exit(-1);
 	}
+}
 
+BitSetSp::BitSetSp(int nPop, std::initializer_list<int> lv) :
+	nBB_(INDEX_1TO1(nPop))
+{
+	try {
+
+		//VBB_ initially empty.. with default capacity
+
+		//sets bit conveniently
+		for (auto& bit : lv) {
+
+			//////////////////
+			assert(bit >= 0 && bit < nPop);
+			/////////////////
+
+			//sets bits - adds pBlocks in place
+			set_bit(bit);
+
+		}
+
+	}
+	catch (...) {
+		LOG_ERROR("Error during construction - BitSet::BitSetSp()");
+		LOG_ERROR("exiting...");
+		std::exit(-1);
+	}
 }
 
 
