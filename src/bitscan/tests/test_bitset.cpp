@@ -121,9 +121,16 @@ TEST(BitSetClass, construction_val) {
 	BitSet bb_0(130, false);			//starts to ZERO	
 	BitSet bb_default(130);				//starts to ZERO
 
-	EXPECT_TRUE(bb_1.is_bit(129));
-	EXPECT_FALSE(bb_0.is_bit(129));
-	EXPECT_FALSE(bb_0.is_bit(129));
+	EXPECT_TRUE(bb_1.is_bit(128));	
+	EXPECT_TRUE(bb_1.is_bit(129));		//last bit of the population size
+	EXPECT_FALSE(bb_1.is_bit(130));
+	EXPECT_FALSE(bb_1.is_bit(191));		//last bit of the bitset's capacity
+
+	EXPECT_FALSE(bb_0.is_bit(129));		
+	EXPECT_FALSE(bb_0.is_bit(130));
+
+	EXPECT_FALSE(bb_default.is_bit(129));	
+	EXPECT_FALSE(bb_default.is_bit(130));
 }
 
 TEST(BitSetClass, set_bit_basic) {

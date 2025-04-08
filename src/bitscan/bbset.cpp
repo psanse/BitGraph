@@ -80,15 +80,17 @@ BitSet::BitSet(int popsize, bool val) :
 {
 	
 	try {
-		vBB_.assign(nBB_, val ? ONE : 0);
-		if (val) {
-			//TODO...trim the last bitblock to the population size			
-		}
+		vBB_.assign(nBB_, val ? ONE : 0);		
 	}
 	catch (...) {
 		LOG_ERROR("Error during construction - BitSet::BitSet");
 		LOG_ERROR("exiting...");
 		std::exit(-1);
+	}
+
+	//trim last bitblock to ZERO if val = TRUE
+	if (val) {
+		vBB_.back() &= bblock::MASK_0_HIGH(popsize - WMUL(nBB_ - 1));
 	}
 }
 
