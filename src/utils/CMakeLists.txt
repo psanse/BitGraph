@@ -31,24 +31,13 @@ set(LOGGER_LEVEL "debug" CACHE STRING "Logger level used at run time")
 set_property(CACHE LOGGER_LEVEL PROPERTY STRINGS debug verbose error)
 message(STATUS "LOGGER_LEVEL is '${LOGGER_LEVEL}'")
 
-#if( ${LOGGER_LEVEL} STREQUAL "debug")
-#    add_definitions(-DLOGGER_DEBUG_LEVEL)				#all messages (logger.h) 
-#endif()
-
-#if( ${LOGGER_LEVEL}  STREQUAL "verbose")
-#    add_definitions(-DLOGGER_VERBOSE_LEVEL)				#all messages (logger.h)  	
-#endif()
-
-#if( ${LOGGER_LEVEL}  STREQUAL "error")
-#    add_definitions(-DLOGGER_ERROR_LEVEL)				#all messages (logger.h)  	
-#endif()
-
+#################
 # Make sure the compiler can find include files for our utils library
 # when other libraries or executables link to bitscan
 
 target_include_directories(utils PUBLIC 
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
-  $<INSTALL_INTERFACE:include>    # <prefix>/include/<PROJECT_NAME>/mylib
+  $<INSTALL_INTERFACE:include>    									# <prefix>/include/<PROJECT_NAME>/mylib
 )
 
 target_compile_definitions(utils
