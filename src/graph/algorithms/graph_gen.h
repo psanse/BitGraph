@@ -105,6 +105,14 @@ public:
 	* @returns 0 if OK, -1 if ERROR
 	*/
 	static int create_graph_benchmark	(const std::string& path, const random_attr_t& rd);
+
+	/**
+	* @brief creates an isomorphism by shuffling the vertices of the input graph g
+	*		 randomly (uses std::shuffle)
+	* @returns 0 if successful, -1 otherwise
+	* @details: TODO - Unit test (14/04/2025)
+	**/
+	static int create_isomorphism(Graph_t& giso, const Graph_t& g);
 };
 
 /////////////////
@@ -245,7 +253,7 @@ int RandomGen<Graph_t>::create_graph(Graph_t& g, std::size_t n, double p) {
 	}
 
 	//////////////////
-	g.gen_random_edges(p);		//generate edges apprpiately (undirected / directed)
+	g.gen_random_edges(p);		//generate edges appropiately (undirected / directed)
 	//////////////////
 	
 
@@ -289,6 +297,30 @@ int RandomGen<Graph_t>::create_graph_benchmark(const std::string& path, const ra
 		}
 	}
 	return 0;		//OK
+}
+
+template<class Graph_t>
+inline
+int RandomGen<Graph_t>::create_isomorphism(Graph_t& g_iso, const Graph_t& g)
+{
+	vector<int> map(g.size(), 0);
+	std::iota(map.begin(), map.end(), 0);
+	std::shuffle(	map.begin(), 
+					map.end(),
+					std::default_random_engine(com::rand::RandomUniformGen<>::FIXED_RANDOM_SEED)	);
+
+	//creates the isomorphism according to the mapping
+	try {
+		GraphFastRootSort<ugraph> gs(g);
+		gs.reorder(map, g_iso);
+	}
+	catch (std::exception& e) {
+		LOG_ERROR("error during isomorphism generation - RandomGen<Graph_t>::create_isomorphism");
+		LOG_ERROR(e.what());
+		return -1;
+	}
+
+	return 0;
 }
 
 template<int logSizeTable>
