@@ -112,7 +112,7 @@ public:
 	* @returns 0 if successful, -1 otherwise
 	* @details: TODO - Unit test (14/04/2025)
 	**/
-	static int create_isomorphism(Graph_t& giso, const Graph_t& g);
+	static int create_isomorphism(Graph_t& giso,  Graph_t& g_ori);
 };
 
 /////////////////
@@ -301,9 +301,9 @@ int RandomGen<Graph_t>::create_graph_benchmark(const std::string& path, const ra
 
 template<class Graph_t>
 inline
-int RandomGen<Graph_t>::create_isomorphism(Graph_t& g_iso, const Graph_t& g)
+int RandomGen<Graph_t>::create_isomorphism(Graph_t& g_iso,  Graph_t& g_ori)
 {
-	vector<int> map(g.size(), 0);
+	vector<int> map(g_ori.size(), 0);
 	std::iota(map.begin(), map.end(), 0);
 	std::shuffle(	map.begin(), 
 					map.end(),
@@ -311,7 +311,7 @@ int RandomGen<Graph_t>::create_isomorphism(Graph_t& g_iso, const Graph_t& g)
 
 	//creates the isomorphism according to the mapping
 	try {
-		GraphFastRootSort<ugraph> gs(g);
+		GraphFastRootSort<ugraph> gs(g_ori);
 		gs.reorder(map, g_iso);
 	}
 	catch (std::exception& e) {
