@@ -107,12 +107,14 @@ public:
 	static int create_graph_benchmark	(const std::string& path, const random_attr_t& rd);
 
 	/**
-	* @brief creates an isomorphism by shuffling the vertices of the input graph g
+	* @brief creates an isomorphi grap g_iso by shuffling the vertices of the input graph g
 	*		 randomly (uses std::shuffle)
+	* @param g: input graph 
+	* @param g_iso: output isomorphic graph to g
 	* @returns 0 if successful, -1 otherwise
 	* @details: TODO - Unit test (14/04/2025)
 	**/
-	static int create_isomorphism(Graph_t& giso,  Graph_t& g_ori);
+	static int create_isomorphism(Graph_t& g_iso,  Graph_t& g);
 };
 
 /////////////////
