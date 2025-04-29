@@ -23,11 +23,15 @@ The library currently offers a variety of graph types, the most relevant ones be
 * `ugraph_w`: for undirected vertex-weighted graphs
 * `ugraph_ew`: for undirected edge-weighted graphs
  
-To include the GRAPH library in your project, add the header #include "BitGraph/graph/graph.h". In the following example, a bitset of 100 elements is declared, containing only the 11th element (index numbering starts at 0).
+To include the GRAPH library in your project, add the header #include "BitGraph/graph/graph.h". In the following example, a simple undirected graphs with 10 vertices and 3 edges is declared.
 
 ``` plaintext
+ugraph g(10);
 
-
+g.add_edge(0, 1);
+g.add_edge(0, 2);
+g.add_edge(7, 8);
+g.print_data();		//screen output: n:=10 m:=3 p:=0.067
 
 ```´
 
