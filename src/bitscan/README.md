@@ -42,27 +42,37 @@ Here is an example of the bitscan loop syntax (non-destructive type):
 bitarray bb(100);
 bb.set_bit(10);
 bb.set_bit(20);
+
 //...
+
 bb.init_scan(bbo::NON_DESTRUCTIVE);
 int nBit = bbo::noBit;
 while( (nBit = bb.next_bit()) != bbo::noBit ){
      //Do something with nBit...
 }
 ```
-and here is the equivalent syntax using a specialized scanning object:
+And here is the equivalent, less verbose syntax, using a specialised scanning object:
 
 ``` plaintext
-    sparse_bitarray bba(100000);
-    	//...
+//...
+bbo::Scan<bitarray> sc(bb);
+while ( (nBit = sc.next_bit()) != bbo::noBit) {
+  //Do something with nBit...
+}
+```
+Specialised types for sparse bitsets are also available.
 
-    if(bba.init_scan(bbo::DESTRUCTIVE)!= -1){
-	   int nBit = BBObject::nobit;
-   	   while( (nBit=bbi.next_bit_del()) != BBObject::noBit ){
-		//Do something with nBit...
-	   }
-	}
+``` plaintext
+sparse_bitarray bbsp(1000000);
+bb.set_bit(0);
+bb.set_bit(999999);
+
+bbo::Scan<sparse_bitarray> scSparse(sb);
+while ((nBit = scSparse.next_bit()) != bbo::noBit) {
+	cout << "sparse bit scanned:" << nBit << endl;
+}
 ```  
-In this case the *if* clause is necessary because sparse bitsets can have empty semantics (no memory allocation), which is checked in the init_scan function. Moreover, the scanning now differs from the previous case because it deletes each population member from the set once it is found (DESTRUCTIVE type). Finally, it is worth noting that scanning operations from different starting points in the bitset are also supported.
+See the unit tests related to sparse bitsets for additional examples [here](https://github.com/psanse/BitGraph/blob/master/src/bitscan/tests/test_bitset_sparse.cpp).
 
 
 CONFIGURATION PARAMETERS
