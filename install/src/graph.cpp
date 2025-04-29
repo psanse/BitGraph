@@ -6,24 +6,24 @@
 using namespace std;
 
 #include <iostream>
-#include "BitGraph/graph/graph.h"		//the one and only header file for the GRAPH 1.0 lib
+#include "BitGraph/graph/graph.h"		//the one and only header file for the GRAPH lib
 
 int main() {
 
 	//small undirected graph with 10 vertices
-	ugraph g(10);
+	ugraph ug(10);
 
-	g.add_edge(0, 1);
-	g.add_edge(0, 2);
-	g.add_edge(7, 8);
-	g.print_data();
-	g.print_edges();	
+	ug.add_edge(0, 1);
+	ug.add_edge(0, 2);
+	ug.add_edge(7, 8);
+	ug.print_data();
+	ug.print_edges();	
 
 	cout << "****************************" << endl;
 
-	g.shrink_to_fit(5);		//graph induced by the first 5 vertices	
-	g.print_data();
-	g.print_edges();
+	ug.shrink_to_fit(5);		//graph induced by the first 5 vertices	
+	ug.print_data();
+	ug.print_edges();
 	
 	cout << "****************************" << endl;
 
@@ -39,24 +39,53 @@ int main() {
 	cout << "****************************" << endl;
 
 	//unit weighted graph with 10 vertices and vertex weights set at  3.0
-	ugraph_w gw(10, 3.0);	
+	ugraph_w ugw(10, 3.0);	
 
-	gw.add_edge(0, 1);
-	gw.add_edge(0, 2);
-	gw.print_data();
-	gw.print_weights();
-	gw.print_edges();
+	ugw.add_edge(0, 1);
+	ugw.add_edge(0, 2);
+	ugw.print_data();
+	ugw.print_weights();
+	ugw.print_edges();
 
 	cout << "****************************" << endl;
 
 	//edge-weighted graph with 10 vertices, no edges and vertex weights set at 8.0
-	ugraph_ew gew(10, 8.0);
+	ugraph_ew ugew(10, 8.0);
 
-	gew.add_edge(0, 1, 4.5);
-	gew.add_edge(0, 2, 5.3);
-	gew.print_data();
-	gew.print_weights();
+	ugew.add_edge(0, 1, 4.5);
+	ugew.add_edge(0, 2, 5.3);
+	ugew.print_data();
+	ugew.print_weights();
+
+	cout << "****************************" << endl;
+
+	//directed graphs 
+	graph g(100);
+	g.add_edge(0, 1);
+	g.add_edge(0, 2);
+	g.add_edge(1, 2);
+
+	g.make_bidirected();	//makes all edges bidrected
 
 
-	return 0;
+	//editing
+	ugraph ug1(100);
+	ug1.add_edge(0, 1);
+	ug1.add_edge(0, 2);
+	ug1.add_edge(1, 2);
+
+	ugraph ug2(ug1);
+	ug2.add_edge(0, 3);
+	ug2.remove_edge(0, 2);
+	ug2.print_data();
+
+	cout << "****************************" << endl;
+
+
+	//generation
+	auto cycle = ugraph::make_cycle(10);				//creates a 10-cycle 
+	cycle.shrink_to_fit(5);								//subgraph induced by the first 5 vertices of the 10-cycle
+	cycle.print_data();
+
+
 }
