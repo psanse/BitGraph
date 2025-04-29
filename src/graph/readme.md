@@ -2,10 +2,13 @@
 GRAPH DOCUMENTATION UNDER DEVELOPMENT
 ===================
 
-GRAPH is a very efficient C++ library for graphs. At the core of GRAPH is the BITSCAN library (see folder *bitscan*, in this repository). 
+GRAPH is a an efficient C++ library for graphs. At the core of GRAPH is the BITSCAN library (see folder *[bitscan](https://github.com/psanse/BitGraph/tree/master/src/bitscan)*, in this repository). 
 
-GETTING STARTED
--------------------------------
+Main Features
+-----------------------------
+
+Getting Started
+-----------------------------
 
 To use GRAPH in your projects, add the following header: 
 
