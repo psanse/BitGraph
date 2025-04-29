@@ -25,6 +25,12 @@ The library currently offers a variety of graph types, the most relevant ones be
  
 To include the GRAPH library in your project, add the header #include "BitGraph/graph/graph.h". In the following example, a bitset of 100 elements is declared, containing only the 11th element (index numbering starts at 0).
 
+``` plaintext
+
+
+
+```´
+
 BUILDING GRAPHS
 -------------------------------
 GRAPH currently distinguishes 4 main types of graph objects:
