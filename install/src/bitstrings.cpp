@@ -11,7 +11,7 @@ using namespace std;
 
 int main() {
 
-	//normal bitset 
+	//small bitset (130 elements)
 	bitarray bb(130);
 	bb.set_bit(0);
 	bb.set_bit(129);
@@ -19,7 +19,7 @@ int main() {
 		
 	cout << "****************************" << endl;
 
-	//massive bitset 10M bits
+	//massive bitset (10M elements)
 	sparse_bitarray sb(10000000);
 	sb.set_bit(0);
 	sb.set_bit(900000);
@@ -29,7 +29,7 @@ int main() {
 	cout << "****************************" << endl;
 
 
-	//non-destructive bitscanning (manual)
+	//non-destructive forward bitscanning (manual)
 	bb.init_scan(bbo::NON_DESTRUCTIVE);
 	int nBit = bbo::noBit;
 	while ((nBit = bb.next_bit()) != bbo::noBit) {
@@ -38,7 +38,7 @@ int main() {
 
 	cout << "****************************" << endl;
 
-	//non-destructive bitscanning (specialized scanning objects)
+	//non-destructive forward bitscanning (specialized scanning objects)
 	bbo::Scan<bitarray> sc(bb);
 	while ( (nBit = sc.next_bit()) != bbo::noBit) {
 		cout << "bit scanned:" << nBit << endl;
@@ -46,7 +46,7 @@ int main() {
 
 	cout << "****************************" << endl;
 
-	//non-destructive bitscanning for sparse bitsets
+	//non-destructive forward bitscanning for sparse bitsets
 	bbo::Scan<sparse_bitarray> scSparse(sb);
 	while ((nBit = scSparse.next_bit()) != bbo::noBit) {
 		cout << "sparse bit scanned:" << nBit << endl;
