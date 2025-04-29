@@ -51,7 +51,7 @@ while( (nBit = bb.next_bit()) != bbo::noBit ){
      //Do something with nBit...
 }
 ```
-And here is the equivalent, less verbose syntax, using a specialised scanning object:
+And here is the equivalent, less verbose syntax, using one of the four specialised scanning objects:
 
 ``` plaintext
 //...
@@ -67,7 +67,7 @@ sparse_bitarray bbsp(1000000);
 bb.set_bit(0);
 bb.set_bit(999999);
 
-bbo::Scan<sparse_bitarray> scSparse(sb);
+bbo::Scan<sparse_bitarray> scSparse(bbsp);
 while ((nBit = scSparse.next_bit()) != bbo::noBit) {
 	cout << "sparse bit scanned:" << nBit << endl;
 }
