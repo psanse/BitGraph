@@ -17,7 +17,6 @@ int main() {
 	bb.set_bit(129);
 	bb.print();
 		
-	
 	cout << "****************************" << endl;
 
 	//massive bitset 10M bits
@@ -28,6 +27,22 @@ int main() {
 
 	
 	cout << "****************************" << endl;
+
+
+	//non-destructive bitscanning (manual)
+	bb.init_scan(bbo::NON_DESTRUCTIVE);
+	int nBit = bbo::noBit;
+	while ((nBit = bb.next_bit()) != bbo::noBit) {
+		cout << "bit scanned:" << nBit << endl;
+	}
+
+	cout << "****************************" << endl;
+
+	//non-destructive bitscanning (specialized scanning objects)
+	bbo::Scan<bitarray> sc(bb);
+	while ( (nBit = sc.next_bit()) != bbo::noBit) {
+		cout << "bit scanned:" << nBit << endl;
+	}
 
 	
 
