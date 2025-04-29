@@ -29,7 +29,7 @@ int main(){
    std::cout << bb;	//screen output [10, 20 (2)]
  }
 ```   
-Many examples are provided in the *[tests](https://github.com/psanse/BitGraph/tree/master/src/bitscan/tests)* folder, and in the [install](https://github.com/psanse/BitGraph/tree/master/install/src) folder. 
+Many more examples are provided in the *[tests](https://github.com/psanse/BitGraph/tree/master/src/bitscan/tests)* folder, and in the [install](https://github.com/psanse/BitGraph/tree/master/install/src) folder. 
 
 Efficient bitscanning
 -------------------------------
