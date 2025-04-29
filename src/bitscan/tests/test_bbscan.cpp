@@ -2,7 +2,7 @@
 * @file test_bbscan.cpp
 * @brief Unit tests of the BBScan class - only related to non-nested bitscanning
 * @details Taken from the unit tests in test_bitstring.cpp (2014), filtering out other bitstring classes in the hierarchy
-* @created 12/02/2025
+* @created 12/02/2025, last_update 29/04/2025
 * @author pss
 **/
 
