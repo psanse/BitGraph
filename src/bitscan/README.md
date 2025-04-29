@@ -2,7 +2,7 @@ BITSCAN  - DOCUMENTATION UNDER DEVELOPMENT
 ===================
 BITSCAN is a C++ library designed to efficiently manipulate bit arrays—also called bit strings or bit sets—with a particular emphasis on high-performance bitscanning operations. The library is the outcome of over **two decades of research in combinatorial optimization** and is very efficient when working with sets. In this context, a bitset encodes a population of elements, where each  element is represented by a single bit set to 1.
 
-#Features
+# Features
 The library currently offers a variety of types for handling bitsets, the most relevant ones being:
 
 - `bitarray`: Main type for standard bitset manipulation. 
