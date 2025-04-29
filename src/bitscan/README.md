@@ -1,10 +1,10 @@
 BITSCAN  - DOCUMENTATION UNDER DEVELOPMENT
 ===================
-BITSCAN is a C++ library designed to efficiently manipulate bit arrays—also called bit strings or bit sets—with a particular emphasis on high-performance bitscanning operations. The library is the outcome of over **two decades of research in combinatorial optimization** and is very efficient when working with sets. In this context, a bitset encodes a set of elements, where each element is represented by a single bit set to 1.
+BITSCAN is a C++ library designed to efficiently manipulate bit arrays—also called bitstrings or bitsets—with a particular emphasis on high-performance bitscanning operations. The library is the outcome of over **two decades of research in combinatorial optimization** and is very efficient when working with sets. In this context, a bitset encodes a set of elements, and each element is represented by a single bit set to 1.
 
 Main Features
 -------------------------------
-BITSCAN features several low-level optimizations for bitscanning—the enumeration of set bits—that have proven effective in the implementation of high-performance combinatorial optimization algorithms. Among other features, it supports both destructive and non-destructive scans, forward and reverse scans, random starting points and caching of the last scanned bit. It also includes many operations for single 64-bit numbers.
+BITSCAN features several low-level optimizations for bitscanning—the enumeration of set bits—that have proven effective in implementing high-performance combinatorial optimization algorithms. Among other features, it supports destructive and non-destructive scans, forward and reverse scans, random starting points and caching of the last scanned bit. It also includes many useful operations for 64-element bitsets (encoded by a single number).
 
 Getting started
 -------------------------------
@@ -29,12 +29,12 @@ int main(){
    std::cout << bb;	//screen output [10, 20 (2)]
  }
 ```   
-Many examples are provided in the *[tests](https://github.com/psanse/BitGraph/tree/master/src/bitscan/tests)* folder.  
+Many examples are provided in the *[tests](https://github.com/psanse/BitGraph/tree/master/src/bitscan/tests)* folder, and in the [install](https://github.com/psanse/BitGraph/tree/master/install/src) folder. 
 
 Efficient bitscanning
 -------------------------------
 
-The BITSCAN library features specific optimisation techniques for *destructive* and *non-destructive* scans. In a destructive bit scan (DBS), whenever a 1-bit is read *it is removed from the bitset* (at the end of the process the bit string is empty). In the (conventional) non-destructive case (NDBS), the bitset remains unaltered. 
+The BITSCAN library features specific optimisation techniques for *destructive* and *non-destructive* scans. In a destructive bitscan, each 1-bit is removed from the bitset as it is read, resulting in an empty bitset at the end of the process. In contrast, during a (conventional) non-destructive bitscan, the bitset remains unchanged. Other features include reverse bitscanning, initial, configurable starting point, specific scanning objects with simplified syntax,  
 
 Here is an example of fast bit scan loop syntax in BITSCAN:
 
