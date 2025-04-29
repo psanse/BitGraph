@@ -60,55 +60,28 @@ ug.add_edge(0,2);
 ug.add_edge(1,2);
 ```
 
-EDITING GRAPHS
+Working with graphs
 -------------------------------
 
-Edges may be added or deleted in constant time (*remove\_edge* member function) for simple graphs (in the case of sparse graphs complexity increases because it takes logarithmic time to find an edge). They may also be generated randomly, as well as uniform random graph benchmarks. Graphs may also be resized and copied. Here is a trivial example of graph editing which involves adding and deleting edges:
+Edges may be added or deleted in constant time (*remove\_edge* member function) for small and middle-size graphs. In the case of large and massive graphs they are logarithmic operations.
+Graphs may also be copied and assigned, and special generation functions are available for special graphs, i.e., uniform random, cycles, cliques, stars and others. 
+In the following example, a 10-cycle is created and then reduced to the induced graph by its first 5 vertices:
+
+``` plaintext      
+auto cycle = ugraph::make_cycle(10);				 
+cycle.shrink_to_fit(5);			//subgraph induced by the first 5 vertices of the 10-cycle
+cycle.print_data();			//screen output n:=5 m:=5 p:=0.5
+```		
    
-    graph g(500);							
-	g.add_edge(0,1);				
-	g.add_edge(0,2);
-	g.add_edge(1,2);
-	g.remove_edge(0,1);
-	g.remove_edge(0,2);
-	g.remove_edge(1,2);
-    if(g.is_empty()) cout<<"empty graph"<<endl;			
-
-A MORE COMPLEX EXAMPLE
--------------------------------
-[K-core analysis](https://en.wikipedia.org/wiki/Degeneracy_(graph_theory)) in GRAPH is extremely fast, which makes it ideal for massive sparse graphs.  
-
-Here is an example:
-    
-    #include "graph/graph.h" 
-    #include "graph/kcore.h" 
-   				
-    void main(){
-	  sparse_ugraph ug("road-belgium-osm");
-	  KCore<sparse_ugraph> kc(ug);				//configures KCore class
-      kc.kcore();						//k-core analysis for the full graph
-	  kc.print_kcore();	
-
-	  sparse_bitarray bbs(ug.number_of_vertices());		//k-core analysis for the subgraph bbs induced by the first 30 vertices
-	  bbs.set_bit(0,29);
-	  kc.set_subgraph(&bbs);
-	 
-  	  kc.kcore();    
-	  kc.print_kcore();							
-    }
-
-
-
-    
-EXTERNAL SOURCES
+External sources
 -------------------------------
 
-GRAPH supports DIMACS, Matrix Market Exchange and Edge list text formats. A few examples of undirected graphs in different formats may be found in the *data* folder. To load a graph from file pass the appropriate filename to the constructor:
-
+GRAPH supports DIMACS, Matrix Market Exchange and Edge list text formats. To load a graph from a file just give the name of the file in the declaration:
+``` plaintext  
+graph g("brock200_1.clq");				
+'''
     
-    graph g("brock200_1.clq");				//reads "brock200_1.clq" file in DIMACS, MTX, or EDGES format
-    
-OTHERS
+Others
 -------------------------------
 
 Basic functionality in GRAPH includes sorting according to different criteria, subgraph degree and support,  random generation, subgraph generation, density, weights on edges and vertices and many others.
