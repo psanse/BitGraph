@@ -8,9 +8,9 @@ Main Features
 -----------------------------
 Among the features of GRAPH we highlight the following:
 * Efficient representation of graphs in memory using bitsets.
-* Optimized graph operations using bitmasks
-* Specialised types for sparse graphs
-* Specialised operations for uniform random graphs
+* Optimised graph operations using bitmasks
+* Specialised types for sparse graphs, vertex-weighted and edge-weighted graphs.
+* Specialised operations for graph generation (uniform random graphs, sparse graphs)
 * Specialised operations for vertex sorting 
 
 Getting Started
