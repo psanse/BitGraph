@@ -39,7 +39,7 @@ Many more examples are provided in the [tests](https://github.com/psanse/BitGrap
 
 Declaring graphs
 -------------------------------
-The following example creates a directed graph with 100 vertices and 3 edges, and then makes the edges bidirected to form a 3-clique:
+The following example creates a directed graph with 100 vertices and 3 directed edges, and then makes the edges bidirected:
 ``` plaintext
 //...
     
@@ -51,8 +51,7 @@ g.add_edge(1,2);
 g.make_bidirected()		//creates a 3-clique
 ```   
 
-
-A better option for cliques would be the class Ugraph for undirected graphs. Here is the code for the 3-clique subgraph {0, 2, 3} in a graph with 100 vertices:
+A better option for cliques would be to use the type ugraph for undirected graphs. Here is the code for the 3-clique subgraph {0, 2, 3} in a graph with 100 vertices:
    
     ugraph g(100);					//creates an empty (undirected) graph with 100 vertices
 	g.add_edge(0,1);				
