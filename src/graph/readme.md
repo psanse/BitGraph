@@ -30,10 +30,10 @@ To include the GRAPH library in your project, add the header #include "BitGraph/
 //...
 ugraph g(10);
 
-g.add_edge(0, 1);
-g.add_edge(0, 2);
-g.add_edge(7, 8);
-g.print_data();		//screen output: n:=10 m:=3 p:=0.067
+ug.add_edge(0, 1);
+ug.add_edge(0, 2);
+ug.add_edge(7, 8);
+ug.print_data();		//screen output: n:=10 m:=3 p:=0.067
 ```
 Many more examples are provided in the [tests](https://github.com/psanse/BitGraph/tree/master/src/graph/tests) folder. A basic example is shown in the [install](https://github.com/psanse/BitGraph/blob/master/install/src/graph.cpp) folder.
 
@@ -51,12 +51,14 @@ g.add_edge(1,2);
 g.make_bidirected()		//creates a 3-clique
 ```   
 
-A better option for cliques would be to use the type ugraph for undirected graphs. Here is the code for the 3-clique subgraph {0, 2, 3} in a graph with 100 vertices:
-   
-    ugraph g(100);					//creates an empty (undirected) graph with 100 vertices
-	g.add_edge(0,1);				
-	g.add_edge(0,2);
-	g.add_edge(1,2);
+A better option for cliques would be to use the type ugraph for undirected graphs. Here is the code to define the 3-clique {0, 2, 3} in a graph with 100 vertices:
+
+``` plaintext   
+ugraph ug(100);					//creates an empty (undirected) graph with 100 vertices
+ug.add_edge(0,1);				
+ug.add_edge(0,2);
+ug.add_edge(1,2);
+```
 
 EDITING GRAPHS
 -------------------------------
