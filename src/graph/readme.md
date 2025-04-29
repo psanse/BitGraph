@@ -84,9 +84,9 @@ cycle.print_data();			//screen output n:=5 m:=5 p:=0.5
 External sources
 -------------------------------
 
-GRAPH currently supports DIMACS, Edge list and Matrix Market Exchange formats. To load a graph from a file, the name of the file should be provided in the declaration:
+GRAPH currently supports DIMACS, Edge list and Matrix Market Exchange formats. To load a graph from a file, the name of the file should be provided in the declaration, e.g.:
 ``` plaintext  
-graph g("brock200_1.clq");				
+ugraph ug("brock200_1.clq");				
 ```
     
 Others
