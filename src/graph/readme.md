@@ -59,7 +59,7 @@ ug.add_edge(0,1);
 ug.add_edge(0,2);
 ug.add_edge(1,2);
 ```
-For massive graphs, the specialised type `sparse_graph` should be used. In the following example, a graph of 1M verties and 3 edges is declared.
+For massive graphs, the specialised type `sparse_graph` should be used. In the following example, a graph with 1M vertices and 3 edges is declared.
 
 ``` plaintext   
 sparse_ugraph sg(1000000);					
