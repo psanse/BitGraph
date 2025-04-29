@@ -51,7 +51,7 @@ g.add_edge(1,2);
 g.make_bidirected()		//creates a 3-clique
 ```   
 
-A better option for cliques would be to use the type ugraph for undirected graphs. Here is the code to define the 3-clique {0, 2, 3} in a graph with 100 vertices:
+A better option for cliques would be to use the type `ugraph` for undirected graphs. Here is the code to define the 3-clique {0, 2, 3} in a graph with 100 vertices:
 
 ``` plaintext   
 ugraph ug(100);					//creates an empty (undirected) graph with 100 vertices
