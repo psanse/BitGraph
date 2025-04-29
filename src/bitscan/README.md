@@ -73,13 +73,3 @@ while ((nBit = scSparse.next_bit()) != bbo::noBit) {
 }
 ```  
 See the unit tests related to sparse bitsets for additional examples [here](https://github.com/psanse/BitGraph/blob/master/src/bitscan/tests/test_bitset_sparse.cpp).
-
-
-CONFIGURATION PARAMETERS
--------------------------
-
-The file *bbconfig.h* contains customization parameters. An important parameter is:
-
-1. POPCOUNT_64: Disable in processor architectures which do not support hardware population count assembly instructions. 
-
-
