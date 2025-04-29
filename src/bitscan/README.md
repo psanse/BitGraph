@@ -10,12 +10,12 @@ Getting started
 -------------------------------
 The library currently offers a variety of types for handling bitsets, the most relevant ones being:
 
-- `bitarray`: Main type for standard bitset manipulation. 
-- `sparse_bitarray`: Main type for large and massive sets with few elements.
+- `bitarray`: main type for standard bitset manipulation. 
+- `sparse_bitarray`: main type for large and massive sets with few elements.
 
 BITSCAN also offers a `bblock` namespace with many useful operations for 64-bit numbers.
 
-To include the BITSCAN library in your project, add the dependency to the *bitscan.h file*. In the following example, a bitset of 100 elements is declared and the 11th bit is set to 1 (index numbering starts at 0). 
+To include the BITSCAN library in your project, add the header `#include bitscan/bitscan.h`. In the following example, a bitset of 100 elements is declared and the 11th bit is set to 1 (index numbering starts at 0). 
 
     #include "bitscan/bitscan.h"
     	//...
