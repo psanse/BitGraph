@@ -2,13 +2,14 @@ BITSCAN  - DOCUMENTATION UNDER DEVELOPMENT
 ===================
 BITSCAN is a C++ library designed to efficiently manipulate bit arrays—also called bit strings or bit sets—with a particular emphasis on high-performance bitscanning operations. The library is the outcome of over **two decades of research in combinatorial optimization** and is very efficient when working with sets. In this context, a bitset encodes a population of elements, where each  element is represented by a single bit set to 1.
 
+#Features
 The library currently offers a variety of types for handling bitsets, the most relevant ones being:
 
-- `bitblock`: Wrapper for bit manipulation of 64-bit numbers (*lsb*, *msb*, *popcount* etc.).
-- `bitarray`: Main type for standard bit manipulation. 
+- `bitarray`: Main type for standard bitset manipulation. 
 - `sparse_bitarray`: Main type for large and massive sets with few elements.
-  
-Other types such as `simple_bitarray`, `simple_sparse_bitarray` and `watched_bitarray` are included for specific operations. For example, the `watched_bitarray` type is intended for set populations with low density, but not sparse. Empty bit blocks are still stored in full, but two pointers (aka sentinels) which point (alias *watch*) the highest and lowest empty blocks respectively, determine the range of useful bitmasks (see [here](http://download.springer.com/static/pdf/797/chp%253A10.1007%252F978-3-319-09584-4_12.pdf?auth66=1411550130_ba322f209d8b171722fa67741d3f77e9&ext=.pdf "watched bit arrays") for an interesting application).
+
+The library also offers a `bblock` namespace for bit manipulation of 64-bit numbers.
+
 
 The library features several optimizations for typical enumeration of set members (in this context, *bitscanning*) which have been found useful for fast implementation of algorithms during research, such as  destructive vs non-destructive scans, forward and reverse_forward scans, random starting points, caching indexes etc. 
 
