@@ -11,7 +11,7 @@ Getting started
 The library currently offers a variety of types for handling bitsets, the most relevant ones being:
 
 - `bitarray`: main type for standard bitset manipulation. 
-- `sparse_bitarray`: main type for large and massive sets with few elements.
+- `sparse_bitarray`: main type for large and massive bitsets with few elements.
 
 BITSCAN also offers a `bblock` namespace with many useful operations for 64-bit numbers.
 
