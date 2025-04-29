@@ -6,7 +6,10 @@ GRAPH is a C++ library for graphs. At its core, GRAPH relies on the BITSCAN libr
 
 Main Features
 -----------------------------
+The main features of GRAPH are the following:
+* encodes the adjacency matrix as a collection of bitsets. 
 
+several low-level optimizations for bitscanning—the enumeration of set bits—that have proven effective in implementing high-performance combinatorial optimization algorithms. Among other features, it supports destructive and non-destructive scans, forward and reverse scans, random starting points and caching of the last scanned bit. It also includes many useful operations for 64-element bitsets (encoded by a single number).
 
 
 Getting Started
