@@ -24,6 +24,11 @@ To include the BITSCAN library in your project, add the header `#include "bitsca
 int main(){
    bitarray bb(100);
    bb.set_bit(10);
+   bb.set_bit(20);
+
+   //scan the elements the bitset
+    
+	
    std::cout << bb;
  }
 ```   
