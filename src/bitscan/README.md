@@ -31,7 +31,7 @@ int main(){
 ```   
 Many more examples are provided in the *tests* folder.  
 
-Efficient BitScanning
+Efficient bitscanning
 -------------------------------
 
 The BITSCAN library features specific optimisation techniques for *destructive* and *non-destructive* scans. In a destructive bit scan (DBS), whenever a 1-bit is read *it is removed from the bitset* (at the end of the process the bit string is empty). In the (conventional) non-destructive case (NDBS), the bitset remains unaltered. 
