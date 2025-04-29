@@ -64,8 +64,8 @@ Specialised types for sparse bitsets are also available.
 
 ``` plaintext
 sparse_bitarray bbsp(1000000);
-bb.set_bit(0);
-bb.set_bit(999999);
+bbsp.set_bit(0);
+bbsp.set_bit(999999);
 
 bbo::Scan<sparse_bitarray> scSparse(bbsp);
 while ((nBit = scSparse.next_bit()) != bbo::noBit) {
