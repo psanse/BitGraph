@@ -2,8 +2,7 @@
 GRAPH DOCUMENTATION UNDER DEVELOPMENT
 ===================
 
-GRAPH is a C++ library for graphs. At the core of GRAPH is the BITSCAN library (see folder *[bitscan](https://github.com/psanse/BitGraph/tree/master/src/bitscan)* in this repository). 
-The library is the outcome of over two decades of research in combinatorial optimization and is very efficient when working with sets. In this context, a bitset encodes a set of elements, and each element is represented by a single bit set to 1.
+GRAPH is a C++ library for graphs. At its core, GRAPH relies on the BITSCAN library (located in the bitscan folder of the repository). GRAPH uses BITSCAN to efficiently represent graphs in memory and to optimize fundamental operations such as, e.g., computing vertex degrees, sorting vertices, and building graph isomorphisms.
 
 Main Features
 -----------------------------
