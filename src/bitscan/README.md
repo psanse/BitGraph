@@ -24,9 +24,9 @@ To include the BITSCAN library in your project, add the header `#include "bitsca
 int main(){
    bitarray bb(100);
    bb.set_bit(10);
-   bb.set_bit(20);	//screen ouptut [10, 20 (2)]
+   bb.set_bit(20);	
 
-   std::cout << bb;
+   std::cout << bb;	//screen ouptut [10, 20 (2)]
  }
 ```   
 You will find many more examples in the *tests* folder.  
