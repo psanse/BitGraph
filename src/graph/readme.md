@@ -32,7 +32,6 @@ g.add_edge(0, 1);
 g.add_edge(0, 2);
 g.add_edge(7, 8);
 g.print_data();		//screen output: n:=10 m:=3 p:=0.067
-
 ```
 
 BUILDING GRAPHS
