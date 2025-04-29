@@ -71,5 +71,7 @@ bbo::Scan<sparse_bitarray> scSparse(sb);
 while ((nBit = scSparse.next_bit()) != bbo::noBit) {
 	cout << "sparse bit scanned:" << nBit << endl;
 }
+
+Screen output: [0, 999999 (2)]
 ```  
 See the unit tests related to sparse bitsets for additional examples [here](https://github.com/psanse/BitGraph/blob/master/src/bitscan/tests/test_bitset_sparse.cpp).
