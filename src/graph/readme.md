@@ -35,30 +35,20 @@ g.print_data();		//screen output: n:=10 m:=3 p:=0.067
 ```
 Many more examples are provided in the [tests](https://github.com/psanse/BitGraph/tree/master/src/graph/tests) folder. A basic example is shown in the [install](https://github.com/psanse/BitGraph/blob/master/install/src/graph.cpp) folder.
 
-BUILDING GRAPHS
+Declaring graphs
 -------------------------------
-GRAPH currently distinguishes 4 main types of graph objects:
-
-- `graph`: for directed graphs
-- `ugraph`: for undirected graphs
-- `sparse_graph`: for sparse directed graphs
-- `sparse_ugraph`: for sparse undirected graphs
-
-
-The following example builds a directed graph with 100 vertices and 3 edges:
-
-    #include "graph/graph.h"
-    //...
+The following example creates a directed graph with 100 vertices and 3 edges, and then makes the edges bidirected to form a 3-clique:
+``` plaintext
+#include "BitGraph/graph/graph.h"
     
-    graph g(100);					//creates an empty (directed) graph with 100 vertices
-    g.add_edge(0,1);				//configures the edges
-	g.add_edge(0,2);
-	g.add_edge(1,2);
+graph g(100);					
+g.add_edge(0,1);				
+g.add_edge(0,2);
+g.add_edge(1,2);
 
+g.make_bidirected()		//creates a 3-clique
+```   
 
-To make the edges bidirected call the *make\_bidirected* function:
-   
-    g.make_bidirected()				//creates a 3-clique
 
 A better option for cliques would be the class Ugraph for undirected graphs. Here is the code for the 3-clique subgraph {0, 2, 3} in a graph with 100 vertices:
    
