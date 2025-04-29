@@ -17,7 +17,7 @@ BITSCAN also offers a `bblock` namespace with many useful operations for 64-bit 
 
 To include the BITSCAN library in your project, add the header `#include "bitscan/bitscan.h"`. In the following example, a set of 100 elements is declared and the 11th bit is set to 1 (index numbering starts at 0). 
 
-``` javascript
+``` plaintext
     #include "bitscan/bitscan.h"
     	//...
 	int main(){
