@@ -71,8 +71,8 @@ sg.add_edge(1,2);
 Working with graphs
 -------------------------------
 
-Edges may be added or deleted in constant time (*remove\_edge* member function) for small and middle-size graphs. In the case of large and massive graphs they are logarithmic operations.
-Graphs may also be copied and assigned, and special generation functions are available for special graphs, i.e., uniform random, cycles, cliques, stars and others. 
+Edges may be added or deleted in constant time for small and medium-sized graphs. In the case of large and massive graphs, they are both logarithmic operations.
+Graphs may also be copied and assigned, and specific generation functions are available for special graphs, such as, e.g., uniform random graphs, cycles, cliques or stars. 
 In the following example, a 10-cycle is created and then reduced to the induced graph by its first 5 vertices:
 
 ``` plaintext      
@@ -84,7 +84,7 @@ cycle.print_data();			//screen output n:=5 m:=5 p:=0.5
 External sources
 -------------------------------
 
-GRAPH supports DIMACS, Matrix Market Exchange and Edge list text formats. To load a graph from a file just give the name of the file in the declaration:
+GRAPH currently supports DIMACS, Edge list and Matrix Market Exchange formats. To load a graph from a file, the name of the file should be provided in the declaration:
 ``` plaintext  
 graph g("brock200_1.clq");				
 ```
