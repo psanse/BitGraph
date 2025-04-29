@@ -24,7 +24,8 @@ To include the BITSCAN library in your project, add the header `#include "bitsca
    	  bitarray bbi(100);
   	  bbi.set_bit(10);
    	  std::cout << bbi;
-  	}    
+  	}
+```   
 You will find many more examples in the *tests* folder.  
 
 EXAMPLES OF BITSCANNING OPERATIONS
