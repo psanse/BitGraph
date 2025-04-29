@@ -29,7 +29,7 @@ int main(){
    std::cout << bb;	//screen ouptut [10, 20 (2)]
  }
 ```   
-You will find many more examples in the *tests* folder.  
+Many more examples are provided in the *tests* folder.  
 
 EXAMPLES OF BITSCANNING OPERATIONS
 -------------------------------
