@@ -26,9 +26,6 @@ int main(){
    bb.set_bit(10);
    bb.set_bit(20);
 
-   //scan the elements the bitset
-    
-	
    std::cout << bb;
  }
 ```   
