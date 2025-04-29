@@ -11,10 +11,19 @@ Among the features of GRAPH we highlight the following:
 * Optimised graph operations using bitmasks
 * Specialised types for sparse graphs, vertex-weighted and edge-weighted graphs.
 * Specialised operations for graph generation (uniform random graphs, sparse graphs)
-* Specialised operations for vertex sorting 
+* Specialised operations for vertex sorting, k-core analysis and others. 
 
 Getting Started
 -----------------------------
+The library currently offers a variety of graph types, the most relevant ones being:
+* `graph`: for directed graphs
+* `ugraph`: for undirected graphs
+* `sparse_graph`: for sparse directed graphs
+* `sparse_ugraph`: for sparse undirected graphs
+* `ugraph_w`: for undirected vertex-weighted graphs
+* `ugraph_ew`: for undirected edge-weighted graphs
+ 
+
 
 To use GRAPH in your projects, add the following header: 
 
