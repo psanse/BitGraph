@@ -23,7 +23,7 @@ To include the BITSCAN library in your project, add the header `#include "bitsca
 int main(){
    bitarray bb(100);
    bb.set_bit(10);
-   std::cout << bbi;
+   std::cout << bb;
  }
 ```   
 You will find many more examples in the *tests* folder.  
