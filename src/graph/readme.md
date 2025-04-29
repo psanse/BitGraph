@@ -1,5 +1,5 @@
 
-GRAPH DOCUMENTATION UNDER DEVELOPMENT
+The GRAPH library
 ===================
 
 GRAPH is a C++ library for graphs. At its core, GRAPH relies on the BITSCAN library (located in the bitscan folder of the repository). GRAPH uses BITSCAN to efficiently represent graphs in memory and to optimize fundamental operations such as, e.g., computing vertex degrees, sorting vertices, and building graph isomorphisms.
@@ -80,16 +80,10 @@ GRAPH supports DIMACS, Matrix Market Exchange and Edge list text formats. To loa
 ``` plaintext  
 graph g("brock200_1.clq");				
 ```
-
-
     
 Others
 -------------------------------
 
-Basic functionality in GRAPH includes sorting according to different criteria, subgraph degree and support,  random generation, subgraph generation, density, weights on edges and vertices and many others.
+An extensive documentation of GRAPH is under development.
 
 
-COMPATIBILITY
--------------------------------
-
-GRAPH has been tested in Windows 64-bit OS and Linux OS. Note that a 64-bit OS is mandatory because of the BITSCAN dependency.
