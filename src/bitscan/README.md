@@ -67,8 +67,8 @@ sparse_bitarray bbsp(1000000);
 bbsp.set_bit(0);
 bbsp.set_bit(999999);
 
-bbo::Scan<sparse_bitarray> scSparse(bbsp);
-while ((nBit = scSparse.next_bit()) != bbo::noBit) {
+bbo::Scan<sparse_bitarray> scs(bbsp);
+while ((nBit = scs.next_bit()) != bbo::noBit) {
 	cout << "sparse bit scanned:" << nBit << endl;
 }
 
