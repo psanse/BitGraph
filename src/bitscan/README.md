@@ -15,14 +15,14 @@ The library currently offers a variety of types for handling bitsets, the most r
 
 BITSCAN also offers a `bblock` namespace with many useful operations for 64-bit numbers.
 
-To include the BITSCAN library in your project, add the header `#include "bitscan/bitscan.h"`. In the following example, a set of 100 elements is declared and the 11th bit is set to 1 (index numbering starts at 0). 
+To include the BITSCAN library in your project, add the header `#include "bitscan/bitscan.h"`. In the following example, a bitset of 100 elements is declared, containing only the 11th element (index numbering starts at 0). 
 
 ``` plaintext
 #include "bitscan/bitscan.h"
 
 int main(){
-   bitarray bbi(100);
-   bbi.set_bit(10);
+   bitarray bb(100);
+   bb.set_bit(10);
    std::cout << bbi;
  }
 ```   
