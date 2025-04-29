@@ -44,7 +44,13 @@ int main() {
 		cout << "bit scanned:" << nBit << endl;
 	}
 
-	
+	cout << "****************************" << endl;
+
+	//non-destructive bitscanning for sparse bitsets
+	bbo::Scan<sparse_bitarray> scSparse(sb);
+	while ((nBit = scSparse.next_bit()) != bbo::noBit) {
+		cout << "sparse bit scanned:" << nBit << endl;
+	}
 
 	return 0;
 }
