@@ -23,17 +23,7 @@ The library currently offers a variety of graph types, the most relevant ones be
 * `ugraph_w`: for undirected vertex-weighted graphs
 * `ugraph_ew`: for undirected edge-weighted graphs
  
-
-
-To use GRAPH in your projects, add the following header: 
-
-	#include "graph/graph.h"
-
-To add k-core graph analysis, for example, (see GRAPH ANALYSIS section below) the header is:
-
-	#include "graph/kcore.h"
-
-**Additional documentation is under development, and will be published asap.**
+To include the GRAPH library in your project, add the header #include "BitGraph/graph/graph.h". In the following example, a bitset of 100 elements is declared, containing only the 11th element (index numbering starts at 0).
 
 BUILDING GRAPHS
 -------------------------------
