@@ -6,7 +6,7 @@ GRAPH is a C++ library for graphs. At its core, GRAPH relies on the BITSCAN libr
 
 Main Features
 -----------------------------
-The main features of GRAPH are the following:
+Among the features of GRAPH we highlight the following:
 * Efficient representation of graphs in memory using bitsets.
 * Optimized graph operations using bitmasks
 * Specialised types for sparse graphs
