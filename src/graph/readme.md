@@ -33,6 +33,7 @@ g.add_edge(0, 2);
 g.add_edge(7, 8);
 g.print_data();		//screen output: n:=10 m:=3 p:=0.067
 ```
+Many more examples are provided in the [tests](https://github.com/psanse/BitGraph/tree/master/src/graph/tests) folder. A basic example is shown in the [install](https://github.com/psanse/BitGraph/blob/master/install/src/graph.cpp) folder.
 
 BUILDING GRAPHS
 -------------------------------
