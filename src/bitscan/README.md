@@ -34,20 +34,24 @@ Many examples are provided in the *[tests](https://github.com/psanse/BitGraph/tr
 Efficient bitscanning
 -------------------------------
 
-The BITSCAN library features specific optimisation techniques for *destructive* and *non-destructive* scans. In a destructive bitscan, each 1-bit is removed from the bitset as it is read, resulting in an empty bitset at the end of the process. In contrast, during a (conventional) non-destructive bitscan, the bitset remains unchanged. Other features include reverse bitscanning, initial, configurable starting point, specific scanning objects with simplified syntax,  
+The BITSCAN library features specific optimisation techniques for *destructive* and *non-destructive* scans. In a destructive bitscan, each 1-bit is removed from the bitset as it is read, resulting in an empty bitset at the end of the process. In contrast, during a (conventional) non-destructive bitscan, the bitset remains unchanged. Other features include reverse bitscanning, initial, configurable starting points, specific scanning objects with simplified syntax and others.  
 
-Here is an example of fast bit scan loop syntax in BITSCAN:
+Here is an example of the bitscan loop syntax (non-destructive type):
 
-    bitarray bba(100);
-    	//...
-	bba.init_scan(bbo::NON_DESTRUCTIVE);
-   	int nBit = BBObject::noBit;;
-  	 while( (nBit=bba.next_bit()) != BBObject::noBit ){
-   	     //Do something with nBit...
-  	}   
-The *init_scan* member function configures cache information appropriately. Currently four types of scans are supported: DESTRUCTIVE, NON\_DESTRUCTIVE and the reverse counterparts (DESTRUCTIVE\_REVERSE and NON\_DESTRUCTIVE\_REVERSE). For each type there is an appropriate family of functions. Here is another example, this time for a sparse bitset of 100000 bits:
+``` plaintext
+bitarray bb(100);
+bb.set_bit(10);
+bb.set_bit(20);
+//...
+bb.init_scan(bbo::NON_DESTRUCTIVE);
+int nBit = bbo::noBit;
+while( (nBit = bb.next_bit()) != bbo::noBit ){
+     //Do something with nBit...
+}
+```
+and here is the equivalent syntax using a specialized scanning object:
 
-
+``` plaintext
     sparse_bitarray bba(100000);
     	//...
 
@@ -57,6 +61,7 @@ The *init_scan* member function configures cache information appropriately. Curr
 		//Do something with nBit...
 	   }
 	}
+```  
 In this case the *if* clause is necessary because sparse bitsets can have empty semantics (no memory allocation), which is checked in the init_scan function. Moreover, the scanning now differs from the previous case because it deletes each population member from the set once it is found (DESTRUCTIVE type). Finally, it is worth noting that scanning operations from different starting points in the bitset are also supported.
 
 
