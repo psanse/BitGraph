@@ -36,20 +36,16 @@ protected:
 TEST_F(BBScanClassTest, non_destructive) {
 	std::set<int> res;
 
-	int nBit = EMPTY_ELEM;
-	while (true) {
-		nBit = bbn.next_bit(nBit);
-		if (nBit == EMPTY_ELEM) break;
+	int nBit = bbo::noBit;
+	while ( (nBit = bbn.next_bit(nBit)) != bbo::noBit) {
 		res.insert(nBit);
 	}
 
 	EXPECT_TRUE(res == sol);
 
 	res.clear();
-	bbsc.init_scan(BBObject::NON_DESTRUCTIVE);
-	while (true) {
-		nBit = bbsc.next_bit();
-		if (nBit == EMPTY_ELEM) break;
+	bbsc.init_scan(bbo::NON_DESTRUCTIVE);
+	while ( (nBit = bbsc.next_bit())!= bbo::noBit) {
 		res.insert(nBit);
 	}
 
@@ -61,9 +57,7 @@ TEST_F(BBScanClassTest, non_destructive_with_starting_point) {
 	std::set<int> res;
 
 	int nBit = 50;
-	while (true) {
-		nBit = bbn.next_bit(nBit);
-		if (nBit == EMPTY_ELEM) break;
+	while ( (nBit = bbn.next_bit(nBit))!= bbo::noBit ) {
 		res.insert(nBit);
 	}
 
@@ -73,9 +67,7 @@ TEST_F(BBScanClassTest, non_destructive_with_starting_point) {
 
 	res.clear();
 	bbsc.init_scan(50, BBObject::NON_DESTRUCTIVE);
-	while (true) {
-		nBit = bbsc.next_bit();
-		if (nBit == EMPTY_ELEM) break;
+	while ( (nBit = bbsc.next_bit()) != bbo::noBit ) {
 		res.insert(nBit);
 	}
 
@@ -83,17 +75,13 @@ TEST_F(BBScanClassTest, non_destructive_with_starting_point) {
 	EXPECT_EQ(1, res.count(100));
 	EXPECT_EQ(0, res.count(50));
 	/////////////////////
-	res.clear();
-
 }
 
 TEST_F(BBScanClassTest, reverse_non_destructive) {
 	std::set<int> res;
 
-	int nBit = EMPTY_ELEM;
-	while (true) {
-		nBit = bbn.prev_bit(nBit);
-		if (nBit == EMPTY_ELEM) break;
+	int nBit = bbo::noBit;
+	while ( (nBit = bbn.prev_bit(nBit)) != bbo::noBit ) {
 		res.insert(nBit);
 	}
 
@@ -101,9 +89,7 @@ TEST_F(BBScanClassTest, reverse_non_destructive) {
 
 	res.clear();
 	bbsc.init_scan(BBObject::NON_DESTRUCTIVE_REVERSE);
-	while (true) {
-		nBit = bbsc.prev_bit();
-		if (nBit == EMPTY_ELEM) break;
+	while ( (nBit = bbsc.prev_bit()) != bbo::noBit) {
 		res.insert(nBit);
 	}
 
@@ -117,9 +103,7 @@ TEST_F(BBScanClassTest, reverse_non_destructive_with_starting_point) {
 	std::set<int> res;
 
 	int nBit = 50;
-	while (true) {
-		nBit = bbn.prev_bit(nBit);
-		if (nBit == EMPTY_ELEM) break;
+	while ( (nBit = bbn.prev_bit(nBit)) != bbo::noBit) {
 		res.insert(nBit);
 	}
 
@@ -129,9 +113,7 @@ TEST_F(BBScanClassTest, reverse_non_destructive_with_starting_point) {
 
 	res.clear();
 	bbsc.init_scan(50, BBObject::NON_DESTRUCTIVE_REVERSE);
-	while (true) {
-		nBit = bbsc.prev_bit();
-		if (nBit == EMPTY_ELEM) break;
+	while ( (nBit = bbsc.prev_bit())!=bbo::noBit ) {
 		res.insert(nBit);
 	}
 
@@ -150,9 +132,7 @@ TEST_F(BBScanClassTest, destructive) {
 	res.clear();
 	BBScan bbsc1(bbsc);
 	bbsc1.init_scan(BBObject::DESTRUCTIVE);
-	while (true) {
-		nBit = bbsc1.next_bit_del();
-		if (nBit == EMPTY_ELEM) break;
+	while ((nBit = bbsc1.next_bit_del()) != bbo::noBit) {
 		res.insert(nBit);
 	}
 
@@ -166,10 +146,8 @@ TEST_F(BBScanClassTest, reverse_destructive) {
 	std::set<int> res;
 
 	BitSet bbn1(bbn);
-	int nBit = EMPTY_ELEM;
-	while (true) {
-		nBit = bbn1.prev_bit(nBit);
-		if (nBit == EMPTY_ELEM) break;
+	int nBit = bbo::noBit;
+	while ( (nBit = bbn1.prev_bit(nBit)) != bbo::noBit) {
 		res.insert(nBit);
 		bbn1.erase_bit(nBit);
 	}
@@ -181,9 +159,7 @@ TEST_F(BBScanClassTest, reverse_destructive) {
 	res.clear();
 	BBScan bbsc1(bbsc);
 	bbsc1.init_scan(BBObject::DESTRUCTIVE_REVERSE);
-	while (true) {
-		nBit = bbsc1.prev_bit_del();
-		if (nBit == EMPTY_ELEM) break;
+	while ( (nBit = bbsc1.prev_bit_del()) != bbo::noBit) {
 		res.insert(nBit);
 	}
 
@@ -292,10 +268,9 @@ TEST(BBScanClass, init_scan_specific) {
 	bbsc.init_scan(10, bbo::NON_DESTRUCTIVE);
 
 	BBScan bbres(100);
-	while (true) {
-		int v = bbsc.next_bit();
-		if (v == EMPTY_ELEM) break;
-		bbres.set_bit(v);
+	int nBit = bbo::noBit;
+	while ( (nBit = bbsc.next_bit()) != bbo::noBit) {
+		bbres.set_bit(nBit);
 	}
 
 	EXPECT_FALSE(bbres.is_bit(10));
@@ -307,10 +282,8 @@ TEST(BBScanClass, init_scan_specific) {
 	bbres.erase_bit();
 	bbsc.set_bit(0);
 	bbsc.init_scan(EMPTY_ELEM, bbo::NON_DESTRUCTIVE);  /* note bi.init_scan(0, ..) is not the same */
-	while (true) {
-		int v = bbsc.next_bit();
-		if (v == EMPTY_ELEM) break;
-		bbres.set_bit(v);
+	while ((nBit = bbsc.next_bit())!= bbo::noBit) {
+		bbres.set_bit(nBit);
 	}
 
 	EXPECT_EQ(4, bbres.size());
@@ -320,10 +293,8 @@ TEST(BBScanClass, init_scan_specific) {
 	//incorrect scan from the beginning
 	bbres.erase_bit();
 	bbsc.init_scan(0, bbo::NON_DESTRUCTIVE);  /* note bi.init_scan(0, ..) is not the same */
-	while (true) {
-		int v = bbsc.next_bit();
-		if (v == EMPTY_ELEM) break;
-		bbres.set_bit(v);
+	while ((nBit = bbsc.next_bit()) != bbo::noBit) {
+		bbres.set_bit(nBit);
 	}
 
 	EXPECT_FALSE(bbres.is_bit(0));
