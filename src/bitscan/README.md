@@ -26,7 +26,7 @@ int main(){
    bb.set_bit(10);
    bb.set_bit(20);	
 
-   std::cout << bb;	//screen ouptut [10, 20 (2)]
+   std::cout << bb;	//screen output [10, 20 (2)]
  }
 ```   
 Many more examples are provided in the *tests* folder.  
