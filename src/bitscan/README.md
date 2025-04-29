@@ -19,7 +19,7 @@ To include the BITSCAN library in your project, add the header `#include "BitGra
 
 ``` plaintext
 #include <iostream>
-#include "bitscan/bitscan.h"
+#include "BitGraph/bitscan/bitscan.h"
 
 int main(){
    bitarray bb(100);
