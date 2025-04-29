@@ -18,13 +18,13 @@ BITSCAN also offers a `bblock` namespace with many useful operations for 64-bit 
 To include the BITSCAN library in your project, add the header `#include "bitscan/bitscan.h"`. In the following example, a set of 100 elements is declared and the 11th bit is set to 1 (index numbering starts at 0). 
 
 ``` plaintext
-    #include "bitscan/bitscan.h"
-    	//...
-	int main(){
-   	  bitarray bbi(100);
-  	  bbi.set_bit(10);
-   	  std::cout << bbi;
-  	}
+#include "bitscan/bitscan.h"
+
+int main(){
+   bitarray bbi(100);
+   bbi.set_bit(10);
+   std::cout << bbi;
+ }
 ```   
 You will find many more examples in the *tests* folder.  
 
