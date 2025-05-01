@@ -1,6 +1,6 @@
 /**
 * @file graph.cpp
-* @brief Example of how to link to GRAPH lib.
+* @brief GRAPH basics - linking to GRAPH lib.
 * @details created 01/2025, last updated 29/04/2025
 **/
 using namespace std;
