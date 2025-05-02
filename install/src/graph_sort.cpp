@@ -1,29 +1,34 @@
 /**
 * @file graph_sort.cpp
 * @brief GRAPH sorting example - linking to GRAPH lib.
-* @details created 01/2025, last updated 29/04/2025
+* @details created 01/2025, last updated 02/05/2025
 **/
 using namespace std;
 
 #include <iostream>
 #include "BitGraph/graph/graph.h"							//header file for main types of GRAPH lib
-#include "BitGraph/graph/algorithms/graph_fast_sort.h"		//sorting 
+#include "BitGraph/graph/algorithms/graph_fast_sort.h"		//sorting algorithms
 
 
 int main() {
 
 	//small undirected graph with 10 vertices
-	ugraph ug(10);
+	ugraph ug(5);
 
 	ug.add_edge(0, 1);
 	ug.add_edge(0, 2);
-	ug.add_edge(7, 8);
+	ug.add_edge(3, 4);
 	
-
-	//creates an isomorphism with vertices sorted according to (non-decreasing) degenerate minimum degree
-	ugraph ug_sorted;
+	//A sorting object	
 	GraphFastRootSort<ugraph> gs(ug);
-	gs.reorder(gs.new_order(GraphFastRootSort<ugraph>::MIN_DEGEN, false), ug_sorted);
+
+	//A new ordering of the vertices - minimum degree first (degenerate) {1->0, 0->1, 2->2, 3->3, 4->4}	
+	//In a degenerate ordering, each vertex sorted is removed and the sorting criterion is computed for the remaining vertices
+	auto order = gs.new_order(GraphFastRootSort<ugraph>::MIN_DEGEN, false);
+	
+	//create an isomorphism of the original graph according to the new ordering
+	ugraph ug_sorted;
+	gs.reorder(order, ug_sorted);
 
 
 	//I/O

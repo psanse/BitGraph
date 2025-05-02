@@ -1,12 +1,12 @@
 /**
-* @file graph.cpp
+* @file graph_basic.cpp
 * @brief GRAPH basics - linking to GRAPH lib.
-* @details created 01/2025, last updated 29/04/2025
+* @details created 01/2025, last updated 02/05/2025
 **/
 using namespace std;
 
 #include <iostream>
-#include "BitGraph/graph/graph.h"		//the one and only header file for the GRAPH lib
+#include "BitGraph/graph/graph.h"		//header file for main types of GRAPH lib
 
 int main() {
 
