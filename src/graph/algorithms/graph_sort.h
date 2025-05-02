@@ -1,12 +1,13 @@
 //graph_sort.h: header for GraphSort class which sorts graphs by different criteria
 //date: 20/11/15
 //authors: pss
+//comments: CURRENTLY DEPRECATED (02/05/2025)
 
 #ifndef __GRAPH_SORT_H__
 #define __GRAPH_SORT_H__
 
 #include "graph/graph.h"
-#include "graph/algorithms/kcore.h"
+#include "kcore.h"
 #include "filter_graph_sort_type.h"			//Template Graph_t reduced to undirected types
 #include "utils/logger.h"
 #include "utils/common.h"

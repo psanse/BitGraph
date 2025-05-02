@@ -14,8 +14,8 @@
 #include <algorithm>
 #include <vector>
 #include <iterator>
-#include "graph/algorithms/graph_fast_sort.h"
-#include "graph/kcore.h"
+#include "graph_fast_sort.h"
+#include "kcore.h"
 #include "filter_graph_sort_type.h"			//limits template Graph_t to undirected types
 #include "utils/logger.h"
 #include "utils/common.h"					//sort functors

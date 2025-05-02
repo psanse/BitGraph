@@ -15,9 +15,9 @@
 #include <random>								
 
 #include "utils/common.h"
-#include "simple_ugraph.h"
-#include "simple_graph_w.h"							// must be after simple_ugraph include
-#include "simple_graph_ew.h"						// must be after simple_ugraph include
+#include "graph/simple_ugraph.h"
+#include "graph/simple_graph_w.h"					// must be after simple_ugraph include
+#include "graph/simple_graph_ew.h"					// must be after simple_ugraph include
 
 //aliases for graph types (see also graph.h)
 using graph = Graph<bitarray>;						//simple graph

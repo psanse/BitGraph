@@ -29,7 +29,23 @@ target_link_libraries (graph_sorting LINK_PUBLIC
 	BitGraph::bitscan
 	BitGraph::utils				)
 
-set_target_properties(graph_basics
+set_target_properties(graph_sorting
+	PROPERTIES
+	RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/bin" )
+
+
+#######################
+# target uninform random graphs
+#######################
+
+add_executable(graph_random src/graph_rand.cpp)
+
+target_link_libraries (graph_random LINK_PUBLIC 
+	BitGraph::graph
+	BitGraph::bitscan
+	BitGraph::utils				)
+
+set_target_properties(graph_random
 	PROPERTIES
 	RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/bin" )
 

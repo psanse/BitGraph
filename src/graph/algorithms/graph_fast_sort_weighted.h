@@ -8,8 +8,8 @@
 #ifndef __GRAPH_FAST_SORT_WEIGHTED_H__
 #define __GRAPH_FAST_SORT_WEIGHTED_H__
 
-#include "algorithms/graph_fast_sort.h"
-#include "algorithms/decode.h"
+#include "graph_fast_sort.h"
+#include "decode.h"
 #include "utils/common.h"						
 #include "utils/logger.h"
 #include <vector>

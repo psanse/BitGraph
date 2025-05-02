@@ -12,7 +12,7 @@
 
 #include "utils/logger.h"
 #include "utils/common.h"
-#include "algorithms/decode.h"
+#include "decode.h"
 #include <iostream>
 #include <vector>
 #include <string>

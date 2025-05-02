@@ -10,9 +10,9 @@
 #ifndef __GRAPH_FUNC_H__
 #define __GRAPH_FUNC_H__
 
-#include "simple_ugraph.h"
-#include "simple_graph_w.h"				// must be after ugraph include
-#include "simple_graph_ew.h"				// must beafter ugraph include
+#include "graph/simple_ugraph.h"
+#include "graph/simple_graph_w.h"				// must be after ugraph include
+#include "graph/simple_graph_ew.h"				// must beafter ugraph include
 #include "utils/common.h"
 #include "utils/logger.h"
 #include <algorithm>

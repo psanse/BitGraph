@@ -15,13 +15,12 @@
 #define __KCORE_H__
 
 #include "utils/logger.h"
-#include "simple_ugraph.h"
-#include "algorithms/graph_fast_sort.h"
+#include "graph/simple_ugraph.h"
+#include "graph_fast_sort.h"
 #include <vector>
 #include <iostream>
 #include <algorithm>
 #include <map> 
-
 
  //undef NDEBUG to avoid assertions
 #include <cassert>
