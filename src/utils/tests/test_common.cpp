@@ -145,6 +145,10 @@ TEST(Common_dir, path){
 	std::string path_2("c:\\kk");		//WINDOWS	
 	com::dir::append_slash(path_2);
 	EXPECT_STREQ("c:\\kk\\", path_2.c_str());
+
+	std::string path_3(".\\kk");
+	com::dir::append_slash(path_3);
+	EXPECT_STREQ(".\\kk\\", path_3.c_str());
 #endif
 
 }

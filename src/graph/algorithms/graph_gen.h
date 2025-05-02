@@ -290,8 +290,8 @@ int RandomGen<Graph_t>::create_graph_benchmark(const std::string& path, const ra
 				o << mypath.c_str() << "r" << i << "_" << j << "_" << k << ".txt";
 				f.open(o.str().c_str());
 				if (!f) {
-					cerr << "Error when opening file to write" << endl;
-					return -1;
+					LOGG_ERROR("error in file name: ", o.str(), "- RandomGen<Graph_t>::create_graph_benchmark");
+					std::exit(-1);
 				}
 				g.write_dimacs(f);
 				f.close();
