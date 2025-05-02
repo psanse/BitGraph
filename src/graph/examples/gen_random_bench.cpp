@@ -1,13 +1,12 @@
 /**
 * @file gen_random.cpp
 * @brief Generates a benchmark of simple uniform random undirected graphs
-* @created 24/05/2015
-* @tagOne 20/12/22 -- changed to a proper random generator executable
-* @last_update 27/01/25
+* @details created 24/05/2015,  last_update 02/05/2025
+* @author pss
 **/
 
 #include <iostream>
-#include <string.h>
+#include <sstream>
 #include <string>
 #include "graph/algorithms/graph_gen.h"
 #include "utils/logger.h"
@@ -29,86 +28,112 @@ struct input_t{
 
 	//I/O
 	friend ostream & operator<<(ostream& o, const input_t& i) {
-		o << "RANGE N: " << "[" << i.nLB << "," << i.nUB << "]" << endl
-		  << "RANGE P: " << "[" << i.pLB << "," << i.pUB << "]" << endl
-		  << "NREP: " << i.nRep <<endl
-		  << "INCN: " << i.incN << endl
-		  << "INCP: " << i.incP << endl;
+		o << "RANGE SIZE: " << "[" << i.nLB << "," << i.nUB << "]" << endl
+		  << "RANGE DENSITY: " << "[" << i.pLB << "," << i.pUB << "]" << endl
+		  << "NUM_REP: " << i.nRep <<endl
+		  << "INC_SIZE: " << i.incN << endl
+		  << "INC_DENSITY: " << i.incP << endl;
 
 		return o;
 	}
 
-}info;
+};
 
-int main(int argc, char** argv){
-		
-	if (argc != 9) {
-		LOG_ERROR("Enter <range of sizes> <range of densities> <num of instances> <inc size> <inc density> <output dir>"						);
-		LOG_ERROR("exiting...");
-		return -1;
+class parserRB {
+private:
+	int argc_;
+	
+public:
+	input_t info_;
+	string path_benchmark_;
+
+public:
+	parserRB(int argc,  char* argv[]) :
+		argc_{ argc },
+		info_{}
+	{
+		if (argc_ != 9) {
+			LOG_ERROR("Enter <range of sizes> <range of densities> <num of instances> <inc size> <inc density> <output dir>");
+			LOG_ERROR("exiting...");
+			std::exit(- 1);
+		}	
+
+		parse(argv);
 	}
 
-	//////////////////////////
-	//parse input params
-	stringstream sstr;
-	string str_path_benchmark;
-		
-	sstr = std::stringstream();
-	sstr << argv[1];
-	sstr >> info.nLB;
-	sstr = std::stringstream();
-	sstr << argv[2];
-	sstr >> info.nUB;
-	sstr = std::stringstream();
-	sstr << argv[3];
-	sstr >> info.pLB;
-	sstr = std::stringstream();
-	sstr << argv[4];
-	sstr >> info.pUB;
-	sstr = std::stringstream();
-	sstr << argv[5];
-	sstr >> info.nRep;
-	sstr = std::stringstream();
-	sstr << argv[6];
-	sstr >> info.incN;
-	sstr = std::stringstream();
-	sstr << argv[7];
-	sstr >> info.incP;
+	void parse(char* argv[]) {
 
-	str_path_benchmark = argv[8];
-
-	//assertions
-	assert(info.nLB > info.nUB || info.nLB < 0);
-	assert(info.pLB > info.pUB || info.pLB < 0);
-	assert(info.nRep <= 0);
-	assert(info.incN <= 0);
-	assert(info.incP <= 0);
-
-
-	//I/O
-	LOG_INFO("*******************************");
-	LOG_INFO("Generating random graph benchmark");
-	LOGG_INFO("PATH: ", str_path_benchmark);
-	sstr = std::stringstream();
-	sstr << info;
-	LOGG_INFO(sstr.str());	
-	LOG_INFO("*******************************");
+		stringstream sstr;
 	
-	/////////////////////////////	
-	//create the benchmark
-	random_attr_t rt(info.nLB, info.nUB, info.pLB, info.pUB, info.nRep, info.incN, info.incP);
+		sstr << argv[1];
+		sstr >> info_.nLB;
+		
+		sstr = std::stringstream();
+		sstr << argv[2];
+		sstr >> info_.nUB;
+		assert( (info_.nLB < info_.nUB) || info_.nLB > 0 );
 
-	/////////////////////////////////////////////////////////////////////////////
-	RandomGen<ugraph>::create_graph_benchmark(str_path_benchmark.c_str(), rt);
-	/////////////////////////////////////////////////////////////////////////////
+		sstr = std::stringstream();
+		sstr << argv[3];
+		sstr >> info_.pLB;
+
+		sstr = std::stringstream();
+		sstr << argv[4];
+		sstr >> info_.pUB;
+		assert( (info_.pLB < info_.pUB) || info_.pLB > 0);
+
+		sstr = std::stringstream();
+		sstr << argv[5];
+		sstr >> info_.nRep;
+		assert(info_.nRep > 0);
+
+		sstr = std::stringstream();
+		sstr << argv[6];
+		sstr >> info_.incN;
+		assert(info_.incN > 0);
+
+		sstr = std::stringstream();
+		sstr << argv[7];
+		sstr >> info_.incP;
+		assert(info_.incP > 0);
+
+		path_benchmark_ = argv[8];		
+	}
+
+};
+
+int main(int argc,  char* argv[]) {
+		
+	parserRB parser(argc, argv);
 
 
-	//////////////////////////////////
-	//create a single graph
-	//ugraph g;
-	//RandomGen<ugraph>::create_ugraph(g,100,.1);
-	//g.print_info();
-	//////////////////////////////////
+	//////////////
+	//generate single uniform random graph
+	cout << "*******************************" << endl;
+	cout << "Generating random graph..." << endl;
+	ugraph ug;	
+
+	///////////////////////////////////////////////
+	RandomGen<ugraph>::create_graph(ug,100,.1);
+	///////////////////////////////////////////////
+
+	ug.print_data();
+	cout << endl;
+
+	/////////////
+	//generate uniform random graph benchmark
+	cout << "*******************************" << endl;
+	cout << "Generating random graph benchmark..." << endl;	
+	cout << parser.info_;	
+	cout << "TARGET_PATH: " << parser.path_benchmark_ << endl;
+	cout << "*******************************" << endl;
+
+	//declare appropiate random data for the generator
+	random_attr_t rt(parser.info_.nLB, parser.info_.nUB, parser.info_.pLB, parser.info_.pUB, parser.info_.nRep, parser.info_.incN, parser.info_.incP);
+	
+	////////////////////////////////////////////////////////////////////////////////
+	RandomGen<ugraph>::create_graph_benchmark(parser.path_benchmark_.c_str(), rt);	
+	////////////////////////////////////////////////////////////////////////////////
 
 }
 
