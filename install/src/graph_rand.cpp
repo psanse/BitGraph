@@ -1,6 +1,7 @@
 /**
 * @file graph_rand.cpp
 * @brief GRAPH uniform random graphs example - linking to GRAPH lib.
+* @details: a target path is required in the command line for the uniform random benchmark
 * @details created 02/2025, last updated 02/05/2025
 **/
 using namespace std;
@@ -17,7 +18,12 @@ using namespace std;
 
 
 //UNIT TESTS
-int main() {
+int main(int argc, char* argv[]) {
+
+	if (argc != 2){
+		LOG_ERROR("please enter a valid output dir...exiting");
+		std::exit(-1);
+	}
 
 	//////////////
 	//generate single uniform random graph
@@ -37,16 +43,18 @@ int main() {
 	cout << "*******************************" << endl;
 	cout << "Generating random graph benchmark..." << endl;
 
-
+	
 	//declare appropiate random data for the generator
-	//range of sizes: [10, 15]
-	//range of densities: [0.5, 0.6]
-	//number of instances: 2 of each type
-	//increment size: 1
-	//increment density: 0.1
+	/**
+	 *range of sizes : [10, 15]
+	 *range of densities: [0.5, 0.6]
+	 *number of instances: 2 of each type
+	 *increment size: 1
+	 *increment density: 0.1	
+	**/
 	random_attr_t rt(10, 15, 0.5, 0.6, 2, 1, 0.1);
 
-	string output_path = "./benchmark";
+	string output_path = argv[1];
 
 	////////////////////////////////////////////////////////////////////////////////
 	RandomGen<ugraph>::create_graph_benchmark(output_path, rt);
