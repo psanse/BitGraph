@@ -32,7 +32,42 @@ using namespace std;
 
 namespace qfunc{
 	
-	//independent sets
+	//clique and independent set heuristics
+
+	/**
+	* @brief determines the size of the independent set formed by  the first consecutive vertices
+	*		 in the half-open range [@begin, @end[ of the set @lv
+	* @param g input graph
+	* @param lv: input set of vertices (C-style array)
+	* @param begin, end: pointers to first and one after the last vertex in @lv to be considered
+	* @returns: size (number of vertices) of the independent set
+	* @details: runs in O(n^2) worst-case time, where n = end - begin
+	* @TODO - builds and iset but only returns its size
+	**/
+	template<class Graph_t>
+	int find_iset(Graph_t& g, int lv[], int begin, int end) {
+
+		std::vector<int> iset;
+		iset.push_back(lv[begin]);
+
+		//main loop
+		for (auto i = begin + 1; i < end; ++i) {
+			int w = lv[i];
+
+			//determines if w can be added to the independent set
+			for (const auto& v : iset) {
+				////////////////////////////////////////////////
+				if (g.is_edge(v, w)) { return iset.size(); }
+				///////////////////////////////////////////////
+			}
+
+			//adds the vertex to the independent set
+			iset.push_back(w);
+
+		}
+
+		return iset.size();
+	}
 
 	/**
 	* @brief determines the size of the independent set that enlarges the singleton set {@v} formed by
@@ -77,43 +112,7 @@ namespace qfunc{
 		return nV;		
 	}
 
-	/**
-	* @brief determines the size of the independent set formed by  the first consecutive vertices 
-	*		 in the half-open range [@begin, @end[ of the set @lv
-	* @param g input graph
-	* @param lv: input set of vertices (C-style array)
-	* @param begin, end: pointers to first and one after the last vertex in @lv to be considered
-	* @returns: size (number of vertices) of the independent set 
-	* @details: runs in O(n^2) worst-case time, where n = end - begin
-	* @TODO - builds and iset but only returns its size
-	**/
-	template<class Graph_t>
-	int find_iset(Graph_t& g, int lv[], int begin, int end) {
-	
-		std::vector<int> iset; 
-		iset.push_back(lv[begin]);
 
-		//main loop
-		for (auto i = begin + 1; i < end; ++i) {
-			int w = lv[i];		
-
-			//determines if w can be added to the independent set
-			for (const auto& v : iset) {
-				////////////////////////////////////////////////
-				if (g.is_edge(v, w)) { return iset.size(); }
-				///////////////////////////////////////////////
-			}
-
-			//adds the vertex to the independent set
-			iset.push_back(w);
-			
-		}
-
-		return iset.size();		
-	}
-//
-//	
-//
 //	template<class Graph_t>
 //	int find_clq(Graph_t& g, vint& clq, int begin, int* lv, int end) {
 //	////////////////////////////////
