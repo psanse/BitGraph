@@ -13,6 +13,7 @@ ${CMAKE_CURRENT_SOURCE_DIR}/algorithms/graph_map.h
 ${CMAKE_CURRENT_SOURCE_DIR}/algorithms/graph_func.h
 ${CMAKE_CURRENT_SOURCE_DIR}/algorithms/graph_fast_sort.h
 ${CMAKE_CURRENT_SOURCE_DIR}/algorithms/graph_fast_sort_weighted.h
+${CMAKE_CURRENT_SOURCE_DIR}/algorithms/clique/clq_func.h
 #algorithms/graph_sort.h
 )
 

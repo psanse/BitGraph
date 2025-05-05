@@ -35,7 +35,7 @@ namespace qfunc{
 	//clique and independent set heuristics
 
 	/**
-	* @brief determines the size of the independent set formed by  the first consecutive vertices
+	* @brief Heuristic that determines the size of the independent set formed by  the first consecutive vertices
 	*		 in the half-open range [@begin, @end[ of the set @lv
 	* @param g input graph
 	* @param lv: input set of vertices (C-style array)
@@ -46,6 +46,10 @@ namespace qfunc{
 	**/
 	template<class Graph_t>
 	int find_iset(Graph_t& g, int lv[], int begin, int end) {
+
+		////////////////////////
+		assert(begin <= end);
+		///////////////////////
 
 		std::vector<int> iset;
 		iset.push_back(lv[begin]);
@@ -70,7 +74,7 @@ namespace qfunc{
 	}
 
 	/**
-	* @brief determines the size of the independent set that enlarges the singleton set {@v} formed by
+	* @brief Heuristic that determines the size of the independent set that enlarges the singleton set {@v} formed by
 	*		 the first consecutive vertices in the half-open range [@begin, @end[ of the set @lv
 	* @param g input graph
 	* @param v: input vertex that determines the singleton independent set {v} to be enlarged
@@ -112,27 +116,49 @@ namespace qfunc{
 		return nV;		
 	}
 
+	/**
+	* @brief Heuristic that enlarges the clique in @clq with vertices in the half-open range [@begin, @end[ of the set @lv.
+	*		 Vertices are taken in order from @lv and fixed to @clq if adjacent to all vertices in @clq.
+	* @param g input graph
+	* @param lv: input set of vertices (C-style array)
+	* @param begin, end: pointers to first and one after the last vertex in @lv to be considered
+	* @param clq: input clique to be enlarged (if possible)
+	* @returns: size (number of vertices) added to @clq
+	**/
+	template<class Graph_t>
+	int find_clq(Graph_t& g, std::vector<int>& clq, int lv[], int begin, int end) {
 
-//	template<class Graph_t>
-//	int find_clq(Graph_t& g, vint& clq, int begin, int* lv, int end) {
-//	////////////////////////////////
-//	//enlarges clq with vertices in lv, starting from @begin
-//	//
-//	// RETURN val:number of vertices added to clq
-//		int num_added = 0;
-//		bool clq_found;
-//		for (int i = begin; i < end; i++) {
-//			clq_found = true;
-//			for (int j = 0; j < clq.size(); j++) {
-//				if (!g.is_edge(lv[i], clq[j])) { clq_found = false; break; }
-//			}
-//			if (clq_found) {
-//				clq.push_back(lv[i]);
-//				num_added++;
-//			}
-//		}
-//		return num_added;
-//	}
+		////////////////////////
+		assert(begin <= end);
+		///////////////////////
+
+		bool clq_found = false;
+		int nV = 0;
+		
+		//main loop that iterates over all the vertices in the range
+		for (auto i = begin; i < end; ++i) {
+			clq_found = true;
+			int w = lv[i];
+			
+			//checks the vertex is adjacent to all vertices in @clq	
+			for (const auto& v : clq) {
+				if (!g.is_edge(v, w)) {
+					clq_found = false;
+					break;
+				}
+			}
+			
+			//adds the vertex to the clique if previous condition is met
+			if (clq_found) {
+				clq.push_back(lv[i]);
+				nV++;
+			}
+		}
+
+		return nV;
+	}
+
+
 //
 //	template<class Graph_t>
 //	int find_clq(Graph_t& g, vint& clq, int* quasi, int begin, int* lv, int end) {
