@@ -142,6 +142,45 @@ explicit stack_t	(int MAX_SIZE);
 #endif
 
 	};
+
+	////////////////////////
+	//
+	// struct range_t
+	//
+	// (interval of positive integers - typically a range of vertices)
+	///////////////////////
+
+	struct range_t {
+		static const int noRange = -1;			
+		int vl, vh;								//vl: low vertex/value, vh: high vertex/value
+
+		range_t(int lh = noRange, int rh = noRange) :
+			vl{ lh }, vh{ rh }
+		{}
+
+		//boolean operations
+
+		/**
+		* @brief: determines an empty range
+		* @returns: True if the range has at least one NO_RANGE value False otherwise
+		**/
+		bool is_empty() const { return (vl == noRange || vh == noRange); }
+
+		//I/O
+
+		/**
+		* @brief: streams the range in the format [@vl, @vh]
+		**/
+		std::ostream& print(std::ostream& os = std::cout) const {
+			os << "[" << vl << "," << vh << "]"; 
+			return os; 
+		}		
+	};
+
+	inline
+	bool operator == (const range_t& lhs, const range_t& rhs) {
+		return (lhs.vl == rhs.vl && rhs.vh == rhs.vh);
+	}
 	
 
 	///////////////////////
