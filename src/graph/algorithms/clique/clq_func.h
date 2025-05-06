@@ -414,7 +414,8 @@ namespace qfunc{
 		return true;
 	}
 
-
+//////////////////////////////////
+// VERY CLIQUE SPECIFIC - PLACE IT IN COPT
 //	template<class Graph_t>
 //	int quasi_clq(Graph_t& g, vint& clq, int* quasi, typename Graph_t::_bbt& bbv) {
 //		////////////////////////////////
