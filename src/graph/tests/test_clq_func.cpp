@@ -85,6 +85,39 @@ TEST_F(CliqueCommonTest, find_clique) {
 
 }
 
+TEST_F(CliqueCommonTest, is_iset) {
+
+	typename ugraph::_bbt bb{ static_cast<int>(ug.size()), { 1, 3, 4} };
+
+	/////////////////////////////////////
+	EXPECT_TRUE(qfunc::is_iset(ug, bb));
+	/////////////////////////////////////
+	
+	//empty set - not an independent set
+	bb.erase_bit();
+
+	/////////////////////////////////////
+	EXPECT_FALSE(qfunc::is_iset(ug, bb));
+	/////////////////////////////////////
+
+	///////////////////
+	//set of integer numbers
+	vint lv = { 1, 3, 4 };
+
+	/////////////////////////////////////
+	EXPECT_TRUE(qfunc::is_iset(ug, lv));
+	/////////////////////////////////////
+
+	//empty set - not an independent set
+	lv.clear();
+
+	/////////////////////////////////////
+	EXPECT_FALSE(qfunc::is_iset(ug, lv));
+	/////////////////////////////////////
+
+
+}
+
 
 //TEST(qfunc, DISABLED_basic){
 //			

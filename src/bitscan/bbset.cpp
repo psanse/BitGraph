@@ -75,8 +75,8 @@ BitSet&  erase_bit(const BitSet& lhs, const BitSet& rhs,  BitSet& res){
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
-BitSet::BitSet(int popsize, bool val) :
-	nBB_(INDEX_1TO1(popsize))
+BitSet::BitSet(int nPop, bool val) :
+	nBB_(INDEX_1TO1(nPop))
 {
 	
 	try {
@@ -90,7 +90,7 @@ BitSet::BitSet(int popsize, bool val) :
 
 	//trim last bitblock to ZERO if val = TRUE
 	if (val) {
-		vBB_.back() &= bblock::MASK_0_HIGH(popsize - WMUL(nBB_ - 1));
+		vBB_.back() &= bblock::MASK_0_HIGH(nPop - WMUL(nBB_ - 1));
 	}
 }
 

@@ -216,44 +216,67 @@ namespace qfunc{
 	//}
 	//	
 
-//	template<class Graph_t> 
-//	bool is_iset(Graph_t& g, typename Graph_t::_bbt& bb){
-//	/////////////////
-//	// TRUE if subgraph bb is and independent set
-//	//
-//	// COMMENTS: /* Not optimized for all graph types */
-//
-//		bitarray neighbor(g.number_of_vertices());
-//		if(bb.init_scan(bbo::NON_DESTRUCTIVE)==EMPTY_ELEM) return false;	//empty cliqe
-//		while(true){
-//			int v=bb.next_bit();
-//			if (v==EMPTY_ELEM) break;
-//
-//			//check neighborhood						
-//			AND(g.get_neighbors(v), bb, neighbor);
-//			if(!neighbor.is_empty())
-//					return false;
-//			 
-//		}
-//		return true;
-//	}
-//
-//	template<class Graph_t> 
-//	bool is_iset_edge_based(Graph_t& g, vint& lv){
-//	/////////////////////
-//	// determines iset by looking at edges: simple approach
-//	// with early check detection; specially suited when nodes
-//	// come as lists not bitstrings (6/10/17)
-//		int nElem = lv.size();
-//		for(int i=0; i< nElem - 1; i++)
-//			for(int j=i+1; j< nElem; j++){
-//				if(g.is_edge(lv[i], lv[j])){
-//					return false;
-//				}
-//			}
-//
-//		return true;
-//	}
+
+	/**
+	* @brief Determines if the set of vertices @bb is an independent set
+	* @param g: input graph
+	* @param bb: input set of vertices (bitset)
+	* @returns TRUE if the set is an independent set (empty sets are NOT isets)
+	* @TODO: not optimized for sparse graph types
+	**/
+	template<class Graph_t> 
+	bool is_iset(Graph_t& g, typename Graph_t::_bbt& bb){
+
+		//////////////////////////////////////////////////////
+		assert (bb.init_scan(bbo::NON_DESTRUCTIVE)!= -1);
+		//////////////////////////////////////////////////////
+
+		int v = bbo::noBit;
+		while( (v = bb.next_bit()) != bbo::noBit){ 
+		
+			//check neighborhood of v
+			const auto& bbnv = g.neighbors(v);
+			for (auto nBB = 0; nBB < bb.number_of_blocks(); ++nBB) {
+			 
+				//////////////////////////////////////////
+				if ( bb.block(nBB) & bbnv.block(nBB) ) {
+					return false;
+				}
+				/////////////////////////////////////////
+			}
+
+		}//end bitscan
+
+		//returns false if the set is empty, true otherwise
+		return (bb.is_empty())? false : true;
+		
+	}
+
+	/**
+	* @brief Determines if the set of vertices @bb is an independent set
+	* @param g: input graph
+	* @param lv: input set of vertices
+	* @returns TRUE if the set is an independent set (empty sets are NOT isets)
+	* @details: created 6/10/2017, last updated 06/05/2025
+	* @TODO: not optimized for sparse graph types
+	**/
+	template<class Graph_t> 
+	bool is_iset(Graph_t& g, std::vector<int>& lv){
+	
+		auto nElem = lv.size();
+		if (nElem == 0) return false;					////empty set is not an independent set
+
+		for (auto i = 0; i < nElem - 1; ++i) {
+			for (auto j = i + 1; j < nElem; ++j) {
+
+				if (g.is_edge(lv[i], lv[j])) {
+					return false;
+				}
+			}
+		}
+
+		return true;
+	}
 //
 //	template<class Graph_t> 
 //	bool is_iset_union(Graph_t& g, vint& lv, int v){
