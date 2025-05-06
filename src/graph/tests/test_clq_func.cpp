@@ -67,8 +67,23 @@ TEST_F(CliqueCommonTest, find_iset_consecutive_vertices) {
 }
 
 
+TEST_F(CliqueCommonTest, find_clique) {
 
+	int lv[] = { 0, 1, 2, 3, 4, 5 };
+	int posBegin = 2;
+	int posEnd = 6;
 
+	//////////////////////////////////////////////////////
+	std::vector<int> clq = { 0 };
+	int nV = qfunc::find_clq(ug, clq, lv, posBegin, posEnd);
+	//////////////////////////////////////////////////////
+
+	EXPECT_EQ(1, nV); 							//only vertex {3} is added to clq		
+
+	std::vector<int> clq_exp = { 0, 3 };		//{0, 3} is a maximal clique
+	EXPECT_EQ(clq_exp, clq);
+
+}
 
 
 //TEST(qfunc, DISABLED_basic){

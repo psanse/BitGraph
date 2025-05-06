@@ -35,17 +35,17 @@ namespace qfunc{
 	//clique and independent set heuristics
 
 	/**
-	* @brief Heuristic that determines the size of the independent set formed by  the first consecutive vertices
-	*		 in the half-open range [@begin, @end[ of the set @lv
+	* @brief Heuristic that determines the size of the maximal independent set formed by the first consecutive vertices
+	*		 in the (half-open) range [@begin, @end[ of the set @lv
 	* @param g input graph
 	* @param lv: input set of vertices (C-style array)
-	* @param begin, end: pointers to first and one after the last vertex in @lv to be considered
+	* @param begin, end: positions of first and one-after-last the last vertex in @lv to be considered
 	* @returns: size (number of vertices) of the independent set
 	* @details: runs in O(n^2) worst-case time, where n = end - begin
 	* @TODO - builds and iset but only returns its size
 	**/
 	template<class Graph_t>
-	int find_iset(Graph_t& g, int lv[], int begin, int end) {
+	int find_iset(Graph_t& g, int lv[], unsigned int begin, unsigned int end) {
 
 		////////////////////////
 		assert(begin <= end);
@@ -74,17 +74,17 @@ namespace qfunc{
 	}
 
 	/**
-	* @brief Heuristic that determines the size of the independent set that enlarges the singleton set {@v} formed by
-	*		 the first consecutive vertices in the half-open range [@begin, @end[ of the set @lv
+	* @brief Heuristic that determines the size of the maximal independent set that can enlarge the singleton set {@v}
+	*        considering the first consecutive vertices in the (half open)range [@begin, @end[ of the set @lv
 	* @param g input graph
 	* @param v: input vertex that determines the singleton independent set {v} to be enlarged
 	* @param lv: input set of vertices (C-style array)
-	* @param begin, end: pointers to first and one after the last vertex in @lv to be considered
+	* @param begin, end: positions of first and one-after-last the last vertex in @lv to be considered
 	* @returns: size of the enlarged independent set (excluding @v)
 	* @details: runs in O(n^2) worst-case time, where n = end - begin
 	**/
 	template<class Graph_t>
-	int find_iset(Graph_t& g, int v, int lv[], int begin, int end) {
+	int find_iset(Graph_t& g, int v, int lv[], unsigned int begin, unsigned int end) {
 		
 		////////////////////////
 		assert(begin <= end);
@@ -98,11 +98,11 @@ namespace qfunc{
 			//candidate vertex to enlarge the independent set
 			int w = lv[i];
 
-			/////////////////////////////////////////////////////
+			//check that w is non-adjacent to v
 			if (g.neighbors(v).is_bit(w)) {return nV;}
-			/////////////////////////////////////////////////////
+			
 
-			//iterates over the vertices in @lv already selected in the iset
+			//check that w is non-adjacent to all the previous vertices in @lv 
 			for (auto j = i - 1; j >= begin; --j) {
 
 				///////////////////////////////////////////////////////////
@@ -126,7 +126,7 @@ namespace qfunc{
 	* @returns: size (number of vertices) added to @clq
 	**/
 	template<class Graph_t>
-	int find_clq(Graph_t& g, std::vector<int>& clq, int lv[], int begin, int end) {
+	int find_clq(Graph_t& g, std::vector<int>& clq, int lv[], unsigned int begin, unsigned int end) {
 
 		////////////////////////
 		assert(begin <= end);
@@ -158,55 +158,64 @@ namespace qfunc{
 		return nV;
 	}
 
+	//////////////////////////////////
+	// VERY CLIQUE SPECIFIC - PLACE IT IN COPT
+	//// enlarges @clq with vertices in lv, starting from @begin
+	//// can detect cliques by swapping one of the vertices in @quasi
+	////
+	//// RETURN val:number of vertices added to clq (0 or 1)
+	////
+	//// COMMENTS: format issues-MUST BE! @quasi[VERTEX]:=-1 or VERTEX
 
-//
-//	template<class Graph_t>
-//	int find_clq(Graph_t& g, vint& clq, int* quasi, int begin, int* lv, int end) {
-//		////////////////////////////////
-//		// enlarges @clq with vertices in lv, starting from @begin
-//		// can detect cliques by swapping one of the vertices in @quasi
-//		//
-//		// RETURN val:number of vertices added to clq (0 or 1)
-//		//
-//		// COMMENTS: format issues-MUST BE! @quasi[VERTEX]:=-1 or VERTEX
-//		
-//		int num_added = 0, counter=0, iqv=-1;	
-//		for (int i = (end - 1); i >=begin ; i--){						//reverse direction! perhaps better for brock? (26/01/2021)
-//		//for (int i = begin; i < end; i++) {		
-//			counter = 0;
-//			for (int j = 0; j < clq.size(); j++) {
-//				if (!g.is_edge(lv[i], clq[j])) { 
-//					counter++;				
-//					if (quasi[clq[j]] == -1 || lv[i] == quasi[clq[j]] || counter >= 2) { counter = 2;  break; }
-//					else { iqv = j;  };					
-//				}
-//			}
-//			
-//			if (counter == 0) {	
-//				LOG_ERROR("warning!- improving clique with previous dolls, find_clq(...)" << lv[i]);
-//				cin.get();
-//				clq.push_back(lv[i]);
-//				num_added++;
-//				break;						//quasi info may not be valid	
-//			}else if (counter == 1) {
-//				int qswap = quasi[clq[iqv]];
-//				if (  g.is_edge(lv[i], qswap) ) {	//quasi-clique check
-//					
-//					clq.push_back(lv[i]);
-//					clq[iqv] = qswap;			//swap vertex in @clq with the new quasi vertex 					
-//					num_added++;
-//																
-//					break;						//EXIT-quasi clique info is not valid any more
-//				}
-//				else {
-//					//LOG_INFO("ENCONTRADO SWAP SIN MEJORA: "<< lv[i]);
-//				}
-//				
-//			}			
-//		}
-//		return num_added;
-//	}
-//		
+	//template<class Graph_t>
+	//int find_clq(Graph_t& g, vint& clq, int* quasi, int begin, int* lv, int end) {
+	//			
+	//	int num_added = 0, counter = 0, iqv = -1;	
+
+	//	//main loop - iterates over each vertex in the range
+	//	for (int i = (end - 1); i >= begin ; i--){						//reverse direction! perhaps better for brock? (26/01/2021)
+	//	//for (int i = begin; i < end; i++) {	
+	//	// 	
+	//		counter = 0;
+
+	//		for (auto j = 0; j < clq.size(); ++j) {
+	//			if (!g.is_edge(lv[i], clq[j])) { 
+	//				counter++;				
+	//				if (quasi[clq[j]] == -1 || lv[i] == quasi[clq[j]] || counter >= 2) { 
+	//					counter = 2;  
+	//					break; 
+	//				}
+	//				else { iqv = j;  };					
+	//			}
+	//		}
+	//		
+	//		if (counter == 0) {	
+	//			LOG_ERROR("warning!- improving clique with previous dolls, find_clq(...)" << lv[i]);
+	//			cin.get();
+	//			clq.push_back(lv[i]);
+	//			num_added++;
+	//			break;						//quasi info may not be valid	
+	//		}else if (counter == 1) {
+	//			int qswap = quasi[clq[iqv]];
+	//			if (  g.is_edge(lv[i], qswap) ) {	//quasi-clique check
+	//				
+	//				clq.push_back(lv[i]);
+	//				clq[iqv] = qswap;			//swap vertex in @clq with the new quasi vertex 					
+	//				num_added++;
+	//															
+	//				break;						//EXIT-quasi clique info is not valid any more
+	//			}
+	//			else {
+	//				//LOG_INFO("ENCONTRADO SWAP SIN MEJORA: "<< lv[i]);
+	//			}
+	//			
+	//		}			
+	//	}
+
+	//	return num_added;
+	//}
+	//	
+
 //	template<class Graph_t> 
 //	bool is_iset(Graph_t& g, typename Graph_t::_bbt& bb){
 //	/////////////////
