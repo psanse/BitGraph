@@ -75,7 +75,7 @@ TEST_F(CliqueCommonTest, find_clique) {
 
 	//////////////////////////////////////////////////////
 	std::vector<int> clq = { 0 };
-	int nV = qfunc::find_clq(ug, clq, lv, posBegin, posEnd);
+	int nV = qfunc::find_clique(ug, clq, lv, posBegin, posEnd);
 	//////////////////////////////////////////////////////
 
 	EXPECT_EQ(1, nV); 							//only vertex {3} is added to clq		
@@ -89,6 +89,9 @@ TEST_F(CliqueCommonTest, is_iset) {
 
 	typename ugraph::_bbt bb{ static_cast<int>(ug.size()), { 1, 3, 4} };
 
+	///////////////////
+	//bitset of vertices
+
 	/////////////////////////////////////
 	EXPECT_TRUE(qfunc::is_iset(ug, bb));
 	/////////////////////////////////////
@@ -101,7 +104,7 @@ TEST_F(CliqueCommonTest, is_iset) {
 	/////////////////////////////////////
 
 	///////////////////
-	//set of integer numbers
+	//collection of vertices (std::vector)
 	vint lv = { 1, 3, 4 };
 
 	/////////////////////////////////////
@@ -115,6 +118,66 @@ TEST_F(CliqueCommonTest, is_iset) {
 	EXPECT_FALSE(qfunc::is_iset(ug, lv));
 	/////////////////////////////////////
 
+	///////////////////
+	//collection of vertices + {v}
+	lv = { 2, 5 };
+	int v = 0;
+
+	////////////////////////////////////////
+	EXPECT_TRUE(qfunc::is_iset(ug, lv, v));		// {0} is non-adjacent to {2, 5}
+	///////////////////////////////////////
+	
+}
+
+TEST_F(CliqueCommonTest, is_clique) {
+
+	typename ugraph::_bbt bb{ static_cast<int>(ug.size()), { 0, 4 } };
+
+	///////////////////
+	//bitset of vertices
+
+	/////////////////////////////////////
+	EXPECT_TRUE(qfunc::is_clique(ug, bb));
+	/////////////////////////////////////
+
+	//empty set - not a clique
+	bb.erase_bit();
+
+	/////////////////////////////////////
+	EXPECT_FALSE(qfunc::is_clique(ug, bb));
+	/////////////////////////////////////
+
+	///////////////////
+	//collection of vertices (std::vector)
+	vint lv = { 0, 4 };
+
+	/////////////////////////////////////
+	EXPECT_TRUE(qfunc::is_clique(ug, lv));
+	/////////////////////////////////////
+
+	//empty set - not an independent set
+	lv.clear();
+
+	/////////////////////////////////////
+	EXPECT_FALSE(qfunc::is_clique(ug, lv));
+	/////////////////////////////////////
+
+	///////////////////
+	//collection of vertices + {v}
+	lv = { 4 };
+	int v = 0;
+
+	////////////////////////////////////////
+	EXPECT_TRUE(qfunc::is_clique(ug, lv, v));		// {0} is adjacent to {4}
+	///////////////////////////////////////
+
+	///////////////////
+	//collection of vertices (C-array)
+	int lv_CArrray [] = {0, 4};
+
+	/////////////////////////////////////
+	EXPECT_TRUE(qfunc::is_clique(ug, lv_CArrray, 2));
+	/////////////////////////////////////
 
 }
 

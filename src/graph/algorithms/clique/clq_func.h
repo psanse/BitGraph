@@ -32,6 +32,7 @@ using namespace std;
 
 namespace qfunc{
 	
+	///////////////////
 	//clique and independent set heuristics
 
 	/**
@@ -126,7 +127,7 @@ namespace qfunc{
 	* @returns: size (number of vertices) added to @clq
 	**/
 	template<class Graph_t>
-	int find_clq(Graph_t& g, std::vector<int>& clq, int lv[], unsigned int begin, unsigned int end) {
+	int find_clique(Graph_t& g, std::vector<int>& clq, int lv[], unsigned int begin, unsigned int end) {
 
 		////////////////////////
 		assert(begin <= end);
@@ -216,6 +217,8 @@ namespace qfunc{
 	//}
 	//	
 
+	/////////////////
+	//boolean operations
 
 	/**
 	* @brief Determines if the set of vertices @bb is an independent set
@@ -277,163 +280,141 @@ namespace qfunc{
 
 		return true;
 	}
-//
-//	template<class Graph_t> 
-//	bool is_iset_union(Graph_t& g, vint& lv, int v){
-//	/////////////////////
-//	// Assuming the nodes in lv form an iset, returns TRUE if
-//	// if the set lv + {v} is also an iset 
-//	// date: (5/2/18)
-//	// Note: an empty lv set always returns TRUE
-//
-//		if(lv.empty()) return true;
-//
-//		for(int i=0; i<lv.size(); i++){
-//			if(g.is_edge(lv[i], v)){
-//				return false;
-//			}
-//		}
-//
-//		return true;
-//	}
-//
-//	template<class Graph_t> 
-//	bool is_clique(Graph_t& g, typename Graph_t::_bbt& bb){
-//	/////////////////
-//	// TRUE if subgraph bb is a clique
-//	//
-//	// COMMENTS: /* Not optimized for all graph types / not valid for sparse graphs */
-//	//
-//	// /* TODO-CHECK: SIZE OF BB=1
-//
-//		bitarray neighbor(g.number_of_vertices());
-//		if(bb.init_scan(bbo::NON_DESTRUCTIVE)==EMPTY_ELEM) return false;	//empty cliqe
-//		while(true){
-//			int v=bb.next_bit();
-//			if (v==EMPTY_ELEM) break;
-//
-//			//check neighborhood						
-//			AND(g.get_neighbors(v), bb, neighbor);
-//			neighbor.set_bit(v);
-//			if(!(bb==neighbor)) 
-//					return false; 
-//		}
-//		return true;
-//	}
-//	
-//	//specialization
-//	inline bool is_clique(sparse_ugraph& g, vint& lv) {
-//		struct is_clique_not_implemented_with_sparse_ugraph {};
-//		return false;
-//	}
-//
-//	template<class Graph_t> 
-//	bool is_clique(Graph_t& g, vint& lv){
-//	/////////////////
-//	// TRUE if subgraph lv is a clique
-//	// 
-//	// COMMENTS:
-//	//  I. implemented with unrolling for early condition detection
-//	//  II. the bad part is the initial construction of a bitstring from lv
-//	//	/* Not optimized for all graph types */
-//
-//		if(lv.empty()) return false;
-//		else if(lv.size()==1) return true;
-//		typename Graph_t::_bbt ref(lv, g.number_of_vertices());
-//	
-//	/*	ref.print();
-//		LOG_INFO(".........");*/
-//
-//		for(vint::iterator it=lv.begin(); it!=lv.end(); it++){
-//			int v=*it;
-//			typename Graph_t::_bbt& neigh=g.get_neighbors(v);			
-//			ref.erase_bit(v);												//to compare only neighbors of v
-//			
-//			//check neighborhood-unroll
-//			for(int nBB=0; nBB<neigh.number_of_bitblocks(); nBB++){
-//				BITBOARD aux=ref.get_bitboard(nBB) & neigh.get_bitboard(nBB);
-//				if (aux != ref.get_bitboard(nBB)) {
-//#ifdef	print_clq_func_logs
-//					LOG_INFO("v:" << v << "not in clique" << "-qfunc::is_clique()");
-//#endif
-//					return false;
-//				}
-//			}
-//
-//			ref.set_bit(v);													//resets context
-//
-//			//without unrolling
-//			/*AND(g.get_neighbors(v), bb, neighbor);
-//			neighbor.set_bit(v);
-//			if(!(bb==neighbor)) 
-//			return false; */
-//
-//		}
-//		return true;
-//	}
-//		
-//	template<class Graph_t> 
-//	bool is_clique_edge_based(Graph_t& g, vint& lv){
-//	/////////////////////
-//	// determines clique by looking at edges: simple approach
-//	// with early check detection; specially suited when nodes
-//	// come as lists not bitstrings (6/10/17)
-//	//
-//	// COMMENTS: An empty clique is a clique
-//		
-//		int nElem = lv.size();
-//		for(int i=0; i< nElem -1; i++)
-//			for(int j=i+1; j< nElem; j++){
-//				if(!g.is_edge(lv[i], lv[j])){
-//					return false;
-//				}
-//			}
-//
-//		return true;
-//	}
-//	
-//	template<class Graph_t> 
-//	bool is_clique(Graph_t& g, int* lv, int size){
-//	/////////////////
-//	// TRUE if subgraph bb is a clique (C-ARRAY INTERFACE)
-//	// 
-//	// COMMENTS:
-//	//  I. implemented with unrolling for early condition detection
-//	//  II. the bad part is the initial construction of a bitstring from lv
-//	//	/* Not optimized for all graph types */
-//
-//		if(size<=0) return false;
-//		else if(size==1) return true;
-//		typename Graph_t::_bbt ref(g.number_of_vertices());
-//		for(int i=0; i<size; i++){
-//			ref.set_bit(lv[i]);
-//		}
-//	
-//		for(int i=0; i<size; i++){
-//			int v=lv[i];
-//			typename Graph_t::_bbt& neigh=g.get_neighbors(v);			
-//			ref.erase_bit(v);												//to compare only neighbors of v
-//			
-//			//check neighborhood-unroll
-//			for(int nBB=0; nBB<neigh.number_of_bitblocks(); nBB++){
-//				BITBOARD aux=ref.get_bitboard(nBB)& neigh.get_bitboard(nBB);
-//				if(aux!=ref.get_bitboard(nBB))
-//					return false;
-//			}
-//
-//			ref.set_bit(v);													//resets context
-//
-//			//without unrolling
-//			/*AND(g.get_neighbors(v), bb, neighbor);
-//			neighbor.set_bit(v);
-//			if(!(bb==neighbor)) 
-//			return false; */
-//
-//		}
-//
-//		return true;
-//	}
-//
+		
+	/**
+	* @brief Determines if {v} is not adjacent to any vertex in @lv. 
+	* @param g: input graph
+	* @param lv: input set of vertices
+	* @param v: input vertex
+	* @returns TRUE if the set {lv + v} is an independent set or if {lv} is empty.
+	* @details: created 5/02/2018, last updated 06/05/2025
+	* @comment: if {lv} is an iset, then {lv + v} is also an iset
+	**/
+	template<class Graph_t> 
+	bool is_iset(Graph_t& g, std::vector<int>& lv, int v){
+	
+		if(lv.empty()) return true;
+
+		for (const auto& w : lv) {
+			if (g.is_edge(v, w)) {
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	/**
+	* @brief Determines if the set of vertices @bb forms a clique
+	* @param g: input graph
+	* @param bb: input set of vertices (bitset)
+	* @returns TRUE if the set is a clique (empty sets are NOT cliques)
+	* @TODO: not optimized for sparse graph types
+	**/
+	template<class Graph_t>
+	bool is_clique(Graph_t& g, typename Graph_t::_bbt& bb) {
+
+		//////////////////////////////////////////////////////
+		assert(bb.init_scan(bbo::NON_DESTRUCTIVE) != -1);
+		//////////////////////////////////////////////////////
+
+		int v = bbo::noBit;
+		while ((v = bb.next_bit()) != bbo::noBit) {
+
+			//check neighborhood of v
+			const auto& bbnv = g.neighbors(v);
+			for (auto nBB = 0; nBB < bb.number_of_blocks(); ++nBB) {
+
+				//////////////////////////////////////////
+				if (!(bb.block(nBB) & bbnv.block(nBB))) {
+					return false;
+				}
+				/////////////////////////////////////////
+			}
+
+		}//end bitscan
+
+		//returns false if the set is empty, true otherwise
+		return (bb.is_empty()) ? false : true;
+
+	}
+
+
+	/**
+	* @brief Determines if the set of vertices @lv is a clique
+	* @param g: input graph
+	* @param lv: input set of vertices
+	* @returns TRUE if the set is a clique (empty sets are NOT cliques)
+	* @details: created 6/10/2017, last updated 06/05/2025
+	* @TODO: not optimized for sparse graph types
+	**/
+	template<class Graph_t>
+	bool is_clique(Graph_t& g, std::vector<int>& lv) {
+
+		auto nElem = lv.size();
+		if (nElem == 0) return false;					//an empty set is not a clique
+
+		for (auto i = 0; i < nElem - 1; ++i) {
+			for (auto j = i + 1; j < nElem; ++j) {
+
+				if (!g.is_edge(lv[i], lv[j])) {
+					return false;
+				}
+			}
+		}
+
+		return true;
+	}
+
+	/**
+	* @brief Determines if the set of vertices @lv is a clique
+	* @param g: input graph
+	* @param lv: input set of vertices
+	* @returns TRUE if the set is a clique (empty sets are NOT cliques)
+	* @details: created 6/10/2017, last updated 06/05/2025
+	* @TODO: not optimized for sparse graph types
+	**/
+	template<class Graph_t>
+	bool is_clique(Graph_t& g, int lv[], std::size_t size) {
+				
+		if (size == 0) return false;					//an empty set is not a clique
+
+		for (auto i = 0; i < size - 1; ++i) {
+			for (auto j = i + 1; j < size; ++j) {
+
+				if (!g.is_edge(lv[i], lv[j])) {
+					return false;
+				}
+			}
+		}
+
+		return true;
+	}
+
+	/**
+	* @brief Determines if {v} is adjacent to any vertex in @lv.
+	* @param g: input graph
+	* @param lv: input set of vertices
+	* @param v: input vertex
+	* @returns TRUE if the set {lv + v} is an independent set or if {lv} is empty.
+	* @details: created 5/02/2018, last updated 06/05/2025
+	* @comment: if {lv} is a clique, then {lv + v} is also a clique
+	**/
+	template<class Graph_t>
+	bool is_clique(Graph_t& g, std::vector<int>& lv, int v) {
+
+		if (lv.empty()) return true;
+
+		for (const auto& w : lv) {
+			if (!g.is_edge(v, w)) {
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+
 //	template<class Graph_t>
 //	int quasi_clq(Graph_t& g, vint& clq, int* quasi, typename Graph_t::_bbt& bbv) {
 //		////////////////////////////////
@@ -491,23 +472,39 @@ namespace qfunc{
 //		return num_added;
 //	}
 //
-//	template<class Graph_t>
-//	int greedy_clique_LB (const Graph_t& g,  typename Graph_t::_bbt& bbsg){
-//	//////////////////////
-//	// first neighbor node at each iteration, starting from {1}		/* TO TEST, but looks ok */
-//	// 
-//		int lb=0;
-//		typename Graph_t::_bbt bb(bbsg);
-//		bb.init_scan(bbo::DESTRUCTIVE);
-//		while(true){
-//			int v=bb.next_bit_del();
-//			if (v==EMPTY_ELEM) break;
-//			lb++;
-//			bb&=g.get_neighbors(v);		
-//		}
-//		return lb;
-//	}
-//
+ 
+	//////////////////////
+	//maximum clique lower bounds
+	 
+	/**
+	* @brief Computes a lower bound lb for the maximum clique in the graph induced by @bbsg, i.e.,lb <= w(G[@bbsg]). 
+	*	     The procedure takes the vertices of the set @bbsg in order to enlarge an initial (empty) clique 
+	*		 whenever possible. Note that the first vertex in @bbsg	 is always fixed in the clique.
+	* @param g: input graph
+	* @param bbsg: input set of vertices (bitset)
+	* @returns an MCP lower bound
+	* @comments: alternative implementation to previous find_clique(...) - suboptimal worst-case complexity
+	**/
+	template<class Graph_t>
+	int lb_MCP (const Graph_t& g, const typename Graph_t::_bbt& bbsg){
+	
+		int lb = 0;
+		typename Graph_t::_bbt bb(bbsg);
+
+		//main loop - destructive scan of bb
+		bb.init_scan(bbo::DESTRUCTIVE);
+		int v = bbo::noBit;
+		while( (v = bb.next_bit_del()) != bbo::noBit ){
+			
+			//v fixed in the clique
+			lb++;
+
+			//removes non-adjacent vertices to v from bb - TODO optimize by starting from v
+			bb &= g.neighbors(v);		
+		}
+		return lb;
+	}
+
 //	template<class Graph_t>
 //	int greedy_clique_LB (const Graph_t& g,  typename Graph_t::_bbt& bbsg, vint& clq,  bool reverse=false){
 //	//////////////////////
