@@ -9,24 +9,11 @@
 
 #include <iostream>
 #include <algorithm>
-//#include <numeric>							/* accumulate */
-
 #include "utils/logger.h"
 #include "utils/common.h"
-//#include "../../copt_config_logs.h"
-//#include "../clique_types.h"
-
 
 //#undef NDEBUG to enable run-time assertions
 #include <cassert>		
-
-
-//////////////////
-////switches
-//#define my_assert_qfunc							//(OFF in Release mode!)
-////
-//////////////////
-
 
 using namespace std;
 
@@ -339,7 +326,6 @@ namespace qfunc{
 
 	}
 
-
 	/**
 	* @brief Determines if the set of vertices @lv is a clique
 	* @param g: input graph
@@ -484,10 +470,10 @@ namespace qfunc{
 	* @param g: input graph
 	* @param bbsg: input set of vertices (bitset)
 	* @returns an MCP lower bound
-	* @comments: alternative implementation to previous find_clique(...) - suboptimal worst-case complexity
+	* @comments: alternative implementation to previous find_clique(...) - the actual clique is not stored
 	**/
 	template<class Graph_t>
-	int lb_MCP (const Graph_t& g, const typename Graph_t::_bbt& bbsg){
+	int lb_subgraph_mcp (const Graph_t& g, const typename Graph_t::_bbt& bbsg){
 	
 		int lb = 0;
 		typename Graph_t::_bbt bb(bbsg);
