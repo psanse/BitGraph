@@ -497,6 +497,16 @@ namespace qfunc{
 	//
 	// RETURNS set of nodes in clq
 
+	/**
+	* @brief Clique heuristic that builds a clique with the vertices in @bbsg.
+	*		 Vertices are taken in order from @bbsg and fixed to @clq if possible.
+	* @param g input graph
+	* @param clq: output clique
+	* @param bbsg: (bit)set of vertices
+	* @param template Reverse: TRUE vertices are taken from bbsg in reverse order, FALSE from first to last
+	* @returns: number of vertices in clq
+	* @TODO: possibly return the clique
+	**/
 	template<class Graph_t, bool Reverse = false>
 	int find_clique(const Graph_t& g, std::vector<int>& clq, typename Graph_t::_bbt& bbsg){
 
@@ -513,7 +523,7 @@ namespace qfunc{
 		int v = bbo::noBit;
 		while ( true) {
 
-			if constexpr (Reverse) { v = bb.previous_bit(); }
+			if constexpr (Reverse) { v = bb.prev_bit(); }
 			else { v = bb.next_bit(); }
 
 			if (v == bbo::noBit) break;

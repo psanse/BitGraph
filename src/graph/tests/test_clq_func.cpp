@@ -17,8 +17,6 @@
 
 using namespace std;
 
-
-
 class CliqueCommonTest : public ::testing::Test {
 protected:
 	void SetUp() override {
@@ -82,6 +80,33 @@ TEST_F(CliqueCommonTest, find_clique) {
 
 	std::vector<int> clq_exp = { 0, 3 };		//{0, 3} is a maximal clique
 	EXPECT_EQ(clq_exp, clq);
+
+}
+
+TEST_F(CliqueCommonTest, find_clique_2) {
+
+	typename ugraph::_bbt bb{ (int)ug.size(), {2, 3, 4, 5}};
+	std::vector<int> clq;
+
+
+	//////////////////////////////////////////////////////
+	int nV = qfunc::find_clique<decltype(ug), false >(ug, clq, bb);				//false: first-to-last order scanning of bb
+	//////////////////////////////////////////////////////
+
+	EXPECT_EQ(2, nV); 							//{2, 5} is the maximal clique
+
+	std::vector<int> clq_exp = { 2, 5 };		
+	EXPECT_EQ(clq_exp, clq);
+
+	//empty set case
+	bb.erase_bit();
+
+	//////////////////////////////////////////////////////
+	nV = qfunc::find_clique(ug, clq, bb);
+	//////////////////////////////////////////////////////
+
+	EXPECT_EQ(0, nV);
+	EXPECT_TRUE(clq.empty());
 
 }
 
