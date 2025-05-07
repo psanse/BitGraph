@@ -503,14 +503,13 @@ namespace qfunc{
 	* @param g input graph
 	* @param clq: output clique
 	* @param bbsg: (bit)set of vertices
-	* @param template Reverse: TRUE vertices are taken from bbsg in reverse order, FALSE from first to last
+	* @param template Reverse: TRUE vertices are taken from bbsg from last to first, FALSE from first to last
 	* @returns: number of vertices in clq
 	* @TODO: possibly return the clique
 	**/
 	template<class Graph_t, bool Reverse = false>
 	int find_clique(const Graph_t& g, std::vector<int>& clq, typename Graph_t::_bbt& bbsg){
-
-		int lb = 0;
+			
 		typename Graph_t::_bbt bb(bbsg);
 		clq.clear();
 
@@ -518,88 +517,104 @@ namespace qfunc{
 		if constexpr (Reverse) {
 			bb.init_scan(bbo::NON_DESTRUCTIVE_REVERSE);
 		}else { bb.init_scan(bbo::NON_DESTRUCTIVE); }
-
-		//bb.init_scan(bbo::DESTRUCTIVE);
+				
 		int v = bbo::noBit;
 		while ( true) {
 
 			if constexpr (Reverse) { v = bb.prev_bit(); }
 			else { v = bb.next_bit(); }
 
+			/////////////////////////////
 			if (v == bbo::noBit) break;
+			///////////////////////////////
 
 			//v fixed in the clique
-			lb++;
+			clq.push_back(v);
 
 			//removes non-adjacent vertices to v from bb - TODO optimize by starting from v
-			bb &= g.neighbors(v);
-
-			//add the vertex to the clique
-			clq.push_back(v);
+			bb &= g.neighbors(v);						
 		}
-
-		return lb;
+		
+		return clq.size();
 	}
-//
-//	template<class Graph_t>
-//	int greedy_clique_LB_max_deg(const Graph_t& g, typename Graph_t::_bbt& bbsg, vint& clq, bool reverse=false) {
-//		//////////////////////
-//		// At each iteration takes the item with larger neighborhood
-//		//
-//		// RETURNS set of nodes in clq or O if bbsg is empty
-//		//
-//		// date@Paris_13_/10_/19
-//		// TODO@OPTIMIZE- Gets stuck in practice for some graphs!!
-//
-//		const int N = g.number_of_vertices();
-//		int lb = 0;
-//		typename Graph_t::_bbt bb1(bbsg);
-//		typename Graph_t::_bbt bb2(bb1);
-//		clq.clear();
-//
-//	
-//		int pcmax = 0, pc, vmax, v;
-//		do {
-//			//finds the best guy in the current neighborhood
-//			pcmax = 0;
-//			vmax = EMPTY_ELEM;
-//			
-//			if (reverse) {	bb2.init_scan(bbo::NON_DESTRUCTIVE_REVERSE);}
-//			else {	bb2.init_scan(bbo::NON_DESTRUCTIVE);}
-//			while (true) {
-//				if (reverse) {	v = bb2.previous_bit();	}
-//				else {	v = bb2.next_bit();	}
-//
-//				if (v == EMPTY_ELEM) break;							
-//				pc = 0;
-//				const typename Graph_t::_bbt& bbn = g.get_neighbors(v);
-//				for (int nBB = 0; nBB <= WDIV(N); nBB++) {
-//					pc += BitBoard::popc64(bb2.get_bitboard(nBB) & bbn.get_bitboard(nBB));
-//				}
-//				
-//				if (pcmax < pc) {
-//					pcmax = pc;
-//					vmax = v;
-//				}				
-//			}
-//			
-//			if (pcmax > 0) {
-//				clq.push_back(vmax);
-//				bb1 &= g.get_neighbors(vmax);
-//				bb2 = bb1;
-//				lb++;
-//			}
-//			else {							 /* empty neighborhood, add first vertex in the set to the clq */
-//				int w = bb2.lsbn64();
-//				if (w != EMPTY_ELEM) {
-//					clq.push_back(w);
-//					lb++;
-//				}
-//				break;
-//			}
-//		} while (true);
-//		return lb;
-//	}
+
+	/**
+	* @brief Clique heuristic that builds a clique with the vertices in @bbsg.
+	*		 Each time the vertex with maximum degree that can enlarge the clique is selected
+	* @param g input graph
+	* @param clq: output clique
+	* @param bbsg: (bit)set of vertices
+	* @param template Reverse: TRUE vertices are taken from bbsg from last to first, FALSE from first to last
+	* @returns: number of vertices in clq
+	* @details: created in 13/10/2019 (Paris), optimized in 06/05/2025
+	* @TODO: possibly return the clique
+	**/
+	template<class Graph_t, bool Reverse = false>
+	int find_clique_max_deg(const Graph_t& g, std::vector<int>& clq, const typename Graph_t::_bbt& bbsg) {
+
+		typename Graph_t::_bbt bbsgC{ bbsg };
+		clq.clear();
+				
+		int pcmax, pc;
+		int vmax, v;
+		do {
+
+			/////////////////
+			//finds the vertex with max deg in the current neighborhood
+			pcmax = 0;
+			
+			if constexpr  (Reverse) { bbsgC.init_scan(bbo::NON_DESTRUCTIVE_REVERSE); }
+			else { bbsgC.init_scan(bbo::NON_DESTRUCTIVE); }
+			while (true) {
+				if constexpr (Reverse) { v = bbsgC.previous_bit(); }
+				else { v = bbsgC.next_bit(); }
+
+				////////////////////////////
+				if (v == bbo::noBit) break;
+				////////////////////////////
+
+				pc = 0;
+				const typename Graph_t::_bbt& bbn = g.neighbors(v);
+				for (auto nBB = 0; nBB < g.number_of_blocks(); ++nBB) {
+					pc += bblock::popc64(bbsgC.block(nBB) & bbn.block(nBB));
+				}
+
+				//store vertex if more neighbors
+				if (pcmax < pc) {
+					pcmax = pc;
+					vmax = v;
+				}
+			}
+
+			////////////////////////
+			//actions depending on pcmax
+			if (pcmax > 0) {
+
+				//add vmax to the clique 
+				clq.push_back(vmax);
+
+				//removes non-adjacent vertices to vmax from bbsgC
+				bbsgC &= g.neighbors(vmax);					
+			}
+			else {
+
+				////////////////////////
+				assert(pcmax == 0);
+				////////////////////////
+
+				// pcmax == 0, empty neighborhood, bbsg is an iset
+				// add first (could be any) vertex from bbsg to the clq  -  loop ends
+				int w = bbsgC.lsb();
+
+				if (w != bbo::noBit) { clq.push_back(w);}				
+			}
+			
+			//if pcmax ==0 at least one vertex can enlarge clq, 
+			//so continue iterating, else STOP
+		} while (pcmax > 0);	
+
+		return clq.size();
+	}
 //
 //	template<class Graph_t>
 //	int greedy_clique_all_nodes_LB(const Graph_t& g, typename Graph_t::_bbt& bbsg, vint& clq) {

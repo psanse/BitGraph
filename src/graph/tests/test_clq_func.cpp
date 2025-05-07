@@ -206,6 +206,31 @@ TEST_F(CliqueCommonTest, is_clique) {
 
 }
 
+TEST(Clique, find_clique_max_deg) {
+
+	const int NV = 6;
+
+	ugraph ug(NV);
+	ug.add_edge(0, 1);
+	ug.add_edge(0, 3);
+	ug.add_edge(0, 4);	
+	ug.add_edge(2, 5);	
+	ug.add_edge(3, 4);
+
+	std::vector<int> clq;
+	typename ugraph::_bbt bbsg{ static_cast<int>(ug.size()), { 0, 1, 2, 3, 4, 5} };
+
+	/////////////////////////////////////////////////////////
+	int nV = qfunc::find_clique_max_deg(ug, clq, bbsg);
+	/////////////////////////////////////////////////////////
+
+	EXPECT_EQ(3, nV);		//{0, 3, 4} is the maximum clique
+
+	std::vector<int> clq_exp = { 0, 3, 4};
+	EXPECT_EQ(clq_exp, clq);
+
+}
+
 
 //TEST(qfunc, DISABLED_basic){
 //			
