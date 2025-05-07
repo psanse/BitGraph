@@ -473,7 +473,7 @@ namespace qfunc{
 	* @comments: alternative implementation to previous find_clique(...) - the actual clique is not stored
 	**/
 	template<class Graph_t>
-	int lb_subgraph_mcp (const Graph_t& g, const typename Graph_t::_bbt& bbsg){
+	int lb_clique (const Graph_t& g, const typename Graph_t::_bbt& bbsg){
 	
 		int lb = 0;
 		typename Graph_t::_bbt bb(bbsg);
@@ -492,31 +492,62 @@ namespace qfunc{
 		return lb;
 	}
 
-//	template<class Graph_t>
-//	int greedy_clique_LB (const Graph_t& g,  typename Graph_t::_bbt& bbsg, vint& clq,  bool reverse=false){
-//	//////////////////////
-//	// first neighbor node at each iteration, starting from {1}		/* TO TEST, but looks ok */
-//	//
-//	// RETURNS set of nodes in clq
-//
-//
-//		int lb = 0, v = EMPTY_ELEM;
-//		typename Graph_t::_bbt bb(bbsg);
-//		clq.clear();
-//
-//		if (reverse) { bb.init_scan(bbo::NON_DESTRUCTIVE_REVERSE); }
-//		else { bb.init_scan(bbo::NON_DESTRUCTIVE); }
-//		while(true){
-//			if (reverse) { v = bb.previous_bit(); }
-//			else { v = bb.next_bit(); }	
-//
-//			if (v==EMPTY_ELEM) break;
-//			lb++;
-//			bb&=g.get_neighbors(v);	
-//			clq.push_back(v);
-//		}
-//		return lb;
-//	}
+	//////////////////////
+	// first neighbor node at each iteration, starting from {1}		/* TO TEST, but looks ok */
+	//
+	// RETURNS set of nodes in clq
+
+	template<class Graph_t, bool Reverse = false>
+	int lb_clique(const Graph_t& g,  typename Graph_t::_bbt& bbsg, vint& clq){
+
+
+		int lb = 0;
+		typename Graph_t::_bbt bb(bbsg);
+		clq.clear();
+
+		//main loop - destructive scan of bb
+		if constexpr (Reverse) {
+			bb.init_scan(bbo::NON_DESTRUCTIVE_REVERSE);
+		}else { bb.init_scan(bbo::NON_DESTRUCTIVE); }
+
+		//bb.init_scan(bbo::DESTRUCTIVE);
+		int v = bbo::noBit;
+		while ( true) {
+
+			if constexpr (Reverse) { v = bb.previous_bit(); }
+			else { v = bb.next_bit(); }
+
+			if (v == bbo::noBit) break;
+
+			//v fixed in the clique
+			lb++;
+
+			//removes non-adjacent vertices to v from bb - TODO optimize by starting from v
+			bb &= g.neighbors(v);
+
+			//add the vertex to the clique
+			clq.push_back(v);
+		}
+		return lb;
+
+
+	/*	int lb = 0, v = EMPTY_ELEM;
+		typename Graph_t::_bbt bb(bbsg);
+		clq.clear();
+
+		if (reverse) { bb.init_scan(bbo::NON_DESTRUCTIVE_REVERSE); }
+		else { bb.init_scan(bbo::NON_DESTRUCTIVE); }
+		while(true){
+			if (reverse) { v = bb.previous_bit(); }
+			else { v = bb.next_bit(); }	
+
+			if (v==EMPTY_ELEM) break;
+			lb++;
+			bb&=g.get_neighbors(v);	
+			clq.push_back(v);
+		}
+		return lb;*/
+	}
 //
 //	template<class Graph_t>
 //	int greedy_clique_LB_max_deg(const Graph_t& g, typename Graph_t::_bbt& bbsg, vint& clq, bool reverse=false) {
