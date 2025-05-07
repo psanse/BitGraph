@@ -498,8 +498,7 @@ namespace qfunc{
 	// RETURNS set of nodes in clq
 
 	template<class Graph_t, bool Reverse = false>
-	int lb_clique(const Graph_t& g,  typename Graph_t::_bbt& bbsg, vint& clq){
-
+	int find_clique(const Graph_t& g, std::vector<int>& clq, typename Graph_t::_bbt& bbsg){
 
 		int lb = 0;
 		typename Graph_t::_bbt bb(bbsg);
@@ -528,25 +527,8 @@ namespace qfunc{
 			//add the vertex to the clique
 			clq.push_back(v);
 		}
+
 		return lb;
-
-
-	/*	int lb = 0, v = EMPTY_ELEM;
-		typename Graph_t::_bbt bb(bbsg);
-		clq.clear();
-
-		if (reverse) { bb.init_scan(bbo::NON_DESTRUCTIVE_REVERSE); }
-		else { bb.init_scan(bbo::NON_DESTRUCTIVE); }
-		while(true){
-			if (reverse) { v = bb.previous_bit(); }
-			else { v = bb.next_bit(); }	
-
-			if (v==EMPTY_ELEM) break;
-			lb++;
-			bb&=g.get_neighbors(v);	
-			clq.push_back(v);
-		}
-		return lb;*/
 	}
 //
 //	template<class Graph_t>
