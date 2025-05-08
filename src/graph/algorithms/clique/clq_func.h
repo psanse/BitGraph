@@ -616,43 +616,64 @@ namespace qfunc{
 		return clq.size();
 	}
 
-//	template<class Graph_t>
-//	int greedy_clique_all_nodes_LB(const Graph_t& g, typename Graph_t::_bbt& bbsg, vint& clq) {
-//		//////////////////////
-//		// first neighbor node at each iteration, starting from {1}		/* TO TEST, but looks ok */
-//		//
-//		// RETURNS set of nodes in clq
-//		//
-//		///* TODO-include nb  of iterations as as parameter */
-//
-//		const int N = g.number_of_vertices();
-//		int lb = 0;
-//		int lb_max = 0;
-//		vint clq_max;
-//		typename Graph_t::_bbt bb(N);
-//		for (int v = 0; v < N; v++) {
-//			lb_max = 0;
-//			clq_max.clear();
-//			bb = bbsg;
-//			bb &= g.get_neighbors(v);
-//			clq_max.push_back(v);
-//			bb.init_scan(bbo::DESTRUCTIVE);
-//			while (true) {
-//				int v = bb.next_bit_del();
-//				if (v == EMPTY_ELEM) break;
-//				lb_max++;
-//				bb &= g.get_neighbors(v);
-//				clq_max.push_back(v);
-//			}
-//			if (lb_max > lb) {
-//				lb = lb_max;
-//				clq = clq_max;
-//			}
-//		}
-//		return lb;
-//	}
-//
-//
+	/**
+	* @brief: Clique heuristic that computes a clique from a pool of cliques in G[@bbsg].
+	*		  Specifically, the pool are all the |@bbsg| cliques formed with a first vertex from @bbsg 
+	*		  and enlarging them with the remaining vertices in order. 
+	*		  The procedure chooses the LARGEST clique  from the pool.
+	* @param g input graph
+	* @param clq: output clique
+	* @param bbsg: (bit)set of vertices
+	* @returns: number of vertices in clq
+	* @details: imported from copt repo, optimized in 08/05/2025
+	* @TODO: possibly return the clique
+	**/
+	template<class Graph_t>
+	int find_clique_in_pool(const Graph_t& g, std::vector<int>& clq, typename Graph_t::_bbt& bbsg) {
+					
+		typename Graph_t::_bbt bb(g.size());
+		clq.clear();
+
+		//main loop - seed clique with each vertex in bbsg
+		vint clq_curr;
+		for (int v = 0; v < g.size(); ++v) {			
+			
+			clq_curr.clear();
+
+			//fix vertex in the current clique
+			clq_curr.push_back(v);
+
+			////////////
+			//determine clique with the first consecutive vertices in the neighboorhood of v
+
+			//initialize bb with the neighborhood of v in bbsg in [v, end)
+			AND<true>(v, g.size() - 1, g.neighbors(v), bbsg, bb);
+					
+			//main loop
+			int w = bbo::noBit;
+			bb.init_scan(bbo::DESTRUCTIVE);
+			while ( (w = bb.next_bit_del()) != bbo::noBit ) {
+								
+				clq_curr.push_back(w);
+
+				//optimization of bb &= g.get_neighbors(w);	
+				for (auto nBB = WDIV(w); nBB < g.number_of_blocks(); ++nBB) {
+					bb.block(nBB) &= g.neighbors(v).block(nBB);
+				}
+				
+			}
+			///////////
+
+			//I/O
+			//com::stl::print_collection(clq_curr, std::cout, true);
+
+			//update clique if smaller than current clique
+			if (clq.size() < clq_curr.size()) { clq = clq_curr; }
+		}
+
+		return clq.size();	
+	}
+
 //	template<class Graph_t>
 //	int greedy_consec_clique_LB (const Graph_t& g,  typename Graph_t::_bbt& bbsg){
 //	//////////////////////
@@ -684,7 +705,7 @@ namespace qfunc{
 //		bbsg.set_bit(lv.front());
 //		return lb;
 //	}
-//
+
 //	template<class Graph_t>
 //	int greedy_consec_clique_LB (const Graph_t& g, vint& clq){
 //	//////////////////////
@@ -747,7 +768,8 @@ namespace qfunc{
 //		bbsg.set_bit(clq.front());
 //		return lb;
 //	}
-//	
+
+
 //	template<class Graph_t>
 //	inline
 //		void incUB(const Graph_t& g, int ub[], size_t size) {

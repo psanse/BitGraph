@@ -1546,10 +1546,6 @@ bool operator==	(const BitSet& lhs, const BitSet& rhs){
 				(lhs.vBB_ == rhs.vBB_) 			);
 };
 
-
-
-
-
 BitSet& BitSet::erase_bit (const BitSet& bbn){
 
 	for (auto i = 0; i < nBB_; ++i) {
