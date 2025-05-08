@@ -566,7 +566,7 @@ namespace qfunc{
 			if constexpr  (Reverse) { bbsgC.init_scan(bbo::NON_DESTRUCTIVE_REVERSE); }
 			else { bbsgC.init_scan(bbo::NON_DESTRUCTIVE); }
 			while (true) {
-				if constexpr (Reverse) { v = bbsgC.previous_bit(); }
+				if constexpr (Reverse) { v = bbsgC.prev_bit(); }
 				else { v = bbsgC.next_bit(); }
 
 				////////////////////////////
@@ -615,7 +615,7 @@ namespace qfunc{
 
 		return clq.size();
 	}
-//
+
 //	template<class Graph_t>
 //	int greedy_clique_all_nodes_LB(const Graph_t& g, typename Graph_t::_bbt& bbsg, vint& clq) {
 //		//////////////////////

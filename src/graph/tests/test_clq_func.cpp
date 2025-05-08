@@ -221,7 +221,7 @@ TEST(Clique, find_clique_max_deg) {
 	typename ugraph::_bbt bbsg{ static_cast<int>(ug.size()), { 0, 1, 2, 3, 4, 5} };
 
 	/////////////////////////////////////////////////////////
-	int nV = qfunc::find_clique_max_deg(ug, clq, bbsg);
+	int nV = qfunc::find_clique_max_deg<decltype(ug), false>(ug, clq, bbsg);
 	/////////////////////////////////////////////////////////
 
 	EXPECT_EQ(3, nV);		//{0, 3, 4} is the maximum clique
