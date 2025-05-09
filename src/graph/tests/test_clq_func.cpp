@@ -43,7 +43,7 @@ TEST_F(CliqueCommonTest, find_iset_enlarge_singleton) {
 	int posEnd = 6;
 
 	//////////////////////////////////////////////////////
-	int nV = qfunc::find_iset (ug, v, lv, posBegin, posEnd);
+	int nV = gfunc::iset::find_iset (ug, v, lv, posBegin, posEnd);
 	//////////////////////////////////////////////////////
 
 	EXPECT_EQ(3, nV); 	//{3, 4, 5} - {1, 3, 4, 5} form an independent set
@@ -57,7 +57,7 @@ TEST_F(CliqueCommonTest, find_iset_consecutive_vertices) {
 	int posEnd = 6;
 
 	//////////////////////////////////////////////////////
-	int nV = qfunc::find_iset(ug, lv, posBegin, posEnd);
+	int nV = gfunc::iset::find_iset(ug, lv, posBegin, posEnd);
 	//////////////////////////////////////////////////////
 
 	EXPECT_EQ(4, nV); 	//{1, 2, 3, 4} is an iset
@@ -73,7 +73,7 @@ TEST_F(CliqueCommonTest, find_clique) {
 
 	//////////////////////////////////////////////////////
 	std::vector<int> clq = { 0 };
-	int nV = qfunc::find_clique(ug, clq, lv, posBegin, posEnd);
+	int nV = gfunc::clq::find_clique(ug, clq, lv, posBegin, posEnd);
 	//////////////////////////////////////////////////////
 
 	EXPECT_EQ(1, nV); 							//only vertex {3} is added to clq		
@@ -90,7 +90,7 @@ TEST_F(CliqueCommonTest, find_clique_2) {
 
 
 	//////////////////////////////////////////////////////
-	int nV = qfunc::find_clique<decltype(ug), false >(ug, clq, bb);				//false: first-to-last order scanning of bb
+	int nV = gfunc::clq::find_clique<decltype(ug), false >(ug, clq, bb);				//false: first-to-last order scanning of bb
 	//////////////////////////////////////////////////////
 
 	EXPECT_EQ(2, nV); 							//{2, 5} is the maximal clique
@@ -102,7 +102,7 @@ TEST_F(CliqueCommonTest, find_clique_2) {
 	bb.erase_bit();
 
 	//////////////////////////////////////////////////////
-	nV = qfunc::find_clique(ug, clq, bb);
+	nV = gfunc::clq::find_clique(ug, clq, bb);
 	//////////////////////////////////////////////////////
 
 	EXPECT_EQ(0, nV);
@@ -114,7 +114,7 @@ TEST_F(CliqueCommonTest, find_clique_2) {
 	bb.set_bit(3);
 	bb.set_bit(4);
 	bb.set_bit(5);
-	nV = qfunc::find_clique_lb(ug, bb);
+	nV = gfunc::clq::find_clique_lb(ug, bb);
 
 	EXPECT_EQ(2, nV); 							//{2, 5} is the maximal clique
 
@@ -129,14 +129,14 @@ TEST_F(CliqueCommonTest, is_iset) {
 	//bitset of vertices
 
 	/////////////////////////////////////
-	EXPECT_TRUE(qfunc::is_iset(ug, bb));
+	EXPECT_TRUE(gfunc::iset::is_iset(ug, bb));
 	/////////////////////////////////////
 	
 	//empty set - not an independent set
 	bb.erase_bit();
 
 	/////////////////////////////////////
-	EXPECT_FALSE(qfunc::is_iset(ug, bb));
+	EXPECT_FALSE(gfunc::iset::is_iset(ug, bb));
 	/////////////////////////////////////
 
 	///////////////////
@@ -144,14 +144,14 @@ TEST_F(CliqueCommonTest, is_iset) {
 	vint lv = { 1, 3, 4 };
 
 	/////////////////////////////////////
-	EXPECT_TRUE(qfunc::is_iset(ug, lv));
+	EXPECT_TRUE(gfunc::iset::is_iset(ug, lv));
 	/////////////////////////////////////
 
 	//empty set - not an independent set
 	lv.clear();
 
 	/////////////////////////////////////
-	EXPECT_FALSE(qfunc::is_iset(ug, lv));
+	EXPECT_FALSE(gfunc::iset::is_iset(ug, lv));
 	/////////////////////////////////////
 
 	///////////////////
@@ -160,7 +160,7 @@ TEST_F(CliqueCommonTest, is_iset) {
 	int v = 0;
 
 	////////////////////////////////////////
-	EXPECT_TRUE(qfunc::is_iset(ug, lv, v));		// {0} is non-adjacent to {2, 5}
+	EXPECT_TRUE(gfunc::iset::is_iset(ug, lv, v));		// {0} is non-adjacent to {2, 5}
 	///////////////////////////////////////
 	
 }
@@ -173,14 +173,14 @@ TEST_F(CliqueCommonTest, is_clique) {
 	//bitset of vertices
 
 	/////////////////////////////////////
-	EXPECT_TRUE(qfunc::is_clique(ug, bb));
+	EXPECT_TRUE(gfunc::clq::is_clique(ug, bb));
 	/////////////////////////////////////
 
 	//empty set - not a clique
 	bb.erase_bit();
 
 	/////////////////////////////////////
-	EXPECT_FALSE(qfunc::is_clique(ug, bb));
+	EXPECT_FALSE(gfunc::clq::is_clique(ug, bb));
 	/////////////////////////////////////
 
 	///////////////////
@@ -188,14 +188,14 @@ TEST_F(CliqueCommonTest, is_clique) {
 	vint lv = { 0, 4 };
 
 	/////////////////////////////////////
-	EXPECT_TRUE(qfunc::is_clique(ug, lv));
+	EXPECT_TRUE(gfunc::clq::is_clique(ug, lv));
 	/////////////////////////////////////
 
 	//empty set - not an independent set
 	lv.clear();
 
 	/////////////////////////////////////
-	EXPECT_FALSE(qfunc::is_clique(ug, lv));
+	EXPECT_FALSE(gfunc::clq::is_clique(ug, lv));
 	/////////////////////////////////////
 
 	///////////////////
@@ -204,7 +204,7 @@ TEST_F(CliqueCommonTest, is_clique) {
 	int v = 0;
 
 	////////////////////////////////////////
-	EXPECT_TRUE(qfunc::is_clique(ug, lv, v));		// {0} is adjacent to {4}
+	EXPECT_TRUE(gfunc::clq::is_clique(ug, lv, v));		// {0} is adjacent to {4}
 	///////////////////////////////////////
 
 	///////////////////
@@ -212,7 +212,7 @@ TEST_F(CliqueCommonTest, is_clique) {
 	int lv_CArrray [] = {0, 4};
 
 	/////////////////////////////////////
-	EXPECT_TRUE(qfunc::is_clique(ug, lv_CArrray, 2));
+	EXPECT_TRUE(gfunc::clq::is_clique(ug, lv_CArrray, 2));
 	/////////////////////////////////////
 
 }
@@ -232,7 +232,7 @@ TEST(Clique, find_clique_max_deg) {
 	typename ugraph::_bbt bbsg{ static_cast<int>(ug.size()), { 0, 1, 2, 3, 4, 5} };
 
 	/////////////////////////////////////////////////////////
-	int nV = qfunc::find_clique_max_deg<decltype(ug), false>(ug, clq, bbsg);
+	int nV = gfunc::clq::find_clique_max_deg<decltype(ug), false>(ug, clq, bbsg);
 	/////////////////////////////////////////////////////////
 
 	EXPECT_EQ(3, nV);		//{0, 3, 4} is the maximum clique
@@ -257,7 +257,7 @@ TEST(Clique, find_clique_in_pool) {
 	typename ugraph::_bbt bbsg{ static_cast<int>(ug.size()), { 0, 1, 2, 3, 4, 5} };
 
 	/////////////////////////////////////////////////////////
-	int nV = qfunc::find_clique_from_pool(ug, clq, bbsg);
+	int nV = gfunc::clq::find_clique_from_pool(ug, clq, bbsg);
 	/////////////////////////////////////////////////////////
 
 	//pool of cliques: {0, 1, 3, 4} {1} {2 5} {3 4} {4} {5} - clq = {0, 1, 3, 4}
@@ -281,7 +281,7 @@ TEST(Clique, find_max_clique_lb) {
 	typename ugraph::_bbt bbsg{ static_cast<int>(ug.size()), { 0, 1, 2, 3, 4, 5} };
 
 	/////////////////////////////////////////////////////////
-	int nV = qfunc::find_clique_lb(ug);
+	int nV = gfunc::clq::find_clique_lb(ug);
 	/////////////////////////////////////////////////////////
 
 	EXPECT_EQ(2, nV);		//{0, 3, 4} is the maximum clique
