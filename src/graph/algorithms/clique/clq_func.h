@@ -258,11 +258,11 @@ namespace qfunc{
 	inline
 	bool is_iset(Graph_t& g, std::vector<int>& lv){
 	
-		auto nElem = lv.size();
-		if (nElem == 0) return false;					////empty set is not an independent set
+		auto nV = lv.size();
+		if (nV == 0) return false;					////empty set is not an independent set
 
-		for (auto i = 0; i < nElem - 1; ++i) {
-			for (auto j = i + 1; j < nElem; ++j) {
+		for (auto i = 0; i < nV - 1; ++i) {
+			for (auto j = i + 1; j < nV; ++j) {
 
 				if (g.is_edge(lv[i], lv[j])) {
 					return false;
@@ -345,11 +345,11 @@ namespace qfunc{
 	inline
 	bool is_clique(Graph_t& g, std::vector<int>& lv) {
 
-		auto nElem = lv.size();
-		if (nElem == 0) return false;					//an empty set is not a clique
+		auto nV = lv.size();
+		if (nV == 0) return false;					//an empty set is not a clique
 
-		for (auto i = 0; i < nElem - 1; ++i) {
-			for (auto j = i + 1; j < nElem; ++j) {
+		for (auto i = 0; i < nV - 1; ++i) {
+			for (auto j = i + 1; j < nV; ++j) {
 
 				if (!g.is_edge(lv[i], lv[j])) {
 					return false;
