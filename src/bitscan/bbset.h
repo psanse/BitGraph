@@ -180,6 +180,7 @@ public:
 	 * @brief Constructor of an EMPTY bitset given a population size nPop
 	 *		  The capacity of the bitset is set according to the population size
 	 * @param nBits : population size		
+	 * @param val: initial value (TRUE, FALSE) of every bit in the bitset
 	 **/
 	 explicit  BitSet				(int nPop, bool val = false);
 

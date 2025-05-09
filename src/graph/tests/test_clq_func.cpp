@@ -108,6 +108,17 @@ TEST_F(CliqueCommonTest, find_clique_2) {
 	EXPECT_EQ(0, nV);
 	EXPECT_TRUE(clq.empty());
 
+
+	//same but computing only the size of the clique
+	bb.set_bit(2);
+	bb.set_bit(3);
+	bb.set_bit(4);
+	bb.set_bit(5);
+	nV = qfunc::find_clique_lb(ug, bb);
+
+	EXPECT_EQ(2, nV); 							//{2, 5} is the maximal clique
+
+
 }
 
 TEST_F(CliqueCommonTest, is_iset) {
@@ -246,12 +257,42 @@ TEST(Clique, find_clique_in_pool) {
 	typename ugraph::_bbt bbsg{ static_cast<int>(ug.size()), { 0, 1, 2, 3, 4, 5} };
 
 	/////////////////////////////////////////////////////////
-	int nV = qfunc::find_clique_in_pool(ug, clq, bbsg);
+	int nV = qfunc::find_clique_from_pool(ug, clq, bbsg);
 	/////////////////////////////////////////////////////////
 
 	//pool of cliques: {0, 1, 3, 4} {1} {2 5} {3 4} {4} {5} - clq = {0, 1, 3, 4}
 	std::vector<int> clq_exp = { 0, 1, 3, 4 };
 	EXPECT_EQ(clq_exp, clq);
+
+}
+
+TEST(Clique, find_max_clique_lb) {
+
+	const int NV = 6;
+
+	ugraph ug(NV);
+	ug.add_edge(0, 1);
+	ug.add_edge(0, 3);
+	ug.add_edge(0, 4);
+	ug.add_edge(2, 5);
+	ug.add_edge(3, 4);
+
+	std::vector<int> clq;
+	typename ugraph::_bbt bbsg{ static_cast<int>(ug.size()), { 0, 1, 2, 3, 4, 5} };
+
+	/////////////////////////////////////////////////////////
+	int nV = qfunc::find_clique_lb(ug);
+	/////////////////////////////////////////////////////////
+
+	EXPECT_EQ(2, nV);		//{0, 3, 4} is the maximum clique
+
+}
+
+
+TEST(Color, SEQ) {
+
+
+	//TODO...
 
 }
 
