@@ -1,19 +1,15 @@
 /**
 * @file  test_clq_func.cpp
-* @brief This file contains unit tests for clique common functions (under the namespace qfunc).
+* @brief This file contains unit tests for clique common functions (under the namespace gfunc).
 * @dev pss
-* @details: created 01/14/2023, imported in 05/05/2025
+* @details: created 01/14/2023, imported in 05/05/2025, last update 10/05/2025
 **/
 
 #include "gtest/gtest.h"
-//#include "graph/graph_gen.h"
 #include "utils/common.h"
 #include "utils/logger.h"
 #include "graph/graph.h"
 #include "graph/algorithms/clique/clq_func.h"
-//#include "../clique/algorithms/cover.h"
-//#include "../runs/run_CLQ_manager.h"
-//#include "../clique/clique_config_paths.h"
 
 using namespace std;
 
