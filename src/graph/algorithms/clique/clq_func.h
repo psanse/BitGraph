@@ -827,7 +827,7 @@ namespace gfunc {
 		inline
 			int SEQ(const Graph_t& g, const typename Graph_t::_bbt& bbsg, int* ub = nullptr) {
 
-			int pc = bbsg.popcn64();
+			int pc = bbsg.size();
 			if (pc == 0) { return 0; }			//early exit - bitset bbsg is empty	
 
 			int col = 1, v = bbo::noBit, nBB = bbo::noBit;
@@ -855,7 +855,7 @@ namespace gfunc {
 					/////////////////////////////////
 
 					//removes neighbors of v
-					bb_sel.erase_block(nBB, g.neighbors(v));
+					bb_sel.erase_block(WDIV(v), -1,  g.neighbors(v));
 				}
 
 				//open a new color
