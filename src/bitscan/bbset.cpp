@@ -450,7 +450,7 @@ int find_first_common_block(int firstBlock, int lastBlock, const BitSet& lhs, co
 
 	int last_block = ((lastBlock == -1) ? rhs.nBB_ - 1 : lastBlock);
 
-	for (auto i = firstBlock; i < last_block; i++) {
+	for (auto i = firstBlock; i <= last_block; i++) {
 		BITBOARD bb = lhs.vBB_[i] & rhs.vBB_[i];
 		if (bb) {
 			return bblock::lsb64_intrinsic(bb) + WMUL(i);
