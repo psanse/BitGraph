@@ -1,6 +1,6 @@
 /**
 * @file  test_clq_func.cpp
-* @brief This file contains unit tests for clique common functions (under the namespace gfunc).
+* @brief This file contains unit tests for clique and clique-related common functions (under the namespace gfunc).
 * @dev pss
 * @details: created 01/14/2023, imported in 05/05/2025, last update 10/05/2025
 **/
