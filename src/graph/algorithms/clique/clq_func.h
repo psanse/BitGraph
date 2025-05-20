@@ -2,8 +2,8 @@
 * @file clq_func.h
 * @brief  header for graph algorithms / data types related to cliques / isets
 * @details: imported from COpt repo (created 10/07/19, last update: 28/11/19)
-* @details: imported 09/05/2025
-* @details: contains C++17 if contexpr instructions - possibly remove
+* @details: imported 09/05/2025, last update 20/05/2025
+* @details: C++17 if contexpr instructions have been commented - add when C++17 compatibility is acceptable (currently only C++14)
 * @dev: pss
 **/
 
@@ -160,7 +160,7 @@ namespace gfunc {
 		* @param bbsg: (bit)set of vertices
 		* @param template Reverse: TRUE vertices are taken from bbsg from last to first, FALSE from first to last
 		* @returns: number of vertices in clq
-		* @TODO: possibly return the clique
+		* @TODO: possibly return the clique, add if constexpr when C++17 is accepted
 		**/
 		template<class Graph_t, bool Reverse = false>
 		inline
@@ -170,7 +170,7 @@ namespace gfunc {
 			clq.clear();
 
 			//main loop - destructive scan of bb
-			if constexpr (Reverse) {
+			if /*constexpr*/ (Reverse) {
 				bb.init_scan(bbo::NON_DESTRUCTIVE_REVERSE);
 			}
 			else { bb.init_scan(bbo::NON_DESTRUCTIVE); }
@@ -178,7 +178,7 @@ namespace gfunc {
 			int v = bbo::noBit;
 			while (true) {
 
-				if constexpr (Reverse) { v = bb.prev_bit(); }
+				if /*constexpr*/ (Reverse) { v = bb.prev_bit(); }
 				else { v = bb.next_bit(); }
 
 				/////////////////////////////
@@ -189,7 +189,7 @@ namespace gfunc {
 				clq.push_back(v);
 
 				//optimization of bb &= g.get_neighbors(w);	
-				if constexpr (Reverse) {
+				if /*constexpr*/ (Reverse) {
 					for (auto nBB = WDIV(v); nBB >= 0; --nBB) {
 						bb.block(nBB) &= g.neighbors(v).block(nBB);
 					}
@@ -213,7 +213,7 @@ namespace gfunc {
 		* @param template Reverse: TRUE vertices are taken from bbsg from last to first, FALSE from first to last
 		* @returns: number of vertices in clq
 		* @details: created in 13/10/2019 (Paris), optimized in 06/05/2025
-		* @TODO: possibly return the clique
+		* @TODO: possibly return the clique, add if constexpr when C++17 is accepted
 		**/
 		template<class Graph_t, bool Reverse = false>
 		inline
@@ -230,10 +230,10 @@ namespace gfunc {
 				//finds the vertex with max deg in the current neighborhood
 				pcmax = 0;
 
-				if constexpr (Reverse) { bbsgC.init_scan(bbo::NON_DESTRUCTIVE_REVERSE); }
+				if /*constexpr*/ (Reverse) { bbsgC.init_scan(bbo::NON_DESTRUCTIVE_REVERSE); }
 				else { bbsgC.init_scan(bbo::NON_DESTRUCTIVE); }
 				while (true) {
-					if constexpr (Reverse) { v = bbsgC.prev_bit(); }
+					if /*constexpr*/ (Reverse) { v = bbsgC.prev_bit(); }
 					else { v = bbsgC.next_bit(); }
 
 					////////////////////////////
@@ -413,20 +413,22 @@ namespace gfunc {
 		template<class Graph_t>
 		inline
 			bool is_iset(Graph_t& g, typename Graph_t::_bbt& bb) {
+						
+			int retVal = bb.init_scan(bbo::NON_DESTRUCTIVE);
 
-			//////////////////////////////////////////////////////
-			assert(bb.init_scan(bbo::NON_DESTRUCTIVE) != -1);
-			//////////////////////////////////////////////////////
-
+			///////////////////////
+			assert(retVal != -1);
+			///////////////////////
+						
 			int v = bbo::noBit;
-			while ((v = bb.next_bit()) != bbo::noBit) {
+			while ( (v = bb.next_bit()) != bbo::noBit ) {
 
 				//check neighborhood of v
 				const auto& bbnv = g.neighbors(v);
-				for (auto nBB = 0; nBB < bb.number_of_blocks(); ++nBB) {
+				for (auto nBB = 0; nBB < bb.number_of_blocks(); ++nBB) {				
 
 					//////////////////////////////////////////
-					if (bb.block(nBB) & bbnv.block(nBB)) {
+					if ( bb.block(nBB) & bbnv.block(nBB) ) {
 						return false;
 					}
 					/////////////////////////////////////////
@@ -503,10 +505,12 @@ namespace gfunc {
 		inline
 			bool is_clique(Graph_t& g, typename Graph_t::_bbt& bb) {
 
-			//////////////////////////////////////////////////////
-			assert(bb.init_scan(bbo::NON_DESTRUCTIVE) != -1);
-			//////////////////////////////////////////////////////
+			int retVal = bb.init_scan(bbo::NON_DESTRUCTIVE);
 
+			///////////////////////
+			assert(retVal != -1);
+			///////////////////////
+			
 			int v = bbo::noBit;
 			while ((v = bb.next_bit()) != bbo::noBit) {
 
@@ -686,7 +690,7 @@ namespace gfunc {
 			int lb = 0;
 
 			//main loop - destructive scan of bb
-			if constexpr (Reverse) {
+			if /*constexpr*/ (Reverse) {
 				bb.init_scan(bbo::NON_DESTRUCTIVE_REVERSE);
 			}
 			else { bb.init_scan(bbo::NON_DESTRUCTIVE); }
@@ -694,7 +698,7 @@ namespace gfunc {
 			int v = bbo::noBit;
 			while (true) {
 
-				if constexpr (Reverse) { v = bb.prev_bit(); }
+				if /*constexpr*/ (Reverse) { v = bb.prev_bit(); }
 				else { v = bb.next_bit(); }
 
 				/////////////////////////////
@@ -735,7 +739,7 @@ namespace gfunc {
 			int lb = 0;
 
 			//main loop - destructive scan of bb
-			if constexpr (Reverse) {
+			if /*constexpr*/ (Reverse) {
 				bb.init_scan(bbo::NON_DESTRUCTIVE_REVERSE);
 			}
 			else { bb.init_scan(bbo::NON_DESTRUCTIVE); }
@@ -743,7 +747,7 @@ namespace gfunc {
 			int v = bbo::noBit;
 			while (true) {
 
-				if constexpr (Reverse) { v = bb.prev_bit(); }
+				if /*constexpr*/ (Reverse) { v = bb.prev_bit(); }
 				else { v = bb.next_bit(); }
 
 				/////////////////////////////
