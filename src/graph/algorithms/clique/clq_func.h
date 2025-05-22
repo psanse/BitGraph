@@ -670,8 +670,9 @@ namespace gfunc {
 		//	}
 		//
 
-			//////////////////////
-			//maximum clique bounds
+	//////////////////////
+	//maximum clique bounds
+
 	namespace clq {
 		/**
 		* @brief Clique heuristic that computes a LOWER bound for the maximum clique in @g[@bbsg].
