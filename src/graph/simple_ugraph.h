@@ -3,7 +3,7 @@
  * @brief class Ugraph for simple undirected graphs	(no self loops)
  *
  * @created 17/6/10
- * @last_update 03/01/25
+ * @last_update 23/05/25
  * @author pss
  *
  * This code is part of the GRAPH 1.0 C++ library 
@@ -189,6 +189,14 @@ public:
 
 	//TODO implement min_degree (03/01/2025)
 	
+	/**
+	* @brief number of edges with a single endpoint in a vertex from @sg
+	* @param sg input (bit) set of vertices 
+	**/
+	template<class bitset_t>
+	int outgoing_degree			(bitset_t& sg)							const;
+	int outgoing_degree			(std::vector<int> sg)					const;
+
 //////////////	
 // Modifiers
 public:
@@ -314,6 +322,40 @@ int Ugraph<T>::max_subgraph_degree (bitset_t& sg) const {
 
 	return max_degree;
 }
+
+template<class T>
+template<class bitset_t>
+inline int Ugraph<T>::outgoing_degree(bitset_t& sg) const
+{
+	//number of edges
+	int nE = 0;		
+	
+	//scan declaration
+	int retVal = sg.init_scan(bbo::NON_DESTRUCTIVE) != BBObject::noBit;
+
+	////////////////////////
+	assert(retVal != -1);
+	///////////////////////
+
+	//main loop
+	int v = BBObject::noBit;
+	while ((v = sg.next_bit()) != BBObject::noBit) {
+		for (auto nBB = 0; nBB < ptype::NBB_; ++nBB) {
+			BITBOARD bb = ptype::neighbors(v).block(nBB) &~ sg.block(nBB);		//neighbors of v NOT in sg
+			nE += bblock::popc64(bb);
+		}
+	}
+	
+	return nE;
+}
+
+template<class T>
+inline int Ugraph<T>::outgoing_degree(std::vector<int> sg) const
+{	
+	T bbsg{ (int)ptype::NV_, sg };
+	return (outgoing_degree(bbsg));
+}
+
 
 template<class T>
 template<class bitset_t>
@@ -489,6 +531,7 @@ int Ugraph<T>::degree(int v, const BitSetSp& bbs)	const {
 	LOG_ERROR("exiting...");
 	std::exit(-1);
 }
+
 
 
 template<class T>

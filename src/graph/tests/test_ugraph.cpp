@@ -415,6 +415,29 @@ TEST(Ugraph, make_graphs) {
 	EXPECT_TRUE(star.is_edge(0, 3));
 }
 
+TEST(Ugraph, outgoing_degree) {
+	
+	const int SIZE = 6;
+	ugraph ug(SIZE);
+	ug.add_edge(0, 1);
+	ug.add_edge(1, 2);
+	ug.add_edge(1, 3);
+	ug.add_edge(0, 2);
+	ug.add_edge(4, 5);
+
+	//A) input a bitset
+	ugraph::_bbt bbsg{ SIZE, {1, 3} };
+
+	EXPECT_EQ(2, ug.outgoing_degree(bbsg));  //Outgoing edges:{{0, 1},{1, 2}}
+
+
+	//B) input a vector
+	std::vector<int> lv = { 1, 3 };
+
+	EXPECT_EQ(2, ug.outgoing_degree(lv));  //Outgoing edges:{{0, 1},{1, 2}}
+
+}
+
 
 /////////////////////////////
 //
