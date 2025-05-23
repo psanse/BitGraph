@@ -8,6 +8,7 @@
  *
  * This code is part of the GRAPH 1.0 C++ library 
  *
+ * TODO implement min_degree functions (03/01/2025)
  **/
 
 #ifndef __SIMPLE_UGRAPH_H__
@@ -187,7 +188,6 @@ public:
 	template<class bitset_t>
 	int max_subgraph_degree		(bitset_t& sg)							const;
 
-	//TODO implement min_degree (03/01/2025)
 	
 	/**
 	* @brief number of edges with a single endpoint in a vertex from @sg
@@ -195,6 +195,11 @@ public:
 	**/
 	template<class bitset_t>
 	int outgoing_degree			(bitset_t& sg)							const;
+	
+	/**
+	* @brief number of edges with a single endpoint in a vertex from @sg
+	* @param sg input (vector) set of vertices
+	**/
 	int outgoing_degree			(std::vector<int> sg)					const;
 
 //////////////	
