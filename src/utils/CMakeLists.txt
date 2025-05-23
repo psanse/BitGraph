@@ -1,12 +1,9 @@
 #########################
 #headers for UTILS lib
 #########################
-set(useful_headers_for_IDE 
-    ${CMAKE_CURRENT_SOURCE_DIR}/common.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/common_types.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/prec_timer.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/logger.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/info/info_base.h
+
+file(GLOB USEFUL_HEADER_FILES   ${CMAKE_CURRENT_SOURCE_DIR}/*.h 
+                                ${CMAKE_CURRENT_SOURCE_DIR}/info/*.h
 )
 
 #creates utils library
@@ -20,7 +17,7 @@ add_library (utils STATIC
     info/info_base.cpp
     info/info_clq.cpp                                   #move to clq algorithms and remove from here
     #logger.cpp 
-    ${useful_headers_for_IDE}
+    ${USEFUL_HEADER_FILES}
 )
 
 ##############
@@ -52,7 +49,7 @@ set_target_properties(utils
     ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
     LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
     RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
-    #PUBLIC_HEADER   "${useful_headers_for_IDE}"        #does not preserve internal structure       
+    #PUBLIC_HEADER   "${USEFUL_HEADER_FILES}"        #does not preserve internal structure       
 )
 
 #############

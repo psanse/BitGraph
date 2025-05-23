@@ -1,19 +1,8 @@
 #########################
 #headers for BITSCAN lib
 #########################
-set(useful_headers_for_IDE
- ${CMAKE_CURRENT_SOURCE_DIR}/bbconfig.h
- ${CMAKE_CURRENT_SOURCE_DIR}/bbtypes.h
- ${CMAKE_CURRENT_SOURCE_DIR}/bitblock.h
- ${CMAKE_CURRENT_SOURCE_DIR}/bbset.h
- ${CMAKE_CURRENT_SOURCE_DIR}/bbset_sparse.h
- ${CMAKE_CURRENT_SOURCE_DIR}/bbscan.h
- ${CMAKE_CURRENT_SOURCE_DIR}/bbscan_sparse.h
- ${CMAKE_CURRENT_SOURCE_DIR}/bbsentinel.h
- ${CMAKE_CURRENT_SOURCE_DIR}/bbobject.h
- ${CMAKE_CURRENT_SOURCE_DIR}/bbalgorithm.h
- ${CMAKE_CURRENT_SOURCE_DIR}/bitscan.h
-)
+
+file(GLOB USEFUL_HEADER_FILES  ${CMAKE_CURRENT_SOURCE_DIR}/*.h)
 
 ###################
 #creates BITSCAN lib
@@ -24,7 +13,7 @@ bitblock.cpp
 bbset.cpp  
 bbset_sparse.cpp 
 tables.cpp
-${useful_headers_for_IDE}
+${USEFUL_HEADER_FILES}
 )
 
 set_target_properties(bitscan 
@@ -32,7 +21,7 @@ set_target_properties(bitscan
     ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
     LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
     RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
-    #PUBLIC_HEADER   "${useful_headers_for_IDE}"        #does not preserve internal structure  
+    #PUBLIC_HEADER   "${USEFUL_HEADER_FILES}"        #does not preserve internal structure  
 )
 
 

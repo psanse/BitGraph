@@ -1,21 +1,12 @@
 #########################
 #headers for GRAPH lib
 ########################
-set(useful_headers_for_IDE
-${CMAKE_CURRENT_SOURCE_DIR}/graph.h
-${CMAKE_CURRENT_SOURCE_DIR}/simple_graph.h
-${CMAKE_CURRENT_SOURCE_DIR}/simple_ugraph.h
-${CMAKE_CURRENT_SOURCE_DIR}/simple_graph_ew.h
-${CMAKE_CURRENT_SOURCE_DIR}/simple_graph_w.h
-${CMAKE_CURRENT_SOURCE_DIR}/algorithms/kcore.h
-${CMAKE_CURRENT_SOURCE_DIR}/algorithms/graph_gen.h
-${CMAKE_CURRENT_SOURCE_DIR}/algorithms/graph_map.h
-${CMAKE_CURRENT_SOURCE_DIR}/algorithms/graph_func.h
-${CMAKE_CURRENT_SOURCE_DIR}/algorithms/graph_fast_sort.h
-${CMAKE_CURRENT_SOURCE_DIR}/algorithms/graph_fast_sort_weighted.h
-${CMAKE_CURRENT_SOURCE_DIR}/algorithms/clique/clq_func.h
-#algorithms/graph_sort.h
+file(GLOB USEFUL_HEADER_FILES  ${CMAKE_CURRENT_SOURCE_DIR}/*.h 
+                               ${CMAKE_CURRENT_SOURCE_DIR}/algorithms/*.h
 )
+
+#removed this file, currently  is deprecated
+list(REMOVE_ITEM USEFUL_HEADER_FILES ${CMAKE_CURRENT_SOURCE_DIR}/algorithms/graph_sort.h) 
 
 ###################
 # GRAPH lib
@@ -25,7 +16,7 @@ simple_graph_w.cpp
 simple_graph_ew.cpp
 formats/mmio.cpp
 algorithms/decode.cpp
-${useful_headers_for_IDE}
+${USEFUL_HEADER_FILES}
 )
 
 set_target_properties(graph 
@@ -33,7 +24,7 @@ set_target_properties(graph
     ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
     LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
     RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
-	#PUBLIC_HEADER   "${useful_headers_for_IDE}"        #does not preserve internal structure 
+	#PUBLIC_HEADER   "${USEFUL_HEADER_FILES}"        #does not preserve internal structure 
 )
 
 # Make sure the compiler can find include files for GRAPH
