@@ -2,7 +2,7 @@
 #headers for BITSCAN lib
 #########################
 
-file(GLOB USEFUL_HEADER_FILES  ${CMAKE_CURRENT_SOURCE_DIR}/*.h)
+file(GLOB HEADER_FILES  ${CMAKE_CURRENT_SOURCE_DIR}/*.h)
 
 ###################
 #creates BITSCAN lib
@@ -13,7 +13,7 @@ bitblock.cpp
 bbset.cpp  
 bbset_sparse.cpp 
 tables.cpp
-${USEFUL_HEADER_FILES}
+${HEADER_FILES}
 )
 
 set_target_properties(bitscan 
@@ -21,7 +21,7 @@ set_target_properties(bitscan
     ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
     LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
     RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
-    #PUBLIC_HEADER   "${USEFUL_HEADER_FILES}"        #does not preserve internal structure  
+    #PUBLIC_HEADER   "${HEADER_FILES}"        #does not preserve internal structure  
 )
 
 

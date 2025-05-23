@@ -2,7 +2,7 @@
 #headers for UTILS lib
 #########################
 
-file(GLOB USEFUL_HEADER_FILES   ${CMAKE_CURRENT_SOURCE_DIR}/*.h 
+file(GLOB HEADER_FILES   ${CMAKE_CURRENT_SOURCE_DIR}/*.h 
                                 ${CMAKE_CURRENT_SOURCE_DIR}/info/*.h
 )
 
@@ -17,7 +17,7 @@ add_library (utils STATIC
     info/info_base.cpp
     info/info_clq.cpp                                   #move to clq algorithms and remove from here
     #logger.cpp 
-    ${USEFUL_HEADER_FILES}
+    ${HEADER_FILES}
 )
 
 ##############
@@ -49,7 +49,7 @@ set_target_properties(utils
     ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
     LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
     RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
-    #PUBLIC_HEADER   "${USEFUL_HEADER_FILES}"        #does not preserve internal structure       
+    #PUBLIC_HEADER   "${HEADER_FILES}"        #does not preserve internal structure       
 )
 
 #############

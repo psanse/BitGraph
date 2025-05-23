@@ -1,12 +1,12 @@
 #########################
 #headers for GRAPH lib
 ########################
-file(GLOB USEFUL_HEADER_FILES  ${CMAKE_CURRENT_SOURCE_DIR}/*.h 
+file(GLOB HEADER_FILES  ${CMAKE_CURRENT_SOURCE_DIR}/*.h 
                                ${CMAKE_CURRENT_SOURCE_DIR}/algorithms/*.h
 )
 
 #removed this file, currently  is deprecated
-list(REMOVE_ITEM USEFUL_HEADER_FILES ${CMAKE_CURRENT_SOURCE_DIR}/algorithms/graph_sort.h) 
+list(REMOVE_ITEM HEADER_FILES ${CMAKE_CURRENT_SOURCE_DIR}/algorithms/graph_sort.h) 
 
 ###################
 # GRAPH lib
@@ -16,7 +16,7 @@ simple_graph_w.cpp
 simple_graph_ew.cpp
 formats/mmio.cpp
 algorithms/decode.cpp
-${USEFUL_HEADER_FILES}
+${HEADER_FILES}
 )
 
 set_target_properties(graph 
@@ -24,7 +24,7 @@ set_target_properties(graph
     ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
     LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
     RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
-	#PUBLIC_HEADER   "${USEFUL_HEADER_FILES}"        #does not preserve internal structure 
+	#PUBLIC_HEADER   "${HEADER_FILES}"        #does not preserve internal structure 
 )
 
 # Make sure the compiler can find include files for GRAPH
