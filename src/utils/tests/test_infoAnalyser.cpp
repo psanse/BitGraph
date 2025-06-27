@@ -19,6 +19,8 @@
 #define NUM_ALG	2
 #define INSTANCE_NAME	"graph"
 
+using namespace std;
+
 class InfoAnalyserTest : public ::testing::Test {
 protected:
 	void SetUp() override {

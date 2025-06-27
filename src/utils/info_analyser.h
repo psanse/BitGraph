@@ -228,7 +228,7 @@ std::ostream& print_analyser_summary	(std::ostream& o) const;
 //data members
 private:
 	////////////////////////////////////////////////////
-	vector<vInfo_t>						arrayOfTests_;			//[rep][alg] - main DB  (matrix of results - main data to be processed)
+	std::vector<vInfo_t>				arrayOfTests_;			//[rep][alg] - main DB  (matrix of results - main data to be processed)
 	////////////////////////////////////////////////////
 
 	std::vector<double>					arrayOfAvTimes;			//[alg] - search times	
