@@ -14,8 +14,6 @@
 
 #include "bbset.h"	
 
-using namespace std;
-
 
 /////////////////////////////////
 //

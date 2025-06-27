@@ -14,8 +14,6 @@
 #include "utils/logger.h"
 #include <vector>
 
-using namespace std;
-
 ///////////////////////////
 //
 // class GraphFastRootSort_W

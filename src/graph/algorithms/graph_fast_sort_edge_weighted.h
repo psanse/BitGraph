@@ -21,7 +21,6 @@
 #include "utils/common.h"					//sort functors
 #include "decode.h"
 
-using namespace std;
 
 ///////////////////////////
 //

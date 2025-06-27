@@ -24,7 +24,6 @@
 #include <iostream>
 #include <vector>
 
-using namespace std;
 
 //alias
 using vint = std::vector<int>;

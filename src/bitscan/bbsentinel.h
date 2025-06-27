@@ -18,8 +18,7 @@
 #include "bitscan/bbscan.h"
 #include "bitscan/bbalgorithm.h"			//MIN, MAX
 
- using namespace std;
-
+ 
 class BBSentinel : public BBScan{
 	friend BBSentinel&  AND	(const BitSet& lhs, const BBSentinel& rhs,  BBSentinel& res);		//updates sentinels
 
@@ -72,7 +71,7 @@ virtual	bool is_empty				(int nBBL, int nBBH) const;					//is empty in range
 //////////////
 // I/O
 	
-	std::ostream& print(ostream& o=cout, bool show_pc = true, bool endl = true) const override;
+	std::ostream& print(std::ostream& o = std::cout, bool show_pc = true, bool endl = true) const override;
 
 /////////////////
 // bit scanning operations 
@@ -118,10 +117,10 @@ int BBSentinel::prev_bit_del(){
 
 	unsigned long posInBB;
 
-	for(int i=m_BBH; i>=m_BBL; i--){
+	for(int i = m_BBH; i >= m_BBL; i--){
 		if(_BitScanReverse64(&posInBB,vBB_[i])){
-			m_BBH=i;
-			vBB_[i]&=~Tables::mask[posInBB];			//erase before the return
+			m_BBH = i;
+			vBB_[i] &= ~Tables::mask[posInBB];			//erase before the return
 			return (posInBB+WMUL(i));
 		}
 	}
@@ -138,14 +137,14 @@ int BBSentinel::next_bit_del (){
 
 	unsigned long posInBB;
 
-	for(int i=m_BBL; i<=m_BBH; i++){
+	for(int i = m_BBL; i <= m_BBH; i++){
 		if(_BitScanForward64(&posInBB,vBB_[i]) ){
-			m_BBL=i;
-			vBB_[i]&=~Tables::mask[posInBB];					//erase before the return
+			m_BBL  =i;
+			vBB_[i] &= ~Tables::mask[posInBB];					//erase before the return
 			return (posInBB+ WMUL(i));
 		}
 	}
-return EMPTY_ELEM;  
+	return EMPTY_ELEM;  
 }
 
 
@@ -158,16 +157,16 @@ int BBSentinel::next_bit_del (BBSentinel& bbN_del){
 
 	unsigned long posInBB;
 
-	for(int i=m_BBL; i<=m_BBH; i++){
+	for(int i = m_BBL; i <= m_BBH; i++){
 		if(_BitScanForward64(&posInBB, vBB_[i]) ){
-			m_BBL=i;
-			vBB_[i]&=~Tables::mask[posInBB];					//erase before the return
-			bbN_del.vBB_[i]&=~Tables::mask[posInBB];
+			m_BBL = i;
+			vBB_[i] &= ~Tables::mask[posInBB];					//erase before the return
+			bbN_del.vBB_[i] &= ~Tables::mask[posInBB];
 			return (posInBB+ WMUL(i));
 		}
 	}
 	
-return EMPTY_ELEM;  
+	return EMPTY_ELEM;  
 }
 
 
@@ -186,11 +185,11 @@ int BBSentinel::next_bit(){
 		scan_.pos_ =posInBB;
 		return (posInBB + WMUL(scan_.bbi_));
 	}else{													
-		for(int i=scan_.bbi_+1; i<=m_BBH; i++){
+		for(int i = scan_.bbi_+1; i <= m_BBH; i++){
 			if(_BitScanForward64(&posInBB,vBB_[i])){
-				scan_.bbi_=i;
-				scan_.pos_=posInBB;
-				return (posInBB+ WMUL(i));
+				scan_.bbi_ = i;
+				scan_.pos_ = posInBB;
+				return (posInBB + WMUL(i));
 			}
 		}
 	}

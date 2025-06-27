@@ -5,7 +5,7 @@ file(GLOB HEADER_FILES  ${CMAKE_CURRENT_SOURCE_DIR}/*.h
                                ${CMAKE_CURRENT_SOURCE_DIR}/algorithms/*.h
 )
 
-#removed this file, currently  is deprecated
+#removed this file, currently deprecated
 list(REMOVE_ITEM HEADER_FILES ${CMAKE_CURRENT_SOURCE_DIR}/algorithms/graph_sort.h) 
 
 ###################

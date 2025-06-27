@@ -18,8 +18,6 @@
 #include <string>
 
 
-using namespace std;
-
 ///////////////////////
 // 
 // GraphMap for managing pairs of vertex orderings	

@@ -22,7 +22,6 @@
 //uncomment #undef NDEBUG in bbconfig.h to enable run-time assertions
 #include <cassert>
 
-using namespace std;
 
 //initial reserve of bit blocks for any new sparse bitstring - CHECK efficiency (17/02/2025)
 constexpr int DEFAULT_CAPACITY = 2;		
@@ -52,14 +51,14 @@ public:
 		bool is_empty		()					const	{ return !bb_ ; }
 		void clear			()							{ bb_ = 0;}
 
-		std::ostream& print			(std::ostream& o = cout, bool eofl = true)	const;
+		std::ostream& print			(std::ostream& o = std::cout, bool eofl = true)	const;
 friend  std::ostream& operator<<	(std::ostream& o, const pBlock_t& pB)				{ pB.print(o); return o; }
 	};
 
 	//aliases
-	using vPB		= vector<pBlock_t>;
-	using vPB_it	= vector<pBlock_t>::iterator;
-	using vPB_cit	= vector<pBlock_t>::const_iterator;
+	using vPB		= std::vector<pBlock_t>;
+	using vPB_it	= typename std::vector<pBlock_t>::iterator;
+	using vPB_cit	= typename std::vector<pBlock_t>::const_iterator;
 		
 	//functor for sorting - check if it is necessary, or throwing lambdas is enough
 	struct pBlock_less {
@@ -308,7 +307,7 @@ explicit BitSetSp					(int nPop, bool is_popsize = true );
 	* 
 	* TODO - possibly remove - since it can be obained from find_block_ext trivially (21/02/2025)
 	**/
-	pair<bool, int>	 find_block_pos(int blockID)			const;
+	std::pair<bool, int>	 find_block_pos(int blockID)			const;
 											
 	/**
 	* @brief commodity iterators / const iterators for the bitset
@@ -709,7 +708,7 @@ BitSetSp& AND_block					(int firstBlock, int lastBlock, const BitSetSp& bitset) 
 	* @returns output stream
 	* @details uses basic bitscanning implementation to enumerate the bits
 	**/
-	ostream& print					(ostream& o = cout, bool show_pc = true, bool endl = true ) const override;
+	std::ostream& print					(std::ostream& o = std::cout, bool show_pc = true, bool endl = true ) const override;
 
 /////////////////////
 //Conversions
@@ -722,7 +721,7 @@ BitSetSp& AND_block					(int firstBlock, int lastBlock, const BitSetSp& bitset) 
 	* 
 	* TODO implement - cast operator (24/02/2025)
 	**/
-	string to_string				()							const;													
+	std::string to_string				()							const;
 	
 	/**
 	* @brief Converts the bitstring to a std::vector of non-negative integers.
@@ -1310,12 +1309,12 @@ BitSetSp& OR(const BitSetSp& lhs, const BitSetSp& rhs, BitSetSp& res) {
 
 		if (itL->idx_ < itR->idx_) {
 			res.vBB_.push_back(BitSetSp::pBlock_t(itL->idx_, itL->bb_));
-			res.print(cout, true);	
+			res.print(std::cout, true);	
 			itL++;
 		}
 		else if (itL->idx_ > itR->idx_) {
 			res.vBB_.push_back(BitSetSp::pBlock_t(itR->idx_, itR->bb_));
-			res.print(cout, true);
+			res.print(std::cout, true);
 			itR++;
 		}
 		else {
@@ -1709,7 +1708,7 @@ BitSetSp& BitSetSp::reset_bit (int lastBit, const BitSetSp& rhs){
 	if (pR.second != rhs.cend()) {
 
 		//copy up to and excluding bbh
-		std::copy(rhs.cbegin(), pR.second, insert_iterator<vPB>(vBB_, vBB_.begin()));
+		std::copy(rhs.cbegin(), pR.second, std::insert_iterator<vPB>(vBB_, vBB_.begin()));
 
 		//deal with last block bbh
 		if (pR.first) {
@@ -1861,10 +1860,10 @@ BitSetSp::find_block_ext(int blockID)
 }
 
 template<bool LB_policy>
-pair<bool, BitSetSp::vPB_cit>
+std::pair<bool, BitSetSp::vPB_cit>
 BitSetSp::find_block_ext(int blockID) const
 {
-	pair<bool, BitSetSp::vPB_cit>res;
+	std::pair<bool, BitSetSp::vPB_cit>res;
 
 	if (LB_policy) {
 		////////////////////////////////////////////////////////////////////////////////////////////

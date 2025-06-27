@@ -23,7 +23,6 @@
 //#undef NDEBUG												
 
 
-
 /////////////
 //Popcount
 //(switch in case processors do not support operations for population count)
