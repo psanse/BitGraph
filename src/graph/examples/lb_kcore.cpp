@@ -26,7 +26,7 @@ int main(int argc, char** argv){
 
 	//find initial kcore
 	sparse_ugraph ug(filename);
-	KCore<sparse_ugraph> kc(ug);
+	bitgraph::KCore<sparse_ugraph> kc(ug);
 
 	///////////////////
 	kc.find_kcore();

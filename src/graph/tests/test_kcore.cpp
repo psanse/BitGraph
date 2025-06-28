@@ -20,6 +20,7 @@
 #include "utils/result.h"
 
 using namespace std;
+using namespace bitgraph;
 
 //aliases
 using vint = std::vector<int>;
