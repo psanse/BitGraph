@@ -27,10 +27,10 @@
 
 
 #include "simple_ugraph.h"
-using graph = Graph<bitarray>;						//simple graph
-using ugraph = Ugraph<bitarray>;					//simple undirected graph
-using sparse_graph = Graph<sparse_bitarray>;		//simple sparse graph
-using sparse_ugraph = Ugraph<sparse_bitarray>;		//simple sparse undirected graph
+using graph = bitgraph::Graph<bitarray>;						//simple graph
+using ugraph = bitgraph::Ugraph<bitarray>;						//simple undirected graph
+using sparse_graph = bitgraph::Graph<sparse_bitarray>;			//simple sparse graph
+using sparse_ugraph = bitgraph::Ugraph<sparse_bitarray>;		//simple sparse undirected graph
 
 #include "simple_graph_w.h"							//MUST BE AFTER ugraph type 
 using ugraph_w = Graph_W<ugraph, double>;			//simple vertex weighted graph with double weights

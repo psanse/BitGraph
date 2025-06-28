@@ -29,7 +29,7 @@ extern const int DEFAULT_WEIGHT_MODULUS;								//for modulus weight generation 
 template<class W>
 using vecw = std::vector<W>;	
 
-using  ugraph = Ugraph<bitarray> ;
+using ugraph = bitgraph::Ugraph<bitarray> ;
 
 ///////////////////////
 //

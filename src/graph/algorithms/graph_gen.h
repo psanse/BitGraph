@@ -20,10 +20,10 @@
 #include "graph/simple_graph_ew.h"					// must be after simple_ugraph include
 
 //aliases for graph types (see also graph.h)
-using graph = Graph<bitarray>;						//simple graph
-using ugraph = Ugraph<bitarray>;					//simple undirected graph
-using sparse_graph = Graph<sparse_bitarray>;		//simple sparse graph
-using sparse_ugraph = Ugraph<sparse_bitarray>;		//simple sparse undirected graph
+using graph = bitgraph::Graph<bitarray>;						//simple graph
+using ugraph = bitgraph::Ugraph<bitarray>;					//simple undirected graph
+using sparse_graph = bitgraph::Graph<sparse_bitarray>;		//simple sparse graph
+using sparse_ugraph = bitgraph::Ugraph<sparse_bitarray>;		//simple sparse undirected graph
 using ugraph_w = Graph_W<ugraph, double>;
 using ugraph_wi = Graph_W<ugraph, int>;
 using ugraph_ew = Graph_EW<ugraph, double>;

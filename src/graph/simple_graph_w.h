@@ -26,7 +26,7 @@ extern const int DEFAULT_WEIGHT_MODULUS;								//for modulus weight generation 
 	
 //alias
 using vint = std::vector<int>;
-using ugraph = Ugraph<bitarray>;
+using ugraph = bitgraph::Ugraph<bitarray>;
 
 
 ///////////////////////
