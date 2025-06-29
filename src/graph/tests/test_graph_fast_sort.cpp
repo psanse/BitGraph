@@ -26,8 +26,8 @@ typedef Graph_W<ugraph, double> ugraph_w;			//simple vertex weighted graph with 
 typedef Graph_W<ugraph, int> ugraph_wi;				//simple vertex weighted graph with int weights
 
 //useful alias
-using graph = Graph<bitarray>;						//simple graph
-using ugraph = Ugraph<bitarray>;					//simple undirected graph
+using graph = bitgraph::Graph<bitarray>;			//simple graph
+using ugraph = bitgraph::Ugraph<bitarray>;			//simple undirected graph
 
 using namespace std;
 using namespace ::com::sort;

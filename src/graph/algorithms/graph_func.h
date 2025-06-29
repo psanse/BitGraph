@@ -20,8 +20,8 @@
 
 //aliases for graph types (see graph.h)
 using vint = std::vector<int>;
-using graph = Graph<bitarray>;
-using ugraph = Ugraph<bitarray>;	
+using graph = bitgraph::Graph<bitarray>;
+using ugraph = bitgraph::Ugraph<bitarray>;
 using ugraph_w = Graph_W<ugraph, double>;
 using ugraph_wi = Graph_W<ugraph, int>;
 using ugraph_ew = Graph_EW<ugraph, double>;

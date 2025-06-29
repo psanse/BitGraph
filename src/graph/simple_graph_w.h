@@ -301,7 +301,7 @@ protected:
 ///////////////////////
 //
 // Graph_W class 
-// (user generic class to specialize for different types of graphs) 
+// (main template class to specialize for different types of graphs) 
 //
 ///////////////////////
 

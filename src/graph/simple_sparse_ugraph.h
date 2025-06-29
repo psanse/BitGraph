@@ -20,7 +20,7 @@
 #include <vector>
 
 //alias
-using USS = Ugraph<BBScanSp>;
+using USS = bitgraph::Ugraph<BBScanSp>;
 
 ////////////////////////
 //

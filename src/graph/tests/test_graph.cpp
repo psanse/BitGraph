@@ -15,7 +15,7 @@
 #include <iostream>
 
 //useful alias
-using graph = Graph<bitarray>;						//simple graph
+using graph = bitgraph::Graph<bitarray>;						//simple graph
 
 using namespace std;
 using vint = vector<int>;

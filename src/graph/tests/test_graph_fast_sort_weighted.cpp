@@ -16,9 +16,10 @@
 #include <string>
 
 
+
 //useful alias
-using graph = Graph<bitarray>;						//simple graph
-using ugraph = Ugraph<bitarray>;					//simple undirected graph
+using graph = bitgraph::Graph<bitarray>;			//simple graph
+using ugraph = bitgraph::Ugraph<bitarray>;			//simple undirected graph
 using ugraph_w = Graph_W < ugraph, double>;			//simple vertex weighted graph with double weights
 using ugraph_wi = Graph_W < ugraph, int>;			//simple vertex weighted graph with integer weights
 

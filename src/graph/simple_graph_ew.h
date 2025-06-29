@@ -397,7 +397,7 @@ protected:
 //
 // Graph_WE class 
 // 
-// I.  user generic class to specialize for different types of graphs
+// I.  main template class to specialize for different types of graphs
 // II. currently only defined for ugraph type
 //
 ///////////////////////

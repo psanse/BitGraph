@@ -17,7 +17,7 @@
 #include <iostream>
 
 using vint = std::vector<int>;
-using  ugraph = Ugraph<bitarray>;
+using  ugraph = bitgraph::Ugraph<bitarray>;
 
 using namespace std;
 

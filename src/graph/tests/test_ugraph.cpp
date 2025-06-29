@@ -9,11 +9,13 @@
 #include "gtest/gtest.h"
 #include <iostream>
 
+
 //alias
-using graph = Graph<bitarray>;						//simple graph
-using ugraph = Ugraph<bitarray>;					//simple undirected graph	
+using graph = bitgraph::Graph<bitarray>;					//simple graph
+using ugraph = bitgraph::Ugraph<bitarray>;					//simple undirected graph	
 
 using namespace std;
+
 
 TEST(Ugraph_test, constructor_file){
 
@@ -384,10 +386,10 @@ TEST(Ugraph, remove_edges){
 }
 
 TEST(Ugraph, make_graphs) {
-	auto tri = Ugraph<bitarray>::make_triangle();
-	auto clique = Ugraph<bitarray>::make_clique(4);
-	auto cycle = Ugraph<bitarray>::make_cycle(4);
-	auto star = Ugraph<bitarray>::make_star(4);				//vertex 0 is the center of the star
+	auto tri = bitgraph::Ugraph<bitarray>::make_triangle();
+	auto clique = bitgraph::Ugraph<bitarray>::make_clique(4);
+	auto cycle = bitgraph::Ugraph<bitarray>::make_cycle(4);
+	auto star = bitgraph::Ugraph<bitarray>::make_star(4);				//vertex 0 is the center of the star
 
 	EXPECT_EQ(3, tri.size());
 	EXPECT_EQ(4, clique.size());

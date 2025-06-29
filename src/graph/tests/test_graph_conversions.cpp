@@ -13,6 +13,8 @@
 
 using namespace std;
 
+using bitgraph::GraphConversion;
+
 TEST(Conversions, sparse2ugraph) {
 	
 	sparse_ugraph sug(4);

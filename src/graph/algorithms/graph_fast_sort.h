@@ -39,8 +39,8 @@ using vint = std::vector<int>;
 template <class Graph_t>
 class GraphFastRootSort{
 	//restrict to ugraph and sparse_ugraph types
-	static_assert(	std::is_same<Ugraph<BBScan>, Graph_t>::value	||
-					std::is_same<Ugraph<BBScanSp>, Graph_t>::value		, "is not a valid GraphFastRootSort type");
+	static_assert(	std::is_same<bitgraph::Ugraph<BBScan>, Graph_t>::value	||
+					std::is_same<bitgraph::Ugraph<BBScanSp>, Graph_t>::value		, "is not a valid GraphFastRootSort type");
 	
 public:
 	using basic_type = Graph_t;											//graph type

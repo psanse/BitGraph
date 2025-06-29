@@ -70,9 +70,9 @@ namespace bitgraph {
 			Graph(std::size_t n, int* adj[], std::string filename = "");		//old-style adjacency matrix
 
 			//move and copy semantics allowed
-			Graph(const Graph& g) = default;
+			Graph								(const Graph& g) = default;
 			Graph& operator =					(const Graph& g) = default;
-			Graph(Graph&& g)			noexcept = default;
+			Graph								(Graph&& g)			noexcept = default;
 			Graph& operator =					(Graph&& g)			noexcept = default;
 
 			virtual	~Graph() = default;
@@ -333,7 +333,7 @@ namespace bitgraph {
 			* @returns TRUE if lhs.adj_ == rhs.adj_
 			**/
 			template <class U>
-			friend bool operator ==				(const Graph<U>& lhs, const Graph<U>& rhs);
+			friend bool operator ==	 (const Graph<U>& lhs, const Graph<U>& rhs);
 
 			////////////
 			// Read / write basic operations
@@ -439,17 +439,27 @@ namespace bitgraph {
 	}//end namespace _impl
 
 	using _impl::Graph;			//alias for Graph<T> with T=BBScan
-
+	
 }//end namespace bitgraph
 
 //////////////////////////////////////////
 // Necessary implementation of template methods in header file
 
+
+namespace bitgraph {
+	namespace _impl {
+			
+		template <class U>
+		bool operator== (const Graph<U>& lhs, const Graph<U>& rhs) {
+			return lhs.adj_ == rhs.adj_;
+		}
+
+	} // namespace _impl  
+} // namespace bitgraph
+
+
 namespace bitgraph {
 
-	template <class T>
-	inline
-		bool operator == (const Graph<T>& lhs, const Graph<T>& rhs) { return lhs.adj_ == rhs.adj_; }
 
 	template<class T>
 	template <class U>

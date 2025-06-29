@@ -18,7 +18,6 @@
 using namespace std;
 
 
-
 TEST(Graph_sparse, max_subgraph_degree) {
 	
 	const int NV = 100;
