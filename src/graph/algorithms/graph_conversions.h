@@ -1,12 +1,12 @@
-/*
+/**
  * @file graph_conversions.h 
  * @brief sconversions between different graph types of the GRAPH library 
  *
  * @creation_date 25/11/16
- * @last_update 27/01/25
+ * @last_update 30/06/25
  * @author pss
  *
- */
+ **/
 
 #ifndef __GRAPH_TYPE_CONVERSIONS_H__
 #define	__GRAPH_TYPE_CONVERSIONS_H__
@@ -19,9 +19,10 @@
 using namespace std;
 
 //alias for the converted graph types
-using ugraph = bitgraph::Ugraph<bitarray>;						//simple undirected graph type
-using sparse_ugraph = bitgraph::Ugraph<sparse_bitarray>;		//simple sparse undirected graph type
-
+namespace bitgraph {
+	using ugraph = bitgraph::Ugraph<bitarray>;						//simple undirected graph type
+	using sparse_ugraph = bitgraph::Ugraph<sparse_bitarray>;		//simple sparse undirected graph type
+}
 
 namespace bitgraph {
 	namespace _impl {

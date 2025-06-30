@@ -19,6 +19,7 @@
 #include "graph/simple_graph_w.h"					// must be after simple_ugraph include
 #include "graph/simple_graph_ew.h"					// must be after simple_ugraph include
 
+//useful aliases
 namespace bitgraph {
 	
 	using graph = bitgraph::Graph<bitarray>;						//simple graph

@@ -23,7 +23,6 @@
 #include <cassert>							//NDEBUG should be undefined - (normally in compiler DEBUG mode)
 
 using namespace std;	
-
 using namespace bitgraph;
 
 /////////////////////////////////////////////////

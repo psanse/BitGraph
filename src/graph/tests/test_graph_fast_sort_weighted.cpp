@@ -16,14 +16,16 @@
 #include <string>
 
 
-
 //useful alias
-using graph = bitgraph::Graph<bitarray>;					//simple graph
-using ugraph = bitgraph::Ugraph<bitarray>;					//simple undirected graph
-using ugraph_w = bitgraph::Graph_W < ugraph, double>;		//simple vertex weighted graph with double weights
-using ugraph_wi = bitgraph::Graph_W < ugraph, int>;			//simple vertex weighted graph with integer weights
+namespace bitgraph {
+	using graph = bitgraph::Graph<bitarray>;					//simple graph
+	using ugraph = bitgraph::Ugraph<bitarray>;					//simple undirected graph
+	using ugraph_w = bitgraph::Graph_W < ugraph, double>;		//simple vertex weighted graph with double weights
+	using ugraph_wi = bitgraph::Graph_W < ugraph, int>;			//simple vertex weighted graph with integer weights
+}
 
 using namespace std;
+using namespace bitgraph;	
 
 class GraphFastRootSortWeightedTest : public ::testing::Test {
 protected:

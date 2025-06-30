@@ -7,6 +7,8 @@
 
 #include "graph/algorithms/decode.h"
 
+using namespace bitgraph;
+
 int Decode::decode_node(int v) const
 { 
 	DecodeVertex df(ords_);

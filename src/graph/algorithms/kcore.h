@@ -22,8 +22,7 @@
 #include <algorithm>
 #include <map> 
 
- //undef NDEBUG to avoid assertions
-#include <cassert>
+#include <cassert>		 //undef NDEBUG to avoid assertions
 
 /////////////////////////
 //SWAP-MACRO: places vertex u as last vertex in the bin with one less degree. Updates bin but not degree of u

@@ -12,8 +12,8 @@
 #include <iostream>
 
 using namespace std;
+using namespace bitgraph;
 
-using bitgraph::GraphConversion;
 
 TEST(Conversions, sparse2ugraph) {
 	

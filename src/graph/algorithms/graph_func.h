@@ -18,6 +18,7 @@
 #include <algorithm>
 #include <iostream>
 
+//useful aliases
 using vint = std::vector<int>;
 
 namespace bitgraph {
