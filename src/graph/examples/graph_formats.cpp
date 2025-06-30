@@ -13,6 +13,7 @@
 #include "utils/logger.h"
 
 using namespace std;
+using namespace bitgraph;
 
 enum class file_t{DIMACS=1, MTX, EDGELIST};
 

@@ -16,6 +16,7 @@
 #include "graph/algorithms/graph_fast_sort.h"
 
 using namespace std;
+using namespace bitgraph;
 
 TEST(Decode, GraphFastRootSort) {
 	

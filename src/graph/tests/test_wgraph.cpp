@@ -16,8 +16,10 @@
 #include <iostream>
 
 //useful alias
-using ugrah_w = bitgraph::Graph_W<ugraph, double>;			//simple vertex weighted graph with double weights
-using ugraph_wi = bitgraph::Graph_W<ugraph, int>;				//simple vertex weighted graph with int weights	
+namespace bitgraph {
+	using ugraph_w = bitgraph::Graph_W<ugraph, double>;			//simple vertex weighted graph with double weights
+	using ugraph_wi = bitgraph::Graph_W<ugraph, int>;				//simple vertex weighted graph with int weights	
+}
 
 using namespace std;
 using namespace bitgraph;

@@ -11,6 +11,7 @@
 #include "utils/logger.h"
 
 using namespace std;
+using namespace bitgraph;	
 
 int main(int argc, char** argv){
 	if(argc != 3){

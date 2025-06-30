@@ -15,6 +15,7 @@
 #include <iostream>
 
 using namespace std;
+using namespace bitgraph;	
 
 TEST(Random_Graph, random_attr_t){
 	

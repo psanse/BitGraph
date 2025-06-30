@@ -16,6 +16,7 @@
 #include <strstream>
 
 using namespace std;
+using namespace bitgraph;
 
 
 TEST(Graph_sparse, max_subgraph_degree) {

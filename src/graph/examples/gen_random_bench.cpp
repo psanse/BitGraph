@@ -16,6 +16,7 @@
 #include <cassert>
 
 using namespace std;
+using namespace bitgraph;
 
 struct input_t{
 	int nLB;

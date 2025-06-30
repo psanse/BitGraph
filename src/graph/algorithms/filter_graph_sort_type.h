@@ -9,10 +9,10 @@ struct filterGraphSortType;		//error at compile time
 
 //valid specializations
 template <>
-struct filterGraphSortType<ugraph>{};
+struct filterGraphSortType<bitgraph::ugraph>{};
 template <>
-struct filterGraphSortType<sparse_ugraph>{};
+struct filterGraphSortType<bitgraph::sparse_ugraph>{};
 
 template <>
-struct filterGraphSortType<ugraph_w>{};		/* for weighted graphs */
+struct filterGraphSortType<bitgraph::ugraph_w>{};		/* for weighted graphs */
 #endif

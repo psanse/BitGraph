@@ -17,9 +17,13 @@
 #include <iostream>
 
 using vint = std::vector<int>;
-using  ugraph = bitgraph::Ugraph<bitarray>;
+
+namespace bitgraph {
+	using  ugraph = bitgraph::Ugraph<bitarray>;
+}
 
 using namespace std;
+using namespace bitgraph;
 
 class GraphMapTest : public ::testing::Test {
 protected:

@@ -12,6 +12,7 @@
 #include "graph/algorithms/clique/clq_func.h"
 
 using namespace std;
+using namespace bitgraph;
 
 class CliqueCommonTest : public ::testing::Test {
 protected:

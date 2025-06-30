@@ -27,18 +27,23 @@
 
 
 #include "simple_ugraph.h"
-using graph = bitgraph::Graph<bitarray>;						//simple graph
-using ugraph = bitgraph::Ugraph<bitarray>;						//simple undirected graph
-using sparse_graph = bitgraph::Graph<sparse_bitarray>;			//simple sparse graph
-using sparse_ugraph = bitgraph::Ugraph<sparse_bitarray>;		//simple sparse undirected graph
+namespace bitgraph {
+	using graph = bitgraph::Graph<bitarray>;						//simple graph
+	using ugraph = bitgraph::Ugraph<bitarray>;						//simple undirected graph
+	using sparse_graph = bitgraph::Graph<sparse_bitarray>;			//simple sparse graph
+	using sparse_ugraph = bitgraph::Ugraph<sparse_bitarray>;		//simple sparse undirected graph
+}
 
 #include "simple_graph_w.h"										//MUST BE AFTER ugraph type 
-using ugraph_w = bitgraph::Graph_W<ugraph, double>;				//simple vertex weighted graph with double weights
-using ugraph_wi = bitgraph::Graph_W<ugraph, int>;				//simple vertex weighted graph with int weights
+namespace bitgraph {
+	using ugraph_w = bitgraph::Graph_W<ugraph, double>;				//simple vertex weighted graph with double weights
+	using ugraph_wi = bitgraph::Graph_W<ugraph, int>;				//simple vertex weighted graph with int weights
+}
 
 #include "simple_graph_ew.h"									//MUST BE AFTER ugraph type 
-using ugraph_ew = bitgraph::Graph_EW<ugraph, double>;			//simple edge weighted graph with double weights
-using ugraph_ewi = bitgraph::Graph_EW<ugraph, int>;				//simple edge weighted graph with int weights
-
+namespace bitgraph {
+	using ugraph_ew = bitgraph::Graph_EW<ugraph, double>;			//simple edge weighted graph with double weights
+	using ugraph_ewi = bitgraph::Graph_EW<ugraph, int>;				//simple edge weighted graph with int weights
+}
 
 #endif

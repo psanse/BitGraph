@@ -13,9 +13,10 @@
 #include "gtest/gtest.h"
 #include <iostream>
 
+using vint = std::vector<int>;
 
 using namespace std;
-using vint = std::vector<int>;
+using namespace bitgraph;
 
 class GFuncTest : public ::testing::Test {
 protected:
