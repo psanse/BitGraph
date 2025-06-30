@@ -29,10 +29,10 @@ int main(int argc, char* argv[]) {
 	//generate single uniform random graph
 	cout << "*******************************" << endl;
 	cout << "Generating random graph..." << endl;
-	ugraph ug;
+	bitgraph::ugraph ug;
 
 	///////////////////////////////////////////////
-	RandomGen<ugraph>::create_graph(ug, 100, .1);
+	bitgraph::RandomGen<bitgraph::ugraph>::create_graph(ug, 100, .1);
 	///////////////////////////////////////////////
 
 	ug.print_data();
@@ -52,12 +52,12 @@ int main(int argc, char* argv[]) {
 	 *increment size: 1
 	 *increment density: 0.1	
 	**/
-	random_attr_t rt(10, 15, 0.5, 0.6, 2, 1, 0.1);
+	bitgraph::random_attr_t rt(10, 15, 0.5, 0.6, 2, 1, 0.1);
 
 	string output_path = argv[1];
 
 	////////////////////////////////////////////////////////////////////////////////
-	RandomGen<ugraph>::create_graph_benchmark(output_path, rt);
+	bitgraph::RandomGen<bitgraph::ugraph>::create_graph_benchmark(output_path, rt);
 	////////////////////////////////////////////////////////////////////////////////
 
 

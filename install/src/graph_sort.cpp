@@ -13,21 +13,21 @@ using namespace std;
 int main() {
 
 	//small undirected graph with 10 vertices
-	ugraph ug(5);
+	bitgraph::ugraph ug(5);
 
 	ug.add_edge(0, 1);
 	ug.add_edge(0, 2);
 	ug.add_edge(3, 4);
 	
 	//A sorting object	
-	GraphFastRootSort<ugraph> gs(ug);
+	bitgraph::GraphFastRootSort<bitgraph::ugraph> gs(ug);
 
 	//A new ordering of the vertices - minimum degree first (degenerate) {1->0, 0->1, 2->2, 3->3, 4->4}	
 	//In a degenerate ordering, each vertex sorted is removed and the sorting criterion is computed for the remaining vertices
-	auto order = gs.new_order(GraphFastRootSort<ugraph>::MIN_DEGEN, false);
+	auto order = gs.new_order(bitgraph::GraphFastRootSort<bitgraph::ugraph>::MIN_DEGEN, false);
 	
 	//create an isomorphism of the original graph according to the new ordering
-	ugraph ug_sorted;
+	bitgraph::ugraph ug_sorted;
 	gs.reorder(order, ug_sorted);
 
 
