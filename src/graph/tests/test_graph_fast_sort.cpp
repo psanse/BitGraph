@@ -21,6 +21,8 @@
 
 #include "graph/simple_graph_w.h"							//MUST BE AFTER ugraph type 
 
+using namespace bitgraph;
+
 //useful alias
 using ugraph_w = bitgraph::Graph_W<ugraph, double>;			//simple vertex weighted graph with double weights
 using ugraph_wi = bitgraph::Graph_W<ugraph, int>;			//simple vertex weighted graph with int weights

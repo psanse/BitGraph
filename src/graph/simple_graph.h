@@ -497,9 +497,7 @@ namespace bitgraph {
 
 	//////////////////////////////////////////
 	//
-	//
-
-
+	// class Graph<T> implementation
 
 	template<class T>
 	inline
@@ -548,7 +546,6 @@ namespace bitgraph {
 			}
 		}
 	}
-
 
 
 	template<class T>

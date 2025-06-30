@@ -26,7 +26,6 @@ extern const int DEFAULT_WEIGHT_MODULUS;								//for modulus weight generation 
 	
 //alias
 using vint = std::vector<int>;
-using ugraph = bitgraph::Ugraph<bitarray>;
 
 namespace bitgraph {
 
@@ -311,14 +310,16 @@ namespace bitgraph {
 
 
 namespace bitgraph {
-///////////////////////
-//
-// Graph_W class 
-// (main template class to specialize for different types of graphs) 
-//
-///////////////////////
 
 	namespace _impl {
+
+		///////////////////////
+		//
+		// Graph_W class 
+		// (main template class to specialize for different types of graphs) 
+		//
+		///////////////////////
+
 
 		template<class Graph_t, class W>
 		class Graph_W : public Base_Graph_W <Graph_t, W> {};
@@ -334,7 +335,11 @@ namespace bitgraph {
 //
 ////////////////////////////////////
 
-namespace bitgraph {	
+namespace bitgraph {
+
+	namespace _impl {
+
+		using ugraph = bitgraph::Ugraph<bitarray>;
 
 		template<class W>
 		class Graph_W<ugraph, W> : public Base_Graph_W<ugraph, W> {
@@ -370,6 +375,10 @@ namespace bitgraph {
 				*/
 			ostream& write_dimacs(ostream& o = std::cout)		override;
 		};
+
+	}//end namespace _impl	
+
+	using _impl::ugraph;									//alias for the graph class
 	
 }//end namespace bitgraph
 
@@ -380,18 +389,21 @@ namespace bitgraph {
 
 namespace bitgraph {
 
-	template<class Graph_t, class W>
-	template<class Func>
-	inline
-		void Base_Graph_W<Graph_t, W>::transform_weights(Func f)
-	{
-		auto NV = number_of_vertices();
+	namespace _impl {
 
-		///////////////////////////////////////////////////////
-		std::transform(w_.begin(), w_.end(), w_.begin(), f);
-		///////////////////////////////////////////////////////
+		template<class Graph_t, class W>
+		template<class Func>
+		inline
+			void Base_Graph_W<Graph_t, W>::transform_weights(Func f)
+		{
+			auto NV = number_of_vertices();
 
-	}
+			///////////////////////////////////////////////////////
+			std::transform(w_.begin(), w_.end(), w_.begin(), f);
+			///////////////////////////////////////////////////////
+
+		}
+	}//end namespace _impl	
 
 }//end namespace bitgraph
 

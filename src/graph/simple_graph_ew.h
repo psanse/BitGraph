@@ -29,11 +29,13 @@ extern const int DEFAULT_WEIGHT_MODULUS;								//for modulus weight generation 
 template<class W>
 using vecw = std::vector<W>;	
 
-using ugraph = bitgraph::Ugraph<bitarray> ;
 
 namespace bitgraph {
 
 	namespace _impl {
+
+		using ugraph = bitgraph::Ugraph<bitarray>;
+
 		///////////////////////
 		//
 		// class Base_Graph_EW 
@@ -399,6 +401,7 @@ namespace bitgraph {
 	}//end of namespace _impl
 
 	using _impl::Base_Graph_EW;							//alias for the base class
+	using _impl::ugraph;								//alias for the ugraph type
 
 }//end of namespace bitgraph
 

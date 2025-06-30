@@ -20,9 +20,7 @@
 #include "utils/prec_timer.h"
 #include <fstream>
 #include <iostream>
-
-//works when NDEBUG is undefined - (normally when in compiler DEBUG mode)
-#include <cassert>
+#include <cassert>							//NDEBUG should be undefined - (normally in compiler DEBUG mode)
 
 using namespace std;	
 

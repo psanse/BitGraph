@@ -28,7 +28,6 @@ using namespace bitgraph;
 //globals
 const int DEFAULT_WEIGHT_MODULUS = 200;     //for modulus weight generation  [Pullman 2008]		
 
-
 /////////////////////////////////////////////////
 template<class Graph_t, class W>
 const W Base_Graph_W <Graph_t, W >::NO_WEIGHT = -1;		
@@ -193,34 +192,6 @@ ostream& Base_Graph_W<Graph_t, W>::write_dimacs(ostream& o) {
 	return o;
 }
 
-template<class W>
-ostream& Graph_W<ugraph, W>::write_dimacs(ostream& o) {
-
-	//timestamp comment
-	ptype::g_.timestamp_dimacs(o);
-
-	//name comment
-	ptype::g_.name_dimacs(o);
-
-	//dimacs header - recompute edges
-	ptype::g_.header_dimacs(o, false);
-
-	//write DIMACS nodes n <v> <w>
-	const int NV = ptype::g_.number_of_vertices();
-	for (int v = 0; v < NV; ++v) {
-		o << "n " << v + 1 << " " << ptype::weight(v) << endl;
-	}
-
-	//write directed edges (1-based vertex notation dimacs)
-	for (std::size_t v = 0; v < NV - 1; ++v) {
-		for (std::size_t w = v + 1; w < NV; ++w) {
-			if (ptype::g_.is_edge(v, w))							//O(log) for sparse graphs: specialize
-				o << "e " << v + 1 << " " << w + 1 << endl;			
-		}
-	}
-
-	return o;
-}
 
 template<class Graph_t, class W>
 int Base_Graph_W<Graph_t, W>::read_dimacs (string filename, int type){
@@ -485,6 +456,38 @@ ostream& Base_Graph_W<Graph_t, W>::print_weights (ostream& o, bool show_v) const
 	}else{
 		com::stl::print_collection<vector<W>>(w_, o, true);
 	}
+	return o;
+}
+
+///////////////////
+// Specialization for undirected graphs
+
+template<class W>
+ostream& Graph_W<ugraph, W>::write_dimacs(ostream& o) {
+
+	//timestamp comment
+	ptype::g_.timestamp_dimacs(o);
+
+	//name comment
+	ptype::g_.name_dimacs(o);
+
+	//dimacs header - recompute edges
+	ptype::g_.header_dimacs(o, false);
+
+	//write DIMACS nodes n <v> <w>
+	const int NV = ptype::g_.number_of_vertices();
+	for (int v = 0; v < NV; ++v) {
+		o << "n " << v + 1 << " " << ptype::weight(v) << endl;
+	}
+
+	//write directed edges (1-based vertex notation dimacs)
+	for (std::size_t v = 0; v < NV - 1; ++v) {
+		for (std::size_t w = v + 1; w < NV; ++w) {
+			if (ptype::g_.is_edge(v, w))							//O(log) for sparse graphs: specialize
+				o << "e " << v + 1 << " " << w + 1 << endl;
+		}
+	}
+
 	return o;
 }
 
