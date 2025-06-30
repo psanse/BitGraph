@@ -14,18 +14,12 @@
 #define __SIMPLE_GRAPH_WEIGHTED_H__
 
 #include "utils/common.h"
+#include "graph_globals.h"
 #include "simple_ugraph.h"
 #include <iostream>
 #include <vector>
 #include <algorithm>
 
-
-////////////////////////////////////////////////////////////////
-extern const int DEFAULT_WEIGHT_MODULUS;								//for modulus weight generation  [Pullman 2008]					
-////////////////////////////////////////////////////////////////
-	
-//alias
-using vint = std::vector<int>;
 
 namespace bitgraph {
 

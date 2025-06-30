@@ -21,12 +21,13 @@
 #include "utils/prec_timer.h"
 #include <fstream>
 #include <iostream>
+#include "graph_globals.h"
 				
 using namespace std;
 using namespace bitgraph;
 
 //globals
-const int DEFAULT_WEIGHT_MODULUS = 200;     //for modulus weight generation  [Pullman 2008]		
+//const int DEFAULT_WEIGHT_MODULUS = 200;     //for modulus weight generation  [Pullman 2008]		
 
 /////////////////////////////////////////////////
 template<class Graph_t, class W>

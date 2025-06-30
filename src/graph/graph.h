@@ -1,15 +1,15 @@
 /** 
  * @file graph.h
- * @brief  The one and only header file for the GRAPH 1.0 library
- *		    simple graphs (encoded as BITSCAN bitstrings)
- *
- * @comment: The GRAPH 1.0 library is an efficient C++ library for simple graphs
- *			 GRAPH stores the adjacency matrix un full and each row is encoded as a
- *			 bitstring. GRAPH is at the core of a number of state-of-the-art-leading 
+ * @brief  The one-and-only header file for the main graph types of the BitGraph library
+ *		    
+ * @comment: BitGraph is an efficient C++ library for simple graphs
+ *			 BitGraph stores the adjacency matrix un full and each row is encoded as a
+ *			 bitstring. BitGraph is at the core of a number of state-of-the-art-leading 
  *			 exact algorithms for NP-hard problems. 
  *
- * @author: Pablo San Segundo (main developper)
+ * @dev: Pablo San Segundo (main developper)
  * @version: 1.0 
+ * @details: last_update 30/06/2025 (added graph_globals.h header file)
  * 
  *
  * Permission to use, modify and distribute this software is
@@ -24,6 +24,8 @@
 
 #ifndef __GRAPH_INCLUDE_H__
 #define __GRAPH_INCLUDE_H__
+
+#include "graph_globals.h"
 
 
 #include "simple_ugraph.h"

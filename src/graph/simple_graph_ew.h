@@ -17,18 +17,10 @@
 #define __SIMPLE_GRAPH_EDGE_WEIGHTED_H__
 
 #include "utils/common.h"
+#include "graph_globals.h"
 #include "simple_ugraph.h"
 #include <iostream>
 #include <vector>
-
-/////////////////////////////////////////////
-extern const int DEFAULT_WEIGHT_MODULUS;								//for modulus weight generation  [Pullman 2008]					
-///////////////////////////////////////////
-
-//aliases
-template<class W>
-using vecw = std::vector<W>;	
-
 
 namespace bitgraph {
 

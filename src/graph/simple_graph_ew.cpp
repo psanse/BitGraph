@@ -21,6 +21,7 @@
 #include <fstream>
 #include <iostream>
 #include <cassert>							//NDEBUG should be undefined - (normally in compiler DEBUG mode)
+#include "graph_globals.h"
 
 using namespace std;	
 using namespace bitgraph;

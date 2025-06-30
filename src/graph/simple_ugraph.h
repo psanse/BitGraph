@@ -16,8 +16,8 @@
 
 #include "simple_graph.h"
 #include "utils/prec_timer.h"
+#include "graph_globals.h"
 
-using vint = std::vector<int>;
 
 namespace bitgraph {
 

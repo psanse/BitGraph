@@ -7,6 +7,8 @@
 #ifndef __GRAPH_GLOBALS_H__
 #define __GRAPH_GLOBALS_H__
 
+#include <vector>	
+
 //useful alias for STL containers
 
 namespace bitgraph {
@@ -15,14 +17,13 @@ namespace bitgraph {
 	template<class W>
 	using vecw = std::vector<W>;
 
-	//...
+	//...TODO- ADD more aliases required
 }
 
-//////////////////////////////////////////////
-constexpr int DEFAULT_WEIGHT_MODULUS = 200;			//default modulus for edge-weights [Pullman 2008]
-///////////////////////////////////////////////
+//default modulus for vertex and edge-weights [Pullman 2008]
+constexpr int DEFAULT_WEIGHT_MODULUS = 200;		
 
-
+//TODO...add more global constants as required
 
 
 

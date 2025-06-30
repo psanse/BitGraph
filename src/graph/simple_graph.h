@@ -29,7 +29,6 @@
 #include <iostream>
 #include <vector>
 
-//useful aliases
 
 namespace bitgraph {
 
