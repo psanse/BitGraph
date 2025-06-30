@@ -17,10 +17,11 @@
 #include "utils/common.h"
 
 using namespace std;
+using namespace bitgraph;
 
 //alias
-using ugraph_ewi = Graph_EW<ugraph, int>;
-using ugraph_ew	 = Graph_EW<ugraph, double>;
+using ugraph_ewi = bitgraph::Graph_EW<ugraph, int>;
+using ugraph_ew	 = bitgraph::Graph_EW<ugraph, double>;
 using vint = vector<int>;
 
 class UGraphEWTest : public ::testing::Test {

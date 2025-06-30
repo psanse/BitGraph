@@ -31,7 +31,6 @@
 
 //useful aliases
 
-
 namespace bitgraph {
 
 	namespace _impl {

@@ -32,13 +32,13 @@ using ugraph = bitgraph::Ugraph<bitarray>;						//simple undirected graph
 using sparse_graph = bitgraph::Graph<sparse_bitarray>;			//simple sparse graph
 using sparse_ugraph = bitgraph::Ugraph<sparse_bitarray>;		//simple sparse undirected graph
 
-#include "simple_graph_w.h"							//MUST BE AFTER ugraph type 
-using ugraph_w = Graph_W<ugraph, double>;			//simple vertex weighted graph with double weights
-using ugraph_wi = Graph_W<ugraph, int>;				//simple vertex weighted graph with int weights
+#include "simple_graph_w.h"										//MUST BE AFTER ugraph type 
+using ugraph_w = bitgraph::Graph_W<ugraph, double>;				//simple vertex weighted graph with double weights
+using ugraph_wi = bitgraph::Graph_W<ugraph, int>;				//simple vertex weighted graph with int weights
 
-#include "simple_graph_ew.h"						//MUST BE AFTER ugraph type 
-using ugraph_ew = Graph_EW<ugraph, double>;			//simple edge weighted graph with double weights
-using ugraph_ewi = Graph_EW<ugraph, int>;			//simple edge weighted graph with int weights
+#include "simple_graph_ew.h"									//MUST BE AFTER ugraph type 
+using ugraph_ew = bitgraph::Graph_EW<ugraph, double>;			//simple edge weighted graph with double weights
+using ugraph_ewi = bitgraph::Graph_EW<ugraph, int>;				//simple edge weighted graph with int weights
 
 
 #endif

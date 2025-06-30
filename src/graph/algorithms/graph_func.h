@@ -22,10 +22,10 @@
 using vint = std::vector<int>;
 using graph = bitgraph::Graph<bitarray>;
 using ugraph = bitgraph::Ugraph<bitarray>;
-using ugraph_w = Graph_W<ugraph, double>;
-using ugraph_wi = Graph_W<ugraph, int>;
-using ugraph_ew = Graph_EW<ugraph, double>;
-using ugraph_ewi = Graph_EW<ugraph, int>;
+using ugraph_w = bitgraph::Graph_W<ugraph, double>;
+using ugraph_wi = bitgraph::Graph_W<ugraph, int>;
+using ugraph_ew = bitgraph::Graph_EW<ugraph, double>;
+using ugraph_ewi = bitgraph::Graph_EW<ugraph, int>;
 
 
 ///////////////////////
@@ -672,7 +672,7 @@ namespace gfunc{
 		
 		//alias
 		template<class W>
-		using UEW = Graph_EW<ugraph, W>;
+		using UEW = bitgraph::Graph_EW<ugraph, W>;
 
 		/*
 		* @brief Determines the sum of the edge-weights of a given undirected graph

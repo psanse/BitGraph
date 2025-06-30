@@ -146,7 +146,7 @@ TEST(GtoDimacs, DISABLED_read_RTN_edge_weighted){
 	
 	//GtoDim::read_dimacs_edge_weights(fullname);
 	
-	Graph_EW<ugraph, double> gew(TEST_GRAPH_DESKTOP_ETSIDI_I9 + instance);
+	bitgraph::Graph_EW<ugraph, double> gew(TEST_GRAPH_DESKTOP_ETSIDI_I9 + instance);
 	gew.print_data();
 	EXPECT_EQ(3, gew.weight(0,8));
 	EXPECT_EQ(3, gew.weight(0,9));

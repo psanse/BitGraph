@@ -23,6 +23,7 @@
 #include <iostream>
 				
 using namespace std;
+using namespace bitgraph;
 
 //globals
 const int DEFAULT_WEIGHT_MODULUS = 200;     //for modulus weight generation  [Pullman 2008]		

@@ -20,6 +20,7 @@
 using vint = std::vector<int>;
 
 namespace bitgraph {
+
 	namespace _impl {
 		
 		//////////////////
@@ -313,9 +314,7 @@ namespace bitgraph {
 // Necessary implementation of template methods in header file
 
 namespace bitgraph {
-
-	using USS = Ugraph<BBScanSp>;
-
+	
 	template<class T>
 	template<class bitset_t>
 	inline
@@ -845,6 +844,10 @@ namespace bitgraph {
 		return 0;
 	}
 
+}//end namespace bitgraph
+
+	using USS = bitgraph::Ugraph<BBScanSp>;
+
 	////////////////////////
 	//
 	// Specializations of class Ugraph<T> methods for sparse graphs
@@ -1115,7 +1118,7 @@ namespace bitgraph {
 		}
 	}
 
-}//end namespace bitgraph
+
 
 
 #endif

@@ -26,6 +26,8 @@
 
 using namespace std;	
 
+using namespace bitgraph;
+
 /////////////////////////////////////////////////
 template<class Graph_t, class W>
 const W Base_Graph_EW <Graph_t, W >::NO_WEIGHT =  -1;					// or 0x1FFFFFFF (best value for empty weight?)	
