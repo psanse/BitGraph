@@ -15,10 +15,12 @@
 #include <iostream>
 
 //useful alias
-using graph = bitgraph::Graph<bitarray>;						//simple graph
+using vint = vector<int>;
+
+using graph = bitgraph::Graph<bitgraph::bitarray>;						//simple graph
 
 using namespace std;
-using vint = vector<int>;
+using namespace bitgraph;
 
 class GraphTest : public ::testing::Test {
 protected:

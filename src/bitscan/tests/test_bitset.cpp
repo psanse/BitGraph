@@ -13,6 +13,8 @@
 #include <set>		
 
 using namespace std;
+using namespace bitgraph;
+
 
 class BitSetClassTest: public ::testing::Test{
 protected:

@@ -12,17 +12,21 @@
 
 //useful aliases
 
-//base of the hierarchy
-using bbo = BBObject;
+namespace bitgraph {
 
-//non-sparse
-using simple_bitarray = BitSet;
-using bitarray = BBScan;
-using watched_bitarray = BBSentinel;
+	//base of the hierarchy
+	using bbo = BBObject;
 
-//sparse
-using simple_sparse_bitarray = BitSetSp;
-using sparse_bitarray = BBScanSp;
+	//non-sparse
+	using simple_bitarray = BitSet;
+	using bitarray = BBScan;
+	using watched_bitarray = BBSentinel;
+
+	//sparse
+	using simple_sparse_bitarray = BitSetSp;
+	using sparse_bitarray = BBScanSp;
+
+}
 
 
 

@@ -1297,7 +1297,8 @@ namespace bitgraph {
 	// SPECIALIZATIONS (sparse)
 	// 
 
-	using GSS = bitgraph::Graph<BBScanSp>;
+	using GSS = bitgraph::Graph<bitgraph::BBScanSp>;
+
 
 	////////////////////////
 	//

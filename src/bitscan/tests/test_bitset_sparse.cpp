@@ -14,6 +14,7 @@
 #include <algorithm>
 
 using namespace std;
+using namespace bitgraph;
 
 class BitSetSpClassTest : public ::testing::Test {
 protected:

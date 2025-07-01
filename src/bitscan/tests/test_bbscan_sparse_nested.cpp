@@ -10,6 +10,7 @@
 #include <vector>
 
 using namespace std;
+using namespace bitgraph;
 
 class BitScanNestedSparseTest : public ::testing::Test {
 protected:

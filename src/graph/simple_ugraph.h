@@ -846,7 +846,7 @@ namespace bitgraph {
 
 }//end namespace bitgraph
 
-	using USS = bitgraph::Ugraph<BBScanSp>;
+	using USS = bitgraph::Ugraph<bitgraph::BBScanSp>;
 
 	////////////////////////
 	//

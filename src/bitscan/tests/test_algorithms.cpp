@@ -16,6 +16,8 @@
 
 using namespace std;
 
+using namespace bitgraph;
+
 ///////////////////////////
 //predeclaration for g++
 #ifdef __GNUC__

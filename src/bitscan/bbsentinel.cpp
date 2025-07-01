@@ -16,13 +16,25 @@
 
 using namespace std;
 
-BBSentinel&  AND (const BitSet& lhs, const BBSentinel& rhs,  BBSentinel& res){
-	res.m_BBL=rhs.m_BBL;
-	res.m_BBH=rhs.m_BBH;
-	for(int i=rhs.m_BBL; i<=rhs.m_BBH; i++){
-		res.vBB_[i]=lhs.block(i)&rhs.vBB_[i];
+using namespace bitgraph;
+
+namespace bitgraph {
+
+	namespace _impl {
+
+		BBSentinel& AND(const BitSet& lhs, const BBSentinel& rhs, BBSentinel& res) {
+			res.m_BBL = rhs.m_BBL;
+			res.m_BBH = rhs.m_BBH;
+			for (int i = rhs.m_BBL; i <= rhs.m_BBH; i++) {
+				res.vBB_[i] = lhs.block(i) & rhs.vBB_[i];
+			}
+			return res;
+		}
+
 	}
-return res;
+
+	using _impl::AND;
+
 }
 
 void BBSentinel::init_sentinels(bool update){

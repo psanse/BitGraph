@@ -13,6 +13,7 @@
 #include <vector>
 
 using namespace std;
+using namespace bitgraph;
 
 class BBScanSpClassTest : public ::testing::Test {
 protected:

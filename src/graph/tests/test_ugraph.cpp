@@ -11,10 +11,12 @@
 
 
 //alias
-using graph = bitgraph::Graph<bitarray>;					//simple graph
-using ugraph = bitgraph::Ugraph<bitarray>;					//simple undirected graph	
+using graph = bitgraph::Graph<bitgraph::bitarray>;					//simple graph
+using ugraph = bitgraph::Ugraph<bitgraph::bitarray>;					//simple undirected graph	
 
 using namespace std;
+using namespace bitgraph;
+
 
 
 TEST(Ugraph_test, constructor_file){

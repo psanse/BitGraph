@@ -13,6 +13,7 @@
 #include <set>
 
 using namespace std;
+using namespace bitgraph;
 
 
 class BBScanClassTest: public ::testing::Test{

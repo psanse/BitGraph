@@ -11,6 +11,10 @@
 #include <iostream>
 
 using namespace std;
+using namespace bitgraph;
+
+using _impl::Tables;
+
 
 TEST(bblockTest, masks_in_range) {
 

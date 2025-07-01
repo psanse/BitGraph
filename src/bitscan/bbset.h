@@ -818,6 +818,8 @@ namespace bitgraph {
 	}//end namespace _impl
 
 	using _impl::BitSet;
+	using _impl::operator!=;
+
 
 }//end namespace bitgraph
 
@@ -1561,11 +1563,7 @@ namespace bitgraph{
 			return pc;
 		}
 
-		inline
-			bool operator==	(const BitSet& lhs, const BitSet& rhs) {
-			return ((lhs.nBB_ == rhs.nBB_) &&
-				(lhs.vBB_ == rhs.vBB_));
-		};
+		
 
 		BitSet& BitSet::erase_bit(const BitSet& bbn) {
 
@@ -1619,6 +1617,109 @@ namespace bitgraph{
 			return *this;
 		}
 
+		template<bool Erase>
+		BitSet& BitSet::AND_EQUAL_block(int firstBlock, int lastBlock, const BitSet& rhs) {
+
+			auto last_block = ((lastBlock == -1) ? nBB_ - 1 : lastBlock);
+
+			///////////////////////////////////////////////////////////////////////////////////
+			assert((firstBlock >= 0) && (firstBlock <= last_block) && (last_block < rhs.capacity()));
+			/////////////////////////////////////////////////////////////////////////////////
+
+
+			for (auto i = firstBlock; i <= last_block; ++i) {
+				this->vBB_[i] &= rhs.vBB_[i];
+			}
+
+			//set bits to 0 outside the range if required
+			if (Erase) {
+				for (int i = last_block + 1; i < nBB_; ++i) {
+					vBB_[i] = ZERO;
+				}
+				for (int i = 0; i < firstBlock; ++i) {
+					vBB_[i] = ZERO;
+				}
+			}
+
+			return *this;
+		}
+
+		template<bool Erase>
+		BitSet& BitSet::OR_EQUAL_block(int firstBlock, int lastBlock, const BitSet& rhs) {
+
+			auto last_block = ((lastBlock == -1) ? nBB_ - 1 : lastBlock);
+
+			///////////////////////////////////////////////////////////////////////////////////
+			assert((firstBlock >= 0) && (firstBlock <= last_block) && (last_block < rhs.capacity()));
+			/////////////////////////////////////////////////////////////////////////////////
+
+			for (auto i = firstBlock; i <= last_block; ++i) {
+				vBB_[i] |= rhs.vBB_[i];
+			}
+
+			//set bits to 0 outside the range if required
+			if (Erase) {
+				for (int i = last_block + 1; i < nBB_; ++i) {
+					vBB_[i] = ZERO;
+				}
+				for (int i = 0; i < firstBlock; ++i) {
+					vBB_[i] = ZERO;
+				}
+			}
+
+			return *this;
+		}
+
+		
+
+		/////////////////
+		//
+		// DEPRECATED STATELESS MASKING FUNCTIONS
+		//
+		//////////////////
+
+		//template<bool Erase = false>
+		//inline
+		//BitSet& AND(int lastBit, const BitSet& lhs, const BitSet& rhs, BitSet& res) {
+		//
+		//	//determine bitblock
+		//	int nbb = WDIV(lastBit);
+		//
+		//	for (auto i = 0; i <= nbb; ++i) {
+		//		res.vBB_[i] = rhs.vBB_[i] & lhs.vBB_[i];
+		//	}
+		//
+		//	//trim last part of the bitblock - including lastBit
+		//	res.vBB_[nbb] &= Tables::mask_low[lastBit - WMUL(nbb) /* WMOD(lastBit)*/];
+		//
+		//	//delete the rest of bitstring if the operation is not lazy
+		//	if (Erase) {
+		//		for (int i = nbb + 1; i < lhs.nBB_; ++i) {
+		//			res.vBB_[i] = ZERO;
+		//		}
+		//	}
+		//
+		//	return res;
+		//}
+
+	} //end namespace _impl
+
+}//end namespace bitgraph
+
+
+///////////////////
+// friend functions of BitSet
+
+
+namespace bitgraph {
+
+	namespace _impl {
+
+		inline
+			bool operator==	(const BitSet& lhs, const BitSet& rhs) {
+			return ((lhs.nBB_ == rhs.nBB_) &&
+				(lhs.vBB_ == rhs.vBB_));
+		};
 
 		template<bool Erase>
 		inline
@@ -1725,33 +1826,7 @@ namespace bitgraph{
 			return res;
 		}
 
-		template<bool Erase>
-		BitSet& BitSet::AND_EQUAL_block(int firstBlock, int lastBlock, const BitSet& rhs) {
-
-			auto last_block = ((lastBlock == -1) ? nBB_ - 1 : lastBlock);
-
-			///////////////////////////////////////////////////////////////////////////////////
-			assert((firstBlock >= 0) && (firstBlock <= last_block) && (last_block < rhs.capacity()));
-			/////////////////////////////////////////////////////////////////////////////////
-
-
-			for (auto i = firstBlock; i <= last_block; ++i) {
-				this->vBB_[i] &= rhs.vBB_[i];
-			}
-
-			//set bits to 0 outside the range if required
-			if (Erase) {
-				for (int i = last_block + 1; i < nBB_; ++i) {
-					vBB_[i] = ZERO;
-				}
-				for (int i = 0; i < firstBlock; ++i) {
-					vBB_[i] = ZERO;
-				}
-			}
-
-			return *this;
-		}
-
+		
 		template<bool Erase>
 		inline
 			BitSet& OR(int firstBit, int lastBit, const BitSet& lhs, const BitSet& rhs, BitSet& res)
@@ -1855,64 +1930,16 @@ namespace bitgraph{
 			return res;
 		}
 
-		template<bool Erase>
-		BitSet& BitSet::OR_EQUAL_block(int firstBlock, int lastBlock, const BitSet& rhs) {
+		
 
-			auto last_block = ((lastBlock == -1) ? nBB_ - 1 : lastBlock);
+	}//end namespace _impl
 
-			///////////////////////////////////////////////////////////////////////////////////
-			assert((firstBlock >= 0) && (firstBlock <= last_block) && (last_block < rhs.capacity()));
-			/////////////////////////////////////////////////////////////////////////////////
-
-			for (auto i = firstBlock; i <= last_block; ++i) {
-				vBB_[i] |= rhs.vBB_[i];
-			}
-
-			//set bits to 0 outside the range if required
-			if (Erase) {
-				for (int i = last_block + 1; i < nBB_; ++i) {
-					vBB_[i] = ZERO;
-				}
-				for (int i = 0; i < firstBlock; ++i) {
-					vBB_[i] = ZERO;
-				}
-			}
-
-			return *this;
-		}
-
-
-		/////////////////
-		//
-		// DEPRECATED STATELESS MASKING FUNCTIONS
-		//
-		//////////////////
-
-		//template<bool Erase = false>
-		//inline
-		//BitSet& AND(int lastBit, const BitSet& lhs, const BitSet& rhs, BitSet& res) {
-		//
-		//	//determine bitblock
-		//	int nbb = WDIV(lastBit);
-		//
-		//	for (auto i = 0; i <= nbb; ++i) {
-		//		res.vBB_[i] = rhs.vBB_[i] & lhs.vBB_[i];
-		//	}
-		//
-		//	//trim last part of the bitblock - including lastBit
-		//	res.vBB_[nbb] &= Tables::mask_low[lastBit - WMUL(nbb) /* WMOD(lastBit)*/];
-		//
-		//	//delete the rest of bitstring if the operation is not lazy
-		//	if (Erase) {
-		//		for (int i = nbb + 1; i < lhs.nBB_; ++i) {
-		//			res.vBB_[i] = ZERO;
-		//		}
-		//	}
-		//
-		//	return res;
-		//}
-
-	} //end namespace _impl
+	using _impl::operator==;
+	using _impl::AND;
+	using _impl::AND_block;
+	using _impl::OR;
+	using _impl::OR_block;
+	
 
 }//end namespace bitgraph
 

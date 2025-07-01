@@ -19,6 +19,8 @@
 
 using namespace std;
 
+using namespace bitgraph;
+
 class MasksTest : public ::testing::Test {
 protected:
 	MasksTest() : bb(130), bb1(130) {}

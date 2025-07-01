@@ -12,6 +12,9 @@
 
 using namespace std;
 
+
+using namespace bitgraph;
+
 class BitScanNestedTest : public ::testing::Test {
 protected:
 	BitScanNestedTest() :bb(65) {}
