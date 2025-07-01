@@ -1,5 +1,7 @@
 #include "tables.h"
 
+using bitgraph::_impl::Tables;
+
 //common masks and lookup tables always available
 int Tables::pc[65536];								//1_bit population in 16 bit blocks
 int Tables::lsb[65536];								//LSB lookup table 16 bits

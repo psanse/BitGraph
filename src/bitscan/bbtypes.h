@@ -21,13 +21,15 @@
 
 #ifndef __BBTYPES_H__
 #define __BBTYPES_H__
-		
-using U8		= unsigned char;
-using U16		= unsigned short;
-using U32		= unsigned long;
-using BITBOARD	= unsigned long long;
-using BYTE		= unsigned char;	
-using BOOL		= int;								//Deprecated: use bool instead (CHECK 08/02/25)
+
+
+	using U8 = unsigned char;
+	using U16 = unsigned short;
+	using U32 = unsigned long;
+	using BITBOARD = unsigned long long;
+	using BYTE = unsigned char;
+	using BOOL = int;								//Deprecated: use bool instead (CHECK 08/02/25)
+
 
 constexpr BITBOARD ONE = 0xFFFFFFFFFFFFFFFF;		//1 bit mask	
 constexpr BITBOARD EVEN = 0x5555555555555555;		//1 bits in even positions: 64 bits
