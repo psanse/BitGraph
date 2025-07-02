@@ -23,7 +23,7 @@
 
 //useful alias
 using vint	= std::vector<int>;
-using vbset = std::vector<BITBOARD>;	
+using vbset = std::vector<bitgraph::BITBOARD>;
 
 namespace bitgraph {
 
@@ -818,7 +818,17 @@ namespace bitgraph {
 	}//end namespace _impl
 
 	using _impl::BitSet;
+
 	using _impl::operator!=;
+	using _impl::operator==;
+	using _impl::AND;
+	using _impl::OR;
+	using _impl::AND_block;
+	using _impl::OR_block;
+	using _impl::find_first_common;
+	using _impl::find_first_common_block;
+	using _impl::erase_bit;
+
 
 
 }//end namespace bitgraph
@@ -828,9 +838,7 @@ namespace bitgraph {
 // Necessary implementations for generic code - must be in header file
 
 namespace bitgraph{
-
-	namespace _impl {
-
+	
 		int BitSet::find_first_common(const BitSet& rhs) const {
 
 			BITBOARD bb = 0;
@@ -1702,7 +1710,6 @@ namespace bitgraph{
 		//	return res;
 		//}
 
-	} //end namespace _impl
 
 }//end namespace bitgraph
 
@@ -1934,12 +1941,6 @@ namespace bitgraph {
 
 	}//end namespace _impl
 
-	using _impl::operator==;
-	using _impl::AND;
-	using _impl::AND_block;
-	using _impl::OR;
-	using _impl::OR_block;
-	
 
 }//end namespace bitgraph
 

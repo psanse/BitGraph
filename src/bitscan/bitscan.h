@@ -1,6 +1,6 @@
 /**
  * @file bitscan.h
- * @brief Main header file for the BITSCAN library
+ * @brief Main header file for the BITSCAN part of the BITGRAPH lib
  * @version 1.0
  * @details The BITSCAN library is a C++ library for bit set optimization. *
  * @details created 2014, last update 12/02/2025

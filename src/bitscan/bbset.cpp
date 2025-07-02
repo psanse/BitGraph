@@ -367,6 +367,8 @@ BitSet& BitSet::set_bit(const vint& lv) {
 	return *this;
 
 }
+
+
 ///////////////////////
 // friend functions of BitSet
 //
@@ -462,12 +464,6 @@ namespace bitgraph {
 		}
 
 	}//end namespace _impl
-
-	using _impl::AND;
-	using _impl::OR;
-	using _impl::erase_bit;
-	using _impl::find_first_common;
-	using _impl::find_first_common_block;
 
 }//end namespace bitgraph
 

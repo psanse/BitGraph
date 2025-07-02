@@ -1,5 +1,7 @@
 #include "tables.h"
 
+
+using namespace bitgraph;
 using bitgraph::_impl::Tables;
 
 //common masks and lookup tables always available

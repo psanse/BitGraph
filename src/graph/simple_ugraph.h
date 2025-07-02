@@ -857,7 +857,7 @@ namespace bitgraph {
 
 	template<>
 	inline
-		BITBOARD USS::number_of_edges(bool lazy) {
+		bitgraph::BITBOARD USS::number_of_edges(bool lazy) {
 
 		if (lazy || ptype::NE_ == 0) {
 

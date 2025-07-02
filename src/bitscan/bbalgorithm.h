@@ -303,6 +303,9 @@ namespace bitgraph {
 	using _impl::bbStack_t;
 	using _impl::bbCol_t;	
 
+	using _impl::operator==;
+	using _impl::operator!=;
+
 }//end namespace bitgraph
 
 ///////////////////////////////////////////////////////////
@@ -310,8 +313,6 @@ namespace bitgraph {
 
 
 namespace bitgraph {
-
-	namespace _impl {
 
 		template <class BitSet_t, int SIZE>
 		inline
@@ -461,7 +462,6 @@ namespace bitgraph {
 			}
 		}
 
-	}//end namespace _impl
 
 }//end namespace bitgraph
 

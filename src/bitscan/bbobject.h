@@ -18,7 +18,7 @@ namespace bitgraph {
 		//////////////////
 		//
 		// BBObject class
-		// (abstract class - base of the bitstring hierarchy)
+		// (abstract class - base of the bitset hierarchy)
 		//
 		//////////////////
 
@@ -60,6 +60,7 @@ namespace bitgraph {
 			// Currently, BitSet_t can only be an object derived from BBScan class (14/02/25)
 			//
 			////////////////////////////
+
 			template< class BitSet_t >
 			struct ScanRev {
 				using basic_type = BitSet_t;
@@ -219,6 +220,7 @@ namespace bitgraph {
 	}// namespace _impl
 
 	using _impl::BBObject;
+	using _impl::operator<<;
 
 }// namespace bitgraph
 

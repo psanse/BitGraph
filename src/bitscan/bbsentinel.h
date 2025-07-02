@@ -101,6 +101,8 @@ namespace bitgraph {
 
 	using _impl::BBSentinel;
 
+	using _impl::AND;
+
 }//namespace bitgraph
 
 
