@@ -3,12 +3,13 @@
 * @brief GRAPH sorting example - linking to GRAPH lib.
 * @details created 01/2025, last updated 02/05/2025
 **/
-using namespace std;
+
 
 #include <iostream>
 #include "BitGraph/graph/graph.h"							//header file for main types of GRAPH lib
 #include "BitGraph/graph/algorithms/graph_fast_sort.h"		//sorting algorithms
 
+using namespace std;
 
 int main() {
 

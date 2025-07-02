@@ -4,7 +4,7 @@
 * @details: a target path is required in the command line for the uniform random benchmark
 * @details created 02/2025, last updated 02/05/2025
 **/
-using namespace std;
+
 
 #include <iostream>
 #include "BitGraph/graph/graph.h"							//header file for main types of GRAPH lib

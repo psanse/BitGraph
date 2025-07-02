@@ -4,15 +4,17 @@
 * @details created 26/02/2025
 **/
 
-using namespace std;
-
 #include <iostream>
 #include <BitGraph/bitscan/bitscan.h>		//the one and only header file for the BITSCAN 1.0 lib
+
+using namespace std;
+//using namespace bitgraph;					//alternatively, to avoid typing "bitgraph::" before each type
+
 
 int main() {
 
 	//small bitset (130 elements)
-	bitarray bb(130);
+	bitgraph::bitarray bb(130);
 	bb.set_bit(0);
 	bb.set_bit(129);
 	bb.print();
@@ -20,7 +22,7 @@ int main() {
 	cout << "****************************" << endl;
 
 	//massive bitset (10M elements)
-	sparse_bitarray sb(10000000);
+	bitgraph::sparse_bitarray sb(10000000);
 	sb.set_bit(0);
 	sb.set_bit(900000);
 	sb.print();
@@ -30,25 +32,25 @@ int main() {
 
 
 	//non-destructive forward bitscanning (manual)
-	bb.init_scan(bbo::NON_DESTRUCTIVE);
-	int nBit = bbo::noBit;
-	while ((nBit = bb.next_bit()) != bbo::noBit) {
+	bb.init_scan(bitgraph::bbo::NON_DESTRUCTIVE);
+	int nBit = bitgraph::bbo::noBit;
+	while ((nBit = bb.next_bit()) != bitgraph::bbo::noBit) {
 		cout << "bit scanned:" << nBit << endl;
 	}
 
 	cout << "****************************" << endl;
 
 	//non-destructive forward bitscanning (specialized scanning objects)
-	bbo::Scan<bitarray> sc(bb);
-	while ( (nBit = sc.next_bit()) != bbo::noBit) {
+	bitgraph::bbo::Scan<bitgraph::bitarray> sc(bb);
+	while ( (nBit = sc.next_bit()) != bitgraph::bbo::noBit) {
 		cout << "bit scanned:" << nBit << endl;
 	}
 
 	cout << "****************************" << endl;
 
 	//non-destructive forward bitscanning for sparse bitsets
-	bbo::Scan<sparse_bitarray> scSparse(sb);
-	while ((nBit = scSparse.next_bit()) != bbo::noBit) {
+	bitgraph::bbo::Scan<bitgraph::sparse_bitarray> scSparse(sb);
+	while ((nBit = scSparse.next_bit()) != bitgraph::bbo::noBit) {
 		cout << "sparse bit scanned:" << nBit << endl;
 	}
 
