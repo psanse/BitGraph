@@ -11,203 +11,209 @@
 
 #include <iostream>
 
-namespace com {
-
-	////////////////////////
-	//
-	// struct stack_t
-	//
-	// (simple stack implemented by a C-array)
-	//
-	////////////////////////
-
-	template <class T>
-	struct stack_t {
+namespace bitgraph {
 	
-		///////
-		//construction / destruction
-		stack_t		();
-explicit stack_t	(int MAX_SIZE);
+	namespace com {
 
-		//copy semantics are disallowed
-		stack_t				(const stack_t& )	= delete;
-		stack_t& operator = (const stack_t& )	= delete;
+		////////////////////////
+		//
+		// struct stack_t
+		//
+		// (simple stack implemented by a C-array)
+		//
+		////////////////////////
 
-		//move semantics are allowed
-		stack_t				(stack_t&&)	 noexcept;
-		stack_t& operator = (stack_t&&)	 noexcept;
-			
-		~stack_t	()					{ clear(); }
+		template <class T>
+		struct stack_t {
 
-		//setters and getters 
-	const T& at			(int pos)	const			{ return stack_[pos]; }
-	const T& top		()			const;
-	const T& bottom		()			const			{ return stack_[0]; }
+			///////
+			//construction / destruction
+			stack_t();
+			explicit stack_t(int MAX_SIZE);
 
-		 T& at			(int pos)					{ return stack_[pos]; }
-		 T& top			();
-		 T& bottom		()							{ return stack_[0]; }
-		 	
-		std::size_t size()							{ return nE_; }
+			//copy semantics are disallowed
+			stack_t(const stack_t&) = delete;
+			stack_t& operator = (const stack_t&) = delete;
 
-		////////////
-		// memory
-		
-		/**
-		* @brief Resets the stack to a new size, previos elements are destroyed. 
-		*        The new elements are constructed with the default constructor
-		**/
-		void reset		(int MAX_SIZE);
+			//move semantics are allowed
+			stack_t(stack_t&&)	 noexcept;
+			stack_t& operator = (stack_t&&)	 noexcept;
 
-	private:
-		/**
-		* @brief Deallocates memory (used by the destructor)
-		*	     Use erase to clean the stack without deallocating memory
-		**/
-		void clear		();					
-		
-		//////////////
-		//basic operations (no memory management)
-	public:
-				
-		/**
-		* @brief Places element at the top of the stack
-		*	     (last position in the underlying array)
-		**/
-		void push		(T d);
-				
-		/**
-		* @brief Places element at the bottom of the stack
-		*	     (first position in the underlying array)
-		* 
-		*		 I. The bottom element is moved to the top of the stack
-		**/
-		void push_bottom(T d);
-					
-		/**
-		* @brief Rremoves the top element from the stack 
-		*	     (the element is lost)
-		**/
-		void pop		();
-						
-		/**
-		* @brief Removes the top nb elements from the top of the stack.
-		*		 (the elements are lost)
-		* @param nb: number of elements to remove
-		*	   
-		**/
-		void pop		(std::size_t nb);
-			
-		/**
-		* @brief Removes the bottom element of the stack.  from the top of the stack.
-		*		 (the element is lost)
-		*
-		*		 I. The top element is moved to the bottomof the stack
-		**/
-		void pop_bottom	();
-				
-		/**
-		* @brief Removes the element at position pos form the underlying array.
-		*		 (the element is lost)
-		*
-		*		 I. The top element is moved to position pos
-		* @param pos: position of the element to remove
-		**/
-		void erase		(int pos);
-					
-		/**
-		* @brief Removes all elements from the stack.
-		*		 (no deallocation)
-		**/
-		void erase		()					{ nE_ = 0; }									
+			~stack_t() { clear(); }
 
-		/////////////////
-		//boolean operations
-		
-		bool empty		()		const		{ return (nE_ == 0); }
+			//setters and getters 
+			const T& at(int pos)	const { return stack_[pos]; }
+			const T& top()			const;
+			const T& bottom()			const { return stack_[0]; }
 
-		/////
-		//I/O
+			T& at(int pos) { return stack_[pos]; }
+			T& top();
+			T& bottom() { return stack_[0]; }
 
-		std::ostream& print(std::ostream& o) const;
-		friend std::ostream& operator << (std::ostream& o, const stack_t& s)	{ s.print(o); return o; }
-	
-		/////////////////////
-		// data members
-		
-		std::size_t nE_;								//number of elements, used as internal index
-		T* stack_;										//underlying C-array (TODO - raw pointer ¿change to a std::vector?)		
+			std::size_t size() { return nE_; }
+
+			////////////
+			// memory
+
+			/**
+			* @brief Resets the stack to a new size, previos elements are destroyed.
+			*        The new elements are constructed with the default constructor
+			**/
+			void reset(int MAX_SIZE);
+
+		private:
+			/**
+			* @brief Deallocates memory (used by the destructor)
+			*	     Use erase to clean the stack without deallocating memory
+			**/
+			void clear();
+
+			//////////////
+			//basic operations (no memory management)
+		public:
+
+			/**
+			* @brief Places element at the top of the stack
+			*	     (last position in the underlying array)
+			**/
+			void push(T d);
+
+			/**
+			* @brief Places element at the bottom of the stack
+			*	     (first position in the underlying array)
+			*
+			*		 I. The bottom element is moved to the top of the stack
+			**/
+			void push_bottom(T d);
+
+			/**
+			* @brief Rremoves the top element from the stack
+			*	     (the element is lost)
+			**/
+			void pop();
+
+			/**
+			* @brief Removes the top nb elements from the top of the stack.
+			*		 (the elements are lost)
+			* @param nb: number of elements to remove
+			*
+			**/
+			void pop(std::size_t nb);
+
+			/**
+			* @brief Removes the bottom element of the stack.  from the top of the stack.
+			*		 (the element is lost)
+			*
+			*		 I. The top element is moved to the bottomof the stack
+			**/
+			void pop_bottom();
+
+			/**
+			* @brief Removes the element at position pos form the underlying array.
+			*		 (the element is lost)
+			*
+			*		 I. The top element is moved to position pos
+			* @param pos: position of the element to remove
+			**/
+			void erase(int pos);
+
+			/**
+			* @brief Removes all elements from the stack.
+			*		 (no deallocation)
+			**/
+			void erase() { nE_ = 0; }
+
+			/////////////////
+			//boolean operations
+
+			bool empty()		const { return (nE_ == 0); }
+
+			/////
+			//I/O
+
+			std::ostream& print(std::ostream& o) const;
+			friend std::ostream& operator << (std::ostream& o, const stack_t& s) { s.print(o); return o; }
+
+			/////////////////////
+			// data members
+
+			std::size_t nE_;								//number of elements, used as internal index
+			T* stack_;										//underlying C-array (TODO - raw pointer ¿change to a std::vector?)		
 #ifdef DEBUG_STACKS
-		int MAX_;										//maximum number of elements	
+			int MAX_;										//maximum number of elements	
 #endif
 
-	};
+		};
 
-	////////////////////////
-	//
-	// struct range_t
-	//
-	// (interval of positive integers - typically a range of vertices)
-	///////////////////////
+		////////////////////////
+		//
+		// struct range_t
+		//
+		// (interval of positive integers - typically a range of vertices)
+		///////////////////////
 
-	struct range_t {
-		static const int noRange = -1;			
-		int vl, vh;								//vl: low vertex/value, vh: high vertex/value
+		struct range_t {
+			static const int noRange = -1;
+			int vl, vh;								//vl: low vertex/value, vh: high vertex/value
 
-		range_t(int lh = noRange, int rh = noRange) :
-			vl{ lh }, vh{ rh }
-		{}
+			range_t(int lh = noRange, int rh = noRange) :
+				vl{ lh }, vh{ rh }
+			{
+			}
 
-		//boolean operations
+			//boolean operations
 
-		/**
-		* @brief: determines an empty range
-		* @returns: True if the range has at least one NO_RANGE value False otherwise
-		**/
-		bool is_empty() const { return (vl == noRange || vh == noRange); }
+			/**
+			* @brief: determines an empty range
+			* @returns: True if the range has at least one NO_RANGE value False otherwise
+			**/
+			bool is_empty() const { return (vl == noRange || vh == noRange); }
 
-		//I/O
+			//I/O
 
-		/**
-		* @brief: streams the range in the format [@vl, @vh]
-		**/
-		std::ostream& print(std::ostream& os = std::cout) const {
-			os << "[" << vl << "," << vh << "]"; 
-			return os; 
-		}		
-	};
+			/**
+			* @brief: streams the range in the format [@vl, @vh]
+			**/
+			std::ostream& print(std::ostream& os = std::cout) const {
+				os << "[" << vl << "," << vh << "]";
+				return os;
+			}
+		};
 
-	inline
-	bool operator == (const range_t& lhs, const range_t& rhs) {
-		return (lhs.vl == rhs.vl && rhs.vh == rhs.vh);
+		inline
+			bool operator == (const range_t& lhs, const range_t& rhs) {
+			return (lhs.vl == rhs.vl && rhs.vh == rhs.vh);
+		}
+
+
+		///////////////////////
+		//
+		// class my_array
+		//
+		// my old C_array wrraper
+		// 
+		// TODO - deprecated, possibly remove (17(01/25)
+		//
+		////////////////////////
+
+		/*template<class T>
+		class my_array {
+			T* pt;
+			size_t sz;
+		public:
+			my_array	(size_t size, T val) :sz(size) { pt = new T[sz];  for (int i = 0; i < sz; i++) { pt[i] = val; } }
+			~my_array() { delete[] pt; }
+			T& operator [](int idx) { return pt[idx]; }
+			const T& operator [](int idx) const { return pt[idx]; }
+			T at(int idx) { return pt[idx]; }
+			T* get_array() { return pt; };
+			size_t size() { return sz; }
+		};*/
+
 	}
-	
 
-	///////////////////////
-	//
-	// class my_array
-	//
-	// my old C_array wrraper
-	// 
-	// TODO - deprecated, possibly remove (17(01/25)
-	//
-	////////////////////////
 
-	/*template<class T>
-	class my_array {
-		T* pt;
-		size_t sz;
-	public:
-		my_array	(size_t size, T val) :sz(size) { pt = new T[sz];  for (int i = 0; i < sz; i++) { pt[i] = val; } }
-		~my_array() { delete[] pt; }
-		T& operator [](int idx) { return pt[idx]; }
-		const T& operator [](int idx) const { return pt[idx]; }
-		T at(int idx) { return pt[idx]; }
-		T* get_array() { return pt; };
-		size_t size() { return sz; }
-	};*/
-
-}
+}//end namespace bitgraph
 
 
 
