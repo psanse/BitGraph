@@ -39,9 +39,7 @@ using vint = std::vector<int>;
 using vdob = std::vector<double>;
 
 
-
-
-namespace com {
+namespace com { 
 	
 
  namespace dir {
