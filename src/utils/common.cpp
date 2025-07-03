@@ -10,11 +10,15 @@
 
 using namespace std;
 
+using namespace bitgraph;
+
 //gloabl template variables
-namespace com {
-	namespace rand {
-		template<typename D, typename RE>
-		std::size_t RandomUniformGen<D, RE>::seed_ = RandomUniformGen<D, RE>::FIXED_RANDOM_SEED;
+namespace bitgraph {
+	namespace com {
+		namespace rand {
+			template<typename D, typename RE>
+			std::size_t RandomUniformGen<D, RE>::seed_ = RandomUniformGen<D, RE>::FIXED_RANDOM_SEED;
+		}
 	}
 }
 

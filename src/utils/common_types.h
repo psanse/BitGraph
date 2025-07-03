@@ -2,7 +2,7 @@
  * @file common_types.h  
  * @brief set of useful types 
  * @date ?
- * @last_update 17/01/25
+ * @last_update 03/07/25
  * @author pss
  **/
 
@@ -10,6 +10,18 @@
 #define	__COMMON_TYPES_H__
 
 #include <iostream>
+#include <vector>
+
+///////////////////////
+// useful aliases 
+
+namespace bitgraph {
+
+	using vint = std::vector<int>;
+	using vdob = std::vector<double>;
+
+}
+
 
 namespace bitgraph {
 	
@@ -128,11 +140,13 @@ namespace bitgraph {
 
 			bool empty()		const { return (nE_ == 0); }
 
-			/////
+			////////////////////
 			//I/O
 
 			std::ostream& print(std::ostream& o) const;
-			friend std::ostream& operator << (std::ostream& o, const stack_t& s) { s.print(o); return o; }
+			
+			template<class U>
+			friend std::ostream& operator<< (std::ostream& o, const stack_t<U>& s);
 
 			/////////////////////
 			// data members
@@ -212,11 +226,24 @@ namespace bitgraph {
 
 	}
 
+	//not sure if third party code will use this features (TODO- CHECK)
+	using com::range_t;
+	using com::stack_t;
+	using com::operator==;
 
 }//end namespace bitgraph
 
 
+namespace bitgraph {
+	namespace com {
+				
+		template<class U>
+		inline
+		std::ostream& operator<< (std::ostream& o, const stack_t<U>& s) { s.print(o); return o; }
+	}
 
+	using com::operator<<;
+}
 
 
 #endif

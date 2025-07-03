@@ -32,11 +32,7 @@
 
 #include "common_types.h"				//common types additional utilities, to be included e
 
-///////////////////////
-// aliases 
 
-using vint = std::vector<int>;
-using vdob = std::vector<double>;
 
 namespace bitgraph {
 
@@ -684,6 +680,9 @@ namespace bitgraph {
 
 		}
 	}
+	
+	//provides access to third party code to bitgraph::com inside the bitgraph namespace
+	using namespace com;
 
 }//end namespace bitgraph
 
