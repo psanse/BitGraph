@@ -16,6 +16,7 @@
 
 #include "utils/common.h"
 
+
 /******************
 *
 * Class PrecisionTimer
@@ -24,31 +25,41 @@
 *
 ********************/
 
-class PrecisionTimer
-{
-public:
-	using clock_t = std::chrono::high_resolution_clock;					//chrono::steady_clock = chrono::high_resolution_clock in VS 2015
-	using wall_clock_t = std::chrono::system_clock;						//MUST BE
-	using timepoint_t = std::chrono::time_point<clock_t>;
-	using wall_timepoint_t = std::chrono::time_point<wall_clock_t>;
+namespace bitgraph {
 
-public:
-	void wall_tic() { wall_time = get_wall_time(); }
-	double wall_toc()  const { return com::time::toDouble(get_wall_time() - wall_time); };
-	void cpu_tic() { cpu_time = get_cpu_time(); }
-	double cpu_toc() const { return com::time::toDouble(get_cpu_time() - cpu_time); };
+	namespace _impl {
 
-	static std::string local_timestamp(bool date = true) {
-		return com::time::tp2string(wall_clock_t::now(), date);				//MUST BE wall clock
-	}
-private:
-	timepoint_t get_cpu_time() const { return clock_t::now(); }
-	wall_timepoint_t get_wall_time() const { return wall_clock_t::now(); }
+		class PrecisionTimer
+		{
+		public:
+			using clock_t = std::chrono::high_resolution_clock;					//chrono::steady_clock = chrono::high_resolution_clock in VS 2015
+			using wall_clock_t = std::chrono::system_clock;						//MUST BE
+			using timepoint_t = std::chrono::time_point<clock_t>;
+			using wall_timepoint_t = std::chrono::time_point<wall_clock_t>;
 
-private:
-	timepoint_t cpu_time;
-	wall_timepoint_t wall_time;
-};
+		public:
+			void wall_tic() { wall_time = get_wall_time(); }
+			double wall_toc()  const { return com::time::toDouble(get_wall_time() - wall_time); };
+			void cpu_tic() { cpu_time = get_cpu_time(); }
+			double cpu_toc() const { return com::time::toDouble(get_cpu_time() - cpu_time); };
+
+			static std::string local_timestamp(bool date = true) {
+				return com::time::tp2string(wall_clock_t::now(), date);				//MUST BE wall clock
+			}
+		private:
+			timepoint_t get_cpu_time() const { return clock_t::now(); }
+			wall_timepoint_t get_wall_time() const { return wall_clock_t::now(); }
+
+		private:
+			timepoint_t cpu_time;
+			wall_timepoint_t wall_time;
+		};
+
+	}//end namespace _impl
+
+	using _impl::PrecisionTimer;
+
+}//end namespace bitgraph
 
 #endif
 

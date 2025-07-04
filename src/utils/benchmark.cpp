@@ -14,6 +14,8 @@
 
 using namespace std;
 
+using namespace bitgraph;
+
 Benchmark::Benchmark(const string& pathname):
 	PATH_(pathname)
 {

@@ -135,7 +135,7 @@ namespace bitgraph {
 
 			/**
 			*  @brief Functor to compute the mean of a collection
-			*		   (use a for-each loop)
+			*		   (TODO- use a for-each loop)
 			**/
 			class MeanValue {
 			private:
@@ -156,7 +156,7 @@ namespace bitgraph {
 
 			/**
 			*  @brief Functor to compute the standard deviation of a collection
-			*		   given its mean (use a for-each loop)
+			*		   given its mean (TODO use a for-each loop)
 			**/
 			class StdDevValue {
 			private:
@@ -244,7 +244,7 @@ namespace bitgraph {
 	//////////////////////////////
 	//
 	// FUNCTORS for sorting
-	// (substitute by lambdas if possible - 18/01/2025)
+	// (TODO substitute by lambdas inside the code whenever possible - 18/01/2025)
 	//
 	//////////////////////////////
 
@@ -253,7 +253,7 @@ namespace bitgraph {
 		/**
 		* @brief Functor to sort a collection of elements by a criterion
 		*
-		*		 I. Enable type is for SFINAE handling of special cases
+		*		 I. Enable type is for SFINAE 
 		*
 		**/
 		template<class T, class ColCrit_t, bool Greater, typename Enable = void >
@@ -294,6 +294,7 @@ namespace bitgraph {
 
 		/**
 		* @brief functor to sort a collection according to a product of value and criterion
+		* @details: if contexpr (C++17) removed for C++11 compatibility
 		*
 		**/
 		template<class T, class ColCrit_t, bool Greater>
@@ -303,7 +304,7 @@ namespace bitgraph {
 			bool operator()(const T& a, const T& b) const {
 				auto prod_a = crit[a] * a;
 				auto prod_b = crit[b] * b;
-				if (Greater) {							 //if contexpr in C++17 is the point - removed for C++11 compatibility
+				if (Greater) {							 //if contexpr in C++17 removed for C++11 compatibility
 					return prod_a > prod_b;
 				}
 				else {
@@ -596,9 +597,9 @@ namespace bitgraph {
 			* @brief Streams a time duration
 			*		 (shows ratio and ticks)
 			**/
-			template <typename V, typename R>
+			template <typename T, typename R>
 			inline
-				std::ostream& operator << (std::ostream& s, const std::chrono::duration<V, R>& d)
+				std::ostream& operator << (std::ostream& s, const std::chrono::duration<T, R>& d)
 			{
 				s << "[" << d.count() << " of "
 					<< R::num << "/"
@@ -683,6 +684,10 @@ namespace bitgraph {
 	
 	//provides access to third party code to bitgraph::com inside the bitgraph namespace
 	using namespace com;
+	using namespace com::stl;
+	using namespace com::time;
+	using namespace com::sort;
+	using namespace com::rand;	
 
 }//end namespace bitgraph
 

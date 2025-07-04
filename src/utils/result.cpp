@@ -11,18 +11,35 @@
 
 using namespace std;
 
-ostream& operator<< (ostream& o, const Result& r){
-	 o<<setw(30)<<left<<r.m_name<<setw(15)<<r.m_steps<<setw(10)<<r.m_UB<<setw(10)<<r.m_LB<<fixed<<setw(12)<<setprecision(3)<<right<<r.m_uT;
-	
-	 //shows active counters
-	o<<setw(8)<<right;
-	for(int i=0; i<r.number_of_counters(); i++){
-			o<<" "<<r.get_counters()[i]<<" ";
+using namespace bitgraph;
+
+///////////////////
+// friend functions of result
+
+namespace bitgraph {
+
+	namespace _impl {
+
+		ostream& operator<< (ostream& o, const Result& r) {
+			o << setw(30) << left << r.m_name << setw(15) << r.m_steps << setw(10) << r.m_UB << setw(10) << r.m_LB << fixed << setw(12) << setprecision(3) << right << r.m_uT;
+
+			//shows active counters
+			o << setw(8) << right;
+			for (int i = 0; i < r.number_of_counters(); i++) {
+				o << " " << r.get_counters()[i] << " ";
+			}
+
+			o << endl;
+			return o;
+		}
 	}
-	
-	o<<endl;
-	return o;
+
+	using _impl::operator<<;
 }
+
+//////////////////////////
+// Result  class implementation
+
 
 string Result::get_current_local_time(){
 	return PrecisionTimer::local_timestamp();  
