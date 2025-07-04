@@ -10,7 +10,7 @@
 #include "utils/info/info_clq.h"
 #include <thread>
 
-using namespace com;
+using namespace bitgraph;
 
 
 class InfoCLQTest : public ::testing::Test {

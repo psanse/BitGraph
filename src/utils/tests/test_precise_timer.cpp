@@ -12,6 +12,7 @@
 
 
 using namespace std;
+using namespace bitgraph;
 
 class PrecisionTimerTest : public ::testing::Test {
 protected:

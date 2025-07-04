@@ -20,6 +20,7 @@
 #define INSTANCE_NAME	"graph"
 
 using namespace std;
+using namespace bitgraph;
 
 class InfoAnalyserTest : public ::testing::Test {
 protected:

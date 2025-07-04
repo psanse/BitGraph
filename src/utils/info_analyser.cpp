@@ -16,9 +16,20 @@
 
 
 using namespace std;
+using namespace bitgraph;
 
-template<class AlgInfo_t>
-std::ostream& operator << (std::ostream& o, const InfoAnalyser<AlgInfo_t>& t) { t.print_analyser_summary(o); return o; }
+////////////////////////////
+// friend functions of InfoAnalyser	
+namespace bitgraph {
+	namespace com {
+
+		template<class AlgInfo_t>
+		std::ostream& operator << (std::ostream& o, const InfoAnalyser<AlgInfo_t>& t) { t.print_analyser_summary(o); return o; }
+	}
+}
+
+///////////////////////////
+// InfoAnalyser class implementation
 
 template<class AlgInfo_t>
 void InfoAnalyser< AlgInfo_t>::clear()
@@ -489,14 +500,12 @@ std::ostream& InfoAnalyser<AlgInfo_t>::print_analyser_summary(std::ostream& o) c
 
 }
 
-
 /////////////////////////////////
 // declaration of valid types 
 
-template class InfoAnalyser< com::infoCLQ<int> >;
-template class InfoAnalyser< com::infoCLQ<double> >;
+template class InfoAnalyser< infoCLQ<int> >;
+template class InfoAnalyser< infoCLQ<double> >;
 
-template std::ostream& operator << (std::ostream& o, const InfoAnalyser<com::infoCLQ<int>>& t);
-template std::ostream& operator << (std::ostream& o, const InfoAnalyser<com::infoCLQ<double>>& t);
+template std::ostream& bitgraph::com::operator << (std::ostream& o, const InfoAnalyser<infoCLQ<int>>& t);
+template std::ostream& bitgraph::com::operator << (std::ostream& o, const InfoAnalyser<infoCLQ<double>>& t);
 
-/////////////////////////////////

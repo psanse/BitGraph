@@ -7,7 +7,8 @@
 #include <algorithm>
 
 using namespace std;
-using ull = unsigned long long;
+using namespace bitgraph;
+
 
 //TODO - CHECK DISABLED TEST - time (16/02/2025)
 

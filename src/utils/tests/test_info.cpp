@@ -11,7 +11,7 @@
 #include <iostream>
 #include <sstream>
 
-using namespace com;
+using namespace bitgraph;
 
 class InfoBaseTest : public ::testing::Test {
 protected:

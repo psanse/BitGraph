@@ -136,19 +136,19 @@ double infoBase::readTimer(phase_t t)
 
 	switch (t) {
 	case phase_t::SEARCH:
-		timeSearch_ = com::time::toDouble(endTime - startTimeSearch_);
+		timeSearch_ = com::_time::toDouble(endTime - startTimeSearch_);
 		elapsedTime = timeSearch_;
 		break;
 	case phase_t::PREPROC:
-		timePreproc_ = com::time::toDouble(endTime - startTimeSearch_);
+		timePreproc_ = com::_time::toDouble(endTime - startTimeSearch_);
 		elapsedTime = timePreproc_;
 		break;
 	case phase_t::PARSE:
-		timeParse_ = com::time::toDouble(endTime - startTimeSearch_);
+		timeParse_ = com::_time::toDouble(endTime - startTimeSearch_);
 		elapsedTime = timeParse_;
 		break;
 	case phase_t::LAST_INCUMBENT:
-		timeIncumbent_ = com::time::toDouble(endTime - startTimeSearch_);
+		timeIncumbent_ = com::_time::toDouble(endTime - startTimeSearch_);
 		elapsedTime = timeIncumbent_;
 		break;
 
@@ -164,7 +164,7 @@ double infoBase::readTimer(phase_t t)
 double infoBase::elapsedTime(tpoint_t startTime)
 {
 	tpoint_t endTime = PrecisionTimer::clock_t::now();
-	return com::time::toDouble(endTime - startTime);
+	return com::_time::toDouble(endTime - startTime);
 
 }
 

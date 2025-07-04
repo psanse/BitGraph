@@ -9,6 +9,7 @@
 #include <sstream>
 #include <string>
 #include "graph/algorithms/graph_gen.h"
+#include "utils/common.h"
 #include "utils/logger.h"
 
 //comment in release mode - to disable assertions

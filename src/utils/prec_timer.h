@@ -39,12 +39,12 @@ namespace bitgraph {
 
 		public:
 			void wall_tic() { wall_time = get_wall_time(); }
-			double wall_toc()  const { return com::time::toDouble(get_wall_time() - wall_time); };
+			double wall_toc()  const { return com::_time::toDouble(get_wall_time() - wall_time); };
 			void cpu_tic() { cpu_time = get_cpu_time(); }
-			double cpu_toc() const { return com::time::toDouble(get_cpu_time() - cpu_time); };
+			double cpu_toc() const { return com::_time::toDouble(get_cpu_time() - cpu_time); };
 
 			static std::string local_timestamp(bool date = true) {
-				return com::time::tp2string(wall_clock_t::now(), date);				//MUST BE wall clock
+				return com::_time::tp2string(wall_clock_t::now(), date);				//MUST BE wall clock
 			}
 		private:
 			timepoint_t get_cpu_time() const { return clock_t::now(); }

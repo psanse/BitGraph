@@ -1094,36 +1094,7 @@ namespace bitgraph {
 
 		return largest_clique;
 	}
-
-	struct less_kcore {
-		less_kcore(vector<int>& pos, vector<int>& ver, vector<int>& deg) :pos(pos), ver(ver), deg(deg) {}
-		bool operator()(int lhs, int rhs) const {
-			return(deg[ver[pos[lhs]]] > deg[ver[pos[lhs]]]);
-		}
-		vector<int>& pos;
-		vector<int>& ver;
-		vector<int>& deg;
-	};
-
-	struct remove_kcore {
-
-		//constructor
-		remove_kcore(vector<int>& pos, vector<int>& ver, vector<int>& deg, int max_clique) :
-			pos(pos), ver(ver), deg(deg), max_core_number(max_clique)
-		{
-		}
-
-		//functor operator
-		bool operator()(int data) const {
-			return(deg[ver[pos[data]]] < max_core_number);
-		}
-
-		//data members
-		vector<int>& pos;
-		vector<int>& ver;
-		vector<int>& deg;
-		int max_core_number;
-	};
+		
 
 	template<>
 	inline vint KCore<sparse_ugraph>::find_heur_clique_sparse(int num_iter) {
@@ -1132,6 +1103,36 @@ namespace bitgraph {
 		// date:30/12/2014
 		//
 		// COMMENTS: (only available for sparse_graph type)
+
+		struct less_kcore {
+			less_kcore(vector<int>& pos, vector<int>& ver, vector<int>& deg) :pos(pos), ver(ver), deg(deg) {}
+			bool operator()(int lhs, int rhs) const {
+				return(deg[ver[pos[lhs]]] > deg[ver[pos[lhs]]]);
+			}
+			vector<int>& pos;
+			vector<int>& ver;
+			vector<int>& deg;
+		};
+
+		struct remove_kcore {
+
+			//constructor
+			remove_kcore(vector<int>& pos, vector<int>& ver, vector<int>& deg, int max_clique) :
+				pos(pos), ver(ver), deg(deg), max_core_number(max_clique)
+			{
+			}
+
+			//functor operator
+			bool operator()(int data) const {
+				return(deg[ver[pos[data]]] < max_core_number);
+			}
+
+			//data members
+			vector<int>& pos;
+			vector<int>& ver;
+			vector<int>& deg;
+			int max_core_number;
+		};
 
 		auto max_size = 1;
 		auto iter = 1;
@@ -1154,8 +1155,8 @@ namespace bitgraph {
 			bbneigh.to_vector(candidates);
 
 			//sort degeneracy
-			sort(candidates.begin(), candidates.end(), less_kcore(pos_, ver_, deg_));
-
+			std::sort(candidates.begin(), candidates.end(), less_kcore(pos_, ver_, deg_));
+					
 			candidates.erase(remove_if(candidates.begin(), candidates.end(), remove_kcore(pos_, ver_, deg_, max_size)), candidates.end());
 
 

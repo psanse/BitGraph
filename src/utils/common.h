@@ -591,7 +591,7 @@ namespace bitgraph {
 	//
 	//////////////////////////////
 	namespace com {
-		namespace time {
+		namespace _time {
 
 			/**
 			* @brief Streams a time duration
@@ -680,14 +680,16 @@ namespace bitgraph {
 					int hour, int min, int sec = 0);
 
 		}
-	}
+	}//end namespace com
 	
 	//provides access to third party code to bitgraph::com inside the bitgraph namespace
 	using namespace com;
-	using namespace com::stl;
+
+	/*using namespace com::stl;
 	using namespace com::time;
 	using namespace com::sort;
 	using namespace com::rand;	
+	using namespace com::dir;*/
 
 }//end namespace bitgraph
 
