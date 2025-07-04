@@ -685,11 +685,11 @@ namespace bitgraph {
 	//provides access to third party code to bitgraph::com inside the bitgraph namespace
 	using namespace com;
 
-	/*using namespace com::stl;
-	using namespace com::time;
+	using namespace com::stl;
+	using namespace com::_time;
 	using namespace com::sort;
 	using namespace com::rand;	
-	using namespace com::dir;*/
+	using namespace com::dir;
 
 }//end namespace bitgraph
 
