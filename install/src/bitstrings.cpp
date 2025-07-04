@@ -1,7 +1,7 @@
 /**
 * @file bitstring.cpp
-* @brief Example of how to link to the BITSCAN lib.
-* @details created 26/02/2025
+* @brief Example of BITSCAN, part of the BITGRAPH lib.
+* @details created 26/02/2025, last update 04/07/2025
 **/
 
 #include <iostream>

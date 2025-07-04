@@ -1,7 +1,7 @@
 /**
 * @file graph_basic.cpp
-* @brief GRAPH basics - linking to GRAPH lib.
-* @details created 01/2025, last updated 02/05/2025
+* @brief Example of GRAPH, part of the BITGRAPH lib.
+* @details created 01/2025, last updated 04/07/2025
 **/
 
 
@@ -10,6 +10,8 @@
 
 
 using namespace std;
+//using namespace bitgraph;				//alternatively, to avoid typing "bitgraph::" before each type
+
 
 int main() {
 

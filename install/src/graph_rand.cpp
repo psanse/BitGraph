@@ -1,8 +1,8 @@
 /**
 * @file graph_rand.cpp
-* @brief GRAPH uniform random graphs example - linking to GRAPH lib.
+* @brief Example of GRAPH, part of the BITGRAPH lib.
 * @details: a target path is required in the command line for the uniform random benchmark
-* @details created 02/2025, last updated 02/05/2025
+* @details created 02/2025, last updated 04/07/2025
 **/
 
 
@@ -10,11 +10,9 @@
 #include "BitGraph/graph/graph.h"							//header file for main types of GRAPH lib
 #include "BitGraph/graph/algorithms/graph_gen.h"			//uniform random graph generator
 
-//comment in release mode - to disable assertions
-//#undef NDEBUG
-#include <cassert>
-
 using namespace std;
+//using namespace bitgraph;									//alternatively, to avoid typing "bitgraph::" before each type
+
 
 
 //UNIT TESTS
