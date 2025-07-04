@@ -843,7 +843,7 @@ namespace bitgraph {
 		//read the first edge to determine the type of input
 		//f.getline(line, 250); 
 		//stringstream sstr(line);
-		//int nw=com::counting::count_words(sstr.str());
+		//int nw=counting::count_words(sstr.str());
 		//if(nw< 3 || nw > 4){
 		//	cerr<<filename<<":wrong edge line format reading DIMACS format"<<endl;
 		//	reset(); f.close(); 	return -1;
@@ -1217,7 +1217,7 @@ namespace bitgraph {
 		//sets directed edges with probability p
 		for (std::size_t i = 0; i < NV_; ++i) {
 			for (std::size_t j = 0; j < NV_; ++j) {
-				if (::com::rand::uniform_dist(p)) {
+				if (rand::uniform_dist(p)) {
 					add_edge(i, j);
 				}
 			}
@@ -1235,7 +1235,7 @@ namespace bitgraph {
 		}
 
 		//generates edge
-		if (::com::rand::uniform_dist(p)) {
+		if (rand::uniform_dist(p)) {
 			add_edge(v, w);
 		}
 

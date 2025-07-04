@@ -35,7 +35,7 @@ using graph = bitgraph::Graph<bitarray>;			//simple graph
 using ugraph = bitgraph::Ugraph<bitarray>;			//simple undirected graph
 
 using namespace std;
-using namespace ::com::sort;
+using namespace bitgraph::com::sort;
 
 class GraphFastRootSortTest : public ::testing::Test {
 protected:

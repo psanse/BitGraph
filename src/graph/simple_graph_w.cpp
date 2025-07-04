@@ -302,7 +302,7 @@ int Base_Graph_W<Graph_t, W>::read_dimacs (string filename, int type){
 
 	std::getline(f, line);
 	stringstream sstr(line);
-	int nw = ::com::counting::number_of_words (line /*sstr.str()*/);
+	int nw = counting::number_of_words (line /*sstr.str()*/);
 
 	//assert
 	if(nw != 3){

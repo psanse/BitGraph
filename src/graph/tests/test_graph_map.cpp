@@ -46,8 +46,8 @@ TEST_F(GraphMapTest, build_mapping) {
 	//l2r={1, 2, 3 ,0}, r2l={3, 0, 1, 2}
 
 	GraphMap gm;
-	gm.build_mapping< GraphFastRootSort<ugraph>> (ug, GraphFastRootSort<ugraph>::MAX, ::com::sort::FIRST_TO_LAST,
-													  GraphFastRootSort<ugraph>::MIN, ::com::sort::FIRST_TO_LAST, "MAX F2L", "MIN F2L"	);
+	gm.build_mapping< GraphFastRootSort<ugraph>> (ug, GraphFastRootSort<ugraph>::MAX, sort::FIRST_TO_LAST,
+													  GraphFastRootSort<ugraph>::MIN, sort::FIRST_TO_LAST, "MAX F2L", "MIN F2L"	);
 	//////////////////////////////////												  
 	EXPECT_EQ	(NV, gm.size());
 	EXPECT_TRUE	(gm.is_consistent());
