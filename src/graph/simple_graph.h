@@ -129,7 +129,7 @@ namespace bitgraph {
 			* @brief resets to empty graph given name and number of vertices
 			* @param n number of vertices
 			* @param name name of the instance
-			* @returns 0 if success, -1 if memory allocation fails
+			* @returns 0 if success, -1 if memory allocation fails (non-throwing interface)
 			* @creation 31/12/24
 			**/
 			int reset(std::size_t n, string name = "");
@@ -137,7 +137,7 @@ namespace bitgraph {
 			/**
 			* @brief sets graph from file in dimacs/MTX/Edges formats (in this order)
 			* @param filename file
-			* @returns 0 if success, -1 if file cannot be read
+			* @returns 0 if success, -1 if file cannot be read (non-throwing interface)
 			**/
 			int reset(std::string filename);
 
@@ -424,7 +424,7 @@ namespace bitgraph {
 			//////////////////////////
 			// data members
 		protected:
-			std::vector<T> adj_;		//adjacency matrix 
+			std::vector<T> adj_;			//adjacency matrix 
 			std::size_t NV_;				//number of vertices
 			BITBOARD NE_;					//number of edges (updated on the fly)
 			std::size_t NBB_;				//number of bit blocks per row (in the case of sparse graphs this is a maximum value)

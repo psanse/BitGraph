@@ -59,22 +59,22 @@ namespace bitgraph {
 
 
 			//constructors
-			Base_Graph_W() {};																			//No memory allocation
+			Base_Graph_W() {};																					//No memory allocation
 			explicit Base_Graph_W(std::vector<W>& lw);															//creates empty graph with |V|= n with vertex weights
-			Base_Graph_W(_gt& g, vector<W>& lw) :g_(g), w_(lw) { assert(w_.size() == g_.size()); }	//creates graph with vertex weights	
-			Base_Graph_W(_gt& g) :g_(g), w_(g.size(), DEFAULT_WEIGHT) {}					//creates graph with DEFAULT_WEIGHTs
-			explicit Base_Graph_W(int N, W val = DEFAULT_WEIGHT) {
+			Base_Graph_W(_gt& g, vector<W>& lw) :g_(g), w_(lw) { assert(w_.size() == g_.size()); }				//creates graph with vertex weights	
+			Base_Graph_W(_gt& g) :g_(g), w_(g.size(), DEFAULT_WEIGHT) {}										//creates graph with DEFAULT_WEIGHTs
+			explicit Base_Graph_W(int N, W val = DEFAULT_WEIGHT) {												//creates empty graph with |V|= N and weight value val	
 				int ret_val = reset(N, val);
 				assert(ret_val != -1);
-			}				//creates empty graph with |V|= N with weight value val	
+			}				
 
-/*
-* @brief Reads weighted graph from ASCII file in DIMACS format
-*
-*		 If unable to read weights generates modulus weights [Pullman 2008]
-*
-*		 TODO: add support for other formats
-*/
+			/**
+			* @brief Reads weighted graph from ASCII file in DIMACS format
+			*
+			*		 If unable to read weights generates modulus weights [Pullman 2008]
+			*
+			*		 TODO: add support for other formats
+			**/
 			explicit Base_Graph_W(std::string filename);
 
 			//copy constructor, move constructor, copy operator =, move operator =

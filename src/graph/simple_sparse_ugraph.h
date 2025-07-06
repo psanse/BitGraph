@@ -19,8 +19,12 @@
 #include <string>
 #include <vector>
 
-//alias
-using USS = bitgraph::Ugraph<BBScanSp>;
+
+namespace bitgraph {
+	//useful alias
+	using USS = bitgraph::Ugraph<BBScanSp>;
+
+}
 
 ////////////////////////
 //
@@ -31,7 +35,7 @@ using USS = bitgraph::Ugraph<BBScanSp>;
 
 template<>
 inline
-BITBOARD USS::number_of_edges(bool lazy) {
+bitgraph::BITBOARD USS::number_of_edges(bool lazy) {
 		
 	if (lazy || ptype::NE_ == 0) {
 

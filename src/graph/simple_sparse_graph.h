@@ -18,8 +18,12 @@
 #include <string>
 #include <vector>
 
-//useful aliases
-using GSS = bitgraph::Graph<BBScanSp>;
+namespace bitgraph {
+
+	//useful aliases
+	using GSS = bitgraph::Graph<BBScanSp>;
+
+}
 
 ////////////////////////
 //
