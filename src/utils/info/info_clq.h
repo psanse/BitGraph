@@ -1,11 +1,12 @@
-/*
- *info_clq.h: interface for result logs of clique and clique-based algorithms
- *@date 12/12/2024
- *@last_update 16/01/2025
+/**
+ *@file info_clq.h:
+* @brief: interface for result logs of clique and clique-based algorithms
+ *@details created 12/12/2024, last_update 06/07/2025
  *@dev pss
- */
+ **/
 
- //TODO - move infoCliSAT to COPT lib (remove from bitgraph::com namespace)
+//TODO - move infoCliSAT to COPT lib (remove from bitgraph::com namespace)
+//TODO- under development, not used yet
 
 #ifndef __INFO_CLIQUE_H__
 #define __INFO_CLIQUE_H__
@@ -14,7 +15,6 @@
 #include <iostream>
 #include <vector>
 
-//TODO- CONTINUE
 
 namespace bitgraph {
 

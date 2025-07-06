@@ -216,9 +216,9 @@ int InfoAnalyser<AlgInfo_t>::analyser (comp_t* pComp){
 	//compares algorithms (use for comparison of two algorithms)
 	if(pComp != nullptr){
 
-		if (com::stl::all_equal(arrayOfAvSol))		{ pComp-> same_sol = true; }
-		if (com::stl::all_equal(arrayOfAvSteps))	{ pComp-> same_steps = true; }
-		if (com::stl::all_equal(arrayOfAvLB))		{ pComp-> same_lb = true; }
+		if (_stl::all_equal(arrayOfAvSol))		{ pComp-> same_sol = true; }
+		if (_stl::all_equal(arrayOfAvSteps))	{ pComp-> same_steps = true; }
+		if (_stl::all_equal(arrayOfAvLB))		{ pComp-> same_lb = true; }
 		if (arrayOfAvSteps[0] > arrayOfAvSteps[1])	{ pComp-> steps_first_greater = true; }
 		
 		pComp-> steps_lhs = arrayOfAvSteps[0];

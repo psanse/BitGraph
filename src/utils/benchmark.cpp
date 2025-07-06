@@ -36,7 +36,7 @@ void Benchmark::add_test(const string str_file){
 	}
 	else {								//appends slash to PATH_ if not present		
 		str = PATH_;
-		com::dir::append_slash(str);
+		com::_dir::append_slash(str);
 		str += str_file;
 
 		//#ifdef _WIN32
@@ -58,7 +58,7 @@ void Benchmark::add_test(const string str_file, int val){
 	}
 	else{								//appends slash to PATH_ if not present		
 		str = PATH_;
-		com::dir::append_slash(str);
+		com::_dir::append_slash(str);
 		str += str_file;	
 
 //#ifdef _WIN32

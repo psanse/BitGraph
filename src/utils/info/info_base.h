@@ -1,9 +1,9 @@
-/*
- *info_base.h: interface for result logs of clique and clique-based algorithms
- *@date 12/12/2024
- *@last_update 13/23/2024
+/**
+ *@file info_base.h
+* @brief: interface for result logs of clique and clique-based algorithms
+ *@details: created 12/12/2024, last_update 13/23/2024
  *@dev pss
- */
+ **/
 
 #ifndef _INFO_BASE_H_
 #define _INFO_BASE_H_
@@ -17,10 +17,7 @@
 namespace bitgraph {
 
 	namespace com {
-
-		using tpoint_t = PrecisionTimer::timepoint_t;
-
-
+		
 		//////////////////////
 		//
 		//	infoBase
@@ -32,6 +29,8 @@ namespace bitgraph {
 		///////////////////////
 
 		struct infoBase {
+
+			using tpoint_t = PrecisionTimer::timepoint_t;
 
 			enum phase_t { SEARCH = 0, PREPROC, LAST_INCUMBENT, PARSE };
 
@@ -108,16 +107,14 @@ namespace bitgraph {
 
 			//////////////////////
 			//data members
-
-
-					/////////////////////
-					//general info
-
-			std::string name_ = "";										//instance name
+			//////////////////////
+						
+			//general info
+			std::string name_ = "";											//instance name
 			uint32_t N_ = 0;												//number of vertices
 			uint64_t M_ = 0;												//number of edges			
-			double TIME_OUT_ = std::numeric_limits<double>::max();	//seconds
-			double TIME_OUT_HEUR_ = std::numeric_limits<double>::max();	//seconds
+			double TIME_OUT_ = std::numeric_limits<double>::max();			//in seconds
+			double TIME_OUT_HEUR_ = std::numeric_limits<double>::max();		//in seconds
 
 			//algorithms
 

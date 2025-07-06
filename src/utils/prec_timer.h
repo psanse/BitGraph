@@ -1,9 +1,9 @@
-//prec_timer.h:		class PreciseTimer for timestamps and time intervals
-//					uisng std::chrono from the SL
-//
-//@dev: pss
-//@date: 01/11/2024
-/////////////////////////////////////////
+/**
+* @file: prec_timer.h
+* @brief: header for class PreciseTimer that manages timestamps and time intervals
+* @details: uses std::chrono 
+* @detals: created 01/11/2024, last update 06/07/2025
+**/
 
 #ifndef __PRECISION_TIMER__
 #define __PRECISION_TIMER__
@@ -15,7 +15,6 @@
 #endif
 
 #include "utils/common.h"
-
 
 /******************
 *

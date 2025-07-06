@@ -165,7 +165,7 @@ void Result::print_last_sol(std::ostream& o ){
 
 void Result::print_all_sol (ostream& o){
 	for(int i=0; i<m_lsol.size(); i++){
-		com::stl::print_collection(m_lsol[i]);
+		_stl::print_collection(m_lsol[i]);
 		o<<endl;
 	}
 	o<<endl;

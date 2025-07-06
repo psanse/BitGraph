@@ -323,20 +323,20 @@ namespace bitgraph{
 		case L2R:
 			o << "\n*****************" << endl;
 			o << "L->R" << endl;
-			com::stl::print_collection(l2r_, o, true);
+			_stl::print_collection(l2r_, o, true);
 			o << "\n*****************" << endl;
 			break;
 		case R2L:
 			o << "\n*****************" << endl;
 			o << "R->L" << endl;
-			com::stl::print_collection(r2l_, o, true);
+			_stl::print_collection(r2l_, o, true);
 			o << "******************" << endl;
 			break;
 		case BOTH:
 			o << "\n*****************" << endl;
 			o << "L->R and R->L" << endl;
-			com::stl::print_collection(l2r_, o, true);
-			com::stl::print_collection(r2l_, o, true);
+			_stl::print_collection(l2r_, o, true);
+			_stl::print_collection(r2l_, o, true);
 			o << "*****************" << endl;
 			break;
 		default:

@@ -503,7 +503,7 @@ namespace bitgraph {
 			BITBOARD bb = 0;
 
 			for (auto i = 0; i < WORD_SIZE; i++) {
-				if (com::rand::uniform_dist(p)) {
+				if (com::_rand::uniform_dist(p)) {
 					bb |= Tables::mask[i];
 				}
 			}

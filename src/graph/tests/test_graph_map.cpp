@@ -46,8 +46,8 @@ TEST_F(GraphMapTest, build_mapping) {
 	//l2r={1, 2, 3 ,0}, r2l={3, 0, 1, 2}
 
 	GraphMap gm;
-	gm.build_mapping< GraphFastRootSort<ugraph>> (ug, GraphFastRootSort<ugraph>::MAX, sort::FIRST_TO_LAST,
-													  GraphFastRootSort<ugraph>::MIN, sort::FIRST_TO_LAST, "MAX F2L", "MIN F2L"	);
+	gm.build_mapping< GraphFastRootSort<ugraph>> (ug, GraphFastRootSort<ugraph>::MAX, _sort::FIRST_TO_LAST,
+													  GraphFastRootSort<ugraph>::MIN, _sort::FIRST_TO_LAST, "MAX F2L", "MIN F2L"	);
 	//////////////////////////////////												  
 	EXPECT_EQ	(NV, gm.size());
 	EXPECT_TRUE	(gm.is_consistent());
@@ -75,7 +75,7 @@ TEST_F(GraphMapTest, build_mapping_single_ordering){
 	//l2r={1, 2, 3 ,0}
 
 	GraphMap gm;
-	gm.build_mapping< GraphFastRootSort<ugraph> > (ug, GraphFastRootSort<ugraph>::MIN, ::com::sort::FIRST_TO_LAST, "MIN_DEG");
+	gm.build_mapping< GraphFastRootSort<ugraph> > (ug, GraphFastRootSort<ugraph>::MIN, _sort::FIRST_TO_LAST, "MIN_DEG");
 	
 	EXPECT_EQ(NV, gm.size());
 	
@@ -95,7 +95,7 @@ TEST_F(GraphMapTest, predefined_single_ordering){
 	
 	//predefined ordering
 	GraphFastRootSort<ugraph> gol(ug);
-	vint o2n = gol.new_order(GraphFastRootSort<ugraph>::MIN, ::com::sort::FIRST_TO_LAST);
+	vint o2n = gol.new_order(GraphFastRootSort<ugraph>::MIN, _sort::FIRST_TO_LAST);
 
 	GraphMap gm;
 	gm.build_mapping(o2n, "MIN F2L");			// builds mapping according to the given ordering

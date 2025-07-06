@@ -313,9 +313,9 @@ int TestAnalyser::analyser(info_t* info){
 	//compares algorithms (use for comparison of two algorithms)
 	if(info != nullptr){
 
-		if (com::stl::all_equal(arrayOfAvSol))		{ info -> same_sol = true; }
-		if (com::stl::all_equal(arrayOfAvSteps))	{ info -> same_steps = true; }
-		if (com::stl::all_equal(arrayOfAvLB))		{ info -> same_lb = true; }
+		if (_stl::all_equal(arrayOfAvSol))		{ info -> same_sol = true; }
+		if (_stl::all_equal(arrayOfAvSteps))	{ info -> same_steps = true; }
+		if (_stl::all_equal(arrayOfAvLB))		{ info -> same_lb = true; }
 		if (arrayOfAvSteps[0] > arrayOfAvSteps[1])	{ info -> steps_first_greater = true; }
 		
 		info -> steps_lhs = arrayOfAvSteps[0]; 

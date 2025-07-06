@@ -5,11 +5,8 @@
  * 
  *		  Manages a matrix of test results:	columns are algorithms, rows are repetitions
  * 
- * @date  2013
- * @last_update 20/01/2025
- * @author pss  
- * 
- * 
+ * @details: created  2013, last_update 20/01/2025
+ * @dev pss  
  **/
 
 #ifndef __INFO_ANALYSER_H__

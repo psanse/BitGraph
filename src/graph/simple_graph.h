@@ -1217,7 +1217,7 @@ namespace bitgraph {
 		//sets directed edges with probability p
 		for (std::size_t i = 0; i < NV_; ++i) {
 			for (std::size_t j = 0; j < NV_; ++j) {
-				if (rand::uniform_dist(p)) {
+				if (_rand::uniform_dist(p)) {
 					add_edge(i, j);
 				}
 			}

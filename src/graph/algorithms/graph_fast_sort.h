@@ -594,7 +594,7 @@ namespace bitgraph {
 	{
 
 		vint kord;
-		sort::fill_vertices(kord, first_k);
+		_sort::fill_vertices(kord, first_k);
 
 		//////////////////////////////////////////////////////
 		has_greater_val<int, vint> pred(nb_neigh_);
@@ -645,7 +645,7 @@ namespace bitgraph {
 	template<class Graph_t>
 	inline const vint& GraphFastRootSort<Graph_t>::sort_non_decreasing_deg(int first_k, bool rev) {
 		vint kord;
-		sort::fill_vertices(kord, first_k);
+		_sort::fill_vertices(kord, first_k);
 
 		//////////////////////////////////////////////////////
 		has_smaller_val<int, vint> pred(nb_neigh_);

@@ -1,9 +1,8 @@
 /**
  * @file benchmark.h
  * @brief interface for Benchmark class, a wrapper to manage graph datasets for testing
- * @date ?
- * @last_update 17/01/25
- * @author pss
+ * @details: created ?, last_update 06/07/25
+ * @dev pss
  **/
 
 #ifndef __BENCHMARK_H__

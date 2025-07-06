@@ -40,7 +40,7 @@ namespace bitgraph {
 	namespace com {
 
 
-		namespace dir {
+		namespace _dir {
 			/**
 			  * @brief Appends a slash at the end of the path if no slash is present.
 			  *		   The type of slash depends on the SO (Linux '/', Windows '\')
@@ -59,7 +59,7 @@ namespace bitgraph {
 			std::string remove_path(const std::string& path);
 		}
 
-		namespace stl {
+		namespace _stl {
 
 			/**
 			*
@@ -125,7 +125,7 @@ namespace bitgraph {
 
 		/////////////////////////////////////////////
 
-		namespace mat {
+		namespace _mat {
 
 			template<typename T>
 			inline
@@ -180,7 +180,7 @@ namespace bitgraph {
 		}
 		//////////////////////
 
-		namespace fileproc {
+		namespace _file {
 
 			/**
 			* @brief writes a set of vertices in a collection to file in the format:
@@ -221,7 +221,7 @@ namespace bitgraph {
 
 		}
 
-		namespace counting {
+		namespace _count {
 
 			/**
 			* @brief counts the number of words in a string
@@ -423,7 +423,7 @@ namespace bitgraph {
 	//
 	//////////////////////////////
 	namespace com {
-		namespace sort {
+		namespace _sort {
 			enum { FIRST_TO_LAST = 0, LAST_TO_FIRST };
 			enum { NEW_TO_OLD = 0, OLD_TO_NEW };			//format of the ordering - old-to-new in the space of the original graph, new-to-old in the space of the new graph
 
@@ -489,7 +489,7 @@ namespace bitgraph {
 	//
 	//////////////////////////////
 	namespace com {
-		namespace rand {
+		namespace _rand {
 
 			//////////////////
 			//
@@ -685,11 +685,11 @@ namespace bitgraph {
 	//provides access to third party code to bitgraph::com inside the bitgraph namespace
 	using namespace com;
 
-	using namespace com::stl;
+	using namespace com::_stl;
 	using namespace com::_time;
-	using namespace com::sort;
-	using namespace com::rand;	
-	using namespace com::dir;
+	using namespace com::_sort;
+	using namespace com::_rand;	
+	using namespace com::_dir;
 
 }//end namespace bitgraph
 

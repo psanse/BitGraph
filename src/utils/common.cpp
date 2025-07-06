@@ -16,7 +16,7 @@ using namespace std;
 namespace bitgraph {
 
 	namespace com {
-		namespace rand {
+		namespace _rand {
 			template<typename D, typename RE>
 			std::size_t RandomUniformGen<D, RE>::seed_ = RandomUniformGen<D, RE>::FIXED_RANDOM_SEED;
 		}
@@ -24,7 +24,7 @@ namespace bitgraph {
 
 	
 	namespace com {
-		namespace sort {
+		namespace _sort {
 
 			/********************************************************************************************************************************
 			*
@@ -71,7 +71,7 @@ namespace bitgraph {
 
 
 	namespace com {
-		namespace dir {
+		namespace _dir {
 
 			void append_slash(std::string& path) {
 
@@ -113,7 +113,7 @@ namespace bitgraph {
 
 
 	namespace com {
-		namespace fileproc {
+		namespace _file {
 
 			int READ_SET_OF_INTERDICTED_VERTICES(const char* filename, vector<int>& interdicted_nodes) {
 

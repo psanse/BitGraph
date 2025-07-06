@@ -1,11 +1,9 @@
 /**
-* @file file..h
+* @file file.h
 * @brief A basic wrapper to read/write from a filestream safely
-*		 Has a macr FILE_LOG for easy logging
-* @date 24/02/15
-* @last_update 19/01/25
+*		 Uses macro FILE_LOG for easy logging to file
+* @details: created 24/02/15, last_update 19/01/25
 * @author pss
-*
 **/
 
 #ifndef __FILE_LOG_H__

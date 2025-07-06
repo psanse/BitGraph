@@ -1,4 +1,4 @@
-/*
+/**
  * @file test_analyser.h
  * @brief TestAnalyser class to manage benchmarking of graph algorithms.
  *		  Manages a matrix of test results:	columns are algorithms, rows are repetitions
@@ -9,7 +9,7 @@
  * 
  * TODO - generic for other types different from Result (20/01/25)
  * 
- */
+ **/
 
 #ifndef __TEST_ANALYSER_H__
 #define __TEST_ANALYSER_H__
