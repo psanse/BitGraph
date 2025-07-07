@@ -154,19 +154,22 @@ TEST(BitScanNestedSparse, scanning_empty_bitsets) {
 
 	bbsp.erase_bit();
 	lb.clear();
-	//starts a new scan  - MUST capture the return val of init_scan
-	//if there is a risk the bitset to be scanned is empty
-	if ( sc1.init_scan() == 0 ) {
-		while ((bit = sc1.next_bit()) != BBObject::noBit) {
-			lb.push_back(bit);
-		}
 
-		///////////////////////
-		EXPECT_EQ(10, lb[0]);
-		EXPECT_EQ(20, lb[1]);
-		EXPECT_EQ(64, lb[2]);
-		///////////////////////
-	}
+	EXPECT_THROW(sc1.init_scan(), BitScanError);		//empty bitset cannot be scanned
+
+	////starts a new scan  - MUST capture the return val of init_scan
+	////if there is a risk the bitset to be scanned is empty
+	//if ( sc1.init_scan() == 0 ) {
+	//	while ((bit = sc1.next_bit()) != BBObject::noBit) {
+	//		lb.push_back(bit);
+	//	}
+
+	//	///////////////////////
+	//	EXPECT_EQ(10, lb[0]);
+	//	EXPECT_EQ(20, lb[1]);
+	//	EXPECT_EQ(64, lb[2]);
+	//	///////////////////////
+	//}
 
 }
 
