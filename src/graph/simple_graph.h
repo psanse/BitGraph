@@ -29,12 +29,10 @@
 #include <iostream>
 #include <vector>
 
-
 namespace bitgraph {
 
 	namespace _impl {
-		
-		
+				
 
 		//////////////////
 		//
@@ -338,28 +336,29 @@ namespace bitgraph {
 
 		public:
 			/**
-			* @brief reads a simple directed unweighted graph in DIMACS format
-			* @returns 0 if correct, -1 in case of error
-			* @details: does not read weights
+			* @brief reads a simple directed unweighted graph in DIMACS format 
+			* @returns 0 if correct, -1 in case of error (non-throwing interface)
+			* @details: does not read weights, 
 			**/
 			int read_dimacs(const std::string& filename);
 
 			/**
 			* @brief reads a graph matrix exchange format (at the moment only MCPS)
-			* @returns 0 if correct, -1 in case of error
+			* @returns 0 if correct, -1 in case of error  (non-throwing interface)
 			**/
 			int read_mtx(const std::string& filename);
 
 			/**
 			* @brief reads a graph in list of edges format
-			* @returns 0 if correct, -1 in case of error
+			* @returns 0 if correct, -1 in case of error (non-throwing interface)
 			**/
 			int read_EDGES(const std::string& filename);
 
 			/**
 			* @brief reads 0-1 adjacency matrix (rows) with a first line indicating |V|
+			* @details: (non-throwing interface)
 			**/
-			int read_01(const std::string& filename);
+			int read_01(const std::string& filename); 
 
 			/*
 			* @brief writes directed graph in dimacs format
