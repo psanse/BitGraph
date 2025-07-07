@@ -442,7 +442,7 @@ namespace bitgraph {
 			scan_block(vBB_.size() - 1);
 			break;
 		default:
-			LOG_ERROR("unknown scan type - BBScanSp::::init_scan");
+			LOG_ERROR("unknown scan type - BBScanSp::init_scan");
 			return -1;
 		}
 
