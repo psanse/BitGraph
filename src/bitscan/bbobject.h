@@ -232,6 +232,10 @@ namespace bitgraph {
 	}// namespace _impl
 
 	using _impl::BBObject;
+
+	namespace _impl {
+		std::ostream& operator<< (std::ostream& o, const BBObject& bb);
+	}	
 	using _impl::operator<<;
 
 }// namespace bitgraph

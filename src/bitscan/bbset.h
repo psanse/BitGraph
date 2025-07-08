@@ -821,6 +821,18 @@ namespace bitgraph {
 
 	using _impl::BitSet;
 
+	/*namespace _impl {
+		bool operator ==	(const BitSet& lhs, const BitSet& rhs);
+		bool operator !=	(const BitSet& lhs, const BitSet& rhs);
+		BitSet& AND			(const BitSet& lhs, const BitSet& rhs, BitSet& res);
+		BitSet& OR			(int firstBit, int lastBit, const BitSet& lhs, const BitSet& rhs, BitSet& res);
+		BitSet AND_block	(int firstBlock, int lastBlock, BitSet lhs, const BitSet& rhs);
+		BitSet OR_block		(int firstBlock, int lastBlock, BitSet lhs, const BitSet& rhs);
+		int find_first_common(const BitSet& lhs, const BitSet& rhs);
+		int find_first_common_block(int firstBlock, int lastBlock, const BitSet& lhs, const BitSet& rhs);
+		BitSet& erase_bit(const BitSet& lhs, const BitSet& rhs, BitSet& res);
+	}*/
+
 	using _impl::operator!=;
 	using _impl::operator==;
 	using _impl::AND;
