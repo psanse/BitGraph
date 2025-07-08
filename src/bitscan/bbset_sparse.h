@@ -72,7 +72,7 @@ namespace bitgraph {
 		public:
 
 			friend bool operator ==			(const BitSetSp& lhs, const BitSetSp& rhs);
-			friend bool operator !=			(const BitSetSp& lhs, const BitSetSp& rhs) { return !(lhs == rhs); }
+			friend bool operator !=			(const BitSetSp& lhs, const BitSetSp& rhs);
 
 			/**
 			* @brief AND between lhs and rhs sparse bitsets - stores the result in sparse bitset res
@@ -85,10 +85,10 @@ namespace bitgraph {
 			friend  BitSetSp& AND(const BitSetSp& lhs, const BitSetSp& rhs, BitSetSp& res);
 
 			/**
-			* @brief AND between lhs and rhs bitsets
+			* @brief AND between lhs and rhs bitsets - stores the result in @lhs
 			* @returns resulting bitset
 			**/
-			friend BitSetSp 		AND(BitSetSp lhs, const BitSetSp& rhs) { return lhs &= rhs; }
+			friend BitSetSp AND(BitSetSp lhs, const BitSetSp& rhs);
 
 			/**
 			* @brief AND between lhs and rhs bitsets in the CLOSED block bit-range [firstBit, lastBit]
@@ -102,7 +102,7 @@ namespace bitgraph {
 			* TODO... (25/02/2025)
 			**/
 			friend BitSetSp& AND(int firstBit, int lastBit, const BitSetSp& lhs,
-				const BitSetSp& rhs, BitSetSp& res) = delete;
+									const BitSetSp& rhs, BitSetSp& res				) = delete;
 
 			/**
 			* @brief AND between lhs and rhs bitsets in the CLOSED block-range [firstBlock, lastBlock]
@@ -749,15 +749,15 @@ namespace bitgraph {
 
 		}; //end BitSetSp class
 
+
+
+
+
 	}//end namespace _impl
 
 	using _impl::BitSetSp;
-	using _impl::AND;
-	using _impl::AND_block;
-	using _impl::OR;
-	using _impl::erase_bit;
 
-
+	
 }//end namespace bitgraph
 
 
@@ -1712,6 +1712,17 @@ namespace bitgraph {
 namespace bitgraph {
 
 	namespace _impl {
+			
+
+		inline
+			bool operator == (const BitSetSp& lhs, const BitSetSp& rhs) {
+					return(	(lhs.nBB_ == rhs.nBB_) &&
+							(lhs.vBB_ == rhs.vBB_)			);
+		}
+
+		inline
+			bool operator != (const BitSetSp& lhs, const BitSetSp& rhs) { return !(lhs == rhs); }
+		
 
 		inline
 			BitSetSp& AND(const BitSetSp& lhs, const BitSetSp& rhs, BitSetSp& res) {
@@ -1769,6 +1780,9 @@ namespace bitgraph {
 
 			return res;
 		}
+				
+		inline
+			BitSetSp AND(BitSetSp lhs, const BitSetSp& rhs) { return lhs &= rhs; }
 
 		inline
 			BitSetSp& OR(const BitSetSp& lhs, const BitSetSp& rhs, BitSetSp& res) {
@@ -1907,25 +1921,15 @@ namespace bitgraph {
 
 	}//end namespace _impl
 
-
+	using _impl::operator==;
+	using _impl::operator!=;
+	using _impl::AND;
+	using _impl::AND_block;
+	using _impl::OR;
+	using _impl::erase_bit;
 
 }//end namespace bitgraph
 
-
-namespace bitgraph {
-
-	namespace _impl {
-
-		inline
-			bool operator == (const BitSetSp& lhs, const BitSetSp& rhs) {
-
-			return((lhs.nBB_ == rhs.nBB_) &&
-				(lhs.vBB_ == rhs.vBB_));
-		}
-
-	}
-
-}
 
 
 

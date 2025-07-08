@@ -1932,7 +1932,12 @@ namespace bitgraph {
 			return res;
 		}
 
-		
+		BitSet& AND(const BitSet& lhs, const BitSet& rhs, BitSet& res);
+		BitSet& OR(const BitSet& lhs, const BitSet& rhs, BitSet& res);
+		BitSet& erase_bit(const BitSet& lhs, const BitSet& rhs, BitSet& res);
+		int find_first_common(const BitSet& lhs, const BitSet& rhs);
+		int find_first_common_block(int firstBlock, int lastBlock, const BitSet& lhs, const BitSet& rhs);
+				
 
 	}//end namespace _impl
 
