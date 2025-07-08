@@ -800,14 +800,14 @@ namespace bitgraph {
 			return -1;
 		}
 
-		if (::gio::dimacs::read_dimacs_header(f, size, nEdges) == -1) {
+		if (bitgraph::gio::dimacs::read_dimacs_header(f, size, nEdges) == -1) {
 			reset();
 			f.close();
 			return -1;
 		}
 
 		reset(size);
-		::gio::read_empty_lines(f);
+		bitgraph::gio::read_empty_lines(f);
 
 		//read weights format n <x> <w> if they exist
 		//c=f.peek();
@@ -834,7 +834,7 @@ namespace bitgraph {
 		//	}
 
 		//	LOG_INFO("Graph<T>::read_dimacs-Weights read correctly from DIMACS file"<<filename);
-		//	::gio::dimacs::read_empty_lines(f);
+		//	bitgraph::::gio::dimacs::read_empty_lines(f);
 		//}
 	/////////////////////	
 	//read edges
