@@ -462,7 +462,7 @@ namespace bitgraph {
 
 		//necessary check 
 		if (vBB_.empty()) {
-			throw BitScanError("empty sparse bitstring, cannot be scanned - BBScanSp::init_scan");		//will not be handled - terminates the program
+			throw BitScanError("empty sparse bitstring, cannot be scanned - BBScanSp::init_scan");		
 		}
 
 		//special case - first bitscan
