@@ -14,14 +14,15 @@
 #include "utils/logger.h"
 #include "utils/common.h"
 
-//#undef NDEBUG to enable run-time assertions
-#include <cassert>		
+#include <cassert>			//DEBUG run-time assertions 
 
 namespace gfunc {
-	namespace iset {
 
-		using namespace bitgraph;
-		using bbo = bitgraph::BBObject;
+	using namespace bitgraph;
+	using bbo = bitgraph::BBObject;
+
+	namespace iset {
+	
 
 		///////////////////
 		//clique and independent set heuristics
@@ -112,6 +113,7 @@ namespace gfunc {
 	}
 
 	namespace clq {
+		
 		/**
 		* @brief Clique heuristic that enlarges the clique in @clq with vertices in the half-open range [@begin, @end[ of the set @lv.
 		*		 Vertices are taken in order from @lv and fixed to @clq if adjacent to all vertices in @clq.
@@ -174,9 +176,9 @@ namespace gfunc {
 
 			//main loop - destructive scan of bb
 			if /*constexpr*/ (Reverse) {
-				bb.init_scan(bitgraph::BBObject::NON_DESTRUCTIVE_REVERSE);
+				bb.init_scan(bbo::NON_DESTRUCTIVE_REVERSE);
 			}
-			else { bb.init_scan(bitgraph::BBObject::NON_DESTRUCTIVE); }
+			else { bb.init_scan(bbo::NON_DESTRUCTIVE); }
 
 			int v =bbo::noBit;
 			while (true) {
@@ -233,8 +235,8 @@ namespace gfunc {
 				//finds the vertex with max deg in the current neighborhood
 				pcmax = 0;
 
-				if /*constexpr*/ (Reverse) { bbsgC.init_scan(bitgraph::BBObject::NON_DESTRUCTIVE_REVERSE); }
-				else { bbsgC.init_scan(bitgraph::BBObject::NON_DESTRUCTIVE); }
+				if /*constexpr*/ (Reverse) { bbsgC.init_scan(bbo::NON_DESTRUCTIVE_REVERSE); }
+				else { bbsgC.init_scan(bbo::NON_DESTRUCTIVE); }
 				while (true) {
 					if /*constexpr*/ (Reverse) { v = bbsgC.prev_bit(); }
 					else { v = bbsgC.next_bit(); }
@@ -321,7 +323,7 @@ namespace gfunc {
 
 				//main loop
 				int w =bbo::noBit;
-				bb.init_scan(bitgraph::BBObject::DESTRUCTIVE);
+				bb.init_scan(bbo::DESTRUCTIVE);
 				while ((w = bb.next_bit_del()) !=bbo::noBit) {
 
 					clq_curr.push_back(w);
@@ -695,9 +697,9 @@ namespace gfunc {
 
 			//main loop - destructive scan of bb
 			if /*constexpr*/ (Reverse) {
-				bb.init_scan(bitgraph::BBObject::NON_DESTRUCTIVE_REVERSE);
+				bb.init_scan(bbo::NON_DESTRUCTIVE_REVERSE);
 			}
-			else { bb.init_scan(bitgraph::BBObject::NON_DESTRUCTIVE); }
+			else { bb.init_scan(bbo::NON_DESTRUCTIVE); }
 
 			int v =bbo::noBit;
 			while (true) {
@@ -744,9 +746,9 @@ namespace gfunc {
 
 			//main loop - destructive scan of bb
 			if /*constexpr*/ (Reverse) {
-				bb.init_scan(bitgraph::BBObject::NON_DESTRUCTIVE_REVERSE);
+				bb.init_scan(bbo::NON_DESTRUCTIVE_REVERSE);
 			}
-			else { bb.init_scan(bitgraph::BBObject::NON_DESTRUCTIVE); }
+			else { bb.init_scan(bbo::NON_DESTRUCTIVE); }
 
 			int v =bbo::noBit;
 			while (true) {
@@ -849,7 +851,7 @@ namespace gfunc {
 				bb_sel = bb_unsel;
 
 				//build a new iset with vertices from bb_sel
-				bb_sel.init_scan(bitgraph::BBObject::DESTRUCTIVE);
+				bb_sel.init_scan(bbo::DESTRUCTIVE);
 				while ((v = bb_sel.next_bit_del()) !=bbo::noBit) {
 
 					//update coloring
