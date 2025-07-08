@@ -240,6 +240,7 @@ namespace bitgraph {
 			 *		  II. Memory is deallocated and reallocated as required
 			 * @param nPop: population size
 			 * @param lv : vector of integers representing 1-bits in the bitset
+			 * @details: Exception caught inside and the program exits
 			**/
 			void reset(int nPop, const vint& lv);
 
@@ -250,6 +251,7 @@ namespace bitgraph {
 			*		  II. Memory is deallocated and reallocated as required
 			*
 			* @param nPop: population size
+			* @details: Exception caught inside and the program exits
 			**/
 			void reset(int nPop);
 

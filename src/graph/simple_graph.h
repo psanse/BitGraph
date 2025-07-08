@@ -60,7 +60,7 @@ namespace bitgraph {
 
 			/////////////			
 			//construction / destruction
-			Graph() ;															//creates empty graph
+			Graph() noexcept ;													//creates empty graph
 			explicit Graph(std::size_t n);										//creates graph with n=|V| and m=0 	
 			explicit Graph(std::string filename);								//creates graph from file		
 			Graph(std::size_t n, int* adj[], std::string filename = "");		//old-style adjacency matrix
@@ -144,7 +144,7 @@ namespace bitgraph {
 			* @details: to deallocate memory -  g = graph()
 			* @details: in general, should not be called directly
 			**/
-			void reset();
+			void reset() noexcept;
 
 			/**
 			* @brief reduces the capacity to the size of the bitsets that make
@@ -499,7 +499,7 @@ namespace bitgraph {
 
 	template<class T>
 	inline
-		Graph<T>::Graph(void) :
+		Graph<T>::Graph(void) noexcept :
 		NV_(0), NBB_(0), NE_(0),
 		name_(""), path_("")
 	{
@@ -578,7 +578,7 @@ namespace bitgraph {
 
 	template<class T>
 	inline
-		void Graph<T>::reset() {
+		void Graph<T>::reset() noexcept {
 		adj_.clear(), name_.clear(), path_.clear();
 		NV_ = 0, NBB_ = 0, NE_ = 0;
 	}

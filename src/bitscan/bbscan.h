@@ -14,6 +14,7 @@
 
 #include "bbset.h"	
 #include "bbexcep_hand.h"
+#include <cassert>
 
 namespace bitgraph{
 
@@ -71,9 +72,9 @@ namespace bitgraph{
 				* @brief Configures the initial block and bit position for bitscanning
 				*		 according to one of the 4 scan types passed as argument
 				* @param sct: type of scan
-				* @returns 0 if successful, -1 otherwise (now throws BitScanError (08/07/2025))
+				* @returns 0 if successful, -1 otherwise  (now exits the program (08/07/2025))
 				**/
-			virtual inline	int init_scan(scan_types sct) ;
+			virtual inline	int init_scan (scan_types sct) noexcept ;
 
 			/**
 			* @brief Configures the initial block and bit position for bitscanning
@@ -82,11 +83,11 @@ namespace bitgraph{
 			*		 If firstBit is -1 (BBObject::noBit), the scan starts from the beginning.
 			* @param firstBit: starting bit
 			* @param sct: type of scan
-			* @returns 0 if successful, -1 otherwise (now throws BitScanError (08/07/2025))
+			* @returns 0 if successful, -1 otherwise (now exits the program (08/07/2025))
 			*
 			* TODO - no firstBit information is configured for DESTRUCTIVE scan types (08/02/2025)
 			**/
-			inline	int init_scan(int firstBit, scan_types sct) ;
+			inline	int init_scan(int firstBit, scan_types sct) noexcept ;
 
 
 			////////////////
@@ -488,7 +489,7 @@ namespace bitgraph {
 	}
 
 
-	int BBScan::init_scan(scan_types sct)  {
+	int BBScan::init_scan(scan_types sct) noexcept  {
 
 		switch (sct) {
 		case NON_DESTRUCTIVE:
@@ -506,8 +507,9 @@ namespace bitgraph {
 			scan_block(nBB_ - 1);
 			break;
 		default:
-			//LOG_ERROR("unknown scan type - BBScan::::init_scan");
-			throw BitScanError("unknown scan type in BBScan::init_scan");		
+			LOG_ERROR("unknown scan type - BBScan::::init_scan");
+			assert(false);
+			//throw BitScanError("unknown scan type in BBScan::init_scan");		
 			//return -1;
 		}
 
@@ -515,7 +517,7 @@ namespace bitgraph {
 	}
 
 
-	int BBScan::init_scan(int firstBit, scan_types sct)  {
+	int BBScan::init_scan(int firstBit, scan_types sct)  noexcept {
 
 		//special case - first bitscan
 		if (firstBit == BBObject::noBit) {
@@ -535,7 +537,9 @@ namespace bitgraph {
 			scan_block(bbh);
 			break;
 		default:
-			throw BitScanError("unknown scan type in BBScan::init_scan");		//will not be handled - terminates the program
+			LOG_ERROR("unknown scan type - BBScan::init_scan");
+			assert(false);
+			//throw BitScanError("unknown scan type in BBScan::init_scan");		
 		}
 
 		return 0;

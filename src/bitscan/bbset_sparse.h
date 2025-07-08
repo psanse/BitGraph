@@ -140,14 +140,15 @@ namespace bitgraph {
 		/////////////////////
 		// constructors / destructors
 
-			BitSetSp() :nBB_(0) {}
+			BitSetSp() noexcept : nBB_(0) {}
 
 			/**
 			* @brief Creates an EMPTY bitset given a population size nPop
 			*		  The capacity of the bitset is set according to the population size
 			* @param nBits : population size if is_popsize is true, otherwise the capacity of the bitset
+			* @details: Exception caught inside and the program exits
 			**/
-			explicit BitSetSp(int nPop, bool is_popsize = true);
+			explicit BitSetSp (int nPop, bool is_popsize = true);
 
 			/**
 			 * @brief Creates a bitset given an initial vector lv of 1-bit elements
@@ -155,6 +156,7 @@ namespace bitgraph {
 			 *		  The capacity of the bitset is set according to nPop
 			 * @param nPop: population size
 			 * @param lv : vector of integers representing 1-bits in the bitset
+			 * @details: Exception caught inside and the program exits
 			 **/
 			BitSetSp(int nPop, const vint& lv);
 
@@ -164,6 +166,7 @@ namespace bitgraph {
 			*		  The capacity of the bitset is set according to nPop
 			* @param nPop: population size
 			* @param lv : set of integers representing 1-bits in the bitset
+			* @details: Exception caught inside and the program exits
 			**/
 			explicit  BitSetSp(int nPop, std::initializer_list<int> lv);
 
@@ -178,27 +181,28 @@ namespace bitgraph {
 			////////////
 			//reset / init (heap allocation)
 
-				/**
-				* @brief resets the sparse bitset to a new population size if is_popsize is true,
-				*	     otherwise the maximum number of bitblocks of the bitset
-				* @param nPop: population size
-				* @param is_popsize: if true, the population size is set to nPop, otherwise the
-				*					  it is the maximum number of bitblocks of the bitset
-				* @details: if exception is thrown, the program exits
-				**/
+			/**
+			* @brief resets the sparse bitset to a new population size if is_popsize is true,
+			*	     otherwise the maximum number of bitblocks of the bitset
+			* @param nPop: population size
+			* @param is_popsize: if true, the population size is set to nPop, otherwise the
+			*					  it is the maximum number of bitblocks of the bitset
+			* @details:  Exception caught inside and the program exits
+			**/
 			void reset(int nPop, bool is_popsize = true);
 
 			/**
 			* @brief resets the sparse bitset to a new population size with lv 1-bits
 			* @param nPop: population size
 			* @param lv: vector of 1-bits to set
-			* @details: if exception is thrown, the program exits
+			* @details: Exception caught inside and the program exits
 			**/
 			void reset(int nPop, const vint& lv);
 
 			/**
 			* @brief resets the sparse bitset to a new population size, old syntax
 			*		 now favoured by reset(...).
+			* @details:  Exception caught inside and the program exits
 			**/
 			void init(int nPop, bool is_popsize = true);
 

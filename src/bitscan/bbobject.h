@@ -67,8 +67,10 @@ namespace bitgraph {
 				using type = ScanRev<BitSet_t>;
 
 			public:
-
-				//constructor
+								
+				/**
+				* @brief: constructor for reverse bitscanning - may throw for sparse bitsets if empty
+				**/
 				ScanRev(BitSet_t& bb, int firstBit = -1) : bb_(bb) { init_scan(firstBit); }
 
 				int get_block() { return  bb_.scan_.bbi_; }
@@ -77,6 +79,7 @@ namespace bitgraph {
 				* @brief Scans the bitset from [firstBit , end of the bitset)
 				*		 If firstBit = -1 scans the whole bitset
 				* @param firstBit: starting position of the scan
+				* @details: may throw for sparse bitsets if empty
 				**/
 				int init_scan(int firstBit = -1) { return bb_.init_scan(firstBit, BBObject::NON_DESTRUCTIVE_REVERSE); }
 
@@ -104,7 +107,9 @@ namespace bitgraph {
 
 			public:
 
-				//constructor
+				/**
+				* @brief: constructor for bitscanning - may throw for sparse bitsets if empty
+				**/
 				Scan(BitSet_t& bb, int firstBit = -1) : bb_(bb) { init_scan(firstBit); }
 
 				int get_block() { return  bb_.scan_.bbi_; }
@@ -113,6 +118,7 @@ namespace bitgraph {
 				* @brief Scans the bitset from [firstBit , end of the bitset)
 				*		 If firstBit = -1 scans the whole bitset
 				* @param firstBit: starting position of the scan
+				* @details: may throw for sparse bitsets if empty
 				**/
 				int init_scan(int firstBit = -1) { return bb_.init_scan(firstBit, BBObject::NON_DESTRUCTIVE); }
 
@@ -140,7 +146,9 @@ namespace bitgraph {
 
 			public:
 
-				//constructor
+				/**
+				* @brief: constructor for destructive bitscanning - may throw for sparse bitsets if empty
+				**/
 				ScanDest(BitSet_t& bb) : bb_(bb) { init_scan(); }
 
 				int get_block() { return bb_.scan_.bbi_; }
@@ -148,6 +156,7 @@ namespace bitgraph {
 				/**
 				* @brief Scans the bitset in the range [0 , end of the bitset)
 				*		 Removes bits as they are scanned
+				* @details: may throw for sparse bitsets if empty
 				**/
 				int init_scan() { return bb_.init_scan(BBObject::DESTRUCTIVE); }
 
@@ -175,7 +184,9 @@ namespace bitgraph {
 
 			public:
 
-				//constructor
+				/**
+				* @brief: constructor for destructive reverse bitscanning - may throw for sparse bitsets if empty
+				**/
 				ScanDestRev(BitSet_t& bb) : bb_(bb) { init_scan(); }
 
 				int get_block() { return bb_.scan_.bbi_; }
@@ -183,6 +194,7 @@ namespace bitgraph {
 				/**
 				* @brief Scans the bitset in the range (end_of_bitset, 0]
 				*		 Removes bits as they are scanned
+				* @details: may throw for sparse bitsets if empty
 				**/
 				int init_scan() { return bb_.init_scan(BBObject::DESTRUCTIVE_REVERSE); }
 

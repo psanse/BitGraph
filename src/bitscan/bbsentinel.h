@@ -80,7 +80,7 @@ namespace bitgraph {
 			/////////////////
 			// bit scanning operations 
 
-			int init_scan(scan_types sct) override;
+			int init_scan(scan_types sct) noexcept override;
 
 			inline int prev_bit_del() override;							//**TODO- empty bitstring
 			inline	int next_bit_del() override;

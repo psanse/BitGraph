@@ -23,6 +23,14 @@ protected:
 
 	BBScanSp bb;
 };
+
+TEST(BitScanNestedSparse, exception_handlers) {
+
+	BBScanSp bbsp(130);
+
+	EXPECT_THROW(BBScanSp::scan sc1(bbsp), BitScanError);
+
+}
 	
 //tests the 4 types of scanning
 TEST_F(BitScanNestedSparseTest, basic) {
@@ -252,6 +260,8 @@ TEST_F(BitScanNestedSparseTest, delete_additional_bitstring) {
 	/////////////////////////////
 
 }
+
+
 
 
 

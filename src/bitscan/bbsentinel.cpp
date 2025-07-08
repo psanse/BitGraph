@@ -183,7 +183,7 @@ std::ostream& BBSentinel::print(std::ostream& o, bool show_pc, bool endl ) const
 	return o;
 }
 
-int BBSentinel::init_scan(scan_types sct){
+int BBSentinel::init_scan(scan_types sct) noexcept {
 	switch(sct){
 	case NON_DESTRUCTIVE:
 		update_sentinels();
@@ -203,7 +203,7 @@ int BBSentinel::init_scan(scan_types sct){
 		break;
 	default:
 		cerr<<"bad scan type"<<endl;
-		return -1;
+		std::exit(EXIT_FAILURE);
 	}
 return 0;
 }

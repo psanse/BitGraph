@@ -31,6 +31,14 @@ protected:
 	std::vector<int> pSet;
 };
 
+TEST(BitScanSparse, exception_handlers) {
+
+	BBScanSp bbsp(130);
+
+	EXPECT_THROW(bbsp.init_scan(BBObject::NON_DESTRUCTIVE), BitScanError);
+
+}
+
 TEST_F(BBScanSpClassTest, check_example) {
 
 	EXPECT_EQ(7, bbsc.size());

@@ -13,6 +13,7 @@
 
 #include "bitscan/bbset_sparse.h"
 #include "bbexcep_hand.h"
+#include <cassert>
 
 using namespace std;
 
@@ -75,10 +76,10 @@ namespace bitgraph {
 			   * @brief Configures the initial block and bit position for bitscanning
 			   *		 according to one of the 4 scan types passed as argument
 			   * @param sct: type of scan
-			   * @returns 0 if successful, -1 otherwise, or if the bitset is empty
+			   * @returns 0 if successful, -1 otherwise (now exits (08/07/2025))
 			   * @details : sparse bitsets may have no blocks, in which case the scan is not possible and
-			   *		     the function returns -1
-			   * @details : now throws  BitScanError for unknwon scan or empty sparse bitset (08/07/2025)
+			   *		     the function returns -1 -
+			   * @details : (08/07/2025) throws  BitScanError for empty sparse bitset 
 			   **/
 			int init_scan(scan_types sct);
 
@@ -90,10 +91,10 @@ namespace bitgraph {
 			*		 If firstBit is -1 (BBObject::noBit), the scan starts from the beginning.
 			* @param firstBit: starting bit
 			* @param sct: type of scan
-			* @returns 0 if successful, -1 otherwise or if the bitset is empty
+			* @returns 0 if successful, -1 otherwise (now exits (08/07/2025))
 			* @details : sparse bitsets may have no blocks, in which case the scan is not possible and
-			*		     the function returns -1
-			* @details : now throws BitScanError for invalid destructive scan, unknown scan or empty sparse set (08/07/2025)
+			*		     the function returns -1 
+			* @details : (08/07/2025) throws  BitScanError for empty sparse bitset
 			*
 			* TODO - extend to NON-DESTRUCTIVE cases
 			**/
@@ -431,7 +432,8 @@ namespace bitgraph {
 
 		//necessary check since sparse bitstrings have empty semantics (i.e. sparse graphs)
 		if (vBB_.empty()) {
-			throw BitScanError("empty sparse bitstring, cannot be scanned - BBScanSp::init_scan");		//will not be handled - terminates the program
+			//LOG_ERROR("empty sparse bitstring, cannot be scanned - BBScanSp::init_scan...exiting");
+			throw BitScanError("empty sparse bitstring, cannot be scanned - BBScanSp::init_scan");		
 		}			
 
 		switch (sct) {
@@ -450,7 +452,9 @@ namespace bitgraph {
 			scan_block(vBB_.size() - 1);
 			break;
 		default:
-			throw BitScanError("unknown scan type in BBScanSp::init_scan");		//will not be handled - terminates the program
+			LOG_ERROR("unknown scan type in BBScanSp::init_scan");
+			assert(false);
+			//throw BitScanError("unknown scan type in BBScanSp::init_scan");		//will not be handled - terminates the program
 	
 		}
 
@@ -462,6 +466,7 @@ namespace bitgraph {
 
 		//necessary check 
 		if (vBB_.empty()) {
+			//LOG_ERROR("empty sparse bitstring, cannot be scanned - BBScanSp::init_scan...exiting");
 			throw BitScanError("empty sparse bitstring, cannot be scanned - BBScanSp::init_scan");		
 		}
 
@@ -490,12 +495,15 @@ namespace bitgraph {
 			break;
 		case DESTRUCTIVE:
 		case DESTRUCTIVE_REVERSE:
-				//scan_block(p.second);
-			LOG_ERROR("incorrect destructive scan type in BBScanSp::init_scan");
-			throw BitScanError("incorrect destructive scan type in BBScanSp::init_scan");		////will not be handled - terminates the program
+			//scan_block(p.second);
+			LOG_ERROR("destructive scan type currently not available in BBScanSp::init_scan...exiting");
+			std::exit(EXIT_FAILURE);
+			//throw BitScanError("incorrect destructive scan type in BBScanSp::init_scan");		
 			break;
 		default:
-			throw BitScanError("unknown scan type in BBScanSp::init_scan");		//will not be handled - terminates the program
+			LOG_ERROR("unknown scan type in BBScanSp::init_scan...exiting");
+			std::exit(EXIT_FAILURE);
+			//throw BitScanError("unknown scan type in BBScanSp::init_scan");		
 		}
 
 		//nothing to scan or error
