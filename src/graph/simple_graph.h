@@ -60,9 +60,9 @@ namespace bitgraph {
 
 			/////////////			
 			//construction / destruction
-			Graph();															//creates empty graph
-			explicit Graph(std::size_t n);											//creates graph with n=|V| and m=0 	
-			explicit Graph(std::string filename);										//creates graph from file		
+			Graph() ;															//creates empty graph
+			explicit Graph(std::size_t n);										//creates graph with n=|V| and m=0 	
+			explicit Graph(std::string filename);								//creates graph from file		
 			Graph(std::size_t n, int* adj[], std::string filename = "");		//old-style adjacency matrix
 
 			//move and copy semantics allowed
@@ -127,7 +127,7 @@ namespace bitgraph {
 			* @brief resets to empty graph given name and number of vertices
 			* @param n number of vertices
 			* @param name name of the instance
-			* @returns 0 if success, -1 if memory allocation fails (non-throwing interface)
+			* @returns 0 if success, -1 if memory allocation fails (error code, non-throwing interface)
 			* @creation 31/12/24
 			**/
 			int reset(std::size_t n, string name = "");
@@ -135,7 +135,7 @@ namespace bitgraph {
 			/**
 			* @brief sets graph from file in dimacs/MTX/Edges formats (in this order)
 			* @param filename file
-			* @returns 0 if success, -1 if file cannot be read (non-throwing interface)
+			* @returns 0 if success, -1 if file cannot be read (error code, non-throwing interface)
 			**/
 			int reset(std::string filename);
 

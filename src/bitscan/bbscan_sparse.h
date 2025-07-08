@@ -78,7 +78,7 @@ namespace bitgraph {
 			   * @returns 0 if successful, -1 otherwise, or if the bitset is empty
 			   * @details : sparse bitsets may have no blocks, in which case the scan is not possible and
 			   *		     the function returns -1
-			   * @details : throws  BitScanError, which will not be handled
+			   * @details : now throws  BitScanError for unknwon scan or empty sparse bitset (08/07/2025)
 			   **/
 			int init_scan(scan_types sct);
 
@@ -93,7 +93,7 @@ namespace bitgraph {
 			* @returns 0 if successful, -1 otherwise or if the bitset is empty
 			* @details : sparse bitsets may have no blocks, in which case the scan is not possible and
 			*		     the function returns -1
-			* @details : throws  BitScanError (invalid destructive scan, empty sparse set), which will not be handled
+			* @details : now throws BitScanError for invalid destructive scan, unknown scan or empty sparse set (08/07/2025)
 			*
 			* TODO - extend to NON-DESTRUCTIVE cases
 			**/
@@ -431,9 +431,7 @@ namespace bitgraph {
 
 		//necessary check since sparse bitstrings have empty semantics (i.e. sparse graphs)
 		if (vBB_.empty()) {
-			LOG_ERROR("empty sparse bitstring, cannot be scanned - BBScanSp::init_scan");
 			throw BitScanError("empty sparse bitstring, cannot be scanned - BBScanSp::init_scan");		//will not be handled - terminates the program
-			//return -1;
 		}			
 
 		switch (sct) {
@@ -452,9 +450,8 @@ namespace bitgraph {
 			scan_block(vBB_.size() - 1);
 			break;
 		default:
-			LOG_ERROR("unknown scan type - BBScanSp::init_scan");
 			throw BitScanError("unknown scan type in BBScanSp::init_scan");		//will not be handled - terminates the program
-	//		return -1;
+	
 		}
 
 		return 0;
@@ -465,16 +462,13 @@ namespace bitgraph {
 
 		//necessary check 
 		if (vBB_.empty()) {
-			LOG_ERROR("empty sparse bitstring, cannot be scanned - BBScanSp::init_scan");
 			throw BitScanError("empty sparse bitstring, cannot be scanned - BBScanSp::init_scan");		//will not be handled - terminates the program
-			//return -1;
 		}
 
 		//special case - first bitscan
 		if (firstBit == BBObject::noBit) {
 			return init_scan(sct);
 		}
-
 
 		//determine the index of the starting block (not its ID)
 		auto bbL = WDIV(firstBit);
@@ -501,9 +495,7 @@ namespace bitgraph {
 			throw BitScanError("incorrect destructive scan type in BBScanSp::init_scan");		////will not be handled - terminates the program
 			break;
 		default:
-			LOG_ERROR("unknown scan type in BBScanSp::init_scan");
 			throw BitScanError("unknown scan type in BBScanSp::init_scan");		//will not be handled - terminates the program
-			//return -1;
 		}
 
 		//nothing to scan or error
