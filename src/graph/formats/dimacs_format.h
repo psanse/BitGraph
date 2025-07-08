@@ -1,10 +1,10 @@
-/*
+/**
 * @file dimacs_format.h
 * @brief header of stateless class DIMACS_READER which implements a number of utilities to read dimacs format
-* @creation 30/09/2018
-* @last_update 27/01/2025
-* @authos pss
-*/
+* @details: creation 30/09/2018, ast_update 27/01/2025
+* 
+* TODO - clean this horror code (08/07/2025)
+**/
 
 #include <fstream>
 #include <sstream>
@@ -117,6 +117,10 @@ namespace bitgraph {
 
 		} //namespace dimacs
 	} //namespace gio
+
+	using gio::read_empty_lines;
+	using gio::dimacs::read_dimacs_header;
+	using gio::dimacs::graph_to_dimacs;
 
 }//end namescape bitgraph	
 
