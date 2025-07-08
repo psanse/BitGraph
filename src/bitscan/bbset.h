@@ -533,7 +533,7 @@ namespace bitgraph {
 
 
 			friend bool operator ==			(const BitSet& lhs, const BitSet& rhs);
-			friend bool operator !=			(const BitSet& lhs, const BitSet& rhs) { return !(lhs == rhs); }
+			friend bool operator !=			(const BitSet& lhs, const BitSet& rhs);
 
 
 			////////////////////////
@@ -612,7 +612,7 @@ namespace bitgraph {
 			* @last_update 04/02/2025
 			**/
 			inline	int	find_common_singleton_block(int first_block, int last_block,
-				const BitSet& rhs, int& bit)		const;
+													const BitSet& rhs, int& bit)		const;
 
 			/**
 			* @brief Determines the single 1-bit in this bitstring of to the set difference
@@ -636,12 +636,12 @@ namespace bitgraph {
 			* @details: created  27/7/16, last_update 04/02/2025
 			**/
 			inline  int find_diff_pair(const BitSet& rhs,
-				int& bit1, int& bit2)					const;
+										int& bit1, int& bit2)					const;
 
 			/////////////////////////////
 			//Boolean functions 
 
-			inline bool is_bit(int bit)										const;
+			inline bool is_bit(int bit)											const;
 
 			/**
 			* @brief TRUE if the bitstring has all 0-bits
@@ -820,30 +820,6 @@ namespace bitgraph {
 	}//end namespace _impl
 
 	using _impl::BitSet;
-
-	/*namespace _impl {
-		bool operator ==	(const BitSet& lhs, const BitSet& rhs);
-		bool operator !=	(const BitSet& lhs, const BitSet& rhs);
-		BitSet& AND			(const BitSet& lhs, const BitSet& rhs, BitSet& res);
-		BitSet& OR			(int firstBit, int lastBit, const BitSet& lhs, const BitSet& rhs, BitSet& res);
-		BitSet AND_block	(int firstBlock, int lastBlock, BitSet lhs, const BitSet& rhs);
-		BitSet OR_block		(int firstBlock, int lastBlock, BitSet lhs, const BitSet& rhs);
-		int find_first_common(const BitSet& lhs, const BitSet& rhs);
-		int find_first_common_block(int firstBlock, int lastBlock, const BitSet& lhs, const BitSet& rhs);
-		BitSet& erase_bit(const BitSet& lhs, const BitSet& rhs, BitSet& res);
-	}*/
-
-	using _impl::operator!=;
-	using _impl::operator==;
-	using _impl::AND;
-	using _impl::OR;
-	using _impl::AND_block;
-	using _impl::OR_block;
-	using _impl::find_first_common;
-	using _impl::find_first_common_block;
-	using _impl::erase_bit;
-
-
 
 }//end namespace bitgraph
 
@@ -1742,6 +1718,11 @@ namespace bitgraph {
 				(lhs.vBB_ == rhs.vBB_));
 		};
 
+		inline
+			bool operator!=	(const BitSet& lhs, const BitSet& rhs) {
+			return !(lhs == rhs);
+		};
+
 		template<bool Erase>
 		inline
 			BitSet& AND(int firstBit, int lastBit, const BitSet& lhs, const BitSet& rhs, BitSet& res)
@@ -1954,6 +1935,17 @@ namespace bitgraph {
 		
 
 	}//end namespace _impl
+
+	//friend functions of BitSet
+	using _impl::operator!=;
+	using _impl::operator==;
+	using _impl::AND;
+	using _impl::OR;
+	using _impl::AND_block;
+	using _impl::OR_block;
+	using _impl::find_first_common;
+	using _impl::find_first_common_block;
+	using _impl::erase_bit;
 
 
 }//end namespace bitgraph
