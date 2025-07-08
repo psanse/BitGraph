@@ -1328,7 +1328,7 @@ namespace bitgraph {
 		}
 
 		for (int ii = 0; ii < NV; ii++) {
-			com::sort::SORT_NON_DECR(order, degree, NV);
+			_sort::SORT_NON_DECR(order, degree, NV);
 
 			for (int iii = 0; iii < NV; iii++) {
 				position[order[iii]] = iii;

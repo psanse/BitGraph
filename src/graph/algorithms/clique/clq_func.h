@@ -20,6 +20,9 @@
 namespace gfunc {
 	namespace iset {
 
+		using namespace bitgraph;
+		using bbo = bitgraph::BBObject;
+
 		///////////////////
 		//clique and independent set heuristics
 
@@ -171,11 +174,11 @@ namespace gfunc {
 
 			//main loop - destructive scan of bb
 			if /*constexpr*/ (Reverse) {
-				bb.init_scan(bbo::NON_DESTRUCTIVE_REVERSE);
+				bb.init_scan(bitgraph::BBObject::NON_DESTRUCTIVE_REVERSE);
 			}
-			else { bb.init_scan(bbo::NON_DESTRUCTIVE); }
+			else { bb.init_scan(bitgraph::BBObject::NON_DESTRUCTIVE); }
 
-			int v = bbo::noBit;
+			int v =bbo::noBit;
 			while (true) {
 
 				if /*constexpr*/ (Reverse) { v = bb.prev_bit(); }
@@ -230,8 +233,8 @@ namespace gfunc {
 				//finds the vertex with max deg in the current neighborhood
 				pcmax = 0;
 
-				if /*constexpr*/ (Reverse) { bbsgC.init_scan(bbo::NON_DESTRUCTIVE_REVERSE); }
-				else { bbsgC.init_scan(bbo::NON_DESTRUCTIVE); }
+				if /*constexpr*/ (Reverse) { bbsgC.init_scan(bitgraph::BBObject::NON_DESTRUCTIVE_REVERSE); }
+				else { bbsgC.init_scan(bitgraph::BBObject::NON_DESTRUCTIVE); }
 				while (true) {
 					if /*constexpr*/ (Reverse) { v = bbsgC.prev_bit(); }
 					else { v = bbsgC.next_bit(); }
@@ -243,7 +246,7 @@ namespace gfunc {
 					pc = 0;
 					const typename Graph_t::_bbt& bbn = g.neighbors(v);
 					for (auto nBB = 0; nBB < g.number_of_blocks(); ++nBB) {
-						pc += bblock::popc64(bbsgC.block(nBB) & bbn.block(nBB));
+						pc += bitgraph::bblock::popc64(bbsgC.block(nBB) & bbn.block(nBB));
 					}
 
 					//store vertex if more neighbors
@@ -273,7 +276,7 @@ namespace gfunc {
 					// add first (could be any) vertex from bbsg to the clq  -  loop ends
 					int w = bbsgC.lsb();
 
-					if (w != bbo::noBit) { clq.push_back(w); }
+					if (w !=bbo::noBit) { clq.push_back(w); }
 				}
 
 				//if pcmax ==0 at least one vertex can enlarge clq, 
@@ -314,12 +317,12 @@ namespace gfunc {
 				//determine clique with the first consecutive vertices in the neighboorhood of v
 
 				//initialize bb with the neighborhood of v in bbsg in [v, end)
-				AND<true>(v, g.size() - 1, g.neighbors(v), bbsg, bb);
+				bitgraph::AND<true>(v, g.size() - 1, g.neighbors(v), bbsg, bb);
 
 				//main loop
-				int w = bbo::noBit;
-				bb.init_scan(bbo::DESTRUCTIVE);
-				while ((w = bb.next_bit_del()) != bbo::noBit) {
+				int w =bbo::noBit;
+				bb.init_scan(bitgraph::BBObject::DESTRUCTIVE);
+				while ((w = bb.next_bit_del()) !=bbo::noBit) {
 
 					clq_curr.push_back(w);
 
@@ -420,8 +423,8 @@ namespace gfunc {
 			assert(retVal != -1);
 			///////////////////////
 						
-			int v = bbo::noBit;
-			while ( (v = bb.next_bit()) != bbo::noBit ) {
+			int v =bbo::noBit;
+			while ( (v = bb.next_bit()) !=bbo::noBit ) {
 
 				//check neighborhood of v
 				const auto& bbnv = g.neighbors(v);
@@ -511,8 +514,8 @@ namespace gfunc {
 			assert(retVal != -1);
 			///////////////////////
 			
-			int v = bbo::noBit;
-			while ((v = bb.next_bit()) != bbo::noBit) {
+			int v =bbo::noBit;
+			while ((v = bb.next_bit()) !=bbo::noBit) {
 
 				//check neighborhood of v
 				const auto& bbnv = g.neighbors(v);
@@ -692,18 +695,18 @@ namespace gfunc {
 
 			//main loop - destructive scan of bb
 			if /*constexpr*/ (Reverse) {
-				bb.init_scan(bbo::NON_DESTRUCTIVE_REVERSE);
+				bb.init_scan(bitgraph::BBObject::NON_DESTRUCTIVE_REVERSE);
 			}
-			else { bb.init_scan(bbo::NON_DESTRUCTIVE); }
+			else { bb.init_scan(bitgraph::BBObject::NON_DESTRUCTIVE); }
 
-			int v = bbo::noBit;
+			int v =bbo::noBit;
 			while (true) {
 
 				if /*constexpr*/ (Reverse) { v = bb.prev_bit(); }
 				else { v = bb.next_bit(); }
 
 				/////////////////////////////
-				if (v == bbo::noBit) break;
+				if (v ==bbo::noBit) break;
 				///////////////////////////////
 
 				//v fixed in the clique
@@ -741,18 +744,18 @@ namespace gfunc {
 
 			//main loop - destructive scan of bb
 			if /*constexpr*/ (Reverse) {
-				bb.init_scan(bbo::NON_DESTRUCTIVE_REVERSE);
+				bb.init_scan(bitgraph::BBObject::NON_DESTRUCTIVE_REVERSE);
 			}
-			else { bb.init_scan(bbo::NON_DESTRUCTIVE); }
+			else { bb.init_scan(bitgraph::BBObject::NON_DESTRUCTIVE); }
 
-			int v = bbo::noBit;
+			int v =bbo::noBit;
 			while (true) {
 
 				if /*constexpr*/ (Reverse) { v = bb.prev_bit(); }
 				else { v = bb.next_bit(); }
 
 				/////////////////////////////
-				if (v == bbo::noBit) break;
+				if (v ==bbo::noBit) break;
 				///////////////////////////////
 
 				//v fixed in the clique
@@ -835,7 +838,7 @@ namespace gfunc {
 			int pc = bbsg.size();
 			if (pc == 0) { return 0; }			//early exit - bitset bbsg is empty	
 
-			int col = 1, v = bbo::noBit, nBB = bbo::noBit;
+			int col = 1, v =bbo::noBit, nBB =bbo::noBit;
 
 			//main loop - greedy coloring	
 			typename Graph_t::_bbt bb_unsel(bbsg);
@@ -846,8 +849,8 @@ namespace gfunc {
 				bb_sel = bb_unsel;
 
 				//build a new iset with vertices from bb_sel
-				bb_sel.init_scan(bbo::DESTRUCTIVE);
-				while ((v = bb_sel.next_bit_del()) != bbo::noBit) {
+				bb_sel.init_scan(bitgraph::BBObject::DESTRUCTIVE);
+				while ((v = bb_sel.next_bit_del()) !=bbo::noBit) {
 
 					//update coloring
 					if (ub) { ub[v] = col; }

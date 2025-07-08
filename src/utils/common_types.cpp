@@ -195,6 +195,7 @@ std::ostream& stack_t<T>::print(std::ostream& o) const {
 
 
 
+
 /////////////////////////////////
 // declaration of valid types 
 

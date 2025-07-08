@@ -16,6 +16,8 @@
  *
  **/
 
+using bitgraph::WORD_SIZE;
+
 ////////////////////
 //DEBUG mode assertions
 
@@ -77,9 +79,9 @@
 
 ////////////////////
 //MACROS for mapping bit index to bitblock index (0 or 1 based)
-#define INDEX_0TO0(p)			(WDIV(p))					//p>0
-#define INDEX_0TO1(p)			(WDIV(p)+1)					//p>0
-#define INDEX_1TO1(p)			((((p)-1)/WORD_SIZE)+1)		//p>0
+#define INDEX_0TO0(p)			(WDIV(p))							//p>0
+#define INDEX_0TO1(p)			(WDIV(p)+1)							//p>0
+#define INDEX_1TO1(p)			((((p)-1)/WORD_SIZE)+1)	//p>0
 #define INDEX_1TO0(p)			((((p)-1)/WORD_SIZE))		//p>0
 
 //Bitscan operations which used extended lookups

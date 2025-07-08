@@ -18,6 +18,7 @@
 #include "graph/simple_ugraph.h"
 #include "graph/simple_graph_w.h"					// must be after simple_ugraph include
 #include "graph/simple_graph_ew.h"					// must be after simple_ugraph include
+#include "graph_fast_sort.h"
 
 //useful aliases
 namespace bitgraph {
@@ -353,7 +354,7 @@ namespace bitgraph{
 		std::iota(map.begin(), map.end(), 0);
 		std::shuffle(map.begin(),
 			map.end(),
-			std::default_random_engine(com::rand::RandomUniformGen<>::FIXED_RANDOM_SEED));
+			std::default_random_engine(_rand::RandomUniformGen<>::FIXED_RANDOM_SEED));
 
 		//creates the isomorphism according to the mapping
 		try {

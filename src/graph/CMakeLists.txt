@@ -2,7 +2,9 @@
 #headers for GRAPH lib
 ########################
 file(GLOB HEADER_FILES  ${CMAKE_CURRENT_SOURCE_DIR}/*.h 
-                               ${CMAKE_CURRENT_SOURCE_DIR}/algorithms/*.h
+                        ${CMAKE_CURRENT_SOURCE_DIR}/algorithms/*.h
+                        ${CMAKE_CURRENT_SOURCE_DIR}/algorithms/clique/*.h
+                        ${CMAKE_CURRENT_SOURCE_DIR}/formats/*.h
 )
 
 #removed this file, currently deprecated

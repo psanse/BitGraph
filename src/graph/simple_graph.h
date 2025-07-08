@@ -1234,7 +1234,7 @@ namespace bitgraph {
 		}
 
 		//generates edge
-		if (rand::uniform_dist(p)) {
+		if (_rand::uniform_dist(p)) {
 			add_edge(v, w);
 		}
 

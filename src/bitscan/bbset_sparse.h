@@ -1658,7 +1658,7 @@ namespace bitgraph {
 	std::pair<bool, BitSetSp::vPB_it>
 		BitSetSp::find_block_ext(int blockID)
 	{
-		pair<bool, BitSetSp::vPB_it> res;
+		std::pair<bool, BitSetSp::vPB_it> res;
 
 		if (LB_policy) {
 			////////////////////////////////////////////////////////////////////////////////////////////

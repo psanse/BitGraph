@@ -27,11 +27,19 @@
 #define  _USE_MATH_DEFINES				//for PI
 #include <math.h>
 
-using vint = vector<int>;
+
+//useful alias
+namespace bitgraph {
+
+	using vint = vector<int>;
+}
+
 
 namespace gio {
 	
 	namespace yed {
+
+		using namespace bitgraph;
 
 		/**********************************************
 		*
@@ -294,7 +302,7 @@ namespace gio {
 				}
 			}
 			LOG_INFO("******************");
-			com::stl::print_collection(isets_aux, cout, true);
+			_stl::print_collection(isets_aux, cout, true);
 			LOG_INFO("******************");
 			///////////////////////
 
