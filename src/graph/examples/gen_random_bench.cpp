@@ -9,6 +9,7 @@
 #include <sstream>
 #include <string>
 #include "graph/algorithms/graph_gen.h"
+#include "graph_excep_hand.h"
 #include "utils/common.h"
 #include "utils/logger.h"
 
@@ -60,7 +61,17 @@ public:
 			std::exit(- 1);
 		}	
 
-		parse(argv);
+		try {
+			////////////////
+			parse(argv);
+			////////////////
+		}
+		catch (const GraphParseError& e) {
+			LOG_ERROR(e.what());
+			LOG_ERROR("exiting...");
+			std::exit(-1);
+		}
+		
 	}
 
 	void parse(char* argv[]) {
@@ -73,7 +84,11 @@ public:
 		sstr = std::stringstream();
 		sstr << argv[2];
 		sstr >> info_.nUB;
-		assert( (info_.nLB < info_.nUB) || info_.nLB > 0 );
+		if (info_.nLB > info_.nUB || info_.nLB <= 0) {
+			throw GraphParseError("Invalid range of sizes - parserRB::parse");
+								
+		}
+		//assert( (info_.nLB < info_.nUB) || info_.nLB > 0 );
 
 		sstr = std::stringstream();
 		sstr << argv[3];
@@ -82,22 +97,34 @@ public:
 		sstr = std::stringstream();
 		sstr << argv[4];
 		sstr >> info_.pUB;
-		assert( (info_.pLB < info_.pUB) || info_.pLB > 0);
+		if( info_.pLB > info_.pUB || info_.pLB <= 0) {
+			throw GraphParseError("Invalid range of densities - parserRB::parse");
+		}
+		//assert( (info_.pLB < info_.pUB) || info_.pLB > 0);
 
 		sstr = std::stringstream();
 		sstr << argv[5];
 		sstr >> info_.nRep;
-		assert(info_.nRep > 0);
+		if (info_.nRep <= 0) {
+			throw GraphParseError("Invalid number of repetitions - parserRB::parse");
+		}
+		//assert(info_.nRep > 0);
 
 		sstr = std::stringstream();
 		sstr << argv[6];
 		sstr >> info_.incN;
-		assert(info_.incN > 0);
+		if (info_.incN <= 0) {
+			throw GraphParseError("Invalid number of size increment - parserRB::parse");
+		}
+		//assert(info_.incN > 0);
 
 		sstr = std::stringstream();
 		sstr << argv[7];
 		sstr >> info_.incP;
-		assert(info_.incP > 0);
+		if (info_.incP <= 0) {
+			throw GraphParseError("Invalid number of density increment - parserRB::parse");
+		}
+		//assert(info_.incP > 0);
 
 		path_benchmark_ = argv[8];		
 	}
@@ -106,9 +133,8 @@ public:
 
 int main(int argc,  char* argv[]) {
 
-
 	parserRB parser(argc, argv);
-	
+		
 	//////////////
 	//generate single uniform random graph
 	cout << "*******************************" << endl;

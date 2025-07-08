@@ -1,21 +1,21 @@
 /**
-* @file bbexcep_hand.h
-* @brief contains exception handling for the bitscan lib part of the bitgraph lib
-* @details created 07/07/2025, last_update 08/07/2025
+* @file graph_excep_hand.h
+* @brief contains exception handling for the GRAPH lib part of the BITGRAPH lib
+* @details created 08/07/2025
 **/
 
-#ifndef __BBEXCEP_HAND_H__	
-#define __BBEXCEP_HAND_H__
+#ifndef __GRAPH_EXCEP_HAND_H__	
+#define __GRAPH_EXCEP_HAND_H__
 
 #include <iostream>
 #include <exception>
 
 
-class BitScanError : public std::runtime_error {
+class GraphParseError : public std::invalid_argument {
 
 public:
-	explicit BitScanError(const std::string& message)
-		: std::runtime_error("BitScanError: " + message) {}
+	explicit GraphParseError(const std::string& message)
+		: std::invalid_argument("GraphParseError: " + message) {}
 };
 
 

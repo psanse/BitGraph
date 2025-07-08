@@ -130,14 +130,14 @@ namespace bitgraph {
 			* @returns 0 if success, -1 if memory allocation fails (error code, non-throwing interface)
 			* @creation 31/12/24
 			**/
-			int reset(std::size_t n, string name = "");
+			int reset(std::size_t n, string name = "") noexcept;
 
 			/**
 			* @brief sets graph from file in dimacs/MTX/Edges formats (in this order)
 			* @param filename file
 			* @returns 0 if success, -1 if file cannot be read (error code, non-throwing interface)
 			**/
-			int reset(std::string filename);
+			int reset(std::string filename) noexcept;
 
 			/**
 			* @brief resets to default values (does not deallocate memory)
@@ -585,7 +585,7 @@ namespace bitgraph {
 
 	template<class T>
 	inline
-		int Graph<T>::reset(std::size_t NV, string name) {
+		int Graph<T>::reset(std::size_t NV, string name) noexcept {
 
 		if (NV <= 0) {
 			LOGG_ERROR("Invalid graph size ", NV, " - Graph<T>::reset");
@@ -685,7 +685,7 @@ namespace bitgraph {
 
 	template<class T>
 	inline
-		int Graph<T>::reset(string filename) {
+		int Graph<T>::reset(string filename) noexcept {
 		if (read_dimacs(filename) == -1) {
 			if (read_mtx(filename) == -1) {
 				if (read_EDGES(filename) == -1) {
