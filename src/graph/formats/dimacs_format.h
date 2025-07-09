@@ -20,7 +20,8 @@ namespace bitgraph {
 
 	namespace gio {
 		/**
-		*  @brief removes empty lines from the input stream - stops at the first non-empty line
+		*  @brief removes empty lines from the input stream during paring
+		*		  - stops at the first non-empty line
 		*  @param f (input) stream
 		**/
 		inline
@@ -50,53 +51,96 @@ namespace bitgraph {
 			* @param m ouptut - number if edges (nE) read
 			* @return 0 if success, -1 if error
 			*/
+			//inline
+			//	int read_dimacs_header(std::fstream& f, int& n, int& m) {
+
+			//	std::string line;
+			//	std::string token;
+			//	char c;
+			//	bool dimacs_header_found = false;
+
+			//	while (!dimacs_header_found) {
+
+			//		///////////////
+			//		c = f.peek();
+			//		///////////////
+
+			//		switch (c) {
+			//		case 'c':							//comment line in DIMACS format
+			//		case '\n':
+			//		case '\r':							//this is not DIMACS format - CHECK
+			//			std::getline(f, line);
+			//			break;
+
+			//		case 'p':  //header found - read: p edge <nV> <nE> 
+
+			//			/////////////////////////////////
+			//			f >> token >> token >> n >> m;
+			//			/////////////////////////////////
+
+			//			if (!f.good() || token != "edge") {
+			//				LOG_ERROR("bad DIMACS header found  ('p' line) - DIMACS_READER::read_dimacs_header");
+			//				return -1;
+			//			}
+
+			//			dimacs_header_found = true;
+			//			std::getline(f, line);						//remove remaining part of the line
+			//			break;
+
+			//		default:
+			//			LOG_ERROR("bad DIMACS protocol  - DIMACS_READER::read_dimacs_header");
+			//			LOGG_ERROR("first character of new line is: ", c);
+			//			return -1;
+			//		}
+
+			//	}
+
+			//	//returns the number of vertices
+			//	return n;
+			//}
+
+			/**
+			* @brief reads DIMACS header (p edge <nV> <nE>) from the input stream
+			* @param f input stream
+			* @param n output - number of vertices (nV) read
+			* @param m ouptut - number if edges (nE) read
+			* @return number of vertices n if success, -1 if error
+			**/
 			inline
 				int read_dimacs_header(std::fstream& f, int& n, int& m) {
 
 				std::string line;
-				std::string token;
-				char c;
-				bool dimacs_header_found = false;
+				n = 0; m = 0;
 
-				while (!dimacs_header_found) {
+				read_empty_lines(f);
 
-					///////////////
-					c = f.peek();
-					///////////////
-
-					switch (c) {
-					case 'c':							//comment line in DIMACS format
-					case '\n':
-					case '\r':							//this is not DIMACS format - CHECK
-						std::getline(f, line);
-						break;
-
-					case 'p':  //header found - read: p edge <nV> <nE> 
-
-						/////////////////////////////////
-						f >> token >> token >> n >> m;
-						/////////////////////////////////
-
-						if (!f.good() || token != "edge") {
-							LOG_ERROR("bad DIMACS header found  ('p' line) - DIMACS_READER::read_dimacs_header");
-							return -1;
-						}
-
-						dimacs_header_found = true;
-						std::getline(f, line);						//remove remaining part of the line
-						break;
-
-					default:
+				while (std::getline(f, line)) {
+					if (line[0] == 'c') continue;				//skip comment lines or ...
+					if (line[0] != 'p') {
 						LOG_ERROR("bad DIMACS protocol  - DIMACS_READER::read_dimacs_header");
-						LOGG_ERROR("first character of new line is: ", c);
+						LOGG_ERROR("first character of new line is: ", line[0]);
 						return -1;
 					}
 
+					std::istringstream iss(line);
+					std::string p, type;
+					if (iss >> p >> type >> n >> m) {
+						if (type != "edge") {
+							LOGG_ERROR("bad DIMACS header found: expecting 'p edge <nV> <nE>'- found: ", p, " ", type);
+							LOG_ERROR("- DIMACS_READER::read_dimacs_header");
+							return -1;
+						}
+						else {
+							break;
+						}
+					}
 				}
-
-				//returns the number of vertices
+				
+				//reaches here if the header is found
 				return n;
 			}
+						
+
 
 			/*
 			* @brief writes a graph in DIMACS format
