@@ -2,9 +2,10 @@
 * @file edges_format.h
 * @bried header of class MMXI to read MMX format in GRAPH
 * 		 Currently only reads matrix from a configuration MCPS
-* @created 19/11/2014
-* @last_update 27/01/2025
-* @author pss
+* @details created 19/11/2014, last_update 27/01/2025
+* @dev pss
+* 
+* TODO - old code, refactoring needed (09/07/25)
 **/
 
 #include <cstdio>

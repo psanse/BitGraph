@@ -337,28 +337,31 @@ namespace bitgraph {
 		public:
 			/**
 			* @brief reads a simple directed unweighted graph in DIMACS format 
-			* @returns 0 if correct, -1 in case of error (non-throwing interface)
-			* @details: does not read weights, 
+			* @returns 0 if correct, -1 in case of error (error code non-throwing interface)
+			* @details: iterates on the parsed number of edges 
+			* 
+			* TODO: iterate on number of lines 'e' and check if it is consistent
+			*		with the parsed number of edges
 			**/
-			int read_dimacs(const std::string& filename);
+			int read_dimacs(const std::string& filename) noexcept;
 
 			/**
 			* @brief reads a graph matrix exchange format (at the moment only MCPS)
-			* @returns 0 if correct, -1 in case of error  (non-throwing interface)
+			* @returns 0 if correct, -1 in case of error (error code non-throwing interface)
 			**/
-			int read_mtx(const std::string& filename);
+			int read_mtx(const std::string& filename) noexcept;
 
 			/**
 			* @brief reads a graph in list of edges format
-			* @returns 0 if correct, -1 in case of error (non-throwing interface)
+			* @returns 0 if correct, -1 in case of error (error code non-throwing interface)
 			**/
-			int read_EDGES(const std::string& filename);
+			int read_EDGES(const std::string& filename) noexcept;
 
 			/**
 			* @brief reads 0-1 adjacency matrix (rows) with a first line indicating |V|
-			* @details: (non-throwing interface)
+			* @details: (error code non-throwing interface)
 			**/
-			int read_01(const std::string& filename); 
+			int read_01(const std::string& filename) noexcept; 
 
 			/*
 			* @brief writes directed graph in dimacs format
@@ -786,12 +789,9 @@ namespace bitgraph {
 
 	template<class T>
 	inline
-		int Graph<T>::read_dimacs(const string& filename) {
+		int Graph<T>::read_dimacs(const string& filename) noexcept{
 
-
-		int size, nEdges, v1, v2, edges = 0;
-		//_wt wv=0.0;
-		/*char token[10];*/ char line[250]; char c;
+		int n=0, m=0, v1=0, v2=0;			
 
 		fstream f(filename.c_str());
 		if (!f) {
@@ -800,70 +800,19 @@ namespace bitgraph {
 			return -1;
 		}
 
-		if (bitgraph::gio::dimacs::read_dimacs_header(f, size, nEdges) == -1) {
+		if (gio::dimacs::read_dimacs_header(f, n, m) == -1) {
 			reset();
 			f.close();
 			return -1;
 		}
 
-		reset(size);
+		reset(n);
 		gio::skip_empty_lines(f);
-
-		//read weights format n <x> <w> if they exist
-		//c=f.peek();
-		//if(c=='n' || c=='v' /* used by Zavalnij */){						
-		//	LOG_ERROR("Graph<T>::read_dimacs-DIMACS weights found in file: excluding other weights");
-		//	reset_wv();
-		//	m_is_wv=true;
-		//	for(int n=0; n<NV_; n++){
-		//		f>>c>>v1>>wv;
-		//		if(!f.good()){
-		//			cerr<<"bad line related to weights"<<endl;
-		//			reset();
-		//			f.close();
-		//			return -1;
-		//		}
-		//		m_wv[v1-1]=wv;
-		//		if(wv==0){
-		//			cerr<<filename<<":wrong header for edges reading DIMACS format"<<endl;
-		//			reset();
-		//			f.close();
-		//			return -1;
-		//		}
-		//		f.getline(line, 250);  //remove remaining part of the line
-		//	}
-
-		//	LOG_INFO("Graph<T>::read_dimacs-Weights read correctly from DIMACS file"<<filename);
-		//	bitgraph::::gio::dimacs::read_empty_lines(f);
-		//}
-	/////////////////////	
-	//read edges
-
-		//read the first edge to determine the type of input
-		//f.getline(line, 250); 
-		//stringstream sstr(line);
-		//int nw=counting::count_words(sstr.str());
-		//if(nw< 3 || nw > 4){
-		//	cerr<<filename<<":wrong edge line format reading DIMACS format"<<endl;
-		//	reset(); f.close(); 	return -1;
-		//}else if(nw==4){  /* edge weighted case */
-		//	LOG_INFO("reading edge weights from the file"); 
-		//	reset_we(0.0);
-		//}
-
-		////interpret the first line
-		//if(nw==3){
-		//	sstr>>c>>v1>>v2;	
-		//	add_edge(v1-1,v2-1);
-		//}else if(nw==4){
-		//	sstr>>c>>v1>>v2>>wv;
-		//	add_edge(v1-1,v2-1);
-		//	set_we(v1-1, v2-1, wv);	
-		//}
-
-
-		//remaining edges
-		for (int e = 0 /*1*/; e < nEdges; e++) {
+		
+		////////////////////////
+		//parse edges directly from the stream
+		string line; char c;
+		for (int e = 0; e < m; e++) {			//iterates on the number of edges, TODO - iterate on lines and check edges
 			f >> c;
 			if (c != 'e') {
 				LOGG_ERROR(filename, ":wrong header for edges reading DIMACS format");
@@ -879,50 +828,20 @@ namespace bitgraph {
 #else
 			add_edge(v1 - 1, v2 - 1);
 #endif
-
-			//add bidirectional edge	
-			/*if(nw == 3){
-				f>>v1>>v2;
-				add_edge(v1-1,v2-1);
-			}else if(nw == 4){
-				f>>v1>>v2>>wv;
-				add_edge(v1-1,v2-1);
-				set_we(v1-1, v2-1, wv);
-			}	*/
-
+					
 			//removes remaining part of the line
-			f.getline(line, 250);
+			std::getline(f, line);		
 		}
+
 		f.close();
-
-		//name (removes path)
-		name(filename);
-
-		//extension for weighted files (9/10/16)
-	//	string str(filename);					//filename contains the full path
-
-		//read weights from external files if necessary
-	//	if(!m_is_wv){
-	//
-	//#ifdef FILE_EXTENSION_W	
-	//		str+=".w";
-	//#elif FILE_EXTENSION_D
-	//		str+=".d";
-	//#elif FILE_EXTENSION_WWW
-	//		str+=".www";
-	//#else
-	//		str+=".nofile";
-	//#endif
-	//		
-	//		read_weights(str);
-	//	}
-
+				
+		name(filename);			//removes full path
 		return 0;
 	}
 
 	template<class T>
 	inline
-		int Graph<T>::read_01(const string& filename) {
+		int Graph<T>::read_01(const string& filename) noexcept {
 
 
 		int size, val;
@@ -964,7 +883,7 @@ namespace bitgraph {
 
 	template<class T>
 	inline
-		int  Graph<T>::read_mtx(const string& filename) {
+		int  Graph<T>::read_mtx(const string& filename) noexcept {
 
 
 		MMI<Graph<T> > myreader(*this);
@@ -973,7 +892,7 @@ namespace bitgraph {
 
 	template<class T>
 	inline
-		int  Graph<T>::read_EDGES(const string& filename) {
+		int  Graph<T>::read_EDGES(const string& filename) noexcept {
 
 		EDGES<Graph<T> > myreader(filename, *this);
 		return (myreader.read());

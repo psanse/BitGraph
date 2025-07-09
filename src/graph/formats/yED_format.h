@@ -1,14 +1,11 @@
-/*
-* @file graph_inout.h
-* @brief stateless functions for I/O operations on graphs
-* @created 10/07/2019
-* @last_update 27/01/25
-* @author pss
+/**
+* @file yED_format.h
+* @brief stateless API to work with yED lib
+* @details created 10/07/2019, last_update 27/01/25
+* @dev pss
 * 
-* @comment generic code for graph types in the GRAPH lib
-* 
-* TODO@: this code contains only yED format - possibly change name of file (30/12/2022)
-*/
+* TODO - add tests (09/07/2025)
+**/
 
 #ifndef	__GRAPH_INPUT_OUTPUT_H__
 #define __GRAPH_INPUT_OUTPUT_H__
@@ -21,8 +18,6 @@
 #include "utils/file.h"
 #include "utils/logger.h"
 #include "utils/common.h"
-//#include graph/graph.h"
-
 
 #define  _USE_MATH_DEFINES				//for PI
 #include <math.h>
@@ -31,7 +26,7 @@
 //useful alias
 namespace bitgraph {
 
-	using vint = vector<int>;
+	using vint = std::vector<int>;
 }
 
 //useful alias
@@ -41,6 +36,7 @@ namespace bitgraph {
 
 		namespace yed {
 
+			using namespace std;
 			using namespace bitgraph;
 
 			/**********************************************
@@ -84,7 +80,7 @@ namespace bitgraph {
 						<< " text " << i + 1
 						<< " fontSize " << font_size
 						<< " ] "
-						<< " ]  " << endl;
+						<< " ]  " << std::endl;
 					return gml;
 			}
 
@@ -108,13 +104,13 @@ namespace bitgraph {
 				}
 
 				gml << " ]"
-					<< " ]" << endl;
+					<< " ]" << std::endl;
 				return gml;
 			}
 
 			inline
 				std::ostream& HEADER(std::ostream& gml) {
-				gml << "graph  [ hierarchic  1  directed  1 \n\n" << endl;
+				gml << "graph  [ hierarchic  1  directed  1 \n\n" << std::endl;
 				return gml;
 			}
 
@@ -455,7 +451,9 @@ namespace bitgraph {
 				/////////////////////////////////////
 				return 0;
 			}
-		}
+
+		}//end of namespace yed
+
 	}//end of namespace gio
 
 } //end of namespace bitgraph

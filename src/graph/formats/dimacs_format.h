@@ -1,9 +1,7 @@
 /**
 * @file dimacs_format.h
-* @brief header of stateless class DIMACS_READER which implements a number of utilities to read dimacs format
-* @details: creation 30/09/2018, ast_update 27/01/2025
-* 
-* TODO - clean this horror code (08/07/2025)
+* @brief utilities to parse dimacs format
+* @details: creation 30/09/2018, last_update 09/07/2025
 **/
 
 #include <fstream>
@@ -49,7 +47,7 @@ namespace bitgraph {
 			* @param f input stream
 			* @param n output - number of vertices (nV) read
 			* @param m ouptut - number if edges (nE) read
-			* @return number of vertices n if success, -1 if error
+			* @returns number of vertices @n if success, -1 if error
 			**/
 			inline
 				int read_dimacs_header(std::fstream& f, int& n, int& m) {
