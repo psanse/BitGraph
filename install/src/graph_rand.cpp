@@ -19,7 +19,7 @@ using namespace std;
 int main(int argc, char* argv[]) {
 
 	if (argc != 2){
-		LOG_ERROR("please enter a valid output dir...exiting");
+		LOG_ERROR("please enter a valid output directory...exiting");
 		std::exit(-1);
 	}
 
