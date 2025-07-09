@@ -20,12 +20,12 @@ namespace bitgraph {
 
 	namespace gio {
 		/**
-		*  @brief removes empty lines from the input stream during paring
+		*  @brief portable empty line skipper when parsing from file stream @f
 		*		  - stops at the first non-empty line
-		*  @param f (input) stream
+		*  @param f (input) fstream
 		**/
 		inline
-			void read_empty_lines(std::fstream& f) {
+			void skip_empty_lines(std::fstream& f) {
 			std::string line;
 
 			streampos oldpos = f.tellg();
@@ -43,62 +43,7 @@ namespace bitgraph {
 		}
 
 		namespace dimacs {
-
-			/*
-			* @brief reads DIMACS header (p edge <nV> <nE>) from the input stream
-			* @param f input stream
-			* @param n output - number of vertices (nV) read
-			* @param m ouptut - number if edges (nE) read
-			* @return 0 if success, -1 if error
-			*/
-			//inline
-			//	int read_dimacs_header(std::fstream& f, int& n, int& m) {
-
-			//	std::string line;
-			//	std::string token;
-			//	char c;
-			//	bool dimacs_header_found = false;
-
-			//	while (!dimacs_header_found) {
-
-			//		///////////////
-			//		c = f.peek();
-			//		///////////////
-
-			//		switch (c) {
-			//		case 'c':							//comment line in DIMACS format
-			//		case '\n':
-			//		case '\r':							//this is not DIMACS format - CHECK
-			//			std::getline(f, line);
-			//			break;
-
-			//		case 'p':  //header found - read: p edge <nV> <nE> 
-
-			//			/////////////////////////////////
-			//			f >> token >> token >> n >> m;
-			//			/////////////////////////////////
-
-			//			if (!f.good() || token != "edge") {
-			//				LOG_ERROR("bad DIMACS header found  ('p' line) - DIMACS_READER::read_dimacs_header");
-			//				return -1;
-			//			}
-
-			//			dimacs_header_found = true;
-			//			std::getline(f, line);						//remove remaining part of the line
-			//			break;
-
-			//		default:
-			//			LOG_ERROR("bad DIMACS protocol  - DIMACS_READER::read_dimacs_header");
-			//			LOGG_ERROR("first character of new line is: ", c);
-			//			return -1;
-			//		}
-
-			//	}
-
-			//	//returns the number of vertices
-			//	return n;
-			//}
-
+			
 			/**
 			* @brief reads DIMACS header (p edge <nV> <nE>) from the input stream
 			* @param f input stream
@@ -112,7 +57,7 @@ namespace bitgraph {
 				std::string line;
 				n = 0; m = 0;
 
-				read_empty_lines(f);
+				skip_empty_lines(f);
 
 				while (std::getline(f, line)) {
 					if (line[0] == 'c') continue;				//skip comment lines or ...
@@ -139,9 +84,7 @@ namespace bitgraph {
 				//reaches here if the header is found
 				return n;
 			}
-						
-
-
+			
 			/*
 			* @brief writes a graph in DIMACS format
 			* @param g graph

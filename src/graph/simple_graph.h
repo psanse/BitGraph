@@ -807,7 +807,7 @@ namespace bitgraph {
 		}
 
 		reset(size);
-		bitgraph::gio::read_empty_lines(f);
+		gio::skip_empty_lines(f);
 
 		//read weights format n <x> <w> if they exist
 		//c=f.peek();
