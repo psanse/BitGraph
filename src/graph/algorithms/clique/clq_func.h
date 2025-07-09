@@ -13,6 +13,7 @@
 #include <iostream>
 #include "utils/logger.h"
 #include "utils/common.h"
+#include "bitscan/bitblock.h"		//for bitblock operations
 
 #include <cassert>			//DEBUG run-time assertions 
 

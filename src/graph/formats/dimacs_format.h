@@ -19,26 +19,26 @@
 namespace bitgraph {
 
 	namespace gio {
-		/*
-		* @brief removes empty lines from the input stream
-		* @param f input stream
-		* @return 0 if success, -1 if error (currently only 0)
-		*/
+		/**
+		*  @brief removes empty lines from the input stream - stops at the first non-empty line
+		*  @param f (input) stream
+		**/
 		inline
-			int read_empty_lines(std::fstream& f) {
+			void read_empty_lines(std::fstream& f) {
 			std::string line;
-			char c;
 
-			while (true) {
-				c = f.peek();
-				if (c == '\n') {
-					std::getline(f, line);
-					continue;
+			streampos oldpos = f.tellg();
+			while (std::getline(f, line)) {
+
+				if (line.empty() || line[0] == '\n' || line[0] == '\r') {
+					oldpos = f.tellg();
+					continue;							//skip empty lines
 				}
+
+				//rewind to the beginning of the line and exit
+				f.seekg(oldpos);
 				break;
 			}
-
-			return 0;
 		}
 
 		namespace dimacs {
@@ -116,10 +116,9 @@ namespace bitgraph {
 			}
 
 		} //namespace dimacs
-	} //namespace gio
 
-	using gio::read_empty_lines;
-	using gio::dimacs::read_dimacs_header;
+	} //namespace gio
+		
 	using gio::dimacs::graph_to_dimacs;
 
 }//end namescape bitgraph	
