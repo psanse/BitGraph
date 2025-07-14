@@ -115,12 +115,12 @@ namespace bitgraph {
 	namespace com {
 		namespace _file {
 
-			int READ_SET_OF_INTERDICTED_VERTICES(const char* filename, vector<int>& interdicted_nodes) {
+			int READ_SET_OF_INTERDICTED_VERTICES(const char* filename, vector<int>& interdicted_nodes) noexcept {
 
 				//opens a file in binary mode
 				std::ifstream f(filename, ios::binary | ios::in);
 				if (!f) {
-					LOGG_ERROR("File could not be opened: ", filename, "- ::com::READ_SET_OF_INTERDICTED_NODES");
+					LOGG_ERROR("File could not be opened: ", filename, "_file::READ_SET_OF_INTERDICTED_NODES");
 					return -1;
 				}
 

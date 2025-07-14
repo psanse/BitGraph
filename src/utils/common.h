@@ -29,6 +29,7 @@
 #include <vector>
 #include <algorithm>
 #include <iterator>
+#include <regex>
 
 #include "common_types.h"				//common types additional utilities, to be included e
 
@@ -135,7 +136,7 @@ namespace bitgraph {
 
 			/**
 			*  @brief Functor to compute the mean of a collection
-			*		   (TODO- use a for-each loop)
+			*		   (use in a for-each loop)
 			**/
 			class MeanValue {
 			private:
@@ -156,7 +157,7 @@ namespace bitgraph {
 
 			/**
 			*  @brief Functor to compute the standard deviation of a collection
-			*		   given its mean (TODO use a for-each loop)
+			*		   given its mean (use in a for-each loop)
 			**/
 			class StdDevValue {
 			private:
@@ -190,22 +191,26 @@ namespace bitgraph {
 			* @param filename: name of the output file
 			* @param nodes: collection of elements to be written
 			* @param plus_one: flag to add 1 to each element before writing
-			* @returns 0 if success, -1 if error
+			* @returns 0 if success, -1 if error (non-throwing interface)
 			**/
 			template<class Col_t>
 			inline
-				int WRITE_SET_OF_VERTICES(const char* filename, const Col_t& nodes, bool plus_one = true)
+				int WRITE_SET_OF_VERTICES(const char* filename, const Col_t& nodes, bool plus_one = true) noexcept
 			{
 				std::ofstream f(filename, std::ofstream::out);
 				if (!f) {
-					LOGG_ERROR("Could not open file: ", filename);
+					LOGG_ERROR("Could not open file: ", filename, "_file::WRITE_SET_OF_VERTICES");
 					return -1;
 				}
 
 				auto SIZE = nodes.size();
 				f << "size " << SIZE << std::endl;
 				for (auto i = 0; i < SIZE; ++i) {
-					f << ((plus_one) ? nodes[i] + 1 : nodes[i]) << std::endl;
+					if !(f << ((plus_one) ? nodes[i] + 1 : nodes[i]) << std::endl) {
+						LOGG_ERROR("Error writing to file: ", filename, " at element: ", i, "_file::WRITE_SET_OF_VERTICES");
+						f.close();
+						return -1;
+					}					
 				}
 
 				f.close();
@@ -215,9 +220,9 @@ namespace bitgraph {
 			/**
 			 * @brief reads a mask of 0s and 1s from a file and provides the position of the 0s
 			 * @param interdicted_nodes: output vector of integers to store the positions of the 0s
-			 * @returns 0 if success, -1 if error
+			 * @returns 0 if success, -1 if error (non-throwing interface)
 			 **/
-			int READ_SET_OF_INTERDICTED_VERTICES(const char* filename, std::vector<int>& interdicted_nodes);
+			int READ_SET_OF_INTERDICTED_VERTICES(const char* filename, std::vector<int>& interdicted_nodes) noexcept;
 
 		}
 
@@ -227,16 +232,22 @@ namespace bitgraph {
 			* @brief counts the number of words in a string
 			**/
 			inline
-				int number_of_words(std::string str)
+				int number_of_words(const std::string& str)
 			{
-				auto word_count = 0;
+				static const std::regex word_regex(R"(\b\w+\b)");
+				return std::distance(
+					std::sregex_iterator(	str.begin(), str.end(), word_regex),
+											std::sregex_iterator()				);
+
+				//OLD CODE
+				/*auto word_count = 0;
 				std::stringstream sstr(str);
 				std::string word;
 				while (sstr >> word) {
 					++word_count;
 				}
 
-				return word_count;
+				return word_count;*/
 			}
 		}
 	}
