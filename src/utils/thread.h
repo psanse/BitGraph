@@ -1,6 +1,6 @@
 /**
 * @file thread.h
-* @brief Thread class to run a function member of a class as a thread
+* @brief Thread class to run a function member of an object as a thread
 * @date 2013
 * @last_update 20/01/2025
 * @version 1.0
