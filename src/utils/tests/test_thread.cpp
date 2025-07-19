@@ -71,7 +71,9 @@ TEST(run_thread, callable) {
 		}
 	};
 
+	//////////////////////////////////////
 	EXPECT_EQ(run_thread(functor()), 0);
+	//////////////////////////////////////
 }
 
 TEST(run_thread, member_function) {
