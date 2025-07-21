@@ -1,47 +1,53 @@
 /**
-* @file test_thread.cpp
-* @brief Unit tests for thread interface in thread.h file
-* @details created 25/01/2025, last_update 19/07/2025
+* @file test_task.cpp
+* @brief Unit tests for async tasks interface in task.h file
+* @details created 25/01/2025, last_update 21/07/2025
 * @dev pss
 *
-* TODO - 1) Add tests with params, 2) revise ThreadExample test (19/07/2025)
+* TODO - Check ThreadExample test  - possibly remove (19/07/2025)
 **/
 
 #include "gtest/gtest.h"
-#include "utils/thread.h"
-#include <thread>
+#include "utils/task.h"
+#include <future>
 
 using namespace bitgraph;
 
 
-TEST(run_thread, callable) {
+TEST(run_task, callable) {
 
 	struct functor {
-		void operator()() {
+		int operator()(int a) {
 			std::this_thread::sleep_for(std::chrono::milliseconds(200)); // Simulate work
+			return a;
 		}
 	};
 
 	//////////////////////////////////////
 	functor f;
-	run_thread(f);
+	auto res = run_task(f, 5);
 	//////////////////////////////////////
+
+	EXPECT_EQ(res, 5);
 }
 
-TEST(run_thread, member_function) {
+TEST(run_task, member_function) {
 
 	class X {
 	public:
-		void run() {
+		int run() {
 			std::this_thread::sleep_for(std::chrono::milliseconds(200)); // Simulate work
+			return 0;
 		}
 	};
 
 
 	X x;
 	//////////////////////////////////////
-	run_thread(&X::run, x);
+	auto res = run_task(&X::run, x);
 	//////////////////////////////////////
+
+	EXPECT_EQ(res, 0);
 }
 
 //////////////////////////
