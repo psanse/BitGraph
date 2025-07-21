@@ -24,8 +24,8 @@ namespace bitgraph {
 		* @details: The task MUST have a return value. The task, if required, must throw an exception derived from std::exception.
 		**/
 		template<typename func_t, typename obj_t, typename... Args>
-		auto run_task(func_t func, obj_t& obj, Args&&... args) noexcept ->
-							decltype((obj.*func)(std::forward<Args>(args)...))
+		auto run_task(func_t func, obj_t& obj, Args&&... args) noexcept
+						->	decltype((obj.*func)(std::forward<Args>(args)...))
 		{
 			using ret_t = decltype((obj.*func)(std::forward<Args>(args)...));
 			ret_t value{};
