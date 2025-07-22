@@ -2,7 +2,7 @@
 * @file task.h
 * @brief convenience functions and classed to run callable objects or member functions as async threads.
 * 		 Application: algorithm test framework - algoritms are run sequentially  and main thread waits for each one to finish
-* @details: created 2013, last_update 21/07/2025
+* @details: created 2013, last_update 22/07/2025
 * @dev: pss
 **/ 
 
@@ -11,66 +11,68 @@
 
 #include <future>
 #include <exception>
+#include <type_traits>
 #include "logger.h"
 
 namespace bitgraph {
 
 	namespace com {
 
-
 		/**
-		* @brief: Runs a task according to a member function of an object with generic params and waits for its finish
-		* @return: value determined by the task (member function) or a default value if an exception is caught
-		* @details: The task MUST have a return value. The task, if required, must throw an exception derived from std::exception.
+		* @brief: Runs a task asynchronously (different thread) according to a member function of an object with generic params and waits for it to finish
+		*		  providing the task's return value.
+		* @return: task's return value or a default value if an exception is caught
+		* @details: the task MUST have a return value. The task, if required, must throw an exception derived from std::exception.
 		**/
 		template<typename func_t, typename obj_t, typename... Args>
-		auto run_task(func_t func, obj_t& obj, Args&&... args) noexcept
-						->	decltype((obj.*func)(std::forward<Args>(args)...))
-		{
-			using ret_t = decltype((obj.*func)(std::forward<Args>(args)...));
+		inline
+		typename std::result_of<func_t(obj_t&, Args...)>::type
+		run_task_async(func_t func, obj_t& obj, Args&&... args) noexcept	
+		{	
+			using ret_t = typename std::result_of<func_t(obj_t&, Args...)>::type;
 			ret_t value{};
 
 			//future to hold the result of the async task
-			decltype(std::async(func, std::ref(obj), std::forward<Args>(args)...)) fut;
-
+			std::future<ret_t> fut = std::async(std::launch::async, func, std::ref(obj), std::forward<Args>(args)...);
+			
 			try {
-				fut = std::async(func, std::ref(obj), std::forward<Args>(args)...); 
 				value = fut.get();
 			}
 			catch (std::exception& e) {
-				LOGG_ERROR("caught exception thrown by task: ", e.what(), "bitgraph::run_task");
+				LOGG_ERROR("caught exception thrown by task: ", e.what(), "bitgraph::run_task_async");				
 			}
 
 			return value;
 		}
 
 		/**
-		* @brief: Runs a task according to a callable object as a thread with generic params and waits for its finish
-		* @return: value determined by the task (callable object) or a default value if an exception is caught
-		* @details: The task MUST have a return value. The task, if required, must throw an exception derived from std::exception.
+		* @brief: Runs a task  asynchronously (different thread) to a callable object as a thread with generic params and waits for it to finish
+		*		  providing the task's return value.
+		* @return: task's return value or a default value if an exception is caught
+		* @details: the task MUST have a return value. The task, if required, must throw an exception derived from std::exception.
 		**/
 		template<typename callable_t, typename... Args>
-		auto run_task(callable_t obj, Args&&... args) noexcept
-							-> decltype(obj(std::forward<Args>(args)...))
-		{
-			using ret_t = decltype(obj(std::forward<Args>(args)...));
+		inline
+		typename std::result_of<callable_t(Args...)>::type
+		run_task_async(callable_t&& obj, Args&&... args) noexcept
+		{		
+
+			using ret_t = typename std::result_of<callable_t(Args...)>::type;
 			ret_t value{};
 
 			//future to hold the result of the async task
-			decltype(std::async(obj, std::forward<Args>(args)...)) fut;
-
+			std::future<ret_t> fut = std::async(std::launch::async, obj, std::forward<Args>(args)...);;
+		
 			try {
-				fut = std::async(obj, std::forward<Args>(args)...);
 				value = fut.get();						
 			}
 			catch (std::exception & e) {
-				LOGG_ERROR("caught exception thrown by task: ", e.what(), "bitgraph::run_task");
+				LOGG_ERROR("caught exception thrown by task: ", e.what(), "bitgraph::run_task_async");
 			}
 
 			return value;
 		}
-				
-
+		
 		//////////////////////
 		////
 		//// Thread class (DEPRECATED - REMOVE)
@@ -99,10 +101,9 @@ namespace bitgraph {
 
 		//};
 
-
 	}//end namespace com
 	
-	using com::run_task;
+	using com::run_task_async;
 	//using com::Thread;
 
 }//end namespace bitgraph

@@ -10,9 +10,9 @@
 #include "gtest/gtest.h"
 #include "utils/task.h"
 #include <future>
+#include <chrono>
 
 using namespace bitgraph;
-
 
 TEST(run_task, callable) {
 
@@ -24,8 +24,8 @@ TEST(run_task, callable) {
 	};
 
 	//////////////////////////////////////
-	functor f;
-	auto res = run_task(f, 5);
+	//functor f;
+	auto res = run_task_async(functor(), 5);
 	//////////////////////////////////////
 
 	EXPECT_EQ(res, 5);
@@ -44,7 +44,7 @@ TEST(run_task, member_function) {
 
 	X x;
 	//////////////////////////////////////
-	auto res = run_task(&X::run, x);
+	auto res = run_task_async(&X::run, x);
 	//////////////////////////////////////
 
 	EXPECT_EQ(res, 0);
