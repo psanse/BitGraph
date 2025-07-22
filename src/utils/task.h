@@ -17,7 +17,7 @@
 namespace bitgraph {
 
 	namespace com {
-
+		
 		/**
 		* @brief: Runs a task asynchronously (different thread) according to a member function of an object with generic params and waits for it to finish
 		*		  providing the task's return value.
@@ -36,7 +36,7 @@ namespace bitgraph {
 			std::future<ret_t> fut = std::async(std::launch::async, func, std::ref(obj), std::forward<Args>(args)...);
 			
 			try {
-				value = fut.get();
+				value = fut.get();		//can throw			
 			}
 			catch (std::exception& e) {
 				LOGG_ERROR("caught exception thrown by task: ", e.what(), "bitgraph::run_task_async");				
@@ -64,7 +64,7 @@ namespace bitgraph {
 			std::future<ret_t> fut = std::async(std::launch::async, obj, std::forward<Args>(args)...);;
 		
 			try {
-				value = fut.get();						
+				value = fut.get();			//can throw				
 			}
 			catch (std::exception & e) {
 				LOGG_ERROR("caught exception thrown by task: ", e.what(), "bitgraph::run_task_async");
