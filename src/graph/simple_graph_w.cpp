@@ -104,7 +104,7 @@ template<class Graph_t, class W>
 }
 
 
- template<class Graph_t, class W>
+template<class Graph_t, class W>
 bool Base_Graph_W<Graph_t, W>::is_unit_weighted()
 {
 	for (W v : w_) {
@@ -496,13 +496,18 @@ ostream& Graph_W<ugraph, W>::write_dimacs(ostream& o) {
 ////////////////////////////////////////////
 //list of valid types to allow generic code in *.cpp files 
 
-template class  Base_Graph_W<ugraph, int>;
-template class  Base_Graph_W<ugraph, double>;
-template class  Graph_W<ugraph, int>;
-template class  Graph_W<ugraph, double>;
+namespace bitgraph {
+	namespace _impl {
 
-//other specializations... (sparse_graph)
+		template class  Base_Graph_W<ugraph, int>;
+		template class  Base_Graph_W<ugraph, double>;
+		template class  Graph_W<ugraph, int>;
+		template class  Graph_W<ugraph, double>;
 
+		//other specializations... (sparse_graph)
+
+	} // namespace _impl
+} // namespace bitgraph
 
 ////////////////////////////////////////////
 

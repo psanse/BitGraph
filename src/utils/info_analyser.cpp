@@ -503,9 +503,14 @@ std::ostream& InfoAnalyser<AlgInfo_t>::print_analyser_summary(std::ostream& o) c
 /////////////////////////////////
 // declaration of valid types 
 
-template class InfoAnalyser< infoCLQ<int> >;
-template class InfoAnalyser< infoCLQ<double> >;
+namespace bitgraph {
+	namespace com {
 
-template std::ostream& bitgraph::com::operator << (std::ostream& o, const InfoAnalyser<infoCLQ<int>>& t);
-template std::ostream& bitgraph::com::operator << (std::ostream& o, const InfoAnalyser<infoCLQ<double>>& t);
+		template class InfoAnalyser< infoCLQ<int> >;
+		template class InfoAnalyser< infoCLQ<double> >;
 
+		template std::ostream& operator << (std::ostream& o, const InfoAnalyser<infoCLQ<int>>& t);
+		template std::ostream& operator << (std::ostream& o, const InfoAnalyser<infoCLQ<double>>& t);
+
+	} // namespace com
+} // namespace bitgraph

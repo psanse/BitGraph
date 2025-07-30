@@ -1025,9 +1025,9 @@ namespace bitgraph {
 		}
 
 		if (num_iter != EMPTY_ELEM) {
-			LOGG_PRINT("kc[", "it:", iter, ",", " lb:", max_size, "]");
+			LOGG_INFO("kc[", "it:", iter, ",", " lb:", max_size, "]");
 		}
-		else LOGG_PRINT("kc[lb:", max_size, "]");
+		else LOGG_INFO("kc[lb:", max_size, "]");
 
 		return largest_clique;
 	}

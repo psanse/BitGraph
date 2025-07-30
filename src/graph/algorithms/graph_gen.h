@@ -494,7 +494,7 @@ namespace bitgraph{
 
 	template<class Graph_t>
 	inline
-		int EdgeWeightGen<Graph_t>::create_weights(Graph_t& g, type_t type, int wmod, std::string FILE_EXTENSION = "", string FILE_PATH = "") {
+		int EdgeWeightGen<Graph_t>::create_weights(Graph_t& g, type_t type, int wmod, std::string FILE_EXTENSION, string FILE_PATH) {
 
 		switch (type) {
 		case WMOD:

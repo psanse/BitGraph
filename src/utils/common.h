@@ -206,7 +206,7 @@ namespace bitgraph {
 				auto SIZE = nodes.size();
 				f << "size " << SIZE << std::endl;
 				for (auto i = 0; i < SIZE; ++i) {
-					if !(f << ((plus_one) ? nodes[i] + 1 : nodes[i]) << std::endl) {
+					if (!(f << ((plus_one) ? nodes[i] + 1 : nodes[i]) << std::endl)) {
 						LOGG_ERROR("Error writing to file: ", filename, " at element: ", i, "_file::WRITE_SET_OF_VERTICES");
 						f.close();
 						return -1;
