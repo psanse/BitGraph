@@ -12,7 +12,7 @@ add_executable (test_utils
      test_info.cpp
      test_info_clq.cpp
      test_precise_timer.cpp
-     test_thread.cpp
+     test_task.cpp
      test_logger.cpp
      test_benchmark.cpp
      test_infoAnalyser.cpp

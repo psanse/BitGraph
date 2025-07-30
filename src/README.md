@@ -43,7 +43,7 @@ include(FetchContent)
 FetchContent_Declare(
   BitGraph
   GIT_REPOSITORY https://github.com/psanse/BitGraph
-  GIT_TAG master			# A fixed release source will be provided shortly
+  GIT_TAG v1.1.0			# Or latest release 
 )
 FetchContent_MakeAvailable(BitGraph)
 include_directories (PUBLIC ${FETCHCONTENT_BASE_DIR}/BitGraph-src/src)

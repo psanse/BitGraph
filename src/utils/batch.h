@@ -20,8 +20,8 @@ public:
 	~Batch() { clear(); }
 
 	//getters and setters
-	int number_of_tests		()			{ return tests.size(); }
-	Alg_t* get_test			(int id)	{ return tests[id]; }
+	int number_of_tests				()			{ return tests.size(); }
+std::unique_ptr<Alg_t>& get_test	(int id)	{ return tests[id]; }
 
 /////////////////////////
 //basic operations
@@ -30,22 +30,15 @@ public:
 	* @brief adds tests of type AlgVar_t (derived from Alg_t)  - deallocates memory
 	**/
 	template<class AlgVar_t =  Alg_t>
-	void add_test			(Param_t p)	{ tests.emplace_back( new AlgVar_t(p) ); }
+	void add_test			(Param_t p)	{ tests.emplace_back( make_unique<AlgVar_t>(p) ); }
 
 	template<class AlgVar_t = Alg_t>
-	void operator +=		(Param_t p) { tests.emplace_back( new AlgVar_t(p) ); }
+	void operator +=		(Param_t p) { tests.emplace_back( make_unique<AlgVar_t>(p)); }
 
 	/**
 	* @brief clears all tests - deallocates memory
 	**/
-	void clear(){
-
-		for (auto& pTest : tests) {
-			delete pTest;
-		}
-		
-		tests.clear();
-	}
+	void clear(){ tests.clear(); }
 	
 	/**
 	* @brief runs all tests
@@ -58,11 +51,10 @@ public:
 		}
 	}
 	
-
 /////////
 //data members
 protected:
-	std::vector<Alg_t*> tests; 
+	std::vector < std::unique_ptr<Alg_t> > tests;
 };
 
 #endif
