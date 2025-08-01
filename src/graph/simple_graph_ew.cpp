@@ -581,8 +581,8 @@ std::ostream& Graph_EW<ugraph, W>::print_edges(std::ostream& o, bool eofl)  cons
 	for (auto i = 0; i < NV - 1; ++i) {
 		for (auto j = i + 1; j < NV; ++j) {
 
-			if (is_edge(i, j)) {
-				o << "[" << i << "]" << "--(" << weight(i, j)  << ")-->" << "[" << j << "]" << endl;
+			if (ptype::g_.is_edge(i, j)) {
+				o << "[" << i << "]" << "--(" << ptype::we_[i][j]  << ")-->" << "[" << j << "]" << endl;
 			}
 		}
 	}
@@ -792,12 +792,17 @@ void Base_Graph_EW<Graph_t, W>::make_edge_weighted(bool erase_non_edges)
 ////////////////////////////////////////////
 //list of valid types to allow generic code in *.cpp files 
 
-template class  Base_Graph_EW<ugraph, int>;
-template class  Base_Graph_EW<ugraph, double>;
-template class  Graph_EW<ugraph, int>;
-template class  Graph_EW<ugraph, double>;
+namespace bitgraph {
+	namespace _impl {
 
-//other specializations... (sparse_graph)
+		template class  Base_Graph_EW<ugraph, int>;
+		template class  Base_Graph_EW<ugraph, double>;
+		template class  Graph_EW<ugraph, int>;
+		template class  Graph_EW<ugraph, double>;
 
+		//other specializations... (sparse_graph)
+
+} //namespace _impl
+} //namespace bitgraph
 
 ////////////////////////////////////////////

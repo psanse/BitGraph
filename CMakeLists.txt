@@ -58,7 +58,8 @@ option(INCLUDE_OPENMP "Makes OpenMP available (only for Windows platforms)" OFF)
 #############
 # APPLE options  - extend to other SO
 if (APPLE)
-    set(CMAKE_OSX_ARCHITECTURES "x86_64")
+    set(CMAKE_OSX_ARCHITECTURES "x86_64;arm64" CACHE STRING "Set architectures for Apple platforms (x86_64;arm64)" FORCE)
+	set(CMAKE_OSX_DEPLOYMENT_TARGET "10.15" CACHE STRING "Set minimum deployment target for Apple platforms (10.15)" FORCE)
     set(CMAKE_PREFIX_PATH "/usr/local/homebrew")
     #add_compile_options(-arch arm64)
 endif (APPLE)
@@ -66,12 +67,4 @@ endif (APPLE)
 ####################
 # Subdirectories 
 ####################
-add_subdirectory (src) 
-
-
-
-
-
-
-
-
+add_subdirectory (src)

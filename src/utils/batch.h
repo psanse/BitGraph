@@ -11,6 +11,7 @@
 #define __BATCH_H__
 
 #include <vector>
+#include <memory>
 
 template <class Alg_t, class Param_t>
 class Batch{
@@ -30,10 +31,10 @@ std::unique_ptr<Alg_t>& get_test	(int id)	{ return tests[id]; }
 	* @brief adds tests of type AlgVar_t (derived from Alg_t)  - deallocates memory
 	**/
 	template<class AlgVar_t =  Alg_t>
-	void add_test			(Param_t p)	{ tests.emplace_back( make_unique<AlgVar_t>(p) ); }
+	void add_test			(Param_t p)	{ tests.emplace_back( std::make_unique<AlgVar_t>(p) ); }
 
 	template<class AlgVar_t = Alg_t>
-	void operator +=		(Param_t p) { tests.emplace_back( make_unique<AlgVar_t>(p)); }
+	void operator +=		(Param_t p) { tests.emplace_back( std::make_unique<AlgVar_t>(p)); }
 
 	/**
 	* @brief clears all tests - deallocates memory

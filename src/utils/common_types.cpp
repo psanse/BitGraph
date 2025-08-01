@@ -16,14 +16,14 @@ using namespace bitgraph;
 
 
 template<class T>
-stack_t<T>::stack_t() :nE_(0), stack_(nullptr) {
+bitgraph::com::stack_t<T>::stack_t() :nE_(0), stack_(nullptr) {
 #ifdef DEBUG_STACKS
 	int MAX_ = 0;
 #endif   
 }
 
 template<class T>
-stack_t<T>::stack_t(int MAX_SIZE) : stack_(nullptr) {
+bitgraph::com::stack_t<T>::stack_t(int MAX_SIZE) : stack_(nullptr) {
 	try {
 		stack_ = new T[MAX_SIZE];
 	}
@@ -38,7 +38,7 @@ stack_t<T>::stack_t(int MAX_SIZE) : stack_(nullptr) {
 }
 
 template<class T>
-stack_t<T>::stack_t(stack_t&& s) noexcept :
+bitgraph::com::stack_t<T>::stack_t(bitgraph::com::stack_t<T>&& s) noexcept :
 	nE_(s.nE_),
 	stack_(s.stack_)
 #ifdef DEBUG_STACKS
@@ -51,8 +51,7 @@ stack_t<T>::stack_t(stack_t&& s) noexcept :
 }
 
 template<class T>
-stack_t<T>& stack_t<T>::operator = (stack_t&& s) noexcept
-{
+bitgraph::com::stack_t<T>& bitgraph::com::stack_t<T>::operator = (bitgraph::com::stack_t<T>&& s) noexcept{
 	nE_ = s.nE_;
 	stack_ = s.stack_;
 #ifdef DEBUG_STACKS
@@ -65,7 +64,7 @@ stack_t<T>& stack_t<T>::operator = (stack_t&& s) noexcept
 }
 
 template<class T>
-void stack_t<T>::reset(int MAX_SIZE) {
+void bitgraph::com::stack_t<T>::reset(int MAX_SIZE) {
 	nE_ = 0;
 	delete[] stack_;
 	try {
@@ -82,7 +81,7 @@ void stack_t<T>::reset(int MAX_SIZE) {
 }
 
 template<class T>
-void stack_t<T>::clear() {
+void bitgraph::com::stack_t<T>::clear() {
 	delete[] stack_;
 	stack_ = nullptr;
 	nE_ = 0;
@@ -92,7 +91,7 @@ void stack_t<T>::clear() {
 }
 
 template<class T>
-void stack_t<T>::push(T d) {
+void bitgraph::com::stack_t<T>::push(T d) {
 	stack_[nE_++] = std::move(d);
 #ifdef DEBUG_STACKS
 	if (nE_ > MAX_) {
@@ -104,7 +103,7 @@ void stack_t<T>::push(T d) {
 }
 
 template<class T>
-void stack_t<T>::push_bottom(T d) {
+void bitgraph::com::stack_t<T>::push_bottom(T d) {
 	if (nE_ == 0) {
 		stack_[nE_++] = std::move(d);
 	}
@@ -123,7 +122,7 @@ void stack_t<T>::push_bottom(T d) {
 }
 
 template<class T>
-const T& stack_t<T>::top() const
+const T& bitgraph::com::stack_t<T>::top() const
 {
 	if (nE_ == 0) {
 		return stack_[0];
@@ -134,7 +133,7 @@ const T& stack_t<T>::top() const
 }
 
 template<class T>
-T& stack_t<T>::top()
+T& bitgraph::com::stack_t<T>::top()
 {
 	if (nE_ == 0) {
 		return stack_[0];
@@ -145,21 +144,21 @@ T& stack_t<T>::top()
 }
 
 template<class T>
-void stack_t<T>::pop() {
+void bitgraph::com::stack_t<T>::pop() {
 	assert(nE_ > 0);
 	--nE_;
 	//return stack_[--nE_];	
 }
 
 template<class T>
-void stack_t<T>::pop(std::size_t nb) {
+void bitgraph::com::stack_t<T>::pop(std::size_t nb) {
 	assert(nE_ >= nb);
 	nE_ -= nb;
 	//return nb;
 }
 
 template<class T>
-void stack_t<T>::pop_bottom() {
+void bitgraph::com::stack_t<T>::pop_bottom() {
 	assert(nE_ > 0);
 	stack_[0] = stack_[--nE_];
 	//return nE_;
@@ -173,7 +172,7 @@ void stack_t<T>::pop_bottom() {
 
 
 template<class T>
-void stack_t<T>::erase(int pos) {
+void bitgraph::com::stack_t<T>::erase(int pos) {
 	assert(pos > 0);
 	stack_[pos] = stack_[--nE_];
 	//if (nE_ > 0) {
@@ -184,7 +183,7 @@ void stack_t<T>::erase(int pos) {
 
 //I/O
 template<class T>
-std::ostream& stack_t<T>::print(std::ostream& o) const {
+std::ostream& bitgraph::com::stack_t<T>::print(std::ostream& o) const {
 	o << "[";
 	for (auto i = 0; i < nE_; ++i) {
 		o << stack_[i] << " ";

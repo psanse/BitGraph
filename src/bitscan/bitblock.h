@@ -25,34 +25,51 @@
 //	#define __popcnt64 __builtin_popcountll					/* removed 6/11/2017 for mingw_64 */
 	#include <intrin.h>										//windows specific
 #else
-	#define __popcnt64 __builtin_popcountll			
-	#include <x86intrin.h>										//linux specific
-	 static inline unsigned char _BitScanForward64(unsigned long* Index,  unsigned long long  Mask)
-		{
-			unsigned long long  Ret;
-			__asm__
-			(
-				"bsfq %[Mask], %[Ret]"
-				:[Ret] "=r" (Ret)
-				:[Mask] "mr" (Mask)
-			);
-			*Index = (unsigned long)Ret;
-			return Mask?1:0;
-		}
-		static inline unsigned char _BitScanReverse64(unsigned long* Index,  unsigned long long  Mask)
-		{
-			 unsigned long long  Ret;
-			__asm__
-			(
-				"bsrq %[Mask], %[Ret]"
-				:[Ret] "=r" (Ret)
-				:[Mask] "mr" (Mask)
-			);
-			*Index = (unsigned long)Ret;
-			return Mask?1:0;
-		}
-#endif
+	#define __popcnt64 __builtin_popcountll
 
+	#if defined(__x86_64__)
+		#include <x86intrin.h>
+		static inline unsigned char _BitScanForward64(unsigned long* Index, unsigned long long Mask)
+		{
+			unsigned long long Ret;
+			__asm__(
+				"bsfq %[Mask], %[Ret]"
+				: [Ret] "=r" (Ret)
+				: [Mask] "mr" (Mask)
+			);
+			*Index = (unsigned long)Ret;
+			return Mask ? 1 : 0;
+		}
+
+		static inline unsigned char _BitScanReverse64(unsigned long* Index, unsigned long long Mask)
+		{
+			unsigned long long Ret;
+			__asm__(
+				"bsrq %[Mask], %[Ret]"
+				: [Ret] "=r" (Ret)
+				: [Mask] "mr" (Mask)
+			);
+			*Index = (unsigned long)Ret;
+			return Mask ? 1 : 0;
+		}
+	#elif defined(__aarch64__)
+		static inline unsigned char _BitScanForward64(unsigned long* Index, unsigned long long Mask)
+		{
+			if (Mask == 0) return 0;
+			*Index = __builtin_ctzll(Mask);
+			return 1;
+		}
+
+		static inline unsigned char _BitScanReverse64(unsigned long* Index, unsigned long long Mask)
+		{
+			if (Mask == 0) return 0;
+			*Index = 63 - __builtin_clzll(Mask);
+			return 1;
+		}
+	#else
+		#error Unsupported architecture
+	#endif
+#endif
 
 #else
 	#include <intrin.h>										//windows specific
