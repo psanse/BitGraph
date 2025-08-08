@@ -10,7 +10,6 @@
 #include <iostream>
 #include <exception>
 
-
 class GraphParseError : public std::invalid_argument {
 
 public:

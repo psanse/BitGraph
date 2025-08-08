@@ -77,7 +77,7 @@ public:
 	void parse(char* argv[]) {
 
 		stringstream sstr;
-	
+		
 		sstr << argv[1];
 		sstr >> info_.nLB;
 		
