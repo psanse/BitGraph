@@ -32,7 +32,7 @@ int main(int argc, char** argv){
 	//parse file with format
 	LOGG_INFO("reading graph from ", filename);
 
-	sparse_ugraph g1(filename);
+	ugraph g1(filename);		//alternatively, can use the sparse encoding sparse_ugraph 	
 	g1.print_data();
 
 	///////////////////

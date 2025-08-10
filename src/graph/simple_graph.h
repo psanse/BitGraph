@@ -681,7 +681,7 @@ namespace bitgraph {
 		adj_.resize(N);
 		NV_ = N;
 		NE_ = 0;												//so that when required, the value will be recomputed
-		NBB_ = INDEX_1TO1(N);								//maximum number of bitblocks per row (for sparse graphs)		
+		NBB_ = INDEX_1TO1(N);									//maximum number of bitblocks per row (for sparse graphs)		
 
 		return 0;
 	}
