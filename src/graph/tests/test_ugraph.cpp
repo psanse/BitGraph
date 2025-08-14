@@ -18,8 +18,7 @@ using namespace std;
 using namespace bitgraph;
 
 
-
-TEST(Ugraph_test, constructor_file){
+TEST(Ugraph, constructor_file){
 
 	string path = PATH_GRAPH_TESTS_CMAKE_SRC_CODE;
 
@@ -52,6 +51,18 @@ TEST(Ugraph_test, constructor_file){
 	EXPECT_STREQ("brock200_4.clq",g4.name().c_str());
 	/////////////////////////////////////////////////////
 
+}
+
+TEST(Ugraph, read_dimacs) {
+
+	string path = PATH_GRAPH_TESTS_CMAKE_SRC_CODE;
+
+	ugraph ug(PATH_GRAPH_TESTS_CMAKE_SRC_CODE "dimacs_format_graph.clq");
+		
+	//////////////////////////////////////////
+	EXPECT_EQ(5, ug.number_of_vertices());
+	EXPECT_EQ(4, ug.number_of_edges());
+	/////////////////////////////////////////
 }
 
 TEST(Ugraph, constructor_adj_matrix) {

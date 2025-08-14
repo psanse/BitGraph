@@ -21,12 +21,14 @@ namespace bitgraph {
 		*  @brief portable empty line skipper when parsing from file stream @f
 		*		  - stops at the first non-empty line
 		*  @param f (input) fstream
+		*  @details: is not working properly in combination with std::getline(f, line)
+		*			 in some compilers. Currently deprecated. (14/08/2025)
 		**/
 		inline
 			void skip_empty_lines(std::fstream& f) {
 			std::string line;
 
-			streampos oldpos = f.tellg();
+			std::streampos oldpos = f.tellg();
 			while (std::getline(f, line)) {
 
 				if (line.empty() || line[0] == '\n' || line[0] == '\r') {
@@ -55,10 +57,13 @@ namespace bitgraph {
 				std::string line;
 				n = 0; m = 0;
 
-				skip_empty_lines(f);
+				////////////////////
+				//skip_empty_lines(f);
+				////////////////////
 
 				while (std::getline(f, line)) {
-					if (line[0] == 'c') continue;				//skip comment lines or ...
+					if (line[0] == 'c' ) continue;			//skip comment lines or ...
+					if (line.empty() || line[0] == '\n' || line[0] == '\r') continue;
 					if (line[0] != 'p') {
 						LOG_ERROR("bad DIMACS protocol  - DIMACS_READER::read_dimacs_header");
 						LOGG_ERROR("first character of new line is: ", line[0]);
