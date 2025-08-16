@@ -18,30 +18,32 @@ namespace bitgraph {
 
 	namespace gio {
 		/**
-		*  @brief portable empty line skipper when parsing from file stream @f
+		*  @brief portable empty line skipper when parsing from a @stream
 		*		  - stops at the first non-empty line
 		*  @param f (input) fstream
-		*  @details: is not working properly in combination with std::getline(f, line)
-		*			 in some compilers. Currently deprecated. (14/08/2025)
-		**/
+		*  @details: assumes any line which does not start with \n or \r is a non-empty line
+		**/		
 		inline
-			void skip_empty_lines(std::fstream& f) {
+			void skip_empty_lines(std::istream& stream) {
 			std::string line;
 
-			std::streampos oldpos = f.tellg();
-			while (std::getline(f, line)) {
+			while (stream.good()) {
+				char next = stream.peek();
 
-				if (line.empty() || line[0] == '\n' || line[0] == '\r') {
-					oldpos = f.tellg();
-					continue;							//skip empty lines
+				if (next == EOF) {
+					break;
 				}
 
-				//rewind to the beginning of the line and exit
-				f.seekg(oldpos);
+				if (next == '\n' || next == '\r') {
+					std::getline(stream, line);
+					continue;
+				}
+
+				//non-empty line assumed
 				break;
 			}
 		}
-
+			
 		namespace dimacs {
 			
 			/**
@@ -49,10 +51,12 @@ namespace bitgraph {
 			* @param f input stream
 			* @param n output - number of vertices (nV) read
 			* @param m ouptut - number if edges (nE) read
-			* @returns number of vertices @n if success, -1 if error
+			* @returns number of vertices @n if success, -1 if error 
+			* @details: no throwing interface - catches exceptions internally
+			* @details: removes comment lines (starting with 'c') and empty lines
 			**/
 			inline
-				int read_dimacs_header(std::fstream& f, int& n, int& m) {
+				int read_dimacs_header (std::fstream& f, int& n, int& m) noexcept {
 
 				std::string line;
 				n = 0; m = 0;
@@ -60,28 +64,34 @@ namespace bitgraph {
 				////////////////////
 				//skip_empty_lines(f);
 				////////////////////
-
-				while (std::getline(f, line)) {
-					if (line[0] == 'c' ) continue;			//skip comment lines or ...
-					if (line.empty() || line[0] == '\n' || line[0] == '\r') continue;
-					if (line[0] != 'p') {
-						LOG_ERROR("bad DIMACS protocol  - DIMACS_READER::read_dimacs_header");
-						LOGG_ERROR("first character of new line is: ", line[0]);
-						return -1;
-					}
-
-					std::istringstream iss(line);
-					std::string p, type;
-					if (iss >> p >> type >> n >> m) {
-						if (type != "edge") {
-							LOGG_ERROR("bad DIMACS header found: expecting 'p edge <nV> <nE>'- found: ", p, " ", type);
-							LOG_ERROR("- DIMACS_READER::read_dimacs_header");
+				try {
+					while (std::getline(f, line)) {
+						if (line[0] == 'c') continue;			//skip comment lines or ...
+						if (line.empty() || line[0] == '\n' || line[0] == '\r') continue;
+						if (line[0] != 'p') {
+							LOG_ERROR("bad DIMACS protocol  - DIMACS_READER::read_dimacs_header");
+							LOGG_ERROR("first character of new line is: ", line[0]);
 							return -1;
 						}
-						else {
-							break;
+
+						std::istringstream iss(line);
+						std::string p, type;
+						if (iss >> p >> type >> n >> m) {
+							if (type != "edge") {
+								LOGG_ERROR("bad DIMACS header found: expecting 'p edge <nV> <nE>'- found: ", p, " ", type);
+								LOG_ERROR("- DIMACS_READER::read_dimacs_header");
+								return -1;
+							}
+							else {
+								break;
+							}
 						}
 					}
+				}
+				catch (std::exception& e) {
+					LOGG_ERROR("error reading DIMACS header: ", e.what());
+					LOG_ERROR("- DIMACS_READER::read_dimacs_header");
+					return -1;
 				}
 				
 				//reaches here if the header is found

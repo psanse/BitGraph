@@ -208,7 +208,7 @@ int Base_Graph_W<Graph_t, W>::read_dimacs (string filename, int type){
 
 	//read header
 	int nV = -1, nEdges = -1;
-	if(::gio::dimacs::read_dimacs_header(f, nV, nEdges) == -1){
+	if(gio::dimacs::read_dimacs_header(f, nV, nEdges) == -1){
 		reset(); 
 		f.close();
 		return -1;

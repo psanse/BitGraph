@@ -809,7 +809,7 @@ namespace bitgraph {
 		}
 
 		reset(n);
-		//gio::skip_empty_lines(f);
+		gio::skip_empty_lines(f);   
 		
 		////////////////////////
 		//parse edges directly from the stream
