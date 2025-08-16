@@ -13,10 +13,6 @@
 #include "utils/common.h"
 #include "utils/logger.h"
 
-//comment in release mode - to disable assertions
-//#undef NDEBUG
-#include <cassert>
-
 using namespace std;
 using namespace bitgraph;
 
@@ -61,74 +57,42 @@ public:
 			std::exit(- 1);
 		}	
 
-		try {
-			////////////////
+		try {			
 			parse(argv);
-			////////////////
 		}
 		catch (const GraphParseError& e) {
 			LOG_ERROR(e.what());
 			LOG_ERROR("exiting...");
 			std::exit(-1);
-		}
-		
+		}		
 	}
 
 	void parse(char* argv[]) {
 
-		stringstream sstr;
-		
-		sstr << argv[1];
-		sstr >> info_.nLB;
-		
-		sstr = std::stringstream();
-		sstr << argv[2];
-		sstr >> info_.nUB;
+		info_.nLB = std::stoi(argv[1]);	
+		info_.nUB = std::stoi(argv[2]);
 		if (info_.nLB > info_.nUB || info_.nLB <= 0) {
 			throw GraphParseError("Invalid range of sizes - parserRB::parse");
-								
 		}
-		//assert( (info_.nLB < info_.nUB) || info_.nLB > 0 );
-
-		sstr = std::stringstream();
-		sstr << argv[3];
-		sstr >> info_.pLB;
-
-		sstr = std::stringstream();
-		sstr << argv[4];
-		sstr >> info_.pUB;
-		if( info_.pLB > info_.pUB || info_.pLB <= 0) {
+		info_.pLB = std::stod(argv[3]);
+		info_.pUB = std::stod(argv[4]);	
+		if (info_.pLB > info_.pUB || info_.pLB <= 0) {
 			throw GraphParseError("Invalid range of densities - parserRB::parse");
 		}
-		//assert( (info_.pLB < info_.pUB) || info_.pLB > 0);
-
-		sstr = std::stringstream();
-		sstr << argv[5];
-		sstr >> info_.nRep;
+		info_.nRep = std::stoi(argv[5]);
 		if (info_.nRep <= 0) {
 			throw GraphParseError("Invalid number of repetitions - parserRB::parse");
 		}
-		//assert(info_.nRep > 0);
-
-		sstr = std::stringstream();
-		sstr << argv[6];
-		sstr >> info_.incN;
+		info_.incN = std::stoi(argv[6]);
 		if (info_.incN <= 0) {
 			throw GraphParseError("Invalid number of size increment - parserRB::parse");
 		}
-		//assert(info_.incN > 0);
-
-		sstr = std::stringstream();
-		sstr << argv[7];
-		sstr >> info_.incP;
+		info_.incP = std::stod(argv[7]);
 		if (info_.incP <= 0) {
 			throw GraphParseError("Invalid number of density increment - parserRB::parse");
 		}
-		//assert(info_.incP > 0);
-
 		path_benchmark_ = argv[8];		
 	}
-
 };
 
 int main(int argc,  char* argv[]) {
