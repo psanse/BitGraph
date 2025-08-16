@@ -223,7 +223,7 @@ int Base_Graph_W<Graph_t, W>::read_dimacs (string filename, int type){
 
 	//skips empty lines
 	gio::skip_empty_lines(f);
-
+	
 	//////////////
 	//read vertex weights format <n> <vertex index> <weight> if they exist
 	int v1 = -1, v2 = -1;
