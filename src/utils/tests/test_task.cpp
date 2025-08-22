@@ -10,6 +10,7 @@
 #include "gtest/gtest.h"
 #include "utils/task.h"
 #include <future>
+#include <thread>
 #include <chrono>
 
 using namespace bitgraph;
