@@ -1,0 +1,13 @@
+
+c
+c graph used for testing purposes
+c dimacs format
+c
+c
+
+p edge 5 4
+
+e 1 2
+e 1 3
+e 1 4
+e 1 5
