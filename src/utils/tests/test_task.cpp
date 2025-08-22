@@ -4,7 +4,7 @@
 * @details created 25/01/2025, last_update 21/07/2025
 * @dev pss
 *
-* TODO - Check ThreadExample test  - possibly remove (19/07/2025)
+* TODO - Check ThreadExample tests  - possibly remove (19/07/2025)
 **/
 
 #include "gtest/gtest.h"
