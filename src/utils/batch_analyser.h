@@ -3,11 +3,12 @@
  * @brief BatchAnalyser class to manage benchmarking of graph algorithms.
  *		  Manages a matrix of test results:	columns are algorithms, rows are repetitions
  *		  Takes into account tests which timed-out in the reported results
- * @date  2013
- * @last_update 20/01/2025
- * @author pss  
+ * @date  2013,  last_update 20/01/2025
+ * @author pss 
+ * @details current only source is an array of Result objects
  * 
- * TODO - generic for other types different from Result (20/01/25)
+ * TODO! - generalize for other types different from Result (20/01/25)
+ *         DEPRECATED in favour of info_analyser.h file with generic types (23/08/2025)
  * 
  **/
 
