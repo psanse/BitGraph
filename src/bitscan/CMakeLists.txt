@@ -24,13 +24,6 @@ set_target_properties(bitscan
     #PUBLIC_HEADER   "${HEADER_FILES}"        #does not preserve internal structure  
 )
 
-
-# Make sure the compiler can find include files for our bitscan library
-# when other libraries or executables link to bitscan
-#target_include_directories (bitscan 
-#    PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}
-#)
-
 # Make sure the compiler can find include files for our bitscan library
 # when other libraries or executables link to bitscan
 target_include_directories(bitscan PUBLIC 
