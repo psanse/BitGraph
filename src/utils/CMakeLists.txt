@@ -3,19 +3,17 @@
 #########################
 
 file(GLOB HEADER_FILES   ${CMAKE_CURRENT_SOURCE_DIR}/*.h 
-                                ${CMAKE_CURRENT_SOURCE_DIR}/info/*.h
+                         ${CMAKE_CURRENT_SOURCE_DIR}/info/*.h
 )
 
 #creates utils library
 add_library (utils STATIC
     benchmark.cpp 
     result.cpp
-    test_analyser.cpp
-    info_analyser.cpp
+    batch_analyser.cpp
     common.cpp
     common_types.cpp
-    info/info_base.cpp
-    info/info_clq.cpp                                   #move to clq algorithms and remove from here
+    info/info_base.cpp   
     #logger.cpp 
     ${HEADER_FILES}
 )

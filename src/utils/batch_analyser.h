@@ -1,6 +1,6 @@
 /**
- * @file test_analyser.h
- * @brief TestAnalyser class to manage benchmarking of graph algorithms.
+ * @file batch_analyser.h
+ * @brief BatchAnalyser class to manage benchmarking of graph algorithms.
  *		  Manages a matrix of test results:	columns are algorithms, rows are repetitions
  *		  Takes into account tests which timed-out in the reported results
  * @date  2013
@@ -11,8 +11,8 @@
  * 
  **/
 
-#ifndef __TEST_ANALYSER_H__
-#define __TEST_ANALYSER_H__
+#ifndef __BATCH_ANALYSER_H__
+#define __BATCH_ANALYSER_H__
 
 #include <iostream>
 #include <vector>
@@ -33,14 +33,14 @@ namespace bitgraph {
 
 		//////////////////////////
 		// 
-		// TestAnalyser class
+		// BatchAnalyser class
 		//
 		//////////////////////////
 
-		class TestAnalyser {
+		class BatchAnalyser {
 
-			//streams the report of the TestAnalyser - main driver
-			friend std::ostream& operator << (std::ostream&, const TestAnalyser&);
+			//streams the report of the BatchAnalyser - main driver
+			friend std::ostream& operator << (std::ostream&, const BatchAnalyser&);
 
 			enum { ERR = -1, OK = 0 };
 
@@ -72,15 +72,15 @@ namespace bitgraph {
 
 			////////////////////	
 			//construction / destruction
-			TestAnalyser() : print_mode_(DEFAULT_PRINT_MODE), nAlg_(0), nRep_(0) {}
+			BatchAnalyser() : print_mode_(DEFAULT_PRINT_MODE), nAlg_(0), nRep_(0) {}
 
 			//copy and move semantics disallowed
-			TestAnalyser(const TestAnalyser&) = delete;
-			TestAnalyser& operator= (const TestAnalyser&) = delete;
-			TestAnalyser(TestAnalyser&&) = delete;
-			TestAnalyser& operator= (TestAnalyser&&) = delete;
+			BatchAnalyser(const BatchAnalyser&) = delete;
+			BatchAnalyser& operator= (const BatchAnalyser&) = delete;
+			BatchAnalyser(BatchAnalyser&&) = delete;
+			BatchAnalyser& operator= (BatchAnalyser&&) = delete;
 
-			~TestAnalyser() = default;
+			~BatchAnalyser() = default;
 
 			/////////////////////
 			//setters/getters
@@ -213,7 +213,7 @@ namespace bitgraph {
 
 	}//end namespace impl
 
-	using _impl::TestAnalyser;
+	using _impl::BatchAnalyser;
 
 }//end namespace bitgraph
 

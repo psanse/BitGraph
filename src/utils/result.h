@@ -1,10 +1,13 @@
-// result.h: interface for the Result class, a general purpose class for tests in search problems 
-//			 where solutions are lists of integers 
-// author: jorge artieda
-// last update: 1/3/15
-//
-// Comments: includes fields for multiple soltions as well as multiple counters to keep track of search
-//////////////////////////////////////////////////////////////////////
+/**
+* @file: result.h
+* @brief: interface for the Result class, a general purpose class for tests in search problems 
+*		   where solutions are lists of integers 
+* @details: created 1/3/15
+* @Comments: includes fields for multiple soltions as well as multiple counters to keep track of search
+* @details: To deprecate in favour of info classes - 20/08/2025
+* 
+**/
+
 
 #ifndef __RESULT_H__
 #define	__RESULT_H__

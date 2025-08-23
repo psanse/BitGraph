@@ -11,7 +11,8 @@
 
 #include "gtest/gtest.h"
 #include "utils/info_analyser.h"
-#include "utils/info/info_clq.h"
+#include "utils/info/info_base.h"
+
 #include "utils/file.h"
 #include <thread>
 
@@ -30,14 +31,14 @@ protected:
 
 			for (int a = 0; a < NUM_ALG; ++a) {
 
-				com::infoCLQ<int> info;
+				com::infoBase info;
 				info.N_ = 5;
 				info.M_ = 7;
 				info.TIME_OUT_ = 1000;
 				info.TIME_OUT_HEUR_ = 200;
-				info.nSteps_ = 10 + a;						//diff number of steps for each algorithm in all rep.
-				info.ub_ = 50;
-				info.lb_ = 10;
+				//info.nSteps_ = 10 + a;						//diff number of steps for each algorithm in all rep.
+				//info.ub_ = 50;
+				//info.lb_ = 10;
 
 				info.name_ = INSTANCE_NAME;					//same instance
 				ta.add_test(new_rep, info);
@@ -47,7 +48,7 @@ protected:
 	}
 	void TearDown() override {}
 		
-	InfoAnalyser<com::infoCLQ<int>> ta;
+	InfoAnalyser<com::infoBase> ta;
 };
 
 TEST_F(InfoAnalyserTest, toFile) {
@@ -88,15 +89,15 @@ TEST_F(InfoAnalyserTest, toFile) {
 TEST(InfoAnalyser, basic){
 		
 	auto duration = std::chrono::milliseconds(50);
-	InfoAnalyser<com::infoCLQ<int>> ta;
+	InfoAnalyser<com::infoBase> ta;
 
 	for(auto r = 0; r < NUM_REP; ++r){
 		bool new_rep = true;
 		for(auto a = 0;  a < NUM_ALG; ++a){
-			com::infoCLQ<int> info;
-			info.nSteps_=10;
+			com::infoBase info;
+			/*info.nSteps_=10;
 			info.ub_=50;
-			info.lb_=10;
+			info.lb_=10;*/
 
 			info.startTimer(com::infoBase::SEARCH);
 			
@@ -140,15 +141,15 @@ TEST(InfoAnalyser, basic){
 
 TEST(InfoAnalyser, info){
 		
-	InfoAnalyser<com::infoCLQ<int>> ta;
+	InfoAnalyser<com::infoBase> ta;
 
 	for(int r = 0; r < NUM_REP; ++r){
 		bool new_rep = true;
 		for(int a = 0; a < NUM_ALG - 1; ++a){
-			com::infoCLQ<int> info;		
-			info.nSteps_ = 10;
+			com::infoBase info;		
+			/*info.nSteps_ = 10;
 			info.ub_ = 50;
-			info.lb_ = 10;
+			info.lb_ = 10;*/
 		
 			info.name_ = INSTANCE_NAME;					//same instance
 			ta.add_test(new_rep, info);
@@ -157,13 +158,13 @@ TEST(InfoAnalyser, info){
 				
 
 		//last algorithm (change the number of steps)
-		com::infoCLQ<int> info;
-		info.nSteps_ = 11;
-		info.ub_ = 50;
-		info.lb_ = 10;
+		//com::infoBase info;
+		//info.nSteps_ = 11;
+		//info.ub_ = 50;
+		//info.lb_ = 10;
 
-		info.name_ = INSTANCE_NAME;					//same instance		
-		ta.add_test(new_rep, info);
+		//info.name_ = INSTANCE_NAME;					//same instance		
+		//ta.add_test(new_rep, info);
 	}
 				
 	decltype(ta)::comp_t info;
@@ -183,16 +184,16 @@ TEST(InfoAnalyser, info){
 
 TEST(InfoAnalyser, all_timeout){
 		
-	InfoAnalyser<com::infoCLQ<int>> ta;
+	InfoAnalyser<com::infoBase> ta;
 
 	for(auto r = 0; r < NUM_REP; ++r){
 		bool new_rep = true;
 		for(auto a = 0; a < NUM_ALG; ++a){
-			com::infoCLQ<int> info;
-			info.nSteps_ = 10;
-			info.ub_ = 50;
-			info.lb_ = 10;
-			info.isTimeOut_ = true;						//all fail
+			com::infoBase info;
+			//info.nSteps_ = 10;
+			//info.ub_ = 50;
+			//info.lb_ = 10;
+			//info.isTimeOut_ = true;						//all fail
 			info.name_=INSTANCE_NAME;
 			
 			ta.add_test(new_rep, info);
@@ -220,16 +221,16 @@ TEST(InfoAnalyser, all_timeout){
 
 TEST(InfoAnalyser, only_one_test_and_fails){
 		
-	InfoAnalyser<com::infoCLQ<int>> ta;
+	InfoAnalyser<com::infoBase> ta;
 	
 	for(auto r = 0; r < 1; ++r){			//one test only
 		bool new_rep = true;
 		for(auto a = 0; a < NUM_ALG; ++a){
-			com::infoCLQ<int> info;
-			info.nSteps_ = 10;
-			info.ub_ = 50;
-			info.lb_ = 10;
-			info.isTimeOut_ = true;						//all fail
+			com::infoBase info;
+			//info.nSteps_ = 10;
+			//info.ub_ = 50;
+			//info.lb_ = 10;
+			//info.isTimeOut_ = true;						//all fail
 			info.name_= INSTANCE_NAME;
 			
 

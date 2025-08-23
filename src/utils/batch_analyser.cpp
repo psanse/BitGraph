@@ -1,6 +1,6 @@
 /*
  * @file tests_analyser.cpp
- * @brief implementation of the TestAnalyser class (tests_analyser.h) to manage benchmarking of graph algorithms
+ * @brief implementation of the BatchAnalyser class (tests_analyser.h) to manage benchmarking of graph algorithms
  * @date 2013
  * @last_update 20/01/2025
  * @author pss
@@ -8,7 +8,7 @@
 
 #include "common.h"
 #include "logger.h"
-#include "test_analyser.h"
+#include "batch_analyser.h"
 #include <iomanip>
 #include <math.h>
 #include <string>
@@ -18,40 +18,40 @@ using namespace std;
 using namespace bitgraph;
 
 /////////////////////
-//friend functions of TestAnalyser
+//friend functions of BatchAnalyser
 
 namespace bitgraph {
 
 	namespace _impl {
 
-		ostream& operator << (ostream& o, const TestAnalyser& t)
+		ostream& operator << (ostream& o, const BatchAnalyser& t)
 		{
 			try {
 				//general information
-				if (t.print_mode_ & TestAnalyser::NAME) {					//assumes the same instance for all tests
+				if (t.print_mode_ & BatchAnalyser::NAME) {					//assumes the same instance for all tests
 					//o<<left<<setw(30)<<t.arrayOfTests_[0][0].get_name()<<" ";
 					o << left << setw(30) << t.arrayOfTests_[0][0].get_name();
 				}
 
-				if (t.print_mode_ & TestAnalyser::SIZE) {
+				if (t.print_mode_ & BatchAnalyser::SIZE) {
 					//o<<setw(5)<<right<<setprecision(0)<<t.arrayOfTests_[0][0].get_d1()<<" ";  
 					o << right << "\t" << t.arrayOfTests_[0][0].get_d1();
 				}
 
-				if (t.print_mode_ & TestAnalyser::EDGES) {
+				if (t.print_mode_ & BatchAnalyser::EDGES) {
 					//o<<setw(5)<<right<<setprecision(0)<<t.arrayOfTests_[0][0].get_d2()<<" ";  
 					o << right << "\t" << t.arrayOfTests_[0][0].get_d2();
 				}
 
-				if (t.print_mode_ & TestAnalyser::TIMEOUT) {
+				if (t.print_mode_ & BatchAnalyser::TIMEOUT) {
 					o << right << setw(10) << "\t" << (int)t.arrayOfTests_[0][0].get_tout();
 				}
 
-				if (t.print_mode_ & TestAnalyser::ALG) {
+				if (t.print_mode_ & BatchAnalyser::ALG) {
 					o << right << "\t" << t.arrayOfTests_[0][0].get_alg();
 				}
 
-				if (t.print_mode_ & TestAnalyser::SORT) {
+				if (t.print_mode_ & BatchAnalyser::SORT) {
 					//TODO@decode SORT_TYPE!
 					//o << setw(5) << right << setprecision(0) << t.arrayOfTests_[0][0].get_d3() << " ";
 					o << right << "\t" << t.arrayOfTests_[0][0].get_d3();
@@ -63,51 +63,51 @@ namespace bitgraph {
 				o.setf(ios::fixed);
 				for (auto i = 0; i < t.nAlg_; ++i) {
 
-					if (t.print_mode_ & TestAnalyser::LOWER_BOUND) {
+					if (t.print_mode_ & BatchAnalyser::LOWER_BOUND) {
 						//o << setw(4) << right << setprecision(2) << t.arrayOfAvLB[i] << " ";
 						o << right << setw(7) << setprecision(2) << "\t" << t.arrayOfAvLB[i];
 
 					}
 
-					if (t.print_mode_ & TestAnalyser::SOL) {
+					if (t.print_mode_ & BatchAnalyser::SOL) {
 						//o << setw(5) << right << setprecision(2) << t.arrayOfAvSol[i] << " ";
 						o << right << setw(7) << setprecision(2) << "\t" << t.arrayOfAvSol[i];
 					}
 
-					//if(t.print_mode_& TestAnalyser::STDDEV_SOL){
+					//if(t.print_mode_& BatchAnalyser::STDDEV_SOL){
 					//	o<<setw(5)<<right<<setprecision(2)<<t.arrayOfSdSol[i]<<" ";  
 					//}
 
-					//if(t.print_mode_ & TestAnalyser::MAX_SOL){
+					//if(t.print_mode_ & BatchAnalyser::MAX_SOL){
 					//	//o<<setw(5)<<right<<setprecision(0)<<t.arrayOfMaxSol[i]<<" ";  
 					//	o << setprecision(0) << "\t" << t.arrayOfMaxSol[i];				
 					//}
 
 
-					if (t.print_mode_ & TestAnalyser::STEPS) {
+					if (t.print_mode_ & BatchAnalyser::STEPS) {
 						//o<<setw(15)<<right<<setprecision(0)<<t.arrayOfAvSteps[i]<<" ";  
 						o << right << setw(10) << setprecision(0) << "\t" << t.arrayOfAvSteps[i];
 
 					}
 
-					if (t.print_mode_ & TestAnalyser::TIME) {
+					if (t.print_mode_ & BatchAnalyser::TIME) {
 						//o<<setw(12)<<right<<setprecision(3)<<t.arrayOfAvTimes[i]<<" "; 
 						o << right << setw(7) << setprecision(3) << "\t" << t.arrayOfAvTimes[i];
 
 					}
 
-					if (t.print_mode_ & TestAnalyser::TIMEPRE) {
+					if (t.print_mode_ & BatchAnalyser::TIMEPRE) {
 						//o<<setw(12)<<right<<setprecision(3)<<t.arrayOfAvTimes[i]<<" "; 
 						o << right << setw(7) << setprecision(3) << "\t" << t.arrayOfAvPreProcTimes[i];
 
 					}
 
-					if (t.print_mode_ & TestAnalyser::NFAIL) {
+					if (t.print_mode_ & BatchAnalyser::NFAIL) {
 						//o << setw(5) << t.arrayOfFails[i] << " ";
 						o << right << "\t" << t.arrayOfFails[i];
 					}
 
-					if (t.print_mode_ & TestAnalyser::NCONT) {
+					if (t.print_mode_ & BatchAnalyser::NCONT) {
 						for (auto j = 0; j < t.arrayOfCounters[i].size(); ++j) {
 							o << right << setw(10) << setprecision(4) << t.arrayOfCounters[i][j] << " ";
 						}
@@ -136,9 +136,9 @@ namespace bitgraph {
 }//end namespace bitgraph
 
 //////////////////////////
-// TestAnalyser class implementation
+// BatchAnalyser class implementation
 
-void TestAnalyser::clear()
+void BatchAnalyser::clear()
 {
 	arrayOfTests_.clear();				//[nRep][nAlg]
 	arrayOfAvTimes.clear();
@@ -157,7 +157,7 @@ void TestAnalyser::clear()
 	//arrayOfSdSol.clear();
 }
 
-void TestAnalyser::add_test(bool isNewRep, Result res){
+void BatchAnalyser::add_test(bool isNewRep, Result res){
 			
 	if(isNewRep || arrayOfTests_.empty() ){					//new repetition/test
 
@@ -172,15 +172,15 @@ void TestAnalyser::add_test(bool isNewRep, Result res){
 	}
 }
 
-int TestAnalyser::analyser(info_t* info){
+int BatchAnalyser::analyser(info_t* info){
 
 	//updates nRep_, nAlg_ values / checks consistency
 	if(make_consistent() == ERR){
 		if (nRep_ <= 0) {
-			LOGG_ERROR("Error in number of repetitions: ", nRep_, "TestAnalyser::analyser");
+			LOGG_ERROR("Error in number of repetitions: ", nRep_, "BatchAnalyser::analyser");
 		}
 		if(nAlg_ <= 0){
-			LOGG_ERROR("Error in number of algorithms: ", nAlg_, "TestAnalyser::analyser");
+			LOGG_ERROR("Error in number of algorithms: ", nAlg_, "BatchAnalyser::analyser");
 		}
 		return ERR;
 	}
@@ -327,14 +327,14 @@ int TestAnalyser::analyser(info_t* info){
 return OK;
 }
 
-bool TestAnalyser::consistent_sol_val(int& num_error){
+bool BatchAnalyser::consistent_sol_val(int& num_error){
 
 	num_error = -1;
 	bool same_sol = true;
 
 	//check no reported solutions
 	if (arrayOfAvSol.empty()){
-		LOG_ERROR("No reported solutions, possibly all timed -  TestAnalyser::is_consistent_sol");
+		LOG_ERROR("No reported solutions, possibly all timed -  BatchAnalyser::is_consistent_sol");
 		num_error = 0;	
 		return false;
 	}
@@ -356,19 +356,19 @@ bool TestAnalyser::consistent_sol_val(int& num_error){
 	return same_sol;
 }
 
-bool TestAnalyser::is_consistent_array_of_tests()
+bool BatchAnalyser::is_consistent_array_of_tests()
 {
 	return (	(nRep_ == arrayOfTests_.size())		&& 
 				(nAlg_ == arrayOfTests_[0].size())		);
 
 }
 
-ostream& TestAnalyser::print_single(ostream & o, int idAlg){
+ostream& BatchAnalyser::print_single(ostream & o, int idAlg){
 
 	//update nRep_ and nAlg_ appropiately
 	make_consistent();
 	if(nRep_ == 0 || nAlg_ == 0 ){
-		LOG_ERROR("Empty tests - TestAnalyser::print_single");
+		LOG_ERROR("Empty tests - BatchAnalyser::print_single");
 		return o;
 	}
 
@@ -397,18 +397,18 @@ ostream& TestAnalyser::print_single(ostream & o, int idAlg){
 	return o;
 }
 
-std::ostream& TestAnalyser::print_single_rep	(ostream & o, int nRep, int idAlg){
+std::ostream& BatchAnalyser::print_single_rep	(ostream & o, int nRep, int idAlg){
 
 	//assert
 	if (nRep < 0) {
-		LOGG_ERROR("incorrect number of repetitions", nRep, "-TestAnalyser::print_single_rep");
+		LOGG_ERROR("incorrect number of repetitions", nRep, "-BatchAnalyser::print_single_rep");
 		return o;
 	}
 	
 	//update nRep_ and nAlg_ appropiately
 	make_consistent();
 	if(nRep_==0 || nAlg_==0 ){
-		LOG_ERROR("Empty tests - TestAnalyser::print_single_rep");
+		LOG_ERROR("Empty tests - BatchAnalyser::print_single_rep");
 		return o;
 	}	
 
@@ -435,7 +435,7 @@ std::ostream& TestAnalyser::print_single_rep	(ostream & o, int nRep, int idAlg){
 			////////////////////////////////////////
 
 		}catch(exception e){
-			LOGG_ERROR("Bad output", " Test:", a, " Rep:", nRep,  "-TestAnalyser::print_single_rep");
+			LOGG_ERROR("Bad output", " Test:", a, " Rep:", nRep,  "-BatchAnalyser::print_single_rep");
 			break;
 		}
 	}
@@ -444,7 +444,7 @@ std::ostream& TestAnalyser::print_single_rep	(ostream & o, int nRep, int idAlg){
 	return o;
 }
 
-int TestAnalyser::make_consistent(){
+int BatchAnalyser::make_consistent(){
 		
 	int retVal = OK;
 

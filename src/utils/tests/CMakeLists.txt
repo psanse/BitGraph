@@ -9,18 +9,19 @@ add_executable (test_utils
     # TESTS CHECKED  (26/01/2025)
      test_common.cpp
      test_file.cpp    
-     test_info.cpp
-     test_info_clq.cpp
+     test_info.cpp     
      test_precise_timer.cpp
      test_task.cpp
      test_logger.cpp
-     test_benchmark.cpp
-     test_infoAnalyser.cpp
+     test_benchmark.cpp    
      test_result.cpp     
      test_batch.cpp 
+                
 
      #test working but deprecated / or expect to be deprecated
      #tests/test_testAnalyser.cpp
+     #test_infoAnalyser.cpp         //in COPT_BG (23/08/2025)
+     
    
 )
 
