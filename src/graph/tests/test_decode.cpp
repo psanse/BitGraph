@@ -8,7 +8,7 @@
 
 #include <iostream>
 #include "utils/common.h"
-#include "utils/result.h"
+//#include "utils/result.h"
 #include "gtest/gtest.h"
 #include "graph/graph.h"
 #include "graph/algorithms/graph_gen.h"

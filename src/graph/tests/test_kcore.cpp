@@ -17,7 +17,7 @@
 #include "graph/algorithms/kcore.h"
 #include "utils/common.h"
 #include "utils/logger.h"
-#include "utils/result.h"
+//#include "utils/result.h"
 
 using namespace std;
 using namespace bitgraph;
