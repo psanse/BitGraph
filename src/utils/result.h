@@ -120,6 +120,7 @@ namespace bitgraph {
 			void print_first_sol(std::ostream& o = std::cout);
 			void print_last_sol(std::ostream& o = std::cout);
 			void print_all_sol(std::ostream& o = std::cout);
+			
 			////////////////////////
 			// Data members
 		private:

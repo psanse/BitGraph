@@ -101,22 +101,22 @@ namespace bitgraph {
 
 			/////////////
 			// Basic operations
-				/**
-				 * @brief main driver - analyzes main DB and stores results in the appropiate part of the state
-				 *
-				 *		I. A test is each repetition of an algorithm
-				 *		II.All algorithms are assumed to have the same number of counters for each test
-				 *		III.Averaged results only consider NOT FAILED tests (as long as there is one test, results will be shown)
-				 *		IV. If all tests FAIL no results are shown
-				 *
-				 *		TODO: Standard deviation analysis
-				 *
-				 * @param info: output information that compares tests with only two algorithms
-				 *				(if NULL, no output)
-				 *
-				 * @returns ERR(-1) if the dataset is empty / inconsistent, OK(0) otherwise
-				 *
-				 **/
+			/**
+			 * @brief main driver - analyzes main DB and stores results in the appropiate part of the state
+			 *
+			 *		I. A test is each repetition of an algorithm
+			 *		II.All algorithms are assumed to have the same number of counters for each test
+			 *		III.Averaged results only consider NOT FAILED tests (as long as there is one test, results will be shown)
+			 *		IV. If all tests FAIL no results are shown
+			 *
+			 *		TODO: Standard deviation analysis
+			 *
+			 * @param info: output information that compares tests with only two algorithms
+			 *				(if NULL, no output)
+			 *
+			 * @returns ERR(-1) if the dataset is empty / inconsistent, OK(0) otherwise
+			 *
+			 **/
 			int analyser(info_t* info = NULL);
 
 			/**
@@ -137,12 +137,12 @@ namespace bitgraph {
 			// Boolean operations
 			// 
 
-				/**
-				* @brief Determines if the solutions of the algorithms are consistent
-				* @param num_error: -1 ok, 0 - no solution available for any algorithm (returns FALSE),
+			/**
+			* @brief Determines if the solutions of the algorithms are consistent
+			* @param num_error: -1 ok, 0 - no solution available for any algorithm (returns FALSE),
 									[1...nAlg_] the first algorithm with a different solution from the one first reported
-				* @results TRUE if all the solution values are the same for all algorithms, FALSE otherwise
-				**/
+			* @results TRUE if all the solution values are the same for all algorithms, FALSE otherwise
+			**/
 			bool consistent_sol_val(int& num_error);
 
 			/**
@@ -156,12 +156,12 @@ namespace bitgraph {
 			//////////////	
 			// I/O
 
-				/**
-				* @brief Streams individual results of algorithm idAlg
-				* @param idAlg: algorithm number, if -1 all algorithms are reported (default value)
-				* @param o: input / output stream
-				* @returns the output stream
-				**/
+			/**
+			* @brief Streams individual results of algorithm idAlg
+			* @param idAlg: algorithm number, if -1 all algorithms are reported (default value)
+			* @param o: input / output stream
+			* @returns the output stream
+			**/
 			std::ostream& print_single(std::ostream& o, int idAlg = -1 /*all alg*/);					//prints individual results of alg
 
 			/**

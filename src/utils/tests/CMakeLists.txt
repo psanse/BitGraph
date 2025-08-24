@@ -15,13 +15,11 @@ add_executable (test_utils
      test_logger.cpp
      test_benchmark.cpp    
      test_result.cpp     
-     test_batch.cpp 
-                
+     test_batch.cpp                 
 
      #test working but deprecated / or expect to be deprecated
      #tests/test_testAnalyser.cpp   //renamed class to BatchAnalyser (26/01/2025)
      #test_infoAnalyser.cpp         //in COPT_BG (23/08/2025)
-     
    
 )
 

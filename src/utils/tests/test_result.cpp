@@ -9,7 +9,6 @@
 using namespace std;
 using namespace bitgraph;
 
-
 //TODO - CHECK DISABLED TEST - time (16/02/2025)
 
 TEST(Result, solutions){
@@ -45,8 +44,7 @@ TEST(Result, counters){
 	EXPECT_EQ(5, r.get_counter_value(index_2));
 
 	r.inc_counter(index_2, 3);
-	EXPECT_EQ(8, r.get_counter_value(index_2));
-	
+	EXPECT_EQ(8, r.get_counter_value(index_2));	
 }
 
 TEST(Result, DISABLED_time) {
