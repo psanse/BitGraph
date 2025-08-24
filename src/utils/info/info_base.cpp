@@ -90,7 +90,7 @@ void infoBase::startTimer(phase_t t)
 		startTimeIncumbent_ = PrecisionTimer::clock_t::now();
 		break;
 	default:
-		LOG_ERROR("bizarre timer type, exiting... - com::infoCLQ::start_timer");
+		LOG_ERROR("bizarre timer type, exiting... - com::infoBase::start_timer");
 		LOGG_ERROR("timer type: ", (int)t, " - com::infoBase::start_timer");
 		std::exit(-1);
 	}
@@ -153,7 +153,7 @@ double infoBase::readTimer(phase_t t)
 		break;
 
 	default:
-		LOG_ERROR("bizarre timer type, exiting... - infoCLQ::read_time");
+		LOG_ERROR("bizarre timer type, exiting... - infoBase::read_time");
 		LOGG_ERROR("timer type : ", (int)t);
 		std::exit(-1);
 	}
