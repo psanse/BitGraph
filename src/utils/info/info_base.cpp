@@ -122,7 +122,7 @@ void infoBase::clearTimer(phase_t t) {
 	}
 }
 
-void infoBase::clearTimers() {
+void infoBase::clearAllTimers() {
 	clearTimer(phase_t::SEARCH);
 	clearTimer(phase_t::PARSE);
 	clearTimer(phase_t::PREPROC);
@@ -140,15 +140,15 @@ double infoBase::readTimer(phase_t t)
 		elapsedTime = timeSearch_;
 		break;
 	case phase_t::PREPROC:
-		timePreproc_ = com::_time::toDouble(endTime - startTimeSearch_);
+		timePreproc_ = com::_time::toDouble(endTime - startTimePreproc_);
 		elapsedTime = timePreproc_;
 		break;
 	case phase_t::PARSE:
-		timeParse_ = com::_time::toDouble(endTime - startTimeSearch_);
+		timeParse_ = com::_time::toDouble(endTime - startTimeParse_);
 		elapsedTime = timeParse_;
 		break;
 	case phase_t::LAST_INCUMBENT:
-		timeIncumbent_ = com::_time::toDouble(endTime - startTimeSearch_);
+		timeIncumbent_ = com::_time::toDouble(endTime - startTimeIncumbent_);
 		elapsedTime = timeIncumbent_;
 		break;
 
@@ -181,7 +181,7 @@ void infoBase::clearGeneralInfo() {
 }
 
 void infoBase::clear(bool lazy) {
-	clearTimers();
+	clearAllTimers();
 	if (!lazy) {
 		clearGeneralInfo();					//CHECK comment: "manually at the start of every run"
 	}

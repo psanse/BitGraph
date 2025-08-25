@@ -65,6 +65,17 @@ namespace bitgraph {
 			*/
 			double readTimer(phase_t t);
 
+			/*
+			* @brief clears appropiate time duration (concerning phase_t @t) 
+			*/
+			void clearTimer(phase_t t);
+
+			/**
+			* @brief clears all timers
+			**/
+			void clearAllTimers();
+
+
 			//clear context 
 			/*
 			* @brief clears context
@@ -74,8 +85,8 @@ namespace bitgraph {
 
 		protected:
 			void clearGeneralInfo();					//CHECK comment: "manually at the start of every run"	
-			void clearTimers();
-			void clearTimer(phase_t t);
+			
+			
 
 			//I/O
 		public:
@@ -132,7 +143,7 @@ namespace bitgraph {
 			double timePreproc_ = 0;					//preprocessing time(in seconds)
 
 			tpoint_t startTimeSearch_;
-			double timeSearch_ = 0;						//search time(in seconds)
+			double timeSearch_ = 0;						//search time (in seconds)
 
 			tpoint_t startTimeIncumbent_;
 			double timeIncumbent_ = 0;					//time when last new incumbent was found (in seconds)
