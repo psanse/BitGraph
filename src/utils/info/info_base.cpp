@@ -36,9 +36,9 @@ std::ostream& infoBase::printParams(std::ostream& o) const
 	o << "DATA:" << name_.c_str() << "\t N:" << N_ << "\t M:" << M_ << "\t D:" << 2 * M_ / (float)((N_ - 1) * N_) << endl;
 	o << "TIME_LIMIT:" << TIME_OUT_ << endl;
 	o << "TIME_LIMIT_HEUR:" << TIME_OUT_HEUR_ << endl;
-	o << "ALG:" << algSearch_ << endl;
+	/*o << "ALG:" << algSearch_ << endl;
 	o << "SORTING:" << algSort_ << endl;
-	o << "HEUR:" << algHeur_ << endl;
+	o << "HEUR:" << algHeur_ << endl;*/
 	o << "*****************************" << endl;
 
 	return o;
@@ -60,9 +60,9 @@ std::ostream& infoBase::printTimers(std::ostream& o) const
 std::ostream& infoBase::printReport(std::ostream& o, bool is_endl) const
 {
 	o << name_.c_str() << "\t" << N_ << "\t" << M_ << "\t" << TIME_OUT_ << "\t" << TIME_OUT_HEUR_ << "\t"
-		<< algSearch_ << "\t"
+		/*<< algSearch_ << "\t"
 		<< algSort_ << "\t"
-		<< algHeur_ << "\t"
+		<< algHeur_ << "\t"*/
 		<< timeParse_ << "\t" << timePreproc_ << "\t" << timeIncumbent_ << "\t" << timeSearch_ << "\t";
 
 	if (is_endl) {
@@ -175,9 +175,9 @@ void infoBase::clearGeneralInfo() {
 	M_ = 0;
 	TIME_OUT_ = std::numeric_limits<double>::max();
 	TIME_OUT_HEUR_ = std::numeric_limits<double>::max();
-	algSearch_ = -1;
+	/*algSearch_ = -1;
 	algHeur_ = -1;
-	algSort_ = -1;
+	algSort_ = -1;*/
 }
 
 void infoBase::clear(bool lazy) {

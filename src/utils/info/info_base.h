@@ -42,9 +42,9 @@ namespace bitgraph {
 			uint64_t number_of_edges() const { return M_; };
 			double time_out() const { return TIME_OUT_; };
 			double time_out_heur() const { return TIME_OUT_HEUR_; }
-			int search_algorithm() const { return algSearch_; }
+			/*int search_algorithm() const { return algSearch_; }
 			int heuristic_algorithm() const { return algHeur_; }
-			int sorting_algorithm() const { return algSort_; }
+			int sorting_algorithm() const { return algSort_; }*/
 			double parsing_time() const { return timeParse_; }
 			double preprocessing_time() const { return timePreproc_; }
 			double search_time() const { return timeSearch_; }
@@ -129,9 +129,9 @@ namespace bitgraph {
 
 			//algorithms
 
-			int algSearch_ = -1;						//algorithm identifier
-			int algHeur_ = -1;							//root heuristic policy (e.g. AMTS, no AMTS or combined with other heuristics)	
-			int algSort_ = -1;							//sorting policy selected as input configuration parameter (might not be the final choice)
+			//int algSearch_ = -1;						//algorithm identifier
+			//int algHeur_ = -1;							//root heuristic policy (e.g. AMTS, no AMTS or combined with other heuristics)	
+			//int algSort_ = -1;							//sorting policy selected as input configuration parameter (might not be the final choice)
 
 
 			// timers		
