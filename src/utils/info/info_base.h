@@ -84,7 +84,7 @@ namespace bitgraph {
 			virtual void clear(bool lazy = false);
 
 		protected:
-			void clearGeneralInfo();					//CHECK comment: "manually at the start of every run"	
+			virtual void clearGeneralInfo();					//CHECK comment: "manually at the start of every run"	
 			
 			
 
