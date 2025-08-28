@@ -84,6 +84,9 @@ namespace bitgraph {
 			virtual void clear(bool lazy = false);
 
 		protected:
+			/**
+			* @brief clears general info - virtual since derived classes might have more general info to clear
+			**/
 			virtual void clearGeneralInfo();					//CHECK comment: "manually at the start of every run"	
 			
 			
