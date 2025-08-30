@@ -33,9 +33,9 @@ namespace bitgraph {
 std::ostream& infoBase::printParams(std::ostream& o) const
 {
 	o << "*****************************\n";
-	o << "DATA:" << name_.c_str() << "\t N:" << N_ << "\t M:" << M_ << "\t D:" << 2 * M_ / (float)((N_ - 1) * N_) << endl;
-	o << "TIME_LIMIT:" << TIME_OUT_ << endl;
-	o << "TIME_LIMIT_HEUR:" << TIME_OUT_HEUR_ << endl;
+	o << "NAME:" << data_.name << "\t N:" << data_.N << "\t M:" << data_.M << "\t D:" << 2 * data_.M / (float)((data_.N - 1) * data_.N) << endl;
+	o << "TIME_LIMIT:" << data_.TIME_OUT << endl;
+	o << "TIME_LIMIT_HEUR:" << data_.TIME_OUT_HEUR << endl;
 	/*o << "ALG:" << algSearch_ << endl;
 	o << "SORTING:" << algSort_ << endl;
 	o << "HEUR:" << algHeur_ << endl;*/
@@ -50,8 +50,8 @@ std::ostream& infoBase::printTimers(std::ostream& o) const
 	o << "time_preproc:" << timePreproc_ << endl;
 	o << "time_incumbent:" << timeIncumbent_ << endl;
 	o << "time_search:" << timeSearch_ << endl;
-	o << "TIME_LIMIT:" << TIME_OUT_ << endl;
-	o << "TIME_LIMIT_HEUR:" << TIME_OUT_HEUR_ << endl;
+	o << "TIME_OUT(s):" << data_.TIME_OUT << endl;
+	o << "TIME_OUT_HEUR(s):" << data_.TIME_OUT_HEUR << endl;
 	o << "*****************************" << endl;
 
 	return o;
@@ -59,15 +59,13 @@ std::ostream& infoBase::printTimers(std::ostream& o) const
 
 std::ostream& infoBase::printReport(std::ostream& o, bool is_endl) const
 {
-	o << name_.c_str() << "\t" << N_ << "\t" << M_ << "\t" << TIME_OUT_ << "\t" << TIME_OUT_HEUR_ << "\t"
+	o << data_.name << "\t" << data_.N << "\t" << data_.M << "\t" << data_.TIME_OUT << "\t" << data_.TIME_OUT_HEUR << "\t"
 		/*<< algSearch_ << "\t"
 		<< algSort_ << "\t"
 		<< algHeur_ << "\t"*/
 		<< timeParse_ << "\t" << timePreproc_ << "\t" << timeIncumbent_ << "\t" << timeSearch_ << "\t";
 
-	if (is_endl) {
-		o << std::endl;
-	}
+	if (is_endl) {	o << endl;	}
 
 	return o;
 }
@@ -168,17 +166,6 @@ double infoBase::elapsedTime(tpoint_t startTime)
 
 }
 
-void infoBase::clearGeneralInfo() {
-
-	name_.clear();
-	N_ = 0;
-	M_ = 0;
-	TIME_OUT_ = std::numeric_limits<double>::max();
-	TIME_OUT_HEUR_ = std::numeric_limits<double>::max();
-	/*algSearch_ = -1;
-	algHeur_ = -1;
-	algSort_ = -1;*/
-}
 
 void infoBase::clear(bool lazy) {
 	clearAllTimers();

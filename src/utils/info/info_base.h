@@ -14,10 +14,52 @@
 #include <limits>
 #include <vector>
 
+
 namespace bitgraph {
 
 	namespace com {
 		
+		//////////////////////////
+		//
+		// struct paramBase
+		// (General parameter info for all combinatorial algorithms)
+		//
+		//////////////////////////
+		struct paramBase {
+
+			std::string name = "";											//instance name
+			uint32_t N = 0;													//number of vertices
+			uint64_t M = 0;													//number of edges			
+			double TIME_OUT = std::numeric_limits<double>::max();			//in seconds
+			double TIME_OUT_HEUR = std::numeric_limits<double>::max();		//in seconds
+
+			int nThreads = 1;												// number of threads
+			bool unrolled = false;											// loop unrolling
+
+			virtual void reset() {
+				name = "";
+				N = 0;
+				M = 0;
+				TIME_OUT = std::numeric_limits<double>::max();
+				TIME_OUT_HEUR = std::numeric_limits<double>::max();
+				nThreads = 1;
+				unrolled = false;
+			}
+
+			//I/O		
+			virtual std::ostream& print(std::ostream& o = std::cout, bool endl = true) const {
+				o << "\name: " << name
+					<< "\nN: " << N
+					<< "\nM: " << M
+					<< "\nTOUT(s): " << TIME_OUT
+					<< "\nTOUT_HEUR(s): " << TIME_OUT_HEUR
+					<< "\nnTHREADS: " << nThreads;
+				//  << "\nunrolled: " << std::boolalpha << unrolled;
+				if (endl) o << std::endl;
+				return o;
+			}
+		};
+
 		//////////////////////
 		//
 		//	infoBase
@@ -34,23 +76,35 @@ namespace bitgraph {
 
 			enum phase_t { SEARCH = 0, PREPROC, LAST_INCUMBENT, PARSE };
 
+			//constructors / destructor
+
+			infoBase() = default;
+			explicit infoBase(const paramBase& p) : data_(p) {}
+
 			/////////////////////
 			// getters
 
-			std::string name() const { return name_; }
-			uint32_t number_of_vertices() const { return N_; }
-			uint64_t number_of_edges() const { return M_; };
-			double time_out() const { return TIME_OUT_; };
-			double time_out_heur() const { return TIME_OUT_HEUR_; }
-			/*int search_algorithm() const { return algSearch_; }
-			int heuristic_algorithm() const { return algHeur_; }
-			int sorting_algorithm() const { return algSort_; }*/
+			std::string name() const noexcept { return data_.name; }
+			uint32_t number_of_vertices() const noexcept { return data_.N; }
+			uint64_t number_of_edges() const noexcept { return data_.M; };
+			double time_out() const noexcept { return data_.TIME_OUT; };
+			double time_out_heur() const noexcept { return data_.TIME_OUT_HEUR; }
+			int number_of_threads() const  noexcept { return data_.nThreads; }
+
 			double parsing_time() const { return timeParse_; }
 			double preprocessing_time() const { return timePreproc_; }
 			double search_time() const { return timeSearch_; }
 			double incumbent_time() const { return timeIncumbent_; }
 
 			//////////////////////
+			//setters - only for general info, timers should not be set manually
+						
+			void name(std::string name) { data_.name = std::move(name); }
+			void number_of_vertices(uint32_t n) { data_.N = n; }
+			void number_of_edges(uint64_t m) { data_.M = m; }
+			void time_out(double t) { data_.TIME_OUT = t; }
+			void time_out_heur(double t) { data_.TIME_OUT_HEUR = t; }
+			void number_of_threads(int n) { data_.nThreads = n; }
 
 			/*
 			* @brief elapsed time from start_time to now
@@ -87,9 +141,8 @@ namespace bitgraph {
 			/**
 			* @brief clears general info - virtual since derived classes might have more general info to clear
 			**/
-			virtual void clearGeneralInfo();					//CHECK comment: "manually at the start of every run"	
-			
-			
+			virtual void clearGeneralInfo() { data_.reset(); }					//CHECK comment: "manually at the start of every run"	
+						
 
 			//I/O
 		public:
@@ -122,41 +175,27 @@ namespace bitgraph {
 			//////////////////////
 			//data members
 			//////////////////////
-						
-			//general info
-			std::string name_ = "";											//instance name
-			uint32_t N_ = 0;												//number of vertices
-			uint64_t M_ = 0;												//number of edges			
-			double TIME_OUT_ = std::numeric_limits<double>::max();			//in seconds
-			double TIME_OUT_HEUR_ = std::numeric_limits<double>::max();		//in seconds
 
-			//algorithms
+			paramBase data_;							//general info
 
-			//int algSearch_ = -1;						//algorithm identifier
-			//int algHeur_ = -1;							//root heuristic policy (e.g. AMTS, no AMTS or combined with other heuristics)	
-			//int algSort_ = -1;							//sorting policy selected as input configuration parameter (might not be the final choice)
-
-
-			// timers		
-
+			// timers
 			tpoint_t startTimeParse_;
-			double timeParse_ = 0;						//parsing time(in seconds)
-
+			double timeParse_ = 0;					//parsing time(in seconds)
 			tpoint_t startTimePreproc_;
-			double timePreproc_ = 0;					//preprocessing time(in seconds)
-
+			double timePreproc_ = 0;				//preprocessing time(in seconds)
 			tpoint_t startTimeSearch_;
-			double timeSearch_ = 0;						//search time (in seconds)
-
+			double timeSearch_ = 0;					//search time (in seconds)
 			tpoint_t startTimeIncumbent_;
-			double timeIncumbent_ = 0;					//time when last new incumbent was found (in seconds)
+			double timeIncumbent_ = 0;				//time when last new incumbent was found (in seconds)
 
 		};
 
 	}//namespace com
 
+	using com::paramBase;
 	using com::infoBase;
 	using com::operator<<;
+
 
 }//end namespace bitgraph
 
