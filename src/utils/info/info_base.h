@@ -76,6 +76,23 @@ namespace bitgraph {
 
 			enum phase_t { SEARCH = 0, PREPROC, LAST_INCUMBENT, PARSE };
 
+			//////////////////////
+			//data members
+			
+			paramBase data_;							//general info
+
+			// timers
+			tpoint_t startTimeParse_;
+			double timeParse_ = 0;					//parsing time(in seconds)
+			tpoint_t startTimePreproc_;
+			double timePreproc_ = 0;				//preprocessing time(in seconds)
+			tpoint_t startTimeSearch_;
+			double timeSearch_ = 0;					//search time (in seconds)
+			tpoint_t startTimeIncumbent_;
+			double timeIncumbent_ = 0;				//time when last new incumbent was found (in seconds)
+
+
+			///////////////////////
 			//constructors / destructor
 
 			infoBase() = default;
@@ -172,21 +189,7 @@ namespace bitgraph {
 			*/
 			std::ostream& printTimers(std::ostream& o = std::cout) const;
 
-			//////////////////////
-			//data members
-			//////////////////////
-
-			paramBase data_;							//general info
-
-			// timers
-			tpoint_t startTimeParse_;
-			double timeParse_ = 0;					//parsing time(in seconds)
-			tpoint_t startTimePreproc_;
-			double timePreproc_ = 0;				//preprocessing time(in seconds)
-			tpoint_t startTimeSearch_;
-			double timeSearch_ = 0;					//search time (in seconds)
-			tpoint_t startTimeIncumbent_;
-			double timeIncumbent_ = 0;				//time when last new incumbent was found (in seconds)
+		
 
 		};
 
