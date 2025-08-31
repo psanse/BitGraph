@@ -55,9 +55,12 @@ namespace bitgraph {
 			////////////////////////////////////////////////
 
 			void clear() { ords_.clear(); }
-			void insert_ordering(const vint& o) { ords_.emplace_back(o); }
-			vint  get_first_ordering() const { return ords_.front(); }
-			bool is_empty() const { return ords_.empty(); }
+			void add_ordering(const vint& o) { ords_.emplace_back(o); }
+			bool is_empty() const noexcept { return ords_.empty(); }
+			const vint& first_ordering() const noexcept {
+				static const vint empty; 
+				return ords_.empty()? empty : ords_.front();
+			}
 
 			/*
 			* @brief decodes a single vertex for the given orderings
