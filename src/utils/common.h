@@ -646,6 +646,20 @@ namespace bitgraph {
 				return sstr.str();
 			}
 
+			/*
+			* @brief determines elapsed time from @start_time to now in seconds
+			* @param start_time - starting time point to determine duration
+			* @returns elapsed time in SECONDS (with decimals)
+			* 
+			* TODO - add unit test (31/08/2025)
+			*/
+			inline
+			double elapsedTime(std::chrono::high_resolution_clock::time_point startTime)
+			{				
+				return toDouble(std::chrono::high_resolution_clock::now() - startTime);
+
+			}
+
 			//template<typename TP_t>
 			//inline
 			//	std::string tp2string(const TP_t& tp, bool date = true)

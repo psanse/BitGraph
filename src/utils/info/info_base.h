@@ -34,7 +34,7 @@ namespace bitgraph {
 			double TIME_OUT_HEUR = std::numeric_limits<double>::max();		//in seconds
 
 			int nThreads = 1;												// number of threads
-			bool unrolled = false;											// loop unrolling
+			bool unrolled = false;											// loop unrolling - possibly deprecated
 
 			virtual void reset() {
 				name = "";
@@ -48,7 +48,7 @@ namespace bitgraph {
 
 			//I/O		
 			virtual std::ostream& print(std::ostream& o = std::cout, bool endl = true) const {
-				o << "\name: " << name
+				o << "\NAME: " << name
 					<< "\nN: " << N
 					<< "\nM: " << M
 					<< "\nTOUT(s): " << TIME_OUT
@@ -75,6 +75,15 @@ namespace bitgraph {
 			using tpoint_t = PrecisionTimer::timepoint_t;
 
 			enum phase_t { SEARCH = 0, PREPROC, LAST_INCUMBENT, PARSE };
+
+			/*
+			* @brief determines elapsed time from @start_time to now in seconds
+			* @param start_time - starting time point to determine duration
+			* @returns elapsed time in seconds
+			* @details: utility for time measurement outside the class			* 
+			* @details - moved to bitgraph utils::com::_time namespace (common.h) 31/08/2025
+			*/
+			//static double elapsedTime(tpoint_t start_time);
 
 			//////////////////////
 			//data members
@@ -123,19 +132,20 @@ namespace bitgraph {
 			void time_out_heur(double t) { data_.TIME_OUT_HEUR = t; }
 			void number_of_threads(int n) { data_.nThreads = n; }
 
-			/*
-			* @brief elapsed time from start_time to now
-			*/
-			static double elapsedTime(tpoint_t start_time);
 
 			//timers
+			/*
+			* @brief sets initial time in timer @t (previously set with startTimer(...))
+			* @param t - phase_t enum
+			*/
 			void startTimer(phase_t t);
 
 			/*
-			* @brief reads time in timer t (previously set with startTimer(...))
+			* @brief reads time in timer @t (previously set with startTimer(...))
+			* @param t - phase_t enum
 			*/
 			double readTimer(phase_t t);
-
+			
 			/*
 			* @brief clears appropiate time duration (concerning phase_t @t) 
 			*/
@@ -145,11 +155,9 @@ namespace bitgraph {
 			* @brief clears all timers
 			**/
 			void clearAllTimers();
-
-
-			//clear context 
+									
 			/*
-			* @brief clears context
+			* @brief resets to default values
 			* @param lazy - if true general info is NOT cleared, only timers
 			*/
 			virtual void clear(bool lazy = false);
@@ -158,7 +166,7 @@ namespace bitgraph {
 			/**
 			* @brief clears general info - virtual since derived classes might have more general info to clear
 			**/
-			virtual void clearGeneralInfo() { data_.reset(); }					//CHECK comment: "manually at the start of every run"	
+			virtual void clearGeneralInfo() { data_.reset(); }					
 						
 
 			//I/O

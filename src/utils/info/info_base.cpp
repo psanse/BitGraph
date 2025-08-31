@@ -159,12 +159,12 @@ double infoBase::readTimer(phase_t t)
 	return elapsedTime;
 }
 
-double infoBase::elapsedTime(tpoint_t startTime)
-{
-	tpoint_t endTime = PrecisionTimer::clock_t::now();
-	return com::_time::toDouble(endTime - startTime);
-
-}
+//double infoBase::elapsedTime(tpoint_t startTime)
+//{
+//	tpoint_t endTime = PrecisionTimer::clock_t::now();
+//	return com::_time::toDouble(endTime - startTime);
+//
+//}
 
 
 void infoBase::clear(bool lazy) {
