@@ -48,7 +48,7 @@ namespace bitgraph {
 
 			//I/O		
 			virtual std::ostream& print(std::ostream& o = std::cout, bool endl = true) const {
-				o << "\NAME: " << name
+				o << "NAME: " << name
 					<< "\nN: " << N
 					<< "\nM: " << M
 					<< "\nTOUT(s): " << TIME_OUT
@@ -197,8 +197,6 @@ namespace bitgraph {
 			*/
 			std::ostream& printTimers(std::ostream& o = std::cout) const;
 
-		
-
 		};
 
 	}//namespace com
@@ -207,7 +205,7 @@ namespace bitgraph {
 	using com::infoBase;
 	using com::operator<<;
 
-
+	
 }//end namespace bitgraph
 
 

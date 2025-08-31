@@ -44,26 +44,26 @@ vint Decode::decode_list(const vint& l) const
 	return res;
 }
 
-int Decode::decode_list(const vint& l, vint& res) const
-{
-	if (ords_.empty() || l.empty() ) {					//no reordering, return a copy
-		res = l;
-		return 0;										//CHECK user cases- why not return -1?
-	}
+//int Decode::decode_list(const vint& l, vint& res) const
+//{
+//	if (ords_.empty() || l.empty() ) {					//no reordering, return a copy
+//		res = l;
+//		return -1;										//CHECK user cases- why not return -1?
+//	}
+//
+//	res.clear();
+//	res.reserve(l.size());
+//	DecodeVertex df(ords_);
+//	transform(l.cbegin(), l.cend(), res.begin(), df);
+//
+//	//old code- why using a back_insert_iterator?
+//	//std::back_insert_iterator< std::vector<int> > b_it(res);	
+//	//transform(l.cbegin(), l.cend(), b_it, df );
+//
+//	return 0;
+//}
 
-	res.clear();
-	res.reserve(l.size());
-	DecodeVertex df(ords_);
-	transform(l.cbegin(), l.cend(), res.begin(), df);
-
-	//old code- why using a back_insert_iterator?
-	//std::back_insert_iterator< std::vector<int> > b_it(res);	
-	//transform(l.cbegin(), l.cend(), b_it, df );
-
-	return 0;
-}
-
-int Decode::decode_list_in_place(vint& l)
+int Decode::decode_list_in_place(vint& l) const
 {
 	if (l.empty()) return -1;
 	DecodeVertex df(ords_);
