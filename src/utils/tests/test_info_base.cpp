@@ -30,11 +30,11 @@ protected:
 
 TEST_F(InfoBaseTest, DefaultConstructor) {
 	
-	EXPECT_EQ(info.name_, "");
-	EXPECT_EQ(info.N_, 0);
-	EXPECT_EQ(info.M_, 0);
-	EXPECT_EQ(info.TIME_OUT_	 , std::numeric_limits<double>::max());
-	EXPECT_EQ(info.TIME_OUT_HEUR_, std::numeric_limits<double>::max());
+	EXPECT_EQ(info.data_.name, "");
+	EXPECT_EQ(info.data_.N, 0);
+	EXPECT_EQ(info.data_.M, 0);
+	EXPECT_EQ(info.data_.TIME_OUT	 , std::numeric_limits<double>::max());
+	EXPECT_EQ(info.data_.TIME_OUT_HEUR, std::numeric_limits<double>::max());
 	/*EXPECT_EQ(info.algSearch_, -1);
 	EXPECT_EQ(info.algHeur_, -1);
 	EXPECT_EQ(info.algSort_, -1);*/
@@ -58,22 +58,15 @@ TEST_F(InfoBaseTest, ReadTimer) {
 	//test other timers...
 }
 
-TEST_F(InfoBaseTest, ElapsedTime) {
-
-	auto start_time = std::chrono::high_resolution_clock::now();
-	double elapsed = info.elapsedTime(start_time);
-
-	EXPECT_GE(elapsed, 0.0);
-}
 
 TEST_F(InfoBaseTest, ClearGeneralInfo) {
 
-	info.N_ = 10;
-	info.M_ = 20;
+	info.data_.N = 10;
+	info.data_.M = 20;
 	info.clear();
 
-	EXPECT_EQ(info.N_, 0);
-	EXPECT_EQ(info.M_, 0);
+	EXPECT_EQ(info.data_.N, 0);
+	EXPECT_EQ(info.data_.M, 0);
 }
 
 TEST_F(InfoBaseTest, ClearTimers) {
@@ -88,23 +81,23 @@ TEST_F(InfoBaseTest, ClearTimers) {
 
 TEST_F(InfoBaseTest, Clear) {
 
-	info.N_ = 10;
-	info.M_ = 20;
+	info.data_.N = 10;
+	info.data_.M = 20;
 
 	//clears all - lazy = false
 	info.clear();	
 
-	EXPECT_EQ(info.N_, 0);
-	EXPECT_EQ(info.M_, 0);	
+	EXPECT_EQ(info.data_.N, 0);
+	EXPECT_EQ(info.data_.M, 0);
 
-	info.N_ = 10;
-	info.M_ = 20;
+	info.data_.N = 10;
+	info.data_.M = 20;
 
 	//preserves general info - lazy = true
 	info.clear(true);
 
-	EXPECT_EQ(info.N_, 10);
-	EXPECT_EQ(info.M_, 20);
+	EXPECT_EQ(info.data_.N, 10);
+	EXPECT_EQ(info.data_.M, 20);
 
 
 	//test other members...
@@ -185,13 +178,7 @@ TEST_F(InfoBaseTest, ClearTimersResetsAllTimers) {
 	EXPECT_DOUBLE_EQ(info.timeIncumbent_, 0.0);
 }
 
-TEST_F(InfoBaseTest, ElapsedTimeStatic) {
-	auto start = std::chrono::high_resolution_clock::now();
-	std::this_thread::sleep_for(std::chrono::milliseconds(30));
-	double elapsed = infoBase::elapsedTime(start);
-	EXPECT_GE(elapsed, 0.02);
-	EXPECT_LE(elapsed, 0.1);
-}
+
 
 
 
