@@ -168,9 +168,27 @@ TEST(Common_stl, all_equal){
 	EXPECT_FALSE(_stl::all_equal(v));
 }
 
+
+TEST(Common_timer, elapsedTime) {
+
+
+	auto start = std::chrono::high_resolution_clock::now();
+	std::this_thread::sleep_for(std::chrono::milliseconds(120));
+
+	////////////////////////////////////////////////////
+	double elapsed = com::_time::elapsedTime(start);				//seconds
+	////////////////////////////////////////////////////
+
+	//wide range to avoid false negatives due to scheduling
+	EXPECT_GE(elapsed, 0.11);
+	EXPECT_LE(elapsed, 0.30);
+	
+}
+
+
 /////////////
 //
-// DSIABLED TESTS
+// DISABLED TESTS
 //
 /////////////
 
@@ -201,6 +219,8 @@ TEST(Common_sort, DISABLED_insert_ordered) {
 	std::cout << "inserted at: " << pos << std::endl;*/
 
 }
+
+
 
 
 
