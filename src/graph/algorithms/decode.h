@@ -74,8 +74,9 @@ namespace bitgraph {
 			* TODO- check what should be the return value when the given orderings are empty!
 			*/
 			vint decode_list(const vint& list) const;
-			int decode_list(const vint& l, vint& res) const;
-			int decode_list_in_place(vint& list);
+			int decode_list_in_place(vint& list) const;
+
+			//int decode_list(const vint& l, vint& res) const;
 
 			//////////////////////
 			// data members
