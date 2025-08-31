@@ -67,7 +67,10 @@ namespace bitgraph {
 		//  @brief base struct to report results of graph algorithms.
 		// 
 		//  Supports basic configuration parameters and timers.
-		// 
+		//  
+		//  TODO- conceived as a struct initially (all data members are public), 
+		//  added getters/setters later, possibly convert to a CLASS (31/08/2025)
+		//
 		///////////////////////
 
 		struct infoBase {
