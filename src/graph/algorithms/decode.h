@@ -64,17 +64,24 @@ namespace bitgraph {
 			* @date 16/6/17
 			* @last_update 17/12/2024
 			*/
-			int decode_node(int v) const;
+			int decode(int v) const;
 
 			/*
-			* @brief decodes of a list of vertices for the given orderings
-			* @date 4/10/17
-			* @last_update 17/12/2024
+			* @brief decodes of a list of vertices @list for the given orderings
 			* @param list list of vertices
-			* TODO- check what should be the return value when the given orderings are empty!
+			* @returns decoded list of vertices - empty if @list is empty
+			* @details: created 4/10/17, last_update 31/08/2025			 
 			*/
-			vint decode_list(const vint& list) const;
-			int decode_list_in_place(vint& list) const;
+			vint decode(const vint& list) const;
+
+			/*
+			* @brief modifies the list of vertices @list in place, decoding them for the given orderings
+			* @param list list of vertices
+			* @returns -1 if list is empty, 0 otherwise
+			* @details: created 4/10/17, last_update 31/08/2025
+			*/
+			int decode_in_place(vint& list) const;
+
 
 			//int decode_list(const vint& l, vint& res) const;
 

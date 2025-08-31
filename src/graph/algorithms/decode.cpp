@@ -9,7 +9,7 @@
 
 using namespace bitgraph;
 
-int Decode::decode_node(int v) const
+int Decode::decode(int v) const
 { 
 	DecodeVertex df(ords_);
 	return df(v); 
@@ -33,7 +33,7 @@ vint Decode::reverse(const vint& o)
 	return vres;
 }
 
-vint Decode::decode_list(const vint& l) const
+vint Decode::decode(const vint& l) const
 {
 	vint res;
 	if (!l.empty()) {
@@ -63,7 +63,7 @@ vint Decode::decode_list(const vint& l) const
 //	return 0;
 //}
 
-int Decode::decode_list_in_place(vint& l) const
+int Decode::decode_in_place(vint& l) const
 {
 	if (l.empty()) return -1;
 	DecodeVertex df(ords_);

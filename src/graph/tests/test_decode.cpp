@@ -49,7 +49,7 @@ TEST(Decode, GraphFastRootSort) {
 	vlist.push_back(4);
 	vlist.push_back(5);
 
-	vint dec = d.decode_list(vlist);
+	vint dec = d.decode(vlist);
 	EXPECT_EQ(dec[0], 0);
 	EXPECT_EQ(dec[1], 105);
 	EXPECT_EQ(dec[2], 100);
