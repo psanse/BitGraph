@@ -80,8 +80,8 @@ namespace bitgraph {
 			* @brief determines elapsed time from @start_time to now in seconds
 			* @param start_time - starting time point to determine duration
 			* @returns elapsed time in seconds
-			* @details: utility for time measurement outside the class			* 
-			* @details - moved to bitgraph utils::com::_time namespace (common.h) 31/08/2025
+			* @details: utility for time measurement outside the class
+			* @details - moved to utilities utils::com::_time namespace (common.h) 31/08/2025
 			*/
 			//static double elapsedTime(tpoint_t start_time);
 

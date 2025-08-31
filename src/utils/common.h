@@ -628,6 +628,19 @@ namespace bitgraph {
 				return std::chrono::duration_cast<std::chrono::duration<double>>(d).count();
 			}
 
+			/*
+			* @brief determines elapsed time from @start_time to now in seconds
+			* @param start_time - starting time point to determine duration
+			* @returns elapsed time in SECONDS (with decimals)
+			*
+			* TODO - add unit test (31/08/2025)
+			*/
+			inline
+			double elapsedTime(std::chrono::high_resolution_clock::time_point startTime)
+			{
+				return toDouble(std::chrono::high_resolution_clock::now() - startTime);
+			}
+
 			/**
 			* @brief converts a timepoint to string
 			**/
@@ -646,19 +659,7 @@ namespace bitgraph {
 				return sstr.str();
 			}
 
-			/*
-			* @brief determines elapsed time from @start_time to now in seconds
-			* @param start_time - starting time point to determine duration
-			* @returns elapsed time in SECONDS (with decimals)
-			* 
-			* TODO - add unit test (31/08/2025)
-			*/
-			inline
-			double elapsedTime(std::chrono::high_resolution_clock::time_point startTime)
-			{				
-				return toDouble(std::chrono::high_resolution_clock::now() - startTime);
-
-			}
+		
 
 			//template<typename TP_t>
 			//inline
