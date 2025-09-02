@@ -842,13 +842,13 @@ namespace bitgraph{
 
 		int BitSet::msbn64_lup() const {
 
-			register union u {
+			union u {
 				U16 c[4];
 				BITBOARD b;
-			} val;
+			} val{};
 
 			//reverse loop (most significant bit block early exit)
-			for (auto i = nBB_ - 1; i >= 0; i--) {
+			for (int i = nBB_ - 1 ; i >= 0; i--) {
 				val.b = vBB_[i];
 				if (val.b) {
 					if (val.c[3]) return (Tables::msba[3][val.c[3]] + WMUL(i));
@@ -865,7 +865,7 @@ namespace bitgraph{
 		{
 			U32 posInBB;
 
-			for (auto i = nBB_ - 1; i >= 0; --i) {
+			for (int i = nBB_ - 1; i >= 0; --i) {
 
 				if (_BitScanReverse64(&posInBB, vBB_[i])) {
 					return (posInBB + WMUL(i));
@@ -927,10 +927,10 @@ namespace bitgraph{
 			}
 
 			//looks for the msb in the remaining blocks
-			register union u {
+			union u {
 				U16 c[4];
 				BITBOARD b;
-			}val;
+			}val{};
 
 			for (auto i = bbh - 1; i >= 0; --i) {
 				val.b = vBB_[i];
@@ -954,7 +954,7 @@ namespace bitgraph{
 
 		bool BitSet::is_empty() const
 		{
-			for (auto i = 0; i < nBB_; ++i) {
+			for (int i = 0; i < nBB_; ++i) {
 				if (vBB_[i]) {
 					return false;
 				}

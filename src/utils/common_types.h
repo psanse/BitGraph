@@ -196,7 +196,7 @@ namespace bitgraph {
 
 		inline
 			bool operator == (const range_t& lhs, const range_t& rhs) {
-			return (lhs.vl == rhs.vl && rhs.vh == rhs.vh);
+			return (lhs.vl == rhs.vl && lhs.vh == rhs.vh);
 		}
 
 

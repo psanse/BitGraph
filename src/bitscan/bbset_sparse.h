@@ -564,7 +564,7 @@ namespace bitgraph {
 			inline BitSetSp& erase_bit(int firstBit, int lastBit);
 
 			/**
-			/* @brief sets bit to 0 in the bitstring and returns t
+			 * @brief sets bit to 0 in the bitstring and returns t
 			 * @returns the iterator to the block where the bit was set to 0, if it exists, otherwise
 			 *			the iterator to the block with the closest greater index than the bit (can be END).
 			 * @details oriented to basic bitscanning
@@ -787,7 +787,7 @@ namespace bitgraph {
 		if (!vBB_.empty()) {
 
 			//check if all bitblocks are empty - assumes it is possible, since erase operations allow it
-			for (int i = 0; i < vBB_.size(); ++i) {
+			for (auto i = 0u; i < vBB_.size(); ++i) {
 				if (vBB_[i].bb_) {
 					return false;
 				}
@@ -962,7 +962,7 @@ namespace bitgraph {
 		//find the block containing nBit or closest one with less index 
 		int bbL = WDIV(firstBit);
 
-		for (int i = 0; i < vBB_.size(); ++i) {
+		for (auto i = 0u; i < vBB_.size(); ++i) {
 
 			//block bbL exists - find msb
 			if (vBB_[i].idx_ == bbL) {
@@ -1059,10 +1059,10 @@ namespace bitgraph {
 
 	int BitSetSp::msbn64_lup() const {
 
-		register union u {
+		union u {
 			U16 c[4];
 			BITBOARD b;
-		}val;
+		}val{};
 
 		for (int i = vBB_.size() - 1; i >= 0; --i) {
 			val.b = vBB_[i].bb_;
@@ -1092,14 +1092,11 @@ namespace bitgraph {
 		return BBObject::noBit;
 	}
 
-
-
 	int BitSetSp::lsbn64_intrin(int& block) const {
-
 
 		U32 posInBB;
 
-		for (auto i = 0; i < vBB_.size(); ++i) {
+		for (auto i = 0u; i < vBB_.size(); ++i) {
 			if (_BitScanForward64(&posInBB, vBB_[i].bb_)) {
 				block = i;
 				return(posInBB + WMUL(vBB_[i].idx_));
@@ -1146,7 +1143,7 @@ namespace bitgraph {
 	int BitSetSp::lsbn64_non_intrin() const {
 
 #ifdef DE_BRUIJN
-		for (int i = 0; i < vBB_.size(); ++i) {
+		for (auto i = 0u; i < vBB_.size(); ++i) {
 			if (vBB_[i].bb_) {
 #ifdef ISOLANI_LSB
 				return(Tables::indexDeBruijn64_ISOL[((vBB_[i].bb_ & -vBB_[i].bb_) * DEBRUIJN_MN_64_ISOL/*magic num*/) >> DEBRUIJN_MN_64_SHIFT] + WMUL(vBB_[i].idx_));
@@ -1180,7 +1177,7 @@ namespace bitgraph {
 	{
 		U32 posInBB;
 
-		for (auto i = 0; i < vBB_.size(); ++i) {
+		for (auto i = 0u; i < vBB_.size(); ++i) {
 			if (_BitScanForward64(&posInBB, vBB_[i].bb_)) {
 				return(posInBB + WMUL(vBB_[i].idx_));
 			}
@@ -1194,7 +1191,7 @@ namespace bitgraph {
 
 		BITBOARD pc = 0;
 
-		for (auto i = 0; i < vBB_.size(); ++i) {
+		for (auto i = 0u; i < vBB_.size(); ++i) {
 			pc += bblock::popc64(vBB_[i].bb_);
 		}
 

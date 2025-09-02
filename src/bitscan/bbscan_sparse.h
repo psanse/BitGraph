@@ -217,7 +217,7 @@ namespace bitgraph {
 		else {
 
 			//Searches for next bit in the remaining blocks
-			for (auto i = scan_.bbi_ + 1; i < vBB_.size(); ++i) {
+			for (auto i = scan_.bbi_ + 1; i < (int)vBB_.size(); ++i) {
 				if (_BitScanForward64(&posInBB, vBB_[i].bb_)) {
 					//stores the current block and bit for next call
 					scan_.bbi_ = i;
@@ -338,7 +338,7 @@ namespace bitgraph {
 
 		U32 posInBB;
 
-		for (auto i = scan_.bbi_; i < vBB_.size(); ++i) {
+		for (auto i = scan_.bbi_; i < (int)vBB_.size(); ++i) {
 
 			if (_BitScanForward64(&posInBB, vBB_[i].bb_)) {
 
@@ -361,7 +361,7 @@ namespace bitgraph {
 	{
 		U32 posInBB;
 
-		for (auto i = scan_.bbi_; i < vBB_.size(); ++i) {
+		for (auto i = scan_.bbi_; i < (int)vBB_.size(); ++i) {
 
 			if (_BitScanForward64(&posInBB, vBB_[i].bb_)) {
 

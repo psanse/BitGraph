@@ -623,7 +623,7 @@ namespace bitgraph {
 	inline
 		ostream& Ugraph<T>::print_edges(std::ostream& o, bool eofl) {
 
-		for (auto i = 0; i < ptype::NV_ - 1; ++i) {
+		for (auto i = 0u; i < ptype::NV_ - 1; ++i) {
 			for (auto j = i + 1; j < ptype::NV_; ++j) {
 
 				if (ptype::is_edge(i, j)) {
@@ -693,7 +693,7 @@ namespace bitgraph {
 			o << "% " << ptype::name_.c_str() << endl;
 
 		//write edges - 1 based vertex notation
-		for (auto v = 0; v < ptype::NV_ - 1; ++v) {
+		for (auto v = 0u; v < ptype::NV_ - 1; ++v) {
 			for (auto w = v + 1; w < ptype::NV_; ++w) {
 				if (ptype::is_edge(v, w)) {							//O(log) for sparse graphs: specialize
 					o << v + 1 << " " << w + 1 << endl;
@@ -862,7 +862,7 @@ namespace bitgraph {
 		if (lazy || ptype::NE_ == 0) {
 
 			ptype::NE_ = 0;
-			for (int i = 0; i < ptype::NV_ - 1; i++) {
+			for (auto i = 0u; i < ptype::NV_ - 1; i++) {
 
 				//popuation count from i + 1 onwards
 				ptype::NE_ += adj_[i].size(i + 1, -1);
@@ -1006,7 +1006,7 @@ namespace bitgraph {
 		o << "p edge " << this->NV_ << " " << number_of_edges() << endl << endl;
 
 		//Escribir nodos
-		for (int v = 0; v < this->NV_ - 1; v++) {
+		for (auto v = 0u; v < this->NV_ - 1; v++) {
 
 			//non destructive scan starting from the vertex onwards
 			auto block_v = WDIV(v);
@@ -1031,7 +1031,7 @@ namespace bitgraph {
 	inline
 		ostream& USS::print_edges(std::ostream& o, bool eofl) {
 
-		for (auto v = 0; v < this->NV_ - 1; ++v) {
+		for (auto v = 0u; v < this->NV_ - 1; ++v) {
 
 			//skip empty bitsets - MUST BE since currently the scanning object does not check this
 			if (adj_[v].is_empty()) { continue; }
@@ -1040,7 +1040,7 @@ namespace bitgraph {
 			int w = BBObject::noBit;
 			sparse_bitarray::scan sc(adj_[v]);
 			while ((w = sc.next_bit()) != BBObject::noBit) {
-				if (v < w) {
+				if ((int)v < w) {
 					o << "[" << v << "]" << "-->" << "[" << w + WMUL(sc.get_block()) << "]" << std::endl;
 				}
 			}
@@ -1066,7 +1066,7 @@ namespace bitgraph {
 			o << "% " << this->name_.c_str() << endl;
 
 		//writes edges
-		for (int v = 0; v < this->NV_ - 1; v++) {
+		for (auto v = 0u; v < this->NV_ - 1; v++) {
 			//non destructive scan starting from the vertex onwards
 			pair<bool, int> p = this->adj_[v].find_block_pos(WDIV(v));
 			if (p.second == EMPTY_ELEM) continue;										//no more bitblocks
@@ -1103,7 +1103,7 @@ namespace bitgraph {
 		o << this->NV_ << " " << this->NV_ << " " << number_of_edges() << endl;
 
 		//writes edges
-		for (int v = 0; v < this->NV_ - 1; v++) {
+		for (auto v = 0u; v < this->NV_ - 1; v++) {
 			//non destructive scan starting from the vertex onwards
 			pair<bool, int> p = this->adj_[v].find_block_pos(WDIV(v));
 			if (p.second == EMPTY_ELEM) continue;										//no more bitblocks

@@ -301,7 +301,7 @@ namespace bitgraph {
 		switch (alg) {
 		case NONE:								//trivial case- with exit condition!
 			nodes_.reserve(NV_);
-			for (int i = 0; i < NV_; i++) {
+			for (auto i = 0u; i < NV_; i++) {
 				nodes_.emplace_back(i);
 			}
 
@@ -377,10 +377,10 @@ namespace bitgraph {
 			max_deg = NV_;
 
 			//selects an active vertex with minimum degree
-			for (auto j = 0; j < NV_; j++) {
+			for (auto j = 0u; j < NV_; j++) {
 				if (node_active_state_.is_bit(j) && nb_neigh_[j] < max_deg) {
 					max_deg = nb_neigh_[j];
-					v = j;
+					v = (int)j;
 				}
 			}
 
@@ -427,7 +427,7 @@ namespace bitgraph {
 		do {
 			//finds vertex with maximum degree
 			max_deg = -1;
-			for (auto j = 0; j < NV_; j++) {
+			for (auto j = 0u; j < NV_; j++) {
 				if (node_active_state_.is_bit(j) && nb_neigh_[j] > max_deg) {
 					max_deg = nb_neigh_[j];
 					v = j;
@@ -513,11 +513,11 @@ namespace bitgraph {
 		vint nodes_ori = nodes_;
 		nodes_.clear();
 
-		for (int i = 0; i < NV_; i++) {
+		for (auto i = 0u; i < NV_; i++) {
 
 			//finds vertex with minimum degree with TB according to the given ordering in nodes_ori 
 			min_deg = NV_;
-			for (int j = 0; j < NV_; j++) {
+			for (auto j = 0u; j < NV_; j++) {
 				int u = nodes_ori[j];
 				if (node_active_state_.is_bit(u) && nb_neigh_[u] < min_deg) {
 					min_deg = nb_neigh_[u];
@@ -556,10 +556,10 @@ namespace bitgraph {
 		vint nodes_ori = nodes_;
 		nodes_.clear();
 
-		for (int i = 0; i < NV_; i++) {
+		for (auto i = 0u; i < NV_; i++) {
 			//finds vertex with maximum degree
 			max_deg = -1;
-			for (int j = 0; j < NV_; j++) {
+			for (auto j = 0u; j < NV_; j++) {
 				int u = nodes_ori[j];
 				if (node_active_state_.is_bit(u) && nb_neigh_[u] > max_deg) {
 					max_deg = nb_neigh_[u];
@@ -700,7 +700,7 @@ namespace bitgraph {
 		void GraphFastRootSort<Graph_t>::set_ordering() {
 		nodes_.clear();
 		nodes_.reserve(NV_);
-		for (int i = 0; i < NV_; i++) {
+		for (auto i = 0u; i < NV_; i++) {
 			nodes_.emplace_back(i);
 		}
 	}
@@ -761,7 +761,7 @@ namespace bitgraph {
 	inline
 		const vint& GraphFastRootSort<Graph_t>::compute_deg_root() {
 
-		for (auto elem = 0; elem < NV_; ++elem) {
+		for (auto elem = 0u; elem < NV_; ++elem) {
 			nb_neigh_[elem] = g_.neighbors(elem).size();
 		}
 
@@ -772,7 +772,7 @@ namespace bitgraph {
 	inline
 		const vint& GraphFastRootSort<Graph_t>::compute_support_root()
 	{
-		for (auto elem = 0; elem < NV_; ++elem) {
+		for (auto elem = 0u; elem < NV_; ++elem) {
 			deg_neigh_[elem] = 0;
 			bb_type& bbn = g_.neighbors(elem);
 			if (bbn.init_scan(BBObject::NON_DESTRUCTIVE) != -1) {
@@ -847,7 +847,7 @@ namespace bitgraph {
 		gn.path(g_.path());
 
 		///generate isomorphism (only for undirected graphs) 
-		for (auto i = 0; i < NV - 1; i++) {
+		for (auto i = 0u; i < NV - 1; i++) {
 			for (auto j = i + 1; j < NV; j++) {
 				if (g_.is_edge(i, j)) {									//in O(log) for sparse graphs, should be specialized for that case
 					//////////////////////////////////////////////

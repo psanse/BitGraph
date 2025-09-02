@@ -503,7 +503,7 @@ namespace bitgraph {
 	template<class T>
 	inline
 		Graph<T>::Graph(void) noexcept :
-		NV_(0), NBB_(0), NE_(0),
+		NV_(0), NE_(0), NBB_(0),
 		name_(""), path_("")
 	{
 	}
@@ -637,8 +637,8 @@ namespace bitgraph {
 		auto bbh = WDIV(first_k - 1);
 
 		//copy the relevant vertices of the adjacency matrix
-		for (auto i = 0; i < newg.NV_; ++i) {
-			for (auto j = 0; j <= bbh; ++j) {
+		for (auto i = 0u; i < newg.NV_; ++i) {
+			for (auto j = 0u; j <= bbh; ++j) {
 				newg.adj_[i].block(j) = adj_[i].block(j);
 			}
 			//trims last bitblock
@@ -922,7 +922,7 @@ namespace bitgraph {
 	inline
 		ostream& Graph<T>::print_edges(std::ostream& o, bool eofl) {
 
-		for (auto i = 0; i < NV_ - 1; ++i) {
+		for (auto i = 0u; i < NV_ - 1; ++i) {
 			for (auto j = i + 1; j < NV_; ++j) {
 
 				if (is_edge(i, j)) {
@@ -1246,7 +1246,7 @@ namespace bitgraph {
 
 
 		//copies first k elements of the adjacency matrix 
-		for (int i = 0; i < newg.NV_; i++) {
+		for (auto i = 0u; i < newg.NV_; i++) {
 			newg.adj_[i] = adj_[i];
 			newg.adj_[i].clear_bit(first_k, EMPTY_ELEM);		//closed range
 		}
@@ -1266,7 +1266,7 @@ namespace bitgraph {
 
 		//A) sets to 0 bitblocks outside the range but
 		//does not remove the empty bitbloks
-		for (auto v = 0; v < NV_; ++v) {
+		for (auto v = 0u; v < NV_; ++v) {
 			adj_[v].erase_bit(N, NV_);
 		}
 
@@ -1295,7 +1295,7 @@ namespace bitgraph {
 
 		for (std::size_t v = 0; v < NV_; ++v) {
 			nBBt += adj_[v].number_of_blocks();
-			for (std::size_t bb = 0; bb < adj_[v].number_of_blocks(); bb++) {
+			for (auto bb = 0; bb < adj_[v].number_of_blocks(); bb++) {
 				if (adj_[v].block(bb)) {
 					nBB++;								//nBB should be equal to nBBt
 				}
