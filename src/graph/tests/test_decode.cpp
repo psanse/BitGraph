@@ -38,7 +38,7 @@ TEST(Decode, GraphFastRootSort) {
 	//initis decoder
 	Decode::reverse_in_place(vres);			//format [NEW]->[OLD]
 	Decode d;
-	d.insert_ordering(vres);
+	d.add_ordering(vres);
 
 	//computes the vertex number of a list of vertices of the graph isomorphism in the original graph ug
 	vint vlist;

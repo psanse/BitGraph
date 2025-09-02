@@ -180,7 +180,7 @@ namespace bitgraph {
 		if (d != nullptr) {
 			vint aux(new_order);										//@new_order is in format [OLD]->[NEW]
 			Decode::reverse_in_place(aux);								//@aux is in format [NEW] to [OLD]		
-			d->insert_ordering(aux);
+			d->add_ordering(aux);
 		}
 
 		return 0;
