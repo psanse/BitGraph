@@ -57,21 +57,21 @@ namespace bitgraph {
 			// BitScanning Friendly classes
 			// (similar to iterator models)
 			// 
-			// Currently, BitSet_t can only be an object derived from BBScan class (14/02/25)
+			// Currently, BitSetT can only be an object derived from BBScan class (14/02/25)
 			//
 			////////////////////////////
 
-			template< class BitSet_t >
+			template< class BitSetT >
 			struct ScanRev {
-				using basic_type = BitSet_t;
-				using type = ScanRev<BitSet_t>;
+				using basic_type = BitSetT;
+				using type = ScanRev<BitSetT>;
 
 			public:
 								
 				/**
 				* @brief: constructor for reverse bitscanning - may throw for sparse bitsets if empty
 				**/
-				ScanRev(BitSet_t& bb, int firstBit = -1) : bb_(bb) { init_scan(firstBit); }
+				ScanRev(BitSetT& bb, int firstBit = -1) : bb_(bb) { init_scan(firstBit); }
 
 				int get_block() { return  bb_.scan_.bbi_; }
 
@@ -93,24 +93,24 @@ namespace bitgraph {
 				*		bitstring bitSet
 				* @param bbdel: bitset to delete the bit from
 				**/
-				int next_bit(BitSet_t& bitSet) { return bb_.prev_bit(bitSet); }
+				int next_bit(BitSetT& bitSet) { return bb_.prev_bit(bitSet); }
 
 			private:
-				BitSet_t& bb_;
+				BitSetT& bb_;
 			};
 
 
-			template< class BitSet_t >
+			template< class BitSetT >
 			struct Scan {
-				using basic_type = BitSet_t;
-				using type = Scan<BitSet_t>;
+				using basic_type = BitSetT;
+				using type = Scan<BitSetT>;
 
 			public:
 
 				/**
 				* @brief: constructor for bitscanning - may throw for sparse bitsets if empty
 				**/
-				Scan(BitSet_t& bb, int firstBit = -1) : bb_(bb) { init_scan(firstBit); }
+				Scan(BitSetT& bb, int firstBit = -1) : bb_(bb) { init_scan(firstBit); }
 
 				int get_block() { return  bb_.scan_.bbi_; }
 
@@ -132,24 +132,24 @@ namespace bitgraph {
 				*		 bitstring bitSet
 				* @param bbdel: bitset to delete the bit from
 				**/
-				int next_bit(BitSet_t& bitSet) { return bb_.next_bit(bitSet); }
+				int next_bit(BitSetT& bitSet) { return bb_.next_bit(bitSet); }
 
 			private:
-				BitSet_t& bb_;
+				BitSetT& bb_;
 			};
 
 
-			template< class BitSet_t >
+			template< class BitSetT >
 			struct ScanDest {
-				using basic_type = BitSet_t;
-				using type = ScanDest<BitSet_t>;
+				using basic_type = BitSetT;
+				using type = ScanDest<BitSetT>;
 
 			public:
 
 				/**
 				* @brief: constructor for destructive bitscanning - may throw for sparse bitsets if empty
 				**/
-				ScanDest(BitSet_t& bb) : bb_(bb) { init_scan(); }
+				ScanDest(BitSetT& bb) : bb_(bb) { init_scan(); }
 
 				int get_block() { return bb_.scan_.bbi_; }
 
@@ -170,24 +170,24 @@ namespace bitgraph {
 				*		 bitstring bitSet
 				* @param bbdel: bitset to delete the bit from
 				**/
-				int next_bit(BitSet_t& bitSet) { return bb_.next_bit_del(bitSet); }
+				int next_bit(BitSetT& bitSet) { return bb_.next_bit_del(bitSet); }
 
 			private:
-				BitSet_t& bb_;
+				BitSetT& bb_;
 			};
 
 
-			template< class BitSet_t >
+			template< class BitSetT >
 			struct ScanDestRev {
-				using basic_type = BitSet_t;
-				using type = ScanDest<BitSet_t>;
+				using basic_type = BitSetT;
+				using type = ScanDest<BitSetT>;
 
 			public:
 
 				/**
 				* @brief: constructor for destructive reverse bitscanning - may throw for sparse bitsets if empty
 				**/
-				ScanDestRev(BitSet_t& bb) : bb_(bb) { init_scan(); }
+				ScanDestRev(BitSetT& bb) : bb_(bb) { init_scan(); }
 
 				int get_block() { return bb_.scan_.bbi_; }
 
@@ -208,10 +208,10 @@ namespace bitgraph {
 				*		 and deletes it from the bitstring  bitSet
 				* @param bbdel: bitset to delete the bit from
 				**/
-				int next_bit(BitSet_t& bitSet) { return bb_.prev_bit_del(bitSet); }
+				int next_bit(BitSetT& bitSet) { return bb_.prev_bit_del(bitSet); }
 
 			private:
-				BitSet_t& bb_;
+				BitSetT& bb_;
 			};
 
 

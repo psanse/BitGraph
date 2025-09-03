@@ -25,14 +25,14 @@ namespace bitgraph {
 		
 		//////////////////
 		//
-		// Generic class Ugraph<T>
+		// Generic class Ugraph<BitSetT>
 		// 
-		// (T is limited to bitarray and sparse_bitarray types)
+		// (BitSetT is limited to bitarray and sparse_bitarray types)
 		// 
 		//////////////////
 
-		template<class T = BBScan>
-		class Ugraph : public Graph<T> {
+		template<class BitSetT = BBScan>
+		class Ugraph : public Graph<BitSetT> {
 
 			friend class GraphConversion;
 
@@ -48,16 +48,16 @@ namespace bitgraph {
 
 		public:
 
-			using type = Ugraph<T>;				//own type
-			using ptype = Graph<T>;				//parent type
-			using basic_type = T;				//basic type (a type of bitset)
+			using type = Ugraph<BitSetT>;				//own type
+			using ptype = Graph<BitSetT>;				//parent type
+			using basic_type = BitSetT;				//basic type (a type of bitset)
 
 			using _bbt = basic_type;			//alias for backward compatibility
 			using _mypt = ptype;				//alias for backward compatibility
 
 			//constructors - cannot all be inherited	
-			Ugraph() : Graph<T>() {}									//creates empty graph
-			explicit Ugraph(std::size_t n) : Graph<T>(n) {}						//creates empty graph of size n=|V|	
+			Ugraph() : Graph<BitSetT>() {}									//creates empty graph
+			explicit Ugraph(std::size_t n) : Graph<BitSetT>(n) {}						//creates empty graph of size n=|V|	
 			explicit Ugraph(std::string filename);								//reads graph from file
 
 			/**
@@ -86,7 +86,7 @@ namespace bitgraph {
 			/**
 			* @brief Counts the number of edges	in an induced subgraph by a set of vertices
 			**/
-			BITBOARD number_of_edges(const T&) 								const override;
+			BITBOARD number_of_edges(const BitSetT&) 								const override;
 
 			/////////////
 			// Basic operations
@@ -290,7 +290,7 @@ namespace bitgraph {
 			std::ostream& print_degrees(std::ostream & = std::cout)						const;
 			std::ostream& print_edges(std::ostream & = std::cout, bool eofl = false)	override;
 
-			template<class bitset_t = T>
+			template<class bitset_t = BitSetT>
 			std::ostream& print_edges(bitset_t& bbsg, std::ostream&);
 			std::ostream& print_matrix(std::ostream & = std::cout)						const;
 
@@ -315,10 +315,10 @@ namespace bitgraph {
 
 namespace bitgraph {
 	
-	template<class T>
+	template<class BitSetT>
 	template<class bitset_t>
 	inline
-		int Ugraph<T>::max_subgraph_degree(bitset_t& sg) const {
+		int Ugraph<BitSetT>::max_subgraph_degree(bitset_t& sg) const {
 
 		int max_degree = 0, temp = 0;
 
@@ -336,18 +336,18 @@ namespace bitgraph {
 		return max_degree;
 	}
 
-	template<class T>
+	template<class BitSetT>
 	template<class bitset_t>
-	inline int Ugraph<T>::outgoing_degree(bitset_t& sg) const
+	inline int Ugraph<BitSetT>::outgoing_degree(bitset_t& sg) const
 	{
 		//number of edges
 		int nE = 0;
 
 		//scan declaration
-		int retVal = sg.init_scan(bbo::NON_DESTRUCTIVE) != BBObject::noBit;
+		int retVal = sg.init_scan(bbo::NON_DESTRUCTIVE);
 
 		////////////////////////
-		assert(retVal != -1);
+		assert(retVal != BBObject::noBit);
 		///////////////////////
 
 		//main loop
@@ -362,18 +362,18 @@ namespace bitgraph {
 		return nE;
 	}
 
-	template<class T>
-	inline int Ugraph<T>::outgoing_degree(std::vector<int> sg) const
+	template<class BitSetT>
+	inline int Ugraph<BitSetT>::outgoing_degree(std::vector<int> sg) const
 	{
-		T bbsg{ (int)ptype::NV_, sg };
+		BitSetT bbsg{ (int)ptype::NV_, sg };
 		return (outgoing_degree(bbsg));
 	}
 
 
-	template<class T>
+	template<class BitSetT>
 	template<class bitset_t>
 	inline
-		ostream& Ugraph<T>::print_edges(bitset_t& bbsg, std::ostream& o)
+		ostream& Ugraph<BitSetT>::print_edges(bitset_t& bbsg, std::ostream& o)
 	{
 		for (std::size_t i = 0; i < ptype::NV_ - 1; ++i) {
 			if (!bbsg.is_bit(i)) continue;
@@ -393,11 +393,11 @@ namespace bitgraph {
 	/////////////////////////////////////
 
 
-	template<class T>
+	template<class BitSetT>
 	inline
-		Ugraph<T> Ugraph<T>::make_triangle()
+		Ugraph<BitSetT> Ugraph<BitSetT>::make_triangle()
 	{
-		Ugraph<T> tri(3);
+		Ugraph<BitSetT> tri(3);
 		tri.add_edge(0, 1);
 		tri.add_edge(0, 2);
 		tri.add_edge(1, 2);
@@ -405,11 +405,11 @@ namespace bitgraph {
 		return tri;
 	}
 
-	template<class T>
+	template<class BitSetT>
 	inline
-		Ugraph<T> Ugraph<T>::make_clique(std::size_t NV)
+		Ugraph<BitSetT> Ugraph<BitSetT>::make_clique(std::size_t NV)
 	{
-		Ugraph<T> clique(NV);
+		Ugraph<BitSetT> clique(NV);
 
 		//sets the adjacency matrix to ONE except for the main diagonal
 		for (std::size_t v = 0; v < NV; ++v) {
@@ -420,11 +420,11 @@ namespace bitgraph {
 		return clique;
 	}
 
-	template<class T>
+	template<class BitSetT>
 	inline
-		Ugraph<T> Ugraph<T>::make_cycle(std::size_t NV)
+		Ugraph<BitSetT> Ugraph<BitSetT>::make_cycle(std::size_t NV)
 	{
-		Ugraph<T> cycle(NV);
+		Ugraph<BitSetT> cycle(NV);
 
 		for (std::size_t v = 0; v < NV - 1; ++v) {
 			cycle.add_edge(v, v + 1);
@@ -434,10 +434,10 @@ namespace bitgraph {
 		return cycle;
 	}
 
-	template<class T>
+	template<class BitSetT>
 	inline
-		Ugraph<T> Ugraph<T>::make_star(std::size_t NV) {
-		Ugraph<T> star(NV);
+		Ugraph<BitSetT> Ugraph<BitSetT>::make_star(std::size_t NV) {
+		Ugraph<BitSetT> star(NV);
 		for (std::size_t v = 1; v < NV; ++v) {
 			star.add_edge(0, v);
 		}
@@ -446,26 +446,26 @@ namespace bitgraph {
 	}
 
 
-	template<class T>
+	template<class BitSetT>
 	inline
-		Ugraph<T>::Ugraph(string filename) : Graph<T>()
+		Ugraph<BitSetT>::Ugraph(string filename) : Graph<BitSetT>()
 	{
-		//cannot call Graph<T>::Graph(filename) because Graph<T>::add_edge is overriden!
+		//cannot call Graph<BitSetT>::Graph(filename) because Graph<BitSetT>::add_edge is overriden!
 
 		if (ptype::reset(filename) == -1) {
-			LOGG_ERROR("error when reading file: ", filename, "Graph<T>::Graph");
+			LOGG_ERROR("error when reading file: ", filename, "Graph<BitSetT>::Graph");
 			LOG_ERROR("exiting...");
 			exit(-1);
 		}
 
 	}
 
-	template <class T>
+	template <class BitSetT>
 	inline
-		Ugraph<T>::Ugraph(std::size_t NV, int* adj[], string name) {
+		Ugraph<BitSetT>::Ugraph(std::size_t NV, int* adj[], string name) {
 
 		if (ptype::reset(NV) == -1) {
-			LOG_ERROR("Bad graph construction - Ugraph<T>::Ugraph(std::size_t , int* adj[], string)");
+			LOG_ERROR("Bad graph construction - Ugraph<BitSetT>::Ugraph(std::size_t , int* adj[], string)");
 			LOG_ERROR("exiting...");
 			exit(-1);
 		}
@@ -480,9 +480,9 @@ namespace bitgraph {
 		}
 	}
 
-	template<class T>
+	template<class BitSetT>
 	inline
-		BITBOARD Ugraph<T>::number_of_edges(bool lazy) {
+		BITBOARD Ugraph<BitSetT>::number_of_edges(bool lazy) {
 
 		if (!lazy || ptype::NE_ == 0) {
 			ptype::NE_ = 0;
@@ -494,7 +494,7 @@ namespace bitgraph {
 
 			//////////////////////////////
 			if (ptype::NE_ % 2 != 0) {
-				LOG_ERROR("odd number of edges found in simple undirected graph - Ugraph<T>::number_of_edges");
+				LOG_ERROR("odd number of edges found in simple undirected graph - Ugraph<BitSetT>::number_of_edges");
 				LOG_ERROR("exiting...");
 				exit(-1);
 			}
@@ -506,9 +506,9 @@ namespace bitgraph {
 		return ptype::NE_;
 	}
 
-	template<class T>
+	template<class BitSetT>
 	inline
-		BITBOARD Ugraph<T>::number_of_edges(const T& bbn) const {
+		BITBOARD Ugraph<BitSetT>::number_of_edges(const BitSetT& bbn) const {
 		BITBOARD NE = 0;
 
 		//reads only the upper triangle of the adjacency matrix
@@ -525,9 +525,9 @@ namespace bitgraph {
 		return NE;
 	}
 
-	template<class T>
+	template<class BitSetT>
 	inline
-		int Ugraph<T>::degree(int v, const BitSet& bbn) const {
+		int Ugraph<BitSetT>::degree(int v, const BitSet& bbn) const {
 
 		int ndeg = 0;
 		for (auto i = 0; i < ptype::NBB_; i++) {
@@ -537,19 +537,19 @@ namespace bitgraph {
 		return ndeg;
 	}
 
-	template<class T>
+	template<class BitSetT>
 	inline
-		int Ugraph<T>::degree(int v, const BitSetSp& bbs)	const {
-		LOG_ERROR("function not yet implemented, should not be called - Ugraph<T>::degree");
+		int Ugraph<BitSetT>::degree(int v, const BitSetSp& bbs)	const {
+		LOG_ERROR("function not yet implemented, should not be called - Ugraph<BitSetT>::degree");
 		LOG_ERROR("exiting...");
 		std::exit(-1);
 	}
 
 
 
-	template<class T>
+	template<class BitSetT>
 	inline
-		void Ugraph<T>::add_edge(int v, int w) {
+		void Ugraph<BitSetT>::add_edge(int v, int w) {
 
 		if (v != w) {
 			ptype::adj_[v].set_bit(w);
@@ -558,9 +558,9 @@ namespace bitgraph {
 		}
 	}
 
-	template<class T>
+	template<class BitSetT>
 	inline
-		void Ugraph<T>::remove_edge(int v, int w) {
+		void Ugraph<BitSetT>::remove_edge(int v, int w) {
 		if (v != w) {
 			ptype::adj_[v].erase_bit(w);
 			ptype::adj_[w].erase_bit(v);
@@ -568,9 +568,9 @@ namespace bitgraph {
 		}
 	}
 
-	template<class T>
+	template<class BitSetT>
 	inline
-		void Ugraph<T>::gen_random_edges(double p) {
+		void Ugraph<BitSetT>::gen_random_edges(double p) {
 
 		//removes all edges
 		this->remove_edges();
@@ -586,9 +586,9 @@ namespace bitgraph {
 
 	}
 
-	template<class T>
+	template<class BitSetT>
 	inline
-		int Ugraph<T>::max_graph_degree() const {
+		int Ugraph<BitSetT>::max_graph_degree() const {
 
 		int max_degree = 0, temp = 0;
 
@@ -601,27 +601,27 @@ namespace bitgraph {
 		return max_degree;
 	}
 
-	template<class T>
+	template<class BitSetT>
 	inline
-		double Ugraph<T>::density(bool lazy) {
+		double Ugraph<BitSetT>::density(bool lazy) {
 
 		BITBOARD max_edges = ptype::NV_;
 		max_edges *= (max_edges - 1);
 		return (2 * number_of_edges(lazy) / static_cast<double> (max_edges));
 	}
 
-	template<class T>
+	template<class BitSetT>
 	inline
-		ostream& Ugraph<T>::print_degrees(std::ostream& o) const {
+		ostream& Ugraph<BitSetT>::print_degrees(std::ostream& o) const {
 		for (std::size_t i = 0; i < ptype::NV_; ++i) {
 			o << "deg(" << i << ")" << ":" << degree(i) << " ";
 		}
 		return o;
 	}
 
-	template<class T>
+	template<class BitSetT>
 	inline
-		ostream& Ugraph<T>::print_edges(std::ostream& o, bool eofl) {
+		ostream& Ugraph<BitSetT>::print_edges(std::ostream& o, bool eofl) {
 
 		for (auto i = 0u; i < ptype::NV_ - 1; ++i) {
 			for (auto j = i + 1; j < ptype::NV_; ++j) {
@@ -636,9 +636,9 @@ namespace bitgraph {
 		return o;
 	}
 
-	template<class T>
+	template<class BitSetT>
 	inline
-		ostream& Ugraph<T>::print_matrix(std::ostream& o) const
+		ostream& Ugraph<BitSetT>::print_matrix(std::ostream& o) const
 	{
 		for (std::size_t i = 0; i < ptype::NV_; ++i) {
 			for (std::size_t j = 0; j < ptype::NV_; ++j) {
@@ -657,9 +657,9 @@ namespace bitgraph {
 
 
 
-	template<class T>
+	template<class BitSetT>
 	inline
-		void Ugraph<T>::write_dimacs(ostream& o) {
+		void Ugraph<BitSetT>::write_dimacs(ostream& o) {
 
 		//timestamp comment 
 		o << "c File written by GRAPH:" << PrecisionTimer::local_timestamp();
@@ -681,9 +681,9 @@ namespace bitgraph {
 		}
 	}
 
-	template<class T>
+	template<class BitSetT>
 	inline
-		void  Ugraph<T>::write_EDGES(ostream& o) {
+		void  Ugraph<BitSetT>::write_EDGES(ostream& o) {
 
 		//timestamp comment
 		o << "% File written by GRAPH:" << PrecisionTimer::local_timestamp();
@@ -702,9 +702,9 @@ namespace bitgraph {
 		}
 	}
 
-	template<class T>
+	template<class BitSetT>
 	inline
-		void Ugraph<T>::write_mtx(ostream& o) {
+		void Ugraph<BitSetT>::write_mtx(ostream& o) {
 
 		//header comment
 		o << "%%MatrixMarket matrix coordinate pattern symmetric" << endl;
@@ -730,9 +730,9 @@ namespace bitgraph {
 		}
 	}
 
-	template<class T>
+	template<class BitSetT>
 	inline
-		int Ugraph<T>::degree_up(int v, const BitSet& bbn) const {
+		int Ugraph<BitSetT>::degree_up(int v, const BitSet& bbn) const {
 
 		int nDeg = 0, nBB = WDIV(v);
 
@@ -748,9 +748,9 @@ namespace bitgraph {
 		return nDeg;
 	}
 
-	template<class T>
+	template<class BitSetT>
 	inline
-		int Ugraph<T>::degree_up(int v) const
+		int Ugraph<BitSetT>::degree_up(int v) const
 	{
 		int nDeg = 0, nBB = WDIV(v);
 
@@ -765,9 +765,9 @@ namespace bitgraph {
 		return nDeg;
 	}
 
-	template<class T>
+	template<class BitSetT>
 	inline
-		int Ugraph<T>::degree(int v, int UB, const BitSet& bbn) const {
+		int Ugraph<BitSetT>::degree(int v, int UB, const BitSet& bbn) const {
 
 		int nDeg = 0;
 		for (auto i = 0; i < ptype::NBB_; ++i) {
@@ -780,16 +780,16 @@ namespace bitgraph {
 		return nDeg;
 	}
 
-	template<class T>
-	int Ugraph<T>::degree(int v, int UB, const BitSetSp& bbn) const {
-		LOG_ERROR("function not yet implemented, should not be called - Ugraph<T>::degree");
+	template<class BitSetT>
+	int Ugraph<BitSetT>::degree(int v, int UB, const BitSetSp& bbn) const {
+		LOG_ERROR("function not yet implemented, should not be called - Ugraph<BitSetT>::degree");
 		LOG_ERROR("exiting...");
 		std::exit(-1);
 	}
 
 
-	template<class T>
-	int Ugraph<T>::create_complement(Ugraph& ug) const {
+	template<class BitSetT>
+	int Ugraph<BitSetT>::create_complement(Ugraph& ug) const {
 
 		//resets ug with new allocation
 		if (ug.reset(ptype::NV_) == -1) return -1;
@@ -808,8 +808,8 @@ namespace bitgraph {
 	}
 
 
-	template<class T>
-	int Ugraph<T>::create_subgraph(Ugraph& ug, int v) const
+	template<class BitSetT>
+	int Ugraph<BitSetT>::create_subgraph(Ugraph& ug, int v) const
 	{
 		vector<int> vnn;
 		ptype::neighbors(v).to_vector(vnn);
@@ -817,17 +817,17 @@ namespace bitgraph {
 		return create_subgraph(ug, vnn);
 	}
 
-	template<class T>
-	int Ugraph<T>::create_subgraph(Ugraph& ug, vint& lv) const
+	template<class BitSetT>
+	int Ugraph<BitSetT>::create_subgraph(Ugraph& ug, vint& lv) const
 	{
 		if (lv.empty()) {
-			LOG_ERROR("empty set found while creating an induced graph - Ugraph<T>::create_induced");
+			LOG_ERROR("empty set found while creating an induced graph - Ugraph<BitSetT>::create_induced");
 			return -1;
 		}
 
 		const int NV = lv.size();
 		if (ug.reset(NV) == -1) {
-			LOG_ERROR("bad allocation - Ugraph<T>::create_induced");
+			LOG_ERROR("bad allocation - Ugraph<BitSetT>::create_induced");
 			return -1;
 		}
 
@@ -850,8 +850,8 @@ namespace bitgraph {
 
 	////////////////////////
 	//
-	// Specializations of class Ugraph<T> methods for sparse graphs
-	// (T = sparse_bitarray)
+	// Specializations of class Ugraph<BitSetT> methods for sparse graphs
+	// (BitSetT = sparse_bitarray)
 	//
 	////////////////////////
 
