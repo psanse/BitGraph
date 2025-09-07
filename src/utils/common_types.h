@@ -22,7 +22,6 @@ namespace bitgraph {
 
 }
 
-
 namespace bitgraph {
 	
 	namespace com {
@@ -31,7 +30,7 @@ namespace bitgraph {
 		//
 		// struct stack_t
 		//
-		// (simple stack implemented by a C-array)
+		// (very lightweight stack implemented by a C-array)
 		//
 		////////////////////////
 
@@ -99,7 +98,7 @@ namespace bitgraph {
 			void push_bottom(T d);
 
 			/**
-			* @brief Rremoves the top element from the stack
+			* @brief Removes the top element from the stack
 			*	     (the element is lost)
 			**/
 			void pop();
@@ -113,10 +112,10 @@ namespace bitgraph {
 			void pop(std::size_t nb);
 
 			/**
-			* @brief Removes the bottom element of the stack.  from the top of the stack.
-			*		 (the element is lost)
+			* @brief Replaces the bottom element of the stack with the top element of the stack.
+			*		 (the bottom element is lost)
 			*
-			*		 I. The top element is moved to the bottomof the stack
+			*		 I. The top element is moved to the bottom of the stack
 			**/
 			void pop_bottom();
 
@@ -151,10 +150,10 @@ namespace bitgraph {
 			/////////////////////
 			// data members
 
-			std::size_t nE_;								//number of elements, used as internal index
+			std::size_t nE_;								//number of elements, used as internal index pointing to position of the top element + 1
 			T* stack_;										//underlying C-array (TODO - raw pointer ¿change to a std::vector?)		
 #ifdef DEBUG_STACKS
-			int MAX_;										//maximum number of elements	
+			int MAX_;										//capacity	
 #endif
 
 		};

@@ -592,7 +592,7 @@ namespace bitgraph {
 
 		int max_degree = 0, temp = 0;
 
-		for (int i = 0; i < ptype::NV_; ++i) {
+		for (auto i = 0; i <(int)ptype::NV_; ++i) {
 			temp = degree(i);
 			if (temp > max_degree)
 				max_degree = temp;
