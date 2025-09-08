@@ -68,6 +68,8 @@ namespace bitgraph {
 		//
 		// Manages coreness of vertices in a graph
 		// Manages core of a graph
+		// 
+		// TODO - verify graph is not changed (08/09/2025)
 		//
 		////////////////////
 
