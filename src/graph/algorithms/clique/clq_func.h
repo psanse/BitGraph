@@ -420,7 +420,7 @@ namespace bitgraph {
 			**/
 			template<class Graph_t>
 			inline
-				bool is_iset(Graph_t& g, typename Graph_t::_bbt& bb) {
+				bool is_iset(const Graph_t& g, typename Graph_t::_bbt& bb) {
 
 				int retVal = bb.init_scan(bbo::NON_DESTRUCTIVE);
 
@@ -459,7 +459,7 @@ namespace bitgraph {
 			**/
 			template<class Graph_t>
 			inline
-				bool is_iset(Graph_t& g, const std::vector<int>& lv) {
+				bool is_iset(const Graph_t& g, const std::vector<int>& lv) {
 
 				auto nV = lv.size();
 				if (nV == 0) return false;					////empty set is not an independent set
@@ -487,7 +487,7 @@ namespace bitgraph {
 			**/
 			template<class Graph_t>
 			inline
-				bool is_iset(Graph_t& g, const std::vector<int>& lv, int v) {
+				bool is_iset(const Graph_t& g, const std::vector<int>& lv, int v) {
 
 				if (lv.empty()) return true;
 
@@ -511,7 +511,7 @@ namespace bitgraph {
 			**/
 			template<class Graph_t>
 			inline
-				bool is_clique(Graph_t& g, typename Graph_t::_bbt& bb) {
+				bool is_clique(const Graph_t& g, typename Graph_t::_bbt& bb) {
 
 				int retVal = bb.init_scan(bbo::NON_DESTRUCTIVE);
 
@@ -550,7 +550,7 @@ namespace bitgraph {
 			**/
 			template<class Graph_t>
 			inline
-				bool is_clique(Graph_t& g, const std::vector<int>& lv) {
+				bool is_clique(const Graph_t& g, const std::vector<int>& lv) {
 
 				auto nV = lv.size();
 				if (nV == 0) return false;					//an empty set is not a clique
@@ -577,7 +577,7 @@ namespace bitgraph {
 			**/
 			template<class Graph_t>
 			inline
-				bool is_clique(Graph_t& g, int lv[], std::size_t size) {
+				bool is_clique(const Graph_t& g, int lv[], std::size_t size) {
 
 				if (size == 0) return false;					//an empty set is not a clique
 
@@ -604,7 +604,7 @@ namespace bitgraph {
 			**/
 			template<class Graph_t>
 			inline
-				bool is_clique(Graph_t& g, const std::vector<int>& lv, int v) {
+				bool is_clique(const Graph_t& g, const std::vector<int>& lv, int v) {
 
 				if (lv.empty()) return true;
 
