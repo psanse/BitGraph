@@ -184,8 +184,13 @@ TEST(Graph, move_constructor) {
 	EXPECT_EQ("brock200_2.clq", gc.name());	
 	/////////////////////////////////////////////
 
-}
 
+	//moved-from object is in a valid state (size is not assumed).
+	//can be reused with reset().
+	EXPECT_EQ(0, g.reset(3));
+	EXPECT_EQ(3, g.number_of_vertices());
+	EXPECT_EQ(0, g.number_of_edges());
+}
 
 
 TEST_F(GraphTest, name) {
