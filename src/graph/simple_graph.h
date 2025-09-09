@@ -330,6 +330,8 @@ namespace bitgraph {
 			**/
 			template <class U>
 			friend bool operator ==	 (const Graph<U>& lhs, const Graph<U>& rhs);
+			template <class U>
+			friend bool operator !=	 (const Graph<U>& lhs, const Graph<U>& rhs);
 
 			////////////
 			// Read / write basic operations
@@ -452,6 +454,11 @@ namespace bitgraph {
 		template <class U>
 		bool operator== (const Graph<U>& lhs, const Graph<U>& rhs) {
 			return lhs.adj_ == rhs.adj_;
+		}
+
+		template <class U>
+		bool operator!= (const Graph<U>& lhs, const Graph<U>& rhs) {
+			return lhs.adj_ != rhs.adj_;
 		}
 
 	} // namespace _impl  
