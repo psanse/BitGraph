@@ -42,7 +42,7 @@ namespace bitgraph {
 			**/
 			template<class Graph_t>
 			inline
-				int find_iset(Graph_t& g, int lv[], unsigned int begin, unsigned int end) {
+				int find_iset(const Graph_t& g, int lv[], unsigned int begin, unsigned int end) {
 
 				////////////////////////
 				assert(begin <= end);
@@ -82,7 +82,7 @@ namespace bitgraph {
 			**/
 			template<class Graph_t>
 			inline
-				int find_iset(Graph_t& g, int v, int lv[], unsigned int begin, unsigned int end) {
+				int find_iset(const Graph_t& g, int v, int lv[], unsigned int begin, unsigned int end) {
 
 				////////////////////////
 				assert(begin <= end);
@@ -128,7 +128,7 @@ namespace bitgraph {
 			**/
 			template<class Graph_t>
 			inline
-				int find_clique(Graph_t& g, std::vector<int>& clq, int lv[], unsigned int begin, unsigned int end) {
+				int find_clique(const Graph_t& g, std::vector<int>& clq, int lv[], unsigned int begin, unsigned int end) {
 
 				////////////////////////
 				assert(begin <= end);
