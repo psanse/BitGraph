@@ -718,7 +718,7 @@ namespace bitgraph {
 					lb++;
 
 					//optimization of bb &= g.get_neighbors(w);	
-					if constexpr (Reverse) {
+					if /* constexpr */ (Reverse) {
 						for (auto nBB = WDIV(v); nBB >= 0; --nBB) {
 							bb.block(nBB) &= g.neighbors(v).block(nBB);
 						}
@@ -762,7 +762,7 @@ namespace bitgraph {
 					/////////////////////////////
 					if (v == bbo::noBit) break;
 					///////////////////////////////
-
+					
 					//v fixed in the clique
 					lb++;
 

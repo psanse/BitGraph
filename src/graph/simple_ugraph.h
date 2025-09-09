@@ -67,7 +67,7 @@ namespace bitgraph {
 			**/
 			Ugraph(std::size_t n, int* adj[], string name);			//old-style adjacency matrix
 
-			//TODO- copy constructor, move constructor, copy operator =, move operator = (1/1/2025)
+			//TODO***- copy constructor, move constructor, copy operator =, move operator = (1/1/2025)
 
 			//destructor
 			~Ugraph() = default;

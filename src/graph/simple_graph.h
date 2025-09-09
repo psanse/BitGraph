@@ -54,9 +54,9 @@ namespace bitgraph {
 
 		public:
 
-			using type = Graph<BitSetT>;				//own type
+			using type = Graph<BitSetT>;			//own type
 			using basic_type = BitSetT;				//basic type (a type of bitset)
-			using _bbt = basic_type;			//alias for basic type - for backward compatibility
+			using _bbt = basic_type;				//alias for basic type - for backward compatibility
 
 			/////////////			
 			//construction / destruction
@@ -396,13 +396,13 @@ namespace bitgraph {
 			////////////
 			// I/O basic operations
 
-				/**
-				* @brief prints basic data of the graph to the output stream (n, m and density)
-				* @param lazy if TRUE, reads the number of edges from the cached value @NE_ to compute density
-				* @details Uses the Template Method Pattern (number_of_edges will be overriden in derived classes)
-				* @details Density can be a heavy operation to compute, since it requires the number of edges.
-				*		   If  @lazy is TRUE the number of edges is read from the cached value @NE_
-				**/
+			/**
+			* @brief prints basic data of the graph to the output stream (n, m and density)
+			* @param lazy if TRUE, reads the number of edges from the cached value @NE_ to compute density
+			* @details Uses the Template Method Pattern (number_of_edges will be overriden in derived classes)
+			* @details Density can be a heavy operation to compute, since it requires the number of edges.
+			*		   If  @lazy is TRUE the number of edges is read from the cached value @NE_
+			**/
 			ostream& print_data(bool lazy = true, std::ostream & = std::cout, bool eofl = true);
 
 			/**
@@ -426,7 +426,7 @@ namespace bitgraph {
 			//////////////////////////
 			// data members
 		protected:
-			std::vector<BitSetT> adj_;			//adjacency matrix 
+			std::vector<BitSetT> adj_;		//adjacency matrix 
 			std::size_t NV_;				//number of vertices
 			BITBOARD NE_;					//number of edges (updated on the fly)
 			std::size_t NBB_;				//number of bit blocks per row (in the case of sparse graphs this is a maximum value)
