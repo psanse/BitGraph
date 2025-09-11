@@ -72,7 +72,8 @@ namespace bitgraph{
 				* @brief Configures the initial block and bit position for bitscanning
 				*		 according to one of the 4 scan types passed as argument
 				* @param sct: type of scan
-				* @returns 0 if successful, -1 otherwise  (now exits the program (08/07/2025))
+				* @returns 0 if successful, -1 otherwise  (substituted by fail-safe policy in (08/07/2025))
+				* @details: fail-safe policy, program terminates with -1 code  if error
 				**/
 			virtual inline	int init_scan (scan_types sct) noexcept ;
 
@@ -83,7 +84,8 @@ namespace bitgraph{
 			*		 If firstBit is -1 (BBObject::noBit), the scan starts from the beginning.
 			* @param firstBit: starting bit
 			* @param sct: type of scan
-			* @returns 0 if successful, -1 otherwise (now exits the program (08/07/2025))
+			* @returns 0 if successful, -1 otherwise (substituted by fail-safe policy in (08/07/2025))
+			* @details: fail-safe policy, program terminates with -1 code  if error
 			*
 			* TODO - no firstBit information is configured for DESTRUCTIVE scan types (08/02/2025)
 			**/
@@ -506,11 +508,8 @@ namespace bitgraph {
 		case DESTRUCTIVE_REVERSE:
 			scan_block(nBB_ - 1);
 			break;
-		default:
-			LOG_ERROR("unknown scan type - BBScan::::init_scan");
-			assert(false);
-			//throw BitScanError("unknown scan type in BBScan::init_scan");		
-			//return -1;
+		default:			
+			assert(false && "unknown scan type - BBScan::init_scan");			
 		}
 
 		return 0;

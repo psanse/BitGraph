@@ -855,13 +855,13 @@ namespace bitgraph {
 
 					//build a new iset with vertices from bb_sel
 					bb_sel.init_scan(bbo::DESTRUCTIVE);
-					while ((v = bb_sel.next_bit_del()) != bbo::noBit) {
+					while ((v = bb_sel.next_bit_del(bb_unsel)) != bbo::noBit) {
 
 						//update coloring
 						if (ub) { ub[v] = col; }
 
 						//remove colored vertex from bbsg
-						bb_unsel.erase_bit(v);
+						//bb_unsel.erase_bit(v);
 
 						/////////////////////////////////
 						if ((--pc) == 0) { return col; }				//early exit - all vertices colored
