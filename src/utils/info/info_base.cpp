@@ -17,12 +17,10 @@ using namespace bitgraph;
 ////////////////////////
 // friend functions of infoBase
 namespace bitgraph {
-
 	namespace com {
 		ostream& operator<< (ostream& o, const infoBase& info) {
 			return info.printReport(o);
 		}
-
 	}
 }
 
@@ -36,9 +34,6 @@ std::ostream& infoBase::printParams(std::ostream& o) const
 	o << "NAME:" << data_.name << "\t N:" << data_.N << "\t M:" << data_.M << "\t D:" << 2 * data_.M / (float)((data_.N - 1) * data_.N) << endl;
 	o << "TIME_LIMIT:" << data_.TIME_OUT << endl;
 	o << "TIME_LIMIT_HEUR:" << data_.TIME_OUT_HEUR << endl;
-	/*o << "ALG:" << algSearch_ << endl;
-	o << "SORTING:" << algSort_ << endl;
-	o << "HEUR:" << algHeur_ << endl;*/
 	o << "*****************************" << endl;
 
 	return o;
@@ -46,7 +41,7 @@ std::ostream& infoBase::printParams(std::ostream& o) const
 std::ostream& infoBase::printTimers(std::ostream& o) const
 {
 	o << "*****************************\n";
-	o << "time_parse:" << timeParse_ << endl;
+	o << "time_parse:" << data_.timeElapsed << endl;
 	o << "time_preproc:" << timePreproc_ << endl;
 	o << "time_incumbent:" << timeIncumbent_ << endl;
 	o << "time_search:" << timeSearch_ << endl;
@@ -57,13 +52,26 @@ std::ostream& infoBase::printTimers(std::ostream& o) const
 	return o;
 }
 
-std::ostream& infoBase::printReport(std::ostream& o, bool is_endl) const
+std::ostream& infoBase::printReport( std::ostream& o, report_t r, bool is_endl) const
 {
-	o << data_.name << "\t" << data_.N << "\t" << data_.M << "\t" << data_.TIME_OUT << "\t" << data_.TIME_OUT_HEUR << "\t"
-		/*<< algSearch_ << "\t"
-		<< algSort_ << "\t"
-		<< algHeur_ << "\t"*/
-		<< timeParse_ << "\t" << timePreproc_ << "\t" << timeIncumbent_ << "\t" << timeSearch_ << "\t";
+	if (r == report_t::TABLE) {
+		o << data_.name << "\t" << data_.N << "\t" << data_.M << "\t" 
+			<< data_.TIME_OUT << "\t" << data_.TIME_OUT_HEUR << "\t"
+			<< data_.timeElapsed << "\t" << timePreproc_ << "\t" << timeIncumbent_ << "\t" << timeSearch_ << "\t";
+	}
+	if (r == report_t::VERBOSE) {
+		o << "*****************************\n";
+		o <<"NAME:"<< data_.name
+		  << "\nN:" << data_.N
+		  << "\nM:" << data_.M
+		  << "\nTIME_OUT(s):" << data_.TIME_OUT
+		  << "\nTIME_OUT_HEUR(s):" << data_.TIME_OUT_HEUR
+		  << "\nTIME_PARSE(s):"	<< data_.timeElapsed
+		  << "\nTIME_PREPROC(s):" << timePreproc_
+		  << "\nTIME_INCUMBENT(s):" << timeIncumbent_ 
+		  << "\nTIME_SEARCH(s)" << timeSearch_;
+		o << "\n*******************************";
+	}
 
 	if (is_endl) {	o << endl;	}
 
@@ -80,10 +88,7 @@ void infoBase::startTimer(phase_t t)
 	case phase_t::PREPROC:
 		startTimePreproc_ = PrecisionTimer::clock_t::now();
 		//resetPreprocInfo();					//CHECK()?
-		break;
-	case phase_t::PARSE:
-		startTimeParse_ = PrecisionTimer::clock_t::now();
-		break;
+		break;	
 	case phase_t::LAST_INCUMBENT:
 		startTimeIncumbent_ = PrecisionTimer::clock_t::now();
 		break;
@@ -97,20 +102,13 @@ void infoBase::startTimer(phase_t t)
 
 void infoBase::clearTimer(phase_t t) {
 	switch (t) {
-	case phase_t::SEARCH:
-		//startTimeSearch_ = startTimeSearch_();
+	case phase_t::SEARCH:		
 		timeSearch_ = 0.0;
-		break;
-	case phase_t::PARSE:
-		//startTimeParse_ = startTimeParse_();
-		timeParse_ = 0.0;
-		break;
-	case phase_t::PREPROC:
-		//startTimePreproc_ = startTimePreproc_();
+		break;	
+	case phase_t::PREPROC:	
 		timePreproc_ = 0.0;
 		break;
-	case phase_t::LAST_INCUMBENT:
-		//startTimeIncumbent_ = startTimeIncumbent_();
+	case phase_t::LAST_INCUMBENT:		
 		timeIncumbent_ = 0.0;
 		break;
 	default:
@@ -120,11 +118,11 @@ void infoBase::clearTimer(phase_t t) {
 	}
 }
 
-void infoBase::clearAllTimers() {
-	clearTimer(phase_t::SEARCH);
-	clearTimer(phase_t::PARSE);
+void infoBase::clearAllTimers() {	
+	//clearTimer(phase_t::PARSE);
 	clearTimer(phase_t::PREPROC);
 	clearTimer(phase_t::LAST_INCUMBENT);
+	clearTimer(phase_t::SEARCH);
 }
 
 double infoBase::readTimer(phase_t t)
@@ -140,11 +138,7 @@ double infoBase::readTimer(phase_t t)
 	case phase_t::PREPROC:
 		timePreproc_ = com::_time::toDouble(endTime - startTimePreproc_);
 		elapsedTime = timePreproc_;
-		break;
-	case phase_t::PARSE:
-		timeParse_ = com::_time::toDouble(endTime - startTimeParse_);
-		elapsedTime = timeParse_;
-		break;
+		break;	
 	case phase_t::LAST_INCUMBENT:
 		timeIncumbent_ = com::_time::toDouble(endTime - startTimeIncumbent_);
 		elapsedTime = timeIncumbent_;
@@ -158,14 +152,6 @@ double infoBase::readTimer(phase_t t)
 
 	return elapsedTime;
 }
-
-//double infoBase::elapsedTime(tpoint_t startTime)
-//{
-//	tpoint_t endTime = PrecisionTimer::clock_t::now();
-//	return com::_time::toDouble(endTime - startTime);
-//
-//}
-
 
 void infoBase::clear(bool lazy) {
 	clearAllTimers();

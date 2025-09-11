@@ -27,14 +27,26 @@ namespace bitgraph {
 		//////////////////////////
 		struct paramBase {
 
+			using tpoint_t = PrecisionTimer::timepoint_t;
+
 			std::string name = "";											//instance name
 			uint32_t N = 0;													//number of vertices
 			uint64_t M = 0;													//number of edges			
 			double TIME_OUT = std::numeric_limits<double>::max();			//in seconds
 			double TIME_OUT_HEUR = std::numeric_limits<double>::max();		//in seconds
-
+			
 			int nThreads = 1;												// number of threads
-			bool unrolled = false;											// loop unrolling - possibly deprecated
+			bool unrolled = false;											// loop unrolling - deprecated
+			
+			tpoint_t startTime;
+			double timeElapsed = 0;											//timer included, e.g., measure parse time
+
+			void startTimer() { startTime = PrecisionTimer::clock_t::now(); }
+			double readTimer() {  
+				timeElapsed = com::_time::toDouble(PrecisionTimer::clock_t::now() - startTime); 
+				return timeElapsed;
+			}
+			
 
 			virtual void reset() {
 				name = "";
@@ -53,7 +65,8 @@ namespace bitgraph {
 					<< "\nM: " << M
 					<< "\nTOUT(s): " << TIME_OUT
 					<< "\nTOUT_HEUR(s): " << TIME_OUT_HEUR
-					<< "\nnTHREADS: " << nThreads;
+					<< "\nnTHREADS: " << nThreads
+					<< "\nTIME_PARSE(s): " << timeElapsed;
 				//  << "\nunrolled: " << std::boolalpha << unrolled;
 				if (endl) o << std::endl;
 				return o;
@@ -78,6 +91,7 @@ namespace bitgraph {
 			using tpoint_t = PrecisionTimer::timepoint_t;
 
 			enum phase_t { SEARCH = 0, PREPROC, LAST_INCUMBENT, PARSE };
+			enum report_t { VERBOSE = 0, TABLE = 1};
 
 			/*
 			* @brief determines elapsed time from @start_time to now in seconds
@@ -86,7 +100,7 @@ namespace bitgraph {
 			* @details: utility for time measurement outside the class
 			* @details - moved to utilities utils::com::_time namespace (common.h) 31/08/2025
 			*/
-			//static double elapsedTime(tpoint_t start_time);
+			//static d ouble elapsedTime(tpoint_t start_time);
 
 			//////////////////////
 			//data members
@@ -94,8 +108,8 @@ namespace bitgraph {
 			paramBase data_;						//general info
 
 			// timers
-			tpoint_t startTimeParse_;
-			double timeParse_ = 0;					//parsing time(in seconds)
+			//tpoint_t startTimeParse_;
+			//double timeParse_ = 0;					//parsing time(in seconds)
 			tpoint_t startTimePreproc_;
 			double timePreproc_ = 0;				//preprocessing time(in seconds)
 			tpoint_t startTimeSearch_;
@@ -122,7 +136,7 @@ namespace bitgraph {
 			int number_of_threads() const  noexcept { return data_.nThreads; }
 			uint32_t recursion_calls_per_tout_check() const noexcept { return numStepsTimeOutCheck; }
 
-			double parsing_time() const { return timeParse_; }
+			double parsing_time() const { return data_.timeElapsed; }
 			double preprocessing_time() const { return timePreproc_; }
 			double search_time() const { return timeSearch_; }
 			double incumbent_time() const { return timeIncumbent_; }
@@ -131,7 +145,7 @@ namespace bitgraph {
 			//setters - only for general info, timers should not be set manually
 						
 			void name(std::string name) { data_.name = std::move(name); }
-			void number_of_vertices(uint32_t n) { data_.N = n; }
+			void number_of_vertices(uint32_t N) { data_.N = N; }
 			void number_of_edges(uint64_t m) { data_.M = m; }
 			void time_out(double t) { data_.TIME_OUT = t; }
 			void time_out_heur(double t) { data_.TIME_OUT_HEUR = t; }
@@ -186,7 +200,7 @@ namespace bitgraph {
 			*
 			* TODO Add @K_ to ouput conditionally
 			*/
-			virtual std::ostream& printReport(std::ostream& o = std::cout, bool is_endl = true) const;
+			virtual std::ostream& printReport(std::ostream& o = std::cout, report_t r = report_t::TABLE, bool is_endl = true) const;
 
 			/*
 			* @brief streams gereral info
@@ -204,7 +218,7 @@ namespace bitgraph {
 
 		};
 
-	}//namespace com
+	}//end namespace com
 
 	using com::paramBase;
 	using com::infoBase;
