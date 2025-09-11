@@ -91,7 +91,7 @@ namespace bitgraph {
 			//////////////////////
 			//data members
 			
-			paramBase data_;							//general info
+			paramBase data_;						//general info
 
 			// timers
 			tpoint_t startTimeParse_;
@@ -103,6 +103,7 @@ namespace bitgraph {
 			tpoint_t startTimeIncumbent_;
 			double timeIncumbent_ = 0;				//time when last new incumbent was found (in seconds)
 
+			uint32_t numStepsTimeOutCheck = 100;	//number of recursions before timeout is checked
 
 			///////////////////////
 			//constructors / destructor
@@ -119,6 +120,7 @@ namespace bitgraph {
 			double time_out() const noexcept { return data_.TIME_OUT; };
 			double time_out_heur() const noexcept { return data_.TIME_OUT_HEUR; }
 			int number_of_threads() const  noexcept { return data_.nThreads; }
+			uint32_t recursion_calls_per_tout_check() const noexcept { return numStepsTimeOutCheck; }
 
 			double parsing_time() const { return timeParse_; }
 			double preprocessing_time() const { return timePreproc_; }
@@ -134,7 +136,7 @@ namespace bitgraph {
 			void time_out(double t) { data_.TIME_OUT = t; }
 			void time_out_heur(double t) { data_.TIME_OUT_HEUR = t; }
 			void number_of_threads(int n) { data_.nThreads = n; }
-
+			void recursion_calls_per_tout_check(uint32_t n) { numStepsTimeOutCheck = n; }
 
 			//timers
 			/*
