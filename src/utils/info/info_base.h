@@ -1,7 +1,7 @@
 /**
  *@file info_base.h
 * @brief: interface for result logs of clique and clique-based algorithms
- *@details: created 12/12/2024, last_update 13/23/2024
+ *@details: created 12/12/2024, last_update 12/09/2025
  *@dev pss
  **/
 
@@ -39,7 +39,7 @@ namespace bitgraph {
 			bool unrolled = false;											// loop unrolling - deprecated
 			
 			tpoint_t startTime;
-			double timeElapsed = 0;											//timer included, e.g., measure parse time
+			double timeElapsed = 0;											//timer included, e.g., measure parsing time
 
 			void startTimer() { startTime = PrecisionTimer::clock_t::now(); }
 			double readTimer() {  
@@ -107,9 +107,7 @@ namespace bitgraph {
 			
 			paramBase data_;						//general info
 
-			// timers
-			//tpoint_t startTimeParse_;
-			//double timeParse_ = 0;					//parsing time(in seconds)
+			// timers			
 			tpoint_t startTimePreproc_;
 			double timePreproc_ = 0;				//preprocessing time(in seconds)
 			tpoint_t startTimeSearch_;
