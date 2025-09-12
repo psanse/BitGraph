@@ -40,15 +40,14 @@ std::ostream& infoBase::printParams(std::ostream& o) const
 }
 std::ostream& infoBase::printTimers(std::ostream& o) const
 {
-	o << "*****************************\n";
-	o << "time_parse:" << data_.timeElapsed << endl;
-	o << "time_preproc:" << timePreproc_ << endl;
-	o << "time_incumbent:" << timeIncumbent_ << endl;
-	o << "time_search:" << timeSearch_ << endl;
-	o << "TIME_OUT(s):" << data_.TIME_OUT << endl;
-	o << "TIME_OUT_HEUR(s):" << data_.TIME_OUT_HEUR << endl;
-	o << "*****************************" << endl;
-
+	o << "*****************************";
+	o << "\ntime_parse:" << data_.timeElapsed
+		<< "\ntime_preproc:" << timePreproc_
+		<< "\ntime_incumbent:" << timeIncumbent_
+		<< "\ntime_search:" << timeSearch_
+		<< "\nTIME_OUT(s):" << data_.TIME_OUT
+		<< "\nTIME_OUT_HEUR(s):" << data_.TIME_OUT_HEUR;
+	
 	return o;
 }
 
@@ -60,8 +59,8 @@ std::ostream& infoBase::printReport( std::ostream& o, report_t r, bool is_endl) 
 			<< data_.timeElapsed << "\t" << timePreproc_ << "\t" << timeIncumbent_ << "\t" << timeSearch_ << "\t";
 	}
 	if (r == report_t::VERBOSE) {
-		o << "*****************************\n";
-		o <<"NAME:"<< data_.name
+		o << "\n*****************************";
+		o <<"\nNAME:"<< data_.name
 		  << "\nN:" << data_.N
 		  << "\nM:" << data_.M
 		  << "\nTIME_OUT(s):" << data_.TIME_OUT
@@ -70,7 +69,6 @@ std::ostream& infoBase::printReport( std::ostream& o, report_t r, bool is_endl) 
 		  << "\nTIME_PREPROC(s):" << timePreproc_
 		  << "\nTIME_INCUMBENT(s):" << timeIncumbent_ 
 		  << "\nTIME_SEARCH(s)" << timeSearch_;
-		o << "\n*******************************";
 	}
 
 	if (is_endl) {	o << endl;	}
