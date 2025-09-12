@@ -90,8 +90,8 @@ namespace bitgraph {
 
 			using tpoint_t = PrecisionTimer::timepoint_t;
 
-			enum phase_t { SEARCH = 0, PREPROC, LAST_INCUMBENT, PARSE };
-			enum report_t { VERBOSE = 0, TABLE = 1};
+			enum class phase_t { SEARCH = 0, PREPROC, LAST_INCUMBENT, PARSE };
+			enum class report_t { VERBOSE = 0, TABLE = 1};
 
 			/*
 			* @brief determines elapsed time from @start_time to now in seconds
