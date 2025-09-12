@@ -838,7 +838,7 @@ namespace bitgraph {
 			**/
 			template<class Graph_t>
 			inline
-				int SEQ(const Graph_t& g, const typename Graph_t::_bbt& bbsg, int* ub = nullptr) {
+				int ISEQ(const Graph_t& g, const typename Graph_t::_bbt& bbsg, int* ub = nullptr) {
 
 				int pc = bbsg.size();
 				if (pc == 0) { return 0; }			//early exit - bitset bbsg is empty	
