@@ -288,7 +288,7 @@ namespace bitgraph {
 					//so continue iterating, else STOP
 				} while (pcmax > 0);
 
-				return clq.size();
+				return (int)clq.size();
 			}
 
 			/**
@@ -346,7 +346,7 @@ namespace bitgraph {
 					if (clq.size() < clq_curr.size()) { clq = clq_curr; }
 				}
 
-				return clq.size();
+				return (int)clq.size();
 			}
 		}
 

@@ -87,7 +87,7 @@ namespace bitgraph {
 			void path(std::string path_name) { path_ = std::move(path_name); }
 			std::string path()					const { return path_; }
 
-			std::size_t number_of_vertices()					const { return NV_; }
+			std::size_t number_of_vertices()	const { return NV_; }
 			std::size_t size()					const { return NV_; }
 
 			/**
@@ -853,7 +853,7 @@ namespace bitgraph {
 		int Graph<BitSetT>::read_01(const string& filename) noexcept {
 
 
-		int size, val;
+		int size;
 		char ch, line[250];
 
 		fstream f(filename.c_str());
