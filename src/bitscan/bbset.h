@@ -448,7 +448,7 @@ namespace bitgraph {
 			inline BitSet& erase_bit();
 
 			/**
-			* @brief Removes the bits from the bitstring bitset inside the population range.
+			* @brief Removes the bits from the bitstring @bitset inside the population range.
 			*
 			*		 I. bitset must have a maximum population
 			*			greater or equal than the bitstring.
@@ -457,6 +457,17 @@ namespace bitgraph {
 			* @returns reference to the modified bitstring
 			**/
 			inline	BitSet& erase_bit(const BitSet& bitset);
+
+			/**
+			* @brief Removes the bits  from the bitstring @bitset inside the  closed range [firstBit, lastBit] 
+			* 
+			*		 I. bitset must have a maximum population
+			*			greater or equal than the bitstring.
+			*
+			* @details  Equivalent to a set minus operation
+			* @returns reference to the modified bitstring
+			**/
+			inline BitSet& erase_bit(int firstBit, int lastBit, const const BitSet& bitset);
 
 			/**
 			* @brief Removes the 1-bits from both input bitstrings (their union)
@@ -590,14 +601,16 @@ namespace bitgraph {
 			* @param firstBit, lastBit: closed range of bits (0<=firstBit<=lastBit)
 			* @param bit: contains the singleton bit if it exists or -1
 			* @returns  0 if range is empty, 1 if singleton, -1 if more than one bit exists in the range
+			*			IMPORTANT: if any bitset is empty in the range, the result is 0 (disjoint), , bit = -1 
 			**/
 			inline  int  find_singleton(int firstBit, int lastBit, int& bit)		const;
 
 			/**
-			* @brief Determines the single 1-bit common to both this and rhs bitstring
+			* @brief Determines the single 1-bit common to both this and rhs bitstring.			*		 
 			* @param rhs: input bitstring
 			* @param bit:  1-bit index or -1 if not single disjoint
-			* @returns 0 if disjoint, 1 if intersection is a single bit, -1 otherwise (more than 1-bit in common)
+			* @returns 0 if disjoint,  1 if intersection is a single bit, -1 otherwise (more than 1-bit in common)
+			*		   IMPORTANT: if any bitset is empty, the result is 0 (disjoint), bit = -1
 			**/
 			inline int	find_common_singleton(const BitSet& rhs, int& bit)			const;
 
@@ -1508,7 +1521,6 @@ namespace bitgraph{
 			return pc;
 		}
 
-
 		int BitSet::find_diff_pair(const BitSet& rhs, int& bit1, int& bit2) const {
 
 			int pc = 0;
@@ -1560,8 +1572,7 @@ namespace bitgraph{
 			//pc=0, 1, 2 (size of the set difference)
 			return pc;
 		}
-
-		
+			
 
 		BitSet& BitSet::erase_bit(const BitSet& bbn) {
 
@@ -1569,6 +1580,49 @@ namespace bitgraph{
 				vBB_[i] &= ~bbn.vBB_[i];
 			}
 
+			return *this;
+		}
+
+		BitSet& BitSet::erase_bit(int firstBit, int lastBit, const const BitSet& bbn) {
+
+			//general comment: low - WMUL(bbl) = WMOD(bbl) but supposed to be less expensive (CHECK 01/02/25)
+
+			/////////////////////////////////////////////////////////////////
+			assert(firstBit >= 0 && (firstBit <= lastBit || lastBit == -1));
+			///////////////////////////////////////////////////////////////////
+
+			int bbl = WDIV(firstBit);
+			int bbh = (lastBit == -1) ? nBB_ - 1 : WDIV(lastBit);
+
+			//special case - both ends in the same bitblock
+			if (bbl == bbh)
+			{
+				if (lastBit == -1) {
+					vBB_[bbh] &= ~(bbn.vBB_[bbh] & bblock::MASK_1_HIGH(firstBit - WMUL(bbl)));					
+				}
+				else {
+					vBB_[bbh] &= ~(bbn.vBB_[bbh] & bblock::MASK_1(firstBit - WMUL(bbl), lastBit - WMUL(bbh)));					
+				}
+			}
+			else
+			{
+				//set to one the intermediate blocks
+				for (int i = bbl + 1; i < bbh; ++i) {
+					vBB_[i] &= ~bbn.vBB_[i];
+				}
+
+				//last bitblock
+				if (lastBit == -1) {
+					vBB_[bbh] &= ~bbn.vBB_[bbh];
+				}
+				else {
+					vBB_[bbh] &= ~(bbn.vBB_[bbh] & bblock::MASK_1_LOW(lastBit - WMUL(bbh)));
+				}
+
+				//first  bitblock
+				vBB_[bbl] &= ~(bbn.vBB_[bbl] & bblock::MASK_1_HIGH(firstBit - WMUL(bbl)));				
+			}
+			
 			return *this;
 		}
 
@@ -1581,7 +1635,6 @@ namespace bitgraph{
 
 			return *this;
 		}
-
 
 		BitSet& BitSet::erase_block(int FirstBlock, int LastBlock, const BitSet& bb_lhs, const BitSet& bb_rhs) {
 
@@ -1598,7 +1651,6 @@ namespace bitgraph{
 
 			return *this;
 		}
-
 
 		BitSet& BitSet::erase_block(int firstBlock, int lastBlock, const BitSet& bb_del) {
 
