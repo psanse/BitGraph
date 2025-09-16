@@ -13,6 +13,7 @@
 #include <iostream>
 #include <sstream>
 #include <random>								
+#include <cassert>
 
 #include "utils/common.h"
 #include "graph/simple_ugraph.h"
@@ -56,6 +57,7 @@ namespace bitgraph {
 			//constructor
 			random_attr_t(std::size_t nLB, std::size_t  nUB, double pLB, double pUB, std::size_t  nRep, std::size_t  incN, double incP) {
 				set(nLB, nUB, pLB, pUB, nRep, incN, incP);
+				assert(nLB <= nUB && pLB <= pUB && incP > 0 && "bad parameters - random_attr_t");
 			}
 
 			//setter
