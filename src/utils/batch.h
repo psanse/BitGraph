@@ -42,6 +42,7 @@ public:
 	* @brief clears all tests - deallocates memory
 	**/
 	void clear(){ tests.clear(); }
+		
 	
 	
 /////////
