@@ -73,7 +73,6 @@ TEST_F(InfoBaseTest, ClearTimers) {
 
 	info.clear(false);
 
-	EXPECT_DOUBLE_EQ(info.timeParse_, 0.0);
 	EXPECT_DOUBLE_EQ(info.timePreproc_, 0.0);
 	EXPECT_DOUBLE_EQ(info.timeSearch_, 0.0);
 	EXPECT_DOUBLE_EQ(info.timeIncumbent_, 0.0);
@@ -129,13 +128,6 @@ TEST_F(InfoBaseTest, printReport) {
 
 // Asegúrate de que los enums de phase_t estén definidos correctamente en infoBase
 
-TEST_F(InfoBaseTest, StartAndReadTimerParse) {
-	info.startTimer(infoBase::phase_t::PARSE);
-	std::this_thread::sleep_for(std::chrono::milliseconds(100));
-	double elapsed = info.readTimer(infoBase::phase_t::PARSE);
-	EXPECT_GE(elapsed, 0.09);
-	EXPECT_LE(elapsed, 0.2);
-}
 
 TEST_F(InfoBaseTest, StartAndReadTimerPreproc) {
 	info.startTimer(infoBase::phase_t::PREPROC);
@@ -162,17 +154,16 @@ TEST_F(InfoBaseTest, ClearTimerResetsIndividualTimer) {
 }
 
 TEST_F(InfoBaseTest, ClearTimersResetsAllTimers) {
-	info.startTimer(infoBase::phase_t::PARSE);
+	
 	info.startTimer(infoBase::phase_t::PREPROC);
 	info.startTimer(infoBase::phase_t::SEARCH);
 	info.startTimer(infoBase::phase_t::LAST_INCUMBENT);
 	std::this_thread::sleep_for(std::chrono::milliseconds(10));
-	info.readTimer(infoBase::phase_t::PARSE);
+	
 	info.readTimer(infoBase::phase_t::PREPROC);
 	info.readTimer(infoBase::phase_t::SEARCH);
 	info.readTimer(infoBase::phase_t::LAST_INCUMBENT);
 	info.clearAllTimers();
-	EXPECT_DOUBLE_EQ(info.timeParse_, 0.0);
 	EXPECT_DOUBLE_EQ(info.timePreproc_, 0.0);
 	EXPECT_DOUBLE_EQ(info.timeSearch_, 0.0);
 	EXPECT_DOUBLE_EQ(info.timeIncumbent_, 0.0);

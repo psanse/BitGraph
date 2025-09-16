@@ -305,7 +305,7 @@ TEST(Clique, SEQ_coloring) {
 
 	////////////////////////////////////////
 	int ub[NV];
-	int nCol = gfunc::clq::SEQ(ug, bbsg, ub);
+	int nCol = gfunc::clq::ISEQ(ug, bbsg, ub);
 	///////////////////////////////////////
 
 	EXPECT_EQ(3, nCol);		//{0, 2} {1, 3, 5} {4} - 3 colors
