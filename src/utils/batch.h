@@ -1,10 +1,8 @@
 /**
 * @file batch.h
-* @brief A templatized batch class to run tests of type AlgT (or derived) with Params ParamT
+* @brief A templatized batch class to run tests with parameter configuration ParamT
 *		 (Factory of tests)
-* 
-*		I. AlgT must have a constructor for ParamT
-* 		II. AlgVar_t should derive from AlgT (base of the hierarchy of algorithms)	
+* @details: the tested algorithms must have a constructor that takes ParamT as input
 **/
 
 #ifndef __BATCH_H__
@@ -13,7 +11,13 @@
 #include <vector>
 #include <memory>
 
-template <class AlgT, class ParamT>
+/// <summary>
+/// @brief: lightweight Batch class for tests with configuration ParamT
+/// @details: the tested algorithms must have a constructor that takes ParamT as input
+/// </summary>
+/// <typeparam name="ParamT"> configuration parameters </typeparam>
+
+template <class ParamT>
 class Batch{
 public:
 
@@ -22,7 +26,7 @@ public:
 
 	//getters and setters
 	int number_of_tests				()			{ return tests.size(); }
-std::unique_ptr<AlgT>& get_test	(int id)	{ return tests[id]; }
+	ParamT& get_test				(int id)	{ return tests[id]; }
 
 /////////////////////////
 //basic operations
@@ -30,32 +34,20 @@ std::unique_ptr<AlgT>& get_test	(int id)	{ return tests[id]; }
 	/**
 	* @brief adds tests of type AlgVar_t (derived from AlgT)  - deallocates memory
 	**/
-	template<class AlgVar_t =  AlgT>
-	void add_test			(ParamT p)	{ tests.emplace_back( std::make_unique<AlgVar_t>(p) ); }
-
-	template<class AlgVar_t = AlgT>
-	void operator +=		(ParamT p) { tests.emplace_back( std::make_unique<AlgVar_t>(p)); }
+	void add_test			(const ParamT& p)	{ tests.emplace_back(p); }
+		
+	void operator +=		(const ParamT& p) { tests.emplace_back(p); }
 
 	/**
 	* @brief clears all tests - deallocates memory
 	**/
 	void clear(){ tests.clear(); }
 	
-	/**
-	* @brief runs all tests
-	**/
-	virtual void run_all_tests(){
-		for (auto& pTest : tests) {
-			//pTest->setup();
-			pTest->start();
-			//pTest->tear_down();
-		}
-	}
 	
 /////////
 //data members
 protected:
-	std::vector < std::unique_ptr<AlgT> > tests;
+	std::vector < ParamT > tests;
 };
 
 #endif
