@@ -1,10 +1,10 @@
 /**
 * @file batch.h
-* @brief A templatized batch class to run tests of type Alg_t (or derived) with Params Param_t
+* @brief A templatized batch class to run tests of type AlgT (or derived) with Params ParamT
 *		 (Factory of tests)
 * 
-*		I. Alg_t must have a constructor for Param_t
-* 		II. AlgVar_t should derive from Alg_t (base of the hierarchy of algorithms)	
+*		I. AlgT must have a constructor for ParamT
+* 		II. AlgVar_t should derive from AlgT (base of the hierarchy of algorithms)	
 **/
 
 #ifndef __BATCH_H__
@@ -13,28 +13,28 @@
 #include <vector>
 #include <memory>
 
-template <class Alg_t, class Param_t>
+template <class AlgT, class ParamT>
 class Batch{
 public:
 
 	//construction / destruction
-	~Batch() { clear(); }
+	virtual ~Batch() = default;			//TODO- use predefined destructor
 
 	//getters and setters
 	int number_of_tests				()			{ return tests.size(); }
-std::unique_ptr<Alg_t>& get_test	(int id)	{ return tests[id]; }
+std::unique_ptr<AlgT>& get_test	(int id)	{ return tests[id]; }
 
 /////////////////////////
 //basic operations
 
 	/**
-	* @brief adds tests of type AlgVar_t (derived from Alg_t)  - deallocates memory
+	* @brief adds tests of type AlgVar_t (derived from AlgT)  - deallocates memory
 	**/
-	template<class AlgVar_t =  Alg_t>
-	void add_test			(Param_t p)	{ tests.emplace_back( std::make_unique<AlgVar_t>(p) ); }
+	template<class AlgVar_t =  AlgT>
+	void add_test			(ParamT p)	{ tests.emplace_back( std::make_unique<AlgVar_t>(p) ); }
 
-	template<class AlgVar_t = Alg_t>
-	void operator +=		(Param_t p) { tests.emplace_back( std::make_unique<AlgVar_t>(p)); }
+	template<class AlgVar_t = AlgT>
+	void operator +=		(ParamT p) { tests.emplace_back( std::make_unique<AlgVar_t>(p)); }
 
 	/**
 	* @brief clears all tests - deallocates memory
@@ -55,7 +55,7 @@ std::unique_ptr<Alg_t>& get_test	(int id)	{ return tests[id]; }
 /////////
 //data members
 protected:
-	std::vector < std::unique_ptr<Alg_t> > tests;
+	std::vector < std::unique_ptr<AlgT> > tests;
 };
 
 #endif
