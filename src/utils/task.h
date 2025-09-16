@@ -24,26 +24,48 @@ namespace bitgraph {
 		* @return: task's return value or a default value if an exception is caught
 		* @details: the task MUST have a return value. The task, if required, must throw an exception derived from std::exception.
 		**/
+		//template<typename func_t, typename obj_t, typename... Args>
+		//inline
+		//typename std::result_of<func_t(obj_t&, Args...)>::type
+		//run_task_async(func_t func, obj_t& obj, Args&&... args) noexcept	
+		//{	
+		//	using ret_t = typename std::result_of<func_t(obj_t&, Args...)>::type;
+		//	ret_t value{};
+
+		//	//future to hold the result of the async task
+		//	std::future<ret_t> fut = std::async(std::launch::async, func, std::ref(obj), std::forward<Args>(args)...);
+		//	
+		//	try {
+		//		value = fut.get();		//can throw			
+		//	}
+		//	catch (std::exception& e) {
+		//		LOGG_ERROR("caught exception thrown by task: ", e.what(), "bitgraph::run_task_async");				
+		//	}
+
+		//	return value;
+		//}
+
 		template<typename func_t, typename obj_t, typename... Args>
 		inline
-		typename std::result_of<func_t(obj_t&, Args...)>::type
-		run_task_async(func_t func, obj_t& obj, Args&&... args) noexcept	
-		{	
-			using ret_t = typename std::result_of<func_t(obj_t&, Args...)>::type;
-			ret_t value{};
+			void
+			run_task_async(func_t func, obj_t& obj, Args&&... args) noexcept
+		{
+			/*using ret_t = typename std::result_of<func_t(obj_t&, Args...)>::type;
+			ret_t value{};*/
 
 			//future to hold the result of the async task
-			std::future<ret_t> fut = std::async(std::launch::async, func, std::ref(obj), std::forward<Args>(args)...);
-			
+			std::future<void> fut = std::async(std::launch::async, func, std::ref(obj), std::forward<Args>(args)...);
+
 			try {
-				value = fut.get();		//can throw			
+				fut.get();		//can throw			
 			}
 			catch (std::exception& e) {
-				LOGG_ERROR("caught exception thrown by task: ", e.what(), "bitgraph::run_task_async");				
+				LOGG_ERROR("caught exception thrown by task: ", e.what(), "bitgraph::run_task_async");
 			}
 
-			return value;
+			
 		}
+
 
 		/**
 		* @brief: Runs a task  asynchronously (different thread) to a callable object as a thread with generic params and waits for it to finish
@@ -51,27 +73,31 @@ namespace bitgraph {
 		* @return: task's return value or a default value if an exception is caught
 		* @details: the task MUST have a return value. The task, if required, must throw an exception derived from std::exception.
 		**/
-		template<typename callable_t, typename... Args>
-		inline
-		typename std::result_of<callable_t(Args...)>::type
-		run_task_async(callable_t&& obj, Args&&... args) noexcept
-		{		
+		//template<typename callable_t, typename... Args>
+		//inline
+		//typename std::result_of<callable_t(Args...)>::type
+		//run_task_async(callable_t&& obj, Args&&... args) noexcept
+		//{		
 
-			using ret_t = typename std::result_of<callable_t(Args...)>::type;
-			ret_t value{};
+		//	using ret_t = typename std::result_of<callable_t(Args...)>::type;
+		//	ret_t value{};
 
-			//future to hold the result of the async task
-			std::future<ret_t> fut = std::async(std::launch::async, obj, std::forward<Args>(args)...);;
+		//	//future to hold the result of the async task
+		//	std::future<ret_t> fut = std::async(std::launch::async, obj, std::forward<Args>(args)...);;
+		//
+		//	try {
+		//		value = fut.get();			//can throw				
+		//	}
+		//	catch (std::exception & e) {
+		//		LOGG_ERROR("caught exception thrown by task: ", e.what(), "bitgraph::run_task_async");
+		//	}
+
+		//	return value;
+		//}
+
+	
+
 		
-			try {
-				value = fut.get();			//can throw				
-			}
-			catch (std::exception & e) {
-				LOGG_ERROR("caught exception thrown by task: ", e.what(), "bitgraph::run_task_async");
-			}
-
-			return value;
-		}
 		
 		//////////////////////
 		////

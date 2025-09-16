@@ -25,8 +25,8 @@ public:
 	virtual ~Batch() = default;			//TODO- use predefined destructor
 
 	//getters and setters
-	int number_of_tests				()			{ return tests.size(); }
-	ParamT& get_test				(int id)	{ return tests[id]; }
+	size_t number_of_tests				()		const		{ return tests.size(); }
+	const ParamT& test				(int id) const		{ return tests[id]; }
 
 /////////////////////////
 //basic operations
