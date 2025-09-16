@@ -30,8 +30,7 @@ namespace bitgraph {
 		typename std::enable_if<
 			!std::is_void<typename std::result_of<func_t(obj_t&, Args...)>::type>::value,
 			typename std::result_of<func_t(obj_t&, Args...)>::type
-		>::type
-		//typename std::result_of<func_t(obj_t&, Args...)>::type
+		>::type		
 		run_task_async(func_t func, obj_t& obj, Args&&... args) noexcept
 		{	
 			using ret_t = typename std::result_of<func_t(obj_t&, Args...)>::type;
@@ -59,11 +58,11 @@ namespace bitgraph {
 		**/
 		template<typename func_t, typename obj_t, typename... Args>
 		inline
-			typename std::enable_if<
+		typename std::enable_if<
 			std::is_void<typename std::result_of<func_t(obj_t&, Args...)>::type>::value,
 			void
-			>::type
-			run_task_async(func_t func, obj_t& obj, Args&&... args) noexcept
+		>::type
+		run_task_async(func_t func, obj_t& obj, Args&&... args) noexcept
 		{
 			//future to hold the result of the async task
 			std::future<void> fut = std::async(std::launch::async, func, std::ref(obj), std::forward<Args>(args)...);
@@ -121,7 +120,7 @@ namespace bitgraph {
 			typename std::enable_if<
 			std::is_void<typename std::result_of<callable_t(Args...)>::type>::value,
 			void
-			>::type
+		>::type
 		run_task_async(callable_t&& obj, Args&&... args) noexcept
 		{
 			//future to hold the result of the async task
