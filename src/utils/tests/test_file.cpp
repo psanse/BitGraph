@@ -44,15 +44,15 @@ TEST(FileTest, WriteToFile) {
     }
 
 	//reads the file and ckecks the content
-    std::ifstream file(filename);
+    std::ifstream ifs(filename);
     std::string content;
-    std::getline(file, content);
+    std::getline(ifs, content);
 
     ////////////////////////////////////////
     EXPECT_EQ(content, "Hello, world!");
     ///////////////////////////////////////
     
-    file.close();
+    ifs.close();
     std::remove(filename);
 }
 
@@ -62,9 +62,9 @@ TEST(FileTest, ReadFromFile) {
     //write to a file
     const char* filename = "test_read.txt";
     {
-        std::ofstream file(filename);
-        file << "Hello, world!";
-        file.close();
+        std::ofstream ofs(filename);
+        ofs << "Hello, world!";
+        ofs.close();
     }
 
     //reads the file and checks the content
@@ -87,9 +87,9 @@ TEST(FileTest, AppendToFile) {
 
     const char* filename = "test_append.txt";
     {
-        std::ofstream file(filename);
-        file << "Hello";
-        file.close();
+        std::ofstream ofs(filename);
+        ofs << "Hello";
+        ofs.close();
     }
 
     //appends to the file
@@ -100,15 +100,15 @@ TEST(FileTest, AppendToFile) {
     }
 
 	//checks the content of the file
-    std::ifstream file(filename);
+    std::ifstream ifs(filename);
     std::string content;
-    std::getline(file, content);
+    std::getline(ifs, content);
 
 	////////////////////////////////////////
     EXPECT_EQ(content, "Hello, world!");
 	////////////////////////////////////////
     
-    file.close();
+    ifs.close();
     std::remove(filename);
 }
 
@@ -131,15 +131,15 @@ TEST(FileTest, ReadWriteFile) {
 
 
     //checks the content of the file
-    std::ifstream file(filename);
+    std::ifstream ifs(filename);
     std::string content;
-    std::getline(file, content);
+    std::getline(ifs, content);
 
     ////////////////////////////////////////
     EXPECT_EQ(content, "Hello, world!");
     ////////////////////////////////////////
 
-    file.close();
+    ifs.close();
     std::remove(filename);
 }
 
