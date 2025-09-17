@@ -95,6 +95,11 @@ namespace bitgraph {
 
 		template<class Graph_t>
 		class RandomGen {
+
+			//filter out invalid types - currently only non-sparse unit weighted graphs
+			static_assert(std::is_same<Graph_t, ugraph>::value, 
+						 "RandomGen<Graph_t> : Graph_t must be a simple, non-sparse, unit weighted graph type");
+
 		public:
 
 			/*
@@ -216,6 +221,11 @@ namespace bitgraph {
 		template <class Graph_t>
 		class WeightGen
 		{
+			//filter out invalid types - currently only non-sparse vertex weighted graphs
+			static_assert(std::is_same<Graph_t, ugraph_w>::value ||
+						std::is_same<Graph_t, ugraph_wi>::value,						
+						"WeightGen<Graph_t> : Graph_t must be a simple, non-sparse,  vertex-weighted graph type ");
+
 		public:
 			enum type_t { WMOD = 0, WDEG };
 
@@ -257,6 +267,12 @@ namespace bitgraph {
 		template<class Graph_t>
 		class EdgeWeightGen
 		{
+			//filter out invalid types - currently only non-sparse vertex weighted graphs
+			static_assert(std::is_same<Graph_t, ugraph_ew>::value ||
+						 std::is_same<Graph_t, ugraph_ewi>::value,
+							"EdgeWeightGen<Graph_t> : Graph_t must be a simple, non-sparse,  edge-weighted graph type ");
+
+
 		public:
 			enum type_t { WMOD = 0 };
 
