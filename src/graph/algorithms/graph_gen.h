@@ -90,16 +90,12 @@ namespace bitgraph {
 		//
 		// class RandomGen
 		// (random generation of generic non-sparse and unweighted graphs)
+		// Important: Graph_t can be a graph weighted type. The class will operate only on the graph structure.
 		//
 		//////////////////
 
 		template<class Graph_t>
 		class RandomGen {
-
-			//filter out invalid types - currently only non-sparse unit weighted graphs
-			static_assert(std::is_same<Graph_t, ugraph>::value, 
-						 "RandomGen<Graph_t> : Graph_t must be a simple, non-sparse, unit weighted graph type");
-
 		public:
 
 			/*

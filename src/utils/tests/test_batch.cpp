@@ -29,8 +29,8 @@ TEST(Batch, basic){
 
 	//check test construction
 	for (auto i = 0; i< 5; i++) {
-		EXPECT_EQ(30, b.get_test(i).i_);
-		EXPECT_EQ(20, b.get_test(i).j_);
+		EXPECT_EQ(30, b.test(i).i_);
+		EXPECT_EQ(20, b.test(i).j_);
 	}
 
 	//check cleaning

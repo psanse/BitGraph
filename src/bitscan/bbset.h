@@ -467,7 +467,7 @@ namespace bitgraph {
 			* @details  Equivalent to a set minus operation
 			* @returns reference to the modified bitstring
 			**/
-			inline BitSet& erase_bit(int firstBit, int lastBit, const const BitSet& bitset);
+			inline BitSet& erase_bit(int firstBit, int lastBit,  const BitSet& bitset);
 
 			/**
 			* @brief Removes the 1-bits from both input bitstrings (their union)
@@ -1583,7 +1583,7 @@ namespace bitgraph{
 			return *this;
 		}
 
-		BitSet& BitSet::erase_bit(int firstBit, int lastBit, const const BitSet& bbn) {
+		BitSet& BitSet::erase_bit(int firstBit, int lastBit, const BitSet& bbn) {
 
 			//general comment: low - WMUL(bbl) = WMOD(bbl) but supposed to be less expensive (CHECK 01/02/25)
 

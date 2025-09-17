@@ -11,7 +11,7 @@
 #include "graph/simple_graph_w.h"							 
 #include "graph/algorithms/graph_gen.h"
 #include "gtest/gtest.h"
-#include "utils/common_paths.h";
+#include "utils/common_paths.h"
 #include "utils/logger.h"
 #include <iostream>
 
