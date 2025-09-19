@@ -198,7 +198,7 @@ namespace bitgraph {
 			*
 			* TODO Add @K_ to ouput conditionally
 			*/
-			virtual std::ostream& printReport(std::ostream& o = std::cout, report_t r = report_t::TABLE, bool is_endl = true) const;
+			virtual std::ostream& printReport(std::ostream& o = std::cout, report_t r = report_t::TABLE, bool is_endl = false) const;
 
 			/*
 			* @brief streams gereral info

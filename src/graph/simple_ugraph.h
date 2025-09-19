@@ -114,7 +114,7 @@ namespace bitgraph {
 			/**
 			* @brief Computes the number of neighbors of v (deg(v))	*
 			**/
-			int degree(int v)									const { return ptype::adj_[v].size(); }
+			int degree(int v)									const { return (int)ptype::adj_[v].size(); }
 
 			/**
 			*  @brief number of neighbors of v in a set of vertices

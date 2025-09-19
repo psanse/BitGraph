@@ -19,7 +19,7 @@ using namespace bitgraph;
 namespace bitgraph {
 	namespace com {
 		ostream& operator<< (ostream& o, const infoBase& info) {
-			return info.printReport(o);
+			return info.printReport(o, infoBase::report_t::TABLE, true);
 		}
 	}
 }
