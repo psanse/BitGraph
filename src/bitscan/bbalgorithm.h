@@ -253,7 +253,7 @@ namespace bitgraph {
 				catch (std::exception& e) {
 					LOG_ERROR(e.what());
 					LOG_ERROR("bbCol_t::bbCol_t()");
-					std::exit(-1);
+					std::exit(EXIT_FAILURE);
 				}
 			}
 
@@ -425,7 +425,7 @@ namespace bitgraph {
 			catch (std::exception& e) {
 				LOG_ERROR(e.what());
 				LOG_ERROR("bbStack_t<BitSet_t>::-reset()");
-				std::exit(-1);
+				std::exit(EXIT_FAILURE);
 			}
 
 		}; //end struct

@@ -29,7 +29,7 @@ BitSet::BitSet(int nPop, bool val) :
 	catch (...) {
 		LOG_ERROR("Error during construction - BitSet::BitSet");
 		LOG_ERROR("exiting...");
-		std::exit(-1);
+		std::exit(EXIT_FAILURE);
 	}
 
 	//trim last bitblock to ZERO if val = TRUE
@@ -59,7 +59,7 @@ BitSet::BitSet(const vint& v):
 	catch (...) {
 		LOG_ERROR("Error during construction - BitSet::BitSet()");
 		LOG_ERROR("exiting...");
-		std::exit(-1);
+		std::exit(EXIT_FAILURE);
 	}
 }
 
@@ -86,7 +86,7 @@ BitSet::BitSet (int nPop, const vint& lv):
 	catch (...) {
 		LOG_ERROR("Error during construction - BitSet::BitSet()");
 		LOG_ERROR("exiting...");
-		std::exit(-1);
+		std::exit(EXIT_FAILURE);
 	}
 }
 
@@ -112,7 +112,7 @@ BitSet::BitSet(int nPop, std::initializer_list<int> l):
 	catch (...) {
 		LOG_ERROR("Error during construction - BitSet::BitSet()");
 		LOG_ERROR("exiting...");
-		std::exit(-1);
+		std::exit(EXIT_FAILURE);
 	}
 }
 
@@ -125,7 +125,7 @@ void BitSet::init(int popsize) {
 	catch (...) {
 		LOG_ERROR("Error during allocation - BitSet::init");
 		LOG_ERROR("exiting...");
-		std::exit(-1);
+		std::exit(EXIT_FAILURE);
 	}
 
 }
@@ -151,7 +151,7 @@ void BitSet::init(int popsize, const vint& lv){
 	catch (...) {
 		LOG_ERROR("Error during allocation - BitSet::init");
 		LOG_ERROR("exiting...");
-		std::exit(-1);
+		std::exit(EXIT_FAILURE);
 	}	
 }
 
@@ -164,7 +164,7 @@ void BitSet::reset(int popsize) {
 	catch (...) {
 		LOG_ERROR("Error during allocation - BitSet::reset");
 		LOG_ERROR("exiting...");
-		std::exit(-1);
+		std::exit(EXIT_FAILURE);
 	}
 
 }
@@ -189,7 +189,7 @@ void BitSet::reset(int popsize, const vint& lv) {
 	catch (...) {
 		LOG_ERROR("Error during allocation - BitSet::reset");
 		LOG_ERROR("exiting...");
-		std::exit(-1);
+		std::exit(EXIT_FAILURE);
 	}
 }
 

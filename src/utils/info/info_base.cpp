@@ -93,7 +93,7 @@ void infoBase::startTimer(phase_t t)
 	default:
 		LOG_ERROR("bizarre timer type, exiting... - com::infoBase::start_timer");
 		LOGG_ERROR("timer type: ", (int)t, " - com::infoBase::start_timer");
-		std::exit(-1);
+		std::exit(EXIT_FAILURE);
 	}
 }
 
@@ -112,7 +112,7 @@ void infoBase::clearTimer(phase_t t) {
 	default:
 		LOG_ERROR("bizarre timer type, exiting... - com::infoBase::clearTimer");
 		LOGG_ERROR("timer type: ", (int)t, " - com::infoBase::clearTimer");
-		std::exit(-1);
+		std::exit(EXIT_FAILURE);
 	}
 }
 
@@ -145,7 +145,7 @@ double infoBase::readTimer(phase_t t)
 	default:
 		LOG_ERROR("bizarre timer type, exiting... - infoBase::read_time");
 		LOGG_ERROR("timer type : ", (int)t);
-		std::exit(-1);
+		std::exit(EXIT_FAILURE);
 	}
 
 	return elapsedTime;

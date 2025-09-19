@@ -74,7 +74,7 @@ Base_Graph_W<Graph_t, W>::Base_Graph_W(vector<W>& lw) : w_(lw) {
 	if (g_.reset(lw.size()) == -1) {
 		LOG_ERROR("error during memory graph allocation - Base_Graph_W<T, W>::Base_Graph_W");
 		LOG_ERROR("exiting...");
-		std::exit(-1);
+		std::exit(EXIT_FAILURE);
 	}
 }
 
@@ -84,7 +84,7 @@ Base_Graph_W<Graph_t, W>::Base_Graph_W(std::string filename){
 	if (read_dimacs(filename) == -1) {
 		LOG_ERROR("error reading DIMACS file -Base_Graph_W<Graph_t, W>::Base_Graph_W");
 		LOG_ERROR("exiting...");
-		std::exit(-1);
+		std::exit(EXIT_FAILURE);
 	}
 }
 

@@ -60,7 +60,7 @@ template<class Graph_t, class W>
 		if (reset<true>(NV, val) == -1) {
 			LOG_ERROR("error during memory graph allocation - Base_Graph_EW<T, W>::Base_Graph_EW");
 			LOG_ERROR("exiting...");
-			std::exit(-1);
+			std::exit(EXIT_FAILURE);
 		}
 	}
 	else {
@@ -68,7 +68,7 @@ template<class Graph_t, class W>
 		if (reset<false>(NV, val) == -1) {
 			LOG_ERROR("error during memory graph allocation - Base_Graph_EW<T, W>::Base_Graph_EW");
 			LOG_ERROR("exiting...");
-			std::exit(-1);
+			std::exit(EXIT_FAILURE);
 		}
 	}
  }
@@ -160,7 +160,7 @@ template<class Graph_t, class W>
 	default:	
 		LOG_ERROR("unknown type -  Base_Graph_EW<Graph_t, W>::complement_weights");
 		LOG_ERROR("exiting");
-		std::exit(-1);
+		std::exit(EXIT_FAILURE);
 	}
 	
 }
@@ -407,7 +407,7 @@ ostream& Base_Graph_EW<Graph_t, W>::print_weights (ostream& o, bool line_format,
 	default:
 		LOG_ERROR("unknown type - Base_Graph_EW<Graph_t, W>::print_weights");
 		LOG_ERROR("exiting");
-		std::exit(-1);
+		std::exit(EXIT_FAILURE);
 	}
 	//o << endl << "**************************" << endl;
 	return o;
@@ -477,7 +477,7 @@ ostream& Base_Graph_EW<Graph_t, W>::print_weights (vint& lv, ostream& o, int typ
 	default:
 		LOG_ERROR("unknown type - Base_Graph_EW<Graph_t, W>::print_weights");
 		LOG_ERROR("exiting");
-		std::exit(-1);
+		std::exit(EXIT_FAILURE);
 	}
 	//o << endl << "**************************" << endl;
 

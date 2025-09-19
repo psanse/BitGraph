@@ -633,7 +633,7 @@ namespace bitgraph {
 			//should not happen	
 			LOG_ERROR("unknown type -  Base_Graph_EW<Graph_t, W>::transform_weights");
 			LOG_ERROR("exiting");
-			std::exit(-1);
+			std::exit(EXIT_FAILURE);
 		}
 	}
 
