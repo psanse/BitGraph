@@ -11,45 +11,55 @@
 #include <vector>
 #include <memory>
 
-/// <summary>
-/// @brief: lightweight Batch class for tests with configuration ParamT
-/// @details: the tested algorithms must have a constructor that takes ParamT as input
-/// </summary>
-/// <typeparam name="ParamT"> configuration parameters </typeparam>
+namespace bitgraph {
 
-template <class ParamT>
-class Batch{
-public:
+	namespace _impl {
 
-	//construction / destruction
-	virtual ~Batch() = default;			//TODO- use predefined destructor
+		/// <summary>
+		/// @brief: lightweight Batch class for tests with configuration ParamT
+		/// @details: the tested algorithms must have a constructor that takes ParamT as input
+		/// </summary>
+		/// <typeparam name="ParamT"> configuration parameters </typeparam>
 
-	//getters and setters
-	size_t number_of_tests				()		const		{ return tests.size(); }
-	const ParamT& test				(int id) const		{ return tests[id]; }
+		template <class ParamT>
+		class Batch {
+		public:
 
-/////////////////////////
-//basic operations
+			//construction / destruction
+			virtual ~Batch() = default;			//TODO- use predefined destructor
 
-	/**
-	* @brief adds tests of type AlgVar_t (derived from AlgT)  - deallocates memory
-	**/
-	void add_test			(const ParamT& p)	{ tests.emplace_back(p); }
-		
-	void operator +=		(const ParamT& p) { tests.emplace_back(p); }
+			//getters and setters
+			size_t number_of_tests()		const { return tests.size(); }
+			const ParamT& test(int id) const { return tests[id]; }
 
-	/**
-	* @brief clears all tests - deallocates memory
-	**/
-	void clear(){ tests.clear(); }
-		
-	
-	
-/////////
-//data members
-protected:
-	std::vector < ParamT > tests;
-};
+			/////////////////////////
+			//basic operations
+
+				/**
+				* @brief adds tests of type AlgVar_t (derived from AlgT)  - deallocates memory
+				**/
+			void add_test(const ParamT& p) { tests.emplace_back(p); }
+
+			void operator +=		(const ParamT& p) { tests.emplace_back(p); }
+
+			/**
+			* @brief clears all tests - deallocates memory
+			**/
+			void clear() { tests.clear(); }
+
+
+
+			/////////
+			//data members
+		protected:
+			std::vector < ParamT > tests;
+		};
+
+	}//end namespace _impl
+
+	using _impl::Batch;	
+
+}//end namespace bitgraph
 
 #endif
 
