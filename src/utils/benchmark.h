@@ -63,15 +63,20 @@ namespace bitgraph {
 		//////////////
 		//Benchmark operations
 
-			/**
-			* @brief Adds a test with a value to the benchmark list
-			* **/
+		/**
+		* @brief Adds a test with a value to the benchmark list
+		**/
 		virtual void add_test(const std::string, int val);
 
 		/**
 		* @brief Adds a test without value to the benchmark list
 		* **/
 		virtual void add_test(const std::string);
+
+		/**
+		* @brief returns true if benchmark is empty
+		**/
+		bool is_empty() const { return lf_.empty(); }	
 
 
 		/////////////
