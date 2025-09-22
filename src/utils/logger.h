@@ -6,12 +6,13 @@
 *		  This code has been dedicated to the public domain
 * @date 03/11/2024
 * @last_update 19/01/25
-* @author Slight talioring by pss + copilot
 * 
 * @comments: 
 * 1.vectors & initializer_list are supported using SFINAE
 * 2.C++11 compliant
-* 3.Refined with the help of copilot (06/11/2024)
+* 3.Automatic tuning with the help of copilot (06/11/2024)
+* 
+* TODO - Change to a professional logger in the future (22/09/2025)
 **/
 
 #ifndef	__LOGY_H__
@@ -30,6 +31,8 @@
 #include <ctime>
 #include <initializer_list>
 
+namespace bitgraph{
+
 //////////////////////////////////////////////
 //logger level manual setting - [Warning and ERROR only - default] 
 //
@@ -42,7 +45,7 @@
 //all undef	 WARNING and ERROR
 
 //////////////////////////////////////////
-//my old logger macros compatibility
+//legacy logger macros compatibility
 
 #define LOG_ERROR(msg)			Error(msg)
 #define LOG_WARNING(msg)		Warning(msg)
@@ -158,55 +161,53 @@ void _Error2(T&&... args) {
 
 #if defined(DEBUG) || defined(LOGGER_DEBUG_LEVEL)  // All messages enabled
 
-#define Debug(...) _Debug(__VA_ARGS__)
-#define Info(...) _Info(__VA_ARGS__)
-#define Warning(...) _Warning(__VA_ARGS__)
-#define Error(...) _Error(__VA_ARGS__)
-#define LOGG_DEBUG(...) _Debug2(__VA_ARGS__)
-#define LOGG_INFO(...) _Info2(__VA_ARGS__)
-#define LOGG_WARNING(...) _Warning2(__VA_ARGS__)
-#define LOGG_ERROR(...) _Error2(__VA_ARGS__)
+#define Debug(...) bitgraph::_Debug(__VA_ARGS__)
+#define Info(...) bitgraph::_Info(__VA_ARGS__)
+#define Warning(...) bitgraph::_Warning(__VA_ARGS__)
+#define Error(...) bitgraph::_Error(__VA_ARGS__)
+#define LOGG_DEBUG(...) bitgraph::_Debug2(__VA_ARGS__)
+#define LOGG_INFO(...) bitgraph::_Info2(__VA_ARGS__)
+#define LOGG_WARNING(...) bitgraph::_Warning2(__VA_ARGS__)
+#define LOGG_ERROR(...) bitgraph::_Error2(__VA_ARGS__)
 
 #elif defined(VERBOSE) || defined(LOGGER_VERBOSE_LEVEL)  // All except debug
 
 #define Debug(...) ((void)0)
-#define Info(...) _Info(__VA_ARGS__)
-#define Warning(...) _Warning(__VA_ARGS__)
-#define Error(...) _Error(__VA_ARGS__)
+#define Info(...) bitgraph::_Info(__VA_ARGS__)
+#define Warning(...) bitgraph::_Warning(__VA_ARGS__)
+#define Error(...) bitgraph::_Error(__VA_ARGS__)
 #define LOGG_DEBUG(...) ((void)0)
-#define LOGG_INFO(...) _Info2(__VA_ARGS__)
-#define LOGG_WARNING(...) _Warning2(__VA_ARGS__)
-#define LOGG_ERROR(...) _Error2(__VA_ARGS__)
+#define LOGG_INFO(...) bitgraph::_Info2(__VA_ARGS__)
+#define LOGG_WARNING(...) bitgraph::_Warning2(__VA_ARGS__)
+#define LOGG_ERROR(...) bitgraph::_Error2(__VA_ARGS__)
 
 #elif defined(ERROR) || defined(LOGGER_ERROR_LEVEL)  // Only errors
 
 #define Debug(...) ((void)0)
 #define Info(...) ((void)0)
 #define Warning(...) ((void)0)
-#define Error(...) _Error(__VA_ARGS__)
+#define Error(...) bitgraph::_Error(__VA_ARGS__)
 #define LOGG_DEBUG(...) ((void)0)
 #define LOGG_INFO(...) ((void)0)
 #define LOGG_WARNING(...) ((void)0)
-#define LOGG_ERROR(...) _Error2(__VA_ARGS__)
+#define LOGG_ERROR(...) bitgraph::_Error2(__VA_ARGS__)
 
 #else  // Only warnings and errors by default
 
 #define Debug(...) ((void)0)
 #define Info(...) ((void)0)
 #define Warning(...) _Warning(__VA_ARGS__)
-#define Error(...) _Error(__VA_ARGS__)
+#define Error(...) bitgraph::_Error(__VA_ARGS__)
 #define LOGG_DEBUG(...) ((void)0)
 #define LOGG_INFO(...) ((void)0)
-#define LOGG_WARNING(...) _Warning2(__VA_ARGS__)
-#define LOGG_ERROR(...) _Error2(__VA_ARGS__)
+#define LOGG_WARNING(...) bitgraph::_Warning2(__VA_ARGS__)
+#define LOGG_ERROR(...) bitgraph::_Error2(__VA_ARGS__)
 
 #endif
 
-#define Logy(...) _Silent(__VA_ARGS__)
-#define LOGY(...) _Silent2(__VA_ARGS__)
+#define Logy(...) bitgraph::_Silent(__VA_ARGS__)
+#define LOGY(...) bitgraph::_Silent2(__VA_ARGS__)
 
-
-
-
+} // namespace bitgraph	
 
 #endif

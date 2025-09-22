@@ -13,6 +13,7 @@
 #include "utils/file.h"
 
 using namespace std;
+using namespace bitgraph;
 
 //no real test, just to show how to use the macro
 TEST(FileTest, example_macro){

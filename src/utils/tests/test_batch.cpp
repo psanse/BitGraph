@@ -3,6 +3,8 @@
 #include "utils/logger.h"
 
 using namespace std;
+using namespace bitgraph;
+
 
 //configuration data for the hierarchy of algorithms
 struct param_t{

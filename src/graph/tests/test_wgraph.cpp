@@ -213,33 +213,38 @@ TEST(UGraphW, gen_random) {
 //
 ///////////////
 
-TEST(GraphW, DISABLED_gen_weights_to_file){
-////////////////
-// reads DIMACS file without weights and generates "*.d" file with weights
-// date of creation: 15/04/18
+//TEST(GraphW, DISABLED_gen_weights_to_file){
+//////////////////
+//// reads DIMACS file without weights and generates "*.d" file with weights
+//// date of creation: 15/04/18
+////
+//// TODO@define more tests
 //
-// TODO@define more tests
-
-	LOG_INFO("GraphW:gen_weights_to_file---------------------------------------");
-
-	string path= TEST_GRAPH_PATH_DATA;
-	Graph_W<ugraph, int> ugw(path + "brock200_1.clq");
-	const int NV=ugw.graph().number_of_vertices();
-	
-	//generate weights WDEG mode
-	WeightGen< Graph_W<ugraph, int> >::create_weights(ugw, WeightGen<Graph_W<ugraph, int>>::WMOD, DEFAULT_WEIGHT_MODULUS, ".d", TEST_GRAPH_PATH_LOG);
-		
-
-	/////////////////////
-	//TESTS
-	EXPECT_EQ(NV, ugw.graph().number_of_vertices());
-	
-	LOG_INFO("GraphW: END gen_weights_to_file --------");
-#ifdef TEST_GRAPH_WEIGHTED_STEP_BY_STEP
-	LOG_ERROR("press any key to continue");
-	cin.get();
-#endif;
-}
+//	LOG_INFO("GraphW:gen_weights_to_file---------------------------------------");
+//
+//	string path= PATH_GRAPH_TESTS_CMAKE_SRC_CODE;
+//	Graph_W<ugraph, int> ugw(path + "brock200_1.clq");
+//	const int NV=ugw.graph().number_of_vertices();
+//	
+//	//generate weights WDEG mode
+//	WeightGen< Graph_W<ugraph, int> >::create_weights(ugw, 
+//													WeightGen<Graph_W<ugraph, int>>::WMOD, 
+//													DEFAULT_WEIGHT_MODULUS,
+//													".d", 
+//													TEST_GRAPH_PATH_LOG			
+//													);
+//		
+//
+//	/////////////////////
+//	//TESTS
+//	EXPECT_EQ(NV, ugw.graph().number_of_vertices());
+//	
+//	LOG_INFO("GraphW: END gen_weights_to_file --------");
+//#ifdef TEST_GRAPH_WEIGHTED_STEP_BY_STEP
+//	LOG_ERROR("press any key to continue");
+//	cin.get();
+//#endif;
+//}
 
 
 

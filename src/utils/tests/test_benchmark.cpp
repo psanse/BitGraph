@@ -13,6 +13,7 @@
 #define PATH "c:\\path"
 
 using namespace std;
+using namespace bitgraph;
 
 ////////////////////////
 //

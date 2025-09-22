@@ -17,6 +17,7 @@
 #include <cstdio>
 
 using namespace std;
+using namespace bitgraph;
 
 
  //Test _Debug log function

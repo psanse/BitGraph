@@ -371,7 +371,7 @@ TEST(GraphFastRootSort, new_order_dimacs) {
 
 	using gt = GraphFastRootSort<ugraph>;
 	string name = "brock200_2.clq";
-	name.insert(0, TESTS_GRAPH_DATA_CMAKE);
+	name.insert(0, PATH_GRAPH_TESTS_CMAKE_SRC_CODE);
 
 	ugraph ug(name);
 	gt sorter(ug);
