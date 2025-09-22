@@ -16,7 +16,7 @@ using namespace bitgraph;
 
 
 template<class T>
-bitgraph::com::stack_t<T>::stack_t() :
+bitgraph::stack<T>::stack() :
 	nE_(0), stack_(nullptr), cap_(0)
 {
 #ifdef DEBUG_STACKS
@@ -25,7 +25,7 @@ bitgraph::com::stack_t<T>::stack_t() :
 }
 
 template<class T>
-bitgraph::com::stack_t<T>::stack_t(int MAX_SIZE) : 
+bitgraph::stack<T>::stack(int MAX_SIZE) : 
 	nE_(0), stack_(nullptr), cap_(0)
 {
 	try {
@@ -33,7 +33,7 @@ bitgraph::com::stack_t<T>::stack_t(int MAX_SIZE) :
 		cap_ = static_cast<std::size_t>(MAX_SIZE);
 	}
 	catch (...) {
-		LOGG_ERROR("bad_alloc - stack_t<T>::stack_t");
+		LOGG_ERROR("bad_alloc - stack<T>::stack");
 		throw;
 	}
 
@@ -43,7 +43,7 @@ bitgraph::com::stack_t<T>::stack_t(int MAX_SIZE) :
 }
 
 template<class T>
-bitgraph::com::stack_t<T>::stack_t(bitgraph::com::stack_t<T>&& s) noexcept
+bitgraph::stack<T>::stack(bitgraph::stack<T>&& s) noexcept
 	: nE_(s.nE_), stack_(s.stack_), cap_(s.cap_)
 #ifdef DEBUG_STACKS
 	, MAX_(s.MAX_)
@@ -58,7 +58,7 @@ bitgraph::com::stack_t<T>::stack_t(bitgraph::com::stack_t<T>&& s) noexcept
 }
 
 template<class T>
-bitgraph::com::stack_t<T>& bitgraph::com::stack_t<T>::operator = (bitgraph::com::stack_t<T>&& s) noexcept
+bitgraph::stack<T>& bitgraph::stack<T>::operator = (bitgraph::stack<T>&& s) noexcept
 {
 	delete[] stack_;
 	nE_ = s.nE_;
@@ -77,7 +77,7 @@ bitgraph::com::stack_t<T>& bitgraph::com::stack_t<T>::operator = (bitgraph::com:
 }
 
 template<class T>
-void bitgraph::com::stack_t<T>::reset(int MAX_SIZE) {
+void bitgraph::stack<T>::reset(int MAX_SIZE) {
 	delete[] stack_;
 	nE_ = 0;
 	cap_ = 0;
@@ -86,7 +86,7 @@ void bitgraph::com::stack_t<T>::reset(int MAX_SIZE) {
 		cap_ = static_cast<std::size_t>(MAX_SIZE);
 	}
 	catch (...) {
-		LOG_ERROR("bad_alloc - stack_t<T>::reset");
+		LOG_ERROR("bad_alloc - stack<T>::reset");
 		throw;
 	}
 
@@ -96,7 +96,7 @@ void bitgraph::com::stack_t<T>::reset(int MAX_SIZE) {
 }
 
 template<class T>
-void bitgraph::com::stack_t<T>::clear() {
+void bitgraph::stack<T>::clear() {
 	delete[] stack_;
 	stack_ = nullptr;
 	nE_ = 0;
@@ -107,14 +107,14 @@ void bitgraph::com::stack_t<T>::clear() {
 }
 
 template<class T>
-void bitgraph::com::stack_t<T>::push(T d) {
-	assert(stack_ != nullptr && "stack_t not initialized. Call reset(MAX_SIZE) or use sized ctor - bitgraph::com::stack_t<T>::push");
-	assert(nE_ < cap_ && "stack_t overflow - bitgraph::com::stack_t<T>::push");
+void bitgraph::stack<T>::push(T d) {
+	assert(stack_ != nullptr && "stack not initialized. Call reset(MAX_SIZE) or use sized ctor - bitgraph::stack<T>::push");
+	assert(nE_ < cap_ && "stack overflow - bitgraph::stack<T>::push");
 	stack_[nE_++] = std::move(d);
 #ifdef DEBUG_STACKS
 	if (nE_ > static_cast<std::size_t>MAX_) {
 		LOGG_INFO("bizarre stack with size: ", nE_, " and max size: ", MAX_);
-		LOG_INFO("-bitgraph::com::stack_t<T>::push(T d)");
+		LOG_INFO("-bitgraph::stack<T>::push(T d)");
 		LOG_INFO("press any key to continue");
 		std::cin.get();
 	}
@@ -122,9 +122,9 @@ void bitgraph::com::stack_t<T>::push(T d) {
 }
 
 template<class T>
-void bitgraph::com::stack_t<T>::push_bottom(T d) {
-	assert(stack_ != nullptr && "stack_t not initialized. Call reset(MAX_SIZE) or use sized ctor - bitgraph::com::stack_t<T>::push_bottom");
-	assert(nE_ < cap_ && "stack_t overflow - bitgraph::com::stack_t<T>::push_bottom");
+void bitgraph::stack<T>::push_bottom(T d) {
+	assert(stack_ != nullptr && "stack not initialized. Call reset(MAX_SIZE) or use sized ctor - bitgraph::stack<T>::push_bottom");
+	assert(nE_ < cap_ && "stack overflow - bitgraph::stack<T>::push_bottom");
 
 	if (nE_ == 0) {
 		stack_[nE_++] = std::move(d);
@@ -137,7 +137,7 @@ void bitgraph::com::stack_t<T>::push_bottom(T d) {
 #ifdef DEBUG_STACKS
 	if (nE_ > static_cast<std::size_t>MAX_) {    //*** no checking against N
 		LOGG_INFO("bizarre stack with size: ", nE_, " and max size: ", MAX_);
-		LOG_INFO("-bitgraph::com::stack_t<T>::push_bottom(T d)");
+		LOG_INFO("-bitgraph::stack<T>::push_bottom(T d)");
 		LOG_INFO("press any key to continue");
 		std::cin.get();
 	}
@@ -145,46 +145,46 @@ void bitgraph::com::stack_t<T>::push_bottom(T d) {
 }
 
 template<class T>
-const T& bitgraph::com::stack_t<T>::top() const
+const T& bitgraph::stack<T>::top() const
 {
-	assert(nE_ > 0 && "stack_t::top on empty stack");
+	assert(nE_ > 0 && "stack::top on empty stack");
 	return stack_[nE_ - 1];
 }
 
 template<class T>
-T& bitgraph::com::stack_t<T>::top()
+T& bitgraph::stack<T>::top()
 {
-	assert(nE_ > 0 && "stack_t::top on empty stack");
+	assert(nE_ > 0 && "stack::top on empty stack");
 	return stack_[nE_ - 1];
 }
 
 template<class T>
-void bitgraph::com::stack_t<T>::pop() {
-	assert(nE_ > 0 && "stack_t::pop on empty stack");
+void bitgraph::stack<T>::pop() {
+	assert(nE_ > 0 && "stack::pop on empty stack");
 	--nE_;
 }
 
 template<class T>
-void bitgraph::com::stack_t<T>::pop(std::size_t nb) {
-	assert(nE_ >= nb && "stack_t::pop(nb) removes more elements than present");
+void bitgraph::stack<T>::pop(std::size_t nb) {
+	assert(nE_ >= nb && "stack::pop(nb) removes more elements than present");
 	nE_ -= nb;	
 }
 
 template<class T>
-void bitgraph::com::stack_t<T>::pop_bottom() {
-	assert(nE_ > 0 && "stack_t::pop_bottom on empty stack");
+void bitgraph::stack<T>::pop_bottom() {
+	assert(nE_ > 0 && "stack::pop_bottom on empty stack");
 	stack_[0] = std::move(stack_[--nE_]);
 }
 
 template<class T>
-void bitgraph::com::stack_t<T>::erase(int pos) {
-	assert(pos >= 0 && static_cast<std::size_t>(pos) < nE_ && "stack_t::erase out of bounds");
+void bitgraph::stack<T>::erase(int pos) {
+	assert(pos >= 0 && static_cast<std::size_t>(pos) < nE_ && "stack::erase out of bounds");
 	stack_[pos] = std::move(stack_[--nE_]);
 }
 
 //I/O
 template<class T>
-std::ostream& bitgraph::com::stack_t<T>::print(std::ostream& o) const {
+std::ostream& bitgraph::stack<T>::print(std::ostream& o) const {
 	o << "[";
 	for (auto i = 0; i < nE_; ++i) {
 		o << stack_[i] << " ";
@@ -196,8 +196,8 @@ std::ostream& bitgraph::com::stack_t<T>::print(std::ostream& o) const {
 /////////////////////////////////
 // declaration of valid types 
 
-template struct bitgraph::com::stack_t<int>;
-template struct  bitgraph::com::stack_t<double>;
+template struct bitgraph::stack<int>;
+template struct  bitgraph::stack<double>;
 
 /////////////////////////////////
 

@@ -28,29 +28,29 @@ namespace bitgraph {
 
 		////////////////////////
 		//
-		// struct stack_t
+		// struct stack
 		//
 		// (very lightweight stack implemented by a C-array)
 		//
 		////////////////////////
 
 		template <class T>
-		struct stack_t {
+		struct stack {
 
 			///////
 			//construction / destruction
-			stack_t();
-			explicit stack_t(int MAX_SIZE);
+			stack();
+			explicit stack(int MAX_SIZE);
 
 			//copy semantics are disallowed
-			stack_t(const stack_t&) = delete;
-			stack_t& operator = (const stack_t&) = delete;
+			stack(const stack&) = delete;
+			stack& operator = (const stack&) = delete;
 
 			//move semantics are allowed
-			stack_t(stack_t&&)	 noexcept;
-			stack_t& operator = (stack_t&&)	 noexcept;
+			stack(stack&&)	 noexcept;
+			stack& operator = (stack&&)	 noexcept;
 
-			~stack_t() { clear(); }
+			~stack() { clear(); }
 
 			//setters and getters 
 			const T& at(int pos)	const { return stack_[pos]; }
@@ -147,7 +147,7 @@ namespace bitgraph {
 			std::ostream& print(std::ostream& o) const;
 			
 			template<class U>
-			friend std::ostream& operator<< (std::ostream& o, const stack_t<U>& s);
+			friend std::ostream& operator<< (std::ostream& o, const stack<U>& s);
 
 			/////////////////////
 			// data members
@@ -230,7 +230,7 @@ namespace bitgraph {
 
 	//not sure if third party code will use this features (TODO- CHECK)
 	using com::range_t;
-	using com::stack_t;
+	using com::stack;
 	using com::operator==;
 
 }//end namespace bitgraph
@@ -241,7 +241,7 @@ namespace bitgraph {
 				
 		template<class U>
 		inline
-		std::ostream& operator<< (std::ostream& o, const stack_t<U>& s) { s.print(o); return o; }
+		std::ostream& operator<< (std::ostream& o, const stack<U>& s) { s.print(o); return o; }
 	}
 
 	using com::operator<<;

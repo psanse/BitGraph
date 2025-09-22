@@ -759,7 +759,7 @@ namespace bitgraph {
 			* @details no allocation! stack MUST BE of adequate size to hold all 1-bits
 			* @param s: output stack
 			**/
-			void to_stack(com::stack_t<int>& s)				const;
+			void to_stack(com::stack<int>& s)				const;
 
 			/**
 			* @brief Converts the bitstring to a C array

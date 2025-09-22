@@ -322,7 +322,7 @@ BitSet::operator vint() const {
 }
 
 
-void BitSet::to_stack(com::stack_t<int>& s)	const {
+void BitSet::to_stack(com::stack<int>& s)	const {
 	s.erase();
 
 	int v = BBObject::noBit;

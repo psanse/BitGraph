@@ -270,7 +270,7 @@ namespace bitgraph {
 			* @brief prints the weights of the vertices in the stack lv
 			* @param lv: a set of vertices with a stack interface
 			**/
-			std::ostream& print_weights(com::stack_t<int>& lv, ostream& o = std::cout)								const;
+			std::ostream& print_weights(com::stack<int>& lv, ostream& o = std::cout)								const;
 
 			/**
 			* @brief prints the weights of the vertices in the stack lv
@@ -279,7 +279,7 @@ namespace bitgraph {
 			*				  the stack lv
 			* @param lv: a set of vertices with a stack interface
 			**/
-			std::ostream& print_weights(com::stack_t<int>& lv, const vint& mapping, std::ostream& o = std::cout)	const;
+			std::ostream& print_weights(com::stack<int>& lv, const vint& mapping, std::ostream& o = std::cout)	const;
 
 			/**
 			* @brief prints the weights of the vertices in lv
