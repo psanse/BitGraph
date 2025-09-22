@@ -954,9 +954,9 @@ namespace bitgraph {
 
 		BITBOARD NE = 0;
 
-		for (std::size_t i = 0; i < NV_; i++) {
+		for (auto i = 0u; i < NV_; i++) {
 			if (bbn.is_bit(i)) {
-				for (std::size_t j = 0; j < NV_; j++) {
+				for (auto j = 0u; j < NV_; j++) {
 					if (bbn.is_bit(j)) {						//includes possible self loops
 						if (adj_[i].is_bit(j)) { NE++; }
 					}
@@ -973,7 +973,7 @@ namespace bitgraph {
 
 		if (!lazy || NE_ == 0) {					//no lazy evaluation if NE_ = 0
 			NE_ = 0;
-			for (std::size_t i = 0; i < NV_; i++) {
+			for (auto i = 0u; i < NV_; i++) {
 				NE_ += adj_[i].size();
 			}
 		}
@@ -994,9 +994,9 @@ namespace bitgraph {
 		double Graph<BitSetT>::block_density()	const {
 
 		size_t nBB = 0;
-		for (int v = 0; v < NV_; ++v) {
-			for (int bb = 0; bb < NBB_; bb++) {
-				if (adj_[v].block(bb))		//non-empty bitblock				
+		for (auto v = 0u; v < NV_; ++v) {
+			for (auto bb = 0u; bb < NBB_; bb++) {
+				if (adj_[v].block(bb))		//non-empty bitblock
 					nBB++;
 			}
 		}
@@ -1024,7 +1024,7 @@ namespace bitgraph {
 	template<class BitSetT>
 	inline
 		bool Graph<BitSetT>::is_self_loop() const {
-		for (int i = 0; i < NV_; i++)
+		for (auto i = 0u; i < NV_; i++)
 			if (adj_[i].is_bit(i)) {
 				return true;
 			}
@@ -1036,8 +1036,8 @@ namespace bitgraph {
 		void Graph<BitSetT>::remove_vertices(const BitSet& bbn, Graph& g) {
 
 		//determine the size of the graph g
-		int pc = bbn.size();
-		int new_size = NV_ - pc;
+		auto pc = bbn.size();
+		auto new_size = NV_ - pc;
 
 		if (new_size <= 0) {
 			LOG_ERROR("empty graph after deletion - Graph<BitSetT>::remove_vertices");
@@ -1089,7 +1089,7 @@ namespace bitgraph {
 		int Graph<BitSetT>::degree_in(int v) const {
 
 		int res = 0;
-		for (int i = 0; i < NV_; i++) {
+		for (auto i = 0u; i < NV_; i++) {
 			if (i == v) continue;
 			if (adj_[i].is_bit(v)) { res++; }
 
@@ -1104,7 +1104,7 @@ namespace bitgraph {
 		//resets g with new allocation
 		if (g.reset(NV_) == -1) return -1;
 
-		for (auto i = 0; i < NV_ - 1; ++i) {
+		for (auto i = 0u; i < NV_ - 1; ++i) {
 			for (auto j = i + 1; j < NV_; ++j) {
 
 				if (!adj_[i].is_bit(j)) {
@@ -1124,8 +1124,8 @@ namespace bitgraph {
 	inline
 		void Graph<BitSetT>::make_bidirected() {
 
-		for (std::size_t i = 0; i < NV_; ++i) {
-			for (std::size_t j = 0; j < NV_; ++j) {
+		for (auto i = 0u; i < NV_; ++i) {
+			for (auto j = 0u; j < NV_; ++j) {
 				if (is_edge(i, j)) add_edge(j, i);
 				if (is_edge(j, i)) add_edge(i, j);
 			}
@@ -1142,8 +1142,8 @@ namespace bitgraph {
 		remove_edges();
 
 		//sets directed edges with probability p
-		for (std::size_t i = 0; i < NV_; ++i) {
-			for (std::size_t j = 0; j < NV_; ++j) {
+		for (auto i = 0u; i < NV_; ++i) {
+			for (auto j = 0u; j < NV_; ++j) {
 				if (_rand::uniform_dist(p)) {
 					add_edge(i, j);
 				}
@@ -1183,8 +1183,8 @@ namespace bitgraph {
 		header_dimacs(o, false);
 
 		//write edges 1-based vertex notation 
-		for (std::size_t v = 0; v < NV_; ++v) {
-			for (std::size_t w = 0; w < NV_; ++w) {
+		for (auto v = 0u; v < NV_; ++v) {
+			for (auto w = 0u; w < NV_; ++w) {
 				if (v == w) continue;
 				if (is_edge(v, w)) {								//O(log) for sparse graphs: specialize
 					o << "e " << v + 1 << " " << w + 1 << endl;
@@ -1205,8 +1205,8 @@ namespace bitgraph {
 			o << "\n%  " << name_.c_str() << endl;
 
 		//write edges 1-based vertex notation
-		for (std::size_t v = 0; v < NV_; ++v) {
-			for (std::size_t w = 0; w < NV_; ++w) {
+		for (auto v = 0u; v < NV_; ++v) {
+			for (auto w = 0u; w < NV_; ++w) {
 				if (v == w) continue;
 				if (is_edge(v, w)) {							//O(log) for sparse graphs: specialize
 					o << v + 1 << " " << w + 1 << endl;

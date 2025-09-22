@@ -30,6 +30,9 @@ namespace bitgraph {
 
 std::ostream& infoBase::printParams(std::ostream& o) const
 {
+	o.setf(std::ios::fixed); // fixed notation for floating point values	
+	o.precision(4);				// 4 decimal places
+
 	o << "*****************************\n";
 	o << "NAME:" << data_.name << "\t N:" << data_.N << "\t M:" << data_.M << "\t D:" << 2 * data_.M / (float)((data_.N - 1) * data_.N) << endl;
 	o << "TIME_LIMIT:" << data_.TIME_OUT << endl;
@@ -40,6 +43,9 @@ std::ostream& infoBase::printParams(std::ostream& o) const
 }
 std::ostream& infoBase::printTimers(std::ostream& o) const
 {
+	o.setf(std::ios::fixed);	// fixed notation for floating point values	
+	o.precision(4);				// 4 decimal places
+
 	o << "*****************************";
 	o << "\ntime_parse:" << data_.timeElapsed
 		<< "\ntime_preproc:" << timePreproc_
@@ -53,6 +59,10 @@ std::ostream& infoBase::printTimers(std::ostream& o) const
 
 std::ostream& infoBase::printReport( std::ostream& o, report_t r, bool is_endl) const
 {
+	o.setf(std::ios::fixed); // fixed notation for floating point values	
+	o.precision(4);				// 4 decimal places
+
+
 	if (r == report_t::TABLE) {
 		o << data_.name << "\t" << data_.N << "\t" << data_.M << "\t" 
 			<< data_.TIME_OUT << "\t" << data_.TIME_OUT_HEUR << "\t"

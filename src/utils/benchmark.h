@@ -47,7 +47,7 @@ namespace bitgraph {
 			///////////
 			// setters and getters
 
-			int number_of_instances() { return lf_.size(); }
+			int number_of_instances() { return (int)lf_.size(); }
 
 			void setArrayOfFilenames(std::vector<std::string> list) { lf_ = list; }
 

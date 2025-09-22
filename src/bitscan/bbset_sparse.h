@@ -998,7 +998,7 @@ namespace bitgraph {
 		//find the block containing nBit or closest one with less index 
 		int bbL = WDIV(lastBit);
 
-		for (int i = vBB_.size() - 1; i >= 0; --i) {
+		for (int i = (int)vBB_.size() - 1; i >= 0; --i) {
 
 			//block bbL exists - find msb
 			if (vBB_[i].idx_ == bbL) {
@@ -1024,7 +1024,7 @@ namespace bitgraph {
 
 		U32 posInBB;
 
-		for (int i = vBB_.size() - 1; i >= 0; --i) {
+		for (int i = (int)vBB_.size() - 1; i >= 0; --i) {
 
 			if (_BitScanReverse64(&posInBB, vBB_[i].bb_)) {
 				block = i;
@@ -1064,7 +1064,7 @@ namespace bitgraph {
 			BITBOARD b;
 		}val{};
 
-		for (int i = vBB_.size() - 1; i >= 0; --i) {
+		for (int i = (int)vBB_.size() - 1; i >= 0; --i) {
 			val.b = vBB_[i].bb_;
 			if (val.b) {
 				if (val.c[3]) return (Tables::msba[3][val.c[3]] + WMUL(vBB_[i].idx_));
@@ -1082,7 +1082,7 @@ namespace bitgraph {
 	{
 		U32 posInBB;
 
-		for (int i = vBB_.size() - 1; i >= 0; --i) {
+		for (int i = (int)vBB_.size() - 1; i >= 0; --i) {
 
 			if (_BitScanReverse64(&posInBB, vBB_[i].bb_)) {
 				return (posInBB + WMUL(vBB_[i].idx_));

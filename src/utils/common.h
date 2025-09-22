@@ -235,7 +235,7 @@ namespace bitgraph {
 				int number_of_words(const std::string& str)
 			{
 				static const std::regex word_regex(R"(\b\w+\b)");
-				return std::distance(
+				return (int)std::distance(
 					std::sregex_iterator(	str.begin(), str.end(), word_regex),
 											std::sregex_iterator()				);
 
