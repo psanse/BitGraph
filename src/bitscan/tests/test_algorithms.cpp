@@ -1,6 +1,6 @@
 /**
 * @file test_algorithms.cpp
-* @brief Unit tests for the bitstring algorithms and data strcutures in bbalgorithm.h
+* @brief Unit tests for the bitstring algorithms and data structures in bbalgorithm.h
 * @details created 28/3/17, last_update 14/02/2025
 * @detials added while working on the MWCP algorithm
 * @author pss
@@ -27,9 +27,9 @@ using namespace bitgraph;
 //aliases
 using vint = vector<int>;
 
-class bbSizeClassTest : public ::testing::Test {
+class BitSetWithPC_ClassTest : public ::testing::Test {
 protected:
-	bbSizeClassTest() : bb(NV), bbs (NV){}
+	BitSetWithPC_ClassTest() : bb(NV), bbs (NV){}
 	void SetUp() override {
 		bb.set_bit(10);
 		bb.set_bit(64);
@@ -43,8 +43,8 @@ protected:
 
 	//undirected graph instance	
 	const int NV = 65;
-	bbSize_t<BBScan> bb;												//undirected graph with integer weights
-	bbSize_t<BBScanSp> bbs;
+	BitSetWithPC<BBScan> bb;												//undirected graph with integer weights
+	BitSetWithPC<BBScanSp> bbs;
 };
 
 class StackClassTest : public ::testing::Test {
@@ -67,7 +67,7 @@ protected:
 	bbStack_t<BBScanSp> bbs;
 };
 
-TEST_F(bbSizeClassTest, pop_msb) {
+TEST_F(BitSetWithPC_ClassTest, pop_msb) {
 	
 	//pop_msb non-sparse
 	EXPECT_EQ(3, bb.size());
@@ -98,7 +98,7 @@ TEST_F(bbSizeClassTest, pop_msb) {
 	EXPECT_TRUE(bbs.is_empty());
 }
 
-TEST_F(bbSizeClassTest, pop_lsb) {
+TEST_F(BitSetWithPC_ClassTest, pop_lsb) {
 
 	//pop_msb
 	EXPECT_EQ(3, bb.size());
@@ -129,7 +129,7 @@ TEST_F(bbSizeClassTest, pop_lsb) {
 	EXPECT_TRUE(bbs.is_empty());
 }
 
-TEST_F(bbSizeClassTest, reset) {
+TEST_F(BitSetWithPC_ClassTest, reset) {
 
 	//non-sparse
 	bb.reset(100);
@@ -145,7 +145,7 @@ TEST_F(bbSizeClassTest, reset) {
 
 }
 
-TEST_F(bbSizeClassTest, bit_operations) {
+TEST_F(BitSetWithPC_ClassTest, bit_operations) {
 
 	//non-sparse
 	//bb:{10, 64, 65}, size=3
@@ -173,7 +173,7 @@ TEST_F(bbSizeClassTest, bit_operations) {
 	EXPECT_TRUE( bbs.is_empty());
 }
 
-TEST_F(bbSizeClassTest, lazy_bit_erase) {
+TEST_F(BitSetWithPC_ClassTest, lazy_bit_erase) {
 
 	////////////
 	//non-sparse

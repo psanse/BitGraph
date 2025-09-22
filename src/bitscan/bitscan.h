@@ -9,8 +9,9 @@
 
 #include "bitscan/bbsentinel.h"			//base of the non-sparse hierarchy
 #include "bitscan/bbscan_sparse.h"	
+#include "bbalgorithm.h"				//basic algorithms
 
-//useful aliases
+ //useful aliases
 
 namespace bitgraph {
 
