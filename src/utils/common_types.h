@@ -55,13 +55,15 @@ namespace bitgraph {
 			//setters and getters 
 			const T& at(int pos)	const { return stack_[pos]; }
 			const T& top()			const;
-			const T& bottom()			const { return stack_[0]; }
+			const T& bottom()		const { return stack_[0]; }
 
 			T& at(int pos) { return stack_[pos]; }
 			T& top();
 			T& bottom() { return stack_[0]; }
 
 			std::size_t size() { return nE_; }
+			std::size_t capacity() const { return cap_; }
+			bool full() const { return nE_ >= cap_; }
 
 			////////////
 			// memory
@@ -150,8 +152,9 @@ namespace bitgraph {
 			/////////////////////
 			// data members
 
-			std::size_t nE_;								//number of elements, used as internal index pointing to position of the top element + 1
-			T* stack_;										//underlying C-array (TODO - raw pointer ¿change to a std::vector?)		
+			std::size_t nE_;								//number of elements, points to the next position to fill
+			T* stack_;										//underlying C-array 		
+			std::size_t cap_;								//capacity of the underlying array
 #ifdef DEBUG_STACKS
 			int MAX_;										//capacity	
 #endif
