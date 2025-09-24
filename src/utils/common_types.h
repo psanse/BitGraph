@@ -37,6 +37,8 @@ namespace bitgraph {
 		template <class T>
 		struct stack {
 
+			using value = T;
+
 			///////
 			//construction / destruction
 			stack();
