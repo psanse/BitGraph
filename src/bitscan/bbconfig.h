@@ -83,7 +83,7 @@ static_assert(BITGRAPH_WORD_SIZE == WORD_SIZE, "different values BITGRAPH_WORD_S
 		#define WDIV(i)        ((i) >> 6)          // (i / 64)
 		#define WMOD(i)        ((i) & 63)          // (i % 64)
 		#define WMUL(i)        ((i) << 6)          // (i * 64)
-		#define WMOD_MUL(i)    ((i) & 63)          // igual que WMOD, versión rápida
+		#define WMOD_MUL(i)    ((i) & 63)          // originally a quick WMOD - legacy name
 	#else
 		#define WDIV(i)        ((i) / WORD_SIZE)
 		#define WMOD(i)        ((i) % WORD_SIZE)
