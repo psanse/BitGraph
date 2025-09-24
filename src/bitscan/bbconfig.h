@@ -15,8 +15,15 @@
  * suitability for any purpose.
  *
  **/
+#include "bbtypes.h"
 
 using bitgraph::WORD_SIZE;
+
+//mirror macro  for constexpr bitgraph::WORD_SIZE
+#ifndef BITGRAPH_WORD_SIZE
+	#define BITGRAPH_WORD_SIZE 64    
+#endif
+static_assert(BITGRAPH_WORD_SIZE == WORD_SIZE, "different values BITGRAPH_WORD_SIZE and bitgraph::WORD_SIZE");
 
 ////////////////////
 //DEBUG mode assertions
@@ -71,10 +78,19 @@ using bitgraph::WORD_SIZE;
 #define WMOD(i) (Tables::t_wmodindex[(i)])
 #define WMUL(i) (Tables::t_wxindex[(i)])
 #else 
-#define WDIV(i) ((i)/WORD_SIZE)
-#define WMOD(i) ((i)%WORD_SIZE)
-#define WMUL(i) ((i)*WORD_SIZE)
-#define WMOD_MUL(i) ((i)-WMUL(WDIV(i)))						  //WMOD without modulo operation
+	// Optimization for  WORD_SIZE = 64 
+	#if (BITGRAPH_WORD_SIZE == 64)
+		#define WDIV(i)        ((i) >> 6)          // (i / 64)
+		#define WMOD(i)        ((i) & 63)          // (i % 64)
+		#define WMUL(i)        ((i) << 6)          // (i * 64)
+		#define WMOD_MUL(i)    ((i) & 63)          // igual que WMOD, versión rápida
+	#else
+		#define WDIV(i)        ((i) / WORD_SIZE)
+		#define WMOD(i)        ((i) % WORD_SIZE)
+		#define WMUL(i)        ((i) * WORD_SIZE)
+		#define WMOD_MUL(i)    ((i) - WMUL(WDIV(i)))
+	#endif
+
 #endif 
 
 ////////////////////

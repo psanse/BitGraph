@@ -110,7 +110,11 @@ template<class T>
 void bitgraph::stack<T>::push(T d) {
 	assert(stack_ != nullptr && "stack not initialized. Call reset(MAX_SIZE) or use sized ctor - bitgraph::stack<T>::push");
 	assert(nE_ < cap_ && "stack overflow - bitgraph::stack<T>::push");
+
+	/////////////////////////////
 	stack_[nE_++] = std::move(d);
+	/////////////////////////////
+
 #ifdef DEBUG_STACKS
 	if (nE_ > static_cast<std::size_t>MAX_) {
 		LOGG_INFO("bizarre stack with size: ", nE_, " and max size: ", MAX_);
@@ -126,10 +130,13 @@ void bitgraph::stack<T>::push_bottom(T d) {
 	assert(stack_ != nullptr && "stack not initialized. Call reset(MAX_SIZE) or use sized ctor - bitgraph::stack<T>::push_bottom");
 	assert(nE_ < cap_ && "stack overflow - bitgraph::stack<T>::push_bottom");
 
+	//stack empty case
 	if (nE_ == 0) {
 		stack_[nE_++] = std::move(d);
 	}
 	else {
+
+		//stack non-empty case, moves bottom element to top
 		T temp = stack_[0];
 		stack_[0] = std::move(d);
 		stack_[nE_++] = std::move(temp);
