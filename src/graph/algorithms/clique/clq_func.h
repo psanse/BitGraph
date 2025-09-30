@@ -416,7 +416,7 @@ namespace bitgraph {
 			/**
 			* @brief Determines if the set of vertices @bb is an independent set
 			* @param g: input graph
-			* @param bb: input set of vertices (bitset)
+			* @param bb: input set of vertices (bitset), of capacity at least g.size()
 			* @returns TRUE if the set is an independent set (empty sets are NOT isets)
 			* @TODO: not optimized for sparse graph types
 			**/
