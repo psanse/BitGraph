@@ -79,6 +79,8 @@ namespace bitgraph {
 		template <class BitSetT>
 		struct BitSetWithPC {
 
+			using basic_type = BitSetT;
+
 			//construction / destruction
 			BitSetWithPC(int MAX_POP_SIZE) : 
 				pc_(0),
@@ -94,7 +96,7 @@ namespace bitgraph {
 			BitSetWithPC(BitSetWithPC&&) noexcept = default;
 			BitSetWithPC& operator =	(BitSetWithPC&&) noexcept = default;
 
-		//allocation
+			//allocation
 
 			/**
 			* @brief Resets the original bitset and allocates new capacity
@@ -107,6 +109,8 @@ namespace bitgraph {
 			void init(int MAX_POP_SIZE) { bb_.reset(MAX_POP_SIZE); pc_ = 0; }
 
 			//setters and getters
+			BitSetT& bb()	{ return bb_; }
+			const BitSetT& bb() const { return bb_; }
 			BITBOARD  size()	const { return pc_; }
 
 			//bit twiddling
