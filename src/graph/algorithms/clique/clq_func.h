@@ -434,7 +434,7 @@ namespace bitgraph {
 
 					//check neighborhood of v
 					const auto& bbnv = g.neighbors(v);
-					for (auto nBB = 0; nBB < bb.number_of_blocks(); ++nBB) {
+					for (auto nBB = 0; nBB < INDEX_1TO1(g.size()); ++nBB) {
 
 						//////////////////////////////////////////
 						if (bb.block(nBB) & bbnv.block(nBB)) {
