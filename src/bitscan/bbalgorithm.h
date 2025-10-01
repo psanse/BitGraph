@@ -71,11 +71,14 @@ namespace bitgraph {
 
 		//////////////////////
 		// 
-		// BitSetWithPC class
+		// BitSetWithPC struct
 		// 
 		// A very simple wrapper for any type of bitset of the BBObject hierarchy with CACHED size 
-		// 
-		///////////////////////
+		// Note: The fact that the size is cached  can be different from the real population size is
+		//		 a FEATURE, not a BUG. 
+		//		 For exmaple, in the P-MAX-SAT-BOUND application, color bitsets are reduced by reducing the
+		//		 the pc_ value, but the bitset itself is not modified.
+		
 		template <class BitSetT>
 		struct BitSetWithPC {
 
