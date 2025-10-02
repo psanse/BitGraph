@@ -602,7 +602,7 @@ namespace bitgraph {
 		//decode
 		vint aux(new_order);
 		Decode::reverse_in_place(aux);				//changes to [NEW_INDEX]=OLD_INDEX
-		d.insert_ordering(aux);
+		d.add_ordering(aux);
 
 
 		//new order to stream if available
@@ -744,7 +744,7 @@ namespace bitgraph {
 		//decode
 		vint aux(new_order);
 		Decode::reverse_in_place(aux);				//changes to [NEW_INDEX]=OLD_INDEX
-		d.insert_ordering(aux);
+		d.add_ordering(aux);
 
 
 		//new order to stream if available
@@ -795,7 +795,7 @@ namespace bitgraph {
 		//decode- **TODO optimize (too much copying)
 		vint aux(new_order);
 		Decode::reverse_in_place(aux);				//changes to [NEW_INDEX]=OLD_INDEX
-		d.insert_ordering(aux);
+		d.add_ordering(aux);
 
 		//new order to stream if available
 		if (o != NULL)
@@ -847,7 +847,7 @@ namespace bitgraph {
 		//decode info (one copy too much?)
 		vint aux(new_order);
 		Decode::reverse_in_place(aux);						//changes to [NEW_INDEX]=OLD_INDEX
-		d.insert_ordering(aux);
+		d.add_ordering(aux);
 
 		//I/O
 		if (o != NULL)
