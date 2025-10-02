@@ -316,6 +316,20 @@ TEST(Clique, SEQ_coloring) {
 	EXPECT_EQ(2, ub[5]);
 	EXPECT_EQ(3, ub[4]);	
 
+
+	////////////////////////////////////////
+	std::vector<int> ubVector;
+	nCol = gfunc::clq::ISEQ(ug, bbsg, ubVector);
+	///////////////////////////////////////
+
+	EXPECT_EQ(3, nCol);		//{0, 2} {1, 3, 5} {4} - 3 colors
+	EXPECT_EQ(1, ubVector[0]);
+	EXPECT_EQ(1, ubVector[2]);
+	EXPECT_EQ(2, ubVector[1]);
+	EXPECT_EQ(2, ubVector[3]);
+	EXPECT_EQ(2, ubVector[5]);
+	EXPECT_EQ(3, ubVector[4]);
+
 }
 
 

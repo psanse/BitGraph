@@ -842,6 +842,8 @@ namespace bitgraph {
 			inline
 				int ISEQ(const Graph_t& g, const typename Graph_t::_bbt& bbsg, int* ub = nullptr) {
 
+				//TODO-validation
+
 				int pc = bbsg.size();
 				if (pc == 0) { return 0; }			//early exit - bitset bbsg is empty	
 
@@ -879,51 +881,61 @@ namespace bitgraph {
 
 				return col;		//should not reach here
 			}
-		}
 
-		template<class Graph_t>
-		inline
-			int ISEQ(const Graph_t& g, const typename Graph_t::_bbt& bbsg, std::vector<int>* ub = nullptr) {
+			/**
+			* @brief: ISEQ greedy sequential iset coloring of the vertices in @bbsg
+			* @param g: input graph
+			* @param bbsg: (bit)set of vertices to be colored
+			* @param ub: (output) vector with the resulting coloring
+			* @returns: size of the coloring, i.e., number of different colors used
+			**/
+			template<class Graph_t>
+			inline
+				int ISEQ(const Graph_t& g, const typename Graph_t::_bbt& bbsg, std::vector<int>& ub) {
+				
+				//TODO-validation
 
-			
-			int pc = bbsg.size();
-			if (pc == 0) { return 0; }			//early exit - bitset bbsg is empty	
-			if (ub) { ub -> resize(pc); }
+				int pc = bbsg.size();
+				if (pc == 0) { return 0; }			//early exit - bitset bbsg is empty	
+				ub.assign(pc, 0);
 
-			int col = 1, v = bbo::noBit, nBB = bbo::noBit;
+				int col = 1, v = bbo::noBit, nBB = bbo::noBit;
 
-			//main loop - greedy coloring	
-			typename Graph_t::_bbt bb_unsel(bbsg);
-			typename Graph_t::_bbt bb_sel(g.size());
-			while (true) {
+				//main loop - greedy coloring	
+				typename Graph_t::_bbt bb_unsel(bbsg);
+				typename Graph_t::_bbt bb_sel(g.size());
+				while (true) {
 
-				//load bb_sel with remaining vertices to be colored
-				bb_sel = bb_unsel;
+					//load bb_sel with remaining vertices to be colored
+					bb_sel = bb_unsel;
 
-				//build a new iset with vertices from bb_sel
-				bb_sel.init_scan(bbo::DESTRUCTIVE);
-				while ((v = bb_sel.next_bit_del(bb_unsel)) != bbo::noBit) {
+					//build a new iset with vertices from bb_sel
+					bb_sel.init_scan(bbo::DESTRUCTIVE);
+					while ((v = bb_sel.next_bit_del(bb_unsel)) != bbo::noBit) {
 
-					//update coloring
-					if (ub) { ub[v] = col; }
+						//update coloring
+						ub[v] = col;
 
-					//remove colored vertex from bbsg
-					//bb_unsel.erase_bit(v);
+						//remove colored vertex from bbsg
+						//bb_unsel.erase_bit(v);
 
-					/////////////////////////////////
-					if ((--pc) == 0) { return col; }				//early exit - all vertices colored
-					/////////////////////////////////
+						/////////////////////////////////
+						if ((--pc) == 0) { return col; }				//early exit - all vertices colored
+						/////////////////////////////////
 
-					//removes neighbors of v
-					bb_sel.erase_block(WDIV(v), -1, g.neighbors(v));
+						//removes neighbors of v
+						bb_sel.erase_block(WDIV(v), -1, g.neighbors(v));
+					}
+
+					//open a new color
+					++col;
 				}
 
-				//open a new color
-				++col;
+				return col;		//should not reach here
 			}
-
-			return col;		//should not reach here
 		}
+
+		
 		
 
 
