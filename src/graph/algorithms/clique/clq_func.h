@@ -15,6 +15,7 @@
 #include "utils/common.h"
 #include "bitscan/bbobject.h"		
 #include "bitscan/bitblock.h"		//for bitblock operations
+#include "bitscan/bbset.h"	
 
 #include <cassert>					//DEBUG run-time assertions 
 
@@ -323,7 +324,7 @@ namespace bitgraph {
 					//determine clique with the first consecutive vertices in the neighboorhood of v
 
 					//initialize bb with the neighborhood of v in bbsg in [v, end)
-					bitgraph::AND<true>(v, g.size() - 1, g.neighbors(v), bbsg, bb);
+					bitgraph::_impl::AND<true>(v, g.size() - 1, g.neighbors(v), bbsg, bb);
 
 					//main loop
 					int w = bbo::noBit;
@@ -768,7 +769,7 @@ namespace bitgraph {
 					lb++;
 
 					//optimization of bb &= g.get_neighbors(w);	
-					if constexpr (Reverse) {
+					if /*constexpr*/ (Reverse) {									//for C++14 support
 						for (auto nBB = WDIV(v); nBB >= 0; --nBB) {
 							bb.block(nBB) &= g.neighbors(v).block(nBB);
 						}
