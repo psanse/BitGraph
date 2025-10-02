@@ -438,7 +438,7 @@ namespace bitgraph {
 			for (auto i = 0; i < lhs.nBB_; ++i) {
 				BITBOARD bb = lhs.vBB_[i] & rhs.vBB_[i];
 				if (bb) {
-					return bblock::lsb64_intrinsic(bb) + WMUL(i);
+					return bblock::lsb(bb) + WMUL(i);
 				}
 			}
 
