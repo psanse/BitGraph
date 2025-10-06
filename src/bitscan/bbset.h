@@ -459,7 +459,9 @@ namespace bitgraph {
 			inline	BitSet& erase_bit(const BitSet& bitset);
 
 			/**
-			* @brief Removes the bits  from the bitstring @bitset inside the  closed range [firstBit, lastBit] 
+			* @brief Removes the bits  from the bitstring @bitset inside the 
+			*		 closed range [firstBit, lastBit]. 
+			*		 If lastBit == -1, the range is [firstBit, endOfBitset) 
 			* 
 			*		 I. bitset must have a maximum population
 			*			greater or equal than the bitstring.
