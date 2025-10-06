@@ -15,7 +15,7 @@
  //current impact on stack_t in common_types.h
 
 #ifndef NDEBUG
-#define DEBUG_STACKS		//checks stack sizes (important to debug SAT engine in DEBUG mode)
+//#define DEBUG_STACKS		//checks stack sizes (important to debug SAT engine in DEBUG mode) TODO - legacy code, remove (06/10/2025)
 #endif 
 
 #include "logger.h"

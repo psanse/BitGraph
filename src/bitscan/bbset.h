@@ -405,6 +405,7 @@ namespace bitgraph {
 				* @returns reference to the modified bitstring
 				**/
 			inline	BitSet& set_bit(const BitSet& bb_add);
+			inline BitSet& assign_bit(const BitSet& bb_add);
 
 			/**
 			* @brief Adds the bits from the bitstring bb_add in the range [0, lastBit]
@@ -497,6 +498,7 @@ namespace bitgraph {
 				* @returns reference to the modified bitstring
 				**/
 			inline	BitSet& set_block(int firstBlock, int lastBlock, const BitSet& bb_add);
+			inline BitSet& assign_block(int firstBlock, int lastBlock, const BitSet& bb_add);
 
 			/**
 			* @brief Deletes the 1-bits from the bitstring bb_del in the closed range [firstBlock, lastBlock]
@@ -1221,6 +1223,19 @@ namespace bitgraph{
 			return *this;
 		}
 
+		inline BitSet& _impl::BitSet::assign_bit(const BitSet& bb_add)
+		{
+			/////////////////////////////////
+			assert(nBB_ <= bb_add.nBB_);
+			/////////////////////////////////
+
+			for (auto i = 0; i < nBB_; ++i) {
+				vBB_[i] = bb_add.vBB_[i];
+			}
+
+			return *this;
+		}
+
 
 		BitSet& BitSet::set_block(int firstBlock, int lastBlock, const BitSet& bb_add) {
 
@@ -1233,6 +1248,22 @@ namespace bitgraph{
 
 			for (auto i = firstBlock; i <= last_block; ++i) {
 				vBB_[i] |= bb_add.vBB_[i];
+			}
+
+			return *this;
+		}
+
+		inline BitSet& _impl::BitSet::assign_block(int firstBlock, int lastBlock, const BitSet& bb_add)
+		{
+			int last_block = ((lastBlock == -1) ? nBB_ - 1 : lastBlock);
+
+			////////////////////////////////////////////////////////////////////////////////////////////
+			assert((firstBlock >= 0) && (last_block < bb_add.capacity()) && (firstBlock <= last_block));
+			///////////////////////////////////////////////////////////////////////////////////////////
+
+
+			for (auto i = firstBlock; i <= last_block; ++i) {
+				vBB_[i] = bb_add.vBB_[i];
 			}
 
 			return *this;
