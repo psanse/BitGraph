@@ -507,11 +507,13 @@ namespace bitgraph {
 			// class RandomUniformGen
 			//
 			// (uses global random engine and dist.)
+			// 
+			// TODO - change to a global design pattern (07/10/2025)
 			//
 			//////////////////
 
 			template<	typename D = std::uniform_int_distribution<int>,
-				typename RE = std::mt19937									>	//std::default_random_engine in this machine
+						typename RE = std::mt19937							>	//std::default_random_engine in this machine
 			class RandomUniformGen {
 			public:
 				using result_type = typename D::result_type;
@@ -553,7 +555,7 @@ namespace bitgraph {
 				}
 
 				//////////////////////////////////////////////////////////////////
-				RandomUniformGen() = default;
+				RandomUniformGen() = default;													
 				RandomUniformGen(const RandomUniformGen&) = delete;
 				RandomUniformGen& operator = (const RandomUniformGen&) = delete;
 				//////////////////////////////////////////////////////////////////
@@ -566,7 +568,7 @@ namespace bitgraph {
 
 			////////////////////////////////////////////////////////////////
 			template  < typename D = std::uniform_int_distribution<int>,
-				typename RE = std::mt19937							>
+						typename RE = std::mt19937							>
 			using ugen = RandomUniformGen< D, RE >;
 
 			using iugen = RandomUniformGen< std::uniform_int_distribution<int>, std::mt19937 >;
@@ -578,6 +580,27 @@ namespace bitgraph {
 			template<typename D, typename RE> RE RandomUniformGen<D, RE>::re_;
 			template<typename D, typename RE> D RandomUniformGen<D, RE>::dist_;
 
+
+			//ADD SOMETHING LIKE BELOW TO CLASSES USING RANDOMNESS (07/10/2025)
+			//// Ejemplo: añadir a mnts (no parte del código original)
+			//struct DeterministicRNG {
+			//	explicit DeterministicRNG(uint32_t seed = 123456789u) : eng(seed) {}
+			//	int uniform_int(int lo, int hi) {
+			//		std::uniform_int_distribution<int> dist(lo, hi);
+			//		return dist(eng);
+			//	}
+			//	std::mt19937 eng;
+			//};
+
+			//// Dentro de mnts:
+			//class mnts {
+			//public:
+			//	void set_seed(uint32_t s) { rng.eng.seed(s); has_user_seed = true; }
+			//private:
+			//	DeterministicRNG rng;
+			//	bool has_user_seed = false;
+			//	// Sustituir usos de rand()/shuffle(...) por rng.uniform_int(...)
+			//};
 
 
 			inline
