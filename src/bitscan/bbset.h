@@ -395,16 +395,25 @@ namespace bitgraph {
 			**/
 			//inline  BitSet&  set_bit			();
 
-				/**
-				* @brief Adds the bits from the bitstring bb_add in the population
-				*		 range of the bitstring (bitblocks are copied).
-				*
-				*		 I. The bitblock size of bb_add must be at least as large as the bitstring.
-				*
-				* @details  Equivalent to OR operation / set union
-				* @returns reference to the modified bitstring
-				**/
+			/**
+			* @brief Adds the bits from the bitstring bb_add in the population
+			*		 range of the bitstring (bitblocks are copied).
+			*
+			*		 Note: The bitblock size of bb_add must be at least as large as the bitstring.
+			*
+			* @details  Equivalent to OR operation / set union
+			* @returns reference to the modified bitstring
+			**/
 			inline	BitSet& set_bit(const BitSet& bb_add);
+
+			/**
+			* @brief Overwrites this bitstring with @bb_add (equivalent to operator=)
+			*		  
+			*		 Note: The bitblock size of bb_add must be at least as large as this bitstring.
+			* 
+			* @param bb_add: input bitstring whose bits are copied
+			* returns reference to the modified bitstring
+			**/
 			inline BitSet& assign_bit(const BitSet& bb_add);
 
 			/**
@@ -487,17 +496,28 @@ namespace bitgraph {
 			//BitBlock operations 
 
 				/**
-				* @brief Copies the 1-bits from the bitstring bb_add in the closed range [firstBlock, lastBlock]
+				* @brief ORs the 1-bits from the bitstring @bb_add in the closed range [firstBlock, lastBlock]
 				*		 If LastBlock == -1, the range is [firstBlock, nBB_]
 				*
 				*		 0 <= FirstBlock <= LastBLock < the number of bitblocks in the bitstring
 				*
-				* @param bb_add: input bitstring to be copied
+				* @param bb_add: input bitstring whose bits are added
 				* @param FirstBlock: the first bitblock to be modified
 				* @param LastBLock: the last bitblock to be modified
 				* @returns reference to the modified bitstring
 				**/
 			inline	BitSet& set_block(int firstBlock, int lastBlock, const BitSet& bb_add);
+
+			/**
+			* @brief Overwrites / Copies the blocks of 1-bits from the bitstring @bb_add 
+			*		 in the closed range [firstBlock, lastBlock] to this bitstring.
+			*		 If LastBlock == -1, the range is [firstBlock, nBB_]
+			*		 0 <= FirstBlock <= LastBLock < the number of bitblocks in the bitstring
+			* @param bb_add: input bitstring whose bits are copied
+			* @param FirstBlock: the first bitblock to be modified
+			* @param LastBLock: the last bitblock to be modified
+			* returns reference to the modified bitstring
+			**/
 			inline BitSet& assign_block(int firstBlock, int lastBlock, const BitSet& bb_add);
 
 			/**
