@@ -199,31 +199,7 @@ namespace bitgraph {
 			bool operator == (const range_t& lhs, const range_t& rhs) {
 			return (lhs.vl == rhs.vl && lhs.vh == rhs.vh);
 		}
-
-
-		///////////////////////
-		//
-		// class my_array
-		//
-		// my old C_array wrraper
-		// 
-		// TODO - deprecated, possibly remove (17(01/25)
-		//
-		////////////////////////
-
-		/*template<class T>
-		class my_array {
-			T* pt;
-			size_t sz;
-		public:
-			my_array	(size_t size, T val) :sz(size) { pt = new T[sz];  for (int i = 0; i < sz; i++) { pt[i] = val; } }
-			~my_array() { delete[] pt; }
-			T& operator [](int idx) { return pt[idx]; }
-			const T& operator [](int idx) const { return pt[idx]; }
-			T at(int idx) { return pt[idx]; }
-			T* get_array() { return pt; };
-			size_t size() { return sz; }
-		};*/
+		
 
 	}
 
