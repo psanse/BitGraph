@@ -157,9 +157,6 @@ namespace bitgraph {
 			std::size_t nE_;								//number of elements, points to the next position to fill
 			T* stack_;										//underlying C-array 		
 			std::size_t cap_;								//capacity of the underlying array
-#ifdef DEBUG_STACKS
-			int MAX_;										//capacity	
-#endif
 
 		};
 

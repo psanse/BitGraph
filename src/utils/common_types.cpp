@@ -18,11 +18,7 @@ using namespace bitgraph;
 template<class T>
 bitgraph::stack<T>::stack() :
 	nE_(0), stack_(nullptr), cap_(0)
-{
-#ifdef DEBUG_STACKS
-	MAX_ = 0;
-#endif   
-}
+{}
 
 template<class T>
 bitgraph::stack<T>::stack(int MAX_SIZE) : 
@@ -36,25 +32,15 @@ bitgraph::stack<T>::stack(int MAX_SIZE) :
 		LOGG_ERROR("bad_alloc - stack<T>::stack");
 		throw;
 	}
-
-#ifdef DEBUG_STACKS
-	MAX_ = MAX_SIZE;
-#endif
 }
 
 template<class T>
 bitgraph::stack<T>::stack(bitgraph::stack<T>&& s) noexcept
 	: nE_(s.nE_), stack_(s.stack_), cap_(s.cap_)
-#ifdef DEBUG_STACKS
-	, MAX_(s.MAX_)
-#endif
 {
 	s.stack_ = nullptr;
 	s.nE_ = 0;
 	s.cap_ = 0;
-#ifdef DEBUG_STACKS
-	s.MAX_ = 0;
-#endif
 }
 
 template<class T>
@@ -64,15 +50,11 @@ bitgraph::stack<T>& bitgraph::stack<T>::operator = (bitgraph::stack<T>&& s) noex
 	nE_ = s.nE_;
 	stack_ = s.stack_;
 	cap_ = s.cap_;
-#ifdef DEBUG_STACKS
-	MAX = s.MAX_;
-#endif
+
 	s.stack_ = nullptr;
 	s.nE_ = 0;
 	s.cap_ = 0;
-#ifdef DEBUG_STACKS
-	s.MAX_ = 0;
-#endif
+
 	return *this;
 }
 
@@ -89,10 +71,6 @@ void bitgraph::stack<T>::reset(int MAX_SIZE) {
 		LOG_ERROR("bad_alloc - stack<T>::reset");
 		throw;
 	}
-
-#ifdef DEBUG_STACKS
-	MAX_ = MAX_SIZE;
-#endif
 }
 
 template<class T>
@@ -101,9 +79,6 @@ void bitgraph::stack<T>::clear() {
 	stack_ = nullptr;
 	nE_ = 0;
 	cap_ = 0;
-#ifdef DEBUG_STACKS
-	MAX_ = 0;
-#endif
 }
 
 template<class T>
@@ -114,15 +89,6 @@ void bitgraph::stack<T>::push(T d) {
 	/////////////////////////////
 	stack_[nE_++] = std::move(d);
 	/////////////////////////////
-
-#ifdef DEBUG_STACKS
-	if (nE_ > static_cast<std::size_t>MAX_) {
-		LOGG_INFO("bizarre stack with size: ", nE_, " and max size: ", MAX_);
-		LOG_INFO("-bitgraph::stack<T>::push(T d)");
-		LOG_INFO("press any key to continue");
-		std::cin.get();
-	}
-#endif
 }
 
 template<class T>
@@ -141,14 +107,6 @@ void bitgraph::stack<T>::push_bottom(T d) {
 		stack_[0] = std::move(d);
 		stack_[nE_++] = std::move(temp);
 	}
-#ifdef DEBUG_STACKS
-	if (nE_ > static_cast<std::size_t>MAX_) {    //*** no checking against N
-		LOGG_INFO("bizarre stack with size: ", nE_, " and max size: ", MAX_);
-		LOG_INFO("-bitgraph::stack<T>::push_bottom(T d)");
-		LOG_INFO("press any key to continue");
-		std::cin.get();
-	}
-#endif
 }
 
 template<class T>
