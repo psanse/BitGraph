@@ -241,9 +241,9 @@ namespace bitgraph {
 			/**
 			* @brief generates undirected edges with probability p, exactly.
 			* @param p probability of an edge
-			* @details: - uses a different model from gen_random_edges
+			* @details: - uses a different model from OLD gen_random_edges
 			**/
-			void gen_random_edges(double p);
+			void gen_random_edges(double p)			override;
 
 			//////////////	
 			// Induced subgraphs

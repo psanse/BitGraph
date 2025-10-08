@@ -97,7 +97,9 @@ namespace bitgraph {
 			* @brief Places element at the bottom of the stack
 			*	     (first position in the underlying array)
 			*
-			*		 I. The bottom element is moved to the top of the stack
+			*		 I. The bottom element is moved to the top of the stack			
+			*
+			* TODO - possibly change names (push_front, push_back idioms better) (06/10/2025)
 			**/
 			void push_bottom(T d);
 
