@@ -629,11 +629,12 @@ namespace bitgraph {
 			extern rugen g_rugen;   // real (uniform_real)
 			///////////////////////////////////
 
-
+			/**
+			* @brief returns true with probability p, false with 1 - p
+			**/
 			inline
-				bool uniform_dist(double p) {
-				//returns true with prob p, 0 with 1-p
-
+			bool uniform_dist(double p) {
+			
 				//c- windows generator (deprecated)
 			   /* double n_01=std::rand()/(double)RAND_MAX;
 				return (n_01<=p);*/

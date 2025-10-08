@@ -235,8 +235,15 @@ namespace bitgraph {
 			* @param w input endpoint
 			* @returns 0 is success, -1 if error
 			**/
-			void gen_random_edges(double p)								override;
-
+			//void gen_random_edges(double p)								override;
+			
+			
+			/**
+			* @brief generates undirected edges with probability p, exactly.
+			* @param p probability of an edge
+			* @details: - uses a different model from gen_random_edges
+			**/
+			void gen_random_edges(double p);
 
 			//////////////	
 			// Induced subgraphs
@@ -568,6 +575,24 @@ namespace bitgraph {
 		}
 	}
 
+	//template<class BitSetT>
+	//inline
+	//	void Ugraph<BitSetT>::gen_random_edges(double p) {
+
+	//	//removes all edges
+	//	this->remove_edges();
+
+	//	//sets undirected edges with probability p
+	//	for (std::size_t i = 0; i < this->NV_ - 1; i++) {
+	//		for (std::size_t j = i + 1; j < this->NV_; j++) {
+	//			if (_rand::uniform_dist(p)) {
+	//				add_edge(i, j);
+	//			}
+	//		}
+	//	}
+
+	//}
+
 	template<class BitSetT>
 	inline
 		void Ugraph<BitSetT>::gen_random_edges(double p) {
@@ -575,13 +600,25 @@ namespace bitgraph {
 		//removes all edges
 		this->remove_edges();
 
-		//sets undirected edges with probability p
-		for (std::size_t i = 0; i < this->NV_ - 1; i++) {
-			for (std::size_t j = i + 1; j < this->NV_; j++) {
-				if (_rand::uniform_dist(p)) {
-					add_edge(i, j);
-				}
+		using edge_t = std::pair<int, int>;
+		std::vector<edge_t> edges;
+		edges.reserve(this->NV_ * (this->NV_ - 1) / 2);
+		for (auto i = 0u; i < this->NV_ - 1; ++i) {
+			for (auto j = i + 1; j < this->NV_; ++j) {
+				edges.emplace_back(i, j);
 			}
+		}
+
+		//rounds edges to the nearest integer value
+		const std::size_t N = edges.size();
+		std::size_t M = static_cast<std::size_t>(std::llround(p * N)); 
+		if (M > N) { M = N; };
+
+		std::shuffle(edges.begin(), edges.end(), bitgraph::com::_rand::g_iugen.engine() /*std::mt19937_64(std::random_device{}())*/);
+
+		//take the first M edges
+		for (std::size_t i = 0; i < M; ++i) {
+			add_edge(edges[i].first, edges[i].second);
 		}
 
 	}

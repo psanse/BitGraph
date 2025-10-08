@@ -200,13 +200,10 @@ TEST(UGraphW, gen_random) {
 	RandomGen<ugraph_wi>::create_graph(ugw, NV, density);							/* empty vertex weights by default */
 	WeightGen<ugraph_wi>::create_weights(ugw, WeightGen<ugraph_wi>::WMOD);
 	
-	ugw.print_data();
-	cin.get();
-
 	/////////////////////
 	EXPECT_EQ(NV, ugw.graph().number_of_vertices());
-	EXPECT_TRUE(ugw.density()< density + 0.01);
-	EXPECT_TRUE(ugw.density()> density - 0.01);
+	EXPECT_TRUE(ugw.density()< density + 0.001);
+	EXPECT_TRUE(ugw.density()> density - 0.001);
 	////////////////////
 }
 
