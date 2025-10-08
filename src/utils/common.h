@@ -1,4 +1,4 @@
-/*
+﻿/*
  * @file common.h
  * @brief common utilities for the framework
  * @date ?
@@ -32,6 +32,7 @@
 #include <regex>
 
 #include "common_types.h"				//common types additional utilities, to be included e
+
 
 
 
@@ -501,111 +502,132 @@ namespace bitgraph {
 	//////////////////////////////
 	namespace com {
 		namespace _rand {
-					
-
-			//////////////////
+			
+			/////////////////////
 			//
 			// class RandomUniformGen
 			//
-			// (uses global random engine and dist.)
-			// 
-			// TODO - change to a global design pattern (07/10/2025)
+			// Global-like pattern via static members per <D, RE>.
+			//  - seed() externo e interno (rd / reloj) 
+			//  - set_range(min,max)
+			//  - operator()() y operator()(min,max)
 			//
-			//////////////////
+			//////////////////////
 
-			template<	typename D = std::uniform_int_distribution<int>,
-						typename RE = std::mt19937							>	//std::default_random_engine in this machine
+			template<
+				typename D = std::uniform_int_distribution<int>,
+				typename RE = std::mt19937
+			>
 			class RandomUniformGen {
 			public:
 				using result_type = typename D::result_type;
 				using dist_type = D;
 				using rgen_type = RE;
 
-				constexpr static std::uint32_t FIXED_RANDOM_SEED = 123456789u;		//default seed for randomness
+				constexpr static std::uint32_t FIXED_RANDOM_SEED = 123456789u;   // semilla por defecto
 
-				result_type a() { return dist_.param().a(); }
-				result_type b() { return dist_.param().b(); }
+				struct UseFixedSeed {};        // tag opcional
+				struct UseRandomDevice {};     // tag opciona
 
+				// límites actuales de la distribución
+				result_type a() const { return dist_.param().a(); }
+				result_type b() const { return dist_.param().b(); }
+
+				// cambia el rango de la distribución global (por tipo D)
 				static void set_range(result_type min, result_type max) {
+					if (max < min) throw std::invalid_argument("set_range: max < min");
 					dist_.param(typename D::param_type{ min, max });
 				}
 
-				static void seed(std::size_t seed) {							//external seed
-					seed_ = seed;
-					re_.seed(seed_);
+				// fija semilla externa
+				static void seed(std::size_t s) {
+					seed_ = s;
+					re_.seed(static_cast<typename RE::result_type>(seed_));
 				}
-				static void seed() {											//internal seed- 
+
+				// semilla interna (random_device si tiene entropía; si no, reloj)
+				static void seed() {
 					std::random_device rd;
-
-					///////////////////////////////////////
-					if (rd.entropy())											//checks if the source of randomness in HW is valid
-						seed_ = rd();
-					else
-						seed_ = static_cast<decltype(seed_)>(std::chrono::high_resolution_clock::now().time_since_epoch().count());
-					/////////////////////////////////////////
-
-					re_.seed(seed_);
+					if (rd.entropy() > 0.0) {
+						seed_ = static_cast<std::size_t>(rd());
+					}
+					else {
+						seed_ = static_cast<std::size_t>(
+							std::chrono::high_resolution_clock::now().time_since_epoch().count()
+							);
+					}
+					re_.seed(static_cast<typename RE::result_type>(seed_));
 				}
 
+				// para inspeccionar la semilla actual
+				static std::size_t get_seed() { return seed_; }
+
+				// genera usando el rango actual de 'dist_'
 				result_type operator()() {
 					return dist_(re_);
 				}
 
+				// genera en [min, max] sin tocar el estado global del rango
 				result_type operator()(result_type min, result_type max) {
+					if (max < min) throw std::invalid_argument("operator(min,max): max < min");
 					return dist_(re_, typename D::param_type{ min, max });
 				}
 
-				//////////////////////////////////////////////////////////////////
-				RandomUniformGen() = default;
+				////////////////////////////////////////////////////////////////
+				RandomUniformGen() = default;                    
 				RandomUniformGen(const RandomUniformGen&) = delete;
-				RandomUniformGen& operator = (const RandomUniformGen&) = delete;
-				//////////////////////////////////////////////////////////////////
+				RandomUniformGen& operator=(const RandomUniformGen&) = delete;
+
+				
+				explicit RandomUniformGen(std::size_t s) {
+					seed(s);                   // fija semilla reproducible
+				}
+											
+				explicit RandomUniformGen(UseFixedSeed) {
+					seed(FIXED_RANDOM_SEED);
+				}
+				
+				explicit RandomUniformGen(UseRandomDevice) {
+					seed();                    // usa random_device / reloj
+				}
+				
+
+				static RE& engine() { return re_; }
+				////////////////////////////////////////////////////////////////
 
 			private:
-				static RE re_;										//random generator
-				static D dist_;										//uniform distribution
-				static std::size_t seed_;							//default seed
+				// estado global por combinación <D, RE>
+				static RE re_;                 // motor
+				static D  dist_;               // distribución
+				static std::size_t seed_;      // semilla vigente
 			};
 
-			////////////////////////////////////////////////////////////////
-			template  < typename D = std::uniform_int_distribution<int>,
-						typename RE = std::mt19937							>
-			using ugen = RandomUniformGen< D, RE >;
+			// Aliases convenientes
+			template<typename D = std::uniform_int_distribution<int>,
+				typename RE = std::mt19937>
+			using ugen = RandomUniformGen<D, RE>;
 
-			using iugen = RandomUniformGen< std::uniform_int_distribution<int>, std::mt19937 >;
-			using rugen = RandomUniformGen< std::uniform_real_distribution<double>, std::mt19937 >;
-			////////////////////////////////////////////////////////////////
+			using iugen = RandomUniformGen<std::uniform_int_distribution<int>, std::mt19937>;
+			using rugen = RandomUniformGen<std::uniform_real_distribution<double>, std::mt19937>;
 
-			////////////////
-			// Global declarations for RandomUniformGen class
-			template<typename D, typename RE> RE RandomUniformGen<D, RE>::re_;
-			template<typename D, typename RE> D RandomUniformGen<D, RE>::dist_;
+			// Definiciones de estáticos (C++11/C++14)
+			template<typename D, typename RE>
+			std::size_t RandomUniformGen<D, RE>::seed_ = RandomUniformGen<D, RE>::FIXED_RANDOM_SEED;
 
-			extern iugen g_iugen;   // integer deterministic	
-			extern rugen g_rugen;   // real deterministic
+			template<typename D, typename RE>
+			RE RandomUniformGen<D, RE>::re_ = RE(static_cast<typename RE::result_type>(
+				RandomUniformGen<D, RE>::seed_
+				));
+
+			template<typename D, typename RE>
+			D RandomUniformGen<D, RE>::dist_ = D{};
 
 		
-
-			//ADD SOMETHING LIKE BELOW TO CLASSES USING RANDOMNESS (07/10/2025)
-			//// Ejemplo: a�adir a mnts (no parte del c�digo original)
-			//struct DeterministicRNG {
-			//	explicit DeterministicRNG(uint32_t seed = 123456789u) : eng(seed) {}
-			//	int uniform_int(int lo, int hi) {
-			//		std::uniform_int_distribution<int> dist(lo, hi);
-			//		return dist(eng);
-			//	}
-			//	std::mt19937 eng;
-			//};
-
-			//// Dentro de mnts:
-			//class mnts {
-			//public:
-			//	void set_seed(uint32_t s) { rng.eng.seed(s); has_user_seed = true; }
-			//private:
-			//	DeterministicRNG rng;
-			//	bool has_user_seed = false;
-			//	// Sustituir usos de rand()/shuffle(...) por rng.uniform_int(...)
-			//};
+			///////////////////////////////////
+			//the one-and-only global generators
+			extern iugen g_iugen;   // integer (uniform_int)
+			extern rugen g_rugen;   // real (uniform_real)
+			///////////////////////////////////
 
 
 			inline
@@ -617,12 +639,15 @@ namespace bitgraph {
 				return (n_01<=p);*/
 
 				/////////////////////////////
-				rugen r;
-				return r(0.0, 1.0) <= p;
+				return g_rugen() <= p;
+				//return std::generate_canonical<double, 53>(g_rugen.engine()) <= p;		/* high precision engine */
 				////////////////////////////
-			}
+				
+			}			
+
 		}
 	}
+
 
 	//////////////////////////////
 	//
@@ -745,9 +770,6 @@ namespace bitgraph {
 	using namespace com::_rand;	
 	using namespace com::_dir;
 
-
-	using com::_rand::g_iugen;
-	using com::_rand::g_rugen;
 
 }//end namespace bitgraph
 

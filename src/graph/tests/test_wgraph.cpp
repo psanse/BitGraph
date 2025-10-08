@@ -193,12 +193,15 @@ TEST(UGraphW, gen_weights_dimacs){
 TEST(UGraphW, gen_random) {
 	
 	const int NV = 50;
-	const double density = 0.3;
+	const double density = 0.31;
 		
 	//creates random graph of size NV with modulus weights
 	ugraph_wi ugw;
 	RandomGen<ugraph_wi>::create_graph(ugw, NV, density);							/* empty vertex weights by default */
 	WeightGen<ugraph_wi>::create_weights(ugw, WeightGen<ugraph_wi>::WMOD);
+	
+	ugw.print_data();
+	cin.get();
 
 	/////////////////////
 	EXPECT_EQ(NV, ugw.graph().number_of_vertices());

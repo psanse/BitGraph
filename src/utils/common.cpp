@@ -13,23 +13,23 @@ using namespace std;
 //One and only global generators
 namespace bitgraph {
 	namespace com {
-		namespace _rand {			
-			iugen g_iugen;   // enteros deterministas
-			rugen g_rugen;   // reales deterministas
+		namespace _rand {   
+			iugen g_iugen(iugen::UseFixedSeed{});
+			rugen g_rugen(rugen::UseFixedSeed{});
 		}
-	}	
+	}
 }
 
 
 //gloabl template variables
 namespace bitgraph {
 
-	namespace com {
+	/*namespace com {
 		namespace _rand {
 			template<typename D, typename RE>
 			std::size_t RandomUniformGen<D, RE>::seed_ = RandomUniformGen<D, RE>::FIXED_RANDOM_SEED;
 		}
-	}
+	}*/
 
 	
 	namespace com {
