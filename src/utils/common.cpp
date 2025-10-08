@@ -10,6 +10,15 @@
 
 using namespace std;
 
+//One and only global generators
+namespace bitgraph {
+	namespace com {
+		namespace _rand {			
+			iugen g_iugen;   // enteros deterministas
+			rugen g_rugen;   // reales deterministas
+		}
+	}	
+}
 
 
 //gloabl template variables

@@ -501,6 +501,7 @@ namespace bitgraph {
 	//////////////////////////////
 	namespace com {
 		namespace _rand {
+					
 
 			//////////////////
 			//
@@ -520,7 +521,7 @@ namespace bitgraph {
 				using dist_type = D;
 				using rgen_type = RE;
 
-				constexpr static unsigned int FIXED_RANDOM_SEED = 10000;		//default seed for randomness
+				constexpr static std::uint32_t FIXED_RANDOM_SEED = 123456789u;		//default seed for randomness
 
 				result_type a() { return dist_.param().a(); }
 				result_type b() { return dist_.param().b(); }
@@ -555,7 +556,7 @@ namespace bitgraph {
 				}
 
 				//////////////////////////////////////////////////////////////////
-				RandomUniformGen() = default;													
+				RandomUniformGen() = default;
 				RandomUniformGen(const RandomUniformGen&) = delete;
 				RandomUniformGen& operator = (const RandomUniformGen&) = delete;
 				//////////////////////////////////////////////////////////////////
@@ -580,6 +581,10 @@ namespace bitgraph {
 			template<typename D, typename RE> RE RandomUniformGen<D, RE>::re_;
 			template<typename D, typename RE> D RandomUniformGen<D, RE>::dist_;
 
+			extern iugen g_iugen;   // integer deterministic	
+			extern rugen g_rugen;   // real deterministic
+
+		
 
 			//ADD SOMETHING LIKE BELOW TO CLASSES USING RANDOMNESS (07/10/2025)
 			//// Ejemplo: añadir a mnts (no parte del código original)
@@ -739,6 +744,10 @@ namespace bitgraph {
 	using namespace com::_sort;
 	using namespace com::_rand;	
 	using namespace com::_dir;
+
+
+	using com::_rand::g_iugen;
+	using com::_rand::g_rugen;
 
 }//end namespace bitgraph
 
