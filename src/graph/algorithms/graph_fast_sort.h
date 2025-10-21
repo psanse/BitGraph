@@ -358,7 +358,7 @@ namespace bitgraph {
 		}
 
 		//conversion [NEW] to [OLD] if required
-		if (!o2n) { Decode::reverse_in_place(nodes_); }
+		if (o2n) { Decode::reverse_in_place(nodes_); }
 		return nodes_;
 	}
 
