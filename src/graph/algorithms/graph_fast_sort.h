@@ -359,7 +359,8 @@ namespace bitgraph {
 		}
 
 		//conversion [NEW] to [OLD] if required
-		if (o2n) { Decode::reverse_in_place(nodes_); }
+		//note: sorting produced by sorting primitives is always in [OLD] to [NEW] format
+		if (!o2n) { Decode::reverse_in_place(nodes_); }
 		return nodes_;
 	}
 
@@ -877,8 +878,8 @@ namespace bitgraph {
 
 		std::size_t NV = g.number_of_vertices();
 		gres.reset(NV);
-		gres.name(g_.name());
-		gres.path(g_.path());
+		gres.name(g.name());
+		gres.path(g.path());
 
 		///generate isomorphism (only for undirected graphs) 
 		for (auto i = 0u; i < NV - 1; i++) {

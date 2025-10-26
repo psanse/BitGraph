@@ -367,6 +367,35 @@ TEST_F(GraphFastRootSortTest, reorder) {
 	////////////////////////////////////////////
 }
 
+
+TEST_F(GraphFastRootSortTest, reorder_static) {
+	using gt = GraphFastRootSort<ugraph>;
+	gt sorter(ug);
+
+	sorter.compute_deg_root();
+	vint mapping_o2n = sorter.sort_non_decreasing_deg(false);					//nodes_ = {0, 2, 4, 5, 3, 1}
+	//deg =	{ 0, 3, 1, 2, 1, 1 };
+
+	
+	//////////////////////////////////////////////////////
+	ugraph ugn = gt::reorder(ug, mapping_o2n, nullptr);							//compute isomorphism
+	//////////////////////////////////////////////////////
+
+	EXPECT_EQ(ugn.number_of_vertices(), ug.number_of_vertices());	
+	EXPECT_EQ(ugn.number_of_edges(), ug.number_of_edges());
+
+	////////////////////////////////////////////
+	EXPECT_EQ(ug.number_of_vertices(), ugn.number_of_vertices());
+	EXPECT_EQ(ug.number_of_edges(), ugn.number_of_edges());
+	EXPECT_EQ(ug.degree(0), ugn.degree(0));
+	EXPECT_EQ(ug.degree(2), ugn.degree(1));
+	EXPECT_EQ(ug.degree(1), ugn.degree(2));
+	EXPECT_EQ(ug.degree(4), ugn.degree(3));
+	EXPECT_EQ(ug.degree(5), ugn.degree(4));
+	EXPECT_EQ(ug.degree(3), ugn.degree(5));
+	////////////////////////////////////////////
+}
+
 TEST(GraphFastRootSort, new_order_dimacs) {
 
 	using gt = GraphFastRootSort<ugraph>;
