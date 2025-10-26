@@ -81,12 +81,13 @@ namespace bitgraph {
 			/*
 			* @brief Creates an isomorphism for a given ordering
 			* @param gn output isomorphic graph
-			* @param new_order given ordering in [OLD]->[NEW] format
+			* @param new_order in [OLD]->[NEW] format
 			* @param d ptr to decode object to store the ordering
 			* @comments only for simple undirected graphs with no weights
 			* @return 0 if successful
 			*/
 			int reorder(const vint& new_order, Graph_t& gn, Decode* d = nullptr);
+			static Graph_t reorder(const Graph_t& g, const vint& new_order, Decode* d = nullptr);
 
 			////////////////////////
 			//construction/destructions
@@ -866,6 +867,38 @@ namespace bitgraph {
 		}
 
 		return 0;
+	}
+
+
+	template<class Graph_t>
+	inline Graph_t bitgraph::_impl::GraphFastRootSort<Graph_t>::reorder(const Graph_t& g, const vint& o2n, Decode* d)
+	{
+		Graph_t gres;
+
+		std::size_t NV = g.number_of_vertices();
+		gres.reset(NV);
+		gres.name(g_.name());
+		gres.path(g_.path());
+
+		///generate isomorphism (only for undirected graphs) 
+		for (auto i = 0u; i < NV - 1; i++) {
+			for (auto j = i + 1; j < NV; j++) {
+				if (g.is_edge(i, j)) {									//in O(log) for sparse graphs, should be specialized for that case
+					//////////////////////////////////////////////
+					gres.add_edge(o2n[i], o2n[j]);			//maps the new edges according to the new given order
+					//////////////////////////////////////////////
+				}
+			}
+		}
+
+		///////////////
+		//stores decoding information [NEW]->[OLD]
+		if (d != nullptr) {		
+			auto aux = Decode::reverse(o2n);				//o2n is in format [OLD]->[NEW], aux is in format [NEW]->[OLD]
+			d->add_ordering(aux);
+		}
+
+		return gres;	
 	}
 
 
