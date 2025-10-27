@@ -229,8 +229,8 @@ namespace bitgraph {
 
 			////////////
 			//Reset / init (memory allocation)
-			void init(int nPop);
-			void init(int nPop, const vint& lv);
+			void init(int nPop) noexcept;
+			void init(int nPop, const vint& lv) noexcept;
 
 			/**
 			* @brief Resets this bitset given to a vector lv of 1-bit elements
@@ -240,9 +240,9 @@ namespace bitgraph {
 			 *		  II. Memory is deallocated and reallocated as required
 			 * @param nPop: population size
 			 * @param lv : vector of integers representing 1-bits in the bitset
-			 * @details: Exception caught inside and the program exits
+			 * @details: Fail-fast policy: exceptions are handled inside the program exits
 			**/
-			void reset(int nPop, const vint& lv);
+			void reset(int nPop, const vint& lv) noexcept;
 
 			/**
 			* @brief Resets this bitset to an EMPTY BITSET given to a population size nPop.
@@ -251,9 +251,9 @@ namespace bitgraph {
 			*		  II. Memory is deallocated and reallocated as required
 			*
 			* @param nPop: population size
-			* @details: Exception caught inside and the program exits
+			* @details: Fail-fast policy: exceptions are handled inside the program exits
 			**/
-			void reset(int nPop);
+			void reset(int nPop) noexcept;
 
 			/**
 			* @brief reallocates memory to the number of blocks of the bitset

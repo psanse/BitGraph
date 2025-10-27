@@ -116,11 +116,11 @@ BitSet::BitSet(int nPop, std::initializer_list<int> l):
 	}
 }
 
-void BitSet::init(int popsize) {
+void BitSet::init(int popsize) noexcept {
 
 	try {
 		nBB_ = INDEX_1TO1(popsize);
-		vBB_.resize(nBB_, 0);
+		vBB_.assign(nBB_, 0);
 	}
 	catch (...) {
 		LOG_ERROR("Error during allocation - BitSet::init");
@@ -130,11 +130,11 @@ void BitSet::init(int popsize) {
 
 }
 
-void BitSet::init(int popsize, const vint& lv){
+void BitSet::init(int popsize, const vint& lv) noexcept {
 		
 	try {
 		nBB_ = INDEX_1TO1(popsize); 
-		vBB_.resize(nBB_, 0);
+		vBB_.assign(nBB_, 0);
 
 		//sets bit conveniently
 		for (auto& bit : lv) {
@@ -155,7 +155,7 @@ void BitSet::init(int popsize, const vint& lv){
 	}	
 }
 
-void BitSet::reset(int popsize) {
+void BitSet::reset(int popsize) noexcept {
 
 	try {
 		nBB_ = INDEX_1TO1(popsize);
@@ -168,7 +168,7 @@ void BitSet::reset(int popsize) {
 	}
 
 }
-void BitSet::reset(int popsize, const vint& lv) {
+void BitSet::reset(int popsize, const vint& lv) noexcept {
 
 	try {
 		nBB_ = INDEX_1TO1(popsize);
