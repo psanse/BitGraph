@@ -81,7 +81,7 @@ namespace bitgraph {
 			/*
 			* @brief Creates an isomorphism for a given ordering
 			* @param gn output isomorphic graph
-			* @param new_order in [OLD]->[NEW] format
+			* @param new_order in [OLD]->[NEW]  format
 			* @param d ptr to decode object to store the ordering
 			* @comments only for simple undirected graphs with no weights
 			* @return 0 if successful
@@ -160,7 +160,7 @@ namespace bitgraph {
 			* @brief Computes a non_increasing_degree (non-degenerate) ordering
 			* @param rev reverse ordering if TRUE
 			* @important requires prior computation of deg
-			* @return output ordering in [OLD]->[NEW] format
+			* @return output ordering in [NEW]->[OLD] format
 			**/
 			const vint& sort_non_increasing_deg(bool rev);
 
@@ -168,7 +168,7 @@ namespace bitgraph {
 			* @brief Computes a non-decreasing degree (non-degenerate) ordering
 			* @param rev reverse ordering if TRUE
 			* @important requires prior computation of deg
-			* @return ouptut ordering in [OLD]->[NEW] format
+			* @return ouptut ordering in [NEW]->[OLD] format
 			**/
 			const vint& sort_non_decreasing_deg(bool rev);
 
@@ -176,7 +176,7 @@ namespace bitgraph {
 			* @brief Computes a non-increasing degree (non-degenerate) ordering with tiebreak by supprt
 			* @param rev reverse ordering if TRUE
 			* @important requires prior computation of deg and support
-			* @return output ordering in [OLD]->[NEW] format
+			* @return output ordering in[NEW]->[OLD] format
 			*/
 			const vint& sort_non_increasing_deg_with_support_tb(bool rev);
 
@@ -184,14 +184,14 @@ namespace bitgraph {
 			* @brief Computes a non-decreasing degree (non-degenerate) ordering with tiebreak by supprt
 			* @param rev reverse ordering if TRUE
 			* @important requires prior computation of deg and support
-			* @return output ordering in [OLD]->[NEW] format
+			* @return output ordering in [NEW]->[OLD] format
 			**/
 			const vint& sort_non_decreasing_deg_with_support_tb(bool rev);
 
 			/**
 			* @brief Degenerate non-decreasing degree ordering
 			* @comments deg info is not restored after the call
-			* @return output ordering in [OLD]->[NEW] format
+			* @return output ordering in [NEW]->[OLD] format
 			* TODO - optimize
 			**/
 			const vint& sort_degen_non_decreasing_deg(bool rev);
@@ -205,7 +205,7 @@ namespace bitgraph {
 			*@brief Composite non-decreasing degree degenerate ordering based on a prior given ordering
 			*@param rev reverse ordering if TRUE
 			*@comments the vertex ordering has to be set (with set_ordering(...)) prior to the call
-			*@return output ordering in [OLD]->[NEW] format
+			*@return output ordering in [NEW]->[OLD] format
 			**/
 			const vint& sort_degen_composite_non_decreasing_deg(bool rev);
 
@@ -214,7 +214,7 @@ namespace bitgraph {
 			*@brief Composite non-increasing degree degenerate ordering based on a prior given ordering
 			*@param rev reverse ordering if TRUE
 			*@comments the vertex ordering has to be set (with set_ordering(...)) prior to the call
-			*@return output ordering in [OLD]->[NEW] format
+			*@return output ordering in [NEW]->[OLD] format
 			**/
 			const vint& sort_degen_composite_non_increasing_deg(bool rev);
 
@@ -227,7 +227,7 @@ namespace bitgraph {
 			*@brief sorts the first k vertices by non-increasing degree (non-degenerate)
 			*@param first_k  first k < |V|  vertices to sort ([0..k-1])
 			*@param rev reverse ordering if TRUE
-			*@return output ordering in [OLD]->[NEW] format
+			*@return output ordering in [NEW]->[OLD] format
 			**/
 			const vint& sort_non_increasing_deg(int first_k, bool rev);
 
@@ -236,7 +236,7 @@ namespace bitgraph {
 			*@param first  first vertex to sort (0-based index) - in  [0, |V|-1]
 			*@param last  last vertex to sort	(0-based index)	- in  [0, |V|-1], > first
 			*@param rev reverse ordering if TRUE
-			*@return output ordering in [OLD]->[NEW] format
+			*@return output ordering in [NEW]->[OLD] format
 			**/
 			const vint& sort_non_increasing_deg(int first, int last, bool rev);
 
@@ -244,7 +244,7 @@ namespace bitgraph {
 			*@brief sorts the first k vertices by non-decreasing degree (non-degenerate)
 			*@param first_k  first k < |V|  vertices to sort ([0..k-1])
 			*@param rev reverse ordering if TRUE
-			*@return output ordering in [OLD]->[NEW] format
+			*@return output ordering in [NEW]->[OLD] format
 			**/
 			const vint& sort_non_decreasing_deg(int first_k, bool rev);
 
@@ -253,7 +253,7 @@ namespace bitgraph {
 			*@param first  first vertex to sort (0-based index) - in  [0, |V|-1]
 			*@param last  last vertex to sort	(0-based index)	- in  [0, |V|-1], > first
 			*@param rev reverse ordering if TRUE
-			*@return output ordering in [OLD]->[NEW] format
+			*@return output ordering in [NEW]->[OLD] format
 			**/
 			const vint& sort_non_decreasing_deg(int first, int last, bool rev);
 
@@ -360,7 +360,7 @@ namespace bitgraph {
 
 		//conversion [NEW] to [OLD] if required
 		//note: sorting produced by sorting primitives is always in [OLD] to [NEW] format
-		if (!o2n) { Decode::reverse_in_place(nodes_); }
+		if (o2n) { Decode::reverse_in_place(nodes_); }
 		return nodes_;
 	}
 
