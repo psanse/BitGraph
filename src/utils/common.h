@@ -77,6 +77,17 @@ namespace bitgraph {
 			}
 
 			/**
+			* @brief checks if an std collection contains unique elements
+			* @details: adds the elements to an unordered_set and compares sizes
+			**/
+			template <class Col_t>
+			inline
+				bool all_unique(const Col_t& v) {
+				std::unordered_set<typename Col_t::value_type> s(v.begin(), v.end());
+				return s.size() == v.size();
+			}
+
+			/**
 			* @brief  Streams all the elements of an STL collection
 			*
 			* @param c: input collection
@@ -123,6 +134,7 @@ namespace bitgraph {
 				if (eofl) o << std::endl;
 				return o;
 			}
+						
 		}
 
 		/////////////////////////////////////////////
