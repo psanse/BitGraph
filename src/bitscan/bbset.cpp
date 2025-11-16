@@ -63,33 +63,6 @@ BitSet::BitSet(const vint& v):
 	}
 }
 
-BitSet::BitSet (int nPop, const vint& lv):
-	nBB_(INDEX_1TO1(nPop))
-{
-
-	try {
-		vBB_.assign(nBB_, 0);
-		
-		//sets bit conveniently
-		for (auto& bit : lv) {
-
-			//////////////////
-			assert(bit >= 0 && bit < nPop);
-			/////////////////
-
-			//sets bits - no prior erasing
-			set_bit(bit);
-
-		}
-
-	}
-	catch (...) {
-		LOG_ERROR("Error during construction - BitSet::BitSet()");
-		LOG_ERROR("exiting...");
-		std::exit(EXIT_FAILURE);
-	}
-}
-
 BitSet::BitSet(int nPop, std::initializer_list<int> l):
 	nBB_(INDEX_1TO1(nPop))
 {

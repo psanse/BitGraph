@@ -201,14 +201,16 @@ namespace bitgraph {
 			explicit  BitSet(const vint& lv);
 
 			/**
-			 * @brief Creates a bitset with an initial vector lv of 1-bit elements
+			 * @brief Creates a bitset with an initial collection @lv of 1-bit elements
 			 *		  and a population size nPop
 			 *		  The capacity of the bitset is set according to nPop
 			 * @param nPop: population size
 			 * @param lv : vector of integers representing 1-bits in the bitset
+			 * @details: any collection supporting begin() and end() iterators can be used
 			 **/
-			explicit  BitSet(int nPop, const vint& lv);
-
+			template<class ColT>
+			explicit  BitSet(int nPop, const ColT& lv);
+			
 			/**
 			 * @brief Creates a bitset with an initialez list of 1-bit elements
 			 *		  and a population size nPop
@@ -2059,5 +2061,37 @@ namespace bitgraph {
 
 
 }//end namespace bitgraph
+
+///////////////////////////////////////
+// Header-only template implementations
+
+template<class ColT>
+inline 
+bitgraph::BitSet::BitSet(int nPop, const ColT& lv) :
+	nBB_(INDEX_1TO1(nPop))
+{
+
+	try {
+		vBB_.assign(nBB_, 0);
+
+		//sets bit conveniently
+		for (auto& bit : lv) {
+
+			//////////////////
+			assert(bit >= 0 && bit < nPop);
+			/////////////////
+
+			//sets bits - no prior erasing
+			set_bit(bit);
+
+		}
+
+	}
+	catch (...) {
+		LOG_ERROR("Error during construction - BitSet::BitSet()");
+		LOG_ERROR("exiting...");
+		std::exit(EXIT_FAILURE);
+	}
+}
 
 #endif	

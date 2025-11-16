@@ -11,6 +11,7 @@
 
 #include <iostream>
 #include <vector>
+#include <set>
 
 ///////////////////////
 // useful aliases 
@@ -18,6 +19,7 @@
 namespace bitgraph {
 
 	using vint = std::vector<int>;
+	using sint = std::set<int>;
 	using vdob = std::vector<double>;
 
 }
