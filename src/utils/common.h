@@ -30,6 +30,7 @@
 #include <algorithm>
 #include <iterator>
 #include <regex>
+#include <unordered_set>				//for all_unique
 
 #include "common_types.h"				//common types additional utilities, to be included e
 
