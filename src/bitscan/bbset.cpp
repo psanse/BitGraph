@@ -280,7 +280,10 @@ string BitSet::to_string ()
 void BitSet::to_vector (vint& lv ) const {
 
 	lv.clear();
-	lv.reserve(popcn64());		
+	const int pc = this->size();
+	if (pc == 0) return;				
+	lv.reserve(pc);		
+
 
 	int v = BBObject::noBit;
 	while( (v = next_bit(v)) != BBObject::noBit){
@@ -288,9 +291,27 @@ void BitSet::to_vector (vint& lv ) const {
 	}
 }
 
+void bitgraph::_impl::BitSet::to_set(sint& ls) const
+{
+	ls.clear();
+	const int pc = this->size();
+	if (pc == 0) return;			//fast exit for empty set
+	
+	int v = BBObject::noBit;
+	while ((v = next_bit(v)) != BBObject::noBit) {
+		ls.insert(v);
+	}
+}
+
 BitSet::operator vint() const {
 	vint result;
 	to_vector (result);
+	return result;
+}
+
+BitSet::operator sint() const {
+	sint result;
+	to_set(result);
 	return result;
 }
 

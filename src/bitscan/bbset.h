@@ -18,6 +18,7 @@
 #include "bitblock.h"	
 #include "utils/common.h"			//for the primitive stack type
 #include <vector>	
+#include <set>
 
 #include <cassert>					//uncomment #undef NDEBUG in bbconfig.h to enable run-time assertions
 
@@ -111,7 +112,7 @@ namespace bitgraph {
 			* @brief OR between lhs and rhs bitsets
 			* @returns resulting bitset
 			**/
-			friend BitSet   OR(BitSet lhs, const BitSet& rhs) { return lhs |= rhs; }
+			friend BitSet OR(BitSet lhs, const BitSet& rhs) { return lhs |= rhs; }
 
 			/**
 			* @brief OR between lhs and rhs bitsets in the CLOSED bit-range [firstBit, lastBit]
@@ -767,18 +768,23 @@ namespace bitgraph {
 			///////////////////////
 			//Conversions / Casts
 
-				/**
-				* @brief Converts the bitstring to a std::vector of non-negative integers.
-				*		 The size of the vector is the number of bits in the bitstring.
-				* @param lb: output vector
-				**/
+			/**
+			* @brief Converts the bitstring to a std::vector of non-negative integers.
+			*		 The size of the vector is the number of bits in the bitstring.
+			* @param lb: output vector
+			* 
+			* TODO - loop unrolling for efficiency (18/11/2025)
+			**/
 			void to_vector(vint& lb)							const;
+			void to_set(sint& lb)								const;
 
 			/**
 			* @brief Casts the bitstring to a vector of non-negative integers
 			* @details calls to_vector
 			**/
-			operator vint()								const;
+			explicit operator vint()							const;
+			explicit operator sint()							const;
+
 
 			/**
 			* @brief Converts the bitstring to a stack object s
