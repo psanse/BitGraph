@@ -301,6 +301,38 @@ TEST(BBScanClass, init_scan_specific) {
 	EXPECT_FALSE(bbres.is_bit(0));
 }
 
+TEST(BBScanClass, make_BBScan) {
+	
+	BBScan bb(130);
+	bb.set_bit(10);
+	bb.set_bit(20);
+	bb.set_bit(64);
+
+	//helper
+	BBScan bb_helper = bitgraph::make_BBScan(130, { 10,20,64 });
+	EXPECT_EQ(bb, bb_helper);
+}
+
+TEST(BBScanClass, make_BBScan_Empty) {
+
+	//helper
+	BBScan bb_helper = bitgraph::make_BBScan(130);
+	EXPECT_TRUE(bb_helper.is_empty());
+}
+
+
+TEST(BBScanClass, make_BBScan_Full) {
+
+	//helper
+	int nPop = 130;
+	BBScan bb_helper = bitgraph::make_BBScan_full(nPop);
+
+	EXPECT_EQ(bb_helper.size(), nPop);
+	EXPECT_EQ(bb_helper.lsb(), 0);
+	EXPECT_EQ(bb_helper.msb(), nPop - 1);
+
+}
+
 
 class BBScanClassTest_1 : public ::testing::Test {
 protected:

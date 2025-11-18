@@ -430,7 +430,7 @@ TEST(BitSetClass, cast_to_vector) {
 	bb.set_bit(64);
 
 	//cast to vector
-	vint lv = bb;	
+	vint lv = static_cast<vint>(bb);	
 
 	//expected lv
 	vint lv_exp = { 10, 20, 64 };
