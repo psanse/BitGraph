@@ -781,6 +781,8 @@ namespace bitgraph {
 			/**
 			* @brief Casts the bitstring to a vector of non-negative integers
 			* @details calls to_vector
+			* 
+			* TODO - possibly copy to_set and to_vector implementations for efficiency (18/11/2025)
 			**/
 			explicit operator vint()							const;
 			explicit operator sint()							const;
