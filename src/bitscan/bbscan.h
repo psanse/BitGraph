@@ -547,7 +547,30 @@ namespace bitgraph {
 }//namespace bitgraph
 
 
+///////////////////
+// helpers for BBScan construction
 
+namespace bitgraph {
+
+	/**
+	 * @brief Creates a BBScan object given a maximum number of bits  @nPop (all bits set to 0).
+	 **/
+	inline _impl::BBScan make_BBScan(int nPop) { return _impl::BBScan(nPop, false); }
+
+	/**
+	 * @brief Creates a BBScan object given a maximum number of bits  @nPop (all bits set to 1).
+	 **/
+	inline _impl::BBScan make_BBScan_full(int nPop) { return _impl::BBScan(nPop, true); }
+
+	/**
+	* @brief Creates a BBScan object given a maximum @nPop and a list of values in brackets
+	* @details: - negative values are ignored (asserted in debug mode).
+	*			- values >= nPop are ignored.
+	**/
+	inline _impl::BBScan make_BBScan(int nPop, std::initializer_list<int> lv) { return _impl::BBScan(nPop, lv); }
+		
+
+} // namespace bitgraph
 
 
 
