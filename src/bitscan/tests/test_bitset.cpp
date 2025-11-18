@@ -10,7 +10,8 @@
 #include "bitscan/bbalgorithm.h"
 #include "gtest/gtest.h"
 #include <iostream>
-#include <set>		
+#include <set>	
+#include <vector>	
 
 using namespace std;
 using namespace bitgraph;
@@ -960,7 +961,61 @@ TEST_F(BitSetClassTest_1, operators) {
 	
 }
 
+////////////////////////
+//
+// HELPERS TESTS
+//
+///////////////////////
 
+TEST(BitSetClass, make_bitset_empty) {
+
+	BitSet bb1 = bitgraph::make_bitset(130);
+	EXPECT_TRUE(bb1.is_empty());
+
+}
+
+TEST(BitSetClass, make_bitset_full) {
+
+	BitSet bb = bitgraph::make_bitset_full(130);
+	EXPECT_EQ(bb.size(), 130u);
+	EXPECT_EQ(bb.lsb(), 0u);
+	EXPECT_EQ(bb.msb(), 129u);
+
+}
+
+TEST(BitSetClass, make_bitset_from) {
+
+	std::vector<int> lv = { 10, 20, 64, 130 };
+	BitSet bb = bitgraph::make_bitset_from(130, lv.begin(), lv.end());			//all
+
+	//130 is out of range
+	EXPECT_EQ(bb.size(), 3);
+	EXPECT_TRUE(bb.is_bit(10));
+	EXPECT_TRUE(bb.is_bit(20));
+	EXPECT_TRUE(bb.is_bit(64));
+
+}
+
+TEST(BitSetClass, make_bitset_main_ops) {
+	
+	std::vector<int> lv = { 10, 20, 64 };
+	std::set<int> ls = { 10, 20, 64 };
+
+	BitSet bb(130);
+	bb.set_bit(10);
+	bb.set_bit(20);
+	bb.set_bit(64);
+
+	//helper function for equivalent bitset
+	BitSet bb_helper1 = bitgraph::make_bitset(130, { 10, 20, 64 });
+	BitSet bb_helper2 = bitgraph::make_bitset(130, lv);
+	BitSet bb_helper3 = bitgraph::make_bitset(130, ls);
+
+	EXPECT_EQ(bb, bb_helper1);
+	EXPECT_EQ(bb, bb_helper2);
+	EXPECT_EQ(bb, bb_helper3);
+
+}
 
 
 
@@ -969,20 +1024,20 @@ TEST_F(BitSetClassTest_1, operators) {
 // DISABLED TESTS
 //
 ///////////////////////
-
-TEST(BitSetClass, DISABLED_algorithms) {
-	//simple test for algorithms in bbalg.h
-
-	BitSet bb(130);
-	bb.set_bit(10);
-	bb.set_bit(20);
-	bb.set_bit(64);
-
-	////get_first_k_bits
-	//BITBOARD b8=bb.get_bitstring()[0];
-	//EXPECT_EQ(bblock::popc64_lup(get_first_k_bits(b8, 1)), 1);
-	//EXPECT_EQ(bblock::popc64_lup(get_first_k_bits(b8, 2)), 2);
-	//EXPECT_EQ(bblock::popc64_lup(get_first_k_bits(b8, 3)), 0);
-}
+//
+//TEST(BitSetClass, DISABLED_algorithms) {
+//	//simple test for algorithms in bbalg.h
+//
+//	BitSet bb(130);
+//	bb.set_bit(10);
+//	bb.set_bit(20);
+//	bb.set_bit(64);
+//
+//	////get_first_k_bits
+//	//BITBOARD b8=bb.get_bitstring()[0];
+//	//EXPECT_EQ(bblock::popc64_lup(get_first_k_bits(b8, 1)), 1);
+//	//EXPECT_EQ(bblock::popc64_lup(get_first_k_bits(b8, 2)), 2);
+//	//EXPECT_EQ(bblock::popc64_lup(get_first_k_bits(b8, 3)), 0);
+//}
 
 

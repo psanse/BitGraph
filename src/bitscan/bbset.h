@@ -2094,4 +2094,77 @@ bitgraph::BitSet::BitSet(int nPop, const ColT& lv) :
 	}
 }
 
+/////////////////////////////////
+// -----------------------------------------------------------------------------
+// Helpers to build `BitSets` (header-only, sin romper ABI)
+// -----------------------------------------------------------------------------
+// Typical use
+//   auto bb1 = bitgraph::make_bitset(6);                 // empty, 6 bits
+//   auto bb2 = bitgraph::make_bitset(6, {0,3,4});        // 1-bits in 0,3,4
+//   std::vector<int> lv = {1,2,5};
+//   auto bb3 = bitgraph::make_bitset(6, lv);             // from container
+//   auto bb4 = bitgraph::make_bitset_full(6);            // all bits to 1
+//
+// Notas:
+// - nPop is population size ( maximum number of bits).
+// - Values outside [0, nPop) are ignored (negative values causes assertion).
+
+namespace bitgraph {
+
+	/**
+	* @brief Creates an empty BitSet with a maximum of @nPop bits (all bits set to 0).
+	**/
+	inline _impl::BitSet make_bitset(int nPop) { return _impl::BitSet(nPop, false); }
+
+	/**
+	* @brief Creates a BitSet with a maximum @nPop bits (all bits set to 1).
+	**/
+	inline _impl::BitSet make_bitset_full(int nPop) {
+		_impl::BitSet bs(nPop, false);
+		if (nPop > 0) bs.set_bit(0, nPop - 1);
+		return bs;
+	}
+
+	/**
+	* @brief Creates a BitSet given a maximum @nPop and a range of iterators [first, last).
+	* @details: - negative values are ignored (asserted in debug mode).
+	*			- values >= nPop are ignored.
+	**/
+	template<class It>
+	inline _impl::BitSet make_bitset_from(int nPop, It first, It last) {
+		_impl::BitSet bs(nPop, false);
+		for (auto it = first; it != last; ++it) {
+			int v = static_cast<int>(*it);
+
+			//////////////////
+			assert(v >= 0);
+			//////////////////
+
+			if (v >= 0 && v < nPop) bs.set_bit(v);
+		}
+		return bs;
+	}
+
+	/**
+	* @brief Creates a BitSet given a maximum @nPop and collection of values
+	* @details: - negative values are ignored (asserted in debug mode).
+	*			- values >= nPop are ignored.
+	**/
+	template<class Col>
+	inline _impl::BitSet make_bitset(int nPop, const Col& lv) {
+		return make_bitset_from(nPop, std::begin(lv), std::end(lv));
+	}
+
+
+	/**
+	* @brief Creates a BitSet given a maximum @nPop and a list of values in brackets
+	* @details: - negative values are ignored (asserted in debug mode).
+	*			- values >= nPop are ignored.
+	**/
+	inline _impl::BitSet make_bitset(int nPop, std::initializer_list<int> lv) {
+		return make_bitset_from(nPop, lv.begin(), lv.end());
+	}
+
+} // namespace bitgraph
+
 #endif	
