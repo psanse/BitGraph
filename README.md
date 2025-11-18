@@ -35,7 +35,7 @@ and many others.
 
 ### System platforms
 
-The repo has been tested on Linux (24.x.x) and Windows 10 OS.
+The repository has been tested on Linux (24.x.x) and Windows 10 OS.
 
 ## Releases 
 
