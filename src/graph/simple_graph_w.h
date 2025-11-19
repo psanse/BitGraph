@@ -113,8 +113,8 @@ namespace bitgraph {
 			Graph_t& graph() { return g_; }
 			const Graph_t& graph()			const { return g_; }
 
-			W weight(int v)		const { return w_[v]; }
-			const vector<W>& weight()			const { return w_; }
+			W weight(int v)	const { return w_[v]; }
+			const vector<W>& weight() const { return w_; }
 			vector<W>& weight() { return w_; }
 
 			/*
