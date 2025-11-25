@@ -866,19 +866,19 @@ namespace bitgraph {
 		vint lv;
 		bbsg.to_vector(lv);
 		Graph_t sg;
-
+		
 		////////////////////////////////////
 		this->g_.create_subgraph(sg, lv);	
 		////////////////////////////////////
 
 		//step 2: create a new ordering for the subgraph based on existing primitives
-		vint o2n = this->new_order(alg, ltf, true /* o2n format*/);		
+		vint ordO2N = this->new_order(alg, ltf, true /* o2n format*/);		
 
 		//step 3: map the ordering back to the original graph
 
 		//TODO...
 
-		return o2n;
+		return ordO2N;
 
 		
 	}
