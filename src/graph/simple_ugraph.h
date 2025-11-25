@@ -48,9 +48,9 @@ namespace bitgraph {
 
 		public:
 
-			using type = Ugraph<BitSetT>;				//own type
-			using ptype = Graph<BitSetT>;				//parent type
-			using basic_type = BitSetT;				//basic type (a type of bitset)
+			using type = Ugraph<BitSetT>;		//own type
+			using ptype = Graph<BitSetT>;		//parent type
+			using basic_type = BitSetT;			//basic type (a type of bitset)
 
 			using _bbt = basic_type;			//alias for backward compatibility
 			using _mypt = ptype;				//alias for backward compatibility
@@ -250,15 +250,15 @@ namespace bitgraph {
 
 			//TODO	Graph& create_subgraph	(std::size_t first_k, Graph& g) const  override;
 
-				/**
-				*  @brief Computes the subgraph induced by a set of vertices
-				*  @param lv input set of vertices (std::vector<int>)
-				*  @returns 0 if success, -1 if error
-				**/
-			int create_subgraph(Ugraph& g, vint& lv)					const;
-
 			/**
-			*  @brief Computes the subgraph induced by the neighborhood of a  vertex (29/08/21)
+			*  @brief Computes the subgraph induced by a set of vertices
+			*  @param lv input set of vertices (std::vector<int>)
+			*  @returns 0 if success, -1 if error
+			**/
+			int create_subgraph(Ugraph& g, vint& lv)					const;
+		
+			/**
+			*  @brief Computes the subgraph induced by the neighborhood of a vertex (29/08/21)
 			*
 			*		 Calls create_subgraph(Ugraph& g, vint& lv)
 			*
@@ -880,6 +880,7 @@ namespace bitgraph {
 
 		return 0;
 	}
+
 
 }//end namespace bitgraph
 

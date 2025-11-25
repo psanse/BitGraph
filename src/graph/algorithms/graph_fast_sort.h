@@ -23,6 +23,7 @@
 #include <algorithm>
 #include <iostream>
 #include <vector>
+#include <cassert>
 
 
 //alias
@@ -58,24 +59,24 @@ namespace bitgraph {
 			////////////////////////
 			//static methods 
 
-				/*
-				* @brief Computes the degree of the vertices of a graph
-				* @param g input graph G=(V, E)
-				* @param deg output vector of size |V| (v[i] = deg(vi))
-				*/
+			/**
+			* @brief Computes the degree of the vertices of a graph
+			* @param g input graph G=(V, E)
+			* @param deg output vector of size |V| (v[i] = deg(vi))
+			**/
 			static int compute_deg(const Graph_t& g, vint& deg);
 
 
 			///////////////
 			// drivers - the real public interface
 
-				/*
-				* @brief Computes a new ordering
-				* @param alg sorting algorithm
-				* @param ltf last to first ordering if TRUE
-				* @param o2n old to new ordering	if TRUE
-				* @return new ordering in [OLD]->[NEW] format
-				*/
+			/**
+			* @brief Computes a new ordering
+			* @param alg sorting algorithm
+			* @param ltf last to first ordering if TRUE
+			* @param o2n old to new ordering	if TRUE
+			* @return new ordering in [OLD]->[NEW] format
+			**/
 			virtual vint new_order(int alg, bool ltf = true, bool o2n = true);
 
 			/**
@@ -91,17 +92,17 @@ namespace bitgraph {
 			*			3) map the ordering back to the original graph
 			* 
 			* TODO: to be implemented (25/11/2025)
-			* **/
-			vint new_order(int alg, const bb_type& bbsg, bool ltf = true, bool o2n = true) = delete;			
-
-			/*
+			**/
+			vint new_order(int alg, const bb_type& bbsg, bool ltf = true, bool o2n = true);
+	
+			/**
 			* @brief Creates an isomorphism for a given ordering
 			* @param gn output isomorphic graph
 			* @param new_order in [OLD]->[NEW]  format
 			* @param d ptr to decode object to store the ordering
 			* @comments only for simple undirected graphs with no weights
 			* @return 0 if successful
-			*/
+			**/
 			int reorder(const vint& new_order, Graph_t& gn, Decode* d = nullptr);
 			static Graph_t reorder(const Graph_t& g, const vint& new_order, Decode* d = nullptr);
 
@@ -147,11 +148,10 @@ namespace bitgraph {
 			/////////////////////////
 			// main operations - sorting, etc.
 
-				/*
-				* @brief Sets trivial ordering [1..NV] in @nodes_,
-				*		 a starting point for all sorting primitives
-				*
-				*/
+			/**
+			* @brief Sets trivial ordering [1..NV] in @nodes_,
+			*		 a starting point for all sorting primitives
+			**/
 			void set_ordering();
 
 			/*
@@ -853,6 +853,34 @@ namespace bitgraph {
 
 		node_active_state_.set_bit(0, NV_ - 1);		//all active, pending to be ordered
 		return 0;
+	}
+
+	template<class Graph_t>
+	inline 
+	vint GraphFastRootSort<Graph_t>::new_order(int alg, const bb_type& bbsg, bool ltf, bool o2n)
+	{
+		// Lanzar excepción en tiempo de ejecución para indicar que la función no está implementada.
+		throw std::logic_error("not implemented - GraphFastRootSort::new_order()");
+
+		//step 1: create the induced subgraph of size |bbsg|
+		vint lv;
+		bbsg.to_vector(lv);
+		Graph_t sg;
+
+		////////////////////////////////////
+		this->g_.create_subgraph(sg, lv);	
+		////////////////////////////////////
+
+		//step 2: create a new ordering for the subgraph based on existing primitives
+		vint o2n = this->new_order(alg, ltf, true /* o2n format*/);		
+
+		//step 3: map the ordering back to the original graph
+
+		//TODO...
+
+		return o2n;
+
+		
 	}
 
 	template<class Graph_t>
