@@ -6,7 +6,7 @@
 * @author pss
 * 
 * @TODO add further primitives for composite orderings in subgraphs (29/12/24)
-* @TOD0 add new_order(...) for subgraphs (29/12/24)
+* @TOD0 add new_order(...) for subgraphs (29/12/24) - added declaration (25/11/2025)
 **/
 
 #ifndef __GRAPH_FAST_SORT_H__
@@ -77,6 +77,22 @@ namespace bitgraph {
 				* @return new ordering in [OLD]->[NEW] format
 				*/
 			virtual vint new_order(int alg, bool ltf = true, bool o2n = true);
+
+			/**
+			* @brief Computes a new ordering for the subgraph @bbsg. Only the vertices in @bbsg are reordered.
+			* @param alg: sorting algorithm
+			* @param bbsg: bitset encoding the subgraph vertices
+			* @param ltf: last to first ordering if TRUE
+			* @param o2n: old to new ordering	if TRUE
+			* @result: new ordering in [OLD]->[NEW] format
+			* @details: to be implemented according to the following steps:
+			*			1) create the induced subgraph of size |bbsg|
+			*			2) create a new ordering for the subgraph based on existing primitives
+			*			3) map the ordering back to the original graph
+			* 
+			* TODO: to be implemented (25/11/2025)
+			* **/
+			vint new_order(int alg, const bb_type& bbsg, bool ltf = true, bool o2n = true) = delete;			
 
 			/*
 			* @brief Creates an isomorphism for a given ordering
