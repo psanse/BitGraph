@@ -92,7 +92,6 @@ namespace bitgraph {
 			*			2) create a new ordering for the subgraph based on existing primitives
 			*			3) map the ordering back to the original graph
 			* 
-			* TODO: to be implemented (25/11/2025)
 			**/
 			vint new_order(int alg, bb_type& bbsg, bool ltf = true, bool o2n = true);
 	
@@ -860,11 +859,17 @@ namespace bitgraph {
 	inline 
 	vint GraphFastRootSort<Graph_t>::new_order(int alg, bb_type& bbsg, bool ltf, bool o2n)
 	{			
-		//create the induced subgraph of size |bbsg|
+		//convert bbsg to vector
 		vint lv;
 		bbsg.to_vector(lv);
+		//////////////////////////////////////////////////////////////////////////////////////////
+		assert(!lv.empty() && "empty subgraph detected- GraphFastRootSort<Graph_t>::new_order()");
+		/////////////////////////////////////////////////////////////////////////////////////////
+				
+
+		//create the induced subgraph of size |bbsg|
 		Graph_t sg;
-		
+
 		////////////////////////////////////
 		this->g_.create_subgraph(sg, lv);	
 		////////////////////////////////////
