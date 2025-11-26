@@ -897,7 +897,7 @@ namespace bitgraph {
 
 				int pc = bbsg.size();
 				if (pc == 0) { return 0; }			//early exit - bitset bbsg is empty	
-				ub.assign(pc, 0);
+				ub.assign(g.size(), 0);
 
 				int col = 1, v = bbo::noBit, nBB = bbo::noBit;
 
