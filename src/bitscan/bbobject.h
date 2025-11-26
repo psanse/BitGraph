@@ -30,7 +30,7 @@ namespace bitgraph {
 			enum scan_types { NON_DESTRUCTIVE, NON_DESTRUCTIVE_REVERSE, DESTRUCTIVE, DESTRUCTIVE_REVERSE };
 
 			//to stream
-			friend std::ostream& operator<< (std::ostream& o, const BBObject& bb) { bb.print(o); return o; }
+			friend std::ostream& operator<< (std::ostream& o, const BBObject& bb) { bb.print(o, true/*show_pc*/, false/*endl*/); return o; }
 
 			//////////////////
 			// Efficient nested data structures for bitscanning 
