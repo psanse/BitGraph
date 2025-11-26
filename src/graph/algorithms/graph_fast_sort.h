@@ -24,6 +24,7 @@
 #include <iostream>
 #include <vector>
 #include <cassert>
+#include <numeric>								//std::iota
 
 
 //alias
@@ -93,7 +94,7 @@ namespace bitgraph {
 			* 
 			* TODO: to be implemented (25/11/2025)
 			**/
-			vint new_order(int alg, const bb_type& bbsg, bool ltf = true, bool o2n = true);
+			vint new_order(int alg, bb_type& bbsg, bool ltf = true, bool o2n = true);
 	
 			/**
 			* @brief Creates an isomorphism for a given ordering
@@ -857,12 +858,9 @@ namespace bitgraph {
 
 	template<class Graph_t>
 	inline 
-	vint GraphFastRootSort<Graph_t>::new_order(int alg, const bb_type& bbsg, bool ltf, bool o2n)
-	{
-		// Lanzar excepción en tiempo de ejecución para indicar que la función no está implementada.
-		throw std::logic_error("not implemented - GraphFastRootSort::new_order()");
-
-		//step 1: create the induced subgraph of size |bbsg|
+	vint GraphFastRootSort<Graph_t>::new_order(int alg, bb_type& bbsg, bool ltf, bool o2n)
+	{			
+		//create the induced subgraph of size |bbsg|
 		vint lv;
 		bbsg.to_vector(lv);
 		Graph_t sg;
@@ -871,16 +869,56 @@ namespace bitgraph {
 		this->g_.create_subgraph(sg, lv);	
 		////////////////////////////////////
 
-		//step 2: create a new ordering for the subgraph based on existing primitives
-		vint ordO2N = this->new_order(alg, ltf, true /* o2n format*/);		
+		//create a new ordering for the subgraph based on existing primitives
+		GraphFastRootSort<Graph_t> sort(sg);
+		vint ord_sg = sort.new_order(alg, ltf, false /* n2o format*/);
 
-		//step 3: map the ordering back to the original graph
-
-		//TODO...
-
-		return ordO2N;
+		//map the ordering @ord back to the original graph
+		std::vector<int> ord(NV_);
+		std::iota(ord.begin(), ord.end(), 0);
+		
+		//build reverse mapping from sg to the original graph g
+		vint sg_to_g = ord;
+		int v = bbo::noBit;
+		int index_in_sg = 0;
+		bbsg.init_scan(bbo::NON_DESTRUCTIVE);
+		while ((v = bbsg.next_bit()) != bbo::noBit) {
+			sg_to_g[index_in_sg++] =v;
+		}
+		
+		//mapping of ord_sg to ord ([NEW]->[OLD] format)
+		v = bbo::noBit;
+		index_in_sg = 0;
+		bbsg.init_scan(bbo::NON_DESTRUCTIVE);
+		while((v = bbsg.next_bit()) != bbo::noBit) {
+			int new_index_in_sg = ord_sg[index_in_sg++];
+			ord[v] = sg_to_g[new_index_in_sg];
+		}
 
 		
+		////////////////
+		// check
+
+#ifndef NDEBUG
+
+		assert(ord.size() == NV_ && "ERROR: ord.size() != N - GraphFastRootSort<Graph_t>::new_order");
+
+		//verify vertices outside bbsg have not been reordered
+		for (int v = 0; v < ord.size(); ++v) {
+			if (!bbsg.is_bit(v)) {
+				////////////////////////////////////////////////////////////////////////////////////////////////////////
+				assert(ord[v] == v && "ERROR: vertex outside bbsg reordered - GraphFastRootSort<Graph_t>::new_order");
+				/////////////////////////////////////////////////////////////////////////////////////////////////////////
+			}
+		}
+
+#endif
+		//reverse to [OLD]->[NEW] if required
+		if (o2n) {
+			Decode::reverse_in_place(ord);
+		}
+
+		return ord;		
 	}
 
 	template<class Graph_t>

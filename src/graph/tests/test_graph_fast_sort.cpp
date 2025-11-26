@@ -330,12 +330,12 @@ TEST_F(GraphFastRootSortTest, new_order) {
 	vint mapping = sorter.new_order((gt::MIN), FIRST_TO_LAST, OLD_TO_NEW);
 
 	//////////////////////////////////////////
-	EXPECT_EQ(mapping[0], 0);			
-	EXPECT_EQ(mapping[1], 2);
-	EXPECT_EQ(mapping[2], 4);
-	EXPECT_EQ(mapping[3], 5);
-	EXPECT_EQ(mapping[4], 3);
-	EXPECT_EQ(mapping[5], 1);
+	EXPECT_EQ(mapping[0], 0);					/* old to new */
+	EXPECT_EQ(mapping[2], 1);
+	EXPECT_EQ(mapping[4], 2);
+	EXPECT_EQ(mapping[5], 3);
+	EXPECT_EQ(mapping[3], 4);
+	EXPECT_EQ(mapping[1], 5);
 	//////////////////////////////////////////
 
 	//I/O
@@ -350,7 +350,7 @@ TEST_F(GraphFastRootSortTest, reorder) {
 
 	sorter.compute_deg_root();
 	vint mapping_o2n=sorter.sort_non_decreasing_deg(false);					//nodes_ = {0, 2, 4, 5, 3, 1}
-																		//deg =	{ 0, 3, 1, 2, 1, 1 };
+																			//deg =	{ 0, 3, 1, 2, 1, 1 };
 	//compute isomorphism
 	ugraph ugn;
 	sorter.reorder(mapping_o2n, ugn);
@@ -406,11 +406,11 @@ TEST(GraphFastRootSort, new_order_dimacs) {
 	gt sorter(ug);
 
 	//degenerate min degree ordering
-	vint mapping = sorter.new_order((gt::MIN_DEGEN), LAST_TO_FIRST, OLD_TO_NEW);
+	vint mapping = sorter.new_order((gt::MIN_DEGEN), LAST_TO_FIRST, NEW_TO_OLD);
 
 	//////////////////////////////////////////
-	EXPECT_EQ(mapping[0], 199);
-	EXPECT_EQ(mapping[1], 194);
+	EXPECT_EQ(mapping[0],	199);
+	EXPECT_EQ(mapping[1],	194);
 	EXPECT_EQ(mapping[199], 139);
 	//////////////////////////////////////////
 
@@ -420,7 +420,7 @@ TEST(GraphFastRootSort, new_order_dimacs) {
 
 
 	//composite ordering based on the previous ordering
-	vint mapping_compo = sorter.new_order((gt::MIN_DEGEN_COMPO), LAST_TO_FIRST, OLD_TO_NEW);
+	vint mapping_compo = sorter.new_order((gt::MIN_DEGEN_COMPO), LAST_TO_FIRST, NEW_TO_OLD);
 
 	//////////////////////////////////////////
 	EXPECT_EQ(mapping_compo[0], 69);
@@ -524,6 +524,33 @@ TEST(subgraphSort, first_to_last) {
 	EXPECT_EQ(mapping, mapping_exp);
 	//////////////////////////////////////////
 
+}
+
+TEST(subgraphSort, newOrderSubgraph) {
+
+	const int NV = 6;
+	ugraph ug(NV);
+	ug.add_edge(1, 2);
+	ug.add_edge(1, 3);
+	ug.add_edge(1, 5);
+	ug.add_edge(2, 4);
+	ug.add_edge(2, 5);
+	ug.add_edge(3, 5);										
+
+	//setup
+	using gt = GraphFastRootSort<ugraph>;
+	gt sorter(ug);
+	auto bbsg = bitgraph::make_BBScan(NV, { 1, 3, 4 });	  //deg(1)=2, deg(3)=2, deg(4)=0 in the induced subgraph G[{1, 3, 4}]
+
+	///////////////////////////////////////////////////////////////////
+	vint ord = sorter.new_order(gt::MAX, bbsg, true, false /* n2o */ );		
+	//////////////////////////////////////////////////////////////////
+		
+	////////////////////////////////////////////
+	vint ord_exp = { 0, 4, 2, 3, 1, 5 };					//only vertices in the subgraph are sorted
+	EXPECT_EQ(ord.size(), NV);
+	EXPECT_EQ(ord, ord_exp);
+	//////////////////////////////////////////
 }
 
 

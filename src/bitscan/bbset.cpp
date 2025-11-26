@@ -291,7 +291,7 @@ void BitSet::to_vector (vint& lv ) const {
 	}
 }
 
-void bitgraph::_impl::BitSet::to_set(sint& ls) const
+void BitSet::to_set(sint& ls) const
 {
 	ls.clear();
 	const int pc = this->size();
