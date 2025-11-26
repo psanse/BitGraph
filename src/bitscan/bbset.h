@@ -186,7 +186,7 @@ namespace bitgraph {
 			BitSet() : nBB_(0) {};
 
 			/**
-			* @brief Constructor of an EMPTY bitset given a population size nPop
+			* @brief Constructor of a bitset given a population size nPop
 			*		  The capacity of the bitset is set according to the population size
 			* @param nBits : population size
 			* @param val: initial value (TRUE, FALSE) of every bit in the bitset
@@ -194,7 +194,7 @@ namespace bitgraph {
 			explicit  BitSet(int nPop, bool val = false);
 
 			/**
-			* @brief Constructor of an EMPTY bitset given an initial vector lv of 1-bit elements
+			* @brief Constructor of a bitset given an initial vector lv of 1-bit elements
 			*		  The population size is the maximum value of lv
 			*		  The capacity of the bitset is set according to the population size
 			* @param lv : vector of integers representing 1-bits in the bitset
