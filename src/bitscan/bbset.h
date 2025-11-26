@@ -63,7 +63,7 @@ namespace bitgraph {
 			*		 The result is stored in bitset res. The remaining bits of res outside the range
 			*		 are set to 0 if the template parameter Erase  is true.
 			* @param template<Erase>: if true, the bits of res outside [firstBit, lastBit] are set to 0
-			* @param firstBit, lastBit: closed bit-range 0 < firstBit <= lastBit
+			* @param firstBit, lastBit: closed bit-range 0 <= firstBit <= lastBit
 			* @param lhs, rhs: input bitsets
 			* @param res: output bitset
 			* @returns reference to the resulting bitstring res
@@ -382,7 +382,7 @@ namespace bitgraph {
 
 			/**
 			* @brief sets the bits in the closed range [firstBit, lastBit] to 1 in the bitstring
-			* @params firstBit, lastBit:  0 < firstBit <= lastBit
+			* @params firstBit, lastBit:  0 <= firstBit <= lastBit
 			* @date 22/9/14
 			* @last_update 01/02/25
 			**/
@@ -448,7 +448,7 @@ namespace bitgraph {
 			/**
 			* @brief sets the bits in the closed range [firstBit, lastBit] to 0 in the bitstring
 			*		 If lastBit == -1, the range is [firstBit, endOfBitset)
-			* @params firstBit, lastBit: 0 < firstBit <= lastBit
+			* @params firstBit, lastBit: 0 <= firstBit <= lastBit
 			* @created 22/9/14
 			* @details last_update 01/02/25
 			**/

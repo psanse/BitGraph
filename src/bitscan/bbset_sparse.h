@@ -93,7 +93,7 @@ namespace bitgraph {
 			/**
 			* @brief AND between lhs and rhs bitsets in the CLOSED block bit-range [firstBit, lastBit]
 			*		 The result is stored in bitset res. Outside the range, res is set to 0.
-			* @param firstBit, lastBit: closed bit-range 0 < firstBit <= lastBit <= capacity()
+			* @param firstBit, lastBit: closed bit-range 0 <= firstBit <= lastBit <= capacity()
 			* @param lhs, rhs: input bitsets
 			* @param res: output bitset
 			* @returns reference to the resulting bitstring res
@@ -107,7 +107,7 @@ namespace bitgraph {
 			/**
 			* @brief AND between lhs and rhs bitsets in the CLOSED block-range [firstBlock, lastBlock]
 			*		 The result is stored in bitset res. Outside the range, res is set to 0.
-			* @param firstBit, lastBit: closed bit-range 0 < firstBit <= lastBit <= capacity()
+			* @param firstBit, lastBit: closed bit-range 0 <= firstBit <= lastBit <= capacity()
 			* @param lhs, rhs: input bitsets
 			* @param res: output bitset
 			* @returns reference to the resulting bitstring res
@@ -557,7 +557,7 @@ namespace bitgraph {
 
 			/**
 			* @brief sets the bits in the closed range [firstBit, lastBit] to 0 in the bitstring
-			* @param firstBit:, lastBit: 0 < firstBit <= lastBit
+			* @param firstBit:, lastBit: 0 <= firstBit <= lastBit
 			* @details: last_update 19/02/25
 			* @details: zero blocks are not removed
 			**/
