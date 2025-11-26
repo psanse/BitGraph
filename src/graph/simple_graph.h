@@ -614,7 +614,7 @@ namespace bitgraph {
 		}
 		catch (const std::bad_alloc& e) {
 			LOG_ERROR("memory for graph not allocated - Graph<BitSetT>::reset");
-			LOG_ERROR(e.what());
+			LOG_ERROR("%s", e.what());
 			NV_ = 0;
 			NBB_ = 0;
 			return -1;
