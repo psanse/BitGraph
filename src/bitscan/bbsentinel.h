@@ -134,7 +134,7 @@ namespace bitgraph {
 		// COMMENTS
 		// 1- update sentinels at the start of loop
 
-		unsigned long posInBB;
+		Ul posInBB;
 
 		for (int i = m_BBH; i >= m_BBL; i--) {
 			if (_BitScanReverse64(&posInBB, vBB_[i])) {
@@ -154,7 +154,7 @@ namespace bitgraph {
 		// COMMENTS
 		// 1- update sentinels at the start of loop
 
-		unsigned long posInBB;
+		Ul posInBB;
 
 		for (int i = m_BBL; i <= m_BBH; i++) {
 			if (_BitScanForward64(&posInBB, vBB_[i])) {
@@ -174,7 +174,7 @@ namespace bitgraph {
 		// COMMENTS
 		// 1- update sentinels at the start of loop (experimental, does not use sentinesl of bbN_del)
 
-		unsigned long posInBB;
+		Ul posInBB;
 
 		for (int i = m_BBL; i <= m_BBH; i++) {
 			if (_BitScanForward64(&posInBB, vBB_[i])) {
@@ -198,7 +198,7 @@ namespace bitgraph {
 		// COMMENTS
 		// 1- update sentinels, set scan_.bbi_ to m_BBL and set scan_.pos_ to MASK_LIM at the start of loop
 
-		unsigned long posInBB;
+		Ul posInBB;
 
 		if (_BitScanForward64(&posInBB, vBB_[scan_.bbi_] & Tables::mask_high[scan_.pos_])) {
 			scan_.pos_ = posInBB;
@@ -225,9 +225,9 @@ namespace bitgraph {
 	//// COMMENTS
 	//// 1- update sentinels, set scan_.bbi_ to m_BBL and set scan_.pos_ to MASK_LIM at the start of loop
 	//
-	//	unsigned long posInBB;
+	//	Ul posInBB;
 	//			
-	//	//look uo in the last table
+	//	//look up in the last table
 	//	if(_BitScanForward64(&posInBB, vBB_[scan_.bbi_] & Tables::mask_high[scan_.pos_])){
 	//		scan_.pos_ =posInBB;
 	//		nBB=scan_.bbi_;

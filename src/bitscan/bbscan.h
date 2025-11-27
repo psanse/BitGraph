@@ -245,7 +245,7 @@ namespace bitgraph {
 
 	int BBScan::next_bit_del() {
 
-		U32 posInBB;
+		Ul posInBB;
 
 		for (auto i = scan_.bbi_; i < nBB_; ++i) {
 
@@ -269,7 +269,7 @@ namespace bitgraph {
 
 	int BBScan::next_bit_del(BBScan& bbN_del) {
 
-		U32 posInBB;
+		Ul posInBB;
 
 		for (auto i = scan_.bbi_; i < nBB_; ++i) {
 
@@ -293,7 +293,7 @@ namespace bitgraph {
 
 	int BBScan::next_bit() {
 
-		U32 posInBB;
+		Ul posInBB;
 
 		//Search for next bit in the last scanned block
 		if (_BitScanForward64(&posInBB, vBB_[scan_.bbi_] & Tables::mask_high[scan_.pos_])) {
@@ -326,7 +326,7 @@ namespace bitgraph {
 
 	int BBScan::next_bit(BBScan& bitset) {
 
-		U32 posInBB;
+		Ul posInBB;
 
 		//Search for next bit in the last scanned block
 		if (_BitScanForward64(&posInBB, vBB_[scan_.bbi_] & Tables::mask_high[scan_.pos_])) {
@@ -368,7 +368,7 @@ namespace bitgraph {
 
 	int BBScan::prev_bit() {
 
-		U32 posInBB;
+		Ul posInBB;
 
 		//Searches for previous bit in the last scanned block
 		if (_BitScanReverse64(&posInBB, vBB_[scan_.bbi_] & Tables::mask_low[scan_.pos_])) {
@@ -402,7 +402,7 @@ namespace bitgraph {
 	int BBScan::prev_bit(BBScan& bitset)
 	{
 
-		U32 posInBB;
+		Ul posInBB;
 
 		//Searches for previous bit in the last scanned block
 		if (_BitScanReverse64(&posInBB, vBB_[scan_.bbi_] & Tables::mask_low[scan_.pos_])) {
@@ -442,7 +442,7 @@ namespace bitgraph {
 
 	int BBScan::prev_bit_del() {
 
-		U32 posInBB;
+		Ul posInBB;
 
 		for (auto i = scan_.bbi_; i >= 0; --i) {
 
@@ -464,7 +464,7 @@ namespace bitgraph {
 
 	int BBScan::prev_bit_del(BBScan& bitset) {
 
-		U32 posInBB;
+		Ul posInBB;
 
 		for (auto i = scan_.bbi_; i >= 0; --i) {
 

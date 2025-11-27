@@ -19,13 +19,17 @@
 #ifndef __BBTYPES_H__
 #define __BBTYPES_H__
 
+#include <cstdint>
+
 namespace bitgraph {
 
-	using U8 = unsigned char;
-	using U16 = unsigned short;
-	using U32 = unsigned long;
-	using BITBOARD = unsigned long long;
-	using BYTE = unsigned char;
+	using U8 = std::uint8_t;
+	using U16 = std::uint16_t;
+	using U32 = std::uint32_t;
+	using Ul = unsigned long;		//for intrinscs
+	using U64 = std::uint64_t;
+	using BITBOARD = U64;
+	using BYTE = U8;
 	using BOOL = int;								//Deprecated: use bool instead (CHECK 08/02/25)
 
 

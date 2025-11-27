@@ -1022,7 +1022,7 @@ namespace bitgraph {
 
 	int BitSetSp::msbn64_intrin(int& block)	const {
 
-		U32 posInBB;
+		Ul posInBB;
 
 		for (int i = (int)vBB_.size() - 1; i >= 0; --i) {
 
@@ -1080,7 +1080,7 @@ namespace bitgraph {
 
 	int BitSetSp::msbn64_intrin() const
 	{
-		U32 posInBB;
+		Ul posInBB;
 
 		for (int i = (int)vBB_.size() - 1; i >= 0; --i) {
 
@@ -1094,7 +1094,7 @@ namespace bitgraph {
 
 	int BitSetSp::lsbn64_intrin(int& block) const {
 
-		U32 posInBB;
+		Ul posInBB;
 
 		for (auto i = 0u; i < vBB_.size(); ++i) {
 			if (_BitScanForward64(&posInBB, vBB_[i].bb_)) {
@@ -1175,7 +1175,7 @@ namespace bitgraph {
 
 	int BitSetSp::lsbn64_intrin() const
 	{
-		U32 posInBB;
+		Ul posInBB;
 
 		for (auto i = 0u; i < vBB_.size(); ++i) {
 			if (_BitScanForward64(&posInBB, vBB_[i].bb_)) {

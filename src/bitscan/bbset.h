@@ -910,7 +910,7 @@ namespace bitgraph{
 
 		int BitSet::msbn64_intrin() const
 		{
-			U32 posInBB;
+			Ul posInBB;
 
 			for (int i = nBB_ - 1; i >= 0; --i) {
 
@@ -1393,12 +1393,12 @@ namespace bitgraph{
 
 #endif
 
-			return BBObject::noBit;
+			return  BBObject::noBit;
 		}
 
 		int BitSet::lsbn64_intrin() const
 		{
-			U32 posInBB;
+			Ul posInBB;
 
 			for (auto i = 0; i < nBB_; ++i) {
 				if (_BitScanForward64(&posInBB, vBB_[i])) {
