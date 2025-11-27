@@ -340,14 +340,14 @@ namespace bitgraph {
 			/////////////////
 			// Popcount
 
-				/**
-				* @brief Returns the number of 1-bits in the bitstring
-				*
-				* @details alias to popcn64, calls the function
-				* @details Only function for population count since 12/02/2025
-				* @details implementation depends of POPCN64 switch in bbconfig.h
-				*		   By default - intrinsic HW assembler instructions
-				**/
+			/**
+			* @brief Returns the number of 1-bits in the bitstring
+			*
+			* @details alias to popcn64, calls the function
+			* @details Only function for population count since 12/02/2025
+			* @details implementation depends of POPCN64 switch in bbconfig.h
+			*		   By default - intrinsic HW assembler instructions
+			**/
 			std::size_t	size()									const { return (std::size_t)popcn64(); }
 			std::size_t	size(int firstBit, int lastBit = -1)	const { return (std::size_t)popcn64(firstBit, lastBit); }
 
