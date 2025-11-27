@@ -985,14 +985,14 @@ namespace bitgraph {
 
 	template<>
 	inline
-		int GraphSort<ugraph>::reorder_in_place(const vint& new_order, ostream* o) {
+		int GraphSort<ugraph>::reorder_in_place(const vint&, ostream*) {
 		struct this_type_is_not_available_for_GraphSort {};
 		return 0;
 	}
 
 	template<>
 	inline
-		int GraphSort<ugraph>::reorder_in_place(const vint& new_order, Decode& d, ostream* o) {
+		int GraphSort<ugraph>::reorder_in_place(const vint&, Decode& d, ostream*) {
 		struct this_type_is_not_available_for_GraphSort {};
 		return 0;
 	}

@@ -136,7 +136,7 @@ void Tables::init_masks(){
 			if(j<c) continue; 
 
 			if(j==c) mask_mid[c][j]=mask[c];
-			else mask_mid[c][j]= mask_low[j] & mask_high[c] | mask[c] | mask[j];
+			else mask_mid[c][j]= (mask_low[j] & mask_high[c]) | mask[c] | mask[j];
 		}
 	}
 

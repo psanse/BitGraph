@@ -518,7 +518,7 @@ namespace bitgraph {
 	template<class BitSetT>
 	inline
 		Graph<BitSetT>::Graph(string filename) :
-		NV_(0), NBB_(0), NE_(0),
+		NV_(0), NE_(0), NBB_(0),
 		name_(""), path_("")
 	{
 		if (reset(filename) == -1) {
