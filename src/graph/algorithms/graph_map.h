@@ -28,6 +28,8 @@ namespace bitgraph {
 
 		class GraphMap {
 
+///////////////////////
+//public interface
 		public:
 			enum print_t { L2R = 0, R2L, BOTH };		//streaming configuration
 
@@ -76,7 +78,7 @@ namespace bitgraph {
 		// build mapping operations 
 
 			/**
-			* @brief Computes mapping between the two different sortings of a graph
+			* @brief Computes mapping between two different vertex orderings of a graph
 			*
 			*		 I. The mappings are available by the getters get_l2r(), get_r2l()
 			*
@@ -95,6 +97,7 @@ namespace bitgraph {
 
 			//////////////////////
 			//single ordering
+
 			template< typename Alg_t >
 			int build_mapping(typename Alg_t::_gt&, int lhs_s, int lhs_p, std::string lhs_name = "");
 
@@ -114,8 +117,8 @@ namespace bitgraph {
 			bool is_consistent();
 
 
-			///////////////////////
-			//private interface
+///////////////////////
+//private interface
 
 		protected:
 			void clear() { l2r_.clear(); r2l_.clear(); nameL_.clear(); nameR_.clear(); }
@@ -126,8 +129,8 @@ namespace bitgraph {
 			// data members
 
 			vint l2r_, r2l_;						//mapping between left and right ordering
-			std::string nameL_;						//fancy name of left ordering
-			std::string nameR_;						//fancy name of right ordering	
+			std::string nameL_;						//fancy name describing the left ordering
+			std::string nameR_;						//fancy name describing the right ordering	
 		};
 	}//end of namespace _impl
 

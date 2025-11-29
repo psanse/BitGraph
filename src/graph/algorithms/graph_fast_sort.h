@@ -49,10 +49,10 @@ namespace bitgraph {
 
 		public:
 			using basic_type = Graph_t;											//graph type
+			using _gt = basic_type;												//alias for backward compatibility		
 			using type = GraphFastRootSort< Graph_t>;							//own type		
 			using bb_type = typename Graph_t::_bbt;								//bitset type
-			using _gt = basic_type;												//alias for backward compatibility			
-
+			
 			//non structured enums are used for easy conversion to int when needed
 			enum { PRINT_DEGREE = 0, PRINT_SUPPORT, PRINT_NODES };
 			enum { MIN_DEGEN = 0, MAX_DEGEN, MIN_DEGEN_COMPO, MAX_DEGEN_COMPO, MAX, MIN, MAX_WITH_SUPPORT, MIN_WITH_SUPPORT, NONE };
