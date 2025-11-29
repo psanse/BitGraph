@@ -53,6 +53,7 @@ namespace bitgraph {
 			using basic_type = Graph_t;											//graph type
 			using type = GraphFastRootSort< Graph_t>;							//own type		
 			using bb_type = typename Graph_t::_bbt;								//bitset type
+			using _gt = basic_type;												//alias for backward compatibility			
 
 			enum { PRINT_DEGREE = 0, PRINT_SUPPORT, PRINT_NODES };
 			enum { MIN_DEGEN = 0, MAX_DEGEN, MIN_DEGEN_COMPO, MAX_DEGEN_COMPO, MAX, MIN, MAX_WITH_SUPPORT, MIN_WITH_SUPPORT, NONE };
@@ -810,16 +811,13 @@ namespace bitgraph {
 	{
 		switch (type) {
 		case PRINT_DEGREE:
-			for (auto elem : nb_neigh_) {
-				o << elem << " ";
-			}
+			bitgraph::_stl::print_collection(nb_neigh_, o, eofl);			
 			break;
 		case PRINT_SUPPORT:
-			for (auto elem : deg_neigh_) {
-				o << elem << " ";
-			}
+			bitgraph::_stl::print_collection(deg_neigh_, o, eofl);			
 			break;
 		case PRINT_NODES:
+			bitgraph::_stl::print_collection(nodes_, o, eofl);
 			break;
 		default:
 			LOG_ERROR("unknown print type- GraphFastRootSort<Graph_t>::print()");

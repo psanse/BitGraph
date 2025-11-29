@@ -36,8 +36,9 @@ vint Decode::reverse(const vint& o)
 vint Decode::decode(const vint& l) const
 {
 	vint res;
+	
 	if (!l.empty()) {
-		res.resize(l.size());
+		res.resize(l.size());			//must be resized for transform 
 		DecodeVertex df(ords_);
 		transform(l.cbegin(), l.cend(), res.begin(), df);
 	}

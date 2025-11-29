@@ -7,38 +7,35 @@
 */
 
 #include <iostream>
-#include "utils/common.h"
-//#include "utils/result.h"
 #include "gtest/gtest.h"
+#include "graph/algorithms/decode.h"
+#include "utils/common.h"
 #include "graph/graph.h"
-#include "graph/algorithms/graph_gen.h"
-#include "graph/algorithms/graph_sort.h"
 #include "graph/algorithms/graph_fast_sort.h"
 
 using namespace std;
 using namespace bitgraph;
 
-TEST(Decode, GraphFastRootSort) {
+TEST(Decode, decodeList) {
 	
 	ugraph ug(106);
 	ug.add_edge(1, 2);
 	ug.add_edge(1, 3);
 	ug.add_edge(1, 4);
 	ug.add_edge(78, 5);	
-
-	
+		
 	//computes ordering in format [OLD]->[NEW]
 	using  gt = GraphFastRootSort<ugraph>;
 	gt sorter(ug);											
-	vint vres = sorter.new_order(static_cast<int>(gt::MIN), false /*ltf*/, true /*o2n*/);
+	vint vres = sorter.new_order(static_cast<int>(gt::MIN), false /*ltf*/, true /*old to new */);		
 
 	//I/O
-	//sorter.print(static_cast<int>(gt::sort_print_t::PRINT_NODES), std::cout);
+	sorter.print(static_cast<int>(gt::PRINT_NODES), std::cout);
 	
 	//initis decoder
-	Decode::reverse_in_place(vres);			//format [NEW]->[OLD]
+	Decode::reverse_in_place(vres);			//format [OLD]->[NEW]		
 	Decode d;
-	d.add_ordering(vres);
+	d.add_ordering(vres);					//first 5 elem of vres {0 6 7 8 9 10}
 
 	//computes the vertex number of a list of vertices of the graph isomorphism in the original graph ug
 	vint vlist;
@@ -51,9 +48,11 @@ TEST(Decode, GraphFastRootSort) {
 
 	vint dec = d.decode(vlist);
 	EXPECT_EQ(dec[0], 0);
-	EXPECT_EQ(dec[1], 105);
-	EXPECT_EQ(dec[2], 100);
-	EXPECT_EQ(dec[3], 101);
-	EXPECT_EQ(dec[4], 102);
-	EXPECT_EQ(dec[5], 103);	
+	EXPECT_EQ(dec[1], 6);
+	EXPECT_EQ(dec[2], 7);
+	EXPECT_EQ(dec[3], 8);
+	EXPECT_EQ(dec[4], 9);
+	EXPECT_EQ(dec[5], 10);	
+
+
 }
