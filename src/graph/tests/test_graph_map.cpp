@@ -46,8 +46,8 @@ TEST_F(GraphMapTest, build_mapping) {
 	//l2r={1, 2, 3 ,0}, r2l={3, 0, 1, 2}
 
 	GraphMap gm;
-	gm.build_mapping< GraphSort> (ug, GraphSort::MAX, _sort::FIRST_TO_LAST,
-									  GraphSort::MIN, _sort::FIRST_TO_LAST, "MAX F2L", "MIN F2L"	);
+	gm.build_mapping< GraphSort> (ug, GraphSort::MAX, GraphSort::FIRST_TO_LAST,
+									  GraphSort::MIN, GraphSort::FIRST_TO_LAST, "MAX F2L", "MIN F2L"	);
 		
 	//////////////////////////////////												  
 	EXPECT_EQ	(NV, gm.size());
@@ -76,7 +76,7 @@ TEST_F(GraphMapTest, build_mapping_single_ordering){
 	//l2r={1, 2, 3 ,0}
 
 	GraphMap gm;
-	gm.build_mapping< GraphSort > (ug, GraphSort::MIN, _sort::FIRST_TO_LAST, "MIN_DEG");
+	gm.build_mapping< GraphSort > (ug, GraphSort::MIN, GraphSort::FIRST_TO_LAST, "MIN_DEG");
 	
 	EXPECT_EQ(NV, gm.size());
 	
@@ -96,7 +96,7 @@ TEST_F(GraphMapTest, predefined_single_ordering){
 	
 	//predefined ordering
 	GraphSort gol(ug);
-	vint o2n = gol.new_order(GraphSort::MIN, _sort::FIRST_TO_LAST);
+	vint o2n = gol.new_order(GraphSort::MIN, GraphSort::FIRST_TO_LAST);
 
 	GraphMap gm;
 	gm.build_mapping(o2n, "MIN F2L");			// builds mapping according to the given ordering

@@ -34,14 +34,12 @@ using vint = std::vector<int>;
 namespace bitgraph {
 	namespace _impl {
 
-
 		///////////////////////////
 		//
 		// GraphFastRootSort class
 		// (Graph_t should be restricted to ugraph and sparse_ugraph types)
 		//
 		////////////////////////////
-
 
 		template <class Graph_t>
 		class GraphFastRootSort {
@@ -55,8 +53,11 @@ namespace bitgraph {
 			using bb_type = typename Graph_t::_bbt;								//bitset type
 			using _gt = basic_type;												//alias for backward compatibility			
 
+			//non structured enums are used for easy conversion to int when needed
 			enum { PRINT_DEGREE = 0, PRINT_SUPPORT, PRINT_NODES };
 			enum { MIN_DEGEN = 0, MAX_DEGEN, MIN_DEGEN_COMPO, MAX_DEGEN_COMPO, MAX, MIN, MAX_WITH_SUPPORT, MIN_WITH_SUPPORT, NONE };
+			enum { FIRST_TO_LAST = 0, LAST_TO_FIRST };
+			enum { NEW_TO_OLD = 0, OLD_TO_NEW };								//backward compatibility - possibly to be removed
 
 			////////////////////////
 			//static methods 

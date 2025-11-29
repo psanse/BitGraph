@@ -1,11 +1,10 @@
-﻿/*
+﻿/**
  * @file common.h
  * @brief common utilities for the framework
  * @date ?
  * @last_update 17/01/25
- * @author pss
- *
- */
+ * @dev: main pss, others ff
+ **/
 
 #ifndef __COMMON_H__
 #define	__COMMON_H__
@@ -33,8 +32,6 @@
 #include <unordered_set>				//for all_unique
 
 #include "common_types.h"				//common types additional utilities, to be included e
-
-
 
 
 namespace bitgraph {
@@ -449,9 +446,7 @@ namespace bitgraph {
 	//////////////////////////////
 	namespace com {
 		namespace _sort {
-			enum { FIRST_TO_LAST = 0, LAST_TO_FIRST };
-			enum { NEW_TO_OLD = 0, OLD_TO_NEW };			//format of the ordering - old-to-new in the space of the original graph, new-to-old in the space of the new graph
-
+	
 			/**
 			* @brief Sorting of n items (integer) according to non-increasing values of their scores (double)
 			*
