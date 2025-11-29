@@ -16,6 +16,7 @@
 
 #include "bbobject.h"
 #include "bitblock.h"	
+#include "bbexpr.h"
 #include "utils/common.h"			//for the primitive stack type
 #include <vector>	
 #include <set>
@@ -38,9 +39,23 @@ namespace bitgraph {
 		// @details Does not use HW dependent instructions (intrinsics), nor does it cache information for very fast bitscanning
 		//
 		///////////////////////////////////
-		class BitSet :public BBObject {
+		class BitSet :public BBObject, public BBExprMutable<BitSet> {
 
 		public:
+			template <typename E>
+			explicit BitSet(const BBExpr<E> &rhs) noexcept : BitSet() {
+				*this = rhs;
+			}
+
+			template <typename E>
+			BitSet& operator=(const BBExpr<E> &rhs) noexcept {
+				const E &rhsCast = rhs.bbexpr_cast();
+				if (rhsCast.bbexpr_num_blocks() != nBB_) {
+					nBB_ = rhsCast.bbexpr_num_blocks();
+					vBB_.resize(nBB_);
+				}
+				return assign_bit(rhs);
+			}
 
 			/////////////////////////////
 			// Independent operators / masks  
@@ -410,16 +425,6 @@ namespace bitgraph {
 			inline	BitSet& set_bit(const BitSet& bb_add);
 
 			/**
-			* @brief Overwrites this bitstring with @bb_add (equivalent to operator=)
-			*		  
-			*		 Note: The bitblock size of bb_add must be at least as large as this bitstring.
-			* 
-			* @param bb_add: input bitstring whose bits are copied
-			* returns reference to the modified bitstring
-			**/
-			inline BitSet& assign_bit(const BitSet& bb_add);
-
-			/**
 			* @brief Adds the bits from the bitstring bb_add in the range [0, lastBit]
 			* @param lastBit : the last bit in the range to be copied
 			* @returns reference to the modified bitstring
@@ -551,24 +556,6 @@ namespace bitgraph {
 			////////////////////////
 			// operators
 
-				/**
-				* @brief Bitwise AND operator with bbn
-				* @details For set intersection
-				**/
-			BitSet& operator &=				(const BitSet& bbn);
-
-			/**
-			* @brief Bitwise OR operator with bbn
-			* @details For set union
-			**/
-			BitSet& operator |=				(const BitSet& bbn);
-
-			/**
-			* @brief Bitwise XOR operator with bbn
-			* @details For symmetric_difference
-			**/
-			BitSet& operator ^=				(const BitSet& bbn);
-
 
 			friend bool operator ==			(const BitSet& lhs, const BitSet& rhs);
 			friend bool operator !=			(const BitSet& lhs, const BitSet& rhs);
@@ -580,7 +567,7 @@ namespace bitgraph {
 				/**
 				* @brief flips 1-bits to 0 and 0-bits to 1
 				**/
-			BitSet& flip();
+			BitSet& flip() { return assign_bit(~*this); }
 
 			/**
 			* @brief flips 1-bits to 0 and 0-bits to 1 in the
@@ -804,6 +791,12 @@ namespace bitgraph {
 			**/
 			virtual	int* to_C_array(int* lv, std::size_t& size, bool rev = false);
 
+
+			// BBExpr interface
+			static constexpr bool bbexpr_use_ref = true;
+			int bbexpr_num_blocks() const { return nBB_; }
+			BITBOARD  bbexpr_get_block(int i) const { return vBB_[i]; }
+			BITBOARD &bbexpr_get_block(int i)       { return vBB_[i]; }
 
 			////////////////////////
 			//data members
@@ -1248,19 +1241,6 @@ namespace bitgraph{
 
 			for (auto i = 0; i < nBB_; ++i) {
 				vBB_[i] |= bb_add.vBB_[i];
-			}
-
-			return *this;
-		}
-
-		inline BitSet& _impl::BitSet::assign_bit(const BitSet& bb_add)
-		{
-			/////////////////////////////////
-			assert(nBB_ <= bb_add.nBB_);
-			/////////////////////////////////
-
-			for (auto i = 0; i < nBB_; ++i) {
-				vBB_[i] = bb_add.vBB_[i];
 			}
 
 			return *this;
