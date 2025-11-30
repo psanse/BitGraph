@@ -247,7 +247,6 @@ TEST_F(GraphMapTest, mapBetweenBitsets_single_ordering) {
 }
 
 
-
 ///////////////
 //
 // DEPRECATED TESTS - CHECK

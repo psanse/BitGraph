@@ -86,15 +86,15 @@ namespace bitgraph {
 			*
 			*		 I. The mappings are available by the functions map_l2r(), map_r2l()
 			*
-			*		 II. Type Alg_t is a sorting algorithm (e.g. GraphFastRootSort<Graph_t>)
+			*		 II. Type Alg_t is a sorting algorithm (typically from GraphFastRootSort<Graph_t>)
 			*
-			* @param lhs_s, rhs_s: input sorting strategies of the left and right orderings
-			* @param lhs_p, rhs_p: input placement strategies of the left and right orderings 
+			* @param slhs, srhs: input sorting strategies of the left and right orderings
+			* @param plhs, prhs: input placement strategies of the left and right orderings 
 			*						(FALSE:first-to-last, TRUE:last-to-first)
 			* @param lhs_name, rhs_name: fancy names for the orderings
 			**/
 			template< typename Alg_t>
-			void build_mapping(typename Alg_t::_gt&, int lhs_s, bool lhs_p, int rhs_s, bool rhs_p,
+			void build_mapping(typename Alg_t::_gt&, int slhs, bool plhs, int srhs, bool prhs,
 										std::string lhs_name = "", std::string rhs_name = "");
 
 			/**
@@ -115,17 +115,17 @@ namespace bitgraph {
 			*
 			*		 I. The mappings are available by the functions map_l2r(), map_r2l()
 			*
-			*		 II. Type Alg_t is a sorting algorithm (e.g. GraphFastRootSort<Graph_t>)
+			*		 II. Type Alg_t is a sorting algorithm (typically from GraphFastRootSort<Graph_t>)
 			*
-			* @param lhs_s, rhs_s: input sorting strategies of the left and right orderings
-			* @param lhs_p, rhs_p: input placement strategies of the left and right orderings
+			* @param srhs: input sorting strategies for the ordering (considered to the right)
+			* @param prhs: input placement strategy gor the ordering (considered to the right)
 			*						(FALSE:first-to-last, TRUE:last-to-first)
 			* @param rhs_name: fancy name for the ordering (e.g. "MIN_DEG, F2L")
 			* @details: internally lhs_name is assigned "ORIGINAL GRAPH"
 			**/
 
 			template< typename Alg_t >
-			void build_mapping(typename Alg_t::_gt&, int rhs_s, bool rhs_p, std::string rhs_name = "") ;
+			void build_mapping(typename Alg_t::_gt&, int srhs, bool prhs, std::string rhs_name = "") ;
 
 			/**
 			* @brief Helper when the two mappings are known

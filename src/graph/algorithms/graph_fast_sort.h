@@ -282,8 +282,6 @@ namespace bitgraph {
 			ostream& print(int type, ostream& o, bool eofl = true) const;
 
 
-
-
 			/////////////////////////////////////////////
 			// data members	
 		protected:
