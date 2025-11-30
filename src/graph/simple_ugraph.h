@@ -745,7 +745,7 @@ namespace bitgraph {
 		o << "%%MatrixMarket matrix coordinate pattern symmetric" << endl;
 
 		//timestamp comment
-		o << "% File written by GRAPH:" << PrecisionTimer::local_timestamp();
+		o << "% File written by GRAPH:" << PrecisionTimer::local_timestamp() << endl;
 
 		//name comment
 		if (!ptype::name_.empty())
