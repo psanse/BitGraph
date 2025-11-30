@@ -692,14 +692,12 @@ namespace bitgraph {
 	}
 
 
-
-
 	template<class BitSetT>
 	inline
 		void Ugraph<BitSetT>::write_dimacs(ostream& o) {
 
 		//timestamp comment 
-		o << "c File written by GRAPH:" << PrecisionTimer::local_timestamp();
+		o << "c File written by GRAPH:" << PrecisionTimer::local_timestamp() << endl;
 
 		//name comment
 		if (!ptype::name_.empty())
@@ -723,7 +721,7 @@ namespace bitgraph {
 		void  Ugraph<BitSetT>::write_EDGES(ostream& o) {
 
 		//timestamp comment
-		o << "% File written by GRAPH:" << PrecisionTimer::local_timestamp();
+		o << "% File written by GRAPH:" << PrecisionTimer::local_timestamp() << endl;
 
 		//name coment
 		if (!ptype::name_.empty())
