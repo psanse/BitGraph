@@ -1,9 +1,7 @@
 /*
 * @file test_graph_map.cpp  
 * @brief Unit tests for GraphMap class which manages a pair of vertex orderings
-* @created  14/8/17
-* @update 03/01/20 - adapted to the new GraphFastRootSort class
-* @last_update 10/01/25
+* @date: created  14/8/17, update  GraphFastRootSort 03/01/20, imported from prior COPT (10/01/25), last update 30/11/25
 * @dev pss
 *
 * TODO - check deprecated tests (27/01/25)
@@ -29,9 +27,11 @@ class GraphMapTest : public ::testing::Test {
 protected:
 	void SetUp() override {
 		ug.reset(NV);
-		ug.add_edge(0, 1);
+		ug.add_edge(0, 1);		
 		ug.add_edge(0, 2);
 		ug.add_edge(0, 3);
+		ug.add_edge(1, 2);
+		ug.add_edge(2, 3);
 	}
 	void TearDown() override {}
 
@@ -40,11 +40,10 @@ protected:
 	ugraph ug;											
 };
 
-TEST_F(GraphMapTest, build_mapping) {
+TEST_F(GraphMapTest, build_mapping_2_orderings) {
 		
 	//degrees: {0(3), 1(2), 2(3), 3(2)}
-	//l2r={1, 2, 3 ,0}, r2l={3, 0, 1, 2}
-
+	 
 	GraphMap gm;
 	gm.build_mapping< GraphSort> (ug, GraphSort::MAX, GraphSort::FIRST_TO_LAST,
 									  GraphSort::MIN, GraphSort::FIRST_TO_LAST, "MAX F2L", "MIN F2L"	);
@@ -53,67 +52,201 @@ TEST_F(GraphMapTest, build_mapping) {
 	EXPECT_EQ	(NV, gm.size());
 	EXPECT_TRUE	(gm.is_consistent());
 	//////////////////////////////////
-			
-	vint l2rexp;
-	l2rexp.push_back(1); l2rexp.push_back(2); l2rexp.push_back(3); l2rexp.push_back(0);
-	vint r2lexp;
-	r2lexp.push_back(3); r2lexp.push_back(0); r2lexp.push_back(1); r2lexp.push_back(2);
+		
+	//N2O_L: 0 2 1 3	[4]
+	//O2N_L: 0 2 1 3	[4]
+	//N2O_R: 1 3 0 2	[4]
+	//O2N_R: 2 0 3 1	[4]
+	
+	//l2r={2, 3, 0 ,1}, r2l={2, 3, 0, 1}
 
+	vint l2rexp = { 2, 3, 0, 1 };
+	vint r2lexp = { 2, 3, 0, 1 };
+	
 	//////////////////////////////////
 	EXPECT_EQ	(l2rexp, gm.get_l2r());
 	EXPECT_EQ	(r2lexp, gm.get_r2l());
 	//////////////////////////////////
+
 	
+	//left index to right index
+	EXPECT_EQ(gm.map_l2r(0), 2); 
+	EXPECT_EQ(gm.map_l2r(1), 3);
+	EXPECT_EQ(gm.map_l2r(2), 0);
+	EXPECT_EQ(gm.map_l2r(3), 1);
+
+	//right index to left index
+	EXPECT_EQ(gm.map_r2l(0), 2);
+	EXPECT_EQ(gm.map_r2l(1), 3);
+	EXPECT_EQ(gm.map_r2l(2), 0);
+	EXPECT_EQ(gm.map_r2l(3), 1);
+
 	//I/O
-	/*gm.print_names();
-	gm.print_mappings();*/
+	//gm.print_names();
+	//gm.print_mappings();
 
 }
 
 TEST_F(GraphMapTest, build_mapping_single_ordering){
 		
 	//degrees: {0(3), 1(2), 2(3), 3(2)}
-	//l2r={1, 2, 3 ,0}
 
 	GraphMap gm;
 	gm.build_mapping< GraphSort > (ug, GraphSort::MIN, GraphSort::FIRST_TO_LAST, "MIN_DEG");
 	
 	EXPECT_EQ(NV, gm.size());
-	
-	//check mappings
-	vint l2rexp;
-	l2rexp.push_back(1); l2rexp.push_back(2); l2rexp.push_back(3); l2rexp.push_back(0);
 
+	//l2r ={ 2, 0, 3, 1 };  - [OLD / original index] to [NEW]
+	//r2l ={ 1, 3, 0, 2 }  -  [NEW] to [OLD / original index]
+	
+	vint l2rexp = { 2, 0, 3, 1 }; 
+	vint r2lexp = { 1, 3, 0, 2 };
+	
+	/////////////////////////////////
 	EXPECT_EQ(l2rexp, gm.get_l2r());
+	////////////////////////////////
+
+	//original index to new index
+	EXPECT_EQ(gm.map_l2r(0), 2);							
+	EXPECT_EQ(gm.map_l2r(1), 0);
+	EXPECT_EQ(gm.map_l2r(2), 3);
+	EXPECT_EQ(gm.map_l2r(3), 1);
+
+	//new index to original index
+	EXPECT_EQ(gm.map_r2l(0), 1);
+	EXPECT_EQ(gm.map_r2l(1), 3);
+	EXPECT_EQ(gm.map_r2l(2), 0);
+	EXPECT_EQ(gm.map_r2l(3), 2);
+
+
+	EXPECT_STREQ("ORIGINAL GRAPH", gm.nameL().c_str());		//left ordering is the original graph in single ordering use
+	EXPECT_STREQ("MIN_DEG", gm.nameR().c_str());			//right ordering is the new graph in single ordering use
 
 	//I/O
 	/*gm.print_names();
-	gm.print_mappings();*/	
-
+	gm.print_mappings();	*/
+	
 }
 
 TEST_F(GraphMapTest, predefined_single_ordering){
 	
+	//degrees: {0(3), 1(2), 2(3), 3(2)}
+
 	//predefined ordering
-	GraphSort gol(ug);
-	vint o2n = gol.new_order(GraphSort::MIN, GraphSort::FIRST_TO_LAST);
+	GraphSort gol(ug); 
+	vint n2o = gol.new_order(GraphSort::MIN, GraphSort::FIRST_TO_LAST, false);			 //n2o = {1,3,0,2}			
 
 	GraphMap gm;
-	gm.build_mapping(o2n, "MIN F2L");			// builds mapping according to the given ordering
+	gm.build_mapping(n2o, "MIN F2L");			// builds mapping according to the given ordering
 
 	EXPECT_EQ(NV, gm.size());
 
 	//check mappings
-	vint l2rexp;
-	l2rexp.push_back(1); l2rexp.push_back(2); l2rexp.push_back(3); l2rexp.push_back(0);
+	vint r2lexp = {1, 3, 0, 2};
+	
+	EXPECT_EQ(r2lexp, gm.get_r2l());						//original index to new index is identity
+	EXPECT_STREQ("MIN F2L", gm.nameR().c_str());
+	EXPECT_STREQ("ORIGINAL GRAPH", gm.nameL().c_str());
 
-	EXPECT_EQ(l2rexp, gm.get_l2r());
-	EXPECT_STREQ("MIN F2L", gm.nameL().c_str());
+
+	//user code - map vertices from the original to the new ordering
+	EXPECT_EQ(gm.map_l2r(0), 2);
+	EXPECT_EQ(gm.map_l2r(1), 0);
+	EXPECT_EQ(gm.map_l2r(2), 3);
+	EXPECT_EQ(gm.map_l2r(3), 1);
+
+	//user code - map vertices from the new ordering to the original
+	EXPECT_EQ(gm.map_r2l(0), 1);
+	EXPECT_EQ(gm.map_r2l(1), 3);
+	EXPECT_EQ(gm.map_r2l(2), 0);
+	EXPECT_EQ(gm.map_r2l(3), 2);
 
 	//I/O
 	/*gm.print_names(); 
 	gm.print_mappings();*/
 }
+
+TEST_F(GraphMapTest, mapBetweenBitsets_2orderings) {
+
+	//degrees: {0(3), 1(2), 2(3), 3(2)}
+	//l2r = {2, 3, 0 ,1}, r2l = {2, 3, 0, 1}
+
+	GraphMap gm;
+	gm.build_mapping< GraphSort>(ug, GraphSort::MAX, GraphSort::FIRST_TO_LAST,
+									 GraphSort::MIN, GraphSort::FIRST_TO_LAST, "MAX F2L", "MIN F2L");
+
+	auto NV = ug.number_of_vertices();
+
+			
+	ugraph::_bbt bbl(static_cast<int>(NV));			//left bitset
+	ugraph::_bbt bbr(static_cast<int>(NV));			//right bitset
+
+	//set bits in left bitset
+	bbl.set_bit(1);
+	bbl.set_bit(3);
+
+	////////////////////////////////////////////
+	gm.map_l2r(bbl, bbr, true /* overwrite */);		//overwrite is not necessary here since bbl was erased before
+	////////////////////////////////////////////
+
+	//check right bitset
+	EXPECT_TRUE(bbr.is_bit(3));
+	EXPECT_TRUE(bbr.is_bit(1));
+	EXPECT_EQ(2, bbr.size());
+
+	//set bits in right bitset
+	bbr.erase_bit();
+	bbr.set_bit(1);
+	bbr.set_bit(3);
+	gm.map_r2l(bbl, bbr, true /* overwrite */);		//overwrite is not necessary here since bbr was erased before
+
+	//check left bitset
+	EXPECT_TRUE(bbl.is_bit(3));
+	EXPECT_TRUE(bbl.is_bit(1));
+	EXPECT_EQ(2, bbl.size());
+}
+
+
+TEST_F(GraphMapTest, mapBetweenBitsets_single_ordering) {
+
+	//degrees: {0(3), 1(2), 2(3), 3(2)}	
+	//l2r ={ 2, 0, 3, 1 };  - [OLD / original index] to [NEW]
+	//r2l ={ 1, 3, 0, 2 }  -  [NEW] to [OLD / original index]
+
+	GraphMap gm;
+	gm.build_mapping< GraphSort >(ug, GraphSort::MIN, GraphSort::FIRST_TO_LAST, "MIN_DEG");
+
+	auto NV = ug.number_of_vertices();
+
+	ugraph::_bbt bbl(static_cast<int>(NV));			//left bitset
+	ugraph::_bbt bbr(static_cast<int>(NV));			//right bitset
+
+	//set bits in left bitset
+	bbl.set_bit(1);
+	bbl.set_bit(3);
+
+	////////////////////////////////////////////
+	gm.map_l2r(bbl, bbr, true /* overwrite */);		//overwrite is not necessary here since bbl was erased before
+	////////////////////////////////////////////
+
+	//check right bitset
+	EXPECT_TRUE(bbr.is_bit(0));
+	EXPECT_TRUE(bbr.is_bit(1));
+	EXPECT_EQ(2, bbr.size());
+
+	//set bits in right bitset
+	bbr.erase_bit();
+	bbr.set_bit(1);
+	bbr.set_bit(3);
+	gm.map_r2l(bbl, bbr, true /* overwrite */);		//overwrite is not necessary here since bbr was erased before
+
+	//check left bitset
+	EXPECT_TRUE(bbl.is_bit(3));
+	EXPECT_TRUE(bbl.is_bit(2));
+	EXPECT_EQ(2, bbl.size());
+}
+
+
 
 ///////////////
 //

@@ -53,14 +53,11 @@ static_assert(BITGRAPH_WORD_SIZE == WORD_SIZE, "different values BITGRAPH_WORD_S
     #undef  ISOLANI_LSB										//b^(b-1) implementation (DEFAULT)
 #endif
 
-
-
 ////////////////////
 //Memory allignment	
 		
 //#define _MEM_ALIGNMENT 				32					//change this for different allignments (set to 64 bits? - 01/02/2025)
 //#undef  _MEM_ALIGNMENT									//DEFAULT - currently MUST BE DISABLED , TODO CHECK (01/02/2025)
- 
 
 
 //////////////////////
@@ -94,16 +91,16 @@ static_assert(BITGRAPH_WORD_SIZE == WORD_SIZE, "different values BITGRAPH_WORD_S
 #endif 
 
 ////////////////////
-//MACROS for mapping bit index to bitblock index (0 or 1 based)
+//MACROS for mapping bit indexes to bitblock indexes (0 or 1 based)
 #define INDEX_0TO0(p)			(WDIV(p))							//p>0
 #define INDEX_0TO1(p)			(WDIV(p)+1)							//p>0
-#define INDEX_1TO1(p)			((((p)-1)/WORD_SIZE)+1)	//p>0
-#define INDEX_1TO0(p)			((((p)-1)/WORD_SIZE))		//p>0
+#define INDEX_1TO1(p)			((((p)-1)/WORD_SIZE)+1)				//p>0
+#define INDEX_1TO0(p)			((((p)-1)/WORD_SIZE))				//p>0
 
 //Bitscan operations which used extended lookups
 //have been removed in this release
-#define EXTENDED_LOOKUPS									//uses extra storage space for fast lookup 
-#undef	EXTENDED_LOOKUPS									//comment for fast bitset operations - DEFAULT, DO NOT CHANGE!	
+#define EXTENDED_LOOKUPS											//uses extra storage space for fast lookup 
+#undef	EXTENDED_LOOKUPS											//DEFAULT OFF, DO NOT CHANGE!	
 
 
 

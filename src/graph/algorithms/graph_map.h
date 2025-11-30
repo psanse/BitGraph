@@ -1,9 +1,10 @@
 /**
 * @file graph_map.h
-* @brief header for GraphMap class which manages pairs of vertex orderings
-* @update conversions between two isomporphic graphs encoded by GRAPH (14/8/17)
-* @update extended to inlcude mapping to a single sorting (1/10/17)
-* @last_update 27/01/25
+* @brief header for GraphMap class that manages pairs of vertex orderings
+* @update conversions between two orderings of vertices (typically encoded by GraphFastRootSort) (14/8/17)
+* @update extended to inlcude mapping to a single ordering (1/10/17)
+* @date: imported from COPT framework in 2024, last_update 27/01/25
+* @details: GraphMap is conceived as a wrapper for GraphFastRootSort, but it is not restricted to it due to its generic template design
 * @dev pss
 **/
 
@@ -12,6 +13,7 @@
 
 #include "utils/logger.h"
 #include "utils/common.h"
+#include "bitscan/bbconfig.h"			//for INDEX_1_TO_1 macro
 #include "decode.h"
 #include <iostream>
 #include <vector>
@@ -28,8 +30,8 @@ namespace bitgraph {
 
 		class GraphMap {
 
-///////////////////////
-//public interface
+		///////////////////////
+		//public interface
 		public:
 			enum print_t { L2R = 0, R2L, BOTH };		//streaming configuration
 
@@ -78,30 +80,59 @@ namespace bitgraph {
 		// build mapping operations 
 
 			/**
-			* @brief Computes mapping between two different vertex orderings of a graph
+			* @brief Computes mapping between two different vertex orderings of a graph, 
+			*		 internally stored as left and right orderings.
+			*		 (the indexes of the original graph can be seen as in-between :-))
 			*
-			*		 I. The mappings are available by the getters get_l2r(), get_r2l()
+			*		 I. The mappings are available by the functions map_l2r(), map_r2l()
 			*
 			*		 II. Type Alg_t is a sorting algorithm (e.g. GraphFastRootSort<Graph_t>)
 			*
 			* @param lhs_s, rhs_s: input sorting strategies of the left and right orderings
-			* @param lhs_p, rhs_p: input placement strategies of the left and right orderings (first-to-last, last-to-first)
+			* @param lhs_p, rhs_p: input placement strategies of the left and right orderings 
+			*						(FALSE:first-to-last, TRUE:last-to-first)
 			* @param lhs_name, rhs_name: fancy names for the orderings
-			* @returns -1 if error, 0 otherwise
 			**/
 			template< typename Alg_t>
-			int build_mapping(typename Alg_t::_gt&, int lhs_s, int lhs_p, int rhs_s, int rhs_p,
-									std::string lhs_name = "", std::string rhs_name = ""			);
+			void build_mapping(typename Alg_t::_gt&, int lhs_s, bool lhs_p, int rhs_s, bool rhs_p,
+										std::string lhs_name = "", std::string rhs_name = "");
 
-			int build_mapping(const vint& lhs_o2n, const vint& rhs_o2n, std::string lhs_name = "", std::string rhs_name = "");
+			/**
+			* @brief Helper when the two mappings @lhs_o2n  and @rhs_o2n are knownt
+			* @param lhs_o2n: known mapping in [OLD]->[NEW] format 
+			* @param rhs_o2n: known mapping in [OLD]->[NEW] format 
+			* @param lhs_name, rhs_name: fancy names for the orderings
+			**/
+			void build_mapping(const vint& lhs_o2n, const vint& rhs_o2n, std::string lhs_name = "", std::string rhs_name = "");
 
 			//////////////////////
 			//single ordering
 
-			template< typename Alg_t >
-			int build_mapping(typename Alg_t::_gt&, int lhs_s, int lhs_p, std::string lhs_name = "");
+			/**
+			* @brief Computes and manages a vertex ordering of a graph, internally stored as:
+			*		RIGHT ordering: new index
+			*		LEFT : the index of the original graph
+			*
+			*		 I. The mappings are available by the functions map_l2r(), map_r2l()
+			*
+			*		 II. Type Alg_t is a sorting algorithm (e.g. GraphFastRootSort<Graph_t>)
+			*
+			* @param lhs_s, rhs_s: input sorting strategies of the left and right orderings
+			* @param lhs_p, rhs_p: input placement strategies of the left and right orderings
+			*						(FALSE:first-to-last, TRUE:last-to-first)
+			* @param rhs_name: fancy name for the ordering (e.g. "MIN_DEG, F2L")
+			* @details: internally lhs_name is assigned "ORIGINAL GRAPH"
+			**/
 
-			int build_mapping(const vint& lhs_o2n, std::string lhs_name = "");
+			template< typename Alg_t >
+			void build_mapping(typename Alg_t::_gt&, int rhs_s, bool rhs_p, std::string rhs_name = "") ;
+
+			/**
+			* @brief Helper when the two mappings are known
+			* @param rhs_n2o: known mapping in [NEW]->[OLD] format (which is more intuitive for single ordering)
+			* @param rhs_name: fancy name for the ordering (e.g. "MIN_DEG, F2L")
+			**/
+			void build_mapping(const vint& rhs_n2o, std::string rhs_name = "");
 
 			//////////////
 			//I/O
@@ -112,18 +143,16 @@ namespace bitgraph {
 			//Boolean operations
 
 			/**
-			* @brief checks if the internal mapping state l2r_, r2l is consistent
+			* @brief checks if the internal mapping state @l2r_, @r2l_ is consistent
 			**/
 			bool is_consistent();
 
-
-///////////////////////
-//private interface
+		///////////////////////
+		//private interface
 
 		protected:
 			void clear() { l2r_.clear(); r2l_.clear(); nameL_.clear(); nameR_.clear(); }
 			void reset(std::size_t NV) { clear(); 	l2r_.resize(NV); r2l_.resize(NV); }
-
 
 			////////////////
 			// data members
@@ -148,18 +177,21 @@ namespace bitgraph{
 	inline
 		bitset_t& GraphMap::map_l2r(bitset_t& bbl, bitset_t& bbr, bool overwrite) const {
 
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////
+		assert(bbl.capacity() == bbr.capacity() && "bizarre bitsets with different capacity - GraphMap::map_l2r");
+		assert(INDEX_1TO1(l2r_.size()) == bbr.capacity() && "not adequate bitset capacity for the mapping - GraphMap::map_l2r ");
+		///////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 		//cleans bbr if requested
 		if (overwrite) { bbr.erase_bit(); }
-
-		//sets bitscanning configuration
-		if (bbl.init_scan(BBObject::NON_DESTRUCTIVE) != bbo::noBit) {
-
-			//bitscans bbl and sets bits in bbr
-			int v = BBObject::noBit;
-			while (v = bbl.next_bit() != BBObject::noBit) {
-				bbr.set_bit(l2r_[v]);
-			}
+		
+		//scan the bitset bbl and map
+		bbl.init_scan(BBObject::NON_DESTRUCTIVE) != bbo::noBit;
+		int v = BBObject::noBit;
+		while ( (v = bbl.next_bit()) != BBObject::noBit) {
+			bbr.set_bit(l2r_[v]);
 		}
+		
 
 		return bbr;
 	}
@@ -168,19 +200,21 @@ namespace bitgraph{
 	inline
 		bitset_t& GraphMap::map_r2l(bitset_t& bbl, bitset_t& bbr, bool overwrite) const {
 
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////
+		assert(bbl.capacity() == bbr.capacity() && "bizarre bitsets with different capacity - GraphMap::map_l2r");
+		assert(INDEX_1TO1(l2r_.size()) == bbr.capacity() && "not adequate bitset capacity for the mapping - GraphMap::map_l2r ");
+		///////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 		//cleans bbr if requested
 		if (overwrite) { bbl.erase_bit(); }
 
 		//sets bitscanning configuration
-		if (bbr.init_scan(BBObject::NON_DESTRUCTIVE) != bbo::noBit) {
-
-			//bitscans bbl and sets bits in bbr
-			int v = BBObject::noBit;
-			while (v = bbr.next_bit() != BBObject::noBit) {
-				bbl.set_bit(r2l_[v]);
-			}
+		bbr.init_scan(BBObject::NON_DESTRUCTIVE) != bbo::noBit;
+		int v = BBObject::noBit;
+		while ((v = bbr.next_bit()) != BBObject::noBit) {
+			bbl.set_bit(r2l_[v]);
 		}
-
+		
 		return bbl;
 	}
 
@@ -198,10 +232,10 @@ namespace bitgraph{
 
 	template<class Alg_t>
 	inline
-		int GraphMap::build_mapping(typename Alg_t::_gt& g, int slhs, int plhs, int srhs, int prhs,
+	void GraphMap::build_mapping(typename Alg_t::_gt& g, int slhs, bool plhs, int srhs, bool prhs,
 															std::string lhs_name, std::string rhs_name)
 	{
-		vint o2n_lhs, n2o_lhs, o2n_rhs, n2o_rhs;
+		vint lhs_o2n, lhs_n2o, rhs_o2n, rhs_n2o;
 
 		auto NV = g.number_of_vertices();
 
@@ -209,41 +243,42 @@ namespace bitgraph{
 
 		//determine sorting lhs
 		Alg_t gol(g);
-		o2n_lhs = gol.new_order(slhs, plhs);
-		n2o_lhs = Decode::reverse(o2n_lhs);
+		lhs_o2n = gol.new_order(slhs, plhs /* false:first to last*/, true /* o2n*/);				 // vint new_order(int alg, bool ltf = true, bool o2n = true);
+		lhs_n2o = Decode::reverse(lhs_o2n);
 
 		//determine sorting rhs
 		Alg_t gor(g);
-		o2n_rhs = gor.new_order(srhs, prhs);
-		n2o_rhs = Decode::reverse(o2n_rhs);
+		rhs_o2n = gor.new_order(srhs, prhs/* false:first to last*/, true /* o2n */);
+		rhs_n2o = Decode::reverse(rhs_o2n);
 
 		//determines direct and reverse mappings independently
 		for (auto v = 0; v < NV; v++) {
-			l2r_[v] = o2n_rhs[n2o_lhs[v]];				// l->r
+			l2r_[v] = rhs_o2n[lhs_n2o[v]];				// l->r
 		}
 		for (auto v = 0; v < NV; v++) {
-			r2l_[v] = o2n_lhs[n2o_rhs[v]];			// r->l 
+			r2l_[v] = lhs_o2n[rhs_n2o[v]];				// r->l 
 		}
 
 		nameL_ = std::move(lhs_name);
 		nameR_ = std::move(rhs_name);
-
-		if (!is_consistent()) {
-			LOG_ERROR("bad ordering - GraphMap::build_mapping");
-			return -1;
-		}
+			
+		
+		/*if (!is_consistent()) {
+			LOG_ERROR("L2R and R2L are inconsistent orderings - GraphMap::build_mapping (2 ord...)");
+			LOG_ERROR("exiting...");
+			std::exit(EXIT_FAILURE);
+		}*/
 
 		//I/O
-		//cout<<"N2O_D"; com::stl::print_collection(n2o_d); cout<<std::endl;
-		//cout<<"O2N_D";com::stl::print_collection(o2n_d); cout<<std::endl;
-		//cout<<"O2N_W";com::stl::print_collection(o2n_w); cout<<std::endl;
-		//cout<<"N2O_W";com::stl::print_collection(n2o_w); cout<<std::endl;
-
-		return 0;
+	  /*cout<<"N2O_L: "; bitgraph::_stl::print_collection(lhs_n2o, cout, true);
+		cout<<"O2N_L: "; bitgraph::_stl::print_collection(lhs_o2n, cout, true); 
+		cout<<"N2O_R: "; bitgraph::_stl::print_collection(rhs_n2o, cout, true);
+		cout<<"O2N_R: "; bitgraph::_stl::print_collection(rhs_o2n, cout, true);
+		print_mappings();*/		 
 	}
 
 	template< typename Alg_t>
-	int GraphMap::build_mapping(typename Alg_t::_gt& g, int lhs_s, int lhs_p, std::string lhs_name) {
+	void GraphMap::build_mapping(typename Alg_t::_gt& g, int srhs, bool prhs, std::string rhs_name)  {
 
 		auto NV = g.number_of_vertices();
 
@@ -251,41 +286,46 @@ namespace bitgraph{
 
 		//determine sorting lhs
 		Alg_t gol(g);
-		l2r_ = gol.new_order(lhs_s, lhs_p);
+		l2r_ = gol.new_order(srhs, prhs /* false:first to last */ , true /* o2n */);
 		r2l_ = Decode::reverse(l2r_);
 
-		nameL_ = lhs_name;
-		nameR_ = "NOT USED - SINGLE GRAPH MAPPING";
-
-		if (!is_consistent()) {
-			LOG_ERROR("bad ordering - GraphMap::build_mapping");
-			return -1;
-		}
-
-		return 0;
+		nameL_ = "ORIGINAL GRAPH";
+		nameR_ = std::move(rhs_name);
+	
+		/*if (!is_consistent()) {
+			LOG_ERROR("L2R and R2L are inconsistent orderings - GraphMap::build_mapping(single ord...)");
+			LOG_ERROR("exiting...");
+			std::exit(EXIT_FAILURE);
+		}*/
+			
+		//return 0;
 	}
 
 	inline
-		int GraphMap::build_mapping(const vint& o2n_lhs, const vint& o2n_rhs, std::string lhs_name, std::string rhs_name) {
+		void GraphMap::build_mapping(const vint& lhs_o2n, const vint& rhs_o2n, std::string lhs_name, std::string rhs_name) {
 
-		vint n2o_lhs, n2o_rhs;
+		/////////////////////////////////////////////////////////////////////////////////////////////////////////
+		assert(lhs_o2n.size() == rhs_o2n.size() && "ERROR: different size orderings - GraphMap::build_mapping");
+		/////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-		auto NV = o2n_lhs.size();
+		vint lhs_n2o, rhs_n2o;
+
+		auto NV = lhs_o2n.size();
 
 		reset(NV);
 
 		//determine sorting lhs
-		n2o_lhs = Decode::reverse(o2n_lhs);
+		lhs_n2o = Decode::reverse(lhs_o2n);
 
 		//determine sorting rhs
-		n2o_rhs = Decode::reverse(o2n_rhs);
+		rhs_n2o = Decode::reverse(rhs_o2n);
 
 		//determines direct and reverse mappings independently
 		for (int v = 0; v < NV; v++) {
-			l2r_[v] = o2n_rhs[n2o_lhs[v]];				// l->r 
+			l2r_[v] = rhs_o2n[lhs_n2o[v]];				// l->r 
 		}
 		for (int v = 0; v < NV; v++) {
-			r2l_[v] = o2n_lhs[n2o_rhs[v]];				// r->l 
+			r2l_[v] = lhs_o2n[rhs_n2o[v]];				// r->l 
 		}
 
 		nameL_ = std::move(lhs_name);
@@ -293,30 +333,30 @@ namespace bitgraph{
 
 
 		//assert
-		if (!is_consistent()) {
+		/*if (!is_consistent()) {
 			LOG_ERROR("bad ordering - GraphMap::build_mapping");
 			return -1;
-		}
+		}*/
 
 		//I/O
 		//cout<<"N2O_D"; com::stl::print_collection(n2o_d); cout<<endl;
 		//cout<<"O2N_D";com::stl::print_collection(o2n_d); cout<<endl;
 		//cout<<"O2N_W";com::stl::print_collection(o2n_w); cout<<endl;
 		//cout<<"N2O_W";com::stl::print_collection(n2o_w); cout<<endl;
-
-		return 0;
+		//print_mappings();
+		
 	}
 
 	inline
-		int GraphMap::build_mapping(const vint& lhs_o2n, std::string lhs_name) {
+		void GraphMap::build_mapping(const vint& rhs_n2o, std::string lhs_name) {
 
-		l2r_ = lhs_o2n;
-		r2l_ = Decode::reverse(l2r_);
+		l2r_ = Decode::reverse(rhs_n2o);
+		r2l_ = rhs_n2o;
 
-		nameL_ = std::move(lhs_name);
-		nameR_ = "NOT USED - SINGLE MAPPING";
+		nameL_ = "ORIGINAL GRAPH";
+		nameR_ = std::move(lhs_name);
 
-		return 0;
+		//return 0;
 	}
 
 	inline
