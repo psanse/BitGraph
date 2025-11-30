@@ -2,11 +2,9 @@
 * @file graph_fast_sort.h
 * @brief header for GraphFastRootSort class which sorts graphs by different criteria
 * @details: changed nodes_ stack to vector (18/03/19)
-* @details: created 12/03/15,  last_update 27/01/25
+*			- now working with subgraphs (30/11/2025)
+* @date: created 12/03/15,  last_update 27/01/25
 * @author pss
-* 
-* @TODO add further primitives for composite orderings in subgraphs (29/12/24)
-* @TOD0 add new_order(...) for subgraphs (29/12/24) - added declaration (25/11/2025)
 **/
 
 #ifndef __GRAPH_FAST_SORT_H__
