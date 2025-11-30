@@ -327,7 +327,7 @@ TEST_F(GraphFastRootSortTest, new_order) {
 
 	//absolute min degree ordering first-to-last and old-to-new 
 	//nodes_ = {0, 2, 4, 5, 3, 1}
-	vint mapping = sorter.new_order((gt::MIN), FIRST_TO_LAST, OLD_TO_NEW);
+	vint mapping = sorter.new_order((gt::MIN), gt::FIRST_TO_LAST, gt::OLD_TO_NEW);
 
 	//////////////////////////////////////////
 	EXPECT_EQ(mapping[0], 0);					/* old to new */
@@ -406,7 +406,7 @@ TEST(GraphFastRootSort, new_order_dimacs) {
 	gt sorter(ug);
 
 	//degenerate min degree ordering
-	vint mapping = sorter.new_order((gt::MIN_DEGEN), LAST_TO_FIRST, NEW_TO_OLD);
+	vint mapping = sorter.new_order((gt::MIN_DEGEN), gt::LAST_TO_FIRST, gt::NEW_TO_OLD);
 
 	//////////////////////////////////////////
 	EXPECT_EQ(mapping[0],	199);
@@ -420,7 +420,7 @@ TEST(GraphFastRootSort, new_order_dimacs) {
 
 
 	//composite ordering based on the previous ordering
-	vint mapping_compo = sorter.new_order((gt::MIN_DEGEN_COMPO), LAST_TO_FIRST, NEW_TO_OLD);
+	vint mapping_compo = sorter.new_order((gt::MIN_DEGEN_COMPO), gt::LAST_TO_FIRST, gt::NEW_TO_OLD);
 
 	//////////////////////////////////////////
 	EXPECT_EQ(mapping_compo[0], 69);
