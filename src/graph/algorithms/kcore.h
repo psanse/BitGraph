@@ -306,7 +306,7 @@ namespace bitgraph {
 	{
 		//degenerate minimum degree ordering
 		GraphFastRootSort<Graph_t> gfs(g);
-		vint degen_order = gfs.new_order(GraphFastRootSort<Graph_t>::MIN_DEGEN, _sort::LAST_TO_FIRST);		//MUST BE LAST-TO-FIRST!
+		vint degen_order = gfs.new_order(GraphFastRootSort<Graph_t>::MIN_DEGEN, GraphFastRootSort<Graph_t>::LAST_TO_FIRST);		//MUST BE LAST-TO-FIRST!
 
 		//I. count maximum of the neighbors of each vertex v that precedes v in the ordering
 		//II.find the maximum count
