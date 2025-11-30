@@ -60,7 +60,7 @@ namespace bitgraph {
 
 			////////////////////////
 			//construction / destruction
-			GraphFastRootSort_W(GraphW_t& gw) : gw_(gw), GraphFastRootSort<typename GraphW_t::_gt>(gw.graph()) {}
+			GraphFastRootSort_W(GraphW_t& gw) : GraphFastRootSort<typename GraphW_t::_gt>(gw.graph()), gw_(gw) {}
 
 			//move and copy semantics
 			GraphFastRootSort_W(const GraphFastRootSort_W&) = delete;

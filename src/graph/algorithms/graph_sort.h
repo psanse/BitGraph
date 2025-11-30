@@ -69,19 +69,19 @@ namespace bitgraph {
 			typedef vdeg::iterator					vdeg_it;
 
 			//sorting criteria
-			struct degreeLess /* : public binary_function<deg_t, deg_t, bool>*/ {
+			struct degreeLess {
 				bool operator() (deg_t i, deg_t j) const {
 					return (abs(i.deg) < abs(j.deg));
 				}
 			};
 
-			struct degreeGreater/* : public binary_function<deg_t, deg_t, bool> */ {
+			struct degreeGreater {
 				bool operator() (deg_t i, deg_t j) const {
 					return (i.deg > j.deg);
 				}
 			};
 
-			struct degreeWithTieBreakLess /* : public binary_function<deg_t, deg_t, bool> */ {
+			struct degreeWithTieBreakLess {
 				bool operator() (deg_t i, deg_t j) const {
 					if (i.deg < j.deg) return true;
 					else if (i.deg == j.deg) {
@@ -200,16 +200,14 @@ namespace bitgraph {
 
 		}
 
-		struct weightMore :
-			public binary_function<wset_t, wset_t, bool> {
+		struct weightMore {
 			bool operator() (wset_t i, wset_t j) const {
 				if (i.wv > j.wv) return true;
 				return false;
 			}
 		};
 
-		struct weightLess :
-			public binary_function<wset_t, wset_t, bool> {
+		struct weightLess {
 			bool operator() (wset_t i, wset_t j) const {
 				if (i.wv < j.wv) return true;
 				return false;
@@ -259,8 +257,7 @@ namespace bitgraph {
 			lv[i].degv = g.degree(i);
 		}
 
-		struct weightDegMore :
-			public binary_function<wset_t, wset_t, bool> {
+		struct weightDegMore {
 			bool operator() (wset_t i, wset_t j) const {
 				if (i.wv * i.degv > j.wv * j.degv) return true;
 				return false;
@@ -268,8 +265,7 @@ namespace bitgraph {
 		};
 
 
-		struct weightDegLess :
-			public binary_function<wset_t, wset_t, bool> {
+		struct weightDegLess {
 			bool operator() (wset_t i, wset_t j) const {
 				if (i.wv * i.degv < j.wv * j.degv) return true;
 				return false;
@@ -989,14 +985,14 @@ namespace bitgraph {
 
 	template<>
 	inline
-		int GraphSort<ugraph>::reorder_in_place(const vint& new_order, ostream* o) {
+		int GraphSort<ugraph>::reorder_in_place(const vint&, ostream*) {
 		struct this_type_is_not_available_for_GraphSort {};
 		return 0;
 	}
 
 	template<>
 	inline
-		int GraphSort<ugraph>::reorder_in_place(const vint& new_order, Decode& d, ostream* o) {
+		int GraphSort<ugraph>::reorder_in_place(const vint&, Decode& d, ostream*) {
 		struct this_type_is_not_available_for_GraphSort {};
 		return 0;
 	}

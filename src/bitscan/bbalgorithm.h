@@ -267,7 +267,7 @@ namespace bitgraph {
 					}
 				}
 				catch (std::exception& e) {
-					LOG_ERROR(e.what());
+					LOG_ERROR("%s", e.what());
 					LOG_ERROR("bbCol_t::bbCol_t()");
 					std::exit(EXIT_FAILURE);
 				}
@@ -439,7 +439,7 @@ namespace bitgraph {
 				////////////////////////////
 			}
 			catch (std::exception& e) {
-				LOG_ERROR(e.what());
+				LOG_ERROR("%s", e.what());
 				LOG_ERROR("bbStack_t<BitSetT>::-reset()");
 				std::exit(EXIT_FAILURE);
 			}

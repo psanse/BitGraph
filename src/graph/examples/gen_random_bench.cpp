@@ -61,7 +61,7 @@ public:
 			parse(argv);
 		}
 		catch (const GraphParseError& e) {
-			LOG_ERROR(e.what());
+			LOG_ERROR("%s", e.what());
 			LOG_ERROR("exiting...");
 			std::exit(-1);
 		}		

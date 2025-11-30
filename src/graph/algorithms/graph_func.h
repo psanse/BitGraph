@@ -324,7 +324,7 @@ namespace bitgraph {
 			template<class Graph_t>
 			vint& sort_deg(const Graph_t& g, vint& lv, typename  Graph_t::_bbt& bbref, bool min_sort = true) {
 
-				int deg = 0;
+				//int deg = 0;
 
 				//determine the degree of each vertex in lv wrt to ref
 				vint ldeg(g.number_of_vertices(), 0);

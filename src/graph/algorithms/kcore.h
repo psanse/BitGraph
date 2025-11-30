@@ -410,7 +410,7 @@ namespace bitgraph {
 		bin_sort(is_subg);
 
 		auto u = EMPTY_ELEM;
-		auto v = EMPTY_ELEM;
+		//auto v = EMPTY_ELEM;
 
 		if (!is_subg) {
 
@@ -1044,7 +1044,7 @@ namespace bitgraph {
 
 		auto max_size = 1;
 		auto iter = 1;
-		auto from = EMPTY_ELEM;
+		//auto from = EMPTY_ELEM;
 
 		vint curr_clique;
 		vint largest_clique;
@@ -1063,7 +1063,7 @@ namespace bitgraph {
 			bbneigh = g_.neighbors(ver_[i]);
 
 			//iterates over all vertices to pick them in degeneracy ordering
-			for (auto j = i - 1; j >= 0; --j) {
+			for (auto j = i - 1; j >= 0; --j) { // FIXME unsigned >= 0 always true
 
 				if (deg_[ver_[j]] < max_size) { break; }
 
@@ -1109,7 +1109,7 @@ namespace bitgraph {
 		struct less_kcore {
 			less_kcore(vector<int>& pos, vector<int>& ver, vector<int>& deg) :pos(pos), ver(ver), deg(deg) {}
 			bool operator()(int lhs, int rhs) const {
-				return(deg[ver[pos[lhs]]] > deg[ver[pos[lhs]]]);
+				return(deg[ver[pos[lhs]]] > deg[ver[pos[lhs]]]); // FIXME should it be rhs?
 			}
 			vector<int>& pos;
 			vector<int>& ver;
@@ -1138,7 +1138,7 @@ namespace bitgraph {
 
 		auto max_size = 1;
 		auto iter = 1;
-		auto from = EMPTY_ELEM;
+		//auto from = EMPTY_ELEM;
 
 		vint curr_clique;
 		vint largest_clique;

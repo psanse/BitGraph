@@ -262,7 +262,7 @@ namespace bitgraph {
     /* use when I[], J[], and val[]J, and val[] are already allocated */
     /******************************************************************/
 
-    int mm_read_mtx_crd_data(FILE* f, int M, int N, int nz, int I[], int J[],
+    int mm_read_mtx_crd_data(FILE* f, int /*M*/, int /*N*/, int nz, int I[], int J[],
         double val[], MM_typecode matcode)
     {
         int i;
@@ -459,12 +459,16 @@ namespace bitgraph {
         char* mm_strdup(const char*);
         int error = 0;
 
+        /* prevent uninitialized variable warning */
+        for (int i=0; i<4; ++i)
+            types[i] = 0;
+
         /* check for MTX type */
         if (mm_is_matrix(matcode))
             //types[0] = MM_MTX_STR;
             strcpy(types[0], MM_MTX_STR);
         else
-            error = 1;
+            error = 1; // FIXME unused
 
         /* check for CRD or ARR matrix */
         if (mm_is_sparse(matcode))
