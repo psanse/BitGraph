@@ -489,7 +489,7 @@ namespace bitgraph {
 
 	template<class BitSetT>
 	inline
-		BITBOARD Ugraph<BitSetT>::number_of_edges(bool lazy) {
+		BITBOARD Ugraph<BitSetT>::number_of_edges(bool lazy ) {
 
 		if (!lazy || ptype::NE_ == 0) {
 			ptype::NE_ = 0;
