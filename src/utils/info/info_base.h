@@ -67,7 +67,7 @@ namespace bitgraph {
 					<< "\nTOUT_HEUR(s): " << TIME_OUT_HEUR
 					<< "\nnTHREADS: " << nThreads
 					<< "\nTIME_PARSE(s): " << timeElapsed;
-				//  << "\nunrolled: " << std::boolalpha << unrolled;
+				//  << "\nunrolled: " << std::boolalpha << unrolled << std::noboolalpha;
 				if (endl) o << std::endl;
 				return o;
 			}

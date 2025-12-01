@@ -2,7 +2,8 @@
 * @file file.h
 * @brief A basic wrapper to read/write from a filestream safely
 *		 Uses macro FILE_LOG for easy logging to file
-* @details: created 24/02/15, last_update 19/01/25
+* @date: created 24/02/15, last_update 01/12/25
+* @details: added fast-fail semantics if the file cannot be opened
 * @dev pss
 **/
 
@@ -13,7 +14,7 @@
 #include <fstream>
 #include "utils/logger.h"
 
-#define FILE_LOG(file,type)		bitgraph::File( (file), bitgraph::File::type).getFileStream()	
+#define FILE_LOG(file,type)		bitgraph::File( (file), bitgraph::File::type).stream()	
 
 
 namespace bitgraph {
@@ -25,44 +26,62 @@ namespace bitgraph {
 			enum mode_t { READ = 0, WRITE, READ_WRITE, APPEND };
 
 			//getter
-			std::fstream& getFileStream() { return fs; }
+			std::fstream& stream() { return fs; }
 
 			//contructor
-			File(const char* filename, mode_t mode = APPEND)
+			explicit File(const char* filename, mode_t mode = APPEND)
 			{
 				switch (mode) {
 				case READ:
-					fs.open(filename, std::fstream::in);
-					if (fs.fail()) {
-						LOGG_ERROR("unable to open reading file: ", filename, "-File::File ");
-					}
+					fs.open(filename, std::ios::in);					
 					break;
 				case WRITE:
-					fs.open(filename, std::fstream::out);
-					if (fs.fail()) {
-						LOGG_ERROR("unable to open writing file: ", filename, "-File::File ");
-					}
+					fs.open(filename, std::ios::out);					
 					break;
 				case READ_WRITE:
-					fs.open(filename, std::fstream::in | std::fstream::out);
-					if (fs.fail()) {
-						LOGG_ERROR("unable to open reading/writing file: ", filename, "-File::File ");
-					}
+					fs.open(filename, std::ios::in | std::ios::out);
+
+					//creates a new file if it does not exist
+					if (!fs.is_open()) { 
+						fs.clear();
+						fs.open(filename, std::ios::out); 
+						fs.close();
+						fs.open(filename, std::ios::in | std::ios::out);
+					}					
 					break;
 				case APPEND:																//Considered only for writing purposes
-					fs.open(filename, std::fstream::out | std::fstream::app);
-					if (fs.fail()) {
-						LOGG_ERROR("unable to open appending file: ", filename, "-File::File ");
-					}
+					fs.open(filename, std::ios::out | std::ios::app);
 					break;
 
 				default:
 					LOG_ERROR("unknown mode for operating on a file -File::File ");
 				}
+
+				//check if file is open
+				if (!fs.is_open()) {
+					LOGG_ERROR("unable to open file: ", filename, " -File::File");
+					LOG_ERROR("exiting...");
+					std::exit(EXIT_FAILURE);
+				}
+			}
+
+			//copy semantics forbidden
+			File(const File&) = delete;
+			File& operator=(const File&) = delete;
+
+			//move semantics allowed 
+			File(File&& other) noexcept : fs(std::move(other.fs)) {}
+			File& operator=(File&& other) noexcept {
+				if (this != &other) fs = std::move(other.fs);
+				return *this;
 			}
 
 			//destructor
 			~File() { fs.close(); }
+
+			//useful methods
+			bool is_open() const { return fs.is_open(); }
+			bool good() const { return fs.good(); }
 
 
 		private:
@@ -71,6 +90,7 @@ namespace bitgraph {
 	}//end namespace _impl	
 
 	using _impl::File;	
+	
 
 }//end namespace bitgraph
 
