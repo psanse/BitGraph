@@ -377,7 +377,7 @@ namespace bitgraph{
 		}
 		catch (std::exception& e) {
 			LOG_ERROR("error during isomorphism generation - RandomGen<Graph_t>::create_isomorphism");
-			LOG_ERROR(e.what());
+			LOG_ERROR("%s", e.what());
 			return -1;
 		}
 

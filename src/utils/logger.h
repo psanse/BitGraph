@@ -30,6 +30,7 @@
 #include <cstdio>
 #include <ctime>
 #include <initializer_list>
+#include <cstdarg>
 
 namespace bitgraph{
 
@@ -47,11 +48,11 @@ namespace bitgraph{
 //////////////////////////////////////////
 //legacy logger macros compatibility
 
-#define LOG_ERROR(msg)			Error(msg)
-#define LOG_WARNING(msg)		Warning(msg)
-#define LOG_INFO(msg)			Info(msg)
-#define LOG_PRINT(msg)			Info(msg)
-#define LOG_DEBUG(msg)			Debug(msg)
+#define LOG_ERROR(...)			Error(__VA_ARGS__)
+#define LOG_WARNING(...)		Warning(__VA_ARGS__)
+#define LOG_INFO(...)			Info(__VA_ARGS__)
+#define LOG_PRINT(...)			Info(__VA_ARGS__)
+#define LOG_DEBUG(...)			Debug(__VA_ARGS__)
 
 //////////////////////
 #define LOG_PAK()				Info("press any key to continue")
@@ -101,35 +102,53 @@ static inline void logy_helper(const F& first, R&&... rest) {
 	logy_helper(std::forward<R>(rest)...);
 }
 
-// Direct logging functions with printf-style format strings
-template<typename... T>
-void _Debug(const char* format, T... args) {
+// Reemplaza las declaraciones problemáticas de funciones con atributos GCC/Clang
+// por una macro portable que solo aplica el atributo en compiladores compatibles.
+// En MSVC, __attribute__ no es válido, así que se omite.
+
+#if defined(__GNUC__) || defined(__clang__)
+#define LOGY_PRINTF_ATTR(fmt_idx, arg_idx) __attribute__((format(printf, fmt_idx, arg_idx)))
+#else
+#define LOGY_PRINTF_ATTR(fmt_idx, arg_idx)
+#endif
+
+
+inline void _Debug(const char* format, ...) LOGY_PRINTF_ATTR(1, 2) {
 	logy_header(" DEBUG: ");
-	std::fprintf(stderr, format, args...);
+	va_list ap;
+	va_start(ap, format);
+	std::fprintf(stderr, format, ap);
+	va_end(ap);
 	std::fprintf(stderr, "\n");
 	std::fflush(stderr);
 }
 
-template<typename... T>
-void _Info(const char* format, T... args) {
+inline void _Info(const char* format, ...) LOGY_PRINTF_ATTR(1, 2) {
 	logy_header(" INFO: ");
-	std::fprintf(stderr, format, args...);
+	va_list ap;
+	va_start(ap, format);
+	std::fprintf(stderr, format, ap);
+	va_end(ap);
 	std::fprintf(stderr, "\n");
 	std::fflush(stderr);
 }
 
-template<typename... T>
-void _Warning(const char* format, T... args) {
+inline void _Warning(const char* format, ...) LOGY_PRINTF_ATTR(1, 2) {
 	logy_header(" WARNING: ");
-	std::fprintf(stderr, format, args...);
+	va_list ap;
+	va_start(ap, format);
+	std::fprintf(stderr, format, ap);
+	va_end(ap);
 	std::fprintf(stderr, "\n");
 	std::fflush(stderr);
 }
 
-template<typename... T>
-void _Error(const char* format, T... args) {
+inline void _Error(const char* format, ...) LOGY_PRINTF_ATTR(1, 2) {
 	logy_header(" ERROR: ");
-	std::fprintf(stderr, format, args...);
+	va_list ap;
+	va_start(ap, format);
+	std::vfprintf(stderr, format, ap);
+	va_end(ap);
 	std::fprintf(stderr, "\n");
 	std::fflush(stderr);
 }

@@ -13,7 +13,7 @@
 #include "graph/algorithms/graph_gen.h"
 #include "gtest/gtest.h"
 #include <iostream>
-#include <strstream>
+#include <sstream>
 
 using namespace std;
 using namespace bitgraph;
