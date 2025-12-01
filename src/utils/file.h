@@ -3,7 +3,7 @@
 * @brief A basic wrapper to read/write from a filestream safely
 *		 Uses macro FILE_LOG for easy logging to file
 * @date: created 24/02/15, last_update 01/12/25
-* @details: added fast-fail semantics if the file cannot be opened
+* @details: will throw if the file cannot be opened
 * @dev pss
 **/
 
@@ -60,8 +60,7 @@ namespace bitgraph {
 				//check if file is open
 				if (!fs.is_open()) {
 					LOGG_ERROR("unable to open file: ", filename, " -File::File");
-					LOG_ERROR("exiting...");
-					std::exit(EXIT_FAILURE);
+					throw("unable to open file");
 				}
 			}
 
