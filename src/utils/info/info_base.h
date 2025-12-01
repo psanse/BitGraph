@@ -145,8 +145,8 @@ namespace bitgraph {
 			void name(std::string name) { data_.name = std::move(name); }
 			void number_of_vertices(uint32_t N) { data_.N = N; }
 			void number_of_edges(uint64_t m) { data_.M = m; }
-			void time_out(double t) { data_.TIME_OUT = t; }
-			void time_out_heur(double t) { data_.TIME_OUT_HEUR = t; }
+			void time_out(double t) {(t == -1)? data_.TIME_OUT = std::numeric_limits<double>::max() : data_.TIME_OUT = t; }
+			void time_out_heur(double t) {(t == -1)? data_.TIME_OUT_HEUR = std::numeric_limits<double>::max() : data_.TIME_OUT_HEUR = t; }
 			void number_of_threads(int n) { data_.nThreads = n; }
 			void recursion_calls_per_tout_check(uint32_t n) { numStepsTimeOutCheck = n; }
 
