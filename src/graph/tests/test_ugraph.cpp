@@ -511,7 +511,7 @@ TEST(Ugraph, DISABLED_add_vertex_multiple) {
 #ifdef TEST_GRAPH_STEP_BY_STEP
 	LOG_ERROR("press any key to continue");
 	cin.get();
-#endif;
+#endif
 }
 
 TEST(Ugraph, DISABLED_add_single_vertex) {
@@ -566,7 +566,7 @@ TEST(Ugraph, DISABLED_add_single_vertex) {
 #ifdef TEST_GRAPH_STEP_BY_STEP
 	LOG_ERROR("press any key to continue");
 	cin.get();
-#endif;
+#endif
 }
 
 //////////////////

@@ -135,7 +135,7 @@ int Graph<BitSet_t>::reset	(std::size_t NV, string name) {
 	}
 	catch (const std::bad_alloc& e) {
 		LOG_ERROR("memory for graph not allocated - Graph<BitSet_t>::reset");
-		LOG_ERROR(e.what());
+		LOG_ERROR("%s", e.what());
 		NV_ = 0;
 		NBB_ = 0;
 		return -1;
