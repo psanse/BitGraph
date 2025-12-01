@@ -15,7 +15,7 @@ add_executable (test_bitscan
     test_bitblock.cpp
     test_masks.cpp 
     test_bbscan_nested.cpp 
-     test_bbscan.cpp 
+    test_bbscan.cpp 
     test_bitset.cpp 
     test_bbscan_sparse.cpp 
     test_bitset_sparse.cpp
