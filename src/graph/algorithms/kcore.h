@@ -1051,7 +1051,7 @@ namespace bitgraph {
 		sparse_bitarray bbneigh(NV_);
 
 		//main loop
-		for (auto i = ver_.size() - 1; i > 0; --i) {
+		for (auto i = static_cast<int>(ver_.size()) - 1; i > 0; --i) {
 
 			//CUT at root level
 			if (deg_[ver_[i]] < max_size) {
@@ -1063,7 +1063,7 @@ namespace bitgraph {
 			bbneigh = g_.neighbors(ver_[i]);
 
 			//iterates over all vertices to pick them in degeneracy ordering
-			for (auto j = i - 1; j >= 0; --j) { // FIXME unsigned >= 0 always true
+			for (auto j = i - 1; j >= 0; --j) { 
 
 				if (deg_[ver_[j]] < max_size) { break; }
 
@@ -1077,7 +1077,7 @@ namespace bitgraph {
 			curr_clique.push_back(ver_[i]);
 
 			//update size
-			if (max_size < curr_clique.size()) {
+			if (max_size < static_cast<int>(curr_clique.size())) {
 				largest_clique = curr_clique;
 				max_size = largest_clique.size();
 
