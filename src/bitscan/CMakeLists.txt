@@ -37,7 +37,7 @@ if (MSVC)
     # not enabled because this is not a tested target
     target_compile_options(bitscan PRIVATE /W4)
 else()
-    target_compile_options(bitcan PRIVATE -Wall -Wextra -Wpedantic)
+    target_compile_options(bitscan PRIVATE -Wall -Wextra -Wpedantic)
 endif()
 
 #############
