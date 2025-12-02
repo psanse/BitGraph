@@ -91,7 +91,7 @@ void Base_Graph_EW<Graph_t, W>::set_vertex_weight( W val) {
 
 	auto NV = number_of_vertices();
 
-	for (std::size_t v = 0; v < NV; v++) {
+	for (int v = 0; v < NV; v++) {
 			we_[v][v] = val;
 	}	
 
@@ -370,15 +370,15 @@ std::ostream& Base_Graph_EW<Graph_t, W>::write_dimacs (std::ostream& o) {
 	g_.header_dimacs(o, false);
 
 	//write vertex weights (edge weights of self loops are considered vertex weights)
-	for (std::size_t v = 0; v < NV; ++v) {
+	for (int v = 0; v < NV; ++v) {
 		if (we_[v][v] != NO_WEIGHT) {
 			o << "n " << v + 1 << " " << we_[v][v] << std::endl;
 		}
 	}
 		
 	//write (directed) edges and edge-weights
-	for(std::size_t v = 0; v < NV; ++v){
-		for(std::size_t w = 0; w < NV; ++w){
+	for(int v = 0; v < NV; ++v){
+		for(int w = 0; w < NV; ++w){
 			if (v != w && g_.is_edge(v, w)) {										
 				o << "e " << v + 1 << " " << w + 1 << we_[v][w] << std::endl;			//1-based vertex notation dimacs format	
 			}
@@ -487,8 +487,8 @@ ostream& Base_Graph_EW<Graph_t, W>::print_weights (vint& lv, ostream& o, int typ
 template<class Graph_t, class W>
 std::ostream& Base_Graph_EW<Graph_t, W>::print_edge_weights(vint& lv, std::ostream& o) const
 {
-	for (auto i = 0; i < lv.size(); ++i) {
-		for (auto j = 0; j < lv.size(); j++) {
+	for (auto i = 0u; i < lv.size(); ++i) {
+		for (auto j = 0u; j < lv.size(); j++) {
 			if (we_[lv[i]][lv[j]] != Base_Graph_EW<Graph_t, W>::NO_WEIGHT) {
 
 				///////////////////////////////////////////////////////////////////////////////////
@@ -504,7 +504,7 @@ std::ostream& Base_Graph_EW<Graph_t, W>::print_edge_weights(vint& lv, std::ostre
 template<class Graph_t, class W>
 std::ostream& Base_Graph_EW<Graph_t, W>::print_vertex_weights(vint& lv, std::ostream& o) const
 {
-	for (auto i = 0; i < lv.size(); ++i) {
+	for (auto i = 0u; i < lv.size(); ++i) {
 		if (we_[lv[i]][lv[i]] != Base_Graph_EW<Graph_t, W>::NO_WEIGHT) {
 
 			/////////////////////////////////////////////////////////////////
@@ -674,8 +674,8 @@ std::ostream& Graph_EW<ugraph, W>::print_edge_weights(std::ostream& o, bool line
 template<class W>
 std::ostream& Graph_EW<ugraph, W>::print_edge_weights(vint& lv, std::ostream& o) const
 {	
-	for (auto i = 0; i < lv.size() - 1; ++i) {
-		for (auto j = i + 1; j < lv.size(); ++j) {
+	for (auto i = 0u; i < lv.size() - 1; ++i) {
+		for (auto ju = i + 1; j < lv.size(); ++j) {
 			if (ptype::we_[lv[i]][lv[j]] != ptype::NO_WEIGHT) {
 
 				/////////////////////////////////////////////////////////////////////////////////////////	
@@ -708,15 +708,15 @@ ostream& Graph_EW<ugraph, W>::write_dimacs (ostream& o) {
 	ptype::g_.header_dimacs(o, false);
 		
 	//write vertex weights
-	for (std::size_t v = 0; v < NV; ++v) {
+	for (int v = 0; v < NV; ++v) {
 		if (ptype::we_[v][v] != ptype::NO_WEIGHT) {
 			o << "n " << v + 1 << " " << ptype::we_[v][v] << endl;
 		}
 	}
 
 	//write undirected edges and edge weights
-	for(std::size_t v = 0; v < NV - 1; ++v){
-		for(std::size_t w = v + 1; w < NV; ++w){
+	for(int v = 0; v < NV - 1; ++v){
+		for(int w = v + 1; w < NV; ++w){
 			if (ptype::g_.is_edge(v, w)) {														//O(log) for sparse graphs: specialize
 				o << "e " << v + 1 << " " << w + 1 << " " << ptype::we_[v][w] << endl;			//1-based vertex notation dimacs
 			}
@@ -749,7 +749,7 @@ void Base_Graph_EW<Graph_t, W>::gen_random_edges(double p, W val)
 	g_.remove_edges();
 
 	//sets directed edges with probability p
-	for (auto i = 0; i < NV-1; ++i) {
+	for (auto i = 0; i < NV - 1; ++i) {
 		for (auto j = i + 1; j < NV; ++j) {
 
 			//considers both directed edges separately
@@ -782,7 +782,7 @@ template<class Graph_t, class W>
 void Base_Graph_EW<Graph_t, W>::make_edge_weighted(bool erase_non_edges)
 {
 	//sets all vertex weights to NO_WEIGHT
-	for (auto v = 0; v < g_.size(); ++v) {
+	for (auto v = 0u; v < g_.size(); ++v) {
 		we_[v][v] = Base_Graph_EW<Graph_t, W>::NO_WEIGHT;	
 	}
 

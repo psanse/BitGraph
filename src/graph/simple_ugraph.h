@@ -829,7 +829,7 @@ namespace bitgraph {
 		//resets ug with new allocation
 		if (ug.reset(ptype::NV_) == -1) return -1;
 
-		for (auto i = 0; i < ptype::NV_ - 1; ++i) {
+		for (auto i = 0u; i < ptype::NV_ - 1; ++i) {
 			for (auto j = i + 1; j < ptype::NV_; ++j) {
 
 				if (!ptype::adj_[i].is_bit(j)) {
