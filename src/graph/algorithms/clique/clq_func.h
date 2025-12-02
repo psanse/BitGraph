@@ -847,7 +847,7 @@ namespace bitgraph {
 				int pc = bbsg.size();
 				if (pc == 0) { return 0; }			//early exit - bitset bbsg is empty	
 
-				int col = 1, v = bbo::noBit, nBB = bbo::noBit;
+				int col = 1, v = bbo::noBit;
 
 				//main loop - greedy coloring	
 				typename Graph_t::_bbt bb_unsel(bbsg);
