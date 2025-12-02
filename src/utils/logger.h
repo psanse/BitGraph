@@ -102,18 +102,27 @@ static inline void logy_helper(const F& first, R&&... rest) {
 	logy_helper(std::forward<R>(rest)...);
 }
 
-// Reemplaza las declaraciones problemáticas de funciones con atributos GCC/Clang
-// por una macro portable que solo aplica el atributo en compiladores compatibles.
-// En MSVC, __attribute__ no es válido, así que se omite.
+//// Reemplaza las declaraciones problemáticas de funciones con atributos GCC/Clang
+//// por una macro portable que solo aplica el atributo en compiladores compatibles.
+//// En MSVC, __attribute__ no es válido, así que se omite.
+//
+//#if defined(__GNUC__) || defined(__clang__)
+//#define LOGY_PRINTF_ATTR(fmt_idx, arg_idx) __attribute__((format(printf, fmt_idx, arg_idx)))
+//#else
+//#define LOGY_PRINTF_ATTR(fmt_idx, arg_idx)
+//#endif
 
-#if defined(__GNUC__) || defined(__clang__)
+// Atributo portable para comprobación de formato printf.
+// GCC/Clang: aplica __attribute__((format(printf,...)))
+// MSVC: vacío (no soportado)
+#if defined(__GNUC__) || defined(__clang__) || defined(__INTEL_COMPILER)
 #define LOGY_PRINTF_ATTR(fmt_idx, arg_idx) __attribute__((format(printf, fmt_idx, arg_idx)))
 #else
 #define LOGY_PRINTF_ATTR(fmt_idx, arg_idx)
 #endif
 
-
-inline void _Debug(const char* format, ...) LOGY_PRINTF_ATTR(1, 2) {
+inline void _Debug(const char* format, ...) LOGY_PRINTF_ATTR(1, 2);
+{
 	logy_header(" DEBUG: ");
 	va_list ap;
 	va_start(ap, format);
