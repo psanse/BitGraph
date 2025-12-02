@@ -64,8 +64,10 @@ namespace bitgraph {
 			Base_Graph_W(_gt& g, vector<W>& lw) :g_(g), w_(lw) { assert(w_.size() == g_.size()); }				//creates graph with vertex weights	
 			Base_Graph_W(_gt& g) :g_(g), w_(g.size(), DEFAULT_WEIGHT) {}										//creates graph with DEFAULT_WEIGHTs
 			explicit Base_Graph_W(int N, W val = DEFAULT_WEIGHT) {												//creates empty graph with |V|= N and weight value val	
-				int ret_val = reset(N, val);
-				assert(ret_val != -1);
+				const int ret = reset(N, val);
+				if (ret == -1) {
+					throw std::runtime_error("Base_Graph_W: reset() failed for N=" + std::to_string(N));
+				}
 			}				
 
 			/**

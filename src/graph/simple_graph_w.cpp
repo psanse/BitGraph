@@ -181,8 +181,8 @@ ostream& Base_Graph_W<Graph_t, W>::write_dimacs(ostream& o) {
 	}
 	
 	//write undirected edges (1-based vertex notation dimacs)
-	for (std::size_t v = 0; v < NV; ++v) {
-		for (std::size_t w = 0; w < NV; ++w) {
+	for (int v = 0; v < NV; ++v) {
+		for (int w = 0; w < NV; ++w) {
 			if (v == w) continue;
 			if (g_.is_edge(v, w)) {									//O(log) for sparse graphs: specialize
 				o << "e " << v + 1 << " " << w + 1 << endl;			//1 based vertex notation dimacs
@@ -394,7 +394,7 @@ ostream& Base_Graph_W<Graph_t, W>::print_data(bool lazy, std::ostream& o, bool e
 template <class Graph_t, class W>
 ostream& Base_Graph_W<Graph_t, W>::print_weights (com::stack<int>& lv, ostream& o) const{
 
-	for(auto i = 0; i < lv.nE_; ++i){
+	for(auto i = 0u; i < lv.nE_; ++i){
 		o << "[" << lv.at(i) << ":(" << w_[lv.at(i)] << ")] ";
 	}
 	o << "(" << lv.nE_ << ")" <<endl;
@@ -414,7 +414,7 @@ ostream& Base_Graph_W<Graph_t, W>::print_weights (int* lv, int NV, ostream& o) c
 template <class Graph_t, class W>
 ostream& Base_Graph_W<Graph_t, W>::print_weights (com::stack<int>& lv, const vint& mapping, ostream& o) const{
 
-	for(auto i = 0; i < lv.nE_; ++i){
+	for(auto i = 0u; i < lv.nE_; ++i){
 		o << "[" << mapping[lv.at(i)] << ":(" << w_[mapping[lv.at(i)]] << ")] ";
 	}
 	o << "(" << lv.nE_ << ")" << endl;
@@ -424,7 +424,7 @@ ostream& Base_Graph_W<Graph_t, W>::print_weights (com::stack<int>& lv, const vin
 template <class Graph_t, class W>
 ostream& Base_Graph_W<Graph_t, W>::print_weights (vint& lv, ostream& o) const{
 	
-	for(auto i = 0; i < lv.size(); i++){
+	for(auto i = 0u; i < lv.size(); i++){
 		o << "[" << lv[i] << ":(" << w_[lv[i]] << ")] ";
 	}
 	o << "(" << lv.size() << ")" << endl;
@@ -450,7 +450,7 @@ ostream& Base_Graph_W<Graph_t, W>::print_weights (ostream& o, bool show_v) const
 	const std::size_t NV = g_.number_of_vertices();
 
 	if(show_v){
-		for(std::size_t i = 0; i < NV; ++i){
+		for(auto i = 0u; i < NV; ++i){
 			o << "[" << i << ":(" << w_[i] << ")] ";
 		}
 		o << endl;
@@ -482,8 +482,8 @@ ostream& Graph_W<ugraph, W>::write_dimacs(ostream& o) {
 	}
 
 	//write directed edges (1-based vertex notation dimacs)
-	for (std::size_t v = 0; v < NV - 1; ++v) {
-		for (std::size_t w = v + 1; w < NV; ++w) {
+	for (int v = 0; v < NV - 1; ++v) {
+		for (int w = v + 1; w < NV; ++w) {
 			if (ptype::g_.is_edge(v, w))							//O(log) for sparse graphs: specialize
 				o << "e " << v + 1 << " " << w + 1 << endl;
 		}

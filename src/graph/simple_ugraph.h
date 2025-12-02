@@ -537,7 +537,7 @@ namespace bitgraph {
 		int Ugraph<BitSetT>::degree(int v, const BitSet& bbn) const {
 
 		int ndeg = 0;
-		for (auto i = 0; i < ptype::NBB_; i++) {
+		for (auto i = 0u; i < ptype::NBB_; i++) {
 			ndeg += bblock::popc64(ptype::adj_[v].block(i) & bbn.block(i));
 		}
 
