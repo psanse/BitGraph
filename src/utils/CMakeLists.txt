@@ -50,6 +50,14 @@ set_target_properties(utils
     #PUBLIC_HEADER   "${HEADER_FILES}"        #does not preserve internal structure       
 )
 
+# Enable compiler warnings.
+if (MSVC)
+    # not enabled because this is not a tested target
+    target_compile_options(utils PRIVATE /W4)
+else()
+    target_compile_options(utils PRIVATE -Wall -Wextra -Wpedantic)
+endif()
+
 #############
 # Install UTILS lib
 # UTILS lib header files are deployed manually

@@ -1,3 +1,4 @@
+
 #########################
 #headers for BITSCAN lib
 #########################
@@ -30,6 +31,14 @@ target_include_directories(bitscan PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
   $<INSTALL_INTERFACE:${include_install_dir}>    # <prefix>/include/<PROJECT_NAME>
 )
+
+# Enable compiler warnings.
+if (MSVC)
+    # not enabled because this is not a tested target
+    target_compile_options(bitscan PRIVATE /W4)
+else()
+    target_compile_options(bitcan PRIVATE -Wall -Wextra -Wpedantic)
+endif()
 
 #############
 # Install BITSCAN lib

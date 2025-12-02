@@ -19,14 +19,6 @@ project(${LIBNAME}
     VERSION  ${LIB_MAJOR_VERS}.${LIB_MINOR_VERS}.${LIB_PATCH_VERS}
 	LANGUAGES CXX C	)
 
-# Enable compiler warnings.
-if (MSVC)
-    # not enabled because this is not a tested target
-    #add_compile_options(/W4)
-else()
-    add_compile_options(-Wall -Wextra)
-endif()
-
 #################
 # Introduce variables for export:
 # * CMAKE_INSTALL_LIBDIR		#lib

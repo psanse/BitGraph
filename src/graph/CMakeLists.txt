@@ -36,6 +36,14 @@ target_include_directories(graph PUBLIC
   $<INSTALL_INTERFACE:include>    # <prefix>/include/<PROJECT_NAME>/graph
 )
 
+# Enable compiler warnings.
+if (MSVC)
+    # not enabled because this is not a tested target
+    target_compile_options(graph PRIVATE /W4)
+else()
+    target_compile_options(graph PRIVATE -Wall -Wextra -Wpedantic)
+endif()
+
 ###################
 # UNIT TESTS for GRAPH lib
 ###################
