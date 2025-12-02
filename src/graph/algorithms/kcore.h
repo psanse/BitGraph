@@ -1109,7 +1109,7 @@ namespace bitgraph {
 		struct less_kcore {
 			less_kcore(vector<int>& pos, vector<int>& ver, vector<int>& deg) :pos(pos), ver(ver), deg(deg) {}
 			bool operator()(int lhs, int rhs) const {
-				return(deg[ver[pos[lhs]]] > deg[ver[pos[lhs]]]); // FIXME should it be rhs?
+				return(deg[ver[pos[rhs]]] > deg[ver[pos[lhs]]]);	//CHECK rhs / lhs!!!
 			}
 			vector<int>& pos;
 			vector<int>& ver;
@@ -1163,7 +1163,7 @@ namespace bitgraph {
 
 
 			//iterates over all vertices to pick them in degeneracy ordering
-			for (auto n = 0; n < candidates.size(); ++n) {
+			for (auto n = 0u; n < candidates.size(); ++n) {
 
 				if (bbneigh.is_bit(candidates[n])) {				//adjacent
 
