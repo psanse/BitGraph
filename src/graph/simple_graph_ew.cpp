@@ -675,7 +675,7 @@ template<class W>
 std::ostream& Graph_EW<ugraph, W>::print_edge_weights(vint& lv, std::ostream& o) const
 {	
 	for (auto i = 0u; i < lv.size() - 1; ++i) {
-		for (auto ju = i + 1; j < lv.size(); ++j) {
+		for (auto j = i + 1; j < lv.size(); ++j) {
 			if (ptype::we_[lv[i]][lv[j]] != ptype::NO_WEIGHT) {
 
 				/////////////////////////////////////////////////////////////////////////////////////////	

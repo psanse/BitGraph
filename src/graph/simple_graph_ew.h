@@ -803,7 +803,7 @@ namespace bitgraph {
 
 		//set vertex weights to NO_WEIGHT if required
 		if (EdgeWeightedGraph) {
-			for (auto v = 0; v < NV; ++v) {
+			for (auto v = 0u; v < NV; ++v) {
 				we_[v][v] = NO_WEIGHT;
 			}
 		}
