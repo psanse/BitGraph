@@ -232,7 +232,7 @@ BitSetSp& BitSetSp::set_bit(int firstBit, int lastBit)
 	//main loop
 	auto block = bbl + 1;
 	posTHIS++;
-	while (posTHIS < sizeL && block < bbh) {
+	while (posTHIS < static_cast<int>(sizeL) && block < bbh) {
 
 		if (vBB_[posTHIS].idx_ < block) {
 
@@ -278,7 +278,7 @@ BitSetSp& BitSetSp::set_bit(int firstBit, int lastBit)
 
 	//II. Exit because no more blocks in *this
 	//	  Note: no sorting required in this case if blocks are appended at the end
-	if (posTHIS == sizeL) {
+	if (posTHIS == static_cast<int>(sizeL)) {
 
 		//[block, bbh[
 		for (int i = block; i < bbh; i++) {
@@ -346,7 +346,7 @@ BitSetSp& BitSetSp::set_bit (const BitSetSp& rhs){
 	///////////////////////////////////
 			
 	//main loop
-	while( posL != sizeL && rIt != rhs.vBB_.end()) {
+	while( posL != static_cast<int>(sizeL) && rIt != rhs.vBB_.end()) {
 		
 		if (vBB_[posL].idx_ < rIt->idx_) {
 			++posL;
@@ -370,7 +370,7 @@ BitSetSp& BitSetSp::set_bit (const BitSetSp& rhs){
 
 
 	//I. exit condition
-	if (posL == sizeL)			
+	if (posL == static_cast<int>(sizeL))
 	{
 		//append rhs blocks at the end
 		vBB_.insert(vBB_.end(), rIt, rhs.vBB_.end());
@@ -451,7 +451,7 @@ BitSetSp&  BitSetSp::set_block (int firstBlock, int lastBlock, const BitSetSp& r
 
 	///////////////////
 	//main loop
-	while (posL < sizeL				&&
+	while (posL < static_cast<int>(sizeL) &&
 			vBB_[posL].idx_ <= lastBlock &&
 			pRlow.second != rhs.vBB_.end()  &&
 			pRlow.second->idx_ <= lastBlock		)
@@ -486,7 +486,7 @@ BitSetSp&  BitSetSp::set_block (int firstBlock, int lastBlock, const BitSetSp& r
 	}//end while
 		
 	//exit conditions   
-	if (posL == sizeL || vBB_[posL].idx_ > lastBlock)
+	if (posL == static_cast<int>(sizeL) || vBB_[posL].idx_ > lastBlock)
 	{
 		//add remaining blocks in rhs to *this
 		for (; pRlow.second != rhs.vBB_.end() && pRlow.second->idx_ <= lastBlock; ++pRlow.second) {
@@ -687,7 +687,7 @@ BitSetSp& BitSetSp::operator |= (const BitSetSp& rhs){
 	bool flag_sort = false;			//flag to sort the collection
 		
 	//OR before all the blocks of one of the bitsets have been examined
-	while (posL < sizeL && itR != rhs.vBB_.end()) {
+	while (posL < static_cast<int>(sizeL) && itR != rhs.vBB_.end()) {
 			
 		if(vBB_[posL].idx_ < itR->idx_)
 		{
@@ -713,7 +713,7 @@ BitSetSp& BitSetSp::operator |= (const BitSetSp& rhs){
 	}
 
 	//rhs unfinished with index below the last block of *this
-	if (posL == sizeL) {
+	if (posL == static_cast<int>(sizeL)) {
 
 		for (; itR != rhs.vBB_.end(); ++itR) {
 
@@ -739,7 +739,7 @@ BitSetSp& BitSetSp::operator ^= (const BitSetSp& rhs) {
 	bool flag_sort = false;			//flag to sort the collection
 	
 	//XOR before all the blocks of one of the bitsets have been examined
-	while ((posL < sizeL) && (itR !=  rhs.vBB_.end())) {
+	while ((posL < static_cast<int>(sizeL)) && (itR !=  rhs.vBB_.end())) {
 
 		if (vBB_[posL].idx_ < itR->idx_)
 		{
@@ -767,7 +767,7 @@ BitSetSp& BitSetSp::operator ^= (const BitSetSp& rhs) {
 	}
 
 	//rhs unfinished with index below the last block of *this
-	if (posL == sizeL) {
+	if (posL == static_cast<int>(sizeL)) {
 
 		for (; itR != rhs.vBB_.end(); ++itR) {
 

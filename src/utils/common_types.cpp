@@ -151,7 +151,7 @@ void bitgraph::stack<T>::erase(int pos) {
 template<class T>
 std::ostream& bitgraph::stack<T>::print(std::ostream& o) const {
 	o << "[";
-	for (auto i = 0; i < nE_; ++i) {
+	for (auto i = 0u; i < nE_; ++i) {
 		o << stack_[i] << " ";
 	}
 	o << "]" << "[" << nE_ << "]" << std::endl;

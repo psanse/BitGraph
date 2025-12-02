@@ -85,7 +85,7 @@ int Benchmark::get_value (string filename){
 ///////////////////
 // E/S
 std::ostream& Benchmark::print(ostream& o) {
-	 for(auto i = 0; i < lf_.size(); ++i){
+	 for(auto i = 0u; i < lf_.size(); ++i){
 		 o << lf_[i];
 		 if(mf_.count(lf_[i])){
 			 o << ":" << mf_[lf_[i]];

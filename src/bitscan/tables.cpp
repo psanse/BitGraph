@@ -105,7 +105,6 @@ void Tables::init_masks(){
 
 	////////////////////////////
 	//mask_low[65]
-	BITBOARD aux=0;
 	for (int c=0;c<64;c++)
 	{
 		for ( int j=0; j<c /* not included the element itself*/; j++)
