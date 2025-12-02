@@ -102,18 +102,8 @@ static inline void logy_helper(const F& first, R&&... rest) {
 	logy_helper(std::forward<R>(rest)...);
 }
 
-//// Reemplaza las declaraciones problemáticas de funciones con atributos GCC/Clang
-//// por una macro portable que solo aplica el atributo en compiladores compatibles.
-//// En MSVC, __attribute__ no es válido, así que se omite.
-//
-//#if defined(__GNUC__) || defined(__clang__)
-//#define LOGY_PRINTF_ATTR(fmt_idx, arg_idx) __attribute__((format(printf, fmt_idx, arg_idx)))
-//#else
-//#define LOGY_PRINTF_ATTR(fmt_idx, arg_idx)
-//#endif
-
 // Atributo portable para comprobación de formato printf.
-// GCC/Clang: aplica __attribute__((format(printf,...)))
+// GCC/Clang/ICC: aplica __attribute__((format(printf,...)))
 // MSVC: vacío (no soportado)
 #if defined(__GNUC__) || defined(__clang__) || defined(__INTEL_COMPILER)
 #define LOGY_PRINTF_ATTR(fmt_idx, arg_idx) __attribute__((format(printf, fmt_idx, arg_idx)))
@@ -121,46 +111,54 @@ static inline void logy_helper(const F& first, R&&... rest) {
 #define LOGY_PRINTF_ATTR(fmt_idx, arg_idx)
 #endif
 
+
+// Declaraciones con atributo
 inline void _Debug(const char* format, ...) LOGY_PRINTF_ATTR(1, 2);
-{
+inline void _Info(const char* format, ...) LOGY_PRINTF_ATTR(1, 2);
+inline void _Warning(const char* format, ...) LOGY_PRINTF_ATTR(1, 2);
+inline void _Error(const char* format, ...) LOGY_PRINTF_ATTR(1, 2);
+
+// Definiciones sin atributo
+inline void _Debug(const char* format, ...) {
 	logy_header(" DEBUG: ");
 	va_list ap;
 	va_start(ap, format);
-	std::fprintf(stderr, format, ap);
+	std::vfprintf(stderr, format, ap);   // OJO: vfprintf
 	va_end(ap);
 	std::fprintf(stderr, "\n");
 	std::fflush(stderr);
 }
 
-inline void _Info(const char* format, ...) LOGY_PRINTF_ATTR(1, 2) {
+inline void _Info(const char* format, ...) {
 	logy_header(" INFO: ");
 	va_list ap;
 	va_start(ap, format);
-	std::fprintf(stderr, format, ap);
+	std::vfprintf(stderr, format, ap);   // OJO: vfprintf
 	va_end(ap);
 	std::fprintf(stderr, "\n");
 	std::fflush(stderr);
 }
 
-inline void _Warning(const char* format, ...) LOGY_PRINTF_ATTR(1, 2) {
+inline void _Warning(const char* format, ...) {
 	logy_header(" WARNING: ");
 	va_list ap;
 	va_start(ap, format);
-	std::fprintf(stderr, format, ap);
+	std::vfprintf(stderr, format, ap);   // OJO: vfprintf
 	va_end(ap);
 	std::fprintf(stderr, "\n");
 	std::fflush(stderr);
 }
 
-inline void _Error(const char* format, ...) LOGY_PRINTF_ATTR(1, 2) {
+inline void _Error(const char* format, ...) {
 	logy_header(" ERROR: ");
 	va_list ap;
 	va_start(ap, format);
-	std::vfprintf(stderr, format, ap);
+	std::vfprintf(stderr, format, ap);   // ya lo tenías bien aquí
 	va_end(ap);
 	std::fprintf(stderr, "\n");
 	std::fflush(stderr);
 }
+
 
 // Direct print logging without format strings
 template<typename... T>
