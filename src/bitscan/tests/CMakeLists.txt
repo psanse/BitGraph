@@ -21,6 +21,7 @@ add_executable (test_bitscan
     test_bitset_sparse.cpp
     test_bbscan_sparse_nested.cpp 
 
+    test_bbexpr.cpp
 )
 
 set_target_properties(test_bitscan 

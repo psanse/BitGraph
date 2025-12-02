@@ -168,49 +168,6 @@ void BitSet::reset(int popsize, const vint& lv) noexcept {
 
 
 
-//////////////////////////
-//
-// BITSET OPERATORS
-// (size is determined by *this)
-/////////////////////////
-
-BitSet& BitSet::operator &=	(const BitSet& bbn){
-
-	for (auto i = 0; i < nBB_; ++i) {
-		vBB_[i] &= bbn.vBB_[i];
-	}
-				
-	return *this;
-}
-
-BitSet& BitSet::operator |=	(const BitSet& bbn){
-	
-	for (auto i = 0; i < nBB_; ++i) {
-		vBB_[i] |= bbn.vBB_[i];
-	}
-
-	return *this;
-}
-
-BitSet& BitSet::operator ^=	(const BitSet& bbn) {
-	
-	for (auto i = 0; i < nBB_; ++i) {
-		vBB_[i] ^= bbn.vBB_[i];
-	}
-
-	return *this;
-}
-
-
-BitSet& BitSet::flip (){
-
-	for (auto i = 0; i < nBB_; ++i) {
-		vBB_[i] = ~vBB_[i];
-	}
-
-	return *this;
-}
-
 BitSet& BitSet::flip_block(int firstBlock, int lastBlock)
 {
 	
