@@ -205,7 +205,7 @@ namespace bitgraph {
 						}
 					}
 					else {
-						for (auto nBB = WDIV(v); nBB < g.number_of_blocks(); ++nBB) {
+						for (auto nBB = WDIV(v); nBB < static_cast<int>(g.number_of_blocks()); ++nBB) {
 							bb.block(nBB) &= g.neighbors(v).block(nBB);
 						}
 					}
@@ -251,8 +251,8 @@ namespace bitgraph {
 						////////////////////////////
 
 						pc = 0;
-						const typename Graph_t::_bbt& bbn = g.neighbors(v);
-						for (auto nBB = 0; nBB < g.number_of_blocks(); ++nBB) {
+						const typename Graph_t::_bbt& bbn =  g.neighbors(v);
+						for (auto nBB = 0u; nBB < g.number_of_blocks(); ++nBB) {
 							pc += bitgraph::bblock::popc64(bbsgC.block(nBB) & bbn.block(nBB));
 						}
 
@@ -557,7 +557,7 @@ namespace bitgraph {
 				auto nV = lv.size();
 				if (nV == 0) return false;					//an empty set is not a clique
 
-				for (auto i = 0; i < nV - 1; ++i) {
+				for (auto i = 0u; i < nV - 1; ++i) {
 					for (auto j = i + 1; j < nV; ++j) {
 
 						if (!g.is_edge(lv[i], lv[j])) {

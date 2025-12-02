@@ -327,7 +327,7 @@ namespace bitgraph {
 	inline
 		int Ugraph<BitSetT>::max_subgraph_degree(bitset_t& sg) const {
 
-		int max_degree = 0, temp = 0;
+		int max_degree = 0;
 
 		int v = BBObject::noBit;
 		if (sg.init_scan(bbo::NON_DESTRUCTIVE) != BBObject::noBit) {

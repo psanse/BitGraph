@@ -730,7 +730,7 @@ namespace bitgraph {
 		if (!is_subg) {
 
 			//bin_sort full graph
-			for (auto v = 0; v < ver_.size(); ++v) {
+			for (auto v = 0u; v < ver_.size(); ++v) {
 				pos_[v] = bin_[deg_[v]];					//stores the new position of v (pos_ is not strictly needed for bin_sort, but it is for kcore)
 				ver_[pos_[v]] = v;							//places v in the new position in ver_ (mapping -  new-to-old format)			
 				bin_[deg_[v]]++;
@@ -1176,7 +1176,7 @@ namespace bitgraph {
 			curr_clique.push_back(ver_[i]);
 
 			//update size
-			if (max_size < curr_clique.size()) {
+			if (max_size < static_cast<int>(curr_clique.size())) {
 				largest_clique = curr_clique;
 				max_size = largest_clique.size();
 
