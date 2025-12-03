@@ -215,7 +215,7 @@ BitSet& BitSet::flip_block(int firstBlock, int lastBlock)
 {
 	
 	///////////////////////////////////////////////////////////////////////////////////
-	assert((firstBlock >= 0) && (firstBlock <= lastBlock) && (lastBlock < capacity()));
+	assert((firstBlock >= 0) && (firstBlock <= lastBlock) && (lastBlock < num_blocks()));
 	/////////////////////////////////////////////////////////////////////////////////
 
 	for (auto i = firstBlock; i < lastBlock; ++i) {
@@ -442,7 +442,7 @@ namespace bitgraph {
 		int find_first_common_block(int firstBlock, int lastBlock, const BitSet& lhs, const BitSet& rhs) {
 
 			///////////////////////////////////////////////////////////////////////////////
-			assert((firstBlock >= 0) && (firstBlock <= lastBlock) && (lastBlock < lhs.capacity()));
+			assert((firstBlock >= 0) && (firstBlock <= lastBlock) && (lastBlock < lhs.num_blocks()));
 			///////////////////////////////////////////////////////////////////////////////
 
 			int last_block = ((lastBlock == -1) ? rhs.nBB_ - 1 : lastBlock);
