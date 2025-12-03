@@ -346,8 +346,8 @@ namespace bitgraph {
 			* @details implementation depends of POPCN64 switch in bbconfig.h
 			*		   By default - intrinsic HW assembler instructions
 			**/
-			std::size_t	count()									const { return (std::size_t)popcn64(); }
-			std::size_t	count(int firstBit, int lastBit = -1)	const { return (std::size_t)popcn64(firstBit, lastBit); }
+			int	count()									const { return popcn64(); }
+			int	count(int firstBit, int lastBit = -1)	const { return popcn64(firstBit, lastBit); }
 
 			/**
 			* @brief returns the number of 1-bits in the bitstring
