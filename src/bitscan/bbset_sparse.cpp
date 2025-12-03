@@ -330,7 +330,7 @@ BitSetSp& BitSetSp::reset_bit(int firstBit, int lastBit){
 BitSetSp& BitSetSp::set_bit (const BitSetSp& rhs){
 
 	///////////////////////////////////////////////
-	assert(rhs.capacity() == this->capacity());
+	assert(rhs.num_blocks() == this->num_blocks());
 	//////////////////////////////////////////////
 
 	//special case
@@ -392,7 +392,7 @@ BitSetSp&  BitSetSp::set_block (int firstBlock, int lastBlock, const BitSetSp& r
 	}
 
 	//////////////////////////////////////////////////////////////////////////////////
-	assert(firstBlock >= 0 && firstBlock <= lastBlock && lastBlock < rhs.capacity());
+	assert(firstBlock >= 0 && firstBlock <= lastBlock && lastBlock < rhs.num_blocks());
 	//////////////////////////////////////////////////////////////////////////////////
 
 	////////////////////////
