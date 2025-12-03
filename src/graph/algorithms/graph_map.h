@@ -237,7 +237,7 @@ namespace bitgraph{
 	{
 		vint lhs_o2n, lhs_n2o, rhs_o2n, rhs_n2o;
 
-		auto NV = g.number_of_vertices();
+		auto NV = g.num_vertices();
 
 		reset(NV);
 
@@ -280,7 +280,7 @@ namespace bitgraph{
 	template< typename Alg_t>
 	void GraphMap::build_mapping(typename Alg_t::_gt& g, int srhs, bool prhs, std::string rhs_name)  {
 
-		auto NV = g.number_of_vertices();
+		auto NV = g.num_vertices();
 
 		reset(NV);
 

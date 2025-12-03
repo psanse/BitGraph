@@ -67,8 +67,8 @@ namespace bitgraph {
 			* @param lhs, rhs: input bitsets
 			* @param res: output bitset
 			* @returns reference to the resulting bitstring res
-			* @details: The capacity of lhs and rhs must be the same.
-			*			The capacity of res must be greater or equal than lhs / rhs
+			* @details: The num_blocks of lhs and rhs must be the same.
+			*			The num_blocks of res must be greater or equal than lhs / rhs
 			* @details: created 06/02/2025
 			* @details: GCC does not allow default template parameters in friend functions
 			**/
@@ -79,10 +79,10 @@ namespace bitgraph {
 			* @brief AND between lhs and rhs bitsets in the closed block- range [firstBlock, lastBlock].
 			*		 Stores the result in res. The remaining bits of res outside the range
 			*		 are set to 0 if the template parameter Erase is true.
-			*		 If lastBock==-1, the range is till the end of the bitset, i.e., [firstBlock, capacity())
+			*		 If lastBock==-1, the range is till the end of the bitset, i.e., [firstBlock, num_blocks())
 			*
-			*		I.  The capacity of lhs and rhs must be the same.
-			*		II. The capacity of res must be at least the same as lhs nand rhs
+			*		I.  The num_blocks of lhs and rhs must be the same.
+			*		II. The num_blocks of res must be at least the same as lhs nand rhs
 			* @param template<Erase>: if true, the bits of res outside [firstBit, lastBit] are set to 0
 			* @param lhs, rhs: input bitsets
 			* @param res: output bitset
@@ -121,8 +121,8 @@ namespace bitgraph {
 			* @param lhs, rhs: input bitsets
 			* @param res: output bitset
 			* @returns reference to the resulting bitstring res
-			* @details: The capacity of lhs and rhs must be the same.
-			*			The capacity of res must be greater or equal than lhs / rhs
+			* @details: The num_blocks of lhs and rhs must be the same.
+			*			The num_blocks of res must be greater or equal than lhs / rhs
 			* @details: created 06/02/2025
 			* @details: GCC does not allow default template parameters in friend functions
 			**/
@@ -133,10 +133,10 @@ namespace bitgraph {
 			* @brief OR between lhs and rhs bitsets in the closed block- range [firstBlock, lastBlock].
 			*		 Stores the result in res. The remaining bits of res outside the range
 			*		 are set to 0 if the template parameter Erase is true, else res is not modified.
-			*		 If lastBock==-1, the range is til the end of the bitset, i.e., [firstBlock, capacity())
+			*		 If lastBock==-1, the range is til the end of the bitset, i.e., [firstBlock, num_blocks())
 			*
-			*		I.  The capacity of lhs and rhs must be the same.
-			*		II. The capacity of res must be at least the same as lhs nand rhs
+			*		I.  The num_blocks of lhs and rhs must be the same.
+			*		II. The num_blocks of res must be at least the same as lhs nand rhs
 			* @param template<Erase>: if true, the bits of res outside [firstBit, lastBit] are set to 0
 			* @param lhs, rhs: input bitsets
 			* @param res: output bitset
@@ -187,7 +187,7 @@ namespace bitgraph {
 
 			/**
 			* @brief Constructor of a bitset given a population size nPop
-			*		  The capacity of the bitset is set according to the population size
+			*		  The num_blocks of the bitset is set according to the population size
 			* @param nBits : population size
 			* @param val: initial value (TRUE, FALSE) of every bit in the bitset
 			**/
@@ -196,7 +196,7 @@ namespace bitgraph {
 			/**
 			* @brief Constructor of a bitset given an initial vector lv of 1-bit elements
 			*		  The population size is the maximum value of lv
-			*		  The capacity of the bitset is set according to the population size
+			*		  The num_blocks of the bitset is set according to the population size
 			* @param lv : vector of integers representing 1-bits in the bitset
 			**/
 			explicit  BitSet(const vint& lv);
@@ -204,7 +204,7 @@ namespace bitgraph {
 			/**
 			 * @brief Creates a bitset with an initial collection @lv of 1-bit elements
 			 *		  and a population size nPop
-			 *		  The capacity of the bitset is set according to nPop
+			 *		  The num_blocks of the bitset is set according to nPop
 			 * @param nPop: population size
 			 * @param lv : vector of integers representing 1-bits in the bitset
 			 * @details: any collection supporting begin() and end() iterators can be used
@@ -215,7 +215,7 @@ namespace bitgraph {
 			/**
 			 * @brief Creates a bitset with an initialez list of 1-bit elements
 			 *		  and a population size nPop
-			 *		  The capacity of the bitset is set according to nPop
+			 *		  The num_blocks of the bitset is set according to nPop
 			 * @param nPop: population size
 			 * @param lv : set of integers representing 1-bits in the bitset
 			 **/
@@ -239,7 +239,7 @@ namespace bitgraph {
 			* @brief Resets this bitset given to a vector lv of 1-bit elements
 			 *		  and a population size nPop.
 			 *
-			 *		  I. The capacity of the bitset is set according to nPop.
+			 *		  I. The num_blocks of the bitset is set according to nPop.
 			 *		  II. Memory is deallocated and reallocated as required
 			 * @param nPop: population size
 			 * @param lv : vector of integers representing 1-bits in the bitset
@@ -250,7 +250,7 @@ namespace bitgraph {
 			/**
 			* @brief Resets this bitset to an EMPTY BITSET given to a population size nPop.
 			*
-			*		  I. The capacity of the bitset is set according to nPop.
+			*		  I. The num_blocks of the bitset is set according to nPop.
 			*		  II. Memory is deallocated and reallocated as required
 			*
 			* @param nPop: population size
@@ -266,13 +266,11 @@ namespace bitgraph {
 			/////////////////////
 			//setters and getters (will not allocate memory)
 
-			int number_of_blocks()							const { return nBB_; }
-
 			/**
-			* @brief alternative syntax for number_of_blocks
+			* @brief returns the number of blocks allocated for the bitset
 			**/
-			int capacity()									const { return nBB_; }
-
+			std::size_t num_blocks()		const noexcept { return nBB_; }					
+							
 			vbset& bitset() { return vBB_; }
 			const vbset& bitset()				const { return vBB_; }
 
@@ -348,8 +346,8 @@ namespace bitgraph {
 			* @details implementation depends of POPCN64 switch in bbconfig.h
 			*		   By default - intrinsic HW assembler instructions
 			**/
-			std::size_t	size()									const { return (std::size_t)popcn64(); }
-			std::size_t	size(int firstBit, int lastBit = -1)	const { return (std::size_t)popcn64(firstBit, lastBit); }
+			std::size_t	count()									const { return (std::size_t)popcn64(); }
+			std::size_t	count(int firstBit, int lastBit = -1)	const { return (std::size_t)popcn64(firstBit, lastBit); }
 
 			/**
 			* @brief returns the number of 1-bits in the bitstring
@@ -389,7 +387,7 @@ namespace bitgraph {
 			inline  BitSet& set_bit(int firstBit, int lastBit);
 
 			/**
-			* @brief Sets all bitblocks up to the bitstring capacity to 1.
+			* @brief Sets all bitblocks up to the bitstring num_blocks to 1.
 			*
 			* @details Might set more bits than the maximum population size conceived by
 			*		  the client user during construction (i.e. bitset constructed with 64 bits, has 2 bitblocks)
@@ -428,8 +426,8 @@ namespace bitgraph {
 
 			/**
 			* @brief Adds elements from a vector of non-negative integers lv as 1-bit
-			*	    up to the maximum capacity of the bitstring. Values greater than the
-			*		maximum capacity of the biset are ignored.
+			*	    up to the maximum num_blocks of the bitstring. Values greater than the
+			*		maximum num_blocks of the biset are ignored.
 			*
 			* @param lv: vector of non-negative integers
 			* @returns reference to the modified bitstring
@@ -827,8 +825,8 @@ namespace bitgraph {
 			* @param lhs, rhs: input bitsets
 			* @param res: output bitset
 			* @returns reference to the resulting bitstring res
-			* @details: The capacity of lhs and rhs must be the same.
-			*			The capacity of res must be greater or equal than lhs / rhs
+			* @details: The num_blocks of lhs and rhs must be the same.
+			*			The num_blocks of res must be greater or equal than lhs / rhs
 			*
 			* TODO: slightly weird behaviour, check if it is necessary
 			* TODO: add firstBit logic  (06/02/2025)
@@ -1015,7 +1013,7 @@ namespace bitgraph{
 			int last_block = ((lastBlock == -1) ? nBB_ - 1 : lastBlock);
 
 			///////////////////////////////////////////////////////////////////////////////
-			assert((firstBlock >= 0) && (last_block < capacity()) && (firstBlock <= last_block));
+			assert((firstBlock >= 0) && (last_block < num_blocks()) && (firstBlock <= last_block));
 			///////////////////////////////////////////////////////////////////////////////
 
 
@@ -1056,7 +1054,7 @@ namespace bitgraph{
 			int last_block = ((lastBlock == -1) ? nBB_ - 1 : lastBlock);
 
 			///////////////////////////////////////////////////////////////////////////////
-			assert((firstBlock >= 0) && (last_block < capacity()) && (firstBlock <= last_block));
+			assert((firstBlock >= 0) && (last_block < num_blocks()) && (firstBlock <= last_block));
 			///////////////////////////////////////////////////////////////////////////////
 
 
@@ -1272,7 +1270,7 @@ namespace bitgraph{
 			int last_block = ((lastBlock == -1) ? nBB_ - 1 : lastBlock);
 
 			////////////////////////////////////////////////////////////////////////////////////////////
-			assert((firstBlock >= 0) && (last_block < bb_add.capacity()) && (firstBlock <= last_block));
+			assert((firstBlock >= 0) && (last_block < bb_add.num_blocks()) && (firstBlock <= last_block));
 			///////////////////////////////////////////////////////////////////////////////////////////
 
 
@@ -1288,7 +1286,7 @@ namespace bitgraph{
 			int last_block = ((lastBlock == -1) ? nBB_ - 1 : lastBlock);
 
 			////////////////////////////////////////////////////////////////////////////////////////////
-			assert((firstBlock >= 0) && (last_block < bb_add.capacity()) && (firstBlock <= last_block));
+			assert((firstBlock >= 0) && (last_block < bb_add.num_blocks()) && (firstBlock <= last_block));
 			///////////////////////////////////////////////////////////////////////////////////////////
 
 
@@ -1432,7 +1430,7 @@ namespace bitgraph{
 
 
 			///////////////////////////////////////////////////////////////////////////////////
-			assert((firstBlock >= 0) && (firstBlock <= last_block) && (last_block < capacity()));
+			assert((firstBlock >= 0) && (firstBlock <= last_block) && (last_block < num_blocks()));
 			/////////////////////////////////////////////////////////////////////////////////
 
 
@@ -1532,7 +1530,7 @@ namespace bitgraph{
 			int last_block = (lastBlock == -1) ? nBB_ - 1 : lastBlock;
 
 			///////////////////////////////////////////////////////////////////////////////
-			assert((firstBlock >= 0) && (last_block < capacity()) && (firstBlock <= last_block));
+			assert((firstBlock >= 0) && (last_block < num_blocks()) && (firstBlock <= last_block));
 			///////////////////////////////////////////////////////////////////////////////
 
 
@@ -1720,7 +1718,7 @@ namespace bitgraph{
 			int last_block = ((lastBlock == -1) ? nBB_ - 1 : lastBlock);
 
 			///////////////////////////////////////////////////////////////////////////////
-			assert((firstBlock >= 0) && (last_block < bb_del.capacity()) && (firstBlock <= last_block));
+			assert((firstBlock >= 0) && (last_block < bb_del.num_blocks()) && (firstBlock <= last_block));
 			///////////////////////////////////////////////////////////////////////////////
 
 			for (auto i = firstBlock; i <= last_block; ++i) {
@@ -1736,7 +1734,7 @@ namespace bitgraph{
 			auto last_block = ((lastBlock == -1) ? nBB_ - 1 : lastBlock);
 
 			///////////////////////////////////////////////////////////////////////////////////
-			assert((firstBlock >= 0) && (firstBlock <= last_block) && (last_block < rhs.capacity()));
+			assert((firstBlock >= 0) && (firstBlock <= last_block) && (last_block < rhs.num_blocks()));
 			/////////////////////////////////////////////////////////////////////////////////
 
 
@@ -1763,7 +1761,7 @@ namespace bitgraph{
 			auto last_block = ((lastBlock == -1) ? nBB_ - 1 : lastBlock);
 
 			///////////////////////////////////////////////////////////////////////////////////
-			assert((firstBlock >= 0) && (firstBlock <= last_block) && (last_block < rhs.capacity()));
+			assert((firstBlock >= 0) && (firstBlock <= last_block) && (last_block < rhs.num_blocks()));
 			/////////////////////////////////////////////////////////////////////////////////
 
 			for (auto i = firstBlock; i <= last_block; ++i) {
@@ -1920,8 +1918,8 @@ namespace bitgraph {
 			int last_block = ((lastBlock == -1) ? lhs.nBB_ - 1 : lastBlock);
 
 			//////////////////////////////////////////////////////////////////
-			assert((firstBlock >= 0) && (last_block < lhs.capacity()) &&
-				(firstBlock <= last_block) && (rhs.capacity() == lhs.capacity()));
+			assert((firstBlock >= 0) && (last_block < lhs.num_blocks()) &&
+				(firstBlock <= last_block) && (rhs.num_blocks() == lhs.num_blocks()));
 			//////////////////////////////////////////////////////////////////
 
 

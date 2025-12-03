@@ -31,7 +31,7 @@ TEST(Graph_sparse, max_subgraph_degree) {
 	g.add_edge(78, 79);
 	g.add_edge(79, 80);
 
-	sparse_bitarray sg(g.number_of_vertices());
+	sparse_bitarray sg(g.num_vertices());
 	
 	sg.reset_bit(0, 3);
 	////////////////////////////////////////
@@ -58,16 +58,16 @@ TEST(Graph_sparse,constructor_file){
 	sparse_graph g4(PATH_GRAPH_TESTS_CMAKE_SRC_CODE "brock200_4.clq");
 
 	//number of vertices
-	EXPECT_EQ	(200, g1.number_of_vertices());
-	EXPECT_EQ	(200, g2.number_of_vertices());
-	EXPECT_EQ	(200, g3.number_of_vertices());
-	EXPECT_EQ	(200, g4.number_of_vertices());
+	EXPECT_EQ	(200, g1.num_vertices());
+	EXPECT_EQ	(200, g2.num_vertices());
+	EXPECT_EQ	(200, g3.num_vertices());
+	EXPECT_EQ	(200, g4.num_vertices());
 
 	//number of (directed) edges
-	EXPECT_EQ	(14834,g1.number_of_edges());
-	EXPECT_EQ	(9876,g2.number_of_edges());
-	EXPECT_EQ	(12048,g3.number_of_edges());
-	EXPECT_EQ	(13089,g4.number_of_edges());
+	EXPECT_EQ	(14834,g1.num_edges());
+	EXPECT_EQ	(9876,g2.num_edges());
+	EXPECT_EQ	(12048,g3.num_edges());
+	EXPECT_EQ	(13089,g4.num_edges());
 
 	//name
 	EXPECT_STREQ("brock200_1.clq", g1.name().c_str());
@@ -86,10 +86,10 @@ TEST(Graph_sparse,constructor_file){
 	g4.make_bidirected();
 
 	//number of (bidirected) edges
-	EXPECT_EQ	(2*14834,g1.number_of_edges());
-	EXPECT_EQ	(2*9876,g2.number_of_edges());
-	EXPECT_EQ	(2*12048,g3.number_of_edges());
-	EXPECT_EQ	(2*13089,g4.number_of_edges());
+	EXPECT_EQ	(2*14834,g1.num_edges());
+	EXPECT_EQ	(2*9876,g2.num_edges());
+	EXPECT_EQ	(2*12048,g3.num_edges());
+	EXPECT_EQ	(2*13089,g4.num_edges());
 	
 }
 
@@ -99,8 +99,8 @@ TEST(Graph_sparse,constructor_copy){
 	sparse_graph g1	(g);
 
 	////////////////////////////////////////////////////////////
-	EXPECT_EQ	(g.number_of_edges(),g1.number_of_edges());
-	EXPECT_EQ	(g.number_of_vertices(),g1.number_of_vertices());
+	EXPECT_EQ	(g.num_edges(),g1.num_edges());
+	EXPECT_EQ	(g.num_vertices(),g1.num_vertices());
 	EXPECT_EQ	(g.name(),g1.name());
 	EXPECT_EQ	("brock200_2.clq",g1.name());
 	EXPECT_TRUE	(g == g1);
@@ -167,20 +167,20 @@ TEST(Graph_sparse, create_subgraph) {
 	g.create_subgraph(50, g1);
 
 	/////////////////////////////////////////////
-	EXPECT_EQ	(50, g1.number_of_vertices());
-	EXPECT_EQ	(4, g1.number_of_edges());			//0->1, 1->2, 2->3, 0->3
+	EXPECT_EQ	(50, g1.num_vertices());
+	EXPECT_EQ	(4, g1.num_edges());			//0->1, 1->2, 2->3, 0->3
 	/////////////////////////////////////////////
 
 	//create graph with first 3 vertices
 	g.create_subgraph(3, g1);
 	
 	/////////////////////////////////////////
-	EXPECT_EQ	(3, g1.number_of_vertices());
-	EXPECT_EQ	(2, g1.number_of_edges());			//0->1, 1->2, 2->3
+	EXPECT_EQ	(3, g1.num_vertices());
+	EXPECT_EQ	(2, g1.num_edges());			//0->1, 1->2, 2->3
 	/////////////////////////////////////////
 
 	//creating a wrong size subgraph - g1 remains unchanged
-	EXPECT_EQ	(g1.number_of_vertices(), (g.create_subgraph(0, g1)).number_of_vertices());
+	EXPECT_EQ	(g1.num_vertices(), (g.create_subgraph(0, g1)).num_vertices());
 
 }
 
@@ -202,16 +202,16 @@ TEST(Graph_sparse, shrink_to_fit) {
 	g.shrink_to_fit(50);
 
 	/////////////////////////////////////////
-	EXPECT_EQ	(50, g.number_of_vertices());
-	EXPECT_EQ	(4, g.number_of_edges());			//0->1, 1->2, 2->3, 0->3
+	EXPECT_EQ	(50, g.num_vertices());
+	EXPECT_EQ	(4, g.num_edges());			//0->1, 1->2, 2->3, 0->3
 	/////////////////////////////////////////
 	
 	//reduces graph to 3 vertices
 	g.shrink_to_fit(3);
 	
 	/////////////////////////////////////////
-	EXPECT_EQ	(3, g.number_of_vertices());
-	EXPECT_EQ	(2, g.number_of_edges());			//0->1, 1->2
+	EXPECT_EQ	(3, g.num_vertices());
+	EXPECT_EQ	(2, g.num_edges());			//0->1, 1->2
 	EXPECT_TRUE	(g.is_edge(0, 1));
 	EXPECT_TRUE	(g.is_edge(1, 2));
 	EXPECT_FALSE(g.is_edge(2, 3));
@@ -235,9 +235,9 @@ TEST(Ugraph_sparse, number_of_edges) {
 	g.add_edge(0, 5);
 	g.add_edge(7, 128);
 
-	EXPECT_EQ(5, g.number_of_edges(true));			//uses current value of number of edges	
-	EXPECT_EQ(5, g.number_of_edges(true));			//uses current value of number of edges	
-	EXPECT_EQ(5, g.number_of_edges(false));			//recomputes number of edges
+	EXPECT_EQ(5, g.num_edges(true));			//uses current value of number of edges	
+	EXPECT_EQ(5, g.num_edges(true));			//uses current value of number of edges	
+	EXPECT_EQ(5, g.num_edges(false));			//recomputes number of edges
 	
 }
 
@@ -250,7 +250,7 @@ TEST(Ugraph_sparse, degree_induced){
 	////////////////////////////
 	
 	//set of vertices {0, 1, 6}
-	sparse_bitarray bbset(g.number_of_vertices());
+	sparse_bitarray bbset(g.num_vertices());
 	bbset.set_bit(0);
 	bbset.set_bit(1);
 	bbset.set_bit(6);
@@ -278,7 +278,7 @@ TEST(Ugraph_sparse, degree_brock){
 	/////////////////////////////////
 
 	//set of vertices {0, 1}
-	sparse_bitarray bbset(g.number_of_vertices());
+	sparse_bitarray bbset(g.num_vertices());
 	bbset.set_bit(0);
 	bbset.set_bit(1);
 	
@@ -287,10 +287,10 @@ TEST(Ugraph_sparse, degree_brock){
 	/////////////////////////////////
 
 	//set of all the vertices 
-	bbset.set_bit(0, g.number_of_vertices()-1);
+	bbset.set_bit(0, g.num_vertices()-1);
 	
 	///////////////////////////////////////////////////////////
-	EXPECT_EQ (g.neighbors(1).size(),g.degree(1, bbset));
+	EXPECT_EQ (g.neighbors(1).count(),g.degree(1, bbset));
 	///////////////////////////////////////////////////////////
 }
 
@@ -321,16 +321,16 @@ TEST(Ugraph_sparse,ugraph_from_file){
 	sparse_ugraph g4(PATH_GRAPH_TESTS_CMAKE_SRC_CODE "brock200_4.clq");
 
 	//number of vertices
-	EXPECT_EQ(200, g1.number_of_vertices());
-	EXPECT_EQ(200, g2.number_of_vertices());
-	EXPECT_EQ(200, g3.number_of_vertices());
-	EXPECT_EQ(200, g4.number_of_vertices());
+	EXPECT_EQ(200, g1.num_vertices());
+	EXPECT_EQ(200, g2.num_vertices());
+	EXPECT_EQ(200, g3.num_vertices());
+	EXPECT_EQ(200, g4.num_vertices());
 
 	//number of edges
-	EXPECT_EQ	(14834,g1.number_of_edges());
-	EXPECT_EQ	(9876,g2.number_of_edges());
-	EXPECT_EQ	(12048,g3.number_of_edges());
-	EXPECT_EQ	(13089,g4.number_of_edges());
+	EXPECT_EQ	(14834,g1.num_edges());
+	EXPECT_EQ	(9876,g2.num_edges());
+	EXPECT_EQ	(12048,g3.num_edges());
+	EXPECT_EQ	(13089,g4.num_edges());
 
 	//name
 	EXPECT_STREQ("brock200_1.clq", g1.name().c_str());
@@ -395,16 +395,16 @@ TEST(Ugraph_sparse, DISABLED_adjacency_matrix){
 				}
 
 				//expected number of edges is 0 because it is only reading upper triangle
-				ASSERT_EQ(0, ug.number_of_edges(false));
+				ASSERT_EQ(0, ug.num_edges(false));
 				
 				//deletes lower triangle
-				BITBOARD E=ug2.number_of_edges(false);
+				BITBOARD E=ug2.num_edges(false);
 				for(int i=0; i<N; i++){
 					ug2.neighbors(i).erase_bit(0, i);
 				}
 
 				//expected number of edges is the same as before (only reading upper triangle)
-				ASSERT_EQ(E, ug2.number_of_edges(false));
+				ASSERT_EQ(E, ug2.num_edges(false));
 												
 				cout<<"[N:"<<N<<" p:"<<P<<" r:"<<rep<<"]"<<endl;
 			}

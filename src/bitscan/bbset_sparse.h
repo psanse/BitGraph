@@ -93,11 +93,11 @@ namespace bitgraph {
 			/**
 			* @brief AND between lhs and rhs bitsets in the CLOSED block bit-range [firstBit, lastBit]
 			*		 The result is stored in bitset res. Outside the range, res is set to 0.
-			* @param firstBit, lastBit: closed bit-range 0 <= firstBit <= lastBit <= capacity()
+			* @param firstBit, lastBit: closed bit-range 0 <= firstBit <= lastBit <= num_blocks()
 			* @param lhs, rhs: input bitsets
 			* @param res: output bitset
 			* @returns reference to the resulting bitstring res
-			* @details: The capacity of lhs and rhs must be the same.
+			* @details: The num_blocks of lhs and rhs must be the same.
 			*
 			* TODO... (25/02/2025)
 			**/
@@ -107,11 +107,11 @@ namespace bitgraph {
 			/**
 			* @brief AND between lhs and rhs bitsets in the CLOSED block-range [firstBlock, lastBlock]
 			*		 The result is stored in bitset res. Outside the range, res is set to 0.
-			* @param firstBit, lastBit: closed bit-range 0 <= firstBit <= lastBit <= capacity()
+			* @param firstBit, lastBit: closed bit-range 0 <= firstBit <= lastBit <= num_blocks()
 			* @param lhs, rhs: input bitsets
 			* @param res: output bitset
 			* @returns reference to the resulting bitstring res
-			* @details: The capacity of lhs and rhs must be the same.
+			* @details: The num_blocks of lhs and rhs must be the same.
 			**/
 			friend  BitSetSp& AND_block(int firstBlock, int lastBlock, const BitSetSp& lhs, const BitSetSp& rhs, BitSetSp& res);
 
@@ -144,16 +144,16 @@ namespace bitgraph {
 
 			/**
 			* @brief Creates an EMPTY bitset given a population size nPop
-			*		  The capacity of the bitset is set according to the population size
-			* @param nBits : population size if is_popsize is true, otherwise the capacity of the bitset
+			*		  The num_blocks of the bitset is set according to the population size
+			* @param nBits : population size if is_popsize is true, otherwise the num_blocks of the bitset
 			* @details: Exception caught inside and the program exits
 			**/
 			explicit BitSetSp (int nPop, bool is_popsize = true);
 
 			/**
 			 * @brief Creates a bitset given an initial vector lv of 1-bit elements
-			 *		  and a population capacity determined by the population maximum size nPop
-			 *		  The capacity of the bitset is set according to nPop
+			 *		  and a population num_blocks determined by the population maximum size nPop
+			 *		  The num_blocks of the bitset is set according to nPop
 			 * @param nPop: population size
 			 * @param lv : vector of integers representing 1-bits in the bitset
 			 * @details: Exception caught inside and the program exits
@@ -163,7 +163,7 @@ namespace bitgraph {
 			/**
 			* @brief Creates a bitset with an initial list of 1-bit elements
 			*		  and a population size nPop
-			*		  The capacity of the bitset is set according to nPop
+			*		  The num_blocks of the bitset is set according to nPop
 			* @param nPop: population size
 			* @param lv : set of integers representing 1-bits in the bitset
 			* @details: Exception caught inside and the program exits
@@ -215,21 +215,21 @@ namespace bitgraph {
 			/////////////////////
 			//setters and getters (will not allocate memory)
 
-				/**
-				* @brief number of non-zero bitblocks in the bitstring
-				* @details As opposed to the non-sparse case, it can be zero if there are no 1-bits
-				*		   even though the maximum number of bitblocks determined in construction nBB_
-				*		   can be anything.
-				**/
-			int number_of_blocks()						const { return vBB_.size(); }
+			/**
+			* @brief number of non-zero bitblocks in the bitstring
+			* @details As opposed to the non-sparse case, it can be zero if there are no 1-bits
+			*		   even though the maximum number of bitblocks determined in construction nBB_
+			*		   can be anything.
+			**/
+			std::size_t size()				const noexcept { return vBB_.size(); }
 
 			/**
 			* @brief maximum number of bitblocks in the bitset
-			* @details the capacity is determined by the population size (construction),
-			*		   it is NOT the number_of_blocks(), which are the non-zero bitblocks in the bitset
-			*
+			* @details the num_blocks is determined by the population size (construction),
+			* 		   - comment: NOT the size of @vBB_, which is the non-zero bitblocks in the bitset
 			**/
-			int capacity()						const { return nBB_; }
+			std::size_t num_blocks()		const noexcept { return nBB_; }
+								
 
 			/**
 			* @brief returns the bitblock at position blockID, not the id-th block of the
@@ -423,15 +423,14 @@ namespace bitgraph {
 			/////////////////
 			// Popcount
 
-				/**
-				* @brief Number of 1-bits in the bitstring
-				*
-				* @details alias to popcn64, calls the function
-				* @details To be used instead of popcn64 (12/02/2025)
-				*
-				**/
-			std::size_t size()							const { return (std::size_t)popcn64(); }
-			std::size_t size(int firstBit, int lastBit)	const { return (std::size_t)popcn64(firstBit, lastBit); }
+			/**
+			* @brief Number of 1-bits in the bitstring
+			*
+			* @details alias to popcn64, calls the function
+			* @details To be used instead of popcn64 (12/02/2025)
+			**/
+			int count()								const { return popcn64(); }
+			int count(int firstBit, int lastBit)	const { return popcn64(firstBit, lastBit); }
 
 		protected:
 			/**
@@ -490,7 +489,7 @@ namespace bitgraph {
 			inline	BitSetSp& reset_bit(int firstBit, int lastBit, const BitSetSp& rhs);
 
 			/**
-			* @brief Sets bit in THIS. If bit is outside the capacity of the bitset
+			* @brief Sets bit in THIS. If bit is outside the num_blocks of the bitset
 			*		 it is ignored (feature)
 			* @param bit: position of the bit to set
 			* @returns 0 if the bit was set, -1 if error
@@ -517,7 +516,7 @@ namespace bitgraph {
 			* @brief Adds the bits from the bitstring bitset in the population
 			*		 range of *THIS (bitblocks are copied).
 			*
-			*		 I. Both bitsets MUST have the SAME capacity (number of blocks).
+			*		 I. Both bitsets MUST have the SAME num_blocks (number of blocks).
 			*		II. Should have the same expected maximum population size
 			*
 			* @details  Equivalent to OR operation / set union
@@ -581,7 +580,7 @@ namespace bitgraph {
 			void  erase_bit() { vBB_.clear(); }
 
 			/**
-			* @brief Removes the 1-bits from bitset (inside *this capacity).
+			* @brief Removes the 1-bits from bitset (inside *this num_blocks).
 			*
 			*		 I. bitset must have a maximum population greater or equal than the bitstring (CHECK - 19/02/2025)
 			*
@@ -659,7 +658,7 @@ namespace bitgraph {
 			* @details set intersection operation
 			* @details Capacities of THIS and bitset should be the same.
 			*
-			* TODO - check semantics when the capacity of bitset is greater than the capacity of THIS (23/02/2025)
+			* TODO - check semantics when the num_blocks of bitset is greater than the num_blocks of THIS (23/02/2025)
 			**/
 			inline BitSetSp& AND_block(int firstBlock, const BitSetSp& rhs);
 
@@ -828,7 +827,7 @@ namespace bitgraph {
 	bool BitSetSp::is_disjoint_block(int first_block, int last_block, const BitSetSp& rhs)   const {
 
 		///////////////////////////////////////////////////////////////////////////////////
-		assert(first_block >= 0 && first_block <= last_block && (last_block < rhs.capacity()));
+		assert(first_block >= 0 && first_block <= last_block && (last_block < rhs.num_blocks()));
 		///////////////////////////////////////////////////////////////////////////////////
 
 		auto posL = BBObject::noBit;
@@ -1361,7 +1360,7 @@ namespace bitgraph {
 		}
 
 		//////////////////////////////////////////////////////////////////////////////////
-		assert(firstBlock >= 0 && firstBlock <= lastBlock && lastBlock < rhs.capacity());
+		assert(firstBlock >= 0 && firstBlock <= lastBlock && lastBlock < rhs.num_blocks());
 		//////////////////////////////////////////////////////////////////////////////////
 
 		//determine the closest block in the range for both bitstrings
@@ -1446,7 +1445,7 @@ namespace bitgraph {
 		auto bbl = WDIV(firstBit);
 
 		/////////////////////////
-		assert(bbh < capacity());
+		assert(bbh < num_blocks());
 		/////////////////////////
 
 		auto offsetl = firstBit - WMUL(bbl);
@@ -1558,7 +1557,7 @@ namespace bitgraph {
 		auto bbh = WDIV(lastBit);
 
 		////////////////////////////////////////////////////////////////////////////////////
-		assert((bbl >= 0) && (bbl <= bbh) && (bbh < nBB_) && (bbh < rhs.capacity()));
+		assert((bbl >= 0) && (bbl <= bbh) && (bbh < nBB_) && (bbh < rhs.num_blocks()));
 		///////////////////////////////////////////////////////////////////////////////////
 
 		vBB_.clear();
@@ -1726,7 +1725,7 @@ namespace bitgraph {
 
 
 			/////////////////////////////////////////////////////////////
-			res.reset(lhs.capacity(), false);
+			res.reset(lhs.num_blocks(), false);
 			res.vBB_.reserve(std::min(lhs.vBB_.size(), rhs.vBB_.size()));
 			/////////////////////////////////////////////////////////////
 
@@ -1785,7 +1784,7 @@ namespace bitgraph {
 			BitSetSp& OR(const BitSetSp& lhs, const BitSetSp& rhs, BitSetSp& res) {
 
 			/////////////////////////////////////////////////////////////
-			res.reset(lhs.capacity(), false);
+			res.reset(lhs.num_blocks(), false);
 			res.vBB_.reserve(lhs.vBB_.size() + rhs.vBB_.size());
 			/////////////////////////////////////////////////////////////
 
@@ -1832,11 +1831,11 @@ namespace bitgraph {
 			BitSetSp& AND_block(int firstBlock, int lastBlock, const BitSetSp& lhs, const BitSetSp& rhs, BitSetSp& res) {
 
 			///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-			assert(firstBlock >= 0 && firstBlock <= lastBlock && lastBlock < rhs.capacity() && lastBlock < lhs.capacity());
+			assert(firstBlock >= 0 && firstBlock <= lastBlock && lastBlock < rhs.num_blocks() && lastBlock < lhs.num_blocks());
 			////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 			//////////////////////////////////////////////////////////////
-			res.reset(lhs.capacity(), false);
+			res.reset(lhs.num_blocks(), false);
 			res.vBB_.reserve(std::min(lhs.vBB_.size(), rhs.vBB_.size()));
 			//////////////////////////////////////////////////////////////
 
@@ -1885,7 +1884,7 @@ namespace bitgraph {
 			}
 
 			///////////////////////////////////
-			res.reset(lhs.capacity(), false);
+			res.reset(lhs.num_blocks(), false);
 			res.vBB_.reserve(lhs.vBB_.size());
 			///////////////////////////////////
 

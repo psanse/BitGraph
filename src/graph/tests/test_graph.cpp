@@ -40,10 +40,10 @@ protected:
 
 TEST_F(GraphTest, constructor) {
 
-	EXPECT_EQ(6, g.number_of_vertices());
-	EXPECT_EQ(4, g.number_of_edges(false));
-	EXPECT_EQ(6, g.number_of_vertices());
-	EXPECT_EQ(1, g.number_of_blocks());
+	EXPECT_EQ(6, g.num_vertices());
+	EXPECT_EQ(4, g.num_edges(false));
+	EXPECT_EQ(6, g.num_vertices());
+	EXPECT_EQ(1, g.num_blocks());
 	EXPECT_TRUE(g.path().empty());
 	EXPECT_TRUE(g.name().empty());
 
@@ -59,9 +59,9 @@ TEST_F(GraphTest, deallocate_memory) {
 	//clean memory
 	g = graph();						//std::swap(graph(), g);
 
-	EXPECT_EQ	(0, g.number_of_vertices());
+	EXPECT_EQ	(0, g.num_vertices());
 	EXPECT_TRUE	(g.name().empty());
-	EXPECT_EQ	(0, g.number_of_edges());
+	EXPECT_EQ	(0, g.num_edges());
 }
 
 
@@ -109,20 +109,20 @@ TEST(Graph, constructor_file) {
 	graph g4(path + "brock200_4.clq");
 
 	//test number of edges
-	EXPECT_EQ(14834, g1.number_of_edges());
-	EXPECT_EQ(9876, g2.number_of_edges());
-	EXPECT_EQ(12048, g3.number_of_edges());
-	EXPECT_EQ(13089, g4.number_of_edges());
+	EXPECT_EQ(14834, g1.num_edges());
+	EXPECT_EQ(9876, g2.num_edges());
+	EXPECT_EQ(12048, g3.num_edges());
+	EXPECT_EQ(13089, g4.num_edges());
 
 	//test is directed
 	EXPECT_NE(g1.is_edge(3, 2), g1.is_edge(2, 3));
 	EXPECT_NE(g1.is_edge(4, 2), g1.is_edge(2, 4));
 
 	//test number of vertices
-	EXPECT_EQ(200, g1.number_of_vertices());
-	EXPECT_EQ(200, g2.number_of_vertices());
-	EXPECT_EQ(200, g3.number_of_vertices());
-	EXPECT_EQ(200, g4.number_of_vertices());
+	EXPECT_EQ(200, g1.num_vertices());
+	EXPECT_EQ(200, g2.num_vertices());
+	EXPECT_EQ(200, g3.num_vertices());
+	EXPECT_EQ(200, g4.num_vertices());
 
 	//make bidirected
 	g1.make_bidirected();
@@ -131,10 +131,10 @@ TEST(Graph, constructor_file) {
 	g4.make_bidirected();
 
 	//test number of (bidirected) edges	
-	EXPECT_EQ(2 * 14834, g1.number_of_edges());
-	EXPECT_EQ(2 * 9876, g2.number_of_edges());
-	EXPECT_EQ(2 * 12048, g3.number_of_edges());
-	EXPECT_EQ(2 * 13089, g4.number_of_edges());
+	EXPECT_EQ(2 * 14834, g1.num_edges());
+	EXPECT_EQ(2 * 9876, g2.num_edges());
+	EXPECT_EQ(2 * 12048, g3.num_edges());
+	EXPECT_EQ(2 * 13089, g4.num_edges());
 
 	//test names
 	EXPECT_STREQ("brock200_1.clq", g1.name().c_str());
@@ -153,8 +153,8 @@ TEST(Graph, copy_constructor) {
 	///////////////
 
 	/////////////////////////////////////////////////////////
-	EXPECT_EQ	(g.number_of_edges(), gc.number_of_edges());
-	EXPECT_EQ	(g.number_of_vertices(), gc.number_of_vertices());
+	EXPECT_EQ	(g.num_edges(), gc.num_edges());
+	EXPECT_EQ	(g.num_vertices(), gc.num_vertices());
 	EXPECT_EQ	(g.name(), gc.name());
 	EXPECT_EQ	("brock200_2.clq", gc.name());
 	EXPECT_TRUE	(g == gc);
@@ -171,16 +171,16 @@ TEST(Graph, move_constructor) {
 
 	string path = PATH_GRAPH_TESTS_CMAKE_SRC_CODE;
 	graph g(path + "brock200_2.clq");
-	const int NV = g.number_of_vertices();
-	const int NE = g.number_of_edges();
+	const int NV = g.num_vertices();
+	const int NE = g.num_edges();
 
 	///////////////
 	graph gc(std::move(g));
 	///////////////
 
 	/////////////////////////////////////////////
-	EXPECT_EQ(NE, gc.number_of_edges());
-	EXPECT_EQ(NV, gc.number_of_vertices());
+	EXPECT_EQ(NE, gc.num_edges());
+	EXPECT_EQ(NV, gc.num_vertices());
 	EXPECT_EQ("brock200_2.clq", gc.name());	
 	/////////////////////////////////////////////
 
@@ -188,8 +188,8 @@ TEST(Graph, move_constructor) {
 	//moved-from object is in a valid state (size is not assumed).
 	//can be reused with reset().
 	EXPECT_EQ(0, g.reset(3));
-	EXPECT_EQ(3, g.number_of_vertices());
-	EXPECT_EQ(0, g.number_of_edges());
+	EXPECT_EQ(3, g.num_vertices());
+	EXPECT_EQ(0, g.num_edges());
 }
 
 
@@ -215,15 +215,15 @@ TEST_F(GraphTest, reset_and_reset) {
 
 	////////////////////////////////////
 	g.reset(NV);							
-	EXPECT_EQ(NV, g.number_of_vertices());
-	EXPECT_EQ(0, g.number_of_edges());
+	EXPECT_EQ(NV, g.num_vertices());
+	EXPECT_EQ(0, g.num_edges());
 	EXPECT_TRUE(g.name().empty());						//reset(NV, true) clears name
 	////////////////////////////////////
 	
 	///////////////////////////////////
 	g.reset(NV + 1, "new_name");
-	EXPECT_EQ(NV + 1, g.number_of_vertices());
-	EXPECT_EQ(0, g.number_of_edges());
+	EXPECT_EQ(NV + 1, g.num_vertices());
+	EXPECT_EQ(0, g.num_edges());
 	EXPECT_STREQ("new_name", g.name().c_str());			
 	////////////////////////////////////
 }
@@ -262,8 +262,8 @@ TEST(Graph, density) {
 	const int NVexp = 200, NEexp = 14834;
 
 	//////////////////////////////////////////
-	EXPECT_EQ(NVexp, g.number_of_vertices());
-	EXPECT_EQ(NEexp, g.number_of_edges());
+	EXPECT_EQ(NVexp, g.num_vertices());
+	EXPECT_EQ(NEexp, g.num_edges());
 	//////////////////////////////////////////
 	
 	BITBOARD aux = NVexp * (NVexp - 1);
@@ -288,7 +288,7 @@ TEST(Graph, neighbors){
 	BitSet& neigh_to_one =g.neighbors(1);
 		
 	//////////////////////////////////////
-	EXPECT_EQ	(1, neigh_to_one.size());	//{2} is the only neighbor of 1 and has degree 2
+	EXPECT_EQ	(1, neigh_to_one.count());	//{2} is the only neighbor of 1 and has degree 2
 	EXPECT_TRUE	( neigh_to_one.is_bit(2) );
 	///////////////////////////////////////
 }
@@ -298,8 +298,8 @@ TEST(Graph, is_edge){
 	string path= PATH_GRAPH_TESTS_CMAKE_SRC_CODE;
 	graph g(path + "sample.clq");
 
-	EXPECT_EQ(7, g.number_of_vertices());
-	EXPECT_EQ(11, g.number_of_edges());
+	EXPECT_EQ(7, g.num_vertices());
+	EXPECT_EQ(11, g.num_edges());
 	
 	EXPECT_TRUE(g.is_edge(1,0));
 	EXPECT_TRUE(g.is_edge(2,0));
@@ -341,7 +341,7 @@ TEST(Graph, remove_edges) {
 	//removes all edges with endpoint in 1
 	g.remove_edges(1);				
 	EXPECT_TRUE(g.is_edge(0, 2));			//only edge left
-	EXPECT_EQ(1, g.number_of_edges());
+	EXPECT_EQ(1, g.num_edges());
 
 }
 
@@ -362,8 +362,8 @@ TEST(Graph, shrink_to_fit) {
 
 	////////////////////////////
 	ASSERT_EQ(0, status);
-	EXPECT_EQ(50, g.number_of_vertices());
-	EXPECT_EQ(4, g.number_of_edges());			//0->1, 1->2, 2->3, 0->3
+	EXPECT_EQ(50, g.num_vertices());
+	EXPECT_EQ(4, g.num_edges());			//0->1, 1->2, 2->3, 0->3
 	EXPECT_TRUE(g.is_edge(0, 1));
 	EXPECT_TRUE(g.is_edge(1, 2));
 	EXPECT_TRUE(g.is_edge(2, 3));
@@ -388,8 +388,8 @@ TEST(Graph, shrink_to_fit_only_capacity) {
 	g.shrink_to_fit();
 
 	////////////////////////////
-	EXPECT_EQ(100, g.number_of_vertices());
-	EXPECT_EQ(8, g.number_of_edges());			//all of them
+	EXPECT_EQ(100, g.num_vertices());
+	EXPECT_EQ(8, g.num_edges());			//all of them
 	EXPECT_TRUE(g.is_edge(0, 1));
 	EXPECT_TRUE(g.is_edge(1, 2));
 	EXPECT_TRUE(g.is_edge(2, 3));
@@ -417,14 +417,14 @@ TEST(Graph, create_subgraph){
 	g.create_subgraph(50, g1);
 
 	////////////////////////////////////////
-	EXPECT_EQ(50, g1.number_of_vertices());
-	EXPECT_EQ(4, g1.number_of_edges());			//0->1, 1->2, 2->3, 0->3
+	EXPECT_EQ(50, g1.num_vertices());
+	EXPECT_EQ(4, g1.num_edges());			//0->1, 1->2, 2->3, 0->3
 	////////////////////////////////////////
 
 	//creates subgraph with first 3 vertices
 	g.create_subgraph(3, g1);
-	EXPECT_EQ(3, g1.number_of_vertices());
-	EXPECT_EQ(2, g1.number_of_edges());			//0->1, 1->2 
+	EXPECT_EQ(3, g1.num_vertices());
+	EXPECT_EQ(2, g1.num_edges());			//0->1, 1->2 
 	
 }
 
@@ -441,7 +441,7 @@ TEST(Graph, create_subgraph){
 //	g.add_edge(1,2);
 //	g.add_edge(0,2);
 //	
-//	int nV=g.number_of_vertices();
+//	int nV=g.num_vertices();
 //	EXPECT_DOUBLE_EQ(2.0/(nV*NUM_BB) ,g.block_density());		//around 1/500 of useful bitblocks
 //	
 //	sparse_graph g1(64*NUM_BB);
@@ -457,7 +457,7 @@ TEST(Graph, create_subgraph){
 //	g2.add_edge(1,2);
 //	g2.add_edge(0,2);
 //
-//	EXPECT_DOUBLE_EQ(3.0/g2.number_of_vertices(), g2.block_density());		
+//	EXPECT_DOUBLE_EQ(3.0/g2.num_vertices(), g2.block_density());		
 //
 //	//spare case
 //	sparse_ugraph g3(4);

@@ -26,8 +26,8 @@ TEST(Conversions, sparse2ugraph) {
 	ugraph ug;
 	GraphConversion::sug2ug(sug, ug);
 
-	EXPECT_EQ(4, ug.number_of_vertices());
-	EXPECT_EQ(4, ug.number_of_edges());
+	EXPECT_EQ(4, ug.num_vertices());
+	EXPECT_EQ(4, ug.num_edges());
 	EXPECT_TRUE(ug.is_edge(0, 1));
 	EXPECT_TRUE(ug.is_edge(1, 2));
 	EXPECT_TRUE(ug.is_edge(1, 3));
@@ -40,8 +40,8 @@ TEST(Conversions, sparse2ugraph) {
 	sug1.add_edge(0, 2);
 
 	GraphConversion::sug2ug(sug1, ug);
-	EXPECT_EQ(300, ug.number_of_vertices());
-	EXPECT_EQ(4, ug.number_of_edges());
+	EXPECT_EQ(300, ug.num_vertices());
+	EXPECT_EQ(4, ug.num_edges());
 	EXPECT_TRUE(ug.is_edge(0, 1));
 	EXPECT_TRUE(ug.is_edge(1, 2));
 	EXPECT_TRUE(ug.is_edge(1, 3));
@@ -60,8 +60,8 @@ TEST(Conversions, ugraph2sparse_ugraph) {
 	sparse_ugraph sug;
 	GraphConversion::ug2sug(ug, sug);
 
-	EXPECT_EQ(4, sug.number_of_vertices());
-	EXPECT_EQ(4, sug.number_of_edges());
+	EXPECT_EQ(4, sug.num_vertices());
+	EXPECT_EQ(4, sug.num_edges());
 	EXPECT_TRUE(sug.is_edge(0, 1));
 	EXPECT_TRUE(sug.is_edge(1, 2));
 	EXPECT_TRUE(sug.is_edge(1, 3));
@@ -74,8 +74,8 @@ TEST(Conversions, ugraph2sparse_ugraph) {
 	ug1.add_edge(0, 2);
 
 	GraphConversion::ug2sug(ug1, sug);
-	EXPECT_EQ(300, sug.number_of_vertices());
-	EXPECT_EQ(4, sug.number_of_edges());
+	EXPECT_EQ(300, sug.num_vertices());
+	EXPECT_EQ(4, sug.num_edges());
 	EXPECT_TRUE(sug.is_edge(0, 1));
 	EXPECT_TRUE(sug.is_edge(1, 2));
 	EXPECT_TRUE(sug.is_edge(1, 3));

@@ -280,7 +280,7 @@ string BitSet::to_string ()
 void BitSet::to_vector (vint& lv ) const {
 
 	lv.clear();
-	const int pc = this->size();
+	const int pc = this->count();
 	if (pc == 0) return;				
 	lv.reserve(pc);		
 
@@ -294,7 +294,7 @@ void BitSet::to_vector (vint& lv ) const {
 void BitSet::to_set(sint& ls) const
 {
 	ls.clear();
-	const int pc = this->size();
+	const int pc = this->count();
 	if (pc == 0) return;			//fast exit for empty set
 	
 	int v = BBObject::noBit;

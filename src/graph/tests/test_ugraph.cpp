@@ -29,18 +29,18 @@ TEST(Ugraph, constructor_file){
 
 	//test number of vertices
 	//////////////////////////////////////////
-	EXPECT_EQ(200, g1.number_of_vertices());
-	EXPECT_EQ(200, g2.number_of_vertices());
-	EXPECT_EQ(200, g3.number_of_vertices());
-	EXPECT_EQ(200, g4.number_of_vertices());
+	EXPECT_EQ(200, g1.num_vertices());
+	EXPECT_EQ(200, g2.num_vertices());
+	EXPECT_EQ(200, g3.num_vertices());
+	EXPECT_EQ(200, g4.num_vertices());
 	//////////////////////////////////////////
 
 	//test number of edges
 	//////////////////////////////////////////
-	EXPECT_EQ(14834,g1.number_of_edges());
-	EXPECT_EQ(9876,g2.number_of_edges());
-	EXPECT_EQ(12048,g3.number_of_edges());
-	EXPECT_EQ(13089,g4.number_of_edges());
+	EXPECT_EQ(14834,g1.num_edges());
+	EXPECT_EQ(9876,g2.num_edges());
+	EXPECT_EQ(12048,g3.num_edges());
+	EXPECT_EQ(13089,g4.num_edges());
 	//////////////////////////////////////////
 		
 	//test names 
@@ -60,8 +60,8 @@ TEST(Ugraph, read_dimacs) {
 	ugraph ug(PATH_GRAPH_TESTS_CMAKE_SRC_CODE "dimacs_format_graph.clq");
 		
 	//////////////////////////////////////////
-	EXPECT_EQ(5, ug.number_of_vertices());
-	EXPECT_EQ(4, ug.number_of_edges());
+	EXPECT_EQ(5, ug.num_vertices());
+	EXPECT_EQ(4, ug.num_edges());
 	/////////////////////////////////////////
 }
 
@@ -138,7 +138,7 @@ TEST(Ugraph, equal_toy) {
 	//////////
 
 	//////////////////////////////////////////////
-	EXPECT_EQ	(7, g1.number_of_vertices());
+	EXPECT_EQ	(7, g1.num_vertices());
 	EXPECT_TRUE	(g1.is_edge(0, 1));
 	EXPECT_TRUE	(g1.is_edge(1, 2));
 	EXPECT_TRUE	(g1.is_edge(2, 3));
@@ -155,15 +155,15 @@ TEST(Ugraph, degree) {
 	string path = PATH_GRAPH_TESTS_CMAKE_SRC_CODE;
 	ugraph g(path + "sample.clq");
 
-	EXPECT_EQ	(7, g.number_of_vertices());
-	EXPECT_EQ	(11, g.number_of_edges());
+	EXPECT_EQ	(7, g.num_vertices());
+	EXPECT_EQ	(11, g.num_edges());
 	
 	/////////////////////////////
 	EXPECT_EQ	( 3, g.degree(1) );
 	/////////////////////////////
 	
 	//define a subset of vertices
-	bitarray bbset	(g.number_of_vertices());
+	bitarray bbset	(g.num_vertices());
 	bbset.set_bit	(0);
 	bbset.set_bit	(1);
 	bbset.set_bit	(6);
@@ -208,15 +208,15 @@ TEST(Ugraph, degree_dimacs) {
 	ugraph g(path + "brock200_1.clq");
 
 
-	EXPECT_EQ		(200, g.number_of_vertices());
-	EXPECT_EQ		(14834, g.number_of_edges());
+	EXPECT_EQ		(200, g.num_vertices());
+	EXPECT_EQ		(14834, g.num_edges());
 
 	///////////////////////////////////////////
 	EXPECT_FALSE(g.is_edge(0, 1));								//(1)	
 	///////////////////////////////////////////
 
 	//define a subset of vertices
-	bitarray bbset (g.number_of_vertices());
+	bitarray bbset (g.num_vertices());
 	bbset.set_bit(0);
 	bbset.set_bit(1);
 
@@ -225,7 +225,7 @@ TEST(Ugraph, degree_dimacs) {
 	///////////////////////////////////////////
 
 	//set of all vertices
-	bbset.set_bit(0, g.number_of_vertices() - 1);
+	bbset.set_bit(0, g.num_vertices() - 1);
 
 	//////////////////////////////////////////////
 	EXPECT_EQ(g.degree(1), g.degree(1, bbset));
@@ -246,7 +246,7 @@ TEST(Ugraph, max_subgraph_degree) {
 	g.add_edge(79, 80);
 
 	//induced subgraph by {0, 1, 2, 3}
-	bitarray bbset(g.number_of_vertices());
+	bitarray bbset(g.num_vertices());
 	bbset.set_bit(0, 3);
 	EXPECT_EQ(3, g.max_subgraph_degree(bbset));		
 
@@ -270,8 +270,8 @@ TEST(Ugraph, density_sample) {
 	const int NVexp = 7;
 	const int NEexp = 11;
 
-	auto NV = ug.number_of_vertices();
-	auto NE = ug.number_of_edges();
+	auto NV = ug.num_vertices();
+	auto NE = ug.num_edges();
 
 	//////////////////////
 	EXPECT_EQ(NEexp, NE);
@@ -295,8 +295,8 @@ TEST(Ugraph, density_brock) {
 	const int NVexp = 200;
 	const int NEexp = 14834;
 	
-	auto NV = ug.number_of_vertices();
-	auto NE = ug.number_of_edges();
+	auto NV = ug.num_vertices();
+	auto NE = ug.num_edges();
 	
 	//////////////////////
 	EXPECT_EQ(NEexp, NE);
@@ -335,8 +335,8 @@ TEST(Ugraph, create_subgraph) {
 
 	////////////////////////////////
 	ASSERT_EQ	(0, status);
-	EXPECT_EQ	(4, ugi.number_of_vertices());
-	EXPECT_EQ	(2, ugi.number_of_edges(true));
+	EXPECT_EQ	(4, ugi.num_vertices());
+	EXPECT_EQ	(2, ugi.num_edges(true));
 	EXPECT_TRUE	(ugi.is_edge(0,1));					//edge (2,3)
 	EXPECT_TRUE	(ugi.is_edge(2,3));					//edge (5,6)
 	////////////////////////////////
@@ -347,8 +347,8 @@ TEST(Ugraph, create_subgraph) {
 
 	////////////////////////////////
 	ASSERT_EQ	(0, status);
-	EXPECT_EQ	(2, ugi.number_of_vertices());
-	EXPECT_EQ	(0, ugi.number_of_edges(true));
+	EXPECT_EQ	(2, ugi.num_vertices());
+	EXPECT_EQ	(0, ugi.num_edges(true));
 	////////////////////////////////
 
 }
@@ -372,7 +372,7 @@ TEST(Ugraph, complement_graph){
 	EXPECT_TRUE	(cg.is_edge(2,3));
 	EXPECT_FALSE(cg.is_edge(0, 1));
 	EXPECT_FALSE(cg.is_edge(1, 2));
-	EXPECT_EQ	(g.number_of_vertices(), cg.number_of_vertices());
+	EXPECT_EQ	(g.num_vertices(), cg.num_vertices());
 	////////////////////////////////
 
 }
@@ -393,7 +393,7 @@ TEST(Ugraph, remove_edges){
 	EXPECT_FALSE( g.is_edge(1, 2) );
 	EXPECT_FALSE( g.is_edge(1, 3) );
 	EXPECT_FALSE( g.is_edge(0, 1) );
-	EXPECT_EQ	(1, g.number_of_edges());		//edge {0, 2}
+	EXPECT_EQ	(1, g.num_edges());		//edge {0, 2}
 	////////////////////////////////
 
 }
@@ -489,8 +489,8 @@ TEST(Ugraph, DISABLED_add_vertex_multiple) {
 
 /////////////////
 //TESTS
-	EXPECT_EQ(g.number_of_vertices(), NV + 3);
-	EXPECT_EQ(g.number_of_edges(false), 4 + 6);
+	EXPECT_EQ(g.num_vertices(), NV + 3);
+	EXPECT_EQ(g.num_edges(false), 4 + 6);
 
 	int v = NV;
 	EXPECT_TRUE(g.is_edge(v, 0));
@@ -546,8 +546,8 @@ TEST(Ugraph, DISABLED_add_single_vertex) {
 	/////////////////
 	//TESTS
 	int v = NV;
-	EXPECT_EQ(g.number_of_vertices(), NV + 1);
-	EXPECT_EQ(g.number_of_edges(false), 4 + 2);
+	EXPECT_EQ(g.num_vertices(), NV + 1);
+	EXPECT_EQ(g.num_edges(false), 4 + 2);
 	EXPECT_TRUE(g.is_edge(v, 0));
 	EXPECT_TRUE(g.is_edge(v, 3));
 	EXPECT_FALSE(g.is_edge(v, 1));
@@ -556,8 +556,8 @@ TEST(Ugraph, DISABLED_add_single_vertex) {
 	//Extends graph by one vertex with empty neighborhood
 
 		//g.add_vertex();	
-	EXPECT_EQ(g.number_of_vertices(), NV + 2);
-	EXPECT_EQ(g.number_of_edges(false), 4 + 2);
+	EXPECT_EQ(g.num_vertices(), NV + 2);
+	EXPECT_EQ(g.num_edges(false), 4 + 2);
 	v = NV + 1;
 	EXPECT_FALSE(g.is_edge(v, 0));
 
@@ -583,7 +583,7 @@ TEST(Ugraph, DISABLED_add_single_vertex) {
 //	g.add_edge(1,2);
 //	g.add_edge(0,2);
 //	
-//	int nV=g.number_of_vertices();
+//	int nV=g.num_vertices();
 //	EXPECT_DOUBLE_EQ(2.0/(nV*NUM_BB) ,g.block_density());		//around 1/500 of useful bitblocks
 //	
 //	sparse_graph g1(64*NUM_BB);
@@ -599,7 +599,7 @@ TEST(Ugraph, DISABLED_add_single_vertex) {
 //	g2.add_edge(1,2);
 //	g2.add_edge(0,2);
 //
-//	EXPECT_DOUBLE_EQ(3.0/g2.number_of_vertices(), g2.block_density());		
+//	EXPECT_DOUBLE_EQ(3.0/g2.num_vertices(), g2.block_density());		
 //
 //	//spare case
 //	sparse_ugraph g3(4);
@@ -618,14 +618,14 @@ TEST(Ugraph, DISABLED_add_single_vertex) {
 //	bbn.set_bit(0, 3);
 //	g.remove_vertices(bbn);
 //
-//	EXPECT_EQ(3, g.number_of_vertices());		//7-4=3 vertices which form a clique (proper)
-//	EXPECT_EQ(3, g.number_of_edges());
+//	EXPECT_EQ(3, g.num_vertices());		//7-4=3 vertices which form a clique (proper)
+//	EXPECT_EQ(3, g.num_edges());
 //}
 //
 //TEST(Ugraph_test,numberof_edges){
 //	ugraph g("brock200_1.clq");
 //		
-//	EXPECT_EQ(14834, g.number_of_edges());		//7-4=3 vertices which form a clique (proper)
+//	EXPECT_EQ(14834, g.num_edges());		//7-4=3 vertices which form a clique (proper)
 //}
 //
 //TEST(Graph_test, block_density_index){

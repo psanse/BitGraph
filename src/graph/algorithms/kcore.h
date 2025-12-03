@@ -336,7 +336,7 @@ namespace bitgraph {
 	}
 
 	template<class Graph_t>
-	inline KCore<Graph_t>::KCore(Graph_t& g) : g_(g), NV_(g.number_of_vertices()), deg_(NV_), pos_(NV_) {
+	inline KCore<Graph_t>::KCore(Graph_t& g) : g_(g), NV_(g.num_vertices()), deg_(NV_), pos_(NV_) {
 
 		try {
 			ver_.assign(NV_, EMPTY_ELEM);
@@ -349,7 +349,7 @@ namespace bitgraph {
 	}
 
 	template<class Graph_t>
-	inline KCore<Graph_t>::KCore(Graph_t& g, _bbt subg) : g_(g), NV_(g.number_of_vertices()), deg_(NV_), pos_(NV_) {
+	inline KCore<Graph_t>::KCore(Graph_t& g, _bbt subg) : g_(g), NV_(g.num_vertices()), deg_(NV_), pos_(NV_) {
 
 		subg_ = std::move(subg);
 
@@ -365,7 +365,7 @@ namespace bitgraph {
 	}
 
 	template<class Graph_t>
-	inline KCore<Graph_t>::KCore(Graph_t& g, vint set) : g_(g), NV_(g.number_of_vertices()), deg_(NV_), pos_(NV_) {
+	inline KCore<Graph_t>::KCore(Graph_t& g, vint set) : g_(g), NV_(g.num_vertices()), deg_(NV_), pos_(NV_) {
 
 		//builds a  bitset from a vector of vertices (population size NV_)
 		subg_ = _bbt(NV_, set);

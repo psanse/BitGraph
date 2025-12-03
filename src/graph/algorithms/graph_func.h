@@ -55,9 +55,9 @@ namespace bitgraph {
 		int neighbors(const Graph_t& g, int v, typename  Graph_t::_bbt& bbref, vector<int>& lv) {
 
 			lv.clear();
-			lv.reserve(g.number_of_vertices());		//allocates maximum possible size
+			lv.reserve(g.num_vertices());		//allocates maximum possible size
 
-			auto MAXNBB = g.number_of_blocks();
+			auto MAXNBB = g.num_blocks();
 			for (decltype(MAXNBB) nBB = 0; nBB < MAXNBB; ++nBB) {
 
 				//block NBB of the intersection of N(v) and bbref
@@ -92,9 +92,9 @@ namespace bitgraph {
 		int neighbors_after(const Graph_t& g, int v, typename  Graph_t::_bbt& bbref, vector<int>& lv) {
 
 			lv.clear();
-			lv.reserve(g.number_of_vertices());		//allocates maximum possible size
+			lv.reserve(g.num_vertices());		//allocates maximum possible size
 
-			auto MAXNBB = g.number_of_blocks();
+			auto MAXNBB = g.num_blocks();
 
 			//////////////////////////////////////////
 			//first nBB - trimming and decoding
@@ -285,7 +285,7 @@ namespace bitgraph {
 				int deg = 0;
 
 				//determine the degree of each vertex in lv wrt to ref
-				vint ldeg(g.number_of_vertices(), 0);
+				vint ldeg(g.num_vertices(), 0);
 				for (auto v : lv) {
 					deg = 0;
 					for (auto w : lref) {
@@ -327,7 +327,7 @@ namespace bitgraph {
 				//int deg = 0;
 
 				//determine the degree of each vertex in lv wrt to ref
-				vint ldeg(g.number_of_vertices(), 0);
+				vint ldeg(g.num_vertices(), 0);
 				for (auto v : lv) {
 					ldeg[v] = g.degree(v, bbref);
 				}
@@ -697,7 +697,7 @@ namespace bitgraph {
 			typename UEW<W>::_bbt wesum(const UEW<W>& g, bool only_we = false) {
 
 				double total_weight = 0.0;
-				const auto NV = g.number_of_vertices();
+				const auto NV = g.num_vertices();
 
 				for (auto i = 0; i < NV - 1; ++i) {
 					for (auto j = (only_we ? i + 1 : i); j < NV; j++) {

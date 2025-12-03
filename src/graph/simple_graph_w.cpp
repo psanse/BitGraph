@@ -91,7 +91,7 @@ Base_Graph_W<Graph_t, W>::Base_Graph_W(std::string filename){
 template<class Graph_t, class W>
  int Base_Graph_W<Graph_t, W>::set_modulus_weight(int MODE){
 
-	const std::size_t NV = g_.number_of_vertices();
+	const std::size_t NV = g_.num_vertices();
 
 	w_.clear();
 	w_.reserve(NV);
@@ -138,7 +138,7 @@ template <class Graph_t, class W>
 int	Base_Graph_W<Graph_t,W >::set_weight (vector<W>& lw){
 
 	//assert
-	if( g_.number_of_vertices() != lw.size() ){
+	if( g_.num_vertices() != lw.size() ){
 		LOG_ERROR ("bizarre number of weights - Base_Graph_W<Graph_t,W >::set_w");
 		LOG_ERROR ("weights remain unchanged");
 		return -1;
@@ -175,7 +175,7 @@ ostream& Base_Graph_W<Graph_t, W>::write_dimacs(ostream& o) {
 	g_.header_dimacs(o, false);
 		
 	//write DIMACS nodes n <v> <w>
-	const int NV = g_.number_of_vertices();
+	const int NV = g_.num_vertices();
 	for (int v = 0; v < NV; ++v ) {
 		o << "n " << v + 1 << " " << weight(v) << endl;
 	}
@@ -358,7 +358,7 @@ int Base_Graph_W<Graph_t, W>::read_weights(string filename) {
 	LOGG_DEBUG("reading vertex weights from: ", filename, "- Base_Graph_W<Graph_t, W>::read_weights");
 
 	//allocation of memory for weights
-	auto NV = g_.number_of_vertices();
+	auto NV = g_.num_vertices();
 	w_.clear();
 	w_.reserve(NV);
 
@@ -440,14 +440,14 @@ ostream& Base_Graph_W<Graph_t, W>::print_weights (_bbt& bbsg, ostream& o) const{
 		if(v == EMPTY_ELEM) break;
 		o << "[" << v << ":(" << w_[v] << ")] ";
 	}
-	o << "(" << bbsg.size() << ")" << endl;
+	o << "(" << bbsg.count() << ")" << endl;
 	return o;
 }
 
 template <class Graph_t, class W>
 ostream& Base_Graph_W<Graph_t, W>::print_weights (ostream& o, bool show_v) const{
 
-	const std::size_t NV = g_.number_of_vertices();
+	const std::size_t NV = g_.num_vertices();
 
 	if(show_v){
 		for(auto i = 0u; i < NV; ++i){
@@ -476,7 +476,7 @@ ostream& Graph_W<ugraph, W>::write_dimacs(ostream& o) {
 	ptype::g_.header_dimacs(o, false);
 
 	//write DIMACS nodes n <v> <w>
-	const int NV = ptype::g_.number_of_vertices();
+	const int NV = ptype::g_.num_vertices();
 	for (int v = 0; v < NV; ++v) {
 		o << "n " << v + 1 << " " << ptype::weight(v) << endl;
 	}

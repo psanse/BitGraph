@@ -150,7 +150,7 @@ namespace bitgraph {
 	inline
 		int GraphFastRootSort_W<GraphW_t>::reorder(const vint& new_order, GraphW_t& gn, Decode* d) {
 
-		int NV = gw_.number_of_vertices();
+		int NV = gw_.num_vertices();
 
 		//assigns unit weights(1.0) 	
 		gn.reset(NV, 1.0);

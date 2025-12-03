@@ -115,7 +115,7 @@ TEST_F(BitSetClassTest, reverse_destructive) {
 	}
 
 	EXPECT_TRUE(res == sol);
-	EXPECT_EQ(0, bbN1.size());
+	EXPECT_EQ(0, bbN1.count());
 }
 
 TEST(BitSetClass, construction_val) {
@@ -127,7 +127,7 @@ TEST(BitSetClass, construction_val) {
 	EXPECT_TRUE(bb_1.is_bit(128));	
 	EXPECT_TRUE(bb_1.is_bit(129));		//last bit of the population size
 	EXPECT_FALSE(bb_1.is_bit(130));
-	EXPECT_FALSE(bb_1.is_bit(191));		//last bit of the bitset's capacity
+	EXPECT_FALSE(bb_1.is_bit(191));		//last bit of the bitset's num_blocks
 
 	EXPECT_FALSE(bb_0.is_bit(129));		
 	EXPECT_FALSE(bb_0.is_bit(130));
@@ -142,7 +142,7 @@ TEST(BitSetClass, initializer_list) {
 	EXPECT_TRUE(bb.is_bit(1));
 	EXPECT_TRUE(bb.is_bit(5));		//last bit of the population size
 	EXPECT_TRUE(bb.is_bit(7));
-	EXPECT_EQ(3, bb.size());
+	EXPECT_EQ(3, bb.count());
 }
 
 TEST(BitSetClass, set_bit_basic) {
@@ -172,13 +172,13 @@ TEST(BitSetClass, set_bit_basic) {
 
 	EXPECT_TRUE(bb.is_bit(22));
 	EXPECT_TRUE(bb.is_bit(23));
-	EXPECT_EQ(1, bb.number_of_blocks());
+	EXPECT_EQ(1, bb.num_blocks());
 
 	//copy constructor
 	BitSet bb2(bb);
 	EXPECT_TRUE(bb2.is_bit(22));
 	EXPECT_TRUE(bb2.is_bit(23));
-	EXPECT_EQ(1, bb2.number_of_blocks());
+	EXPECT_EQ(1, bb2.num_blocks());
 }
 
 TEST(BitSetClass, set_bit_range) {
@@ -208,7 +208,7 @@ TEST(BitSetClass, set_bit_range) {
 	EXPECT_TRUE(bb1.is_bit(0));
 
 	bb1.set_bit(55, 56);					//bb1={0...55 56...64}
-	EXPECT_TRUE(bb1.size(4, 130));	
+	EXPECT_TRUE(bb1.count(4, 130));
 	EXPECT_TRUE(bb1.is_bit(0));
 	EXPECT_TRUE(bb1.is_bit(55));
 	EXPECT_TRUE(bb1.is_bit(56));
@@ -217,7 +217,7 @@ TEST(BitSetClass, set_bit_range) {
 	//same range
 	BitSet bb2(130);
 	bb2.set_bit(5, 5);
-	EXPECT_EQ(1, bb2.size());
+	EXPECT_EQ(1, bb2.count());
 	EXPECT_TRUE(bb2.is_bit(5));
 }
 
@@ -234,7 +234,7 @@ TEST(BitSetClass, set_bit_from_another_bitstring) {
 
 	EXPECT_TRUE(bb.is_bit(50));
 	EXPECT_FALSE(bb.is_bit(80));
-	EXPECT_EQ(1, bb.size());
+	EXPECT_EQ(1, bb.count());
 }
 
 TEST(BitSetClass, boolean_disjoint){
@@ -335,7 +335,7 @@ TEST(BitSetClass, erase_bit_range){
 	/////////////////////
 
 	EXPECT_FALSE(bb.is_bit(5));
-	EXPECT_EQ(129, bb.size());
+	EXPECT_EQ(129, bb.count());
 }
 
 TEST(BitSetClass, erase_bit_union){
@@ -356,7 +356,7 @@ TEST(BitSetClass, erase_bit_union){
 	//////////////////////////
 
 	EXPECT_TRUE(bb.is_bit(64));
-	EXPECT_EQ(1,bb.size());
+	EXPECT_EQ(1,bb.count());
 }
 
 TEST(BitSetClass, population_count){
@@ -366,15 +366,15 @@ TEST(BitSetClass, population_count){
 	bb.set_bit(20);
 	bb.set_bit(64);
 
-	EXPECT_EQ(3, bb.size());
-	EXPECT_EQ(2, bb.size(11, 130));
-	EXPECT_EQ(1, bb.size(21, 130));
-	EXPECT_EQ(0, bb.size(65, 130));
-	EXPECT_EQ(1, bb.size(64, 130));
+	EXPECT_EQ(3, bb.count());
+	EXPECT_EQ(2, bb.count(11, 130));
+	EXPECT_EQ(1, bb.count(21, 130));
+	EXPECT_EQ(0, bb.count(65, 130));
+	EXPECT_EQ(1, bb.count(64, 130));
 
 	//same bit index
-	EXPECT_EQ(1, bb.size(10, 10));
-	EXPECT_EQ(1, bb.size(20, 20));
+	EXPECT_EQ(1, bb.count(10, 10));
+	EXPECT_EQ(1, bb.count(20, 20));
 
 }
 
@@ -466,13 +466,13 @@ TEST(BitSetClass, vector_operations) {
 	//construction from vector and popsize (12/11/16)
 	lv = {10, 20};
 	BitSet bbN3(POPULATION_SIZE, lv);
-	EXPECT_EQ(2,bbN3.size());
+	EXPECT_EQ(2,bbN3.count());
 	EXPECT_TRUE(bbN3.is_bit(10));
 	EXPECT_TRUE(bbN3.is_bit(20));
 
 	//bitstring with population size 20 
 	BitSet bbN4(21, lv);						//vector element 20 will not make part of the bitstring
-	EXPECT_EQ(2, bbN4.size());
+	EXPECT_EQ(2, bbN4.count());
 	EXPECT_TRUE(bbN4.is_bit(10));
 	EXPECT_TRUE(bbN4.is_bit(20));
 
@@ -484,7 +484,7 @@ TEST(BitSetClass, vector_operations) {
 	BitSet bbN5(100);						//max population size 100						
 	bbN5.set_bit(lv);
 
-	EXPECT_EQ(4, bbN5.size());
+	EXPECT_EQ(4, bbN5.count());
 	EXPECT_TRUE(bbN5.is_bit(10));
 	EXPECT_TRUE(bbN5.is_bit(19));
 	EXPECT_TRUE(bbN5.is_bit(45));
@@ -500,7 +500,7 @@ TEST(BitSetClass, conversion_to_vector) {
 	bb1.set_bit(0,24);
 
 	//////////////////////////////
-	EXPECT_EQ(25, bb1.size());
+	EXPECT_EQ(25, bb1.count());
 	//////////////////////////////
 
 	vector<int> lv_exp(25,0);	
@@ -569,7 +569,7 @@ TEST(BitSetClass, erase_block) {
 	bb.erase_block(0, -1, bb1);			//bb={49}
 	EXPECT_FALSE(bb.is_bit(50));
 	EXPECT_TRUE(bb.is_bit(49));
-	EXPECT_EQ(1, bb.size());
+	EXPECT_EQ(1, bb.count());
 
 }
 
@@ -578,7 +578,7 @@ TEST_F(BitSetClassTest_1, erase_block_2) {
 	BitSet bbres(130);
 
 	bb.erase_block(2, 2, bb1);		//nothing deleted
-	EXPECT_EQ(3, bb.size());
+	EXPECT_EQ(3, bb.count());
 
 	bb.erase_block(1, 1, bb1);		//nothing deleted
 	EXPECT_TRUE(bb.is_bit(10));
@@ -587,7 +587,7 @@ TEST_F(BitSetClassTest_1, erase_block_2) {
 	EXPECT_FALSE(bb.is_bit(100));
 
 	bb.erase_block(0, 2, bb1);		//nothing deleted
-	EXPECT_EQ(1, bb.size());
+	EXPECT_EQ(1, bb.count());
 }
 
 TEST(BitSetClass, find_single_bit_intersection){
@@ -714,19 +714,19 @@ TEST(BitSetClass, AND) {
 	AND(bb, bb1, bbresAND);
 	EXPECT_TRUE(bbresAND.is_bit(10));
 	EXPECT_TRUE(bbresAND.is_bit(64));
-	EXPECT_EQ(2, bbresAND.size());
+	EXPECT_EQ(2, bbresAND.count());
 
 	//AND bit-range [10, 63], bits to 0 outside the range
 	AND<true>(10, 63, bb, bb1, bbresAND);				//bbresAND={10}
 	EXPECT_TRUE(bbresAND.is_bit(10));
-	EXPECT_EQ(1, bbresAND.size());
+	EXPECT_EQ(1, bbresAND.count());
 	
 	//AND bit-range [10, 63], preserving bits outside the range
 	bbresAND.set_bit(100);								//sets a bit outside the range [10, 63]
 	AND<false> (10, 63, bb, bb1, bbresAND);				//bbresAND={10, 100}
 	EXPECT_TRUE(bbresAND.is_bit(10));
 	EXPECT_TRUE(bbresAND.is_bit(100));
-	EXPECT_EQ(2, bbresAND.size());
+	EXPECT_EQ(2, bbresAND.count());
 
 }
 
@@ -746,7 +746,7 @@ TEST(BitSetClass, AND_by_blocks) {
 	BitSet bbresAND = AND_block(2, 2, bb, bb1);
 
 	////////////////////////////////
-	EXPECT_EQ(0, bbresAND.size());
+	EXPECT_EQ(0, bbresAND.count());
 	////////////////////////////////
 
 	//bbresAND = {3}
@@ -755,12 +755,12 @@ TEST(BitSetClass, AND_by_blocks) {
 
 	//AND of third block - rest of bits NOT removed
 	AND_block<false>(2, 2, bb, bb1, bbresAND);					//resAND = {3}, since the first two blocks remain the same
-	EXPECT_EQ(1, bbresAND.size());
+	EXPECT_EQ(1, bbresAND.count());
 	EXPECT_TRUE(bbresAND.is_bit(3));
 
 	//AND of third block - rest of bits are removed
 	AND_block<true>(1, 2, bb, bb1, bbresAND);					//bbresAND={64}, 64 is the only bit in the range of blocks
-	EXPECT_EQ(1, bbresAND.size());
+	EXPECT_EQ(1, bbresAND.count());
 	EXPECT_TRUE(bbresAND.is_bit(64));
 }
 
@@ -781,9 +781,9 @@ TEST(BitSetClass, AND_with_allocation) {
 	BitSet bbresAND  =  AND(bb, bb1);
 	EXPECT_TRUE(bbresAND.is_bit(10));
 	EXPECT_TRUE(bbresAND.is_bit(64));
-	EXPECT_EQ(2, bbresAND.size());
-	EXPECT_EQ(3, bbresAND.capacity());									//capacity = number of bitblocks	
-	EXPECT_EQ(3, bbresAND.number_of_blocks());
+	EXPECT_EQ(2, bbresAND.count());
+	EXPECT_EQ(3, bbresAND.num_blocks());									
+	EXPECT_EQ(3, bbresAND.num_blocks());
 
 }
 
@@ -806,7 +806,7 @@ TEST(BitSetClass, OR) {
 	EXPECT_TRUE(bbresOR.is_bit(20));
 	EXPECT_TRUE(bbresOR.is_bit(64));
 	EXPECT_TRUE(bbresOR.is_bit(100));
-	EXPECT_EQ(4, bbresOR.size());
+	EXPECT_EQ(4, bbresOR.count());
 
 	//OR bit-range [10, 20], preserving bits outside the range							
 	OR<false>(10, 20, bb, bb1, bbresOR);			//bbresOR={10, 20, 64, 100}		
@@ -814,13 +814,13 @@ TEST(BitSetClass, OR) {
 	EXPECT_TRUE(bbresOR.is_bit(20));
 	EXPECT_TRUE(bbresOR.is_bit(64));
 	EXPECT_TRUE(bbresOR.is_bit(100));
-	EXPECT_EQ(4, bbresOR.size());
+	EXPECT_EQ(4, bbresOR.count());
 
 	//OR bit-range [10, 20], setting to 0 bits outside the range
 	OR<true>(10, 20, bb, bb1, bbresOR);				//bbresOR={10, 20}
 	EXPECT_TRUE(bbresOR.is_bit(10));
 	EXPECT_TRUE(bbresOR.is_bit(20));
-	EXPECT_EQ(2, bbresOR.size());
+	EXPECT_EQ(2, bbresOR.count());
 }
 
 TEST(BitSetClass, OR_by_blocks) {
@@ -841,7 +841,7 @@ TEST(BitSetClass, OR_by_blocks) {
 	////////////////////////////////
 	EXPECT_TRUE(bbresOR.is_bit(64));
 	EXPECT_TRUE(bbresOR.is_bit(100));
-	EXPECT_EQ(2, bbresOR.size());
+	EXPECT_EQ(2, bbresOR.count());
 	////////////////////////////////
 		
 	//adds bit 129
@@ -852,12 +852,12 @@ TEST(BitSetClass, OR_by_blocks) {
 	EXPECT_TRUE(bbresOR.is_bit(64));
 	EXPECT_TRUE(bbresOR.is_bit(100));
 	EXPECT_TRUE(bbresOR.is_bit(129));
-	EXPECT_EQ(3, bbresOR.size());
+	EXPECT_EQ(3, bbresOR.count());
 	
 	//OR setting a bitset - rest of bits ARE removed
 	OR_block<true>(2, 2, bb, bb1, bbresOR);					//bbresAND={129}, {64, 100} are removed, since they are outside the block range
 	EXPECT_TRUE(bbresOR.is_bit(129));
-	EXPECT_EQ(1, bbresOR.size());
+	EXPECT_EQ(1, bbresOR.count());
 }
 
 TEST(BitSetClass, set_bits) {
@@ -908,7 +908,7 @@ TEST_F(BitSetClassTest_1, erase_bit_stateless) {
 	///////////////////////////////
 
 	EXPECT_TRUE	(bbERASE.is_bit(20));
-	EXPECT_EQ	(1, bbERASE.size());
+	EXPECT_EQ	(1, bbERASE.count());
 
 }
 
@@ -940,7 +940,7 @@ TEST_F(BitSetClassTest_1, operators) {
 
 	EXPECT_TRUE(bb.is_bit(10));
 	EXPECT_TRUE(bb.is_bit(64));
-	EXPECT_EQ(2, bb.size());
+	EXPECT_EQ(2, bb.count());
 
 	////////////////////////////////
 	bb.AND_EQUAL_block(1, 1, bb1);		//bb={10, 64}
@@ -948,13 +948,13 @@ TEST_F(BitSetClassTest_1, operators) {
 
 	EXPECT_TRUE	(bb.is_bit(10));
 	EXPECT_TRUE	(bb.is_bit(64));
-	EXPECT_EQ	(2, bb.size());
+	EXPECT_EQ	(2, bb.count());
 
 	/////////////
 	bb |= bb1;			//bb={10, 64, 100}
 	/////////////
 
-	EXPECT_EQ(3, bb.size());
+	EXPECT_EQ(3, bb.count());
 	EXPECT_TRUE(bb.is_bit(10));
 	EXPECT_TRUE(bb.is_bit(64));
 	EXPECT_TRUE(bb.is_bit(100));
@@ -977,7 +977,7 @@ TEST(BitSetClass, make_bitset_empty) {
 TEST(BitSetClass, make_bitset_full) {
 
 	BitSet bb = bitgraph::make_bitset_full(130);
-	EXPECT_EQ(bb.size(), 130u);
+	EXPECT_EQ(bb.count(), 130u);
 	EXPECT_EQ(bb.lsb(), 0u);
 	EXPECT_EQ(bb.msb(), 129u);
 
@@ -989,7 +989,7 @@ TEST(BitSetClass, make_bitset_from) {
 	BitSet bb = bitgraph::make_bitset_from(130, lv.begin(), lv.end());			//all
 
 	//130 is out of range
-	EXPECT_EQ(bb.size(), 3);
+	EXPECT_EQ(bb.count(), 3);
 	EXPECT_TRUE(bb.is_bit(10));
 	EXPECT_TRUE(bb.is_bit(20));
 	EXPECT_TRUE(bb.is_bit(64));

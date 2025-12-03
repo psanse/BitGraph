@@ -76,26 +76,30 @@ namespace bitgraph {
 			/////////////
 			// setters and getters
 
-				/**
-				* @brief Sets instance name.
-				* @param instance name of instance
-				* @details: Separates path and instance name internally (if applicable)
-				**/
+			/**
+			* @brief Sets instance name.
+			* @param instance name of instance
+			* @details: Separates path and instance name internally (if applicable)
+			**/
 			void name(std::string instance);
 			std::string name()					const { return name_; }
 
 			void path(std::string path_name) { path_ = std::move(path_name); }
 			std::string path()					const { return path_; }
 
-			std::size_t number_of_vertices()	const { return NV_; }
-			std::size_t size()					const { return NV_; }
+			/**
+			* @brief number of vertices of the graph. Alias to num_vertices()
+			**/
+			std::size_t size()					const { return num_vertices(); }
+			std::size_t num_vertices()			const { return NV_; }
+			
 
 			/**
 			* @brief number of bitblocks in each bitset (row) of the adjacency matriz
 			*		 In the case of sparse graphs, the value is the maximum capacity
 			*		 of all bitsets.
 			**/
-			std::size_t number_of_blocks()					const { return NBB_; }
+			std::size_t num_blocks()			const { return NBB_; }
 
 			/*
 			* @brief Counts the number of edges	(includes self loops)
@@ -106,17 +110,17 @@ namespace bitgraph {
 			*			  if FALSE counts and updates @NE_
 			* @returns number of edges
 			*/
-			virtual	BITBOARD number_of_edges(bool lazy = true);
+			virtual	BITBOARD num_edges(bool lazy = true);
 
 			/**
 			* @brief Counts the number of edges	in an induced subgraph by a set of vertices
 			* @param set input bitset of vertices that induces the subgraph
 			* @returns number of edges
 			**/
-			virtual	BITBOARD number_of_edges(const BitSetT& set)	const;
+			virtual	BITBOARD num_edges(const BitSetT& set)	const;
 
-			const vector<BitSetT>& adjacency_matrix()					const { return adj_; }
-			const BitSetT& neighbors(int v)				const { return adj_[v]; }
+			const vector<BitSetT>& adjacency_matrix()		const { return adj_; }
+			const BitSetT& neighbors(int v)					const { return adj_[v]; }
 			BitSetT& neighbors(int v) { return adj_[v]; }
 
 			//////////////////////////
@@ -401,7 +405,7 @@ namespace bitgraph {
 			/**
 			* @brief prints basic data of the graph to the output stream (n, m and density)
 			* @param lazy if TRUE, reads the number of edges from the cached value @NE_ to compute density
-			* @details Uses the Template Method Pattern (number_of_edges will be overriden in derived classes)
+			* @details Uses the Template Method Pattern (num_edges will be overriden in derived classes)
 			* @details Density can be a heavy operation to compute, since it requires the number of edges.
 			*		   If  @lazy is TRUE the number of edges is read from the cached value @NE_
 			**/
@@ -429,9 +433,9 @@ namespace bitgraph {
 			// data members
 		protected:
 			std::vector<BitSetT> adj_;		//adjacency matrix 
-			std::size_t NV_;				//number of vertices
-			BITBOARD NE_;					//number of edges (updated on the fly)
-			std::size_t NBB_;				//number of bit blocks per row (in the case of sparse graphs this is a maximum value)
+			int NV_;						//number of vertices
+			BITBOARD NE_;					//number of edges (can be very large)
+			int NBB_;						//number of bit blocks per row (in the case of sparse graphs this is a maximum value)
 
 			//names
 			std::string name_;				//name of instance, without path	
@@ -472,7 +476,7 @@ namespace bitgraph {
 	template <class U>
 	inline
 		double Graph<BitSetT>::density(const U& bbN) {
-		BITBOARD  edges = number_of_edges(bbN);
+		BITBOARD  edges = num_edges(bbN);
 		if (edges == 0) { return 0.0; }
 
 		BITBOARD  pc = bbN.popcn64();
@@ -792,7 +796,7 @@ namespace bitgraph {
 	template<class BitSetT>
 	inline
 		std::ostream& Graph<BitSetT>::header_dimacs(std::ostream& o, bool lazy) {
-		o << "p edge " << NV_ << " " << number_of_edges(lazy) << endl << endl;
+		o << "p edge " << NV_ << " " << num_edges(lazy) << endl << endl;
 		return o;
 	}
 
@@ -914,8 +918,8 @@ namespace bitgraph {
 		if (!name_.empty()) { o << name_.c_str() << '\t'; }
 
 		////////////////////////////////////////////////////////////////
-		o << "n:= " << number_of_vertices() << "\t"
-			<< std::fixed << "m:= " << number_of_edges(lazy) << "\t"
+		o << "n:= " << num_vertices() << "\t"
+			<< std::fixed << "m:= " << num_edges(lazy) << "\t"
 			<< std::setprecision(3) << "p:= " << density(true);
 		////////////////////////////////////////////////////////////////
 
@@ -950,7 +954,7 @@ namespace bitgraph {
 
 	template<class BitSetT>
 	inline
-		BITBOARD Graph<BitSetT>::number_of_edges(const BitSetT& bbn) const {
+		BITBOARD Graph<BitSetT>::num_edges(const BitSetT& bbn) const {
 
 		BITBOARD NE = 0;
 
@@ -969,12 +973,12 @@ namespace bitgraph {
 
 	template<class BitSetT>
 	inline
-		BITBOARD Graph<BitSetT>::number_of_edges(bool lazy) {
+		BITBOARD Graph<BitSetT>::num_edges(bool lazy) {
 
 		if (!lazy || NE_ == 0) {					//no lazy evaluation if NE_ = 0
 			NE_ = 0;
 			for (auto i = 0u; i < NV_; i++) {
-				NE_ += adj_[i].size();
+				NE_ += adj_[i].count();
 			}
 		}
 
@@ -986,7 +990,7 @@ namespace bitgraph {
 		double Graph<BitSetT>::density(bool lazy) {
 		BITBOARD max_edges = NV_;								//type MUST BE for very large graphs as (I) is bigger than unsigned int
 		max_edges *= (max_edges - 1);							//(I)
-		return (number_of_edges(lazy) / (double)max_edges);		//n*(n-1) edges (since it is a directed graph))
+		return (num_edges(lazy) / (double)max_edges);		//n*(n-1) edges (since it is a directed graph))
 	}
 
 	template<class BitSetT>
@@ -1301,8 +1305,8 @@ namespace bitgraph {
 		std::size_t nBBt = 0;							//number of allocated bitblocks (all should be non-empty in the sparse case)
 
 		for (std::size_t v = 0; v < NV_; ++v) {
-			nBBt += adj_[v].number_of_blocks();
-			for (auto bb = 0; bb < adj_[v].number_of_blocks(); bb++) {
+			nBBt += adj_[v].size();
+			for (auto bb = 0; bb < adj_[v].size(); bb++) {
 				if (adj_[v].block(bb)) {
 					nBB++;								//nBB should be equal to nBBt
 				}
@@ -1320,7 +1324,7 @@ namespace bitgraph {
 
 		//number of allocated blocks
 		for (std::size_t v = 0; v < NV_; ++v) {
-			nBBt += adj_[v].number_of_blocks();
+			nBBt += adj_[v].size();
 		}
 
 		BITBOARD aux = ceil(NV_ / double(WORD_SIZE));
@@ -1338,9 +1342,9 @@ namespace bitgraph {
 		double den = 0.0;
 
 		for (std::size_t i = 0; i < NV_; ++i) {
-			nBB = adj_[i].number_of_blocks();
+			nBB = adj_[i].size();
 			nBBt += nBB;
-			den += static_cast<double>(adj_[i].size()) /
+			den += static_cast<double>(adj_[i].count()) /
 				(BITBOARD(nBB) * WORD_SIZE);
 		}
 

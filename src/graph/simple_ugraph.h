@@ -81,12 +81,12 @@ namespace bitgraph {
 			* @param lazy if TRUE (reads value @NE_)
 			*			  if FALSE counts and updates @NE_
 			**/
-			BITBOARD number_of_edges(bool lazy = true)						  override;
+			BITBOARD num_edges(bool lazy = true)						  override;
 
 			/**
 			* @brief Counts the number of edges	in an induced subgraph by a set of vertices
 			**/
-			BITBOARD number_of_edges(const BitSetT&) 								const override;
+			BITBOARD num_edges(const BitSetT&) 								const override;
 
 			/////////////
 			// Basic operations
@@ -114,7 +114,7 @@ namespace bitgraph {
 			/**
 			* @brief Computes the number of neighbors of v (deg(v))	*
 			**/
-			int degree(int v)									const { return (int)ptype::adj_[v].size(); }
+			int degree(int v)									const { return (int)ptype::adj_[v].count(); }
 
 			/**
 			*  @brief number of neighbors of v in a set of vertices
@@ -489,19 +489,19 @@ namespace bitgraph {
 
 	template<class BitSetT>
 	inline
-		BITBOARD Ugraph<BitSetT>::number_of_edges(bool lazy ) {
+		BITBOARD Ugraph<BitSetT>::num_edges(bool lazy ) {
 
 		if (!lazy || ptype::NE_ == 0) {
 			ptype::NE_ = 0;
 
 			//adds all edges and divides by 2 for efficiency - checks for self loops	
 			for (std::size_t i = 0; i < ptype::NV_; i++) {
-				ptype::NE_ += ptype::adj_[i].size();
+				ptype::NE_ += ptype::adj_[i].count();
 			}
 
 			//////////////////////////////
 			if (ptype::NE_ % 2 != 0) {
-				LOG_ERROR("odd number of edges found in simple undirected graph - Ugraph<BitSetT>::number_of_edges");
+				LOG_ERROR("odd number of edges found in simple undirected graph - Ugraph<BitSetT>::num_edges");
 				LOG_ERROR("exiting...");
 				exit(-1);
 			}
@@ -515,7 +515,7 @@ namespace bitgraph {
 
 	template<class BitSetT>
 	inline
-		BITBOARD Ugraph<BitSetT>::number_of_edges(const BitSetT& bbn) const {
+		BITBOARD Ugraph<BitSetT>::num_edges(const BitSetT& bbn) const {
 		BITBOARD NE = 0;
 
 		//reads only the upper triangle of the adjacency matrix
@@ -644,7 +644,7 @@ namespace bitgraph {
 
 		BITBOARD max_edges = ptype::NV_;
 		max_edges *= (max_edges - 1);
-		return (2 * number_of_edges(lazy) / static_cast<double> (max_edges));
+		return (2 * num_edges(lazy) / static_cast<double> (max_edges));
 	}
 
 	template<class BitSetT>
@@ -704,7 +704,7 @@ namespace bitgraph {
 			o << "c " << ptype::name_.c_str() << endl;
 
 		//dimacs header
-		o << "p edge " << ptype::NV_ << " " << number_of_edges(false /* recompute */) << endl << endl;
+		o << "p edge " << ptype::NV_ << " " << num_edges(false /* recompute */) << endl << endl;
 
 		//bidirectional edges (1 based in dimacs)
 		for (std::size_t v = 0; v < ptype::NV_ - 1; ++v) {
@@ -753,7 +753,7 @@ namespace bitgraph {
 
 		//number of vertices and edges
 		ptype::NE_ = 0;																			//eliminates lazy evaluation of edge count 
-		o << ptype::NV_ << " " << ptype::NV_ << " " << number_of_edges() << endl;
+		o << ptype::NV_ << " " << ptype::NV_ << " " << num_edges() << endl;
 
 		//writes edges 1-based vertex notation
 		for (auto v = 0; v < ptype::NV_ - 1; ++v) {
@@ -893,7 +893,7 @@ namespace bitgraph {
 
 	template<>
 	inline
-		bitgraph::BITBOARD USS::number_of_edges(bool lazy) {
+		bitgraph::BITBOARD USS::num_edges(bool lazy) {
 
 		if (lazy || ptype::NE_ == 0) {
 
@@ -901,7 +901,7 @@ namespace bitgraph {
 			for (auto i = 0u; i < ptype::NV_ - 1; i++) {
 
 				//popuation count from i + 1 onwards
-				ptype::NE_ += adj_[i].size(i + 1, -1);
+				ptype::NE_ += adj_[i].count(i + 1, -1);
 			}
 		}
 
@@ -944,7 +944,7 @@ namespace bitgraph {
 
 		if (Graph<sparse_bitarray>::adj_[v].is_empty()) return 0;
 
-		return Graph<sparse_bitarray>::adj_[v].size();
+		return Graph<sparse_bitarray>::adj_[v].count();
 	}
 
 	template<>
@@ -1039,7 +1039,7 @@ namespace bitgraph {
 			o << "c " << this->name_.c_str() << endl;
 
 		//tamaño del grafo
-		o << "p edge " << this->NV_ << " " << number_of_edges() << endl << endl;
+		o << "p edge " << this->NV_ << " " << num_edges() << endl << endl;
 
 		//Escribir nodos
 		for (auto v = 0u; v < this->NV_ - 1; v++) {
@@ -1136,7 +1136,7 @@ namespace bitgraph {
 
 		//size and edges
 		NE_ = 0;																	//eliminates lazy evaluation of edge count 
-		o << this->NV_ << " " << this->NV_ << " " << number_of_edges() << endl;
+		o << this->NV_ << " " << this->NV_ << " " << num_edges() << endl;
 
 		//writes edges
 		for (auto v = 0u; v < this->NV_ - 1; v++) {

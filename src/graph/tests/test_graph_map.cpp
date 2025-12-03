@@ -175,7 +175,7 @@ TEST_F(GraphMapTest, mapBetweenBitsets_2orderings) {
 	gm.build_mapping< GraphSort>(ug, GraphSort::MAX, GraphSort::FIRST_TO_LAST,
 									 GraphSort::MIN, GraphSort::FIRST_TO_LAST, "MAX F2L", "MIN F2L");
 
-	auto NV = ug.number_of_vertices();
+	auto NV = ug.num_vertices();
 
 			
 	ugraph::_bbt bbl(static_cast<int>(NV));			//left bitset
@@ -192,7 +192,7 @@ TEST_F(GraphMapTest, mapBetweenBitsets_2orderings) {
 	//check right bitset
 	EXPECT_TRUE(bbr.is_bit(3));
 	EXPECT_TRUE(bbr.is_bit(1));
-	EXPECT_EQ(2, bbr.size());
+	EXPECT_EQ(2, bbr.count());
 
 	//set bits in right bitset
 	bbr.erase_bit();
@@ -203,7 +203,7 @@ TEST_F(GraphMapTest, mapBetweenBitsets_2orderings) {
 	//check left bitset
 	EXPECT_TRUE(bbl.is_bit(3));
 	EXPECT_TRUE(bbl.is_bit(1));
-	EXPECT_EQ(2, bbl.size());
+	EXPECT_EQ(2, bbl.count());
 }
 
 
@@ -216,7 +216,7 @@ TEST_F(GraphMapTest, mapBetweenBitsets_single_ordering) {
 	GraphMap gm;
 	gm.build_mapping< GraphSort >(ug, GraphSort::MIN, GraphSort::FIRST_TO_LAST, "MIN_DEG");
 
-	auto NV = ug.number_of_vertices();
+	auto NV = ug.num_vertices();
 
 	ugraph::_bbt bbl(static_cast<int>(NV));			//left bitset
 	ugraph::_bbt bbr(static_cast<int>(NV));			//right bitset
@@ -232,7 +232,7 @@ TEST_F(GraphMapTest, mapBetweenBitsets_single_ordering) {
 	//check right bitset
 	EXPECT_TRUE(bbr.is_bit(0));
 	EXPECT_TRUE(bbr.is_bit(1));
-	EXPECT_EQ(2, bbr.size());
+	EXPECT_EQ(2, bbr.count());
 
 	//set bits in right bitset
 	bbr.erase_bit();
@@ -243,7 +243,7 @@ TEST_F(GraphMapTest, mapBetweenBitsets_single_ordering) {
 	//check left bitset
 	EXPECT_TRUE(bbl.is_bit(3));
 	EXPECT_TRUE(bbl.is_bit(2));
-	EXPECT_EQ(2, bbl.size());
+	EXPECT_EQ(2, bbl.count());
 }
 
 
@@ -321,8 +321,8 @@ TEST_F(GraphMapTest, mapBetweenBitsets_single_ordering) {
 //		gbbs::sort_t::MAX_WEIGHT, gbbs::place_t::PLACE_FL, "MIN_DEG", "MAX_W");
 //
 //
-//	bitarray bbl(ug.number_of_vertices());
-//	bitarray bbr(ug.number_of_vertices());
+//	bitarray bbl(ug.num_vertices());
+//	bitarray bbr(ug.num_vertices());
 //	bbl.set_bit(0); bbl.set_bit(9);
 //
 //	//l2r-bitstring

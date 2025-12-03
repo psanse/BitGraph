@@ -71,7 +71,7 @@ TEST_F(MasksTest, OR_range) {
 	EXPECT_TRUE(res.is_bit(20));
 	EXPECT_TRUE(res.is_bit(63));	
 	EXPECT_TRUE(res.is_bit(64));
-	EXPECT_EQ(4, res.size());
+	EXPECT_EQ(4, res.count());
 	
 	//cleans res outside the range
 	OR<true>(0, 100, bb, bb1, res);						// res = {10, 20, 63, 64, 100}		
@@ -80,7 +80,7 @@ TEST_F(MasksTest, OR_range) {
 	EXPECT_TRUE(res.is_bit(63));
 	EXPECT_TRUE(res.is_bit(64));
 	EXPECT_TRUE(res.is_bit(100));
-	EXPECT_EQ(5, res.size());
+	EXPECT_EQ(5, res.count());
 	
 	//cleans res outside the range
 	OR<true>(12, POPSIZE-1, bb, bb1, res);				// res = { 20, 63, 64 100}
@@ -89,7 +89,7 @@ TEST_F(MasksTest, OR_range) {
 	EXPECT_TRUE(res.is_bit(63));
 	EXPECT_TRUE(res.is_bit(64));
 	EXPECT_TRUE(res.is_bit(100));
-	EXPECT_EQ(4, res.size());
+	EXPECT_EQ(4, res.count());
 
 }
 
@@ -106,14 +106,14 @@ TEST_F(MasksTest, AND_OR) {
 
 	EXPECT_TRUE	(resAND.is_bit(10));
 	EXPECT_FALSE(resAND.is_bit(64));
-	EXPECT_EQ	(1, resAND.size());
+	EXPECT_EQ	(1, resAND.count());
 
 
 	///////////////////////
 	OR(bb, bb1, resOR);
 	//////////////////////
 
-	EXPECT_EQ	(5, resOR.size());
+	EXPECT_EQ	(5, resOR.count());
 	EXPECT_TRUE	(resOR.is_bit(10));
 	EXPECT_TRUE	(resOR.is_bit(20));
 	EXPECT_TRUE	(resOR.is_bit(63));
@@ -128,23 +128,23 @@ TEST_F(MasksTest_1, AND_stateless){
 	
 	AND<false>(0, 11, bb, bb1, resAND);				//resAND = {10, 64}
 	EXPECT_TRUE	(resAND.is_bit(10));
-	EXPECT_EQ	(1, resAND.size());
+	EXPECT_EQ	(1, resAND.count());
 
 	//cleans resAND outside the range
 	AND<true>(0, 10, bb, bb1, resAND);				//resAND = {10}
 	EXPECT_TRUE	(resAND.is_bit(10));
-	EXPECT_EQ	(1, resAND.size());
+	EXPECT_EQ	(1, resAND.count());
 
 	//cleans resAND outside the range
 	AND<true>(0, 63, bb, bb1, resAND);				//resAND = {10}
 	EXPECT_FALSE(resAND.is_bit(64));
-	EXPECT_EQ(1, resAND.size());
+	EXPECT_EQ(1, resAND.count());
 
 	//cleans resAND outside the range
 	AND<true>(0, 64, bb, bb1, resAND);				//resAND = {10, 64}
 	EXPECT_TRUE (resAND.is_bit(64));
 	EXPECT_TRUE (resAND.is_bit(10));
-	EXPECT_EQ	(2, resAND.size());
+	EXPECT_EQ	(2, resAND.count());
 		
 	//cleans resAND outside the range				
 	AND<true>(0, 5, bb, bb1, resAND);				//resAND = {0}	
@@ -195,11 +195,11 @@ TEST(Masks, DISABLED_AND_OR_sparse) {
 	AND(bb, bb1, bbresAND);
 	EXPECT_TRUE(bbresAND.is_bit(10));
 	EXPECT_TRUE(bbresAND.is_bit(64));
-	EXPECT_EQ(2, bbresAND.size());
+	EXPECT_EQ(2, bbresAND.count());
 
 	//OR
 	OR(bb, bb1, bbresOR);
-	EXPECT_EQ(4, bbresOR.size());
+	EXPECT_EQ(4, bbresOR.count());
 
 	//&=
 	sparse_bitarray bb2(130);
@@ -216,7 +216,7 @@ TEST(Masks, DISABLED_AND_OR_sparse) {
 	bb2 &= bb3;
 	EXPECT_TRUE(bb2.is_bit(10));
 	EXPECT_TRUE(bb2.is_bit(64));
-	EXPECT_EQ(2, bb2.size());
+	EXPECT_EQ(2, bb2.count());
 
 }
 
@@ -246,14 +246,14 @@ TEST(Masks, DISABLED_set_bits_sparse) {
 	EXPECT_TRUE(bb.is_bit(129));
 
 	//erase range
-	bb.erase_block(2, WDIV(bb1.number_of_blocks()) -1,  bb1);
+	bb.erase_block(2, WDIV(bb1.size()) -1,  bb1);
 	EXPECT_FALSE(bb.is_bit(129));
 
-	bb.erase_block(1, WDIV(bb1.number_of_blocks()) - 1, bb1);
+	bb.erase_block(1, WDIV(bb1.size()) - 1, bb1);
 	EXPECT_FALSE(bb.is_bit(100));
 	EXPECT_FALSE(bb.is_bit(64));
 		
-	bb.erase_block(0, WDIV(bb1.number_of_blocks()) - 1, bb1);
+	bb.erase_block(0, WDIV(bb1.size()) - 1, bb1);
 	EXPECT_TRUE(bb.is_bit(20));
 }
 
@@ -273,7 +273,7 @@ TEST(Masks, DISABLED_erase_block_sparse) {
 	bb1.set_bit(100);
 
 	bb.erase_block(2, 2, bb1);		//nothing deleted
-	EXPECT_EQ(3, bb.size());
+	EXPECT_EQ(3, bb.count());
 
 	bb.erase_block(1, 1, bb1);		//nothing deleted
 	EXPECT_TRUE(bb.is_bit(10));
@@ -282,7 +282,7 @@ TEST(Masks, DISABLED_erase_block_sparse) {
 	EXPECT_FALSE(bb.is_bit(100));
 
 	bb.erase_block(0, 2, bb1);		//nothing deleted
-	EXPECT_EQ(1, bb.size());
+	EXPECT_EQ(1, bb.count());
 }
 
 TEST(Masks, DISABLED_erase_bit_stateless) {
@@ -308,7 +308,7 @@ TEST(Masks, DISABLED_erase_bit_stateless) {
 	EXPECT_TRUE(bbsERASE.is_bit(20));
 	EXPECT_FALSE(bbsERASE.is_bit(10));
 	EXPECT_FALSE(bbsERASE.is_bit(64));
-	EXPECT_EQ(1, bbsERASE.size());
+	EXPECT_EQ(1, bbsERASE.count());
 }
 
 TEST(Masks, DISABLED_ERASE_extreme_cases) {
@@ -340,5 +340,5 @@ TEST(Masks, DISABLED_ERASE_extreme_cases) {
 	erase_bit(bbs, bbs1, bbsERASE);
 	EXPECT_TRUE(bbsERASE.is_bit(10));
 	EXPECT_TRUE(bbsERASE.is_bit(64));
-	EXPECT_EQ(2, bbsERASE.size());
+	EXPECT_EQ(2, bbsERASE.count());
 }

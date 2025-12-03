@@ -55,8 +55,8 @@ TEST_F(UGraphWTest, scale_transformation) {
 
 TEST_F(UGraphWTest, contruction) {
 
-	EXPECT_EQ	(NV, gw.number_of_vertices());
-	EXPECT_EQ	(2,  gw.number_of_edges());
+	EXPECT_EQ	(NV, gw.num_vertices());
+	EXPECT_EQ	(2,  gw.num_edges());
 
 	//vertex weights
 	EXPECT_EQ	(1, gw.weight(0));
@@ -76,8 +76,8 @@ TEST_F(UGraphWTest, copy_constructor) {
 	ugraph_wi gw_copy(gw);
 
 	//////////////////////////////////
-	EXPECT_EQ	(NV, gw_copy.number_of_vertices());
-	EXPECT_EQ	(2, gw_copy.number_of_edges());
+	EXPECT_EQ	(NV, gw_copy.num_vertices());
+	EXPECT_EQ	(2, gw_copy.num_edges());
 
 	//vertex weights
 	EXPECT_EQ	(1, gw_copy.weight(0));
@@ -100,8 +100,8 @@ TEST_F(UGraphWTest, assignment) {
 	gw1 = gw;
 
 	//////////////////////////////////
-	EXPECT_EQ(NV, gw1.number_of_vertices());
-	EXPECT_EQ(2, gw1.number_of_edges());
+	EXPECT_EQ(NV, gw1.num_vertices());
+	EXPECT_EQ(2, gw1.num_edges());
 
 	//vertex weights
 	EXPECT_EQ(1, gw1.weight(0));
@@ -160,7 +160,7 @@ TEST(UGraphW, constructor_from_file) {
 	//read DIMACS graph from file - no DIMACS weights, sets default weights 
 	ugraph_wi ugw(PATH_GRAPH_TESTS_CMAKE_SRC_CODE  "sample.clq");
 
-	const int NV = ugw.graph().number_of_vertices();
+	const int NV = ugw.graph().num_vertices();
 
 	EXPECT_EQ(7, NV);
 	EXPECT_EQ(1, ugw.weight(0));
@@ -174,7 +174,7 @@ TEST(UGraphW, gen_weights_dimacs){
 	//read DIMACS graph from file - no DIMACS weights, sets default weights 
 	ugraph_wi ugw (PATH_GRAPH_TESTS_CMAKE_SRC_CODE  "brock200_1.clq");
 
-	const int NV = ugw.graph().number_of_vertices();
+	const int NV = ugw.graph().num_vertices();
 
 	EXPECT_EQ(200, NV);
 	EXPECT_EQ(ugraph_wi::DEFAULT_WEIGHT, ugw.weight(0));
@@ -201,7 +201,7 @@ TEST(UGraphW, gen_random) {
 	WeightGen<ugraph_wi>::create_weights(ugw, WeightGen<ugraph_wi>::WMOD);
 	
 	/////////////////////
-	EXPECT_EQ(NV, ugw.graph().number_of_vertices());
+	EXPECT_EQ(NV, ugw.graph().num_vertices());
 	EXPECT_TRUE(ugw.density()< density + 0.001);
 	EXPECT_TRUE(ugw.density()> density - 0.001);
 	////////////////////
@@ -224,7 +224,7 @@ TEST(UGraphW, gen_random) {
 //
 //	string path= PATH_GRAPH_TESTS_CMAKE_SRC_CODE;
 //	Graph_W<ugraph, int> ugw(path + "brock200_1.clq");
-//	const int NV=ugw.graph().number_of_vertices();
+//	const int NV=ugw.graph().num_vertices();
 //	
 //	//generate weights WDEG mode
 //	WeightGen< Graph_W<ugraph, int> >::create_weights(ugw, 
@@ -237,7 +237,7 @@ TEST(UGraphW, gen_random) {
 //
 //	/////////////////////
 //	//TESTS
-//	EXPECT_EQ(NV, ugw.graph().number_of_vertices());
+//	EXPECT_EQ(NV, ugw.graph().num_vertices());
 //	
 //	LOG_INFO("GraphW: END gen_weights_to_file --------");
 //#ifdef TEST_GRAPH_WEIGHTED_STEP_BY_STEP
@@ -400,8 +400,8 @@ TEST(UGraphW, gen_random) {
 //	}
 //
 //	//Number of (directed) edges
-//	EXPECT_EQ(125,g1.number_of_vertices());
-//	EXPECT_EQ(736,g1.number_of_edges());
+//	EXPECT_EQ(125,g1.num_vertices());
+//	EXPECT_EQ(736,g1.num_edges());
 //	
 //	int w1=g1.get_wv(0);
 //	int w125=g1.get_wv(124);

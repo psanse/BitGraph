@@ -145,11 +145,11 @@ namespace bitgraph {
 				else return BBObject::noBit;
 			}
 
-			int sync_pc() { pc_ = bb_.size(); return pc_; }
+			int sync_pc() { pc_ = bb_.count(); return pc_; }
 
 			//bool
 			bool is_empty() const { return (pc_ == 0); }
-			bool is_sync_pc() const { return (pc_ == bb_.size()); }
+			bool is_sync_pc() const { return (pc_ == bb_.count()); }
 
 			//operators
 			friend bool operator ==	(const BitSetWithPC& lhs, const BitSetWithPC& rhs) { return (lhs.pc_ == rhs.pc_) && (lhs.bb_ == rhs.bb_); }
@@ -274,8 +274,8 @@ namespace bitgraph {
 			}
 
 			//setters and getters
-			int number_of_bitblocks(int bitsetID) { return bb_[bitsetID].number_of_bitblocks(); }
-			int size(int bitsetID) { return bb_[bitsetID].size(); }
+			int number_of_bitblocks(int bitsetID) { return bb_[bitsetID].num_blocks(); }
+			int size(int bitsetID) { return bb_[bitsetID].count(); }
 			int capacity() { return SIZE; }
 
 			//basic operations
@@ -384,7 +384,7 @@ namespace bitgraph {
 		inline
 			bool bbStack_t<BitSetT>::is_sync() {
 
-			if (bb_.size() != stack_.size()) { return false; }
+			if (bb_.count() != stack_.size()) { return false; }
 
 			//checks if exactly the population of bb_ is in the STACK  
 			for (auto i = 0; i < stack_.size(); ++i) {
@@ -501,7 +501,7 @@ namespace bitgraph {
 			std::vector<int> to_vector(BitSetT& bbn) {
 
 			std::vector<int> res;
-			res.reserve(bbn.size());
+			res.reserve(bbn.count());
 
 			//uses primitive bitscanning which is compatible for all bitsets in the hierarchy
 			int v = BBObject::noBit;

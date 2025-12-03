@@ -46,7 +46,7 @@ TEST_F(UGraphEWTest, basic_setup) {
 	EXPECT_EQ(1, ugew.weight(0, 1));
 	EXPECT_EQ(2, ugew.weight(0, 2));
 	EXPECT_EQ(3, ugew.weight(1, 3));
-	EXPECT_EQ(3, ugew.number_of_edges());
+	EXPECT_EQ(3, ugew.num_edges());
 	EXPECT_EQ(5, ugew.size());
 	
 }
@@ -54,8 +54,8 @@ TEST_F(UGraphEWTest, basic_setup) {
 TEST_F(UGraphEWTest, copy_constructor) {
 	ugraph_ewi gcopy(ugew);
 
-	EXPECT_EQ(NV, gcopy.number_of_vertices());
-	EXPECT_EQ(ugew.number_of_edges(), gcopy.number_of_edges());
+	EXPECT_EQ(NV, gcopy.num_vertices());
+	EXPECT_EQ(ugew.num_edges(), gcopy.num_edges());
 
 	//TODO... add more tests
 }
@@ -66,7 +66,7 @@ TEST_F(UGraphEWTest, add_edge) {
 
 	EXPECT_TRUE	(ugew.is_edge(1, 4));
 	EXPECT_EQ	(6, ugew.weight(1, 4));
-	EXPECT_EQ	(4, ugew.number_of_edges());
+	EXPECT_EQ	(4, ugew.num_edges());
 }
 
 TEST_F(UGraphEWTest, set_edge_weights) {
@@ -145,7 +145,7 @@ TEST_F(UGraphEWTest, generate_weights) {
 												EdgeWeightGen<ugraph_ewi>::WMOD,
 												DEFAULT_WEIGHT_MODULUS					);		
 
-	EXPECT_EQ(NV, ugew.graph().number_of_vertices());
+	EXPECT_EQ(NV, ugew.graph().num_vertices());
 	EXPECT_EQ(4, ugew.weight(0, 1));
 	EXPECT_EQ(5, ugew.weight(0, 2));
 	EXPECT_EQ(7, ugew.weight(1, 3));
@@ -159,8 +159,8 @@ TEST(UGraphEW, constructor_file) {
 
 	ugraph_ewi ugew(PATH_GRAPH_TESTS_CMAKE_SRC_CODE "toy_ew_dimacs.txt");
 
-	EXPECT_EQ(5, ugew.number_of_vertices());
-	EXPECT_EQ(5, ugew.number_of_edges());
+	EXPECT_EQ(5, ugew.num_vertices());
+	EXPECT_EQ(5, ugew.num_edges());
 
 	//all vertex weights 
 	EXPECT_EQ(10, ugew.weight(0, 0));
@@ -285,7 +285,7 @@ TEST(UGraphEW, DISABLED_write_to_file) {
 //	
 //	string fullname=PATH+filename;
 //	ugraph ug(fullname);
-//	const int NV=ug.number_of_vertices();
+//	const int NV=ug.num_vertices();
 //	
 //	//generate weights (only mode)
 //	EdgeWeightGen<ugraph>::create_weights(ug, EdgeWeightGen<ugraph>::WMOD, ".we", PATH);
@@ -356,7 +356,7 @@ TEST(UGraphEW, DISABLED_write_to_file) {
 //	
 //	string fullname=PATH+filename;
 //	ugraph ug(fullname);
-//	const int NV=ug.number_of_vertices();
+//	const int NV=ug.num_vertices();
 //	
 //	//generate weights (only mode)
 //	EdgeWeightGen<ugraph>::create_weights(ug, EdgeWeightGen<ugraph>::WMOD, ".we", PATH);
@@ -547,7 +547,7 @@ TEST(UGraphEW, DISABLED_write_to_file) {
 //	string filename="brock200_1.clq";
 //	string fullname=PATH+filename;
 //	ugraph ug(fullname);
-//	const int NV=ug.number_of_vertices();
+//	const int NV=ug.num_vertices();
 //	
 //	//generate weights (only mode)
 //	EdgeWeightGen<ugraph>::create_weights(ug, EdgeWeightGen<ugraph>::WMOD, ".we", PATH);

@@ -93,7 +93,7 @@ namespace bitgraph {
 			// setters and getters
 
 			void set_weight(int v, W val) { w_.at(v) = val; }
-			void set_weight(W val = DEFAULT_WEIGHT) { w_.assign(g_.number_of_vertices(), val); }
+			void set_weight(W val = DEFAULT_WEIGHT) { w_.assign(g_.num_vertices(), val); }
 
 			/*
 			* @brief sets vertex weights to all vertices
@@ -134,10 +134,10 @@ namespace bitgraph {
 			void path(std::string path_name) { g_.path(path_name); }
 			std::string path()			const { return g_.path(); }
 
-			int number_of_vertices()			const { return g_.number_of_vertices(); }
-			int size()			const { return g_.number_of_vertices(); }
+			int num_vertices()			const { return g_.num_vertices(); }
+			int size()			const { return g_.num_vertices(); }
 
-			int number_of_edges(bool lazy = true) { return g_.number_of_edges(lazy); }
+			int num_edges(bool lazy = true) { return g_.num_edges(lazy); }
 
 			//////////////////////////
 			// memory allocation 
@@ -392,7 +392,7 @@ namespace bitgraph {
 		inline
 			void Base_Graph_W<Graph_t, W>::transform_weights(Func f)
 		{
-			auto NV = number_of_vertices();
+			auto NV = num_vertices();
 
 			///////////////////////////////////////////////////////
 			std::transform(w_.begin(), w_.end(), w_.begin(), f);

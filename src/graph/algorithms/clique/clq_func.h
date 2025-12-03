@@ -205,7 +205,7 @@ namespace bitgraph {
 						}
 					}
 					else {
-						for (auto nBB = WDIV(v); nBB < static_cast<int>(g.number_of_blocks()); ++nBB) {
+						for (auto nBB = WDIV(v); nBB < static_cast<int>(g.num_blocks()); ++nBB) {
 							bb.block(nBB) &= g.neighbors(v).block(nBB);
 						}
 					}
@@ -252,7 +252,7 @@ namespace bitgraph {
 
 						pc = 0;
 						const typename Graph_t::_bbt& bbn =  g.neighbors(v);
-						for (auto nBB = 0u; nBB < g.number_of_blocks(); ++nBB) {
+						for (auto nBB = 0u; nBB < g.num_blocks(); ++nBB) {
 							pc += bitgraph::bblock::popc64(bbsgC.block(nBB) & bbn.block(nBB));
 						}
 
@@ -334,7 +334,7 @@ namespace bitgraph {
 						clq_curr.push_back(w);
 
 						//optimization of bb &= g.get_neighbors(w);	
-						for (auto nBB = WDIV(w); nBB < g.number_of_blocks(); ++nBB) {
+						for (auto nBB = WDIV(w); nBB < g.num_blocks(); ++nBB) {
 							bb.block(nBB) &= g.neighbors(v).block(nBB);
 						}
 
@@ -526,7 +526,7 @@ namespace bitgraph {
 
 					//check neighborhood of v
 					const auto& bbnv = g.neighbors(v);
-					for (auto nBB = 0; nBB < bb.number_of_blocks(); ++nBB) {
+					for (auto nBB = 0; nBB < bb.num_blocks(); ++nBB) {
 
 						//////////////////////////////////////////
 						if (!(bb.block(nBB) & bbnv.block(nBB))) {
@@ -726,7 +726,7 @@ namespace bitgraph {
 						}
 					}
 					else {
-						for (auto nBB = WDIV(v); nBB < g.number_of_blocks(); ++nBB) {
+						for (auto nBB = WDIV(v); nBB < g.num_blocks(); ++nBB) {
 							bb.block(nBB) &= g.neighbors(v).block(nBB);
 						}
 					}
@@ -775,7 +775,7 @@ namespace bitgraph {
 						}
 					}
 					else {
-						for (auto nBB = WDIV(v); nBB < g.number_of_blocks(); ++nBB) {
+						for (auto nBB = WDIV(v); nBB < g.num_blocks(); ++nBB) {
 							bb.block(nBB) &= g.neighbors(v).block(nBB);
 						}
 					}
@@ -844,7 +844,7 @@ namespace bitgraph {
 
 				//TODO-validation
 
-				int pc = bbsg.size();
+				int pc = bbsg.count();
 				if (pc == 0) { return 0; }			//early exit - bitset bbsg is empty	
 
 				int col = 1, v = bbo::noBit;
@@ -895,7 +895,7 @@ namespace bitgraph {
 				
 				//TODO-validation
 
-				int pc = bbsg.size();
+				int pc = bbsg.count();
 				if (pc == 0) { return 0; }			//early exit - bitset bbsg is empty	
 				ub.assign(g.size(), 0);
 
@@ -1001,7 +1001,7 @@ namespace bitgraph {
 		//		int nb_edges = 0;
 		//		typename Graph_t::_bbt bbcov(clq, g.number_of_vertices());
 		//		for (int i = 0; i < clq.size(); i++) {
-		//			for (int NBB = 0; NBB < g.number_of_blocks(); NBB++) {
+		//			for (int NBB = 0; NBB < g.num_blocks(); NBB++) {
 		//				BITBOARD bb = g.get_neighbors(clq[i]).get_bitboard(NBB) &~bbcov.get_bitboard(NBB);
 		//				nb_edges += BitBoard::popc64(bb);
 		//			}

@@ -37,7 +37,7 @@ const W Base_Graph_EW <Graph_t, W >::ZERO_WEIGHT = 0;
 template<class Graph_t, class W>
  bool Base_Graph_EW<Graph_t, W>::is_consistent(){
 
-	auto NV = number_of_vertices();
+	auto NV = num_vertices();
 
 	for (auto i = 0; i < NV; ++i) {
 		for (auto j = 0; j < NV; ++j) {
@@ -89,7 +89,7 @@ void Base_Graph_EW<Graph_t, W>::add_edge(int v, int w, W val)
 template<class Graph_t, class W>
 void Base_Graph_EW<Graph_t, W>::set_vertex_weight( W val) {
 
-	auto NV = number_of_vertices();
+	auto NV = num_vertices();
 
 	for (int v = 0; v < NV; v++) {
 			we_[v][v] = val;
@@ -120,7 +120,7 @@ void Base_Graph_EW<Graph_t, W >::set_weight(int v, int w, W val) {
 template<class Graph_t, class W>
  void Base_Graph_EW<Graph_t, W>::complement_weights(int type){
 
-	auto NV = number_of_vertices();	
+	auto NV = num_vertices();	
 
 	switch (type) {
 	case EDGE:
@@ -171,7 +171,7 @@ template<class Graph_t, class W>
 template<class Graph_t, class W>
 vecw<W> Base_Graph_EW<Graph_t, W>::vertex_weights()  const {
 
-	auto NV = number_of_vertices();
+	auto NV = this->num_vertices();
 
 	vector<W> res;
 	res.reserve(NV);
@@ -358,7 +358,7 @@ int Base_Graph_EW<Graph_t, W>::read_dimacs (string filename){
 template<class Graph_t, class W>
 std::ostream& Base_Graph_EW<Graph_t, W>::write_dimacs (std::ostream& o) {
 	
-	auto NV = number_of_vertices();
+	auto NV = num_vertices();
 
 	//timestamp 
 	g_.timestamp_dimacs(o);
@@ -550,7 +550,7 @@ std::ostream& Base_Graph_EW<Graph_t, W>::print_vertex(int v, std::ostream& o, bo
 template<class Graph_t, class W>
 std::ostream& Base_Graph_EW<Graph_t, W>::print_edges(std::ostream& o, bool eofl) const{
 
-	const int NV = g_.number_of_vertices();
+	const int NV = g_.num_vertices();
 	for (auto i = 0; i < NV - 1; ++i) {
 		for (auto j = i + 1; j < NV; ++j) {
 
@@ -579,7 +579,7 @@ std::ostream& Base_Graph_EW<Graph_t, W>::print_edges(std::ostream& o, bool eofl)
 template<class W>
 std::ostream& Graph_EW<ugraph, W>::print_edges(std::ostream& o, bool eofl)  const {	
 
-	const int NV = ptype::g_.number_of_vertices();	
+	const int NV = ptype::g_.num_vertices();	
 
 	for (auto i = 0; i < NV - 1; ++i) {
 		for (auto j = i + 1; j < NV; ++j) {
@@ -629,7 +629,7 @@ void Graph_EW< ugraph, W >::set_weight(int v, int w, W val) {
 template<class W>
 void Graph_EW<ugraph, W>::gen_random_edges(double p, W val){
 
-	const int NV = ptype::g_.number_of_vertices();
+	const int NV = ptype::g_.num_vertices();
 
 	//removes all edges
 	ptype::g_.remove_edges();
@@ -696,7 +696,7 @@ std::ostream& Graph_EW<ugraph, W>::print_edge_weights(vint& lv, std::ostream& o)
 template<class W>
 ostream& Graph_EW<ugraph, W>::write_dimacs (ostream& o) {
 	
-	auto NV = ptype::number_of_vertices();
+	auto NV = ptype::num_vertices();
 
 	//timestamp 
 	ptype::g_.timestamp_dimacs(o);
@@ -743,7 +743,7 @@ int Base_Graph_EW<Graph_t, W>::create_complement(Base_Graph_EW<Graph_t, W>& g) c
 template<class Graph_t, class W>
 void Base_Graph_EW<Graph_t, W>::gen_random_edges(double p, W val)
 {
-	const int NV = g_.number_of_vertices();
+	const int NV = g_.num_vertices();
 
 	//removes all edges
 	g_.remove_edges();
@@ -766,7 +766,7 @@ void Base_Graph_EW<Graph_t, W>::gen_random_edges(double p, W val)
 template<class Graph_t, class W>
 void Base_Graph_EW<Graph_t, W>::erase_non_edge_weights() {
 
-	const int NV = g_.number_of_vertices();
+	const int NV = g_.num_vertices();
 
 	for (auto i = 0; i < NV - 1; ++i) {
 		for (auto j = i + 1; j < NV; ++j) {

@@ -460,7 +460,7 @@ namespace bitgraph{
 	inline
 		int WeightGen<Graph_t>::create_weights(Graph_t& g, type_t type, int wmod, std::string FILE_EXTENSION, std::string FILE_PATH) {
 
-		const int NV = g.graph().number_of_vertices();
+		const int NV = g.graph().num_vertices();
 
 		//no need to clear the current weights since they are overwritten
 

@@ -59,8 +59,8 @@ TEST_F(GraphFastRootSortWeightedTest, constructor) {
 	//test unweighted part of the graph
 	auto gw = sorter.graph();
 	////////////////////////////////////////////
-	EXPECT_EQ(sorter.number_of_vertices(), gw.number_of_vertices());
-	EXPECT_EQ(NV, gw.number_of_vertices());
+	EXPECT_EQ(sorter.num_vertices(), gw.num_vertices());
+	EXPECT_EQ(NV, gw.num_vertices());
 	////////////////////////////////////////////
 
 	//test weights

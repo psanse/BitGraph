@@ -111,7 +111,7 @@ namespace bitgraph {
 
 			explicit GraphFastRootSort(Graph_t& gout) :
 				g_(gout),
-				NV_(g_.number_of_vertices())
+				NV_(g_.num_vertices())
 			{
 				nb_neigh_.assign(NV_, 0);
 				deg_neigh_.assign(NV_, 0);
@@ -133,7 +133,7 @@ namespace bitgraph {
 			const vint& degree() const { return nb_neigh_; }
 			const vint& support() const { return deg_neigh_; }
 			const Graph_t& graph() const { return g_; }
-			std::size_t number_of_vertices() const { return NV_; }
+			std::size_t num_vertices() const { return NV_; }
 
 			///////////////////////
 			// allocation
@@ -287,7 +287,7 @@ namespace bitgraph {
 		protected:
 
 			Graph_t& g_;											//ideally CONST but some operations like neighbors are non-const (TODO!)
-			std::size_t NV_;										//number of vertices cached - g_.number_of_vertices()  
+			std::size_t NV_;										//number of vertices cached - g_.num_vertices()  
 
 			vint nb_neigh_;											//stores the degree of the vertices		
 			vint deg_neigh_;										//stores the support of the vertices (degree of neighbors)
@@ -778,7 +778,7 @@ namespace bitgraph {
 		const vint& GraphFastRootSort<Graph_t>::compute_deg_root() {
 
 		for (auto elem = 0u; elem < NV_; ++elem) {
-			nb_neigh_[elem] = g_.neighbors(elem).size();
+			nb_neigh_[elem] = g_.neighbors(elem).count();
 		}
 
 		return nb_neigh_;
@@ -828,7 +828,7 @@ namespace bitgraph {
 
 	template<class Graph_t>
 	inline int GraphFastRootSort<Graph_t>::compute_deg(const Graph_t& g, vint& deg) {
-		auto NV = g.number_of_vertices();
+		auto NV = g.num_vertices();
 		deg.assign(NV, -1);
 		for (auto v = 0; v < NV; v++) {
 			deg[v] = g.neighbors(v).size();
@@ -925,7 +925,7 @@ namespace bitgraph {
 	inline
 		int GraphFastRootSort<Graph_t>::reorder(const vint& new_order, Graph_t& gn, Decode* d)
 	{
-		std::size_t NV = g_.number_of_vertices();
+		std::size_t NV = g_.num_vertices();
 		gn.reset(NV);
 		gn.name(g_.name());
 		gn.path(g_.path());
@@ -958,7 +958,7 @@ namespace bitgraph {
 	{
 		Graph_t gres;
 
-		std::size_t NV = g.number_of_vertices();
+		std::size_t NV = g.num_vertices();
 		gres.reset(NV);
 		gres.name(g.name());
 		gres.path(g.path());

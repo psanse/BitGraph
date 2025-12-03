@@ -871,7 +871,7 @@ string BitSetSp::to_string ()  const{
 		sstr << nBit << ' ';
 	}
 
-	sstr << '(' << size() << ')';
+	sstr << '(' << count() << ')';
 
 	///////////////
 	sstr << ']';

@@ -135,13 +135,13 @@ TEST_F(BitSetWithPC_ClassTest, reset) {
 	bb.reset(100);
 	EXPECT_EQ(0, bb.size());
 	EXPECT_EQ(0, bb.pc_);
-	EXPECT_EQ(2, bb.bb_.capacity());
+	EXPECT_EQ(2, bb.bb_.num_blocks());
 
 	//sparse
 	bbs.reset(100);
 	EXPECT_EQ(0, bbs.size());
 	EXPECT_EQ(0, bbs.pc_);
-	EXPECT_EQ(2, bbs.bb_.capacity());
+	EXPECT_EQ(2, bbs.bb_.num_blocks());
 
 }
 

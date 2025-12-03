@@ -41,7 +41,7 @@ TEST(BitScanSparse, exception_handlers) {
 
 TEST_F(BBScanSpClassTest, check_example) {
 
-	EXPECT_EQ(7, bbsc.size());
+	EXPECT_EQ(7, bbsc.count());
 	EXPECT_TRUE(bbsc.is_bit(0));
 	EXPECT_TRUE(bbsc.is_bit(50));
 	EXPECT_TRUE(bbsc.is_bit(100));
@@ -50,8 +50,8 @@ TEST_F(BBScanSpClassTest, check_example) {
 	EXPECT_TRUE(bbsc.is_bit(250));
 	EXPECT_TRUE(bbsc.is_bit(300));
 
-	EXPECT_EQ(5, bbsc.capacity());
-	EXPECT_EQ(5, bbsc.number_of_blocks());
+	EXPECT_EQ(5, bbsc.num_blocks());
+	EXPECT_EQ(5, bbsc.size());
 
 	//I/O
 	//bbsc.print();
@@ -61,7 +61,7 @@ TEST_F(BBScanSpClassTest, copy_constructor) {
 
 	BBScanSp bbscCOPY(bbsc);
 
-	EXPECT_EQ	(7, bbscCOPY.size());
+	EXPECT_EQ	(7, bbscCOPY.count());
 	EXPECT_TRUE	(bbscCOPY.is_bit(0));
 	EXPECT_TRUE	(bbscCOPY.is_bit(50));
 	EXPECT_TRUE	(bbscCOPY.is_bit(100));
@@ -70,8 +70,8 @@ TEST_F(BBScanSpClassTest, copy_constructor) {
 	EXPECT_TRUE	(bbscCOPY.is_bit(250));
 	EXPECT_TRUE	(bbscCOPY.is_bit(300));
 
-	EXPECT_EQ	(5, bbscCOPY.capacity());
-	EXPECT_EQ	(5, bbscCOPY.number_of_blocks());
+	EXPECT_EQ	(5, bbscCOPY.num_blocks());
+	EXPECT_EQ	(5, bbscCOPY.size());
 }
 
 TEST(BBScanSpClass, population_count){
@@ -81,11 +81,11 @@ TEST(BBScanSpClass, population_count){
 	bbs.set_bit(20);
 	bbs.set_bit(64);
 
-	EXPECT_EQ(3, bbs.size());
-	EXPECT_EQ(2, bbs.size(11, -1));
-	EXPECT_EQ(1, bbs.size(21, -1));
-	EXPECT_EQ(0, bbs.size(65, -1));
-	EXPECT_EQ(1, bbs.size(64, -1));
+	EXPECT_EQ(3, bbs.count());
+	EXPECT_EQ(2, bbs.count(11, -1));
+	EXPECT_EQ(1, bbs.count(21, -1));
+	EXPECT_EQ(0, bbs.count(65, -1));
+	EXPECT_EQ(1, bbs.count(64, -1));
 }
 
 TEST(BBScanSpClass, set_bits) {
@@ -94,11 +94,11 @@ TEST(BBScanSpClass, set_bits) {
 	sb.reset_bit(30,40);
 	EXPECT_TRUE(sb.is_bit(30));
 	EXPECT_TRUE(sb.is_bit(40));
-	EXPECT_EQ(11, sb.size());
+	EXPECT_EQ(11, sb.count());
 
 	sb.reset_bit(55);
 	EXPECT_TRUE(sb.is_bit(55));
-	EXPECT_EQ(1, sb.size());	
+	EXPECT_EQ(1, sb.count());
 }
 
 TEST(BBScanSpClass, boolean_properties){
@@ -152,8 +152,8 @@ TEST(BBScanSpClass, non_destructive_direct){
 	EXPECT_EQ(10, v[0]);
 	EXPECT_EQ(20, v[1]);
 	EXPECT_EQ(64, v[2]);
-	EXPECT_EQ(2, bbsp.number_of_blocks());				//number of blocks 
-	EXPECT_EQ(3, bbsp.capacity());						//number of blocks
+	EXPECT_EQ(2, bbsp.size());				//number of blocks 
+	EXPECT_EQ(3, bbsp.num_blocks());						//number of blocks
 
 }
 
@@ -181,8 +181,8 @@ TEST(BBScanSpClass, non_destructive_reverse) {
 	EXPECT_EQ(64, v[0]);
 	EXPECT_EQ(20, v[1]);
 	EXPECT_EQ(10, v[2]);
-	EXPECT_EQ(2, bbsp.number_of_blocks());				//number of blocks 
-	EXPECT_EQ(3, bbsp.capacity());						//number of blocks
+	EXPECT_EQ(2, bbsp.size());				//number of blocks 
+	EXPECT_EQ(3, bbsp.num_blocks());						//number of blocks
 		
 }
 
@@ -209,8 +209,8 @@ TEST(BBScanSpClass, non_destructive_with_starting_point){
 
 	EXPECT_EQ(20, v[0]);
 	EXPECT_EQ(64, v[1]);
-	EXPECT_EQ(2, bbsp.number_of_blocks());				//number of blocks 
-	EXPECT_EQ(3, bbsp.capacity());						//number of blocks
+	EXPECT_EQ(2, bbsp.size());				//number of blocks 
+	EXPECT_EQ(3, bbsp.num_blocks());						//number of blocks
 }
 
 TEST(BBScanSpClass, non_destructive_reverse_with_starting_point) {
@@ -235,8 +235,8 @@ TEST(BBScanSpClass, non_destructive_reverse_with_starting_point) {
 	}
 
 	EXPECT_EQ(10, v[0]);
-	EXPECT_EQ(2, bbsp.number_of_blocks());				//number of blocks 
-	EXPECT_EQ(3, bbsp.capacity());						//number of blocks
+	EXPECT_EQ(2, bbsp.size());				//number of blocks 
+	EXPECT_EQ(3, bbsp.num_blocks());						//number of blocks
 }
 
 TEST(BBScanSpClass, destructive){
@@ -264,9 +264,9 @@ TEST(BBScanSpClass, destructive){
 	EXPECT_EQ(20, v[1]);
 	EXPECT_EQ(64, v[2]);
 	EXPECT_TRUE(bbsp.is_empty());
-	EXPECT_EQ(0, bbsp.size());							//population count
-	EXPECT_EQ(2, bbsp.number_of_blocks());				//2 blocks 
-	EXPECT_EQ(3, bbsp.capacity());						//nBB_ = 3	
+	EXPECT_EQ(0, bbsp.count());							//population count
+	EXPECT_EQ(2, bbsp.size());				//2 blocks 
+	EXPECT_EQ(3, bbsp.num_blocks());						//nBB_ = 3	
 }
 
 TEST(BBScanSpClass, destructive_reverse) {
@@ -294,7 +294,7 @@ TEST(BBScanSpClass, destructive_reverse) {
 	EXPECT_EQ(20, v[1]);
 	EXPECT_EQ(10, v[2]);
 	EXPECT_TRUE(bbsp.is_empty());
-	EXPECT_EQ(0, bbsp.size());							//population count
-	EXPECT_EQ(2, bbsp.number_of_blocks());				//2 blocks 
-	EXPECT_EQ(3, bbsp.capacity());						//nBB_ = 3	
+	EXPECT_EQ(0, bbsp.count());							//population count
+	EXPECT_EQ(2, bbsp.size());							//2 blocks 
+	EXPECT_EQ(3, bbsp.num_blocks());					//nBB_ = 3	
 }

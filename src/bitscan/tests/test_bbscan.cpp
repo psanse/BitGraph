@@ -138,7 +138,7 @@ TEST_F(BBScanClassTest, destructive) {
 	}
 
 	EXPECT_TRUE(res == sol);
-	EXPECT_EQ(0, bbsc1.size());
+	EXPECT_EQ(0, bbsc1.count());
 
 }
 
@@ -154,7 +154,7 @@ TEST_F(BBScanClassTest, reverse_destructive) {
 	}
 
 	EXPECT_TRUE(res == sol);
-	EXPECT_EQ(0, bbn1.size());
+	EXPECT_EQ(0, bbn1.count());
 
 	//intrinsic
 	res.clear();
@@ -165,7 +165,7 @@ TEST_F(BBScanClassTest, reverse_destructive) {
 	}
 
 	EXPECT_TRUE(res == sol);
-	EXPECT_EQ(0, bbsc1.size());
+	EXPECT_EQ(0, bbsc1.count());
 }
 
 TEST(BBScanClass, setters_and_getters) {
@@ -187,13 +187,13 @@ TEST(BBScanClass, setters_and_getters) {
 
 	EXPECT_TRUE(bb.is_bit(22));
 	EXPECT_TRUE(bb.is_bit(23));
-	EXPECT_EQ(1,bb.number_of_blocks());
+	EXPECT_EQ(1,bb.num_blocks());
 
 	//copy constructor
 	BitSet bb2(bb);
 	EXPECT_TRUE(bb2.is_bit(22));
 	EXPECT_TRUE(bb2.is_bit(23));
-	EXPECT_EQ(1,bb2.number_of_blocks());
+	EXPECT_EQ(1,bb2.num_blocks());
 
 }
 
@@ -240,7 +240,7 @@ TEST(BBScanClass, set_bit_range){
 	EXPECT_TRUE(bb1.is_bit(0));
 	
 	bb1.set_bit(55, 56);
-	EXPECT_TRUE(bb1.size(4, 129));
+	EXPECT_TRUE(bb1.count(4, 129));
 }
 
 TEST(BBScanClass, erase_bit_range){
@@ -277,7 +277,7 @@ TEST(BBScanClass, init_scan_specific) {
 	EXPECT_FALSE(bbres.is_bit(10));
 	EXPECT_TRUE(bbres.is_bit(50));
 	EXPECT_TRUE(bbres.is_bit(64));
-	EXPECT_EQ(2, bbres.size());
+	EXPECT_EQ(2, bbres.count());
 
 	//scan from the beginning
 	bbres.erase_bit();
@@ -287,7 +287,7 @@ TEST(BBScanClass, init_scan_specific) {
 		bbres.set_bit(nBit);
 	}
 
-	EXPECT_EQ(4, bbres.size());
+	EXPECT_EQ(4, bbres.count());
 	EXPECT_TRUE(bbres.is_bit(0));
 	EXPECT_TRUE(bbres.is_bit(10));
 
@@ -327,7 +327,7 @@ TEST(BBScanClass, make_BBScan_Full) {
 	int nPop = 130;
 	BBScan bb_helper = bitgraph::make_BBScan_full(nPop);
 
-	EXPECT_EQ(bb_helper.size(), nPop);
+	EXPECT_EQ(bb_helper.count(), nPop);
 	EXPECT_EQ(bb_helper.lsb(), 0);
 	EXPECT_EQ(bb_helper.msb(), nPop - 1);
 
@@ -349,7 +349,7 @@ protected:
 };
 
 TEST_F(BBScanClassTest_1, miscellanous){
-	EXPECT_EQ(bbn.size(),bbsc.size());
+	EXPECT_EQ(bbn.count(),bbsc.count());
 	EXPECT_EQ(bbalg::to_vector(bbn), bbalg::to_vector(bbsc));
 }
 

@@ -127,14 +127,14 @@ namespace bitgraph {
 			Graph_t& graph() { return g_; }
 			const Graph_t& graph()						const { return g_; }
 
-			int number_of_vertices()						const { return g_.number_of_vertices(); }
+			int num_vertices()						const { return g_.num_vertices(); }
 
 			/**
-			* @brief alias for the number_of_vertices function
+			* @brief alias for the num_vertices function
 			**/
-			int size()						const { return g_.number_of_vertices(); }
+			int size()						const { return g_.num_vertices(); }
 
-			int number_of_edges(bool lazy = true) { return g_.number_of_edges(lazy); }
+			int num_edges(bool lazy = true) { return g_.num_edges(lazy); }
 
 			/**
 			* @brief neighbor set of vertex @v
@@ -562,7 +562,7 @@ namespace bitgraph {
 	inline
 		void Base_Graph_EW< Graph_t, W>::set_weight(mat_t& lw, bool edges_only) {
 
-		auto NV = number_of_vertices();
+		auto NV = num_vertices();
 
 		/////////////////////////
 		assert(lw.size() == NV);
@@ -595,7 +595,7 @@ namespace bitgraph {
 	inline
 		void Base_Graph_EW<Graph_t, W>::transform_weights(Func f, int type)
 	{
-		auto NV = number_of_vertices();
+		auto NV = num_vertices();
 
 		switch (type) {
 			//edge-weights
@@ -642,7 +642,7 @@ namespace bitgraph {
 	inline
 		void Base_Graph_EW< Graph_t, W>::set_edge_weight(W val) {
 
-		auto NV = number_of_vertices();
+		auto NV = num_vertices();
 
 		//set to empty weight the non-edges
 		for (int v = 0; v < NV; v++) {
@@ -662,7 +662,7 @@ namespace bitgraph {
 	inline
 		void Base_Graph_EW<Graph_t, W>::set_modulus_edge_weight(int MODULUS) {
 
-		auto NV = number_of_vertices();
+		auto NV = num_vertices();
 
 		//vertex-weights NO_WEIGHT
 		//set_vertex_weight(NO_WEIGHT);
@@ -690,7 +690,7 @@ namespace bitgraph {
 	inline
 		void Graph_EW< ugraph, W >::set_edge_weight(W val) {
 
-		auto NV = ptype::number_of_vertices();
+		auto NV = ptype::num_vertices();
 
 		//set to empty wv and non-edges UPPER-T
 		for (auto v = 0; v < NV - 1; v++) {
@@ -719,7 +719,7 @@ namespace bitgraph {
 	inline
 		void Graph_EW< ugraph, W >::set_weight(typename Graph_EW<ugraph, W>::mat_t& lw, bool edges_only) {
 
-		auto NV = ptype::number_of_vertices();
+		auto NV = ptype::num_vertices();
 
 		/////////////////////////
 		assert(lw.size() == NV);
@@ -761,7 +761,7 @@ namespace bitgraph {
 	inline
 		void Graph_EW<ugraph, W>::set_modulus_edge_weight(int MODULUS) {
 
-		auto NV = ptype::g_.number_of_vertices();
+		auto NV = ptype::g_.num_vertices();
 
 		//vertex-weights NO_WEIGHT
 		//set_vertex_weight(ptype::NO_WEIGHT);

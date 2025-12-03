@@ -220,7 +220,7 @@ TEST_F(BitScanNestedSparseTest, delete_additional_bitstring) {
 	while ((bit = sc1.next_bit(bb_del)) != BBObject::noBit) { ; }
 	
 	//////////////////////////////
-	EXPECT_EQ(2, bb_del.size());
+	EXPECT_EQ(2, bb_del.count());
 	EXPECT_TRUE(bb_del.is_bit(3));
 	EXPECT_TRUE(bb_del.is_bit(10));
 	//////////////////////////////
@@ -231,7 +231,7 @@ TEST_F(BitScanNestedSparseTest, delete_additional_bitstring) {
 	while ((bit = sc2.next_bit(bb_del)) != BBObject::noBit) { ; }
 
 	//////////////////////////////
-	EXPECT_EQ(2, bb_del.size());
+	EXPECT_EQ(2, bb_del.count());
 	EXPECT_TRUE(bb_del.is_bit(3));
 	EXPECT_TRUE(bb_del.is_bit(10));
 	//////////////////////////////
@@ -242,7 +242,7 @@ TEST_F(BitScanNestedSparseTest, delete_additional_bitstring) {
 	while ((bit = sc3.next_bit(bb_del)) != BBObject::noBit) { ; }
 
 	//////////////////////////////
-	EXPECT_EQ(2, bb_del.size());
+	EXPECT_EQ(2, bb_del.count());
 	EXPECT_TRUE(bb_del.is_bit(3));
 	EXPECT_TRUE(bb_del.is_bit(10));
 	/////////////////////////////
@@ -254,7 +254,7 @@ TEST_F(BitScanNestedSparseTest, delete_additional_bitstring) {
 	while ((bit = sc4.next_bit(bb_del)) != BBObject::noBit) { ; }
 
 	//////////////////////////////
-	EXPECT_EQ(2, bb_del.size());
+	EXPECT_EQ(2, bb_del.count());
 	EXPECT_TRUE(bb_del.is_bit(3));
 	EXPECT_TRUE(bb_del.is_bit(10));
 	/////////////////////////////

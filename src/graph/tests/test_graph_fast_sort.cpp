@@ -57,8 +57,8 @@ TEST_F(GraphFastRootSortTest, constructor) {
 	//unweighted part
 	auto g = sorter.graph();
 	///////////////////////////////////////////////////////////////////
-	EXPECT_EQ(sorter.number_of_vertices(), g.number_of_vertices());
-	EXPECT_EQ(NV, g.number_of_vertices());
+	EXPECT_EQ(sorter.num_vertices(), g.num_vertices());
+	EXPECT_EQ(NV, g.num_vertices());
 	///////////////////////////////////////////////////////////////////
 
 	//...
@@ -356,8 +356,8 @@ TEST_F(GraphFastRootSortTest, reorder) {
 	sorter.reorder(mapping_o2n, ugn);
 	
 	////////////////////////////////////////////
-	EXPECT_EQ(ug.number_of_vertices(), ugn.number_of_vertices());
-	EXPECT_EQ(ug.number_of_edges(), ugn.number_of_edges());
+	EXPECT_EQ(ug.num_vertices(), ugn.num_vertices());
+	EXPECT_EQ(ug.num_edges(), ugn.num_edges());
 	EXPECT_EQ(ug.degree(0), ugn.degree(0));
 	EXPECT_EQ(ug.degree(2), ugn.degree(1));
 	EXPECT_EQ(ug.degree(1), ugn.degree(2));					
@@ -381,12 +381,12 @@ TEST_F(GraphFastRootSortTest, reorder_static) {
 	ugraph ugn = gt::reorder(ug, mapping_o2n, nullptr);							//compute isomorphism
 	//////////////////////////////////////////////////////
 
-	EXPECT_EQ(ugn.number_of_vertices(), ug.number_of_vertices());	
-	EXPECT_EQ(ugn.number_of_edges(), ug.number_of_edges());
+	EXPECT_EQ(ugn.num_vertices(), ug.num_vertices());	
+	EXPECT_EQ(ugn.num_edges(), ug.num_edges());
 
 	////////////////////////////////////////////
-	EXPECT_EQ(ug.number_of_vertices(), ugn.number_of_vertices());
-	EXPECT_EQ(ug.number_of_edges(), ugn.number_of_edges());
+	EXPECT_EQ(ug.num_vertices(), ugn.num_vertices());
+	EXPECT_EQ(ug.num_edges(), ugn.num_edges());
 	EXPECT_EQ(ug.degree(0), ugn.degree(0));
 	EXPECT_EQ(ug.degree(2), ugn.degree(1));
 	EXPECT_EQ(ug.degree(1), ugn.degree(2));
@@ -653,7 +653,7 @@ TEST(subgraphSort, newOrderSubgraph) {
 //
 //	GraphSort<ugraph> gs(ug);
 //	ug.print_data(); 
-//	int edges=ug.number_of_edges();
+//	int edges=ug.num_edges();
 //	vector<int> new_order=gs.new_order_fast(MIN_DEG_DEGEN,PLACE_FL);
 //	gs.reorder(new_order, &cout);
 //
@@ -668,8 +668,8 @@ TEST(subgraphSort, newOrderSubgraph) {
 //	}
 //
 //	cout<<endl; ug.print_data(); cout<<endl;
-//	EXPECT_EQ(SIZE, ug.number_of_vertices());
-//	EXPECT_EQ(edges, ug.number_of_edges(false));
+//	EXPECT_EQ(SIZE, ug.num_vertices());
+//	EXPECT_EQ(edges, ug.num_edges(false));
 //	EXPECT_EQ(sol, new_order);
 //
 //	LOG_INFO("-----------------------------------");
@@ -867,7 +867,7 @@ TEST(subgraphSort, newOrderSubgraph) {
 //
 //	GraphSort<ugraph> gs(ug);
 //	ug.print_data(); 
-//	int edges=ug.number_of_edges();
+//	int edges=ug.num_edges();
 //	vector<int> new_order=gs.new_order(MIN_DEG_DEGEN,PLACE_FL);
 //	gs.reorder(new_order, &cout);
 //
@@ -882,8 +882,8 @@ TEST(subgraphSort, newOrderSubgraph) {
 //	}
 //
 //	cout<<endl; ug.print_data(); cout<<endl;
-//	EXPECT_EQ(SIZE, ug.number_of_vertices());
-//	EXPECT_EQ(edges, ug.number_of_edges(false));
+//	EXPECT_EQ(SIZE, ug.num_vertices());
+//	EXPECT_EQ(edges, ug.num_edges(false));
 //	EXPECT_EQ(sol, new_order);
 //
 //	cout<<"-----------------------------------"<<endl;
@@ -901,7 +901,7 @@ TEST(subgraphSort, newOrderSubgraph) {
 //
 //	GraphSort<sparse_ugraph> gs(ug);
 //	ug.print_data(); 
-//	int edges=ug.number_of_edges();
+//	int edges=ug.num_edges();
 //	vector<int> new_order=gs.new_order(MIN_DEG_DEGEN,PLACE_FL);
 //	gs.reorder(new_order, &cout);
 //
@@ -916,8 +916,8 @@ TEST(subgraphSort, newOrderSubgraph) {
 //	}
 //
 //	cout<<endl; ug.print_data(); cout<<endl;
-//	EXPECT_EQ(SIZE, ug.number_of_vertices());
-//	EXPECT_EQ(edges, ug.number_of_edges(false));
+//	EXPECT_EQ(SIZE, ug.num_vertices());
+//	EXPECT_EQ(edges, ug.num_edges(false));
 //	EXPECT_EQ(sol, new_order);
 //
 //	cout<<"-----------------------------------"<<endl;
@@ -935,7 +935,7 @@ TEST(subgraphSort, newOrderSubgraph) {
 //
 //	GraphSort<ugraph> gs(ug);
 //	ug.print_data(); 
-//	int edges=ug.number_of_edges();
+//	int edges=ug.num_edges();
 //	vector<int> new_order=gs.new_order(MAX_DEG_DEGEN, PLACE_FL);
 //	gs.reorder(new_order, &cout);
 //
@@ -947,8 +947,8 @@ TEST(subgraphSort, newOrderSubgraph) {
 //	sol[1]=2; sol[2]=1;		//consequence of degenerate sorting
 //	
 //	cout<<endl; ug.print_data(); cout<<endl;
-//	EXPECT_EQ(SIZE, ug.number_of_vertices());
-//	EXPECT_EQ(edges, ug.number_of_edges(false));
+//	EXPECT_EQ(SIZE, ug.num_vertices());
+//	EXPECT_EQ(edges, ug.num_edges(false));
 //	EXPECT_EQ(sol, new_order);
 //
 //	cout<<"-----------------------------------"<<endl;
@@ -1029,7 +1029,7 @@ TEST(subgraphSort, newOrderSubgraph) {
 //	//non decreasing kcore ordering 
 //	vector<int> new_order=gs.new_order(gbbs::KCORE_UB,gbbs::PLACE_FL); //currently always PLACE_FL
 //	com::stl::print_collection<vector<int>>(new_order); cout<<endl;
-//	EXPECT_EQ(ug.number_of_vertices(), new_order.size());
+//	EXPECT_EQ(ug.num_vertices(), new_order.size());
 //
 //	cout<<"-----------------------------------"<<endl;
 //}
@@ -1043,7 +1043,7 @@ TEST(subgraphSort, newOrderSubgraph) {
 //	//non decreasing kcore ordering
 //	vector<int> new_order=gs.new_order(KCORE_UB,PLACE_FL);				//currently always PLACE_FL
 //	com::stl::print_collection<vector<int>>(new_order); cout<<endl;
-//	EXPECT_EQ(ug.number_of_vertices(), new_order.size());
+//	EXPECT_EQ(ug.num_vertices(), new_order.size());
 //	LOG_INFO("-----------------------------------");
 //}
 //
@@ -1280,8 +1280,8 @@ TEST(subgraphSort, newOrderSubgraph) {
 //	//Comparison between both graphs edge by edge
 //	//(currently operator == between graphs is not working because equality between sparse_bitarrays does not check empty bitblocks)
 //    int j,j2;
-//    ASSERT_TRUE(ug.number_of_vertices()==ug2.number_of_vertices());
-//    for(int i=0;i<ug.number_of_vertices();i++){
+//    ASSERT_TRUE(ug.num_vertices()==ug2.num_vertices());
+//    for(int i=0;i<ug.num_vertices();i++){
 //        sparse_bitarray neigh=ug.get_neighbors(i);
 //		sparse_bitarray neigh2=ug2.get_neighbors(i);
 //        if((neigh.init_scan(bbo::NON_DESTRUCTIVE)!=EMPTY_ELEM) && (neigh2.init_scan(bbo::NON_DESTRUCTIVE)!=EMPTY_ELEM)) {
@@ -1409,7 +1409,7 @@ TEST(subgraphSort, newOrderSubgraph) {
 //	GraphSort<ugraph> gs2(ug2);
 //	gs2.reorder(gs.new_order(gbbs::MIN_DEG_DEGEN));
 //
-//	EXPECT_EQ(ug2.number_of_edges(), ug1.number_of_edges());	
+//	EXPECT_EQ(ug2.num_edges(), ug1.num_edges());	
 //	EXPECT_EQ(ug2, ug1);
 //	
 //	cout<<"-----------------------------------"<<endl;

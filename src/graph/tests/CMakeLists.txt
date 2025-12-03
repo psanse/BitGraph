@@ -9,22 +9,22 @@ add_executable (test_graph
 
 #  TESTS CHECKED  (last 29/11/2025)
  
-# test_func.cpp
-# test_graph.cpp
-# test_ugraph.cpp
-# test_wgraph.cpp
-# test_wegraph.cpp
-# test_sparse_graph.cpp 
-# test_wegraph.cpp
-# test_graph_fast_sort.cpp
-# test_graph_fast_sort_weighted.cpp
-# test_random_graph.cpp
-# test_graph_conversions.cpp
-# test_sparse_graph.cpp
-# test_format.cpp 
-# test_decode.cpp
- test_clq_func.cpp
-# test_graph_map.cpp 
+  test_func.cpp
+  test_graph.cpp
+  test_ugraph.cpp
+  test_wgraph.cpp
+  test_wegraph.cpp
+  test_sparse_graph.cpp 
+  test_wegraph.cpp
+  test_graph_fast_sort.cpp
+  test_graph_fast_sort_weighted.cpp
+  test_random_graph.cpp
+  test_graph_conversions.cpp
+  test_sparse_graph.cpp
+  test_format.cpp 
+  test_decode.cpp
+  test_clq_func.cpp
+  test_graph_map.cpp 
 
 #  TESTS TO BE CHECKED
 #  test_kcore.cpp              //TODO (26/11/2025)

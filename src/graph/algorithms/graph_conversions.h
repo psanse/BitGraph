@@ -52,7 +52,7 @@ namespace bitgraph {
 			static int sug2ug(const sparse_ugraph& sug, ugraph& ug)
 			{
 
-				auto NV = sug.number_of_vertices();
+				auto NV = sug.num_vertices();
 
 				//allocation - empty graph of size NV
 				if (ug.reset(NV) == -1) {
@@ -85,7 +85,7 @@ namespace bitgraph {
 			*/
 			static	int ug2sug(const ugraph& ug, sparse_ugraph& sug)
 			{
-				auto NV = ug.number_of_vertices();
+				auto NV = ug.num_vertices();
 
 				//allocation - empty graph of size NV
 				if (sug.reset(NV) == -1) {
@@ -94,7 +94,7 @@ namespace bitgraph {
 				}
 
 				//add edges	
-				auto blockID = ug.number_of_blocks();
+				auto blockID = ug.num_blocks();
 				for (auto v = 0; v < NV; ++v) {
 					for (auto nBB = 0; nBB < blockID; ++nBB) {
 
