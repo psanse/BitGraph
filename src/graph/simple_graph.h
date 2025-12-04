@@ -597,7 +597,7 @@ namespace bitgraph {
 		}
 
 		//initialization
-		NV_ = NV;
+		NV_ = static_cast<int>(NV);
 		NBB_ = INDEX_1TO1(NV_);
 		NE_ = 0;
 
@@ -923,8 +923,8 @@ namespace bitgraph {
 	inline
 		ostream& Graph<BitSetT>::print_edges(std::ostream& o, bool eofl) {
 
-		for (auto i = 0u; i < NV_ - 1; ++i) {
-			for (auto j = i + 1; j < NV_; ++j) {
+		for (int i = 0; i < NV_ - 1; ++i) {
+			for (int j = i + 1; j < NV_; ++j) {
 
 				if (is_edge(i, j)) {
 					o << "[" << i << "]" << "-->" << "[" << j << "]" << endl;
@@ -948,9 +948,9 @@ namespace bitgraph {
 
 		std::size_t NE = 0;
 
-		for (auto i = 0u; i < NV_; i++) {
+		for (int i = 0; i < NV_; ++i) {
 			if (bbn.is_bit(i)) {
-				for (auto j = 0u; j < NV_; j++) {
+				for (int j = 0; j < NV_; ++j) {
 					if (bbn.is_bit(j)) {						//includes possible self loops
 						if (adj_[i].is_bit(j)) { NE++; }
 					}
@@ -967,7 +967,7 @@ namespace bitgraph {
 
 		if (!lazy || NE_ == 0) {					//no lazy evaluation if NE_ = 0
 			NE_ = 0;
-			for (auto i = 0u; i < NV_; i++) {
+			for (int i = 0; i < NV_; i++) {
 				NE_ += adj_[i].count();
 			}
 		}
@@ -1136,8 +1136,8 @@ namespace bitgraph {
 		remove_edges();
 
 		//sets directed edges with probability p
-		for (auto i = 0u; i < NV_; ++i) {
-			for (auto j = 0u; j < NV_; ++j) {
+		for (int i = 0; i < NV_; ++i) {
+			for (int j = 0; j < NV_; ++j) {
 				if (_rand::uniform_dist(p)) {
 					add_edge(i, j);
 				}
@@ -1177,8 +1177,8 @@ namespace bitgraph {
 		header_dimacs(o, false);
 
 		//write edges 1-based vertex notation 
-		for (auto v = 0u; v < NV_; ++v) {
-			for (auto w = 0u; w < NV_; ++w) {
+		for (int v = 0; v < NV_; ++v) {
+			for (int w = 0; w < NV_; ++w) {
 				if (v == w) continue;
 				if (is_edge(v, w)) {								//O(log) for sparse graphs: specialize
 					o << "e " << v + 1 << " " << w + 1 << endl;
@@ -1199,8 +1199,8 @@ namespace bitgraph {
 			o << "\n%  " << name_.c_str() << endl;
 
 		//write edges 1-based vertex notation
-		for (auto v = 0u; v < NV_; ++v) {
-			for (auto w = 0u; w < NV_; ++w) {
+		for (int v = 0; v < NV_; ++v) {
+			for (int w = 0; w < NV_; ++w) {
 				if (v == w) continue;
 				if (is_edge(v, w)) {							//O(log) for sparse graphs: specialize
 					o << v + 1 << " " << w + 1 << endl;

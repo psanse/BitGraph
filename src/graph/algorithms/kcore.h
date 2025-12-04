@@ -1042,7 +1042,7 @@ namespace bitgraph {
 		//
 		// COMMENTS: At the moment, only available for sparse_graph type
 
-		auto max_size = 1;
+		std::size_t max_size = 1;
 		auto iter = 1;
 		//auto from = EMPTY_ELEM;
 
@@ -1077,7 +1077,7 @@ namespace bitgraph {
 			curr_clique.push_back(ver_[i]);
 
 			//update size
-			if (max_size < static_cast<int>(curr_clique.size())) {
+			if (max_size < curr_clique.size()) {
 				largest_clique = curr_clique;
 				max_size = largest_clique.size();
 
@@ -1136,7 +1136,7 @@ namespace bitgraph {
 			int max_core_number;
 		};
 
-		auto max_size = 1;
+		std::size_t max_size = 1;
 		auto iter = 1;
 		//auto from = EMPTY_ELEM;
 
@@ -1176,9 +1176,9 @@ namespace bitgraph {
 			curr_clique.push_back(ver_[i]);
 
 			//update size
-			if (max_size < static_cast<int>(curr_clique.size())) {
+			if (max_size < curr_clique.size()) {
 				largest_clique = curr_clique;
-				max_size = largest_clique.size();
+				max_size =largest_clique.size();
 
 				//I/O
 				LOGG_DEBUG(iter, ".", "lb:", max_size, " seed: [", i, ":", ver_[i], "]");
