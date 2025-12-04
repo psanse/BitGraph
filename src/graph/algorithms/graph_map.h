@@ -178,8 +178,8 @@ namespace bitgraph{
 		bitset_t& GraphMap::map_l2r(bitset_t& bbl, bitset_t& bbr, bool overwrite) const {
 
 		//////////////////////////////////////////////////////////////////////////////////////////////////////////
-		assert(bbl.capacity() == bbr.capacity() && "bizarre bitsets with different capacity - GraphMap::map_l2r");
-		assert(INDEX_1TO1(l2r_.size()) == bbr.capacity() && "not adequate bitset capacity for the mapping - GraphMap::map_l2r ");
+		assert(bbl.num_blocks() == bbr.num_blocks() && "bizarre bitsets with different num_blocks - GraphMap::map_l2r");
+		assert(INDEX_1TO1(l2r_.size()) == bbr.num_blocks() && "not adequate bitset num_blocks for the mapping - GraphMap::map_l2r ");
 		///////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 		//cleans bbr if requested
@@ -201,8 +201,8 @@ namespace bitgraph{
 		bitset_t& GraphMap::map_r2l(bitset_t& bbl, bitset_t& bbr, bool overwrite) const {
 
 		//////////////////////////////////////////////////////////////////////////////////////////////////////////
-		assert(bbl.capacity() == bbr.capacity() && "bizarre bitsets with different capacity - GraphMap::map_l2r");
-		assert(INDEX_1TO1(l2r_.size()) == bbr.capacity() && "not adequate bitset capacity for the mapping - GraphMap::map_l2r ");
+		assert(bbl.num_blocks() == bbr.num_blocks() && "bizarre bitsets with different num_blocks - GraphMap::map_l2r");
+		assert(INDEX_1TO1(l2r_.size()) == bbr.num_blocks() && "not adequate bitset num_blocks for the mapping - GraphMap::map_l2r ");
 		///////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 		//cleans bbr if requested
