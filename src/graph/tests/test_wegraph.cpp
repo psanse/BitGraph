@@ -31,7 +31,7 @@ protected:
 		ugew.add_edge(0, 1, 1);
 		ugew.add_edge(0, 2, 2);
 		ugew.add_edge(1, 3, 3);
-		ugew.name("toy_weighted");
+		ugew.set_name("toy_weighted");
 	}
 	void TearDown() override {}
 

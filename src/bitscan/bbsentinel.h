@@ -113,10 +113,10 @@ namespace bitgraph {
 
 	inline int BBSentinel::popcn64() const {
 		BITBOARD pc = 0;
-		for (int i = m_BBL; i <= m_BBH; i++) {
+		for (int i = m_BBL; i <= m_BBH; ++i) {
 			pc += __popcnt64(vBB_[i]);
 		}
-		return pc;
+		return (int)pc;
 	}
 
 }

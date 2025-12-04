@@ -26,14 +26,16 @@ namespace bitgraph {
 		inline
 			void skip_empty_lines(std::istream& stream) {
 			std::string line;
+			char next = 0;
 
 			while (stream.good()) {
-				char next = stream.peek();
-
-				if (next == EOF) {
-					break;
+				
+				int c = stream.peek();
+				if (c == EOF) break;
+				else {
+					next = static_cast<char>(c);
 				}
-
+				
 				if (next == '\n' || next == '\r') {
 					std::getline(stream, line);
 					continue;

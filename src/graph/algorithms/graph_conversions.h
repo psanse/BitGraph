@@ -72,7 +72,7 @@ namespace bitgraph {
 				}
 
 				//name
-				ug.name(sug.name());
+				ug.set_name(sug.name());
 
 				return 0;
 			}
@@ -109,7 +109,7 @@ namespace bitgraph {
 				}
 
 				//name
-				sug.name(ug.name());
+				sug.set_name(ug.name());
 
 				return 0;
 			}

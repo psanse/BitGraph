@@ -321,7 +321,7 @@ namespace bitgraph{
 		//name - r<n>_<p>.txt
 		std::stringstream sstr;
 		sstr << "r" << n << "_" << p << ".txt";
-		g.name(sstr.str());
+		g.set_name(sstr.str());
 
 		return 0;
 	}

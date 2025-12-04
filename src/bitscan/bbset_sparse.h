@@ -188,6 +188,8 @@ namespace bitgraph {
 			* @param is_popsize: if true, the population size is set to nPop, otherwise the
 			*					  it is the maximum number of bitblocks of the bitset
 			* @details:  Exception caught inside and the program exits
+			* 
+			* TODO- change API (04/12/2025)
 			**/
 			void reset(int nPop, bool is_popsize = true);
 
@@ -1194,7 +1196,7 @@ namespace bitgraph {
 			pc += bblock::popc64(vBB_[i].bb_);
 		}
 
-		return pc;
+		return (int)pc;
 	}
 
 
@@ -1217,7 +1219,7 @@ namespace bitgraph {
 			}
 		}
 
-		return pc;
+		return (int)pc;
 	}
 
 
@@ -1246,7 +1248,7 @@ namespace bitgraph {
 			}
 		}
 
-		return pc;
+		return (int)pc;
 	}
 
 
@@ -1725,7 +1727,7 @@ namespace bitgraph {
 
 
 			/////////////////////////////////////////////////////////////
-			res.reset(lhs.num_blocks(), false);
+			res.reset((int)lhs.num_blocks(), false);
 			res.vBB_.reserve(std::min(lhs.vBB_.size(), rhs.vBB_.size()));
 			/////////////////////////////////////////////////////////////
 
@@ -1784,7 +1786,7 @@ namespace bitgraph {
 			BitSetSp& OR(const BitSetSp& lhs, const BitSetSp& rhs, BitSetSp& res) {
 
 			/////////////////////////////////////////////////////////////
-			res.reset(lhs.num_blocks(), false);
+			res.reset((int)lhs.num_blocks(), false);
 			res.vBB_.reserve(lhs.vBB_.size() + rhs.vBB_.size());
 			/////////////////////////////////////////////////////////////
 
@@ -1835,7 +1837,7 @@ namespace bitgraph {
 			////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 			//////////////////////////////////////////////////////////////
-			res.reset(lhs.num_blocks(), false);
+			res.reset((int)lhs.num_blocks(), false);
 			res.vBB_.reserve(std::min(lhs.vBB_.size(), rhs.vBB_.size()));
 			//////////////////////////////////////////////////////////////
 
@@ -1884,7 +1886,7 @@ namespace bitgraph {
 			}
 
 			///////////////////////////////////
-			res.reset(lhs.num_blocks(), false);
+			res.reset(static_cast<int>(lhs.num_blocks()), false);
 			res.vBB_.reserve(lhs.vBB_.size());
 			///////////////////////////////////
 

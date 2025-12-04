@@ -127,7 +127,7 @@ namespace bitgraph {
 		}
 
 		//name (remove path)
-		g.name(filename);
+		g.set_name(filename);
 
 
 		fclose(f);

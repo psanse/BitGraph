@@ -126,12 +126,12 @@ namespace bitgraph {
 			*/
 			W maximum_weight(int& v)	const;
 
-			const _bbt& neighbors(int v)		const { return g_.neighbors(v); }
+			const _bbt& neighbors(int v)	const { return g_.neighbors(v); }
 			_bbt& neighbors(int v) { return g_.neighbors(v); }
 
-			void name(std::string str) { g_.name(str); }
+			void set_name(std::string str) { g_.set_name(str); }
 			std::string name()			const { return g_.name(); }
-			void path(std::string path_name) { g_.path(path_name); }
+			void set_path(std::string path_name) { g_.set_path(path_name); }
 			std::string path()			const { return g_.path(); }
 
 			int num_vertices()			const { return g_.num_vertices(); }

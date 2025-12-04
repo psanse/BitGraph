@@ -348,7 +348,7 @@ int Base_Graph_EW<Graph_t, W>::read_dimacs (string filename){
 	 }
 
 	 //name (removes path)
-	 g_.name(filename);
+	 g_.set_name(filename);
 
 	 f.close();	
 
@@ -731,8 +731,8 @@ template<class Graph_t, class W>
 int Base_Graph_EW<Graph_t, W>::create_complement(Base_Graph_EW<Graph_t, W>& g) const
 {
 
-	g.name(this->name());
-	g.path(this->path());
+	g.set_name(this->name());
+	g.set_path(this->path());
 	g.weights() = we_;
 
 	/////////////////////////////////////////

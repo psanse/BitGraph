@@ -195,15 +195,15 @@ TEST(Graph, move_constructor) {
 
 TEST_F(GraphTest, name) {
 	
-	g.name("test");
+	g.set_name("test");
 	EXPECT_STREQ("test", g.name().c_str());
 	EXPECT_TRUE(g.path().empty());
 
-	g.name("c:/path/test");
+	g.set_name("c:/path/test");
 	EXPECT_STREQ("test", g.name().c_str());
 	EXPECT_STREQ("c:/path/", g.path().c_str());
 
-	g.name("c:\\path\\test");
+	g.set_name("c:\\path\\test");
 	EXPECT_STREQ("test", g.name().c_str());
 	EXPECT_STREQ("c:\\path\\", g.path().c_str());
 }
@@ -211,7 +211,7 @@ TEST_F(GraphTest, name) {
 TEST_F(GraphTest, reset_and_reset) {
 
 	const int NV = 10;
-	g.name("new_name");
+	g.set_name("new_name");
 
 	////////////////////////////////////
 	g.reset(NV);							

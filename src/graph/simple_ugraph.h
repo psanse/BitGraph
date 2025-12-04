@@ -48,12 +48,14 @@ namespace bitgraph {
 
 		public:
 
-			using type = Ugraph<BitSetT>;		//own type
-			using ptype = Graph<BitSetT>;		//parent type
-			using basic_type = BitSetT;			//basic type (a type of bitset)
-
-			using _bbt = basic_type;			//alias for backward compatibility
-			using _mypt = ptype;				//alias for backward compatibility
+			using Self = Ugraph<BitSetT>;		//own type
+			using BaseT = Graph<BitSetT>;		//parent type
+			using bitset_type = BitSetT;		//basic type (a type of bitset)
+			
+			using basic_type = bitset_type;		//alias for backward compatibility
+			using _bbt = bitset_type;			//alias for backward compatibility
+			using _mypt = BaseT;				//alias for backward compatibility
+			using ptype = BaseT;				//alias for base type in modern C++
 
 			//constructors - cannot all be inherited	
 			Ugraph() : Graph<BitSetT>() {}									//creates empty graph
@@ -114,7 +116,7 @@ namespace bitgraph {
 			/**
 			* @brief Computes the number of neighbors of v (deg(v))	*
 			**/
-			int degree(int v)									const { return (int)ptype::adj_[v].count(); }
+			int degree(int v)									const { return (int)this->adj_[v].count(); }
 
 			/**
 			*  @brief number of neighbors of v in a set of vertices
@@ -360,8 +362,8 @@ namespace bitgraph {
 		//main loop
 		int v = BBObject::noBit;
 		while ((v = sg.next_bit()) != BBObject::noBit) {
-			for (auto nBB = 0; nBB < ptype::NBB_; ++nBB) {
-				BITBOARD bb = ptype::neighbors(v).block(nBB) & ~sg.block(nBB);		//neighbors of v NOT in sg
+			for (auto nBB = 0; nBB < this->NBB_; ++nBB) {
+				BITBOARD bb = this->neighbors(v).block(nBB) & ~sg.block(nBB);		//neighbors of v NOT in sg
 				nE += bblock::popc64(bb);
 			}
 		}
@@ -372,7 +374,7 @@ namespace bitgraph {
 	template<class BitSetT>
 	inline int Ugraph<BitSetT>::outgoing_degree(std::vector<int> sg) const
 	{
-		BitSetT bbsg{ (int)ptype::NV_, sg };
+		BitSetT bbsg{ (int)this->NV_, sg };
 		return (outgoing_degree(bbsg));
 	}
 
@@ -382,11 +384,11 @@ namespace bitgraph {
 	inline
 		ostream& Ugraph<BitSetT>::print_edges(bitset_t& bbsg, std::ostream& o)
 	{
-		for (std::size_t i = 0; i < ptype::NV_ - 1; ++i) {
+		for (std::size_t i = 0; i < this->NV_ - 1; ++i) {
 			if (!bbsg.is_bit(i)) continue;
-			for (std::size_t j = i + 1; j < ptype::NV_; ++j) {
+			for (std::size_t j = i + 1; j < this->NV_; ++j) {
 				if (!bbsg.is_bit(j)) continue;
-				if (ptype::is_edge(i, j)) {
+				if (this->is_edge(i, j)) {
 					o << "[" << i << "]" << "--" << "[" << j << "]" << endl;
 				}
 			}
@@ -476,7 +478,7 @@ namespace bitgraph {
 			LOG_ERROR("exiting...");
 			exit(-1);
 		}
-		this->name(name);
+		this->set_name(name);
 
 		for (std::size_t i = 0; i < NV - 1; ++i) {
 			for (std::size_t j = i + 1; j < NV; ++j) {
@@ -519,11 +521,11 @@ namespace bitgraph {
 		std::size_t NE = 0;
 
 		//reads only the upper triangle of the adjacency matrix
-		for (std::size_t i = 0; i < ptype::NV_ - 1; ++i) {
+		for (std::size_t i = 0; i < this->NV_ - 1; ++i) {
 			if (bbn.is_bit(i)) {
-				for (std::size_t j = i + 1; j < ptype::NV_; ++j) {
+				for (std::size_t j = i + 1; j < this->NV_; ++j) {
 					if (bbn.is_bit(j)) {
-						if (ptype::adj_[i].is_bit(j)) { ++NE; }
+						if (this->adj_[i].is_bit(j)) { ++NE; }
 					}
 				}
 			}
@@ -559,9 +561,9 @@ namespace bitgraph {
 		void Ugraph<BitSetT>::add_edge(int v, int w) {
 
 		if (v != w) {
-			ptype::adj_[v].set_bit(w);
-			ptype::adj_[w].set_bit(v);
-			ptype::NE_++;
+			this->adj_[v].set_bit(w);
+			this->adj_[w].set_bit(v);
+			this->NE_++;
 		}
 	}
 
@@ -569,9 +571,9 @@ namespace bitgraph {
 	inline
 		void Ugraph<BitSetT>::remove_edge(int v, int w) {
 		if (v != w) {
-			ptype::adj_[v].erase_bit(w);
-			ptype::adj_[w].erase_bit(v);
-			ptype::NE_--;
+			this->adj_[v].erase_bit(w);
+			this->adj_[w].erase_bit(v);
+			this->NE_--;
 		}
 	}
 
@@ -629,7 +631,7 @@ namespace bitgraph {
 
 		int max_degree = 0, temp = 0;
 
-		for (auto i = 0; i <(int)ptype::NV_; ++i) {
+		for (auto i = 0; i <(int)this->NV_; ++i) {
 			temp = degree(i);
 			if (temp > max_degree)
 				max_degree = temp;
@@ -642,7 +644,7 @@ namespace bitgraph {
 	inline
 		double Ugraph<BitSetT>::density(bool lazy) {
 
-		BITBOARD max_edges = ptype::NV_;
+		BITBOARD max_edges = this->NV_;
 		max_edges *= (max_edges - 1);
 		return (2 * num_edges(lazy) / static_cast<double> (max_edges));
 	}
@@ -650,7 +652,7 @@ namespace bitgraph {
 	template<class BitSetT>
 	inline
 		ostream& Ugraph<BitSetT>::print_degrees(std::ostream& o) const {
-		for (std::size_t i = 0; i < ptype::NV_; ++i) {
+		for (std::size_t i = 0; i < this->NV_; ++i) {
 			o << "deg(" << i << ")" << ":" << degree(i) << " ";
 		}
 		return o;
@@ -660,10 +662,10 @@ namespace bitgraph {
 	inline
 		ostream& Ugraph<BitSetT>::print_edges(std::ostream& o, bool eofl) {
 
-		for (auto i = 0u; i < ptype::NV_ - 1; ++i) {
-			for (auto j = i + 1; j < ptype::NV_; ++j) {
+		for (auto i = 0u; i < this->NV_ - 1; ++i) {
+			for (auto j = i + 1; j < this->NV_; ++j) {
 
-				if (ptype::is_edge(i, j)) {
+				if (this->is_edge(i, j)) {
 					o << "[" << i << "]" << "--" << "[" << j << "]" << endl;
 				}
 			}
@@ -677,9 +679,9 @@ namespace bitgraph {
 	inline
 		ostream& Ugraph<BitSetT>::print_matrix(std::ostream& o) const
 	{
-		for (std::size_t i = 0; i < ptype::NV_; ++i) {
-			for (std::size_t j = 0; j < ptype::NV_; ++j) {
-				if (ptype::is_edge(i, j)) {
+		for (std::size_t i = 0; i < this->NV_; ++i) {
+			for (std::size_t j = 0; j < this->NV_; ++j) {
+				if (this->is_edge(i, j)) {
 					o << "1";
 				}
 				else {
@@ -700,16 +702,16 @@ namespace bitgraph {
 		o << "c File written by GRAPH:" << PrecisionTimer::local_timestamp() << endl;
 
 		//name comment
-		if (!ptype::name_.empty())
-			o << "c " << ptype::name_.c_str() << endl;
+		if (!this->name_.empty())
+			o << "c " << this->name_.c_str() << endl;
 
 		//dimacs header
-		o << "p edge " << ptype::NV_ << " " << num_edges(false /* recompute */) << endl << endl;
+		o << "p edge " << this->NV_ << " " << num_edges(false /* recompute */) << endl << endl;
 
 		//bidirectional edges (1 based in dimacs)
-		for (std::size_t v = 0; v < ptype::NV_ - 1; ++v) {
-			for (std::size_t w = v + 1; w < ptype::NV_; ++w) {
-				if (ptype::is_edge(v, w)) {										//O(log) for sparse graphs: specialize
+		for (std::size_t v = 0; v < this->NV_ - 1; ++v) {
+			for (std::size_t w = v + 1; w < this->NV_; ++w) {
+				if (this->is_edge(v, w)) {										//O(log) for sparse graphs: specialize
 					o << "e " << v + 1 << " " << w + 1 << endl;
 				}
 			}
@@ -724,13 +726,13 @@ namespace bitgraph {
 		o << "% File written by GRAPH:" << PrecisionTimer::local_timestamp() << endl;
 
 		//name coment
-		if (!ptype::name_.empty())
-			o << "% " << ptype::name_.c_str() << endl;
+		if (!this->name_.empty())
+			o << "% " << this->name_.c_str() << endl;
 
 		//write edges - 1 based vertex notation
-		for (auto v = 0u; v < ptype::NV_ - 1; ++v) {
-			for (auto w = v + 1; w < ptype::NV_; ++w) {
-				if (ptype::is_edge(v, w)) {							//O(log) for sparse graphs: specialize
+		for (auto v = 0u; v < this->NV_ - 1; ++v) {
+			for (auto w = v + 1; w < this->NV_; ++w) {
+				if (this->is_edge(v, w)) {							//O(log) for sparse graphs: specialize
 					o << v + 1 << " " << w + 1 << endl;
 				}
 			}
@@ -748,17 +750,17 @@ namespace bitgraph {
 		o << "% File written by GRAPH:" << PrecisionTimer::local_timestamp() << endl;
 
 		//name comment
-		if (!ptype::name_.empty())
-			o << "% " << ptype::name_.c_str() << endl;
+		if (!this->name_.empty())
+			o << "% " << this->name_.c_str() << endl;
 
 		//number of vertices and edges
-		ptype::NE_ = 0;																			//eliminates lazy evaluation of edge count 
-		o << ptype::NV_ << " " << ptype::NV_ << " " << num_edges() << endl;
+		this->NE_ = 0;																			//eliminates lazy evaluation of edge count 
+		o << this->NV_ << " " << this->NV_ << " " << num_edges() << endl;
 
 		//writes edges 1-based vertex notation
-		for (auto v = 0; v < ptype::NV_ - 1; ++v) {
-			for (auto w = v + 1; w < ptype::NV_; ++w) {
-				if (ptype::is_edge(v, w)) {														//O(log) for sparse graphs: specialize
+		for (auto v = 0; v < this->NV_ - 1; ++v) {
+			for (auto w = v + 1; w < this->NV_; ++w) {
+				if (this->is_edge(v, w)) {														//O(log) for sparse graphs: specialize
 					o << v + 1 << " " << w + 1 << endl;
 				}
 			}
@@ -771,13 +773,13 @@ namespace bitgraph {
 
 		int nDeg = 0, nBB = WDIV(v);
 
-		for (auto i = nBB + 1; i < ptype::NBB_; ++i) {
-			nDeg += bblock::popc64(ptype::adj_[v].block(i) & bbn.block(i));
+		for (auto i = nBB + 1; i < this->NBB_; ++i) {
+			nDeg += bblock::popc64(this->adj_[v].block(i) & bbn.block(i));
 		}
 
 		//truncate the bitblock of v
 		nDeg += bblock::popc64(bblock::MASK_1(WMOD(v) + 1, 63) &
-			ptype::adj_[v].block(nBB) & bbn.block(nBB)
+			this->adj_[v].block(nBB) & bbn.block(nBB)
 		);
 
 		return nDeg;
@@ -789,13 +791,13 @@ namespace bitgraph {
 	{
 		int nDeg = 0, nBB = WDIV(v);
 
-		for (auto i = nBB + 1; i < ptype::NBB_; ++i) {
-			nDeg += bblock::popc64(ptype::adj_[v].block(i));
+		for (auto i = nBB + 1; i < this->NBB_; ++i) {
+			nDeg += bblock::popc64(this->adj_[v].block(i));
 		}
 
 		//truncate the bitblock of v
 		nDeg += bblock::popc64(bblock::MASK_1(WMOD(v) + 1, 63) &
-			ptype::adj_[v].block(nBB));
+			this->adj_[v].block(nBB));
 
 		return nDeg;
 	}
@@ -805,9 +807,9 @@ namespace bitgraph {
 		int Ugraph<BitSetT>::degree(int v, int UB, const BitSet& bbn) const {
 
 		int nDeg = 0;
-		for (auto i = 0; i < ptype::NBB_; ++i) {
+		for (auto i = 0; i < this->NBB_; ++i) {
 
-			nDeg += bblock::popc64(ptype::adj_[v].block(i) & bbn.block(i));
+			nDeg += bblock::popc64(this->adj_[v].block(i) & bbn.block(i));
 
 			if (nDeg >= UB) { return UB; }
 		}
@@ -827,12 +829,12 @@ namespace bitgraph {
 	int Ugraph<BitSetT>::create_complement(Ugraph& ug) const {
 
 		//resets ug with new allocation
-		if (ug.reset(ptype::NV_) == -1) return -1;
+		if (ug.reset(this->NV_) == -1) return -1;
 
-		for (auto i = 0u; i < ptype::NV_ - 1; ++i) {
-			for (auto j = i + 1; j < ptype::NV_; ++j) {
+		for (auto i = 0u; i < this->NV_ - 1; ++i) {
+			for (auto j = i + 1; j < this->NV_; ++j) {
 
-				if (!ptype::adj_[i].is_bit(j)) {
+				if (!this->adj_[i].is_bit(j)) {
 					ug.add_edge(i, j);
 				}
 
@@ -847,7 +849,7 @@ namespace bitgraph {
 	int Ugraph<BitSetT>::create_subgraph(Ugraph& ug, int v) const
 	{
 		vector<int> vnn;
-		ptype::neighbors(v).to_vector(vnn);
+		this->neighbors(v).to_vector(vnn);
 
 		return create_subgraph(ug, vnn);
 	}
@@ -870,7 +872,7 @@ namespace bitgraph {
 		for (std::size_t i = 0; i < NV - 1; i++) {
 			for (std::size_t j = i + 1; j < NV; j++) {
 
-				if (ptype::is_edge(lv[i], lv[j])) {
+				if (this->is_edge(lv[i], lv[j])) {
 					ug.add_edge(i, j);						//adds bidirected edge
 				}
 			}
@@ -895,17 +897,17 @@ namespace bitgraph {
 	inline
 		bitgraph::BITBOARD USS::num_edges(bool lazy) {
 
-		if (lazy || ptype::NE_ == 0) {
+		if (lazy || this->NE_ == 0) {
 
-			ptype::NE_ = 0;
-			for (auto i = 0u; i < ptype::NV_ - 1; i++) {
+			this->NE_ = 0;
+			for (int i = 0; i < this->NV_ - 1; ++i) {
 
-				//popuation count from i + 1 onwards
-				ptype::NE_ += adj_[i].count(i + 1, -1);
+				//population count from i + 1 onwards
+				this->NE_ += adj_[i].count(i + 1, -1);
 			}
 		}
 
-		return ptype::NE_;
+		return this->NE_;
 	}
 
 	template<>
@@ -1042,7 +1044,7 @@ namespace bitgraph {
 		o << "p edge " << this->NV_ << " " << num_edges() << endl << endl;
 
 		//Escribir nodos
-		for (auto v = 0u; v < this->NV_ - 1; v++) {
+		for (auto v = 0; v < this->NV_ - 1; v++) {
 
 			//non destructive scan starting from the vertex onwards
 			auto block_v = WDIV(v);
@@ -1067,7 +1069,7 @@ namespace bitgraph {
 	inline
 		ostream& USS::print_edges(std::ostream& o, bool eofl) {
 
-		for (auto v = 0u; v < this->NV_ - 1; ++v) {
+		for (auto v = 0; v < this->NV_ - 1; ++v) {
 
 			//skip empty bitsets - MUST BE since currently the scanning object does not check this
 			if (adj_[v].is_empty()) { continue; }
@@ -1102,7 +1104,7 @@ namespace bitgraph {
 			o << "% " << this->name_.c_str() << endl;
 
 		//writes edges
-		for (auto v = 0u; v < this->NV_ - 1; v++) {
+		for (auto v = 0; v < this->NV_ - 1; v++) {
 			//non destructive scan starting from the vertex onwards
 			pair<bool, int> p = this->adj_[v].find_block_pos(WDIV(v));
 			if (p.second == EMPTY_ELEM) continue;										//no more bitblocks

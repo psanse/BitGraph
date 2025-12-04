@@ -442,14 +442,14 @@ namespace bitgraph {
 			scan_bit(MASK_LIM);
 			break;
 		case NON_DESTRUCTIVE_REVERSE:
-			scan_block(vBB_.size() - 1);
+			scan_block(static_cast<int>(vBB_.size()) - 1);
 			scan_bit(WORD_SIZE);
 			break;
 		case DESTRUCTIVE:
 			scan_block(0);
 			break;
 		case DESTRUCTIVE_REVERSE:
-			scan_block(vBB_.size() - 1);
+			scan_block(static_cast<int>(vBB_.size()) - 1);
 			break;
 		default:
 			LOG_ERROR("unknown scan type in BBScanSp::init_scan");

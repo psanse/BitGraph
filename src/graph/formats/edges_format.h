@@ -47,7 +47,7 @@ namespace bitgraph {
 			}
 
 			//set name without path
-			g.name(filename);
+			g.set_name(filename);
 		}
 
 		template<class T>
@@ -114,7 +114,7 @@ namespace bitgraph {
 			}
 
 			//set name (without path)
-			g.name(graphname);
+			g.set_name(graphname);
 
 			return 0;
 		}

@@ -51,12 +51,13 @@ namespace bitgraph {
 
 			friend class GraphConversion;
 
-
 		public:
-
-			using type = Graph<BitSetT>;			//own type
-			using basic_type = BitSetT;				//basic type (a type of bitset)
-			using _bbt = basic_type;				//alias for basic type - for backward compatibility
+			using Self = Graph<BitSetT>;			//own type
+			using bitset_type = BitSetT;			//basic type (a type of bitset)
+				
+			using type = Self;						//for backward compatibility
+			using basic_type = bitset_type;			//for backward compatibility
+			using _bbt = bitset_type;				//for backward compatibility
 
 			/////////////			
 			//construction / destruction
@@ -81,17 +82,17 @@ namespace bitgraph {
 			* @param instance name of instance
 			* @details: Separates path and instance name internally (if applicable)
 			**/
-			void name(std::string instance);
-			std::string name()					const { return name_; }
+			void set_name(std::string instance);
+			std::string name()					const noexcept { return name_; }
 
-			void path(std::string path_name) { path_ = std::move(path_name); }
-			std::string path()					const { return path_; }
+			void set_path(std::string path_name) { path_ = std::move(path_name); }
+			std::string path()					const noexcept { return path_; }
 
 			/**
 			* @brief number of vertices of the graph. Alias to num_vertices()
 			**/
-			std::size_t size()					const { return num_vertices(); }
-			std::size_t num_vertices()			const { return NV_; }
+			std::size_t size()					const  noexcept { return num_vertices(); }
+			std::size_t num_vertices()			const  noexcept { return NV_; }
 			
 
 			/**
@@ -99,7 +100,7 @@ namespace bitgraph {
 			*		 In the case of sparse graphs, the value is the maximum capacity
 			*		 of all bitsets.
 			**/
-			std::size_t num_blocks()			const { return NBB_; }
+			std::size_t num_blocks()			const noexcept  { return NBB_; }
 
 			/*
 			* @brief Counts the number of edges	(includes self loops)
@@ -213,7 +214,7 @@ namespace bitgraph {
 			* @brief number of outgoing edges from v
 			* @param v input vertex
 			**/
-			int degree_out(int v)					const { return adj_[v].size(); }
+			int degree_out(int v)					const { return adj_[v].count(); }
 
 			/**
 			* @brief number edges incident to v
@@ -548,7 +549,7 @@ namespace bitgraph {
 			LOG_ERROR("bizarre graph construction-Graph<BitSetT>::Graph(...), exiting... ");
 			exit(-1);
 		}
-		name(filename);
+		set_name(filename);
 
 		//add edges
 		for (auto i = 0; i < nV; i++) {
@@ -563,7 +564,7 @@ namespace bitgraph {
 
 	template<class BitSetT>
 	inline
-		void Graph<BitSetT>::name(std::string name) {
+		void Graph<BitSetT>::set_name(std::string name) {
 
 		//update name
 		size_t found = name.find_last_of("/\\");
@@ -577,18 +578,6 @@ namespace bitgraph {
 			name_ = std::move(name);
 			path_.clear();
 		}
-
-
-		//if(separate_path){
-		//	size_t found=name.find_last_of("/\\");
-		//	name_ = str.substr(found + 1);
-		//	if (found != string::npos) {			
-		//		path_ = str.substr(0, found + 1);  //includes slash
-		//	}
-		//}else{
-		//	name_=name;
-		//	path_.clear();
-		//}
 	}
 
 	template<class BitSetT>
@@ -626,7 +615,7 @@ namespace bitgraph {
 		}
 
 		//update instance name
-		this->name(std::move(name));
+		this->set_name(std::move(name));
 
 		return 0;
 	}
@@ -849,7 +838,7 @@ namespace bitgraph {
 
 		f.close();
 				
-		name(filename);			//removes full path
+		set_name(filename);			//removes full path
 		return 0;
 	}
 
@@ -891,7 +880,7 @@ namespace bitgraph {
 		f.close();
 
 		//name (removes path)
-		name(filename);
+		set_name(filename);
 		return 0;
 	}
 
@@ -1041,7 +1030,7 @@ namespace bitgraph {
 		void Graph<BitSetT>::remove_vertices(const BitSet& bbn, Graph& g) {
 
 		//determine the size of the graph g
-		auto pc = bbn.size();
+		auto pc = bbn.count();
 		auto new_size = NV_ - pc;
 
 		if (new_size <= 0) {
@@ -1258,9 +1247,9 @@ namespace bitgraph {
 
 
 		//copies first k elements of the adjacency matrix 
-		for (auto i = 0u; i < newg.NV_; i++) {
+		for (auto i = 0; i < newg.NV_; i++) {
 			newg.adj_[i] = adj_[i];
-			newg.adj_[i].clear_bit(first_k, EMPTY_ELEM);		//closed range
+			newg.adj_[i].clear_bit(static_cast<int>(first_k), EMPTY_ELEM);		//closed range
 		}
 
 		return newg;
@@ -1270,16 +1259,18 @@ namespace bitgraph {
 	inline
 		int GSS::shrink_to_fit(std::size_t N) {
 
+		int num_vert = static_cast<int>(N);
+
 		//assertions
-		if (NV_ <= N) {
+		if (NV_ <= static_cast<int>(N)) {
 			LOGG_WARNING("Wrong shrinking size ", N, " the graph remains unchanged - GSS::shrink_to_fit");
 			return -1;
 		}
 
 		//A) sets to 0 bitblocks outside the range but
 		//does not remove the empty bitbloks
-		for (auto v = 0u; v < NV_; ++v) {
-			adj_[v].erase_bit(N, NV_);
+		for (int v = 0; v < NV_; ++v) {
+			adj_[v].erase_bit(num_vert, NV_);
 		}
 
 		//B) EXPERIMENTAL - sets to 0 bitblocks and removes the empty bitblocks 
@@ -1290,9 +1281,9 @@ namespace bitgraph {
 
 		//resizes adjacency matrix
 		adj_.resize(N);
-		NV_ = N;
-		NE_ = 0;											//so that when required, the value will be recomputed
-		NBB_ = INDEX_1TO1(N);								//maximum number of bitblocks per row (for sparse graphs)		
+		NV_ = num_vert;
+		NE_ = 0u;											//so that when required, the value will be recomputed
+		NBB_ = INDEX_1TO1(num_vert);								//maximum number of bitblocks per row (for sparse graphs)		
 
 
 		return 0;
@@ -1321,17 +1312,21 @@ namespace bitgraph {
 	inline
 		double GSS::block_density_sparse() const {
 
+		///////////////////
+		assert(NV_ > 0);
+		///////////////////
+
 		std::size_t nBBt = 0;							//number of allocated bitblocks (all should be non-empty in the sparse case)
 
 		//number of allocated blocks
 		for (std::size_t v = 0; v < NV_; ++v) {
 			nBBt += adj_[v].size();
 		}
+				
+		BITBOARD blocks_per_row = INDEX_1TO1(NV_);		// ceil(NV_ / double(WORD_SIZE));
+		BITBOARD maxBlocks = NV_ * blocks_per_row;
 
-		BITBOARD aux = ceil(NV_ / double(WORD_SIZE));
-		BITBOARD maxBlock = NV_ * aux;
-
-		return static_cast<double>(nBBt) / maxBlock;
+		return static_cast<double>(nBBt) / static_cast<double>(maxBlocks);
 	}
 
 	template<>

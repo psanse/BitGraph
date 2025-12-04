@@ -127,7 +127,7 @@ TEST(Ugraph, equal_toy) {
 	g.add_edge(2, 3);
 	g.add_edge(0, 3);
 	g.add_edge(5, 6);
-	g.name("toy");
+	g.set_name("toy");
 
 	ugraph g1(3);
 	g1.add_edge(0, 1);

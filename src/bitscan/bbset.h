@@ -1451,7 +1451,7 @@ namespace bitgraph{
 
 		int BitSet::popcn64() const {
 
-			BITBOARD pc = 0;
+			int pc = 0;
 
 			for (auto i = 0; i < nBB_ /*vBB_.size()*/; ++i) {
 				pc += bblock::popc64(vBB_[i]);

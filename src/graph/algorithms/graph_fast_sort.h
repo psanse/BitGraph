@@ -927,8 +927,8 @@ namespace bitgraph {
 	{
 		std::size_t NV = g_.num_vertices();
 		gn.reset(NV);
-		gn.name(g_.name());
-		gn.path(g_.path());
+		gn.set_name(g_.name());
+		gn.set_path(g_.path());
 
 		///generate isomorphism (only for undirected graphs) 
 		for (auto i = 0u; i < NV - 1; i++) {
@@ -960,8 +960,8 @@ namespace bitgraph {
 
 		std::size_t NV = g.num_vertices();
 		gres.reset(NV);
-		gres.name(g.name());
-		gres.path(g.path());
+		gres.set_name(g.name());
+		gres.set_path(g.path());
 
 		///generate isomorphism (only for undirected graphs) 
 		for (auto i = 0u; i < NV - 1; i++) {

@@ -33,7 +33,7 @@ protected:
 		gw.set_weight(0, 1);
 		gw.set_weight(1, 2);
 		gw.set_weight(2, 3);
-		gw.name("toy_weighted");
+		gw.set_name("toy_weighted");
 	}
 	void TearDown() override {}
 

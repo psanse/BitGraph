@@ -156,8 +156,8 @@ namespace bitgraph {
 		gn.reset(NV, 1.0);
 
 		//copy graph data
-		gn.name(gw_.name());
-		gn.path(gw_.path());
+		gn.set_name(gw_.name());
+		gn.set_path(gw_.path());
 
 		//generate isomorphism (only for undirected graphs)
 		for (auto i = 0; i < NV - 1; ++i) {

@@ -402,7 +402,7 @@ namespace bitgraph {
 		int popc64(const BITBOARD bb_dato) {
 
 #ifdef POPCOUNT_INTRINSIC_64
-			return __popcnt64(bb_dato);
+			return (int)__popcnt64(bb_dato);
 #else
 			//lookup table popcount
 			register union x {

@@ -143,9 +143,9 @@ namespace bitgraph {
 			const _bbt& neighbors(int v)			const { return g_.neighbors(v); }
 			_bbt& neighbors(int v) { return g_.neighbors(v); }
 
-			void name(std::string str) { g_.name(str); }
+			void set_name(std::string str) { g_.set_name(str); }
 			string name()				const { return g_.name(); }
-			void path(std::string path_name) { g_.path(path_name); }
+			void set_path(std::string path_name) { g_.set_path(path_name); }
 			string path()				const { return g_.path(); }
 
 			double density(bool lazy = true) { return g_.density(lazy); }
@@ -808,7 +808,7 @@ namespace bitgraph {
 			}
 		}
 
-		g_.name(name);
+		g_.set_name(name);
 
 		return 0;
 	}
