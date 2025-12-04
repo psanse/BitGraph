@@ -35,19 +35,19 @@ namespace bitgraph {
 
 template<>
 inline
-bitgraph::BITBOARD USS::number_of_edges(bool lazy) {
-		
-	if (lazy || ptype::NE_ == 0) {
+std::size_t USS::num_edges(bool lazy) {
 
-		ptype::NE_ = 0;
-		for (int i = 0; i < ptype::NV_ - 1; i++) {
+	if (lazy || this->NE_ == 0) {
+
+		this->NE_ = 0;
+		for (int i = 0; i < this->NV_ - 1; i++) {
 
 			//popuation count from i + 1 onwards
-			ptype::NE_ += adj_[i].size(i + 1, -1);			
-		}		
+			this->NE_ += adj_[i].count(i + 1, -1);
+		}
 	}
 
-	return ptype::NE_;
+	return this->NE_;
 }
 
 template<>
@@ -181,7 +181,7 @@ void USS::write_dimacs(ostream& o) {
 		o << "c " << this->name_.c_str() << endl;
 
 	//tamaño del grafo
-	o << "p edge " << this->NV_ << " " << number_of_edges() << endl << endl;
+	o << "p edge " << this->NV_ << " " << num_edges() << endl << endl;
 
 	//Escribir nodos
 	for (int v = 0; v < this->NV_ - 1; v++) {
@@ -207,9 +207,9 @@ void USS::write_dimacs(ostream& o) {
 
 template<>
 inline
-ostream& USS::print_edges (std::ostream& o)  {
+std::ostream& USS::print_edges (std::ostream& o, bool eofl)  {
 
-	for (auto v = 0; v < this->NV_ - 1; ++v) {
+	for (int v = 0; v < this->NV_ - 1; ++v) {
 	
 		//skip empty bitsets - MUST BE since currently the scanning object does not check this
 		if (adj_[v].is_empty()) { continue; }
@@ -224,6 +224,7 @@ ostream& USS::print_edges (std::ostream& o)  {
 		}
 	}
 
+	if (eofl) { o << std::endl; }
 	return o;
 }
 
@@ -277,7 +278,7 @@ void USS::write_mtx(ostream& o) {
 
 	//size and edges
 	NE_ = 0;																	//eliminates lazy evaluation of edge count 
-	o << this->NV_ << " " << this->NV_ << " " << number_of_edges() << endl;
+	o << this->NV_ << " " << this->NV_ << " " << num_edges() << endl;
 
 	//writes edges
 	for (int v = 0; v < this->NV_ - 1; v++) {

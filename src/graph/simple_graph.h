@@ -110,14 +110,14 @@ namespace bitgraph {
 			*			  if FALSE counts and updates @NE_
 			* @returns number of edges
 			*/
-			virtual	BITBOARD num_edges(bool lazy = true);
+			virtual	std::size_t num_edges(bool lazy = true);
 
 			/**
 			* @brief Counts the number of edges	in an induced subgraph by a set of vertices
 			* @param set input bitset of vertices that induces the subgraph
 			* @returns number of edges
 			**/
-			virtual	BITBOARD num_edges(const BitSetT& set)	const;
+			virtual	std::size_t num_edges(const BitSetT& set)	const;
 
 			const vector<BitSetT>& adjacency_matrix()		const { return adj_; }
 			const BitSetT& neighbors(int v)					const { return adj_[v]; }
@@ -293,12 +293,12 @@ namespace bitgraph {
 			//////////////	
 			// Induced subgraphs
 
-				/**
-				* @brief computes the induced subgraph by the first k vertices in the current graph
-				* @param first_k first k vertices to be included in the new graph
-				* @param g output new induced subgraph
-				* @returns the new induced subgraph (if the operation fails, g remains unchanged)
-				**/
+			/**
+			* @brief computes the induced subgraph by the first k vertices in the current graph
+			* @param first_k first k vertices to be included in the new graph
+			* @param g output new induced subgraph
+			* @returns the new induced subgraph (if the operation fails, g remains unchanged)
+			**/
 			virtual	Graph& create_subgraph(std::size_t first_k, Graph& g) const;
 
 			/**
@@ -416,13 +416,13 @@ namespace bitgraph {
 			**/
 			ostream& print_adj(std::ostream & = std::cout, bool eofl = true) const;
 
-			/**º
-			* @brief Edges of the graph to the output stream in format [v]-->[w]
+			/**
+			* @brief streams edges of the graph to the output stream in format [v]-->[w]
 			**/
 			virtual ostream& print_edges(std::ostream & = std::cout, bool eofl = false);
 
 			/*
-			* @brief Edges of the subgraph induced by a set of vertices to output stream
+			* @brief streams edges of the subgraph induced by a set of vertices to output stream
 			* @param bbsg input (bit) set of vertices
 			* @param o output stream
 			*/
@@ -433,8 +433,9 @@ namespace bitgraph {
 			// data members
 		protected:
 			std::vector<BitSetT> adj_;		//adjacency matrix 
+			
 			int NV_;						//number of vertices
-			BITBOARD NE_;					//number of edges (can be very large)
+			std::size_t NE_;				//number of edges (can be very large)
 			int NBB_;						//number of bit blocks per row (in the case of sparse graphs this is a maximum value)
 
 			//names
@@ -954,9 +955,9 @@ namespace bitgraph {
 
 	template<class BitSetT>
 	inline
-		BITBOARD Graph<BitSetT>::num_edges(const BitSetT& bbn) const {
+		std::size_t Graph<BitSetT>::num_edges(const BitSetT& bbn) const {
 
-		BITBOARD NE = 0;
+		std::size_t NE = 0;
 
 		for (auto i = 0u; i < NV_; i++) {
 			if (bbn.is_bit(i)) {
@@ -973,7 +974,7 @@ namespace bitgraph {
 
 	template<class BitSetT>
 	inline
-		BITBOARD Graph<BitSetT>::num_edges(bool lazy) {
+		std::size_t Graph<BitSetT>::num_edges(bool lazy) {
 
 		if (!lazy || NE_ == 0) {					//no lazy evaluation if NE_ = 0
 			NE_ = 0;

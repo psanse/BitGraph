@@ -81,12 +81,12 @@ namespace bitgraph {
 			* @param lazy if TRUE (reads value @NE_)
 			*			  if FALSE counts and updates @NE_
 			**/
-			BITBOARD num_edges(bool lazy = true)						  override;
+			std::size_t num_edges(bool lazy = true)						  override;
 
 			/**
 			* @brief Counts the number of edges	in an induced subgraph by a set of vertices
 			**/
-			BITBOARD num_edges(const BitSetT&) 								const override;
+			std::size_t num_edges(const BitSetT&) 								const override;
 
 			/////////////
 			// Basic operations
@@ -459,10 +459,10 @@ namespace bitgraph {
 	{
 		//cannot call Graph<BitSetT>::Graph(filename) because Graph<BitSetT>::add_edge is overriden!
 
-		if (ptype::reset(filename) == -1) {
+		if (this->reset(filename) == -1) {
 			LOGG_ERROR("error when reading file: ", filename, "Graph<BitSetT>::Graph");
 			LOG_ERROR("exiting...");
-			exit(-1);
+			std::exit(EXIT_FAILURE);
 		}
 
 	}
@@ -471,12 +471,12 @@ namespace bitgraph {
 	inline
 		Ugraph<BitSetT>::Ugraph(std::size_t NV, int* adj[], string name) {
 
-		if (ptype::reset(NV) == -1) {
+		if (this->reset(NV) == -1) {
 			LOG_ERROR("Bad graph construction - Ugraph<BitSetT>::Ugraph(std::size_t , int* adj[], string)");
 			LOG_ERROR("exiting...");
 			exit(-1);
 		}
-		ptype::name(name);
+		this->name(name);
 
 		for (std::size_t i = 0; i < NV - 1; ++i) {
 			for (std::size_t j = i + 1; j < NV; ++j) {
@@ -489,34 +489,34 @@ namespace bitgraph {
 
 	template<class BitSetT>
 	inline
-		BITBOARD Ugraph<BitSetT>::num_edges(bool lazy ) {
+		std::size_t Ugraph<BitSetT>::num_edges(bool lazy ) {
 
-		if (!lazy || ptype::NE_ == 0) {
-			ptype::NE_ = 0;
+		if (!lazy || this->NE_ == 0) {
+			this->NE_ = 0;
 
 			//adds all edges and divides by 2 for efficiency - checks for self loops	
-			for (std::size_t i = 0; i < ptype::NV_; i++) {
-				ptype::NE_ += ptype::adj_[i].count();
+			for (auto i = 0; i < this->NV_; ++i) {
+				this->NE_ += this->adj_[i].count();
 			}
 
 			//////////////////////////////
-			if (ptype::NE_ % 2 != 0) {
+			if (this->NE_ % 2 != 0) {
 				LOG_ERROR("odd number of edges found in simple undirected graph - Ugraph<BitSetT>::num_edges");
 				LOG_ERROR("exiting...");
 				exit(-1);
 			}
 			//////////////////////////////
 
-			ptype::NE_ /= 2;						//MUST be even at this point			
+			this->NE_ /= 2;						//MUST be even at this point			
 		}
 
-		return ptype::NE_;
+		return this->NE_;
 	}
 
 	template<class BitSetT>
 	inline
-		BITBOARD Ugraph<BitSetT>::num_edges(const BitSetT& bbn) const {
-		BITBOARD NE = 0;
+		std::size_t Ugraph<BitSetT>::num_edges(const BitSetT& bbn) const {
+		std::size_t NE = 0;
 
 		//reads only the upper triangle of the adjacency matrix
 		for (std::size_t i = 0; i < ptype::NV_ - 1; ++i) {
@@ -537,8 +537,8 @@ namespace bitgraph {
 		int Ugraph<BitSetT>::degree(int v, const BitSet& bbn) const {
 
 		int ndeg = 0;
-		for (auto i = 0u; i < ptype::NBB_; i++) {
-			ndeg += bblock::popc64(ptype::adj_[v].block(i) & bbn.block(i));
+		for (auto i = 0; i < this->NBB_; i++) {
+			ndeg += bblock::popc64(this->adj_[v].block(i) & bbn.block(i));
 		}
 
 		return ndeg;
