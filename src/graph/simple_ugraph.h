@@ -298,20 +298,19 @@ namespace bitgraph {
 
 			std::ostream& print_degrees(std::ostream & = std::cout)						const;
 			std::ostream& print_edges(std::ostream & = std::cout, bool eofl = false)	override;
-
-			template<class bitset_t = BitSetT>
-			std::ostream& print_edges(bitset_t& bbsg, std::ostream&);
-			std::ostream& print_matrix(std::ostream & = std::cout)						const;
+						
+			std::ostream& print_edges(BitSetT& bbsg, std::ostream&);
+			std::ostream& print_adjacency_matrix(std::ostream & = std::cout)			const;
 
 			//////////////	
-			// deleted - CHECK	
-			virtual	void remove_vertices(const BitSet& bbn) = delete;				//commented out implementation - EXPERIMENTAL
+			// deleted methods legacy - CHECK	
+			virtual void remove_vertices(const BitSet& bbn) override = delete;				//commented out implementation - EXPERIMENTAL
 
 			/**
 			*  @brief enlarges the graph with a new vertex (provided its neighborhood)
 			*		  TODO - code removed, BUGGY (should not be called , unit tests DISABLED)
 			**/
-			int add_vertex(_bbt* neigh = nullptr) = delete;
+			int add_vertex(bitset_type* neigh = nullptr) = delete;
 		};
 	}//end namespace _impl
 
@@ -380,9 +379,8 @@ namespace bitgraph {
 
 
 	template<class BitSetT>
-	template<class bitset_t>
 	inline
-		ostream& Ugraph<BitSetT>::print_edges(bitset_t& bbsg, std::ostream& o)
+	ostream& Ugraph<BitSetT>::print_edges(BitSetT& bbsg, std::ostream& o)
 	{
 		for (std::size_t i = 0; i < this->NV_ - 1; ++i) {
 			if (!bbsg.is_bit(i)) continue;
@@ -677,7 +675,7 @@ namespace bitgraph {
 
 	template<class BitSetT>
 	inline
-		ostream& Ugraph<BitSetT>::print_matrix(std::ostream& o) const
+		ostream& Ugraph<BitSetT>::print_adjacency_matrix(std::ostream& o) const
 	{
 		for (std::size_t i = 0; i < this->NV_; ++i) {
 			for (std::size_t j = 0; j < this->NV_; ++j) {
@@ -1141,7 +1139,7 @@ namespace bitgraph {
 		o << this->NV_ << " " << this->NV_ << " " << num_edges() << endl;
 
 		//writes edges
-		for (auto v = 0u; v < this->NV_ - 1; v++) {
+		for (int v = 0; v < this->NV_ - 1; v++) {
 			//non destructive scan starting from the vertex onwards
 			pair<bool, int> p = this->adj_[v].find_block_pos(WDIV(v));
 			if (p.second == EMPTY_ELEM) continue;										//no more bitblocks

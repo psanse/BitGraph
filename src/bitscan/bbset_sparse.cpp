@@ -399,9 +399,9 @@ BitSetSp&  BitSetSp::set_block (int firstBlock, int lastBlock, const BitSetSp& r
 	// Initialization
 
 	//this		
-	auto posL = BBObject::noBit;										//position of firstBlock in THIS or closest block
-	auto itL = find_block(firstBlock, posL);							//iterator for THIS O(log n)
-	(itL != vBB_.end()) ? posL = itL - vBB_.begin() : 1;				//sets posL to itL
+	auto posL = BBObject::noBit;													//position of firstBlock in THIS or closest block
+	auto itL = find_block(firstBlock, posL);										//iterator for THIS O(log n)
+	(itL != vBB_.end()) ? posL = static_cast<int>(itL - vBB_.begin()) : 1;			//sets posL to itL
 	
 	//stores the original size of THIS since it can be enlarged
 	const auto sizeL = vBB_.size();									
@@ -795,9 +795,9 @@ BITBOARD BitSetSp::find_block (int blockID) const{
 	if(it != vBB_.end() && it->idx_ == blockID){
 		return it->bb_;
 	}
-	else {
-		return BBObject::noBit;
-	}
+	
+	return BBObject::noBit;
+	
 }
 
 

@@ -249,8 +249,12 @@ namespace bitgraph {
 
 			/**
 			* @brief finds the bitblock of the block index
-			* @returns bitblock of the block index or BBOjbect::noBit if it does not exist, i.e., it is empty
+			* @param blockID: index of the block to find
+			* @returns bitblock of the block index @blockID or 0 if it does not exist, i.e., it is empty
 			* @details O(log) complexity
+			*		 - does not dissambiguate between non-existing block and existing empty block . CHECK! (25/02/2025)
+			* 
+			* TODO - return INVALID_EMPTY_BITBLOCK to dissambiguate (25/02/2025)
 			**/
 			BITBOARD find_block(int blockID)			const;
 
@@ -1643,7 +1647,7 @@ namespace bitgraph {
 		////////////////////////////////////////////////////////////////////////////////////////////
 
 		if (it != vBB_.end() && (it->idx_ == blockID || Policy_iterPos)) {
-			pos = it - vBB_.begin();
+			pos = static_cast<int>(it - vBB_.begin());
 		}
 		else {
 			pos = BBObject::noBit;
