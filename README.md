@@ -39,7 +39,7 @@ The repository has been tested on Linux (24.x.x) and Windows 10 OS.
 
 ## Releases 
 
-The latest release, v1.2.0 (December 2025), remains compatible with C++11, except for GoogleTest, which requires C++14. 
+The latest release, v1.2.1 (December 2025), remains compatible with C++11, except for GoogleTest, which requires C++14. 
 
 ## Acknowledgements
 
