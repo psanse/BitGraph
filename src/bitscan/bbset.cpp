@@ -19,8 +19,8 @@ using namespace bitgraph;
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
-BitSet::BitSet(int nPop, bool val) :
-	nBB_(INDEX_1TO1(nPop))
+BitSet::BitSet(std::size_t nPop, bool val) :
+	nBB_(static_cast<int>(INDEX_1TO1(nPop)))
 {
 	
 	try {
@@ -63,7 +63,7 @@ BitSet::BitSet(const vint& v):
 	}
 }
 
-BitSet::BitSet(int nPop, std::initializer_list<int> l):
+BitSet::BitSet(std::size_t nPop, std::initializer_list<int> l):
 	nBB_(INDEX_1TO1(nPop))
 {
 	try {
@@ -89,10 +89,10 @@ BitSet::BitSet(int nPop, std::initializer_list<int> l):
 	}
 }
 
-void BitSet::init(int popsize) noexcept {
+void BitSet::init(std::size_t popsize) noexcept {
 
 	try {
-		nBB_ = INDEX_1TO1(popsize);
+		nBB_ = static_cast<int>(INDEX_1TO1(popsize));
 		vBB_.assign(nBB_, 0);
 	}
 	catch (...) {
@@ -103,10 +103,10 @@ void BitSet::init(int popsize) noexcept {
 
 }
 
-void BitSet::init(int popsize, const vint& lv) noexcept {
+void BitSet::init(std::size_t popsize, const vint& lv) noexcept {
 		
 	try {
-		nBB_ = INDEX_1TO1(popsize); 
+		nBB_ = static_cast<int>(INDEX_1TO1(popsize));
 		vBB_.assign(nBB_, 0);
 
 		//sets bit conveniently
@@ -128,10 +128,10 @@ void BitSet::init(int popsize, const vint& lv) noexcept {
 	}	
 }
 
-void BitSet::reset(int popsize) noexcept {
+void BitSet::reset(std::size_t popsize) noexcept {
 
 	try {
-		nBB_ = INDEX_1TO1(popsize);
+		nBB_ = static_cast<int>(INDEX_1TO1(popsize));
 		vBB_.assign(nBB_, 0);
 	}
 	catch (...) {
@@ -141,10 +141,10 @@ void BitSet::reset(int popsize) noexcept {
 	}
 
 }
-void BitSet::reset(int popsize, const vint& lv) noexcept {
+void BitSet::reset(std::size_t popsize, const vint& lv) noexcept {
 
 	try {
-		nBB_ = INDEX_1TO1(popsize);
+		nBB_ = static_cast<int>(INDEX_1TO1(popsize));
 		vBB_.assign(nBB_, 0);
 
 		//sets bit conveniently

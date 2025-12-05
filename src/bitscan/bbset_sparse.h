@@ -38,7 +38,6 @@ namespace bitgraph {
 
 		class BitSetSp : public BBObject {
 			static int DEFAULT_CAPACITY;		//initial allocation of bit blocks for any new sparse bitstring - CHECK efficiency (17/02/2025)
-			
 					
 		public:
 			struct pBlock_t {

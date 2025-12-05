@@ -39,11 +39,12 @@ namespace bitgraph {
 		//
 		///////////////////////////////////
 		class BitSet :public BBObject {
+						
+
+		public:
 
 			using index_t = std::vector<BITBOARD>::size_type;
 			static constexpr index_t npos = index_t(-1);
-
-		public:
 
 			/////////////////////////////
 			// Independent operators / masks  
@@ -192,7 +193,7 @@ namespace bitgraph {
 			* @param nBits : population size
 			* @param val: initial value (TRUE, FALSE) of every bit in the bitset
 			**/
-			explicit  BitSet(int nPop, bool val = false);
+			explicit  BitSet(std::size_t nPop, bool val = false);
 
 			/**
 			* @brief Constructor of a bitset given an initial vector lv of 1-bit elements
@@ -211,7 +212,7 @@ namespace bitgraph {
 			 * @details: any collection supporting begin() and end() iterators can be used
 			 **/
 			template<class ColT>
-			explicit  BitSet(int nPop, const ColT& lv);
+			explicit  BitSet(std::size_t nPop, const ColT& lv);
 			
 			/**
 			 * @brief Creates a bitset with an initialez list of 1-bit elements
@@ -220,7 +221,7 @@ namespace bitgraph {
 			 * @param nPop: population size
 			 * @param lv : set of integers representing 1-bits in the bitset
 			 **/
-			explicit  BitSet(int nPop, std::initializer_list<int> lv);
+			explicit  BitSet(std::size_t nPop, std::initializer_list<int> lv);
 
 
 			//Move and copy semantics allowed
@@ -233,8 +234,8 @@ namespace bitgraph {
 
 			////////////
 			//Reset / init (memory allocation)
-			void init(int nPop) noexcept;
-			void init(int nPop, const vint& lv) noexcept;
+			void init(std::size_t nPop) noexcept;
+			void init(std::size_t nPop, const vint& lv) noexcept;
 
 			/**
 			* @brief Resets this bitset given to a vector lv of 1-bit elements
@@ -246,7 +247,7 @@ namespace bitgraph {
 			 * @param lv : vector of integers representing 1-bits in the bitset
 			 * @details: Fail-fast policy: exceptions are handled inside the program exits
 			**/
-			void reset(int nPop, const vint& lv) noexcept;
+			void reset(std::size_t nPop, const vint& lv) noexcept;
 
 			/**
 			* @brief Resets this bitset to an EMPTY BITSET given to a population size nPop.
@@ -257,7 +258,7 @@ namespace bitgraph {
 			* @param nPop: population size
 			* @details: Fail-fast policy: exceptions are handled inside the program exits
 			**/
-			void reset(int nPop) noexcept;
+			void reset(std::size_t nPop) noexcept;
 
 			/**
 			* @brief reallocates memory to the number of blocks of the bitset
@@ -1092,32 +1093,32 @@ namespace bitgraph{
 
 		inline int  BitSet::is_singleton(int firstBit, int lastBit) const {
 
-			index_t nbbl = WDIV(firstBit);
-			index_t nbbh = WDIV(lastBit);
+			index_t bbl = WDIV(firstBit);
+			index_t bbh = WDIV(lastBit);
 			int pc = 0;
 
 			//both ends
-			if (nbbl == nbbh) {
-				if ((pc = bblock::popc64(vBB_[nbbl] & bblock::MASK_1(/*firstBit - WMUL(nbbl)*/ WMOD(firstBit), /*lastBit - WMUL(nbbh)*/  WMOD(lastBit)))) > 1) {
+			if (bbl == bbh) {
+				if ((pc = bblock::popc64(vBB_[bbl] & bblock::MASK_1(/*firstBit - WMUL(bbl)*/ WMOD(firstBit), /*lastBit - WMUL(bbh)*/  WMOD(lastBit)))) > 1) {
 					return -1;
 				}
 			}
 			else {
 
 				//checks first block
-				if ((pc = bblock::popc64(vBB_[nbbl] & bblock::MASK_1_HIGH(/*firstBit - WMUL(nbbl)*/ WMOD(firstBit)  ))) > 1) {
+				if ((pc = bblock::popc64(vBB_[bbl] & bblock::MASK_1_HIGH(/*firstBit - WMUL(bbl)*/ WMOD(firstBit)  ))) > 1) {
 					return -1;
 				}
 
 				//checks intermediate blocks
-				for (auto i = nbbl + 1; i < nbbh; ++i) {
+				for (auto i = bbl + 1; i < bbh; ++i) {
 					if (pc += bblock::popc64(vBB_[i]) > 1) {
 						return -1;
 					}
 				}
 
 				//checks last block
-				if ((pc += bblock::popc64(vBB_[nbbh] & bblock::MASK_1_LOW(/*lastBit - WMUL(nbbh) */ WMOD(lastBit)  ))) > 1) {
+				if ((pc += bblock::popc64(vBB_[bbh] & bblock::MASK_1_LOW(/*lastBit - WMUL(bbh) */ WMOD(lastBit)  ))) > 1) {
 					return -1;
 				}
 			}
@@ -1130,20 +1131,20 @@ namespace bitgraph{
 
 		inline int  BitSet::find_singleton(int firstBit, int lastBit, int& singleton) const {
 
-			index_t nbbl = WDIV(firstBit);
-			index_t	nbbh = WDIV(lastBit);
-			index_t posl = WMOD(firstBit);    //firstBit - WMUL(nbbl);		
-			index_t posh = WMOD(lastBit);     //lastBit - WMOD(nbbh);		
+			index_t bbl = WDIV(firstBit);
+			index_t	bbh = WDIV(lastBit);
+			index_t posL = WMOD(firstBit);    //firstBit - WMUL(bbl);		
+			index_t posH = WMOD(lastBit);     //lastBit - WMOD(bbh);		
 			int pc = 0;
 			bool vertex_not_found = true;
 			singleton = BBObject::noBit;
 
 			//both ends
-			if (nbbl == nbbh) {
-				BITBOARD bbl = vBB_[nbbl] & bblock::MASK_1(posl, posh);
+			if (bbl == bbh) {
+				BITBOARD bbl = vBB_[bbl] & bblock::MASK_1(posL, posH);
 				pc = bblock::popc64(bbl);
 				if ((pc = bblock::popc64(bbl)) == 1) {
-					singleton = bblock::lsb(bbl) + WMUL(nbbl);
+					singleton = bblock::lsb(bbl) + WMUL(bbl);
 					/////////
 					return 1;
 					////////
@@ -1152,7 +1153,7 @@ namespace bitgraph{
 			else {
 
 				//checks first block
-				BITBOARD bbl = vBB_[nbbl] & bblock::MASK_1_HIGH(posl);
+				BITBOARD bbl = vBB_[bbl] & bblock::MASK_1_HIGH(posL);
 
 				if ((pc = bblock::popc64(bbl)) > 1) {
 					/////////
@@ -1161,11 +1162,11 @@ namespace bitgraph{
 				}
 				else if (pc == 1) {
 					vertex_not_found = false;
-					singleton = bblock::lsb(bbl) + WMUL(nbbl);
+					singleton = bblock::lsb(bbl) + WMUL(bbl);
 				}
 
 				//checks intermediate blocks
-				for (auto i = nbbl + 1; i < nbbh; ++i) {
+				for (auto i = bbl + 1; i < bbh; ++i) {
 					if ((pc += bblock::popc64(vBB_[i])) > 1) {
 						/////////
 						return -1;
@@ -1178,7 +1179,7 @@ namespace bitgraph{
 				}
 
 				//checks last block
-				BITBOARD bbh = vBB_[nbbh] & bblock::MASK_1_LOW(posh);
+				BITBOARD bbh = vBB_[bbh] & bblock::MASK_1_LOW(posH);
 
 				if ((pc += bblock::popc64(bbh)) > 1) {
 					/////////
@@ -1186,7 +1187,7 @@ namespace bitgraph{
 					/////////
 				}
 				else if (vertex_not_found && (pc == 1)) {
-					singleton = bblock::lsb64_intrinsic(bbh) + WMUL(nbbh);
+					singleton = bblock::lsb64_intrinsic(bbh) + WMUL(bbh);
 				}
 			}
 
@@ -1600,7 +1601,7 @@ namespace bitgraph{
 				}
 				else if (pc == 1 && is_first_bit) {  //stores bit the first time pc == 1 
 
-					bit1 = bblock::lsb64_intrinsic(bb) + WMUL(i);
+					bit1 = bblock::lsb(bb) + WMUL(i);
 					is_first_bit = false;
 
 				}
@@ -1609,15 +1610,15 @@ namespace bitgraph{
 					if (is_first_bit) {
 
 						//determines the two bits in the same block
-						bit1 = bblock::lsb64_intrinsic(bb) + WMUL(i);
-						bit2 = bblock::msb64_intrinsic(bb) + WMUL(i);
+						bit1 = bblock::lsb(bb) + WMUL(i);
+						bit2 = bblock::msb(bb) + WMUL(i);
 
 					}
 					else {
 
 						//determines the second bit directly since the
 						//two bits of the set difference are in different bitblocks
-						bit2 = bblock::lsb64_intrinsic(bb) + WMUL(i);
+						bit2 = bblock::lsb(bb) + WMUL(i);
 					}
 
 					is_second_bit = false;
@@ -1843,10 +1844,10 @@ namespace bitgraph {
 			assert(firstBit >= 0 && firstBit <= lastBit);
 			/////////////////////////////////////////////
 
-			int bbl = WDIV(firstBit);
-			int bbh = WDIV(lastBit);
-			int bith = lastBit - WMUL(bbh);
-			int bitl = firstBit - WMUL(bbl);
+			BitSet::index_t bbl = WDIV(firstBit);
+			BitSet::index_t bbh = WDIV(lastBit);
+			int posH = WMOD(lastBit);			//lastBit - WMUL(bbh));
+			int posL = WMOD(firstBit);			//firstBit - WMUL(bbl);
 
 			//////////////////////////////////
 			//Blocks within the range
@@ -1856,17 +1857,17 @@ namespace bitgraph {
 			{
 				if (Erase) {
 					//overwrites
-					res.vBB_[bbh] = lhs.vBB_[bbh] & rhs.vBB_[bbh] & bblock::MASK_1(bitl, bith);
+					res.vBB_[bbh] = lhs.vBB_[bbh] & rhs.vBB_[bbh] & bblock::MASK_1(posL, posH);
 				}
 				else {
 					//overwrites partially in the closed range
-					bblock::copy(bitl, bith, lhs.vBB_[bbh] & rhs.vBB_[bbh], res.vBB_[bbh]);
+					bblock::copy(posL, posH, lhs.vBB_[bbh] & rhs.vBB_[bbh], res.vBB_[bbh]);
 				}
 			}
 			else
 			{
 				//AND intermediate blocks
-				for (int i = bbl + 1; i < bbh; ++i) {
+				for (auto i = bbl + 1; i < bbh; ++i) {
 					//overwrites
 					res.vBB_[i] = lhs.vBB_[i] & rhs.vBB_[i];
 				}
@@ -1874,21 +1875,21 @@ namespace bitgraph {
 				//updates the last block bbh in the range
 				if (Erase) {
 					//overwrites
-					res.vBB_[bbh] = lhs.vBB_[bbh] & rhs.vBB_[bbh] & bblock::MASK_1_LOW(bith);
+					res.vBB_[bbh] = lhs.vBB_[bbh] & rhs.vBB_[bbh] & bblock::MASK_1_LOW(posH);
 				}
 				else {
-					//overwrites bbh partially inside the range (including bith)
-					bblock::copy_low(bith, lhs.vBB_[bbh] & rhs.vBB_[bbh], res.vBB_[bbh]);
+					//overwrites bbh partially inside the range (including posH)
+					bblock::copy_low(posH, lhs.vBB_[bbh] & rhs.vBB_[bbh], res.vBB_[bbh]);
 				}
 
 				//updates the first block bbl in the range
 				if (Erase) {
 					//overwrites
-					res.vBB_[bbl] = lhs.vBB_[bbl] & rhs.vBB_[bbl] & bblock::MASK_1_HIGH(bitl);
+					res.vBB_[bbl] = lhs.vBB_[bbl] & rhs.vBB_[bbl] & bblock::MASK_1_HIGH(posL);
 				}
 				else {
-					//overwrites bbl partially inside the range (including bitl)
-					bblock::copy_high(bitl, lhs.vBB_[bbl] & rhs.vBB_[bbl], res.vBB_[bbl]);
+					//overwrites bbl partially inside the range (including posL)
+					bblock::copy_high(posL, lhs.vBB_[bbl] & rhs.vBB_[bbl], res.vBB_[bbl]);
 				}
 			}
 
@@ -1897,11 +1898,11 @@ namespace bitgraph {
 
 			//set to 0 all bits outside the bitblock range if required
 			if (Erase) {
-				for (int i = bbh + 1; i < res.nBB_; ++i) {
+				for (auto i = bbh + 1; i < static_cast<BitSet::index_t>(res.nBB_); ++i) {
 					res.vBB_[i] = ZERO;
 				}
 
-				for (int i = 0; i < bbl; ++i) {
+				for (BitSet::index_t i = 0; i < bbl; ++i) {
 					res.vBB_[i] = ZERO;
 				}
 			}
@@ -1928,7 +1929,7 @@ namespace bitgraph {
 
 			//set bits to 0 outside the range if required
 			if (Erase) {
-				for (int i = lastBlock + 1; i < lhs.nBB_; ++i) {
+				for (auto i = lastBlock + 1; i < static_cast<BitSet::index_t>(lhs.nBB_); ++i) {
 					res.vBB_[i] = ZERO;
 				}
 				for (BitSet::index_t i = 0; i < firstBlock; ++i) {
@@ -1950,8 +1951,8 @@ namespace bitgraph {
 
 			BitSet::index_t bbl = WDIV(firstBit);
 			BitSet::index_t bbh = WDIV(lastBit);
-			int posh = WMOD(lastBit);  //lastBit - WMUL(bbh);
-			int posl = WMOD(firstBit); //firstBit - WMUL(bbl);
+			int posH = WMOD(lastBit);						//lastBit - WMUL(bbh);
+			int posL = WMOD(firstBit);						//firstBit - WMUL(bbl);
 
 			//////////////////////////////////
 			//Blocks within the range
@@ -1961,11 +1962,11 @@ namespace bitgraph {
 			{
 				if (Erase) {
 					//overwrites
-					res.vBB_[bbh] = (lhs.vBB_[bbh] | rhs.vBB_[bbh]) & bblock::MASK_1(posl, posh);
+					res.vBB_[bbh] = (lhs.vBB_[bbh] | rhs.vBB_[bbh]) & bblock::MASK_1(posL, posH);
 				}
 				else {
 					//overwrites partially in the closed range
-					bblock::copy(posl, posh, lhs.vBB_[bbh] | rhs.vBB_[bbh], res.vBB_[bbh]);
+					bblock::copy(posL, posH, lhs.vBB_[bbh] | rhs.vBB_[bbh], res.vBB_[bbh]);
 				}
 			}
 			else
@@ -1979,21 +1980,21 @@ namespace bitgraph {
 				//updates the last block bbh in the range
 				if (Erase) {
 					//overwrites
-					res.vBB_[bbh] = (lhs.vBB_[bbh] | rhs.vBB_[bbh]) & bblock::MASK_1_LOW(posh);
+					res.vBB_[bbh] = (lhs.vBB_[bbh] | rhs.vBB_[bbh]) & bblock::MASK_1_LOW(posH);
 				}
 				else {
-					//overwrites bbh partially inside the range (including posh)
-					bblock::copy_low(posh, lhs.vBB_[bbh] | rhs.vBB_[bbh], res.vBB_[bbh]);
+					//overwrites bbh partially inside the range (including posH)
+					bblock::copy_low(posH, lhs.vBB_[bbh] | rhs.vBB_[bbh], res.vBB_[bbh]);
 				}
 
 				//updates the first block bbl in the range
 				if (Erase) {
 					//overwrites
-					res.vBB_[bbl] = (lhs.vBB_[bbl] | rhs.vBB_[bbl]) & bblock::MASK_1_HIGH(posl);
+					res.vBB_[bbl] = (lhs.vBB_[bbl] | rhs.vBB_[bbl]) & bblock::MASK_1_HIGH(posL);
 				}
 				else {
-					//overwrites bbl partially inside the range (including posl)
-					bblock::copy_high(posl, lhs.vBB_[bbl] | rhs.vBB_[bbl], res.vBB_[bbl]);
+					//overwrites bbl partially inside the range (including posL)
+					bblock::copy_high(posL, lhs.vBB_[bbl] | rhs.vBB_[bbl], res.vBB_[bbl]);
 				}
 			}
 
@@ -2071,8 +2072,8 @@ namespace bitgraph {
 
 template<class ColT>
 inline 
-bitgraph::BitSet::BitSet(int nPop, const ColT& lv) :
-	nBB_(INDEX_1TO1(nPop))
+bitgraph::BitSet::BitSet(std::size_t nPop, const ColT& lv) :
+	nBB_(static_cast<int>(INDEX_1TO1(nPop)))
 {
 
 	try {
