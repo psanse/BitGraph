@@ -38,12 +38,14 @@ namespace bitgraph {
 
 		class BitSetSp : public BBObject {
 			static int DEFAULT_CAPACITY;		//initial allocation of bit blocks for any new sparse bitstring - CHECK efficiency (17/02/2025)
+			
+					
 		public:
 			struct pBlock_t {
-				int idx_;
+				std::size_t idx_;
 				BITBOARD bb_;
 
-				pBlock_t(int idx = BBObject::noBit, BITBOARD bb = 0) : idx_(idx), bb_(bb) {}
+				pBlock_t(std::size_t idx = -1, BITBOARD bb = 0) : idx_(idx), bb_(bb) {}
 
 				bool operator ==	(const pBlock_t& e)	const { return (idx_ == e.idx_ && bb_ == e.bb_); }
 				bool operator !=	(const pBlock_t& e)	const { return (idx_ != e.idx_ || bb_ != e.bb_); }
@@ -59,6 +61,10 @@ namespace bitgraph {
 			using vPB = std::vector<pBlock_t>;
 			using vPB_it = typename std::vector<pBlock_t>::iterator;
 			using vPB_cit = typename std::vector<pBlock_t>::const_iterator;
+			using index_t = std::vector<pBlock_t>::size_type;
+
+			//sentinel for invalid index
+			static constexpr index_t npos = index_t(-1);			 
 
 			//functor for sorting - check if it is necessary, or throwing lambdas is enough
 			struct pBlock_less {
@@ -113,7 +119,7 @@ namespace bitgraph {
 			* @returns reference to the resulting bitstring res
 			* @details: The num_blocks of lhs and rhs must be the same.
 			**/
-			friend  BitSetSp& AND_block(int firstBlock, int lastBlock, const BitSetSp& lhs, const BitSetSp& rhs, BitSetSp& res);
+			friend  BitSetSp& AND_block(index_t firstBlock, index_t lastBlock, const BitSetSp& lhs, const BitSetSp& rhs, BitSetSp& res);
 
 			/**
 			* @brief OR between lhs and rhs sparse bitsets - stores the result in sparse bitset res
@@ -158,7 +164,7 @@ namespace bitgraph {
 			 * @param lv : vector of integers representing 1-bits in the bitset
 			 * @details: Exception caught inside and the program exits
 			 **/
-			BitSetSp(int nPop, const vint& lv);
+			explicit BitSetSp(int nPop, const vint& lv);
 
 			/**
 			* @brief Creates a bitset with an initial list of 1-bit elements
@@ -187,26 +193,26 @@ namespace bitgraph {
 			* @param nPop: population size
 			* @param is_popsize: if true, the population size is set to nPop, otherwise the
 			*					  it is the maximum number of bitblocks of the bitset
-			* @details:  Exception caught inside and the program exits
+			* @details: Fail-fast strategy - exception caught inside and the program exits
 			* 
 			* TODO- change API (04/12/2025)
 			**/
-			void reset(int nPop, bool is_popsize = true);
+			void reset(int nPop, bool is_popsize = true) noexcept;
 
 			/**
 			* @brief resets the sparse bitset to a new population size with lv 1-bits
 			* @param nPop: population size
 			* @param lv: vector of 1-bits to set
-			* @details: Exception caught inside and the program exits
+			* @details:  Fail-fast strategy - exception caught inside and the program exits
 			**/
-			void reset(int nPop, const vint& lv);
+			void reset(int nPop, const vint& lv) noexcept;
 
 			/**
 			* @brief resets the sparse bitset to a new population size, old syntax
 			*		 now favoured by reset(...).
-			* @details:  Exception caught inside and the program exits
+			* @details:  Fail-fast strategy - exception caught inside and the program exits
 			**/
-			void init(int nPop, bool is_popsize = true);
+			void init(int nPop, bool is_popsize = true) noexcept;
 
 			/**
 			* @brief reallocates memory to the number of blocks of the bitset
@@ -238,25 +244,24 @@ namespace bitgraph {
 			*		 equivalent non-sparse bitset in the general case. To find the id-th block
 			*		 use find_bitblock function.
 			**/
-			BITBOARD  block(int blockID)			const { return vBB_[blockID].bb_; }
-			BITBOARD& block(int blockID) { return vBB_[blockID].bb_; }
+			BITBOARD  block(index_t blockID)			const { return vBB_[blockID].bb_; }
+			BITBOARD& block(index_t blockID) { return vBB_[blockID].bb_; }
 
-			pBlock_t  pBlock(int blockID)			const { return vBB_[blockID]; }
-			pBlock_t& pBlock(int blockID) { return vBB_[blockID]; }
+			pBlock_t  pBlock(index_t blockID)			const { return vBB_[blockID]; }
+			pBlock_t& pBlock(index_t blockID) { return vBB_[blockID]; }
 
 			const vPB& bitset()						const { return vBB_; }
 			vPB& bitset() { return vBB_; }
 
 			/**
-			* @brief finds the bitblock of the block index
+			* @brief Finds the bitblock corresponding to @blockIDx
+			*		 Block not found returns 0 (does not throw)
 			* @param blockID: index of the block to find
-			* @returns bitblock of the block index @blockID or 0 if it does not exist, i.e., it is empty
+			* @returns bitblock of the block index @blockID - 0 if the block does not exist
 			* @details O(log) complexity
-			*		 - does not dissambiguate between non-existing block and existing empty block . CHECK! (25/02/2025)
-			* 
-			* TODO - return INVALID_EMPTY_BITBLOCK to dissambiguate (25/02/2025)
+			*		 - does not dissambiguate between non-existing block and existing empty block 
 			**/
-			BITBOARD find_block(int blockID)			const;
+			BITBOARD find_block(index_t blockID)			const;
 
 			/**
 			* @brief Finds the bitblock given its block index blockID and its position in the collection. If it does not exists
@@ -265,7 +270,7 @@ namespace bitgraph {
 			* @param blockID: index of the block
 			* @param pos: OUTPUT param which provides I) the position of the block in the collection with index BlockID,
 			*			  II) BBObject::noBit depending if the block does not exist or the Policy parameter
-			* param Policy_iterPos: template param which, if true, asks for the position of the block returned
+			* param ReturnInsertPos: template param which, if true, asks for the position of the block returned
 			* @returns: iterator to the closest bitblock with index greater or equal to blocKID
 			*			or END() if the block does not exist. Depending on the Policy parameter, it can also provide
 			*			the position of the bitblock pointed by the iterator. If the block does not exist, and the Policy iterPos = false
@@ -273,14 +278,14 @@ namespace bitgraph {
 			* @details O(log) complexity
 			* @details two implementations, read only and read-write
 			**/
-			template<bool Policy_iterPos = false>
-			vPB_cit find_block(int blockID, int& pos)	const;
+			template<bool ReturnInsertPos = false>
+			vPB_cit find_block(index_t blockID, index_t& insert_pos)	const;
 
-			template<bool Policy_iterPos = false>
-			vPB_it  find_block(int blockID, int& pos);
+			template<bool ReturnInsertPos = false>
+			vPB_it  find_block(index_t blockID, index_t& pos);
 
 			/**
-			* @brief extended version of find_block. The template parameter LB_policy determines
+			* @brief extended version of find_block. The template parameter UseLowerBound determines
 			*		 the search policy: lower_bound (true) or upper_bound (false). If true, it searches
 			*		 for the block with the same index as blockID, otherwise it searches for the closest
 			*		 block with a greater index than blockID.
@@ -295,17 +300,17 @@ namespace bitgraph {
 			*		  a) Policy = true - the block does not exist and all the blocks have index less than blockID
 			*		  b) Policy = false - all the blocks have index lower than OR EQUAL to blockID
 			**/
-			template<bool LB_policy = true>
+			template<bool UseLowerBound = true>
 			std::pair<bool, vPB_it>
-				find_block_ext(int blockID);
+				find_block_ext(index_t blockID);
 
 			/**
 			* @brief extended version of find_block, returning a const iterator
 			*		 (see non-const function)
 			**/
-			template<bool LB_policy = true>
+			template<bool UseLowerBound = true>
 			std::pair<bool, vPB_cit>
-				find_block_ext(int blockID)			const;
+				find_block_ext(index_t blockID)			const;
 
 			/**
 			* @brief finds the position (index) of the bitblock with index blockID
@@ -317,14 +322,14 @@ namespace bitgraph {
 			*
 			* TODO - possibly remove - since it can be obained from find_block_ext trivially (21/02/2025)
 			**/
-			std::pair<bool, int>	 find_block_pos(int blockID)			const;
+			std::pair<bool, index_t>  find_block_pos(index_t blockID)			const;
 
 			/**
 			* @brief commodity iterators / const iterators for the bitset
 			**/
 			vPB_it  begin() { return vBB_.begin(); }
 			vPB_it  end() { return vBB_.end(); }
-			vPB_cit cbegin()						const { return vBB_.cbegin(); }
+			vPB_cit cbegin()					const { return vBB_.cbegin(); }
 			vPB_cit cend()						const { return vBB_.cend(); }
 
 			//////////////////////////////
@@ -347,7 +352,7 @@ namespace bitgraph {
 
 		public:
 			int msb()						const { return msbn64_intrin(); }
-			int msb(int& block)			const { return msbn64_intrin(block); }
+			int msb(int& block)				const { return msbn64_intrin(block); }
 		protected:
 
 			/**
@@ -470,9 +475,9 @@ namespace bitgraph {
 			/////////////////////
 			//Setting (ordered insertion) / Erasing bits  
 
-				/**
-				* @brief Sets THIS to the singleton bit
-				**/
+			/**
+			* @brief Sets THIS to the singleton bit
+			**/
 			inline BitSetSp& reset_bit(int bit);
 
 			/**
@@ -666,7 +671,7 @@ namespace bitgraph {
 			*
 			* TODO - check semantics when the num_blocks of bitset is greater than the num_blocks of THIS (23/02/2025)
 			**/
-			inline BitSetSp& AND_block(int firstBlock, const BitSetSp& rhs);
+			inline BitSetSp& AND_block(index_t firstBlock, const BitSetSp& rhs);
 
 			/////////////////////////
 			//TODO - (19/02/2025)
@@ -676,9 +681,9 @@ namespace bitgraph {
 			/////////////////////////////
 			//Boolean functions
 
-				 /**
-				 * @brief TRUE if there is a 1-bit in the position bit
-				 **/
+			 /**
+			 * @brief TRUE if there is a 1-bit in the position bit
+			 **/
 			inline	bool is_bit(int bit)				const;
 
 			/**
@@ -698,7 +703,7 @@ namespace bitgraph {
 			* @brief TRUE if this bitstring has no bits in common with rhs
 			*		 in the closed range [first_block, last_block]
 			**/
-			inline	bool is_disjoint_block(int first_block, int last_block, const BitSetSp& bb)   const;
+			inline	bool is_disjoint_block(index_t first_block, index_t last_block, const BitSetSp& bb)   const;
 
 			////////////////////////
 			 //Other operations 
@@ -708,28 +713,28 @@ namespace bitgraph {
 			/////////////////////
 			//I/O 
 
-				/**
-				* @brief streams bb and its size to @o  with format
-				*		 [bit1 bit2 bit3 ... <(pc)>] - (if empty: [ ])
-				* @param o: output stream
-				* @param show_pc: if true, shows popcount
-				* @param endl: if true, adds a new line at the end
-				* @returns output stream
-				* @details uses basic bitscanning implementation to enumerate the bits
-				**/
+			/**
+			* @brief streams bb and its size to @o  with format
+			*		 [bit1 bit2 bit3 ... <(pc)>] - (if empty: [ ])
+			* @param o: output stream
+			* @param show_pc: if true, shows popcount
+			* @param endl: if true, adds a new line at the end
+			* @returns output stream
+			* @details uses basic bitscanning implementation to enumerate the bits
+			**/
 			std::ostream& print(std::ostream& o = std::cout, bool show_pc = true, bool endl = true) const override;
 
 			/////////////////////
 			//Conversions
-			// 		
-				/**
-				* @brief converts the bitstring to a string of 1-bits with format
-				*        [bit1 bit2 bit3 ... <(pc)>] - (if empty: [ ])
-				* @details same as print, but returns a string
-				* @returns string representation of the bitstring
-				*
-				* TODO implement - cast operator (24/02/2025)
-				**/
+			 		
+			/**
+			* @brief converts the bitstring to a string of 1-bits with format
+			*        [bit1 bit2 bit3 ... <(pc)>] - (if empty: [ ])
+			* @details same as print, but returns a string
+			* @returns string representation of the bitstring
+			*
+			* TODO implement - cast operator (24/02/2025)
+			**/
 			std::string to_string()							const;
 
 			/**
@@ -753,9 +758,6 @@ namespace bitgraph {
 			int nBB_;					//maximum number of bitblocks
 
 		}; //end BitSetSp class
-
-
-
 
 
 	}//end namespace _impl
@@ -830,14 +832,14 @@ namespace bitgraph {
 	}
 
 
-	bool BitSetSp::is_disjoint_block(int first_block, int last_block, const BitSetSp& rhs)   const {
+	bool BitSetSp::is_disjoint_block(index_t first_block, index_t last_block, const BitSetSp& rhs)   const {
 
 		///////////////////////////////////////////////////////////////////////////////////
 		assert(first_block >= 0 && first_block <= last_block && (last_block < rhs.num_blocks()));
 		///////////////////////////////////////////////////////////////////////////////////
 
-		auto posL = BBObject::noBit;
-		auto posR = BBObject::noBit;
+		auto posL = npos;
+		auto posR = npos;
 		auto itL = find_block(first_block, posL);
 		auto itR = rhs.find_block(first_block, posR);
 
@@ -1257,12 +1259,12 @@ namespace bitgraph {
 
 
 
-	BitSetSp& BitSetSp::AND_block(int firstBlock, const BitSetSp& rhs) {
+	BitSetSp& BitSetSp::AND_block(index_t firstBlock, const BitSetSp& rhs) {
 
 		//determine the closes block to firstBlock
-		auto posL = BBObject::noBit;
-		auto itL = this->find_block(firstBlock, posL);			//*this
-		auto posR = BBObject::noBit;
+		auto posL = npos;
+		auto itL = this->find_block(firstBlock, posL);				//*this
+		auto posR = npos;
 		auto itR = rhs.find_block(firstBlock, posR);				//rhs
 
 		while (itL != vBB_.end() && itR != rhs.vBB_.end())
@@ -1616,37 +1618,37 @@ namespace bitgraph {
 		return *this;
 	}
 
-	template<bool Policy_iterPos>
+	template<bool ReturnInsertPos>
 	inline
 		BitSetSp::vPB_cit
-		BitSetSp::find_block(int blockID, int& pos) const
+		BitSetSp::find_block(index_t blockID, index_t& pos) const
 	{
 
 		////////////////////////////////////////////////////////////////////////////////////////////
 		auto it = lower_bound(vBB_.cbegin(), vBB_.cend(), pBlock_t(blockID), pBlock_less());
 		////////////////////////////////////////////////////////////////////////////////////////////
 
-		if (it != vBB_.end() && (it->idx_ == blockID || Policy_iterPos)) {
-			pos = it - vBB_.begin();
+		if (it != vBB_.end() && (it->idx_ == blockID || ReturnInsertPos)) {
+			pos = static_cast<index_t>(it - vBB_.begin());
 		}
 		else {
-			pos = BBObject::noBit;
+			pos = npos;
 		}
 
 		return it;
 	}
 
-	template<bool Policy_iterPos>
+	template<bool ReturnInsertPos>
 	inline
 		BitSetSp::vPB_it
-		BitSetSp::find_block(int blockID, int& pos)
+		BitSetSp::find_block(index_t blockID, index_t& pos)
 	{
 
 		////////////////////////////////////////////////////////////////////////////////////////////
 		auto it = lower_bound(vBB_.begin(), vBB_.end(), pBlock_t(blockID), pBlock_less());
 		////////////////////////////////////////////////////////////////////////////////////////////
 
-		if (it != vBB_.end() && (it->idx_ == blockID || Policy_iterPos)) {
+		if (it != vBB_.end() && (it->idx_ == blockID || ReturnInsertPos)) {
 			pos = static_cast<int>(it - vBB_.begin());
 		}
 		else {
@@ -1656,13 +1658,13 @@ namespace bitgraph {
 		return it;
 	}
 
-	template<bool LB_policy>
+	template<bool UseLowerBound>
 	std::pair<bool, BitSetSp::vPB_it>
-		BitSetSp::find_block_ext(int blockID)
+		BitSetSp::find_block_ext(index_t blockID)
 	{
 		std::pair<bool, BitSetSp::vPB_it> res;
 
-		if (LB_policy) {
+		if (UseLowerBound) {
 			////////////////////////////////////////////////////////////////////////////////////////////
 			res.second = lower_bound(vBB_.begin(), vBB_.end(), pBlock_t(blockID), pBlock_less());
 			////////////////////////////////////////////////////////////////////////////////////////////
@@ -1680,13 +1682,13 @@ namespace bitgraph {
 		return res;
 	}
 
-	template<bool LB_policy>
+	template<bool UseLowerBound>
 	std::pair<bool, BitSetSp::vPB_cit>
-		BitSetSp::find_block_ext(int blockID) const
+		BitSetSp::find_block_ext(index_t blockID) const
 	{
 		std::pair<bool, BitSetSp::vPB_cit>res;
 
-		if (LB_policy) {
+		if (UseLowerBound) {
 			////////////////////////////////////////////////////////////////////////////////////////////
 			res.second = lower_bound(vBB_.cbegin(), vBB_.cend(), pBlock_t(blockID), pBlock_less());
 			////////////////////////////////////////////////////////////////////////////////////////////
@@ -1834,7 +1836,7 @@ namespace bitgraph {
 
 
 		inline
-			BitSetSp& AND_block(int firstBlock, int lastBlock, const BitSetSp& lhs, const BitSetSp& rhs, BitSetSp& res) {
+			BitSetSp& AND_block(BitSetSp::index_t firstBlock, BitSetSp::index_t lastBlock, const BitSetSp& lhs, const BitSetSp& rhs, BitSetSp& res) {
 
 			///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 			assert(firstBlock >= 0 && firstBlock <= lastBlock && lastBlock < rhs.num_blocks() && lastBlock < lhs.num_blocks());
@@ -1845,8 +1847,8 @@ namespace bitgraph {
 			res.vBB_.reserve(std::min(lhs.vBB_.size(), rhs.vBB_.size()));
 			//////////////////////////////////////////////////////////////
 
-			auto posL = BBObject::noBit;
-			auto posR = BBObject::noBit;
+			auto posL = BitSetSp::npos;
+			auto posR = BitSetSp::npos;
 			auto itL = lhs.find_block(firstBlock, posL);
 			auto itR = rhs.find_block(firstBlock, posR);
 

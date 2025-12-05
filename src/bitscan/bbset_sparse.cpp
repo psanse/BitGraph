@@ -90,7 +90,7 @@ BitSetSp::BitSetSp(int nPop, std::initializer_list<int> lv) :
 }
 
 
-void BitSetSp::reset(int size, bool is_popsize)
+void BitSetSp::reset(int size, bool is_popsize) noexcept
 {
 	try {
 		(is_popsize) ? nBB_ = INDEX_1TO1(size) : nBB_ = size;
@@ -104,7 +104,7 @@ void BitSetSp::reset(int size, bool is_popsize)
 	}
 }
 
-void BitSetSp::reset(int nPop, const vint& lv)
+void BitSetSp::reset(int nPop, const vint& lv) noexcept
 {
 
 	try {
@@ -132,7 +132,7 @@ void BitSetSp::reset(int nPop, const vint& lv)
 	}
 }
 
-void BitSetSp::init (int size, bool is_popsize){
+void BitSetSp::init (int size, bool is_popsize) noexcept {
 	try {
 		(is_popsize) ? nBB_ = INDEX_1TO1(size) : nBB_ = size;
 		vBB_.clear();
@@ -160,7 +160,7 @@ BitSetSp& BitSetSp::set_bit(int firstBit, int lastBit)
 	bool flag_sort = false;						//flag to sort the collection
 
 	//finds position of block closest to blockID (equal or greater index)
-	auto posTHIS = 0;							//block position *this	
+	auto posTHIS = npos;							//block position *this	
 	auto itbl = find_block(bbl, posTHIS);
 			
 
@@ -176,7 +176,7 @@ BitSetSp& BitSetSp::set_bit(int firstBit, int lastBit)
 	////////////////////
  
 	//I. special case: all existing blocks are outside the range
-	if (posTHIS == BBObject::noBit) {
+	if (posTHIS == npos) {
 
 		if (bbl == bbh) {
 			vBB_.emplace_back(pBlock_t(bbl, bblock::MASK_1(offsetl, offseth)));
@@ -399,7 +399,7 @@ BitSetSp&  BitSetSp::set_block (int firstBlock, int lastBlock, const BitSetSp& r
 	// Initialization
 
 	//this		
-	auto posL = BBObject::noBit;													//position of firstBlock in THIS or closest block
+	auto posL = npos;																//position of firstBlock in THIS or closest block
 	auto itL = find_block(firstBlock, posL);										//iterator for THIS O(log n)
 	(itL != vBB_.end()) ? posL = static_cast<int>(itL - vBB_.begin()) : 1;			//sets posL to itL
 	
@@ -786,7 +786,7 @@ BitSetSp& BitSetSp::operator ^= (const BitSetSp& rhs) {
 }
 
 
-BITBOARD BitSetSp::find_block (int blockID) const{
+BITBOARD BitSetSp::find_block (index_t blockID) const{
 
 	////////////////////////////////////////////////////////////////////////////////////////////
 	auto it = lower_bound(vBB_.cbegin(), vBB_.cend(), pBlock_t(blockID), pBlock_less());
@@ -796,15 +796,15 @@ BITBOARD BitSetSp::find_block (int blockID) const{
 		return it->bb_;
 	}
 	
-	return BBObject::noBit;
+	return 0;
 	
 }
 
 
-std::pair<bool, int>
-BitSetSp::find_block_pos (int blockID) const{
+std::pair<bool, typename BitSetSp::index_t>
+BitSetSp::find_block_pos (index_t blockID) const{
 
-	std::pair<bool, int> res(false, EMPTY_ELEM);
+	std::pair<bool, index_t> res(false, EMPTY_ELEM);
 
 	////////////////////////////////////////////////////////////////////////////////////////////
 	auto it = lower_bound(vBB_.cbegin(), vBB_.cend(), pBlock_t(blockID), pBlock_less());

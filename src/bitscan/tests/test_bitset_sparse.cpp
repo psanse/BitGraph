@@ -142,7 +142,7 @@ TEST(Sparse, find_block)
 	EXPECT_TRUE(bblock::is_bit(bb, 38));			//the bitset starts at 960, so 998 has offset 38.
 
 	//variant returning also the position in the collection (not its real index)
-	auto pos = BBObject::noBit;	
+	auto pos = BitSetSp::npos;
 	auto it = bbsp.find_block(WDIV(1000), pos);		//bb = 998
 	EXPECT_EQ(1, pos);								//second block in the sparse bitset
 
