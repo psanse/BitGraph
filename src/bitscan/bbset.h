@@ -270,13 +270,19 @@ namespace bitgraph {
 			/**
 			* @brief returns the number of blocks allocated for the bitset
 			**/
-			std::size_t num_blocks()		const noexcept { return nBB_; }					
+			std::size_t num_blocks() const noexcept { return nBB_; }					
 							
-			vbset& bitset() { return vBB_; }
-			const vbset& bitset()				const { return vBB_; }
+			vbset& bitset()  noexcept { return vBB_; }
+			const vbset& bitset() const  noexcept { return vBB_; }
 
-			BITBOARD block(int blockID)	const { return vBB_[blockID]; }
-			BITBOARD& block(int blockID) { return vBB_[blockID]; }
+			BITBOARD block(index_t blockID)	const {
+				assert(blockID < vBB_.size());
+				return vBB_[blockID]; 
+			}
+			BITBOARD& block(index_t blockID) {
+				assert(blockID < vBB_.size());
+				return vBB_[blockID];
+			}
 
 			//////////////////////////////
 			// Bitscanning (no HW operations)
@@ -615,7 +621,7 @@ namespace bitgraph {
 			/**
 			* @brief Determines the lowest bit (least-significant) in common between rhs and this bitstring
 			* @param rhs: input bitstring
-			* @returns the first bit in common, -1 if they are disjoint
+			* @returns the first 1-bit in common, -1 if they are disjoint
 			* @created 7/17
 			* @last_update 02/02/2025
 			**/
@@ -674,8 +680,7 @@ namespace bitgraph {
 			*		  and -1 otherwise (more than 1-bit)
 			* @details: created  27/7/16, last_update 04/02/2025
 			**/
-			inline  int find_diff_pair(const BitSet& rhs, 
-										int& bit1, int& bit2) 	const;
+			inline  int find_diff_pair(const BitSet& rhs, int& bit1, int& bit2) 	const;
 
 			/////////////////////////////
 			//Boolean functions 
@@ -875,7 +880,7 @@ namespace bitgraph {
 
 namespace bitgraph{
 	
-		int BitSet::find_first_common(const BitSet& rhs) const {
+		inline int BitSet::find_first_common(const BitSet& rhs) const {
 
 			BITBOARD bb = 0;
 			for (auto i = 0; i < nBB_; ++i) {
@@ -886,7 +891,7 @@ namespace bitgraph{
 			return BBObject::noBit;
 		}
 
-		int BitSet::msbn64_lup() const {
+		inline int BitSet::msbn64_lup() const {
 
 			union u {
 				U16 c[4];
@@ -907,7 +912,7 @@ namespace bitgraph{
 			return BBObject::noBit;		//should not reach here
 		}
 
-		int BitSet::msbn64_intrin() const
+		inline int BitSet::msbn64_intrin() const
 		{
 			Ul posInBB;
 
@@ -922,7 +927,7 @@ namespace bitgraph{
 		}
 
 
-		int BitSet::next_bit(int bit) const {
+		inline int BitSet::next_bit(int bit) const {
 
 			//bit = -1 is a special case of early exit
 			//typically used in a loop, in the first bitscan call.
@@ -955,7 +960,7 @@ namespace bitgraph{
 
 
 
-		int BitSet::prev_bit(int bit) const {
+		inline int BitSet::prev_bit(int bit) const {
 
 			//special case - first bitscan,
 			//calls for the most-significant bit in the bitstring
@@ -992,13 +997,13 @@ namespace bitgraph{
 		}
 
 
-		bool BitSet::is_bit(int nbit/*0 based*/) const {
+		inline bool BitSet::is_bit(int nbit/*0 based*/) const {
 
 			return (vBB_[WDIV(nbit)] & Tables::mask[WMOD(nbit)]);
 
 		}
 
-		bool BitSet::is_empty() const
+		inline bool BitSet::is_empty() const
 		{
 			for (int i = 0; i < nBB_; ++i) {
 				if (vBB_[i]) {
@@ -1009,9 +1014,9 @@ namespace bitgraph{
 			return true;
 		}
 
-		bool BitSet::is_empty_block(index_t firstBlock, index_t lastBlock) const {
+		inline bool BitSet::is_empty_block(index_t firstBlock, index_t lastBlock) const {
 
-			int last_block = ((lastBlock == npos) ? static_cast<index_t>(nBB_ - 1) : lastBlock);
+			index_t last_block = ((lastBlock == npos) ? static_cast<index_t>(nBB_ - 1) : lastBlock);
 
 			///////////////////////////////////////////////////////////////////////////////
 			assert((firstBlock >= 0) && (last_block < num_blocks()) && (firstBlock <= last_block));
@@ -1028,7 +1033,7 @@ namespace bitgraph{
 		}
 
 
-		bool BitSet::is_disjoint(const BitSet& rhs) const
+		inline bool BitSet::is_disjoint(const BitSet& rhs) const
 		{
 			for (auto i = 0; i < nBB_; ++i) {
 				if (vBB_[i] & rhs.vBB_[i]) {
@@ -1039,7 +1044,7 @@ namespace bitgraph{
 		}
 
 
-		bool BitSet::is_disjoint(const BitSet& lhs, const BitSet& rhs)	const
+		inline bool BitSet::is_disjoint(const BitSet& lhs, const BitSet& rhs)	const
 		{
 			for (auto i = 0; i < nBB_; ++i) {
 				if (vBB_[i] & lhs.vBB_[i] & rhs.vBB_[i]) {
@@ -1050,9 +1055,9 @@ namespace bitgraph{
 		}
 
 
-		bool BitSet::is_disjoint_block(index_t firstBlock, index_t lastBlock, const BitSet& rhs)	const {
+		inline bool BitSet::is_disjoint_block(index_t firstBlock, index_t lastBlock, const BitSet& rhs)	const {
 
-			int last_block = ((lastBlock == npos) ? static_cast<index_t>(nBB_ - 1) : lastBlock);
+			index_t last_block = ((lastBlock == npos) ? static_cast<index_t>(nBB_ - 1) : lastBlock);
 
 			///////////////////////////////////////////////////////////////////////////////
 			assert((firstBlock >= 0) && (last_block < num_blocks()) && (firstBlock <= last_block));
@@ -1069,7 +1074,7 @@ namespace bitgraph{
 
 
 
-		BitSet& BitSet::set_bit(int lastBit, const BitSet& bb_add) {
+		inline BitSet& BitSet::set_bit(int lastBit, const BitSet& bb_add) {
 
 			int bbh = WDIV(lastBit);
 
@@ -1085,7 +1090,7 @@ namespace bitgraph{
 		}
 
 
-		int  BitSet::is_singleton(int firstBit, int lastBit) const {
+		inline int  BitSet::is_singleton(int firstBit, int lastBit) const {
 
 			int nbbl = WDIV(firstBit);
 			int nbbh = WDIV(lastBit);
@@ -1123,12 +1128,12 @@ namespace bitgraph{
 		}
 
 
-		int  BitSet::find_singleton(int firstBit, int lastBit, int& singleton) const {
+		inline int  BitSet::find_singleton(int firstBit, int lastBit, int& singleton) const {
 
-			int nbbl = WDIV(firstBit);
-			int	nbbh = WDIV(lastBit);
-			int posl = firstBit - WMUL(nbbl);		//equiv. WMOD(low);
-			int posh = lastBit - WMOD(nbbh);		//equiv. WMOD(high);
+			index_t nbbl = WDIV(firstBit);
+			index_t	nbbh = WDIV(lastBit);
+			index_t posl = firstBit - WMUL(nbbl);		//equiv. WMOD(low);
+			index_t posh = lastBit - WMOD(nbbh);		//equiv. WMOD(high);
 			int pc = 0;
 			bool vertex_not_found = true;
 			singleton = BBObject::noBit;
@@ -1193,21 +1198,21 @@ namespace bitgraph{
 		}
 
 
-		BitSet& BitSet::set_bit(int bit) {
+		inline BitSet& BitSet::set_bit(int bit) {
 
 			vBB_[WDIV(bit)] |= Tables::mask[WMOD(bit)];
 			return *this;
 		}
 
 
-		BitSet& BitSet::set_bit(int firstBit, int lastBit) {
+		inline BitSet& BitSet::set_bit(int firstBit, int lastBit) {
 
 			////////////////////////////////////////////////
 			assert(firstBit >= 0 && firstBit <= lastBit);
 			///////////////////////////////////////////////
 
-			int bbl = WDIV(firstBit);
-			int bbh = WDIV(lastBit);
+			index_t bbl = WDIV(firstBit);
+			index_t bbh = WDIV(lastBit);
 
 
 			if (bbl == bbh)
@@ -1217,7 +1222,7 @@ namespace bitgraph{
 			else
 			{
 				//set to one the intermediate blocks
-				for (int i = bbl + 1; i < bbh; ++i) {
+				for (auto i = bbl + 1; i < bbh; ++i) {
 					vBB_[i] = ONE;
 				}
 
@@ -1229,17 +1234,9 @@ namespace bitgraph{
 
 			return *this;
 		}
+		
 
-		//inline
-		//BitSet& BitSet::set_bit (){
-		//
-		//	for (auto i = 0; i < nBB_; ++i) {
-		//		vBB_[i] = ONE;
-		//	}
-		//	return *this;
-		//}
-
-		BitSet& BitSet::set_bit(const BitSet& bb_add) {
+		inline BitSet& BitSet::set_bit(const BitSet& bb_add) {
 
 			/////////////////////////////////
 			assert(nBB_ <= bb_add.nBB_);
@@ -1252,7 +1249,7 @@ namespace bitgraph{
 			return *this;
 		}
 
-		inline BitSet& _impl::BitSet::assign_bit(const BitSet& bb_add)
+		inline BitSet& BitSet::assign_bit(const BitSet& bb_add)
 		{
 			/////////////////////////////////
 			assert(nBB_ <= bb_add.nBB_);
@@ -1266,7 +1263,7 @@ namespace bitgraph{
 		}
 
 
-		BitSet& BitSet::set_block(index_t firstBlock, index_t lastBlock, const BitSet& bb_add) {
+		inline BitSet& BitSet::set_block(index_t firstBlock, index_t lastBlock, const BitSet& bb_add) {
 
 			index_t last_block = ((lastBlock == npos) ? static_cast<index_t>(nBB_ - 1) : lastBlock);
 
@@ -1299,7 +1296,7 @@ namespace bitgraph{
 		}
 
 
-		BitSet& BitSet::erase_bit() {
+		inline BitSet& BitSet::erase_bit() {
 
 			for (auto i = 0; i < nBB_; ++i) {
 				vBB_[i] = ZERO;
@@ -1308,14 +1305,14 @@ namespace bitgraph{
 			return *this;
 		}
 
-		BitSet& BitSet::erase_bit(int nBit) {
+		inline BitSet& BitSet::erase_bit(int nBit) {
 
 			vBB_[WDIV(nBit)] &= ~Tables::mask[WMOD(nBit)];
 			return *this;
 		}
 
 
-		BitSet& BitSet::erase_bit(int firstBit, int lastBit) {
+		inline BitSet& BitSet::erase_bit(int firstBit, int lastBit) {
 
 			//general comment: low - WMUL(bbl) = WMOD(bbl) but supposed to be less expensive (CHECK 01/02/25)
 
@@ -1358,7 +1355,7 @@ namespace bitgraph{
 			return *this;
 		}
 
-		int BitSet::lsbn64_non_intrin() const {
+		inline int BitSet::lsbn64_non_intrin() const {
 			/////////////////
 			// different implementations of lsbn depending on configuration
 
@@ -1395,7 +1392,7 @@ namespace bitgraph{
 			return  BBObject::noBit;
 		}
 
-		int BitSet::lsbn64_intrin() const
+		inline int BitSet::lsbn64_intrin() const
 		{
 			Ul posInBB;
 
@@ -1408,7 +1405,7 @@ namespace bitgraph{
 			return BBObject::noBit;
 		}
 
-		int BitSet::is_singleton() const {
+		inline int BitSet::is_singleton() const {
 
 			int pc = 0;
 			for (auto i = 0; i < nBB_; ++i) {
@@ -1425,7 +1422,7 @@ namespace bitgraph{
 		}
 
 
-		int BitSet::is_singleton_block(index_t firstBlock, index_t lastBlock) const
+		inline int BitSet::is_singleton_block(index_t firstBlock, index_t lastBlock) const
 		{
 			int last_block = ((lastBlock == npos) ? static_cast<index_t>(nBB_ - 1) : lastBlock);
 
@@ -1450,7 +1447,7 @@ namespace bitgraph{
 		}
 
 
-		int BitSet::popcn64() const {
+		inline int BitSet::popcn64() const {
 
 			int pc = 0;
 
@@ -1462,7 +1459,7 @@ namespace bitgraph{
 		}
 
 
-		int BitSet::popcn64(int firstBit, int lastBit) const
+		inline int BitSet::popcn64(int firstBit, int lastBit) const
 		{
 
 			/////////////////////////////////////////////////////////////////
@@ -1496,10 +1493,7 @@ namespace bitgraph{
 			return pc;
 		}
 
-
-
-
-		int BitSet::find_common_singleton(const BitSet& rhs, int& bit) const {
+		inline int BitSet::find_common_singleton(const BitSet& rhs, int& bit) const {
 
 			int pc = 0;
 			bool is_first_vertex = true;
@@ -1524,8 +1518,7 @@ namespace bitgraph{
 		}
 
 
-
-		int	BitSet::find_common_singleton_block(index_t firstBlock, index_t lastBlock, const BitSet& rhs, int& bit) const {
+		inline	int	BitSet::find_common_singleton_block(index_t firstBlock, index_t lastBlock, const BitSet& rhs, int& bit) const {
 
 
 			int last_block = (lastBlock == npos) ? static_cast<index_t>(nBB_ - 1) : lastBlock;
@@ -1557,7 +1550,7 @@ namespace bitgraph{
 		}
 
 
-		int BitSet::find_diff_singleton(const BitSet& rhs, int& bit) const {
+		inline int BitSet::find_diff_singleton(const BitSet& rhs, int& bit) const {
 
 			int pc = 0;
 			bit = BBObject::noBit;
@@ -1583,7 +1576,7 @@ namespace bitgraph{
 			return pc;
 		}
 
-		int BitSet::find_diff_pair(const BitSet& rhs, int& bit1, int& bit2) const {
+		inline int BitSet::find_diff_pair(const BitSet& rhs, int& bit1, int& bit2) const {
 
 			int pc = 0;
 			bool is_first_bit = true;
@@ -1636,7 +1629,7 @@ namespace bitgraph{
 		}
 			
 
-		BitSet& BitSet::erase_bit(const BitSet& bbn) {
+		inline BitSet& BitSet::erase_bit(const BitSet& bbn) {
 
 			for (auto i = 0; i < nBB_; ++i) {
 				vBB_[i] &= ~bbn.vBB_[i];
@@ -1645,7 +1638,7 @@ namespace bitgraph{
 			return *this;
 		}
 
-		BitSet& BitSet::erase_bit(int firstBit, int lastBit, const BitSet& bbn) {
+		inline BitSet& BitSet::erase_bit(int firstBit, int lastBit, const BitSet& bbn) {
 
 			//general comment: low - WMUL(bbl) = WMOD(bbl) but supposed to be less expensive (CHECK 01/02/25)
 
@@ -1689,7 +1682,7 @@ namespace bitgraph{
 		}
 
 
-		BitSet& BitSet::erase_bit(const BitSet& bb_lhs, const BitSet& bb_rhs) {
+		inline BitSet& BitSet::erase_bit(const BitSet& bb_lhs, const BitSet& bb_rhs) {
 
 			for (auto i = 0; i < nBB_; i++) {
 				vBB_[i] &= ~(bb_lhs.vBB_[i] | bb_rhs.vBB_[i]);
@@ -1698,14 +1691,16 @@ namespace bitgraph{
 			return *this;
 		}
 
-		BitSet& BitSet::erase_block(index_t firstBlock, index_t lastBlock, const BitSet& bb_lhs, const BitSet& bb_rhs) {
+		inline BitSet& BitSet::erase_block(index_t firstBlock, index_t lastBlock, const BitSet& bb_lhs, const BitSet& bb_rhs) {
 
+
+			index_t last_block = (lastBlock == npos) ? static_cast<index_t>(nBB_ - 1) : lastBlock;
 
 			///////////////////////////////////////////////////////////////////////////////
-			assert((firstBlock >= 0) && (LastBlock < nBB_) && (firstBlock <= LastBlock));
+			assert((firstBlock >= 0) && (last_block < num_blocks()) && (firstBlock <= last_block));
 			///////////////////////////////////////////////////////////////////////////////
 
-			index_t last_block = (lastBlock == -1) ? static_cast<index_t>(nBB_ - 1) : lastBlock;
+		
 
 			for (auto i = firstBlock; i <= last_block; ++i) {
 				vBB_[i] &= ~(bb_lhs.vBB_[i] | bb_rhs.vBB_[i]);
@@ -1714,7 +1709,7 @@ namespace bitgraph{
 			return *this;
 		}
 
-		BitSet& BitSet::erase_block(index_t firstBlock, index_t lastBlock, const BitSet& bb_del) {
+		inline BitSet& BitSet::erase_block(index_t firstBlock, index_t lastBlock, const BitSet& bb_del) {
 
 			index_t last_block = ((lastBlock == npos) ? static_cast<index_t>(nBB_ - 1) : lastBlock);
 
@@ -1730,6 +1725,7 @@ namespace bitgraph{
 		}
 
 		template<bool Erase>
+		inline
 		BitSet& BitSet::AND_EQUAL_block(index_t firstBlock, index_t lastBlock, const BitSet& rhs) {
 
 			auto last_block = ((lastBlock == npos) ? static_cast<index_t>(nBB_ - 1) : lastBlock);
@@ -1757,6 +1753,7 @@ namespace bitgraph{
 		}
 
 		template<bool Erase>
+		inline
 		BitSet& BitSet::OR_EQUAL_block(index_t firstBlock, index_t lastBlock, const BitSet& rhs) {
 
 			auto last_block = ((lastBlock == npos) ? static_cast<index_t>(nBB_ - 1) : lastBlock);
@@ -1916,7 +1913,7 @@ namespace bitgraph {
 		inline
 			BitSet& AND_block(BitSet::index_t firstBlock, BitSet::index_t lastBlock, const BitSet& lhs, const BitSet& rhs, BitSet& res) {
 
-			int last_block = ((lastBlock == BitSet::npos) ? static_cast<BitSet::index_t>(lhs.nBB_ - 1) : lastBlock);
+			BitSet::index_t last_block = ((lastBlock == BitSet::npos) ? static_cast<BitSet::index_t>(lhs.nBB_ - 1) : lastBlock);
 
 			//////////////////////////////////////////////////////////////////
 			assert((firstBlock >= 0) && (last_block < lhs.num_blocks()) &&
@@ -2051,7 +2048,7 @@ namespace bitgraph {
 		BitSet& OR(const BitSet& lhs, const BitSet& rhs, BitSet& res);
 		BitSet& erase_bit(const BitSet& lhs, const BitSet& rhs, BitSet& res);
 		int find_first_common(const BitSet& lhs, const BitSet& rhs);
-		int find_first_common_block(int firstBlock, int lastBlock, const BitSet& lhs, const BitSet& rhs);
+		int find_first_common(BitSet::index_t firstBlock, BitSet::index_t lastBlock, const BitSet& lhs, const BitSet& rhs);
 				
 
 	}//end namespace _impl
@@ -2064,7 +2061,6 @@ namespace bitgraph {
 	using _impl::AND_block;
 	using _impl::OR_block;
 	using _impl::find_first_common;
-	using _impl::find_first_common_block;
 	using _impl::erase_bit;
 
 

@@ -445,12 +445,12 @@ namespace bitgraph {
 			assert((firstBlock >= 0) && (firstBlock <= lastBlock) && (lastBlock < lhs.num_blocks()));
 			///////////////////////////////////////////////////////////////////////////////
 
-			BitSet::index_t last_block = ((lastBlock == BitSet::npos) ? static_cast<BitSet::index_t>(rhs.nBB_ - 1) : lastBlock);
+			BitSet::index_t last_block = (lastBlock == BitSet::npos) ? static_cast<BitSet::index_t>(rhs.nBB_ - 1) : lastBlock;
 
 			for (auto i = firstBlock; i <= last_block; i++) {
 				BITBOARD bb = lhs.vBB_[i] & rhs.vBB_[i];
 				if (bb) {
-					return bblock::lsb64_intrinsic(bb) + WMUL(i);
+					return bblock::lsb(bb) + WMUL(i);
 				}
 			}
 
