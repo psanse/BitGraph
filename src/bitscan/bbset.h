@@ -341,7 +341,7 @@ namespace bitgraph {
 			* @details: Uses a lookup table implementation for msb()
 			* @details: Not recommended. DEPRECATED in favour of the bitscanning with state of BBIntrinsic class
 			**/
-			inline 	 int prev_bit(int bit)	const;
+			inline 	int prev_bit(int bit)	const;
 
 			/////////////////
 			// Popcount
