@@ -940,10 +940,10 @@ namespace bitgraph{
 			int bbl = WDIV(bit);
 
 			//looks for the next bit in the current block
-			int npos = bblock::lsb64_de_Bruijn(Tables::mask_high[bit - WMUL(bbl) /*WMOD(bit)*/] & vBB_[bbl]);
-			if (npos >= 0) {
+			int pos = bblock::lsb64_de_Bruijn(Tables::mask_high[bit - WMUL(bbl) /*WMOD(bit)*/] & vBB_[bbl]);
+			if (pos >= 0) {
 				//////////////////////////////
-				return (npos + WMUL(bbl));
+				return (pos + WMUL(bbl));
 				////////////////////////////
 			}
 
@@ -972,9 +972,9 @@ namespace bitgraph{
 			int bbh = WDIV(bit);
 
 			//looks for the msb in the (trimmed) current block
-			int npos = bblock::msb64_lup(Tables::mask_low[bit - WMUL(bbh) /* WMOD(bit) */] & vBB_[bbh]);
-			if (npos != BBObject::noBit) {
-				return (npos + WMUL(bbh));
+			int pos = bblock::msb64_lup(Tables::mask_low[ /*bit - WMUL(bbh)*/  WMOD(bit) ] & vBB_[bbh]);
+			if (pos != BBObject::noBit) {
+				return (pos + WMUL(bbh));
 			}
 
 			//looks for the msb in the remaining blocks
@@ -1016,7 +1016,7 @@ namespace bitgraph{
 
 		inline bool BitSet::is_empty_block(index_t firstBlock, index_t lastBlock) const {
 
-			index_t last_block = ((lastBlock == npos) ? static_cast<index_t>(nBB_ - 1) : lastBlock);
+			index_t last_block = (lastBlock == BitSet::npos) ? static_cast<index_t>(nBB_ - 1) : lastBlock;
 
 			///////////////////////////////////////////////////////////////////////////////
 			assert((firstBlock >= 0) && (last_block < num_blocks()) && (firstBlock <= last_block));
@@ -1057,7 +1057,7 @@ namespace bitgraph{
 
 		inline bool BitSet::is_disjoint_block(index_t firstBlock, index_t lastBlock, const BitSet& rhs)	const {
 
-			index_t last_block = ((lastBlock == npos) ? static_cast<index_t>(nBB_ - 1) : lastBlock);
+			index_t last_block = (lastBlock == BitSet::npos) ? static_cast<index_t>(nBB_ - 1) : lastBlock;
 
 			///////////////////////////////////////////////////////////////////////////////
 			assert((firstBlock >= 0) && (last_block < num_blocks()) && (firstBlock <= last_block));
@@ -1076,14 +1076,14 @@ namespace bitgraph{
 
 		inline BitSet& BitSet::set_bit(int lastBit, const BitSet& bb_add) {
 
-			int bbh = WDIV(lastBit);
+			index_t bbh = WDIV(lastBit);
 
 			for (auto i = 0; i < bbh; ++i) {
 				vBB_[i] = bb_add.vBB_[i];
 			}
 
 			//copy the appropiate part of the bbh bitblock (including high)
-			bblock::copy_low(lastBit - WMUL(bbh), bb_add.vBB_[bbh], this->vBB_[bbh]);
+			bblock::copy_low(/*lastBit - WMUL(bbh)*/ WMOD(lastBit), bb_add.vBB_[bbh], this->vBB_[bbh]);
 
 
 			return *this;
@@ -1092,20 +1092,20 @@ namespace bitgraph{
 
 		inline int  BitSet::is_singleton(int firstBit, int lastBit) const {
 
-			int nbbl = WDIV(firstBit);
-			int nbbh = WDIV(lastBit);
+			index_t nbbl = WDIV(firstBit);
+			index_t nbbh = WDIV(lastBit);
 			int pc = 0;
 
 			//both ends
 			if (nbbl == nbbh) {
-				if ((pc = bblock::popc64(vBB_[nbbl] & bblock::MASK_1(firstBit - WMUL(nbbl), lastBit - WMUL(nbbh)))) > 1) {
+				if ((pc = bblock::popc64(vBB_[nbbl] & bblock::MASK_1(/*firstBit - WMUL(nbbl)*/ WMOD(firstBit), /*lastBit - WMUL(nbbh)*/  WMOD(lastBit)))) > 1) {
 					return -1;
 				}
 			}
 			else {
 
 				//checks first block
-				if ((pc = bblock::popc64(vBB_[nbbl] & bblock::MASK_1_HIGH(firstBit - WMUL(nbbl)  /* eq. to WMOD(nbbl) */))) > 1) {
+				if ((pc = bblock::popc64(vBB_[nbbl] & bblock::MASK_1_HIGH(/*firstBit - WMUL(nbbl)*/ WMOD(firstBit)  ))) > 1) {
 					return -1;
 				}
 
@@ -1117,7 +1117,7 @@ namespace bitgraph{
 				}
 
 				//checks last block
-				if ((pc += bblock::popc64(vBB_[nbbh] & bblock::MASK_1_LOW(lastBit - WMUL(nbbh)  /* eq. to WMOD(nbbl) */))) > 1) {
+				if ((pc += bblock::popc64(vBB_[nbbh] & bblock::MASK_1_LOW(/*lastBit - WMUL(nbbh) */ WMOD(lastBit)  ))) > 1) {
 					return -1;
 				}
 			}
@@ -1132,8 +1132,8 @@ namespace bitgraph{
 
 			index_t nbbl = WDIV(firstBit);
 			index_t	nbbh = WDIV(lastBit);
-			index_t posl = firstBit - WMUL(nbbl);		//equiv. WMOD(low);
-			index_t posh = lastBit - WMOD(nbbh);		//equiv. WMOD(high);
+			index_t posl = WMOD(firstBit);    //firstBit - WMUL(nbbl);		
+			index_t posh = WMOD(lastBit);     //lastBit - WMOD(nbbh);		
 			int pc = 0;
 			bool vertex_not_found = true;
 			singleton = BBObject::noBit;
@@ -1143,7 +1143,7 @@ namespace bitgraph{
 				BITBOARD bbl = vBB_[nbbl] & bblock::MASK_1(posl, posh);
 				pc = bblock::popc64(bbl);
 				if ((pc = bblock::popc64(bbl)) == 1) {
-					singleton = bblock::lsb64_intrinsic(bbl) + WMUL(nbbl);
+					singleton = bblock::lsb(bbl) + WMUL(nbbl);
 					/////////
 					return 1;
 					////////
@@ -1161,7 +1161,7 @@ namespace bitgraph{
 				}
 				else if (pc == 1) {
 					vertex_not_found = false;
-					singleton = bblock::lsb64_intrinsic(bbl) + WMUL(nbbl);
+					singleton = bblock::lsb(bbl) + WMUL(nbbl);
 				}
 
 				//checks intermediate blocks
@@ -1217,7 +1217,7 @@ namespace bitgraph{
 
 			if (bbl == bbh)
 			{
-				vBB_[bbh] |= bblock::MASK_1(firstBit - WMUL(bbl), lastBit - WMUL(bbh));
+				vBB_[bbh] |= bblock::MASK_1( /*firstBit - WMUL(bbl)*/ WMOD(firstBit), /*lastBit - WMUL(bbh)*/ WMOD(lastBit));
 			}
 			else
 			{
@@ -1227,8 +1227,8 @@ namespace bitgraph{
 				}
 
 				//sets the first and last blocks
-				vBB_[bbh] |= bblock::MASK_1_LOW(lastBit - WMUL(bbh));
-				vBB_[bbl] |= bblock::MASK_1_HIGH(firstBit - WMUL(bbl));
+				vBB_[bbh] |= bblock::MASK_1_LOW(/*lastBit - WMUL(bbh)*/ WMOD(lastBit));
+				vBB_[bbl] |= bblock::MASK_1_HIGH(/*firstBit - WMUL(bbl)*/ WMOD(firstBit));
 
 			}
 
@@ -1265,7 +1265,7 @@ namespace bitgraph{
 
 		inline BitSet& BitSet::set_block(index_t firstBlock, index_t lastBlock, const BitSet& bb_add) {
 
-			index_t last_block = ((lastBlock == npos) ? static_cast<index_t>(nBB_ - 1) : lastBlock);
+			index_t last_block = ((lastBlock == BitSet::npos) ? static_cast<index_t>(nBB_ - 1) : lastBlock);
 
 			////////////////////////////////////////////////////////////////////////////////////////////
 			assert((firstBlock >= 0) && (last_block < bb_add.num_blocks()) && (firstBlock <= last_block));
@@ -1281,7 +1281,7 @@ namespace bitgraph{
 
 		inline BitSet& BitSet::assign_block(index_t firstBlock, index_t lastBlock, const BitSet& bb_add)
 		{
-			index_t last_block = ((lastBlock == npos) ? static_cast<index_t>(nBB_ - 1) : lastBlock);
+			index_t last_block = ((lastBlock == BitSet::npos) ? static_cast<index_t>(nBB_ - 1) : lastBlock);
 
 			////////////////////////////////////////////////////////////////////////////////////////////
 			assert((firstBlock >= 0) && (last_block < bb_add.num_blocks()) && (firstBlock <= last_block));
@@ -1320,17 +1320,17 @@ namespace bitgraph{
 			assert(firstBit >= 0 && (firstBit <= lastBit || lastBit == -1));
 			///////////////////////////////////////////////////////////////////
 
-			int bbl = WDIV(firstBit);
-			int bbh = (lastBit == -1) ? nBB_ - 1 : WDIV(lastBit);
+			index_t bbl = WDIV(firstBit);
+			index_t bbh = (lastBit == BBObject::noBit) ? static_cast<index_t>(nBB_ - 1) : WDIV(lastBit);
 
 
 			if (bbl == bbh)
 			{
-				if (lastBit == -1) {
-					vBB_[bbh] &= bblock::MASK_0_HIGH(firstBit - WMUL(bbl));
+				if (lastBit == BBObject::noBit) {
+					vBB_[bbh] &= bblock::MASK_0_HIGH(WMOD(firstBit));
 				}
 				else {
-					vBB_[bbh] &= bblock::MASK_0(firstBit - WMUL(bbl), lastBit - WMUL(bbh));
+					vBB_[bbh] &= bblock::MASK_0(WMOD(firstBit), WMOD(lastBit));
 				}
 			}
 			else
@@ -1341,15 +1341,15 @@ namespace bitgraph{
 				}
 
 				//last bitblock
-				if (lastBit == -1) {
+				if (lastBit == BBObject::noBit) {
 					vBB_[bbh] = ZERO;
 				}
 				else {
-					vBB_[bbh] &= bblock::MASK_0_LOW(lastBit - WMUL(bbh));
+					vBB_[bbh] &= bblock::MASK_0_LOW(WMOD(lastBit));
 				}
 
 				//first  bitblock
-				vBB_[bbl] &= bblock::MASK_0_HIGH(firstBit - WMUL(bbl));
+				vBB_[bbl] &= bblock::MASK_0_HIGH(WMOD(firstBit));
 			}
 
 			return *this;
@@ -1424,7 +1424,7 @@ namespace bitgraph{
 
 		inline int BitSet::is_singleton_block(index_t firstBlock, index_t lastBlock) const
 		{
-			int last_block = ((lastBlock == npos) ? static_cast<index_t>(nBB_ - 1) : lastBlock);
+			int last_block = ((lastBlock == BitSet::npos) ? static_cast<index_t>(nBB_ - 1) : lastBlock);
 
 
 			///////////////////////////////////////////////////////////////////////////////////
@@ -1467,14 +1467,14 @@ namespace bitgraph{
 			////////////////////////////////////////////////////////////////
 
 			int pc = 0;
-			int bbl = WDIV(firstBit);
-			int bbh = (lastBit == -1) ? nBB_ - 1 : WDIV(lastBit);
+			index_t bbl = WDIV(firstBit);
+			index_t bbh = (lastBit == BBObject::noBit) ? static_cast<index_t>(nBB_ - 1) : WDIV(lastBit);
 
 
 			if (bbl == bbh)
 			{
 				//same block
-				pc = bblock::popc64(vBB_[bbl] & bblock::MASK_1(firstBit - WMUL(bbl), lastBit - WMUL(bbh)));
+				pc = bblock::popc64(vBB_[bbl] & bblock::MASK_1(WMOD(firstBit), WMOD(lastBit)));
 
 			}
 			else
@@ -1485,8 +1485,8 @@ namespace bitgraph{
 				}
 
 				//count the population of the first and last blocks
-				pc += bblock::popc64(vBB_[bbh] & bblock::MASK_1_LOW(lastBit - WMUL(bbh)));
-				pc += bblock::popc64(vBB_[bbl] & bblock::MASK_1_HIGH(firstBit - WMUL(bbl)));
+				pc += bblock::popc64(vBB_[bbh] & bblock::MASK_1_LOW(WMOD(lastBit)));
+				pc += bblock::popc64(vBB_[bbl] & bblock::MASK_1_HIGH(WMOD(firstBit)));
 
 			}
 
@@ -1521,7 +1521,7 @@ namespace bitgraph{
 		inline	int	BitSet::find_common_singleton_block(index_t firstBlock, index_t lastBlock, const BitSet& rhs, int& bit) const {
 
 
-			int last_block = (lastBlock == npos) ? static_cast<index_t>(nBB_ - 1) : lastBlock;
+			int last_block = (lastBlock == BitSet::npos) ? static_cast<index_t>(nBB_ - 1) : lastBlock;
 
 			///////////////////////////////////////////////////////////////////////////////
 			assert((firstBlock >= 0) && (last_block < num_blocks()) && (firstBlock <= last_block));
@@ -1647,16 +1647,16 @@ namespace bitgraph{
 			///////////////////////////////////////////////////////////////////
 
 			index_t bbl = WDIV(firstBit);
-			index_t bbh = (lastBit == -1) ? static_cast<index_t>(nBB_ - 1) : WDIV(lastBit);
+			index_t bbh = (lastBit == BBObject::noBit) ? static_cast<index_t>(nBB_ - 1) : WDIV(lastBit);
 
 			//special case - both ends in the same bitblock
 			if (bbl == bbh)
 			{
 				if (lastBit == BBObject::noBit) {
-					vBB_[bbh] &= ~(bbn.vBB_[bbh] & bblock::MASK_1_HIGH(firstBit - WMUL(bbl)));					
+					vBB_[bbh] &= ~(bbn.vBB_[bbh] & bblock::MASK_1_HIGH(WMOD(firstBit)));					
 				}
 				else {
-					vBB_[bbh] &= ~(bbn.vBB_[bbh] & bblock::MASK_1(firstBit - WMUL(bbl), lastBit - WMUL(bbh)));					
+					vBB_[bbh] &= ~(bbn.vBB_[bbh] & bblock::MASK_1(WMOD(firstBit), WMOD(lastBit)));					
 				}
 			}
 			else
@@ -1667,15 +1667,15 @@ namespace bitgraph{
 				}
 
 				//last bitblock
-				if (lastBit == -1) {
+				if (lastBit == BBObject::noBit) {
 					vBB_[bbh] &= ~bbn.vBB_[bbh];
 				}
 				else {
-					vBB_[bbh] &= ~(bbn.vBB_[bbh] & bblock::MASK_1_LOW(lastBit - WMUL(bbh)));
+					vBB_[bbh] &= ~(bbn.vBB_[bbh] & bblock::MASK_1_LOW(WMOD(lastBit)));
 				}
 
 				//first  bitblock
-				vBB_[bbl] &= ~(bbn.vBB_[bbl] & bblock::MASK_1_HIGH(firstBit - WMUL(bbl)));				
+				vBB_[bbl] &= ~(bbn.vBB_[bbl] & bblock::MASK_1_HIGH(WMOD(firstBit)));
 			}
 			
 			return *this;
@@ -1694,7 +1694,7 @@ namespace bitgraph{
 		inline BitSet& BitSet::erase_block(index_t firstBlock, index_t lastBlock, const BitSet& bb_lhs, const BitSet& bb_rhs) {
 
 
-			index_t last_block = (lastBlock == npos) ? static_cast<index_t>(nBB_ - 1) : lastBlock;
+			index_t last_block = (lastBlock == BitSet::npos) ? static_cast<index_t>(nBB_ - 1) : lastBlock;
 
 			///////////////////////////////////////////////////////////////////////////////
 			assert((firstBlock >= 0) && (last_block < num_blocks()) && (firstBlock <= last_block));
@@ -1711,7 +1711,7 @@ namespace bitgraph{
 
 		inline BitSet& BitSet::erase_block(index_t firstBlock, index_t lastBlock, const BitSet& bb_del) {
 
-			index_t last_block = ((lastBlock == npos) ? static_cast<index_t>(nBB_ - 1) : lastBlock);
+			index_t last_block = ((lastBlock == BitSet::npos) ? static_cast<index_t>(nBB_ - 1) : lastBlock);
 
 			///////////////////////////////////////////////////////////////////////////////
 			assert((firstBlock >= 0) && (last_block < bb_del.num_blocks()) && (firstBlock <= last_block));
@@ -1728,7 +1728,7 @@ namespace bitgraph{
 		inline
 		BitSet& BitSet::AND_EQUAL_block(index_t firstBlock, index_t lastBlock, const BitSet& rhs) {
 
-			auto last_block = ((lastBlock == npos) ? static_cast<index_t>(nBB_ - 1) : lastBlock);
+			auto last_block = ((lastBlock == BitSet::npos) ? static_cast<index_t>(nBB_ - 1) : lastBlock);
 
 			///////////////////////////////////////////////////////////////////////////////////
 			assert((firstBlock >= 0) && (firstBlock <= last_block) && (last_block < rhs.num_blocks()));
@@ -1756,7 +1756,7 @@ namespace bitgraph{
 		inline
 		BitSet& BitSet::OR_EQUAL_block(index_t firstBlock, index_t lastBlock, const BitSet& rhs) {
 
-			auto last_block = ((lastBlock == npos) ? static_cast<index_t>(nBB_ - 1) : lastBlock);
+			auto last_block = ((lastBlock == BitSet::npos) ? static_cast<index_t>(nBB_ - 1) : lastBlock);
 
 			///////////////////////////////////////////////////////////////////////////////////
 			assert((firstBlock >= 0) && (firstBlock <= last_block) && (last_block < rhs.num_blocks()));
@@ -1948,10 +1948,10 @@ namespace bitgraph {
 			assert(firstBit <= lastBit && firstBit >= 0);
 			//////////////////////////////
 
-			int bbl = WDIV(firstBit);
-			int bbh = WDIV(lastBit);
-			int bith = lastBit - WMUL(bbh);
-			int bitl = firstBit - WMUL(bbl);
+			BitSet::index_t bbl = WDIV(firstBit);
+			BitSet::index_t bbh = WDIV(lastBit);
+			int posh = WMOD(lastBit);  //lastBit - WMUL(bbh);
+			int posl = WMOD(firstBit); //firstBit - WMUL(bbl);
 
 			//////////////////////////////////
 			//Blocks within the range
@@ -1961,11 +1961,11 @@ namespace bitgraph {
 			{
 				if (Erase) {
 					//overwrites
-					res.vBB_[bbh] = (lhs.vBB_[bbh] | rhs.vBB_[bbh]) & bblock::MASK_1(bitl, bith);
+					res.vBB_[bbh] = (lhs.vBB_[bbh] | rhs.vBB_[bbh]) & bblock::MASK_1(posl, posh);
 				}
 				else {
 					//overwrites partially in the closed range
-					bblock::copy(bitl, bith, lhs.vBB_[bbh] | rhs.vBB_[bbh], res.vBB_[bbh]);
+					bblock::copy(posl, posh, lhs.vBB_[bbh] | rhs.vBB_[bbh], res.vBB_[bbh]);
 				}
 			}
 			else
@@ -1979,21 +1979,21 @@ namespace bitgraph {
 				//updates the last block bbh in the range
 				if (Erase) {
 					//overwrites
-					res.vBB_[bbh] = (lhs.vBB_[bbh] | rhs.vBB_[bbh]) & bblock::MASK_1_LOW(bith);
+					res.vBB_[bbh] = (lhs.vBB_[bbh] | rhs.vBB_[bbh]) & bblock::MASK_1_LOW(posh);
 				}
 				else {
-					//overwrites bbh partially inside the range (including bith)
-					bblock::copy_low(bith, lhs.vBB_[bbh] | rhs.vBB_[bbh], res.vBB_[bbh]);
+					//overwrites bbh partially inside the range (including posh)
+					bblock::copy_low(posh, lhs.vBB_[bbh] | rhs.vBB_[bbh], res.vBB_[bbh]);
 				}
 
 				//updates the first block bbl in the range
 				if (Erase) {
 					//overwrites
-					res.vBB_[bbl] = (lhs.vBB_[bbl] | rhs.vBB_[bbl]) & bblock::MASK_1_HIGH(bitl);
+					res.vBB_[bbl] = (lhs.vBB_[bbl] | rhs.vBB_[bbl]) & bblock::MASK_1_HIGH(posl);
 				}
 				else {
-					//overwrites bbl partially inside the range (including bitl)
-					bblock::copy_high(bitl, lhs.vBB_[bbl] | rhs.vBB_[bbl], res.vBB_[bbl]);
+					//overwrites bbl partially inside the range (including posl)
+					bblock::copy_high(posl, lhs.vBB_[bbl] | rhs.vBB_[bbl], res.vBB_[bbl]);
 				}
 			}
 
@@ -2002,11 +2002,11 @@ namespace bitgraph {
 
 			//set to 0 all bits outside the bitblock range if required
 			if (Erase) {
-				for (int i = bbh + 1; i < res.nBB_; ++i) {
+				for (auto i = bbh + 1; i < res.nBB_; ++i) {
 					res.vBB_[i] = ZERO;
 				}
 
-				for (int i = 0; i < bbl; ++i) {
+				for (BitSet::index_t i = 0; i < bbl; ++i) {
 					res.vBB_[i] = ZERO;
 				}
 			}

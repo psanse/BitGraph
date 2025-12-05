@@ -34,7 +34,7 @@ BitSet::BitSet(int nPop, bool val) :
 
 	//trim last bitblock to ZERO if val = TRUE
 	if (val) {
-		vBB_.back() &= bblock::MASK_0_HIGH(nPop - WMUL(nBB_ - 1));
+		vBB_.back() &= bblock::MASK_0_HIGH(WMOD(nPop) /*nPop - WMUL(nBB_ - 1)*/);
 	}
 }
 
