@@ -396,7 +396,7 @@ TEST(BitSetClass, to_vector) {
 
 	//conversion to vector
 	vector<int> lv;
-	bb.to_vector(lv);
+	bb.extract(lv);
 
 	////////////////////////////
 	EXPECT_EQ(lv_exp, lv);
@@ -405,20 +405,20 @@ TEST(BitSetClass, to_vector) {
 ///////////////
 // C-array interface (4/7/16)
 
-	int c_array[POPULATION_SIZE];
+	int array[POPULATION_SIZE];
 	for (auto i = 0; i < POPULATION_SIZE; ++i) {
-		c_array[i] = EMPTY_ELEM;
+		array[i] = EMPTY_ELEM;
 	}
 
 	//conversion to C-array
 	std::size_t size = 0;
-	bb.to_C_array(c_array, size);
+	bb.extract_array(array, size);
 	
 	////////////////////////
 	EXPECT_EQ(3, size);
-	EXPECT_TRUE(std::find(std::begin(c_array), std::end(c_array), 10) != std::end(c_array)) ;
-	EXPECT_TRUE(std::find(std::begin(c_array), std::end(c_array), 20) != std::end(c_array));
-	EXPECT_TRUE(std::find(std::begin(c_array), std::end(c_array), 64) != std::end(c_array));
+	EXPECT_TRUE(std::find(std::begin(array), std::end(array), 10) != std::end(array)) ;
+	EXPECT_TRUE(std::find(std::begin(array), std::end(array), 20) != std::end(array));
+	EXPECT_TRUE(std::find(std::begin(array), std::end(array), 64) != std::end(array));
 	/////////////////////////
 }
 

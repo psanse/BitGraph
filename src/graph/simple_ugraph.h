@@ -847,7 +847,7 @@ namespace bitgraph {
 	int Ugraph<BitSetT>::create_subgraph(Ugraph& ug, int v) const
 	{
 		vector<int> vnn;
-		this->neighbors(v).to_vector(vnn);
+		this->neighbors(v).extract(vnn);
 
 		return create_subgraph(ug, vnn);
 	}

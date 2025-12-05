@@ -200,7 +200,7 @@ namespace bitgraph {
 
 			//decodes subgraph to vector
 			vint lv;
-			bbsg.to_vector(lv);
+			bbsg.extract(lv);
 
 			//singleton input bitset - induced subgraph has no edges
 			auto NV = lv.size();
@@ -239,7 +239,7 @@ namespace bitgraph {
 
 			//decodes subgraph to vector
 			vint lv;
-			bbsg.to_vector(lv);
+			bbsg.extract(lv);
 
 			//input bitset of size 2 - induced subgraph has no triangles
 			auto NV = lv.size();
