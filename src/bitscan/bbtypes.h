@@ -37,7 +37,7 @@ namespace bitgraph {
 	constexpr BITBOARD EVEN = 0x5555555555555555;		//1 bits in even positions: 64 bits
 	constexpr U32 EVEN_32 = 0x55555555;					//1 bits in even positions: 32 bits
 	constexpr U8 EVEN_8 = 0x55;						    //1 bits in even positions: 8 bits
-	constexpr BITBOARD ZERO = 0x0000000000000000;		//0 64 bit mask
+	constexpr BITBOARD ZERO = 0ull;						//0 64 bit mask
 
 }
 

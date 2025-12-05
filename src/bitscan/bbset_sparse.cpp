@@ -796,7 +796,7 @@ BITBOARD BitSetSp::find_block (index_t blockID) const{
 		return it->bb_;
 	}
 	
-	return 0;
+	return ZERO;
 	
 }
 

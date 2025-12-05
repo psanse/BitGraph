@@ -1652,7 +1652,7 @@ namespace bitgraph {
 			pos = static_cast<int>(it - vBB_.begin());
 		}
 		else {
-			pos = BBObject::noBit;
+			pos = npos;
 		}
 
 		return it;

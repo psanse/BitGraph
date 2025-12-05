@@ -211,7 +211,7 @@ BitSet& BitSet::flip (){
 	return *this;
 }
 
-BitSet& BitSet::flip_block(int firstBlock, int lastBlock)
+BitSet& BitSet::flip_block(index_t firstBlock, index_t lastBlock)
 {
 	
 	///////////////////////////////////////////////////////////////////////////////////
@@ -398,7 +398,7 @@ namespace bitgraph {
 		//	//	(firstBlock <= lastBlock) && (rhs.nBB_ == lhs.nBB_));
 		//	////////////////////////////////////////////////////////////////////
 		//
-		//	//int last_block = ((lastBlock == -1) ? lhs.nBB_ - 1 : lastBlock);
+		//	//int last_block = ((lastBlock == Bitset::npos) ? lhs.nBB_ - 1 : lastBlock);
 		//
 		//	//for (auto i = firstBlock; i <= last_block; ++i) {
 		//	//	lhs.vBB_[i] &= rhs.vBB_[i];
@@ -439,13 +439,13 @@ namespace bitgraph {
 			return BBObject::noBit;		//disjoint
 		}
 
-		int find_first_common_block(int firstBlock, int lastBlock, const BitSet& lhs, const BitSet& rhs) {
+		int find_first_common(BitSet::index_t firstBlock, BitSet::index_t lastBlock, const BitSet& lhs, const BitSet& rhs) {
 
 			///////////////////////////////////////////////////////////////////////////////
 			assert((firstBlock >= 0) && (firstBlock <= lastBlock) && (lastBlock < lhs.num_blocks()));
 			///////////////////////////////////////////////////////////////////////////////
 
-			int last_block = ((lastBlock == -1) ? rhs.nBB_ - 1 : lastBlock);
+			BitSet::index_t last_block = ((lastBlock == BitSet::npos) ? static_cast<BitSet::index_t>(rhs.nBB_ - 1) : lastBlock);
 
 			for (auto i = firstBlock; i <= last_block; i++) {
 				BITBOARD bb = lhs.vBB_[i] & rhs.vBB_[i];
