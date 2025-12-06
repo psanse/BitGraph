@@ -270,8 +270,10 @@ namespace bitgraph {
 
 			/**
 			* @brief returns the number of blocks allocated for the bitset
+			* @details: equivalent to size() in this class, but not in sparse bitsets
 			**/
-			std::size_t num_blocks() const noexcept { return nBB_; }					
+			std::size_t num_blocks() const noexcept { return nBB_; }							
+			//std::size_t size() const noexcept { return vBB_.size(); }
 							
 			vbset& bitset()  noexcept { return vBB_; }
 			const vbset& bitset() const  noexcept { return vBB_; }
@@ -812,7 +814,7 @@ namespace bitgraph {
 			//data members
 
 		protected:
-			int nBB_;							//number of bitblocks 
+			int nBB_;							//number of bitblocks (redundant to vBB.size() but preserved for efficiency)
 			std::vector<BITBOARD> vBB_;			//bitset
 
 
