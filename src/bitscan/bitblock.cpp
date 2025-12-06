@@ -41,16 +41,16 @@ namespace bitgraph {
 				if (bb16) return (Tables::lsba[3][bb16]);
 			}
 
-			return EMPTY_ELEM;		//should not occur
+			return BBObject::noBit;		//should not occur
 		}
 
 
-		int  lsb64_pc(const BITBOARD bb_dato) {
+		int lsb64_pc(const BITBOARD bb_dato) {
 
 			if (bb_dato) {
 				return popc64((bb_dato & -bb_dato) - 1);
 			}
-			return EMPTY_ELEM;
+			return BBObject::noBit;
 		}
 
 
@@ -60,11 +60,10 @@ namespace bitgraph {
 				return(Tables::T_64[(bb_dato & (~bb_dato + 1)) % 67]);
 			}
 
-			return EMPTY_ELEM;
+			return BBObject::noBit;
 		}
 
-		int  lsb64_lup_eff(const BITBOARD bb_dato) {
-
+		int lsb64_lup_eff(const BITBOARD bb_dato) {
 
 			register union x {
 				U16 c[4];
@@ -83,7 +82,7 @@ namespace bitgraph {
 				else return (Tables::lsb[val.c[3]] + 48);		//nonzero by (1)
 			}
 
-			return EMPTY_ELEM;		//Should not reach
+			return BBObject::noBit;		//Should not reach
 		}
 
 		//////////////////////////////
@@ -113,7 +112,7 @@ namespace bitgraph {
 			} val;
 			val.b = bb;
 
-			//if(bb==0) return -1;				//for sparse data
+			//if(bb == 0) return -1;				//for sparse data
 
 			if (val.b) {
 				if (val.c[3]) return (Tables::msba[3][val.c[3]]);
@@ -130,13 +129,13 @@ namespace bitgraph {
 						return (msb[val.c[1]] + 16);
 				else  return (msb[val.c[0]]);			//should be nonzero by (1)*/
 
-			return EMPTY_ELEM;							//should not reach here
+			return BBObject::noBit;							//should not reach here
 		}
 
 
 		//////
 		// I/O
-		//////
+
 		std::ostream& print(BITBOARD bb_data, std::ostream& o, bool endofl)
 		{
 

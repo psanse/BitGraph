@@ -12,8 +12,9 @@
 #define __BITBLOCK_H__
 
 #include <iostream>
-#include "bbtypes.h"
-#include "bbconfig.h"
+//#include "bbtypes.h"
+//#include "bbconfig.h"
+#include "bbobject.h"		//for BBObject::noBit
 #include "tables.h"
 
 ///////////////////////////
@@ -89,7 +90,7 @@ namespace bitgraph {
 				
 		using _impl::Tables;
 
-		//compile time globals for bitscanning operations in bitblocks
+		//magic numbers for bitscanning operations in bitblocks
 		constexpr unsigned long long DEBRUIJN_MN_64_ISOL = 0x07EDD5E59A4E28C2;
 		constexpr unsigned long long DEBRUIJN_MN_64_SEP = 0x03f79d71b4cb0a89;
 		constexpr unsigned long long DEBRUIJN_MN_64_SHIFT = 58;
@@ -102,26 +103,26 @@ namespace bitgraph {
 		* @returns TRUE if the bit is set, FALSE otherwise
 		**/
 		inline
-			bool is_bit(const BITBOARD bb, int bit) { return (bb & Tables::mask[bit]); }
-
+		bool is_bit(const BITBOARD bb, int bit) { return (bb & Tables::mask[bit]); }
 
 		/////////////////////
 		// BitScanning
-			/**
-			* @brief Index of the least significant bit of bb implemented
-			*		 with perfect hashing according to modulo
-			* @param bb: input 64-bit bitblock
-			* @returns index of the least significant bit or -1 if empty
-			*
-			* @details T_64[67] returns the index of the single 1-bit
-			*		   in the family of bitblocks 000...1...000
-			* @returns index of the least significant bit or -1 if empty
-			* @comment Modulus operation is not efficient.
-			**/
-		int  lsb64_mod(const BITBOARD bb);
 
 		/**
 		* @brief Index of the least significant bit of bb implemented
+		*		 with perfect hashing according to modulo
+		* @param bb: input 64-bit bitblock
+		* @returns index of the least significant bit or -1 if empty
+		*
+		* @details T_64[67] returns the index of the single 1-bit
+		*		   in the family of bitblocks 000...1...000
+		* @returns index of the least significant bit or -1 if empty
+		* @comment Modulus operation is not efficient.
+		**/
+		int  lsb64_mod(const BITBOARD bb);
+
+		/**
+		* @brief Index of the least significant bit in @bb implemented
 		*		 with a 16-bit lookup table
 		* @param bb: input 64-bit bitblock
 		* @returns index of the least significant bit or -1 if empty
@@ -129,7 +130,7 @@ namespace bitgraph {
 		int  lsb64_lup(const BITBOARD bb);
 
 		/**
-		* @brief Index of the least significant bit of bb implemented
+		* @brief Index of the least significant bit in @bb implemented
 		*		 with a 16-bit lookup table
 		* @param bb: input 64-bit bitblock
 		* @returns index of the least significant bit or -1 if empty
@@ -139,7 +140,7 @@ namespace bitgraph {
 		int  lsb64_lup_eff(const BITBOARD bb);
 
 		/**
-		* @brief Index of the least significant bit of bb function implemented
+		* @brief Index of the least significant bit in @bb implemented
 		*		 as a population count operation
 		* @param bb: input 64-bit bitblock
 		* @returns index of the least significant bit or -1 if empty
@@ -148,7 +149,7 @@ namespace bitgraph {
 		int  lsb64_pc(const BITBOARD bb);
 
 		/**
-		* @brief Index of the least significant bit of bb function implemented
+		* @brief Index of the least significant bit in @bb function implemented
 		*		 with a De Bruijn magic word for perfect hashing as
 		*		 a product and a shift operation.
 		* @param bb: input 64-bit bitblock
@@ -165,7 +166,7 @@ namespace bitgraph {
 		int lsb64_de_Bruijn(const BITBOARD bb);
 
 		/**
-		* @brief Index of the least significant bit of bb (default)
+		* @brief Index of the least significant bit in @bb (default)
 		*		(intrin.h WIN / x86intrin.h Linux lib)
 		* @param bb: input 64-bit bitblock
 		* @details implemented by calling processor instructions
@@ -173,9 +174,8 @@ namespace bitgraph {
 		**/
 		int lsb64_intrinsic(const BITBOARD bb);
 
-
 		/**
-		* @brief Index of the least significant bit in bb
+		* @brief Index of the least significant bit in @bb
 		*		 (RECOMMENDED to use - calls lsb64_intrinsic)
 		* @param bb: input 64-bit bitblock
 		* @returns index of the least significant bit or -1 if empty
@@ -184,7 +184,7 @@ namespace bitgraph {
 
 
 		/**
-		* @brief Index of the most significant bit in bb implemented
+		* @brief Index of the most significant bit in @bb implemented
 		*		 with a 16-bit lookup table
 		* @param bb: input 64-bit bitblock
 		* @returns Index of the most least significant bit or -1 if empty
@@ -192,7 +192,7 @@ namespace bitgraph {
 		int msb64_lup(const BITBOARD bb);
 
 		/**
-		* @brief Index of the most significant bit of bb implemented
+		* @brief Index of the most significant bit of @bb implemented
 		*		 with a De Bruijn magic word for perfect hashing as
 		*		 a product and a shift operation.
 		*
@@ -203,26 +203,27 @@ namespace bitgraph {
 		*
 		* TODO - efficiency tests
 		**/
-		int  msb64_de_Bruijn(const BITBOARD bb);		//De Bruijn magic word 
+		int  msb64_de_Bruijn(const BITBOARD bb);		
 
 		/**
-		* @brief Index of the most significant bit in @bb which uses processor instructions
-		*		(intrin.h WIN / x86intrin.h Linux lib)
+		* @brief Index of the most significant bit in @bb implemented with processor instructions
+		*		(intrin.h WIN / x86intrin.h Linux lib).
 		* @param bb: input 64-bit bitblock
 		* @returns index of the most significant bit or -1 if empty
+		* @details: recommended choice for MSB 
 		**/
-		 int msb64_intrinsic(const BITBOARD bb);
-
+		int msb64_intrinsic(const BITBOARD bb);
 
 		/**
-		* @brief Index of the most significant bit in @bb. Alias for msb64_intrinsic.
+		* @brief Index of the most significant bit in @bb. Alias for msb64_intrinsic (recommended).
 		* @param bb: input 64-bit bitblock
 		* @returns index of the most significant bit or -1 if empty
+		* @details: recommended choice for MSB 
 		**/
 		inline int msb(const BITBOARD bb) { return msb64_intrinsic(bb); }
 
 		/////////////////////
-		// Bit population
+		// Bit counting
 
 		/**
 		* @brief population count in bb implemented with 16-bit lookup tables
@@ -250,13 +251,17 @@ namespace bitgraph {
 		*
 		* @return number of 1-bits in the bitblock
 		**/
-		////////////////////////////////////////////////
 		int popc64(const BITBOARD bb);
-		////////////////////////////////////////////////
+						
+		/**
+		* @brief convenient alias for population count in @bb
+		**/
+		inline int count(const BITBOARD bb) { return popc64(bb); }
 
-		//alias for population count	
-		//inline int size(const BITBOARD bb_dato) { return popc64(bb_dato); }
-		inline int count(const BITBOARD bb_dato) { return popc64(bb_dato); }
+		/**
+		* @brief deprecated alias for population count in @bb
+		**/
+		inline int size(const BITBOARD bb) = delete;    //{ return popc64(bb); }
 
 	//////////////////////
 	//  Masks
@@ -363,16 +368,15 @@ namespace bitgraph {
 		/////////////////////
 		// I/O
 
-			/**
-			* @brief streams bb and its popcount to the output stream
-			*		 (format ...000111 [3])
-			**/
+		/**
+		* @brief streams bb and its popcount to the output stream
+		*		 (format ...000111 [3])
+		**/
 		std::ostream& print(BITBOARD bb, std::ostream & = std::cout, bool endofl = true);
 
 	} //end namespace bblock
 
 }//end namespace bitgraph
-
 
 
 //////////////////////////////
@@ -381,15 +385,14 @@ namespace bitgraph {
 namespace bitgraph {
 
 	namespace bblock {
-
-		using _impl::Tables;
+				
 
 		inline int lsb64_intrinsic(const BITBOARD bb_dato) {
 			unsigned long index;
 			if (_BitScanForward64(&index, bb_dato))
 				return(index);
 
-			return EMPTY_ELEM;
+			return BBObject::noBit;
 		}
 
 
@@ -398,7 +401,7 @@ namespace bitgraph {
 			if (_BitScanReverse64(&index, bb_dato))
 				return(index);
 
-			return EMPTY_ELEM;
+			return BBObject::noBit;
 		}
 
 
@@ -415,19 +418,17 @@ namespace bitgraph {
 
 			val.b = bb_dato; //Carga unisn
 
-			return (Tables::pc[val.c[0]] + Tables::pc[val.c[1]] + Tables::pc[val.c[2]] + Tables::pc[val.c[3]]); //Suma de poblaciones  
+			return (impl::Tables::pc[val.c[0]] + impl::Tables::pc[val.c[1]] + impl::Tables::pc[val.c[2]] + impl::Tables::pc[val.c[3]]); //Suma de poblaciones  
 #endif
 
 		}
-
 		
-
-		inline inline int lsb64_de_Bruijn(const BITBOARD bb_dato) {
-
+		inline int lsb64_de_Bruijn(const BITBOARD bb_dato) {
+					
 #ifdef ISOLANI_LSB
-			return (bb_dato == 0) ? EMPTY_ELEM : Tables::indexDeBruijn64_ISOL[((bb_dato & -bb_dato) * DEBRUIJN_MN_64_ISOL) >> DEBRUIJN_MN_64_SHIFT];
+			return (bb_dato == 0) ? BBObject::noBit : _impl::Tables::indexDeBruijn64_ISOL[((bb_dato & -bb_dato) * DEBRUIJN_MN_64_ISOL) >> DEBRUIJN_MN_64_SHIFT];
 #else
-			return (bb_dato == 0) ? EMPTY_ELEM : Tables::indexDeBruijn64_SEP[((bb_dato ^ (bb_dato - 1)) * DEBRUIJN_MN_64_SEP) >> DEBRUIJN_MN_64_SHIFT];
+			return (bb_dato == 0) ? BBObject::noBit : _impl::Tables::indexDeBruijn64_SEP[((bb_dato ^ (bb_dato - 1)) * DEBRUIJN_MN_64_SEP) >> DEBRUIJN_MN_64_SHIFT];
 #endif
 
 		}
@@ -435,7 +436,7 @@ namespace bitgraph {
 		inline
 			int msb64_de_Bruijn(const BITBOARD bb_dato) {
 
-			if (bb_dato == 0) return EMPTY_ELEM;
+			if (bb_dato == 0) return BBObject::noBit;
 
 			//creates all 1s up to MSB position
 			BITBOARD bb = bb_dato;
@@ -447,7 +448,7 @@ namespace bitgraph {
 			bb |= bb >> 32;
 
 			//applys same computation as for LSB-de Bruijn
-			return Tables::indexDeBruijn64_SEP[(bb * DEBRUIJN_MN_64_SEP) >> DEBRUIJN_MN_64_SHIFT];
+			return _impl::Tables::indexDeBruijn64_SEP[(bb * DEBRUIJN_MN_64_SEP) >> DEBRUIJN_MN_64_SHIFT];
 		}
 	}//end namespace bblock
 

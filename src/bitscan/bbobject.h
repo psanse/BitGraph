@@ -10,8 +10,8 @@
 #define  __BB_OBJECT_H__
 
 #include <iostream>
-#include "bitscan/bbtypes.h"
-#include "bitscan/bbconfig.h"
+#include "bbtypes.h"
+#include "bbconfig.h"
 
 namespace bitgraph {
 	namespace _impl {
@@ -24,8 +24,8 @@ namespace bitgraph {
 
 		class BBObject {
 		public:
-			static const int noBit = -1;
-			static const BITBOARD noBlock = std::numeric_limits<BITBOARD>::max();		
+			static constexpr int noBit = -1;
+			static constexpr BITBOARD noBlock = std::numeric_limits<BITBOARD>::max();		
 
 			//types of bit scans
 			enum scan_types { NON_DESTRUCTIVE, NON_DESTRUCTIVE_REVERSE, DESTRUCTIVE, DESTRUCTIVE_REVERSE };
