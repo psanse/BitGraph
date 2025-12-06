@@ -4,10 +4,12 @@
   *		   includes namespace bbalg at the end with a few algorithms
   * @author pss
   * @details created 2017, last_update 06/12/2025
+  * 
+  * TODO - change filename to bbutils.h (27/02/2025)
   **/
 
-#ifndef  _BBALG_H_
-#define  _BBALG_H_
+#ifndef  __BBUTILS_H__
+#define  __BBUTILS_H__
 
 #include "utils/common.h"
 #include "utils/logger.h"
@@ -69,9 +71,7 @@ namespace bitgraph {
 }//end namespace bitgraph
 
 namespace bitgraph {
-
-
-
+	
 	//////////////////////
 	// 
 	// BitSetWithPC struct
