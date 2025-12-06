@@ -19,54 +19,37 @@
 
 //aliases
 namespace bitgraph {
-
 	using bbo = BBObject;
-
 }
 
 namespace bitgraph {
-	///////////////////////
-	//
-	// namespace bbAlg for stateless functions for BitSets
-	//
-	// TODO - check and refactor these functions (27/02/2025)
-	// 
-	///////////////////////
+	
+	/**
+	* @brief Converts a bitset to a vector of integers of size the
+	*		 population count of the bitset hierarchy. The bitset is not modified.
+	* @details: function next_bit() is used to extract the bits
+	**/
+	template<class BitSetT>
+	std::vector<int> to_vector(BitSetT& bbn);
 
-	namespace utils {
+	/**
+	* @brief Creates a random BITBOARD (64-bits) with density p of 1-bits
+	*
+	* @TODO: Not precise generator (but acceptable since the population is at most 64).
+	*		 better to generate a collection of 64 elements with 64*p 1s and shuffle it
+	**/
+	BITBOARD random_bitblock(double p);
 
-		/**
-		* @brief Converts a bitset to a vector of integers of size equal to the 
-		*		 population count of the bitset
-		*        I. the bitset is not modified
-		*		II. the bitset must be of the efficient scanning type
-		*			in the BBObject hierarchy (BBScan or BBScanSp)
-		*
-		* TODO - Check BitSetT type with type traits (27/02/2025)
-		**/
-		template<class BitSetT>
-		std::vector<int> to_vector(BitSetT& bbn);
-
-		/**
-		* @brief Creates a random BITBOARD (64-bits) with density p of 1-bits
-		* 
-		* @TODO: Not precise generator (but acceptable since the population is at most 64).
-		*		 better to generate a collection of 64 elements with 64*p 1s and shuffle it
-		**/
-		BITBOARD random_bitblock(double p);
-
-		/**
-		* @brief extracts the first k 1-bits in the bitset @bb
-		* @param k: the number of bits to find
-		* @param bb: the input bitset
-		* @param lv: the output vector of integers
-		* @returns the number of bits found in lv
-		* @details: used in BBMWCP for upper bound computation
-		**/
-		template<class BitSetT>
-		int extract_first_k(int k, BitSetT& bb, std::vector<int>& lv);
-
-	}//end namespace utils
+	/**
+	* @brief extracts the first k 1-bits in the bitset @bb
+	* @param k: the number of bits to find
+	* @param bb: the input bitset
+	* @param lv: the output vector of integers
+	* @returns the number of bits found in lv
+	* @details: used in BBMWCP for upper bound computation
+	**/
+	template<class BitSetT>
+	int extract_first_k(int k, BitSetT& bb, std::vector<int>& lv);
 
 }//end namespace bitgraph
 
@@ -381,228 +364,210 @@ namespace bitgraph {
 
 namespace bitgraph {
 
-		template <class BitSetT, int SIZE>
-		inline
-			BitSet& _impl::bbCol_t<BitSetT, SIZE>::set_bit(int bitsetID, int bit, bool& is_first_bit) {
+	using _impl::Tables;
 
-			//adds bit
-			bb_[bitsetID].set_bit(bit);
+	template <class BitSetT, int SIZE>
+	inline
+		BitSet& _impl::bbCol_t<BitSetT, SIZE>::set_bit(int bitsetID, int bit, bool& is_first_bit) {
 
-			//checks if the bit added is the first bit of the bitset
-			is_first_bit = (bit == bb_[bitsetID].lsb());
+		//adds bit
+		bb_[bitsetID].set_bit(bit);
 
-			//returns a reference to the modified bitset
-			return 	std::ref(bb_[bitsetID]);
-		}
+		//checks if the bit added is the first bit of the bitset
+		is_first_bit = (bit == bb_[bitsetID].lsb());
+
+		//returns a reference to the modified bitset
+		return 	std::ref(bb_[bitsetID]);
+	}
 
 
-		template <class BitSetT, int SIZE>
-		inline
-			std::ostream& _impl::bbCol_t<BitSetT, SIZE>::print(std::ostream& o, bool show_pc, bool eofl)  const {
-			for (auto i = 0; i < bb_.size(); ++i) {
-				if (!bb_[i].is_empty()) {
-					bb_[i].print(o, show_pc, true);
-				}
+	template <class BitSetT, int SIZE>
+	inline
+		std::ostream& _impl::bbCol_t<BitSetT, SIZE>::print(std::ostream& o, bool show_pc, bool eofl)  const {
+		for (auto i = 0; i < bb_.size(); ++i) {
+			if (!bb_[i].is_empty()) {
+				bb_[i].print(o, show_pc, true);
 			}
-			if (eofl) { o << std::endl; }
-			return o;
 		}
+		if (eofl) { o << std::endl; }
+		return o;
+	}
 
-		template <class BitSetT>
-		inline
-			std::ostream& _impl::BitSetStack<BitSetT>::print(print_t t, std::ostream& o, bool eofl) {
+	template <class BitSetT>
+	inline
+		std::ostream& _impl::BitSetStack<BitSetT>::print(print_t t, std::ostream& o, bool eofl) {
 
-			switch (t) {
-			case STACK:
-				o << "[";
-				for (auto i = 0; i < stack_.size(); ++i) {
-					o << stack_[i] << " ";
-				}
-				o << "]" << std::endl;
-				break;
-			case BITSET:
-				bb_.print(o, true, false);		//size info and no end of line
-				break;
-			default:
-				; //error
+		switch (t) {
+		case STACK:
+			o << "[";
+			for (auto i = 0; i < stack_.size(); ++i) {
+				o << stack_[i] << " ";
 			}
-
-			if (eofl) { o << std::endl; }
-			return o;
+			o << "]" << std::endl;
+			break;
+		case BITSET:
+			bb_.print(o, true, false);		//size info and no end of line
+			break;
+		default:
+			; //error
 		}
 
-		template <class BitSetT>
-		inline
-			bool _impl::BitSetStack<BitSetT>::is_sync() {
+		if (eofl) { o << std::endl; }
+		return o;
+	}
 
-			//same population count
-			if (bb_.count() != static_cast<int>(stack_.size())) {
+	template <class BitSetT>
+	inline
+		bool _impl::BitSetStack<BitSetT>::is_sync() {
+
+		//same population count
+		if (bb_.count() != static_cast<int>(stack_.size())) {
+			return false;
+		}
+
+		//same bits in the stack  
+		for (auto i = 0u; i < stack_.size(); ++i) {
+			if (!bb_.is_bit(stack_[i])) {
 				return false;
 			}
-
-			//same bits in the stack  
-			for (auto i = 0u; i < stack_.size(); ++i) {
-				if (!bb_.is_bit(stack_[i])) {
-					return false;
-				}
-			}
-
-			return true;
 		}
 
-		template <class BitSetT>
-		inline
-			void _impl::BitSetStack<BitSetT>::sync_bitset() {
+		return true;
+	}
 
-			bb_.erase_bit();
-			for (auto i = 0; i < stack_.size(); i++) {
-				bb_.set_bit(stack_[i]);
-			}
+	template <class BitSetT>
+	inline
+		void _impl::BitSetStack<BitSetT>::sync_bitset() {
+
+		bb_.erase_bit();
+		for (auto i = 0; i < stack_.size(); i++) {
+			bb_.set_bit(stack_[i]);
 		}
+	}
 
-		template <class BitSetT>
-		inline
-			void _impl::BitSetStack<BitSetT>::sync_stack() {
+	template <class BitSetT>
+	inline
+		void _impl::BitSetStack<BitSetT>::sync_stack() {
 
-			//cleans stack
-			stack_.clear();
+		//cleans stack
+		stack_.clear();
 
-			//bitscanning with nested data structure
-			typename BitSetT::scan sc(bb_);
-			if (sc.init_scan() != -1) {
-				int bit = BBObject::noBit;
-				while ((bit = bb_.next_bit()) != BBObject::noBit) {
-					stack_.emplace_back(bit);
-				}
-			}
-
-		}
-
-		template <class BitSetT>
-		inline
-			void  _impl::BitSetStack<BitSetT>::reset(int MAX_POP_SIZE) {
-
-			//cleans stack
-			stack_.clear();
-
-			//allocates memory	
-			try {
-				/////////////////////////////
-				bb_.reset(MAX_POP_SIZE);
-				stack_.clear();
-				////////////////////////////
-			}
-			catch (std::exception& e) {
-				LOG_ERROR("%s", e.what());
-				LOG_ERROR("BitSetStack<BitSetT>::-reset()");
-				std::exit(EXIT_FAILURE);
-			}
-
-		}; //end struct
-
-
-		template <class BitSetT>
-		inline
-			void _impl::BitSetStack<BitSetT>::push(int bit) {
-
-			if (!bb_.is_bit(bit)) {
-				bb_.set_bit(bit);
+		//bitscanning with nested data structure
+		typename BitSetT::scan sc(bb_);
+		if (sc.init_scan() != -1) {
+			int bit = BBObject::noBit;
+			while ((bit = bb_.next_bit()) != BBObject::noBit) {
 				stack_.emplace_back(bit);
 			}
 		}
 
-		template <class BitSetT>
-		inline
-			int _impl::BitSetStack<BitSetT>::pop() {
+	}
 
-			if (stack_.size() > 0) {
-				int bit = stack_.back();
-				stack_.pop_back();
-				bb_.erase_bit(bit);
-				return bit;
-			}
-			else return BBObject::noBit;
+	template <class BitSetT>
+	inline
+		void  _impl::BitSetStack<BitSetT>::reset(int MAX_POP_SIZE) {
+
+		//cleans stack
+		stack_.clear();
+
+		//allocates memory	
+		try {
+			/////////////////////////////
+			bb_.reset(MAX_POP_SIZE);
+			stack_.clear();
+			////////////////////////////
+		}
+		catch (std::exception& e) {
+			LOG_ERROR("%s", e.what());
+			LOG_ERROR("BitSetStack<BitSetT>::-reset()");
+			std::exit(EXIT_FAILURE);
 		}
 
-		template <class BitSetT>
-		inline
-			void _impl::BitSetStack<BitSetT>::erase_bit() {
-			for (int i = 0; i < stack_.size(); i++) {
-				bb_.erase_bit(stack_[i]);
-			}
+	}; //end struct
+
+
+	template <class BitSetT>
+	inline
+		void _impl::BitSetStack<BitSetT>::push(int bit) {
+
+		if (!bb_.is_bit(bit)) {
+			bb_.set_bit(bit);
+			stack_.emplace_back(bit);
+		}
+	}
+
+	template <class BitSetT>
+	inline
+		int _impl::BitSetStack<BitSetT>::pop() {
+
+		if (stack_.size() > 0) {
+			int bit = stack_.back();
+			stack_.pop_back();
+			bb_.erase_bit(bit);
+			return bit;
+		}
+		else return BBObject::noBit;
+	}
+
+	template <class BitSetT>
+	inline
+		void _impl::BitSetStack<BitSetT>::erase_bit() {
+		for (int i = 0; i < stack_.size(); i++) {
+			bb_.erase_bit(stack_[i]);
+		}
+	}
+
+
+	template<class BitSetT>
+	inline
+		std::vector<int> to_vector(BitSetT& bbn) {
+
+		std::vector<int> res;
+		res.reserve(bbn.count());
+
+		//uses primitive bitscanning which is compatible for all bitsets in the hierarchy
+		int v = BBObject::noBit;
+		while ((v = bbn.next_bit(v)) != BBObject::noBit) {
+			res.emplace_back(v);
 		}
 
+		return res;
+	}
 
-}//end namespace bitgraph
 
+	inline
+		BITBOARD random_bitblock(double p) {
 
+		BITBOARD bb = 0;
 
-namespace bitgraph {
-
-	///////////////////////
-	//
-	// Stateless functions for BitSets
-	// (namespace bbalg)
-	//
-	//////////////////////
-
-	namespace bbalg {
-
-		using _impl::Tables;
-
-		template<class BitSetT>
-		inline
-			std::vector<int> to_vector(BitSetT& bbn) {
-
-			std::vector<int> res;
-			res.reserve(bbn.count());
-
-			//uses primitive bitscanning which is compatible for all bitsets in the hierarchy
-			int v = BBObject::noBit;
-			while ((v = bbn.next_bit(v)) != BBObject::noBit) {
-				res.emplace_back(v);
+		for (auto i = 0; i < WORD_SIZE; i++) {
+			if (com::_rand::uniform_dist(p)) {
+				bb |= Tables::mask[i];
 			}
+		}
+		return bb;
+	}
 
-			return res;
+	template<class BitSetT>
+	inline
+		int extract_first_k(int k, BitSetT& bb, std::vector<int>& lv) {
+
+		lv.clear();
+
+		///////////////////////////////////////////////////////////////
+		if (bb.init_scan(bbo::NON_DESTRUCTIVE) == -1) { return 0; }
+		///////////////////////////////////////////////////////////////
+
+		int nBits = 0;
+		int bit = BBObject::noBit;
+		while ((bit = bb.next_bit()) != BBObject::noBit || nBits < k) {
+			lv.emplace_back(bit);
+			nBits++;
 		}
 
-
-		inline
-			BITBOARD random_bitblock(double p) {
-
-			BITBOARD bb = 0;
-
-			for (auto i = 0; i < WORD_SIZE; i++) {
-				if (com::_rand::uniform_dist(p)) {
-					bb |= Tables::mask[i];
-				}
-			}
-			return bb;
-		}
-
-		template<class BitSetT>
-		inline
-			int extract_first_k(int k, BitSetT& bb, std::vector<int>& lv) {
-
-			lv.clear();
-
-			///////////////////////////////////////////////////////////////
-			if (bb.init_scan(bbo::NON_DESTRUCTIVE) == -1) { return 0; }
-			///////////////////////////////////////////////////////////////
-
-			int nBits = 0;
-			int bit = BBObject::noBit;
-			while ((bit = bb.next_bit()) != BBObject::noBit || nBits < k) {
-				lv.emplace_back(bit);
-				nBits++;
-			}
-
-			//number of bits found (ideally the first-k)
-			return nBits;
-		}
-
-	}//end namespace bbalg
-
+		//number of bits found (ideally the first-k)
+		return nBits;
+	}
 
 }//end namespace bitgraph
 

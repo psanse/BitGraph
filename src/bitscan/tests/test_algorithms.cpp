@@ -315,7 +315,7 @@ TEST(algorithms, extract_first_k){
 	
 	//solution in vector
 	vint lbits (3,-1);
-	bbalg::extract_first_k(3,bb, lbits);
+	extract_first_k(3,bb, lbits);
 
 	vint lbits_exp;
 	lbits_exp.push_back(10);
@@ -328,7 +328,7 @@ TEST(algorithms, extract_first_k){
 TEST(algorithms, random_bitblock) {
 	
 	//10% of density	
-	BITBOARD bb = bbalg::random_bitblock(0.5);
+	BITBOARD bb = random_bitblock(0.5);
 
 	//around 30 bits
 	EXPECT_GE(bblock::count(bb), 20);
@@ -343,7 +343,7 @@ TEST(algorithms, to_vector) {
 	bb.set_bit(65);
 
 	//stateless conversion to vector
-	auto lv = bbalg::to_vector(bb);
+	auto lv = to_vector(bb);
 	EXPECT_EQ(10, lv[0]);
 	EXPECT_EQ(64, lv[1]);
 	EXPECT_EQ(65, lv[2]);
@@ -355,7 +355,7 @@ TEST(algorithms, to_vector) {
 	bbs.set_bit(65);
 
 	//stateless conversion to vector
-	auto lvs = bbalg::to_vector(bbs);
+	auto lvs = to_vector(bbs);
 	EXPECT_EQ(10, lvs[0]);
 	EXPECT_EQ(64, lvs[1]);
 	EXPECT_EQ(65, lvs[2]);

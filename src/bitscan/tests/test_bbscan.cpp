@@ -350,7 +350,7 @@ protected:
 
 TEST_F(BBScanClassTest_1, miscellanous){
 	EXPECT_EQ(bbn.count(),bbsc.count());
-	EXPECT_EQ(bbalg::to_vector(bbn), bbalg::to_vector(bbsc));
+	EXPECT_EQ(to_vector(bbn), to_vector(bbsc));
 }
 
 
