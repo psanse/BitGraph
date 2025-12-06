@@ -1172,7 +1172,7 @@ namespace bitgraph{
 						/////////
 					}
 					else if (vertex_not_found && (pc == 1)) {
-						singleton = bblock::lsb64_intrinsic(vBB_[i]) + WMUL(i);
+						singleton = bblock::lsb(vBB_[i]) + WMUL(i);
 						vertex_not_found = false;
 					}
 				}

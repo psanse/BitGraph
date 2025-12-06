@@ -331,7 +331,7 @@ TEST(algorithms, random_bitblock) {
 	BITBOARD bb = bbalg::gen_random_block(0.5);
 
 	//around 30 bits
-	EXPECT_GE(bblock::size(bb), 20);
+	EXPECT_GE(bblock::count(bb), 20);
 
 }
 
