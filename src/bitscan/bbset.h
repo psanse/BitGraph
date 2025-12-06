@@ -970,7 +970,7 @@ namespace bitgraph{
 			}
 
 			//bitblock of input bit
-			index_t blockH = WDIV(bit);
+			int blockH = WDIV(bit);
 
 			//looks for the msb in the (trimmed) current block
 			int pos = bblock::msb64_lup(Tables::mask_low[ /*bit - WMUL(blockH)*/  WMOD(bit) ] & vBB_[blockH]);
@@ -1094,8 +1094,8 @@ namespace bitgraph{
 
 		inline int  BitSet::is_singleton(int firstBit, int lastBit) const {
 
-			index_t blockL = WDIV(firstBit);
-			index_t blockH = WDIV(lastBit);
+			int blockL = WDIV(firstBit);
+			int blockH = WDIV(lastBit);
 			int pc = 0;
 
 			//both ends
@@ -1132,8 +1132,8 @@ namespace bitgraph{
 
 		inline int  BitSet::find_singleton(int firstBit, int lastBit, int& singleton) const {
 
-			index_t blockL = WDIV(firstBit);
-			index_t	blockH = WDIV(lastBit);
+			int blockL = WDIV(firstBit);
+			int	blockH = WDIV(lastBit);
 			int offsetL = WMOD(firstBit);			//firstBit - WMUL(blockL);		
 			int offsetH = WMOD(lastBit);			//lastBit - WMOD(blockH);		
 			int pc = 0;
@@ -1213,8 +1213,8 @@ namespace bitgraph{
 			assert(firstBit >= 0 && firstBit <= lastBit);
 			///////////////////////////////////////////////
 
-			index_t blockL = WDIV(firstBit);
-			index_t blockH = WDIV(lastBit);
+			int blockL = WDIV(firstBit);
+			int blockH = WDIV(lastBit);
 
 
 			if (blockL == blockH)
@@ -1322,8 +1322,8 @@ namespace bitgraph{
 			assert(firstBit >= 0 && (firstBit <= lastBit || lastBit == -1));
 			///////////////////////////////////////////////////////////////////
 
-			index_t blockL = WDIV(firstBit);
-			index_t blockH = (lastBit == BBObject::noBit) ? static_cast<index_t>(nBB_ - 1) : WDIV(lastBit);
+			int blockL = WDIV(firstBit);
+			int blockH = (lastBit == BBObject::noBit) ? (nBB_ - 1) : WDIV(lastBit);
 
 
 			if (blockL == blockH)
@@ -1338,7 +1338,7 @@ namespace bitgraph{
 			else
 			{
 				//set to one the intermediate blocks
-				for (int i = blockL + 1; i < blockH; ++i) {
+				for (auto i = blockL + 1; i < blockH; ++i) {
 					vBB_[i] = ZERO;
 				}
 
@@ -1426,7 +1426,7 @@ namespace bitgraph{
 
 		inline int BitSet::is_singleton_block(index_t firstBlock, index_t lastBlock) const
 		{
-			int last_block = ((lastBlock == BitSet::npos) ? static_cast<index_t>(nBB_ - 1) : lastBlock);
+			index_t last_block = ((lastBlock == BitSet::npos) ? static_cast<index_t>(nBB_ - 1) : lastBlock);
 
 
 			///////////////////////////////////////////////////////////////////////////////////
@@ -1523,7 +1523,7 @@ namespace bitgraph{
 		inline	int	BitSet::find_common_singleton_block(index_t firstBlock, index_t lastBlock, const BitSet& rhs, int& bit) const {
 
 
-			int last_block = (lastBlock == BitSet::npos) ? static_cast<index_t>(nBB_ - 1) : lastBlock;
+			index_t last_block = (lastBlock == BitSet::npos) ? static_cast<index_t>(nBB_ - 1) : lastBlock;
 
 			///////////////////////////////////////////////////////////////////////////////
 			assert((firstBlock >= 0) && (last_block < num_blocks()) && (firstBlock <= last_block));
@@ -1730,7 +1730,7 @@ namespace bitgraph{
 		inline
 		BitSet& BitSet::AND_EQUAL_block(index_t firstBlock, index_t lastBlock, const BitSet& rhs) {
 
-			auto last_block = ((lastBlock == BitSet::npos) ? static_cast<index_t>(nBB_ - 1) : lastBlock);
+			index_t last_block = ((lastBlock == BitSet::npos) ? static_cast<index_t>(nBB_ - 1) : lastBlock);
 
 			///////////////////////////////////////////////////////////////////////////////////
 			assert((firstBlock >= 0) && (firstBlock <= last_block) && (last_block < rhs.num_blocks()));
@@ -1950,8 +1950,8 @@ namespace bitgraph {
 			assert(firstBit <= lastBit && firstBit >= 0);
 			//////////////////////////////
 
-			BitSet::index_t blockL = WDIV(firstBit);
-			BitSet::index_t blockH = WDIV(lastBit);
+			int blockL = WDIV(firstBit);
+			int blockH = WDIV(lastBit);
 			int offsetH = WMOD(lastBit);						//lastBit - WMUL(blockH);
 			int offsetL = WMOD(firstBit);						//firstBit - WMUL(blockL);
 
@@ -2008,7 +2008,7 @@ namespace bitgraph {
 					res.vBB_[i] = ZERO;
 				}
 
-				for (BitSet::index_t i = 0; i < blockL; ++i) {
+				for (int i = 0; i < blockL; ++i) {
 					res.vBB_[i] = ZERO;
 				}
 			}

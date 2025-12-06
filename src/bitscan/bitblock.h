@@ -78,6 +78,8 @@
 
 namespace bitgraph {
 
+	using _impl::Tables;
+
 	/////////////////////////////////
 	//
 	// namespace bblock
@@ -87,8 +89,7 @@ namespace bitgraph {
 	///////////////////////////////////
 
 	namespace bblock {
-				
-		using _impl::Tables;
+			
 
 		//magic numbers for bitscanning operations in bitblocks
 		constexpr unsigned long long DEBRUIJN_MN_64_ISOL = 0x07EDD5E59A4E28C2;
