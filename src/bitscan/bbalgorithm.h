@@ -31,7 +31,7 @@ namespace bitgraph {
 	// 
 	///////////////////////
 
-	namespace bbalg {
+	namespace utils {
 
 		/**
 		* @brief Converts a bitset to a vector of integers of size equal to the 
@@ -64,9 +64,141 @@ namespace bitgraph {
 		template<class BitSetT>
 		int extract_first_k(int k, BitSetT& bb, std::vector<int>& lv);
 
-	}//end namespace bbalg
+	}//end namespace utils
 
 }//end namespace bitgraph
+
+namespace bitgraph {
+
+
+
+	//////////////////////
+	// 
+	// BitSetWithPC struct
+	// 
+	// A very simple wrapper for any type of bitset of the BBObject hierarchy with CACHED size 
+	// FEATURE: The population count @pc_ cached can differ from the real population size in bb_count()				
+	//			For example, in the P-MAX-SAT-BOUND application, color bitsets are reduced by reducing the
+	//			the pc_ value, but the bitset itself is not modified.
+	/////////////////////
+
+	template <class BitSetT>
+	struct BitSetWithPC {
+
+		using bitset_type = BitSetT;
+		using count_t = std::size_t;
+
+		//construction / destruction
+		BitSetWithPC(int MAX_POP_SIZE) :
+			pc_(0),
+			bb_(MAX_POP_SIZE)
+		{
+		}
+		BitSetWithPC() :
+			pc_(0)
+		{
+		}
+
+		//copy / move semantics disallowed
+		BitSetWithPC(const BitSetWithPC& rhs) = delete;
+		BitSetWithPC& operator =	(const BitSetWithPC& rhs) noexcept = delete;
+		BitSetWithPC(BitSetWithPC&&) noexcept = default;
+		BitSetWithPC& operator =	(BitSetWithPC&&) noexcept = default;
+
+		//allocation
+
+		/**
+		* @brief Resets the original bitset and allocates new capacity
+		**/
+		void reset(std::size_t MAX_POP_SIZE) { bb_.reset(MAX_POP_SIZE); pc_ = 0; }
+
+		/**
+		* @brief Equivalent to reset, preserved for legacy reasons
+		**/
+		void init(std::size_t MAX_POP_SIZE) { bb_.reset(MAX_POP_SIZE); pc_ = 0; }
+
+		//setters and getters
+		BitSetT& bb() noexcept { return bb_; }
+		const BitSetT& bb() const noexcept { return bb_; }
+		count_t  count()	const  noexcept { return pc_; }
+
+		//bit twiddling
+		void set_bit(int bit) { bb_.set_bit(bit); ++pc_; }
+		int  erase_bit(int bit) { bb_.erase_bit(bit); return(--pc_); }
+
+		/**
+		* @brief clears all 1-bits. If lazy is true, the bitset is not modified.
+		**/
+		void erase_bit(bool lazy = false) { if (!lazy) { bb_.erase_bit(); } pc_ = 0; }
+
+
+		//redefinition of useful operations
+		int lsb() { if (pc_ > 0) { return bb_.lsb(); } else return BBObject::noBit; }
+		int msb() { if (pc_ > 0) { return bb_.msb(); } else return BBObject::noBit; }
+
+		/**
+		* @brief pops the most significant bit. If the bitset is empty, returns BBObject::noBit
+		**/
+		int pop_msb() {
+			if (pc_ > 0) {
+				int bit = bb_.msb();
+				bb_.erase_bit(bit);
+				pc_--; return bit;
+			}
+			else return BBObject::noBit;
+		}
+
+		/**
+		* @brief pops the least significant bit. If the bitset is empty, returns BBObject::noBit
+		**/
+		int pop_lsb() {
+			if (pc_ > 0) {
+				int bit = bb_.lsb();
+				bb_.erase_bit(bit);
+				pc_--; return bit;
+			}
+			else return BBObject::noBit;
+		}
+
+		int sync_pc() {
+			pc_ = bb_.count();
+			return pc_;
+		}
+
+		//bool
+		bool is_empty() const { return (pc_ == 0); }
+		bool is_sync_pc() const { return (pc_ == bb_.count()); }
+
+		//operators
+		friend bool operator ==	(const BitSetWithPC& lhs, const BitSetWithPC& rhs) { return (lhs.pc_ == rhs.pc_) && (lhs.bb_ == rhs.bb_); }
+		friend bool operator !=	(const BitSetWithPC& lhs, const BitSetWithPC& rhs) { return !(lhs == rhs); }
+
+		//I/O
+		std::ostream& print(std::ostream& o = std::cout, bool show_pc = true, bool eofl = true)	const;
+
+		/////////////////
+		// data members
+
+		count_t pc_;								//population count (cached) - can differ from bb_.count()
+		BitSetT bb_;								//any bitset type of the BBObject hierarchy	
+
+	}; //end BitSetWithPC class
+
+	/////////////////////////////////////////
+	// BitSetWithPC class method external definitions in header
+
+	template <class BitSetT>
+	inline
+		std::ostream& BitSetWithPC<BitSetT>::print(std::ostream& o, bool show_pc, bool eofl) const {
+
+		bb_.print(o, true, false);
+		if (show_pc) { o << "[" << pc_ << "]"; }
+		if (eofl) { o << std::endl; }
+		return o;
+	}
+	
+} //end namespace bitgraph
+
 
 namespace bitgraph {
 
@@ -74,177 +206,78 @@ namespace bitgraph {
 
 		//////////////////////
 		// 
-		// BitSetWithPC struct
+		// BitSetStack class	 
 		// 
-		// A very simple wrapper for any type of bitset of the BBObject hierarchy with CACHED size 
-		// FEATURE: The population count @pc_ cached can differ from the real population size in bb_count()				
-		//			For example, in the P-MAX-SAT-BOUND application, color bitsets are reduced by reducing the
-		//			the pc_ value, but the bitset itself is not modified.
-		/////////////////////
-		
-		template <class BitSetT>
-		struct BitSetWithPC {
-						
-			using bitset_type = BitSetT;
-			using count_t = std::size_t;
-
-			//construction / destruction
-			BitSetWithPC(int MAX_POP_SIZE) : 
-				pc_(0),
-				bb_(MAX_POP_SIZE)
-			{}
-			BitSetWithPC() : 
-				pc_(0) 
-			{}
-
-			//copy / move semantics disallowed
-			BitSetWithPC(const BitSetWithPC& rhs) = delete;
-			BitSetWithPC& operator =	(const BitSetWithPC& rhs) noexcept = delete;
-			BitSetWithPC(BitSetWithPC&&) noexcept = default;
-			BitSetWithPC& operator =	(BitSetWithPC&&) noexcept = default;
-
-			//allocation
-
-			/**
-			* @brief Resets the original bitset and allocates new capacity
-			**/
-			void reset(std::size_t MAX_POP_SIZE) { bb_.reset(MAX_POP_SIZE); pc_ = 0; }
-
-			/**
-			* @brief Equivalent to reset, preserved for legacy reasons
-			**/
-			void init(std::size_t MAX_POP_SIZE) { bb_.reset(MAX_POP_SIZE); pc_ = 0; }
-
-			//setters and getters
-			BitSetT& bb() noexcept	{ return bb_; }
-			const BitSetT& bb() const noexcept { return bb_; }
-			count_t  count()	const  noexcept { return pc_; }
-
-			//bit twiddling
-			void set_bit(int bit) { bb_.set_bit(bit); ++pc_; }
-			int  erase_bit(int bit) { bb_.erase_bit(bit); return(--pc_); }
-
-			/**
-			* @brief clears all 1-bits. If lazy is true, the bitset is not modified.
-			**/
-			void erase_bit(bool lazy = false) { if (!lazy) { bb_.erase_bit(); } pc_ = 0; }
-
-
-			//redefinition of useful operations
-			int lsb() { if (pc_ > 0) { return bb_.lsb(); } else return BBObject::noBit; }
-			int msb() { if (pc_ > 0) { return bb_.msb(); } else return BBObject::noBit; }
-
-			/**
-			* @brief pops the most significant bit. If the bitset is empty, returns BBObject::noBit
-			**/
-			int pop_msb() {
-				if (pc_ > 0) { 
-					int bit = bb_.msb();
-					bb_.erase_bit(bit);
-					pc_--; return bit;
-				} 
-				else return BBObject::noBit;
-			}
-
-			/**
-			* @brief pops the least significant bit. If the bitset is empty, returns BBObject::noBit
-			**/
-			int pop_lsb() {
-				if (pc_ > 0) {
-					int bit = bb_.lsb();
-					bb_.erase_bit(bit);
-					pc_--; return bit; 
-				} 
-				else return BBObject::noBit;
-			}
-
-			int sync_pc() {
-				pc_ = bb_.count();
-				return pc_;
-			}
-
-			//bool
-			bool is_empty() const { return (pc_ == 0); }
-			bool is_sync_pc() const { return (pc_ == bb_.count()); }
-
-			//operators
-			friend bool operator ==	(const BitSetWithPC& lhs, const BitSetWithPC& rhs) { return (lhs.pc_ == rhs.pc_) && (lhs.bb_ == rhs.bb_); }
-			friend bool operator !=	(const BitSetWithPC& lhs, const BitSetWithPC& rhs) { return !(lhs == rhs); }
-
-			//I/O
-			std::ostream& print(std::ostream& o = std::cout, bool show_pc = true, bool eofl = true)	const;
-
-			/////////////////
-			// data members
-
-			count_t pc_;								//population count (cached) - can differ from bb_.count()
- 			BitSetT bb_;								//any bitset type of the BBObject hierarchy	
-
-		}; //end BitSetWithPC class
-
-		/////////////////////////////////////////
-		// BitSetWithPC class method external definitions in header
-
-		template <class BitSetT>
-		inline
-		std::ostream& BitSetWithPC<BitSetT>::print(std::ostream& o, bool show_pc, bool eofl) const {
-
-			bb_.print(o, true, false);
-			if (show_pc) { o << "[" << pc_ << "]"; }
-			if (eofl) { o << std::endl; }
-			return o;
-		}
-
-		//////////////////////
+		// @brief: a very simple wrapper for a bitset combined with a vector to support a stack interface
+		//		   the stack contains elements from 0 to the size of the bitset -1, corresponding to the 1-bits in the bitset
 		// 
-		// bbStack_t class	 
-		// 
-		// @brief: a very simple wrapper for a bitset with a stack interface
-		// 
-		// @details: created 28/13/17, refactored 27/01/2025
+		// @details: created 28/13/17, refactored 27/01/2025, last update 06/12/2025
 		// 
 		//////////////////////
 
 		template <class BitSetT>
-		struct bbStack_t {
+		struct BitSetStack {
 
 			enum print_t { STACK = 0, BITSET };
 
 			//construction / destruction
-			bbStack_t(int MAX_POP_SIZE) : bb_(MAX_POP_SIZE) {}
-			bbStack_t() {}
+			BitSetStack(std::size_t MAX_POP_SIZE) : bb_(MAX_POP_SIZE) {}
+			BitSetStack() {}
 
-			//move and copy semantics - copy and move semantics forbidden
-			bbStack_t(const bbStack_t& rhs) = delete;
-			bbStack_t& operator =	(const bbStack_t& rhs) noexcept = delete;
-
-			
+			//move and copy semantics - disabled
+			BitSetStack(const BitSetStack& rhs) = delete;
+			BitSetStack& operator =	(const BitSetStack& rhs) noexcept = delete;
+						
 			//allocation
 
 			void reset(int MAX_POP_SIZE);
 
 			//setters and getters
-			int  size() { return stack_.size(); }
+			std::size_t size() { return stack_.size(); }
 
 			//stack interface (bits are added / removed according to the stack)
-			void push(int elem);
+			/**
+			* @brief pushes @bit onto the stack (internally also to the bitset)
+			* @param bit: bit to push onto the stack - must be less than the population size of the bitset
+			**/
+			void push(int bit);
+
+			/**
+			* @brief extract the last bit from the stack (internally also removes it from the bitset)
+			**/
 			int pop();
 
 			///////////
 			//basic operations
-
-			//clears bits from the bitset according to stack
+						
+			/**
+			* @brief clears all 1-bits in the bitset according to the stack
+			* @details: the stack itself remains unchanged
+			**/
 			void erase_bit();
 
-			//synchro stack according to bitset (ordered from lsb to msb)
+			//synchro operations bitset / stack 
+			
+			/**
+			* @brief sets the stack according to the internal bitset @bb_, 
+			*		 running through all 1-bits in @bb_ in order from LSB to MSB
+			* @details: the bitset remains unchanged
+			**/
 			void sync_stack();
-
-			//synchro bitset according to stack
-			void sync_bb();
+			
+			/**
+			* @brief sets the internal bitset @bb_ according to the current stack
+			* @details: the stack remains unchanged
+			**/
+			void sync_bitset();
 
 			//boolean
-				/* may occur if data is manipulated directly */
-			//checks if the contents in the STACK is in BB - currently the opposite is not checked
+						
+			/**
+			* @brief checks if the contents of the stack and bitset are the same 
+			* @returns TRUE if the stack and bitset are the same
+			* @details: the order in which the bits are placed in the stack is not relevant
+			**/
 			bool is_sync();
 
 			bool is_empty() { return (stack_.empty()); }
@@ -258,7 +291,7 @@ namespace bitgraph {
 			BitSetT bb_;
 			std::vector<int> stack_;
 
-		}; //end bbStack_t class
+		}; //end BitSetStack class
 
 		//////////////////////
 		// 
@@ -266,6 +299,8 @@ namespace bitgraph {
 		// 
 		// @brief  a very simple wrapper for a collection of bitsets of a fixed size
 		// @details: created 9/8/17 for MWCP upper bound computation, refactored 27/02/2025
+		// 
+		// TODO - legacy code, check usage and refactor / remove if necessary (06/12/2025)
 		// 
 		///////////////////////
 
@@ -338,13 +373,6 @@ namespace bitgraph {
 
 	}//end namespace _impl
 
-	using _impl::BitSetWithPC;
-	using _impl::bbStack_t;
-	using _impl::bbCol_t;	
-
-	using _impl::operator==;
-	using _impl::operator!=;
-
 }//end namespace bitgraph
 
 ///////////////////////////////////////////////////////////
@@ -355,7 +383,7 @@ namespace bitgraph {
 
 		template <class BitSetT, int SIZE>
 		inline
-			BitSet& bbCol_t<BitSetT, SIZE>::set_bit(int bitsetID, int bit, bool& is_first_bit) {
+			BitSet& _impl::bbCol_t<BitSetT, SIZE>::set_bit(int bitsetID, int bit, bool& is_first_bit) {
 
 			//adds bit
 			bb_[bitsetID].set_bit(bit);
@@ -370,7 +398,7 @@ namespace bitgraph {
 
 		template <class BitSetT, int SIZE>
 		inline
-			std::ostream& bbCol_t<BitSetT, SIZE>::print(std::ostream& o, bool show_pc, bool eofl)  const {
+			std::ostream& _impl::bbCol_t<BitSetT, SIZE>::print(std::ostream& o, bool show_pc, bool eofl)  const {
 			for (auto i = 0; i < bb_.size(); ++i) {
 				if (!bb_[i].is_empty()) {
 					bb_[i].print(o, show_pc, true);
@@ -382,7 +410,7 @@ namespace bitgraph {
 
 		template <class BitSetT>
 		inline
-			std::ostream& bbStack_t<BitSetT>::print(print_t t, std::ostream& o, bool eofl) {
+			std::ostream& _impl::BitSetStack<BitSetT>::print(print_t t, std::ostream& o, bool eofl) {
 
 			switch (t) {
 			case STACK:
@@ -405,12 +433,15 @@ namespace bitgraph {
 
 		template <class BitSetT>
 		inline
-			bool bbStack_t<BitSetT>::is_sync() {
+			bool _impl::BitSetStack<BitSetT>::is_sync() {
 
-			if (bb_.count() != stack_.size()) { return false; }
+			//same population count
+			if (bb_.count() != static_cast<int>(stack_.size())) {
+				return false;
+			}
 
-			//checks if exactly the population of bb_ is in the STACK  
-			for (auto i = 0; i < stack_.size(); ++i) {
+			//same bits in the stack  
+			for (auto i = 0u; i < stack_.size(); ++i) {
 				if (!bb_.is_bit(stack_[i])) {
 					return false;
 				}
@@ -421,7 +452,7 @@ namespace bitgraph {
 
 		template <class BitSetT>
 		inline
-			void bbStack_t<BitSetT>::sync_bb() {
+			void _impl::BitSetStack<BitSetT>::sync_bitset() {
 
 			bb_.erase_bit();
 			for (auto i = 0; i < stack_.size(); i++) {
@@ -431,7 +462,7 @@ namespace bitgraph {
 
 		template <class BitSetT>
 		inline
-			void bbStack_t<BitSetT>::sync_stack() {
+			void _impl::BitSetStack<BitSetT>::sync_stack() {
 
 			//cleans stack
 			stack_.clear();
@@ -449,7 +480,7 @@ namespace bitgraph {
 
 		template <class BitSetT>
 		inline
-			void  bbStack_t<BitSetT>::reset(int MAX_POP_SIZE) {
+			void  _impl::BitSetStack<BitSetT>::reset(int MAX_POP_SIZE) {
 
 			//cleans stack
 			stack_.clear();
@@ -463,7 +494,7 @@ namespace bitgraph {
 			}
 			catch (std::exception& e) {
 				LOG_ERROR("%s", e.what());
-				LOG_ERROR("bbStack_t<BitSetT>::-reset()");
+				LOG_ERROR("BitSetStack<BitSetT>::-reset()");
 				std::exit(EXIT_FAILURE);
 			}
 
@@ -472,7 +503,7 @@ namespace bitgraph {
 
 		template <class BitSetT>
 		inline
-			void bbStack_t<BitSetT>::push(int bit) {
+			void _impl::BitSetStack<BitSetT>::push(int bit) {
 
 			if (!bb_.is_bit(bit)) {
 				bb_.set_bit(bit);
@@ -482,7 +513,7 @@ namespace bitgraph {
 
 		template <class BitSetT>
 		inline
-			int bbStack_t<BitSetT>::pop() {
+			int _impl::BitSetStack<BitSetT>::pop() {
 
 			if (stack_.size() > 0) {
 				int bit = stack_.back();
@@ -495,7 +526,7 @@ namespace bitgraph {
 
 		template <class BitSetT>
 		inline
-			void bbStack_t<BitSetT>::erase_bit() {
+			void _impl::BitSetStack<BitSetT>::erase_bit() {
 			for (int i = 0; i < stack_.size(); i++) {
 				bb_.erase_bit(stack_[i]);
 			}

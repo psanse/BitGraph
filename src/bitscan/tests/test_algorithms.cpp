@@ -63,8 +63,8 @@ protected:
 
 	//undirected graph instance	
 	const int NV = 65;
-	bbStack_t<BBScan> bb;												//undirected graph with integer weights
-	bbStack_t<BBScanSp> bbs;
+	_impl::BitSetStack<BBScan> bb;												//undirected graph with integer weights
+	_impl::BitSetStack<BBScanSp> bbs;
 };
 
 TEST_F(BitSetWithPC_ClassTest, pop_msb) {
@@ -270,7 +270,7 @@ TEST_F(StackClassTest, basic_operations){
 
 TEST(bbCol_tClass, basic){
 	
-	bbCol_t<BBScan, 20> bbc(130);		
+	_impl::bbCol_t<BBScan, 20> bbc(130);		
 	bbc.set_bit(0,10);
 	bbc.set_bit(0,64);
 	bbc.set_bit(0,65);
