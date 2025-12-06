@@ -70,29 +70,29 @@ protected:
 TEST_F(BitSetWithPC_ClassTest, pop_msb) {
 	
 	//pop_msb non-sparse
-	EXPECT_EQ(3, bb.size());
+	EXPECT_EQ(3, bb.count());
 	EXPECT_EQ(65,bb.pop_msb());
-	EXPECT_EQ(2, bb.size());
+	EXPECT_EQ(2, bb.count());
 
 	EXPECT_EQ(64,bb.pop_msb());
-	EXPECT_EQ(1, bb.size());
+	EXPECT_EQ(1, bb.count());
 
 	EXPECT_EQ(10, bb.pop_msb());
-	EXPECT_EQ(0, bb.size());
+	EXPECT_EQ(0, bb.count());
 
 	EXPECT_EQ(-1, bb.pop_msb());
 	EXPECT_TRUE(bb.is_empty());
 
 	//pop_msb sparse
-	EXPECT_EQ(3, bbs.size());
+	EXPECT_EQ(3, bbs.count());
 	EXPECT_EQ(65, bbs.pop_msb());
-	EXPECT_EQ(2, bbs.size());
+	EXPECT_EQ(2, bbs.count());
 
 	EXPECT_EQ(64, bbs.pop_msb());
-	EXPECT_EQ(1, bbs.size());
+	EXPECT_EQ(1, bbs.count());
 
 	EXPECT_EQ(10, bbs.pop_msb());
-	EXPECT_EQ(0, bbs.size());
+	EXPECT_EQ(0, bbs.count());
 
 	EXPECT_EQ(-1, bbs.pop_msb());
 	EXPECT_TRUE(bbs.is_empty());
@@ -101,29 +101,29 @@ TEST_F(BitSetWithPC_ClassTest, pop_msb) {
 TEST_F(BitSetWithPC_ClassTest, pop_lsb) {
 
 	//pop_msb
-	EXPECT_EQ(3, bb.size());
+	EXPECT_EQ(3, bb.count());
 	EXPECT_EQ(10, bb.pop_lsb());
-	EXPECT_EQ(2, bb.size());
+	EXPECT_EQ(2, bb.count());
 
 	EXPECT_EQ(64, bb.pop_lsb());
-	EXPECT_EQ(1, bb.size());
+	EXPECT_EQ(1, bb.count());
 
 	EXPECT_EQ(65, bb.pop_lsb());
-	EXPECT_EQ(0, bb.size());
+	EXPECT_EQ(0, bb.count());
 
 	EXPECT_EQ(-1, bb.pop_lsb());
 	EXPECT_TRUE(bb.is_empty());
 
 	//pop_msb -sparse
-	EXPECT_EQ(3, bbs.size());
+	EXPECT_EQ(3, bbs.count());
 	EXPECT_EQ(10, bbs.pop_lsb());
-	EXPECT_EQ(2, bbs.size());
+	EXPECT_EQ(2, bbs.count());
 
 	EXPECT_EQ(64, bbs.pop_lsb());
-	EXPECT_EQ(1, bbs.size());
+	EXPECT_EQ(1, bbs.count());
 
 	EXPECT_EQ(65, bbs.pop_lsb());
-	EXPECT_EQ(0, bbs.size());
+	EXPECT_EQ(0, bbs.count());
 
 	EXPECT_EQ(-1, bbs.pop_lsb());
 	EXPECT_TRUE(bbs.is_empty());
@@ -133,13 +133,13 @@ TEST_F(BitSetWithPC_ClassTest, reset) {
 
 	//non-sparse
 	bb.reset(100);
-	EXPECT_EQ(0, bb.size());
+	EXPECT_EQ(0, bb.count());
 	EXPECT_EQ(0, bb.pc_);
 	EXPECT_EQ(2, bb.bb_.num_blocks());
 
 	//sparse
 	bbs.reset(100);
-	EXPECT_EQ(0, bbs.size());
+	EXPECT_EQ(0, bbs.count());
 	EXPECT_EQ(0, bbs.pc_);
 	EXPECT_EQ(2, bbs.bb_.num_blocks());
 
@@ -148,28 +148,28 @@ TEST_F(BitSetWithPC_ClassTest, reset) {
 TEST_F(BitSetWithPC_ClassTest, bit_operations) {
 
 	//non-sparse
-	//bb:{10, 64, 65}, size=3
-	EXPECT_EQ(3, bb.size());
+	//bb:{10, 64, 65}, count=3
+	EXPECT_EQ(3, bb.count());
 	EXPECT_EQ(65, bb.msb());
 	EXPECT_EQ(10, bb.lsb());
 	EXPECT_EQ(2, bb.erase_bit(65));
-	EXPECT_EQ(2, bb.size());
+	EXPECT_EQ(2, bb.count());
 	EXPECT_EQ(1, bb.erase_bit(64));
-	EXPECT_EQ(1, bb.size());
+	EXPECT_EQ(1, bb.count());
 	EXPECT_EQ(0, bb.erase_bit(10));
-	EXPECT_EQ(0, bb.size());
+	EXPECT_EQ(0, bb.count());
 	EXPECT_TRUE(bb.is_empty());	
 
 	//sparse
-	EXPECT_EQ(3, bbs.size());
+	EXPECT_EQ(3, bbs.count());
 	EXPECT_EQ(65, bbs.msb());
 	EXPECT_EQ(10, bbs.lsb());
 	EXPECT_EQ(2, bbs.erase_bit(65));
-	EXPECT_EQ(2, bbs.size());
+	EXPECT_EQ(2, bbs.count());
 	EXPECT_EQ(1, bbs.erase_bit(64));
-	EXPECT_EQ(1, bbs.size());
+	EXPECT_EQ(1, bbs.count());
 	EXPECT_EQ(0, bbs.erase_bit(10));
-	EXPECT_EQ(0, bbs.size());
+	EXPECT_EQ(0, bbs.count());
 	EXPECT_TRUE( bbs.is_empty());
 }
 
@@ -179,7 +179,7 @@ TEST_F(BitSetWithPC_ClassTest, lazy_bit_erase) {
 	//non-sparse
 	 
 	//cleans the bitset without modifying the bitset
-	bb.erase_bit(true);										//bb:{10, 64, 65}, size=0 (lazy)
+	bb.erase_bit(true);										//bb:{10, 64, 65}, count=0 (lazy)
 	
 	//empty bitset to all effects
 	EXPECT_EQ(BBObject::noBit, bb.msb());
@@ -187,15 +187,15 @@ TEST_F(BitSetWithPC_ClassTest, lazy_bit_erase) {
 	EXPECT_EQ(BBObject::noBit, bb.pop_msb());
 	EXPECT_EQ(BBObject::noBit, bb.pop_lsb());
 	EXPECT_TRUE(bb.is_empty());
-	EXPECT_EQ(0, bb.size());
+	EXPECT_EQ(0, bb.count());
 
 	//not sync
 	EXPECT_FALSE(bb.is_sync_pc());
 
 	//sync cached popcount - restores bb
-	bb.sync_pc();						//restores bb:{10, 64, 65} with size=3	
+	bb.sync_pc();						//restores bb:{10, 64, 65} with count=3	
 	EXPECT_TRUE(bb.is_sync_pc());
-	EXPECT_EQ(3, bb.size());
+	EXPECT_EQ(3, bb.count());
 	EXPECT_TRUE(bb.bb_.is_bit(10));
 	EXPECT_TRUE(bb.bb_.is_bit(64));
 	EXPECT_TRUE(bb.bb_.is_bit(65));
@@ -204,7 +204,7 @@ TEST_F(BitSetWithPC_ClassTest, lazy_bit_erase) {
 	//sparse
 
 	//cleans the bitset without modifying the bitset
-	bbs.erase_bit(true);										//bb:{10, 64, 65}, size=0 (lazy)
+	bbs.erase_bit(true);										//bb:{10, 64, 65}, count=0 (lazy)
 
 	//empty bitset to all effects
 	EXPECT_EQ(BBObject::noBit, bbs.msb());
@@ -212,15 +212,15 @@ TEST_F(BitSetWithPC_ClassTest, lazy_bit_erase) {
 	EXPECT_EQ(BBObject::noBit, bbs.pop_msb());
 	EXPECT_EQ(BBObject::noBit, bbs.pop_lsb());
 	EXPECT_TRUE(bbs.is_empty());
-	EXPECT_EQ(0, bbs.size());
+	EXPECT_EQ(0, bbs.count());
 
 	//not sync
 	EXPECT_FALSE(bbs.is_sync_pc());
 
 	//sync cached popcount - restores bbs
-	bbs.sync_pc();							//bbs:{10, 64, 65} with size=3	
+	bbs.sync_pc();							//bbs:{10, 64, 65} with count=3	
 	EXPECT_TRUE(bbs.is_sync_pc());
-	EXPECT_EQ(3, bbs.size());
+	EXPECT_EQ(3, bbs.count());
 	EXPECT_TRUE(bbs.bb_.is_bit(10));
 	EXPECT_TRUE(bbs.bb_.is_bit(64));
 	EXPECT_TRUE(bbs.bb_.is_bit(65));
@@ -305,7 +305,7 @@ TEST(bbCol_tClass, basic){
 	
 }
 
-TEST(algorithms, first_k_bits){
+TEST(algorithms, extract_first_k){
 
 	
 	BBScan bb(100);	
@@ -315,7 +315,7 @@ TEST(algorithms, first_k_bits){
 	
 	//solution in vector
 	vint lbits (3,-1);
-	bbalg::first_k_bits(3,bb, lbits);
+	bbalg::extract_first_k(3,bb, lbits);
 
 	vint lbits_exp;
 	lbits_exp.push_back(10);
@@ -328,7 +328,7 @@ TEST(algorithms, first_k_bits){
 TEST(algorithms, random_bitblock) {
 	
 	//10% of density	
-	BITBOARD bb = bbalg::gen_random_block(0.5);
+	BITBOARD bb = bbalg::random_bitblock(0.5);
 
 	//around 30 bits
 	EXPECT_GE(bblock::count(bb), 20);

@@ -526,7 +526,7 @@ TEST(BitSetClass, GenRandom){
 	const double TOLERANCE=.05;
 
 	for(auto i = 0; i < NUM_TRIES; ++i){
-		BITBOARD bb = bbalg::gen_random_block(DENSITY);  //random bits
+		BITBOARD bb = bbalg::random_bitblock(DENSITY);  //random bits
 		vd.emplace_back(bblock::popc64(bb)/(double)WORD_SIZE);
 	}
 
