@@ -27,7 +27,7 @@ using namespace bitgraph;
 class UGraphWTest : public ::testing::Test {
 protected:
 	void SetUp() override {
-		gw.reset(NV, 0.0);
+		gw.reset(NV, static_cast<ugraph_wi::_wt>(0.0));
 		gw.graph().add_edge(0, 1);
 		gw.graph().add_edge(0, 2);
 		gw.set_weight(0, 1);

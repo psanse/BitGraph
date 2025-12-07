@@ -287,7 +287,7 @@ namespace bitgraph {
 		protected:
 
 			Graph_t& g_;											//ideally CONST but some operations like neighbors are non-const (TODO!)
-			std::size_t NV_;										//number of vertices cached - g_.num_vertices()  
+			int NV_;												//number of vertices cached - g_.num_vertices()  
 
 			vint nb_neigh_;											//stores the degree of the vertices		
 			vint deg_neigh_;										//stores the support of the vertices (degree of neighbors)
@@ -316,7 +316,7 @@ namespace bitgraph {
 		switch (alg) {
 		case NONE:								//trivial case- with exit condition!
 			nodes_.reserve(NV_);
-			for (auto i = 0u; i < NV_; i++) {
+			for (auto i = 0; i < NV_; i++) {
 				nodes_.emplace_back(i);
 			}
 
@@ -443,7 +443,7 @@ namespace bitgraph {
 		do {
 			//finds vertex with maximum degree
 			max_deg = -1;
-			for (auto j = 0u; j < NV_; j++) {
+			for (auto j = 0; j < NV_; j++) {
 				if (node_active_state_.is_bit(j) && nb_neigh_[j] > max_deg) {
 					max_deg = nb_neigh_[j];
 					v = j;
@@ -529,11 +529,11 @@ namespace bitgraph {
 		vint nodes_ori = nodes_;
 		nodes_.clear();
 
-		for (auto i = 0u; i < NV_; i++) {
+		for (auto i = 0; i < NV_; i++) {
 
 			//finds vertex with minimum degree with TB according to the given ordering in nodes_ori 
 			min_deg = NV_;
-			for (auto j = 0u; j < NV_; j++) {
+			for (auto j = 0; j < NV_; j++) {
 				int u = nodes_ori[j];
 				if (node_active_state_.is_bit(u) && nb_neigh_[u] < min_deg) {
 					min_deg = nb_neigh_[u];
@@ -572,10 +572,10 @@ namespace bitgraph {
 		vint nodes_ori = nodes_;
 		nodes_.clear();
 
-		for (auto i = 0u; i < NV_; i++) {
+		for (auto i = 0; i < NV_; i++) {
 			//finds vertex with maximum degree
 			max_deg = -1;
-			for (auto j = 0u; j < NV_; j++) {
+			for (auto j = 0; j < NV_; j++) {
 				int u = nodes_ori[j];
 				if (node_active_state_.is_bit(u) && nb_neigh_[u] > max_deg) {
 					max_deg = nb_neigh_[u];

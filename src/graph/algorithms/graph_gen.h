@@ -462,12 +462,12 @@ namespace bitgraph{
 
 		switch (type) {
 		case WDEG:
-			for (std::size_t v = 0; v < NV; ++v) {
+			for (int v = 0; v < NV; ++v) {
 				g.set_weight(v, g.graph().degree(v));
 			}
 			break;
 		case WMOD:
-			for (std::size_t v = 0; v < NV; ++v) {
+			for (int v = 0; v < NV; ++v) {
 				g.set_weight(v, (1 + ((v + 1) % wmod)));
 			}
 			break;
