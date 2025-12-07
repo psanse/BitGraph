@@ -1159,7 +1159,7 @@ namespace bitgraph {
 			//sort degeneracy
 			std::sort(candidates.begin(), candidates.end(), less_kcore(pos_, ver_, deg_));
 					
-			candidates.erase(remove_if(candidates.begin(), candidates.end(), remove_kcore(pos_, ver_, deg_, max_size)), candidates.end());
+			candidates.erase(remove_if(candidates.begin(), candidates.end(), remove_kcore(pos_, ver_, deg_, static_cast<int>(max_size))), candidates.end());
 
 
 			//iterates over all vertices to pick them in degeneracy ordering

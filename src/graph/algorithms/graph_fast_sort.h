@@ -171,7 +171,6 @@ namespace bitgraph {
 			**/
 			const vint& compute_support_root();
 
-
 			/**
 			* @brief Computes a non_increasing_degree (non-degenerate) ordering
 			* @param rev reverse ordering if TRUE
@@ -393,10 +392,10 @@ namespace bitgraph {
 			max_deg = NV_;
 
 			//selects an active vertex with minimum degree
-			for (auto j = 0u; j < NV_; j++) {
+			for (int j = 0; j < NV_; j++) {
 				if (node_active_state_.is_bit(j) && nb_neigh_[j] < max_deg) {
 					max_deg = nb_neigh_[j];
-					v = (int)j;
+					v = j;
 				}
 			}
 
@@ -716,7 +715,7 @@ namespace bitgraph {
 		void GraphFastRootSort<Graph_t>::set_ordering() {
 		nodes_.clear();
 		nodes_.reserve(NV_);
-		for (auto i = 0u; i < NV_; i++) {
+		for (int i = 0; i < NV_; i++) {
 			nodes_.emplace_back(i);
 		}
 	}
@@ -777,7 +776,7 @@ namespace bitgraph {
 	inline
 		const vint& GraphFastRootSort<Graph_t>::compute_deg_root() {
 
-		for (auto elem = 0u; elem < NV_; ++elem) {
+		for (int elem = 0; elem < NV_; ++elem) {
 			nb_neigh_[elem] = g_.neighbors(elem).count();
 		}
 
@@ -788,7 +787,7 @@ namespace bitgraph {
 	inline
 		const vint& GraphFastRootSort<Graph_t>::compute_support_root()
 	{
-		for (auto elem = 0u; elem < NV_; ++elem) {
+		for (int elem = 0; elem < NV_; ++elem) {
 			deg_neigh_[elem] = 0;
 			bb_type& bbn = g_.neighbors(elem);
 			if (bbn.init_scan(BBObject::NON_DESTRUCTIVE) != -1) {

@@ -419,8 +419,9 @@ namespace bitgraph {
 		Ugraph<BitSetT> clique(NV);
 
 		//sets the adjacency matrix to ONE except for the main diagonal
-		for (std::size_t v = 0; v < NV; ++v) {
-			clique.neighbors(v).set_bit(0, NV - 1);
+		const auto nV = static_cast<int>(NV);
+		for (int v = 0; v < nV; ++v) {
+			clique.neighbors(v).set_bit(0, nV - 1);
 			clique.neighbors(v).erase_bit(v);
 		}
 
@@ -433,10 +434,11 @@ namespace bitgraph {
 	{
 		Ugraph<BitSetT> cycle(NV);
 
-		for (std::size_t v = 0; v < NV - 1; ++v) {
+		const auto nV = static_cast<int>(NV);
+		for (int v = 0; v < nV - 1; ++v) {
 			cycle.add_edge(v, v + 1);
 		}
-		cycle.add_edge(NV - 1, 0);
+		cycle.add_edge(nV - 1, 0);
 
 		return cycle;
 	}
@@ -445,7 +447,9 @@ namespace bitgraph {
 	inline
 		Ugraph<BitSetT> Ugraph<BitSetT>::make_star(std::size_t NV) {
 		Ugraph<BitSetT> star(NV);
-		for (std::size_t v = 1; v < NV; ++v) {
+
+		const auto nV = static_cast<int>(NV);
+		for (int v = 1; v < nV; ++v) {
 			star.add_edge(0, v);
 		}
 
@@ -459,11 +463,9 @@ namespace bitgraph {
 
 		this->reset(NV);
 		this->set_name(name);
-
-		const auto N = this->NV_;
-
-		for (auto i = 0; i < N - 1; ++i) {
-			for (auto j = i + 1; j < N; ++j) {
+		
+		for (int i = 0; i < this->NV_ - 1; ++i) {
+			for (int j = i + 1; j < this->NV_; ++j) {
 				if (adj[i][j] == 1) {
 					add_edge(i, j);
 				}
@@ -479,7 +481,7 @@ namespace bitgraph {
 			this->NE_ = 0;
 
 			//adds all edges and divides by 2 for efficiency - checks for self loops	
-			for (auto i = 0; i < this->NV_; ++i) {
+			for (int i = 0; i < this->NV_; ++i) {
 				this->NE_ += this->adj_[i].count();
 			}
 
@@ -842,16 +844,15 @@ namespace bitgraph {
 			LOG_ERROR("empty set found while creating an induced graph - Ugraph<BitSetT>::create_induced");
 			return -1;
 		}
-
-		const int NV = lv.size();
-		
+				
 		///////////////
-		ug.reset(NV);
+		ug.reset(lv.size());
 		///////////////
 		
 		//add appropiate edges
-		for (std::size_t i = 0; i < NV - 1; i++) {
-			for (std::size_t j = i + 1; j < NV; j++) {
+		const int nV = static_cast<int>(lv.size());
+		for (int i = 0; i < nV - 1; i++) {
+			for (int j = i + 1; j < nV; j++) {
 
 				if (this->is_edge(lv[i], lv[j])) {
 					ug.add_edge(i, j);						//adds bidirected edge

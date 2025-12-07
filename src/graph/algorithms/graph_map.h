@@ -38,7 +38,7 @@ namespace bitgraph {
 			///////////////////////
 			//setters and getters
 
-			int size() { return l2r_.size(); }
+			std::size_t size() { return l2r_.size(); }
 			vint& get_l2r() { return l2r_; }
 			vint& get_r2l() { return r2l_; }
 			const vint& get_l2r() const { return l2r_; }
@@ -186,7 +186,7 @@ namespace bitgraph{
 		if (overwrite) { bbr.erase_bit(); }
 		
 		//scan the bitset bbl and map
-		bbl.init_scan(BBObject::NON_DESTRUCTIVE) != bbo::noBit;
+		bbl.init_scan(BBObject::NON_DESTRUCTIVE);
 		int v = BBObject::noBit;
 		while ( (v = bbl.next_bit()) != BBObject::noBit) {
 			bbr.set_bit(l2r_[v]);
@@ -209,7 +209,7 @@ namespace bitgraph{
 		if (overwrite) { bbl.erase_bit(); }
 
 		//sets bitscanning configuration
-		bbr.init_scan(BBObject::NON_DESTRUCTIVE) != bbo::noBit;
+		bbr.init_scan(BBObject::NON_DESTRUCTIVE);
 		int v = BBObject::noBit;
 		while ((v = bbr.next_bit()) != BBObject::noBit) {
 			bbl.set_bit(r2l_[v]);

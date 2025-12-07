@@ -117,7 +117,7 @@ namespace bitgraph {
 
 			/*
 			* @brief Determines weight and vertex of maximum weight
-			* @param v ouptut vector of maximum weight
+			* @param v ouptut vertex of maximum weight
 			* @returns weight of vertex v
 			*/
 			W maximum_weight(int& v)	const;
@@ -133,7 +133,7 @@ namespace bitgraph {
 			int num_vertices()			const { return g_.num_vertices(); }
 			int size()			const { return g_.num_vertices(); }
 
-			int num_edges(bool lazy = true) { return g_.num_edges(lazy); }
+			std::size_t num_edges(bool lazy = true) { return g_.num_edges(lazy); }
 
 			//////////////////////////
 			// memory allocation 

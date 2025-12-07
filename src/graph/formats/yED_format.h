@@ -127,8 +127,9 @@ namespace bitgraph {
 			*********************/
 			template<class Graph_t>
 			inline
-				int graph_to_gml(Graph_t& g, std::string filename, double scale = 7.5, int flag_edges = 1) {
-				const unsigned int N = g.num_vertices();
+				int graph_to_gml(Graph_t& g, std::string filename, double scale = 7.5, int flag_edges = 1) 
+			{
+				const auto N = g.num_vertices();
 				if (N == 0) { LOG_INFO("cannot paint the empty graph, will produce no output -gio::yed::graph_to_gml"); return 0; }
 				std::string filenameExt = filename + ".gml";
 				std::ofstream grafo(filenameExt);
@@ -172,8 +173,9 @@ namespace bitgraph {
 			*********************/
 			template<class Graph_t>
 			inline
-				int graph_to_gml(Graph_t& g, vint& vset, std::string filename, col_t col = yed::GREEN, double scale = 7.5, int flag_edges = 1, std::string path = "") {
-				const int N = g.num_vertices();
+				int graph_to_gml(Graph_t& g, vint& vset, std::string filename, col_t col = yed::GREEN, double scale = 7.5, int flag_edges = 1, std::string path = "") 
+			{
+				const auto N = g.num_vertices();
 				if (N == 0) { LOG_INFO("cannot paint the empty graph, will produce no output- gio::yed::graph_to_gml"); return 0; }
 				std::string filenameExt = path + filename + ".gml";
 				std::ofstream grafo(filenameExt);
@@ -225,8 +227,10 @@ namespace bitgraph {
 			*********************/
 			template<class Graph_t>
 			inline
-				int graph_to_gml_clique(Graph_t& g, vint& clq, std::string filename, col_t col_clq = yed::GREEN, col_t col = gio::yed::DEFAULT, double scale = 7.5, int flag_edges = 1, std::string path = "") {
-				const int N = g.num_vertices();
+				int graph_to_gml_clique(Graph_t& g, vint& clq, std::string filename, col_t col_clq = yed::GREEN, 
+										col_t col = gio::yed::DEFAULT, double scale = 7.5, int flag_edges = 1, std::string path = "") 
+			{
+				const auto N = g.num_vertices();
 				if (N == 0) { LOG_INFO("cannot paint the empty graph, will produce no output -gio::yed::graph_to_gml_clique"); return 0; }
 				std::string filenameExt = path + filename + ".gml";
 				std::ofstream grafo(filenameExt);
@@ -282,8 +286,9 @@ namespace bitgraph {
 			*
 			*********************/
 			template<class Graph_t>
-			inline int graph_to_gml_color(Graph_t& g, vector<vint>& isets, std::string filename, double scale = 7.5, int flag_edges = 1) {
-				const int N = g.num_vertices();
+			inline int graph_to_gml_color(Graph_t& g, vector<vint>& isets, std::string filename, double scale = 7.5, int flag_edges = 1)
+			{
+				const auto N = g.num_vertices();
 				if (N == 0) { LOG_INFO("cannot paint the empty graph, will produce no output -gio::yed::graph_to_gml_color"); return 0; }
 				std::string filenameExt = filename + ".gml";
 				std::ofstream grafo(filenameExt);
@@ -346,8 +351,9 @@ namespace bitgraph {
 			********************/
 			template<class Graph_t>
 			inline
-				int graph_to_gml_layered(Graph_t& g, vector<int>& layers, string filename, double scale = 20, int flag_edges = 1) {
-				auto N = g.num_vertices();
+				int graph_to_gml_layered(Graph_t& g, vector<int>& layers, string filename, double scale = 20, int flag_edges = 1)
+			{
+				const  auto N = g.num_vertices();
 				string filenameExt = filename + ".gml";
 				ofstream grafo(filenameExt);
 				if (!grafo) { LOGG_ERROR("file: ", filenameExt, "could no be opened", "--gio::yed::graph_to_gml_layered(...)"); return -1; }
@@ -409,8 +415,9 @@ namespace bitgraph {
 			********************/
 			template<class Graph_t>
 			inline
-				int graph_to_gml_circular(Graph_t& g, std::string filename, double radius = 2, double scale = 20, int flag_edges = 1) {
-				const unsigned int N = g.num_vertices();
+				int graph_to_gml_circular(Graph_t& g, std::string filename, double radius = 2, double scale = 20, int flag_edges = 1) 
+			{
+				const auto N = g.num_vertices();
 				std::string filenameExt = filename + ".gml";
 				std::ofstream grafo(filenameExt);
 				if (!grafo) {
@@ -426,7 +433,7 @@ namespace bitgraph {
 				//vertices
 				double angle = 0, inc = (2 * M_PI) / N;		//rads
 				double x, y;
-				for (unsigned int i = 0; i < N; ++i) {
+				for ( int i = 0; i < N; ++i) {
 					x = radius * cos(angle);
 					y = radius * sin(angle);
 					add_vertex(grafo, i, x, y, scale, gio::yed::DEFAULT);
@@ -435,8 +442,8 @@ namespace bitgraph {
 
 				//add edges
 				if (flag_edges) {
-					for (unsigned int i = 0; i < N - 1; i++) {
-						for (unsigned int j = i + 1; j < N; j++) {
+					for ( int i = 0; i < N - 1; i++) {
+						for ( int j = i + 1; j < N; j++) {
 							if (g.is_edge(i, j)) {
 								///////////////////////////////////////////////
 								gio::yed::add_edge(grafo, i, j);

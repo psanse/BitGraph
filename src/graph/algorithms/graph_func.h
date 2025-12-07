@@ -45,14 +45,13 @@ namespace bitgraph {
 		/*
 		* @brief List of neighbors of v in the set of vertices bbref ()
 		* @param g: a simple undirected graph
-		* @param lv_n: output list of vertices
+		* @param lv: output list of vertices
 		* @param bbref: list (bitset) of reference vertices
-		* @returns number of vertices in lv_n
-		* @created: 03/09/18
-		* @last_update: 09/01/25
+		* @returns number of vertices in lv
+		* @date: created 03/09/18, last_update: 09/01/25
 		*/
 		template<class Graph_t>
-		int neighbors(const Graph_t& g, int v, typename  Graph_t::_bbt& bbref, vector<int>& lv) {
+		std::size_t neighbors(const Graph_t& g, int v, typename  Graph_t::_bbt& bbref, vector<int>& lv) {
 
 			lv.clear();
 			lv.reserve(g.num_vertices());		//allocates maximum possible size
@@ -85,11 +84,10 @@ namespace bitgraph {
 		* @param lv_n: output list of vertices
 		* @param bbref: list (bitset) of reference vertices
 		* @returns number of vertices in lv_n
-		* @created: 03/09/18
-		* @last_update: 09/01/25
+		* @date: created 03/09/18, @last_update: 09/01/25
 		*/
 		template<class Graph_t>
-		int neighbors_after(const Graph_t& g, int v, typename  Graph_t::_bbt& bbref, vector<int>& lv) {
+		std::size_t neighbors_after(const Graph_t& g, int v, typename  Graph_t::_bbt& bbref, vector<int>& lv) {
 
 			lv.clear();
 			lv.reserve(g.num_vertices());		//allocates maximum possible size
@@ -150,7 +148,7 @@ namespace bitgraph {
 		* @details: fast-fail policy - exits if error
 		*/
 		template<class Graph_t>
-		int create_complete(Graph_t& g, std::size_t N) {
+		void create_complete(Graph_t& g, std::size_t N) {
 
 			/////////////
 			g.reset(N);

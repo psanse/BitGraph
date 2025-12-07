@@ -130,12 +130,12 @@ namespace bitgraph {
 
 			/**
 			* @brief resets to empty graph given name and number of vertices
-			* @param n number of vertices
+			* @param NV number of vertices
 			* @param name name of the instance
 			* @details: fast-fail policy - exits if failure
 			* @date: created 31/12/24, last_update 07/12/25
 			**/
-			void reset(std::size_t n, string name = "") noexcept;
+			void reset(std::size_t NV, string name = "") noexcept;
 
 			/**
 			* @brief sets graph from file in dimacs/MTX/Edges formats (in this order)

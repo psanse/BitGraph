@@ -146,8 +146,8 @@ int	Base_Graph_W<Graph_t,W >::set_weight (vector<W>& lw){
 template <class Graph_t, class W>
 W Base_Graph_W<Graph_t, W>::maximum_weight(int& v) const{
 
-	auto it = std::max_element(w_.begin(), w_.end());
-	v = it - w_.begin();
+	auto it = std::max_element(w_.cbegin(), w_.cend());
+	v = static_cast<int>(it - w_.begin());
 	return *it;
 }
 
@@ -222,14 +222,21 @@ int Base_Graph_W<Graph_t, W>::read_dimacs (string filename, int type){
 	//read vertex weights format <n> <vertex index> <weight> if they exist
 	int v1 = -1, v2 = -1;
 	W wv = -1;
-	char c;
-	c = f.peek();
-	switch (c) {
+	int c = f.peek();
+	if(c == EOF){
+		LOG_ERROR("bizarre EOF when peeking for first char - Base_Graph_W<Graph_t, W>::read_dimacs");
+		reset();
+		f.close();
+		return -1;
+	}
+	char next = static_cast<char>(c);
+	
+	switch (next) {
 	case 'n':
 	case 'v':						// 'v' format used by Zavalnij in evil_W benchmark 
 
 		for (int n = 0; n < nV; ++n) {
-			f >> c >> v1 >> wv;
+			f >> next >> v1 >> wv;
 			
 			//assert
 			if (f.bad()) {
@@ -287,7 +294,15 @@ int Base_Graph_W<Graph_t, W>::read_dimacs (string filename, int type){
 
 	//read the first edge line - 3 tokens expected (no edge-weights)
 	c = f.peek();
-	if (c != 'e') {
+	if (c == EOF) {
+		LOG_ERROR("bizarre EOF when peeking for first char - Base_Graph_W<Graph_t, W>::read_dimacs");
+		reset();
+		f.close();
+		return -1;
+	}
+	next = static_cast<char>(c);
+
+	if (next != 'e') {
 		LOG_ERROR("Wrong edge format reading edges - Base_Graph_EW<Graph_t, W>::read_dimacs");
 		reset();
 		f.close();
@@ -308,14 +323,14 @@ int Base_Graph_W<Graph_t, W>::read_dimacs (string filename, int type){
 	
 	//parse the first edge
 	if(nw == 3){
-		sstr >> c >> v1 >> v2;	
+		sstr >> next >> v1 >> v2;
 		g_.add_edge(v1 - 1,v2 - 1);
 	}
 	
 	//remaining edges
 	for(int e = 1; e < nEdges; ++e){
-		f >> c;
-		if(c != 'e' || f.bad()){
+		f >> next;
+		if(next != 'e' || f.bad()){
 			LOG_ERROR("Wrong edge format reading edges - Base_Graph_W<Graph_t, W>::read_dimacs");
 			reset();
 			f.close();

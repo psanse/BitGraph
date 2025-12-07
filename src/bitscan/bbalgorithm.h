@@ -69,18 +69,16 @@ namespace bitgraph {
 	struct BitSetWithPC {
 
 		using bitset_type = BitSetT;
-		using count_t = std::size_t;
+		using count_t = int;
 
 		//construction / destruction
-		BitSetWithPC(int MAX_POP_SIZE) :
+		BitSetWithPC(std::size_t MAX_POP_SIZE) :
 			pc_(0),
 			bb_(MAX_POP_SIZE)
-		{
-		}
+		{}
 		BitSetWithPC() :
 			pc_(0)
-		{
-		}
+		{}
 
 		//copy / move semantics disallowed
 		BitSetWithPC(const BitSetWithPC& rhs) = delete;
@@ -132,18 +130,20 @@ namespace bitgraph {
 		}
 
 		/**
-		* @brief pops the least significant bit. If the bitset is empty, returns BBObject::noBit
+		* @brief pops the least significant bit. 
+		* @returns the bit popped or BBObject::noBit if the bitset is empty
 		**/
 		int pop_lsb() {
 			if (pc_ > 0) {
 				int bit = bb_.lsb();
 				bb_.erase_bit(bit);
-				pc_--; return bit;
+				pc_--; 
+				return bit;
 			}
 			else return BBObject::noBit;
 		}
 
-		int sync_pc() {
+		count_t sync_pc() {
 			pc_ = bb_.count();
 			return pc_;
 		}

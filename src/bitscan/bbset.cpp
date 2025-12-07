@@ -64,7 +64,7 @@ BitSet::BitSet(const vint& v):
 }
 
 BitSet::BitSet(std::size_t nPop, std::initializer_list<int> l):
-	nBB_(INDEX_1TO1(nPop))
+	nBB_(static_cast<int>(INDEX_1TO1(nPop)))
 {
 	try {
 		vBB_.assign(nBB_, 0);
@@ -432,7 +432,7 @@ namespace bitgraph {
 			for (auto i = 0; i < lhs.nBB_; ++i) {
 				BITBOARD bb = lhs.vBB_[i] & rhs.vBB_[i];
 				if (bb) {
-					return bblock::lsb(bb) + WMUL(i);
+					return bblock::lsb(bb) + static_cast<int>(WMUL(i));
 				}
 			}
 
@@ -450,7 +450,7 @@ namespace bitgraph {
 			for (auto i = firstBlock; i <= last_block; i++) {
 				BITBOARD bb = lhs.vBB_[i] & rhs.vBB_[i];
 				if (bb) {
-					return bblock::lsb(bb) + WMUL(i);
+					return bblock::lsb(bb) + static_cast<int>(WMUL(i));
 				}
 			}
 
