@@ -302,8 +302,8 @@ namespace bitgraph {
 			* @details implemented as a lookup table
 			**/
 		protected:
-			inline  int msbn64_lup()	const;
-			inline  int msbn64_intrin()	const;
+			int msbn64_lup()	const;
+			int msbn64_intrin()	const;
 
 		public:
 			int msb()	const { return msbn64_intrin(); }
@@ -314,8 +314,8 @@ namespace bitgraph {
 			*			an internal switch (see config.h)
 			**/
 		protected:
-			inline  int lsbn64_non_intrin()	const;
-			inline  int lsbn64_intrin()	const;
+			int lsbn64_non_intrin()	const;
+			int lsbn64_intrin()	const;
 
 		public:
 			int lsb()	const { return lsbn64_intrin(); }
@@ -334,7 +334,7 @@ namespace bitgraph {
 			* @details: Uses a DeBruijn implementation for lsb()
 			* @details: DEPRECATED in favour of the bitscanning with state of BBIntrinsic class
 			**/
-			inline	 int next_bit(int bit)	const;
+			int next_bit(int bit)	const;
 
 			/**
 			* @brief Computes the next most significant  1-bit in the bitstring after bit
@@ -350,7 +350,7 @@ namespace bitgraph {
 			* @details: Uses a lookup table implementation for msb()
 			* @details: Not recommended. DEPRECATED in favour of the bitscanning with state of BBIntrinsic class
 			**/
-			inline 	int prev_bit(int bit)	const;
+			int prev_bit(int bit)	const;
 
 			/////////////////
 			// Popcount
@@ -370,7 +370,7 @@ namespace bitgraph {
 			* @brief returns the number of 1-bits in the bitstring
 			**/
 		protected:
-			virtual	inline int popcn64()							const;
+			virtual	int popcn64()	const;
 
 			/**
 			* @brief Returns the number of 1-bits in the bitstring
@@ -380,7 +380,7 @@ namespace bitgraph {
 			* @details efficiently implemented as a lookup table or with HW instructions
 			*			depending  on an internal switch (see config.h)
 			**/
-			virtual	inline int popcn64(int firstBit, int lastBit = -1)	const;
+			virtual	int popcn64(int firstBit, int lastBit = -1)	const;
 
 			/////////////////////
 			//Setting / Erasing bits 
@@ -391,7 +391,7 @@ namespace bitgraph {
 			* @param  bit: position of the 1-bit to set (nBit >= 0)
 			* @returns reference to the modified bitstring
 			**/
-			inline	BitSet& set_bit(int bit);
+			BitSet& set_bit(int bit);
 
 			/**
 			* @brief sets the bits in the closed range [firstBit, lastBit] to 1 in the bitstring
@@ -399,7 +399,7 @@ namespace bitgraph {
 			* @date 22/9/14
 			* @last_update 01/02/25
 			**/
-			inline  BitSet& set_bit(int firstBit, int lastBit);
+			 BitSet& set_bit(int firstBit, int lastBit);
 
 			/**
 			* @brief Sets all bitblocks up to the bitstring num_blocks to 1.
@@ -420,7 +420,7 @@ namespace bitgraph {
 			* @details  Equivalent to OR operation / set union
 			* @returns reference to the modified bitstring
 			**/
-			inline	BitSet& set_bit(const BitSet& bb_add);
+			BitSet& set_bit(const BitSet& bb_add);
 
 			/**
 			* @brief Overwrites this bitstring with @bb_add (equivalent to operator=)
@@ -430,14 +430,14 @@ namespace bitgraph {
 			* @param bb_add: input bitstring whose bits are copied
 			* returns reference to the modified bitstring
 			**/
-			inline BitSet& assign_bit(const BitSet& bb_add);
+			BitSet& assign_bit(const BitSet& bb_add);
 
 			/**
 			* @brief Adds the bits from the bitstring bb_add in the range [0, lastBit]
 			* @param lastBit : the last bit in the range to be copied
 			* @returns reference to the modified bitstring
 			**/
-			inline BitSet& set_bit(int lastBit, const BitSet& bb_add);
+			BitSet& set_bit(int lastBit, const BitSet& bb_add);
 
 			/**
 			* @brief Adds elements from a vector of non-negative integers lv as 1-bit
@@ -456,7 +456,7 @@ namespace bitgraph {
 			* @param  bit: position of the 1-bit to set (>=0)
 			* @returns reference to the modified bitstring
 			**/
-			inline	BitSet& erase_bit(int bit);
+			BitSet& erase_bit(int bit);
 
 			/**
 			* @brief sets the bits in the closed range [firstBit, lastBit] to 0 in the bitstring
@@ -465,13 +465,13 @@ namespace bitgraph {
 			* @created 22/9/14
 			* @details last_update 01/02/25
 			**/
-			inline BitSet& erase_bit(int firstBit, int lastBit);
+			BitSet& erase_bit(int firstBit, int lastBit);
 
 			/**
 			* @brief sets all bits to 0
 			* @returns reference to the modified bitstring
 			**/
-			inline BitSet& erase_bit();
+			BitSet& erase_bit();
 
 			/**
 			* @brief Removes the bits from the bitstring @bitset inside the population range.
@@ -482,7 +482,7 @@ namespace bitgraph {
 			* @details  Equivalent to a set minus operation
 			* @returns reference to the modified bitstring
 			**/
-			inline	BitSet& erase_bit(const BitSet& bitset);
+			BitSet& erase_bit(const BitSet& bitset);
 
 			/**
 			* @brief Removes the bits  from the bitstring @bitset inside the 
@@ -495,7 +495,7 @@ namespace bitgraph {
 			* @details  Equivalent to a set minus operation
 			* @returns reference to the modified bitstring
 			**/
-			inline BitSet& erase_bit(int firstBit, int lastBit,  const BitSet& bitset);
+			BitSet& erase_bit(int firstBit, int lastBit,  const BitSet& bitset);
 
 			/**
 			* @brief Removes the 1-bits from both input bitstrings (their union)
@@ -506,7 +506,7 @@ namespace bitgraph {
 			* @created: 30/7/2017  for the MWCP
 			* @last_update: 02/02/2025
 			**/
-			inline	BitSet& erase_bit(const BitSet& lhs, const BitSet& rhs);
+			BitSet& erase_bit(const BitSet& lhs, const BitSet& rhs);
 
 			/////////////////////
 			//BitBlock operations 
@@ -522,7 +522,7 @@ namespace bitgraph {
 			* @param LastBLock: the last bitblock to be modified
 			* @returns reference to the modified bitstring
 			**/
-			inline	BitSet& set_block(index_t firstBlock, index_t lastBlock, const BitSet& bb_add);
+			BitSet& set_block(index_t firstBlock, index_t lastBlock, const BitSet& bb_add);
 
 			/**
 			* @brief Overwrites / Copies the blocks of 1-bits from the bitstring @bb_add 
@@ -534,7 +534,7 @@ namespace bitgraph {
 			* @param LastBLock: the last bitblock to be modified
 			* returns reference to the modified bitstring
 			**/
-			inline BitSet& assign_block(index_t firstBlock, index_t lastBlock, const BitSet& bb_add);
+			BitSet& assign_block(index_t firstBlock, index_t lastBlock, const BitSet& bb_add);
 
 			/**
 			* @brief Deletes the 1-bits from the bitstring bb_del in the closed range [firstBlock, lastBlock]
@@ -547,7 +547,7 @@ namespace bitgraph {
 			* @param lastBlock: the last bitblock to be modified
 			* @returns reference to the modified bitstring
 			**/
-			inline	BitSet& erase_block(index_t firstBlock, index_t lastBlock, const BitSet& bb_del);
+			BitSet& erase_block(index_t firstBlock, index_t lastBlock, const BitSet& bb_del);
 
 			/**
 			* @brief Removes the 1-bits from both input bitstrings (their union)
@@ -559,7 +559,7 @@ namespace bitgraph {
 			* @returns reference to the modified bitstring
 			* @date: 02/02/2025 during a refactorization of BITSCAN
 			**/
-			inline	BitSet& erase_block(index_t firstBlock, index_t lastBlock, const BitSet& bb_del_lhs, const BitSet& bb_del_rhs);
+			BitSet& erase_block(index_t firstBlock, index_t lastBlock, const BitSet& bb_del_lhs, const BitSet& bb_del_rhs);
 
 			////////////////////////
 			// operators
@@ -611,7 +611,6 @@ namespace bitgraph {
 			* @date: 04/02/2025 during a refactorization of BITSCAN
 			**/
 			template<bool Erase = false>
-			inline
 			BitSet& AND_EQUAL_block(index_t firstBlock, index_t lastBlock, const BitSet& rhs);
 
 			/**
@@ -623,7 +622,6 @@ namespace bitgraph {
 			* @returns reference to the modified bitstring
 			**/
 			template<bool Erase = false>
-			inline
 			BitSet& OR_EQUAL_block(index_t firstBlock, index_t lastBlock, const BitSet& rhs);
 
 			/**
@@ -633,7 +631,7 @@ namespace bitgraph {
 			* @created 7/17
 			* @last_update 02/02/2025
 			**/
-			inline int find_first_common(const BitSet& rhs)	const;
+			int find_first_common(const BitSet& rhs)	const;
 
 			/**
 			* @brief Determines if the bitstring has a single 1-bit in the closed range [firstBit, lastBit]
@@ -643,7 +641,7 @@ namespace bitgraph {
 			* @returns  0 if range is empty, 1 if singleton, -1 if more than one bit exists in the range
 			*			IMPORTANT: if any bitset is empty in the range, the result is 0 (disjoint), , bit = -1 
 			**/
-			inline  int  find_singleton(int firstBit, int lastBit, int& bit) const;
+			int  find_singleton(int firstBit, int lastBit, int& bit) const;
 
 			/**
 			* @brief Determines the single 1-bit common to both this and rhs bitstring.			*		 
@@ -652,7 +650,7 @@ namespace bitgraph {
 			* @returns 0 if disjoint,  1 if intersection is a single bit, -1 otherwise (more than 1-bit in common)
 			*		   IMPORTANT: if any bitset is empty, the result is 0 (disjoint), bit = -1
 			**/
-			inline int	find_common_singleton(const BitSet& rhs, int& bit)	const;
+			int	find_common_singleton(const BitSet& rhs, int& bit)	const;
 
 			/**
 			* @brief  Determines the single 1-bit common to both this and rhs bitstring in the
@@ -664,7 +662,7 @@ namespace bitgraph {
 			* @created 14/8/16
 			* @last_update 04/02/2025
 			**/
-			inline	int	find_common_singleton_block(index_t first_block, index_t last_block,
+			int	find_common_singleton(index_t first_block, index_t last_block,
 															const BitSet& rhs, int& bit)		const;
 
 			/**
@@ -675,7 +673,7 @@ namespace bitgraph {
 			* @created 27/7/16
 			* @last_update 04/02/2025
 			**/
-			inline	int	find_diff_singleton(const BitSet& rhs, int& bit) const;
+			int	find_diff_singleton(const BitSet& rhs, int& bit) const;
 
 			/**
 			* @brief Determines the pair of bits bit1 and bit2 the set difference  bitset this \ rhs.
@@ -688,17 +686,17 @@ namespace bitgraph {
 			*		  and -1 otherwise (more than 1-bit)
 			* @details: created  27/7/16, last_update 04/02/2025
 			**/
-			inline  int find_diff_pair(const BitSet& rhs, int& bit1, int& bit2) 	const;
+			int find_diff_pair(const BitSet& rhs, int& bit1, int& bit2) 	const;
 
 			/////////////////////////////
 			//Boolean functions 
 
-			inline bool is_bit(int bit)	const;
+			bool is_bit(int bit)	const;
 
 			/**
 			* @brief TRUE if the bitstring has all 0-bits
 			**/
-			inline virtual bool is_empty() 	const;
+			virtual bool is_empty() 	const;
 
 			/**
 			* @brief Determines if the bitstring has all 0-bits in the closed range [firstBlock, lastBlock]
@@ -708,7 +706,7 @@ namespace bitgraph {
 			* @returns TRUE if the bitstring has all 0-bits in the given range
 			* @details optimized for non-sparse bitsets - early exit
 			**/
-			inline virtual bool is_empty_block(index_t firstBlock, index_t lastBlock) const;
+			virtual bool is_empty_block(index_t firstBlock, index_t lastBlock) const;
 
 			/**
 			* @brief TRUE if caller bitstring has a single 1-bit
@@ -716,7 +714,7 @@ namespace bitgraph {
 			* @created (15/3/17)
 			* @details optimized for non-sparse bitsets - early exit
 			**/
-			inline int is_singleton() const;
+			int is_singleton() const;
 
 			/**
 			* @brief Determines if the caller bitstring has a single 1-bit in the
@@ -726,7 +724,7 @@ namespace bitgraph {
 			* @returns 1 if singleton, 0 if empty, -1 if more than one bit in the specifed range
 			* @details optimized for non-sparse bitsets - early exit
 			**/
-			inline int  is_singleton(int firstBit, int lastBit)						const;
+			int  is_singleton(int firstBit, int lastBit)						const;
 
 			/**
 			* @brief TRUE if caller bitstring has a single 1-bit in the closed range [firstBlock, lastBlock]
@@ -736,12 +734,12 @@ namespace bitgraph {
 			* @returns 1 if singleton, 0 if empty, -1 if more than one bit.
 			* @details optimized for non-sparse bitsets - early exit
 			**/
-			inline int is_singleton_block(index_t firstBlock, index_t lastBlock) const;
+			int is_singleton_block(index_t firstBlock, index_t lastBlock) const;
 
 			/**
 			* @brief TRUE if this bitstring has no bits in common with rhs
 			**/
-			inline bool is_disjoint(const BitSet& rhs)	const;
+			bool is_disjoint(const BitSet& rhs)	const;
 
 			/**
 			* @brief TRUE if this bitstring has no bits in common with rhs
@@ -749,12 +747,12 @@ namespace bitgraph {
 			*
 			*		If lastBlock == npos, the range is [firstBlock, nBB_]
 			**/
-			inline bool is_disjoint_block(index_t firstBlock, index_t lastBlock,const BitSet& rhs)	const;
+			bool is_disjoint_block(index_t firstBlock, index_t lastBlock,const BitSet& rhs)	const;
 			/**
 			* @brief TRUE if this bitstring has no bits in common with neither lhs NOR rhs bitstrings
 			* @details Currently not available for sparse bitsets
 			**/
-			inline bool is_disjoint(const BitSet& lhs, const  BitSet& rhs)	const;
+			bool is_disjoint(const BitSet& lhs, const  BitSet& rhs)	const;
 
 			/////////////////////
 			// I/O 
@@ -1524,8 +1522,7 @@ namespace bitgraph{
 			return pc;
 		}
 
-
-		inline	int	BitSet::find_common_singleton_block(index_t firstBlock, index_t lastBlock, const BitSet& rhs, int& bit) const {
+		inline	int	BitSet::find_common_singleton(index_t firstBlock, index_t lastBlock, const BitSet& rhs, int& bit) const {
 
 
 			index_t last_block = (lastBlock == BitSet::npos) ? static_cast<index_t>(nBB_ - 1) : lastBlock;
