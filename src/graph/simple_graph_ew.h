@@ -164,11 +164,10 @@ namespace bitgraph {
 			* @brief resets to a graph with |V|= n with weight val in everey vertex and edge
 			* @param n number of vertices
 			* @param name name of the instance
-			* @returns 0 if success, -1 if memory allocation fails
+			* @details: fast-fail policy - exits if failure
 			**/
 			template<bool EdgeWeightedGraph = false>
-			int reset(std::size_t n, W val = ZERO_WEIGHT, string name = "");					//before: int init (int n, W val = NO_WEIGHT, bool reset_name = true);
-
+			void reset(std::size_t n, W val = ZERO_WEIGHT, string name = "");					//before: int init (int n, W val = NO_WEIGHT, bool reset_name = true);
 
 			/////////////////////////
 			// basic operations
@@ -239,10 +238,10 @@ namespace bitgraph {
 			////////////////
 			// Conversions 
 
-				/**
-				* @brief sets all vertex weights to NO_WEIGHT
-				* @param erase_non_edges if TRUE, sets non-edges to NO_WEIGHT
-				**/
+			/**
+			* @brief sets all vertex weights to NO_WEIGHT
+			* @param erase_non_edges if TRUE, sets non-edges to NO_WEIGHT
+			**/
 			void make_edge_weighted(bool erase_non_edges = false);
 
 			/**
@@ -269,11 +268,11 @@ namespace bitgraph {
 			////////////////////////
 			//weight operations
 
-				/**
-				* @brief transforms weights (excluding NO_WEIGHT values) using functor f
-				* @param f functor
-				* @param type: EDGE (edge-weights), VERTEX (vertex-weights) or BOTH
-				**/
+			/**
+			* @brief transforms weights (excluding NO_WEIGHT values) using functor f
+			* @param f functor
+			* @param type: EDGE (edge-weights), VERTEX (vertex-weights) or BOTH
+			**/
 			template<class Func>
 			void transform_weights(Func f, int type = BOTH);
 
@@ -308,16 +307,18 @@ namespace bitgraph {
 			* @brief prints the edge (v, w) in line format: [v]-(val)->[w], one edge per line
 			**/
 			std::ostream& print_edge(int v, int w, std::ostream& o = std::cout, bool endl = true) const;
+
 			/**
 			* @brief streams the vertex @v in format [v:(val)]
 			**/
-			std::ostream& print_vertex(int v, std::ostream& o = std::cout, bool endl = true)		 const;
+			std::ostream& print_vertex(int v, std::ostream& o = std::cout, bool endl = true) const;
+
 			/**
 			* @brief streams non-empty (excluding NO_WEIGHT value) weight info
 			*		 for all directed edges.
 			**/
-			std::ostream& print_weights(std::ostream& o = std::cout, bool line_format = true,
-				int type = BOTH)							const;
+			std::ostream& print_weights(std::ostream& o = std::cout, bool line_format = true, int type = BOTH)	const;
+
 			/**
 			* @brief streams non-empty (excluding NO_WEIGHT value)  weights
 			*		 of directed edges induced by the subgraph of vertices in lv
@@ -786,7 +787,7 @@ namespace bitgraph {
 	template<class Graph_t, class W>
 	template<bool EdgeWeightedGraph>
 	inline
-		int Base_Graph_EW<Graph_t, W>::reset(std::size_t NV, W val, string name)
+		void Base_Graph_EW<Graph_t, W>::reset(std::size_t NV, W val, string name)
 	{
 		///////////////
 		g_.reset(NV);
@@ -797,7 +798,8 @@ namespace bitgraph {
 		}
 		catch (...) {
 			LOG_ERROR("bad weight assignment - Base_Graph_EW<Graph_t, W>::reset");
-			return -1;
+			LOG_ERROR("exiting");
+			std::exit(EXIT_FAILURE);
 		}
 
 		//set vertex weights to NO_WEIGHT if required
@@ -808,8 +810,7 @@ namespace bitgraph {
 		}
 
 		g_.set_name(name);
-
-		return 0;
+	
 	}
 
 }//end of namespace bitgraph

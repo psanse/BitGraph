@@ -55,22 +55,8 @@ template<class Graph_t, class W>
  template<class Graph_t, class W>
  Base_Graph_EW<Graph_t, W>::Base_Graph_EW(int NV, W val, bool edge_weighted)
  {
-	 if (edge_weighted) {
-
-		if (reset<true>(NV, val) == -1) {
-			LOG_ERROR("error during memory graph allocation - Base_Graph_EW<T, W>::Base_Graph_EW");
-			LOG_ERROR("exiting...");
-			std::exit(EXIT_FAILURE);
-		}
-	}
-	else {
-
-		if (reset<false>(NV, val) == -1) {
-			LOG_ERROR("error during memory graph allocation - Base_Graph_EW<T, W>::Base_Graph_EW");
-			LOG_ERROR("exiting...");
-			std::exit(EXIT_FAILURE);
-		}
-	}
+	 if (edge_weighted)  reset<true>(NV, val);
+	 else reset<false>(NV, val);
  }
 
  template<class Graph_t, class W>
@@ -200,14 +186,16 @@ int Base_Graph_EW<Graph_t, W>::read_dimacs (string filename){
 
 	//read header
 	 int nV = -1, nEdges = -1;
-	 if (gio::dimacs::read_dimacs_header (f, nV, nEdges) == -1 ||
-		 reset(nV) == -1	)  //allocates memory for the graph, default NO_WEIGHT edge-weights
+	 if (gio::dimacs::read_dimacs_header (f, nV, nEdges) == -1)
 	 {
 		 LOG_ERROR("error when reading dimacs header / allocation - Base_Graph_EW<Graph_t, W>::read_dimacs");
 		 reset();
 		 f.close();
 		 return -1;
 	 }
+
+	 //allocates memory for the graph - no allocation for edge-weights
+	 reset(nV);
 
 	 //skips empty lines
 	 gio::skip_empty_lines(f);
