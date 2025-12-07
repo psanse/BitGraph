@@ -147,19 +147,22 @@ namespace bitgraph {
 		* @brief creates a complete graph of a given size N
 		* @param g: a simple graph
 		* @param N: number of vertices
-		* @returns 0 if success, -1 if error
+		* @details: fast-fail policy - exits if error
 		*/
 		template<class Graph_t>
 		int create_complete(Graph_t& g, std::size_t N) {
 
-			if (g.reset(N) == -1) { return -1; }
+			/////////////
+			g.reset(N);
+			/////////////
+			
+			const auto n = static_cast<int>(N);
 
-			for (auto i = 0; i < N; ++i) {
-				for (auto j = 0; j < N; j++) {
+			for (auto i = 0; i < n; ++i) {
+				for (auto j = 0; j < n; j++) {
 					g.add_edge(i, j);
 				}
 			}
-			return 0;
 		}
 
 		/*
@@ -168,19 +171,21 @@ namespace bitgraph {
 		*
 		* @param g: a simple graph
 		* @param N: number of vertices
-		* @returns 0 if success, -1 if error
+		* @details: fast-fail policy - exits if error
 		*/
 		inline
-			int create_complete(ugraph& g, int N) {
+			void create_complete(ugraph& g, int N) {
 
-			if (g.reset(N) == -1) { return -1; }
+			/////////////
+			g.reset(N);
+			/////////////
+			
 
 			for (auto i = 0; i < N - 1; ++i) {
 				for (auto j = i + 1; j < N; ++j) {
 					g.add_edge(i, j);
 				}
-			}
-			return 0;
+			}			
 		}
 
 		/*

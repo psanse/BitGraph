@@ -46,20 +46,17 @@ namespace bitgraph {
 
 			/*
 			* @brief conversion from sparse_ugraph to ugraph
-			* @returns 0 if conversion is successful, -1 otherwise
+			* @details: failfast policy - exits if memory allocation fails
 			* @date	25/11/16
 			*/
-			static int sug2ug(const sparse_ugraph& sug, ugraph& ug)
+			static void sug2ug(const sparse_ugraph& sug, ugraph& ug)
 			{
 
 				auto NV = sug.num_vertices();
 
 				//allocation - empty graph of size NV
-				if (ug.reset(NV) == -1) {
-					LOG_ERROR("memory for graph not allocated- GraphConversion::sug2ug");
-					return -1;
-				}
-
+				ug.reset(NV);
+				
 				//copies adjacency (non-empty) block array
 				for (auto v = 0; v < NV; ++v) {
 					for (auto it = sug.adj_[v].cbegin(); it != sug.adj_[v].cend(); ++it) {
@@ -72,27 +69,22 @@ namespace bitgraph {
 				}
 
 				//name
-				ug.set_name(sug.name());
-
-				return 0;
+				ug.set_name(sug.name());				
 			}
 
 
 			/*
 			* @brief conversion from ugraph to sparse_ugraph
-			* @returns 0 if conversion is successful, -1 otherwise
+			* @details: fast-fail policy- exits if error
 			* @date	25/11/16
 			*/
-			static	int ug2sug(const ugraph& ug, sparse_ugraph& sug)
+			static	void ug2sug(const ugraph& ug, sparse_ugraph& sug)
 			{
 				auto NV = ug.num_vertices();
 
 				//allocation - empty graph of size NV
-				if (sug.reset(NV) == -1) {
-					LOG_ERROR("memory for graph not allocated- GraphConversion::sug2ug");
-					return -1;
-				}
-
+				sug.reset(NV);
+			
 				//add edges	
 				auto blockID = ug.num_blocks();
 				for (auto v = 0; v < NV; ++v) {
@@ -111,7 +103,6 @@ namespace bitgraph {
 				//name
 				sug.set_name(ug.name());
 
-				return 0;
 			}
 
 		};

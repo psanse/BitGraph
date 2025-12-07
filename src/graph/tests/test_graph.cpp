@@ -187,7 +187,8 @@ TEST(Graph, move_constructor) {
 
 	//moved-from object is in a valid state (size is not assumed).
 	//can be reused with reset().
-	EXPECT_EQ(0, g.reset(3));
+	g.reset(3);
+
 	EXPECT_EQ(3, g.num_vertices());
 	EXPECT_EQ(0, g.num_edges());
 }

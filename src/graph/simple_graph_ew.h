@@ -788,11 +788,10 @@ namespace bitgraph {
 	inline
 		int Base_Graph_EW<Graph_t, W>::reset(std::size_t NV, W val, string name)
 	{
-		if (g_.reset(NV) == -1) {
-			LOG_ERROR("error during memory graph allocation - Base_Graph_W<T, W>::reset");
-			return -1;
-		}
-
+		///////////////
+		g_.reset(NV);
+		////////////////
+		
 		try {
 			we_.assign(NV, vector<W>(NV, val));
 		}

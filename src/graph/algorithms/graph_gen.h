@@ -300,27 +300,23 @@ namespace bitgraph {
 namespace bitgraph{	
 
 	template<class Graph_t>
-	int RandomGen<Graph_t>::create_graph(Graph_t& g, std::size_t n, double p) {
+	int RandomGen<Graph_t>::create_graph(Graph_t& g, std::size_t NV, double p) {
 
 		//assert - TODO DEBUG MODE
-		if (n <= 0) {
+		if (NV <= 0) {
 			LOG_ERROR("bad number of vertices - RandomGen<Graph_t>::create_graph");
 			return -1;
 		}
 
-		if (g.reset(n) == -1) {
-			LOG_ERROR("error during allocation - RandomGen<Graph_t>::create_graph");
-			return -1;
-		}
-
-		//////////////////
+		//////////////
+		g.reset(NV);	
 		g.gen_random_edges(p);		//generate edges appropiately (undirected / directed)
 		//////////////////
 
 
-		//name - r<n>_<p>.txt
+		//name - r<NV>_<p>.txt
 		std::stringstream sstr;
-		sstr << "r" << n << "_" << p << ".txt";
+		sstr << "r" << NV << "_" << p << ".txt";
 		g.set_name(sstr.str());
 
 		return 0;

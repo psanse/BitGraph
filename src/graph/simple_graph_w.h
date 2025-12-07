@@ -60,15 +60,11 @@ namespace bitgraph {
 
 			//constructors
 			Base_Graph_W() {};																					//No memory allocation
-			explicit Base_Graph_W(std::vector<W>& lw);															//creates empty graph with |V|= n with vertex weights
+			explicit Base_Graph_W(std::vector<W>& lw) : w_(lw) { g_.reset(lw.size()); }							//creates empty graph with |V|= n with vertex weights
 			Base_Graph_W(_gt& g, vector<W>& lw) :g_(g), w_(lw) { assert(w_.size() == g_.size()); }				//creates graph with vertex weights	
 			Base_Graph_W(_gt& g) :g_(g), w_(g.size(), DEFAULT_WEIGHT) {}										//creates graph with DEFAULT_WEIGHTs
-			explicit Base_Graph_W(int N, W val = DEFAULT_WEIGHT) {												//creates empty graph with |V|= N and weight value val	
-				const int ret = reset(N, val);
-				if (ret == -1) {
-					throw std::runtime_error("Base_Graph_W: reset() failed for N=" + std::to_string(N));
-				}
-			}				
+			explicit Base_Graph_W(int N, W val = DEFAULT_WEIGHT) { reset(N, val);}								//creates empty graph with |V|= N and weight value val
+					
 
 			/**
 			* @brief Reads weighted graph from ASCII file in DIMACS format
@@ -142,13 +138,13 @@ namespace bitgraph {
 			//////////////////////////
 			// memory allocation 
 
-				/**
-				* @brief resets to empty graph given name and number of vertices
-				* @param n number of vertices
-				* @param name name of the instance
-				* @returns 0 if success, -1 if memory allocation fails
-				**/
-			int reset(std::size_t n, W val = DEFAULT_WEIGHT, string name = "");
+			/**
+			* @brief resets to empty graph given name and number of vertices
+			* @param n number of vertices
+			* @param name name of the instance
+			* @details: fast-fail policy - exits if error
+			**/
+			void reset(std::size_t n, W val = DEFAULT_WEIGHT, string name = "");
 
 		protected:
 			/**

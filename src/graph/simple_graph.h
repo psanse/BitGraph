@@ -62,7 +62,7 @@ namespace bitgraph {
 			/////////////			
 			//construction / destruction
 			Graph() noexcept ;													//creates empty graph
-			explicit Graph(std::size_t n);										//creates graph with n=|V| and m=0 	
+			explicit Graph(std::size_t NV);										//creates graph with n=|V| and m=0 	
 			explicit Graph(std::string filename);								//creates graph from file		
 			Graph(std::size_t n, int* adj[], std::string filename = "");		//old-style adjacency matrix
 
@@ -83,16 +83,16 @@ namespace bitgraph {
 			* @details: Separates path and instance name internally (if applicable)
 			**/
 			void set_name(std::string instance);
-			std::string name()					const noexcept { return name_; }
+			std::string name() const noexcept { return name_; }
 
 			void set_path(std::string path_name) { path_ = std::move(path_name); }
-			std::string path()					const noexcept { return path_; }
+			std::string path() const noexcept { return path_; }
 
 			/**
 			* @brief number of vertices of the graph. Alias to num_vertices()
 			**/
-			std::size_t size()			const  noexcept { return NV_; }
-			int num_vertices()			const  noexcept { return NV_; }
+			std::size_t size() const  noexcept { return NV_; }
+			int num_vertices() const  noexcept { return NV_; }
 			
 
 			/**
@@ -132,17 +132,17 @@ namespace bitgraph {
 			* @brief resets to empty graph given name and number of vertices
 			* @param n number of vertices
 			* @param name name of the instance
-			* @returns 0 if success, -1 if memory allocation fails (error code, non-throwing interface)
-			* @creation 31/12/24
+			* @details: fast-fail policy - exits if failure
+			* @date: created 31/12/24, last_update 07/12/25
 			**/
-			int reset(std::size_t n, string name = "") noexcept;
+			void reset(std::size_t n, string name = "") noexcept;
 
 			/**
 			* @brief sets graph from file in dimacs/MTX/Edges formats (in this order)
 			* @param filename file
-			* @returns 0 if success, -1 if file cannot be read (error code, non-throwing interface)
+			* @details: fast-fail policy - exits if failure
 			**/
-			int reset(std::string filename) noexcept;
+			void reset(std::string filename) noexcept;
 
 			/**
 			* @brief resets to default values (does not deallocate memory)
@@ -527,11 +527,7 @@ namespace bitgraph {
 		NV_(0), NE_(0), NBB_(0),
 		name_(""), path_("")
 	{
-		if (reset(filename) == -1) {
-			LOGG_ERROR("error when reading file: ", filename, "Graph<BitSetT>::Graph");
-			LOG_ERROR("exiting...");
-			exit(-1);
-		}
+		reset(filename);		
 	}
 
 	template<class BitSetT>
@@ -544,14 +540,16 @@ namespace bitgraph {
 
 	template <class BitSetT>
 	inline
-		Graph<BitSetT>::Graph(std::size_t nV, int* adj[], string filename) {
-		if (reset(nV) == -1) {
-			LOG_ERROR("bizarre graph construction-Graph<BitSetT>::Graph(...), exiting... ");
-			exit(-1);
-		}
+		Graph<BitSetT>::Graph(std::size_t NV, int* adj[], string filename) {
+		
+		///////////////
+		reset(NV);
+		//////////////
+		
 		set_name(filename);
 
 		//add edges
+		const auto nV = static_cast<int>(NV);
 		for (auto i = 0; i < nV; i++) {
 			for (int j = 0; j < nV; j++) {
 				if (adj[i][j] == 1) {
@@ -589,11 +587,13 @@ namespace bitgraph {
 
 	template<class BitSetT>
 	inline
-		int Graph<BitSetT>::reset(std::size_t NV, string name) noexcept {
-
-		if (NV <= 0) {
+		void Graph<BitSetT>::reset(std::size_t NV, string name) noexcept {
+		
+		//check size - must fit in int type
+		if (NV > std::numeric_limits<int>::max()) {
 			LOGG_ERROR("Invalid graph size ", NV, " - Graph<BitSetT>::reset");
-			return -1;
+			LOG_ERROR("exiting... ");
+			std::exit(EXIT_FAILURE);
 		}
 
 		//initialization
@@ -609,15 +609,13 @@ namespace bitgraph {
 		catch (const std::bad_alloc& e) {
 			LOG_ERROR("memory for graph not allocated - Graph<BitSetT>::reset");
 			LOG_ERROR("%s", e.what());
-			NV_ = 0;
-			NBB_ = 0;
-			return -1;
+			LOG_ERROR("exiting... ");
+			std::exit(EXIT_FAILURE);
 		}
 
 		//update instance name
 		this->set_name(std::move(name));
 
-		return 0;
 	}
 
 	template<class BitSetT>
@@ -630,11 +628,10 @@ namespace bitgraph {
 			return newg;
 		}
 
-		if (newg.reset(first_k) == -1) {
-			LOG_ERROR("memory for graph not allocated - Graph<BitSetT>::create_subgraph");
-			return newg;
-		}
-
+		//////////////////////
+		newg.reset(first_k);
+		///////////////////////
+				
 		auto bbh = WDIV(first_k - 1);
 
 		//copy the relevant vertices of the adjacency matrix
@@ -689,19 +686,19 @@ namespace bitgraph {
 
 	template<class BitSetT>
 	inline
-		int Graph<BitSetT>::reset(string filename) noexcept {
+		void Graph<BitSetT>::reset(string filename) noexcept {
 		if (read_dimacs(filename) == -1) {
 			if (read_mtx(filename) == -1) {
 				if (read_EDGES(filename) == -1) {
 					if (read_01(filename) == -1) {
-						LOGG_ERROR("Unable to read a graph form file ", filename, "- Graph<BitSetT>::reset");
-						LOG_ERROR("Format considered: DIMACS / MTX / EDGES / 01");
-						return -1;
+						LOGG_ERROR("Unable to read a graph from file ", filename, "- Graph<BitSetT>::reset");
+						LOG_ERROR("Formats considered: DIMACS / MTX / EDGES / 01");
+						LOG_ERROR("exiting...");
+						std::exit(EXIT_FAILURE);
 					}
 				}
 			}
-		}
-		return 0;
+		}		
 	}
 
 	template<class BitSetT>
@@ -860,11 +857,11 @@ namespace bitgraph {
 
 		//read size
 		f >> size;
-		if (reset(size) == -1) {
-			LOG_ERROR("Graph<BitSetT>::read_01-bizarre graph size");
-			f.close();
-			return -1;
-		}
+
+		///////////////
+		reset(size);
+		///////////////
+
 		f.getline(line, 250);  //remove final part of the line
 
 		//read rows		
@@ -1239,12 +1236,7 @@ namespace bitgraph {
 		}
 
 		//allocates memory for the new graph
-		if (newg.reset(first_k) == -1) {
-			LOG_ERROR("memory for graph not allocated - GSS::create_subgraph");
-			LOG_ERROR("graph remains unchanged");
-			return newg;
-		}
-
+		newg.reset(first_k);
 
 		//copies first k elements of the adjacency matrix 
 		for (auto i = 0; i < newg.NV_; i++) {

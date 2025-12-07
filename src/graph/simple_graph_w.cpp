@@ -68,15 +68,12 @@ int Base_Graph_W<Graph_t, W>::create_complement(Base_Graph_W<Graph_t, W>& g) con
 	////////////////////////////////////////
 }
 
-template<class Graph_t, class W>
-Base_Graph_W<Graph_t, W>::Base_Graph_W(vector<W>& lw) : w_(lw) {
-
-	if (g_.reset(lw.size()) == -1) {
-		LOG_ERROR("error during memory graph allocation - Base_Graph_W<T, W>::Base_Graph_W");
-		LOG_ERROR("exiting...");
-		std::exit(EXIT_FAILURE);
-	}
-}
+//template<class Graph_t, class W>
+//Base_Graph_W<Graph_t, W>::Base_Graph_W(vector<W>& lw) : w_(lw) {
+//
+//	g_.reset(lw.size());
+//	
+//}
 
 template<class Graph_t, class W>
 Base_Graph_W<Graph_t, W>::Base_Graph_W(std::string filename){	
@@ -114,24 +111,22 @@ bool Base_Graph_W<Graph_t, W>::is_unit_weighted()
 }
 
 template<class Graph_t, class W>
-int Base_Graph_W<Graph_t, W>::reset(std::size_t NV, W val, string name)
+void Base_Graph_W<Graph_t, W>::reset(std::size_t NV, W val, string name)
 {
-	if (g_.reset(NV) == -1) {
-		LOG_ERROR("error during memory graph allocation - Base_Graph_W<T, W>::reset");
-		return -1;
-	}
-
+	/////////////////
+	g_.reset(NV);
+	///////////////
+	
 	try {
 		w_.assign(NV, val);
 	}
 	catch (...) {
 		LOG_ERROR("bad weight assignment - Base_Graph_W<Graph_t, W>::reset");
-		return -1;
+		LOG_ERROR("exiting...");
+		std::exit(EXIT_FAILURE);	
 	}
 
 	g_.set_name(name);
-
-	return 0;
 }
 
 template <class Graph_t, class W>
@@ -215,12 +210,11 @@ int Base_Graph_W<Graph_t, W>::read_dimacs (string filename, int type){
 	}	
 	
 	//allocates memory for the graph, assigns default unit weights
-	if (reset(nV) == -1) {
-		reset();
-		f.close();
-		return -1;
-	}
 
+	/////////////
+	reset(nV);
+	////////////
+	
 	//skips empty lines
 	gio::skip_empty_lines(f);
 	

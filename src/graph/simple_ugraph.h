@@ -58,9 +58,9 @@ namespace bitgraph {
 			using ptype = BaseT;				//alias for base type in modern C++
 
 			//constructors - cannot all be inherited	
-			Ugraph() : Graph<BitSetT>() {}									//creates empty graph
-			explicit Ugraph(std::size_t n) : Graph<BitSetT>(n) {}						//creates empty graph of size n=|V|	
-			explicit Ugraph(std::string filename);								//reads graph from file
+			Ugraph() : Graph<BitSetT>() {}															//creates empty graph
+			explicit Ugraph(std::size_t n) : Graph<BitSetT>(n) {}									//creates empty graph of size n=|V|	
+			explicit Ugraph(std::string filename) {this->reset(filename);}							//reads graph from file
 
 			/**
 			* @brief Creates a graph from an C-style adjacency matrix
@@ -453,33 +453,17 @@ namespace bitgraph {
 	}
 
 
-	template<class BitSetT>
-	inline
-		Ugraph<BitSetT>::Ugraph(string filename) : Graph<BitSetT>()
-	{
-		//cannot call Graph<BitSetT>::Graph(filename) because Graph<BitSetT>::add_edge is overriden!
-
-		if (this->reset(filename) == -1) {
-			LOGG_ERROR("error when reading file: ", filename, "Graph<BitSetT>::Graph");
-			LOG_ERROR("exiting...");
-			std::exit(EXIT_FAILURE);
-		}
-
-	}
-
 	template <class BitSetT>
 	inline
 		Ugraph<BitSetT>::Ugraph(std::size_t NV, int* adj[], string name) {
 
-		if (this->reset(NV) == -1) {
-			LOG_ERROR("Bad graph construction - Ugraph<BitSetT>::Ugraph(std::size_t , int* adj[], string)");
-			LOG_ERROR("exiting...");
-			exit(-1);
-		}
+		this->reset(NV);
 		this->set_name(name);
 
-		for (std::size_t i = 0; i < NV - 1; ++i) {
-			for (std::size_t j = i + 1; j < NV; ++j) {
+		const auto N = this->NV_;
+
+		for (auto i = 0; i < N - 1; ++i) {
+			for (auto j = i + 1; j < N; ++j) {
 				if (adj[i][j] == 1) {
 					add_edge(i, j);
 				}
@@ -551,7 +535,6 @@ namespace bitgraph {
 		LOG_ERROR("exiting...");
 		std::exit(EXIT_FAILURE);
 	}
-
 
 
 	template<class BitSetT>
@@ -827,8 +810,8 @@ namespace bitgraph {
 	int Ugraph<BitSetT>::create_complement(Ugraph& ug) const {
 
 		//resets ug with new allocation
-		if (ug.reset(this->NV_) == -1) return -1;
-
+		ug.reset(this->NV_);
+			
 		for (int i = 0; i < this->NV_ - 1; ++i) {
 			for (int j = i + 1; j < this->NV_; ++j) {
 
@@ -861,11 +844,11 @@ namespace bitgraph {
 		}
 
 		const int NV = lv.size();
-		if (ug.reset(NV) == -1) {
-			LOG_ERROR("bad allocation - Ugraph<BitSetT>::create_induced");
-			return -1;
-		}
-
+		
+		///////////////
+		ug.reset(NV);
+		///////////////
+		
 		//add appropiate edges
 		for (std::size_t i = 0; i < NV - 1; i++) {
 			for (std::size_t j = i + 1; j < NV; j++) {
