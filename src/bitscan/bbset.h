@@ -39,11 +39,10 @@ namespace bitgraph {
 		//
 		///////////////////////////////////
 		class BitSet :public BBObject {
-						
-
+				
 		public:
 
-			using index_t = std::vector<BITBOARD>::size_type;			//std::size_t
+			using index_t = std::vector<BITBOARD>::size_type;			//std::size_t - TODO@set to int?
 			static constexpr index_t npos = index_t(-1);
 
 			/////////////////////////////
@@ -306,7 +305,7 @@ namespace bitgraph {
 			int msbn64_intrin()	const;
 
 		public:
-			int msb()	const { return msbn64_intrin(); }
+			inline int msb()	const { return msbn64_intrin(); }
 
 			/**
 			* @brief returns the index of the least significant bit in the bitstring
@@ -318,7 +317,7 @@ namespace bitgraph {
 			int lsbn64_intrin()	const;
 
 		public:
-			int lsb()	const { return lsbn64_intrin(); }
+			inline int lsb()	const { return lsbn64_intrin(); }
 
 			/**
 			* @brief Computes the next least significant 1-bit in the bitstring after bit
@@ -363,8 +362,8 @@ namespace bitgraph {
 			* @details implementation depends of POPCN64 switch in bbconfig.h
 			*		   By default - intrinsic HW assembler instructions
 			**/
-			int	count()									const { return popcn64(); }
-			int	count(int firstBit, int lastBit = -1)	const { return popcn64(firstBit, lastBit); }
+			inline int	count()									const { return popcn64(); }
+			inline int	count(int firstBit, int lastBit = -1)	const { return popcn64(firstBit, lastBit); }
 
 			/**
 			* @brief returns the number of 1-bits in the bitstring
