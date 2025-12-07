@@ -373,7 +373,7 @@ namespace bitgraph {
 	template<class BitSetT>
 	inline int Ugraph<BitSetT>::outgoing_degree(std::vector<int> sg) const
 	{
-		BitSetT bbsg{ static_cast<typename BitSetT::index_t>(this->NV_), sg };
+		BitSetT bbsg{ this->size(), sg };
 		return (outgoing_degree(bbsg));
 	}
 

@@ -243,7 +243,7 @@ namespace bitgraph {
 			*		 equivalent non-sparse bitset in the general case. To find the id-th block
 			*		 use find_bitblock function.
 			**/
-			BITBOARD  block(index_t blockID)			const { return vBB_[blockID].bb_; }
+			BITBOARD  block(index_t blockID)	const { return vBB_[blockID].bb_; }
 			BITBOARD& block(index_t blockID) { return vBB_[blockID].bb_; }
 
 			pBlock_t  pBlock(index_t blockID)			const { return vBB_[blockID]; }
