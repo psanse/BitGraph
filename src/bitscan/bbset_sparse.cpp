@@ -179,15 +179,15 @@ BitSetSp& BitSetSp::set_bit(int firstBit, int lastBit)
 	if (posTHIS == npos) {
 
 		if (bbl == bbh) {
-			vBB_.emplace_back(pBlock_t(bbl, bblock::MASK_1(offsetl, offseth)));
+			vBB_.emplace_back(SparseBlock(bbl, bblock::MASK_1(offsetl, offseth)));
 		}
 		else {
 
 			//add blocks trimming both ends 
-			vBB_.emplace_back(pBlock_t(bbl, bblock::MASK_1_HIGH(offsetl)));
-			vBB_.emplace_back(pBlock_t(bbh, bblock::MASK_1_LOW(offseth)));
+			vBB_.emplace_back(SparseBlock(bbl, bblock::MASK_1_HIGH(offsetl)));
+			vBB_.emplace_back(SparseBlock(bbh, bblock::MASK_1_LOW(offseth)));
 			for (int i = bbl + 1; i < bbh; i++) {
-				vBB_.emplace_back(pBlock_t(i, ONE));
+				vBB_.emplace_back(SparseBlock(i, ONE));
 			}
 		}
 		
@@ -205,12 +205,12 @@ BitSetSp& BitSetSp::set_bit(int firstBit, int lastBit)
 			if (vBB_[posTHIS].idx_ > bbl) {
 						
 				//insert block to avoid sorting - special case
-				vBB_.insert(itbl, pBlock_t(bbl, bblock::MASK_1(offsetl, offseth)));
+				vBB_.insert(itbl, SparseBlock(bbl, bblock::MASK_1(offsetl, offseth)));
 			}
 			else {
 
 				//places at the end - no sorting required
-				vBB_.emplace_back(pBlock_t(bbl, bblock::MASK_1(offsetl, offseth)));
+				vBB_.emplace_back(SparseBlock(bbl, bblock::MASK_1(offsetl, offseth)));
 			}			
 		}
 
@@ -222,7 +222,7 @@ BitSetSp& BitSetSp::set_bit(int firstBit, int lastBit)
 		vBB_[posTHIS].bb_ |= bblock::MASK_1_HIGH(offsetl);		
 	}
 	else {
-		vBB_.emplace_back(pBlock_t(bbl, bblock::MASK_1_HIGH(offsetl)));
+		vBB_.emplace_back(SparseBlock(bbl, bblock::MASK_1_HIGH(offsetl)));
 		if (vBB_[posTHIS].idx_ > bbl) {
 			flag_sort = true;
 		}
@@ -237,14 +237,14 @@ BitSetSp& BitSetSp::set_bit(int firstBit, int lastBit)
 		if (vBB_[posTHIS].idx_ < block) {
 
 			//add block
-			vBB_.emplace_back(pBlock_t(block, ONE));			
+			vBB_.emplace_back(SparseBlock(block, ONE));			
 			
 			posTHIS++;
 		}
 		else if (vBB_[posTHIS].idx_ > block) {
 			
 			//add block
-			vBB_.emplace_back(pBlock_t(block, ONE));
+			vBB_.emplace_back(SparseBlock(block, ONE));
 			flag_sort = true;
 	
 			block++;
@@ -269,7 +269,7 @@ BitSetSp& BitSetSp::set_bit(int firstBit, int lastBit)
 			vBB_[posTHIS].bb_ |= bblock::MASK_1_LOW(offseth);
 		}
 		else {
-			vBB_.emplace_back(pBlock_t(block, bblock::MASK_1_LOW(offseth)));
+			vBB_.emplace_back(SparseBlock(block, bblock::MASK_1_LOW(offseth)));
 			if (vBB_[posTHIS].idx_ > block) {
 				flag_sort = true;
 			}
@@ -282,11 +282,11 @@ BitSetSp& BitSetSp::set_bit(int firstBit, int lastBit)
 
 		//[block, bbh[
 		for (int i = block; i < bbh; i++) {
-			vBB_.emplace_back(pBlock_t(i, ONE));
+			vBB_.emplace_back(SparseBlock(i, ONE));
 		}
 		
 		//last block - bbh
-		vBB_.emplace_back(pBlock_t(bbh, bblock::MASK_1_LOW(offseth)));
+		vBB_.emplace_back(SparseBlock(bbh, bblock::MASK_1_LOW(offseth)));
 	}
 	
 	//keep the collection sorted if required
@@ -310,17 +310,17 @@ BitSetSp& BitSetSp::reset_bit(int firstBit, int lastBit){
 	
 	//special case: same bitblock
 	if(bbh == bbl){	
-		vBB_.emplace_back( pBlock_t( bbl, bblock::MASK_1(firstBit - WMUL(bbl), lastBit - WMUL(bbh))));
+		vBB_.emplace_back( SparseBlock( bbl, bblock::MASK_1(firstBit - WMUL(bbl), lastBit - WMUL(bbh))));
 	}
 	else {
 
 		//first and last blocks
-		vBB_.emplace_back(pBlock_t(bbl, bblock::MASK_1_HIGH(firstBit - WMUL(bbl))));
-		vBB_.emplace_back(pBlock_t(bbh, bblock::MASK_1_LOW(lastBit - WMUL(bbh))));
+		vBB_.emplace_back(SparseBlock(bbl, bblock::MASK_1_HIGH(firstBit - WMUL(bbl))));
+		vBB_.emplace_back(SparseBlock(bbh, bblock::MASK_1_LOW(lastBit - WMUL(bbh))));
 
 		//in-between blocks
 		for (auto block = bbl + 1; block < bbh; ++block) {
-			vBB_.emplace_back(pBlock_t(block, ONE));
+			vBB_.emplace_back(SparseBlock(block, ONE));
 		}
 	}
 
@@ -511,8 +511,8 @@ BitSetSp&  BitSetSp::set_block (int firstBlock, int lastBlock, const BitSetSp& r
 int BitSetSp::clear_bit (int firstBit, int lastBit){
 	
 	int bbl = EMPTY_ELEM, bbh = EMPTY_ELEM; 
-	pair<bool, BitSetSp::vPB_it> pl;
-	pair<bool, BitSetSp::vPB_it> ph;
+	pair<bool, BlockVecIt> pl;
+	pair<bool, BlockVecIt> ph;
 
 ////////////////////////
 //special cases
@@ -796,7 +796,7 @@ BitSetSp& BitSetSp::operator ^= (const BitSetSp& rhs) {
 BITBOARD BitSetSp::find_block (index_t blockID) const{
 
 	////////////////////////////////////////////////////////////////////////////////////////////
-	auto it = lower_bound(vBB_.cbegin(), vBB_.cend(), pBlock_t(blockID), pBlock_less());
+	auto it = lower_bound(vBB_.cbegin(), vBB_.cend(), SparseBlock(blockID), pBlock_less());
 	////////////////////////////////////////////////////////////////////////////////////////////
 
 	if(it != vBB_.end() && it->idx_ == blockID){
@@ -814,7 +814,7 @@ BitSetSp::find_block_pos (index_t blockID) const{
 	std::pair<bool, index_t> res(false, EMPTY_ELEM);
 
 	////////////////////////////////////////////////////////////////////////////////////////////
-	auto it = lower_bound(vBB_.cbegin(), vBB_.cend(), pBlock_t(blockID), pBlock_less());
+	auto it = lower_bound(vBB_.cbegin(), vBB_.cend(), SparseBlock(blockID), pBlock_less());
 	////////////////////////////////////////////////////////////////////////////////////////////
 
 	if(it != vBB_.end()){
@@ -970,7 +970,7 @@ BitSetSp::operator vint() const
 //	return BBObject::noBit;
 //}
 
-ostream& BitSetSp::pBlock_t::print(ostream& o, bool eofl) const
+ostream& BitSetSp::SparseBlock::print(ostream& o, bool eofl) const
 {
 
 	o << "[";

@@ -22,7 +22,6 @@
 //uncomment #undef NDEBUG in bbconfig.h to enable run-time assertions
 #include <cassert>
 
-
 //aliases
 using vint = std::vector<int>; 
 
@@ -45,32 +44,32 @@ namespace bitgraph {
 		
 		using BBObject::npos;
 		
-		struct pBlock_t {
+		struct SparseBlock {
 			
 			index_t idx_;
 			BITBOARD bb_;
 
-			pBlock_t(int idx = npos, BITBOARD bb = 0) : idx_(idx), bb_(bb) {}
+			SparseBlock(int idx = npos, BITBOARD bb = 0) : idx_(idx), bb_(bb) {}
 
-			bool operator ==	(const pBlock_t& e)	const { return (idx_ == e.idx_ && bb_ == e.bb_); }
-			bool operator !=	(const pBlock_t& e)	const { return (idx_ != e.idx_ || bb_ != e.bb_); }
+			bool operator ==	(const SparseBlock& e)	const { return (idx_ == e.idx_ && bb_ == e.bb_); }
+			bool operator !=	(const SparseBlock& e)	const { return (idx_ != e.idx_ || bb_ != e.bb_); }
 			bool operator !		()					const { return !bb_; }
 			bool is_empty()					const { return !bb_; }
 			void clear() { bb_ = 0; }
 
 			std::ostream& print(std::ostream& o = std::cout, bool eofl = true)	const;
-			friend  std::ostream& operator<<	(std::ostream& o, const pBlock_t& pB) { pB.print(o); return o; }
+			friend  std::ostream& operator<<	(std::ostream& o, const SparseBlock& pB) { pB.print(o); return o; }
 		};
 
 		//aliases
-		using vPB = std::vector<pBlock_t>;
-		using vPB_it = typename std::vector<pBlock_t>::iterator;
-		using vPB_cit = typename std::vector<pBlock_t>::const_iterator;
+		using BlockVec  = std::vector<SparseBlock>;
+		using BlockVecIt  = typename std::vector<SparseBlock>::iterator;
+		using BlockVecConstIt = typename std::vector<SparseBlock>::const_iterator;
 				 
 
-		//functor for sorting - check if it is necessary, or throwing lambdas is enough
+		//functor for sorting -
 		struct pBlock_less {
-			bool operator()(const pBlock_t& lhs, const pBlock_t& rhs) const {
+			bool operator()(const SparseBlock& lhs, const SparseBlock& rhs) const {
 				return lhs.idx_ < rhs.idx_;
 			}
 		};
@@ -109,8 +108,7 @@ namespace bitgraph {
 		*
 		* TODO... (25/02/2025)
 		**/
-		friend BitSetSp& AND(int firstBit, int lastBit, const BitSetSp& lhs,
-			const BitSetSp& rhs, BitSetSp& res) = delete;
+		friend BitSetSp& AND(int firstBit, int lastBit, const BitSetSp& lhs, const BitSetSp& rhs, BitSetSp& res) = delete;
 
 		/**
 		* @brief AND between lhs and rhs bitsets in the CLOSED block-range [firstBlock, lastBlock]
@@ -249,11 +247,11 @@ namespace bitgraph {
 		BITBOARD  block(index_t blockID)	const { return vBB_[blockID].bb_; }
 		BITBOARD& block(index_t blockID) { return vBB_[blockID].bb_; }
 
-		pBlock_t  pBlock(index_t blockID)			const { return vBB_[blockID]; }
-		pBlock_t& pBlock(index_t blockID) { return vBB_[blockID]; }
+		SparseBlock  pBlock(index_t blockID)			const { return vBB_[blockID]; }
+		SparseBlock& pBlock(index_t blockID) { return vBB_[blockID]; }
 
-		const vPB& bitset()						const { return vBB_; }
-		vPB& bitset() { return vBB_; }
+		const BlockVec & bitset()						const { return vBB_; }
+		BlockVec & bitset() { return vBB_; }
 
 		/**
 		* @brief Finds the bitblock corresponding to @blockIDx
@@ -281,10 +279,10 @@ namespace bitgraph {
 			* @details two implementations, read only and read-write
 			**/
 		template<bool ReturnInsertPos = false>
-		vPB_cit find_block(index_t blockID, index_t& insert_pos)	const;
+		BlockVecConstIt find_block(index_t blockID, index_t& insert_pos)	const;
 
 		template<bool ReturnInsertPos = false>
-		vPB_it  find_block(index_t blockID, index_t& pos);
+		BlockVecIt   find_block(index_t blockID, index_t& pos);
 
 		/**
 		* @brief extended version of find_block. The template parameter UseLowerBound determines
@@ -303,7 +301,7 @@ namespace bitgraph {
 		*		  b) Policy = false - all the blocks have index lower than OR EQUAL to blockID
 		**/
 		template<bool UseLowerBound = true>
-		std::pair<bool, vPB_it>
+		std::pair<bool, BlockVecIt >
 			find_block_ext(index_t blockID);
 
 		/**
@@ -311,7 +309,7 @@ namespace bitgraph {
 		*		 (see non-const function)
 		**/
 		template<bool UseLowerBound = true>
-		std::pair<bool, vPB_cit>
+		std::pair<bool, BlockVecConstIt>
 			find_block_ext(index_t blockID)			const;
 
 		/**
@@ -329,10 +327,10 @@ namespace bitgraph {
 		/**
 		* @brief commodity iterators / const iterators for the bitset
 		**/
-		vPB_it  begin() { return vBB_.begin(); }
-		vPB_it  end() { return vBB_.end(); }
-		vPB_cit cbegin()					const { return vBB_.cbegin(); }
-		vPB_cit cend()						const { return vBB_.cend(); }
+		BlockVecIt   begin() { return vBB_.begin(); }
+		BlockVecIt   end() { return vBB_.end(); }
+		BlockVecConstIt cbegin()					const { return vBB_.cbegin(); }
+		BlockVecConstIt cend()						const { return vBB_.cend(); }
 
 		//////////////////////////////
 		// Bitscanning (no cache) 
@@ -584,7 +582,7 @@ namespace bitgraph {
 		 *
 		 * TODO -  improve or remove (19/02/2025)
 		 **/
-		inline	vPB_it  erase_bit(int bit, vPB_it from_it);
+		inline	BlockVecIt   erase_bit(int bit, BlockVecIt  from_it);
 
 		/**
 		* @brief sets all bits to 0
@@ -757,7 +755,7 @@ namespace bitgraph {
 		//data members
 
 	protected:
-		vPB vBB_;					//a vector of sorted pairs of a non-empty bitblock and its index in a non-sparse bitstring
+		BlockVec  vBB_;					//a vector of sorted pairs of a non-empty bitblock and its index in a non-sparse bitstring
 		int nBB_;					//maximum number of bitblocks
 
 	}; //end BitSetSp class
@@ -778,7 +776,7 @@ namespace bitgraph {
 		int bb = WDIV(bit);
 
 		/////////////////////////////////////////////////////////////////////////////////////
-		auto it = lower_bound(vBB_.cbegin(), vBB_.cend(), pBlock_t(bb), pBlock_less());
+		auto it = lower_bound(vBB_.cbegin(), vBB_.cend(), SparseBlock(bb), pBlock_less());
 		/////////////////////////////////////////////////////////////////////////////////////
 
 		return (it != vBB_.cend() &&
@@ -882,7 +880,7 @@ namespace bitgraph {
 		auto bb = WDIV(bit);
 
 		//find closest block to blockID greater or equal
-		auto it = lower_bound(vBB_.begin(), vBB_.end(), pBlock_t(bb), pBlock_less());
+		auto it = lower_bound(vBB_.begin(), vBB_.end(), SparseBlock(bb), pBlock_less());
 
 		if (it != vBB_.end() && it->idx_ == bb) {
 
@@ -894,13 +892,13 @@ namespace bitgraph {
 	}
 
 
-	BitSetSp::vPB_it
-		BitSetSp::erase_bit(int bit, BitSetSp::vPB_it from_it) {
+	BitSetSp::BlockVecIt 
+		BitSetSp::erase_bit(int bit, BitSetSp::BlockVecIt  from_it) {
 
 		int bb = WDIV(bit);
 
 		//iterator to the block of the bit if it exists or the closest non-empty block with greater index
-		auto it = lower_bound(from_it, vBB_.end(), pBlock_t(bb), pBlock_less());
+		auto it = lower_bound(from_it, vBB_.end(), SparseBlock(bb), pBlock_less());
 
 		if (it != vBB_.end() && it->idx_ == bb) {
 
@@ -931,11 +929,11 @@ namespace bitgraph {
 		else {
 			if (pL.second == vBB_.end()) {
 				//there are not blocks with higher index
-				vBB_.emplace_back(pBlock_t(bb, bblock::MASK_BIT(bit - WMUL(bb) /* WMOD(bit) */)));
+				vBB_.emplace_back(SparseBlock(bb, bblock::MASK_BIT(bit - WMUL(bb) /* WMOD(bit) */)));
 			}
 			else {
 				//there are blocks with higher index, insert to avoid sorting
-				vBB_.insert(pL.second, pBlock_t(bb, bblock::MASK_BIT(bit - WMUL(bb) /* WMOD(bit) */)));
+				vBB_.insert(pL.second, SparseBlock(bb, bblock::MASK_BIT(bit - WMUL(bb) /* WMOD(bit) */)));
 			}
 		}
 
@@ -951,7 +949,7 @@ namespace bitgraph {
 		vBB_.clear();
 
 		auto bb = WDIV(bit);
-		vBB_.push_back(pBlock_t(bb, bblock::MASK_BIT(bit - WMUL(bb) /*WMOD(bit)*/)));
+		vBB_.push_back(SparseBlock(bb, bblock::MASK_BIT(bit - WMUL(bb) /*WMOD(bit)*/)));
 
 		return *this;
 	}
@@ -1211,7 +1209,7 @@ namespace bitgraph {
 	int BitSetSp::popcn64(int firstBit) const {
 
 		auto bbL = WDIV(firstBit);
-		auto it = lower_bound(vBB_.begin(), vBB_.end(), pBlock_t(bbL), pBlock_less());
+		auto it = lower_bound(vBB_.begin(), vBB_.end(), SparseBlock(bbL), pBlock_less());
 		BITBOARD pc = 0;
 
 		if (it != vBB_.end()) {
@@ -1240,7 +1238,7 @@ namespace bitgraph {
 		/////////////////////////////////
 
 		auto bbL = WDIV(firstBit);
-		auto it = lower_bound(vBB_.begin(), vBB_.end(), pBlock_t(bbL), pBlock_less());
+		auto it = lower_bound(vBB_.begin(), vBB_.end(), SparseBlock(bbL), pBlock_less());
 		BITBOARD pc = 0;
 
 		if (it != vBB_.end()) {
@@ -1462,7 +1460,7 @@ namespace bitgraph {
 		auto offseth = lastBit - WMUL(bbh);
 
 		//determines the block in bbl or the closest one with greater index 
-		auto it = lower_bound(vBB_.begin(), vBB_.end(), pBlock_t(bbl), pBlock_less());
+		auto it = lower_bound(vBB_.begin(), vBB_.end(), SparseBlock(bbl), pBlock_less());
 
 		//special case - no bits to erase in the closed range
 		if (it == vBB_.end()) {
@@ -1541,11 +1539,11 @@ namespace bitgraph {
 		if (pR.second != rhs.cend()) {
 
 			//copy up to and excluding bbh
-			std::copy(rhs.cbegin(), pR.second, std::insert_iterator<vPB>(vBB_, vBB_.begin()));
+			std::copy(rhs.cbegin(), pR.second, std::insert_iterator<BlockVec>(vBB_, vBB_.begin()));
 
 			//deal with last block bbh
 			if (pR.first) {
-				vBB_.emplace_back(pBlock_t(bbh, pR.second->bb_ & bblock::MASK_1_LOW(lastBit - WMUL(bbh))));
+				vBB_.emplace_back(SparseBlock(bbh, pR.second->bb_ & bblock::MASK_1_LOW(lastBit - WMUL(bbh))));
 
 			}
 		}
@@ -1573,7 +1571,7 @@ namespace bitgraph {
 		vBB_.clear();
 
 		//finds bbl or closest block with greater indx
-		auto it = lower_bound(rhs.cbegin(), rhs.cend(), pBlock_t(bbl), pBlock_less());
+		auto it = lower_bound(rhs.cbegin(), rhs.cend(), SparseBlock(bbl), pBlock_less());
 
 		//special case - no bits to set in the closed range
 		if (it == rhs.cend()) {
@@ -1588,14 +1586,14 @@ namespace bitgraph {
 			//special case, the range is a singleton, exit condition
 			if (bbh == bbl)
 			{
-				vBB_.emplace_back(pBlock_t(bbl, it->bb_ & bblock::MASK_1(offsetl, offseth)));
+				vBB_.emplace_back(SparseBlock(bbl, it->bb_ & bblock::MASK_1(offsetl, offseth)));
 
 				return *this;
 			}
 			else {
 
 				//add lower block
-				vBB_.emplace_back(pBlock_t(bbl, it->bb_ & bblock::MASK_1_HIGH(offsetl)));
+				vBB_.emplace_back(SparseBlock(bbl, it->bb_ & bblock::MASK_1_HIGH(offsetl)));
 
 				//next block
 				++it;
@@ -1613,7 +1611,7 @@ namespace bitgraph {
 		if (it != rhs.cend() && it->idx_ == bbh) {
 
 			//add and trim last block
-			vBB_.push_back(pBlock_t(bbh, it->bb_ & bblock::MASK_1_LOW(offseth)));
+			vBB_.push_back(SparseBlock(bbh, it->bb_ & bblock::MASK_1_LOW(offseth)));
 
 		}
 
@@ -1622,12 +1620,12 @@ namespace bitgraph {
 
 	template<bool ReturnInsertPos>
 	inline
-		BitSetSp::vPB_cit
+		BitSetSp::BlockVecConstIt
 		BitSetSp::find_block(index_t blockID, index_t& pos) const
 	{
 
 		////////////////////////////////////////////////////////////////////////////////////////////
-		auto it = lower_bound(vBB_.cbegin(), vBB_.cend(), pBlock_t(blockID), pBlock_less());
+		auto it = lower_bound(vBB_.cbegin(), vBB_.cend(), SparseBlock(blockID), pBlock_less());
 		////////////////////////////////////////////////////////////////////////////////////////////
 
 		if (it != vBB_.end() && (it->idx_ == blockID || ReturnInsertPos)) {
@@ -1642,12 +1640,12 @@ namespace bitgraph {
 
 	template<bool ReturnInsertPos>
 	inline
-		BitSetSp::vPB_it
+		BitSetSp::BlockVecIt 
 		BitSetSp::find_block(index_t blockID, index_t& pos)
 	{
 
 		////////////////////////////////////////////////////////////////////////////////////////////
-		auto it = lower_bound(vBB_.begin(), vBB_.end(), pBlock_t(blockID), pBlock_less());
+		auto it = lower_bound(vBB_.begin(), vBB_.end(), SparseBlock(blockID), pBlock_less());
 		////////////////////////////////////////////////////////////////////////////////////////////
 
 		if (it != vBB_.end() && (it->idx_ == blockID || ReturnInsertPos)) {
@@ -1661,21 +1659,21 @@ namespace bitgraph {
 	}
 
 	template<bool UseLowerBound>
-	std::pair<bool, BitSetSp::vPB_it>
+	std::pair<bool, BitSetSp::BlockVecIt >
 		BitSetSp::find_block_ext(index_t blockID)
 	{
-		std::pair<bool, BitSetSp::vPB_it> res;
+		std::pair<bool, BlockVecIt > res;
 
 		if (UseLowerBound) {
 			////////////////////////////////////////////////////////////////////////////////////////////
-			res.second = lower_bound(vBB_.begin(), vBB_.end(), pBlock_t(blockID), pBlock_less());
+			res.second = lower_bound(vBB_.begin(), vBB_.end(), SparseBlock(blockID), pBlock_less());
 			////////////////////////////////////////////////////////////////////////////////////////////
 
 			res.first = (res.second != vBB_.end()) && (res.second->idx_ == blockID);
 		}
 		else {
 			////////////////////////////////////////////////////////////////////////////////////////////
-			res.second = upper_bound(vBB_.begin(), vBB_.end(), pBlock_t(blockID), pBlock_less());
+			res.second = upper_bound(vBB_.begin(), vBB_.end(), SparseBlock(blockID), pBlock_less());
 			////////////////////////////////////////////////////////////////////////////////////////////
 
 			res.first = false;			//the same block cannot be found with upper_bound, only the closest with greater index
@@ -1685,21 +1683,21 @@ namespace bitgraph {
 	}
 
 	template<bool UseLowerBound>
-	std::pair<bool, BitSetSp::vPB_cit>
+	std::pair<bool, BitSetSp::BlockVecConstIt>
 		BitSetSp::find_block_ext(index_t blockID) const
 	{
-		std::pair<bool, BitSetSp::vPB_cit>res;
+		std::pair<bool, BlockVecConstIt>res;
 
 		if (UseLowerBound) {
 			////////////////////////////////////////////////////////////////////////////////////////////
-			res.second = lower_bound(vBB_.cbegin(), vBB_.cend(), pBlock_t(blockID), pBlock_less());
+			res.second = lower_bound(vBB_.cbegin(), vBB_.cend(), SparseBlock(blockID), pBlock_less());
 			////////////////////////////////////////////////////////////////////////////////////////////
 
 			res.first = (res.second != vBB_.end()) && (res.second->idx_ == blockID);
 		}
 		else {
 			////////////////////////////////////////////////////////////////////////////////////////////
-			res.second = upper_bound(vBB_.cbegin(), vBB_.cend(), pBlock_t(blockID), pBlock_less());
+			res.second = upper_bound(vBB_.cbegin(), vBB_.cend(), SparseBlock(blockID), pBlock_less());
 			////////////////////////////////////////////////////////////////////////////////////////////
 
 			res.first = false;			//the same block cannot be found with upper_bound, only the closest with greater index
@@ -1754,7 +1752,7 @@ namespace bitgraph {
 			}
 			else {
 				////////////////////////////////////////////////////////////////////////
-				res.vBB_.push_back(BitSetSp::pBlock_t(itL->idx_, itL->bb_ & itR->bb_));
+				res.vBB_.push_back(BitSetSp::SparseBlock(itL->idx_, itL->bb_ & itR->bb_));
 				/////////////////////////////////////////////////////////////////////////
 				itL++;
 				itR++;
@@ -1775,7 +1773,7 @@ namespace bitgraph {
 
 		//	//blocks remain to be examined in both bitsets
 		//	if (blockL.idx_ == itR->idx_) {
-		//		res.vBB_.push_back(BitSetSp::pBlock_t(blockL.idx_, blockL.bb_ & itR->bb_));
+		//		res.vBB_.push_back(BitSetSp::SparseBlock(blockL.idx_, blockL.bb_ & itR->bb_));
 		//	}
 		//	
 		//}
@@ -1800,19 +1798,19 @@ namespace bitgraph {
 		while (itL != lhs.vBB_.end() && itR != rhs.vBB_.end()) {
 
 			if (itL->idx_ < itR->idx_) {
-				res.vBB_.push_back(BitSetSp::pBlock_t(itL->idx_, itL->bb_));
+				res.vBB_.push_back(BitSetSp::SparseBlock(itL->idx_, itL->bb_));
 				res.print(std::cout, true);
 				itL++;
 			}
 			else if (itL->idx_ > itR->idx_) {
-				res.vBB_.push_back(BitSetSp::pBlock_t(itR->idx_, itR->bb_));
+				res.vBB_.push_back(BitSetSp::SparseBlock(itR->idx_, itR->bb_));
 				res.print(std::cout, true);
 				itR++;
 			}
 			else {
 
 				////////////////////////////////////////////////////////////////////////
-				res.vBB_.push_back(BitSetSp::pBlock_t(itL->idx_, itL->bb_ | itR->bb_));
+				res.vBB_.push_back(BitSetSp::SparseBlock(itL->idx_, itL->bb_ | itR->bb_));
 				/////////////////////////////////////////////////////////////////////////
 
 				itL++;
@@ -1870,7 +1868,7 @@ namespace bitgraph {
 			else {
 				//blocks with same index
 				///////////////////////////////////
-				res.vBB_.push_back(BitSetSp::pBlock_t(itL->idx_, itL->bb_ & itR->bb_));
+				res.vBB_.push_back(BitSetSp::SparseBlock(itL->idx_, itL->bb_ & itR->bb_));
 				///////////////////////////////////
 				++itL;
 				++itR;
@@ -1911,10 +1909,10 @@ namespace bitgraph {
 
 			//blocks remain to be examined in both bitsets
 			if (blockL.idx_ == itR->idx_) {
-				res.vBB_.push_back(BitSetSp::pBlock_t(blockL.idx_, blockL.bb_ & ~itR->bb_));
+				res.vBB_.push_back(BitSetSp::SparseBlock(blockL.idx_, blockL.bb_ & ~itR->bb_));
 			}
 			else {
-				res.vBB_.push_back(BitSetSp::pBlock_t(blockL.idx_, blockL.bb_));
+				res.vBB_.push_back(BitSetSp::SparseBlock(blockL.idx_, blockL.bb_));
 			}
 		}
 
