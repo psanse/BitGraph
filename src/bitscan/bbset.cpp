@@ -439,7 +439,7 @@ namespace bitgraph {
 			return BBObject::noBit;		//disjoint
 		}
 
-		int find_first_common(BitSet::index_t firstBlock, BitSet::index_t lastBlock, const BitSet& lhs, const BitSet& rhs) {
+		int find_first_common_block(BitSet::index_t firstBlock, BitSet::index_t lastBlock, const BitSet& lhs, const BitSet& rhs) {
 
 			///////////////////////////////////////////////////////////////////////////////
 			assert((firstBlock >= 0) && (firstBlock <= lastBlock) && (lastBlock < lhs.num_blocks()));

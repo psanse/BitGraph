@@ -178,7 +178,7 @@ namespace bitgraph {
 			* @param lhs, rhs: input bitsets
 			* @returns the first BIT of the intersection or BBObject::noBit if the sets are disjoint
 			**/
-			friend int find_first_common(index_t firstBlock, index_t lastBlock, const BitSet& lhs, const BitSet& rhs);
+			friend int find_first_common_block(index_t firstBlock, index_t lastBlock, const BitSet& lhs, const BitSet& rhs);
 
 
 			////////////
@@ -233,6 +233,7 @@ namespace bitgraph {
 
 			////////////
 			//Reset / init (memory allocation)
+
 			void init(std::size_t nPop) noexcept;
 			void init(std::size_t nPop, const vint& lv) noexcept;
 
@@ -280,7 +281,7 @@ namespace bitgraph {
 			* @details: recommended for consumer code
 			**/
 			std::size_t size() const noexcept { return vBB_.size(); }
-							
+			
 			vbset& bitset()  noexcept { return vBB_; }
 			const vbset& bitset() const  noexcept { return vBB_; }
 
@@ -661,8 +662,8 @@ namespace bitgraph {
 			* @created 14/8/16
 			* @last_update 04/02/2025
 			**/
-			int	find_common_singleton(index_t first_block, index_t last_block,
-															const BitSet& rhs, int& bit)		const;
+			int	find_common_singleton_block(index_t firstBlock, index_t lastBlock,
+															const BitSet& rhs, int& bit) const;
 
 			/**
 			* @brief Determines the single 1-bit in this bitstring of to the set difference
@@ -1521,7 +1522,7 @@ namespace bitgraph{
 			return pc;
 		}
 
-		inline	int	BitSet::find_common_singleton(index_t firstBlock, index_t lastBlock, const BitSet& rhs, int& bit) const {
+		inline	int	BitSet::find_common_singleton_block(index_t firstBlock, index_t lastBlock, const BitSet& rhs, int& bit) const {
 
 
 			index_t last_block = (lastBlock == BitSet::npos) ? static_cast<index_t>(nBB_ - 1) : lastBlock;

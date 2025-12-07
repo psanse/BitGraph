@@ -645,10 +645,10 @@ namespace bitgraph {
 			////////////////////////
 			//Operators (member functions)
 
-				/**
-				* @brief Bitwise AND operator with rhs
-				* @details apply for set intersection
-				**/
+			/**
+			* @brief Bitwise AND operator with rhs
+			* @details apply for set intersection
+			**/
 			BitSetSp& operator &=				(const BitSetSp& rhs);
 
 			/**
