@@ -60,7 +60,7 @@ namespace bitgraph {
 					//determines if w can be added to the independent set
 					for (const auto& v : iset) {
 						////////////////////////////////////////////////
-						if (g.is_edge(v, w)) { return iset.size(); }
+						if (g.is_edge(v, w)) { return static_cast<int>(iset.size()); }
 						///////////////////////////////////////////////
 					}
 
@@ -69,7 +69,7 @@ namespace bitgraph {
 
 				}
 
-				return iset.size();
+				return static_cast<int>(iset.size());
 			}
 
 			/**
@@ -211,7 +211,7 @@ namespace bitgraph {
 					}
 				}
 
-				return clq.size();
+				return static_cast<int>(clq.size());
 			}
 
 			/**
@@ -252,7 +252,7 @@ namespace bitgraph {
 
 						pc = 0;
 						const typename Graph_t::_bbt& bbn =  g.neighbors(v);
-						for (auto nBB = 0u; nBB < g.num_blocks(); ++nBB) {
+						for (int nBB = 0; nBB < g.num_blocks(); ++nBB) {
 							pc += bitgraph::bblock::popc64(bbsgC.block(nBB) & bbn.block(nBB));
 						}
 
@@ -313,7 +313,7 @@ namespace bitgraph {
 
 				//main loop - seed vertex for a clique 
 				vint clq_curr;
-				for (int v = 0; v < g.size(); ++v) {
+				for (int v = 0; v < g.num_vertices(); ++v) {
 
 					clq_curr.clear();
 
@@ -324,7 +324,7 @@ namespace bitgraph {
 					//determine clique with the first consecutive vertices in the neighboorhood of v
 
 					//initialize bb with the neighborhood of v in bbsg in [v, end)
-					bitgraph::_impl::AND<true>(v, g.size() - 1, g.neighbors(v), bbsg, bb);
+					bitgraph::_impl::AND<true>(v, g.num_vertices() - 1, g.neighbors(v), bbsg, bb);
 
 					//main loop
 					int w = bbo::noBit;

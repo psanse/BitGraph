@@ -43,7 +43,7 @@ namespace bitgraph {
 
 		public:
 
-			using index_t = std::vector<BITBOARD>::size_type;
+			using index_t = std::vector<BITBOARD>::size_type;			//std::size_t
 			static constexpr index_t npos = index_t(-1);
 
 			/////////////////////////////
@@ -1277,7 +1277,7 @@ namespace bitgraph{
 			index_t last_block = ((lastBlock == BitSet::npos) ? static_cast<index_t>(nBB_ - 1) : lastBlock);
 
 			////////////////////////////////////////////////////////////////////////////////////////////
-			assert((firstBlock >= 0) && (last_block < bb_add.num_blocks()) && (firstBlock <= last_block));
+			assert( (last_block < bb_add.num_blocks()) && (firstBlock <= last_block));
 			///////////////////////////////////////////////////////////////////////////////////////////
 
 
@@ -1533,7 +1533,7 @@ namespace bitgraph{
 			index_t last_block = (lastBlock == BitSet::npos) ? static_cast<index_t>(nBB_ - 1) : lastBlock;
 
 			///////////////////////////////////////////////////////////////////////////////
-			assert((firstBlock >= 0) && (last_block < num_blocks()) && (firstBlock <= last_block));
+			assert((last_block < num_blocks()) && (firstBlock <= last_block));
 			///////////////////////////////////////////////////////////////////////////////
 
 
@@ -1651,9 +1651,9 @@ namespace bitgraph{
 
 			//general comment: low - WMUL(blockL) = WMOD(blockL) but supposed to be less expensive (CHECK 01/02/25)
 
-			/////////////////////////////////////////////////////////////////
-			assert(firstBit >= 0 && (firstBit <= lastBit || lastBit == -1));
-			///////////////////////////////////////////////////////////////////
+			/////////////////////////////////////////////////////////////
+			assert(firstBit <= lastBit || lastBit == BBObject::noBit);
+			/////////////////////////////////////////////////////////////
 
 			index_t blockL = WDIV(firstBit);
 			index_t blockH = (lastBit == BBObject::noBit) ? static_cast<index_t>(nBB_ - 1) : WDIV(lastBit);
@@ -1706,11 +1706,9 @@ namespace bitgraph{
 			index_t last_block = (lastBlock == BitSet::npos) ? static_cast<index_t>(nBB_ - 1) : lastBlock;
 
 			///////////////////////////////////////////////////////////////////////////////
-			assert((firstBlock >= 0) && (last_block < num_blocks()) && (firstBlock <= last_block));
+			assert(last_block < num_blocks() && firstBlock <= last_block);
 			///////////////////////////////////////////////////////////////////////////////
-
-		
-
+			
 			for (auto i = firstBlock; i <= last_block; ++i) {
 				vBB_[i] &= ~(bb_lhs.vBB_[i] | bb_rhs.vBB_[i]);
 			}
@@ -1723,7 +1721,7 @@ namespace bitgraph{
 			index_t last_block = ((lastBlock == BitSet::npos) ? static_cast<index_t>(nBB_ - 1) : lastBlock);
 
 			///////////////////////////////////////////////////////////////////////////////
-			assert((firstBlock >= 0) && (last_block < bb_del.num_blocks()) && (firstBlock <= last_block));
+			assert(last_block < bb_del.num_blocks() && firstBlock <= last_block);
 			///////////////////////////////////////////////////////////////////////////////
 
 			for (auto i = firstBlock; i <= last_block; ++i) {
@@ -1740,7 +1738,7 @@ namespace bitgraph{
 			index_t last_block = ((lastBlock == BitSet::npos) ? static_cast<index_t>(nBB_ - 1) : lastBlock);
 
 			///////////////////////////////////////////////////////////////////////////////////
-			assert((firstBlock >= 0) && (firstBlock <= last_block) && (last_block < rhs.num_blocks()));
+			assert( firstBlock <= last_block && last_block < rhs.num_blocks());
 			/////////////////////////////////////////////////////////////////////////////////
 
 
@@ -1765,10 +1763,10 @@ namespace bitgraph{
 		inline
 		BitSet& BitSet::OR_EQUAL_block(index_t firstBlock, index_t lastBlock, const BitSet& rhs) {
 
-			auto last_block = ((lastBlock == BitSet::npos) ? static_cast<index_t>(nBB_ - 1) : lastBlock);
+			auto last_block = (lastBlock == BitSet::npos) ? static_cast<index_t>(nBB_ - 1) : lastBlock;
 
 			///////////////////////////////////////////////////////////////////////////////////
-			assert((firstBlock >= 0) && (firstBlock <= last_block) && (last_block < rhs.num_blocks()));
+			assert(firstBlock <= last_block && last_block < rhs.num_blocks());
 			/////////////////////////////////////////////////////////////////////////////////
 
 			for (index_t i = firstBlock; i <= last_block; ++i) {

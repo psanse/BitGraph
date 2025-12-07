@@ -504,9 +504,9 @@ namespace bitgraph {
 			/////////////
 			//useful interface for graph operations (no weights)
 
-			int max_graph_degree() { return ptype::g_.max_graph_degree(); }
-			int degree(int v)										const { return ptype::g_.degree(v); }
-			int degree(int v, const typename ptype::_bbt& bbn)	const { return ptype::g_.degree(v, bbn); }
+			int max_graph_degree() { return this->g_.max_graph_degree(); }
+			int degree(int v)										const { return this->g_.degree(v); }
+			int degree(int v, const typename ptype::_bbt& bbn)	const { return this->g_.degree(v, bbn); }
 
 			/////////////
 			//other operations
@@ -695,7 +695,7 @@ namespace bitgraph {
 		//set to empty wv and non-edges UPPER-T
 		for (auto v = 0; v < NV - 1; v++) {
 			for (auto w = v + 1; w < NV; w++) {
-				if (ptype::g_.is_edge(v, w)) {
+				if (this->g_.is_edge(v, w)) {
 					ptype::we_[v][w] = val;
 					ptype::we_[w][v] = val;
 				}
@@ -735,7 +735,7 @@ namespace bitgraph {
 		//sets edge-weights
 		for (auto v = 0; v < NV - 1; ++v) {
 			for (auto w = v + 1; w < NV; ++w) {
-				if (ptype::g_.is_edge(v, w)) {
+				if (this->g_.is_edge(v, w)) {
 					ptype::we_[v][w] = lw[v][w];
 					ptype::we_[w][v] = lw[w][v];
 				}
@@ -761,7 +761,7 @@ namespace bitgraph {
 	inline
 		void Graph_EW<ugraph, W>::set_modulus_edge_weight(int MODULUS) {
 
-		auto NV = ptype::g_.num_vertices();
+		auto NV = this->g_.num_vertices();
 
 		//vertex-weights NO_WEIGHT
 		//set_vertex_weight(ptype::NO_WEIGHT);
@@ -769,7 +769,7 @@ namespace bitgraph {
 		//sets weights of undirected edges
 		for (auto v = 0; v < NV - 1; ++v) {
 			for (auto w = v + 1; w < NV; ++w) {
-				if (ptype::g_.is_edge(v, w)) {
+				if (this->g_.is_edge(v, w)) {
 
 					///////////////////////////////////////
 					set_weight(v, w, (1 + ((v + w + 2 /* 0-based index*/) % MODULUS)));

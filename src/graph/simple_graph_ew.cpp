@@ -655,7 +655,7 @@ void Graph_EW<ugraph, W>::gen_random_edges(double p, W val){
 template<class W>
 std::ostream& Graph_EW<ugraph, W>::print_edge_weights(std::ostream& o, bool line_format) const
 {
-	int NV = ptype::g_.size();
+	int NV = this->g_.num_vertices();
 
 	//streams edge-weights 
 	if (line_format) {
@@ -703,29 +703,29 @@ std::ostream& Graph_EW<ugraph, W>::print_edge_weights(vint& lv, std::ostream& o)
 template<class W>
 ostream& Graph_EW<ugraph, W>::write_dimacs (ostream& o) {
 	
-	auto NV = ptype::num_vertices();
+	int NV = this->g_.num_vertices();
 
 	//timestamp 
-	ptype::g_.timestamp_dimacs(o);
+	this->g_.timestamp_dimacs(o);
 	
 	//name
-	ptype::g_.name_dimacs(o);
+	this->g_.name_dimacs(o);
 
 	//dimacs header - recompute edges
-	ptype::g_.header_dimacs(o, false);
+	this->g_.header_dimacs(o, false);
 		
 	//write vertex weights
 	for (int v = 0; v < NV; ++v) {
-		if (ptype::we_[v][v] != ptype::NO_WEIGHT) {
-			o << "n " << v + 1 << " " << ptype::we_[v][v] << endl;
+		if (this->we_[v][v] != ptype::NO_WEIGHT) {
+			o << "n " << v + 1 << " " << this->we_[v][v] << endl;
 		}
 	}
 
 	//write undirected edges and edge weights
 	for(int v = 0; v < NV - 1; ++v){
 		for(int w = v + 1; w < NV; ++w){
-			if (ptype::g_.is_edge(v, w)) {														//O(log) for sparse graphs: specialize
-				o << "e " << v + 1 << " " << w + 1 << " " << ptype::we_[v][w] << endl;			//1-based vertex notation dimacs
+			if (this->g_.is_edge(v, w)) {														//O(log) for sparse graphs: specialize
+				o << "e " << v + 1 << " " << w + 1 << " " << this->we_[v][w] << endl;			//1-based vertex notation dimacs
 			}
 		}
 	}
