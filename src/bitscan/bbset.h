@@ -297,10 +297,10 @@ namespace bitgraph {
 			//////////////////////////////
 			// Bitscanning (no HW operations)
 
-				/**
-				* @brief returns the index of the most significant bit in the bitstring
-				* @details implemented as a lookup table
-				**/
+			/**
+			* @brief returns the index of the most significant bit in the bitstring
+			* @details implemented as a lookup table
+			**/
 		protected:
 			inline  int msbn64_lup()	const;
 			inline  int msbn64_intrin()	const;
@@ -382,11 +382,9 @@ namespace bitgraph {
 			**/
 			virtual	inline int popcn64(int firstBit, int lastBit = -1)	const;
 
-
 			/////////////////////
 			//Setting / Erasing bits 
 		public:
-
 
 			/**
 			* @brief sets a 1-bit in the bitstring
