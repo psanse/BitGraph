@@ -25,7 +25,7 @@ namespace bitgraph {
 		class BBObject {
 		public:
 			static constexpr int noBit = -1;
-			static constexpr BITBOARD noBlock = std::numeric_limits<BITBOARD>::max();		
+			static constexpr BITBOARD noBlock = std::numeric_limits<BITBOARD>::max();				//for sparse bitsets - indicates no block found
 
 			//types of bit scans
 			enum scan_types { NON_DESTRUCTIVE, NON_DESTRUCTIVE_REVERSE, DESTRUCTIVE, DESTRUCTIVE_REVERSE };

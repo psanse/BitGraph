@@ -42,8 +42,10 @@ namespace bitgraph {
 				
 		public:
 			
+			////////////////////////////////////////
 			using index_t = int;				
 			static constexpr index_t npos = -1;
+			////////////////////////////////////////
 
 			//alternative size_t type for index_t deprecated (07/02/2025)
 			//using index_t = std::vector<BITBOARD>::size_type;			//std::size_t
