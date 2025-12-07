@@ -153,7 +153,7 @@ namespace bitgraph {
 			* @param nBits : population size if is_popsize is true, otherwise the num_blocks of the bitset
 			* @details: Exception caught inside and the program exits
 			**/
-			explicit BitSetSp (int nPop, bool is_popsize = true);
+			explicit BitSetSp (std::size_t nPop, bool is_popsize = true);
 
 			/**
 			 * @brief Creates a bitset given an initial vector lv of 1-bit elements
@@ -163,7 +163,7 @@ namespace bitgraph {
 			 * @param lv : vector of integers representing 1-bits in the bitset
 			 * @details: Exception caught inside and the program exits
 			 **/
-			explicit BitSetSp(int nPop, const vint& lv);
+			explicit BitSetSp(std::size_t nPop, const vint& lv);
 
 			/**
 			* @brief Creates a bitset with an initial list of 1-bit elements
@@ -173,7 +173,7 @@ namespace bitgraph {
 			* @param lv : set of integers representing 1-bits in the bitset
 			* @details: Exception caught inside and the program exits
 			**/
-			explicit  BitSetSp(int nPop, std::initializer_list<int> lv);
+			explicit  BitSetSp(std::size_t nPop, std::initializer_list<int> lv);
 
 			//Allows copy and move semantics
 			BitSetSp(const BitSetSp& bbN) = default;
@@ -196,7 +196,7 @@ namespace bitgraph {
 			* 
 			* TODO- change API (04/12/2025)
 			**/
-			void reset(int nPop, bool is_popsize = true) noexcept;
+			void reset(std::size_t nPop, bool is_popsize = true) noexcept;
 
 			/**
 			* @brief resets the sparse bitset to a new population size with lv 1-bits
@@ -204,14 +204,14 @@ namespace bitgraph {
 			* @param lv: vector of 1-bits to set
 			* @details:  Fail-fast strategy - exception caught inside and the program exits
 			**/
-			void reset(int nPop, const vint& lv) noexcept;
+			void reset(std::size_t nPop, const vint& lv) noexcept;
 
 			/**
 			* @brief resets the sparse bitset to a new population size, old syntax
 			*		 now favoured by reset(...).
 			* @details:  Fail-fast strategy - exception caught inside and the program exits
 			**/
-			void init(int nPop, bool is_popsize = true) noexcept;
+			void init(std::size_t nPop, bool is_popsize = true) noexcept;
 
 			/**
 			* @brief reallocates memory to the number of blocks of the bitset
@@ -973,11 +973,11 @@ namespace bitgraph {
 			//block bbL exists - find msb
 			if (vBB_[i].idx_ == bbL) {
 
-				int npos = bblock::lsb(vBB_[i].bb_ & Tables::mask_high[firstBit - WMUL(bbL)]);
+				int pos = bblock::lsb(vBB_[i].bb_ & Tables::mask_high[firstBit - WMUL(bbL)]);
 
 				//exits if a bit is found
-				if (npos != BBObject::noBit) {
-					return (WMUL(bbL) + npos);
+				if (pos != BBObject::noBit) {
+					return (WMUL(bbL) + pos);
 				}
 				else {
 					continue;		//next block
@@ -986,7 +986,7 @@ namespace bitgraph {
 
 			//first non-zero block with greater index than bbL
 			if (vBB_[i].bb_ && vBB_[i].idx_ > bbL) {
-				return bblock::lsb(vBB_[i].bb_) + WMUL(vBB_[i].idx_);
+				return bblock::lsb(vBB_[i].bb_) + static_cast<int>(WMUL(vBB_[i].idx_));
 			}
 		}
 
@@ -1003,22 +1003,23 @@ namespace bitgraph {
 
 		//find the block containing nBit or closest one with less index 
 		int bbL = WDIV(lastBit);
+		const auto size = static_cast<int>(vBB_.size());
 
-		for (int i = (int)vBB_.size() - 1; i >= 0; --i) {
+		for (int i = size - 1; i >= 0; --i) {
 
 			//block bbL exists - find msb
 			if (vBB_[i].idx_ == bbL) {
 
-				int npos = bblock::msb(vBB_[i].bb_ & Tables::mask_low[lastBit - WMUL(bbL)]);
-				if (npos != BBObject::noBit) {
-					return (WMUL(bbL) + npos);
+				int pos = bblock::msb(vBB_[i].bb_ & Tables::mask_low[lastBit - WMUL(bbL)]);
+				if (pos != BBObject::noBit) {
+					return (WMUL(bbL) + pos);
 				}
 				continue;
 			}
 
 			//first block with less index than bbL
 			if (vBB_[i].bb_ && vBB_[i].idx_ < bbL) {
-				return bblock::msb(vBB_[i].bb_) + WMUL(vBB_[i].idx_);
+				return bblock::msb(vBB_[i].bb_) + static_cast<int>(WMUL(vBB_[i].idx_));
 			}
 		}
 
@@ -1029,12 +1030,13 @@ namespace bitgraph {
 	int BitSetSp::msbn64_intrin(int& block)	const {
 
 		Ul posInBB;
+		const auto size = static_cast<int>(vBB_.size());
 
-		for (int i = (int)vBB_.size() - 1; i >= 0; --i) {
+		for (int i = size - 1; i >= 0; --i) {
 
 			if (_BitScanReverse64(&posInBB, vBB_[i].bb_)) {
 				block = i;
-				return (posInBB + WMUL(vBB_[i].idx_));
+				return (posInBB + static_cast<int>(WMUL(vBB_[i].idx_)));
 			}
 		}
 
@@ -1070,13 +1072,14 @@ namespace bitgraph {
 			BITBOARD b;
 		}val{};
 
-		for (int i = (int)vBB_.size() - 1; i >= 0; --i) {
+		const auto size = static_cast<int>(vBB_.size());
+		for (int i = size; i >= 0; --i) {
 			val.b = vBB_[i].bb_;
 			if (val.b) {
-				if (val.c[3]) return (Tables::msba[3][val.c[3]] + WMUL(vBB_[i].idx_));
-				if (val.c[2]) return (Tables::msba[2][val.c[2]] + WMUL(vBB_[i].idx_));
-				if (val.c[1]) return (Tables::msba[1][val.c[1]] + WMUL(vBB_[i].idx_));
-				if (val.c[0]) return (Tables::msba[0][val.c[0]] + WMUL(vBB_[i].idx_));
+				if (val.c[3]) return (Tables::msba[3][val.c[3]] + static_cast<int>(WMUL(vBB_[i].idx_)));
+				if (val.c[2]) return (Tables::msba[2][val.c[2]] + static_cast<int>(WMUL(vBB_[i].idx_)));
+				if (val.c[1]) return (Tables::msba[1][val.c[1]] + static_cast<int>(WMUL(vBB_[i].idx_)));
+				if (val.c[0]) return (Tables::msba[0][val.c[0]] + static_cast<int>(WMUL(vBB_[i].idx_)));
 			}
 		}
 
@@ -1087,11 +1090,12 @@ namespace bitgraph {
 	int BitSetSp::msbn64_intrin() const
 	{
 		Ul posInBB;
+		const auto size = static_cast<int>(vBB_.size());
 
-		for (int i = (int)vBB_.size() - 1; i >= 0; --i) {
+		for (int i = size - 1; i >= 0; --i) {
 
 			if (_BitScanReverse64(&posInBB, vBB_[i].bb_)) {
-				return (posInBB + WMUL(vBB_[i].idx_));
+				return (posInBB + static_cast<int>(WMUL(vBB_[i].idx_)));
 			}
 		}
 
@@ -1105,7 +1109,7 @@ namespace bitgraph {
 		for (auto i = 0u; i < vBB_.size(); ++i) {
 			if (_BitScanForward64(&posInBB, vBB_[i].bb_)) {
 				block = i;
-				return(posInBB + WMUL(vBB_[i].idx_));
+				return(posInBB + static_cast<int>(WMUL(vBB_[i].idx_)));
 			}
 		}
 
@@ -1155,7 +1159,7 @@ namespace bitgraph {
 				return(Tables::indexDeBruijn64_ISOL[((vBB_[i].bb_ & -vBB_[i].bb_) * DEBRUIJN_MN_64_ISOL/*magic num*/) >> DEBRUIJN_MN_64_SHIFT] + WMUL(vBB_[i].idx_));
 #else
 				return(Tables::indexDeBruijn64_SEP[((vBB_[i].bb_ ^ (vBB_[i].bb_ - 1)) * bblock::DEBRUIJN_MN_64_SEP/*magic num*/) >>
-					bblock::DEBRUIJN_MN_64_SHIFT] + WMUL(vBB_[i].idx_));
+					bblock::DEBRUIJN_MN_64_SHIFT] + static_cast<int>(WMUL(vBB_[i].idx_)));
 			}
 #endif
 		}
@@ -1168,10 +1172,10 @@ namespace bitgraph {
 		for (int i = 0; i < vBB_.size(); ++i) {
 			val.b = vBB_[i].bb_;
 			if (val.b) {
-				if (val.c[0]) return (Tables::lsba[0][val.c[0]] + WMUL(vBB_[i].idx_));
-				if (val.c[1]) return (Tables::lsba[1][val.c[1]] + WMUL(vBB_[i].idx_));
-				if (val.c[2]) return (Tables::lsba[2][val.c[2]] + WMUL(vBB_[i].idx_));
-				if (val.c[3]) return (Tables::lsba[3][val.c[3]] + WMUL(vBB_[i].idx_));
+				if (val.c[0]) return (Tables::lsba[0][val.c[0]] + static_cast<int>(WMUL(vBB_[i].idx_)));
+				if (val.c[1]) return (Tables::lsba[1][val.c[1]] + static_cast<int>(WMUL(vBB_[i].idx_)));
+				if (val.c[2]) return (Tables::lsba[2][val.c[2]] + static_cast<int>(WMUL(vBB_[i].idx_))));
+				if (val.c[3]) return (Tables::lsba[3][val.c[3]] + static_cast<int>(WMUL(vBB_[i].idx_)));
 			}
 		}
 
@@ -1185,7 +1189,7 @@ namespace bitgraph {
 
 		for (auto i = 0u; i < vBB_.size(); ++i) {
 			if (_BitScanForward64(&posInBB, vBB_[i].bb_)) {
-				return(posInBB + WMUL(vBB_[i].idx_));
+				return(posInBB + static_cast<int>(WMUL(vBB_[i].idx_)));
 			}
 		}
 

@@ -287,7 +287,7 @@ TEST(Ugraph_sparse, degree_brock){
 	/////////////////////////////////
 
 	//set of all the vertices 
-	bbset.set_bit(0, g.num_vertices()-1);
+	bbset.set_bit(0, static_cast<int>(g.num_vertices() - 1));
 	
 	///////////////////////////////////////////////////////////
 	EXPECT_EQ (g.neighbors(1).count(),g.degree(1, bbset));

@@ -211,7 +211,7 @@ namespace bitgraph {
 			//stores the current bit for next call
 			scan_.pos_ = posInBB;
 
-			return (posInBB + WMUL(vBB_[scan_.bbi_].idx_));
+			return (posInBB + static_cast<int>(WMUL(vBB_[scan_.bbi_].idx_)));
 
 		}
 		else {
@@ -223,7 +223,7 @@ namespace bitgraph {
 					scan_.bbi_ = i;
 					scan_.pos_ = posInBB;
 
-					return (posInBB + WMUL(vBB_[i].idx_));
+					return (posInBB + static_cast<int>(WMUL(vBB_[i].idx_)));
 				}
 			}
 		}
@@ -245,7 +245,7 @@ namespace bitgraph {
 			//delete the bit from the input bitset
 			bitset.erase_bit(posInBB);
 
-			return (posInBB + WMUL(vBB_[scan_.bbi_].idx_));
+			return (posInBB + static_cast<int>(WMUL(vBB_[scan_.bbi_].idx_)));
 
 		}
 		else {
@@ -260,7 +260,7 @@ namespace bitgraph {
 					//delete the bit from the input bitset
 					bitset.erase_bit(posInBB);
 
-					return (posInBB + WMUL(vBB_[i].idx_));
+					return (posInBB + static_cast<int>(WMUL(vBB_[i].idx_)));
 				}
 			}
 		}
@@ -277,7 +277,7 @@ namespace bitgraph {
 			//stores the current bit for next call
 			scan_.pos_ = posInBB;
 
-			return (posInBB + WMUL(vBB_[scan_.bbi_].idx_));
+			return (posInBB + static_cast<int>(WMUL(vBB_[scan_.bbi_].idx_)));
 		}
 		else {
 			//Searches for previous bit in the remaining blocks
@@ -289,7 +289,7 @@ namespace bitgraph {
 					scan_.bbi_ = i;
 					scan_.pos_ = posInBB;
 
-					return (posInBB + WMUL(vBB_[i].idx_));
+					return (posInBB + static_cast<int>(WMUL(vBB_[i].idx_)));
 				}
 			}
 		}
@@ -310,7 +310,7 @@ namespace bitgraph {
 			//delete the bit from the input bitset
 			bitset.erase_bit(posInBB);
 
-			return (posInBB + WMUL(vBB_[scan_.bbi_].idx_));
+			return (posInBB + static_cast<int>(WMUL(vBB_[scan_.bbi_].idx_)));
 		}
 		else {
 			//Searches for previous bit in the remaining blocks
@@ -325,7 +325,7 @@ namespace bitgraph {
 					//delete the bit from the input bitset
 					bitset.erase_bit(posInBB);
 
-					return (posInBB + WMUL(vBB_[i].idx_));
+					return (posInBB + static_cast<int>(WMUL(vBB_[i].idx_)));
 				}
 			}
 		}
@@ -348,7 +348,7 @@ namespace bitgraph {
 				//deletes the current bit before returning
 				vBB_[i].bb_ &= ~Tables::mask[posInBB];
 
-				return (posInBB + WMUL(vBB_[i].idx_));
+				return (posInBB + static_cast<int>(WMUL(vBB_[i].idx_)));
 			}
 
 		}
@@ -374,7 +374,7 @@ namespace bitgraph {
 				//delete the bit from the input bitset
 				bitset.erase_bit(posInBB);
 
-				return (posInBB + WMUL(vBB_[i].idx_));
+				return (posInBB + static_cast<int>(WMUL(vBB_[i].idx_)));
 			}
 
 		}
@@ -396,7 +396,7 @@ namespace bitgraph {
 				//deletes the current bit from the bitset before returning
 				vBB_[i].bb_ &= ~Tables::mask[posInBB];
 
-				return (posInBB + WMUL(vBB_[i].idx_));
+				return (posInBB + static_cast<int>(WMUL(vBB_[i].idx_)));
 			}
 		}
 
@@ -420,7 +420,7 @@ namespace bitgraph {
 				//delete the bit from the input bitset
 				bitset.erase_bit(posInBB);
 
-				return (posInBB + WMUL(vBB_[i].idx_));
+				return (posInBB + static_cast<int>(WMUL(vBB_[i].idx_)));
 			}
 		}
 

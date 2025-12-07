@@ -61,7 +61,6 @@ TEST_F(CliqueCommonTest, find_iset_consecutive_vertices) {
 
 }
 
-
 TEST_F(CliqueCommonTest, find_clique) {
 
 	int lv[] = { 0, 1, 2, 3, 4, 5 };

@@ -270,10 +270,17 @@ namespace bitgraph {
 
 			/**
 			* @brief returns the number of blocks allocated for the bitset
-			* @details: equivalent to size() in this class, but not in sparse bitsets
+			* @returns number of blocks allocated for the bitset - integer type 
+			* @details: recommended for internal use
 			**/
-			std::size_t num_blocks() const noexcept { return nBB_; }							
-			//std::size_t size() const noexcept { return vBB_.size(); }
+			int num_blocks() const noexcept { return nBB_; }	
+
+			/**
+			* @brief returns the number of blocks allocated for the bitset
+			* @returns number of blocks allocated for the bitset - std::size_ type
+			* @details: recommended for consumer code
+			**/
+			std::size_t size() const noexcept { return vBB_.size(); }
 							
 			vbset& bitset()  noexcept { return vBB_; }
 			const vbset& bitset() const  noexcept { return vBB_; }
@@ -506,17 +513,17 @@ namespace bitgraph {
 			/////////////////////
 			//BitBlock operations 
 
-				/**
-				* @brief ORs the 1-bits from the bitstring @bb_add in the closed range [firstBlock, lastBlock]
-				*		 If lastBlock = npos, the range is [firstBlock, nBB_]
-				*
-				*		 0 <= FirstBlock <= LastBLock < the number of bitblocks in the bitstring
-				*
-				* @param bb_add: input bitstring whose bits are added
-				* @param FirstBlock: the first bitblock to be modified
-				* @param LastBLock: the last bitblock to be modified
-				* @returns reference to the modified bitstring
-				**/
+			/**
+			* @brief ORs the 1-bits from the bitstring @bb_add in the closed range [firstBlock, lastBlock]
+			*		 If lastBlock = npos, the range is [firstBlock, nBB_]
+			*
+			*		 0 <= FirstBlock <= LastBLock < the number of bitblocks in the bitstring
+			*
+			* @param bb_add: input bitstring whose bits are added
+			* @param FirstBlock: the first bitblock to be modified
+			* @param LastBLock: the last bitblock to be modified
+			* @returns reference to the modified bitstring
+			**/
 			inline	BitSet& set_block(index_t firstBlock, index_t lastBlock, const BitSet& bb_add);
 
 			/**
@@ -1286,7 +1293,7 @@ namespace bitgraph{
 			index_t last_block = ((lastBlock == BitSet::npos) ? static_cast<index_t>(nBB_ - 1) : lastBlock);
 
 			////////////////////////////////////////////////////////////////////////////////////////////
-			assert((firstBlock >= 0) && (last_block < bb_add.num_blocks()) && (firstBlock <= last_block));
+			assert((last_block < bb_add.num_blocks()) && (firstBlock <= last_block));
 			///////////////////////////////////////////////////////////////////////////////////////////
 
 
@@ -1534,7 +1541,7 @@ namespace bitgraph{
 			bit = BBObject::noBit;
 			bool is_first_vertex = true;
 
-			for (auto i = firstBlock; i <= last_block; ++i) {
+			for (index_t i = firstBlock; i <= last_block; ++i) {
 				pc += bblock::popc64(vBB_[i] & rhs.vBB_[i]);
 				if (pc > 1) {
 					bit = BBObject::noBit;
@@ -1542,7 +1549,7 @@ namespace bitgraph{
 				}
 				else if (is_first_vertex && pc == 1) {	//stores bit the first time pc == 1 
 
-					bit = bblock::lsb64_intrinsic(vBB_[i] & rhs.vBB_[i]) + WMUL(i);
+					bit = bblock::lsb64_intrinsic(vBB_[i] & rhs.vBB_[i]) + static_cast<int>(WMUL(i));
 					is_first_vertex = false;
 				}
 			}
@@ -1764,13 +1771,13 @@ namespace bitgraph{
 			assert((firstBlock >= 0) && (firstBlock <= last_block) && (last_block < rhs.num_blocks()));
 			/////////////////////////////////////////////////////////////////////////////////
 
-			for (auto i = firstBlock; i <= last_block; ++i) {
+			for (index_t i = firstBlock; i <= last_block; ++i) {
 				vBB_[i] |= rhs.vBB_[i];
 			}
 
 			//set bits to 0 outside the range if required
 			if (Erase) {
-				for (int i = last_block + 1; i < nBB_; ++i) {
+				for (index_t i = last_block + 1; i < nBB_; ++i) {
 					vBB_[i] = ZERO;
 				}
 				for (index_t i = 0; i < firstBlock; ++i) {

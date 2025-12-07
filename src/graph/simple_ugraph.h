@@ -519,9 +519,9 @@ namespace bitgraph {
 		std::size_t NE = 0;
 
 		//reads only the upper triangle of the adjacency matrix
-		for (std::size_t i = 0; i < this->NV_ - 1; ++i) {
+		for (int i = 0; i < this->NV_ - 1; ++i) {
 			if (bbn.is_bit(i)) {
-				for (std::size_t j = i + 1; j < this->NV_; ++j) {
+				for (int j = i + 1; j < this->NV_; ++j) {
 					if (bbn.is_bit(j)) {
 						if (this->adj_[i].is_bit(j)) { ++NE; }
 					}
@@ -603,7 +603,7 @@ namespace bitgraph {
 		using edge_t = std::pair<int, int>;
 		std::vector<edge_t> edges;
 		edges.reserve(this->NV_ * (this->NV_ - 1) / 2);
-		for (auto i = 0u; i < this->NV_ - 1; ++i) {
+		for (int i = 0; i < this->NV_ - 1; ++i) {
 			for (auto j = i + 1; j < this->NV_; ++j) {
 				edges.emplace_back(i, j);
 			}
@@ -660,8 +660,8 @@ namespace bitgraph {
 	inline
 		ostream& Ugraph<BitSetT>::print_edges(std::ostream& o, bool eofl) {
 
-		for (auto i = 0u; i < this->NV_ - 1; ++i) {
-			for (auto j = i + 1; j < this->NV_; ++j) {
+		for (int i = 0; i < this->NV_ - 1; ++i) {
+			for (int j = i + 1; j < this->NV_; ++j) {
 
 				if (this->is_edge(i, j)) {
 					o << "[" << i << "]" << "--" << "[" << j << "]" << endl;
@@ -677,8 +677,8 @@ namespace bitgraph {
 	inline
 		ostream& Ugraph<BitSetT>::print_adjacency_matrix(std::ostream& o) const
 	{
-		for (std::size_t i = 0; i < this->NV_; ++i) {
-			for (std::size_t j = 0; j < this->NV_; ++j) {
+		for (int i = 0; i < this->NV_; ++i) {
+			for (int j = 0; j < this->NV_; ++j) {
 				if (this->is_edge(i, j)) {
 					o << "1";
 				}
@@ -707,8 +707,8 @@ namespace bitgraph {
 		o << "p edge " << this->NV_ << " " << num_edges(false /* recompute */) << endl << endl;
 
 		//bidirectional edges (1 based in dimacs)
-		for (std::size_t v = 0; v < this->NV_ - 1; ++v) {
-			for (std::size_t w = v + 1; w < this->NV_; ++w) {
+		for (int v = 0; v < this->NV_ - 1; ++v) {
+			for (int w = v + 1; w < this->NV_; ++w) {
 				if (this->is_edge(v, w)) {										//O(log) for sparse graphs: specialize
 					o << "e " << v + 1 << " " << w + 1 << endl;
 				}
@@ -728,8 +728,8 @@ namespace bitgraph {
 			o << "% " << this->name_.c_str() << endl;
 
 		//write edges - 1 based vertex notation
-		for (auto v = 0u; v < this->NV_ - 1; ++v) {
-			for (auto w = v + 1; w < this->NV_; ++w) {
+		for (int v = 0; v < this->NV_ - 1; ++v) {
+			for (int w = v + 1; w < this->NV_; ++w) {
 				if (this->is_edge(v, w)) {							//O(log) for sparse graphs: specialize
 					o << v + 1 << " " << w + 1 << endl;
 				}
@@ -829,8 +829,8 @@ namespace bitgraph {
 		//resets ug with new allocation
 		if (ug.reset(this->NV_) == -1) return -1;
 
-		for (auto i = 0u; i < this->NV_ - 1; ++i) {
-			for (auto j = i + 1; j < this->NV_; ++j) {
+		for (int i = 0; i < this->NV_ - 1; ++i) {
+			for (int j = i + 1; j < this->NV_; ++j) {
 
 				if (!this->adj_[i].is_bit(j)) {
 					ug.add_edge(i, j);

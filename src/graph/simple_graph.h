@@ -91,8 +91,8 @@ namespace bitgraph {
 			/**
 			* @brief number of vertices of the graph. Alias to num_vertices()
 			**/
-			std::size_t size()					const  noexcept { return num_vertices(); }
-			std::size_t num_vertices()			const  noexcept { return NV_; }
+			std::size_t size()			const  noexcept { return NV_; }
+			int num_vertices()			const  noexcept { return NV_; }
 			
 
 			/**
@@ -100,7 +100,7 @@ namespace bitgraph {
 			*		 In the case of sparse graphs, the value is the maximum capacity
 			*		 of all bitsets.
 			**/
-			std::size_t num_blocks()			const noexcept  { return NBB_; }
+			int num_blocks()			const noexcept  { return NBB_; }
 
 			/*
 			* @brief Counts the number of edges	(includes self loops)
@@ -638,7 +638,7 @@ namespace bitgraph {
 		auto bbh = WDIV(first_k - 1);
 
 		//copy the relevant vertices of the adjacency matrix
-		for (auto i = 0u; i < newg.NV_; ++i) {
+		for (int i = 0; i < newg.NV_; ++i) {
 			for (auto j = 0u; j <= bbh; ++j) {
 				newg.adj_[i].block(j) = adj_[i].block(j);
 			}

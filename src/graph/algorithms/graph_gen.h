@@ -337,7 +337,7 @@ namespace bitgraph{
 		std::string mypath(path);
 		_dir::append_slash(mypath);
 
-		for (int i = rd.nLB; i <= rd.nUB; i += rd.incN) {
+		for (auto i = rd.nLB; i <= rd.nUB; i += rd.incN) {
 			for (double j = rd.pLB; j <= rd.pUB; j += rd.incP) {
 				for (int k = 0; k < rd.nRep; k++) {
 

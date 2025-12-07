@@ -127,14 +127,14 @@ namespace bitgraph {
 			Graph_t& graph() { return g_; }
 			const Graph_t& graph()						const { return g_; }
 
-			int num_vertices()						const { return g_.num_vertices(); }
+			std::size_t num_vertices()					const { return g_.num_vertices(); }
 
 			/**
 			* @brief alias for the num_vertices function
 			**/
-			int size()						const { return g_.num_vertices(); }
+			std::size_t size()						const { return g_.num_vertices(); }
 
-			int num_edges(bool lazy = true) { return g_.num_edges(lazy); }
+			std::size_t num_edges(bool lazy = true) { return g_.num_edges(lazy); }
 
 			/**
 			* @brief neighbor set of vertex @v

@@ -29,14 +29,14 @@ int BitSetSp::DEFAULT_CAPACITY = 2;
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
-BitSetSp::BitSetSp(int nPop, bool is_popsize ){
+BitSetSp::BitSetSp(std::size_t nPop, bool is_popsize ){
 
-	(is_popsize)? nBB_ = INDEX_1TO1(nPop) : nBB_ = nPop;
+	(is_popsize)? nBB_ = static_cast<int>(INDEX_1TO1(nPop)) : nBB_ = static_cast<int>(nPop);
 	vBB_.reserve(DEFAULT_CAPACITY);							
 }
 
-BitSetSp::BitSetSp(int nPop, const vint& lv):
-	nBB_(INDEX_1TO1(nPop))
+BitSetSp::BitSetSp(std::size_t nPop, const vint& lv):
+	nBB_(static_cast<int>(INDEX_1TO1(nPop)))
 {
 	try {
 		
@@ -62,8 +62,8 @@ BitSetSp::BitSetSp(int nPop, const vint& lv):
 	}
 }
 
-BitSetSp::BitSetSp(int nPop, std::initializer_list<int> lv) :
-	nBB_(INDEX_1TO1(nPop))
+BitSetSp::BitSetSp(std::size_t nPop, std::initializer_list<int> lv) :
+	nBB_(static_cast<int>(INDEX_1TO1(nPop)))
 {
 	try {
 
@@ -90,10 +90,10 @@ BitSetSp::BitSetSp(int nPop, std::initializer_list<int> lv) :
 }
 
 
-void BitSetSp::reset(int size, bool is_popsize) noexcept
+void BitSetSp::reset(std::size_t nPop, bool is_popsize) noexcept
 {
 	try {
-		(is_popsize) ? nBB_ = INDEX_1TO1(size) : nBB_ = size;
+		(is_popsize) ? nBB_ = static_cast<int>(INDEX_1TO1(nPop)) : nBB_ = static_cast<int>(nPop);
 		decltype(vBB_)().swap(vBB_);
 		vBB_.reserve(DEFAULT_CAPACITY);
 	}
@@ -104,12 +104,12 @@ void BitSetSp::reset(int size, bool is_popsize) noexcept
 	}
 }
 
-void BitSetSp::reset(int nPop, const vint& lv) noexcept
+void BitSetSp::reset(std::size_t nPop, const vint& lv) noexcept
 {
 
 	try {
-		
-		nBB_ = INDEX_1TO1(nPop);
+
+		nBB_ = static_cast<int>(INDEX_1TO1(nPop));
 		decltype(vBB_)().swap(vBB_);
 		vBB_.reserve(DEFAULT_CAPACITY);
 
@@ -132,9 +132,9 @@ void BitSetSp::reset(int nPop, const vint& lv) noexcept
 	}
 }
 
-void BitSetSp::init (int size, bool is_popsize) noexcept {
+void BitSetSp::init (std::size_t size, bool is_popsize) noexcept {
 	try {
-		(is_popsize) ? nBB_ = INDEX_1TO1(size) : nBB_ = size;
+		(is_popsize) ? nBB_ = static_cast<int>(INDEX_1TO1(size)) : nBB_ = static_cast<int>(size);
 		vBB_.clear();
 		vBB_.reserve(DEFAULT_CAPACITY);
 	}
