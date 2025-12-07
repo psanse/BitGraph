@@ -39,18 +39,13 @@ namespace bitgraph {
 		//
 		///////////////////////////////////
 		class BitSet :public BBObject {
-				
+						
+			using index_t = BBObject::index_t;
 		public:
-			
-			////////////////////////////////////////
-			using index_t = int;				
-			static constexpr index_t npos = -1;
-			////////////////////////////////////////
+					
+			using BBObject::npos;
 
-			//alternative size_t type for index_t deprecated (07/02/2025)
-			//using index_t = std::vector<BITBOARD>::size_type;			//std::size_t
-			//static constexpr index_t npos = index_t(-1);
-
+						
 			/////////////////////////////
 			// Independent operators / masks  
 			// comment: do not modify this bitset

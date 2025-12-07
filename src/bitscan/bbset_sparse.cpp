@@ -508,7 +508,7 @@ BitSetSp&  BitSetSp::set_block (int firstBlock, int lastBlock, const BitSetSp& r
 	return *this;		
 }
 
-int BitSetSp::clear_bit (int low, int high){
+int BitSetSp::clear_bit (int firstBit, int lastBit){
 	
 	int bbl = EMPTY_ELEM, bbh = EMPTY_ELEM; 
 	pair<bool, BitSetSp::vPB_it> pl;
@@ -516,29 +516,30 @@ int BitSetSp::clear_bit (int low, int high){
 
 ////////////////////////
 //special cases
-	if(high == EMPTY_ELEM && low == EMPTY_ELEM){
+	if(lastBit == EMPTY_ELEM && firstBit == EMPTY_ELEM){
 		vBB_.clear();
 		return 0;
 	}
 
-	if(high == EMPTY_ELEM){
-		bbl=WDIV(low);
+	if(lastBit == EMPTY_ELEM){
+		bbl = WDIV(firstBit);
 		pl = find_block_ext(bbl);
-		if(pl.second==vBB_.end()) return 0;
+		if(pl.second == vBB_.end()) return 0;
 
 		if(pl.first){	//lower block exists
-			pl.second->bb_&=Tables::mask_low[low-WMUL(bbl)];
+			pl.second->bb_ &= Tables::mask_low[firstBit - WMUL(bbl)];
 			++pl.second;
 		}
 
 		//remaining
 		vBB_.erase(pl.second, vBB_.end());
 		return 0;
-	}else if(low == EMPTY_ELEM){
-		bbh=WDIV(high); 
-		ph=find_block_ext(bbh);
-		if(ph.first){	//upper block exists
-			ph.second->bb_&=Tables::mask_high[high-WMUL(bbh)];
+
+	}else if(firstBit == EMPTY_ELEM){
+		bbh = WDIV(lastBit); 
+		ph = find_block_ext(bbh);
+		if(ph.first){			//upper block exists
+			ph.second->bb_ &= Tables::mask_high[lastBit - WMUL(bbh)];
 		}
 
 		//remaining
@@ -550,53 +551,59 @@ int BitSetSp::clear_bit (int low, int high){
 // general cases
 
 	//check consistency
-	if(low>high){
-		cerr<<"Error in set bit in range"<<endl;
+	if(firstBit > lastBit){
+		LOG_ERROR("Error in set bit in range - BitSetSp::clear_bit");
 		return -1;
 	}
-		
 
-	bbl=WDIV(low);
-	bbh=WDIV(high); 
-	pl=find_block_ext(bbl);
-	ph=find_block_ext(bbh);	
-
+	bbl = WDIV(firstBit);
+	bbh = WDIV(lastBit); 
+	pl = find_block_ext(bbl);
+	ph = find_block_ext(bbh);
 
 	//tratamiento
 	if(pl.second!=vBB_.end()){
+
 		//updates lower bitblock
-		if(pl.first){	//lower block exists
-			if(bbh==bbl){		//case update in the same bitblock
-				BITBOARD bb_low=pl.second->bb_ & Tables::mask_high[high-WMUL(bbh)];
-				BITBOARD bb_high=pl.second->bb_ &Tables::mask_low[low-WMUL(bbl)];
-				pl.second->bb_=bb_low | bb_high;
+		if(pl.first){	
+			
+			//lower block exists
+			if(bbh==bbl){		
+				
+				//case update in the same bitblock
+				BITBOARD bb_low = pl.second->bb_ & _impl::Tables::mask_high[lastBit - WMUL(bbh)];
+				BITBOARD bb_high = pl.second->bb_ & _impl::Tables::mask_low[firstBit - WMUL(bbl)];
+				pl.second->bb_ = bb_low | bb_high;
 				return 0;
 			}
 
 			//update lower block
-			pl.second->bb_&=Tables::mask_low[low-WMUL(bbl)];
+			pl.second->bb_ &= _impl::Tables::mask_low[firstBit - WMUL(bbl)];
 			++pl.second;
 		}
 
 		//updates upper bitblock
-		if(ph.first){	//lower block exists
-			if(bbh==bbl){		//case update in the same bitblock
-				BITBOARD bb_low=pl.second->bb_ & Tables::mask_high[high-WMUL(bbh)];
-				BITBOARD bb_high=pl.second->bb_ &Tables::mask_low[low-WMUL(bbl)];
-				pl.second->bb_=bb_low | bb_high;
+		if(ph.first){	
+			
+			//lower block exists
+			if(bbh==bbl){		
+				
+				//case update in the same bitblock
+				BITBOARD bb_low = pl.second->bb_ & _impl::Tables::mask_high[lastBit - WMUL(bbh)];
+				BITBOARD bb_high = pl.second->bb_ & _impl::Tables::mask_low[firstBit - WMUL(bbl)];
+				pl.second->bb_ = bb_low | bb_high;
 				return 0;
 			}
 
 			//update lower block
-			ph.second->bb_&=Tables::mask_high[high-WMUL(bbh)];
+			ph.second->bb_ &= _impl::Tables::mask_high[lastBit - WMUL(bbh)];
 		}
 
 		//remaining
 		vBB_.erase(pl.second, ph.second);
 	}
-
-	
-return 0;
+		
+	return 0;
 }
 
 BitSetSp&  BitSetSp::erase_bit (const BitSetSp& rhs ){
@@ -880,7 +887,7 @@ string BitSetSp::to_string ()  const{
 	return sstr.str();
 }
 
-void BitSetSp::to_vector (std::vector<int>& lb)const{
+void BitSetSp::extract (std::vector<int>& lb)const{
 
 	lb.clear();
 
@@ -893,7 +900,7 @@ void BitSetSp::to_vector (std::vector<int>& lb)const{
 BitSetSp::operator vint() const
 {
 	vint lb;
-	to_vector(lb);
+	extract(lb);
 	return lb;
 }
 

@@ -24,6 +24,17 @@ namespace bitgraph {
 
 	class BBObject {
 	public:
+
+		////////////////////////////////////////
+		using index_t = int;
+		static constexpr index_t npos = -1;
+
+		//alternative size_t type for index_t deprecated (07/02/2025)
+		//using index_t = std::vector<BITBOARD>::size_type;			//std::size_t
+		//static constexpr index_t npos = index_t(-1);
+
+		////////////////////////////////////////
+
 		static constexpr int noBit = -1;
 		static constexpr BITBOARD noBlock = std::numeric_limits<BITBOARD>::max();				//for sparse bitsets - indicates no block found
 

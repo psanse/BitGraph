@@ -1154,7 +1154,7 @@ namespace bitgraph {
 			//determines neighbor set
 			curr_clique.clear();
 			bbneigh = g_.neighbors(ver_[i]);
-			bbneigh.to_vector(candidates);
+			bbneigh.extract(candidates);
 
 			//sort degeneracy
 			std::sort(candidates.begin(), candidates.end(), less_kcore(pos_, ver_, deg_));

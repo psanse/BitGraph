@@ -300,7 +300,7 @@ namespace bitgraph {
 			* @param g output new induced subgraph
 			* @returns the new induced subgraph (if the operation fails, g remains unchanged)
 			**/
-			virtual	Graph& create_subgraph(std::size_t first_k, Graph& g) const;
+			virtual	Graph& create_subgraph(int first_k, Graph& g) const;
 
 			/**
 			* @brief creates the subgraph induced by the vertices NOT in the input set
@@ -620,7 +620,7 @@ namespace bitgraph {
 
 	template<class BitSetT>
 	inline
-		Graph<BitSetT>& Graph<BitSetT>::create_subgraph(std::size_t first_k, Graph<BitSetT>& newg) const {
+		Graph<BitSetT>& Graph<BitSetT>::create_subgraph(int first_k, Graph<BitSetT>& newg) const {
 
 		//assert is size required is greater or equal current size
 		if (first_k >= NV_ || first_k <= 0) {
@@ -629,7 +629,7 @@ namespace bitgraph {
 		}
 
 		//////////////////////
-		newg.reset(first_k);
+		newg.reset(static_cast<std::size_t>(first_k));
 		///////////////////////
 				
 		auto bbh = WDIV(first_k - 1);
@@ -1227,7 +1227,7 @@ namespace bitgraph {
 
 	template<>
 	inline
-		GSS& GSS::create_subgraph(std::size_t first_k, GSS& newg) const {
+		GSS& GSS::create_subgraph(int first_k, GSS& newg) const {
 
 		//assertions
 		if (first_k >= NV_ || first_k <= 0) {
@@ -1241,7 +1241,7 @@ namespace bitgraph {
 		//copies first k elements of the adjacency matrix 
 		for (auto i = 0; i < newg.NV_; i++) {
 			newg.adj_[i] = adj_[i];
-			newg.adj_[i].clear_bit(static_cast<int>(first_k), EMPTY_ELEM);		//closed range
+			newg.adj_[i].clear_bit(first_k, EMPTY_ELEM);		//closed range
 		}
 
 		return newg;
