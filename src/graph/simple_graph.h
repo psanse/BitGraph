@@ -45,6 +45,8 @@ namespace bitgraph {
 		template<class BitSetT = BBScan>
 		class Graph {
 
+			using index_t = int;
+
 			//filter out invalid types
 			static_assert(std::is_same<BBScan, BitSetT>::value ||
 				std::is_same<BBScanSp, BitSetT>::value, "is not a valid Graph type");
@@ -435,9 +437,9 @@ namespace bitgraph {
 		protected:
 			std::vector<BitSetT> adj_;		//adjacency matrix 
 			
-			int NV_;						//number of vertices
+			index_t NV_;					//number of vertices
 			std::size_t NE_;				//number of edges (can be very large)
-			int NBB_;						//number of bit blocks per row (in the case of sparse graphs this is a maximum value)
+			index_t NBB_;					//number of bit blocks per row (in the case of sparse graphs this is a maximum value)
 
 			//names
 			std::string name_;				//name of instance, without path	
