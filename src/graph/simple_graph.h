@@ -738,7 +738,7 @@ namespace bitgraph {
 	template<class BitSetT>
 	inline
 		void Graph<BitSetT>::remove_edges() {
-		for (std::size_t v = 0; v < NV_; ++v) {
+		for (int v = 0; v < NV_; ++v) {
 			adj_[v].erase_bit();
 		}
 
@@ -749,8 +749,8 @@ namespace bitgraph {
 	inline
 		ostream& Graph<BitSetT>::print_adj(std::ostream& o, bool eofl) const {
 
-		for (auto i = 0; i < NV_; ++i) {
-			for (auto j = 0; j < NV_; ++j) {
+		for (int i = 0; i < NV_; ++i) {
+			for (int j = 0; j < NV_; ++j) {
 				if (is_edge(i, j)) {
 					o << "1" << " ";
 				}
@@ -791,7 +791,7 @@ namespace bitgraph {
 	inline
 		int Graph<BitSetT>::read_dimacs(const string& filename) noexcept{
 
-		int n=0, m=0, v1=0, v2=0;			
+		int n = 0, m = 0, v1 = 0, v2 = 0;			
 
 		fstream f(filename.c_str());
 		if (!f) {
