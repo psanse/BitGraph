@@ -22,7 +22,6 @@
 namespace bitgraph {
 	namespace _impl {
 
-
 		class BBSentinel : public BBScan {
 			friend BBSentinel& AND(const BitSet& lhs, const BBSentinel& rhs, BBSentinel& res);		//updates sentinels
 
@@ -100,8 +99,6 @@ namespace bitgraph {
 	}//namespace _impl
 
 	using _impl::BBSentinel;
-
-	//using _impl::AND;
 
 }//namespace bitgraph
 
