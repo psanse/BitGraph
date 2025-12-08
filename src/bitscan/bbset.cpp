@@ -64,7 +64,7 @@ BitSet::BitSet(const vint& v):
 }
 
 BitSet::BitSet(std::size_t nPop, std::initializer_list<int> l):
-	nBB_(static_cast<int>(INDEX_1TO1(nPop)))
+	nBB_(static_cast<index_t>(INDEX_1TO1(nPop)))
 {
 	try {
 		vBB_.assign(nBB_, 0);
@@ -92,7 +92,7 @@ BitSet::BitSet(std::size_t nPop, std::initializer_list<int> l):
 void BitSet::init(std::size_t nPop) noexcept {
 
 	try {
-		nBB_ = static_cast<int>(INDEX_1TO1(nPop));
+		nBB_ = static_cast<index_t>(INDEX_1TO1(nPop));
 		vBB_.assign(nBB_, 0);
 	}
 	catch (...) {
@@ -106,7 +106,7 @@ void BitSet::init(std::size_t nPop) noexcept {
 void BitSet::init(std::size_t nPop, const vint& lv) noexcept {
 		
 	try {
-		nBB_ = static_cast<int>(INDEX_1TO1(nPop));
+		nBB_ = static_cast<index_t>(INDEX_1TO1(nPop));
 		vBB_.assign(nBB_, 0);
 
 		//sets bit conveniently
@@ -128,10 +128,10 @@ void BitSet::init(std::size_t nPop, const vint& lv) noexcept {
 	}	
 }
 
-void BitSet::reset(std::size_t popsize) noexcept {
+void BitSet::reset(std::size_t nPop) noexcept {
 
 	try {
-		nBB_ = static_cast<int>(INDEX_1TO1(popsize));
+		nBB_ = static_cast<index_t>(INDEX_1TO1(nPop));
 		vBB_.assign(nBB_, 0);
 	}
 	catch (...) {
@@ -141,17 +141,17 @@ void BitSet::reset(std::size_t popsize) noexcept {
 	}
 
 }
-void BitSet::reset(std::size_t popsize, const vint& lv) noexcept {
+void BitSet::reset(std::size_t nPop, const vint& lv) noexcept {
 
 	try {
-		nBB_ = static_cast<int>(INDEX_1TO1(popsize));
+		nBB_ = static_cast<index_t>(INDEX_1TO1(nPop));
 		vBB_.assign(nBB_, 0);
 
 		//sets bit conveniently
 		for (auto& bit : lv) {
 
 			//////////////////
-			assert(bit >= 0 && bit < popsize);
+			assert(bit >= 0 && bit < static_cast<index_t>(nPop));
 			/////////////////
 
 			//sets bits - no prior erasing
