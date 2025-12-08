@@ -1285,12 +1285,14 @@ namespace bitgraph {
 	inline
 		double GSS::block_density()	const {
 
-		std::size_t nBB = 0;							//number of non-empty bitblocks	
-		std::size_t nBBt = 0;							//number of allocated bitblocks (all should be non-empty in the sparse case)
+		std::size_t  nBB = 0;							//number of non-empty bitblocks	
+		std::size_t  nBBt = 0;							//number of allocated bitblocks (all should be non-empty in the sparse case)
 
-		for (std::size_t v = 0; v < NV_; ++v) {
-			nBBt += adj_[v].size();
-			for (auto bb = 0; bb < adj_[v].size(); bb++) {
+		for (int v = 0; v < NV_; ++v) {
+			const auto sz = adj_[v].size();  
+			nBBt += sz;
+			const auto deg = static_cast<int>(sz);
+			for (int bb = 0; bb < deg; bb++) {
 				if (adj_[v].block(bb)) {
 					nBB++;								//nBB should be equal to nBBt
 				}
