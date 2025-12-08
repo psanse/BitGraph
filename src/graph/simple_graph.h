@@ -1313,7 +1313,7 @@ namespace bitgraph {
 		std::size_t nBBt = 0;							//number of allocated bitblocks (all should be non-empty in the sparse case)
 
 		//number of allocated blocks
-		for (std::size_t v = 0; v < NV_; ++v) {
+		for (int v = 0; v < NV_; ++v) {
 			nBBt += adj_[v].size();
 		}
 				
@@ -1331,7 +1331,7 @@ namespace bitgraph {
 		std::size_t nBBt = 0;							//number of allocated bitblocks (all should be non-empty in the sparse case)
 		double den = 0.0;
 
-		for (std::size_t i = 0; i < NV_; ++i) {
+		for (int i = 0; i < NV_; ++i) {
 			nBB = adj_[i].size();
 			nBBt += nBB;
 			den += static_cast<double>(adj_[i].count()) /
@@ -1357,13 +1357,12 @@ namespace bitgraph {
 
 
 		//write edges 1-based vertex notation
-		for (std::size_t v = 0; v < NV_; ++v) {
+		for (int v = 0; v < NV_; ++v) {
 
 			//non destructive scan of each bitstring
-			if (adj_[v].init_scan(bbo::NON_DESTRUCTIVE) != EMPTY_ELEM) {
-				while (1) {
-					int w = adj_[v].next_bit();
-					if (w == EMPTY_ELEM) { break; }
+			if (adj_[v].init_scan(bbo::NON_DESTRUCTIVE) != BBObject::noBit) {
+				int w = BBObject::noBit;
+				while ((w = adj_[v].next_bit()) != BBObject::noBit){
 					o << "e " << v + 1 << " " << w + 1 << endl;
 				}
 			}
