@@ -268,9 +268,9 @@ TEST_F(StackClassTest, basic_operations){
 	EXPECT_EQ(2, bbs.size());	
 }
 
-TEST(bbCol_tClass, basic){
+TEST(BitSetArrayClass, basic){
 	
-	_impl::bbCol_t<BBScan, 20> bbc(130);		
+	_impl::BitSetArray<BBScan, 20> bbc(130);		
 	bbc.set_bit(0,10);
 	bbc.set_bit(0,64);
 	bbc.set_bit(0,65);

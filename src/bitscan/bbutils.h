@@ -278,7 +278,7 @@ namespace bitgraph {
 
 		//////////////////////
 		// 
-		// bbCol_t class 
+		// BitSetArray class 
 		// 
 		// @brief  a very simple wrapper for a collection of bitsets of a fixed size
 		// @details: created 9/8/17 for MWCP upper bound computation, refactored 27/02/2025
@@ -288,13 +288,13 @@ namespace bitgraph {
 		///////////////////////
 
 		template <class BitSetT, int SIZE>
-		struct bbCol_t {
+		struct BitSetArray {
 
 			using basic_type = BitSetT;
-			using type = bbCol_t<BitSetT, SIZE>;
+			using type = BitSetArray<BitSetT, SIZE>;
 
 			//contructors / destructors
-			bbCol_t(int popCount) {
+			BitSetArray(int popCount) {
 				reset(popCount);
 			}
 
@@ -309,7 +309,7 @@ namespace bitgraph {
 				}
 				catch (std::exception& e) {
 					LOG_ERROR("%s", e.what());
-					LOG_ERROR("bbCol_t::bbCol_t()");
+					LOG_ERROR("BitSetArray::BitSetArray()");
 					std::exit(EXIT_FAILURE);
 				}
 			}
@@ -368,7 +368,7 @@ namespace bitgraph {
 
 	template <class BitSetT, int SIZE>
 	inline
-		BitSet& _impl::bbCol_t<BitSetT, SIZE>::set_bit(int bitsetID, int bit, bool& is_first_bit) {
+		BitSet& _impl::BitSetArray<BitSetT, SIZE>::set_bit(int bitsetID, int bit, bool& is_first_bit) {
 
 		//adds bit
 		bb_[bitsetID].set_bit(bit);
@@ -383,7 +383,7 @@ namespace bitgraph {
 
 	template <class BitSetT, int SIZE>
 	inline
-		std::ostream& _impl::bbCol_t<BitSetT, SIZE>::print(std::ostream& o, bool show_pc, bool eofl)  const {
+		std::ostream& _impl::BitSetArray<BitSetT, SIZE>::print(std::ostream& o, bool show_pc, bool eofl)  const {
 		for (auto i = 0; i < bb_.size(); ++i) {
 			if (!bb_[i].is_empty()) {
 				bb_[i].print(o, show_pc, true);
