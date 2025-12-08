@@ -14,6 +14,7 @@
 #include "utils/logger.h"
 #include "utils/common.h"
 #include "bitscan/bbconfig.h"			//for INDEX_1_TO_1 macro
+#include "bitscan/bbobject.h"
 #include "decode.h"
 #include <iostream>
 #include <vector>
