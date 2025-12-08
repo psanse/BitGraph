@@ -73,7 +73,7 @@ BitSet::BitSet(std::size_t nPop, std::initializer_list<int> l):
 		for (auto& bit : l) {
 
 			//////////////////
-			assert(bit >= 0 && bit < nPop);
+			assert(bit >= 0 && bit < static_cast<int>(nPop));
 			/////////////////
 
 			//sets bits - no prior erasing
@@ -89,10 +89,10 @@ BitSet::BitSet(std::size_t nPop, std::initializer_list<int> l):
 	}
 }
 
-void BitSet::init(std::size_t popsize) noexcept {
+void BitSet::init(std::size_t nPop) noexcept {
 
 	try {
-		nBB_ = static_cast<int>(INDEX_1TO1(popsize));
+		nBB_ = static_cast<int>(INDEX_1TO1(nPop));
 		vBB_.assign(nBB_, 0);
 	}
 	catch (...) {
@@ -103,17 +103,17 @@ void BitSet::init(std::size_t popsize) noexcept {
 
 }
 
-void BitSet::init(std::size_t popsize, const vint& lv) noexcept {
+void BitSet::init(std::size_t nPop, const vint& lv) noexcept {
 		
 	try {
-		nBB_ = static_cast<int>(INDEX_1TO1(popsize));
+		nBB_ = static_cast<int>(INDEX_1TO1(nPop));
 		vBB_.assign(nBB_, 0);
 
 		//sets bit conveniently
 		for (auto& bit : lv) {
 
 			//////////////////
-			assert(bit >= 0 && bit < popsize);
+			assert(bit >= 0 && bit < static_cast<int>(nPop));
 			/////////////////
 
 			//sets bits - no prior erasing
