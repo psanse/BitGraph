@@ -24,7 +24,7 @@
 
 //useful alias
 using vint	= std::vector<int>;
-using vbset = std::vector<bitgraph::BITBOARD>;
+using DenseBlockVec = std::vector<bitgraph::BITBOARD>;
 
 namespace bitgraph {
 
@@ -41,6 +41,7 @@ namespace bitgraph {
 		class BitSet :public BBObject {
 						
 			using index_t = BBObject::index_t;
+
 		public:
 					
 			using BBObject::npos;
@@ -281,8 +282,8 @@ namespace bitgraph {
 			**/
 			std::size_t size() const noexcept { return vBB_.size(); }
 			
-			vbset& bitset()  noexcept { return vBB_; }
-			const vbset& bitset() const  noexcept { return vBB_; }
+			DenseBlockVec& bitset()  noexcept { return vBB_; }
+			const DenseBlockVec& bitset() const  noexcept { return vBB_; }
 
 			BITBOARD block(index_t blockID)	const {
 				assert(blockID < vBB_.size());
@@ -814,8 +815,9 @@ namespace bitgraph {
 			//data members
 
 		protected:
-			int nBB_;							//number of bitblocks (redundant to vBB.size() but preserved for efficiency)
-			std::vector<BITBOARD> vBB_;			//bitset
+			DenseBlockVec vBB_;					//vector of fixed size bitblocks 
+			int nBB_;							//number of bitblocks (redundant to vBB.size(), cached for efficiency)
+		
 
 			/////////////////////////////////////////////////////////////////////////////////////////////////////////
 			// DEPRECATED friend operations, TO BE REMOVED. NOT CHECKED!! (06/02/2025)

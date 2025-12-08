@@ -19,20 +19,26 @@ using namespace std;
 
 using namespace bitgraph;
 
-
 ///////////////////////////////////////
-int BitSetSp::DEFAULT_CAPACITY = 2;
+constexpr int BitSetSp::DEFAULT_CAPACITY;
 ///////////////////////////////////////
 
 
-//////////////////////////////////////////////////////////////////////
-// Construction/Destruction
-//////////////////////////////////////////////////////////////////////
+BitSetSp::BitSetSp(std::size_t nPop):
+	nBB_(static_cast<int>(INDEX_1TO1(nPop)))
+{
 
-BitSetSp::BitSetSp(std::size_t nPop, bool is_popsize ){
+	vBB_.reserve(DEFAULT_CAPACITY);
+}
 
-	(is_popsize)? nBB_ = static_cast<int>(INDEX_1TO1(nPop)) : nBB_ = static_cast<int>(nPop);
-	vBB_.reserve(DEFAULT_CAPACITY);							
+BitSetSp bitgraph::BitSetSp::from_num_blocks(int nBlocks)
+{
+	///////////////////////////////////////////////////////////////////////////////
+	assert(nBlocks > 0 && "bizarre number of blocks - BitSetSp::from_num_blocks");
+	//////////////////////////////////////////////////////////////////////////////
+
+	std::size_t nPop = static_cast<std::size_t>WMUL(nBlocks);
+	return BitSetSp(nPop);
 }
 
 BitSetSp::BitSetSp(std::size_t nPop, const vint& lv):
@@ -387,7 +393,7 @@ BitSetSp& BitSetSp::set_bit (const BitSetSp& rhs){
 BitSetSp&  BitSetSp::set_block (int firstBlock, int lastBlock, const BitSetSp& rhs){
 			
 	//special case - the full range
-	if (lastBlock == -1) {
+	if (lastBlock == npos) {
 		return set_block(firstBlock, rhs);
 	}
 
@@ -510,18 +516,18 @@ BitSetSp&  BitSetSp::set_block (int firstBlock, int lastBlock, const BitSetSp& r
 
 int BitSetSp::clear_bit (int firstBit, int lastBit){
 	
-	int bbl = EMPTY_ELEM, bbh = EMPTY_ELEM; 
+	int bbl = npos, bbh = npos;
 	pair<bool, BlockVecIt> pl;
 	pair<bool, BlockVecIt> ph;
 
 ////////////////////////
 //special cases
-	if(lastBit == EMPTY_ELEM && firstBit == EMPTY_ELEM){
+	if(lastBit == npos && firstBit == npos){
 		vBB_.clear();
 		return 0;
 	}
 
-	if(lastBit == EMPTY_ELEM){
+	if(lastBit == npos){
 		bbl = WDIV(firstBit);
 		pl = find_block_ext(bbl);
 		if(pl.second == vBB_.end()) return 0;
@@ -535,7 +541,7 @@ int BitSetSp::clear_bit (int firstBit, int lastBit){
 		vBB_.erase(pl.second, vBB_.end());
 		return 0;
 
-	}else if(firstBit == EMPTY_ELEM){
+	}else if(firstBit == npos){
 		bbh = WDIV(lastBit); 
 		ph = find_block_ext(bbh);
 		if(ph.first){			//upper block exists
@@ -818,7 +824,7 @@ BitSetSp::find_block_pos (index_t blockID) const{
 	////////////////////////////////////////////////////////////////////////////////////////////
 
 	if(it != vBB_.end()){
-		res.second = it - vBB_.begin();
+		res.second = it - vBB_.begin();						//always positive
 		if(it->idx_ == blockID){
 			res.first = true;
 		}

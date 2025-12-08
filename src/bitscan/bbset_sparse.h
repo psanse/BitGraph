@@ -26,7 +26,7 @@
 using vint = std::vector<int>; 
 
 namespace bitgraph {
-	
+		
 	/////////////////////////////////
 	//
 	// class BitSetSp
@@ -38,7 +38,7 @@ namespace bitgraph {
 				
 		using index_t = BBObject::index_t;
 	
-		static int DEFAULT_CAPACITY;		//initial allocation of bit blocks for any new sparse bitstring - CHECK efficiency (17/02/2025)
+		static constexpr int DEFAULT_CAPACITY = 2;		//initial allocation of bit blocks for any new sparse bitstring - CHECK efficiency (17/02/2025)
 
 	public:
 		
@@ -149,12 +149,17 @@ namespace bitgraph {
 		BitSetSp() noexcept : nBB_(0) {}
 
 		/**
-		* @brief Creates an EMPTY bitset given a population size nPop
-		*		  The num_blocks of the bitset is set according to the population size
-		* @param nBits : population size if is_popsize is true, otherwise the num_blocks of the bitset
-		* @details: Exception caught inside and the program exits
+		* @brief Creates an EMPTY bitset given a population size nPop		  
+		* @param nPop : population size 
 		**/
-		explicit BitSetSp(std::size_t nPop, bool is_popsize = true);
+		explicit BitSetSp(std::size_t nPop);
+
+		/**
+		* @brief Creates an EMPTY bitset given a number of 64-blocks
+		*		 Population size nBlocks * 64
+		* @param nBlocks : number of blocks
+		**/
+		static BitSetSp from_num_blocks(int nBlocks); 
 
 		/**
 		 * @brief Creates a bitset given an initial vector lv of 1-bit elements
@@ -755,7 +760,7 @@ namespace bitgraph {
 		//data members
 
 	protected:
-		BlockVec  vBB_;					//a vector of sorted pairs of a non-empty bitblock and its index in a non-sparse bitstring
+		BlockVec  vBB_;				//a vector of sorted pairs of a non-empty bitblock and its index in a non-sparse bitstring
 		int nBB_;					//maximum number of bitblocks
 
 	}; //end BitSetSp class

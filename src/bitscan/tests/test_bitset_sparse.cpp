@@ -50,6 +50,20 @@ TEST(Sparse, construction_basic){
 	EXPECT_TRUE(bbsp.is_bit(10));
 }
 
+TEST(Sparse, construction_from_blocks) {
+
+	auto bbsp = BitSetSp::from_num_blocks(16);
+
+	bbsp.set_bit(500);
+	bbsp.set_bit(700);
+	bbsp.set_bit(900);
+
+	EXPECT_EQ(3, bbsp.count());						//bbsp = {500, 700, 900}
+	EXPECT_TRUE(bbsp.is_bit(500));
+	EXPECT_TRUE(bbsp.is_bit(700));
+	EXPECT_TRUE(bbsp.is_bit(900));
+}
+
 TEST(Sparse, construction_from_vector) {
 
 	vector<int> lv = { 100, 200, 300, 400, 500 };
@@ -589,7 +603,7 @@ TEST(Sparse, operators){
 	EXPECT_TRUE(bbsp==resOR);
 
 	//AND
-	BitSetSp bbsp2(130,true);
+	BitSetSp bbsp2(130);
 	bbsp2.set_bit(54);
 	BitSetSp resAND(130);
 	AND(bbsp1,bbsp2,resAND);
