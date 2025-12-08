@@ -2,10 +2,10 @@
   * @file bbset_sparse.h
   * @brief header for sparse class equivalent to the BitSetSp class
   * @author pss
-  * @details created 19/12/2015?, @last_update 15/02/2025
+  * @details created 19/12/2015?, @last_update 08/12/2025 (improved design, types etc.)
   *
-  * TODO - complete BitSet class interface (25/02/2025)	
-  * TODO - check inlining and header / cpp implementations (25/02/2025)
+  * TODO - Improve BitSet class interface (08/12/2025)	
+  * TODO - check inlining and header / cpp implementations (08/12/2025) 
   **/
 
 #ifndef __BBSET_SPARSE_H__
@@ -167,7 +167,7 @@ namespace bitgraph {
 		 *		  The num_blocks of the bitset is set according to nPop
 		 * @param nPop: population size
 		 * @param lv : vector of integers representing 1-bits in the bitset
-		 * @details: Exception caught inside and the program exits
+		* @details: fast-fail policy, exception caught inside and the program exits
 		 **/
 		explicit BitSetSp(std::size_t nPop, const vint& lv);
 
@@ -177,7 +177,7 @@ namespace bitgraph {
 		*		  The num_blocks of the bitset is set according to nPop
 		* @param nPop: population size
 		* @param lv : set of integers representing 1-bits in the bitset
-		* @details: Exception caught inside and the program exits
+		* @details: fast-fail policy, exception caught inside and the program exits
 		**/
 		explicit  BitSetSp(std::size_t nPop, std::initializer_list<int> lv);
 
@@ -198,9 +198,7 @@ namespace bitgraph {
 		* @param nPop: population size
 		* @param is_popsize: if true, the population size is set to nPop, otherwise the
 		*					  it is the maximum number of bitblocks of the bitset
-		* @details: Fail-fast strategy - exception caught inside and the program exits
-		*
-		* TODO- change API (04/12/2025)
+		* @details: fast-fail policy, exception caught inside and the program exits
 		**/
 		void reset(std::size_t nPop, bool is_popsize = true) noexcept;
 
@@ -208,14 +206,14 @@ namespace bitgraph {
 		* @brief resets the sparse bitset to a new population size with lv 1-bits
 		* @param nPop: population size
 		* @param lv: vector of 1-bits to set
-		* @details:  Fail-fast strategy - exception caught inside and the program exits
+		* @details: fast-fail policy, exception caught inside and the program exits
 		**/
 		void reset(std::size_t nPop, const vint& lv) noexcept;
 
 		/**
 		* @brief resets the sparse bitset to a new population size, old syntax
 		*		 now favoured by reset(...).
-		* @details:  Fail-fast strategy - exception caught inside and the program exits
+		* @details: fast-fail policy, exception caught inside and the program exits
 		**/
 		void init(std::size_t nPop, bool is_popsize = true) noexcept;
 
@@ -334,8 +332,8 @@ namespace bitgraph {
 		**/
 		BlockVecIt   begin() { return vBB_.begin(); }
 		BlockVecIt   end() { return vBB_.end(); }
-		BlockVecConstIt cbegin()					const { return vBB_.cbegin(); }
-		BlockVecConstIt cend()						const { return vBB_.cend(); }
+		BlockVecConstIt cbegin() const { return vBB_.cbegin(); }
+		BlockVecConstIt cend() const { return vBB_.cend(); }
 
 		//////////////////////////////
 		// Bitscanning (no cache) 
@@ -356,8 +354,8 @@ namespace bitgraph {
 		inline  int msbn64_intrin()						const;
 
 	public:
-		int msb()						const { return msbn64_intrin(); }
-		int msb(int& block)				const { return msbn64_intrin(block); }
+		int msb()	const { return msbn64_intrin(); }
+		int msb(int& block)	 const { return msbn64_intrin(block); }
 	protected:
 
 		/**
@@ -366,7 +364,7 @@ namespace bitgraph {
 		*			an internal switch (see config.h)
 		* @returns index of the most significant bit in the bitstring
 		**/
-		inline	int lsbn64_non_intrin()						const;
+		inline	int lsbn64_non_intrin()					const;
 
 		/**
 		* @brief Determines the most significant bit in the bitstring
@@ -376,8 +374,8 @@ namespace bitgraph {
 		inline  int lsbn64_intrin()						const;
 
 	public:
-		int lsb()						const { return lsbn64_intrin(); }
-		int lsb(int& block)			const { return lsbn64_intrin(block); }
+		int lsb() const { return lsbn64_intrin(); }
+		int lsb(int& block)	const { return lsbn64_intrin(block); }
 
 	public:
 
@@ -610,7 +608,7 @@ namespace bitgraph {
 		* @brief erase operation which effectively removes the zero blocks
 		* @details EXPERIMENTAL - does not look efficient,
 		*
-		* TODO - refactor, actually used elsewhere in GRAPH. CHECK!! (19/02/2025)
+		* TODO - refactor, actually used elsewhere in GRAPH. CHECK (19/02/2025)
 		**/
 		int	 clear_bit(int firstBit, int lastBit);
 
@@ -625,7 +623,7 @@ namespace bitgraph {
 		* @returns reference to the modified bitstring
 		**/
 		inline  BitSetSp& erase_block(int firstBlock, int lastBlock, const BitSetSp& bitset);
-
+	
 	protected:
 		/**
 		* @brief Deletes the 1-bits from the bitstring bb_del in the SEMI_OPEN range [firstBlock, min{rhs.nBB_, *this->nBB_})

@@ -153,8 +153,8 @@ void BitSetSp::init (std::size_t size, bool is_popsize) noexcept {
 
 BitSetSp& BitSetSp::set_bit(int firstBit, int lastBit)
 {
-	auto bbl = WDIV(firstBit);					//block index firstBit
-	auto bbh = WDIV(lastBit);					//block index lastBit
+	index_t bbl = WDIV(firstBit);					//block index firstBit
+	index_t bbh = WDIV(lastBit);					//block index lastBit
 
 	/////////////////////////////////////////////////////////
 	assert(firstBit >= 0 && firstBit <= lastBit && bbh<nBB_ );
@@ -166,7 +166,7 @@ BitSetSp& BitSetSp::set_bit(int firstBit, int lastBit)
 	bool flag_sort = false;						//flag to sort the collection
 
 	//finds position of block closest to blockID (equal or greater index)
-	auto posTHIS = npos;							//block position *this	
+	auto posTHIS = npos;						//block position *this	
 	auto itbl = find_block(bbl, posTHIS);
 			
 
@@ -305,8 +305,8 @@ BitSetSp& BitSetSp::set_bit(int firstBit, int lastBit)
 
 BitSetSp& BitSetSp::reset_bit(int firstBit, int lastBit){
 
-	auto bbh = WDIV(lastBit);
-	auto bbl = WDIV(firstBit);
+	index_t bbh = WDIV(lastBit);
+	index_t bbl = WDIV(firstBit);
 
 	///////////////////////////////// 
 	assert(bbl >= 0 && bbh < nBB_);
@@ -316,13 +316,13 @@ BitSetSp& BitSetSp::reset_bit(int firstBit, int lastBit){
 	
 	//special case: same bitblock
 	if(bbh == bbl){	
-		vBB_.emplace_back( SparseBlock( bbl, bblock::MASK_1(firstBit - WMUL(bbl), lastBit - WMUL(bbh))));
+		vBB_.emplace_back( SparseBlock( bbl, bblock::MASK_1(WMOD(firstBit), WMOD(lastBit))));
 	}
 	else {
 
 		//first and last blocks
-		vBB_.emplace_back(SparseBlock(bbl, bblock::MASK_1_HIGH(firstBit - WMUL(bbl))));
-		vBB_.emplace_back(SparseBlock(bbh, bblock::MASK_1_LOW(lastBit - WMUL(bbh))));
+		vBB_.emplace_back(SparseBlock(bbl, bblock::MASK_1_HIGH(WMOD(firstBit))));
+		vBB_.emplace_back(SparseBlock(bbh, bblock::MASK_1_LOW(WMOD(lastBit))));
 
 		//in-between blocks
 		for (auto block = bbl + 1; block < bbh; ++block) {
@@ -405,7 +405,7 @@ BitSetSp&  BitSetSp::set_block (int firstBlock, int lastBlock, const BitSetSp& r
 	// Initialization
 
 	//this		
-	auto posL = npos;																//position of firstBlock in THIS or closest block
+	index_t posL = npos;																//position of firstBlock in THIS or closest block
 	auto itL = find_block(firstBlock, posL);										//iterator for THIS O(log n)
 	(itL != vBB_.end()) ? posL = static_cast<int>(itL - vBB_.begin()) : 1;			//sets posL to itL
 	
@@ -516,7 +516,8 @@ BitSetSp&  BitSetSp::set_block (int firstBlock, int lastBlock, const BitSetSp& r
 
 int BitSetSp::clear_bit (int firstBit, int lastBit){
 	
-	int bbl = npos, bbh = npos;
+	index_t bbl = npos;
+	index_t bbh = npos;
 	pair<bool, BlockVecIt> pl;
 	pair<bool, BlockVecIt> ph;
 
@@ -694,7 +695,7 @@ BitSetSp& BitSetSp::operator &= (const BitSetSp& rhs){
 
 BitSetSp& BitSetSp::operator |= (const BitSetSp& rhs){
 
-	auto posL = 0;					//position *this
+	index_t posL = 0;					//position *this
 	auto itR = rhs.cbegin();		//iterator to rhs
 	auto sizeL = vBB_.size();		//stores the original size of *this since it will be modified
 	bool flag_sort = false;			//flag to sort the collection
@@ -746,7 +747,7 @@ BitSetSp& BitSetSp::operator |= (const BitSetSp& rhs){
 
 BitSetSp& BitSetSp::operator ^= (const BitSetSp& rhs) {
 
-	auto posL = 0;					//position *this	
+	index_t posL = 0;					//position *this	
 	auto itR = rhs.cbegin();		//iterator to rhs
 	auto sizeL = vBB_.size();		//stores the original size of *this since it will be modified
 	bool flag_sort = false;			//flag to sort the collection
