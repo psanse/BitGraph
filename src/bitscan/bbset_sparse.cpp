@@ -52,7 +52,7 @@ BitSetSp::BitSetSp(std::size_t nPop, const vint& lv):
 		for (auto& bit : lv) {
 
 			//////////////////
-			assert(bit >= 0 && bit < nPop);
+			assert(bit >= 0 && bit < static_cast<int>(nPop));
 			/////////////////
 
 			//sets bits - adds pBlocks in place
@@ -79,7 +79,7 @@ BitSetSp::BitSetSp(std::size_t nPop, std::initializer_list<int> lv) :
 		for (auto& bit : lv) {
 
 			//////////////////
-			assert(bit >= 0 && bit < nPop);
+			assert(bit >= 0 && bit < static_cast<int>(nPop));
 			/////////////////
 
 			//sets bits - adds pBlocks in place
@@ -123,7 +123,7 @@ void BitSetSp::reset(std::size_t nPop, const vint& lv) noexcept
 		for (auto& bit : lv) {
 
 			//////////////////
-			assert(bit >= 0 && bit < nPop);
+			assert(bit >= 0 && bit < static_cast<int>(nPop));
 			/////////////////
 
 			//sets bits - adds pBlocks in place
@@ -398,7 +398,7 @@ BitSetSp&  BitSetSp::set_block (int firstBlock, int lastBlock, const BitSetSp& r
 	}
 
 	//////////////////////////////////////////////////////////////////////////////////
-	assert(firstBlock >= 0 && firstBlock <= lastBlock && lastBlock < rhs.num_blocks());
+	assert(firstBlock >= 0 && firstBlock <= lastBlock && lastBlock < static_cast<int>(rhs.num_blocks()));
 	//////////////////////////////////////////////////////////////////////////////////
 
 	////////////////////////

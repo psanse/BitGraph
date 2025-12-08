@@ -1372,7 +1372,7 @@ namespace bitgraph {
 		}
 
 		//////////////////////////////////////////////////////////////////////////////////
-		assert( (firstBlock >= 0) && (firstBlock <= lastBlock) && (lastBlock < rhs.num_blocks()));
+		assert( (firstBlock >= 0) && (firstBlock <= lastBlock) && (lastBlock < static_cast<int>(rhs.num_blocks())));
 		//////////////////////////////////////////////////////////////////////////////////
 
 		//determine the closest block in the range for both bitstrings
@@ -1457,7 +1457,7 @@ namespace bitgraph {
 		index_t bbl = WDIV(firstBit);
 
 		/////////////////////////
-		assert(bbh < num_blocks());
+		assert(bbh < static_cast<int>(num_blocks()));
 		/////////////////////////
 
 		auto offsetl = WMOD(firstBit);
@@ -1569,7 +1569,7 @@ namespace bitgraph {
 		index_t bbh = WDIV(lastBit);
 
 		////////////////////////////////////////////////////////////////////////////////////
-		assert((bbl >= 0) && (bbl <= bbh) && (bbh < nBB_) && (bbh < rhs.num_blocks()));
+		assert((bbl >= 0) && (bbl <= bbh) && (bbh < nBB_) && (bbh < static_cast<int>(rhs.num_blocks()());
 		///////////////////////////////////////////////////////////////////////////////////
 
 		vBB_.clear();
