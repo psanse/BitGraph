@@ -130,8 +130,19 @@ namespace bitgraph {
 			void set_path(std::string path_name) { g_.set_path(path_name); }
 			std::string path()			const { return g_.path(); }
 
+			/**
+			* @brief number of vertices of the graph
+			* @returns: number of vertices (int type)
+			* @details: internal use
+			**/
 			int num_vertices()			const { return g_.num_vertices(); }
-			int size()			const { return g_.num_vertices(); }
+			
+			/**
+			* @brief number of vertices of the graph - consumer code
+			* @returns: number of vertices (std::size_t type)
+			* @details: for consumer code
+			**/
+			std::size_t size()			const { return g_.size(); }
 
 			std::size_t num_edges(bool lazy = true) { return g_.num_edges(lazy); }
 

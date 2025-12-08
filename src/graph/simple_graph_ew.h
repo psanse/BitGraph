@@ -113,7 +113,7 @@ namespace bitgraph {
 			/*
 			*  @brief getter for the specific subset of vertex-weights
 			*/
-			vecw<W> vertex_weights()						const;
+			vecw<W> vertex_weights()					const;
 
 			/**
 			*  @brief getter for the all the weights (vertex and edge-weights)
@@ -127,12 +127,19 @@ namespace bitgraph {
 			Graph_t& graph() { return g_; }
 			const Graph_t& graph()						const { return g_; }
 
-			std::size_t num_vertices()					const { return g_.num_vertices(); }
-
 			/**
-			* @brief alias for the num_vertices function
+			* @brief number of vertices of the graph 
+			* @returns: number of vertices (int type)
+			* @details: internal use
 			**/
-			std::size_t size()						const { return g_.num_vertices(); }
+			int num_vertices()							const { return g_.num_vertices(); }
+			
+			/**
+			* @brief number of vertices of the graph - consumer code
+			* @returns: number of vertices (std::size_t type)
+			* @details: for consumer code
+			**/
+			std::size_t size()							const { return g_.size(); }
 
 			std::size_t num_edges(bool lazy = true) { return g_.num_edges(lazy); }
 
