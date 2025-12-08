@@ -42,14 +42,15 @@ namespace bitgraph {
 
 	public:
 		
-		using BBObject::npos;
+		using BBObject::npos;			//invalid index
+		using BBObject::noBit;			//invalid bit
 		
 		struct SparseBlock {
 			
 			index_t idx_;
 			BITBOARD bb_;
 
-			SparseBlock(int idx = npos, BITBOARD bb = 0) : idx_(idx), bb_(bb) {}
+			SparseBlock(index_t idx = npos, BITBOARD bb = 0) : idx_(idx), bb_(bb) {}
 
 			bool operator ==	(const SparseBlock& e)	const { return (idx_ == e.idx_ && bb_ == e.bb_); }
 			bool operator !=	(const SparseBlock& e)	const { return (idx_ != e.idx_ || bb_ != e.bb_); }

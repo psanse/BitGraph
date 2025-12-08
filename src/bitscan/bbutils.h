@@ -1,12 +1,9 @@
  /**
-  * @file bbalgorithm.h
-  * @brief header for the algorithms and data structures for bitstrings and bitblocks
-  *		   includes namespace bbalg at the end with a few algorithms
+  * @file bbutils.h
+  * @brief contains composite bitset classes and other utility functions for the BITSCAN library
   * @author pss
-  * @details created 2017, last_update 06/12/2025
-  * 
-  * TODO - change filename to bbutils.h (27/02/2025)
-  **/
+  * @details created 2017, last_update 08/12/2025
+ **/
 
 #ifndef  __BBUTILS_H__
 #define  __BBUTILS_H__
