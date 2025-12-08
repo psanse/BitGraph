@@ -457,7 +457,7 @@ namespace bitgraph {
         char buffer[MM_MAX_LINE_LENGTH];
         char* types[4];
         char* mm_strdup(const char*);
-        int error = 0;
+        //int error = 0;
 
         /* prevent uninitialized variable warning */
         for (int i=0; i<4; ++i)
@@ -468,7 +468,8 @@ namespace bitgraph {
             //types[0] = MM_MTX_STR;
             strcpy(types[0], MM_MTX_STR);
         else
-            error = 1; // FIXME unused
+            return nullptr;
+           // error = 1; // FIXME unused
 
         /* check for CRD or ARR matrix */
         if (mm_is_sparse(matcode))
