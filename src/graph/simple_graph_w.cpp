@@ -47,9 +47,9 @@ const W Base_Graph_W <Graph_t, W >::DEFAULT_WEIGHT = 1.0;
 template<class Graph_t, class W>
 void Base_Graph_W<Graph_t, W>::complement_weights()
 {
-	auto NV = size();
+	auto nV = num_vertices();
 
-	for (auto v = 0; v < NV; ++v) {
+	for (int v = 0; v < nV; ++v) {
 		if (weight(v) != NO_WEIGHT) {
 			w_[v] = - w_[v];	
 		}
@@ -133,7 +133,7 @@ template <class Graph_t, class W>
 int	Base_Graph_W<Graph_t,W >::set_weight (vector<W>& lw){
 
 	//assert
-	if( g_.num_vertices() != lw.size() ){
+	if( g_.size() != lw.size() ){
 		LOG_ERROR ("bizarre number of weights - Base_Graph_W<Graph_t,W >::set_w");
 		LOG_ERROR ("weights remain unchanged");
 		return -1;
@@ -373,7 +373,7 @@ int Base_Graph_W<Graph_t, W>::read_weights(string filename) {
 
 	//reads weights
 	double w = -1.0;
-	for (std::size_t i = 0; i < NV; ++i) {
+	for (int i = 0; i < NV; ++i) {
 		f >> w;
 		if (f.fail()) {
 			LOGG_ERROR("bad reading of weights in:", filename, "- Base_Graph_W<Graph_t, W>::read_weights");

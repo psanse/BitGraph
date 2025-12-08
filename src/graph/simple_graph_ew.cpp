@@ -410,7 +410,7 @@ ostream& Base_Graph_EW<Graph_t, W>::print_weights (ostream& o, bool line_format,
 template<class Graph_t, class W>
 std::ostream& Base_Graph_EW<Graph_t, W>::print_edge_weights(std::ostream& o, bool line_format) const
 {
-	const auto NV = g_.size();
+	const auto NV = g_.num_vertices();
 
 	//streams edge-weights 
 	if (line_format) {
@@ -424,8 +424,8 @@ std::ostream& Base_Graph_EW<Graph_t, W>::print_edge_weights(std::ostream& o, boo
 		}*/
 	}
 	else {								//outputs to stream edge-weights in matrix form
-		for (auto i = 0; i < NV; ++i) {
-			for (auto j = 0; j < NV; ++j) {
+		for (int i = 0; i < NV; ++i) {
+			for (int j = 0; j < NV; ++j) {
 				if (we_[i][j] != Base_Graph_EW<Graph_t, W>::NO_WEIGHT) {
 					o << we_[i][j] << '\t';
 				}
@@ -443,9 +443,9 @@ std::ostream& Base_Graph_EW<Graph_t, W>::print_edge_weights(std::ostream& o, boo
 template<class Graph_t, class W>
 std::ostream& Base_Graph_EW<Graph_t, W>::print_vertex_weights(std::ostream& o) const
 {
-	const auto NV = g_.size();	
+	const auto NV = g_.num_vertices();	
 
-	for (auto v = 0; v < NV; v++) {
+	for (int v = 0; v < NV; v++) {
 		if (we_[v][v] != Base_Graph_EW<Graph_t, W>::NO_WEIGHT) {
 			o << "[" << v << ":(" << we_[v][v] << ")] " << endl;
 		}
