@@ -286,11 +286,11 @@ namespace bitgraph {
 			const DenseBlockVec& bitset() const  noexcept { return vBB_; }
 
 			BITBOARD block(index_t blockID)	const {
-				assert(blockID < vBB_.size());
+				assert(blockID < static_cast<index_t>(vBB_.size()));
 				return vBB_[blockID]; 
 			}
 			BITBOARD& block(index_t blockID) {
-				assert(blockID < vBB_.size());
+				assert(blockID < static_cast<index_t>(vBB_.size()));
 				return vBB_[blockID];
 			}
 

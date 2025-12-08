@@ -228,7 +228,7 @@ namespace bitgraph {
 		//setters and getters (will not allocate memory)
 
 		/**
-		* @brief number of non-zero bitblocks in the bitstring
+		* @brief number of non-zero bitblocks in the sparse bitset
 		* @details As opposed to the non-sparse case, it can be zero if there are no 1-bits
 		*		   even though the maximum number of bitblocks determined in construction nBB_
 		*		   can be anything.
@@ -236,7 +236,7 @@ namespace bitgraph {
 		std::size_t size()				const noexcept { return vBB_.size(); }
 
 		/**
-		* @brief maximum number of bitblocks in the bitset
+		* @brief number of non-zero bitblocks in the sparse bitset
 		* @details the num_blocks is determined by the population size (construction),
 		* 		   - comment: NOT the size of @vBB_, which is the non-zero bitblocks in the bitset
 		**/
@@ -623,7 +623,7 @@ namespace bitgraph {
 		* @param bitset: input bitstring whose 1-bits are to be removed from *this
 		* @returns reference to the modified bitstring
 		**/
-		inline  BitSetSp& erase_block(int firstBlock, int lastBlock, const BitSetSp& bitset);
+		inline  BitSetSp& erase_block(index_t firstBlock, index_t lastBlock, const BitSetSp& bitset);
 	
 	protected:
 		/**
@@ -635,7 +635,7 @@ namespace bitgraph {
 		* @param bitset: input bitstring whose 1-bits are to be removed from *this
 		* @returns reference to the modified bitstring
 		**/
-		inline BitSetSp& erase_block(int firstBlock, const BitSetSp& bitset);
+		inline BitSetSp& erase_block(index_t firstBlock, const BitSetSp& bitset);
 
 	public:
 		/**
@@ -705,9 +705,9 @@ namespace bitgraph {
 
 		/**
 		* @brief TRUE if this bitstring has no bits in common with rhs
-		*		 in the closed range [first_block, last_block]
+		*		 in the closed range [firstBlock, lastBlock]
 		**/
-		inline	bool is_disjoint_block(index_t first_block, index_t last_block, const BitSetSp& bb)   const;
+		inline	bool is_disjoint_block(index_t firstBlock, index_t lastBlock, const BitSetSp& bb)   const;
 
 		////////////////////////
 		 //Other operations 
@@ -832,22 +832,22 @@ namespace bitgraph {
 	}
 
 
-	bool BitSetSp::is_disjoint_block(index_t first_block, index_t last_block, const BitSetSp& rhs)   const {
+	bool BitSetSp::is_disjoint_block(index_t firstBlock, index_t lastBlock, const BitSetSp& rhs)   const {
 
 		///////////////////////////////////////////////////////////////////////////////////
-		assert(first_block >= 0 && first_block <= last_block && (last_block < rhs.num_blocks()));
+		assert(firstBlock >= 0 && firstBlock <= lastBlock && (lastBlock < static_cast<index_t>(rhs.num_blocks())));
 		///////////////////////////////////////////////////////////////////////////////////
 
 		auto posL = npos;
 		auto posR = npos;
-		auto itL = find_block(first_block, posL);
-		auto itR = rhs.find_block(first_block, posR);
+		auto itL = find_block(firstBlock, posL);
+		auto itR = rhs.find_block(firstBlock, posR);
 
 		//main loop
 		while (itL != vBB_.end() &&
-			itL->idx_ <= last_block &&
+			itL->idx_ <= lastBlock &&
 			itR != rhs.vBB_.end() &&
-			itR->idx_ <= last_block)
+			itR->idx_ <= lastBlock)
 		{
 
 			if (itL->idx_ < itR->idx_) {
@@ -1266,9 +1266,9 @@ namespace bitgraph {
 	BitSetSp& BitSetSp::AND_block(index_t firstBlock, const BitSetSp& rhs) {
 
 		//determine the closes block to firstBlock
-		auto posL = npos;
+		index_t posL = npos;
 		auto itL = this->find_block(firstBlock, posL);				//*this
-		auto posR = npos;
+		index_t posR = npos;
 		auto itR = rhs.find_block(firstBlock, posR);				//rhs
 
 		while (itL != vBB_.end() && itR != rhs.vBB_.end())
@@ -1364,7 +1364,7 @@ namespace bitgraph {
 
 
 
-	BitSetSp& BitSetSp::erase_block(int firstBlock, int lastBlock, const BitSetSp& rhs)
+	BitSetSp& BitSetSp::erase_block(index_t firstBlock, index_t lastBlock, const BitSetSp& rhs)
 	{
 		//special case until the end of the bitset
 		if (lastBlock == -1) {
@@ -1372,7 +1372,7 @@ namespace bitgraph {
 		}
 
 		//////////////////////////////////////////////////////////////////////////////////
-		assert(firstBlock >= 0 && firstBlock <= lastBlock && lastBlock < rhs.num_blocks());
+		assert( (firstBlock >= 0) && (firstBlock <= lastBlock) && (lastBlock < rhs.num_blocks()));
 		//////////////////////////////////////////////////////////////////////////////////
 
 		//determine the closest block in the range for both bitstrings
@@ -1410,7 +1410,7 @@ namespace bitgraph {
 	}
 
 
-	BitSetSp& BitSetSp::erase_block(int firstBlock, const BitSetSp& rhs) {
+	BitSetSp& BitSetSp::erase_block(index_t firstBlock, const BitSetSp& rhs) {
 
 
 		//determine the closest block in the range for both bitstrings
@@ -1453,15 +1453,15 @@ namespace bitgraph {
 		assert(firstBit >= 0 && firstBit <= lastBit);
 		//////////////////////////////////////////////
 
-		auto bbh = WDIV(lastBit);
-		auto bbl = WDIV(firstBit);
+		index_t bbh = WDIV(lastBit);
+		index_t bbl = WDIV(firstBit);
 
 		/////////////////////////
 		assert(bbh < num_blocks());
 		/////////////////////////
 
-		auto offsetl = firstBit - WMUL(bbl);
-		auto offseth = lastBit - WMUL(bbh);
+		auto offsetl = WMOD(firstBit);
+		auto offseth = WMOD(lastBit);
 
 		//determines the block in bbl or the closest one with greater index 
 		auto it = lower_bound(vBB_.begin(), vBB_.end(), SparseBlock(bbl), pBlock_less());
@@ -1528,7 +1528,7 @@ namespace bitgraph {
 
 	BitSetSp& BitSetSp::reset_bit(int lastBit, const BitSetSp& rhs) {
 
-		auto bbh = WDIV(lastBit);
+		index_t bbh = WDIV(lastBit);
 
 		////////////////////////
 		assert(bbh < nBB_);
@@ -1565,8 +1565,8 @@ namespace bitgraph {
 		}
 		///////////////////////////////
 
-		auto bbl = WDIV(firstBit);
-		auto bbh = WDIV(lastBit);
+		index_t bbl = WDIV(firstBit);
+		index_t bbh = WDIV(lastBit);
 
 		////////////////////////////////////////////////////////////////////////////////////
 		assert((bbl >= 0) && (bbl <= bbh) && (bbh < nBB_) && (bbh < rhs.num_blocks()));
@@ -1583,8 +1583,8 @@ namespace bitgraph {
 		}
 
 		//first block exists
-		auto offsetl = firstBit - WMUL(bbl);
-		auto offseth = lastBit - WMUL(bbh);
+		auto offsetl = WMOD(firstBit);
+		auto offseth = WMOD(lastBit);
 		if (it->idx_ == bbl)
 		{
 			//special case, the range is a singleton, exit condition
@@ -1836,8 +1836,9 @@ namespace bitgraph {
 
 
 	inline
-		BitSetSp& AND_block(BitSetSp::index_t firstBlock, BitSetSp::index_t lastBlock, const BitSetSp& lhs, const BitSetSp& rhs, BitSetSp& res) {
-
+		BitSetSp& AND_block(BitSetSp::index_t firstBlock, BitSetSp::index_t lastBlock, const BitSetSp& lhs, const BitSetSp& rhs, BitSetSp& res) 
+	{
+		
 		///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		assert(firstBlock >= 0 && firstBlock <= lastBlock && lastBlock < rhs.num_blocks() && lastBlock < lhs.num_blocks());
 		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1847,8 +1848,8 @@ namespace bitgraph {
 		res.vBB_.reserve(std::min(lhs.vBB_.size(), rhs.vBB_.size()));
 		//////////////////////////////////////////////////////////////
 
-		auto posL = BitSetSp::npos;
-		auto posR = BitSetSp::npos;
+		BitSetSp::index_t posL = BitSetSp::npos;
+		BitSetSp::index_t posR = BitSetSp::npos;
 		auto itL = lhs.find_block(firstBlock, posL);
 		auto itR = rhs.find_block(firstBlock, posR);
 
