@@ -1569,7 +1569,7 @@ namespace bitgraph {
 		index_t bbh = WDIV(lastBit);
 
 		////////////////////////////////////////////////////////////////////////////////////
-		assert((bbl >= 0) && (bbl <= bbh) && (bbh < nBB_) && (bbh < static_cast<int>(rhs.num_blocks()());
+		assert((bbl >= 0) && (bbl <= bbh) && (bbh < nBB_) && (bbh < static_cast<int>(rhs.num_blocks())));
 		///////////////////////////////////////////////////////////////////////////////////
 
 		vBB_.clear();
