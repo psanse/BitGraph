@@ -1095,8 +1095,8 @@ namespace bitgraph {
 		//resets g with new allocation
 		if (g.reset(NV_) == -1) return -1;
 
-		for (auto i = 0u; i < NV_ - 1; ++i) {
-			for (auto j = i + 1; j < NV_; ++j) {
+		for (int i = 0; i < NV_ - 1; ++i) {
+			for (int j = i + 1; j < NV_; ++j) {
 
 				if (!adj_[i].is_bit(j)) {
 					g.add_edge(i, j);
@@ -1115,8 +1115,8 @@ namespace bitgraph {
 	inline
 		void Graph<BitSetT>::make_bidirected() {
 
-		for (auto i = 0u; i < NV_; ++i) {
-			for (auto j = 0u; j < NV_; ++j) {
+		for (int i = 0; i < NV_; ++i) {
+			for (int j = 0; j < NV_; ++j) {
 				if (is_edge(i, j)) add_edge(j, i);
 				if (is_edge(j, i)) add_edge(i, j);
 			}

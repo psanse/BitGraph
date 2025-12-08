@@ -16,7 +16,7 @@
 #define __BB_SENTINEL_H__
 
 #include "bitscan/bbscan.h"
-#include "bitscan/bbalgorithm.h"			//MIN, MAX
+#include "bitscan/bbutils.h"			//MIN, MAX
 
 
 namespace bitgraph {

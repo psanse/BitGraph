@@ -6,7 +6,7 @@
 * @author pss
 **/
 
-#include "bitscan/bbalgorithm.h"				
+#include "bitscan/bbutils.h"				
 #include "bitscan/bbscan.h"
 #include "bitscan/bbscan_sparse.h"
 #include "gtest/gtest.h"

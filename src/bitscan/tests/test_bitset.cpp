@@ -7,7 +7,7 @@
 **/
 
 #include "bitscan/bbset.h"	
-#include "bitscan/bbalgorithm.h"
+#include "bitscan/bbutils.h"
 #include "gtest/gtest.h"
 #include <iostream>
 #include <set>	
