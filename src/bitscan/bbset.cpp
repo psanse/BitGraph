@@ -369,95 +369,93 @@ BitSet& BitSet::set_bit(const vint& lv) {
 
 namespace bitgraph {
 
-	namespace _impl {
 
-		BitSet& AND(const BitSet& lhs, const BitSet& rhs, BitSet& res) {
 
-			for (auto i = 0; i < lhs.nBB_; ++i) {
-				res.vBB_[i] = lhs.vBB_[i] & rhs.vBB_[i];
-			}
+	BitSet& AND(const BitSet& lhs, const BitSet& rhs, BitSet& res) {
 
-			return res;
+		for (auto i = 0; i < lhs.nBB_; ++i) {
+			res.vBB_[i] = lhs.vBB_[i] & rhs.vBB_[i];
 		}
 
-		BitSet& OR(const BitSet& lhs, const BitSet& rhs, BitSet& res) {
+		return res;
+	}
 
-			for (auto i = 0; i < lhs.nBB_; ++i) {
-				res.vBB_[i] = lhs.vBB_[i] | rhs.vBB_[i];
-			}
+	BitSet& OR(const BitSet& lhs, const BitSet& rhs, BitSet& res) {
 
-			return res;
+		for (auto i = 0; i < lhs.nBB_; ++i) {
+			res.vBB_[i] = lhs.vBB_[i] | rhs.vBB_[i];
 		}
 
-
-
-		//BitSet AND_block(int firstBlock, int lastBlock, BitSet lhs, const BitSet& rhs)
-		//{
-		//	////////////////////////////////////////////////////////////////////
-		//	//assert((firstBlock >= 0) && (LastBlock < lhs.nBB_) &&
-		//	//	(firstBlock <= lastBlock) && (rhs.nBB_ == lhs.nBB_));
-		//	////////////////////////////////////////////////////////////////////
-		//
-		//	//int last_block = ((lastBlock == Bitset::npos) ? lhs.nBB_ - 1 : lastBlock);
-		//
-		//	//for (auto i = firstBlock; i <= last_block; ++i) {
-		//	//	lhs.vBB_[i] &= rhs.vBB_[i];
-		//	//}
-		//
-		//	////set bits to 0 outside the range 
-		//	//for (int i = lastBlock + 1; i < lhs.nBB_; ++i) {
-		//	//	lhs.vBB_[i] = ZERO;
-		//	//}
-		//	//for (int i = 0; i < firstBlock; ++i) {
-		//	//	lhs.vBB_[i] = ZERO;
-		//	//}
-		//
-		//	//return lhs;
-		//}
+		return res;
+	}
 
 
 
-		BitSet& erase_bit(const BitSet& lhs, const BitSet& rhs, BitSet& res) {
+	//BitSet AND_block(int firstBlock, int lastBlock, BitSet lhs, const BitSet& rhs)
+	//{
+	//	////////////////////////////////////////////////////////////////////
+	//	//assert((firstBlock >= 0) && (LastBlock < lhs.nBB_) &&
+	//	//	(firstBlock <= lastBlock) && (rhs.nBB_ == lhs.nBB_));
+	//	////////////////////////////////////////////////////////////////////
+	//
+	//	//int last_block = ((lastBlock == Bitset::npos) ? lhs.nBB_ - 1 : lastBlock);
+	//
+	//	//for (auto i = firstBlock; i <= last_block; ++i) {
+	//	//	lhs.vBB_[i] &= rhs.vBB_[i];
+	//	//}
+	//
+	//	////set bits to 0 outside the range 
+	//	//for (int i = lastBlock + 1; i < lhs.nBB_; ++i) {
+	//	//	lhs.vBB_[i] = ZERO;
+	//	//}
+	//	//for (int i = 0; i < firstBlock; ++i) {
+	//	//	lhs.vBB_[i] = ZERO;
+	//	//}
+	//
+	//	//return lhs;
+	//}
 
 
-			for (auto i = 0; i < lhs.nBB_; ++i) {
-				res.vBB_[i] = lhs.vBB_[i] & ~rhs.vBB_[i];
-			}
 
-			return res;
+	BitSet& erase_bit(const BitSet& lhs, const BitSet& rhs, BitSet& res) {
+
+
+		for (auto i = 0; i < lhs.nBB_; ++i) {
+			res.vBB_[i] = lhs.vBB_[i] & ~rhs.vBB_[i];
 		}
 
-		int find_first_common(const BitSet& lhs, const BitSet& rhs) {
+		return res;
+	}
 
-			for (auto i = 0; i < lhs.nBB_; ++i) {
-				BITBOARD bb = lhs.vBB_[i] & rhs.vBB_[i];
-				if (bb) {
-					return bblock::lsb(bb) + static_cast<int>(WMUL(i));
-				}
+	int find_first_common(const BitSet& lhs, const BitSet& rhs) {
+
+		for (auto i = 0; i < lhs.nBB_; ++i) {
+			BITBOARD bb = lhs.vBB_[i] & rhs.vBB_[i];
+			if (bb) {
+				return bblock::lsb(bb) + static_cast<int>(WMUL(i));
 			}
-
-			return BBObject::noBit;		//disjoint
 		}
 
-		int find_first_common_block(BitSet::index_t firstBlock, BitSet::index_t lastBlock, const BitSet& lhs, const BitSet& rhs) {
+		return BBObject::noBit;		//disjoint
+	}
 
-			///////////////////////////////////////////////////////////////////////////////
-			assert((firstBlock >= 0) && (firstBlock <= lastBlock) && (lastBlock < lhs.num_blocks()));
-			///////////////////////////////////////////////////////////////////////////////
+	int find_first_common_block(BitSet::index_t firstBlock, BitSet::index_t lastBlock, const BitSet& lhs, const BitSet& rhs) {
 
-			BitSet::index_t last_block = (lastBlock == BitSet::npos) ? static_cast<BitSet::index_t>(rhs.nBB_ - 1) : lastBlock;
+		///////////////////////////////////////////////////////////////////////////////
+		assert((firstBlock >= 0) && (firstBlock <= lastBlock) && (lastBlock < lhs.num_blocks()));
+		///////////////////////////////////////////////////////////////////////////////
 
-			for (auto i = firstBlock; i <= last_block; i++) {
-				BITBOARD bb = lhs.vBB_[i] & rhs.vBB_[i];
-				if (bb) {
-					return bblock::lsb(bb) + static_cast<int>(WMUL(i));
-				}
+		BitSet::index_t last_block = (lastBlock == BitSet::npos) ? static_cast<BitSet::index_t>(rhs.nBB_ - 1) : lastBlock;
+
+		for (auto i = firstBlock; i <= last_block; i++) {
+			BITBOARD bb = lhs.vBB_[i] & rhs.vBB_[i];
+			if (bb) {
+				return bblock::lsb(bb) + static_cast<int>(WMUL(i));
 			}
-
-			return BBObject::noBit;		//disjoint
 		}
 
-	}//end namespace _impl
+		return BBObject::noBit;		//disjoint
+	}
 
 }//end namespace bitgraph
 

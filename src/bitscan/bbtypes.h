@@ -41,19 +41,15 @@ namespace bitgraph {
 
 }
 
-
 namespace bitgraph {
-	namespace _impl {
-		constexpr int EMPTY_ELEM = -1;						//empty table element, bitboard or bitstring 	
 
-		//size of the register word - DO NOT CHANGE!
-		constexpr int WORD_SIZE = 64;
-		constexpr int WORD_SIZE_MINUS_ONE = WORD_SIZE - 1;
-		constexpr int MASK_LIM = WORD_SIZE + 1;				  //mask limit for bitscan operations of a single BITBOARD
-	}
+	constexpr int EMPTY_ELEM = -1;						//empty table element,... 	
 
-	using _impl::WORD_SIZE;
-	using _impl::EMPTY_ELEM;
+	//size of the register word - DO NOT CHANGE!
+	constexpr int WORD_SIZE = 64;
+	constexpr int WORD_SIZE_MINUS_ONE = WORD_SIZE - 1;
+	constexpr int MASK_LIM = WORD_SIZE + 1;				  //mask limit for bitscan operations of a single BITBOARD
+
 }
 
 

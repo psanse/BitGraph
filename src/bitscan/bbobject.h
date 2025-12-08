@@ -46,7 +46,7 @@ namespace bitgraph {
 			int bbi_;								//bitblock index 	
 			int pos_;								//bit index [0...63] 
 
-			scan_t() :bbi_(noBit), pos_(_impl::MASK_LIM) {}
+			scan_t() :bbi_(noBit), pos_(MASK_LIM) {}
 
 			void set_block(int block) { bbi_ = block; }
 			void set_pos(int bit) { pos_ = bit; }

@@ -324,7 +324,7 @@ namespace bitgraph {
 					//determine clique with the first consecutive vertices in the neighboorhood of v
 
 					//initialize bb with the neighborhood of v in bbsg in [v, end)
-					bitgraph::_impl::AND<true>(v, g.num_vertices() - 1, g.neighbors(v), bbsg, bb);
+					bitgraph::AND<true>(v, g.num_vertices() - 1, g.neighbors(v), bbsg, bb);
 
 					//main loop
 					int w = bbo::noBit;

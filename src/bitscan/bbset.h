@@ -27,852 +27,847 @@ using vint	= std::vector<int>;
 using DenseBlockVec = std::vector<bitgraph::BITBOARD>;
 
 namespace bitgraph {
-
-	namespace _impl {
-
-		/////////////////////////////////
-		//
-		// BitSet class 
-		//
-		// Manages bit strings greater than WORD_SIZE 
-		// @details Does not use HW dependent instructions (intrinsics), nor does it cache information for very fast bitscanning
-		//
-		///////////////////////////////////
-		class BitSet :public BBObject {
-						
-			using index_t = BBObject::index_t;
-
-		public:
-					
-			using BBObject::npos;
-
-						
-			/////////////////////////////
-			// Independent operators / masks  
-			// comment: do not modify this bitset
-
-			/**
-			* @brief AND between lhs and rhs bitsets, stores the result in an existing bitset res
-			* @returns reference to the resulting bitstring res
-			**/
-			friend BitSet& AND(const BitSet& lhs, const BitSet& rhs, BitSet& res);
-
-			/**
-			* @brief AND between lhs and rhs bitsets
-			* @returns resulting bitset
-			**/
-			friend BitSet AND(BitSet lhs, const BitSet& rhs) { return lhs &= rhs; }
-
-			/**
-			* @brief AND between lhs and rhs bitsets in the CLOSED bit-range [firstBit, lastBit]
-			*		 The result is stored in bitset res. The remaining bits of res outside the range
-			*		 are set to 0 if the template parameter Erase  is true.
-			* @param template<Erase>: if true, the bits of res outside [firstBit, lastBit] are set to 0
-			* @param firstBit, lastBit: closed bit-range 0 <= firstBit <= lastBit
-			* @param lhs, rhs: input bitsets
-			* @param res: output bitset
-			* @returns reference to the resulting bitstring res
-			* @details: The num_blocks of lhs and rhs must be the same.
-			*			The num_blocks of res must be greater or equal than lhs / rhs
-			* @details: created 06/02/2025
-			* @details: GCC does not allow default template parameters in friend functions
-			**/
-			template<bool Erase>
-			friend BitSet& AND(int firstBit, int lastBit, const BitSet& lhs, const BitSet& rhs, BitSet& res);
-
-			/**
-			* @brief AND between lhs and rhs bitsets in the closed block- range [firstBlock, lastBlock].
-			*		 Stores the result in res. The remaining bits of res outside the range
-			*		 are set to 0 if the template parameter Erase is true.
-			*		 If lastBock==-1, the range is till the end of the bitset, i.e., [firstBlock, num_blocks())
-			*
-			*		I.  The num_blocks of lhs and rhs must be the same.
-			*		II. The num_blocks of res must be at least the same as lhs nand rhs
-			* @param template<Erase>: if true, the bits of res outside [firstBit, lastBit] are set to 0
-			* @param lhs, rhs: input bitsets
-			* @param res: output bitset
-			* @returns reference to the resulting bitstring res
-			* @details: GCC does not allow default template parameters in friend functions
-			**/
-			template<bool Erase>
-			friend BitSet& AND_block(index_t firstBlock, index_t lastBlock, const BitSet& lhs, const BitSet& rhs, BitSet& res);
-
-			/**
-			* @brief AND between lhs and rhs bitsets in the closed block-range [firstBlock, lastBlock].
-			*		 If lastBock==-1, the range is the full bitset. The bits outside the range are set to 0.
-			* @returns the new resulting bitset
-			**/
-			friend BitSet AND_block(index_t firstBlock, index_t lastBlock,	BitSet lhs, const BitSet& rhs) {
-				return lhs.AND_EQUAL_block<true>(firstBlock, lastBlock, rhs);
-			}
-
-			/**
-			* @brief OR between lhs and rhs bitsets, stores the result in an existing bitset res
-			* @returns reference to the resulting bitstring res
-			**/
-			friend BitSet& OR(const BitSet& lhs, const BitSet& rhs, BitSet& res);
-
-			/**
-			* @brief OR between lhs and rhs bitsets
-			* @returns resulting bitset
-			**/
-			friend BitSet OR(BitSet lhs, const BitSet& rhs) { return lhs |= rhs; }
-
-			/**
-			* @brief OR between lhs and rhs bitsets in the CLOSED bit-range [firstBit, lastBit]
-			*		 The result is stored in bitset res. The remaining bits of res outside the range
-			*		 are set to 0 if the template parameter Erase is true, else res is not modified.
-			* @param lhs, rhs: input bitsets
-			* @param res: output bitset
-			* @returns reference to the resulting bitstring res
-			* @details: The num_blocks of lhs and rhs must be the same.
-			*			The num_blocks of res must be greater or equal than lhs / rhs
-			* @details: created 06/02/2025
-			* @details: GCC does not allow default template parameters in friend functions
-			**/
-			template<bool Erase>
-			friend BitSet& OR(int firstBit, int lastBit, const BitSet& lhs, const BitSet& rhs, BitSet& res);
-
-			/**
-			* @brief OR between lhs and rhs bitsets in the closed block- range [firstBlock, lastBlock].
-			*		 Stores the result in res. The remaining bits of res outside the range
-			*		 are set to 0 if the template parameter Erase is true, else res is not modified.
-			*		 If lastBock==-1, the range is til the end of the bitset, i.e., [firstBlock, num_blocks())
-			*
-			*		I.  The num_blocks of lhs and rhs must be the same.
-			*		II. The num_blocks of res must be at least the same as lhs nand rhs
-			* @param template<Erase>: if true, the bits of res outside [firstBit, lastBit] are set to 0
-			* @param lhs, rhs: input bitsets
-			* @param res: output bitset
-			* @returns reference to the resulting bitstring res
-			**/
-			template<bool Erase>
-			friend BitSet& OR_block(index_t firstBlock, index_t lastBlock, const BitSet& lhs, const BitSet& rhs, BitSet& res);
-
-			/**
-			* @brief OR between lhs and rhs bitsets in the closed block-range [firstBlock, lastBlock].
-			*		 If lastBock==-1, the range is the full bitset. The bits outside the range are set to 0.
-			* @returns the new resulting bitset
-			**/
-			friend BitSet OR_block(index_t firstBlock, index_t lastBlock, BitSet lhs, const BitSet& rhs) {
-				return lhs.OR_EQUAL_block<true>(firstBlock, lastBlock, rhs);
-			}
-
-			/**
-			* @brief Removes the 1-bits in the bitstring rhs from the bitstring lhs. Stores
-			*		 the result in res.
-			* @returns reference to the resulting bitstring res
-			**/
-			friend BitSet& erase_bit(const BitSet& lhs, const BitSet& rhs, BitSet& res);										//removes rhs from lhs
-
-			/**
-			* @brief Determines the first bit of the itersection between bitsets lhs and rhs
-			* @param lhs, rhs: input bitsets
-			* @returns the first BIT of the intersection or BBObject::noBit if the sets are disjoint
-			**/
-			friend int find_first_common(const BitSet& lhs, const BitSet& rhs);
-
-			/**
-			* @brief Determines the first bit of the itersection between bitsets lhs and rhs
-			*		 in the closed block-range [firstBlock, lastBlock].
-			*		 If lastBock == -1, the range [firstBlock, END OF BITSET)
-			* @param lhs, rhs: input bitsets
-			* @returns the first BIT of the intersection or BBObject::noBit if the sets are disjoint
-			**/
-			friend int find_first_common_block(index_t firstBlock, index_t lastBlock, const BitSet& lhs, const BitSet& rhs);
-
-			////////////
-			//construction / destruction 
-
-			BitSet() : nBB_(0) {};
-
-			/**
-			* @brief Constructor of a bitset given a population size nPop
-			*		  The num_blocks of the bitset is set according to the population size
-			* @param nBits : population size
-			* @param val: initial value (TRUE, FALSE) of every bit in the bitset
-			**/
-			explicit  BitSet(std::size_t nPop, bool val = false);
-
-			/**
-			* @brief Constructor of a bitset given an initial vector lv of 1-bit elements
-			*		  The population size is the maximum value of lv
-			*		  The num_blocks of the bitset is set according to the population size
-			* @param lv : vector of integers representing 1-bits in the bitset
-			**/
-			explicit  BitSet(const vint& lv);
-
-			/**
-			 * @brief Creates a bitset with an initial collection @lv of 1-bit elements
-			 *		  and a population size nPop
-			 *		  The num_blocks of the bitset is set according to nPop
-			 * @param nPop: population size
-			 * @param lv : vector of integers representing 1-bits in the bitset
-			 * @details: any collection supporting begin() and end() iterators can be used
-			 **/
-			template<class ColT>
-			explicit  BitSet(std::size_t nPop, const ColT& lv);
-			
-			/**
-			 * @brief Creates a bitset with an initialez list of 1-bit elements
-			 *		  and a population size nPop
-			 *		  The num_blocks of the bitset is set according to nPop
-			 * @param nPop: population size
-			 * @param lv : set of integers representing 1-bits in the bitset
-			 **/
-			explicit  BitSet(std::size_t nPop, std::initializer_list<int> lv);
-
-
-			//Move and copy semantics allowed
-			BitSet(const BitSet& bbN) = default;
-			BitSet(BitSet&&)			noexcept = default;
-			BitSet& operator =				(const BitSet&) = default;
-			BitSet& operator =				(BitSet&&)			noexcept = default;
-
-			virtual	~BitSet() = default;
-
-			////////////
-			//Reset / init (memory allocation)
-
-			void init(std::size_t nPop) noexcept;
-			void init(std::size_t nPop, const vint& lv) noexcept;
-
-			/**
-			* @brief Resets this bitset given to a vector lv of 1-bit elements
-			 *		  and a population size nPop.
-			 *
-			 *		  I. The num_blocks of the bitset is set according to nPop.
-			 *		  II. Memory is deallocated and reallocated as required
-			 * @param nPop: population size
-			 * @param lv : vector of integers representing 1-bits in the bitset
-			 * @details: Fail-fast policy: exceptions are handled inside the program exits
-			**/
-			void reset(std::size_t nPop, const vint& lv) noexcept;
-
-			/**
-			* @brief Resets this bitset to an EMPTY BITSET given to a population size nPop.
-			*
-			*		  I. The num_blocks of the bitset is set according to nPop.
-			*		  II. Memory is deallocated and reallocated as required
-			*
-			* @param nPop: population size
-			* @details: Fail-fast policy: exceptions are handled inside the program exits
-			**/
-			void reset(std::size_t nPop) noexcept;
-
-			/**
-			* @brief reallocates memory to the number of blocks of the bitset
-			**/
-			void  shrink_to_fit() { vBB_.shrink_to_fit(); }
-
-			/////////////////////
-			//setters and getters (will not allocate memory)
-
-			/**
-			* @brief returns the number of blocks allocated for the bitset
-			* @returns number of blocks allocated for the bitset - integer type 
-			* @details: recommended for internal use
-			**/
-			int num_blocks() const noexcept { return nBB_; }	
-
-			/**
-			* @brief returns the number of blocks allocated for the bitset
-			* @returns number of blocks allocated for the bitset - std::size_ type
-			* @details: recommended for consumer code
-			**/
-			std::size_t size() const noexcept { return vBB_.size(); }
-			
-			DenseBlockVec& bitset()  noexcept { return vBB_; }
-			const DenseBlockVec& bitset() const  noexcept { return vBB_; }
-
-			BITBOARD block(index_t blockID)	const {
-				assert(blockID < static_cast<index_t>(vBB_.size()));
-				return vBB_[blockID]; 
-			}
-			BITBOARD& block(index_t blockID) {
-				assert(blockID < static_cast<index_t>(vBB_.size()));
-				return vBB_[blockID];
-			}
-
-			//////////////////////////////
-			// Bitscanning (no HW operations)
-
-			/**
-			* @brief returns the index of the most significant bit in the bitstring
-			* @details implemented as a lookup table
-			**/
-		protected:
-			int msbn64_lup()	const;
-			int msbn64_intrin()	const;
-
-		public:
-			int msb()	const { return msbn64_intrin(); }
-
-			/**
-			* @brief returns the index of the least significant bit in the bitstring
-			* @details  implemented as a de Bruijn hashing or a lookup table depending on
-			*			an internal switch (see config.h)
-			**/
-		protected:
-			int lsbn64_non_intrin()	const;
-			int lsbn64_intrin()	const;
-
-		public:
-			int lsb()	const { return lsbn64_intrin(); }
-
-			/**
-			* @brief Computes the next least significant 1-bit in the bitstring after bit
-			*		 If bit == BBObject::noBit, returns the lest significant bit in the bitstring.
-			*
-			*		 I.Primitive scanning stateless feature at this level. Require a bit position as argument always.
-			*		II. Use bitscanning with state for proper bitscanning (derived class or external feature)
-			*
-			* @param bit: position from which to start the search
-			* @returns the next 1-bit in the bitstring after bit, BBObject::noBit if there are no more bits
-			* @details: no internal state is used, NOT EFFICIENT since it has to compute the offset and
-			*		    current bitblock of bit in each call. It does not cache the last bit found.
-			* @details: Uses a DeBruijn implementation for lsb()
-			* @details: DEPRECATED in favour of the bitscanning with state of BBIntrinsic class
-			**/
-			int next_bit(int bit)	const;
-
-			/**
-			* @brief Computes the next most significant  1-bit in the bitstring after bit
-			*		 If bit == BBObject::noBit, returns the most significant bit in the bitstring
-			*
-			*		 I. Primitive scanning stateless feature at this level. Require a bit position as argument always.
-			*		II. Use bitscanning with state for proper bitscanning (derived class or external feature)
-			*
-			* @param bit: position from which to start the search
-			* @returns the next msb 1-bit in the bitstring after bit, BBObject::noBit if there are no more bits
-			* @details: no internal state is used, NOT EFFICIENT since it has to compute the offset and
-			*		    current bitblock of bit in each call. It does not cache the last bit found.
-			* @details: Uses a lookup table implementation for msb()
-			* @details: Not recommended. DEPRECATED in favour of the bitscanning with state of BBIntrinsic class
-			**/
-			int prev_bit(int bit)	const;
-
-			/////////////////
-			// Popcount
-
-			/**
-			* @brief Returns the number of 1-bits in the bitstring
-			*
-			* @details alias to popcn64, calls the function
-			* @details Only function for population count since 12/02/2025
-			* @details implementation depends of POPCN64 switch in bbconfig.h
-			*		   By default - intrinsic HW assembler instructions
-			**/
-			int	count()									const { return popcn64(); }
-			int	count(int firstBit, int lastBit = -1)	const { return popcn64(firstBit, lastBit); }
-
-			/**
-			* @brief returns the number of 1-bits in the bitstring
-			**/
-		protected:
-			virtual	int popcn64()	const;
-
-			/**
-			* @brief Returns the number of 1-bits in the bitstring
-			*	 	 in the closed range [firstBit, lastBit]
-			*		 If lastBit == -1, the range is [firstBit, endOfBitset)
-			*
-			* @details efficiently implemented as a lookup table or with HW instructions
-			*			depending  on an internal switch (see config.h)
-			**/
-			virtual	int popcn64(int firstBit, int lastBit = -1)	const;
-
-			/////////////////////
-			//Setting / Erasing bits 
-		public:
-
-			/**
-			* @brief sets a 1-bit in the bitstring
-			* @param  bit: position of the 1-bit to set (nBit >= 0)
-			* @returns reference to the modified bitstring
-			**/
-			BitSet& set_bit(int bit);
-
-			/**
-			* @brief sets the bits in the closed range [firstBit, lastBit] to 1 in the bitstring
-			* @params firstBit, lastBit:  0 <= firstBit <= lastBit
-			* @date 22/9/14
-			* @last_update 01/02/25
-			**/
-			 BitSet& set_bit(int firstBit, int lastBit);
-
-			/**
-			* @brief Sets all bitblocks up to the bitstring num_blocks to 1.
-			*
-			* @details Might set more bits than the maximum population size conceived by
-			*		  the client user during construction (i.e. bitset constructed with 64 bits, has 2 bitblocks)
-			*
-			* TODO - REMOVED for safety (12/02/2025)
-			**/
-			//inline  BitSet&  set_bit			();
-
-			/**
-			* @brief Adds the bits from the bitstring bb_add in the population
-			*		 range of the bitstring (bitblocks are copied).
-			*
-			*		 Note: The bitblock size of bb_add must be at least as large as the bitstring.
-			*
-			* @details  Equivalent to OR operation / set union
-			* @returns reference to the modified bitstring
-			**/
-			BitSet& set_bit(const BitSet& bb_add);
-
-			/**
-			* @brief Overwrites this bitstring with @bb_add (equivalent to operator=)
-			*		  
-			*		 Note: The bitblock size of bb_add must be at least as large as this bitstring.
-			* 
-			* @param bb_add: input bitstring whose bits are copied
-			* returns reference to the modified bitstring
-			**/
-			BitSet& assign_bit(const BitSet& bb_add);
-
-			/**
-			* @brief Adds the bits from the bitstring bb_add in the range [0, lastBit]
-			* @param lastBit : the last bit in the range to be copied
-			* @returns reference to the modified bitstring
-			**/
-			BitSet& set_bit(int lastBit, const BitSet& bb_add);
-
-			/**
-			* @brief Adds elements from a vector of non-negative integers lv as 1-bit
-			*	    up to the maximum num_blocks of the bitstring. Values greater than the
-			*		maximum num_blocks of the biset are ignored.
-			*
-			* @param lv: vector of non-negative integers
-			* @returns reference to the modified bitstring
-			* @details negative elements will cause an assertion if NDEBUG is not defined,
-			*		  else the behaviour is undefined.
-			**/
-			BitSet& set_bit(const vint& lv);
-
-			/**
-			* @brief sets bit number bit to 0 in the bitstring
-			* @param  bit: position of the 1-bit to set (>=0)
-			* @returns reference to the modified bitstring
-			**/
-			BitSet& erase_bit(int bit);
-
-			/**
-			* @brief sets the bits in the closed range [firstBit, lastBit] to 0 in the bitstring
-			*		 If lastBit == -1, the range is [firstBit, endOfBitset)
-			* @params firstBit, lastBit: 0 <= firstBit <= lastBit
-			* @created 22/9/14
-			* @details last_update 01/02/25
-			**/
-			BitSet& erase_bit(int firstBit, int lastBit);
-
-			/**
-			* @brief sets all bits to 0
-			* @returns reference to the modified bitstring
-			**/
-			BitSet& erase_bit();
-
-			/**
-			* @brief Removes the bits from the bitstring @bitset inside the population range.
-			*
-			*		 I. bitset must have a maximum population
-			*			greater or equal than the bitstring.
-			*
-			* @details  Equivalent to a set minus operation
-			* @returns reference to the modified bitstring
-			**/
-			BitSet& erase_bit(const BitSet& bitset);
-
-			/**
-			* @brief Removes the bits  from the bitstring @bitset inside the 
-			*		 closed range [firstBit, lastBit]. 
-			*		 If lastBit == -1, the range is [firstBit, endOfBitset) 
-			* 
-			*		 I. bitset must have a maximum population
-			*			greater or equal than the bitstring.
-			*
-			* @details  Equivalent to a set minus operation
-			* @returns reference to the modified bitstring
-			**/
-			BitSet& erase_bit(int firstBit, int lastBit,  const BitSet& bitset);
-
-			/**
-			* @brief Removes the 1-bits from both input bitstrings (their union)
-			*		inside the population range. The sizes of both input bitstrings
-			*		must be greater than the destination bitstring (*this)
-			* @param lhs, rhs: input bitstrings
-			* @returns reference to the modified bitstring
-			* @created: 30/7/2017  for the MWCP
-			* @last_update: 02/02/2025
-			**/
-			BitSet& erase_bit(const BitSet& lhs, const BitSet& rhs);
-
-			/////////////////////
-			//BitBlock operations 
-
-			/**
-			* @brief ORs the 1-bits from the bitstring @bb_add in the closed range [firstBlock, lastBlock]
-			*		 If lastBlock = npos, the range is [firstBlock, nBB_]
-			*
-			*		 0 <= FirstBlock <= LastBLock < the number of bitblocks in the bitstring
-			*
-			* @param bb_add: input bitstring whose bits are added
-			* @param FirstBlock: the first bitblock to be modified
-			* @param LastBLock: the last bitblock to be modified
-			* @returns reference to the modified bitstring
-			**/
-			BitSet& set_block(index_t firstBlock, index_t lastBlock, const BitSet& bb_add);
-
-			/**
-			* @brief Overwrites / Copies the blocks of 1-bits from the bitstring @bb_add 
-			*		 in the closed range [firstBlock, lastBlock] to this bitstring.
-			*		 If LastBlock = npos, the range is [firstBlock, nBB_]
-			*		 0 <= FirstBlock <= LastBLock < the number of bitblocks in the bitstring
-			* @param bb_add: input bitstring whose bits are copied
-			* @param FirstBlock: the first bitblock to be modified
-			* @param LastBLock: the last bitblock to be modified
-			* returns reference to the modified bitstring
-			**/
-			BitSet& assign_block(index_t firstBlock, index_t lastBlock, const BitSet& bb_add);
-
-			/**
-			* @brief Deletes the 1-bits from the bitstring bb_del in the closed range [firstBlock, lastBlock]
-			*		 If lastBlock = npos, the range is the whole bitstring.
-			*
-			*		 0 <= firstBlock <= lastBlock < the number of bitblocks in the bitstring
-			*
-			* @param bb_del: input bitstring whose 1-bits are to be removed
-			* @param firstBlock: the first bitblock to be modified
-			* @param lastBlock: the last bitblock to be modified
-			* @returns reference to the modified bitstring
-			**/
-			BitSet& erase_block(index_t firstBlock, index_t lastBlock, const BitSet& bb_del);
-
-			/**
-			* @brief Removes the 1-bits from both input bitstrings (their union)
-			*		in the closed range of bitblocks [firstBlock, lastBlock]
-			*		If lastBlock = npos, the range is [firstBlock, nBB_]
-			*
-			* @param firstBlock: the first bitblock to be modified
-			* @param bb_del_lhs, bb_del_rhs : bitstrings whose 1-bits are to be removed
-			* @returns reference to the modified bitstring
-			* @date: 02/02/2025 during a refactorization of BITSCAN
-			**/
-			BitSet& erase_block(index_t firstBlock, index_t lastBlock, const BitSet& bb_del_lhs, const BitSet& bb_del_rhs);
-
-			////////////////////////
-			// operators
-
-			/**
-			* @brief Bitwise AND operator with bbn
-			* @details For set intersection
-			**/
-			BitSet& operator &=				(const BitSet& bbn);
-
-			/**
-			* @brief Bitwise OR operator with bbn
-			* @details For set union
-			**/
-			BitSet& operator |=				(const BitSet& bbn);
-
-			/**
-			* @brief Bitwise XOR operator with bbn
-			* @details For symmetric_difference
-			**/
-			BitSet& operator ^=				(const BitSet& bbn);
-
-			friend bool operator ==			(const BitSet& lhs, const BitSet& rhs);
-			friend bool operator !=			(const BitSet& lhs, const BitSet& rhs);
-
-			////////////////////////
-			// Basic operations
-
-			/**
-			* @brief flips 1-bits to 0 and 0-bits to 1
-			**/
-			BitSet& flip();
-
-			/**
-			* @brief flips 1-bits to 0 and 0-bits to 1 in the
-			*		 closed block range [firstBlock, lastBlock]
-			**/
-			BitSet& flip_block(index_t firstBlock, index_t lastBlock);
-
-			/**
-			* @brief AND between rhs and caller bitstring in the closed range of bitblocks [firstBlock, lastBlock]
-			*		 If lastBlock == npos the range is [firstBlock, nBB_]
-			*
-			* @param firstBlock, lastBlock: range of blocks (0<=firstBlock<=lastBlock<nBB_).
-			* @param rhs: bitstring
-			* @returns reference to the modified bitstring
-			* @date: 04/02/2025 during a refactorization of BITSCAN
-			**/
-			template<bool Erase = false>
-			BitSet& AND_EQUAL_block(index_t firstBlock, index_t lastBlock, const BitSet& rhs);
-
-			/**
-			* @brief OR between rhs and caller bitstring in the closed range of bitblocks [firstBlock, lastBlock]
-			*		 If lastBlock == npos the range is [firstBlock, nBB_]
-			*
-			* @param firstBlock, lastBlock: range of blocks (0<=firstBlock<=lastBlock<nBB_)
-			* @param rhs: bitstring
-			* @returns reference to the modified bitstring
-			**/
-			template<bool Erase = false>
-			BitSet& OR_EQUAL_block(index_t firstBlock, index_t lastBlock, const BitSet& rhs);
-
-			/**
-			* @brief Determines the lowest bit (least-significant) in common between rhs and this bitstring
-			* @param rhs: input bitstring
-			* @returns the first 1-bit in common, -1 if they are disjoint
-			* @created 7/17
-			* @last_update 02/02/2025
-			**/
-			int find_first_common(const BitSet& rhs)	const;
-
-			/**
-			* @brief Determines if the bitstring has a single 1-bit in the closed range [firstBit, lastBit]
-			*		 in singleton_bit
-			* @param firstBit, lastBit: closed range of bits (0<=firstBit<=lastBit)
-			* @param bit: contains the singleton bit if it exists or -1
-			* @returns  0 if range is empty, 1 if singleton, -1 if more than one bit exists in the range
-			*			IMPORTANT: if any bitset is empty in the range, the result is 0 (disjoint), , bit = -1 
-			**/
-			int  find_singleton(int firstBit, int lastBit, int& bit) const;
-
-			/**
-			* @brief Determines the single 1-bit common to both this and rhs bitstring.			*		 
-			* @param rhs: input bitstring
-			* @param bit:  1-bit index or -1 if not single disjoint
-			* @returns 0 if disjoint,  1 if intersection is a single bit, -1 otherwise (more than 1-bit in common)
-			*		   IMPORTANT: if any bitset is empty, the result is 0 (disjoint), bit = -1
-			**/
-			int	find_common_singleton(const BitSet& rhs, int& bit)	const;
-
-			/**
-			* @brief  Determines the single 1-bit common to both this and rhs bitstring in the
-			*		  closed range [firstBlock, lastBlock].
-			*		  If lastBlock == npos the range is [firstBlock, nBB_]
-			*
-			* @param bit:  1-bit index or -1 if not single disjoint
-			* @returns 0 if disjoint, 1 if intersection is a single bit, -1 otherwise (more than 1-bit in common)
-			* @created 14/8/16
-			* @last_update 04/02/2025
-			**/
-			int	find_common_singleton_block(index_t firstBlock, index_t lastBlock,
-															const BitSet& rhs, int& bit) const;
-
-			/**
-			* @brief Determines the single 1-bit in this bitstring of to the set difference
-			*		 bitset this \ rhs.
-			* @param bit:  1-bit index or -1 if the set difference is not a single bit
-			* @returns 0 if the set difference is empty, 1 if a singleton and -1 otherwise (more than 1-bit)
-			* @created 27/7/16
-			* @last_update 04/02/2025
-			**/
-			int	find_diff_singleton(const BitSet& rhs, int& bit) const;
-
-			/**
-			* @brief Determines the pair of bits bit1 and bit2 the set difference  bitset this \ rhs.
-			*		 If the set difference is a singleton, bit1 = singleton bit and bit2 = -1.
-			*		 If the set diference is empty or larger than 2 bits, bit1 = bit2 = -1.
-			*
-			* @param bit1, bit2: output pair of bits of the set difference.
-			*
-			* @returns 0 if the set difference is empty, 1 if it is a singleton, 2 a pair
-			*		  and -1 otherwise (more than 1-bit)
-			* @details: created  27/7/16, last_update 04/02/2025
-			**/
-			int find_diff_pair(const BitSet& rhs, int& bit1, int& bit2) 	const;
-
-			/////////////////////////////
-			//Boolean functions 
-
-			bool is_bit(int bit)	const;
-
-			/**
-			* @brief TRUE if the bitstring has all 0-bits
-			**/
-			virtual bool is_empty() 	const;
-
-			/**
-			* @brief Determines if the bitstring has all 0-bits in the closed range [firstBlock, lastBlock]
-			*		  If lastBlock == npos the range is [firstBlock, nBB_]
-			*
-			* @param firstBlock, lastBlock: range of blocks (0<=firstBlock<=lastBlock<nBB_).
-			* @returns TRUE if the bitstring has all 0-bits in the given range
-			* @details optimized for non-sparse bitsets - early exit
-			**/
-			virtual bool is_empty_block(index_t firstBlock, index_t lastBlock) const;
-
-			/**
-			* @brief TRUE if caller bitstring has a single 1-bit
-			* @returns 1 if singleton, 0 if empty, -1 if more than one bit
-			* @created (15/3/17)
-			* @details optimized for non-sparse bitsets - early exit
-			**/
-			int is_singleton() const;
-
-			/**
-			* @brief Determines if the caller bitstring has a single 1-bit in the
-			*		 closed bit-range [firstBit, lastBit]
-			*
-			* @param firstBlock, lastBlock: range of blocks (0<=firstBlock<=lastBlock<nBB_).
-			* @returns 1 if singleton, 0 if empty, -1 if more than one bit in the specifed range
-			* @details optimized for non-sparse bitsets - early exit
-			**/
-			int  is_singleton(int firstBit, int lastBit)						const;
-
-			/**
-			* @brief TRUE if caller bitstring has a single 1-bit in the closed range [firstBlock, lastBlock]
-			*		  If lastBlock == npos the range is [firstBlock, nBB_]
-			*
-			* @param firstBlock, lastBlock: range of blocks (0<=firstBlock<=lastBlock<nBB_).
-			* @returns 1 if singleton, 0 if empty, -1 if more than one bit.
-			* @details optimized for non-sparse bitsets - early exit
-			**/
-			int is_singleton_block(index_t firstBlock, index_t lastBlock) const;
-
-			/**
-			* @brief TRUE if this bitstring has no bits in common with rhs
-			**/
-			bool is_disjoint(const BitSet& rhs)	const;
-
-			/**
-			* @brief TRUE if this bitstring has no bits in common with rhs
-			*		 in the closed range [firstBlock, lastBlock].
-			*
-			*		If lastBlock == npos, the range is [firstBlock, nBB_]
-			**/
-			bool is_disjoint_block(index_t firstBlock, index_t lastBlock,const BitSet& rhs)	const;
-			/**
-			* @brief TRUE if this bitstring has no bits in common with neither lhs NOR rhs bitstrings
-			* @details Currently not available for sparse bitsets
-			**/
-			bool is_disjoint(const BitSet& lhs, const  BitSet& rhs)	const;
-
-			/////////////////////
-			// I/O 
-			
-			/**
-			* @brief streams bb and its popcount to the output stream o
-			* @details format example [...000111 (3)]
-			* @param o: output stream
-			* @param show_pc: if true, shows popcount
-			* @returns output stream
-			**/
-			std::ostream& print(std::ostream& o = std::cout,
-				bool show_pc = true, bool endl = true)		const override;
-			/**
-			* @brief converts bb and its popcount to a readable string
-			* @details format example [...000111 (3)]
-			* @returns string
-			*
-			* TODO implement - cast operator	(24/02/2025)
-			**/
-			std::string to_string();
-
-			///////////////////////
-			//Conversions / Casts
-
-			/**
-			* @brief Fills std::vector lb with the 1-bits of the bitset.
-			* @param lb: output vector of integers (external ownership)
-			* 
-			* TODO - loop unrolling for efficiency (18/11/2025)
-			**/
-			void extract(vint& lb)								const;
-			void to_set(sint& lb)								const;
-
-			/**
-			* @brief Casts the bitstring to a vector of non-negative integers
-			* @details calls to_vector
-			* 
-			* TODO - possibly copy to_set and to_vector implementations for efficiency (18/11/2025)
-			**/
-			explicit operator vint()							const;
-			explicit operator sint()							const;
-
-
-			/**
-			* @brief Fills stack @s
-			* @param s: output stack object (external ownership)
-			**/
-			void extract_stack(com::stack<int>& s)			const;
-
-			/**
-			* @brief Fills array @lv and sets @size 
-			* @param lv: must point to an array of capacity <= size (external ownership)
-			* @param size: output size of the array
-			* @param rev: if true, the array is filled in reverse order
-			* @returns pointer to the array, size of the array
-			**/
-			virtual	int* extract_array(int* lv, std::size_t& size, bool rev = false);
-
-
-			////////////////////////
-			//data members
-
-		protected:
-			DenseBlockVec vBB_;					//vector of fixed size bitblocks 
-			int nBB_;							//number of bitblocks (redundant to vBB.size(), cached for efficiency)
-		
-
-			/////////////////////////////////////////////////////////////////////////////////////////////////////////
-			// DEPRECATED friend operations, TO BE REMOVED. NOT CHECKED!! (06/02/2025)
-
-			/**
-			* @brief AND between lhs and rhs bitsets in the SEMI-OPEN range [0, last_vertex)
-			*
-			*		 I. Sets to 0 the remaining bits after, and including lastBit of the bitblock lbBLOCK containing lastBit
-			*		 II.If template Erase is true, the rest of the bitblocks after  lbBLOCK are also set to 0
-			*
-			* @param lastBit:  position that determines the range of the AND mask
-			* @param lhs, rhs: input bitsets
-			* @param res: output bitset
-			* @returns reference to the resulting bitstring res
-			* @details: The num_blocks of lhs and rhs must be the same.
-			*			The num_blocks of res must be greater or equal than lhs / rhs
-			*
-			* TODO: slightly weird behaviour, check if it is necessary
-			* TODO: add firstBit logic  (06/02/2025)
-			* TODO: deprecated - remove after checking optimization algorithms (06/02/2025)
-			**/
-			//template<bool Erase>
-			//friend BitSet& AND(int lastBit, const BitSet& lhs, const BitSet& rhs, BitSet& res);
-
-			/**
-			* @brief AND between lhs and rhs bitsets in the SEMI-OPEN range [0, last_vertex)
-			*		 For C-array compatibility, the result is stored in bitset res
-			* @returns C-array of integers representing the resulting bitstring res, array size is stored in size
-			* @details: Experimental, not efficient
-			* TODO: deprecated - REMOVE after checking optimization algorithms (06/02/2025)
-			**/
-			//friend int* AND(int lastBit, const BitSet& lhs, const BitSet& rhs, int bitset[], int& size);
-
-			/**
-			* @brief OR between lhs and rhs bitsets in the SEMI-OPEN range [firstBit, END).
-			*		 Stores the result in bitset res.
-			*		 Outside the range the bits are set to lhs.
-			* @param lhs, rhs: input bitsets
-			* @param res: output bitset
-			* @returns reference to the resulting bitstring res
-			**/
-			//friend BitSet& OR(int firstBit, const BitSet& lhs, const BitSet& rhs, BitSet& res);
-
-			// lhs OR rhs - ranges (rhs [v, END[ if left = TRUE,  rhs [0, v[ if left = false)
-			// date@26/10/19
-			//friend BitSet& OR(int bit, bool left /* to */, const BitSet& lhs, const BitSet& rhs, BitSet& res);
-
-			//////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-		}; //end BitSet class
-
-	}//end namespace _impl
-
-	using _impl::BitSet;
-
+	
+	/////////////////////////////////
+	//
+	// BitSet class 
+	//
+	// Manages bit strings greater than WORD_SIZE 
+	// @details Does not use HW dependent instructions (intrinsics), nor does it cache information for very fast bitscanning
+	//
+	///////////////////////////////////
+	class BitSet :public BBObject {
+
+		using index_t = BBObject::index_t;
+
+	public:
+
+		using BBObject::npos;
+
+
+		/////////////////////////////
+		// Independent operators / masks  
+		// comment: do not modify this bitset
+
+		/**
+		* @brief AND between lhs and rhs bitsets, stores the result in an existing bitset res
+		* @returns reference to the resulting bitstring res
+		**/
+		friend BitSet& AND(const BitSet& lhs, const BitSet& rhs, BitSet& res);
+
+		/**
+		* @brief AND between lhs and rhs bitsets
+		* @returns resulting bitset
+		**/
+		friend BitSet AND(BitSet lhs, const BitSet& rhs) { return lhs &= rhs; }
+
+		/**
+		* @brief AND between lhs and rhs bitsets in the CLOSED bit-range [firstBit, lastBit]
+		*		 The result is stored in bitset res. The remaining bits of res outside the range
+		*		 are set to 0 if the template parameter Erase  is true.
+		* @param template<Erase>: if true, the bits of res outside [firstBit, lastBit] are set to 0
+		* @param firstBit, lastBit: closed bit-range 0 <= firstBit <= lastBit
+		* @param lhs, rhs: input bitsets
+		* @param res: output bitset
+		* @returns reference to the resulting bitstring res
+		* @details: The num_blocks of lhs and rhs must be the same.
+		*			The num_blocks of res must be greater or equal than lhs / rhs
+		* @details: created 06/02/2025
+		* @details: GCC does not allow default template parameters in friend functions
+		**/
+		template<bool Erase>
+		friend BitSet& AND(int firstBit, int lastBit, const BitSet& lhs, const BitSet& rhs, BitSet& res);
+
+		/**
+		* @brief AND between lhs and rhs bitsets in the closed block- range [firstBlock, lastBlock].
+		*		 Stores the result in res. The remaining bits of res outside the range
+		*		 are set to 0 if the template parameter Erase is true.
+		*		 If lastBock==-1, the range is till the end of the bitset, i.e., [firstBlock, num_blocks())
+		*
+		*		I.  The num_blocks of lhs and rhs must be the same.
+		*		II. The num_blocks of res must be at least the same as lhs nand rhs
+		* @param template<Erase>: if true, the bits of res outside [firstBit, lastBit] are set to 0
+		* @param lhs, rhs: input bitsets
+		* @param res: output bitset
+		* @returns reference to the resulting bitstring res
+		* @details: GCC does not allow default template parameters in friend functions
+		**/
+		template<bool Erase>
+		friend BitSet& AND_block(index_t firstBlock, index_t lastBlock, const BitSet& lhs, const BitSet& rhs, BitSet& res);
+
+		/**
+		* @brief AND between lhs and rhs bitsets in the closed block-range [firstBlock, lastBlock].
+		*		 If lastBock==-1, the range is the full bitset. The bits outside the range are set to 0.
+		* @returns the new resulting bitset
+		**/
+		friend BitSet AND_block(index_t firstBlock, index_t lastBlock, BitSet lhs, const BitSet& rhs) {
+			return lhs.AND_EQUAL_block<true>(firstBlock, lastBlock, rhs);
+		}
+
+		/**
+		* @brief OR between lhs and rhs bitsets, stores the result in an existing bitset res
+		* @returns reference to the resulting bitstring res
+		**/
+		friend BitSet& OR(const BitSet& lhs, const BitSet& rhs, BitSet& res);
+
+		/**
+		* @brief OR between lhs and rhs bitsets
+		* @returns resulting bitset
+		**/
+		friend BitSet OR(BitSet lhs, const BitSet& rhs) { return lhs |= rhs; }
+
+		/**
+		* @brief OR between lhs and rhs bitsets in the CLOSED bit-range [firstBit, lastBit]
+		*		 The result is stored in bitset res. The remaining bits of res outside the range
+		*		 are set to 0 if the template parameter Erase is true, else res is not modified.
+		* @param lhs, rhs: input bitsets
+		* @param res: output bitset
+		* @returns reference to the resulting bitstring res
+		* @details: The num_blocks of lhs and rhs must be the same.
+		*			The num_blocks of res must be greater or equal than lhs / rhs
+		* @details: created 06/02/2025
+		* @details: GCC does not allow default template parameters in friend functions
+		**/
+		template<bool Erase>
+		friend BitSet& OR(int firstBit, int lastBit, const BitSet& lhs, const BitSet& rhs, BitSet& res);
+
+		/**
+		* @brief OR between lhs and rhs bitsets in the closed block- range [firstBlock, lastBlock].
+		*		 Stores the result in res. The remaining bits of res outside the range
+		*		 are set to 0 if the template parameter Erase is true, else res is not modified.
+		*		 If lastBock==-1, the range is til the end of the bitset, i.e., [firstBlock, num_blocks())
+		*
+		*		I.  The num_blocks of lhs and rhs must be the same.
+		*		II. The num_blocks of res must be at least the same as lhs nand rhs
+		* @param template<Erase>: if true, the bits of res outside [firstBit, lastBit] are set to 0
+		* @param lhs, rhs: input bitsets
+		* @param res: output bitset
+		* @returns reference to the resulting bitstring res
+		**/
+		template<bool Erase>
+		friend BitSet& OR_block(index_t firstBlock, index_t lastBlock, const BitSet& lhs, const BitSet& rhs, BitSet& res);
+
+		/**
+		* @brief OR between lhs and rhs bitsets in the closed block-range [firstBlock, lastBlock].
+		*		 If lastBock==-1, the range is the full bitset. The bits outside the range are set to 0.
+		* @returns the new resulting bitset
+		**/
+		friend BitSet OR_block(index_t firstBlock, index_t lastBlock, BitSet lhs, const BitSet& rhs) {
+			return lhs.OR_EQUAL_block<true>(firstBlock, lastBlock, rhs);
+		}
+
+		/**
+		* @brief Removes the 1-bits in the bitstring rhs from the bitstring lhs. Stores
+		*		 the result in res.
+		* @returns reference to the resulting bitstring res
+		**/
+		friend BitSet& erase_bit(const BitSet& lhs, const BitSet& rhs, BitSet& res);										//removes rhs from lhs
+
+		/**
+		* @brief Determines the first bit of the itersection between bitsets lhs and rhs
+		* @param lhs, rhs: input bitsets
+		* @returns the first BIT of the intersection or BBObject::noBit if the sets are disjoint
+		**/
+		friend int find_first_common(const BitSet& lhs, const BitSet& rhs);
+
+		/**
+		* @brief Determines the first bit of the itersection between bitsets lhs and rhs
+		*		 in the closed block-range [firstBlock, lastBlock].
+		*		 If lastBock == -1, the range [firstBlock, END OF BITSET)
+		* @param lhs, rhs: input bitsets
+		* @returns the first BIT of the intersection or BBObject::noBit if the sets are disjoint
+		**/
+		friend int find_first_common_block(index_t firstBlock, index_t lastBlock, const BitSet& lhs, const BitSet& rhs);
+
+		////////////
+		//construction / destruction 
+
+		BitSet() : nBB_(0) {};
+
+		/**
+		* @brief Constructor of a bitset given a population size nPop
+		*		  The num_blocks of the bitset is set according to the population size
+		* @param nBits : population size
+		* @param val: initial value (TRUE, FALSE) of every bit in the bitset
+		**/
+		explicit  BitSet(std::size_t nPop, bool val = false);
+
+		/**
+		* @brief Constructor of a bitset given an initial vector lv of 1-bit elements
+		*		  The population size is the maximum value of lv
+		*		  The num_blocks of the bitset is set according to the population size
+		* @param lv : vector of integers representing 1-bits in the bitset
+		**/
+		explicit  BitSet(const vint& lv);
+
+		/**
+		 * @brief Creates a bitset with an initial collection @lv of 1-bit elements
+		 *		  and a population size nPop
+		 *		  The num_blocks of the bitset is set according to nPop
+		 * @param nPop: population size
+		 * @param lv : vector of integers representing 1-bits in the bitset
+		 * @details: any collection supporting begin() and end() iterators can be used
+		 **/
+		template<class ColT>
+		explicit  BitSet(std::size_t nPop, const ColT& lv);
+
+		/**
+		 * @brief Creates a bitset with an initialez list of 1-bit elements
+		 *		  and a population size nPop
+		 *		  The num_blocks of the bitset is set according to nPop
+		 * @param nPop: population size
+		 * @param lv : set of integers representing 1-bits in the bitset
+		 **/
+		explicit  BitSet(std::size_t nPop, std::initializer_list<int> lv);
+
+
+		//Move and copy semantics allowed
+		BitSet(const BitSet& bbN) = default;
+		BitSet(BitSet&&)			noexcept = default;
+		BitSet& operator =				(const BitSet&) = default;
+		BitSet& operator =				(BitSet&&)			noexcept = default;
+
+		virtual	~BitSet() = default;
+
+		////////////
+		//Reset / init (memory allocation)
+
+		void init(std::size_t nPop) noexcept;
+		void init(std::size_t nPop, const vint& lv) noexcept;
+
+		/**
+		* @brief Resets this bitset given to a vector lv of 1-bit elements
+		 *		  and a population size nPop.
+		 *
+		 *		  I. The num_blocks of the bitset is set according to nPop.
+		 *		  II. Memory is deallocated and reallocated as required
+		 * @param nPop: population size
+		 * @param lv : vector of integers representing 1-bits in the bitset
+		 * @details: Fail-fast policy: exceptions are handled inside the program exits
+		**/
+		void reset(std::size_t nPop, const vint& lv) noexcept;
+
+		/**
+		* @brief Resets this bitset to an EMPTY BITSET given to a population size nPop.
+		*
+		*		  I. The num_blocks of the bitset is set according to nPop.
+		*		  II. Memory is deallocated and reallocated as required
+		*
+		* @param nPop: population size
+		* @details: Fail-fast policy: exceptions are handled inside the program exits
+		**/
+		void reset(std::size_t nPop) noexcept;
+
+		/**
+		* @brief reallocates memory to the number of blocks of the bitset
+		**/
+		void  shrink_to_fit() { vBB_.shrink_to_fit(); }
+
+		/////////////////////
+		//setters and getters (will not allocate memory)
+
+		/**
+		* @brief returns the number of blocks allocated for the bitset
+		* @returns number of blocks allocated for the bitset - integer type
+		* @details: recommended for internal use
+		**/
+		int num_blocks() const noexcept { return nBB_; }
+
+		/**
+		* @brief returns the number of blocks allocated for the bitset
+		* @returns number of blocks allocated for the bitset - std::size_ type
+		* @details: recommended for consumer code
+		**/
+		std::size_t size() const noexcept { return vBB_.size(); }
+
+		DenseBlockVec& bitset()  noexcept { return vBB_; }
+		const DenseBlockVec& bitset() const  noexcept { return vBB_; }
+
+		BITBOARD block(index_t blockID)	const {
+			assert(blockID < static_cast<index_t>(vBB_.size()));
+			return vBB_[blockID];
+		}
+		BITBOARD& block(index_t blockID) {
+			assert(blockID < static_cast<index_t>(vBB_.size()));
+			return vBB_[blockID];
+		}
+
+		//////////////////////////////
+		// Bitscanning (no HW operations)
+
+		/**
+		* @brief returns the index of the most significant bit in the bitstring
+		* @details implemented as a lookup table
+		**/
+	protected:
+		int msbn64_lup()	const;
+		int msbn64_intrin()	const;
+
+	public:
+		int msb()	const { return msbn64_intrin(); }
+
+		/**
+		* @brief returns the index of the least significant bit in the bitstring
+		* @details  implemented as a de Bruijn hashing or a lookup table depending on
+		*			an internal switch (see config.h)
+		**/
+	protected:
+		int lsbn64_non_intrin()	const;
+		int lsbn64_intrin()	const;
+
+	public:
+		int lsb()	const { return lsbn64_intrin(); }
+
+		/**
+		* @brief Computes the next least significant 1-bit in the bitstring after bit
+		*		 If bit == BBObject::noBit, returns the lest significant bit in the bitstring.
+		*
+		*		 I.Primitive scanning stateless feature at this level. Require a bit position as argument always.
+		*		II. Use bitscanning with state for proper bitscanning (derived class or external feature)
+		*
+		* @param bit: position from which to start the search
+		* @returns the next 1-bit in the bitstring after bit, BBObject::noBit if there are no more bits
+		* @details: no internal state is used, NOT EFFICIENT since it has to compute the offset and
+		*		    current bitblock of bit in each call. It does not cache the last bit found.
+		* @details: Uses a DeBruijn implementation for lsb()
+		* @details: DEPRECATED in favour of the bitscanning with state of BBIntrinsic class
+		**/
+		int next_bit(int bit)	const;
+
+		/**
+		* @brief Computes the next most significant  1-bit in the bitstring after bit
+		*		 If bit == BBObject::noBit, returns the most significant bit in the bitstring
+		*
+		*		 I. Primitive scanning stateless feature at this level. Require a bit position as argument always.
+		*		II. Use bitscanning with state for proper bitscanning (derived class or external feature)
+		*
+		* @param bit: position from which to start the search
+		* @returns the next msb 1-bit in the bitstring after bit, BBObject::noBit if there are no more bits
+		* @details: no internal state is used, NOT EFFICIENT since it has to compute the offset and
+		*		    current bitblock of bit in each call. It does not cache the last bit found.
+		* @details: Uses a lookup table implementation for msb()
+		* @details: Not recommended. DEPRECATED in favour of the bitscanning with state of BBIntrinsic class
+		**/
+		int prev_bit(int bit)	const;
+
+		/////////////////
+		// Popcount
+
+		/**
+		* @brief Returns the number of 1-bits in the bitstring
+		*
+		* @details alias to popcn64, calls the function
+		* @details Only function for population count since 12/02/2025
+		* @details implementation depends of POPCN64 switch in bbconfig.h
+		*		   By default - intrinsic HW assembler instructions
+		**/
+		int	count()									const { return popcn64(); }
+		int	count(int firstBit, int lastBit = -1)	const { return popcn64(firstBit, lastBit); }
+
+		/**
+		* @brief returns the number of 1-bits in the bitstring
+		**/
+	protected:
+		virtual	int popcn64()	const;
+
+		/**
+		* @brief Returns the number of 1-bits in the bitstring
+		*	 	 in the closed range [firstBit, lastBit]
+		*		 If lastBit == -1, the range is [firstBit, endOfBitset)
+		*
+		* @details efficiently implemented as a lookup table or with HW instructions
+		*			depending  on an internal switch (see config.h)
+		**/
+		virtual	int popcn64(int firstBit, int lastBit = -1)	const;
+
+		/////////////////////
+		//Setting / Erasing bits 
+	public:
+
+		/**
+		* @brief sets a 1-bit in the bitstring
+		* @param  bit: position of the 1-bit to set (nBit >= 0)
+		* @returns reference to the modified bitstring
+		**/
+		BitSet& set_bit(int bit);
+
+		/**
+		* @brief sets the bits in the closed range [firstBit, lastBit] to 1 in the bitstring
+		* @params firstBit, lastBit:  0 <= firstBit <= lastBit
+		* @date 22/9/14
+		* @last_update 01/02/25
+		**/
+		BitSet& set_bit(int firstBit, int lastBit);
+
+		/**
+		* @brief Sets all bitblocks up to the bitstring num_blocks to 1.
+		*
+		* @details Might set more bits than the maximum population size conceived by
+		*		  the client user during construction (i.e. bitset constructed with 64 bits, has 2 bitblocks)
+		*
+		* TODO - REMOVED for safety (12/02/2025)
+		**/
+		//inline  BitSet&  set_bit			();
+
+		/**
+		* @brief Adds the bits from the bitstring bb_add in the population
+		*		 range of the bitstring (bitblocks are copied).
+		*
+		*		 Note: The bitblock size of bb_add must be at least as large as the bitstring.
+		*
+		* @details  Equivalent to OR operation / set union
+		* @returns reference to the modified bitstring
+		**/
+		BitSet& set_bit(const BitSet& bb_add);
+
+		/**
+		* @brief Overwrites this bitstring with @bb_add (equivalent to operator=)
+		*
+		*		 Note: The bitblock size of bb_add must be at least as large as this bitstring.
+		*
+		* @param bb_add: input bitstring whose bits are copied
+		* returns reference to the modified bitstring
+		**/
+		BitSet& assign_bit(const BitSet& bb_add);
+
+		/**
+		* @brief Adds the bits from the bitstring bb_add in the range [0, lastBit]
+		* @param lastBit : the last bit in the range to be copied
+		* @returns reference to the modified bitstring
+		**/
+		BitSet& set_bit(int lastBit, const BitSet& bb_add);
+
+		/**
+		* @brief Adds elements from a vector of non-negative integers lv as 1-bit
+		*	    up to the maximum num_blocks of the bitstring. Values greater than the
+		*		maximum num_blocks of the biset are ignored.
+		*
+		* @param lv: vector of non-negative integers
+		* @returns reference to the modified bitstring
+		* @details negative elements will cause an assertion if NDEBUG is not defined,
+		*		  else the behaviour is undefined.
+		**/
+		BitSet& set_bit(const vint& lv);
+
+		/**
+		* @brief sets bit number bit to 0 in the bitstring
+		* @param  bit: position of the 1-bit to set (>=0)
+		* @returns reference to the modified bitstring
+		**/
+		BitSet& erase_bit(int bit);
+
+		/**
+		* @brief sets the bits in the closed range [firstBit, lastBit] to 0 in the bitstring
+		*		 If lastBit == -1, the range is [firstBit, endOfBitset)
+		* @params firstBit, lastBit: 0 <= firstBit <= lastBit
+		* @created 22/9/14
+		* @details last_update 01/02/25
+		**/
+		BitSet& erase_bit(int firstBit, int lastBit);
+
+		/**
+		* @brief sets all bits to 0
+		* @returns reference to the modified bitstring
+		**/
+		BitSet& erase_bit();
+
+		/**
+		* @brief Removes the bits from the bitstring @bitset inside the population range.
+		*
+		*		 I. bitset must have a maximum population
+		*			greater or equal than the bitstring.
+		*
+		* @details  Equivalent to a set minus operation
+		* @returns reference to the modified bitstring
+		**/
+		BitSet& erase_bit(const BitSet& bitset);
+
+		/**
+		* @brief Removes the bits  from the bitstring @bitset inside the
+		*		 closed range [firstBit, lastBit].
+		*		 If lastBit == -1, the range is [firstBit, endOfBitset)
+		*
+		*		 I. bitset must have a maximum population
+		*			greater or equal than the bitstring.
+		*
+		* @details  Equivalent to a set minus operation
+		* @returns reference to the modified bitstring
+		**/
+		BitSet& erase_bit(int firstBit, int lastBit, const BitSet& bitset);
+
+		/**
+		* @brief Removes the 1-bits from both input bitstrings (their union)
+		*		inside the population range. The sizes of both input bitstrings
+		*		must be greater than the destination bitstring (*this)
+		* @param lhs, rhs: input bitstrings
+		* @returns reference to the modified bitstring
+		* @created: 30/7/2017  for the MWCP
+		* @last_update: 02/02/2025
+		**/
+		BitSet& erase_bit(const BitSet& lhs, const BitSet& rhs);
+
+		/////////////////////
+		//BitBlock operations 
+
+		/**
+		* @brief ORs the 1-bits from the bitstring @bb_add in the closed range [firstBlock, lastBlock]
+		*		 If lastBlock = npos, the range is [firstBlock, nBB_]
+		*
+		*		 0 <= FirstBlock <= LastBLock < the number of bitblocks in the bitstring
+		*
+		* @param bb_add: input bitstring whose bits are added
+		* @param FirstBlock: the first bitblock to be modified
+		* @param LastBLock: the last bitblock to be modified
+		* @returns reference to the modified bitstring
+		**/
+		BitSet& set_block(index_t firstBlock, index_t lastBlock, const BitSet& bb_add);
+
+		/**
+		* @brief Overwrites / Copies the blocks of 1-bits from the bitstring @bb_add
+		*		 in the closed range [firstBlock, lastBlock] to this bitstring.
+		*		 If LastBlock = npos, the range is [firstBlock, nBB_]
+		*		 0 <= FirstBlock <= LastBLock < the number of bitblocks in the bitstring
+		* @param bb_add: input bitstring whose bits are copied
+		* @param FirstBlock: the first bitblock to be modified
+		* @param LastBLock: the last bitblock to be modified
+		* returns reference to the modified bitstring
+		**/
+		BitSet& assign_block(index_t firstBlock, index_t lastBlock, const BitSet& bb_add);
+
+		/**
+		* @brief Deletes the 1-bits from the bitstring bb_del in the closed range [firstBlock, lastBlock]
+		*		 If lastBlock = npos, the range is the whole bitstring.
+		*
+		*		 0 <= firstBlock <= lastBlock < the number of bitblocks in the bitstring
+		*
+		* @param bb_del: input bitstring whose 1-bits are to be removed
+		* @param firstBlock: the first bitblock to be modified
+		* @param lastBlock: the last bitblock to be modified
+		* @returns reference to the modified bitstring
+		**/
+		BitSet& erase_block(index_t firstBlock, index_t lastBlock, const BitSet& bb_del);
+
+		/**
+		* @brief Removes the 1-bits from both input bitstrings (their union)
+		*		in the closed range of bitblocks [firstBlock, lastBlock]
+		*		If lastBlock = npos, the range is [firstBlock, nBB_]
+		*
+		* @param firstBlock: the first bitblock to be modified
+		* @param bb_del_lhs, bb_del_rhs : bitstrings whose 1-bits are to be removed
+		* @returns reference to the modified bitstring
+		* @date: 02/02/2025 during a refactorization of BITSCAN
+		**/
+		BitSet& erase_block(index_t firstBlock, index_t lastBlock, const BitSet& bb_del_lhs, const BitSet& bb_del_rhs);
+
+		////////////////////////
+		// operators
+
+		/**
+		* @brief Bitwise AND operator with bbn
+		* @details For set intersection
+		**/
+		BitSet& operator &=				(const BitSet& bbn);
+
+		/**
+		* @brief Bitwise OR operator with bbn
+		* @details For set union
+		**/
+		BitSet& operator |=				(const BitSet& bbn);
+
+		/**
+		* @brief Bitwise XOR operator with bbn
+		* @details For symmetric_difference
+		**/
+		BitSet& operator ^=				(const BitSet& bbn);
+
+		friend bool operator ==			(const BitSet& lhs, const BitSet& rhs);
+		friend bool operator !=			(const BitSet& lhs, const BitSet& rhs);
+
+		////////////////////////
+		// Basic operations
+
+		/**
+		* @brief flips 1-bits to 0 and 0-bits to 1
+		**/
+		BitSet& flip();
+
+		/**
+		* @brief flips 1-bits to 0 and 0-bits to 1 in the
+		*		 closed block range [firstBlock, lastBlock]
+		**/
+		BitSet& flip_block(index_t firstBlock, index_t lastBlock);
+
+		/**
+		* @brief AND between rhs and caller bitstring in the closed range of bitblocks [firstBlock, lastBlock]
+		*		 If lastBlock == npos the range is [firstBlock, nBB_]
+		*
+		* @param firstBlock, lastBlock: range of blocks (0<=firstBlock<=lastBlock<nBB_).
+		* @param rhs: bitstring
+		* @returns reference to the modified bitstring
+		* @date: 04/02/2025 during a refactorization of BITSCAN
+		**/
+		template<bool Erase = false>
+		BitSet& AND_EQUAL_block(index_t firstBlock, index_t lastBlock, const BitSet& rhs);
+
+		/**
+		* @brief OR between rhs and caller bitstring in the closed range of bitblocks [firstBlock, lastBlock]
+		*		 If lastBlock == npos the range is [firstBlock, nBB_]
+		*
+		* @param firstBlock, lastBlock: range of blocks (0<=firstBlock<=lastBlock<nBB_)
+		* @param rhs: bitstring
+		* @returns reference to the modified bitstring
+		**/
+		template<bool Erase = false>
+		BitSet& OR_EQUAL_block(index_t firstBlock, index_t lastBlock, const BitSet& rhs);
+
+		/**
+		* @brief Determines the lowest bit (least-significant) in common between rhs and this bitstring
+		* @param rhs: input bitstring
+		* @returns the first 1-bit in common, -1 if they are disjoint
+		* @created 7/17
+		* @last_update 02/02/2025
+		**/
+		int find_first_common(const BitSet& rhs)	const;
+
+		/**
+		* @brief Determines if the bitstring has a single 1-bit in the closed range [firstBit, lastBit]
+		*		 in singleton_bit
+		* @param firstBit, lastBit: closed range of bits (0<=firstBit<=lastBit)
+		* @param bit: contains the singleton bit if it exists or -1
+		* @returns  0 if range is empty, 1 if singleton, -1 if more than one bit exists in the range
+		*			IMPORTANT: if any bitset is empty in the range, the result is 0 (disjoint), , bit = -1
+		**/
+		int  find_singleton(int firstBit, int lastBit, int& bit) const;
+
+		/**
+		* @brief Determines the single 1-bit common to both this and rhs bitstring.			*
+		* @param rhs: input bitstring
+		* @param bit:  1-bit index or -1 if not single disjoint
+		* @returns 0 if disjoint,  1 if intersection is a single bit, -1 otherwise (more than 1-bit in common)
+		*		   IMPORTANT: if any bitset is empty, the result is 0 (disjoint), bit = -1
+		**/
+		int	find_common_singleton(const BitSet& rhs, int& bit)	const;
+
+		/**
+		* @brief  Determines the single 1-bit common to both this and rhs bitstring in the
+		*		  closed range [firstBlock, lastBlock].
+		*		  If lastBlock == npos the range is [firstBlock, nBB_]
+		*
+		* @param bit:  1-bit index or -1 if not single disjoint
+		* @returns 0 if disjoint, 1 if intersection is a single bit, -1 otherwise (more than 1-bit in common)
+		* @created 14/8/16
+		* @last_update 04/02/2025
+		**/
+		int	find_common_singleton_block(index_t firstBlock, index_t lastBlock,
+			const BitSet& rhs, int& bit) const;
+
+		/**
+		* @brief Determines the single 1-bit in this bitstring of to the set difference
+		*		 bitset this \ rhs.
+		* @param bit:  1-bit index or -1 if the set difference is not a single bit
+		* @returns 0 if the set difference is empty, 1 if a singleton and -1 otherwise (more than 1-bit)
+		* @created 27/7/16
+		* @last_update 04/02/2025
+		**/
+		int	find_diff_singleton(const BitSet& rhs, int& bit) const;
+
+		/**
+		* @brief Determines the pair of bits bit1 and bit2 the set difference  bitset this \ rhs.
+		*		 If the set difference is a singleton, bit1 = singleton bit and bit2 = -1.
+		*		 If the set diference is empty or larger than 2 bits, bit1 = bit2 = -1.
+		*
+		* @param bit1, bit2: output pair of bits of the set difference.
+		*
+		* @returns 0 if the set difference is empty, 1 if it is a singleton, 2 a pair
+		*		  and -1 otherwise (more than 1-bit)
+		* @details: created  27/7/16, last_update 04/02/2025
+		**/
+		int find_diff_pair(const BitSet& rhs, int& bit1, int& bit2) 	const;
+
+		/////////////////////////////
+		//Boolean functions 
+
+		bool is_bit(int bit)	const;
+
+		/**
+		* @brief TRUE if the bitstring has all 0-bits
+		**/
+		virtual bool is_empty() 	const;
+
+		/**
+		* @brief Determines if the bitstring has all 0-bits in the closed range [firstBlock, lastBlock]
+		*		  If lastBlock == npos the range is [firstBlock, nBB_]
+		*
+		* @param firstBlock, lastBlock: range of blocks (0<=firstBlock<=lastBlock<nBB_).
+		* @returns TRUE if the bitstring has all 0-bits in the given range
+		* @details optimized for non-sparse bitsets - early exit
+		**/
+		virtual bool is_empty_block(index_t firstBlock, index_t lastBlock) const;
+
+		/**
+		* @brief TRUE if caller bitstring has a single 1-bit
+		* @returns 1 if singleton, 0 if empty, -1 if more than one bit
+		* @created (15/3/17)
+		* @details optimized for non-sparse bitsets - early exit
+		**/
+		int is_singleton() const;
+
+		/**
+		* @brief Determines if the caller bitstring has a single 1-bit in the
+		*		 closed bit-range [firstBit, lastBit]
+		*
+		* @param firstBlock, lastBlock: range of blocks (0<=firstBlock<=lastBlock<nBB_).
+		* @returns 1 if singleton, 0 if empty, -1 if more than one bit in the specifed range
+		* @details optimized for non-sparse bitsets - early exit
+		**/
+		int  is_singleton(int firstBit, int lastBit)						const;
+
+		/**
+		* @brief TRUE if caller bitstring has a single 1-bit in the closed range [firstBlock, lastBlock]
+		*		  If lastBlock == npos the range is [firstBlock, nBB_]
+		*
+		* @param firstBlock, lastBlock: range of blocks (0<=firstBlock<=lastBlock<nBB_).
+		* @returns 1 if singleton, 0 if empty, -1 if more than one bit.
+		* @details optimized for non-sparse bitsets - early exit
+		**/
+		int is_singleton_block(index_t firstBlock, index_t lastBlock) const;
+
+		/**
+		* @brief TRUE if this bitstring has no bits in common with rhs
+		**/
+		bool is_disjoint(const BitSet& rhs)	const;
+
+		/**
+		* @brief TRUE if this bitstring has no bits in common with rhs
+		*		 in the closed range [firstBlock, lastBlock].
+		*
+		*		If lastBlock == npos, the range is [firstBlock, nBB_]
+		**/
+		bool is_disjoint_block(index_t firstBlock, index_t lastBlock, const BitSet& rhs)	const;
+		/**
+		* @brief TRUE if this bitstring has no bits in common with neither lhs NOR rhs bitstrings
+		* @details Currently not available for sparse bitsets
+		**/
+		bool is_disjoint(const BitSet& lhs, const  BitSet& rhs)	const;
+
+		/////////////////////
+		// I/O 
+
+		/**
+		* @brief streams bb and its popcount to the output stream o
+		* @details format example [...000111 (3)]
+		* @param o: output stream
+		* @param show_pc: if true, shows popcount
+		* @returns output stream
+		**/
+		std::ostream& print(std::ostream& o = std::cout,
+			bool show_pc = true, bool endl = true)		const override;
+		/**
+		* @brief converts bb and its popcount to a readable string
+		* @details format example [...000111 (3)]
+		* @returns string
+		*
+		* TODO implement - cast operator	(24/02/2025)
+		**/
+		std::string to_string();
+
+		///////////////////////
+		//Conversions / Casts
+
+		/**
+		* @brief Fills std::vector lb with the 1-bits of the bitset.
+		* @param lb: output vector of integers (external ownership)
+		*
+		* TODO - loop unrolling for efficiency (18/11/2025)
+		**/
+		void extract(vint& lb)								const;
+		void to_set(sint& lb)								const;
+
+		/**
+		* @brief Casts the bitstring to a vector of non-negative integers
+		* @details calls to_vector
+		*
+		* TODO - possibly copy to_set and to_vector implementations for efficiency (18/11/2025)
+		**/
+		explicit operator vint()							const;
+		explicit operator sint()							const;
+
+
+		/**
+		* @brief Fills stack @s
+		* @param s: output stack object (external ownership)
+		**/
+		void extract_stack(com::stack<int>& s)			const;
+
+		/**
+		* @brief Fills array @lv and sets @size
+		* @param lv: must point to an array of capacity <= size (external ownership)
+		* @param size: output size of the array
+		* @param rev: if true, the array is filled in reverse order
+		* @returns pointer to the array, size of the array
+		**/
+		virtual	int* extract_array(int* lv, std::size_t& size, bool rev = false);
+
+
+		////////////////////////
+		//data members
+
+	protected:
+		DenseBlockVec vBB_;					//vector of fixed size bitblocks 
+		int nBB_;							//number of bitblocks (redundant to vBB.size(), cached for efficiency)
+
+
+		/////////////////////////////////////////////////////////////////////////////////////////////////////////
+		// DEPRECATED friend operations, TO BE REMOVED. NOT CHECKED!! (06/02/2025)
+
+		/**
+		* @brief AND between lhs and rhs bitsets in the SEMI-OPEN range [0, last_vertex)
+		*
+		*		 I. Sets to 0 the remaining bits after, and including lastBit of the bitblock lbBLOCK containing lastBit
+		*		 II.If template Erase is true, the rest of the bitblocks after  lbBLOCK are also set to 0
+		*
+		* @param lastBit:  position that determines the range of the AND mask
+		* @param lhs, rhs: input bitsets
+		* @param res: output bitset
+		* @returns reference to the resulting bitstring res
+		* @details: The num_blocks of lhs and rhs must be the same.
+		*			The num_blocks of res must be greater or equal than lhs / rhs
+		*
+		* TODO: slightly weird behaviour, check if it is necessary
+		* TODO: add firstBit logic  (06/02/2025)
+		* TODO: deprecated - remove after checking optimization algorithms (06/02/2025)
+		**/
+		//template<bool Erase>
+		//friend BitSet& AND(int lastBit, const BitSet& lhs, const BitSet& rhs, BitSet& res);
+
+		/**
+		* @brief AND between lhs and rhs bitsets in the SEMI-OPEN range [0, last_vertex)
+		*		 For C-array compatibility, the result is stored in bitset res
+		* @returns C-array of integers representing the resulting bitstring res, array size is stored in size
+		* @details: Experimental, not efficient
+		* TODO: deprecated - REMOVE after checking optimization algorithms (06/02/2025)
+		**/
+		//friend int* AND(int lastBit, const BitSet& lhs, const BitSet& rhs, int bitset[], int& size);
+
+		/**
+		* @brief OR between lhs and rhs bitsets in the SEMI-OPEN range [firstBit, END).
+		*		 Stores the result in bitset res.
+		*		 Outside the range the bits are set to lhs.
+		* @param lhs, rhs: input bitsets
+		* @param res: output bitset
+		* @returns reference to the resulting bitstring res
+		**/
+		//friend BitSet& OR(int firstBit, const BitSet& lhs, const BitSet& rhs, BitSet& res);
+
+		// lhs OR rhs - ranges (rhs [v, END[ if left = TRUE,  rhs [0, v[ if left = false)
+		// date@26/10/19
+		//friend BitSet& OR(int bit, bool left /* to */, const BitSet& lhs, const BitSet& rhs, BitSet& res);
+
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	}; //end BitSet class
+
+	
 }//end namespace bitgraph
 
 
@@ -1816,7 +1811,7 @@ namespace bitgraph{
 
 namespace bitgraph {
 
-	namespace _impl {
+	
 
 		inline
 			bool operator==	(const BitSet& lhs, const BitSet& rhs) {
@@ -2046,18 +2041,16 @@ namespace bitgraph {
 		int find_first_common(const BitSet& lhs, const BitSet& rhs);
 		int find_first_common_block(BitSet::index_t firstBlock, BitSet::index_t lastBlock, const BitSet& lhs, const BitSet& rhs);
 				
-
-	}//end namespace _impl
-
-	//friend functions of BitSet
-	using _impl::operator!=;
-	using _impl::operator==;
-	using _impl::AND;
-	using _impl::OR;
-	using _impl::AND_block;
-	using _impl::OR_block;
-	using _impl::find_first_common;
-	using _impl::erase_bit;
+		
+	////friend functions of BitSet
+	//using _impl::operator!=;
+	//using _impl::operator==;
+	//using _impl::AND;
+	//using _impl::OR;
+	//using _impl::AND_block;
+	//using _impl::OR_block;
+	//using _impl::find_first_common;
+	//using _impl::erase_bit;
 
 
 }//end namespace bitgraph
@@ -2114,13 +2107,13 @@ namespace bitgraph {
 	/**
 	* @brief Creates an empty BitSet with a maximum of @nPop bits (all bits set to 0).
 	**/
-	inline _impl::BitSet make_bitset(int nPop) { return _impl::BitSet(nPop, false); }
+	inline BitSet make_bitset(int nPop) { return BitSet(nPop, false); }
 
 	/**
 	* @brief Creates a BitSet with a maximum @nPop bits (all bits set to 1).
 	**/
-	inline _impl::BitSet make_bitset_full(int nPop) {
-		_impl::BitSet bs(nPop, false);
+	inline BitSet make_bitset_full(int nPop) {
+		BitSet bs(nPop, false);
 		if (nPop > 0) bs.set_bit(0, nPop - 1);
 		return bs;
 	}
@@ -2131,8 +2124,8 @@ namespace bitgraph {
 	*			- values >= nPop are ignored.
 	**/
 	template<class It>
-	inline _impl::BitSet make_bitset_from(int nPop, It first, It last) {
-		_impl::BitSet bs(nPop, false);
+	inline BitSet make_bitset_from(int nPop, It first, It last) {
+		BitSet bs(nPop, false);
 		for (auto it = first; it != last; ++it) {
 			int v = static_cast<int>(*it);
 
@@ -2151,7 +2144,7 @@ namespace bitgraph {
 	*			- values >= nPop are ignored.
 	**/
 	template<class Col>
-	inline _impl::BitSet make_bitset(int nPop, const Col& lv) {
+	inline BitSet make_bitset(int nPop, const Col& lv) {
 		return make_bitset_from(nPop, std::begin(lv), std::end(lv));
 	}
 
@@ -2161,7 +2154,7 @@ namespace bitgraph {
 	* @details: - negative values are ignored (asserted in debug mode).
 	*			- values >= nPop are ignored.
 	**/
-	inline _impl::BitSet make_bitset(int nPop, std::initializer_list<int> lv) {
+	inline BitSet make_bitset(int nPop, std::initializer_list<int> lv) {
 		return make_bitset_from(nPop, lv.begin(), lv.end());
 	}
 

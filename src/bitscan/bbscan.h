@@ -18,7 +18,7 @@
 
 namespace bitgraph{
 
-	namespace _impl {
+	
 		/////////////////////////////////
 		//
 		// Class BBScan
@@ -230,10 +230,6 @@ namespace bitgraph{
 		protected:
 			scan_t scan_;
 		};
-
-	}//namespace _impl
-
-	using _impl::BBScan;
 
 } //namespace bitgraph
 
@@ -555,19 +551,19 @@ namespace bitgraph {
 	/**
 	 * @brief Creates a BBScan object given a maximum number of bits  @nPop (all bits set to 0).
 	 **/
-	inline _impl::BBScan make_BBScan(int nPop) { return _impl::BBScan(nPop, false); }
+	inline BBScan make_BBScan(int nPop) { return BBScan(nPop, false); }
 
 	/**
 	 * @brief Creates a BBScan object given a maximum number of bits  @nPop (all bits set to 1).
 	 **/
-	inline _impl::BBScan make_BBScan_full(int nPop) { return _impl::BBScan(nPop, true); }
+	inline BBScan make_BBScan_full(int nPop) { return BBScan(nPop, true); }
 
 	/**
 	* @brief Creates a BBScan object given a maximum @nPop and a list of values in brackets
 	* @details: - negative values are ignored (asserted in debug mode).
 	*			- values >= nPop are ignored.
 	**/
-	inline _impl::BBScan make_BBScan(int nPop, std::initializer_list<int> lv) { return _impl::BBScan(nPop, lv); }
+	inline BBScan make_BBScan(int nPop, std::initializer_list<int> lv) { return BBScan(nPop, lv); }
 		
 
 } // namespace bitgraph
