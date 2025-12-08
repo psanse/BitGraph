@@ -44,9 +44,7 @@ namespace bitgraph {
 
 		template<class BitSetT = BBScan>
 		class Graph {
-
-			using index_t = int;
-
+			
 			//filter out invalid types
 			static_assert(std::is_same<BBScan, BitSetT>::value ||
 				std::is_same<BBScanSp, BitSetT>::value, "is not a valid Graph type");
@@ -54,6 +52,9 @@ namespace bitgraph {
 			friend class GraphConversion;
 
 		public:
+
+			using index_t = int;
+
 			using Self = Graph<BitSetT>;			//own type
 			using bitset_type = BitSetT;			//basic type (a type of bitset)
 				
@@ -94,7 +95,7 @@ namespace bitgraph {
 			* @brief number of vertices of the graph. Alias to num_vertices()
 			**/
 			std::size_t size() const  noexcept { return NV_; }
-			int num_vertices() const  noexcept { return NV_; }
+			index_t num_vertices() const  noexcept { return NV_; }
 			
 
 			/**
@@ -102,7 +103,7 @@ namespace bitgraph {
 			*		 In the case of sparse graphs, the value is the maximum capacity
 			*		 of all bitsets.
 			**/
-			int num_blocks()			const noexcept  { return NBB_; }
+			index_t num_blocks() const noexcept  { return NBB_; }
 
 			/*
 			* @brief Counts the number of edges	(includes self loops)

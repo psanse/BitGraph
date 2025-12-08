@@ -33,7 +33,7 @@ namespace bitgraph {
 
 template<>
 inline 
-GSS& GSS::create_subgraph(std::size_t first_k, GSS& newg) const{
+GSS& GSS::create_subgraph(int first_k, GSS& newg) const{
 	
 	//assertions
 	if (first_k >= NV_ || first_k <= 0) {
@@ -42,13 +42,8 @@ GSS& GSS::create_subgraph(std::size_t first_k, GSS& newg) const{
 	}
 
 	//allocates memory for the new graph
-	if (newg.reset(first_k) == -1) {
-		LOG_ERROR("memory for graph not allocated - GSS::create_subgraph");
-		LOG_ERROR("graph remains unchanged");
-		return newg;
-	}
-		
-
+	newg.reset(first_k);
+	
 	//copies first k elements of the adjacency matrix 
 	for (int i = 0; i < newg.NV_; i++) {
 		newg.adj_[i] = adj_[i];
