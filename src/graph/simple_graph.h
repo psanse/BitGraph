@@ -636,7 +636,7 @@ namespace bitgraph {
 
 		//copy the relevant vertices of the adjacency matrix
 		for (int i = 0; i < newg.NV_; ++i) {
-			for (auto j = 0u; j <= bbh; ++j) {
+			for (int j = 0; j <= bbh; ++j) {
 				newg.adj_[i].block(j) = adj_[i].block(j);
 			}
 			//trims last bitblock
@@ -677,9 +677,9 @@ namespace bitgraph {
 
 		//resizes adjacency matrix
 		adj_.resize(N);
-		NV_ = N;
+		NV_ = static_cast<int>(N);
 		NE_ = 0;												//so that when required, the value will be recomputed
-		NBB_ = INDEX_1TO1(N);									//maximum number of bitblocks per row (for sparse graphs)		
+		NBB_ = INDEX_1TO1(NV_);									//maximum number of bitblocks per row (for sparse graphs)		
 
 		return 0;
 	}
