@@ -30,8 +30,8 @@ namespace bitgraph {
 			using tpoint_t = PrecisionTimer::timepoint_t;
 
 			std::string name = "";											//instance name
-			uint32_t N = 0;													//number of vertices
-			uint64_t M = 0;													//number of edges			
+			std::size_t N = 0;												//number of vertices
+			std::size_t M = 0;												//number of edges			
 			double TIME_OUT = std::numeric_limits<double>::max();			//in seconds
 			double TIME_OUT_HEUR = std::numeric_limits<double>::max();		//in seconds
 			
@@ -127,12 +127,12 @@ namespace bitgraph {
 			// getters
 
 			std::string name() const noexcept { return data_.name; }
-			uint32_t num_vertices() const noexcept { return data_.N; }
-			uint64_t num_edges() const noexcept { return data_.M; };
+			std::size_t num_vertices() const noexcept { return data_.N; }
+			std::size_t num_edges() const noexcept { return data_.M; };
 			double time_out() const noexcept { return data_.TIME_OUT; };
 			double time_out_heur() const noexcept { return data_.TIME_OUT_HEUR; }
 			int number_of_threads() const  noexcept { return data_.nThreads; }
-			uint32_t recursion_calls_per_tout_check() const noexcept { return numStepsTimeOutCheck; }
+			std::size_t recursion_calls_per_tout_check() const noexcept { return numStepsTimeOutCheck; }
 
 			double parsing_time() const noexcept { return data_.timeElapsed; }
 			double preprocessing_time() const  noexcept { return timePreproc_; }
@@ -143,8 +143,8 @@ namespace bitgraph {
 			//setters - only for general info, timers should not be set manually
 						
 			void name(std::string name) noexcept  { data_.name = std::move(name); }
-			void num_vertices(uint32_t N)  noexcept  { data_.N = N; }
-			void num_edges(uint64_t m) noexcept { data_.M = m; }
+			void num_vertices(std::size_t N)  noexcept  { data_.N = N; }
+			void num_edges(std::size_t m) noexcept { data_.M = m; }
 			void time_out(double t)  noexcept {(t == -1)? data_.TIME_OUT = std::numeric_limits<double>::max() : data_.TIME_OUT = t; }
 			void time_out_heur(double t) noexcept {(t == -1)? data_.TIME_OUT_HEUR = std::numeric_limits<double>::max() : data_.TIME_OUT_HEUR = t; }
 			void number_of_threads(int n) noexcept { data_.nThreads = n; }

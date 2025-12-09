@@ -44,7 +44,7 @@ namespace bitgraph {
 			///////
 			//construction / destruction
 			stack();
-			explicit stack(int MAX_SIZE);
+			explicit stack(std::size_t MAX_SIZE);
 
 			//copy semantics are disallowed
 			stack(const stack&) = delete;
@@ -76,7 +76,7 @@ namespace bitgraph {
 			* @brief Resets the stack to a new size, previos elements are destroyed.
 			*        The new elements are constructed with the default constructor
 			**/
-			void reset(int MAX_SIZE);
+			void reset(std::size_t MAX_SIZE);
 
 		private:
 			/**
@@ -158,9 +158,9 @@ namespace bitgraph {
 			/////////////////////
 			// data members
 
-			std::size_t nE_;								//number of elements, points to the next position to fill
-			T* stack_;										//underlying C-array 		
-			std::size_t cap_;								//capacity of the underlying array
+			std::size_t nE_ = 0;								//number of elements, points to the next position to fill
+			T* stack_ = nullptr;								//underlying C-array 		
+			std::size_t cap_ = 0;								//capacity of the underlying array
 
 		};
 

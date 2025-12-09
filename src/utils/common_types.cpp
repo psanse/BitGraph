@@ -21,12 +21,12 @@ bitgraph::stack<T>::stack() :
 {}
 
 template<class T>
-bitgraph::stack<T>::stack(int MAX_SIZE) : 
+bitgraph::stack<T>::stack(std::size_t MAX_SIZE) : 
 	nE_(0), stack_(nullptr), cap_(0)
 {
 	try {
 		stack_ = new T[MAX_SIZE];
-		cap_ = static_cast<std::size_t>(MAX_SIZE);
+		cap_ = MAX_SIZE;
 	}
 	catch (...) {
 		LOGG_ERROR("bad_alloc - stack<T>::stack");
@@ -59,13 +59,13 @@ bitgraph::stack<T>& bitgraph::stack<T>::operator = (bitgraph::stack<T>&& s) noex
 }
 
 template<class T>
-void bitgraph::stack<T>::reset(int MAX_SIZE) {
+void bitgraph::stack<T>::reset(std::size_t MAX_SIZE) {
 	delete[] stack_;
 	nE_ = 0;
 	cap_ = 0;
 	try {
 		stack_ = new T[MAX_SIZE];
-		cap_ = static_cast<std::size_t>(MAX_SIZE);
+		cap_ = MAX_SIZE;
 	}
 	catch (...) {
 		LOG_ERROR("bad_alloc - stack<T>::reset");
