@@ -309,6 +309,13 @@ BitSet::operator vint() const {
 	return result;
 }
 
+bitgraph::BitSet::operator sint() const
+{
+	sint result;
+	extract_set(result);
+	return result;
+}
+
 
 void BitSet::extract_stack(com::stack<int>& s)	const {
 	s.erase();

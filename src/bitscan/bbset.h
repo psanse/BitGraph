@@ -790,6 +790,7 @@ namespace bitgraph {
 		* @details calls to_vector
 		**/
 		explicit operator vint()							const;
+		explicit operator sint()							const;
 		
 		/**
 		* @brief Fills stack @s
