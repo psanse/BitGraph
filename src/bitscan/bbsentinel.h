@@ -99,8 +99,6 @@ namespace bitgraph {
 
 	}//namespace _impl
 
-//	using _impl::BBSentinel;
-
 }//namespace bitgraph
 
 
