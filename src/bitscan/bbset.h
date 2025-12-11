@@ -2069,7 +2069,7 @@ bitgraph::BitSet::BitSet(std::size_t nPop, const ColT& lv) :
 		for (auto& bit : lv) {
 
 			//////////////////
-			assert(bit >= 0 && bit < nPop);
+			assert(bit >= 0 && bit < static_cast<int>(nPop));
 			/////////////////
 
 			//sets bits - no prior erasing

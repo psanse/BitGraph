@@ -401,7 +401,7 @@ namespace bitgraph {
 
 			//////////////////////////////////
 			nodes_.emplace_back(v);
-			if (nodes_.size() == NV_) { break; }			//exit condition
+			if (nodes_.size() == g_.size()) { break; }			//exit condition
 
 			node_active_state_.erase_bit(v);
 			///////////////////////////////////
@@ -451,7 +451,7 @@ namespace bitgraph {
 
 			//////////////////////////////////
 			nodes_.emplace_back(v);
-			if (nodes_.size() == NV_) { break; }			//exit condition
+			if (nodes_.size() == g_.size()) { break; }			//exit condition
 
 			node_active_state_.erase_bit(v);
 			//////////////////////////////////
