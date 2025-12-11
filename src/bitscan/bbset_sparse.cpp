@@ -16,7 +16,6 @@
 #include <cassert>
  
 using namespace std;
-
 using namespace bitgraph;
 
 ///////////////////////////////////////
@@ -894,7 +893,7 @@ string BitSetSp::to_string ()  const{
 	return sstr.str();
 }
 
-void BitSetSp::extract (std::vector<int>& lb)const{
+void BitSetSp::extract (std::vector<int>& lb) const{
 
 	lb.clear();
 
