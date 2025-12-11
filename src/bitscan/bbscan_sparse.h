@@ -19,180 +19,174 @@ using namespace std;
 
 namespace bitgraph {
 
-	namespace _impl {
+	/////////////////////////////////
+	//
+	// Class BBScanSp
+	// (Uses a number of optimizations for sparse bit scanning)
+	//
+	///////////////////////////////////
 
-		/////////////////////////////////
-		//
-		// Class BBScanSp
-		// (Uses a number of optimizations for sparse bit scanning)
-		//
-		///////////////////////////////////
+	class BBScanSp : public BitSetSp {
 
-		class BBScanSp : public BitSetSp {
+	public:
 
-		public:
+		template <class U>
+		friend struct BBObject::Scan;
+		template <class U>
+		friend struct BBObject::ScanDest;
+		template <class U>
+		friend struct BBObject::ScanRev;
+		template <class U>
+		friend struct BBObject::ScanDestRev;
 
-			template <class U>
-			friend struct BBObject::Scan;
-			template <class U>
-			friend struct BBObject::ScanDest;
-			template <class U>
-			friend struct BBObject::ScanRev;
-			template <class U>
-			friend struct BBObject::ScanDestRev;
+	public:
 
-		public:
+		//aliases for bitscanning 
+		using scan = typename BBObject::Scan<BBScanSp>;
+		using scanR = typename BBObject::ScanRev<BBScanSp>;
+		using scanD = typename BBObject::ScanDest<BBScanSp>;
+		using scanDR = typename BBObject::ScanDestRev<BBScanSp>;
 
-			//aliases for bitscanning 
-			using scan = typename BBObject::Scan<BBScanSp>;
-			using scanR = typename BBObject::ScanRev<BBScanSp>;
-			using scanD = typename BBObject::ScanDest<BBScanSp>;
-			using scanDR = typename BBObject::ScanDestRev<BBScanSp>;
+	public:
 
-		public:
+		//////////////////////////////
+		//construction / destruction
 
-			//////////////////////////////
-			//construction / destruction
+			//inherit constructors
+		using BitSetSp::BitSetSp;
 
-				//inherit constructors
-			using BitSetSp::BitSetSp;
+		//TODO...check copy and move assignments - should be forbidden
 
-			//TODO...check copy and move assignments - should be forbidden
+		~BBScanSp() = default;
 
-			~BBScanSp() = default;
+		///////////////
+		// setters and getters
+		void scan_block(int blockID) { scan_.bbi_ = blockID; }			//refers to the position in the collection (not in the bitstring)
+		void scan_bit(int bit) { scan_.pos_ = bit; }
 
-			///////////////
-			// setters and getters
-			void scan_block(int blockID) { scan_.bbi_ = blockID; }			//refers to the position in the collection (not in the bitstring)
-			void scan_bit(int bit) { scan_.pos_ = bit; }
+		int  scan_block()	 const { return scan_.bbi_; }
+		int  scan_bit()	 const { return scan_.pos_; }
 
-			int  scan_block()	 const { return scan_.bbi_; }
-			int  scan_bit()	 const { return scan_.pos_; }
+		//////////////////////////////
+		// Bitscanning (with cached info)
 
-			//////////////////////////////
-			// Bitscanning (with cached info)
+		/**
+		* @brief Configures the initial block and bit position for bitscanning
+		*		 according to one of the 4 scan types passed as argument
+		* @param sct: type of scan
+		* @returns 0 if successful, -1 otherwise (now exits (08/07/2025))
+		* @details : sparse bitsets may have no blocks, in which case the scan is not possible and
+		*		     the function returns -1 -
+		* @details : (08/07/2025) throws  BitScanError for empty sparse bitset
+		**/
+		int init_scan(scan_types sct);
 
-			   /**
-			   * @brief Configures the initial block and bit position for bitscanning
-			   *		 according to one of the 4 scan types passed as argument
-			   * @param sct: type of scan
-			   * @returns 0 if successful, -1 otherwise (now exits (08/07/2025))
-			   * @details : sparse bitsets may have no blocks, in which case the scan is not possible and
-			   *		     the function returns -1 -
-			   * @details : (08/07/2025) throws  BitScanError for empty sparse bitset 
-			   **/
-			int init_scan(scan_types sct);
+		/**
+		* @brief Configures the initial block and bit position for bitscanning
+		*		 starting from the bit 'firstBit' onwards, excluding 'firstBit'
+		*		 according to one of the 4 scan types passed as argument
+		*		 (currently ONLY for the NON-DESTRUCTIVE cases).
+		*		 If firstBit is -1 (BBObject::noBit), the scan starts from the beginning.
+		* @param firstBit: starting bit
+		* @param sct: type of scan
+		* @returns 0 if successful, -1 otherwise (now exits (08/07/2025))
+		* @details : sparse bitsets may have no blocks, in which case the scan is not possible and
+		*		     the function returns -1
+		* @details : (08/07/2025) throws  BitScanError for empty sparse bitset
+		*
+		* TODO - extend to NON-DESTRUCTIVE cases
+		**/
+		int init_scan(int firstBit, scan_types sct);
 
-			/**
-			* @brief Configures the initial block and bit position for bitscanning
-			*		 starting from the bit 'firstBit' onwards, excluding 'firstBit'
-			*		 according to one of the 4 scan types passed as argument
-			*		 (currently ONLY for the NON-DESTRUCTIVE cases).
-			*		 If firstBit is -1 (BBObject::noBit), the scan starts from the beginning.
-			* @param firstBit: starting bit
-			* @param sct: type of scan
-			* @returns 0 if successful, -1 otherwise (now exits (08/07/2025))
-			* @details : sparse bitsets may have no blocks, in which case the scan is not possible and
-			*		     the function returns -1 
-			* @details : (08/07/2025) throws  BitScanError for empty sparse bitset
-			*
-			* TODO - extend to NON-DESTRUCTIVE cases
-			**/
-			int init_scan(int firstBit, scan_types sct);
+		////////////////
+		// bitscan forward
 
-			////////////////
-			// bitscan forward
+		/**
+		* @brief next bit in the bitstring, starting from the block
+		*		 in the last call to next_bit.
+		*		 Scan type: destructive
+		*
+		*		 I. caches the current block for the next call
+		*		II. erases the current scanned bit
+		*		III. First call requires initialization with init_scan(DESTRUCTIVE)
+		*
+		* @returns the next bit in the bitstring, BBObject::noBit if there are no more bits
+		* @details created 2015, last update 25/02/2025
+		**/
+		inline int next_bit_del();
+		inline int next_bit_del(BBScanSp& bitset);
 
-			/**
-			* @brief next bit in the bitstring, starting from the block
-			*		 in the last call to next_bit.
-			*		 Scan type: destructive
-			*
-			*		 I. caches the current block for the next call
-			*		II. erases the current scanned bit
-			*		III. First call requires initialization with init_scan(DESTRUCTIVE)
-			*
-			* @returns the next bit in the bitstring, BBObject::noBit if there are no more bits
-			* @details created 2015, last update 25/02/2025
-			**/
-			inline int next_bit_del();
-			inline int next_bit_del(BBScanSp& bitset);
+		/**
+		* @brief next bit in the bitstring, starting from the bit retrieved
+		*		 in the last call to next_bit.
+		*		 Scan type: non-destructive
+		*
+		*		 I. caches the current block for the next call
+		*		II. DOES NOT erase the current scanned bit
+		*		III. caches the scanned bit for the next call
+		* 		IV. First call requires initialization with init_scan(NON-DESTRUCTIVE)
+		*
+		* @returns the next bit in the bitstring, BBObject::noBit if there are no more bits
+		* @details Created 5/9/2014, last update 09/02/2025
+		* @details Since the scan does not delete the scanned bit from the bitstring,
+		*		   it has to cache the last scanned bit for the next call
+		**/
+		inline int next_bit();
+		inline int next_bit(BBScanSp& bitset);
 
-			/**
-			* @brief next bit in the bitstring, starting from the bit retrieved
-			*		 in the last call to next_bit.
-			*		 Scan type: non-destructive
-			*
-			*		 I. caches the current block for the next call
-			*		II. DOES NOT erase the current scanned bit
-			*		III. caches the scanned bit for the next call
-			* 		IV. First call requires initialization with init_scan(NON-DESTRUCTIVE)
-			*
-			* @returns the next bit in the bitstring, BBObject::noBit if there are no more bits
-			* @details Created 5/9/2014, last update 09/02/2025
-			* @details Since the scan does not delete the scanned bit from the bitstring,
-			*		   it has to cache the last scanned bit for the next call
-			**/
-			inline int next_bit();
-			inline int next_bit(BBScanSp& bitset);
+		/**
+		* @brief for basic bitscanning - they are hidden by next_bit()
+		**/
+		using BitSetSp::next_bit;
 
-			/**
-			* @brief for basic bitscanning - they are hidden by next_bit()
-			**/
-			using BitSetSp::next_bit;
+		////////////////
+		// bitscan backwards
 
-			////////////////
-			// bitscan backwards
+		/**
+		* @brief previous bit (next less significant bit) in the bitstring, starting from the bit retrieved
+		*		 in the last call to next_bit.
+		*		 Scan type: destructive, reverse
+		*
+		*		 I. caches the current block for the next call
+		*		II. erases the current scanned bit
+		* 		III. First call requires initialization with init_scan(DESTRUCTIVE, REVERSE)
+		*
+		* @returns the next lsb bit in the bitstring, BBObject::noBit if there are no more bits
+		* @details Created 23/3/12, last update 09/02/2025
+		**/
+		inline int prev_bit_del();
+		inline int prev_bit_del(BBScanSp& bitset);
+		/**
+		* @brief previous bit (next less significant bit)) in the bitstring, starting from the bit retrieved
+		*		 in the last call to next_bit.
+		*		 Scan type: non-destructive, reverse
+		*
+		*		 I. caches the current block for the next call
+		*		II. caches the scanned bit for the next call
+		* 		III. First call requires initialization with init_scan(NON-DESTRUCTIVE, REVERSE)
+		*
+		* @returns the previous bit (next less significant bit) in the bitstring, BBObject::noBit if there are no more bits
+		* @details Created 5/9/2014, last update 09/02/2025
+		* @details Since the scan does not delete the scanned bit from the bitstring,
+		*		   it has to cache the last scanned bit for the next call
+		**/
+		inline int prev_bit();
+		inline int prev_bit(BBScanSp& bitset);
 
-			/**
-			* @brief previous bit (next less significant bit) in the bitstring, starting from the bit retrieved
-			*		 in the last call to next_bit.
-			*		 Scan type: destructive, reverse
-			*
-			*		 I. caches the current block for the next call
-			*		II. erases the current scanned bit
-			* 		III. First call requires initialization with init_scan(DESTRUCTIVE, REVERSE)
-			*
-			* @returns the next lsb bit in the bitstring, BBObject::noBit if there are no more bits
-			* @details Created 23/3/12, last update 09/02/2025
-			**/
-			inline int prev_bit_del();
-			inline int prev_bit_del(BBScanSp& bitset);
-			/**
-			* @brief previous bit (next less significant bit)) in the bitstring, starting from the bit retrieved
-			*		 in the last call to next_bit.
-			*		 Scan type: non-destructive, reverse
-			*
-			*		 I. caches the current block for the next call
-			*		II. caches the scanned bit for the next call
-			* 		III. First call requires initialization with init_scan(NON-DESTRUCTIVE, REVERSE)
-			*
-			* @returns the previous bit (next less significant bit) in the bitstring, BBObject::noBit if there are no more bits
-			* @details Created 5/9/2014, last update 09/02/2025
-			* @details Since the scan does not delete the scanned bit from the bitstring,
-			*		   it has to cache the last scanned bit for the next call
-			**/
-			inline int prev_bit();
-			inline int prev_bit(BBScanSp& bitset);
+		/////////////////
+		//	DEPRECATED
 
-			/////////////////
-			//	DEPRECATED
+	//inline int next_bit_del				(int& nBB);								//nBB: index of bitblock in the bitstring	(not in the collection)	
+	//inline int next_bit_del				(int& nBB, BBScanSp& );					//EXPERIMENTAL! 
+	//inline int next_bit_del_pos			(int& posBB);							//posBB: position of bitblock in the collection (not the index of the element)		
+	//inline int next_bit					(int& nBB);								//nBB: index of bitblock in the bitstring	(not in the collection)				
+	//inline int prev_bit_del				(int& nBB);
 
-		//inline int next_bit_del				(int& nBB);								//nBB: index of bitblock in the bitstring	(not in the collection)	
-		//inline int next_bit_del				(int& nBB, BBScanSp& );					//EXPERIMENTAL! 
-		//inline int next_bit_del_pos			(int& posBB);							//posBB: position of bitblock in the collection (not the index of the element)		
-		//inline int next_bit					(int& nBB);								//nBB: index of bitblock in the bitstring	(not in the collection)				
-		//inline int prev_bit_del				(int& nBB);
-
-		//////////////////
-		// data members
-		protected:
-			scan_t scan_;
-		};
-
-	}//end namespace _impl
-
-	using _impl::BBScanSp;	
+	//////////////////
+	// data members
+	protected:
+		scan_t scan_;
+	};
 
 }//end namespace bitgraph
 

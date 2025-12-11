@@ -21,7 +21,7 @@ namespace bitgraph {
 	//non-sparse
 	using simple_bitarray = BitSet;
 	using bitarray = BBScan;
-	using watched_bitarray = BBSentinel;
+	using watched_bitarray = _impl::BBSentinel;
 
 	//sparse
 	using simple_sparse_bitarray = BitSetSp;

@@ -761,7 +761,12 @@ namespace bitgraph {
 		* @returns output stream
 		**/
 		std::ostream& print(std::ostream& o = std::cout,
-			bool show_pc = true, bool endl = true)		const override;
+							bool show_pc = true, bool endl = true)	const override;
+	
+
+		///////////////////////
+		//Conversions / Casts
+
 		/**
 		* @brief converts bb and its popcount to a readable string
 		* @details format example [...000111 (3)]
@@ -771,9 +776,6 @@ namespace bitgraph {
 		**/
 		std::string to_string();
 
-		///////////////////////
-		//Conversions / Casts
-
 		/**
 		* @brief Fills std::vector lb with the 1-bits of the bitset.
 		* @param lb: output vector of integers (external ownership)
@@ -781,18 +783,14 @@ namespace bitgraph {
 		* TODO - loop unrolling for efficiency (18/11/2025)
 		**/
 		void extract(vint& lb)								const;
-		void to_set(sint& lb)								const;
+		void extract_set(sint& lb)							const;
 
 		/**
 		* @brief Casts the bitstring to a vector of non-negative integers
 		* @details calls to_vector
-		*
-		* TODO - possibly copy to_set and to_vector implementations for efficiency (18/11/2025)
 		**/
 		explicit operator vint()							const;
-		explicit operator sint()							const;
-
-
+		
 		/**
 		* @brief Fills stack @s
 		* @param s: output stack object (external ownership)
@@ -801,12 +799,11 @@ namespace bitgraph {
 
 		/**
 		* @brief Fills array @lv and sets @size
-		* @param lv: must point to an array of capacity <= size (external ownership)
-		* @param size: output size of the array
+		* @param lv: must point to an array of capacity >= population size of this bitset (external ownership)
+		* @param size: output size of the array, should be the same as this->count()
 		* @param rev: if true, the array is filled in reverse order
-		* @returns pointer to the array, size of the array
 		**/
-		virtual	int* extract_array(int* lv, std::size_t& size, bool rev = false);
+		void extract_array(int* lv, std::size_t& size, bool rev = false);
 
 
 		////////////////////////

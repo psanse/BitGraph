@@ -9,7 +9,7 @@
   * 
   * @author pss
   *
-  * TODO- PENDING FULL REFACTORING (13/02/2025)
+  * TODO- PENDING FULL REFACTORING, namespace _impl (13/02/2025)
   **/
 
 #ifndef __BB_SENTINEL_H__
@@ -20,6 +20,7 @@
 
 
 namespace bitgraph {
+	
 	namespace _impl {
 
 		class BBSentinel : public BBScan {
@@ -98,7 +99,7 @@ namespace bitgraph {
 
 	}//namespace _impl
 
-	using _impl::BBSentinel;
+//	using _impl::BBSentinel;
 
 }//namespace bitgraph
 
@@ -108,7 +109,7 @@ namespace bitgraph {
 
 namespace bitgraph {
 
-	inline int BBSentinel::popcn64() const {
+	inline int _impl::BBSentinel::popcn64() const {
 		BITBOARD pc = 0;
 		for (int i = m_BBL; i <= m_BBH; ++i) {
 			pc += __popcnt64(vBB_[i]);
@@ -124,7 +125,7 @@ namespace bitgraph {
 
 	//specializes the only bitscan function used
 
-	int BBSentinel::prev_bit_del() {
+	int _impl::BBSentinel::prev_bit_del() {
 		//////////////
 		// BitScan reverse order and distructive
 		//
@@ -144,7 +145,7 @@ namespace bitgraph {
 	}
 
 
-	int BBSentinel::next_bit_del() {
+	int _impl::BBSentinel::next_bit_del() {
 		//////////////
 		// Bitscan distructive between sentinels
 		//
@@ -164,7 +165,7 @@ namespace bitgraph {
 	}
 
 
-	int BBSentinel::next_bit_del(BBSentinel& bbN_del) {
+	int _impl::BBSentinel::next_bit_del(BBSentinel& bbN_del) {
 		//////////////
 		// Bitscan distructive between sentinels
 		//
@@ -187,7 +188,7 @@ namespace bitgraph {
 
 
 
-	int BBSentinel::next_bit() {
+	int _impl::BBSentinel::next_bit() {
 		////////////////////////////
 		// last update:31/12/2013
 		// BitScan non destructive

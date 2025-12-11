@@ -291,7 +291,7 @@ void BitSet::extract (vint& lv ) const {
 	}
 }
 
-void BitSet::to_set(sint& ls) const
+void BitSet::extract_set(sint& ls) const
 {
 	ls.clear();
 	const int pc = this->count();
@@ -309,12 +309,6 @@ BitSet::operator vint() const {
 	return result;
 }
 
-BitSet::operator sint() const {
-	sint result;
-	to_set(result);
-	return result;
-}
-
 
 void BitSet::extract_stack(com::stack<int>& s)	const {
 	s.erase();
@@ -325,8 +319,7 @@ void BitSet::extract_stack(com::stack<int>& s)	const {
 	}
 }
 
-
-int* BitSet::extract_array(int* lv, std::size_t& size, bool rev) 	{
+void BitSet::extract_array(int* lv, std::size_t& size, bool rev) 	{
 	size = 0;
 	int v = BBObject::noBit;
 
@@ -340,7 +333,7 @@ int* BitSet::extract_array(int* lv, std::size_t& size, bool rev) 	{
 			lv[size++] = v;
 		}
 	}
-	return lv;
+
 }
 
 BitSet& BitSet::set_bit(const vint& lv) {
