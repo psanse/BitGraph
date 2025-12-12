@@ -331,13 +331,14 @@ namespace bitgraph {
 
 		using Self = Graph_W<ugraph, W>;						//own type
 		using BaseT = Base_Graph_W<ugraph, W>;					//parent type
-		using graph_type = ugraph;								//graph type
-		using bitset_type = typename graph_type::bitset_type;	//bitset type used by graph type 
-		using weight_type = W;									//weight type
-
+		using typename BaseT::graph_type;						
+		using typename BaseT::bitset_type;
+		using typename BaseT::weight_type;
+		
 		//alias types for backward compatibility
 		using _gt = graph_type;
-		using _wt = W;											//weight number type for backward compatibility
+		using _wt = weight_type;											
+		using _bbt = bitset_type;
 
 		//constructors (inherited from Base class)
 		using BaseT::Base_Graph_W;

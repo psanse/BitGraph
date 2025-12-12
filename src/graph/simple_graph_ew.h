@@ -433,15 +433,18 @@ namespace bitgraph {
 
 		using type = Graph_EW<ugraph, W>;						//own type
 		using BaseT = Base_Graph_EW<ugraph, W>;					//parent type
-		using graph_type = ugraph;								//graph type
-		using bitset_type = typename graph_type::bitset_type;	//bitset type used by graph type 
+		//using graph_type = ugraph;								//graph type
+		//using bitset_type = typename graph_type::bitset_type;	//bitset type used by graph type 
 		
+		using typename BaseT::graph_type;					//weight type
+		using typename BaseT::bitset_type;
 		using typename BaseT::mat_t;							//matrix type for weights
 
 
 		//alias types for backward compatibility
-		using _wt = W;										//weight number type for backward compatibility
+		using _wt = W;											//weight number type for backward compatibility
 		using _gt = graph_type;
+		using _bbt = bitset_type;
 
 		//constructors (inherited)
 		using Base_Graph_EW<ugraph, W>::Base_Graph_EW;
@@ -490,7 +493,7 @@ namespace bitgraph {
 		* @param val weight value
 		**/
 		template <bool EraseNonEdges = false>
-		void set_edge_weight(W val = ptype::ZERO_WEIGHT);
+		void set_edge_weight(W val = BaseT::ZERO_WEIGHT);
 
 		/**
 		* @brief sets new edge-weights based on modulus operation [Pullan 2008, MODULUS = 200]
