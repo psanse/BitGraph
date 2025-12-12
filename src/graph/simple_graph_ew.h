@@ -453,7 +453,7 @@ namespace bitgraph {
 		/**
 		* @ brief adds an edge (v, w) with weight val
 		**/
-		void add_edge(int v, int w, W val = ptype::ZERO_WEIGHT)	override;
+		void add_edge(int v, int w, W val = BaseT::ZERO_WEIGHT)	override;
 
 		/**
 		*  @brief sets edge-weight val to the undirected edge {v, w} if the edge exists
