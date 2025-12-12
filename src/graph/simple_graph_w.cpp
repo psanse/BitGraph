@@ -29,16 +29,16 @@ using namespace bitgraph;
 //globals
 //const int DEFAULT_WEIGHT_MODULUS = 200;     //for modulus weight generation  [Pullman 2008]		
 
-/////////////////////////////////////////////////
-//template<class Graph_t, class W>
-//const W Base_Graph_W <Graph_t, W >::NO_WEIGHT = -1;
+///////////////////////////////////////////////
+template<class Graph_t, class W>
+const W Base_Graph_W <Graph_t, W >::NO_WEIGHT;
 
-//template<class Graph_t, class W>
-//constexpr W Base_Graph_W <Graph_t, W >::ZERO_WEIGHT;
-//
-//template<class Graph_t, class W>
-//constexpr W Base_Graph_W <Graph_t, W >::DEFAULT_WEIGHT;
-/////////////////////////////////////////////////
+template<class Graph_t, class W>
+constexpr W Base_Graph_W <Graph_t, W >::ZERO_WEIGHT;
+
+template<class Graph_t, class W>
+constexpr W Base_Graph_W <Graph_t, W >::DEFAULT_WEIGHT;
+///////////////////////////////////////////////
 
 
 template<class Graph_t, class W>
