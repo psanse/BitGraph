@@ -334,6 +334,10 @@ namespace bitgraph {
 		using typename BaseT::graph_type;						
 		using typename BaseT::bitset_type;
 		using typename BaseT::weight_type;
+
+		using BaseT::NO_WEIGHT;
+		using BaseT::ZERO_WEIGHT;
+		using BaseT::DEFAULT_WEIGHT;
 		
 		//alias types for backward compatibility
 		using _gt = graph_type;
