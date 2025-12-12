@@ -435,11 +435,7 @@ namespace bitgraph {
 		using BaseT = Base_Graph_EW<ugraph, W>;					//parent type
 		using typename BaseT::graph_type;						
 		using typename BaseT::bitset_type;
-
-		using BaseT::NO_WEIGHT;
-		using BaseT::ZERO_WEIGHT;
-		using BaseT::DEFAULT_WEIGHT;
-		
+				
 		//alias types for backward compatibility
 		using _wt = W;											//weight number type for backward compatibility
 		using _gt = graph_type;
