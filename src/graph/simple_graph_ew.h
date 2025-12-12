@@ -509,14 +509,14 @@ namespace bitgraph {
 
 		int max_graph_degree()						const { return this->g_.max_graph_degree(); }
 		int degree(int v)							const { return this->g_.degree(v); }
-		int degree(int v, const typename _bbt& bbn)	const { return this->g_.degree(v, bbn); }
+		int degree(int v, const _bbt& bbn)			const { return this->g_.degree(v, bbn); }
 
 		/////////////
 		//other operations
 
-			/**
-			* @brief generates random edges uniformly with probability p and weight val
-			**/
+		/**
+		* @brief generates random edges uniformly with probability p and weight val
+		**/
 		void gen_random_edges(double, W val = BaseT::ZERO_WEIGHT)						override;
 
 		/////////////
