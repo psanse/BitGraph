@@ -27,11 +27,11 @@ using namespace std;
 using namespace bitgraph;
 
 /////////////////////////////////////////////////
-template<class Graph_t, class W>
-const W Base_Graph_EW <Graph_t, W >::NO_WEIGHT =  -1;					// or 0x1FFFFFFF (best value for empty weight?)	
-
-template<class Graph_t, class W>
-const W Base_Graph_EW <Graph_t, W >::ZERO_WEIGHT = 0;
+//template<class Graph_t, class W>
+//const W Base_Graph_EW <Graph_t, W >::NO_WEIGHT =  -1;					// or 0x1FFFFFFF (best value for empty weight?)	
+//
+//template<class Graph_t, class W>
+//const W Base_Graph_EW <Graph_t, W >::ZERO_WEIGHT = 0;
 /////////////////////////////////////////////////
 
 template<class Graph_t, class W>
@@ -92,7 +92,7 @@ void Base_Graph_EW<Graph_t, W >::set_weight(int v, int w, W val) {
 
 	bool is_edge = g_.is_edge(v, w);	
 
-	if (is_edge || (val == Base_Graph_EW<Graph_t, W >::NO_WEIGHT && !is_edge)) {
+	if (is_edge || (val == NO_WEIGHT && !is_edge)) {
 		we_[v][w] = val;
 	}
 	else {
@@ -574,13 +574,13 @@ std::ostream& Base_Graph_EW<Graph_t, W>::print_edges(std::ostream& o, bool eofl)
 template<class W>
 std::ostream& Graph_EW<ugraph, W>::print_edges(std::ostream& o, bool eofl)  const {	
 
-	const auto NV = ptype::g_.num_vertices();	
+	const auto NV = this->g_.num_vertices();	
 
 	for (auto i = 0; i < NV - 1; ++i) {
 		for (auto j = i + 1; j < NV; ++j) {
 
-			if (ptype::g_.is_edge(i, j)) {
-				o << "[" << i << "]" << "--(" << ptype::we_[i][j]  << ")-->" << "[" << j << "]" << endl;
+			if (this->g_.is_edge(i, j)) {
+				o << "[" << i << "]" << "--(" << this->we_[i][j]  << ")-->" << "[" << j << "]" << endl;
 			}
 		}
 	}
@@ -593,11 +593,11 @@ template<class W>
 void Graph_EW<ugraph, W>::add_edge(int v, int w, W val)
 {
 	//sets undirected edge
-	ptype::g_.add_edge(v, w);
+	this->g_.add_edge(v, w);
 
 	//sets both weights
-	ptype::we_[v][w] = val;
-	ptype::we_[w][v] = val;
+	this->we_[v][w] = val;
+	this->we_[w][v] = val;
 }
 
 template <class W>
@@ -607,12 +607,12 @@ void Graph_EW< ugraph, W >::set_weight(int v, int w, W val) {
 	assert(v != w);
 	//////////////////
 
-	auto is_edge = ptype::g_.is_edge(v, w);
+	auto is_edge = this->g_.is_edge(v, w);
 
 
-	if (is_edge || (val == ptype::NO_WEIGHT && !is_edge)) {
-		ptype::we_[v][w] = val;
-		ptype::we_[w][v] = val;
+	if (is_edge || (val == BaseT::NO_WEIGHT && !is_edge)) {
+		this->we_[v][w] = val;
+		this->we_[w][v] = val;
 	}
 	else {
 		LOGG_WARNING("edge-weight cannot be added to a non-edge", 
@@ -624,10 +624,10 @@ void Graph_EW< ugraph, W >::set_weight(int v, int w, W val) {
 template<class W>
 void Graph_EW<ugraph, W>::gen_random_edges(double p, W val){
 
-	const auto NV = ptype::g_.num_vertices();
+	const auto NV = this->g_.num_vertices();
 
 	//removes all edges
-	ptype::g_.remove_edges();
+	this->g_.remove_edges();
 
 	//sets directed edges with probability p
 	for (auto i = 0; i < NV - 1; ++i) {
@@ -652,8 +652,8 @@ std::ostream& Graph_EW<ugraph, W>::print_edge_weights(std::ostream& o, bool line
 	else {								//outputs to stream edge-weights in matrix form
 		for (auto i = 0; i < NV - 1; ++i) {
 			for (auto j = i + 1; j < NV; ++j) {
-				if (ptype::we_[i][j] != ptype::NO_WEIGHT) {
-					o << ptype::we_[i][j] << '\t';
+				if (this->we_[i][j] != BaseT::NO_WEIGHT) {
+					o << this->we_[i][j] << '\t';
 				}
 				else {
 					o << "--" << '\t';
@@ -671,14 +671,14 @@ std::ostream& Graph_EW<ugraph, W>::print_edge_weights(vint& lv, std::ostream& o)
 {	
 	for (auto i = 0u; i < lv.size() - 1; ++i) {
 		for (auto j = i + 1; j < lv.size(); ++j) {
-			if (ptype::we_[lv[i]][lv[j]] != ptype::NO_WEIGHT) {
+			if (this->we_[lv[i]][lv[j]] != BaseT::NO_WEIGHT) {
 
 				/////////////////////////////////////////////////////////////////////////////////////////	
-				//o << "[" << lv[i] << "-" << lv[j] << " (" << ptype::we_[lv[i]][lv[j]] << ")] " << endl;
+				//o << "[" << lv[i] << "-" << lv[j] << " (" << this->we_[lv[i]][lv[j]] << ")] " << endl;
 				///////////////////////////////////////////////////////////////////////////////////////////
 
 				///////////////////////////////////////////////////////////////////////////////////////////
-				o << "[" << i << "]" << "--(" << ptype::weight(i, j) << ")-->" << "[" << j << "]" << endl;
+				o << "[" << i << "]" << "--(" << this->weight(i, j) << ")-->" << "[" << j << "]" << endl;
 				///////////////////////////////////////////////////////////////////////////////////////////
 			}
 		}
@@ -704,7 +704,7 @@ ostream& Graph_EW<ugraph, W>::write_dimacs (ostream& o) {
 		
 	//write vertex weights
 	for (int v = 0; v < NV; ++v) {
-		if (this->we_[v][v] != ptype::NO_WEIGHT) {
+		if (this->we_[v][v] != BaseT::NO_WEIGHT) {
 			o << "n " << v + 1 << " " << this->we_[v][v] << endl;
 		}
 	}
@@ -791,16 +791,14 @@ void Base_Graph_EW<Graph_t, W>::make_edge_weighted(bool erase_non_edges)
 //list of valid types to allow generic code in *.cpp files 
 
 namespace bitgraph {
-	namespace _impl {
 
-		template class  Base_Graph_EW<ugraph, int>;
-		template class  Base_Graph_EW<ugraph, double>;
-		template class  Graph_EW<ugraph, int>;
-		template class  Graph_EW<ugraph, double>;
+	template class  Base_Graph_EW<ugraph, int>;
+	template class  Base_Graph_EW<ugraph, double>;
+	template class  Graph_EW<ugraph, int>;
+	template class  Graph_EW<ugraph, double>;
 
 		//other specializations... (sparse_graph)
 
-} //namespace _impl
 } //namespace bitgraph
 
 ////////////////////////////////////////////

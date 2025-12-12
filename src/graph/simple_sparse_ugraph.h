@@ -19,11 +19,9 @@
 #include <string>
 #include <vector>
 
-
+ //useful alias
 namespace bitgraph {
-	//useful alias
 	using USS = bitgraph::Ugraph<BBScanSp>;
-
 }
 
 ////////////////////////

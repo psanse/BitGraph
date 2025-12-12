@@ -25,6 +25,7 @@ namespace bitgraph {
 }
 
 namespace bitgraph {
+	
 	namespace _impl {
 
 		////////////////////////
@@ -56,7 +57,7 @@ namespace bitgraph {
 
 				//allocation - empty graph of size NV
 				ug.reset(NV);
-				
+
 				//copies adjacency (non-empty) block array
 				for (auto v = 0; v < NV; ++v) {
 					for (auto it = sug.adj_[v].cbegin(); it != sug.adj_[v].cend(); ++it) {
@@ -69,7 +70,7 @@ namespace bitgraph {
 				}
 
 				//name
-				ug.set_name(sug.name());				
+				ug.set_name(sug.name());
 			}
 
 
@@ -84,7 +85,7 @@ namespace bitgraph {
 
 				//allocation - empty graph of size NV
 				sug.reset(NV);
-			
+
 				//add edges	
 				auto blockID = ug.num_blocks();
 				for (auto v = 0; v < NV; ++v) {
@@ -108,8 +109,6 @@ namespace bitgraph {
 		};
 
 	} //end of namespace _impl
-
-	using _impl::GraphConversion;
 
 }//end of namespace bitgraph
 

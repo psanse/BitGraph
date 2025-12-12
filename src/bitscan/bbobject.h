@@ -68,8 +68,12 @@ namespace bitgraph {
 
 		template< class BitSetT >
 		struct ScanRev {
-			using basic_type = BitSetT;
-			using type = ScanRev<BitSetT>;
+
+			using Self = ScanRev<BitSetT>;		//own type
+			using bitset_type = BitSetT;		//basic type (a type of bitset)
+
+			//using basic_type = bitset_type;		//for backward compatibility
+			//using type = Self;
 
 		public:
 
@@ -107,9 +111,10 @@ namespace bitgraph {
 
 		template< class BitSetT >
 		struct Scan {
-			using basic_type = BitSetT;
-			using type = Scan<BitSetT>;
+			using Self = ScanRev<BitSetT>;		//own type
+			using bitset_type = BitSetT;		//basic type (a type of bitset)
 
+			
 		public:
 
 			/**
@@ -146,8 +151,8 @@ namespace bitgraph {
 
 		template< class BitSetT >
 		struct ScanDest {
-			using basic_type = BitSetT;
-			using type = ScanDest<BitSetT>;
+			using Self = ScanRev<BitSetT>;		//own type
+			using bitset_type = BitSetT;		//basic type (a type of bitset)
 
 		public:
 
@@ -184,9 +189,10 @@ namespace bitgraph {
 
 		template< class BitSetT >
 		struct ScanDestRev {
-			using basic_type = BitSetT;
-			using type = ScanDest<BitSetT>;
+			using Self = ScanRev<BitSetT>;		//own type
+			using bitset_type = BitSetT;		//basic type (a type of bitset)
 
+			
 		public:
 
 			/**

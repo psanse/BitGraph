@@ -30,19 +30,16 @@ using namespace bitgraph;
 //const int DEFAULT_WEIGHT_MODULUS = 200;     //for modulus weight generation  [Pullman 2008]		
 
 /////////////////////////////////////////////////
-template<class Graph_t, class W>
-const W Base_Graph_W <Graph_t, W >::NO_WEIGHT = -1;		
+//template<class Graph_t, class W>
+//const W Base_Graph_W <Graph_t, W >::NO_WEIGHT = -1;
 
-template<class Graph_t, class W>
-const W Base_Graph_W <Graph_t, W >::ZERO_WEIGHT = 0;
-
-template<class Graph_t, class W>
-const W Base_Graph_W <Graph_t, W >::DEFAULT_WEIGHT = 1.0;												
+//template<class Graph_t, class W>
+//constexpr W Base_Graph_W <Graph_t, W >::ZERO_WEIGHT;
+//
+//template<class Graph_t, class W>
+//constexpr W Base_Graph_W <Graph_t, W >::DEFAULT_WEIGHT;
 /////////////////////////////////////////////////
 
-
-////////////////////////////////////////////////////////////////
-// Necessary implementation of template methods in header file
 
 template<class Graph_t, class W>
 void Base_Graph_W<Graph_t, W>::complement_weights()
@@ -67,13 +64,6 @@ int Base_Graph_W<Graph_t, W>::create_complement(Base_Graph_W<Graph_t, W>& g) con
 	return g_.create_complement(g.graph());
 	////////////////////////////////////////
 }
-
-//template<class Graph_t, class W>
-//Base_Graph_W<Graph_t, W>::Base_Graph_W(vector<W>& lw) : w_(lw) {
-//
-//	g_.reset(lw.size());
-//	
-//}
 
 template<class Graph_t, class W>
 Base_Graph_W<Graph_t, W>::Base_Graph_W(std::string filename){	
@@ -476,24 +466,24 @@ template<class W>
 ostream& Graph_W<ugraph, W>::write_dimacs(ostream& o) {
 
 	//timestamp comment
-	ptype::g_.timestamp_dimacs(o);
+	this->g_.timestamp_dimacs(o);
 
 	//name comment
-	ptype::g_.name_dimacs(o);
+	this->g_.name_dimacs(o);
 
 	//dimacs header - recompute edges
-	ptype::g_.header_dimacs(o, false);
+	this->g_.header_dimacs(o, false);
 
 	//write DIMACS nodes n <v> <w>
-	const int NV = ptype::g_.num_vertices();
+	const int NV = this->g_.num_vertices();
 	for (int v = 0; v < NV; ++v) {
-		o << "n " << v + 1 << " " << ptype::weight(v) << endl;
+		o << "n " << v + 1 << " " << this->weight(v) << endl;
 	}
 
 	//write directed edges (1-based vertex notation dimacs)
 	for (int v = 0; v < NV - 1; ++v) {
 		for (int w = v + 1; w < NV; ++w) {
-			if (ptype::g_.is_edge(v, w))							//O(log) for sparse graphs: specialize
+			if (this->g_.is_edge(v, w))							//O(log) for sparse graphs: specialize
 				o << "e " << v + 1 << " " << w + 1 << endl;
 		}
 	}
@@ -506,16 +496,15 @@ ostream& Graph_W<ugraph, W>::write_dimacs(ostream& o) {
 //list of valid types to allow generic code in *.cpp files 
 
 namespace bitgraph {
-	namespace _impl {
 
-		template class  Base_Graph_W<ugraph, int>;
-		template class  Base_Graph_W<ugraph, double>;
-		template class  Graph_W<ugraph, int>;
-		template class  Graph_W<ugraph, double>;
+	template class  Base_Graph_W<ugraph, int>;
+	template class  Base_Graph_W<ugraph, double>;
+	template class  Graph_W<ugraph, int>;
+	template class  Graph_W<ugraph, double>;
 
-		//other specializations... (sparse_graph)
+	//other specializations... (sparse_graph)
 
-	} // namespace _impl
+
 } // namespace bitgraph
 
 ////////////////////////////////////////////

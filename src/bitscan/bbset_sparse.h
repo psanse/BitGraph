@@ -42,8 +42,8 @@ namespace bitgraph {
 
 	public:
 		
-		using BBObject::npos;			//invalid index
-		using BBObject::noBit;			//invalid bit
+		using BBObject::npos;			//invalid block (index_t)
+		using BBObject::noBit;			//invalid bit	(int)
 		
 		struct SparseBlock {
 			
