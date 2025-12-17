@@ -14,12 +14,6 @@
 
 using namespace bitgraph;
 
-
-template<class T>
-bitgraph::stack<T>::stack() :
-	nE_(0), stack_(nullptr), cap_(0)
-{}
-
 template<class T>
 bitgraph::stack<T>::stack(std::size_t MAX_SIZE) : 
 	nE_(0), stack_(nullptr), cap_(0)
@@ -60,17 +54,22 @@ bitgraph::stack<T>& bitgraph::stack<T>::operator = (bitgraph::stack<T>&& s) noex
 
 template<class T>
 void bitgraph::stack<T>::reset(std::size_t MAX_SIZE) {
-	delete[] stack_;
-	nE_ = 0;
-	cap_ = 0;
+
+	// 1) Allocate first (may throw). No state changes yet.
+	T* new_stack = nullptr;
 	try {
-		stack_ = new T[MAX_SIZE];
-		cap_ = MAX_SIZE;
+		new_stack = (MAX_SIZE == 0) ? nullptr : new T[MAX_SIZE];
 	}
-	catch (...) {
-		LOG_ERROR("bad_alloc - stack<T>::reset");
-		throw;
+	catch (const std::bad_alloc&) {
+		LOG_ERROR("bad_alloc - stack<T>::reset (MAX_SIZE=", MAX_SIZE, ")");
+		throw; 
 	}
+
+	// 2) Commit (no-throw section)
+	delete[] stack_;
+	stack_ = new_stack;
+	nE_ = 0;
+	cap_ = MAX_SIZE;
 }
 
 template<class T>

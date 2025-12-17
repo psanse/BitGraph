@@ -30,20 +30,20 @@ namespace bitgraph {
 
 		////////////////////////
 		//
-		// struct stack
+		// struct FixedStack
 		//
-		// (very lightweight stack implemented by a C-array)
+		// (very lightweight fixed size stack implemented by a C-array)
 		//
 		////////////////////////
 
 		template <class T>
 		struct stack {
 
-			using value = T;
+			using value_type = T;
 
 			///////
 			//construction / destruction
-			stack();
+			stack() = default;
 			explicit stack(std::size_t MAX_SIZE);
 
 			//copy semantics are disallowed
