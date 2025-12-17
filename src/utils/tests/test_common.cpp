@@ -29,11 +29,11 @@ namespace bitgraph {
 
 TEST(Common_stack, constructor) {
 
-	bitgraph::com::stack<int> s(3);
+	bitgraph::com::FixedStack<int> s(3);
 	s.push(10);
 	s.push(20);
 		
-	bitgraph::com::stack<int> s2 = std::move(s);
+	bitgraph::com::FixedStack<int> s2 = std::move(s);
 
 	EXPECT_EQ(2, s2.size());
 	EXPECT_EQ(20, s2.top());
@@ -83,10 +83,10 @@ TEST(Common_counting, number_of_words){
 
 }
 
-TEST(Common, stack_basic) {
+TEST(Common, fixed_stack_basic) {
 
 	const int N = 10;
-	bitgraph::com::stack<int> s(N);
+	bitgraph::com::FixedStack<int> s(N);
 
 	EXPECT_EQ(0, s.size());
 
@@ -121,10 +121,10 @@ TEST(Common, stack_basic) {
 
 }
 
-TEST(Common, stack_pop){
+TEST(Common, fixed_stack_pop){
 
 	const int N=10;		
-	bitgraph::com::stack<int> s(N);
+	bitgraph::com::FixedStack<int> s(N);
 	s.push(10);
 	s.push(30);
 

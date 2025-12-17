@@ -15,7 +15,7 @@
 using namespace bitgraph;
 
 template<class T>
-bitgraph::stack<T>::stack(std::size_t MAX_SIZE) : 
+bitgraph::FixedStack<T>::FixedStack(std::size_t MAX_SIZE) : 
 	nE_(0), stack_(nullptr), cap_(0)
 {
 	try {
@@ -23,13 +23,13 @@ bitgraph::stack<T>::stack(std::size_t MAX_SIZE) :
 		cap_ = MAX_SIZE;
 	}
 	catch (...) {
-		LOGG_ERROR("bad_alloc - stack<T>::stack");
+		LOGG_ERROR("bad_alloc - FixedStack<T>::FixedStack");
 		throw;
 	}
 }
 
 template<class T>
-bitgraph::stack<T>::stack(bitgraph::stack<T>&& s) noexcept
+bitgraph::FixedStack<T>::FixedStack(bitgraph::FixedStack<T>&& s) noexcept
 	: nE_(s.nE_), stack_(s.stack_), cap_(s.cap_)
 {
 	s.stack_ = nullptr;
@@ -38,7 +38,7 @@ bitgraph::stack<T>::stack(bitgraph::stack<T>&& s) noexcept
 }
 
 template<class T>
-bitgraph::stack<T>& bitgraph::stack<T>::operator = (bitgraph::stack<T>&& s) noexcept
+bitgraph::FixedStack<T>& bitgraph::FixedStack<T>::operator = (bitgraph::FixedStack<T>&& s) noexcept
 {
 	delete[] stack_;
 	nE_ = s.nE_;
@@ -53,7 +53,7 @@ bitgraph::stack<T>& bitgraph::stack<T>::operator = (bitgraph::stack<T>&& s) noex
 }
 
 template<class T>
-void bitgraph::stack<T>::reset(std::size_t MAX_SIZE) {
+void bitgraph::FixedStack<T>::reset(std::size_t MAX_SIZE) {
 
 	// 1) Allocate first (may throw). No state changes yet.
 	T* new_stack = nullptr;
@@ -61,7 +61,7 @@ void bitgraph::stack<T>::reset(std::size_t MAX_SIZE) {
 		new_stack = (MAX_SIZE == 0) ? nullptr : new T[MAX_SIZE];
 	}
 	catch (const std::bad_alloc&) {
-		LOG_ERROR("bad_alloc - stack<T>::reset (MAX_SIZE=", MAX_SIZE, ")");
+		LOG_ERROR("bad_alloc - FixedStack<T>::reset (MAX_SIZE=", MAX_SIZE, ")");
 		throw; 
 	}
 
@@ -73,7 +73,7 @@ void bitgraph::stack<T>::reset(std::size_t MAX_SIZE) {
 }
 
 template<class T>
-void bitgraph::stack<T>::clear() {
+void bitgraph::FixedStack<T>::clear() {
 	delete[] stack_;
 	stack_ = nullptr;
 	nE_ = 0;
@@ -81,9 +81,9 @@ void bitgraph::stack<T>::clear() {
 }
 
 template<class T>
-void bitgraph::stack<T>::push(T d) {
-	assert(stack_ != nullptr && "stack not initialized. Call reset(MAX_SIZE) or use sized ctor - bitgraph::stack<T>::push");
-	assert(nE_ < cap_ && "stack overflow - bitgraph::stack<T>::push");
+void bitgraph::FixedStack<T>::push(T d) {
+	assert(stack_ != nullptr && "FixedStack not initialized. Call reset(MAX_SIZE) or use sized ctor - bitgraph::FixedStack<T>::push");
+	assert(nE_ < cap_ && "FixedStack overflow - bitgraph::FixedStack<T>::push");
 
 	/////////////////////////////
 	stack_[nE_++] = std::move(d);
@@ -91,17 +91,17 @@ void bitgraph::stack<T>::push(T d) {
 }
 
 template<class T>
-void bitgraph::stack<T>::push_bottom(T d) {
-	assert(stack_ != nullptr && "stack not initialized. Call reset(MAX_SIZE) or use sized ctor - bitgraph::stack<T>::push_bottom");
-	assert(nE_ < cap_ && "stack overflow - bitgraph::stack<T>::push_bottom");
+void bitgraph::FixedStack<T>::push_bottom(T d) {
+	assert(stack_ != nullptr && "FixedStack not initialized. Call reset(MAX_SIZE) or use sized ctor - bitgraph::FixedStack<T>::push_bottom");
+	assert(nE_ < cap_ && "FixedStack overflow - bitgraph::FixedStack<T>::push_bottom");
 
-	//stack empty case
+	//FixedStack empty case
 	if (nE_ == 0) {
 		stack_[nE_++] = std::move(d);
 	}
 	else {
 
-		//stack non-empty case, moves bottom element to top
+		//FixedStack non-empty case, moves bottom element to top
 		T temp = stack_[0];
 		stack_[0] = std::move(d);
 		stack_[nE_++] = std::move(temp);
@@ -109,46 +109,46 @@ void bitgraph::stack<T>::push_bottom(T d) {
 }
 
 template<class T>
-const T& bitgraph::stack<T>::top() const
+const T& bitgraph::FixedStack<T>::top() const
 {
-	assert(nE_ > 0 && "stack::top on empty stack");
+	assert(nE_ > 0 && "FixedStack::top on empty FixedStack");
 	return stack_[nE_ - 1];
 }
 
 template<class T>
-T& bitgraph::stack<T>::top()
+T& bitgraph::FixedStack<T>::top()
 {
-	assert(nE_ > 0 && "stack::top on empty stack");
+	assert(nE_ > 0 && "FixedStack::top on empty FixedStack");
 	return stack_[nE_ - 1];
 }
 
 template<class T>
-void bitgraph::stack<T>::pop() {
-	assert(nE_ > 0 && "stack::pop on empty stack");
+void bitgraph::FixedStack<T>::pop() {
+	assert(nE_ > 0 && "FixedStack::pop on empty FixedStack");
 	--nE_;
 }
 
 template<class T>
-void bitgraph::stack<T>::pop(std::size_t nb) {
-	assert(nE_ >= nb && "stack::pop(nb) removes more elements than present");
+void bitgraph::FixedStack<T>::pop(std::size_t nb) {
+	assert(nE_ >= nb && "FixedStack::pop(nb) removes more elements than present");
 	nE_ -= nb;	
 }
 
 template<class T>
-void bitgraph::stack<T>::pop_bottom() {
-	assert(nE_ > 0 && "stack::pop_bottom on empty stack");
+void bitgraph::FixedStack<T>::pop_bottom() {
+	assert(nE_ > 0 && "FixedStack::pop_bottom on empty FixedStack");
 	stack_[0] = std::move(stack_[--nE_]);
 }
 
 template<class T>
-void bitgraph::stack<T>::erase(int pos) {
-	assert(pos >= 0 && static_cast<std::size_t>(pos) < nE_ && "stack::erase out of bounds");
+void bitgraph::FixedStack<T>::erase(int pos) {
+	assert(pos >= 0 && static_cast<std::size_t>(pos) < nE_ && "FixedStack::erase out of bounds");
 	stack_[pos] = std::move(stack_[--nE_]);
 }
 
 //I/O
 template<class T>
-std::ostream& bitgraph::stack<T>::print(std::ostream& o) const {
+std::ostream& bitgraph::FixedStack<T>::print(std::ostream& o) const {
 	o << "[";
 	for (auto i = 0u; i < nE_; ++i) {
 		o << stack_[i] << " ";
@@ -160,8 +160,8 @@ std::ostream& bitgraph::stack<T>::print(std::ostream& o) const {
 /////////////////////////////////
 // declaration of valid types 
 
-template struct bitgraph::stack<int>;
-template struct  bitgraph::stack<double>;
+template struct bitgraph::FixedStack<int>;
+template struct  bitgraph::FixedStack<double>;
 
 /////////////////////////////////
 

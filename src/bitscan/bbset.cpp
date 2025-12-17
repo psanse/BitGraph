@@ -317,7 +317,7 @@ bitgraph::BitSet::operator sint() const
 }
 
 
-void BitSet::extract_stack(com::stack<int>& s)	const {
+void BitSet::extract_stack(com::FixedStack<int>& s)	const {
 	s.erase();
 
 	int v = BBObject::noBit;

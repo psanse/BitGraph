@@ -32,45 +32,45 @@ namespace bitgraph {
 		//
 		// struct FixedStack
 		//
-		// (very lightweight fixed size stack implemented by a C-array)
+		// (lightweight fixed size stack implemented by a fixed size array)
 		//
 		////////////////////////
 
 		template <class T>
-		struct stack {
+		struct FixedStack {
 
 			using value_type = T;
 
 			///////
 			//construction / destruction
-			stack() = default;
-			explicit stack(std::size_t MAX_SIZE);
+			FixedStack() = default;
+			explicit FixedStack(std::size_t MAX_SIZE);
 
 			//copy semantics are disallowed
-			stack(const stack&) = delete;
-			stack& operator = (const stack&) = delete;
+			FixedStack(const FixedStack&) = delete;
+			FixedStack& operator = (const FixedStack&) = delete;
 
 			//move semantics are allowed
-			stack(stack&&)	 noexcept;
-			stack& operator = (stack&&)	 noexcept;
+			FixedStack(FixedStack&&)	 noexcept;
+			FixedStack& operator = (FixedStack&&)	 noexcept;
 
-			~stack() { clear(); }
+			~FixedStack() { clear(); }
 
 			//setters and getters 
-			const T& at(int pos)	const { return stack_[pos]; }
+			const T& at(std::size_t pos)	const { return stack_[pos]; }
 			const T& top()			const;
-			const T& bottom()		const { return stack_[0]; }
-
-			T& at(int pos) { return stack_[pos]; }
 			T& top();
+			const T& bottom()		const { return stack_[0]; }
 			T& bottom() { return stack_[0]; }
 
-			std::size_t size() { return nE_; }
-			std::size_t capacity() const { return cap_; }
-			bool full() const { return nE_ >= cap_; }
+			T& at(std::size_t pos) { return stack_[pos]; }
+			
+			std::size_t size() const noexcept  { return nE_; }
+			std::size_t capacity() const noexcept  { return cap_; }
+						
 
 			////////////
-			// memory
+			// allocation
 
 			/**
 			* @brief Resets the stack to a new size, previos elements are destroyed.
@@ -92,6 +92,7 @@ namespace bitgraph {
 			/**
 			* @brief Places element at the top of the stack
 			*	     (last position in the underlying array)
+			* @details: no allocation is performed, stack must have enough capacity
 			**/
 			void push(T d);
 
@@ -100,7 +101,7 @@ namespace bitgraph {
 			*	     (first position in the underlying array)
 			*
 			*		 I. The bottom element is moved to the top of the stack			
-			*
+			* @details: no allocation is performed, stack must have enough capacity
 			* TODO - possibly change names (push_front, push_back idioms better) (06/10/2025)
 			**/
 			void push_bottom(T d);
@@ -108,6 +109,7 @@ namespace bitgraph {
 			/**
 			* @brief Removes the top element from the stack
 			*	     (the element is lost)
+			* @details: no deallocation is performed
 			**/
 			void pop();
 
@@ -115,7 +117,7 @@ namespace bitgraph {
 			* @brief Removes the top nb elements from the top of the stack.
 			*		 (the elements are lost)
 			* @param nb: number of elements to remove
-			*
+			* @details: no deallocation is performed
 			**/
 			void pop(std::size_t nb);
 
@@ -124,6 +126,7 @@ namespace bitgraph {
 			*		 (the bottom element is lost)
 			*
 			*		 I. The top element is moved to the bottom of the stack
+			* @details: no deallocation is performed
 			**/
 			void pop_bottom();
 
@@ -133,19 +136,22 @@ namespace bitgraph {
 			*
 			*		 I. The top element is moved to position pos
 			* @param pos: position of the element to remove
+			* @details: no deallocation is performed
 			**/
 			void erase(int pos);
 
 			/**
 			* @brief Removes all elements from the stack.
 			*		 (no deallocation)
+			* @details: no deallocation is performed
 			**/
-			void erase() { nE_ = 0; }
+			void erase() noexcept { nE_ = 0; }
 
 			/////////////////
 			//boolean operations
 
-			bool empty()		const { return (nE_ == 0); }
+			bool empty() const noexcept { return (nE_ == 0); }
+			bool full() const noexcept { return nE_ >= cap_; }
 
 			////////////////////
 			//I/O
@@ -153,40 +159,60 @@ namespace bitgraph {
 			std::ostream& print(std::ostream& o) const;
 			
 			template<class U>
-			friend std::ostream& operator<< (std::ostream& o, const stack<U>& s);
+			friend std::ostream& operator<< (std::ostream& o, const FixedStack<U>& s);
 
 			/////////////////////
 			// data members
 
+		private:
 			std::size_t nE_ = 0;								//number of elements, points to the next position to fill
 			T* stack_ = nullptr;								//underlying C-array 		
 			std::size_t cap_ = 0;								//capacity of the underlying array
 
 		};
 
+	}//end namespace com
+			
+	using com::FixedStack;
+		
+}//end namespace bitgraph
+
+namespace bitgraph {
+	namespace com {
+		template<class U>
+		inline
+			std::ostream& operator<< (std::ostream& o, const FixedStack<U>& s) { s.print(o); return o; }
+	}
+}
+
+
+namespace bitgraph {
+	namespace detail
+	{
+
 		////////////////////////
 		//
-		// struct range_t
+		// struct IntRange
 		//
-		// (interval of positive integers - typically a range of vertices)
+		// Interval of positive integers - typically a range of vertices
+		// 
+		// TODO - under development (17/12/2025)
 		///////////////////////
 
-		struct range_t {
-			static const int noRange = -1;
-			int vl, vh;								//vl: low vertex/value, vh: high vertex/value
+		struct IntRange {
+			static constexpr int no_range = -1;
+			int vl = no_range;		//lower bound
+			int vh = no_range;		//upper bound
 
-			range_t(int lh = noRange, int rh = noRange) :
-				vl{ lh }, vh{ rh }
-			{
-			}
+			IntRange(int lh = no_range, int rh = no_range) noexcept :
+				vl{lh}, vh{rh}
+			{}
 
-			//boolean operations
-
-			/**
-			* @brief: determines an empty range
-			* @returns: True if the range has at least one NO_RANGE value False otherwise
-			**/
-			bool is_empty() const { return (vl == noRange || vh == noRange); }
+			//basic operations
+					
+			constexpr bool is_unset() const noexcept { return (vl == no_range || vh == no_range); }
+			constexpr bool is_set()   const noexcept { return !is_unset(); }
+			constexpr bool is_proper() const noexcept { return is_set() && (vl <= vh) && (vl >= 0); }
 
 			//I/O
 
@@ -197,34 +223,22 @@ namespace bitgraph {
 				os << "[" << vl << "," << vh << "]";
 				return os;
 			}
+
+			friend std::ostream& operator<<(std::ostream& os, const IntRange& r) {
+				return os << "[" << r.vl << "," << r.vh << "]";
+			}
+
+			friend constexpr bool operator == (const IntRange& lhs, const IntRange& rhs) {
+				return (lhs.vl == rhs.vl && lhs.vh == rhs.vh);
+			}
 		};
-
-		inline
-			bool operator == (const range_t& lhs, const range_t& rhs) {
-			return (lhs.vl == rhs.vl && lhs.vh == rhs.vh);
-		}
-		
-
-	}
-
-	//not sure if third party code will use this features (TODO- CHECK)
-	using com::range_t;
-	using com::stack;
-	using com::operator==;
+				
+	}//end namespace detail	
 
 }//end namespace bitgraph
 
 
-namespace bitgraph {
-	namespace com {
-				
-		template<class U>
-		inline
-		std::ostream& operator<< (std::ostream& o, const stack<U>& s) { s.print(o); return o; }
-	}
 
-	using com::operator<<;
-}
 
 
 #endif

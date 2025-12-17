@@ -16,7 +16,7 @@
 
 #include "bbobject.h"
 #include "bitblock.h"	
-#include "utils/common.h"			//for the primitive stack type
+#include "utils/common.h"			//for the primitive FixedStack type
 #include <vector>	
 #include <set>
 
@@ -796,7 +796,7 @@ namespace bitgraph {
 		* @brief Fills stack @s
 		* @param s: output stack object (external ownership)
 		**/
-		void extract_stack(com::stack<int>& s)			const;
+		void extract_stack(com::FixedStack<int>& s)			const;
 
 		/**
 		* @brief Fills array @lv and sets @size

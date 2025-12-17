@@ -274,16 +274,16 @@ namespace bitgraph {
 		* @brief prints the weights of the vertices in the stack lv
 		* @param lv: a set of vertices with a stack interface
 		**/
-		std::ostream& print_weights(com::stack<int>& lv, ostream& o = std::cout)								const;
+		std::ostream& print_weights(com::FixedStack<int>& lv, ostream& o = std::cout)								const;
 
 		/**
-		* @brief prints the weights of the vertices in the stack lv
+		* @brief prints the weights of the vertices in the FixedStack lv
 		*		 given a mapping of the vertices
 		* @param mapping: input mapping of the vertices with at least the same size as
-		*				  the stack lv
-		* @param lv: a set of vertices with a stack interface
+		*				  the FixedStack lv
+		* @param lv: a set of vertices with a FixedStack interface
 		**/
-		std::ostream& print_weights(com::stack<int>& lv, const vint& mapping, std::ostream& o = std::cout)	const;
+		std::ostream& print_weights(com::FixedStack<int>& lv, const vint& mapping, std::ostream& o = std::cout)	const;
 
 		/**
 		* @brief prints the weights of the vertices in lv
