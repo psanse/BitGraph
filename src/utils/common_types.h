@@ -12,6 +12,7 @@
 #include <iostream>
 #include <vector>
 #include <set>
+#include <cassert>
 
 ///////////////////////
 // useful aliases 
@@ -66,8 +67,10 @@ namespace bitgraph {
 			T& at(std::size_t pos) { return stack_[pos]; }
 			
 			std::size_t size() const noexcept  { return nE_; }
+			int size_int() const noexcept { return static_cast<int>(nE_); }								
 			std::size_t capacity() const noexcept  { return cap_; }
-						
+			
+			
 
 			////////////
 			// allocation
@@ -147,6 +150,15 @@ namespace bitgraph {
 			**/
 			void erase() noexcept { nE_ = 0; }
 
+			/**
+			* @brief Provides fast-rollback to a previous mark.
+			* @details: no deallocation is performed
+			**/
+			void truncate(std::size_t new_size) noexcept {
+				assert(new_size <= nE_);
+				nE_ = new_size;
+			}
+
 			/////////////////
 			//boolean operations
 
@@ -163,7 +175,7 @@ namespace bitgraph {
 
 			/////////////////////
 			// data members
-
+				
 		private:
 			std::size_t nE_ = 0;								//number of elements, points to the next position to fill
 			T* stack_ = nullptr;								//underlying C-array 		
