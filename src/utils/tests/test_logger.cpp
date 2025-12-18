@@ -4,7 +4,7 @@
 *		 Giovanni Squillero <giovanni.squillero@polito.it> (Summer 2018)
 * @date 06/11/2024
 * @last_update 25/01/25
-* @author copilot
+* @dev copilot
 *
 * TODO - no real tests, just visual inspection
 **/
