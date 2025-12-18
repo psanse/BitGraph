@@ -90,8 +90,18 @@ namespace bitgraph {
 		/**
 		* @brief number of vertices of the graph. Alias to num_vertices()
 		**/
-		std::size_t size() const  noexcept { return NV_; }
+		std::size_t size() const  noexcept { 
+			assert(NV_ >= 0);
+			return static_cast<std::size_t>(NV_); 
+		}
+
+		/**
+		* @brief number of vertices of the graph as signed integer
+		* @return: number of vertices as a signed integer
+		* @details: aliases order() and num_vertices()
+		**/
 		index_t num_vertices() const  noexcept { return NV_; }
+		index_t order() const  noexcept { return NV_; }
 
 
 		/**
@@ -641,7 +651,7 @@ namespace bitgraph {
 	inline
 		void Graph<BitSetT>::shrink_to_fit() {
 
-		for (auto v = 0; v < NV_; ++v) {
+		for (int v = 0; v < NV_; ++v) {
 			adj_[v].shrink_to_fit();
 		}
 
@@ -662,7 +672,7 @@ namespace bitgraph {
 
 		//sets to 0 bitblocks outside the range but
 		//does not remove the empty bitbloks
-		for (auto v = 0; v < NV_; ++v) {
+		for (int v = 0; v < NV_; ++v) {
 			adj_[v].erase_bit(NV_, -1);
 		}
 
