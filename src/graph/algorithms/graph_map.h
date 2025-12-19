@@ -267,7 +267,7 @@ namespace bitgraph{
 		/*if (!is_consistent()) {
 			LOG_ERROR("L2R and R2L are inconsistent orderings - GraphMap::build_mapping (2 ord...)");
 			LOG_ERROR("exiting...");
-			std::exit(EXIT_FAILURE);
+			std::abort();
 		}*/
 
 		//I/O
@@ -296,7 +296,7 @@ namespace bitgraph{
 		/*if (!is_consistent()) {
 			LOG_ERROR("L2R and R2L are inconsistent orderings - GraphMap::build_mapping(single ord...)");
 			LOG_ERROR("exiting...");
-			std::exit(EXIT_FAILURE);
+			std::abort();
 		}*/
 			
 		//return 0;

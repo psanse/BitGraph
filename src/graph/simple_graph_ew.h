@@ -638,7 +638,7 @@ namespace bitgraph {
 			//should not happen	
 			LOG_ERROR("unknown type -  Base_Graph_EW<Graph_t, W>::transform_weights");
 			LOG_ERROR("exiting");
-			std::exit(EXIT_FAILURE);
+			std::abort();
 		}
 	}
 
@@ -803,7 +803,7 @@ namespace bitgraph {
 		catch (...) {
 			LOG_ERROR("bad weight assignment - Base_Graph_EW<Graph_t, W>::reset");
 			LOG_ERROR("exiting");
-			std::exit(EXIT_FAILURE);
+			std::abort();
 		}
 
 		//set vertex weights to NO_WEIGHT if required

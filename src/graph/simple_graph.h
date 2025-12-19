@@ -594,7 +594,7 @@ namespace bitgraph {
 		if (NV > std::numeric_limits<int>::max()) {
 			LOGG_ERROR("Invalid graph size ", NV, " - Graph<BitSetT>::reset");
 			LOG_ERROR("exiting... ");
-			std::exit(EXIT_FAILURE);
+			std::abort();
 		}
 
 		//initialization
@@ -611,7 +611,7 @@ namespace bitgraph {
 			LOG_ERROR("memory for graph not allocated - Graph<BitSetT>::reset");
 			LOG_ERROR("%s", e.what());
 			LOG_ERROR("exiting... ");
-			std::exit(EXIT_FAILURE);
+			std::abort();
 		}
 
 		//update instance name
@@ -695,7 +695,7 @@ namespace bitgraph {
 						LOGG_ERROR("Unable to read a graph from file ", filename, "- Graph<BitSetT>::reset");
 						LOG_ERROR("Formats considered: DIMACS / MTX / EDGES / 01");
 						LOG_ERROR("exiting...");
-						std::exit(EXIT_FAILURE);
+						std::abort();
 					}
 				}
 			}

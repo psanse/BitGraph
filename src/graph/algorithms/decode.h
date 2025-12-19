@@ -38,7 +38,7 @@ namespace bitgraph {
 							LOGG_ERROR("Out of Range error: ", oor.what());
 							LOGG_ERROR("DecodeVertex: operator() - vertex : ", v);
 							LOGG_ERROR("exiting...");
-							std::exit(EXIT_FAILURE);
+							std::abort();
 						}
 					}
 					return v;

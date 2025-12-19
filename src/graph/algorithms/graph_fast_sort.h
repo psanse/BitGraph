@@ -494,7 +494,7 @@ namespace bitgraph {
 			if (node_active_state_.init_scan(BBObject::NON_DESTRUCTIVE) != -1) {
 				LOG_ERROR("init scan failed -  GraphFastRootSort<Graph_t>::sort_degen_non_decreasing_deg_B");
 				LOG_ERROR("exting");
-				std::exit(EXIT_FAILURE);
+				std::abort();
 			}
 
 			while ((w = node_active_state_.next_bit()) != BBObject::noBit) {

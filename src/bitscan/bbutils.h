@@ -307,7 +307,7 @@ namespace bitgraph {
 				catch (std::exception& e) {
 					LOG_ERROR("%s", e.what());
 					LOG_ERROR("BitSetArray::BitSetArray()");
-					std::exit(EXIT_FAILURE);
+					std::abort();
 				}
 			}
 
@@ -477,7 +477,7 @@ namespace bitgraph {
 		catch (std::exception& e) {
 			LOG_ERROR("%s", e.what());
 			LOG_ERROR("BitSetStack<BitSetT>::-reset()");
-			std::exit(EXIT_FAILURE);
+			std::abort();
 		}
 
 	}; //end struct

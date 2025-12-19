@@ -533,7 +533,7 @@ namespace bitgraph {
 		int Ugraph<BitSetT>::degree(int v, const BitSetSp& bbs)	const {
 		LOG_ERROR("function not yet implemented, should not be called - Ugraph<BitSetT>::degree");
 		LOG_ERROR("exiting...");
-		std::exit(EXIT_FAILURE);
+		std::abort();
 	}
 
 
@@ -802,7 +802,7 @@ namespace bitgraph {
 	int Ugraph<BitSetT>::degree(int v, int UB, const BitSetSp& bbn) const {
 		LOG_ERROR("function not yet implemented, should not be called - Ugraph<BitSetT>::degree");
 		LOG_ERROR("exiting...");
-		std::exit(EXIT_FAILURE);
+		std::abort();
 	}
 
 
