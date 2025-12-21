@@ -61,7 +61,7 @@ void bitgraph::FixedStack<T>::reset(std::size_t MAX_SIZE) {
 		new_stack = (MAX_SIZE == 0) ? nullptr : new T[MAX_SIZE];
 	}
 	catch (const std::bad_alloc&) {
-		LOG_ERROR("bad_alloc - FixedStack<T>::reset (MAX_SIZE=", MAX_SIZE, ")");
+		LOGG_ERROR("bad_alloc - FixedStack<T>::reset (MAX_SIZE=", MAX_SIZE, ")");
 		throw; 
 	}
 
