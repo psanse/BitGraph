@@ -190,11 +190,11 @@ TEST_F(BitSetWithPC_ClassTest, lazy_bit_erase) {
 	EXPECT_EQ(0, bb.count());
 
 	//not sync
-	EXPECT_FALSE(bb.is_sync_pc());
+	EXPECT_FALSE(bb.is_pc_consistent());
 
 	//sync cached popcount - restores bb
-	bb.sync_pc();						//restores bb:{10, 64, 65} with count=3	
-	EXPECT_TRUE(bb.is_sync_pc());
+	bb.recompute_pc();						//restores bb:{10, 64, 65} with count=3	
+	EXPECT_TRUE(bb.is_pc_consistent());
 	EXPECT_EQ(3, bb.count());
 	EXPECT_TRUE(bb.bb_.is_bit(10));
 	EXPECT_TRUE(bb.bb_.is_bit(64));
@@ -215,11 +215,11 @@ TEST_F(BitSetWithPC_ClassTest, lazy_bit_erase) {
 	EXPECT_EQ(0, bbs.count());
 
 	//not sync
-	EXPECT_FALSE(bbs.is_sync_pc());
+	EXPECT_FALSE(bbs.is_pc_consistent());
 
 	//sync cached popcount - restores bbs
-	bbs.sync_pc();							//bbs:{10, 64, 65} with count=3	
-	EXPECT_TRUE(bbs.is_sync_pc());
+	bbs.recompute_pc();							//bbs:{10, 64, 65} with count=3	
+	EXPECT_TRUE(bbs.is_pc_consistent());
 	EXPECT_EQ(3, bbs.count());
 	EXPECT_TRUE(bbs.bb_.is_bit(10));
 	EXPECT_TRUE(bbs.bb_.is_bit(64));
