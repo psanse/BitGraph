@@ -154,7 +154,7 @@ namespace bitgraph {
 
 		//bool
 		bool is_empty() const { return (pc_ == 0); }
-		bool is_sync_pc() const { return (pc_ == bb_.count()); }
+		bool is_pc_consistent() const { return (pc_ == bb_.count()); }
 
 		//operators
 		friend bool operator ==	(const BitSetWithPC& lhs, const BitSetWithPC& rhs) { return (lhs.pc_ == rhs.pc_) && (lhs.bb_ == rhs.bb_); }
