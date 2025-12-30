@@ -140,7 +140,14 @@ namespace bitgraph {
 			else return BBObject::noBit;
 		}
 
-		count_t sync_pc() {
+		/**
+		* @brief synchronizes the cached population count @pc_ with the real population count of the bitset
+		* @returns the updated population count
+		* @details
+		*	Does not take into account inference chains, active vertices etc. 
+		*	Simply sets pc_ = bb_.count()
+		**/
+		count_t recompute_pc() {
 			pc_ = bb_.count();
 			return pc_;
 		}
