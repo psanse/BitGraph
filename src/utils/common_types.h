@@ -213,10 +213,11 @@ namespace bitgraph {
 
 		struct IntRange {
 			static constexpr int no_range = -1;
+
 			int vl = no_range;		//lower bound
 			int vh = no_range;		//upper bound
 
-			IntRange(int lh = no_range, int rh = no_range) noexcept :
+			constexpr IntRange(int lh = no_range, int rh = no_range) noexcept :
 				vl{lh}, vh{rh}
 			{}
 
