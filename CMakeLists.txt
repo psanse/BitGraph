@@ -12,8 +12,8 @@ set(CMAKE_INSTALL_PREFIX ${CMAKE_SOURCE_DIR}/install CACHE PATH "prefix director
 
 set(LIBNAME "BitGraph")
 set(LIB_MAJOR_VERS "1")
-set(LIB_MINOR_VERS "1")
-set(LIB_PATCH_VERS "5")
+set(LIB_MINOR_VERS "3")
+set(LIB_PATCH_VERS "3")
 
 project(${LIBNAME} 
     VERSION  ${LIB_MAJOR_VERS}.${LIB_MINOR_VERS}.${LIB_PATCH_VERS}
