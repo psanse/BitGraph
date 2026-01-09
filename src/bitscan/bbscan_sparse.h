@@ -491,12 +491,12 @@ namespace bitgraph {
 		case DESTRUCTIVE_REVERSE:
 			//scan_block(p.second);
 			LOG_ERROR("destructive scan type currently not available in BBScanSp::init_scan...exiting");
-			std::abort();
+			std::exit(EXIT_FAILURE);
 			//throw BitScanError("incorrect destructive scan type in BBScanSp::init_scan");		
 			break;
 		default:
 			LOG_ERROR("unknown scan type in BBScanSp::init_scan...exiting");
-			std::abort();
+			std::exit(EXIT_FAILURE);
 			//throw BitScanError("unknown scan type in BBScanSp::init_scan");		
 		}
 

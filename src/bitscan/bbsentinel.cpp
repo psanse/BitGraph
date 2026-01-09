@@ -209,7 +209,7 @@ namespace bitgraph {
 				break;
 			default:
 				cerr << "bad scan type" << endl;
-				std::abort();
+				std::exit(EXIT_FAILURE);
 			}
 			return 0;
 		}

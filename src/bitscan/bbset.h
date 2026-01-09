@@ -2081,7 +2081,7 @@ bitgraph::BitSet::BitSet(std::size_t nPop, const ColT& lv) :
 	catch (...) {
 		LOG_ERROR("Error during construction - BitSet::BitSet()");
 		LOG_ERROR("exiting...");
-		std::abort();
+		std::exit(EXIT_FAILURE);
 	}
 }
 

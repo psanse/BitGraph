@@ -63,7 +63,7 @@ BitSetSp::BitSetSp(std::size_t nPop, const vint& lv):
 	catch (...) {
 		LOG_ERROR("Error during construction - BitSet::BitSetSp()");
 		LOG_ERROR("exiting...");
-		std::abort();
+		std::exit(EXIT_FAILURE);
 	}
 }
 
@@ -90,7 +90,7 @@ BitSetSp::BitSetSp(std::size_t nPop, std::initializer_list<int> lv) :
 	catch (...) {
 		LOG_ERROR("Error during construction - BitSet::BitSetSp()");
 		LOG_ERROR("exiting...");
-		std::abort();
+		std::exit(EXIT_FAILURE);
 	}
 }
 
@@ -105,7 +105,7 @@ void BitSetSp::reset(std::size_t nPop, bool is_popsize) noexcept
 	catch (...) {
 		LOG_ERROR("Error during reset - BitSet::reset");
 		LOG_ERROR("exiting...");
-		std::abort();
+		std::exit(EXIT_FAILURE);
 	}
 }
 
@@ -133,7 +133,7 @@ void BitSetSp::reset(std::size_t nPop, const vint& lv) noexcept
 	catch (...) {
 		LOG_ERROR("Error during reset - BitSet::reset");
 		LOG_ERROR("exiting...");
-		std::abort();
+		std::exit(EXIT_FAILURE);
 	}
 }
 
@@ -146,7 +146,7 @@ void BitSetSp::init (std::size_t size, bool is_popsize) noexcept {
 	catch (...) {
 		LOG_ERROR("Error during initialization - BitSet::init");
 		LOG_ERROR("exiting...");
-		std::abort();
+		std::exit(EXIT_FAILURE);
 	}	
 }
 

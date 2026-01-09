@@ -344,7 +344,7 @@ namespace bitgraph {
 		catch (std::bad_alloc& ba) {
 			LOGG_ERROR("bad_alloc exception - KCore<T>::reset_subgraph", ba.what());
 			LOG_ERROR("exiting...");
-			std::abort();
+			std::exit(EXIT_FAILURE);
 		}
 	}
 
@@ -359,7 +359,7 @@ namespace bitgraph {
 		catch (std::bad_alloc& ba) {
 			LOGG_ERROR("bad_alloc exception - KCore<T>::reset_subgraph", ba.what());
 			LOG_ERROR("Exiting...");
-			std::abort();
+			std::exit(EXIT_FAILURE);
 		}
 
 	}
@@ -376,7 +376,7 @@ namespace bitgraph {
 		catch (std::bad_alloc& ba) {
 			LOGG_ERROR("bad_alloc exception - KCore<T>::reset_subgraph", ba.what());
 			LOG_ERROR("Exiting...");
-			std::abort();
+			std::exit(EXIT_FAILURE);
 		}
 
 	}
