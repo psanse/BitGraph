@@ -346,7 +346,7 @@ namespace bitgraph{
 					f.open(o.str().c_str());
 					if (!f) {
 						LOGG_ERROR("error in file name: ", o.str(), "- RandomGen<Graph_t>::create_graph_benchmark");
-						std::abort();
+						std::exit(EXIT_FAILURE);
 					}
 					g.write_dimacs(f);
 					f.close();

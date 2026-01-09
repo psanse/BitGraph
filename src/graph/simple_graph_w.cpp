@@ -71,7 +71,7 @@ Base_Graph_W<Graph_t, W>::Base_Graph_W(std::string filename){
 	if (read_dimacs(filename) == -1) {
 		LOG_ERROR("error reading DIMACS file -Base_Graph_W<Graph_t, W>::Base_Graph_W");
 		LOG_ERROR("exiting...");
-		std::abort();
+		std::exit(EXIT_FAILURE);
 	}
 }
 
@@ -113,7 +113,7 @@ void Base_Graph_W<Graph_t, W>::reset(std::size_t NV, W val, string name)
 	catch (...) {
 		LOG_ERROR("bad weight assignment - Base_Graph_W<Graph_t, W>::reset");
 		LOG_ERROR("exiting...");
-		std::abort();	
+		std::exit(EXIT_FAILURE);	
 	}
 
 	g_.set_name(name);
