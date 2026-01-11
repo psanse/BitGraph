@@ -33,10 +33,10 @@ std::ostream& infoBase::printParams(std::ostream& o) const
 	o.setf(std::ios::fixed); // fixed notation for floating point values	
 	o.precision(4);				// 4 decimal places
 
-	o << "*****************************\n";
-	o << "NAME:" << data_.name << "\t N:" << data_.N << "\t M:" << data_.M << "\t D:" << 2 * data_.M / (float)((data_.N - 1) * data_.N) << endl;
-	o << "TIME_LIMIT:" << data_.TIME_OUT << endl;
-	o << "TIME_LIMIT_HEUR:" << data_.TIME_OUT_HEUR << endl;
+	o << "\n*****************************";
+	o << "\nNAME:" << data_.name << "\t N:" << data_.N << "\t M:" << data_.M << "\t D:" << 2 * data_.M / (float)((data_.N - 1) * data_.N) << endl;
+	o << "\nTIME_LIMIT:" << data_.TIME_OUT;
+	o << "\nTIME_LIMIT_HEUR:" << data_.TIME_OUT_HEUR;
 	o << "*****************************" << endl;
 
 	return o;
@@ -46,7 +46,7 @@ std::ostream& infoBase::printTimers(std::ostream& o) const
 	o.setf(std::ios::fixed);	// fixed notation for floating point values	
 	o.precision(4);				// 4 decimal places
 
-	o << "*****************************";
+	o << "\n*****************************";
 	o << "\ntime_parse:" << data_.timeElapsed
 		<< "\ntime_preproc:" << timePreproc_
 		<< "\ntime_incumbent:" << timeIncumbent_
@@ -65,8 +65,12 @@ std::ostream& infoBase::printReport( std::ostream& o, report_t r, bool is_endl) 
 
 	if (r == report_t::TABLE) {
 		o << data_.name << "\t" << data_.N << "\t" << data_.M << "\t" 
-			<< data_.TIME_OUT << "\t" << data_.TIME_OUT_HEUR << "\t"
-			<< data_.timeElapsed << "\t" << timePreproc_ << "\t" << timeIncumbent_ << "\t" << timeSearch_ << "\t";
+			<< data_.TIME_OUT << "\t" 
+			<< data_.TIME_OUT_HEUR << "\t"
+			<< data_.timeElapsed << "\t" 
+			<< timePreproc_ << "\t"
+			<< timeIncumbent_ << "\t"
+			<< timeSearch_ << "\t";				//to concatenate with other info if needed
 	}
 	if (r == report_t::VERBOSE) {
 		o << "\n*****************************";
