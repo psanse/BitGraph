@@ -104,6 +104,24 @@ namespace bitgraph {
 			const T* cbegin() const noexcept { return data(); }
 			const T* cend() const noexcept { return data() + nE_; }
 
+			//safe STL reverse iterators, even  if nE_ == 0. 
+			//Better than manually manipulating pointers.
+			auto rbegin() noexcept {
+				return std::make_reverse_iterator(end());
+			}
+
+			auto rend() noexcept {
+				return std::make_reverse_iterator(begin());
+			}
+
+			auto rbegin() const noexcept {
+				return std::make_reverse_iterator(end());
+			}
+
+			auto rend() const noexcept {
+				return std::make_reverse_iterator(begin());
+			}
+
 			////////////
 			// allocation
 
