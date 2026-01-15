@@ -74,8 +74,8 @@ namespace bitgraph {
 			FixedStack& operator = (const FixedStack&) = delete;
 
 			//move semantics are allowed
-			FixedStack(FixedStack&&)	 noexcept;
-			FixedStack& operator = (FixedStack&&)	 noexcept;
+			FixedStack(FixedStack&&)	 noexcept = default;
+			FixedStack& operator = (FixedStack&&) noexcept = default;
 
 			~FixedStack() { deallocate(); }
 
@@ -92,8 +92,8 @@ namespace bitgraph {
 			int size_int() const noexcept { return static_cast<int>(nE_); }								
 			std::size_t capacity() const noexcept  { return cap_; }
 			
-			T* data() noexcept { return stack_; }
-			const T* data() const noexcept { return stack_; }
+			T* data() noexcept { return stack_.get(); }
+			const T* data() const noexcept { return stack_.get(); }
 			
 
 			////////////
@@ -243,7 +243,7 @@ namespace bitgraph {
 		private:
 			std::size_t nE_ = 0;				//number of elements, points to the next position to fill		
 			std::size_t cap_ = 0;				//capacity of the underlying array
-			T* stack_ = nullptr;				//underlying C-array - TODO: use smart pointer?	(15/01/2026)
+			std::unique_ptr<T[]> stack_;		//underlying C-array - TODO: use smart pointer?	(15/01/2026)
 
 		};
 

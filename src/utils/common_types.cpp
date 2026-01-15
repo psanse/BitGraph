@@ -16,63 +16,53 @@ using namespace bitgraph;
 
 template<class T>
 bitgraph::FixedStack<T>::FixedStack(std::size_t MAX_SIZE) : 
-	nE_(0), stack_(nullptr), cap_(0)
+	nE_(0), stack_(MAX_SIZE ? std::make_unique<T[]>(MAX_SIZE) : nullptr), cap_(MAX_SIZE)
 {
 	static_assert(std::is_trivially_destructible<T>::value,
-				"FixedStack requires trivially destructible T.");
-
-	try {
-		stack_ = (MAX_SIZE == 0) ? nullptr : new T[MAX_SIZE];
-		cap_ = MAX_SIZE;
-	}
-	catch (const std::bad_alloc&) {
-		LOGG_ERROR("bad_alloc - FixedStack<T>::FixedStack(MAX_SIZE=", MAX_SIZE, ")");
-		throw;
-	}
+				"FixedStack requires trivially destructible T.");	
 }
 
-template<class T>
-bitgraph::FixedStack<T>::FixedStack(bitgraph::FixedStack<T>&& s) noexcept
-	: nE_(s.nE_), stack_(s.stack_), cap_(s.cap_)
-{
-	s.stack_ = nullptr;
-	s.nE_ = 0;
-	s.cap_ = 0;
-}
+//template<class T>
+//bitgraph::FixedStack<T>::FixedStack(bitgraph::FixedStack<T>&& s) noexcept
+//	: nE_(s.nE_), stack_(s.stack_), cap_(s.cap_)
+//{
+//	s.stack_ = nullptr;
+//	s.nE_ = 0;
+//	s.cap_ = 0;
+//}
 
-template<class T>
-bitgraph::FixedStack<T>& bitgraph::FixedStack<T>::operator = (bitgraph::FixedStack<T>&& s) noexcept
-{
-	if (this == &s) return *this;          // self-move guard
-
-	delete[] stack_;
-	nE_ = s.nE_;
-	stack_ = s.stack_;
-	cap_ = s.cap_;
-
-	s.stack_ = nullptr;
-	s.nE_ = 0;
-	s.cap_ = 0;
-
-	return *this;
-}
+//template<class T>
+//bitgraph::FixedStack<T>& bitgraph::FixedStack<T>::operator = (bitgraph::FixedStack<T>&& s) noexcept
+//{
+//	if (this == &s) return *this;          // self-move guard
+//
+//	delete[] stack_;
+//	nE_ = s.nE_;
+//	stack_ = s.stack_;
+//	cap_ = s.cap_;
+//
+//	s.stack_ = nullptr;
+//	s.nE_ = 0;
+//	s.cap_ = 0;
+//
+//	return *this;
+//}
 
 template<class T>
 void bitgraph::FixedStack<T>::reset(std::size_t MAX_SIZE) {
 
 	// 1) Allocate first (may throw). No state changes yet.
-	T* new_stack = nullptr;
+	std::unique_ptr<T[]> new_stack;
+
 	try {
-		new_stack = (MAX_SIZE == 0) ? nullptr : new T[MAX_SIZE];
+		new_stack = (MAX_SIZE ? std::make_unique<T[]>(MAX_SIZE) : nullptr);
 	}
 	catch (const std::bad_alloc&) {
 		LOGG_ERROR("bad_alloc - FixedStack<T>::reset (MAX_SIZE=", MAX_SIZE, ")");
 		throw; 
 	}
 
-	// 2) Commit (no-throw section)
-	delete[] stack_;
-	stack_ = new_stack;
+	stack_ = std::move(new_stack);
 	nE_ = 0;
 	cap_ = MAX_SIZE;
 	
@@ -81,8 +71,7 @@ void bitgraph::FixedStack<T>::reset(std::size_t MAX_SIZE) {
 template<class T>
 void bitgraph::FixedStack<T>::deallocate() noexcept
 {
-	delete[] stack_;
-	stack_ = nullptr;
+	stack_.reset();
 	nE_ = 0;
 	cap_ = 0;
 }
