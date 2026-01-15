@@ -318,7 +318,7 @@ bitgraph::BitSet::operator sint() const
 
 
 void BitSet::extract_stack(com::FixedStack<int>& s)	const {
-	s.erase();
+	s.clear();
 
 	int v = BBObject::noBit;
 	while ((v = next_bit(v)) != BBObject::noBit) {

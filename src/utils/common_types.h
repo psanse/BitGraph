@@ -46,7 +46,7 @@ namespace bitgraph {
 		 *
 		 * @details
 		 * - Capacity is fixed after allocation (via constructor or reset()).
-		 * - Push/pop/erase/truncate perform no allocation/deallocation.
+		 * - Push/pop/clear/truncate perform no allocation/deallocation.
 		 * - Some operations use "swap-with-top" semantics for O(1) removal.
 		 *
 		 * @note
@@ -59,13 +59,14 @@ namespace bitgraph {
 			static_assert(std::is_trivial<T>::value,
 				"FixedStack<T> is intended only for trivial types (POD-like).");
 			static_assert(std::is_trivially_destructible<T>::value,
-				"FixedStack<T> assumes pop/erase/truncate don't run destructors.");
+				"FixedStack<T> assumes pop/clear/truncate don't run destructors.");
 
 			// Element type stored in the stack.
 			using value_type = T;
 
 			///////
 			//construction / destruction
+
 			FixedStack() = default;
 			explicit FixedStack(std::size_t MAX_SIZE);
 
@@ -149,7 +150,7 @@ namespace bitgraph {
 			 *
 			 * @note This is used by the destructor and reset().
 			 */
-			void deallocate() noexcept;
+			void deallocate();
 
 			//////////////
 			//basic operations (no memory management)
@@ -224,14 +225,14 @@ namespace bitgraph {
 			 * O(1). The element at @p pos is replaced with the current top element, then size is decreased by 1.
 			 * Ordering is not preserved.
 			 */
-			void erase(int pos);
+			void erase_swap(int pos);
 
 			/**
 			* @brief Removes all elements from the stack.
 			*		 (no deallocation)
 			* @details: no deallocation is performed
 			**/
-			void erase() noexcept { nE_ = 0; }
+			void clear() noexcept { nE_ = 0; }
 
 			/**
 			 * @brief Fast rollback to a previous size.
@@ -269,7 +270,7 @@ namespace bitgraph {
 		private:
 			std::size_t nE_ = 0;				//number of elements, points to the next position to fill		
 			std::size_t cap_ = 0;				//capacity of the underlying array
-			std::unique_ptr<T[]> stack_;		//underlying C-array - TODO: use smart pointer?	(15/01/2026)
+			std::unique_ptr<T[]> stack_;		//underlying C-array 
 
 		};
 

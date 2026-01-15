@@ -15,12 +15,9 @@
 using namespace bitgraph;
 
 template<class T>
-bitgraph::FixedStack<T>::FixedStack(std::size_t MAX_SIZE) : 
+bitgraph::FixedStack<T>::FixedStack(std::size_t MAX_SIZE) :
 	nE_(0), stack_(MAX_SIZE ? std::make_unique<T[]>(MAX_SIZE) : nullptr), cap_(MAX_SIZE)
-{
-	static_assert(std::is_trivially_destructible<T>::value,
-				"FixedStack requires trivially destructible T.");	
-}
+{}
 
 //template<class T>
 //bitgraph::FixedStack<T>::FixedStack(bitgraph::FixedStack<T>&& s) noexcept
@@ -69,7 +66,7 @@ void bitgraph::FixedStack<T>::reset(std::size_t MAX_SIZE) {
 }
 
 template<class T>
-void bitgraph::FixedStack<T>::deallocate() noexcept
+void bitgraph::FixedStack<T>::deallocate() 
 {
 	stack_.reset();
 	nE_ = 0;
@@ -139,8 +136,8 @@ void bitgraph::FixedStack<T>::pop_bottom_swap() {
 }
 
 template<class T>
-void bitgraph::FixedStack<T>::erase(int pos) {
-	assert(pos >= 0 && static_cast<std::size_t > (pos) < nE_ && "FixedStack::erase out of bounds");
+void bitgraph::FixedStack<T>::erase_swap(int pos) {
+	assert(pos >= 0 && static_cast<std::size_t > (pos) < nE_ && "FixedStack::erase_swap out of bounds");
 	stack_[pos] = std::move(stack_[--nE_]);
 }
 
