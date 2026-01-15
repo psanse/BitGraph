@@ -81,6 +81,7 @@ namespace bitgraph {
 
 			//setters and getters 
 			const T& at(std::size_t pos)	const { return stack_[pos]; }
+
 			const T& top() const;
 			T& top();
 			const T& bottom() const { return stack_[0]; }
