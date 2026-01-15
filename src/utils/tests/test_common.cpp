@@ -1,10 +1,11 @@
 /**
 * @file test_common.cpp 
 * @brief Testing of common utilities
+* @details
+*	- last_update 15/01/2026
 * @date ?
-* @last_update 17/01/25
 * @author pss
-* 
+
 * TODO - add tests, check disabled tests  (18/01/25)
 **/
 
@@ -38,8 +39,63 @@ TEST(Common_stack, constructor) {
 	EXPECT_EQ(2, s2.size());
 	EXPECT_EQ(20, s2.top());
 	EXPECT_EQ(10, s2.bottom());
+}
+
+
+TEST(Common_stack, forward_iteration) {
+
+	bitgraph::com::FixedStack<int> s(3);
+	s.push(10);
+	s.push(20);
+	s.push(30);
+
+	std::vector<int> elems;
+
+	//forward iteration
+	for (int elem : s) {
+		elems.push_back(elem);
+	}
+
+	EXPECT_EQ(3, elems.size());
+	EXPECT_EQ(10, elems[0]);
+	EXPECT_EQ(20, elems[1]);
+	EXPECT_EQ(30, elems[2]);
+}
+
+
+
+TEST(Common_stack, backward_iteration) {
+
+	bitgraph::com::FixedStack<int> s(3);
+	s.push(10);
+	s.push(20);
+	s.push(30);
+
+	std::vector<int> elems;
+
+	//backward iteration
+	for (auto it = s.rbegin(); it!=s.rend(); ++it) {
+		elems.push_back(*it);
+	}
+
+	EXPECT_EQ(3, elems.size());
+	EXPECT_EQ(30, elems[0]);
+	EXPECT_EQ(20, elems[1]);
+	EXPECT_EQ(10, elems[2]);
+
+	//backward iteration safe with empty stack
+	s.erase();
+	elems.clear();
+
+	for (auto it = s.rbegin(); it != s.rend(); ++it) {
+		elems.push_back(*it);
+	}
+
+	EXPECT_EQ(0, elems.size());
 
 }
+
+
 
 TEST(Common_mat, mean_and_stdev) {
 
