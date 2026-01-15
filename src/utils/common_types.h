@@ -33,13 +33,35 @@ namespace bitgraph {
 		//
 		// struct FixedStack
 		//
-		// (lightweight fixed size stack implemented by a fixed size array)
+		// Lightweight fixed-capacity stack backed by a raw C-array.
+		// Intended for TRIVIAL types only (no element destructors are ever invoked).
 		//
 		////////////////////////
 
+		/**
+		 * @brief Fixed-capacity stack implemented on top of a contiguous C-array.
+		 *
+		 * @tparam T Trivial element type (POD-like). The container never runs element
+		 *         destructors; removal operations are index-only.
+		 *
+		 * @details
+		 * - Capacity is fixed after allocation (via constructor or reset()).
+		 * - Push/pop/erase/truncate perform no allocation/deallocation.
+		 * - Some operations use "swap-with-top" semantics for O(1) removal.
+		 *
+		 * @note
+		 * This container assumes @p T is trivial (or at least trivially destructible).
+		 * Do NOT use with types that manage resources (std::string, std::vector, RAII handles, ...).
+		 */
 		template <class T>
 		struct FixedStack {
 
+			static_assert(std::is_trivial<T>::value,
+				"FixedStack<T> is intended only for trivial types (POD-like).");
+			static_assert(std::is_trivially_destructible<T>::value,
+				"FixedStack<T> assumes pop/erase/truncate don't run destructors.");
+
+			// Element type stored in the stack.
 			using value_type = T;
 
 			///////
@@ -55,7 +77,7 @@ namespace bitgraph {
 			FixedStack(FixedStack&&)	 noexcept;
 			FixedStack& operator = (FixedStack&&)	 noexcept;
 
-			~FixedStack() { clear(); }
+			~FixedStack() { deallocate(); }
 
 			//setters and getters 
 			const T& at(std::size_t pos)	const { return stack_[pos]; }
@@ -70,44 +92,71 @@ namespace bitgraph {
 			int size_int() const noexcept { return static_cast<int>(nE_); }								
 			std::size_t capacity() const noexcept  { return cap_; }
 			
+			T* data() noexcept { return stack_; }
+			const T* data() const noexcept { return stack_; }
 			
 
 			////////////
 			// allocation
 
 			/**
-			* @brief Resets the stack to a new size, previos elements are destroyed.
-			*        The new elements are constructed with the default constructor
-			**/
+			 * @brief Reinitializes the stack with capacity @p MAX_SIZE.
+			 *
+			 * @param MAX_SIZE New capacity.
+			 *
+			 * @details
+			 * - Releases any currently allocated storage.
+			 * - Allocates a new underlying array sized @p MAX_SIZE.
+			 * - The stack becomes empty after the call.
+			 *
+			 * @post size() == 0, capacity() == MAX_SIZE.
+			 */
 			void reset(std::size_t MAX_SIZE);
 
 		private:
 			/**
-			* @brief Deallocates memory (used by the destructor)
-			*	     Use erase to clean the stack without deallocating memory
-			**/
-			void clear();
+			 * @brief Deallocates underlying storage and resets state.
+			 *
+			 * @details
+			 * - Frees the C-array backing the stack.
+			 * - Sets stack_ to nullptr, cap_ to 0, and nE_ to 0.
+			 *
+			 * @note This is used by the destructor and reset().
+			 */
+			void deallocate() noexcept;
 
 			//////////////
 			//basic operations (no memory management)
 		public:
 
 			/**
-			* @brief Places element at the top of the stack
-			*	     (last position in the underlying array)
-			* @details: no allocation is performed, stack must have enough capacity
-			**/
-			void push(T d);
+			 * @brief Pushes @p d to the top of the stack.
+			 *
+			 * @param d Value to push.
+			 *
+			 * @pre size() < capacity()
+			 *
+			 * @details
+			 * O(1). No allocation is performed.
+			 */
+			void push(const T& d);
 
 			/**
-			* @brief Places element at the bottom of the stack
-			*	     (first position in the underlying array)
-			*
-			*		 I. The bottom element is moved to the top of the stack			
-			* @details: no allocation is performed, stack must have enough capacity
-			* TODO - possibly change names (push_front, push_back idioms better) (06/10/2025)
-			**/
-			void push_bottom(T d);
+			 * @brief Inserts @p d at the bottom (index 0) using O(1) swap-with-bottom semantics.
+			 *
+			 * @param d Value to insert at the bottom.
+			 *
+			 * @pre size() < capacity()
+			 *
+			 * @details
+			 * O(1). Implements:
+			 *  - Move current bottom element to the top (if stack non-empty),
+			 *  - Place @p d at the bottom,
+			 *  - Increase size by 1.
+			 *
+			 * This is NOT a stable "shift-right" operation; ordering changes.
+			 */
+			void push_bottom_swap(T d);
 
 			/**
 			* @brief Removes the top element from the stack
@@ -125,22 +174,30 @@ namespace bitgraph {
 			void pop(std::size_t nb);
 
 			/**
-			* @brief Replaces the bottom element of the stack with the top element of the stack.
-			*		 (the bottom element is lost)
-			*
-			*		 I. The top element is moved to the bottom of the stack
-			* @details: no deallocation is performed
-			**/
-			void pop_bottom();
+			 * @brief Removes the bottom element using O(1) swap-with-top semantics.
+			 *
+			 * @pre size() > 0
+			 *
+			 * @details
+			 * O(1). Implements:
+			 *  - Move current top element to the bottom (index 0),
+			 *  - Decrease size by 1.
+			 *
+			 * This is NOT a stable "shift-left" operation; ordering changes.
+			 */
+			void pop_bottom_swap();
 
 			/**
-			* @brief Removes the element at position pos form the underlying array.
-			*		 (the element is lost)
-			*
-			*		 I. The top element is moved to position pos
-			* @param pos: position of the element to remove
-			* @details: no deallocation is performed
-			**/
+			 * @brief Removes the element at position @p pos using O(1) swap-with-top semantics.
+			 *
+			 * @param pos Position of the element to remove.
+			 *
+			 * @pre pos < size()
+			 *
+			 * @details
+			 * O(1). The element at @p pos is replaced with the current top element, then size is decreased by 1.
+			 * Ordering is not preserved.
+			 */
 			void erase(int pos);
 
 			/**
@@ -151,9 +208,15 @@ namespace bitgraph {
 			void erase() noexcept { nE_ = 0; }
 
 			/**
-			* @brief Provides fast-rollback to a previous mark.
-			* @details: no deallocation is performed
-			**/
+			 * @brief Fast rollback to a previous size.
+			 *
+			 * @param new_size New logical size.
+			 *
+			 * @pre new_size <= size()
+			 *
+			 * @details
+			 * O(1). Useful for backtracking/rollback. Does not deallocate memory and does not run destructors.
+			 */
 			void truncate(std::size_t new_size) noexcept {
 				assert(new_size <= nE_);
 				nE_ = new_size;
@@ -164,6 +227,7 @@ namespace bitgraph {
 
 			bool empty() const noexcept { return (nE_ == 0); }
 			bool full() const noexcept { return nE_ >= cap_; }
+
 
 			////////////////////
 			//I/O
@@ -177,9 +241,9 @@ namespace bitgraph {
 			// data members
 				
 		private:
-			std::size_t nE_ = 0;								//number of elements, points to the next position to fill
-			T* stack_ = nullptr;								//underlying C-array 		
-			std::size_t cap_ = 0;								//capacity of the underlying array
+			std::size_t nE_ = 0;				//number of elements, points to the next position to fill		
+			std::size_t cap_ = 0;				//capacity of the underlying array
+			T* stack_ = nullptr;				//underlying C-array - TODO: use smart pointer?	(15/01/2026)
 
 		};
 
