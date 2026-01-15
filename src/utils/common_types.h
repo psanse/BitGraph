@@ -95,6 +95,13 @@ namespace bitgraph {
 			T* data() noexcept { return stack_.get(); }
 			const T* data() const noexcept { return stack_.get(); }
 			
+			//for range-based for
+			T* begin() noexcept { return data(); }
+			T* end() noexcept { return data() + nE_; }
+			const T* begin() const noexcept { return data(); }
+			const T* end() const noexcept { return data() + nE_; }
+			const T* cbegin() const noexcept { return data(); }
+			const T* cend() const noexcept { return data() + nE_; }
 
 			////////////
 			// allocation
