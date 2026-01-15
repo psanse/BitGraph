@@ -77,7 +77,7 @@ void bitgraph::FixedStack<T>::deallocate() noexcept
 }
 
 template<class T>
-void bitgraph::FixedStack<T>::push(const T& d)
+void bitgraph::FixedStack<T>::push(T d)
 {
 	assert(stack_ != nullptr && "FixedStack not initialized. Call reset(MAX_SIZE) or use sized ctor - bitgraph::FixedStack<T>::push");
 	assert(nE_ < cap_ && "FixedStack overflow - bitgraph::FixedStack<T>::push");

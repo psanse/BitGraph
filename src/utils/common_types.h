@@ -74,7 +74,7 @@ namespace bitgraph {
 			FixedStack& operator = (const FixedStack&) = delete;
 
 			//move semantics are allowed
-			FixedStack(FixedStack&&)	 noexcept = default;
+			FixedStack(FixedStack&&) noexcept = default;
 			FixedStack& operator = (FixedStack&&) noexcept = default;
 
 			~FixedStack() { deallocate(); }
@@ -146,7 +146,7 @@ namespace bitgraph {
 			 * @details
 			 * O(1). No allocation is performed.
 			 */
-			void push(const T& d);
+			void push(T d);
 
 			/**
 			 * @brief Inserts @p d at the bottom (index 0) using O(1) swap-with-bottom semantics.
