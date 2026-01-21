@@ -53,7 +53,7 @@ namespace bitgraph {
 
 		using Self = Ugraph<BitSetT>;		//own type
 		using BaseT = Graph<BitSetT>;		//parent type
-		using typename BaseT::bitset_type;	
+		using BaseT::bitset_type;	
 
 		//alias for backward compatibility
 		using _bbt = bitset_type;			

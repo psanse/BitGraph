@@ -28,7 +28,7 @@ namespace bitgraph{
 		/////////////////////////////////
 
 		class BBScan : public BitSet {
-		public:
+		public :
 
 			template <class U>
 			friend struct BBObject::Scan;

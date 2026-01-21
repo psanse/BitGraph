@@ -433,8 +433,8 @@ namespace bitgraph {
 
 		using type = Graph_EW<ugraph, W>;						//own type
 		using BaseT = Base_Graph_EW<ugraph, W>;					//parent type
-		using typename BaseT::graph_type;						
-		using typename BaseT::bitset_type;
+		using BaseT::graph_type;						
+		using BaseT::bitset_type;
 
 		using BaseT::NO_WEIGHT;
 		using BaseT::ZERO_WEIGHT;
@@ -445,7 +445,7 @@ namespace bitgraph {
 		using _gt = graph_type;
 		using _bbt = bitset_type;
 
-		using typename BaseT::mat_t;							//matrix type for weights
+		using BaseT::mat_t;							//matrix type for weights
 
 		//constructors (inherited)
 		using Base_Graph_EW<ugraph, W>::Base_Graph_EW;
