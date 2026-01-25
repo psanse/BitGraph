@@ -331,9 +331,9 @@ namespace bitgraph {
 
 		using Self = Graph_W<ugraph, W>;						//own type
 		using BaseT = Base_Graph_W<ugraph, W>;					//parent type
-		using BaseT::graph_type;						
-		using BaseT::bitset_type;
-		using BaseT::weight_type;
+		using graph_type = typename BaseT::graph_type;
+		using bitset_type = typename BaseT::bitset_type;
+		using weight_type = typename BaseT::weight_type;
 
 		using BaseT::NO_WEIGHT;
 		using BaseT::ZERO_WEIGHT;
