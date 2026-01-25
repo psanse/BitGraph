@@ -23,8 +23,8 @@ add_executable (test_bitscan
 
 )
 
-set_target_properties(test_bitscan 
-    PROPERTIES
+set_target_properties(test_bitscan PROPERTIES
+  
     #ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
     #LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
     RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin/tests"
