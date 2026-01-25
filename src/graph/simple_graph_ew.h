@@ -445,7 +445,7 @@ namespace bitgraph {
 		using _gt = graph_type;
 		using _bbt = bitset_type;
 
-		using BaseT::mat_t;							//matrix type for weights
+		using mat_t = typename BaseT::mat_t;							//matrix type for weights
 
 		//constructors (inherited)
 		using Base_Graph_EW<ugraph, W>::Base_Graph_EW;
