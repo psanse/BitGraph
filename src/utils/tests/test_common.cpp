@@ -84,7 +84,7 @@ TEST(Common_stack, backward_iteration) {
 	EXPECT_EQ(10, elems[2]);
 
 	//backward iteration safe with empty stack
-	s.erase();
+	s.clear();
 	elems.clear();
 
 	for (auto it = s.rbegin(); it != s.rend(); ++it) {
@@ -171,7 +171,7 @@ TEST(Common, fixed_stack_basic) {
 	//I/O
 	//std::cout << s;
 	
-	s.erase();
+	s.clear();
 
 	EXPECT_TRUE(s.empty());
 
@@ -193,7 +193,7 @@ TEST(Common, fixed_stack_pop){
 	
 	//note:popping another element should cause an assertion failure in DEBUG MODE
 
-	s.erase();
+	s.clear();
 	EXPECT_TRUE(s.empty());
 
 }

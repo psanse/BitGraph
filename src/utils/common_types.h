@@ -12,6 +12,7 @@
 #include <iostream>
 #include <vector>
 #include <set>
+#include <memory>
 #include <cassert>
 
 ///////////////////////
@@ -122,6 +123,13 @@ namespace bitgraph {
 			auto rend() const noexcept {
 				return std::make_reverse_iterator(begin());
 			}
+
+			////////////////////
+			// operators 
+
+			// element access operator []
+			T operator [] (std::size_t pos) const { return stack_[pos]; }		// T is always a trivial type
+			T& operator [] (std::size_t pos) { return stack_[pos]; }
 
 			////////////
 			// allocation
