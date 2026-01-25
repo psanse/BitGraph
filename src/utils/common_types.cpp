@@ -16,7 +16,7 @@ using namespace bitgraph;
 
 template<class T>
 bitgraph::FixedStack<T>::FixedStack(std::size_t MAX_SIZE) :
-	nE_(0), stack_(MAX_SIZE ? std::make_unique<T[]>(MAX_SIZE) : nullptr), cap_(MAX_SIZE)
+	nE_(0), cap_(MAX_SIZE), stack_(MAX_SIZE ? std::make_unique<T[]>(MAX_SIZE) : nullptr)
 {}
 
 //template<class T>
