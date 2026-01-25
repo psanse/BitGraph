@@ -55,8 +55,8 @@ namespace bitgraph {
 		using BaseT = Graph<BitSetT>;		//parent type
 		using BaseT::bitset_type;	
 
-		//alias for backward compatibility
-		using _bbt = bitset_type;			
+		//alias for backward compatibility - to be removed in future versions
+		using _bbt = typename BaseT::bitset_type;			
 
 		//constructors - cannot all be inherited	
 		Ugraph() : Graph<BitSetT>() {}															//creates empty graph
