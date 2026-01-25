@@ -17,10 +17,12 @@ tables.cpp
 ${HEADER_FILES}
 )
 
-set_target_properties(bitscan PROPERTIES
-    CXX_STANDARD 14					
-    CXX_STANDARD_REQUIRED ON		
-    CXX_EXTENSIONS OFF
+target_compile_features(bitscan PUBLIC cxx_std_14)
+
+set_target_properties(bitscan PROPERTIES CXX_EXTENSIONS NO
+    #CXX_STANDARD 14					
+    #CXX_STANDARD_REQUIRED ON		
+    #CXX_EXTENSIONS OFF
     ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
     LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
     RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"

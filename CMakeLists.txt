@@ -6,7 +6,7 @@ endif()
 	
 set(CMAKE_INSTALL_PREFIX ${CMAKE_SOURCE_DIR}/install CACHE PATH "prefix directory to install BitGraph - default set to a local dir in the package which includes a linking example")	
 
-#C++14 is required for googletest 
+#C++14 required for BitGraph and googletest
 set(CMAKE_CXX_STANDARD 14)					
 set(CMAKE_CXX_STANDARD_REQUIRED ON)		
 set(CMAKE_CXX_EXTENSIONS OFF)

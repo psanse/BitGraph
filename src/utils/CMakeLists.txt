@@ -42,10 +42,9 @@ target_compile_definitions(utils
     $<$<STREQUAL:${LOGGER_LEVEL},error>:LOGGER_ERROR_LEVEL>         #warning and error (logger.h)
 )
 
-set_target_properties(utils PROPERTIES
-    CXX_STANDARD 14					
-    CXX_STANDARD_REQUIRED ON		
-    CXX_EXTENSIONS OFF
+target_compile_features(utils PUBLIC cxx_std_14)
+
+set_target_properties(utils PROPERTIES  CXX_EXTENSIONS NO   
     ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
     LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
     RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
