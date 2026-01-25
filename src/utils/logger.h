@@ -64,6 +64,15 @@ template <typename T> struct is_rangeloop_supported : std::false_type {};
 template <typename T> struct is_rangeloop_supported<std::vector<T>> : std::true_type {};
 template <typename T> struct is_rangeloop_supported<std::initializer_list<T>> : std::true_type {};
 
+// Forward decls (IMPORTANT)
+template<typename T>
+typename std::enable_if<is_rangeloop_supported<T>::value, std::string>::type
+tag_expand(const T&);
+
+template<typename T>
+typename std::enable_if<!is_rangeloop_supported<T>::value, std::string>::type
+tag_expand(const T&);
+
 // Tag expansion function for supported range-loop types
 template<typename T>
 typename std::enable_if<is_rangeloop_supported<T>::value, std::string>::type tag_expand(const T& arg) {
