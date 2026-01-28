@@ -33,34 +33,28 @@ namespace bitgraph {
 	//
 	////////////////////////
 
-	template<class Graph_t, class W>
+	template<class Graph_t, class WeightT>
 	class Base_Graph_W {
 
 	public:
 		enum { Wext = 0, Dext, WWWext, NOext };				//file extensions for weights (used in function read_dimacs)	
 
-		using Self = Base_Graph_W<Graph_t, W>;				//own type
 		using graph_type = Graph_t;							//graph type	
 		using bitset_type = typename Graph_t::bitset_type;	//bitset type used by graph type 
 		using VertexBitset = bitset_type;					//alias for semantic type
-		using weight_type = W;
-					
-
-		//alias types for backward compatibility
-		//using _gt = graph_type;
-		using _wt = weight_type;
-
+		using Weight = WeightT;
+		
 		//constants - globals
-		static constexpr W NO_WEIGHT = W(-1);				//possibly change to a sentinel std::numeric_limits<W>::max() ?
-		static constexpr W ZERO_WEIGHT = W(0);
-		static constexpr W DEFAULT_WEIGHT = W(1);			//default weight value for weights (1.0)	
+		static constexpr Weight NO_WEIGHT{ -1 };				//possibly change to a sentinel std::numeric_limits<WeightT>::max() ?
+		static constexpr Weight ZERO_WEIGHT{ 0 };
+		static constexpr Weight DEFAULT_WEIGHT{ 1 };			//default weight value for weights (1.0)	
 
 		//constructors
 		Base_Graph_W() {};																					//No memory allocation
-		explicit Base_Graph_W(std::vector<W>& lw) : w_(lw) { g_.reset(lw.size()); }							//creates empty graph with |V|= n with vertex weights
-		Base_Graph_W(graph_type& g, vector<W>& lw) :g_(g), w_(lw) { assert(w_.size() == g_.size()); }				//creates graph with vertex weights	
+		explicit Base_Graph_W(std::vector<Weight>& lw) : w_(lw) { g_.reset(lw.size()); }							//creates empty graph with |V|= n with vertex weights
+		Base_Graph_W(graph_type& g, vector<Weight>& lw) :g_(g), w_(lw) { assert(w_.size() == g_.size()); }				//creates graph with vertex weights	
 		Base_Graph_W(graph_type& g) :g_(g), w_(g.size(), DEFAULT_WEIGHT) {}										//creates graph with DEFAULT_WEIGHTs
-		explicit Base_Graph_W(int N, W val = DEFAULT_WEIGHT) { reset(N, val); }								//creates empty graph with |V|= N and weight value val
+		explicit Base_Graph_W(int N, Weight val = DEFAULT_WEIGHT) { reset(N, val); }								//creates empty graph with |V|= N and weight value val
 
 		/**
 		* @brief Reads weighted graph from ASCII file in DIMACS format
@@ -84,15 +78,15 @@ namespace bitgraph {
 		/////////////
 		// setters and getters
 
-		void set_weight(int v, W val) { w_.at(v) = val; }
-		void set_weight(W val = DEFAULT_WEIGHT) { w_.assign(g_.num_vertices(), val); }
+		void set_weight(int v, Weight val) { w_.at(v) = val; }
+		void set_weight(Weight val = DEFAULT_WEIGHT) { w_.assign(g_.num_vertices(), val); }
 
 		/*
 		* @brief sets vertex weights to all vertices
 		* @param lw vector of weights of size |V|
 		* @returns 0 if success, -1 if error
 		*/
-		int	 set_weight(std::vector<W>& lw);
+		int	 set_weight(std::vector<Weight>& lw);
 
 		/**
 		* @brief generates weights based on modulus operation [Pullan 2008, MODE = 200]
@@ -107,16 +101,16 @@ namespace bitgraph {
 		Graph_t& graph() { return g_; }
 		const Graph_t& graph()			const { return g_; }
 
-		W weight(int v)	const { return w_[v]; }
-		const vector<W>& weight() const { return w_; }
-		vector<W>& weight() { return w_; }
+		Weight weight(int v)	const { return w_[v]; }
+		const vector<Weight>& weight() const { return w_; }
+		vector<Weight>& weight() { return w_; }
 
 		/*
 		* @brief Determines weight and vertex of maximum weight
 		* @param v ouptut vertex of maximum weight
 		* @returns weight of vertex v
 		*/
-		W maximum_weight(int& v)	const;
+		Weight maximum_weight(int& v)	const;
 
 		const VertexBitset& neighbors(int v)	const { return g_.neighbors(v); }
 		VertexBitset& neighbors(int v) { return g_.neighbors(v); }
@@ -151,7 +145,7 @@ namespace bitgraph {
 		* @param name name of the instance
 		* @details: fast-fail policy - exits if error
 		**/
-		void reset(std::size_t n, W val = DEFAULT_WEIGHT, string name = "");
+		void reset(std::size_t n, Weight val = DEFAULT_WEIGHT, string name = "");
 
 	protected:
 		/**
@@ -297,8 +291,8 @@ namespace bitgraph {
 		// data members
 
 	protected:
-		Graph_t g_;							//graph
-		vector<W> w_;						//vector of weights 
+		Graph_t g_;								//graph
+		vector<Weight> w_;						//vector of weights 
 	};
 
 }//end namespace bitgraph
@@ -312,8 +306,8 @@ namespace bitgraph {
 	//
 	///////////////////////
 
-	template<class Graph_t, class W>
-	class Graph_W : public Base_Graph_W <Graph_t, W> {};	
+	template<class Graph_t, class WeightT>
+	class Graph_W : public Base_Graph_W <Graph_t, WeightT> {};
 }
 
 ////////////////////////////////////
@@ -326,21 +320,21 @@ namespace bitgraph {
 
 	using ugraph = bitgraph::Ugraph<bitarray>;
 
-	template<class W>
-	class Graph_W<ugraph, W> : public Base_Graph_W<ugraph, W> {
+	template<class WeightT>
+	class Graph_W<ugraph, WeightT> : public Base_Graph_W<ugraph, WeightT> {
 	public:
 			
-		using BaseT = Base_Graph_W<ugraph, W>;					//parent type
+		using BaseT = Base_Graph_W<ugraph, WeightT>;					//parent type
 		using graph_type = typename BaseT::graph_type;
 		using bitset_type = typename BaseT::bitset_type;
-		using weight_type = typename BaseT::weight_type;
+		using Weight = typename BaseT::Weight;
 
 		using BaseT::NO_WEIGHT;
 		using BaseT::ZERO_WEIGHT;
 		using BaseT::DEFAULT_WEIGHT;
 		
 		//alias types for backward compatibility
-		using _wt = weight_type;											
+		//using _wt = weight_type;											
 		using VertexBitset = bitset_type;
 
 		//constructors (inherited from Base class)
@@ -372,10 +366,10 @@ namespace bitgraph {
 
 namespace bitgraph {
 
-	template<class Graph_t, class W>
+	template<class Graph_t, class WeightT>
 	template<class Func>
 	inline
-		void Base_Graph_W<Graph_t, W>::transform_weights(Func f)
+		void Base_Graph_W<Graph_t, WeightT>::transform_weights(Func f)
 	{
 		auto NV = num_vertices();
 

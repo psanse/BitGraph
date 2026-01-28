@@ -55,7 +55,8 @@ namespace bitgraph {
 				
 		using bitset_type = BitSetT;				//basic type (a type of bitset)
 		using VertexBitset = bitset_type;			//alias for semantic type
-	
+		
+
 		/////////////			
 		//construction / destruction
 		Graph() noexcept;													//creates empty graph
@@ -95,8 +96,7 @@ namespace bitgraph {
 		* @return: number of vertices as a signed integer
 		* @details: aliases order() and num_vertices()
 		**/
-		int num_vertices() const  noexcept { return NV_; }
-		
+		int num_vertices() const  noexcept { return NV_; }		
 
 		/**
 		* @brief number of bitblocks in each bitset (row) of the adjacency matriz

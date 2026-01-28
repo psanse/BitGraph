@@ -33,7 +33,7 @@ namespace bitgraph {
 			using type = GraphFastRootSort_W<GraphW_t>;						//own type	
 			using ugtype = typename basic_type::graph_type;						//non-weighted graph type	
 			using ptype = GraphFastRootSort <ugtype>;						//parent type
-			using wtype = typename GraphW_t::_wt;							//weight type
+			using Weight = typename GraphW_t::Weight;							//weight type
 
 			enum { MAX_WEIGHT = 100, MIN_WEIGHT };							//sorting algorithms for weighted graphs	
 
@@ -194,7 +194,7 @@ namespace bitgraph {
 		ptype::set_ordering();
 
 		/////////////////////////////////////////////////////////////////////////////
-		com::has_greater_val< int, std::vector<wtype> > pred(gw_.weight());
+		com::has_greater_val< int, std::vector<Weight> > pred(gw_.weight());
 		std::stable_sort(this->nodes_.begin(), this->nodes_.end(), pred);
 		/////////////////////////////////////////////////////////////////////////////
 
@@ -211,7 +211,7 @@ namespace bitgraph {
 		ptype::set_ordering();
 
 		/////////////////////////////////////////////////////////////////////////////
-		com::has_smaller_val< int, std::vector<wtype> > pred(gw_.weight());
+		com::has_smaller_val< int, std::vector<Weight> > pred(gw_.weight());
 		std::stable_sort(this->nodes_.begin(), this->nodes_.end(), pred);
 		/////////////////////////////////////////////////////////////////////////////
 

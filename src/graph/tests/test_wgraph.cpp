@@ -27,7 +27,7 @@ using namespace bitgraph;
 class UGraphWTest : public ::testing::Test {
 protected:
 	void SetUp() override {
-		gw.reset(NV, static_cast<ugraph_wi::_wt>(0.0));
+		gw.reset(NV, static_cast<ugraph_wi::Weight>(0.0));
 		gw.graph().add_edge(0, 1);
 		gw.graph().add_edge(0, 2);
 		gw.set_weight(0, 1);
@@ -46,7 +46,7 @@ protected:
 TEST_F(UGraphWTest, scale_transformation) {
 
 	//scale transformation (mul by *5 all the weights)
-	gw.transform_weights(com::scale<decltype(gw)::_wt>(5));
+	gw.transform_weights(com::scale<decltype(gw)::Weight>(5));
 
 	EXPECT_EQ(5,  gw.weight(0));
 	EXPECT_EQ(10, gw.weight(1));

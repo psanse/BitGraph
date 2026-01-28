@@ -366,9 +366,9 @@ namespace bitgraph {
 			* @brief sum of weights of the vertices in a (bit)set (bbref)
 			*/
 			template<typename Graph_t>
-			typename Graph_t::_wt wsum(const Graph_t& g, typename Graph_t::VertexBitset& bbref) {
+			typename Graph_t::Weight wsum(const Graph_t& g, typename Graph_t::VertexBitset& bbref) {
 
-				typename Graph_t::_wt total_weight = 0;
+				typename Graph_t::Weight total_weight = 0;
 
 				//bitscanning configuration
 				bbref.init_scan(bbo::NON_DESTRUCTIVE);
@@ -386,9 +386,9 @@ namespace bitgraph {
 			* @brief sum of weights of the vertices in a set (lv)
 			*/
 			template<typename Graph_t>
-			typename Graph_t::_wt wsum(const Graph_t& g, vint& lv) {
+			typename Graph_t::Weight wsum(const Graph_t& g, vint& lv) {
 
-				typename Graph_t::_wt total_weight = 0;
+				typename Graph_t::Weight total_weight = 0;
 
 				//iterate and add
 				for (int v : lv) {
@@ -402,9 +402,9 @@ namespace bitgraph {
 			* @brief sum of weights of the vertices in a graph
 			*/
 			template<typename Graph_t>
-			typename Graph_t::_wt wsum(const Graph_t& g) {
+			typename Graph_t::Weight wsum(const Graph_t& g) {
 
-				typename Graph_t::_wt total_weight = 0;
+				typename Graph_t::Weight total_weight = 0;
 
 				// Obtiene el vector de pesos de los vértices
 				const auto& weights = g.weights();
@@ -423,7 +423,7 @@ namespace bitgraph {
 			*		 plus the weight of vertex v
 			*/
 			template<typename Graph_t>
-			typename Graph_t::_wt wsum(const Graph_t& g, int v, typename Graph_t::VertexBitset& bbref) {
+			typename Graph_t::Weight wsum(const Graph_t& g, int v, typename Graph_t::VertexBitset& bbref) {
 
 				auto total_weight = g.weight(v);
 
@@ -446,7 +446,7 @@ namespace bitgraph {
 			*		 plus the weight of vertex v
 			*/
 			template<typename Graph_t>
-			typename Graph_t::_wt wsum(Graph_t& g, int v) {
+			typename Graph_t::Weight wsum(Graph_t& g, int v) {
 
 				auto total_weight = g.weight(v);
 				const auto& bbn = g.neighbors(v);
@@ -617,8 +617,8 @@ namespace bitgraph {
 					return (weights[a] - g.degree(a)) > (weights[b] - g.degree(b));
 					};
 
-				/*com::has_smaller_val_diff<int, typename vector<Graph_t::_wt>> my_struct_smaller_diff(g.weights());
-				com::has_greater_val_diff<int, typename vector<Graph_t::_wt>> my_struct_greater_diff(g.weights());*/
+				/*com::has_smaller_val_diff<int, typename vector<Graph_t::Weight>> my_struct_smaller_diff(g.weights());
+				com::has_greater_val_diff<int, typename vector<Graph_t::Weight>> my_struct_greater_diff(g.weights());*/
 
 				//sorting according to ldeg
 				if (min_sort) {
@@ -677,13 +677,13 @@ namespace bitgraph {
 
 			/*template<typename Graph_t>
 			struct accum_we{
-				typename Graph_t::_wt operator ()( double accum, int v) const{return (accum + lw[v]);}
+				typename Graph_t::Weight operator ()( double accum, int v) const{return (accum + lw[v]);}
 				accum_we(double* lw):lw(lw){}
 				const double* lw;
 			};*/
 
 			template<typename Graph_t>
-			typename Graph_t::_wt wesum(const Graph_t& g, bool only_we = false) { LOG_ERROR("not implemented yet -  edgeW::wesum"); return 0; }
+			typename Graph_t::Weight wesum(const Graph_t& g, bool only_we = false) { LOG_ERROR("not implemented yet -  edgeW::wesum"); return 0; }
 
 			//alias
 			template<class W>
@@ -725,9 +725,9 @@ namespace bitgraph {
 			*
 			*/
 			template<typename Graph_t>
-			typename Graph_t::_wt wesum(const Graph_t& g, vint& lv, bool only_we = false) {
+			typename Graph_t::Weight wesum(const Graph_t& g, vint& lv, bool only_we = false) {
 
-				typename Graph_t::_wt total_weight = 0.0;
+				typename Graph_t::Weight total_weight = 0.0;
 				const auto NV = lv.size();
 
 				for (auto i = 0; i < NV - 1; i++) {
@@ -742,8 +742,8 @@ namespace bitgraph {
 				return total_weight;
 			}
 
-			template<class Graph_t, class _wt>
-			int ew_shift_2_highest_index(const Graph_t& g, const int* lv, _wt* lw, int size_lv, double wper = 1.0) {
+			template<class Graph_t, class WeightT>
+			int ew_shift_2_highest_index(const Graph_t& g, const int* lv, WeightT* lw, int size_lv, double wper = 1.0) {
 				/////////////////////////
 				// 
 				// last_update@: 8/8/2018
