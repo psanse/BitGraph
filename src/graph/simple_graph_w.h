@@ -67,9 +67,9 @@ namespace bitgraph {
 
 		//copy constructor, move constructor, copy operator =, move operator =
 		Base_Graph_W(const Base_Graph_W& g) = default;
-		Base_Graph_W(Base_Graph_W&& g)   noexcept = default;
-		Base_Graph_W& operator =			(const Base_Graph_W& g) = default;
-		Base_Graph_W& operator =			(Base_Graph_W&& g)	 noexcept = default;
+		Base_Graph_W(Base_Graph_W&& g) noexcept = default;
+		Base_Graph_W& operator = (const Base_Graph_W& g) = default;
+		Base_Graph_W& operator = (Base_Graph_W&& g)	 noexcept = default;
 
 		//destructor
 		virtual	~Base_Graph_W() = default;
@@ -177,7 +177,7 @@ namespace bitgraph {
 		/////////////
 		// boolean properties
 
-		bool is_edge(int v, int w)		const { return g_.is_edge(v, w); }
+		bool is_edge(int v, int w) const { return g_.is_edge(v, w); }
 
 		/**
 		* @brief checks if the graph is unit-weighted
@@ -213,7 +213,7 @@ namespace bitgraph {
 			* @param g output graph
 			* @returns 0 if success, -1 if error
 			*/
-		int create_complement(Base_Graph_W& g)					const;
+		int create_complement(Base_Graph_W& g) const;
 
 		////////////
 		// I/O
@@ -257,18 +257,18 @@ namespace bitgraph {
 		* @param show_vert: if FALSE does not show vertex info but the collection of weights
 		*					in order
 		**/
-		std::ostream& print_weights(std::ostream& o = std::cout, bool show_vert = true)						const;
+		std::ostream& print_weights(std::ostream& o = std::cout, bool show_vert = true)	const;
 
 		/**
 		* @brief streams vertex-weights in the subset of vertices  bbsg
 		**/
-		std::ostream& print_weights(VertexBitset& bbsg, std::ostream& o = std::cout)									const;
+		std::ostream& print_weights(VertexBitset& bbsg, std::ostream& o = std::cout) const;
 
 		/**
 		* @brief prints the weights of the vertices in the stack lv
 		* @param lv: a set of vertices with a stack interface
 		**/
-		std::ostream& print_weights(com::FixedStack<int>& lv, ostream& o = std::cout)								const;
+		std::ostream& print_weights(com::FixedStack<int>& lv, ostream& o = std::cout) const;
 
 		/**
 		* @brief prints the weights of the vertices in the FixedStack lv
@@ -283,8 +283,8 @@ namespace bitgraph {
 		* @brief prints the weights of the vertices in lv
 		* @supports C-arrays
 		**/
-		std::ostream& print_weights(vint& lv, std::ostream& o = std::cout)										const;
-		std::ostream& print_weights(int* lv, int n, std::ostream& o = std::cout)								const;
+		std::ostream& print_weights(vint& lv, std::ostream& o = std::cout) const;
+		std::ostream& print_weights(int* lv, int n, std::ostream& o = std::cout) const;
 
 		/////////////////////////////////////
 		// data members
@@ -341,9 +341,9 @@ namespace bitgraph {
 
 		/////////////
 		//useful interface-specific for undirected weighted graphs
-		int max_graph_degree()						const { return this->g_.max_graph_degree(); }
-		int degree(int v)							const { return this->g_.degree(v); }
-		int degree(int v, const BitSet& bbn)		const { return this->g_.degree(v, bbn); }
+		int max_graph_degree() const { return this->g_.max_graph_degree(); }
+		int degree(int v) const { return this->g_.degree(v); }
+		int degree(int v, const BitSet& bbn) const { return this->g_.degree(v, bbn); }
 
 		///////////
 		//I/O operations
@@ -353,7 +353,7 @@ namespace bitgraph {
 		*
 		*		 (self-loops are not considered)
 		*/
-		ostream& write_dimacs(ostream& o = std::cout)		override;
+		ostream& write_dimacs(ostream& o = std::cout) override;
 	};
 	
 }//end namespace bitgraph

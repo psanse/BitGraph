@@ -84,9 +84,9 @@ namespace bitgraph {
 
 		//copy constructor, move constructor, copy operator =, move operator =
 		Base_Graph_EW(const Base_Graph_EW& g) = default;
-		Base_Graph_EW(Base_Graph_EW&& g)		noexcept = default;
-		Base_Graph_EW& operator =		(const Base_Graph_EW& g) = default;
-		Base_Graph_EW& operator =		(Base_Graph_EW&& g)		noexcept = default;
+		Base_Graph_EW(Base_Graph_EW&& g) noexcept = default;
+		Base_Graph_EW& operator = (const Base_Graph_EW& g) = default;
+		Base_Graph_EW& operator = (Base_Graph_EW&& g)		noexcept = default;
 
 		//destructor
 		virtual	~Base_Graph_EW() = default;
@@ -99,45 +99,45 @@ namespace bitgraph {
 		* @param v, Weight: edge
 		* @details: no check for vertex existence
 		**/
-		Weight weight(int v, int w)			const { return we_[v][w]; }
+		Weight weight(int v, int w)	const { return we_[v][w]; }
 
 		/**
 		* @brief getter for vertex-weights
 		* @param v: vertex
 		* @details: no check for vertex existence
 		**/
-		Weight weight(int v)					const { return we_[v][v]; }
+		Weight weight(int v) const { return we_[v][v]; }
 
 		/*
 		*  @brief getter for the specific subset of vertex-weights
 		*/
-		vecw<Weight> vertex_weights()					const;
+		vecw<Weight> vertex_weights() const;
 
 		/**
 		*  @brief getter for the all the weights (vertex and edge-weights)
 		**/
 		mat_t& weights() { return we_; }
-		const mat_t& weights()						const { return we_; }
+		const mat_t& weights() const { return we_; }
 
 		/**
 		*  @brief getter for the graph (no weight information just edges)
 		**/
 		Graph_t& graph() { return g_; }
-		const Graph_t& graph()						const { return g_; }
+		const Graph_t& graph() const { return g_; }
 
 		/**
 		* @brief number of vertices of the graph
 		* @returns: number of vertices (int type)
 		* @details: internal use
 		**/
-		int num_vertices()							const { return g_.num_vertices(); }
+		int num_vertices() const { return g_.num_vertices(); }
 
 		/**
 		* @brief number of vertices of the graph - consumer code
 		* @returns: number of vertices (std::size_t type)
 		* @details: for consumer code
 		**/
-		std::size_t size()	const { return g_.size(); }
+		std::size_t size() const { return g_.size(); }
 
 		std::size_t num_edges(bool lazy = true) { return g_.num_edges(lazy); }
 
@@ -145,13 +145,13 @@ namespace bitgraph {
 		* @brief neighbor set of vertex @v
 		* @param v input vertex
 		**/
-		const VertexBitset& neighbors(int v)			const { return g_.neighbors(v); }
+		const VertexBitset& neighbors(int v) const { return g_.neighbors(v); }
 		VertexBitset& neighbors(int v) { return g_.neighbors(v); }
 
 		void set_name(std::string str) { g_.set_name(str); }
-		string name()				const { return g_.name(); }
+		string name() const { return g_.name(); }
 		void set_path(std::string path_name) { g_.set_path(path_name); }
-		string path()				const { return g_.path(); }
+		string path() const { return g_.path(); }
 
 		double density(bool lazy = true) { return g_.density(lazy); }
 
@@ -257,7 +257,7 @@ namespace bitgraph {
 		/////////////////////////
 		// boolean properties
 
-		bool is_edge(int v, int w)			const { return g_.is_edge(v, w); }
+		bool is_edge(int v, int w) const { return g_.is_edge(v, w); }
 
 		/*
 		* @brief consistency check
@@ -296,7 +296,7 @@ namespace bitgraph {
 			* @param g output graph
 			* @returns 0 if success, -1 if error
 			**/
-		int create_complement(Base_Graph_EW<Graph_t, Weight>& g)					const;
+		int create_complement(Base_Graph_EW<Graph_t, Weight>& g) const;
 
 		/**
 		* @brief generates random edges uniformly with probability p and weight val
@@ -366,26 +366,26 @@ namespace bitgraph {
 		/**
 		* @brief prints the edges of the graph in line format [v]-(val)->[w], one edge per line
 		**/
-		virtual std::ostream& print_edges(std::ostream& o = std::cout, bool eofl = true)				const;
+		virtual std::ostream& print_edges(std::ostream& o = std::cout, bool eofl = true) const;
 
 		/**
 		* @brief prints edges in different formats
 		* @param line_format: if TRUE, prints one edge per line, otherwise in matrix format
 		**/
-		virtual	std::ostream& print_edge_weights(std::ostream& o = std::cout, bool line_format = true)		const;
-		std::ostream& print_vertex_weights(std::ostream& o = std::cout)								const;
+		virtual	std::ostream& print_edge_weights(std::ostream& o = std::cout, bool line_format = true) const;
+		std::ostream& print_vertex_weights(std::ostream& o = std::cout) const;
 
 		/**
 		* @brief prints the edges of the graph induced by the vertices of lv in line format
 		* @param lv: input set of vertices of the induced subgraph
 		**/
-		virtual	std::ostream& print_edge_weights(vint& lv, std::ostream& o = std::cout)					const;
+		virtual	std::ostream& print_edge_weights(vint& lv, std::ostream& o = std::cout)	const;
 
 		/**
 		* @brief prints the vertices of the vertices of lv
 		* @param lv: input set of vertices
 		**/
-		std::ostream& print_vertex_weights(vint& lv, std::ostream& o = std::cout)						const;
+		std::ostream& print_vertex_weights(vint& lv, std::ostream& o = std::cout) const;
 
 		///////////////////
 		//data members
@@ -447,7 +447,7 @@ namespace bitgraph {
 		/**
 		* @ brief adds an edge (v, w) with weight val
 		**/
-		void add_edge(int v, int w, Weight val  = BaseT::ZERO_WEIGHT )	override;
+		void add_edge(int v, int w, Weight val  = BaseT::ZERO_WEIGHT ) override;
 
 		/**
 		*  @brief sets edge-weight val to the undirected edge {v, w} if the edge exists
@@ -461,7 +461,7 @@ namespace bitgraph {
 		*  @details: asserts v!=w
 		*  @details: in a non-edge it can only set weight to NO_WEIGHT
 		**/
-		void set_weight(int v, int w, Weight val)					override;
+		void set_weight(int v, int w, Weight val) override;
 
 		/**
 		*  @brief sets edge-weights in lw consistently to the graph
@@ -502,9 +502,9 @@ namespace bitgraph {
 		/////////////
 		//useful interface for graph operations (no weights)
 
-		int max_graph_degree()								const { return this->g_.max_graph_degree(); }
-		int degree(int v)									const { return this->g_.degree(v); }
-		int degree(int v, const VertexBitset& bbn)					const { return this->g_.degree(v, bbn); }
+		int max_graph_degree() const { return this->g_.max_graph_degree(); }
+		int degree(int v) const { return this->g_.degree(v); }
+		int degree(int v, const VertexBitset& bbn) const { return this->g_.degree(v, bbn); }
 
 		/////////////
 		//other operations
@@ -512,7 +512,7 @@ namespace bitgraph {
 		/**
 		* @brief generates random edges uniformly with probability p and weight val
 		**/
-		void gen_random_edges(double, Weight val = BaseT::ZERO_WEIGHT)						override;
+		void gen_random_edges(double, Weight val = BaseT::ZERO_WEIGHT) override;
 
 		/////////////
 		// I/O operations
@@ -520,11 +520,10 @@ namespace bitgraph {
 		/**
 		* @brief prints the edges of the graph in line format [v]-(val)->[w], one edge per line
 		**/
-		std::ostream& print_edges(std::ostream& o = std::cout, bool eofl = false)					const override;
+		std::ostream& print_edges(std::ostream& o = std::cout, bool eofl = false) const override;
 
-		std::ostream& print_edge_weights(std::ostream& o = std::cout, bool line_format = true)				const override;
-
-		std::ostream& print_edge_weights(vint& lv, std::ostream& o = std::cout)								const override;
+		std::ostream& print_edge_weights(std::ostream& o = std::cout, bool line_format = true) const override;
+		std::ostream& print_edge_weights(vint& lv, std::ostream& o = std::cout)	const override;
 
 	public:
 		/**
