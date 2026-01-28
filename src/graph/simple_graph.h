@@ -98,9 +98,8 @@ namespace bitgraph {
 		* @return: number of vertices as a signed integer
 		* @details: aliases order() and num_vertices()
 		**/
-		index_t num_vertices() const  noexcept { return NV_; }
-		index_t order() const  noexcept { return NV_; }
-
+		int num_vertices() const  noexcept { return NV_; }
+		
 
 		/**
 		* @brief number of bitblocks in each bitset (row) of the adjacency matriz
