@@ -50,25 +50,22 @@ namespace bitgraph {
 		friend class GraphConversion;
 
 	public:
-
-		using index_t = int;
-				
-		using bitset_type = BitsetT;				//basic type (a type of bitset)
-		using VertexBitset = bitset_type;			//alias for semantic type
+						
+		using bitset_type = BitsetT;				// basic type (a type of bitset)
+		using VertexBitset = bitset_type;			// alias for semantic type
 		
-
 		/////////////			
 		//construction / destruction
-		Graph() noexcept;													//creates empty graph
-		explicit Graph(std::size_t NV);										//creates graph with n=|V| and m=0 	
-		explicit Graph(std::string filename);								//creates graph from file		
-		Graph(std::size_t n, int* adj[], std::string filename = "");		//old-style adjacency matrix
+		Graph() noexcept;													// creates empty graph
+		explicit Graph(std::size_t NV);										// creates graph with n=|V| and m=0 	
+		explicit Graph(std::string filename);								// creates graph from file		
+		Graph(std::size_t n, int* adj[], std::string filename = "");		// old-style adjacency matrix
 
 		//move and copy semantics allowed
 		Graph(const Graph& g) = default;
-		Graph& operator =					(const Graph& g) = default;
-		Graph(Graph&& g)			noexcept = default;
-		Graph& operator =					(Graph&& g)			noexcept = default;
+		Graph& operator = (const Graph& g) = default;
+		Graph(Graph&& g) noexcept = default;
+		Graph& operator = (Graph&& g) noexcept = default;
 
 		virtual	~Graph() = default;
 
@@ -103,7 +100,7 @@ namespace bitgraph {
 		*		 In the case of sparse graphs, the value is the maximum capacity
 		*		 of all bitsets.
 		**/
-		index_t num_blocks() const noexcept { return NBB_; }
+		int num_blocks() const noexcept { return NBB_; }
 
 		/*
 		* @brief Counts the number of edges	(includes self loops)		
@@ -119,11 +116,11 @@ namespace bitgraph {
 		* @param set input bitset of vertices that induces the subgraph
 		* @returns number of edges
 		**/
-		virtual	std::size_t num_edges(const BitsetT& set)	const;
+		virtual	std::size_t num_edges(const VertexBitset& set)	const;
 
-		const vector<BitsetT>& adjacency_matrix()		const { return adj_; }
-		const BitsetT& neighbors(int v)					const { return adj_[v]; }
-		BitsetT& neighbors(int v) { return adj_[v]; }
+		const vector<VertexBitset>& adjacency_matrix()		const { return adj_; }
+		const VertexBitset& neighbors(int v)					const { return adj_[v]; }
+		VertexBitset& neighbors(int v) { return adj_[v]; }
 
 		//////////////////////////
 		// memory allocation 
@@ -185,7 +182,7 @@ namespace bitgraph {
 		* @brief density of the subgraph induced by a set of vertices
 		* @param set input (bit) set of vertices
 		**/
-		template <class U = BitsetT>
+		template <class U = VertexBitset>
 		double density(const U& set);
 
 		/**
@@ -428,17 +425,17 @@ namespace bitgraph {
 		* @param bbsg input (bit) set of vertices
 		* @param o output stream
 		*/
-		template <class U = BitsetT>
+		template <class U = VertexBitset>
 		ostream& print_edges(U& bbsg, ostream& o = std::cout)	const;
 
 		//////////////////////////
 		// data members
 	protected:
-		std::vector<BitsetT> adj_;		//adjacency matrix 
+		std::vector<VertexBitset> adj_;		//adjacency matrix 
 
-		index_t NV_;					//number of vertices
-		std::size_t NE_;				//number of edges (can be very large)
-		index_t NBB_;					//number of bit blocks per row (in the case of sparse graphs this is a maximum value)
+		int NV_;						// number of vertices
+		std::size_t NE_;				// number of edges (can be very large)
+		int NBB_;						// number of bit blocks per row (in the case of sparse graphs this is a maximum value)
 
 		//names
 		std::string name_;				//name of instance, without path	
