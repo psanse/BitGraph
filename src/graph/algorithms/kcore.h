@@ -398,7 +398,6 @@ namespace bitgraph {
 	}
 
 
-
 	template<class Graph_t>
 	inline int KCore<Graph_t>::find_kcore(bool is_subg) {
 
@@ -408,19 +407,18 @@ namespace bitgraph {
 			return -1;
 		}
 		bin_sort(is_subg);
-
-		auto u = EMPTY_ELEM;
-		//auto v = EMPTY_ELEM;
-
+				
 		if (!is_subg) {
 
 			//kcore computation for the full graph
 			for (auto& v : ver_) {
 
 				//iterates over N(v)
+				
 				VertexBitset& neigh = g_.neighbors(v);
 				if (neigh.init_scan(bbo::NON_DESTRUCTIVE) != -1) {			//CHECK MUST BE - for sparse_bitarrays
 
+					int u = BBObject::noBit;
 					while ((u = neigh.next_bit()) != BBObject::noBit) {
 
 						if (deg_[u] > deg_[v]) {
@@ -432,7 +430,6 @@ namespace bitgraph {
 				}
 
 			}//vertex iteration
-
 		}
 		else {
 
@@ -448,6 +445,7 @@ namespace bitgraph {
 				//iterates over the neighbors of v in the subgraph
 				if (neigh.init_scan(bbo::NON_DESTRUCTIVE) != -1) {			//CHECK MUST BE - for sparse_bitarrays
 
+					int u = BBObject::noBit;
 					while ((u = neigh.next_bit()) != BBObject::noBit) {
 
 						if (deg_[u] > deg_[v]) {

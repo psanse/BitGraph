@@ -30,7 +30,10 @@
 #include <vector>
 
 namespace bitgraph {
-					
+	
+	namespace _impl {
+		class GraphConversion;			// forward declaration
+	}
 
 	//////////////////
 	//
@@ -47,7 +50,7 @@ namespace bitgraph {
 		static_assert(std::is_same<BBScan, BitsetT>::value ||
 			std::is_same<BBScanSp, BitsetT>::value, "is not a valid Graph type");
 
-		friend class GraphConversion;
+		friend class _impl::GraphConversion;
 
 	public:
 						

@@ -26,32 +26,52 @@ namespace bitgraph {
 	using U8 = std::uint8_t;
 	using U16 = std::uint16_t;
 	using U32 = std::uint32_t;
-	using Ul = unsigned long;		//for intrinscs
 	using U64 = std::uint64_t;
-	using BITBOARD = U64;
+
+	using Ul = unsigned long;							// for intrinsics
+	
+	using BITBOARD = U64;								// alias for semantics
 	using BYTE = U8;
-	using BOOL = int;								//Deprecated: use bool instead (CHECK 08/02/25)
+
+	//C++14 style to avoid ODR issues
+	enum : BITBOARD {
+		ONE = 0xFFFFFFFFFFFFFFFFULL,					// 1 bit mask
+		EVEN = 0x5555555555555555ULL,					// 1 bits in even positions: 64 bits
+		ZERO = 0ULL	
+	};
+
+	enum : U32 {
+		EVEN_32 = 0x55555555U
+	};
+
+	enum : U8 {
+		EVEN_8 = 0x55U
+	};
+
+	//legacy code
+	//constexpr BITBOARD ONE = 0xFFFFFFFFFFFFFFFF;		// 1 bit mask	
+	//constexpr BITBOARD EVEN = 0x5555555555555555;		// 1 bits in even positions: 64 bits
+	//constexpr U32 EVEN_32 = 0x55555555;				// 1 bits in even positions: 32 bits
+	//constexpr U8 EVEN_8 = 0x55;						// 1 bits in even positions: 8 bits
+	//constexpr BITBOARD ZERO = 0ull;					// 0 64 bit mask
 
 
-	constexpr BITBOARD ONE = 0xFFFFFFFFFFFFFFFF;		//1 bit mask	
-	constexpr BITBOARD EVEN = 0x5555555555555555;		//1 bits in even positions: 64 bits
-	constexpr U32 EVEN_32 = 0x55555555;					//1 bits in even positions: 32 bits
-	constexpr U8 EVEN_8 = 0x55;						    //1 bits in even positions: 8 bits
-	constexpr BITBOARD ZERO = 0ull;						//0 64 bit mask
+	//C++14 style to avoid ODR issues
+	enum : int {
+		EMPTY_ELEM = -1,								// empty table element,... 	
+		WORD_SIZE = 64,									// size of the register word - DO NOT CHANGE!
+		WORD_SIZE_MINUS_ONE = WORD_SIZE - 1,
+		MASK_LIM = WORD_SIZE + 1						// mask limit for bitscan operations on a single BITBOARD
+	};
 
-}
+	//legacy code
+	//constexpr int EMPTY_ELEM = -1;						
+	
+	////size of the register word - DO NOT CHANGE!
+	//constexpr int WORD_SIZE = 64;
+	//constexpr int WORD_SIZE_MINUS_ONE = WORD_SIZE - 1;
+	//constexpr int MASK_LIM = WORD_SIZE + 1;				  
 
-namespace bitgraph {
+} // end namespace bitgraph
 
-	constexpr int EMPTY_ELEM = -1;						//empty table element,... 	
-
-	//size of the register word - DO NOT CHANGE!
-	constexpr int WORD_SIZE = 64;
-	constexpr int WORD_SIZE_MINUS_ONE = WORD_SIZE - 1;
-	constexpr int MASK_LIM = WORD_SIZE + 1;				  //mask limit for bitscan operations of a single BITBOARD
-
-}
-
-
-
-#endif
+#endif // __BBTYPES_H__

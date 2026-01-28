@@ -108,7 +108,7 @@ namespace bitgraph {
 			BitSetT& bb_;
 		};
 
-
+		
 		template< class BitSetT >
 		struct Scan {
 			using Self = ScanRev<BitSetT>;		//own type
