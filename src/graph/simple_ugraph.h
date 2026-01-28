@@ -55,7 +55,7 @@ namespace bitgraph {
 		using BaseT = Graph<BitSetT>;		//parent type
 
 		using bitset_type = typename BaseT::bitset_type;
-		using VertexBitset = typename BaseT::VertexBitset;		// alias for semantic type
+		using VertexBitset = bitset_type;						// alias for semantic type
 
 		//constructors - cannot all be inherited	
 		Ugraph() : Graph<BitSetT>() {}															//creates empty graph

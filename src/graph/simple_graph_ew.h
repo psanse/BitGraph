@@ -43,17 +43,16 @@ namespace bitgraph {
 
 		using Self = Base_Graph_EW;								//own type
 		using graph_type = Graph_t;								//graph type
-		using bitset_type = typename graph_type::bitset_type;	//bitset type used by graph type 
+		using bitset_type = typename Graph_t::bitset_type;		//bitset type used by graph type 
+		using VertexBitset = bitset_type;						//alias for semantic type
 		using weight_type = W;									//weight type
 
 		//alias types for backward compatibility
 		using _gt = graph_type;
-		using _bbt = bitset_type;
 		using _wt = weight_type;								//weight number type for backward compatibility
 
 		using mat_t = vector<vector<weight_type>>;				//type for a matrix of weights
-						
-
+		
 		//enum to distinguish between vertex and edge weights
 		enum { VERTEX, EDGE, BOTH };
 
@@ -150,8 +149,8 @@ namespace bitgraph {
 		* @brief neighbor set of vertex @v
 		* @param v input vertex
 		**/
-		const _bbt& neighbors(int v)			const { return g_.neighbors(v); }
-		_bbt& neighbors(int v) { return g_.neighbors(v); }
+		const VertexBitset& neighbors(int v)			const { return g_.neighbors(v); }
+		VertexBitset& neighbors(int v) { return g_.neighbors(v); }
 
 		void set_name(std::string str) { g_.set_name(str); }
 		string name()				const { return g_.name(); }
@@ -434,7 +433,8 @@ namespace bitgraph {
 		using type = Graph_EW<ugraph, W>;						//own type
 		using BaseT = Base_Graph_EW<ugraph, W>;					//parent type
 		using graph_type = ugraph;						
-		using bitset_type = typename ugraph::bitset_type;
+		using bitset_type = typename BaseT::bitset_type;
+		using VertexBitset = bitset_type;						//alias for semantic type
 
 		using BaseT::NO_WEIGHT;
 		using BaseT::ZERO_WEIGHT;
@@ -443,7 +443,6 @@ namespace bitgraph {
 		//alias types for backward compatibility
 		using _wt = W;											//weight number type for backward compatibility
 		using _gt = graph_type;
-		using _bbt = bitset_type;
 
 		using mat_t = typename BaseT::mat_t;							//matrix type for weights
 
@@ -514,7 +513,7 @@ namespace bitgraph {
 
 		int max_graph_degree()								const { return this->g_.max_graph_degree(); }
 		int degree(int v)									const { return this->g_.degree(v); }
-		int degree(int v, const _bbt& bbn)					const { return this->g_.degree(v, bbn); }
+		int degree(int v, const VertexBitset& bbn)					const { return this->g_.degree(v, bbn); }
 
 		/////////////
 		//other operations

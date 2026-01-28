@@ -42,11 +42,12 @@ namespace bitgraph {
 		using Self = Base_Graph_W<Graph_t, W>;				//own type
 		using graph_type = Graph_t;							//graph type	
 		using bitset_type = typename Graph_t::bitset_type;	//bitset type used by graph type 
+		using VertexBitset = bitset_type;					//alias for semantic type
 		using weight_type = W;
+					
 
 		//alias types for backward compatibility
 		using _gt = graph_type;
-		using VertexBitset = bitset_type;
 		using _wt = weight_type;
 
 		//constants - globals
