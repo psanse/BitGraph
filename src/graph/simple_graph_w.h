@@ -33,14 +33,14 @@ namespace bitgraph {
 	//
 	////////////////////////
 
-	template<class Graph_t, class WeightT>
+	template<class GraphT, class WeightT>
 	class Base_Graph_W {
 
 	public:
 		enum { Wext = 0, Dext, WWWext, NOext };				//file extensions for weights (used in function read_dimacs)	
 
-		using graph_type = Graph_t;							//graph type	
-		using bitset_type = typename Graph_t::bitset_type;	//bitset type used by graph type 
+		using graph_type = GraphT;							//graph type	
+		using bitset_type = typename GraphT::bitset_type;	//bitset type used by graph type 
 		using VertexBitset = bitset_type;					//alias for semantic type
 		using Weight = WeightT;
 		
@@ -98,8 +98,8 @@ namespace bitgraph {
 		int set_modulus_weight(int MODE = DEFAULT_WEIGHT_MODULUS);
 
 
-		Graph_t& graph() { return g_; }
-		const Graph_t& graph()			const { return g_; }
+		GraphT& graph() { return g_; }
+		const GraphT& graph()			const { return g_; }
 
 		Weight weight(int v)	const { return w_[v]; }
 		const vector<Weight>& weight() const { return w_; }
@@ -291,7 +291,7 @@ namespace bitgraph {
 		// data members
 
 	protected:
-		Graph_t g_;								//graph
+		graph_type g_;								//graph
 		vector<Weight> w_;						//vector of weights 
 	};
 
@@ -306,8 +306,8 @@ namespace bitgraph {
 	//
 	///////////////////////
 
-	template<class Graph_t, class WeightT>
-	class Graph_W : public Base_Graph_W <Graph_t, WeightT> {};
+	template<class GraphT, class WeightT>
+	class Graph_W : public Base_Graph_W <GraphT, WeightT> {};
 }
 
 ////////////////////////////////////
@@ -366,10 +366,10 @@ namespace bitgraph {
 
 namespace bitgraph {
 
-	template<class Graph_t, class WeightT>
+	template<class GraphT, class WeightT>
 	template<class Func>
 	inline
-		void Base_Graph_W<Graph_t, WeightT>::transform_weights(Func f)
+		void Base_Graph_W<GraphT, WeightT>::transform_weights(Func f)
 	{
 		auto NV = num_vertices();
 

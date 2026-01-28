@@ -68,7 +68,7 @@ namespace bitgraph {
 		**/
 		Ugraph(std::size_t n, int* adj[], string name);			//old-style adjacency matrix
 
-		//TODO***- copy constructor, move constructor, copy operator =, move operator = (1/1/2025)
+		// @todo: copy constructor, move constructor, copy operator =, move operator = (1/1/2025)
 
 		//destructor
 		~Ugraph() = default;
@@ -227,7 +227,7 @@ namespace bitgraph {
 		void remove_edge(int v, int w)							override;
 
 		/**
-		* @brief generates undirected edges with probability p.
+		* @brief legacy: generates undirected edges with probability p.
 		*
 		*		 I. (v, v) not allowed.
 		*		 II. Valid for directed/undirected graphs (TMP design)
@@ -238,11 +238,10 @@ namespace bitgraph {
 		**/
 		//void gen_random_edges(double p)								override;
 
-
 		/**
 		* @brief generates undirected edges with probability p, exactly.
 		* @param p probability of an edge
-		* @details: - uses a different model from OLD gen_random_edges
+		* @details: - uses a different model than legacy gen_random_edges
 		**/
 		void gen_random_edges(double p)			override;
 
