@@ -37,17 +37,17 @@ namespace bitgraph {
 	class Base_Graph_W {
 
 	public:
-		enum { Wext = 0, Dext, WWWext, NOext };				//file extensions for weights (used in function read_dimacs)	
+		enum { Wext = 0, Dext, WWWext, NOext };				// file extensions for weights (used in function read_dimacs - @todo CHECK if necessary, add scope (28/01/2026))	
 
-		using graph_type = GraphT;							//graph type	
-		using bitset_type = typename GraphT::bitset_type;	//bitset type used by graph type 
-		using VertexBitset = bitset_type;					//alias for semantic type
+		using graph_type = GraphT;							// graph type	
+		using bitset_type = typename GraphT::bitset_type;	// bitset type used by graph type 
+		using VertexBitset = bitset_type;					// alias for semantic type
 		using Weight = WeightT;
 		
 		//constants - globals
-		static constexpr Weight NO_WEIGHT{ -1 };				//possibly change to a sentinel std::numeric_limits<WeightT>::max() ?
+		static constexpr Weight NO_WEIGHT{ -1 };				// possibly change to a sentinel std::numeric_limits<WeightT>::max() ?
 		static constexpr Weight ZERO_WEIGHT{ 0 };
-		static constexpr Weight DEFAULT_WEIGHT{ 1 };			//default weight value for weights (1.0)	
+		static constexpr Weight DEFAULT_WEIGHT{ 1 };			// default weight value for weights (1.0)	
 
 		//constructors
 		Base_Graph_W() {};																					//No memory allocation
@@ -70,7 +70,6 @@ namespace bitgraph {
 		Base_Graph_W(Base_Graph_W&& g)   noexcept = default;
 		Base_Graph_W& operator =			(const Base_Graph_W& g) = default;
 		Base_Graph_W& operator =			(Base_Graph_W&& g)	 noexcept = default;
-
 
 		//destructor
 		virtual	~Base_Graph_W() = default;
@@ -98,10 +97,10 @@ namespace bitgraph {
 		int set_modulus_weight(int MODE = DEFAULT_WEIGHT_MODULUS);
 
 
-		GraphT& graph() { return g_; }
-		const GraphT& graph()			const { return g_; }
+		graph_type& graph() { return g_; }
+		const graph_type& graph() const { return g_; }
 
-		Weight weight(int v)	const { return w_[v]; }
+		Weight weight(int v) const { return w_[v]; }
 		const vector<Weight>& weight() const { return w_; }
 		vector<Weight>& weight() { return w_; }
 
@@ -112,27 +111,27 @@ namespace bitgraph {
 		*/
 		Weight maximum_weight(int& v)	const;
 
-		const VertexBitset& neighbors(int v)	const { return g_.neighbors(v); }
+		const VertexBitset& neighbors(int v) const { return g_.neighbors(v); }
 		VertexBitset& neighbors(int v) { return g_.neighbors(v); }
 
 		void set_name(std::string str) { g_.set_name(str); }
-		std::string name()			const { return g_.name(); }
+		std::string name() const { return g_.name(); }
 		void set_path(std::string path_name) { g_.set_path(path_name); }
-		std::string path()			const { return g_.path(); }
+		std::string path() const { return g_.path(); }
 
 		/**
 		* @brief number of vertices of the graph
 		* @returns: number of vertices (int type)
 		* @details: internal use
 		**/
-		int num_vertices()			const { return g_.num_vertices(); }
+		int num_vertices() const { return g_.num_vertices(); }
 
 		/**
 		* @brief number of vertices of the graph - consumer code
 		* @returns: number of vertices (std::size_t type)
 		* @details: for consumer code
 		**/
-		std::size_t size()			const { return g_.size(); }
+		std::size_t size() const { return g_.size(); }
 
 		std::size_t num_edges(bool lazy = true) { return g_.num_edges(lazy); }
 
