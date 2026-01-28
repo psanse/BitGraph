@@ -85,8 +85,8 @@ namespace bitgraph {
 			using type = KCore;
 
 			//alias types for backward compatibility
-			using _bbt = typename basic_type::_bbt;			//bitset type
-			using _gt = basic_type;							//graph type
+			using VertexBitset = typename basic_type::VertexBitset;			//bitset type
+			using _gt = basic_type;											//graph type
 
 			//////////////
 			//globals
@@ -110,7 +110,7 @@ namespace bitgraph {
 
 			//constructors
 			KCore(Graph_t& g);
-			KCore(Graph_t& g, _bbt subg);
+			KCore(Graph_t& g, VertexBitset subg);
 			KCore(Graph_t& g, vint subg);
 
 			//copy and move semantics disallowed
@@ -167,7 +167,7 @@ namespace bitgraph {
 
 
 			const _gt& get_graph()							const { return g_; }
-			const _bbt& get_subgraph()						const { return subg_; }
+			const VertexBitset& get_subgraph()						const { return subg_; }
 
 			/*
 			* @brief sets a new induced subgraph.
@@ -176,7 +176,7 @@ namespace bitgraph {
 			*
 			* @returns 0 if success, -1 if memory allocation fails
 			*/
-			int reset_subgraph(_bbt psg);
+			int reset_subgraph(VertexBitset psg);
 
 			//////////////
 			// Main operations
@@ -281,7 +281,7 @@ namespace bitgraph {
 
 			Graph_t& g_;																//the one and only graph G=(V, E)			
 			const int NV_;																//size of graph |V| - for convenience
-			_bbt subg_;																	//reference induced subgraph to study coreness 
+			VertexBitset subg_;																	//reference induced subgraph to study coreness 
 
 			//data structures
 			vint deg_;																	//coreness of vertices																
@@ -349,7 +349,7 @@ namespace bitgraph {
 	}
 
 	template<class Graph_t>
-	inline KCore<Graph_t>::KCore(Graph_t& g, _bbt subg) : g_(g), NV_(g.num_vertices()), deg_(NV_), pos_(NV_) {
+	inline KCore<Graph_t>::KCore(Graph_t& g, VertexBitset subg) : g_(g), NV_(g.num_vertices()), deg_(NV_), pos_(NV_) {
 
 		subg_ = std::move(subg);
 
@@ -368,7 +368,7 @@ namespace bitgraph {
 	inline KCore<Graph_t>::KCore(Graph_t& g, vint set) : g_(g), NV_(g.num_vertices()), deg_(NV_), pos_(NV_) {
 
 		//builds a  bitset from a vector of vertices (population size NV_)
-		subg_ = _bbt(NV_, set);
+		subg_ = VertexBitset(NV_, set);
 
 		try {
 			ver_.assign(subg_.size(), EMPTY_ELEM);
@@ -382,7 +382,7 @@ namespace bitgraph {
 	}
 
 	template<class Graph_t>
-	inline int KCore<Graph_t>::reset_subgraph(_bbt subg) {
+	inline int KCore<Graph_t>::reset_subgraph(VertexBitset subg) {
 
 		subg_ = std::move(subg);
 
@@ -418,7 +418,7 @@ namespace bitgraph {
 			for (auto& v : ver_) {
 
 				//iterates over N(v)
-				_bbt& neigh = g_.neighbors(v);
+				VertexBitset& neigh = g_.neighbors(v);
 				if (neigh.init_scan(bbo::NON_DESTRUCTIVE) != -1) {			//CHECK MUST BE - for sparse_bitarrays
 
 					while ((u = neigh.next_bit()) != BBObject::noBit) {
@@ -437,7 +437,7 @@ namespace bitgraph {
 		else {
 
 			//kcore computation for the induced subgraph by the (bit)set of vertices in subg_
-			_bbt neigh(NV_);
+			VertexBitset neigh(NV_);
 
 			//sorts by degree and computes degeneracy
 			for (auto v : ver_) {
@@ -819,8 +819,8 @@ namespace bitgraph {
 
 		int maxNumNeigh = EMPTY_ELEM;
 		int	numNeigh = EMPTY_ELEM;
-		_bbt bb_unsel(NV_);
-		_bbt bb_sel(NV_);
+		VertexBitset bb_unsel(NV_);
+		VertexBitset bb_sel(NV_);
 
 		if (rev) {
 

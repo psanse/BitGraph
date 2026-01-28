@@ -51,7 +51,7 @@ namespace bitgraph {
 		* @date: created 03/09/18, last_update: 09/01/25
 		*/
 		template<class Graph_t>
-		std::size_t neighbors(const Graph_t& g, int v, typename  Graph_t::_bbt& bbref, vector<int>& lv) {
+		std::size_t neighbors(const Graph_t& g, int v, typename  Graph_t::VertexBitset& bbref, vector<int>& lv) {
 
 			lv.clear();
 			lv.reserve(g.num_vertices());		//allocates maximum possible size
@@ -87,7 +87,7 @@ namespace bitgraph {
 		* @date: created 03/09/18, @last_update: 09/01/25
 		*/
 		template<class Graph_t>
-		std::size_t neighbors_after(const Graph_t& g, int v, typename  Graph_t::_bbt& bbref, vector<int>& lv) {
+		std::size_t neighbors_after(const Graph_t& g, int v, typename  Graph_t::VertexBitset& bbref, vector<int>& lv) {
 
 			lv.clear();
 			lv.reserve(g.num_vertices());		//allocates maximum possible size
@@ -196,7 +196,7 @@ namespace bitgraph {
 		* @returns TRUE if the induced subgraph has no edges, FALSE otherwise
 		*/
 		template<class Graph_t>
-		bool is_edgeFree_subgraph(Graph_t& g, typename Graph_t::_bbt& bbsg, vint& edge) {
+		bool is_edgeFree_subgraph(Graph_t& g, typename Graph_t::VertexBitset& bbsg, vint& edge) {
 
 			//cleans output edge
 			edge.clear();
@@ -235,7 +235,7 @@ namespace bitgraph {
 		* @returns TRUE if the induced subgraph has no edges, FALSE otherwise
 		*/
 		template<class Graph_t>
-		bool is_triangleFree_subgraph(Graph_t& g, typename Graph_t::_bbt& bbsg, vint& triangle) {
+		bool is_triangleFree_subgraph(Graph_t& g, typename Graph_t::VertexBitset& bbsg, vint& triangle) {
 
 			//cleans output 
 			triangle.clear();
@@ -325,7 +325,7 @@ namespace bitgraph {
 			* @returns sorted list of vertices lv
 			*/
 			template<class Graph_t>
-			vint& sort_deg(const Graph_t& g, vint& lv, typename  Graph_t::_bbt& bbref, bool min_sort = true) {
+			vint& sort_deg(const Graph_t& g, vint& lv, typename  Graph_t::VertexBitset& bbref, bool min_sort = true) {
 
 				//int deg = 0;
 
@@ -366,7 +366,7 @@ namespace bitgraph {
 			* @brief sum of weights of the vertices in a (bit)set (bbref)
 			*/
 			template<typename Graph_t>
-			typename Graph_t::_wt wsum(const Graph_t& g, typename Graph_t::_bbt& bbref) {
+			typename Graph_t::_wt wsum(const Graph_t& g, typename Graph_t::VertexBitset& bbref) {
 
 				typename Graph_t::_wt total_weight = 0;
 
@@ -423,7 +423,7 @@ namespace bitgraph {
 			*		 plus the weight of vertex v
 			*/
 			template<typename Graph_t>
-			typename Graph_t::_wt wsum(const Graph_t& g, int v, typename Graph_t::_bbt& bbref) {
+			typename Graph_t::_wt wsum(const Graph_t& g, int v, typename Graph_t::VertexBitset& bbref) {
 
 				auto total_weight = g.weight(v);
 
@@ -697,7 +697,7 @@ namespace bitgraph {
 			* TODO - simplified code (09/01/25)
 			*/
 			template<typename W>
-			typename UEW<W>::_bbt wesum(const UEW<W>& g, bool only_we = false) {
+			typename UEW<W>::VertexBitset wesum(const UEW<W>& g, bool only_we = false) {
 
 				double total_weight = 0.0;
 				const auto NV = g.num_vertices();

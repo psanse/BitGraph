@@ -55,8 +55,8 @@ namespace bitgraph {
 
 		using Self = Graph<BitSetT>;			//own type
 		using bitset_type = BitSetT;			//basic type (a type of bitset)
-
-		using _bbt = bitset_type;				//for backward compatibility
+		using VertexBitset = BitSetT;			//alias for vertex bitset
+	
 
 		/////////////			
 		//construction / destruction

@@ -178,8 +178,8 @@ TEST_F(GraphMapTest, mapBetweenBitsets_2orderings) {
 	auto NV = ug.num_vertices();
 
 			
-	ugraph::_bbt bbl(static_cast<int>(NV));			//left bitset
-	ugraph::_bbt bbr(static_cast<int>(NV));			//right bitset
+	ugraph::VertexBitset bbl(static_cast<int>(NV));			//left bitset
+	ugraph::VertexBitset bbr(static_cast<int>(NV));			//right bitset
 
 	//set bits in left bitset
 	bbl.set_bit(1);
@@ -218,8 +218,8 @@ TEST_F(GraphMapTest, mapBetweenBitsets_single_ordering) {
 
 	auto NV = ug.num_vertices();
 
-	ugraph::_bbt bbl(static_cast<int>(NV));			//left bitset
-	ugraph::_bbt bbr(static_cast<int>(NV));			//right bitset
+	ugraph::VertexBitset bbl(static_cast<int>(NV));			//left bitset
+	ugraph::VertexBitset bbr(static_cast<int>(NV));			//right bitset
 
 	//set bits in left bitset
 	bbl.set_bit(1);

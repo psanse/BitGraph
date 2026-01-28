@@ -441,7 +441,7 @@ TEST(Ugraph, outgoing_degree) {
 	ug.add_edge(4, 5);
 
 	//A) input a bitset
-	ugraph::_bbt bbsg{ SIZE, {1, 3} };
+	ugraph::VertexBitset bbsg{ SIZE, {1, 3} };
 
 	EXPECT_EQ(2, ug.outgoing_degree(bbsg));  //Outgoing edges:{{0, 1},{1, 2}}
 
@@ -479,7 +479,7 @@ TEST(Ugraph, DISABLED_add_vertex_multiple) {
 
 	///////////////////
 	//Extends graph according to this neighborhood
-	graph::_bbt bbn(NV + 1 /* MUST BE THE NEW SIZE! */);
+	graph::VertexBitset bbn(NV + 1 /* MUST BE THE NEW SIZE! */);
 	bbn.set_bit(0);
 	bbn.set_bit(3);
 
@@ -532,7 +532,7 @@ TEST(Ugraph, DISABLED_add_single_vertex) {
 
 	///////////////////
 	//Extends graph according to this neighborhood
-	graph::_bbt bbn(NV + 1 /* MUST BE THE NEW SIZE! */);
+	graph::VertexBitset bbn(NV + 1 /* MUST BE THE NEW SIZE! */);
 	bbn.set_bit(0);
 	bbn.set_bit(3);
 

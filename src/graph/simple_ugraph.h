@@ -54,9 +54,12 @@ namespace bitgraph {
 		using Self = Ugraph<BitSetT>;		//own type
 		using BaseT = Graph<BitSetT>;		//parent type
 		using bitset_type = BitSetT;
+		
 
 		//alias for backward compatibility - to be removed in future versions
-		using _bbt = bitset_type;
+		using VertexBitset = typename BaseT::VertexBitset;
+		
+		//using _bbt = bitset_type;
 
 		//constructors - cannot all be inherited	
 		Ugraph() : Graph<BitSetT>() {}															//creates empty graph

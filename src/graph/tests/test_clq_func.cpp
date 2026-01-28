@@ -81,7 +81,7 @@ TEST_F(CliqueCommonTest, find_clique) {
 
 TEST_F(CliqueCommonTest, find_clique_2) {
 
-	typename ugraph::_bbt bb{ ug.size(), {2, 3, 4, 5}};
+	typename ugraph::VertexBitset bb{ ug.size(), {2, 3, 4, 5}};
 	std::vector<int> clq;
 
 
@@ -119,7 +119,7 @@ TEST_F(CliqueCommonTest, find_clique_2) {
 
 TEST_F(CliqueCommonTest, is_iset) {
 
-	typename ugraph::_bbt bb{ ug.size(), { 1, 3, 4} };
+	typename ugraph::VertexBitset bb{ ug.size(), { 1, 3, 4} };
 
 	///////////////////
 	//bitset of vertices
@@ -163,7 +163,7 @@ TEST_F(CliqueCommonTest, is_iset) {
 
 TEST_F(CliqueCommonTest, is_clique) {
 
-	typename ugraph::_bbt bb{ ug.size(), { 0, 4 } };
+	typename ugraph::VertexBitset bb{ ug.size(), { 0, 4 } };
 
 	///////////////////
 	//bitset of vertices
@@ -225,7 +225,7 @@ TEST(Clique, find_clique_max_deg) {
 	ug.add_edge(3, 4);
 
 	std::vector<int> clq;
-	typename ugraph::_bbt bbsg{ ug.size(), { 0, 1, 2, 3, 4, 5} };
+	typename ugraph::VertexBitset bbsg{ ug.size(), { 0, 1, 2, 3, 4, 5} };
 
 	/////////////////////////////////////////////////////////
 	int nV = gfunc::clq::find_clique_max_deg<decltype(ug), false>(ug, clq, bbsg);
@@ -250,7 +250,7 @@ TEST(Clique, find_clique_in_pool) {
 	ug.add_edge(3, 4);
 
 	std::vector<int> clq;
-	typename ugraph::_bbt bbsg{ ug.size(), { 0, 1, 2, 3, 4, 5} };
+	typename ugraph::VertexBitset bbsg{ ug.size(), { 0, 1, 2, 3, 4, 5} };
 
 	/////////////////////////////////////////////////////////
 	int nV = gfunc::clq::find_clique_from_pool(ug, clq, bbsg);
@@ -274,7 +274,7 @@ TEST(Clique, find_max_clique_lb) {
 	ug.add_edge(3, 4);
 
 	std::vector<int> clq;
-	typename ugraph::_bbt bbsg{ ug.size(), { 0, 1, 2, 3, 4, 5} };
+	typename ugraph::VertexBitset bbsg{ ug.size(), { 0, 1, 2, 3, 4, 5} };
 
 	/////////////////////////////////////////////////////////
 	int nV = gfunc::clq::find_clique_lb(ug);
@@ -299,7 +299,7 @@ TEST(Clique, SEQ_coloring) {
 
 
 	std::vector<int> clq;
-	typename ugraph::_bbt bbsg{ ug.size(), { 0, 1, 2, 3, 4, 5} };
+	typename ugraph::VertexBitset bbsg{ ug.size(), { 0, 1, 2, 3, 4, 5} };
 
 
 	////////////////////////////////////////

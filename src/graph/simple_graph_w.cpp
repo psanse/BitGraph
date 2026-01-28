@@ -431,7 +431,7 @@ ostream& Base_Graph_W<Graph_t, W>::print_weights (vint& lv, ostream& o) const{
 }
 
 template <class Graph_t, class W>
-ostream& Base_Graph_W<Graph_t, W>::print_weights (_bbt& bbsg, ostream& o) const{
+ostream& Base_Graph_W<Graph_t, W>::print_weights (VertexBitset& bbsg, ostream& o) const{
 	
 	bbsg.init_scan(bbo::NON_DESTRUCTIVE);										/* CHECK sparse graphs */
 	while(true){
