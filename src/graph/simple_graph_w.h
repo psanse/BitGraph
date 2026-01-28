@@ -352,15 +352,14 @@ namespace bitgraph {
 		int degree(int v)							const { return this->g_.degree(v); }
 		int degree(int v, const BitSet& bbn)		const { return this->g_.degree(v, bbn); }
 
-
 		///////////
 		//I/O operations
 
-			/*
-			* @brief Writes undirected graph to stream in dimacs format
-			*
-			*		 (self-loops are not considered)
-			*/
+		/*
+		* @brief Writes undirected graph to stream in dimacs format
+		*
+		*		 (self-loops are not considered)
+		*/
 		ostream& write_dimacs(ostream& o = std::cout)		override;
 	};
 	

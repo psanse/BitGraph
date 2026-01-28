@@ -88,10 +88,7 @@ namespace bitgraph {
 		/**
 		* @brief number of vertices of the graph. Alias to num_vertices()
 		**/
-		std::size_t size() const  noexcept { 
-			assert(NV_ >= 0);
-			return static_cast<std::size_t>(NV_); 
-		}
+		std::size_t size() const  noexcept { return static_cast<std::size_t>(NV_); }
 
 		/**
 		* @brief number of vertices of the graph as signed integer
