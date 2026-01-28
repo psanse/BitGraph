@@ -37,29 +37,26 @@ namespace bitgraph {
 	//
 	///////////////////////
 
-	template<class Graph_t, class W>
+	template<class Graph_t, class WeightT>
 	class Base_Graph_EW {
 	public:
-
-		using Self = Base_Graph_EW;								//own type
-		using graph_type = Graph_t;								//graph type
-		using bitset_type = typename Graph_t::bitset_type;		//bitset type used by graph type 
-		using VertexBitset = bitset_type;						//alias for semantic type
-		using weight_type = W;									//weight type
-
-		//alias types for backward compatibility
-		using _wt = weight_type;								//weight number type for backward compatibility
-
-		using mat_t = vector<vector<weight_type>>;				//type for a matrix of weights
+				
+		using graph_type = Graph_t;								// graph type
+		using bitset_type = typename Graph_t::bitset_type;		// bitset type used by graph type 
+		using VertexBitset = bitset_type;						// alias for semantic type
+		using Weight = WeightT;								
+		
+		using mat_t = vector<vector<Weight>>;					// type for a matrix of weights
 		
 		//enum to distinguish between vertex and edge weights
 		enum { VERTEX, EDGE, BOTH };
 
 		////////////////////////////
 		//constants / globals
-		static constexpr W NO_WEIGHT = W(-1);					//possibly change sentinel to std::numeric_limits<W>::max() ?		
-		static constexpr W ZERO_WEIGHT = W(0);
-		static constexpr W DEFAULT_WEIGHT = W(1);				//default weight value for weights (1.0)	
+
+		static constexpr Weight NO_WEIGHT { -1 };					//possibly change sentinel to std::numeric_limits<WeightT>::max() ?		
+		static constexpr Weight ZERO_WEIGHT{ 0 };
+		static constexpr Weight DEFAULT_WEIGHT{ 1 };				//default weight value for weights (1.0)	
 
 		//////////////////////////
 		//constructors / destructor
@@ -76,7 +73,7 @@ namespace bitgraph {
 		* @details: base line for all weights is set to val, i.e. vertex weights are
 		*			set to val, but edge-weights will be overwritten when edges are added
 		**/
-		Base_Graph_EW(int n, W val = ZERO_WEIGHT, bool edge_weighted = false);						//creates empty graph with |V|= n and val weights	
+		Base_Graph_EW(int n, Weight val = ZERO_WEIGHT, bool edge_weighted = false);						//creates empty graph with |V|= n and val weights	
 
 		/**
 		* @brief reads graph from file. If ewights are not found it generated them
@@ -99,22 +96,22 @@ namespace bitgraph {
 
 		/**
 		* @brief getter for edge-weights
-		* @param v, w: edge
+		* @param v, Weight: edge
 		* @details: no check for vertex existence
 		**/
-		W weight(int v, int w)			const { return we_[v][w]; }
+		Weight weight(int v, int w)			const { return we_[v][w]; }
 
 		/**
 		* @brief getter for vertex-weights
 		* @param v: vertex
 		* @details: no check for vertex existence
 		**/
-		W weight(int v)					const { return we_[v][v]; }
+		Weight weight(int v)					const { return we_[v][v]; }
 
 		/*
 		*  @brief getter for the specific subset of vertex-weights
 		*/
-		vecw<W> vertex_weights()					const;
+		vecw<Weight> vertex_weights()					const;
 
 		/**
 		*  @brief getter for the all the weights (vertex and edge-weights)
@@ -175,7 +172,7 @@ namespace bitgraph {
 		* @details: fast-fail policy - exits if failure
 		**/
 		template<bool EdgeWeightedGraph = false>
-		void reset(std::size_t n, W val = ZERO_WEIGHT, string name = "");					//before: int init (int n, W val = NO_WEIGHT, bool reset_name = true);
+		void reset(std::size_t n, Weight val = ZERO_WEIGHT, string name = "");					//before: int init (int n, Weight val = NO_WEIGHT, bool reset_name = true);
 
 		/////////////////////////
 		// basic operations
@@ -184,25 +181,25 @@ namespace bitgraph {
 			* @brief Adds an edge (v, w) with weight val
 			*	      (if the edge exists, sets val)
 			**/
-		virtual	void add_edge(int v, int w, W val = ZERO_WEIGHT);
+		virtual	void add_edge(int v, int w, Weight val = ZERO_WEIGHT);
 
 		/**
 		*  @brief sets vertex-weight
 		*  @details: vertex-weights are stored as self-loop edge-weights
 		**/
-		void set_weight(int v, W val) { we_[v][v] = val; }
+		void set_weight(int v, Weight val) { we_[v][v] = val; }
 
 		/**
 		*  @brief sets edge-weight to an EXISTNG given directed edge (v, w)
 		*		  (in a non-edge it can only set weight to NO_WEIGHT)
 		*  @param v input vertex
-		*  @param w input vertex
+		*  @param Weight input vertex
 		*  @param val input weight value
 
 		*  @details: asserts it REALLY is an edge (and not a self-loop)
 		*  @details: in a non-edge it can only set weight to NO_WEIGHT
 		**/
-		virtual	void set_weight(int v, int w, W val);
+		virtual	void set_weight(int v, int w, Weight val);
 
 		/**
 		*  @brief sets edge weights in @lw  if there is a corresponding edge.
@@ -218,7 +215,7 @@ namespace bitgraph {
 		/**
 		*  @brief sets all vertex-weights (self-loop edge weights) to the same weight @val
 		**/
-		void set_vertex_weight(W val = ZERO_WEIGHT);
+		void set_vertex_weight(Weight val = ZERO_WEIGHT);
 
 		/**
 		*  @brief sets all edge-weights to val IF there is a corresponding edge.
@@ -228,7 +225,7 @@ namespace bitgraph {
 		*						  (aditional cleaning)
 		**/
 		template<bool EraseNonEdges = false>
-		void set_edge_weight(W val = ZERO_WEIGHT);
+		void set_edge_weight(Weight val = ZERO_WEIGHT);
 
 		/**
 		* @brief sets new edge-weights based on modulus operation [Pullan 2008, MODULUS = 200]
@@ -299,12 +296,12 @@ namespace bitgraph {
 			* @param g output graph
 			* @returns 0 if success, -1 if error
 			**/
-		int create_complement(Base_Graph_EW<Graph_t, W>& g)					const;
+		int create_complement(Base_Graph_EW<Graph_t, Weight>& g)					const;
 
 		/**
 		* @brief generates random edges uniformly with probability p and weight val
 		**/
-		virtual void gen_random_edges(double, W val);
+		virtual void gen_random_edges(double, Weight val);
 
 		////////////
 		// I/O 
@@ -414,8 +411,8 @@ namespace bitgraph {
 	//
 	///////////////////////
 
-	template <class Graph_t, class W>
-	class Graph_EW : public Base_Graph_EW<Graph_t, W> {};
+	template <class Graph_t, class WeightT>
+	class Graph_EW : public Base_Graph_EW<Graph_t, WeightT> {};
 }
 
 ////////////////////////////////////
@@ -425,25 +422,24 @@ namespace bitgraph {
 ////////////////////////////////////
 namespace bitgraph {
 
-	template <class W>
-	class Graph_EW<ugraph, W> : public Base_Graph_EW<ugraph, W> {
+	template <class WeightT>
+	class Graph_EW<ugraph, WeightT> : public Base_Graph_EW<ugraph, WeightT> {
 	public:
 				
-		using BaseT = Base_Graph_EW<ugraph, W>;					// parent type
-		using graph_type = typename BaseT::graph_type;			// must be ugraph				
+		using BaseT = Base_Graph_EW<ugraph, WeightT>;					// parent type
+		using graph_type = typename BaseT::graph_type;				
 		using bitset_type = typename BaseT::bitset_type;
-		using VertexBitset = bitset_type;						// alias for semantic type
+		using VertexBitset = bitset_type;								// alias for semantic type
+		using Weight = typename BaseT::Weight;							
 
 		using BaseT::NO_WEIGHT;
 		using BaseT::ZERO_WEIGHT;
 		using BaseT::DEFAULT_WEIGHT;
-
-		//alias types for backward compatibility
-		using _wt = W;											// weight number type for backward compatibility
-		using mat_t = typename BaseT::mat_t;					// matrix type for weights
+			
+		using mat_t = typename BaseT::mat_t;							// matrix type for weights
 
 		//constructors (inherited)
-		using Base_Graph_EW<ugraph, W>::Base_Graph_EW;
+		using Base_Graph_EW<ugraph, Weight>::Base_Graph_EW;
 
 		/////////////////////////
 		// basic operations
@@ -451,7 +447,7 @@ namespace bitgraph {
 		/**
 		* @ brief adds an edge (v, w) with weight val
 		**/
-		void add_edge(int v, int w, W val = BaseT::ZERO_WEIGHT)	override;
+		void add_edge(int v, int w, Weight val  = BaseT::ZERO_WEIGHT )	override;
 
 		/**
 		*  @brief sets edge-weight val to the undirected edge {v, w} if the edge exists
@@ -465,7 +461,7 @@ namespace bitgraph {
 		*  @details: asserts v!=w
 		*  @details: in a non-edge it can only set weight to NO_WEIGHT
 		**/
-		void set_weight(int v, int w, W val)					override;
+		void set_weight(int v, int w, Weight val)					override;
 
 		/**
 		*  @brief sets edge-weights in lw consistently to the graph
@@ -489,7 +485,7 @@ namespace bitgraph {
 		* @param val weight value
 		**/
 		template <bool EraseNonEdges = false>
-		void set_edge_weight(W val = BaseT::ZERO_WEIGHT);
+		void set_edge_weight(Weight val = BaseT::ZERO_WEIGHT);
 
 		/**
 		* @brief sets new edge-weights based on modulus operation [Pullan 2008, MODULUS = 200]
@@ -516,7 +512,7 @@ namespace bitgraph {
 		/**
 		* @brief generates random edges uniformly with probability p and weight val
 		**/
-		void gen_random_edges(double, W val = BaseT::ZERO_WEIGHT)						override;
+		void gen_random_edges(double, Weight val = BaseT::ZERO_WEIGHT)						override;
 
 		/////////////
 		// I/O operations
@@ -556,10 +552,10 @@ namespace bitgraph {
 
 namespace bitgraph {
 
-	template <class Graph_t, class W>
+	template <class Graph_t, class WeightT>
 	template <bool EraseNonEdges>
 	inline
-		void Base_Graph_EW< Graph_t, W>::set_weight(mat_t& lw, bool edges_only) {
+		void Base_Graph_EW< Graph_t, WeightT>::set_weight(mat_t& lw, bool edges_only) {
 
 		auto NV = num_vertices();
 
@@ -568,13 +564,13 @@ namespace bitgraph {
 		/////////////////////////
 
 		/*if (lw.size() != NV) {
-			LOG_ERROR("bizarre matrix of weights-Base_Graph_EW<Graph_t,W >::set_edge_weight(mat_t...)");
+			LOG_ERROR("bizarre matrix of weights-Base_Graph_EW<Graph_t,WeightT >::set_edge_weight(mat_t...)");
 			return -1;
 		}*/
 
 		//set to empty wv and non-edges
-		for (auto v = 0; v < NV; ++v) {
-			for (auto w = 0; w < NV; ++w) {
+		for (int v = 0; v < NV; ++v) {
+			for (int w = 0; w < NV; ++w) {
 
 				if (edges_only && v == w) continue;			//skips vertex weights if required
 
@@ -589,10 +585,10 @@ namespace bitgraph {
 		}
 	}
 
-	template<class Graph_t, class W>
+	template<class Graph_t, class WeightT>
 	template<class Func>
 	inline
-		void Base_Graph_EW<Graph_t, W>::transform_weights(Func f, int type)
+		void Base_Graph_EW<Graph_t, WeightT>::transform_weights(Func f, int type)
 	{
 		auto NV = num_vertices();
 
@@ -630,16 +626,16 @@ namespace bitgraph {
 			break;
 		default:
 			//should not happen	
-			LOG_ERROR("unknown type -  Base_Graph_EW<Graph_t, W>::transform_weights");
+			LOG_ERROR("unknown type -  Base_Graph_EW<Graph_t, WeightT>::transform_weights");
 			LOG_ERROR("exiting");
 			std::exit(EXIT_FAILURE);
 		}
 	}
 
-	template <class Graph_t, class W>
+	template <class Graph_t, class WeightT>
 	template<bool EraseNonEdges>
 	inline
-		void Base_Graph_EW< Graph_t, W>::set_edge_weight(W val) {
+		void Base_Graph_EW< Graph_t, WeightT>::set_edge_weight(Weight val) {
 
 		auto NV = num_vertices();
 
@@ -656,18 +652,15 @@ namespace bitgraph {
 		}
 	}
 
-	template<class Graph_t, class W>
+	template<class Graph_t, class WeightT>
 	template <bool EraseNonEdges>
 	inline
-		void Base_Graph_EW<Graph_t, W>::set_modulus_edge_weight(int MODULUS) {
+		void Base_Graph_EW<Graph_t, WeightT>::set_modulus_edge_weight(int MODULUS) {
 
-		auto NV = num_vertices();
+		int NV = num_vertices();
 
-		//vertex-weights NO_WEIGHT
-		//set_vertex_weight(NO_WEIGHT);
-
-		for (auto v = 0; v < NV; ++v) {
-			for (auto w = 0; w < NV; ++w) {
+		for (int v = 0; v < NV; ++v) {
+			for (int w = 0; w < NV; ++w) {
 
 				if (g_.is_edge(v, w)) {
 
@@ -684,16 +677,16 @@ namespace bitgraph {
 		}
 	}
 
-	template <class W>
+	template <class WeightT>
 	template <bool EraseNonEdges>
 	inline
-		void Graph_EW< ugraph, W >::set_edge_weight(W val) {
+		void Graph_EW< ugraph, WeightT >::set_edge_weight(Weight val) {
 
-		auto NV = this->num_vertices();
+		const auto NV = this->num_vertices();
 
 		//set to empty wv and non-edges UPPER-T
-		for (auto v = 0; v < NV - 1; v++) {
-			for (auto w = v + 1; w < NV; w++) {
+		for (int v = 0; v < NV - 1; v++) {
+			for (int w = v + 1; w < NV; w++) {
 				if (this->g_.is_edge(v, w)) {
 					this->we_[v][w] = val;
 					this->we_[w][v] = val;
@@ -713,15 +706,15 @@ namespace bitgraph {
 		}*/
 	}
 
-	template <class W>
+	template <class WeightT>
 	template<bool EraseNonEdges>
 	inline
-		void Graph_EW< ugraph, W >::set_weight(typename Graph_EW<ugraph, W>::mat_t& lw, bool edges_only) {
+		void Graph_EW< ugraph, WeightT >::set_weight(typename Graph_EW<ugraph, WeightT>::mat_t& lw, bool edges_only) {
 
-		auto NV = this->num_vertices();
+		const int NV = this->num_vertices();
 
 		/////////////////////////
-		assert(lw.size() == NV);
+		assert(lw.size() == static_cast<std::size_t>(NV));
 		/////////////////////////
 
 		////assert
@@ -732,8 +725,8 @@ namespace bitgraph {
 		//}
 
 		//sets edge-weights
-		for (auto v = 0; v < NV - 1; ++v) {
-			for (auto w = v + 1; w < NV; ++w) {
+		for (int v = 0; v < NV - 1; ++v) {
+			for (int w = v + 1; w < NV; ++w) {
 				if (this->g_.is_edge(v, w)) {
 					this->we_[v][w] = lw[v][w];
 					this->we_[w][v] = lw[w][v];
@@ -749,25 +742,25 @@ namespace bitgraph {
 
 		//vertex weights
 		if (!edges_only) {
-			for (auto v = 0; v < NV; v++) {
+			for (int v = 0; v < NV; v++) {
 				this->we_[v][v] = lw[v][v];
 			}
 		}
 	}
 
-	template<class W>
+	template<class WeightT>
 	template<bool EraseNonEdges>
 	inline
-		void Graph_EW<ugraph, W>::set_modulus_edge_weight(int MODULUS) {
+		void Graph_EW<ugraph, WeightT>::set_modulus_edge_weight(int MODULUS) {
 
-		auto NV = this->g_.num_vertices();
+		const int NV = this->g_.num_vertices();
 
 		//vertex-weights NO_WEIGHT
 		//set_vertex_weight(BaseT::NO_WEIGHT);
 
 		//sets weights of undirected edges
-		for (auto v = 0; v < NV - 1; ++v) {
-			for (auto w = v + 1; w < NV; ++w) {
+		for (int v = 0; v < NV - 1; ++v) {
+			for (int w = v + 1; w < NV; ++w) {
 				if (this->g_.is_edge(v, w)) {
 
 					///////////////////////////////////////
@@ -782,20 +775,20 @@ namespace bitgraph {
 		}
 	}
 
-	template<class Graph_t, class W>
+	template<class Graph_t, class WeightT>
 	template<bool EdgeWeightedGraph>
 	inline
-		void Base_Graph_EW<Graph_t, W>::reset(std::size_t NV, W val, string name)
+		void Base_Graph_EW<Graph_t, WeightT>::reset(std::size_t NV, Weight val, string name)
 	{
 		///////////////
 		g_.reset(NV);
 		////////////////
 		
 		try {
-			we_.assign(NV, vector<W>(NV, val));
+			we_.assign(NV, vector<WeightT>(NV, val));
 		}
 		catch (...) {
-			LOG_ERROR("bad weight assignment - Base_Graph_EW<Graph_t, W>::reset");
+			LOG_ERROR("bad weight assignment - Base_Graph_EW<Graph_t, Weight>::reset");
 			LOG_ERROR("exiting");
 			std::exit(EXIT_FAILURE);
 		}

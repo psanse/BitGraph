@@ -26,19 +26,19 @@
 using namespace std;	
 using namespace bitgraph;
 
-/////////////////////////////////////////////////
-template<class Graph_t, class W>
-const W Base_Graph_EW <Graph_t, W >::NO_WEIGHT;	
+///////////////////////////////////////////////////
+template<class Graph_t, class WeightT>
+const WeightT Base_Graph_EW <Graph_t, WeightT >::NO_WEIGHT;	
 
-template<class Graph_t, class W>
-const W Base_Graph_EW <Graph_t, W >::DEFAULT_WEIGHT;
+template<class Graph_t, class WeightT>
+const WeightT Base_Graph_EW <Graph_t, WeightT >::DEFAULT_WEIGHT;
 
-template<class Graph_t, class W>
-const W Base_Graph_EW <Graph_t, W >::ZERO_WEIGHT;
+template<class Graph_t, class WeightT>
+const WeightT Base_Graph_EW <Graph_t, WeightT >::ZERO_WEIGHT;
 ///////////////////////////////////////////////
 
-template<class Graph_t, class W>
- bool Base_Graph_EW<Graph_t, W>::is_consistent(){
+template<class Graph_t, class WeightT>
+ bool Base_Graph_EW<Graph_t, WeightT>::is_consistent(){
 
 	auto NV = num_vertices();
 
@@ -46,7 +46,7 @@ template<class Graph_t, class W>
 		for (auto j = 0; j < NV; ++j) {
 
 			if ( we_[i][j] == NO_WEIGHT &&  g_.is_edge(i, j) ) {
-				LOGG_WARNING ("edge [", i, ", ", j ,")] with NO_WEIGHT - Base_Graph_EW<Graph_t, W>::is_consistent()");
+				LOGG_WARNING ("edge [", i, ", ", j ,")] with NO_WEIGHT - Base_Graph_EW<Graph_t, WeightT>::is_consistent()");
 				return false;
 			}
 
@@ -55,28 +55,28 @@ template<class Graph_t, class W>
 	return true;
 }
 
- template<class Graph_t, class W>
- Base_Graph_EW<Graph_t, W>::Base_Graph_EW(int NV, W val, bool edge_weighted)
+ template<class Graph_t, class WeightT>
+ Base_Graph_EW<Graph_t, WeightT>::Base_Graph_EW(int NV, Weight val, bool edge_weighted)
  {
 	 if (edge_weighted)  reset<true>(NV, val);
 	 else reset<false>(NV, val);
  }
 
- template<class Graph_t, class W>
-Base_Graph_EW<Graph_t, W>::Base_Graph_EW(string filename){
+ template<class Graph_t, class WeightT>
+Base_Graph_EW<Graph_t, WeightT>::Base_Graph_EW(string filename){
 	read_dimacs	(filename);							
 }
 
 
-template<class Graph_t, class W>
-void Base_Graph_EW<Graph_t, W>::add_edge(int v, int w, W val)
+template<class Graph_t, class WeightT>
+void Base_Graph_EW<Graph_t, WeightT>::add_edge(int v, int w, Weight val)
 {
 	g_.add_edge(v, w);
 	we_[v][w] = val;	
 }
 
-template<class Graph_t, class W>
-void Base_Graph_EW<Graph_t, W>::set_vertex_weight( W val) {
+template<class Graph_t, class WeightT>
+void Base_Graph_EW<Graph_t, WeightT>::set_vertex_weight( Weight val) {
 
 	auto NV = num_vertices();
 
@@ -86,8 +86,8 @@ void Base_Graph_EW<Graph_t, W>::set_vertex_weight( W val) {
 
 }
 
-template <class Graph_t, class W>
-void Base_Graph_EW<Graph_t, W >::set_weight(int v, int w, W val) {
+template <class Graph_t, class WeightT>
+void Base_Graph_EW<Graph_t, WeightT >::set_weight(int v, int w, Weight val) {
 	
 	////////////////
 	assert(v != w);
@@ -100,14 +100,14 @@ void Base_Graph_EW<Graph_t, W >::set_weight(int v, int w, W val) {
 	}
 	else {
 		LOGG_WARNING("attempting to set an edge-weight to a non-edge", "(", v, ",", w, ")",
-						 "- Base_Graph_EW<Graph_t,W >::set_weight"							);		
+						 "- Base_Graph_EW<Graph_t,WeightT >::set_weight"							);		
 	}
 }
 
 
 
-template<class Graph_t, class W>
- void Base_Graph_EW<Graph_t, W>::complement_weights(int type){
+template<class Graph_t, class WeightT>
+ void Base_Graph_EW<Graph_t, WeightT>::complement_weights(int type){
 
 	auto NV = num_vertices();	
 
@@ -147,7 +147,7 @@ template<class Graph_t, class W>
 		}
 		break;
 	default:	
-		LOG_ERROR("unknown type -  Base_Graph_EW<Graph_t, W>::complement_weights");
+		LOG_ERROR("unknown type -  Base_Graph_EW<Graph_t, WeightT>::complement_weights");
 		LOG_ERROR("exiting");
 		std::exit(EXIT_FAILURE);
 	}
@@ -155,12 +155,12 @@ template<class Graph_t, class W>
 }
 
 
-template<class Graph_t, class W>
-vecw<W> Base_Graph_EW<Graph_t, W>::vertex_weights()  const {
+template<class Graph_t, class WeightT>
+vecw<WeightT> Base_Graph_EW<Graph_t, WeightT>::vertex_weights()  const {
 
 	auto NV = this->num_vertices();
 
-	vector<W> res;
+	vector<WeightT> res;
 	res.reserve(NV);
 	for (auto v = 0; v < NV; ++v) {
 		res.emplace_back(we_[v][v]);
@@ -175,14 +175,14 @@ vecw<W> Base_Graph_EW<Graph_t, W>::vertex_weights()  const {
 //
 //////////////
 
-template<class Graph_t, class W>
-int Base_Graph_EW<Graph_t, W>::read_dimacs (string filename){
+template<class Graph_t, class WeightT>
+int Base_Graph_EW<Graph_t, WeightT>::read_dimacs (string filename){
 		
 	string line;	
 		
 	fstream f(filename.c_str());
 	if(!f){
-		LOGG_ERROR("error when reading file ", filename, " in DIMACS format - Base_Graph_EW<Graph_t, W>::read_dimacs");
+		LOGG_ERROR("error when reading file ", filename, " in DIMACS format - Base_Graph_EW<Graph_t, WeightT>::read_dimacs");
 		reset();
 		return -1;
 	}
@@ -191,7 +191,7 @@ int Base_Graph_EW<Graph_t, W>::read_dimacs (string filename){
 	 int nV = -1, nEdges = -1;
 	 if (gio::dimacs::read_dimacs_header (f, nV, nEdges) == -1)
 	 {
-		 LOG_ERROR("error when reading dimacs header / allocation - Base_Graph_EW<Graph_t, W>::read_dimacs");
+		 LOG_ERROR("error when reading dimacs header / allocation - Base_Graph_EW<Graph_t, WeightT>::read_dimacs");
 		 reset();
 		 f.close();
 		 return -1;
@@ -206,12 +206,12 @@ int Base_Graph_EW<Graph_t, W>::read_dimacs (string filename){
 	 //////////////
 	//read vertex-weights format <n> <vertex index> <weight> if they exist
 	 int v1 = -1, v2 = -1;
-	 W wv = NO_WEIGHT;
+	 WeightT wv = NO_WEIGHT;
 	 
 	 //peek next non-empty character
 	 int c = f.peek();
 	 if (c == EOF) {
-		 LOG_ERROR("bizarre EOF when peeking for first char - Base_Graph_EW<Graph_t, W>::read_dimacs");
+		 LOG_ERROR("bizarre EOF when peeking for first char - Base_Graph_EW<Graph_t, WeightT>::read_dimacs");
 		 reset();
 		 f.close();
 		 return -1;
@@ -227,15 +227,15 @@ int Base_Graph_EW<Graph_t, W>::read_dimacs (string filename){
 
 			 //assert
 			 if (f.bad()) {
-				 LOG_ERROR("error when reading vertex-weights - Base_Graph_EW<Graph_t, W>::read_dimacs");
+				 LOG_ERROR("error when reading vertex-weights - Base_Graph_EW<Graph_t, WeightT>::read_dimacs");
 				 reset();
 				 f.close();
 				 return -1;
 			 }
 
 			 //non-positive vertex-weight check
-			 if (wv <= static_cast<W>(0)) {
-				 LOGG_WARNING("non-positive weight read: ", wv, "- Base_Graph_EW<Graph_t, W>::read_dimacs");
+			 if (wv <= static_cast<WeightT>(0)) {
+				 LOGG_WARNING("non-positive weight read: ", wv, "- Base_Graph_EW<Graph_t, WeightT>::read_dimacs");
 			 }
 
 			 //////////////////////////
@@ -250,7 +250,7 @@ int Base_Graph_EW<Graph_t, W>::read_dimacs (string filename){
 		 gio::skip_empty_lines(f);
 		 break;
 	 default:
-		 LOGG_DEBUG("missing vertex-weights in file ", filename, " setting unit weights - Base_Graph_EW<Graph_t, W>::read_dimacs");
+		 LOGG_DEBUG("missing vertex-weights in file ", filename, " setting unit weights - Base_Graph_EW<Graph_t, WeightT>::read_dimacs");
 	 }//end of switch
 	 	
 	 /////////////////////	
@@ -259,7 +259,7 @@ int Base_Graph_EW<Graph_t, W>::read_dimacs (string filename){
 	 //read the first edge line - 4 tokens expected (e <v> <w> <edge-weight>)
 	 c = f.peek();
 	 if (c == EOF) {
-		 LOG_ERROR("bizarre EOF when peeking for first char - Base_Graph_EW<Graph_t, W>::read_dimacs");
+		 LOG_ERROR("bizarre EOF when peeking for first char - Base_Graph_EW<Graph_t, WeightT>::read_dimacs");
 		 reset();
 		 f.close();
 		 return -1;
@@ -268,7 +268,7 @@ int Base_Graph_EW<Graph_t, W>::read_dimacs (string filename){
 	 
 
 	 if (next != 'e') {
-		 LOG_ERROR("Wrong edge format reading edges - Base_Graph_EW<Graph_t, W>::read_dimacs");
+		 LOG_ERROR("Wrong edge format reading edges - Base_Graph_EW<Graph_t, WeightT>::read_dimacs");
 		 reset();
 		 f.close();
 		 return -1;
@@ -286,13 +286,13 @@ int Base_Graph_EW<Graph_t, W>::read_dimacs (string filename){
 	 case 4: edge_weights_found = true;	break; 		//expected: e <v> <w> <edge-weight> 
 	 case 3: edge_weights_found = false;  break;	//expeceted: e <v> <w>  	
 	 default:
-		 LOG_ERROR("Wrong edge format - Base_Graph_EW<Graph_t, W>::read_dimacs");
+		 LOG_ERROR("Wrong edge format - Base_Graph_EW<Graph_t, WeightT>::read_dimacs");
 		 reset();
 		 f.close();
 		 return -1;
 	 }
 
-	 W we = NO_WEIGHT;
+	 WeightT we = NO_WEIGHT;
 
 	 //parse the first edge
 	 if (edge_weights_found) {
@@ -318,7 +318,7 @@ int Base_Graph_EW<Graph_t, W>::read_dimacs (string filename){
 	 for (int e = 1; e < nEdges; ++e) {
 		 f >> next;
 		 if ( f.bad() || next != 'e'  ) {
-			 LOG_ERROR("Wrong edge format reading edges - Base_Graph_EW<Graph_t, W>::read_dimacs");
+			 LOG_ERROR("Wrong edge format reading edges - Base_Graph_EW<Graph_t, WeightT>::read_dimacs");
 			 reset();
 			 f.close();
 			 return -1;
@@ -353,8 +353,8 @@ int Base_Graph_EW<Graph_t, W>::read_dimacs (string filename){
 	 return 0;
 }
 
-template<class Graph_t, class W>
-std::ostream& Base_Graph_EW<Graph_t, W>::write_dimacs (std::ostream& o) {
+template<class Graph_t, class WeightT>
+std::ostream& Base_Graph_EW<Graph_t, WeightT>::write_dimacs (std::ostream& o) {
 	
 	auto NV = num_vertices();
 
@@ -386,8 +386,8 @@ std::ostream& Base_Graph_EW<Graph_t, W>::write_dimacs (std::ostream& o) {
 	return o;
 }
 
-template <class Graph_t, class W>
-ostream& Base_Graph_EW<Graph_t, W>::print_weights (ostream& o, bool line_format, int type) const{
+template <class Graph_t, class WeightT>
+ostream& Base_Graph_EW<Graph_t, WeightT>::print_weights (ostream& o, bool line_format, int type) const{
 
 	//o << endl << "**************************" << endl;
 	switch (type) {
@@ -403,15 +403,15 @@ ostream& Base_Graph_EW<Graph_t, W>::print_weights (ostream& o, bool line_format,
 		print_vertex_weights(o);
 		break;
 	default:
-		LOG_ERROR("unknown type - Base_Graph_EW<Graph_t, W>::print_weights");
+		LOG_ERROR("unknown type - Base_Graph_EW<Graph_t, WeightT>::print_weights");
 		LOG_ERROR("exiting");
 		std::exit(EXIT_FAILURE);
 	}
 	//o << endl << "**************************" << endl;
 	return o;
 }
-template<class Graph_t, class W>
-std::ostream& Base_Graph_EW<Graph_t, W>::print_edge_weights(std::ostream& o, bool line_format) const
+template<class Graph_t, class WeightT>
+std::ostream& Base_Graph_EW<Graph_t, WeightT>::print_edge_weights(std::ostream& o, bool line_format) const
 {
 	const auto NV = g_.num_vertices();
 
@@ -420,7 +420,7 @@ std::ostream& Base_Graph_EW<Graph_t, W>::print_edge_weights(std::ostream& o, boo
 		print_edges(o, false);
 		/*for (auto i = 0; i < NV; ++i) {
 			for (auto j = 0; j < NV; ++j) {
-				if (we_[i][j] != Base_Graph_EW<Graph_t, W>::NO_WEIGHT) {
+				if (we_[i][j] != Base_Graph_EW<Graph_t, WeightT>::NO_WEIGHT) {
 					o << "[" << i << "->" << j << " (" << we_[i][j] << ")] " << endl;
 				}
 			}
@@ -429,7 +429,7 @@ std::ostream& Base_Graph_EW<Graph_t, W>::print_edge_weights(std::ostream& o, boo
 	else {								//outputs to stream edge-weights in matrix form
 		for (int i = 0; i < NV; ++i) {
 			for (int j = 0; j < NV; ++j) {
-				if (we_[i][j] != Base_Graph_EW<Graph_t, W>::NO_WEIGHT) {
+				if (we_[i][j] != Base_Graph_EW<Graph_t, WeightT>::NO_WEIGHT) {
 					o << we_[i][j] << '\t';
 				}
 				else {
@@ -443,21 +443,21 @@ std::ostream& Base_Graph_EW<Graph_t, W>::print_edge_weights(std::ostream& o, boo
 	return o;
 }
 
-template<class Graph_t, class W>
-std::ostream& Base_Graph_EW<Graph_t, W>::print_vertex_weights(std::ostream& o) const
+template<class Graph_t, class WeightT>
+std::ostream& Base_Graph_EW<Graph_t, WeightT>::print_vertex_weights(std::ostream& o) const
 {
 	const auto NV = g_.num_vertices();	
 
 	for (int v = 0; v < NV; v++) {
-		if (we_[v][v] != Base_Graph_EW<Graph_t, W>::NO_WEIGHT) {
+		if (we_[v][v] != Base_Graph_EW<Graph_t, WeightT>::NO_WEIGHT) {
 			o << "[" << v << ":(" << we_[v][v] << ")] " << endl;
 		}
 	}
 	return o;
 }
 
-template <class Graph_t, class W>
-ostream& Base_Graph_EW<Graph_t, W>::print_weights (vint& lv, ostream& o, int type) const{
+template <class Graph_t, class WeightT>
+ostream& Base_Graph_EW<Graph_t, WeightT>::print_weights (vint& lv, ostream& o, int type) const{
 
 	//o << endl << "**************************" << endl;
 	switch (type) {
@@ -473,7 +473,7 @@ ostream& Base_Graph_EW<Graph_t, W>::print_weights (vint& lv, ostream& o, int typ
 		print_vertex_weights(lv, o);
 		break;
 	default:
-		LOG_ERROR("unknown type - Base_Graph_EW<Graph_t, W>::print_weights");
+		LOG_ERROR("unknown type - Base_Graph_EW<Graph_t, WeightT>::print_weights");
 		LOG_ERROR("exiting");
 		std::exit(EXIT_FAILURE);
 	}
@@ -482,12 +482,12 @@ ostream& Base_Graph_EW<Graph_t, W>::print_weights (vint& lv, ostream& o, int typ
 	return o;
 }
 
-template<class Graph_t, class W>
-std::ostream& Base_Graph_EW<Graph_t, W>::print_edge_weights(vint& lv, std::ostream& o) const
+template<class Graph_t, class WeightT>
+std::ostream& Base_Graph_EW<Graph_t, WeightT>::print_edge_weights(vint& lv, std::ostream& o) const
 {
 	for (auto i = 0u; i < lv.size(); ++i) {
 		for (auto j = 0u; j < lv.size(); j++) {
-			if (we_[lv[i]][lv[j]] != Base_Graph_EW<Graph_t, W>::NO_WEIGHT) {
+			if (we_[lv[i]][lv[j]] != Base_Graph_EW<Graph_t, WeightT>::NO_WEIGHT) {
 
 				///////////////////////////////////////////////////////////////////////////////////
 				o << "[" << lv[i] << "->" << lv[j] << " (" << we_[lv[i]][lv[j]] << ")] " << endl;
@@ -499,11 +499,11 @@ std::ostream& Base_Graph_EW<Graph_t, W>::print_edge_weights(vint& lv, std::ostre
 	return o;
 }
 
-template<class Graph_t, class W>
-std::ostream& Base_Graph_EW<Graph_t, W>::print_vertex_weights(vint& lv, std::ostream& o) const
+template<class Graph_t, class WeightT>
+std::ostream& Base_Graph_EW<Graph_t, WeightT>::print_vertex_weights(vint& lv, std::ostream& o) const
 {
 	for (auto i = 0u; i < lv.size(); ++i) {
-		if (we_[lv[i]][lv[i]] != Base_Graph_EW<Graph_t, W>::NO_WEIGHT) {
+		if (we_[lv[i]][lv[i]] != Base_Graph_EW<Graph_t, WeightT>::NO_WEIGHT) {
 
 			/////////////////////////////////////////////////////////////////
 			o << "[" << lv[i] << ":(" << we_[lv[i]][lv[i]] << ")] " << endl;
@@ -514,16 +514,16 @@ std::ostream& Base_Graph_EW<Graph_t, W>::print_vertex_weights(vint& lv, std::ost
 	return o;
 }
 
-template<class Graph_t, class W>
-ostream& Base_Graph_EW<Graph_t, W>::print_data (bool lazy, std::ostream& o, bool eofl) {
+template<class Graph_t, class WeightT>
+ostream& Base_Graph_EW<Graph_t, WeightT>::print_data (bool lazy, std::ostream& o, bool eofl) {
 	g_.print_data(lazy, o, false);
-	o << " [type:ew]";								//"w" for vertex-weighted graphs in GRAPH lib
+	o << " [type:ew]";								//"WeightT" for vertex-weighted graphs in GRAPH lib
 	if (eofl) { o << std::endl; }
 	return o;
 }
 
-template<class Graph_t, class W>
-std::ostream& Base_Graph_EW<Graph_t, W>::print_edge(int v, int w, std::ostream& o, bool eofl) const
+template<class Graph_t, class WeightT>
+std::ostream& Base_Graph_EW<Graph_t, WeightT>::print_edge(int v, int w, std::ostream& o, bool eofl) const
 {
 	if (g_.is_edge(v, w)) {
 		o << "[" << v << "]--(" << we_[v][w] << ")-->" << "[" << w << "]";
@@ -536,8 +536,8 @@ std::ostream& Base_Graph_EW<Graph_t, W>::print_edge(int v, int w, std::ostream& 
 	return o;
 }
 
-template<class Graph_t, class W>
-std::ostream& Base_Graph_EW<Graph_t, W>::print_vertex(int v, std::ostream& o, bool eofl) const
+template<class Graph_t, class WeightT>
+std::ostream& Base_Graph_EW<Graph_t, WeightT>::print_vertex(int v, std::ostream& o, bool eofl) const
 {
 	o << "[" << v << ":(" << we_[v][v] << ")" << "]"; 
 	
@@ -545,8 +545,8 @@ std::ostream& Base_Graph_EW<Graph_t, W>::print_vertex(int v, std::ostream& o, bo
 	return o; 
 }
 
-template<class Graph_t, class W>
-std::ostream& Base_Graph_EW<Graph_t, W>::print_edges(std::ostream& o, bool eofl) const{
+template<class Graph_t, class WeightT>
+std::ostream& Base_Graph_EW<Graph_t, WeightT>::print_edges(std::ostream& o, bool eofl) const{
 
 	const auto NV = g_.num_vertices();
 	for (auto i = 0; i < NV - 1; ++i) {
@@ -574,8 +574,8 @@ std::ostream& Base_Graph_EW<Graph_t, W>::print_edges(std::ostream& o, bool eofl)
 //
 ///////////////////////////
 
-template<class W>
-std::ostream& Graph_EW<ugraph, W>::print_edges(std::ostream& o, bool eofl)  const {	
+template<class WeightT>
+std::ostream& Graph_EW<ugraph, WeightT>::print_edges(std::ostream& o, bool eofl)  const {	
 
 	const auto NV = this->g_.num_vertices();	
 
@@ -592,8 +592,8 @@ std::ostream& Graph_EW<ugraph, W>::print_edges(std::ostream& o, bool eofl)  cons
 	return o;
 }
 
-template<class W>
-void Graph_EW<ugraph, W>::add_edge(int v, int w, W val)
+template<class WeightT>
+void Graph_EW<ugraph, WeightT>::add_edge(int v, int w, Weight val)
 {
 	//sets undirected edge
 	this->g_.add_edge(v, w);
@@ -604,7 +604,7 @@ void Graph_EW<ugraph, W>::add_edge(int v, int w, W val)
 }
 
 template <class W>
-void Graph_EW< ugraph, W >::set_weight(int v, int w, W val) {
+void Graph_EW< ugraph, W >::set_weight(int v, int w, Weight val) {
 
 	//////////////////
 	assert(v != w);
@@ -619,13 +619,13 @@ void Graph_EW< ugraph, W >::set_weight(int v, int w, W val) {
 	}
 	else {
 		LOGG_WARNING("edge-weight cannot be added to a non-edge", 
-					  "(", v, ",", w, ")", "- Graph_EW<Graph_t,W >::set_weight" );	
+					  "(", v, ",", w, ")", "- Graph_EW<Graph_t,WeightT >::set_weight" );	
 	}
 	
 }
 
-template<class W>
-void Graph_EW<ugraph, W>::gen_random_edges(double p, W val){
+template<class WeightT>
+void Graph_EW<ugraph, WeightT>::gen_random_edges(double p, Weight val){
 
 	const auto NV = this->g_.num_vertices();
 
@@ -643,8 +643,8 @@ void Graph_EW<ugraph, W>::gen_random_edges(double p, W val){
 	}
 }
 
-template<class W>
-std::ostream& Graph_EW<ugraph, W>::print_edge_weights(std::ostream& o, bool line_format) const
+template<class WeightT>
+std::ostream& Graph_EW<ugraph, WeightT>::print_edge_weights(std::ostream& o, bool line_format) const
 {
 	int NV = this->g_.num_vertices();
 
@@ -669,8 +669,8 @@ std::ostream& Graph_EW<ugraph, W>::print_edge_weights(std::ostream& o, bool line
 	return o;
 }
 
-template<class W>
-std::ostream& Graph_EW<ugraph, W>::print_edge_weights(vint& lv, std::ostream& o) const
+template<class WeightT>
+std::ostream& Graph_EW<ugraph, WeightT>::print_edge_weights(vint& lv, std::ostream& o) const
 {	
 	for (auto i = 0u; i < lv.size() - 1; ++i) {
 		for (auto j = i + 1; j < lv.size(); ++j) {
@@ -691,8 +691,8 @@ std::ostream& Graph_EW<ugraph, W>::print_edge_weights(vint& lv, std::ostream& o)
 }
 
 
-template<class W>
-ostream& Graph_EW<ugraph, W>::write_dimacs (ostream& o) {
+template<class WeightT>
+ostream& Graph_EW<ugraph, WeightT>::write_dimacs (ostream& o) {
 	
 	int NV = this->g_.num_vertices();
 
@@ -725,8 +725,8 @@ ostream& Graph_EW<ugraph, W>::write_dimacs (ostream& o) {
 }
 
 
-template<class Graph_t, class W>
-int Base_Graph_EW<Graph_t, W>::create_complement(Base_Graph_EW<Graph_t, W>& g) const
+template<class Graph_t, class WeightT>
+int Base_Graph_EW<Graph_t, WeightT>::create_complement(Base_Graph_EW<Graph_t, Weight>& g) const
 {
 
 	g.set_name(this->name());
@@ -738,8 +738,8 @@ int Base_Graph_EW<Graph_t, W>::create_complement(Base_Graph_EW<Graph_t, W>& g) c
 	/////////////////////////////////////////
 }
 
-template<class Graph_t, class W>
-void Base_Graph_EW<Graph_t, W>::gen_random_edges(double p, W val)
+template<class Graph_t, class WeightT>
+void Base_Graph_EW<Graph_t, WeightT>::gen_random_edges(double p, Weight val)
 {
 	const auto NV = g_.num_vertices();
 
@@ -761,8 +761,8 @@ void Base_Graph_EW<Graph_t, W>::gen_random_edges(double p, W val)
 	}
 }
 
-template<class Graph_t, class W>
-void Base_Graph_EW<Graph_t, W>::erase_non_edge_weights() {
+template<class Graph_t, class WeightT>
+void Base_Graph_EW<Graph_t, WeightT>::erase_non_edge_weights() {
 
 	const auto NV = g_.num_vertices();
 
@@ -770,18 +770,18 @@ void Base_Graph_EW<Graph_t, W>::erase_non_edge_weights() {
 		for (auto j = i + 1; j < NV; ++j) {
 
 			if (!g_.is_edge(i, j)) {
-				this->set_weight(i, j, Base_Graph_EW<Graph_t, W>::NO_WEIGHT);
+				this->set_weight(i, j, Base_Graph_EW<Graph_t, WeightT>::NO_WEIGHT);
 			}
 		}
 	}
 }
 
-template<class Graph_t, class W>
-void Base_Graph_EW<Graph_t, W>::make_edge_weighted(bool erase_non_edges)
+template<class Graph_t, class WeightT>
+void Base_Graph_EW<Graph_t, WeightT>::make_edge_weighted(bool erase_non_edges)
 {
 	//sets all vertex weights to NO_WEIGHT
 	for (auto v = 0u; v < g_.size(); ++v) {
-		we_[v][v] = Base_Graph_EW<Graph_t, W>::NO_WEIGHT;	
+		we_[v][v] = Base_Graph_EW<Graph_t, WeightT>::NO_WEIGHT;	
 	}
 
 	if (erase_non_edges) {
