@@ -48,7 +48,6 @@ namespace bitgraph {
 		using weight_type = W;									//weight type
 
 		//alias types for backward compatibility
-		using _gt = graph_type;
 		using _wt = weight_type;								//weight number type for backward compatibility
 
 		using mat_t = vector<vector<weight_type>>;				//type for a matrix of weights
@@ -66,7 +65,7 @@ namespace bitgraph {
 		//constructors / destructor
 
 		Base_Graph_EW() {};										//no memory allocation
-		Base_Graph_EW(_gt& g, mat_t& lwe) : g_(g), we_(lwe) {}										//creates graph from a non-weighted graph and a set of weights
+		Base_Graph_EW(graph_type& g, mat_t& lwe) : g_(g), we_(lwe) {}										//creates graph from a non-weighted graph and a set of weights
 
 		/**
 		* @brief creates a graph with |V|= n and val weights as base line.
@@ -429,26 +428,22 @@ namespace bitgraph {
 	template <class W>
 	class Graph_EW<ugraph, W> : public Base_Graph_EW<ugraph, W> {
 	public:
-
-		using type = Graph_EW<ugraph, W>;						//own type
-		using BaseT = Base_Graph_EW<ugraph, W>;					//parent type
-		using graph_type = ugraph;						
+				
+		using BaseT = Base_Graph_EW<ugraph, W>;					// parent type
+		using graph_type = typename BaseT::graph_type;			// must be ugraph				
 		using bitset_type = typename BaseT::bitset_type;
-		using VertexBitset = bitset_type;						//alias for semantic type
+		using VertexBitset = bitset_type;						// alias for semantic type
 
 		using BaseT::NO_WEIGHT;
 		using BaseT::ZERO_WEIGHT;
 		using BaseT::DEFAULT_WEIGHT;
 
 		//alias types for backward compatibility
-		using _wt = W;											//weight number type for backward compatibility
-		using _gt = graph_type;
-
-		using mat_t = typename BaseT::mat_t;							//matrix type for weights
+		using _wt = W;											// weight number type for backward compatibility
+		using mat_t = typename BaseT::mat_t;					// matrix type for weights
 
 		//constructors (inherited)
 		using Base_Graph_EW<ugraph, W>::Base_Graph_EW;
-
 
 		/////////////////////////
 		// basic operations

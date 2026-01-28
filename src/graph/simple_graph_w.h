@@ -47,7 +47,7 @@ namespace bitgraph {
 					
 
 		//alias types for backward compatibility
-		using _gt = graph_type;
+		//using _gt = graph_type;
 		using _wt = weight_type;
 
 		//constants - globals
@@ -58,8 +58,8 @@ namespace bitgraph {
 		//constructors
 		Base_Graph_W() {};																					//No memory allocation
 		explicit Base_Graph_W(std::vector<W>& lw) : w_(lw) { g_.reset(lw.size()); }							//creates empty graph with |V|= n with vertex weights
-		Base_Graph_W(_gt& g, vector<W>& lw) :g_(g), w_(lw) { assert(w_.size() == g_.size()); }				//creates graph with vertex weights	
-		Base_Graph_W(_gt& g) :g_(g), w_(g.size(), DEFAULT_WEIGHT) {}										//creates graph with DEFAULT_WEIGHTs
+		Base_Graph_W(graph_type& g, vector<W>& lw) :g_(g), w_(lw) { assert(w_.size() == g_.size()); }				//creates graph with vertex weights	
+		Base_Graph_W(graph_type& g) :g_(g), w_(g.size(), DEFAULT_WEIGHT) {}										//creates graph with DEFAULT_WEIGHTs
 		explicit Base_Graph_W(int N, W val = DEFAULT_WEIGHT) { reset(N, val); }								//creates empty graph with |V|= N and weight value val
 
 		/**
@@ -329,8 +329,7 @@ namespace bitgraph {
 	template<class W>
 	class Graph_W<ugraph, W> : public Base_Graph_W<ugraph, W> {
 	public:
-
-		using Self = Graph_W<ugraph, W>;						//own type
+			
 		using BaseT = Base_Graph_W<ugraph, W>;					//parent type
 		using graph_type = typename BaseT::graph_type;
 		using bitset_type = typename BaseT::bitset_type;
@@ -341,7 +340,6 @@ namespace bitgraph {
 		using BaseT::DEFAULT_WEIGHT;
 		
 		//alias types for backward compatibility
-		using _gt = graph_type;
 		using _wt = weight_type;											
 		using VertexBitset = bitset_type;
 

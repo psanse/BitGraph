@@ -26,12 +26,12 @@ namespace bitgraph {
 		////////////////////////////
 
 		template <class GraphW_t>
-		class GraphFastRootSort_W : public GraphFastRootSort <typename GraphW_t::_gt> {
+		class GraphFastRootSort_W : public GraphFastRootSort <typename GraphW_t::graph_type> {
 
 		public:
 			using basic_type = GraphW_t;									//weighted graph type
 			using type = GraphFastRootSort_W<GraphW_t>;						//own type	
-			using ugtype = typename basic_type::_gt;						//non-weighted graph type	
+			using ugtype = typename basic_type::graph_type;						//non-weighted graph type	
 			using ptype = GraphFastRootSort <ugtype>;						//parent type
 			using wtype = typename GraphW_t::_wt;							//weight type
 
@@ -60,7 +60,7 @@ namespace bitgraph {
 
 			////////////////////////
 			//construction / destruction
-			GraphFastRootSort_W(GraphW_t& gw) : GraphFastRootSort<typename GraphW_t::_gt>(gw.graph()), gw_(gw) {}
+			GraphFastRootSort_W(GraphW_t& gw) : GraphFastRootSort<typename GraphW_t::graph_type>(gw.graph()), gw_(gw) {}
 
 			//move and copy semantics
 			GraphFastRootSort_W(const GraphFastRootSort_W&) = delete;

@@ -50,8 +50,7 @@ namespace bitgraph {
 		// @todo other helpers... (03/01/2025)
 
 	public:
-
-		using Self = Ugraph<BitSetT>;		//own type
+			
 		using BaseT = Graph<BitSetT>;		//parent type
 
 		using bitset_type = typename BaseT::bitset_type;

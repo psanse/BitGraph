@@ -52,12 +52,10 @@ namespace bitgraph {
 	public:
 
 		using index_t = int;
-
-		using Self = Graph<BitSetT>;				//own type
+				
 		using bitset_type = BitSetT;				//basic type (a type of bitset)
 		using VertexBitset = bitset_type;			//alias for semantic type
 	
-
 		/////////////			
 		//construction / destruction
 		Graph() noexcept;													//creates empty graph
