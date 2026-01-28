@@ -47,19 +47,15 @@ namespace bitgraph {
 		static Ugraph make_cycle(std::size_t n);
 		static Ugraph make_star(std::size_t n);
 
-		//TODO... others (03/01/2025)
+		// @todo other helpers... (03/01/2025)
 
 	public:
 
 		using Self = Ugraph<BitSetT>;		//own type
 		using BaseT = Graph<BitSetT>;		//parent type
-		using bitset_type = BitSetT;
-		
 
-		//alias for backward compatibility - to be removed in future versions
-		using VertexBitset = typename BaseT::VertexBitset;
-		
-		//using _bbt = bitset_type;
+		using bitset_type = typename BaseT::bitset_type;
+		using VertexBitset = typename BaseT::VertexBitset;		// alias for semantic type
 
 		//constructors - cannot all be inherited	
 		Ugraph() : Graph<BitSetT>() {}															//creates empty graph

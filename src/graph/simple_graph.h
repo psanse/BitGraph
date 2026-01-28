@@ -53,9 +53,9 @@ namespace bitgraph {
 
 		using index_t = int;
 
-		using Self = Graph<BitSetT>;			//own type
-		using bitset_type = BitSetT;			//basic type (a type of bitset)
-		using VertexBitset = BitSetT;			//alias for vertex bitset
+		using Self = Graph<BitSetT>;				//own type
+		using bitset_type = BitSetT;				//basic type (a type of bitset)
+		using VertexBitset = bitset_type;			//alias for semantic type
 	
 
 		/////////////			

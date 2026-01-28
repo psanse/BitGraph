@@ -19,10 +19,7 @@
 #include <vector>
 
 namespace bitgraph {
-
-	//useful aliases
 	using GSS = bitgraph::Graph<BBScanSp>;
-
 }
 
 ////////////////////////
