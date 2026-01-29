@@ -62,9 +62,9 @@ namespace bitgraph {
 		};
 
 		//aliases
-		using BlockVec  = std::vector<SparseBlock>;
-		using BlockVecIt  = typename std::vector<SparseBlock>::iterator;
-		using BlockVecConstIt = typename std::vector<SparseBlock>::const_iterator;
+		using SparseBlockVec  = std::vector<SparseBlock>;
+		using SparseBlockVecIt  = typename std::vector<SparseBlock>::iterator;
+		using SparseBlockVecConstIt = typename std::vector<SparseBlock>::const_iterator;
 				 
 
 		//functor for sorting -
@@ -183,9 +183,9 @@ namespace bitgraph {
 
 		//Allows copy and move semantics
 		BitsetSp(const BitsetSp& bbN) = default;
-		BitsetSp(BitsetSp&&)		noexcept = default;
-		BitsetSp& operator =			(const BitsetSp&) = default;
-		BitsetSp& operator =			(BitsetSp&&)		noexcept = default;
+		BitsetSp(BitsetSp&&) noexcept = default;
+		BitsetSp& operator = (const BitsetSp&) = default;
+		BitsetSp& operator = (BitsetSp&&) noexcept = default;
 
 		virtual ~BitsetSp() = default;
 
@@ -232,14 +232,14 @@ namespace bitgraph {
 		*		   even though the maximum number of bitblocks determined in construction nBB_
 		*		   can be anything.
 		**/
-		std::size_t size()				const noexcept { return vBB_.size(); }
+		std::size_t size() const noexcept { return vBB_.size(); }
 
 		/**
 		* @brief number of non-zero bitblocks in the sparse bitset
 		* @details the num_blocks is determined by the population size (construction),
 		* 		   - comment: NOT the size of @vBB_, which is the non-zero bitblocks in the bitset
 		**/
-		std::size_t num_blocks()		const noexcept { return nBB_; }
+		std::size_t num_blocks() const noexcept { return nBB_; }
 
 
 		/**
@@ -247,14 +247,14 @@ namespace bitgraph {
 		*		 equivalent non-sparse bitset in the general case. To find the id-th block
 		*		 use find_bitblock function.
 		**/
-		BITBOARD  block(index_t blockID)	const { return vBB_[blockID].bb_; }
+		BITBOARD  block(index_t blockID) const { return vBB_[blockID].bb_; }
 		BITBOARD& block(index_t blockID) { return vBB_[blockID].bb_; }
 
-		SparseBlock  pBlock(index_t blockID)			const { return vBB_[blockID]; }
+		SparseBlock  pBlock(index_t blockID) const { return vBB_[blockID]; }
 		SparseBlock& pBlock(index_t blockID) { return vBB_[blockID]; }
 
-		const BlockVec & bitset()						const { return vBB_; }
-		BlockVec & bitset() { return vBB_; }
+		const SparseBlockVec & bitset()	const { return vBB_; }
+		SparseBlockVec & bitset() { return vBB_; }
 
 		/**
 		* @brief Finds the bitblock corresponding to @blockIDx
@@ -264,7 +264,7 @@ namespace bitgraph {
 		* @details O(log) complexity
 		*		 - does not dissambiguate between non-existing block and existing empty block
 		**/
-		BITBOARD find_block(index_t blockID)			const;
+		BITBOARD find_block(index_t blockID) const;
 
 		/**
 		* @brief Finds the bitblock given its block index blockID and its position in the collection. If it does not exists
@@ -282,10 +282,10 @@ namespace bitgraph {
 			* @details two implementations, read only and read-write
 			**/
 		template<bool ReturnInsertPos = false>
-		BlockVecConstIt find_block(index_t blockID, index_t& insert_pos)	const;
+		SparseBlockVecConstIt find_block(index_t blockID, index_t& insert_pos)	const;
 
 		template<bool ReturnInsertPos = false>
-		BlockVecIt   find_block(index_t blockID, index_t& pos);
+		SparseBlockVecIt   find_block(index_t blockID, index_t& pos);
 
 		/**
 		* @brief extended version of find_block. The template parameter UseLowerBound determines
@@ -304,7 +304,7 @@ namespace bitgraph {
 		*		  b) Policy = false - all the blocks have index lower than OR EQUAL to blockID
 		**/
 		template<bool UseLowerBound = true>
-		std::pair<bool, BlockVecIt >
+		std::pair<bool, SparseBlockVecIt >
 			find_block_ext(index_t blockID);
 
 		/**
@@ -312,8 +312,8 @@ namespace bitgraph {
 		*		 (see non-const function)
 		**/
 		template<bool UseLowerBound = true>
-		std::pair<bool, BlockVecConstIt>
-			find_block_ext(index_t blockID)			const;
+		std::pair<bool, SparseBlockVecConstIt>
+			find_block_ext(index_t blockID)	const;
 
 		/**
 		* @brief finds the position (index) of the bitblock with index blockID
@@ -325,15 +325,15 @@ namespace bitgraph {
 		*
 		* TODO - possibly remove - since it can be obained from find_block_ext trivially (21/02/2025)
 		**/
-		std::pair<bool, index_t>  find_block_pos(index_t blockID)			const;
+		std::pair<bool, index_t>  find_block_pos(index_t blockID) const;
 
 		/**
 		* @brief commodity iterators / const iterators for the bitset
 		**/
-		BlockVecIt   begin() { return vBB_.begin(); }
-		BlockVecIt   end() { return vBB_.end(); }
-		BlockVecConstIt cbegin() const { return vBB_.cbegin(); }
-		BlockVecConstIt cend() const { return vBB_.cend(); }
+		SparseBlockVecIt   begin() { return vBB_.begin(); }
+		SparseBlockVecIt   end() { return vBB_.end(); }
+		SparseBlockVecConstIt cbegin() const { return vBB_.cbegin(); }
+		SparseBlockVecConstIt cend() const { return vBB_.cend(); }
 
 		//////////////////////////////
 		// Bitscanning (no cache) 
@@ -344,14 +344,14 @@ namespace bitgraph {
 		* @returns index of the most significant bit in the bitstring
 		*  @details implemented as a lookup table
 		**/
-		inline	int msbn64_lup()						const;
+		inline	int msbn64_lup() const;
 
 		/**
 		* @brief Determines the most significant bit in the bitstring
 		*		 and returns the bitblock of the last scanned bit
 		**/
-		inline	int msbn64_intrin(int& block)			const;
-		inline  int msbn64_intrin()						const;
+		inline	int msbn64_intrin(int& block) const;
+		inline  int msbn64_intrin() const;
 
 	public:
 		int msb()	const { return msbn64_intrin(); }
@@ -364,14 +364,14 @@ namespace bitgraph {
 		*			an internal switch (see config.h)
 		* @returns index of the most significant bit in the bitstring
 		**/
-		inline	int lsbn64_non_intrin()					const;
+		inline	int lsbn64_non_intrin()	const;
 
 		/**
 		* @brief Determines the most significant bit in the bitstring
 		*		 and returns the bitblock of the last scanned bit
 		**/
-		inline	int lsbn64_intrin(int& block)			const;
-		inline  int lsbn64_intrin()						const;
+		inline	int lsbn64_intrin(int& block) const;
+		inline  int lsbn64_intrin()	const;
 
 	public:
 		int lsb() const { return lsbn64_intrin(); }
@@ -389,7 +389,7 @@ namespace bitgraph {
 		* @details: SAFE but not efficient. USE ONLY for basic bitscanning.
 		* @details: O(log n) worst-case complexity, n is the number of blocks in the bitset
 		**/
-		inline	int next_bit(int firstBit)			const;
+		inline	int next_bit(int firstBit) const;
 
 		/**
 		* @brief Computes the next most significant 1-bit in the bitstring BEFORE  lastBit
@@ -401,7 +401,7 @@ namespace bitgraph {
 		* @details: SAFE but not efficient. USE ONLY for basic bitscanning.
 		* @details: O(n) worst-case complexity, n is the number of blocks in the bitset
 		**/
-		inline	int prev_bit(int lastBit)			const;
+		inline	int prev_bit(int lastBit) const;
 
 	protected:
 
@@ -443,8 +443,8 @@ namespace bitgraph {
 		* @details alias to popcn64, calls the function
 		* @details To be used instead of popcn64 (12/02/2025)
 		**/
-		int count()								const { return popcn64(); }
-		int count(int firstBit, int lastBit)	const { return popcn64(firstBit, lastBit); }
+		int count()	const { return popcn64(); }
+		int count(int firstBit, int lastBit) const { return popcn64(firstBit, lastBit); }
 
 	protected:
 		/**
@@ -453,7 +453,7 @@ namespace bitgraph {
 		* @details implementation depends of POPCN64 switch in bbconfig.h
 		*		   By default - intrinsic HW assembler instructions
 		**/
-		virtual inline	 int popcn64()						const;
+		virtual inline int popcn64() const;
 
 	protected:
 		/**
@@ -464,14 +464,14 @@ namespace bitgraph {
 		* @details efficiently implemented as a lookup table or with HW instructions
 		*			depending  on an internal switch (see config.h)
 		**/
-		virtual	inline int popcn64(int firstBit, int lastBit)		const;
+		virtual	inline int popcn64(int firstBit, int lastBit) const;
 
 		/**
 		* @brief number of 1-bits in the range [nBit, END(
 		* @details implementation depends of POPCN64 switch in bbconfig.h
 		*		   By default - intrinsic HW assembler instructions
 		**/
-		virtual inline	 int popcn64(int firstBit)					const;
+		virtual inline int popcn64(int firstBit) const;
 
 
 	public:
@@ -585,7 +585,7 @@ namespace bitgraph {
 		 *
 		 * TODO -  improve or remove (19/02/2025)
 		 **/
-		inline	BlockVecIt   erase_bit(int bit, BlockVecIt  from_it);
+		inline	SparseBlockVecIt   erase_bit(int bit, SparseBlockVecIt  from_it);
 
 		/**
 		* @brief sets all bits to 0
@@ -653,19 +653,19 @@ namespace bitgraph {
 		* @brief Bitwise AND operator with rhs
 		* @details apply for set intersection
 		**/
-		BitsetSp& operator &=				(const BitsetSp& rhs);
+		BitsetSp& operator &= (const BitsetSp& rhs);
 
 		/**
 		* @brief Bitwise OR operator with rhs
 		* @details set union operation
 		**/
-		BitsetSp& operator |=				(const BitsetSp& rhs);
+		BitsetSp& operator |= (const BitsetSp& rhs);
 
 		/**
 		* @brief Bitwise XOR operator with rhs
 		* @details set symmetric difference operation
 		**/
-		BitsetSp& operator ^=				(const BitsetSp& rhs);
+		BitsetSp& operator ^= (const BitsetSp& rhs);
 
 		/**
 		* @brief Bitwise AND operator with rhs in the range [firstBlock, END)
@@ -687,7 +687,7 @@ namespace bitgraph {
 		 /**
 		 * @brief TRUE if there is a 1-bit in the position bit
 		 **/
-		inline	bool is_bit(int bit)				const;
+		inline	bool is_bit(int bit) const;
 
 		/**
 		* @brief TRUE if the bitstring has all 0-bits
@@ -695,18 +695,18 @@ namespace bitgraph {
 		*			that there are blocks with all 0-bits, so all of them need
 		*			to be checked.
 		**/
-		inline	bool is_empty()						const;
+		inline	bool is_empty()	const;
 
 		/**
 		* @brief TRUE if this bitstring has no bits in common with rhs
 		**/
-		inline	bool is_disjoint(const BitsetSp& bb)	const;
+		inline	bool is_disjoint(const BitsetSp& bb) const;
 
 		/**
 		* @brief TRUE if this bitstring has no bits in common with rhs
 		*		 in the closed range [firstBlock, lastBlock]
 		**/
-		inline	bool is_disjoint_block(index_t firstBlock, index_t lastBlock, const BitsetSp& bb)   const;
+		inline	bool is_disjoint_block(index_t firstBlock, index_t lastBlock, const BitsetSp& bb) const;
 
 		////////////////////////
 		 //Other operations 
@@ -758,7 +758,7 @@ namespace bitgraph {
 		//data members
 
 	protected:
-		BlockVec  vBB_;				//a vector of sorted pairs of a non-empty bitblock and its index in a non-sparse bitstring
+		SparseBlockVec  vBB_;				//a vector of sorted pairs of a non-empty bitblock and its index in a non-sparse bitstring
 		int nBB_;					//maximum number of bitblocks
 
 	}; //end BitsetSp class
@@ -895,8 +895,8 @@ namespace bitgraph {
 	}
 
 
-	BitsetSp::BlockVecIt 
-		BitsetSp::erase_bit(int bit, BitsetSp::BlockVecIt  from_it) {
+	BitsetSp::SparseBlockVecIt 
+		BitsetSp::erase_bit(int bit, BitsetSp::SparseBlockVecIt  from_it) {
 
 		int bb = WDIV(bit);
 
@@ -1542,7 +1542,7 @@ namespace bitgraph {
 		if (pR.second != rhs.cend()) {
 
 			//copy up to and excluding bbh
-			std::copy(rhs.cbegin(), pR.second, std::insert_iterator<BlockVec>(vBB_, vBB_.begin()));
+			std::copy(rhs.cbegin(), pR.second, std::insert_iterator<SparseBlockVec>(vBB_, vBB_.begin()));
 
 			//deal with last block bbh
 			if (pR.first) {
@@ -1623,7 +1623,7 @@ namespace bitgraph {
 
 	template<bool ReturnInsertPos>
 	inline
-		BitsetSp::BlockVecConstIt
+		BitsetSp::SparseBlockVecConstIt
 		BitsetSp::find_block(index_t blockID, index_t& pos) const
 	{
 
@@ -1643,7 +1643,7 @@ namespace bitgraph {
 
 	template<bool ReturnInsertPos>
 	inline
-		BitsetSp::BlockVecIt 
+		BitsetSp::SparseBlockVecIt 
 		BitsetSp::find_block(index_t blockID, index_t& pos)
 	{
 
@@ -1662,10 +1662,10 @@ namespace bitgraph {
 	}
 
 	template<bool UseLowerBound>
-	std::pair<bool, BitsetSp::BlockVecIt >
+	std::pair<bool, BitsetSp::SparseBlockVecIt >
 		BitsetSp::find_block_ext(index_t blockID)
 	{
-		std::pair<bool, BlockVecIt > res;
+		std::pair<bool, SparseBlockVecIt > res;
 
 		if (UseLowerBound) {
 			////////////////////////////////////////////////////////////////////////////////////////////
@@ -1686,10 +1686,10 @@ namespace bitgraph {
 	}
 
 	template<bool UseLowerBound>
-	std::pair<bool, BitsetSp::BlockVecConstIt>
+	std::pair<bool, BitsetSp::SparseBlockVecConstIt>
 		BitsetSp::find_block_ext(index_t blockID) const
 	{
-		std::pair<bool, BlockVecConstIt>res;
+		std::pair<bool, SparseBlockVecConstIt>res;
 
 		if (UseLowerBound) {
 			////////////////////////////////////////////////////////////////////////////////////////////

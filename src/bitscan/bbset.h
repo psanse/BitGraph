@@ -42,8 +42,7 @@ namespace bitgraph {
 		using DenseBlockVec = std::vector<BITBOARD>;
 
 	public:
-				
-
+		
 		/////////////////////////////
 		// Independent operators / masks  
 		// comment: do not modify this bitset

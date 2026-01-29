@@ -516,8 +516,8 @@ int BitsetSp::clear_bit (int firstBit, int lastBit){
 	
 	index_t bbl = npos;
 	index_t bbh = npos;
-	pair<bool, BlockVecIt> pl;
-	pair<bool, BlockVecIt> ph;
+	pair<bool, SparseBlockVecIt> pl;
+	pair<bool, SparseBlockVecIt> ph;
 
 ////////////////////////
 //special cases
