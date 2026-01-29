@@ -137,7 +137,7 @@ TEST_F(CliqueCommonTest, is_iset) {
 
 	///////////////////
 	//collection of vertices (std::vector)
-	vint lv = { 1, 3, 4 };
+	VertexList lv = { 1, 3, 4 };
 
 	/////////////////////////////////////
 	EXPECT_TRUE(gfunc::iset::is_iset(ug, lv));
@@ -181,7 +181,7 @@ TEST_F(CliqueCommonTest, is_clique) {
 
 	///////////////////
 	//collection of vertices (std::vector)
-	vint lv = { 0, 4 };
+	VertexList lv = { 0, 4 };
 
 	/////////////////////////////////////
 	EXPECT_TRUE(gfunc::clq::is_clique(ug, lv));

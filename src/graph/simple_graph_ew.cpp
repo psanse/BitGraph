@@ -156,7 +156,7 @@ template<class Graph_t, class WeightT>
 
 
 template<class Graph_t, class WeightT>
-vecw<WeightT> Base_Graph_EW<Graph_t, WeightT>::vertex_weights()  const {
+std::vector<WeightT> Base_Graph_EW<Graph_t, WeightT>::vertex_weights()  const {
 
 	auto NV = this->num_vertices();
 
@@ -457,7 +457,7 @@ std::ostream& Base_Graph_EW<Graph_t, WeightT>::print_vertex_weights(std::ostream
 }
 
 template <class Graph_t, class WeightT>
-ostream& Base_Graph_EW<Graph_t, WeightT>::print_weights (vint& lv, ostream& o, int type) const{
+ostream& Base_Graph_EW<Graph_t, WeightT>::print_weights (VertexList& lv, ostream& o, int type) const{
 
 	//o << endl << "**************************" << endl;
 	switch (type) {
@@ -483,7 +483,7 @@ ostream& Base_Graph_EW<Graph_t, WeightT>::print_weights (vint& lv, ostream& o, i
 }
 
 template<class Graph_t, class WeightT>
-std::ostream& Base_Graph_EW<Graph_t, WeightT>::print_edge_weights(vint& lv, std::ostream& o) const
+std::ostream& Base_Graph_EW<Graph_t, WeightT>::print_edge_weights(VertexList& lv, std::ostream& o) const
 {
 	for (auto i = 0u; i < lv.size(); ++i) {
 		for (auto j = 0u; j < lv.size(); j++) {
@@ -500,7 +500,7 @@ std::ostream& Base_Graph_EW<Graph_t, WeightT>::print_edge_weights(vint& lv, std:
 }
 
 template<class Graph_t, class WeightT>
-std::ostream& Base_Graph_EW<Graph_t, WeightT>::print_vertex_weights(vint& lv, std::ostream& o) const
+std::ostream& Base_Graph_EW<Graph_t, WeightT>::print_vertex_weights(VertexList& lv, std::ostream& o) const
 {
 	for (auto i = 0u; i < lv.size(); ++i) {
 		if (we_[lv[i]][lv[i]] != Base_Graph_EW<Graph_t, WeightT>::NO_WEIGHT) {
@@ -670,7 +670,7 @@ std::ostream& Graph_EW<ugraph, WeightT>::print_edge_weights(std::ostream& o, boo
 }
 
 template<class WeightT>
-std::ostream& Graph_EW<ugraph, WeightT>::print_edge_weights(vint& lv, std::ostream& o) const
+std::ostream& Graph_EW<ugraph, WeightT>::print_edge_weights(VertexList& lv, std::ostream& o) const
 {	
 	for (auto i = 0u; i < lv.size() - 1; ++i) {
 		for (auto j = i + 1; j < lv.size(); ++j) {

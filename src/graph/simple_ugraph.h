@@ -239,12 +239,12 @@ namespace bitgraph {
 		*  @param lv input set of vertices (std::vector<int>)
 		*  @returns 0 if success, -1 if error
 		**/
-		int create_subgraph(Ugraph& g, vint& lv) const;
+		int create_subgraph(Ugraph& g, VertexList& lv) const;
 
 		/**
 		*  @brief Computes the subgraph induced by the neighborhood of a vertex (29/08/21)
 		*
-		*		 Calls create_subgraph(Ugraph& g, vint& lv)
+		*		 Calls create_subgraph(Ugraph& g, VertexList& lv)
 		*
 		*  @param v input vertex which determines the neighborhood
 		*  @returns 0 if success, -1 if error
@@ -794,7 +794,7 @@ namespace bitgraph {
 	}
 
 	template<class BitsetT>
-	int Ugraph<BitsetT>::create_subgraph(Ugraph& ug, vint& lv) const
+	int Ugraph<BitsetT>::create_subgraph(Ugraph& ug, VertexList& lv) const
 	{
 		if (lv.empty()) {
 			LOG_ERROR("empty set found while creating an induced graph - Ugraph<BitsetT>::create_induced");

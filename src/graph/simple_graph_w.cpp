@@ -411,7 +411,7 @@ ostream& Base_Graph_W<Graph_t, W>::print_weights (int* lv, int NV, ostream& o) c
 }
 
 template <class Graph_t, class W>
-ostream& Base_Graph_W<Graph_t, W>::print_weights (com::FixedStack<int>& lv, const vint& mapping, ostream& o) const{
+ostream& Base_Graph_W<Graph_t, W>::print_weights (com::FixedStack<int>& lv, const VertexMapping& mapping, ostream& o) const{
 
 	for(auto i = 0u; i < lv.size(); ++i){
 		o << "[" << mapping[lv.at(i)] << ":(" << w_[mapping[lv.at(i)]] << ")] ";
@@ -421,7 +421,7 @@ ostream& Base_Graph_W<Graph_t, W>::print_weights (com::FixedStack<int>& lv, cons
 }
 
 template <class Graph_t, class W>
-ostream& Base_Graph_W<Graph_t, W>::print_weights (vint& lv, ostream& o) const{
+ostream& Base_Graph_W<Graph_t, W>::print_weights (VertexList& lv, ostream& o) const{
 	
 	for(auto i = 0u; i < lv.size(); i++){
 		o << "[" << lv[i] << ":(" << w_[lv[i]] << ")] ";

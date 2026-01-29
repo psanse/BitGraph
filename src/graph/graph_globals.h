@@ -1,5 +1,5 @@
 /**
-* @file: grap_globals.h
+* @file: graph_globals.h
 * @brief: global information for GRAPH in BitGraph
 * @details: created 30/06/2025
 */
@@ -9,22 +9,18 @@
 
 #include <vector>	
 
-//useful alias for STL containers
+//useful alias / globlas for GRAPH
 
 namespace bitgraph {
-	using vint = std::vector<int>;
 
-	template<class W>
-	using vecw = std::vector<W>;
+	using VertexList = std::vector<int>;
+	using VertexMapping = std::vector<int>;
 
-	//...TODO- ADD more aliases required
+	enum : int {
+		DEFAULT_WEIGHT_MODULUS = 200		//default modulus for vertex and edge-weights [Pullman 2008]
+
+		// @todo add more integal global constants as required
+	};
 }
-
-//default modulus for vertex and edge-weights [Pullman 2008]
-constexpr int DEFAULT_WEIGHT_MODULUS = 200;		
-
-//TODO...add more global constants as required
-
-
 
 #endif // __GRAPH_GLOBALS_H__

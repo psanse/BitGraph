@@ -277,13 +277,13 @@ namespace bitgraph {
 		*				  the FixedStack lv
 		* @param lv: a set of vertices with a FixedStack interface
 		**/
-		std::ostream& print_weights(com::FixedStack<int>& lv, const vint& mapping, std::ostream& o = std::cout)	const;
+		std::ostream& print_weights(com::FixedStack<int>& lv, const VertexMapping& mapping, std::ostream& o = std::cout)	const;
 
 		/**
 		* @brief prints the weights of the vertices in lv
 		* @supports C-arrays
 		**/
-		std::ostream& print_weights(vint& lv, std::ostream& o = std::cout) const;
+		std::ostream& print_weights(VertexList& lv, std::ostream& o = std::cout) const;
 		std::ostream& print_weights(int* lv, int n, std::ostream& o = std::cout) const;
 
 		/////////////////////////////////////
