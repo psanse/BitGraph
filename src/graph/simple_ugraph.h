@@ -119,7 +119,7 @@ namespace bitgraph {
 		*
 		*  @param bbn input non-sparse (bit) set of vertices
 		**/
-		int degree(int v, const BitSet& bbn) const;
+		int degree(int v, const Bitset& bbn) const;
 
 		/**
 		*  @brief number of neighbors of v in a sparse encoded set of vertices
@@ -140,7 +140,7 @@ namespace bitgraph {
 		*  @param bbn input (bit) set of vertices
 		*  @returns neighbors of v if <= UB, otherwise UB
 		**/
-		int degree(int v, int UB, const BitSet& bbn) const;  //truncated degree (14/2/2016)
+		int degree(int v, int UB, const Bitset& bbn) const;  //truncated degree (14/2/2016)
 
 		/**
 		*  @brief truncated number of neighbors of v in a sparse enconded set of vertices
@@ -163,7 +163,7 @@ namespace bitgraph {
 		* @param bbn: input (bit) set of vertices
 		*
 		**/
-		int degree_up(int v, const BitSet& bbn)	const;  //TODO: test (27/4/2016)
+		int degree_up(int v, const Bitset& bbn)	const;  //TODO: test (27/4/2016)
 
 		/**
 		* @brief number of neighbors of v that come after v
@@ -286,7 +286,7 @@ namespace bitgraph {
 
 		//////////////	
 		// deleted methods legacy - CHECK	
-		virtual void remove_vertices(const BitSet& bbn) override = delete;				//commented out implementation - EXPERIMENTAL
+		virtual void remove_vertices(const Bitset& bbn) override = delete;				//commented out implementation - EXPERIMENTAL
 
 		/**
 		*  @brief enlarges the graph with a new vertex (provided its neighborhood)
@@ -494,7 +494,7 @@ namespace bitgraph {
 
 	template<class BitsetT>
 	inline
-		int Ugraph<BitsetT>::degree(int v, const BitSet& bbn) const {
+		int Ugraph<BitsetT>::degree(int v, const Bitset& bbn) const {
 
 		int ndeg = 0;
 		for (auto i = 0; i < this->NBB_; i++) {
@@ -708,7 +708,7 @@ namespace bitgraph {
 
 	template<class BitsetT>
 	inline
-		int Ugraph<BitsetT>::degree_up(int v, const BitSet& bbn) const {
+		int Ugraph<BitsetT>::degree_up(int v, const Bitset& bbn) const {
 
 		int nDeg = 0, nBB = WDIV(v);
 
@@ -743,7 +743,7 @@ namespace bitgraph {
 
 	template<class BitsetT>
 	inline
-		int Ugraph<BitsetT>::degree(int v, int UB, const BitSet& bbn) const {
+		int Ugraph<BitsetT>::degree(int v, int UB, const Bitset& bbn) const {
 
 		int nDeg = 0;
 		for (int i = 0; i < this->NBB_; ++i) {
@@ -889,7 +889,7 @@ namespace bitgraph {
 
 	template<>
 	inline
-		int USS::degree(int v, const BitSet& bbn) const {
+		int USS::degree(int v, const Bitset& bbn) const {
 
 		int ndeg = 0;
 		for (auto it = adj_[v].cbegin(); it != adj_[v].cend(); ++it) {
@@ -926,7 +926,7 @@ namespace bitgraph {
 
 	template<>
 	inline
-		int USS::degree(int v, int UB, const BitSet& bbn) const {
+		int USS::degree(int v, int UB, const Bitset& bbn) const {
 
 		int ndeg = 0;
 		for (auto it = adj_[v].cbegin(); it != adj_[v].cend(); ++it) {

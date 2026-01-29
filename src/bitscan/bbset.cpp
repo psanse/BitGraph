@@ -1,6 +1,6 @@
 /**
  * @file bbset.cpp file
- * @brief implementation of the BitSet class for non-sparsearrays of bit
+ * @brief implementation of the Bitset class for non-sparsearrays of bit
  * @author pss
  **/
 
@@ -19,7 +19,7 @@ using namespace bitgraph;
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
-BitSet::BitSet(std::size_t nPop, bool val) :
+Bitset::Bitset(std::size_t nPop, bool val) :
 	nBB_(static_cast<int>(INDEX_1TO1(nPop)))
 {
 	
@@ -27,7 +27,7 @@ BitSet::BitSet(std::size_t nPop, bool val) :
 		vBB_.assign(nBB_, val ? ONE : 0);		
 	}
 	catch (...) {
-		LOG_ERROR("Error during construction - BitSet::BitSet");
+		LOG_ERROR("Error during construction - Bitset::Bitset");
 		LOG_ERROR("exiting...");
 		std::exit(EXIT_FAILURE);
 	}
@@ -39,7 +39,7 @@ BitSet::BitSet(std::size_t nPop, bool val) :
 }
 
 
-BitSet::BitSet(const vint& v):
+Bitset::Bitset(const vint& v):
 	nBB_(BBObject::noBit)
 {
 	try {
@@ -57,13 +57,13 @@ BitSet::BitSet(const vint& v):
 		}
 	}
 	catch (...) {
-		LOG_ERROR("Error during construction - BitSet::BitSet()");
+		LOG_ERROR("Error during construction - Bitset::Bitset()");
 		LOG_ERROR("exiting...");
 		std::exit(EXIT_FAILURE);
 	}
 }
 
-BitSet::BitSet(std::size_t nPop, std::initializer_list<int> l):
+Bitset::Bitset(std::size_t nPop, std::initializer_list<int> l):
 	nBB_(static_cast<index_t>(INDEX_1TO1(nPop)))
 {
 	try {
@@ -83,27 +83,27 @@ BitSet::BitSet(std::size_t nPop, std::initializer_list<int> l):
 
 	}
 	catch (...) {
-		LOG_ERROR("Error during construction - BitSet::BitSet()");
+		LOG_ERROR("Error during construction - Bitset::Bitset()");
 		LOG_ERROR("exiting...");
 		std::exit(EXIT_FAILURE);
 	}
 }
 
-void BitSet::init(std::size_t nPop) noexcept {
+void Bitset::init(std::size_t nPop) noexcept {
 
 	try {
 		nBB_ = static_cast<index_t>(INDEX_1TO1(nPop));
 		vBB_.assign(nBB_, 0);
 	}
 	catch (...) {
-		LOG_ERROR("Error during allocation - BitSet::init");
+		LOG_ERROR("Error during allocation - Bitset::init");
 		LOG_ERROR("exiting...");
 		std::exit(EXIT_FAILURE);
 	}
 
 }
 
-void BitSet::init(std::size_t nPop, const vint& lv) noexcept {
+void Bitset::init(std::size_t nPop, const vint& lv) noexcept {
 		
 	try {
 		nBB_ = static_cast<index_t>(INDEX_1TO1(nPop));
@@ -122,26 +122,26 @@ void BitSet::init(std::size_t nPop, const vint& lv) noexcept {
 		}
 	}
 	catch (...) {
-		LOG_ERROR("Error during allocation - BitSet::init");
+		LOG_ERROR("Error during allocation - Bitset::init");
 		LOG_ERROR("exiting...");
 		std::exit(EXIT_FAILURE);
 	}	
 }
 
-void BitSet::reset(std::size_t nPop) noexcept {
+void Bitset::reset(std::size_t nPop) noexcept {
 
 	try {
 		nBB_ = static_cast<index_t>(INDEX_1TO1(nPop));
 		vBB_.assign(nBB_, 0);
 	}
 	catch (...) {
-		LOG_ERROR("Error during allocation - BitSet::reset");
+		LOG_ERROR("Error during allocation - Bitset::reset");
 		LOG_ERROR("exiting...");
 		std::exit(EXIT_FAILURE);
 	}
 
 }
-void BitSet::reset(std::size_t nPop, const vint& lv) noexcept {
+void Bitset::reset(std::size_t nPop, const vint& lv) noexcept {
 
 	try {
 		nBB_ = static_cast<index_t>(INDEX_1TO1(nPop));
@@ -160,7 +160,7 @@ void BitSet::reset(std::size_t nPop, const vint& lv) noexcept {
 		}
 	}
 	catch (...) {
-		LOG_ERROR("Error during allocation - BitSet::reset");
+		LOG_ERROR("Error during allocation - Bitset::reset");
 		LOG_ERROR("exiting...");
 		std::exit(EXIT_FAILURE);
 	}
@@ -174,7 +174,7 @@ void BitSet::reset(std::size_t nPop, const vint& lv) noexcept {
 // (size is determined by *this)
 /////////////////////////
 
-BitSet& BitSet::operator &=	(const BitSet& bbn){
+Bitset& Bitset::operator &=	(const Bitset& bbn){
 
 	for (auto i = 0; i < nBB_; ++i) {
 		vBB_[i] &= bbn.vBB_[i];
@@ -183,7 +183,7 @@ BitSet& BitSet::operator &=	(const BitSet& bbn){
 	return *this;
 }
 
-BitSet& BitSet::operator |=	(const BitSet& bbn){
+Bitset& Bitset::operator |=	(const Bitset& bbn){
 	
 	for (auto i = 0; i < nBB_; ++i) {
 		vBB_[i] |= bbn.vBB_[i];
@@ -192,7 +192,7 @@ BitSet& BitSet::operator |=	(const BitSet& bbn){
 	return *this;
 }
 
-BitSet& BitSet::operator ^=	(const BitSet& bbn) {
+Bitset& Bitset::operator ^=	(const Bitset& bbn) {
 	
 	for (auto i = 0; i < nBB_; ++i) {
 		vBB_[i] ^= bbn.vBB_[i];
@@ -202,7 +202,7 @@ BitSet& BitSet::operator ^=	(const BitSet& bbn) {
 }
 
 
-BitSet& BitSet::flip (){
+Bitset& Bitset::flip (){
 
 	for (auto i = 0; i < nBB_; ++i) {
 		vBB_[i] = ~vBB_[i];
@@ -211,7 +211,7 @@ BitSet& BitSet::flip (){
 	return *this;
 }
 
-BitSet& BitSet::flip_block(index_t firstBlock, index_t lastBlock)
+Bitset& Bitset::flip_block(index_t firstBlock, index_t lastBlock)
 {
 	
 	///////////////////////////////////////////////////////////////////////////////////
@@ -232,7 +232,7 @@ BitSet& BitSet::flip_block(index_t firstBlock, index_t lastBlock)
 //
 //////////////////////////
 
-std::ostream& BitSet::print(std::ostream& o, bool show_pc, bool endl ) const
+std::ostream& Bitset::print(std::ostream& o, bool show_pc, bool endl ) const
 {
 	o << "[";
 	
@@ -256,7 +256,7 @@ std::ostream& BitSet::print(std::ostream& o, bool show_pc, bool endl ) const
 	return o;
 }
 
-string BitSet::to_string ()
+string Bitset::to_string ()
 {
 	ostringstream sstr;
 
@@ -277,7 +277,7 @@ string BitSet::to_string ()
 }
 
 
-void BitSet::extract (vint& lv ) const {
+void Bitset::extract (vint& lv ) const {
 
 	lv.clear();
 	const int pc = this->count();
@@ -291,7 +291,7 @@ void BitSet::extract (vint& lv ) const {
 	}
 }
 
-void BitSet::extract_set(sint& ls) const
+void Bitset::extract_set(sint& ls) const
 {
 	ls.clear();
 	const int pc = this->count();
@@ -303,13 +303,13 @@ void BitSet::extract_set(sint& ls) const
 	}
 }
 
-BitSet::operator vint() const {
+Bitset::operator vint() const {
 	vint result;
 	extract(result);
 	return result;
 }
 
-bitgraph::BitSet::operator sint() const
+bitgraph::Bitset::operator sint() const
 {
 	sint result;
 	extract_set(result);
@@ -317,7 +317,7 @@ bitgraph::BitSet::operator sint() const
 }
 
 
-void BitSet::extract_stack(com::FixedStack<int>& s)	const {
+void Bitset::extract_stack(com::FixedStack<int>& s)	const {
 	s.clear();
 
 	int v = BBObject::noBit;
@@ -326,7 +326,7 @@ void BitSet::extract_stack(com::FixedStack<int>& s)	const {
 	}
 }
 
-void BitSet::extract_array(int* lv, std::size_t& size, bool rev) 	{
+void Bitset::extract_array(int* lv, std::size_t& size, bool rev) 	{
 	size = 0;
 	int v = BBObject::noBit;
 
@@ -343,7 +343,7 @@ void BitSet::extract_array(int* lv, std::size_t& size, bool rev) 	{
 
 }
 
-BitSet& BitSet::set_bit(const vint& lv) {
+Bitset& Bitset::set_bit(const vint& lv) {
 
 	//copies elements up to the maximum capacity of the bitstring
 	auto maxPopSize = WMUL(nBB_);
@@ -364,14 +364,14 @@ BitSet& BitSet::set_bit(const vint& lv) {
 
 
 ///////////////////////
-// friend functions of BitSet
+// friend functions of Bitset
 //
 
 namespace bitgraph {
 
 
 
-	BitSet& AND(const BitSet& lhs, const BitSet& rhs, BitSet& res) {
+	Bitset& AND(const Bitset& lhs, const Bitset& rhs, Bitset& res) {
 
 		for (auto i = 0; i < lhs.nBB_; ++i) {
 			res.vBB_[i] = lhs.vBB_[i] & rhs.vBB_[i];
@@ -380,7 +380,7 @@ namespace bitgraph {
 		return res;
 	}
 
-	BitSet& OR(const BitSet& lhs, const BitSet& rhs, BitSet& res) {
+	Bitset& OR(const Bitset& lhs, const Bitset& rhs, Bitset& res) {
 
 		for (auto i = 0; i < lhs.nBB_; ++i) {
 			res.vBB_[i] = lhs.vBB_[i] | rhs.vBB_[i];
@@ -391,7 +391,7 @@ namespace bitgraph {
 
 
 
-	//BitSet AND_block(int firstBlock, int lastBlock, BitSet lhs, const BitSet& rhs)
+	//Bitset AND_block(int firstBlock, int lastBlock, Bitset lhs, const Bitset& rhs)
 	//{
 	//	////////////////////////////////////////////////////////////////////
 	//	//assert((firstBlock >= 0) && (LastBlock < lhs.nBB_) &&
@@ -417,7 +417,7 @@ namespace bitgraph {
 
 
 
-	BitSet& erase_bit(const BitSet& lhs, const BitSet& rhs, BitSet& res) {
+	Bitset& erase_bit(const Bitset& lhs, const Bitset& rhs, Bitset& res) {
 
 
 		for (auto i = 0; i < lhs.nBB_; ++i) {
@@ -427,7 +427,7 @@ namespace bitgraph {
 		return res;
 	}
 
-	int find_first_common(const BitSet& lhs, const BitSet& rhs) {
+	int find_first_common(const Bitset& lhs, const Bitset& rhs) {
 
 		for (auto i = 0; i < lhs.nBB_; ++i) {
 			BITBOARD bb = lhs.vBB_[i] & rhs.vBB_[i];
@@ -439,13 +439,13 @@ namespace bitgraph {
 		return BBObject::noBit;		//disjoint
 	}
 
-	int find_first_common_block(BitSet::index_t firstBlock, BitSet::index_t lastBlock, const BitSet& lhs, const BitSet& rhs) {
+	int find_first_common_block(Bitset::index_t firstBlock, Bitset::index_t lastBlock, const Bitset& lhs, const Bitset& rhs) {
 
 		///////////////////////////////////////////////////////////////////////////////
 		assert((firstBlock >= 0) && (firstBlock <= lastBlock) && (lastBlock < lhs.num_blocks()));
 		///////////////////////////////////////////////////////////////////////////////
 
-		BitSet::index_t last_block = (lastBlock == BitSet::npos) ? static_cast<BitSet::index_t>(rhs.nBB_ - 1) : lastBlock;
+		Bitset::index_t last_block = (lastBlock == Bitset::npos) ? static_cast<Bitset::index_t>(rhs.nBB_ - 1) : lastBlock;
 
 		for (auto i = firstBlock; i <= last_block; i++) {
 			BITBOARD bb = lhs.vBB_[i] & rhs.vBB_[i];
@@ -465,7 +465,7 @@ namespace bitgraph {
 //
 //////////////////
 
-//int* AND(int lastBit, const BitSet& lhs, const BitSet& rhs, int bitset[], int& size) {
+//int* AND(int lastBit, const Bitset& lhs, const Bitset& rhs, int bitset[], int& size) {
 //
 //	BITBOARD bb;
 //	int offset;
@@ -496,7 +496,7 @@ namespace bitgraph {
 //}
 
 
-//BitSet& OR(int from, const BitSet& lhs, const BitSet& rhs, BitSet& res) {
+//Bitset& OR(int from, const Bitset& lhs, const Bitset& rhs, Bitset& res) {
 //
 //	int first_block = WDIV(from);
 //
@@ -515,7 +515,7 @@ namespace bitgraph {
 //}
 
 
-//BitSet& OR(int v, bool from, const BitSet& lhs, const BitSet& rhs, BitSet& res) {
+//Bitset& OR(int v, bool from, const Bitset& lhs, const Bitset& rhs, Bitset& res) {
 //
 //
 //	int nBB = WDIV(v);

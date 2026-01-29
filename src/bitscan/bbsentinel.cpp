@@ -22,7 +22,7 @@ namespace bitgraph {
 
 	namespace _impl {
 
-		BBSentinel& AND(const BitSet& lhs, const BBSentinel& rhs, BBSentinel& res) {
+		BBSentinel& AND(const Bitset& lhs, const BBSentinel& rhs, BBSentinel& res) {
 			res.m_BBL = rhs.m_BBL;
 			res.m_BBH = rhs.m_BBH;
 			for (int i = rhs.m_BBL; i <= rhs.m_BBH; i++) {
@@ -183,7 +183,7 @@ namespace bitgraph {
 		}
 
 		std::ostream& BBSentinel::print(std::ostream& o, bool show_pc, bool endl) const {
-			BitSet::print(o, show_pc, endl);
+			Bitset::print(o, show_pc, endl);
 			o << "(" << m_BBL << "," << m_BBH << ")";
 
 			return o;
@@ -227,12 +227,12 @@ namespace bitgraph {
 		}
 
 
-		BBSentinel& BBSentinel::erase_bit(const BitSet& bbn) {
+		BBSentinel& BBSentinel::erase_bit(const Bitset& bbn) {
 			//////////////////////////////
 			// deletes 1-bits in bbn in current sentinel range
 			// 
 			// REMARKS:
-			// 1.Has to be careful with BitSet cast to int in constructor
+			// 1.Has to be careful with Bitset cast to int in constructor
 
 			for (int i = m_BBL; i <= m_BBH; i++)
 				vBB_[i] &= ~bbn.block(i);		//**access
@@ -305,7 +305,7 @@ namespace bitgraph {
 
 		}
 
-		BBSentinel& BBSentinel::operator&=	(const  BitSet& bbn) {
+		BBSentinel& BBSentinel::operator&=	(const  Bitset& bbn) {
 			//////////////////
 			// AND operation in the range of the sentinels
 

@@ -324,7 +324,7 @@ namespace bitgraph {
 			int capacity() { return SIZE; }
 
 			//basic operations
-			BitSet& set_bit(int bitsetID, int bit) { return std::ref((bb_[bitsetID].set_bit(bit))); }
+			Bitset& set_bit(int bitsetID, int bit) { return std::ref((bb_[bitsetID].set_bit(bit))); }
 
 			/**
 			* @brief sets the bit in the position pos of the bitset at bitsetID
@@ -334,14 +334,14 @@ namespace bitgraph {
 			* @param is_first_bit: true if bit is now the first bit of the bitset
 			* @returns a reference to the bitset modified
 			**/
-			BitSet& set_bit(int bitsetID, int bit, bool& is_first_bit);
+			Bitset& set_bit(int bitsetID, int bit, bool& is_first_bit);
 
-			BitSet& erase_bit(int bitsetID, int bit) { return std::ref((bb_[bitsetID].erase_bit(bit))); }
+			Bitset& erase_bit(int bitsetID, int bit) { return std::ref((bb_[bitsetID].erase_bit(bit))); }
 
 			/**
 			* @brief clears all 1-bits in the bitset bb_[bitsetID]
 			**/
-			BitSet& erase_bit(int bitsetID) { return std::ref((bb_[bitsetID].erase_bit())); }
+			Bitset& erase_bit(int bitsetID) { return std::ref((bb_[bitsetID].erase_bit())); }
 
 			//bool
 			bool is_bit(int pos, int bit) { return bb_[pos].is_bit(bit); }
@@ -372,7 +372,7 @@ namespace bitgraph {
 
 	template <class BitSetT, int SIZE>
 	inline
-		BitSet& _impl::BitSetArray<BitSetT, SIZE>::set_bit(int bitsetID, int bit, bool& is_first_bit) {
+		Bitset& _impl::BitSetArray<BitSetT, SIZE>::set_bit(int bitsetID, int bit, bool& is_first_bit) {
 
 		//adds bit
 		bb_[bitsetID].set_bit(bit);

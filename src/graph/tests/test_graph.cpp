@@ -286,7 +286,7 @@ TEST(Graph, neighbors){
 	g.add_edge(0,3);
 	
 	//compute vertices adjacent to {1}
-	BitSet& neigh_to_one =g.neighbors(1);
+	Bitset& neigh_to_one =g.neighbors(1);
 		
 	//////////////////////////////////////
 	EXPECT_EQ	(1, neigh_to_one.count());	//{2} is the only neighbor of 1 and has degree 2

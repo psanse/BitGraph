@@ -19,7 +19,7 @@ namespace bitgraph {
 	using bbo = BBObject;
 
 	//non-sparse
-	using simple_bitarray = BitSet;
+	using simple_bitarray = Bitset;
 	using bitarray = BBScan;
 	using watched_bitarray = _impl::BBSentinel;
 

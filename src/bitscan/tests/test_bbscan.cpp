@@ -29,7 +29,7 @@ protected:
 
 //////////////////////
 //data members
-	BitSet bbn;
+	Bitset bbn;
 	BBScan bbsc;
 	set<int> sol;
 };
@@ -146,7 +146,7 @@ TEST_F(BBScanClassTest, reverse_destructive) {
 
 	std::set<int> res;
 
-	BitSet bbn1(bbn);
+	Bitset bbn1(bbn);
 	int nBit = bbo::noBit;
 	while ( (nBit = bbn1.prev_bit(nBit)) != bbo::noBit) {
 		res.insert(nBit);
@@ -169,7 +169,7 @@ TEST_F(BBScanClassTest, reverse_destructive) {
 }
 
 TEST(BBScanClass, setters_and_getters) {
-	BitSet bb(130);
+	Bitset bb(130);
 	bb.set_bit(10);
 	bb.set_bit(20);
 	bb.set_bit(64);
@@ -180,7 +180,7 @@ TEST(BBScanClass, setters_and_getters) {
 	EXPECT_FALSE(bb.is_bit(63));
 
 	//assignment
-	BitSet bb1(34);
+	Bitset bb1(34);
 	bb1.set_bit(22);
 	bb1.set_bit(23);
 	bb=bb1;
@@ -190,7 +190,7 @@ TEST(BBScanClass, setters_and_getters) {
 	EXPECT_EQ(1,bb.num_blocks());
 
 	//copy constructor
-	BitSet bb2(bb);
+	Bitset bb2(bb);
 	EXPECT_TRUE(bb2.is_bit(22));
 	EXPECT_TRUE(bb2.is_bit(23));
 	EXPECT_EQ(1,bb2.num_blocks());
@@ -199,12 +199,12 @@ TEST(BBScanClass, setters_and_getters) {
 
 TEST(BBScanClass, boolean_disjoint){
 
-	BitSet bb(130);
+	Bitset bb(130);
 	bb.set_bit(10);
 	bb.set_bit(20);
 	bb.set_bit(64);
 
-	BitSet bb1(130);
+	Bitset bb1(130);
 	bb1.set_bit(11);
 	bb1.set_bit(21);
 	bb1.set_bit(65);
@@ -215,7 +215,7 @@ TEST(BBScanClass, boolean_disjoint){
 	bb1.set_bit(64);
 	EXPECT_FALSE(bb.is_disjoint(bb1));
 
-	BitSet bb2(130);
+	Bitset bb2(130);
 	bb2.set_bit(11);				//in common in bb1 and bb2 but not bb
 	bb2.set_bit(22);
 	bb2.set_bit(66);
@@ -226,12 +226,12 @@ TEST(BBScanClass, boolean_disjoint){
 }
 
 TEST(BBScanClass, set_bit_range){
-	BitSet bb(130);
+	Bitset bb(130);
 	bb.set_bit(0, 64);
 	EXPECT_TRUE(bb.is_bit(0));
 	EXPECT_TRUE(bb.is_bit(64));
 	
-	BitSet bb1(130);
+	Bitset bb1(130);
 	bb1.set_bit(0, 0);
 	EXPECT_TRUE(bb1.is_bit(0));
 	
@@ -245,7 +245,7 @@ TEST(BBScanClass, set_bit_range){
 
 TEST(BBScanClass, erase_bit_range){
 
-	BitSet bb(130);
+	Bitset bb(130);
 	bb.set_bit(0, 129);
 
 	bb.erase_bit(0, 64);
@@ -344,7 +344,7 @@ protected:
 	}
 
 	vector<int> val;
-	BitSet bbn;
+	Bitset bbn;
 	BBScan bbsc;	
 };
 

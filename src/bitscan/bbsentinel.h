@@ -24,7 +24,7 @@ namespace bitgraph {
 	namespace _impl {
 
 		class BBSentinel : public BBScan {
-			friend BBSentinel& AND(const BitSet& lhs, const BBSentinel& rhs, BBSentinel& res);		//updates sentinels
+			friend BBSentinel& AND(const Bitset& lhs, const BBSentinel& rhs, BBSentinel& res);		//updates sentinels
 
 		public:
 			BBSentinel() :m_BBH(EMPTY_ELEM), m_BBL(EMPTY_ELEM) { init_sentinels(false); }
@@ -56,9 +56,9 @@ namespace bitgraph {
 
 				//erase: will not update sentinels	
 			virtual	void  erase_bit();											//in sentinel range
-			virtual	void  erase_bit(int nBit) { BitSet::erase_bit(nBit); }	//required because of the cast-to-int construction of sentinels (1)
+			virtual	void  erase_bit(int nBit) { Bitset::erase_bit(nBit); }	//required because of the cast-to-int construction of sentinels (1)
 			void  erase_bit_and_update(int nBit);									//erases and updates sentinels			
-			BBSentinel& erase_bit(const BitSet&);							//(1): required for SEQ coloring
+			BBSentinel& erase_bit(const Bitset&);							//(1): required for SEQ coloring
 
 			virtual	bool is_empty()const;
 			virtual	bool is_empty(int nBBL, int nBBH) const;					//is empty in range
@@ -70,7 +70,7 @@ namespace bitgraph {
 			////////////////
 			// operators
 			BBSentinel& operator=		(const BBSentinel&);
-			BBSentinel& operator&=		(const BitSet&);
+			BBSentinel& operator&=		(const Bitset&);
 
 			//////////////
 			// I/O

@@ -343,7 +343,7 @@ namespace bitgraph {
 		//useful interface-specific for undirected weighted graphs
 		int max_graph_degree() const { return this->g_.max_graph_degree(); }
 		int degree(int v) const { return this->g_.degree(v); }
-		int degree(int v, const BitSet& bbn) const { return this->g_.degree(v, bbn); }
+		int degree(int v, const Bitset& bbn) const { return this->g_.degree(v, bbn); }
 
 		///////////
 		//I/O operations

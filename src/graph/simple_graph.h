@@ -308,11 +308,11 @@ namespace bitgraph {
 		* @param set input set of vertices
 		* @param g ouptut induced subgraph
 		**/
-		void remove_vertices(const BitSet& set, Graph& g);
+		void remove_vertices(const Bitset& set, Graph& g);
 
 		//////////////	
 		// deleted - CHECK	
-		virtual void remove_vertices(const BitSet& set) = delete;	//commented out implementation - EXPERIMENTAL
+		virtual void remove_vertices(const Bitset& set) = delete;	//commented out implementation - EXPERIMENTAL
 
 		/////////////
 		// Boolean properties
@@ -1019,7 +1019,7 @@ namespace bitgraph {
 
 	template<class BitsetT>
 	inline
-		void Graph<BitsetT>::remove_vertices(const BitSet& bbn, Graph& g) {
+		void Graph<BitsetT>::remove_vertices(const Bitset& bbn, Graph& g) {
 
 		//determine the size of the graph g
 		auto pc = bbn.count();
@@ -1058,7 +1058,7 @@ namespace bitgraph {
 	}
 
 	//template<class BitsetT>
-	//void Graph<BitsetT>::remove_vertices (const BitSet& bbn){
+	//void Graph<BitsetT>::remove_vertices (const Bitset& bbn){
 	/////////////////
 	//// Experimental: deletes input list of nodes by creating a temporal graph
 	////

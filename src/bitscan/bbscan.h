@@ -27,7 +27,7 @@ namespace bitgraph{
 		// 
 		/////////////////////////////////
 
-		class BBScan : public BitSet {
+		class BBScan : public Bitset {
 		public :
 
 			template <class U>
@@ -51,7 +51,7 @@ namespace bitgraph{
 			//construction / destruction
 
 			//inherit constructors	
-			using BitSet::BitSet;
+			using Bitset::Bitset;
 
 			//TODO...check copy and move assignments 
 
@@ -147,7 +147,7 @@ namespace bitgraph{
 			/**
 			* @brief for basic bitscanning operatins - they are hidden by next_bit()
 			**/
-			using BitSet::next_bit;
+			using Bitset::next_bit;
 
 			/**
 			* @brief next bit in the bitstring, starting from the bit retrieved
