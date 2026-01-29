@@ -6,6 +6,7 @@
 *
 * TODO - check deprecated tests (27/01/25)
 */
+
 #include "gtest/gtest.h"
 #include "graph/algorithms/graph_map.h"
 #include "graph/algorithms/graph_fast_sort.h"
@@ -14,6 +15,7 @@
 #include <iostream>
 
 using vint = std::vector<int>;
+
 
 namespace bitgraph {
 	using  ugraph =	 Ugraph<bitarray>;
@@ -99,8 +101,8 @@ TEST_F(GraphMapTest, build_mapping_single_ordering){
 	//l2r ={ 2, 0, 3, 1 };  - [OLD / original index] to [NEW]
 	//r2l ={ 1, 3, 0, 2 }  -  [NEW] to [OLD / original index]
 	
-	vint l2rexp = { 2, 0, 3, 1 }; 
-	vint r2lexp = { 1, 3, 0, 2 };
+	VertexMapping l2rexp = { 2, 0, 3, 1 };
+	VertexMapping r2lexp = { 1, 3, 0, 2 };
 	
 	/////////////////////////////////
 	EXPECT_EQ(l2rexp, gm.get_l2r());
@@ -142,7 +144,7 @@ TEST_F(GraphMapTest, predefined_single_ordering){
 	EXPECT_EQ(NV, gm.size());
 
 	//check mappings
-	vint r2lexp = {1, 3, 0, 2};
+	VertexMapping r2lexp = { 1, 3, 0, 2 };
 	
 	EXPECT_EQ(r2lexp, gm.get_r2l());						//original index to new index is identity
 	EXPECT_STREQ("MIN F2L", gm.nameR().c_str());

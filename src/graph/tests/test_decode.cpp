@@ -27,7 +27,7 @@ TEST(Decode, decodeList) {
 	//computes ordering in format [OLD]->[NEW]
 	using  gt = GraphFastRootSort<ugraph>;
 	gt sorter(ug);											
-	vint vres = sorter.new_order(static_cast<int>(gt::MIN), false /*ltf*/, true /*old to new */);		
+	gt::VertexOrdering vres = sorter.new_order(static_cast<int>(gt::MIN), false /*ltf*/, true /*old to new */);		
 
 	//I/O
 	sorter.print(static_cast<int>(gt::PRINT_NODES), std::cout);
@@ -38,7 +38,7 @@ TEST(Decode, decodeList) {
 	d.add_ordering(vres);					//first 5 elem of vres {0 6 7 8 9 10}
 
 	//computes the vertex number of a list of vertices of the graph isomorphism in the original graph ug
-	vint vlist;
+	VertexList vlist;
 	vlist.push_back(0);
 	vlist.push_back(1);
 	vlist.push_back(2);
@@ -46,7 +46,7 @@ TEST(Decode, decodeList) {
 	vlist.push_back(4);
 	vlist.push_back(5);
 
-	vint dec = d.decode(vlist);
+	auto dec = d.decode(vlist);
 	EXPECT_EQ(dec[0], 0);
 	EXPECT_EQ(dec[1], 6);
 	EXPECT_EQ(dec[2], 7);

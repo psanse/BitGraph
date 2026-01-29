@@ -37,6 +37,8 @@ namespace bitgraph {
 
 			enum { MAX_WEIGHT = 100, MIN_WEIGHT };							//sorting algorithms for weighted graphs	
 
+			using typename ptype::VertexOrdering;
+
 			////////////////
 			// public interface 
 		public:
@@ -46,7 +48,7 @@ namespace bitgraph {
 			* @param ltf  last to first if TRUE
 			* @param o2n  old to new if TRUE
 			*/
-			vint new_order(int alg, bool ltf = true, bool o2n = true)		override;
+			VertexOrdering new_order(int alg, bool ltf = true, bool o2n = true)		override;
 
 			/*
 			* @brief Creates a weighted graph isomorphism for a given ordering
@@ -56,7 +58,7 @@ namespace bitgraph {
 			* @comments only for simple undirected graphs with no weights
 			* @return 0 if successful
 			*/
-			int  reorder(const vint& new_order, GraphW_t& gn, Decode* d = nullptr);
+			int  reorder(const VertexOrdering& new_order, GraphW_t& gn, Decode* d = nullptr);
 
 			////////////////////////
 			//construction / destruction
@@ -83,7 +85,7 @@ namespace bitgraph {
 			* @comments uses stable sort
 			* @returns reference to the new ordering in @nodes_ ([OLD]->[NEW] format)
 			*/
-			const vint& sort_by_non_increasing_weight(bool ltf = true);
+			const VertexOrdering& sort_by_non_increasing_weight(bool ltf = true);
 
 			/*
 			* @brief Non-degenerate minimum weight sorting of vertices
@@ -91,7 +93,7 @@ namespace bitgraph {
 			* @comments uses stable sort
 			* @returns reference to the new ordering in @nodes_ ([OLD]->[NEW] format)
 			*/
-			const vint& sort_by_non_decreasing_weight(bool ltf = true);
+			const VertexOrdering& sort_by_non_decreasing_weight(bool ltf = true);
 
 			////////////////
 			// data members	
@@ -111,8 +113,8 @@ namespace bitgraph {
 namespace bitgraph {
 
 	template <class GraphW_t >
-	inline
-		vint GraphFastRootSort_W<GraphW_t>::new_order(int alg, bool ltf, bool o2n) {
+	inline auto
+	 GraphFastRootSort_W<GraphW_t>::new_order(int alg, bool ltf, bool o2n) -> VertexOrdering {
 		this->nodes_.clear();											//clears the ordering
 
 		switch (alg) {
@@ -148,7 +150,7 @@ namespace bitgraph {
 
 	template <class GraphW_t >
 	inline
-		int GraphFastRootSort_W<GraphW_t>::reorder(const vint& new_order, GraphW_t& gn, Decode* d) {
+		int GraphFastRootSort_W<GraphW_t>::reorder(const VertexOrdering& new_order, GraphW_t& gn, Decode* d) {
 
 		int NV = gw_.num_vertices();
 
@@ -178,7 +180,7 @@ namespace bitgraph {
 		///////////////
 		//stores decoding information [NEW]->[OLD]
 		if (d != nullptr) {
-			vint aux(new_order);										//@new_order is in format [OLD]->[NEW]
+			VertexOrdering aux(new_order);										//@new_order is in format [OLD]->[NEW]
 			Decode::reverse_in_place(aux);								//@aux is in format [NEW] to [OLD]		
 			d->add_ordering(aux);
 		}
@@ -187,8 +189,8 @@ namespace bitgraph {
 	}
 
 	template<class GraphW_t>
-	inline
-		const vint& GraphFastRootSort_W<GraphW_t>::sort_by_non_increasing_weight(bool ltf)
+	inline auto
+	GraphFastRootSort_W<GraphW_t>::sort_by_non_increasing_weight(bool ltf) -> const VertexOrdering&
 	{
 		//set trivial ordering [1..NV] in @nodes_ as starting point 
 		ptype::set_ordering();
@@ -205,7 +207,8 @@ namespace bitgraph {
 	}
 
 	template<class GraphW_t>
-	inline const vint& GraphFastRootSort_W<GraphW_t>::sort_by_non_decreasing_weight(bool ltf)
+	inline auto
+	GraphFastRootSort_W<GraphW_t>::sort_by_non_decreasing_weight(bool ltf) -> const VertexOrdering&
 	{
 		//set trivial ordering [1..NV] in @nodes_ as starting point 
 		ptype::set_ordering();
