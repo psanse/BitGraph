@@ -97,7 +97,7 @@ namespace bitgraph {
 			* @param lhs_name, rhs_name: fancy names for the orderings
 			**/
 			template< typename Alg_t>
-			void build_mapping(typename Alg_t::_gt&, int slhs, bool plhs, int srhs, bool prhs,
+			void build_mapping(typename Alg_t::graph_type&, int slhs, bool plhs, int srhs, bool prhs,
 										std::string lhs_name = "", std::string rhs_name = "");
 
 			/**
@@ -128,7 +128,7 @@ namespace bitgraph {
 			**/
 
 			template< typename Alg_t >
-			void build_mapping(typename Alg_t::_gt&, int srhs, bool prhs, std::string rhs_name = "") ;
+			void build_mapping(typename Alg_t::graph_type&, int srhs, bool prhs, std::string rhs_name = "") ;
 
 			/**
 			* @brief Helper when the two mappings are known
@@ -235,7 +235,7 @@ namespace bitgraph{
 
 	template<class Alg_t>
 	inline
-	void GraphMap::build_mapping(typename Alg_t::_gt& g, int slhs, bool plhs, int srhs, bool prhs,
+	void GraphMap::build_mapping(typename Alg_t::graph_type& g, int slhs, bool plhs, int srhs, bool prhs,
 															std::string lhs_name, std::string rhs_name)
 	{
 		VertexMapping lhs_o2n, lhs_n2o, rhs_o2n, rhs_n2o;
@@ -281,7 +281,7 @@ namespace bitgraph{
 	}
 
 	template< typename Alg_t>
-	void GraphMap::build_mapping(typename Alg_t::_gt& g, int srhs, bool prhs, std::string rhs_name)  {
+	void GraphMap::build_mapping(typename Alg_t::graph_type& g, int srhs, bool prhs, std::string rhs_name)  {
 
 		auto NV = g.num_vertices();
 

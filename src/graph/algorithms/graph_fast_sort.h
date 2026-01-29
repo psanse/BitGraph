@@ -11,7 +11,7 @@
 #define __GRAPH_FAST_SORT_H__
 							
 
-#include "graph/simple_ugraph.h"				//to limit template Graph_t to undirected types - types must be known
+#include "graph/simple_ugraph.h"				//to limit template GraphT to undirected types - types must be known
 
 #include "utils/logger.h"
 #include "utils/common.h"						
@@ -31,15 +31,16 @@ namespace bitgraph {
 		///////////////////////////
 		//
 		// GraphFastRootSort class
-		// (Graph_t should be restricted to ugraph and sparse_ugraph types)
+		// (GraphT should be restricted to ugraph and sparse_ugraph types)
 		//
 		////////////////////////////
 
-		template <class Graph_t>
+		template <class GraphT>
 		class GraphFastRootSort {
+			
 			//restrict to ugraph and sparse_ugraph types
-			static_assert(std::is_same<bitgraph::Ugraph<BBScan>, Graph_t>::value ||
-				std::is_same<bitgraph::Ugraph<BBScanSp>, Graph_t>::value, "is not a valid GraphFastRootSort type");
+			static_assert(std::is_same<bitgraph::Ugraph<BBScan>, GraphT>::value ||
+				std::is_same<bitgraph::Ugraph<BBScanSp>, GraphT>::value, "is not a valid GraphFastRootSort type");
 		
 		public:
 			using VertexOrdering = bitgraph::VertexOrdering;
@@ -48,10 +49,8 @@ namespace bitgraph {
 
 
 		public:
-			using basic_type = Graph_t;											//graph type
-			using _gt = basic_type;												//alias for backward compatibility		
-			using type = GraphFastRootSort< Graph_t>;							//own type		
-			using bb_type = typename Graph_t::VertexBitset;								//bitset type
+			using graph_type = GraphT;												// graph type
+			using VertexBitset = typename GraphT::VertexBitset;						// bitset type
 			
 			//non structured enums are used for easy conversion to int when needed
 			enum { PRINT_DEGREE = 0, PRINT_SUPPORT, PRINT_NODES };
@@ -67,7 +66,7 @@ namespace bitgraph {
 			* @param g input graph G=(V, E)
 			* @param deg output vector of size |V| (v[i] = deg(vi))
 			**/
-			static int compute_deg(const Graph_t& g, std::vector<int>& deg);
+			static int compute_deg(const graph_type& g, std::vector<int>& deg);
 
 
 			///////////////
@@ -95,7 +94,7 @@ namespace bitgraph {
 			*			3) map the ordering back to the original graph
 			* 
 			**/
-			VertexOrdering new_order(int alg, bb_type& bbsg, bool ltf = true, bool o2n = true);
+			VertexOrdering new_order(int alg, VertexBitset& bbsg, bool ltf = true, bool o2n = true);
 	
 			/**
 			* @brief Creates an isomorphism for a given ordering
@@ -105,13 +104,13 @@ namespace bitgraph {
 			* @comments only for simple undirected graphs with no weights
 			* @return 0 if successful
 			**/
-			int reorder(const VertexOrdering& new_order, Graph_t& gn, Decode* d = nullptr);
-			static Graph_t reorder(const Graph_t& g, const VertexOrdering& new_order, Decode* d = nullptr);
+			int reorder(const VertexOrdering& new_order, graph_type& gn, Decode* d = nullptr);
+			static graph_type reorder(const graph_type& g, const VertexOrdering& new_order, Decode* d = nullptr);
 
 			////////////////////////
 			//construction/destructions
 
-			explicit GraphFastRootSort(Graph_t& gout) :
+			explicit GraphFastRootSort(graph_type& gout) :
 				g_(gout),
 				NV_(g_.num_vertices())
 			{
@@ -134,7 +133,7 @@ namespace bitgraph {
 
 			const std::vector<int>& degree() const { return nb_neigh_; }
 			const std::vector<int>& support() const { return deg_neigh_; }
-			const Graph_t& graph() const { return g_; }
+			const graph_type& graph() const { return g_; }
 			std::size_t num_vertices() const { return NV_; }
 
 			///////////////////////
@@ -287,13 +286,13 @@ namespace bitgraph {
 			// data members	
 		protected:
 
-			Graph_t& g_;											//ideally CONST but some operations like neighbors are non-const (TODO!)
-			int NV_;												//number of vertices cached - g_.num_vertices()  
+			graph_type& g_;												// ideally CONST but some operations like neighbors are non-const (TODO!)
+			int NV_;												// number of vertices cached - g_.num_vertices()  
 
-			VertexDegrees nb_neigh_;								//stores the degree of the vertices		
-			VertexSupports deg_neigh_;								//stores the support of the vertices (degree of neighbors)
-			bb_type node_active_state_;								//bitset for active vertices: 1bit-active, 0bit-passive. Used in degenerate orderings	
-			VertexOrdering nodes_;											//stores the ordering
+			VertexDegrees nb_neigh_;								// stores the degree of the vertices		
+			VertexSupports deg_neigh_;								// stores the support of the vertices (degree of neighbors)
+			VertexBitset node_active_state_;						// bitset for active vertices: 1bit-active, 0bit-passive. Used in degenerate orderings	
+			VertexOrdering nodes_;									// stores the ordering
 
 		};//end of GraphFastRootSort class
 
@@ -308,9 +307,9 @@ namespace bitgraph {
 
 namespace bitgraph {
 
-	template<class Graph_t>
+	template<class GraphT>
 	inline
-		VertexOrdering GraphFastRootSort<Graph_t>::new_order(int alg, bool ltf, bool o2n)
+		VertexOrdering GraphFastRootSort<GraphT>::new_order(int alg, bool ltf, bool o2n)
 	{
 		nodes_.clear();
 
@@ -322,7 +321,7 @@ namespace bitgraph {
 			}
 
 			///////////////////////
-			LOG_WARNING("NONE alg. sorting petition detected, returning trivial isomorphism- GraphFastRootSort<Graph_t>::new_order()");
+			LOG_WARNING("NONE alg. sorting petition detected, returning trivial isomorphism- GraphFastRootSort<GraphT>::new_order()");
 			return nodes_;
 			///////////////////////
 
@@ -368,7 +367,7 @@ namespace bitgraph {
 			sort_non_decreasing_deg_with_support_tb(ltf);
 			break;
 		default:
-			LOGG_ERROR("unknown sorting algorithm : ", alg, "- GraphFastRootSort<Graph_t>::new_order");
+			LOGG_ERROR("unknown sorting algorithm : ", alg, "- GraphFastRootSort<GraphT>::new_order");
 			LOG_ERROR("exiting...");
 			exit(-1);
 		}
@@ -379,9 +378,9 @@ namespace bitgraph {
 		return nodes_;
 	}
 
-	template<class Graph_t>
+	template<class GraphT>
 	inline
-		const VertexOrdering& GraphFastRootSort<Graph_t>::sort_degen_non_decreasing_deg(bool rev) {
+		const VertexOrdering& GraphFastRootSort<GraphT>::sort_degen_non_decreasing_deg(bool rev) {
 
 		//initialization
 		node_active_state_.set_bit(0, NV_ - 1);					//all vertices active, pending to be ordered
@@ -409,7 +408,7 @@ namespace bitgraph {
 			///////////////////////////////////
 
 			//update degree info of the remaining active vertices
-			bb_type& bbn = g_.neighbors(v);
+			VertexBitset& bbn = g_.neighbors(v);
 
 			if (bbn.init_scan(BBObject::NON_DESTRUCTIVE) != -1) {
 				int w = BBObject::noBit;
@@ -430,9 +429,9 @@ namespace bitgraph {
 		return nodes_;
 	}
 
-	template<class Graph_t>
+	template<class GraphT>
 	inline
-		const VertexOrdering& GraphFastRootSort<Graph_t>::sort_degen_non_increasing_deg(bool rev) {
+		const VertexOrdering& GraphFastRootSort<GraphT>::sort_degen_non_increasing_deg(bool rev) {
 
 		//initialization
 		node_active_state_.set_bit(0, NV_ - 1);										//all vertices active, pending to be ordered
@@ -459,7 +458,7 @@ namespace bitgraph {
 			//////////////////////////////////
 
 			//updates neighborhood info in remaining vertices
-			bb_type& bbn = g_.neighbors(v);
+			VertexBitset& bbn = g_.neighbors(v);
 			if (bbn.init_scan(BBObject::NON_DESTRUCTIVE) != -1) {
 				int w = BBObject::noBit;
 				while ((w = bbn.next_bit()) != BBObject::noBit) {
@@ -477,8 +476,8 @@ namespace bitgraph {
 		return nodes_;
 	}
 
-	template<class Graph_t>
-	inline const VertexOrdering& GraphFastRootSort<Graph_t>::sort_degen_non_decreasing_deg_B(bool rev)
+	template<class GraphT>
+	inline const VertexOrdering& GraphFastRootSort<GraphT>::sort_degen_non_decreasing_deg_B(bool rev)
 	{
 
 		int min_deg = NV_, deg = 0;
@@ -494,7 +493,7 @@ namespace bitgraph {
 
 			//selects an active vertex with minimum degree
 			if (node_active_state_.init_scan(BBObject::NON_DESTRUCTIVE) != -1) {
-				LOG_ERROR("init scan failed -  GraphFastRootSort<Graph_t>::sort_degen_non_decreasing_deg_B");
+				LOG_ERROR("init scan failed -  GraphFastRootSort<GraphT>::sort_degen_non_decreasing_deg_B");
 				LOG_ERROR("exting");
 				std::exit(EXIT_FAILURE);
 			}
@@ -521,9 +520,9 @@ namespace bitgraph {
 		return nodes_;
 	}
 
-	template<class Graph_t>
+	template<class GraphT>
 	inline
-		const VertexOrdering& GraphFastRootSort<Graph_t>::sort_degen_composite_non_decreasing_deg(bool rev)
+		const VertexOrdering& GraphFastRootSort<GraphT>::sort_degen_composite_non_decreasing_deg(bool rev)
 	{
 		node_active_state_.set_bit(0, NV_ - 1);			//all active, pending to be ordered
 		int min_deg = NV_, v = EMPTY_ELEM;
@@ -547,7 +546,7 @@ namespace bitgraph {
 			node_active_state_.erase_bit(v);
 
 			//updates neighborhood info in remaining vertices
-			bb_type& bbn = g_.neighbors(v);
+			VertexBitset& bbn = g_.neighbors(v);
 			if (bbn.init_scan(BBObject::NON_DESTRUCTIVE) != -1) {
 				int w = BBObject::noBit;
 				while ((w = bbn.next_bit()) != BBObject::noBit) {
@@ -564,9 +563,9 @@ namespace bitgraph {
 		return nodes_;
 	}
 
-	template<class Graph_t>
+	template<class GraphT>
 	inline
-		const VertexOrdering& GraphFastRootSort<Graph_t>::sort_degen_composite_non_increasing_deg(bool rev)
+		const VertexOrdering& GraphFastRootSort<GraphT>::sort_degen_composite_non_increasing_deg(bool rev)
 	{
 		node_active_state_.set_bit(0, NV_ - 1);											//all active, pending to be ordered
 		int max_deg = 0, v = EMPTY_ELEM;
@@ -589,7 +588,7 @@ namespace bitgraph {
 			node_active_state_.erase_bit(v);
 
 			//updates neighborhood info in remaining vertices
-			bb_type& bbn = g_.neighbors(v);
+			VertexBitset& bbn = g_.neighbors(v);
 			if (bbn.init_scan(BBObject::NON_DESTRUCTIVE) != -1) {
 				int w = BBObject::noBit;
 				while ((w = bbn.next_bit()) != BBObject::noBit) {
@@ -606,8 +605,8 @@ namespace bitgraph {
 		return nodes_;
 	}
 
-	template<class Graph_t>
-	inline const VertexOrdering& GraphFastRootSort<Graph_t>::sort_non_increasing_deg(int first_k, bool rev)
+	template<class GraphT>
+	inline const VertexOrdering& GraphFastRootSort<GraphT>::sort_non_increasing_deg(int first_k, bool rev)
 	{
 
 		VertexOrdering kord;
@@ -631,8 +630,8 @@ namespace bitgraph {
 		return nodes_;
 	}
 
-	template<class Graph_t>
-	inline const VertexOrdering& GraphFastRootSort<Graph_t>::sort_non_increasing_deg(int first, int last, bool rev) {
+	template<class GraphT>
+	inline const VertexOrdering& GraphFastRootSort<GraphT>::sort_non_increasing_deg(int first, int last, bool rev) {
 
 		VertexOrdering kord;
 		kord.reserve(last - first + 1);
@@ -659,8 +658,8 @@ namespace bitgraph {
 		return nodes_;
 	}
 
-	template<class Graph_t>
-	inline const VertexOrdering& GraphFastRootSort<Graph_t>::sort_non_decreasing_deg(int first_k, bool rev) {
+	template<class GraphT>
+	inline const VertexOrdering& GraphFastRootSort<GraphT>::sort_non_decreasing_deg(int first_k, bool rev) {
 		VertexOrdering kord;
 		_sort::fill_vertices(kord, first_k);
 
@@ -683,8 +682,8 @@ namespace bitgraph {
 		return nodes_;
 	}
 
-	template<class Graph_t>
-	inline const VertexOrdering& GraphFastRootSort<Graph_t>::sort_non_decreasing_deg(int first, int last, bool rev) {
+	template<class GraphT>
+	inline const VertexOrdering& GraphFastRootSort<GraphT>::sort_non_decreasing_deg(int first, int last, bool rev) {
 
 		VertexOrdering kord;
 		kord.reserve(last - first + 1);
@@ -712,9 +711,9 @@ namespace bitgraph {
 	}
 
 
-	template<class Graph_t>
+	template<class GraphT>
 	inline
-		void GraphFastRootSort<Graph_t>::set_ordering() {
+		void GraphFastRootSort<GraphT>::set_ordering() {
 		nodes_.clear();
 		nodes_.reserve(NV_);
 		for (int i = 0; i < NV_; i++) {
@@ -722,9 +721,9 @@ namespace bitgraph {
 		}
 	}
 
-	template<class Graph_t>
+	template<class GraphT>
 	inline
-		const VertexOrdering& GraphFastRootSort<Graph_t>::sort_non_increasing_deg(bool rev) {
+		const VertexOrdering& GraphFastRootSort<GraphT>::sort_non_increasing_deg(bool rev) {
 		set_ordering();
 		has_greater_val<int, VertexOrdering> pred(nb_neigh_);
 		std::stable_sort(nodes_.begin(), nodes_.end(), pred);
@@ -735,9 +734,9 @@ namespace bitgraph {
 	}
 
 
-	template<class Graph_t>
+	template<class GraphT>
 	inline
-		const VertexOrdering& GraphFastRootSort<Graph_t>::sort_non_decreasing_deg(bool rev) {
+		const VertexOrdering& GraphFastRootSort<GraphT>::sort_non_decreasing_deg(bool rev) {
 		set_ordering();
 		has_smaller_val<int, VertexOrdering> pred(nb_neigh_);
 		std::stable_sort(nodes_.begin(), nodes_.end(), pred);
@@ -748,9 +747,9 @@ namespace bitgraph {
 		return nodes_;
 	}
 
-	template<class Graph_t>
+	template<class GraphT>
 	inline
-		const VertexOrdering& GraphFastRootSort<Graph_t>::sort_non_increasing_deg_with_support_tb(bool rev) {
+		const VertexOrdering& GraphFastRootSort<GraphT>::sort_non_increasing_deg_with_support_tb(bool rev) {
 		set_ordering();
 		has_greater_val_with_tb<int, VertexOrdering> pred(nb_neigh_, deg_neigh_);
 		std::stable_sort(nodes_.begin(), nodes_.end(), pred);
@@ -761,9 +760,9 @@ namespace bitgraph {
 		return nodes_;
 	}
 
-	template<class Graph_t>
+	template<class GraphT>
 	inline auto
-	GraphFastRootSort<Graph_t>::sort_non_decreasing_deg_with_support_tb(bool rev) -> const VertexOrdering& {
+	GraphFastRootSort<GraphT>::sort_non_decreasing_deg_with_support_tb(bool rev) -> const VertexOrdering& {
 		set_ordering();
 		has_smaller_val_with_tb<int, VertexOrdering> pred(nb_neigh_, deg_neigh_);
 		std::stable_sort(nodes_.begin(), nodes_.end(), pred);
@@ -774,9 +773,9 @@ namespace bitgraph {
 		return nodes_;
 	}
 
-	template<class Graph_t>
+	template<class GraphT>
 	inline auto 
-	GraphFastRootSort<Graph_t>::compute_deg_root() -> const VertexDegrees&  {
+	GraphFastRootSort<GraphT>::compute_deg_root() -> const VertexDegrees&  {
 
 		for (int elem = 0; elem < NV_; ++elem) {
 			nb_neigh_[elem] = g_.neighbors(elem).count();
@@ -785,13 +784,13 @@ namespace bitgraph {
 		return nb_neigh_;
 	}
 
-	template<class Graph_t>
+	template<class GraphT>
 	inline auto
-	GraphFastRootSort<Graph_t>::compute_support_root() -> const VertexSupports&
+	GraphFastRootSort<GraphT>::compute_support_root() -> const VertexSupports&
 	{
 		for (int elem = 0; elem < NV_; ++elem) {
 			deg_neigh_[elem] = 0;
-			bb_type& bbn = g_.neighbors(elem);
+			VertexBitset& bbn = g_.neighbors(elem);
 			if (bbn.init_scan(BBObject::NON_DESTRUCTIVE) != -1) {
 				int w = BBObject::noBit;
 				while ((w = bbn.next_bit()) != EMPTY_ELEM) {
@@ -803,9 +802,9 @@ namespace bitgraph {
 		return deg_neigh_;
 	}
 
-	template<class Graph_t>
+	template<class GraphT>
 	inline
-		ostream& GraphFastRootSort<Graph_t>::print(int type, ostream& o, bool eofl) const
+		ostream& GraphFastRootSort<GraphT>::print(int type, ostream& o, bool eofl) const
 	{
 		switch (type) {
 		case PRINT_DEGREE:
@@ -818,7 +817,7 @@ namespace bitgraph {
 			bitgraph::_stl::print_collection(nodes_, o, eofl);
 			break;
 		default:
-			LOG_ERROR("unknown print type- GraphFastRootSort<Graph_t>::print()");
+			LOG_ERROR("unknown print type- GraphFastRootSort<GraphT>::print()");
 			LOG_ERROR("exiting...");
 			exit(-1);
 		}
@@ -827,8 +826,8 @@ namespace bitgraph {
 		return o;
 	}
 
-	template<class Graph_t>
-	inline int GraphFastRootSort<Graph_t>::compute_deg(const Graph_t& g, std::vector<int>& deg) {
+	template<class GraphT>
+	inline int GraphFastRootSort<GraphT>::compute_deg(const graph_type& g, std::vector<int>& deg) {
 		auto NV = g.num_vertices();
 		deg.assign(NV, -1);
 		for (auto v = 0; v < NV; v++) {
@@ -837,9 +836,9 @@ namespace bitgraph {
 		return 0;
 	}
 
-	template<class Graph_t>
+	template<class GraphT>
 	inline
-		int GraphFastRootSort<Graph_t>::reset() {
+		int GraphFastRootSort<GraphT>::reset() {
 
 		nb_neigh_.clear();
 		nb_neigh_.resize(NV_);
@@ -851,28 +850,28 @@ namespace bitgraph {
 		return 0;
 	}
 
-	template<class Graph_t>
+	template<class GraphT>
 	inline auto
-	GraphFastRootSort<Graph_t>::new_order(int alg, bb_type& bbsg, bool ltf, bool o2n) -> VertexOrdering
+	GraphFastRootSort<GraphT>::new_order(int alg, VertexBitset& bbsg, bool ltf, bool o2n) -> VertexOrdering
 	{			
 		//convert bbsg to vector
 		VertexOrdering lv;
 		bbsg.extract(lv);
 
 		//////////////////////////////////////////////////////////////////////////////////////////
-		assert(!lv.empty() && "empty subgraph detected- GraphFastRootSort<Graph_t>::new_order()");
+		assert(!lv.empty() && "empty subgraph detected- GraphFastRootSort<GraphT>::new_order()");
 		/////////////////////////////////////////////////////////////////////////////////////////
 				
 
 		//create the induced subgraph of size |bbsg|
-		Graph_t sg;
+		graph_type sg;
 
 		////////////////////////////////////
 		this->g_.create_subgraph(sg, lv);	
 		////////////////////////////////////
 
 		//create a new ordering for the subgraph based on existing primitives
-		GraphFastRootSort<Graph_t> sort(sg);
+		GraphFastRootSort<graph_type> sort(sg);
 		VertexOrdering ord_sg = sort.new_order(alg, ltf, false /* n2o format*/);
 
 		//map the ordering @ord back to the original graph
@@ -903,13 +902,13 @@ namespace bitgraph {
 
 #ifndef NDEBUG
 
-		assert(ord.size() == NV_ && "ERROR: ord.size() != N - GraphFastRootSort<Graph_t>::new_order");
+		assert(ord.size() == NV_ && "ERROR: ord.size() != N - GraphFastRootSort<GraphT>::new_order");
 
 		//verify vertices outside bbsg have not been reordered
 		for (int v = 0; v < ord.size(); ++v) {
 			if (!bbsg.is_bit(v)) {
 				////////////////////////////////////////////////////////////////////////////////////////////////////////
-				assert(ord[v] == v && "ERROR: vertex outside bbsg reordered - GraphFastRootSort<Graph_t>::new_order");
+				assert(ord[v] == v && "ERROR: vertex outside bbsg reordered - GraphFastRootSort<GraphT>::new_order");
 				/////////////////////////////////////////////////////////////////////////////////////////////////////////
 			}
 		}
@@ -923,9 +922,9 @@ namespace bitgraph {
 		return ord;		
 	}
 
-	template<class Graph_t>
+	template<class GraphT>
 	inline
-		int GraphFastRootSort<Graph_t>::reorder(const VertexOrdering& new_order, Graph_t& gn, Decode* d)
+		int GraphFastRootSort<GraphT>::reorder(const VertexOrdering& new_order, graph_type& gn, Decode* d)
 	{
 		std::size_t NV = g_.num_vertices();
 		gn.reset(NV);
@@ -955,10 +954,10 @@ namespace bitgraph {
 	}
 
 
-	template<class Graph_t>
-	inline Graph_t bitgraph::_impl::GraphFastRootSort<Graph_t>::reorder(const Graph_t& g, const VertexOrdering& o2n, Decode* d)
+	template<class GraphT>
+	inline GraphT bitgraph::_impl::GraphFastRootSort<GraphT>::reorder(const graph_type& g, const VertexOrdering& o2n, Decode* d)
 	{
-		Graph_t gres;
+		graph_type gres;
 
 		std::size_t NV = g.num_vertices();
 		gres.reset(NV);
