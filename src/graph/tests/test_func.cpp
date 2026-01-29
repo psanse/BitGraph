@@ -1,9 +1,9 @@
 /*
 * @file test_func.cpp 
 * @brief Unit tests for namespace gfunc functions
-* @created 20/7/18
+* @date 20/07/2018
 * @update Graph_W type for weighted graphs 23/01/19
-* @last_update 27/01/25
+* @last_modified 29/01/2026
 * @author pss
 *
 * TODO - ADD TESTS... (09/01/25)
@@ -12,8 +12,6 @@
 #include "graph/algorithms/graph_func.h"
 #include "gtest/gtest.h"
 #include <iostream>
-
-using vint = std::vector<int>;
 
 using namespace std;
 using namespace bitgraph;
@@ -58,7 +56,7 @@ protected:
 
 TEST_F(GFuncTest, is_triangleFree_subgraph) {
 		
-	vint triangle;	
+	VertexList triangle;	
 	EXPECT_TRUE(gfunc::is_triangleFree_subgraph(ug, ug.neighbors(0), triangle));			
 
 	//adds a triangle
@@ -69,7 +67,7 @@ TEST_F(GFuncTest, is_triangleFree_subgraph) {
 
 TEST_F(GFuncTest, is_edgeFree_subgraph) {
 		
-	vint edge;
+	std::vector<int> edge;
 	EXPECT_FALSE(gfunc::is_edgeFree_subgraph(ug, ug.neighbors(0), edge) );				//{1, 3} is in G[{1, 2, 3}]					
 	
 	//removes the only edge 
@@ -83,7 +81,7 @@ TEST_F(GFuncTestW, sort_w){
 	using namespace gfunc::vertexW;	
 
 	//set of vertices
-	vint lv; 
+	VertexList lv;
 	lv.push_back(0);
 	lv.push_back(1); 
 	lv.push_back(2);
@@ -91,7 +89,7 @@ TEST_F(GFuncTestW, sort_w){
 	//sorts the set of vertices according to non-decreasing weight
 	sort_w(ugw,lv, true);
 
-	vint lv_exp;		
+	VertexList lv_exp;
 	lv_exp.push_back(2);
 	lv_exp.push_back(1);
 	lv_exp.push_back(0);
@@ -129,7 +127,7 @@ TEST_F(GFuncTestW, wsum){
 	using namespace gfunc::vertexW;
 	
 	//set of vertices {0, 1}
-	vint lv; 
+	VertexList lv;
 	lv.push_back(0);
 	lv.push_back(1);
 
@@ -175,11 +173,11 @@ TEST(GFunc, neighbors){
 	
 	/////////////
 	//neighbors of vertex {3} in bitset bbV = {0, 63, 64}
-	vint neigh;
+	VertexList neigh;
 	neighbors<ugraph>(ug, 3, bbV, neigh);
 
 	//expected neighbors
-	vint neigh_exp;
+	VertexList neigh_exp;
 	neigh_exp.push_back(0);
 	neigh_exp.push_back(63);
 	neigh_exp.push_back(64);

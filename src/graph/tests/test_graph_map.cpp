@@ -4,7 +4,7 @@
 * @date: created  14/8/17, update  GraphFastRootSort 03/01/20, imported from prior COPT (10/01/25), last update 30/11/25
 * @dev pss
 *
-* TODO - check deprecated tests (27/01/25)
+* @todo - check deprecated tests (27/01/25)
 */
 
 #include "gtest/gtest.h"
@@ -13,9 +13,6 @@
 #include "graph/simple_ugraph.h"
 #include "utils/common.h"
 #include <iostream>
-
-using vint = std::vector<int>;
-
 
 namespace bitgraph {
 	using  ugraph =	 Ugraph<bitarray>;
@@ -62,8 +59,8 @@ TEST_F(GraphMapTest, build_mapping_2_orderings) {
 	
 	//l2r={2, 3, 0 ,1}, r2l={2, 3, 0, 1}
 
-	vint l2rexp = { 2, 3, 0, 1 };
-	vint r2lexp = { 2, 3, 0, 1 };
+	VertexMapping l2rexp = { 2, 3, 0, 1 };
+	VertexMapping r2lexp = { 2, 3, 0, 1 };
 	
 	//////////////////////////////////
 	EXPECT_EQ	(l2rexp, gm.get_l2r());
@@ -136,7 +133,7 @@ TEST_F(GraphMapTest, predefined_single_ordering){
 
 	//predefined ordering
 	GraphSort gol(ug); 
-	vint n2o = gol.new_order(GraphSort::MIN, GraphSort::FIRST_TO_LAST, false);			 //n2o = {1,3,0,2}			
+	VertexOrdering n2o = gol.new_order(GraphSort::MIN, GraphSort::FIRST_TO_LAST, false);			 //n2o = {1,3,0,2}			
 
 	GraphMap gm;
 	gm.build_mapping(n2o, "MIN F2L");			// builds mapping according to the given ordering

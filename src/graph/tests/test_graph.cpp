@@ -1,21 +1,16 @@
 /*
 * @file test_graph.cpp  
 * @brief Unit tests for the Graph class for directed graphs
-* @created ?
-* @updated 29/12/20
-* @last_update 31/12/24
+* @date ?
+* @last_modified 29/01/2026
 * @author pss
 * 
-* @TODO - ADD TESTS, e.g. operator =, move operator =,...
+* @todo - ADD TESTS, e.g. operator =, move operator =,...
 */
-
 
 #include "gtest/gtest.h"
 #include "graph/simple_graph.h"
 #include <iostream>
-
-//useful alias
-using vint = vector<int>;
 
 using graph = bitgraph::Graph<bitgraph::bitarray>;						//simple graph
 

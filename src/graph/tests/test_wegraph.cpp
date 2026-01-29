@@ -22,7 +22,6 @@ using namespace bitgraph;
 //alias
 using ugraph_ewi = bitgraph::Graph_EW<ugraph, int>;
 using ugraph_ew	 = bitgraph::Graph_EW<ugraph, double>;
-using vint = vector<int>;
 
 class UGraphEWTest : public ::testing::Test {
 protected:
