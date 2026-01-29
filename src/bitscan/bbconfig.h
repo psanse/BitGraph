@@ -135,10 +135,10 @@
 
 ////////////////////
 //MACROS for mapping bit indexes to bitblock indexes (0 or 1 based)
-#define INDEX_0TO0(p)			(WDIV(p))							//p>0
-#define INDEX_0TO1(p)			(WDIV(p)+1)							//p>0
-#define INDEX_1TO1(p)			((((p)-1)/bitgraph::WORD_SIZE)+1)				//p>0
-#define INDEX_1TO0(p)			((((p)-1)/bitgraph::WORD_SIZE))				//p>0
+#define INDEX_0TO0(p)			(WDIV(p))									// p>0
+#define INDEX_0TO1(p)			(WDIV(p)+1)									// p>0
+#define INDEX_1TO1(p)			((((p)-1)/bitgraph::WORD_SIZE)+1)			// p>0
+#define INDEX_1TO0(p)			((((p)-1)/bitgraph::WORD_SIZE))				// p>0
 
 //TODO: change macro names for clarity to the following:
 //#define BIT0_WORD0(p)   (WDIV(p))

@@ -69,7 +69,7 @@ namespace bitgraph {
 		template< class BitSetT >
 		struct ScanRev {
 
-			using Self = ScanRev<BitSetT>;		//own type
+		//	using Self = ScanRev<BitSetT>;		//own type
 			using bitset_type = BitSetT;		//basic type (a type of bitset)
 
 			//using basic_type = bitset_type;		//for backward compatibility
