@@ -1,6 +1,6 @@
  /**
   * @file bbset_sparse.cpp
-  * @brief implementations for the sparse BitSetSp class wrapper for sparse bitstrings (header bbset_sparse.h)
+  * @brief implementations for the sparse BitsetSp class wrapper for sparse bitstrings (header bbset_sparse.h)
   * @author pss
   * @details created 10/02/2015?, @last_update 20/02/2025
   *
@@ -19,28 +19,28 @@ using namespace std;
 using namespace bitgraph;
 
 ///////////////////////////////////////
-constexpr int BitSetSp::DEFAULT_CAPACITY;
+constexpr int BitsetSp::DEFAULT_CAPACITY;
 ///////////////////////////////////////
 
 
-BitSetSp::BitSetSp(std::size_t nPop):
+BitsetSp::BitsetSp(std::size_t nPop):
 	nBB_(static_cast<int>(INDEX_1TO1(nPop)))
 {
 
 	vBB_.reserve(DEFAULT_CAPACITY);
 }
 
-BitSetSp bitgraph::BitSetSp::from_num_blocks(int nBlocks)
+BitsetSp bitgraph::BitsetSp::from_num_blocks(int nBlocks)
 {
 	///////////////////////////////////////////////////////////////////////////////
-	assert(nBlocks > 0 && "bizarre number of blocks - BitSetSp::from_num_blocks");
+	assert(nBlocks > 0 && "bizarre number of blocks - BitsetSp::from_num_blocks");
 	//////////////////////////////////////////////////////////////////////////////
 
 	std::size_t nPop = static_cast<std::size_t>WMUL(nBlocks);
-	return BitSetSp(nPop);
+	return BitsetSp(nPop);
 }
 
-BitSetSp::BitSetSp(std::size_t nPop, const vint& lv):
+BitsetSp::BitsetSp(std::size_t nPop, const vint& lv):
 	nBB_(static_cast<int>(INDEX_1TO1(nPop)))
 {
 	try {
@@ -61,13 +61,13 @@ BitSetSp::BitSetSp(std::size_t nPop, const vint& lv):
 
 	}
 	catch (...) {
-		LOG_ERROR("Error during construction - BitSet::BitSetSp()");
+		LOG_ERROR("Error during construction - BitSet::BitsetSp()");
 		LOG_ERROR("exiting...");
 		std::exit(EXIT_FAILURE);
 	}
 }
 
-BitSetSp::BitSetSp(std::size_t nPop, std::initializer_list<int> lv) :
+BitsetSp::BitsetSp(std::size_t nPop, std::initializer_list<int> lv) :
 	nBB_(static_cast<int>(INDEX_1TO1(nPop)))
 {
 	try {
@@ -88,14 +88,14 @@ BitSetSp::BitSetSp(std::size_t nPop, std::initializer_list<int> lv) :
 
 	}
 	catch (...) {
-		LOG_ERROR("Error during construction - BitSet::BitSetSp()");
+		LOG_ERROR("Error during construction - BitSet::BitsetSp()");
 		LOG_ERROR("exiting...");
 		std::exit(EXIT_FAILURE);
 	}
 }
 
 
-void BitSetSp::reset(std::size_t nPop, bool is_popsize) noexcept
+void BitsetSp::reset(std::size_t nPop, bool is_popsize) noexcept
 {
 	try {
 		(is_popsize) ? nBB_ = static_cast<int>(INDEX_1TO1(nPop)) : nBB_ = static_cast<int>(nPop);
@@ -109,7 +109,7 @@ void BitSetSp::reset(std::size_t nPop, bool is_popsize) noexcept
 	}
 }
 
-void BitSetSp::reset(std::size_t nPop, const vint& lv) noexcept
+void BitsetSp::reset(std::size_t nPop, const vint& lv) noexcept
 {
 
 	try {
@@ -137,7 +137,7 @@ void BitSetSp::reset(std::size_t nPop, const vint& lv) noexcept
 	}
 }
 
-void BitSetSp::init (std::size_t size, bool is_popsize) noexcept {
+void BitsetSp::init (std::size_t size, bool is_popsize) noexcept {
 	try {
 		(is_popsize) ? nBB_ = static_cast<int>(INDEX_1TO1(size)) : nBB_ = static_cast<int>(size);
 		vBB_.clear();
@@ -150,7 +150,7 @@ void BitSetSp::init (std::size_t size, bool is_popsize) noexcept {
 	}	
 }
 
-BitSetSp& BitSetSp::set_bit(int firstBit, int lastBit)
+BitsetSp& BitsetSp::set_bit(int firstBit, int lastBit)
 {
 	index_t bbl = WDIV(firstBit);					//block index firstBit
 	index_t bbh = WDIV(lastBit);					//block index lastBit
@@ -302,7 +302,7 @@ BitSetSp& BitSetSp::set_bit(int firstBit, int lastBit)
 	return *this;
 }
 
-BitSetSp& BitSetSp::reset_bit(int firstBit, int lastBit){
+BitsetSp& BitsetSp::reset_bit(int firstBit, int lastBit){
 
 	index_t bbh = WDIV(lastBit);
 	index_t bbl = WDIV(firstBit);
@@ -332,7 +332,7 @@ BitSetSp& BitSetSp::reset_bit(int firstBit, int lastBit){
 	return *this;
 }
 
-BitSetSp& BitSetSp::set_bit (const BitSetSp& rhs){
+BitsetSp& BitsetSp::set_bit (const BitsetSp& rhs){
 
 	///////////////////////////////////////////////
 	assert(rhs.num_blocks() == this->num_blocks());
@@ -389,7 +389,7 @@ BitSetSp& BitSetSp::set_bit (const BitSetSp& rhs){
 	return *this;		
 }
 
-BitSetSp&  BitSetSp::set_block (int firstBlock, int lastBlock, const BitSetSp& rhs){
+BitsetSp&  BitsetSp::set_block (int firstBlock, int lastBlock, const BitsetSp& rhs){
 			
 	//special case - the full range
 	if (lastBlock == npos) {
@@ -513,7 +513,7 @@ BitSetSp&  BitSetSp::set_block (int firstBlock, int lastBlock, const BitSetSp& r
 	return *this;		
 }
 
-int BitSetSp::clear_bit (int firstBit, int lastBit){
+int BitsetSp::clear_bit (int firstBit, int lastBit){
 	
 	index_t bbl = npos;
 	index_t bbh = npos;
@@ -558,7 +558,7 @@ int BitSetSp::clear_bit (int firstBit, int lastBit){
 
 	//check consistency
 	if(firstBit > lastBit){
-		LOG_ERROR("Error in set bit in range - BitSetSp::clear_bit");
+		LOG_ERROR("Error in set bit in range - BitsetSp::clear_bit");
 		return -1;
 	}
 
@@ -612,7 +612,7 @@ int BitSetSp::clear_bit (int firstBit, int lastBit){
 	return 0;
 }
 
-BitSetSp&  BitSetSp::erase_bit (const BitSetSp& rhs ){
+BitsetSp&  BitsetSp::erase_bit (const BitsetSp& rhs ){
 
 	auto itL = vBB_.begin();		//iterator to *this
 	auto itR = rhs.vBB_.cbegin();	//iterator to rhs
@@ -642,7 +642,7 @@ BitSetSp&  BitSetSp::erase_bit (const BitSetSp& rhs ){
 	return *this;
 }
 
-BitSetSp& BitSetSp::operator &= (const BitSetSp& rhs){
+BitsetSp& BitsetSp::operator &= (const BitsetSp& rhs){
 	
 	auto itL = vBB_.begin();		//iterator to *this	
 	auto itR = rhs.vBB_.cbegin();	//iterator to rhs	
@@ -692,7 +692,7 @@ BitSetSp& BitSetSp::operator &= (const BitSetSp& rhs){
 	return *this;
 }
 
-BitSetSp& BitSetSp::operator |= (const BitSetSp& rhs){
+BitsetSp& BitsetSp::operator |= (const BitsetSp& rhs){
 
 	index_t posL = 0;					//position *this
 	auto itR = rhs.cbegin();		//iterator to rhs
@@ -744,7 +744,7 @@ BitSetSp& BitSetSp::operator |= (const BitSetSp& rhs){
 	return *this;
 }
 
-BitSetSp& BitSetSp::operator ^= (const BitSetSp& rhs) {
+BitsetSp& BitsetSp::operator ^= (const BitsetSp& rhs) {
 
 	index_t posL = 0;					//position *this	
 	auto itR = rhs.cbegin();		//iterator to rhs
@@ -799,7 +799,7 @@ BitSetSp& BitSetSp::operator ^= (const BitSetSp& rhs) {
 }
 
 
-BITBOARD BitSetSp::find_block (index_t blockID) const{
+BITBOARD BitsetSp::find_block (index_t blockID) const{
 
 	////////////////////////////////////////////////////////////////////////////////////////////
 	auto it = lower_bound(vBB_.cbegin(), vBB_.cend(), SparseBlock(blockID), pBlock_less());
@@ -814,8 +814,8 @@ BITBOARD BitSetSp::find_block (index_t blockID) const{
 }
 
 
-std::pair<bool, typename BitSetSp::index_t>
-BitSetSp::find_block_pos (index_t blockID) const{
+std::pair<bool, typename BitsetSp::index_t>
+BitsetSp::find_block_pos (index_t blockID) const{
 
 	std::pair<bool, index_t> res(false, EMPTY_ELEM);
 
@@ -841,7 +841,7 @@ BitSetSp::find_block_pos (index_t blockID) const{
 ////
 ////////////////////////////
 
-ostream& BitSetSp::print (std::ostream& o, bool show_pc, bool endl ) const  {
+ostream& BitsetSp::print (std::ostream& o, bool show_pc, bool endl ) const  {
 	
 	/////////////
 	o << '[';
@@ -871,7 +871,7 @@ ostream& BitSetSp::print (std::ostream& o, bool show_pc, bool endl ) const  {
 	return o;
 }
 
-string BitSetSp::to_string ()  const{
+string BitsetSp::to_string ()  const{
 
 	ostringstream sstr;
 
@@ -893,7 +893,7 @@ string BitSetSp::to_string ()  const{
 	return sstr.str();
 }
 
-void BitSetSp::extract (std::vector<int>& lb) const{
+void BitsetSp::extract (std::vector<int>& lb) const{
 
 	lb.clear();
 
@@ -903,7 +903,7 @@ void BitSetSp::extract (std::vector<int>& lb) const{
 	}
 }
 
-BitSetSp::operator vint() const
+BitsetSp::operator vint() const
 {
 	vint lb;
 	extract(lb);
@@ -917,29 +917,29 @@ BitSetSp::operator vint() const
 ///////////////////////////////
 
 ///////////////////
-// Bit scanning with cached BitSetSp::block_scanned
+// Bit scanning with cached BitsetSp::block_scanned
 // (UNSAFE)
 
 
-//int BitSetSp::prev_bit(int lastBit) {
+//int BitsetSp::prev_bit(int lastBit) {
 //
 //	//special case - first bitscan
 //	if (lastBit == BBObject::noBit) {
 //
 //		//finds msb AND caches next block to scan
-//		return msb(BitSetSp::block_scanned);
+//		return msb(BitsetSp::block_scanned);
 //	}
 //
-//	//if block of firstBit exists it MUST be  BitSetSp::block_scanned - compute lsb
-//	int npos = bblock::msb(vBB_[BitSetSp::block_scanned].bb_ & Tables::mask_low[lastBit - WMUL(BitSetSp::block_scanned)]);
+//	//if block of firstBit exists it MUST be  BitsetSp::block_scanned - compute lsb
+//	int npos = bblock::msb(vBB_[BitsetSp::block_scanned].bb_ & Tables::mask_low[lastBit - WMUL(BitsetSp::block_scanned)]);
 //	if (npos != BBObject::noBit) {
-//		return (WMUL(BitSetSp::block_scanned) + npos);
+//		return (WMUL(BitsetSp::block_scanned) + npos);
 //	}
 //
-//	//BitSetSp::block_scanned does not exist - finds closest block to BitSetSp::block_scanned
-//	for (int i = BitSetSp::block_scanned - 1; i >= 0; --i) {  //new bitblock
+//	//BitsetSp::block_scanned does not exist - finds closest block to BitsetSp::block_scanned
+//	for (int i = BitsetSp::block_scanned - 1; i >= 0; --i) {  //new bitblock
 //		if (vBB_[i].bb_) {
-//			BitSetSp::block_scanned = i;
+//			BitsetSp::block_scanned = i;
 //			return bblock::msb(vBB_[i].bb_) + WMUL(vBB_[i].idx_);
 //		}
 //	}
@@ -947,28 +947,28 @@ BitSetSp::operator vint() const
 //	return BBObject::noBit;
 //}
 //
-//int BitSetSp::next_bit(int firstBit) {
+//int BitsetSp::next_bit(int firstBit) {
 //
 //	//special case - first bitscan
 //	if (firstBit == BBObject::noBit) {
 //
 //		//finds lsb AND caches next block to scan
-//		return lsb(BitSetSp::block_scanned);
+//		return lsb(BitsetSp::block_scanned);
 //	}
 //
-//	//if block of firstBit exists it MUST be  BitSetSp::block_scanned - compute lsb
-//	int npos = bblock::lsb(vBB_[BitSetSp::block_scanned].bb_ & Tables::mask_high[firstBit - WMUL(BitSetSp::block_scanned)]);
+//	//if block of firstBit exists it MUST be  BitsetSp::block_scanned - compute lsb
+//	int npos = bblock::lsb(vBB_[BitsetSp::block_scanned].bb_ & Tables::mask_high[firstBit - WMUL(BitsetSp::block_scanned)]);
 //	if (npos != BBObject::noBit) {
-//		return (npos + WMUL(BitSetSp::block_scanned));
+//		return (npos + WMUL(BitsetSp::block_scanned));
 //	}
 //
 //	//bbL does not exist - finds closest block to bbL
-//	for (auto i = BitSetSp::block_scanned + 1; i < vBB_.size(); ++i) {
+//	for (auto i = BitsetSp::block_scanned + 1; i < vBB_.size(); ++i) {
 //		//new bitblock
 //		if (vBB_[i].bb_) {
 //
 //			//update cached block
-//			BitSetSp::block_scanned = i;
+//			BitsetSp::block_scanned = i;
 //			return bblock::lsb64_de_Bruijn(vBB_[i].bb_) + WMUL(vBB_[i].idx_);
 //		}
 //	}
@@ -976,7 +976,7 @@ BitSetSp::operator vint() const
 //	return BBObject::noBit;
 //}
 
-ostream& BitSetSp::SparseBlock::print(ostream& o, bool eofl) const
+ostream& BitsetSp::SparseBlock::print(ostream& o, bool eofl) const
 {
 
 	o << "[";

@@ -1,6 +1,6 @@
  /**
   * @file bbset_sparse.h
-  * @brief header for sparse class equivalent to the BitSetSp class
+  * @brief header for sparse class equivalent to the BitsetSp class
   * @author pss
   * @details created 19/12/2015?, @last_update 08/12/2025 (improved design, types etc.)
   *
@@ -29,12 +29,12 @@ namespace bitgraph {
 		
 	/////////////////////////////////
 	//
-	// class BitSetSp
+	// class BitsetSp
 	// (manages sparse bit strings, except efficient bitscanning)
 	//
 	///////////////////////////////////
 
-	class BitSetSp : public BBObject {
+	class BitsetSp : public BBObject {
 				
 		using index_t = BBObject::index_t;
 	
@@ -79,8 +79,8 @@ namespace bitgraph {
 		// Independent operators / masks  
 	public:
 
-		friend bool operator ==			(const BitSetSp& lhs, const BitSetSp& rhs);
-		friend bool operator !=			(const BitSetSp& lhs, const BitSetSp& rhs);
+		friend bool operator ==			(const BitsetSp& lhs, const BitsetSp& rhs);
+		friend bool operator !=			(const BitsetSp& lhs, const BitsetSp& rhs);
 
 		/**
 		* @brief AND between lhs and rhs sparse bitsets - stores the result in sparse bitset res
@@ -90,13 +90,13 @@ namespace bitgraph {
 		* #details: currently two implementations, one optimized for THIS having less population and the other
 		*			assuming both THIS and rhs have similar population
 		**/
-		friend  BitSetSp& AND(const BitSetSp& lhs, const BitSetSp& rhs, BitSetSp& res);
+		friend  BitsetSp& AND(const BitsetSp& lhs, const BitsetSp& rhs, BitsetSp& res);
 
 		/**
 		* @brief AND between lhs and rhs bitsets - stores the result in @lhs
 		* @returns resulting bitset
 		**/
-		friend BitSetSp AND(BitSetSp lhs, const BitSetSp& rhs);
+		friend BitsetSp AND(BitsetSp lhs, const BitsetSp& rhs);
 
 		/**
 		* @brief AND between lhs and rhs bitsets in the CLOSED block bit-range [firstBit, lastBit]
@@ -109,7 +109,7 @@ namespace bitgraph {
 		*
 		* TODO... (25/02/2025)
 		**/
-		friend BitSetSp& AND(int firstBit, int lastBit, const BitSetSp& lhs, const BitSetSp& rhs, BitSetSp& res) = delete;
+		friend BitsetSp& AND(int firstBit, int lastBit, const BitsetSp& lhs, const BitsetSp& rhs, BitsetSp& res) = delete;
 
 		/**
 		* @brief AND between lhs and rhs bitsets in the CLOSED block-range [firstBlock, lastBlock]
@@ -120,7 +120,7 @@ namespace bitgraph {
 		* @returns reference to the resulting bitstring res
 		* @details: The num_blocks of lhs and rhs must be the same.
 		**/
-		friend  BitSetSp& AND_block(index_t firstBlock, index_t lastBlock, const BitSetSp& lhs, const BitSetSp& rhs, BitSetSp& res);
+		friend  BitsetSp& AND_block(index_t firstBlock, index_t lastBlock, const BitsetSp& lhs, const BitsetSp& rhs, BitsetSp& res);
 
 		/**
 		* @brief OR between lhs and rhs sparse bitsets - stores the result in sparse bitset res
@@ -128,7 +128,7 @@ namespace bitgraph {
 		* @param res: output bitset
 		* @returns reference to res
 		**/
-		friend  BitSetSp& OR(const BitSetSp& lhs, const BitSetSp& rhs, BitSetSp& res);
+		friend  BitsetSp& OR(const BitsetSp& lhs, const BitsetSp& rhs, BitsetSp& res);
 
 		/**
 		* @brief Removes 1-bits in the bitstring rhs from the bitstring lhs. Stores
@@ -139,7 +139,7 @@ namespace bitgraph {
 		*
 		* TODO - add optimization policy to allow to choose reference bitset (see (1) - 25/02/2025)
 		**/
-		friend BitSetSp& erase_bit(const BitSetSp& lhs, const BitSetSp& rhs, BitSetSp& res);
+		friend BitsetSp& erase_bit(const BitsetSp& lhs, const BitsetSp& rhs, BitsetSp& res);
 
 
 		//TODO - add same interface as BitSet (25/02/2025)
@@ -147,20 +147,20 @@ namespace bitgraph {
 	/////////////////////
 	// constructors / destructors
 
-		BitSetSp() noexcept : nBB_(0) {}
+		BitsetSp() noexcept : nBB_(0) {}
 
 		/**
 		* @brief Creates an EMPTY bitset given a population size nPop		  
 		* @param nPop : population size 
 		**/
-		explicit BitSetSp(std::size_t nPop);
+		explicit BitsetSp(std::size_t nPop);
 
 		/**
 		* @brief Creates an EMPTY bitset given a number of 64-blocks
 		*		 Population size nBlocks * 64
 		* @param nBlocks : number of blocks
 		**/
-		static BitSetSp from_num_blocks(int nBlocks); 
+		static BitsetSp from_num_blocks(int nBlocks); 
 
 		/**
 		 * @brief Creates a bitset given an initial vector lv of 1-bit elements
@@ -170,7 +170,7 @@ namespace bitgraph {
 		 * @param lv : vector of integers representing 1-bits in the bitset
 		* @details: fast-fail policy, exception caught inside and the program exits
 		 **/
-		explicit BitSetSp(std::size_t nPop, const vint& lv);
+		explicit BitsetSp(std::size_t nPop, const vint& lv);
 
 		/**
 		* @brief Creates a bitset with an initial list of 1-bit elements
@@ -180,15 +180,15 @@ namespace bitgraph {
 		* @param lv : set of integers representing 1-bits in the bitset
 		* @details: fast-fail policy, exception caught inside and the program exits
 		**/
-		explicit  BitSetSp(std::size_t nPop, std::initializer_list<int> lv);
+		explicit  BitsetSp(std::size_t nPop, std::initializer_list<int> lv);
 
 		//Allows copy and move semantics
-		BitSetSp(const BitSetSp& bbN) = default;
-		BitSetSp(BitSetSp&&)		noexcept = default;
-		BitSetSp& operator =			(const BitSetSp&) = default;
-		BitSetSp& operator =			(BitSetSp&&)		noexcept = default;
+		BitsetSp(const BitsetSp& bbN) = default;
+		BitsetSp(BitsetSp&&)		noexcept = default;
+		BitsetSp& operator =			(const BitsetSp&) = default;
+		BitsetSp& operator =			(BitsetSp&&)		noexcept = default;
 
-		virtual ~BitSetSp() = default;
+		virtual ~BitsetSp() = default;
 
 		////////////
 		//reset / init (heap allocation)
@@ -482,12 +482,12 @@ namespace bitgraph {
 		/**
 		* @brief Sets THIS to the singleton bit
 		**/
-		inline BitSetSp& reset_bit(int bit);
+		inline BitsetSp& reset_bit(int bit);
 
 		/**
 		* @brief Sets THIS to 1-bits in the	 range [firstBit, lastBit]
 		**/
-		BitSetSp& reset_bit(int firstBit, int lastBit);
+		BitsetSp& reset_bit(int firstBit, int lastBit);
 
 		/**
 		* @brief Sets THIS to rhs in the range [0, lastBit]
@@ -495,13 +495,13 @@ namespace bitgraph {
 		*			range [firstBit=0, lastBit]
 		**/
 	protected:
-		inline	BitSetSp& reset_bit(int lastBit, const BitSetSp& rhs);
+		inline	BitsetSp& reset_bit(int lastBit, const BitsetSp& rhs);
 
 		/**
 		* @brief Sets THIS to rhs in the closed range [firstBit, lastBit]
 		**/
 	public:
-		inline	BitSetSp& reset_bit(int firstBit, int lastBit, const BitSetSp& rhs);
+		inline	BitsetSp& reset_bit(int firstBit, int lastBit, const BitsetSp& rhs);
 
 		/**
 		* @brief Sets bit in THIS. If bit is outside the num_blocks of the bitset
@@ -513,7 +513,7 @@ namespace bitgraph {
 		* @details O (log n) to insert the new block according to index
 		*		   ( + n potential shifts since it is a vector)
 		**/
-		inline	BitSetSp& set_bit(int bit);
+		inline	BitsetSp& set_bit(int bit);
 
 		/**
 		* @brief sets bits in the closed range [firstBit, lastBit]
@@ -525,7 +525,7 @@ namespace bitgraph {
 		*				the first block of the range
 		* @details  III.O(n log n) average case for sorting (if required)
 		**/
-		BitSetSp& set_bit(int firstBit, int lastBit);
+		BitsetSp& set_bit(int firstBit, int lastBit);
 
 		/**
 		* @brief Adds the bits from the bitstring bitset in the population
@@ -538,8 +538,8 @@ namespace bitgraph {
 		* @details  Does not use iterators - not necessary to allocate memory a priori
 		* @returns  reference to the modified bitstring
 		**/
-		BitSetSp& set_bit(const BitSetSp& bitset);
-		BitSetSp& set_bit(int firstBit, int lastBit, const BitSetSp& bitset) = delete;	 //TODO
+		BitsetSp& set_bit(const BitsetSp& bitset);
+		BitsetSp& set_bit(int firstBit, int lastBit, const BitsetSp& bitset) = delete;	 //TODO
 
 		/**
 		* @brief Adds 1-bits in bitset in the closed range [firstBlock, lastBlock] to *this
@@ -549,7 +549,7 @@ namespace bitgraph {
 		* @returns reference to the modified bitstring
 		* @details Does not require to allocate memory a priori
 		**/
-		BitSetSp& set_block(int firstBlock, int lastBlock, const BitSetSp& bitset);
+		BitsetSp& set_block(int firstBlock, int lastBlock, const BitsetSp& bitset);
 
 	protected:
 		/**
@@ -558,7 +558,7 @@ namespace bitgraph {
 		*
 		* TODO - CHECK, possible OR operation is missing (23/02/2025)
 		**/
-		inline BitSetSp& set_block(int firstBlock, const BitSetSp& bitset);
+		inline BitsetSp& set_block(int firstBlock, const BitsetSp& bitset);
 
 	public:
 		/**
@@ -567,7 +567,7 @@ namespace bitgraph {
 		* @returns reference to the modified bitstring
 		* @details: zero blocks are not removed
 		**/
-		inline	BitSetSp& erase_bit(int bit);
+		inline	BitsetSp& erase_bit(int bit);
 
 		/**
 		* @brief sets the bits in the closed range [firstBit, lastBit] to 0 in the bitstring
@@ -575,7 +575,7 @@ namespace bitgraph {
 		* @details: last_update 19/02/25
 		* @details: zero blocks are not removed
 		**/
-		inline BitSetSp& erase_bit(int firstBit, int lastBit);
+		inline BitsetSp& erase_bit(int firstBit, int lastBit);
 
 		/**
 		 * @brief sets bit to 0 in the bitstring and returns t
@@ -603,7 +603,7 @@ namespace bitgraph {
 		* @details: zero blocks are not removed
 		* @returns reference to the modified bitstring
 		**/
-		BitSetSp& erase_bit(const BitSetSp& bitset);
+		BitsetSp& erase_bit(const BitsetSp& bitset);
 
 		/**
 		* @brief erase operation which effectively removes the zero blocks
@@ -623,7 +623,7 @@ namespace bitgraph {
 		* @param bitset: input bitstring whose 1-bits are to be removed from *this
 		* @returns reference to the modified bitstring
 		**/
-		inline  BitSetSp& erase_block(index_t firstBlock, index_t lastBlock, const BitSetSp& bitset);
+		inline  BitsetSp& erase_block(index_t firstBlock, index_t lastBlock, const BitsetSp& bitset);
 	
 	protected:
 		/**
@@ -635,7 +635,7 @@ namespace bitgraph {
 		* @param bitset: input bitstring whose 1-bits are to be removed from *this
 		* @returns reference to the modified bitstring
 		**/
-		inline BitSetSp& erase_block(index_t firstBlock, const BitSetSp& bitset);
+		inline BitsetSp& erase_block(index_t firstBlock, const BitsetSp& bitset);
 
 	public:
 		/**
@@ -645,7 +645,7 @@ namespace bitgraph {
 		*
 		* TODO - remove after checking calls  (22/02/2025)
 		**/
-		BitSetSp& erase_block_pos(int firstBlockPos, const BitSetSp& rhs) = delete;
+		BitsetSp& erase_block_pos(int firstBlockPos, const BitsetSp& rhs) = delete;
 
 		////////////////////////
 		//Operators (member functions)
@@ -654,19 +654,19 @@ namespace bitgraph {
 		* @brief Bitwise AND operator with rhs
 		* @details apply for set intersection
 		**/
-		BitSetSp& operator &=				(const BitSetSp& rhs);
+		BitsetSp& operator &=				(const BitsetSp& rhs);
 
 		/**
 		* @brief Bitwise OR operator with rhs
 		* @details set union operation
 		**/
-		BitSetSp& operator |=				(const BitSetSp& rhs);
+		BitsetSp& operator |=				(const BitsetSp& rhs);
 
 		/**
 		* @brief Bitwise XOR operator with rhs
 		* @details set symmetric difference operation
 		**/
-		BitSetSp& operator ^=				(const BitSetSp& rhs);
+		BitsetSp& operator ^=				(const BitsetSp& rhs);
 
 		/**
 		* @brief Bitwise AND operator with rhs in the range [firstBlock, END)
@@ -675,12 +675,12 @@ namespace bitgraph {
 		*
 		* TODO - check semantics when the num_blocks of bitset is greater than the num_blocks of THIS (23/02/2025)
 		**/
-		inline BitSetSp& AND_block(index_t firstBlock, const BitSetSp& rhs);
+		inline BitsetSp& AND_block(index_t firstBlock, const BitsetSp& rhs);
 
 		/////////////////////////
 		//TODO - (19/02/2025)
 
-		BitSetSp& AND_block(int firstBlock, int lastBlock, const BitSetSp& bitset) = delete;
+		BitsetSp& AND_block(int firstBlock, int lastBlock, const BitsetSp& bitset) = delete;
 
 		/////////////////////////////
 		//Boolean functions
@@ -701,13 +701,13 @@ namespace bitgraph {
 		/**
 		* @brief TRUE if this bitstring has no bits in common with rhs
 		**/
-		inline	bool is_disjoint(const BitSetSp& bb)	const;
+		inline	bool is_disjoint(const BitsetSp& bb)	const;
 
 		/**
 		* @brief TRUE if this bitstring has no bits in common with rhs
 		*		 in the closed range [firstBlock, lastBlock]
 		**/
-		inline	bool is_disjoint_block(index_t firstBlock, index_t lastBlock, const BitSetSp& bb)   const;
+		inline	bool is_disjoint_block(index_t firstBlock, index_t lastBlock, const BitsetSp& bb)   const;
 
 		////////////////////////
 		 //Other operations 
@@ -762,7 +762,7 @@ namespace bitgraph {
 		BlockVec  vBB_;				//a vector of sorted pairs of a non-empty bitblock and its index in a non-sparse bitstring
 		int nBB_;					//maximum number of bitblocks
 
-	}; //end BitSetSp class
+	}; //end BitsetSp class
 
 
 }//end namespace bitgraph
@@ -775,7 +775,7 @@ namespace bitgraph {
 
 namespace bitgraph {
 
-	bool BitSetSp::is_bit(int bit)	const {
+	bool BitsetSp::is_bit(int bit)	const {
 
 		int bb = WDIV(bit);
 
@@ -789,7 +789,7 @@ namespace bitgraph {
 	}
 
 
-	bool BitSetSp::is_empty()	const {
+	bool BitsetSp::is_empty()	const {
 
 		if (!vBB_.empty()) {
 
@@ -805,7 +805,7 @@ namespace bitgraph {
 	}
 
 
-	bool BitSetSp::is_disjoint(const BitSetSp& rhs) const {
+	bool BitsetSp::is_disjoint(const BitsetSp& rhs) const {
 
 		auto itL = vBB_.begin();
 		auto itR = rhs.vBB_.begin();
@@ -832,7 +832,7 @@ namespace bitgraph {
 	}
 
 
-	bool BitSetSp::is_disjoint_block(index_t firstBlock, index_t lastBlock, const BitSetSp& rhs)   const {
+	bool BitsetSp::is_disjoint_block(index_t firstBlock, index_t lastBlock, const BitsetSp& rhs)   const {
 
 		///////////////////////////////////////////////////////////////////////////////////
 		assert(firstBlock >= 0 && firstBlock <= lastBlock && (lastBlock < static_cast<index_t>(rhs.num_blocks())));
@@ -878,8 +878,8 @@ namespace bitgraph {
 	// Bit updates
 
 
-	BitSetSp&
-		BitSetSp::erase_bit(int bit) {
+	BitsetSp&
+		BitsetSp::erase_bit(int bit) {
 
 		auto bb = WDIV(bit);
 
@@ -896,8 +896,8 @@ namespace bitgraph {
 	}
 
 
-	BitSetSp::BlockVecIt 
-		BitSetSp::erase_bit(int bit, BitSetSp::BlockVecIt  from_it) {
+	BitsetSp::BlockVecIt 
+		BitsetSp::erase_bit(int bit, BitsetSp::BlockVecIt  from_it) {
 
 		int bb = WDIV(bit);
 
@@ -914,8 +914,8 @@ namespace bitgraph {
 	}
 
 
-	BitSetSp&
-		BitSetSp::set_bit(int bit) {
+	BitsetSp&
+		BitsetSp::set_bit(int bit) {
 
 		auto bb = WDIV(bit);
 
@@ -947,8 +947,8 @@ namespace bitgraph {
 
 
 
-	BitSetSp&
-		BitSetSp::reset_bit(int bit) {
+	BitsetSp&
+		BitsetSp::reset_bit(int bit) {
 
 		vBB_.clear();
 
@@ -959,7 +959,7 @@ namespace bitgraph {
 	}
 
 
-	int BitSetSp::next_bit(int firstBit)  const {
+	int BitsetSp::next_bit(int firstBit)  const {
 
 		//special case - first bitscan
 		if (firstBit == BBObject::noBit) {
@@ -995,7 +995,7 @@ namespace bitgraph {
 	}
 
 
-	int BitSetSp::prev_bit(int lastBit) const {
+	int BitsetSp::prev_bit(int lastBit) const {
 
 		//special case - first bitscan
 		if (lastBit == BBObject::noBit) {
@@ -1028,7 +1028,7 @@ namespace bitgraph {
 	}
 
 
-	int BitSetSp::msbn64_intrin(int& block)	const {
+	int BitsetSp::msbn64_intrin(int& block)	const {
 
 		Ul posInBB;
 		const auto size = static_cast<int>(vBB_.size());
@@ -1066,7 +1066,7 @@ namespace bitgraph {
 	}
 
 
-	int BitSetSp::msbn64_lup() const {
+	int BitsetSp::msbn64_lup() const {
 
 		union u {
 			U16 c[4];
@@ -1088,7 +1088,7 @@ namespace bitgraph {
 	}
 
 
-	int BitSetSp::msbn64_intrin() const
+	int BitsetSp::msbn64_intrin() const
 	{
 		Ul posInBB;
 		const auto size = static_cast<int>(vBB_.size());
@@ -1103,7 +1103,7 @@ namespace bitgraph {
 		return BBObject::noBit;
 	}
 
-	int BitSetSp::lsbn64_intrin(int& block) const {
+	int BitsetSp::lsbn64_intrin(int& block) const {
 
 		Ul posInBB;
 
@@ -1151,7 +1151,7 @@ namespace bitgraph {
 	}
 
 
-	int BitSetSp::lsbn64_non_intrin() const {
+	int BitsetSp::lsbn64_non_intrin() const {
 
 #ifdef DE_BRUIJN
 		for (auto i = 0u; i < vBB_.size(); ++i) {
@@ -1184,7 +1184,7 @@ namespace bitgraph {
 		return EMPTY_ELEM;
 	}
 
-	int BitSetSp::lsbn64_intrin() const
+	int BitsetSp::lsbn64_intrin() const
 	{
 		Ul posInBB;
 
@@ -1198,7 +1198,7 @@ namespace bitgraph {
 	}
 
 
-	int BitSetSp::popcn64() const {
+	int BitsetSp::popcn64() const {
 
 		BITBOARD pc = 0;
 
@@ -1210,7 +1210,7 @@ namespace bitgraph {
 	}
 
 
-	int BitSetSp::popcn64(int firstBit) const {
+	int BitsetSp::popcn64(int firstBit) const {
 
 		auto bbL = WDIV(firstBit);
 		auto it = lower_bound(vBB_.begin(), vBB_.end(), SparseBlock(bbL), pBlock_less());
@@ -1233,7 +1233,7 @@ namespace bitgraph {
 	}
 
 
-	int BitSetSp::popcn64(int firstBit, int lastBit) const
+	int BitsetSp::popcn64(int firstBit, int lastBit) const
 	{
 		////////////////////////////////
 		if (lastBit == -1) {
@@ -1263,7 +1263,7 @@ namespace bitgraph {
 
 
 
-	BitSetSp& BitSetSp::AND_block(index_t firstBlock, const BitSetSp& rhs) {
+	BitsetSp& BitsetSp::AND_block(index_t firstBlock, const BitsetSp& rhs) {
 
 		//determine the closes block to firstBlock
 		index_t posL = npos;
@@ -1315,7 +1315,7 @@ namespace bitgraph {
 	}
 
 
-	BitSetSp& BitSetSp::set_block(int firstBlock, const BitSetSp& rhs) {
+	BitsetSp& BitsetSp::set_block(int firstBlock, const BitsetSp& rhs) {
 
 		//determine the closes block to firstBlock
 		auto  pairTHIS = this->find_block_ext(firstBlock);		//*this
@@ -1364,7 +1364,7 @@ namespace bitgraph {
 
 
 
-	BitSetSp& BitSetSp::erase_block(index_t firstBlock, index_t lastBlock, const BitSetSp& rhs)
+	BitsetSp& BitsetSp::erase_block(index_t firstBlock, index_t lastBlock, const BitsetSp& rhs)
 	{
 		//special case until the end of the bitset
 		if (lastBlock == -1) {
@@ -1410,7 +1410,7 @@ namespace bitgraph {
 	}
 
 
-	BitSetSp& BitSetSp::erase_block(index_t firstBlock, const BitSetSp& rhs) {
+	BitsetSp& BitsetSp::erase_block(index_t firstBlock, const BitsetSp& rhs) {
 
 
 		//determine the closest block in the range for both bitstrings
@@ -1447,7 +1447,7 @@ namespace bitgraph {
 	}
 
 
-	BitSetSp& BitSetSp::erase_bit(int firstBit, int lastBit) {
+	BitsetSp& BitsetSp::erase_bit(int firstBit, int lastBit) {
 
 		//////////////////////////////////////////////
 		assert(firstBit >= 0 && firstBit <= lastBit);
@@ -1526,7 +1526,7 @@ namespace bitgraph {
 	}
 
 
-	BitSetSp& BitSetSp::reset_bit(int lastBit, const BitSetSp& rhs) {
+	BitsetSp& BitsetSp::reset_bit(int lastBit, const BitsetSp& rhs) {
 
 		index_t bbh = WDIV(lastBit);
 
@@ -1556,7 +1556,7 @@ namespace bitgraph {
 	}
 
 
-	BitSetSp& BitSetSp::reset_bit(int firstBit, int lastBit, const BitSetSp& rhs) {
+	BitsetSp& BitsetSp::reset_bit(int firstBit, int lastBit, const BitsetSp& rhs) {
 
 		//////////////////////////////
 		//special case - range starts from the beginning, called specialized case
@@ -1624,8 +1624,8 @@ namespace bitgraph {
 
 	template<bool ReturnInsertPos>
 	inline
-		BitSetSp::BlockVecConstIt
-		BitSetSp::find_block(index_t blockID, index_t& pos) const
+		BitsetSp::BlockVecConstIt
+		BitsetSp::find_block(index_t blockID, index_t& pos) const
 	{
 
 		////////////////////////////////////////////////////////////////////////////////////////////
@@ -1644,8 +1644,8 @@ namespace bitgraph {
 
 	template<bool ReturnInsertPos>
 	inline
-		BitSetSp::BlockVecIt 
-		BitSetSp::find_block(index_t blockID, index_t& pos)
+		BitsetSp::BlockVecIt 
+		BitsetSp::find_block(index_t blockID, index_t& pos)
 	{
 
 		////////////////////////////////////////////////////////////////////////////////////////////
@@ -1663,8 +1663,8 @@ namespace bitgraph {
 	}
 
 	template<bool UseLowerBound>
-	std::pair<bool, BitSetSp::BlockVecIt >
-		BitSetSp::find_block_ext(index_t blockID)
+	std::pair<bool, BitsetSp::BlockVecIt >
+		BitsetSp::find_block_ext(index_t blockID)
 	{
 		std::pair<bool, BlockVecIt > res;
 
@@ -1687,8 +1687,8 @@ namespace bitgraph {
 	}
 
 	template<bool UseLowerBound>
-	std::pair<bool, BitSetSp::BlockVecConstIt>
-		BitSetSp::find_block_ext(index_t blockID) const
+	std::pair<bool, BitsetSp::BlockVecConstIt>
+		BitsetSp::find_block_ext(index_t blockID) const
 	{
 		std::pair<bool, BlockVecConstIt>res;
 
@@ -1714,22 +1714,22 @@ namespace bitgraph {
 
 
 ///////////////////////////
-// friend functions of BitSetSp
+// friend functions of BitsetSp
 
 namespace bitgraph {
 
 	inline
-		bool operator == (const BitSetSp& lhs, const BitSetSp& rhs) {
+		bool operator == (const BitsetSp& lhs, const BitsetSp& rhs) {
 		return((lhs.nBB_ == rhs.nBB_) &&
 			(lhs.vBB_ == rhs.vBB_));
 	}
 
 	inline
-		bool operator != (const BitSetSp& lhs, const BitSetSp& rhs) { return !(lhs == rhs); }
+		bool operator != (const BitsetSp& lhs, const BitsetSp& rhs) { return !(lhs == rhs); }
 
 
 	inline
-		BitSetSp& AND(const BitSetSp& lhs, const BitSetSp& rhs, BitSetSp& res) {
+		BitsetSp& AND(const BitsetSp& lhs, const BitsetSp& rhs, BitsetSp& res) {
 
 
 		/////////////////////////////////////////////////////////////
@@ -1756,7 +1756,7 @@ namespace bitgraph {
 			}
 			else {
 				////////////////////////////////////////////////////////////////////////
-				res.vBB_.push_back(BitSetSp::SparseBlock(itL->idx_, itL->bb_ & itR->bb_));
+				res.vBB_.push_back(BitsetSp::SparseBlock(itL->idx_, itL->bb_ & itR->bb_));
 				/////////////////////////////////////////////////////////////////////////
 				itL++;
 				itR++;
@@ -1777,7 +1777,7 @@ namespace bitgraph {
 
 		//	//blocks remain to be examined in both bitsets
 		//	if (blockL.idx_ == itR->idx_) {
-		//		res.vBB_.push_back(BitSetSp::SparseBlock(blockL.idx_, blockL.bb_ & itR->bb_));
+		//		res.vBB_.push_back(BitsetSp::SparseBlock(blockL.idx_, blockL.bb_ & itR->bb_));
 		//	}
 		//	
 		//}
@@ -1786,10 +1786,10 @@ namespace bitgraph {
 	}
 
 	inline
-		BitSetSp AND(BitSetSp lhs, const BitSetSp& rhs) { return lhs &= rhs; }
+		BitsetSp AND(BitsetSp lhs, const BitsetSp& rhs) { return lhs &= rhs; }
 
 	inline
-		BitSetSp& OR(const BitSetSp& lhs, const BitSetSp& rhs, BitSetSp& res) {
+		BitsetSp& OR(const BitsetSp& lhs, const BitsetSp& rhs, BitsetSp& res) {
 
 		/////////////////////////////////////////////////////////////
 		res.reset((int)lhs.num_blocks(), false);
@@ -1802,19 +1802,19 @@ namespace bitgraph {
 		while (itL != lhs.vBB_.end() && itR != rhs.vBB_.end()) {
 
 			if (itL->idx_ < itR->idx_) {
-				res.vBB_.push_back(BitSetSp::SparseBlock(itL->idx_, itL->bb_));
+				res.vBB_.push_back(BitsetSp::SparseBlock(itL->idx_, itL->bb_));
 				res.print(std::cout, true);
 				itL++;
 			}
 			else if (itL->idx_ > itR->idx_) {
-				res.vBB_.push_back(BitSetSp::SparseBlock(itR->idx_, itR->bb_));
+				res.vBB_.push_back(BitsetSp::SparseBlock(itR->idx_, itR->bb_));
 				res.print(std::cout, true);
 				itR++;
 			}
 			else {
 
 				////////////////////////////////////////////////////////////////////////
-				res.vBB_.push_back(BitSetSp::SparseBlock(itL->idx_, itL->bb_ | itR->bb_));
+				res.vBB_.push_back(BitsetSp::SparseBlock(itL->idx_, itL->bb_ | itR->bb_));
 				/////////////////////////////////////////////////////////////////////////
 
 				itL++;
@@ -1836,12 +1836,12 @@ namespace bitgraph {
 
 
 	inline
-		BitSetSp& AND_block(BitSetSp::index_t firstBlock, BitSetSp::index_t lastBlock, const BitSetSp& lhs, const BitSetSp& rhs, BitSetSp& res) 
+		BitsetSp& AND_block(BitsetSp::index_t firstBlock, BitsetSp::index_t lastBlock, const BitsetSp& lhs, const BitsetSp& rhs, BitsetSp& res) 
 	{
 		
 		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		assert(firstBlock >= 0 && firstBlock <= lastBlock);
-		assert(lastBlock < static_cast<BitSetSp::index_t>(rhs.num_blocks()) && lastBlock < static_cast<BitSetSp::index_t>(lhs.num_blocks()));
+		assert(lastBlock < static_cast<BitsetSp::index_t>(rhs.num_blocks()) && lastBlock < static_cast<BitsetSp::index_t>(lhs.num_blocks()));
 		///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 		//////////////////////////////////////////////////////////////
@@ -1849,8 +1849,8 @@ namespace bitgraph {
 		res.vBB_.reserve(std::min(lhs.vBB_.size(), rhs.vBB_.size()));
 		//////////////////////////////////////////////////////////////
 
-		BitSetSp::index_t posL = BitSetSp::npos;
-		BitSetSp::index_t posR = BitSetSp::npos;
+		BitsetSp::index_t posL = BitsetSp::npos;
+		BitsetSp::index_t posR = BitsetSp::npos;
 		auto itL = lhs.find_block(firstBlock, posL);
 		auto itR = rhs.find_block(firstBlock, posR);
 
@@ -1874,7 +1874,7 @@ namespace bitgraph {
 			else {
 				//blocks with same index
 				///////////////////////////////////
-				res.vBB_.push_back(BitSetSp::SparseBlock(itL->idx_, itL->bb_ & itR->bb_));
+				res.vBB_.push_back(BitsetSp::SparseBlock(itL->idx_, itL->bb_ & itR->bb_));
 				///////////////////////////////////
 				++itL;
 				++itR;
@@ -1886,7 +1886,7 @@ namespace bitgraph {
 	}
 
 	inline
-		BitSetSp& erase_bit(const BitSetSp& lhs, const BitSetSp& rhs, BitSetSp& res) {
+		BitsetSp& erase_bit(const BitsetSp& lhs, const BitsetSp& rhs, BitsetSp& res) {
 
 		//special case - rhs empty bitstring
 		if (rhs.is_empty()) {
@@ -1915,10 +1915,10 @@ namespace bitgraph {
 
 			//blocks remain to be examined in both bitsets
 			if (blockL.idx_ == itR->idx_) {
-				res.vBB_.push_back(BitSetSp::SparseBlock(blockL.idx_, blockL.bb_ & ~itR->bb_));
+				res.vBB_.push_back(BitsetSp::SparseBlock(blockL.idx_, blockL.bb_ & ~itR->bb_));
 			}
 			else {
-				res.vBB_.push_back(BitSetSp::SparseBlock(blockL.idx_, blockL.bb_));
+				res.vBB_.push_back(BitsetSp::SparseBlock(blockL.idx_, blockL.bb_));
 			}
 		}
 
@@ -1947,7 +1947,7 @@ namespace bitgraph {
 /////////////////////////
 
 //inline
-//BitSetSp&  BitSetSp::erase_block_pos (int first_pos_of_block, const BitSetSp& rhs ){
+//BitsetSp&  BitsetSp::erase_block_pos (int first_pos_of_block, const BitsetSp& rhs ){
 ///////////////////////
 //// erases bits from a starting block in *this (given as the position in the bitstring collection, not its index) till the end of the bitstring, 
 //

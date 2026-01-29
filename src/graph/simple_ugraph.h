@@ -130,7 +130,7 @@ namespace bitgraph {
 		*
 		* TODO - currently not implemented, only for sparse graphs (03/03/2025)
 		**/
-		int degree(int v, const BitSetSp& bbs) const;
+		int degree(int v, const BitsetSp& bbs) const;
 
 		/**
 		*  @brief truncated number of neighbors of v in a set of vertices
@@ -152,7 +152,7 @@ namespace bitgraph {
 		*
 		* TODO - currently not implemented, only for sparse graphs (03/03/2025)
 		**/
-		int degree(int v, int UB, const BitSetSp& bbs) const;	//truncated degree  (14/2/2016)
+		int degree(int v, int UB, const BitsetSp& bbs) const;	//truncated degree  (14/2/2016)
 
 		/**
 		*  @brief number of neighbors of v in a vertex set with higher index than v
@@ -506,7 +506,7 @@ namespace bitgraph {
 
 	template<class BitsetT>
 	inline
-		int Ugraph<BitsetT>::degree(int v, const BitSetSp& bbs)	const {
+		int Ugraph<BitsetT>::degree(int v, const BitsetSp& bbs)	const {
 		LOG_ERROR("function not yet implemented, should not be called - Ugraph<BitsetT>::degree");
 		LOG_ERROR("exiting...");
 		std::exit(EXIT_FAILURE);
@@ -757,7 +757,7 @@ namespace bitgraph {
 	}
 
 	template<class BitsetT>
-	int Ugraph<BitsetT>::degree(int v, int UB, const BitSetSp& bbn) const {
+	int Ugraph<BitsetT>::degree(int v, int UB, const BitsetSp& bbn) const {
 		LOG_ERROR("function not yet implemented, should not be called - Ugraph<BitsetT>::degree");
 		LOG_ERROR("exiting...");
 		std::exit(EXIT_FAILURE);
@@ -901,7 +901,7 @@ namespace bitgraph {
 
 	template<>
 	inline
-		int USS::degree(int v, const BitSetSp& bbs) const {
+		int USS::degree(int v, const BitsetSp& bbs) const {
 
 		int ndeg = 0;
 		auto itv = adj_[v].cbegin();
@@ -939,7 +939,7 @@ namespace bitgraph {
 
 	template<>
 	inline
-		int USS::degree(int v, int UB, const BitSetSp& bbs) const {
+		int USS::degree(int v, int UB, const BitsetSp& bbs) const {
 
 		int ndeg = 0;
 		auto itv = adj_[v].cbegin();

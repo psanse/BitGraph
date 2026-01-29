@@ -28,13 +28,13 @@ protected:
 
 	//////////////////////
 	//data members
-	BitSetSp bbsp;	
+	BitsetSp bbsp;	
 	vector<int> pSet;
 };
 
 TEST(Sparse, construction_basic){
 
-	BitSetSp bbsp(1000);
+	BitsetSp bbsp(1000);
 	
 	bbsp.set_bit(500);
 	bbsp.set_bit(700);
@@ -52,7 +52,7 @@ TEST(Sparse, construction_basic){
 
 TEST(Sparse, construction_from_blocks) {
 
-	auto bbsp = BitSetSp::from_num_blocks(16);
+	auto bbsp = BitsetSp::from_num_blocks(16);
 
 	bbsp.set_bit(500);
 	bbsp.set_bit(700);
@@ -67,7 +67,7 @@ TEST(Sparse, construction_from_blocks) {
 TEST(Sparse, construction_from_vector) {
 
 	vector<int> lv = { 100, 200, 300, 400, 500 };
-	BitSetSp bbsp(1000, lv);
+	BitsetSp bbsp(1000, lv);
 
 	EXPECT_TRUE(bbsp.is_bit(100));
 	EXPECT_TRUE(bbsp.is_bit(200));
@@ -79,7 +79,7 @@ TEST(Sparse, construction_from_vector) {
 }
 
 TEST(Sparse, construction_initalizer_list) {
-	BitSetSp bbsp{ 1000, {1, 7, 10} };
+	BitsetSp bbsp{ 1000, {1, 7, 10} };
 
 	EXPECT_TRUE(bbsp.is_bit(1));
 	EXPECT_TRUE(bbsp.is_bit(7));
@@ -89,7 +89,7 @@ TEST(Sparse, construction_initalizer_list) {
 
 TEST_F(BitSetSpClassTest, copy_constructor) {
 
-	BitSetSp bbspCOPY(bbsp);
+	BitsetSp bbspCOPY(bbsp);
 
 	EXPECT_TRUE(bbspCOPY.is_bit(0));
 	EXPECT_TRUE(bbspCOPY.is_bit(50));
@@ -147,7 +147,7 @@ TEST_F(BitSetSpClassTest, reset) {
 
 TEST(Sparse, find_block)
 {
-	BitSetSp bbsp(1000);
+	BitsetSp bbsp(1000);
 	bbsp.set_bit(10);
 	bbsp.set_bit(20);
 	bbsp.set_bit(998);
@@ -156,7 +156,7 @@ TEST(Sparse, find_block)
 	EXPECT_TRUE(bblock::is_bit(bb, 38));			//the bitset starts at 960, so 998 has offset 38.
 
 	//variant returning also the position in the collection (not its real index)
-	auto pos = BitSetSp::npos;
+	auto pos = BitsetSp::npos;
 	auto it = bbsp.find_block(WDIV(1000), pos);		//bb = 998
 	EXPECT_EQ(1, pos);								//second block in the sparse bitset
 
@@ -167,7 +167,7 @@ TEST(Sparse, find_block)
 
 TEST(Sparse, find_block_2) {
 
-	BitSetSp bbsp(130);
+	BitsetSp bbsp(130);
 	bbsp.set_bit(10);
 	bbsp.set_bit(20);
 	bbsp.set_bit(64);
@@ -196,13 +196,13 @@ TEST(Sparse, find_block_2) {
 
 TEST(Sparse, member_masks) {
 
-	BitSetSp lhs;
+	BitsetSp lhs;
 	lhs.init(200);
 	lhs.set_bit(63);
 	lhs.set_bit(126);
 	lhs.set_bit(189);	
 	
-	BitSetSp rhs;
+	BitsetSp rhs;
 	rhs.init(200);
 	rhs.set_bit(63);
 	rhs.set_bit(127);
@@ -220,7 +220,7 @@ TEST(Sparse, member_masks) {
 
 TEST(Sparse, population_count){
 
-	BitSetSp bb(130);
+	BitsetSp bb(130);
 	bb.set_bit(10);
 	bb.set_bit(20);
 	bb.set_bit(64);
@@ -234,7 +234,7 @@ TEST(Sparse, population_count){
 
 TEST(Sparse, set_bits) {
 	
-	BitSetSp bbsp(10000);
+	BitsetSp bbsp(10000);
 
 	bbsp.set_bit(0);
 	bbsp.set_bit(1);
@@ -251,13 +251,13 @@ TEST(Sparse, set_bits) {
 	EXPECT_TRUE(bbsp.is_bit(3));
 	EXPECT_TRUE(bbsp.is_bit(27));
 	EXPECT_EQ(32, bbsp.count());
-	EXPECT_TRUE(std::is_sorted(bbsp.bitset().begin(), bbsp.bitset().end(), BitSetSp::pBlock_less()));
+	EXPECT_TRUE(std::is_sorted(bbsp.bitset().begin(), bbsp.bitset().end(), BitsetSp::pBlock_less()));
 	
 
 	bbsp.set_bit(1002,1002);
 	EXPECT_TRUE(bbsp.is_bit(1002));
 	EXPECT_EQ(33, bbsp.count());
-	EXPECT_TRUE(std::is_sorted(bbsp.bitset().begin(), bbsp.bitset().end(), BitSetSp::pBlock_less()));
+	EXPECT_TRUE(std::is_sorted(bbsp.bitset().begin(), bbsp.bitset().end(), BitsetSp::pBlock_less()));
 
 
 	//range
@@ -265,21 +265,21 @@ TEST(Sparse, set_bits) {
 	EXPECT_FALSE(bbsp.is_bit(28));
 	EXPECT_TRUE(bbsp.is_bit(29));
 	EXPECT_TRUE(bbsp.is_bit(125));
-	EXPECT_TRUE(std::is_sorted(bbsp.bitset().begin(), bbsp.bitset().end(), BitSetSp::pBlock_less()));
+	EXPECT_TRUE(std::is_sorted(bbsp.bitset().begin(), bbsp.bitset().end(), BitsetSp::pBlock_less()));
 
 	bbsp.set_bit(1001,1100);
 	EXPECT_FALSE(bbsp.is_bit(999));
 	EXPECT_TRUE(bbsp.is_bit(1001));
 	EXPECT_TRUE(bbsp.is_bit(1100));
 	EXPECT_FALSE(bbsp.is_bit(1101));
-	EXPECT_TRUE(std::is_sorted(bbsp.bitset().begin(), bbsp.bitset().end(), BitSetSp::pBlock_less()));
+	EXPECT_TRUE(std::is_sorted(bbsp.bitset().begin(), bbsp.bitset().end(), BitsetSp::pBlock_less()));
 
 }
 
 TEST(Sparse, set_bits_from_bitset) {
 
-	BitSetSp bbsp(10000);
-	BitSetSp bbsp1(10000);			//same population	
+	BitsetSp bbsp(10000);
+	BitsetSp bbsp1(10000);			//same population	
 
 	bbsp.set_bit(0);
 	bbsp.set_bit(1);
@@ -299,13 +299,13 @@ TEST(Sparse, set_bits_from_bitset) {
 	EXPECT_TRUE(bbsp.is_bit(9150));	
 	EXPECT_TRUE(bbsp.is_bit(3));
 	EXPECT_EQ(9, bbsp.count());
-	EXPECT_TRUE(std::is_sorted(bbsp.bitset().begin(), bbsp.bitset().end(), BitSetSp::pBlock_less()));
+	EXPECT_TRUE(std::is_sorted(bbsp.bitset().begin(), bbsp.bitset().end(), BitsetSp::pBlock_less()));
 }
 
 
 TEST(Sparse, erase_block_range) {
 
-	BitSetSp bbsp(10000);
+	BitsetSp bbsp(10000);
 
 	bbsp.set_bit(0);
 	bbsp.set_bit(1);
@@ -315,7 +315,7 @@ TEST(Sparse, erase_block_range) {
 	bbsp.set_bit(1000);
 	bbsp.set_bit(9000);
 
-	BitSetSp bbsp1(10000);
+	BitsetSp bbsp1(10000);
 		
 	bbsp1.set_bit(2);
 	bbsp1.set_bit(126);
@@ -332,7 +332,7 @@ TEST(Sparse, erase_block_range) {
 
 TEST(Sparse, set_blocks) {
 	
-	BitSetSp bbsp(10000);
+	BitsetSp bbsp(10000);
 
 	bbsp.set_bit(0);
 	bbsp.set_bit(1);
@@ -342,7 +342,7 @@ TEST(Sparse, set_blocks) {
 	bbsp.set_bit(1000);
 	bbsp.set_bit(9000);
 
-	BitSetSp bbsp1(10000);
+	BitsetSp bbsp1(10000);
 
 	bbsp1.set_bit(5);
 	bbsp1.set_bit(8);
@@ -370,7 +370,7 @@ TEST(Sparse, set_blocks) {
 
 TEST(Sparse, erase_bits) {
 	
-	BitSetSp bbsp(10000);
+	BitsetSp bbsp(10000);
 
 	bbsp.set_bit(0);
 	bbsp.set_bit(1);
@@ -423,13 +423,13 @@ TEST(Sparse, erase_bits) {
 
 TEST(Sparse, member_OR_operator) {
 
-	BitSetSp bbsp(130);
+	BitsetSp bbsp(130);
 	bbsp.set_bit(64);
 	bbsp.set_bit(120);
 	bbsp.shrink_to_fit();
 	
 
-	BitSetSp bbsp1(130);
+	BitsetSp bbsp1(130);
 	bbsp1.set_bit(5);
 	bbsp1.set_bit(54);
 	
@@ -444,19 +444,19 @@ TEST(Sparse, member_OR_operator) {
 	EXPECT_TRUE(bbsp.is_bit(54));
 	EXPECT_TRUE(bbsp.is_bit(64));
 	EXPECT_TRUE(bbsp.is_bit(120));
-	EXPECT_TRUE(std::is_sorted(bbsp.bitset().begin(), bbsp.bitset().end(), BitSetSp::pBlock_less()));
+	EXPECT_TRUE(std::is_sorted(bbsp.bitset().begin(), bbsp.bitset().end(), BitsetSp::pBlock_less()));
 	
 }
 
 TEST(Sparse, member_XOR_operator) {
 
-	BitSetSp bbsp(130);
+	BitsetSp bbsp(130);
 	bbsp.set_bit(10);
 	bbsp.set_bit(30);
 	bbsp.set_bit(64);
 	bbsp.set_bit(128);
 
-	BitSetSp bbsp1(130);
+	BitsetSp bbsp1(130);
 	bbsp1.set_bit(30);
 	bbsp1.set_bit(54);
 	bbsp1.set_bit(128);
@@ -470,18 +470,18 @@ TEST(Sparse, member_XOR_operator) {
 	EXPECT_TRUE(bbsp.is_bit(10));
 	EXPECT_TRUE(bbsp.is_bit(54));
 	EXPECT_TRUE(bbsp.is_bit(64));
-	EXPECT_TRUE(std::is_sorted(bbsp.bitset().begin(), bbsp.bitset().end(), BitSetSp::pBlock_less()));
+	EXPECT_TRUE(std::is_sorted(bbsp.bitset().begin(), bbsp.bitset().end(), BitsetSp::pBlock_less()));
 
 }
 
 TEST(Sparse, OR_block) {
 
-	BitSetSp bbsp(130);
+	BitsetSp bbsp(130);
 	bbsp.set_bit(10);
 	bbsp.set_bit(20);
 	bbsp.set_bit(64);
 
-	BitSetSp bbsp1(130);
+	BitsetSp bbsp1(130);
 	bbsp1.set_bit(30);
 	bbsp1.set_bit(54);
 	bbsp1.set_bit(128);
@@ -495,19 +495,19 @@ TEST(Sparse, OR_block) {
 	EXPECT_TRUE(bbsp.is_bit(10));
 	EXPECT_TRUE(bbsp.is_bit(64));
 	EXPECT_TRUE(bbsp.is_bit(128));
-	EXPECT_TRUE(std::is_sorted(bbsp.bitset().begin(), bbsp.bitset().end(), BitSetSp::pBlock_less()));
+	EXPECT_TRUE(std::is_sorted(bbsp.bitset().begin(), bbsp.bitset().end(), BitsetSp::pBlock_less()));
 
 }
 
 TEST(Sparse, AND_block) {
 
-	BitSetSp bbsp(130);
+	BitsetSp bbsp(130);
 	bbsp.set_bit(10);
 	bbsp.set_bit(20);
 	bbsp.set_bit(115);
 	bbsp.set_bit(128);
 
-	BitSetSp bbsp1(130);
+	BitsetSp bbsp1(130);
 	bbsp1.set_bit(30);
 	bbsp1.set_bit(54);
 	bbsp1.set_bit(115);
@@ -520,15 +520,15 @@ TEST(Sparse, AND_block) {
 	EXPECT_TRUE(bbsp.is_bit(10));
 	EXPECT_TRUE(bbsp.is_bit(20));
 	EXPECT_TRUE(bbsp.is_bit(115));
-	EXPECT_TRUE(std::is_sorted(bbsp.bitset().begin(), bbsp.bitset().end(), BitSetSp::pBlock_less()));
+	EXPECT_TRUE(std::is_sorted(bbsp.bitset().begin(), bbsp.bitset().end(), BitsetSp::pBlock_less()));
 
 }
 
 TEST(Sparse, friend_AND_block_range) {
 
-	BitSetSp bbsp(10000);
-	BitSetSp bbspAND(10000);
-	BitSetSp res(10000);
+	BitsetSp bbsp(10000);
+	BitsetSp bbspAND(10000);
+	BitsetSp res(10000);
 
 	bbsp.set_bit(0);
 	bbsp.set_bit(1);
@@ -557,13 +557,13 @@ TEST(Sparse, friend_AND_block_range) {
 
 TEST(Sparse, member_AND_operator) {
 
-	BitSetSp bbsp(130);
+	BitsetSp bbsp(130);
 	bbsp.set_bit(10);
 	bbsp.set_bit(20);
 	bbsp.set_bit(64);
 	bbsp.set_bit(129);
 
-	BitSetSp bbsp1(130);
+	BitsetSp bbsp1(130);
 	bbsp1.set_bit(10);
 	bbsp1.set_bit(64);
 	bbsp1.set_bit(128);
@@ -576,24 +576,24 @@ TEST(Sparse, member_AND_operator) {
 	EXPECT_EQ(2, bbsp.count());
 	EXPECT_TRUE(bbsp.is_bit(10));
 	EXPECT_TRUE(bbsp.is_bit(64));
-	EXPECT_TRUE(std::is_sorted(bbsp.bitset().begin(), bbsp.bitset().end(), BitSetSp::pBlock_less()));
+	EXPECT_TRUE(std::is_sorted(bbsp.bitset().begin(), bbsp.bitset().end(), BitsetSp::pBlock_less()));
 
 }
 
 TEST(Sparse, operators){
 
-	BitSetSp bbsp(130);
+	BitsetSp bbsp(130);
 	bbsp.set_bit(10);
 	bbsp.set_bit(20);
 	bbsp.set_bit(64);
 
-	BitSetSp bbsp1(130);
+	BitsetSp bbsp1(130);
 	bbsp1.set_bit(30);
 	bbsp1.set_bit(54);
 	bbsp1.set_bit(128);
 	
 	//OR
-	BitSetSp resOR(130);
+	BitsetSp resOR(130);
 	OR(bbsp1, bbsp, resOR);
 	EXPECT_EQ(6, resOR.count());
 
@@ -603,9 +603,9 @@ TEST(Sparse, operators){
 	EXPECT_TRUE(bbsp==resOR);
 
 	//AND
-	BitSetSp bbsp2(130);
+	BitsetSp bbsp2(130);
 	bbsp2.set_bit(54);
-	BitSetSp resAND(130);
+	BitsetSp resAND(130);
 	AND(bbsp1,bbsp2,resAND);
 	EXPECT_TRUE(resAND.is_bit(54));
 	EXPECT_EQ(1, resAND.count());
@@ -613,7 +613,7 @@ TEST(Sparse, operators){
 
 TEST(Sparse, insertion) {
 
-	BitSetSp bbsp(130);					
+	BitsetSp bbsp(130);					
 	bbsp.set_bit(64);
 	bbsp.set_bit(65);
 	bbsp.set_bit(12);					//obligatory
@@ -623,22 +623,22 @@ TEST(Sparse, insertion) {
 
 TEST(Sparse, integration) {
 
-	BitSetSp bbs(10000);
+	BitsetSp bbs(10000);
 	bbs.set_bit(10);
 	bbs.set_bit(1000);
 	bbs.set_bit(70);
 	bbs.set_bit(150);
 	
-	BitSetSp bbs1(10000);
+	BitsetSp bbs1(10000);
 	bbs1.set_bit(1000);
 
-	BitSetSp bbs2(10000);
+	BitsetSp bbs2(10000);
 	AND(bbs1, bbs, bbs2);
 	EXPECT_EQ(1, bbs2.count());
 	EXPECT_TRUE(bbs2.is_bit(1000));
 	EXPECT_TRUE(bbs2==bbs1);
 
-	BitSetSp bbs3(10000);
+	BitsetSp bbs3(10000);
 	OR(bbs1,bbs, bbs3);
 	EXPECT_EQ(4, bbs3.count());
 	EXPECT_TRUE(bbs3.is_bit(1000));
@@ -799,7 +799,7 @@ TEST(Sparse, operator_and_eq) {
 
 TEST(Sparse, DISABLED_clear_bits) {
 
-	BitSetSp bbsp(10000);
+	BitsetSp bbsp(10000);
 
 	bbsp.set_bit(0);
 	bbsp.set_bit(1);

@@ -26,7 +26,7 @@ namespace bitgraph {
 	//
 	///////////////////////////////////
 
-	class BBScanSp : public BitSetSp {
+	class BBScanSp : public BitsetSp {
 
 	public:
 
@@ -53,7 +53,7 @@ namespace bitgraph {
 		//construction / destruction
 
 			//inherit constructors
-		using BitSetSp::BitSetSp;
+		using BitsetSp::BitsetSp;
 
 		//TODO...check copy and move assignments - should be forbidden
 
@@ -137,7 +137,7 @@ namespace bitgraph {
 		/**
 		* @brief for basic bitscanning - they are hidden by next_bit()
 		**/
-		using BitSetSp::next_bit;
+		using BitsetSp::next_bit;
 
 		////////////////
 		// bitscan backwards
