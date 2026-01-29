@@ -16,6 +16,7 @@
 #include "bitscan/bbobject.h"		
 #include "bitscan/bitblock.h"		//for bitblock operations
 #include "bitscan/bbset.h"	
+#include "graph/graph_globals.h"
 
 #include <cassert>					//DEBUG run-time assertions 
 
