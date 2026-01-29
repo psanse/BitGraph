@@ -24,7 +24,7 @@ Bitset::Bitset(std::size_t nPop, bool val) :
 {
 	
 	try {
-		vBB_.assign(nBB_, val ? ONE : 0);		
+		vBB_.assign(nBB_, val ? static_cast<BITBOARD>(ONE) : 0);		
 	}
 	catch (...) {
 		LOG_ERROR("Error during construction - Bitset::Bitset");
