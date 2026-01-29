@@ -33,22 +33,24 @@ namespace bitgraph {
 		//
 		////////////////////////////
 
-		template <class GraphEW_t>
-		class GraphFastRootSort_EW : public GraphFastRootSort <typename GraphEW_t::_gt> {
+		template <class GraphEWT>
+		class GraphFastRootSort_EW : public GraphFastRootSort <typename GraphEWT::graph_type> {
 
 		public:
-			typedef GraphFastRootSort <typename GraphEW_t::_gt> _mypt;
-			enum { MAX_WEIGHT = 100 };
-
+			using graph_type = typename GraphEWT::graph_type;								
+			using BaseT = GraphFastRootSort<graph_type>;
+				
 			////////////////
 			// data members	
 		private:
-			GraphEW_t& m_gw;
+			graph_type& m_gw;
+
+			//////////////////
 
 		public:
 			////////////////////////
 			//construction / allocation
-			GraphFastRootSort_EW(GraphEW_t& gwout) : m_gw(gwout), _mypt(gwout.graph()) {}
+			GraphFastRootSort_EW(graph_type& gwout) : m_gw(gwout), BaseT(gwout.graph()) {}
 			~GraphFastRootSort_EW() {}
 
 			////////////////
@@ -58,7 +60,7 @@ namespace bitgraph {
 			///////////
 			//overrides
 			vint new_order(int alg, bool ltf = true, bool o2n = true);								/* interface for the framework */
-			int reorder(const vint& new_order, GraphEW_t& gn, Decode* d = NULL);					// (new) interface for the framework- TODO@build an in-place reordering as in the old GraphSort 	
+			int reorder(const vint& new_order, graph_type& gn, Decode* d = NULL);					// (new) interface for the framework- TODO@build an in-place reordering as in the old GraphSort 	
 
 		private:
 
@@ -76,9 +78,9 @@ namespace bitgraph {
 
 namespace bitgraph {
 
-	template <class GraphEW_t >
+	template <class GraphEWT >
 	inline
-		vint GraphFastRootSort_EW<GraphEW_t>::new_order(int alg, bool ltf, bool o2n) {
+		vint GraphFastRootSort_EW<GraphEWT>::new_order(int alg, bool ltf, bool o2n) {
 		/////////////////
 		// Computes new order of vertices accordig to @alg
 		//
@@ -90,17 +92,17 @@ namespace bitgraph {
 		vector<int> order;
 
 		switch (alg) {
-		case _mypt::NONE:
-		case _mypt::MIN_DEGEN:
-		case _mypt::MIN_DEGEN_COMPO:
-		case _mypt::MAX_DEGEN:
-		case _mypt::MAX_DEGEN_COMPO:
-		case _mypt::MAX:
-		case _mypt::MIN:
-		case _mypt::MAX_WITH_SUPPORT:
-		case _mypt::MIN_WITH_SUPPORT:
+		case BaseT::NONE:
+		case BaseT::MIN_DEGEN:
+		case BaseT::MIN_DEGEN_COMPO:
+		case BaseT::MAX_DEGEN:
+		case BaseT::MAX_DEGEN_COMPO:
+		case BaseT::MAX:
+		case BaseT::MIN:
+		case BaseT::MAX_WITH_SUPPORT:
+		case BaseT::MIN_WITH_SUPPORT:
 
-			order = _mypt::new_order(alg, ltf, o2n);
+			order = BaseT::new_order(alg, ltf, o2n);
 			break;
 
 		default:
@@ -110,9 +112,9 @@ namespace bitgraph {
 		return order;
 	}
 
-	template <class GraphEW_t >
+	template <class GraphEWT >
 	inline
-		int GraphFastRootSort_EW<GraphEW_t>::reorder(const vint& new_order, GraphEW_t& gn, Decode* d) {
+		int GraphFastRootSort_EW<GraphEWT>::reorder(const vint& new_order, graph_type& gn, Decode* d) {
 		/////////////////////
 		// EXPERIMENTAL-ONLY FOR SIMPLE GRAPHS
 		//
@@ -120,7 +122,7 @@ namespace bitgraph {
 		// @new_order: MUST BE mapping [OLD]->[NEW]!
 
 		int NV = m_gw.number_of_vertices();
-		gn.init(NV, GraphEW_t::NOWT);
+		gn.init(NV, graph_type::NOWT);
 		gn.set_name(m_gw.get_name(), false /* no path separation */);
 		gn.set_path(m_gw.get_path());
 
