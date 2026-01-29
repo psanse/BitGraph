@@ -94,7 +94,7 @@ namespace bitgraph {
 			*			3) map the ordering back to the original graph
 			* 
 			**/
-			VertexOrdering new_order(int alg, VertexBitset& bbsg, bool ltf = true, bool o2n = true);
+			virtual VertexOrdering new_order(int alg, VertexBitset& bbsg, bool ltf = true, bool o2n = true);
 	
 			/**
 			* @brief Creates an isomorphism for a given ordering
@@ -104,7 +104,8 @@ namespace bitgraph {
 			* @comments only for simple undirected graphs with no weights
 			* @return 0 if successful
 			**/
-			int reorder(const VertexOrdering& new_order, graph_type& gn, Decode* d = nullptr);
+			virtual int reorder(const VertexOrdering& new_order, graph_type& gn, Decode* d = nullptr);
+			
 			static graph_type reorder(const graph_type& g, const VertexOrdering& new_order, Decode* d = nullptr);
 
 			////////////////////////

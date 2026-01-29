@@ -3,9 +3,13 @@
 * @brief header for GraphFastRootSort_EW_W class which sorts
 *		 weighted graphs according to different criteria
 * @details : created 08/12/2021
-* @last_update 30/06/2025 (added bitgraph namespace)
+* @last_update 29/01/2026 
 * @author pss
-* @comments: TODO - unit tests for GraphFastRootSort_EW  (30/06/2025)
+* 
+* @todo
+* - unit tests for GraphFastRootSort_EW  (30/06/2025)
+* - check everything works as expected (29/01/2026)
+* 
 **/
 
 #ifndef __GRAPH_FAST_SORT_EDGE_WEIGHTED_H__
@@ -39,6 +43,8 @@ namespace bitgraph {
 		public:
 			using graph_type = typename GraphEWT::graph_type;								
 			using BaseT = GraphFastRootSort<graph_type>;
+			
+			using typename BaseT::VertexOrdering;
 				
 			////////////////
 			// data members	
@@ -54,14 +60,15 @@ namespace bitgraph {
 			~GraphFastRootSort_EW() {}
 
 			////////////////
-			// interface (public)	
+			// interface 	
 		public:
 
 			///////////
 			//overrides
-			vint new_order(int alg, bool ltf = true, bool o2n = true);								/* interface for the framework */
-			int reorder(const vint& new_order, graph_type& gn, Decode* d = NULL);					// (new) interface for the framework- TODO@build an in-place reordering as in the old GraphSort 	
 
+			VertexOrdering new_order(int alg, bool ltf = true, bool o2n = true) override ;								// interface for the framework 
+			int reorder(const VertexOrdering& new_order, graph_type& gn, Decode* d = NULL) override;					// (new) interface for the framework- TODO@build an in-place reordering as in the old GraphSort 	
+			
 		private:
 
 		};
@@ -79,8 +86,9 @@ namespace bitgraph {
 namespace bitgraph {
 
 	template <class GraphEWT >
-	inline
-		vint GraphFastRootSort_EW<GraphEWT>::new_order(int alg, bool ltf, bool o2n) {
+	inline auto
+	GraphFastRootSort_EW<GraphEWT>::new_order(int alg, bool ltf, bool o2n) -> VertexOrdering
+	{
 		/////////////////
 		// Computes new order of vertices accordig to @alg
 		//
@@ -114,7 +122,7 @@ namespace bitgraph {
 
 	template <class GraphEWT >
 	inline
-		int GraphFastRootSort_EW<GraphEWT>::reorder(const vint& new_order, graph_type& gn, Decode* d) {
+		int GraphFastRootSort_EW<GraphEWT>::reorder(const VertexOrdering& new_order, graph_type& gn, Decode* d) {
 		/////////////////////
 		// EXPERIMENTAL-ONLY FOR SIMPLE GRAPHS
 		//
@@ -138,7 +146,7 @@ namespace bitgraph {
 		///////////////
 		//stores decoding information [NEW]->[OLD]
 		if (d != NULL) {
-			vint aux(new_order);
+			VertexOrdering aux(new_order);
 			Decode::reverse_in_place(aux);								//maps [NEW] to [OLD]		
 			d->insert_ordering(aux);
 		}
