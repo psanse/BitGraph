@@ -26,8 +26,8 @@ namespace bitgraph {
 	*		 population count of the bitset hierarchy. The bitset is not modified.
 	* @details: function next_bit() is used to extract the bits
 	**/
-	template<class BitSetT>
-	std::vector<int> to_vector(BitSetT& bbn);
+	template<class BitsetT>
+	std::vector<int> to_vector(BitsetT& bbn);
 
 	/**
 	* @brief Creates a random BITBOARD (64-bits) with density p of 1-bits
@@ -45,8 +45,8 @@ namespace bitgraph {
 	* @returns the number of bits found in lv
 	* @details: used in BBMWCP for upper bound computation
 	**/
-	template<class BitSetT>
-	int extract_first_k(int k, BitSetT& bb, std::vector<int>& lv);
+	template<class BitsetT>
+	int extract_first_k(int k, BitsetT& bb, std::vector<int>& lv);
 
 }//end namespace bitgraph
 
@@ -62,10 +62,10 @@ namespace bitgraph {
 	//			the pc_ value, but the bitset itself is not modified.
 	/////////////////////
 
-	template <class BitSetT>
+	template <class BitsetT>
 	struct BitSetWithPC {
 
-		using bitset_type = BitSetT;
+		using bitset_t = BitsetT;
 		using count_t = int;
 
 		//construction / destruction
@@ -96,8 +96,8 @@ namespace bitgraph {
 		void init(std::size_t MAX_POP_SIZE) { bb_.reset(MAX_POP_SIZE); pc_ = 0; }
 
 		//setters and getters
-		BitSetT& bb() noexcept { return bb_; }
-		const BitSetT& bb() const noexcept { return bb_; }
+		BitsetT& bb() noexcept { return bb_; }
+		const BitsetT& bb() const noexcept { return bb_; }
 		count_t  count()	const  noexcept { return pc_; }
 
 		//bit twiddling
@@ -167,16 +167,16 @@ namespace bitgraph {
 		// data members
 
 		count_t pc_;								//population count (cached) - can differ from bb_.count()
-		BitSetT bb_;								//any bitset type of the BBObject hierarchy	
+		BitsetT bb_;								//any bitset type of the BBObject hierarchy	
 
 	}; //end BitSetWithPC class
 
 	/////////////////////////////////////////
 	// BitSetWithPC class method external definitions in header
 
-	template <class BitSetT>
+	template <class BitsetT>
 	inline
-		std::ostream& BitSetWithPC<BitSetT>::print(std::ostream& o, bool show_pc, bool eofl) const {
+		std::ostream& BitSetWithPC<BitsetT>::print(std::ostream& o, bool show_pc, bool eofl) const {
 
 		bb_.print(o, true, false);
 		if (show_pc) { o << "[" << pc_ << "]"; }
@@ -202,7 +202,7 @@ namespace bitgraph {
 		// 
 		//////////////////////
 
-		template <class BitSetT>
+		template <class BitsetT>
 		struct BitSetStack {
 
 			enum print_t { STACK = 0, BITSET };
@@ -275,7 +275,7 @@ namespace bitgraph {
 			/////////////////
 			// data members
 
-			BitSetT bb_;
+			BitsetT bb_;
 			std::vector<int> stack_;
 
 		}; //end BitSetStack class
@@ -291,11 +291,11 @@ namespace bitgraph {
 		// 
 		///////////////////////
 
-		template <class BitSetT, int SIZE>
+		template <class BitsetT, int SIZE>
 		struct BitSetArray {
 
-			using basic_type = BitSetT;
-			using type = BitSetArray<BitSetT, SIZE>;
+			using basic_type = BitsetT;
+			using type = BitSetArray<BitsetT, SIZE>;
 
 			//contructors / destructors
 			BitSetArray(int popCount) {
@@ -355,7 +355,7 @@ namespace bitgraph {
 		/////////////
 		// data members
 			static const int nBB_ = SIZE;
-			std::array<BitSetT, SIZE> bb_;
+			std::array<BitsetT, SIZE> bb_;
 		};
 
 	}//end namespace _impl
@@ -370,9 +370,9 @@ namespace bitgraph {
 
 	using _impl::Tables;
 
-	template <class BitSetT, int SIZE>
+	template <class BitsetT, int SIZE>
 	inline
-		Bitset& _impl::BitSetArray<BitSetT, SIZE>::set_bit(int bitsetID, int bit, bool& is_first_bit) {
+		Bitset& _impl::BitSetArray<BitsetT, SIZE>::set_bit(int bitsetID, int bit, bool& is_first_bit) {
 
 		//adds bit
 		bb_[bitsetID].set_bit(bit);
@@ -385,9 +385,9 @@ namespace bitgraph {
 	}
 
 
-	template <class BitSetT, int SIZE>
+	template <class BitsetT, int SIZE>
 	inline
-		std::ostream& _impl::BitSetArray<BitSetT, SIZE>::print(std::ostream& o, bool show_pc, bool eofl)  const {
+		std::ostream& _impl::BitSetArray<BitsetT, SIZE>::print(std::ostream& o, bool show_pc, bool eofl)  const {
 		for (auto i = 0; i < bb_.size(); ++i) {
 			if (!bb_[i].is_empty()) {
 				bb_[i].print(o, show_pc, true);
@@ -397,9 +397,9 @@ namespace bitgraph {
 		return o;
 	}
 
-	template <class BitSetT>
+	template <class BitsetT>
 	inline
-		std::ostream& _impl::BitSetStack<BitSetT>::print(print_t t, std::ostream& o, bool eofl) {
+		std::ostream& _impl::BitSetStack<BitsetT>::print(print_t t, std::ostream& o, bool eofl) {
 
 		switch (t) {
 		case STACK:
@@ -420,9 +420,9 @@ namespace bitgraph {
 		return o;
 	}
 
-	template <class BitSetT>
+	template <class BitsetT>
 	inline
-		bool _impl::BitSetStack<BitSetT>::is_sync() {
+		bool _impl::BitSetStack<BitsetT>::is_sync() {
 
 		//same population count
 		if (bb_.count() != static_cast<int>(stack_.size())) {
@@ -439,9 +439,9 @@ namespace bitgraph {
 		return true;
 	}
 
-	template <class BitSetT>
+	template <class BitsetT>
 	inline
-		void _impl::BitSetStack<BitSetT>::sync_bitset() {
+		void _impl::BitSetStack<BitsetT>::sync_bitset() {
 
 		bb_.erase_bit();
 		for (auto i = 0; i < stack_.size(); i++) {
@@ -449,15 +449,15 @@ namespace bitgraph {
 		}
 	}
 
-	template <class BitSetT>
+	template <class BitsetT>
 	inline
-		void _impl::BitSetStack<BitSetT>::sync_stack() {
+		void _impl::BitSetStack<BitsetT>::sync_stack() {
 
 		//cleans stack
 		stack_.clear();
 
 		//bitscanning with nested data structure
-		typename BitSetT::scan sc(bb_);
+		typename BitsetT::scan sc(bb_);
 		if (sc.init_scan() != -1) {
 			int bit = BBObject::noBit;
 			while ((bit = bb_.next_bit()) != BBObject::noBit) {
@@ -467,9 +467,9 @@ namespace bitgraph {
 
 	}
 
-	template <class BitSetT>
+	template <class BitsetT>
 	inline
-		void  _impl::BitSetStack<BitSetT>::reset(int MAX_POP_SIZE) {
+		void  _impl::BitSetStack<BitsetT>::reset(int MAX_POP_SIZE) {
 
 		//cleans stack
 		stack_.clear();
@@ -483,16 +483,16 @@ namespace bitgraph {
 		}
 		catch (std::exception& e) {
 			LOG_ERROR("%s", e.what());
-			LOG_ERROR("BitSetStack<BitSetT>::-reset()");
+			LOG_ERROR("BitSetStack<BitsetT>::-reset()");
 			std::exit(EXIT_FAILURE);
 		}
 
 	}; //end struct
 
 
-	template <class BitSetT>
+	template <class BitsetT>
 	inline
-		void _impl::BitSetStack<BitSetT>::push(int bit) {
+		void _impl::BitSetStack<BitsetT>::push(int bit) {
 
 		if (!bb_.is_bit(bit)) {
 			bb_.set_bit(bit);
@@ -500,9 +500,9 @@ namespace bitgraph {
 		}
 	}
 
-	template <class BitSetT>
+	template <class BitsetT>
 	inline
-		int _impl::BitSetStack<BitSetT>::pop() {
+		int _impl::BitSetStack<BitsetT>::pop() {
 
 		if (stack_.size() > 0) {
 			int bit = stack_.back();
@@ -513,18 +513,18 @@ namespace bitgraph {
 		else return BBObject::noBit;
 	}
 
-	template <class BitSetT>
+	template <class BitsetT>
 	inline
-		void _impl::BitSetStack<BitSetT>::erase_bit() {
+		void _impl::BitSetStack<BitsetT>::erase_bit() {
 		for (int i = 0; i < stack_.size(); i++) {
 			bb_.erase_bit(stack_[i]);
 		}
 	}
 
 
-	template<class BitSetT>
+	template<class BitsetT>
 	inline
-		std::vector<int> to_vector(BitSetT& bbn) {
+		std::vector<int> to_vector(BitsetT& bbn) {
 
 		std::vector<int> res;
 		res.reserve(bbn.count());
@@ -552,9 +552,9 @@ namespace bitgraph {
 		return bb;
 	}
 
-	template<class BitSetT>
+	template<class BitsetT>
 	inline
-		int extract_first_k(int k, BitSetT& bb, std::vector<int>& lv) {
+		int extract_first_k(int k, BitsetT& bb, std::vector<int>& lv) {
 
 		lv.clear();
 
