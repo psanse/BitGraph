@@ -62,25 +62,22 @@ namespace bitgraph {
 		// BitScanning Friendly classes
 		// (similar to iterator models)
 		// 
-		// Currently, BitSetT can only be an object derived from BBScan class (14/02/25)
+		// Currently, BitsetT can only be an object derived from BBScan class (14/02/25)
 		//
 		////////////////////////////
 
-		template< class BitSetT >
+		template< class BitsetT >
 		struct ScanRev {
-
-		//	using Self = ScanRev<BitSetT>;		//own type
-			using bitset_type = BitSetT;		//basic type (a type of bitset)
-
-			//using basic_type = bitset_type;		//for backward compatibility
-			//using type = Self;
+					
+			using bitset_type = BitsetT;		// basic type (a type of bitset)
+			using bitset_t = bitset_type;		// alias less redundant
 
 		public:
 
 			/**
 			* @brief: constructor for reverse bitscanning - may throw for sparse bitsets if empty
 			**/
-			ScanRev(BitSetT& bb, int firstBit = -1) : bb_(bb) { init_scan(firstBit); }
+			ScanRev(bitset_t& bb, int firstBit = -1) : bb_(bb) { init_scan(firstBit); }
 
 			int get_block() { return  bb_.scan_.bbi_; }
 
@@ -102,25 +99,25 @@ namespace bitgraph {
 			*		bitstring bitSet
 			* @param bbdel: bitset to delete the bit from
 			**/
-			int next_bit(BitSetT& bitSet) { return bb_.prev_bit(bitSet); }
+			int next_bit(bitset_t& bitSet) { return bb_.prev_bit(bitSet); }
 
 		private:
-			BitSetT& bb_;
+			bitset_t& bb_;
 		};
 
 		
-		template< class BitSetT >
+		template< class BitsetT >
 		struct Scan {
-			using Self = ScanRev<BitSetT>;		//own type
-			using bitset_type = BitSetT;		//basic type (a type of bitset)
-
+		
+			using bitset_type = BitsetT;		// basic type (a type of bitset)
+			using bitset_t = bitset_type;		// alias less redundant
 			
 		public:
 
 			/**
 			* @brief: constructor for bitscanning - may throw for sparse bitsets if empty
 			**/
-			Scan(BitSetT& bb, int firstBit = -1) : bb_(bb) { init_scan(firstBit); }
+			Scan(bitset_t& bb, int firstBit = -1) : bb_(bb) { init_scan(firstBit); }
 
 			int get_block() { return  bb_.scan_.bbi_; }
 
@@ -142,24 +139,24 @@ namespace bitgraph {
 			*		 bitstring bitSet
 			* @param bbdel: bitset to delete the bit from
 			**/
-			int next_bit(BitSetT& bitSet) { return bb_.next_bit(bitSet); }
+			int next_bit(bitset_t& bitSet) { return bb_.next_bit(bitSet); }
 
 		private:
-			BitSetT& bb_;
+			bitset_t& bb_;
 		};
 
 
-		template< class BitSetT >
+		template< class BitsetT >
 		struct ScanDest {
-			using Self = ScanRev<BitSetT>;		//own type
-			using bitset_type = BitSetT;		//basic type (a type of bitset)
 
+				using bitset_type = BitsetT;		// basic type (a type of bitset)
+				using bitset_t = bitset_type;		// alias less redundant
 		public:
 
 			/**
 			* @brief: constructor for destructive bitscanning - may throw for sparse bitsets if empty
 			**/
-			ScanDest(BitSetT& bb) : bb_(bb) { init_scan(); }
+			ScanDest(bitset_t& bb) : bb_(bb) { init_scan(); }
 
 			int get_block() { return bb_.scan_.bbi_; }
 
@@ -180,25 +177,24 @@ namespace bitgraph {
 			*		 bitstring bitSet
 			* @param bbdel: bitset to delete the bit from
 			**/
-			int next_bit(BitSetT& bitSet) { return bb_.next_bit_del(bitSet); }
+			int next_bit(bitset_t& bitSet) { return bb_.next_bit_del(bitSet); }
 
 		private:
-			BitSetT& bb_;
+			bitset_t& bb_;
 		};
 
 
-		template< class BitSetT >
+		template< class BitsetT >
 		struct ScanDestRev {
-			using Self = ScanRev<BitSetT>;		//own type
-			using bitset_type = BitSetT;		//basic type (a type of bitset)
-
+			using bitset_type = BitsetT;		// basic type (a type of bitset)
+			using bitset_t = bitset_type;		// alias less redundant
 			
 		public:
 
 			/**
 			* @brief: constructor for destructive reverse bitscanning - may throw for sparse bitsets if empty
 			**/
-			ScanDestRev(BitSetT& bb) : bb_(bb) { init_scan(); }
+			ScanDestRev(bitset_t& bb) : bb_(bb) { init_scan(); }
 
 			int get_block() { return bb_.scan_.bbi_; }
 
@@ -219,10 +215,10 @@ namespace bitgraph {
 			*		 and deletes it from the bitstring  bitSet
 			* @param bbdel: bitset to delete the bit from
 			**/
-			int next_bit(BitSetT& bitSet) { return bb_.prev_bit_del(bitSet); }
+			int next_bit(bitset_t& bitSet) { return bb_.prev_bit_del(bitSet); }
 
 		private:
-			BitSetT& bb_;
+			bitset_t& bb_;
 		};
 
 
