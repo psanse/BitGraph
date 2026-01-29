@@ -11,10 +11,6 @@
 #include "graph_globals.h"
 #include "utils/logger.h"
 #include <vector>
-#include <algorithm>
-
-//aliases
-//using vint = std::vector<int>;
 
 namespace bitgraph {
 	namespace _impl {

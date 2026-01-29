@@ -6,6 +6,7 @@
 */
 
 #include "graph/algorithms/decode.h"
+#include <algorithm>
 
 using namespace bitgraph;
 
