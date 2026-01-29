@@ -50,7 +50,7 @@ namespace bitgraph{
 			//////////////////////////////
 			//construction / destruction
 
-				//inherit constructors	
+			//inherit constructors	
 			using BitSet::BitSet;
 
 			//TODO...check copy and move assignments 
