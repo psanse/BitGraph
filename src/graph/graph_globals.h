@@ -15,6 +15,7 @@ namespace bitgraph {
 
 	using VertexList = std::vector<int>;
 	using VertexMapping = std::vector<int>;
+	using VertexOrdering = std::vector<int>;
 
 	enum : int {
 		DEFAULT_WEIGHT_MODULUS = 200		//default modulus for vertex and edge-weights [Pullman 2008]

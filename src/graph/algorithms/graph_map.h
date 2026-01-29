@@ -31,6 +31,8 @@ namespace bitgraph {
 
 		class GraphMap {
 
+			using VertexMapping = bitgraph::VertexMapping;
+
 		///////////////////////
 		//public interface
 		public:
@@ -40,16 +42,16 @@ namespace bitgraph {
 			//setters and getters
 
 			std::size_t size() { return l2r_.size(); }
-			vint& get_l2r() { return l2r_; }
-			vint& get_r2l() { return r2l_; }
-			const vint& get_l2r() const { return l2r_; }
-			const vint& get_r2l() const { return r2l_; }
+			VertexMapping& get_l2r() { return l2r_; }
+			VertexMapping& get_r2l() { return r2l_; }
+			const VertexMapping& get_l2r() const { return l2r_; }
+			const VertexMapping& get_r2l() const { return r2l_; }
 			std::string nameL() { return nameL_; }
 			std::string nameR() { return nameR_; }
 
 			//sets mapping (no need to build it)
-			void set_l2r(vint& l, std::string name) { l2r_ = l; nameL_ = name; }
-			void set_r2l(vint& r, std::string name) { r2l_ = r; nameR_ = name; }
+			void set_l2r(VertexMapping& l, std::string name) { l2r_ = l; nameL_ = name; }
+			void set_r2l(VertexMapping& r, std::string name) { r2l_ = r; nameR_ = name; }
 
 			////////////////
 			// mapping getters
@@ -104,7 +106,7 @@ namespace bitgraph {
 			* @param rhs_o2n: known mapping in [OLD]->[NEW] format 
 			* @param lhs_name, rhs_name: fancy names for the orderings
 			**/
-			void build_mapping(const vint& lhs_o2n, const vint& rhs_o2n, std::string lhs_name = "", std::string rhs_name = "");
+			void build_mapping(const VertexMapping& lhs_o2n, const VertexMapping& rhs_o2n, std::string lhs_name = "", std::string rhs_name = "");
 
 			//////////////////////
 			//single ordering
@@ -133,7 +135,7 @@ namespace bitgraph {
 			* @param rhs_n2o: known mapping in [NEW]->[OLD] format (which is more intuitive for single ordering)
 			* @param rhs_name: fancy name for the ordering (e.g. "MIN_DEG, F2L")
 			**/
-			void build_mapping(const vint& rhs_n2o, std::string rhs_name = "");
+			void build_mapping(const VertexMapping& rhs_n2o, std::string rhs_name = "");
 
 			//////////////
 			//I/O
@@ -158,7 +160,7 @@ namespace bitgraph {
 			////////////////
 			// data members
 
-			vint l2r_, r2l_;						//mapping between left and right ordering
+			VertexMapping l2r_, r2l_;						//mapping between left and right ordering
 			std::string nameL_;						//fancy name describing the left ordering
 			std::string nameR_;						//fancy name describing the right ordering	
 		};
@@ -236,7 +238,7 @@ namespace bitgraph{
 	void GraphMap::build_mapping(typename Alg_t::_gt& g, int slhs, bool plhs, int srhs, bool prhs,
 															std::string lhs_name, std::string rhs_name)
 	{
-		vint lhs_o2n, lhs_n2o, rhs_o2n, rhs_n2o;
+		VertexMapping lhs_o2n, lhs_n2o, rhs_o2n, rhs_n2o;
 
 		auto NV = g.num_vertices();
 
@@ -244,7 +246,7 @@ namespace bitgraph{
 
 		//determine sorting lhs
 		Alg_t gol(g);
-		lhs_o2n = gol.new_order(slhs, plhs /* false:first to last*/, true /* o2n*/);				 // vint new_order(int alg, bool ltf = true, bool o2n = true);
+		lhs_o2n = gol.new_order(slhs, plhs /* false:first to last*/, true /* o2n*/);				 // VertexMapping new_order(int alg, bool ltf = true, bool o2n = true);
 		lhs_n2o = Decode::reverse(lhs_o2n);
 
 		//determine sorting rhs
@@ -303,13 +305,13 @@ namespace bitgraph{
 	}
 
 	inline
-		void GraphMap::build_mapping(const vint& lhs_o2n, const vint& rhs_o2n, std::string lhs_name, std::string rhs_name) {
+		void GraphMap::build_mapping(const VertexMapping& lhs_o2n, const VertexMapping& rhs_o2n, std::string lhs_name, std::string rhs_name) {
 
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////
 		assert(lhs_o2n.size() == rhs_o2n.size() && "ERROR: different size orderings - GraphMap::build_mapping");
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-		vint lhs_n2o, rhs_n2o;
+		VertexMapping lhs_n2o, rhs_n2o;
 
 		auto NV = lhs_o2n.size();
 
@@ -349,7 +351,7 @@ namespace bitgraph{
 	}
 
 	inline
-		void GraphMap::build_mapping(const vint& rhs_n2o, std::string lhs_name) {
+		void GraphMap::build_mapping(const VertexMapping& rhs_n2o, std::string lhs_name) {
 
 		l2r_ = Decode::reverse(rhs_n2o);
 		r2l_ = rhs_n2o;

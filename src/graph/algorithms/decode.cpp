@@ -15,27 +15,27 @@ int Decode::decode(int v) const
 	return df(v); 
 };
 
-void Decode::reverse_in_place(vint& o)
+void Decode::reverse_in_place(VertexOrdering& o)
 {
-	vint vaux(o.size());
+	VertexOrdering vaux(o.size());
 	for (std::size_t i = 0; i < o.size(); ++i) {
 		vaux[o[i]] = i;
 	}
 	o = std::move(vaux);
 }
 
-vint Decode::reverse(const vint& o)
+VertexOrdering Decode::reverse(const VertexOrdering& o)
 {
-	vint vres(o.size());
+	VertexOrdering vres(o.size());
 	for (std::size_t i = 0; i < o.size(); ++i) {
 		vres[o[i]] = i;
 	}
 	return vres;
 }
 
-vint Decode::decode(const vint& l) const
+VertexOrdering Decode::decode(const VertexOrdering& l) const
 {
-	vint res;
+	VertexOrdering res;
 	
 	if (!l.empty()) {
 		res.resize(l.size());			//must be resized for transform 
@@ -45,7 +45,7 @@ vint Decode::decode(const vint& l) const
 	return res;
 }
 
-//int Decode::decode_list(const vint& l, vint& res) const
+//int Decode::decode_list(const VertexOrdering& l, VertexOrdering& res) const
 //{
 //	if (ords_.empty() || l.empty() ) {					//no reordering, return a copy
 //		res = l;
@@ -64,7 +64,7 @@ vint Decode::decode(const vint& l) const
 //	return 0;
 //}
 
-int Decode::decode_in_place(vint& l) const
+int Decode::decode_in_place(VertexOrdering& l) const
 {
 	if (l.empty()) return -1;
 	DecodeVertex df(ords_);

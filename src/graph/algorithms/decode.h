@@ -8,26 +8,29 @@
 #ifndef __DECODE_ORDERINGS_H__
 #define __DECODE_ORDERINGS_H__
 
+#include "graph_globals.h"
 #include "utils/logger.h"
 #include <vector>
 #include <algorithm>
 
 //aliases
-using vint = std::vector<int>;
+//using vint = std::vector<int>;
 
 namespace bitgraph {
 	namespace _impl {
 
 		class Decode {
 		private:
+
+			using VertexOrdering = bitgraph::VertexOrdering;
+
 			/*
 			* @brief functor which unwinds composite orderings for a given vertex
 			*/
 			struct DecodeVertex {
-				DecodeVertex(const std::vector<vint>& ords) :
+				DecodeVertex(const std::vector<VertexOrdering>& ords) :
 					ords_(ords)
-				{
-				}
+				{}
 
 				int operator() (int v) const {
 					for (auto it = ords_.rbegin(); it != ords_.rend(); ++it) {
@@ -45,20 +48,20 @@ namespace bitgraph {
 				}
 
 				/////////////////////////////////////		
-				const std::vector<vint>& ords_;
+				const std::vector<VertexOrdering>& ords_;
 			};
 
 		public:
 			///////////////////////////////////////////////
-			static void reverse_in_place(vint& o);						//changes [index]-->[value] in place
-			static vint reverse(const vint& o);							//changes [index]-->[value] 
+			static void reverse_in_place(VertexOrdering& o);						//changes [index]-->[value] in place
+			static VertexOrdering reverse(const VertexOrdering& o);							//changes [index]-->[value] 
 			////////////////////////////////////////////////
 
 			void clear() { ords_.clear(); }
-			void add_ordering(const vint& o) { ords_.emplace_back(o); }
+			void add_ordering(const VertexOrdering& o) { ords_.emplace_back(o); }
 			bool is_empty() const noexcept { return ords_.empty(); }
-			const vint& first_ordering() const noexcept {
-				static const vint empty; 
+			const VertexOrdering& first_ordering() const noexcept {
+				static const VertexOrdering empty; 
 				return ords_.empty()? empty : ords_.front();
 			}
 
@@ -75,7 +78,7 @@ namespace bitgraph {
 			* @returns decoded list of vertices - empty if @list is empty
 			* @details: created 4/10/17, last_update 31/08/2025			 
 			*/
-			vint decode(const vint& list) const;
+			VertexOrdering decode(const VertexOrdering& list) const;
 
 			/*
 			* @brief modifies the list of vertices @list in place, decoding them for the given orderings
@@ -83,14 +86,14 @@ namespace bitgraph {
 			* @returns -1 if list is empty, 0 otherwise
 			* @details: created 4/10/17, last_update 31/08/2025
 			*/
-			int decode_in_place(vint& list) const;
+			int decode_in_place(VertexOrdering& list) const;
 
 
-			//int decode_list(const vint& l, vint& res) const;
+			//int decode_list(const VertexOrdering& l, VertexOrdering& res) const;
 
 			//////////////////////
 			// data members
-			std::vector<vint> ords_;					//composition of orderings in [new]--[old] format
+			std::vector<VertexOrdering> ords_;					//composition of orderings in [new]--[old] format
 		};
 
 	}//end of namespace _impl
