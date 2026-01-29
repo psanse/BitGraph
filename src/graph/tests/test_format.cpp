@@ -44,7 +44,7 @@ TEST(G2gml, clique) {
 	ug.add_edge(3, 5);
 	ug.add_edge(4, 5);
 
-	vint clq, vpart, vhat_map_ori;
+	VertexList clq;
 	clq.push_back(0); clq.push_back(1); clq.push_back(2);
 
 	/////////////////////////////////////////////////////////////////////
@@ -70,7 +70,7 @@ TEST(G2gml, vertex_set) {
 	ug.add_edge(3, 5);
 	ug.add_edge(4, 5);
 
-	vint vset;
+	VertexList vset;
 	vset.push_back(0); vset.push_back(1); vset.push_back(2);
 
 	/////////////////////////////////////////////////////////////////////
