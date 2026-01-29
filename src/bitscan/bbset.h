@@ -13,7 +13,6 @@
 #ifndef __BBSET_H__
 #define __BBSET_H__
 
-
 #include "bbobject.h"
 #include "bitblock.h"	
 #include "utils/common.h"			//for the primitive FixedStack type
@@ -22,12 +21,8 @@
 
 #include <cassert>					//uncomment #undef NDEBUG in bbconfig.h to enable run-time assertions
 
-//useful alias
-using vint	= std::vector<int>;
-using DenseBlockVec = std::vector<bitgraph::BITBOARD>;
-
 namespace bitgraph {
-	
+		
 	/////////////////////////////////
 	//
 	// Bitset class 
@@ -36,14 +31,18 @@ namespace bitgraph {
 	// @details Does not use HW dependent instructions (intrinsics), nor does it cache information for very fast bitscanning
 	//
 	///////////////////////////////////
-	class Bitset :public BBObject {
+	class Bitset : public BBObject {
 
-		using index_t = BBObject::index_t;
+		using BaseT = BBObject;
+		using BaseT::index_t;
+		using BaseT::bitpos_list;
+		using BaseT::bitpos_set;
+		using BaseT::npos;
+
+		using DenseBlockVec = std::vector<BITBOARD>;
 
 	public:
-
-		using BBObject::npos;
-
+				
 
 		/////////////////////////////
 		// Independent operators / masks  
@@ -198,7 +197,7 @@ namespace bitgraph {
 		*		  The num_blocks of the bitset is set according to the population size
 		* @param lv : vector of integers representing 1-bits in the bitset
 		**/
-		explicit  Bitset(const vint& lv);
+		explicit  Bitset(const bitpos_list& lv);
 
 		/**
 		 * @brief Creates a bitset with an initial collection @lv of 1-bit elements
@@ -233,7 +232,7 @@ namespace bitgraph {
 		//Reset / init (memory allocation)
 
 		void init(std::size_t nPop) noexcept;
-		void init(std::size_t nPop, const vint& lv) noexcept;
+		void init(std::size_t nPop, const bitpos_list& lv) noexcept;
 
 		/**
 		* @brief Resets this bitset given to a vector lv of 1-bit elements
@@ -245,7 +244,7 @@ namespace bitgraph {
 		 * @param lv : vector of integers representing 1-bits in the bitset
 		 * @details: Fail-fast policy: exceptions are handled inside the program exits
 		**/
-		void reset(std::size_t nPop, const vint& lv) noexcept;
+		void reset(std::size_t nPop, const bitpos_list& lv) noexcept;
 
 		/**
 		* @brief Resets this bitset to an EMPTY BITSET given to a population size nPop.
@@ -447,7 +446,7 @@ namespace bitgraph {
 		* @details negative elements will cause an assertion if NDEBUG is not defined,
 		*		  else the behaviour is undefined.
 		**/
-		Bitset& set_bit(const vint& lv);
+		Bitset& set_bit(const bitpos_list& lv);
 
 		/**
 		* @brief sets bit number bit to 0 in the bitstring
@@ -782,15 +781,15 @@ namespace bitgraph {
 		*
 		* TODO - loop unrolling for efficiency (18/11/2025)
 		**/
-		void extract(vint& lb)								const;
-		void extract_set(sint& lb)							const;
+		void extract(bitpos_list& lb)							const;
+		void extract_set(bitpos_set& lb)							const;
 
 		/**
 		* @brief Casts the bitstring to a vector of non-negative integers
 		* @details calls to_vector
 		**/
-		explicit operator vint()							const;
-		explicit operator sint()							const;
+		explicit operator bitpos_list()							const;
+		explicit operator bitpos_set()							const;
 		
 		/**
 		* @brief Fills stack @s

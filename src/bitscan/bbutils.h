@@ -14,10 +14,6 @@
 #include <array>
 #include <functional>
 
-//aliases
-namespace bitgraph {
-	using bbo = BBObject;
-}
 
 namespace bitgraph {
 	

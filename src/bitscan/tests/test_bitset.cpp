@@ -430,10 +430,10 @@ TEST(BitSetClass, cast_to_vector) {
 	bb.set_bit(64);
 
 	//cast to vector
-	vint lv = static_cast<vint>(bb);	
+	bitpos_list lv = static_cast<bitpos_list>(bb);	
 
 	//expected lv
-	vint lv_exp = { 10, 20, 64 };
+	bitpos_list lv_exp = { 10, 20, 64 };
 
 	/////////////////////////
 	EXPECT_EQ(lv_exp, lv);
@@ -445,7 +445,7 @@ TEST(BitSetClass, vector_operations) {
 	const int POPULATION_SIZE = 50;
 
 	Bitset bbN1(POPULATION_SIZE);
-	vector<int> lv = {10, 20, 45, 62};
+	bitpos_list lv = {10, 20, 45, 62};
 
 	bbN1.set_bit(lv[0]);
 	bbN1.set_bit(lv[1]);
@@ -456,8 +456,8 @@ TEST(BitSetClass, vector_operations) {
 	//construction from vector (bitset with lv.size)
 	Bitset bbN2(lv);
 
-	vector<int> lvN1 = to_vector(bbN1);
-	vector<int> lvN2 = to_vector(bbN2);
+	bitpos_list lvN1 = to_vector(bbN1);
+	bitpos_list lvN2 = to_vector(bbN2);
 
 	EXPECT_EQ(lv, lvN1);
 	EXPECT_EQ(lv, lvN2);
@@ -503,7 +503,7 @@ TEST(BitSetClass, conversion_to_vector) {
 	EXPECT_EQ(25, bb1.count());
 	//////////////////////////////
 
-	vector<int> lv_exp(25,0);	
+	bitpos_list lv_exp(25,0);
 	for(auto i = 0; i < 25; ++i){
 		lv_exp[i]=i;
 	}

@@ -136,7 +136,7 @@ TEST_F(BitSetSpClassTest, reset) {
 	EXPECT_EQ(0, bbsp.size());				//number of non_zero bitblocks
 
 	//size and bits
-	vint lv = { 10, 20, 100 };
+	bitpos_list lv = { 10, 20, 100 };
 	bbsp.reset(200, lv);
 	EXPECT_EQ(3, bbsp.count());							//number of 1-bis
 	EXPECT_EQ(2, bbsp.size());				//number of non_zero bitblocks

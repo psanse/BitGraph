@@ -26,6 +26,8 @@ namespace bitgraph {
 	public:
 				
 		using index_t = int;
+		using bitpos_list = bitgraph::bitpos_list;
+		using bitpos_set = bitgraph::bitpos_set;
 
 		//sentinel values
 		static constexpr index_t npos = -1;			//invalid block index
@@ -237,6 +239,8 @@ namespace bitgraph {
 
 	}; //end of BBObject class;
 
+	// alias
+	using bbo = BBObject;
 
 }// namespace bitgraph
 

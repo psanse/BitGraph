@@ -26,7 +26,6 @@ constexpr int BitsetSp::DEFAULT_CAPACITY;
 BitsetSp::BitsetSp(std::size_t nPop):
 	nBB_(static_cast<int>(INDEX_1TO1(nPop)))
 {
-
 	vBB_.reserve(DEFAULT_CAPACITY);
 }
 
@@ -40,7 +39,7 @@ BitsetSp bitgraph::BitsetSp::from_num_blocks(int nBlocks)
 	return BitsetSp(nPop);
 }
 
-BitsetSp::BitsetSp(std::size_t nPop, const vint& lv):
+BitsetSp::BitsetSp(std::size_t nPop, const bitpos_list& lv):
 	nBB_(static_cast<int>(INDEX_1TO1(nPop)))
 {
 	try {
@@ -109,7 +108,7 @@ void BitsetSp::reset(std::size_t nPop, bool is_popsize) noexcept
 	}
 }
 
-void BitsetSp::reset(std::size_t nPop, const vint& lv) noexcept
+void BitsetSp::reset(std::size_t nPop, const bitpos_list& lv) noexcept
 {
 
 	try {
@@ -893,7 +892,7 @@ string BitsetSp::to_string ()  const{
 	return sstr.str();
 }
 
-void BitsetSp::extract (std::vector<int>& lb) const{
+void BitsetSp::extract (bitpos_list& lb) const{
 
 	lb.clear();
 
@@ -903,9 +902,9 @@ void BitsetSp::extract (std::vector<int>& lb) const{
 	}
 }
 
-BitsetSp::operator vint() const
+BitsetSp::operator bitpos_list() const
 {
-	vint lb;
+	bitpos_list lb;
 	extract(lb);
 	return lb;
 }

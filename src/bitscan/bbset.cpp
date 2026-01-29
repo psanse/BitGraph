@@ -39,7 +39,7 @@ Bitset::Bitset(std::size_t nPop, bool val) :
 }
 
 
-Bitset::Bitset(const vint& v):
+Bitset::Bitset(const bitpos_list& v):
 	nBB_(BBObject::noBit)
 {
 	try {
@@ -103,7 +103,7 @@ void Bitset::init(std::size_t nPop) noexcept {
 
 }
 
-void Bitset::init(std::size_t nPop, const vint& lv) noexcept {
+void Bitset::init(std::size_t nPop, const bitpos_list& lv) noexcept {
 		
 	try {
 		nBB_ = static_cast<index_t>(INDEX_1TO1(nPop));
@@ -141,7 +141,7 @@ void Bitset::reset(std::size_t nPop) noexcept {
 	}
 
 }
-void Bitset::reset(std::size_t nPop, const vint& lv) noexcept {
+void Bitset::reset(std::size_t nPop, const bitpos_list& lv) noexcept {
 
 	try {
 		nBB_ = static_cast<index_t>(INDEX_1TO1(nPop));
@@ -277,7 +277,7 @@ string Bitset::to_string ()
 }
 
 
-void Bitset::extract (vint& lv ) const {
+void Bitset::extract (bitpos_list& lv ) const {
 
 	lv.clear();
 	const int pc = this->count();
@@ -291,7 +291,7 @@ void Bitset::extract (vint& lv ) const {
 	}
 }
 
-void Bitset::extract_set(sint& ls) const
+void Bitset::extract_set(bitpos_set& ls) const
 {
 	ls.clear();
 	const int pc = this->count();
@@ -303,15 +303,15 @@ void Bitset::extract_set(sint& ls) const
 	}
 }
 
-Bitset::operator vint() const {
-	vint result;
+Bitset::operator bitpos_list() const {
+	bitpos_list result;
 	extract(result);
 	return result;
 }
 
-bitgraph::Bitset::operator sint() const
+bitgraph::Bitset::operator bitpos_set() const
 {
-	sint result;
+	bitpos_set result;
 	extract_set(result);
 	return result;
 }
@@ -343,7 +343,7 @@ void Bitset::extract_array(int* lv, std::size_t& size, bool rev) 	{
 
 }
 
-Bitset& Bitset::set_bit(const vint& lv) {
+Bitset& Bitset::set_bit(const bitpos_list& lv) {
 
 	//copies elements up to the maximum capacity of the bitstring
 	auto maxPopSize = WMUL(nBB_);

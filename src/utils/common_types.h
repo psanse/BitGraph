@@ -2,7 +2,7 @@
  * @file common_types.h  
  * @brief set of useful types 
  * @date ?
- * @last_update 03/07/25
+ * @last_update 29/01/2026
  * @author pss
  **/
 
@@ -15,16 +15,6 @@
 #include <memory>
 #include <cassert>
 
-///////////////////////
-// useful aliases 
-
-namespace bitgraph {
-
-	using vint = std::vector<int>;
-	using sint = std::set<int>;
-	using vdob = std::vector<double>;
-
-}
 
 namespace bitgraph {
 	

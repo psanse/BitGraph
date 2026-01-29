@@ -20,6 +20,8 @@
 #define __BBTYPES_H__
 
 #include <cstdint>
+#include <vector>
+#include <set>
 
 namespace bitgraph {
 
@@ -70,7 +72,10 @@ namespace bitgraph {
 	////size of the register word - DO NOT CHANGE!
 	//constexpr int WORD_SIZE = 64;
 	//constexpr int WORD_SIZE_MINUS_ONE = WORD_SIZE - 1;
-	//constexpr int MASK_LIM = WORD_SIZE + 1;				  
+	//constexpr int MASK_LIM = WORD_SIZE + 1;	
+	
+	using bitpos_list = std::vector<int>;
+	using bitpos_set = std::set<int>;
 
 } // end namespace bitgraph
 

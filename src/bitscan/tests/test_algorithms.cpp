@@ -24,8 +24,6 @@ using namespace bitgraph;
 	const int BBObject::noBit;
 #endif
 
-//aliases
-using vint = vector<int>;
 
 class BitSetWithPC_ClassTest : public ::testing::Test {
 protected:
@@ -314,10 +312,10 @@ TEST(algorithms, extract_first_k){
 	bb.set_bit(65);
 	
 	//solution in vector
-	vint lbits (3,-1);
+	bitpos_list lbits (3,-1);
 	extract_first_k(3,bb, lbits);
 
-	vint lbits_exp;
+	bitpos_list lbits_exp;
 	lbits_exp.push_back(10);
 	lbits_exp.push_back(64);
 	lbits_exp.push_back(65);

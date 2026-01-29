@@ -19,11 +19,8 @@
 #include <algorithm>
 #include <iterator>
 
-//uncomment #undef NDEBUG in bbconfig.h to enable run-time assertions
-#include <cassert>
+#include <cassert>  //uncomment #undef NDEBUG in bbconfig.h to enable run-time assertions
 
-//aliases
-using vint = std::vector<int>; 
 
 namespace bitgraph {
 		
@@ -37,7 +34,9 @@ namespace bitgraph {
 	class BitsetSp : public BBObject {
 				
 		using index_t = BBObject::index_t;
-	
+		using BaseT = BBObject;
+		using BaseT::bitpos_list;
+
 		static constexpr int DEFAULT_CAPACITY = 2;		//initial allocation of bit blocks for any new sparse bitstring - CHECK efficiency (17/02/2025)
 
 	public:
@@ -170,7 +169,7 @@ namespace bitgraph {
 		 * @param lv : vector of integers representing 1-bits in the bitset
 		* @details: fast-fail policy, exception caught inside and the program exits
 		 **/
-		explicit BitsetSp(std::size_t nPop, const vint& lv);
+		explicit BitsetSp(std::size_t nPop, const bitpos_list& lv);
 
 		/**
 		* @brief Creates a bitset with an initial list of 1-bit elements
@@ -209,7 +208,7 @@ namespace bitgraph {
 		* @param lv: vector of 1-bits to set
 		* @details: fast-fail policy, exception caught inside and the program exits
 		**/
-		void reset(std::size_t nPop, const vint& lv) noexcept;
+		void reset(std::size_t nPop, const bitpos_list& lv) noexcept;
 
 		/**
 		* @brief resets the sparse bitset to a new population size, old syntax
@@ -746,14 +745,14 @@ namespace bitgraph {
 		*		 The size of the vector is the number of bits in the bitstring.
 		* @param lb: output vector
 		**/
-		void extract(std::vector<int>& lb) const;
+		void extract(bitpos_list& lb) const;
 
 		/**
 		* @brief Casts the bitstring to a vector of non-negative integers
 		*		 (convenience function for the API)
 		* @details calls to_vector
 		**/
-		operator vint () const;
+		operator bitpos_list () const;
 
 		/////////////////////
 		//data members
