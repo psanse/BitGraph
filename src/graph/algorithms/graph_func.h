@@ -19,7 +19,6 @@
 #include <iostream>
 
 //useful aliases
-using vint = std::vector<int>;
 
 namespace bitgraph {
 
@@ -50,14 +49,15 @@ namespace bitgraph {
 		* @returns number of vertices in lv
 		* @date: created 03/09/18, last_update: 09/01/25
 		*/
-		template<class Graph_t>
-		std::size_t neighbors(const Graph_t& g, int v, typename  Graph_t::VertexBitset& bbref, vector<int>& lv) {
+		template<class GraphT>
+		std::size_t neighbors(const GraphT& g, int v, typename  GraphT::VertexBitset& bbref, VertexList& lv) {
 
 			lv.clear();
 			lv.reserve(g.num_vertices());		//allocates maximum possible size
+			
+			const int maxBB = g.num_blocks();
 
-			auto MAXNBB = g.num_blocks();
-			for (decltype(MAXNBB) nBB = 0; nBB < MAXNBB; ++nBB) {
+			for (int nBB = 0; nBB < maxBB; ++nBB) {
 
 				//block NBB of the intersection of N(v) and bbref
 				BITBOARD bb = g.neighbors(v).block(nBB) & bbref.block(nBB);
@@ -86,13 +86,13 @@ namespace bitgraph {
 		* @returns number of vertices in lv_n
 		* @date: created 03/09/18, @last_update: 09/01/25
 		*/
-		template<class Graph_t>
-		std::size_t neighbors_after(const Graph_t& g, int v, typename  Graph_t::VertexBitset& bbref, vector<int>& lv) {
+		template<class GraphT>
+		std::size_t neighbors_after(const GraphT& g, int v, typename GraphT::VertexBitset& bbref, VertexList& lv) {
 
 			lv.clear();
 			lv.reserve(g.num_vertices());		//allocates maximum possible size
 
-			auto MAXNBB = g.num_blocks();
+			
 
 			//////////////////////////////////////////
 			//first nBB - trimming and decoding
@@ -120,7 +120,9 @@ namespace bitgraph {
 			//////////////////////////////////////////
 			//remaining blocks
 
-			for (decltype(MAXNBB) nBB = nBBv + 1; nBB < MAXNBB; ++nBB) {
+			const int maxBB = g.num_blocks();
+
+			for (int nBB = nBBv + 1; nBB < maxBB; ++nBB) {
 
 				//block NBB of the intersection of N(v) and bbref
 				BITBOARD bb = g.neighbors(v).block(nBB) & bbref.block(nBB);
@@ -147,17 +149,17 @@ namespace bitgraph {
 		* @param N: number of vertices
 		* @details: fast-fail policy - exits if error
 		*/
-		template<class Graph_t>
-		void create_complete(Graph_t& g, std::size_t N) {
+		template<class GraphT>
+		void create_complete(GraphT& g, std::size_t N) {
 
 			/////////////
 			g.reset(N);
 			/////////////
 			
-			const auto n = static_cast<int>(N);
+			const int n = static_cast<int>(N);
 
-			for (auto i = 0; i < n; ++i) {
-				for (auto j = 0; j < n; j++) {
+			for (int i = 0; i < n; ++i) {
+				for (int j = 0; j < n; j++) {
 					g.add_edge(i, j);
 				}
 			}
@@ -171,8 +173,7 @@ namespace bitgraph {
 		* @param N: number of vertices
 		* @details: fast-fail policy - exits if error
 		*/
-		inline
-			void create_complete(ugraph& g, int N) {
+		inline	void create_complete(ugraph& g, int N) {
 
 			/////////////
 			g.reset(N);
@@ -194,31 +195,32 @@ namespace bitgraph {
 		* @param bbsg: bitset of vertices that induces the subgraph
 		* @param edge: output first-found edge (pair of vertices) in the induced subgraph
 		* @returns TRUE if the induced subgraph has no edges, FALSE otherwise
+		* 
+		* @todo - change returned edge to std::pair<int,int> (29/01/2026)
 		*/
-		template<class Graph_t>
-		bool is_edgeFree_subgraph(Graph_t& g, typename Graph_t::VertexBitset& bbsg, vint& edge) {
+		template<class GraphT>
+		bool is_edgeFree_subgraph(GraphT& g, typename GraphT::VertexBitset& bbsg, std::vector<int>& edge) {
 
 			//cleans output edge
 			edge.clear();
 
 			//decodes subgraph to vector
-			vint lv;
+			VertexList lv;
 			bbsg.extract(lv);
 
 			//singleton input bitset - induced subgraph has no edges
-			auto NV = lv.size();
+			int NV = static_cast<int>(lv.size());
 			if (NV <= 1) { return true; }
 
 			//searches for an edge in the induced subgraph
-			for (auto i = 0; i < NV - 1; i++) {
-				for (auto j = i + 1; j < NV; j++) {
+			for (int i = 0; i < NV - 1; ++i) {
+				for (int j = i + 1; j < NV; ++j) {
 
 					if (g.is_edge(lv[i], lv[j])) {
 						edge.emplace_back(lv[i]);
 						edge.emplace_back(lv[j]);
 						return false;
 					}
-
 				}
 			}
 
@@ -231,17 +233,17 @@ namespace bitgraph {
 		*
 		* @param g: a simple graph
 		* @param bbsg: bitset of vertices that induces the subgraph
-		* @param edge: output first-found triangle (triplet of vertices) in the induced subgraph
+		* @param triangle: output first-found triangle (triplet of vertices) in the induced subgraph
 		* @returns TRUE if the induced subgraph has no edges, FALSE otherwise
 		*/
-		template<class Graph_t>
-		bool is_triangleFree_subgraph(Graph_t& g, typename Graph_t::VertexBitset& bbsg, vint& triangle) {
+		template<class GraphT>
+		bool is_triangleFree_subgraph(GraphT& g, typename GraphT::VertexBitset& bbsg, std::vector<int>& triangle) {
 
 			//cleans output 
 			triangle.clear();
 
 			//decodes subgraph to vector
-			vint lv;
+			VertexList lv;
 			bbsg.extract(lv);
 
 			//input bitset of size 2 - induced subgraph has no triangles
@@ -282,13 +284,13 @@ namespace bitgraph {
 			* @param min_sort: sorting criteria
 			* @returns sorted list of vertices lv
 			*/
-			template<class Graph_t>
-			vint& sort_deg(const Graph_t& g, vint& lv, const vint& lref, bool min_sort = true) {
+			template<class GraphT>
+			VertexList& sort_deg(const GraphT& g, VertexList& lv, const VertexList& lref, bool min_sort = true) {
 
 				int deg = 0;
 
 				//determine the degree of each vertex in lv wrt to ref
-				vint ldeg(g.num_vertices(), 0);
+				std::vector<int> ldeg(g.num_vertices(), 0);
 				for (auto v : lv) {
 					deg = 0;
 					for (auto w : lref) {
@@ -324,13 +326,13 @@ namespace bitgraph {
 			* @param min_sort: sorting criteria
 			* @returns sorted list of vertices lv
 			*/
-			template<class Graph_t>
-			vint& sort_deg(const Graph_t& g, vint& lv, typename  Graph_t::VertexBitset& bbref, bool min_sort = true) {
+			template<class GraphT>
+			VertexList& sort_deg(const GraphT& g, VertexList& lv, typename  GraphT::VertexBitset& bbref, bool min_sort = true) {
 
 				//int deg = 0;
 
 				//determine the degree of each vertex in lv wrt to ref
-				vint ldeg(g.num_vertices(), 0);
+				std::vector<int> ldeg(g.num_vertices(), 0);
 				for (auto v : lv) {
 					ldeg[v] = g.degree(v, bbref);
 				}
@@ -348,27 +350,31 @@ namespace bitgraph {
 
 				return lv;
 			}
-		} //namespace sort
-
+		} //end namespace sort
 
 		
-
-		////////////////////
-		//namespace for vertex-weighted graphs functions
-		// 
-		//@created: 9/1/17
-		//@last_update: 9/1/25
+		/**
+		 * @namespace vertex_weighted_graph
+		 * @brief Utilities and algorithms for vertex-weighted graphs.
+		 *
+		 * This namespace provides data structures and functions for working with
+		 * graphs in which weights are associated with vertices rather than edges.
+		 * Typical use cases include optimization problems, graph traversal with
+		 * vertex costs, and weighted path computations.
+		 *
+		 * @date 2017-01-09
+		 * @last_modified 2026-01-29
+		 */
 
 		namespace vertexW {
-				
-
+			
 			/*
 			* @brief sum of weights of the vertices in a (bit)set (bbref)
 			*/
-			template<typename Graph_t>
-			typename Graph_t::Weight wsum(const Graph_t& g, typename Graph_t::VertexBitset& bbref) {
+			template<typename GraphT>
+			typename GraphT::Weight wsum(const GraphT& g, typename GraphT::VertexBitset& bbref) {
 
-				typename Graph_t::Weight total_weight = 0;
+				typename GraphT::Weight total_weight = 0;
 
 				//bitscanning configuration
 				bbref.init_scan(bbo::NON_DESTRUCTIVE);
@@ -385,10 +391,10 @@ namespace bitgraph {
 			/*
 			* @brief sum of weights of the vertices in a set (lv)
 			*/
-			template<typename Graph_t>
-			typename Graph_t::Weight wsum(const Graph_t& g, vint& lv) {
+			template<typename GraphT>
+			typename GraphT::Weight wsum(const GraphT& g, VertexList& lv) {
 
-				typename Graph_t::Weight total_weight = 0;
+				typename GraphT::Weight total_weight = 0;
 
 				//iterate and add
 				for (int v : lv) {
@@ -401,10 +407,10 @@ namespace bitgraph {
 			/*
 			* @brief sum of weights of the vertices in a graph
 			*/
-			template<typename Graph_t>
-			typename Graph_t::Weight wsum(const Graph_t& g) {
+			template<typename GraphT>
+			typename GraphT::Weight wsum(const GraphT& g) {
 
-				typename Graph_t::Weight total_weight = 0;
+				typename GraphT::Weight total_weight = 0;
 
 				// Obtiene el vector de pesos de los vértices
 				const auto& weights = g.weights();
@@ -422,8 +428,8 @@ namespace bitgraph {
 			* @brief sum of weights the neighborhood of a vertex (v) in a (bit)set of vertices (bbref)
 			*		 plus the weight of vertex v
 			*/
-			template<typename Graph_t>
-			typename Graph_t::Weight wsum(const Graph_t& g, int v, typename Graph_t::VertexBitset& bbref) {
+			template<typename GraphT>
+			typename GraphT::Weight wsum(const GraphT& g, int v, typename GraphT::VertexBitset& bbref) {
 
 				auto total_weight = g.weight(v);
 
@@ -445,8 +451,8 @@ namespace bitgraph {
 			* @brief sum of weights the neighborhood of a vertex (v)
 			*		 plus the weight of vertex v
 			*/
-			template<typename Graph_t>
-			typename Graph_t::Weight wsum(Graph_t& g, int v) {
+			template<typename GraphT>
+			typename GraphT::Weight wsum(GraphT& g, int v) {
 
 				auto total_weight = g.weight(v);
 				const auto& bbn = g.neighbors(v);
@@ -469,8 +475,8 @@ namespace bitgraph {
 			* @param min_sort: sorting flag (true: non-decreasing, false: non-increasing)
 			* @returns sorted set of vertices
 			*/
-			template<typename Graph_t>
-			vint& sort_w(const Graph_t& g, vint& lv, bool min_sort = true) {
+			template<typename GraphT>
+			VertexList& sort_w(const GraphT& g, VertexList& lv, bool min_sort = true) {
 
 				//sorting criteria
 				const auto& weights = g.weight();
@@ -503,8 +509,8 @@ namespace bitgraph {
 			* @param min_sort: sorting flag (true: non-decreasing, false: non-increasing)
 			* @returns pointer to the sorted array
 			*/
-			template<typename Graph_t>
-			int* sort_w(const Graph_t& g, int* lv, std::size_t size, bool min_sort = true) {
+			template<typename GraphT>
+			int* sort_w(const GraphT& g, int* lv, std::size_t size, bool min_sort = true) {
 
 				//sorting criteria
 				const auto& weights = g.weight();
@@ -535,8 +541,8 @@ namespace bitgraph {
 			* @param min_sort: sorting flag (true: non-decreasing, false: non-increasing)
 			* @returns sorted set of vertices
 			*/
-			template<typename Graph_t>
-			vint& sort_wdProd(const Graph_t& g, vint& lv, bool min_sort = true) {
+			template<typename GraphT>
+			VertexList& sort_wdProd(const GraphT& g, VertexList& lv, bool min_sort = true) {
 
 				//weights as part of the sorting criteria
 				const auto& weights = g.weights();
@@ -569,8 +575,8 @@ namespace bitgraph {
 			* @param min_sort: sorting flag (true: non-decreasing, false: non-increasing)
 			* @returns pointer to the sorted array
 			*/
-			template<typename Graph_t>
-			int* sort_wdProd(const Graph_t& g, int* lv, int size, bool min_sort = true) {
+			template<typename GraphT>
+			int* sort_wdProd(const GraphT& g, int* lv, int size, bool min_sort = true) {
 
 				//weights as part of the sorting criteria
 				const auto& weights = g.weights();
@@ -602,8 +608,8 @@ namespace bitgraph {
 			* @param min_sort: sorting flag (true: non-decreasing, false: non-increasing)
 			* @returns sorted set of vertices
 			*/
-			template<typename Graph_t>
-			vint& sort_wdDif(const Graph_t& g, vint& lv, bool min_sort = true) {
+			template<typename GraphT>
+			VertexList& sort_wdDif(const GraphT& g, VertexList& lv, bool min_sort = true) {
 
 				//weights as part of the sorting criteria
 				const auto& weights = g.weights();
@@ -617,8 +623,8 @@ namespace bitgraph {
 					return (weights[a] - g.degree(a)) > (weights[b] - g.degree(b));
 					};
 
-				/*com::has_smaller_val_diff<int, typename vector<Graph_t::Weight>> my_struct_smaller_diff(g.weights());
-				com::has_greater_val_diff<int, typename vector<Graph_t::Weight>> my_struct_greater_diff(g.weights());*/
+				/*com::has_smaller_val_diff<int, typename vector<GraphT::Weight>> my_struct_smaller_diff(g.weights());
+				com::has_greater_val_diff<int, typename vector<GraphT::Weight>> my_struct_greater_diff(g.weights());*/
 
 				//sorting according to ldeg
 				if (min_sort) {
@@ -638,8 +644,8 @@ namespace bitgraph {
 			* @param min_sort: sorting flag (true: non-decreasing, false: non-increasing)
 			* @returns pointer to the sorted array
 			*/
-			template<typename Graph_t>
-			int* sort_wdDif(const Graph_t& g, int* lv, int size, bool min_sort = true) {
+			template<typename GraphT>
+			int* sort_wdDif(const GraphT& g, int* lv, int size, bool min_sort = true) {
 
 				//weights as part of the sorting criteria
 				const auto& weights = g.weights();
@@ -675,15 +681,15 @@ namespace bitgraph {
 
 		namespace edgeW {
 
-			/*template<typename Graph_t>
+			/*template<typename GraphT>
 			struct accum_we{
-				typename Graph_t::Weight operator ()( double accum, int v) const{return (accum + lw[v]);}
+				typename GraphT::Weight operator ()( double accum, int v) const{return (accum + lw[v]);}
 				accum_we(double* lw):lw(lw){}
 				const double* lw;
 			};*/
 
-			template<typename Graph_t>
-			typename Graph_t::Weight wesum(const Graph_t& g, bool only_we = false) { LOG_ERROR("not implemented yet -  edgeW::wesum"); return 0; }
+			template<typename GraphT>
+			typename GraphT::Weight wesum(const GraphT& g, bool only_we = false) { LOG_ERROR("not implemented yet -  edgeW::wesum"); return 0; }
 
 			//alias
 			template<class W>
@@ -700,10 +706,10 @@ namespace bitgraph {
 			typename UEW<W>::VertexBitset wesum(const UEW<W>& g, bool only_we = false) {
 
 				double total_weight = 0.0;
-				const auto NV = g.num_vertices();
+				const int NV = g.num_vertices();
 
-				for (auto i = 0; i < NV - 1; ++i) {
-					for (auto j = (only_we ? i + 1 : i); j < NV; j++) {
+				for (int i = 0; i < NV - 1; ++i) {
+					for (int j = (only_we ? i + 1 : i); j < NV; j++) {
 
 						if (g.get_we(i, j) != UEW<W>::NOWT) {
 							total_weight += g.get_we(i, j);				//no edge-checking!
@@ -724,16 +730,16 @@ namespace bitgraph {
 			* @returns sum of the weights
 			*
 			*/
-			template<typename Graph_t>
-			typename Graph_t::Weight wesum(const Graph_t& g, vint& lv, bool only_we = false) {
+			template<typename GraphT>
+			typename GraphT::Weight wesum(const GraphT& g, VertexList& lv, bool only_we = false) {
 
-				typename Graph_t::Weight total_weight = 0.0;
-				const auto NV = lv.size();
+				typename GraphT::Weight total_weight = 0.0;
+				const int NV = static_cast<int>(lv.size());
 
-				for (auto i = 0; i < NV - 1; i++) {
-					for (auto j = (only_we ? i + 1 : i); j < NV; ++j) {
+				for (int i = 0; i < NV - 1; i++) {
+					for (int j = (only_we ? i + 1 : i); j < NV; ++j) {
 
-						if (g.get_we(i, j) != Graph_t::NOWT) {				//Checks graph consistency - perhaps remove or do it in DEBUG mode only
+						if (g.get_we(i, j) != GraphT::NOWT) {				//Checks graph consistency - perhaps remove or do it in DEBUG mode only
 							total_weight += g.get_we(lv[i], lv[j]);			//no edge-checking!
 						}
 					}
@@ -742,8 +748,8 @@ namespace bitgraph {
 				return total_weight;
 			}
 
-			template<class Graph_t, class WeightT>
-			int ew_shift_2_highest_index(const Graph_t& g, const int* lv, WeightT* lw, int size_lv, double wper = 1.0) {
+			template<class GraphT, class WeightT>
+			int ew_shift_2_highest_index(const GraphT& g, const int* lv, WeightT* lw, int size_lv, double wper = 1.0) {
 				/////////////////////////
 				// 
 				// last_update@: 8/8/2018
