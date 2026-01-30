@@ -11,10 +11,13 @@
 
 #include "graph/algorithms/graph_func.h"
 #include "gtest/gtest.h"
+#include "graph.h"				//	facade types
 #include <iostream>
 
 using namespace std;
 using namespace bitgraph;
+
+
 
 class GFuncTest : public ::testing::Test {
 protected:

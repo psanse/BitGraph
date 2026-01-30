@@ -11,6 +11,7 @@
 #define __GRAPH_TRAITS_H__
 
 #include "simple_ugraph.h"
+#include <type_traits>
 
 namespace bitgraph {
 
@@ -26,6 +27,10 @@ namespace bitgraph {
     struct graph_traits<Ugraph<BitsetT>> {
         static constexpr bool is_undirected = true;
     };
+
+	// helper to trigger static_assert false in templates
+    template<class>
+    struct dependent_false : std::false_type {};
 
 } 
 
