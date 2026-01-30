@@ -6,7 +6,6 @@
 *
 **/
 
-
 #ifndef __GRAPH_TRAITS_H__
 #define __GRAPH_TRAITS_H__
 
@@ -30,10 +29,9 @@ namespace bitgraph {
 
 	// helper to trigger static_assert false in templates
     template<class>
-    struct dependent_false : std::false_type {};
+    struct dependent_false : std::false_type {};        // alternatively always_false
 
 } 
-
 
 
 #endif // __GRAPH_TRAITS_H__

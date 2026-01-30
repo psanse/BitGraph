@@ -144,6 +144,7 @@ namespace bitgraph {
 
 namespace bitgraph {
 	namespace _impl {
+
 		/////////////////
 		//
 		// class SparseRandomGen
