@@ -13,6 +13,7 @@
 #include "graph/simple_ugraph.h"
 #include "graph/simple_graph_w.h"				// must be after ugraph include
 #include "graph/simple_graph_ew.h"				// must beafter ugraph include
+#include "graph/graph_traits.h"
 #include "utils/common.h"
 #include "utils/logger.h"
 #include <algorithm>
@@ -143,6 +144,28 @@ namespace bitgraph {
 			return lv.size();
 		}
 
+		template<class GraphT>
+		void create_complete_impl(GraphT& g, std::size_t N, std::false_type /*directed*/) {
+			g.reset(N);
+			const int n = static_cast<int>(N);
+			for (int i = 0; i < n; ++i) {
+				for (int j = 0; j < n; ++j) {
+					if (i != j) g.add_edge(i, j);     // avoid self-loops for “simple”
+				}
+			}
+		}
+
+		template<class GraphT>
+		void create_complete_impl(GraphT& g, std::size_t N, std::true_type /*undirected*/) {
+			g.reset(N);
+			const int n = static_cast<int>(N);
+			for (int i = 0; i < n - 1; ++i) {
+				for (int j = i + 1; j < n; ++j) {
+					g.add_edge(i, j);
+				}
+			}
+		}
+
 		/*
 		* @brief creates a complete graph of a given size N
 		* @param g: a simple graph
@@ -150,42 +173,56 @@ namespace bitgraph {
 		* @details: fast-fail policy - exits if error
 		*/
 		template<class GraphT>
-		void create_complete(GraphT& g, std::size_t N) {
-
-			/////////////
-			g.reset(N);
-			/////////////
-			
-			const int n = static_cast<int>(N);
-
-			for (int i = 0; i < n; ++i) {
-				for (int j = 0; j < n; j++) {
-					g.add_edge(i, j);
-				}
-			}
+		inline void create_complete(GraphT& g, std::size_t N) {
+			create_complete_impl(g, N, std::bool_constant<graph_traits<GraphT>::is_undirected>{});
 		}
 
-		/*
-		* @brief creates a complete undirected graph (clique) of a given size N
-		*		 (specialization for undirected graphs)
-		*
-		* @param g: a simple graph
-		* @param N: number of vertices
-		* @details: fast-fail policy - exits if error
-		*/
-		inline	void create_complete(ugraph& g, int N) {
 
-			/////////////
-			g.reset(N);
-			/////////////
-			
+		//legacy code - to be removed eventually
+		///*
+		//* @brief creates a complete graph of a given size N
+		//* @param g: a simple graph
+		//* @param N: number of vertices
+		//* @details: fast-fail policy - exits if error
+		//*/
+		//template<class GraphT>
+		//void create_complete(GraphT& g, std::size_t N) {
 
-			for (auto i = 0; i < N - 1; ++i) {
-				for (auto j = i + 1; j < N; ++j) {
-					g.add_edge(i, j);
-				}
-			}			
-		}
+		//	/////////////
+		//	g.reset(N);
+		//	/////////////
+		//	
+		//	const int n = static_cast<int>(N);
+
+		//	for (int i = 0; i < n; ++i) {
+		//		for (int j = 0; j < n; j++) {
+		//			g.add_edge(i, j);
+		//		}
+		//	}
+		//}
+
+		///*
+		//* @brief creates a complete undirected graph (clique) of a given size N
+		//*		 (specialization for undirected graphs)
+		//*
+		//* @param g: a simple graph
+		//* @param N: number of vertices
+		//* @details: fast-fail policy - exits if error
+		//*/
+		//inline void create_complete(ugraph& g, int N) {
+
+		//	/////////////
+		//	g.reset(N);
+		//	/////////////
+		//	
+
+		//	for (auto i = 0; i < N - 1; ++i) {
+		//		for (auto j = i + 1; j < N; ++j) {
+		//			g.add_edge(i, j);
+		//		}
+		//	}			
+		//}
+		////////////////////////
 
 		/*
 		* @brief Determines if an induced subgraph has no edges
