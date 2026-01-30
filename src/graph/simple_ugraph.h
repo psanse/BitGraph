@@ -16,7 +16,7 @@
 
 #include "simple_graph.h"
 #include "utils/prec_timer.h"
-#include "graph_globals.h"
+#include "graph_types.h"
 
 
 namespace bitgraph {

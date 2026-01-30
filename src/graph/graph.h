@@ -25,7 +25,7 @@
 #ifndef __GRAPH_INCLUDE_H__
 #define __GRAPH_INCLUDE_H__
 
-#include "graph_globals.h"
+#include "graph_types.h"
 
 
 #include "simple_ugraph.h"

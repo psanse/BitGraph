@@ -13,15 +13,16 @@
    **/
 
 #include "graph/simple_graph_w.h"
-
+#include "graph_types.h"
 #include "bitscan/bitscan.h"
 #include "graph/formats/dimacs_format.h"			
 #include "utils/common.h"
 #include "utils/logger.h"
 #include "utils/prec_timer.h"
+
 #include <fstream>
 #include <iostream>
-#include "graph_globals.h"
+
 				
 using namespace std;
 using namespace bitgraph;

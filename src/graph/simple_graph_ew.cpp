@@ -13,15 +13,16 @@
    **/
 
 #include "bitscan/bitscan.h"
+#include "graph_types.h"
 #include "graph/formats/dimacs_format.h"
-#include "graph/simple_graph_ew.h"	
+#include "graph/simple_graph_ew.h"
 #include "utils/common.h"
 #include "utils/logger.h"
 #include "utils/prec_timer.h"
 #include <fstream>
 #include <iostream>
 #include <cassert>							//NDEBUG should be undefined - (normally in compiler DEBUG mode)
-#include "graph_globals.h"
+
 
 using namespace std;	
 using namespace bitgraph;

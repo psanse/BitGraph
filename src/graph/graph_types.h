@@ -1,15 +1,13 @@
 /**
-* @file: graph_globals.h
-* @brief: global information for GRAPH in BitGraph
+* @file: graph_types.h
+* @brief: common types / contants used by GRAPH in BitGraph
 * @details: created 30/06/2025
 */
 
-#ifndef __GRAPH_GLOBALS_H__
-#define __GRAPH_GLOBALS_H__
+#ifndef __GRAPH_TYPES_H__
+#define __GRAPH_TYPES_H__
 
 #include <vector>	
-
-//useful alias / globlas for GRAPH
 
 namespace bitgraph {
 
@@ -24,4 +22,4 @@ namespace bitgraph {
 	};
 }
 
-#endif // __GRAPH_GLOBALS_H__
+#endif // __GRAPH_TYPES_H__

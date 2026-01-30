@@ -14,7 +14,7 @@
 #define __SIMPLE_GRAPH_WEIGHTED_H__
 
 #include "utils/common.h"
-#include "graph_globals.h"
+#include "graph_types.h"
 #include "simple_ugraph.h"
 #include <iostream>
 #include <vector>

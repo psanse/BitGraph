@@ -8,7 +8,7 @@
 #ifndef __DECODE_ORDERINGS_H__
 #define __DECODE_ORDERINGS_H__
 
-#include "graph_globals.h"
+#include "graph_types.h"
 #include "utils/logger.h"
 #include <vector>
 
