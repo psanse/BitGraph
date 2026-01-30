@@ -174,10 +174,10 @@ namespace bitgraph {
 		*/
 		template<class GraphT>
 		inline void create_complete(GraphT& g, std::size_t N) {
-			create_complete_impl(g, N, std::bool_constant<graph_traits<GraphT>::is_undirected>{});
+			create_complete_impl(g, N, std::integral_constant<bool, graph_traits<GraphT>::is_undirected>{});		//C++14 compatible
 		}
 
-
+		
 		//legacy code - to be removed eventually
 		///*
 		//* @brief creates a complete graph of a given size N
