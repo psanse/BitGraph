@@ -23,10 +23,7 @@
 namespace bitgraph {
 
 	namespace gfunc {
-
-		//using namespace bitgraph;
-		using bbo = bitgraph::BBObject;
-
+		
 		namespace iset {
 
 
