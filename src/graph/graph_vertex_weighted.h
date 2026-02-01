@@ -14,8 +14,7 @@
 
 #include "graph_types.h"
 #include "graph_basic.h"
-#include "simple_graph_w.h"                                     // MUST BE AFTER graph_basic.h 
-
+#include "simple_graph_w.h"												 // MUST BE AFTER graph_basic.h 
 
 namespace bitgraph {
     
@@ -25,21 +24,18 @@ namespace bitgraph {
 	class Graph_W<ugraph, WeightT> : public Base_Graph_W<ugraph, WeightT> {
 	public:
 
-		using BaseT = Base_Graph_W<ugraph, WeightT>;					//parent type
+		using BaseT = Base_Graph_W<ugraph, WeightT>;					
 		using graph_type = typename BaseT::graph_type;
 		using bitset_type = typename BaseT::bitset_type;
 		using Weight = typename BaseT::Weight;
+		using VertexBitset = bitset_type;						// alias for semantic information
 
 		using BaseT::NO_WEIGHT;
 		using BaseT::ZERO_WEIGHT;
 		using BaseT::DEFAULT_WEIGHT;
-
-		//alias types for backward compatibility
-		//using _wt = weight_type;											
-		using VertexBitset = bitset_type;
-
+				
 		//constructors (inherited from Base class)
-		using BaseT::Base_Graph_W;
+		using BaseT::BaseT;
 
 		/////////////
 		//useful interface-specific for undirected weighted graphs

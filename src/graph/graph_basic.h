@@ -12,23 +12,10 @@
 #define __GRAPH_BASIC_H__
 
 #include "graph_types.h"
-
-//#include "simple_ugraph.h"
+#include "simple_sparse_graph.h"
 #include "simple_sparse_ugraph.h"
 
 namespace bitgraph {
-    	
-
-	// note that implementations of Graph<Bitset> and Ugraph<BitsetT> are in simple_graph and simple_ugraph.h 
-	// there are no specializations for BitsetT = BBScan>   
-
-    // specialized implementations of graph types for sparse_bitarray
-
-
-
-
-
-
 
     // alias facade graph types
     using graph = Graph<bitarray>;                              // simple graph 

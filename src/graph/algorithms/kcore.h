@@ -15,7 +15,8 @@
 #define __KCORE_H__
 
 #include "utils/logger.h"
-#include "graph/simple_ugraph.h"
+//#include "graph/simple_ugraph.h"
+#include "graph/graph_basic.h"
 #include "graph_fast_sort.h"
 #include <vector>
 #include <iostream>
@@ -53,10 +54,6 @@ using vint_cit = std::vector<int>::const_iterator;
 
 using map_t = std::map<int, int>;	
 using map_it = std::map<int, int>::iterator;
-
-namespace bitgraph {
-	using sparse_ugraph = bitgraph::Ugraph<sparse_bitarray>;			//simple sparse undirected graph
-}
 
 
 namespace bitgraph {
