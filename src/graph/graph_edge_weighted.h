@@ -1,19 +1,45 @@
-/** 
+/**
  * @file graph_edge_weighted.h
- * @brief  
- *		    
- * @comment:  
  *
- * @author: pss (main developper)
- * @date 01/02/2026 
- **/
+ * @brief Facade specializations and public aliases for edge-weighted graphs.
+ *
+ * This header binds the generic edge-weighted graph template
+ * `Graph_EW<GraphT, WeightT>` to concrete *facade graph types*, in particular
+ * undirected graphs (`ugraph`).
+ *
+ * It provides:
+ *  - Specializations of `Graph_EW` for facade graph types (e.g. `ugraph`)
+ *  - A user-facing, stable interface for edge-weighted undirected graphs
+ *  - Convenience aliases for commonly used weight types
+ *
+ *  In addition to declaring the facade specialization
+ * `Graph_EW<ugraph, WeightT>`, this file also provides **inline implementations**
+ * of facade-specific methods whose behavior depends on the undirected graph
+ * interface .
+ * 
+ * @details
+ * This file acts as the *facade binding layer* between:
+ *  - the **generic implementation** of edge-weighted graphs
+ *    (`simple_graph_ew.h`, `Base_Graph_EW`)
+ *  - and the **named facade graph types** defined elsewhere (e.g. `ugraph`)
+ * 
+ * @note
+ * This header must be included **after** `graph_basic.h`, as it relies on the
+ * definition of the `ugraph` facade type.
+ *
+ * @author
+ * Pablo San Segundo (pss)
+ *
+ * @date
+ * 01/02/2026
+ */
 
-#ifndef __GRAPH_INCLUDE_H__
-#define __GRAPH_INCLUDE_H__
+#ifndef __GRAPH_EDGE_WEIGHTED_H__
+#define __GRAPH_EDGE_WEIGHTED_H__
 
 #include "graph_types.h"
 #include "graph_basic.h"
-#include "simple_graph_ew.h"											// MUST BE AFTER graph_basic.h
+#include "simple_graph_ew.h"											
 
 namespace bitgraph {
 		 
@@ -400,4 +426,4 @@ namespace bitgraph {
 }
 
 
-#endif // __GRAPH_INCLUDE_H__
+#endif // __GRAPH_EDGE_WEIGHTED_H__
