@@ -16,7 +16,8 @@
 #include <cassert>
 
 #include "utils/common.h"
-#include "graph/graph_basic.h"								// facade types ugraph, graph, sparse_ugraph, sparse_graph
+#include "graph/graph_vertex_weighted.h"						// facade types 
+#include "graph/graph_edge_weighted.h"							// facade types 
 #include "graph_fast_sort.h"
 
 
