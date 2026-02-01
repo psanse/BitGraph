@@ -42,18 +42,15 @@ namespace bitgraph {
 	public:
 
 		//aliases for bitscanning 
-		using scan = typename BBObject::Scan<BBScanSp>;
-		using scanR = typename BBObject::ScanRev<BBScanSp>;
-		using scanD = typename BBObject::ScanDest<BBScanSp>;
-		using scanDR = typename BBObject::ScanDestRev<BBScanSp>;
-
-	public:
+		using scan   = typename BBObject::Scan<BBScanSp>;
+		using scanR  = typename BBObject::ScanRev<BBScanSp>;
+		using scanD  = typename BBObject::ScanDest<BBScanSp>;
+		using scanDR = typename BBObject::ScanDestRev<BBScanSp>;			
 
 		//////////////////////////////
 		//construction / destruction
-
-			//inherit constructors
-		using BitsetSp::BitsetSp;
+				
+		using BitsetSp::BitsetSp;		//inherit constructors
 
 		//TODO...check copy and move assignments - should be forbidden
 
@@ -94,7 +91,7 @@ namespace bitgraph {
 		*		     the function returns -1
 		* @details : (08/07/2025) throws  BitScanError for empty sparse bitset
 		*
-		* TODO - extend to NON-DESTRUCTIVE cases
+		* @todo - extend to NON-DESTRUCTIVE cases
 		**/
 		int init_scan(int firstBit, scan_types sct);
 

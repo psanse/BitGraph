@@ -16,8 +16,14 @@
 #include "simple_ugraph.h"
 
 namespace bitgraph {
+    	
 
-	// specialized implementations of graph types with bitarray and sparse_bitarray
+	// note that implementations of Graph<Bitset> and Ugraph<BitsetT> are in simple_graph and simple_ugraph.h 
+	// there are no specializations for BitsetT = BBScan>   
+
+    // specialized implementations of graph types for sparse_bitarray
+
+
 
 
 
@@ -29,6 +35,9 @@ namespace bitgraph {
     using sparse_graph = Graph<sparse_bitarray>;                // simple sparse graph
     using sparse_ugraph = Ugraph<sparse_bitarray>;              // simple sparse undirected graph
 }
+
+///////////////////////////////
+// implementation ni header file
 
 
 
