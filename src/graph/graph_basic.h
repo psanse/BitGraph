@@ -37,7 +37,7 @@ namespace bitgraph {
 }
 
 ///////////////////////////////
-// implementation ni header file
+// implementation in header file
 
 
 
