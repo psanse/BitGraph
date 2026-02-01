@@ -12,6 +12,7 @@
 #ifndef __SIMPLE_SPARSE_GRAPH_H__
 #define __SIMPLE_SPARSE_GRAPH_H__
 
+#include "graph_types.h"
 #include "simple_graph.h"
 #include <iostream>
 #include <string>
@@ -59,8 +60,8 @@ namespace bitgraph{
 		}
 
 		//trims vertices 
-		for (int i = 0; i < sizeInt; i++) {
-			adj_[i].clear_bit(size, EMPTY_ELEM);				//closed range
+		for (Vertex v = 0; v < sizeInt; ++v) {
+			adj_[v].clear_bit(size, EMPTY_ELEM);				//closed range
 		}
 
 		//resizes adjacency matrix
@@ -78,9 +79,9 @@ namespace bitgraph{
 		std::size_t nBB = 0;							//number of non-empty bitblocks	
 		std::size_t nBBt = 0;							//number of allocated bitblocks (all should be non-empty in the sparse case)
 
-		for (std::size_t v = 0; v < NV_; ++v) {
+		for (Vertex v = 0; v < NV_; ++v) {
 			nBBt += adj_[v].size();
-			for (std::size_t bb = 0; bb < adj_[v].size(); bb++) {
+			for (std::size_t bb = 0; bb < adj_[v].size(); ++bb) {
 				if (adj_[v].block(bb)) {
 					nBB++;								//nBB should be equal to nBBt
 				}
@@ -96,7 +97,7 @@ namespace bitgraph{
 		std::size_t nBBt = 0;							//number of allocated bitblocks (all should be non-empty in the sparse case)
 
 		//number of allocated blocks
-		for (std::size_t v = 0; v < NV_; ++v) {
+		for (Vertex v = 0; v < NV_; ++v) {
 			nBBt += adj_[v].size();
 		}
 
@@ -113,10 +114,10 @@ namespace bitgraph{
 		std::size_t nBBt = 0;							//number of allocated bitblocks (all should be non-empty in the sparse case)
 		double den = 0.0;
 
-		for (std::size_t i = 0; i < NV_; ++i) {
-			nBB = adj_[i].size();
+		for (Vertex v = 0; v < NV_; ++v) {
+			nBB = adj_[v].size();
 			nBBt += nBB;
-			den += static_cast<double>(adj_[i].size()) /
+			den += static_cast<double>(adj_[v].size()) /
 				(BITBOARD(nBB) * WORD_SIZE);
 		}
 
@@ -135,9 +136,8 @@ namespace bitgraph{
 		//dimacs header - does not recompute edges, can be a heavy operation
 		header_dimacs(o, true);
 
-
 		//write edges 1-based vertex notation
-		for (std::size_t v = 0; v < NV_; ++v) {
+		for (Vertex v = 0; v < NV_; ++v) {
 
 			//non destructive scan of each bitstring
 			if (adj_[v].init_scan(bbo::NON_DESTRUCTIVE) != EMPTY_ELEM) {
