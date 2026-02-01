@@ -37,7 +37,7 @@ namespace bitgraph {
 
 			enum { MAX_WEIGHT = 100, MIN_WEIGHT };							//sorting algorithms for weighted graphs	
 
-			using typename ptype::VertexOrdering;
+			using VertexOrdering = typename ptype::VertexOrdering;
 
 			////////////////
 			// public interface 

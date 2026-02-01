@@ -44,7 +44,7 @@ namespace bitgraph {
 			using graph_type = typename GraphEWT::graph_type;								
 			using BaseT = GraphFastRootSort<graph_type>;
 			
-			using typename BaseT::VertexOrdering;
+			using VertexOrdering = BaseT::VertexOrdering;
 				
 			////////////////
 			// data members	
