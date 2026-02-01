@@ -2,9 +2,11 @@
 * @file graph_gen.h
 * @brief header for Erdos-Renyi sparse and non sparse bitstring unidrected graph generation 
 * @author pss
-* @details: created?, last_update 07/03/25
+* @details: 
+*  - created ?
+*  - last modified 01/02/2026
 * 
-* TODO - simplify class architecture for graph generation (07/03/25)
+* @todo - simplify class architecture for graph generation (07/03/25)
 **/
 
 #ifndef __GRAPH_GEN_H__
@@ -532,6 +534,4 @@ namespace bitgraph{
 }//end namespace bitgraph
 
 
-
-
-#endif
+#endif //__GRAPH_GEN_H__
