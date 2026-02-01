@@ -40,6 +40,4 @@ namespace bitgraph {
 // implementation in header file
 
 
-
-
 #endif // __GRAPH_BASIC_H__
