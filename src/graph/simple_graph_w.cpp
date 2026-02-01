@@ -37,7 +37,6 @@ template<class Graph_t, class W>
 constexpr W Base_Graph_W <Graph_t, W >::DEFAULT_WEIGHT;
 ///////////////////////////////////////////////
 
-
 template<class Graph_t, class W>
 void Base_Graph_W<Graph_t, W>::complement_weights()
 {
@@ -45,13 +44,14 @@ void Base_Graph_W<Graph_t, W>::complement_weights()
 
 	for (int v = 0; v < nV; ++v) {
 		if (weight(v) != NO_WEIGHT) {
-			w_[v] = - w_[v];	
+			w_[v] = -w_[v];	
 		}
 	}
 }
 
 template<class Graph_t, class W>
-int Base_Graph_W<Graph_t, W>::create_complement(Base_Graph_W<Graph_t, W>& g) const {
+int Base_Graph_W<Graph_t, W>::create_complement(Base_Graph_W<Graph_t, W>& g) const
+{
 
 	g.set_name(this->name());
 	g.set_path(this->path());
@@ -63,7 +63,8 @@ int Base_Graph_W<Graph_t, W>::create_complement(Base_Graph_W<Graph_t, W>& g) con
 }
 
 template<class Graph_t, class W>
-Base_Graph_W<Graph_t, W>::Base_Graph_W(std::string filename){	
+Base_Graph_W<Graph_t, W>::Base_Graph_W(std::string filename)
+{	
 	
 	if (read_dimacs(filename) == -1) {
 		LOG_ERROR("error reading DIMACS file -Base_Graph_W<Graph_t, W>::Base_Graph_W");
@@ -73,7 +74,8 @@ Base_Graph_W<Graph_t, W>::Base_Graph_W(std::string filename){
 }
 
 template<class Graph_t, class W>
- int Base_Graph_W<Graph_t, W>::set_modulus_weight(int MODE){
+ int Base_Graph_W<Graph_t, W>::set_modulus_weight(int MODE)
+ {
 
 	const std::size_t NV = g_.num_vertices();
 
@@ -86,7 +88,6 @@ template<class Graph_t, class W>
 
 	return 0;
 }
-
 
 template<class Graph_t, class W>
 bool Base_Graph_W<Graph_t, W>::is_unit_weighted()
@@ -117,8 +118,8 @@ void Base_Graph_W<Graph_t, W>::reset(std::size_t NV, W val, string name)
 }
 
 template <class Graph_t, class W>
-int	Base_Graph_W<Graph_t,W >::set_weight (vector<W>& lw){
-
+int	Base_Graph_W<Graph_t,W >::set_weight (vector<W>& lw)
+{
 	//assert
 	if( g_.size() != lw.size() ){
 		LOG_ERROR ("bizarre number of weights - Base_Graph_W<Graph_t,W >::set_w");
@@ -131,8 +132,8 @@ int	Base_Graph_W<Graph_t,W >::set_weight (vector<W>& lw){
 }
 
 template <class Graph_t, class W>
-W Base_Graph_W<Graph_t, W>::maximum_weight(int& v) const{
-
+W Base_Graph_W<Graph_t, W>::maximum_weight(int& v) const
+{
 	auto it = std::max_element(w_.cbegin(), w_.cend());
 	v = static_cast<int>(it - w_.begin());
 	return *it;
@@ -141,12 +142,11 @@ W Base_Graph_W<Graph_t, W>::maximum_weight(int& v) const{
 ///////////////
 //
 // I/O operations
-//
-//////////////
+
 
 template<class Graph_t, class W>
-ostream& Base_Graph_W<Graph_t, W>::write_dimacs(ostream& o) {
-	
+ostream& Base_Graph_W<Graph_t, W>::write_dimacs(ostream& o)
+{
 	//timestamp comment
 	g_.timestamp_dimacs(o);
 	
@@ -177,7 +177,8 @@ ostream& Base_Graph_W<Graph_t, W>::write_dimacs(ostream& o) {
 
 
 template<class Graph_t, class W>
-int Base_Graph_W<Graph_t, W>::read_dimacs (string filename, int type){
+int Base_Graph_W<Graph_t, W>::read_dimacs (string filename, int type)
+{
 			
 	std::string line;
 	
@@ -338,8 +339,8 @@ int Base_Graph_W<Graph_t, W>::read_dimacs (string filename, int type){
 }
 
 template<class Graph_t, class W>
-int Base_Graph_W<Graph_t, W>::read_weights(string filename) {
-	
+int Base_Graph_W<Graph_t, W>::read_weights(string filename) 
+{
 	////////////////////////////////
 	ifstream f(filename.c_str());
 	////////////////////////////////
@@ -380,7 +381,8 @@ int Base_Graph_W<Graph_t, W>::read_weights(string filename) {
 }
 
 template<class Graph_t, class W>
-ostream& Base_Graph_W<Graph_t, W>::print_data(bool lazy, std::ostream& o, bool endl) {
+ostream& Base_Graph_W<Graph_t, W>::print_data(bool lazy, std::ostream& o, bool endl) 
+{
 	g_.print_data(lazy, o, false);
 	o << " [type:w]";								//adds tag to indicate it is weighted		
 	if (endl) { o << std::endl; }
@@ -388,9 +390,10 @@ ostream& Base_Graph_W<Graph_t, W>::print_data(bool lazy, std::ostream& o, bool e
 }
 
 template <class Graph_t, class W>
-ostream& Base_Graph_W<Graph_t, W>::print_weights (com::FixedStack<int>& lv, ostream& o) const{
-
-	for(auto i = 0u; i < lv.size(); ++i){
+ostream& Base_Graph_W<Graph_t, W>::print_weights (com::FixedStack<int>& lv, ostream& o) const
+{
+	const int SIZE = static_cast<int>(lv.size());
+	for(int i = 0; i < lv.size(); ++i){
 		o << "[" << lv.at(i) << ":(" << w_[lv.at(i)] << ")] ";
 	}
 	o << "(" << lv.size() << ")" <<endl;
@@ -398,9 +401,9 @@ ostream& Base_Graph_W<Graph_t, W>::print_weights (com::FixedStack<int>& lv, ostr
 }
 
 template <class Graph_t, class W>
-ostream& Base_Graph_W<Graph_t, W>::print_weights (int* lv, int NV, ostream& o) const{
-
-	for(auto i = 0; i < NV; ++i){
+ostream& Base_Graph_W<Graph_t, W>::print_weights (int* lv, int NV, ostream& o) const
+{
+	for(int i = 0; i < NV; ++i){
 		o << "[" << lv[i] << ":(" << w_[lv[i]] << ")] ";
 	}
 	o << "(" << NV << ")" << endl;
@@ -408,9 +411,10 @@ ostream& Base_Graph_W<Graph_t, W>::print_weights (int* lv, int NV, ostream& o) c
 }
 
 template <class Graph_t, class W>
-ostream& Base_Graph_W<Graph_t, W>::print_weights (com::FixedStack<int>& lv, const VertexMapping& mapping, ostream& o) const{
-
-	for(auto i = 0u; i < lv.size(); ++i){
+ostream& Base_Graph_W<Graph_t, W>::print_weights (com::FixedStack<int>& lv, const VertexMapping& mapping, ostream& o) const
+{
+	const int SIZE = static_cast<int>(lv.size());
+	for(int i = 0; i < lv.size(); ++i){
 		o << "[" << mapping[lv.at(i)] << ":(" << w_[mapping[lv.at(i)]] << ")] ";
 	}
 	o << "(" << lv.size() << ")" << endl;
@@ -418,9 +422,10 @@ ostream& Base_Graph_W<Graph_t, W>::print_weights (com::FixedStack<int>& lv, cons
 }
 
 template <class Graph_t, class W>
-ostream& Base_Graph_W<Graph_t, W>::print_weights (VertexList& lv, ostream& o) const{
-	
-	for(auto i = 0u; i < lv.size(); i++){
+ostream& Base_Graph_W<Graph_t, W>::print_weights (VertexList& lv, ostream& o) const
+{
+	const int SIZE = static_cast<int>(lv.size());
+	for(int i = 0; i < SIZE; ++i){
 		o << "[" << lv[i] << ":(" << w_[lv[i]] << ")] ";
 	}
 	o << "(" << lv.size() << ")" << endl;
@@ -428,12 +433,11 @@ ostream& Base_Graph_W<Graph_t, W>::print_weights (VertexList& lv, ostream& o) co
 }
 
 template <class Graph_t, class W>
-ostream& Base_Graph_W<Graph_t, W>::print_weights (VertexBitset& bbsg, ostream& o) const{
-	
+ostream& Base_Graph_W<Graph_t, W>::print_weights (VertexBitset& bbsg, ostream& o) const
+{
+	int v = bbo::noBit;
 	bbsg.init_scan(bbo::NON_DESTRUCTIVE);										/* CHECK sparse graphs */
-	while(true){
-		int v = bbsg.next_bit();
-		if(v == EMPTY_ELEM) break;
+	while((v = bbsg.next_bit())!= bbo::noBit){
 		o << "[" << v << ":(" << w_[v] << ")] ";
 	}
 	o << "(" << bbsg.count() << ")" << endl;
@@ -441,12 +445,11 @@ ostream& Base_Graph_W<Graph_t, W>::print_weights (VertexBitset& bbsg, ostream& o
 }
 
 template <class Graph_t, class W>
-ostream& Base_Graph_W<Graph_t, W>::print_weights (ostream& o, bool show_v) const{
-
-	const std::size_t NV = g_.num_vertices();
-
+ostream& Base_Graph_W<Graph_t, W>::print_weights (ostream& o, bool show_v) const
+{
+	const int NV = num_vertices();
 	if(show_v){
-		for(auto i = 0u; i < NV; ++i){
+		for(int i = 0; i < NV; ++i){
 			o << "[" << i << ":(" << w_[i] << ")] ";
 		}
 		o << endl;
