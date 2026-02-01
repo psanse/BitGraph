@@ -17,7 +17,7 @@
 
 namespace bitgraph {
 		 
-	// Specialization for undirected graphs
+	// specialization for undirected graphs
 
 	template <class WeightT>
 	class Graph_EW<ugraph, WeightT> : public Base_Graph_EW<ugraph, WeightT> {

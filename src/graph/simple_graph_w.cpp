@@ -22,13 +22,9 @@
 
 #include <fstream>
 #include <iostream>
-
 				
 using namespace std;
 using namespace bitgraph;
-
-//globals
-//const int DEFAULT_WEIGHT_MODULUS = 200;     //for modulus weight generation  [Pullman 2008]		
 
 ///////////////////////////////////////////////
 template<class Graph_t, class W>
@@ -460,38 +456,6 @@ ostream& Base_Graph_W<Graph_t, W>::print_weights (ostream& o, bool show_v) const
 	return o;
 }
 
-///////////////////
-// Specialization for undirected graphs
-
-template<class W>
-ostream& Graph_W<ugraph, W>::write_dimacs(ostream& o) {
-
-	//timestamp comment
-	this->g_.timestamp_dimacs(o);
-
-	//name comment
-	this->g_.name_dimacs(o);
-
-	//dimacs header - recompute edges
-	this->g_.header_dimacs(o, false);
-
-	//write DIMACS nodes n <v> <w>
-	const int NV = this->g_.num_vertices();
-	for (int v = 0; v < NV; ++v) {
-		o << "n " << v + 1 << " " << this->weight(v) << endl;
-	}
-
-	//write directed edges (1-based vertex notation dimacs)
-	for (int v = 0; v < NV - 1; ++v) {
-		for (int w = v + 1; w < NV; ++w) {
-			if (this->g_.is_edge(v, w))							//O(log) for sparse graphs: specialize
-				o << "e " << v + 1 << " " << w + 1 << endl;
-		}
-	}
-
-	return o;
-}
-
 
 ////////////////////////////////////////////
 //list of valid types to allow generic code in *.cpp files 
@@ -500,8 +464,8 @@ namespace bitgraph {
 
 	template class  Base_Graph_W<ugraph, int>;
 	template class  Base_Graph_W<ugraph, double>;
-	template class  Graph_W<ugraph, int>;
-	template class  Graph_W<ugraph, double>;
+	//template class  Graph_W<ugraph, int>;
+	//template class  Graph_W<ugraph, double>;
 
 	//other specializations... (sparse_graph)
 

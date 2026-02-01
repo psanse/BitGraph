@@ -309,53 +309,6 @@ namespace bitgraph {
 	class Graph_W : public Base_Graph_W <GraphT, WeightT> {};
 }
 
-////////////////////////////////////
-// 
-// Specialization for undirected graphs
-//
-////////////////////////////////////
-
-namespace bitgraph {
-
-	template<class WeightT>
-	class Graph_W<ugraph, WeightT> : public Base_Graph_W<ugraph, WeightT> {
-	public:
-			
-		using BaseT = Base_Graph_W<ugraph, WeightT>;					//parent type
-		using graph_type = typename BaseT::graph_type;
-		using bitset_type = typename BaseT::bitset_type;
-		using Weight = typename BaseT::Weight;
-
-		using BaseT::NO_WEIGHT;
-		using BaseT::ZERO_WEIGHT;
-		using BaseT::DEFAULT_WEIGHT;
-		
-		//alias types for backward compatibility
-		//using _wt = weight_type;											
-		using VertexBitset = bitset_type;
-
-		//constructors (inherited from Base class)
-		using BaseT::Base_Graph_W;
-
-		/////////////
-		//useful interface-specific for undirected weighted graphs
-		int max_graph_degree() const { return this->g_.max_graph_degree(); }
-		int degree(int v) const { return this->g_.degree(v); }
-		int degree(int v, const Bitset& bbn) const { return this->g_.degree(v, bbn); }
-
-		///////////
-		//I/O operations
-
-		/*
-		* @brief Writes undirected graph to stream in dimacs format
-		*
-		*		 (self-loops are not considered)
-		*/
-		ostream& write_dimacs(ostream& o = std::cout) override;
-	};
-	
-}//end namespace bitgraph
-
 
 /////////////////////////////////////////////
 //

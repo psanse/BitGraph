@@ -644,10 +644,10 @@ namespace bitgraph {
 
 	template class  Base_Graph_EW<ugraph, int>;
 	template class  Base_Graph_EW<ugraph, double>;
-	template class  Graph_EW<ugraph, int>;
-	template class  Graph_EW<ugraph, double>;
+	//template class  Graph_EW<ugraph, int>;
+	//template class  Graph_EW<ugraph, double>;
 
-		//other specializations... (sparse_graph)
+	//other specializations... (sparse_graph)
 
 } //namespace bitgraph
 
