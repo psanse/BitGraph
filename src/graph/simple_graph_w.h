@@ -14,7 +14,7 @@
 #define __SIMPLE_GRAPH_WEIGHTED_H__
 
 #include "utils/common.h"
-#include "graph_types.h"
+#include "graph_basic.h"
 #include "simple_ugraph.h"
 #include <iostream>
 #include <vector>
@@ -316,8 +316,6 @@ namespace bitgraph {
 ////////////////////////////////////
 
 namespace bitgraph {
-
-	using ugraph = bitgraph::Ugraph<bitarray>;
 
 	template<class WeightT>
 	class Graph_W<ugraph, WeightT> : public Base_Graph_W<ugraph, WeightT> {

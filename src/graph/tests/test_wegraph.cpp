@@ -5,23 +5,19 @@
 * @last_update 27/01/25
 * @author pss
 *
-* @TODO - ADD TESTS, CHECK DISABLED (08/01/2025)
+* @todo - ADD TESTS, CHECK DISABLED (08/01/2025)
 */
 
 #include <iostream>
 #include "gtest/gtest.h"
-#include "graph/algorithms/graph_gen.h"		
-#include "graph/simple_graph_ew.h"
+#include "graph/algorithms/graph_gen.h"	
+#include "graph/graph_edge_weighted.h"
 #include "utils/logger.h"	
 #include "utils/common_paths.h"
 #include "utils/common.h"
 
 using namespace std;
 using namespace bitgraph;
-
-//alias
-using ugraph_ewi = bitgraph::Graph_EW<ugraph, int>;
-using ugraph_ew	 = bitgraph::Graph_EW<ugraph, double>;
 
 class UGraphEWTest : public ::testing::Test {
 protected:

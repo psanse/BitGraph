@@ -5,24 +5,16 @@
 * @last_update 27/01/25
 */ 
 
+
 #include "graph/algorithms/graph_fast_sort.h"
 #include "graph/algorithms/graph_fast_sort_weighted.h"
-#include "graph/simple_graph_w.h"							//MUST BE AFTER ugraph type 
+#include "graph/graph_vertex_weighted.h"
 #include "gtest/gtest.h"
 #include <iostream>
 #include "utils/common.h"
 #include "utils/logger.h"
 #include "utils/file.h"
 #include <string>
-
-
-//useful alias
-namespace bitgraph {
-	using graph = bitgraph::Graph<bitarray>;					//simple graph
-	using ugraph = bitgraph::Ugraph<bitarray>;					//simple undirected graph
-	using ugraph_w = bitgraph::Graph_W < ugraph, double>;		//simple vertex weighted graph with double weights
-	using ugraph_wi = bitgraph::Graph_W < ugraph, int>;			//simple vertex weighted graph with integer weights
-}
 
 using namespace std;
 using namespace bitgraph;	

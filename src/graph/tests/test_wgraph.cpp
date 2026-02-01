@@ -1,25 +1,19 @@
 /*
 * @file test_wgraph.cpp  
 * @brief tests for vertex-weighted graphs
-* @created 9/10/16
-* @last_update 27/01/25
+* @date 9/10/16
+* @last modified 01/02/2026
 * @author pss
 * 
-* @TODO - ADD TESTS and check disabled / commented out tests at the end of file (09/01/25)
+* @todo - ADD TESTS and check disabled / commented out tests at the end of file (09/01/25)
 */
 
-#include "graph/simple_graph_w.h"							 
+#include "graph_vertex_weighted.h"
 #include "graph/algorithms/graph_gen.h"
 #include "gtest/gtest.h"
 #include "utils/common_paths.h"
 #include "utils/logger.h"
 #include <iostream>
-
-//useful alias
-namespace bitgraph {
-	using ugraph_w = bitgraph::Graph_W<ugraph, double>;			//simple vertex weighted graph with double weights
-	using ugraph_wi = bitgraph::Graph_W<ugraph, int>;				//simple vertex weighted graph with int weights	
-}
 
 using namespace std;
 using namespace bitgraph;
@@ -42,15 +36,13 @@ protected:
 	ugraph_wi gw;											//undirected graph with integer weights
 };
 
-
 TEST_F(UGraphWTest, scale_transformation) {
 
 	//scale transformation (mul by *5 all the weights)
 	gw.transform_weights(com::scale<decltype(gw)::Weight>(5));
 
 	EXPECT_EQ(5,  gw.weight(0));
-	EXPECT_EQ(10, gw.weight(1));
-	
+	EXPECT_EQ(10, gw.weight(1));	
 }
 
 TEST_F(UGraphWTest, contruction) {

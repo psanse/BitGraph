@@ -12,18 +12,12 @@
 #ifndef __GRAPH_TYPE_CONVERSIONS_H__
 #define	__GRAPH_TYPE_CONVERSIONS_H__
 
-#include "graph/simple_ugraph.h"								//currently, contains the only converted graph types
+//#include "graph/simple_ugraph.h"								//legacy - to remove
+
+#include "graph_basic.h"
 #include "utils/common.h"
 #include "utils/logger.h"
 #include <iostream>
-
-using namespace std;
-
-//alias for converted graph facade types
-namespace bitgraph {
-	using ugraph = bitgraph::Ugraph<bitarray>;						//simple undirected graph type
-	using sparse_ugraph = bitgraph::Ugraph<sparse_bitarray>;		//simple sparse undirected graph type
-}
 
 namespace bitgraph {
 	

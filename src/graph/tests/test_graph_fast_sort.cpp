@@ -19,19 +19,10 @@
 #include "utils/file.h"
 #include <string>
 
-#include "graph/simple_graph_w.h"							//MUST BE AFTER ugraph type 
-
-using namespace bitgraph;
-
-//useful alias
-using ugraph_w = bitgraph::Graph_W<ugraph, double>;			//simple vertex weighted graph with double weights
-using ugraph_wi = bitgraph::Graph_W<ugraph, int>;			//simple vertex weighted graph with int weights
-
-//useful alias
-using graph = bitgraph::Graph<bitarray>;			//simple graph
-using ugraph = bitgraph::Ugraph<bitarray>;			//simple undirected graph
+#include "graph/graph_vertex_weighted.h"
 
 using namespace std;
+using namespace bitgraph;
 using namespace bitgraph::com::_sort;
 
 class GraphFastRootSortTest : public ::testing::Test {

@@ -16,26 +16,8 @@
 #include <cassert>
 
 #include "utils/common.h"
-#include "graph/graph.h"								// facade types for consumer code
+#include "graph/graph_basic.h"								// facade types ugraph, graph, sparse_ugraph, sparse_graph
 #include "graph_fast_sort.h"
-
-//useful facade type aliases - remove in future versions if #include "graph/graph.h" is used
- 
-//#include "graph/simple_ugraph.h"
-//#include "graph/simple_graph_w.h"						// must be after simple_ugraph include
-//#include "graph/simple_graph_ew.h"					// must be after simple_ugraph include
- 
-//namespace bitgraph {
-	
-//	using graph = bitgraph::Graph<bitarray>;						//simple graph
-//	using ugraph = bitgraph::Ugraph<bitarray>;						//simple undirected graph
-//	using sparse_graph = bitgraph::Graph<sparse_bitarray>;			//simple sparse graph
-//	using sparse_ugraph = bitgraph::Ugraph<sparse_bitarray>;		//simple sparse undirected graph
-//	using ugraph_w = bitgraph::Graph_W<ugraph, double>;
-//	using ugraph_wi = bitgraph::Graph_W<ugraph, int>;
-//	using ugraph_ew = bitgraph::Graph_EW<ugraph, double>;
-//	using ugraph_ewi = bitgraph::Graph_EW<ugraph, int>;
-//}
 
 
 namespace bitgraph {
