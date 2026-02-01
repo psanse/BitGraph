@@ -1,9 +1,9 @@
 /** 
  * @file graph.h
- * @brief  Header file for the main facade graph types of the BitScan library  to be used by consumer code
+ * @brief  Header file for the main facade graph types of the BitGraph library  to be used by consumer code
  *		    
- * @comment: BitGraph is an efficient C++ library for simple graphs
- *			 BitGraph stores the adjacency matrix un full and each row is encoded as a
+ * @notes: BitGraph is an efficient C++ library for simple graphs
+ *			 BitGraph stores the adjacency matrix in full, where each row is encoded as a
  *			 bitstring. BitGraph is at the core of a number of state-of-the-art-leading 
  *			 exact algorithms for NP-hard problems. 
  *
