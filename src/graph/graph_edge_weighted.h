@@ -36,7 +36,7 @@ namespace bitgraph {
 		using mat_t = typename BaseT::mat_t;							// matrix type for weights
 
 		//constructors (inherited)
-		using Base_Graph_EW<ugraph, Weight>::Base_Graph_EW;
+		using BaseT::BaseT;
 
 		/////////////////////////
 		// basic operations

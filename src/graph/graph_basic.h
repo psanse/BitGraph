@@ -13,7 +13,8 @@
 
 #include "graph_types.h"
 
-#include "simple_ugraph.h"
+//#include "simple_ugraph.h"
+#include "simple_sparse_ugraph.h"
 
 namespace bitgraph {
     	
