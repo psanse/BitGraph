@@ -17,13 +17,19 @@
 
 namespace bitgraph {
 
-    // Core graphs
+	// specialized implementations of graph types with bitarray and sparse_bitarray
+
+
+
+
+
+    // alias facade graph types
     using graph = Graph<bitarray>;                              // simple graph 
     using ugraph = Ugraph<bitarray>;                            // simple undirected graph
     using sparse_graph = Graph<sparse_bitarray>;                // simple sparse graph
     using sparse_ugraph = Ugraph<sparse_bitarray>;              // simple sparse undirected graph
-   
 }
+
 
 
 
