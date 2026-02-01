@@ -1,17 +1,45 @@
-/**
-  * @file simple_graph_ew.h
-  * @brief classes Base_Graph_EW and Graph_EW for edge-weighted graphs, 
-  *			where self_loops are considered as vertex weights. Thus IT IS
-  *			NOT for the most general case of vertex and edge-weighted GRAPHS,
-  *		    but could suffice also for vertices in both vertices and egdes
-  *			in many applications.
-  *
-  * @details: created 16/01/19, last_update 08/03/25
-  * @details: milestone train application (10/11/2021)
-  * @author pss
-  *
-  * This code is part of the GRAPH 1.0 C++ library
-  **/
+﻿/**
+ * @file simple_graph_ew.h
+ *
+ * @brief Generic base and implementation templates for edge-weighted graphs.
+ *
+ * This header defines the generic classes `Base_Graph_EW` and `Graph_EW`,
+ * which provide support for **edge-weighted graphs** where **self-loops are
+ * interpreted as vertex weights**.
+ *
+ * @details
+ * The weighting model implemented in this file is intentionally restricted:
+ *  - Edge weights are associated with edges {u, v}, u ≠ v
+ *  - Self-loops (u, u) are interpreted as **vertex weights**
+ *
+ * Therefore, this implementation does **not** represent the most general case
+ * of graphs with independent vertex and edge weights. Nevertheless, it is
+ * sufficient for many applications where vertex weights can be encoded as
+ * self-loops (e.g., maximum clique variants, train scheduling models, etc.).
+ *
+ * The class `Base_Graph_EW` provides common infrastructure shared across
+ * different graph types and enables specialization of behavior according to
+ * the underlying graph representation.
+ *
+ * The user-facing class is `Graph_EW<GraphT, WeightT>`, which extends
+ * `Base_Graph_EW` with a public interface for edge-weighted graph operations.
+ *
+ * @note
+ * This header contains **generic implementation code** and must not depend on
+ * facade graph types. Facade-specific bindings (e.g., for `ugraph`) are defined
+ * in higher-level headers.
+ *
+ * @par Historical notes
+ *  - created: 16/01/2019
+ *  - Milestone application: Train scheduling (10/11/2021)
+ *  - Last update: 01/02/2026
+ *
+ * @author
+ * Pablo San Segundo (pss)
+ *
+ * @copyright
+ * This file is part of the GRAPH 1.0 C++ library.
+ */
 
 #ifndef __SIMPLE_GRAPH_EDGE_WEIGHTED_H__
 #define __SIMPLE_GRAPH_EDGE_WEIGHTED_H__
@@ -31,9 +59,8 @@ namespace bitgraph {
 	//
 	// Note: user class is Graph_EW (see below) 
 	// 
-	// TODO: there are some common parts with Base_Graph_W for weights in the vertices (12/12/2025)
-	//
-	///////////////////////
+	// @todo there are some common parts with Base_Graph_W for weights in the vertices (12/12/2025)
+	
 
 	template<class Graph_t, class WeightT>
 	class Base_Graph_EW {
