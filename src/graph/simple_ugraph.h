@@ -8,7 +8,7 @@
  *
  * This code is part of the GRAPH 1.0 C++ library 
  *
- * TODO implement min_degree functions (03/01/2025)
+ * @todo implement min_degree functions (03/01/2025)
  **/
 
 #ifndef __SIMPLE_UGRAPH_H__
