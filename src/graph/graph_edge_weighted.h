@@ -138,8 +138,7 @@ namespace bitgraph {
 		virtual	std::ostream& write_dimacs(std::ostream& o);
 
 	}; //end of Graph_EW class
-	
-      
+	      
 	// edge-weighted facade types
 
     using ugraph_ew = Graph_EW<ugraph, double>;                 // simple edge weighted graph with double weights

@@ -9,10 +9,8 @@
 */
 
 #include "gtest/gtest.h"
-#include "graph/simple_graph.h"
+#include "graph/graph_basic.h"
 #include <iostream>
-
-using graph = bitgraph::Graph<bitgraph::bitarray>;						//simple graph
 
 using namespace std;
 using namespace bitgraph;
@@ -52,13 +50,12 @@ TEST_F(GraphTest, constructor) {
 TEST_F(GraphTest, deallocate_memory) {
 	
 	//clean memory
-	g = graph();						//std::swap(graph(), g);
+	g = graph{};							//std::swap(graph(), g);
 
 	EXPECT_EQ	(0, g.num_vertices());
 	EXPECT_TRUE	(g.name().empty());
 	EXPECT_EQ	(0, g.num_edges());
 }
-
 
 TEST(Graph, constructor_adj_mat) {
 
