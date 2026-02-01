@@ -1,13 +1,43 @@
-/**
-* @file graph_gen.h
-* @brief header for Erdos-Renyi sparse and non sparse bitstring unidrected graph generation 
-* @author pss
-* @details: 
-*  - created ?
-*  - last modified 01/02/2026
-* 
-* @todo - simplify class architecture for graph generation (07/03/25)
-**/
+﻿/**
+ * @file graph_gen.h
+ *
+ * @brief Random graph generation utilities (Erdős–Rényi G(n,p)) for BitGraph facades.
+ *
+ * This header provides utilities to generate undirected simple graphs following
+ * the Erdős–Rényi model G(n,p), supporting both dense and sparse bitset-backed
+ * graph representations.
+ *
+ * It includes:
+ *  - Parameter bundles for benchmark generation (`random_attr_t`)
+ *  - Generic random generators for graph structure (`RandomGen<GraphT>`)
+ *  - Generation of isomorphic graphs by vertex permutation
+ *  - Batch generation of benchmark sets over ranges of n and p
+ *
+ * @details
+ * The generators operate on the **graph structure only** (vertex/edge set).
+ * When `GraphT` is a weighted-graph facade type, weights are not generated or
+ * modified unless explicitly handled by the caller; only edges are created.
+ *
+ * The main generation model is:
+ *  - Simple graphs (no self-loops)
+ *  - Uniform edge creation probability p for each potential edge
+ *
+ * This header is intended for benchmarking, testing, and dataset generation.
+ * It may include facade headers to make common concrete graph types available.
+ *
+ * @note
+ * The current architecture mixes facade bindings and generator logic; a future
+ * refactor is planned to simplify class structure and reduce include coupling.
+ *
+ * @par Historical notes
+ *  - Created: (unknown)
+ *  - Last modified: 01/02/2026
+ *
+ * @todo Simplify class architecture for graph generation (07/03/2025).
+ *
+ * @author
+ * Pablo San Segundo (pss)
+ */
 
 #ifndef __GRAPH_GEN_H__
 #define __GRAPH_GEN_H__
@@ -21,7 +51,6 @@
 #include "graph/graph_vertex_weighted.h"						// facade types 
 #include "graph/graph_edge_weighted.h"							// facade types 
 #include "graph_fast_sort.h"
-
 
 namespace bitgraph {
 
