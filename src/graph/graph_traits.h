@@ -28,9 +28,11 @@ namespace bitgraph {
     };
 
 	// helper to trigger static_assert false in templates
+	// public derivation from std::false_type gives standard trait behavior
+	// mental model: dependent false has value false unless specialized otherwise
     template<class>
     struct dependent_false : std::false_type {};        // alternatively always_false
-
+       
 } 
 
 

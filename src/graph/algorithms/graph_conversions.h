@@ -6,6 +6,7 @@
  * @last_update 30/06/25
  * @author pss
  *
+ * @todo change design in the future 01/02/2026
  **/
 
 #ifndef __GRAPH_TYPE_CONVERSIONS_H__
@@ -18,7 +19,7 @@
 
 using namespace std;
 
-//alias for the converted graph types
+//alias for converted graph facade types
 namespace bitgraph {
 	using ugraph = bitgraph::Ugraph<bitarray>;						//simple undirected graph type
 	using sparse_ugraph = bitgraph::Ugraph<sparse_bitarray>;		//simple sparse undirected graph type
