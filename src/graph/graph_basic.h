@@ -1,0 +1,30 @@
+/** 
+ * @file graph_basic.h
+ * @brief  
+ *		    
+ * @comment:  
+ *
+ * @author: pss
+ * @date 01/02/2026 
+ **/
+
+#ifndef __GRAPH_BASIC_H__
+#define __GRAPH_BASIC_H__
+
+#include "graph_types.h"
+
+#include "simple_ugraph.h"
+
+namespace bitgraph {
+
+    // Core graphs
+    using graph = Graph<bitarray>;                              // simple graph 
+    using ugraph = Ugraph<bitarray>;                            // simple undirected graph
+    using sparse_graph = Graph<sparse_bitarray>;                // simple sparse graph
+    using sparse_ugraph = Ugraph<sparse_bitarray>;              // simple sparse undirected graph
+   
+}
+
+
+
+#endif // __GRAPH_BASIC_H__
