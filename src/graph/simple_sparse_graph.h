@@ -50,22 +50,24 @@ namespace bitgraph{
 	template<>
 	inline int Graph<BBScanSp>::shrink_to_fit(std::size_t size)
 	{
+		const int sizeInt = static_cast<int>(size);
+
 		//assertions
-		if (NV_ <= size) {
-			LOGG_WARNING("Wrong shrinking size ", size, " the graph remains unchanged - Graph<BBScanSp>::shrink_to_fit");
+		if (NV_ <= sizeInt) {
+			LOGG_WARNING("Wrong shrinking size ", sizeInt, " the graph remains unchanged - Graph<BBScanSp>::shrink_to_fit");
 			return -1;
 		}
 
 		//trims vertices 
-		for (int i = 0; i < size; i++) {
+		for (int i = 0; i < sizeInt; i++) {
 			adj_[i].clear_bit(size, EMPTY_ELEM);				//closed range
 		}
 
 		//resizes adjacency matrix
 		adj_.resize(size);
-		NV_ = size;
-		NE_ = 0;												//so that when required, the value will be recomputed
-		NBB_ = INDEX_1TO1(size);								//maximum number of bitblocks per row (for sparse graphs)		
+		NV_ = sizeInt;
+		NE_ = 0;												// so that when required, the value will be recomputed
+		NBB_ = INDEX_1TO1(sizeInt);								// maximum number of bitblocks per row (for sparse graphs)		
 
 		return 0;
 	}
