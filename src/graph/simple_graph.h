@@ -1,15 +1,10 @@
- /**
-   * @file simple_graph.h
-   * @brief class Graph for simple graphs 
-   *
-   * @details: created 17/6/10, last_update 06/01/25
-   * @author pss
-   *
-   * This code is part of the GRAPH 1.0 C++ library
-   * 
-   * TODO use SFINAE to filter types (10/01/2025)
-   *
-   **/
+/**
+ * @file simple_graph.h
+ * @brief class Graph for simple graphs 
+ *
+ * @details: created 17/6/10, last_update 06/01/25
+ * @author pss
+ */
 
 #ifndef __SIMPLE_GRAPH_H__
 #define __SIMPLE_GRAPH_H__
@@ -21,19 +16,17 @@
 #include "formats/mmx_format.h"
 #include "utils/logger.h"
 #include "utils/prec_timer.h"
-#include <fstream>
+
+#include <iostream>
 #include <iomanip>
-#include <iostream>
+#include <fstream>
 #include <string>
-#include <vector>
-#include <iostream>
 #include <vector>
 
 namespace bitgraph {
 	
-	namespace _impl {
-		class GraphConversion;			// forward declaration
-	}
+	// forward declaration
+	namespace _impl { class GraphConversion;}
 
 	//////////////////
 	//
@@ -48,7 +41,7 @@ namespace bitgraph {
 
 		//filter out invalid types
 		static_assert(std::is_same<BBScan, BitsetT>::value ||
-			std::is_same<BBScanSp, BitsetT>::value, "is not a valid Graph type");
+							std::is_same<BBScanSp, BitsetT>::value, "is not a valid Graph type");
 
 		friend class _impl::GraphConversion;
 
