@@ -1,10 +1,41 @@
-/**
- * @file simple_graph.h
- * @brief class Graph for simple graphs 
- *
- * @details: created 17/6/10, last_update 06/01/25
- * @author pss
- */
+ /**
+  * @file simple_graph.h
+  *
+  * @brief Generic graph container for simple (unweighted) graphs.
+  *
+  * This header defines the primary template `Graph<BitsetT>`, which represents
+  * a simple graph using a bitset-based adjacency structure.
+  *
+  * The class provides:
+  *  - Core graph storage and basic operations
+  *  - Graph construction, inspection, and modification
+  *  - Import/export support for common graph formats (DIMACS, Matrix Market,
+  *    edge lists, MMX)
+  *  - Utility services such as logging and timing for graph operations
+  *
+  * @details
+  * `Graph<BitsetT>` is the fundamental graph abstraction used throughout the
+  * BitGraph library. The template parameter `BitsetT` specifies the underlying
+  * adjacency representation and is currently restricted to:
+  *  - `BBScan`   (dense bitset representation)
+  *  - `BBScanSp` (sparse bitset representation)
+  *
+  * Higher-level graph abstractions (e.g. undirected graphs, weighted graphs,
+  * and facade graph types) are built on top of this class.
+  *
+  *
+  * @note
+  * This header is a core dependency of most BitGraph components and should be
+  * included before facade or algorithm-level headers.
+  *
+  * @author
+  * Pablo San Segundo (pss)
+  *
+  * @date
+  * Created: 17/06/2010
+  * Last update: 06/01/2025
+  */
+
 
 #ifndef __SIMPLE_GRAPH_H__
 #define __SIMPLE_GRAPH_H__
