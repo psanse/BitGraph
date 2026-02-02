@@ -368,7 +368,7 @@ namespace bitgraph {
 		pos_(NV_)		
 	{
 		try {
-			subg_ = graph_type::VertexBitset{ static_cast<std::size_t>(NV_), subg };
+			subg_ = typename graph_type::VertexBitset{ static_cast<std::size_t>(NV_), subg };
 			ver_.assign(subg_.size(), EMPTY_ELEM);
 		}
 		catch (std::bad_alloc& ba) {
