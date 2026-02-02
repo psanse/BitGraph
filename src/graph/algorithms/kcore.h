@@ -6,16 +6,16 @@
  * @last_update 27/01/25
  * @author pss
  *
- * TODO - mention reference paper to determine KCore
- * TODO - using pointer to external bitset as set of vertices of the induced subgraph. Change to an owned bitset or vector of vertices (13/01/25)
+ * @TODO - mention reference paper to determine KCore
+ * @TODO - using pointer to external bitset as set of vertices of the induced subgraph. Change to an owned bitset or vector of vertices (13/01/25)
  *		  Add different types to define the set of vertices that induces the subgraph (13/01/25)
+ * @todo - tests not passing, check (02/02/2026)
  **/
 
 #ifndef __KCORE_H__
 #define __KCORE_H__
 
 #include "utils/logger.h"
-//#include "graph/simple_ugraph.h"
 #include "graph/graph_basic.h"
 #include "graph_fast_sort.h"
 #include <vector>
