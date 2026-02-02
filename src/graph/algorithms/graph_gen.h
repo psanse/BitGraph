@@ -107,11 +107,11 @@ namespace bitgraph {
 		//
 		// class RandomGen
 		// (random generation of generic non-sparse and unweighted graphs)
-		// Important: Graph_t can be a graph weighted type. The class will operate only on the graph structure.
+		// Important: GraphT can be a graph weighted type. The class will operate only on the graph structure.
 		//
 		//////////////////
 
-		template<class Graph_t>
+		template<class GraphT>
 		class RandomGen {
 		public:
 
@@ -127,7 +127,7 @@ namespace bitgraph {
 			* @param p probability of edge creation
 			* @returns 0 if OK, -1 if ERROR
 			*/
-			static int create_graph(Graph_t& g, std::size_t n, double p);
+			static int create_graph(GraphT& g, std::size_t n, double p);
 
 			/*
 			* @brief creates a set uniform random (n, p) directed/undirected graphs
@@ -151,11 +151,11 @@ namespace bitgraph {
 			* @returns 0 if successful, -1 otherwise
 			* @details: TODO - Unit test (14/04/2025)
 			**/
-			static int create_isomorphism(Graph_t& g_iso, Graph_t& g);
+			static int create_isomorphism(GraphT& g_iso, GraphT& g);
 		};
 	}//end of namespace _impl	
 
-	using _impl::RandomGen;		//alias for RandomGen<Graph_t>
+	using _impl::RandomGen;		//alias for RandomGen<GraphT>
 
 }//end of namespace bitgraph	
 
@@ -170,7 +170,7 @@ namespace bitgraph {
 		// Currently only for undirected graphs
 		//
 		//////////////////
-		template<class Graph_t, int logSizeTable = 35000 >
+		template<class GraphT, int logSizeTable = 35000 >
 		class SparseRandomGen {};
 
 		/////////////////
@@ -213,7 +213,7 @@ namespace bitgraph {
 		};
 	}//end of namespace _impl
 
-	using _impl::SparseRandomGen;		//alias for SparseRandomGen<Graph_t, logSizeTable>
+	using _impl::SparseRandomGen;		//alias for SparseRandomGen<GraphT, logSizeTable>
 }//end of namespace bitgraph
 
 
@@ -232,13 +232,13 @@ namespace bitgraph {
 		//
 		////////////////
 
-		template <class Graph_t>
+		template <class GraphT>
 		class WeightGen
 		{
 			//filter out invalid types - currently only non-sparse vertex weighted graphs
-			static_assert(std::is_same<Graph_t, ugraph_w>::value ||
-						std::is_same<Graph_t, ugraph_wi>::value,						
-						"WeightGen<Graph_t> : Graph_t must be a simple, non-sparse,  vertex-weighted graph type ");
+			static_assert(std::is_same<GraphT, ugraph_w>::value ||
+						std::is_same<GraphT, ugraph_wi>::value,						
+						"WeightGen<GraphT> : GraphT must be a simple, non-sparse,  vertex-weighted graph type ");
 
 		public:
 			enum type_t { WMOD = 0, WDEG };
@@ -254,12 +254,12 @@ namespace bitgraph {
 			*
 			* @returns -1 if error, 0 if OK
 			*/
-			static int create_weights(Graph_t& g, type_t, int wmod = DEFAULT_WEIGHT_MODULUS,
+			static int create_weights(GraphT& g, type_t, int wmod = DEFAULT_WEIGHT_MODULUS,
 				std::string FILE_EXTENSION = "", std::string FILE_PATH = "");
 		};
 	}//end of namespace _impl
 
-	using _impl::WeightGen;		//alias for WeightGen<Graph_t>
+	using _impl::WeightGen;		//alias for WeightGen<GraphT>
 }//end of namespace bitgraph
 
 
@@ -278,13 +278,13 @@ namespace bitgraph {
 		////////////////
 
 
-		template<class Graph_t>
+		template<class GraphT>
 		class EdgeWeightGen
 		{
 			//filter out invalid types - currently only non-sparse vertex weighted graphs
-			static_assert(std::is_same<Graph_t, ugraph_ew>::value ||
-						 std::is_same<Graph_t, ugraph_ewi>::value,
-							"EdgeWeightGen<Graph_t> : Graph_t must be a simple, non-sparse,  edge-weighted graph type ");
+			static_assert(std::is_same<GraphT, ugraph_ew>::value ||
+						 std::is_same<GraphT, ugraph_ewi>::value,
+							"EdgeWeightGen<GraphT> : GraphT must be a simple, non-sparse,  edge-weighted graph type ");
 
 
 		public:
@@ -303,13 +303,13 @@ namespace bitgraph {
 			*
 			* @returns -1 if error, 0 if OK
 			*/
-			static int create_weights(Graph_t& g, type_t, int wmod = DEFAULT_WEIGHT_MODULUS,
+			static int create_weights(GraphT& g, type_t, int wmod = DEFAULT_WEIGHT_MODULUS,
 				std::string FILE_EXTENSION = "", std::string FILE_PATH = "");
 
 		};
 	}//end of namespace _impl
 
-	using _impl::EdgeWeightGen;		//alias for EdgeWeightGen<Graph_t>
+	using _impl::EdgeWeightGen;		//alias for EdgeWeightGen<GraphT>
 }//end of namespace bitgraph
 
 	////////////////////////////////////////////////////////////////////////
@@ -317,12 +317,12 @@ namespace bitgraph {
 
 namespace bitgraph{	
 
-	template<class Graph_t>
-	int RandomGen<Graph_t>::create_graph(Graph_t& g, std::size_t NV, double p) {
+	template<class GraphT>
+	int RandomGen<GraphT>::create_graph(GraphT& g, std::size_t NV, double p) {
 
 		//assert - TODO DEBUG MODE
 		if (NV <= 0) {
-			LOG_ERROR("bad number of vertices - RandomGen<Graph_t>::create_graph");
+			LOG_ERROR("bad number of vertices - RandomGen<GraphT>::create_graph");
 			return -1;
 		}
 
@@ -340,11 +340,11 @@ namespace bitgraph{
 		return 0;
 	}
 
-	template<class Graph_t>
-	int RandomGen<Graph_t>::create_graph_benchmark(const std::string& path, const random_attr_t& rd) {
+	template<class GraphT>
+	int RandomGen<GraphT>::create_graph_benchmark(const std::string& path, const random_attr_t& rd) {
 
 		std::ostringstream o;
-		Graph_t g;
+		GraphT g;
 		std::ofstream f;
 
 		//add slash '/' at the end to the path if required
@@ -363,7 +363,7 @@ namespace bitgraph{
 					o << mypath.c_str() << "r" << i << "_" << j << "_" << k << ".txt";
 					f.open(o.str().c_str());
 					if (!f) {
-						LOGG_ERROR("error in file name: ", o.str(), "- RandomGen<Graph_t>::create_graph_benchmark");
+						LOGG_ERROR("error in file name: ", o.str(), "- RandomGen<GraphT>::create_graph_benchmark");
 						std::exit(EXIT_FAILURE);
 					}
 					g.write_dimacs(f);
@@ -374,9 +374,9 @@ namespace bitgraph{
 		return 0;		//OK
 	}
 
-	template<class Graph_t>
+	template<class GraphT>
 	inline
-		int RandomGen<Graph_t>::create_isomorphism(Graph_t& g_iso, Graph_t& g_ori)
+		int RandomGen<GraphT>::create_isomorphism(GraphT& g_iso, GraphT& g_ori)
 	{
 		vector<int> map(g_ori.size(), 0);
 		std::iota(map.begin(), map.end(), 0);
@@ -390,7 +390,7 @@ namespace bitgraph{
 			gs.reorder(map, g_iso);
 		}
 		catch (std::exception& e) {
-			LOG_ERROR("error during isomorphism generation - RandomGen<Graph_t>::create_isomorphism");
+			LOG_ERROR("error during isomorphism generation - RandomGen<GraphT>::create_isomorphism");
 			LOG_ERROR("%s", e.what());
 			return -1;
 		}
@@ -470,9 +470,9 @@ namespace bitgraph{
 		return 0;
 	}
 
-	template<class Graph_t>
+	template<class GraphT>
 	inline
-		int WeightGen<Graph_t>::create_weights(Graph_t& g, type_t type, int wmod, std::string FILE_EXTENSION, std::string FILE_PATH) {
+		int WeightGen<GraphT>::create_weights(GraphT& g, type_t type, int wmod, std::string FILE_EXTENSION, std::string FILE_PATH) {
 
 		const int NV = g.graph().num_vertices();
 
@@ -490,7 +490,7 @@ namespace bitgraph{
 			}
 			break;
 		default:
-			LOG_INFO("incorrect weight generation mode - WeightGen<Graph_t>::create_weights");
+			LOG_INFO("incorrect weight generation mode - WeightGen<GraphT>::create_weights");
 			return -1;
 		}
 
@@ -506,7 +506,7 @@ namespace bitgraph{
 			//streams weights to file
 			std::ofstream f(filename);
 			if (!f) {
-				LOGG_INFO("WeightGen<Graph_t>::create_weights () - cannot write weights to file ", filename);
+				LOGG_INFO("WeightGen<GraphT>::create_weights () - cannot write weights to file ", filename);
 				return -1;
 			}
 
@@ -520,16 +520,16 @@ namespace bitgraph{
 		return 0;
 	}
 
-	template<class Graph_t>
+	template<class GraphT>
 	inline
-		int EdgeWeightGen<Graph_t>::create_weights(Graph_t& g, type_t type, int wmod, std::string FILE_EXTENSION, string FILE_PATH) {
+		int EdgeWeightGen<GraphT>::create_weights(GraphT& g, type_t type, int wmod, std::string FILE_EXTENSION, string FILE_PATH) {
 
 		switch (type) {
 		case WMOD:
 			g.set_modulus_edge_weight(wmod);
 			break;
 		default:
-			LOG_INFO("bad weight generation mode - EdgeWeightGen<Graph_t>::create_weights");
+			LOG_INFO("bad weight generation mode - EdgeWeightGen<GraphT>::create_weights");
 			LOG_INFO("original weights unchanged");
 			return -1;
 		}
@@ -546,7 +546,7 @@ namespace bitgraph{
 			//streams weights to file
 			std::ofstream f(filename);
 			if (!f) {
-				LOGG_INFO("cannot write edge-weights to file ", filename, " - EdgeWeightGen<Graph_t>::create_weights");
+				LOGG_INFO("cannot write edge-weights to file ", filename, " - EdgeWeightGen<GraphT>::create_weights");
 				return -1;
 			}
 
