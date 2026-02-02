@@ -48,7 +48,7 @@ void Base_Graph_W<GraphT, WeightT>::complement_weights()
 }
 
 template<class GraphT, class WeightT>
-int Base_Graph_W<GraphT, WeightT>::create_complement(Base_Graph_W<GraphT, Weight>& g) const
+int Base_Graph_W<GraphT, WeightT>::create_complement(Base_Graph_W<graph_type, Weight>& g) const
 {
 	g.set_name(this->name());
 	g.set_path(this->path());
@@ -455,7 +455,7 @@ ostream& Base_Graph_W<GraphT, WeightT>::print_weights (ostream& o, bool show_v) 
 
 
 ////////////////////////////////////////////
-//list of valid types to allow generic code in *.cpp files 
+//list of valid types for generic code in *.cpp files 
 
 namespace bitgraph {
 
@@ -465,7 +465,6 @@ namespace bitgraph {
 	//template class  Graph_W<ugraph, double>;
 
 	//other specializations... (sparse_graph)
-
 
 } // namespace bitgraph
 

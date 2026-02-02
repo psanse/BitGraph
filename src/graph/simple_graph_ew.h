@@ -321,7 +321,7 @@ namespace bitgraph {
 			* @param g output graph
 			* @returns 0 if success, -1 if error
 			**/
-		int create_complement(Base_Graph_EW<GraphT, Weight>& g) const;
+		int create_complement(Base_Graph_EW<graph_type, Weight>& g) const;
 
 		/**
 		* @brief generates random edges uniformly with probability p and weight val
@@ -416,7 +416,7 @@ namespace bitgraph {
 		//data members
 
 	protected:
-		GraphT g_;
+		graph_type g_;
 		mat_t   we_;								//matrix of vertex and edge-weights 																
 
 	}; //end of class Base_Graph_EW
