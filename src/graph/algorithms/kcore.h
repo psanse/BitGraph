@@ -278,10 +278,10 @@ namespace bitgraph {
 			VertexBitset subg_;															// reference induced subgraph to study coreness 
 
 			//data structures
-			vint deg_;																	// coreness of vertices																
-			vint bin_;																	// bins [deg[v]] for bin sort sorting algorithm
-			vint ver_;																	// vertices in non-decreasing kcore order (mapping in new-to-old format)
-			vint pos_;																	// position of vertices in ver_ (old-to-new format)
+			std::vector<int> deg_;														// coreness of vertices																
+			std::vector<int> bin_;														// bins [deg[v]] for bin sort sorting algorithm
+			VertexList ver_;															// vertices in non-decreasing kcore order (mapping in new-to-old format)
+			VertexList pos_;															// position of vertices in ver_ (old-to-new format)
 		};
 
 	}//end namespace impl
@@ -343,10 +343,13 @@ namespace bitgraph {
 	}
 
 	template<class GraphT>
-	inline KCore<GraphT>::KCore(graph_type& g, VertexBitset subg) : g_(g), NV_(g.num_vertices()), deg_(NV_), pos_(NV_) {
-
-		subg_ = std::move(subg); 
-
+	inline KCore<GraphT>::KCore(graph_type& g, VertexBitset subg) : 
+		g_(g),
+		NV_(g.num_vertices()),
+		deg_(NV_), 
+		pos_(NV_), 
+		subg_(std::move(subg))
+	{
 		try {
 			ver_.assign(subg_.size(), EMPTY_ELEM);
 		}
@@ -355,16 +358,17 @@ namespace bitgraph {
 			LOG_ERROR("Exiting...");
 			std::exit(EXIT_FAILURE);
 		}
-
 	}
 
-
 	template<class GraphT>
-	inline KCore<GraphT>::KCore(graph_type& g, const VertexList& subg) : g_(g), NV_(g.num_vertices()), deg_(NV_), pos_(NV_) {
-		
-		subg_ = graph_type::VertexBitset(static_cast<std::size_t>(NV_), subg);
-		
+	inline KCore<GraphT>::KCore(graph_type& g, const VertexList& subg) :
+		g_(g),
+		NV_(g.num_vertices()),
+		deg_(NV_),
+		pos_(NV_)		
+	{
 		try {
+			subg_ = graph_type::VertexBitset{ static_cast<std::size_t>(NV_), subg };
 			ver_.assign(subg_.size(), EMPTY_ELEM);
 		}
 		catch (std::bad_alloc& ba) {
@@ -372,7 +376,6 @@ namespace bitgraph {
 			LOG_ERROR("Exiting...");
 			std::exit(EXIT_FAILURE);
 		}
-
 	}
 
 
