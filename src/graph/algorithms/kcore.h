@@ -104,7 +104,7 @@ namespace bitgraph {
 			//constructors
 			KCore(graph_type& g);
 			KCore(graph_type& g, VertexBitset bbSubg);
-			KCore(graph_type& g, VertexList subg);
+			KCore(graph_type& g, const VertexList& subg);
 		
 
 			//copy and move semantics disallowed
@@ -360,7 +360,7 @@ namespace bitgraph {
 
 
 	template<class GraphT>
-	inline KCore<GraphT>::KCore(graph_type& g, VertexList subg) : g_(g), NV_(g.num_vertices()), deg_(NV_), pos_(NV_) {
+	inline KCore<GraphT>::KCore(graph_type& g, const VertexList& subg) : g_(g), NV_(g.num_vertices()), deg_(NV_), pos_(NV_) {
 		
 		subg_ = graph_type::VertexBitset(static_cast<std::size_t>(NV_), subg);
 		
