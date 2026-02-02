@@ -1,6 +1,6 @@
 /** 
  * @file graph.h
- * @brief  Header file for the main facade graph types of the BitGraph library  to be used by consumer code
+ * @brief  Header file for the main facade graph types of the BitGraph library to be used by consumer code
  *		    
  * @notes:
  *	BitGraph is an efficient C++ library for simple graphs.
