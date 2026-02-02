@@ -15,6 +15,7 @@
 #include "gtest/gtest.h"
 #include "graph/algorithms/graph_gen.h"
 #include "graph/algorithms/kcore.h"
+#include "graph/graph_types.h"
 #include "utils/common.h"
 #include "utils/logger.h"
 //#include "utils/result.h"
@@ -32,7 +33,7 @@ protected:
 		ug.add_edge(0, 1);
 		ug.add_edge(0, 2);
 		ug.add_edge(0, 3);
-		ug.name("star");
+		ug.set_name("star");
 	}
 	void TearDown() override {}
 
@@ -45,7 +46,7 @@ TEST_F(KcoreWTest, constructor) {
 
 	KCore<ugraph> kc(ug);
 
-	EXPECT_EQ(4, kc.get_graph().number_of_vertices());
+	EXPECT_EQ(4, kc.get_graph().num_vertices());
 	EXPECT_TRUE(kc.get_subgraph().is_empty());
 
 
@@ -54,7 +55,7 @@ TEST_F(KcoreWTest, constructor) {
 TEST_F(KcoreWTest, set_subgraph) {
 
 	//bitset that induces a subgraph in G
-	decltype(ug)::_bbt bbset(4);
+	decltype(ug)::bitset_type bbset(4);
 	bbset.set_bit(0);
 	bbset.set_bit(2);
 	
@@ -72,10 +73,10 @@ TEST_F(KcoreWTest, set_subgraph) {
 TEST_F(KcoreWTest, set_subgraph_from_vector) {
 
 	//bitset that induces a subgraph in G
-	vint vset = { 0, 2, 3 };
+	VertexList vList = { 0, 2, 3 };
 
 	//KCore with subgraph
-	KCore<ugraph> kc(ug, vset);
+	KCore<ugraph> kc(ug, vList);
 	auto psg = kc.get_subgraph();
 
 	EXPECT_TRUE(kc.get_subgraph().is_bit(0));
@@ -195,7 +196,7 @@ TEST(KCoreSparse, kcore_decomp_full_graph){
 	
 	KCore<sparse_ugraph> kc(sug);
 
-	EXPECT_EQ	(11, kc.get_graph().number_of_vertices());
+	EXPECT_EQ	(11, kc.get_graph().num_vertices());
 	EXPECT_TRUE	( kc.get_subgraph().is_empty());
 
 	////////////////////
@@ -220,14 +221,14 @@ TEST(KCoreSparse, DISABLED_kcore_decomp_subgraph) {
 	sparse_ugraph sug(PATH_GRAPH_TESTS_CMAKE_SRC_CODE "star.clq");
 
 	//bitset that induces a 3-clique in G
-	decltype(sug)::_bbt bbset(sug.number_of_vertices());
+	decltype(sug)::bitset_type bbset(sug.num_vertices());
 	bbset.set_bit(0);
 	bbset.set_bit(1);
 	bbset.set_bit(6);
 
 	KCore<sparse_ugraph> kc(sug, bbset);
 
-	EXPECT_EQ(11, kc.get_graph().number_of_vertices());
+	EXPECT_EQ(11, kc.get_graph().num_vertices());
 	EXPECT_TRUE(kc.get_subgraph().is_bit(0));
 	EXPECT_TRUE(kc.get_subgraph().is_bit(1));
 	EXPECT_TRUE(kc.get_subgraph().is_bit(6));
@@ -340,7 +341,7 @@ TEST(KCoreUB, DISABLED_kcore_example_I) {
 
 TEST(KCoreUB, DISABLED_random){
 	random_attr_t rd(10, 100, .05, .20, 50, 10, .05);
-	const BOOL store_graph=true;
+	const bool store_graph=true;
 	char PATH[250]="C:\\Users\\pablo\\Desktop\\random_tests\\";
 	stringstream sstr("");
 	string name("");
@@ -357,7 +358,7 @@ TEST(KCoreUB, DISABLED_random){
 				sstr.str(""); sstr.clear();
 				sstr<<tam<<"_"<<den<<"_"<<rep;
 				name+=sstr.str();
-				ug.name(name+".txt");		//change name appropiately
+				ug.set_name(name+".txt");		//change name appropiately
 				
 				//name stamp
 				sstr.str(""); sstr.clear();	

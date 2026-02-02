@@ -27,8 +27,8 @@ add_executable (test_graph
   test_graph_map.cpp 
 
 #  TESTS TO BE CHECKED
-#  test_kcore.cpp              //TODO (26/11/2025)
-#  tests/test_graph_sort.cpp  //DEPRECATED
+   test_kcore.cpp                   # to fix (02/02/2026)
+#  tests/test_graph_sort.cpp        # DEPRECATED
 
 )
 

@@ -75,7 +75,7 @@ namespace bitgraph {
 		public:
 			friend ostream& operator<< (std::ostream& o, const KCore& kc) { kc.print_kcore(o); return o; }
 
-			enum print_t { DEG, BIN, VER, POS };
+			enum print_t : int { DEG = 0, BIN, VER, POS };
 
 			//alias types
 			using graph_type = GraphT;						
@@ -95,22 +95,23 @@ namespace bitgraph {
 			*
 			* TO NOTE: it is not possible an early exit (13/01/25)
 			*/
-			static int find_kcore(GraphT& g);
+			static int find_kcore(graph_type& g);
 
 			//////////////////////////////
 			//construction / destruction
 		public:
 
 			//constructors
-			KCore(GraphT& g);
-			KCore(GraphT& g, VertexBitset subg);
-			KCore(GraphT& g, vint subg);
+			KCore(graph_type& g);
+			KCore(graph_type& g, VertexBitset bbSubg);
+			KCore(graph_type& g, VertexList subg);
+		
 
 			//copy and move semantics disallowed
 			KCore(const KCore& kc) = delete;
-			KCore& operator =					(const KCore& kc) = delete;
-			KCore(KCore&& kc)	noexcept = delete;
-			KCore& operator =					(KCore&& kc)	noexcept = delete;
+			KCore& operator = (const KCore& kc) = delete;
+			KCore(KCore&& kc) noexcept = delete;
+			KCore& operator = (KCore&& kc)	noexcept = delete;
 
 			//destructor - default
 			virtual ~KCore() = default;
@@ -118,24 +119,24 @@ namespace bitgraph {
 			////////////////
 			//setters and getters 
 
-				/*
-				* @brief Maximum core number of the graph
-				*		 (must be called afer kcore())
-				* @returns Maximum core number of the graph or -1 if error
-				*/
-			int max_core_number()							const;
+			/*
+			* @brief Maximum core number of the graph
+			*		 (must be called afer kcore())
+			* @returns Maximum core number of the graph or -1 if error
+			*/
+			int max_core_number() const;
 
 			/*
 			* @brief Core number of a given vertex
 			*		 (must be called afer kcore())
 			*/
-			int coreness(std::size_t v)						const { return deg_[v]; }
+			int coreness(std::size_t v)	const { return deg_[v]; }
 
 			/*
 			* @brief Size of the kcore for a given k >=0 , number of vertices with core number k
 			*		 (must be called afer kcore())
 			*/
-			int core_size(std::size_t k)					const;
+			int core_size(std::size_t k) const;
 
 			/*
 			* @brief Returns the k-core set of vertices for a given k >=0
@@ -144,23 +145,23 @@ namespace bitgraph {
 			*		 I. k = 0: all vertices in V
 			*		II. k = 1: vertices in the 1-core etc...
 			*/
-			vint core_set(std::size_t k)					const;
+			vint core_set(std::size_t k) const;
 
 			/*
 			* @brief Coreness of all vertices
 			*		 (must be called afer kcore()).
 			*/
-			const vint& coreness_numbers()					const { return deg_; }
+			const vint& coreness_numbers()	const { return deg_; }
 
 			/*
 			* @brief Arrangement of the vertices according to non-decreasing kcore number
 			*		 (must be called afer kcore()).
 			*/
-			const vint& kcore_ordering()					const { return ver_; }
+			const vint& kcore_ordering() const { return ver_; }
 
 
-			const graph_type& get_graph()							const { return g_; }
-			const VertexBitset& get_subgraph()						const { return subg_; }
+			const graph_type& get_graph() const { return g_; }
+			const VertexBitset& get_subgraph() const { return subg_; }
 
 			/*
 			* @brief sets a new induced subgraph.
@@ -263,7 +264,7 @@ namespace bitgraph {
 			void bin_sort(bool is_subg = false);
 
 			//experimental
-			void bin_sort(vint& lv, bool rev);					//bin sort according to vertex set lv (rev TRUE: vertices taken in reverse order)
+			void bin_sort(VertexList& lv, bool rev);					//bin sort according to vertex set lv (rev TRUE: vertices taken in reverse order)
 
 			//I/O
 			std::ostream& print(print_t = VER, std::ostream& o = std::cout);
@@ -272,15 +273,15 @@ namespace bitgraph {
 			// data members
 		private:
 
-			GraphT& g_;																//the one and only graph G=(V, E)			
-			const int NV_;																//size of graph |V| - for convenience
-			VertexBitset subg_;																	//reference induced subgraph to study coreness 
+			graph_type& g_;																// the one and only graph G=(V, E)			
+			int NV_;																	// size of graph |V| - for convenience
+			VertexBitset subg_;															// reference induced subgraph to study coreness 
 
 			//data structures
-			vint deg_;																	//coreness of vertices																
-			vint bin_;																	//bins [deg[v]] for bin sort sorting algorithm
-			vint ver_;																	//vertices in non-decreasing kcore order (mapping in new-to-old format)
-			vint pos_;																	//position of vertices in ver_ (old-to-new format)
+			vint deg_;																	// coreness of vertices																
+			vint bin_;																	// bins [deg[v]] for bin sort sorting algorithm
+			vint ver_;																	// vertices in non-decreasing kcore order (mapping in new-to-old format)
+			vint pos_;																	// position of vertices in ver_ (old-to-new format)
 		};
 
 	}//end namespace impl
@@ -295,7 +296,7 @@ namespace bitgraph {
 namespace bitgraph {
 
 	template<class GraphT>
-	inline int KCore<GraphT>::find_kcore(GraphT& g)
+	inline int KCore<GraphT>::find_kcore(graph_type& g)
 	{
 		//degenerate minimum degree ordering
 		GraphFastRootSort<GraphT> gfs(g);
@@ -329,7 +330,7 @@ namespace bitgraph {
 	}
 
 	template<class GraphT>
-	inline KCore<GraphT>::KCore(GraphT& g) : g_(g), NV_(g.num_vertices()), deg_(NV_), pos_(NV_) {
+	inline KCore<GraphT>::KCore(graph_type& g) : g_(g), NV_(g.num_vertices()), deg_(NV_), pos_(NV_) {
 
 		try {
 			ver_.assign(NV_, EMPTY_ELEM);
@@ -342,7 +343,7 @@ namespace bitgraph {
 	}
 
 	template<class GraphT>
-	inline KCore<GraphT>::KCore(GraphT& g, VertexBitset subg) : g_(g), NV_(g.num_vertices()), deg_(NV_), pos_(NV_) {
+	inline KCore<GraphT>::KCore(graph_type& g, VertexBitset subg) : g_(g), NV_(g.num_vertices()), deg_(NV_), pos_(NV_) {
 
 		subg_ = std::move(subg);
 
@@ -357,11 +358,11 @@ namespace bitgraph {
 
 	}
 
-	template<class GraphT>
-	inline KCore<GraphT>::KCore(GraphT& g, vint set) : g_(g), NV_(g.num_vertices()), deg_(NV_), pos_(NV_) {
 
-		//builds a  bitset from a vector of vertices (population size NV_)
-		subg_ = VertexBitset(NV_, set);
+	template<class GraphT>
+	inline KCore<GraphT>::KCore(graph_type& g, VertexList subg) : g_(g), NV_(g.num_vertices()), deg_(NV_), pos_(NV_) {
+		
+		subg_ = graph_type::VertexBitset{ static_cast<std::size_t>(NV_), subg};
 
 		try {
 			ver_.assign(subg_.size(), EMPTY_ELEM);
@@ -373,6 +374,7 @@ namespace bitgraph {
 		}
 
 	}
+
 
 	template<class GraphT>
 	inline int KCore<GraphT>::reset_subgraph(VertexBitset subg) {
@@ -582,7 +584,7 @@ namespace bitgraph {
 
 		//new bin sort over ver_ in reverse order for final sorting
 		init_bin();
-		vint lv(ver_);				//requires a copy
+		VertexList lv(ver_);				//requires a copy
 		bin_sort(lv, true);			//reverse order
 
 		return UB;
@@ -753,7 +755,7 @@ namespace bitgraph {
 	}
 
 	template<class GraphT>
-	inline void KCore<GraphT>::bin_sort(vint& lv, bool rev) {
+	inline void KCore<GraphT>::bin_sort(VertexList& lv, bool rev) {
 		////////////////
 		// sorts vertices in lv by non decreasing degree (deg_) in linear time (EXPERIMENTAL)
 		// date of creation: 7/3/16
