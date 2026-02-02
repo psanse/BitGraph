@@ -345,7 +345,7 @@ namespace bitgraph {
 	template<class GraphT>
 	inline KCore<GraphT>::KCore(graph_type& g, VertexBitset subg) : g_(g), NV_(g.num_vertices()), deg_(NV_), pos_(NV_) {
 
-		subg_ = std::move(subg);
+		subg_ = std::move(subg); 
 
 		try {
 			ver_.assign(subg_.size(), EMPTY_ELEM);
@@ -363,7 +363,7 @@ namespace bitgraph {
 	inline KCore<GraphT>::KCore(graph_type& g, VertexList subg) : g_(g), NV_(g.num_vertices()), deg_(NV_), pos_(NV_) {
 		
 		subg_ = graph_type::VertexBitset{ static_cast<std::size_t>(NV_), subg};
-
+		
 		try {
 			ver_.assign(subg_.size(), EMPTY_ELEM);
 		}
