@@ -125,9 +125,9 @@ namespace bitgraph {
 			* graph_to_gml
 			*
 			*********************/
-			template<class Graph_t>
+			template<class GraphT>
 			inline
-				int graph_to_gml(Graph_t& g, std::string filename, double scale = 7.5, int flag_edges = 1) 
+				int graph_to_gml(GraphT& g, std::string filename, double scale = 7.5, int flag_edges = 1) 
 			{
 				const auto N = g.num_vertices();
 				if (N == 0) { LOG_INFO("cannot paint the empty graph, will produce no output -gio::yed::graph_to_gml"); return 0; }
@@ -171,16 +171,16 @@ namespace bitgraph {
 			* (including coloring a subset of vertices with different color)
 			*
 			*********************/
-			template<class Graph_t>
+			template<class GraphT>
 			inline
-				int graph_to_gml(Graph_t& g, vint& vset, std::string filename, col_t col = yed::GREEN, double scale = 7.5, int flag_edges = 1, std::string path = "") 
+				int graph_to_gml(GraphT& g, vint& vset, std::string filename, col_t col = yed::GREEN, double scale = 7.5, int flag_edges = 1, std::string path = "") 
 			{
 				const auto N = g.num_vertices();
 				if (N == 0) { LOG_INFO("cannot paint the empty graph, will produce no output- gio::yed::graph_to_gml"); return 0; }
 				std::string filenameExt = path + filename + ".gml";
 				std::ofstream grafo(filenameExt);
 				if (!grafo) { LOGG_ERROR("file: ", filenameExt, "could no be opened", " -graph_to_gml(...)"); return -1; }
-				typename Graph_t::VertexBitset bbclq(N, vset);
+				typename GraphT::VertexBitset bbclq(N, vset);
 				//bbclq.print(cout, true);
 
 
@@ -225,9 +225,9 @@ namespace bitgraph {
 			* graph_to_gml_clique
 			*
 			*********************/
-			template<class Graph_t>
+			template<class GraphT>
 			inline
-				int graph_to_gml_clique(Graph_t& g, vint& clq, std::string filename, col_t col_clq = yed::GREEN, 
+				int graph_to_gml_clique(GraphT& g, vint& clq, std::string filename, col_t col_clq = yed::GREEN, 
 										col_t col = gio::yed::DEFAULT, double scale = 7.5, int flag_edges = 1, std::string path = "") 
 			{
 				const auto N = g.num_vertices();
@@ -235,7 +235,7 @@ namespace bitgraph {
 				std::string filenameExt = path + filename + ".gml";
 				std::ofstream grafo(filenameExt);
 				if (!grafo) { LOGG_ERROR("file: ", filenameExt, " could no be opened", " -gio::yed::graph_to_gml_clique(...)"); return -1; }
-				typename Graph_t::VertexBitset bbclq(N, clq);
+				typename GraphT::VertexBitset bbclq(N, clq);
 				//bbclq.print(cout, true);
 
 
@@ -285,8 +285,8 @@ namespace bitgraph {
 			* graph_to_gml_color
 			*
 			*********************/
-			template<class Graph_t>
-			inline int graph_to_gml_color(Graph_t& g, vector<vint>& isets, std::string filename, double scale = 7.5, int flag_edges = 1)
+			template<class GraphT>
+			inline int graph_to_gml_color(GraphT& g, vector<vint>& isets, std::string filename, double scale = 7.5, int flag_edges = 1)
 			{
 				const auto N = g.num_vertices();
 				if (N == 0) { LOG_INFO("cannot paint the empty graph, will produce no output -gio::yed::graph_to_gml_color"); return 0; }
@@ -349,9 +349,9 @@ namespace bitgraph {
 			*
 			* param@layers: partition of independent sets, separated by -1 markers
 			********************/
-			template<class Graph_t>
+			template<class GraphT>
 			inline
-				int graph_to_gml_layered(Graph_t& g, vector<int>& layers, string filename, double scale = 20, int flag_edges = 1)
+				int graph_to_gml_layered(GraphT& g, vector<int>& layers, string filename, double scale = 20, int flag_edges = 1)
 			{
 				const  auto N = g.num_vertices();
 				string filenameExt = filename + ".gml";
@@ -413,9 +413,9 @@ namespace bitgraph {
 			* graph_to_gml_circular
 			*
 			********************/
-			template<class Graph_t>
+			template<class GraphT>
 			inline
-				int graph_to_gml_circular(Graph_t& g, std::string filename, double radius = 2, double scale = 20, int flag_edges = 1) 
+				int graph_to_gml_circular(GraphT& g, std::string filename, double radius = 2, double scale = 20, int flag_edges = 1) 
 			{
 				const auto N = g.num_vertices();
 				std::string filenameExt = filename + ".gml";

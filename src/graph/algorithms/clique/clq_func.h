@@ -40,9 +40,9 @@ namespace bitgraph {
 			* @details: runs in O(n^2) worst-case time, where n = end - begin
 			* @TODO - builds and iset but only returns its size
 			**/
-			template<class Graph_t>
+			template<class GraphT>
 			inline
-				int find_iset(const Graph_t& g, int lv[], unsigned int begin, unsigned int end) {
+				int find_iset(const GraphT& g, int lv[], unsigned int begin, unsigned int end) {
 
 				////////////////////////
 				assert(begin <= end);
@@ -80,9 +80,9 @@ namespace bitgraph {
 			* @returns: size of the enlarged independent set (excluding @v)
 			* @details: runs in O(n^2) worst-case time, where n = end - begin
 			**/
-			template<class Graph_t>
+			template<class GraphT>
 			inline
-				int find_iset(const Graph_t& g, int v, int lv[], unsigned int begin, unsigned int end) {
+				int find_iset(const GraphT& g, int v, int lv[], unsigned int begin, unsigned int end) {
 
 				////////////////////////
 				assert(begin <= end);
@@ -126,9 +126,9 @@ namespace bitgraph {
 			* @param clq: input clique to be enlarged (if possible)
 			* @returns: size (number of vertices) added to @clq
 			**/
-			template<class Graph_t>
+			template<class GraphT>
 			inline
-				int find_clique(const Graph_t& g, std::vector<int>& clq, int lv[], unsigned int begin, unsigned int end) {
+				int find_clique(const GraphT& g, std::vector<int>& clq, int lv[], unsigned int begin, unsigned int end) {
 
 				////////////////////////
 				assert(begin <= end);
@@ -170,11 +170,11 @@ namespace bitgraph {
 			* @returns: number of vertices in clq
 			* @TODO: possibly return the clique, add if constexpr when C++17 is accepted
 			**/
-			template<class Graph_t, bool Reverse = false>
+			template<class GraphT, bool Reverse = false>
 			inline
-				int find_clique(const Graph_t& g, std::vector<int>& clq, typename Graph_t::VertexBitset& bbsg) {
+				int find_clique(const GraphT& g, std::vector<int>& clq, typename GraphT::VertexBitset& bbsg) {
 
-				typename Graph_t::VertexBitset bb(bbsg);
+				typename GraphT::VertexBitset bb(bbsg);
 				clq.clear();
 
 				//main loop - destructive scan of bb
@@ -223,11 +223,11 @@ namespace bitgraph {
 			* @details: created in 13/10/2019 (Paris), optimized in 06/05/2025
 			* @TODO: possibly return the clique, add if constexpr when C++17 is accepted
 			**/
-			template<class Graph_t, bool Reverse = false>
+			template<class GraphT, bool Reverse = false>
 			inline
-				int find_clique_max_deg(const Graph_t& g, std::vector<int>& clq, const typename Graph_t::VertexBitset& bbsg) {
+				int find_clique_max_deg(const GraphT& g, std::vector<int>& clq, const typename GraphT::VertexBitset& bbsg) {
 
-				typename Graph_t::VertexBitset bbsgC{ bbsg };
+				typename GraphT::VertexBitset bbsgC{ bbsg };
 				clq.clear();
 
 				int pcmax, pc;
@@ -249,7 +249,7 @@ namespace bitgraph {
 						////////////////////////////
 
 						pc = 0;
-						const typename Graph_t::VertexBitset& bbn =  g.neighbors(v);
+						const typename GraphT::VertexBitset& bbn =  g.neighbors(v);
 						for (int nBB = 0; nBB < g.num_blocks(); ++nBB) {
 							pc += bitgraph::bblock::popc64(bbsgC.block(nBB) & bbn.block(nBB));
 						}
@@ -302,11 +302,11 @@ namespace bitgraph {
 			* @returns: number of vertices in clq
 			* @details: imported from copt repo, optimized in 08/05/2025
 			**/
-			template<class Graph_t>
+			template<class GraphT>
 			inline
-				int find_clique_from_pool(const Graph_t& g, std::vector<int>& clq, typename Graph_t::VertexBitset& bbsg) {
+				int find_clique_from_pool(const GraphT& g, std::vector<int>& clq, typename GraphT::VertexBitset& bbsg) {
 
-				typename Graph_t::VertexBitset bb(g.size());
+				typename GraphT::VertexBitset bb(g.size());
 				clq.clear();
 
 				//main loop - seed vertex for a clique 
@@ -359,8 +359,8 @@ namespace bitgraph {
 		////
 		//// COMMENTS: format issues-MUST BE! @quasi[VERTEX]:=-1 or VERTEX
 
-		//template<class Graph_t>
-		//int find_clq(Graph_t& g, VertexList& clq, int* quasi, int begin, int* lv, int end) {
+		//template<class GraphT>
+		//int find_clq(GraphT& g, VertexList& clq, int* quasi, int begin, int* lv, int end) {
 		//			
 		//	int num_added = 0, counter = 0, iqv = -1;	
 
@@ -418,9 +418,9 @@ namespace bitgraph {
 			* @returns TRUE if the set is an independent set (empty sets are NOT isets)
 			* @TODO: not optimized for sparse graph types
 			**/
-			template<class Graph_t>
+			template<class GraphT>
 			inline
-				bool is_iset(const Graph_t& g, typename Graph_t::VertexBitset& bb) {
+				bool is_iset(const GraphT& g, typename GraphT::VertexBitset& bb) {
 
 				int retVal = bb.init_scan(bbo::NON_DESTRUCTIVE);
 
@@ -457,9 +457,9 @@ namespace bitgraph {
 			* @details: created 6/10/2017, last updated 06/05/2025
 			* @TODO: not optimized for sparse graph types
 			**/
-			template<class Graph_t>
+			template<class GraphT>
 			inline
-				bool is_iset(const Graph_t& g, const std::vector<int>& lv) {
+				bool is_iset(const GraphT& g, const std::vector<int>& lv) {
 
 				auto nV = lv.size();
 				if (nV == 0) return false;					////empty set is not an independent set
@@ -485,9 +485,9 @@ namespace bitgraph {
 			* @details: created 5/02/2018, last updated 06/05/2025
 			* @comment: if {lv} is an iset, then {lv + v} is also an iset
 			**/
-			template<class Graph_t>
+			template<class GraphT>
 			inline
-				bool is_iset(const Graph_t& g, const std::vector<int>& lv, int v) {
+				bool is_iset(const GraphT& g, const std::vector<int>& lv, int v) {
 
 				if (lv.empty()) return true;
 
@@ -509,9 +509,9 @@ namespace bitgraph {
 			* @returns TRUE if the set is a clique (empty sets are NOT cliques)
 			* @TODO: not optimized for sparse graph types
 			**/
-			template<class Graph_t>
+			template<class GraphT>
 			inline
-				bool is_clique(const Graph_t& g, typename Graph_t::VertexBitset& bb) {
+				bool is_clique(const GraphT& g, typename GraphT::VertexBitset& bb) {
 
 				int retVal = bb.init_scan(bbo::NON_DESTRUCTIVE);
 
@@ -548,9 +548,9 @@ namespace bitgraph {
 			* @details: created 6/10/2017, last updated 06/05/2025
 			* @TODO: not optimized for sparse graph types
 			**/
-			template<class Graph_t>
+			template<class GraphT>
 			inline
-				bool is_clique(const Graph_t& g, const std::vector<int>& lv) {
+				bool is_clique(const GraphT& g, const std::vector<int>& lv) {
 
 				auto nV = lv.size();
 				if (nV == 0) return false;					//an empty set is not a clique
@@ -575,9 +575,9 @@ namespace bitgraph {
 			* @details: created 6/10/2017, last updated 06/05/2025
 			* @TODO: not optimized for sparse graph types
 			**/
-			template<class Graph_t>
+			template<class GraphT>
 			inline
-				bool is_clique(const Graph_t& g, int lv[], std::size_t size) {
+				bool is_clique(const GraphT& g, int lv[], std::size_t size) {
 
 				if (size == 0) return false;					//an empty set is not a clique
 
@@ -602,9 +602,9 @@ namespace bitgraph {
 			* @details: created 5/02/2018, last updated 06/05/2025
 			* @comment: if {lv} is a clique, then {lv + v} is also a clique
 			**/
-			template<class Graph_t>
+			template<class GraphT>
 			inline
-				bool is_clique(const Graph_t& g, const std::vector<int>& lv, int v) {
+				bool is_clique(const GraphT& g, const std::vector<int>& lv, int v) {
 
 				if (lv.empty()) return true;
 
@@ -620,8 +620,8 @@ namespace bitgraph {
 
 		//////////////////////////////////
 		// VERY CLIQUE SPECIFIC - PLACE IT IN COPT
-		//	template<class Graph_t>
-		//	int quasi_clq(Graph_t& g, VertexList& clq, int* quasi, typename Graph_t::VertexBitset& bbv) {
+		//	template<class GraphT>
+		//	int quasi_clq(GraphT& g, VertexList& clq, int* quasi, typename GraphT::VertexBitset& bbv) {
 		//		////////////////////////////////
 		//		// caches quasicliques in @quasi for consecutive vertices not in @clq (candidate quasi_vertices range [0-highest vertex index of clq[)
 		//		// quasi[VERTEX_IN_CLQ]:= qv (@clq - {VERTEX_IN_CLQ} + {qv} is a clique in @g of the same size)
@@ -634,7 +634,7 @@ namespace bitgraph {
 		//		//ASSERT
 		//		if (clq.empty()) return 0;
 		//
-		//		typename Graph_t::VertexBitset bbclq(clq, g.number_of_vertices());
+		//		typename GraphT::VertexBitset bbclq(clq, g.number_of_vertices());
 		//		int num_added = 0, num_no_clq = 0, qv = -1, lastOfclq = bbclq.msbn64();
 		//
 		//		for (int v = 0; v < lastOfclq; v++) {									/* last vertex in clq excluded, since it MUST BE in @bbv*/
@@ -691,11 +691,11 @@ namespace bitgraph {
 			* @returns: number of vertices in clq
 			* @TODO: possibly return the clique
 			**/
-			template<class Graph_t, bool Reverse = false>
+			template<class GraphT, bool Reverse = false>
 			inline
-				int find_clique_lb(const Graph_t& g, typename Graph_t::VertexBitset& bbsg) {
+				int find_clique_lb(const GraphT& g, typename GraphT::VertexBitset& bbsg) {
 
-				typename Graph_t::VertexBitset bb(bbsg);
+				typename GraphT::VertexBitset bb(bbsg);
 				int lb = 0;
 
 				//main loop - destructive scan of bb
@@ -740,11 +740,11 @@ namespace bitgraph {
 			* @param template Reverse: TRUE vertices are taken from bbsg from last to first, FALSE from first to last
 			* @returns: a lower bound for the size of the maximum clique in g.
 			**/
-			template<class Graph_t, bool Reverse = false>
+			template<class GraphT, bool Reverse = false>
 			inline
-				int find_clique_lb(const Graph_t& g) {
+				int find_clique_lb(const GraphT& g) {
 
-				typename Graph_t::VertexBitset bb((int)g.size(), true);
+				typename GraphT::VertexBitset bb((int)g.size(), true);
 				int lb = 0;
 
 				//main loop - destructive scan of bb
@@ -787,8 +787,8 @@ namespace bitgraph {
 			// Each time the bitset is scanned to find the first vertex that can enlarge
 			// the clique (early exit when it cannot)
 
-			//template<class Graph_t>
-			//int find_clique_lb_ALT(const Graph_t& g, typename Graph_t::VertexBitset& bbsg) {
+			//template<class GraphT>
+			//int find_clique_lb_ALT(const GraphT& g, typename GraphT::VertexBitset& bbsg) {
 
 			//	//////////////////////////////////////
 			//	if (bbsg.is_empty()) { return 0; }		/* empty set */
@@ -836,9 +836,9 @@ namespace bitgraph {
 			* @TODO : UNIT TEST
 			* @TODO : two functions, one for the color bound, the other for the coloring
 			**/
-			template<class Graph_t>
+			template<class GraphT>
 			inline
-				int ISEQ(const Graph_t& g, const typename Graph_t::VertexBitset& bbsg, int* ub = nullptr) {
+				int ISEQ(const GraphT& g, const typename GraphT::VertexBitset& bbsg, int* ub = nullptr) {
 
 				//TODO-validation
 
@@ -848,8 +848,8 @@ namespace bitgraph {
 				int col = 1, v = bbo::noBit;
 
 				//main loop - greedy coloring	
-				typename Graph_t::VertexBitset bb_unsel(bbsg);
-				typename Graph_t::VertexBitset bb_sel(g.size());
+				typename GraphT::VertexBitset bb_unsel(bbsg);
+				typename GraphT::VertexBitset bb_sel(g.size());
 				while (true) {
 
 					//load bb_sel with remaining vertices to be colored
@@ -887,9 +887,9 @@ namespace bitgraph {
 			* @param ub: (output) vector with the resulting coloring
 			* @returns: size of the coloring, i.e., number of different colors used
 			**/
-			template<class Graph_t>
+			template<class GraphT>
 			inline
-				int ISEQ(const Graph_t& g, const typename Graph_t::VertexBitset& bbsg, std::vector<int>& ub) {
+				int ISEQ(const GraphT& g, const typename GraphT::VertexBitset& bbsg, std::vector<int>& ub) {
 				
 				//TODO-validation
 
@@ -900,8 +900,8 @@ namespace bitgraph {
 				int col = 1, v = bbo::noBit, nBB = bbo::noBit;
 
 				//main loop - greedy coloring	
-				typename Graph_t::VertexBitset bb_unsel(bbsg);
-				typename Graph_t::VertexBitset bb_sel(g.size());
+				typename GraphT::VertexBitset bb_unsel(bbsg);
+				typename GraphT::VertexBitset bb_sel(g.size());
 				while (true) {
 
 					//load bb_sel with remaining vertices to be colored
@@ -940,9 +940,9 @@ namespace bitgraph {
 		//////////////////////////////////
 		// Incremental bounds VERY CLIQUE SPECIFIC - PLACE IT IN COPT
 
-		//	template<class Graph_t>
+		//	template<class GraphT>
 		//	inline
-		//		void incUB(const Graph_t& g, int ub[], size_t size) {
+		//		void incUB(const GraphT& g, int ub[], size_t size) {
 		//		//computes incremental clique bound for nodes 1 to size for the given graph
 		//		ub[0] = 1;
 		//		int max = 0;
@@ -957,9 +957,9 @@ namespace bitgraph {
 		//		}
 		//	}
 		//
-		//	template<class Graph_t>
+		//	template<class GraphT>
 		//	inline
-		//		int incUB(const Graph_t& g, typename Graph_t::VertexBitset& bbsg, int ub[]) {
+		//		int incUB(const GraphT& g, typename GraphT::VertexBitset& bbsg, int ub[]) {
 		//		// computes incremental clique bound for nodes in bbsg
 		//		// RETURNS -1 if bbsg is empty, 0 in any other case
 		//		// 
@@ -990,14 +990,14 @@ namespace bitgraph {
 			////////////////////////
 			//Others - outgoing / incoming edges
 
-		//	template<class Graph_t>
+		//	template<class GraphT>
 		//	inline
-		//	int number_outgoing_edges(Graph_t& g, std::vector<int> clq) {
+		//	int number_outgoing_edges(GraphT& g, std::vector<int> clq) {
 		//		///////////////////////
 		//		// RETURNS edges outgoing from every vertex of @clq
 		//	
 		//		int nb_edges = 0;
-		//		typename Graph_t::VertexBitset bbcov(clq, g.number_of_vertices());
+		//		typename GraphT::VertexBitset bbcov(clq, g.number_of_vertices());
 		//		for (int i = 0; i < clq.size(); i++) {
 		//			for (int NBB = 0; NBB < g.num_blocks(); NBB++) {
 		//				BITBOARD bb = g.get_neighbors(clq[i]).get_bitboard(NBB) &~bbcov.get_bitboard(NBB);
@@ -1007,9 +1007,9 @@ namespace bitgraph {
 		//		return nb_edges;
 		//	}
 		//
-		//	template<class Graph_t>
+		//	template<class GraphT>
 		//	inline
-		//		int max_number_outgoing_edges(Graph_t& g, std::vector<vector<int>>& part, int& pos) {
+		//		int max_number_outgoing_edges(GraphT& g, std::vector<vector<int>>& part, int& pos) {
 		//		///////////////////////
 		//		// RETURNS index of element in @part with maximum number of outgoing edges (-1 if empty)
 		//
@@ -1022,9 +1022,9 @@ namespace bitgraph {
 		//		return max;
 		//	}
 		//
-		//	template<class Graph_t>
+		//	template<class GraphT>
 		//	inline
-		//		int min_number_outgoing_edges(Graph_t& g, std::vector<vector<int>>& part, int& pos) {
+		//		int min_number_outgoing_edges(GraphT& g, std::vector<vector<int>>& part, int& pos) {
 		//		///////////////////////
 		//		// RETURNS index of element in @part with minimum number of outgoing edges (-1 if empty)
 		//

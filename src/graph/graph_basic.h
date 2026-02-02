@@ -11,7 +11,6 @@
 #ifndef __GRAPH_BASIC_H__
 #define __GRAPH_BASIC_H__
 
-#include "graph_types.h"
 #include "simple_sparse_graph.h"
 #include "simple_sparse_ugraph.h"
 

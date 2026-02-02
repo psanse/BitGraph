@@ -106,8 +106,8 @@ namespace bitgraph {
 			* @param filename name of output file stream
 			* @return 0 if success, -1 if error
 			*/
-			template<class Graph_t>
-			inline	int graph_to_dimacs(Graph_t& g, std::string filename) {
+			template<class GraphT>
+			inline	int graph_to_dimacs(GraphT& g, std::string filename) {
 				ofstream f(filename);
 				if (f) {
 					g.write_dimacs(f);

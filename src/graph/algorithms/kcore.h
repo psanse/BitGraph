@@ -70,7 +70,7 @@ namespace bitgraph {
 		//
 		////////////////////
 
-		template<class Graph_t>
+		template<class GraphT>
 		class KCore {
 		public:
 			friend ostream& operator<< (std::ostream& o, const KCore& kc) { kc.print_kcore(o); return o; }
@@ -78,13 +78,9 @@ namespace bitgraph {
 			enum print_t { DEG, BIN, VER, POS };
 
 			//alias types
-			using basic_type = Graph_t;						//a graph from GRAPH, typically sparse_ugraph
-			using type = KCore;
-
-			//alias types for backward compatibility
-			using VertexBitset = typename basic_type::VertexBitset;			//bitset type
-			using _gt = basic_type;											//graph type
-
+			using graph_type = GraphT;						
+			using VertexBitset = typename graph_type::VertexBitset;			
+		
 			//////////////
 			//globals
 
@@ -99,16 +95,16 @@ namespace bitgraph {
 			*
 			* TO NOTE: it is not possible an early exit (13/01/25)
 			*/
-			static int find_kcore(Graph_t& g);
+			static int find_kcore(GraphT& g);
 
 			//////////////////////////////
 			//construction / destruction
 		public:
 
 			//constructors
-			KCore(Graph_t& g);
-			KCore(Graph_t& g, VertexBitset subg);
-			KCore(Graph_t& g, vint subg);
+			KCore(GraphT& g);
+			KCore(GraphT& g, VertexBitset subg);
+			KCore(GraphT& g, vint subg);
 
 			//copy and move semantics disallowed
 			KCore(const KCore& kc) = delete;
@@ -163,7 +159,7 @@ namespace bitgraph {
 			const vint& kcore_ordering()					const { return ver_; }
 
 
-			const _gt& get_graph()							const { return g_; }
+			const graph_type& get_graph()							const { return g_; }
 			const VertexBitset& get_subgraph()						const { return subg_; }
 
 			/*
@@ -276,7 +272,7 @@ namespace bitgraph {
 			// data members
 		private:
 
-			Graph_t& g_;																//the one and only graph G=(V, E)			
+			GraphT& g_;																//the one and only graph G=(V, E)			
 			const int NV_;																//size of graph |V| - for convenience
 			VertexBitset subg_;																	//reference induced subgraph to study coreness 
 
@@ -298,12 +294,12 @@ namespace bitgraph {
 
 namespace bitgraph {
 
-	template<class Graph_t>
-	inline int KCore<Graph_t>::find_kcore(Graph_t& g)
+	template<class GraphT>
+	inline int KCore<GraphT>::find_kcore(GraphT& g)
 	{
 		//degenerate minimum degree ordering
-		GraphFastRootSort<Graph_t> gfs(g);
-		vint degen_order = gfs.new_order(GraphFastRootSort<Graph_t>::MIN_DEGEN, GraphFastRootSort<Graph_t>::LAST_TO_FIRST);		//MUST BE LAST-TO-FIRST!
+		GraphFastRootSort<GraphT> gfs(g);
+		vint degen_order = gfs.new_order(GraphFastRootSort<GraphT>::MIN_DEGEN, GraphFastRootSort<GraphT>::LAST_TO_FIRST);		//MUST BE LAST-TO-FIRST!
 
 		//I. count maximum of the neighbors of each vertex v that precedes v in the ordering
 		//II.find the maximum count
@@ -332,8 +328,8 @@ namespace bitgraph {
 		return max_width;
 	}
 
-	template<class Graph_t>
-	inline KCore<Graph_t>::KCore(Graph_t& g) : g_(g), NV_(g.num_vertices()), deg_(NV_), pos_(NV_) {
+	template<class GraphT>
+	inline KCore<GraphT>::KCore(GraphT& g) : g_(g), NV_(g.num_vertices()), deg_(NV_), pos_(NV_) {
 
 		try {
 			ver_.assign(NV_, EMPTY_ELEM);
@@ -345,8 +341,8 @@ namespace bitgraph {
 		}
 	}
 
-	template<class Graph_t>
-	inline KCore<Graph_t>::KCore(Graph_t& g, VertexBitset subg) : g_(g), NV_(g.num_vertices()), deg_(NV_), pos_(NV_) {
+	template<class GraphT>
+	inline KCore<GraphT>::KCore(GraphT& g, VertexBitset subg) : g_(g), NV_(g.num_vertices()), deg_(NV_), pos_(NV_) {
 
 		subg_ = std::move(subg);
 
@@ -361,8 +357,8 @@ namespace bitgraph {
 
 	}
 
-	template<class Graph_t>
-	inline KCore<Graph_t>::KCore(Graph_t& g, vint set) : g_(g), NV_(g.num_vertices()), deg_(NV_), pos_(NV_) {
+	template<class GraphT>
+	inline KCore<GraphT>::KCore(GraphT& g, vint set) : g_(g), NV_(g.num_vertices()), deg_(NV_), pos_(NV_) {
 
 		//builds a  bitset from a vector of vertices (population size NV_)
 		subg_ = VertexBitset(NV_, set);
@@ -378,8 +374,8 @@ namespace bitgraph {
 
 	}
 
-	template<class Graph_t>
-	inline int KCore<Graph_t>::reset_subgraph(VertexBitset subg) {
+	template<class GraphT>
+	inline int KCore<GraphT>::reset_subgraph(VertexBitset subg) {
 
 		subg_ = std::move(subg);
 
@@ -395,12 +391,12 @@ namespace bitgraph {
 	}
 
 
-	template<class Graph_t>
-	inline int KCore<Graph_t>::find_kcore(bool is_subg) {
+	template<class GraphT>
+	inline int KCore<GraphT>::find_kcore(bool is_subg) {
 
 		//inits data structures
 		if (init_kcore(is_subg) == -1) {
-			LOG_ERROR("Error during memory allocation - KCore<Graph_t>::init_kcore");
+			LOG_ERROR("Error during memory allocation - KCore<GraphT>::init_kcore");
 			return -1;
 		}
 		bin_sort(is_subg);
@@ -459,8 +455,8 @@ namespace bitgraph {
 		return 0;
 	}
 
-	template<class Graph_t>
-	inline int KCore<Graph_t>::find_kcore_UB(int UB_out) {
+	template<class GraphT>
+	inline int KCore<GraphT>::find_kcore_UB(int UB_out) {
 		////////////
 		//  date of creation: 5/3/16
 		//  last update: 5/3/16
@@ -497,7 +493,7 @@ namespace bitgraph {
 		//check that UB_out is not the maximum graph degree
 		//i.e. deg = 1 , bin has size 2 (0 and 1)
 		if (bin_.size() <= UB_out + 1) {
-			LOG_INFO("UB is not worse than maximum graph degree: vertices left as is - KCore<Graph_t>::kcore_UB");
+			LOG_INFO("UB is not worse than maximum graph degree: vertices left as is - KCore<GraphT>::kcore_UB");
 			return UB_out;
 		}
 
@@ -592,8 +588,8 @@ namespace bitgraph {
 		return UB;
 	}
 
-	template<class Graph_t>
-	inline int KCore<Graph_t>::init_kcore(bool is_subg) {
+	template<class GraphT>
+	inline int KCore<GraphT>::init_kcore(bool is_subg) {
 
 		int max_deg = 0, v = EMPTY_ELEM;
 
@@ -663,8 +659,8 @@ namespace bitgraph {
 		return 0;
 	}
 
-	template<class Graph_t>
-	inline int KCore<Graph_t>::init_bin(bool is_subg) {
+	template<class GraphT>
+	inline int KCore<GraphT>::init_bin(bool is_subg) {
 
 		//finds maximum degree of G
 		int max_deg = EMPTY_ELEM;
@@ -707,8 +703,8 @@ namespace bitgraph {
 		return 0;
 	}
 
-	template<class Graph_t>
-	inline void KCore<Graph_t>::bin_sort(bool is_subg) {
+	template<class GraphT>
+	inline void KCore<GraphT>::bin_sort(bool is_subg) {
 
 
 		//sets bin_ with the position in the new ordering (I): 
@@ -756,8 +752,8 @@ namespace bitgraph {
 
 	}
 
-	template<class Graph_t>
-	inline void KCore<Graph_t>::bin_sort(vint& lv, bool rev) {
+	template<class GraphT>
+	inline void KCore<GraphT>::bin_sort(vint& lv, bool rev) {
 		////////////////
 		// sorts vertices in lv by non decreasing degree (deg_) in linear time (EXPERIMENTAL)
 		// date of creation: 7/3/16
@@ -809,8 +805,8 @@ namespace bitgraph {
 		bin_[0] = 0;
 	}
 
-	template<class Graph_t>
-	inline int KCore<Graph_t>::minimum_width(bool rev) {
+	template<class GraphT>
+	inline int KCore<GraphT>::minimum_width(bool rev) {
 
 		int maxNumNeigh = EMPTY_ELEM;
 		int	numNeigh = EMPTY_ELEM;
@@ -856,8 +852,8 @@ namespace bitgraph {
 
 
 
-	template<class Graph_t>
-	inline int KCore<Graph_t>::max_core_number() const {
+	template<class GraphT>
+	inline int KCore<GraphT>::max_core_number() const {
 
 		//assert
 		if (ver_.empty()) {
@@ -867,8 +863,8 @@ namespace bitgraph {
 		return deg_[ver_.back()];
 	}
 
-	template<class Graph_t>
-	vint KCore<Graph_t>::core_set(std::size_t k) const {
+	template<class GraphT>
+	vint KCore<GraphT>::core_set(std::size_t k) const {
 
 		vint res;
 
@@ -881,8 +877,8 @@ namespace bitgraph {
 		return res;
 	}
 
-	template<class Graph_t>
-	inline int KCore<Graph_t>::core_size(std::size_t k) const {
+	template<class GraphT>
+	inline int KCore<GraphT>::core_size(std::size_t k) const {
 
 		auto count = 0;
 
@@ -895,8 +891,8 @@ namespace bitgraph {
 		return count;
 	}
 
-	template<class Graph_t>
-	inline int KCore<Graph_t>::make_kcore_filter(map_t& filter, bool reverse) {
+	template<class GraphT>
+	inline int KCore<GraphT>::make_kcore_filter(map_t& filter, bool reverse) {
 		///////////////////////////////
 		// maps kcore number to the starting vertex of the next kcore partition (filter[kc(v)]->first vertex w,  kc(w)=kc(v)+1)
 		// Example [v,kc(v)], reverse=TRUE, kcore dec:[1,1][2,1][3,2][4,1] then filter[2]=1 the single element in filter
@@ -959,8 +955,8 @@ namespace bitgraph {
 		return filter.size();
 	}
 
-	template<class Graph_t>
-	inline vint KCore<Graph_t>::find_heur_clique(int num_iter) {
+	template<class GraphT>
+	inline vint KCore<GraphT>::find_heur_clique(int num_iter) {
 		///////////////////////
 		// A more efficient and clean implementation of the greedy clique heuristic based on Kcore
 		//
@@ -1198,8 +1194,8 @@ namespace bitgraph {
 	//
 	///////////////////////
 
-	template<class Graph_t>
-	inline std::ostream& KCore<Graph_t>::print(print_t type, ostream& o) {
+	template<class GraphT>
+	inline std::ostream& KCore<GraphT>::print(print_t type, ostream& o) {
 		switch (type) {
 		case DEG:
 			for (auto i = 0; i < deg_.size(); ++i) {
@@ -1232,8 +1228,8 @@ namespace bitgraph {
 		return o;
 	}
 
-	template<class Graph_t>
-	inline std::ostream& KCore<Graph_t>::print_kcore(bool real_deg, bool subgraph, ostream& o)	const {
+	template<class GraphT>
+	inline std::ostream& KCore<GraphT>::print_kcore(bool real_deg, bool subgraph, ostream& o)	const {
 
 		if (!subgraph) {
 
