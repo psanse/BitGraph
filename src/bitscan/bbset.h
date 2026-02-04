@@ -809,8 +809,8 @@ namespace bitgraph {
 		//data members
 
 	protected:
-		DenseBlockVec vBB_;					//vector of fixed size bitblocks 
-		int nBB_;							//number of bitblocks (redundant to vBB.size(), cached for efficiency)
+		DenseBlockVec vBB_;					// vector of fixed size bitblocks 
+		int nBB_;							// number of bitblocks (redundant to vBB.size(), cached for efficiency)
 
 
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////
