@@ -92,10 +92,14 @@ namespace bitgraph {
 			
 
 		//magic numbers for bitscanning operations in bitblocks
-		constexpr unsigned long long DEBRUIJN_MN_64_ISOL = 0x07EDD5E59A4E28C2;
-		constexpr unsigned long long DEBRUIJN_MN_64_SEP = 0x03f79d71b4cb0a89;
-		constexpr unsigned long long DEBRUIJN_MN_64_SHIFT = 58;
+		// C++14 style to avoid ODR issues
+		enum : unsigned long long {
+			DEBRUIJN_MN_64_ISOL = 0x07EDD5E59A4E28C2,
+			DEBRUIJN_MN_64_SEP = 0x03f79d71b4cb0a89,
+			DEBRUIJN_MN_64_SHIFT = 58,
+		};
 
+	
 		////////////////////
 		// Boolean
 

@@ -12,8 +12,6 @@
 #include "utils/logger.h"
 #include "bitscan/bbset.h"
 #include <array>
-#include <functional>
-
 
 namespace bitgraph {
 	
@@ -61,8 +59,8 @@ namespace bitgraph {
 	template <class BitsetT>
 	struct BitSetWithPC {
 
-		using bitset_t = BitsetT;
-		using count_t = int;
+		using bitset_type = BitsetT;
+		using bitcount_t = int;
 
 		//construction / destruction
 		BitSetWithPC(std::size_t MAX_POP_SIZE) :
@@ -94,7 +92,7 @@ namespace bitgraph {
 		//setters and getters
 		BitsetT& bb() noexcept { return bb_; }
 		const BitsetT& bb() const noexcept { return bb_; }
-		count_t  count()	const  noexcept { return pc_; }
+		bitcount_t  count()	const  noexcept { return pc_; }
 
 		//bit twiddling
 		void set_bit(int bit) { bb_.set_bit(bit); ++pc_; }
@@ -143,7 +141,7 @@ namespace bitgraph {
 		*	Does not take into account inference chains, active vertices etc. 
 		*	Simply sets pc_ = bb_.count()
 		**/
-		count_t recompute_pc() {
+		bitcount_t recompute_pc() {
 			pc_ = bb_.count();
 			return pc_;
 		}
@@ -162,7 +160,7 @@ namespace bitgraph {
 		/////////////////
 		// data members
 
-		count_t pc_;								//population count (cached) - can differ from bb_.count()
+		bitcount_t pc_;								//population count (cached) - can differ from bb_.count()
 		BitsetT bb_;								//any bitset type of the BBObject hierarchy	
 
 	}; //end BitSetWithPC class
@@ -202,6 +200,9 @@ namespace bitgraph {
 		struct BitSetStack {
 
 			enum print_t { STACK = 0, BITSET };
+			using bitset_type = BitsetT;
+			using bit_id = int;							// or whatever int means here
+			using bitStack = std::vector<bit_id>;
 
 			//construction / destruction
 			BitSetStack(std::size_t MAX_POP_SIZE) : bb_(MAX_POP_SIZE) {}
@@ -271,8 +272,8 @@ namespace bitgraph {
 			/////////////////
 			// data members
 
-			BitsetT bb_;
-			std::vector<int> stack_;
+			bitset_type bb_;
+			bitStack stack_;
 
 		}; //end BitSetStack class
 
@@ -290,7 +291,7 @@ namespace bitgraph {
 		template <class BitsetT, int SIZE>
 		struct BitSetArray {
 
-			using basic_type = BitsetT;
+			using bitset_type = BitsetT;
 			using type = BitSetArray<BitsetT, SIZE>;
 
 			//contructors / destructors
@@ -351,7 +352,7 @@ namespace bitgraph {
 		/////////////
 		// data members
 			static const int nBB_ = SIZE;
-			std::array<BitsetT, SIZE> bb_;
+			std::array<bitset_type, SIZE> bb_;
 		};
 
 	}//end namespace _impl

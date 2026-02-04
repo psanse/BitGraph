@@ -1,5 +1,7 @@
 /** 
- * bbtypes.h file from the BITSCAN part of the BITGRAPH library
+ * @file bbtypes.h
+ * @brief file from the BITSCAN part of the BITGRAPH library
+ * @last modified 04/02/2026
  *
  * Copyright (C)
  * Author: Pablo San Segundo
@@ -43,21 +45,13 @@ namespace bitgraph {
 	};
 
 	enum : U32 {
-		EVEN_32 = 0x55555555U
+		EVEN_32 = 0x55555555U							// 1 bits in even positions: 32 bits
 	};
 
 	enum : U8 {
-		EVEN_8 = 0x55U
+		EVEN_8 = 0x55U									// 1 bits in even positions: 8 bits
 	};
-
-	//legacy code
-	//constexpr BITBOARD ONE = 0xFFFFFFFFFFFFFFFF;		// 1 bit mask	
-	//constexpr BITBOARD EVEN = 0x5555555555555555;		// 1 bits in even positions: 64 bits
-	//constexpr U32 EVEN_32 = 0x55555555;				// 1 bits in even positions: 32 bits
-	//constexpr U8 EVEN_8 = 0x55;						// 1 bits in even positions: 8 bits
-	//constexpr BITBOARD ZERO = 0ull;					// 0 64 bit mask
-
-
+	
 	//C++14 style to avoid ODR issues
 	enum : int {
 		EMPTY_ELEM = -1,								// empty table element,... 	
@@ -66,14 +60,6 @@ namespace bitgraph {
 		MASK_LIM = WORD_SIZE + 1						// mask limit for bitscan operations on a single BITBOARD
 	};
 
-	//legacy code
-	//constexpr int EMPTY_ELEM = -1;						
-	
-	////size of the register word - DO NOT CHANGE!
-	//constexpr int WORD_SIZE = 64;
-	//constexpr int WORD_SIZE_MINUS_ONE = WORD_SIZE - 1;
-	//constexpr int MASK_LIM = WORD_SIZE + 1;	
-	
 	using bitpos_list = std::vector<int>;
 	using bitpos_set = std::set<int>;
 

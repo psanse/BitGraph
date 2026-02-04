@@ -47,6 +47,9 @@ namespace bitgraph{
 			using scanD = typename BBObject::ScanDest<BBScan>;
 			using scanDR = typename BBObject::ScanDestRev<BBScan>;
 
+			// for basic bitscanning operatins - they are hidden by next_bit()
+			using Bitset::next_bit;				
+
 			//////////////////////////////
 			//construction / destruction
 
@@ -65,17 +68,18 @@ namespace bitgraph{
 
 			int  scan_block()	 const { return scan_.bbi_; }
 			int  scan_bit()	 const { return scan_.pos_; }
+			
 			//////////////////////////////
 			// Bitscanning (with cached info)
 
-				/**
-				* @brief Configures the initial block and bit position for bitscanning
-				*		 according to one of the 4 scan types passed as argument
-				* @param sct: type of scan
-				* @returns 0 if successful, -1 otherwise  (substituted by fail-safe policy in (08/07/2025))
-				* @details: fail-safe policy, program terminates with -1 code  if error
-				**/
-			virtual inline	int init_scan (scan_types sct) noexcept ;
+			/**
+			* @brief Configures the initial block and bit position for bitscanning
+			*		 according to one of the 4 scan types passed as argument
+			* @param sct: type of scan
+			* @returns 0 if successful, -1 otherwise  (substituted by fail-safe policy in (08/07/2025))
+			* @details: fail-safe policy, program terminates with -1 code  if error
+			**/
+			virtual int init_scan (scan_types sct) noexcept ;
 
 			/**
 			* @brief Configures the initial block and bit position for bitscanning
@@ -89,7 +93,7 @@ namespace bitgraph{
 			*
 			* TODO - no firstBit information is configured for DESTRUCTIVE scan types (08/02/2025)
 			**/
-			inline	int init_scan(int firstBit, scan_types sct) noexcept ;
+			int init_scan(int firstBit, scan_types sct) noexcept ;
 
 
 			////////////////
@@ -106,7 +110,7 @@ namespace bitgraph{
 			* @returns the next bit in the bitstring, BBObject::noBit if there are no more bits
 			* @details Created   23/3/12, last update 09/02/2025
 			**/
-			virtual inline  int next_bit_del();
+			virtual  int next_bit_del();
 
 
 			/**
@@ -125,7 +129,7 @@ namespace bitgraph{
 			* @param block: output parameter with the current bitblock
 			* @returns the next bit in the bitstring, BBObject::noBit if there are no more bits
 			**/
-			virtual inline int next_bit_del(BBScan& bitset);
+			virtual int next_bit_del(BBScan& bitset);
 
 			/**
 			* @brief next bit in the bitstring, starting from the bit retrieved
@@ -142,12 +146,9 @@ namespace bitgraph{
 			* @details Since the scan does not delete the scanned bit from the bitstring,
 			*		   it has to cache the last scanned bit for the next call
 			**/
-			virtual	inline  int next_bit();
+			virtual	 int next_bit();
 
-			/**
-			* @brief for basic bitscanning operatins - they are hidden by next_bit()
-			**/
-			using Bitset::next_bit;
+		
 
 			/**
 			* @brief next bit in the bitstring, starting from the bit retrieved
@@ -167,7 +168,7 @@ namespace bitgraph{
 			* @details Since the scan does not delete the scanned bit from the bitstring,
 			*		   it has to cache the last scanned bit for the next call
 			**/
-			virtual inline	 int next_bit(BBScan& bitset);
+			virtual int next_bit(BBScan& bitset);
 
 			////////////////
 			// bitscan backwards
@@ -186,8 +187,8 @@ namespace bitgraph{
 			* @details Since the scan does not delete the scanned bit from the bitstring,
 			*		   it has to cache the last scanned bit for the next call
 			**/
-			virtual  inline int prev_bit();
-			virtual	inline int prev_bit(BBScan& bitset);
+			virtual  int prev_bit();
+			virtual	 int prev_bit(BBScan& bitset);
 
 
 			/**
@@ -202,7 +203,7 @@ namespace bitgraph{
 			* @returns the next lsb bit in the bitstring, BBObject::noBit if there are no more bits
 			* @details Created   23/3/12, last update 09/02/2025
 			**/
-			virtual inline	int prev_bit_del();
+			virtual int prev_bit_del();
 
 
 			/**
@@ -222,11 +223,12 @@ namespace bitgraph{
 			* @returns the next lsb bit in the bitstring, BBObject::noBit if there are no more bits
 			* @details Created   23/3/12, last update 09/02/2025
 			**/
-			virtual inline int prev_bit_del(BBScan& bitset);
+			virtual int prev_bit_del(BBScan& bitset);
 
 
 			//////////////////
 			/// data members
+
 		protected:
 			scan_t scan_;
 		};
@@ -239,6 +241,7 @@ namespace bitgraph{
 
 namespace bitgraph {
 
+	inline 
 	int BBScan::next_bit_del() {
 
 		Ul posInBB;
@@ -261,8 +264,7 @@ namespace bitgraph {
 	}
 
 
-
-
+	inline 
 	int BBScan::next_bit_del(BBScan& bbN_del) {
 
 		Ul posInBB;
@@ -287,6 +289,7 @@ namespace bitgraph {
 	}
 
 
+	inline 
 	int BBScan::next_bit() {
 
 		Ul posInBB;
@@ -320,6 +323,7 @@ namespace bitgraph {
 
 
 
+	inline
 	int BBScan::next_bit(BBScan& bitset) {
 
 		Ul posInBB;
@@ -362,6 +366,7 @@ namespace bitgraph {
 	}
 
 
+	inline 
 	int BBScan::prev_bit() {
 
 		Ul posInBB;
@@ -395,6 +400,7 @@ namespace bitgraph {
 	}
 
 
+	inline
 	int BBScan::prev_bit(BBScan& bitset)
 	{
 
@@ -436,6 +442,7 @@ namespace bitgraph {
 
 
 
+	inline 
 	int BBScan::prev_bit_del() {
 
 		Ul posInBB;
@@ -458,6 +465,7 @@ namespace bitgraph {
 
 
 
+	inline 
 	int BBScan::prev_bit_del(BBScan& bitset) {
 
 		Ul posInBB;
@@ -487,6 +495,7 @@ namespace bitgraph {
 	}
 
 
+	inline
 	int BBScan::init_scan(scan_types sct) noexcept  {
 
 		switch (sct) {
@@ -512,6 +521,7 @@ namespace bitgraph {
 	}
 
 
+	inline
 	int BBScan::init_scan(int firstBit, scan_types sct)  noexcept {
 
 		//special case - first bitscan
@@ -551,19 +561,22 @@ namespace bitgraph {
 	/**
 	 * @brief Creates a BBScan object given a maximum number of bits  @nPop (all bits set to 0).
 	 **/
-	inline BBScan make_BBScan(int nPop) { return BBScan(nPop, false); }
+	inline
+	BBScan make_BBScan(int nPop) { return BBScan(nPop, false); }
 
 	/**
 	 * @brief Creates a BBScan object given a maximum number of bits  @nPop (all bits set to 1).
 	 **/
-	inline BBScan make_BBScan_full(int nPop) { return BBScan(nPop, true); }
+	inline 
+	BBScan make_BBScan_full(int nPop) { return BBScan(nPop, true); }
 
 	/**
 	* @brief Creates a BBScan object given a maximum @nPop and a list of values in brackets
 	* @details: - negative values are ignored (asserted in debug mode).
 	*			- values >= nPop are ignored.
 	**/
-	inline BBScan make_BBScan(int nPop, std::initializer_list<int> lv) { return BBScan(nPop, lv); }
+	inline 
+	BBScan make_BBScan(int nPop, std::initializer_list<int> lv) { return BBScan(nPop, lv); }
 		
 
 } // namespace bitgraph
