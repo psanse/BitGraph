@@ -14,7 +14,7 @@
 
 //#include "graph/simple_ugraph.h"								//legacy - to remove
 
-#include "graph_basic.h"
+#include "graph/graph_basic.h"
 #include "utils/common.h"
 #include "utils/logger.h"
 #include <iostream>
