@@ -33,7 +33,8 @@ set_target_properties(graph PROPERTIES  CXX_EXTENSIONS NO
 # Make sure the compiler can find include files for GRAPH
 # when other libraries or executables link to it
 target_include_directories(graph PUBLIC 
-  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+ # $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+  $<BUILD_INTERFACE:${BITGRAPH_ROOT_INCLUDE_DIR}>
   $<INSTALL_INTERFACE:include>    # <prefix>/include/<PROJECT_NAME>/graph
 )
 

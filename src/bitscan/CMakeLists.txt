@@ -32,7 +32,8 @@ set_target_properties(bitscan PROPERTIES CXX_EXTENSIONS NO
 # Make sure the compiler can find include files for our bitscan library
 # when other libraries or executables link to bitscan
 target_include_directories(bitscan PUBLIC 
-  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+#  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+  $<BUILD_INTERFACE:${BITGRAPH_ROOT_INCLUDE_DIR}>
   $<INSTALL_INTERFACE:${include_install_dir}>    # <prefix>/include/<PROJECT_NAME>
 )
 

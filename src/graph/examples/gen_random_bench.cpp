@@ -9,7 +9,7 @@
 #include <sstream>
 #include <string>
 #include "graph/algorithms/graph_gen.h"
-#include "graph_excep_hand.h"
+#include "graph/graph_excep_hand.h"
 #include "utils/common.h"
 #include "utils/logger.h"
 

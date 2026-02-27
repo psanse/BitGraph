@@ -31,7 +31,8 @@ message(STATUS "LOGGER_LEVEL is '${LOGGER_LEVEL}'")
 # when other libraries or executables link to bitscan
 
 target_include_directories(utils PUBLIC 
-  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+ # $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+  $<BUILD_INTERFACE:${BITGRAPH_ROOT_INCLUDE_DIR}>
   $<INSTALL_INTERFACE:include>    									# <prefix>/include/<PROJECT_NAME>/mylib
 )
 

@@ -107,7 +107,9 @@ endif (WIN32 AND INCLUDE_OPENMP)
 ####################
 # Subdirectories 
 ####################
-include_directories (PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+#include_directories (PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+
+set(BITGRAPH_ROOT_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 
 add_subdirectory (utils)
 add_subdirectory (bitscan)
