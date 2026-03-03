@@ -7,7 +7,7 @@
 * @author pss
 **/
 
-#include "graph_basic.h"
+#include "graph/graph_basic.h"
 #include "gtest/gtest.h"
 #include <iostream>
 
