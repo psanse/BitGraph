@@ -904,11 +904,12 @@ namespace bitgraph {
 		// check
 
 #ifndef NDEBUG
+		const int OSIZE = static_cast<int>(ord.size());
 
-		assert(ord.size() == NV_ && "ERROR: ord.size() != N - GraphFastRootSort<GraphT>::new_order");
+		assert(OSIZE == NV_ && "ERROR: ord.size() != N - GraphFastRootSort<GraphT>::new_order");
 
 		//verify vertices outside bbsg have not been reordered
-		for (int v = 0; v < ord.size(); ++v) {
+		for (int v = 0; v < OSIZE; ++v) {
 			if (!bbsg.is_bit(v)) {
 				////////////////////////////////////////////////////////////////////////////////////////////////////////
 				assert(ord[v] == v && "ERROR: vertex outside bbsg reordered - GraphFastRootSort<GraphT>::new_order");
