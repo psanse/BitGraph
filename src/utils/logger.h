@@ -231,7 +231,7 @@ void _Error2(T&&... args) {
 
 #define Debug(...) ((void)0)
 #define Info(...) ((void)0)
-#define Warning(...) _Warning(__VA_ARGS__)
+#define Warning(...) bitgraph::_Warning(__VA_ARGS__)
 #define Error(...) bitgraph::_Error(__VA_ARGS__)
 #define LOGG_DEBUG(...) ((void)0)
 #define LOGG_INFO(...) ((void)0)
