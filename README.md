@@ -39,7 +39,7 @@ The repository has been tested on Linux (24.x.x) and Windows 10 OS.
 
 ## Releases 
 
-The latest release, v1.4.1 (March 2026), remains compatible with C++14. 
+The latest release, v1.4.2 (March 2026), remains compatible with C++14. 
 
 ## Acknowledgements
 
