@@ -121,6 +121,7 @@ TEST_F(BitSetClassTest, reverse_destructive) {
 TEST(BitSetClass, construction_val) {
 
 	Bitset bb_1(130, true);				//starts to ONE - currently one bits populate also the last bitblock until the end
+	Bitset bb_2(64, true);
 	Bitset bb_0(130, false);			//starts to ZERO	
 	Bitset bb_default(130);				//starts to ZERO
 
@@ -134,6 +135,8 @@ TEST(BitSetClass, construction_val) {
 
 	EXPECT_FALSE(bb_default.is_bit(129));	
 	EXPECT_FALSE(bb_default.is_bit(130));
+		
+	EXPECT_TRUE(bb_2.is_bit(63));	
 }
 
 TEST(BitSetClass, initializer_list) {

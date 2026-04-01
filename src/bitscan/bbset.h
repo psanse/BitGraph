@@ -988,7 +988,7 @@ namespace bitgraph{
 
 
 		inline bool Bitset::is_bit(int nbit/*0 based*/) const {
-
+			
 			return (vBB_[WDIV(nbit)] & Tables::mask[WMOD(nbit)]);
 
 		}
