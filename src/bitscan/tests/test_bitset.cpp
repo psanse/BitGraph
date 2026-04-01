@@ -137,6 +137,8 @@ TEST(BitSetClass, construction_val) {
 	EXPECT_FALSE(bb_default.is_bit(130));
 		
 	EXPECT_TRUE(bb_2.is_bit(63));	
+	EXPECT_TRUE(bb_2.is_bit(62));
+	EXPECT_TRUE(bb_2.is_bit(0));
 }
 
 TEST(BitSetClass, initializer_list) {

@@ -34,8 +34,16 @@ Bitset::Bitset(std::size_t nPop, bool val) :
 
 	//trim last bitblock to ZERO if val = TRUE
 	if (val && nPop > 0) {
-		vBB_.back() &= bblock::MASK_0_HIGH(nPop - WMUL(nBB_ - 1));			// cannot be /* bblock::MASK_0_HIGH(WMOD(nPop))! */
+		const auto rem = WMOD(nPop);
+		if (rem != 0) {
+			vBB_.back() &= bblock::MASK_0_HIGH(rem);
+		}
 	}
+
+	////trim last bitblock to ZERO if val = TRUE
+	//if (val && nPop > 0) {
+	//	vBB_.back() &= bblock::MASK_0_HIGH(nPop - WMUL(nBB_ - 1));			// cannot be /* bblock::MASK_0_HIGH(WMOD(nPop))! */
+	//}
 }
 
 
