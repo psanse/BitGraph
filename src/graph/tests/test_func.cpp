@@ -57,6 +57,23 @@ protected:
 };
 
 
+TEST(GFunc, circulant) {
+
+	using namespace gfunc;
+
+	const int NV = 5;
+	auto ug = ugraph::make_cycle(NV);
+
+	std::vector<int> step_set;
+	auto is_circ = gfunc::is_circulant(ug, &step_set);			//cycle is circulant with jump list {1, 4}	
+
+	EXPECT_TRUE(is_circ);
+
+	std::vector<int> step_set_exp{ 1, 4 };
+	EXPECT_EQ(step_set_exp, step_set);
+
+}
+
 TEST_F(GFuncTest, is_triangleFree_subgraph) {
 		
 	VertexList triangle;	
@@ -220,6 +237,10 @@ TEST(GFunc, neighbors){
 	EXPECT_EQ(neigh_exp, neigh);
 		
 }
+
+
+
+
 
 // date: 24/10/17
 TEST(GFunc, sort){				

@@ -161,9 +161,93 @@ namespace bitgraph {
 		*  - intended for public API
 		*/
 		template<class GraphT>
-		inline void create_complete(GraphT& g, std::size_t N) {
+		inline 
+			void create_complete(GraphT& g, std::size_t N)
+		{
 			create_complete_impl(g, N, std::integral_constant<bool, graph_traits<GraphT>::is_undirected>{});		//C++14 compatible
 		}
+
+
+		/**
+		 * @brief Returns the jump pattern of vertex v for the current labeling 0..n-1.
+		 *
+		 * jump[d] == 1  <=>  edge(v, (v+d) mod n) exists, for d=1..n-1
+		 *
+		 * Required graph interface:
+		 *   - int number_of_vertices() const;
+		 *   - bool is_edge(int u, int v) const;
+		 */
+		template <class Graph>
+		inline
+			std::vector<unsigned char> circulant_jump_pattern(const Graph& g, int v)
+		{
+			const int n = g.num_vertices();
+			std::vector<unsigned char> jump(static_cast<std::size_t>(n), 0);
+
+			for (int d = 1; d < n; ++d) {
+				const int u = (v + d) % n;
+				jump[d] = g.is_edge(v, u) ? 1 : 0;
+			}
+
+			return jump;
+		}
+
+		/**
+		 * @brief Checks whether an undirected simple graph is circulant
+		 *        with the current labeling 0..n-1.
+		 *
+		 * Criterion:
+		 *   all vertices must have the same modular jump pattern.
+		 *
+		 * @param g input graph
+		 * @param[out] step_set optional full jump list S
+		 * @return true iff the graph is circulant with current labeling
+		 * @details:
+		 *	 - usually for undirected graphs, only half of the jump pattern is needed (d < n/2) due to symmetry,
+		 *     but this function checks the full pattern for generality and to allow directed graphs in the future.
+		  */
+		template <class Graph>
+		inline
+			bool is_circulant(const Graph& g, std::vector<Vertex>* step_set = nullptr)
+		{
+			const int NV = g.num_vertices();
+
+			if (NV <= 0) return false;
+			if (step_set) step_set->clear();
+
+			// simple graph: no loops
+			for (int v = 0; v < NV; ++v) {
+				if (g.is_edge(v, v)) return false;
+			}
+
+			if (NV == 1) return true;
+
+			// reference jump pattern
+			const auto ref = circulant_jump_pattern(g, 0);
+
+			// undirected circulant => symmetry d <-> n-d
+			for (int d = 1; d < NV; ++d) {
+				if (ref[d] != ref[(NV - d) % NV]) {
+					return false;
+				}
+			}
+
+			// every vertex must have the same jump pattern
+			for (Vertex v = 1; v < NV; ++v) {
+				const auto pat = circulant_jump_pattern(g, v);
+				if (pat != ref) return false;
+			}
+
+			// output
+			if (step_set) {
+				for (int d = 1; d < NV; ++d) {
+					if (ref[d]) step_set->push_back(d);
+				}
+			}
+
+			return true;
+		}
+
 
 		
 		//legacy code - to be removed eventually
@@ -296,6 +380,7 @@ namespace bitgraph {
 			}
 			return true;
 		}
+		
 
 		namespace sort {
 			/*
