@@ -17,6 +17,42 @@
 
 namespace bitgraph{
 
+		/////////////////////////////////
+		//
+		// Class BBScanView
+		//
+		// (Efficient bit scanning by composition over Bitset)
+		//
+		/////////////////////////////////
+
+		class BBScanView {
+		public:
+			explicit BBScanView(Bitset& bitset) noexcept : bitset_(bitset) {}
+			~BBScanView() = default;
+
+			void scan_block(int bbindex) noexcept { scan_.bbi_ = bbindex; }
+			void scan_bit(int posbit) noexcept { scan_.pos_ = posbit; }
+
+			int  scan_block() const noexcept { return scan_.bbi_; }
+			int  scan_bit() const noexcept { return scan_.pos_; }
+
+			int init_scan(BBObject::scan_types sct) noexcept;
+			int init_scan(int firstBit, BBObject::scan_types sct) noexcept;
+
+			int next_bit_del();
+			int next_bit_del(Bitset& bitset);
+			int next_bit();
+			int next_bit(Bitset& bitset);
+			int prev_bit();
+			int prev_bit(Bitset& bitset);
+			int prev_bit_del();
+			int prev_bit_del(Bitset& bitset);
+
+		protected:
+			Bitset& bitset_;
+			BBObject::scan_t scan_;
+		};
+
 	
 		/////////////////////////////////
 		//
@@ -239,6 +275,264 @@ namespace bitgraph{
 // INLINE Implementation for generic code, must be in header file
 
 namespace bitgraph {
+
+	inline
+	int BBScanView::next_bit_del() {
+
+		if (bitset_.num_blocks() <= 0) {
+			return BBObject::noBit;
+		}
+
+		auto& vBB = bitset_.bitset();
+		Ul posInBB;
+
+		for (auto i = scan_.bbi_; i < bitset_.num_blocks(); ++i) {
+			if (_BitScanForward64(&posInBB, vBB[i])) {
+				scan_.bbi_ = i;
+				vBB[i] &= ~Tables::mask[posInBB];
+				return (posInBB + WMUL(i));
+			}
+		}
+
+		return BBObject::noBit;
+	}
+
+	inline
+	int BBScanView::next_bit_del(Bitset& bitset) {
+
+		if (bitset_.num_blocks() <= 0) {
+			return BBObject::noBit;
+		}
+
+		auto& vBB = bitset_.bitset();
+		auto& vBB_del = bitset.bitset();
+		assert(bitset.num_blocks() == bitset_.num_blocks());
+
+		Ul posInBB;
+		for (auto i = scan_.bbi_; i < bitset_.num_blocks(); ++i) {
+			if (_BitScanForward64(&posInBB, vBB[i])) {
+				scan_.bbi_ = i;
+				vBB[i] &= ~Tables::mask[posInBB];
+				vBB_del[i] &= ~Tables::mask[posInBB];
+				return (posInBB + WMUL(i));
+			}
+		}
+
+		return BBObject::noBit;
+	}
+
+	inline
+	int BBScanView::next_bit() {
+
+		if (bitset_.num_blocks() <= 0 || scan_.bbi_ == BBObject::noBit) {
+			return BBObject::noBit;
+		}
+
+		auto& vBB = bitset_.bitset();
+		Ul posInBB;
+
+		if (_BitScanForward64(&posInBB, vBB[scan_.bbi_] & Tables::mask_high[scan_.pos_])) {
+			scan_.pos_ = posInBB;
+			return (posInBB + WMUL(scan_.bbi_));
+		}
+
+		for (auto i = scan_.bbi_ + 1; i < bitset_.num_blocks(); ++i) {
+			if (_BitScanForward64(&posInBB, vBB[i])) {
+				scan_.bbi_ = i;
+				scan_.pos_ = posInBB;
+				return (posInBB + WMUL(i));
+			}
+		}
+
+		return BBObject::noBit;
+	}
+
+	inline
+	int BBScanView::next_bit(Bitset& bitset) {
+
+		if (bitset_.num_blocks() <= 0 || scan_.bbi_ == BBObject::noBit) {
+			return BBObject::noBit;
+		}
+
+		auto& vBB = bitset_.bitset();
+		auto& vBB_del = bitset.bitset();
+		assert(bitset.num_blocks() == bitset_.num_blocks());
+
+		Ul posInBB;
+		if (_BitScanForward64(&posInBB, vBB[scan_.bbi_] & Tables::mask_high[scan_.pos_])) {
+			scan_.pos_ = posInBB;
+			vBB_del[scan_.bbi_] &= ~Tables::mask[posInBB];
+			return (posInBB + WMUL(scan_.bbi_));
+		}
+
+		for (auto i = scan_.bbi_ + 1; i < bitset_.num_blocks(); ++i) {
+			if (_BitScanForward64(&posInBB, vBB[i])) {
+				scan_.bbi_ = i;
+				scan_.pos_ = posInBB;
+				vBB_del[i] &= ~Tables::mask[posInBB];
+				return (posInBB + WMUL(i));
+			}
+		}
+
+		return BBObject::noBit;
+	}
+
+	inline
+	int BBScanView::prev_bit() {
+
+		if (bitset_.num_blocks() <= 0 || scan_.bbi_ == BBObject::noBit) {
+			return BBObject::noBit;
+		}
+
+		auto& vBB = bitset_.bitset();
+		Ul posInBB;
+
+		if (_BitScanReverse64(&posInBB, vBB[scan_.bbi_] & Tables::mask_low[scan_.pos_])) {
+			scan_.pos_ = posInBB;
+			return (posInBB + WMUL(scan_.bbi_));
+		}
+
+		for (auto i = scan_.bbi_ - 1; i >= 0; --i) {
+			if (_BitScanReverse64(&posInBB, vBB[i])) {
+				scan_.bbi_ = i;
+				scan_.pos_ = posInBB;
+				return (posInBB + WMUL(i));
+			}
+		}
+
+		return BBObject::noBit;
+	}
+
+	inline
+	int BBScanView::prev_bit(Bitset& bitset) {
+
+		if (bitset_.num_blocks() <= 0 || scan_.bbi_ == BBObject::noBit) {
+			return BBObject::noBit;
+		}
+
+		auto& vBB = bitset_.bitset();
+		auto& vBB_del = bitset.bitset();
+		assert(bitset.num_blocks() == bitset_.num_blocks());
+
+		Ul posInBB;
+		if (_BitScanReverse64(&posInBB, vBB[scan_.bbi_] & Tables::mask_low[scan_.pos_])) {
+			scan_.pos_ = posInBB;
+			vBB_del[scan_.bbi_] &= ~Tables::mask[posInBB];
+			return (posInBB + WMUL(scan_.bbi_));
+		}
+
+		for (auto i = scan_.bbi_ - 1; i >= 0; --i) {
+			if (_BitScanReverse64(&posInBB, vBB[i])) {
+				scan_.bbi_ = i;
+				scan_.pos_ = posInBB;
+				vBB_del[scan_.bbi_] &= ~Tables::mask[posInBB];
+				return (posInBB + WMUL(i));
+			}
+		}
+
+		return BBObject::noBit;
+	}
+
+	inline
+	int BBScanView::prev_bit_del() {
+
+		if (bitset_.num_blocks() <= 0) {
+			return BBObject::noBit;
+		}
+
+		auto& vBB = bitset_.bitset();
+		Ul posInBB;
+
+		for (auto i = scan_.bbi_; i >= 0; --i) {
+			if (_BitScanReverse64(&posInBB, vBB[i])) {
+				scan_.bbi_ = i;
+				vBB[i] &= ~Tables::mask[posInBB];
+				return (posInBB + WMUL(i));
+			}
+		}
+
+		return BBObject::noBit;
+	}
+
+	inline
+	int BBScanView::prev_bit_del(Bitset& bitset) {
+
+		if (bitset_.num_blocks() <= 0) {
+			return BBObject::noBit;
+		}
+
+		auto& vBB = bitset_.bitset();
+		auto& vBB_del = bitset.bitset();
+		assert(bitset.num_blocks() == bitset_.num_blocks());
+
+		Ul posInBB;
+		for (auto i = scan_.bbi_; i >= 0; --i) {
+			if (_BitScanReverse64(&posInBB, vBB[i])) {
+				scan_.bbi_ = i;
+				vBB[i] &= ~Tables::mask[posInBB];
+				vBB_del[i] &= ~Tables::mask[posInBB];
+				return (posInBB + WMUL(i));
+			}
+		}
+
+		return BBObject::noBit;
+	}
+
+	inline
+	int BBScanView::init_scan(BBObject::scan_types sct) noexcept {
+
+		if (bitset_.num_blocks() <= 0) {
+			scan_block(BBObject::noBit);
+			scan_bit(MASK_LIM);
+			return 0;
+		}
+
+		switch (sct) {
+		case BBObject::NON_DESTRUCTIVE:
+			scan_block(0);
+			scan_bit(MASK_LIM);
+			break;
+		case BBObject::NON_DESTRUCTIVE_REVERSE:
+			scan_block(bitset_.num_blocks() - 1);
+			scan_bit(WORD_SIZE);
+			break;
+		case BBObject::DESTRUCTIVE:
+			scan_block(0);
+			break;
+		case BBObject::DESTRUCTIVE_REVERSE:
+			scan_block(bitset_.num_blocks() - 1);
+			break;
+		default:
+			assert(false && "unknown scan type - BBScanView::init_scan");
+		}
+
+		return 0;
+	}
+
+	inline
+	int BBScanView::init_scan(int firstBit, BBObject::scan_types sct) noexcept {
+
+		if (firstBit == BBObject::noBit) {
+			return init_scan(sct);
+		}
+
+		const int bbh = WDIV(firstBit);
+		switch (sct) {
+		case BBObject::NON_DESTRUCTIVE:
+		case BBObject::NON_DESTRUCTIVE_REVERSE:
+			scan_block(bbh);
+			scan_bit(WMOD(firstBit));
+			break;
+		case BBObject::DESTRUCTIVE:
+		case BBObject::DESTRUCTIVE_REVERSE:
+			scan_block(bbh);
+			break;
+		default:
+			assert(false && "unknown scan type - BBScanView::init_scan");
+		}
+
+		return 0;
+	}
 
 	inline 
 	int BBScan::next_bit_del() {
