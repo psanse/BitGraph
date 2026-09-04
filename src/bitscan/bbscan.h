@@ -49,6 +49,22 @@ namespace bitgraph{
 			int prev_bit_del(Bitset& bitset);
 
 		protected:
+			bool has_valid_cursor(int maxPosition) const noexcept {
+				static_cast<void>(maxPosition);
+				if (scan_.bbi_ == BBObject::noBit) {
+					return false;
+				}
+				assert(scan_.bbi_ >= 0 && scan_.bbi_ < bitset_.num_blocks());
+				assert(scan_.pos_ >= 0 && scan_.pos_ <= maxPosition);
+				return true;
+			}
+
+			bool has_compatible_layout(const Bitset& bitset) const noexcept {
+				static_cast<void>(bitset);
+				assert(bitset.num_blocks() == bitset_.num_blocks());
+				return true;
+			}
+
 			Bitset& bitset_;
 			BBObject::scan_t scan_;
 		};
@@ -279,7 +295,7 @@ namespace bitgraph {
 	inline
 	int BBScanView::next_bit_del() {
 
-		if (bitset_.num_blocks() <= 0) {
+		if (!has_valid_cursor(MASK_LIM)) {
 			return BBObject::noBit;
 		}
 
@@ -287,8 +303,12 @@ namespace bitgraph {
 		Ul posInBB;
 
 		for (auto i = scan_.bbi_; i < bitset_.num_blocks(); ++i) {
-			if (_BitScanForward64(&posInBB, vBB[i])) {
+			const BITBOARD candidates = (i == scan_.bbi_)
+				? vBB[i] & Tables::mask_high[scan_.pos_]
+				: vBB[i];
+			if (_BitScanForward64(&posInBB, candidates)) {
 				scan_.bbi_ = i;
+				scan_.pos_ = posInBB;
 				vBB[i] &= ~Tables::mask[posInBB];
 				return (posInBB + WMUL(i));
 			}
@@ -300,18 +320,22 @@ namespace bitgraph {
 	inline
 	int BBScanView::next_bit_del(Bitset& bitset) {
 
-		if (bitset_.num_blocks() <= 0) {
+		if (!has_valid_cursor(MASK_LIM) || !has_compatible_layout(bitset)) {
 			return BBObject::noBit;
 		}
 
 		auto& vBB = bitset_.bitset();
 		auto& vBB_del = bitset.bitset();
-		assert(bitset.num_blocks() == bitset_.num_blocks());
+		assert(has_compatible_layout(bitset));
 
 		Ul posInBB;
 		for (auto i = scan_.bbi_; i < bitset_.num_blocks(); ++i) {
-			if (_BitScanForward64(&posInBB, vBB[i])) {
+			const BITBOARD candidates = (i == scan_.bbi_)
+				? vBB[i] & Tables::mask_high[scan_.pos_]
+				: vBB[i];
+			if (_BitScanForward64(&posInBB, candidates)) {
 				scan_.bbi_ = i;
+				scan_.pos_ = posInBB;
 				vBB[i] &= ~Tables::mask[posInBB];
 				vBB_del[i] &= ~Tables::mask[posInBB];
 				return (posInBB + WMUL(i));
@@ -324,7 +348,7 @@ namespace bitgraph {
 	inline
 	int BBScanView::next_bit() {
 
-		if (bitset_.num_blocks() <= 0 || scan_.bbi_ == BBObject::noBit) {
+		if (!has_valid_cursor(MASK_LIM)) {
 			return BBObject::noBit;
 		}
 
@@ -350,13 +374,13 @@ namespace bitgraph {
 	inline
 	int BBScanView::next_bit(Bitset& bitset) {
 
-		if (bitset_.num_blocks() <= 0 || scan_.bbi_ == BBObject::noBit) {
+		if (!has_valid_cursor(MASK_LIM) || !has_compatible_layout(bitset)) {
 			return BBObject::noBit;
 		}
 
 		auto& vBB = bitset_.bitset();
 		auto& vBB_del = bitset.bitset();
-		assert(bitset.num_blocks() == bitset_.num_blocks());
+		assert(has_compatible_layout(bitset));
 
 		Ul posInBB;
 		if (_BitScanForward64(&posInBB, vBB[scan_.bbi_] & Tables::mask_high[scan_.pos_])) {
@@ -380,7 +404,7 @@ namespace bitgraph {
 	inline
 	int BBScanView::prev_bit() {
 
-		if (bitset_.num_blocks() <= 0 || scan_.bbi_ == BBObject::noBit) {
+		if (!has_valid_cursor(WORD_SIZE)) {
 			return BBObject::noBit;
 		}
 
@@ -406,13 +430,13 @@ namespace bitgraph {
 	inline
 	int BBScanView::prev_bit(Bitset& bitset) {
 
-		if (bitset_.num_blocks() <= 0 || scan_.bbi_ == BBObject::noBit) {
+		if (!has_valid_cursor(WORD_SIZE) || !has_compatible_layout(bitset)) {
 			return BBObject::noBit;
 		}
 
 		auto& vBB = bitset_.bitset();
 		auto& vBB_del = bitset.bitset();
-		assert(bitset.num_blocks() == bitset_.num_blocks());
+		assert(has_compatible_layout(bitset));
 
 		Ul posInBB;
 		if (_BitScanReverse64(&posInBB, vBB[scan_.bbi_] & Tables::mask_low[scan_.pos_])) {
@@ -436,7 +460,7 @@ namespace bitgraph {
 	inline
 	int BBScanView::prev_bit_del() {
 
-		if (bitset_.num_blocks() <= 0) {
+		if (!has_valid_cursor(WORD_SIZE)) {
 			return BBObject::noBit;
 		}
 
@@ -444,8 +468,12 @@ namespace bitgraph {
 		Ul posInBB;
 
 		for (auto i = scan_.bbi_; i >= 0; --i) {
-			if (_BitScanReverse64(&posInBB, vBB[i])) {
+			const BITBOARD candidates = (i == scan_.bbi_)
+				? vBB[i] & Tables::mask_low[scan_.pos_]
+				: vBB[i];
+			if (_BitScanReverse64(&posInBB, candidates)) {
 				scan_.bbi_ = i;
+				scan_.pos_ = posInBB;
 				vBB[i] &= ~Tables::mask[posInBB];
 				return (posInBB + WMUL(i));
 			}
@@ -457,18 +485,22 @@ namespace bitgraph {
 	inline
 	int BBScanView::prev_bit_del(Bitset& bitset) {
 
-		if (bitset_.num_blocks() <= 0) {
+		if (!has_valid_cursor(WORD_SIZE) || !has_compatible_layout(bitset)) {
 			return BBObject::noBit;
 		}
 
 		auto& vBB = bitset_.bitset();
 		auto& vBB_del = bitset.bitset();
-		assert(bitset.num_blocks() == bitset_.num_blocks());
+		assert(has_compatible_layout(bitset));
 
 		Ul posInBB;
 		for (auto i = scan_.bbi_; i >= 0; --i) {
-			if (_BitScanReverse64(&posInBB, vBB[i])) {
+			const BITBOARD candidates = (i == scan_.bbi_)
+				? vBB[i] & Tables::mask_low[scan_.pos_]
+				: vBB[i];
+			if (_BitScanReverse64(&posInBB, candidates)) {
 				scan_.bbi_ = i;
+				scan_.pos_ = posInBB;
 				vBB[i] &= ~Tables::mask[posInBB];
 				vBB_del[i] &= ~Tables::mask[posInBB];
 				return (posInBB + WMUL(i));
@@ -480,6 +512,9 @@ namespace bitgraph {
 
 	inline
 	int BBScanView::init_scan(BBObject::scan_types sct) noexcept {
+		if (sct < BBObject::NON_DESTRUCTIVE || sct > BBObject::DESTRUCTIVE_REVERSE) {
+			return -1;
+		}
 
 		if (bitset_.num_blocks() <= 0) {
 			scan_block(BBObject::noBit);
@@ -498,12 +533,14 @@ namespace bitgraph {
 			break;
 		case BBObject::DESTRUCTIVE:
 			scan_block(0);
+			scan_bit(MASK_LIM);
 			break;
 		case BBObject::DESTRUCTIVE_REVERSE:
 			scan_block(bitset_.num_blocks() - 1);
+			scan_bit(WORD_SIZE);
 			break;
 		default:
-			assert(false && "unknown scan type - BBScanView::init_scan");
+			return -1;
 		}
 
 		return 0;
@@ -515,20 +552,23 @@ namespace bitgraph {
 		if (firstBit == BBObject::noBit) {
 			return init_scan(sct);
 		}
+		if (firstBit < 0 || firstBit >= bitset_.num_blocks() * WORD_SIZE) {
+			scan_block(BBObject::noBit);
+			scan_bit(MASK_LIM);
+			return -1;
+		}
 
 		const int bbh = WDIV(firstBit);
 		switch (sct) {
 		case BBObject::NON_DESTRUCTIVE:
 		case BBObject::NON_DESTRUCTIVE_REVERSE:
-			scan_block(bbh);
-			scan_bit(WMOD(firstBit));
-			break;
 		case BBObject::DESTRUCTIVE:
 		case BBObject::DESTRUCTIVE_REVERSE:
 			scan_block(bbh);
+			scan_bit(WMOD(firstBit));
 			break;
 		default:
-			assert(false && "unknown scan type - BBScanView::init_scan");
+			return -1;
 		}
 
 		return 0;

@@ -11,6 +11,7 @@
 #include "gtest/gtest.h"
 #include <iostream>
 #include <set>
+#include <vector>
 
 using namespace std;
 using namespace bitgraph;
@@ -33,6 +34,131 @@ protected:
 	BBScan bbsc;
 	set<int> sol;
 };
+
+class BBScanViewTest : public ::testing::Test {
+protected:
+	BBScanViewTest() : bitset(301), destination(301) {}
+
+	void SetUp() override {
+		for (int bit = 0; bit <= 300; bit += 50) {
+			bitset.set_bit(bit);
+			destination.set_bit(bit);
+			expected.insert(bit);
+		}
+	}
+
+	Bitset bitset;
+	Bitset destination;
+	set<int> expected;
+};
+
+TEST_F(BBScanViewTest, non_destructive_scans_forward_and_preserves_source) {
+	BBScanView scan(bitset);
+	set<int> result;
+
+	scan.init_scan(BBObject::NON_DESTRUCTIVE);
+	for (int bit = scan.next_bit(); bit != BBObject::noBit; bit = scan.next_bit()) {
+		result.insert(bit);
+	}
+
+	EXPECT_EQ(expected, result);
+	EXPECT_EQ(expected.size(), bitset.count());
+}
+
+TEST_F(BBScanViewTest, non_destructive_scan_honors_start_and_destination) {
+	BBScanView scan(bitset);
+	set<int> result;
+
+	scan.init_scan(50, BBObject::NON_DESTRUCTIVE);
+	for (int bit = scan.next_bit(destination); bit != BBObject::noBit; bit = scan.next_bit(destination)) {
+		result.insert(bit);
+	}
+
+	EXPECT_EQ((set<int>{100, 150, 200, 250, 300}), result);
+	EXPECT_EQ(expected.size(), bitset.count());
+	EXPECT_TRUE(destination.is_bit(0));
+	EXPECT_TRUE(destination.is_bit(50));
+	EXPECT_EQ(2, destination.count());
+}
+
+TEST_F(BBScanViewTest, destructive_scans_empty_the_source_in_both_directions) {
+	BBScanView forward(bitset);
+	set<int> forwardResult;
+
+	forward.init_scan(BBObject::DESTRUCTIVE);
+	for (int bit = forward.next_bit_del(); bit != BBObject::noBit; bit = forward.next_bit_del()) {
+		forwardResult.insert(bit);
+	}
+
+	EXPECT_EQ(expected, forwardResult);
+	EXPECT_TRUE(bitset.is_empty());
+
+	for (int bit : expected) {
+		bitset.set_bit(bit);
+	}
+
+	BBScanView reverse(bitset);
+	set<int> reverseResult;
+	reverse.init_scan(BBObject::DESTRUCTIVE_REVERSE);
+	for (int bit = reverse.prev_bit_del(); bit != BBObject::noBit; bit = reverse.prev_bit_del()) {
+		reverseResult.insert(bit);
+	}
+
+	EXPECT_EQ(expected, reverseResult);
+	EXPECT_TRUE(bitset.is_empty());
+}
+
+TEST_F(BBScanViewTest, reverse_non_destructive_scan_honors_start) {
+	BBScanView scan(bitset);
+	vector<int> result;
+
+	ASSERT_EQ(0, scan.init_scan(200, BBObject::NON_DESTRUCTIVE_REVERSE));
+	for (int bit = scan.prev_bit(); bit != BBObject::noBit; bit = scan.prev_bit()) {
+		result.push_back(bit);
+	}
+
+	EXPECT_EQ((vector<int>{150, 100, 50, 0}), result);
+	EXPECT_EQ(expected.size(), bitset.count());
+}
+
+TEST_F(BBScanViewTest, destructive_scans_honor_start_within_a_block) {
+	Bitset forwardBits(128, {1, 10, 20, 63, 64, 90});
+	BBScanView forward(forwardBits);
+	vector<int> forwardResult;
+
+	ASSERT_EQ(0, forward.init_scan(10, BBObject::DESTRUCTIVE));
+	for (int bit = forward.next_bit_del(); bit != BBObject::noBit; bit = forward.next_bit_del()) {
+		forwardResult.push_back(bit);
+	}
+	EXPECT_EQ((vector<int>{20, 63, 64, 90}), forwardResult);
+	EXPECT_TRUE(forwardBits.is_bit(1));
+	EXPECT_TRUE(forwardBits.is_bit(10));
+
+	Bitset reverseBits(128, {1, 10, 20, 63, 64, 90});
+	BBScanView reverse(reverseBits);
+	vector<int> reverseResult;
+
+	ASSERT_EQ(0, reverse.init_scan(63, BBObject::DESTRUCTIVE_REVERSE));
+	for (int bit = reverse.prev_bit_del(); bit != BBObject::noBit; bit = reverse.prev_bit_del()) {
+		reverseResult.push_back(bit);
+	}
+	EXPECT_EQ((vector<int>{20, 10, 1}), reverseResult);
+	EXPECT_TRUE(reverseBits.is_bit(63));
+	EXPECT_TRUE(reverseBits.is_bit(64));
+	EXPECT_TRUE(reverseBits.is_bit(90));
+}
+
+TEST_F(BBScanViewTest, rejects_invalid_start_and_uninitialized_scan_is_safe) {
+	BBScanView scan(bitset);
+
+	EXPECT_EQ(BBObject::noBit, scan.next_bit());
+	EXPECT_EQ(BBObject::noBit, scan.prev_bit_del());
+	EXPECT_EQ(-1, scan.init_scan(-2, BBObject::NON_DESTRUCTIVE));
+	EXPECT_EQ(BBObject::noBit, scan.next_bit());
+	EXPECT_EQ(-1, scan.init_scan(bitset.num_blocks() * WORD_SIZE,
+		BBObject::NON_DESTRUCTIVE_REVERSE));
+	EXPECT_EQ(BBObject::noBit, scan.prev_bit());
+}
 
 TEST_F(BBScanClassTest, non_destructive) {
 	std::set<int> res;
