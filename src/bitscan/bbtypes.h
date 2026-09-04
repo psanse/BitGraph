@@ -18,8 +18,8 @@
  *
  **/
 
-#ifndef __BBTYPES_H__
-#define __BBTYPES_H__
+#ifndef BITGRAPH_BITSCAN_BBTYPES_H
+#define BITGRAPH_BITSCAN_BBTYPES_H
 
 #include <cstdint>
 #include <vector>
@@ -39,7 +39,7 @@ namespace bitgraph {
 
 	//C++14 style to avoid ODR issues
 	enum : BITBOARD {
-		ONE = 0xFFFFFFFFFFFFFFFFULL,					// 1 bit mask
+		ONE = 0xFFFFFFFFFFFFFFFFULL,					// all bits set mask
 		EVEN = 0x5555555555555555ULL,					// 1 bits in even positions: 64 bits
 		ZERO = 0ULL	
 	};
@@ -60,9 +60,11 @@ namespace bitgraph {
 		MASK_LIM = WORD_SIZE + 1						// mask limit for bitscan operations on a single BITBOARD
 	};
 
+	static_assert(sizeof(BITBOARD) * 8 == WORD_SIZE, "BITBOARD size and WORD_SIZE must match");
+
 	using bitpos_list = std::vector<int>;
 	using bitpos_set = std::set<int>;
 
 } // end namespace bitgraph
 
-#endif // __BBTYPES_H__
+#endif // BITGRAPH_BITSCAN_BBTYPES_H

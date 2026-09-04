@@ -1,13 +1,13 @@
 /**  
  * @file bbobject.h
  * @brief Interface for the BITSCAN library hierarchy of classes
- * @deatails created ?, last_update 14/02/2025
+   * @details created ?, last_update 14/02/2025
  * @author: pss
  *
  **/
 
-#ifndef  __BB_OBJECT_H__
-#define  __BB_OBJECT_H__
+#ifndef BITGRAPH_BITSCAN_BBOBJECT_H
+#define BITGRAPH_BITSCAN_BBOBJECT_H
 
 #include <iostream>
 #include "bbtypes.h"
@@ -44,18 +44,18 @@ namespace bitgraph {
 
 		//cache for bitscanning
 		struct scan_t {
-
+			
 			int bbi_;								//bitblock index 	
 			int pos_;								//bit index [0...63] 
 
-			scan_t() :bbi_(noBit), pos_(MASK_LIM) {}
+			constexpr scan_t() noexcept : bbi_(BBObject::noBit), pos_(MASK_LIM) {}
 
-			void set_block(int block) { bbi_ = block; }
-			void set_pos(int bit) { pos_ = bit; }
-			void set_bit(int bit) {
-				int bbh = WDIV(bit);
+			void set_block(int block) noexcept { bbi_ = block; }
+			void set_pos(int bit) noexcept { pos_ = bit; }
+			void set_bit(int bit) noexcept {
+				const int bbh = WDIV(bit);
 				bbi_ = bbh;
-				pos_ = bit - WMUL(bbh);					/* equiv. to WMOD(bit)*/
+				pos_ = WMOD(bit);					/* equiv. to WMOD(bit)*/
 			}
 		};
 
@@ -72,16 +72,16 @@ namespace bitgraph {
 		struct ScanRev {
 					
 			using bitset_type = BitsetT;		// basic type (a type of bitset)
-			using bitset_t = bitset_type;		// alias less redundant
+			using bitset_t = bitset_type;		// alias less verbose
 
 		public:
 
 			/**
 			* @brief: constructor for reverse bitscanning - may throw for sparse bitsets if empty
 			**/
-			ScanRev(bitset_t& bb, int firstBit = -1) : bb_(bb) { init_scan(firstBit); }
+			explicit ScanRev(bitset_t& bb, int firstBit = BBObject::noBit) : bb_(bb) { init_scan(firstBit); }
 
-			int get_block() { return  bb_.scan_.bbi_; }
+			int get_block() const noexcept { return bb_.scan_.bbi_; }
 
 			/**
 			* @brief Scans the bitset from [firstBit , end of the bitset)
@@ -89,7 +89,7 @@ namespace bitgraph {
 			* @param firstBit: starting position of the scan
 			* @details: may throw for sparse bitsets if empty
 			**/
-			int init_scan(int firstBit = -1) { return bb_.init_scan(firstBit, BBObject::NON_DESTRUCTIVE_REVERSE); }
+			int init_scan(int firstBit = BBObject::noBit) { return bb_.init_scan(firstBit, BBObject::NON_DESTRUCTIVE_REVERSE); }
 
 			/**
 			* @brief returns the next bit in the bitset during a reverse bitscanning operation
@@ -112,16 +112,16 @@ namespace bitgraph {
 		struct Scan {
 		
 			using bitset_type = BitsetT;		// basic type (a type of bitset)
-			using bitset_t = bitset_type;		// alias less redundant
+			using bitset_t = bitset_type;		// alias less verbose
 			
 		public:
 
 			/**
 			* @brief: constructor for bitscanning - may throw for sparse bitsets if empty
 			**/
-			Scan(bitset_t& bb, int firstBit = -1) : bb_(bb) { init_scan(firstBit); }
+			explicit Scan(bitset_t& bb, int firstBit = BBObject::noBit) : bb_(bb) { init_scan(firstBit); }
 
-			int get_block() { return  bb_.scan_.bbi_; }
+			int get_block() const noexcept { return bb_.scan_.bbi_; }
 
 			/**
 			* @brief Scans the bitset from [firstBit , end of the bitset)
@@ -129,7 +129,7 @@ namespace bitgraph {
 			* @param firstBit: starting position of the scan
 			* @details: may throw for sparse bitsets if empty
 			**/
-			int init_scan(int firstBit = -1) { return bb_.init_scan(firstBit, BBObject::NON_DESTRUCTIVE); }
+			int init_scan(int firstBit = BBObject::noBit) { return bb_.init_scan(firstBit, BBObject::NON_DESTRUCTIVE); }
 
 			/**
 			* @brief returns the next bit in the bitset during a reverse bitscanning operation
@@ -152,15 +152,15 @@ namespace bitgraph {
 		struct ScanDest {
 
 				using bitset_type = BitsetT;		// basic type (a type of bitset)
-				using bitset_t = bitset_type;		// alias less redundant
+				using bitset_t = bitset_type;		// alias less verbose
 		public:
 
 			/**
 			* @brief: constructor for destructive bitscanning - may throw for sparse bitsets if empty
 			**/
-			ScanDest(bitset_t& bb) : bb_(bb) { init_scan(); }
+			explicit ScanDest(bitset_t& bb) : bb_(bb) { init_scan(); }
 
-			int get_block() { return bb_.scan_.bbi_; }
+			int get_block() const noexcept { return bb_.scan_.bbi_; }
 
 			/**
 			* @brief Scans the bitset in the range [0 , end of the bitset)
@@ -189,16 +189,16 @@ namespace bitgraph {
 		template< class BitsetT >
 		struct ScanDestRev {
 			using bitset_type = BitsetT;		// basic type (a type of bitset)
-			using bitset_t = bitset_type;		// alias less redundant
-			
+			using bitset_t = bitset_type;		// alias less verbose
+
 		public:
 
 			/**
 			* @brief: constructor for destructive reverse bitscanning - may throw for sparse bitsets if empty
 			**/
-			ScanDestRev(bitset_t& bb) : bb_(bb) { init_scan(); }
+			explicit ScanDestRev(bitset_t& bb) : bb_(bb) { init_scan(); }
 
-			int get_block() { return bb_.scan_.bbi_; }
+			int get_block() const noexcept { return bb_.scan_.bbi_; }
 
 			/**
 			* @brief Scans the bitset in the range (end_of_bitset, 0]
@@ -244,4 +244,4 @@ namespace bitgraph {
 
 }// namespace bitgraph
 
-#endif
+#endif // BITGRAPH_BITSCAN_BBOBJECT_H

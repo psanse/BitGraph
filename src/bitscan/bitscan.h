@@ -1,7 +1,7 @@
 /**
  * @file bitscan.h
  * @brief facade aliases for consumer code of the BITSCAN lib, a C++ library for bitset optimization.
- * @details The BITSCAN library is currently released as part of the BITGRAPH C++. 
+ * @details The BITSCAN library is currently released as part of the BITGRAPH C++ library. 
  * @details
  *  - date 2014
  *  - last modified 01/02/2026

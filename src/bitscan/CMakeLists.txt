@@ -76,10 +76,26 @@ endif(INSTALL_BITGRAPH)
 ###################
 # UNIT TESTS for BITSCAN lib  
 ###################
-#option(bitscan_build_tests "Build bitscan tests." ON)
-if (BUILD_TESTS)
+# Per-target option to enable building unit tests for the bitscan target
+option(BITSCAN_BUILD_TESTS "Build bitscan tests." ON)
 
-	add_subdirectory(tests)
+# If the project-wide BUILD_TESTS is enabled and the per-target option is ON,
+# prepare GoogleTest and add the tests subdirectory. Use FetchContent so tests
+# can be built even when google test is not installed on the system.
+if (BUILD_TESTS AND BITSCAN_BUILD_TESTS)
+
+    include(FetchContent)
+    FetchContent_Declare(
+        googletest
+        GIT_REPOSITORY https://github.com/google/googletest.git
+        GIT_TAG release-1.14.0
+    )
+    # Prevent GoogleTest from overriding our compiler options
+    set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+    FetchContent_MakeAvailable(googletest)
+
+    enable_testing()
+    add_subdirectory(tests)
 
 endif()
 

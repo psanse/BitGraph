@@ -13,7 +13,6 @@
 #define __BBSCAN_H__
 
 #include "bbset.h"	
-#include "bbexcep_hand.h"
 #include <cassert>
 
 namespace bitgraph{

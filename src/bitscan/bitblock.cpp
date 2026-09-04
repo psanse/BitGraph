@@ -23,7 +23,7 @@ namespace bitgraph {
 
 			val.b = bb_dato;
 
-			return (Tables::pc[val.c[0]] + Tables::pc[val.c[1]] + Tables::pc[val.c[2]] + Tables::pc[val.c[3]]); //Suma de poblaciones 
+			return (Tables::pc[val.c[0]] + Tables::pc[val.c[1]] + Tables::pc[val.c[2]] + Tables::pc[val.c[3]]);		//Suma de poblaciones 
 		}
 
 

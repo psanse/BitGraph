@@ -1,5 +1,5 @@
-﻿/**  
- * @file config.h
+﻿/**
+ * @file bbconfig.h
  * @brief Global configuration parameters for the BITSCAN library.
  *
  * This header defines compile-time and configuration-level parameters
@@ -13,6 +13,9 @@
  * @created ?
  * @last_update 2025-12-19
  **/
+
+#ifndef BITGRAPH_BITSCAN_BBCONFIG_H
+#define BITGRAPH_BITSCAN_BBCONFIG_H
 
 #include "bbtypes.h"
 
@@ -105,27 +108,30 @@
 	#define WMOD(i) (Tables::t_wmodindex[(i)])
 	#define WMUL(i) (Tables::t_wxindex[(i)])
 #else 
+	constexpr int BITSCAN_WORD_SIZE = bitgraph::WORD_SIZE;
+	static_assert(BITSCAN_WORD_SIZE == 64 || BITSCAN_WORD_SIZE > 0,
+					"invalid BITSCAN_WORD_SIZE");
 
-	//mirror macro for constexpr bitgraph::WORD_SIZE (used by #if)
-	#ifndef BITGRAPH_WORD_SIZE
-		#define BITGRAPH_WORD_SIZE 64    
-	#endif
-	static_assert(BITGRAPH_WORD_SIZE == bitgraph::WORD_SIZE,
-					"different values BITGRAPH_WORD_SIZE and bitgraph::WORD_SIZE");
+	constexpr inline int BITSCAN_WDIV(const int i) noexcept {
+		return (BITSCAN_WORD_SIZE == 64) ? (i >> 6) : (i / BITSCAN_WORD_SIZE);
+	}
 
-	// Optimization for  WORD_SIZE = 64 
-	#if (BITGRAPH_WORD_SIZE == 64)
-		#define WDIV(i)        ((i) >> 6)          // (i / 64)
-		#define WMOD(i)        ((i) & 63)          // (i % 64)
-		#define WMUL(i)        ((i) << 6)          // (i * 64)
-		#define WMOD_MUL(i)    ((i) & 63)          // originally a quick WMOD - legacy name, to remove (19/12/2025)
-	#else
-		#define WDIV(i)        ((i) / WORD_SIZE)
-		#define WMOD(i)        ((i) % WORD_SIZE)
-		#define WMUL(i)        ((i) * WORD_SIZE)
-	
-		#define WMOD_MUL(i)    ((i) - WMUL(WDIV(i)))
-	#endif
+	constexpr inline int BITSCAN_WMOD(const int i) noexcept {
+		return (BITSCAN_WORD_SIZE == 64) ? (i & 63) : (i % BITSCAN_WORD_SIZE);
+	}
+
+	constexpr inline int BITSCAN_WMUL(const int i) noexcept {
+		return (BITSCAN_WORD_SIZE == 64) ? (i << 6) : (i * BITSCAN_WORD_SIZE);
+	}
+
+	constexpr inline int BITSCAN_WMOD_MUL(const int i) noexcept {
+		return (BITSCAN_WORD_SIZE == 64) ? (i & 63) : (i - BITSCAN_WMUL(BITSCAN_WDIV(i)));			// legacy varianto of WMOD(i) for compatibility with older code paths
+	}
+
+	#define WDIV(i)        (BITSCAN_WDIV(i))
+	#define WMOD(i)        (BITSCAN_WMOD(i))
+	#define WMUL(i)        (BITSCAN_WMUL(i))
+	#define WMOD_MUL(i)    (BITSCAN_WMOD_MUL(i))
 #endif
 
 //TODO: change WDIV / WDIV / WMUL  macro names for clarity to the following:
@@ -135,10 +141,15 @@
 
 ////////////////////
 //MACROS for mapping bit indexes to bitblock indexes (0 or 1 based)
-#define INDEX_0TO0(p)			(WDIV(p))									// p>0
-#define INDEX_0TO1(p)			(WDIV(p)+1)									// p>0
-#define INDEX_1TO1(p)			((((p)-1)/bitgraph::WORD_SIZE)+1)			// p>0
-#define INDEX_1TO0(p)			((((p)-1)/bitgraph::WORD_SIZE))				// p>0
+constexpr inline int BITSCAN_INDEX_0TO0(const int p) noexcept { return WDIV(p); }								// p>0
+constexpr inline int BITSCAN_INDEX_0TO1(const int p) noexcept { return WDIV(p) + 1; }							// p>0
+constexpr inline int BITSCAN_INDEX_1TO1(const int p) noexcept { return (((p) - 1) / bitgraph::WORD_SIZE) + 1; } // p>0
+constexpr inline int BITSCAN_INDEX_1TO0(const int p) noexcept { return (((p) - 1) / bitgraph::WORD_SIZE); }     // p>0
+
+#define INDEX_0TO0(p)			(BITSCAN_INDEX_0TO0(p))						// p>0
+#define INDEX_0TO1(p)			(BITSCAN_INDEX_0TO1(p))						// p>0
+#define INDEX_1TO1(p)			(BITSCAN_INDEX_1TO1(p))						// p>0
+#define INDEX_1TO0(p)			(BITSCAN_INDEX_1TO0(p))						// p>0
 
 //TODO: change macro names for clarity to the following:
 //#define BIT0_WORD0(p)   (WDIV(p))
@@ -161,11 +172,7 @@
 //   DO NOT define EXTENDED_LOOKUPS unless full extended-lookup support is
 //   restored and validated.
 //
-#define EXTENDED_LOOKUPS											
-#undef	EXTENDED_LOOKUPS											
+#define EXTENDED_LOOKUPS
+#undef EXTENDED_LOOKUPS
 
-
-
-
-
-
+#endif // BITGRAPH_BITSCAN_BBCONFIG_H

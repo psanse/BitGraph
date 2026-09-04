@@ -4,11 +4,11 @@
 * @details created 07/07/2025, last_update 08/07/2025
 **/
 
-#ifndef __BBEXCEP_HAND_H__	
-#define __BBEXCEP_HAND_H__
+#ifndef BITGRAPH_BITSCAN_BBEXCEP_HAND_H
+#define BITGRAPH_BITSCAN_BBEXCEP_HAND_H
 
-#include <iostream>
-#include <exception>
+#include <stdexcept>
+#include <string>
 
 
 class BitScanError : public std::runtime_error {
@@ -19,4 +19,4 @@ public:
 };
 
 
-#endif
+#endif // BITGRAPH_BITSCAN_BBEXCEP_HAND_H

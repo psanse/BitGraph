@@ -1,5 +1,5 @@
-/**  
- * @file bbset.h file 
+/**
+ * @file bbset.h
  * @brief header file of the Bitset class from the BITSCAN library.
  *		  Manages bitstrings of any size as an array of bitblocks (64-bit numbers)
  * @author pss
@@ -10,16 +10,16 @@
  *			 namespace bbscan.
  **/
 
-#ifndef __BBSET_H__
-#define __BBSET_H__
+#ifndef BITGRAPH_BITSCAN_BBSET_H
+#define BITGRAPH_BITSCAN_BBSET_H
 
 #include "bbobject.h"
-#include "bitblock.h"	
-#include "utils/common.h"			//for the primitive FixedStack type
-#include <vector>	
-#include <set>
+#include "bitblock.h"
+#include "utils/common.h"	//for the primitive FixedStack type
 
-#include <cassert>					//uncomment #undef NDEBUG in bbconfig.h to enable run-time assertions
+#include <cassert>			// Runtime assertions (active when NDEBUG is not defined, typically Debug builds)
+#include <set>
+#include <vector>
 
 namespace bitgraph {
 		
@@ -77,10 +77,19 @@ namespace bitgraph {
 		friend Bitset& AND(int firstBit, int lastBit, const Bitset& lhs, const Bitset& rhs, Bitset& res);
 
 		/**
+		* @brief Wrapper for range AND with explicit runtime policy.
+		* @param eraseOutsideRange: if true, sets bits outside [firstBit, lastBit] to 0.
+		*/
+		friend Bitset& AND(int firstBit, int lastBit, const Bitset& lhs, const Bitset& rhs, Bitset& res, bool eraseOutsideRange) {
+			return eraseOutsideRange ? AND<true>(firstBit, lastBit, lhs, rhs, res)
+									 : AND<false>(firstBit, lastBit, lhs, rhs, res);
+		}
+
+		/**
 		* @brief AND between lhs and rhs bitsets in the closed block- range [firstBlock, lastBlock].
 		*		 Stores the result in res. The remaining bits of res outside the range
 		*		 are set to 0 if the template parameter Erase is true.
-		*		 If lastBock==-1, the range is till the end of the bitset, i.e., [firstBlock, num_blocks())
+		*		 If lastBock == -1, the range is till the end of the bitset, i.e., [firstBlock, num_blocks())
 		*
 		*		I.  The num_blocks of lhs and rhs must be the same.
 		*		II. The num_blocks of res must be at least the same as lhs nand rhs
@@ -128,6 +137,15 @@ namespace bitgraph {
 		**/
 		template<bool Erase>
 		friend Bitset& OR(int firstBit, int lastBit, const Bitset& lhs, const Bitset& rhs, Bitset& res);
+
+		/**
+		* @brief Wrapper for range OR with explicit runtime policy.
+		* @param eraseOutsideRange: if true, sets bits outside [firstBit, lastBit] to 0.
+		*/
+		friend Bitset& OR(int firstBit, int lastBit, const Bitset& lhs, const Bitset& rhs, Bitset& res, bool eraseOutsideRange) {
+			return eraseOutsideRange ? OR<true>(firstBit, lastBit, lhs, rhs, res)
+									: OR<false>(firstBit, lastBit, lhs, rhs, res);
+		}
 
 		/**
 		* @brief OR between lhs and rhs bitsets in the closed block- range [firstBlock, lastBlock].
@@ -466,8 +484,10 @@ namespace bitgraph {
 		/**
 		* @brief sets all bits to 0
 		* @returns reference to the modified bitstring
+		* @details: complexity O(nBlocks), does not deallocate memory.
 		**/
 		Bitset& erase_bit();
+		Bitset& erase_all_bits();				// alias for erase_bit() but more explicit
 
 		/**
 		* @brief Removes the bits from the bitstring @bitset inside the population range.
@@ -608,6 +628,15 @@ namespace bitgraph {
 		Bitset& AND_EQUAL_block(index_t firstBlock, index_t lastBlock, const Bitset& rhs);
 
 		/**
+		* @brief Wrapper example for AND_EQUAL_block with explicit runtime policy.
+		* @param eraseOutsideRange: if true, sets caller bits outside [firstBlock,lastBlock] to 0.
+		*/
+		Bitset& AND_EQUAL_block(index_t firstBlock, index_t lastBlock, const Bitset& rhs, bool eraseOutsideRange) {
+			return eraseOutsideRange ? AND_EQUAL_block<true>(firstBlock, lastBlock, rhs)
+									 : AND_EQUAL_block<false>(firstBlock, lastBlock, rhs);
+		}
+
+		/**
 		* @brief OR between rhs and caller bitstring in the closed range of bitblocks [firstBlock, lastBlock]
 		*		 If lastBlock == npos the range is [firstBlock, nBB_]
 		*
@@ -617,6 +646,15 @@ namespace bitgraph {
 		**/
 		template<bool Erase = false>
 		Bitset& OR_EQUAL_block(index_t firstBlock, index_t lastBlock, const Bitset& rhs);
+
+		/**
+		* @brief Wrapper example for OR_EQUAL_block with explicit runtime policy.
+		* @param eraseOutsideRange: if true, sets caller bits outside [firstBlock,lastBlock] to 0.
+		*/
+		Bitset& OR_EQUAL_block(index_t firstBlock, index_t lastBlock, const Bitset& rhs, bool eraseOutsideRange) {
+			return eraseOutsideRange ? OR_EQUAL_block<true>(firstBlock, lastBlock, rhs)
+									 : OR_EQUAL_block<false>(firstBlock, lastBlock, rhs);
+		}
 
 		/**
 		* @brief Determines the lowest bit (least-significant) in common between rhs and this bitstring
@@ -1283,6 +1321,10 @@ namespace bitgraph{
 			}
 
 			return *this;
+		}
+
+		inline Bitset& Bitset::erase_all_bits() {
+			return erase_bit();
 		}
 
 
@@ -2156,4 +2198,4 @@ namespace bitgraph {
 
 } // namespace bitgraph
 
-#endif	
+#endif // BITGRAPH_BITSCAN_BBSET_H
