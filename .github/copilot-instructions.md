@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # Copilot Instructions
 
 ## Directrices del proyecto
@@ -35,4 +34,4 @@ Visual Studio builds should use MSVC.
 ## Tests
 
 Use GoogleTest for unit tests.
->>>>>>> e1706b019ce5c4b8e013721616ebb45d7af67890
+
