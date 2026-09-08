@@ -157,6 +157,55 @@ TEST_F(BBScanViewTest, rejects_invalid_start_and_uninitialized_scan_is_safe) {
 	EXPECT_EQ(BBObject::noBit, scan.prev_bit());
 }
 
+TEST_F(BBScanViewTest, template_non_destructive_forward_scan) {
+	BBScanViewT<BBObject::NON_DESTRUCTIVE> scan(bitset);
+	set<int> result;
+
+	ASSERT_EQ(0, scan.init_scan());
+	for (int bit = scan.next_bit(); bit != BBObject::noBit; bit = scan.next_bit()) {
+		result.insert(bit);
+	}
+
+	EXPECT_EQ(expected, result);
+	EXPECT_EQ(expected.size(), bitset.count());
+}
+
+TEST_F(BBScanViewTest, template_destructive_reverse_scan) {
+	BBScanViewT<BBObject::DESTRUCTIVE_REVERSE> scan(bitset);
+	set<int> result;
+
+	ASSERT_EQ(0, scan.init_scan());
+	for (int bit = scan.prev_bit(); bit != BBObject::noBit; bit = scan.prev_bit()) {
+		result.insert(bit);
+	}
+
+	EXPECT_EQ(expected, result);
+	EXPECT_TRUE(bitset.is_empty());
+}
+
+TEST_F(BBScanViewTest, template_scan_honors_start) {
+	BBScanViewT<BBObject::NON_DESTRUCTIVE_REVERSE> scan(bitset);
+	vector<int> result;
+
+	ASSERT_EQ(0, scan.init_scan(200));
+	for (int bit = scan.prev_bit(); bit != BBObject::noBit; bit = scan.prev_bit()) {
+		result.push_back(bit);
+	}
+
+	EXPECT_EQ((vector<int>{150, 100, 50, 0}), result);
+	EXPECT_EQ(expected.size(), bitset.count());
+}
+
+TEST(BBScanViewTemplateTest, template_scan_rejects_invalid_start) {
+	Bitset bits(128, {1, 63, 64, 90});
+	BBScanViewT<BBObject::DESTRUCTIVE> scan(bits);
+
+	EXPECT_EQ(-1, scan.init_scan(-2));
+	EXPECT_EQ(BBObject::noBit, scan.next_bit());
+	EXPECT_EQ(-1, scan.init_scan(bits.num_blocks() * WORD_SIZE));
+	EXPECT_EQ(BBObject::noBit, scan.next_bit());
+}
+
 TEST_F(BBScanClassTest, non_destructive) {
 	std::set<int> res;
 
