@@ -1,12 +1,13 @@
 /**
 * @file test_bbscan.cpp
-* @brief Unit tests of the BBScan class - only related to non-nested bitscanning
+* @brief Unit tests of the BBScan class  - only related to non-nested bitscanning and BBScanView classes
 * @details Taken from the unit tests in test_bitstring.cpp (2014), filtering out other bitstring classes in the hierarchy
 * @created 12/02/2025, last_update 29/04/2025
 * @author pss
 **/
 
 #include "bitscan/bbscan.h"
+#include "bitscan/bbscan_view.h"
 #include "bitscan/bbutils.h"
 #include "gtest/gtest.h"
 #include <iostream>
@@ -54,7 +55,8 @@ TEST_F(BBScanViewTest, non_destructive_scans_forward_and_preserves_source) {
 	BBScanView scan(bitset);
 	set<int> result;
 
-	scan.init_scan(BBObject::NON_DESTRUCTIVE);
+
+	ASSERT_EQ(0, scan.init_scan(BBObject::NON_DESTRUCTIVE));
 	for (int bit = scan.next_bit(); bit != BBObject::noBit; bit = scan.next_bit()) {
 		result.insert(bit);
 	}
@@ -67,7 +69,7 @@ TEST_F(BBScanViewTest, non_destructive_scan_honors_start_and_does_not_mutate_sou
 	BBScanView scan(bitset);
 	set<int> result;
 
-	scan.init_scan(50, BBObject::NON_DESTRUCTIVE);
+	ASSERT_EQ(0, scan.init_scan(50, BBObject::NON_DESTRUCTIVE));
 	for (int bit = scan.next_bit(); bit != BBObject::noBit; bit = scan.next_bit()) {
 		result.insert(bit);
 	}
@@ -82,7 +84,7 @@ TEST_F(BBScanViewTest, destructive_mode_with_next_prev_mutates_source) {
 	BBScanView forward(bitset);
 	set<int> forwardResult;
 
-	forward.init_scan(BBObject::DESTRUCTIVE);
+	ASSERT_EQ(0, forward.init_scan(BBObject::DESTRUCTIVE));
 	for (int bit = forward.next_bit(); bit != BBObject::noBit; bit = forward.next_bit()) {
 		forwardResult.insert(bit);
 	}
@@ -96,7 +98,7 @@ TEST_F(BBScanViewTest, destructive_mode_with_next_prev_mutates_source) {
 
 	BBScanView reverse(bitset);
 	set<int> reverseResult;
-	reverse.init_scan(BBObject::DESTRUCTIVE_REVERSE);
+	ASSERT_EQ(0, reverse.init_scan(BBObject::DESTRUCTIVE_REVERSE));
 	for (int bit = reverse.prev_bit(); bit != BBObject::noBit; bit = reverse.prev_bit()) {
 		reverseResult.insert(bit);
 	}
