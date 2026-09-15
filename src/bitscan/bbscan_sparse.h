@@ -26,7 +26,7 @@ namespace bitgraph {
 	//
 	///////////////////////////////////
 
-	class BBScanSp : public BitsetSp {
+	class BBScanSp  : public BitsetSp {
 
 	public:
 

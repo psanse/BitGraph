@@ -11,16 +11,15 @@
   * TODO - Compare efficiency with nested bitscanning classes in BBObject (13/02/2025)
   **/
 
-#ifndef __BBSCAN_H__
-#define __BBSCAN_H__
+#ifndef _BITGRAPH_BBSCAN_H_
+#define _BITGRAPH_BBSCAN_H_
 
 #include "bbset.h"	
 #include <cassert>
 #include <type_traits>
 
 namespace bitgraph{
-	
-	
+		
 		/////////////////////////////////
 		//
 		// Class BBScan
@@ -40,8 +39,7 @@ namespace bitgraph{
 			friend struct BBObject::ScanRev;
 			template <class U>
 			friend struct BBObject::ScanDestRev;
-
-		public:
+					
 
 			//aliases for bitscanning 
 			using scan = typename BBObject::Scan<BBScan>;
@@ -60,17 +58,9 @@ namespace bitgraph{
 
 			//TODO...check copy and move assignments 
 
-			~BBScan() = default;
-
-			///////////////////////////////
-			//setters and getters
-
-			void scan_block(int bbindex) { scan_.bbi_ = bbindex; }
-			void scan_bit(int posbit) { scan_.pos_ = posbit; }
-
-			int  scan_block()	 const { return scan_.bbi_; }
-			int  scan_bit()	 const { return scan_.pos_; }
-			
+			~BBScan() = default;				
+		
+		
 			//////////////////////////////
 			// Bitscanning (with cached info)
 
@@ -81,7 +71,7 @@ namespace bitgraph{
 			* @returns 0 if successful, -1 otherwise  (substituted by fail-safe policy in (08/07/2025))
 			* @details: fail-safe policy, program terminates with -1 code  if error
 			**/
-			virtual int init_scan (scan_types sct) noexcept ;
+			virtual int init_scan (scan_types sct) noexcept;
 
 			/**
 			* @brief Configures the initial block and bit position for bitscanning
@@ -149,8 +139,7 @@ namespace bitgraph{
 			*		   it has to cache the last scanned bit for the next call
 			**/
 			virtual	 int next_bit();
-
-		
+				
 
 			/**
 			* @brief next bit in the bitstring, starting from the bit retrieved
@@ -227,337 +216,30 @@ namespace bitgraph{
 			**/
 			virtual int prev_bit_del(BBScan& bitset);
 
-
-			//////////////////
-			/// data members
-
 		protected:
+
+		///////////////////////////////
+		//setters and getters
+		
+			void scan_block(int bbindex) noexcept { scan_.bbi_ = bbindex; }
+			void scan_bit(int posbit) noexcept { scan_.pos_ = posbit; }
+
+			int  scan_block() 	 const noexcept { return scan_.bbi_; }
+			int  scan_bit()	  const noexcept { return scan_.pos_; }
+
+
+		//////////////////
+		/// data members
+	
 			scan_t scan_;
 		};
 
 } //namespace bitgraph
 
-///////////////////////
-//
-// INLINE Implementation for generic code, must be in header file
-
-namespace bitgraph {
-		
-
-	inline 
-	int BBScan::next_bit_del() {
-
-		Ul posInBB;
-
-		for (auto i = scan_.bbi_; i < nBB_; ++i) {
-
-			if (_BitScanForward64(&posInBB, vBB_[i])) {
-				//stores the current block
-				scan_.bbi_ = i;
-
-				//deletes the current bit before returning
-				vBB_[i] &= ~Tables::mask[posInBB];
-
-				return (posInBB + WMUL(i));
-			}
-
-		}
-
-		return BBObject::noBit;
-	}
-
-
-	inline 
-	int BBScan::next_bit_del(BBScan& bbN_del) {
-
-		Ul posInBB;
-
-		for (auto i = scan_.bbi_; i < nBB_; ++i) {
-
-			if (_BitScanForward64(&posInBB, vBB_[i])) {
-				//stores the current block and copies to output
-				scan_.bbi_ = i;
-
-				//deletes the current bit before returning
-				vBB_[i] &= ~Tables::mask[posInBB];
-
-				//erases from the bitset passed the scanned bit
-				bbN_del.vBB_[i] &= ~Tables::mask[posInBB];
-
-				return (posInBB + WMUL(i));
-			}
-		}
-
-		return BBObject::noBit;
-	}
-
-
-	inline 
-	int BBScan::next_bit() {
-
-		Ul posInBB;
-
-		//Search for next bit in the last scanned block
-		if (_BitScanForward64(&posInBB, vBB_[scan_.bbi_] & Tables::mask_high[scan_.pos_])) {
-
-			//stores the current bit for next call
-			scan_.pos_ = posInBB;									//current block has not changed, so not stored
-
-			return (posInBB + WMUL(scan_.bbi_));
-
-		}
-		else {
-
-			//Searches for next bit in the remaining blocks
-			for (auto i = scan_.bbi_ + 1; i < nBB_; ++i) {
-				if (_BitScanForward64(&posInBB, vBB_[i])) {
-
-					//stores the current block and bit for next call
-					scan_.bbi_ = i;
-					scan_.pos_ = posInBB;
-
-					return (posInBB + WMUL(i));
-				}
-			}
-		}
-
-		return BBObject::noBit;
-	}
-
-
-
-	inline
-	int BBScan::next_bit(BBScan& bitset) {
-
-		Ul posInBB;
-
-		//Search for next bit in the last scanned block
-		if (_BitScanForward64(&posInBB, vBB_[scan_.bbi_] & Tables::mask_high[scan_.pos_])) {
-
-			//stores the current bit for next call
-			scan_.pos_ = posInBB;									//current block has not changed, so not stored	
-
-			//outputs the current block
-			//block = scan_.bbi_;
-
-			//deletes the bit from the input bitset
-			bitset.vBB_[scan_.bbi_] &= ~Tables::mask[posInBB];
-
-			return (posInBB + WMUL(scan_.bbi_));
-		}
-		else {
-			//Searches for next bit in the remaining blocks
-			for (auto i = scan_.bbi_ + 1; i < nBB_; i++) {
-				if (_BitScanForward64(&posInBB, vBB_[i])) {
-
-					//stores the current block and bit for next call
-					scan_.bbi_ = i;
-					scan_.pos_ = posInBB;
-
-					//outputs the current block
-					//block = i;
-
-					//deletes the bit from the input bitset
-					bitset.vBB_[i] &= ~Tables::mask[posInBB];
-
-					return (posInBB + WMUL(i));
-				}
-			}
-		}
-
-		return BBObject::noBit;
-	}
-
-
-	inline 
-	int BBScan::prev_bit() {
-
-		Ul posInBB;
-
-		//Searches for previous bit in the last scanned block
-		if (_BitScanReverse64(&posInBB, vBB_[scan_.bbi_] & Tables::mask_low[scan_.pos_])) {
-
-			//stores the current bit for next call
-			scan_.pos_ = posInBB;									//current block has not changed, so not stored			
-
-			return (posInBB + WMUL(scan_.bbi_));
-
-		}
-		else {
-
-			//Searches for previous bit in the remaining blocks
-			for (auto i = scan_.bbi_ - 1; i >= 0; --i) {
-
-				if (_BitScanReverse64(&posInBB, vBB_[i])) {
-
-					//stores the current block and bit for next call
-					scan_.bbi_ = i;
-					scan_.pos_ = posInBB;
-
-					return (posInBB + WMUL(i));
-				}
-			}
-		}
-
-		return BBObject::noBit;
-	}
-
-
-	inline
-	int BBScan::prev_bit(BBScan& bitset)
-	{
-
-		Ul posInBB;
-
-		//Searches for previous bit in the last scanned block
-		if (_BitScanReverse64(&posInBB, vBB_[scan_.bbi_] & Tables::mask_low[scan_.pos_])) {
-
-			//stores the current bit for next call
-			scan_.pos_ = posInBB;									//current block has not changed, so not stored			
-
-			//deletes the bit from the input bitset
-			bitset.vBB_[scan_.bbi_] &= ~Tables::mask[posInBB];
-
-			return (posInBB + WMUL(scan_.bbi_));
-
-		}
-		else {
-
-			//Searches for previous bit in the remaining blocks
-			for (auto i = scan_.bbi_ - 1; i >= 0; --i) {
-
-				if (_BitScanReverse64(&posInBB, vBB_[i])) {
-
-					//stores the current block and bit for next call
-					scan_.bbi_ = i;
-					scan_.pos_ = posInBB;
-
-					//deletes the bit from the input bitset
-					bitset.vBB_[scan_.bbi_] &= ~Tables::mask[posInBB];
-
-					return (posInBB + WMUL(i));
-				}
-			}
-		}
-
-		return BBObject::noBit;
-	}
-
-
-
-	inline 
-	int BBScan::prev_bit_del() {
-
-		Ul posInBB;
-
-		for (auto i = scan_.bbi_; i >= 0; --i) {
-
-			if (_BitScanReverse64(&posInBB, vBB_[i])) {
-
-				//stores the current block for the next call
-				scan_.bbi_ = i;
-
-				//deletes the current bit from the bitset before returning
-				vBB_[i] &= ~Tables::mask[posInBB];
-
-				return (posInBB + WMUL(i));
-			}
-		}
-		return BBObject::noBit;
-	}
-
-
-
-	inline 
-	int BBScan::prev_bit_del(BBScan& bitset) {
-
-		Ul posInBB;
-
-		for (auto i = scan_.bbi_; i >= 0; --i) {
-
-			if (_BitScanReverse64(&posInBB, vBB_[i])) {
-
-				//stores the current block for the next call
-				scan_.bbi_ = i;
-
-				//deletes the current bit from the bitset before returning
-				vBB_[i] &= ~Tables::mask[posInBB];
-
-
-				//outputs the current block
-				//block = i;
-
-				//erases the bit from the input bitset
-				bitset.vBB_[i] &= ~Tables::mask[posInBB];
-
-				return (posInBB + WMUL(i));
-			}
-		}
-
-		return BBObject::noBit;
-	}
-
-
-	inline
-	int BBScan::init_scan(scan_types sct) noexcept  {
-
-		switch (sct) {
-		case NON_DESTRUCTIVE:
-			scan_block(0);
-			scan_bit(MASK_LIM);
-			break;
-		case NON_DESTRUCTIVE_REVERSE:
-			scan_block(nBB_ - 1);
-			scan_bit(WORD_SIZE);		//mask_low[WORD_SIZE] = ONE
-			break;
-		case DESTRUCTIVE:
-			scan_block(0);
-			break;
-		case DESTRUCTIVE_REVERSE:
-			scan_block(nBB_ - 1);
-			break;
-		default:			
-			assert(false && "unknown scan type - BBScan::init_scan");			
-		}
-
-		return 0;
-	}
-
-
-	inline
-	int BBScan::init_scan(int firstBit, scan_types sct)  noexcept {
-
-		//special case - first bitscan
-		if (firstBit == BBObject::noBit) {
-			return init_scan(sct);
-		}
-
-
-		int bbh = WDIV(firstBit);
-		switch (sct) {
-		case NON_DESTRUCTIVE:
-		case NON_DESTRUCTIVE_REVERSE:
-			scan_block(bbh);
-			scan_bit(firstBit - WMUL(bbh) /* WMOD(firstBit) */);
-			break;
-		case DESTRUCTIVE:
-		case DESTRUCTIVE_REVERSE:
-			scan_block(bbh);
-			break;
-		default:
-			LOG_ERROR("unknown scan type - BBScan::init_scan");
-			assert(false);
-			//throw BitScanError("unknown scan type in BBScan::init_scan");		
-		}
-
-		return 0;
-	}
-
-}//namespace bitgraph
-
 
 ///////////////////
-// helpers for BBScan construction
+// convenient helpers for BBScan construction
+// (part of the public API)
 
 namespace bitgraph {
 
@@ -565,28 +247,32 @@ namespace bitgraph {
 	 * @brief Creates a BBScan object given a maximum number of bits  @nPop (all bits set to 0).
 	 **/
 	inline
-	BBScan make_BBScan(int nPop) { return BBScan(nPop, false); }
+		BBScan make_BBScan(int nPop) { return BBScan(nPop, false); }
 
 	/**
 	 * @brief Creates a BBScan object given a maximum number of bits  @nPop (all bits set to 1).
 	 **/
-	inline 
-	BBScan make_BBScan_full(int nPop) { return BBScan(nPop, true); }
+	inline
+		BBScan make_BBScan_full(int nPop) { return BBScan(nPop, true); }
 
 	/**
 	* @brief Creates a BBScan object given a maximum @nPop and a list of values in brackets
 	* @details: - negative values are ignored (asserted in debug mode).
 	*			- values >= nPop are ignored.
 	**/
-	inline 
-	BBScan make_BBScan(int nPop, std::initializer_list<int> lv) { return BBScan(nPop, lv); }
-		
+	inline
+		BBScan make_BBScan(int nPop, std::initializer_list<int> lv) { return BBScan(nPop, lv); }
+
 
 } // namespace bitgraph
 
 
+//////////////////////////
+// INLINE Implementation for generic code, should be in header file
+#include "bbscan_imp.h"
 
-#endif
+
+#endif // _BITGRAPH_BBSCAN_H_
 
 
 

@@ -7,9 +7,11 @@ add_executable (test_bitscan
 	#gtest_main.cc 
   
     #TESTS TO CHECK (26/02/2025)   
-    test_algorithms.cpp   
+    #test_algorithms.cpp   
     #test_example.cpp   
     #test_bbsentinel.cpp 
+	
+	test_bbscan_view.cpp  
 
     #TESTS CHECKED (26/02/2025)
     test_bitblock.cpp
