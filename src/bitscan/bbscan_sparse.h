@@ -71,12 +71,10 @@ namespace bitgraph {
 		* @brief Configures the initial block and bit position for bitscanning
 		*		 according to one of the 4 scan types passed as argument
 		* @param sct: type of scan
-		* @returns 0 if successful, -1 otherwise (now exits (08/07/2025))
 		* @details : sparse bitsets may have no blocks, in which case the scan is not possible and
 		*		     the function returns -1 -
-		* @details : (08/07/2025) throws  BitScanError for empty sparse bitset
 		**/
-		int init_scan(scan_types sct);
+		void init_scan(scan_types sct) noexcept;
 
 		/**
 		* @brief Configures the initial block and bit position for bitscanning
@@ -86,14 +84,12 @@ namespace bitgraph {
 		*		 If firstBit is -1 (BBObject::noBit), the scan starts from the beginning.
 		* @param firstBit: starting bit
 		* @param sct: type of scan
-		* @returns 0 if successful, -1 otherwise (now exits (08/07/2025))
 		* @details : sparse bitsets may have no blocks, in which case the scan is not possible and
 		*		     the function returns -1
 		* @details : (08/07/2025) throws  BitScanError for empty sparse bitset
-		*
-		* @todo - extend to NON-DESTRUCTIVE cases
+		*	
 		**/
-		int init_scan(int firstBit, scan_types sct);
+		void init_scan(int firstBit, scan_types sct) noexcept;
 
 		////////////////
 		// bitscan forward
@@ -179,9 +175,28 @@ namespace bitgraph {
 	//inline int next_bit					(int& nBB);								//nBB: index of bitblock in the bitstring	(not in the collection)				
 	//inline int prev_bit_del				(int& nBB);
 
+
+	protected:
+		
+		// terminating handlers
+		[[noreturn]]
+		inline void invalid_scan_type() noexcept {
+			LOG_ERROR("Unknown scan type in BBScanSp::init_scan");
+			std::terminate();
+		}
+
+		void invalidate_scan() noexcept {
+			scan_block(BBObject::noBit);
+			scan_bit(BBObject::noBit);
+		}
+
+		bool has_valid_cursor() const noexcept {
+			return scan_.bbi_ != BBObject::noBit;
+		}
+
 	//////////////////
 	// data members
-	protected:
+
 		scan_t scan_;
 	};
 
@@ -192,7 +207,12 @@ namespace bitgraph {
 
 namespace bitgraph {
 
-	inline int BBScanSp::next_bit() {
+	inline int BBScanSp::next_bit()
+	{
+
+		if (!has_valid_cursor()) {
+			return BBObject::noBit;
+		}
 
 		Ul posInBB;
 
@@ -225,6 +245,10 @@ namespace bitgraph {
 
 	inline int BBScanSp::next_bit(BBScanSp& bitset)
 	{
+		if (!has_valid_cursor()) {
+			return BBObject::noBit;
+		}
+
 		Ul posInBB;
 
 		//search for next bit in the last block
@@ -259,7 +283,12 @@ namespace bitgraph {
 		return BBObject::noBit;
 	}
 
-	inline int BBScanSp::prev_bit() {
+	inline int BBScanSp::prev_bit() 
+	{
+
+		if (!has_valid_cursor()) {
+			return BBObject::noBit;
+		}
 
 		Ul posInBB;
 
@@ -291,6 +320,11 @@ namespace bitgraph {
 
 	inline int BBScanSp::prev_bit(BBScanSp& bitset)
 	{
+
+		if (!has_valid_cursor()) {
+			return BBObject::noBit;
+		}
+
 		Ul posInBB;
 
 		//searches for previous bit in the last scanned block
@@ -327,6 +361,10 @@ namespace bitgraph {
 
 	inline int BBScanSp::next_bit_del() {
 
+		if (!has_valid_cursor()) {
+			return BBObject::noBit;
+		}
+
 		Ul posInBB;
 
 		for (auto i = scan_.bbi_; i < (int)vBB_.size(); ++i) {
@@ -350,6 +388,10 @@ namespace bitgraph {
 
 	inline int BBScanSp::next_bit_del(BBScanSp& bitset)
 	{
+		if (!has_valid_cursor()) {
+			return BBObject::noBit;
+		}
+
 		Ul posInBB;
 
 		for (auto i = scan_.bbi_; i < (int)vBB_.size(); ++i) {
@@ -375,6 +417,10 @@ namespace bitgraph {
 
 	inline int BBScanSp::prev_bit_del() {
 
+		if (!has_valid_cursor()) {
+			return BBObject::noBit;
+		}
+
 		Ul posInBB;
 
 		for (int i = scan_.bbi_; i >= 0; --i) {
@@ -396,6 +442,10 @@ namespace bitgraph {
 
 	inline int BBScanSp::prev_bit_del(BBScanSp& bitset)
 	{
+		if (!has_valid_cursor()) {
+			return BBObject::noBit;
+		}
+
 		Ul posInBB;
 
 		for (int i = scan_.bbi_; i >= 0; --i) {
@@ -419,12 +469,12 @@ namespace bitgraph {
 	}
 
 	inline
-		int BBScanSp::init_scan(scan_types sct)  {
+		void BBScanSp::init_scan(scan_types sct)  noexcept {
 
 		//necessary check since sparse bitstrings have empty semantics (i.e. sparse graphs)
 		if (vBB_.empty()) {
-			//LOG_ERROR("empty sparse bitstring, cannot be scanned - BBScanSp::init_scan...exiting");
-			throw BitScanError("empty sparse bitstring, cannot be scanned - BBScanSp::init_scan");		
+			invalidate_scan();
+			return;			
 		}			
 
 		switch (sct) {
@@ -443,27 +493,24 @@ namespace bitgraph {
 			scan_block(static_cast<int>(vBB_.size()) - 1);
 			break;
 		default:
-			LOG_ERROR("unknown scan type in BBScanSp::init_scan");
-			assert(false);
-			//throw BitScanError("unknown scan type in BBScanSp::init_scan");		//will not be handled - terminates the program
-	
+			invalid_scan_type();	
 		}
-
-		return 0;
+		
 	}
 
 	inline
-		int BBScanSp::init_scan(int firstBit, scan_types sct)  {
+		void BBScanSp::init_scan(int firstBit, scan_types sct) noexcept {
 
 		//necessary check 
 		if (vBB_.empty()) {
-			//LOG_ERROR("empty sparse bitstring, cannot be scanned - BBScanSp::init_scan...exiting");
-			throw BitScanError("empty sparse bitstring, cannot be scanned - BBScanSp::init_scan");		
+			invalidate_scan();
+			return;
 		}
 
 		//special case - first bitscan
 		if (firstBit == BBObject::noBit) {
-			return init_scan(sct);
+			init_scan(sct);
+			return;
 		}
 
 		//determine the index of the starting block (not its ID)
@@ -475,7 +522,8 @@ namespace bitgraph {
 
 		//no blocks with index greater or equal to bbL, nothing to scan
 		if (p.second == BBObject::noBit) {
-			return -1;
+			invalidate_scan();
+			return;
 		}
 
 		switch (sct) {
@@ -492,13 +540,9 @@ namespace bitgraph {
 			//throw BitScanError("incorrect destructive scan type in BBScanSp::init_scan");		
 			break;
 		default:
-			LOG_ERROR("unknown scan type in BBScanSp::init_scan...exiting");
-			std::exit(EXIT_FAILURE);
-			//throw BitScanError("unknown scan type in BBScanSp::init_scan");		
+			invalid_scan_type();
 		}
 
-		//nothing to scan or error
-		return 0;
 	}
 
 

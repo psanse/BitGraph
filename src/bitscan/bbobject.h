@@ -89,7 +89,7 @@ namespace bitgraph {
 			* @param firstBit: starting position of the scan
 			* @details: may throw for sparse bitsets if empty
 			**/
-			int init_scan(int firstBit = BBObject::noBit) { return bb_.init_scan(firstBit, BBObject::NON_DESTRUCTIVE_REVERSE); }
+			void init_scan(int firstBit = BBObject::noBit) noexcept {  bb_.init_scan(firstBit, BBObject::NON_DESTRUCTIVE_REVERSE); }
 
 			/**
 			* @brief returns the next bit in the bitset during a reverse bitscanning operation
@@ -129,7 +129,7 @@ namespace bitgraph {
 			* @param firstBit: starting position of the scan
 			* @details: may throw for sparse bitsets if empty
 			**/
-			int init_scan(int firstBit = BBObject::noBit) { return bb_.init_scan(firstBit, BBObject::NON_DESTRUCTIVE); }
+			void init_scan(int firstBit = BBObject::noBit) noexcept { bb_.init_scan(firstBit, BBObject::NON_DESTRUCTIVE); }
 
 			/**
 			* @brief returns the next bit in the bitset during a reverse bitscanning operation
@@ -167,7 +167,7 @@ namespace bitgraph {
 			*		 Removes bits as they are scanned
 			* @details: may throw for sparse bitsets if empty
 			**/
-			int init_scan() { return bb_.init_scan(BBObject::DESTRUCTIVE); }
+			void init_scan() noexcept { bb_.init_scan(BBObject::DESTRUCTIVE); }
 
 			/**
 			* @brief returns the next bit in the bitset during a reverse bitscanning operation
@@ -205,7 +205,7 @@ namespace bitgraph {
 			*		 Removes bits as they are scanned
 			* @details: may throw for sparse bitsets if empty
 			**/
-			int init_scan() { return bb_.init_scan(BBObject::DESTRUCTIVE_REVERSE); }
+			void init_scan() noexcept {  bb_.init_scan(BBObject::DESTRUCTIVE_REVERSE); }
 
 			/**
 			* @brief returns the next bit in the bitset during a reverse bitscanning operation

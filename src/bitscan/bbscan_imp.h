@@ -13,7 +13,10 @@ namespace bitgraph {
 		
 
 	inline 
-	int BBScan::next_bit_del() {
+	int BBScan::next_bit_del()
+	{
+
+		assert(has_valid_cursor());
 
 		Ul posInBB;
 
@@ -36,7 +39,10 @@ namespace bitgraph {
 
 
 	inline 
-	int BBScan::next_bit_del(BBScan& bbN_del) {
+	int BBScan::next_bit_del(BBScan& bbN_del)
+	{
+
+		assert(has_valid_cursor());
 
 		Ul posInBB;
 
@@ -61,7 +67,10 @@ namespace bitgraph {
 
 
 	inline 
-	int BBScan::next_bit() {
+	int BBScan::next_bit()
+	{
+
+		assert(has_valid_cursor());
 
 		Ul posInBB;
 
@@ -95,7 +104,10 @@ namespace bitgraph {
 
 
 	inline
-	int BBScan::next_bit(BBScan& bitset) {
+	int BBScan::next_bit(BBScan& bitset)
+	{
+
+		assert(has_valid_cursor());
 
 		Ul posInBB;
 
@@ -138,7 +150,9 @@ namespace bitgraph {
 
 
 	inline 
-	int BBScan::prev_bit() {
+	int BBScan::prev_bit()
+	{
+		assert(has_valid_cursor());
 
 		Ul posInBB;
 
@@ -174,6 +188,7 @@ namespace bitgraph {
 	inline
 	int BBScan::prev_bit(BBScan& bitset)
 	{
+		assert(has_valid_cursor());
 
 		Ul posInBB;
 
@@ -214,7 +229,9 @@ namespace bitgraph {
 
 
 	inline 
-	int BBScan::prev_bit_del() {
+	int BBScan::prev_bit_del()
+	{
+		assert(has_valid_cursor());
 
 		Ul posInBB;
 
@@ -237,7 +254,9 @@ namespace bitgraph {
 
 
 	inline 
-	int BBScan::prev_bit_del(BBScan& bitset) {
+	int BBScan::prev_bit_del(BBScan& bitset)
+	{
+		assert(has_valid_cursor());
 
 		Ul posInBB;
 
@@ -267,7 +286,7 @@ namespace bitgraph {
 
 
 	inline
-	int BBScan::init_scan(scan_types sct) noexcept  {
+	void BBScan::init_scan(scan_types sct) noexcept  {
 
 		switch (sct) {
 		case NON_DESTRUCTIVE:
@@ -288,16 +307,17 @@ namespace bitgraph {
 			invalid_scan_type();					
 		}
 
-		return 0;
+		//return 0;
 	}
 
 
 	inline
-	int BBScan::init_scan(int firstBit, scan_types sct)  noexcept {
+	void BBScan::init_scan(int firstBit, scan_types sct)  noexcept {
 
 		//special case - first bitscan
 		if (firstBit == BBObject::noBit) {
-			return init_scan(sct);
+			init_scan(sct);
+			return;
 		}
 
 
@@ -316,7 +336,7 @@ namespace bitgraph {
 			invalid_scan_type();
 		}
 
-		return 0;
+		//return 0;
 	}
 
 }//namespace bitgraph

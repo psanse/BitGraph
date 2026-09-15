@@ -414,18 +414,18 @@ namespace bitgraph {
 				//iterates over N(v)
 				
 				VertexBitset& neigh = g_.neighbors(v);
-				if (neigh.init_scan(bbo::NON_DESTRUCTIVE) != -1) {			//CHECK MUST BE - for sparse_bitarrays
+				neigh.init_scan(bbo::NON_DESTRUCTIVE);			
 
-					int u = BBObject::noBit;
-					while ((u = neigh.next_bit()) != BBObject::noBit) {
+				int u = BBObject::noBit;
+				while ((u = neigh.next_bit()) != BBObject::noBit) {
 
-						if (deg_[u] > deg_[v]) {
-							SWAP_BIN(u);			//swap bin movement for v (also sorted in ver_)
-							--deg_[u];				//decrease degree of swapped vertex
-						}
+					if (deg_[u] > deg_[v]) {
+						SWAP_BIN(u);			//swap bin movement for v (also sorted in ver_)
+						--deg_[u];				//decrease degree of swapped vertex
 					}
-
 				}
+
+				
 
 			}//vertex iteration
 		}
@@ -441,18 +441,18 @@ namespace bitgraph {
 				AND(g_.neighbors(v), subg_, neigh);
 
 				//iterates over the neighbors of v in the subgraph
-				if (neigh.init_scan(bbo::NON_DESTRUCTIVE) != -1) {			//CHECK MUST BE - for sparse_bitarrays
+				neigh.init_scan(bbo::NON_DESTRUCTIVE);
 
-					int u = BBObject::noBit;
-					while ((u = neigh.next_bit()) != BBObject::noBit) {
+				int u = BBObject::noBit;
+				while ((u = neigh.next_bit()) != BBObject::noBit) {
 
-						if (deg_[u] > deg_[v]) {
-							SWAP_BIN(u);			//swap bin movement for v (also sorted in ver_)
-							--deg_[u];				//decrease degree of swapped vertex
-						}
+					if (deg_[u] > deg_[v]) {
+						SWAP_BIN(u);			//swap bin movement for v (also sorted in ver_)
+						--deg_[u];				//decrease degree of swapped vertex
 					}
+				}
 
-				}//endif
+				
 
 			}//vertex iteration
 		}
@@ -629,7 +629,7 @@ namespace bitgraph {
 
 			//kcore for the subgraph induced by subg_
 			//subg_ cannot be empty, so the assertion MUST hold
-			assert(subg_.init_scan(bbo::NON_DESTRUCTIVE) != -1);
+			subg_.init_scan(bbo::NON_DESTRUCTIVE);
 
 			while ((v = subg_.next_bit()) != BBObject::noBit) {
 
@@ -652,8 +652,8 @@ namespace bitgraph {
 			}
 
 			//sets bins values for the induced subgraph
-			//subg_ cannot be empty, so the assertion MUST hold
-			assert(subg_.init_scan(bbo::NON_DESTRUCTIVE) != -1);
+			//subg_ cannot be empty 
+			subg_.init_scan(bbo::NON_DESTRUCTIVE);
 
 			v = BBObject::noBit;
 			while ((v = subg_.next_bit()) != BBObject::noBit) {
@@ -734,10 +734,8 @@ namespace bitgraph {
 		}
 		else {
 
-			//bin_sort subgraph induced by subg_
-			//subg_ cannot be empty, assertion MUST hold
-			assert(subg_.init_scan(bbo::NON_DESTRUCTIVE) != -1);
-
+			//bin_sort subgraph induced by subg_			
+			subg_.init_scan(bbo::NON_DESTRUCTIVE);
 			auto v = BBObject::noBit;
 			while ((v = subg_.next_bit()) != BBObject::noBit) {
 				pos_[v] = bin_[deg_[v]];

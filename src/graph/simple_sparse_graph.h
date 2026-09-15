@@ -140,13 +140,14 @@ namespace bitgraph{
 		for (Vertex v = 0; v < NV_; ++v) {
 
 			//non destructive scan of each bitstring
-			if (adj_[v].init_scan(bbo::NON_DESTRUCTIVE) != EMPTY_ELEM) {
-				while (1) {
-					int w = adj_[v].next_bit();
-					if (w == EMPTY_ELEM) { break; }
-					o << "e " << v + 1 << " " << w + 1 << endl;
-				}
+			adj_[v].init_scan(bbo::NON_DESTRUCTIVE);
+			
+			while (true) {
+				int w = adj_[v].next_bit();
+				if (w == EMPTY_ELEM) { break; }
+				o << "e " << v + 1 << " " << w + 1 << endl;
 			}
+			
 		}
 	}
 

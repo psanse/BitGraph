@@ -31,14 +31,6 @@ protected:
 	std::vector<int> pSet;
 };
 
-TEST(BitScanSparse, exception_handlers) {
-
-	BBScanSp bbsp(130);
-
-	EXPECT_THROW(bbsp.init_scan(BBObject::NON_DESTRUCTIVE), BitScanError);
-
-}
-
 TEST_F(BBScanSpClassTest, check_example) {
 
 	EXPECT_EQ(7, bbsc.count());
@@ -138,12 +130,8 @@ TEST(BBScanSpClass, non_destructive_direct){
 
 	//non destructive
 	int nBit = BBObject::noBit;
-	int retVal = bbsp.init_scan(BBObject::NON_DESTRUCTIVE);
-
-	//////////////////////////
-	EXPECT_NE(-1, retVal);
-	//////////////////////////
-
+	bbsp.init_scan(BBObject::NON_DESTRUCTIVE);
+		
 	//scanning
 	while ( (nBit = bbsp.next_bit()) != BBObject::noBit ){
 		v.push_back(nBit);
@@ -167,11 +155,7 @@ TEST(BBScanSpClass, non_destructive_reverse) {
 
 	//non destructive reverse
 	int nBit = BBObject::noBit;
-	int retVal = bbsp.init_scan(BBObject::NON_DESTRUCTIVE_REVERSE);
-
-	//////////////////////////
-	EXPECT_NE(-1, retVal);
-	//////////////////////////
+	bbsp.init_scan(BBObject::NON_DESTRUCTIVE_REVERSE);
 
 	//scanning
 	while ((nBit = bbsp.prev_bit()) != BBObject::noBit) {
@@ -196,12 +180,8 @@ TEST(BBScanSpClass, non_destructive_with_starting_point){
 
 	//non destructive reverse
 	int nBit = BBObject::noBit;
-	int retVal = bbsp.init_scan(15, BBObject::NON_DESTRUCTIVE);
-
-	//////////////////////////
-	EXPECT_NE(-1, retVal);
-	//////////////////////////
-
+	bbsp.init_scan(15, BBObject::NON_DESTRUCTIVE);
+	
 	//scanning
 	while ((nBit = bbsp.next_bit()) != BBObject::noBit) {
 		v.push_back(nBit);
@@ -223,12 +203,8 @@ TEST(BBScanSpClass, non_destructive_reverse_with_starting_point) {
 
 	//non destructive reverse
 	int nBit = BBObject::noBit;
-	int retVal = bbsp.init_scan(15, BBObject::NON_DESTRUCTIVE_REVERSE);
-
-	//////////////////////////
-	EXPECT_NE(-1, retVal);
-	//////////////////////////
-
+	bbsp.init_scan(15, BBObject::NON_DESTRUCTIVE_REVERSE);
+		
 	//scanning
 	while ((nBit = bbsp.prev_bit()) != BBObject::noBit) {
 		v.push_back(nBit);
@@ -249,11 +225,7 @@ TEST(BBScanSpClass, destructive){
 
 	//non destructive reverse
 	int nBit = BBObject::noBit;
-	int retVal = bbsp.init_scan(BBObject::DESTRUCTIVE);
-
-	//////////////////////////
-	EXPECT_NE(-1, retVal);
-	//////////////////////////
+	bbsp.init_scan(BBObject::DESTRUCTIVE);
 
 	//scanning
 	while ((nBit = bbsp.next_bit_del()) != BBObject::noBit) {
@@ -279,11 +251,7 @@ TEST(BBScanSpClass, destructive_reverse) {
 
 	//non destructive reverse
 	int nBit = BBObject::noBit;
-	int retVal = bbsp.init_scan(BBObject::DESTRUCTIVE_REVERSE);
-
-	//////////////////////////
-	EXPECT_NE(-1, retVal);
-	//////////////////////////
+	bbsp.init_scan(BBObject::DESTRUCTIVE_REVERSE);
 
 	//scanning
 	while ((nBit = bbsp.prev_bit_del()) != BBObject::noBit) {

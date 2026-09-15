@@ -189,7 +189,7 @@ namespace bitgraph {
 			return o;
 		}
 
-		int BBSentinel::init_scan(scan_types sct) noexcept {
+		void BBSentinel::init_scan(scan_types sct) noexcept {
 			switch (sct) {
 			case NON_DESTRUCTIVE:
 				update_sentinels();
@@ -211,7 +211,7 @@ namespace bitgraph {
 				cerr << "bad scan type" << endl;
 				std::exit(EXIT_FAILURE);
 			}
-			return 0;
+			//return 0;
 		}
 
 

@@ -411,14 +411,14 @@ namespace bitgraph {
 			//update degree info of the remaining active vertices
 			VertexBitset& bbn = g_.neighbors(v);
 
-			if (bbn.init_scan(BBObject::NON_DESTRUCTIVE) != -1) {
-				int w = BBObject::noBit;
-				while ((w = bbn.next_bit()) != BBObject::noBit) {
-					if (node_active_state_.is_bit(w)) {
-						nb_neigh_[w]--;
-					}
+			bbn.init_scan(BBObject::NON_DESTRUCTIVE);
+			int w = BBObject::noBit;
+			while ((w = bbn.next_bit()) != BBObject::noBit) {
+				if (node_active_state_.is_bit(w)) {
+					nb_neigh_[w]--;
 				}
 			}
+			
 
 		} while (true);
 
@@ -460,14 +460,14 @@ namespace bitgraph {
 
 			//updates neighborhood info in remaining vertices
 			VertexBitset& bbn = g_.neighbors(v);
-			if (bbn.init_scan(BBObject::NON_DESTRUCTIVE) != -1) {
-				int w = BBObject::noBit;
-				while ((w = bbn.next_bit()) != BBObject::noBit) {
-					if (node_active_state_.is_bit(w)) {
-						nb_neigh_[w]--;
-					}
+			bbn.init_scan(BBObject::NON_DESTRUCTIVE);
+			int w = BBObject::noBit;
+			while ((w = bbn.next_bit()) != BBObject::noBit) {
+				if (node_active_state_.is_bit(w)) {
+					nb_neigh_[w]--;
 				}
 			}
+			
 
 		} while (true);
 
@@ -548,14 +548,15 @@ namespace bitgraph {
 
 			//updates neighborhood info in remaining vertices
 			VertexBitset& bbn = g_.neighbors(v);
-			if (bbn.init_scan(BBObject::NON_DESTRUCTIVE) != -1) {
-				int w = BBObject::noBit;
-				while ((w = bbn.next_bit()) != BBObject::noBit) {
-					if (node_active_state_.is_bit(w)) {
-						nb_neigh_[w]--;
-					}
+			bbn.init_scan(BBObject::NON_DESTRUCTIVE);
+
+			int w = BBObject::noBit;
+			while ((w = bbn.next_bit()) != BBObject::noBit) {
+				if (node_active_state_.is_bit(w)) {
+					nb_neigh_[w]--;
 				}
 			}
+			
 		}
 
 		if (rev) {
@@ -590,14 +591,14 @@ namespace bitgraph {
 
 			//updates neighborhood info in remaining vertices
 			VertexBitset& bbn = g_.neighbors(v);
-			if (bbn.init_scan(BBObject::NON_DESTRUCTIVE) != -1) {
-				int w = BBObject::noBit;
-				while ((w = bbn.next_bit()) != BBObject::noBit) {
-					if (node_active_state_.is_bit(w)) {
-						nb_neigh_[w]--;
-					}
+			bbn.init_scan(BBObject::NON_DESTRUCTIVE);
+			int w = BBObject::noBit;
+			while ((w = bbn.next_bit()) != BBObject::noBit) {
+				if (node_active_state_.is_bit(w)) {
+					nb_neigh_[w]--;
 				}
 			}
+			
 		}
 
 		if (rev) {
@@ -794,11 +795,10 @@ namespace bitgraph {
 		for (int elem = 0; elem < NV_; ++elem) {
 			deg_neigh_[elem] = 0;
 			VertexBitset& bbn = g_.neighbors(elem);
-			if (bbn.init_scan(BBObject::NON_DESTRUCTIVE) != -1) {
-				int w = BBObject::noBit;
-				while ((w = bbn.next_bit()) != EMPTY_ELEM) {
-					deg_neigh_[elem] += nb_neigh_[w];
-				}
+			bbn.init_scan(BBObject::NON_DESTRUCTIVE);
+			int w = BBObject::noBit;
+			while ((w = bbn.next_bit()) != EMPTY_ELEM) {
+				deg_neigh_[elem] += nb_neigh_[w];
 			}
 		}
 

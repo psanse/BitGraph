@@ -307,15 +307,15 @@ namespace bitgraph {
 		int max_degree = 0;
 
 		int v = BBObject::noBit;
-		if (sg.init_scan(bbo::NON_DESTRUCTIVE) != BBObject::noBit) {
-			while ((v = sg.next_bit()) != BBObject::noBit) {
+		sg.init_scan(bbo::NON_DESTRUCTIVE);
+		while ((v = sg.next_bit()) != BBObject::noBit) {
 
-				//compute max_degree circumscribed to subgraph
-				if (max_degree < degree(v, sg)) {
-					max_degree = degree(v, sg);
-				}
+			//compute max_degree circumscribed to subgraph
+			if (max_degree < degree(v, sg)) {
+				max_degree = degree(v, sg);
 			}
 		}
+		
 
 		return max_degree;
 	}
@@ -328,11 +328,7 @@ namespace bitgraph {
 		int nE = 0;
 
 		//scan declaration
-		int retVal = sg.init_scan(bbo::NON_DESTRUCTIVE);
-
-		////////////////////////
-		assert(retVal != BBObject::noBit);
-		///////////////////////
+		sg.init_scan(bbo::NON_DESTRUCTIVE);
 
 		//main loop
 		int v = BBObject::noBit;

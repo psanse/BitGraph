@@ -422,12 +422,7 @@ namespace bitgraph {
 			inline
 				bool is_iset(const GraphT& g, typename GraphT::VertexBitset& bb) {
 
-				int retVal = bb.init_scan(bbo::NON_DESTRUCTIVE);
-
-				///////////////////////
-				assert(retVal != -1);
-				///////////////////////
-
+				bb.init_scan(bbo::NON_DESTRUCTIVE);
 				int v = bbo::noBit;
 				while ((v = bb.next_bit()) != bbo::noBit) {
 
@@ -513,12 +508,7 @@ namespace bitgraph {
 			inline
 				bool is_clique(const GraphT& g, typename GraphT::VertexBitset& bb) {
 
-				int retVal = bb.init_scan(bbo::NON_DESTRUCTIVE);
-
-				///////////////////////
-				assert(retVal != -1);
-				///////////////////////
-
+				bb.init_scan(bbo::NON_DESTRUCTIVE);
 				int v = bbo::noBit;
 				while ((v = bb.next_bit()) != bbo::noBit) {
 
