@@ -11,7 +11,6 @@ add_executable (test_bitscan
     #test_example.cpp   
     #test_bbsentinel.cpp 
 	
-	test_bbscan_view.cpp  
 
     #TESTS CHECKED (26/02/2025)
     test_bitblock.cpp
@@ -22,6 +21,7 @@ add_executable (test_bitscan
     test_bbscan_sparse.cpp 
     test_bitset_sparse.cpp
     test_bbscan_sparse_nested.cpp 
+    test_bbscan_view.cpp  
 
 )
 

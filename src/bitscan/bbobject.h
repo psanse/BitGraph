@@ -45,8 +45,8 @@ namespace bitgraph {
 		//cache for bitscanning
 		struct scan_t {
 			
-			int bbi_;								//bitblock index 	
-			int pos_;								//bit index [0...63] 
+			index_t bbi_;							// bitblock index 	
+			int pos_;								// bit position [0...63] 
 
 			constexpr scan_t() noexcept : bbi_(BBObject::noBit), pos_(MASK_LIM) {}
 
@@ -65,6 +65,8 @@ namespace bitgraph {
 		// (similar to iterator models)
 		// 
 		// Currently, BitsetT can only be an object derived from BBScan class (14/02/25)
+		// In the long run, gradually evolve to external utilities with namespaces, e.g., bitgraph::scan::Dest<T>,
+		// with a more generic interface (15/09/26)
 		//
 		////////////////////////////
 

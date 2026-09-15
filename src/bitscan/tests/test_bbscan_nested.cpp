@@ -35,7 +35,6 @@ TEST_F(BitScanNestedTest, basic) {
 
 	//direct scanning
 	BBScan::scan sc1(bb);
-	sc1.init_scan();
 	int bit = BBObject::noBit;
 	while ((bit = sc1.next_bit()) != BBObject::noBit) {
 		lbits.emplace_back(bit);
