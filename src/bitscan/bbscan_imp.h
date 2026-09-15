@@ -284,8 +284,8 @@ namespace bitgraph {
 		case DESTRUCTIVE_REVERSE:
 			scan_block(nBB_ - 1);
 			break;
-		default:			
-			assert(false && "unknown scan type - BBScan::init_scan");			
+		default:
+			invalid_scan_type();					
 		}
 
 		return 0;
@@ -313,9 +313,7 @@ namespace bitgraph {
 			scan_block(bbh);
 			break;
 		default:
-			LOG_ERROR("unknown scan type - BBScan::init_scan");
-			assert(false);
-			//throw BitScanError("unknown scan type in BBScan::init_scan");		
+			invalid_scan_type();
 		}
 
 		return 0;

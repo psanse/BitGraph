@@ -17,6 +17,7 @@
 #include "bbset.h"	
 #include <cassert>
 #include <type_traits>
+#include <exception>		// std::terminate
 
 namespace bitgraph{
 		
@@ -69,7 +70,7 @@ namespace bitgraph{
 			*		 according to one of the 4 scan types passed as argument
 			* @param sct: type of scan
 			* @returns 0 if successful, -1 otherwise  (substituted by fail-safe policy in (08/07/2025))
-			* @details: fail-safe policy, program terminates with -1 code  if error
+			* @details: fail-safe policy, program terminates if error
 			**/
 			virtual int init_scan (scan_types sct) noexcept;
 
@@ -81,7 +82,7 @@ namespace bitgraph{
 			* @param firstBit: starting bit
 			* @param sct: type of scan
 			* @returns 0 if successful, -1 otherwise (substituted by fail-safe policy in (08/07/2025))
-			* @details: fail-safe policy, program terminates with -1 code  if error
+			* @details: fail-safe policy, program terminates if error
 			*
 			* TODO - no firstBit information is configured for DESTRUCTIVE scan types (08/02/2025)
 			**/
@@ -227,6 +228,12 @@ namespace bitgraph{
 			int  scan_block() 	 const noexcept { return scan_.bbi_; }
 			int  scan_bit()	  const noexcept { return scan_.pos_; }
 
+		// terminating handlers
+		[[noreturn]]
+			inline void invalid_scan_type() noexcept {
+				LOG_ERROR("Unknown scan type in BBScan::init_scan");
+				std::terminate();
+			}
 
 		//////////////////
 		/// data members
