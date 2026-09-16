@@ -8,7 +8,7 @@ add_executable(bitscan_basic
 )
 
 target_link_libraries(bitscan_basic
-    PRIVATE BITSCAN
+    PRIVATE bitscan
 )
 
 add_executable(bitscan_destructive
@@ -16,7 +16,7 @@ add_executable(bitscan_destructive
 )
 
 target_link_libraries(bitscan_destructive
-    PRIVATE BITSCAN
+    PRIVATE bitscan
 )
 
 add_executable(bitscan_views
@@ -24,5 +24,5 @@ add_executable(bitscan_views
 )
 
 target_link_libraries(bitscan_views
-    PRIVATE BITSCAN
+    PRIVATE bitscan
 )

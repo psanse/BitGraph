@@ -1807,6 +1807,15 @@ namespace bitgraph{
 			return *this;
 		}
 
+		inline
+		void Bitset::extract_stack(com::FixedStack<int>& s)	const {
+			s.clear();
+
+			int v = BBObject::noBit;
+			while ((v = next_bit(v)) != BBObject::noBit) {
+				s.push(v);
+			}
+		}
 		
 
 		/////////////////

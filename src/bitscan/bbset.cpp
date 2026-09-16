@@ -317,22 +317,13 @@ Bitset::operator bitpos_list() const {
 	return result;
 }
 
-bitgraph::Bitset::operator bitpos_set() const
+Bitset::operator bitpos_set() const
 {
 	bitpos_set result;
 	extract_set(result);
 	return result;
 }
 
-
-void Bitset::extract_stack(com::FixedStack<int>& s)	const {
-	s.clear();
-
-	int v = BBObject::noBit;
-	while ((v = next_bit(v)) != BBObject::noBit) {
-		s.push(v);
-	}
-}
 
 void Bitset::extract_array(int* lv, std::size_t& size, bool rev) 	{
 	size = 0;
