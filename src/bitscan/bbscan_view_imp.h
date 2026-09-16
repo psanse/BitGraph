@@ -16,11 +16,7 @@ namespace bitgraph {
 	template <BBObject::scan_types ScanType>
 	inline
 	int BBScanViewT<ScanType>::next_bit_destructive_impl() {
-
-		/*if (scan_.bbi_ == BBObject::noBit) {
-			return BBObject::noBit;
-		}*/
-
+	
 		auto& vBB = bitset_.bitset();
 		Ul posInBB;
 
@@ -42,12 +38,7 @@ namespace bitgraph {
 	template <BBObject::scan_types ScanType>
 	inline
 	int BBScanViewT<ScanType>::next_bit_impl() {
-
-		/* if (scan_.bbi_ == BBObject::noBit) {
-			return BBObject::noBit;
-		}*/
 		
-
 		auto& vBB = bitset_.bitset();
 		Ul posInBB;
 
@@ -70,11 +61,7 @@ namespace bitgraph {
 	template <BBObject::scan_types ScanType>
 	inline
 	int BBScanViewT<ScanType>::prev_bit_impl() {
-
-	/*	if (scan_.bbi_ == BBObject::noBit) {
-			return BBObject::noBit;
-		}*/
-
+		
 		auto& vBB = bitset_.bitset();
 		Ul posInBB;
 
@@ -97,11 +84,7 @@ namespace bitgraph {
 	template <BBObject::scan_types ScanType>
 	inline
 	int BBScanViewT<ScanType>::prev_bit_destructive_impl() {
-
-		/*if (scan_.bbi_ == BBObject::noBit) {
-			return BBObject::noBit;
-		}*/
-
+		
 		auto& vBB = bitset_.bitset();
 		Ul posInBB;
 
