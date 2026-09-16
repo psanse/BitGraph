@@ -13,15 +13,13 @@ file(GLOB HEADER_FILES
 #creates BITSCAN lib
 ###################
 add_library (bitscan STATIC
-bbsentinel.cpp 
-bitblock.cpp 
-bbset.cpp  
-bbset_sparse.cpp 
-tables.cpp
-${HEADER_FILES}
+    bbsentinel.cpp 
+    bitblock.cpp 
+    bbset.cpp  
+    bbset_sparse.cpp 
+    tables.cpp
+    ${HEADER_FILES}
 )
-
-target_compile_features(bitscan PUBLIC cxx_std_14)
 
 set_target_properties(bitscan PROPERTIES CXX_EXTENSIONS NO
     #CXX_STANDARD 14					
@@ -36,7 +34,6 @@ set_target_properties(bitscan PROPERTIES CXX_EXTENSIONS NO
 # Make sure the compiler can find include files for our bitscan library
 # when other libraries or executables link to bitscan
 target_include_directories(bitscan PUBLIC 
-#  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
   $<BUILD_INTERFACE:${BITGRAPH_ROOT_INCLUDE_DIR}>
   $<INSTALL_INTERFACE:${include_install_dir}>    # <prefix>/include/<PROJECT_NAME>
 )
@@ -61,29 +58,51 @@ endif()
 
 if(INSTALL_BITGRAPH)
 
-#Install BITSCAN library
-install(
-   TARGETS bitscan
-   EXPORT  "${TARGETS_EXPORT_NAME}"
-   ARCHIVE DESTINATION lib
-   LIBRARY DESTINATION lib
-   RUNTIME DESTINATION bin
-   INCLUDES DESTINATION include
-)
+    install(
+        TARGETS bitscan
+        EXPORT "${TARGETS_EXPORT_NAME}"
+        ARCHIVE DESTINATION "${CMAKE_INSTALL_LIBDIR}"
+        LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}"
+        RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}"
+        INCLUDES DESTINATION "${include_install_dir}"
+    )
 
-#install header files
-file(GLOB_RECURSE DEPLOY_FILES_AND_DIRS "${source_code_dir}/bitscan/*.h")
-foreach(ITEM ${DEPLOY_FILES_AND_DIRS})
-    file(RELATIVE_PATH REL_PATH ${source_code_dir} ${ITEM})
-    get_filename_component(DIR_PATH ${REL_PATH} DIRECTORY)
-    install(FILES ${ITEM} DESTINATION ${include_install_dir}/${DIR_PATH})	 
- endforeach()
+    # Installs header files as <prefix>/include/BitGraph/bitscan/...
+    install(
+        DIRECTORY "${source_code_dir}/bitscan"
+        DESTINATION "${include_install_dir}"
+        FILES_MATCHING
+        PATTERN "*.h"
+        PATTERN "*.hpp"
+    )
+   
+   ###########
+   #deprecated scripts 
+   ###########
 
-endif(INSTALL_BITGRAPH)
+   # install(
+   #    TARGETS bitscan
+   #    EXPORT  "${TARGETS_EXPORT_NAME}"
+   #    ARCHIVE DESTINATION lib
+   #    LIBRARY DESTINATION lib
+   #    RUNTIME DESTINATION bin
+   #    INCLUDES DESTINATION include
+   # )
+
+  #install header files (working, preserves internal structure)
+  #  file(GLOB_RECURSE DEPLOY_FILES_AND_DIRS "${source_code_dir}/bitscan/*.h")
+  #  foreach(ITEM ${DEPLOY_FILES_AND_DIRS})
+  #      file(RELATIVE_PATH REL_PATH ${source_code_dir} ${ITEM})
+  #      get_filename_component(DIR_PATH ${REL_PATH} DIRECTORY)
+  #      install(FILES ${ITEM} DESTINATION ${include_install_dir}/${DIR_PATH})	 
+  #   endforeach()
+
+endif()
 
 ###################
 # UNIT TESTS for BITSCAN lib  
 ###################
+
 # Per-target option to enable building unit tests for the bitscan target
 option(BITSCAN_BUILD_TESTS "Build bitscan tests." ON)
 
@@ -108,7 +127,6 @@ if (BUILD_TESTING AND BITSCAN_BUILD_TESTS)
     add_subdirectory(tests)
 
 endif()
-
 
 ###################
 # EXAMPLES for BITSCAN lib  

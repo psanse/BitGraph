@@ -1,11 +1,3 @@
-##############
-# Source layout
-##############
-
-set(BITGRAPH_ROOT_INCLUDE_DIR
-    "${CMAKE_CURRENT_SOURCE_DIR}"
-)
-
 #################
 # Export layout
 #################
@@ -61,9 +53,59 @@ if(WIN32 AND INCLUDE_OPENMP)
     endif()
 endif()
 
+
+#################
+# Export layout
+# Valid for all platforms:
+# #   * <prefix>/lib*/cmake/<PROJECT_NAME>
+# #   * <prefix>/lib*/
+# #   * <prefix>/include/
+#################
+
+set(source_code_dir
+	"${CMAKE_CURRENT_SOURCE_DIR}"
+)
+
+set(TARGETS_EXPORT_NAME
+	"${PROJECT_NAME}Targets"
+ )
+ 
+set(namespace
+	"${PROJECT_NAME}::"
+)
+
+set(config_install_dir 
+	"${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}"
+)
+
+set(include_install_dir 
+	"${CMAKE_INSTALL_INCLUDEDIR}/${PROJECT_NAME}"
+)
+
+# Directory for generated package-configuration files.
+# <PROJECT-NAME>Targets.cmake file during the build - will be installed later on
+
+set(generated_dir 
+	"${CMAKE_CURRENT_BINARY_DIR}/generated"
+)
+
+set(version_config 
+	"${generated_dir}/${PROJECT_NAME}ConfigVersion.cmake"
+)
+
+set(project_config 
+	"${generated_dir}/${PROJECT_NAME}Config.cmake"
+)
+
+
+
 ####################
-# Library components
+# Subdirectories
 ####################
+
+set(BITGRAPH_ROOT_INCLUDE_DIR
+    "${CMAKE_CURRENT_SOURCE_DIR}"
+)
 
 add_subdirectory(utils)
 add_subdirectory(bitscan)
