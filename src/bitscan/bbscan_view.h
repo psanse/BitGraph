@@ -10,7 +10,7 @@
 #ifndef _BITGRAPH_BITSCAN_BBSCAN_VIEW_H_
 #define _BITGRAPH_BITSCAN_BBSCAN_VIEW_H_
 
-#include "bbset.h"	
+#include "bbscan.h"	
 #include <cassert>
 #include <type_traits>
 
@@ -30,7 +30,7 @@ namespace bitgraph{
 		 * @note The referenced Bitset must remain valid throughout the lifetime
 		 *       of this object.
 		 */
-		template <BBObject::scan_types ScanType = BBObject::NON_DESTRUCTIVE>
+		template <class BitsetT, BBObject::scan_types ScanType = BBObject::NON_DESTRUCTIVE>
 		class BBScanViewT {
 
 			static_assert(
@@ -42,7 +42,7 @@ namespace bitgraph{
 				);
 
 		public:
-			explicit BBScanViewT(Bitset& bitset) noexcept : bitset_(bitset) {}
+			explicit BBScanViewT(BitsetT& bitset) noexcept : bitset_(bitset) {}
 			~BBScanViewT() = default;
 
 			/**
@@ -109,12 +109,7 @@ namespace bitgraph{
 			// Reverse, destructive
 			int next_bit_dispatch(std::true_type, std::true_type)	{	return prev_bit_destructive_impl();	}
 
-
-			/*int next_bit_dispatch(std::true_type) { return next_bit_destructive_impl(); }
-			int next_bit_dispatch(std::false_type) { return next_bit_impl(); }
-			int prev_bit_dispatch(std::true_type) { return prev_bit_destructive_impl(); }
-			int prev_bit_dispatch(std::false_type) { return prev_bit_impl(); }*/
-
+			
 			void init_scan_dispatch(std::true_type) noexcept {
 				set_scan_block(bitset_.num_blocks() - 1);
 				set_scan_bit(WORD_SIZE);
@@ -146,24 +141,42 @@ namespace bitgraph{
 				std::terminate();
 			}
 
-			Bitset& bitset_;
+			BitsetT& bitset_;
 			BBObject::scan_t scan_;
 		};	
 
 
 		// Convenient aliases for the supported scanning modes
 		namespace view {
-			using Forward =
-				BBScanViewT<BBObject::NON_DESTRUCTIVE>;
 
-			using Reverse =
-				BBScanViewT<BBObject::NON_DESTRUCTIVE_REVERSE>;
 
-			using DestructiveForward =
-				BBScanViewT<BBObject::DESTRUCTIVE>;
+			// Generic scan-view aliases.
 
-			using DestructiveReverse =
-				BBScanViewT<BBObject::DESTRUCTIVE_REVERSE>;
+			template<class BitsetT>
+			using ForwardView =
+				BBScanViewT<BitsetT, BBObject::NON_DESTRUCTIVE>;
+
+			template<class BitsetT>
+			using ReverseView =
+				BBScanViewT<BitsetT, BBObject::NON_DESTRUCTIVE_REVERSE>;
+
+			template<class BitsetT>
+			using DestructiveForwardView =
+				BBScanViewT<BitsetT, BBObject::DESTRUCTIVE>;
+
+			template<class BitsetT>
+			using DestructiveReverseView =
+				BBScanViewT<BitsetT, BBObject::DESTRUCTIVE_REVERSE>;
+
+			// Convenience aliases for the public bitarray implementation.
+
+			using Forward =	ForwardView<BBScan>;
+
+			using Reverse = ReverseView<BBScan>;
+
+			using DestructiveForward = DestructiveForwardView<BBScan>;			
+
+			using DestructiveReverse = DestructiveReverseView<BBScan>;
 	
 		}
 

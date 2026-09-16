@@ -6,9 +6,15 @@
  * in the bitarray. Multiple non-destructive views can therefore traverse the
  * same bitarray independently and simultaneously.
  *
+ * The example demonstrates:
+ *
+ * - convenience aliases bound to bitarray, such as view::Forward;
+ * - generic aliases with an explicit bitset type, such as
+ *   view::ForwardView<bitarray>;
+ * - simultaneous forward and reverse traversal of the same bitarray.
+ *
  * The view type determines the traversal direction. All views expose the same
- * next_bit() operation: a Forward view returns bits in increasing position
- * order, whereas a Reverse view returns them in decreasing position order.
+ * next_bit() operation.
  *
  * @note The referenced bitarray must remain valid throughout the lifetime of
  *       every view.
@@ -92,6 +98,41 @@ int main()
     for (int bit = reverse.next_bit();
         bit != bitarray::noBit;
         bit = reverse.next_bit()) {
+        std::cout << bit << ' ';
+    }
+
+    std::cout << '\n';
+
+
+    /*
+     * Generic scan-view aliases
+     *
+     * The generic aliases accept the bitset type explicitly. This is useful for
+     * algorithms that select the bitset implementation through a template
+     * parameter.
+     */
+
+    std::cout << "\nGeneric forward view: ";
+
+    bitgraph::view::ForwardView<bitarray> genericForward(bits);
+    genericForward.init_scan();
+
+    for (int bit = genericForward.next_bit();
+        bit != bitarray::noBit;
+        bit = genericForward.next_bit()) {
+        std::cout << bit << ' ';
+    }
+
+    std::cout << '\n';
+
+    std::cout << "Generic reverse view: ";
+
+    bitgraph::view::ReverseView<bitarray> genericReverse(bits);
+    genericReverse.init_scan();
+
+    for (int bit = genericReverse.next_bit();
+        bit != bitarray::noBit;
+        bit = genericReverse.next_bit()) {
         std::cout << bit << ' ';
     }
 

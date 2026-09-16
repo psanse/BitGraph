@@ -13,9 +13,9 @@
 
 namespace bitgraph {
 		
-	template <BBObject::scan_types ScanType>
+	template <class BitsetT, BBObject::scan_types ScanType>
 	inline
-	int BBScanViewT<ScanType>::next_bit_destructive_impl() {
+	int BBScanViewT<BitsetT, ScanType>::next_bit_destructive_impl() {
 	
 		auto& vBB = bitset_.bitset();
 		Ul posInBB;
@@ -35,9 +35,9 @@ namespace bitgraph {
 		return BBObject::noBit;
 	}
 
-	template <BBObject::scan_types ScanType>
+	template <class BitsetT, BBObject::scan_types ScanType>
 	inline
-	int BBScanViewT<ScanType>::next_bit_impl() {
+	int BBScanViewT<BitsetT, ScanType>::next_bit_impl() {
 		
 		auto& vBB = bitset_.bitset();
 		Ul posInBB;
@@ -58,9 +58,9 @@ namespace bitgraph {
 		return BBObject::noBit;
 	}
 
-	template <BBObject::scan_types ScanType>
+	template <class BitsetT, BBObject::scan_types ScanType>
 	inline
-	int BBScanViewT<ScanType>::prev_bit_impl() {
+	int BBScanViewT<BitsetT, ScanType>::prev_bit_impl() {
 		
 		auto& vBB = bitset_.bitset();
 		Ul posInBB;
@@ -81,9 +81,9 @@ namespace bitgraph {
 		return BBObject::noBit;
 	}
 
-	template <BBObject::scan_types ScanType>
+	template <class BitsetT, BBObject::scan_types ScanType>
 	inline
-	int BBScanViewT<ScanType>::prev_bit_destructive_impl() {
+	int BBScanViewT<BitsetT, ScanType>::prev_bit_destructive_impl() {
 		
 		auto& vBB = bitset_.bitset();
 		Ul posInBB;
@@ -103,9 +103,9 @@ namespace bitgraph {
 		return BBObject::noBit;
 	}
 
-	template <BBObject::scan_types ScanType>
+	template <class BitsetT, BBObject::scan_types ScanType>
 	inline
-	int BBScanViewT<ScanType>::next_bit() {
+	int BBScanViewT<BitsetT, ScanType>::next_bit() {
 
 		assert(has_valid_cursor());
 
@@ -115,9 +115,9 @@ namespace bitgraph {
 		);		
 	}
 
-	template <BBObject::scan_types ScanType>
+	template <class BitsetT, BBObject::scan_types ScanType>
 	inline
-	void BBScanViewT<ScanType>::init_scan() noexcept {
+	void BBScanViewT<BitsetT, ScanType>::init_scan() noexcept {
 
 		if (bitset_.num_blocks() <= 0) {
 			set_scan_block(BBObject::noBit);
@@ -130,9 +130,9 @@ namespace bitgraph {
 		);
 	}
 
-	template <BBObject::scan_types ScanType>
+	template <class BitsetT, BBObject::scan_types ScanType>
 	inline
-	void BBScanViewT<ScanType>::init_scan(int firstBit) noexcept {
+	void BBScanViewT<BitsetT, ScanType>::init_scan(int firstBit) noexcept {
 
 		if (firstBit == BBObject::noBit) {
 			init_scan();

@@ -12,7 +12,7 @@ target_link_libraries(bitscan_basic
 )
 
 add_executable(bitscan_destructive
-    destructive_scanning.cpp
+    basic_destructive_scanning.cpp
 )
 
 target_link_libraries(bitscan_destructive
