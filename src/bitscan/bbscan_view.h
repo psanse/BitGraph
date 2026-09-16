@@ -168,6 +168,7 @@ namespace bitgraph{
 
 			using DestructiveReverse =
 				BBScanViewT<BBObject::DESTRUCTIVE_REVERSE>;
+	
 		}
 
 
