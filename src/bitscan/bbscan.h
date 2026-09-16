@@ -21,13 +21,24 @@
 
 namespace bitgraph{
 		
-		/////////////////////////////////
-		//
-		// Class BBScan
-		// 
-		// (Efficient bit scanning)
-		// 
-		/////////////////////////////////
+		/**
+		* @brief Bitset implementation optimized for high-performance bit scanning.
+		*
+		* BBScan stores a persistent scan cursor (`scan_t`) inside the bitset to
+		* minimize initialization and state-management overhead in performance-critical
+		* code paths. This design is particularly suited to bit-parallel graph
+		* algorithms, where bitsets represent vertex sets, candidate sets, or graph
+		* neighborhoods and are scanned repeatedly.
+		*
+		* @warning A BBScan object supports only one active scan at a time. Starting or
+		*          initializing another scan on the same bitset overwrites its
+		*          persistent scan cursor and invalidates the scan already in progress.
+		*          Different BBScan objects may be scanned independently.
+		*
+		* @note The scanner classes associated with BBScan are lightweight interfaces
+		*       over the persistent cursor owned by the bitset; they do not maintain
+		*       independent scan state.
+		*/
 
 		class BBScan : public Bitset {
 		public :
@@ -228,7 +239,7 @@ namespace bitgraph{
 		// terminating and other handlers
 		[[noreturn]]
 			inline void invalid_scan_type() noexcept {
-				LOG_ERROR("Unknown scan type in BBScan::init_scan");
+				std::fputs("Unknown scan type in BBScan::init_scan\n", stderr);
 				std::terminate();
 			}
 

@@ -12,203 +12,14 @@
 
 
 namespace bitgraph {
-
-	inline
-	int BBScanView::next_bit_destructive_impl() {
-
-		if (!has_valid_cursor(MASK_LIM)) {
-			return BBObject::noBit;
-		}
-
-		auto& vBB = bitset_.bitset();
-		Ul posInBB;
-
-		for (auto i = scan_.bbi_; i < bitset_.num_blocks(); ++i) {
-			const BITBOARD candidates = (i == scan_.bbi_)
-				? vBB[i] & Tables::mask_high[scan_.pos_]
-				: vBB[i];
-			if (_BitScanForward64(&posInBB, candidates)) {
-				scan_.bbi_ = i;
-				scan_.pos_ = posInBB;
-				vBB[i] &= ~Tables::mask[posInBB];
-				return (posInBB + WMUL(i));
-			}
-		}
-
-		return BBObject::noBit;
-	}
-
-	inline
-	int BBScanView::next_bit_impl() {
-
-		if (!has_valid_cursor(MASK_LIM)) {
-			return BBObject::noBit;
-		}
-
-		auto& vBB = bitset_.bitset();
-		Ul posInBB;
-
-		if (_BitScanForward64(&posInBB, vBB[scan_.bbi_] & Tables::mask_high[scan_.pos_])) {
-			scan_.pos_ = posInBB;
-			return (posInBB + WMUL(scan_.bbi_));
-		}
-
-		for (auto i = scan_.bbi_ + 1; i < bitset_.num_blocks(); ++i) {
-			if (_BitScanForward64(&posInBB, vBB[i])) {
-				scan_.bbi_ = i;
-				scan_.pos_ = posInBB;
-				return (posInBB + WMUL(i));
-			}
-		}
-
-		return BBObject::noBit;
-	}
-
-	inline
-	int BBScanView::prev_bit_impl() {
-
-		if (!has_valid_cursor(WORD_SIZE)) {
-			return BBObject::noBit;
-		}
-
-		auto& vBB = bitset_.bitset();
-		Ul posInBB;
-
-		if (_BitScanReverse64(&posInBB, vBB[scan_.bbi_] & Tables::mask_low[scan_.pos_])) {
-			scan_.pos_ = posInBB;
-			return (posInBB + WMUL(scan_.bbi_));
-		}
-
-		for (auto i = scan_.bbi_ - 1; i >= 0; --i) {
-			if (_BitScanReverse64(&posInBB, vBB[i])) {
-				scan_.bbi_ = i;
-				scan_.pos_ = posInBB;
-				return (posInBB + WMUL(i));
-			}
-		}
-
-		return BBObject::noBit;
-	}
-
-	inline
-	int BBScanView::prev_bit_destructive_impl() {
-
-		if (!has_valid_cursor(WORD_SIZE)) {
-			return BBObject::noBit;
-		}
-
-		auto& vBB = bitset_.bitset();
-		Ul posInBB;
-
-		for (auto i = scan_.bbi_; i >= 0; --i) {
-			const BITBOARD candidates = (i == scan_.bbi_)
-				? vBB[i] & Tables::mask_low[scan_.pos_]
-				: vBB[i];
-			if (_BitScanReverse64(&posInBB, candidates)) {
-				scan_.bbi_ = i;
-				scan_.pos_ = posInBB;
-				vBB[i] &= ~Tables::mask[posInBB];
-				return (posInBB + WMUL(i));
-			}
-		}
-
-		return BBObject::noBit;
-	}
-
-	inline
-	int BBScanView::next_bit() {
-		switch (scan_type_) {
-		case BBObject::NON_DESTRUCTIVE:
-		case BBObject::NON_DESTRUCTIVE_REVERSE:
-			return next_bit_impl();
-		case BBObject::DESTRUCTIVE:
-		case BBObject::DESTRUCTIVE_REVERSE:
-			return next_bit_destructive_impl();
-		default:
-			return BBObject::noBit;
-		}
-	}
-
-	inline
-	int BBScanView::prev_bit() {
-		switch (scan_type_) {
-		case BBObject::NON_DESTRUCTIVE:
-		case BBObject::NON_DESTRUCTIVE_REVERSE:
-			return prev_bit_impl();
-		case BBObject::DESTRUCTIVE:
-		case BBObject::DESTRUCTIVE_REVERSE:
-			return prev_bit_destructive_impl();
-		default:
-			return BBObject::noBit;
-		}
-	}
-
-	inline
-	int BBScanView::init_scan(BBObject::scan_types sct) noexcept {
-		if (sct < BBObject::NON_DESTRUCTIVE || sct > BBObject::DESTRUCTIVE_REVERSE) {
-			return -1;
-		}
-		scan_type_ = sct;
-
-		if (bitset_.num_blocks() <= 0) {
-			set_scan_block(BBObject::noBit);
-			set_scan_bit(MASK_LIM);
-			return 0;
-		}
-
-		switch (sct) {
-		case BBObject::NON_DESTRUCTIVE:
-			set_scan_block(0);
-			set_scan_bit(MASK_LIM);
-			break;
-		case BBObject::NON_DESTRUCTIVE_REVERSE:
-			set_scan_block(bitset_.num_blocks() - 1);
-			set_scan_bit(WORD_SIZE);
-			break;
-		case BBObject::DESTRUCTIVE:
-			set_scan_block(0);
-			set_scan_bit(MASK_LIM);
-			break;
-		case BBObject::DESTRUCTIVE_REVERSE:
-			set_scan_block(bitset_.num_blocks() - 1);
-			set_scan_bit(WORD_SIZE);
-			break;
-		default:
-			return -1;
-		}
-
-		return 0;
-	}
-
-	inline
-	int BBScanView::init_scan(int firstBit, BBObject::scan_types sct) noexcept {
-		if (sct < BBObject::NON_DESTRUCTIVE || sct > BBObject::DESTRUCTIVE_REVERSE) {
-			return -1;
-		}
-		scan_type_ = sct;
-
-		if (firstBit == BBObject::noBit) {
-			return init_scan(sct);
-		}
-		if (firstBit < 0 || firstBit >= bitset_.num_blocks() * WORD_SIZE) {
-			set_scan_block(BBObject::noBit);
-			set_scan_bit(MASK_LIM);
-			return -1;
-		}
-				
-		set_scan_block(WDIV(firstBit));
-		set_scan_bit(WMOD(firstBit));
-
-		return 0;
-	}
-
+		
 	template <BBObject::scan_types ScanType>
 	inline
 	int BBScanViewT<ScanType>::next_bit_destructive_impl() {
 
-		if (!has_valid_cursor(MASK_LIM)) {
+		/*if (scan_.bbi_ == BBObject::noBit) {
 			return BBObject::noBit;
-		}
+		}*/
 
 		auto& vBB = bitset_.bitset();
 		Ul posInBB;
@@ -232,9 +43,10 @@ namespace bitgraph {
 	inline
 	int BBScanViewT<ScanType>::next_bit_impl() {
 
-		if (!has_valid_cursor(MASK_LIM)) {
+		/* if (scan_.bbi_ == BBObject::noBit) {
 			return BBObject::noBit;
-		}
+		}*/
+		
 
 		auto& vBB = bitset_.bitset();
 		Ul posInBB;
@@ -259,9 +71,9 @@ namespace bitgraph {
 	inline
 	int BBScanViewT<ScanType>::prev_bit_impl() {
 
-		if (!has_valid_cursor(WORD_SIZE)) {
+	/*	if (scan_.bbi_ == BBObject::noBit) {
 			return BBObject::noBit;
-		}
+		}*/
 
 		auto& vBB = bitset_.bitset();
 		Ul posInBB;
@@ -286,9 +98,9 @@ namespace bitgraph {
 	inline
 	int BBScanViewT<ScanType>::prev_bit_destructive_impl() {
 
-		if (!has_valid_cursor(WORD_SIZE)) {
+		/*if (scan_.bbi_ == BBObject::noBit) {
 			return BBObject::noBit;
-		}
+		}*/
 
 		auto& vBB = bitset_.bitset();
 		Ul posInBB;
@@ -311,45 +123,56 @@ namespace bitgraph {
 	template <BBObject::scan_types ScanType>
 	inline
 	int BBScanViewT<ScanType>::next_bit() {
-		return this->next_bit_dispatch(std::integral_constant<bool, is_destructive_scan()>{});
+
+		assert(has_valid_cursor());
+
+		return this->next_bit_dispatch(
+			std::integral_constant<bool, is_destructive_scan()>{}
+		);
 	}
 
 	template <BBObject::scan_types ScanType>
 	inline
 	int BBScanViewT<ScanType>::prev_bit() {
-		return this->prev_bit_dispatch(std::integral_constant<bool, is_destructive_scan()>{});
+
+		assert(has_valid_cursor());
+
+		return this->prev_bit_dispatch(
+			std::integral_constant<bool, is_destructive_scan()>{}
+		);
 	}
 
 	template <BBObject::scan_types ScanType>
 	inline
-	int BBScanViewT<ScanType>::init_scan() noexcept {
+	void BBScanViewT<ScanType>::init_scan() noexcept {
 
 		if (bitset_.num_blocks() <= 0) {
 			set_scan_block(BBObject::noBit);
 			set_scan_bit(MASK_LIM);
-			return 0;
+			return;
 		}
 
-		return this->init_scan_dispatch(std::integral_constant<bool, is_reverse_scan()>{});
+		init_scan_dispatch(
+			std::integral_constant<bool, is_reverse_scan()>{}
+		);
 	}
 
 	template <BBObject::scan_types ScanType>
 	inline
-	int BBScanViewT<ScanType>::init_scan(int firstBit) noexcept {
+	void BBScanViewT<ScanType>::init_scan(int firstBit) noexcept {
 
 		if (firstBit == BBObject::noBit) {
-			return init_scan();
+			init_scan();
+			return;
 		}
-		if (firstBit < 0 || firstBit >= bitset_.num_blocks() * WORD_SIZE) {
-			set_scan_block(BBObject::noBit);
-			set_scan_bit(MASK_LIM);
-			return -1;
+						
+		if (firstBit < 0 || 
+			static_cast<std::size_t>(firstBit) >= bitset_.size()) {
+			scan_initialization_error();
 		}
 
 		set_scan_block(WDIV(firstBit));
 		set_scan_bit(WMOD(firstBit));
-
-		return 0;
 	}
 
 	
