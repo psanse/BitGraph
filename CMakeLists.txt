@@ -23,6 +23,7 @@ set(LIB_PATCH_VERS "3")
 project(${LIBNAME} 
     VERSION  ${LIB_MAJOR_VERS}.${LIB_MINOR_VERS}.${LIB_PATCH_VERS}
 	LANGUAGES CXX C	)
+	
 
 #################
 # Introduce variables for export:
@@ -34,19 +35,64 @@ include(GNUInstallDirs)
 #################
 # UNIT TESTS (using googletest) 
 
-#Tests and examples are not built by default in Projects which embed BitGraph
-if(CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)	
-	#Root dir - BitGraph project, build tests									
-	SET(BUILD_TESTS ON CACHE BOOL "builds tests for BitGraph (uses googletest)" FORCE)
-	SET(BUILD_EXAMPLES ON CACHE BOOL "builds examples for BitGraph " FORCE)
-	#SET(INSTALL_BITGRAPH ON CACHE BOOL "installs BitGraph if required" FORCE)
-
+# Tests and examples are enabled by default only when BitGraph is the
+# top-level project.
+if(CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
+    set(BITGRAPH_STANDALONE ON)
 else()
-	#not Root dir - Project embedding BitGraph, building tests / examples and installing BitGraph is not enabled
-	SET(BUILD_TESTS OFF CACHE BOOL "builds tests for BitGraph (uses googletest)" FORCE)
-	SET(BUILD_EXAMPLES OFF CACHE BOOL "builds examples for BitGraph " FORCE)
-	#SET(INSTALL_BITGRAPH OFF CACHE BOOL "installs BitGraph if required" FORCE)
+    set(BITGRAPH_STANDALONE OFF)
 endif()
+
+option(
+    BUILD_TESTING
+    "Build BitGraph tests"
+    ${BITGRAPH_STANDALONE}
+)
+
+option(
+    BUILD_EXAMPLES
+    "Build BitGraph examples"
+    ${BITGRAPH_STANDALONE}
+)
+
+
+# Defines BUILD_TESTING, when not already defined, and calls
+# enable_testing() when (standard) BUILD_TESTING is enabled.
+
+if(BUILD_TESTING)
+    enable_testing()
+
+    include(FetchContent)
+
+    set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+    set(BUILD_GMOCK OFF CACHE BOOL "" FORCE)
+    set(INSTALL_GTEST OFF CACHE BOOL "" FORCE)
+
+    FetchContent_Declare(
+        googletest
+        URL https://github.com/google/googletest/archive/refs/tags/v1.14.0.zip
+        DOWNLOAD_EXTRACT_TIMESTAMP TRUE
+    )
+
+    FetchContent_MakeAvailable(googletest)
+
+    message(STATUS "Building tests with GoogleTest framework")
+endif()
+
+
+# if(CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)	
+	# #Root dir - BitGraph project, build tests									
+	# SET(BUILD_TESTS ON CACHE BOOL "builds tests for BitGraph (uses googletest)" FORCE)
+	# SET(BUILD_EXAMPLES ON CACHE BOOL "builds examples for BitGraph " FORCE)
+	# #SET(INSTALL_BITGRAPH ON CACHE BOOL "installs BitGraph if required" FORCE)
+
+# else()
+	# #not Root dir - Project embedding BitGraph, building tests / examples and installing BitGraph is not enabled
+	# SET(BUILD_TESTS OFF CACHE BOOL "builds tests for BitGraph (uses googletest)" FORCE)
+	# SET(BUILD_EXAMPLES OFF CACHE BOOL "builds examples for BitGraph " FORCE)
+	# #SET(INSTALL_BITGRAPH OFF CACHE BOOL "installs BitGraph if required" FORCE)
+# endif()
+
 
 ###################
 # INSTALL BitGraph (find_package, config mode)
@@ -68,6 +114,7 @@ if (APPLE)
     set(CMAKE_PREFIX_PATH "/usr/local/homebrew")
     #add_compile_options(-arch arm64)
 endif (APPLE)
+
 
 ####################
 # Subdirectories 

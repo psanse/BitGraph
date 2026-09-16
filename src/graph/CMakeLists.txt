@@ -49,8 +49,11 @@ endif()
 ###################
 # UNIT TESTS for GRAPH lib
 ###################
-#option(graph_build_tests "Build graph tests." ON)
-if (BUILD_TESTS)
+
+# Per-target option to enable building unit tests for the graph lib
+option(GRAPH_BUILD_TESTS "Build bitscan tests." ON)
+
+if (BUILD_TESTING AND GRAPH_BUILD_TESTS )
 
     add_subdirectory(tests)
 

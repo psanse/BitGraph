@@ -88,16 +88,18 @@ foreach(ITEM ${DEPLOY_FILES_AND_DIRS})
  
 endif(INSTALL_BITGRAPH)
 
-
- 
-
 #############
 # UNIT TESTS for UTILS lib
 #############
-#option(utils_build_tests "Build utils tests." ON)
-if (BUILD_TESTS)
 
-	add_subdirectory(tests)
+# Per-target option to enable building unit tests for the graph lib
+option(UTILS_BUILD_TESTS "Build utilities tests." ON)
+
+if (BUILD_TESTING AND UTILS_BUILD_TESTS)
+
+    add_subdirectory(tests)
 
 endif()
+
+
 

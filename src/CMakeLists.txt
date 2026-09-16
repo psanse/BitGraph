@@ -57,30 +57,30 @@ if(WIN32)
   set(CMAKE_SHARED_LINKER_FLAGS "-Wl,--export-all-symbols")
 endif(WIN32)
 
-#################
-# Google tests 
+# #################
+# # Google tests 
 
-if (BUILD_TESTS)
-    include(FetchContent)
+# if (BUILD_TESTS)
+    # include(FetchContent)
 
-    FetchContent_Declare(
-        googletest
-        URL https://github.com/google/googletest/archive/refs/tags/release-1.12.1.zip
-    )
+    # FetchContent_Declare(
+        # googletest
+        # URL https://github.com/google/googletest/archive/refs/tags/release-1.12.1.zip
+    # )
 
-    set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)	
-	set(BUILD_GMOCK OFF CACHE BOOL "" FORCE)
-    FetchContent_MakeAvailable(googletest)
+    # set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)	
+	# set(BUILD_GMOCK OFF CACHE BOOL "" FORCE)
+    # FetchContent_MakeAvailable(googletest)
 	
-	#C++14 is required for googletest 
-	set(CMAKE_CXX_STANDARD 14)					
-	set(CMAKE_CXX_STANDARD_REQUIRED ON)		
+	# #C++14 is required for googletest 
+	# set(CMAKE_CXX_STANDARD 14)					
+	# set(CMAKE_CXX_STANDARD_REQUIRED ON)		
 	
-	#for tests to be run with make test or ctest
-	enable_testing()	
+	# #for tests to be run with make test or ctest
+	# enable_testing()	
 	
-	message(STATUS "Building tests with GoogleTest framework")
-endif(BUILD_TESTS)
+	# message(STATUS "Building tests with GoogleTest framework")
+# endif(BUILD_TESTS)
 
 #############
 # USEFUL PATHS (to be used inside the code)

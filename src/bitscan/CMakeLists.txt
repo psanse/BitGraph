@@ -86,21 +86,33 @@ option(BITSCAN_BUILD_TESTS "Build bitscan tests." ON)
 # If the project-wide BUILD_TESTS is enabled and the per-target option is ON,
 # prepare GoogleTest and add the tests subdirectory. Use FetchContent so tests
 # can be built even when google test is not installed on the system.
-if (BUILD_TESTS AND BITSCAN_BUILD_TESTS)
+if (BUILD_TESTING AND BITSCAN_BUILD_TESTS)
 
-    include(FetchContent)
-    FetchContent_Declare(
-        googletest
-        GIT_REPOSITORY https://github.com/google/googletest.git
-        GIT_TAG release-1.14.0
-    )
-    # Prevent GoogleTest from overriding our compiler options
-    set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
-    FetchContent_MakeAvailable(googletest)
-
-    enable_testing()
+    # include(FetchContent)
+	
+	# if(NOT TARGET GTest::gtest)
+    # FetchContent_Declare(
+        # googletest
+        # GIT_REPOSITORY https://github.com/google/googletest.git
+        # GIT_TAG release-1.14.0
+    # )
+    # # Prevent GoogleTest from overriding our compiler options
+    # set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+    # FetchContent_MakeAvailable(googletest)
+	# endif()
+ 
     add_subdirectory(tests)
 
 endif()
 
+
+###################
+# EXAMPLES for BITSCAN lib  
+###################
+# Per-target option to enable building examples for the bitscan target
+option(BITSCAN_BUILD_EXAMPLES "Build bitscan examples." ON)
+
+if(BUILD_EXAMPLES AND BITSCAN_BUILD_EXAMPLES)
+    add_subdirectory(examples)
+endif()
 
