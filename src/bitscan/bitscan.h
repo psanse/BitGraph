@@ -68,7 +68,7 @@ namespace bitgraph {
 
 
 /////////////////////////
-// Examples of usage:
+// Examples of API usage:
 
 //bitgraph::bitarray candidates(numVertices);
 //
