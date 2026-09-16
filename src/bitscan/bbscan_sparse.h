@@ -11,6 +11,7 @@
 #ifndef __BBSCAN_SPARSE_H__
 #define __BBSCAN_SPARSE_H__
 
+#include "detail/persistent_scan.h"
 #include "bitscan/bbset_sparse.h"
 #include "bbexcep_hand.h"
 #include <cassert>
@@ -30,22 +31,25 @@ namespace bitgraph {
 
 	public:
 
-		template <class U>
-		friend struct BBObject::Scan;
-		template <class U>
-		friend struct BBObject::ScanDest;
-		template <class U>
-		friend struct BBObject::ScanRev;
-		template <class U>
-		friend struct BBObject::ScanDestRev;
+		template<class>
+		friend class detail::PersistentScan;
+
+		template<class>
+		friend class detail::PersistentScanReverse;
+
+		template<class>
+		friend class detail::PersistentScanDestructive;
+
+		template<class>
+		friend class detail::PersistentScanDestructiveReverse;
 
 	public:
 
 		//aliases for bitscanning 
-		using scan   = typename BBObject::Scan<BBScanSp>;
-		using scanR  = typename BBObject::ScanRev<BBScanSp>;
-		using scanD  = typename BBObject::ScanDest<BBScanSp>;
-		using scanDR = typename BBObject::ScanDestRev<BBScanSp>;			
+		using scan = detail::PersistentScan<BBScanSp>;
+		using scanR = detail::PersistentScanReverse<BBScanSp>;
+		using scanD = detail::PersistentScanDestructive<BBScanSp>;
+		using scanDR = detail::PersistentScanDestructiveReverse<BBScanSp>;
 
 		//////////////////////////////
 		//construction / destruction

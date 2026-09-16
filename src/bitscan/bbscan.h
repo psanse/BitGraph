@@ -14,6 +14,7 @@
 #ifndef _BITGRAPH_BBSCAN_H_
 #define _BITGRAPH_BBSCAN_H_
 
+#include "detail/persistent_scan.h"
 #include "bbset.h"	
 #include <cassert>
 #include <type_traits>
@@ -42,14 +43,18 @@ namespace bitgraph{
 
 		class BBScan : public Bitset {
 
-			template <class U>
-			friend struct BBObject::Scan;
-			template <class U>
-			friend struct BBObject::ScanDest;
-			template <class U>
-			friend struct BBObject::ScanRev;
-			template <class U>
-			friend struct BBObject::ScanDestRev;
+			template<class>
+			friend class detail::PersistentScan;
+
+			template<class>
+			friend class detail::PersistentScanReverse;
+
+			template<class>
+			friend class detail::PersistentScanDestructive;
+
+			template<class>
+			friend class detail::PersistentScanDestructiveReverse;
+	
 
 		public :
 	
@@ -57,10 +62,11 @@ namespace bitgraph{
 			* @brief Punblic Hot-path scanners using the persistent cursor owned by BBScan.
 			* @details Only one scanner may be active on a given BBScan object at a time.
 			*/
-			using scan = typename BBObject::Scan<BBScan>;
-			using scanR = typename BBObject::ScanRev<BBScan>;
-			using scanD = typename BBObject::ScanDest<BBScan>;
-			using scanDR = typename BBObject::ScanDestRev<BBScan>;
+
+			using scan = detail::PersistentScan<BBScan>;
+			using scanR = detail::PersistentScanReverse<BBScan>;
+			using scanD = detail::PersistentScanDestructive<BBScan>;
+			using scanDR = detail::PersistentScanDestructiveReverse<BBScan>;
 
 			// for basic bitscanning operatins - they are hidden by next_bit()
 			using Bitset::next_bit;				

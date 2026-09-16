@@ -3,7 +3,11 @@
 #headers for BITSCAN lib
 #########################
 
-file(GLOB HEADER_FILES  ${CMAKE_CURRENT_SOURCE_DIR}/*.h)
+file(GLOB HEADER_FILES
+    CONFIGURE_DEPENDS
+    "${CMAKE_CURRENT_SOURCE_DIR}/*.h"
+    "${CMAKE_CURRENT_SOURCE_DIR}/details/*.h"
+)
 
 ###################
 #creates BITSCAN lib
