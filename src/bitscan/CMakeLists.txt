@@ -6,7 +6,7 @@
 file(GLOB HEADER_FILES
     CONFIGURE_DEPENDS
     "${CMAKE_CURRENT_SOURCE_DIR}/*.h"
-    "${CMAKE_CURRENT_SOURCE_DIR}/details/*.h"
+    "${CMAKE_CURRENT_SOURCE_DIR}/detail/*.h"
 )
 
 ###################
