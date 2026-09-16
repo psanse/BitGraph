@@ -78,24 +78,7 @@ namespace bitgraph{
 			 *          BBObject::noBit violates the precondition.
 			 */
 			int next_bit();
-
-			/**
-			 * @brief Returns the next set bit while scanning in reverse order.
-			 *
-			 * Searches for the next set bit in decreasing bit-position order. For a
-			 * destructive scan, the returned bit is also cleared from the referenced
-			 * bitset.
-			 *
-			 * @pre The scan has been initialized and has not already been exhausted.
-			 *
-			 * @return The position of the next set bit, or BBObject::noBit if this call
-			 *         reaches the end of the scan.
-			 *
-			 * @warning After this function returns BBObject::noBit, it must not be called
-			 *          again until the scan has been reinitialized.
-			 */
-			int prev_bit();
-
+			
 		private:
 			
 			static constexpr bool is_reverse_scan() noexcept {
@@ -114,10 +97,23 @@ namespace bitgraph{
 			int prev_bit_impl();
 			int prev_bit_destructive_impl();
 
-			int next_bit_dispatch(std::true_type) { return next_bit_destructive_impl(); }
+			// Forward, non-destructive
+			int next_bit_dispatch(std::false_type, std::false_type)	{	return next_bit_impl();			}
+
+			// Forward, destructive
+			int next_bit_dispatch(std::false_type, std::true_type) 	{	return next_bit_destructive_impl(); }
+
+			// Reverse, non-destructive
+			int next_bit_dispatch(std::true_type, std::false_type) 	{	return prev_bit_impl();		}
+
+			// Reverse, destructive
+			int next_bit_dispatch(std::true_type, std::true_type)	{	return prev_bit_destructive_impl();	}
+
+
+			/*int next_bit_dispatch(std::true_type) { return next_bit_destructive_impl(); }
 			int next_bit_dispatch(std::false_type) { return next_bit_impl(); }
 			int prev_bit_dispatch(std::true_type) { return prev_bit_destructive_impl(); }
-			int prev_bit_dispatch(std::false_type) { return prev_bit_impl(); }
+			int prev_bit_dispatch(std::false_type) { return prev_bit_impl(); }*/
 
 			void init_scan_dispatch(std::true_type) noexcept {
 				set_scan_block(bitset_.num_blocks() - 1);
@@ -163,7 +159,7 @@ namespace bitgraph{
 			using Reverse =
 				BBScanViewT<BBObject::NON_DESTRUCTIVE_REVERSE>;
 
-			using Destructive =
+			using DestructiveForward =
 				BBScanViewT<BBObject::DESTRUCTIVE>;
 
 			using DestructiveReverse =

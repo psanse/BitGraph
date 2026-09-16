@@ -2,18 +2,19 @@
  * @file independent_views.cpp
  * @brief Demonstrates independent scan views over the same bitarray.
  *
- * Unlike persistent scanners, each scan view owns its cursor. Multiple
- * non-destructive views can therefore traverse the same bitarray
- * independently and simultaneously.
+ * Each scan view owns its cursor instead of using the persistent cursor stored
+ * in the bitarray. Multiple non-destructive views can therefore traverse the
+ * same bitarray independently and simultaneously.
  *
- * The forward view traverses set bits using next_bit(), whereas the reverse
- * view traverses them using prev_bit().
+ * The view type determines the traversal direction. All views expose the same
+ * next_bit() operation: a Forward view returns bits in increasing position
+ * order, whereas a Reverse view returns them in decreasing position order.
  *
- * @note The referenced bitarray must remain valid throughout the lifetime
- *       of every view.
+ * @note The referenced bitarray must remain valid throughout the lifetime of
+ *       every view.
  *
- * @warning Destructive views modify the referenced bitarray and should not
- *          overlap with other views operating on the same bitarray.
+ * @warning Destructive views modify the referenced bitarray and must not
+ *          overlap with another view accessing the same bitarray.
  */
 
 #include <iostream>
@@ -35,10 +36,11 @@ int main()
     bits.set_bit(129);
 
     /*
-     * Create two views over the same bitarray.
+     * Create forward and reverse views over the same bitarray.
      *
-     * Each view owns an independent cursor, so advancing one view does not
-     * change the position of the other.
+     * Each view owns an independent cursor, so advancing one view does not change
+     * the position of the other. Both views expose next_bit(); the view type
+     * determines the traversal direction.
      */
 
     bitgraph::view::scan forward(bits);
@@ -50,7 +52,7 @@ int main()
     std::cout << "Interleaved independent scans:\n";
 
     int forwardBit = forward.next_bit();
-    int reverseBit = reverse.prev_bit();
+    int reverseBit = reverse.next_bit();
 
     while (forwardBit != bitarray::noBit ||
         reverseBit != bitarray::noBit) {
@@ -62,13 +64,14 @@ int main()
 
         if (reverseBit != bitarray::noBit) {
             std::cout << "  reverse: " << reverseBit << '\n';
-            reverseBit = reverse.prev_bit();
+            reverseBit = reverse.next_bit();
         }
     }
 
     /*
-     * Reinitialize the views to perform complete scans independently.
-     */
+    * Reinitialize both views and perform complete scans. Reinitializing a view
+    * resets only its own cursor.
+    */
 
     std::cout << "\nComplete forward view: ";
 
@@ -86,9 +89,9 @@ int main()
 
     reverse.init_scan();
 
-    for (int bit = reverse.prev_bit();
+    for (int bit = reverse.next_bit();
         bit != bitarray::noBit;
-        bit = reverse.prev_bit()) {
+        bit = reverse.next_bit()) {
         std::cout << bit << ' ';
     }
 

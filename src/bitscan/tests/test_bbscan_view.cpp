@@ -47,7 +47,7 @@ TEST_F(BBScanViewTest, template_destructive_reverse_scan) {
 	std::set<int> result;
 
 	scan.init_scan();
-	for (int bit = scan.prev_bit(); bit != BBObject::noBit; bit = scan.prev_bit()) {
+	for (int bit = scan.next_bit(); bit != BBObject::noBit; bit = scan.next_bit()) {
 		result.insert(bit);
 	}
 
@@ -60,7 +60,7 @@ TEST_F(BBScanViewTest, template_scan_honors_start) {
 	std::vector<int> result;
 
 	scan.init_scan(200);
-	for (int bit = scan.prev_bit(); bit != BBObject::noBit; bit = scan.prev_bit()) {
+	for (int bit = scan.next_bit(); bit != BBObject::noBit; bit = scan.next_bit()) {
 		result.push_back(bit);
 	}
 
@@ -70,7 +70,7 @@ TEST_F(BBScanViewTest, template_scan_honors_start) {
 
 TEST(BBScanViewTemplateTest, template_scan_rejects_invalid_start) {
 	Bitset bits(128, {1, 63, 64, 90});
-	view::Destructive scan(bits);
+	view::DestructiveForward scan(bits);
 
 	EXPECT_DEATH(scan.init_scan(-2), "");
 	EXPECT_DEATH(scan.init_scan(static_cast<int>(bits.size())), "");

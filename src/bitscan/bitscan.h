@@ -60,7 +60,7 @@ namespace bitgraph {
 
 		using scan = bitgraph::view::Forward;
 		using scanR = bitgraph::view::Reverse;
-		using scanD = bitgraph::view::Destructive;
+		using scanD = bitgraph::view::DestructiveForward;
 		using scanDR = bitgraph::view::DestructiveReverse;	
 
 	} // namespace view

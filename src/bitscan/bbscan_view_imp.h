@@ -109,20 +109,10 @@ namespace bitgraph {
 
 		assert(has_valid_cursor());
 
-		return this->next_bit_dispatch(
+		return next_bit_dispatch(
+			std::integral_constant<bool, is_reverse_scan()>{},
 			std::integral_constant<bool, is_destructive_scan()>{}
-		);
-	}
-
-	template <BBObject::scan_types ScanType>
-	inline
-	int BBScanViewT<ScanType>::prev_bit() {
-
-		assert(has_valid_cursor());
-
-		return this->prev_bit_dispatch(
-			std::integral_constant<bool, is_destructive_scan()>{}
-		);
+		);		
 	}
 
 	template <BBObject::scan_types ScanType>
