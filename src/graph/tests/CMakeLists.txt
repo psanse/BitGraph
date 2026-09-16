@@ -2,6 +2,13 @@
 # GRAPH lib - Example targets
 ###################
 
+set(
+    PATH_GRAPH_TESTS
+    "${CMAKE_CURRENT_SOURCE_DIR}/../data"
+    CACHE PATH
+    "Path to GRAPH unit-test data"
+)
+
 add_executable (test_graph 
 
  # gtest_main.cpp
@@ -29,8 +36,13 @@ add_executable (test_graph
 #  TESTS TO BE CHECKED
 #   test_kcore.cpp                   # to fix (02/02/2026)
 #  tests/test_graph_sort.cpp        # deprecated class
+ 
+)
 
-  #   test_func.cpp
+
+target_compile_definitions(test_graph
+    PRIVATE
+        PATH_GRAPH_TESTS_CMAKE_SRC_CODE="${PATH_GRAPH_TESTS}/"
 )
 
 set_target_properties(test_graph 

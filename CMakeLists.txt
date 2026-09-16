@@ -32,6 +32,10 @@ project(${LIBNAME}
 # * CMAKE_INSTALL_INCLUDEDIR	#include
 include(GNUInstallDirs)
 
+list(APPEND CMAKE_MODULE_PATH
+    "${PROJECT_SOURCE_DIR}/cmake"
+)
+
 #################
 # UNIT TESTS (using googletest) 
 

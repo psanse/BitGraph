@@ -41,6 +41,10 @@ target_include_directories(bitscan PUBLIC
   $<INSTALL_INTERFACE:${include_install_dir}>    # <prefix>/include/<PROJECT_NAME>
 )
 
+target_compile_features(bitscan
+    PUBLIC cxx_std_14
+)
+
 # Enable compiler warnings.
 if (MSVC)
     # not enabled because this is not a tested target
