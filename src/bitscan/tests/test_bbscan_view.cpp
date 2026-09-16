@@ -30,7 +30,7 @@ protected:
 
 
 TEST_F(BBScanViewTest, template_non_destructive_forward_scan) {
-	BBScanForward scan(bitset);
+	view::Forward scan(bitset);
 	std::set<int> result;
 
 	scan.init_scan();
@@ -43,7 +43,7 @@ TEST_F(BBScanViewTest, template_non_destructive_forward_scan) {
 }
 
 TEST_F(BBScanViewTest, template_destructive_reverse_scan) {
-	BBScanDestructiveReverse scan(bitset);
+	view::DestructiveReverse scan(bitset);
 	std::set<int> result;
 
 	scan.init_scan();
@@ -56,7 +56,7 @@ TEST_F(BBScanViewTest, template_destructive_reverse_scan) {
 }
 
 TEST_F(BBScanViewTest, template_scan_honors_start) {
-	BBScanReverse scan(bitset);
+	view::Reverse scan(bitset);
 	std::vector<int> result;
 
 	scan.init_scan(200);
@@ -70,7 +70,7 @@ TEST_F(BBScanViewTest, template_scan_honors_start) {
 
 TEST(BBScanViewTemplateTest, template_scan_rejects_invalid_start) {
 	Bitset bits(128, {1, 63, 64, 90});
-	BBScanDestructive scan(bits);
+	view::Destructive scan(bits);
 
 	EXPECT_DEATH(scan.init_scan(-2), "");
 	EXPECT_DEATH(scan.init_scan(static_cast<int>(bits.size())), "");

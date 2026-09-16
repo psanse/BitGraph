@@ -41,7 +41,6 @@ namespace bitgraph{
 		*/
 
 		class BBScan : public Bitset {
-		public :
 
 			template <class U>
 			friend struct BBObject::Scan;
@@ -51,9 +50,13 @@ namespace bitgraph{
 			friend struct BBObject::ScanRev;
 			template <class U>
 			friend struct BBObject::ScanDestRev;
-					
 
-			//aliases for bitscanning 
+		public :
+	
+			/**
+			* @brief Punblic Hot-path scanners using the persistent cursor owned by BBScan.
+			* @details Only one scanner may be active on a given BBScan object at a time.
+			*/
 			using scan = typename BBObject::Scan<BBScan>;
 			using scanR = typename BBObject::ScanRev<BBScan>;
 			using scanD = typename BBObject::ScanDest<BBScan>;

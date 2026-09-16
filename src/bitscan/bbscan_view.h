@@ -156,18 +156,19 @@ namespace bitgraph{
 
 
 		// Convenient aliases for the supported scanning modes
+		namespace view {
+			using Forward =
+				BBScanViewT<BBObject::NON_DESTRUCTIVE>;
 
-		using BBScanForward =
-			BBScanViewT<BBObject::NON_DESTRUCTIVE>;
+			using Reverse =
+				BBScanViewT<BBObject::NON_DESTRUCTIVE_REVERSE>;
 
-		using BBScanReverse =
-			BBScanViewT<BBObject::NON_DESTRUCTIVE_REVERSE>;
+			using Destructive =
+				BBScanViewT<BBObject::DESTRUCTIVE>;
 
-		using BBScanDestructive =
-			BBScanViewT<BBObject::DESTRUCTIVE>;
-
-		using BBScanDestructiveReverse =
-			BBScanViewT<BBObject::DESTRUCTIVE_REVERSE>;
+			using DestructiveReverse =
+				BBScanViewT<BBObject::DESTRUCTIVE_REVERSE>;
+		}
 
 
 } //namespace bitgraph
