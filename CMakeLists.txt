@@ -1,15 +1,10 @@
-cmake_minimum_required (VERSION 2.8...3.14)  	
+#cmake_minimum_required (VERSION 2.8...3.14)  	
+cmake_minimum_required (VERSION 3.14)  
 
-if(${CMAKE_VERSION} VERSION_GREATER "3.24.0") 
-   cmake_policy(SET CMP0135 NEW) 
+# Use extraction-time timestamps for downloaded archives when supported.
+if(POLICY CMP0135)
+    cmake_policy(SET CMP0135 NEW)
 endif()
-	
-set(CMAKE_INSTALL_PREFIX ${CMAKE_SOURCE_DIR}/install CACHE PATH "prefix directory to install BitGraph - default set to a local dir in the package which includes a linking example")	
-
-#C++14 required for BitGraph and googletest
-set(CMAKE_CXX_STANDARD 14)					
-set(CMAKE_CXX_STANDARD_REQUIRED ON)		
-set(CMAKE_CXX_EXTENSIONS OFF)
 
 ############
 # project 
@@ -20,24 +15,58 @@ set(LIB_MAJOR_VERS "1")
 set(LIB_MINOR_VERS "4")
 set(LIB_PATCH_VERS "3")
 
-project(${LIBNAME} 
+project(
+    ${LIBNAME} 
     VERSION  ${LIB_MAJOR_VERS}.${LIB_MINOR_VERS}.${LIB_PATCH_VERS}
-	LANGUAGES CXX C	)
-	
+	LANGUAGES CXX C	
+)
+
+
+#C++14 required for BitGraph and googletest
+set(CMAKE_CXX_STANDARD 14)					
+set(CMAKE_CXX_STANDARD_REQUIRED ON)		
+set(CMAKE_CXX_EXTENSIONS OFF)
+
+
+#################
+# Installation directories
+#################
+
+# Use a local installation directory only when BitGraph is the top-level
+# project and the user has not explicitly selected another install prefix.
+if(CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR
+   AND CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
+    set(
+        CMAKE_INSTALL_PREFIX
+        "${CMAKE_SOURCE_DIR}/install"
+        CACHE PATH
+        "Prefix directory for installing BitGraph"
+        FORCE
+    )
+endif()
+
+
+# Defines:
+# - CMAKE_INSTALL_LIBDIR        #lib
+# - CMAKE_INSTALL_BINDIR        #bin
+# - CMAKE_INSTALL_INCLUDEDIR    #include
+include(GNUInstallDirs)
+
 
 #################
 # Introduce variables for export:
 # * CMAKE_INSTALL_LIBDIR		#lib
 # * CMAKE_INSTALL_BINDIR		#bin
 # * CMAKE_INSTALL_INCLUDEDIR	#include
-include(GNUInstallDirs)
+#include(GNUInstallDirs)
 
 list(APPEND CMAKE_MODULE_PATH
     "${PROJECT_SOURCE_DIR}/cmake"
 )
 
 #################
-# UNIT TESTS (using googletest) 
+# Standalone build
+#################
 
 # Tests and examples are enabled by default only when BitGraph is the
 # top-level project.
@@ -59,9 +88,15 @@ option(
     ${BITGRAPH_STANDALONE}
 )
 
+#################
+# GoogleTest
+#################
 
-# Defines BUILD_TESTING, when not already defined, and calls
-# enable_testing() when (standard) BUILD_TESTING is enabled.
+option(
+    INSTALL_GTEST
+    "Install GoogleTest with BitGraph"
+    OFF
+)
 
 if(BUILD_TESTING)
     enable_testing()
@@ -84,40 +119,50 @@ if(BUILD_TESTING)
 endif()
 
 
-# if(CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)	
-	# #Root dir - BitGraph project, build tests									
-	# SET(BUILD_TESTS ON CACHE BOOL "builds tests for BitGraph (uses googletest)" FORCE)
-	# SET(BUILD_EXAMPLES ON CACHE BOOL "builds examples for BitGraph " FORCE)
-	# #SET(INSTALL_BITGRAPH ON CACHE BOOL "installs BitGraph if required" FORCE)
+#################
+# BitGraph installation (find_package, config mode)
+#################
 
-# else()
-	# #not Root dir - Project embedding BitGraph, building tests / examples and installing BitGraph is not enabled
-	# SET(BUILD_TESTS OFF CACHE BOOL "builds tests for BitGraph (uses googletest)" FORCE)
-	# SET(BUILD_EXAMPLES OFF CACHE BOOL "builds examples for BitGraph " FORCE)
-	# #SET(INSTALL_BITGRAPH OFF CACHE BOOL "installs BitGraph if required" FORCE)
-# endif()
+option(
+    INSTALL_BITGRAPH 
+    "Enable installation of BitGraph. (Projects embedding BitGraph may want to turn this OFF.)"
+    ${BITGRAPH_STANDALONE}
+)
 
 
-###################
-# INSTALL BitGraph (find_package, config mode)
-option(INSTALL_BITGRAPH "Enable installation of BitGraph. (Projects embedding BitGraph may want to turn this OFF.)" ON)
+#################
+# OpenMP
+#################
 
-###################
-# INSTALL googletest - default off
-option(INSTALL_GTEST "Enable installation of googletest (disabled by default)" OFF)
+option(
+    INCLUDE_OPENMP 
+    "Makes OpenMP available (only for Windows platforms)" 
+    OFF
+)
 
-#############
-# OpenMP (Windows)
-option(INCLUDE_OPENMP "Makes OpenMP available (only for Windows platforms)" OFF)
+#################
+# Apple configuration
+#################
 
-#############
-# APPLE options  - extend to other SO
-if (APPLE)
-    set(CMAKE_OSX_ARCHITECTURES "x86_64;arm64" CACHE STRING "Set architectures for Apple platforms (x86_64;arm64)" FORCE)
-	set(CMAKE_OSX_DEPLOYMENT_TARGET "10.15" CACHE STRING "Set minimum deployment target for Apple platforms (10.15)" FORCE)
-    set(CMAKE_PREFIX_PATH "/usr/local/homebrew")
-    #add_compile_options(-arch arm64)
-endif (APPLE)
+if(APPLE)
+    set(
+        CMAKE_OSX_ARCHITECTURES
+        "x86_64;arm64"
+        CACHE STRING
+        "Architectures for Apple platforms"
+    )
+
+    set(
+        CMAKE_OSX_DEPLOYMENT_TARGET
+        "10.15"
+        CACHE STRING
+        "Minimum macOS deployment target"
+    )
+
+    list(APPEND CMAKE_PREFIX_PATH
+        "/usr/local/homebrew"
+    )
+endif()
 
 
 ####################
