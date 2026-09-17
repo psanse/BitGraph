@@ -2,39 +2,45 @@
 # BITSCAN lib - Unit test targets
 ###################
 
-add_executable (test_bitscan 
+add_executable(
+    test_bitscan
 
-	#gtest_main.cc 
-  
-    #TESTS TO CHECK (26/02/2025)   
-    #test_algorithms.cpp   
-    #test_example.cpp   
-    #test_bbsentinel.cpp 
-	
-
-    #TESTS CHECKED (26/02/2025)
+    # Tests checked on 26/02/2025.
     test_bitblock.cpp
-    test_masks.cpp 
-    test_bbscan_nested.cpp 
-    test_bbscan.cpp 
-    test_bitset.cpp 
-    test_bbscan_sparse.cpp 
+    test_masks.cpp
+    test_bbscan_nested.cpp
+    test_bbscan.cpp
+    test_bitset.cpp
+    test_bbscan_sparse.cpp
     test_bitset_sparse.cpp
-    test_bbscan_sparse_nested.cpp 
-    test_bbscan_view.cpp  
+    test_bbscan_sparse_nested.cpp
+    test_bbscan_view.cpp
 
+    # Tests to be checked:
+    # test_algorithms.cpp
+    # test_example.cpp
+    # test_bbsentinel.cpp
 )
 
-set_target_properties(test_bitscan PROPERTIES
-  
-    #ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
-    #LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
-    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin/tests"
+set_target_properties(
+    test_bitscan
+    PROPERTIES
+        RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin/tests"
 )
 
-#target_include_directories (test_bitscan PRIVATE ../googletest/include/)
+target_link_libraries(
+    test_bitscan
+    PRIVATE
+        bitscan
+        GTest::gtest_main
+)
 
-target_link_libraries (test_bitscan LINK_PRIVATE bitscan gtest_main utils)
+
+# Register each GoogleTest case individually with CTest and Visual Studio
+# Test Explorer.
+include(GoogleTest)
+gtest_discover_tests(test_bitscan)
+
 
 
 

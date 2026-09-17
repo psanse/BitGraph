@@ -295,6 +295,10 @@ namespace bitgraph {
 		* @details: recommended for consumer code
 		**/
 		std::size_t size() const noexcept { return vBB_.size(); }
+		std::size_t bit_capacity() const noexcept {
+			return static_cast<std::size_t>(num_blocks()) * WORD_SIZE;
+		}
+
 
 		DenseBlockVec& bitset()  noexcept { return vBB_; }
 		const DenseBlockVec& bitset() const  noexcept { return vBB_; }

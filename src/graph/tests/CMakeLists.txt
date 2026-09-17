@@ -2,26 +2,14 @@
 # GRAPH lib - Example targets
 ###################
 
-set(
-    PATH_GRAPH_TESTS
-    "${CMAKE_CURRENT_SOURCE_DIR}/../data"
-    CACHE PATH
-    "Path to GRAPH unit-test data"
-)
+add_executable (
+  test_graph 
 
-add_executable (test_graph 
-
- # gtest_main.cpp
-  
-
-#  TESTS CHECKED  (last 29/11/2025)
- 
+  # TESTS CHECKED  (last 29/11/2025)
   test_func.cpp
   test_graph.cpp
   test_ugraph.cpp
   test_wgraph.cpp
-  test_wegraph.cpp
-  test_sparse_graph.cpp 
   test_wegraph.cpp
   test_graph_fast_sort.cpp
   test_graph_fast_sort_weighted.cpp
@@ -33,29 +21,35 @@ add_executable (test_graph
   test_clq_func.cpp
   test_graph_map.cpp 
 
-#  TESTS TO BE CHECKED
-#   test_kcore.cpp                   # to fix (02/02/2026)
-#  tests/test_graph_sort.cpp        # deprecated class
- 
+  # Tests to be checked:
+  # test_kcore.cpp             # to fix (02/02/2026)
+  # test_graph_sort.cpp        # deprecated class 
 )
 
-
-target_compile_definitions(test_graph
+target_compile_definitions(
+    test_graph
     PRIVATE
-        PATH_GRAPH_TESTS_CMAKE_SRC_CODE="${PATH_GRAPH_TESTS}/"
+        PATH_GRAPH_TESTS_CMAKE_SRC_CODE="${GRAPH_TEST_DATA_DIR}/"
 )
 
-set_target_properties(test_graph 
+set_target_properties(
+    test_graph
     PROPERTIES
-    #ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
-    #LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
-    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin/tests"
-   
+        RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin/tests"
 )
 
-#target_include_directories (test_graph PUBLIC ../googletest/include/)
+target_link_libraries(
+    test_graph
+    PRIVATE
+        graph
+        GTest::gtest_main
+)
 
-target_link_libraries (test_graph LINK_PUBLIC graph bitscan utils gtest_main)
+# Register each GoogleTest case individually with CTest and Visual Studio
+# Test Explorer.
+include(GoogleTest)
+gtest_discover_tests(test_graph)
+
 
 
 

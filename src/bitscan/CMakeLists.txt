@@ -1,4 +1,3 @@
-
 #########################
 #headers for BITSCAN lib
 #########################
@@ -12,7 +11,9 @@ file(GLOB HEADER_FILES
 ###################
 #creates BITSCAN lib
 ###################
-add_library (bitscan STATIC
+
+add_library (
+    bitscan STATIC
     bbsentinel.cpp 
     bitblock.cpp 
     bbset.cpp  
@@ -38,6 +39,16 @@ target_include_directories(bitscan PUBLIC
   $<INSTALL_INTERFACE:${include_install_dir}>    # <prefix>/include/<PROJECT_NAME>
 )
 
+# BITSCAN depends on UTILS. These dependencies are PUBLIC so their
+# usage requirements propagate correctly to BITSCAN consumers, although users
+# normally link against the umbrella BitGraph target.
+
+target_link_libraries(
+    bitscan
+    PUBLIC
+        utils
+)
+
 target_compile_features(bitscan
     PUBLIC cxx_std_14
 )
@@ -52,8 +63,7 @@ endif()
 
 #############
 # Install BITSCAN lib
-# BITSCAN lib header files are deployed manually
-# to preserve internal structure
+# (preserves internal structure)
 #############
 
 if(INSTALL_BITGRAPH)
@@ -111,19 +121,6 @@ option(BITSCAN_BUILD_TESTS "Build bitscan tests." ON)
 # can be built even when google test is not installed on the system.
 if (BUILD_TESTING AND BITSCAN_BUILD_TESTS)
 
-    # include(FetchContent)
-	
-	# if(NOT TARGET GTest::gtest)
-    # FetchContent_Declare(
-        # googletest
-        # GIT_REPOSITORY https://github.com/google/googletest.git
-        # GIT_TAG release-1.14.0
-    # )
-    # # Prevent GoogleTest from overriding our compiler options
-    # set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
-    # FetchContent_MakeAvailable(googletest)
-	# endif()
- 
     add_subdirectory(tests)
 
 endif()
@@ -132,7 +129,11 @@ endif()
 # EXAMPLES for BITSCAN lib  
 ###################
 # Per-target option to enable building examples for the bitscan target
-option(BITSCAN_BUILD_EXAMPLES "Build bitscan examples." ON)
+option(
+    BITSCAN_BUILD_EXAMPLES
+    "Build bitscan examples."
+    ON
+)
 
 if(BUILD_EXAMPLES AND BITSCAN_BUILD_EXAMPLES)
     add_subdirectory(examples)

@@ -67,7 +67,8 @@ TEST_F(BBScanViewTest, template_non_destructive_forward_scan) {
  *       position order and clears them from the source bitset.
  */
 TEST_F(BBScanViewTest, template_destructive_reverse_scan) {
-	view::DestructiveReverse scan(bitset);
+	BBScan bitsetCopy(bitset);
+	view::DestructiveReverse scan(bitsetCopy);
 	std::vector<int> result;
 
 	scan.init_scan();
@@ -82,7 +83,7 @@ TEST_F(BBScanViewTest, template_destructive_reverse_scan) {
 	};
 
 	EXPECT_EQ(expected_order, result);
-	EXPECT_TRUE(bitset.is_empty());
+	EXPECT_TRUE(bitsetCopy.is_empty());
 }
 
 /**
@@ -94,8 +95,9 @@ TEST_F(BBScanViewTest, template_destructive_reverse_scan) {
  */
 TEST_F(BBScanViewTest, template_scan_honors_start) {
 	view::Reverse scan(bitset);
+	bitset.print();
 	std::vector<int> result;
-
+		
 	scan.init_scan(200);
 	for (int bit = scan.next_bit(); bit != BBObject::noBit; bit = scan.next_bit()) {
 		result.push_back(bit);
@@ -110,13 +112,13 @@ TEST_F(BBScanViewTest, template_scan_honors_start) {
  *       initial position is negative and differs from BBObject::noBit, or
  *       when it lies outside the bitset.
  */
-TEST(BBScanViewTest, template_scan_rejects_invalid_start) {
+TEST_F(BBScanViewTest, template_scan_rejects_invalid_start) {
 	BBScan bits(128, { 1, 63, 64, 90 });
-	view::DestructiveForward scan(bits);
+	view::Forward scan(bits);
 
 	EXPECT_DEATH(scan.init_scan(-2), "");
 	EXPECT_DEATH(
-		scan.init_scan(static_cast<int>(bits.size())),
+		scan.init_scan(static_cast<int>(bits.bit_capacity())),
 		""
 	);
 }

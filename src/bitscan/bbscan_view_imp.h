@@ -140,7 +140,7 @@ namespace bitgraph {
 		}
 						
 		if (firstBit < 0 || 
-			static_cast<std::size_t>(firstBit) >= bitset_.size()) {
+			static_cast<std::size_t>(firstBit) >= bitset_.bit_capacity()) {
 			scan_initialization_error();
 		}
 
