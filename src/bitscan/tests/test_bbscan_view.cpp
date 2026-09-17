@@ -52,8 +52,7 @@ protected:
 TEST_F(BBScanViewTest, template_non_destructive_forward_scan) {
 	view::Forward scan(bitset);
 	std::set<int> result;
-
-	scan.init_scan();
+		
 	for (int bit = scan.next_bit(); bit != BBObject::noBit; bit = scan.next_bit()) {
 		result.insert(bit);
 	}
@@ -70,8 +69,7 @@ TEST_F(BBScanViewTest, template_destructive_reverse_scan) {
 	BBScan bitsetCopy(bitset);
 	view::DestructiveReverse scan(bitsetCopy);
 	std::vector<int> result;
-
-	scan.init_scan();
+		
 	for (int bit = scan.next_bit();
 		bit != BBObject::noBit;
 		bit = scan.next_bit()) {
@@ -94,11 +92,9 @@ TEST_F(BBScanViewTest, template_destructive_reverse_scan) {
  * 150, 100, 50, 0; the set bit at position 200 is not returned.
  */
 TEST_F(BBScanViewTest, template_scan_honors_start) {
-	view::Reverse scan(bitset);
-	bitset.print();
+	view::Reverse scan(bitset, 200);		// init scan at 200
 	std::vector<int> result;
 		
-	scan.init_scan(200);
 	for (int bit = scan.next_bit(); bit != BBObject::noBit; bit = scan.next_bit()) {
 		result.push_back(bit);
 	}
@@ -130,10 +126,7 @@ TEST_F(BBScanViewTest, template_scan_rejects_invalid_start) {
 TEST_F(BBScanViewTest, views_have_independent_cursors) {
 	view::Forward forward(bitset);
 	view::Reverse reverse(bitset);
-
-	forward.init_scan();
-	reverse.init_scan();
-
+	
 	// Advance both views alternately.
 	EXPECT_EQ(0, forward.next_bit());
 	EXPECT_EQ(300, reverse.next_bit());
@@ -178,7 +171,6 @@ TEST(BBScanViewGenericTest, non_destructive_forward_scan_with_bitset) {
 	view::ForwardView<Bitset> scan(bits);
 	std::vector<int> result;
 
-	scan.init_scan();
 	for (int bit = scan.next_bit();
 		bit != BBObject::noBit;
 		bit = scan.next_bit()) {
@@ -203,7 +195,6 @@ TEST(BBScanViewGenericTest, non_destructive_reverse_scan_with_bitset) {
 	view::ReverseView<Bitset> scan(bits);
 	std::vector<int> result;
 
-	scan.init_scan();
 	for (int bit = scan.next_bit();
 		bit != BBObject::noBit;
 		bit = scan.next_bit()) {
@@ -228,7 +219,6 @@ TEST(BBScanViewGenericTest, destructive_forward_scan_with_bitset) {
 	view::DestructiveForwardView<Bitset> scan(bits);
 	std::vector<int> result;
 
-	scan.init_scan();
 	for (int bit = scan.next_bit();
 		bit != BBObject::noBit;
 		bit = scan.next_bit()) {
@@ -253,7 +243,6 @@ TEST(BBScanViewGenericTest, destructive_reverse_scan_with_bitset) {
 	view::DestructiveReverseView<Bitset> scan(bits);
 	std::vector<int> result;
 
-	scan.init_scan();
 	for (int bit = scan.next_bit();
 		bit != BBObject::noBit;
 		bit = scan.next_bit()) {

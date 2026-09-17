@@ -17,19 +17,27 @@
 namespace bitgraph{
 		
 		/**
-		 * @brief Compile-time-configurable view for scanning the set bits of a Bitset.
-		 *
-		 * The @p ScanType template parameter determines the traversal direction
-		 * and whether the scan is destructive. Fixing the scanning mode at compile
-		 * time avoids run-time dispatch.
-		 *
-		 * In destructive modes, visited bits are cleared from the referenced Bitset.
-		 *
-		 * @tparam ScanType Scanning mode, including direction and destructive behavior.
-		 *
-		 * @note The referenced Bitset must remain valid throughout the lifetime
-		 *       of this object.
-		 */
+		* @brief Compile-time-configurable view for scanning set bits.
+		*
+		* ScanType determines the traversal direction and whether scanning is
+		* destructive. Fixing the scanning mode at compile time eliminates per-bit
+		* run-time mode dispatch.
+		*
+		* Each view owns an independent cursor. Multiple non-destructive views may
+		* therefore scan the same bitset independently.
+		*
+		* In destructive modes, returned bits are cleared from the referenced bitset.
+		*
+		* @tparam BitsetT Bitset type supporting the scan-view interface.
+		* @tparam ScanType Scanning mode, including traversal direction and
+		*                   destructive behavior.
+		*
+		* @note The referenced bitset must remain valid throughout the lifetime of
+		*       the view.
+		*
+		* @warning Destructive views must not overlap with other scans accessing the
+		*          same bitset.
+		*/
 		template <class BitsetT, BBObject::scan_types ScanType = BBObject::NON_DESTRUCTIVE>
 		class BBScanViewT {
 
@@ -42,7 +50,7 @@ namespace bitgraph{
 				);
 
 		public:
-			explicit BBScanViewT(BitsetT& bitset) noexcept : bitset_(bitset) {}
+			explicit BBScanViewT(BitsetT& bitset, int firstBit = BBObject::noBit) noexcept : bitset_(bitset) { init_scan(firstBit); }
 			~BBScanViewT() = default;
 
 			/**
