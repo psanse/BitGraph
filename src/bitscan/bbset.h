@@ -22,6 +22,36 @@
 #include <vector>
 
 namespace bitgraph {
+
+	////////////////////////
+	// Forward declarations
+	////////////////////////
+	class Bitset;
+	
+	Bitset& AND(const Bitset& lhs, const Bitset& rhs, Bitset& res);
+	Bitset AND(Bitset lhs, const Bitset& rhs);
+	template<bool Erase>
+	Bitset& AND(int firstBit, int lastBit, const Bitset& lhs, const Bitset& rhs, Bitset& res);
+	Bitset& AND(int firstBit, int lastBit, const Bitset& lhs, const Bitset& rhs, Bitset& res, bool eraseOutsideRange);
+	template<bool Erase>
+	Bitset& AND_block(BBObject::index_t firstBlock, BBObject::index_t lastBlock, const Bitset& lhs, const Bitset& rhs, Bitset& res);
+	Bitset AND_block(BBObject::index_t firstBlock, BBObject::index_t lastBlock, Bitset lhs, const Bitset& rhs);
+	Bitset& OR(const Bitset& lhs, const Bitset& rhs, Bitset& res);
+	
+	Bitset OR(Bitset lhs, const Bitset& rhs);	
+	template<bool Erase>
+	Bitset& OR(int firstBit, int lastBit, const Bitset& lhs, const Bitset& rhs, Bitset& res);	
+	Bitset& OR(int firstBit, int lastBit, const Bitset& lhs, const Bitset& rhs, Bitset& res, bool eraseOutsideRange);
+	template<bool Erase>
+	Bitset& OR_block(BBObject::index_t firstBlock, BBObject::index_t lastBlock, const Bitset& lhs, const Bitset& rhs, Bitset& res);
+	Bitset OR_block(BBObject::index_t firstBlock, BBObject::index_t lastBlock, Bitset lhs, const Bitset& rhs);
+	
+	Bitset& erase_bit(const Bitset& lhs, const Bitset& rhs, Bitset& res);		
+	int find_first_common(const Bitset& lhs, const Bitset& rhs);	
+	int find_first_common_block(BBObject::index_t firstBlock, BBObject::index_t lastBlock, const Bitset& lhs, const Bitset& rhs);
+
+	bool operator==	(const Bitset& lhs, const Bitset& rhs);
+	bool operator!=	(const Bitset& lhs, const Bitset& rhs);
 		
 	/////////////////////////////////
 	//
@@ -273,7 +303,7 @@ namespace bitgraph {
 		}
 
 		// TODO... add named factories for inclusive intervals
-
+		static Bitset from_closed_interval(std::size_t nPop, int first, int last) = delete;
 
 		////////
 		// Copy and move semantics allowed
@@ -2181,7 +2211,7 @@ bitgraph::Bitset::Bitset(std::size_t nPop, const ColT& lv) :
 
 /////////////////////////////////
 // -----------------------------------------------------------------------------
-// Helpers to build `BitSets` (header-only, sin romper ABI)
+// Helpers (free factories) to build `BitSets` (header-only, sin romper API)
 // -----------------------------------------------------------------------------
 // Typical use
 //   auto bb1 = bitgraph::make_bitset(6);                 // empty, 6 bits
@@ -2193,6 +2223,8 @@ bitgraph::Bitset::Bitset(std::size_t nPop, const ColT& lv) :
 // Notas:
 // - nPop is population size ( maximum number of bits).
 // - Values outside [0, nPop) are ignored (negative values causes assertion).
+//
+// TODO: since they only return a Bitset, implement as named factories in the Bitset class (17/09/2026).
 
 namespace bitgraph {
 
