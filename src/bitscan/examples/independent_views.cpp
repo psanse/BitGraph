@@ -51,27 +51,21 @@ int main()
 
     bitgraph::view::scan forward(bits);
     bitgraph::view::scanR reverse(bits);
-
-    forward.init_scan();
-    reverse.init_scan();
+      
 
     std::cout << "Interleaved independent scans:\n";
 
     int forwardBit = forward.next_bit();
     int reverseBit = reverse.next_bit();
 
-    while (forwardBit != bitarray::noBit ||
-        reverseBit != bitarray::noBit) {
+    while (forwardBit != bitarray::noBit) {
+        assert(reverseBit != bitarray::noBit);
 
-        if (forwardBit != bitarray::noBit) {
-            std::cout << "  forward: " << forwardBit << '\n';
-            forwardBit = forward.next_bit();
-        }
+        std::cout << "  forward: " << forwardBit << '\n';
+        std::cout << "  reverse: " << reverseBit << '\n';
 
-        if (reverseBit != bitarray::noBit) {
-            std::cout << "  reverse: " << reverseBit << '\n';
-            reverseBit = reverse.next_bit();
-        }
+        forwardBit = forward.next_bit();
+        reverseBit = reverse.next_bit();
     }
 
     /*
@@ -80,7 +74,7 @@ int main()
     */
 
     std::cout << "\nComplete forward view: ";
-
+       
     forward.init_scan();
 
     for (int bit = forward.next_bit();
@@ -92,7 +86,7 @@ int main()
     std::cout << '\n';
 
     std::cout << "Complete reverse view: ";
-
+        
     reverse.init_scan();
 
     for (int bit = reverse.next_bit();
@@ -102,7 +96,6 @@ int main()
     }
 
     std::cout << '\n';
-
 
     /*
      * Generic scan-view aliases
@@ -115,8 +108,7 @@ int main()
     std::cout << "\nGeneric forward view: ";
 
     bitgraph::view::ForwardView<bitarray> genericForward(bits);
-    genericForward.init_scan();
-
+  
     for (int bit = genericForward.next_bit();
         bit != bitarray::noBit;
         bit = genericForward.next_bit()) {
@@ -128,7 +120,7 @@ int main()
     std::cout << "Generic reverse view: ";
 
     bitgraph::view::ReverseView<bitarray> genericReverse(bits);
-    genericReverse.init_scan();
+  
 
     for (int bit = genericReverse.next_bit();
         bit != bitarray::noBit;

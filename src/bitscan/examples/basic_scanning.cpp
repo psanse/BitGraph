@@ -1,4 +1,3 @@
-
 /**
  * @file basic_scanning.cpp
  * @brief Demonstrates forward and reverse persistent scanning of a bitarray.
@@ -8,7 +7,7 @@
  * - The scanner-wrapper interface, which exposes next_bit() for both forward
  *   and reverse traversal.
  * - The direct interface, which requires next_bit() for forward traversal and
- *   prev_bit() for reverse traversal.
+ *   prev_bit() for reverse traversal (requires call to init_scan())
  *
  * Persistent scanning uses the cursor stored in the bitarray and is intended
  * for performance-critical bit-parallel algorithms.
