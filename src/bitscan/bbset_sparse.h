@@ -158,6 +158,7 @@ namespace bitgraph {
 		* @brief Creates an EMPTY bitset given a number of 64-blocks
 		*		 Population size nBlocks * 64
 		* @param nBlocks : number of blocks
+		* @details named factory function 
 		**/
 		static BitsetSp from_num_blocks(int nBlocks); 
 
@@ -187,7 +188,7 @@ namespace bitgraph {
 		BitsetSp& operator = (const BitsetSp&) = default;
 		BitsetSp& operator = (BitsetSp&&) noexcept = default;
 
-		virtual ~BitsetSp() = default;
+		~BitsetSp() override = default;
 
 		////////////
 		//reset / init (heap allocation)
@@ -488,18 +489,19 @@ namespace bitgraph {
 		**/
 		BitsetSp& reset_bit(int firstBit, int lastBit);
 
+		
+	protected:
 		/**
 		* @brief Sets THIS to rhs in the range [0, lastBit]
 		* @details: more efficient than using the more general reset_bit in the
 		*			range [firstBit=0, lastBit]
 		**/
-	protected:
 		inline	BitsetSp& reset_bit(int lastBit, const BitsetSp& rhs);
-
+				
+	public:
 		/**
 		* @brief Sets THIS to rhs in the closed range [firstBit, lastBit]
 		**/
-	public:
 		inline	BitsetSp& reset_bit(int firstBit, int lastBit, const BitsetSp& rhs);
 
 		/**

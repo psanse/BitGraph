@@ -198,52 +198,93 @@ namespace bitgraph {
 		////////////
 		//construction / destruction 
 
-		Bitset() : nBB_(0) {};
+		Bitset() : nBB_(0) {}
 
 		/**
-		* @brief Constructor of a bitset given a population size nPop
-		*		  The num_blocks of the bitset is set according to the population size
-		* @param nBits : population size
-		* @param val: initial value (TRUE, FALSE) of every bit in the bitset
-		**/
-		explicit  Bitset(std::size_t nPop, bool val = false);
+		 * @brief Constructs a bitset with capacity for at least @p nPop bits.
+		 *
+		 * Storage is allocated in complete bitblocks, so the resulting physical
+		 * capacity may be greater than @p nPop.
+		 *
+		 * @param nPop Minimum number of bit positions required.
+		 * @param value Initial value assigned to every physically allocated bit.
+		 */
+		explicit  Bitset(std::size_t nPop, bool value = false);
 
 		/**
-		* @brief Constructor of a bitset given an initial vector lv of 1-bit elements
-		*		  The population size is the maximum value of lv
-		*		  The num_blocks of the bitset is set according to the population size
-		* @param lv : vector of integers representing 1-bits in the bitset
-		**/
-		explicit  Bitset(const bitpos_list& lv);
+		 * @brief Constructs a bitset containing the specified set-bit positions.
+		 *
+		 * The required capacity is inferred from the greatest position in @p positions.
+		 * An empty collection produces an empty bitset.
+		 *
+		 * @param positions Positions of the bits to set.
+		 *
+		 * @pre Every position must be nonnegative.
+		 */
+		explicit  Bitset(const bitpos_list& positions);
 
 		/**
-		 * @brief Creates a bitset with an initial collection @lv of 1-bit elements
-		 *		  and a population size nPop
-		 *		  The num_blocks of the bitset is set according to nPop
-		 * @param nPop: population size
-		 * @param lv : vector of integers representing 1-bits in the bitset
-		 * @details: any collection supporting begin() and end() iterators can be used
-		 **/
+		 * @brief Constructs a bitset with the specified set-bit positions.
+		 *
+		 * Storage is allocated for at least @p requestedBits bit positions, and every
+		 * position contained in @p positions is set.
+		 *
+		 * @tparam Collection Collection type providing begin() and end().
+		 * @param nPop Minimum number of bit positions required.
+		 * @param positions Positions of the bits to set.
+		 *
+		 * @pre Every position must be nonnegative and smaller than
+		 *      @p requestedBits.
+		 */
 		template<class ColT>
-		explicit  Bitset(std::size_t nPop, const ColT& lv);
+		explicit  Bitset(std::size_t nPop, const ColT& positions);
 
 		/**
-		 * @brief Creates a bitset with an initialez list of 1-bit elements
-		 *		  and a population size nPop
-		 *		  The num_blocks of the bitset is set according to nPop
-		 * @param nPop: population size
-		 * @param lv : set of integers representing 1-bits in the bitset
-		 **/
-		explicit  Bitset(std::size_t nPop, std::initializer_list<int> lv);
+		 * @brief Constructs a bitset from an initializer list of set-bit positions.
+		 *
+		 * @param nPop Minimum number of bit positions required.
+		 * @param positions Positions of the bits to set.
+		 *
+		 * @pre Every position must be nonnegative and smaller than
+		 *      @p requestedBits.
+		 */
+		explicit  Bitset(std::size_t nPop, std::initializer_list<int> positions);
 
 
-		//Move and copy semantics allowed
-		Bitset(const Bitset& bbN) = default;
-		Bitset(Bitset&&)			noexcept = default;
-		Bitset& operator =				(const Bitset&) = default;
-		Bitset& operator =				(Bitset&&)			noexcept = default;
+		////////
+		// Named factories
+		
 
-		virtual	~Bitset() = default;
+		static Bitset empty(std::size_t nPop)
+		{
+			return Bitset(nPop, false);
+		}
+
+		static Bitset full(std::size_t nPop)
+		{
+			return Bitset(nPop, true);
+		}
+
+		static Bitset from_set_bits(
+			std::size_t nPop,
+			std::initializer_list<int> positions)
+		{
+			return Bitset(nPop, positions);
+		}
+
+		// TODO... add named factories for inclusive intervals
+
+
+		////////
+		// Copy and move semantics allowed
+
+		Bitset(const Bitset&) = default;
+		Bitset(Bitset&&) noexcept = default;
+
+		Bitset& operator=(const Bitset&) = default;
+		Bitset& operator=(Bitset&&) noexcept = default;
+
+		~Bitset() override = default;
 
 		////////////
 		//Reset / init (memory allocation)
