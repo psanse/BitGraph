@@ -273,7 +273,7 @@ namespace bitgraph {
 
 
 
-		bool BBSentinel::is_empty() const {
+		bool BBSentinel::is_empty() const noexcept {
 			////////////////
 			// New definition of emptyness with sentinels
 

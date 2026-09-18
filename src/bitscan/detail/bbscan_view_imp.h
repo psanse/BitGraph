@@ -1,11 +1,20 @@
- /**
-  * @file bbscan_view_imp.h file
-  * @brief header file which implements the BBScanView class from the BITSCAN library (see bbscan_view.h).
-  *		   Manages efficient bitscanning as a separate view. For hot paths use BBScan.
-  * @created 11/09/2026
-  * @author pss
-  * 
-  **/
+/**
+ * @file bbscan_view_impl.h
+ * @brief Inline and template implementations for BITSCAN scan views.
+ *
+ * This file implements the scan-view classes declared in bbscan_view.h.
+ * Scan views own an independent cursor, allowing multiple non-destructive
+ * views to traverse the same bitset independently.
+ *
+ * For performance-critical paths that can use a cursor stored directly in the
+ * bitset, prefer the persistent scanning interface provided by BBScan.
+ *
+ * This implementation header is included at the end of bbscan_view.h and
+ * should not be included directly by user code.
+ *
+ * @date Created: 11/09/2026
+ * @author P. San Segundo
+ */
 
 #ifndef _BITGRAPH_BITSCAN_BBSCAN_VIEW_IMP_H_
 #define _BITGRAPH_BITSCAN_BBSCAN_VIEW_IMP_H_

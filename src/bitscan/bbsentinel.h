@@ -60,11 +60,11 @@ namespace bitgraph {
 			void  erase_bit_and_update(int nBit);									//erases and updates sentinels			
 			BBSentinel& erase_bit(const Bitset&);							//(1): required for SEQ coloring
 
-			virtual	bool is_empty()const;
+			virtual	bool is_empty()const noexcept;
 			virtual	bool is_empty(int nBBL, int nBBH) const;					//is empty in range
 
 #ifdef POPCOUNT_INTRINSIC_64
-			int popcn64() const;
+			int popcn64() const noexcept;
 #endif
 
 			////////////////
@@ -107,7 +107,7 @@ namespace bitgraph {
 
 namespace bitgraph {
 
-	inline int _impl::BBSentinel::popcn64() const {
+	inline int _impl::BBSentinel::popcn64() const noexcept {
 		BITBOARD pc = 0;
 		for (int i = m_BBL; i <= m_BBH; ++i) {
 			pc += __popcnt64(vBB_[i]);

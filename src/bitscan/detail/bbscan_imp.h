@@ -1,9 +1,17 @@
- /**
-  * @file bbscan_imp.h file
-  * @brief header file which implements the BBScan class from the BITSCAN library (see bbscan.h).
-  * @details created 15/09/2026
-  * @dev pss
-  **/
+/**
+ * @file bbscan_impl.h
+ * @brief Inline and template implementations for the BBScan class.
+ *
+ * This file implements the operations declared in bbscan.h. BBScan provides
+ * persistent-cursor scanning optimized for performance-critical paths in
+ * bit-parallel algorithms.
+ *
+ * This implementation header is included at the end of bbscan.h and should
+ * not be included directly by user code.
+ *
+ * @date Created: 15/09/2026
+ * @author P. San Segundo
+ */
 
 #ifndef _BITGRAPH_BBSCAN_IMP_H_
 #define _BITGRAPH_BBSCAN_IMP_H_

@@ -171,7 +171,7 @@ void Bitset::reset(std::size_t nPop, const bit_indices& bits) noexcept {
 // (size is determined by *this)
 /////////////////////////
 
-Bitset& Bitset::operator &=	(const Bitset& bbn){
+Bitset& Bitset::operator &=	(const Bitset& bbn) noexcept{
 
 	for (auto i = 0; i < nBB_; ++i) {
 		vBB_[i] &= bbn.vBB_[i];
@@ -180,7 +180,7 @@ Bitset& Bitset::operator &=	(const Bitset& bbn){
 	return *this;
 }
 
-Bitset& Bitset::operator |=	(const Bitset& bbn){
+Bitset& Bitset::operator |=	(const Bitset& bbn) noexcept{
 	
 	for (auto i = 0; i < nBB_; ++i) {
 		vBB_[i] |= bbn.vBB_[i];
@@ -189,7 +189,7 @@ Bitset& Bitset::operator |=	(const Bitset& bbn){
 	return *this;
 }
 
-Bitset& Bitset::operator ^=	(const Bitset& bbn) {
+Bitset& Bitset::operator ^=	(const Bitset& bbn) noexcept {
 	
 	for (auto i = 0; i < nBB_; ++i) {
 		vBB_[i] ^= bbn.vBB_[i];
@@ -199,7 +199,8 @@ Bitset& Bitset::operator ^=	(const Bitset& bbn) {
 }
 
 
-Bitset& Bitset::flip (){
+
+Bitset& Bitset::flip () noexcept {
 
 	for (auto i = 0; i < nBB_; ++i) {
 		vBB_[i] = ~vBB_[i];
@@ -208,7 +209,7 @@ Bitset& Bitset::flip (){
 	return *this;
 }
 
-Bitset& Bitset::flip_block(block_index_t firstBlock, block_index_t lastBlock)
+Bitset& Bitset::flip_block(block_index_t firstBlock, block_index_t lastBlock) noexcept
 {
 	
 	///////////////////////////////////////////////////////////////////////////////////
@@ -470,7 +471,7 @@ namespace bitgraph {
 			return BBObject::noBit;
 		}
 
-		int Bitset::next_bit(int bit) const {
+		int Bitset::next_bit(bit_index_t bit) const noexcept {
 
 			//bit = -1 is a special case of early exit
 			//typically used in a loop, in the first bitscan call.
@@ -501,7 +502,7 @@ namespace bitgraph {
 			return BBObject::noBit;
 		}
 
-		int Bitset::prev_bit(int bit) const {
+		int Bitset::prev_bit(bit_index_t bit) const noexcept{
 
 			//special case - first bitscan,
 			//calls for the most-significant bit in the bitstring
@@ -538,24 +539,6 @@ namespace bitgraph {
 			return BBObject::noBit;		//should not reach here
 		}
 
-
-		bool Bitset::is_bit(int nbit/*0 based*/) const {
-			
-			return (vBB_[WDIV(nbit)] & Tables::mask[WMOD(nbit)]);
-
-		}
-
-		bool Bitset::is_empty() const
-		{
-			for (int i = 0; i < nBB_; ++i) {
-				if (vBB_[i]) {
-					return false;
-				}
-			}
-
-			return true;
-		}
-
 		bool Bitset::is_empty_block(block_index_t firstBlock, block_index_t lastBlock) const {
 
 			const auto last_block = (lastBlock == Bitset::npos) ? nBB_ - 1 : lastBlock;
@@ -575,7 +558,7 @@ namespace bitgraph {
 		}
 
 
-		bool Bitset::is_disjoint(const Bitset& rhs) const
+		bool Bitset::is_disjoint(const Bitset& rhs) const noexcept
 		{
 			for (auto i = 0; i < nBB_; ++i) {
 				if (vBB_[i] & rhs.vBB_[i]) {
@@ -616,7 +599,7 @@ namespace bitgraph {
 
 
 
-		Bitset& Bitset::set_bit(int lastBit, const Bitset& bb_add) {
+		Bitset& Bitset::set_bit(bit_index_t lastBit, const Bitset& bb_add) {
 
 			block_index_t blockH = WDIV(lastBit);
 
@@ -632,7 +615,7 @@ namespace bitgraph {
 		}
 
 
-		int  Bitset::is_singleton(int firstBit, int lastBit) const {
+		int  Bitset::is_singleton(bit_index_t firstBit, bit_index_t lastBit) const {
 
 			int blockL = WDIV(firstBit);
 			int blockH = WDIV(lastBit);
@@ -670,7 +653,7 @@ namespace bitgraph {
 		}
 
 
-		int  Bitset::find_singleton(int firstBit, int lastBit, int& singleton) const {
+		int  Bitset::find_singleton(bit_index_t firstBit, bit_index_t lastBit, bit_index_t& singleton) const {
 
 			int blockL = WDIV(firstBit);
 			int	blockH = WDIV(lastBit);
@@ -740,14 +723,15 @@ namespace bitgraph {
 		}
 
 
-		Bitset& Bitset::set_bit(int bit) {
+		Bitset& Bitset::set_bit(bit_index_t bit) noexcept {
 
 			vBB_[WDIV(bit)] |= Tables::mask[WMOD(bit)];
 			return *this;
 		}
 
 
-		Bitset& Bitset::set_bit(int firstBit, int lastBit) {
+
+		Bitset& Bitset::set_bit(bit_index_t firstBit, bit_index_t lastBit) noexcept {
 
 			////////////////////////////////////////////////
 			assert(firstBit >= 0 && firstBit <= lastBit);
@@ -843,7 +827,7 @@ namespace bitgraph {
 		}
 
 
-		Bitset& Bitset::erase_bit() {
+		Bitset& Bitset::erase_bit() noexcept {
 
 			for (auto i = 0; i < nBB_; ++i) {
 				vBB_[i] = ZERO;
@@ -852,14 +836,15 @@ namespace bitgraph {
 			return *this;
 		}
 
-		Bitset& Bitset::erase_bit(int nBit) {
+		Bitset& Bitset::erase_bit(bit_index_t nBit) noexcept {
 
 			vBB_[WDIV(nBit)] &= ~Tables::mask[WMOD(nBit)];
 			return *this;
 		}
 
 
-		Bitset& Bitset::erase_bit(int firstBit, int lastBit) {
+
+		Bitset& Bitset::erase_bit(bit_index_t firstBit, bit_index_t lastBit) noexcept{
 
 			//general comment: low - WMUL(blockL) = WMOD(blockL) but supposed to be less expensive (CHECK 01/02/25)
 
@@ -993,8 +978,7 @@ namespace bitgraph {
 			return 0;
 		}
 
-
-		int Bitset::popcn64() const {
+		int Bitset::popcn64() const noexcept {
 
 			int pc = 0;
 
@@ -1006,7 +990,7 @@ namespace bitgraph {
 		}
 
 
-		int Bitset::popcn64(int firstBit, int lastBit) const
+		int Bitset::popcn64(bit_index_t firstBit, bit_index_t lastBit) const noexcept
 		{
 
 			/////////////////////////////////////////////////////////////////
@@ -1040,7 +1024,7 @@ namespace bitgraph {
 			return pc;
 		}
 
-		int Bitset::find_common_singleton(const Bitset& rhs, int& bit) const {
+		int Bitset::find_common_singleton(const Bitset& rhs, bit_index_t& bit) const {
 
 			int pc = 0;
 			bool is_first_vertex = true;
@@ -1095,7 +1079,7 @@ namespace bitgraph {
 		}
 
 
-		int Bitset::find_diff_singleton(const Bitset& rhs, int& bit) const {
+		int Bitset::find_diff_singleton(const Bitset& rhs, bit_index_t& bit) const {
 
 			int pc = 0;
 			bit = BBObject::noBit;
@@ -1121,7 +1105,7 @@ namespace bitgraph {
 			return pc;
 		}
 
-		int Bitset::find_diff_pair(const Bitset& rhs, int& bit1, int& bit2) const {
+		int Bitset::find_diff_pair(const Bitset& rhs, bit_index_t& bit1, bit_index_t& bit2) const {
 
 			int pc = 0;
 			bool is_first_bit = true;
@@ -1183,7 +1167,7 @@ namespace bitgraph {
 			return *this;
 		}
 
-		Bitset& Bitset::erase_bit(int firstBit, int lastBit, const Bitset& bbn) {
+		Bitset& Bitset::erase_bit(bit_index_t firstBit, bit_index_t lastBit, const Bitset& bbn) noexcept {
 
 			//general comment: low - WMUL(blockL) = WMOD(blockL) but supposed to be less expensive (CHECK 01/02/25)
 
@@ -1267,12 +1251,12 @@ namespace bitgraph {
 			return *this;
 		}
 
-		void Bitset::extract_stack(com::FixedStack<int>& s)	const {
+		void Bitset::extract_stack(com::FixedStack<bit_index_t>& s)	const {
 			s.clear();
 
-			int v = BBObject::noBit;
-			while ((v = next_bit(v)) != BBObject::noBit) {
-				s.push(v);
+			bit_index_t bit = BBObject::noBit;
+			while ((bit = next_bit(bit)) != BBObject::noBit) {
+				s.push(bit);
 			}
 		}
 
@@ -1295,8 +1279,6 @@ namespace bitgraph {
 // Notas:
 // - nPop is population size ( maximum number of bits).
 // - Values outside [0, nPop) are ignored (negative values causes assertion).
-//
-
 
 namespace bitgraph {
 

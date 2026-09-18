@@ -1,9 +1,21 @@
+/**
+ * @file bbset_impl.h
+ * @brief Template and inline implementations for the Bitset class.
+ *
+ * This file contains implementation definitions that must remain visible to
+ * translation units using Bitset, including template constructors, template
+ * member functions, and template bitset operations.
+ *
+ * The file is included at the end of bbset.h and should not normally be
+ * included directly by user code.
+ *
+ * @note All declarations implemented here belong to the bitgraph namespace.
+ *
+ * @author P. San Segundo
+ */
 
 #ifndef BITGRAPH_BITSCAN_BBSET_IMP_H
 #define BITGRAPH_BITSCAN_BBSET_IMP_H
-
-#include "bbset.h"
-
 
 namespace bitgraph {
 		
@@ -360,5 +372,33 @@ namespace bitgraph {
 
 } // end namespace bitgraph
 
+
+
+///////////////////
+// non-template inline Bitset methods
+///////////////////
+
+namespace bitgraph {
+	
+	inline
+	bool Bitset::is_bit(bit_index_t nbit/*0 based*/) const noexcept {
+
+		return (vBB_[WDIV(nbit)] & Tables::mask[WMOD(nbit)]) != 0;
+
+	}
+
+	inline
+	bool Bitset::is_empty() const noexcept 
+	{
+		for (int i = 0; i < nBB_; ++i) {
+			if (vBB_[i]) {
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+} // end namespace bitgraph
 
 #endif // BITGRAPH_BITSCAN_BBSET_IMP_H
