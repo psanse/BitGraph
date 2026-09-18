@@ -185,7 +185,7 @@ namespace bitgraph {
 		* @param bb: input 64-bit bitblock
 		* @returns index of the least significant bit or -1 if empty
 		**/
-		inline	int lsb(const BITBOARD bb) { return lsb64_intrinsic(bb); }
+		inline int lsb(const BITBOARD bb) { return lsb64_intrinsic(bb); }
 
 
 		/**
@@ -275,56 +275,49 @@ namespace bitgraph {
 		* @param bit: bit in the bitblock [0...63]
 		* @returns 64-bit bitblock mask with only one bit set
 		**/
-		inline
-			BITBOARD MASK_BIT(int bit) { return Tables::mask[bit]; }
+		inline BITBOARD MASK_BIT(int bit) { return Tables::mask[bit]; }
 
 		/**
 		* @brief Sets to 1 the bits inside the closed range [low, high], sets to 0 the rest
 		* @param low, high: positions in the bitblock [0...63]
 		* @returns 64-bit bitblock mask
 		**/
-		inline
-			BITBOARD MASK_1(int low, int high) { return Tables::mask_mid[low][high]; };
+		inline BITBOARD MASK_1(int low, int high) { return Tables::mask_mid[low][high]; };
 
 		/**
 		* @brief Sets to 1 all bits in the closed range [0, 63]
 		* @param idx: input reference bit position [0...63]
 		* @returns 64-bit bitblock mask
 		**/
-		inline
-			BITBOARD MASK_1_LOW(int idx) { return ~Tables::mask_high[idx]; }
+		inline BITBOARD MASK_1_LOW(int idx) { return ~Tables::mask_high[idx]; }
 
 		/**
 		* @brief Sets to 1 all bits in the closed range [idx, 63]
 		* @param idx: input reference bit position [0...63]
 		* @returns 64-bit bitblock mask
 		**/
-		inline
-			BITBOARD MASK_1_HIGH(int idx) { return ~Tables::mask_low[idx]; }
+		inline BITBOARD MASK_1_HIGH(int idx) { return ~Tables::mask_low[idx]; }
 
 		/**
 		* @brief Sets to 0 the bits inside the closed range [low, high], sets to 1 the rest
 		* @param low, high: positions in the bitblock [0...63]
 		* @returns 64-bit bitblock mask
 		**/
-		inline
-			BITBOARD MASK_0(int low, int high) { return ~Tables::mask_mid[low][high]; }
+		inline BITBOARD MASK_0(int low, int high) { return ~Tables::mask_mid[low][high]; }
 
 		/**
 	   * @brief Sets to 0 all bits in the closed range [0, idx]
 	   * @param idx: input reference bit position [0...63]
 	   * @returns 64-bit bitblock mask
 	   **/
-		inline
-			BITBOARD MASK_0_LOW(int idx) { return Tables::mask_high[idx]; }
+		inline BITBOARD MASK_0_LOW(int idx) { return Tables::mask_high[idx]; }
 
 		/**
 	   * @brief Sets to 0 all bits in the closed range [idx, 63]
 	   * @param idx: input reference bit position [0...63]
 	   * @returns 64-bit bitblock mask
 	   **/
-		inline
-			BITBOARD MASK_0_HIGH(int idx) { return Tables::mask_low[idx]; }
+		inline BITBOARD MASK_0_HIGH(int idx) { return Tables::mask_low[idx]; }
 
 		/**
 		* @brief sets to 0 the bits of the bitblock bb to the right of index (the index-bit is not trimmed)
@@ -333,8 +326,7 @@ namespace bitgraph {
 		* @returns the trimmed bitblock
 		* @date 30/01/2015
 		**/
-		inline
-			BITBOARD trim_low(BITBOARD bb, int idx) { return bb & ~Tables::mask_low[idx]; }
+		inline BITBOARD trim_low(BITBOARD bb, int idx) { return bb & ~Tables::mask_low[idx]; }
 
 		/**
 		* @brief sets to 0 the bits of the bitblock bb to the left side of index (the index-bit is not trimmed)

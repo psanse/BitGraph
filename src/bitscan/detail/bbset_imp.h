@@ -325,7 +325,7 @@ namespace bitgraph {
 
 
 	//////////////////
-	// template (free) factories
+	// template (free) additional factories
 	/////////////////
 
 	/**
