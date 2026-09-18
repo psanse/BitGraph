@@ -20,8 +20,9 @@ using namespace bitgraph;
 //////////////////////////////////////////////////////////////////////
 
 Bitset::Bitset(std::size_t nPop, bool val)
-	: nBB_(static_cast<int>(INDEX_1TO1(nPop))),
-	vBB_(nBB_, val ? static_cast<BITBOARD>(ONE) : static_cast<BITBOARD>(0))
+try
+: nBB_(static_cast<int>(INDEX_1TO1(nPop))),
+vBB_(nBB_, val ? ONE : ZERO)
 {
 	// Clear unused high positions in the final block if val = TRUE
 	if (val && nPop > 0) {
@@ -35,10 +36,26 @@ Bitset::Bitset(std::size_t nPop, bool val)
 	//if (val && nPop > 0) {
 	//	vBB_.back() &= bblock::MASK_0_HIGH(nPop - WMUL(nBB_ - 1));			// cannot be /* bblock::MASK_0_HIGH(WMOD(nPop))! */
 	//}
+
+}
+catch (const std::bad_alloc& e) {
+	LOG_ERROR("Bitset construction failed: out of memory - Bitset::Bitset()");
+	LOG_ERROR(e.what());
+	std::terminate();
+}
+catch (const std::exception& e) {
+	LOG_ERROR("Bitset construction failed: std::exception - Bitset::Bitset()");
+	LOG_ERROR(e.what());
+	std::terminate();
+}
+catch (...) {
+	LOG_ERROR("Bitset construction failed: unknown error - Bitset::Bitset()");
+	std::terminate();
 }
 
-Bitset::Bitset(const bitpos_list& bits)
-	: nBB_(0)
+Bitset::Bitset(const bit_indices& bits)
+try
+: nBB_(0)
 {
 	if (bits.empty()) {
 		return;
@@ -48,104 +65,106 @@ Bitset::Bitset(const bitpos_list& bits)
 	assert(maxBit >= 0);
 
 	nBB_ = static_cast<int>(INDEX_0TO1(maxBit));
-	vBB_.assign(static_cast<std::size_t>(nBB_), BITBOARD{ 0 });
+	vBB_.assign(static_cast<std::size_t>(nBB_), ZERO);
 
 	for (const auto bit : bits) {
 		assert(bit >= 0);
-		if (bit >= 0) {
-			set_bit(bit);
-		}
+
+		if (bit >= 0) {	set_bit(bit);}
 	}
+}
+catch (const std::bad_alloc& e) {
+	LOG_ERROR("Bitset construction failed: out of memory - Bitset::Bitset(const bit_indices&)");
+	LOG_ERROR(e.what());
+	std::terminate();
+}
+catch (const std::exception& e) {
+	LOG_ERROR("Bitset construction failed: std::exception - Bitset::Bitset(const bit_indices&)");
+	LOG_ERROR(e.what());
+	std::terminate();
+}
+catch (...) {
+	LOG_ERROR("Bitset construction failed: unknown error - Bitset::Bitset(const bit_indices&)");
+	std::terminate();
 }
 
 Bitset::Bitset(std::size_t nPop, std::initializer_list<int> bits)
-	: nBB_(static_cast<index_t>(INDEX_1TO1(nPop))),
-	vBB_(static_cast<std::size_t>(nBB_), BITBOARD{ 0 })
+try
+	: nBB_(static_cast<block_index_t>(INDEX_1TO1(nPop))),
+	vBB_(static_cast<std::size_t>(nBB_), ZERO)
 {
 	for (const int bit : bits) {
-		assert(bit >= 0 && bit < static_cast<int>(nPop));
-		if (bit >= 0 && bit < static_cast<int>(nPop)) {
-			set_bit(bit);
+		assert(bit >= 0 && bit < static_cast<bit_index_t>(nPop));
+				
+		if (bit < 0 || bit >= static_cast<bit_index_t>(nPop)) {
+			LOG_ERROR("Bitset construction failed: invalid bit index - Bitset::Bitset(nPop, initializer_list)");
+			LOG_ERROR("invalid bit is out of [0, nPop)");
+			std::terminate();
 		}
+
+		set_bit(bit);
 	}
 }
 
-void Bitset::init(std::size_t nPop) noexcept {
-
-	try {
-		nBB_ = static_cast<index_t>(INDEX_1TO1(nPop));
-		vBB_.assign(nBB_, 0);
-	}
-	catch (...) {
-		LOG_ERROR("Error during allocation - Bitset::init");
-		LOG_ERROR("exiting...");
-		std::exit(EXIT_FAILURE);
-	}
+catch (const std::bad_alloc& e) {
+	LOG_ERROR("Bitset construction failed: out of memory - Bitset::Bitset(nPop, initializer_list)");
+	LOG_ERROR(e.what());
+	std::terminate();
 }
-
-void Bitset::init(std::size_t nPop, const bitpos_list& lv) noexcept {
-		
-	try {
-		nBB_ = static_cast<index_t>(INDEX_1TO1(nPop));
-		vBB_.assign(nBB_, 0);
-
-		//sets bit conveniently
-		for (auto& bit : lv) {
-
-			//////////////////
-			assert(bit >= 0 && bit < static_cast<int>(nPop));
-			/////////////////
-
-			//sets bits - no prior erasing
-			set_bit(bit);
-
-		}
-	}
-	catch (...) {
-		LOG_ERROR("Error during allocation - Bitset::init");
-		LOG_ERROR("exiting...");
-		std::exit(EXIT_FAILURE);
-	}	
+catch (const std::exception& e) {
+	LOG_ERROR("Bitset construction failed: std::exception - Bitset::Bitset(nPop, initializer_list)");
+	LOG_ERROR(e.what());
+	std::terminate();
+}
+catch (...) {
+	LOG_ERROR("Bitset construction failed: unknown error - Bitset::Bitset(nPop, initializer_list)");
+	std::terminate();
 }
 
 void Bitset::reset(std::size_t nPop) noexcept {
 
 	try {
-		nBB_ = static_cast<index_t>(INDEX_1TO1(nPop));
-		vBB_.assign(nBB_, 0);
+		nBB_ = static_cast<block_index_t>(INDEX_1TO1(nPop));
+		vBB_.assign(nBB_, ZERO);
+	}
+	catch (const std::bad_alloc& e) {
+		LOG_ERROR("init failed: out of memory - Bitset::reset(std::size_t nPop)");
+		LOG_ERROR(e.what());
+		std::terminate();
+	}
+	catch (const std::exception& e) {
+		LOG_ERROR("init failed: std::exception - Bitset::reset(std::size_t nPop)");
+		LOG_ERROR(e.what());
+		std::terminate();
 	}
 	catch (...) {
-		LOG_ERROR("Error during allocation - Bitset::reset");
-		LOG_ERROR("exiting...");
-		std::exit(EXIT_FAILURE);
+		LOG_ERROR("init failed: unknown error - Bitset::reset(std::size_t nPop)");
+		std::terminate();
 	}
 
 }
-void Bitset::reset(std::size_t nPop, const bitpos_list& lv) noexcept {
+
+void Bitset::reset(std::size_t nPop, const bit_indices& bits) noexcept {
 
 	try {
-		nBB_ = static_cast<index_t>(INDEX_1TO1(nPop));
-		vBB_.assign(nBB_, 0);
+		nBB_ = static_cast<block_index_t>(INDEX_1TO1(nPop));
+		vBB_.assign(static_cast<std::size_t>(nBB_), BITBOARD{ 0 });
 
 		//sets bit conveniently
-		for (auto& bit : lv) {
+		for (const auto bit : bits) {
 
-			//////////////////
-			assert(bit >= 0 && bit < static_cast<index_t>(nPop));
-			/////////////////
+			assert(bit >= 0 && bit < static_cast<int>(nPop));
 
 			//sets bits - no prior erasing
-			set_bit(bit);
-
+			set_bit(static_cast<bit_t>(bit));
 		}
 	}
 	catch (...) {
-		LOG_ERROR("Error during allocation - Bitset::reset");
+		LOG_ERROR("Error during allocation - Bitset::reset(const std::size_t nPop, const bit_indices& bits)");
 		LOG_ERROR("exiting...");
-		std::exit(EXIT_FAILURE);
+		std::terminate();
 	}
 }
-
 
 //////////////////////////
 //
@@ -190,7 +209,7 @@ Bitset& Bitset::flip (){
 	return *this;
 }
 
-Bitset& Bitset::flip_block(index_t firstBlock, index_t lastBlock)
+Bitset& Bitset::flip_block(block_index_t firstBlock, block_index_t lastBlock)
 {
 	
 	///////////////////////////////////////////////////////////////////////////////////
@@ -256,7 +275,7 @@ string Bitset::to_string ()
 }
 
 
-void Bitset::extract (bitpos_list& lv ) const {
+void Bitset::extract (bit_indices& lv ) const {
 
 	lv.clear();
 	const int pc = this->count();
@@ -270,7 +289,7 @@ void Bitset::extract (bitpos_list& lv ) const {
 	}
 }
 
-void Bitset::extract_set(bitpos_set& ls) const
+void Bitset::extract_set(bit_index_set& ls) const
 {
 	ls.clear();
 	const int pc = this->count();
@@ -282,15 +301,15 @@ void Bitset::extract_set(bitpos_set& ls) const
 	}
 }
 
-Bitset::operator bitpos_list() const {
-	bitpos_list result;
+Bitset::operator bit_indices() const {
+	bit_indices result;
 	extract(result);
 	return result;
 }
 
-Bitset::operator bitpos_set() const
+Bitset::operator bit_index_set() const
 {
-	bitpos_set result;
+	bit_index_set result;
 	extract_set(result);
 	return result;
 }
@@ -313,7 +332,7 @@ void Bitset::extract_array(int* lv, std::size_t& size, bool rev) 	{
 
 }
 
-Bitset& Bitset::set_bit(const bitpos_list& lv) {
+Bitset& Bitset::set_bit(const bit_indices& lv) {
 
 	//copies elements up to the maximum capacity of the bitstring
 	auto maxPopSize = WMUL(nBB_);
@@ -409,13 +428,13 @@ namespace bitgraph {
 		return BBObject::noBit;		//disjoint
 	}
 
-	int find_first_common_block(Bitset::index_t firstBlock, Bitset::index_t lastBlock, const Bitset& lhs, const Bitset& rhs) {
+	int find_first_common_block(Bitset::block_index_t firstBlock, Bitset::block_index_t lastBlock, const Bitset& lhs, const Bitset& rhs) {
 
 		///////////////////////////////////////////////////////////////////////////////
 		assert((firstBlock >= 0) && (firstBlock <= lastBlock) && (lastBlock < lhs.num_blocks()));
 		///////////////////////////////////////////////////////////////////////////////
 
-		Bitset::index_t last_block = (lastBlock == Bitset::npos) ? static_cast<Bitset::index_t>(rhs.nBB_ - 1) : lastBlock;
+		Bitset::block_index_t last_block = (lastBlock == Bitset::npos) ? static_cast<Bitset::block_index_t>(rhs.nBB_ - 1) : lastBlock;
 
 		for (auto i = firstBlock; i <= last_block; i++) {
 			BITBOARD bb = lhs.vBB_[i] & rhs.vBB_[i];
@@ -426,6 +445,9 @@ namespace bitgraph {
 
 		return BBObject::noBit;		//disjoint
 	}
+
+
+
 
 }//end namespace bitgraph
 

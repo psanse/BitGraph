@@ -24,15 +24,25 @@ namespace bitgraph {
 
 	class BBObject {
 	public:
-				
+		
+		// type aliases
+		using bit_index_t = bitgraph::bit_index_t;
+		using block_index_t = bitgraph::block_index_t;
+		
+		// preserved aliases for backward compatibility
 		using index_t = int;
 		using bit_t = int;
+		
+		using bit_indices = bitgraph::bit_indices;
+		using bit_index_set = bitgraph::bit_index_set;
+
+		// preserved aliases for backward compatibility
 		using bitpos_list = bitgraph::bitpos_list;
 		using bitpos_set = bitgraph::bitpos_set;
-
+		
 		//sentinel values
-		static constexpr index_t npos = -1;			//invalid block index
-		static constexpr int noBit = -1;			//invalid bit or no bit found
+		static constexpr block_index_t npos = -1;			//invalid block index
+		static constexpr bit_index_t noBit = -1;			//invalid bit or no bit found
 		
 		//types of bit scans
 		enum scan_types { NON_DESTRUCTIVE, NON_DESTRUCTIVE_REVERSE, DESTRUCTIVE, DESTRUCTIVE_REVERSE };

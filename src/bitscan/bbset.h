@@ -34,8 +34,8 @@ namespace bitgraph {
 	Bitset& AND(int firstBit, int lastBit, const Bitset& lhs, const Bitset& rhs, Bitset& res);
 	Bitset& AND(int firstBit, int lastBit, const Bitset& lhs, const Bitset& rhs, Bitset& res, bool eraseOutsideRange);
 	template<bool Erase>
-	Bitset& AND_block(BBObject::index_t firstBlock, BBObject::index_t lastBlock, const Bitset& lhs, const Bitset& rhs, Bitset& res);
-	Bitset AND_block(BBObject::index_t firstBlock, BBObject::index_t lastBlock, Bitset lhs, const Bitset& rhs);
+	Bitset& AND_block(BBObject::block_index_t firstBlock, BBObject::block_index_t lastBlock, const Bitset& lhs, const Bitset& rhs, Bitset& res);
+	Bitset AND_block(BBObject::block_index_t firstBlock, BBObject::block_index_t lastBlock, Bitset lhs, const Bitset& rhs);
 	Bitset& OR(const Bitset& lhs, const Bitset& rhs, Bitset& res);
 	
 	Bitset OR(Bitset lhs, const Bitset& rhs);	
@@ -43,12 +43,12 @@ namespace bitgraph {
 	Bitset& OR(int firstBit, int lastBit, const Bitset& lhs, const Bitset& rhs, Bitset& res);	
 	Bitset& OR(int firstBit, int lastBit, const Bitset& lhs, const Bitset& rhs, Bitset& res, bool eraseOutsideRange);
 	template<bool Erase>
-	Bitset& OR_block(BBObject::index_t firstBlock, BBObject::index_t lastBlock, const Bitset& lhs, const Bitset& rhs, Bitset& res);
-	Bitset OR_block(BBObject::index_t firstBlock, BBObject::index_t lastBlock, Bitset lhs, const Bitset& rhs);
+	Bitset& OR_block(BBObject::block_index_t firstBlock, BBObject::block_index_t lastBlock, const Bitset& lhs, const Bitset& rhs, Bitset& res);
+	Bitset OR_block(BBObject::block_index_t firstBlock, BBObject::block_index_t lastBlock, Bitset lhs, const Bitset& rhs);
 	
 	Bitset& erase_bit(const Bitset& lhs, const Bitset& rhs, Bitset& res);		
 	int find_first_common(const Bitset& lhs, const Bitset& rhs);	
-	int find_first_common_block(BBObject::index_t firstBlock, BBObject::index_t lastBlock, const Bitset& lhs, const Bitset& rhs);
+	int find_first_common_block(BBObject::block_index_t firstBlock, BBObject::block_index_t lastBlock, const Bitset& lhs, const Bitset& rhs);
 
 	bool operator==	(const Bitset& lhs, const Bitset& rhs);
 	bool operator!=	(const Bitset& lhs, const Bitset& rhs);
@@ -64,9 +64,9 @@ namespace bitgraph {
 	class Bitset : public BBObject {
 
 		using BaseT = BBObject;
-		using BaseT::index_t;
-		using BaseT::bitpos_list;
-		using BaseT::bitpos_set;
+		using BaseT::block_index_t;
+		using BaseT::bit_indices;
+		using BaseT::bit_index_set;
 		using BaseT::npos;
 
 		using DenseBlockVec = std::vector<BITBOARD>;
@@ -130,14 +130,14 @@ namespace bitgraph {
 		* @details: GCC does not allow default template parameters in friend functions
 		**/
 		template<bool Erase>
-		friend Bitset& AND_block(index_t firstBlock, index_t lastBlock, const Bitset& lhs, const Bitset& rhs, Bitset& res);
+		friend Bitset& AND_block(block_index_t firstBlock, block_index_t lastBlock, const Bitset& lhs, const Bitset& rhs, Bitset& res);
 
 		/**
 		* @brief AND between lhs and rhs bitsets in the closed block-range [firstBlock, lastBlock].
 		*		 If lastBock==-1, the range is the full bitset. The bits outside the range are set to 0.
 		* @returns the new resulting bitset
 		**/
-		friend Bitset AND_block(index_t firstBlock, index_t lastBlock, Bitset lhs, const Bitset& rhs) {
+		friend Bitset AND_block(block_index_t firstBlock, block_index_t lastBlock, Bitset lhs, const Bitset& rhs) {
 			return lhs.AND_EQUAL_block<true>(firstBlock, lastBlock, rhs);
 		}
 
@@ -191,14 +191,14 @@ namespace bitgraph {
 		* @returns reference to the resulting bitstring res
 		**/
 		template<bool Erase>
-		friend Bitset& OR_block(index_t firstBlock, index_t lastBlock, const Bitset& lhs, const Bitset& rhs, Bitset& res);
+		friend Bitset& OR_block(block_index_t firstBlock, block_index_t lastBlock, const Bitset& lhs, const Bitset& rhs, Bitset& res);
 
 		/**
 		* @brief OR between lhs and rhs bitsets in the closed block-range [firstBlock, lastBlock].
 		*		 If lastBock==-1, the range is the full bitset. The bits outside the range are set to 0.
 		* @returns the new resulting bitset
 		**/
-		friend Bitset OR_block(index_t firstBlock, index_t lastBlock, Bitset lhs, const Bitset& rhs) {
+		friend Bitset OR_block(block_index_t firstBlock, block_index_t lastBlock, Bitset lhs, const Bitset& rhs) {
 			return lhs.OR_EQUAL_block<true>(firstBlock, lastBlock, rhs);
 		}
 
@@ -223,7 +223,7 @@ namespace bitgraph {
 		* @param lhs, rhs: input bitsets
 		* @returns the first BIT of the intersection or BBObject::noBit if the sets are disjoint
 		**/
-		friend int find_first_common_block(index_t firstBlock, index_t lastBlock, const Bitset& lhs, const Bitset& rhs);
+		friend int find_first_common_block(block_index_t firstBlock, block_index_t lastBlock, const Bitset& lhs, const Bitset& rhs);
 
 		////////////
 		//construction / destruction 
@@ -238,6 +238,8 @@ namespace bitgraph {
 		 *
 		 * @param nPop Minimum number of bit positions required.
 		 * @param value Initial value assigned to every physically allocated bit.
+		 * @warning This constructor follows a fail-fast policy. If construction
+	     *     fails, the program terminates.
 		 */
 		explicit  Bitset(std::size_t nPop, bool value = false);
 
@@ -250,8 +252,10 @@ namespace bitgraph {
 		 * @param bits Positions of the bits to set.
 		 *
 		 * @pre Every position must be nonnegative.
+		 * @warning This constructor follows a fail-fast policy. If construction
+	     *     fails, the program terminates.
 		 */
-		explicit  Bitset(const bitpos_list& bits);
+		explicit  Bitset(const bit_indices& bits);
 
 		/**
 		 * @brief Constructs a bitset with the specified set-bit positions.
@@ -265,6 +269,8 @@ namespace bitgraph {
 		 *
 		 * @pre Every position must be nonnegative and smaller than
 		 *      @p requestedBits.
+		 * @warning This constructor follows a fail-fast policy. If construction
+	     *     fails, the program terminates.
 		 */
 		template<class ColT>
 		explicit  Bitset(std::size_t nPop, const ColT& bits);
@@ -277,6 +283,8 @@ namespace bitgraph {
 		 *
 		 * @pre Every position must be nonnegative and smaller than
 		 *      @p requestedBits.
+		 * @warning This constructor follows a fail-fast policy. If construction
+	     *     fails, the program terminates.
 		 */
 		explicit  Bitset(std::size_t nPop, std::initializer_list<int> bits);
 
@@ -284,7 +292,6 @@ namespace bitgraph {
 		////////
 		// Named factories
 		
-
 		static Bitset empty(std::size_t nPop)
 		{
 			return Bitset(nPop, false);
@@ -329,10 +336,7 @@ namespace bitgraph {
 
 		////////////
 		//Reset / init (memory allocation)
-
-		void init(std::size_t nPop) noexcept;
-		void init(std::size_t nPop, const bitpos_list& lv) noexcept;
-
+		
 		/**
 		* @brief Resets this bitset given to a vector lv of 1-bit elements
 		 *		  and a population size nPop.
@@ -341,9 +345,9 @@ namespace bitgraph {
 		 *		  II. Memory is deallocated and reallocated as required
 		 * @param nPop: population size
 		 * @param lv : vector of integers representing 1-bits in the bitset
-		 * @details: Fail-fast policy: exceptions are handled inside the program exits
+		 * @warning: this function follows a fail-fast policy. If the function fails, the program terminates.
 		**/
-		void reset(std::size_t nPop, const bitpos_list& lv) noexcept;
+		void reset(std::size_t nPop, const bit_indices& lv) noexcept;
 
 		/**
 		* @brief Resets this bitset to an EMPTY BITSET given to a population size nPop.
@@ -352,9 +356,13 @@ namespace bitgraph {
 		*		  II. Memory is deallocated and reallocated as required
 		*
 		* @param nPop: population size
-		* @details: Fail-fast policy: exceptions are handled inside the program exits
+		* @warning: this function follows a fail-fast policy. If the function fails, the program terminates.
 		**/
 		void reset(std::size_t nPop) noexcept;
+
+		/* substituted by reset - preserved for backward compatibility */
+		void init(std::size_t nPop) noexcept { reset(nPop); }
+		void init(std::size_t nPop, const bit_indices& bits) noexcept { reset(nPop, bits); }
 
 		/**
 		* @brief reallocates memory to the number of blocks of the bitset
@@ -381,16 +389,15 @@ namespace bitgraph {
 			return static_cast<std::size_t>(num_blocks()) * WORD_SIZE;
 		}
 
-
 		DenseBlockVec& bitset()  noexcept { return vBB_; }
 		const DenseBlockVec& bitset() const  noexcept { return vBB_; }
 
-		BITBOARD block(index_t blockID)	const {
-			assert(blockID < static_cast<index_t>(vBB_.size()));
+		BITBOARD block(block_index_t blockID)	const {
+			assert(blockID < static_cast<block_index_t>(vBB_.size()));
 			return vBB_[blockID];
 		}
-		BITBOARD& block(index_t blockID) {
-			assert(blockID < static_cast<index_t>(vBB_.size()));
+		BITBOARD& block(block_index_t blockID) {
+			assert(blockID < static_cast<block_index_t>(vBB_.size()));
 			return vBB_[blockID];
 		}
 
@@ -549,7 +556,7 @@ namespace bitgraph {
 		* @details negative elements will cause an assertion if NDEBUG is not defined,
 		*		  else the behaviour is undefined.
 		**/
-		Bitset& set_bit(const bitpos_list& lv);
+		Bitset& set_bit(const bit_indices& lv);
 
 		/**
 		* @brief sets bit number bit to 0 in the bitstring
@@ -624,7 +631,7 @@ namespace bitgraph {
 		* @param LastBLock: the last bitblock to be modified
 		* @returns reference to the modified bitstring
 		**/
-		Bitset& set_block(index_t firstBlock, index_t lastBlock, const Bitset& bb_add);
+		Bitset& set_block(block_index_t firstBlock, block_index_t lastBlock, const Bitset& bb_add);
 
 		/**
 		* @brief Overwrites / Copies the blocks of 1-bits from the bitstring @bb_add
@@ -636,7 +643,7 @@ namespace bitgraph {
 		* @param LastBLock: the last bitblock to be modified
 		* returns reference to the modified bitstring
 		**/
-		Bitset& assign_block(index_t firstBlock, index_t lastBlock, const Bitset& bb_add);
+		Bitset& assign_block(block_index_t firstBlock, block_index_t lastBlock, const Bitset& bb_add);
 
 		/**
 		* @brief Deletes the 1-bits from the bitstring bb_del in the closed range [firstBlock, lastBlock]
@@ -649,7 +656,7 @@ namespace bitgraph {
 		* @param lastBlock: the last bitblock to be modified
 		* @returns reference to the modified bitstring
 		**/
-		Bitset& erase_block(index_t firstBlock, index_t lastBlock, const Bitset& bb_del);
+		Bitset& erase_block(block_index_t firstBlock, block_index_t lastBlock, const Bitset& bb_del);
 
 		/**
 		* @brief Removes the 1-bits from both input bitstrings (their union)
@@ -661,7 +668,7 @@ namespace bitgraph {
 		* @returns reference to the modified bitstring
 		* @date: 02/02/2025 during a refactorization of BITSCAN
 		**/
-		Bitset& erase_block(index_t firstBlock, index_t lastBlock, const Bitset& bb_del_lhs, const Bitset& bb_del_rhs);
+		Bitset& erase_block(block_index_t firstBlock, block_index_t lastBlock, const Bitset& bb_del_lhs, const Bitset& bb_del_rhs);
 
 		////////////////////////
 		// operators
@@ -699,7 +706,7 @@ namespace bitgraph {
 		* @brief flips 1-bits to 0 and 0-bits to 1 in the
 		*		 closed block range [firstBlock, lastBlock]
 		**/
-		Bitset& flip_block(index_t firstBlock, index_t lastBlock);
+		Bitset& flip_block(block_index_t firstBlock, block_index_t lastBlock);
 
 		/**
 		* @brief AND between rhs and caller bitstring in the closed range of bitblocks [firstBlock, lastBlock]
@@ -711,13 +718,13 @@ namespace bitgraph {
 		* @date: 04/02/2025 during a refactorization of BITSCAN
 		**/
 		template<bool Erase = false>
-		Bitset& AND_EQUAL_block(index_t firstBlock, index_t lastBlock, const Bitset& rhs);
+		Bitset& AND_EQUAL_block(block_index_t firstBlock, block_index_t lastBlock, const Bitset& rhs);
 
 		/**
 		* @brief Wrapper example for AND_EQUAL_block with explicit runtime policy.
 		* @param eraseOutsideRange: if true, sets caller bits outside [firstBlock,lastBlock] to 0.
 		*/
-		Bitset& AND_EQUAL_block(index_t firstBlock, index_t lastBlock, const Bitset& rhs, bool eraseOutsideRange) {
+		Bitset& AND_EQUAL_block(block_index_t firstBlock, block_index_t lastBlock, const Bitset& rhs, bool eraseOutsideRange) {
 			return eraseOutsideRange ? AND_EQUAL_block<true>(firstBlock, lastBlock, rhs)
 									 : AND_EQUAL_block<false>(firstBlock, lastBlock, rhs);
 		}
@@ -731,13 +738,13 @@ namespace bitgraph {
 		* @returns reference to the modified bitstring
 		**/
 		template<bool Erase = false>
-		Bitset& OR_EQUAL_block(index_t firstBlock, index_t lastBlock, const Bitset& rhs);
+		Bitset& OR_EQUAL_block(block_index_t firstBlock, block_index_t lastBlock, const Bitset& rhs);
 
 		/**
 		* @brief Wrapper example for OR_EQUAL_block with explicit runtime policy.
 		* @param eraseOutsideRange: if true, sets caller bits outside [firstBlock,lastBlock] to 0.
 		*/
-		Bitset& OR_EQUAL_block(index_t firstBlock, index_t lastBlock, const Bitset& rhs, bool eraseOutsideRange) {
+		Bitset& OR_EQUAL_block(block_index_t firstBlock, block_index_t lastBlock, const Bitset& rhs, bool eraseOutsideRange) {
 			return eraseOutsideRange ? OR_EQUAL_block<true>(firstBlock, lastBlock, rhs)
 									 : OR_EQUAL_block<false>(firstBlock, lastBlock, rhs);
 		}
@@ -780,7 +787,7 @@ namespace bitgraph {
 		* @created 14/8/16
 		* @last_update 04/02/2025
 		**/
-		int	find_common_singleton_block(index_t firstBlock, index_t lastBlock,
+		int	find_common_singleton_block(block_index_t firstBlock, block_index_t lastBlock,
 			const Bitset& rhs, int& bit) const;
 
 		/**
@@ -824,7 +831,7 @@ namespace bitgraph {
 		* @returns TRUE if the bitstring has all 0-bits in the given range
 		* @details optimized for non-sparse bitsets - early exit
 		**/
-		virtual bool is_empty_block(index_t firstBlock, index_t lastBlock) const;
+		virtual bool is_empty_block(block_index_t firstBlock, block_index_t lastBlock) const;
 
 		/**
 		* @brief TRUE if caller bitstring has a single 1-bit
@@ -852,7 +859,7 @@ namespace bitgraph {
 		* @returns 1 if singleton, 0 if empty, -1 if more than one bit.
 		* @details optimized for non-sparse bitsets - early exit
 		**/
-		int is_singleton_block(index_t firstBlock, index_t lastBlock) const;
+		int is_singleton_block(block_index_t firstBlock, block_index_t lastBlock) const;
 
 		/**
 		* @brief TRUE if this bitstring has no bits in common with rhs
@@ -865,7 +872,7 @@ namespace bitgraph {
 		*
 		*		If lastBlock == npos, the range is [firstBlock, nBB_]
 		**/
-		bool is_disjoint_block(index_t firstBlock, index_t lastBlock, const Bitset& rhs)	const;
+		bool is_disjoint_block(block_index_t firstBlock, block_index_t lastBlock, const Bitset& rhs)	const;
 		/**
 		* @brief TRUE if this bitstring has no bits in common with neither lhs NOR rhs bitstrings
 		* @details Currently not available for sparse bitsets
@@ -904,15 +911,15 @@ namespace bitgraph {
 		*
 		* TODO - loop unrolling for efficiency (18/11/2025)
 		**/
-		void extract(bitpos_list& lb)							const;
-		void extract_set(bitpos_set& lb)							const;
+		void extract(bit_indices& lb)							const;
+		void extract_set(bit_index_set& lb)							const;
 
 		/**
 		* @brief Casts the bitstring to a vector of non-negative integers
 		* @details calls to_vector
 		**/
-		explicit operator bitpos_list()							const;
-		explicit operator bitpos_set()							const;
+		explicit operator bit_indices()							const;
+		explicit operator bit_index_set()							const;
 		
 		/**
 		* @brief Fills stack @s
@@ -1137,7 +1144,7 @@ namespace bitgraph{
 			return true;
 		}
 
-		inline bool Bitset::is_empty_block(index_t firstBlock, index_t lastBlock) const {
+		inline bool Bitset::is_empty_block(block_index_t firstBlock, block_index_t lastBlock) const {
 
 			const auto last_block = (lastBlock == Bitset::npos) ? nBB_ - 1 : lastBlock;
 
@@ -1178,7 +1185,7 @@ namespace bitgraph{
 		}
 
 
-		inline bool Bitset::is_disjoint_block(index_t firstBlock, index_t lastBlock, const Bitset& rhs)	const {
+		inline bool Bitset::is_disjoint_block(block_index_t firstBlock, block_index_t lastBlock, const Bitset& rhs)	const {
 
 			const auto last_block = (lastBlock == Bitset::npos) ? nBB_ - 1 : lastBlock;
 
@@ -1199,7 +1206,7 @@ namespace bitgraph{
 
 		inline Bitset& Bitset::set_bit(int lastBit, const Bitset& bb_add) {
 
-			index_t blockH = WDIV(lastBit);
+			block_index_t blockH = WDIV(lastBit);
 
 			for (auto i = 0; i < blockH; ++i) {
 				vBB_[i] = bb_add.vBB_[i];
@@ -1386,7 +1393,8 @@ namespace bitgraph{
 		}
 
 
-		inline Bitset& Bitset::set_block(index_t firstBlock, index_t lastBlock, const Bitset& bb_add) {
+
+		inline Bitset& Bitset::set_block(block_index_t firstBlock, block_index_t lastBlock, const Bitset& bb_add) {
 
 			const auto last_block = (lastBlock == Bitset::npos) ? nBB_ - 1 : lastBlock;
 
@@ -1402,7 +1410,7 @@ namespace bitgraph{
 			return *this;
 		}
 
-		inline Bitset& Bitset::assign_block(index_t firstBlock, index_t lastBlock, const Bitset& bb_add)
+		inline Bitset& Bitset::assign_block(block_index_t firstBlock, block_index_t lastBlock, const Bitset& bb_add)
 		{
 			const auto last_block = (lastBlock == Bitset::npos) ? nBB_ - 1 : lastBlock;
 
@@ -1549,7 +1557,7 @@ namespace bitgraph{
 		}
 
 
-		inline int Bitset::is_singleton_block(index_t firstBlock, index_t lastBlock) const
+		inline int Bitset::is_singleton_block(block_index_t firstBlock, block_index_t lastBlock) const
 		{
 			const auto last_block = (lastBlock == Bitset::npos) ? nBB_ - 1 : lastBlock;
 
@@ -1594,8 +1602,8 @@ namespace bitgraph{
 			////////////////////////////////////////////////////////////////
 
 			int pc = 0;
-			index_t blockL = WDIV(firstBit);
-			index_t blockH = (lastBit == BBObject::noBit) ? static_cast<index_t>(nBB_ - 1) : WDIV(lastBit);
+			block_index_t blockL = WDIV(firstBit);
+			block_index_t blockH = (lastBit == BBObject::noBit) ? static_cast<block_index_t>(nBB_ - 1) : WDIV(lastBit);
 
 
 			if (blockL == blockH)
@@ -1644,7 +1652,7 @@ namespace bitgraph{
 			return pc;
 		}
 
-		inline	int	Bitset::find_common_singleton_block(index_t firstBlock, index_t lastBlock, const Bitset& rhs, int& bit) const 
+		inline	int	Bitset::find_common_singleton_block(block_index_t firstBlock, block_index_t lastBlock, const Bitset& rhs, int& bit) const 
 		{
 			const auto last_block = (lastBlock == Bitset::npos) ? nBB_ - 1 : lastBlock;
 
@@ -1657,7 +1665,7 @@ namespace bitgraph{
 			bit = BBObject::noBit;
 			bool is_first_vertex = true;
 
-			for (index_t i = firstBlock; i <= last_block; ++i) {
+			for (block_index_t i = firstBlock; i <= last_block; ++i) {
 				pc += bblock::popc64(vBB_[i] & rhs.vBB_[i]);
 				if (pc > 1) {
 					bit = BBObject::noBit;
@@ -1771,8 +1779,8 @@ namespace bitgraph{
 			assert(firstBit <= lastBit || lastBit == BBObject::noBit);
 			/////////////////////////////////////////////////////////////
 
-			index_t blockL = WDIV(firstBit);
-			index_t blockH = (lastBit == BBObject::noBit) ? static_cast<index_t>(nBB_ - 1) : WDIV(lastBit);
+			block_index_t blockL = WDIV(firstBit);
+			block_index_t blockH = (lastBit == BBObject::noBit) ? static_cast<block_index_t>(nBB_ - 1) : WDIV(lastBit);
 
 			//special case - both ends in the same bitblock
 			if (blockL == blockH)
@@ -1816,10 +1824,10 @@ namespace bitgraph{
 			return *this;
 		}
 
-		inline Bitset& Bitset::erase_block(index_t firstBlock, index_t lastBlock, const Bitset& bb_lhs, const Bitset& bb_rhs) {
+		inline Bitset& Bitset::erase_block(block_index_t firstBlock, block_index_t lastBlock, const Bitset& bb_lhs, const Bitset& bb_rhs) {
 
 
-			index_t last_block = (lastBlock == Bitset::npos)? nBB_ - 1 : lastBlock;
+			block_index_t last_block = (lastBlock == Bitset::npos)? nBB_ - 1 : lastBlock;
 
 			///////////////////////////////////////////////////////////////////////////////
 			assert((firstBlock >= 0) && (last_block < num_blocks()) && (firstBlock <= last_block));
@@ -1832,7 +1840,7 @@ namespace bitgraph{
 			return *this;
 		}
 
-		inline Bitset& Bitset::erase_block(index_t firstBlock, index_t lastBlock, const Bitset& bb_del) {
+		inline Bitset& Bitset::erase_block(block_index_t firstBlock, block_index_t lastBlock, const Bitset& bb_del) {
 
 			const auto last_block = (lastBlock == Bitset::npos) ? nBB_ - 1 : lastBlock;
 
@@ -1849,7 +1857,7 @@ namespace bitgraph{
 
 		template<bool Erase>
 		inline
-		Bitset& Bitset::AND_EQUAL_block(index_t firstBlock, index_t lastBlock, const Bitset& rhs) {
+		Bitset& Bitset::AND_EQUAL_block(block_index_t firstBlock, block_index_t lastBlock, const Bitset& rhs) {
 
 			const auto last_block = (lastBlock == Bitset::npos) ? nBB_ - 1 : lastBlock;
 
@@ -1867,7 +1875,7 @@ namespace bitgraph{
 				for (auto i = last_block + 1; i < nBB_; ++i) {
 					vBB_[i] = ZERO;
 				}
-				for (index_t i = 0; i < firstBlock; ++i) {
+				for (block_index_t i = 0; i < firstBlock; ++i) {
 					vBB_[i] = ZERO;
 				}
 			}
@@ -1877,24 +1885,24 @@ namespace bitgraph{
 
 		template<bool Erase>
 		inline
-		Bitset& Bitset::OR_EQUAL_block(index_t firstBlock, index_t lastBlock, const Bitset& rhs) {
+		Bitset& Bitset::OR_EQUAL_block(block_index_t firstBlock, block_index_t lastBlock, const Bitset& rhs) {
 
-			auto last_block = (lastBlock == Bitset::npos) ? static_cast<index_t>(nBB_ - 1) : lastBlock;
+			auto last_block = (lastBlock == Bitset::npos) ? static_cast<block_index_t>(nBB_ - 1) : lastBlock;
 
 			///////////////////////////////////////////////////////////////////////////////////
 			assert(firstBlock <= last_block && last_block < rhs.num_blocks());
 			/////////////////////////////////////////////////////////////////////////////////
 
-			for (index_t i = firstBlock; i <= last_block; ++i) {
+			for (block_index_t i = firstBlock; i <= last_block; ++i) {
 				vBB_[i] |= rhs.vBB_[i];
 			}
 
 			//set bits to 0 outside the range if required
 			if (Erase) {
-				for (index_t i = last_block + 1; i < nBB_; ++i) {
+				for (block_index_t i = last_block + 1; i < nBB_; ++i) {
 					vBB_[i] = ZERO;
 				}
-				for (index_t i = 0; i < firstBlock; ++i) {
+				for (block_index_t i = 0; i < firstBlock; ++i) {
 					vBB_[i] = ZERO;
 				}
 			}
@@ -1975,8 +1983,8 @@ namespace bitgraph {
 			assert(firstBit >= 0 && firstBit <= lastBit);
 			/////////////////////////////////////////////
 
-			Bitset::index_t blockL = WDIV(firstBit);
-			Bitset::index_t blockH = WDIV(lastBit);
+			Bitset::block_index_t blockL = WDIV(firstBit);
+			Bitset::block_index_t blockH = WDIV(lastBit);
 			int offsetH = WMOD(lastBit);			//lastBit - WMUL(blockH));
 			int offsetL = WMOD(firstBit);			//firstBit - WMUL(blockL);
 
@@ -2029,11 +2037,11 @@ namespace bitgraph {
 
 			//set to 0 all bits outside the bitblock range if required
 			if (Erase) {
-				for (auto i = blockH + 1; i < static_cast<Bitset::index_t>(res.nBB_); ++i) {
+				for (auto i = blockH + 1; i < static_cast<Bitset::block_index_t>(res.nBB_); ++i) {
 					res.vBB_[i] = ZERO;
 				}
 
-				for (Bitset::index_t i = 0; i < blockL; ++i) {
+				for (Bitset::block_index_t i = 0; i < blockL; ++i) {
 					res.vBB_[i] = ZERO;
 				}
 			}
@@ -2043,7 +2051,7 @@ namespace bitgraph {
 
 		template<bool Erase>
 		inline
-			Bitset& AND_block(Bitset::index_t firstBlock, Bitset::index_t lastBlock, const Bitset& lhs, const Bitset& rhs, Bitset& res) {
+			Bitset& AND_block(Bitset::block_index_t firstBlock, Bitset::block_index_t lastBlock, const Bitset& lhs, const Bitset& rhs, Bitset& res) {
 
 			const auto last_block = (lastBlock == Bitset::npos) ? lhs.nBB_ - 1 : lastBlock;
 
@@ -2060,10 +2068,10 @@ namespace bitgraph {
 
 			//set bits to 0 outside the range if required
 			if (Erase) {
-				for (auto i = lastBlock + 1; i < static_cast<Bitset::index_t>(lhs.nBB_); ++i) {
+				for (auto i = lastBlock + 1; i < static_cast<Bitset::block_index_t>(lhs.nBB_); ++i) {
 					res.vBB_[i] = ZERO;
 				}
-				for (Bitset::index_t i = 0; i < firstBlock; ++i) {
+				for (Bitset::block_index_t i = 0; i < firstBlock; ++i) {
 					res.vBB_[i] = ZERO;
 				}
 			}
@@ -2148,7 +2156,7 @@ namespace bitgraph {
 
 		template<bool Erase>
 		inline
-			Bitset& OR_block(Bitset::index_t firstBlock, Bitset::index_t lastBlock, const Bitset& lhs, const Bitset& rhs, Bitset& res)
+			Bitset& OR_block(Bitset::block_index_t firstBlock, Bitset::block_index_t lastBlock, const Bitset& lhs, const Bitset& rhs, Bitset& res)
 		{
 			
 			const auto last_block = (lastBlock == Bitset::npos)? lhs.nBB_ - 1 : lastBlock;
@@ -2160,16 +2168,16 @@ namespace bitgraph {
 
 		
 			//AND mask in the range
-			for (Bitset::index_t i = firstBlock; i <= last_block; ++i) {
+			for (Bitset::block_index_t i = firstBlock; i <= last_block; ++i) {
 				res.vBB_[i] = rhs.vBB_[i] | lhs.vBB_[i];
 			}
 
 			//set bits to 0 outside the range if required
 			if (Erase) {
-				for (Bitset::index_t i = lastBlock + 1; i < lhs.nBB_; ++i) {
+				for (Bitset::block_index_t i = lastBlock + 1; i < lhs.nBB_; ++i) {
 					res.vBB_[i] = ZERO;
 				}
-				for (Bitset::index_t i = 0; i < firstBlock; ++i) {
+				for (Bitset::block_index_t i = 0; i < firstBlock; ++i) {
 					res.vBB_[i] = ZERO;
 				}
 			}
@@ -2181,7 +2189,7 @@ namespace bitgraph {
 		Bitset& OR(const Bitset& lhs, const Bitset& rhs, Bitset& res);
 		Bitset& erase_bit(const Bitset& lhs, const Bitset& rhs, Bitset& res);
 		int find_first_common(const Bitset& lhs, const Bitset& rhs);
-		int find_first_common_block(Bitset::index_t firstBlock, Bitset::index_t lastBlock, const Bitset& lhs, const Bitset& rhs);
+		int find_first_common_block(Bitset::block_index_t firstBlock, Bitset::block_index_t lastBlock, const Bitset& lhs, const Bitset& rhs);
 				
 		
 	////friend functions of Bitset
@@ -2201,48 +2209,39 @@ namespace bitgraph {
 // Header-only template implementations
 
 template<class ColT>
-inline 
-bitgraph::Bitset::Bitset(std::size_t nPop, const ColT& bits):
-	nBB_(static_cast<int>(INDEX_1TO1(nPop))),
-	vBB_(static_cast<std::size_t>(nBB_), 0)
+inline
+bitgraph::Bitset::Bitset(std::size_t nPop, const ColT& bits)
+try
+	: nBB_(static_cast<int>(INDEX_1TO1(nPop))),
+	vBB_(static_cast<std::size_t>(nBB_), BITBOARD{ 0 })
 {
 	for (const auto& value : bits) {
-		const auto bit = static_cast<std::intmax_t>(value);
+		const auto bit = static_cast<bit_index_t>(value);
 				
 		assert(bit >= 0);
 		assert(static_cast<std::size_t>(bit) < nPop);
 
-		// release mode check - terminates
-		/*if (bit < 0 ||
-			static_cast<std::size_t>(bit) >= nPop) {
-			bitset_initialization_error();
-		}*/
+		if (bit < 0 || static_cast<std::size_t>(bit) >= nPop) {
+			LOGG_ERROR("Invalid bit position: ", bit, "- Bitset::Bitset(nPop, ColT)");
+			std::terminate();
+		}
 
 		set_bit(static_cast<bit_t>(bit));
 	}
-
-	//try {
-	//	vBB_.assign(nBB_, 0);
-
-	//	//sets bit conveniently
-	//	for (auto& bit : lv) {
-
-
-	//		//////////////////
-	//		assert(bit >= 0 && bit < static_cast<int>(nPop));
-	//		/////////////////
-
-	//		//sets bits - no prior erasing
-	//		set_bit(static_cast<bit_t>(bit));
-
-	//	}
-
-	//}
-	//catch (...) {
-	//	LOG_ERROR("Error during construction - Bitset::Bitset()");
-	//	LOG_ERROR("exiting...");
-	//	std::exit(EXIT_FAILURE);
-	//}
+}
+catch (const std::bad_alloc& e) {
+	LOG_ERROR("Bitset construction failed: out of memory - Bitset::Bitset(nPop, ColT)");
+	LOG_ERROR(e.what());
+	std::terminate();
+}
+catch (const std::exception& e) {
+	LOG_ERROR("Bitset construction failed: std::exception - Bitset::Bitset(nPop, ColT)");
+	LOG_ERROR(e.what());
+	std::terminate();
+}
+catch (...) {
+	LOG_ERROR("Bitset construction failed: unknown error - Bitset::Bitset(nPop, ColT)");
+	std::terminate();
 }
 
 /////////////////////////////////

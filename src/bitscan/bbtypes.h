@@ -62,8 +62,16 @@ namespace bitgraph {
 
 	static_assert(sizeof(BITBOARD) * 8 == WORD_SIZE, "BITBOARD size and WORD_SIZE must match");
 
-	using bitpos_list = std::vector<int>;
-	using bitpos_set = std::set<int>;
+	using bit_index_t = int;
+	using block_index_t = int;
+
+	using bit_indices = std::vector<bit_index_t>;
+	using bit_index_set = std::set<bit_index_t>;
+
+	// Aliases for backward compatibility
+	using bitpos_list = std::vector<bit_index_t>;
+	using bitpos_set = std::set<bit_index_t>;
+	
 
 } // end namespace bitgraph
 
