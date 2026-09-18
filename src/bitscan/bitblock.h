@@ -444,7 +444,9 @@ namespace bitgraph {
 			//applys same computation as for LSB-de Bruijn
 			return _impl::Tables::indexDeBruijn64_SEP[(bb * DEBRUIJN_MN_64_SEP) >> DEBRUIJN_MN_64_SHIFT];
 		}
+
 	} // end namespace bblock
+
 } // end namespace bitgraph
 
 
