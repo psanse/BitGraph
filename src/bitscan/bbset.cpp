@@ -37,53 +37,39 @@ Bitset::Bitset(std::size_t nPop, bool val)
 	//}
 }
 
-Bitset::Bitset(const bitpos_list& v):
-	nBB_(BBObject::noBit)
+Bitset::Bitset(const bitpos_list& bits)
+	: nBB_(0)
 {
-	try {
-		nBB_ = INDEX_0TO1(*(max_element(v.begin(), v.end())));
-		vBB_.assign(nBB_, 0);
+	if (bits.empty()) {
+		return;
+	}
 
-		for (auto& bit : v) {
+	const auto maxBit = *std::max_element(bits.begin(), bits.end());
+	assert(maxBit >= 0);
 
-			//////////////////
-			assert(bit >= 0);
-			/////////////////
+	nBB_ = static_cast<int>(INDEX_0TO1(maxBit));
+	vBB_.assign(static_cast<std::size_t>(nBB_), BITBOARD{ 0 });
 
-			//sets bits - no prior erasing
+	for (const auto bit : bits) {
+		assert(bit >= 0);
+		if (bit >= 0) {
 			set_bit(bit);
 		}
 	}
-	catch (...) {
-		LOG_ERROR("Error during construction - Bitset::Bitset()");
-		LOG_ERROR("exiting...");
-		std::exit(EXIT_FAILURE);
-	}
 }
 
-Bitset::Bitset(std::size_t nPop, std::initializer_list<int> l):
-	nBB_(static_cast<index_t>(INDEX_1TO1(nPop)))
+Bitset::Bitset(std::size_t nPop, std::initializer_list<int> bits)
+	: nBB_(static_cast<index_t>(INDEX_1TO1(nPop))),
+	vBB_(static_cast<std::size_t>(nBB_), BITBOARD{ 0 })
 {
-	try {
-		vBB_.assign(nBB_, 0);
-
-		//sets bit conveniently
-		for (auto& bit : l) {
-
-			//////////////////
-			assert(bit >= 0 && bit < static_cast<int>(nPop));
-			/////////////////
-
-			//sets bits - no prior erasing
+	for (const int bit : bits) {
+		assert(bit >= 0 && bit < static_cast<int>(nPop));
+		if (bit >= 0 && bit < static_cast<int>(nPop)) {
 			set_bit(bit);
 		}
 	}
-	catch (...) {
-		LOG_ERROR("Error during construction - Bitset::Bitset()");
-		LOG_ERROR("exiting...");
-		std::exit(EXIT_FAILURE);
-	}
 }
+
 
 void Bitset::init(std::size_t nPop) noexcept {
 
