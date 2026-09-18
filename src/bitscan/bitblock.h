@@ -285,7 +285,7 @@ namespace bitgraph {
 		inline BITBOARD MASK_1(int low, int high) { return Tables::mask_mid[low][high]; };
 
 		/**
-		* @brief Sets to 1 all bits in the closed range [0, 63]
+		* @brief Sets to 1 all bits in the closed range [0, idx]
 		* @param idx: input reference bit position [0...63]
 		* @returns 64-bit bitblock mask
 		**/
