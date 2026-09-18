@@ -821,11 +821,7 @@ namespace bitgraph {
 
 			return *this;
 		}
-
-		Bitset& Bitset::erase_all_bits() {
-			return erase_bit();
-		}
-
+		
 
 		Bitset& Bitset::erase_bit() noexcept {
 

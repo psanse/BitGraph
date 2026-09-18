@@ -26,3 +26,12 @@ add_executable(bitscan_views
 target_link_libraries(bitscan_views
     PRIVATE bitscan
 )
+
+add_executable(bitset_core
+    bitset_core_api.cpp
+)
+
+target_link_libraries(bitset_core
+    PRIVATE bitscan
+)
+
