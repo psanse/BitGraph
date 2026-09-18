@@ -359,7 +359,6 @@ Bitset& Bitset::set_bit(const bit_indices& lv) {
 namespace bitgraph {
 
 
-
 	Bitset& AND(const Bitset& lhs, const Bitset& rhs, Bitset& res) {
 
 		for (auto i = 0; i < lhs.nBB_; ++i) {

@@ -304,7 +304,7 @@ namespace bitgraph {
 
 //////////////////////////
 // INLINE Implementation for generic code, should be in header file
-#include "bbscan_imp.h"
+#include "detail/bbscan_imp.h"
 
 
 #endif // _BITGRAPH_BBSCAN_H_

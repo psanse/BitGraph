@@ -1960,9 +1960,7 @@ namespace bitgraph{
 
 
 namespace bitgraph {
-
 	
-
 		inline
 			bool operator==	(const Bitset& lhs, const Bitset& rhs) {
 			return ((lhs.nBB_ == rhs.nBB_) &&
@@ -2184,24 +2182,7 @@ namespace bitgraph {
 
 			return res;
 		}
-
-		Bitset& AND(const Bitset& lhs, const Bitset& rhs, Bitset& res);
-		Bitset& OR(const Bitset& lhs, const Bitset& rhs, Bitset& res);
-		Bitset& erase_bit(const Bitset& lhs, const Bitset& rhs, Bitset& res);
-		int find_first_common(const Bitset& lhs, const Bitset& rhs);
-		int find_first_common_block(Bitset::block_index_t firstBlock, Bitset::block_index_t lastBlock, const Bitset& lhs, const Bitset& rhs);
-				
 		
-	////friend functions of Bitset
-	//using _impl::operator!=;
-	//using _impl::operator==;
-	//using _impl::AND;
-	//using _impl::OR;
-	//using _impl::AND_block;
-	//using _impl::OR_block;
-	//using _impl::find_first_common;
-	//using _impl::erase_bit;
-
 
 }//end namespace bitgraph
 
