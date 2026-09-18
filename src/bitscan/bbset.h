@@ -334,6 +334,7 @@ namespace bitgraph {
 		{
 			return Bitset(nPop, positions);
 		}
+
 				
 		////////
 		// Copy and move semantics allowed
