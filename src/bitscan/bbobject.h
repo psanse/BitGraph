@@ -26,6 +26,7 @@ namespace bitgraph {
 	public:
 				
 		using index_t = int;
+		using bit_t = int;
 		using bitpos_list = bitgraph::bitpos_list;
 		using bitpos_set = bitgraph::bitpos_set;
 

@@ -24,7 +24,7 @@
 namespace bitgraph {
 
 	////////////////////////
-	// Forward declarations
+	// Forward declarations (friend functions of Bitset)
 	////////////////////////
 	class Bitset;
 	
@@ -247,11 +247,11 @@ namespace bitgraph {
 		 * The required capacity is inferred from the greatest position in @p positions.
 		 * An empty collection produces an empty bitset.
 		 *
-		 * @param positions Positions of the bits to set.
+		 * @param bits Positions of the bits to set.
 		 *
 		 * @pre Every position must be nonnegative.
 		 */
-		explicit  Bitset(const bitpos_list& positions);
+		explicit  Bitset(const bitpos_list& bits);
 
 		/**
 		 * @brief Constructs a bitset with the specified set-bit positions.
@@ -261,24 +261,24 @@ namespace bitgraph {
 		 *
 		 * @tparam Collection Collection type providing begin() and end().
 		 * @param nPop Minimum number of bit positions required.
-		 * @param positions Positions of the bits to set.
+		 * @param bits Positions of the bits to set.
 		 *
 		 * @pre Every position must be nonnegative and smaller than
 		 *      @p requestedBits.
 		 */
 		template<class ColT>
-		explicit  Bitset(std::size_t nPop, const ColT& positions);
+		explicit  Bitset(std::size_t nPop, const ColT& bits);
 
 		/**
 		 * @brief Constructs a bitset from an initializer list of set-bit positions.
 		 *
 		 * @param nPop Minimum number of bit positions required.
-		 * @param positions Positions of the bits to set.
+		 * @param bits Positions of the bits to set.
 		 *
 		 * @pre Every position must be nonnegative and smaller than
 		 *      @p requestedBits.
 		 */
-		explicit  Bitset(std::size_t nPop, std::initializer_list<int> positions);
+		explicit  Bitset(std::size_t nPop, std::initializer_list<int> bits);
 
 
 		////////
@@ -295,16 +295,27 @@ namespace bitgraph {
 			return Bitset(nPop, true);
 		}
 
+		template<class It>
+		static Bitset from_positions(
+			std::size_t nPop,
+			It first,
+			It last) = delete;
+
+		template<class Collection>
+		static Bitset from_positions(
+			std::size_t nPop,
+			const Collection& positions)
+		{
+			return Bitset(nPop, positions);
+		}
+
 		static Bitset from_set_bits(
 			std::size_t nPop,
 			std::initializer_list<int> positions)
 		{
 			return Bitset(nPop, positions);
 		}
-
-		// TODO... add named factories for inclusive intervals
-		static Bitset from_closed_interval(std::size_t nPop, int first, int last) = delete;
-
+				
 		////////
 		// Copy and move semantics allowed
 
@@ -918,14 +929,23 @@ namespace bitgraph {
 		void extract_array(int* lv, std::size_t& size, bool rev = false);
 
 
+		///////////////////////////////
+		// handlers
+
+		[[noreturn]]
+		static void bitset_initialization_error() noexcept
+		{
+			std::fputs("Bitset initialization failed: invalid bit position\n", stderr);
+			std::terminate();
+		}
+
 		////////////////////////
 		//data members
 
 	protected:
-		DenseBlockVec vBB_;					// vector of fixed size bitblocks 
 		int nBB_;							// number of bitblocks (redundant to vBB.size(), cached for efficiency)
-
-
+		DenseBlockVec vBB_;					// vector of fixed size bitblocks 
+		
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////
 		// DEPRECATED friend operations, TO BE REMOVED. NOT CHECKED!! (06/02/2025)
 
@@ -2182,31 +2202,47 @@ namespace bitgraph {
 
 template<class ColT>
 inline 
-bitgraph::Bitset::Bitset(std::size_t nPop, const ColT& lv) :
-	nBB_(static_cast<int>(INDEX_1TO1(nPop)))
+bitgraph::Bitset::Bitset(std::size_t nPop, const ColT& bits):
+	nBB_(static_cast<int>(INDEX_1TO1(nPop))),
+	vBB_(static_cast<std::size_t>(nBB_), 0)
 {
+	for (const auto& value : bits) {
+		const auto bit = static_cast<std::intmax_t>(value);
+				
+		assert(bit >= 0);
+		assert(static_cast<std::size_t>(bit) < nPop);
 
-	try {
-		vBB_.assign(nBB_, 0);
+		// release mode check - terminates
+		/*if (bit < 0 ||
+			static_cast<std::size_t>(bit) >= nPop) {
+			bitset_initialization_error();
+		}*/
 
-		//sets bit conveniently
-		for (auto& bit : lv) {
-
-			//////////////////
-			assert(bit >= 0 && bit < static_cast<int>(nPop));
-			/////////////////
-
-			//sets bits - no prior erasing
-			set_bit(bit);
-
-		}
-
+		set_bit(static_cast<bit_t>(bit));
 	}
-	catch (...) {
-		LOG_ERROR("Error during construction - Bitset::Bitset()");
-		LOG_ERROR("exiting...");
-		std::exit(EXIT_FAILURE);
-	}
+
+	//try {
+	//	vBB_.assign(nBB_, 0);
+
+	//	//sets bit conveniently
+	//	for (auto& bit : lv) {
+
+
+	//		//////////////////
+	//		assert(bit >= 0 && bit < static_cast<int>(nPop));
+	//		/////////////////
+
+	//		//sets bits - no prior erasing
+	//		set_bit(static_cast<bit_t>(bit));
+
+	//	}
+
+	//}
+	//catch (...) {
+	//	LOG_ERROR("Error during construction - Bitset::Bitset()");
+	//	LOG_ERROR("exiting...");
+	//	std::exit(EXIT_FAILURE);
+	//}
 }
 
 /////////////////////////////////

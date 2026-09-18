@@ -19,24 +19,15 @@ using namespace bitgraph;
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
-Bitset::Bitset(std::size_t nPop, bool val) :
-	nBB_(static_cast<int>(INDEX_1TO1(nPop)))
+Bitset::Bitset(std::size_t nPop, bool val)
+	: nBB_(static_cast<int>(INDEX_1TO1(nPop))),
+	vBB_(nBB_, val ? static_cast<BITBOARD>(ONE) : static_cast<BITBOARD>(0))
 {
-	
-	try {
-		vBB_.assign(nBB_, val ? static_cast<BITBOARD>(ONE) : 0);		
-	}
-	catch (...) {
-		LOG_ERROR("Error during construction - Bitset::Bitset");
-		LOG_ERROR("exiting...");
-		std::exit(EXIT_FAILURE);
-	}
-
-	//trim last bitblock to ZERO if val = TRUE
+	// Clear unused high positions in the final block if val = TRUE
 	if (val && nPop > 0) {
-		const auto rem = WMOD(nPop);
-		if (rem != 0) {
-			vBB_.back() &= bblock::MASK_0_HIGH(rem);
+		const auto usedBits = WMOD(nPop);
+		if (usedBits != 0) {
+			vBB_.back() &= bblock::MASK_0_HIGH(usedBits);
 		}
 	}
 
@@ -45,7 +36,6 @@ Bitset::Bitset(std::size_t nPop, bool val) :
 	//	vBB_.back() &= bblock::MASK_0_HIGH(nPop - WMUL(nBB_ - 1));			// cannot be /* bblock::MASK_0_HIGH(WMOD(nPop))! */
 	//}
 }
-
 
 Bitset::Bitset(const bitpos_list& v):
 	nBB_(BBObject::noBit)
@@ -86,9 +76,7 @@ Bitset::Bitset(std::size_t nPop, std::initializer_list<int> l):
 
 			//sets bits - no prior erasing
 			set_bit(bit);
-
 		}
-
 	}
 	catch (...) {
 		LOG_ERROR("Error during construction - Bitset::Bitset()");
@@ -108,7 +96,6 @@ void Bitset::init(std::size_t nPop) noexcept {
 		LOG_ERROR("exiting...");
 		std::exit(EXIT_FAILURE);
 	}
-
 }
 
 void Bitset::init(std::size_t nPop, const bitpos_list& lv) noexcept {
