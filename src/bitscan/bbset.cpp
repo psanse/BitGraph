@@ -70,7 +70,6 @@ Bitset::Bitset(std::size_t nPop, std::initializer_list<int> bits)
 	}
 }
 
-
 void Bitset::init(std::size_t nPop) noexcept {
 
 	try {
@@ -146,7 +145,6 @@ void Bitset::reset(std::size_t nPop, const bitpos_list& lv) noexcept {
 		std::exit(EXIT_FAILURE);
 	}
 }
-
 
 
 //////////////////////////
