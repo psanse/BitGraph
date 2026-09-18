@@ -198,9 +198,72 @@ namespace bitgraph {
 			dest |= destOri & Tables::mask_high[bit];
 		}
 
+
+
+		int lsb64_intrinsic(const BITBOARD bb_dato) {
+			unsigned long index;
+			if (_BitScanForward64(&index, bb_dato))
+				return(index);
+
+			return BBObject::noBit;
+		}
+
+
+		int msb64_intrinsic(const BITBOARD bb_dato) {
+			unsigned long index;
+			if (_BitScanReverse64(&index, bb_dato))
+				return(index);
+
+			return BBObject::noBit;
+		}
+
+
+		int popc64(const BITBOARD bb_dato) {
+
+#ifdef POPCOUNT_INTRINSIC_64
+			return (int)__popcnt64(bb_dato);
+#else
+			//lookup table popcount
+			register union x {
+				U16 c[4];
+				BITBOARD b;
+			} val;
+
+			val.b = bb_dato; //Carga unisn
+
+			return (impl::Tables::pc[val.c[0]] + impl::Tables::pc[val.c[1]] + impl::Tables::pc[val.c[2]] + impl::Tables::pc[val.c[3]]); //Suma de poblaciones  
+#endif
+
+		}
+
+		int lsb64_de_Bruijn(const BITBOARD bb_dato) {
+
+#ifdef ISOLANI_LSB
+			return (bb_dato == 0) ? BBObject::noBit : _impl::Tables::indexDeBruijn64_ISOL[((bb_dato & -bb_dato) * DEBRUIJN_MN_64_ISOL) >> DEBRUIJN_MN_64_SHIFT];
+#else
+			return (bb_dato == 0) ? BBObject::noBit : _impl::Tables::indexDeBruijn64_SEP[((bb_dato ^ (bb_dato - 1)) * DEBRUIJN_MN_64_SEP) >> DEBRUIJN_MN_64_SHIFT];
+#endif
+
+		}
+
+		int msb64_de_Bruijn(const BITBOARD bb_dato) {
+
+			if (bb_dato == 0) return BBObject::noBit;
+
+			//creates all 1s up to MSB position
+			BITBOARD bb = bb_dato;
+			bb |= bb >> 1;
+			bb |= bb >> 2;
+			bb |= bb >> 4;
+			bb |= bb >> 8;
+			bb |= bb >> 16;
+			bb |= bb >> 32;
+
+			//applys same computation as for LSB-de Bruijn
+			return _impl::Tables::indexDeBruijn64_SEP[(bb * DEBRUIJN_MN_64_SEP) >> DEBRUIJN_MN_64_SHIFT];
+		}
+
 	}//end namespace bblock
 
 }//end namespace bitgraph
-
-
 

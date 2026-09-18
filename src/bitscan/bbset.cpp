@@ -1,6 +1,6 @@
 /**
  * @file bbset.cpp file
- * @brief implementation of the Bitset class for non-sparsearrays of bit
+ * @brief implementation of the Bitset class for non-sparse bitarrays
  * @author pss
  **/
 
@@ -14,10 +14,9 @@
 using namespace std;
 using namespace bitgraph;
 
+/////////////////////////////
+// BitSet definitions
 
-//////////////////////////////////////////////////////////////////////
-// Construction/Destruction
-//////////////////////////////////////////////////////////////////////
 
 Bitset::Bitset(std::size_t nPop, bool val)
 try
@@ -223,13 +222,6 @@ Bitset& Bitset::flip_block(block_index_t firstBlock, block_index_t lastBlock)
 	return *this;
 }
 
-
-//////////////////////////
-//
-// I/O FILES
-//
-//////////////////////////
-
 std::ostream& Bitset::print(std::ostream& o, bool show_pc, bool endl ) const
 {
 	o << "[";
@@ -353,7 +345,7 @@ Bitset& Bitset::set_bit(const bit_indices& lv) {
 
 
 ///////////////////////
-// friend functions of Bitset
+// Friend Bitset functions (non-template) 
 //
 
 namespace bitgraph {
@@ -377,33 +369,15 @@ namespace bitgraph {
 		return res;
 	}
 
+	
+	bool operator==	(const Bitset& lhs, const Bitset& rhs) {
+			return ((lhs.nBB_ == rhs.nBB_) &&	(lhs.vBB_ == rhs.vBB_));
+	};
 
-
-	//Bitset AND_block(int firstBlock, int lastBlock, Bitset lhs, const Bitset& rhs)
-	//{
-	//	////////////////////////////////////////////////////////////////////
-	//	//assert((firstBlock >= 0) && (LastBlock < lhs.nBB_) &&
-	//	//	(firstBlock <= lastBlock) && (rhs.nBB_ == lhs.nBB_));
-	//	////////////////////////////////////////////////////////////////////
-	//
-	//	//int last_block = ((lastBlock == Bitset::npos) ? lhs.nBB_ - 1 : lastBlock);
-	//
-	//	//for (auto i = firstBlock; i <= last_block; ++i) {
-	//	//	lhs.vBB_[i] &= rhs.vBB_[i];
-	//	//}
-	//
-	//	////set bits to 0 outside the range 
-	//	//for (int i = lastBlock + 1; i < lhs.nBB_; ++i) {
-	//	//	lhs.vBB_[i] = ZERO;
-	//	//}
-	//	//for (int i = 0; i < firstBlock; ++i) {
-	//	//	lhs.vBB_[i] = ZERO;
-	//	//}
-	//
-	//	//return lhs;
-	//}
-
-
+	
+	bool operator!=	(const Bitset& lhs, const Bitset& rhs) {
+		return !(lhs == rhs);
+	}; 
 
 	Bitset& erase_bit(const Bitset& lhs, const Bitset& rhs, Bitset& res) {
 
@@ -448,94 +422,937 @@ namespace bitgraph {
 
 
 
+
+	
+		int Bitset::find_first_common(const Bitset& rhs) const {
+
+			BITBOARD bb = 0;
+			for (auto i = 0; i < nBB_; ++i) {
+				if ((bb = (vBB_[i] & rhs.vBB_[i]))) {
+					return bblock::lsb64_intrinsic(bb) + WMUL(i);
+				}
+			}
+			return BBObject::noBit;
+		}
+
+		int Bitset::msbn64_lup() const {
+
+			union u {
+				U16 c[4];
+				BITBOARD b;
+			} val{};
+
+			//reverse loop (most significant bit block early exit)
+			for (int i = nBB_ - 1 ; i >= 0; i--) {
+				val.b = vBB_[i];
+				if (val.b) {
+					if (val.c[3]) return (Tables::msba[3][val.c[3]] + WMUL(i));
+					if (val.c[2]) return (Tables::msba[2][val.c[2]] + WMUL(i));
+					if (val.c[1]) return (Tables::msba[1][val.c[1]] + WMUL(i));
+					if (val.c[0]) return (Tables::msba[0][val.c[0]] + WMUL(i));
+				}
+			}
+
+			return BBObject::noBit;		//should not reach here
+		}
+
+		int Bitset::msbn64_intrin() const
+		{
+			Ul posInBB;
+
+			for (int i = nBB_ - 1; i >= 0; --i) {
+
+				if (_BitScanReverse64(&posInBB, vBB_[i])) {
+					return (posInBB + WMUL(i));
+				}
+			}
+
+			return BBObject::noBit;
+		}
+
+		int Bitset::next_bit(int bit) const {
+
+			//bit = -1 is a special case of early exit
+			//typically used in a loop, in the first bitscan call.
+			//Determines the least significant bit in the bitsring
+			if (bit == BBObject::noBit) {
+				return lsb();
+			}
+
+			//compute bitlbock of the bit
+			int blockL = WDIV(bit);
+
+			//looks for the next bit in the current block
+			int pos = bblock::lsb64_de_Bruijn(Tables::mask_high[bit - WMUL(blockL) /*WMOD(bit)*/] & vBB_[blockL]);
+			if (pos >= 0) {
+				//////////////////////////////
+				return (pos + WMUL(blockL));
+				////////////////////////////
+			}
+
+			//looks in remaining biblocks
+			for (auto i = blockL + 1; i < nBB_; ++i) {
+				if (vBB_[i]) {
+					return(bblock::lsb64_de_Bruijn(vBB_[i]) + WMUL(i));
+				}
+			}
+
+			//should not reach here
+			return BBObject::noBit;
+		}
+
+		int Bitset::prev_bit(int bit) const {
+
+			//special case - first bitscan,
+			//calls for the most-significant bit in the bitstring
+			if (bit == BBObject::noBit) {
+				return msb();
+			}
+
+			//bitblock of input bit
+			int blockH = WDIV(bit);
+
+			//looks for the msb in the (trimmed) current block
+			int pos = bblock::msb64_lup(Tables::mask_low[ /*bit - WMUL(blockH)*/  WMOD(bit) ] & vBB_[blockH]);
+			if (pos != BBObject::noBit) {
+				return (pos + WMUL(blockH));
+			}
+
+			//looks for the msb in the remaining blocks
+			union u {
+				U16 c[4];
+				BITBOARD b;
+			}val{};
+
+			for (int i = static_cast<int>(blockH - 1) /* must be signed! */; i >= 0; --i)
+			{
+				val.b = vBB_[i];
+				if (val.b) {
+					if (val.c[3]) return (Tables::msba[3][val.c[3]] + WMUL(i));
+					if (val.c[2]) return (Tables::msba[2][val.c[2]] + WMUL(i));
+					if (val.c[1]) return (Tables::msba[1][val.c[1]] + WMUL(i));
+					if (val.c[0]) return (Tables::msba[0][val.c[0]] + WMUL(i));
+				}
+			}
+
+			return BBObject::noBit;		//should not reach here
+		}
+
+
+		bool Bitset::is_bit(int nbit/*0 based*/) const {
+			
+			return (vBB_[WDIV(nbit)] & Tables::mask[WMOD(nbit)]);
+
+		}
+
+		bool Bitset::is_empty() const
+		{
+			for (int i = 0; i < nBB_; ++i) {
+				if (vBB_[i]) {
+					return false;
+				}
+			}
+
+			return true;
+		}
+
+		bool Bitset::is_empty_block(block_index_t firstBlock, block_index_t lastBlock) const {
+
+			const auto last_block = (lastBlock == Bitset::npos) ? nBB_ - 1 : lastBlock;
+
+			///////////////////////////////////////////////////////////////////////////////
+			assert((firstBlock >= 0) && (last_block < num_blocks()) && (firstBlock <= last_block));
+			///////////////////////////////////////////////////////////////////////////////
+
+
+			for (auto i = firstBlock; i <= last_block; ++i) {
+				if (vBB_[i]) {
+					return false;
+				}
+			}
+
+			return true;
+		}
+
+
+		bool Bitset::is_disjoint(const Bitset& rhs) const
+		{
+			for (auto i = 0; i < nBB_; ++i) {
+				if (vBB_[i] & rhs.vBB_[i]) {
+					return false;
+				}
+			}
+			return true;
+		}
+
+
+		bool Bitset::is_disjoint(const Bitset& lhs, const Bitset& rhs)	const
+		{
+			for (auto i = 0; i < nBB_; ++i) {
+				if (vBB_[i] & lhs.vBB_[i] & rhs.vBB_[i]) {
+					return false;
+				}
+			}
+			return true;
+		}
+
+
+		bool Bitset::is_disjoint_block(block_index_t firstBlock, block_index_t lastBlock, const Bitset& rhs)	const {
+
+			const auto last_block = (lastBlock == Bitset::npos) ? nBB_ - 1 : lastBlock;
+
+			///////////////////////////////////////////////////////////////////////////////
+			assert((firstBlock >= 0) && (last_block < num_blocks()) && (firstBlock <= last_block));
+			///////////////////////////////////////////////////////////////////////////////
+
+
+			for (auto i = firstBlock; i <= last_block; ++i) {
+				if (vBB_[i] & rhs.vBB_[i]) {
+					return false;
+				}
+			}
+			return true;
+		}
+
+
+
+		Bitset& Bitset::set_bit(int lastBit, const Bitset& bb_add) {
+
+			block_index_t blockH = WDIV(lastBit);
+
+			for (auto i = 0; i < blockH; ++i) {
+				vBB_[i] = bb_add.vBB_[i];
+			}
+
+			//copy the appropiate part of the blockH bitblock (including high)
+			bblock::copy_low(/*lastBit - WMUL(blockH)*/ WMOD(lastBit), bb_add.vBB_[blockH], this->vBB_[blockH]);
+
+
+			return *this;
+		}
+
+
+		int  Bitset::is_singleton(int firstBit, int lastBit) const {
+
+			int blockL = WDIV(firstBit);
+			int blockH = WDIV(lastBit);
+			int pc = 0;
+
+			//both ends
+			if (blockL == blockH) {
+				if ((pc = bblock::popc64(vBB_[blockL] & bblock::MASK_1(/*firstBit - WMUL(blockL)*/ WMOD(firstBit), /*lastBit - WMUL(blockH)*/  WMOD(lastBit)))) > 1) {
+					return -1;
+				}
+			}
+			else {
+
+				//checks first block
+				if ((pc = bblock::popc64(vBB_[blockL] & bblock::MASK_1_HIGH(/*firstBit - WMUL(blockL)*/ WMOD(firstBit)  ))) > 1) {
+					return -1;
+				}
+
+				//checks intermediate blocks
+				for (auto i = blockL + 1; i < blockH; ++i) {
+					if (pc += bblock::popc64(vBB_[i]) > 1) {
+						return -1;
+					}
+				}
+
+				//checks last block
+				if ((pc += bblock::popc64(vBB_[blockH] & bblock::MASK_1_LOW(/*lastBit - WMUL(blockH) */ WMOD(lastBit)  ))) > 1) {
+					return -1;
+				}
+			}
+
+			//reasons on return value - 0 empty, 1 singleton (-1 early exit)
+			if (pc == 0) { return 0; }
+			return 1;						//MUST BE singleton
+		}
+
+
+		int  Bitset::find_singleton(int firstBit, int lastBit, int& singleton) const {
+
+			int blockL = WDIV(firstBit);
+			int	blockH = WDIV(lastBit);
+			int offsetL = WMOD(firstBit);			//firstBit - WMUL(blockL);		
+			int offsetH = WMOD(lastBit);			//lastBit - WMOD(blockH);		
+			int pc = 0;
+			bool vertex_not_found = true;
+			singleton = BBObject::noBit;
+
+			//both ends
+			if (blockL == blockH) {
+				BITBOARD bbl = vBB_[blockL] & bblock::MASK_1(offsetL, offsetH);
+				pc = bblock::popc64(bbl);
+				if ((pc = bblock::popc64(bbl)) == 1) {
+					singleton = bblock::lsb(bbl) + WMUL(blockL);
+					/////////
+					return 1;
+					////////
+				}
+			}
+			else {
+
+				//checks first block
+				BITBOARD bbl = vBB_[blockL] & bblock::MASK_1_HIGH(offsetL);
+
+				if ((pc = bblock::popc64(bbl)) > 1) {
+					/////////
+					return -1;
+					/////////
+				}
+				else if (pc == 1) {
+					vertex_not_found = false;
+					singleton = bblock::lsb(bbl) + WMUL(blockL);
+				}
+
+				//checks intermediate blocks
+				for (auto i = blockL + 1; i < blockH; ++i) {
+					if ((pc += bblock::popc64(vBB_[i])) > 1) {
+						/////////
+						return -1;
+						/////////
+					}
+					else if (vertex_not_found && (pc == 1)) {
+						singleton = bblock::lsb(vBB_[i]) + WMUL(i);
+						vertex_not_found = false;
+					}
+				}
+
+				//checks last block
+				BITBOARD bbh = vBB_[blockH] & bblock::MASK_1_LOW(offsetH);
+
+				if ((pc += bblock::popc64(bbh)) > 1) {
+					/////////
+					return -1;
+					/////////
+				}
+				else if (vertex_not_found && (pc == 1)) {
+					singleton = bblock::lsb(bbh) + WMUL(blockH);
+				}
+			}
+
+			//reason with pc
+			if (pc == 0) { return 0; }
+
+			//must be singleton
+			return 1;
+		}
+
+
+		Bitset& Bitset::set_bit(int bit) {
+
+			vBB_[WDIV(bit)] |= Tables::mask[WMOD(bit)];
+			return *this;
+		}
+
+
+		Bitset& Bitset::set_bit(int firstBit, int lastBit) {
+
+			////////////////////////////////////////////////
+			assert(firstBit >= 0 && firstBit <= lastBit);
+			///////////////////////////////////////////////
+
+			int blockL = WDIV(firstBit);
+			int blockH = WDIV(lastBit);
+
+
+			if (blockL == blockH)
+			{
+				vBB_[blockH] |= bblock::MASK_1( /*firstBit - WMUL(blockL)*/ WMOD(firstBit), /*lastBit - WMUL(blockH)*/ WMOD(lastBit));
+			}
+			else
+			{
+				//set to one the intermediate blocks
+				for (auto i = blockL + 1; i < blockH; ++i) {
+					vBB_[i] = ONE;
+				}
+
+				//sets the first and last blocks
+				vBB_[blockH] |= bblock::MASK_1_LOW(/*lastBit - WMUL(blockH)*/ WMOD(lastBit));
+				vBB_[blockL] |= bblock::MASK_1_HIGH(/*firstBit - WMUL(blockL)*/ WMOD(firstBit));
+
+			}
+
+			return *this;
+		}
+		
+
+		Bitset& Bitset::set_bit(const Bitset& bb_add) {
+
+			/////////////////////////////////
+			assert(nBB_ <= bb_add.nBB_);
+			/////////////////////////////////
+
+			for (auto i = 0; i < nBB_; ++i) {
+				vBB_[i] |= bb_add.vBB_[i];
+			}
+
+			return *this;
+		}
+
+		Bitset& Bitset::assign_bit(const Bitset& bb_add)
+		{
+			/////////////////////////////////
+			assert(nBB_ <= bb_add.nBB_);
+			/////////////////////////////////
+
+			for (auto i = 0; i < nBB_; ++i) {
+				vBB_[i] = bb_add.vBB_[i];
+			}
+
+			return *this;
+		}
+
+
+
+		Bitset& Bitset::set_block(block_index_t firstBlock, block_index_t lastBlock, const Bitset& bb_add) {
+
+			const auto last_block = (lastBlock == Bitset::npos) ? nBB_ - 1 : lastBlock;
+
+			////////////////////////////////////////////////////////////////////////////////////////////
+			assert((firstBlock >= 0) && (last_block < bb_add.num_blocks()) && (firstBlock <= last_block));
+			///////////////////////////////////////////////////////////////////////////////////////////
+
+
+			for (auto i = firstBlock; i <= last_block; ++i) {
+				vBB_[i] |= bb_add.vBB_[i];
+			}
+
+			return *this;
+		}
+
+		Bitset& Bitset::assign_block(block_index_t firstBlock, block_index_t lastBlock, const Bitset& bb_add)
+		{
+			const auto last_block = (lastBlock == Bitset::npos) ? nBB_ - 1 : lastBlock;
+
+			////////////////////////////////////////////////////////////////////////////////////////////
+			assert((firstBlock>=0) && (last_block < bb_add.num_blocks()) && (firstBlock <= last_block));
+			///////////////////////////////////////////////////////////////////////////////////////////
+
+
+			for (auto i = firstBlock; i <= last_block; ++i) {
+				vBB_[i] = bb_add.vBB_[i];
+			}
+
+			return *this;
+		}
+
+		Bitset& Bitset::erase_all_bits() {
+			return erase_bit();
+		}
+
+
+		Bitset& Bitset::erase_bit() {
+
+			for (auto i = 0; i < nBB_; ++i) {
+				vBB_[i] = ZERO;
+			}
+
+			return *this;
+		}
+
+		Bitset& Bitset::erase_bit(int nBit) {
+
+			vBB_[WDIV(nBit)] &= ~Tables::mask[WMOD(nBit)];
+			return *this;
+		}
+
+
+		Bitset& Bitset::erase_bit(int firstBit, int lastBit) {
+
+			//general comment: low - WMUL(blockL) = WMOD(blockL) but supposed to be less expensive (CHECK 01/02/25)
+
+			/////////////////////////////////////////////////////////////////
+			assert(firstBit >= 0 && (firstBit <= lastBit || lastBit == -1));
+			///////////////////////////////////////////////////////////////////
+
+			int blockL = WDIV(firstBit);
+			int blockH = (lastBit == BBObject::noBit) ? (nBB_ - 1) : WDIV(lastBit);
+
+
+			if (blockL == blockH)
+			{
+				if (lastBit == BBObject::noBit) {
+					vBB_[blockH] &= bblock::MASK_0_HIGH(WMOD(firstBit));
+				}
+				else {
+					vBB_[blockH] &= bblock::MASK_0(WMOD(firstBit), WMOD(lastBit));
+				}
+			}
+			else
+			{
+				//set to one the intermediate blocks
+				for (auto i = blockL + 1; i < blockH; ++i) {
+					vBB_[i] = ZERO;
+				}
+
+				//last bitblock
+				if (lastBit == BBObject::noBit) {
+					vBB_[blockH] = ZERO;
+				}
+				else {
+					vBB_[blockH] &= bblock::MASK_0_LOW(WMOD(lastBit));
+				}
+
+				//first  bitblock
+				vBB_[blockL] &= bblock::MASK_0_HIGH(WMOD(firstBit));
+			}
+
+			return *this;
+		}
+
+		int Bitset::lsbn64_non_intrin() const {
+			/////////////////
+			// different implementations of lsbn depending on configuration
+
+#ifdef DE_BRUIJN
+			for (auto i = 0; i < nBB_; ++i) {
+				if (vBB_[i])
+#ifdef ISOLANI_LSB
+					return(Tables::indexDeBruijn64_ISOL[((vBB_[i] & -vBB_[i]) * DEBRUIJN_MN_64_ISOL/*magic num*/) >> DEBRUIJN_MN_64_SHIFT] + WMUL(i));
+#else
+					return(Tables::indexDeBruijn64_SEP[((vBB_[i] ^ (vBB_[i] - 1)) * bblock::DEBRUIJN_MN_64_SEP/*magic num*/) >>
+						bblock::DEBRUIJN_MN_64_SHIFT] + WMUL(i));
+#endif
+			}
+#elif LOOKUP
+			union u {
+				U16 c[4];
+				BITBOARD b;
+			};
+
+			u val;
+
+			for (int i = 0; i < nBB_; i++) {
+				val.b = vBB_[i];
+				if (val.b) {
+					if (val.c[0]) return (Tables::lsba[0][val.c[0]] + WMUL(i));
+					if (val.c[1]) return (Tables::lsba[1][val.c[1]] + WMUL(i));
+					if (val.c[2]) return (Tables::lsba[2][val.c[2]] + WMUL(i));
+					if (val.c[3]) return (Tables::lsba[3][val.c[3]] + WMUL(i));
+				}
+			}
+
+#endif
+
+			return  BBObject::noBit;
+		}
+
+		int Bitset::lsbn64_intrin() const
+		{
+			Ul posInBB;
+
+			for (auto i = 0; i < nBB_; ++i) {
+				if (_BitScanForward64(&posInBB, vBB_[i])) {
+					return(posInBB + WMUL(i));
+				}
+			}
+
+			return BBObject::noBit;
+		}
+
+		int Bitset::is_singleton() const {
+
+			int pc = 0;
+			for (auto i = 0; i < nBB_; ++i) {
+				if ((pc += bblock::popc64(vBB_[i])) > 1) {
+					return -1;
+				}
+			}
+
+			//reasons with pc: 1-singleton, 0-empty
+			if (pc == 1) { return 1; }
+
+			//must be empty bitset
+			return 0;
+		}
+
+
+		int Bitset::is_singleton_block(block_index_t firstBlock, block_index_t lastBlock) const
+		{
+			const auto last_block = (lastBlock == Bitset::npos) ? nBB_ - 1 : lastBlock;
+
+
+			///////////////////////////////////////////////////////////////////////////////////
+			assert((firstBlock >= 0) && (firstBlock <= last_block) && (last_block < num_blocks()));
+			/////////////////////////////////////////////////////////////////////////////////
+
+
+			int pc = 0;
+			for (auto i = firstBlock; i < last_block; ++i) {
+				if ((pc += bblock::popc64(vBB_[i])) > 1) {
+					return -1;
+				}
+			}
+
+			//reasons with pc: 1- singleton, 0-empty
+			if (pc == 1) { return 1; }
+
+			//must be empty bitset
+			return 0;
+		}
+
+
+		int Bitset::popcn64() const {
+
+			int pc = 0;
+
+			for (auto i = 0; i < nBB_ /*vBB_.size()*/; ++i) {
+				pc += bblock::popc64(vBB_[i]);
+			}
+
+			return pc;
+		}
+
+
+		int Bitset::popcn64(int firstBit, int lastBit) const
+		{
+
+			/////////////////////////////////////////////////////////////////
+			assert(firstBit > 0 && ((firstBit <= lastBit) || (lastBit == -1)));
+			////////////////////////////////////////////////////////////////
+
+			int pc = 0;
+			block_index_t blockL = WDIV(firstBit);
+			block_index_t blockH = (lastBit == BBObject::noBit) ? static_cast<block_index_t>(nBB_ - 1) : WDIV(lastBit);
+
+
+			if (blockL == blockH)
+			{
+				//same block
+				pc = bblock::popc64(vBB_[blockL] & bblock::MASK_1(WMOD(firstBit), WMOD(lastBit)));
+
+			}
+			else
+			{
+				//count the population of the intermediate blocks
+				for (auto i = blockL + 1; i < blockH; ++i) {
+					pc += bblock::popc64(vBB_[i]);
+				}
+
+				//count the population of the first and last blocks
+				pc += bblock::popc64(vBB_[blockH] & bblock::MASK_1_LOW(WMOD(lastBit)));
+				pc += bblock::popc64(vBB_[blockL] & bblock::MASK_1_HIGH(WMOD(firstBit)));
+
+			}
+
+			return pc;
+		}
+
+		int Bitset::find_common_singleton(const Bitset& rhs, int& bit) const {
+
+			int pc = 0;
+			bool is_first_vertex = true;
+			bit = BBObject::noBit;
+
+			//main loop
+			for (auto i = 0; i < nBB_; ++i) {
+				pc += bblock::popc64(vBB_[i] & rhs.vBB_[i]);
+				if (pc > 1) {
+					bit = BBObject::noBit;
+					return -1;
+				}
+				else if (is_first_vertex && pc == 1) { //stores bit the first time pc == 1 
+
+					bit = bblock::lsb64_intrinsic(vBB_[i] & rhs.vBB_[i]) + WMUL(i);
+					is_first_vertex = false;
+				}
+			}
+
+			//disjoint - pc = 0
+			return pc;
+		}
+
+		int	Bitset::find_common_singleton_block(block_index_t firstBlock, block_index_t lastBlock, const Bitset& rhs, int& bit) const 
+		{
+			const auto last_block = (lastBlock == Bitset::npos) ? nBB_ - 1 : lastBlock;
+
+			///////////////////////////////////////////////////////////////////////////////
+			assert((firstBlock >= 0) && (last_block < num_blocks()) && (firstBlock <= last_block));
+			///////////////////////////////////////////////////////////////////////////////
+
+
+			int pc = 0;
+			bit = BBObject::noBit;
+			bool is_first_vertex = true;
+
+			for (block_index_t i = firstBlock; i <= last_block; ++i) {
+				pc += bblock::popc64(vBB_[i] & rhs.vBB_[i]);
+				if (pc > 1) {
+					bit = BBObject::noBit;
+					return -1;
+				}
+				else if (is_first_vertex && pc == 1) {	//stores bit the first time pc == 1 
+
+					bit = bblock::lsb64_intrinsic(vBB_[i] & rhs.vBB_[i]) + WMUL(i);
+					is_first_vertex = false;
+				}
+			}
+
+			//pc = 0 (disjoint) /pc = 1 (intersection between *this and rhs a single bit)	
+			return pc;
+		}
+
+
+		int Bitset::find_diff_singleton(const Bitset& rhs, int& bit) const {
+
+			int pc = 0;
+			bit = BBObject::noBit;
+			bool is_first_vertex = true;
+
+			for (auto i = 0; i < nBB_; ++i) {
+
+				//popcount of set difference - removes bits of rhs from *this
+				pc += bblock::popc64(vBB_[i] & ~rhs.vBB_[i]);
+
+				if (pc > 1) {
+					bit = BBObject::noBit;
+					return -1;
+				}
+				else if (pc == 1 && is_first_vertex) { //stores bit the first time pc == 1 
+
+					bit = bblock::lsb64_intrinsic(vBB_[i] & ~rhs.vBB_[i]) + WMUL(i);
+					is_first_vertex = false;
+				}
+			}
+
+			//pc = 0 (*this subset of rhs, empty setdiff) / pc = 1 (singleton setdiff)
+			return pc;
+		}
+
+		int Bitset::find_diff_pair(const Bitset& rhs, int& bit1, int& bit2) const {
+
+			int pc = 0;
+			bool is_first_bit = true;
+			bool is_second_bit = true;
+			bit1 = BBObject::noBit;
+			bit2 = BBObject::noBit;
+
+			//main loop
+			for (auto i = 0; i < nBB_; ++i) {
+
+				//popcount of set difference - removes bits of rhs from *this
+				BITBOARD bb = vBB_[i] & ~rhs.vBB_[i];
+				pc += bblock::popc64(bb);
+
+				if (pc > 2) {
+
+					bit1 = BBObject::noBit;
+					bit2 = BBObject::noBit;
+					return BBObject::noBit;
+
+				}
+				else if (pc == 1 && is_first_bit) {  //stores bit the first time pc == 1 
+
+					bit1 = bblock::lsb(bb) + WMUL(i);
+					is_first_bit = false;
+
+				}
+				else if (pc == 2 && is_second_bit) {  //stores the two bits the first time pc == 2 
+
+					if (is_first_bit) {
+
+						//determines the two bits in the same block
+						bit1 = bblock::lsb(bb) + WMUL(i);
+						bit2 = bblock::msb(bb) + WMUL(i);
+
+					}
+					else {
+
+						//determines the second bit directly since the
+						//two bits of the set difference are in different bitblocks
+						bit2 = bblock::lsb(bb) + WMUL(i);
+					}
+
+					is_second_bit = false;
+				}
+			}
+
+			//pc=0, 1, 2 (size of the set difference)
+			return pc;
+		}
+			
+
+		Bitset& Bitset::erase_bit(const Bitset& bbn) {
+
+			for (auto i = 0; i < nBB_; ++i) {
+				vBB_[i] &= ~bbn.vBB_[i];
+			}
+
+			return *this;
+		}
+
+		Bitset& Bitset::erase_bit(int firstBit, int lastBit, const Bitset& bbn) {
+
+			//general comment: low - WMUL(blockL) = WMOD(blockL) but supposed to be less expensive (CHECK 01/02/25)
+
+			/////////////////////////////////////////////////////////////
+			assert(firstBit <= lastBit || lastBit == BBObject::noBit);
+			/////////////////////////////////////////////////////////////
+
+			block_index_t blockL = WDIV(firstBit);
+			block_index_t blockH = (lastBit == BBObject::noBit) ? static_cast<block_index_t>(nBB_ - 1) : WDIV(lastBit);
+
+			//special case - both ends in the same bitblock
+			if (blockL == blockH)
+			{
+				if (lastBit == BBObject::noBit) {
+					vBB_[blockH] &= ~(bbn.vBB_[blockH] & bblock::MASK_1_HIGH(WMOD(firstBit)));					
+				}
+				else {
+					vBB_[blockH] &= ~(bbn.vBB_[blockH] & bblock::MASK_1(WMOD(firstBit), WMOD(lastBit)));					
+				}
+			}
+			else
+			{
+				//set to one the intermediate blocks
+				for (auto i = blockL + 1; i < blockH; ++i) {
+					vBB_[i] &= ~bbn.vBB_[i];
+				}
+
+				//last bitblock
+				if (lastBit == BBObject::noBit) {
+					vBB_[blockH] &= ~bbn.vBB_[blockH];
+				}
+				else {
+					vBB_[blockH] &= ~(bbn.vBB_[blockH] & bblock::MASK_1_LOW(WMOD(lastBit)));
+				}
+
+				//first  bitblock
+				vBB_[blockL] &= ~(bbn.vBB_[blockL] & bblock::MASK_1_HIGH(WMOD(firstBit)));
+			}
+			
+			return *this;
+		}
+
+
+		Bitset& Bitset::erase_bit(const Bitset& bb_lhs, const Bitset& bb_rhs) {
+
+			for (auto i = 0; i < nBB_; i++) {
+				vBB_[i] &= ~(bb_lhs.vBB_[i] | bb_rhs.vBB_[i]);
+			}
+
+			return *this;
+		}
+
+		Bitset& Bitset::erase_block(block_index_t firstBlock, block_index_t lastBlock, const Bitset& bb_lhs, const Bitset& bb_rhs) {
+
+
+			block_index_t last_block = (lastBlock == Bitset::npos)? nBB_ - 1 : lastBlock;
+
+			///////////////////////////////////////////////////////////////////////////////
+			assert((firstBlock >= 0) && (last_block < num_blocks()) && (firstBlock <= last_block));
+			///////////////////////////////////////////////////////////////////////////////
+			
+			for (auto i = firstBlock; i <= last_block; ++i) {
+				vBB_[i] &= ~(bb_lhs.vBB_[i] | bb_rhs.vBB_[i]);
+			}
+
+			return *this;
+		}
+
+		Bitset& Bitset::erase_block(block_index_t firstBlock, block_index_t lastBlock, const Bitset& bb_del) {
+
+			const auto last_block = (lastBlock == Bitset::npos) ? nBB_ - 1 : lastBlock;
+
+			///////////////////////////////////////////////////////////////////////////////
+			assert((firstBlock>=0) && (last_block < bb_del.num_blocks()) && (firstBlock <= last_block));
+			///////////////////////////////////////////////////////////////////////////////
+
+			for (auto i = firstBlock; i <= last_block; ++i) {
+				vBB_[i] &= ~bb_del.vBB_[i];
+			}
+
+			return *this;
+		}
+
+		void Bitset::extract_stack(com::FixedStack<int>& s)	const {
+			s.clear();
+
+			int v = BBObject::noBit;
+			while ((v = next_bit(v)) != BBObject::noBit) {
+				s.push(v);
+			}
+		}
+
 }//end namespace bitgraph
 
-/////////////////
-//
-// DEPRECATED STATELESS MASKING FUNCTIONS
-//
-//////////////////
 
-//int* AND(int lastBit, const Bitset& lhs, const Bitset& rhs, int bitset[], int& size) {
+/////////////////////////////////
+// -----------------------------------------------------------------------------
+// Helpers (free factories) to build `BitSets` (header-only, sin romper API)
+// 
+// TODO: since they only return a Bitset, implement as named factories in the Bitset class (17/09/2026).
+// -----------------------------------------------------------------------------
+// Typical use
+//   auto bb1 = bitgraph::make_bitset(6);                 // empty, 6 bits
+//   auto bb2 = bitgraph::make_bitset(6, {0,3,4});        // 1-bits in 0,3,4
+//   std::vector<int> lv = {1,2,5};
+//   auto bb3 = bitgraph::make_bitset(6, lv);             // from container
+//   auto bb4 = bitgraph::make_bitset_full(6);            // all bits to 1
 //
-//	BITBOARD bb;
-//	int offset;
-//	size = 0;
-//	int nbb = WDIV(lastBit);
+// Notas:
+// - nPop is population size ( maximum number of bits).
+// - Values outside [0, nPop) are ignored (negative values causes assertion).
 //
-//	for (auto i = 0; i < nbb; ++i) {
-//		bb = rhs.vBB_[i] & lhs.vBB_[i];
-//		offset = WMUL(i);
-//
-//		while (bb) {
-//			int v = bblock::lsb64_intrinsic(bb);
-//			bitset[size++] = offset + v;
-//			bb ^= Tables::mask[v];
-//		}
-//
-//	}
-//
-//	//trim last
-//	bb = rhs.vBB_[nbb] & lhs.vBB_[nbb] & Tables::mask_low[WMOD(lastBit)];
-//	while (bb) {
-//		int v = bblock::lsb64_intrinsic(bb);
-//		bitset[size++] = WMUL(nbb) + v;
-//		bb ^= Tables::mask[v];
-//	}
-//
-//	return bitset;
-//}
 
 
-//Bitset& OR(int from, const Bitset& lhs, const Bitset& rhs, Bitset& res) {
-//
-//	int first_block = WDIV(from);
-//
-//	for (auto i = 0; i < first_block; ++i) {
-//		res.vBB_[i] = lhs.vBB_[i];
-//	}
-//
-//	for (auto i = first_block + 1; i < lhs.nBB_; ++i) {
-//		res.vBB_[i] = rhs.vBB_[i] | lhs.vBB_[i];
-//	}
-//
-//	//special case-first block
-//	res.vBB_[first_block] = lhs.vBB_[first_block] | (rhs.vBB_[first_block] & ~Tables::mask_low[from - WMUL(first_block)]);
-//
-//	return res;
-//}
+namespace bitgraph {
+
+	/**
+	* @brief Creates an empty Bitset with a maximum of @nPop bits (all bits set to 0).
+	**/
+	Bitset make_bitset(int nPop) { return Bitset(nPop, false); }
+
+	/**
+	* @brief Creates a Bitset with a maximum @nPop bits (all bits set to 1).
+	**/
+	Bitset make_bitset_full(int nPop) {
+		Bitset bs(nPop, false);
+		if (nPop > 0) bs.set_bit(0, nPop - 1);
+		return bs;
+	}
+
+	///**
+	//* @brief Creates a Bitset given a maximum @nPop and a range of iterators [first, last).
+	//* @details: - negative values are ignored (asserted in debug mode).
+	//*			- values >= nPop are ignored.
+	//**/
+	//template<class It>
+	//inline Bitset make_bitset_from(int nPop, It first, It last) {
+	//	Bitset bs(nPop, false);
+	//	for (auto it = first; it != last; ++it) {
+	//		int v = static_cast<int>(*it);
+
+	//		//////////////////
+	//		assert(v >= 0);
+	//		//////////////////
+
+	//		if (v >= 0 && v < nPop) bs.set_bit(v);
+	//	}
+	//	return bs;
+	//}
+
+	///**
+	//* @brief Creates a Bitset given a maximum @nPop and collection of values
+	//* @details: - negative values are ignored (asserted in debug mode).
+	//*			- values >= nPop are ignored.
+	//**/
+	//template<class Col>
+	//inline Bitset make_bitset(int nPop, const Col& lv) {
+	//	return make_bitset_from(nPop, std::begin(lv), std::end(lv));
+	//}
 
 
-//Bitset& OR(int v, bool from, const Bitset& lhs, const Bitset& rhs, Bitset& res) {
-//
-//
-//	int nBB = WDIV(v);
-//	int pos = WMOD(v);
-//
-//	if (from) {
-//		for (auto i = 0; i < nBB; i++) {
-//			res.vBB_[i] = lhs.vBB_[i];
-//		}
-//		for (auto i = nBB + 1; i < lhs.nBB_; i++) {
-//			res.vBB_[i] = lhs.vBB_[i] | rhs.vBB_[i];
-//		}
-//
-//		//critical block
-//		res.vBB_[nBB] = lhs.vBB_[nBB] | (rhs.vBB_[nBB] & ~Tables::mask_low[pos]);
-//
-//	}
-//	else {
-//		for (auto i = nBB + 1; i < lhs.nBB_; i++) {
-//			res.vBB_[i] = lhs.vBB_[i];
-//		}
-//
-//		for (auto i = 0; i < nBB; i++) {
-//			res.vBB_[i] = lhs.vBB_[i] | rhs.vBB_[i];
-//		}
-//
-//		//critical block
-//		res.vBB_[nBB] = lhs.vBB_[nBB] | (rhs.vBB_[nBB] & ~Tables::mask_high[pos]);
-//	}
-//
-//	return res;
-//}
+	/**
+	* @brief Creates a Bitset given a maximum @nPop and a list of values in brackets
+	* @details: - negative values are ignored (asserted in debug mode).
+	*			- values >= nPop are ignored.
+	**/
+	Bitset make_bitset(int nPop, std::initializer_list<int> lv) {
+		return make_bitset_from(nPop, lv.begin(), lv.end());
+	}
+
+} // namespace bitgraph
+
