@@ -310,7 +310,7 @@ namespace bitgraph {
 				clq.clear();
 
 				//main loop - seed vertex for a clique 
-				VertexList clq_curr;
+				Vertices clq_curr;
 				for (int v = 0; v < g.num_vertices(); ++v) {
 
 					clq_curr.clear();
@@ -360,7 +360,7 @@ namespace bitgraph {
 		//// COMMENTS: format issues-MUST BE! @quasi[VERTEX]:=-1 or VERTEX
 
 		//template<class GraphT>
-		//int find_clq(GraphT& g, VertexList& clq, int* quasi, int begin, int* lv, int end) {
+		//int find_clq(GraphT& g, Vertices& clq, int* quasi, int begin, int* lv, int end) {
 		//			
 		//	int num_added = 0, counter = 0, iqv = -1;	
 
@@ -611,7 +611,7 @@ namespace bitgraph {
 		//////////////////////////////////
 		// VERY CLIQUE SPECIFIC - PLACE IT IN COPT
 		//	template<class GraphT>
-		//	int quasi_clq(GraphT& g, VertexList& clq, int* quasi, typename GraphT::VertexBitset& bbv) {
+		//	int quasi_clq(GraphT& g, Vertices& clq, int* quasi, typename GraphT::VertexBitset& bbv) {
 		//		////////////////////////////////
 		//		// caches quasicliques in @quasi for consecutive vertices not in @clq (candidate quasi_vertices range [0-highest vertex index of clq[)
 		//		// quasi[VERTEX_IN_CLQ]:= qv (@clq - {VERTEX_IN_CLQ} + {qv} is a clique in @g of the same size)
@@ -649,7 +649,7 @@ namespace bitgraph {
 		//					LOG_ERROR("bizarre clique, exiting....-com::quasi_clq()");
 		//					LOG_ERROR("v that may be added:" << v);
 		//					stringstream sstr;
-		//					com::stl::print_collection<VertexList>(clq, sstr);
+		//					com::stl::print_collection<Vertices>(clq, sstr);
 		//					LOG_ERROR("clq with v included" << sstr.str());
 		//					exit(-1);
 		//				}
@@ -958,7 +958,7 @@ namespace bitgraph {
 		//		//
 		//		//*EXPERIMENTAL*
 		//
-		//		VertexList nodes;
+		//		Vertices nodes;
 		//		bbsg.to_vector(nodes);			/* conversion-seems the simplest  thing to do */
 		//		if (nodes.empty()) return -1;
 		//		ub[nodes.front()] = 1;

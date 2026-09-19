@@ -458,7 +458,7 @@ std::ostream& Base_Graph_EW<GraphT, WeightT>::print_vertex_weights(std::ostream&
 }
 
 template <class GraphT, class WeightT>
-ostream& Base_Graph_EW<GraphT, WeightT>::print_weights (VertexList& lv, ostream& o, int type) const{
+ostream& Base_Graph_EW<GraphT, WeightT>::print_weights (Vertices& lv, ostream& o, int type) const{
 
 	//o << endl << "**************************" << endl;
 	switch (type) {
@@ -484,7 +484,7 @@ ostream& Base_Graph_EW<GraphT, WeightT>::print_weights (VertexList& lv, ostream&
 }
 
 template<class GraphT, class WeightT>
-std::ostream& Base_Graph_EW<GraphT, WeightT>::print_edge_weights(VertexList& lv, std::ostream& o) const
+std::ostream& Base_Graph_EW<GraphT, WeightT>::print_edge_weights(Vertices& lv, std::ostream& o) const
 {
 	for (auto i = 0u; i < lv.size(); ++i) {
 		for (auto j = 0u; j < lv.size(); j++) {
@@ -501,7 +501,7 @@ std::ostream& Base_Graph_EW<GraphT, WeightT>::print_edge_weights(VertexList& lv,
 }
 
 template<class GraphT, class WeightT>
-std::ostream& Base_Graph_EW<GraphT, WeightT>::print_vertex_weights(VertexList& lv, std::ostream& o) const
+std::ostream& Base_Graph_EW<GraphT, WeightT>::print_vertex_weights(Vertices& lv, std::ostream& o) const
 {
 	for (auto i = 0u; i < lv.size(); ++i) {
 		if (we_[lv[i]][lv[i]] != Base_Graph_EW<GraphT, WeightT>::NO_WEIGHT) {

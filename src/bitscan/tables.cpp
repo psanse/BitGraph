@@ -35,11 +35,15 @@ int Tables::t_wmodindex[MAX_CACHED_INDEX];
 int Tables::lsb_l[65536][16];				//LSB position list of 1-bits in BITBOARD16
 #endif
 
+
 /**
- * @brief Initializes the BITSCAN lookup tables before main().
+ * @brief Initializes the BITSCAN lookup tables during program startup.
  *
- * @warning Initialization order relative to global objects in other
- *          translation units is unspecified.
+ * This initializer runs when the library is loaded, before ordinary runtime
+ * use of the lookup tables.
+ *
+ * @warning The initialization order relative to global objects defined in
+ *          other translation units is unspecified.
  */
 namespace {
 

@@ -146,7 +146,7 @@ namespace bitgraph {
 		std::ostream& print_edges(std::ostream& o = std::cout, bool eofl = false) const override;
 
 		std::ostream& print_edge_weights(std::ostream& o = std::cout, bool line_format = true) const override;
-		std::ostream& print_edge_weights(VertexList& lv, std::ostream& o = std::cout)	const override;
+		std::ostream& print_edge_weights(Vertices& lv, std::ostream& o = std::cout)	const override;
 
 	public:
 		/**
@@ -369,7 +369,7 @@ namespace bitgraph {
 	}
 
 	template<class WeightT>
-	std::ostream& Graph_EW<ugraph, WeightT>::print_edge_weights(VertexList& lv, std::ostream& o) const
+	std::ostream& Graph_EW<ugraph, WeightT>::print_edge_weights(Vertices& lv, std::ostream& o) const
 	{
 		const int SIZE = static_cast<int>(lv.size());
 		for (int i = 0; i < SIZE - 1; ++i) {

@@ -283,7 +283,7 @@ namespace bitgraph {
 		* @brief prints the weights of the vertices in lv
 		* @supports C-arrays
 		**/
-		std::ostream& print_weights(VertexList& lv, std::ostream& o = std::cout) const;
+		std::ostream& print_weights(Vertices& lv, std::ostream& o = std::cout) const;
 		std::ostream& print_weights(int* lv, int n, std::ostream& o = std::cout) const;
 
 		/////////////////////////////////////

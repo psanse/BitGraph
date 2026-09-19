@@ -44,7 +44,7 @@ TEST(G2gml, clique) {
 	ug.add_edge(3, 5);
 	ug.add_edge(4, 5);
 
-	VertexList clq;
+	Vertices clq;
 	clq.push_back(0); clq.push_back(1); clq.push_back(2);
 
 	/////////////////////////////////////////////////////////////////////
@@ -70,7 +70,7 @@ TEST(G2gml, vertex_set) {
 	ug.add_edge(3, 5);
 	ug.add_edge(4, 5);
 
-	VertexList vset;
+	Vertices vset;
 	vset.push_back(0); vset.push_back(1); vset.push_back(2);
 
 	/////////////////////////////////////////////////////////////////////

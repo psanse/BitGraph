@@ -38,7 +38,7 @@ TEST(Decode, decodeList) {
 	d.add_ordering(vres);					//first 5 elem of vres {0 6 7 8 9 10}
 
 	//computes the vertex number of a list of vertices of the graph isomorphism in the original graph ug
-	VertexList vlist;
+	Vertices vlist;
 	vlist.push_back(0);
 	vlist.push_back(1);
 	vlist.push_back(2);

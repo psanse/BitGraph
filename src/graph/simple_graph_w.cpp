@@ -416,7 +416,7 @@ ostream& Base_Graph_W<GraphT, WeightT>::print_weights (com::FixedStack<int>& lv,
 }
 
 template <class GraphT, class WeightT>
-ostream& Base_Graph_W<GraphT, WeightT>::print_weights (VertexList& lv, ostream& o) const
+ostream& Base_Graph_W<GraphT, WeightT>::print_weights (Vertices& lv, ostream& o) const
 {
 	const int SIZE = static_cast<int>(lv.size());
 	for(Vertex i = 0; i < SIZE; ++i){

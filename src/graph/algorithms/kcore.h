@@ -104,7 +104,7 @@ namespace bitgraph {
 			//constructors
 			KCore(graph_type& g);
 			KCore(graph_type& g, VertexBitset bbSubg);
-			KCore(graph_type& g, const VertexList& subg);
+			KCore(graph_type& g, const Vertices& subg);
 		
 
 			//copy and move semantics disallowed
@@ -264,7 +264,7 @@ namespace bitgraph {
 			void bin_sort(bool is_subg = false);
 
 			//experimental
-			void bin_sort(VertexList& lv, bool rev);					//bin sort according to vertex set lv (rev TRUE: vertices taken in reverse order)
+			void bin_sort(Vertices& lv, bool rev);					//bin sort according to vertex set lv (rev TRUE: vertices taken in reverse order)
 
 			//I/O
 			std::ostream& print(print_t = VER, std::ostream& o = std::cout);
@@ -280,8 +280,8 @@ namespace bitgraph {
 			//data structures
 			std::vector<int> deg_;														// coreness of vertices																
 			std::vector<int> bin_;														// bins [deg[v]] for bin sort sorting algorithm
-			VertexList ver_;															// vertices in non-decreasing kcore order (mapping in new-to-old format)
-			VertexList pos_;															// position of vertices in ver_ (old-to-new format)
+			Vertices ver_;															// vertices in non-decreasing kcore order (mapping in new-to-old format)
+			Vertices pos_;															// position of vertices in ver_ (old-to-new format)
 		};
 
 	}//end namespace impl
@@ -361,7 +361,7 @@ namespace bitgraph {
 	}
 
 	template<class GraphT>
-	inline KCore<GraphT>::KCore(graph_type& g, const VertexList& subg) :
+	inline KCore<GraphT>::KCore(graph_type& g, const Vertices& subg) :
 		g_(g),
 		NV_(g.num_vertices()),
 		deg_(NV_),
@@ -587,7 +587,7 @@ namespace bitgraph {
 
 		//new bin sort over ver_ in reverse order for final sorting
 		init_bin();
-		VertexList lv(ver_);				//requires a copy
+		Vertices lv(ver_);				//requires a copy
 		bin_sort(lv, true);			//reverse order
 
 		return UB;
@@ -756,7 +756,7 @@ namespace bitgraph {
 	}
 
 	template<class GraphT>
-	inline void KCore<GraphT>::bin_sort(VertexList& lv, bool rev) {
+	inline void KCore<GraphT>::bin_sort(Vertices& lv, bool rev) {
 		////////////////
 		// sorts vertices in lv by non decreasing degree (deg_) in linear time (EXPERIMENTAL)
 		// date of creation: 7/3/16

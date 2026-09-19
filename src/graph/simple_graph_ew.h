@@ -353,7 +353,7 @@ namespace bitgraph {
 		* @brief streams non-empty (excluding NO_WEIGHT value)  weights
 		*		 of directed edges induced by the subgraph of vertices in lv
 		**/
-		std::ostream& print_weights(VertexList& lv, std::ostream& o = std::cout, int type = BOTH)	const;
+		std::ostream& print_weights(Vertices& lv, std::ostream& o = std::cout, int type = BOTH)	const;
 
 		///////////
 		// read/write operations
@@ -404,13 +404,13 @@ namespace bitgraph {
 		* @brief prints the edges of the graph induced by the vertices of lv in line format
 		* @param lv: input set of vertices of the induced subgraph
 		**/
-		virtual	std::ostream& print_edge_weights(VertexList& lv, std::ostream& o = std::cout)	const;
+		virtual	std::ostream& print_edge_weights(Vertices& lv, std::ostream& o = std::cout)	const;
 
 		/**
 		* @brief prints the vertices of the vertices of lv
 		* @param lv: input set of vertices
 		**/
-		std::ostream& print_vertex_weights(VertexList& lv, std::ostream& o = std::cout) const;
+		std::ostream& print_vertex_weights(Vertices& lv, std::ostream& o = std::cout) const;
 
 		///////////////////
 		//data members

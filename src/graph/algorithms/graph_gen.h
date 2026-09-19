@@ -39,8 +39,8 @@
  * Pablo San Segundo (pss)
  */
 
-#ifndef __GRAPH_GEN_H__
-#define __GRAPH_GEN_H__
+#ifndef BITGRAPH_GRAPH_GEN_H
+#define BITGRAPH_GRAPH_GEN_H
 
 #include <iostream>
 #include <sstream>
@@ -563,4 +563,5 @@ namespace bitgraph{
 }//end namespace bitgraph
 
 
-#endif //__GRAPH_GEN_H__
+
+#endif //BITGRAPH_GRAPH_GEN_H__

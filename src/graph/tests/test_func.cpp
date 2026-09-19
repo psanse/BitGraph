@@ -76,7 +76,7 @@ TEST(GFunc, circulant) {
 
 TEST_F(GFuncTest, is_triangleFree_subgraph) {
 		
-	VertexList triangle;	
+	Vertices triangle;	
 	EXPECT_TRUE(gfunc::is_triangleFree_subgraph(ug, ug.neighbors(0), triangle));			
 
 	//adds a triangle
@@ -101,7 +101,7 @@ TEST_F(GFuncTestW, sort_w){
 	using namespace gfunc::vertexW;	
 
 	//set of vertices
-	VertexList lv;
+	Vertices lv;
 	lv.push_back(0);
 	lv.push_back(1); 
 	lv.push_back(2);
@@ -109,7 +109,7 @@ TEST_F(GFuncTestW, sort_w){
 	//sorts the set of vertices according to non-decreasing weight
 	sort_w(ugw,lv, true);
 
-	VertexList lv_exp;
+	Vertices lv_exp;
 	lv_exp.push_back(2);
 	lv_exp.push_back(1);
 	lv_exp.push_back(0);
@@ -147,7 +147,7 @@ TEST_F(GFuncTestW, wsum){
 	using namespace gfunc::vertexW;
 	
 	//set of vertices {0, 1}
-	VertexList lv;
+	Vertices lv;
 	lv.push_back(0);
 	lv.push_back(1);
 
@@ -193,11 +193,11 @@ TEST(GFunc, neighbors){
 	
 	/////////////
 	//neighbors of vertex {3} in bitset bbV = {0, 63, 64}
-	VertexList neigh;
+	Vertices neigh;
 	neighbors<ugraph>(ug, 3, bbV, neigh);
 
 	//expected neighbors
-	VertexList neigh_exp;
+	Vertices neigh_exp;
 	neigh_exp.push_back(0);
 	neigh_exp.push_back(63);
 	neigh_exp.push_back(64);
