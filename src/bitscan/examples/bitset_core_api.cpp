@@ -15,14 +15,15 @@
 
 int main()
 {
+
 	// bitarray is the recommended public type. The same core API is also
 	// available through the lower-level simple_bitarray type.
-	using bitset_type = bitgraph::bitarray;
-
+	using bitgraph::bitarray;
+	
 	std::cout << std::boolalpha;
 
 	// Create a bitarray with capacity for at least 130 positions.
-	bitset_type bits(130);
+	bitarray bits(130);
 
 	// Storage and population queries.
 	std::cout << "Number of blocks: "
@@ -58,7 +59,7 @@ int main()
 	std::cout << "Population count: " << bits.count() << '\n';
 
 	// bits now contains {3,20,21,25}.
-	bitset_type rhs(130);
+	bitarray rhs(130);
 
 	rhs.set(3)
 		.set(25)
@@ -68,21 +69,21 @@ int main()
 		<< bits.intersects(rhs) << '\n';
 
 	// Intersection: {3,20,21,25} intersect {3,25,64} = {3,25}.
-	bitset_type intersection = bits;
+	bitarray intersection = bits;
 	intersection. and_eq (rhs);
 
 	std::cout << "Intersection population: "
 		<< intersection.count() << '\n';
 
 	// Union: {3,20,21,25} union {3,25,64} = {3,20,21,25,64}.
-	bitset_type union_set = bits;
+	bitarray union_set = bits;
 	union_set. or_eq (rhs);
 
 	std::cout << "Union population: "
 		<< union_set.count() << '\n';
 
 	// Set difference: {3,20,21,25} minus {3,25,64} = {20,21}.
-	bitset_type difference = bits;
+	bitarray difference = bits;
 	difference.andnot_eq(rhs);
 
 	std::cout << "Difference population: "
