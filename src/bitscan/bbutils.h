@@ -183,7 +183,7 @@ namespace bitgraph {
 
 namespace bitgraph {
 
-	namespace _impl {
+	namespace detail {
 
 		//////////////////////
 		// 
@@ -355,7 +355,7 @@ namespace bitgraph {
 			std::array<bitset_type, SIZE> bb_;
 		};
 
-	}//end namespace _impl
+	}//end namespace detail
 
 }//end namespace bitgraph
 
@@ -365,11 +365,11 @@ namespace bitgraph {
 
 namespace bitgraph {
 
-	using _impl::Tables;
+	using detail::Tables;
 
 	template <class BitsetT, int SIZE>
 	inline
-		Bitset& _impl::BitSetArray<BitsetT, SIZE>::set_bit(int bitsetID, int bit, bool& is_first_bit) {
+		Bitset& detail::BitSetArray<BitsetT, SIZE>::set_bit(int bitsetID, int bit, bool& is_first_bit) {
 
 		//adds bit
 		bb_[bitsetID].set_bit(bit);
@@ -384,7 +384,7 @@ namespace bitgraph {
 
 	template <class BitsetT, int SIZE>
 	inline
-		std::ostream& _impl::BitSetArray<BitsetT, SIZE>::print(std::ostream& o, bool show_pc, bool eofl)  const {
+		std::ostream& detail::BitSetArray<BitsetT, SIZE>::print(std::ostream& o, bool show_pc, bool eofl)  const {
 		for (auto i = 0; i < bb_.size(); ++i) {
 			if (!bb_[i].is_empty()) {
 				bb_[i].print(o, show_pc, true);
@@ -396,7 +396,7 @@ namespace bitgraph {
 
 	template <class BitsetT>
 	inline
-		std::ostream& _impl::BitSetStack<BitsetT>::print(print_t t, std::ostream& o, bool eofl) {
+		std::ostream& detail::BitSetStack<BitsetT>::print(print_t t, std::ostream& o, bool eofl) {
 
 		switch (t) {
 		case STACK:
@@ -419,7 +419,7 @@ namespace bitgraph {
 
 	template <class BitsetT>
 	inline
-		bool _impl::BitSetStack<BitsetT>::is_sync() {
+		bool detail::BitSetStack<BitsetT>::is_sync() {
 
 		//same population count
 		if (bb_.count() != static_cast<int>(stack_.size())) {
@@ -438,7 +438,7 @@ namespace bitgraph {
 
 	template <class BitsetT>
 	inline
-		void _impl::BitSetStack<BitsetT>::sync_bitset() {
+		void detail::BitSetStack<BitsetT>::sync_bitset() {
 
 		bb_.erase_bit();
 		for (auto i = 0; i < stack_.size(); i++) {
@@ -448,7 +448,7 @@ namespace bitgraph {
 
 	template <class BitsetT>
 	inline
-		void _impl::BitSetStack<BitsetT>::sync_stack() {
+		void detail::BitSetStack<BitsetT>::sync_stack() {
 
 		//cleans stack
 		stack_.clear();
@@ -466,7 +466,7 @@ namespace bitgraph {
 
 	template <class BitsetT>
 	inline
-		void  _impl::BitSetStack<BitsetT>::reset(int MAX_POP_SIZE) {
+		void  detail::BitSetStack<BitsetT>::reset(int MAX_POP_SIZE) {
 
 		//cleans stack
 		stack_.clear();
@@ -489,7 +489,7 @@ namespace bitgraph {
 
 	template <class BitsetT>
 	inline
-		void _impl::BitSetStack<BitsetT>::push(int bit) {
+		void detail::BitSetStack<BitsetT>::push(int bit) {
 
 		if (!bb_.is_bit(bit)) {
 			bb_.set_bit(bit);
@@ -499,7 +499,7 @@ namespace bitgraph {
 
 	template <class BitsetT>
 	inline
-		int _impl::BitSetStack<BitsetT>::pop() {
+		int detail::BitSetStack<BitsetT>::pop() {
 
 		if (stack_.size() > 0) {
 			int bit = stack_.back();
@@ -512,7 +512,7 @@ namespace bitgraph {
 
 	template <class BitsetT>
 	inline
-		void _impl::BitSetStack<BitsetT>::erase_bit() {
+		void detail::BitSetStack<BitsetT>::erase_bit() {
 		for (int i = 0; i < stack_.size(); i++) {
 			bb_.erase_bit(stack_[i]);
 		}

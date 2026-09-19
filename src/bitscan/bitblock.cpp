@@ -12,7 +12,7 @@ namespace bitgraph {
 
 	namespace bblock {
 
-		using bitgraph::_impl::Tables;						
+		using bitgraph::detail::Tables;
 
 		int popc64_lup(const BITBOARD bb_dato) {
 

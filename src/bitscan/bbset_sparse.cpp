@@ -576,14 +576,14 @@ int BitsetSp::clear_bit (int firstBit, int lastBit){
 			if(bbh==bbl){		
 				
 				//case update in the same bitblock
-				BITBOARD bb_low = pl.second->bb_ & _impl::Tables::mask_high[lastBit - WMUL(bbh)];
-				BITBOARD bb_high = pl.second->bb_ & _impl::Tables::mask_low[firstBit - WMUL(bbl)];
+				BITBOARD bb_low = pl.second->bb_ & detail::Tables::mask_high[lastBit - WMUL(bbh)];
+				BITBOARD bb_high = pl.second->bb_ & detail::Tables::mask_low[firstBit - WMUL(bbl)];
 				pl.second->bb_ = bb_low | bb_high;
 				return 0;
 			}
 
 			//update lower block
-			pl.second->bb_ &= _impl::Tables::mask_low[firstBit - WMUL(bbl)];
+			pl.second->bb_ &= detail::Tables::mask_low[firstBit - WMUL(bbl)];
 			++pl.second;
 		}
 
@@ -594,14 +594,14 @@ int BitsetSp::clear_bit (int firstBit, int lastBit){
 			if(bbh==bbl){		
 				
 				//case update in the same bitblock
-				BITBOARD bb_low = pl.second->bb_ & _impl::Tables::mask_high[lastBit - WMUL(bbh)];
-				BITBOARD bb_high = pl.second->bb_ & _impl::Tables::mask_low[firstBit - WMUL(bbl)];
+				BITBOARD bb_low = pl.second->bb_ & detail::Tables::mask_high[lastBit - WMUL(bbh)];
+				BITBOARD bb_high = pl.second->bb_ & detail::Tables::mask_low[firstBit - WMUL(bbl)];
 				pl.second->bb_ = bb_low | bb_high;
 				return 0;
 			}
 
 			//update lower block
-			ph.second->bb_ &= _impl::Tables::mask_high[lastBit - WMUL(bbh)];
+			ph.second->bb_ &= detail::Tables::mask_high[lastBit - WMUL(bbh)];
 		}
 
 		//remaining

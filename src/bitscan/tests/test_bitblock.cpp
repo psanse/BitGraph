@@ -13,7 +13,7 @@
 using namespace std;
 using namespace bitgraph;
 
-using _impl::Tables;
+using detail::Tables;
 
 
 TEST(bblockTest, masks_in_range) {

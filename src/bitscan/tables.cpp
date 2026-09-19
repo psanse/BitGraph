@@ -2,7 +2,7 @@
 
 
 using namespace bitgraph;
-using bitgraph::_impl::Tables;
+using bitgraph::detail::Tables;
 
 //common masks and lookup tables always available
 int Tables::pc[65536];								//1_bit population in 16 bit blocks
@@ -35,10 +35,32 @@ int Tables::t_wmodindex[MAX_CACHED_INDEX];
 int Tables::lsb_l[65536][16];				//LSB position list of 1-bits in BITBOARD16
 #endif
 
-//global initialization of tables
-struct Init{
-	Init(){Tables::InitAllTables();}
-} initTables;
+/**
+ * @brief Initializes the BITSCAN lookup tables before main().
+ *
+ * @warning Initialization order relative to global objects in other
+ *          translation units is unspecified.
+ */
+namespace {
+
+	struct TablesInitializer {
+		TablesInitializer() noexcept
+		{
+			bitgraph::detail::Tables::InitAllTables();
+		}
+	};
+
+	/**
+	 * @brief Translation-unit-local object that triggers lookup-table initialization.
+	 */
+	const TablesInitializer tables_initializer{};
+
+} // unnamed namespace
+
+////global initialization of tables
+//struct Init{
+//	Init(){Tables::InitAllTables();}
+//} initTables;
 
 ////////////////////
 // magic number tables of 64 bits (always available since space requierement is trivial)
@@ -311,13 +333,11 @@ void Tables::init_cached_index()
 
 //boot tables in RAM
 
-int Tables::InitAllTables(){
+void Tables::InitAllTables(){
 	init_mlsb();
     init_popc();
     init_popc8();
     init_masks(); 
 	init_lsb_l();
 	init_cached_index();
-
-return 1;
 }

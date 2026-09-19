@@ -18,23 +18,23 @@
  * suitability for any purpose.
  */
 
-#ifndef __TABLES_H__
-#define __TABLES_H__
+#ifndef BITGRAPH_BITSCAN_TABLES_H
+#define BITGRAPH_BITSCAN_TABLES_H
 
 #include "bbtypes.h"
 
 namespace bitgraph {
 
-	namespace _impl {
+	namespace detail {
 
 		class Tables {
 
-		private:
-			Tables() {};
-			virtual ~Tables() {};
-
+			Tables() = delete;
+			~Tables() = delete;
+		
 		public:
-			static int InitAllTables();							//Driver for all inits
+			static void InitAllTables();							//Driver for all inits
+		
 		private:
 			static void init_masks();
 			static void init_popc8();
@@ -95,8 +95,8 @@ namespace bitgraph {
 
 		};
 
-	}//end of namespace _impl
+	}//end of namespace detail
 
 }//end of namespace bitgraph
 
-#endif
+#endif // BITGRAPH_BITSCAN_TABLES_H

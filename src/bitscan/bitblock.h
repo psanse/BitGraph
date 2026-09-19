@@ -78,7 +78,7 @@
 
 namespace bitgraph {
 
-	using _impl::Tables;
+	using detail::Tables;
 
 	/////////////////////////////////
 	//
@@ -421,9 +421,9 @@ namespace bitgraph {
 			int lsb64_de_Bruijn(const BITBOARD bb_dato) {
 
 #ifdef ISOLANI_LSB
-			return (bb_dato == 0) ? BBObject::noBit : _impl::Tables::indexDeBruijn64_ISOL[((bb_dato & -bb_dato) * DEBRUIJN_MN_64_ISOL) >> DEBRUIJN_MN_64_SHIFT];
+			return (bb_dato == 0) ? BBObject::noBit : detail::Tables::indexDeBruijn64_ISOL[((bb_dato & -bb_dato) * DEBRUIJN_MN_64_ISOL) >> DEBRUIJN_MN_64_SHIFT];
 #else
-			return (bb_dato == 0) ? BBObject::noBit : _impl::Tables::indexDeBruijn64_SEP[((bb_dato ^ (bb_dato - 1)) * DEBRUIJN_MN_64_SEP) >> DEBRUIJN_MN_64_SHIFT];
+			return (bb_dato == 0) ? BBObject::noBit : detail::Tables::indexDeBruijn64_SEP[((bb_dato ^ (bb_dato - 1)) * DEBRUIJN_MN_64_SEP) >> DEBRUIJN_MN_64_SHIFT];
 #endif
 
 		}
@@ -442,7 +442,7 @@ namespace bitgraph {
 			bb |= bb >> 32;
 
 			//applys same computation as for LSB-de Bruijn
-			return _impl::Tables::indexDeBruijn64_SEP[(bb * DEBRUIJN_MN_64_SEP) >> DEBRUIJN_MN_64_SHIFT];
+			return detail::Tables::indexDeBruijn64_SEP[(bb * DEBRUIJN_MN_64_SEP) >> DEBRUIJN_MN_64_SHIFT];
 		}
 
 	} // end namespace bblock
