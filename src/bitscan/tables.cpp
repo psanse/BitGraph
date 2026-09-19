@@ -57,10 +57,6 @@ namespace {
 
 } // unnamed namespace
 
-////global initialization of tables
-//struct Init{
-//	Init(){Tables::InitAllTables();}
-//} initTables;
 
 ////////////////////
 // magic number tables of 64 bits (always available since space requierement is trivial)
@@ -209,16 +205,16 @@ void Tables::init_popc(){
 	}
 
 
-	//Implementacion Shift+Add: 
-	pc_sa[0]=0;					//null bits population
+	//Implementacion Shift+Add: TO CHECK! (19/09/2026) 
+	//pc_sa[0]=0;					//null bits population
 
-	for (c=1;c<65536;c++)	{
-		n=0;
-		for(k=0;k<13;k+=4)
-				n+=0xF & (c>>k);  //Sum of the number of bits every 4
-		
-		pc_sa[c]=n;
-	}
+	//for (c=1;c<65536;c++)	{
+	//	n=0;
+	//	for(k=0;k<13;k+=4)
+	//			n+=0xF & (c>>k);  //Sum of the number of bits every 4
+	//	
+	//	pc_sa[c]=n;
+	//}
 }
 
 ////////////////////////////////////////
