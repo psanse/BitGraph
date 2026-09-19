@@ -13,12 +13,12 @@
  * 
  **/
 
-#ifndef __GRAPH_FACADE_H__
-#define __GRAPH_FACADE_H__
+#ifndef BITSCAN_GRAPH_MAIN_HEADER_H
+#define BITSCAN_GRAPH_MAIN_HEADER_H
 
 #include "graph_types.h"
 #include "graph_basic.h"
 #include "graph_vertex_weighted.h"
 #include "graph_edge_weighted.h"
 
-#endif // __GRAPH_FACADE_H__
+#endif // BITSCAN_GRAPH_MAIN_HEADER_H
