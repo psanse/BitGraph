@@ -12,8 +12,8 @@
   * TODO- PENDING FULL REFACTORING, namespace _impl (13/02/2025)
   **/
 
-#ifndef __BB_SENTINEL_H__
-#define __BB_SENTINEL_H__
+#ifndef BITGRAPH_BITSCAN_BB_SENTINEL_H
+#define BITGRAPH_BITSCAN_BB_SENTINEL_H
 
 #include "bitscan/bbscan.h"
 #include "bitscan/bbutils.h"			//MIN, MAX
@@ -243,7 +243,7 @@ namespace bitgraph {
 
 }//end namespace bitgraph
 
-#endif 
+#endif //BITGRAPH_BITSCAN_BB_SENTINEL_H
 
 
 

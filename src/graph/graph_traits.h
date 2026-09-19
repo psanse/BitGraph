@@ -13,6 +13,8 @@
  * @author P. San Segundo
  */
 
+ // TODO  add weighted graph traits (edge-weighted, vertex-weighted) when needed (30/01/2026)
+
 #ifndef BITGRAPH_GRAPH_TRAITS_H
 #define BITGRAPH_GRAPH_TRAITS_H__
 
@@ -34,6 +36,8 @@ namespace bitgraph {
     template<class GraphT>
     struct graph_traits {
         static constexpr bool is_undirected = false;
+        static constexpr bool is_vertex_weighted = false;
+        static constexpr bool is_edge_weighted = false;
     };
 
     /**

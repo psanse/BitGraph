@@ -13,8 +13,8 @@
  * @author P. San Segundo
  */
 
-#ifndef _BITGRAPH_BBSCAN_IMP_H_
-#define _BITGRAPH_BBSCAN_IMP_H_
+#ifndef BITGRAPH_BITSCAN_BBSCAN_IMP_H_
+#define BITGRAPH_BITSCAN_BBSCAN_IMP_H_
 
 
 namespace bitgraph {
@@ -351,7 +351,8 @@ namespace bitgraph {
 
 
 
-#endif // _BITGRAPH_BBSCAN_IMP_H_
+
+#endif // BITGRAPH_BITSCAN_BBSCAN_IMP_H_	
 
 
 

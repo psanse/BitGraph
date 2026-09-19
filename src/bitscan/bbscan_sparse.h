@@ -8,8 +8,8 @@
  * TODO refactoring and testing 25/02/2025
  **/
 
-#ifndef __BBSCAN_SPARSE_H__
-#define __BBSCAN_SPARSE_H__
+#ifndef BITGRAPH_BITSCAN_BBSCAN_SPARSE_H
+#define BITGRAPH_BITSCAN_BBSCAN_SPARSE_H
 
 #include "detail/persistent_scan.h"
 #include "bitscan/bbset_sparse.h"
@@ -685,4 +685,4 @@ namespace bitgraph {
 }//end namespace bitgraph
 
 
-#endif 
+#endif // BITGRAPH_BITSCAN_BBSCAN_SPARSE_H

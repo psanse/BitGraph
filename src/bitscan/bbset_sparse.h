@@ -8,8 +8,8 @@
   * TODO - check inlining and header / cpp implementations (08/12/2025) 
   **/
 
-#ifndef __BBSET_SPARSE_H__
-#define __BBSET_SPARSE_H__
+#ifndef BITGRAPH_BITSCAN_BBSET_SPARSE_H
+#define BITGRAPH_BITSCAN_BBSET_SPARSE_H	
 
 #include "bitscan/bbobject.h"
 #include "bitscan/bitblock.h"
@@ -1938,9 +1938,6 @@ namespace bitgraph {
 
 
 
-
-
-
 //////////////////////////
 //
 // DEPRECATED
@@ -1970,4 +1967,4 @@ namespace bitgraph {
 //}
 
 
-#endif
+#endif //  BITGRAPH_BITSCAN_BBSET_SPARSE_H	

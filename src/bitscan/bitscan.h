@@ -8,6 +8,10 @@
  * @author pss
  **/
 
+
+#ifndef BITGRAPH_BITSCAN_BITSCAN_H
+#define BITGRAPH_BITSCAN_BITSCAN_H
+
 #include "bbsentinel.h"      // Non-sparse hierarchy
 #include "bbscan_sparse.h"   // Sparse hierarchy
 #include "bbscan_view.h"     // Independent scan views
@@ -79,3 +83,6 @@ namespace bitgraph {
 //bitgraph::view::scan scanView(candidates);
 
 ////////////////////
+
+
+#endif // BITGRAPH_BITSCAN_BITSCAN_H

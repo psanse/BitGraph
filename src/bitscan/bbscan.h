@@ -11,8 +11,8 @@
   * TODO - Compare efficiency with nested bitscanning classes in BBObject (13/02/2025)
   **/
 
-#ifndef _BITGRAPH_BBSCAN_H_
-#define _BITGRAPH_BBSCAN_H_
+#ifndef BITGRAPH_BITSCAN_BBSCAN_H
+#define BITGRAPH_BITSCAN_BBSCAN_H
 
 #include "detail/persistent_scan.h"
 #include "bbset.h"	
@@ -307,7 +307,8 @@ namespace bitgraph {
 #include "detail/bbscan_imp.h"
 
 
-#endif // _BITGRAPH_BBSCAN_H_
+
+#endif // BITGRAPH_BITSCAN_BBSCAN_H_
 
 
 

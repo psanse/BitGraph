@@ -10,13 +10,15 @@
 #include <stdexcept>
 #include <string>
 
+namespace detail {
 
-class BitScanError : public std::runtime_error {
+	class BitScanError : public std::runtime_error {
 
-public:
-	explicit BitScanError(const std::string& message)
-		: std::runtime_error("BitScanError: " + message) {}
-};
+	public:
+		explicit BitScanError(const std::string& message)
+			: std::runtime_error("BitScanError: " + message) {}
+	};
+}
 
 
 #endif // BITGRAPH_BITSCAN_BBEXCEP_HAND_H

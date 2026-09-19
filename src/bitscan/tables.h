@@ -1,22 +1,19 @@
-/*  
- * tables.h file from the BITSCAN library, a C++ library for bit 
- * sets optimization. It has been used to implement BBMC, a very
- * succesful bit-parallel algorithm for exact maximum clique. 
- * (see license file for references)
- *
- * Copyright (C)
- * Author: Pablo San Segundo
- * Intelligent Control Research Group (CSIC-UPM) 
- *
- * Permission to use, modify and distribute this software is
- * granted provided that this copyright notice appears in all 
- * copies, in source code or in binaries. For precise terms 
- * see the accompanying LICENSE file.
- *
- * This software is provided "AS IS" with no warranty of any 
- * kind, express or implied, and with no claim as to its
- * suitability for any purpose.
- */
+ /**
+  * @file tables.h
+  * @brief Declares internal masks and lookup tables used by BITSCAN.
+  *
+  * This header declares precomputed tables used by low-level bit operations,
+  * including population counts, least- and most-significant-bit lookup tables,
+  * bit masks, De Bruijn lookup tables, and optional cached index conversions.
+  *
+  * The tables are initialized once during library startup by
+  * Tables::InitAllTables().
+  *
+  * @warning The declarations in bitgraph::detail are implementation details
+  *          and are not part of the supported public API.
+  *
+  * @author Pablo San Segundo
+  */
 
 #ifndef BITGRAPH_BITSCAN_TABLES_H
 #define BITGRAPH_BITSCAN_TABLES_H

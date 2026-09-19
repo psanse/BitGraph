@@ -5,8 +5,8 @@
   * @details created 2017, last_update 08/12/2025
  **/
 
-#ifndef  __BBUTILS_H__
-#define  __BBUTILS_H__
+#ifndef  BITGRAPH_BITSCAN_BBUTILS_H
+#define  BITGRAPH_BITSCAN_BBUTILS_H
 
 #include "utils/common.h"
 #include "utils/logger.h"
@@ -573,5 +573,5 @@ namespace bitgraph {
 }//end namespace bitgraph
 
 
-#endif
+#endif // BITGRAPH_BITSCAN_BBUTILS_H
 

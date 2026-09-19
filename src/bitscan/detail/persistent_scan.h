@@ -14,8 +14,8 @@
  *          on the same bitset invalidates any scan already in progress.
  */
 
-#ifndef _BITGRAPH_BITSCAN_DETAIL_PERSISTENT_SCAN_H_
-#define _BITGRAPH_BITSCAN_DETAIL_PERSISTENT_SCAN_H_
+#ifndef BITGRAPH_BITSCAN_DETAIL_PERSISTENT_SCAN_H
+#define BITGRAPH_BITSCAN_DETAIL_PERSISTENT_SCAN_H
 
 #include "bitscan/bbobject.h"
 
@@ -270,4 +270,4 @@ namespace bitgraph {
     } // namespace detail
 } // namespace bitgraph
 
-#endif // _BITGRAPH_BITSCAN_DETAIL_PERSISTENT_SCAN_H_	
+#endif // BITGRAPH_BITSCAN_DETAIL_PERSISTENT_SCAN_H	

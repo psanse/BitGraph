@@ -7,8 +7,8 @@
   * 
   **/
 
-#ifndef _BITGRAPH_BITSCAN_BBSCAN_VIEW_H_
-#define _BITGRAPH_BITSCAN_BBSCAN_VIEW_H_
+#ifndef BITGRAPH_BITSCAN_BBSCAN_VIEW_H
+#define BITGRAPH_BITSCAN_BBSCAN_VIEW_H
 
 #include "bbscan.h"	
 #include <cassert>
@@ -197,7 +197,8 @@ namespace bitgraph{
 #include "detail/bbscan_view_imp.h"
 
 
-#endif // _BITGRAPH_BITSCAN_BBSCAN_VIEW_H_
+
+#endif // BITGRAPH_BITSCAN_BBSCAN_VIEW_H_
 
 
 
