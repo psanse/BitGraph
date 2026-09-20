@@ -428,7 +428,7 @@ ostream& Base_Graph_W<GraphT, WeightT>::print_weights (Vertices& lv, ostream& o)
 }
 
 template <class GraphT, class WeightT>
-ostream& Base_Graph_W<GraphT, WeightT>::print_weights (VertexBitset& bbsg, ostream& o) const
+ostream& Base_Graph_W<GraphT, WeightT>::print_weights (vertex_bitset_t& bbsg, ostream& o) const
 {
 	Vertex v = bbo::noBit;
 	bbsg.init_scan(bbo::NON_DESTRUCTIVE);										/* CHECK sparse graphs */

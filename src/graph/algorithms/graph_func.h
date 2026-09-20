@@ -38,7 +38,7 @@ namespace bitgraph {
 		* @date: created 03/09/18, last_update: 09/01/25
 		*/
 		template<class GraphT>
-		std::size_t neighbors(const GraphT& g, Vertex v, typename  GraphT::VertexBitset& bbref, Vertices& lv) {
+		std::size_t neighbors(const GraphT& g, Vertex v, typename  GraphT::vertex_bitset_t& bbref, Vertices& lv) {
 
 			lv.clear();
 			lv.reserve(g.num_vertices());		//allocates maximum possible size
@@ -75,7 +75,7 @@ namespace bitgraph {
 		* @date: created 03/09/18, @last_update: 09/01/25
 		*/
 		template<class GraphT>
-		std::size_t neighbors_after(const GraphT& g, Vertex v, typename GraphT::VertexBitset& bbref, Vertices& lv) {
+		std::size_t neighbors_after(const GraphT& g, Vertex v, typename GraphT::vertex_bitset_t& bbref, Vertices& lv) {
 
 			lv.clear();
 			lv.reserve(g.num_vertices());		//allocates maximum possible size
@@ -308,7 +308,7 @@ namespace bitgraph {
 		* @todo - change returned edge to std::pair<int,int> (29/01/2026)
 		*/
 		template<class GraphT>
-		bool is_edgeFree_subgraph(GraphT& g, typename GraphT::VertexBitset& bbsg, std::vector<Vertex>& edge) {
+		bool is_edgeFree_subgraph(GraphT& g, typename GraphT::vertex_bitset_t& bbsg, std::vector<Vertex>& edge) {
 
 			//cleans output edge
 			edge.clear();
@@ -346,7 +346,7 @@ namespace bitgraph {
 		* @returns TRUE if the induced subgraph has no edges, FALSE otherwise
 		*/
 		template<class GraphT>
-		bool is_triangleFree_subgraph(GraphT& g, typename GraphT::VertexBitset& bbsg, std::vector<Vertex>& triangle) {
+		bool is_triangleFree_subgraph(GraphT& g, typename GraphT::vertex_bitset_t& bbsg, std::vector<Vertex>& triangle) {
 
 			//cleans output 
 			triangle.clear();
@@ -437,7 +437,7 @@ namespace bitgraph {
 			* @returns sorted list of vertices lv
 			*/
 			template<class GraphT>
-			Vertices& sort_deg(const GraphT& g, Vertices& lv, typename  GraphT::VertexBitset& bbref, bool min_sort = true) {
+			Vertices& sort_deg(const GraphT& g, Vertices& lv, typename  GraphT::vertex_bitset_t& bbref, bool min_sort = true) {
 
 				//int deg = 0;
 
@@ -482,7 +482,7 @@ namespace bitgraph {
 			* @brief sum of weights of the vertices in a (bit)set (bbref)
 			*/
 			template<typename GraphT>
-			typename GraphT::Weight wsum(const GraphT& g, typename GraphT::VertexBitset& bbref) {
+			typename GraphT::Weight wsum(const GraphT& g, typename GraphT::vertex_bitset_t& bbref) {
 
 				typename GraphT::Weight total_weight = 0;
 
@@ -539,7 +539,7 @@ namespace bitgraph {
 			*		 plus the weight of vertex v
 			*/
 			template<typename GraphT>
-			typename GraphT::Weight wsum(const GraphT& g, Vertex v, typename GraphT::VertexBitset& bbref) {
+			typename GraphT::Weight wsum(const GraphT& g, Vertex v, typename GraphT::vertex_bitset_t& bbref) {
 
 				auto total_weight = g.weight(v);
 

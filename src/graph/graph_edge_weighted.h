@@ -52,7 +52,7 @@ namespace bitgraph {
 		using BaseT = Base_Graph_EW<ugraph, WeightT>;					// parent type
 		using graph_type = typename BaseT::graph_type;
 		using bitset_type = typename BaseT::bitset_type;
-		using VertexBitset = bitset_type;								// alias for semantic type
+		using vertex_bitset_t = bitset_type;								// alias for semantic type
 		using Weight = typename BaseT::Weight;
 
 		using BaseT::NO_WEIGHT;
@@ -127,7 +127,7 @@ namespace bitgraph {
 
 		int max_graph_degree() const { return this->g_.max_graph_degree(); }
 		int degree(int v) const { return this->g_.degree(v); }
-		int degree(int v, const VertexBitset& bbn) const { return this->g_.degree(v, bbn); }
+		int degree(int v, const vertex_bitset_t& bbn) const { return this->g_.degree(v, bbn); }
 
 		/////////////
 		//other operations

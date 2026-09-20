@@ -57,7 +57,7 @@ namespace bitgraph {
 		using graph_type = typename BaseT::graph_type;
 		using bitset_type = typename BaseT::bitset_type;
 		using Weight = typename BaseT::Weight;
-		using VertexBitset = bitset_type;						// alias for semantic information
+		using vertex_bitset_t = bitset_type;						// alias for semantic information
 
 		using BaseT::NO_WEIGHT;
 		using BaseT::ZERO_WEIGHT;

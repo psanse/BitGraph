@@ -40,7 +40,8 @@ namespace bitgraph {
 
 		using graph_type = GraphT;							// graph type	
 		using bitset_type = typename GraphT::bitset_type;	// bitset type used by graph type 
-		using VertexBitset = bitset_type;					// alias for semantic type
+		using vertex_bitset_t = bitset_type;				// alias for semantic type
+		using VertexBitset = vertex_bitset_t;				// alias for backward compatibility
 		using Weight = WeightT;
 		
 		//constants - globals
@@ -110,8 +111,8 @@ namespace bitgraph {
 		*/
 		Weight maximum_weight(int& v)	const;
 
-		const VertexBitset& neighbors(int v) const { return g_.neighbors(v); }
-		VertexBitset& neighbors(int v) { return g_.neighbors(v); }
+		const vertex_bitset_t& neighbors(int v) const { return g_.neighbors(v); }
+		vertex_bitset_t& neighbors(int v) { return g_.neighbors(v); }
 
 		void set_name(std::string str) { g_.set_name(str); }
 		std::string name() const { return g_.name(); }
@@ -261,7 +262,7 @@ namespace bitgraph {
 		/**
 		* @brief streams vertex-weights in the subset of vertices  bbsg
 		**/
-		std::ostream& print_weights(VertexBitset& bbsg, std::ostream& o = std::cout) const;
+		std::ostream& print_weights(vertex_bitset_t& bbsg, std::ostream& o = std::cout) const;
 
 		/**
 		* @brief prints the weights of the vertices in the stack lv

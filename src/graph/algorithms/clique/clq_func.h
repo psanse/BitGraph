@@ -172,9 +172,9 @@ namespace bitgraph {
 			**/
 			template<class GraphT, bool Reverse = false>
 			inline
-				int find_clique(const GraphT& g, std::vector<int>& clq, typename GraphT::VertexBitset& bbsg) {
+				int find_clique(const GraphT& g, std::vector<int>& clq, typename GraphT::vertex_bitset_t& bbsg) {
 
-				typename GraphT::VertexBitset bb(bbsg);
+				typename GraphT::vertex_bitset_t bb(bbsg);
 				clq.clear();
 
 				//main loop - destructive scan of bb
@@ -225,9 +225,9 @@ namespace bitgraph {
 			**/
 			template<class GraphT, bool Reverse = false>
 			inline
-				int find_clique_max_deg(const GraphT& g, std::vector<int>& clq, const typename GraphT::VertexBitset& bbsg) {
+				int find_clique_max_deg(const GraphT& g, std::vector<int>& clq, const typename GraphT::vertex_bitset_t& bbsg) {
 
-				typename GraphT::VertexBitset bbsgC{ bbsg };
+				typename GraphT::vertex_bitset_t bbsgC{ bbsg };
 				clq.clear();
 
 				int pcmax, pc;
@@ -249,7 +249,7 @@ namespace bitgraph {
 						////////////////////////////
 
 						pc = 0;
-						const typename GraphT::VertexBitset& bbn =  g.neighbors(v);
+						const typename GraphT::vertex_bitset_t& bbn =  g.neighbors(v);
 						for (int nBB = 0; nBB < g.num_blocks(); ++nBB) {
 							pc += bitgraph::bblock::popc64(bbsgC.block(nBB) & bbn.block(nBB));
 						}
@@ -304,9 +304,9 @@ namespace bitgraph {
 			**/
 			template<class GraphT>
 			inline
-				int find_clique_from_pool(const GraphT& g, std::vector<int>& clq, typename GraphT::VertexBitset& bbsg) {
+				int find_clique_from_pool(const GraphT& g, std::vector<int>& clq, typename GraphT::vertex_bitset_t& bbsg) {
 
-				typename GraphT::VertexBitset bb(g.size());
+				typename GraphT::vertex_bitset_t bb(g.size());
 				clq.clear();
 
 				//main loop - seed vertex for a clique 
@@ -420,7 +420,7 @@ namespace bitgraph {
 			**/
 			template<class GraphT>
 			inline
-				bool is_iset(const GraphT& g, typename GraphT::VertexBitset& bb) {
+				bool is_iset(const GraphT& g, typename GraphT::vertex_bitset_t& bb) {
 
 				bb.init_scan(bbo::NON_DESTRUCTIVE);
 				int v = bbo::noBit;
@@ -506,7 +506,7 @@ namespace bitgraph {
 			**/
 			template<class GraphT>
 			inline
-				bool is_clique(const GraphT& g, typename GraphT::VertexBitset& bb) {
+				bool is_clique(const GraphT& g, typename GraphT::vertex_bitset_t& bb) {
 
 				bb.init_scan(bbo::NON_DESTRUCTIVE);
 				int v = bbo::noBit;
@@ -611,7 +611,7 @@ namespace bitgraph {
 		//////////////////////////////////
 		// VERY CLIQUE SPECIFIC - PLACE IT IN COPT
 		//	template<class GraphT>
-		//	int quasi_clq(GraphT& g, Vertices& clq, int* quasi, typename GraphT::VertexBitset& bbv) {
+		//	int quasi_clq(GraphT& g, Vertices& clq, int* quasi, typename GraphT::vertex_bitset_t& bbv) {
 		//		////////////////////////////////
 		//		// caches quasicliques in @quasi for consecutive vertices not in @clq (candidate quasi_vertices range [0-highest vertex index of clq[)
 		//		// quasi[VERTEX_IN_CLQ]:= qv (@clq - {VERTEX_IN_CLQ} + {qv} is a clique in @g of the same size)
@@ -624,7 +624,7 @@ namespace bitgraph {
 		//		//ASSERT
 		//		if (clq.empty()) return 0;
 		//
-		//		typename GraphT::VertexBitset bbclq(clq, g.number_of_vertices());
+		//		typename GraphT::vertex_bitset_t bbclq(clq, g.number_of_vertices());
 		//		int num_added = 0, num_no_clq = 0, qv = -1, lastOfclq = bbclq.msbn64();
 		//
 		//		for (int v = 0; v < lastOfclq; v++) {									/* last vertex in clq excluded, since it MUST BE in @bbv*/
@@ -683,9 +683,9 @@ namespace bitgraph {
 			**/
 			template<class GraphT, bool Reverse = false>
 			inline
-				int find_clique_lb(const GraphT& g, typename GraphT::VertexBitset& bbsg) {
+				int find_clique_lb(const GraphT& g, typename GraphT::vertex_bitset_t& bbsg) {
 
-				typename GraphT::VertexBitset bb(bbsg);
+				typename GraphT::vertex_bitset_t bb(bbsg);
 				int lb = 0;
 
 				//main loop - destructive scan of bb
@@ -734,7 +734,7 @@ namespace bitgraph {
 			inline
 				int find_clique_lb(const GraphT& g) {
 
-				typename GraphT::VertexBitset bb((int)g.size(), true);
+				typename GraphT::vertex_bitset_t bb((int)g.size(), true);
 				int lb = 0;
 
 				//main loop - destructive scan of bb
@@ -778,7 +778,7 @@ namespace bitgraph {
 			// the clique (early exit when it cannot)
 
 			//template<class GraphT>
-			//int find_clique_lb_ALT(const GraphT& g, typename GraphT::VertexBitset& bbsg) {
+			//int find_clique_lb_ALT(const GraphT& g, typename GraphT::vertex_bitset_t& bbsg) {
 
 			//	//////////////////////////////////////
 			//	if (bbsg.is_empty()) { return 0; }		/* empty set */
@@ -828,7 +828,7 @@ namespace bitgraph {
 			**/
 			template<class GraphT>
 			inline
-				int ISEQ(const GraphT& g, const typename GraphT::VertexBitset& bbsg, int* ub = nullptr) {
+				int ISEQ(const GraphT& g, const typename GraphT::vertex_bitset_t& bbsg, int* ub = nullptr) {
 
 				//TODO-validation
 
@@ -838,8 +838,8 @@ namespace bitgraph {
 				int col = 1, v = bbo::noBit;
 
 				//main loop - greedy coloring	
-				typename GraphT::VertexBitset bb_unsel(bbsg);
-				typename GraphT::VertexBitset bb_sel(g.size());
+				typename GraphT::vertex_bitset_t bb_unsel(bbsg);
+				typename GraphT::vertex_bitset_t bb_sel(g.size());
 				while (true) {
 
 					//load bb_sel with remaining vertices to be colored
@@ -879,7 +879,7 @@ namespace bitgraph {
 			**/
 			template<class GraphT>
 			inline
-				int ISEQ(const GraphT& g, const typename GraphT::VertexBitset& bbsg, std::vector<int>& ub) {
+				int ISEQ(const GraphT& g, const typename GraphT::vertex_bitset_t& bbsg, std::vector<int>& ub) {
 				
 				//TODO-validation
 
@@ -890,8 +890,8 @@ namespace bitgraph {
 				int col = 1, v = bbo::noBit, nBB = bbo::noBit;
 
 				//main loop - greedy coloring	
-				typename GraphT::VertexBitset bb_unsel(bbsg);
-				typename GraphT::VertexBitset bb_sel(g.size());
+				typename GraphT::vertex_bitset_t bb_unsel(bbsg);
+				typename GraphT::vertex_bitset_t bb_sel(g.size());
 				while (true) {
 
 					//load bb_sel with remaining vertices to be colored
@@ -949,7 +949,7 @@ namespace bitgraph {
 		//
 		//	template<class GraphT>
 		//	inline
-		//		int incUB(const GraphT& g, typename GraphT::VertexBitset& bbsg, int ub[]) {
+		//		int incUB(const GraphT& g, typename GraphT::vertex_bitset_t& bbsg, int ub[]) {
 		//		// computes incremental clique bound for nodes in bbsg
 		//		// RETURNS -1 if bbsg is empty, 0 in any other case
 		//		// 
@@ -987,7 +987,7 @@ namespace bitgraph {
 		//		// RETURNS edges outgoing from every vertex of @clq
 		//	
 		//		int nb_edges = 0;
-		//		typename GraphT::VertexBitset bbcov(clq, g.number_of_vertices());
+		//		typename GraphT::vertex_bitset_t bbcov(clq, g.number_of_vertices());
 		//		for (int i = 0; i < clq.size(); i++) {
 		//			for (int NBB = 0; NBB < g.num_blocks(); NBB++) {
 		//				BITBOARD bb = g.get_neighbors(clq[i]).get_bitboard(NBB) &~bbcov.get_bitboard(NBB);

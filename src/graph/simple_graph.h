@@ -1,7 +1,7 @@
  /**
   * @file simple_graph.h
   *
-  * @brief Generic graph container for simple (unweighted) graphs.
+  * @brief Generic graph container for simple (unweighted, sparse and non-sparse) graphs.
   *
   * This header defines the primary template `Graph<BitsetT>`, which represents
   * a simple graph using a bitset-based adjacency structure.
@@ -23,7 +23,6 @@
   * Higher-level graph abstractions (e.g. undirected graphs, weighted graphs,
   * and facade graph types) are built on top of this class.
   *
-  *
   * @note
   * This header is a core dependency of most BitGraph components and should be
   * included before facade or algorithm-level headers.
@@ -31,9 +30,8 @@
   * @author
   * Pablo San Segundo (pss)
   *
-  * @date
-  * Created: 17/06/2010
-  * Last update: 06/01/2025
+  * @date Created: 17/06/2010
+  * @date Last update: 20/09/2026
   */
 
 
@@ -57,7 +55,7 @@
 namespace bitgraph {
 	
 	// forward declaration
-	namespace _impl { class GraphConversion;}
+	namespace detail { class GraphConversion;}
 
 	//////////////////
 	//
@@ -70,16 +68,17 @@ namespace bitgraph {
 	template<class BitsetT = BBScan>
 	class Graph {
 
-		//filter out invalid types
+		// filter everything else than BBScan and BBScanSP
 		static_assert(std::is_same<BBScan, BitsetT>::value ||
 							std::is_same<BBScanSp, BitsetT>::value, "is not a valid Graph type");
 
-		friend class _impl::GraphConversion;
+		friend class detail::GraphConversion;
 
 	public:
 						
 		using bitset_type = BitsetT;				// basic type (a type of bitset)
-		using VertexBitset = bitset_type;			// alias for semantic type
+		using vertex_bitset_t = bitset_type;
+		using VertexBitset = vertex_bitset_t;		// alias for backward compatibility
 		
 		/////////////			
 		//construction / destruction
@@ -143,11 +142,11 @@ namespace bitgraph {
 		* @param set input bitset of vertices that induces the subgraph
 		* @returns number of edges
 		**/
-		virtual	std::size_t num_edges(const VertexBitset& set)	const;
-
-		const vector<VertexBitset>& adjacency_matrix()		const { return adj_; }
-		const VertexBitset& neighbors(int v)					const { return adj_[v]; }
-		VertexBitset& neighbors(int v) { return adj_[v]; }
+		virtual std::size_t num_edges(const BitsetT& set) const;
+		
+		const vector<vertex_bitset_t>& adjacency_matrix()		const { return adj_; }
+		const vertex_bitset_t& neighbors(int v)					const { return adj_[v]; }
+		vertex_bitset_t& neighbors(int v) { return adj_[v]; }
 
 		//////////////////////////
 		// memory allocation 
@@ -209,7 +208,7 @@ namespace bitgraph {
 		* @brief density of the subgraph induced by a set of vertices
 		* @param set input (bit) set of vertices
 		**/
-		template <class U = VertexBitset>
+		template <class U = vertex_bitset_t>
 		double density(const U& set);
 
 		/**
@@ -452,13 +451,13 @@ namespace bitgraph {
 		* @param bbsg input (bit) set of vertices
 		* @param o output stream
 		*/
-		template <class U = VertexBitset>
+		template <class U = vertex_bitset_t>
 		ostream& print_edges(U& bbsg, ostream& o = std::cout)	const;
 
 		//////////////////////////
 		// data members
 	protected:
-		std::vector<VertexBitset> adj_;		//adjacency matrix 
+		std::vector<vertex_bitset_t> adj_;		//adjacency matrix 
 
 		int NV_;						// number of vertices
 		std::size_t NE_;				// number of edges (can be very large)

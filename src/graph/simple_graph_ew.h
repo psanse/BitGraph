@@ -68,7 +68,8 @@ namespace bitgraph {
 				
 		using graph_type = GraphT;								// graph type
 		using bitset_type = typename GraphT::bitset_type;		// bitset type used by graph type 
-		using VertexBitset = bitset_type;						// alias for semantic type
+		using vertex_bitset_t = bitset_type;					// alias for semantic type
+		using VertexBitset = vertex_bitset_t;					// alias for backward compatibility
 		using Weight = WeightT;								
 		
 		using mat_t = vector<vector<Weight>>;					// type for a matrix of weights
@@ -170,8 +171,8 @@ namespace bitgraph {
 		* @brief neighbor set of vertex @v
 		* @param v input vertex
 		**/
-		const VertexBitset& neighbors(int v) const { return g_.neighbors(v); }
-		VertexBitset& neighbors(int v) { return g_.neighbors(v); }
+		const vertex_bitset_t& neighbors(int v) const { return g_.neighbors(v); }
+		vertex_bitset_t& neighbors(int v) { return g_.neighbors(v); }
 
 		void set_name(std::string str) { g_.set_name(str); }
 		string name() const { return g_.name(); }

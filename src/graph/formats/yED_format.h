@@ -180,7 +180,7 @@ namespace bitgraph {
 				std::string filenameExt = path + filename + ".gml";
 				std::ofstream grafo(filenameExt);
 				if (!grafo) { LOGG_ERROR("file: ", filenameExt, "could no be opened", " -graph_to_gml(...)"); return -1; }
-				typename GraphT::VertexBitset bbclq(N, vset);
+				typename GraphT::vertex_bitset_t bbclq(N, vset);
 				//bbclq.print(cout, true);
 
 
@@ -235,10 +235,8 @@ namespace bitgraph {
 				std::string filenameExt = path + filename + ".gml";
 				std::ofstream grafo(filenameExt);
 				if (!grafo) { LOGG_ERROR("file: ", filenameExt, " could no be opened", " -gio::yed::graph_to_gml_clique(...)"); return -1; }
-				typename GraphT::VertexBitset bbclq(N, clq);
-				//bbclq.print(cout, true);
-
-
+				typename GraphT::vertex_bitset_t bbclq(N, clq);
+				
 				//////////////////////////////////
 				HEADER(grafo);
 				//////////////////////////////////

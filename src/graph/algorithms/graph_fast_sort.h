@@ -50,7 +50,7 @@ namespace bitgraph {
 
 		public:
 			using graph_type = GraphT;												// graph type
-			using VertexBitset = typename GraphT::VertexBitset;						// bitset type
+			using vertex_bitset_t = typename GraphT::vertex_bitset_t;						// bitset type
 			
 			//non structured enums are used for easy conversion to int when needed
 			enum { PRINT_DEGREE = 0, PRINT_SUPPORT, PRINT_NODES };
@@ -94,7 +94,7 @@ namespace bitgraph {
 			*			3) map the ordering back to the original graph
 			* 
 			**/
-			virtual VertexOrdering new_order(int alg, VertexBitset& bbsg, bool ltf = true, bool o2n = true);
+			virtual VertexOrdering new_order(int alg, vertex_bitset_t& bbsg, bool ltf = true, bool o2n = true);
 	
 			/**
 			* @brief Creates an isomorphism for a given ordering
@@ -292,7 +292,7 @@ namespace bitgraph {
 
 			VertexDegrees nb_neigh_;								// stores the degree of the vertices		
 			VertexSupports deg_neigh_;								// stores the support of the vertices (degree of neighbors)
-			VertexBitset node_active_state_;						// bitset for active vertices: 1bit-active, 0bit-passive. Used in degenerate orderings	
+			vertex_bitset_t node_active_state_;						// bitset for active vertices: 1bit-active, 0bit-passive. Used in degenerate orderings	
 			VertexOrdering nodes_;									// stores the ordering
 
 		};//end of GraphFastRootSort class
@@ -409,7 +409,7 @@ namespace bitgraph {
 			///////////////////////////////////
 
 			//update degree info of the remaining active vertices
-			VertexBitset& bbn = g_.neighbors(v);
+			vertex_bitset_t& bbn = g_.neighbors(v);
 
 			bbn.init_scan(BBObject::NON_DESTRUCTIVE);
 			int w = BBObject::noBit;
@@ -459,7 +459,7 @@ namespace bitgraph {
 			//////////////////////////////////
 
 			//updates neighborhood info in remaining vertices
-			VertexBitset& bbn = g_.neighbors(v);
+			vertex_bitset_t& bbn = g_.neighbors(v);
 			bbn.init_scan(BBObject::NON_DESTRUCTIVE);
 			int w = BBObject::noBit;
 			while ((w = bbn.next_bit()) != BBObject::noBit) {
@@ -547,7 +547,7 @@ namespace bitgraph {
 			node_active_state_.erase_bit(v);
 
 			//updates neighborhood info in remaining vertices
-			VertexBitset& bbn = g_.neighbors(v);
+			vertex_bitset_t& bbn = g_.neighbors(v);
 			bbn.init_scan(BBObject::NON_DESTRUCTIVE);
 
 			int w = BBObject::noBit;
@@ -590,7 +590,7 @@ namespace bitgraph {
 			node_active_state_.erase_bit(v);
 
 			//updates neighborhood info in remaining vertices
-			VertexBitset& bbn = g_.neighbors(v);
+			vertex_bitset_t& bbn = g_.neighbors(v);
 			bbn.init_scan(BBObject::NON_DESTRUCTIVE);
 			int w = BBObject::noBit;
 			while ((w = bbn.next_bit()) != BBObject::noBit) {
@@ -794,7 +794,7 @@ namespace bitgraph {
 	{
 		for (int elem = 0; elem < NV_; ++elem) {
 			deg_neigh_[elem] = 0;
-			VertexBitset& bbn = g_.neighbors(elem);
+			vertex_bitset_t& bbn = g_.neighbors(elem);
 			bbn.init_scan(BBObject::NON_DESTRUCTIVE);
 			int w = BBObject::noBit;
 			while ((w = bbn.next_bit()) != EMPTY_ELEM) {
@@ -855,7 +855,7 @@ namespace bitgraph {
 
 	template<class GraphT>
 	inline auto
-	GraphFastRootSort<GraphT>::new_order(int alg, VertexBitset& bbsg, bool ltf, bool o2n) -> VertexOrdering
+	GraphFastRootSort<GraphT>::new_order(int alg, vertex_bitset_t& bbsg, bool ltf, bool o2n) -> VertexOrdering
 	{			
 		//convert bbsg to vector
 		VertexOrdering lv;

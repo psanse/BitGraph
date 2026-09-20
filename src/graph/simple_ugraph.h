@@ -32,7 +32,7 @@ namespace bitgraph {
 	template<class BitsetT = BBScan>
 	class Ugraph : public Graph<BitsetT> {
 
-		friend class _impl::GraphConversion;
+		friend class detail::GraphConversion;
 
 	public:
 
@@ -47,7 +47,8 @@ namespace bitgraph {
 		using BaseT = Graph<BitsetT>;		//parent type
 
 		using bitset_type = typename BaseT::bitset_type;
-		using VertexBitset = typename BaseT::VertexBitset;											// alias for semantic type
+		using vertex_bitset_t = bitset_type;								// alias for semantic type
+		using VertexBitset = vertex_bitset_t;								// alias for backward compatibility
 
 		//constructors - cannot all be inherited	
 		Ugraph() : Graph<BitsetT>() {}																// creates empty graph
@@ -79,7 +80,7 @@ namespace bitgraph {
 		/**
 		* @brief Counts the number of edges	in an induced subgraph by a set of vertices
 		**/
-		std::size_t num_edges(const VertexBitset&) 	const override;
+		std::size_t num_edges(const BitsetT&) 	const override;
 
 		/////////////
 		// Basic operations
@@ -278,7 +279,7 @@ namespace bitgraph {
 		std::ostream& print_degrees(std::ostream & = std::cout)	const;
 		std::ostream& print_edges(std::ostream & = std::cout, bool eofl = false) override;
 
-		std::ostream& print_edges(VertexBitset& bbsg, std::ostream&);
+		std::ostream& print_edges(vertex_bitset_t& bbsg, std::ostream&);
 		std::ostream& print_adjacency_matrix(std::ostream & = std::cout) const;
 
 		//////////////	
@@ -352,7 +353,7 @@ namespace bitgraph {
 
 	template<class BitsetT>
 	inline
-	ostream& Ugraph<BitsetT>::print_edges(VertexBitset& bbsg, std::ostream& o)
+	ostream& Ugraph<BitsetT>::print_edges(vertex_bitset_t& bbsg, std::ostream& o)
 	{
 		for (int i = 0; i < this->NV_ - 1; ++i) {
 			if (!bbsg.is_bit(i)) continue;
@@ -468,7 +469,7 @@ namespace bitgraph {
 
 	template<class BitsetT>
 	inline
-		std::size_t Ugraph<BitsetT>::num_edges(const VertexBitset& bbn) const {
+		std::size_t Ugraph<BitsetT>::num_edges(const BitsetT& bbn) const {
 		std::size_t NE = 0;
 
 		//reads only the upper triangle of the adjacency matrix
