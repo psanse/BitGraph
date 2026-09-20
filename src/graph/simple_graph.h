@@ -27,8 +27,7 @@
   * This header is a core dependency of most BitGraph components and should be
   * included before facade or algorithm-level headers.
   *
-  * @author
-  * Pablo San Segundo (pss)
+  * @author Pablo San Segundo (pss)
   *
   * @date Created: 17/06/2010
   * @date Last update: 20/09/2026
@@ -542,20 +541,49 @@ namespace bitgraph {
 			std::terminate();
 		}
 
-
 		//////////////////////////
 		// data members
 	protected:
-		std::vector<vertex_bitset_t> adj_;		//adjacency matrix 
 
-		int NV_;						// number of vertices
-		std::size_t NE_;				// number of edges (can be very large)
-		int NBB_;						// number of bit blocks per row (in the case of sparse graphs this is a maximum value)
+		/**
+		* @brief Adjacency matrix represented as one vertex bitset per row.
+		*
+		* Row `v` contains the outgoing neighbors of vertex `v`. For undirected
+		* graphs, the matrix is symmetric.
+		*/
+		std::vector<vertex_bitset_t> adj_;		
 
-		//names
-		std::string name_;				//name of instance, without path	
-		std::string path_;				//path of instance
-	};
+		/**
+		* @brief Number of vertices in the graph.
+		*/
+		int NV_ = 0;								
+
+		/**
+		* @brief Cached number of edges in the graph.
+		*
+		* This value may be recomputed by num_edges() when lazy evaluation is
+		* disabled.
+		*/
+		std::size_t NE_;						
+
+		/**
+		* @brief Number of bit blocks required for each adjacency row.
+		*
+		* For sparse bitset representations, this is the maximum possible number
+		* of blocks rather than the number currently allocated in every row.
+		*/
+		int NBB_ = 0;								
+
+		/**
+		 * @brief Graph instance name without its directory path.
+		 */
+		std::string name_;	
+
+		/**
+		 * @brief Directory path associated with the graph instance.
+		 */
+		std::string path_;						
+	};	
 		
 	
 }//end namespace bitgraph

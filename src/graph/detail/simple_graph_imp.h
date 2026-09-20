@@ -562,7 +562,8 @@ namespace bitgraph {
 	inline
 		std::size_t Graph<BitsetT>::num_edges(bool lazy) {
 
-		if (!lazy || NE_ == 0) {					//no lazy evaluation if NE_ = 0
+
+		if (!lazy || NE_ == 0) {					
 			NE_ = 0;
 			for (int i = 0; i < NV_; i++) {
 				NE_ += adj_[i].count();
