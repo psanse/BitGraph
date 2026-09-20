@@ -83,42 +83,42 @@ namespace bitgraph {
 		Graph<BitsetT>::Graph(void) noexcept :
 		NV_(0), NE_(0), NBB_(0),
 		name_(""), path_("")
-	{
-	}
+	{ }
 
 	template<class BitsetT>
 	inline
-		Graph<BitsetT>::Graph(std::string filename) :
-		NV_(0), NE_(0), NBB_(0),
-		name_(""), path_("")
+		Graph<BitsetT>::Graph(std::string filename) noexcept
+		: Graph() 		
 	{
 		reset(filename);		
 	}
 
 	template<class BitsetT>
-	inline
-		Graph<BitsetT>::Graph(std::size_t NV) {
-		name_.clear();
-		path_.clear();
+	inline 
+		Graph<BitsetT>::Graph(std::size_t NV) noexcept
+		: Graph()
+	{		
 		reset(NV);
 	}
 
 	template <class BitsetT>
 	inline
-		Graph<BitsetT>::Graph(std::size_t NV, int* adj[], std::string filename) {
-		
-		///////////////
-		reset(NV);
-		//////////////
-		
-		set_name(filename);
+		Graph<BitsetT>::Graph(std::size_t NV, int* adj[], std::string filename) noexcept 
+		: Graph()
+	{
+		// A null matrix is valid only when constructing an empty graph.
+		assert(adj != nullptr || NV == 0);
 
-		//add edges
-		const auto nV = static_cast<int>(NV);
-		for (auto i = 0; i < nV; i++) {
-			for (int j = 0; j < nV; j++) {
-				if (adj[i][j] == 1) {
-					add_edge(i, j);
+		const vertex_t num_vertex = static_cast<vertex_t>(NV);
+
+		reset(NV, std::move(filename));
+
+		for (vertex_t v = 0; v < num_vertex; ++v) {
+			assert(adj[v] != nullptr);
+
+			for (vertex_t w = 0; w < num_vertex; ++w) {
+				if (adj[v][w] != 0) {
+					add_edge(v, w);
 				}
 			}
 		}
@@ -127,7 +127,7 @@ namespace bitgraph {
 
 	template<class BitsetT>
 	inline
-		void Graph<BitsetT>::set_name(std::string name) {
+	void Graph<BitsetT>::set_name(std::string name) {
 
 		//update name
 		size_t found = name.find_last_of("/\\");
@@ -145,7 +145,7 @@ namespace bitgraph {
 
 	template<class BitsetT>
 	inline
-		void Graph<BitsetT>::reset() noexcept {
+	void Graph<BitsetT>::reset() noexcept {
 		adj_.clear(), name_.clear(), path_.clear();
 		NV_ = 0, NBB_ = 0, NE_ = 0;
 	}
@@ -155,32 +155,55 @@ namespace bitgraph {
 		void Graph<BitsetT>::reset(std::size_t NV, std::string name) noexcept {
 		
 		//check size - must fit in int type
-		if (NV > std::numeric_limits<int>::max()) {
-			LOGG_ERROR("Invalid graph size ", NV, " - Graph<BitsetT>::reset");
-			LOG_ERROR("exiting... ");
-			std::exit(EXIT_FAILURE);
+		if (NV > static_cast<std::size_t>(std::numeric_limits<int>::max())) {
+			graph_initialization_error(
+				"Graph size exceeds the supported vertex-index range - reset(std::size_t NV, std::string name).");
 		}
-
-		//initialization
-		NV_ = static_cast<int>(NV);
-		NBB_ = INDEX_1TO1(NV_);
-		NE_ = 0;
-
+		
 		try {
-			//////////////////////////////
-			adj_.assign(NV, BitsetT(NV));				//bitsets initialize to 0 - CHECK 		
-			//////////////////////////////
-		}
-		catch (const std::bad_alloc& e) {
-			LOG_ERROR("memory for graph not allocated - Graph<BitsetT>::reset");
-			LOG_ERROR("%s", e.what());
-			LOG_ERROR("exiting... ");
-			std::exit(EXIT_FAILURE);
-		}
+			/*
+			 * Build the new adjacency matrix independently. This avoids leaving
+			 * the graph partially reinitialized while allocation is in progress.
+			 *
+			 * reserve() also prevents vector reallocations while rows are added.
+			 */
+			std::vector<BitsetT> new_adjacency;
+			new_adjacency.reserve(NV);
 
-		//update instance name
-		this->set_name(std::move(name));
 
+			for (std::size_t i = 0; i < NV; ++i) {
+				new_adjacency.emplace_back(BitsetT{ NV });
+			}
+
+			// Commit the newly constructed representation.
+			adj_.swap(new_adjacency);
+
+			NV_ = static_cast<int>(NV);
+			NBB_ = static_cast<int>(INDEX_1TO1(NV_));
+			NE_ = 0;
+
+			set_name(std::move(name));
+		}
+		catch (const std::bad_alloc& error) {
+			LOGG_ERROR(
+				"Unable to allocate memory for a graph with ",
+				NV,
+				" vertices - reset(std::size_t NV, std::string name): ",
+				error.what());
+
+			std::terminate();
+		}
+		catch (const std::exception& error) {
+			LOGG_ERROR(
+				"Graph initialization failed - reset(std::size_t NV, std::string name): ",
+				error.what());
+
+			std::terminate();
+		}
+		catch (...) {
+			LOG_ERROR("Graph initialization failed - reset(std::size_t NV, std::string name): with an unknown error.");
+			std::terminate();
+		}		
 	}
 
 	template<class BitsetT>
@@ -215,7 +238,7 @@ namespace bitgraph {
 	inline
 		void Graph<BitsetT>::shrink_to_fit() {
 
-		for (int v = 0; v < NV_; ++v) {
+		for (vertex_t v = 0; v < NV_; ++v) {
 			adj_[v].shrink_to_fit();
 		}
 
@@ -236,7 +259,7 @@ namespace bitgraph {
 
 		//sets to 0 bitblocks outside the range but
 		//does not remove the empty bitbloks
-		for (int v = 0; v < NV_; ++v) {
+		for (vertex_t v = 0; v < NV_; ++v) {
 			adj_[v].erase_bit(NV_, -1);
 		}
 
@@ -256,10 +279,17 @@ namespace bitgraph {
 			if (read_mtx(filename) == -1) {
 				if (read_EDGES(filename) == -1) {
 					if (read_01(filename) == -1) {
-						LOGG_ERROR("Unable to read a graph from file ", filename, "- Graph<BitsetT>::reset");
-						LOG_ERROR("Formats considered: DIMACS / MTX / EDGES / 01");
-						LOG_ERROR("exiting...");
-						std::exit(EXIT_FAILURE);
+
+						std::string msg = "Unable to read a graph from file " + filename + " - Graph<BitsetT>::reset (std::string filename)";
+						msg += '\n';
+						msg += "Formats considered: DIMACS / MTX / EDGES / 01";
+					
+						//////////////////////////////
+						graph_initialization_error(
+							msg.c_str()
+						);	
+						//////////////////////////////
+
 					}
 				}
 			}

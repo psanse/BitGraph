@@ -84,10 +84,44 @@ namespace bitgraph {
 		
 		/////////////			
 		//construction / destruction
+
+		  /** @brief Constructs an empty graph. */
 		Graph() noexcept;													// creates empty graph
-		explicit Graph(std::size_t NV);										// creates graph with n=|V| and m=0 	
-		explicit Graph(std::string filename);								// creates graph from file		
-		Graph(std::size_t n, int* adj[], std::string filename = "");		// old-style adjacency matrix
+
+		/**
+	    * @brief Constructs a graph containing @p NV isolated vertices
+	    *		(n = NV and m = 0)
+	    *
+	    * @note This constructor follows a fail-fast policy and terminates the program
+		*       if graph initialization fails.
+	    */
+		explicit Graph(std::size_t NV) noexcept;										
+			
+		/**
+		* @brief Constructs a graph by reading it from @p filename.
+		*
+		* @note This constructor follows a fail-fast policy and terminates the program
+		*       if graph cannot be parsed.
+		*/
+		explicit Graph(std::string filename) noexcept;								
+
+		/**
+		 * @brief Constructs a graph from an old-style adjacency matrix.
+		 *
+		 * Every nonzero entry `adjacency[v][w]` represents the directed edge `(v,w)`.
+		 * For an undirected graph, the input matrix is expected to be symmetric.
+		 *
+		 * @param NV Number of rows and columns in @p adjacency.
+		 * @param adjacency Input adjacency matrix.
+		 * @param filename Optional graph instance name or source filename.
+		 *
+		 * @pre If @p NV is greater than zero, @p adjacency and each of its
+		 *      rows must be valid.
+		 *
+		 * @note This constructor follows a fail-fast policy and terminates the program
+		 *       if graph initialization fails.
+		 */
+		Graph(std::size_t NV, int* adj[], std::string filename = "") noexcept;		
 
 		//move and copy semantics allowed
 		Graph(const Graph& g) = default;
@@ -159,20 +193,28 @@ namespace bitgraph {
 		//////////////////////////
 		// memory allocation 
 	public:
-
+		
 		/**
-		* @brief resets to empty graph given name and number of vertices
-		* @param NV number of vertices
-		* @param name name of the instance
-		* @details: fast-fail policy - exits if failure
-		* @date: created 31/12/24, last_update 07/12/25
-		**/
+		 * @brief Reinitializes the graph with @p NV isolated vertices.
+		 *
+		 * Existing graph contents are discarded. The resulting graph contains no
+		 * edges, and every adjacency bitset is initialized with all bits cleared.
+		 *
+		 * @param NV Number of vertices in the new graph.
+		 * @param name Optional graph instance name or path.
+		 *
+		 * @note This function follows a fail-fast policy and terminates the program
+		 *       if the requested graph cannot be represented or allocated.
+		 * @date created 31/12/24
+		 * @date last_update 20/09/26
+		 */
 		void reset(std::size_t NV, std::string name = "") noexcept;
 
 		/**
 		* @brief sets graph from file in dimacs/MTX/Edges formats (in this order)
 		* @param filename file
-		* @details: fast-fail policy - exits if failure
+		 * @note This function follows a fail-fast policy and terminates the program
+		 *       if the requested graph cannot be represented or allocated.
 		**/
 		void reset(std::string filename) noexcept;
 
@@ -482,6 +524,24 @@ namespace bitgraph {
 		*/
 		template <class U = vertex_bitset_t>
 		ostream& print_edges(U& bbsg, ostream& o = std::cout)	const;
+
+
+		//////////////////
+		// handlers
+	protected:
+		/**
+		 * @brief Reports a graph initialization failure and terminates the program.
+		 *
+		 * @param message Description of the failure.
+		 */
+		[[noreturn]]
+		inline void graph_initialization_error(const char* message) noexcept
+		{
+			LOG_ERROR(message);
+			LOG_ERROR("Terminating the program.");
+			std::terminate();
+		}
+
 
 		//////////////////////////
 		// data members
