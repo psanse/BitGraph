@@ -45,7 +45,7 @@
 #define __SIMPLE_GRAPH_EDGE_WEIGHTED_H__
 
 #include "utils/common.h"
-#include "graph_basic.h"
+#include "graph_unweighted.h"
 #include "simple_ugraph.h"
 #include <iostream>
 #include <vector>

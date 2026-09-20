@@ -16,7 +16,7 @@
 #define __KCORE_H__
 
 #include "utils/logger.h"
-#include "graph/graph_basic.h"
+#include "graph/graph_unweighted.h"
 #include "graph_fast_sort.h"
 #include <vector>
 #include <iostream>

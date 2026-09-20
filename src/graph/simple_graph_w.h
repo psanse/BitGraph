@@ -14,7 +14,6 @@
 #define __SIMPLE_GRAPH_WEIGHTED_H__
 
 #include "utils/common.h"
-#include "graph_basic.h"
 #include "simple_ugraph.h"
 #include <iostream>
 #include <vector>
@@ -290,8 +289,8 @@ namespace bitgraph {
 		// data members
 
 	protected:
-		graph_type g_;								//graph
-		vector<Weight> w_;						//vector of weights 
+		graph_type g_;							// graph
+		vector<Weight> w_;						// vector of weights 
 	};
 
 }//end namespace bitgraph

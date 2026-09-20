@@ -42,7 +42,7 @@
 #define __GRAPH_VERTEX_WEIGHTED_H__
 
 #include "graph_types.h"
-#include "graph_basic.h"
+#include "graph_unweighted.h"
 #include "simple_graph_w.h"												 // MUST BE AFTER graph_basic.h 
 
 namespace bitgraph {

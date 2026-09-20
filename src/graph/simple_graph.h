@@ -37,10 +37,10 @@
   */
 
 
-#ifndef __SIMPLE_GRAPH_H__
-#define __SIMPLE_GRAPH_H__
+#ifndef BITSCAN_GRAPH_SIMPLE_GRAPH_H
+#define BITSCAN_GRAPH_SIMPLE_GRAPH_H
 
-#include "bitscan/bitscan.h"					//dependency to BITSCAN lib				
+#include "bitscan/bitscan.h"									
 #include "formats/dimacs_format.h"
 #include "formats/mmio.h"
 #include "formats/edges_format.h"
@@ -1230,4 +1230,4 @@ namespace bitgraph {
 
 
 
-#endif
+#endif // BITSCAN_GRAPH_SIMPLE_GRAPH_H

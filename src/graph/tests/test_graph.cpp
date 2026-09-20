@@ -9,7 +9,7 @@
 */
 
 #include "gtest/gtest.h"
-#include "graph/graph_basic.h"
+#include "graph/graph_unweighted.h"
 #include <iostream>
 
 using namespace std;

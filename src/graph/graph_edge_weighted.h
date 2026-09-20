@@ -38,7 +38,7 @@
 #define __GRAPH_EDGE_WEIGHTED_H__
 
 #include "graph_types.h"
-#include "graph_basic.h"
+#include "graph_unweighted.h"
 #include "simple_graph_ew.h"											
 
 namespace bitgraph {

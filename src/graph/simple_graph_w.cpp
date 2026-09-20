@@ -11,6 +11,7 @@
  */
 
 #include "graph_types.h"
+#include "graph/graph_unweighted.h"		// required for valid type instantiation 
 #include "graph/simple_graph_w.h"
 #include "bitscan/bitscan.h"
 #include "graph/formats/dimacs_format.h"			
@@ -458,7 +459,7 @@ ostream& Base_Graph_W<GraphT, WeightT>::print_weights (ostream& o, bool show_v) 
 //list of valid types for generic code in *.cpp files 
 
 namespace bitgraph {
-
+	
 	template class  Base_Graph_W<ugraph, int>;
 	template class  Base_Graph_W<ugraph, double>;
 	//template class  Graph_W<ugraph, int>;
