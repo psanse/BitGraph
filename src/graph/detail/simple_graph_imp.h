@@ -562,12 +562,16 @@ namespace bitgraph {
 	inline
 		std::size_t Graph<BitsetT>::num_edges(bool lazy) {
 
-
+		/*
+		 * NE_ == 0 also acts as the "not yet computed" sentinel.
+		 * Consequently, an edgeless graph is rescanned on every lazy call.
+		 */
 		if (!lazy || NE_ == 0) {					
 			NE_ = 0;
-			for (int i = 0; i < NV_; i++) {
-				NE_ += adj_[i].count();
-			}
+
+			for (const auto& neighbors : adj_) {
+				NE_ += static_cast<std::size_t>(neighbors.count());
+			}			
 		}
 
 		return NE_;

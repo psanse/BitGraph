@@ -162,14 +162,21 @@ namespace bitgraph {
 		*		 of all bitsets.
 		**/
 		int num_blocks() const noexcept { return NBB_; }
+			
 
-		/*
-		* @brief Counts the number of edges	(includes self loops)		
-		* @param lazy if TRUE (reads value @NE_)
-		*			  if FALSE counts and updates @NE_
-		* @returns number of edges
-		* @details: it can be a heavy operation for massive graphs
-		*/
+		/**
+		 * @brief Returns the number of edges in the graph.
+		 *
+		 * @param lazy If `true`, returns a previously computed nonzero value when
+		 *             available. If `false`, always recomputes the value from the
+		 *             adjacency matrix.
+		 * @return Number of adjacency entries.
+		 *
+		 * @note A zero cached value is treated as an uninitialized value. Therefore,
+		 *       edgeless graphs are recomputed on every lazy call.
+		 * @note Operations that modify the adjacency matrix must update or invalidate
+		 *       NE_ to prevent a stale (wrong) nonzero result.
+		 */
 		virtual	std::size_t num_edges(bool lazy = true);
 
 		/**
