@@ -12,10 +12,6 @@
 #ifndef BITGRAPH_GRAPH_SIMPLE_SPARSE_GRAPH_H
 #define BITGRAPH_GRAPH_SIMPLE_SPARSE_GRAPH_H
 
-//#include "simple_graph.h"
-//#include <iostream>
-//#include <vector>
-
 ////////////////////////
 //
 // Specializations of class Graph<BitsetT> methods for sparse graphs

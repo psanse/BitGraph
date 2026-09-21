@@ -105,7 +105,7 @@ namespace bitgraph {
 		Graph<BitsetT>::Graph(std::string filename) noexcept
 		: Graph() 		
 	{
-		reset(filename);		
+		reset(std::move(filename));		
 	}
 
 	template<class BitsetT>

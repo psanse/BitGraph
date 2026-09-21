@@ -3,7 +3,7 @@
  * @brief class Ugraph for simple undirected graphs	(no self loops)
  *
  * @created 17/6/10
- * @last_update 23/05/25
+ * @last_update 21/09/26
  * @author pss
  *
  * This code is part of the GRAPH 1.0 C++ library 
@@ -11,8 +11,8 @@
  * @todo implement min_degree functions (03/01/2025)
  **/
 
-#ifndef __SIMPLE_UGRAPH_H__
-#define __SIMPLE_UGRAPH_H__
+#ifndef BITGRAPH_GRAPH_SIMPLE_UGRAPH_H
+#define BITGRAPH_GRAPH_SIMPLE_UGRAPH_H
 
 #include "simple_graph.h"
 #include "utils/prec_timer.h"
@@ -36,36 +36,133 @@ namespace bitgraph {
 
 	public:
 
-		//set of (static) methods to create simple graphs
-		static Ugraph make_triangle();
-		static Ugraph make_clique(std::size_t n);
-		static Ugraph make_cycle(std::size_t n);
-		static Ugraph make_star(std::size_t n);
+		//set of (named) factories to create simple graphs
 
-		// @todo other helpers... (03/01/2025)
-					
+		static Ugraph make_triangle();
+
+		/**
+		 * @brief Creates a complete undirected graph.
+		 *
+		 * Constructs the complete graph \f$K_n\f$, in which every pair of distinct
+		 * vertices is connected by an edge. The graph contains no self-loops.
+		 *
+		 * @param NV Number of vertices in the complete graph.
+		 * @return Complete graph containing @p NV vertices and
+		 *         \f$NV(NV-1)/2\f$ edges.
+		 *
+		 * @note The empty graph \f$K_0\f$ and the single-vertex graph \f$K_1\f$ are
+		 *       valid results.
+		 * @note Construction follows the graph fail-fast policy and terminates if
+		 *       graph allocation fails.
+		 */
+		static Ugraph make_clique(std::size_t NV);
+
+		/**
+		 * @brief Creates a simple undirected cycle graph.
+		 *
+		 * Constructs the cycle graph \f$C_n\f$, where every vertex has degree two.
+		 * Consecutive vertices are adjacent, and the last vertex is connected to
+		 * vertex zero.
+		 *
+		 * @param NV Number of vertices in the cycle. It must be at least
+		 *        three.
+		 * @return Cycle graph containing @p NV vertices and
+		 *         @p NV edges.
+		 *
+		 * @note Construction follows the graph fail-fast policy and terminates if
+		 *       @p NV is smaller than three or graph allocation fails.
+		 */
+		static Ugraph make_cycle(std::size_t NV);
+
+		/**
+		 * @brief Creates an undirected star graph centered at vertex zero.
+		 *
+		 * Constructs the star graph \f$K_{1,n-1}\f$. Vertex `0` is the center and is
+		 * adjacent to every other vertex; no edges exist between the remaining
+		 * vertices.
+		 *
+		 * @param	NV Total number of vertices. It must be at least one.
+		 * @return Star graph containing @p NV vertices and
+		 *         `NV	 - 1` edges.
+		 *
+		 * @note Construction follows the graph fail-fast policy and terminates if
+		 *       @p NV is zero or allocation fails.
+		 */
+		static Ugraph make_star(std::size_t NV);
+
+		// @todo other named factories... (03/01/2025)
+			
+		// type aliases
+
 		using BaseT = Graph<BitsetT>;		//parent type
 
 		using bitset_type = typename BaseT::bitset_type;
 		using vertex_bitset_t = bitset_type;								// alias for semantic type
 		using VertexBitset = vertex_bitset_t;								// alias for backward compatibility
 
-		//constructors - cannot all be inherited	
-		Ugraph() : Graph<BitsetT>() {}																// creates empty graph
-		explicit Ugraph(std::size_t n) : Graph<BitsetT>(n) {}										// creates empty graph of size n=|V|	
-		explicit Ugraph(std::string filename) { this->reset(filename); }							// reads graph from file
+		/////////////			
+		//construction (cannot all be inherited) / destruction 	
+		
+
+		/** @brief Constructs an empty graph with no vertices. */
+		Ugraph() noexcept = default;										
+		
+		/**
+		 * @brief Constructs an undirected graph with isolated vertices.
+		 *
+		 * @param NV Number of vertices. The resulting graph contains no
+		 *        edges.
+		 *
+		 * @note Construction follows the graph fail-fast policy.
+		 */
+		explicit Ugraph(std::size_t NV) noexcept: BaseT(NV) {}					
+		
+		/**
+		 * @brief Constructs an undirected graph by reading it from a file.
+		 *
+		 * The supported input formats are tried according to the policy implemented
+		 * by reset(std::string).
+		 *
+		 * @param filename Input graph filename.
+		 *
+		 * @note Construction follows the graph fail-fast policy and terminates if the
+		 *       file cannot be read in a supported format.
+		 */
+		explicit Ugraph(std::string filename) noexcept
+			: BaseT()		
+		{ this->reset(std::move(filename)); }	
 
 		/**
-		* @brief Creates a graph from an C-style adjacency matrix
-		*
-		*		Reads only the upper triangle of the adjacency matrix
-		**/
-		Ugraph(std::size_t n, int* adj[], string name);			// C-style adjacency matrix
+		 * @brief Constructs an undirected graph from an adjacency matrix.
+		 *
+		 * The constructor reads the strict upper triangle of @p adjacency. Every
+		 * nonzero entry `adjacency[v][w]`, with `v < w`, creates the undirected edge
+		 * `{v,w}`. The symmetric adjacency entries are generated internally by
+		 * add_edge().
+		 *
+		 * Diagonal entries are ignored, so the resulting graph contains no
+		 * self-loops. Entries in the lower triangle are not inspected.
+		 *
+		 * @param numVertices Number of rows and columns in @p adjacency.
+		 * @param adjacency Input adjacency matrix. A null pointer is permitted only
+		 *        when @p numVertices is zero.
+		 * @param name Optional graph instance name or source filename.
+		 *
+		 * @pre If @p numVertices is greater than zero, @p adjacency and each of its
+		 *      rows must point to valid arrays containing at least @p numVertices
+		 *      integer entries.
+		 *
+		 * @note Every nonzero upper-triangle entry is interpreted as an edge.
+		 * @note Construction follows the graph fail-fast policy and terminates if the
+		 *       graph cannot be represented or allocated.
+		 */
+		Ugraph(std::size_t NV, int* adj[], string name) noexcept;			
 
 		// @todo: copy constructor, move constructor, copy operator =, move operator = (1/1/2025)
 
-		//destructor
-		~Ugraph() = default;
+		/** @brief Destroys the graph. */
+		~Ugraph() override = default;
+	
 
 		/////////////
 		// setters and getters
@@ -401,7 +498,7 @@ namespace bitgraph {
 	
 	template<class BitsetT>
 	inline
-		Ugraph<BitsetT> Ugraph<BitsetT>::make_triangle()
+		Ugraph<BitsetT> Ugraph<BitsetT>::make_triangle() 
 	{
 		Ugraph<BitsetT> tri(3);
 		tri.add_edge(0, 1);
@@ -415,12 +512,19 @@ namespace bitgraph {
 	inline
 		Ugraph<BitsetT> Ugraph<BitsetT>::make_clique(std::size_t NV)
 	{
+
 		Ugraph<BitsetT> clique(NV);
 
 		//sets the adjacency matrix to ONE except for the main diagonal
-		const auto nV = static_cast<int>(NV);
-		for (int v = 0; v < nV; ++v) {
-			clique.neighbors(v).set_bit(0, nV - 1);
+		const vertex_t vertex_count = clique.num_vertices();
+		if (vertex_count == 0) {
+			return clique;
+		}
+
+		const vertex_t last_vertex = vertex_count - 1;
+				
+		for (vertex_t v = 0; v < vertex_count; ++v) {
+			clique.neighbors(v).set_bit(0, last_vertex);
 			clique.neighbors(v).erase_bit(v);
 		}
 
@@ -431,24 +535,44 @@ namespace bitgraph {
 	inline
 		Ugraph<BitsetT> Ugraph<BitsetT>::make_cycle(std::size_t NV)
 	{
+		if (NV < 3) {
+			BaseT::graph_initialization_error(
+				"A simple cycle graph requires at least three vertices.");
+		}
+
 		Ugraph<BitsetT> cycle(NV);
 
-		const auto nV = static_cast<int>(NV);
-		for (int v = 0; v < nV - 1; ++v) {
+		//sets the adjacency matrix to ONE except for the main diagonal
+		const vertex_t vertex_count = cycle.num_vertices();
+		if (vertex_count == 0) {
+			return cycle;
+		}
+				
+		for (vertex_t v = 0; v + 1 < vertex_count; ++v) {
 			cycle.add_edge(v, v + 1);
 		}
-		cycle.add_edge(nV - 1, 0);
+
+		cycle.add_edge(vertex_count - 1, 0);
 
 		return cycle;
 	}
 
 	template<class BitsetT>
 	inline
-		Ugraph<BitsetT> Ugraph<BitsetT>::make_star(std::size_t NV) {
+		Ugraph<BitsetT> Ugraph<BitsetT>::make_star(std::size_t NV)
+	{
+				
+		if (NV == 0) {
+			BaseT::graph_initialization_error(
+				"A star graph requires at least one vertex - make_star(std::size_t NV) ");
+		}
+
 		Ugraph<BitsetT> star(NV);
 
-		const auto nV = static_cast<int>(NV);
-		for (int v = 1; v < nV; ++v) {
+		//sets the adjacency matrix to ONE except for the main diagonal
+		const vertex_t vertex_count = star.num_vertices();
+				
+		for (vertex_t v = 1; v < vertex_count; ++v) {
 			star.add_edge(0, v);
 		}
 
@@ -458,19 +582,57 @@ namespace bitgraph {
 
 	template <class BitsetT>
 	inline
-		Ugraph<BitsetT>::Ugraph(std::size_t NV, int* adj[], string name) {
+		Ugraph<BitsetT>::Ugraph(
+			std::size_t NV,
+			int* adj[], 
+			string name) noexcept
+		: BaseT()
+	{
+		// A null matrix is valid only when constructing an empty graph.
+		assert(adj != nullptr || NV == 0);
+			
+		this->reset(NV, std::move(name));
 
-		this->reset(NV);
-		this->set_name(name);
+		const vertex_t num_vertex = static_cast<vertex_t>(NV);	
 		
-		for (int i = 0; i < this->NV_ - 1; ++i) {
-			for (int j = i + 1; j < this->NV_; ++j) {
-				if (adj[i][j] == 1) {
-					add_edge(i, j);
+		// Read only the strict upper triangle. add_edge() stores both directions.
+		for (vertex_t i = 0; i < num_vertex - 1; ++i) {
+			for (vertex_t j = i + 1; j < num_vertex; ++j) {
+				if (adj[i][j] != 0) {
+					this->add_edge(i, j);
 				}
 			}
 		}
 	}
+
+
+	//template <class BitsetT>
+	//inline
+	//	Graph<BitsetT>::Graph(std::size_t NV, int* adj[], std::string filename) noexcept
+	//	: Graph()
+	//{
+	//	// A null matrix is valid only when constructing an empty graph.
+	//	assert(adj != nullptr || NV == 0);
+
+	//	const vertex_t num_vertex = static_cast<vertex_t>(NV);
+
+	//	reset(NV, std::move(filename));
+
+	//	for (vertex_t v = 0; v < num_vertex; ++v) {
+	//		assert(adj[v] != nullptr);
+
+	//		for (vertex_t w = 0; w < num_vertex; ++w) {
+	//			if (adj[v][w] != 0) {
+	//				add_edge(v, w);
+	//			}
+	//		}
+	//	}
+
+	//	edge_count_valid_ = true;  // The edge count is valid after constructing from an adjacency matrix.
+	//}
+
+
+
 
 	template<class BitsetT>
 	inline
@@ -496,7 +658,8 @@ namespace bitgraph {
 
 	template<class BitsetT>
 	inline
-		std::size_t Ugraph<BitsetT>::num_edges(const BitsetT& bbn) const {
+		std::size_t Ugraph<BitsetT>::num_edges(const BitsetT& bbn) const
+	{
 		std::size_t NE = 0;
 
 		//reads only the upper triangle of the adjacency matrix
@@ -878,7 +1041,7 @@ namespace bitgraph {
 
 
 
-#endif // end  __SIMPLE_UGRAPH_H__
+#endif // BITGRAPH_GRAPH_SIMPLE_UGRAPH_H
 
 
 

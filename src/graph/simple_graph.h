@@ -673,7 +673,7 @@ namespace bitgraph {
 		 * @param message Description of the failure.
 		 */
 		[[noreturn]]
-		inline void graph_initialization_error(const char* message) noexcept
+		static void graph_initialization_error(const char* message) noexcept
 		{
 			LOG_ERROR(message);
 			LOG_ERROR("Terminating the program.");
