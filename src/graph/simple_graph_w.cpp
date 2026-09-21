@@ -49,14 +49,14 @@ void Base_Graph_W<GraphT, WeightT>::complement_weights()
 }
 
 template<class GraphT, class WeightT>
-int Base_Graph_W<GraphT, WeightT>::create_complement(Base_Graph_W<graph_type, Weight>& g) const
+void Base_Graph_W<GraphT, WeightT>::create_complement(Base_Graph_W<graph_type, Weight>& g) const
 {
 	g.set_name(this->name());
 	g.set_path(this->path());
 	g.weight() = w_;
 		
 	////////////////////////////////////////
-	return g_.create_complement(g.graph());
+	g_.create_complement(g.graph());
 	////////////////////////////////////////
 }
 

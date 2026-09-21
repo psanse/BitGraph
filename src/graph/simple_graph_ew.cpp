@@ -567,21 +567,15 @@ std::ostream& Base_Graph_EW<GraphT, WeightT>::print_edges(std::ostream& o, bool 
 	return o;
 }
 
-
-
-
-
-
 template<class GraphT, class WeightT>
-int Base_Graph_EW<GraphT, WeightT>::create_complement(Base_Graph_EW<graph_type, Weight>& g) const
+void Base_Graph_EW<GraphT, WeightT>::create_complement(Base_Graph_EW<graph_type, Weight>& g) const
 {
-
 	g.set_name(this->name());
 	g.set_path(this->path());
 	g.weights() = we_;
 
 	/////////////////////////////////////////
-	return g_.create_complement(g.graph());
+	g_.create_complement(g.graph());
 	/////////////////////////////////////////
 }
 

@@ -118,7 +118,7 @@ namespace bitgraph {
 
 	template <class BitsetT>
 	inline
-		Graph<BitsetT>::Graph(std::size_t NV, int* adj[], std::string filename) noexcept 
+		Graph<BitsetT>::Graph(std::size_t NV, const int * const adj[], std::string filename) noexcept 
 		: Graph()
 	{
 		// A null matrix is valid only when constructing an empty graph.
@@ -207,7 +207,7 @@ namespace bitgraph {
 			NV_ = static_cast<int>(NV);
 			NBB_ = static_cast<int>(INDEX_1TO1(NV_));
 			NE_ = 0;
-			edge_count_valid_ = false;
+			edge_count_valid_ = true;
 
 			set_name(std::move(name));
 		}
@@ -319,8 +319,9 @@ namespace bitgraph {
 
 			graph_initialization_error(message.c_str());
 		}
+
+		// edge count is valid after reading from a file
 		
-		edge_count_valid_ = false;
 	}
 
 	template<class BitsetT>
@@ -579,9 +580,9 @@ namespace bitgraph {
 
 		std::size_t NE = 0;
 
-		for (int i = 0; i < NV_; ++i) {
+		for (vertex_t i = 0; i < NV_; ++i) {
 			if (bbn.is_bit(i)) {
-				for (int j = 0; j < NV_; ++j) {
+				for (vertex_t j = 0; j < NV_; ++j) {
 					if (bbn.is_bit(j)) {						//includes possible self loops
 						if (adj_[i].is_bit(j)) { NE++; }
 					}
@@ -794,25 +795,30 @@ namespace bitgraph {
 
 	template<class BitsetT>
 	inline
-		int Graph<BitsetT>::create_complement(Graph& g) const
+		void Graph<BitsetT>::create_complement(Graph& gcomp) const
 	{
-		//resets g with new allocation
-		if (g.reset(NV_) == -1) return -1;
+		if (this == &gcomp) {
+			BaseT::graph_initialization_error(
+				"Input and output graphs must be different in "
+				"Graph::create_complement(Graph& gcomp).");
+		}
 
-		for (int i = 0; i < NV_ - 1; ++i) {
-			for (int j = i + 1; j < NV_; ++j) {
+		gcomp.reset(static_cast<std::size_t>(NV_));	
+			
+		for (vertex_t i = 0; i + 1< NV_; ++i) {
+			for (vertex_t j = i + 1; j < NV_; ++j) {
 
 				if (!adj_[i].is_bit(j)) {
-					g.add_edge(i, j);
+					gcomp.add_edge(i, j);
 				}
 
 				if (!adj_[j].is_bit(i)) {
-					g.add_edge(j, i);
+					gcomp.add_edge(j, i);
 				}
 			}
-		}
+		}		
 
-		return 0;
+		//note: gcomp.edge_count_valid_ = true;  after reset
 	}
 
 	template<class BitsetT>

@@ -121,7 +121,7 @@ namespace bitgraph {
 		 * @note This constructor follows a fail-fast policy and terminates the program
 		 *       if graph initialization fails.
 		 */
-		Graph(std::size_t NV, int* adj[], std::string filename = "") noexcept;		
+		Graph(std::size_t NV,const int * const adj[], std::string filename = "") noexcept;		
 
 		//move and copy semantics allowed
 		Graph(const Graph& g) = default;
@@ -288,8 +288,8 @@ namespace bitgraph {
 		/**
 		* @brief sets graph from file in dimacs/MTX/Edges formats (in this order)
 		* @param filename file
-		 * @note This function follows a fail-fast policy and terminates the program
-		 *       if the requested graph cannot be represented or allocated.
+		* @note This function follows a fail-fast policy and terminates the program
+		*       if the requested graph cannot be represented or allocated.
 		**/
 		void reset(std::string filename) noexcept;
 
@@ -438,11 +438,25 @@ namespace bitgraph {
 		int degree_in(vertex_t v) const;
 
 		/**
-		* @brief Computes complement graph
-		* @param g: output complement graph
-		* @return 0 if success, -1 if error
-		**/
-		int create_complement(Graph& g) const;
+		 * @brief Computes the complement of this directed graph.
+		 *
+		 * For every ordered pair of distinct vertices `(v,w)`, the output graph
+		 * contains the edge `(v,w)` exactly when this graph does not contain it.
+		 * Self-loops are excluded.
+		 *
+		 * The output graph is reset and reallocated as necessary before the complement
+		 * is constructed. Its previous contents are discarded.
+		 *
+		 * @param gcomp Output graph that receives the complement.
+		 *
+		 * @pre @p gcomp must be a different object from this graph.
+		 *
+		 * @note The input and output graphs have the same number of vertices.
+		 * @note Edge-count metadata is maintained through add_edge().
+		 * @note This function follows the graph fail-fast policy and terminates if
+		 *       allocation of the output graph fails.
+		 */
+		void create_complement(Graph& gcomp) const;
 
 		//////////////	
 		// Modifiers

@@ -213,7 +213,7 @@ namespace bitgraph {
 			* @param g output graph
 			* @returns 0 if success, -1 if error
 			*/
-		int create_complement(Base_Graph_W& g) const;
+		void create_complement(Base_Graph_W& g) const;
 
 		////////////
 		// I/O
