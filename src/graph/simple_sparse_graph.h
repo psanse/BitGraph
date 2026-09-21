@@ -49,27 +49,34 @@ namespace bitgraph{
 	}
 
 	template<>
-	inline int Graph<BBScanSp>::shrink_to_fit(std::size_t size)
-	{
-		const int sizeInt = static_cast<int>(size);
+	inline int Graph<BBScanSp>::shrink_to_fit(std::size_t new_size)
+	{	
+		
+		if (new_size >= static_cast<std::size_t>(NV_)) {
+			LOGG_WARNING(
+				"Invalid shrinking size ",
+				new_size,
+				": expected a value smaller than ",
+				NV_,
+				". The graph remains unchanged - Graph<BBScanSp>::shrink_to_fit.");
 
-		//assertions
-		if (NV_ <= sizeInt) {
-			LOGG_WARNING("Wrong shrinking size ", sizeInt, " the graph remains unchanged - Graph<BBScanSp>::shrink_to_fit");
 			return -1;
 		}
 
+		// Safe because newSize < NV_ and NV_ is representable as int.
+		const int new_size_int = static_cast<int>(new_size);
+
 		//trims vertices 
-		for (Vertex v = 0; v < sizeInt; ++v) {
-			adj_[v].clear_bit(size, EMPTY_ELEM);				//closed range
+		for (vertex_t v = 0; v < new_size_int; ++v) {
+			adj_[v].clear_bit(new_size_int, EMPTY_ELEM);		// closed range
 		}
 
 		//resizes adjacency matrix
-		adj_.resize(size);
-		NV_ = sizeInt;
+		adj_.resize(new_size);
+		NV_ = new_size_int;
 		NE_ = 0;												// resets edge cached value
 		edge_count_valid_ = false;								// so that when num edges are required, the value will be recomputed
-		NBB_ = INDEX_1TO1(sizeInt);								// maximum number of bitblocks per row (for sparse graphs)		
+		NBB_ = INDEX_1TO1(new_size_int);						// maximum number of bitblocks per row (for sparse graphs)		
 
 		return 0;
 	}

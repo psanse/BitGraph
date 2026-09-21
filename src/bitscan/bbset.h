@@ -83,7 +83,8 @@ namespace bitgraph {
 		using BaseT::bit_index_set;
 		using BaseT::npos;
 
-		using DenseBlockVec = std::vector<BITBOARD>;
+		using dense_blocks_t = std::vector<block_t>;
+		using DenseBlockVec = dense_blocks_t;				// alias for backward compatibility
 
 	public:
 		
@@ -1008,21 +1009,30 @@ namespace bitgraph {
 		*
 		* TODO - loop unrolling for efficiency (18/11/2025)
 		**/
-		void extract(bit_indices& lb)							const;
-		void extract_set(bit_index_set& lb)							const;
+		void extract(bit_indices& lb) const;
+		void extract_set(bit_index_set& lb)	const;
 
 		/**
-		* @brief Casts the bitstring to a vector of non-negative integers
-		* @details calls to_vector
-		**/
-		explicit operator bit_indices()							const;
-		explicit operator bit_index_set()							const;
+		 * @brief Creates a sequence containing the indices of all set bits.
+		 *
+		 * The indices are returned in increasing order.
+		 *
+		 * @return Sequence containing the positions of the set bits.
+		 */
+		explicit operator bit_indices()	const;
+		
+		/**
+		 * @brief Creates an ordered set containing the indices of all set bits.
+		 *
+		 * @return Set containing the positions of the set bits.
+		 */
+		explicit operator bit_index_set() const;
 		
 		/**
 		* @brief Fills stack @s
 		* @param s: output stack object (external ownership)
 		**/
-		void extract_stack(com::FixedStack<bit_index_t>& s)			const;
+		void extract_stack(com::FixedStack<bit_index_t>& s) const;
 		/**
 		* @brief Fills array @lv and sets @size
 		* @param lv: must point to an array of capacity >= population size of this bitset (external ownership)

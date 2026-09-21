@@ -760,8 +760,8 @@ namespace bitgraph {
 		//data members
 
 	protected:
-		SparseBlockVec  vBB_;				//a vector of sorted pairs of a non-empty bitblock and its index in a non-sparse bitstring
-		int nBB_;					//maximum number of bitblocks
+		SparseBlockVec  vBB_;		// a vector of sorted pairs of a non-empty bitblock and its index in a non-sparse bitstring
+		int nBB_;					// maximum number of bitblocks
 
 	}; //end BitsetSp class
 
