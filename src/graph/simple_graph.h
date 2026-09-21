@@ -738,6 +738,7 @@ namespace bitgraph {
 // Necessary implementation of template methods in header file
 
 #include "detail/simple_graph_imp.h"
+#include "simple_sparse_graph_imp.h"			// specialized implementation for sparse graphs
 
 
 #endif // BITSCAN_GRAPH_SIMPLE_GRAPH_H

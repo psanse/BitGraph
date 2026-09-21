@@ -19,7 +19,7 @@
 #ifndef BITSCAN_GRAPH_UNWEIGHTED_H
 #define BITSCAN_GRAPH_UNWEIGHTED_H
 
-#include "simple_sparse_graph.h"
+#include "simple_graph.h"
 #include "simple_sparse_ugraph.h"
 
 namespace bitgraph {
