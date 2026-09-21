@@ -81,7 +81,7 @@ namespace bitgraph {
 	template<class BitsetT>
 	inline
 		Graph<BitsetT>::Graph(void) noexcept :
-		NV_(0), NE_(0), NBB_(0),
+		NV_(0), NE_(0), NBB_(0), edge_count_valid_(false),
 		name_(""), path_("")
 	{ }
 
@@ -122,6 +122,8 @@ namespace bitgraph {
 				}
 			}
 		}
+
+		edge_count_valid_ = true;  // The edge count is valid after constructing from an adjacency matrix.
 	}
 
 
@@ -148,6 +150,7 @@ namespace bitgraph {
 	void Graph<BitsetT>::reset() noexcept {
 		adj_.clear(), name_.clear(), path_.clear();
 		NV_ = 0, NBB_ = 0, NE_ = 0;
+		edge_count_valid_ = true;
 	}
 
 	template<class BitsetT>
@@ -181,6 +184,7 @@ namespace bitgraph {
 			NV_ = static_cast<int>(NV);
 			NBB_ = static_cast<int>(INDEX_1TO1(NV_));
 			NE_ = 0;
+			edge_count_valid_ = false;
 
 			set_name(std::move(name));
 		}
@@ -242,6 +246,8 @@ namespace bitgraph {
 			adj_[v].shrink_to_fit();
 		}
 
+
+		edge_count_valid_ = false;
 	}
 
 	template<class BitsetT>
@@ -266,34 +272,32 @@ namespace bitgraph {
 		//resizes adjacency matrix
 		adj_.resize(N);
 		NV_ = static_cast<int>(N);
-		NE_ = 0;												//so that when required, the value will be recomputed
-		NBB_ = INDEX_1TO1(NV_);									//maximum number of bitblocks per row (for sparse graphs)		
+		NE_ = 0;												// clears cached value
+		edge_count_valid_ = false;								// so that when num edges are required, its value will be recomputed
+		NBB_ = INDEX_1TO1(NV_);									// maximum number of bitblocks per row (for sparse graphs)		
 
 		return 0;
 	}
 
 	template<class BitsetT>
 	inline
-		void Graph<BitsetT>::reset(std::string filename) noexcept {
-		if (read_dimacs(filename) == -1) {
-			if (read_mtx(filename) == -1) {
-				if (read_EDGES(filename) == -1) {
-					if (read_01(filename) == -1) {
+		void Graph<BitsetT>::reset(std::string filename) noexcept
+	{
+		const bool loaded =
+			read_dimacs(filename) != -1 ||
+			read_mtx(filename) != -1 ||
+			read_EDGES(filename) != -1 ||
+			read_01(filename) != -1;
 
-						std::string msg = "Unable to read a graph from file " + filename + " - Graph<BitsetT>::reset (std::string filename)";
-						msg += '\n';
-						msg += "Formats considered: DIMACS / MTX / EDGES / 01";
-					
-						//////////////////////////////
-						graph_initialization_error(
-							msg.c_str()
-						);	
-						//////////////////////////////
+		if (!loaded) {
+			const std::string message =
+				"Unable to read graph from file '" + filename + "'.\n"
+				"Formats considered: DIMACS / MTX / EDGES / 01.";
 
-					}
-				}
-			}
-		}		
+			graph_initialization_error(message.c_str());
+		}
+		
+		edge_count_valid_ = false;
 	}
 
 	template<class BitsetT>
@@ -330,8 +334,10 @@ namespace bitgraph {
 			adj_[w].erase_bit(v);
 		}
 
+		edge_count_valid_ = false;  // The edge count is no longer valid after removing edges.
+
 		//updates edges
-		NE_ = 0;					//resets edges to avoid lazy evaluation later
+		//NE_ = 0;					//resets edges to avoid lazy evaluation later
 
 	}
 
@@ -342,7 +348,8 @@ namespace bitgraph {
 			adj_[v].erase_bit();
 		}
 
-		NE_ = 0;
+		edge_count_valid_ = false;  // The edge count is no longer valid after removing edges.
+		//NE_ = 0;
 	}
 
 	template <class BitsetT>
@@ -566,12 +573,14 @@ namespace bitgraph {
 		 * NE_ == 0 also acts as the "not yet computed" sentinel.
 		 * Consequently, an edgeless graph is rescanned on every lazy call.
 		 */
-		if (!lazy || NE_ == 0) {					
+		if (!lazy || !edge_count_valid_ ) {					
 			NE_ = 0;
 
 			for (const auto& neighbors : adj_) {
 				NE_ += static_cast<std::size_t>(neighbors.count());
-			}			
+			}
+
+			edge_count_valid_ = true;  // The edge count is now valid after computation.
 		}
 
 		return NE_;
@@ -726,8 +735,10 @@ namespace bitgraph {
 				if (is_edge(j, i)) add_edge(i, j);
 			}
 		}
-
-		NE_ = 0;	//resets edges to avoid lazy evaluation later
+		
+		
+		edge_count_valid_ = false;
+		//NE_ = 0;	//resets edges to avoid lazy evaluation later
 	}
 
 	template<class BitsetT>

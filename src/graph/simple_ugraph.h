@@ -445,23 +445,19 @@ namespace bitgraph {
 	inline
 		std::size_t Ugraph<BitsetT>::num_edges(bool lazy ) {
 
-		if (!lazy || this->NE_ == 0) {
+		if (!lazy || !this->edge_count_valid_ ) {
 			this->NE_ = 0;
 
-			//adds all edges and divides by 2 for efficiency - checks for self loops	
-			for (int i = 0; i < this->NV_; ++i) {
-				this->NE_ += this->adj_[i].count();
+			/*
+			 * Count only the strict upper triangle of the symmetric adjacency
+			 * matrix. Each undirected edge is therefore counted exactly once,
+			 * and diagonal entries are excluded.
+			 */
+			for (vertex_t i = 0; i < this->NV_; ++i) {
+				this->NE_ += adj_[i].count(i + 1, -1);
 			}
-
-			//////////////////////////////
-			if (this->NE_ % 2 != 0) {
-				LOG_ERROR("odd number of edges found in simple undirected graph - Ugraph<BitsetT>::num_edges");
-				LOG_ERROR("exiting...");
-				exit(-1);
-			}
-			//////////////////////////////
-
-			this->NE_ /= 2;						//MUST be even at this point			
+					
+			this->edge_count_valid_ = true;
 		}
 
 		return this->NE_;
@@ -473,9 +469,9 @@ namespace bitgraph {
 		std::size_t NE = 0;
 
 		//reads only the upper triangle of the adjacency matrix
-		for (int i = 0; i < this->NV_ - 1; ++i) {
+		for (vertex_t i = 0; i < this->NV_ - 1; ++i) {
 			if (bbn.is_bit(i)) {
-				for (int j = i + 1; j < this->NV_; ++j) {
+				for (vertex_t j = i + 1; j < this->NV_; ++j) {
 					if (bbn.is_bit(j)) {
 						if (this->adj_[i].is_bit(j)) { ++NE; }
 					}
@@ -526,6 +522,8 @@ namespace bitgraph {
 			this->adj_[w].erase_bit(v);
 			this->NE_--;
 		}
+
+		edge_count_valid_ = false;		//invalidate edge count
 	}
 
 	template<class BitsetT>

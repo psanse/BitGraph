@@ -67,7 +67,8 @@ namespace bitgraph{
 		//resizes adjacency matrix
 		adj_.resize(size);
 		NV_ = sizeInt;
-		NE_ = 0;												// so that when required, the value will be recomputed
+		NE_ = 0;												// resets edge cached value
+		edge_count_valid_ = false;								// so that when num edges are required, the value will be recomputed
 		NBB_ = INDEX_1TO1(sizeInt);								// maximum number of bitblocks per row (for sparse graphs)		
 
 		return 0;

@@ -569,9 +569,17 @@ namespace bitgraph {
 		* @brief Cached number of edges in the graph.
 		*
 		* This value may be recomputed by num_edges() when lazy evaluation is
-		* disabled.
+		* disabled or the edge count is no longer valid.
 		*/
-		std::size_t NE_;						
+		std::size_t NE_;
+
+		/**
+		 * @brief Indicates whether NE_ contains the current number of edges.
+		 *
+		 * If false, num_edges() must recompute the edge count from the adjacency
+		 * matrix before returning or caching it.
+		 */
+		bool edge_count_valid_ = false;
 
 		/**
 		* @brief Number of bit blocks required for each adjacency row.

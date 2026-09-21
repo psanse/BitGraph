@@ -33,14 +33,18 @@ namespace bitgraph {
 	inline
 	std::size_t Ugraph<BBScanSp>::num_edges(bool lazy) {
 
-		if (lazy || this->NE_ == 0) {
+		if (lazy || !this->edge_count_valid_ ) {
 
 			this->NE_ = 0;
 			for (int i = 0; i < this->NV_ - 1; i++) {
 
-				//popuation count from i + 1 onwards
+				// Count only neighbors with a greater vertex index so that each
+				// undirected edge is counted exactly once.
 				this->NE_ += adj_[i].count(i + 1, -1);
 			}
+
+			// NE_ now matches the current adjacency matrix.
+			this->edge_count_valid_ = true;
 		}
 
 		return this->NE_;
