@@ -13,8 +13,8 @@
 #define BITGRAPH_GRAPH_SIMPLE_SPARSE_GRAPH_H
 
 //#include "simple_graph.h"
-#include <iostream>
-#include <vector>
+//#include <iostream>
+//#include <vector>
 
 ////////////////////////
 //
@@ -30,7 +30,10 @@ namespace bitgraph{
 	{
 		//assertions
 		if (first_k >= NV_ || first_k <= 0) {
-			LOGG_WARNING("Bad new size ", first_k, " - graph remains unchanged - Graph<BBScanSp>::create_subgraph");
+			LOGG_WARNING(
+				"Bad new size ", 
+				first_k, 
+				" - graph remains unchanged - Graph<BBScanSp>::create_subgraph (int first_k, Graph<BBScanSp>& newg)");
 			return newg;
 		}
 
@@ -38,9 +41,9 @@ namespace bitgraph{
 		newg.reset(first_k);
 
 		//copies first k elements of the adjacency matrix 
-		for (int i = 0; i < newg.NV_; i++) {
-			newg.adj_[i] = adj_[i];
-			newg.adj_[i].clear_bit(first_k, EMPTY_ELEM);		//closed range
+		for (vertex_t v = 0; v < newg.NV_; v++) {
+			newg.adj_[v] = adj_[v];
+			newg.adj_[v].clear_bit(first_k, EMPTY_ELEM);		//closed range
 		}
 
 		return newg;
@@ -66,15 +69,15 @@ namespace bitgraph{
 
 		//trims vertices 
 		for (vertex_t v = 0; v < new_size_int; ++v) {
-			adj_[v].clear_bit(new_size_int, EMPTY_ELEM);		// closed range
+			this->adj_[v].clear_bit(new_size_int, EMPTY_ELEM);		// closed range
 		}
 
 		//resizes adjacency matrix
-		adj_.resize(new_size);
-		NV_ = new_size_int;
-		NE_ = 0;												// resets edge cached value
-		edge_count_valid_ = false;								// so that when num edges are required, the value will be recomputed
-		NBB_ = INDEX_1TO1(new_size_int);						// maximum number of bitblocks per row (for sparse graphs)		
+		this->adj_.resize(new_size);
+		this->NV_ = new_size_int;
+		this->NE_ = 0;												// resets edge cached value
+		this->edge_count_valid_ = false;								// so that when num edges are required, the value will be recomputed
+		this->NBB_ = INDEX_1TO1(new_size_int);						// maximum number of bitblocks per row (for sparse graphs)		
 
 		return 0;
 	}
@@ -85,12 +88,12 @@ namespace bitgraph{
 		std::size_t non_empty_blocks = 0;				
 		std::size_t alloc_blocks = 0;							
 
-		for (vertex_t v = 0; v < NV_; ++v) {
-			const std::size_t row_blocks = adj_[v].size();	
+		for (vertex_t v = 0; v < this->NV_; ++v) {
+			const std::size_t row_blocks = this->adj_[v].size();	
 			alloc_blocks += row_blocks;
 
 			for (std::size_t block = 0; block < row_blocks; ++block) {
-				if (adj_[v].block(block) != 0) {
+				if (this->adj_[v].block(block) != 0) {
 					++non_empty_blocks;
 				}
 			}		
@@ -112,19 +115,19 @@ namespace bitgraph{
 	inline double Graph<BBScanSp>::block_density_sparse() const 
 	{
 
-		if (NV_ == 0 || NBB_ == 0) {
+		if (this->NV_ == 0 || this->NBB_ == 0) {
 			return 0.0;
 		}
 
 		std::size_t alloc_blocks = 0;
 
-		for (vertex_t vertex = 0; vertex < NV_; ++vertex) {
-			alloc_blocks += adj_[vertex].size();
+		for (vertex_t vertex = 0; vertex < this->NV_; ++vertex) {
+			alloc_blocks += this->adj_[vertex].size();
 		}
 
 		const std::size_t maxBlocks =
-			static_cast<std::size_t>(NV_) *
-			static_cast<std::size_t>(NBB_);
+			static_cast<std::size_t>(this->NV_) *
+			static_cast<std::size_t>(this->NBB_);
 
 		return static_cast<double>(alloc_blocks) /
 			static_cast<double>(maxBlocks);
@@ -134,13 +137,13 @@ namespace bitgraph{
 	inline double Graph<BBScanSp>::average_block_density_sparse() const
 	{
 
-		if (NV_ == 0) {
+		if (this->NV_ == 0) {
 			return 0.0;
 		}
 
 		double density_sum = 0.0;
 
-		for (vertex_t vertex = 0; vertex < NV_; ++vertex) {
+		for (vertex_t vertex = 0; vertex < this->NV_; ++vertex) {
 			const std::size_t alloc_blocks = adj_[vertex].size();
 
 			// An empty adjacency row contributes a density of zero.
@@ -159,7 +162,7 @@ namespace bitgraph{
 				static_cast<double>(alloc_bits);
 		}
 
-		return density_sum / static_cast<double>(NV_);
+		return density_sum / static_cast<double>(this->NV_);
 
 	}
 
@@ -176,13 +179,13 @@ namespace bitgraph{
 		header_dimacs(o, true);
 
 		//write edges 1-based vertex notation
-		for (Vertex v = 0; v < NV_; ++v) {
+		for (vertex_t v = 0; v < this->NV_; ++v) {
 
 			//non destructive scan of each bitstring
 			adj_[v].init_scan(bbo::NON_DESTRUCTIVE);
 			
 			while (true) {
-				int w = adj_[v].next_bit();
+				int w = this->adj_[v].next_bit();
 				if (w == EMPTY_ELEM) { break; }
 				o << "e " << v + 1 << " " << w + 1 << endl;
 			}

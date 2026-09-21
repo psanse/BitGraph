@@ -515,8 +515,7 @@ namespace bitgraph {
 	inline
 		int  Graph<BitsetT>::read_mtx(const std::string& filename) noexcept {
 
-
-		MMI<Graph<BitsetT> > myreader(*this);
+		detail::MMI<Graph<BitsetT> > myreader(*this);
 		return (myreader.read(filename));
 	}
 
