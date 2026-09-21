@@ -14,14 +14,14 @@
 
 //#include "graph/simple_ugraph.h"								//legacy - to remove
 
-#include "graph/graph_basic.h"
+#include "graph/graph_unweighted.h"
 #include "utils/common.h"
 #include "utils/logger.h"
 #include <iostream>
 
 namespace bitgraph {
 	
-	namespace _impl {
+	namespace detail {
 
 		////////////////////////
 		//
@@ -103,7 +103,7 @@ namespace bitgraph {
 
 		};
 
-	} //end of namespace _impl
+	} //end of namespace detail
 
 }//end of namespace bitgraph
 

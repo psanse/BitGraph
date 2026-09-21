@@ -86,10 +86,41 @@ namespace bitgraph {
 		// Basic operations
 
 		/**
-		* @brief density of the undirected graph
-		* @param lazy reads NE_ cached value if TRUE
-		**/
+		 * @brief Computes the density of the undirected graph.
+		 *
+		 * For an undirected simple graph without self-loops, density is defined as
+		 * \f[
+		 *     d = \frac{|E|}{|V|(|V|-1)/2}.
+		 * \f]
+		 *
+		 * Each undirected edge is counted once.
+		 *
+		 * @param lazy If `true`, num_edges() may use a previously cached edge count.
+		 *             If `false`, the edge count is recomputed from the adjacency
+		 *             matrix.
+		 * @return Graph density in the interval `[0,1]`. Returns `0.0` when the graph
+		 *         contains fewer than two vertices.
+		 */
 		double density(bool lazy = true) override;
+	
+		/**
+		 * @brief Computes the density of the undirected subgraph induced by
+		 *        @p vertices.
+		 *
+		 * For the selected vertex set \f$S\f$, density is defined as
+		 * \f[
+		 *     d = \frac{|E(S)|}{|S|(|S|-1)/2},
+		 * \f]
+		 * where \f$E(S)\f$ is the set of edges whose endpoints both belong to
+		 * \f$S\f$. Each undirected edge is counted once, and self-loops are excluded.
+		 *
+		 * @param vertices Bitset containing the vertices that induce the subgraph.
+		 * @return Induced-subgraph density in the interval `[0,1]`. Returns `0.0`
+		 *         when fewer than two vertices are selected.
+		 *
+		 * @pre Every set bit in @p vertices must identify a valid graph vertex.
+		 */
+		double density(const BitsetT& vertices) const override;
 
 		/**
 		* @brief Computes complement graph
@@ -573,12 +604,44 @@ namespace bitgraph {
 
 	template<class BitsetT>
 	inline
-		double Ugraph<BitsetT>::density(bool lazy) {
+		double Ugraph<BitsetT>::density(bool lazy)
+	{
 
-		BITBOARD max_edges = this->NV_;
-		max_edges *= (max_edges - 1);
-		return (2 * num_edges(lazy) / static_cast<double> (max_edges));
+		if (this->NV_ < 2) { return 0.0; }
+
+		/*
+		 * Convert before multiplication so that the product is computed using a
+		 * 64-bit unsigned type. The value may exceed a 32-bit integer.
+		 */
+		const BITBOARD num_vertices = static_cast<BITBOARD>(this->NV_);
+		const BITBOARD max_num_edges = num_vertices * (num_vertices - 1) / 2;
+
+		return static_cast<double>(this->num_edges(lazy)) /
+			static_cast<double>(max_num_edges);
 	}
+
+	template<class BitsetT>
+	inline
+		double Ugraph<BitsetT>::density(const BitsetT& vertices) const
+	{
+		const BITBOARD num_vertices =
+			static_cast<BITBOARD>(vertices.count());
+
+		if (num_vertices < 2) {
+			return 0.0;
+		}
+
+		const BITBOARD edges =
+			static_cast<BITBOARD>(num_edges(vertices));
+
+		const BITBOARD maxEdges =
+			num_vertices * (num_vertices - 1) / 2;		// undirected graph
+
+		return static_cast<double>(edges) /
+			static_cast<double>(maxEdges);
+
+	}
+
 
 	template<class BitsetT>
 	inline

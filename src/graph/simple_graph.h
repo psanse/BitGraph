@@ -134,15 +134,49 @@ namespace bitgraph {
 		// setters and getters
 
 		/**
-		* @brief Sets instance name.
-		* @param instance name of instance
-		* @details: Separates path and instance name internally (if applicable)
-		**/
-		void set_name(std::string instance);
-		std::string name() const noexcept { return name_; }
+		 * @brief Sets the graph instance name and extracts its directory path.
+		 *
+		 * If @p name_or_path contains a directory separator, the final component is
+		 * stored as the instance name and the preceding portion, including the final
+		 * separator, is stored as the path. Both Unix (`/`) and Windows (`\`)
+		 * separators are recognized.
+		 *
+		 * If no separator is present, the complete argument becomes the instance name
+		 * and the stored path is cleared.
+		 *
+		 * @param name_or_path Instance name or complete file path.
+		 */
+		void set_name(std::string name_or_path);
 
-		void set_path(std::string path_name) { path_ = std::move(path_name); }
-		std::string path() const noexcept { return path_; }
+		/**
+		 * @brief Returns the graph instance name without its directory path.
+		 *
+		 * @return Constant reference to the stored instance name.
+		 *
+		 * @note The returned reference remains valid until the graph name is modified
+		 *       or the graph object is destroyed.
+		 */
+		const std::string& name() const noexcept { return name_; }
+
+		/**
+		 * @brief Sets the directory path associated with the graph instance.
+		 *
+		 * The path is stored exactly as supplied; no normalization is performed and
+		 * no trailing directory separator is added automatically.
+		 *
+		 * @param pathName Directory path to store.
+		 */
+		void set_path(std::string path_name) { path_.swap(path_name); }
+
+		/**
+		 * @brief Returns the directory path associated with the graph instance.
+		 *
+		 * The stored path includes its final directory separator when it was extracted
+		 * from a complete filename.
+		 *
+		 * @return Constant reference to the stored directory path.
+		 */
+		const std::string& path() const noexcept { return path_; }
 
 		/**
 		* @brief number of vertices of the graph. Alias to num_vertices()
@@ -186,15 +220,49 @@ namespace bitgraph {
 		**/
 		virtual std::size_t num_edges(const BitsetT& set) const;
 		
+		/**
+		 * @brief Returns the bitset-based adjacency matrix.
+		 *
+		 * Each element of the returned vector represents one adjacency row. Row
+		 * `v` contains the outgoing neighbors of vertex `v`. For an undirected graph,
+		 * the adjacency matrix is symmetric.
+		 *
+		 * @return Constant reference to the adjacency matrix.
+		 *
+		 * @note The reference remains valid until an operation reallocates or replaces
+		 *       the adjacency matrix, such as reset().
+		*/
 		const vector<vertex_bitset_t>& adjacency_matrix() const { return adj_; }
-		const vertex_bitset_t& neighbors(vertex_t v) const {
-			assert(v >= 0 && v < NV_);
-			return adj_[v];
-		}
-		vertex_bitset_t& neighbors(vertex_t v) {
-			assert(v >= 0 && v < NV_);
-			return adj_[v];
-		}
+
+		/**
+		 * @brief Returns the neighbors of a vertex.
+		 *
+		 * For a directed graph, the returned bitset contains the outgoing neighbors
+		 * of @p vertex.
+		 *
+		 * @param vertex Vertex whose neighborhood is requested.
+		 * @return Constant reference to the vertex-neighborhood bitset.
+		 *
+		 * @pre `0 <= vertex < num_vertices()`.
+		 */
+		const vertex_bitset_t& neighbors(vertex_t v) const;
+
+		/**
+		 * @brief Returns modifiable access to the neighbors of a vertex.
+		 *
+		 * The cached edge count is invalidated because the caller may modify the
+		 * returned adjacency row.
+		 *
+		 * @param vertex Vertex whose neighborhood is requested.
+		 * @return Modifiable reference to the vertex-neighborhood bitset.
+		 *
+		 * @pre `0 <= vertex < num_vertices()`.
+		 *
+		 * @warning For an undirected graph, the caller is responsible for preserving
+		 *          adjacency-matrix symmetry and the no-self-loop invariant.
+		 */
+		vertex_bitset_t& neighbors(vertex_t v);
+		
 
 		//////////////////////////
 		// memory allocation 
@@ -253,51 +321,114 @@ namespace bitgraph {
 		//////////////	
 		// Basic operations	
 	public:
-		/**
-		* @brief density of the directed graph
-		* @param lazy reads NE_ cached value if TRUE
-		**/
 
+		/**
+		 * @brief Computes the density of the graph.
+		 *
+		 * For a directed graph without self-loops, density is defined as
+		 * \f[
+		 *     d = \frac{|E|}{|V|(|V|-1)}.
+		 * \f]
+		 *
+		 * @param lazy If `true`, num_edges() may use a previously cached edge count.
+		 *             If `false`, the edge count is recomputed from the adjacency
+		 *             matrix.
+		 * @return Graph density in the interval `[0,1]`. Returns `0.0` when the graph
+		 *         contains fewer than two vertices.
+		 *
+		 * @note Derived graph classes may override this function to use a different
+		 *       maximum-edge formula. For example, an undirected simple graph uses
+		 *       \f$|V|(|V|-1)/2\f$.
+		 */
 		virtual	double density(bool lazy = true);
 
 		/**
-		* @brief density of the subgraph induced by a set of vertices
-		* @param set input (bit) set of vertices
-		**/
-		template <class U = vertex_bitset_t>
-		double density(const U& set);
-
+		 * @brief Computes the density of the subgraph induced by @p vertices.
+		 *
+		 * The density is defined as the number of directed edges in the induced
+		 * subgraph divided by the maximum possible number of directed edges:
+		 * \f[
+		 *     d = \frac{|E(S)|}{|S|(|S|-1)},
+		 * \f]
+		 * where \f$S\f$ is the selected vertex set. Self-loops are not considered.
+		 *
+		 * @param vertices Bitset containing the vertices that induce the subgraph.
+		 * @return Induced-subgraph density in the interval `[0,1]`. Returns `0.0`
+		 *         when fewer than two vertices are selected.
+		 *
+		 * @pre Every set bit in @p vertices must identify a valid graph vertex.
+		 */
+		virtual double density(const BitsetT& vertices) const;
+	
 		/**
-		* @brief number of non-empty bit blocks / total number of bit blocks
-		*
-				 Specialized for sparse graphs
-		*		 (in the case of sparse graphs, density is expected to be 1.0)
-		*
-		**/
+		 * @brief Computes the proportion of nonempty adjacency bit blocks.
+		 *
+		 * For a dense graph representation, block density is defined as the number
+		 * of adjacency blocks containing at least one set bit divided by the total
+		 * number of blocks in the adjacency matrix:
+		 * \f[
+		 *     d_B =
+		 *     \frac{\text{number of nonempty blocks}}
+		 *          {|V| \cdot \text{blocks per adjacency row}}.
+		 * \f]
+		 *
+		 * @return Block density in the interval `[0,1]`. Returns `0.0` when the graph
+		 *         contains no adjacency blocks.
+		 *
+		 * @note Sparse graph representations may provide a specialized implementation.
+		 */
 		double block_density() const;
+		
+		 /**
+		  * @brief Computes the global storage density of the sparse adjacency matrix.
+		  *
+		  * The density is the number of allocated sparse bit blocks divided by the
+		  * number of blocks required by the equivalent dense adjacency matrix:
+		  * \f[
+		  *     d_B =
+		  *     \frac{\text{allocated blocks}}
+		  *          {|V| \cdot \text{blocks per adjacency row}}.
+		  * \f]
+		  *
+		  * @return Sparse-storage density in the interval `[0,1]`. Returns `0.0` when
+		  *         the graph contains no possible adjacency blocks.
+		  */
 
+		double block_density_sparse() const = delete;
+			
 		/**
-		* @brief number of allocated blocks / total possible number of blocks
-		*
-		*		 I.ONLY for sparse graphs
-		**/
-		double block_density_sparse() const;
+		 * @brief Computes the average bit occupancy of the sparse adjacency rows.
+		 *
+		 * For each vertex with allocated adjacency blocks, the row occupancy is
+		 * defined as
+		 * \f[
+		 *     d_v =
+		 *     \frac{\text{number of set bits in row }v}
+		 *          {\text{allocated blocks in row }v \cdot \mathrm{WORD\_SIZE}}.
+		 * \f]
+		 *
+		 * The function returns the arithmetic mean of these row occupancies over all
+		 * graph vertices:
+		 * \f[
+		 *     \bar{d} = \frac{1}{|V|}\sum_{v\in V} d_v.
+		 * \f]
+		 *
+		 * Adjacency rows without allocated blocks contribute zero to the average.
+		 *
+		 * @return Average sparse-row bit occupancy in the interval `[0,1]`. Returns
+		 *         `0.0` when the graph contains no vertices.
+		 *
+		 * @note This operation is defined only for Graph<BBScanSp>.
+		 */
+		double average_block_density_sparse() const = delete;
 
-		/**
-		* @brief average measure of block density (averages the density of each sparse bitset)
-		*
-		*		 I.ONLY for sparse graphs
-		**/
-		double average_block_density_sparse() const;
 
 		/**
 		* @brief number of outgoing edges from v
 		* @param v input vertex
 		**/
-		int degree_out(vertex_t v) const {
-			assert(v >= 0 && v < NV_);
-			return adj_[v].count();
-		}
+		int degree_out(vertex_t v) const;
+
 
 		/**
 		* @brief number edges incident to v

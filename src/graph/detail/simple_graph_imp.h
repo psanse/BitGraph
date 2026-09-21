@@ -40,14 +40,25 @@ namespace bitgraph {
 namespace bitgraph {
 
 	template<class BitsetT>
-	template <class U>
 	inline
-		double Graph<BitsetT>::density(const U& bbN) {
-		BITBOARD  edges = num_edges(bbN);
-		if (edges == 0) { return 0.0; }
+		double Graph<BitsetT>::density(const BitsetT& vertices) const 
+	{
+		const BITBOARD num_vertices =
+			static_cast<BITBOARD>(vertices.count());
 
-		BITBOARD  pc = bbN.popcn64();
-		return edges / static_cast<double>(pc * (pc - 1) / 2);
+		if (num_vertices < 2) {
+			return 0.0;
+		}
+
+		const BITBOARD edges =
+			static_cast<BITBOARD>(num_edges(vertices));
+
+		const BITBOARD maxEdges =
+			num_vertices * (num_vertices - 1);		// directed graph
+
+		return static_cast<double>(edges) /
+			static_cast<double>(maxEdges);
+
 	}
 
 	template<class BitsetT>
@@ -129,20 +140,28 @@ namespace bitgraph {
 
 	template<class BitsetT>
 	inline
-	void Graph<BitsetT>::set_name(std::string name) {
+	void Graph<BitsetT>::set_name(std::string name_or_path) {
 
-		//update name
-		size_t found = name.find_last_of("/\\");
+		std::string new_name;
+		std::string new_path;
 
-		//update path and name
-		if (found != std::string::npos) {
-			name_ = name.substr(found + 1);
-			path_ = name.substr(0, found + 1);  //includes slash
+		const std::string::size_type separator =
+			name_or_path.find_last_of("/\\");
+
+		if (separator != std::string::npos) {
+			new_name = name_or_path.substr(separator + 1);
+			new_path = name_or_path.substr(0, separator + 1);
 		}
 		else {
-			name_ = std::move(name);
-			path_.clear();
+			new_name = std::move(name_or_path);
 		}
+
+		/*
+		 * Commit only after both strings have been constructed successfully.
+		 * swap() does not allocate when standard string allocators are used.
+		 */
+		name_.swap(new_name);
+		path_.swap(new_path);	
 	}
 
 	template<class BitsetT>
@@ -302,9 +321,11 @@ namespace bitgraph {
 
 	template<class BitsetT>
 	inline
-		void Graph<BitsetT>::add_edge(vertex_t v, vertex_t w) {
+		void Graph<BitsetT>::add_edge(vertex_t v, vertex_t w) 
+	{
 		assert(v >= 0 && v < NV_);
 		assert(w >= 0 && w < NV_);
+
 		if (v != w) {
 			adj_[v].set_bit(w);
 			NE_++;
@@ -313,7 +334,8 @@ namespace bitgraph {
 
 	template<class BitsetT>
 	inline
-		void Graph<BitsetT>::remove_edge(vertex_t v, vertex_t w) {
+		void Graph<BitsetT>::remove_edge(vertex_t v, vertex_t w)
+	{
 		assert(v >= 0 && v < NV_);
 		assert(w >= 0 && w < NV_);
 		adj_[v].erase_bit(w);
@@ -322,7 +344,8 @@ namespace bitgraph {
 
 	template<class BitsetT>
 	inline
-		void Graph<BitsetT>::remove_edges(vertex_t v) {
+		void Graph<BitsetT>::remove_edges(vertex_t v)
+	{
 		assert(v >= 0 && v < NV_);
 
 		//erases all outgoing edges from v
@@ -548,7 +571,8 @@ namespace bitgraph {
 
 	template<class BitsetT>
 	inline
-		std::size_t Graph<BitsetT>::num_edges(const BitsetT& bbn) const {
+		std::size_t Graph<BitsetT>::num_edges(const BitsetT& bbn) const
+	{
 
 		std::size_t NE = 0;
 
@@ -564,6 +588,29 @@ namespace bitgraph {
 
 		return NE;
 	}
+
+	template<class BitsetT>
+	inline
+	auto Graph<BitsetT>::neighbors(vertex_t v) const -> const vertex_bitset_t&
+	{
+		assert(v >= 0 && v < NV_);
+
+		return adj_[v];
+	}
+
+	template<class BitsetT>
+	inline
+	auto Graph<BitsetT>::neighbors(vertex_t v) -> vertex_bitset_t&
+	{
+		assert(v >= 0 && v < NV_);
+
+		// The caller may modify the returned adjacency row.
+		edge_count_valid_ = false;
+
+		return adj_[v];
+	}
+
+
 
 	template<class BitsetT>
 	inline
@@ -586,43 +633,71 @@ namespace bitgraph {
 		return NE_;
 	}
 
+	/**
+	 * @brief Computes the edge density of the directed graph.
+	 *
+	 * The density is defined as
+	 * \f[
+	 *     \frac{|E|}{|V|(|V|-1)}
+	 * \f]
+	 * for a directed graph without self-loops.
+	 *
+	 * @param lazy If `true`, num_edges() may use its cached edge count.
+	 * @return Graph density in the interval `[0,1]`. Returns `0.0` when the graph
+	 *         contains fewer than two vertices.
+	 */
 	template<class BitsetT>
 	inline
-		double Graph<BitsetT>::density(bool lazy) {
-		BITBOARD max_edges = NV_;								//type MUST BE for very large graphs as (I) is bigger than unsigned int
-		max_edges *= (max_edges - 1);							//(I)
-		return (num_edges(lazy) / (double)max_edges);		//n*(n-1) edges (since it is a directed graph))
+		double Graph<BitsetT>::density(bool lazy)
+	{
+		if (NV_ < 2) {	return 0.0; }
+
+		/*
+		 * Convert before multiplication so that the product is computed using a
+		 * 64-bit unsigned type. The value may exceed a 32-bit integer.
+		 */
+		const BITBOARD num_vertices = static_cast<BITBOARD>(NV_);
+		const BITBOARD max_num_edges = num_vertices * (num_vertices - 1);
+
+		return static_cast<double>(num_edges(lazy)) /
+			static_cast<double>(max_num_edges);
 	}
 
 	template<class BitsetT>
 	inline
-		double Graph<BitsetT>::block_density()	const {
+		double Graph<BitsetT>::block_density()	const
+	{
 
-		size_t nBB = 0;
-		for (auto v = 0u; v < NV_; ++v) {
-			for (auto bb = 0u; bb < NBB_; bb++) {
-				if (adj_[v].block(bb))		//non-empty bitblock
-					nBB++;
+		if (NV_ == 0 || NBB_ == 0) {
+			return 0.0;
+		}
+
+		std::size_t non_empty_blocks = 0;
+
+		for (vertex_t vertex = 0; vertex < NV_; ++vertex) {
+			for (block_index_t block = 0; block < NBB_; ++block) {
+				if (adj_[vertex].block(block) != 0) {
+					++non_empty_blocks;
+				}
 			}
 		}
 
-		return (nBB / static_cast<double>(NBB_ * NV_));
-	}
+		const std::size_t total_blocks =
+			static_cast<std::size_t>(NV_) *
+			static_cast<std::size_t>(NBB_);
 
-	template<class BitsetT>
-	inline
-		double Graph<BitsetT>::block_density_sparse()	const {
+		return static_cast<double>(nonemptyBlocks) /
+			static_cast<double>(totalBlocks);
 
-		LOG_ERROR("function only for sparse graphs - Graph<BitsetT>::block_density_sparse");
-		return -1;
-	}
+		//size_t nBB = 0;
+		//for (auto v = 0u; v < NV_; ++v) {
+		//	for (auto bb = 0u; bb < NBB_; bb++) {
+		//		if (adj_[v].block(bb))		//non-empty bitblock
+		//			nBB++;
+		//	}
+		//}
 
-	template<class BitsetT>
-	inline
-		double Graph<BitsetT>::average_block_density_sparse()	const {
-
-		LOG_ERROR("function only for sparse graphs - Graph<BitsetT>::average_block_density_sparse");
-		return -1;
+		//return (nBB / static_cast<double>(NBB_ * NV_));
 	}
 
 
@@ -691,7 +766,9 @@ namespace bitgraph {
 
 	template<class BitsetT>
 	inline
-		int Graph<BitsetT>::degree_in(vertex_t v) const {
+		int Graph<BitsetT>::degree_in(vertex_t v) const 
+	{
+		assert(v >= 0 && v < NV_);
 
 		int res = 0;
 		for (auto i = 0u; i < NV_; i++) {
@@ -701,6 +778,16 @@ namespace bitgraph {
 		}
 		return res;
 	}
+
+	template<class BitsetT>
+	inline
+		int Graph<BitsetT>::degree_out(vertex_t v) const
+	{
+		assert(v >= 0 && v < NV_);
+
+		return adj_[v].count();
+	}
+
 
 	template<class BitsetT>
 	inline

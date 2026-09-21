@@ -9,13 +9,11 @@
   * @todo - check logic for efficiency (01/02/2026)
   */
 
-#ifndef __SIMPLE_SPARSE_GRAPH_H__
-#define __SIMPLE_SPARSE_GRAPH_H__
+#ifndef BITGRAPH_GRAPH_SIMPLE_SPARSE_GRAPH_H
+#define BITGRAPH_GRAPH_SIMPLE_SPARSE_GRAPH_H
 
-#include "graph_types.h"
 #include "simple_graph.h"
 #include <iostream>
-#include <string>
 #include <vector>
 
 ////////////////////////
@@ -84,52 +82,85 @@ namespace bitgraph{
 	template<>
 	inline double Graph<BBScanSp>::block_density()	const
 	{
-		std::size_t nBB = 0;							//number of non-empty bitblocks	
-		std::size_t nBBt = 0;							//number of allocated bitblocks (all should be non-empty in the sparse case)
+		std::size_t non_empty_blocks = 0;				
+		std::size_t alloc_blocks = 0;							
 
-		for (Vertex v = 0; v < NV_; ++v) {
-			nBBt += adj_[v].size();
-			for (std::size_t bb = 0; bb < adj_[v].size(); ++bb) {
-				if (adj_[v].block(bb)) {
-					nBB++;								//nBB should be equal to nBBt
+		for (vertex_t v = 0; v < NV_; ++v) {
+			const std::size_t row_blocks = adj_[v].size();	
+			alloc_blocks += row_blocks;
+
+			for (std::size_t block = 0; block < row_blocks; ++block) {
+				if (adj_[v].block(block) != 0) {
+					++non_empty_blocks;
 				}
-			}
+			}		
 		}
 
-		return nBB / static_cast<double>(nBBt);			//density should be 1.0
+		if (alloc_blocks == 0) {
+			return 0.0;
+		}
+
+		/*
+		 * Sparse storage is expected to contain only nonempty blocks, so this
+		 * value should normally be 1.0.
+		 */
+		return static_cast<double>(non_empty_blocks) /
+			static_cast<double>(alloc_blocks);	
 	}
 
 	template<>
 	inline double Graph<BBScanSp>::block_density_sparse() const 
 	{
-		std::size_t nBBt = 0;							//number of allocated bitblocks (all should be non-empty in the sparse case)
 
-		//number of allocated blocks
-		for (Vertex v = 0; v < NV_; ++v) {
-			nBBt += adj_[v].size();
+		if (NV_ == 0 || NBB_ == 0) {
+			return 0.0;
 		}
 
-		BITBOARD aux = ceil(NV_ / double(WORD_SIZE));
-		BITBOARD maxBlock = NV_ * aux;
+		std::size_t alloc_blocks = 0;
 
-		return static_cast<double>(nBBt) / maxBlock;
+		for (vertex_t vertex = 0; vertex < NV_; ++vertex) {
+			alloc_blocks += adj_[vertex].size();
+		}
+
+		const std::size_t maxBlocks =
+			static_cast<std::size_t>(NV_) *
+			static_cast<std::size_t>(NBB_);
+
+		return static_cast<double>(alloc_blocks) /
+			static_cast<double>(maxBlocks);
 	}
 
 	template<>
 	inline double Graph<BBScanSp>::average_block_density_sparse() const
 	{
-		std::size_t nBB = 0;							//number of non-empty bitblocks	
-		std::size_t nBBt = 0;							//number of allocated bitblocks (all should be non-empty in the sparse case)
-		double den = 0.0;
 
-		for (Vertex v = 0; v < NV_; ++v) {
-			nBB = adj_[v].size();
-			nBBt += nBB;
-			den += static_cast<double>(adj_[v].size()) /
-				(BITBOARD(nBB) * WORD_SIZE);
+		if (NV_ == 0) {
+			return 0.0;
 		}
 
-		return (den / nBBt);
+		double density_sum = 0.0;
+
+		for (vertex_t vertex = 0; vertex < NV_; ++vertex) {
+			const std::size_t alloc_blocks = adj_[vertex].size();
+
+			// An empty adjacency row contributes a density of zero.
+			if (alloc_blocks == 0) {
+				continue;
+			}
+
+			const std::size_t set_bits =
+				static_cast<std::size_t>(adj_[vertex].count());
+
+			const std::size_t alloc_bits =
+				alloc_blocks * static_cast<std::size_t>(WORD_SIZE);
+
+			density_sum +=
+				static_cast<double>(set_bits) /
+				static_cast<double>(alloc_bits);
+		}
+
+		return density_sum / static_cast<double>(NV_);
+
 	}
 
 	template<>
@@ -162,4 +193,4 @@ namespace bitgraph{
 } //end of namespace bitgraph
 
 
-#endif // __SIMPLE_SPARSE_GRAPH_H__
+#endif // BITGRAPH_GRAPH_SIMPLE_SPARSE_GRAPH_H
