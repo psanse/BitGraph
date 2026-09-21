@@ -11,7 +11,7 @@
 */
 
 #include "graph/graph.h"
-#include "graph/formats/dimacs_format.h"
+#include "graph/formats/detail/dimacs_format.h"
 #include "graph/formats/yED_format.h"
 #include "gtest/gtest.h"
 #include "utils/common_paths.h"
@@ -48,7 +48,7 @@ TEST(G2gml, clique) {
 	clq.push_back(0); clq.push_back(1); clq.push_back(2);
 
 	/////////////////////////////////////////////////////////////////////
-	int status = gio::yed::graph_to_gml_clique(ug, clq, "gclique");
+	int status = io::yed::graph_to_gml_clique(ug, clq, "gclique");
 	ASSERT_EQ(status, 0);
 	/////////////////////////////////////////////////////////////////////
 
@@ -74,7 +74,7 @@ TEST(G2gml, vertex_set) {
 	vset.push_back(0); vset.push_back(1); vset.push_back(2);
 
 	/////////////////////////////////////////////////////////////////////
-	int status = gio::yed::graph_to_gml(ug, vset, "gset", gio::yed::YELLOW);
+	int status = io::yed::graph_to_gml(ug, vset, "gset", io::yed::YELLOW);
 	ASSERT_EQ(status, 0);
 	/////////////////////////////////////////////////////////////////////
 
@@ -88,7 +88,7 @@ TEST(G2gml, normal_graph) {
 	g.add_edge(0, 3);
 	g.add_edge(4, 5);
 
-	int status = gio::yed::graph_to_gml(g, "test_graph_gml_1");
+	int status = io::yed::graph_to_gml(g, "test_graph_gml_1");
 	ASSERT_EQ(status, 0);
 }
 
@@ -109,7 +109,7 @@ TEST(G2gml, layered_graph) {
 	layers.push_back(6); layers.push_back(7); layers.push_back(8); layers.push_back(9); layers.push_back(EMPTY_ELEM);
 	
 	/////////////////////////////////////////////////////////////////////
-	int status = gio::yed::graph_to_gml_layered(g, layers,"test_graph_gml_lay");
+	int status = io::yed::graph_to_gml_layered(g, layers,"test_graph_gml_lay");
 	ASSERT_EQ(status, 0);
 	/////////////////////////////////////////////////////////////////////
 }
@@ -125,7 +125,7 @@ TEST(G2gml, circular) {
 	g.add_edge(5, 8);
 
 	/////////////////////////////////////////////////////////////////////
-	int status = gio::yed::graph_to_gml_circular(g, "test_graph_gml_circ");
+	int status = io::yed::graph_to_gml_circular(g, "test_graph_gml_circ");
 	ASSERT_EQ(status, 0);
 	/////////////////////////////////////////////////////////////////////
 }

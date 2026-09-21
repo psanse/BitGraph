@@ -14,7 +14,7 @@
 #include "graph/graph_unweighted.h"		// required for valid type instantiation 
 #include "graph/simple_graph_w.h"
 #include "bitscan/bitscan.h"
-#include "graph/formats/dimacs_format.h"			
+#include "graph/formats/detail/dimacs_format.h"			
 #include "utils/common.h"
 #include "utils/logger.h"
 #include "utils/prec_timer.h"

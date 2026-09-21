@@ -21,7 +21,7 @@
 #ifndef BITGRAPH_GRAPH_SIMPLE_GRAPH_IMP_H
 #define BITGRAPH_GRAPH_SIMPLE_GRAPH_IMP_H
 
-#include "graph/formats/dimacs_format.h"
+#include "graph/formats/detail/dimacs_format.h"
 #include "graph/formats/detail/edges_format.h"
 #include "graph/formats/detail/matrix_market_format.h"
 
