@@ -22,8 +22,8 @@
 #define BITGRAPH_GRAPH_SIMPLE_GRAPH_IMP_H
 
 #include "graph/formats/dimacs_format.h"
-#include "graph/formats/edges_format.h"
-#include "graph/formats/detail/matrix_market_reader.h"
+#include "graph/formats/detail/edges_format.h"
+#include "graph/formats/detail/matrix_market_format.h"
 
 
 namespace bitgraph {
@@ -434,14 +434,14 @@ namespace bitgraph {
 			return -1;
 		}
 
-		if (gio::dimacs::read_dimacs_header(f, n, m) == -1) {
+		if (io::detail::dimacs::read_dimacs_header(f, n, m) == -1) {
 			reset();
 			f.close();
 			return -1;
 		}
 
 		reset(n);
-		gio::skip_empty_lines(f);   
+		io::detail::skip_empty_lines(f);   
 		
 		////////////////////////
 		//parse edges directly from the stream
@@ -519,15 +519,15 @@ namespace bitgraph {
 	inline
 		int  Graph<BitsetT>::read_mtx(const std::string& filename) noexcept {
 
-		detail::MMI<Graph<BitsetT> > myreader(*this);
+		io::detail::MMI<Graph<BitsetT> > myreader(*this);
 		return (myreader.read(filename));
 	}
 
 	template<class BitsetT>
 	inline
-		int  Graph<BitsetT>::read_EDGES(const std::string& filename) noexcept {
+		int Graph<BitsetT>::read_EDGES(const std::string& filename) noexcept {
 
-		EDGES<Graph<BitsetT> > myreader(filename, *this);
+		io::detail::EDGES<Graph<BitsetT> > myreader(filename, *this);
 		return (myreader.read());
 	}
 

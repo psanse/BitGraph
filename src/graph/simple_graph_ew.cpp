@@ -190,7 +190,7 @@ int Base_Graph_EW<GraphT, WeightT>::read_dimacs (string filename){
 
 	//read header
 	 int nV = -1, nEdges = -1;
-	 if (gio::dimacs::read_dimacs_header (f, nV, nEdges) == -1)
+	 if (io::detail::dimacs::read_dimacs_header (f, nV, nEdges) == -1)
 	 {
 		 LOG_ERROR("error when reading dimacs header / allocation - Base_Graph_EW<GraphT, WeightT>::read_dimacs");
 		 reset();
@@ -202,7 +202,7 @@ int Base_Graph_EW<GraphT, WeightT>::read_dimacs (string filename){
 	 reset(nV);
 
 	 //skips empty lines
-	 gio::skip_empty_lines(f);
+	 io::detail::skip_empty_lines(f);
 
 	 //////////////
 	//read vertex-weights format <n> <vertex index> <weight> if they exist
@@ -248,7 +248,7 @@ int Base_Graph_EW<GraphT, WeightT>::read_dimacs (string filename){
 		 }
 
 		 // Skip possible empty lines after vertex section
-		 gio::skip_empty_lines(f);
+		 io::detail::skip_empty_lines(f);
 		 break;
 	 default:
 		 LOGG_DEBUG("missing vertex-weights in file ", filename, " setting unit weights - Base_Graph_EW<GraphT, WeightT>::read_dimacs");

@@ -186,7 +186,7 @@ int Base_Graph_W<GraphT, WeightT>::read_dimacs (string filename, int type)
 
 	//read header
 	int nV = -1, nEdges = -1;
-	if(gio::dimacs::read_dimacs_header(f, nV, nEdges) == -1){
+	if(io::detail::dimacs::read_dimacs_header(f, nV, nEdges) == -1){
 		reset(); 
 		f.close();
 		return -1;
@@ -199,7 +199,7 @@ int Base_Graph_W<GraphT, WeightT>::read_dimacs (string filename, int type)
 	////////////
 	
 	//skips empty lines
-	gio::skip_empty_lines(f);
+	io::detail::skip_empty_lines(f);
 	
 	//////////////
 	//read vertex weights format <n> <vertex index> <weight> if they exist
@@ -242,7 +242,7 @@ int Base_Graph_W<GraphT, WeightT>::read_dimacs (string filename, int type)
 		}
 
 		//skip empty lines
-		gio::skip_empty_lines(f);
+		io::detail::skip_empty_lines(f);
 
 		break;
 	default:
