@@ -35,10 +35,7 @@ namespace bitgraph {
 	namespace io {
 
 		namespace yed {
-					
-
-				using namespace std;
-				//using namespace bitgraph;
+								
 
 				/**********************************************
 				*
@@ -63,6 +60,7 @@ namespace bitgraph {
 				enum edge_t {
 					DASHED, NONE
 				};
+
 
 				namespace detail {
 
