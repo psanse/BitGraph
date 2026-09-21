@@ -9,6 +9,7 @@ file(
     "${CMAKE_CURRENT_SOURCE_DIR}/algorithms/*.h"
     "${CMAKE_CURRENT_SOURCE_DIR}/algorithms/clique/*.h"
     "${CMAKE_CURRENT_SOURCE_DIR}/formats/*.h"
+    "${CMAKE_CURRENT_SOURCE_DIR}/formats/detail/*.h"
     "${CMAKE_CURRENT_SOURCE_DIR}/detail/*.h"
 )
 
@@ -26,7 +27,7 @@ add_library  (
     graph STATIC
     simple_graph_w.cpp
     simple_graph_ew.cpp
-    formats/mmio.cpp
+    formats/detail/mmio.cpp
     algorithms/decode.cpp
     ${HEADER_FILES}
 )

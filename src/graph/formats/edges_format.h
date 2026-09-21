@@ -13,6 +13,8 @@
 #include <sstream>
 #include <iostream>
 
+#include "detail/mmio.h"		// for detail::MM_PREMATURE_EOF;
+
 #ifndef _EDGES_READER_H_
 #define	_EDGES_READER_H_
 

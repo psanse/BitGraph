@@ -38,16 +38,17 @@
 
 #include "bitscan/bitscan.h"	
 #include "graph_types.h"
-#include "formats/dimacs_format.h"
-#include "formats/mmio.h"
-#include "formats/edges_format.h"
-#include "formats/mmx_format.h"
+//#include "formats/dimacs_format.h"
+//#include "formats/detail/mmio.h"
+//#include "formats/edges_format.h"
+//#include "formats/mmx_format.h"
+
 #include "utils/logger.h"
-#include "utils/prec_timer.h"
+//#include "utils/prec_timer.h"
 
 #include <iostream>
-#include <iomanip>
-#include <fstream>
+//#include <iomanip>
+//#include <fstream>
 #include <string>
 #include <vector>
 
