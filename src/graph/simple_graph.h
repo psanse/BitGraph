@@ -574,14 +574,30 @@ namespace bitgraph {
 		////////////////
 		//Comparisons
 	public:
+
 		/**
-		* @brief determines if two graphs have the same adjacency matrices
-		* @param lhs left hand side graph
-		* @param rhs right hand side graph
-		* @returns TRUE if lhs.adj_ == rhs.adj_
-		**/
+		 * @brief Compares two graphs for structural equality.
+		 *
+		 * Graphs are equal when they have the same number of vertices and identical
+		 * adjacency matrices. Names, paths, and cached edge counts are ignored.
+		 *
+		 * @tparam U Bitset type used by both graphs.
+		 * @param lhs First graph.
+		 * @param rhs Second graph.
+		 * @return `true` if the graphs are structurally equal; otherwise, `false`.
+		 */
 		template <class U>
 		friend bool operator ==	 (const Graph<U>& lhs, const Graph<U>& rhs);
+
+		/**
+		 * @brief Compares two graphs for structural inequality.
+		 *
+		 * @tparam U Bitset type used by both graphs.
+		 * @param lhs First graph.
+		 * @param rhs Second graph.
+		 * @return `true` if the vertex counts or adjacency matrices differ;
+		 *         otherwise, `false`.
+		 */
 		template <class U>
 		friend bool operator !=	 (const Graph<U>& lhs, const Graph<U>& rhs);
 
@@ -626,6 +642,18 @@ namespace bitgraph {
 		*/
 		virtual	void  write_dimacs(std::ostream& o);
 
+		/*
+		* @brief writes directed graph in edge list format
+		* @param o output stream
+		*/
+		virtual	void  write_EDGES(std::ostream& o);
+
+		/** @name DIMACS output primitives
+		 * These functions write individual parts of a DIMACS file. They are intended
+		 * for graph format implementations and advanced callers.
+		 * @{
+		 */
+
 		/**
 		* @brief writes timestamp for dimacs format
 		**/
@@ -649,13 +677,9 @@ namespace bitgraph {
 		 */
 		std::ostream& header_dimacs(
 			std::ostream& o = std::cout,
-			bool lazy = true);
-
-		/*
-		* @brief writes directed graph in edge list format
-		* @param o output stream
-		*/
-		virtual	void  write_EDGES(std::ostream& o);
+			bool lazy = true) const;
+		
+		/** @} */
 
 		////////////
 		// I/O 

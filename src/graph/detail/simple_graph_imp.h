@@ -30,12 +30,13 @@ namespace bitgraph {
 	
 	template <class U>
 	bool operator== (const Graph<U>& lhs, const Graph<U>& rhs) {
-		return lhs.adj_ == rhs.adj_;
+		return lhs.num_vertices() == rhs.num_vertices() &&
+			   lhs.adj_ == rhs.adj_;
 	}
 
 	template <class U>
 	bool operator!= (const Graph<U>& lhs, const Graph<U>& rhs) {
-		return lhs.adj_ != rhs.adj_;
+		return !(lhs.adj_ == rhs.adj_);
 	}
 
 } // namespace bitgraph
@@ -420,7 +421,8 @@ namespace bitgraph {
 
 	template<class BitsetT>
 	inline
-		std::ostream& Graph<BitsetT>::header_dimacs(std::ostream& o, bool lazy) {
+		std::ostream& Graph<BitsetT>::header_dimacs(std::ostream& o, bool lazy) const
+	{
 		o << "p edge " << NV_ << " " << num_edges(lazy) << endl << endl;
 		return o;
 	}
