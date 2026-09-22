@@ -5,8 +5,8 @@
 * @detals: created 01/11/2024, last update 06/07/2025
 **/
 
-#ifndef __PRECISION_TIMER__
-#define __PRECISION_TIMER__
+#ifndef BITSCAN_UTILS_PRECISION_TIMER_H
+#define BITSCAN_UTILS_PRECISION_TIMER_H
 
 #ifdef _MSC_VER
 #define _CRT_SECURE_NO_WARNINGS		//for std::localtime Windows (VS)
@@ -14,7 +14,7 @@
 #include <sys/time.h>				//TODO@ CHECK if it is necessary after the refactoring (26/01/2025)
 #endif
 
-#include "utils/common.h"
+#include "time_utils.h"
 
 /******************
 *
@@ -26,7 +26,7 @@
 
 namespace bitgraph {
 
-	namespace _impl {
+	namespace utils {
 
 		class PrecisionTimer
 		{
@@ -38,12 +38,12 @@ namespace bitgraph {
 
 		public:
 			void wall_tic() { wall_time = get_wall_time(); }
-			double wall_toc()  const { return com::_time::toDouble(get_wall_time() - wall_time); };
+			double wall_toc()  const noexcept{ return to_seconds(get_wall_time() - wall_time); };
 			void cpu_tic() { cpu_time = get_cpu_time(); }
-			double cpu_toc() const { return com::_time::toDouble(get_cpu_time() - cpu_time); };
+			double cpu_toc() const noexcept { return to_seconds(get_cpu_time() - cpu_time); };
 
 			static std::string local_timestamp(bool date = true) {
-				return com::_time::tp2string(wall_clock_t::now(), date);				//MUST BE wall clock
+				return to_local_timestamp(wall_clock_t::now(), date);				//MUST BE wall clock
 			}
 		private:
 			timepoint_t get_cpu_time() const { return clock_t::now(); }
@@ -56,10 +56,11 @@ namespace bitgraph {
 
 	}//end namespace _impl
 
-	using _impl::PrecisionTimer;
+	// Backward-compatible alias. New code should use bitgraph::utils::PrecisionTimer.
+	using utils::PrecisionTimer;
 
 }//end namespace bitgraph
 
-#endif
+#endif // BITSCAN_UTILS_PRECISION_TIMER_H
 
 

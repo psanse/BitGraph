@@ -16,7 +16,7 @@
 
 namespace bitgraph {
 
-	namespace com {
+	namespace utils {
 		
 		/**
 		* @brief:  Runs a task  asynchronously (different thread)  defined by a member function of an object 
@@ -134,9 +134,9 @@ namespace bitgraph {
 			}
 		}		
 
-	}//end namespace com
+	}//end namespace utils
 	
-	using com::run_task_async;		
+	using utils::run_task_async;		
 
 }//end namespace bitgraph
 

@@ -18,7 +18,7 @@
 
 namespace bitgraph {
 	
-	namespace com {
+	namespace utils {
 
 		////////////////////////
 		//
@@ -272,14 +272,14 @@ namespace bitgraph {
 
 		};
 
-	}//end namespace com
+	}//end namespace utils
 			
-	using com::FixedStack;
+	using utils::FixedStack;
 		
 }//end namespace bitgraph
 
 namespace bitgraph {
-	namespace com {
+	namespace utils {
 		template<class U>
 		inline
 			std::ostream& operator<< (std::ostream& o, const FixedStack<U>& s) { s.print(o); return o; }

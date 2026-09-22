@@ -23,7 +23,7 @@
 
 using namespace std;
 using namespace bitgraph;
-using namespace bitgraph::com::_sort;
+using namespace bitgraph::utils::_sort;
 
 class GraphFastRootSortTest : public ::testing::Test {
 protected:

@@ -335,7 +335,7 @@ namespace bitgraph {
 		for (auto i = 0; i < NV - 1; ++i) {
 			for (auto j = i + 1; j < NV; ++j) {
 
-				if (com::uniform_dist(p)) {
+				if (utils::uniform_dist(p)) {
 					add_edge(i, j, val);
 				}
 			}

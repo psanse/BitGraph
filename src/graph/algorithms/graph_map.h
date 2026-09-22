@@ -342,10 +342,10 @@ namespace bitgraph{
 		}*/
 
 		//I/O
-		//cout<<"N2O_D"; com::stl::print_collection(n2o_d); cout<<endl;
-		//cout<<"O2N_D";com::stl::print_collection(o2n_d); cout<<endl;
-		//cout<<"O2N_W";com::stl::print_collection(o2n_w); cout<<endl;
-		//cout<<"N2O_W";com::stl::print_collection(n2o_w); cout<<endl;
+		//cout<<"N2O_D"; utils::stl::print_collection(n2o_d); cout<<endl;
+		//cout<<"O2N_D";utils::stl::print_collection(o2n_d); cout<<endl;
+		//cout<<"O2N_W";utils::stl::print_collection(o2n_w); cout<<endl;
+		//cout<<"N2O_W";utils::stl::print_collection(n2o_w); cout<<endl;
 		//print_mappings();
 		
 	}
@@ -369,20 +369,20 @@ namespace bitgraph{
 		case L2R:
 			o << "\n*****************" << std::endl;
 			o << "L->R" << std::endl;
-			com::_stl::print_collection(l2r_, o, true);
+			utils::_stl::print_collection(l2r_, o, true);
 			o << "\n*****************" << std::endl;
 			break;
 		case R2L:
 			o << "\n*****************" << std::endl;
 			o << "R->L" << std::endl;
-			com::_stl::print_collection(r2l_, o, true);
+			utils::_stl::print_collection(r2l_, o, true);
 			o << "******************" << std::endl;
 			break;
 		case BOTH:
 			o << "\n*****************" << std::endl;
 			o << "L->R and R->L" << std::endl;
-			com::_stl::print_collection(l2r_, o, true);
-			com::_stl::print_collection(r2l_, o, true);
+			utils::_stl::print_collection(l2r_, o, true);
+			utils::_stl::print_collection(r2l_, o, true);
 			o << "*****************" << std::endl;
 			break;
 		default:

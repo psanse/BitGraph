@@ -1247,7 +1247,7 @@ namespace bitgraph {
 			return *this;
 		}
 
-		void Bitset::extract_stack(com::FixedStack<bit_index_t>& s)	const {
+		void Bitset::extract_stack(utils::FixedStack<bit_index_t>& s)	const {
 			s.clear();
 
 			bit_index_t bit = BBObject::noBit;

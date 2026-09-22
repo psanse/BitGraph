@@ -311,7 +311,7 @@ namespace bitgraph {
 		std::size_t M = static_cast<std::size_t>(std::llround(p * N)); 
 		if (M > N) { M = N; };
 
-		std::shuffle(edges.begin(), edges.end(), bitgraph::com::detail::g_iugen.engine() /*std::mt19937_64(std::random_device{}())*/);
+		std::shuffle(edges.begin(), edges.end(), bitgraph::utils::detail::g_iugen.engine() /*std::mt19937_64(std::random_device{}())*/);
 
 		//take the first M edges
 		for (std::size_t i = 0; i < M; ++i) {

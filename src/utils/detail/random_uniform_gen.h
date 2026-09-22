@@ -9,7 +9,7 @@
 
 namespace bitgraph {
 
-	namespace com {
+	namespace utils {
 
 		namespace detail {
 
@@ -265,7 +265,7 @@ namespace bitgraph {
 
 		} // namespace detail
 
-	} // namespace com
+	} // namespace utils
 
 
 } // namespace bitgraph

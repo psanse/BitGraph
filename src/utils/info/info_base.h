@@ -9,6 +9,7 @@
 #define _INFO_BASE_H_
 
 #include "utils/prec_timer.h"
+#include "utils/time_utils.h"
 #include <iostream>
 #include <string>
 #include <limits>
@@ -17,7 +18,7 @@
 
 namespace bitgraph {
 
-	namespace com {
+	namespace utils {
 		
 		//////////////////////////
 		//
@@ -43,7 +44,7 @@ namespace bitgraph {
 
 			void startTimer() { startTime = PrecisionTimer::clock_t::now(); }
 			double readTimer() {  
-				timeElapsed = com::_time::toDouble(PrecisionTimer::clock_t::now() - startTime); 
+				timeElapsed = to_seconds(PrecisionTimer::clock_t::now() - startTime); 
 				return timeElapsed;
 			}
 			
@@ -98,7 +99,7 @@ namespace bitgraph {
 			* @param start_time - starting time point to determine duration
 			* @returns elapsed time in seconds
 			* @details: utility for time measurement outside the class
-			* @details - moved to utilities utils::com::_time namespace (common.h) 31/08/2025
+			* @details - moved to utilities utils::utils::_time namespace (common.h) 31/08/2025
 			*/
 			//static d ouble elapsedTime(tpoint_t start_time);
 
@@ -216,11 +217,11 @@ namespace bitgraph {
 
 		};
 
-	}//end namespace com
+	}//end namespace utils
 
-	using com::paramBase;
-	using com::infoBase;
-	using com::operator<<;
+	using utils::paramBase;
+	using utils::infoBase;
+	using utils::operator<<;
 
 	
 }//end namespace bitgraph

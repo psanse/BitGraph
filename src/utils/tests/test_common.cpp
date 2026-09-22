@@ -29,11 +29,11 @@ namespace bitgraph {
 
 TEST(Common_stack, constructor) {
 
-	bitgraph::com::FixedStack<int> s(3);
+	bitgraph::utils::FixedStack<int> s(3);
 	s.push(10);
 	s.push(20);
 		
-	bitgraph::com::FixedStack<int> s2 = std::move(s);
+	bitgraph::utils::FixedStack<int> s2 = std::move(s);
 
 	EXPECT_EQ(2, s2.size());
 	EXPECT_EQ(20, s2.top());
@@ -43,7 +43,7 @@ TEST(Common_stack, constructor) {
 
 TEST(Common_stack, forward_iteration) {
 
-	bitgraph::com::FixedStack<int> s(3);
+	bitgraph::utils::FixedStack<int> s(3);
 	s.push(10);
 	s.push(20);
 	s.push(30);
@@ -65,7 +65,7 @@ TEST(Common_stack, forward_iteration) {
 
 TEST(Common_stack, backward_iteration) {
 
-	bitgraph::com::FixedStack<int> s(3);
+	bitgraph::utils::FixedStack<int> s(3);
 	s.push(10);
 	s.push(20);
 	s.push(30);
@@ -102,14 +102,14 @@ TEST(Common_mat, mean_and_stdev) {
 	vdob col = { 2.7, 2.8, 2.9, 3, 3.1, 3.2, 3.3 };
 	
 	//compute mean - implicit cast to double on return, MUST USE for_each and return double
-	double mean = for_each(col.begin(), col.end(), com::_mat::MeanValue());					
+	double mean = for_each(col.begin(), col.end(), utils::_mat::MeanValue());					
 
 	/////////////////////////////
 	EXPECT_DOUBLE_EQ(3, mean);
 	/////////////////////////////
 
 	//compute standard deviation - implicit cast to double on return, MUST USE for_each and return double
-	double stdDev = for_each(col.begin(), col.end(), com::_mat::StdDevValue(mean));
+	double stdDev = for_each(col.begin(), col.end(), utils::_mat::StdDevValue(mean));
 	
 	//compute the standard deviation in a more traditional way
 	double stdDevExp = 0;
@@ -127,12 +127,12 @@ TEST(Common_mat, mean_and_stdev) {
 TEST(Common_counting, number_of_words){
 
 	string str1("hello my 2 3 4");
-	int nw = com::_count::number_of_words(str1);
+	int nw = utils::_count::number_of_words(str1);
 	
 	EXPECT_EQ(5,nw);
 
 	string str2 ("e 1 2 25");
-	nw = com::_count::number_of_words(str2);
+	nw = utils::_count::number_of_words(str2);
 	
 	EXPECT_EQ(4,nw);
 
@@ -141,7 +141,7 @@ TEST(Common_counting, number_of_words){
 TEST(Common, fixed_stack_basic) {
 
 	const int N = 10;
-	bitgraph::com::FixedStack<int> s(N);
+	bitgraph::utils::FixedStack<int> s(N);
 
 	EXPECT_EQ(0, s.size());
 
@@ -179,7 +179,7 @@ TEST(Common, fixed_stack_basic) {
 TEST(Common, fixed_stack_pop){
 
 	const int N=10;		
-	bitgraph::com::FixedStack<int> s(N);
+	bitgraph::utils::FixedStack<int> s(N);
 	s.push(10);
 	s.push(30);
 
@@ -200,16 +200,16 @@ TEST(Common, fixed_stack_pop){
 TEST(Common_dir, path){
 
 	string path_1("c:/kk/");		//POSIX
-	com::_dir::append_slash(path_1);
+	utils::_dir::append_slash(path_1);
 	EXPECT_STREQ("c:/kk/", path_1.c_str());
 
 #ifdef _MSC_VER
 	string path_2("c:\\kk");		//WINDOWS	
-	com::_dir::append_slash(path_2);
+	utils::_dir::append_slash(path_2);
 	EXPECT_STREQ("c:\\kk\\", path_2.c_str());
 
 	string path_3(".\\kk");
-	com::_dir::append_slash(path_3);
+	utils::_dir::append_slash(path_3);
 	EXPECT_STREQ(".\\kk\\", path_3.c_str());
 #endif
 
@@ -218,10 +218,10 @@ TEST(Common_dir, path){
 TEST(Common_stl, all_equal){
 
 	vector<int> v(10, 1);
-	EXPECT_TRUE(com::_stl::all_equal(v));
+	EXPECT_TRUE(utils::_stl::all_equal(v));
 		
 	v.push_back(2);
-	EXPECT_FALSE(com::_stl::all_equal(v));
+	EXPECT_FALSE(utils::_stl::all_equal(v));
 }
 
 
@@ -232,7 +232,7 @@ TEST(Common_timer, elapsedTime) {
 	std::this_thread::sleep_for(std::chrono::milliseconds(120));
 
 	////////////////////////////////////////////////////
-	double elapsed = com::_time::elapsedTime(start);				//seconds
+	double elapsed = utils::elapsed_time(start);				//seconds
 	////////////////////////////////////////////////////
 
 	//wide range to avoid false negatives due to scheduling
@@ -263,7 +263,7 @@ TEST(Common_sort, DISABLED_insert_ordered) {
 	score[1] = 20;
 	score[2] = 5;		
 		
-	int pos = com::_sort::INSERT_ORDERED_SORT_NON_INCR(data, score, N /* tamaño tras inserción N */, 3, 21);
+	int pos = utils::_sort::INSERT_ORDERED_SORT_NON_INCR(data, score, N /* tamaño tras inserción N */, 3, 21);
 	
 	//TODO TEST data 
 

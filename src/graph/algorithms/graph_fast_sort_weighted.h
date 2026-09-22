@@ -196,7 +196,7 @@ namespace bitgraph {
 		ptype::set_ordering();
 
 		/////////////////////////////////////////////////////////////////////////////
-		com::has_greater_val< int, std::vector<Weight> > pred(gw_.weight());
+		utils::has_greater_val< int, std::vector<Weight> > pred(gw_.weight());
 		std::stable_sort(this->nodes_.begin(), this->nodes_.end(), pred);
 		/////////////////////////////////////////////////////////////////////////////
 
@@ -214,7 +214,7 @@ namespace bitgraph {
 		ptype::set_ordering();
 
 		/////////////////////////////////////////////////////////////////////////////
-		com::has_smaller_val< int, std::vector<Weight> > pred(gw_.weight());
+		utils::has_smaller_val< int, std::vector<Weight> > pred(gw_.weight());
 		std::stable_sort(this->nodes_.begin(), this->nodes_.end(), pred);
 		/////////////////////////////////////////////////////////////////////////////
 

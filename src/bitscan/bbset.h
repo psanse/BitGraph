@@ -1032,7 +1032,7 @@ namespace bitgraph {
 		* @brief Fills stack @s
 		* @param s: output stack object (external ownership)
 		**/
-		void extract_stack(com::FixedStack<bit_index_t>& s) const;
+		void extract_stack(utils::FixedStack<bit_index_t>& s) const;
 		/**
 		* @brief Fills array @lv and sets @size
 		* @param lv: must point to an array of capacity >= population size of this bitset (external ownership)

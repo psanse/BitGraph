@@ -24,7 +24,7 @@
 
 namespace bitgraph {
 
-    namespace com {
+    namespace utils {
 		      
 			/**
 			 * @brief Performs a Bernoulli trial with success probability @p p.
@@ -68,7 +68,7 @@ namespace bitgraph {
 
 			}
 
-	} // namespace com
+	} // namespace utils
 
 } // namespace bitgraph
 

@@ -412,14 +412,14 @@ namespace bitgraph {
 				}
 
 				//I/O
-				//com::stl::print_collection(ldeg); 
+				//utils::stl::print_collection(ldeg); 
 
 				//sorting according to ldeg
 				if (min_sort) {
-					std::sort(lv.begin(), lv.end(), com::has_smaller_val<int, vector<int>>(ldeg));
+					std::sort(lv.begin(), lv.end(), utils::has_smaller_val<int, vector<int>>(ldeg));
 				}
 				else {
-					std::sort(lv.begin(), lv.end(), com::has_greater_val<int, vector<int>>(ldeg));
+					std::sort(lv.begin(), lv.end(), utils::has_greater_val<int, vector<int>>(ldeg));
 				}
 
 				return lv;
@@ -448,14 +448,14 @@ namespace bitgraph {
 				}
 
 				//I/O
-				//com::stl::print_collection(ldeg); 
+				//utils::stl::print_collection(ldeg); 
 
 				//sorting according to ldeg
 				if (min_sort) {
-					std::sort(lv.begin(), lv.end(), com::has_smaller_val<int, vector<int>>(ldeg));
+					std::sort(lv.begin(), lv.end(), utils::has_smaller_val<int, vector<int>>(ldeg));
 				}
 				else {
-					std::sort(lv.begin(), lv.end(), com::has_greater_val<int, vector<int>>(ldeg));
+					std::sort(lv.begin(), lv.end(), utils::has_greater_val<int, vector<int>>(ldeg));
 				}
 
 				return lv;
@@ -733,8 +733,8 @@ namespace bitgraph {
 					return (weights[a] - g.degree(a)) > (weights[b] - g.degree(b));
 					};
 
-				/*com::has_smaller_val_diff<int, typename vector<GraphT::Weight>> my_struct_smaller_diff(g.weights());
-				com::has_greater_val_diff<int, typename vector<GraphT::Weight>> my_struct_greater_diff(g.weights());*/
+				/*utils::has_smaller_val_diff<int, typename vector<GraphT::Weight>> my_struct_smaller_diff(g.weights());
+				utils::has_greater_val_diff<int, typename vector<GraphT::Weight>> my_struct_greater_diff(g.weights());*/
 
 				//sorting according to ldeg
 				if (min_sort) {

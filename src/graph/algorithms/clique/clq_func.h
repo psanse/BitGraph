@@ -340,7 +340,7 @@ namespace bitgraph {
 					///////////
 
 					//I/O
-					//com::stl::print_collection(clq_curr, std::cout, true);
+					//utils::stl::print_collection(clq_curr, std::cout, true);
 
 					//update clique if smaller than current clique
 					if (clq.size() < clq_curr.size()) { clq = clq_curr; }
@@ -643,18 +643,18 @@ namespace bitgraph {
 		//				num_added++;
 		//
 		//#ifdef my_assert_qfunc					
-		//				LOG_ERROR("clique found in preceding dolls-com::quasi_clq()");
+		//				LOG_ERROR("clique found in preceding dolls-utils::quasi_clq()");
 		//				LOG_ERROR("may only happen in QUASI-CLIQUE mode, and if a new solution of size > +1 has been found previously");
 		//				/*if (is_clique(g, clq)) {
-		//					LOG_ERROR("bizarre clique, exiting....-com::quasi_clq()");
+		//					LOG_ERROR("bizarre clique, exiting....-utils::quasi_clq()");
 		//					LOG_ERROR("v that may be added:" << v);
 		//					stringstream sstr;
-		//					com::stl::print_collection<Vertices>(clq, sstr);
+		//					utils::stl::print_collection<Vertices>(clq, sstr);
 		//					LOG_ERROR("clq with v included" << sstr.str());
 		//					exit(-1);
 		//				}
 		//				else {
-		//					LOG_ERROR("bizarre clique, exiting....-com::quasi_clq()");
+		//					LOG_ERROR("bizarre clique, exiting....-utils::quasi_clq()");
 		//				}*/
 		//#endif
 		//				return -1;

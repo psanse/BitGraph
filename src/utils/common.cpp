@@ -12,21 +12,21 @@ using namespace std;
 
 // default global generators
 //namespace bitgraph {
-//	namespace com {
+//	namespace utils {
 //		namespace _rand {   
 //
 //			iugen g_iugen;
 //			rugen g_rugen;
 //
 //		} // namespace _rand
-//	} // namespace com
+//	} // namespace utils
 //} // namespace bitgraph
 
 
 //gloabl template variables
 namespace bitgraph {
 
-	/*namespace com {
+	/*namespace utils {
 		namespace _rand {
 			template<typename D, typename RE>
 			std::size_t RandomUniformGen<D, RE>::seed_ = RandomUniformGen<D, RE>::FIXED_RANDOM_SEED;
@@ -34,7 +34,7 @@ namespace bitgraph {
 	}*/
 
 	
-	namespace com {
+	namespace utils {
 		namespace _sort {
 
 			/********************************************************************************************************************************
@@ -81,7 +81,7 @@ namespace bitgraph {
 	}
 
 
-	namespace com {
+	namespace utils {
 		namespace _dir {
 
 			void append_slash(std::string& path) {
@@ -123,7 +123,7 @@ namespace bitgraph {
 	}
 
 
-	namespace com {
+	namespace utils {
 		namespace _file {
 
 			int READ_SET_OF_INTERDICTED_VERTICES(const char* filename, vector<int>& interdicted_nodes) noexcept {
@@ -153,40 +153,7 @@ namespace bitgraph {
 				f.close();
 				return 0;
 			}
-		}
-	}
-
-	namespace com {
-		namespace _time {
-			//////////////////////////////////////
-			//
-			// makeTimePoint(...)
-			// 
-			// converts calendar time to timepoint of system clock
-			//
-			/////////////////////////////////////
-
-
-			std::chrono::system_clock::time_point
-				makeTimePoint(int year, int mon, int day,
-					int hour, int min, int sec)
-			{
-				struct std::tm t;
-				t.tm_sec = sec;						// second of minute (0 .. 59 and 60 for leap seconds)
-				t.tm_min = min;						// minute of hour (0 .. 59)
-				t.tm_hour = hour;					// hour of day (0 .. 23)
-				t.tm_mday = day;					// day of month (0 .. 31)
-				t.tm_mon = mon - 1;					// month of year (0 .. 11)
-				t.tm_year = year - 1900;			// year since 1900
-				t.tm_isdst = -1;					// determine whether daylight saving time
-
-				std::time_t tt = std::mktime(&t);
-				if (tt == -1) {
-					throw "no valid system time";
-				}
-				return std::chrono::system_clock::from_time_t(tt);
-			}
-		}
-	}
+		} // end namespace _file
+	} // end namespace utils
 
 } //end namespace bitgraph

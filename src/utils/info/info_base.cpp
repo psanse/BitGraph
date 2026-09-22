@@ -7,6 +7,7 @@
 
 #include "info_base.h"
 #include "utils/logger.h"
+#include "utils/time_utils.h"
 
 #include <iostream>
 
@@ -17,7 +18,7 @@ using namespace bitgraph;
 ////////////////////////
 // friend functions of infoBase
 namespace bitgraph {
-	namespace com {
+	namespace utils {
 		ostream& operator<< (ostream& o, const infoBase& info) {
 			return info.printReport(o, infoBase::report_t::TABLE, true);
 		}
@@ -105,8 +106,8 @@ void infoBase::startTimer(phase_t t)
 		startTimeIncumbent_ = PrecisionTimer::clock_t::now();
 		break;
 	default:
-		LOG_ERROR("bizarre timer type, exiting... - com::infoBase::start_timer");
-		LOGG_ERROR("timer type: ", (int)t, " - com::infoBase::start_timer");
+		LOG_ERROR("bizarre timer type, exiting... - utils::infoBase::start_timer");
+		LOGG_ERROR("timer type: ", (int)t, " - utils::infoBase::start_timer");
 		std::exit(EXIT_FAILURE);
 	}
 }
@@ -124,8 +125,8 @@ void infoBase::clearTimer(phase_t t) {
 		timeIncumbent_ = 0.0;
 		break;
 	default:
-		LOG_ERROR("bizarre timer type, exiting... - com::infoBase::clearTimer");
-		LOGG_ERROR("timer type: ", (int)t, " - com::infoBase::clearTimer");
+		LOG_ERROR("bizarre timer type, exiting... - utils::infoBase::clearTimer");
+		LOGG_ERROR("timer type: ", (int)t, " - utils::infoBase::clearTimer");
 		std::exit(EXIT_FAILURE);
 	}
 }
@@ -144,15 +145,15 @@ double infoBase::readTimer(phase_t t)
 
 	switch (t) {
 	case phase_t::SEARCH:
-		timeSearch_ = com::_time::toDouble(endTime - startTimeSearch_);
+		timeSearch_ = utils::to_seconds(endTime - startTimeSearch_);
 		elapsedTime = timeSearch_;
 		break;
 	case phase_t::PREPROC:
-		timePreproc_ = com::_time::toDouble(endTime - startTimePreproc_);
+		timePreproc_ = utils::to_seconds(endTime - startTimePreproc_);
 		elapsedTime = timePreproc_;
 		break;	
 	case phase_t::LAST_INCUMBENT:
-		timeIncumbent_ = com::_time::toDouble(endTime - startTimeIncumbent_);
+		timeIncumbent_ = utils::to_seconds(endTime - startTimeIncumbent_);
 		elapsedTime = timeIncumbent_;
 		break;
 

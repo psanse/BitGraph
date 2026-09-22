@@ -268,7 +268,7 @@ namespace bitgraph {
 		* @brief prints the weights of the vertices in the stack lv
 		* @param lv: a set of vertices with a stack interface
 		**/
-		std::ostream& print_weights(com::FixedStack<int>& lv, ostream& o = std::cout) const;
+		std::ostream& print_weights(utils::FixedStack<int>& lv, ostream& o = std::cout) const;
 
 		/**
 		* @brief prints the weights of the vertices in the FixedStack lv
@@ -277,7 +277,7 @@ namespace bitgraph {
 		*				  the FixedStack lv
 		* @param lv: a set of vertices with a FixedStack interface
 		**/
-		std::ostream& print_weights(com::FixedStack<int>& lv, const VertexMapping& mapping, std::ostream& o = std::cout)	const;
+		std::ostream& print_weights(utils::FixedStack<int>& lv, const VertexMapping& mapping, std::ostream& o = std::cout)	const;
 
 		/**
 		* @brief prints the weights of the vertices in lv
