@@ -647,7 +647,7 @@ namespace bitgraph {
 				}
 
 				////////
-				// construction / distraction
+				// construction / destruction
 
 				/**
 				 * @brief Creates a generator handle without changing shared state.
@@ -673,7 +673,7 @@ namespace bitgraph {
 				 * @brief Reseeds the shared engine from a system-derived value.
 				 */
 				explicit RandomUniformGen(UseRandomDevice) {
-					seed();                    // usa random_device / reloj
+					seed();                   
 				}
 				
 				// move / copy contructions disallowed
@@ -759,31 +759,36 @@ namespace bitgraph {
 			 * Shares its engine and distribution with all other rugen objects.
 			 */
 			extern rugen g_rugen;
-			extern rugen g_rugen;   // real (uniform_real)
-			
+					
 
 			/**
-			* @brief returns true with probability p, false with 1 - p
-			**/
+			 * @brief Returns true with probability @p p.
+			 * @param p Probability of returning true.
+			 * @return Result of the random trial.
+			 * @pre `0.0 <= p <= 1.0`.
+			 */
 			inline
 			bool uniform_dist(double p)
-			{
-				if (!(p >= 0.0 && p <= 1.0)) {
-					throw std::invalid_argument("uniform_dist: p must be in [0, 1]");
-				}
+			{				
+				assert(p >= 0.0 && p <= 1.0); // Rejects NaN too.						
+								
+				// Distribution range guaranteed to be in [0, 1)
+				return g_rugen() < p;   
 
-				//c- windows generator (deprecated)
+				//B) if distribution range is not guaranteed to be in [0, 1)
+				//const double sample = std::generate_canonical<
+				//	double,
+				//	std::numeric_limits<double>::digits		// typically 53 for double
+				//>(g_rugen.engine());
+				//return sample < p;
+
+				//C) generates a distribution each time - not for hot paths
+				//std::bernoulli_distribution trial(p);
+				//return trial(g_rugen.engine());					
+
+				//D) windows generator (deprecated)
 			   /* double n_01=std::rand()/(double)RAND_MAX;
-				return (n_01<=p);*/
-
-				/////////////////////////////
-
-				std::bernoulli_distribution trial(p);
-				return trial(g_rugen.engine());
-
-				//return g_rugen() <= p;
-				//return std::generate_canonical<double, 53>(g_rugen.engine()) <= p;		/* high precision engine */
-				////////////////////////////
+				return (n_01<=p);*/						
 				
 			}			
 
