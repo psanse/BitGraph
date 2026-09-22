@@ -33,16 +33,11 @@
 
 #include "common_types.h"				//common types additional utilities, to be included e
 #include "random.h"
-#include "time_utils.h"
-
-
-
+#include "prec_timer.h"
 
 namespace bitgraph {
 
-
 	namespace utils {
-
 
 		namespace _dir {
 			/**
@@ -506,8 +501,7 @@ namespace bitgraph {
 		} // end namespace _sort
 
 	} // end namespace utils
-
-			
+				
 
 	// for backward compatibility
 	using namespace utils::_stl;
