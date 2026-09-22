@@ -260,43 +260,46 @@ namespace bitgraph {
 		return newg;
 	}
 
+	
+	
 	template<class BitsetT>
 	inline
-		void Graph<BitsetT>::shrink_to_fit() {
-
-		for (vertex_t v = 0; v < NV_; ++v) {
-			adj_[v].shrink_to_fit();
-		}
-
-		edge_count_valid_ = false;
+		void Graph<BitsetT>::shrink_to_fit()
+	{
+		for (auto& neighbors : adj_) {
+			neighbors.shrink_to_fit();
+		}		
 	}
 
 	template<class BitsetT>
 	inline
-		int Graph<BitsetT>::shrink_to_fit(std::size_t N) {
+		int Graph<BitsetT>::shrink_to_fit(std::size_t new_size)
+	{
 
-		/*LOG_ERROR("not yet implemented for non-sparse graphs - Graph<BitsetT>::shrink_to_fit");
-		LOG_ERROR("graph remains unchanged");*/
-
-		//assertions
-		if (NV_ <= N) {
-			LOGG_WARNING("Wrong shrinking size ", N, " the graph remains unchanged - Graph<BitsetT>::shrink_to_fit");
+		// Compare before converting to int.
+		if (new_size >= static_cast<std::size_t>(NV_)) {
+			LOGG_WARNING(
+				"Invalid shrinking size ", new_size,
+				": expected a value smaller than ", NV_,
+				". The graph remains unchanged - Graph<BitsetT>::shrink_to_fit(std::size_t)");
 			return -1;
 		}
 
-		//sets to 0 bitblocks outside the range but
-		//does not remove the empty bitbloks
-		for (vertex_t v = 0; v < NV_; ++v) {
-			adj_[v].erase_bit(NV_, -1);
+		const vertex_t new_vertex_count = static_cast<vertex_t>(new_size);
+
+		// Remove edges to vertices outside the new range.
+		for (vertex_t v = 0; v < new_vertex_count; ++v) {
+			adj_[v].erase_bit(new_vertex_count, -1);
 		}
 
-		//resizes adjacency matrix
-		adj_.resize(N);
-		NV_ = static_cast<int>(N);
-		NE_ = 0;												// clears cached value
-		edge_count_valid_ = false;								// so that when num edges are required, its value will be recomputed
-		NBB_ = INDEX_1TO1(NV_);									// maximum number of bitblocks per row (for sparse graphs)		
+		// Remove rows belonging to discarded vertices.
+		adj_.resize(new_size);
+		NV_ = new_vertex_count;
 
+		NE_ = 0;
+		edge_count_valid_ = false;
+		NBB_ = INDEX_1TO1(NV_);			
+				
 		return 0;
 	}
 
@@ -328,11 +331,11 @@ namespace bitgraph {
 	{
 		assert(v >= 0 && v < NV_);
 		assert(w >= 0 && w < NV_);
-
-		if (v != w) {
+				
+		if (v != w && !adj_[v].is_bit(w)) {
 			adj_[v].set_bit(w);
-			NE_++;
-		}
+			++NE_;
+		}		
 	}
 
 	template<class BitsetT>
@@ -341,8 +344,16 @@ namespace bitgraph {
 	{
 		assert(v >= 0 && v < NV_);
 		assert(w >= 0 && w < NV_);
-		adj_[v].erase_bit(w);
-		NE_--;
+
+		if (v != w && adj_[v].is_bit(w)) {
+			adj_[v].erase_bit(w);
+
+			// necessary to avoid NE_ underflow if edge_count_valid_ is false
+			if (edge_count_valid_) {	
+				--NE_;
+			}
+			
+		}
 	}
 
 	template<class BitsetT>
@@ -355,27 +366,27 @@ namespace bitgraph {
 		adj_[v].erase_bit();
 
 		//erases all ingoing edges
-		for (int w = 0; w < NV_; w++) {
-			if (w == v) continue;
-			adj_[w].erase_bit(v);
+		for (vertex_t w = 0; w < NV_; w++) {
+			if (w != v) {
+				adj_[w].erase_bit(v);
+			}
 		}
 
-		edge_count_valid_ = false;  // The edge count is no longer valid after removing edges.
-
-		//updates edges
-		//NE_ = 0;					//resets edges to avoid lazy evaluation later
+		// edge count is no longer valid after removing edges.
+		edge_count_valid_ = false;		
 
 	}
 
 	template<class BitsetT>
 	inline
 		void Graph<BitsetT>::remove_edges() {
-		for (int v = 0; v < NV_; ++v) {
-			adj_[v].erase_bit();
-		}
 
-		edge_count_valid_ = false;  // The edge count is no longer valid after removing edges.
-		//NE_ = 0;
+		for (auto& neighbors : adj_) {
+			neighbors.erase_bit();
+		}
+				
+		NE_ = 0;
+		edge_count_valid_ = true;
 	}
 
 	template <class BitsetT>
@@ -753,32 +764,21 @@ namespace bitgraph {
 
 	}
 
-	//template<class BitsetT>
-	//void Graph<BitsetT>::remove_vertices (const Bitset& bbn){
-	/////////////////
-	//// Experimental: deletes input list of nodes by creating a temporal graph
-	////
-	//// OBSERVATIONS:
-	//// 1.Inefficient implementation with double allocation of memory
-	//
-	//	Graph<BitsetT> g;
-	//	this->remove_vertices(bbn,g);			//allocation 1
-	//	(*this)=g;								//allocation 2	
-	//}
-
 	template<class BitsetT>
 	inline
 		int Graph<BitsetT>::degree_in(vertex_t v) const 
 	{
 		assert(v >= 0 && v < NV_);
+		
+		int degree = 0;
 
-		int res = 0;
-		for (auto i = 0u; i < NV_; i++) {
-			if (i == v) continue;
-			if (adj_[i].is_bit(v)) { res++; }
+		for (vertex_t source = 0; source < NV_; source++) {
+			if (adj_[source].is_bit(v)) {
+				++degree; 
+			}
 
 		}
-		return res;
+		return degree;
 	}
 
 	template<class BitsetT>
@@ -823,16 +823,16 @@ namespace bitgraph {
 	inline
 		void Graph<BitsetT>::make_bidirected() {
 
-		for (int i = 0; i < NV_; ++i) {
-			for (int j = 0; j < NV_; ++j) {
-				if (is_edge(i, j)) add_edge(j, i);
-				if (is_edge(j, i)) add_edge(i, j);
+		for (vertex_t i = 0; i + 1 < NV_; ++i) {
+			for (vertex_t j = i + 1; j < NV_; ++j) {
+				if (is_edge(i, j) ) {
+					add_edge(j, i);
+				}
+				else if (is_edge(j, i) ) {
+					add_edge(i, j);
+				}
 			}
 		}
-		
-		
-		edge_count_valid_ = false;
-		//NE_ = 0;	//resets edges to avoid lazy evaluation later
 	}
 
 	template<class BitsetT>
@@ -845,7 +845,7 @@ namespace bitgraph {
 		//sets directed edges with probability p
 		for (int i = 0; i < NV_; ++i) {
 			for (int j = 0; j < NV_; ++j) {
-				if (_rand::uniform_dist(p)) {
+				if (com::_rand::uniform_dist(p)) {
 					add_edge(i, j);
 				}
 			}

@@ -297,23 +297,30 @@ namespace bitgraph {
 		void reset() noexcept;
 
 		/**
-		* @brief reduces the capacity to the size of the bitsets that make
-		*		 the adjacency matrix.
-		* @details: calls the STL shrink_to_fit function for each bitset
-		*			of the adjacency matrix
-		**/
+		 * @brief Requests removal of unused storage from each adjacency bitset.
+		 *
+		 * The graph's vertices, edges, and cached edge count remain unchanged.
+		 * The amount of storage released depends on the bitset implementation and
+		 * is not guaranteed.
+		 */
 		void shrink_to_fit();
 
 		/**
-		* @brief reduces the graph to the first N vertices (deallocation takes place)
-		*
-		*		(currently only for sparse graphs)
-		*
-		* @param N: number of vertices of the new graph, which must be strictly less
-		*		    than the current number of vertices NV_
-		* @returns 0 if success, otherwise -1 (graph unchanged)
-		**/
-		int shrink_to_fit(std::size_t N);
+		 * @brief Reduces the graph to its first @p new_size vertices.
+		 *
+		 * Keeps vertices in `[0, new_size)` and removes all other vertices and their
+		 * incident edges. The remaining adjacency rows are cleared beyond the new
+		 * vertex range, and the cached edge count is invalidated.
+		 *
+		 * @param new_size Number of vertices to retain. It must be smaller than the
+		 *        current number of vertices.
+		 * @return `0` on success; `-1` if @p new_size is invalid, in which case the
+		 *         graph remains unchanged.
+		 *
+		 * @note Whether adjacency bit blocks are physically deallocated depends on
+		 *       the bitset implementation.
+		 */
+		int shrink_to_fit(std::size_t new_size);
 
 		//////////////	
 		// Basic operations	
@@ -421,16 +428,34 @@ namespace bitgraph {
 
 
 		/**
-		* @brief number of outgoing edges from v
-		* @param v input vertex
-		**/
+		 * @brief Returns the out-degree of a vertex.
+		 *
+		 * Counts the edges directed from @p v to other vertices. In an undirected
+		 * graph, this is the ordinary degree of @p v.
+		 *
+		 * @param v Vertex whose out-degree is requested.
+		 * @return Number of outgoing edges from @p v.
+		 *
+		 * @pre `0 <= v < num_vertices()`.
+		 * 
+		 * @note The implementation includes self-loops in the count.
+		 */
 		int degree_out(vertex_t v) const;
 
 
 		/**
-		* @brief number edges incident to v
-		* @param v input vertex
-		**/
+		 * @brief Returns the in-degree of a vertex.
+		 *
+		 * Counts edges directed toward @p v. In an undirected graph, this equals
+		 * the ordinary degree of @p v.
+		 *
+		 * @param v Vertex whose in-degree is requested.
+		 * @return Number of incoming edges to @p v.
+		 *
+		 * @pre `0 <= v < num_vertices()`.
+		 *
+		 * @note The implementation includes self-loops in the count.
+		 */
 		int degree_in(vertex_t v) const;
 
 		/**
@@ -459,39 +484,74 @@ namespace bitgraph {
 
 	public:
 		/**
-		* @brief adds edge {v -> w} to the graph,
-		*		 no self loops allowed
-		* @param v: outgoing endpoint
-		* @param w: ingoing endpoint
-		*
-		**/
+		 * @brief Adds a directed edge from @p v to @p w.
+		 *
+		 * If the edge already exists, the graph is unchanged. Self-loops are ignored.
+		 * The cached edge count is incremented only when a new edge is inserted.
+		 *
+		 * @param v Source vertex.
+		 * @param w Destination vertex.
+		 *
+		 * @pre `0 <= v < num_vertices()` and `0 <= w < num_vertices()`.
+		 *
+		 * @note If the edge-count cache was previously invalid, it remains invalid;
+		 *       num_edges() recomputes the count before returning it.
+		 */
 		virtual void add_edge(vertex_t v, vertex_t w);
 
 		/**
-		* @brief removes edge {v -> w} from the graph
-		* @param v outgoing endpoint
-		* @param w ingoing endpoint
-		**/
+		 * @brief Removes the directed edge from @p v to @p w.
+		 *
+		 * If the edge is absent, the graph is unchanged. Self-loops are not stored
+		 * and therefore have no effect.
+		 *
+		 * @param v Source vertex.
+		 * @param w Destination vertex.
+		 *
+		 * @pre `0 <= v < num_vertices()` and `0 <= w < num_vertices()`.
+		 *
+		 * @note If the edge-count cache is valid, it is decremented when an edge is
+		 *       removed. An invalid cache remains invalid until num_edges()
+		 *       recomputes it.
+		 */
 		virtual void remove_edge(vertex_t v, vertex_t w);
 
 		/**
-		* @brief removes edges with endpoint in v (outgoing/ingoing)
-		* @param v input vertex
-		**/
+		 * @brief Removes all edges incident to a vertex.
+		 *
+		 * Removes every outgoing edge from @p v and every incoming edge to @p v.
+		 * Any self-loop at @p v is also removed.
+		 *
+		 * @param v Vertex whose incident edges are removed.
+		 * @pre `0 <= v < num_vertices()`.
+		 *
+		 * @note The cached edge count is invalidated and will be recomputed when
+		 *       next requested.
+		 */
 		void remove_edges(vertex_t v);
 
 		/**
-		* @brief removes all edges
-		**/
+		 * @brief Removes every edge from the graph.
+		 *
+		 * The vertices and adjacency storage are retained. After this call, the
+		 * graph contains no edges and its cached edge count is zero.
+		 */
 		void remove_edges();
 
 
 		/**
-		* @brief makes all edges bidirected (conversion to undirected graph)
-		**/
+		 * @brief Adds the reverse edge for every existing directed edge.
+		 *
+		 * After this call, distinct vertices @p i and @p j are adjacent in both
+		 * directions whenever either directed edge existed before the call.
+		 * Existing edges are retained; self-loops are unchanged.
+		 *
+		 * @note The edge count remains valid because add_edge() maintains it.
+		 */
 		void make_bidirected();
 
-		//random generation
+		///////////////
+		// random generation
 
 		/**
 		* @brief generates directed edges with probability p.
@@ -535,8 +595,8 @@ namespace bitgraph {
 		void remove_vertices(const Bitset& set, Graph& g);
 
 		//////////////	
-		// deleted - CHECK	
-		virtual void remove_vertices(const Bitset& set) = delete;	//commented out implementation - EXPERIMENTAL
+		// deleted - 
+		virtual void remove_vertices(const Bitset& set) = delete;	// TODO in the future?
 
 		/////////////
 		// Boolean properties

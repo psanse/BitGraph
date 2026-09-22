@@ -10,15 +10,17 @@
 
 using namespace std;
 
-//One and only global generators
+// default global generators
 namespace bitgraph {
 	namespace com {
 		namespace _rand {   
-			iugen g_iugen(iugen::UseFixedSeed{});
-			rugen g_rugen(rugen::UseFixedSeed{});
-		}
-	}
-}
+
+			iugen g_iugen;
+			rugen g_rugen;
+
+		} // namespace _rand
+	} // namespace com
+} // namespace bitgraph
 
 
 //gloabl template variables

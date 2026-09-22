@@ -37,8 +37,8 @@ TEST(Random_Graph, ugraph){
 	RandomGen<ugraph>::create_graph(ug, 100, .30);
 	
 	//check if inside the range
-	EXPECT_GE(.33, ug.density());
-	EXPECT_LE(.27, ug.density());
+	EXPECT_GE(.301, ug.density());
+	EXPECT_LE(.290, ug.density());
 	
 	//TODO...
 }
@@ -49,8 +49,8 @@ TEST(Random_Graph, sparse_ugraph){
 	RandomGen<sparse_ugraph>::create_graph(sug, 100, .30);
 	
 	//check if inside the range
-	EXPECT_GE(.33, sug.density());
-	EXPECT_LE(.27, sug.density());
+	EXPECT_GE(.301, sug.density());
+	EXPECT_LE(.290, sug.density());
 
 	//TODO...
 	
