@@ -32,7 +32,7 @@
 #include <unordered_set>				//for all_unique
 
 #include "common_types.h"				//common types additional utilities, to be included e
-
+#include "random.h"
 
 namespace bitgraph {
 
@@ -511,286 +511,286 @@ namespace bitgraph {
 	namespace com {
 		namespace _rand {
 
-			/**
-			 * @brief Uniform random generator with shared state for each template type.
-			 *
-			 * All RandomUniformGen<D, RE> objects share one random engine, one
-			 * distribution, and one recorded seed. Seeding or changing the distribution
-			 * range through any object affects every object with the same D and RE types.
-			 *
-			 * The default constructor leaves the shared state unchanged. Constructors
-			 * taking a seed tag or an explicit seed reseed the shared engine.
-			 *
-			 * @tparam D Uniform distribution type, such as
-			 *         std::uniform_int_distribution<int>.
-			 * @tparam RE Random engine type, such as std::mt19937.
-			 *
-			 * @note Access to the shared engine and distribution is not synchronized.
-			 *       Concurrent generation or modification requires external
-			 *       synchronization.
-			 */
+			///**
+			// * @brief Uniform random generator with shared state for each template type.
+			// *
+			// * All RandomUniformGen<D, RE> objects share one random engine, one
+			// * distribution, and one recorded seed. Seeding or changing the distribution
+			// * range through any object affects every object with the same D and RE types.
+			// *
+			// * The default constructor leaves the shared state unchanged. Constructors
+			// * taking a seed tag or an explicit seed reseed the shared engine.
+			// *
+			// * @tparam D Uniform distribution type, such as
+			// *         std::uniform_int_distribution<int>.
+			// * @tparam RE Random engine type, such as std::mt19937.
+			// *
+			// * @note Access to the shared engine and distribution is not synchronized.
+			// *       Concurrent generation or modification requires external
+			// *       synchronization.
+			// */
 
-			template<
-				typename D = std::uniform_int_distribution<int>,
-				typename RE = std::mt19937
-			>
-			class RandomUniformGen {
-			public:
-				using result_type = typename D::result_type;
-				using dist_type = D;
-				using rgen_type = RE;
+			//template<
+			//	typename D = std::uniform_int_distribution<int>,
+			//	typename RE = std::mt19937
+			//>
+			//class RandomUniformGen {
+			//public:
+			//	using result_type = typename D::result_type;
+			//	using dist_type = D;
+			//	using rgen_type = RE;
 
-				/**
-				 * @brief Fixed seed used for reproducible generator initialization.
-				 */
-				constexpr static std::uint32_t FIXED_RANDOM_SEED = 123456789u;   
+			//	/**
+			//	 * @brief Fixed seed used for reproducible generator initialization.
+			//	 */
+			//	constexpr static std::uint32_t FIXED_RANDOM_SEED = 123456789u;   
 
-				/** @brief Selects initialization with FIXED_RANDOM_SEED. */
-				struct UseFixedSeed {};    
+			//	/** @brief Selects initialization with FIXED_RANDOM_SEED. */
+			//	struct UseFixedSeed {};    
 
-				/** @brief Selects initialization from a system-derived seed. */
-				struct UseRandomDevice {};     
+			//	/** @brief Selects initialization from a system-derived seed. */
+			//	struct UseRandomDevice {};     
 
-				/**
-				 * @brief Returns the lower bound of the shared distribution.
-				 * @return Current lower bound.
-				 */
-				result_type a() const { return dist_.param().a(); }
+			//	/**
+			//	 * @brief Returns the lower bound of the shared distribution.
+			//	 * @return Current lower bound.
+			//	 */
+			//	result_type a() const { return dist_.param().a(); }
 
-				/**
-				 * @brief Returns the upper bound of the shared distribution.
-				 * @return Current upper bound.
-				 *
-				 * @note For a uniform real distribution, this is an excluded upper bound.
-				 */
-				result_type b() const { return dist_.param().b(); }
-
-
-				/**
-				 * @brief Changes the default range of the shared distribution.
-				 *
-				 * The new range applies to all generators with the same D and RE types.
-				 *
-				 * @param min Lower bound.
-				 * @param max Upper bound.
-				 * @throws std::invalid_argument If @p max is less than @p min.
-				 *
-				 * @note Whether @p max is included depends on D.
-				 */
-				static void set_range(result_type min, result_type max) {
-					if (max < min) throw std::invalid_argument("set_range: max < min");
-					dist_.param(typename D::param_type{ min, max });
-				}
-
-				/**
-				 * @brief Reseeds the shared random engine.
-				 *
-				 * @param s Seed value. It is converted to RE::result_type before use.
-				 *
-				 * @note Reseeding affects all generators with the same D and RE types.
-				 */
-				static void seed(std::size_t s) {
-					seed_ = s;
-					re_.seed(static_cast<typename RE::result_type>(seed_));
-				}
-
-				/**
-				 * @brief Reseeds the shared engine from a system-derived value.
-				 *
-				 * Uses std::random_device when it reports positive entropy; otherwise,
-				 * uses the current high-resolution clock count.
-				 */
-				static void seed() {
-					std::random_device rd;
-					if (rd.entropy() > 0.0) {
-						seed_ = static_cast<std::size_t>(rd());
-					}
-					else {
-						seed_ = static_cast<std::size_t>(
-							std::chrono::high_resolution_clock::now().time_since_epoch().count()
-							);
-					}
-					re_.seed(static_cast<typename RE::result_type>(seed_));
-				}
-
-				/**
-				 * @brief Returns the last seed recorded by this class.
-				 *
-				 * @return Last seed passed to or generated by seed().
-				 *
-				 * @note This is not the engine's current state. Changes made directly through
-				 *       engine() are not reflected in this value.
-				 */
-				static std::size_t get_seed() { return seed_; }
-
-				/**
-				 * @brief Generates a value using the shared distribution's current range.
-				 * @return Generated value.
-				 */
-				result_type operator()() {	return dist_(re_);	}
-
-				/**
-				 * @brief Generates a value using a range supplied for this draw.
-				 *
-				 * Does not change the shared distribution's default range.
-				 *
-				 * @param min Lower bound.
-				 * @param max Upper bound.
-				 * @return Generated value.
-				 * @throws std::invalid_argument If @p max is less than @p min.
-				 *
-				 * @note Whether @p max is included depends on D.
-				 */
-				result_type operator()(result_type min, result_type max) {
-					if (max < min) throw std::invalid_argument("operator(min,max): max < min");
-					return dist_(re_, typename D::param_type{ min, max });
-				}
-
-				////////
-				// construction / destruction
-
-				/**
-				 * @brief Creates a generator handle without changing shared state.
-				 */
-				RandomUniformGen() = default;    
-				
-				/**
-				 * @brief Reseeds the shared engine with an explicit seed.
-				 * @param s Seed value.
-				 */
-				explicit RandomUniformGen(std::size_t s) {
-					seed(s);                   // fija semilla reproducible
-				}
-				
-				/**
-				 * @brief Reseeds the shared engine with FIXED_RANDOM_SEED.
-				 */
-				explicit RandomUniformGen(UseFixedSeed) {
-					seed(FIXED_RANDOM_SEED);
-				}
-				
-				/**
-				 * @brief Reseeds the shared engine from a system-derived value.
-				 */
-				explicit RandomUniformGen(UseRandomDevice) {
-					seed();                   
-				}
-				
-				// move / copy contructions disallowed
-				RandomUniformGen(const RandomUniformGen&) = delete;
-				RandomUniformGen& operator=(const RandomUniformGen&) = delete;
+			//	/**
+			//	 * @brief Returns the upper bound of the shared distribution.
+			//	 * @return Current upper bound.
+			//	 *
+			//	 * @note For a uniform real distribution, this is an excluded upper bound.
+			//	 */
+			//	result_type b() const { return dist_.param().b(); }
 
 
-				/**
-				 * @brief Returns modifiable access to the shared random engine.
-				 *
-				 * @return Reference to the engine shared by this specialization.
-				 *
-				 * @note Direct changes to the engine do not update get_seed().
-				 */
-				static RE& engine() { return re_; }
-				
+			//	/**
+			//	 * @brief Changes the default range of the shared distribution.
+			//	 *
+			//	 * The new range applies to all generators with the same D and RE types.
+			//	 *
+			//	 * @param min Lower bound.
+			//	 * @param max Upper bound.
+			//	 * @throws std::invalid_argument If @p max is less than @p min.
+			//	 *
+			//	 * @note Whether @p max is included depends on D.
+			//	 */
+			//	static void set_range(result_type min, result_type max) {
+			//		if (max < min) throw std::invalid_argument("set_range: max < min");
+			//		dist_.param(typename D::param_type{ min, max });
+			//	}
 
-			private:
-				/**
-				 * @brief Shared random engine for this D and RE specialization.
-				 *
-				 * Every generated value advances this engine's state.
-				 */
-				static RE re_;       
+			//	/**
+			//	 * @brief Reseeds the shared random engine.
+			//	 *
+			//	 * @param s Seed value. It is converted to RE::result_type before use.
+			//	 *
+			//	 * @note Reseeding affects all generators with the same D and RE types.
+			//	 */
+			//	static void seed(std::size_t s) {
+			//		seed_ = s;
+			//		re_.seed(static_cast<typename RE::result_type>(seed_));
+			//	}
 
-				/**
-			   * @brief Shared distribution and its current default range.
-			   *
-			   * set_range() changes this distribution for all objects of the same
-			   * specialization.
-			   */
-				static D  dist_;               
+			//	/**
+			//	 * @brief Reseeds the shared engine from a system-derived value.
+			//	 *
+			//	 * Uses std::random_device when it reports positive entropy; otherwise,
+			//	 * uses the current high-resolution clock count.
+			//	 */
+			//	static void seed() {
+			//		std::random_device rd;
+			//		if (rd.entropy() > 0.0) {
+			//			seed_ = static_cast<std::size_t>(rd());
+			//		}
+			//		else {
+			//			seed_ = static_cast<std::size_t>(
+			//				std::chrono::high_resolution_clock::now().time_since_epoch().count()
+			//				);
+			//		}
+			//		re_.seed(static_cast<typename RE::result_type>(seed_));
+			//	}
 
-				/**
-				* @brief Last seed supplied through this class's seeding functions.
-				*
-				* This records a seed value, not the current state of the engine. Direct
-				*  modifications through engine() are not reflected here.
-				*/
-				static std::size_t seed_;      
-			};
-						
+			//	/**
+			//	 * @brief Returns the last seed recorded by this class.
+			//	 *
+			//	 * @return Last seed passed to or generated by seed().
+			//	 *
+			//	 * @note This is not the engine's current state. Changes made directly through
+			//	 *       engine() are not reflected in this value.
+			//	 */
+			//	static std::size_t get_seed() { return seed_; }
 
-			// convenient aliases
-			template<typename D = std::uniform_int_distribution<int>,	typename RE = std::mt19937>
-			using ugen = RandomUniformGen<D, RE>;
+			//	/**
+			//	 * @brief Generates a value using the shared distribution's current range.
+			//	 * @return Generated value.
+			//	 */
+			//	result_type operator()() {	return dist_(re_);	}
 
-			using iugen = RandomUniformGen<std::uniform_int_distribution<int>, std::mt19937>;
-			using rugen = RandomUniformGen<std::uniform_real_distribution<double>, std::mt19937>;
+			//	/**
+			//	 * @brief Generates a value using a range supplied for this draw.
+			//	 *
+			//	 * Does not change the shared distribution's default range.
+			//	 *
+			//	 * @param min Lower bound.
+			//	 * @param max Upper bound.
+			//	 * @return Generated value.
+			//	 * @throws std::invalid_argument If @p max is less than @p min.
+			//	 *
+			//	 * @note Whether @p max is included depends on D.
+			//	 */
+			//	result_type operator()(result_type min, result_type max) {
+			//		if (max < min) throw std::invalid_argument("operator(min,max): max < min");
+			//		return dist_(re_, typename D::param_type{ min, max });
+			//	}
+
+			//	////////
+			//	// construction / destruction
+
+			//	/**
+			//	 * @brief Creates a generator handle without changing shared state.
+			//	 */
+			//	RandomUniformGen() = default;    
+			//	
+			//	/**
+			//	 * @brief Reseeds the shared engine with an explicit seed.
+			//	 * @param s Seed value.
+			//	 */
+			//	explicit RandomUniformGen(std::size_t s) {
+			//		seed(s);                   // fija semilla reproducible
+			//	}
+			//	
+			//	/**
+			//	 * @brief Reseeds the shared engine with FIXED_RANDOM_SEED.
+			//	 */
+			//	explicit RandomUniformGen(UseFixedSeed) {
+			//		seed(FIXED_RANDOM_SEED);
+			//	}
+			//	
+			//	/**
+			//	 * @brief Reseeds the shared engine from a system-derived value.
+			//	 */
+			//	explicit RandomUniformGen(UseRandomDevice) {
+			//		seed();                   
+			//	}
+			//	
+			//	// move / copy contructions disallowed
+			//	RandomUniformGen(const RandomUniformGen&) = delete;
+			//	RandomUniformGen& operator=(const RandomUniformGen&) = delete;
 
 
-			// Initial recorded seed for each distribution/engine specialization.
-			template<typename D, typename RE>
-			std::size_t RandomUniformGen<D, RE>::seed_ =
-				RandomUniformGen<D, RE>::FIXED_RANDOM_SEED;
+			//	/**
+			//	 * @brief Returns modifiable access to the shared random engine.
+			//	 *
+			//	 * @return Reference to the engine shared by this specialization.
+			//	 *
+			//	 * @note Direct changes to the engine do not update get_seed().
+			//	 */
+			//	static RE& engine() { return re_; }
+			//	
+
+			//private:
+			//	/**
+			//	 * @brief Shared random engine for this D and RE specialization.
+			//	 *
+			//	 * Every generated value advances this engine's state.
+			//	 */
+			//	static RE re_;       
+
+			//	/**
+			//   * @brief Shared distribution and its current default range.
+			//   *
+			//   * set_range() changes this distribution for all objects of the same
+			//   * specialization.
+			//   */
+			//	static D  dist_;               
+
+			//	/**
+			//	* @brief Last seed supplied through this class's seeding functions.
+			//	*
+			//	* This records a seed value, not the current state of the engine. Direct
+			//	*  modifications through engine() are not reflected here.
+			//	*/
+			//	static std::size_t seed_;      
+			//};
+			//			
+
+			//// convenient aliases
+			//template<typename D = std::uniform_int_distribution<int>,	typename RE = std::mt19937>
+			//using ugen = RandomUniformGen<D, RE>;
+
+			//using iugen = RandomUniformGen<std::uniform_int_distribution<int>, std::mt19937>;
+			//using rugen = RandomUniformGen<std::uniform_real_distribution<double>, std::mt19937>;
 
 
-			// Initial engine state for each specialization.
-			template<typename D, typename RE>
-			RE RandomUniformGen<D, RE>::re_{
-				static_cast<typename RE::result_type>(
-					RandomUniformGen<D, RE>::FIXED_RANDOM_SEED)
-			};
+			//// Initial recorded seed for each distribution/engine specialization.
+			//template<typename D, typename RE>
+			//std::size_t RandomUniformGen<D, RE>::seed_ =
+			//	RandomUniformGen<D, RE>::FIXED_RANDOM_SEED;
 
-			// Default distribution and range for each specialization.
-			template<typename D, typename RE>
-			D RandomUniformGen<D, RE>::dist_{};
+
+			//// Initial engine state for each specialization.
+			//template<typename D, typename RE>
+			//RE RandomUniformGen<D, RE>::re_{
+			//	static_cast<typename RE::result_type>(
+			//		RandomUniformGen<D, RE>::FIXED_RANDOM_SEED)
+			//};
+
+			//// Default distribution and range for each specialization.
+			//template<typename D, typename RE>
+			//D RandomUniformGen<D, RE>::dist_{};
 
 		
-			///////////////////////////////////
-			// default generators for uniform distributions
+			/////////////////////////////////////
+			//// default generators for uniform distributions
 
-			/**
-			 * @brief Default handle for generating uniform integers.
-			 *
-			 * Shares its engine and distribution with all other iugen objects.
-			 */
-			extern iugen g_iugen;   // integer (uniform_int)
+			///**
+			// * @brief Default handle for generating uniform integers.
+			// *
+			// * Shares its engine and distribution with all other iugen objects.
+			// */
+			//extern iugen g_iugen;   // integer (uniform_int)
 
-			/**
-			 * @brief Default handle for generating uniform real values.
-			 *
-			 * Shares its engine and distribution with all other rugen objects.
-			 */
-			extern rugen g_rugen;
-					
+			///**
+			// * @brief Default handle for generating uniform real values.
+			// *
+			// * Shares its engine and distribution with all other rugen objects.
+			// */
+			//extern rugen g_rugen;
+			//		
 
-			/**
-			 * @brief Returns true with probability @p p.
-			 * @param p Probability of returning true.
-			 * @return Result of the random trial.
-			 * @pre `0.0 <= p <= 1.0`.
-			 */
-			inline
-			bool uniform_dist(double p)
-			{				
-				assert(p >= 0.0 && p <= 1.0); // Rejects NaN too.						
-								
-				// Distribution range guaranteed to be in [0, 1)
-				return g_rugen() < p;   
+			///**
+			// * @brief Returns true with probability @p p.
+			// * @param p Probability of returning true.
+			// * @return Result of the random trial.
+			// * @pre `0.0 <= p <= 1.0`.
+			// */
+			//inline
+			//bool uniform_dist(double p)
+			//{				
+			//	assert(p >= 0.0 && p <= 1.0); // Rejects NaN too.						
+			//					
+			//	// Distribution range guaranteed to be in [0, 1)
+			//	return g_rugen() < p;   
 
-				//B) if distribution range is not guaranteed to be in [0, 1)
-				//const double sample = std::generate_canonical<
-				//	double,
-				//	std::numeric_limits<double>::digits		// typically 53 for double
-				//>(g_rugen.engine());
-				//return sample < p;
+			//	//B) if distribution range is not guaranteed to be in [0, 1)
+			//	//const double sample = std::generate_canonical<
+			//	//	double,
+			//	//	std::numeric_limits<double>::digits		// typically 53 for double
+			//	//>(g_rugen.engine());
+			//	//return sample < p;
 
-				//C) generates a distribution each time - not for hot paths
-				//std::bernoulli_distribution trial(p);
-				//return trial(g_rugen.engine());					
+			//	//C) generates a distribution each time - not for hot paths
+			//	//std::bernoulli_distribution trial(p);
+			//	//return trial(g_rugen.engine());					
 
-				//D) windows generator (deprecated)
-			   /* double n_01=std::rand()/(double)RAND_MAX;
-				return (n_01<=p);*/						
-				
-			}			
+			//	//D) windows generator (deprecated)
+			//   /* double n_01=std::rand()/(double)RAND_MAX;
+			//	return (n_01<=p);*/						
+			//	
+			//}			
 
 		}
 	}
@@ -909,12 +909,12 @@ namespace bitgraph {
 	}//end namespace com
 	
 	//provides access to third party code to bitgraph::com inside the bitgraph namespace
-	using namespace com;
+	//using namespace com;
 
 	using namespace com::_stl;
 	using namespace com::_time;
 	using namespace com::_sort;
-	using namespace com::_rand;	
+	//using namespace com::_rand;	
 	using namespace com::_dir;
 
 

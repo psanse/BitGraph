@@ -4,6 +4,7 @@
 
 file(GLOB HEADER_FILES   ${CMAKE_CURRENT_SOURCE_DIR}/*.h 
                          ${CMAKE_CURRENT_SOURCE_DIR}/info/*.h
+                         ${CMAKE_CURRENT_SOURCE_DIR}/detail/*.h
 )
 
 #creates utils library
@@ -13,7 +14,8 @@ add_library (utils STATIC
     #batch_analyser.cpp
     common.cpp
     common_types.cpp
-    info/info_base.cpp   
+    info/info_base.cpp  
+    random.cpp 
     #logger.cpp 
     ${HEADER_FILES}
 )

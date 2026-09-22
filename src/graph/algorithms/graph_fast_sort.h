@@ -613,10 +613,10 @@ namespace bitgraph {
 	{
 
 		VertexOrdering kord;
-		_sort::fill_vertices(kord, first_k);
+		com::_sort::fill_vertices(kord, first_k);
 
 		//////////////////////////////////////////////////////
-		has_greater_val<int, VertexOrdering> pred(nb_neigh_);
+		com::has_greater_val<int, VertexOrdering> pred(nb_neigh_);
 		//////////////////////////////////////////////////////
 
 		std::stable_sort(kord.begin(), kord.end(), pred);
@@ -644,7 +644,7 @@ namespace bitgraph {
 		}
 
 		//////////////////////////////////////////////////////
-		has_greater_val<int, VertexOrdering> pred(nb_neigh_);
+		com::has_greater_val<int, VertexOrdering> pred(nb_neigh_);
 		//////////////////////////////////////////////////////
 
 		std::stable_sort(kord.begin(), kord.end(), pred);
@@ -665,10 +665,10 @@ namespace bitgraph {
 	template<class GraphT>
 	inline const VertexOrdering& GraphFastRootSort<GraphT>::sort_non_decreasing_deg(int first_k, bool rev) {
 		VertexOrdering kord;
-		_sort::fill_vertices(kord, first_k);
+		com::_sort::fill_vertices(kord, first_k);
 
 		//////////////////////////////////////////////////////
-		has_smaller_val<int, VertexOrdering> pred(nb_neigh_);
+		com::has_smaller_val<int, VertexOrdering> pred(nb_neigh_);
 		//////////////////////////////////////////////////////
 
 		std::stable_sort(kord.begin(), kord.end(), pred);
@@ -696,7 +696,7 @@ namespace bitgraph {
 		}
 
 		//////////////////////////////////////////////////////
-		has_smaller_val<int, VertexOrdering> pred(nb_neigh_);
+		com::has_smaller_val<int, VertexOrdering> pred(nb_neigh_);
 		//////////////////////////////////////////////////////
 
 		std::stable_sort(kord.begin(), kord.end(), pred);
@@ -729,7 +729,7 @@ namespace bitgraph {
 	inline
 	const VertexOrdering& GraphFastRootSort<GraphT>::sort_non_increasing_deg(bool rev) {
 		set_ordering();
-		has_greater_val<int, VertexOrdering> pred(nb_neigh_);
+		com::has_greater_val<int, VertexOrdering> pred(nb_neigh_);
 		std::stable_sort(nodes_.begin(), nodes_.end(), pred);
 		if (rev) {
 			std::reverse(nodes_.begin(), nodes_.end());
@@ -742,7 +742,7 @@ namespace bitgraph {
 	inline
 	const VertexOrdering& GraphFastRootSort<GraphT>::sort_non_decreasing_deg(bool rev) {
 		set_ordering();
-		has_smaller_val<int, VertexOrdering> pred(nb_neigh_);
+		com::has_smaller_val<int, VertexOrdering> pred(nb_neigh_);
 		std::stable_sort(nodes_.begin(), nodes_.end(), pred);
 
 		if (rev) {
@@ -755,7 +755,7 @@ namespace bitgraph {
 	inline
 	const VertexOrdering& GraphFastRootSort<GraphT>::sort_non_increasing_deg_with_support_tb(bool rev) {
 		set_ordering();
-		has_greater_val_with_tb<int, VertexOrdering> pred(nb_neigh_, deg_neigh_);
+		com::has_greater_val_with_tb<int, VertexOrdering> pred(nb_neigh_, deg_neigh_);
 		std::stable_sort(nodes_.begin(), nodes_.end(), pred);
 
 		if (rev) {
@@ -768,7 +768,7 @@ namespace bitgraph {
 	inline auto
 	GraphFastRootSort<GraphT>::sort_non_decreasing_deg_with_support_tb(bool rev) -> const VertexOrdering& {
 		set_ordering();
-		has_smaller_val_with_tb<int, VertexOrdering> pred(nb_neigh_, deg_neigh_);
+		com::has_smaller_val_with_tb<int, VertexOrdering> pred(nb_neigh_, deg_neigh_);
 		std::stable_sort(nodes_.begin(), nodes_.end(), pred);
 
 		if (rev) {
@@ -811,13 +811,13 @@ namespace bitgraph {
 	{
 		switch (type) {
 		case PRINT_DEGREE:
-			bitgraph::_stl::print_collection(nb_neigh_, o, eofl);			
+			bitgraph::com::_stl::print_collection(nb_neigh_, o, eofl);			
 			break;
 		case PRINT_SUPPORT:
-			bitgraph::_stl::print_collection(deg_neigh_, o, eofl);			
+			bitgraph::com::_stl::print_collection(deg_neigh_, o, eofl);			
 			break;
 		case PRINT_NODES:
-			bitgraph::_stl::print_collection(nodes_, o, eofl);
+			bitgraph::com::_stl::print_collection(nodes_, o, eofl);
 			break;
 		default:
 			LOG_ERROR("unknown print type- GraphFastRootSort<GraphT>::print()");

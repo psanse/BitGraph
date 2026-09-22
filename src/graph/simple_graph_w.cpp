@@ -294,7 +294,7 @@ int Base_Graph_W<GraphT, WeightT>::read_dimacs (string filename, int type)
 
 	std::getline(f, line);
 	stringstream sstr(line);
-	int nw = _count::number_of_words (line /*sstr.str()*/);
+	int nw = com::_count::number_of_words (line /*sstr.str()*/);
 
 	//assert
 	if(nw != 3){
@@ -449,7 +449,7 @@ ostream& Base_Graph_W<GraphT, WeightT>::print_weights (ostream& o, bool show_v) 
 		}
 		o << endl;
 	}else{
-		_stl::print_collection<vector<Weight>>(w_, o, true);
+		com::_stl::print_collection<vector<Weight>>(w_, o, true);
 	}
 	return o;
 }

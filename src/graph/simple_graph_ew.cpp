@@ -281,7 +281,7 @@ int Base_Graph_EW<GraphT, WeightT>::read_dimacs (string filename){
 	 stringstream sstr(line);
 
 	 //determine if edge weights are present
-	 int nw = _count::number_of_words(line);
+	 int nw = com::_count::number_of_words(line);
 	 bool edge_weights_found = true;
 	 switch (nw) {
 	 case 4: edge_weights_found = true;	break; 		//expected: e <v> <w> <edge-weight> 
@@ -592,10 +592,10 @@ void Base_Graph_EW<GraphT, WeightT>::gen_random_edges(double p, Weight val)
 		for (auto j = i + 1; j < NV; ++j) {
 
 			//considers both directed edges separately
-			if (_rand::uniform_dist(p)) {
+			if (com::uniform_dist(p)) {
 				add_edge(i, j, val);				
 			}
-			if (_rand::uniform_dist(p)) {
+			if (com::uniform_dist(p)) {
 				add_edge(j, i, val);
 			}
 		}

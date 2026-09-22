@@ -349,7 +349,7 @@ namespace bitgraph{
 
 		//add slash '/' at the end to the path if required
 		std::string mypath(path);
-		_dir::append_slash(mypath);
+		com::_dir::append_slash(mypath);
 
 		for (auto i = rd.nLB; i <= rd.nUB; i += rd.incN) {
 			for (double j = rd.pLB; j <= rd.pUB; j += rd.incP) {
@@ -500,7 +500,7 @@ namespace bitgraph{
 
 			//determines the filename
 			std::string path = FILE_PATH;
-			_dir::append_slash(path);
+			com::_dir::append_slash(path);
 			std::string filename = path + g.graph().name() + FILE_EXTENSION;
 
 			//streams weights to file
@@ -540,7 +540,7 @@ namespace bitgraph{
 
 			//determines the filename
 			std::string path = FILE_PATH;
-			_dir::append_slash(path);
+			com::_dir::append_slash(path);
 			std::string filename = path + g.graph().name() + FILE_EXTENSION;
 
 			//streams weights to file

@@ -52,6 +52,6 @@ int main(int argc, char** argv){
 
 	//I/O
 	LOGG_INFO("\n[t:" , time_sec , "," , " Smax:" , heurCLQ.size() , "]\n");
-	_stl::print_collection(heurCLQ);
+	com::_stl::print_collection(heurCLQ);
 }
 

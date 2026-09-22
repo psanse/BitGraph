@@ -11,16 +11,16 @@
 using namespace std;
 
 // default global generators
-namespace bitgraph {
-	namespace com {
-		namespace _rand {   
-
-			iugen g_iugen;
-			rugen g_rugen;
-
-		} // namespace _rand
-	} // namespace com
-} // namespace bitgraph
+//namespace bitgraph {
+//	namespace com {
+//		namespace _rand {   
+//
+//			iugen g_iugen;
+//			rugen g_rugen;
+//
+//		} // namespace _rand
+//	} // namespace com
+//} // namespace bitgraph
 
 
 //gloabl template variables
