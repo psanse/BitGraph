@@ -268,7 +268,6 @@ namespace bitgraph {
 			adj_[v].shrink_to_fit();
 		}
 
-
 		edge_count_valid_ = false;
 	}
 
@@ -704,11 +703,13 @@ namespace bitgraph {
 
 	template<class BitsetT>
 	inline
-		bool Graph<BitsetT>::is_self_loop() const {
-		for (auto i = 0u; i < NV_; i++)
-			if (adj_[i].is_bit(i)) {
+		bool Graph<BitsetT>::is_self_loop() const 
+	{
+		for (vertex_t v = 0; v < NV_; ++v) {
+			if (adj_[v].is_bit(v)) {
 				return true;
 			}
+		}
 		return false;
 	}
 
