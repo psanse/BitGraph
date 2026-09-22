@@ -212,7 +212,7 @@ namespace bitgraph {
 		 * @note Operations that modify the adjacency matrix must update or invalidate
 		 *       NE_ to prevent a stale (wrong) nonzero result.
 		 */
-		virtual	std::size_t num_edges(bool lazy = true);
+		virtual	std::size_t num_edges(bool lazy = true) const;
 
 		/**
 		* @brief Counts the number of edges	in an induced subgraph by a set of vertices
@@ -341,7 +341,7 @@ namespace bitgraph {
 		 *       maximum-edge formula. For example, an undirected simple graph uses
 		 *       \f$|V|(|V|-1)/2\f$.
 		 */
-		virtual	double density(bool lazy = true);
+		virtual	double density(bool lazy = true) const;
 
 		/**
 		 * @brief Computes the density of the subgraph induced by @p vertices.
@@ -637,9 +637,19 @@ namespace bitgraph {
 		std::ostream& name_dimacs(std::ostream& o = std::cout) const;
 
 		/**
-		* @brief writes graph header for dimacs format
-		**/
-		std::ostream& header_dimacs(std::ostream& o = std::cout, bool lazy = true);
+		 * @brief Writes the DIMACS problem line for this graph.
+		 *
+		 * Writes `p edge n m`, where `n` is the number of vertices and `m` is the
+		 * number of edges.
+		 *
+		 * @param out Output stream.
+		 * @param lazy If `true`, num_edges() may use a valid cached edge count.
+		 *             If `false`, the edge count is recomputed.
+		 * @return Reference to @p out.
+		 */
+		std::ostream& header_dimacs(
+			std::ostream& o = std::cout,
+			bool lazy = true);
 
 		/*
 		* @brief writes directed graph in edge list format
@@ -648,34 +658,65 @@ namespace bitgraph {
 		virtual	void  write_EDGES(std::ostream& o);
 
 		////////////
-		// I/O operations
+		// I/O 
 
 		/**
-		* @brief prints basic data of the graph to the output stream (n, m and density)
-		* @param lazy if TRUE, reads the number of edges from the cached value @NE_ to compute density
-		* @details Uses the Template Method Pattern (num_edges will be overriden in derived classes)
-		* @details Density can be a heavy operation to compute, since it requires the number of edges.
-		*		   If  @lazy is TRUE the number of edges is read from the cached value @NE_
-		**/
-		ostream& print_data(bool lazy = true, std::ostream & = std::cout, bool eofl = true);
+		 * @brief Writes the graph's vertex count, edge count, and density.
+		 *
+		 * The edge count and density are obtained through num_edges() and density(),
+		 * so derived graph types use their corresponding implementations.
+		 *
+		 * @param lazy If `true`, a valid cached edge count may be used. If `false`,
+		 *             the edge count is recomputed from the adjacency matrix.
+		 * @param out Output stream.
+		 * @param trailing_new_line If `true`, appends a newline after the data.
+		 * @return Reference to @p out.
+		 *
+		 * @note Recomputing the edge count may be costly for large graphs.
+		 */
+		ostream& print_data(
+			bool lazy = true,
+			std::ostream & = std::cout, 
+			bool trailing_new_line = true) const;
 
 		/**
-		* @brief Adjacency matrix to the output stream, in a readable 0-1 format
-		**/
-		ostream& print_adj(std::ostream & = std::cout, bool eofl = true) const;
+		 * @brief Writes the adjacency matrix in a readable 0–1 format.
+		 *
+		 * Each row represents a vertex, and each column indicates whether an edge
+		 * from that vertex to the corresponding vertex exists.
+		 *
+		 * @param out Output stream.
+		 * @param trailing_new_line If `true`, appends a newline after the matrix.
+		 * @return Reference to @p out.
+		 */
+		ostream& print_adj(
+			std::ostream & = std::cout, 
+			bool trailing_new_line = true) const;
 
 		/**
-		* @brief streams edges of the graph to the output stream in format [v]-->[w]
-		**/
-		virtual ostream& print_edges(std::ostream & = std::cout, bool eofl = false);
+		 * @brief Writes the graph's edges in `[v]-->[w]` format.
+		 *
+		 * For a directed graph, each edge is written from its source vertex to its
+		 * destination vertex. Derived graph types may override this function to
+		 * control how their edges are listed.
+		 *
+		 * @param out Output stream.
+		 * @param trailing_new_line If `true`, appends a newline after the final edge.
+		 * @return Reference to @p out.
+		 */
+		virtual ostream& print_edges(
+			std::ostream & = std::cout, 
+			bool trailing_new_line = false);
 
 		/*
 		* @brief streams edges of the subgraph induced by a set of vertices to output stream
 		* @param bbsg input (bit) set of vertices
 		* @param o output stream
 		*/
-		template <class U = vertex_bitset_t>
-		ostream& print_edges(U& bbsg, ostream& o = std::cout)	const;
+		//template <class U = vertex_bitset_t>
+		ostream& print_edges(
+			const vertex_bitset_t& bbsg,
+			ostream& o = std::cout)	const;
 
 
 		//////////////////
@@ -717,7 +758,7 @@ namespace bitgraph {
 		* This value may be recomputed by num_edges() when lazy evaluation is
 		* disabled or the edge count is no longer valid.
 		*/
-		std::size_t NE_;
+		mutable std::size_t NE_;
 
 		/**
 		 * @brief Indicates whether NE_ contains the current number of edges.
@@ -725,7 +766,7 @@ namespace bitgraph {
 		 * If false, num_edges() must recompute the edge count from the adjacency
 		 * matrix before returning or caching it.
 		 */
-		bool edge_count_valid_ = false;
+		mutable bool edge_count_valid_ = false;
 
 		/**
 		* @brief Number of bit blocks required for each adjacency row.

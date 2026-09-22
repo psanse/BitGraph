@@ -29,6 +29,7 @@ add_library  (
     simple_graph_ew.cpp
     formats/detail/mmio.cpp
     algorithms/decode.cpp
+    algorithms/graph_conversions.cpp
     ${HEADER_FILES}
 )
 

@@ -171,7 +171,7 @@ namespace bitgraph {
 		* @param lazy if TRUE (reads value @NE_)
 		*			  if FALSE counts and updates @NE_
 		**/
-		std::size_t num_edges(bool lazy = true)	 override;
+		std::size_t num_edges(bool lazy = true)	const override;
 
 		/**
 		* @brief Counts the number of edges	in an induced subgraph by a set of vertices
@@ -197,7 +197,7 @@ namespace bitgraph {
 		 * @return Graph density in the interval `[0,1]`. Returns `0.0` when the graph
 		 *         contains fewer than two vertices.
 		 */
-		double density(bool lazy = true) override;
+		double density(bool lazy = true) const override;
 	
 		/**
 		 * @brief Computes the density of the undirected subgraph induced by

@@ -31,7 +31,8 @@ namespace bitgraph {
 
 	template<>
 	inline
-	std::size_t Ugraph<BBScanSp>::num_edges(bool lazy) {
+	std::size_t Ugraph<BBScanSp>::num_edges(bool lazy) const
+	{
 
 		if (lazy || !this->edge_count_valid_ ) {
 

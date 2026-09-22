@@ -206,7 +206,7 @@ namespace bitgraph {
 
 	template<class BitsetT>
 	inline
-		std::size_t Ugraph<BitsetT>::num_edges(bool lazy ) {
+		std::size_t Ugraph<BitsetT>::num_edges(bool lazy ) const {
 
 		if (!lazy || !this->edge_count_valid_ ) {
 			this->NE_ = 0;
@@ -337,7 +337,7 @@ namespace bitgraph {
 
 	template<class BitsetT>
 	inline
-		double Ugraph<BitsetT>::density(bool lazy)
+		double Ugraph<BitsetT>::density(bool lazy) const
 	{
 
 		if (this->NV_ < 2) { return 0.0; }

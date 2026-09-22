@@ -42,6 +42,8 @@ namespace bitgraph{
 			newg.adj_[v].clear_bit(first_k, EMPTY_ELEM);		//closed range
 		}
 
+		// edges count is not valid for the new graph, so it will be recomputed when needed
+		newg.edge_count_valid_ = false;		
 		return newg;
 	}
 

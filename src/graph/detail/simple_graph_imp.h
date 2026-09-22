@@ -66,15 +66,16 @@ namespace bitgraph {
 	}
 
 	template<class BitsetT>
-	template<class U>
+	//template<class U>
 	inline
-		std::ostream& Graph<BitsetT>::print_edges(U& bbsg, std::ostream& o) const {
+		std::ostream& Graph<BitsetT>::print_edges(const vertex_bitset_t& bbsg, std::ostream& o) const
+	{
 
-		for (int i = 0; i < NV_ - 1; i++) {
+		for (vertex_t i = 0; i < NV_ - 1; i++) {
 
 			if (!bbsg.is_bit(i)) continue;
 
-			for (int j = i + 1; j < NV_; j++) {
+			for (vertex_t j = i + 1; j < NV_; j++) {
 
 				if (!bbsg.is_bit(j)) continue;
 
@@ -258,6 +259,8 @@ namespace bitgraph {
 			newg.adj_[i].block(bbh) &= ~Tables::mask_high[WMOD(first_k - 1)];
 		}
 
+		// edges count is not valid for the new graph, so it will be recomputed when needed
+		newg.edge_count_valid_ = false;		
 		return newg;
 	}
 
@@ -534,7 +537,8 @@ namespace bitgraph {
 
 	template<class BitsetT>
 	inline
-		ostream& Graph<BitsetT>::print_data(bool lazy, std::ostream& o, bool eofl) {
+		ostream& Graph<BitsetT>::print_data(bool lazy, std::ostream& o, bool eofl) const
+	{
 
 		if (!name_.empty()) { o << name_.c_str() << '\t'; }
 
@@ -618,12 +622,8 @@ namespace bitgraph {
 
 	template<class BitsetT>
 	inline
-		std::size_t Graph<BitsetT>::num_edges(bool lazy) {
-
-		/*
-		 * NE_ == 0 also acts as the "not yet computed" sentinel.
-		 * Consequently, an edgeless graph is rescanned on every lazy call.
-		 */
+		std::size_t Graph<BitsetT>::num_edges(bool lazy) const {
+				
 		if (!lazy || !edge_count_valid_ ) {					
 			NE_ = 0;
 
@@ -652,7 +652,7 @@ namespace bitgraph {
 	 */
 	template<class BitsetT>
 	inline
-		double Graph<BitsetT>::density(bool lazy)
+		double Graph<BitsetT>::density(bool lazy) const
 	{
 		if (NV_ < 2) {	return 0.0; }
 

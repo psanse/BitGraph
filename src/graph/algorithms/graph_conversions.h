@@ -1,111 +1,45 @@
-/**
- * @file graph_conversions.h 
- * @brief sconversions between different graph types of the GRAPH library 
- *
- * @creation_date 25/11/16
- * @last_update 30/06/25
- * @author pss
- *
- * @todo change design in the future 01/02/2026
- **/
+ /**
+  * @file graph_conversions.h
+  * @brief Declares conversions between dense and sparse undirected graphs.
+  *
+  * The convert_graph() overloads copy a graph between the ugraph and
+  * sparse_ugraph representations. The destination graph is reset, so its
+  * previous contents are discarded. Vertex indices and adjacency are
+  * preserved.
+  *
+  * @date Created: 22/09/2026
+  * @author Pablo San Segundo
+  */
 
-#ifndef __GRAPH_TYPE_CONVERSIONS_H__
-#define	__GRAPH_TYPE_CONVERSIONS_H__
-
-//#include "graph/simple_ugraph.h"								//legacy - to remove
+#ifndef BITGRAPH_GRAPH_CONVERSIONS_H
+#define BITGRAPH_GRAPH_CONVERSIONS_H
 
 #include "graph/graph_unweighted.h"
-#include "utils/common.h"
-#include "utils/logger.h"
-#include <iostream>
 
 namespace bitgraph {
-	
-	namespace detail {
 
-		////////////////////////
-		//
-		// GraphConversion 
-		// 
-		// Conversions between different graph types of the GRAPH library
-		// (stateless - globals)
-		// 
-		// Comment: namespace is not used for a clean friendship declaration in the Graph classes
-		//
-		////////////////////////
-
-		class GraphConversion {
-		public:
-
-			//constructor - deleted
-			GraphConversion() = delete;
-
-			/*
-			* @brief conversion from sparse_ugraph to ugraph
-			* @details: failfast policy - exits if memory allocation fails
-			* @date	25/11/16
-			*/
-			static void sug2ug(const sparse_ugraph& sug, ugraph& ug)
-			{
-
-				auto NV = sug.num_vertices();
-
-				//allocation - empty graph of size NV
-				ug.reset(NV);
-
-				//copies adjacency (non-empty) block array
-				for (auto v = 0; v < NV; ++v) {
-					for (auto it = sug.adj_[v].cbegin(); it != sug.adj_[v].cend(); ++it) {
-
-						////////////////////////////////////////////////////
-						ug.adj_[v].block(it->idx_) = it->bb_;
-						////////////////////////////////////////////////////
-
-					}
-				}
-
-				//name
-				ug.set_name(sug.name());
-			}
+	/**
+	 * @brief Converts a sparse undirected graph to a dense graph.
+	 *
+	 * @param source Sparse input graph.
+	 * @param destination Dense output graph. Its previous contents are discarded.
+	 *
+	 * @note The destination's edge count is recomputed when next requested.
+	 */
+	void convert_graph(const sparse_ugraph& source, ugraph& destination);
 
 
-			/*
-			* @brief conversion from ugraph to sparse_ugraph
-			* @details: fast-fail policy- exits if error
-			* @date	25/11/16
-			*/
-			static	void ug2sug(const ugraph& ug, sparse_ugraph& sug)
-			{
-				auto NV = ug.num_vertices();
+	/**
+	 * @brief Converts a dense undirected graph to a sparse graph.
+	 *
+	 * @param source Dense input graph.
+	 * @param destination Sparse output graph. Its previous contents are discarded.
+	 *
+	 * @note The destination's edge count is recomputed when next requested.
+	 */
+	void convert_graph(const ugraph& source, sparse_ugraph& destination);
 
-				//allocation - empty graph of size NV
-				sug.reset(NV);
+} // namespace bitgraph
 
-				//add edges	
-				auto blockID = ug.num_blocks();
-				for (auto v = 0; v < NV; ++v) {
-					for (auto nBB = 0; nBB < blockID; ++nBB) {
+#endif // BITGRAPH_GRAPH_CONVERSIONS_H
 
-						BITBOARD bb = ug.adj_[v].block(nBB);
-						if (bb != 0) {
-							////////////////////////////////////////////////////
-							sug.adj_[v].bitset().emplace_back(nBB, bb);
-							////////////////////////////////////////////////////
-						}
-
-					}
-				}
-
-				//name
-				sug.set_name(ug.name());
-
-			}
-
-		};
-
-	} //end of namespace detail
-
-}//end of namespace bitgraph
-
-
-#endif
