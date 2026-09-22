@@ -15,9 +15,6 @@
 #define BITGRAPH_GRAPH_SIMPLE_UGRAPH_H
 
 #include "simple_graph.h"
-#include "utils/prec_timer.h"
-#include "graph_types.h"
-
 
 namespace bitgraph {
 	

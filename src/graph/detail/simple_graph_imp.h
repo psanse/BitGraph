@@ -21,11 +21,6 @@
 #ifndef BITGRAPH_GRAPH_SIMPLE_GRAPH_IMP_H
 #define BITGRAPH_GRAPH_SIMPLE_GRAPH_IMP_H
 
-#include "graph/formats/detail/dimacs_format.h"
-#include "graph/formats/detail/edges_format.h"
-#include "graph/formats/detail/matrix_market_format.h"
-
-
 namespace bitgraph {
 	
 	template <class U>
@@ -98,7 +93,7 @@ namespace bitgraph {
 	template<class BitsetT>
 	inline
 		Graph<BitsetT>::Graph(void) noexcept :
-		NV_(0), NE_(0), NBB_(0), edge_count_valid_(false),
+		NV_(0), NBB_(0), NE_(0),edge_count_valid_(false),
 		name_(""), path_("")
 	{ }
 
@@ -140,7 +135,7 @@ namespace bitgraph {
 			}
 		}
 
-		edge_count_valid_ = true;  // The edge count is valid after constructing from an adjacency matrix.
+		// note: the edge count NE_ is valid 
 	}
 
 

@@ -37,18 +37,14 @@
 #define BITSCAN_GRAPH_SIMPLE_GRAPH_H
 
 #include "bitscan/bitscan.h"	
-#include "graph_types.h"
-//#include "formats/dimacs_format.h"
-//#include "formats/detail/mmio.h"
-//#include "formats/edges_format.h"
-//#include "formats/mmx_format.h"
-
 #include "utils/logger.h"
-//#include "utils/prec_timer.h"
+#include "utils/prec_timer.h"
+#include "graph_types.h"
+#include "graph/formats/detail/dimacs_format.h"
+#include "graph/formats/detail/edges_format.h"
+#include "graph/formats/detail/matrix_market_format.h"
 
 #include <iostream>
-//#include <iomanip>
-//#include <fstream>
 #include <string>
 #include <vector>
 
@@ -774,7 +770,15 @@ namespace bitgraph {
 		/**
 		* @brief Number of vertices in the graph.
 		*/
-		int NV_ = 0;								
+		int NV_ = 0;
+
+		/**
+		* @brief Number of bit blocks required for each adjacency row.
+		*
+		* For sparse bitset representations, this is the maximum possible number
+		* of blocks rather than the number currently allocated in every row.
+		*/
+		int NBB_ = 0;
 
 		/**
 		* @brief Cached number of edges in the graph.
@@ -783,22 +787,15 @@ namespace bitgraph {
 		* disabled or the edge count is no longer valid.
 		*/
 		mutable std::size_t NE_;
-
+			
+		
 		/**
 		 * @brief Indicates whether NE_ contains the current number of edges.
 		 *
 		 * If false, num_edges() must recompute the edge count from the adjacency
 		 * matrix before returning or caching it.
 		 */
-		mutable bool edge_count_valid_ = false;
-
-		/**
-		* @brief Number of bit blocks required for each adjacency row.
-		*
-		* For sparse bitset representations, this is the maximum possible number
-		* of blocks rather than the number currently allocated in every row.
-		*/
-		int NBB_ = 0;								
+		mutable bool edge_count_valid_ = false;								
 
 		/**
 		 * @brief Graph instance name without its directory path.
