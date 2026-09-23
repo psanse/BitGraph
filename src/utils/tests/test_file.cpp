@@ -10,7 +10,7 @@
 #include <iostream>
 #include <sstream>
 #include "gtest/gtest.h"
-#include "utils/file.h"
+#include "utils/file_utils.h"
 
 using namespace std;
 using namespace bitgraph;
@@ -39,7 +39,7 @@ TEST(FileTest, WriteToFile) {
     const char* filename = "test_write.txt";
 
     {
-        File file(filename, File::WRITE);
+        File file(filename, File::Mode::WRITE);
         std::fstream& fs = file.stream();
         fs << "Hello, world!";
     }
@@ -70,7 +70,7 @@ TEST(FileTest, ReadFromFile) {
 
     //reads the file and checks the content
     {
-        File file(filename, File::READ);
+        File file(filename, File::Mode::READ);
         std::fstream& fs = file.stream();
         std::string content;
         std::getline(fs, content);
@@ -95,7 +95,7 @@ TEST(FileTest, AppendToFile) {
 
     //appends to the file
     {
-        File file(filename, File::APPEND);
+        File file(filename, File::Mode::APPEND);
         std::fstream& fs = file.stream();
         fs << ", world!";
     }
@@ -124,7 +124,7 @@ TEST(FileTest, ReadWriteFile) {
     }
 
     {
-        File file(filename, File::READ_WRITE);
+        File file(filename, File::Mode::READ_WRITE);
         std::fstream& fs = file.stream();
         fs.seekp(0, std::ios::end);
         fs << ", world!";
@@ -148,5 +148,5 @@ TEST(FileTest, ReadWriteFile) {
 TEST(FileTest, FileNotFound) {
     const char* filename = "non_existent_file.txt";
 	    
-    EXPECT_THROW(File file(filename, File::READ), const char*);
+    EXPECT_THROW(File file(filename, File::Mode::READ), std::runtime_error);
  }

@@ -16,7 +16,7 @@
 #include "utils/common.h"
 #include "utils/common_paths.h"
 #include "utils/logger.h"
-#include "utils/file.h"
+#include "utils/file_utils.h"
 #include <string>
 
 #include "graph/graph_vertex_weighted.h"

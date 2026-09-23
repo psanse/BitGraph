@@ -8,7 +8,7 @@
 #include <sstream>
 #include <iostream>
 
-#include "utils/file.h"
+#include "utils/file_utils.h"
 #include "utils/common.h"
 
 #ifndef	__DIMACS_READER_H__

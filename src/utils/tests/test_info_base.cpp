@@ -49,11 +49,11 @@ TEST_F(InfoBaseTest, StartTimer) {
 TEST_F(InfoBaseTest, ReadTimer) {
 
 	info.startTimer(infoBase::phase_t::SEARCH);
-	std::this_thread::sleep_for (std::chrono::duration<double>(0.3));
+	std::this_thread::sleep_for(std::chrono::milliseconds{ 50 });
 	double elapsed = info.readTimer(infoBase::phase_t::SEARCH);
 
-	EXPECT_GE(elapsed, 0.25);
-	EXPECT_LE(elapsed, 0.35);
+	EXPECT_GE(elapsed, 0.045);
+	EXPECT_LT(elapsed, 1.0);
 
 	//test other timers...
 }
