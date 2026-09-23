@@ -1,26 +1,38 @@
 /**
-* @file logger.h
-* @brief  A simplistic, light-weight, single-header C++ logger  "logy v1.2"
-*		  Dev: Giovanni Squillero <giovanni.squillero@polito.it> (Summer 2018)
-*		  URL: https://github.com/squillero/logy
-*		  This code has been dedicated to the public domain
-* @date 03/11/2024
-* @last_update 19/01/25
-* 
-* @comments: 
-* 1.vectors & initializer_list are supported using SFINAE
-* 2.C++11 compliant
-* 3.Automatic tuning with the help of copilot (06/11/2024)
-* 
-* TODO - Change to a professional logger in the future (22/09/2025)
-**/
+ * @file logger.h
+ * @brief Provides lightweight header-only logging utilities.
+ *
+ * This header is based on the simplistic, light-weight, single-header C++ logger
+ * Logy v1.2 by Giovanni Squillero and provides printf-style and stream-style 
+ * logging at debug, informational, warning, and error levels.
+ *
+ * Log levels can be selected at compile time. Warning and error messages are
+ * enabled by default.
+ *
+ * @note Container expansion currently supports std::vector and
+ *       std::initializer_list.
+ * @note Logging operations are serialized and may be used concurrently from
+ *       multiple threads.
+ *
+ * Original Logy implementation:
+ * Giovanni Squillero, Politecnico di Torino, 2018.
+ * https://github.com/squillero/logy
+ *
+ * The original implementation was dedicated to the public domain.
+ *
+ * @author Giovanni Squillero
+ * @author Pablo San Segundo
+ * @date Original implementation: 2018
+ * @date Created: 03/11/2024
+ * @date Last updated: 23/09/2026
+ */
 
-#ifndef	__LOGY_H__
-#define __LOGY_H__
+#ifndef	BITSCAN_UTILS_LOGGER_H
+#define BITSCAN_UTILS_LOGGER_H
 
-#ifdef _MSC_VER
-#define _CRT_SECURE_NO_WARNINGS
-#endif
+//#ifdef _MSC_VER
+//#define _CRT_SECURE_NO_WARNINGS
+//#endif
 
 #include <type_traits>
 #include <vector>
@@ -245,4 +257,4 @@ void _Error2(T&&... args) {
 
 } // namespace bitgraph	
 
-#endif
+#endif // BITSCAN_UTILS_LOGGER_H
