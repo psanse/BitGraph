@@ -30,6 +30,7 @@ add_library  (
     formats/detail/mmio.cpp
     algorithms/decode.cpp
     algorithms/graph_conversions.cpp
+    formats/detail/vertex_set_format.cpp
     ${HEADER_FILES}
 )
 

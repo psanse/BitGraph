@@ -36,63 +36,7 @@
 #include "prec_timer.h"
 
 namespace bitgraph {
-
-	namespace utils {
-
 		
-
-		
-
-		
-
-		namespace _file {
-
-			/**
-			* @brief writes a set of vertices in a collection to file in the format:
-			*		size <SIZE>
-			*		elem1
-			*		elem2 ...
-			* @param filename: name of the output file
-			* @param nodes: collection of elements to be written
-			* @param plus_one: flag to add 1 to each element before writing
-			* @returns 0 if success, -1 if error (non-throwing interface)
-			**/
-			template<class Col_t>
-			inline
-				int WRITE_SET_OF_VERTICES(const char* filename, const Col_t& nodes, bool plus_one = true) noexcept
-			{
-				std::ofstream f(filename, std::ofstream::out);
-				if (!f) {
-					LOGG_ERROR("Could not open file: ", filename, "_file::WRITE_SET_OF_VERTICES");
-					return -1;
-				}
-
-				auto SIZE = nodes.size();
-				f << "size " << SIZE << std::endl;
-				for (auto i = 0; i < SIZE; ++i) {
-					if (!(f << ((plus_one) ? nodes[i] + 1 : nodes[i]) << std::endl)) {
-						LOGG_ERROR("Error writing to file: ", filename, " at element: ", i, "_file::WRITE_SET_OF_VERTICES");
-						f.close();
-						return -1;
-					}					
-				}
-
-				f.close();
-				return 0;
-			}
-
-			/**
-			 * @brief reads a mask of 0s and 1s from a file and provides the position of the 0s
-			 * @param interdicted_nodes: output vector of integers to store the positions of the 0s
-			 * @returns 0 if success, -1 if error (non-throwing interface)
-			 **/
-			int READ_SET_OF_INTERDICTED_VERTICES(const char* filename, std::vector<int>& interdicted_nodes) noexcept;
-
-		}
-
-		
-	}
-
 	//////////////////////////////
 	//
 	// FUNCTORS for sorting

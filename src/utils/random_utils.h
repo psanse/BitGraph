@@ -47,24 +47,7 @@ namespace bitgraph {
 				assert(p >= 0.0 && p <= 1.0); // Rejects NaN too.						
 
 				// The real-valued generator produces values in [0, 1).
-				return detail::g_rugen() < p;
-
-				// comments
-
-				//B) if distribution range is not guaranteed to be in [0, 1)
-				//const double sample = std::generate_canonical<
-				//	double,
-				//	std::numeric_limits<double>::digits		// typically 53 for double
-				//>(g_rugen.engine());
-				//return sample < p;
-
-				//C) generates a distribution each time - not for hot paths
-				//std::bernoulli_distribution trial(p);
-				//return trial(g_rugen.engine());					
-
-				//D) windows generator (deprecated)
-			   /* double n_01=std::rand()/(double)RAND_MAX;
-				return (n_01<=p);*/
+				return detail::g_rugen() < p;				
 
 			}
 
@@ -73,3 +56,22 @@ namespace bitgraph {
 } // namespace bitgraph
 
 #endif // BITGRAPH_UTILS_RANDOM_H
+
+
+////////////////////
+// comments on implementation of bool uniform_dist(double p)
+
+//B) if distribution range is not guaranteed to be in [0, 1)
+//const double sample = std::generate_canonical<
+//	double,
+//	std::numeric_limits<double>::digits		// typically 53 for double
+//>(g_rugen.engine());
+//return sample < p;
+
+//C) generates a distribution each time - not for hot paths
+//std::bernoulli_distribution trial(p);
+//return trial(g_rugen.engine());					
+
+//D) windows generator (deprecated)
+/* double n_01=std::rand()/(double)RAND_MAX;
+return (n_01<=p);*/
