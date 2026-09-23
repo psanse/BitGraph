@@ -7,7 +7,7 @@
  **/
 
 #include "benchmark.h"
-#include "logger.h"
+#include "utils/logger.h"
 #include <string>
 #include "utils/common.h"
 #include "utils/string_utils.h"

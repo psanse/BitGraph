@@ -16,6 +16,8 @@
 #include "utils/logger.h"
 #include "utils/common.h"	
 #include "utils/collection_utils.h"
+#include "utils/sort_utils.h"
+#include "graph/vertex_utils.h"
 #include "decode.h"
 #include "bitscan/bbtypes.h"					//for EMPTY_ELEM constant	
 #include "bitscan/bbobject.h"
@@ -614,7 +616,7 @@ namespace bitgraph {
 	{
 
 		VertexOrdering kord;
-		utils::_sort::fill_vertices(kord, first_k);
+		fill_vertices(kord, first_k);
 
 		//////////////////////////////////////////////////////
 		utils::has_greater_val<int, VertexOrdering> pred(nb_neigh_);
@@ -666,7 +668,7 @@ namespace bitgraph {
 	template<class GraphT>
 	inline const VertexOrdering& GraphFastRootSort<GraphT>::sort_non_decreasing_deg(int first_k, bool rev) {
 		VertexOrdering kord;
-		utils::_sort::fill_vertices(kord, first_k);
+		fill_vertices(kord, first_k);
 
 		//////////////////////////////////////////////////////
 		utils::has_smaller_val<int, VertexOrdering> pred(nb_neigh_);

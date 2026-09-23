@@ -26,63 +26,7 @@ using namespace std;
 //gloabl template variables
 namespace bitgraph {
 
-	/*namespace utils {
-		namespace _rand {
-			template<typename D, typename RE>
-			std::size_t RandomUniformGen<D, RE>::seed_ = RandomUniformGen<D, RE>::FIXED_RANDOM_SEED;
-		}
-	}*/
-
 	
-	namespace utils {
-		namespace _sort {
-
-			/********************************************************************************************************************************
-			*
-			*		 Sorting of n items (integer) according to non-increasing values of their scores (double)
-			*
-			********************************************************************************************************************************/
-			void SORT_NON_INCR(int* item, double* score, int n)
-			{
-				int salto, i, j, tempItem;
-				double tempScore;
-
-				for (salto = n / 2; salto > 0; salto /= 2)
-					for (i = salto; i < n; i++)
-						for (j = i - salto; j >= 0; j -= salto) {
-							if (score[j] >= score[j + salto]) break;
-							tempScore = score[j]; score[j] = score[j + salto]; score[j + salto] = tempScore;
-							tempItem = item[j]; item[j] = item[j + salto]; item[j + salto] = tempItem;
-						}
-			}
-
-			/********************************************************************************************************************************
-			*
-			*  Sorting of n items (integer) according to non-increasing values of their scores (double)
-			*
-			********************************************************************************************************************************/
-			void SORT_NON_DECR(int* item, double* score, int n)
-
-			{
-				int salto, i, j, tempItem;
-				double tempScore;
-
-				for (salto = n / 2; salto > 0; salto /= 2)
-					for (i = salto; i < n; i++)
-						for (j = i - salto; j >= 0; j -= salto) {
-							if (score[j] <= score[j + salto]) break;
-							tempScore = score[j]; score[j] = score[j + salto]; score[j + salto] = tempScore;
-							tempItem = item[j]; item[j] = item[j + salto]; item[j + salto] = tempItem;
-						}
-			}
-
-
-		}
-	}
-
-
-
-
 	namespace utils {
 		namespace _file {
 

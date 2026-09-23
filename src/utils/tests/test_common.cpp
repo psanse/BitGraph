@@ -14,6 +14,7 @@
 #include "utils/path_utils.h"
 #include "utils/string_utils.h"	
 #include "utils/collection_utils.h"
+#include "utils/sort_utils.h"
 #include "gtest/gtest.h"
 #include "utils/logger.h"
 #include <iostream>
@@ -267,7 +268,7 @@ TEST(Common_sort, DISABLED_insert_ordered) {
 	score[1] = 20;
 	score[2] = 5;		
 		
-	int pos = utils::_sort::INSERT_ORDERED_SORT_NON_INCR(data, score, N /* tamaño tras inserción N */, 3, 21);
+	int pos = utils::INSERT_ORDERED_SORT_NON_INCR(data, score, N /* tamaño tras inserción N */, 3, 21);
 	
 	//TODO TEST data 
 

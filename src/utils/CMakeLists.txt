@@ -18,6 +18,7 @@ add_library (utils STATIC
     random_utils.cpp 
     time_utils.cpp
     path_utils.cpp
+    sort_utils.cpp
     #logger.cpp 
     ${HEADER_FILES}
 )

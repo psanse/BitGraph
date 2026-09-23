@@ -18,6 +18,7 @@
 #include "graph/graph_traits.h"
 #include "utils/common.h"
 #include "utils/logger.h"
+#include "utils/sort_utils.h"
 #include <algorithm>
 #include <iostream>
 
