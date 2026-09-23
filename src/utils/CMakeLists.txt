@@ -8,8 +8,7 @@ file(GLOB HEADER_FILES   ${CMAKE_CURRENT_SOURCE_DIR}/*.h
 )
 
 #creates utils library
-add_library (utils STATIC
-    benchmark.cpp 
+add_library (utils STATIC   
     #result.cpp
     #batch_analyser.cpp
     common.cpp

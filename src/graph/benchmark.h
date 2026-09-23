@@ -5,8 +5,8 @@
  * @dev pss
  **/
 
-#ifndef __BENCHMARK_H__
-#define __BENCHMARK_H__
+#ifndef BITGRAPH_UTILS_BENCHMARK_H
+#define BITGRAPH_UTILS_BENCHMARK_H
 
 #include <iostream>
 #include <string>
@@ -15,7 +15,7 @@
 
 namespace bitgraph {
 
-	namespace _impl {
+	namespace utils {
 
 		//aliases
 		using vstr_t = std::vector<std::string>;
@@ -28,7 +28,9 @@ namespace bitgraph {
 		//////////////////
 
 		class Benchmark {
-			friend std::ostream& operator<<			(std::ostream& o, Benchmark& b) { return b.print(o); }
+			friend std::ostream& operator<<	(std::ostream& o, Benchmark& b) { 
+				return b.print(o); 
+			}
 
 			//move semantics and copy semantics disallowed
 			Benchmark(const Benchmark& b) = delete;
@@ -47,18 +49,31 @@ namespace bitgraph {
 			///////////
 			// setters and getters
 
-			int number_of_instances() { return (int)lf_.size(); }
+			int number_of_instances() { 
+				return (int)lf_.size();
+			}
 
-			void setArrayOfFilenames(std::vector<std::string> list) { lf_ = list; }
+			void setArrayOfFilenames(std::vector<std::string> list) { 
+				lf_ = list; 
+			}
 
 			int get_value(std::string filename);
-			std::string get_path() { return PATH_; }
-			vstr_t& getArrayOfFilenames() { return lf_; }
-			mstri_t& getMapOfFilenames() { return mf_; }
+			std::string get_path() { 
+				return PATH_; 
+			}
+			vstr_t& getArrayOfFilenames() { 
+				return lf_; 
+			}
+			mstri_t& getMapOfFilenames() { 
+				return mf_;
+			}
 
 			/////////////
 			// Context
-			void clear_instances() { lf_.clear(); mf_.clear(); }
+			void clear_instances() {
+				lf_.clear(); 
+				mf_.clear();
+			}
 
 
 			//////////////
@@ -93,10 +108,11 @@ namespace bitgraph {
 			mstri_t					mf_;		//mapping filenames -> value (typically the optimal solution value or a bound)
 		};
 
-	}//end namespace _impl	
+	}//end namespace utils	
 
-	using _impl::Benchmark;		//alias for Benchmark
+	// preserved for backward compatibility API
+	using utils::Benchmark;		
 
 }//end namespace bitgraph
 
-#endif
+#endif // BITGRAPH_UTILS_BENCHMARK_H
