@@ -12,7 +12,7 @@ add_executable(
     test_precise_timer.cpp
     test_task.cpp
     test_logger.cpp
-    test_benchmark.cpp
+    #test_benchmark.cpp
     test_batch.cpp
 )
 

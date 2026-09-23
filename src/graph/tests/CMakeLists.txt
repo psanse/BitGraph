@@ -19,7 +19,8 @@ add_executable (
   test_format.cpp 
   test_decode.cpp
   test_clq_func.cpp
-  test_graph_map.cpp 
+  test_graph_map.cpp
+  test_graph_benchmark.cpp
 
   # Tests to be checked:
   # test_kcore.cpp             # to fix (02/02/2026)
