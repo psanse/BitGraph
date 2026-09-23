@@ -33,6 +33,8 @@ namespace bitgraph {
 		 * The protected constructor prevents direct construction while allowing
 		 * concrete benchmark datasets to derive from this class.
 		 */
+
+		 // TODO - consider a template parameter for the value type (e.g., int, double) to allow more flexible reference values.
 		class GraphBenchmark {
 
 			friend std::ostream& operator<<	(std::ostream& o, GraphBenchmark& b) {
