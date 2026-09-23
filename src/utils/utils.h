@@ -5,8 +5,8 @@
  * @developer: pss
 **/
 
-#ifndef _UTILS_H_
-#define _UTILS_H_
+#ifndef BITGRAPH_UTILS_UTILS_H_
+#define BITGRAPH_UTILS_UTILS_H_
 
 #include "batch.h"
 #include "benchmark.h"
@@ -19,4 +19,4 @@
 #include "task.h"
 
 
-#endif // !_UTILS_H_
+#endif // BITGRAPH_UTILS_UTILS_H_

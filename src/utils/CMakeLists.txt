@@ -15,8 +15,9 @@ add_library (utils STATIC
     common.cpp
     common_types.cpp
     info/info_base.cpp  
-    random.cpp 
+    random_utils.cpp 
     time_utils.cpp
+    path_utils.cpp
     #logger.cpp 
     ${HEADER_FILES}
 )

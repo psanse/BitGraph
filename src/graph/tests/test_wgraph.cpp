@@ -13,6 +13,7 @@
 #include "gtest/gtest.h"
 #include "utils/common_paths.h"
 #include "utils/logger.h"
+#include "utils/math_utils.h"
 #include <iostream>
 
 using namespace std;
@@ -39,7 +40,7 @@ protected:
 TEST_F(UGraphWTest, scale_transformation) {
 
 	//scale transformation (mul by *5 all the weights)
-	gw.transform_weights(utils::scale<decltype(gw)::Weight>(5));
+	gw.transform_weights(utils::Scale<decltype(gw)::Weight>(5));
 
 	EXPECT_EQ(5,  gw.weight(0));
 	EXPECT_EQ(10, gw.weight(1));	

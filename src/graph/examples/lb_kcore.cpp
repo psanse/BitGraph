@@ -9,6 +9,7 @@
 #include "utils/common.h"
 #include "utils/prec_timer.h"
 #include "utils/logger.h"
+#include "utils/collection_utils.h"
 
 using namespace std;
 using namespace bitgraph;	
@@ -52,6 +53,6 @@ int main(int argc, char** argv){
 
 	//I/O
 	LOGG_INFO("\n[t:" , time_sec , "," , " Smax:" , heurCLQ.size() , "]\n");
-	utils::_stl::print_collection(heurCLQ);
+	utils::print_collection(heurCLQ);
 }
 

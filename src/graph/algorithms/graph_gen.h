@@ -48,6 +48,7 @@
 #include <cassert>
 
 #include "utils/common.h"
+#include "utils/path_utils.h"
 #include "graph/graph_vertex_weighted.h"						// facade types 
 #include "graph/graph_edge_weighted.h"							// facade types 
 #include "graph_fast_sort.h"
@@ -349,7 +350,7 @@ namespace bitgraph{
 
 		//add slash '/' at the end to the path if required
 		std::string mypath(path);
-		utils::_dir::append_slash(mypath);
+		utils::append_slash(mypath);
 
 		for (auto i = rd.nLB; i <= rd.nUB; i += rd.incN) {
 			for (double j = rd.pLB; j <= rd.pUB; j += rd.incP) {
@@ -500,7 +501,7 @@ namespace bitgraph{
 
 			//determines the filename
 			std::string path = FILE_PATH;
-			utils::_dir::append_slash(path);
+			utils::append_slash(path);
 			std::string filename = path + g.graph().name() + FILE_EXTENSION;
 
 			//streams weights to file
@@ -540,7 +541,7 @@ namespace bitgraph{
 
 			//determines the filename
 			std::string path = FILE_PATH;
-			utils::_dir::append_slash(path);
+			utils::append_slash(path);
 			std::string filename = path + g.graph().name() + FILE_EXTENSION;
 
 			//streams weights to file

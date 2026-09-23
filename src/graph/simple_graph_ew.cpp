@@ -18,6 +18,7 @@
 #include "graph/simple_graph_ew.h"
 #include "utils/common.h"
 #include "utils/logger.h"
+#include "utils/string_utils.h"
 #include "utils/prec_timer.h"
 #include <fstream>
 #include <iostream>
@@ -281,7 +282,7 @@ int Base_Graph_EW<GraphT, WeightT>::read_dimacs (string filename){
 	 stringstream sstr(line);
 
 	 //determine if edge weights are present
-	 int nw = utils::_count::number_of_words(line);
+	 int nw = utils::number_of_words(line);
 	 bool edge_weights_found = true;
 	 switch (nw) {
 	 case 4: edge_weights_found = true;	break; 		//expected: e <v> <w> <edge-weight> 

@@ -1,5 +1,5 @@
 /**
- * @file random.h
+ * @file random_utils.h
  * @brief Public random-number utilities for the UTILS library.
  *
  * This header provides lightweight random operations for consumer code while

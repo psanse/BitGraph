@@ -13,6 +13,7 @@
 #include "graph/algorithms/graph_gen.h"	
 #include "graph/graph_edge_weighted.h"
 #include "utils/logger.h"	
+#include "utils/math_utils.h"
 #include "utils/common_paths.h"
 #include "utils/common.h"
 
@@ -126,7 +127,7 @@ TEST_F(UGraphEWTest, transform_weights) {
 	EXPECT_EQ(decltype(ugew)::ZERO_WEIGHT, ugew.weight(1, 4));		//NO_WEIGHT - non-edge
 
 	//same using the scale functor utility
-	ugew.transform_weights(utils::scale<decltype(ugew)::Weight>(5));
+	ugew.transform_weights(utils::Scale<decltype(ugew)::Weight>(5));
 	EXPECT_EQ(25, ugew.weight(0, 1));
 	EXPECT_EQ(50, ugew.weight(0, 2));
 	EXPECT_EQ(75, ugew.weight(1, 3));

@@ -1,5 +1,5 @@
 /**
- * @file random.cpp
+ * @file random_utils.cpp
  * @brief Defines the shared random generators used by the UTILS library.
  *
  * This translation unit provides the single program-wide definitions of the
@@ -16,7 +16,7 @@
  * @date Last updated: 22/09/2026
  */
 
-#include "random.h"
+#include "random_utils.h"
 
 namespace bitgraph {
 

@@ -10,6 +10,10 @@
 **/
 
 #include "utils/common.h"
+#include "utils/math_utils.h"
+#include "utils/path_utils.h"
+#include "utils/string_utils.h"	
+#include "utils/collection_utils.h"
 #include "gtest/gtest.h"
 #include "utils/logger.h"
 #include <iostream>
@@ -102,14 +106,14 @@ TEST(Common_mat, mean_and_stdev) {
 	vdob col = { 2.7, 2.8, 2.9, 3, 3.1, 3.2, 3.3 };
 	
 	//compute mean - implicit cast to double on return, MUST USE for_each and return double
-	double mean = for_each(col.begin(), col.end(), utils::_mat::MeanValue());					
+	double mean = for_each(col.begin(), col.end(), utils::MeanValue());					
 
 	/////////////////////////////
 	EXPECT_DOUBLE_EQ(3, mean);
 	/////////////////////////////
 
 	//compute standard deviation - implicit cast to double on return, MUST USE for_each and return double
-	double stdDev = for_each(col.begin(), col.end(), utils::_mat::StdDevValue(mean));
+	double stdDev = for_each(col.begin(), col.end(), utils::StdDevValue(mean));
 	
 	//compute the standard deviation in a more traditional way
 	double stdDevExp = 0;
@@ -127,12 +131,12 @@ TEST(Common_mat, mean_and_stdev) {
 TEST(Common_counting, number_of_words){
 
 	string str1("hello my 2 3 4");
-	int nw = utils::_count::number_of_words(str1);
+	int nw = utils::number_of_words(str1);
 	
 	EXPECT_EQ(5,nw);
 
 	string str2 ("e 1 2 25");
-	nw = utils::_count::number_of_words(str2);
+	nw = utils::number_of_words(str2);
 	
 	EXPECT_EQ(4,nw);
 
@@ -200,16 +204,16 @@ TEST(Common, fixed_stack_pop){
 TEST(Common_dir, path){
 
 	string path_1("c:/kk/");		//POSIX
-	utils::_dir::append_slash(path_1);
+	utils::append_slash(path_1);
 	EXPECT_STREQ("c:/kk/", path_1.c_str());
 
 #ifdef _MSC_VER
 	string path_2("c:\\kk");		//WINDOWS	
-	utils::_dir::append_slash(path_2);
+	utils::append_slash(path_2);
 	EXPECT_STREQ("c:\\kk\\", path_2.c_str());
 
 	string path_3(".\\kk");
-	utils::_dir::append_slash(path_3);
+	utils::append_slash(path_3);
 	EXPECT_STREQ(".\\kk\\", path_3.c_str());
 #endif
 
@@ -218,10 +222,10 @@ TEST(Common_dir, path){
 TEST(Common_stl, all_equal){
 
 	vector<int> v(10, 1);
-	EXPECT_TRUE(utils::_stl::all_equal(v));
+	EXPECT_TRUE(utils::all_equal(v));
 		
 	v.push_back(2);
-	EXPECT_FALSE(utils::_stl::all_equal(v));
+	EXPECT_FALSE(utils::all_equal(v));
 }
 
 

@@ -12,6 +12,7 @@
 #define	__GRAPH_MAPPINGS_H__
 
 #include "utils/logger.h"
+#include "utils/collection_utils.h"
 #include "utils/common.h"
 #include "bitscan/bbconfig.h"			//for INDEX_1_TO_1 macro
 #include "bitscan/bbobject.h"
@@ -369,20 +370,20 @@ namespace bitgraph{
 		case L2R:
 			o << "\n*****************" << std::endl;
 			o << "L->R" << std::endl;
-			utils::_stl::print_collection(l2r_, o, true);
+			utils::print_collection(l2r_, o, true);
 			o << "\n*****************" << std::endl;
 			break;
 		case R2L:
 			o << "\n*****************" << std::endl;
 			o << "R->L" << std::endl;
-			utils::_stl::print_collection(r2l_, o, true);
+			utils::print_collection(r2l_, o, true);
 			o << "******************" << std::endl;
 			break;
 		case BOTH:
 			o << "\n*****************" << std::endl;
 			o << "L->R and R->L" << std::endl;
-			utils::_stl::print_collection(l2r_, o, true);
-			utils::_stl::print_collection(r2l_, o, true);
+			utils::print_collection(l2r_, o, true);
+			utils::print_collection(r2l_, o, true);
 			o << "*****************" << std::endl;
 			break;
 		default:

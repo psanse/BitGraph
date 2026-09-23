@@ -32,164 +32,18 @@
 #include <unordered_set>				//for all_unique
 
 #include "common_types.h"				//common types additional utilities, to be included e
-#include "random.h"
+#include "random_utils.h"
 #include "prec_timer.h"
 
 namespace bitgraph {
 
 	namespace utils {
 
-		namespace _dir {
-			/**
-			  * @brief Appends a slash at the end of the path if no slash is present.
-			  *		   The type of slash depends on the SO (Linux '/', Windows '\')
-			  * @param path: string containing a path to be modified
-			  *
-			  **/
-			void append_slash(std::string& path);
+		
 
-			/**
-			  * @brief	removes the path from a filename
-			  * @param path: input string
-			  *
-			  * @returns: substring after the last slash of the filename.
-			  *		   (if no slash the filename is returned)
-			  **/
-			std::string remove_path(const std::string& path);
-		}
+		
 
-		namespace _stl {
-
-			/**
-			*
-			* @brief Returns true if all elements of a collection are equal
-			*        or the collection is empty
-			*
-			**/
-			template<class Col_t>
-			inline bool all_equal(const Col_t& col) {
-				return (std::adjacent_find(col.cbegin(), col.cend(),
-					std::not_equal_to<typename Col_t::value_type>())			//std::not_equal_to<> is more modern C++
-					== col.cend());
-			}
-
-			/**
-			* @brief checks if an std collection contains unique elements
-			* @details: adds the elements to an unordered_set and compares sizes
-			**/
-			template <class Col_t>
-			inline
-				bool all_unique(const Col_t& v) {
-				std::unordered_set<typename Col_t::value_type> s(v.begin(), v.end());
-				return s.size() == v.size();
-			}
-
-			/**
-			* @brief  Streams all the elements of an STL collection
-			*
-			* @param c: input collection
-			* @param	o: output stream
-			* @param	eofl: flag to include a new line at the end of the stream
-			* @returns: stream with all the elements of the collection
-			**/
-			template <class Col_t>
-			inline
-				std::ostream& print_collection(const Col_t& c, std::ostream& o = std::cout, bool eofl = false)
-			{
-				std::copy(c.cbegin(), c.cend(), std::ostream_iterator<typename Col_t::value_type>(o, " "));
-				o << " [" << c.size() << "]";
-
-				if (eofl) { o << std::endl; }
-				return o;
-			}
-
-			/**
-			 * @brief  Streams all the elements of an STL collection inside a range
-			 *
-			 * @param begin, end: iterators to the beginning and end of the collection
-			 * @param o: output stream
-			 * @param with_endl: flag to include a new line at the end of the stream
-			 * @returns: stream with all the elements of the collection
-			 **/
-			template <class ForwardIterator>
-			inline
-				std::ostream& print_collection(const ForwardIterator begin, const ForwardIterator end,
-					std::ostream& o = std::cout,
-					bool eofl = false,
-					bool index = false)
-			{
-				int nC = 0;
-				for (auto it = begin; it != end; ++it) {
-					if (index) {
-						o << "[" << nC << "]" << *it << " "; nC++;
-					}
-					else {
-						o << *it << " "; nC++;
-					}
-				}
-				o << " [" << nC << "]";
-				if (eofl) o << std::endl;
-				return o;
-			}
-						
-		}
-
-		/////////////////////////////////////////////
-
-		namespace _mat {
-
-			template<typename T>
-			inline
-				T min3(T x, T y, T z) {
-				return std::min<T>(std::min<T>(x, y), z);
-			}
-
-			/**
-			*  @brief Functor to compute the mean of a collection
-			*		   (use in a for-each loop)
-			**/
-			class MeanValue {
-			private:
-				std::size_t num = 0;		// number of elements
-				double sum = 0;				// sum of all element values
-			public:
-
-				void operator() (double elem) {
-					num++;
-					sum += elem;
-				}
-
-				// return mean value (implicit cast)
-				operator double() {
-					return sum / static_cast<double>(num);
-				}
-			};
-
-			/**
-			*  @brief Functor to compute the standard deviation of a collection
-			*		   given its mean (use in a for-each loop)
-			**/
-			class StdDevValue {
-			private:
-				const double MEAN;					//given mean of the collection
-				std::size_t num = 0;				//number of elements
-				double sumSqrDiff = 0;
-			public:
-				StdDevValue(double mean_out) : MEAN(mean_out) {}
-
-				void operator() (double elem) {
-					num++;
-					sumSqrDiff += (MEAN - elem) * (MEAN - elem);
-				}
-
-				// return std diff value (implicit cast)
-				operator double() {
-					return std::sqrt(sumSqrDiff / static_cast<double>(num));
-				}
-			};
-
-		}
-		//////////////////////
+		
 
 		namespace _file {
 
@@ -236,30 +90,7 @@ namespace bitgraph {
 
 		}
 
-		namespace _count {
-
-			/**
-			* @brief counts the number of words in a string
-			**/
-			inline
-				int number_of_words(const std::string& str)
-			{
-				static const std::regex word_regex(R"(\b\w+\b)");
-				return (int)std::distance(
-					std::sregex_iterator(	str.begin(), str.end(), word_regex),
-											std::sregex_iterator()				);
-
-				//OLD CODE
-				/*auto word_count = 0;
-				std::stringstream sstr(str);
-				std::string word;
-				while (sstr >> word) {
-					++word_count;
-				}
-
-				return word_count;*/
-			}
-		}
+		
 	}
 
 	//////////////////////////////
@@ -422,15 +253,7 @@ namespace bitgraph {
 		template<typename Col_t	>
 		struct has_smaller_size {
 			bool operator()(const Col_t& lhs, const Col_t& rhs) const { return lhs.size() < rhs.size(); }
-		};
-
-		//scale functor
-		template< typename T >
-		struct scale {
-			scale(T s) : scale_(s) {}
-			T operator()(T x) const { return x * scale_; }
-			T scale_;
-		};
+		};		
 
 	}
 	////////////////////////////////////////////
@@ -502,14 +325,9 @@ namespace bitgraph {
 
 	} // end namespace utils
 				
-
-	// for backward compatibility
-	using namespace utils::_stl;
-	//using namespace utils::_time;
+		
 	using namespace utils::_sort;
-	//using namespace utils::_rand;	
-	using namespace utils::_dir;
-
+	
 
 }//end namespace bitgraph
 

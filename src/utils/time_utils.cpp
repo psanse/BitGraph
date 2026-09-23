@@ -19,6 +19,8 @@
 
 #include "time_utils.h"
 #include <stdexcept>
+#include <sstream>
+#include <iomanip>			// for std::put_time
 
 namespace bitgraph {
 	namespace utils {

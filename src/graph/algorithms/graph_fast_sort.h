@@ -14,7 +14,8 @@
 #include "graph/simple_ugraph.h"				//to limit template GraphT to undirected types - types must be known
 
 #include "utils/logger.h"
-#include "utils/common.h"						
+#include "utils/common.h"	
+#include "utils/collection_utils.h"
 #include "decode.h"
 #include "bitscan/bbtypes.h"					//for EMPTY_ELEM constant	
 #include "bitscan/bbobject.h"
@@ -811,13 +812,13 @@ namespace bitgraph {
 	{
 		switch (type) {
 		case PRINT_DEGREE:
-			bitgraph::utils::_stl::print_collection(nb_neigh_, o, eofl);			
+			bitgraph::utils::print_collection(nb_neigh_, o, eofl);			
 			break;
 		case PRINT_SUPPORT:
-			bitgraph::utils::_stl::print_collection(deg_neigh_, o, eofl);			
+			bitgraph::utils::print_collection(deg_neigh_, o, eofl);			
 			break;
 		case PRINT_NODES:
-			bitgraph::utils::_stl::print_collection(nodes_, o, eofl);
+			bitgraph::utils::print_collection(nodes_, o, eofl);
 			break;
 		default:
 			LOG_ERROR("unknown print type- GraphFastRootSort<GraphT>::print()");

@@ -17,6 +17,8 @@
 #include "graph/formats/detail/dimacs_format.h"			
 #include "utils/common.h"
 #include "utils/logger.h"
+#include "utils/string_utils.h"
+#include "utils/collection_utils.h"
 #include "utils/prec_timer.h"
 
 #include <fstream>
@@ -294,7 +296,7 @@ int Base_Graph_W<GraphT, WeightT>::read_dimacs (string filename, int type)
 
 	std::getline(f, line);
 	stringstream sstr(line);
-	int nw = utils::_count::number_of_words (line /*sstr.str()*/);
+	int nw = utils::number_of_words (line /*sstr.str()*/);
 
 	//assert
 	if(nw != 3){
@@ -449,7 +451,7 @@ ostream& Base_Graph_W<GraphT, WeightT>::print_weights (ostream& o, bool show_v) 
 		}
 		o << endl;
 	}else{
-		utils::_stl::print_collection<vector<Weight>>(w_, o, true);
+		utils::print_collection<vector<Weight>>(w_, o, true);
 	}
 	return o;
 }

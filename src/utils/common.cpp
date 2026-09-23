@@ -81,46 +81,6 @@ namespace bitgraph {
 	}
 
 
-	namespace utils {
-		namespace _dir {
-
-			void append_slash(std::string& path) {
-
-				std::size_t pos;
-
-				pos = path.find_last_of("\\/");
-				if (pos == path.length() - 1) {
-#ifdef  __GNUC__
-					if (path[pos] == '\\')
-						path.replace(pos, path.length(), "/");
-#elif	_MSC_VER
-					//Windows accepts both slashes so no changes are required
-					/*  if(path[pos]=='/')
-						  path.replace(pos,path.length(),"\\");*/
-#endif
-				}
-				else { //no slash at the ends
-#ifdef _MSC_VER
-					//default option for windows
-					path += '\\';
-
-#elif  __GNUC__
-					path += '/';
-#endif
-				}
-			}
-
-			string remove_path(const std::string& filename) {
-
-				size_t pos = filename.find_last_of("\\/");
-
-				if (pos == string::npos) {
-					return filename;
-				}
-				else { return filename.substr(pos + 1); }
-			}
-		}
-	}
 
 
 	namespace utils {

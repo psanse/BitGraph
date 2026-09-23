@@ -10,6 +10,8 @@
 #include "logger.h"
 #include <string>
 #include "utils/common.h"
+#include "utils/string_utils.h"
+#include "utils/path_utils.h"
 
 
 using namespace std;
@@ -36,7 +38,7 @@ void Benchmark::add_test(const string str_file){
 	}
 	else {								//appends slash to PATH_ if not present		
 		str = PATH_;
-		utils::_dir::append_slash(str);
+		utils::append_slash(str);
 		str += str_file;
 
 		//#ifdef _WIN32
@@ -58,7 +60,7 @@ void Benchmark::add_test(const string str_file, int val){
 	}
 	else{								//appends slash to PATH_ if not present		
 		str = PATH_;
-		utils::_dir::append_slash(str);
+		utils::append_slash(str);
 		str += str_file;	
 
 //#ifdef _WIN32

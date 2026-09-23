@@ -14,10 +14,7 @@
 #define BITSCAN_UTILS_TIME_UTILS_H	
 
 #include <chrono>
-#include <ctime>
-#include <iomanip>
-#include <ostream>
-#include <sstream>
+#include <iostream>
 #include <string>
 
 namespace bitgraph {
