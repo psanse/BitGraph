@@ -31,6 +31,7 @@ add_library  (
     algorithms/decode.cpp
     algorithms/graph_conversions.cpp
     formats/detail/vertex_set_format.cpp
+    algorithms/algorithm_info.cpp
     #graph_benchmark.cpp 
     ${HEADER_FILES}
 )
