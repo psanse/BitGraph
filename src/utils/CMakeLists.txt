@@ -12,7 +12,7 @@ add_library (utils STATIC
     #result.cpp
     #batch_analyser.cpp
     common.cpp
-    common_types.cpp
+    #common_types.cpp
     info/info_base.cpp  
     random_utils.cpp 
     time_utils.cpp

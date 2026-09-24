@@ -17,7 +17,8 @@
 
 #include "bbobject.h"
 #include "bitblock.h"
-#include "utils/common.h"		//for the primitive FixedStack type
+#include "utils/common.h"		
+#include "utils/fixed_stack.h"		// FixedStack<T> for bitblock indices
 
 #include <cassert>				// Runtime assertions (active when NDEBUG is not defined, typically Debug builds)
 #include <initializer_list>

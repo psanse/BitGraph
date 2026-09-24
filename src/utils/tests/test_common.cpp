@@ -5,23 +5,23 @@
 *	- last_update 15/01/2026
 * @date ?
 * @author pss
-
-* TODO - add tests, check disabled tests  (18/01/25)
 **/
 
-#include "utils/common.h"
+
 #include "utils/math_utils.h"
 #include "utils/path_utils.h"
 #include "utils/string_utils.h"	
 #include "utils/collection_utils.h"
 #include "utils/sort_utils.h"
+#include "utils/fixed_stack.h"
+#include "utils/time_utils.h"
 #include "gtest/gtest.h"
-#include "utils/logger.h"
 #include <iostream>
 #include <sstream>
 #include <string>
 #include <vector>
 #include <thread>
+#include <chrono>
 
 using namespace std;
 using namespace bitgraph;
@@ -233,7 +233,8 @@ TEST(Common_stl, all_equal){
 TEST(Common_timer, elapsedTime) {
 
 
-	auto start = std::chrono::high_resolution_clock::now();
+
+	auto start = std::chrono::steady_clock::now();
 	std::this_thread::sleep_for(std::chrono::milliseconds(120));
 
 	////////////////////////////////////////////////////
