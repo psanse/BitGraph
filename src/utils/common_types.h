@@ -6,8 +6,8 @@
  * @author pss
  **/
 
-#ifndef __COMMON_TYPES_H__
-#define	__COMMON_TYPES_H__
+#ifndef BITGRAPH_UTILS_COMMON_TYPES_H
+#define	BITGRAPH_UTILS_COMMON_TYPES_H
 
 #include <iostream>
 #include <vector>
@@ -230,7 +230,9 @@ namespace bitgraph {
 			*		 (no deallocation)
 			* @details: no deallocation is performed
 			**/
-			void clear() noexcept { nE_ = 0; }
+			void clear() noexcept { 
+				nE_ = 0; 
+			}
 
 			/**
 			 * @brief Fast rollback to a previous size.
@@ -286,7 +288,6 @@ namespace bitgraph {
 	}
 }
 
-
 namespace bitgraph {
 
 	namespace utils {
@@ -312,13 +313,13 @@ namespace bitgraph {
 					vl{ lh }, vh{ rh }
 				{}
 
-				//basic operations
+				// basic operations
 
 				constexpr bool is_unset() const noexcept { return (vl == no_range || vh == no_range); }
 				constexpr bool is_set()   const noexcept { return !is_unset(); }
 				constexpr bool is_proper() const noexcept { return is_set() && (vl <= vh) && (vl >= 0); }
 
-				//I/O
+				// I/O
 
 				/**
 				* @brief: streams the range in the format [@vl, @vh]
@@ -337,6 +338,7 @@ namespace bitgraph {
 				}
 			};
 
+
 		}//end namespace detail
 
 	} //end namespace utils
@@ -344,7 +346,4 @@ namespace bitgraph {
 }//end namespace bitgraph
 
 
-
-
-
-#endif
+#endif  // BITGRAPH_UTILS_COMMON_TYPES_H
