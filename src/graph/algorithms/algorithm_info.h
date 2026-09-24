@@ -62,7 +62,7 @@ namespace bitgraph {
 			/// Maximum heuristic execution time, in seconds.
 			double heuristic_time_out = std::numeric_limits<double>::max();
 			
-			int num_threads = 1;										// number of threads
+			int num_threads = 1;										
 			
 			/**
 		   * @brief Legacy loop-unrolling option.
@@ -72,7 +72,6 @@ namespace bitgraph {
 
 			time_point_type start_time{};    ///< Starting point of the auxiliary timer.
 			double elapsed_time = 0.0;       ///< Last measured auxiliary duration.							
-
 
 
 			AlgorithmParameters() = default;
@@ -104,8 +103,7 @@ namespace bitgraph {
 			{
 				elapsed_time = utils::elapsed_time(start_time);
 				return elapsed_time;				
-			}
-						
+			}						
 
 			/**
 			* @brief Restores all common parameters to their default values.
@@ -116,15 +114,15 @@ namespace bitgraph {
 			virtual void reset();
 
 			/**
-			   * @brief Writes the common algorithm parameters.
-			   *
-			   * Derived implementations may extend the output after invoking
-			   * AlgorithmParameters::print().
-			   *
-			   * @param out Destination stream.
-			   * @param trailing_newline Whether to append a newline.
-			   * @return Reference to @p out.
-			   */
+			 * @brief Writes the common algorithm parameters.
+			 *
+			 * Derived implementations may extend the output after invoking
+			 * AlgorithmParameters::print().
+			 *
+			 * @param out Destination stream.
+			 * @param trailing_newline Whether to append a newline.
+			 * @return Reference to @p out.
+			 */
 			virtual std::ostream& print(
 				std::ostream& out = std::cout,
 				bool trailing_newline = true) const;		
@@ -149,48 +147,40 @@ namespace bitgraph {
 		//  added getters/setters later, possibly convert to a CLASS (31/08/2025)
 		//
 		///////////////////////
-
-		struct infoBase {
-
-			using tpoint_t = PrecisionTimer::timepoint_t;
-
+		template <class ParametersT = AlgorithmParameters>
+		class BasicAlgorithmInfo {
+			static_assert(
+				std::is_base_of<AlgorithmParameters, ParametersT>::value,
+				"ParametersT must derive from AlgorithmParameters - BasicAlgorithmInfo ");
+		public:
+			using parameters_type = ParametersT;
+			using time_point_type = PrecisionTimer::timepoint_t;
+			using clock_type = PrecisionTimer::clock_t;
+			using time_point_type = clock_type::time_point;
+					
 			enum class phase_t { SEARCH = 0, PREPROC, LAST_INCUMBENT, PARSE };
 			enum class report_t { VERBOSE = 0, TABLE = 1 };
-
-			/*
-			* @brief determines elapsed time from @start_time to now in seconds
-			* @param start_time - starting time point to determine duration
-			* @returns elapsed time in seconds
-			* @details: utility for time measurement outside the class
-			* @details - moved to utilities utils::utils::_time namespace (common.h) 31/08/2025
-			*/
-			//static double elapsedTime(tpoint_t start_time);
-
-			//////////////////////
-			//data members
-
-			paramBase data_;						//general info
-
-			// timers			
-			tpoint_t startTimePreproc_;
-			double timePreproc_ = 0;				//preprocessing time(in seconds)
-			tpoint_t startTimeSearch_;
-			double timeSearch_ = 0;					//search time (in seconds)
-			tpoint_t startTimeIncumbent_;
-			double timeIncumbent_ = 0;				//time when last new incumbent was found (in seconds)
-
-			uint32_t numStepsTimeOutCheck = 100;	//number of recursions before timeout is checked
+									
 
 			///////////////////////
 			//constructors / destructor
 
-			infoBase() = default;
-			explicit infoBase(const paramBase& p) : data_(p) {}
+			BasicAlgorithmInfo() = default;
+			explicit BasicAlgorithmInfo(const parameters_type& parameters)
+				: data_(parameters)
+			{}
+
+			virtual ~BasicAlgorithmInfo() = default;
 
 			/////////////////////
-			// getters
+			// setters / getters
 
-			std::string name() const noexcept { return data_.name; }
+			const parameters_type& parameters() const noexcept
+			{
+				return parameters_;
+			}
+						
+			const std::string& name() const noexcept { return data_.name; }
 			std::size_t num_vertices() const noexcept { return data_.N; }
 			std::size_t num_edges() const noexcept { return data_.M; };
 			double time_out() const noexcept { return data_.time_out; };
@@ -278,7 +268,22 @@ namespace bitgraph {
 			*/
 			std::ostream& printTimers(std::ostream& o = std::cout) const;
 
-		}; // end struct infoBase
+		protected:
+
+			parameters_type data_;						// general metadata and configuration parameters
+
+			// timers			
+			time_point_type startTimePreproc_;
+			double timePreproc_ = 0;					//preprocessing time(in seconds)
+			time_point_type startTimeSearch_;
+			double timeSearch_ = 0;						//search time (in seconds)
+			time_point_type startTimeIncumbent_;
+			double timeIncumbent_ = 0;					//time when last new incumbent was found (in seconds)
+
+			std::uint32_t numStepsTimeOutCheck = 100;	//number of recursions before timeout is checked
+
+
+		}; // end class infoBase
 
 
 
