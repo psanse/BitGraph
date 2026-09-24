@@ -256,7 +256,7 @@ namespace bitgraph {
 			* @brief resets to default values
 			* @param lazy - if true general info is NOT cleared, only timers
 			*/
-			virtual void clear(bool lazy = false);
+			virtual void clear(bool lazy = false) noexcept;
 
 			/**
 			* @brief clears general info - virtual since derived classes might have more general info to clear

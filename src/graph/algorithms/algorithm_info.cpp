@@ -43,7 +43,7 @@ std::ostream& AlgorithmParameters::print(
 
 
 template <class ParametersT>
-void BasicAlgorithmInfo<ParametersT>::clear(bool lazy) {
+void BasicAlgorithmInfo<ParametersT>::clear(bool lazy) noexcept {
 	clearAllTimers();
 	if (!lazy) {
 		clearGeneralInfo();					
