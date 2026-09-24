@@ -105,13 +105,20 @@ namespace bitgraph {
 				return elapsed_time;				
 			}						
 
+
 			/**
-			* @brief Restores all common parameters to their default values.
+			 * @brief Restores the common algorithm parameters to their defaults.
+			 */
+			void reset_base();
+
+			/**
+			* @brief Restores algorithm-specific parameters to their defaults.
 			*
-			* Derived implementations should reset their additional fields and invoke
-			* AlgorithmParameters::reset().
+			* The base implementation has no algorithm-specific fields to reset.
 			*/
-			virtual void reset();
+			virtual void reset_derived()
+			{ // No algorithm-specific fields to reset in the base class
+			}
 
 			/**
 			 * @brief Writes the common algorithm parameters.
@@ -180,113 +187,154 @@ namespace bitgraph {
 				return parameters_;
 			}
 						
-			const std::string& name() const noexcept { return data_.name; }
-			std::size_t num_vertices() const noexcept { return data_.N; }
-			std::size_t num_edges() const noexcept { return data_.M; };
-			double time_out() const noexcept { return data_.time_out; };
-			double time_out_heur() const noexcept { return data_.heuristic_time_out; }
-			int number_of_threads() const  noexcept { return data_.num_threads; }
-			std::size_t recursion_calls_per_tout_check() const noexcept { return numStepsTimeOutCheck; }
+			const std::string& name() const noexcept {
+				return data_.name; 
+			}
+			std::size_t num_vertices() const noexcept { 
+				return data_.N;
+			}
+			std::size_t num_edges() const noexcept {
+				return data_.M;
+			}
+			double time_out() const noexcept {
+				return data_.time_out; 
+			}
+			double time_out_heur() const noexcept { 
+				return data_.heuristic_time_out;
+			}
+			int number_of_threads() const  noexcept {
+				return data_.num_threads; 
+			}
 
-			double parsing_time() const noexcept { return data_.elapsed_time; }
-			double preprocessing_time() const  noexcept { return timePreproc_; }
-			double search_time() const noexcept { return timeSearch_; }
-			double incumbent_time() const  noexcept { return timeIncumbent_; }
+
+			std::size_t recursion_calls_per_tout_check() const noexcept { 
+				return numStepsTimeOutCheck; 
+			}
+			double parsing_time() const noexcept {
+				return data_.elapsed_time; 
+			}
+			double preprocessing_time() const  noexcept {
+				return timePreproc_; 
+			}
+			double search_time() const noexcept {
+				return timeSearch_;
+			}
+			double incumbent_time() const  noexcept { 
+				return timeIncumbent_; 
+			}
 
 			//////////////////////
 			//setters - only for general info, timers should not be set manually
 
-			void name(std::string name) noexcept { data_.name = std::move(name); }
-			void num_vertices(std::size_t N)  noexcept { data_.N = N; }
-			void num_edges(std::size_t m) noexcept { data_.M = m; }
-			void time_out(double t)  noexcept { (t == -1) ? data_.time_out = std::numeric_limits<double>::max() : data_.time_out = t; }
-			void time_out_heur(double t) noexcept { (t == -1) ? data_.heuristic_time_out = std::numeric_limits<double>::max() : data_.heuristic_time_out = t; }
-			void number_of_threads(int n) noexcept { data_.num_threads = n; }
-			void recursion_calls_per_tout_check(uint32_t n) noexcept { numStepsTimeOutCheck = n; }
-
-			//timers
-			/*
-			* @brief sets initial time in timer @t (previously set with startTimer(...))
-			* @param t - phase_t enum
-			*/
-			void startTimer(phase_t t);
-
-			/*
-			* @brief reads time in timer @t (previously set with startTimer(...))
-			* @param t - phase_t enum
-			*/
-			double readTimer(phase_t t);
-
-			/*
-			* @brief clears appropiate time duration (concerning phase_t @t)
-			*/
-			void clearTimer(phase_t t);
-
-			/**
-			* @brief clears all timers
-			**/
-			void clearAllTimers();
-
+			void name(std::string name) noexcept { 
+				data_.name = std::move(name); 
+			}
+			void num_vertices(std::size_t N)  noexcept { 
+				data_.N = N;
+			}
+			void num_edges(std::size_t m) noexcept { 
+				data_.M = m; 
+			}
+			void time_out(double t)  noexcept { 
+				(t == -1) 
+					? data_.time_out = std::numeric_limits<double>::max() 
+					: data_.time_out = t;
+			}
+			void time_out_heur(double t) noexcept {
+				(t == -1) 
+					? data_.heuristic_time_out = std::numeric_limits<double>::max() 
+					: data_.heuristic_time_out = t;
+			}
+			void number_of_threads(int n) noexcept { 
+				data_.num_threads = n;
+			}
+			void recursion_calls_per_tout_check(uint32_t count) noexcept { 
+				recursion_calls_per_timeout_check_ = count;
+			}
+						
 			/*
 			* @brief resets to default values
 			* @param lazy - if true general info is NOT cleared, only timers
 			*/
 			virtual void clear(bool lazy = false);
 
-		protected:
 			/**
 			* @brief clears general info - virtual since derived classes might have more general info to clear
 			**/
-			virtual void clearGeneralInfo() { data_.reset(); }
-
-
-			//I/O
-		public:
-			friend std::ostream& operator<<	(std::ostream&, const infoBase&);
+			virtual void clearGeneralInfo() noexcept {
+				data_.reset_base();
+			}
 
 			/*
 			* @brief streams all info
 			* @param o: output stream
-			* @param is_endl: if true adds endl at the end
+			* @param trailing_newline: if true adds endl at the end
 			* @returns output stream
 			*
 			* TODO Add @K_ to ouput conditionally
 			*/
-			virtual std::ostream& printReport(std::ostream& o = std::cout, report_t r = report_t::TABLE, bool is_endl = false) const;
+			virtual std::ostream& printReport(
+				std::ostream& o = std::cout, 
+				report_t r = report_t::TABLE,
+				bool trailing_newline = false) const;
 
 			/*
 			* @brief streams gereral info
 			* @param o: output stream
 			* @returns output stream
 			*/
-			virtual	std::ostream& printParams(std::ostream& o = std::cout) const;
+			virtual	std::ostream& printParams(
+				std::ostream& o = std::cout) const;
 
 			/*
 			* @brief streams timer info
 			* @param o output stream
 			* @returns output stream
 			*/
-			std::ostream& printTimers(std::ostream& o = std::cout) const;
+			std::ostream& printTimers(
+				std::ostream& o = std::cout) const;
 
 		protected:
+			
+			//timers
+			/*
+			* @brief sets initial time in timer @t (previously set with startTimer(...))
+			* @param t - phase_t enum
+			*/
+			void startTimer(phase_t t) noexcept;
 
-			parameters_type data_;						// general metadata and configuration parameters
+			/*
+			* @brief reads time in timer @t (previously set with startTimer(...))
+			* @param t - phase_t enum
+			*/
+			double readTimer(phase_t t) const noexcept;
 
-			// timers			
+			/*
+			* @brief clears appropiate time duration (concerning phase_t @t)
+			*/
+			void clearTimer(phase_t t) noexcept;
+
+			/**
+			* @brief clears all timers
+			**/
+			void clearAllTimers() noexcept;
+
+
+			/////////////
+			// data members
+
+			parameters_type data_;						
+							
 			time_point_type startTimePreproc_;
-			double timePreproc_ = 0;					//preprocessing time(in seconds)
+			double timePreproc_ = 0;								//preprocessing time(in seconds)
 			time_point_type startTimeSearch_;
-			double timeSearch_ = 0;						//search time (in seconds)
-			time_point_type startTimeIncumbent_;
-			double timeIncumbent_ = 0;					//time when last new incumbent was found (in seconds)
+			double timeSearch_ = 0;									//search time (in seconds)
+			time_point_type startTimeIncumbent_;		
+			double timeIncumbent_ = 0;								//time when last new incumbent was found (in seconds)
 
-			std::uint32_t numStepsTimeOutCheck = 100;	//number of recursions before timeout is checked
+			std::uint32_t recursion_calls_per_timeout_check_ = 100;	//number of recursions before timeout is checked
 
-
-		}; // end class infoBase
-
-
-
+		}; // end class BasicAlgorithmInfo
 
 }//end namespace bitgraph
 
