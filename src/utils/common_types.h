@@ -260,10 +260,7 @@ namespace bitgraph {
 			//I/O
 
 			std::ostream& print(std::ostream& o) const;
-			
-			template<class U>
-			friend std::ostream& operator<< (std::ostream& o, const FixedStack<U>& s);
-
+						
 			/////////////////////
 			// data members
 				
@@ -272,7 +269,15 @@ namespace bitgraph {
 			std::size_t cap_ = 0;				//capacity of the underlying array
 			std::unique_ptr<T[]> stack_;		//underlying C-array 
 
-		};
+		}; // end struct FixedStack
+
+		template<class U>
+		inline
+			std::ostream& operator<< (std::ostream& o, const FixedStack<U>& s) {
+			s.print(o);
+			return o;
+		}
+
 
 	}//end namespace utils
 			
@@ -280,13 +285,6 @@ namespace bitgraph {
 		
 }//end namespace bitgraph
 
-namespace bitgraph {
-	namespace utils {
-		template<class U>
-		inline
-			std::ostream& operator<< (std::ostream& o, const FixedStack<U>& s) { s.print(o); return o; }
-	}
-}
 
 namespace bitgraph {
 
