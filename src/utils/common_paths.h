@@ -4,8 +4,8 @@
 * @details created  20/06/19, @last_update 22/09/25  - 
 **/
 
-#ifndef __COMMON_PATHS_H__
-#define __COMMON_PATHS_H__
+#ifndef BITSCAN_UTILS_COMMON_PATHS_H
+#define BITSCAN_UTILS_COMMON_PATHS_H
  
 //CMake cached variables 
 #define UNIT_TESTS_GRAPH_PATH	PATH_GRAPH_TESTS_CMAKE_SRC_CODE
@@ -54,4 +54,4 @@
 //#define TEST_CLIQUE_PATH_DATA	TEST_CLIQUE_PATH_DATA_LAPTOP_19
 //#define TEST_GRAPH_PATH_LOG		TEST_GRAPH_PATH_LOG_LAPTOP_19
 
-#endif
+#endif // BITSCAN_UTILS_COMMON_PATHS_H
