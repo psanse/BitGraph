@@ -5,8 +5,8 @@
  *@dev pss
  **/
 
-#ifndef _INFO_BASE_H_
-#define _INFO_BASE_H_
+#ifndef BITGRAPH_UTILS_INFO_BASE_H
+#define BITGRAPH_UTILS_INFO_BASE_H
 
 #include "utils/prec_timer.h"
 #include "utils/time_utils.h"
@@ -228,7 +228,7 @@ namespace bitgraph {
 
 
 
-#endif
+#endif // BITGRAPH_UTILS_INFO_BASE_H
 
 
 

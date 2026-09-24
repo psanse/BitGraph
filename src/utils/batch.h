@@ -33,13 +33,13 @@ namespace bitgraph {
 		/**
 		 * @brief Stores parameter configurations for a batch of tests.
 		 *
-		 * @tparam ParamT Type containing the parameters of one test.
+		 * @tparam ParameterT Type containing the parameters of one test.
 		 */
-		template <class ParamT>
+		template <class ParameterT>
 		class Batch {
 		public:
 
-			using parameter_type = ParamT;
+			using parameter_type = ParameterT;
 			using container_type = std::vector<parameter_type>;
 			using size_type = typename container_type::size_type;
 			using const_iterator = typename container_type::const_iterator;
@@ -147,15 +147,7 @@ namespace bitgraph {
 			{
 				return tests_.empty();
 			}
-
-			/**
-			 * @brief Returns the stored test configurations.
-			 * @return Const reference to the underlying configuration collection.
-			 */
-			const container_type& tests() const noexcept
-			{
-				return tests_;
-			}
+					
 
 		protected:
 
@@ -209,6 +201,17 @@ namespace bitgraph {
 			{
 				add_test(std::move(parameters));
 				return *this;
+			}
+
+			/**
+			 * @brief Returns the stored test configurations.
+			 * @return Const reference to the underlying configuration collection.
+			 * @note: iterator access is desired, i.e., for-range loops,
+			 *		   so this function is not part of the public API
+			 */
+			const container_type& tests() const noexcept
+			{
+				return tests_;
 			}
 
 			

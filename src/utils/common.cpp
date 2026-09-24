@@ -30,33 +30,33 @@ namespace bitgraph {
 	namespace utils {
 		namespace _file {
 
-			int READ_SET_OF_INTERDICTED_VERTICES(const char* filename, vector<int>& interdicted_nodes) noexcept {
+			//int READ_SET_OF_INTERDICTED_VERTICES(const char* filename, vector<int>& interdicted_nodes) noexcept {
 
-				//opens a file in binary mode
-				std::ifstream f(filename, ios::binary | ios::in);
-				if (!f) {
-					LOGG_ERROR("File could not be opened: ", filename, "_file::READ_SET_OF_INTERDICTED_NODES");
-					return -1;
-				}
+			//	//opens a file in binary mode
+			//	std::ifstream f(filename, ios::binary | ios::in);
+			//	if (!f) {
+			//		LOGG_ERROR("File could not be opened: ", filename, "_file::READ_SET_OF_INTERDICTED_NODES");
+			//		return -1;
+			//	}
 
-				//reads the file and stores the positions of the 0s
-				interdicted_nodes.clear();
-				std::size_t index = 0;
-				char c;
-				while (f.get(c)) {
+			//	//reads the file and stores the positions of the 0s
+			//	interdicted_nodes.clear();
+			//	std::size_t index = 0;
+			//	char c;
+			//	while (f.get(c)) {
 
-					if (c == '0') {
-						/////////////////////////////////////
-						interdicted_nodes.push_back(index);
-						////////////////////////////////////
-					}
+			//		if (c == '0') {
+			//			/////////////////////////////////////
+			//			interdicted_nodes.push_back(index);
+			//			////////////////////////////////////
+			//		}
 
-					index++;
-				}
+			//		index++;
+			//	}
 
-				f.close();
-				return 0;
-			}
+			//	f.close();
+			//	return 0;
+			//}
 		} // end namespace _file
 	} // end namespace utils
 

@@ -11,7 +11,7 @@ file(GLOB HEADER_FILES   ${CMAKE_CURRENT_SOURCE_DIR}/*.h
 add_library (utils STATIC   
     #result.cpp
     #batch_analyser.cpp
-    common.cpp
+    #common.cpp
     #common_types.cpp
     info/info_base.cpp  
     random_utils.cpp 
@@ -24,7 +24,7 @@ add_library (utils STATIC
 
 ##############
 # LOGGER LEVEL - default level debug
-# (utils/logger.h) 
+# (utils/logger_utils.h) 
 
 set(LOGGER_LEVEL "debug" CACHE STRING "Logger level used at run time")
 set_property(CACHE LOGGER_LEVEL PROPERTY STRINGS debug verbose error)
