@@ -23,12 +23,14 @@ using namespace bitgraph;
 
 namespace {
 
-	/**
-	 * @brief Concrete Benchmark subclass used by the unit tests.
-	 *
-	 * Benchmark has a protected constructor because it is intended to serve as a
-	 * base class for concrete graph datasets.
-	 */
+    /**
+     * @brief Concrete benchmark subclass used by the unit tests.
+     *
+     * GraphBenchmark is the public alias for
+     * BasicGraphBenchmark<int>. Its constructor is protected because the
+     * benchmark class is intended to serve as a base for concrete graph datasets.
+     * This test subclass exposes that constructor for test setup.
+     */
 	class TestGraphBenchmark final : public bitgraph::GraphBenchmark {
 	public:
 		explicit TestGraphBenchmark(std::string path)

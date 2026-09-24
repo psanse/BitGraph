@@ -20,6 +20,9 @@
 #include <utility>
 #include <vector>
 
+#include "utils/logger.h"
+#include "utils/path_utils.h"
+
 
 
 namespace bitgraph {
@@ -33,30 +36,26 @@ namespace bitgraph {
 		 * The protected constructor prevents direct construction while allowing
 		 * concrete benchmark datasets to derive from this class.
 		 */
-
-		 // TODO - consider a template parameter for the value type (e.g., int, double) to allow more flexible reference values.
-		class GraphBenchmark {
-
-			friend std::ostream& operator<<	(std::ostream& o, GraphBenchmark& b) {
-				return b.print(o);
-			}
-
+		
+		template <class ValueT>
+		class BasicGraphBenchmark {
 		public:
 		
+			using value_type = ValueT;
 			using filename_list = std::vector<std::string>;
-			using value_map = std::map<std::string, int>;
+			using value_map = std::map<std::string, value_type>;
 
 			// alias for backward compatibility
 			using vstr_t = filename_list;
 			using mstri_t = value_map;
 						
 						
-			GraphBenchmark(const GraphBenchmark& b) = delete;
-			GraphBenchmark& operator=	(const GraphBenchmark& b) = delete;
-			GraphBenchmark(GraphBenchmark&& b) = delete;
-			GraphBenchmark& operator=	(GraphBenchmark&& b) = delete;
+			BasicGraphBenchmark(const BasicGraphBenchmark& b) = delete;
+			BasicGraphBenchmark& operator=	(const BasicGraphBenchmark& b) = delete;
+			BasicGraphBenchmark(BasicGraphBenchmark&& b) = delete;
+			BasicGraphBenchmark& operator=	(BasicGraphBenchmark&& b) = delete;
 						
-			virtual ~GraphBenchmark() {}
+			virtual ~BasicGraphBenchmark() {}
 							
 
 			///////////
@@ -92,7 +91,7 @@ namespace bitgraph {
 			 *
 			 * @note This interface assumes that `-1` is not a valid reference value.
 			 */
-			int get_value(const std::string& filename) const;
+			ValueT get_value(const std::string& filename) const;
 						
 			
 			const std::string& path() const noexcept
@@ -144,9 +143,9 @@ namespace bitgraph {
 			 * directory separator is inserted when necessary.
 			 *
 			 * @param filename Instance filename, relative to the benchmark base path.
-			 * @param value Reference value, typically a known optimum or bound.
+			 * @tparam value Reference value, typically a known optimum or bound.
 			 */
-			virtual void add_test(const std::string&, int value);
+			virtual void add_test(const std::string&, ValueT value);
 
 			/**
 			 * @brief Adds a graph instance without an associated reference value.
@@ -184,22 +183,130 @@ namespace bitgraph {
 			 * @brief Constructs a benchmark for a dataset path.
 			 * @param path Common path for all benchmark instances.
 			 */
-			explicit GraphBenchmark(std::string path_name);
+			explicit BasicGraphBenchmark(std::string path_name);
 
 			const std::string path_;   ///< Common path for all instances.
 			filename_list filenames_;  ///< Registered instance filenames.
-			value_map values_;         ///< Reference values indexed by filename.			
-		};
+			value_map values_;         ///< Reference values indexed by filename.
+
+		}; // end class BasicGraphBenchmark
+
+
+		/**
+		 * @brief Writes a graph benchmark to an output stream.
+		 *
+		 * @tparam ValueT Type of the values associated with benchmark instances.
+		 * @param out Output stream.
+		 * @param benchmark Benchmark to write.
+		 * @return Reference to @p out.
+		 */
+		template<class ValueT>
+		std::ostream& operator<<(
+			std::ostream& out,
+			const BasicGraphBenchmark<ValueT>& benchmark)
+		{
+			return benchmark.print(out);
+		}
 	
 
 }//end namespace bitgraph
 
 
 namespace bitgraph {
+	
+	// convenient aliases
+	using GraphBenchmark = 
+		BasicGraphBenchmark<int>;
+
+	using WeightedGraphBenchmark =
+		BasicGraphBenchmark<double>;
+
+	template<class WeightT>
+	using WeightedGraphBenchmarkT =
+		BasicGraphBenchmark<WeightT>;
 
 	// Backward-compatible alias. New code should use GraphBenchmark.
 	using Benchmark = GraphBenchmark;
 
 } // namespace bitgraph
+
+///////////////////////////////////////
+// Necessary header implementation for template class
+
+namespace bitgraph {
+
+	template<class ValueT>
+	BasicGraphBenchmark<ValueT>::BasicGraphBenchmark(std::string path_name)
+		:path_(std::move(path_name))
+	{
+		if (path_.empty()) {
+			LOG_DEBUG(
+				"GraphBenchmark base path is empty; filenames will be used as supplied. - GraphBenchmark::GraphBenchmark");
+		}
+	}
+
+	template<class ValueT>
+	void BasicGraphBenchmark<ValueT>::add_test(const std::string& filename)
+	{
+		std::string full_filename = path_;
+
+		if (!full_filename.empty()) {
+			utils::append_slash(full_filename);
+		}
+
+		full_filename += filename;
+		filenames_.push_back(std::move(full_filename));
+	}
+
+	template<class ValueT>
+	void BasicGraphBenchmark<ValueT>::add_test(
+		const std::string& filename,
+		ValueT value)
+	{
+		std::string full_filename = path_;
+
+		if (!full_filename.empty()) {
+			utils::append_slash(full_filename);
+		}
+
+		full_filename += filename;
+
+		filenames_.push_back(full_filename);
+		values_[full_filename] = value;
+	}
+
+	template<class ValueT>
+	ValueT BasicGraphBenchmark<ValueT>::get_value(const std::string& filename) const
+	{
+		const auto iterator = values_.find(filename);
+
+		return iterator != values_.end()
+			? iterator->second
+			: -1;
+	}
+
+	///////////////////
+	// I/O
+
+	template<class ValueT>
+	std::ostream& BasicGraphBenchmark<ValueT>::print(std::ostream& out) const
+	{
+		for (const auto& filename : filenames_) {
+			out << filename;
+
+			const auto iterator = values_.find(filename);
+
+			if (iterator != values_.end()) {
+				out << ':' << iterator->second;
+			}
+
+			out << '\n';
+		}
+
+		return out;
+	}
+
+}
+
 
 #endif // BITGRAPH_GRAPH_BENCHMARK_H

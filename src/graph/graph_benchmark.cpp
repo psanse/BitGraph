@@ -19,7 +19,8 @@
 
 using namespace bitgraph;
 
-GraphBenchmark::GraphBenchmark(std::string path_name)
+template<class ValueT>
+BasicGraphBenchmark<ValueT>::BasicGraphBenchmark(std::string path_name)
 	:path_(std::move(path_name))
 {
 	if (path_.empty()) {
@@ -28,7 +29,8 @@ GraphBenchmark::GraphBenchmark(std::string path_name)
 	}
 }
 
-void GraphBenchmark::add_test(const std::string& filename)
+template<class ValueT>
+void BasicGraphBenchmark<ValueT>::add_test(const std::string& filename)
 {
 	std::string full_filename = path_;
 
@@ -40,10 +42,10 @@ void GraphBenchmark::add_test(const std::string& filename)
 	filenames_.push_back(std::move(full_filename));
 }
 
-
-void GraphBenchmark::add_test(
+template<class ValueT>
+void BasicGraphBenchmark<ValueT>::add_test(
 	const std::string& filename,
-	int value)
+	ValueT value)
 {
 	std::string full_filename = path_;
 
@@ -57,8 +59,8 @@ void GraphBenchmark::add_test(
 	values_[full_filename] = value;
 }
 
-
-int GraphBenchmark::get_value(const std::string& filename) const
+template<class ValueT>
+ValueT BasicGraphBenchmark<ValueT>::get_value(const std::string& filename) const
 {
 	const auto iterator = values_.find(filename);
 
@@ -70,7 +72,8 @@ int GraphBenchmark::get_value(const std::string& filename) const
 ///////////////////
 // I/O
 
-std::ostream& GraphBenchmark::print(std::ostream& out) const
+template<class ValueT>
+std::ostream& BasicGraphBenchmark<ValueT>::print(std::ostream& out) const
 {
 	for (const auto& filename : filenames_) {
 		out << filename;
