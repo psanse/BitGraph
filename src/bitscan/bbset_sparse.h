@@ -14,7 +14,7 @@
 #include "bitscan/bbobject.h"
 #include "bitscan/bitblock.h"
 #include "utils/logger.h"
-#include "utils/common.h"
+//#include "utils/common.h"
 #include <vector>	
 #include <algorithm>
 #include <iterator>

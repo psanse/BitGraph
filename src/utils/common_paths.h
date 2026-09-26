@@ -2,14 +2,13 @@
 * @file common_paths.h
 * @brief useful paths for tests (different machines...)
 * @details created  20/06/19, @last_update 22/09/25  - 
+* 
+* DEPRECATED - TODO@REFACTOR
 **/
 
 #ifndef BITSCAN_UTILS_COMMON_PATHS_H
 #define BITSCAN_UTILS_COMMON_PATHS_H
  
-//CMake cached variables 
-#define UNIT_TESTS_GRAPH_PATH	BITGRAPH_GRAPH_TEST_DATA_DIR
-
 
 //examples
 //ETSIDI

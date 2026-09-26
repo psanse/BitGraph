@@ -17,7 +17,6 @@
 
 #include "bbobject.h"
 #include "bitblock.h"
-//#include "utils/common.h"		 
 #include "utils/fixed_stack.h"		// FixedStack<T> for bitblock indices
 #include "utils/logger.h"
 
