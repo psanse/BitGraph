@@ -5,14 +5,15 @@
 using namespace std;
 using namespace bitgraph;
 
-
-//configuration data for the hierarchy of algorithms
-struct param_t{
-	int i_ = 0;
-	int j_ = 3;
-};
-
 namespace {
+
+	//configuration data for the hierarchy of algorithms
+	struct param_t {
+		int i_ = 0;
+		int j_ = 3;
+	};
+
+
 	template<class ParamT>
 	class TestBatch : public Batch<ParamT>{
 	public:

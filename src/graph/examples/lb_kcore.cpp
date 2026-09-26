@@ -7,7 +7,7 @@
 #include <iostream>
 #include "graph/algorithms/kcore.h"
 //#include "utils/common.h"
-#include "utils/prec_timer.h"
+#include "utils/precise_timer.h"
 #include "utils/logger.h"
 #include "utils/collection_utils.h"
 

@@ -19,7 +19,7 @@
 #define BITGRAPH_GRAPH_ALGORITHM_INFO_H
 
 
-#include "utils/prec_timer.h"
+#include "utils/precise_timer.h"
 #include "utils/time_utils.h"
 #include "utils/logger.h"
 

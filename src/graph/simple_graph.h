@@ -38,7 +38,7 @@
 
 #include "bitscan/bitscan.h"	
 #include "utils/logger.h"
-#include "utils/prec_timer.h"
+#include "utils/precise_timer.h"
 #include "graph_types.h"
 #include "graph/formats/detail/dimacs_format.h"
 #include "graph/formats/detail/edges_format.h"

@@ -8,7 +8,7 @@
 #ifndef BITGRAPH_UTILS_INFO_BASE_H
 #define BITGRAPH_UTILS_INFO_BASE_H
 
-#include "utils/prec_timer.h"
+#include "utils/precise_timer.h"
 #include "utils/time_utils.h"
 #include <iostream>
 #include <string>

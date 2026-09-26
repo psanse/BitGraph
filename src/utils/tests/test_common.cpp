@@ -26,12 +26,6 @@
 using namespace std;
 using namespace bitgraph;
 
-//useful alias
-namespace bitgraph {
-	
-	using vdob = std::vector<double>;
-}
-
 TEST(Common_stack, constructor) {
 
 	bitgraph::utils::FixedStack<int> s(3);
@@ -99,12 +93,10 @@ TEST(Common_stack, backward_iteration) {
 
 }
 
-
-
 TEST(Common_mat, mean_and_stdev) {
 
 	//collection
-	vdob col = { 2.7, 2.8, 2.9, 3, 3.1, 3.2, 3.3 };
+	std::vector<double> col = { 2.7, 2.8, 2.9, 3, 3.1, 3.2, 3.3 };
 	
 	//compute mean - implicit cast to double on return, MUST USE for_each and return double
 	double mean = for_each(col.begin(), col.end(), utils::MeanValue());					

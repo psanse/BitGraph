@@ -19,7 +19,7 @@
 //#include "utils/common.h"
 #include "utils/logger.h"
 #include "utils/string_utils.h"
-#include "utils/prec_timer.h"
+#include "utils/precise_timer.h"
 #include <fstream>
 #include <iostream>
 #include <cassert>							//NDEBUG should be undefined - (normally in compiler DEBUG mode)
