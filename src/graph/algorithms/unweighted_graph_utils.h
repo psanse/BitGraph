@@ -205,7 +205,9 @@ namespace bitgraph {
 		 */
 		template <class Graph>
 		inline
-			std::vector<unsigned char> circulant_jump_pattern(const Graph& g, int v)
+			std::vector<unsigned char> circulant_jump_pattern(
+				const Graph& g, 
+				int v)
 		{
 			const int n = g.num_vertices();
 			std::vector<unsigned char> jump(static_cast<std::size_t>(n), 0);
@@ -234,7 +236,9 @@ namespace bitgraph {
 		  */
 		template <class Graph>
 		inline
-			bool is_circulant(const Graph& g, std::vector<Vertex>* step_set = nullptr)
+			bool is_circulant(
+				const Graph& g, 
+				std::vector<Vertex>* step_set = nullptr)
 		{
 			const int NV = g.num_vertices();
 
@@ -274,7 +278,6 @@ namespace bitgraph {
 			return true;
 		}
 
-
 		/*
 		* @brief Determines if an induced subgraph has no edges
 		*		 If this is not the case provides the first edge found
@@ -287,8 +290,11 @@ namespace bitgraph {
 		* @todo - change returned edge to std::pair<int,int> (29/01/2026)
 		*/
 		template<class GraphT>
-		bool is_edgeFree_subgraph(GraphT& g, typename GraphT::vertex_bitset_t& bbsg, std::vector<Vertex>& edge) {
-
+		bool is_edgeFree_subgraph(
+			GraphT& g, 
+			const typename GraphT::vertex_set_type& bbsg,
+			std::vector<Vertex>& edge) 
+		{
 			//cleans output edge
 			edge.clear();
 
@@ -325,13 +331,17 @@ namespace bitgraph {
 		* @returns TRUE if the induced subgraph has no edges, FALSE otherwise
 		*/
 		template<class GraphT>
-		bool is_triangleFree_subgraph(GraphT& g, typename GraphT::vertex_bitset_t& bbsg, std::vector<Vertex>& triangle) {
+		bool is_triangleFree_subgraph(
+			GraphT& g,
+			const typename GraphT::vertex_set_type& bbsg,
+			std::vector<Vertex>& triangle) 
+		{
 
 			//cleans output 
 			triangle.clear();
 
 			//decodes subgraph to vector
-			Vertices lv;
+			vertices lv;
 			bbsg.extract(lv);
 
 			//input bitset of size 2 - induced subgraph has no triangles
@@ -379,7 +389,6 @@ namespace bitgraph {
 			const Vertices& lref,
 			bool min_sort = true) 
 		{
-
 			int deg = 0;
 
 			//determine the degree of each vertex in lv wrt to ref
@@ -448,6 +457,9 @@ namespace bitgraph {
 
 			return lv;
 		}
+
+		
+		//////////////////////////////////////
 
 		namespace detail {
 			
