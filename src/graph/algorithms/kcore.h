@@ -523,7 +523,8 @@ namespace bitgraph {
 				p_newUB = -1;
 
 				//loop over neighbors of v with degree greater than UB
-				if (g_.neighbors(v).init_scan(bbo::NON_DESTRUCTIVE) != -1) {
+				g_.neighbors(v).init_scan(bbo::NON_DESTRUCTIVE);
+				//if (g_.neighbors(v).init_scan(bbo::NON_DESTRUCTIVE) != -1) {
 					while ((u = g_.neighbors(v).next_bit()) != BBObject::noBit) {
 
 						if (deg_[u] > UB) {
@@ -543,7 +544,7 @@ namespace bitgraph {
 							else deg_[u]--;
 						}
 					}
-				}
+				//}
 
 				///////////////////////////////////////////////////////
 				//extra loop for new vertices with degree LB caused by v
@@ -555,7 +556,8 @@ namespace bitgraph {
 						v = ver_[p_newUB];
 
 						//loop over neighbors of v with degree greater than UB
-						if (g_.neighbors(v).init_scan(bbo::NON_DESTRUCTIVE) != -1) {
+						g_.neighbors(v).init_scan(bbo::NON_DESTRUCTIVE);
+						//if (g_.neighbors(v).init_scan(bbo::NON_DESTRUCTIVE) != -1) {
 
 							while ((u = g_.neighbors(v).next_bit()) != BBObject::noBit) {
 								if (deg_[u] > UB) {
@@ -567,7 +569,7 @@ namespace bitgraph {
 									(deg_[u] == UB + 1) ? deg_[u] = deg_[v] : deg_[u]--;		//updates degree
 								}
 							}
-						}//endif
+						//}//endif
 
 						p_newUB++;	//next vertex in UB
 					}
@@ -696,7 +698,8 @@ namespace bitgraph {
 
 			//induced subgraph
 			//subg_ cannot be empty, assertion MUST HOLD
-			assert(subg_.init_scan(bbo::NON_DESTRUCTIVE) != -1);
+			subg_.init_scan(bbo::NON_DESTRUCTIVE);
+			//assert(subg_.init_scan(bbo::NON_DESTRUCTIVE) != -1);
 
 			v = BBObject::noBit;
 			while ((v = subg_.next_bit()) != BBObject::noBit) {

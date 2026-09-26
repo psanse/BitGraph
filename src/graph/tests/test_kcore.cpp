@@ -16,31 +16,36 @@
 #include "graph/algorithms/graph_gen.h"
 #include "graph/algorithms/kcore.h"
 #include "graph/graph_types.h"
-#include "utils/common.h"
+//#include "utils/common.h"
 #include "utils/logger.h"
-//#include "utils/result.h"
 
 using namespace std;
 using namespace bitgraph;
 
-//aliases
-using vint = std::vector<int>;
+namespace {
 
-class KcoreWTest : public ::testing::Test {
-protected:
-	void SetUp() override {
-		ug.reset(NV);
-		ug.add_edge(0, 1);
-		ug.add_edge(0, 2);
-		ug.add_edge(0, 3);
-		ug.set_name("star");
-	}
-	void TearDown() override {}
+	//aliases
+	using vint = std::vector<int>;
 
-	//undirected graph instance	
-	const int NV = 4;
-	ugraph ug;												//undirected graph with integer weights
-};
+
+
+	class KcoreWTest : public ::testing::Test {
+	protected:
+		void SetUp() override {
+			ug.reset(NV);
+			ug.add_edge(0, 1);
+			ug.add_edge(0, 2);
+			ug.add_edge(0, 3);
+			ug.set_name("star");
+		}
+		void TearDown() override {}
+
+		//undirected graph instance	
+		const int NV = 4;
+		ugraph ug;												//undirected graph with integer weights
+	};
+
+}
 
 TEST_F(KcoreWTest, constructor) {
 
@@ -73,7 +78,7 @@ TEST_F(KcoreWTest, set_subgraph) {
 TEST_F(KcoreWTest, set_subgraph_from_vector) {
 
 	//bitset that induces a subgraph in G
-	VertexList vList = { 0, 2, 3 };
+	vertices vList = { 0, 2, 3 };
 
 	//KCore with subgraph
 	KCore<ugraph> kc(ug, vList);
@@ -169,7 +174,7 @@ TEST_F(KcoreWTest, kcore_decomp_static) {
 
 TEST(KCore, kcore_decomp_static_brock) {
 
-	ugraph ug(PATH_GRAPH_TESTS_CMAKE_SRC_CODE "brock200_1.clq");
+	ugraph ug(BITGRAPH_GRAPH_TEST_DATA_DIR "brock200_1.clq");
 
 	//core number in O(|V|*|V|)
 	int max_core_quad = KCore<ugraph>::find_kcore(ug);								

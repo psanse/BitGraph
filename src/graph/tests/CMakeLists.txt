@@ -24,7 +24,7 @@ add_executable (
   test_algorithm_info.cpp
 
   # Tests to be checked:
-  # test_kcore.cpp             # to fix (02/02/2026)
+  # test_kcore.cpp             # to fix (26/09/2026)
   # test_graph_sort.cpp        # deprecated class 
 )
 

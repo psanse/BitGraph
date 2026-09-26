@@ -23,7 +23,6 @@
 
 namespace bitgraph {
 
-
 	/**
 	 * @brief Decodes vertices through a composition of graph orderings.
 	 *
