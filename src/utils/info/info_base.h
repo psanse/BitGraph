@@ -1,8 +1,9 @@
 /**
- *@file info_base.h
-* @brief: interface for result logs of clique and clique-based algorithms
- *@details: created 12/12/2024, last_update 12/09/2025
- *@dev pss
+ * @file info_base.h
+ * @brief: interface for result logs of clique and clique-based algorithms
+ * @details: created 12/12/2024, last_update 12/09/2025
+ * @dev pss
+ * @note: deprecated class, tests disable, new types moved to graph (26/09/2026)
  **/
 
 #ifndef BITGRAPH_UTILS_INFO_BASE_H

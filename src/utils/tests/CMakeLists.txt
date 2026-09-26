@@ -5,15 +5,14 @@
 add_executable(
     test_utils
 
-    # Tests checked on 26/01/2025.
-    test_common.cpp
-    test_file.cpp
-    test_info_base.cpp          # deprecated
+    test_general_utils.cpp
+    test_file.cpp   
     test_precise_timer.cpp
     test_task.cpp
-    test_logger.cpp
-    #test_benchmark.cpp
+    test_logger.cpp    
     test_batch.cpp
+    test_info_base.cpp          # deprecated, tests disabled.
+    #test_testAnalyser.cpp      # deprecated, tests disabled.
 )
 
 set_target_properties(

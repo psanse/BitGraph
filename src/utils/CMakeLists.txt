@@ -8,17 +8,12 @@ file(GLOB HEADER_FILES   ${CMAKE_CURRENT_SOURCE_DIR}/*.h
 )
 
 #creates utils library
-add_library (utils STATIC   
-    #result.cpp
-    #batch_analyser.cpp
-    #common.cpp
-    #common_types.cpp
-    info/info_base.cpp     # deprecated
+add_library (utils STATIC     
     random_utils.cpp 
     time_utils.cpp
     path_utils.cpp
-    sort_utils.cpp
-    #logger.cpp 
+    sort_utils.cpp  
+    info/info_base.cpp     # deprecated, refactored andmoved to graph
     ${HEADER_FILES}
 )
 

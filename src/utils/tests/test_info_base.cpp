@@ -1,9 +1,9 @@
 /**
 * test_info_base.cpp: tests the info_base class
- *
- *@date: 15/12/2024, last_update 25/08/2025
- * 
- **/
+*
+* @date: 15/12/2024, last_update 25/08/2025
+* @DEPRECATED - DISABLED ALL TESTS
+**/
 
 #include "gtest/gtest.h"
 #include "utils/info/info_base.h"
@@ -14,21 +14,25 @@
 
 using namespace bitgraph;
 
-class InfoBaseTest : public ::testing::Test {
-protected:
-	infoBase info;
+namespace {
 
-	void SetUp() override {
-		// Initialize any necessary data here
-	}
+	class InfoBaseTest : public ::testing::Test {
+	protected:
+		infoBase info;
 
-	void TearDown() override {
-		// Clean up any necessary data here
-	}
-};
+		void SetUp() override {
+			// Initialize any necessary data here
+		}
+
+		void TearDown() override {
+			// Clean up any necessary data here
+		}
+	};
+
+}
 
 
-TEST_F(InfoBaseTest, DefaultConstructor) {
+TEST_F(InfoBaseTest, DISABLED_DefaultConstructor) {
 	
 	EXPECT_EQ(info.data_.name, "");
 	EXPECT_EQ(info.data_.N, 0);
@@ -40,13 +44,13 @@ TEST_F(InfoBaseTest, DefaultConstructor) {
 	EXPECT_EQ(info.algSort_, -1);*/
 }
 
-TEST_F(InfoBaseTest, StartTimer) {
+TEST_F(InfoBaseTest, DISABLED_StartTimer) {
 
 	info.startTimer(infoBase::phase_t::SEARCH);
 	EXPECT_NO_THROW(info.startTimer(infoBase::phase_t::SEARCH));
 }
 
-TEST_F(InfoBaseTest, ReadTimer) {
+TEST_F(InfoBaseTest, DISABLED_ReadTimer) {
 
 	info.startTimer(infoBase::phase_t::SEARCH);
 	std::this_thread::sleep_for(std::chrono::milliseconds{ 50 });
@@ -59,7 +63,7 @@ TEST_F(InfoBaseTest, ReadTimer) {
 }
 
 
-TEST_F(InfoBaseTest, ClearGeneralInfo) {
+TEST_F(InfoBaseTest, DISABLED_ClearGeneralInfo) {
 
 	info.data_.N = 10;
 	info.data_.M = 20;
@@ -69,7 +73,7 @@ TEST_F(InfoBaseTest, ClearGeneralInfo) {
 	EXPECT_EQ(info.data_.M, 0);
 }
 
-TEST_F(InfoBaseTest, ClearTimers) {
+TEST_F(InfoBaseTest, DISABLED_ClearTimers) {
 
 	info.clear(false);
 
@@ -78,7 +82,7 @@ TEST_F(InfoBaseTest, ClearTimers) {
 	EXPECT_DOUBLE_EQ(info.timeIncumbent_, 0.0);
 }
 
-TEST_F(InfoBaseTest, Clear) {
+TEST_F(InfoBaseTest, DISABLED_Clear) {
 
 	info.data_.N = 10;
 	info.data_.M = 20;
@@ -102,7 +106,7 @@ TEST_F(InfoBaseTest, Clear) {
 	//test other members...
 }
 
-TEST_F(InfoBaseTest, PrintParams) {
+TEST_F(InfoBaseTest, DISABLED_PrintParams) {
 
 	std::ostringstream oss;
 	info.printParams(oss);
@@ -110,7 +114,7 @@ TEST_F(InfoBaseTest, PrintParams) {
 	EXPECT_FALSE(oss.str().empty());
 }
 
-TEST_F(InfoBaseTest, PrintTimers) {
+TEST_F(InfoBaseTest, DISABLED_PrintTimers) {
 
 	std::ostringstream oss;
 	info.printTimers(oss);
@@ -118,7 +122,7 @@ TEST_F(InfoBaseTest, PrintTimers) {
 	EXPECT_FALSE(oss.str().empty());
 }
 
-TEST_F(InfoBaseTest, printReport) {
+TEST_F(InfoBaseTest, DISABLED_printReport) {
 
 	std::ostringstream oss;
 	info.printReport(oss);
@@ -129,7 +133,7 @@ TEST_F(InfoBaseTest, printReport) {
 // Asegúrate de que los enums de phase_t estén definidos correctamente en infoBase
 
 
-TEST_F(InfoBaseTest, StartAndReadTimerPreproc) {
+TEST_F(InfoBaseTest, DISABLED_StartAndReadTimerPreproc) {
 	info.startTimer(infoBase::phase_t::PREPROC);
 	std::this_thread::sleep_for(std::chrono::milliseconds(80));
 	double elapsed = info.readTimer(infoBase::phase_t::PREPROC);
@@ -137,7 +141,7 @@ TEST_F(InfoBaseTest, StartAndReadTimerPreproc) {
 	EXPECT_LE(elapsed, 0.2);
 }
 
-TEST_F(InfoBaseTest, StartAndReadTimerIncumbent) {
+TEST_F(InfoBaseTest, DISABLED_StartAndReadTimerIncumbent) {
 	info.startTimer(infoBase::phase_t::LAST_INCUMBENT);
 	std::this_thread::sleep_for(std::chrono::milliseconds(50));
 	double elapsed = info.readTimer(infoBase::phase_t::LAST_INCUMBENT);
@@ -145,7 +149,7 @@ TEST_F(InfoBaseTest, StartAndReadTimerIncumbent) {
 	EXPECT_LE(elapsed, 0.15);
 }
 
-TEST_F(InfoBaseTest, ClearTimerResetsIndividualTimer) {
+TEST_F(InfoBaseTest, DISABLED_ClearTimerResetsIndividualTimer) {
 	info.startTimer(infoBase::phase_t::SEARCH);
 	std::this_thread::sleep_for(std::chrono::milliseconds(60));
 	info.readTimer(infoBase::phase_t::SEARCH);
@@ -153,7 +157,7 @@ TEST_F(InfoBaseTest, ClearTimerResetsIndividualTimer) {
 	EXPECT_DOUBLE_EQ(info.timeSearch_, 0.0);
 }
 
-TEST_F(InfoBaseTest, ClearTimersResetsAllTimers) {
+TEST_F(InfoBaseTest, DISABLED_ClearTimersResetsAllTimers) {
 	
 	info.startTimer(infoBase::phase_t::PREPROC);
 	info.startTimer(infoBase::phase_t::SEARCH);
