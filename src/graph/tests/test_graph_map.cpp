@@ -11,7 +11,7 @@
 #include "graph/algorithms/graph_map.h"
 #include "graph/algorithms/graph_fast_sort.h"
 #include "graph/simple_ugraph.h"
-#include "utils/common.h"
+//#include "utils/common.h"
 #include <iostream>
 
 namespace bitgraph {

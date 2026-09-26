@@ -15,7 +15,7 @@
 #include "graph/simple_graph_w.h"
 #include "bitscan/bitscan.h"
 #include "graph/formats/detail/dimacs_format.h"			
-#include "utils/common.h"
+//#include "utils/common.h"
 #include "utils/logger.h"
 #include "utils/string_utils.h"
 #include "utils/collection_utils.h"

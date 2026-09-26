@@ -16,7 +16,7 @@
 #include "graph_types.h"
 #include "graph/formats/detail/dimacs_format.h"
 #include "graph/simple_graph_ew.h"
-#include "utils/common.h"
+//#include "utils/common.h"
 #include "utils/logger.h"
 #include "utils/string_utils.h"
 #include "utils/prec_timer.h"

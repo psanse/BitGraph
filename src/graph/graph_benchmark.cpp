@@ -12,7 +12,7 @@
 #include "graph_benchmark.h"
 #include "utils/logger.h"
 #include <string>
-#include "utils/common.h"
+//#include "utils/common.h"
 #include "utils/string_utils.h"
 #include "utils/path_utils.h"
 

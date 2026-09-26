@@ -10,7 +10,7 @@
 #include <string>
 #include "graph/algorithms/graph_gen.h"
 #include "graph/graph_excep_hand.h"
-#include "utils/common.h"
+//#include "utils/common.h"
 #include "utils/logger.h"
 
 using namespace std;
@@ -26,14 +26,14 @@ struct input_t{
 	double incP;
 
 	//I/O
-	friend ostream & operator<<(ostream& o, const input_t& i) {
-		o << "RANGE SIZE: " << "[" << i.nLB << "," << i.nUB << "]" << endl
+	friend ostream & operator<<(ostream& out, const input_t& i) {
+		out << "RANGE SIZE: " << "[" << i.nLB << "," << i.nUB << "]" << endl
 		  << "RANGE DENSITY: " << "[" << i.pLB << "," << i.pUB << "]" << endl
 		  << "NUM_REP: " << i.nRep <<endl
 		  << "INC_SIZE: " << i.incN << endl
 		  << "INC_DENSITY: " << i.incP << endl;
 
-		return o;
+		return out;
 	}
 
 };

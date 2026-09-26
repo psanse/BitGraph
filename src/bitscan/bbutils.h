@@ -8,9 +8,10 @@
 #ifndef  BITGRAPH_BITSCAN_BBUTILS_H
 #define  BITGRAPH_BITSCAN_BBUTILS_H
 
-#include "utils/common.h"
+//#include "utils/common.h"
 #include "utils/logger.h"
 #include "bitscan/bbset.h"
+#include "utils/random_utils.h"
 #include <array>
 
 namespace bitgraph {

@@ -12,7 +12,7 @@
 
 #include <iostream>
 #include "utils/logger.h"
-#include "utils/common.h"
+//#include "utils/common.h"
 #include "bitscan/bbobject.h"		
 #include "bitscan/bitblock.h"		//for bitblock operations
 #include "bitscan/bbset.h"	

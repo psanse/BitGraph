@@ -9,7 +9,7 @@
 #include <iostream>
 #include "gtest/gtest.h"
 #include "graph/algorithms/decode.h"
-#include "utils/common.h"
+//#include "utils/common.h"
 #include "graph/graph.h"
 #include "graph/algorithms/graph_fast_sort.h"
 

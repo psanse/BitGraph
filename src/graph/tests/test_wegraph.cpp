@@ -14,8 +14,8 @@
 #include "graph/graph_edge_weighted.h"
 #include "utils/logger.h"	
 #include "utils/math_utils.h"
-#include "utils/common_paths.h"
-#include "utils/common.h"
+//#include "utils/common_paths.h"
+//#include "utils/common.h"
 
 using namespace std;
 using namespace bitgraph;

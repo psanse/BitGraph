@@ -9,7 +9,7 @@
 #include <iostream>
 
 #include "utils/file_utils.h"
-#include "utils/common.h"
+//#include "utils/common.h"
 
 #ifndef	__DIMACS_READER_H__
 #define __DIMACS_READER_H__

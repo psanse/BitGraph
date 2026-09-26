@@ -13,7 +13,7 @@
 #ifndef __SIMPLE_GRAPH_WEIGHTED_H__
 #define __SIMPLE_GRAPH_WEIGHTED_H__
 
-#include "utils/common.h"
+//#include "utils/common.h"
 #include "simple_ugraph.h"
 #include <iostream>
 #include <vector>

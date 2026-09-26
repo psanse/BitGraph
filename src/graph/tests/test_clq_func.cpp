@@ -6,7 +6,7 @@
 **/
 
 #include "gtest/gtest.h"
-#include "utils/common.h"
+//#include "utils/common.h"
 #include "utils/logger.h"
 #include "graph/graph.h"
 #include "graph/algorithms/clique/clq_func.h"

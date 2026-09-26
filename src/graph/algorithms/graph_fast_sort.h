@@ -14,7 +14,7 @@
 #include "graph/simple_ugraph.h"				//to limit template GraphT to undirected types - types must be known
 
 #include "utils/logger.h"
-#include "utils/common.h"	
+//#include "utils/common.h"	
 #include "utils/collection_utils.h"
 #include "utils/sort_utils.h"
 #include "graph/vertex_utils.h"

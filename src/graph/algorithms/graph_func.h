@@ -16,7 +16,7 @@
 #include "graph/simple_graph_w.h"				// must be after ugraph include
 #include "graph/simple_graph_ew.h"				// must be after ugraph include
 #include "graph/graph_traits.h"
-#include "utils/common.h"
+//#include "utils/common.h"
 #include "utils/logger.h"
 #include "utils/sort_utils.h"
 #include <algorithm>
