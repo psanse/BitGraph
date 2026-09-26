@@ -1,20 +1,21 @@
-/*
-* @file test_func.cpp 
-* @brief Unit tests for namespace graph_utils functions
-* @date 20/07/2018
-* @update Graph_W type for weighted graphs 23/01/19
-* @last_modified 29/01/2026
-* @author pss
-*
-* TODO - ADD TESTS... (09/01/25)
-*/
+/**
+ * @file test_graph_utils.cpp
+ * @brief Unit tests for the general-purpose graph utility functions.
+ *
+ * Tests operations provided by the `bitgraph::graph_utils` namespace,
+ * including neighborhood extraction, degree-based vertex sorting, graph
+ * construction, and structural graph-property checks.
+ *
+ * @author Pablo San Segundo
+ * @date Created: 20/07/2018
+ * @date Last updated: 27/09/2026
+ */
 
 #include "graph/algorithms/graph_utils.h"
 #include "gtest/gtest.h"
 #include "graph/graph.h"				//	facade types
 #include <iostream>
 
-using namespace std;
 using namespace bitgraph;
 
 namespace {
@@ -143,7 +144,7 @@ TEST_F(GraphUtilsTest, is_triangleFree_subgraph) {
 
 TEST_F(GraphUtilsTest, is_edgeFree_subgraph) {
 
-	std::vector<int> edge;
+	std::pair<vertex_t, vertex_t> edge;
 	EXPECT_FALSE(graph_utils::is_edgeFree_subgraph(ug, ug.neighbors(0), edge));				//{1, 3} is in G[{1, 2, 3}]					
 
 	//removes the only edge 
@@ -199,7 +200,7 @@ TEST_F(GraphUtilsTestW, wsum) {
 	//using namespace graph_utils::vertexW;
 
 	//set of vertices {0, 1}
-	Vertices lv;
+	vertices lv;
 	lv.push_back(0);
 	lv.push_back(1);
 
@@ -317,25 +318,48 @@ TEST_F(
 	GraphDegreeSortUtilsTest,
 	SortsByNonIncreasingDegreeInVertexReferenceSet)
 {
-	bitgraph::Vertices vertices{ 0, 1 };
-	const bitgraph::Vertices reference{ 2, 3, 4 };
-
-	constexpr bool non_decreasing = false;
-
 	/*
-	 * Degrees in the reference set:
+	 * Degrees into {2,3,4}:
 	 *   vertex 0 -> {2,3}: degree 2
 	 *   vertex 1 -> {2}:   degree 1
 	 */
-	bitgraph::graph_utils::sort_deg(
+	const bitgraph::vertices reference_vertices{ 2, 3, 4 };
+
+	bitgraph::vertices candidates{ 1, 0 };
+
+	bitgraph::graph_utils::sort_by_degree(
 		graph_,
-		vertices,
-		reference,
-		non_decreasing);
+		candidates,
+		reference_vertices,
+		bitgraph::graph_utils::degree_order::nonincreasing);		
 
 	EXPECT_EQ(
-		(bitgraph::Vertices{ 0, 1 }),
-		vertices);
+		(bitgraph::vertices{ 0, 1 }),
+		candidates);
+}
+
+TEST_F(
+	GraphDegreeSortUtilsTest,
+	LegacySortDegSortsByNonIncreasingDegree)
+{
+
+	/*
+	 * Degrees into {2,3,4}:
+	 *   vertex 0 -> {2,3}: degree 2
+	 *   vertex 1 -> {2}:   degree 1
+	 */
+	const bitgraph::vertices reference_vertices{ 2, 3, 4 };
+	bitgraph::vertices candidates{ 1, 0 };
+
+	bitgraph::graph_utils::sort_deg(
+		graph_,
+		candidates,
+		reference_vertices,
+		false);							// min_sort = false (non-increasing)
+
+	EXPECT_EQ(
+		(bitgraph::vertices{ 0, 1 }),
+		candidates);
 }
 
 /**
@@ -421,7 +445,7 @@ TEST_F(
 	GraphDegreeSortUtilsTest,
 	EmptyBitsetReferenceSetPreservesOrdering)
 {
-	bitgraph::Vertices vertices{ 1, 0 };
+	bitgraph::vertices vertices{ 1, 0 };
 	bitgraph::bitarray empty_reference(vertex_count);
 
 	constexpr bool non_decreasing = false;

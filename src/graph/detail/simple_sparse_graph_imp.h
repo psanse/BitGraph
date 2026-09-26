@@ -87,10 +87,16 @@ namespace bitgraph{
 		std::size_t alloc_blocks = 0;							
 
 		for (vertex_t v = 0; v < this->NV_; ++v) {
-			const std::size_t row_blocks = this->adj_[v].size();	
-			alloc_blocks += row_blocks;
+			const auto& row = this->adj_[v];
 
-			for (std::size_t block = 0; block < row_blocks; ++block) {
+
+			const block_index_t block_count =
+				static_cast<block_index_t>(row.size());
+
+			alloc_blocks += row.size();
+			
+	
+			for (block_index_t block = 0; block < block_count; ++block) {
 				if (this->adj_[v].block(block) != 0) {
 					++non_empty_blocks;
 				}
