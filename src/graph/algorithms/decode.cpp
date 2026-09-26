@@ -1,75 +1,122 @@
-/*
-* @file decode.cpp
-* @brief implementation of the Decode class, which decodes orderings in graphs
-* @date 29/11/13
-* @last_update 17/12/24
-*/
+/**
+ * @file decode.cpp
+ * @brief Implements graph vertex-ordering decoding utilities.
+ *
+ * Contains the non-inline definitions of the OrderingDecoder class, including
+ * permutation inversion and the decoding of individual vertices and vertex
+ * collections through a composition of stored orderings.
+ *
+ * @author Pablo San Segundo
+ * @date created: 29/11/2013
+ * @date last updated: 26/09/2026
+ */
 
 #include "graph/algorithms/decode.h"
 #include <algorithm>
+#include <limits>
+#include <stdexcept>
+#include <vector>
 
 using namespace bitgraph;
 
-int Decode::decode(int v) const
-{ 
-	DecodeVertex df(ords_);
-	return df(v); 
-};
-
-void Decode::reverse_in_place(VertexOrdering& o)
+void OrderingDecoder::invert_ordering(
+	ordering_type& ordering)
 {
-	VertexOrdering vaux(o.size());
-	for (std::size_t i = 0; i < o.size(); ++i) {
-		vaux[o[i]] = i;
-	}
-	o = std::move(vaux);
+	ordering_type inverse =
+		inverse_ordering(ordering);
+
+	ordering.swap(inverse);
 }
 
-VertexOrdering Decode::reverse(const VertexOrdering& o)
+auto OrderingDecoder::inverse_ordering(
+	const ordering_type& ordering) -> ordering_type
 {
-	VertexOrdering vres(o.size());
-	for (std::size_t i = 0; i < o.size(); ++i) {
-		vres[o[i]] = i;
+	assert(
+		ordering.size() <=
+		static_cast<std::size_t>(
+			std::numeric_limits<vertex_t>::max()));
+
+	ordering_type inverse(ordering.size());
+
+	for (std::size_t new_index = 0;
+		new_index < ordering.size();
+		++new_index)
+	{
+		const vertex_t old_index = ordering[new_index];
+
+		assert(old_index >= 0);
+		assert(
+			static_cast<std::size_t>(old_index) <
+			ordering.size());
+
+		inverse[static_cast<std::size_t>(old_index)] =
+			static_cast<vertex_t>(new_index);
 	}
-	return vres;
+
+	return inverse;
 }
 
-VertexOrdering Decode::decode(const VertexOrdering& l) const
+
+vertex_t OrderingDecoder::decode(
+	vertex_t vertex) const noexcept
 {
-	VertexOrdering res;
-	
-	if (!l.empty()) {
-		res.resize(l.size());			//must be resized for transform 
-		DecodeVertex df(ords_);
-		transform(l.cbegin(), l.cend(), res.begin(), df);
+	/*
+	 * Apply the stored orderings in reverse insertion order to recover the
+	 * corresponding vertex in the original graph.
+	 */
+	for (auto iterator = orderings_.rbegin();
+		iterator != orderings_.rend();
+		++iterator) {
+		assert(vertex >= 0);
+		assert(
+			static_cast<std::size_t>(vertex) <
+			iterator->size());
+
+		vertex = (*iterator)[
+			static_cast<std::size_t>(vertex)];
 	}
-	return res;
+
+	return vertex;
 }
 
-//int Decode::decode_list(const VertexOrdering& l, VertexOrdering& res) const
-//{
-//	if (ords_.empty() || l.empty() ) {					//no reordering, return a copy
-//		res = l;
-//		return -1;										//CHECK user cases- why not return -1?
-//	}
-//
-//	res.clear();
-//	res.reserve(l.size());
-//	DecodeVertex df(ords_);
-//	transform(l.cbegin(), l.cend(), res.begin(), df);
-//
-//	//old code- why using a back_insert_iterator?
-//	//std::back_insert_iterator< std::vector<int> > b_it(res);	
-//	//transform(l.cbegin(), l.cend(), b_it, df );
-//
-//	return 0;
-//}
-
-int Decode::decode_in_place(VertexOrdering& l) const
+void OrderingDecoder::decode_vertices_in_place(
+	ordering_type& ordering) const noexcept
 {
-	if (l.empty()) return -1;
-	DecodeVertex df(ords_);
-	transform(l.begin(), l.end(), l.begin(), df);
+	std::transform(
+		ordering.cbegin(),
+		ordering.cend(),
+		ordering.begin(),
+		[this](vertex_t vertex) noexcept {
+			return decode(vertex);
+		});
+}
+
+int OrderingDecoder::decode_in_place(
+	ordering_type& ordering) const noexcept 
+{
+	if (ordering.empty()) {
+		return -1;
+	}
+
+	decode_vertices_in_place(ordering);
+
 	return 0;
 }
+
+auto OrderingDecoder::decode(
+	const ordering_type& ordering) const -> ordering_type
+{
+	ordering_type decoded(ordering.size());
+
+	std::transform(
+		ordering.cbegin(),
+		ordering.cend(),
+		decoded.begin(),
+		[this](vertex_t vertex) {
+			return decode(vertex);
+		});
+
+	return decoded;
+}
+
 
