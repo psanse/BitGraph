@@ -4,9 +4,8 @@
 
 add_executable (
   test_graph 
-
-  # TESTS CHECKED  (last 29/11/2025)
-  test_func.cpp
+   
+  test_graph_utils.cpp
   test_graph.cpp
   test_ugraph.cpp
   test_wgraph.cpp

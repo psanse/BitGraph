@@ -75,9 +75,12 @@ namespace bitgraph {
 
 	public:
 						
-		using bitset_type = BitsetT;				// basic type (a type of bitset)
-		using vertex_bitset_t = bitset_type;
-		using VertexBitset = vertex_bitset_t;		// alias for backward compatibility
+		using bitset_type = BitsetT;				
+		using vertex_set_type = bitset_type;
+
+		// aliases for backward compatibility
+		using vertex_bitset_t = vertex_set_type;
+		using VertexBitset = vertex_bitset_t;		
 		
 		/////////////			
 		//construction / destruction

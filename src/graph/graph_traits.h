@@ -53,6 +53,13 @@ namespace bitgraph {
         static constexpr bool is_undirected = false;
         static constexpr bool is_vertex_weighted = false;
         static constexpr bool is_edge_weighted = false;
+
+        using is_undirected_tag =
+            std::integral_constant<bool, is_undirected>;
+        using is_vertex_weighted_tag =
+            std::integral_constant<bool, is_vertex_weighted>;
+        using is_edge_weighted_tag =
+            std::integral_constant<bool, is_edge_weighted>;
     };
 
     /**
@@ -68,6 +75,13 @@ namespace bitgraph {
         static constexpr bool is_undirected = true;
         static constexpr bool is_vertex_weighted = false;
         static constexpr bool is_edge_weighted = false;
+
+        using is_undirected_tag =
+            std::integral_constant<bool, is_undirected>;
+        using is_vertex_weighted_tag =
+            std::integral_constant<bool, is_vertex_weighted>;
+        using is_edge_weighted_tag =
+            std::integral_constant<bool, is_edge_weighted>;
     };
 
     namespace detail {

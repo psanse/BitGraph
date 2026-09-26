@@ -23,7 +23,6 @@
 
 #include "graph_conversions.h"
 
-//#include "utils/common.h"
 #include "utils/logger.h"
 #include <iostream>
 
@@ -98,7 +97,6 @@ namespace bitgraph {
 							sug.adj_[v].bitset().emplace_back(block, bits);
 							////////////////////////////////////////////////////
 						}
-
 					}
 				}
 
