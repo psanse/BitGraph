@@ -9,15 +9,13 @@
  * @date Last updated: 23/09/2026
  */
 
-
 #include "graph/graph_benchmark.h"
 #include "gtest/gtest.h"
 
 #include <sstream>
 #include <string>
-#include <utility>	// for std::move
+#include <utility>	                    // for std::move
 
-#define PATH "c:\\path"
 
 using namespace bitgraph;
 

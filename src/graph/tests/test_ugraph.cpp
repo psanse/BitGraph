@@ -16,13 +16,11 @@ using namespace bitgraph;
 
 
 TEST(Ugraph, constructor_file){
-
-	string path = PATH_GRAPH_TESTS_CMAKE_SRC_CODE;
-
-	ugraph g1(PATH_GRAPH_TESTS_CMAKE_SRC_CODE "brock200_1.clq");
-	ugraph g2(PATH_GRAPH_TESTS_CMAKE_SRC_CODE "brock200_2.clq");
-	ugraph g3(PATH_GRAPH_TESTS_CMAKE_SRC_CODE "brock200_3.clq");
-	ugraph g4(PATH_GRAPH_TESTS_CMAKE_SRC_CODE "brock200_4.clq");
+	
+	ugraph g1(BITGRAPH_GRAPH_TEST_DATA_DIR "brock200_1.clq");
+	ugraph g2(BITGRAPH_GRAPH_TEST_DATA_DIR "brock200_2.clq");
+	ugraph g3(BITGRAPH_GRAPH_TEST_DATA_DIR "brock200_3.clq");
+	ugraph g4(BITGRAPH_GRAPH_TEST_DATA_DIR "brock200_4.clq");
 
 	//test number of vertices
 	//////////////////////////////////////////
@@ -51,10 +49,8 @@ TEST(Ugraph, constructor_file){
 }
 
 TEST(Ugraph, read_dimacs) {
-
-	string path = PATH_GRAPH_TESTS_CMAKE_SRC_CODE;
-
-	ugraph ug(PATH_GRAPH_TESTS_CMAKE_SRC_CODE "dimacs_format_graph.clq");
+	
+	ugraph ug(BITGRAPH_GRAPH_TEST_DATA_DIR "dimacs_format_graph.clq");
 		
 	//////////////////////////////////////////
 	EXPECT_EQ(5, ug.num_vertices());
@@ -105,7 +101,7 @@ TEST(Ugraph, constructor_adj_matrix) {
 
 TEST(Ugraph, equal_brock) {
 
-	string path = PATH_GRAPH_TESTS_CMAKE_SRC_CODE;
+	string path = BITGRAPH_GRAPH_TEST_DATA_DIR;
 
 	ugraph ug1(path + "brock200_1.clq");
 	ugraph ug2(ug1);
@@ -149,7 +145,7 @@ TEST(Ugraph, equal_toy) {
 
 TEST(Ugraph, degree) {
 
-	string path = PATH_GRAPH_TESTS_CMAKE_SRC_CODE;
+	string path = BITGRAPH_GRAPH_TEST_DATA_DIR;
 	ugraph g(path + "sample.clq");
 
 	EXPECT_EQ	(7, g.num_vertices());
@@ -201,7 +197,7 @@ TEST(Ugraph, degree_up) {
 
 TEST(Ugraph, degree_dimacs) {
 	
-	string path = PATH_GRAPH_TESTS_CMAKE_SRC_CODE;
+	string path = BITGRAPH_GRAPH_TEST_DATA_DIR;
 	ugraph g(path + "brock200_1.clq");
 
 
@@ -261,7 +257,7 @@ TEST(Ugraph, max_subgraph_degree) {
 
 TEST(Ugraph, density_sample) {
 
-	string path = PATH_GRAPH_TESTS_CMAKE_SRC_CODE;
+	string path = BITGRAPH_GRAPH_TEST_DATA_DIR;
 	ugraph ug(path + "sample.clq");
 
 	const int NVexp = 7;
@@ -286,7 +282,7 @@ TEST(Ugraph, density_sample) {
 
 TEST(Ugraph, density_brock) {
 		
-	string path = PATH_GRAPH_TESTS_CMAKE_SRC_CODE;
+	string path = BITGRAPH_GRAPH_TEST_DATA_DIR;
 	ugraph ug(path + "brock200_1.clq");
 
 	const int NVexp = 200;

@@ -13,7 +13,7 @@ add_library (utils STATIC
     #batch_analyser.cpp
     #common.cpp
     #common_types.cpp
-    info/info_base.cpp  
+    info/info_base.cpp     # deprecated
     random_utils.cpp 
     time_utils.cpp
     path_utils.cpp

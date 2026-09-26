@@ -8,7 +8,7 @@ add_executable(
     # Tests checked on 26/01/2025.
     test_common.cpp
     test_file.cpp
-    test_info_base.cpp
+    test_info_base.cpp          # deprecated
     test_precise_timer.cpp
     test_task.cpp
     test_logger.cpp

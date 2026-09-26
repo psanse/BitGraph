@@ -21,6 +21,7 @@ add_executable (
   test_clq_func.cpp
   test_graph_map.cpp
   test_graph_benchmark.cpp
+  test_algorithm_info.cpp
 
   # Tests to be checked:
   # test_kcore.cpp             # to fix (02/02/2026)
@@ -31,6 +32,7 @@ target_compile_definitions(
     test_graph
     PRIVATE
         PATH_GRAPH_TESTS_CMAKE_SRC_CODE="${GRAPH_TEST_DATA_DIR}/"
+        BITGRAPH_GRAPH_TEST_DATA_DIR="${GRAPH_TEST_DATA_DIR}/"
 )
 
 set_target_properties(

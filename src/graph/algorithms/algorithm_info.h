@@ -1,9 +1,3 @@
-/**
- *@file algorithm_info.h
- *@details: created 12/12/2024, last_update 12/09/2025
- *@author pss
- **/
-
  /**
   * @file algorithm_info.h
   * @brief Common configuration, timing, and reporting infrastructure for graph algorithms.
@@ -21,24 +15,23 @@
   * @date last_update 24/09/2026
   */
 
-#ifndef BITGRAPH_GRAPH_ALGORITHMS_ALGORITHM_INFO_H
-#define BITGRAPH_GRAPH_ALGORITHMS_ALGORITHM_INFO_H
+#ifndef BITGRAPH_GRAPH_ALGORITHM_INFO_H
+#define BITGRAPH_GRAPH_ALGORITHM_INFO_H
 
 
 #include "utils/prec_timer.h"
 #include "utils/time_utils.h"
+#include "utils/logger.h"
 
-#include <cstddef>
+#include <cstddef> // for std::size_t
 #include <cstdint>
 #include <iostream>
 #include <limits>
 #include <ostream>
 #include <string>
-#include <utility>
-
 
 namespace bitgraph {
-
+	
 		/**
 		* @brief Common configuration parameters for graph algorithms.
 		*
@@ -50,61 +43,72 @@ namespace bitgraph {
 
 			using time_point_type = PrecisionTimer::timepoint_t;
 			using clock_type = PrecisionTimer::clock_t;
-			using time_point_type = clock_type::time_point;
-
-			std::string name;                ///< Instance name.
-			std::size_t N = 0;				 ///< Number of graph vertices.
-			std::size_t M = 0;				///< Number of graph edges.
-
-			/// Maximum execution time, in seconds.
-			double time_out = std::numeric_limits<double>::max();
-
-			/// Maximum heuristic execution time, in seconds.
-			double heuristic_time_out = std::numeric_limits<double>::max();
 			
-			int num_threads = 1;										
-			
-			/**
-		   * @brief Legacy loop-unrolling option.
-		   * @deprecated Retained for compatibility with existing algorithms.
-		   */
-			bool unrolled = false;											
+			// Instance metadata
+			std::string name;               
+			std::size_t N = 0;				
+			std::size_t M = 0;				
 
-			time_point_type start_time{};    ///< Starting point of the auxiliary timer.
-			double elapsed_time = 0.0;       ///< Last measured auxiliary duration.							
+			// Execution configuration
+			double time_out = std::numeric_limits<double>::max();			
+			double heuristic_time_out = std::numeric_limits<double>::max();	
+
+			int num_threads = 1;			
+			bool unrolled = false;		// legacy loop-unrolling option, retained for compatibility with existing algorithms									
+
+			// Parsing timing
+			time_point_type parsing_start_time{};		
+			double parsing_time = 0.0;											
 
 
 			AlgorithmParameters() = default;
 			virtual ~AlgorithmParameters() = default;
 
+		protected:
+			/**
+		    * @name Copy and move support for derived parameter types
+		    *
+		    * These operations are protected to allow automatically generated
+		    * copy/move operations in derived classes while preventing clients from
+		    * copying or moving objects through AlgorithmParameters and accidentally
+		    * slicing their derived state.
+		    * @{
+		    */
 			AlgorithmParameters(const AlgorithmParameters&) = default;
 			AlgorithmParameters& operator=(const AlgorithmParameters&) = default;
 			AlgorithmParameters(AlgorithmParameters&&) noexcept = default;
 			AlgorithmParameters& operator=(AlgorithmParameters&&) noexcept = default;
+			/** @} */
 
-			
+		public:	
 			/**
 			 * @brief Starts the auxiliary parameter timer.
 			 */
-			void start_timer() noexcept
+			void start_parsing_timer() noexcept
 			{
-				start_time = clock_type::now();
+				parsing_start_time = clock_type::now();
 			}
 
 			/**
-			* @brief Reads the auxiliary parameter timer.
-			*
-			* Updates elapsed_time with the time elapsed since start_timer() was
-			* called.
-			*
-			* @return Elapsed time in seconds.
+			* @brief Stops the parsing timer and stores the elapsed duration.
+			* @return Parsing time in seconds.
 			*/
-			double read_timer() noexcept
+			double read_parsing_timer() noexcept
 			{
-				elapsed_time = utils::elapsed_time(start_time);
-				return elapsed_time;				
-			}						
+				parsing_time =
+					utils::elapsed_time(parsing_start_time);
 
+				return parsing_time;
+			}
+
+			/**
+			* @brief Clears the recorded parsing time.
+			*/
+			void clear_parsing_timer() noexcept
+			{
+				parsing_start_time = time_point_type{};
+				parsing_time = 0.0;
+			}
 
 			/**
 			 * @brief Restores the common algorithm parameters to their defaults.
@@ -142,18 +146,31 @@ namespace bitgraph {
 		using paramBase = AlgorithmParameters;
 
 
-		//////////////////////
-		//
-		//	infoBase
-		// 
-		//  @brief base struct to report results of graph algorithms.
-		// 
-		//  Supports basic configuration parameters and timers.
-		//  
-		//  TODO- conceived as a struct initially (all data members are public), 
-		//  added getters/setters later, possibly convert to a CLASS (31/08/2025)
-		//
-		///////////////////////
+		/**
+		 * @brief Base information class for graph-algorithm executions.
+		 *
+		 * Stores a concrete parameter object together with common execution timers
+		 * and reporting facilities. The parameter type may extend AlgorithmParameters
+		 * with algorithm-specific configuration fields.
+		 *
+		 * Derived information classes may add execution results such as solutions,
+		 * bounds, counters, and search statistics. Such classes should override
+		 * clearResults() to reset their result fields; the public clear() function
+		 * controls the complete clearing sequence.
+		 *
+		 * Public access to the stored parameters is read-only. Derived information
+		 * classes may modify them through the protected parameters() overload.
+		 *
+		 * @tparam ParametersT Concrete parameter type associated with the algorithm.
+		 *         The type must be AlgorithmParameters or derive from it.
+		 *
+		 * @note The complete ParametersT object is stored by value, so derived
+		 *       parameter fields are preserved without object slicing.
+		 *
+		 * @note This class implements the Template Method pattern: clear() defines
+		 *       the clearing procedure and invokes the virtual clearResults() hook
+		 *       for algorithm-specific result data.
+		 */
 		template <class ParametersT = AlgorithmParameters>
 		class BasicAlgorithmInfo {
 			static_assert(
@@ -174,172 +191,254 @@ namespace bitgraph {
 
 			BasicAlgorithmInfo() = default;
 			explicit BasicAlgorithmInfo(const parameters_type& parameters)
-				: data_(parameters)
+				: parameters_(parameters)
 			{}
 
 			virtual ~BasicAlgorithmInfo() = default;
 
-			/////////////////////
-			// setters / getters
+			BasicAlgorithmInfo(const BasicAlgorithmInfo&) = default;
+			BasicAlgorithmInfo& operator=(const BasicAlgorithmInfo&) = default;
+			BasicAlgorithmInfo(BasicAlgorithmInfo&&) noexcept = default;
+			BasicAlgorithmInfo& operator=(BasicAlgorithmInfo&&) noexcept = default;
 
+			// Parameter observers
+
+			 /**
+			 * @brief Returns the complete concrete parameter object.
+			 */
 			const parameters_type& parameters() const noexcept
 			{
 				return parameters_;
 			}
-						
-			const std::string& name() const noexcept {
-				return data_.name; 
+
+			const std::string& name() const noexcept
+			{
+				return parameters_.name;
 			}
-			std::size_t num_vertices() const noexcept { 
-				return data_.N;
+
+			std::size_t num_vertices() const noexcept
+			{
+				return parameters_.N;
 			}
-			std::size_t num_edges() const noexcept {
-				return data_.M;
+
+			std::size_t num_edges() const noexcept
+			{
+				return parameters_.M;
 			}
-			double time_out() const noexcept {
-				return data_.time_out; 
+
+			double time_out() const noexcept
+			{
+				return parameters_.time_out;
 			}
-			double time_out_heur() const noexcept { 
-				return data_.heuristic_time_out;
+
+			double heuristic_time_out() const noexcept
+			{
+				return parameters_.heuristic_time_out;
 			}
-			int number_of_threads() const  noexcept {
-				return data_.num_threads; 
+
+			int number_of_threads() const noexcept
+			{
+				return parameters_.num_threads;
 			}
 
 
-			std::size_t recursion_calls_per_tout_check() const noexcept { 
-				return numStepsTimeOutCheck; 
-			}
-			double parsing_time() const noexcept {
-				return data_.elapsed_time; 
-			}
-			double preprocessing_time() const  noexcept {
-				return timePreproc_; 
-			}
-			double search_time() const noexcept {
-				return timeSearch_;
-			}
-			double incumbent_time() const  noexcept { 
-				return timeIncumbent_; 
+			// Runtime information observers
+			
+			std::uint32_t
+				recursion_calls_per_timeout_check() const noexcept
+			{
+				return recursion_calls_per_timeout_check_;
 			}
 
-			//////////////////////
-			//setters - only for general info, timers should not be set manually
+			double parsing_time() const noexcept
+			{
+				return parameters_.parsing_time;
+			}
 
-			void name(std::string name) noexcept { 
-				data_.name = std::move(name); 
+			double preprocessing_time() const noexcept
+			{
+				return preproc_time_;
 			}
-			void num_vertices(std::size_t N)  noexcept { 
-				data_.N = N;
+
+			double search_time() const noexcept
+			{
+				return search_time_;
 			}
-			void num_edges(std::size_t m) noexcept { 
-				data_.M = m; 
+
+			double incumbent_time() const noexcept
+			{
+				return incumbent_time_;
 			}
-			void time_out(double t)  noexcept { 
-				(t == -1) 
-					? data_.time_out = std::numeric_limits<double>::max() 
-					: data_.time_out = t;
-			}
-			void time_out_heur(double t) noexcept {
-				(t == -1) 
-					? data_.heuristic_time_out = std::numeric_limits<double>::max() 
-					: data_.heuristic_time_out = t;
-			}
-			void number_of_threads(int n) noexcept { 
-				data_.num_threads = n;
-			}
-			void recursion_calls_per_tout_check(uint32_t count) noexcept { 
-				recursion_calls_per_timeout_check_ = count;
-			}
-						
-			/*
-			* @brief resets to default values
-			* @param lazy - if true general info is NOT cleared, only timers
-			*/
-			virtual void clear(bool lazy = false) noexcept;
 
 			/**
-			* @brief clears general info - virtual since derived classes might have more general info to clear
-			**/
-			virtual void clearGeneralInfo() noexcept {
-				data_.reset_base();
+			 * @brief Sets the number of recursive calls between timeout checks.
+			 *
+			 * @param count Number of recursive calls. A larger value reduces
+			 *        checking overhead but may delay timeout detection.
+			 */
+			void recursion_calls_per_timeout_check(
+				std::uint32_t count) noexcept
+			{
+				recursion_calls_per_timeout_check_ = count;
 			}
 
-			/*
-			* @brief streams all info
-			* @param o: output stream
-			* @param trailing_newline: if true adds endl at the end
-			* @returns output stream
-			*
-			* TODO Add @K_ to ouput conditionally
-			*/
-			virtual std::ostream& printReport(
-				std::ostream& o = std::cout, 
-				report_t r = report_t::TABLE,
-				bool trailing_newline = false) const;
+			// Timer operations
+	
 
-			/*
-			* @brief streams gereral info
-			* @param o: output stream
-			* @returns output stream
-			*/
-			virtual	std::ostream& printParams(
-				std::ostream& o = std::cout) const;
-
-			/*
-			* @brief streams timer info
-			* @param o output stream
-			* @returns output stream
-			*/
-			std::ostream& printTimers(
-				std::ostream& o = std::cout) const;
-
-		protected:
-			
-			//timers
 			/*
 			* @brief sets initial time in timer @t (previously set with startTimer(...))
 			* @param t - phase_t enum
 			*/
-			void startTimer(phase_t t) noexcept;
+			void start_timer(phase_t phase) noexcept;
 
 			/*
 			* @brief reads time in timer @t (previously set with startTimer(...))
 			* @param t - phase_t enum
 			*/
-			double readTimer(phase_t t) const noexcept;
+			double read_timer(phase_t phase)  noexcept;
 
 			/*
 			* @brief clears appropiate time duration (concerning phase_t @t)
 			*/
-			void clearTimer(phase_t t) noexcept;
+			void clear_timer(phase_t phase) noexcept;
 
 			/**
-			* @brief clears all timers
-			**/
-			void clearAllTimers() noexcept;
+			* @brief clears all execution timers
+			*/
+			void clear_execution_timers() noexcept;
+						
+			/**
+			 * @brief Resets the algorithm information object.
+			 *
+			 * Clears all execution timers and invokes the virtual clearResults() hook to
+			 * reset algorithm-specific results stored by derived information classes. It
+			 * also resets the parameters defined by the concrete derived parameter type.
+			 *
+			 * Common parameters inherited from AlgorithmParameters, including the
+			 * instance name, graph dimensions, timeout limits, and parsing information,
+			 * are cleared only when @p preserve_base_parameters is false.
+			 *
+			 * @param preserve_base_parameters If true, preserves the common parameters
+			 *        inherited from AlgorithmParameters. If false, restores the complete
+			 *        information object to its default state.
+			 *
+			 * @note Derived information classes should override clearResults(), rather
+			 *       than clear(), to reset their algorithm-specific result fields.
+			 *
+			 * @note The parsing timer is considered part of the common parameter state
+			 *       and is therefore preserved when @p preserve_base_parameters is true.
+			 *
+			 * @see clearResults()
+			 */
+			 void clear(
+				bool preserve_base_parameters = false);
+						
+			// output
+			
+			/**
+			 * @brief Writes the complete algorithm report.
+			 *
+			 * In table mode, values are written as tab-separated fields. In verbose mode,
+			 * each field is written on a labeled line. Floating-point values use fixed
+			 * notation with four decimal places.
+			 *
+			 * The original formatting state of the output stream is restored before the
+			 * function returns.
+			 *
+			 * @param out Destination stream.
+			 * @param format Output report format.
+			 * @param trailing_newline Whether to append a newline.
+			 * @return Reference to @p out.
+			 */
+			virtual std::ostream& print_report(
+				std::ostream& out = std::cout, 
+				report_t format = report_t::TABLE,
+				bool trailing_newline = false) const;
+
+			/**
+			 * @brief Writes the general algorithm parameters to an output stream.
+			 *
+			 * Writes the instance metadata and common execution configuration stored in
+			 * the associated parameter object, such as the instance name, graph size,
+			 * timeout limits, and number of threads.
+			 *
+			 * Derived information classes may override this function to append
+			 * algorithm-specific parameters.
+			 *
+			 * @param out Destination output stream.
+			 * @return Reference to @p out.
+			 */
+			virtual	std::ostream& print_params(
+				std::ostream& o = std::cout) const;
+
+			/**
+			 * @brief Writes the recorded phase durations and timeout limits.
+			 *
+			 * Floating-point values are written in fixed notation with four decimal
+			 * places. The stream's original formatting state is restored before return.
+			 *
+			 * @param out Destination stream.
+			 * @return Reference to @p out.
+			 */
+			std::ostream& print_timers(
+				std::ostream& o = std::cout) const;
 
 
-			/////////////
-			// data members
+			/**
+			 * @brief Writes the complete algorithm report.
+			 */
+			friend std::ostream& operator<<(
+				std::ostream& out,
+				const BasicAlgorithmInfo& information)
+			{
+				return information.print_report(out);
+			}
 
-			parameters_type data_;						
+		protected:
+			/**
+			* @brief Returns mutable access to the concrete parameter object.
+			*
+			* This overload is available only to this class and derived information
+			* classes.
+			*/
+			parameters_type& mutable_parameters() noexcept
+			{
+				return parameters_;
+			}
+
+			/**
+			 * @brief Clears algorithm-specific result information.
+			 *
+			 * Derived information classes should override this function to clear
+			 * counters, solutions, bounds, and other execution results.
+			 */
+			virtual void clear_results() noexcept
+			{}
+				
+			
+			// Concrete parameter object
+			parameters_type parameters_;
 							
-			time_point_type startTimePreproc_;
-			double timePreproc_ = 0;								//preprocessing time(in seconds)
-			time_point_type startTimeSearch_;
-			double timeSearch_ = 0;									//search time (in seconds)
-			time_point_type startTimeIncumbent_;		
-			double timeIncumbent_ = 0;								//time when last new incumbent was found (in seconds)
+			time_point_type preproc_start_time_;
+			double preproc_time_ = 0.0;									//preprocessing time(in seconds)
+			time_point_type search_start_time_;
+			double search_time_ = 0.0;									//search time (in seconds)
+			time_point_type incumbent_start_time_;
+			double incumbent_time_ = 0.0;								//time when last new incumbent was found (in seconds)
 
-			std::uint32_t recursion_calls_per_timeout_check_ = 100;	//number of recursions before timeout is checked
+			std::uint32_t recursion_calls_per_timeout_check_ = 100;		//number of recursions before timeout is checked
 
 		}; // end class BasicAlgorithmInfo
 
-}//end namespace bitgraph
+} //end namespace bitgraph
+
+////////////////////////////////
+// template implementation
+
+#include "detail/algorithm_info_imp.h"
 
 
-#endif //  BBITGRAPH_GRAPH_ALGORITHMS_ALGORITHM_INFO_H
+#endif //  BITGRAPH_GRAPH_ALGORITHMS_INFO_H
 
 
 

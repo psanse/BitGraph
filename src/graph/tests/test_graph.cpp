@@ -92,7 +92,7 @@ TEST(Graph, constructor_adj_mat) {
 
 TEST(Graph, constructor_file) {
 
-	string path = PATH_GRAPH_TESTS_CMAKE_SRC_CODE;
+	string path = BITGRAPH_GRAPH_TEST_DATA_DIR;
 
 	//Undirected graphs read by directed graph class (all edges are non symmetrical)
 	graph g1(path + "brock200_1.clq");
@@ -137,7 +137,7 @@ TEST(Graph, constructor_file) {
 
 TEST(Graph, copy_constructor) {
 	
-	string path = PATH_GRAPH_TESTS_CMAKE_SRC_CODE;
+	string path = BITGRAPH_GRAPH_TEST_DATA_DIR;
 	graph g	(path + "brock200_2.clq");
 
 	///////////////
@@ -161,7 +161,7 @@ TEST(Graph, copy_constructor) {
 
 TEST(Graph, move_constructor) {
 
-	string path = PATH_GRAPH_TESTS_CMAKE_SRC_CODE;
+	string path = BITGRAPH_GRAPH_TEST_DATA_DIR;
 	graph g(path + "brock200_2.clq");
 	const int NV = g.num_vertices();
 	const int NE = g.num_edges();
@@ -233,7 +233,7 @@ TEST_F(GraphTest, equal) {
 
 TEST(Graph, equal_dimacs) {
 
-	string path = PATH_GRAPH_TESTS_CMAKE_SRC_CODE;
+	string path = BITGRAPH_GRAPH_TEST_DATA_DIR;
 	
 	graph g1(path + "brock200_1.clq");
 	graph g2(g1);
@@ -245,7 +245,7 @@ TEST(Graph, equal_dimacs) {
 
 TEST(Graph, density) {
 
-	string path = PATH_GRAPH_TESTS_CMAKE_SRC_CODE;
+	string path = BITGRAPH_GRAPH_TEST_DATA_DIR;
 
 	//reading undirected graph as directed 
 	//CHECK: only upper half od adjacency matrix non-empty
@@ -288,7 +288,7 @@ TEST(Graph, neighbors){
 
 TEST(Graph, is_edge){
 	
-	string path= PATH_GRAPH_TESTS_CMAKE_SRC_CODE;
+	string path= BITGRAPH_GRAPH_TEST_DATA_DIR;
 	graph g(path + "sample.clq");
 
 	EXPECT_EQ(7, g.num_vertices());

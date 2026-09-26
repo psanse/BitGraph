@@ -364,7 +364,7 @@ TEST_F(GraphFastRootSortTest, reorder_static) {
 
 	sorter.compute_deg_root();
 	VertexMapping mapping_o2n = sorter.sort_non_decreasing_deg(false);					//nodes_ = {0, 2, 4, 5, 3, 1}
-	//deg =	{ 0, 3, 1, 2, 1, 1 };
+	//deg =	{ 0, 3, 1, 2, 1, 1 };BITGRAPH_GRAPH_TEST_DATA_DIR
 
 	
 	//////////////////////////////////////////////////////
@@ -390,7 +390,7 @@ TEST(GraphFastRootSort, new_order_dimacs) {
 
 	using gt = GraphFastRootSort<ugraph>;
 	string name = "brock200_2.clq";
-	name.insert(0, PATH_GRAPH_TESTS_CMAKE_SRC_CODE);
+	name.insert(0, BITGRAPH_GRAPH_TEST_DATA_DIR);
 
 	ugraph ug(name);
 	gt sorter(ug);

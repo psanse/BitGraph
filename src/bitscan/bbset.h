@@ -17,10 +17,11 @@
 
 #include "bbobject.h"
 #include "bitblock.h"
-#include "utils/common.h"		
+//#include "utils/common.h"		 
 #include "utils/fixed_stack.h"		// FixedStack<T> for bitblock indices
+#include "utils/logger.h"
 
-#include <cassert>				// Runtime assertions (active when NDEBUG is not defined, typically Debug builds)
+#include <cassert>					
 #include <initializer_list>
 #include <set>
 #include <vector>

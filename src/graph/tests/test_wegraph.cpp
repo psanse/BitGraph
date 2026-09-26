@@ -153,7 +153,7 @@ TEST_F(UGraphEWTest, generate_weights) {
 
 TEST(UGraphEW, constructor_file) {
 
-	ugraph_ewi ugew(PATH_GRAPH_TESTS_CMAKE_SRC_CODE "toy_ew_dimacs.txt");
+	ugraph_ewi ugew(BITGRAPH_GRAPH_TEST_DATA_DIR "toy_ew_dimacs.txt");
 
 	EXPECT_EQ(5, ugew.num_vertices());
 	EXPECT_EQ(5, ugew.num_edges());
@@ -244,14 +244,14 @@ TEST(UGraphEW, DISABLED_gen_random ){
 
 TEST(UGraphEW, DISABLED_write_to_file) {
 
-	//ofstream of(PATH_GRAPH_TESTS_CMAKE_SRC_CODE "toy_ew_dimacs_gen.txt");
+	//ofstream of(BITGRAPH_GRAPH_TEST_DATA_DIR "toy_ew_dimacs_gen.txt");
 	////////////////////////////////////
 	//ugew.write_dimacs(of);
 	////////////////////////////////////
 	//of.close();
 
 	//TODO@read and test properly (visually correct);
-	//Graph_EW<ugraph, int> ugew_gen(PATH_GRAPH_TESTS_CMAKE_SRC_CODE "toy_ew_dimacs_gen.txt");
+	//Graph_EW<ugraph, int> ugew_gen(BITGRAPH_GRAPH_TEST_DATA_DIR "toy_ew_dimacs_gen.txt");
 	//ugew.print_weights();
 }
 

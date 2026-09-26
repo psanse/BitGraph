@@ -151,7 +151,7 @@ TEST_F(UGraphWTest, DISABLED_printing) {
 TEST(UGraphW, constructor_from_file) {
 
 	//read DIMACS graph from file - no DIMACS weights, sets default weights 
-	ugraph_wi ugw(PATH_GRAPH_TESTS_CMAKE_SRC_CODE  "sample.clq");
+	ugraph_wi ugw(BITGRAPH_GRAPH_TEST_DATA_DIR  "sample.clq");
 
 	const int NV = ugw.graph().num_vertices();
 
@@ -165,7 +165,7 @@ TEST(UGraphW, constructor_from_file) {
 TEST(UGraphW, gen_weights_dimacs){
 		
 	//read DIMACS graph from file - no DIMACS weights, sets default weights 
-	ugraph_wi ugw (PATH_GRAPH_TESTS_CMAKE_SRC_CODE  "brock200_1.clq");
+	ugraph_wi ugw (BITGRAPH_GRAPH_TEST_DATA_DIR  "brock200_1.clq");
 
 	const int NV = ugw.graph().num_vertices();
 
@@ -215,7 +215,7 @@ TEST(UGraphW, gen_random) {
 //
 //	LOG_INFO("GraphW:gen_weights_to_file---------------------------------------");
 //
-//	string path= PATH_GRAPH_TESTS_CMAKE_SRC_CODE;
+//	string path= BITGRAPH_GRAPH_TEST_DATA_DIR;
 //	Graph_W<ugraph, int> ugw(path + "brock200_1.clq");
 //	const int NV=ugw.graph().num_vertices();
 //	
