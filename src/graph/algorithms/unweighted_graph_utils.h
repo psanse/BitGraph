@@ -1,13 +1,20 @@
 ﻿/**
-* @file unweighted_graph_utils.h
-* @brief main header for namespace gfunc providing general purpose functions for graphs
-* @details: 
-*  - date 07/3/2017
-*  - last_modified 30/01/2025  
-* @author pss
-*
-* @todo CHECK edgeW::ew_shift_2_highest_index function  (09/01/25)
-**/
+ * @file unweighted_graph_utils.h
+ * @brief Structural utility functions for unweighted graphs.
+ *
+ * Provides general-purpose graph operations in the
+ * `bitgraph::graph_utils` namespace, including neighborhood extraction,
+ * degree-based vertex sorting, graph construction, and structural property
+ * checks.
+ *
+ * Although primarily intended for unweighted graphs, operations that depend
+ * only on adjacency may also be used with weighted graph types; graph weights
+ * are ignored.
+ *
+ * @author Pablo San Segundo
+ * @date Created: 07/03/2017
+ * @date Last updated: 27/09/2026
+ */
 
 #ifndef BITGRAPH_GRAPH_UNWEIGHTED_GRAPH_UTILS_H
 #define BITGRAPH_GRAPH_UNWEIGHTED_GRAPH_UTILS_H
