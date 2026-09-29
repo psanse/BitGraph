@@ -8,8 +8,8 @@
 * @dev pss
 **/
 
-#ifndef __GRAPH_MAPPINGS_H__
-#define	__GRAPH_MAPPINGS_H__
+#ifndef BITGRAPH_VETEX_MAPPING_H
+#define	BITGRAPH_VETEX_MAPPING_H
 
 #include "utils/logger.h"
 #include "utils/collection_utils.h"
@@ -475,4 +475,4 @@ namespace bitgraph
 
 } // end of namespace bitgraph
 
-#endif
+#endif // BITGRAPH_VETEX_MAPPING_H
