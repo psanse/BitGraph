@@ -8,12 +8,11 @@
 * @dev pss
 **/
 
-#ifndef BITGRAPH_VETEX_MAPPING_H
-#define	BITGRAPH_VETEX_MAPPING_H
+#ifndef BITGRAPH_VERTEX_MAPPING_H
+#define	BITGRAPH_VERTEX_MAPPING_H
 
 #include "utils/logger.h"
 #include "utils/collection_utils.h"
-//#include "utils/common.h"
 #include "bitscan/bbconfig.h"			//for INDEX_1_TO_1 macro
 #include "bitscan/bbobject.h"
 #include "decode.h"
@@ -32,7 +31,8 @@ namespace bitgraph {
 	class GraphMap
 	{
 
-		using vertex_mapping = bitgraph::vertex_mapping;
+		using mapping_type = bitgraph::vertex_mapping;
+		using size_type = mapping_type::size_type;
 
 		///////////////////////
 		// public interface
@@ -48,30 +48,50 @@ namespace bitgraph {
 		// setters and getters
 
 		std::size_t size() { return l2r_.size(); }
-		vertex_mapping &get_l2r() { return l2r_; }
-		vertex_mapping &get_r2l() { return r2l_; }
-		const vertex_mapping &get_l2r() const { return l2r_; }
-		const vertex_mapping &get_r2l() const { return r2l_; }
+		mapping_type &get_l2r() { return l2r_; }
+		mapping_type &get_r2l() { return r2l_; }
+		const mapping_type &get_l2r() const { return l2r_; }
+		const mapping_type &get_r2l() const { return r2l_; }
 		std::string nameL() { return nameL_; }
 		std::string nameR() { return nameR_; }
 
-		// sets mapping (no need to build it)
-		void set_l2r(vertex_mapping &l, std::string name)
+
+		void set_left_to_right(
+			mapping_type left_to_right,
+			std::string left_name = {},
+			std::string right_name = {})
 		{
-			l2r_ = l;
-			nameL_ = name;
+			mapping_type right_to_left =
+				OrderingDecoder::inverse_ordering(left_to_right);
+
+			l2r_ = std::move(left_to_right);
+			r2l_ = std::move(right_to_left);
+
+			nameL_ = std::move(left_name);
+			nameR_ = std::move(right_name);
 		}
-		void set_r2l(vertex_mapping &r, std::string name)
-		{
-			r2l_ = r;
-			nameR_ = name;
-		}
+
+		//// sets mapping (no need to build it)
+		//void set_l2r(mapping_type &l, std::string name)
+		//{
+		//	l2r_ = l;
+		//	nameL_ = name;
+		//}
+		//void set_r2l(mapping_type &r, std::string name)
+		//{
+		//	r2l_ = r;
+		//	nameR_ = name;
+		//}
 
 		////////////////
 		// mapping getters
 
-		int map_l2r(int v) const { return l2r_[v]; }
-		int map_r2l(int v) const { return r2l_[v]; }
+		int map_l2r(vertex_t v) const { 
+			return l2r_[v];
+		}
+		int map_r2l(vertex_t v) const { 
+			return r2l_[v]; 
+		}
 
 		/**
 		 * @brief maps a (bit) set of vertices (bbl) to a (bit) set of vertices (bbr)
@@ -79,8 +99,11 @@ namespace bitgraph {
 		 * @param bbr: output bitset of vertices in the space of the right ordering
 		 * @param overwrite: if TRUE, bbr is erased before mapping
 		 **/
-		template <class bitset_t>
-		bitset_t &map_l2r(bitset_t &bbl, bitset_t &bbr, bool overwrite = true) const;
+		template <class BitsetT>
+		BitsetT &map_l2r(
+			BitsetT &bbl,
+			BitsetT &bbr,
+			bool overwrite = true) const;
 
 		/**
 		 * @brief maps a (bit) set of vertices (bbr) to a (bit) set of vertices (bbl)
@@ -88,13 +111,13 @@ namespace bitgraph {
 		 * @param bbr: input bitset of vertices in the space of the right ordering
 		 * @param overwrite: if TRUE, bbr is erased before mapping
 		 **/
-		template <class bitset_t>
-		bitset_t &map_r2l(
-			bitset_t &bbl,
-			bitset_t &bbr,
+		template <class BitsetT>
+		BitsetT &map_r2l(
+			BitsetT &bbl,
+			BitsetT &bbr,
 			bool overwrite = true) const;
 
-		// TODO - extend to other set representations
+
 
 		////////////////////
 		// build mapping operations
@@ -106,20 +129,20 @@ namespace bitgraph {
 		 *
 		 *		 I. The mappings are available by the functions map_l2r(), map_r2l()
 		 *
-		 *		 II. Type Alg_t is a sorting algorithm (typically from GraphFastRootSort<Graph_t>)
+		 *		 II. Type SortAlgT is a sorting algorithm (typically from GraphFastRootSort<Graph_t>)
 		 *
-		 * @param slhs, srhs: input sorting strategies of the left and right orderings
-		 * @param plhs, prhs: input placement strategies of the left and right orderings
+		 * @param left_strategy, right_strategy: input sorting strategies of the left and right orderings
+		 * @param left_placement, right_placement: input placement strategies of the left and right orderings
 		 *						(FALSE:first-to-last, TRUE:last-to-first)
 		 * @param lhs_name, rhs_name: fancy names for the orderings
 		 **/
-		template <typename Alg_t>
+		template <typename SortAlgT>
 		void build_mapping(
-			typename Alg_t::graph_type &,
-			int slhs,
-			bool plhs,
-			int srhs,
-			bool prhs,
+			typename SortAlgT::graph_type& graph,
+			int left_strategy,
+			bool left_placement,
+			int right_strategy,
+			bool right_placement,
 			std::string lhs_name = "",
 			std::string rhs_name = "");
 
@@ -130,8 +153,8 @@ namespace bitgraph {
 		 * @param lhs_name, rhs_name: fancy names for the orderings
 		 **/
 		void build_mapping(
-			const vertex_mapping &lhs_o2n,
-			const vertex_mapping &rhs_o2n,
+			const mapping_type &lhs_o2n,
+			const mapping_type &rhs_o2n,
 			std::string lhs_name = "",
 			std::string rhs_name = "");
 
@@ -145,19 +168,20 @@ namespace bitgraph {
 		 *
 		 *		 I. The mappings are available by the functions map_l2r(), map_r2l()
 		 *
-		 *		 II. Type Alg_t is a sorting algorithm (typically from GraphFastRootSort<Graph_t>)
+		 *		 II. Type SortAlgT is a sorting algorithm (typically from GraphFastRootSort<Graph_t>)
 		 *
-		 * @param srhs: input sorting strategies for the ordering (considered to the right)
-		 * @param prhs: input placement strategy gor the ordering (considered to the right)
+		 * @param right_strategy: input sorting strategies for the ordering (considered to the right)
+		 * @param right_placement: input placement strategy gor the ordering (considered to the right)
 		 *						(FALSE:first-to-last, TRUE:last-to-first)
 		 * @param rhs_name: fancy name for the ordering (e.g. "MIN_DEG, F2L")
 		 * @details: internally lhs_name is assigned "ORIGINAL GRAPH"
 		 **/
 
-		template <typename Alg_t>
+		template <typename SortAlgT>
 		void build_mapping(
-			typename Alg_t::graph_type &,
-			int srhs, bool prhs,
+			typename SortAlgT::graph_type& graph,
+			int right_strategy,
+			bool right_placement,
 			std::string rhs_name = "");
 
 		/**
@@ -184,7 +208,7 @@ namespace bitgraph {
 		/**
 		 * @brief checks if the internal mapping state @l2r_, @r2l_ is consistent
 		 **/
-		bool is_consistent();
+		bool is_consistent() const noexcept;
 
 		///////////////////////
 		// private interface
@@ -220,14 +244,16 @@ namespace bitgraph {
 namespace bitgraph
 {
 
-	template <class bitset_t>
-	inline bitset_t &GraphMap::map_l2r(bitset_t &bbl, bitset_t &bbr, bool overwrite) const
-	{
-
-		//////////////////////////////////////////////////////////////////////////////////////////////////////////
-		assert(bbl.num_blocks() == bbr.num_blocks() && "bizarre bitsets with different num_blocks - GraphMap::map_l2r");
-		assert(INDEX_1TO1(l2r_.size()) == bbr.num_blocks() && "not adequate bitset num_blocks for the mapping - GraphMap::map_l2r ");
-		///////////////////////////////////////////////////////////////////////////////////////////////////////////
+	template <class BitsetT>
+	inline BitsetT &GraphMap::map_l2r(BitsetT &bbl, BitsetT &bbr, bool overwrite) const
+	{		
+		assert(
+			bbl.num_blocks() == bbr.num_blocks()
+			&& "bizarre bitsets with different num_blocks - GraphMap::map_l2r");
+		assert(
+			INDEX_1TO1(l2r_.size()) == bbr.num_blocks() 
+			&& "not adequate bitset num_blocks for the mapping - GraphMap::map_l2r ");
+		
 
 		// cleans bbr if requested
 		if (overwrite)
@@ -246,14 +272,20 @@ namespace bitgraph
 		return bbr;
 	}
 
-	template <class bitset_t>
-	inline bitset_t &GraphMap::map_r2l(bitset_t &bbl, bitset_t &bbr, bool overwrite) const
+	template <class BitsetT>
+	inline BitsetT &GraphMap::map_r2l(
+		BitsetT &bbl,
+		BitsetT &bbr, 
+		bool overwrite) const
 	{
-
-		//////////////////////////////////////////////////////////////////////////////////////////////////////////
-		assert(bbl.num_blocks() == bbr.num_blocks() && "bizarre bitsets with different num_blocks - GraphMap::map_l2r");
-		assert(INDEX_1TO1(l2r_.size()) == bbr.num_blocks() && "not adequate bitset num_blocks for the mapping - GraphMap::map_l2r ");
-		///////////////////////////////////////////////////////////////////////////////////////////////////////////
+		
+		assert(
+			bbl.num_blocks() == bbr.num_blocks()
+			&& "bizarre bitsets with different num_blocks - GraphMap::map_l2r");
+		assert(
+			INDEX_1TO1(l2r_.size()) == bbr.num_blocks() 
+			&& "not adequate bitset num_blocks for the mapping - GraphMap::map_l2r ");
+	
 
 		// cleans bbr if requested
 		if (overwrite)
@@ -272,10 +304,10 @@ namespace bitgraph
 		return bbl;
 	}
 
-	inline bool GraphMap::is_consistent()
+	inline
+		bool GraphMap::is_consistent() const noexcept
 	{
-
-		for (auto v = 0; v < l2r_.size(); ++v)
+		for (vertex_t v = 0; v < l2r_.size(); ++v)
 		{
 			if (v != r2l_[l2r_[v]])
 			{
@@ -286,24 +318,28 @@ namespace bitgraph
 		return true;
 	}
 
-	template <class Alg_t>
-	inline void GraphMap::build_mapping(typename Alg_t::graph_type &g, int slhs, bool plhs, int srhs, bool prhs,
-										std::string lhs_name, std::string rhs_name)
+	template <class SortAlgT>
+	inline void GraphMap::build_mapping(
+		typename SortAlgT::graph_type &graph,
+		int left_strategy, 
+		bool left_placement,
+		int right_strategy, 
+		bool right_placement, 
+		std::string lhs_name, std::string rhs_name)
 	{
-		VertexMapping lhs_o2n, lhs_n2o, rhs_o2n, rhs_n2o;
-
-		auto NV = g.num_vertices();
+		mapping_type lhs_o2n, lhs_n2o, rhs_o2n, rhs_n2o;
+		auto NV = graph.num_vertices();
 
 		reset(NV);
 
 		// determine sorting lhs
-		Alg_t gol(g);
-		lhs_o2n = gol.new_order(slhs, plhs /* false:first to last*/, true /* o2n*/); // VertexMapping new_order(int alg, bool ltf = true, bool o2n = true);
+		SortAlgT gol(graph);
+		lhs_o2n = gol.new_order(left_strategy, left_placement /* false:first to last*/, true /* o2n*/); // VertexMapping new_order(int alg, bool ltf = true, bool o2n = true);
 		lhs_n2o = Decode::reverse(lhs_o2n);
 
 		// determine sorting rhs
-		Alg_t gor(g);
-		rhs_o2n = gor.new_order(srhs, prhs /* false:first to last*/, true /* o2n */);
+		SortAlgT gor(graph);
+		rhs_o2n = gor.new_order(right_strategy, right_placement /* false:first to last*/, true /* o2n */);
 		rhs_n2o = Decode::reverse(rhs_o2n);
 
 		// determines direct and reverse mappings independently
@@ -333,17 +369,21 @@ namespace bitgraph
 		  print_mappings();*/
 	}
 
-	template <typename Alg_t>
-	void GraphMap::build_mapping(typename Alg_t::graph_type &g, int srhs, bool prhs, std::string rhs_name)
+	template <typename SortAlgT>
+	void GraphMap::build_mapping(
+		typename SortAlgT::graph_type &graph, 
+		int right_strategy, 
+		bool right_placement,
+		std::string rhs_name)
 	{
 
-		auto NV = g.num_vertices();
+		auto NV = graph.num_vertices();
 
 		reset(NV);
 
 		// determine sorting lhs
-		Alg_t gol(g);
-		l2r_ = gol.new_order(srhs, prhs /* false:first to last */, true /* o2n */);
+		SortAlgT gol(graph);
+		l2r_ = gol.new_order(right_strategy, right_placement /* false:first to last */, true /* o2n */);
 		r2l_ = Decode::reverse(l2r_);
 
 		nameL_ = "ORIGINAL GRAPH";
@@ -359,8 +399,8 @@ namespace bitgraph
 	}
 
 	inline void GraphMap::build_mapping(
-		const VertexMapping &lhs_o2n,
-		const VertexMapping &rhs_o2n,
+		const mapping_type &lhs_o2n,
+		const mapping_type &rhs_o2n,
 		std::string lhs_name, std::string rhs_name)
 	{
 
@@ -475,4 +515,4 @@ namespace bitgraph
 
 } // end of namespace bitgraph
 
-#endif // BITGRAPH_VETEX_MAPPING_H
+#endif // BITGRAPH_VERTEX_MAPPING_H
