@@ -42,7 +42,7 @@ namespace bitgraph {
 			L2R = 0,
 			R2L,
 			BOTH
-		}; // streaming configuration
+		};	// streaming configuration
 
 		///////////////////////
 		// setters and getters
@@ -358,7 +358,10 @@ namespace bitgraph
 		// return 0;
 	}
 
-	inline void GraphMap::build_mapping(const VertexMapping &lhs_o2n, const VertexMapping &rhs_o2n, std::string lhs_name, std::string rhs_name)
+	inline void GraphMap::build_mapping(
+		const VertexMapping &lhs_o2n,
+		const VertexMapping &rhs_o2n,
+		std::string lhs_name, std::string rhs_name)
 	{
 
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////
