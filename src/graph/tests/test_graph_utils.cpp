@@ -12,6 +12,7 @@
  */
 
 #include "graph/algorithms/graph_utils.h"
+
 #include "gtest/gtest.h"
 #include "graph/graph.h"				//	facade types
 #include <iostream>

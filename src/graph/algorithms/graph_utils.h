@@ -12,24 +12,20 @@
 #ifndef BITGRAPH_GRAPH_GRAPHS_UTILS_H
 #define BITGRAPH_GRAPH_GRAPHS_UTILS_H
 
-//#include "graph/simple_ugraph.h"
-//#include "graph/simple_graph_w.h"				// must be after ugraph include
-//#include "graph/simple_graph_ew.h"				// must be after ugraph include
-//#include "graph/graph_traits.h"
-//#include "utils/logger.h"
-//#include "utils/sort_utils.h"
-//#include <algorithm>
-//#include <iostream>
-
-
 #include "unweighted_graph_utils.h"
 #include "vertex_weighted_graph_utils.h"
 #include "edge_weighted_graph_utils.h"
 
 namespace bitgraph {
 
+	namespace graph_utils {
+
+		// Graph utility declarations.
+	}
+
 	// Backward compatibility alias for graph_utils namespace
 	namespace gfunc = graph_utils;
+	
 
 } // namespace bitgraph
 

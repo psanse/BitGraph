@@ -55,11 +55,33 @@ namespace bitgraph {
 			using graph_type = GraphT;												// graph type
 			using vertex_bitset_t = typename GraphT::vertex_bitset_t;						// bitset type
 			
-			//non structured enums are used for easy conversion to int when needed
+			// new enum for sorting algorithms 
+			enum class strategy {
+				min_degeneracy,
+				max_degeneracy,
+				min_degeneracy_composite,
+				max_degeneracy_composite,
+				max,
+				min,
+				max_with_support,
+				min_with_support,
+				none
+			};
+
+			enum class placement {
+				first_to_last,
+				last_to_first
+			};
+
+			using strategy_type = strategy;
+			using placement_type = placement;
+
+			// non-structured enums are used for easy conversion to int when needed
+			// and backward compatibility with existing code
 			enum { PRINT_DEGREE = 0, PRINT_SUPPORT, PRINT_NODES };
 			enum { MIN_DEGEN = 0, MAX_DEGEN, MIN_DEGEN_COMPO, MAX_DEGEN_COMPO, MAX, MIN, MAX_WITH_SUPPORT, MIN_WITH_SUPPORT, NONE };
 			enum { FIRST_TO_LAST = 0, LAST_TO_FIRST };
-			enum { NEW_TO_OLD = 0, OLD_TO_NEW };								//backward compatibility - possibly to be removed
+			enum { NEW_TO_OLD = 0, OLD_TO_NEW };								// for backward compatibility - possibly to be removed
 
 			////////////////////////
 			//static methods 
