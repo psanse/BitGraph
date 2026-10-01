@@ -117,8 +117,6 @@ namespace bitgraph {
 			BitsetT &bbr,
 			bool overwrite = true) const;
 
-
-
 		////////////////////
 		// build mapping operations
 
