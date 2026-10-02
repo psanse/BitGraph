@@ -144,6 +144,17 @@ namespace bitgraph {
 			std::string lhs_name = "",
 			std::string rhs_name = "");
 
+		// TODO: add a version of build_mapping that takes strategy and placement as enums (instead of int and bool) for better type safety
+		template <typename SortAlgT>
+		void build_mapping(
+			typename SortAlgT::graph_type& graph,
+			typename SortAlgT::strategy left_strategy,
+			typename SortAlgT::placement left_placement,
+			typename SortAlgT::strategy right_strategy,
+			typename SortAlgT::placement right_placement,
+			std::string lhs_name = "",
+			std::string rhs_name = "");
+
 		/**
 		 * @brief Helper when the two mappings @lhs_o2n  and @rhs_o2n are knownt
 		 * @param lhs_o2n: known mapping in [OLD]->[NEW] format
