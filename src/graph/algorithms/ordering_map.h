@@ -1,15 +1,27 @@
 /**
-* @file graph_map.h
-* @brief header for OrderingMap class that manages pairs of vertex orderings
-* @update conversions between two orderings of vertices (typically encoded by GraphFastRootSort) (14/8/17)
-* @update extended to inlcude mapping to a single ordering (1/10/17)
-* @date: imported from COPT framework in 2024, last_update 27/01/25
-* @details: OrderingMap is conceived as a wrapper for GraphFastRootSort, but it is not restricted to it due to its generic template design
-* @dev pss
-**/
-
-#ifndef BITGRAPH_GRAPH_GRAPH_MAP_H
-#define	BITGRAPH_GRAPH_GRAPH_MAP_H
+ * @file ordering_map.h
+ * @brief Defines OrderingMap, which maps vertices between two orderings of a graph.
+ *
+ * @details OrderingMap stores a pair of vertex orderings as two inverse
+ * permutations, left-to-right and right-to-left, and converts single vertices
+ * and bitsets of vertices between them. The original graph indices act as the
+ * intermediate index space, so it supports two use cases:
+ *   - two orderings, each computed from the original graph, and
+ *   - a single ordering, where the left space is the original graph.
+ *
+ * Orderings are computed by a sorting algorithm passed as a template parameter
+ * (typically GraphFastRootSort), but the class is not restricted to it.
+ * The class is independent of any concrete graph type.
+ *
+ * @author Pablo San Segundo
+ * @date Created 14/08/2017 (two orderings); extended to a single ordering 01/10/2017
+ * @date Imported from the COPT framework in 2024
+ * @date Last updated: 04/10/2026
+ *
+ * @see GraphFastRootSort, OrderingDecoder
+ */
+#ifndef BITGRAPH_GRAPH_ALGORITHMS_ORDERING_MAP_H
+#define	BITGRAPH_GRAPH_ALGORITHMS_ORDERING_MAP_H
 
 #include "utils/logger.h"
 #include "utils/collection_utils.h"
@@ -575,4 +587,4 @@ namespace bitgraph
 
 } // end of namespace bitgraph
 
-#endif // BITGRAPH_GRAPH_GRAPH_MAP_H
+#endif // BITGRAPH_GRAPH_ALGORITHMS_ORDERING_MAP_H
