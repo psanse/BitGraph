@@ -124,8 +124,8 @@ TEST_F(GraphMapTest, build_mapping_from_known_o2n_orderings) {
 	EXPECT_TRUE(gm.is_consistent());
 	EXPECT_EQ(gm_ref.get_l2r(), gm.get_l2r());
 	EXPECT_EQ(gm_ref.get_r2l(), gm.get_r2l());
-	EXPECT_STREQ("MAX F2L", gm.nameL().c_str());
-	EXPECT_STREQ("MIN F2L", gm.nameR().c_str());
+	EXPECT_STREQ("MAX F2L", gm.left_name().c_str());
+	EXPECT_STREQ("MIN F2L", gm.right_name().c_str());
 
 	// identical orderings give the identity mapping
 	GraphMap gm_id;
@@ -167,8 +167,8 @@ TEST_F(GraphMapTest, build_mapping_single_ordering){
 	EXPECT_EQ(gm.map_r2l(3), 2);
 
 
-	EXPECT_STREQ("ORIGINAL GRAPH", gm.nameL().c_str());		//left ordering is the original graph in single ordering use
-	EXPECT_STREQ("MIN_DEG", gm.nameR().c_str());			//right ordering is the new graph in single ordering use
+	EXPECT_STREQ("ORIGINAL GRAPH", gm.left_name().c_str());		//left ordering is the original graph in single ordering use
+	EXPECT_STREQ("MIN_DEG", gm.right_name().c_str());			//right ordering is the new graph in single ordering use
 
 	//I/O
 	/*gm.print_names();
@@ -193,8 +193,8 @@ TEST_F(GraphMapTest, predefined_single_ordering){
 	VertexMapping r2lexp = { 1, 3, 0, 2 };
 	
 	EXPECT_EQ(r2lexp, gm.get_r2l());						//original index to new index is identity
-	EXPECT_STREQ("MIN F2L", gm.nameR().c_str());
-	EXPECT_STREQ("ORIGINAL GRAPH", gm.nameL().c_str());
+	EXPECT_STREQ("MIN F2L", gm.right_name().c_str());
+	EXPECT_STREQ("ORIGINAL GRAPH", gm.left_name().c_str());
 
 
 	//user code - map vertices from the original to the new ordering

@@ -8,8 +8,8 @@
 * @dev pss
 **/
 
-#ifndef BITGRAPH_VERTEX_MAPPING_H
-#define	BITGRAPH_VERTEX_MAPPING_H
+#ifndef BITGRAPH_GRAPH_GRAPH_MAP_H
+#define	BITGRAPH_GRAPH_GRAPH_MAP_H
 
 #include "utils/logger.h"
 #include "utils/collection_utils.h"
@@ -31,8 +31,8 @@ namespace bitgraph {
 	class GraphMap
 	{
 
-		using mapping_type = bitgraph::vertex_mapping;
-		using size_type = mapping_type::size_type;
+		using ordering_type = bitgraph::vertex_ordering;
+		using size_type = ordering_type::size_type;
 
 		///////////////////////
 		// public interface
@@ -47,21 +47,23 @@ namespace bitgraph {
 		///////////////////////
 		// setters and getters
 
-		size_type size() { return left_to_right_.size(); }
-		mapping_type &get_l2r() { return left_to_right_; }
-		mapping_type &get_r2l() { return right_to_left_; }
-		const mapping_type &get_l2r() const { return left_to_right_; }
-		const mapping_type &get_r2l() const { return right_to_left_; }
-		std::string nameL() { return left_name_; }
-		std::string nameR() { return right_name_; }
+		size_type size() const noexcept{
+			 return left_to_right_.size();
+		}		
+		ordering_type &get_l2r() { return left_to_right_; }
+		ordering_type &get_r2l() { return right_to_left_; }
+		const ordering_type &get_l2r() const { return left_to_right_; }
+		const ordering_type &get_r2l() const { return right_to_left_; }
+		std::string left_name() const { return left_name_; }
+		std::string right_name() const { return right_name_; }
 
 
 		void set_left_to_right(
-			mapping_type left_to_right,
+			ordering_type left_to_right,
 			std::string left_name = {},
 			std::string right_name = {})
 		{
-			mapping_type right_to_left =
+			ordering_type right_to_left =
 				OrderingDecoder::inverse_ordering(left_to_right);
 
 			left_to_right_ = std::move(left_to_right);
@@ -72,12 +74,12 @@ namespace bitgraph {
 		}
 
 		//// sets mapping (no need to build it)
-		//void set_l2r(mapping_type &l, std::string name)
+		//void set_l2r(ordering_type &l, std::string name)
 		//{
 		//	left_to_right_ = l;
 		//	left_name_ = name;
 		//}
-		//void set_r2l(mapping_type &r, std::string name)
+		//void set_r2l(ordering_type &r, std::string name)
 		//{
 		//	right_to_left_ = r;
 		//	right_name_ = name;
@@ -161,8 +163,8 @@ namespace bitgraph {
 		 * @param left_name, right_name: fancy names for the orderings
 		 **/
 		void build_mapping(
-			const mapping_type &left_o2n,
-			const mapping_type &right_o2n,
+			const ordering_type &left_o2n,
+			const ordering_type &right_o2n,
 			std::string left_name = "",
 			std::string right_name = "");
 
@@ -198,7 +200,7 @@ namespace bitgraph {
 		 * @param right_name: fancy name for the ordering (e.g. "MIN_DEG, F2L")
 		 **/
 		void build_mapping(
-			const VertexMapping &right_n2o,
+			const ordering_type &right_n2o,
 			std::string right_name = "");
 
 		//////////////
@@ -239,8 +241,8 @@ namespace bitgraph {
 		////////////////
 		// data members
 
-		VertexMapping left_to_right_;			// mapping between left to right ordering
-		VertexMapping right_to_left_;			// mapping between right to left ordering
+		ordering_type left_to_right_;			// mapping between left to right ordering
+		ordering_type right_to_left_;			// mapping between right to left ordering
 		std::string left_name_;						// fancy name describing the left ordering
 		std::string right_name_;						// fancy name describing the right ordering
 	};
@@ -260,7 +262,7 @@ namespace bitgraph
 			bbl.num_blocks() == bbr.num_blocks()
 			&& "bizarre bitsets with different num_blocks - GraphMap::map_l2r");
 		assert(
-			INDEX_1TO1(left_to_right_.size()) == bbr.num_blocks() 
+			INDEX_1TO1(static_cast<int>(left_to_right_.size())) == bbr.num_blocks()
 			&& "not adequate bitset num_blocks for the mapping - GraphMap::map_l2r ");
 		
 
@@ -290,10 +292,10 @@ namespace bitgraph
 		
 		assert(
 			bbl.num_blocks() == bbr.num_blocks()
-			&& "bizarre bitsets with different num_blocks - GraphMap::map_l2r");
+			&& "bizarre bitsets with different num_blocks - GraphMap::map_r2l");
 		assert(
-			INDEX_1TO1(left_to_right_.size()) == bbr.num_blocks() 
-			&& "not adequate bitset num_blocks for the mapping - GraphMap::map_l2r ");
+			INDEX_1TO1(static_cast<int>(left_to_right_.size())) == bbr.num_blocks()
+			&& "not adequate bitset num_blocks for the mapping - GraphMap::map_r2l ");
 	
 
 		// cleans bbr if requested
@@ -316,9 +318,9 @@ namespace bitgraph
 	inline
 		bool GraphMap::is_consistent() const noexcept
 	{
-		for (vertex_t v = 0; v < left_to_right_.size(); ++v)
+		for (size_type v = 0; v < left_to_right_.size(); ++v)
 		{
-			if (v != right_to_left_[left_to_right_[v]])
+			if (static_cast<vertex_t>(v) != right_to_left_[left_to_right_[v]])
 			{
 				return false;
 			}
@@ -336,7 +338,7 @@ namespace bitgraph
 		bool right_placement, 
 		std::string left_name, std::string right_name)
 	{
-		mapping_type left_o2n, left_n2o, right_o2n, right_n2o;
+		ordering_type left_o2n, left_n2o, right_o2n, right_n2o;
 		auto vertex_count = graph.num_vertices();
 
 		reset(vertex_count);
@@ -344,12 +346,12 @@ namespace bitgraph
 		// determine left sorting
 		SortAlgT left_sorter(graph);
 		left_o2n = left_sorter.new_order(left_strategy, left_placement /* false:first to last*/, true /* o2n*/); // VertexMapping new_order(int alg, bool ltf = true, bool o2n = true);
-		left_n2o = Decode::reverse(left_o2n);
+		left_n2o = OrderingDecoder::inverse_ordering(left_o2n);
 
 		// determine right sorting
 		SortAlgT right_sorter(graph);
 		right_o2n = right_sorter.new_order(right_strategy, right_placement /* false:first to last*/, true /* o2n */);
-		right_n2o = Decode::reverse(right_o2n);
+		right_n2o = OrderingDecoder::inverse_ordering(right_o2n);
 
 		// determines direct and reverse mappings independently
 		for (auto v = 0; v < vertex_count; v++)
@@ -428,14 +430,14 @@ namespace bitgraph
 	}
 
 	inline void GraphMap::build_mapping(
-		const mapping_type &left_o2n,
-		const mapping_type &right_o2n,
+		const ordering_type &left_o2n,
+		const ordering_type &right_o2n,
 		std::string left_name, std::string right_name)
 	{
 		assert(left_o2n.size() == right_o2n.size() && "different size orderings - GraphMap::build_mapping");
 
 		const auto vertex_count = left_o2n.size();
-		const mapping_type left_n2o = OrderingDecoder::inverse_ordering(left_o2n);
+		const ordering_type left_n2o = OrderingDecoder::inverse_ordering(left_o2n);
 
 		reset(vertex_count);
 
@@ -455,7 +457,7 @@ namespace bitgraph
 		right_name_ = std::move(right_name);
 	}
 
-	inline void GraphMap::build_mapping(const VertexMapping &right_n2o, std::string right_name)
+	inline void GraphMap::build_mapping(const ordering_type &right_n2o, std::string right_name)
 	{
 
 		left_to_right_ = Decode::reverse(right_n2o);
@@ -523,4 +525,4 @@ namespace bitgraph
 
 } // end of namespace bitgraph
 
-#endif // BITGRAPH_VERTEX_MAPPING_H
+#endif // BITGRAPH_GRAPH_GRAPH_MAP_H
