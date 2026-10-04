@@ -60,7 +60,7 @@ namespace bitgraph {
 	 *     Sorter::strategy::min_degeneracy, Sorter::placement::first_to_last,
 	 *     Sorter::strategy::max, Sorter::placement::first_to_last,
 	 *     "MIN_DEGEN, F2L", "MAX, F2L");
-	 * vertex_t w = map.map_l2r(v);   // vertex v in the left space -> right space
+	 * vertex_t w = map.map_left_to_right(v);   // vertex v in the left space -> right space
 	 * @endcode
 	 *
 	 * @note The mappings are plain vectors: copying is O(n), and concurrent
@@ -120,35 +120,35 @@ namespace bitgraph {
 		////////////////
 		// mapping getters
 
-		vertex_t map_l2r(vertex_t v) const noexcept { 
+		vertex_t map_left_to_right(vertex_t v) const noexcept { 
 			return left_to_right_[v];
 		}
-		vertex_t map_r2l(vertex_t v) const noexcept { 
+		vertex_t map_right_to_left(vertex_t v) const noexcept { 
 			return right_to_left_[v]; 
 		}
 
 		/**
 		 * @brief maps a (bit) set of vertices (bbl) to a (bit) set of vertices (bbr)
-		 * @param bbl: input bitset of vertices in the space of the left ordering
-		 * @param bbr: output bitset of vertices in the space of the right ordering
+		 * @param bbleft: input bitset of vertices in the space of the left ordering
+		 * @param bbright: output bitset of vertices in the space of the right ordering
 		 * @param overwrite: if TRUE, bbr is erased before mapping
 		 **/
 		template <class BitsetT>
-		BitsetT &map_l2r(
-			BitsetT &bbl,
-			BitsetT &bbr,
+		BitsetT &map_left_to_right(
+			BitsetT &bbleft,
+			BitsetT &bbright,
 			bool overwrite = true) const;
 
 		/**
 		 * @brief maps a (bit) set of vertices (bbr) to a (bit) set of vertices (bbl)
-		 * @param bbl: output bitset of vertices in the space of the left ordering
-		 * @param bbr: input bitset of vertices in the space of the right ordering
+		 * @param bbleft: output bitset of vertices in the space of the left ordering
+		 * @param bbright: input bitset of vertices in the space of the right ordering
 		 * @param overwrite: if TRUE, bbr is erased before mapping
 		 **/
 		template <class BitsetT>
-		BitsetT &map_r2l(
-			BitsetT &bbl,
-			BitsetT &bbr,
+		BitsetT &map_right_to_left(
+			BitsetT &bbleft,
+			BitsetT &bbright,
 			bool overwrite = true) const;
 
 		////////////////////
@@ -162,7 +162,7 @@ namespace bitgraph {
 		 * each ordering is computed independently from the original graph, and the
 		 * mappings are composed as left index -> original index -> right index.
 		 * Any previous state is replaced. The resulting mappings are available through
-		 * get_l2r(), get_r2l(), map_l2r() and map_r2l().
+		 * get_l2r(), get_r2l(), map_left_to_right() and map_right_to_left().
 		 *
 		 * @tparam SortAlgT Sorting algorithm type, typically GraphFastRootSort<GraphT>.
 		 *                  It must define graph_type, be constructible from a graph
@@ -256,8 +256,8 @@ namespace bitgraph {
 		 *        of @p graph computed by the sorting algorithm @p SortAlgT.
 		 *
 		 * @details The LEFT space is the original graph (identity ordering) and the RIGHT
-		 * space is the new ordering, so map_l2r() maps an original vertex to its new index
-		 * and map_r2l() maps a new index back to the original vertex. The left name is set
+		 * space is the new ordering, so map_left_to_right() maps an original vertex to its new index
+		 * and map_right_to_left() maps a new index back to the original vertex. The left name is set
 		 * to "ORIGINAL GRAPH". Any previous state is replaced.
 		 *
 		 * @tparam SortAlgT Sorting algorithm type, typically GraphFastRootSort<GraphT>.
@@ -293,15 +293,18 @@ namespace bitgraph {
 		 *
 		 * @pre @p right_n2o is a permutation of [0, n).
 		 * @post size() == n and is_consistent() is true.
-		 **/		void build_mapping(
+		 **/	
+		void build_mapping(
 			const ordering_type &right_n2o,
 			std::string right_name = "");
 
 		//////////////
 		// I/O
+
 		std::ostream &print_mappings(
 			print_t type = BOTH,
 			std::ostream &out = std::cout);
+
 		std::ostream &print_names(
 			print_t type = BOTH,
 			std::ostream &out = std::cout);
@@ -350,14 +353,14 @@ namespace bitgraph
 {
 
 	template <class BitsetT>
-	inline BitsetT &OrderingMap::map_l2r(BitsetT &bbl, BitsetT &bbr, bool overwrite) const
+	inline BitsetT &OrderingMap::map_left_to_right(BitsetT &bbl, BitsetT &bbr, bool overwrite) const
 	{		
 		assert(
 			bbl.num_blocks() == bbr.num_blocks()
-			&& "bizarre bitsets with different num_blocks - OrderingMap::map_l2r");
+			&& "bizarre bitsets with different num_blocks - OrderingMap::map_left_to_right");
 		assert(
 			INDEX_1TO1(static_cast<int>(left_to_right_.size())) == bbr.num_blocks()
-			&& "not adequate bitset num_blocks for the mapping - OrderingMap::map_l2r ");
+			&& "not adequate bitset num_blocks for the mapping - OrderingMap::map_left_to_right ");
 		
 
 		// cleans bbr if requested
@@ -378,7 +381,7 @@ namespace bitgraph
 	}
 
 	template <class BitsetT>
-	inline BitsetT &OrderingMap::map_r2l(
+	inline BitsetT &OrderingMap::map_right_to_left(
 		BitsetT &bbl,
 		BitsetT &bbr, 
 		bool overwrite) const
@@ -386,10 +389,10 @@ namespace bitgraph
 		
 		assert(
 			bbl.num_blocks() == bbr.num_blocks()
-			&& "bizarre bitsets with different num_blocks - OrderingMap::map_r2l");
+			&& "bizarre bitsets with different num_blocks - OrderingMap::map_right_to_left");
 		assert(
 			INDEX_1TO1(static_cast<int>(left_to_right_.size())) == bbr.num_blocks()
-			&& "not adequate bitset num_blocks for the mapping - OrderingMap::map_r2l ");
+			&& "not adequate bitset num_blocks for the mapping - OrderingMap::map_right_to_left ");
 	
 
 		// cleans bbr if requested
