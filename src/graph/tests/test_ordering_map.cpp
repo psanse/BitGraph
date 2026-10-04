@@ -2,9 +2,7 @@
 * @file test_ordering_map.cpp  
 * @brief Unit tests for OrderingMap class which manages a pair of vertex orderings
 * @date: created  14/8/17, update  GraphFastRootSort 03/01/20, imported from prior COPT (10/01/25), last update 30/11/25
-* @dev pss
-*
-* @todo - check deprecated tests (27/01/25)
+* @author pss
 */
 
 #include "gtest/gtest.h"
@@ -21,7 +19,7 @@ namespace bitgraph {
 using namespace std;
 using namespace bitgraph;
 
-class GraphMapTest : public ::testing::Test {
+class OrderingMapTest : public ::testing::Test {
 protected:
 	void SetUp() override {
 		ug.reset(NV);
@@ -38,7 +36,7 @@ protected:
 	ugraph ug;											
 };
 
-TEST_F(GraphMapTest, build_mapping_2_orderings) {
+TEST_F(OrderingMapTest, build_mapping_2_orderings) {
 		
 	//degrees: {0(3), 1(2), 2(3), 3(2)}
 	 
@@ -85,7 +83,7 @@ TEST_F(GraphMapTest, build_mapping_2_orderings) {
 
 }
 
-TEST_F(GraphMapTest, build_mapping_enum_overload) {
+TEST_F(OrderingMapTest, build_mapping_enum_overload) {
 
 	OrderingMap gm;
 	gm.build_mapping<GraphSort>(
@@ -105,7 +103,7 @@ TEST_F(GraphMapTest, build_mapping_enum_overload) {
 	EXPECT_EQ(r2lexp, gm.get_r2l());
 }
 
-TEST_F(GraphMapTest, build_mapping_from_known_o2n_orderings) {
+TEST_F(OrderingMapTest, build_mapping_from_known_o2n_orderings) {
 
 	// same orderings as build_mapping_2_orderings, given explicitly in [OLD]->[NEW] format
 	GraphSort gs(ug);
@@ -134,7 +132,7 @@ TEST_F(GraphMapTest, build_mapping_from_known_o2n_orderings) {
 	EXPECT_EQ(id, gm_id.get_r2l());
 }
 
-TEST_F(GraphMapTest, build_mapping_single_ordering){
+TEST_F(OrderingMapTest, build_mapping_single_ordering){
 		
 	//degrees: {0(3), 1(2), 2(3), 3(2)}
 
@@ -175,7 +173,7 @@ TEST_F(GraphMapTest, build_mapping_single_ordering){
 	
 }
 
-TEST_F(GraphMapTest, predefined_single_ordering){
+TEST_F(OrderingMapTest, predefined_single_ordering){
 	
 	//degrees: {0(3), 1(2), 2(3), 3(2)}
 
@@ -213,7 +211,7 @@ TEST_F(GraphMapTest, predefined_single_ordering){
 	gm.print_mappings();*/
 }
 
-TEST_F(GraphMapTest, mapBetweenBitsets_2orderings) {
+TEST_F(OrderingMapTest, mapBetweenBitsets_2orderings) {
 
 	//degrees: {0(3), 1(2), 2(3), 3(2)}
 	//l2r = {2, 3, 0 ,1}, r2l = {2, 3, 0, 1}
@@ -254,7 +252,7 @@ TEST_F(GraphMapTest, mapBetweenBitsets_2orderings) {
 }
 
 
-TEST_F(GraphMapTest, mapBetweenBitsets_single_ordering) {
+TEST_F(OrderingMapTest, mapBetweenBitsets_single_ordering) {
 
 	//degrees: {0(3), 1(2), 2(3), 3(2)}	
 	//l2r ={ 2, 0, 3, 1 };  - [OLD / original index] to [NEW]
@@ -294,119 +292,3 @@ TEST_F(GraphMapTest, mapBetweenBitsets_single_ordering) {
 }
 
 
-///////////////
-//
-// DEPRECATED TESTS - CHECK
-//
-//////////////////
-
-////////////////
-// Weighted graphs: TODO-change to new format!
-///////////////
-//
-//TEST(Graph_map, build_mapping) {
-//	LOG_INFO("Graph_map-build_mapping()---------------");
-//
-//	const int SIZE = 10;
-//	ugraph ug(SIZE);
-//	ug.add_edge(0, 1);
-//	ug.add_edge(1, 2);
-//	ug.add_edge(2, 3);
-//	ug.add_edge(0, 3);		/* cycle 0-3 */
-//
-//	ug.init_wv();
-//	ug.set_wv(0, 10);
-//	ug.set_wv(1, 11);
-//	ug.set_wv(2, 12);
-//	ug.set_wv(3, 13);
-//
-//	OrderingMap gm;
-//	gm.build_mapping(ug, gbbs::sort_t::MIN_DEG_DEGEN, gbbs::place_t::PLACE_FL,
-//		gbbs::sort_t::MAX_WEIGHT, gbbs::place_t::PLACE_FL, "MIN_DEG", "MAX_W");
-//
-//	gm.print_names(); cout << endl;
-//	gm.print_mappings();
-//	vector<int> sol_r2l;
-//	sol_r2l.push_back(9); sol_r2l.push_back(8); sol_r2l.push_back(7); sol_r2l.push_back(6);
-//	sol_r2l.push_back(0); sol_r2l.push_back(1); sol_r2l.push_back(2); sol_r2l.push_back(3);
-//	sol_r2l.push_back(4); sol_r2l.push_back(5);
-//
-//	EXPECT_EQ(sol_r2l, gm.get_r2l());
-//
-//	vector<int> sol_l2r;
-//	sol_l2r.push_back(4); sol_l2r.push_back(5); sol_l2r.push_back(6); sol_l2r.push_back(7);
-//	sol_l2r.push_back(8); sol_l2r.push_back(9); sol_l2r.push_back(3); sol_l2r.push_back(2);
-//	sol_l2r.push_back(1); sol_l2r.push_back(0);
-//
-//	EXPECT_EQ(sol_l2r, gm.get_l2r());
-//
-//	//check values
-//	int vl = 5;
-//	int vr = gm.map_l2r(vl);
-//	EXPECT_EQ(vl, gm.map_r2l(vr));
-//	LOG_INFO("-----------------------------");
-//}
-//
-//TEST(Graph_map, mapping_functions) {
-//	LOG_INFO("Graph_map-mapping_functions()---------------");
-//
-//	const int SIZE = 10;
-//	ugraph ug(SIZE);
-//	ug.add_edge(0, 1);
-//	ug.add_edge(1, 2);
-//	ug.add_edge(2, 3);
-//	ug.add_edge(0, 3);		/* cycle 0-3 */
-//
-//	ug.init_wv();
-//	ug.set_wv(0, 10);
-//	ug.set_wv(1, 11);
-//	ug.set_wv(2, 12);
-//	ug.set_wv(3, 13);
-//
-//	OrderingMap gm;
-//	gm.build_mapping(ug, gbbs::sort_t::MIN_DEG_DEGEN, gbbs::place_t::PLACE_FL,
-//		gbbs::sort_t::MAX_WEIGHT, gbbs::place_t::PLACE_FL, "MIN_DEG", "MAX_W");
-//
-//
-//	bitarray bbl(ug.num_vertices());
-//	bitarray bbr(ug.num_vertices());
-//	bbl.set_bit(0); bbl.set_bit(9);
-//
-//	//l2r-bitstring
-//	gm.map_l2r(bbl, bbr);
-//	EXPECT_TRUE(bbr.is_bit(4));
-//	EXPECT_TRUE(bbr.is_bit(0));
-//	EXPECT_EQ(2, bbr.popcn64());
-//
-//	//r2l-bitstring
-//	bbr.erase_bit();
-//	bbr.set_bit(0); bbr.set_bit(9);
-//	gm.map_r2l(bbl, bbr);
-//	EXPECT_TRUE(bbl.is_bit(9));
-//	EXPECT_TRUE(bbl.is_bit(5));
-//	EXPECT_EQ(2, bbl.popcn64());
-//
-//	//l2r-bba_t
-//	bba_t<bitarray> bbal;
-//	bba_t<bitarray> bbar;
-//	bbal.init(2, 10); bbar.init(2, 10);
-//	bbal.set_bit(0, 0); bbal.set_bit(0, 9);
-//	bbal.set_bit(1, 0); bbal.set_bit(1, 9);
-//	gm.map_l2r(bbal, bbar, 0, 1);
-//	for (int pos = 0; pos < 2; pos++) {
-//		EXPECT_TRUE(bbar.pbb[pos].is_bit(0));
-//		EXPECT_TRUE(bbar.pbb[pos].is_bit(4));
-//		EXPECT_EQ(2, bbar.pbb[pos].popcn64());
-//	}
-//
-//	//r2l-bba_t
-//	bbar.erase_bit();
-//	bbar.set_bit(0, 0); bbar.set_bit(0, 9);
-//	bbar.set_bit(1, 0); bbar.set_bit(1, 9);
-//	gm.map_r2l(bbal, bbar, 0, 1);
-//	for (int pos = 0; pos < 2; pos++) {
-//		EXPECT_TRUE(bbal.pbb[pos].is_bit(9));
-//		EXPECT_TRUE(bbal.pbb[pos].is_bit(5));
-//		EXPECT_EQ(2, bbal.pbb[pos].popcn64());
-//	}
-//}

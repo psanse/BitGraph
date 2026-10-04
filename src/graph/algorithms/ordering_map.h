@@ -462,7 +462,7 @@ namespace bitgraph
 		// determine left sorting
 		SortAlgT left_sorter(graph);
 		left_to_right_ = left_sorter.new_order(right_strategy, right_placement /* false:first to last */, true /* o2n */);
-		right_to_left_ = OrderingDecoder::invert_ordering(left_to_right_);
+		right_to_left_ = OrderingDecoder::inverse_ordering(left_to_right_);
 
 		left_name_ = "ORIGINAL GRAPH";
 		right_name_ = std::move(right_name);
