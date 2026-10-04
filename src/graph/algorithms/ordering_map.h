@@ -34,6 +34,39 @@
 
 namespace bitgraph {
 
+	/**
+	 * @brief Maps vertices between two orderings of a graph.
+	 *
+	 * @details Stores a left ordering and a right ordering as two inverse
+	 * permutations of the vertex set: left-to-right (l2r) and right-to-left (r2l).
+	 * Vertices and bitsets of vertices can be translated in either direction.
+	 *
+	 * The original graph indices are the intermediate index space. Two use cases
+	 * are supported:
+	 *   - Two orderings: both computed from the original graph
+	 *     (left index -> original index -> right index).
+	 *   - Single ordering: the left space is the original graph ("ORIGINAL GRAPH")
+	 *     and the right space is the new ordering.
+	 *
+	 * Mappings are built with the build_mapping() overloads, either from a sorting
+	 * algorithm (typically GraphFastRootSort) or from known orderings. The class
+	 * does not hold a reference to any graph.
+	 *
+	 * @par Example
+	 * @code
+	 * using Sorter = GraphFastRootSort<Ugraph<BBScan>>;
+	 * OrderingMap map;
+	 * map.build_mapping<Sorter>(g,
+	 *     Sorter::strategy::min_degeneracy, Sorter::placement::first_to_last,
+	 *     Sorter::strategy::max, Sorter::placement::first_to_last,
+	 *     "MIN_DEGEN, F2L", "MAX, F2L");
+	 * vertex_t w = map.map_l2r(v);   // vertex v in the left space -> right space
+	 * @endcode
+	 *
+	 * @note The mappings are plain vectors: copying is O(n), and concurrent
+	 *       const access is safe but concurrent modification is not.
+	 * @see GraphFastRootSort, OrderingDecoder
+	 */
 	class OrderingMap
 	{
 
