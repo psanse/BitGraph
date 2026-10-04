@@ -86,6 +86,55 @@ TEST_F(GraphMapTest, build_mapping_2_orderings) {
 
 }
 
+TEST_F(GraphMapTest, build_mapping_enum_overload) {
+
+	GraphMap gm;
+	gm.build_mapping<GraphSort>(
+		ug,
+		GraphSort::strategy::max,
+		GraphSort::placement::first_to_last,
+		GraphSort::strategy::min,
+		GraphSort::placement::first_to_last,
+		"MAX F2L",
+		"MIN F2L");
+
+	VertexMapping l2rexp = { 2, 3, 0, 1 };
+	VertexMapping r2lexp = { 2, 3, 0, 1 };
+
+	EXPECT_TRUE(gm.is_consistent());
+	EXPECT_EQ(l2rexp, gm.get_l2r());
+	EXPECT_EQ(r2lexp, gm.get_r2l());
+}
+
+TEST_F(GraphMapTest, build_mapping_from_known_o2n_orderings) {
+
+	// same orderings as build_mapping_2_orderings, given explicitly in [OLD]->[NEW] format
+	GraphSort gs(ug);
+	VertexMapping lhs_o2n = gs.new_order(GraphSort::MAX, GraphSort::FIRST_TO_LAST, true);
+	VertexMapping rhs_o2n = gs.new_order(GraphSort::MIN, GraphSort::FIRST_TO_LAST, true);
+
+	GraphMap gm;
+	gm.build_mapping(lhs_o2n, rhs_o2n, "MAX F2L", "MIN F2L");
+
+	GraphMap gm_ref;
+	gm_ref.build_mapping<GraphSort>(ug, GraphSort::MAX, GraphSort::FIRST_TO_LAST,
+									GraphSort::MIN, GraphSort::FIRST_TO_LAST);
+
+	EXPECT_EQ(NV, gm.size());
+	EXPECT_TRUE(gm.is_consistent());
+	EXPECT_EQ(gm_ref.get_l2r(), gm.get_l2r());
+	EXPECT_EQ(gm_ref.get_r2l(), gm.get_r2l());
+	EXPECT_STREQ("MAX F2L", gm.nameL().c_str());
+	EXPECT_STREQ("MIN F2L", gm.nameR().c_str());
+
+	// identical orderings give the identity mapping
+	GraphMap gm_id;
+	gm_id.build_mapping(lhs_o2n, lhs_o2n);
+	VertexMapping id = { 0, 1, 2, 3 };
+	EXPECT_EQ(id, gm_id.get_l2r());
+	EXPECT_EQ(id, gm_id.get_r2l());
+}
+
 TEST_F(GraphMapTest, build_mapping_single_ordering){
 		
 	//degrees: {0(3), 1(2), 2(3), 3(2)}

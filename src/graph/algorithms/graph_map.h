@@ -47,7 +47,7 @@ namespace bitgraph {
 		///////////////////////
 		// setters and getters
 
-		std::size_t size() { return left_to_right_.size(); }
+		size_type size() { return left_to_right_.size(); }
 		mapping_type &get_l2r() { return left_to_right_; }
 		mapping_type &get_r2l() { return right_to_left_; }
 		const mapping_type &get_l2r() const { return left_to_right_; }
@@ -86,10 +86,10 @@ namespace bitgraph {
 		////////////////
 		// mapping getters
 
-		int map_l2r(vertex_t v) const { 
+		vertex_t map_l2r(vertex_t v) const { 
 			return left_to_right_[v];
 		}
-		int map_r2l(vertex_t v) const { 
+		vertex_t map_r2l(vertex_t v) const { 
 			return right_to_left_[v]; 
 		}
 
@@ -132,7 +132,7 @@ namespace bitgraph {
 		 * @param left_strategy, right_strategy: input sorting strategies of the left and right orderings
 		 * @param left_placement, right_placement: input placement strategies of the left and right orderings
 		 *						(FALSE:first-to-last, TRUE:last-to-first)
-		 * @param lhs_name, rhs_name: fancy names for the orderings
+		 * @param left_name, right_name: fancy names for the orderings
 		 **/
 		template <typename SortAlgT>
 		void build_mapping(
@@ -141,10 +141,9 @@ namespace bitgraph {
 			bool left_placement,
 			int right_strategy,
 			bool right_placement,
-			std::string lhs_name = "",
-			std::string rhs_name = "");
+			std::string left_name = "",
+			std::string right_name = "");
 
-		// TODO: add a version of build_mapping that takes strategy and placement as enums (instead of int and bool) for better type safety
 		template <typename SortAlgT>
 		void build_mapping(
 			typename SortAlgT::graph_type& graph,
@@ -152,20 +151,20 @@ namespace bitgraph {
 			typename SortAlgT::placement left_placement,
 			typename SortAlgT::strategy right_strategy,
 			typename SortAlgT::placement right_placement,
-			std::string lhs_name = "",
-			std::string rhs_name = "");
+			std::string left_name = "",
+			std::string right_name = "");
 
 		/**
-		 * @brief Helper when the two mappings @lhs_o2n  and @rhs_o2n are knownt
-		 * @param lhs_o2n: known mapping in [OLD]->[NEW] format
-		 * @param rhs_o2n: known mapping in [OLD]->[NEW] format
-		 * @param lhs_name, rhs_name: fancy names for the orderings
+		 * @brief Helper when the two orderings @left_o2n and @right_o2n are known
+		 * @param left_o2n: mapping [ORIGINAL graph index]->[LEFT index]
+		 * @param right_o2n: mapping [ORIGINAL graph index]->[RIGHT index]
+		 * @param left_name, right_name: fancy names for the orderings
 		 **/
 		void build_mapping(
-			const mapping_type &lhs_o2n,
-			const mapping_type &rhs_o2n,
-			std::string lhs_name = "",
-			std::string rhs_name = "");
+			const mapping_type &left_o2n,
+			const mapping_type &right_o2n,
+			std::string left_name = "",
+			std::string right_name = "");
 
 		//////////////////////
 		// single ordering
@@ -182,8 +181,8 @@ namespace bitgraph {
 		 * @param right_strategy: input sorting strategies for the ordering (considered to the right)
 		 * @param right_placement: input placement strategy right_sorter the ordering (considered to the right)
 		 *						(FALSE:first-to-last, TRUE:last-to-first)
-		 * @param rhs_name: fancy name for the ordering (e.g. "MIN_DEG, F2L")
-		 * @details: internally lhs_name is assigned "ORIGINAL GRAPH"
+		 * @param right_name: fancy name for the ordering (e.g. "MIN_DEG, F2L")
+		 * @details: internally left_name is assigned "ORIGINAL GRAPH"
 		 **/
 
 		template <typename SortAlgT>
@@ -191,16 +190,16 @@ namespace bitgraph {
 			typename SortAlgT::graph_type& graph,
 			int right_strategy,
 			bool right_placement,
-			std::string rhs_name = "");
+			std::string right_name = "");
 
 		/**
 		 * @brief Helper when the two mappings are known
-		 * @param rhs_n2o: known mapping in [NEW]->[OLD] format (which is more intuitive for single ordering)
-		 * @param rhs_name: fancy name for the ordering (e.g. "MIN_DEG, F2L")
+		 * @param right_n2o: known mapping [RIGHT index]->[ORIGINAL graph index] (more intuitive for single ordering)
+		 * @param right_name: fancy name for the ordering (e.g. "MIN_DEG, F2L")
 		 **/
 		void build_mapping(
-			const VertexMapping &rhs_n2o,
-			std::string rhs_name = "");
+			const VertexMapping &right_n2o,
+			std::string right_name = "");
 
 		//////////////
 		// I/O
@@ -230,7 +229,7 @@ namespace bitgraph {
 			left_name_.clear();
 			right_name_.clear();
 		}
-		void reset(std::size_t vertex_count)
+		void reset(size_type vertex_count)
 		{
 			clear();
 			left_to_right_.resize(vertex_count);
@@ -335,35 +334,35 @@ namespace bitgraph
 		bool left_placement,
 		int right_strategy, 
 		bool right_placement, 
-		std::string lhs_name, std::string rhs_name)
+		std::string left_name, std::string right_name)
 	{
-		mapping_type lhs_o2n, lhs_n2o, rhs_o2n, rhs_n2o;
+		mapping_type left_o2n, left_n2o, right_o2n, right_n2o;
 		auto vertex_count = graph.num_vertices();
 
 		reset(vertex_count);
 
-		// determine sorting lhs
+		// determine left sorting
 		SortAlgT left_sorter(graph);
-		lhs_o2n = left_sorter.new_order(left_strategy, left_placement /* false:first to last*/, true /* o2n*/); // VertexMapping new_order(int alg, bool ltf = true, bool o2n = true);
-		lhs_n2o = Decode::reverse(lhs_o2n);
+		left_o2n = left_sorter.new_order(left_strategy, left_placement /* false:first to last*/, true /* o2n*/); // VertexMapping new_order(int alg, bool ltf = true, bool o2n = true);
+		left_n2o = Decode::reverse(left_o2n);
 
-		// determine sorting rhs
+		// determine right sorting
 		SortAlgT right_sorter(graph);
-		rhs_o2n = right_sorter.new_order(right_strategy, right_placement /* false:first to last*/, true /* o2n */);
-		rhs_n2o = Decode::reverse(rhs_o2n);
+		right_o2n = right_sorter.new_order(right_strategy, right_placement /* false:first to last*/, true /* o2n */);
+		right_n2o = Decode::reverse(right_o2n);
 
 		// determines direct and reverse mappings independently
 		for (auto v = 0; v < vertex_count; v++)
 		{
-			left_to_right_[v] = rhs_o2n[lhs_n2o[v]]; // l->r
+			left_to_right_[v] = right_o2n[left_n2o[v]]; // l->r
 		}
 		for (auto v = 0; v < vertex_count; v++)
 		{
-			right_to_left_[v] = lhs_o2n[rhs_n2o[v]]; // r->l
+			right_to_left_[v] = left_o2n[right_n2o[v]]; // r->l
 		}
 
-		left_name_ = std::move(lhs_name);
-		right_name_ = std::move(rhs_name);
+		left_name_ = std::move(left_name);
+		right_name_ = std::move(right_name);
 
 		/*if (!is_consistent()) {
 			LOG_ERROR("L2R and R2L are inconsistent orderings - GraphMap::build_mapping (2 ord...)");
@@ -372,11 +371,31 @@ namespace bitgraph
 		}*/
 
 		// I/O
-		/*cout<<"N2O_L: "; bitgraph::_stl::print_collection(lhs_n2o, cout, true);
-		  cout<<"O2N_L: "; bitgraph::_stl::print_collection(lhs_o2n, cout, true);
-		  cout<<"N2O_R: "; bitgraph::_stl::print_collection(rhs_n2o, cout, true);
-		  cout<<"O2N_R: "; bitgraph::_stl::print_collection(rhs_o2n, cout, true);
+		/*cout<<"N2O_L: "; bitgraph::_stl::print_collection(left_n2o, cout, true);
+		  cout<<"O2N_L: "; bitgraph::_stl::print_collection(left_o2n, cout, true);
+		  cout<<"N2O_R: "; bitgraph::_stl::print_collection(right_n2o, cout, true);
+		  cout<<"O2N_R: "; bitgraph::_stl::print_collection(right_o2n, cout, true);
 		  print_mappings();*/
+	}
+
+	template <class SortAlgT>
+	inline void GraphMap::build_mapping(
+		typename SortAlgT::graph_type& graph,
+		typename SortAlgT::strategy left_strategy,
+		typename SortAlgT::placement left_placement,
+		typename SortAlgT::strategy right_strategy,
+		typename SortAlgT::placement right_placement,
+		std::string left_name,
+		std::string right_name)
+	{
+		this->build_mapping<SortAlgT>(
+			graph,
+			static_cast<int>(left_strategy),
+			left_placement == SortAlgT::placement::last_to_first,
+			static_cast<int>(right_strategy),
+			right_placement == SortAlgT::placement::last_to_first,
+			std::move(left_name),
+			std::move(right_name));
 	}
 
 	template <typename SortAlgT>
@@ -384,20 +403,20 @@ namespace bitgraph
 		typename SortAlgT::graph_type &graph, 
 		int right_strategy, 
 		bool right_placement,
-		std::string rhs_name)
+		std::string right_name)
 	{
 
 		auto vertex_count = graph.num_vertices();
 
 		reset(vertex_count);
 
-		// determine sorting lhs
+		// determine left sorting
 		SortAlgT left_sorter(graph);
 		left_to_right_ = left_sorter.new_order(right_strategy, right_placement /* false:first to last */, true /* o2n */);
 		right_to_left_ = Decode::reverse(left_to_right_);
 
 		left_name_ = "ORIGINAL GRAPH";
-		right_name_ = std::move(rhs_name);
+		right_name_ = std::move(right_name);
 
 		/*if (!is_consistent()) {
 			LOG_ERROR("L2R and R2L are inconsistent orderings - GraphMap::build_mapping(single ord...)");
@@ -409,62 +428,41 @@ namespace bitgraph
 	}
 
 	inline void GraphMap::build_mapping(
-		const mapping_type &lhs_o2n,
-		const mapping_type &rhs_o2n,
-		std::string lhs_name, std::string rhs_name)
+		const mapping_type &left_o2n,
+		const mapping_type &right_o2n,
+		std::string left_name, std::string right_name)
 	{
+		assert(left_o2n.size() == right_o2n.size() && "different size orderings - GraphMap::build_mapping");
 
-		/////////////////////////////////////////////////////////////////////////////////////////////////////////
-		assert(lhs_o2n.size() == rhs_o2n.size() && "ERROR: different size orderings - GraphMap::build_mapping");
-		/////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-		VertexMapping lhs_n2o, rhs_n2o;
-
-		auto vertex_count = lhs_o2n.size();
+		const auto vertex_count = left_o2n.size();
+		const mapping_type left_n2o = OrderingDecoder::inverse_ordering(left_o2n);
 
 		reset(vertex_count);
 
-		// determine sorting lhs
-		lhs_n2o = Decode::reverse(lhs_o2n);
-
-		// determine sorting rhs
-		rhs_n2o = Decode::reverse(rhs_o2n);
-
-		// determines direct and reverse mappings independently
-		for (int v = 0; v < vertex_count; v++)
+		// l->r: left index -> original index -> right index
+		for (size_type v = 0; v < vertex_count; ++v)
 		{
-			left_to_right_[v] = rhs_o2n[lhs_n2o[v]]; // l->r
-		}
-		for (int v = 0; v < vertex_count; v++)
-		{
-			right_to_left_[v] = lhs_o2n[rhs_n2o[v]]; // r->l
+			left_to_right_[v] = right_o2n[left_n2o[v]];
 		}
 
-		left_name_ = std::move(lhs_name);
-		right_name_ = std::move(rhs_name);
+		// r->l is the inverse of l->r
+		for (size_type v = 0; v < vertex_count; ++v)
+		{
+			right_to_left_[left_to_right_[v]] = static_cast<vertex_t>(v);
+		}
 
-		// assert
-		/*if (!is_consistent()) {
-			LOG_ERROR("bad ordering - GraphMap::build_mapping");
-			return -1;
-		}*/
-
-		// I/O
-		// cout<<"N2O_D"; utils::stl::print_collection(n2o_d); cout<<endl;
-		// cout<<"O2N_D";utils::stl::print_collection(o2n_d); cout<<endl;
-		// cout<<"O2N_W";utils::stl::print_collection(o2n_w); cout<<endl;
-		// cout<<"N2O_W";utils::stl::print_collection(n2o_w); cout<<endl;
-		// print_mappings();
+		left_name_ = std::move(left_name);
+		right_name_ = std::move(right_name);
 	}
 
-	inline void GraphMap::build_mapping(const VertexMapping &rhs_n2o, std::string lhs_name)
+	inline void GraphMap::build_mapping(const VertexMapping &right_n2o, std::string right_name)
 	{
 
-		left_to_right_ = Decode::reverse(rhs_n2o);
-		right_to_left_ = rhs_n2o;
+		left_to_right_ = Decode::reverse(right_n2o);
+		right_to_left_ = right_n2o;
 
 		left_name_ = "ORIGINAL GRAPH";
-		right_name_ = std::move(lhs_name);
+		right_name_ = std::move(right_name);
 
 		// return 0;
 	}
