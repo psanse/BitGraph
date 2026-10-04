@@ -1,10 +1,10 @@
 /**
 * @file graph_map.h
-* @brief header for GraphMap class that manages pairs of vertex orderings
+* @brief header for OrderingMap class that manages pairs of vertex orderings
 * @update conversions between two orderings of vertices (typically encoded by GraphFastRootSort) (14/8/17)
 * @update extended to inlcude mapping to a single ordering (1/10/17)
 * @date: imported from COPT framework in 2024, last_update 27/01/25
-* @details: GraphMap is conceived as a wrapper for GraphFastRootSort, but it is not restricted to it due to its generic template design
+* @details: OrderingMap is conceived as a wrapper for GraphFastRootSort, but it is not restricted to it due to its generic template design
 * @dev pss
 **/
 
@@ -22,13 +22,7 @@
 
 namespace bitgraph {
 
-	///////////////////////
-	//
-	// GraphMap for managing pairs of vertex orderings
-	//
-	///////////////////////
-
-	class GraphMap
+	class OrderingMap
 	{
 
 		using ordering_type = bitgraph::vertex_ordering;
@@ -50,12 +44,15 @@ namespace bitgraph {
 		size_type size() const noexcept{
 			 return left_to_right_.size();
 		}		
-		ordering_type &get_l2r() { return left_to_right_; }
-		ordering_type &get_r2l() { return right_to_left_; }
-		const ordering_type &get_l2r() const { return left_to_right_; }
-		const ordering_type &get_r2l() const { return right_to_left_; }
-		std::string left_name() const { return left_name_; }
-		std::string right_name() const { return right_name_; }
+		
+		const ordering_type &get_l2r() const noexcept { 
+			return left_to_right_;
+		 }
+		const ordering_type &get_r2l() const noexcept {
+			 return right_to_left_;
+		 }
+		const std::string &left_name() const noexcept { return left_name_; }
+		const std::string &right_name() const noexcept { return right_name_; }
 
 
 		void set_left_to_right(
@@ -72,26 +69,14 @@ namespace bitgraph {
 			left_name_ = std::move(left_name);
 			right_name_ = std::move(right_name);
 		}
-
-		//// sets mapping (no need to build it)
-		//void set_l2r(ordering_type &l, std::string name)
-		//{
-		//	left_to_right_ = l;
-		//	left_name_ = name;
-		//}
-		//void set_r2l(ordering_type &r, std::string name)
-		//{
-		//	right_to_left_ = r;
-		//	right_name_ = name;
-		//}
-
+	
 		////////////////
 		// mapping getters
 
-		vertex_t map_l2r(vertex_t v) const { 
+		vertex_t map_l2r(vertex_t v) const noexcept { 
 			return left_to_right_[v];
 		}
-		vertex_t map_r2l(vertex_t v) const { 
+		vertex_t map_r2l(vertex_t v) const noexcept { 
 			return right_to_left_[v]; 
 		}
 
@@ -123,19 +108,32 @@ namespace bitgraph {
 		// build mapping operations
 
 		/**
-		 * @brief Computes mapping between two different vertex orderings of a graph,
-		 *		 internally stored as left and right orderings.
-		 *		 (the indexes of the original graph can be seen as in-between :-))
+		 * @brief Builds the left-to-right and right-to-left vertex mappings between two
+		 *        orderings of @p graph, both computed by the sorting algorithm @p SortAlgT.
 		 *
-		 *		 I. The mappings are available by the functions map_l2r(), map_r2l()
+		 * @details The original graph indices act as the intermediate index space:
+		 * each ordering is computed independently from the original graph, and the
+		 * mappings are composed as left index -> original index -> right index.
+		 * Any previous state is replaced. The resulting mappings are available through
+		 * get_l2r(), get_r2l(), map_l2r() and map_r2l().
 		 *
-		 *		 II. Type SortAlgT is a sorting algorithm (typically from GraphFastRootSort<Graph_t>)
+		 * @tparam SortAlgT Sorting algorithm type, typically GraphFastRootSort<GraphT>.
+		 *                  It must define graph_type, be constructible from a graph
+		 *                  and provide new_order(int strategy, bool last_to_first, bool o2n).
 		 *
-		 * @param left_strategy, right_strategy: input sorting strategies of the left and right orderings
-		 * @param left_placement, right_placement: input placement strategies of the left and right orderings
-		 *						(FALSE:first-to-last, TRUE:last-to-first)
-		 * @param left_name, right_name: fancy names for the orderings
-		 **/
+		 * @param graph           Graph to be ordered.
+		 * @param left_strategy   Sorting strategy of the left ordering (a SortAlgT strategy value).
+		 * @param left_placement  Placement of the left ordering: false = first-to-last,
+		 *                        true = last-to-first.
+		 * @param right_strategy  Sorting strategy of the right ordering.
+		 * @param right_placement Placement of the right ordering (same convention as @p left_placement).
+		 * @param left_name       Descriptive name of the left ordering (e.g. "MAX_DEG, F2L").
+		 * @param right_name      Descriptive name of the right ordering (e.g. "MIN_DEG, F2L").
+		 *
+		 * @post size() == graph.num_vertices() and is_consistent() is true.
+		 *
+		 * @see build_mapping() overload taking typed strategy and placement enums.
+		 **/		
 		template <typename SortAlgT>
 		void build_mapping(
 			typename SortAlgT::graph_type& graph,
@@ -146,7 +144,26 @@ namespace bitgraph {
 			std::string left_name = "",
 			std::string right_name = "");
 
-		template <typename SortAlgT>
+		/**
+		 * @brief Type-safe overload of build_mapping() taking the strategy and
+		 *        placement enums of @p SortAlgT instead of int and bool.
+		 *
+		 * @details Equivalent to the int/bool overload, with placement::last_to_first
+		 * mapped to true and placement::first_to_last to false.
+		 *
+		 * @tparam SortAlgT Sorting algorithm type defining the nested enum classes
+		 *                  strategy and placement (e.g. GraphFastRootSort<GraphT>).
+		 *
+		 * @param graph           Graph to be ordered.
+		 * @param left_strategy   Sorting strategy of the left ordering.
+		 * @param left_placement  Placement of the left ordering.
+		 * @param right_strategy  Sorting strategy of the right ordering.
+		 * @param right_placement Placement of the right ordering.
+		 * @param left_name       Descriptive name of the left ordering.
+		 * @param right_name      Descriptive name of the right ordering.
+		 *
+		 * @post size() == graph.num_vertices() and is_consistent() is true.
+		 **/		template <typename SortAlgT>
 		void build_mapping(
 			typename SortAlgT::graph_type& graph,
 			typename SortAlgT::strategy left_strategy,
@@ -157,11 +174,27 @@ namespace bitgraph {
 			std::string right_name = "");
 
 		/**
-		 * @brief Helper when the two orderings @left_o2n and @right_o2n are known
-		 * @param left_o2n: mapping [ORIGINAL graph index]->[LEFT index]
-		 * @param right_o2n: mapping [ORIGINAL graph index]->[RIGHT index]
-		 * @param left_name, right_name: fancy names for the orderings
-		 **/
+		 * @brief Builds the left-to-right and right-to-left vertex mappings from two
+		 *        known orderings of the same graph.
+		 *
+		 * @details Both orderings are expressed relative to the original graph, which
+		 * acts as the intermediate index space:
+		 * @code
+		 *   left index --(left_n2o)--> original index --(right_o2n)--> right index
+		 * @endcode
+		 * where left_n2o is the inverse of @p left_o2n. The right-to-left mapping is
+		 * the inverse of the left-to-right mapping. Any previous state, including the
+		 * ordering names, is replaced.
+		 *
+		 * @param left_o2n   Ordering [ORIGINAL graph index] -> [LEFT index].
+		 * @param right_o2n  Ordering [ORIGINAL graph index] -> [RIGHT index].
+		 * @param left_name  Descriptive name of the left ordering (e.g. "MAX_DEG, F2L").
+		 * @param right_name Descriptive name of the right ordering (e.g. "MIN_DEG, F2L").
+		 *
+		 * @pre @p left_o2n and @p right_o2n are permutations of [0, n) of the same
+		 *      size n. Only the size is checked (by assert, in debug builds).
+		 * @post size() == n and is_consistent() is true.
+		 **/	
 		void build_mapping(
 			const ordering_type &left_o2n,
 			const ordering_type &right_o2n,
@@ -172,21 +205,28 @@ namespace bitgraph {
 		// single ordering
 
 		/**
-		 * @brief Computes and manages a vertex ordering of a graph, internally stored as:
-		 *		RIGHT ordering: new index
-		 *		LEFT : the index of the original graph
+		 * @brief Builds the mappings between the original graph and a single new ordering
+		 *        of @p graph computed by the sorting algorithm @p SortAlgT.
 		 *
-		 *		 I. The mappings are available by the functions map_l2r(), map_r2l()
+		 * @details The LEFT space is the original graph (identity ordering) and the RIGHT
+		 * space is the new ordering, so map_l2r() maps an original vertex to its new index
+		 * and map_r2l() maps a new index back to the original vertex. The left name is set
+		 * to "ORIGINAL GRAPH". Any previous state is replaced.
 		 *
-		 *		 II. Type SortAlgT is a sorting algorithm (typically from GraphFastRootSort<Graph_t>)
+		 * @tparam SortAlgT Sorting algorithm type, typically GraphFastRootSort<GraphT>.
+		 *                  It must define graph_type, be constructible from a graph
+		 *                  and provide new_order(int strategy, bool last_to_first, bool o2n).
 		 *
-		 * @param right_strategy: input sorting strategies for the ordering (considered to the right)
-		 * @param right_placement: input placement strategy right_sorter the ordering (considered to the right)
-		 *						(FALSE:first-to-last, TRUE:last-to-first)
-		 * @param right_name: fancy name for the ordering (e.g. "MIN_DEG, F2L")
-		 * @details: internally left_name is assigned "ORIGINAL GRAPH"
+		 * @param graph           Graph to be ordered.
+		 * @param right_strategy  Sorting strategy of the new ordering (a SortAlgT strategy value).
+		 * @param right_placement Placement of the new ordering: false = first-to-last,
+		 *                        true = last-to-first.
+		 * @param right_name      Descriptive name of the new ordering (e.g. "MIN_DEG, F2L").
+		 *
+		 * @post size() == graph.num_vertices() and is_consistent() is true.
+		 *
+		 * @see build_mapping(const ordering_type&, std::string) to use a known ordering.
 		 **/
-
 		template <typename SortAlgT>
 		void build_mapping(
 			typename SortAlgT::graph_type& graph,
@@ -195,11 +235,18 @@ namespace bitgraph {
 			std::string right_name = "");
 
 		/**
-		 * @brief Helper when the two mappings are known
-		 * @param right_n2o: known mapping [RIGHT index]->[ORIGINAL graph index] (more intuitive for single ordering)
-		 * @param right_name: fancy name for the ordering (e.g. "MIN_DEG, F2L")
-		 **/
-		void build_mapping(
+		 * @brief Builds the mappings between the original graph and a known single ordering.
+		 *
+		 * @details The LEFT space is the original graph and the RIGHT space is the given
+		 * ordering. The left name is set to "ORIGINAL GRAPH". Any previous state is replaced.
+		 *
+		 * @param right_n2o  Ordering [RIGHT index] -> [ORIGINAL graph index], the natural
+		 *                   direction when a single ordering is given.
+		 * @param right_name Descriptive name of the ordering (e.g. "MIN_DEG, F2L").
+		 *
+		 * @pre @p right_n2o is a permutation of [0, n).
+		 * @post size() == n and is_consistent() is true.
+		 **/		void build_mapping(
 			const ordering_type &right_n2o,
 			std::string right_name = "");
 
@@ -256,14 +303,14 @@ namespace bitgraph
 {
 
 	template <class BitsetT>
-	inline BitsetT &GraphMap::map_l2r(BitsetT &bbl, BitsetT &bbr, bool overwrite) const
+	inline BitsetT &OrderingMap::map_l2r(BitsetT &bbl, BitsetT &bbr, bool overwrite) const
 	{		
 		assert(
 			bbl.num_blocks() == bbr.num_blocks()
-			&& "bizarre bitsets with different num_blocks - GraphMap::map_l2r");
+			&& "bizarre bitsets with different num_blocks - OrderingMap::map_l2r");
 		assert(
 			INDEX_1TO1(static_cast<int>(left_to_right_.size())) == bbr.num_blocks()
-			&& "not adequate bitset num_blocks for the mapping - GraphMap::map_l2r ");
+			&& "not adequate bitset num_blocks for the mapping - OrderingMap::map_l2r ");
 		
 
 		// cleans bbr if requested
@@ -284,7 +331,7 @@ namespace bitgraph
 	}
 
 	template <class BitsetT>
-	inline BitsetT &GraphMap::map_r2l(
+	inline BitsetT &OrderingMap::map_r2l(
 		BitsetT &bbl,
 		BitsetT &bbr, 
 		bool overwrite) const
@@ -292,10 +339,10 @@ namespace bitgraph
 		
 		assert(
 			bbl.num_blocks() == bbr.num_blocks()
-			&& "bizarre bitsets with different num_blocks - GraphMap::map_r2l");
+			&& "bizarre bitsets with different num_blocks - OrderingMap::map_r2l");
 		assert(
 			INDEX_1TO1(static_cast<int>(left_to_right_.size())) == bbr.num_blocks()
-			&& "not adequate bitset num_blocks for the mapping - GraphMap::map_r2l ");
+			&& "not adequate bitset num_blocks for the mapping - OrderingMap::map_r2l ");
 	
 
 		// cleans bbr if requested
@@ -316,7 +363,7 @@ namespace bitgraph
 	}
 
 	inline
-		bool GraphMap::is_consistent() const noexcept
+		bool OrderingMap::is_consistent() const noexcept
 	{
 		for (size_type v = 0; v < left_to_right_.size(); ++v)
 		{
@@ -330,7 +377,7 @@ namespace bitgraph
 	}
 
 	template <class SortAlgT>
-	inline void GraphMap::build_mapping(
+	inline void OrderingMap::build_mapping(
 		typename SortAlgT::graph_type &graph,
 		int left_strategy, 
 		bool left_placement,
@@ -367,7 +414,7 @@ namespace bitgraph
 		right_name_ = std::move(right_name);
 
 		/*if (!is_consistent()) {
-			LOG_ERROR("L2R and R2L are inconsistent orderings - GraphMap::build_mapping (2 ord...)");
+			LOG_ERROR("L2R and R2L are inconsistent orderings - OrderingMap::build_mapping (2 ord...)");
 			LOG_ERROR("exiting...");
 			std::exit(EXIT_FAILURE);
 		}*/
@@ -381,7 +428,7 @@ namespace bitgraph
 	}
 
 	template <class SortAlgT>
-	inline void GraphMap::build_mapping(
+	inline void OrderingMap::build_mapping(
 		typename SortAlgT::graph_type& graph,
 		typename SortAlgT::strategy left_strategy,
 		typename SortAlgT::placement left_placement,
@@ -401,7 +448,7 @@ namespace bitgraph
 	}
 
 	template <typename SortAlgT>
-	void GraphMap::build_mapping(
+	void OrderingMap::build_mapping(
 		typename SortAlgT::graph_type &graph, 
 		int right_strategy, 
 		bool right_placement,
@@ -415,13 +462,13 @@ namespace bitgraph
 		// determine left sorting
 		SortAlgT left_sorter(graph);
 		left_to_right_ = left_sorter.new_order(right_strategy, right_placement /* false:first to last */, true /* o2n */);
-		right_to_left_ = Decode::reverse(left_to_right_);
+		right_to_left_ = OrderingDecoder::invert_ordering(left_to_right_);
 
 		left_name_ = "ORIGINAL GRAPH";
 		right_name_ = std::move(right_name);
 
 		/*if (!is_consistent()) {
-			LOG_ERROR("L2R and R2L are inconsistent orderings - GraphMap::build_mapping(single ord...)");
+			LOG_ERROR("L2R and R2L are inconsistent orderings - OrderingMap::build_mapping(single ord...)");
 			LOG_ERROR("exiting...");
 			std::exit(EXIT_FAILURE);
 		}*/
@@ -429,12 +476,12 @@ namespace bitgraph
 		// return 0;
 	}
 
-	inline void GraphMap::build_mapping(
+	inline void OrderingMap::build_mapping(
 		const ordering_type &left_o2n,
 		const ordering_type &right_o2n,
 		std::string left_name, std::string right_name)
 	{
-		assert(left_o2n.size() == right_o2n.size() && "different size orderings - GraphMap::build_mapping");
+		assert(left_o2n.size() == right_o2n.size() && "different size orderings - OrderingMap::build_mapping");
 
 		const auto vertex_count = left_o2n.size();
 		const ordering_type left_n2o = OrderingDecoder::inverse_ordering(left_o2n);
@@ -457,10 +504,10 @@ namespace bitgraph
 		right_name_ = std::move(right_name);
 	}
 
-	inline void GraphMap::build_mapping(const ordering_type &right_n2o, std::string right_name)
+	inline void OrderingMap::build_mapping(const ordering_type &right_n2o, std::string right_name)
 	{
 
-		left_to_right_ = Decode::reverse(right_n2o);
+		left_to_right_ = OrderingDecoder::inverse_ordering(right_n2o);
 		right_to_left_ = right_n2o;
 
 		left_name_ = "ORIGINAL GRAPH";
@@ -469,7 +516,7 @@ namespace bitgraph
 		// return 0;
 	}
 
-	inline std::ostream &GraphMap::print_mappings(print_t type, std::ostream &o)
+	inline std::ostream &OrderingMap::print_mappings(print_t type, std::ostream &o)
 	{
 
 		switch (type)
@@ -494,13 +541,13 @@ namespace bitgraph
 			o << "*****************" << std::endl;
 			break;
 		default:
-			LOG_WARNING("bad printing type - GraphMap::print_mappings");
+			LOG_WARNING("bad printing type - OrderingMap::print_mappings");
 		}
 
 		return o;
 	}
 
-	inline std::ostream &GraphMap::print_names(print_t type, std::ostream &o)
+	inline std::ostream &OrderingMap::print_names(print_t type, std::ostream &o)
 	{
 
 		switch (type)
@@ -517,11 +564,14 @@ namespace bitgraph
 			o << "R:" << right_name_;
 			break;
 		default:
-			LOG_WARNING("bad printing type - GraphMap::print_names");
+			LOG_WARNING("bad printing type - OrderingMap::print_names");
 		}
 
 		return o;
 	}
+
+	// Alias for backward compatibility with the previous name of the class
+	using GraphMap = OrderingMap;
 
 } // end of namespace bitgraph
 

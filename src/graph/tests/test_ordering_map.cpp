@@ -1,6 +1,6 @@
 /*
-* @file test_graph_map.cpp  
-* @brief Unit tests for GraphMap class which manages a pair of vertex orderings
+* @file test_ordering_map.cpp  
+* @brief Unit tests for OrderingMap class which manages a pair of vertex orderings
 * @date: created  14/8/17, update  GraphFastRootSort 03/01/20, imported from prior COPT (10/01/25), last update 30/11/25
 * @dev pss
 *
@@ -8,10 +8,9 @@
 */
 
 #include "gtest/gtest.h"
-#include "graph/algorithms/graph_map.h"
+#include "graph/algorithms/ordering_map.h"
 #include "graph/algorithms/graph_fast_sort.h"
 #include "graph/simple_ugraph.h"
-//#include "utils/common.h"
 #include <iostream>
 
 namespace bitgraph {
@@ -43,7 +42,7 @@ TEST_F(GraphMapTest, build_mapping_2_orderings) {
 		
 	//degrees: {0(3), 1(2), 2(3), 3(2)}
 	 
-	GraphMap gm;
+	OrderingMap gm;
 	gm.build_mapping< GraphSort> (ug, GraphSort::MAX, GraphSort::FIRST_TO_LAST,
 									  GraphSort::MIN, GraphSort::FIRST_TO_LAST, "MAX F2L", "MIN F2L"	);
 		
@@ -88,7 +87,7 @@ TEST_F(GraphMapTest, build_mapping_2_orderings) {
 
 TEST_F(GraphMapTest, build_mapping_enum_overload) {
 
-	GraphMap gm;
+	OrderingMap gm;
 	gm.build_mapping<GraphSort>(
 		ug,
 		GraphSort::strategy::max,
@@ -113,10 +112,10 @@ TEST_F(GraphMapTest, build_mapping_from_known_o2n_orderings) {
 	VertexMapping lhs_o2n = gs.new_order(GraphSort::MAX, GraphSort::FIRST_TO_LAST, true);
 	VertexMapping rhs_o2n = gs.new_order(GraphSort::MIN, GraphSort::FIRST_TO_LAST, true);
 
-	GraphMap gm;
+	OrderingMap gm;
 	gm.build_mapping(lhs_o2n, rhs_o2n, "MAX F2L", "MIN F2L");
 
-	GraphMap gm_ref;
+	OrderingMap gm_ref;
 	gm_ref.build_mapping<GraphSort>(ug, GraphSort::MAX, GraphSort::FIRST_TO_LAST,
 									GraphSort::MIN, GraphSort::FIRST_TO_LAST);
 
@@ -128,7 +127,7 @@ TEST_F(GraphMapTest, build_mapping_from_known_o2n_orderings) {
 	EXPECT_STREQ("MIN F2L", gm.right_name().c_str());
 
 	// identical orderings give the identity mapping
-	GraphMap gm_id;
+	OrderingMap gm_id;
 	gm_id.build_mapping(lhs_o2n, lhs_o2n);
 	VertexMapping id = { 0, 1, 2, 3 };
 	EXPECT_EQ(id, gm_id.get_l2r());
@@ -139,7 +138,7 @@ TEST_F(GraphMapTest, build_mapping_single_ordering){
 		
 	//degrees: {0(3), 1(2), 2(3), 3(2)}
 
-	GraphMap gm;
+	OrderingMap gm;
 	gm.build_mapping< GraphSort > (ug, GraphSort::MIN, GraphSort::FIRST_TO_LAST, "MIN_DEG");
 	
 	EXPECT_EQ(NV, gm.size());
@@ -184,7 +183,7 @@ TEST_F(GraphMapTest, predefined_single_ordering){
 	GraphSort gol(ug); 
 	VertexOrdering n2o = gol.new_order(GraphSort::MIN, GraphSort::FIRST_TO_LAST, false);			 //n2o = {1,3,0,2}			
 
-	GraphMap gm;
+	OrderingMap gm;
 	gm.build_mapping(n2o, "MIN F2L");			// builds mapping according to the given ordering
 
 	EXPECT_EQ(NV, gm.size());
@@ -219,7 +218,7 @@ TEST_F(GraphMapTest, mapBetweenBitsets_2orderings) {
 	//degrees: {0(3), 1(2), 2(3), 3(2)}
 	//l2r = {2, 3, 0 ,1}, r2l = {2, 3, 0, 1}
 
-	GraphMap gm;
+	OrderingMap gm;
 	gm.build_mapping< GraphSort>(ug, GraphSort::MAX, GraphSort::FIRST_TO_LAST,
 									 GraphSort::MIN, GraphSort::FIRST_TO_LAST, "MAX F2L", "MIN F2L");
 
@@ -261,7 +260,7 @@ TEST_F(GraphMapTest, mapBetweenBitsets_single_ordering) {
 	//l2r ={ 2, 0, 3, 1 };  - [OLD / original index] to [NEW]
 	//r2l ={ 1, 3, 0, 2 }  -  [NEW] to [OLD / original index]
 
-	GraphMap gm;
+	OrderingMap gm;
 	gm.build_mapping< GraphSort >(ug, GraphSort::MIN, GraphSort::FIRST_TO_LAST, "MIN_DEG");
 
 	auto NV = ug.num_vertices();
@@ -321,7 +320,7 @@ TEST_F(GraphMapTest, mapBetweenBitsets_single_ordering) {
 //	ug.set_wv(2, 12);
 //	ug.set_wv(3, 13);
 //
-//	GraphMap gm;
+//	OrderingMap gm;
 //	gm.build_mapping(ug, gbbs::sort_t::MIN_DEG_DEGEN, gbbs::place_t::PLACE_FL,
 //		gbbs::sort_t::MAX_WEIGHT, gbbs::place_t::PLACE_FL, "MIN_DEG", "MAX_W");
 //
@@ -364,7 +363,7 @@ TEST_F(GraphMapTest, mapBetweenBitsets_single_ordering) {
 //	ug.set_wv(2, 12);
 //	ug.set_wv(3, 13);
 //
-//	GraphMap gm;
+//	OrderingMap gm;
 //	gm.build_mapping(ug, gbbs::sort_t::MIN_DEG_DEGEN, gbbs::place_t::PLACE_FL,
 //		gbbs::sort_t::MAX_WEIGHT, gbbs::place_t::PLACE_FL, "MIN_DEG", "MAX_W");
 //

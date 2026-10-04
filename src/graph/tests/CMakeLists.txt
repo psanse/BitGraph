@@ -18,7 +18,7 @@ add_executable (
   test_format.cpp 
   test_decode.cpp
   test_clq_func.cpp
-  test_graph_map.cpp
+  test_ordering_map.cpp
   test_graph_benchmark.cpp
   test_algorithm_info.cpp
 
