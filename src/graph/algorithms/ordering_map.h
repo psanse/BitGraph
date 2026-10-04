@@ -328,6 +328,7 @@ namespace bitgraph {
 			left_name_.clear();
 			right_name_.clear();
 		}
+
 		void reset(size_type vertex_count)
 		{
 			clear();
@@ -371,7 +372,7 @@ namespace bitgraph
 
 		// scan the bitset bbl and map
 		bbl.init_scan(BBObject::NON_DESTRUCTIVE);
-		int v = BBObject::noBit;
+		vertex_t v = BBObject::noBit;
 		while ((v = bbl.next_bit()) != BBObject::noBit)
 		{
 			bbr.set_bit(left_to_right_[v]);
@@ -451,11 +452,11 @@ namespace bitgraph
 		right_n2o = OrderingDecoder::inverse_ordering(right_o2n);
 
 		// determines direct and reverse mappings independently
-		for (auto v = 0; v < vertex_count; v++)
+		for (size_type = 0; v < vertex_count; v++)
 		{
 			left_to_right_[v] = right_o2n[left_n2o[v]]; // l->r
 		}
-		for (auto v = 0; v < vertex_count; v++)
+		for (size_type v = 0; v < vertex_count; v++)
 		{
 			right_to_left_[v] = left_o2n[right_n2o[v]]; // r->l
 		}
