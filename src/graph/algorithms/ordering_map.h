@@ -92,10 +92,10 @@ namespace bitgraph {
 			 return left_to_right_.size();
 		}		
 		
-		const ordering_type &get_l2r() const noexcept { 
+		const ordering_type &left_to_right() const noexcept { 
 			return left_to_right_;
 		 }
-		const ordering_type &get_r2l() const noexcept {
+		const ordering_type &right_to_left() const noexcept {
 			 return right_to_left_;
 		 }
 		const std::string &left_name() const noexcept { return left_name_; }
@@ -162,7 +162,7 @@ namespace bitgraph {
 		 * each ordering is computed independently from the original graph, and the
 		 * mappings are composed as left index -> original index -> right index.
 		 * Any previous state is replaced. The resulting mappings are available through
-		 * get_l2r(), get_r2l(), map_left_to_right() and map_right_to_left().
+		 * left_to_right(), right_to_left(), map_left_to_right() and map_right_to_left().
 		 *
 		 * @tparam SortAlgT Sorting algorithm type, typically GraphFastRootSort<GraphT>.
 		 *                  It must define graph_type, be constructible from a graph

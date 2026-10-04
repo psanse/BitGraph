@@ -19,22 +19,27 @@ namespace bitgraph {
 using namespace std;
 using namespace bitgraph;
 
-class OrderingMapTest : public ::testing::Test {
-protected:
-	void SetUp() override {
-		ug.reset(NV);
-		ug.add_edge(0, 1);		
-		ug.add_edge(0, 2);
-		ug.add_edge(0, 3);
-		ug.add_edge(1, 2);
-		ug.add_edge(2, 3);
-	}
-	void TearDown() override {}
+namespace {
 
-	//undirected graph instance	
-	const int NV = 4;
-	ugraph ug;											
-};
+	class OrderingMapTest : public ::testing::Test
+	{
+	protected:
+		void SetUp() override
+		{
+			ug.reset(NV);
+			ug.add_edge(0, 1);
+			ug.add_edge(0, 2);
+			ug.add_edge(0, 3);
+			ug.add_edge(1, 2);
+			ug.add_edge(2, 3);
+		}
+		void TearDown() override {}
+
+		// undirected graph instance
+		const int NV = 4;
+		ugraph ug;
+	};
+}
 
 TEST_F(OrderingMapTest, build_mapping_2_orderings) {
 		
@@ -60,22 +65,22 @@ TEST_F(OrderingMapTest, build_mapping_2_orderings) {
 	VertexMapping r2lexp = { 2, 3, 0, 1 };
 	
 	//////////////////////////////////
-	EXPECT_EQ	(l2rexp, gm.get_l2r());
-	EXPECT_EQ	(r2lexp, gm.get_r2l());
+	EXPECT_EQ	(l2rexp, gm.left_to_right());
+	EXPECT_EQ	(r2lexp, gm.right_to_left());
 	//////////////////////////////////
 
 	
 	//left index to right index
-	EXPECT_EQ(gm.map_l2r(0), 2); 
-	EXPECT_EQ(gm.map_l2r(1), 3);
-	EXPECT_EQ(gm.map_l2r(2), 0);
-	EXPECT_EQ(gm.map_l2r(3), 1);
+	EXPECT_EQ(gm.map_left_to_right(0), 2); 
+	EXPECT_EQ(gm.map_left_to_right(1), 3);
+	EXPECT_EQ(gm.map_left_to_right(2), 0);
+	EXPECT_EQ(gm.map_left_to_right(3), 1);
 
 	//right index to left index
-	EXPECT_EQ(gm.map_r2l(0), 2);
-	EXPECT_EQ(gm.map_r2l(1), 3);
-	EXPECT_EQ(gm.map_r2l(2), 0);
-	EXPECT_EQ(gm.map_r2l(3), 1);
+	EXPECT_EQ(gm.map_right_to_left(0), 2);
+	EXPECT_EQ(gm.map_right_to_left(1), 3);
+	EXPECT_EQ(gm.map_right_to_left(2), 0);
+	EXPECT_EQ(gm.map_right_to_left(3), 1);
 
 	//I/O
 	//gm.print_names();
@@ -99,8 +104,8 @@ TEST_F(OrderingMapTest, build_mapping_enum_overload) {
 	VertexMapping r2lexp = { 2, 3, 0, 1 };
 
 	EXPECT_TRUE(gm.is_consistent());
-	EXPECT_EQ(l2rexp, gm.get_l2r());
-	EXPECT_EQ(r2lexp, gm.get_r2l());
+	EXPECT_EQ(l2rexp, gm.left_to_right());
+	EXPECT_EQ(r2lexp, gm.right_to_left());
 }
 
 TEST_F(OrderingMapTest, build_mapping_from_known_o2n_orderings) {
@@ -119,8 +124,8 @@ TEST_F(OrderingMapTest, build_mapping_from_known_o2n_orderings) {
 
 	EXPECT_EQ(NV, gm.size());
 	EXPECT_TRUE(gm.is_consistent());
-	EXPECT_EQ(gm_ref.get_l2r(), gm.get_l2r());
-	EXPECT_EQ(gm_ref.get_r2l(), gm.get_r2l());
+	EXPECT_EQ(gm_ref.left_to_right(), gm.left_to_right());
+	EXPECT_EQ(gm_ref.right_to_left(), gm.right_to_left());
 	EXPECT_STREQ("MAX F2L", gm.left_name().c_str());
 	EXPECT_STREQ("MIN F2L", gm.right_name().c_str());
 
@@ -128,8 +133,8 @@ TEST_F(OrderingMapTest, build_mapping_from_known_o2n_orderings) {
 	OrderingMap gm_id;
 	gm_id.build_mapping(lhs_o2n, lhs_o2n);
 	VertexMapping id = { 0, 1, 2, 3 };
-	EXPECT_EQ(id, gm_id.get_l2r());
-	EXPECT_EQ(id, gm_id.get_r2l());
+	EXPECT_EQ(id, gm_id.left_to_right());
+	EXPECT_EQ(id, gm_id.right_to_left());
 }
 
 TEST_F(OrderingMapTest, build_mapping_single_ordering){
@@ -148,20 +153,20 @@ TEST_F(OrderingMapTest, build_mapping_single_ordering){
 	VertexMapping r2lexp = { 1, 3, 0, 2 };
 	
 	/////////////////////////////////
-	EXPECT_EQ(l2rexp, gm.get_l2r());
+	EXPECT_EQ(l2rexp, gm.left_to_right());
 	////////////////////////////////
 
 	//original index to new index
-	EXPECT_EQ(gm.map_l2r(0), 2);							
-	EXPECT_EQ(gm.map_l2r(1), 0);
-	EXPECT_EQ(gm.map_l2r(2), 3);
-	EXPECT_EQ(gm.map_l2r(3), 1);
+	EXPECT_EQ(gm.map_left_to_right(0), 2);							
+	EXPECT_EQ(gm.map_left_to_right(1), 0);
+	EXPECT_EQ(gm.map_left_to_right(2), 3);
+	EXPECT_EQ(gm.map_left_to_right(3), 1);
 
 	//new index to original index
-	EXPECT_EQ(gm.map_r2l(0), 1);
-	EXPECT_EQ(gm.map_r2l(1), 3);
-	EXPECT_EQ(gm.map_r2l(2), 0);
-	EXPECT_EQ(gm.map_r2l(3), 2);
+	EXPECT_EQ(gm.map_right_to_left(0), 1);
+	EXPECT_EQ(gm.map_right_to_left(1), 3);
+	EXPECT_EQ(gm.map_right_to_left(2), 0);
+	EXPECT_EQ(gm.map_right_to_left(3), 2);
 
 
 	EXPECT_STREQ("ORIGINAL GRAPH", gm.left_name().c_str());		//left ordering is the original graph in single ordering use
@@ -189,22 +194,22 @@ TEST_F(OrderingMapTest, predefined_single_ordering){
 	//check mappings
 	VertexMapping r2lexp = { 1, 3, 0, 2 };
 	
-	EXPECT_EQ(r2lexp, gm.get_r2l());						//original index to new index is identity
+	EXPECT_EQ(r2lexp, gm.right_to_left());						//original index to new index is identity
 	EXPECT_STREQ("MIN F2L", gm.right_name().c_str());
 	EXPECT_STREQ("ORIGINAL GRAPH", gm.left_name().c_str());
 
 
 	//user code - map vertices from the original to the new ordering
-	EXPECT_EQ(gm.map_l2r(0), 2);
-	EXPECT_EQ(gm.map_l2r(1), 0);
-	EXPECT_EQ(gm.map_l2r(2), 3);
-	EXPECT_EQ(gm.map_l2r(3), 1);
+	EXPECT_EQ(gm.map_left_to_right(0), 2);
+	EXPECT_EQ(gm.map_left_to_right(1), 0);
+	EXPECT_EQ(gm.map_left_to_right(2), 3);
+	EXPECT_EQ(gm.map_left_to_right(3), 1);
 
 	//user code - map vertices from the new ordering to the original
-	EXPECT_EQ(gm.map_r2l(0), 1);
-	EXPECT_EQ(gm.map_r2l(1), 3);
-	EXPECT_EQ(gm.map_r2l(2), 0);
-	EXPECT_EQ(gm.map_r2l(3), 2);
+	EXPECT_EQ(gm.map_right_to_left(0), 1);
+	EXPECT_EQ(gm.map_right_to_left(1), 3);
+	EXPECT_EQ(gm.map_right_to_left(2), 0);
+	EXPECT_EQ(gm.map_right_to_left(3), 2);
 
 	//I/O
 	/*gm.print_names(); 
@@ -231,7 +236,7 @@ TEST_F(OrderingMapTest, mapBetweenBitsets_2orderings) {
 	bbl.set_bit(3);
 
 	////////////////////////////////////////////
-	gm.map_l2r(bbl, bbr, true /* overwrite */);		//overwrite is not necessary here since bbl was erased before
+	gm.map_left_to_right(bbl, bbr, true /* overwrite */);		//overwrite is not necessary here since bbl was erased before
 	////////////////////////////////////////////
 
 	//check right bitset
@@ -243,7 +248,7 @@ TEST_F(OrderingMapTest, mapBetweenBitsets_2orderings) {
 	bbr.erase_bit();
 	bbr.set_bit(1);
 	bbr.set_bit(3);
-	gm.map_r2l(bbl, bbr, true /* overwrite */);		//overwrite is not necessary here since bbr was erased before
+	gm.map_right_to_left(bbl, bbr, true /* overwrite */);		//overwrite is not necessary here since bbr was erased before
 
 	//check left bitset
 	EXPECT_TRUE(bbl.is_bit(3));
@@ -271,7 +276,7 @@ TEST_F(OrderingMapTest, mapBetweenBitsets_single_ordering) {
 	bbl.set_bit(3);
 
 	////////////////////////////////////////////
-	gm.map_l2r(bbl, bbr, true /* overwrite */);		//overwrite is not necessary here since bbl was erased before
+	gm.map_left_to_right(bbl, bbr, true /* overwrite */);		//overwrite is not necessary here since bbl was erased before
 	////////////////////////////////////////////
 
 	//check right bitset
@@ -283,7 +288,7 @@ TEST_F(OrderingMapTest, mapBetweenBitsets_single_ordering) {
 	bbr.erase_bit();
 	bbr.set_bit(1);
 	bbr.set_bit(3);
-	gm.map_r2l(bbl, bbr, true /* overwrite */);		//overwrite is not necessary here since bbr was erased before
+	gm.map_right_to_left(bbl, bbr, true /* overwrite */);		//overwrite is not necessary here since bbr was erased before
 
 	//check left bitset
 	EXPECT_TRUE(bbl.is_bit(3));
