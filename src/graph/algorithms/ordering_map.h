@@ -83,7 +83,7 @@ namespace bitgraph {
 			LeftToRight = 0,
 			RightToLeft,
 			Both
-		};	// streaming configuration
+		};	
 
 		///////////////////////
 		// setters and getters
@@ -301,13 +301,13 @@ namespace bitgraph {
 		//////////////
 		// I/O
 
-		std::ostream &print_mappings(
+		std::ostream &print_mappings (
 			print_mode type = print_mode::Both,
-			std::ostream &out = std::cout);
+			std::ostream &out = std::cout) const;
 
-		std::ostream &print_names(
+		std::ostream &print_names  (
 			print_mode type = print_mode::Both,
-			std::ostream &out = std::cout);
+			std::ostream &out = std::cout) const;
 
 		///////////////
 		// Boolean operations
@@ -554,7 +554,9 @@ namespace bitgraph
 		right_name_ = std::move(right_name);
 	}
 
-	inline void OrderingMap::build_mapping(const ordering_type &right_n2o, std::string right_name)
+	inline void OrderingMap::build_mapping(
+		const ordering_type &right_n2o,
+		std::string right_name)
 	{
 
 		left_to_right_ = OrderingDecoder::inverse_ordering(right_n2o);
@@ -566,7 +568,9 @@ namespace bitgraph
 		// return 0;
 	}
 
-	inline std::ostream &OrderingMap::print_mappings(print_mode type, std::ostream &o)
+	inline std::ostream &OrderingMap::print_mappings(
+		print_mode type,
+		std::ostream &o) const
 	{
 
 		switch (type)
@@ -597,7 +601,9 @@ namespace bitgraph
 		return o;
 	}
 
-	inline std::ostream &OrderingMap::print_names(print_mode type, std::ostream &o)
+	inline std::ostream &OrderingMap::print_names(
+		print_mode type, 
+		std::ostream &o) const
 	{
 
 		switch (type)

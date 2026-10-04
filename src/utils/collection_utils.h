@@ -132,7 +132,7 @@ namespace bitgraph {
 				const ForwardIteratorT last,
 				std::ostream& out = std::cout,
 				bool trailing_newline = false,
-				bool show_indices = false)
+				bool show_indices = false) 
 		{
 			std::size_t count = 0;
 			
