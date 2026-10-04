@@ -67,6 +67,8 @@ namespace bitgraph {
 	 *       const access is safe but concurrent modification is not.
 	 * @see GraphFastRootSort, OrderingDecoder
 	 */
+
+
 	class OrderingMap
 	{
 
