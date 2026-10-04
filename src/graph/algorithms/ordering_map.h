@@ -78,11 +78,11 @@ namespace bitgraph {
 		///////////////////////
 		// public interface
 	public:
-		enum print_t
+		enum class print_mode
 		{
-			L2R = 0,
-			R2L,
-			BOTH
+			LeftToRight = 0,
+			RightToLeft,
+			Both
 		};	// streaming configuration
 
 		///////////////////////
@@ -302,11 +302,11 @@ namespace bitgraph {
 		// I/O
 
 		std::ostream &print_mappings(
-			print_t type = BOTH,
+			print_mode type = print_mode::Both,
 			std::ostream &out = std::cout);
 
 		std::ostream &print_names(
-			print_t type = BOTH,
+			print_mode type = print_mode::Both,
 			std::ostream &out = std::cout);
 
 		///////////////
@@ -566,24 +566,24 @@ namespace bitgraph
 		// return 0;
 	}
 
-	inline std::ostream &OrderingMap::print_mappings(print_t type, std::ostream &o)
+	inline std::ostream &OrderingMap::print_mappings(print_mode type, std::ostream &o)
 	{
 
 		switch (type)
 		{
-		case L2R:
+		case print_mode::LeftToRight:
 			o << "\n*****************" << std::endl;
 			o << "L->R" << std::endl;
 			utils::print_collection(left_to_right_, o, true);
 			o << "\n*****************" << std::endl;
 			break;
-		case R2L:
+		case print_mode::RightToLeft:
 			o << "\n*****************" << std::endl;
 			o << "R->L" << std::endl;
 			utils::print_collection(right_to_left_, o, true);
 			o << "******************" << std::endl;
 			break;
-		case BOTH:
+		case print_mode::Both:
 			o << "\n*****************" << std::endl;
 			o << "L->R and R->L" << std::endl;
 			utils::print_collection(left_to_right_, o, true);
@@ -597,18 +597,18 @@ namespace bitgraph
 		return o;
 	}
 
-	inline std::ostream &OrderingMap::print_names(print_t type, std::ostream &o)
+	inline std::ostream &OrderingMap::print_names(print_mode type, std::ostream &o)
 	{
 
 		switch (type)
 		{
-		case L2R:
+		case print_mode::LeftToRight:
 			o << "L:" << left_name_;
 			break;
-		case R2L:
+		case print_mode::RightToLeft:
 			o << "R:" << right_name_;
 			break;
-		case BOTH:
+		case print_mode::Both:
 			o << "L:" << left_name_;
 			o << std::endl;
 			o << "R:" << right_name_;
