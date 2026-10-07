@@ -1,5 +1,5 @@
 /**
- * @file decode.cpp
+ * @file ordering_decoder.cpp
  * @brief Implements graph vertex-ordering decoding utilities.
  *
  * Contains the non-inline definitions of the OrderingDecoder class, including

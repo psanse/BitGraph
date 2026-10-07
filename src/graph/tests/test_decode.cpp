@@ -15,7 +15,7 @@
 #include "gtest/gtest.h"
 
 #include "graph/graph_unweighted.h"
-#include "graph/algorithms/decode.h"
+#include "graph/algorithms/ordering_decoder.h"
 #include "graph/algorithms/graph_fast_sort.h"
 
 #include <utility>

@@ -75,7 +75,7 @@ namespace bitgraph {
 
 
 	inline 
-	int BBScan::next_bit()
+	int BBScan::next_bit() const
 	{
 
 		assert(has_valid_cursor());
@@ -158,7 +158,7 @@ namespace bitgraph {
 
 
 	inline 
-	int BBScan::prev_bit()
+	int BBScan::prev_bit() const
 	{
 		assert(has_valid_cursor());
 

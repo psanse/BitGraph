@@ -76,7 +76,7 @@ namespace bitgraph {
 			 * @pre The scan has been initialized and has not already returned
 			 *      BBObject::noBit.
 			 */
-			int next_bit() { return bb_.next_bit(); }
+			int next_bit() const { return bb_.next_bit(); }
 
 			/**
 			 * @brief Returns the next set bit and clears its position in another bitset.
@@ -92,7 +92,7 @@ namespace bitgraph {
 			 * @pre The scan has been initialized and has not already returned
 			 *      BBObject::noBit.
 			 */
-			int next_bit(bitset_t& bitSet) { return bb_.next_bit(bitSet); }
+			int next_bit(bitset_t& bitSet) const { return bb_.next_bit(bitSet); }
 
 		private:
 			bitset_t& bb_;
@@ -153,7 +153,7 @@ namespace bitgraph {
 			 * @pre The scan has been initialized and has not already returned
 			 *      BBObject::noBit.
 			 */
-			int next_bit() { return bb_.prev_bit(); }
+			int next_bit() const { return bb_.prev_bit(); }
 
 			/**
 			 * @brief Returns the next set bit in reverse order and clears its position
@@ -167,7 +167,7 @@ namespace bitgraph {
 			 * @pre The scan has been initialized and has not already returned
 			 *      BBObject::noBit.
 			 */
-			int next_bit(bitset_t& bitSet) { return bb_.prev_bit(bitSet); }
+			int next_bit(bitset_t& bitSet) const { return bb_.prev_bit(bitSet); }
 
 		private:
 			bitset_t& bb_;
@@ -217,14 +217,14 @@ namespace bitgraph {
 			/**
 			* @brief returns the next bit in the bitset during a reverse bitscanning operation
 			**/
-			int next_bit() { return bb_.next_bit_del(); }
+			int next_bit() const { return bb_.next_bit_del(); }
 
 			/**
 			* @brief scans the next bit in the bitset and deletes it from the
 			*		 bitstring bitSet
 			* @param bbdel: bitset to delete the bit from
 			**/
-			int next_bit(bitset_t& bitSet) { return bb_.next_bit_del(bitSet); }
+			int next_bit(bitset_t& bitSet) const { return bb_.next_bit_del(bitSet); }
 
 		private:
 			bitset_t& bb_;
@@ -254,14 +254,14 @@ namespace bitgraph {
 			/**
 			* @brief returns the next bit in the bitset during a reverse bitscanning operation
 			**/
-			int next_bit() { return bb_.prev_bit_del(); }
+			int next_bit() const { return bb_.prev_bit_del(); }
 
 			/**
 			* @brief scans the next bit in the bitset during a reverse bitscanning operation
 			*		 and deletes it from the bitstring  bitSet
 			* @param bbdel: bitset to delete the bit from
 			**/
-			int next_bit(bitset_t& bitSet) { return bb_.prev_bit_del(bitSet); }
+			int next_bit(bitset_t& bitSet) const { return bb_.prev_bit_del(bitSet); }
 
 		private:
 			bitset_t& bb_;

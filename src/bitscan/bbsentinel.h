@@ -86,7 +86,7 @@ namespace bitgraph {
 			inline	int next_bit_del() override;
 			inline	int next_bit_del(BBSentinel& bbN_del);				//Does not override! CHECK (12/02/2025)
 
-			inline	int next_bit() override;
+			inline	int next_bit() const override;
 
 			//inline	int next_bit(int& nBB) override;
 
@@ -186,7 +186,7 @@ namespace bitgraph {
 
 
 
-	int _impl::BBSentinel::next_bit() {
+	int _impl::BBSentinel::next_bit() const {
 		////////////////////////////
 		// last update:31/12/2013
 		// BitScan non destructive

@@ -155,7 +155,7 @@ namespace bitgraph{
 			* @details Since the scan does not delete the scanned bit from the bitstring,
 			*		   it has to cache the last scanned bit for the next call
 			**/
-			virtual	 int next_bit();
+			virtual	 int next_bit() const;
 				
 
 			/**
@@ -195,7 +195,7 @@ namespace bitgraph{
 			* @details Since the scan does not delete the scanned bit from the bitstring,
 			*		   it has to cache the last scanned bit for the next call
 			**/
-			virtual  int prev_bit();
+			virtual  int prev_bit() const;
 			virtual	 int prev_bit(BBScan& bitset);
 
 
@@ -266,7 +266,7 @@ namespace bitgraph{
 		//////////////////
 		/// data members
 	
-			scan_t scan_;
+			mutable scan_t scan_;
 		};
 
 } //namespace bitgraph
