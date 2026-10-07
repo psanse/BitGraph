@@ -46,8 +46,11 @@ TEST_F(OrderingMapTest, build_mapping_2_orderings) {
 	//degrees: {0(3), 1(2), 2(3), 3(2)}
 	 
 	OrderingMap gm;
-	gm.build_mapping< GraphSort> (ug, GraphSort::MAX, GraphSort::FIRST_TO_LAST,
-									  GraphSort::MIN, GraphSort::FIRST_TO_LAST, "MAX F2L", "MIN F2L"	);
+	gm.build_mapping<GraphSort> (
+		ug, 
+		GraphSort::MAX, GraphSort::FIRST_TO_LAST,
+		GraphSort::MIN, GraphSort::FIRST_TO_LAST, 
+		"MAX F2L", "MIN F2L"	);
 		
 	//////////////////////////////////												  
 	EXPECT_EQ	(NV, gm.size());
@@ -222,7 +225,7 @@ TEST_F(OrderingMapTest, mapBetweenBitsets_2orderings) {
 	//l2r = {2, 3, 0 ,1}, r2l = {2, 3, 0, 1}
 
 	OrderingMap gm;
-	gm.build_mapping< GraphSort>(ug, GraphSort::MAX, GraphSort::FIRST_TO_LAST,
+	gm.build_mapping<GraphSort>(ug, GraphSort::MAX, GraphSort::FIRST_TO_LAST,
 									 GraphSort::MIN, GraphSort::FIRST_TO_LAST, "MAX F2L", "MIN F2L");
 
 	auto NV = ug.num_vertices();
