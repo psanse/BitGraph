@@ -590,6 +590,7 @@ namespace bitgraph {
 		* @returns the new induced subgraph (if the operation fails, g remains unchanged)
 		**/
 		Graph& create_subgraph(int first_k, Graph& graph) const;
+		Graph create_subgraph(int first_k) const = delete;				// TODO in the future?
 		
 		/**
 		* @brief creates the subgraph induced by the vertices NOT in the input set
@@ -602,7 +603,7 @@ namespace bitgraph {
 		// deleted - 
 		
 		virtual void remove_vertices(const Bitset& set) = delete;		// TODO in the future?
-		Graph create_subgraph(int first_k) const = delete;				// TODO!
+		
 
 		/////////////
 		// Boolean properties
