@@ -55,9 +55,7 @@ namespace bitgraph {
 
 			// for backward compatibility with existing code
 			using graph_type = graph_t;
-			
-			
-		public:
+						
 					
 			// new enum for sorting algorithms 
 			enum class strategy {
@@ -75,6 +73,12 @@ namespace bitgraph {
 			enum class placement {
 				first_to_last,
 				last_to_first
+			};
+
+			enum class print_mode {
+				print_degree,
+				print_support,
+				print_nodes
 			};
 						
 			using strategy_t = strategy;
@@ -267,35 +271,22 @@ namespace bitgraph {
 			////////////////////////
 			//setters / getters
 
-			const std::vector<degree_t>& degree() const noexcept{ return nb_neigh_; }
-			const std::vector<degree_t>& support() const noexcept { return deg_neigh_; }
+			const std::vector<degree_t>& degree() const noexcept { return nb_neigh_; }
+			const std::vector<degree_t>& support() const noexcept{ return deg_neigh_; }
 			const graph_t& graph() const noexcept { return g_; }
 			vertex_t num_vertices() const noexcept { return NV_; }
-
-			///////////////////////
-			// allocation
-		protected:
-
-			/**
-			* @brief Restores context for NV_ vertices
-			**/
-			int reset();
-
-		public:
+					
+					
 			/////////////////////////
 			// main operations - sorting, etc.
 
-			/**
-			* @brief Sets trivial ordering [1..NV] in @nodes_,
-			*		 a starting point for all sorting primitives
-			**/
-			void set_ordering();
-
+			
 			/*
 			* @brief Sets an ordering in [OLD]->[NEW] format in @nodes_.
 			*		 This will be the given ordering in composite orderings
 			*/
-			void set_ordering(vertex_ordering_t& nodes) { nodes_ = nodes; }
+			void set_ordering(const vertex_ordering_t& nodes) { nodes_ = nodes; }
+			void set_ordering(vertex_ordering_t&& nodes) { nodes_ = std::move(nodes); }
 
 			/**
 			* @brief Computes the degree of each vertex
@@ -349,8 +340,12 @@ namespace bitgraph {
 			const vertex_ordering_t& sort_degen_non_decreasing_deg(bool rev);
 			const vertex_ordering_t& sort_degen_non_increasing_deg(bool rev);
 
-			//Expermimental alternative implementation - CHECK efficiency
-			//Does not required cached degree info of vertices in @nb_neigh_
+			/**
+			 * @brief Experimental alternative implementation.
+			 * @details This implementation does not require cached degree information of vertices in @nb_neigh_.
+			 *
+			 * @warning Experimental API. May change or be removed without notice.
+			 */
 			const vertex_ordering_t& sort_degen_non_decreasing_deg_B(bool rev);
 
 			/**
@@ -391,8 +386,8 @@ namespace bitgraph {
 			*@return output ordering in [NEW]->[OLD] format
 			**/
 			const vertex_ordering_t& sort_non_increasing_deg(
-				int first, 
-				int last, 
+				vertex_t first, 
+				vertex_t last,
 				bool rev);
 
 			/**
@@ -411,25 +406,36 @@ namespace bitgraph {
 			*@return output ordering in [NEW]->[OLD] format
 			**/
 			const vertex_ordering_t& sort_non_decreasing_deg(
-				int first,
-				int last, 
+				vertex_t first,
+				vertex_t last,
 				bool rev);
 
 			//TODO - add tiebreak support for subgraph ordering 
 			//int  sort_non_increasing_deg_with_support_tb(int n, bool rev = false);
 			//int  sort_non_decreasing_deg_with_support_tb(int n, bool rev = false);
 
-		////////////////////////
-		// I/O
+			////////////////////////
+			// I/O
 			std::ostream& print(
-				int type,
-				std::ostream& o,
-				bool eofl = true) const;
+				print_mode mode,
+				std::ostream& os,
+				bool end_line = true) const;
 
-
-			/////////////////////////////////////////////
-			// data members	
 		protected:
+
+			/**
+			* @brief Restores context for NV_ vertices
+			**/
+			int reset();
+
+			/**
+			 * @brief Sets the trivial vertex ordering in `nodes_`.
+			 *
+			 * Initializes `nodes_` with the identity ordering [0, NV_-1],
+			 * used as the starting point by sorting primitives that require
+			 * an existing ordering.
+			 */
+			void set_ordering();
 
 			graph_t& g_;											// ideally CONST but some operations like neighbors are non-const (TODO!)
 			vertex_t NV_;											// number of vertices cached - g_.num_vertices()  
@@ -439,14 +445,13 @@ namespace bitgraph {
 			vertex_bitset_t node_active_state_;						// bitset for active vertices: 1bit-active, 0bit-passive. Used in degenerate orderings	
 			vertex_ordering_t nodes_;								// stores the ordering
 
-		};//end of GraphFastRootSort class
+		}; // GraphFastRootSort class
 
-	}//end of namespace _impl
+	} // namespace graph_utils
 
 	using graph_utils::GraphFastRootSort;
 
 }//end of namespace bitgraph
-
 
 
 
@@ -796,7 +801,10 @@ namespace bitgraph {
 
 		template<class GraphT>
 		inline
-			auto GraphFastRootSort<GraphT>::sort_non_increasing_deg(int first, int last, bool rev) -> const vertex_ordering_t&
+			auto GraphFastRootSort<GraphT>::sort_non_increasing_deg(
+				vertex_t first,
+				vertex_t last,
+				bool rev) -> const vertex_ordering_t&
 		{
 			vertex_ordering_t kord;
 			kord.reserve(last - first + 1);
@@ -851,7 +859,10 @@ namespace bitgraph {
 
 		template<class GraphT>
 		inline
-			auto GraphFastRootSort<GraphT>::sort_non_decreasing_deg(int first, int last, bool rev)  -> const vertex_ordering_t&
+			auto GraphFastRootSort<GraphT>::sort_non_decreasing_deg(
+				vertex_t first, 
+				vertex_t last, 
+				bool rev)  -> const vertex_ordering_t&
 		{
 			vertex_ordering_t kord;
 			kord.reserve(last - first + 1);
@@ -975,26 +986,30 @@ namespace bitgraph {
 
 		template<class GraphT>
 		inline
-			std::ostream& GraphFastRootSort<GraphT>::print(int type, std::ostream& o, bool eofl) const
+			std::ostream& GraphFastRootSort<GraphT>::print(
+				print_mode mode,
+				std::ostream& os,
+				bool end_line) const
 		{
-			switch (type) {
-			case PRINT_DEGREE:
-				bitgraph::utils::print_collection(nb_neigh_, o, eofl);
+			switch (mode) {
+			case print_mode::print_degree:
+				bitgraph::utils::print_collection(nb_neigh_, os, false);
 				break;
-			case PRINT_SUPPORT:
-				bitgraph::utils::print_collection(deg_neigh_, o, eofl);
+			case print_mode::print_support:
+				bitgraph::utils::print_collection(deg_neigh_, os, false);
 				break;
-			case PRINT_NODES:
-				bitgraph::utils::print_collection(nodes_, o, eofl);
+			case print_mode::print_nodes:
+				bitgraph::utils::print_collection(nodes_, os, false);
 				break;
 			default:
-				LOG_ERROR("unknown print type- GraphFastRootSort<GraphT>::print()");
-				LOG_ERROR("exiting...");
-				exit(-1);
+				LOG_ERROR("unknown print mode- GraphFastRootSort<GraphT>::print()");
+				std::terminate();
 			}
 
-			if (eofl) { o << endl; }
-			return o;
+			if (end_line) {
+				os << std::endl; 
+			}
+			return os;
 		}
 
 		template<class GraphT>
@@ -1038,59 +1053,56 @@ namespace bitgraph {
 						
 			assert(!lv.empty() && "empty subgraph detected- GraphFastRootSort<GraphT>::new_order()");
 			
-			//create the induced subgraph of size |vertex_set|
-			graph_t sg;
+			// create the induced subgraph of size |vertex_set|
+			graph_t induced_subgraph;			
+			this->g_.create_subgraph(induced_subgraph, lv);
+		
+			// create a new ordering for the subgraph based on existing primitives
+			GraphFastRootSort<graph_t> sort(induced_subgraph);
+			vertex_ordering_t ord_induced = sort.new_order(strategy, last_to_first, false /* n2o format*/);
 
-			////////////////////////////////////
-			this->g_.create_subgraph(sg, lv);
-			////////////////////////////////////
-
-			//create a new ordering for the subgraph based on existing primitives
-			GraphFastRootSort<graph_t> sort(sg);
-			vertex_ordering_t ord_sg = sort.new_order(strategy, last_to_first, false /* n2o format*/);
-
-			//map the ordering @ord back to the original graph
+			// map the ordering @ord back to the original graph
 			vertex_ordering_t ord(NV_);
 			std::iota(ord.begin(), ord.end(), 0);
 
-			//build reverse mapping from sg to the original graph g
-			vertex_ordering_t sg_to_g = ord;
-			int v = bbo::noBit;
-			int index_in_sg = 0;
-			vertex_set.init_scan(bbo::NON_DESTRUCTIVE);
-			while ((v = vertex_set.next_bit()) != bbo::noBit) {
-				sg_to_g[index_in_sg++] = v;
+			// map the subgraph ordering back to the original graph.
+			for (std::size_t i = 0; i < lv.size(); ++i) {
+				ord[lv[i]] = lv[ord_induced[i]];
 			}
 
-			//mapping of ord_sg to ord ([NEW]->[OLD] format)
-			v = bbo::noBit;
-			index_in_sg = 0;
-			vertex_set.init_scan(bbo::NON_DESTRUCTIVE);
-			while ((v = vertex_set.next_bit()) != bbo::noBit) {
-				int new_index_in_sg = ord_sg[index_in_sg++];
-				ord[v] = sg_to_g[new_index_in_sg];
-			}
+			////build reverse mapping from sg to the original graph g
+			//vertex_ordering_t sg_to_g = ord;
+			//int v = bbo::noBit;
+			//int index_in_sg = 0;
+			//vertex_set.init_scan(bbo::NON_DESTRUCTIVE);
+			//while ((v = vertex_set.next_bit()) != bbo::noBit) {
+			//	sg_to_g[index_in_sg++] = v;
+			//}
 
-
-			////////////////
-			// check
-
+			////mapping of ord_sg to ord ([NEW]->[OLD] format)
+			//v = bbo::noBit;
+			//index_in_sg = 0;
+			//vertex_set.init_scan(bbo::NON_DESTRUCTIVE);
+			//while ((v = vertex_set.next_bit()) != bbo::noBit) {
+			//	int new_index_in_sg = ord_sg[index_in_sg++];
+			//	ord[v] = sg_to_g[new_index_in_sg];
+			//}
+						
 #ifndef NDEBUG
-			const int OSIZE = static_cast<int>(ord.size());
+			assert(static_cast<int>(ord.size()) == NV_ 
+				&& "ERROR: ord.size() != N - GraphFastRootSort<GraphT>::new_order");
 
-			assert(OSIZE == NV_ && "ERROR: ord.size() != N - GraphFastRootSort<GraphT>::new_order");
-
-			//verify vertices outside vertex_set have not been reordered
-			for (int v = 0; v < OSIZE; ++v) {
+			// Verify that vertices outside the subgraph remain unchanged.
+			for (vertex_t v = 0; v < NV_; ++v) {
 				if (!vertex_set.is_bit(v)) {
-					////////////////////////////////////////////////////////////////////////////////////////////////////////
-					assert(ord[v] == v && "ERROR: vertex outside vertex_set reordered - GraphFastRootSort<GraphT>::new_order");
-					/////////////////////////////////////////////////////////////////////////////////////////////////////////
+					assert(ord[v] == v
+						&& "ERROR: vertex outside vertex_set reordered - "
+						" GraphFastRootSort<GraphT>::new_order");				
 				}
 			}
 #endif
 
-			//reverse to [OLD]->[NEW] if required
+			// Convert [NEW]->[OLD] to [OLD]->[NEW] if requested.
 			if (old_to_new) {
 				Decode::reverse_in_place(ord);
 			}
@@ -1111,11 +1123,10 @@ namespace bitgraph {
 			gres.reset(NV);
 			gres.set_name(graph.name());
 			gres.set_path(graph.path());	
-
 		
-			///generate isomorphism (only for undirected graphs) 
-			for (vertex_t u = 0; u < NV - 1; u++) {
-				for (vertex_t v = u + 1; v < NV; v++) {
+			// Create isomorphism (only for undirected graphs) 
+			for (vertex_t u = 0; u < NV - 1; ++u) {
+				for (vertex_t v = u + 1; v < NV; ++v) {
 
 					//in is_edge is O(log) for sparse graphs, should be specialized for that case
 					if (graph.is_edge(u, v)) {						
@@ -1133,7 +1144,6 @@ namespace bitgraph {
 		}
 
 	} // namespace graph_utils
-
 
 }//end of namespace bitgraph	
 

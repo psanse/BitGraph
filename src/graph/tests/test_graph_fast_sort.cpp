@@ -278,7 +278,7 @@ TEST_F(GraphFastRootSortTest, sort_degen_composite_non_increasing_deg) {
 	using gt = GraphFastRootSort<ugraph>;
 	gt sorter(ug);
 	sorter.compute_deg_root();
-	sorter.sort_non_increasing_deg(false);										//ordering I
+	sorter.sort_non_increasing_deg(false);												//ordering I
 	VertexMapping mapping = sorter.sort_degen_composite_non_increasing_deg(false);		//ordering II (tbs are based on ordering I)
 
 	////////////////////////////////////////////
