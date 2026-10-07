@@ -580,7 +580,7 @@ namespace bitgraph {
 		**/
 		int gen_random_edge(vertex_t v, vertex_t w, double p);
 
-		//////////////	
+		/////////////	
 		// Induced subgraphs
 
 		/**
@@ -590,8 +590,7 @@ namespace bitgraph {
 		* @returns the new induced subgraph (if the operation fails, g remains unchanged)
 		**/
 		Graph& create_subgraph(int first_k, Graph& graph) const;
-		Graph create_subgraph(int first_k) const = delete;				// TODO!
-
+		
 		/**
 		* @brief creates the subgraph induced by the vertices NOT in the input set
 		* @param set input set of vertices
@@ -601,7 +600,9 @@ namespace bitgraph {
 
 		//////////////	
 		// deleted - 
-		virtual void remove_vertices(const Bitset& set) = delete;	// TODO in the future?
+		
+		virtual void remove_vertices(const Bitset& set) = delete;		// TODO in the future?
+		Graph create_subgraph(int first_k) const = delete;				// TODO!
 
 		/////////////
 		// Boolean properties
