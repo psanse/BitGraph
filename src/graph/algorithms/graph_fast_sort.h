@@ -114,7 +114,7 @@ namespace bitgraph {
 			static graph_t reorder(
 				const graph_t& graph,
 				const vertex_ordering_t& new_order_o2n,
-				Decode* decoder = nullptr);
+				OrderingDecoder* decoder = nullptr);
 
 			///////////////
 			// drivers - the real public interface
@@ -163,10 +163,10 @@ namespace bitgraph {
 			/**
 			 * @brief Computes a new ordering for the vertices of an induced subgraph.
 			 *
-			 * Only the vertices contained in `bbsg` are reordered.
+			 * Only the vertices contained in `vertex_set` are reordered.
 			 *
 			 * @param strategy Sorting strategy encoded as an integer.
-			 * @param bbsg Bitset encoding the vertices of the induced subgraph.
+			 * @param vertex_set Bitset encoding the vertices of the induced subgraph.
 			 * @param last_to_first If `true`, vertices are placed from last to first;
 			 *            otherwise, from first to last.
 			 * @param old_to_new If `true`, returns the ordering in [OLD]->[NEW] format;
@@ -183,17 +183,17 @@ namespace bitgraph {
 			[[deprecated("Use new_order(strategy_t,  vertex_bitset_t, placement_t, bool) instead")]]
 			virtual vertex_ordering_t new_order(
 				int strategy, 
-				vertex_bitset_t& bbsg, 
+				vertex_bitset_t& vertex_set,
 				bool last_to_first = true, 
 				bool old_to_new = true);
 
 			/**
 			 * @brief Computes a new ordering for the vertices of an induced subgraph.
 			 *
-			 * Only the vertices contained in `bbsg` are reordered.
+			 * Only the vertices contained in `vertex_set` are reordered.
 			 *
 			 * @param strategy Sorting strategy.
-			 * @param bbsg Bitset encoding the vertices of the induced subgraph.			 *            
+			 * @param vertex_set Bitset encoding the vertices of the induced subgraph.			 *            
 			 * @param placement Vertex placement policy.
 			 * @param old_to_new If `true`, returns the ordering in [OLD]->[NEW] format;
 			 *                   otherwise, in [NEW]->[OLD] format.
@@ -201,13 +201,13 @@ namespace bitgraph {
 			 */
 			virtual vertex_ordering_t new_order(
 				strategy_t strategy,
-				vertex_bitset_t& bbsg,
+				vertex_bitset_t& vertex_set,
 				placement_t placement = placement_t::last_to_first,
 				bool old_to_new = true) 
 			{
 				return new_order(
 					static_cast<int>(strategy),
-					bbsg,
+					vertex_set,
 					placement == placement_t::last_to_first,
 					old_to_new);
 			}
@@ -267,8 +267,8 @@ namespace bitgraph {
 			////////////////////////
 			//setters / getters
 
-			const std::vector<int>& degree() const noexcept{ return nb_neigh_; }
-			const std::vector<int>& support() const noexcept { return deg_neigh_; }
+			const std::vector<degree_t>& degree() const noexcept{ return nb_neigh_; }
+			const std::vector<degree_t>& support() const noexcept { return deg_neigh_; }
 			const graph_t& graph() const noexcept { return g_; }
 			vertex_t num_vertices() const noexcept { return NV_; }
 
@@ -1028,20 +1028,17 @@ namespace bitgraph {
 		inline auto
 			GraphFastRootSort<GraphT>::new_order(
 				int strategy, 
-				vertex_bitset_t& bbsg,
+				vertex_bitset_t& vertex_set,
 				bool last_to_first,
 				bool old_to_new)  -> vertex_ordering_t
 		{
-			//convert bbsg to vector
+			//convert vertex_set to vector
 			vertex_ordering_t lv;
-			bbsg.extract(lv);
-
-			//////////////////////////////////////////////////////////////////////////////////////////
+			vertex_set.extract(lv);
+						
 			assert(!lv.empty() && "empty subgraph detected- GraphFastRootSort<GraphT>::new_order()");
-			/////////////////////////////////////////////////////////////////////////////////////////
-
-
-			//create the induced subgraph of size |bbsg|
+			
+			//create the induced subgraph of size |vertex_set|
 			graph_t sg;
 
 			////////////////////////////////////
@@ -1060,16 +1057,16 @@ namespace bitgraph {
 			vertex_ordering_t sg_to_g = ord;
 			int v = bbo::noBit;
 			int index_in_sg = 0;
-			bbsg.init_scan(bbo::NON_DESTRUCTIVE);
-			while ((v = bbsg.next_bit()) != bbo::noBit) {
+			vertex_set.init_scan(bbo::NON_DESTRUCTIVE);
+			while ((v = vertex_set.next_bit()) != bbo::noBit) {
 				sg_to_g[index_in_sg++] = v;
 			}
 
 			//mapping of ord_sg to ord ([NEW]->[OLD] format)
 			v = bbo::noBit;
 			index_in_sg = 0;
-			bbsg.init_scan(bbo::NON_DESTRUCTIVE);
-			while ((v = bbsg.next_bit()) != bbo::noBit) {
+			vertex_set.init_scan(bbo::NON_DESTRUCTIVE);
+			while ((v = vertex_set.next_bit()) != bbo::noBit) {
 				int new_index_in_sg = ord_sg[index_in_sg++];
 				ord[v] = sg_to_g[new_index_in_sg];
 			}
@@ -1083,11 +1080,11 @@ namespace bitgraph {
 
 			assert(OSIZE == NV_ && "ERROR: ord.size() != N - GraphFastRootSort<GraphT>::new_order");
 
-			//verify vertices outside bbsg have not been reordered
+			//verify vertices outside vertex_set have not been reordered
 			for (int v = 0; v < OSIZE; ++v) {
-				if (!bbsg.is_bit(v)) {
+				if (!vertex_set.is_bit(v)) {
 					////////////////////////////////////////////////////////////////////////////////////////////////////////
-					assert(ord[v] == v && "ERROR: vertex outside bbsg reordered - GraphFastRootSort<GraphT>::new_order");
+					assert(ord[v] == v && "ERROR: vertex outside vertex_set reordered - GraphFastRootSort<GraphT>::new_order");
 					/////////////////////////////////////////////////////////////////////////////////////////////////////////
 				}
 			}

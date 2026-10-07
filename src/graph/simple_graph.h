@@ -589,7 +589,8 @@ namespace bitgraph {
 		* @param g output new induced subgraph
 		* @returns the new induced subgraph (if the operation fails, g remains unchanged)
 		**/
-		virtual	Graph& create_subgraph(int first_k, Graph& g) const;
+		Graph& create_subgraph(int first_k, Graph& graph) const;
+		Graph create_subgraph(int first_k) const = delete;				// TODO!
 
 		/**
 		* @brief creates the subgraph induced by the vertices NOT in the input set
