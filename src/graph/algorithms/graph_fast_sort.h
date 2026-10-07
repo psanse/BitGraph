@@ -161,23 +161,56 @@ namespace bitgraph {
 			}
 
 			/**
-			* @brief Computes a new ordering for the subgraph @bbsg. Only the vertices in @bbsg are reordered.
-			* @param strategy: sorting algorithm
-			* @param bbsg: bitset encoding the subgraph vertices
-			* @param ltf: last to first ordering if TRUE
-			* @param o2n: old to new ordering	if TRUE
-			* @result: new ordering in [OLD]->[NEW] format
-			* @details: to be implemented according to the following steps:
-			*			1) create the induced subgraph of size |bbsg|
-			*			2) create a new ordering for the subgraph based on existing primitives
-			*			3) map the ordering back to the original graph
-			* 
-			**/
+			 * @brief Computes a new ordering for the vertices of an induced subgraph.
+			 *
+			 * Only the vertices contained in `bbsg` are reordered.
+			 *
+			 * @param strategy Sorting strategy encoded as an integer.
+			 * @param bbsg Bitset encoding the vertices of the induced subgraph.
+			 * @param last_to_first If `true`, vertices are placed from last to first;
+			 *            otherwise, from first to last.
+			 * @param old_to_new If `true`, returns the ordering in [OLD]->[NEW] format;
+			 *            otherwise, in [NEW]->[OLD] format.
+			 * @return The computed vertex ordering.
+			 *
+			 * @details The ordering is computed as follows:
+			 *          1. Construct the subgraph induced by the vertices in `bbsg`.
+			 *          2. Compute a vertex ordering for the induced subgraph using
+			 *             the available sorting primitives.
+			 *          3. Map the resulting ordering back to the original graph.
+			 */
+
+			[[deprecated("Use new_order(strategy_t,  vertex_bitset_t, placement_t, bool) instead")]]
 			virtual vertex_ordering_t new_order(
 				int strategy, 
 				vertex_bitset_t& bbsg, 
-				bool ltf = true, 
-				bool o2n = true);
+				bool last_to_first = true, 
+				bool old_to_new = true);
+
+			/**
+			 * @brief Computes a new ordering for the vertices of an induced subgraph.
+			 *
+			 * Only the vertices contained in `bbsg` are reordered.
+			 *
+			 * @param strategy Sorting strategy.
+			 * @param bbsg Bitset encoding the vertices of the induced subgraph.			 *            
+			 * @param placement Vertex placement policy.
+			 * @param old_to_new If `true`, returns the ordering in [OLD]->[NEW] format;
+			 *                   otherwise, in [NEW]->[OLD] format.
+			 * @return The computed vertex ordering.
+			 */
+			virtual vertex_ordering_t new_order(
+				strategy_t strategy,
+				vertex_bitset_t& bbsg,
+				placement_t placement = placement_t::last_to_first,
+				bool old_to_new = true) 
+			{
+				return new_order(
+					static_cast<int>(strategy),
+					bbsg,
+					placement == placement_t::last_to_first,
+					old_to_new);
+			}
 	
 		
 			/**
@@ -996,8 +1029,8 @@ namespace bitgraph {
 			GraphFastRootSort<GraphT>::new_order(
 				int strategy, 
 				vertex_bitset_t& bbsg,
-				bool ltf,
-				bool o2n) -> vertex_ordering_t
+				bool last_to_first,
+				bool old_to_new)  -> vertex_ordering_t
 		{
 			//convert bbsg to vector
 			vertex_ordering_t lv;
@@ -1017,7 +1050,7 @@ namespace bitgraph {
 
 			//create a new ordering for the subgraph based on existing primitives
 			GraphFastRootSort<graph_t> sort(sg);
-			vertex_ordering_t ord_sg = sort.new_order(strategy, ltf, false /* n2o format*/);
+			vertex_ordering_t ord_sg = sort.new_order(strategy, last_to_first, false /* n2o format*/);
 
 			//map the ordering @ord back to the original graph
 			vertex_ordering_t ord(NV_);
@@ -1061,7 +1094,7 @@ namespace bitgraph {
 #endif
 
 			//reverse to [OLD]->[NEW] if required
-			if (o2n) {
+			if (old_to_new) {
 				Decode::reverse_in_place(ord);
 			}
 
