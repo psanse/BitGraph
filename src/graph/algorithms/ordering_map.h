@@ -20,6 +20,7 @@
  *
  * @see GraphFastRootSort, OrderingDecoder
  */
+
 #ifndef BITGRAPH_GRAPH_ALGORITHMS_ORDERING_MAP_H
 #define	BITGRAPH_GRAPH_ALGORITHMS_ORDERING_MAP_H
 
@@ -27,7 +28,7 @@
 #include "utils/collection_utils.h"
 #include "bitscan/bbconfig.h"			//for INDEX_1_TO_1 macro
 #include "bitscan/bbobject.h"
-#include "decode.h"
+#include "ordering_decoder.h"
 #include <iostream>
 #include <vector>
 #include <string>

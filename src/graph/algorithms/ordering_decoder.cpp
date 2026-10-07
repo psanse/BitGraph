@@ -11,7 +11,7 @@
  * @date last updated: 26/09/2026
  */
 
-#include "graph/algorithms/decode.h"
+#include "ordering_decoder.h"
 #include <algorithm>
 #include <limits>
 #include <stdexcept>

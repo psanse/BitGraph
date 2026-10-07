@@ -28,7 +28,7 @@ add_library  (
     simple_graph_w.cpp
     simple_graph_ew.cpp
     formats/detail/mmio.cpp
-    algorithms/decode.cpp
+    algorithms/ordering_decoder.cpp
     algorithms/graph_conversions.cpp
     formats/detail/vertex_set_format.cpp
     algorithms/algorithm_info.cpp

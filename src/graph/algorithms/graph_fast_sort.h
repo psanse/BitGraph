@@ -16,7 +16,7 @@
 #include "utils/logger.h"
 #include "utils/collection_utils.h"
 #include "utils/sort_utils.h"
-#include "decode.h"
+#include "ordering_decoder.h"
 #include "bitscan/bbtypes.h"					//for EMPTY_ELEM constant	
 #include "bitscan/bbobject.h"
 #include <algorithm>
@@ -89,7 +89,7 @@ namespace bitgraph {
 			enum { PRINT_DEGREE = 0, PRINT_SUPPORT, PRINT_NODES };
 			enum { MIN_DEGEN = 0, MAX_DEGEN, MIN_DEGEN_COMPO, MAX_DEGEN_COMPO, MAX, MIN, MAX_WITH_SUPPORT, MIN_WITH_SUPPORT, NONE };
 			enum { FIRST_TO_LAST = 0, LAST_TO_FIRST };
-			enum { NEW_TO_OLD = 0, OLD_TO_NEW };								// for backward compatibility - possibly to be removed
+			enum { NEW_TO_OLD = 0, OLD_TO_NEW };								
 
 			////////////////////////
 			//static methods 
@@ -120,20 +120,49 @@ namespace bitgraph {
 			// drivers - the real public interface
 
 			/**
-			* @brief Computes a new ordering
-			* @param alg sorting algorithm
-			* @param ltf last to first ordering if TRUE
-			* @param o2n old to new ordering	if TRUE
-			* @return new ordering in [OLD]->[NEW] format
-			**/
+			 * @brief Computes a new vertex ordering.
+			 *
+			 * @param strategy Sorting strategy encoded as an integer.
+			 * @param last_to_first If `true`, vertices are placed from last to first;
+			 *                      otherwise, from first to last.
+			 * @param old_to_new If `true`, returns the ordering in [OLD]->[NEW] format;
+			 *                   otherwise, in [NEW]->[OLD] format.
+			 * @return The computed vertex ordering.
+			 *
+			 * @warning The function terminates execution if `strategy` is not a valid
+			 *          sorting strategy.
+			 *
+			 * @deprecated Use the overload accepting `strategy_t` and `placement_t`.
+			 */
+			[[deprecated("Use new_order(strategy_t, placement_t, bool) instead")]]
 			virtual vertex_ordering_t new_order(
-				int alg, 
-				bool ltf = true, 
-				bool o2n = true);
+				int strategy, 
+				bool last_to_first = true, 
+				bool old_to_new = true);
+
+			/**
+			 * @brief Computes a new vertex ordering.
+			 *
+			 * @param strategy Sorting strategy.
+			 * @param placement Vertex placement policy.
+			 * @param old_to_new If `true`, returns the ordering in [OLD]->[NEW] format;
+			 *                   otherwise, in [NEW]->[OLD] format.
+			 * @return The computed vertex ordering.
+			 */
+			virtual vertex_ordering_t new_order(
+				strategy_t strategy,
+				placement_t placement = placement_t::last_to_first,
+				bool old_to_new = true)
+			{
+				return new_order(
+					static_cast<int>(strategy), 
+					placement == placement_t::last_to_first,
+					old_to_new);
+			}
 
 			/**
 			* @brief Computes a new ordering for the subgraph @bbsg. Only the vertices in @bbsg are reordered.
-			* @param alg: sorting algorithm
+			* @param strategy: sorting algorithm
 			* @param bbsg: bitset encoding the subgraph vertices
 			* @param ltf: last to first ordering if TRUE
 			* @param o2n: old to new ordering	if TRUE
@@ -145,37 +174,51 @@ namespace bitgraph {
 			* 
 			**/
 			virtual vertex_ordering_t new_order(
-				int alg, 
+				int strategy, 
 				vertex_bitset_t& bbsg, 
 				bool ltf = true, 
 				bool o2n = true);
 	
+		
 			/**
-			 * @brief Creates an isomorphic graph according to a given vertex ordering.
+			 * @brief Reorders the graph according to an old-to-new vertex ordering.
 			 *
-			 * @param new_order_o2n Vertex ordering in [OLD]->[NEW] format.
-			 * @param output_graph Output isomorphic graph.
-			 * @param decoder Optional pointer to a decoder used to store the corresponding ordering.
-			 * @return 0 if successful.
+			 * @param new_order_o2n Vertex permutation in `[old] -> [new]` format.
+			 * @param decoder Optional decoder receiving the ordering information.
+			 * @return A graph whose vertices are relabeled according to
+			 *         @p new_order_o2n.
 			 *
-			 * @note Only applicable to simple, undirected, unweighted graphs.
+			 * @pre @p new_order_o2n is a valid permutation of the graph vertices.
 			 */
-			int reorder(
+			graph_t reorder(
 				const vertex_ordering_t& new_order_o2n,
-				graph_t& output_graph, 
-				Decode* decoder = nullptr);
-											
+				OrderingDecoder* decoder = nullptr) const
+			{
+				return GraphFastRootSort<graph_t>::reorder(
+					this->graph(),
+					new_order_o2n, 
+					decoder);				
+			}
 
 			////////////////////////
 			//construction/destructions
 
-			explicit GraphFastRootSort(graph_t& gout) :
-				g_(gout),
-				NV_(g_.num_vertices())
+
+			/**
+			 * @brief Constructs a vertex-ordering algorithm for a graph.
+			 *
+			 * The sorter stores a non-owning reference to @p graph. The graph must remain
+			 * alive and must not be structurally modified while the sorter is in use.
+			 *
+			 * @param graph Graph to analyze.
+			 */
+			explicit GraphFastRootSort(graph_t& gout)
+				: g_(gout),
+				  NV_(g_.num_vertices())
 			{
-				nb_neigh_.assign(NV_, 0);
-				deg_neigh_.assign(NV_, 0);
-				node_active_state_.reset(NV_);
+				nb_neigh_.assign(static_cast<size_t>(NV_), 0);
+				deg_neigh_.assign(static_cast<size_t>(NV_), 0);
+				node_active_state_.reset(static_cast<size_t>(NV_));
 			}
 
 			//move and copy semantics not allowed
@@ -194,7 +237,7 @@ namespace bitgraph {
 			const std::vector<int>& degree() const noexcept{ return nb_neigh_; }
 			const std::vector<int>& support() const noexcept { return deg_neigh_; }
 			const graph_t& graph() const noexcept { return g_; }
-			std::size_t num_vertices() const noexcept { return NV_; }
+			vertex_t num_vertices() const noexcept { return NV_; }
 
 			///////////////////////
 			// allocation
@@ -355,13 +398,13 @@ namespace bitgraph {
 			// data members	
 		protected:
 
-			graph_t& g_;												// ideally CONST but some operations like neighbors are non-const (TODO!)
-			int NV_;												// number of vertices cached - g_.num_vertices()  
+			graph_t& g_;											// ideally CONST but some operations like neighbors are non-const (TODO!)
+			vertex_t NV_;											// number of vertices cached - g_.num_vertices()  
 
 			vertex_degrees_t nb_neigh_;								// stores the degree of the vertices		
-			vertex_supports_t deg_neigh_;								// stores the support of the vertices (degree of neighbors)
+			vertex_supports_t deg_neigh_;							// stores the support of the vertices (degree of neighbors)
 			vertex_bitset_t node_active_state_;						// bitset for active vertices: 1bit-active, 0bit-passive. Used in degenerate orderings	
-			vertex_ordering_t nodes_;									// stores the ordering
+			vertex_ordering_t nodes_;								// stores the ordering
 
 		};//end of GraphFastRootSort class
 
@@ -384,72 +427,80 @@ namespace bitgraph {
 
 		template<class GraphT>
 		inline
-			auto GraphFastRootSort<GraphT>::new_order(int alg, bool ltf, bool o2n) -> vertex_ordering_t
+			auto GraphFastRootSort<GraphT>::new_order(
+				int strategy, 
+				bool last_to_first, 
+				bool old_to_new) -> vertex_ordering_t
 		{
 			nodes_.clear();
 
-			switch (alg) {
+			switch (strategy) {
 			case NONE:								//trivial case- with exit condition!
 				nodes_.reserve(NV_);
-				for (auto i = 0; i < NV_; i++) {
-					nodes_.emplace_back(i);
+				for (vertex_t u = 0; u < NV_; ++u) {
+					nodes_.push_back(u);
 				}
-
-				///////////////////////
-				LOG_WARNING("NONE alg. sorting petition detected, returning trivial isomorphism- GraphFastRootSort<GraphT>::new_order()");
-				return nodes_;
-				///////////////////////
-
-				break;
+								
+				LOG_WARNING(
+					"NONE strategy. Sorting request detected; returning trivial ordering - "
+					"GraphFastRootSort<GraphT>::new_order()");
+				return nodes_;				
+								
 			case MIN_DEGEN:
 				set_ordering();
 				compute_deg_root();
-				sort_degen_non_decreasing_deg(ltf);			//checked with framework - (20/12/19 - what does this mean?)
+				sort_degen_non_decreasing_deg(last_to_first);			//checked with framework - (20/12/19 - what does this mean?)
 				break;
 			case MIN_DEGEN_COMPO:
 				compute_deg_root();
 				compute_support_root();
 				sort_non_decreasing_deg_with_support_tb(false /* MUST BE*/);
-				sort_degen_composite_non_decreasing_deg(ltf);
+				sort_degen_composite_non_decreasing_deg(last_to_first);
 				break;
 			case MAX_DEGEN:
 				set_ordering();
 				compute_deg_root();
-				sort_degen_non_increasing_deg(ltf);
+				sort_degen_non_increasing_deg(last_to_first);
 				break;
 			case MAX_DEGEN_COMPO:
 				compute_deg_root();
 				compute_support_root();
 				sort_non_increasing_deg_with_support_tb(false /* MUST BE*/);
-				sort_degen_composite_non_increasing_deg(ltf);
+				sort_degen_composite_non_increasing_deg(last_to_first);
 				break;
 			case MAX:
 				compute_deg_root();
-				sort_non_increasing_deg(ltf);
+				sort_non_increasing_deg(last_to_first);
 				break;
 			case MIN:
 				compute_deg_root();
-				sort_non_decreasing_deg(ltf);
+				sort_non_decreasing_deg(last_to_first);
 				break;
 			case MAX_WITH_SUPPORT:
 				compute_deg_root();
 				compute_support_root();
-				sort_non_increasing_deg_with_support_tb(ltf);
+				sort_non_increasing_deg_with_support_tb(last_to_first);
 				break;
 			case MIN_WITH_SUPPORT:
 				compute_deg_root();
 				compute_support_root();
-				sort_non_decreasing_deg_with_support_tb(ltf);
+				sort_non_decreasing_deg_with_support_tb(last_to_first);
 				break;
 			default:
-				LOGG_ERROR("unknown sorting algorithm : ", alg, "- GraphFastRootSort<GraphT>::new_order");
-				LOG_ERROR("exiting...");
-				exit(-1);
+				LOGG_ERROR(
+					"unknown sorting algorithm : ",
+					strategy, 
+					"- GraphFastRootSort<GraphT>::new_order");
+				
+				std::terminate();
 			}
 
-			//conversion [NEW] to [OLD] if required
-			//note: sorting produced by sorting primitives is always in [OLD] to [NEW] format
-			if (o2n) { Decode::reverse_in_place(nodes_); }
+			// Convert [NEW] -> [OLD] to [OLD] -> [NEW] if required.
+			// Sorting primitives always produce [NEW] -> [OLD].
+			if (old_to_new) { 
+				Decode::reverse_in_place(nodes_); 
+			}
+
 			return nodes_;
 		}
 
@@ -942,7 +993,11 @@ namespace bitgraph {
 
 		template<class GraphT>
 		inline auto
-			GraphFastRootSort<GraphT>::new_order(int alg, vertex_bitset_t& bbsg, bool ltf, bool o2n) -> vertex_ordering_t
+			GraphFastRootSort<GraphT>::new_order(
+				int strategy, 
+				vertex_bitset_t& bbsg,
+				bool ltf,
+				bool o2n) -> vertex_ordering_t
 		{
 			//convert bbsg to vector
 			vertex_ordering_t lv;
@@ -962,7 +1017,7 @@ namespace bitgraph {
 
 			//create a new ordering for the subgraph based on existing primitives
 			GraphFastRootSort<graph_t> sort(sg);
-			vertex_ordering_t ord_sg = sort.new_order(alg, ltf, false /* n2o format*/);
+			vertex_ordering_t ord_sg = sort.new_order(strategy, ltf, false /* n2o format*/);
 
 			//map the ordering @ord back to the original graph
 			vertex_ordering_t ord(NV_);
@@ -1015,42 +1070,10 @@ namespace bitgraph {
 
 		template<class GraphT>
 		inline
-			int GraphFastRootSort<GraphT>::reorder(const vertex_ordering_t& new_order, graph_t& gn, Decode* d)
-		{
-			std::size_t NV = g_.num_vertices();
-			gn.reset(NV);
-			gn.set_name(g_.name());
-			gn.set_path(g_.path());
-
-			///generate isomorphism (only for undirected graphs) 
-			for (auto i = 0u; i < NV - 1; i++) {
-				for (auto j = i + 1; j < NV; j++) {
-					if (g_.is_edge(i, j)) {									//in O(log) for sparse graphs, should be specialized for that case
-						//////////////////////////////////////////////
-						gn.add_edge(new_order[i], new_order[j]);			//maps the new edges according to the new given order
-						//////////////////////////////////////////////
-					}
-				}
-			}
-
-			///////////////
-			//stores decoding information [NEW]->[OLD]
-			if (d != nullptr) {
-				vertex_ordering_t aux(new_order);						//new_order is in format [OLD]->[NEW]
-				Decode::reverse_in_place(aux);				//aux is in format [NEW]->[OLD]		
-				d->add_ordering(aux);
-			}
-
-			return 0;
-		}
-
-
-		template<class GraphT>
-		inline
 		auto GraphFastRootSort<GraphT>::reorder(
 				const graph_t& graph,
 				const vertex_ordering_t& o2n, 
-				Decode* decoder) -> graph_t
+				OrderingDecoder* decoder) -> graph_t
 		{
 			const int NV = graph.num_vertices();
 
@@ -1073,7 +1096,7 @@ namespace bitgraph {
 
 			// Store decoding information: [NEW] -> [OLD].
 			if (decoder != nullptr) {
-				decoder->add_ordering(Decode::inverse_ordering(o2n));  // add_odering requires [NEW] -> [OLD] 
+				decoder->add_ordering(OrderingDecoder::inverse_ordering(o2n));  // add_odering requires [NEW] -> [OLD] 
 			}
 			
 			return gres;

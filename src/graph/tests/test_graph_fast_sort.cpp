@@ -342,10 +342,8 @@ TEST_F(GraphFastRootSortTest, reorder) {
 	VertexMapping mapping_o2n=sorter.sort_non_decreasing_deg(false);					//nodes_ = {0, 2, 4, 5, 3, 1}
 																			//deg =	{ 0, 3, 1, 2, 1, 1 };
 	//compute isomorphism
-	ugraph ugn;
-	sorter.reorder(mapping_o2n, ugn);
-	
-	////////////////////////////////////////////
+	ugraph ugn = sorter.reorder(mapping_o2n);
+		
 	EXPECT_EQ(ug.num_vertices(), ugn.num_vertices());
 	EXPECT_EQ(ug.num_edges(), ugn.num_edges());
 	EXPECT_EQ(ug.degree(0), ugn.degree(0));
@@ -354,7 +352,7 @@ TEST_F(GraphFastRootSortTest, reorder) {
 	EXPECT_EQ(ug.degree(4), ugn.degree(3));
 	EXPECT_EQ(ug.degree(5), ugn.degree(4));					
 	EXPECT_EQ(ug.degree(3), ugn.degree(5));						
-	////////////////////////////////////////////
+	
 }
 
 
