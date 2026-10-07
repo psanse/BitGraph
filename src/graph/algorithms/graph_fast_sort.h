@@ -250,8 +250,8 @@ namespace bitgraph {
 			 * @param graph Graph to analyze.
 			 */
 			explicit GraphFastRootSort(graph_t& gout)
-				: g_(gout),
-				  NV_(g_.num_vertices())
+				: graph_(gout),
+				  NV_(graph_.num_vertices())
 			{
 				nb_neigh_.assign(static_cast<size_t>(NV_), 0);
 				deg_neigh_.assign(static_cast<size_t>(NV_), 0);
@@ -273,21 +273,44 @@ namespace bitgraph {
 
 			const std::vector<degree_t>& degree() const noexcept { return nb_neigh_; }
 			const std::vector<degree_t>& support() const noexcept{ return deg_neigh_; }
-			const graph_t& graph() const noexcept { return g_; }
+			const graph_t& graph() const noexcept { return graph_; }
 			vertex_t num_vertices() const noexcept { return NV_; }
-					
-					
+						
+			////////
+			// I/O
+		
+			std::ostream& print(
+				print_mode mode,
+				std::ostream& os,
+				bool end_line = true) const;
+			
+		protected:
+
 			/////////////////////////
 			// main operations - sorting, etc.
+			// (internals, not part of the public API)
 
-			
+			/**
+			* @brief Restores context for NV_ vertices
+			**/
+			void reset();
+
+			/**
+			 * @brief Sets the trivial vertex ordering in `nodes_`.
+			 *
+			 * Initializes `nodes_` with the identity ordering [0, NV_-1],
+			 * used as the starting point by sorting primitives that require
+			 * an existing ordering.
+			 */
+			void set_ordering();
+
 			/*
 			* @brief Sets an ordering in [OLD]->[NEW] format in @nodes_.
 			*		 This will be the given ordering in composite orderings
 			*/
 			void set_ordering(const vertex_ordering_t& nodes) { nodes_ = nodes; }
 			void set_ordering(vertex_ordering_t&& nodes) { nodes_ = std::move(nodes); }
-
+						
 			/**
 			* @brief Computes the degree of each vertex
 			**/
@@ -413,32 +436,14 @@ namespace bitgraph {
 			//TODO - add tiebreak support for subgraph ordering 
 			//int  sort_non_increasing_deg_with_support_tb(int n, bool rev = false);
 			//int  sort_non_decreasing_deg_with_support_tb(int n, bool rev = false);
-
-			////////////////////////
-			// I/O
-			std::ostream& print(
-				print_mode mode,
-				std::ostream& os,
-				bool end_line = true) const;
-
+							
 		protected:
 
-			/**
-			* @brief Restores context for NV_ vertices
-			**/
-			int reset();
+			////////////////
+			// data members
 
-			/**
-			 * @brief Sets the trivial vertex ordering in `nodes_`.
-			 *
-			 * Initializes `nodes_` with the identity ordering [0, NV_-1],
-			 * used as the starting point by sorting primitives that require
-			 * an existing ordering.
-			 */
-			void set_ordering();
-
-			graph_t& g_;											// ideally CONST but some operations like neighbors are non-const (TODO!)
-			vertex_t NV_;											// number of vertices cached - g_.num_vertices()  
+			graph_t& graph_;										// ideally CONST but some operations like neighbors() are non-const (TODO!)
+			vertex_t NV_;											// number of vertices cached - graph_.num_vertices()  
 
 			vertex_degrees_t nb_neigh_;								// stores the degree of the vertices		
 			vertex_supports_t deg_neigh_;							// stores the support of the vertices (degree of neighbors)
@@ -452,7 +457,6 @@ namespace bitgraph {
 	using graph_utils::GraphFastRootSort;
 
 }//end of namespace bitgraph
-
 
 
 ////////////////////////////////////////////////////////////
@@ -567,13 +571,13 @@ namespace bitgraph {
 
 				//////////////////////////////////
 				nodes_.emplace_back(v);
-				if (nodes_.size() == g_.size()) { break; }			//exit condition
+				if (nodes_.size() == graph_.size()) { break; }			//exit condition
 
 				node_active_state_.erase_bit(v);
 				///////////////////////////////////
 
 				//update degree info of the remaining active vertices
-				vertex_bitset_t& bbn = g_.neighbors(v);
+				vertex_bitset_t& bbn = graph_.neighbors(v);
 
 				bbn.init_scan(BBObject::NON_DESTRUCTIVE);
 				int w = BBObject::noBit;
@@ -618,13 +622,13 @@ namespace bitgraph {
 
 				//////////////////////////////////
 				nodes_.emplace_back(v);
-				if (nodes_.size() == g_.size()) { break; }			//exit condition
+				if (nodes_.size() == graph_.size()) { break; }			//exit condition
 
 				node_active_state_.erase_bit(v);
 				//////////////////////////////////
 
 				//updates neighborhood info in remaining vertices
-				vertex_bitset_t& bbn = g_.neighbors(v);
+				vertex_bitset_t& bbn = graph_.neighbors(v);
 				bbn.init_scan(BBObject::NON_DESTRUCTIVE);
 				int w = BBObject::noBit;
 				while ((w = bbn.next_bit()) != BBObject::noBit) {
@@ -666,7 +670,7 @@ namespace bitgraph {
 				}
 
 				while ((w = node_active_state_.next_bit()) != BBObject::noBit) {
-					deg = g_.degree(w, node_active_state_);
+					deg = graph_.degree(w, node_active_state_);
 					if (min_deg > deg) {											// >= is possible
 						min_deg = deg;
 						v = w;
@@ -713,7 +717,7 @@ namespace bitgraph {
 				node_active_state_.erase_bit(v);
 
 				//updates neighborhood info in remaining vertices
-				vertex_bitset_t& bbn = g_.neighbors(v);
+				vertex_bitset_t& bbn = graph_.neighbors(v);
 				bbn.init_scan(BBObject::NON_DESTRUCTIVE);
 
 				int w = BBObject::noBit;
@@ -756,7 +760,7 @@ namespace bitgraph {
 				node_active_state_.erase_bit(v);
 
 				//updates neighborhood info in remaining vertices
-				vertex_bitset_t& bbn = g_.neighbors(v);
+				vertex_bitset_t& bbn = graph_.neighbors(v);
 				bbn.init_scan(BBObject::NON_DESTRUCTIVE);
 				int w = BBObject::noBit;
 				while ((w = bbn.next_bit()) != BBObject::noBit) {
@@ -961,7 +965,7 @@ namespace bitgraph {
 			GraphFastRootSort<GraphT>::compute_deg_root() -> const vertex_degrees_t& {
 
 			for (int elem = 0; elem < NV_; ++elem) {
-				nb_neigh_[elem] = g_.neighbors(elem).count();
+				nb_neigh_[elem] = graph_.neighbors(elem).count();
 			}
 
 			return nb_neigh_;
@@ -973,7 +977,7 @@ namespace bitgraph {
 		{
 			for (int elem = 0; elem < NV_; ++elem) {
 				deg_neigh_[elem] = 0;
-				vertex_bitset_t& bbn = g_.neighbors(elem);
+				vertex_bitset_t& bbn = graph_.neighbors(elem);
 				bbn.init_scan(BBObject::NON_DESTRUCTIVE);
 				int w = BBObject::noBit;
 				while ((w = bbn.next_bit()) != EMPTY_ELEM) {
@@ -1027,16 +1031,12 @@ namespace bitgraph {
 
 		template<class GraphT>
 		inline
-			int GraphFastRootSort<GraphT>::reset() {
+			void GraphFastRootSort<GraphT>::reset() {
 
-			nb_neigh_.clear();
-			nb_neigh_.resize(NV_);
-
-			deg_neigh_.clear();
-			deg_neigh_.resize(NV_);
-
-			node_active_state_.set_bit(0, NV_ - 1);		//all active, pending to be ordered
-			return 0;
+			nb_neigh_.assign(NV_, 0);
+			deg_neigh_.assign(NV_, 0);
+						
+			node_active_state_.set_bit(0, NV_ - 1);		// all active, pending to be ordered
 		}
 
 		template<class GraphT>
@@ -1055,7 +1055,7 @@ namespace bitgraph {
 			
 			// create the induced subgraph of size |vertex_set|
 			graph_t induced_subgraph;			
-			this->g_.create_subgraph(induced_subgraph, lv);
+			this->graph_.create_subgraph(induced_subgraph, lv);
 		
 			// create a new ordering for the subgraph based on existing primitives
 			GraphFastRootSort<graph_t> sort(induced_subgraph);

@@ -24,21 +24,48 @@
 using namespace std;
 using namespace bitgraph;
 
-class GraphFastRootSortTest : public ::testing::Test {
-protected:
-	void SetUp() override {
-		ug.reset(NV);
-		ug.add_edge(1, 2);
-		ug.add_edge(1, 3);
-		ug.add_edge(1, 4);
-		ug.add_edge(3, 5);
-	}
-	void TearDown() override {}
-	
-	//ugraph instance	
-	const int NV = 6;
-	ugraph ug;
-};
+namespace {
+
+	class GraphFastRootSortTest : public ::testing::Test {
+	protected:
+		void SetUp() override {
+			ug.reset(NV);
+			ug.add_edge(1, 2);
+			ug.add_edge(1, 3);
+			ug.add_edge(1, 4);
+			ug.add_edge(3, 5);
+		}
+		void TearDown() override {}
+
+		//ugraph instance	
+		const int NV = 6;
+		ugraph ug;
+	};
+
+	template<class GraphT>
+	class TestGraphFastRootSort : public GraphFastRootSort<GraphT> {
+	public:
+		using base_t = GraphFastRootSort<GraphT>;
+
+		using base_t::base_t;
+
+		using base_t::compute_deg_root;
+		using base_t::compute_support_root;
+
+		using base_t::sort_non_increasing_deg;
+		using base_t::sort_non_decreasing_deg;
+		using base_t::sort_non_increasing_deg_with_support_tb;
+		using base_t::sort_non_decreasing_deg_with_support_tb;
+
+		using base_t::sort_degen_non_decreasing_deg;
+		using base_t::sort_degen_non_increasing_deg;
+		using base_t::sort_degen_non_decreasing_deg_B;
+
+		using base_t::sort_degen_composite_non_decreasing_deg;
+		using base_t::sort_degen_composite_non_increasing_deg;
+	};
+
+}
 
 TEST_F(GraphFastRootSortTest, constructor) {
 	using gt = GraphFastRootSort<ugraph>;
@@ -56,7 +83,7 @@ TEST_F(GraphFastRootSortTest, constructor) {
 
 TEST_F(GraphFastRootSortTest, compute_deg_root) {
 
-	using gt = GraphFastRootSort<ugraph>;
+	using gt = TestGraphFastRootSort<ugraph>;
 	gt sorter(ug);
 	sorter.compute_deg_root();
 
@@ -72,7 +99,7 @@ TEST_F(GraphFastRootSortTest, compute_deg_root) {
 
 TEST_F(GraphFastRootSortTest, compute_support_root) {
 
-	using gt = GraphFastRootSort<ugraph>;
+	using gt = TestGraphFastRootSort<ugraph>;
 	gt sorter(ug);
 	sorter.compute_deg_root();
 	sorter.compute_support_root();
@@ -89,7 +116,7 @@ TEST_F(GraphFastRootSortTest, compute_support_root) {
 
 TEST_F(GraphFastRootSortTest, sort_non_decreasing_deg) {
 
-	using gt = GraphFastRootSort<ugraph>;
+	using gt = TestGraphFastRootSort<ugraph>;
 	gt sorter(ug);
 	sorter.compute_deg_root();
 	VertexMapping mapping = sorter.sort_non_decreasing_deg(false);
@@ -106,7 +133,7 @@ TEST_F(GraphFastRootSortTest, sort_non_decreasing_deg) {
 
 TEST_F(GraphFastRootSortTest, sort_non_increasing_deg) {
 
-	using gt = GraphFastRootSort<ugraph>;
+	using gt = TestGraphFastRootSort<ugraph>;
 	gt sorter(ug);
 	sorter.compute_deg_root();
 	VertexMapping mapping = sorter.sort_non_increasing_deg(false);
@@ -123,7 +150,7 @@ TEST_F(GraphFastRootSortTest, sort_non_increasing_deg) {
 
 TEST_F(GraphFastRootSortTest, sort_non_decreasing_deg_with_support_tb) {
 
-	using gt = GraphFastRootSort<ugraph>;
+	using gt = TestGraphFastRootSort<ugraph>;
 	gt sorter(ug);
 	sorter.compute_deg_root();
 	sorter.compute_support_root();
@@ -141,7 +168,7 @@ TEST_F(GraphFastRootSortTest, sort_non_decreasing_deg_with_support_tb) {
 
 TEST_F(GraphFastRootSortTest, sort_non_increasing_deg_with_support_tb) {
 
-	using gt = GraphFastRootSort<ugraph>;
+	using gt = TestGraphFastRootSort<ugraph>;
 	gt sorter(ug);
 	sorter.compute_deg_root();
 	sorter.compute_support_root();
@@ -159,7 +186,7 @@ TEST_F(GraphFastRootSortTest, sort_non_increasing_deg_with_support_tb) {
 
 TEST_F(GraphFastRootSortTest, sort_degen_non_decreasing_deg) {
 
-	using gt = GraphFastRootSort<ugraph>;
+	using gt = TestGraphFastRootSort<ugraph>;
 	gt sorter(ug);
 	sorter.compute_deg_root();	
 	VertexMapping mapping = sorter.sort_degen_non_decreasing_deg(false);
@@ -176,7 +203,7 @@ TEST_F(GraphFastRootSortTest, sort_degen_non_decreasing_deg) {
 
 TEST_F(GraphFastRootSortTest, sort_degen_non_decreasing_deg_ltf) {
 
-	using gt = GraphFastRootSort<ugraph>;
+	using gt = TestGraphFastRootSort<ugraph>;
 	gt sorter(ug);
 	sorter.compute_deg_root();	
 	VertexMapping mapping = sorter.sort_degen_non_decreasing_deg(true);
@@ -195,7 +222,7 @@ TEST_F(GraphFastRootSortTest, sort_degen_non_decreasing_deg_ltf) {
 
 TEST_F(GraphFastRootSortTest, sort_degen_non_increasing_deg) {
 
-	using gt = GraphFastRootSort<ugraph>;
+	using gt = TestGraphFastRootSort<ugraph>;
 	gt sorter(ug);
 	sorter.compute_deg_root();	
 	VertexMapping mapping = sorter.sort_degen_non_increasing_deg(false);
@@ -214,7 +241,7 @@ TEST_F(GraphFastRootSortTest, sort_degen_non_increasing_deg) {
 
 TEST_F(GraphFastRootSortTest, sort_degen_non_increasing_deg_ltf) {
 
-	using gt = GraphFastRootSort<ugraph>;
+	using gt = TestGraphFastRootSort<ugraph>;
 	gt sorter(ug);
 	sorter.compute_deg_root();	
 	VertexMapping mapping = sorter.sort_degen_non_increasing_deg(true);
@@ -238,7 +265,7 @@ TEST_F(GraphFastRootSortTest, sort_degen_non_increasing_deg_ltf) {
 
 TEST_F(GraphFastRootSortTest, sort_degen_composite_non_decreasing_deg) {
 
-	using gt = GraphFastRootSort<ugraph>;
+	using gt = TestGraphFastRootSort<ugraph>;
 	gt sorter(ug);
 	sorter.compute_deg_root();
 	sorter.sort_non_decreasing_deg(false);										//ordering I
@@ -256,7 +283,7 @@ TEST_F(GraphFastRootSortTest, sort_degen_composite_non_decreasing_deg) {
 
 TEST_F(GraphFastRootSortTest, sort_degen_composite_non_decreasing_deg_ltf) {
 
-	using gt = GraphFastRootSort<ugraph>;
+	using gt = TestGraphFastRootSort<ugraph>;
 	gt sorter(ug);
 	sorter.compute_deg_root();
 	sorter.sort_non_decreasing_deg(false);											//ordering I
@@ -275,7 +302,7 @@ TEST_F(GraphFastRootSortTest, sort_degen_composite_non_decreasing_deg_ltf) {
 
 TEST_F(GraphFastRootSortTest, sort_degen_composite_non_increasing_deg) {
 
-	using gt = GraphFastRootSort<ugraph>;
+	using gt = TestGraphFastRootSort<ugraph>;
 	gt sorter(ug);
 	sorter.compute_deg_root();
 	sorter.sort_non_increasing_deg(false);												//ordering I
@@ -293,7 +320,7 @@ TEST_F(GraphFastRootSortTest, sort_degen_composite_non_increasing_deg) {
 
 TEST_F(GraphFastRootSortTest, sort_degen_composite_non_increasing_deg_ltf) {
 
-	using gt = GraphFastRootSort<ugraph>;
+	using gt = TestGraphFastRootSort<ugraph>;
 	gt sorter(ug);
 	sorter.compute_deg_root();
 	sorter.sort_non_increasing_deg(false);											//ordering I
@@ -335,7 +362,7 @@ TEST_F(GraphFastRootSortTest, new_order) {
 }
 
 TEST_F(GraphFastRootSortTest, reorder) {
-	using gt = GraphFastRootSort<ugraph>;
+	using gt = TestGraphFastRootSort<ugraph>;
 	gt sorter(ug);
 
 	sorter.compute_deg_root();
@@ -357,7 +384,7 @@ TEST_F(GraphFastRootSortTest, reorder) {
 
 
 TEST_F(GraphFastRootSortTest, reorder_static) {
-	using gt = GraphFastRootSort<ugraph>;
+	using gt = TestGraphFastRootSort<ugraph>;
 	gt sorter(ug);
 
 	sorter.compute_deg_root();
@@ -439,7 +466,7 @@ TEST(subgraphSort, first_k) {
 	ug.add_edge(3, 5);										//deg(0)=0, deg(1)=2, deg(2)=3, deg(3)=1, deg(4)=1, deg(5)=3 
 
 	//setup
-	using gt = GraphFastRootSort<ugraph>;
+	using gt = TestGraphFastRootSort<ugraph>;
 	const int K = 3;
 	gt sorter(ug);
 	sorter.compute_deg_root();
@@ -482,7 +509,7 @@ TEST(subgraphSort, first_to_last) {
 	ug.add_edge(3, 5);										//deg(0)=0, deg(1)=2, deg(2)=3, deg(3)=1, deg(4)=1, deg(5)=3 
 
 	//setup
-	using gt = GraphFastRootSort<ugraph>;
+	using gt = TestGraphFastRootSort<ugraph>;
 	const int FIRST = 1, LAST=2;
 	gt sorter(ug);
 	sorter.compute_deg_root();
