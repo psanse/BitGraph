@@ -378,7 +378,7 @@ namespace bitgraph {
 
 	template<class BitsetT>
 	inline
-		ostream& Ugraph<BitsetT>::print_degrees(std::ostream& o) const {
+		std::ostream& Ugraph<BitsetT>::print_degrees(std::ostream& o) const {
 		for (int i = 0; i < this->NV_; ++i) {
 			o << "deg(" << i << ")" << ":" << degree(i) << " ";
 		}

@@ -25,19 +25,21 @@ namespace bitgraph {
 		//
 		////////////////////////////
 
-		template <class GraphW_t>
-		class GraphFastRootSort_W : public GraphFastRootSort <typename GraphW_t::graph_type> {
+		template <class GraphW>
+		class GraphFastRootSort_W : public GraphFastRootSort <typename GraphW::graph_type> {
 
 		public:
-			using basic_type = GraphW_t;									//weighted graph type
-			using type = GraphFastRootSort_W<GraphW_t>;						//own type	
-			using ugtype = typename basic_type::graph_type;						//non-weighted graph type	
-			using ptype = GraphFastRootSort <ugtype>;						//parent type
-			using Weight = typename GraphW_t::Weight;							//weight type
+			using basic_type = GraphW;									//weighted graph type
+			using type = GraphFastRootSort_W<GraphW>;					//own type	
+			using ugtype = typename basic_type::graph_type;				//non-weighted graph type	
+			using ptype = GraphFastRootSort <ugtype>;					//parent type
+			using Weight = typename GraphW::Weight;						//weight type
+
+			using graph_w_t = basic_type;
 
 			enum { MAX_WEIGHT = 100, MIN_WEIGHT };							//sorting algorithms for weighted graphs	
 
-			using VertexOrdering = typename ptype::VertexOrdering;
+			using VertexOrdering = typename ptype::vertex_ordering_t;
 
 			////////////////
 			// public interface 
@@ -48,7 +50,10 @@ namespace bitgraph {
 			* @param ltf  last to first if TRUE
 			* @param o2n  old to new if TRUE
 			*/
-			VertexOrdering new_order(int alg, bool ltf = true, bool o2n = true)		override;
+			VertexOrdering new_order(
+				int alg, 
+				bool ltf = true,
+				bool o2n = true) override;
 
 			/*
 			* @brief Creates a weighted graph isomorphism for a given ordering
@@ -58,11 +63,15 @@ namespace bitgraph {
 			* @comments only for simple undirected graphs with no weights
 			* @return 0 if successful
 			*/
-			int  reorder(const VertexOrdering& new_order, GraphW_t& gn, Decode* d = nullptr);
+			int reorder(
+				const VertexOrdering& new_order, 
+				graph_w_t& gn,
+				Decode* d = nullptr) ;
+						
 
 			////////////////////////
 			//construction / destruction
-			GraphFastRootSort_W(GraphW_t& gw) : GraphFastRootSort<typename GraphW_t::graph_type>(gw.graph()), gw_(gw) {}
+			GraphFastRootSort_W(graph_w_t& gw) : GraphFastRootSort<typename graph_w_t::graph_type>(gw.graph()), gw_(gw) {}
 
 			//move and copy semantics
 			GraphFastRootSort_W(const GraphFastRootSort_W&) = delete;
@@ -74,7 +83,7 @@ namespace bitgraph {
 
 			//////////
 			// setters / getters
-			const GraphW_t& graph() const { return gw_; }
+			const graph_w_t& graph() const { return gw_; }
 
 			////////
 			//internals
@@ -98,7 +107,7 @@ namespace bitgraph {
 			////////////////
 			// data members	
 		private:
-			const GraphW_t& gw_;
+			const graph_w_t& gw_;
 		};
 
 	}//end of namespace _impl	
@@ -112,10 +121,10 @@ namespace bitgraph {
 
 namespace bitgraph {
 
-	template <class GraphW_t >
+	template <class GraphW >
 	inline auto
-	 GraphFastRootSort_W<GraphW_t>::new_order(int alg, bool ltf, bool o2n) -> VertexOrdering {
-		this->nodes_.clear();											//clears the ordering
+	 GraphFastRootSort_W<GraphW>::new_order(int alg, bool ltf, bool o2n) -> VertexOrdering {
+		this->nodes_.clear();											
 
 		switch (alg) {
 		case ptype::NONE:
@@ -141,16 +150,19 @@ namespace bitgraph {
 			break;
 
 		default:
-			LOG_ERROR("unknown algorithm - GraphFastRootSort_W<GraphW_t>::new_order(...)");
+			LOG_ERROR("unknown algorithm - GraphFastRootSort_W<GraphW>::new_order(...)");
 			LOG_ERROR("exiting...");
 			exit(-1);
 		}
 		return this->nodes_;
 	}
 
-	template <class GraphW_t >
+	template <class GraphW >
 	inline
-		int GraphFastRootSort_W<GraphW_t>::reorder(const VertexOrdering& new_order, GraphW_t& gn, Decode* d) {
+		int GraphFastRootSort_W<GraphW>::reorder(
+			const VertexOrdering& new_order,
+			graph_w_t& gn, Decode* d) 
+	{
 
 		int NV = gw_.num_vertices();
 

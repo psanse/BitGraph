@@ -61,6 +61,11 @@ namespace bitgraph {
 	using VertexOrdering = vertex_ordering;
 
 	/**
+	 * @brief Integer type used to identify the degree of a vertex.
+	 */
+	using degree_t = int;
+
+	/**
 	 * @brief Default modulus used to generate vertex and edge weights.
 	 *
 	 * @see Pullman (2008).

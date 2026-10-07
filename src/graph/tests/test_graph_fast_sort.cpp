@@ -61,7 +61,7 @@ TEST_F(GraphFastRootSortTest, compute_deg_root) {
 	sorter.compute_deg_root();
 
 	//////////////////////////////////////////
-	gt::VertexDegrees deg_exp = { 0, 3, 1, 2, 1, 1};
+	gt::vertex_degrees_t deg_exp = { 0, 3, 1, 2, 1, 1};
 	EXPECT_EQ(deg_exp, sorter.degree());
 	//////////////////////////////////////////
 	
@@ -78,7 +78,7 @@ TEST_F(GraphFastRootSortTest, compute_support_root) {
 	sorter.compute_support_root();
 
 	//////////////////////////////////////////
-	gt::VertexSupports support_exp = { 0, 4, 3, 4, 3, 2 };
+	gt::vertex_supports_t support_exp = { 0, 4, 3, 4, 3, 2 };
 	EXPECT_EQ(support_exp, sorter.support());
 	//////////////////////////////////////////
 
