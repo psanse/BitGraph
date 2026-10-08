@@ -108,7 +108,7 @@ namespace bitgraph {
 			const int NV = graph.number_of_vertices();
 
 			graph_ew_t reordered_graph;
-			reordered_graph.reset(NV);		// 0 weights for edges and vertices
+			reordered_graph.reset(NV, weight_t{1});		
 
 			// Copy graph metadata.
 			reordered_graph.set_name(graph.get_name(), false /* no path separation */);
