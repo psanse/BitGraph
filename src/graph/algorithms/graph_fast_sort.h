@@ -283,10 +283,19 @@ namespace bitgraph {
 			////////
 			// I/O
 		
+
+			/**
+			 * @brief Prints internal sorting information to an output stream.
+			 *
+			 * @param mode Information to print.
+			 * @param os Output stream.
+			 * @param trailing_newline If `true`, appends a newline after the output.
+			 * @return Reference to the output stream.
+			 */
 			std::ostream& print(
 				print_mode mode,
 				std::ostream& os,
-				bool end_line = true) const;
+				bool trailing_newline = true) const;
 			
 		protected:
 
@@ -327,44 +336,77 @@ namespace bitgraph {
 			const vertex_supports_t& compute_support_root();
 
 			/**
-			* @brief Computes a non_increasing_degree (non-degenerate) ordering
-			* @param reverse reverse ordering if TRUE
-			* @important requires prior computation of deg
-			* @return output ordering in [NEW]->[OLD] format
-			**/
+			 * @brief Computes a non-increasing degree ordering.
+			 *
+			 * @param reverse If `true`, reverses the resulting ordering.
+			 * @return Vertex ordering in [NEW]->[OLD] format.
+			 *
+			 * @pre Degree information must be computed before calling this function.
+			 */
 			const vertex_ordering_t& sort_non_increasing_deg(bool reverse);
 
 			/**
-			* @brief Computes a non-decreasing degree (non-degenerate) ordering
-			* @param reverse reverse ordering if TRUE
-			* @important requires prior computation of deg
-			* @return ouptut ordering in [NEW]->[OLD] format
-			**/
+			 * @brief Computes a non-decreasing degree ordering.
+			 *
+			 * @param reverse If `true`, reverses the resulting ordering.
+			 * @return Vertex ordering in [NEW]->[OLD] format.
+			 *
+			 * @pre Degree information must be computed before calling this function.
+			 */
 			const vertex_ordering_t& sort_non_decreasing_deg(bool reverse);
 
-			/*
-			* @brief Computes a non-increasing degree (non-degenerate) ordering with tiebreak by supprt
-			* @param reverse reverse ordering if TRUE
-			* @important requires prior computation of deg and support
-			* @return output ordering in[NEW]->[OLD] format
-			*/
+			/**
+			 * @brief Computes a non-increasing degree ordering using support as a tie-breaker.
+			 *
+			 * Vertices are ordered primarily by non-increasing degree. Ties between
+			 * vertices with the same degree are broken using their support, defined as
+			 * the sum of the degrees of their neighbors:
+			 *
+			 * \f[
+			 *   support(v) = \sum_{u \in N(v)} deg(u)
+			 * \f]
+			 *
+			 * @param reverse If `true`, reverses the resulting ordering.
+			 * @return Vertex ordering in [NEW]->[OLD] format.
+			 *
+			 * @pre Degree and support information must be computed before calling this function.
+			 */
 			const vertex_ordering_t& sort_non_increasing_deg_with_support_tb(bool reverse);
 
 			/**
-			* @brief Computes a non-decreasing degree (non-degenerate) ordering with tiebreak by supprt
-			* @param reverse reverse ordering if TRUE
-			* @important requires prior computation of deg and support
-			* @return output ordering in [NEW]->[OLD] format
-			**/
+			 * @brief Computes a non-decreasing degree ordering using support as a tie-breaker.
+			 *
+			 * Vertices are ordered primarily by non-decreasing degree. Ties between
+			 * vertices with the same degree are broken using their support, defined as
+			 * the sum of the degrees of their neighbors.
+			 *
+			 * @param reverse If `true`, reverses the resulting ordering.
+			 * @return Vertex ordering in [NEW]->[OLD] format.
+			 *
+			 * @pre Degree and support information must be computed before calling this function.
+			 */
 			const vertex_ordering_t& sort_non_decreasing_deg_with_support_tb(bool reverse);
 
 			/**
-			* @brief Degenerate non-decreasing degree ordering
-			* @comments deg info is not restored after the call
-			* @return output ordering in [NEW]->[OLD] format
-			* TODO - optimize
-			**/
+			 * @brief Computes a degenerate non-decreasing degree ordering.
+			 *
+			 * @param reverse If `true`, reverses the resulting ordering.
+			 * @return Vertex ordering in [NEW]->[OLD] format.
+			 *
+			 * @note Cached degree information is modified and not restored after the call.
+			 * @todo Optimize this implementation.
+			 */
 			const vertex_ordering_t& sort_degen_non_decreasing_deg(bool reverse);
+			
+			/**
+			 * @brief Computes a degenerate non-increasing degree ordering.
+			 *
+			 * @param reverse If `true`, reverses the resulting ordering.
+			 * @return Vertex ordering in [NEW]->[OLD] format.
+			 *
+			 * @pre Degree information must be computed before calling this function.
+			 * @note Cached degree information is modified and not restored after the call.
+			 */
 			const vertex_ordering_t& sort_degen_non_increasing_deg(bool reverse);
 
 			/**
@@ -376,20 +418,31 @@ namespace bitgraph {
 			const vertex_ordering_t& sort_degen_non_decreasing_deg_B(bool reverse);
 
 			/**
-			*@brief Composite non-decreasing degree degenerate ordering based on a prior given ordering
-			*@param reverse reverse ordering if TRUE
-			*@comments the vertex ordering has to be set (with set_ordering(...)) prior to the call
-			*@return output ordering in [NEW]->[OLD] format
-			**/
+			 * @brief Computes a composite degenerate non-decreasing degree ordering.
+			 *
+			 * The ordering is computed using the current vertex ordering as the
+			 * tie-breaking criterion during the degenerate degree ordering.
+			 *
+			 * @param reverse If `true`, reverses the resulting ordering.
+			 * @return Vertex ordering in [NEW]->[OLD] format.
+			 *
+			 * @pre An initial vertex ordering must be set before calling this function,
+			 *      for example with `set_ordering(...)`.
+			 */
 			const vertex_ordering_t& sort_degen_composite_non_decreasing_deg(bool reverse);
 
-
 			/**
-			*@brief Composite non-increasing degree degenerate ordering based on a prior given ordering
-			*@param reverse reverse ordering if TRUE
-			*@comments the vertex ordering has to be set (with set_ordering(...)) prior to the call
-			*@return output ordering in [NEW]->[OLD] format
-			**/
+			 * @brief Computes a composite degenerate non-increasing degree ordering.
+			 *
+			 * The ordering is computed using the current vertex ordering as the
+			 * tie-breaking criterion during the degenerate degree ordering.
+			 *
+			 * @param reverse If `true`, reverses the resulting ordering.
+			 * @return Vertex ordering in [NEW]->[OLD] format.
+			 *
+			 * @pre An initial vertex ordering must be set before calling this function,
+			 *      for example with `set_ordering(...)`.
+			 */
 			const vertex_ordering_t& sort_degen_composite_non_increasing_deg(bool reverse);
 
 			/////////////////
@@ -398,40 +451,70 @@ namespace bitgraph {
 			// TODO - add further primitives for composites, etc...
 
 			/**
-			*@brief sorts the first k vertices by non-increasing degree (non-degenerate)
-			*@param first_k  first k < |V|  vertices to sort ([0..k-1])
-			*@param reverse reverse ordering if TRUE
-			*@return output ordering in [NEW]->[OLD] format
-			**/
+			 * @brief Sorts the first `first_k` vertices by non-increasing degree.
+			 *
+			 * Only the vertices in the range [0, first_k - 1] are reordered.
+			 * Vertices outside this range remain unchanged.
+			 *
+			 * @param first_k Number of initial vertices to sort. Must satisfy
+			 *                `0 < first_k < |V|`.
+			 * @param reverse If `true`, reverses the resulting ordering.
+			 * @return Vertex ordering in [NEW]->[OLD] format.
+			 *
+			 * @pre Degree information must be computed before calling this function.
+			 */
 			const vertex_ordering_t& sort_non_increasing_deg(int first_k, bool reverse);
 
 			/**
-			*@brief sorts [first, last] consecutive vertices by non-increasing degree (non-degenerate)
-			*@param first  first vertex to sort (0-based index) - in  [0, |V|-1]
-			*@param last  last vertex to sort	(0-based index)	- in  [0, |V|-1], > first
-			*@param reverse reverse ordering if TRUE
-			*@return output ordering in [NEW]->[OLD] format
-			**/
+			 * @brief Sorts a range of consecutive vertices by non-increasing degree.
+			 *
+			 * Only the vertices in the inclusive range [`first`, `last`] are reordered.
+			 * Vertices outside this range remain unchanged.
+			 *
+			 * @param first First vertex in the range to sort. Must satisfy
+			 *              `0 <= first < |V|`.
+			 * @param last Last vertex in the range to sort. Must satisfy
+			 *             `first < last < |V|`.
+			 * @param reverse If `true`, reverses the resulting ordering.
+			 * @return Vertex ordering in [NEW]->[OLD] format.
+			 *
+			 * @pre Degree information must be computed before calling this function.
+			 */
 			const vertex_ordering_t& sort_non_increasing_deg(
 				vertex_t first, 
 				vertex_t last,
 				bool reverse);
 
 			/**
-			*@brief sorts the first k vertices by non-decreasing degree (non-degenerate)
-			*@param first_k  first k < |V|  vertices to sort ([0..k-1])
-			*@param reverse reverse ordering if TRUE
-			*@return output ordering in [NEW]->[OLD] format
-			**/
+			 * @brief Sorts the first `first_k` vertices by non-decreasing degree.
+			 *
+			 * Only the vertices in the range [0, first_k - 1] are reordered.
+			 * Vertices outside this range remain unchanged.
+			 *
+			 * @param first_k Number of initial vertices to sort. Must satisfy
+			 *                `0 < first_k < |V|`.
+			 * @param reverse If `true`, reverses the resulting ordering.
+			 * @return Vertex ordering in [NEW]->[OLD] format.
+			 *
+			 * @pre Degree information must be computed before calling this function.
+			 */
 			const vertex_ordering_t& sort_non_decreasing_deg(int first_k, bool reverse);
 
 			/**
-			*@brief sorts [first, last] consecutive vertices by non-decreasing degree (non-degenerate)
-			*@param first  first vertex to sort (0-based index) - in  [0, |V|-1]
-			*@param last  last vertex to sort	(0-based index)	- in  [0, |V|-1], > first
-			*@param reverse reverse ordering if TRUE
-			*@return output ordering in [NEW]->[OLD] format
-			**/
+			 * @brief Sorts a range of consecutive vertices by non-decreasing degree.
+			 *
+			 * Only the vertices in the inclusive range [`first`, `last`] are reordered.
+			 * Vertices outside this range remain unchanged.
+			 *
+			 * @param first First vertex in the range to sort. Must satisfy
+			 *              `0 <= first < |V|`.
+			 * @param last Last vertex in the range to sort. Must satisfy
+			 *             `first < last < |V|`.
+			 * @param reverse If `true`, reverses the resulting ordering.
+			 * @return Vertex ordering in [NEW]->[OLD] format.
+			 *
+			 * @pre Degree information must be computed before calling this function.
+			 */
 			const vertex_ordering_t& sort_non_decreasing_deg(
 				vertex_t first,
 				vertex_t last,
@@ -442,10 +525,7 @@ namespace bitgraph {
 			//int  sort_non_decreasing_deg_with_support_tb(int n, bool reverse = false);
 							
 		protected:
-
-			////////////////
-			// data members
-
+					
 			graph_t& graph_;										// ideally CONST but some operations like neighbors() are non-const (TODO!)
 			vertex_t NV_;											// number of vertices cached - graph_.num_vertices()  
 
@@ -997,7 +1077,7 @@ namespace bitgraph {
 			std::ostream& GraphFastRootSort<GraphT>::print(
 				print_mode mode,
 				std::ostream& os,
-				bool end_line) const
+				bool trailing_newline) const
 		{
 			switch (mode) {
 			case print_mode::print_degree:
@@ -1014,7 +1094,7 @@ namespace bitgraph {
 				std::terminate();
 			}
 
-			if (end_line) {
+			if (trailing_newline) {
 				os << std::endl; 
 			}
 			return os;
