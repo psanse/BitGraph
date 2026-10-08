@@ -330,9 +330,15 @@ namespace bitgraph {
 			const vertex_degrees_t& compute_deg_root();
 
 			/**
-			* @brief Computes support for all vertices (sum of the number of neighbors)
-			* @comments May include the same vertex twice
-			**/
+			 * @brief Computes the support of every vertex.
+			 *
+			 * The support of a vertex is the sum of the degrees of its neighbors.
+			 *
+			 * @return Vector containing the support value of each vertex.
+			 *
+			 * @pre Degree information in `nb_neigh_` must be up to date before calling
+			 *      this function.
+			 */
 			const vertex_supports_t& compute_support_root();
 
 			/**
@@ -457,7 +463,7 @@ namespace bitgraph {
 			 * Vertices outside this range remain unchanged.
 			 *
 			 * @param first_k Number of initial vertices to sort. Must satisfy
-			 *                `0 < first_k < |V|`.
+			 *                `0 <= first_k < |V|`.
 			 * @param reverse If `true`, reverses the resulting ordering.
 			 * @return Vertex ordering in [NEW]->[OLD] format.
 			 *
@@ -640,38 +646,39 @@ namespace bitgraph {
 			nodes_.clear();
 			nodes_.reserve(NV_);
 
-			int max_deg = NV_;
-			int v = BBObject::noBit;
 			do {
-				max_deg = NV_;
+				int min_deg = NV_;
+				vertex_t v = BBObject::noBit;
 
 				//selects an active vertex with minimum degree
-				for (int j = 0; j < NV_; j++) {
-					if (node_active_state_.is_bit(j) && nb_neigh_[j] < max_deg) {
-						max_deg = nb_neigh_[j];
-						v = j;
+				for (vertex_t w = 0; w < NV_; w++) {
+					if (node_active_state_.is_bit(w) && nb_neigh_[w] < min_deg) {
+						min_deg = nb_neigh_[w];
+						v = w;
 					}
 				}
 
-				//////////////////////////////////
-				nodes_.emplace_back(v);
-				if (nodes_.size() == graph_.size()) { break; }			//exit condition
+				assert(v != BBObject::noBit &&
+					"no active vertex found - GraphFastRootSort<GraphT>::sort_degen_non_decreasing_deg()");
 
+				
+				nodes_.push_back(v);
 				node_active_state_.erase_bit(v);
-				///////////////////////////////////
+				if (nodes_.size() == static_cast<std::size_t>(NV_)) {		//exit condition
+					break;
+				}
+							
 
-				//update degree info of the remaining active vertices
-				vertex_bitset_t& bbn = graph_.neighbors(v);
+				// Update the degree of the remaining active neighbors.
+				vertex_bitset_t& neighbors = graph_.neighbors(v);
 
-				bbn.init_scan(BBObject::NON_DESTRUCTIVE);
+				neighbors.init_scan(BBObject::NON_DESTRUCTIVE);
 				int w = BBObject::noBit;
-				while ((w = bbn.next_bit()) != BBObject::noBit) {
+				while ((w = neighbors.next_bit()) != BBObject::noBit) {
 					if (node_active_state_.is_bit(w)) {
-						nb_neigh_[w]--;
+						--nb_neigh_[w];
 					}
 				}
-
-
 			} while (true);
 
 
@@ -687,40 +694,47 @@ namespace bitgraph {
 			auto GraphFastRootSort<GraphT>::sort_degen_non_increasing_deg(bool reverse) -> const vertex_ordering_t&
 		{
 
-			//initialization
-			node_active_state_.set_bit(0, NV_ - 1);										//all vertices active, pending to be ordered
+			// Initialization: all vertices active, pending to be ordered.
+			node_active_state_.set_bit(0, NV_ - 1);										
 			nodes_.clear();
 			nodes_.reserve(NV_);
 
 			//main loop
-			int max_deg = 0, v = BBObject::noBit;
+			
 			do {
-				//finds vertex with maximum degree
-				max_deg = -1;
-				for (auto j = 0; j < NV_; j++) {
-					if (node_active_state_.is_bit(j) && nb_neigh_[j] > max_deg) {
-						max_deg = nb_neigh_[j];
-						v = j;
+
+				int max_deg = -1;
+				vertex_t v = BBObject::noBit;
+
+				// Select an active vertex with maximum current degree.
+				for (vertex_t w = 0; w < NV_; w++) {
+					if (node_active_state_.is_bit(w) && nb_neigh_[w] > max_deg) {
+						max_deg = nb_neigh_[w];
+						v = w;
 					}
 				}
 
-				//////////////////////////////////
-				nodes_.emplace_back(v);
-				if (nodes_.size() == graph_.size()) { break; }			//exit condition
+				assert(v != BBObject::noBit &&
+					"no active vertex found - "
+					"GraphFastRootSort<GraphT>::sort_degen_non_increasing_deg()");
 
+				nodes_.push_back(v);
 				node_active_state_.erase_bit(v);
-				//////////////////////////////////
 
-				//updates neighborhood info in remaining vertices
-				vertex_bitset_t& bbn = graph_.neighbors(v);
-				bbn.init_scan(BBObject::NON_DESTRUCTIVE);
-				int w = BBObject::noBit;
-				while ((w = bbn.next_bit()) != BBObject::noBit) {
+				if (nodes_.size() == static_cast<std::size_t>(NV_)) {	 //exit condition
+					break;
+				}
+				
+				// Update the degree of the remaining active neighbors.
+				vertex_bitset_t& neighbors = graph_.neighbors(v);
+				neighbors.init_scan(BBObject::NON_DESTRUCTIVE);
+
+				vertex_t w = BBObject::noBit;
+				while ((w = neighbors.next_bit()) != BBObject::noBit) {
 					if (node_active_state_.is_bit(w)) {
-						nb_neigh_[w]--;
+						--nb_neigh_[w];
 					}
 				}
-
 
 			} while (true);
 
@@ -734,39 +748,37 @@ namespace bitgraph {
 		inline
 			auto GraphFastRootSort<GraphT>::sort_degen_non_decreasing_deg_B(bool reverse) -> const vertex_ordering_t&
 		{
-
-			int min_deg = NV_, deg = 0;
+						
 			node_active_state_.set_bit(0, NV_ - 1);					//all active, pending to be ordered
 			nodes_.clear();
+			nodes_.reserve(NV_);
 
 			//main loop
 			do {
 
-				min_deg = NV_;
-				int w = BBObject::noBit;
-				int v = BBObject::noBit;
+				int min_deg = NV_;
+				vertex_t v = BBObject::noBit;
 
-				//selects an active vertex with minimum degree
-				if (node_active_state_.init_scan(BBObject::NON_DESTRUCTIVE) != -1) {
-					LOG_ERROR("init scan failed -  GraphFastRootSort<GraphT>::sort_degen_non_decreasing_deg_B");
-					LOG_ERROR("exting");
-					std::exit(EXIT_FAILURE);
-				}
-
+				//  find an active vertex with minimum degree
+				node_active_state_.init_scan(BBObject::NON_DESTRUCTIVE);
+				
+				vertex_t w = BBObject::noBit;
 				while ((w = node_active_state_.next_bit()) != BBObject::noBit) {
 					deg = graph_.degree(w, node_active_state_);
-					if (min_deg > deg) {											// >= is possible
+					if (deg < min_deg) {											// >= is possible
 						min_deg = deg;
 						v = w;
 					}
 				}
 
-				//////////////////////////////////
-				node_active_state_.erase_bit(v);
-				nodes_.emplace_back(v);
-				//////////////////////////////////
+				assert(v != BBObject::noBit &&
+					"no active vertex found - "
+					"GraphFastRootSort<GraphT>::sort_degen_non_decreasing_deg_B()");
 
-			} while (nodes_.size() < NV_);
+				node_active_state_.erase_bit(v);
+				nodes_.push_back(v);
+
+			} while (nodes_.size() < static_cast<std::size_t>(NV_));
 
 			if (reverse) {
 				std::reverse(nodes_.begin(), nodes_.end());
@@ -780,37 +792,50 @@ namespace bitgraph {
 			auto GraphFastRootSort<GraphT>::sort_degen_composite_non_decreasing_deg(bool reverse) -> const vertex_ordering_t&
 		{
 			node_active_state_.set_bit(0, NV_ - 1);			//all active, pending to be ordered
-			int min_deg = NV_, v = EMPTY_ELEM;
-			vertex_ordering_t nodes_ori = nodes_;
+			
+			
+			vertex_ordering_t nodes_ori = std::move(nodes_);
 			nodes_.clear();
+			nodes_.reserve(NV_);
+					
 
-			for (auto i = 0; i < NV_; i++) {
+			for (vertex_t i = 0; i < NV_; ++i) {
 
-				//finds vertex with minimum degree with TB according to the given ordering in nodes_ori 
-				min_deg = NV_;
+				int min_deg = NV_;
+				vertex_t v = BBObject::noBit;
+
+				// Select an active vertex with minimum current degree.
+				// Ties are broken according to the prior ordering in nodes_ori.				
 				for (auto j = 0; j < NV_; j++) {
-					int u = nodes_ori[j];
-					if (node_active_state_.is_bit(u) && nb_neigh_[u] < min_deg) {
+					const vertex_t u = nodes_ori[j];
+
+					if (node_active_state_.is_bit(u) &&
+						nb_neigh_[u] < min_deg) {
+						
 						min_deg = nb_neigh_[u];
 						v = u;
 					}
 				}
 
-				//updates context
-				nodes_.emplace_back(v);
+				assert(v != BBObject::noBit &&
+					"no active vertex found - "
+					"GraphFastRootSort<GraphT>::"
+					"sort_degen_composite_non_decreasing_deg()");
+
+			
+				nodes_.push_back(v);
 				node_active_state_.erase_bit(v);
 
-				//updates neighborhood info in remaining vertices
-				vertex_bitset_t& bbn = graph_.neighbors(v);
-				bbn.init_scan(BBObject::NON_DESTRUCTIVE);
+				// Update degrees of the remaining active neighbors.
+				vertex_bitset_t& neighbors = graph_.neighbors(v);
+				neighbors.init_scan(BBObject::NON_DESTRUCTIVE);
 
-				int w = BBObject::noBit;
-				while ((w = bbn.next_bit()) != BBObject::noBit) {
+				vertex_t w = BBObject::noBit;
+				while ((w = neighbors.next_bit()) != BBObject::noBit) {
 					if (node_active_state_.is_bit(w)) {
-						nb_neigh_[w]--;
+						--nb_neigh_[w];
 					}
 				}
-
 			}
 
 			if (reverse) {
@@ -823,41 +848,54 @@ namespace bitgraph {
 		inline
 			auto GraphFastRootSort<GraphT>::sort_degen_composite_non_increasing_deg(bool reverse) -> const vertex_ordering_t&
 		{
-			node_active_state_.set_bit(0, NV_ - 1);											//all active, pending to be ordered
-			int max_deg = 0, v = EMPTY_ELEM;
-			vertex_ordering_t nodes_ori = nodes_;
-			nodes_.clear();
+			node_active_state_.set_bit(0, NV_ - 1);   // all active
 
-			for (auto i = 0; i < NV_; i++) {
-				//finds vertex with maximum degree
-				max_deg = -1;
-				for (auto j = 0; j < NV_; j++) {
-					int u = nodes_ori[j];
-					if (node_active_state_.is_bit(u) && nb_neigh_[u] > max_deg) {
+			vertex_ordering_t nodes_ori = std::move(nodes_);
+			nodes_.clear();
+			nodes_.reserve(NV_);
+			
+			for (vertex_t i = 0; i < NV_; ++i){ 
+
+				int max_deg = -1;
+				vertex_t v = BBObject::noBit;
+				
+				// Select an active vertex with maximum current degree.
+				// Ties are broken according to the prior ordering in nodes_ori.
+				for (vertex_t j = 0; j < NV_; ++j) {
+					const vertex_t u = nodes_ori[j];
+
+					if (node_active_state_.is_bit(u)
+						&& nb_neigh_[u] > max_deg) {
+
 						max_deg = nb_neigh_[u];
 						v = u;
 					}
 				}
 
-				//updates context
-				nodes_.emplace_back(v);
+				assert(v != BBObject::noBit &&
+					"no active vertex found - "
+					"GraphFastRootSort<GraphT>::"
+					"sort_degen_composite_non_increasing_deg()");
+							
+				nodes_.push_back(v);
 				node_active_state_.erase_bit(v);
 
-				//updates neighborhood info in remaining vertices
-				vertex_bitset_t& bbn = graph_.neighbors(v);
-				bbn.init_scan(BBObject::NON_DESTRUCTIVE);
-				int w = BBObject::noBit;
-				while ((w = bbn.next_bit()) != BBObject::noBit) {
+				// Update degrees of the remaining active neighbors.
+				vertex_bitset_t& neighbors = graph_.neighbors(v);
+				neighbors.init_scan(BBObject::NON_DESTRUCTIVE);
+
+				vertex_t w = BBObject::noBit;
+				while ((w = neighbors.next_bit()) != BBObject::noBit) {
 					if (node_active_state_.is_bit(w)) {
-						nb_neigh_[w]--;
+						--nb_neigh_[w];
 					}
 				}
-
 			}
 
 			if (reverse) {
 				std::reverse(nodes_.begin(), nodes_.end());
 			}
+
 			return nodes_;
 		}
 
@@ -865,25 +903,32 @@ namespace bitgraph {
 		inline
 			auto GraphFastRootSort<GraphT>::sort_non_increasing_deg(int first_k, bool reverse) -> const vertex_ordering_t&
 		{
+			assert(
+				0 <= first_k &&
+				first_k < NV_ &&
+				"Invalid first_k - "
+				" GraphFastRootSort<GraphT>::sort_non_increasing_deg()");
 
 			vertex_ordering_t kord;
 			fill_vertices(kord, first_k);
 
-			//////////////////////////////////////////////////////
+		
 			utils::has_greater_val<int, vertex_ordering_t> pred(nb_neigh_);
-			//////////////////////////////////////////////////////
-
 			std::stable_sort(kord.begin(), kord.end(), pred);
+
 			if (reverse) {
 				std::reverse(kord.begin(), kord.end());
 			}
 
-			//generates the ordering in @nodes_ - first k vertices at the beginning
-			nodes_ = kord;
+			// First k vertices are reordered; the remaining vertices keep
+			// their original positions.
+			nodes_ = std::move(kord);
 			nodes_.reserve(NV_);
-			for (int v = first_k; v < NV_; v++) {
-				nodes_.emplace_back(v);
+
+			for (vertex_t v = first_k; v < NV_; v++) {
+				nodes_.push_back(v);
 			}
+
 			return nodes_;
 		}
 
@@ -894,26 +939,36 @@ namespace bitgraph {
 				vertex_t last,
 				bool reverse) -> const vertex_ordering_t&
 		{
+
+			assert(
+				0 <= first &&
+				first < last &&
+				last < NV_ &&
+				"Invalid vertex range [first, last] - "
+				"GraphFastRootSort<GraphT>::sort_non_increasing_deg()");				
+
 			vertex_ordering_t kord;
 			kord.reserve(last - first + 1);
-			for (int i = first; i <= last; i++) {
-				kord.emplace_back(i);
+
+			for (vertex_t v = first; v <= last; ++v) {
+				kord.push_back(v);
 			}
 
-			//////////////////////////////////////////////////////
+			
 			utils::has_greater_val<int, vertex_ordering_t> pred(nb_neigh_);
-			//////////////////////////////////////////////////////
-
 			std::stable_sort(kord.begin(), kord.end(), pred);
+
 			if (reverse) {
 				std::reverse(kord.begin(), kord.end());
 			}
 
-			//generates the ordering - first k vertices at the beginning
-			set_ordering();				//trivial ordering in @nodes_
-			int index = first;
-			for (auto v : kord) {
-				nodes_[index++] = v;	//substitute in nodes_ the sorted vertices
+			// Start from the identity ordering and replace only the range
+			// [first, last] with the sorted vertices.
+			set_ordering();					
+			
+			vertex_t index = first;
+			for (vertex_t v : kord) {
+				nodes_[index++] = v;			// substitute in nodes_ the sorted vertices
 			}
 
 			return nodes_;
@@ -923,23 +978,30 @@ namespace bitgraph {
 		inline
 			auto GraphFastRootSort<GraphT>::sort_non_decreasing_deg(int first_k, bool reverse) -> const vertex_ordering_t&
 		{
+
+			assert(
+				0 <= first_k &&
+				first_k < NV_ &&
+				"Invalid first_k - "
+				" GraphFastRootSort<GraphT>::sort_non_decreasing_deg()");
+
 			vertex_ordering_t kord;
 			fill_vertices(kord, first_k);
 
-			//////////////////////////////////////////////////////
 			utils::has_smaller_val<int, vertex_ordering_t> pred(nb_neigh_);
-			//////////////////////////////////////////////////////
-
 			std::stable_sort(kord.begin(), kord.end(), pred);
+
 			if (reverse) {
 				std::reverse(kord.begin(), kord.end());
 			}
 
-			//generates the ordering - first k vertices at the beginning
-			nodes_ = kord;
+			// Vertices [0, first_k - 1] are reordered; the remaining
+			// vertices preserve their original order.
+			nodes_ = std::move(kord);
 			nodes_.reserve(NV_);
-			for (int v = first_k; v < NV_; v++) {
-				nodes_.emplace_back(v);
+
+			for (vertex_t v = first_k; v < NV_; ++v) {
+				nodes_.push_back(v);
 			}
 
 			return nodes_;
@@ -952,25 +1014,33 @@ namespace bitgraph {
 				vertex_t last, 
 				bool reverse)  -> const vertex_ordering_t&
 		{
+
+			assert(
+				0 <= first &&
+				first < last &&
+				last < NV_ &&
+				"Invalid vertex range [first, last] - "
+				"GraphFastRootSort<GraphT>::sort_non_decreasing_deg()");
+
 			vertex_ordering_t kord;
 			kord.reserve(last - first + 1);
-			for (int i = first; i <= last; i++) {
-				kord.emplace_back(i);
+			for (vertex_t v = first; v <= last; v++) {
+				kord.push_back(v);
 			}
 
-			//////////////////////////////////////////////////////
 			utils::has_smaller_val<int, vertex_ordering_t> pred(nb_neigh_);
-			//////////////////////////////////////////////////////
-
 			std::stable_sort(kord.begin(), kord.end(), pred);
+
 			if (reverse) {
 				std::reverse(kord.begin(), kord.end());
 			}
 
-			//generates the ordering - first k vertices at the beginning
-			set_ordering();				//trivial ordering in @nodes_
-			int index = first;
-			for (auto v : kord) {
+			// Start from the identity ordering and replace only the range
+			// [first, last] with the sorted vertices
+			set_ordering();				
+
+			vertex_t index = first;
+			for (vertex_t v : kord) {
 				nodes_[index++] = v;	//substitute in @nodes_ the sorted vertices
 			}
 
@@ -983,8 +1053,9 @@ namespace bitgraph {
 			void GraphFastRootSort<GraphT>::set_ordering() {
 			nodes_.clear();
 			nodes_.reserve(NV_);
-			for (int i = 0; i < NV_; i++) {
-				nodes_.emplace_back(i);
+
+			for (vertex_t v = 0; v < NV_; v++) {
+				nodes_.push_back(v);
 			}
 		}
 
@@ -993,8 +1064,9 @@ namespace bitgraph {
 			auto GraphFastRootSort<GraphT>::sort_non_increasing_deg(bool reverse) -> const vertex_ordering_t&
 		{
 			set_ordering();
-			utils::has_greater_val<int, vertex_ordering_t> pred(nb_neigh_);
+			utils::has_greater_val<vertex_t, vertex_ordering_t> pred(nb_neigh_);
 			std::stable_sort(nodes_.begin(), nodes_.end(), pred);
+
 			if (reverse) {
 				std::reverse(nodes_.begin(), nodes_.end());
 			}
@@ -1048,8 +1120,8 @@ namespace bitgraph {
 		inline auto
 			GraphFastRootSort<GraphT>::compute_deg_root() -> const vertex_degrees_t& {
 
-			for (int elem = 0; elem < NV_; ++elem) {
-				nb_neigh_[elem] = graph_.neighbors(elem).count();
+			for (vertex_t v = 0; v < NV_; ++v) {
+				nb_neigh_[v] = graph_.neighbors(v).count();
 			}
 
 			return nb_neigh_;
@@ -1059,13 +1131,15 @@ namespace bitgraph {
 		inline auto
 			GraphFastRootSort<GraphT>::compute_support_root() -> const vertex_supports_t&
 		{
-			for (int elem = 0; elem < NV_; ++elem) {
-				deg_neigh_[elem] = 0;
-				vertex_bitset_t& bbn = graph_.neighbors(elem);
-				bbn.init_scan(BBObject::NON_DESTRUCTIVE);
-				int w = BBObject::noBit;
-				while ((w = bbn.next_bit()) != EMPTY_ELEM) {
-					deg_neigh_[elem] += nb_neigh_[w];
+			for (vertex_t v = 0; v < NV_; ++v) {
+				deg_neigh_[v] = 0;
+
+				vertex_bitset_t& neighbors = graph_.neighbors(v);
+				neighbors.init_scan(BBObject::NON_DESTRUCTIVE);
+
+				vertex_t w = BBObject::noBit;
+				while ((w = neighbors.next_bit()) != BBObject::noBit) {
+					deg_neigh_[v] += nb_neigh_[w];
 				}
 			}
 
