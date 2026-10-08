@@ -271,7 +271,7 @@ namespace bitgraph {
 
 			///////////////////////
 			//destructor
-			~GraphFastRootSort() = default;
+			virtual ~GraphFastRootSort() = default;
 
 			////////////////////////
 			//setters / getters

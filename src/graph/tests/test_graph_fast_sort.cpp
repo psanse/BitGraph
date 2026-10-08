@@ -9,7 +9,7 @@
 **/ 
 
 #include "graph/algorithms/graph_fast_sort.h"				//includes #include "graph/simple_ugraph.h"
-#include "graph/algorithms/graph_fast_sort_weighted.h"
+#include "graph/algorithms/graph_fast_sort_vertex_weighted.h"
 
 #include "gtest/gtest.h"
 #include <iostream>

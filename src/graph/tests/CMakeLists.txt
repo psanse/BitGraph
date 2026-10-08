@@ -11,7 +11,7 @@ add_executable (
   test_wgraph.cpp
   test_wegraph.cpp
   test_graph_fast_sort.cpp
-  test_graph_fast_sort_weighted.cpp
+  test_graph_fast_sort_vertex_weighted.cpp
   test_random_graph.cpp
   test_graph_conversions.cpp
   test_sparse_graph.cpp

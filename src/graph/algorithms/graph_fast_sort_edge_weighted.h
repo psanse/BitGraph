@@ -12,22 +12,19 @@
 * 
 **/
 
-#ifndef __GRAPH_FAST_SORT_EDGE_WEIGHTED_H__
-#define __GRAPH_FAST_SORT_EDGE_WEIGHTED_H__
+#ifndef BITGRAPH_GRAPH_GRAPH_FAST_SORT_EDGE_WEIGHTED_H
+#define BITGRAPH_GRAPH_GRAPH_FAST_SORT_EDGE_WEIGHTED_H
 
-#include <iostream>
-#include <algorithm>
-#include <vector>
-#include <iterator>
+
 #include "graph_fast_sort.h"
-#include "kcore.h"
+#include "ordering_decoder.h"
+
 #include "utils/logger.h"
-//#include "utils/common.h"					//sort functors
-#include "decode.h"
+
 
 namespace bitgraph {
 
-	namespace _impl {
+	namespace graph_utils {
 
 		///////////////////////////
 		//
@@ -36,45 +33,60 @@ namespace bitgraph {
 		//
 		////////////////////////////
 
-		template <class GraphEWT>
-		class GraphFastRootSort_EW : public GraphFastRootSort <typename GraphEWT::graph_type> {
+		template <class GraphEW>
+		class GraphFastRootSort_EW : public GraphFastRootSort <typename GraphEW::graph_type> {
 
 		public:
-			using graph_type = typename GraphEWT::graph_type;								
-			using BaseT = GraphFastRootSort<graph_type>;
 			
-			using VertexOrdering = BaseT::VertexOrdering;
-				
-			////////////////
-			// data members	
-		private:
-			graph_type& m_gw;
+			using graph_ew_t = GraphEW;
+			using graph_t = typename GraphEW::graph_type;
+			using base_t = GraphFastRootSort<graph_t>;
+			using weight_t = typename GraphEW::Weight;
+			using vertex_ordering_t = typename base_t::vertex_ordering_t;
 
-			//////////////////
+			// alias for backward compatibility with existing code
+			using basic_type = GraphEW;									//weighted graph type
+			using ptype = base_t;										//parent type
+			using Weight = weight_t;									//weight type
+			using VertexOrdering = vertex_ordering_t;
+								
+		
+			GraphFastRootSort_EW(graph_type& gew) 
+				: base_t(gew.graph()), 
+				graph_ew_(gew)
+			{}
 
+			// move and copy semantics disallowed
+			GraphFastRootSort_EW(const GraphFastRootSort_EW&) = delete;
+			GraphFastRootSort_EW& operator=	(const GraphFastRootSort_EW&) = delete;
+			GraphFastRootSort_EW(GraphFastRootSort_EW&&)	noexcept = delete;
+			GraphFastRootSort_EW& operator=	(GraphFastRootSort_EW&&)	noexcept = delete;
+
+			~GraphFastRootSort_EW() = default;
+
+			using base_t::new_order;
+		
 		public:
-			////////////////////////
-			//construction / allocation
-			GraphFastRootSort_EW(graph_type& gwout) : m_gw(gwout), BaseT(gwout.graph()) {}
-			~GraphFastRootSort_EW() {}
+							
+			static graph_ew_t reorder(
+				const graph_ew_t& graph,
+				const vertex_ordering_t& new_order_o2n,
+				OrderingDecoder* decoder = nullptr);
 
-			////////////////
-			// interface 	
-		public:
-
-			///////////
-			//overrides
-
-			VertexOrdering new_order(int alg, bool ltf = true, bool o2n = true) override ;								// interface for the framework 
-			int reorder(const VertexOrdering& new_order, graph_type& gn, Decode* d = NULL) override;					// (new) interface for the framework- TODO@build an in-place reordering as in the old GraphSort 	
+			void reorder(
+				const vertex_ordering_t& new_order, 
+				graph_ew_t& gew,
+				OrderingDecoder* d = NULL);				
 			
 		private:
+
+			graph_ew_t& graph_ew_;
 
 		};
 
-	}//end of namespace _impl
+	}//end of namespace graph_utils
 
-	using _impl::GraphFastRootSort_EW;
+	using graph_utils::GraphFastRootSort_EW;
 
 }//end of namespace bitgraph
 
@@ -84,96 +96,133 @@ namespace bitgraph {
 
 namespace bitgraph {
 
-	template <class GraphEWT >
-	inline auto
-	GraphFastRootSort_EW<GraphEWT>::new_order(int alg, bool ltf, bool o2n) -> VertexOrdering
-	{
-		/////////////////
-		// Computes new order of vertices accordig to @alg
-		//
-		// PARAMS
-		// @alg:algorithm
-		// @ltf:last to first
-		// @o2n:old to new
+	namespace graph_utils {
 
-		vector<int> order;
+		template<class GraphEW>
+		inline auto
+			GraphFastRootSort_EW<GraphEW>::reorder(
+				const graph_ew_t& graph,
+				const vertex_ordering_t& new_order_o2n,
+				OrderingDecoder* decoder) -> graph_ew_t
+		{
+			const int NV = graph.number_of_vertices();
 
-		switch (alg) {
-		case BaseT::NONE:
-		case BaseT::MIN_DEGEN:
-		case BaseT::MIN_DEGEN_COMPO:
-		case BaseT::MAX_DEGEN:
-		case BaseT::MAX_DEGEN_COMPO:
-		case BaseT::MAX:
-		case BaseT::MIN:
-		case BaseT::MAX_WITH_SUPPORT:
-		case BaseT::MIN_WITH_SUPPORT:
+			graph_ew_t reordered_graph;
+			reordered_graph.reset(NV);		// 0 weights for edges and vertices
 
-			order = BaseT::new_order(alg, ltf, o2n);
-			break;
+			// Copy graph metadata.
+			reordered_graph.set_name(graph.get_name(), false /* no path separation */);
+			reordered_graph.set_path(graph.get_path());
 
-		default:
-			LOG_ERROR("bizarre algorithm- GraphFastRootSort_EW<Graph_t>::new_order(...), exiting...");
-			exit(-1);
+			// Reorder graph topology.
+			// Currently intended for simple undirected graphs.
+			for (vertex_t u = 0; u < NV - 1; ++u) {
+				for (vertex_t v = u + 1; v < NV; ++v) {
+					if (graph.is_edge(u, v)) {
+						reordered_graph.add_edge(
+							new_order_o2n[u],
+							new_order_o2n[v]);
+					}
+				}
+			}
+
+			// Reorder vertex weights.
+			for (vertex_t v = 0; v < NV; ++v) {
+				reordered_graph.set_wv(
+					new_order_o2n[v],
+					graph.get_wv(v));
+			}
+
+			// Reorder edge weights.
+			for (vertex_t u = 0; u < NV - 1; ++u) {
+				for (vertex_t v = u + 1; v < NV; ++v) {
+					if (graph.is_edge(u, v)) {
+
+						const auto weight = graph.get_we(u, v);
+
+						reordered_graph.set_we(
+							new_order_o2n[u],
+							new_order_o2n[v],
+							weight);
+
+						reordered_graph.set_we(
+							new_order_o2n[v],
+							new_order_o2n[u],
+							weight);
+					}
+				}
+			}
+
+			// Store decoding information: [NEW] -> [OLD].
+			if (decoder != nullptr) {
+				vertex_ordering_t new_order_n2o = new_order_o2n;
+				Decode::reverse_in_place(new_order_n2o);
+				decoder->insert_ordering(new_order_n2o);
+			}
+
+			return reordered_graph;
 		}
-		return order;
-	}
 
-	template <class GraphEWT >
-	inline
-		int GraphFastRootSort_EW<GraphEWT>::reorder(const VertexOrdering& new_order, graph_type& gn, Decode* d) {
-		/////////////////////
-		// EXPERIMENTAL-ONLY FOR SIMPLE GRAPHS
-		//
-		// PARAMS
-		// @new_order: MUST BE mapping [OLD]->[NEW]!
 
-		int NV = m_gw.number_of_vertices();
-		gn.init(NV, graph_type::NOWT);
-		gn.set_name(m_gw.get_name(), false /* no path separation */);
-		gn.set_path(m_gw.get_path());
 
-		//only for undirected graphs
-		for (int i = 0; i < NV - 1; i++) {
-			for (int j = i + 1; j < NV; j++) {
-				if (m_gw.is_edge(i, j)) {									//in O(log) for sparse graphs, should be specialized for that case
-					gn.add_edge(new_order[i], new_order[j]);
+		template <class GraphEW >
+		inline
+			void GraphFastRootSort_EW<GraphEW>::reorder(
+				const vertex_ordering_t& new_order,
+				graph_ew_t& gew,
+				OrderingDecoder* d)
+		{
+			/////////////////////
+			// EXPERIMENTAL-ONLY FOR SIMPLE GRAPHS
+			//
+			// PARAMS
+			// @new_order: MUST BE mapping [OLD]->[NEW]!
+
+			int NV = graph_ew_.number_of_vertices();
+			gew.init(NV, graph_type::NOWT);
+			gew.set_name(graph_ew_.get_name(), false /* no path separation */);
+			gew.set_path(graph_ew_.get_path());
+
+			//only for undirected graphs
+			for (int i = 0; i < NV - 1; i++) {
+				for (int j = i + 1; j < NV; j++) {
+					if (graph_ew_.is_edge(i, j)) {									//in O(log) for sparse graphs, should be specialized for that case
+						gew.add_edge(new_order[i], new_order[j]);
+					}
+				}
+			}
+
+			///////////////
+			//stores decoding information [NEW]->[OLD]
+			if (d != NULL) {
+				VertexOrdering aux(new_order);
+				Decode::reverse_in_place(aux);								//maps [NEW] to [OLD]		
+				d->insert_ordering(aux);
+			}
+
+			/////////////////////
+			//weights (vertices) -update
+			for (int i = 0; i < NV; i++) {
+				gew.set_wv(new_order[i], graph_ew_.get_wv(i));
+			}
+
+			/////////////////////
+			//weights (edges)- 	
+			for (int i = 0; i < NV - 1; i++) {
+				for (int j = i + 1; j < NV; j++) {
+					if (graph_ew_.is_edge(i, j)) {
+						gew.set_we(new_order[i], new_order[j], graph_ew_.get_we(i, j));
+						gew.set_we(new_order[j], new_order[i], graph_ew_.get_we(i, j));
+					}
 				}
 			}
 		}
 
-		///////////////
-		//stores decoding information [NEW]->[OLD]
-		if (d != NULL) {
-			VertexOrdering aux(new_order);
-			Decode::reverse_in_place(aux);								//maps [NEW] to [OLD]		
-			d->insert_ordering(aux);
-		}
-
-		/////////////////////
-		//weights (vertices) -update
-		for (int i = 0; i < NV; i++) {
-			gn.set_wv(new_order[i], m_gw.get_wv(i));
-		}
-
-		/////////////////////
-		//weights (edges)- 	
-		for (int i = 0; i < NV - 1; i++) {
-			for (int j = i + 1; j < NV; j++) {
-				if (m_gw.is_edge(i, j)) {
-					gn.set_we(new_order[i], new_order[j], m_gw.get_we(i, j));
-					gn.set_we(new_order[j], new_order[i], m_gw.get_we(i, j));
-				}
-			}
-		}
-
-		return 0;
-	}
+	} // end of namespace graph_utils
 
 }//end of namespace bitgraph
 
 
 
-
-#endif  //__GRAPH_FAST_SORT_EDGE_WEIGHTED_H__
+#endif  // BITGRAPH_GRAPH_GRAPH_FAST_SORT_EDGE_WEIGHTED_H__
 

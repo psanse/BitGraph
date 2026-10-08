@@ -1,12 +1,16 @@
 /**
-* @file graph_fast_sort_weighted.h
-* @brief header for GraphFastRootSort_W_W class which sorts weighted graphs by different criteria
-* @details: created 12/03/21, last_update 28/02/25
-* @author pss
-**/
+ * @file graph_fast_sort_vertex_weighted.h
+ * @brief Vertex-ordering algorithms for vertex-weighted graphs.
+ *
+ * Defines `GraphFastRootSort_VW`, which extends `GraphFastRootSort`
+ * with vertex-ordering strategies based on vertex weights.
+ *
+ * @author pss
+ * @details Created 12/03/2021, last updated 08/10/2026.
+ */
 
-#ifndef BITGRAPH_GRAPH_GRAPH_FAST_SORT_WEIGHTED_H
-#define BITGRAPH_GRAPH_GRAPH_FAST_SORT_WEIGHTED_H
+#ifndef BITGRAPH_GRAPH_GRAPH_FAST_SORT_VERTEX_WEIGHTED_H
+#define BITGRAPH_GRAPH_GRAPH_FAST_SORT_VERTEX_WEIGHTED_H
 
 #include "graph_fast_sort.h"
 #include "ordering_decoder.h"	
@@ -31,7 +35,7 @@ namespace bitgraph {
 		 *       `GraphFastRootSort<typename GraphW::graph_type>`.
 		 */
 		template <class GraphW>
-		class GraphFastRootSort_W  : public GraphFastRootSort <typename GraphW::graph_type>  
+		class GraphFastRootSort_VW  : public GraphFastRootSort <typename GraphW::graph_type>  
 		{
 
 		public:
@@ -83,7 +87,7 @@ namespace bitgraph {
 			 * @brief Computes a new vertex ordering using a legacy integer strategy code.
 			 *
 			 * Supports both the unweighted strategies inherited from the base class and
-			 * the weighted strategies defined by `GraphFastRootSort_W`.
+			 * the weighted strategies defined by `GraphFastRootSort_VW`.
 			 *
 			 * @param strategy Sorting strategy encoded as an integer.
 			 * @param last_to_first If `true`, reverses the resulting ordering.
@@ -158,7 +162,7 @@ namespace bitgraph {
 				const vertex_ordering_t& new_order_o2n,
 				OrderingDecoder* decoder = nullptr) const
 			{
-				return GraphFastRootSort_W::reorder(
+				return GraphFastRootSort_VW::reorder(
 					this->graph(),
 					new_order_o2n,
 					decoder);
@@ -167,16 +171,16 @@ namespace bitgraph {
 
 			////////////////////////
 			//construction / destruction
-			GraphFastRootSort_W(graph_w_t& gw) 
-				: GraphFastRootSort<typename graph_w_t::graph_type>(gw.graph()), graphw_(gw) {}
+			GraphFastRootSort_VW(graph_w_t& gw) 
+				: base_t(gw.graph()), graphw_(gw) {}
 
 			// move and copy semantics disallowed
-			GraphFastRootSort_W(const GraphFastRootSort_W&) = delete;
-			GraphFastRootSort_W& operator=	(const GraphFastRootSort_W&) = delete;
-			GraphFastRootSort_W(GraphFastRootSort_W&&)	noexcept = delete;
-			GraphFastRootSort_W& operator=	(GraphFastRootSort_W&&)	noexcept = delete;
+			GraphFastRootSort_VW(const GraphFastRootSort_VW&) = delete;
+			GraphFastRootSort_VW& operator=	(const GraphFastRootSort_VW&) = delete;
+			GraphFastRootSort_VW(GraphFastRootSort_VW&&)	noexcept = delete;
+			GraphFastRootSort_VW& operator=	(GraphFastRootSort_VW&&)	noexcept = delete;
 
-			~GraphFastRootSort_W() = default;
+			~GraphFastRootSort_VW() = default;
 
 			//////////
 			// setters / getters
@@ -215,7 +219,7 @@ namespace bitgraph {
 
 	}//end of namespace graph_utils	
 
-	using graph_utils::GraphFastRootSort_W;		//alias for the GraphFastRootSort_W class
+	using graph_utils::GraphFastRootSort_VW;		//alias for the GraphFastRootSort_VW class
 
 }//end of namespace bitgraph
 
@@ -228,7 +232,7 @@ namespace bitgraph {
 
 		template <class GraphW >
 		inline auto
-			GraphFastRootSort_W<GraphW>::new_order(
+			GraphFastRootSort_VW<GraphW>::new_order(
 				int strategy,
 				bool last_to_first, 
 				bool old_to_new) -> vertex_ordering_t 
@@ -259,7 +263,7 @@ namespace bitgraph {
 				break;
 
 			default:
-				LOG_ERROR("unknown algorithm - GraphFastRootSort_W<GraphW>::new_order(...)");
+				LOG_ERROR("unknown algorithm - GraphFastRootSort_VW<GraphW>::new_order(...)");
 				std::terminate();
 			}
 			return this->nodes_;
@@ -267,7 +271,7 @@ namespace bitgraph {
 
 		template <class GraphW >
 		inline auto
-			GraphFastRootSort_W<GraphW>::new_order(
+			GraphFastRootSort_VW<GraphW>::new_order(
 				strategy_t strategy,
 				placement_t placement,
 				sort_order_t order) -> vertex_ordering_t
@@ -286,7 +290,7 @@ namespace bitgraph {
 			default:
 				LOG_ERROR(
 					"unknown sorting algorithm -"
-					"GraphFastRootSort_W<GraphW>::new_order(...)");
+					"GraphFastRootSort_VW<GraphW>::new_order(...)");
 				std::terminate();
 			}
 
@@ -299,7 +303,7 @@ namespace bitgraph {
 		}
 
 		template<class GraphW>
-		inline auto GraphFastRootSort_W<GraphW>::reorder(
+		inline auto GraphFastRootSort_VW<GraphW>::reorder(
 			const graph_w_t& graph, 
 			const vertex_ordering_t& new_order_o2n, 
 			OrderingDecoder* decoder) -> graph_w_t
@@ -344,7 +348,7 @@ namespace bitgraph {
 
 		template<class GraphW>
 		inline auto
-			GraphFastRootSort_W<GraphW>::sort_by_non_increasing_weight(
+			GraphFastRootSort_VW<GraphW>::sort_by_non_increasing_weight(
 				bool reverse) -> const vertex_ordering_t&
 		{
 			// Set the trivial ordering [0, NV - 1] as the starting point.
@@ -366,7 +370,7 @@ namespace bitgraph {
 
 		template<class GraphW>
 		inline auto
-			GraphFastRootSort_W<GraphW>::sort_by_non_decreasing_weight(
+			GraphFastRootSort_VW<GraphW>::sort_by_non_decreasing_weight(
 				bool reverse) -> const vertex_ordering_t&
 		{
 			
@@ -390,5 +394,5 @@ namespace bitgraph {
 
 }//end of namespace bitgraph	
 
-#endif //  BITGRAPH_GRAPH_GRAPH_FAST_SORT_WEIGHTED_H
+#endif //  BITGRAPH_GRAPH_GRAPH_FAST_SORT_VERTEX_WEIGHTED_H
 
