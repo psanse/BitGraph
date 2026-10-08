@@ -30,11 +30,14 @@ namespace bitgraph {
 		public:
 			using basic_type = GraphW;									//weighted graph type
 			using type = GraphFastRootSort_W<GraphW>;					//own type	
-			using ugtype = typename basic_type::graph_type;				//non-weighted graph type	
-			using ptype = GraphFastRootSort <ugtype>;					//parent type
-			using Weight = typename GraphW::Weight;						//weight type
+			using graph_type = typename basic_type::graph_type;			//non-weighted graph type	
+			using ptype = GraphFastRootSort <graph_type>;				//parent type
+			using Weight = typename basic_type::Weight;					//weight type
 
+			// useful aliases
 			using graph_w_t = basic_type;
+			using weight_t = Weight;
+			using parent_t = ptype;
 
 			//using ptype::vertex_ordering_t;
 			using VertexOrdering = typename ptype::vertex_ordering_t;
@@ -48,9 +51,7 @@ namespace bitgraph {
 			// backward compatibility with existing code
 			enum { MAX_WEIGHT = 100, MIN_WEIGHT };						//sorting algorithms for weighted graphs	
 
-			
-
-			////////////////
+						////////////////
 			// public interface 
 		public:
 			/*
