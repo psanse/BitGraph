@@ -88,6 +88,7 @@ namespace bitgraph {
 						
 			using strategy_t = strategy;
 			using placement_t = placement;
+			using sort_order_t = sort_order;
 
 			// for backward compatibility with existing code
 			using strategy_type = strategy_t;
@@ -145,7 +146,7 @@ namespace bitgraph {
 			 * @deprecated Use the overload accepting `strategy_t` and `placement_t`.
 			 */
 			[[deprecated("Use new_order(strategy_t, placement_t, bool) instead")]]
-			virtual vertex_ordering_t new_order(
+			vertex_ordering_t new_order(
 				int strategy, 
 				bool last_to_first = true, 
 				bool old_to_new = true);
@@ -155,19 +156,19 @@ namespace bitgraph {
 			 *
 			 * @param strategy Sorting strategy.
 			 * @param placement Vertex placement policy.
-			 * @param old_to_new If `true`, returns the ordering in [OLD]->[NEW] format;
+			 * @param order If `true`, returns the ordering in [OLD]->[NEW] format;
 			 *                   otherwise, in [NEW]->[OLD] format.
 			 * @return The computed vertex ordering.
 			 */
-			virtual vertex_ordering_t new_order(
+			 vertex_ordering_t new_order(
 				strategy_t strategy,
 				placement_t placement = placement_t::last_to_first,
-				sort_order old_to_new = sort_order::old_to_new)
+				sort_order order = sort_order::old_to_new)
 			{
 				return new_order(
 					static_cast<int>(strategy), 
 					placement == placement_t::last_to_first,
-					old_to_new == sort_order::old_to_new);
+					order == sort_order::old_to_new);
 			}
 
 			/**
@@ -191,7 +192,7 @@ namespace bitgraph {
 			 */
 
 			[[deprecated("Use new_order(strategy_t,  vertex_bitset_t, placement_t, bool) instead")]]
-			virtual vertex_ordering_t new_order(
+			 vertex_ordering_t new_order(
 				int strategy, 
 				vertex_bitset_t& vertex_set,
 				bool last_to_first = true, 
@@ -205,21 +206,21 @@ namespace bitgraph {
 			 * @param strategy Sorting strategy.
 			 * @param vertex_set Bitset encoding the vertices of the induced subgraph.			 *            
 			 * @param placement Vertex placement policy.
-			 * @param old_to_new If `true`, returns the ordering in [OLD]->[NEW] format;
+			 * @param order If `true`, returns the ordering in [OLD]->[NEW] format;
 			 *                   otherwise, in [NEW]->[OLD] format.
 			 * @return The computed vertex ordering.
 			 */
-			virtual vertex_ordering_t new_order(
+			 vertex_ordering_t new_order(
 				strategy_t strategy,
 				vertex_bitset_t& vertex_set,
 				placement_t placement = placement_t::last_to_first,
-				sort_order old_to_new = sort_order::old_to_new) 
+				sort_order order = sort_order::old_to_new) 
 			{
 				return new_order(
 					static_cast<int>(strategy),
 					vertex_set,
 					placement == placement_t::last_to_first,
-					old_to_new == sort_order::old_to_new);
+					order == sort_order::old_to_new);
 			}
 			
 			/**

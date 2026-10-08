@@ -5,8 +5,8 @@
 * @author pss
 **/
 
-#ifndef BITGRAPH_GRAPH_GRAPH_FAST_SORT_WEIGHTED_H__
-#define BITGRAPH__GRAPH_FAST_SORT_WEIGHTED_H__
+#ifndef BITGRAPH_GRAPH_GRAPH_FAST_SORT_WEIGHTED_H
+#define BITGRAPH_GRAPH_GRAPH_FAST_SORT_WEIGHTED_H
 
 #include "graph_fast_sort.h"
 #include "ordering_decoder.h"	
@@ -15,17 +15,24 @@
 
 namespace bitgraph {
 
-	namespace _impl {
+	namespace graph_utils {
 
-		///////////////////////////
-		//
-		// class GraphFastRootSort_W
-		// (ordering of vertices for vertex weighted graphs)
-		//
-		////////////////////////////
-
+		/**
+		 * @brief Vertex-ordering utilities for vertex-weighted graphs.
+		 *
+		 * Extends `GraphFastRootSort` with ordering strategies based on vertex
+		 * weights while retaining the unweighted ordering strategies provided by
+		 * the base class.
+		 *
+		 * @tparam GraphW Vertex-weighted graph type. The type must provide a
+		 *                `graph_type` member identifying the underlying graph type.
+		 *
+		 * @note The class inherits from
+		 *       `GraphFastRootSort<typename GraphW::graph_type>`.
+		 */
 		template <class GraphW>
-		class GraphFastRootSort_W : public GraphFastRootSort <typename GraphW::graph_type> {
+		class GraphFastRootSort_W  : public GraphFastRootSort <typename GraphW::graph_type>  
+		{
 
 		public:
 
@@ -41,93 +48,174 @@ namespace bitgraph {
 			using Weight = weight_t;									//weight type
 			using VertexOrdering = vertex_ordering_t;
 			
-			//using type = GraphFastRootSort_W<GraphW>;					//own type
-			//using ugtype = typename basic_type::graph_type;			//non-weighted graph type	
 
+			// specialized enums for vertex weighted sorting strategies
 			enum class strategy {
 				max_weight = 100,
 				min_weight
 			};
-
-			using base_strategy_t = typename base_t::strategy;
+						
+			using strategy_t = strategy;
+			using base_strategy_t = typename base_t::strategy_t;
+			using sort_order_t = typename base_t::sort_order_t;
+			
 
 			// enum for backward compatibility with existing code
 			enum { MAX_WEIGHT = 100, MIN_WEIGHT };					
-
-		
-
-			////////////////
-			// public interface 
+									
 		public:
-			/*
-			* @brief Computes a new_order
-			* @param alg sorting algorithm
-			* @param ltf  last to first if TRUE
-			* @param o2n  old to new if TRUE
-			*/
-			VertexOrdering new_order(
-				int alg, 
-				bool ltf = true,
-				bool o2n = true) override;
 
-			/*
-			* @brief Creates a weighted graph isomorphism for a given ordering
-			* @param gn output isomorphic weighted graph
-			* @param new_order given ordering in [OLD]->[NEW] format
-			* @param d ptr to decode object to store the ordering
-			* @comments only for simple undirected graphs with no weights
-			* @return 0 if successful
-			*/
-			int reorder(
-				const VertexOrdering& new_order, 
-				graph_w_t& gn,
-				Decode* d = nullptr) ;
+			/**
+			 * @brief Reorders the vertices of a graph according to a given ordering.
+			 *
+			 * @param graph Input graph.
+			 * @param new_order_o2n Vertex ordering used to relabel the graph in [OLD]->[NEW] format.
+			 * @param decoder Optional decoder updated with the corresponding [NEW]->[OLD] vertex mapping..
+			 * @return A reordered copy of the input graph.
+			 */
+			static graph_w_t reorder(
+				const graph_w_t& graph,
+				const vertex_ordering_t& new_order_o2n,
+				OrderingDecoder* decoder = nullptr);
+
+
+			/**
+			 * @brief Computes a new vertex ordering using a legacy integer strategy code.
+			 *
+			 * Supports both the unweighted strategies inherited from the base class and
+			 * the weighted strategies defined by `GraphFastRootSort_W`.
+			 *
+			 * @param strategy Sorting strategy encoded as an integer.
+			 * @param last_to_first If `true`, reverses the resulting ordering.
+			 * @param old_to_new If `true`, returns the ordering in [OLD]->[NEW] format;
+			 *                   otherwise, in [NEW]->[OLD] format.
+			 * @return The computed vertex ordering.
+			 *
+			 * @warning Calls `std::terminate()` if `strategy` does not identify a valid
+			 *          sorting strategy.
+			 *
+			 * @deprecated Use the typed `new_order()` overloads instead.
+			 */
+			[[deprecated("Use the typed new_order() overloads instead")]]
+			vertex_ordering_t new_order(
+				int strategy,
+				bool last_to_first = true,
+				bool old_to_new = true);
+
+			/**
+			 * @brief Computes a new vertex ordering using an unweighted sorting strategy.
+			 *
+			 * This overload forwards the request to the base `GraphFastRootSort`
+			 * implementation.
+			 *
+			 * @param strategy Unweighted sorting strategy.
+			 * @param placement Vertex placement policy.
+			 * @param order Ordering format to return  (old->new or new->old).
+			 * @return The computed vertex ordering.
+			 *
+			 * @warning Calls `std::terminate()` if `strategy` is not a valid
+			 *          unweighted sorting strategy.
+			 */
+			vertex_ordering_t new_order(
+				base_strategy_t strategy,
+				placement_t placement = placement_t::last_to_first,
+				sort_order_t order = sort_order_t::old_to_new)
+			{
+				return base_t::new_order(strategy, placement, order);
+			}
 						
+
+			/**
+			 * @brief Computes a new vertex ordering using a weighted sorting strategy.
+			 *
+			 * @param strategy Weighted sorting strategy.
+			 * @param placement Vertex placement policy.
+			 * @param old_to_new If `true`, returns the ordering in [OLD]->[NEW] format;
+			 *                   otherwise, in [NEW]->[OLD] format.
+			 * @return The computed vertex ordering.
+			 *
+			 * @warning Calls `std::terminate()` if `strategy` is not a valid
+			 *          weighted sorting strategy.
+			 */
+			vertex_ordering_t new_order(
+				strategy_t strategy,
+				placement_t placement = placement_t::last_to_first,
+				sort_order_t order = sort_order_t::old_to_new);
+	
+			/**
+			 * @brief Reorders the vertices of the associated graph.
+			 *
+			 * Creates an isomorphic graph by relabeling its vertices according to
+			 * `new_order_o2n`. This overload operates on the graph associated with
+			 * the sorter and forwards the operation to the static `reorder()` function.
+			 *
+			 * @param new_order_o2n Vertex ordering in [OLD]->[NEW] format.
+			 * @param decoder Optional decoder updated with the corresponding
+			 *                [NEW]->[OLD] vertex mapping.
+			 * @return The reordered graph.
+			 */
+			graph_w_t reorder(
+				const vertex_ordering_t& new_order_o2n,
+				OrderingDecoder* decoder = nullptr) const
+			{
+				return GraphFastRootSort_W::reorder(
+					this->graph(),
+					new_order_o2n,
+					decoder);
+			}
+					
 
 			////////////////////////
 			//construction / destruction
-			GraphFastRootSort_W(graph_w_t& gw) : GraphFastRootSort<typename graph_w_t::graph_type>(gw.graph()), gw_(gw) {}
+			GraphFastRootSort_W(graph_w_t& gw) 
+				: GraphFastRootSort<typename graph_w_t::graph_type>(gw.graph()), graphw_(gw) {}
 
-			//move and copy semantics
+			// move and copy semantics disallowed
 			GraphFastRootSort_W(const GraphFastRootSort_W&) = delete;
 			GraphFastRootSort_W& operator=	(const GraphFastRootSort_W&) = delete;
-			GraphFastRootSort_W(GraphFastRootSort_W&&)		noexcept = delete;
-			GraphFastRootSort_W& operator=	(GraphFastRootSort_W&&)		noexcept = delete;
+			GraphFastRootSort_W(GraphFastRootSort_W&&)	noexcept = delete;
+			GraphFastRootSort_W& operator=	(GraphFastRootSort_W&&)	noexcept = delete;
 
 			~GraphFastRootSort_W() = default;
 
 			//////////
 			// setters / getters
-			const graph_w_t& graph() const { return gw_; }
-
-			////////
-			//internals
+			
+			const graph_w_t& graph() const { return graphw_; }
+						
 		private:
-			/*
-			* @brief Non-degenerate maximum weight sorting of vertices
-			* @param ltf last to first if TRUE
-			* @comments uses stable sort
-			* @returns reference to the new ordering in @nodes_ ([OLD]->[NEW] format)
-			*/
-			const VertexOrdering& sort_by_non_increasing_weight(bool ltf = true);
+			
+			/**
+			 * @brief Computes a non-increasing vertex ordering by weight.
+			 *
+			 * Vertices are ordered by non-increasing weight using a stable sort.
+			 *
+			 * @param reverse If `true`, reverses the resulting ordering.
+			 * @return Reference to the computed vertex ordering stored in `nodes_`,
+			 *         in [NEW]->[OLD] format.
+			 */
+			const vertex_ordering_t& sort_by_non_increasing_weight(bool reverse = true);
 
-			/*
-			* @brief Non-degenerate minimum weight sorting of vertices
-			* @param ltf last to first if TRUE
-			* @comments uses stable sort
-			* @returns reference to the new ordering in @nodes_ ([OLD]->[NEW] format)
-			*/
-			const VertexOrdering& sort_by_non_decreasing_weight(bool ltf = true);
+			/**
+			 * @brief Computes a non-decreasing vertex ordering by weight.
+			 *
+			 * Vertices are ordered by non-decreasing weight using a stable sort.
+			 *
+			 * @param reverse If `true`, reverses the resulting ordering.
+			 * @return Reference to the computed vertex ordering stored in `nodes_`,
+			 *         in [NEW]->[OLD] format.
+			 */
+			const vertex_ordering_t& sort_by_non_decreasing_weight(bool reverse = true);
 
 			////////////////
 			// data members	
 		private:
-			const graph_w_t& gw_;
+			const graph_w_t& graphw_;
 		};
 
-	}//end of namespace _impl	
+	}//end of namespace graph_utils	
 
-	using _impl::GraphFastRootSort_W;		//alias for the GraphFastRootSort_W class
+	using graph_utils::GraphFastRootSort_W;		//alias for the GraphFastRootSort_W class
 
 }//end of namespace bitgraph
 
@@ -136,122 +224,171 @@ namespace bitgraph {
 
 namespace bitgraph {
 
-	template <class GraphW >
-	inline auto
-	 GraphFastRootSort_W<GraphW>::new_order(int alg, bool ltf, bool o2n) -> VertexOrdering {
-		this->nodes_.clear();											
+	namespace graph_utils {
 
-		switch (alg) {
-		case ptype::NONE:
-		case ptype::MIN_DEGEN:
-		case ptype::MIN_DEGEN_COMPO:
-		case ptype::MAX_DEGEN:
-		case ptype::MAX_DEGEN_COMPO:
-		case ptype::MAX:
-		case ptype::MIN:
-		case ptype::MAX_WITH_SUPPORT:
-		case ptype::MIN_WITH_SUPPORT:
+		template <class GraphW >
+		inline auto
+			GraphFastRootSort_W<GraphW>::new_order(
+				int strategy,
+				bool last_to_first, 
+				bool old_to_new) -> vertex_ordering_t 
+		{
+			this->nodes_.clear();
 
-			ptype::new_order(alg, ltf, o2n);				//sorts the graph according to non-weighted criteria
-			break;
+			switch (strategy) {
+			case ptype::NONE:
+			case ptype::MIN_DEGEN:
+			case ptype::MIN_DEGEN_COMPO:
+			case ptype::MAX_DEGEN:
+			case ptype::MAX_DEGEN_COMPO:
+			case ptype::MAX:
+			case ptype::MIN:
+			case ptype::MAX_WITH_SUPPORT:
+			case ptype::MIN_WITH_SUPPORT:
 
-		case MAX_WEIGHT:						//currently the only sorting algorithm for weighted graphs
-			sort_by_non_increasing_weight(ltf);
-			if (!o2n) { Decode::reverse_in_place(this->nodes_); }
-			break;
-		case MIN_WEIGHT:						//currently the only sorting algorithm for weighted graphs
-			sort_by_non_decreasing_weight(ltf);
-			if (!o2n) { Decode::reverse_in_place(this->nodes_); }
-			break;
+				ptype::new_order(strategy, last_to_first, old_to_new);			//sorts the graph according to non-weighted criteria
+				break;
 
-		default:
-			LOG_ERROR("unknown algorithm - GraphFastRootSort_W<GraphW>::new_order(...)");
-			LOG_ERROR("exiting...");
-			exit(-1);
+			case MAX_WEIGHT:						//currently the only sorting algorithm for weighted graphs
+				sort_by_non_increasing_weight(last_to_first);
+				if (!old_to_new) { Decode::reverse_in_place(this->nodes_); }
+				break;
+			case MIN_WEIGHT:						//currently the only sorting algorithm for weighted graphs
+				sort_by_non_decreasing_weight(last_to_first);
+				if (!old_to_new) { Decode::reverse_in_place(this->nodes_); }
+				break;
+
+			default:
+				LOG_ERROR("unknown algorithm - GraphFastRootSort_W<GraphW>::new_order(...)");
+				std::terminate();
+			}
+			return this->nodes_;
 		}
-		return this->nodes_;
-	}
 
-	template <class GraphW >
-	inline
-		int GraphFastRootSort_W<GraphW>::reorder(
-			const VertexOrdering& new_order,
-			graph_w_t& gn, Decode* d) 
-	{
+		template <class GraphW >
+		inline auto
+			GraphFastRootSort_W<GraphW>::new_order(
+				strategy_t strategy,
+				placement_t placement,
+				sort_order_t order) -> vertex_ordering_t
+		{
+			switch (strategy) {
+			case strategy::max_weight:
+				sort_by_non_increasing_weight(
+					placement == placement_t::last_to_first);
+				break;
 
-		int NV = gw_.num_vertices();
+			case strategy::min_weight:
+				sort_by_non_decreasing_weight(
+					placement == placement_t::last_to_first);
+				break;
 
-		//assigns unit weights(1.0) 	
-		gn.reset(NV, 1.0);
+			default:
+				LOG_ERROR(
+					"unknown sorting algorithm -"
+					"GraphFastRootSort_W<GraphW>::new_order(...)");
+				std::terminate();
+			}
 
-		//copy graph data
-		gn.set_name(gw_.name());
-		gn.set_path(gw_.path());
+			// Assuming weighted sorting primitives produce [NEW] -> [OLD].
+			if (order == sort_order_t::old_to_new) {
+				Decode::reverse_in_place(this->nodes_);
+			}
 
-		//generate isomorphism (only for undirected graphs)
-		for (auto i = 0; i < NV - 1; ++i) {
-			for (auto j = i + 1; j < NV; ++j) {
-				if (gw_.is_edge(i, j)) {								//is_edge is in O(log) for sparse graphs, should be specialized for that case
-					//switch edges according to new numbering
-					gn.add_edge(new_order[i], new_order[j]);
+			return this->nodes_;
+		}
+
+		template<class GraphW>
+		inline auto GraphFastRootSort_W<GraphW>::reorder(
+			const graph_w_t& graph, 
+			const vertex_ordering_t& new_order_o2n, 
+			OrderingDecoder* decoder) -> graph_w_t
+		{
+
+			const int NV = graph.num_vertices();
+
+			graph_w_t reordered_graph;
+			reordered_graph.reset(NV, weight_t{ 1 });
+
+			// Copy graph metadata.
+			reordered_graph.set_name(graph.name());
+			reordered_graph.set_path(graph.path());
+
+			// Generate the reordered graph.
+			for (vertex_t u = 0; u < NV - 1; ++u) {
+				for (vertex_t v = u + 1; v < NV; ++v) {
+					if (graph.is_edge(u, v)) {
+						reordered_graph.add_edge(
+							new_order_o2n[u],
+							new_order_o2n[v]);
+					}
 				}
 			}
+
+			// Reorder vertex weights.
+			for (vertex_t v = 0; v < NV; ++v) {
+				reordered_graph.set_weight(
+					new_order_o2n[v],
+					graph.weight(v));
+			}
+
+			// Store decoding information: [NEW] -> [OLD].
+			if (decoder != nullptr) {
+				vertex_ordering_t new_order_n2o = new_order_o2n;
+				Decode::reverse_in_place(new_order_n2o);
+				decoder->add_ordering(new_order_n2o);
+			}
+
+			return reordered_graph;			
 		}
 
-		/////////////////////
-		//vertex weights update
-		for (auto i = 0; i < NV; i++) {
-			gn.set_weight(new_order[i], gw_.weight(i));
+		template<class GraphW>
+		inline auto
+			GraphFastRootSort_W<GraphW>::sort_by_non_increasing_weight(
+				bool reverse) -> const vertex_ordering_t&
+		{
+			// Set the trivial ordering [0, NV - 1] as the starting point.
+			base_t::set_ordering();
+					
+			utils::has_greater_val< vertex_t, std::vector<weight_t> > pred(
+				graphw_.weight());
+
+			std::stable_sort(this->nodes_.begin(), this->nodes_.end(), pred);
+			
+
+			//reverse order if required
+			if (reverse) {
+				std::reverse(this->nodes_.begin(), this->nodes_.end()); 
+			}
+
+			return this->nodes_;
 		}
 
-		///////////////
-		//stores decoding information [NEW]->[OLD]
-		if (d != nullptr) {
-			VertexOrdering aux(new_order);										//@new_order is in format [OLD]->[NEW]
-			Decode::reverse_in_place(aux);								//@aux is in format [NEW] to [OLD]		
-			d->add_ordering(aux);
+		template<class GraphW>
+		inline auto
+			GraphFastRootSort_W<GraphW>::sort_by_non_decreasing_weight(
+				bool reverse) -> const vertex_ordering_t&
+		{
+			
+			// Set the trivial ordering [0, NV - 1] as the starting point.
+			base_t::set_ordering();
+					
+			utils::has_smaller_val< int, std::vector<Weight> > pred(
+				graphw_.weight());
+
+			std::stable_sort(this->nodes_.begin(), this->nodes_.end(), pred);
+			
+			//reverse order if required
+			if (reverse) {
+				std::reverse(this->nodes_.begin(), this->nodes_.end());
+			}
+
+			return this->nodes_;
 		}
 
-		return 0;
-	}
-
-	template<class GraphW_t>
-	inline auto
-	GraphFastRootSort_W<GraphW_t>::sort_by_non_increasing_weight(bool ltf) -> const VertexOrdering&
-	{
-		//set trivial ordering [1..NV] in @nodes_ as starting point 
-		ptype::set_ordering();
-
-		/////////////////////////////////////////////////////////////////////////////
-		utils::has_greater_val< int, std::vector<Weight> > pred(gw_.weight());
-		std::stable_sort(this->nodes_.begin(), this->nodes_.end(), pred);
-		/////////////////////////////////////////////////////////////////////////////
-
-		//reverse order if required
-		if (ltf) { std::reverse(this->nodes_.begin(), this->nodes_.end()); }
-
-		return this->nodes_;
-	}
-
-	template<class GraphW_t>
-	inline auto
-	GraphFastRootSort_W<GraphW_t>::sort_by_non_decreasing_weight(bool ltf) -> const VertexOrdering&
-	{
-		//set trivial ordering [1..NV] in @nodes_ as starting point 
-		ptype::set_ordering();
-
-		/////////////////////////////////////////////////////////////////////////////
-		utils::has_smaller_val< int, std::vector<Weight> > pred(gw_.weight());
-		std::stable_sort(this->nodes_.begin(), this->nodes_.end(), pred);
-		/////////////////////////////////////////////////////////////////////////////
-
-		//reverse order if required
-		if (ltf) { std::reverse(this->nodes_.begin(), this->nodes_.end()); }
-
-		return this->nodes_;
-	}
+	}// end of namespace graph_utils
 
 }//end of namespace bitgraph	
 
-#endif
+#endif //  BITGRAPH_GRAPH_GRAPH_FAST_SORT_WEIGHTED_H
 

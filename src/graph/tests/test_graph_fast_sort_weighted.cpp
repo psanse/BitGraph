@@ -1,134 +1,505 @@
 /*
-* @file test_graph_fast_sort_weighted.cpp 
-* @biref Unit tests for Class GraphFastRootSort_W for vertex-weighted graphs (header graph_fast_sort_weighted.h)
-* @created ?
-* @last_update 27/01/25
-*/ 
-
+ * @file test_graph_fast_sort_weighted.cpp
+ * @brief Unit tests for GraphFastRootSort_W for vertex-weighted graphs
+ *        (header graph_fast_sort_weighted.h).
+ * @created ?
+ * @last_update 08/10/26
+ */
 
 #include "graph/algorithms/graph_fast_sort.h"
 #include "graph/algorithms/graph_fast_sort_weighted.h"
 #include "graph/graph_vertex_weighted.h"
+
 #include "gtest/gtest.h"
-#include <iostream>
-//#include "utils/common.h"
-#include "utils/logger.h"
-#include "utils/file_utils.h"
-#include <string>
 
-using namespace std;
-using namespace bitgraph;	
+#include <vector>
 
-class GraphFastRootSortWeightedTest : public ::testing::Test {
-protected:
-	void SetUp() override {
-		ugw.reset(NV);
-		ugw.add_edge(1, 2);
-		ugw.add_edge(1, 5);
-		ugw.add_edge(2, 4);
-		ugw.add_edge(2, 5);
-		ugw.add_edge(3, 5);		
+using namespace bitgraph;
 
-		ugw.set_weight(0, 4.0);
-		ugw.set_weight(1, 5.0);
-		ugw.set_weight(2, 3.0);
+namespace {
 
-		//rest of vertices have default weight 1.0
-	}
+    class GraphFastRootSortWeightedTest : public ::testing::Test {
+    protected:
 
-	void TearDown() override {}
-	
-	//ugraph instance	
-	//deg(5)=3,  deg(2)=3, deg(1)=2,  deg(3)=1, deg(4)=1, deg(0)=0
-	const int NV = 6;
-	ugraph_w ugw;
-};
+        void SetUp() override {
+
+            ugw.reset(NV);
+
+            ugw.add_edge(1, 2);
+            ugw.add_edge(1, 5);
+            ugw.add_edge(2, 4);
+            ugw.add_edge(2, 5);
+            ugw.add_edge(3, 5);
+
+            ugw.set_weight(0, 4.0);
+            ugw.set_weight(1, 5.0);
+            ugw.set_weight(2, 3.0);
+
+            // Remaining vertices have the default weight 1.0.
+        }
+
+        void TearDown() override {}
+
+        /*
+         * Degrees:
+         *
+         * deg(5) = 3
+         * deg(2) = 3
+         * deg(1) = 2
+         * deg(3) = 1
+         * deg(4) = 1
+         * deg(0) = 0
+         */
+        const int NV = 6;
+
+        ugraph_w ugw;
+    };
+
+}
+
+
+// ---------------------------------------------------------------
+// Constructor
+// ---------------------------------------------------------------
 
 TEST_F(GraphFastRootSortWeightedTest, constructor) {
-	using gt = GraphFastRootSort_W<ugraph_w>;
-	gt sorter(ugw);
 
-	//test unweighted part of the graph
-	auto gw = sorter.graph();
-	////////////////////////////////////////////
-	EXPECT_EQ(sorter.num_vertices(), gw.num_vertices());
-	EXPECT_EQ(NV, gw.num_vertices());
-	////////////////////////////////////////////
+    using gt = GraphFastRootSort_W<ugraph_w>;
 
-	//test weights
-	////////////////////////////////////////////
-	EXPECT_DOUBLE_EQ(4.0, gw.weight(0));
-	EXPECT_DOUBLE_EQ(5.0, gw.weight(1));
-	EXPECT_DOUBLE_EQ(3.0, gw.weight(2));
-	EXPECT_DOUBLE_EQ(1.0, gw.weight(3));
-	EXPECT_DOUBLE_EQ(1.0, gw.weight(4));
-	EXPECT_DOUBLE_EQ(1.0, gw.weight(5));
-	////////////////////////////////////////////
+    gt sorter(ugw);
+
+    const auto& gw = sorter.graph();
+
+    // Graph structure.
+    EXPECT_EQ(NV, sorter.num_vertices());
+    EXPECT_EQ(NV, gw.num_vertices());
+
+    // Vertex weights.
+    EXPECT_DOUBLE_EQ(4.0, gw.weight(0));
+    EXPECT_DOUBLE_EQ(5.0, gw.weight(1));
+    EXPECT_DOUBLE_EQ(3.0, gw.weight(2));
+    EXPECT_DOUBLE_EQ(1.0, gw.weight(3));
+    EXPECT_DOUBLE_EQ(1.0, gw.weight(4));
+    EXPECT_DOUBLE_EQ(1.0, gw.weight(5));
 }
 
-TEST_F(GraphFastRootSortWeightedTest, new_order) {
-		
-	using gt = GraphFastRootSort_W<ugraph_w>;
-	gt sorter(ugw);	
 
-	//sort by min degree (non-decreasing)
-	VertexMapping mapping_deg = sorter.new_order(gt::ptype::MIN, false /*f2l*/, true /*o2n*/);
-	
-	////////////////////////////////////////////
-	VertexMapping mapping_deg_exp = { 0, 3, 4, 1, 2, 5 };
-	EXPECT_EQ(mapping_deg, mapping_deg_exp);
-	////////////////////////////////////////////
-		   	
-	//I/O
-	//cout << "absolute min degree ordering with format:  first-to-last, new-to-old" << endl;
-	//sorter.print(static_cast<int>(gt::sort_print_t::PRINT_NODES), cout);					
-	
-	//sort according to non-increasing weight
-	VertexMapping mapping_dec_weight = sorter.new_order(gt::MAX_WEIGHT, false /*f2l*/, true /*o2n*/);
+// ---------------------------------------------------------------
+// Typed unweighted ordering
+// ---------------------------------------------------------------
 
-	////////////////////////////////////////////
-	VertexMapping mapping_dec_weight_exp = { 1, 0, 2, 3, 4, 5 };				//w(1)=5.0,  w(0)=4.0, w(2)=3.0,  w(3)=1.0, w(4)=1.0, w(5)=1.0
-	EXPECT_EQ(mapping_dec_weight, mapping_dec_weight_exp);
-	///////////////////////////////////////////
+TEST_F(GraphFastRootSortWeightedTest, new_order_unweighted) {
 
-	//sort according to non-decreasing weight
-	VertexMapping mapping_inc_weight = sorter.new_order(gt::MIN_WEIGHT, false /*f2l*/, true /*o2n*/);
+    using gt = GraphFastRootSort_W<ugraph_w>;
 
-	////////////////////////////////////////////
-	VertexMapping mapping_inc_weight_exp = { 3, 4, 5, 2, 0, 1 };				//w(3)=1.0,  w(4)=1.0, w(5)=1.0,  w(2)=3.0, w(0)=4.0, w(1)=5.0
-	EXPECT_EQ(mapping_inc_weight, mapping_inc_weight_exp);
-	///////////////////////////////////////////
+    gt sorter(ugw);
 
+    const auto mapping = sorter.new_order(
+        gt::base_strategy_t::min,
+        gt::placement_t::first_to_last,
+        gt::sort_order_t::old_to_new);      // [OLD] -> [NEW]
 
-	//I/O
-	/*cout << "absolute non-incresing weight with format:  first-to-last, old-to-new" << endl;
-	com::stl::print_collection(mapping_weight, cout, true);*/
-		
+    const gt::vertex_ordering_t expected = {
+        0, 3, 4, 1, 2, 5
+    };
+
+    EXPECT_EQ(expected, mapping);
 }
+
+
+// ---------------------------------------------------------------
+// Weighted ordering: non-increasing
+// ---------------------------------------------------------------
+
+TEST_F(GraphFastRootSortWeightedTest, new_order_non_increasing_weight_n2o) {
+
+    using gt = GraphFastRootSort_W<ugraph_w>;
+
+    gt sorter(ugw);
+
+    const auto mapping = sorter.new_order(
+        gt::strategy_t::max_weight,
+        gt::placement_t::first_to_last,
+        gt::sort_order_t::new_to_old);                                 // [NEW] -> [OLD]
+
+    /*
+     * Weights:
+     *
+     * w(1) = 5
+     * w(0) = 4
+     * w(2) = 3
+     * w(3) = 1
+     * w(4) = 1
+     * w(5) = 1
+     *
+     * Stable sorting preserves 3,4,5.
+     */
+    const gt::vertex_ordering_t expected = {
+        1, 0, 2, 3, 4, 5
+    };
+
+    EXPECT_EQ(expected, mapping);
+}
+
+
+// ---------------------------------------------------------------
+// Weighted ordering: non-decreasing
+// ---------------------------------------------------------------
+
+TEST_F(GraphFastRootSortWeightedTest, new_order_non_decreasing_weight_n2o) {
+
+    using gt = GraphFastRootSort_W<ugraph_w>;
+
+    gt sorter(ugw);
+
+    const auto mapping = sorter.new_order(
+        gt::strategy_t::min_weight,
+        gt::placement_t::first_to_last,
+        gt::sort_order_t::new_to_old);                                 // [NEW] -> [OLD]
+
+    /*
+     * Stable ordering:
+     *
+     * w(3) = 1
+     * w(4) = 1
+     * w(5) = 1
+     * w(2) = 3
+     * w(0) = 4
+     * w(1) = 5
+     */
+    const gt::vertex_ordering_t expected = {
+        3, 4, 5, 2, 0, 1
+    };
+
+    EXPECT_EQ(expected, mapping);
+}
+
+
+// ---------------------------------------------------------------
+// Stable sorting
+// ---------------------------------------------------------------
+
+TEST_F(GraphFastRootSortWeightedTest, stable_weight_sort) {
+
+    using gt = GraphFastRootSort_W<ugraph_w>;
+
+    gt sorter(ugw);
+
+    const auto mapping = sorter.new_order(
+        gt::strategy_t::min_weight,
+        gt::placement_t::first_to_last,
+        gt::sort_order_t::new_to_old);                                 // [NEW] -> [OLD]
+
+    /*
+     * Vertices 3, 4 and 5 all have weight 1.0.
+     *
+     * Since stable_sort is used, their original relative order
+     * must be preserved.
+     */
+    ASSERT_GE(mapping.size(), 3u);
+
+    EXPECT_EQ(3, mapping[0]);
+    EXPECT_EQ(4, mapping[1]);
+    EXPECT_EQ(5, mapping[2]);
+}
+
+
+// ---------------------------------------------------------------
+// Mapping direction
+//
+// Use a permutation which is NOT self-inverse so that conversion
+// between [NEW]->[OLD] and [OLD]->[NEW] is actually tested.
+// ---------------------------------------------------------------
+
+TEST(GraphFastRootSortWeightedMappingTest, mapping_direction) {
+
+    using gt = GraphFastRootSort_W<ugraph_w>;
+
+    ugraph_w graph;
+    graph.reset(4);
+
+    graph.set_weight(0, 2.0);
+    graph.set_weight(1, 4.0);
+    graph.set_weight(2, 1.0);
+    graph.set_weight(3, 3.0);
+
+    gt sorter(graph);
+
+    /*
+     * Non-increasing weight:
+     *
+     * NEW -> OLD
+     *
+     * new 0 -> old 1
+     * new 1 -> old 3
+     * new 2 -> old 0
+     * new 3 -> old 2
+     *
+     * {1, 3, 0, 2}
+     */
+    const auto mapping_n2o = sorter.new_order(
+        gt::strategy_t::max_weight,
+        gt::placement_t::first_to_last,
+        gt::sort_order_t::new_to_old);
+
+    const gt::vertex_ordering_t expected_n2o = {
+        1, 3, 0, 2
+    };
+
+    EXPECT_EQ(expected_n2o, mapping_n2o);
+
+    /*
+     * Inverse mapping:
+     *
+     * OLD -> NEW
+     *
+     * old 0 -> new 2
+     * old 1 -> new 0
+     * old 2 -> new 3
+     * old 3 -> new 1
+     *
+     * {2, 0, 3, 1}
+     */
+    const auto mapping_o2n = sorter.new_order(
+        gt::strategy_t::max_weight,
+        gt::placement_t::first_to_last,
+        gt::sort_order_t::old_to_new);
+
+    const gt::vertex_ordering_t expected_o2n = {
+        2, 0, 3, 1
+    };
+
+    EXPECT_EQ(expected_o2n, mapping_o2n);
+}
+
+
+// ---------------------------------------------------------------
+// Placement
+// ---------------------------------------------------------------
+
+TEST(GraphFastRootSortWeightedMappingTest, last_to_first) {
+
+    using gt = GraphFastRootSort_W<ugraph_w>;
+
+    ugraph_w graph;
+    graph.reset(4);
+
+    graph.set_weight(0, 2.0);
+    graph.set_weight(1, 4.0);
+    graph.set_weight(2, 1.0);
+    graph.set_weight(3, 3.0);
+
+    gt sorter(graph);
+
+    /*
+     * Non-increasing first-to-last:
+     *
+     * {1, 3, 0, 2}
+     *
+     * Last-to-first reverses this:
+     *
+     * {2, 0, 3, 1}
+     */
+    const auto mapping = sorter.new_order(
+        gt::strategy_t::max_weight,
+        gt::placement_t::last_to_first,
+        gt::sort_order_t::new_to_old);                                 // [NEW] -> [OLD]
+
+    const gt::vertex_ordering_t expected = {
+        2, 0, 3, 1
+    };
+
+    EXPECT_EQ(expected, mapping);
+}
+
+
+// ---------------------------------------------------------------
+// Reorder - member overload
+// ---------------------------------------------------------------
 
 TEST_F(GraphFastRootSortWeightedTest, reorder) {
 
-	using gt = GraphFastRootSort_W<ugraph_w>;
-	gt sorter(ugw);
-	VertexMapping mapping_weight = sorter.new_order(gt::MAX_WEIGHT, false /*f2l*/, true /*o2n*/);
+    using gt = GraphFastRootSort_W<ugraph_w>;
 
-	
-	////////////////////
-	//creating an isomorphism  (by non-increasing weight)
+    gt sorter(ugw);
 
-	ugraph_w ugw_sorted;
-	sorter.reorder(mapping_weight, ugw_sorted);						//mapping_weight MUST BE in old-to-new format
+    const auto order_o2n = sorter.new_order(
+        gt::strategy_t::max_weight,
+        gt::placement_t::first_to_last,
+        gt::sort_order_t::old_to_new);      // [OLD] -> [NEW]
 
-	////////////////////////////////////////////
-	EXPECT_DOUBLE_EQ(5, ugw_sorted.weight(0));						//w(1)=5.0,  w(0)=4.0, w(2)=3.0,  w(3)=1.0, w(4)=1.0, w(5)=1.0
-	EXPECT_DOUBLE_EQ(4, ugw_sorted.weight(1));
-	EXPECT_DOUBLE_EQ(3, ugw_sorted.weight(2));
-	EXPECT_DOUBLE_EQ(1, ugw_sorted.weight(3));
-	EXPECT_DOUBLE_EQ(1, ugw_sorted.weight(4));
-	EXPECT_DOUBLE_EQ(1, ugw_sorted.weight(5));
-	////////////////////////////////////////////
+    ugraph_w reordered = sorter.reorder(order_o2n);
 
-	//I/O
-	//ugw_sorted.print_weights();
+    EXPECT_EQ(ugw.num_vertices(), reordered.num_vertices());
+    EXPECT_EQ(ugw.num_edges(), reordered.num_edges());
+
+    // -----------------------------------------------------------
+    // Weights
+    // -----------------------------------------------------------
+
+    for (vertex_t v = 0; v < NV; ++v) {
+
+        EXPECT_DOUBLE_EQ(
+            ugw.weight(v),
+            reordered.weight(order_o2n[v]));
+    }
+
+    // -----------------------------------------------------------
+    // Edges
+    // -----------------------------------------------------------
+
+    for (vertex_t u = 0; u < NV - 1; ++u) {
+
+        for (vertex_t v = u + 1; v < NV; ++v) {
+
+            EXPECT_EQ(
+                ugw.is_edge(u, v),
+                reordered.is_edge(
+                    order_o2n[u],
+                    order_o2n[v]));
+        }
+    }
 }
 
+
+// ---------------------------------------------------------------
+// Reorder - explicit weight checking
+// ---------------------------------------------------------------
+
+TEST_F(GraphFastRootSortWeightedTest, reorder_weights) {
+
+    using gt = GraphFastRootSort_W<ugraph_w>;
+
+    gt sorter(ugw);
+
+    const auto order_o2n = sorter.new_order(
+        gt::strategy_t::max_weight,
+        gt::placement_t::first_to_last,
+        gt::sort_order_t::old_to_new);
+
+    ugraph_w reordered = sorter.reorder(order_o2n);
+
+    /*
+     * Sorted by non-increasing weight:
+     *
+     * old vertex : 1   0   2   3   4   5
+     * weight     : 5   4   3   1   1   1
+     */
+    EXPECT_DOUBLE_EQ(5.0, reordered.weight(0));
+    EXPECT_DOUBLE_EQ(4.0, reordered.weight(1));
+    EXPECT_DOUBLE_EQ(3.0, reordered.weight(2));
+    EXPECT_DOUBLE_EQ(1.0, reordered.weight(3));
+    EXPECT_DOUBLE_EQ(1.0, reordered.weight(4));
+    EXPECT_DOUBLE_EQ(1.0, reordered.weight(5));
+}
+
+
+// ---------------------------------------------------------------
+// Reorder - static overload
+// ---------------------------------------------------------------
+
+TEST_F(GraphFastRootSortWeightedTest, reorder_static) {
+
+    using gt = GraphFastRootSort_W<ugraph_w>;
+
+    gt sorter(ugw);
+
+    const auto order_o2n = sorter.new_order(
+        gt::strategy_t::max_weight,
+        gt::placement_t::first_to_last,
+        gt::sort_order_t::old_to_new);
+
+    ugraph_w reordered = gt::reorder(
+        ugw,
+        order_o2n,
+        nullptr);
+
+    EXPECT_EQ(ugw.num_vertices(), reordered.num_vertices());
+    EXPECT_EQ(ugw.num_edges(), reordered.num_edges());
+
+    // Check vertex weights.
+    for (vertex_t v = 0; v < NV; ++v) {
+
+        EXPECT_DOUBLE_EQ(
+            ugw.weight(v),
+            reordered.weight(order_o2n[v]));
+    }
+
+    // Check graph isomorphism under the permutation.
+    for (vertex_t u = 0; u < NV - 1; ++u) {
+
+        for (vertex_t v = u + 1; v < NV; ++v) {
+
+            EXPECT_EQ(
+                ugw.is_edge(u, v),
+                reordered.is_edge(
+                    order_o2n[u],
+                    order_o2n[v]));
+        }
+    }
+}
+
+
+// ---------------------------------------------------------------
+// Reorder with a non-self-inverse permutation
+// ---------------------------------------------------------------
+
+TEST(GraphFastRootSortWeightedMappingTest, reorder_non_self_inverse_mapping) {
+
+    using gt = GraphFastRootSort_W<ugraph_w>;
+
+    ugraph_w graph;
+    graph.reset(4);
+
+    graph.add_edge(0, 1);
+    graph.add_edge(0, 2);
+    graph.add_edge(2, 3);
+
+    graph.set_weight(0, 2.0);
+    graph.set_weight(1, 4.0);
+    graph.set_weight(2, 1.0);
+    graph.set_weight(3, 3.0);
+
+    gt sorter(graph);
+
+    /*
+     * N2O = {1, 3, 0, 2}
+     *
+     * therefore
+     *
+     * O2N = {2, 0, 3, 1}
+     */
+    const auto order_o2n = sorter.new_order(
+        gt::strategy_t::max_weight,
+        gt::placement_t::first_to_last,
+        gt::sort_order_t::old_to_new);
+
+    const gt::vertex_ordering_t expected_o2n = {
+        2, 0, 3, 1
+    };
+
+    ASSERT_EQ(expected_o2n, order_o2n);
+
+    ugraph_w reordered = sorter.reorder(order_o2n);
+
+    // Weights must follow the relabeling.
+    for (vertex_t v = 0; v < graph.num_vertices(); ++v) {
+
+        EXPECT_DOUBLE_EQ(
+            graph.weight(v),
+            reordered.weight(order_o2n[v]));
+    }
+
+    // Edges must follow exactly the same relabeling.
+    for (vertex_t u = 0; u < graph.num_vertices() - 1; ++u) {
+
+        for (vertex_t v = u + 1; v < graph.num_vertices(); ++v) {
+
+            EXPECT_EQ(
+                graph.is_edge(u, v),
+                reordered.is_edge(
+                    order_o2n[u],
+                    order_o2n[v]));
+        }
+    }
+}
