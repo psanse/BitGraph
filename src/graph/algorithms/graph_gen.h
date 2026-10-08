@@ -35,8 +35,7 @@
  *
  * @todo Simplify class architecture for graph generation (07/03/2025).
  *
- * @author
- * Pablo San Segundo (pss)
+ * @author pss
  */
 
 #ifndef BITGRAPH_GRAPH_GEN_H
