@@ -647,7 +647,7 @@ namespace bitgraph {
 			nodes_.reserve(NV_);
 
 			do {
-				int min_deg = NV_;
+				degree_t min_deg = NV_;
 				vertex_t v = BBObject::noBit;
 
 				//selects an active vertex with minimum degree
@@ -703,7 +703,7 @@ namespace bitgraph {
 			
 			do {
 
-				int max_deg = -1;
+				degree_t max_deg = -1;
 				vertex_t v = BBObject::noBit;
 
 				// Select an active vertex with maximum current degree.
@@ -756,7 +756,7 @@ namespace bitgraph {
 			//main loop
 			do {
 
-				int min_deg = NV_;
+				degree_t min_deg = NV_;
 				vertex_t v = BBObject::noBit;
 
 				//  find an active vertex with minimum degree
@@ -801,7 +801,7 @@ namespace bitgraph {
 
 			for (vertex_t i = 0; i < NV_; ++i) {
 
-				int min_deg = NV_;
+				degree_t min_deg = NV_;
 				vertex_t v = BBObject::noBit;
 
 				// Select an active vertex with minimum current degree.
@@ -856,7 +856,7 @@ namespace bitgraph {
 			
 			for (vertex_t i = 0; i < NV_; ++i){ 
 
-				int max_deg = -1;
+				degree_t max_deg = -1;
 				vertex_t v = BBObject::noBit;
 				
 				// Select an active vertex with maximum current degree.

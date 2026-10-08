@@ -5,8 +5,8 @@
 * @author pss
 **/
 
-#ifndef __GRAPH_FAST_SORT_WEIGHTED_H__
-#define __GRAPH_FAST_SORT_WEIGHTED_H__
+#ifndef BITGRAPH_GRAPH_GRAPH_FAST_SORT_WEIGHTED_H__
+#define BITGRAPH__GRAPH_FAST_SORT_WEIGHTED_H__
 
 #include "graph_fast_sort.h"
 #include "ordering_decoder.h"	
@@ -28,17 +28,33 @@ namespace bitgraph {
 		class GraphFastRootSort_W : public GraphFastRootSort <typename GraphW::graph_type> {
 
 		public:
+
+			using graph_w_t = GraphW;
+			using graph_t = typename GraphW::graph_type;
+			using base_t = GraphFastRootSort<graph_t>;
+			using weight_t = typename GraphW::Weight;
+			using vertex_ordering_t = typename base_t::vertex_ordering_t;
+
+			// alias for backward compatibility with existing code
 			using basic_type = GraphW;									//weighted graph type
-			using type = GraphFastRootSort_W<GraphW>;					//own type	
-			using ugtype = typename basic_type::graph_type;				//non-weighted graph type	
-			using ptype = GraphFastRootSort <ugtype>;					//parent type
-			using Weight = typename GraphW::Weight;						//weight type
+			using ptype = base_t;										//parent type
+			using Weight = weight_t;									//weight type
+			using VertexOrdering = vertex_ordering_t;
+			
+			//using type = GraphFastRootSort_W<GraphW>;					//own type
+			//using ugtype = typename basic_type::graph_type;			//non-weighted graph type	
 
-			using graph_w_t = basic_type;
+			enum class strategy {
+				max_weight = 100,
+				min_weight
+			};
 
-			enum { MAX_WEIGHT = 100, MIN_WEIGHT };							//sorting algorithms for weighted graphs	
+			using base_strategy_t = typename base_t::strategy;
 
-			using VertexOrdering = typename ptype::vertex_ordering_t;
+			// enum for backward compatibility with existing code
+			enum { MAX_WEIGHT = 100, MIN_WEIGHT };					
+
+		
 
 			////////////////
 			// public interface 
