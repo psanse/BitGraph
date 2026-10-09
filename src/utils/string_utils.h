@@ -34,7 +34,7 @@ namespace bitgraph {
 		 *       implementation and locale and may not provide full Unicode support.
 		 */
 		inline
-			int number_of_words(const std::string& text)
+			std::size_t number_of_words(const std::string& text)
 		{
 
 			static const std::regex word_expression{ R"(\b\w+\b)" };

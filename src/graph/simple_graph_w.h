@@ -271,7 +271,7 @@ namespace bitgraph {
 		void reset(
 			std::size_t NV,
 			weight_t weight = DEFAULT_WEIGHT,
-			string name = "");
+			string name = "") noexcept;
 
 
 		/////////////////////////
@@ -394,23 +394,50 @@ namespace bitgraph {
 		// I/O
 	
 		/**
-		 * @brief Writes the graph to an output stream in DIMACS format.
+		 * @brief Writes the vertex-weighted graph to an output stream in DIMACS format.
 		 *
-		 * Self-loops are ignored.
+		 * Vertex weights are written as `n <v> <weight>` records and edges using
+		 * DIMACS edge records. Vertex identifiers are 1-based. Self-loops are ignored.
 		 *
 		 * @param os Output stream.
-		 * @return Reference to the output stream.
+		 * @return Reference to @p os.
 		 */
 		ostream& write_dimacs(std::ostream& os = std::cout) const;
+			
+		/**
+		 * @brief Reads a vertex-weighted graph from a DIMACS file.
+		 *
+		 * Vertex weights may be contained in the DIMACS file itself or read from
+		 * an optional separate weight file.
+		 *
+		 * @param filename Name of the DIMACS graph file.
+		 * @param type Format of the optional separate weight file.
+		 * @return 0 on success; `-1` if the input cannot be read or has
+		 *         an invalid format.
+		 *
+		 * @note On failure, the graph is reset to an empty state.
+		 *
+		 * @deprecated Use the overload taking `weight_file_extension`.
+		 */
+		[[deprecated("Use the typed read_dimacs overload with weight_file_extension")]]
+		int read_dimacs(string filename, int type);
 
 		/**
-		* @brief Reads weighted undirected graph from file in DIMACS format
-		* @param filename name of the file
-		* @param type extension of additional filename for separate weights (Wext, Dext, WWWext, NOext)
-		*		 default NOext - no additional file
-		* @returns 0 if success, -1 if error
-		**/
-		int read_dimacs(string filename, int type = NOext);
+		 * @brief Reads a vertex-weighted graph from a DIMACS file.
+		 *
+		 * Vertex weights may be contained in the DIMACS file itself or read from
+		 * an optional separate weight file.
+		 *
+		 * @param filename Name of the DIMACS graph file.
+		 * @param type Format of the optional separate weight file.
+		 * @return `true` on success; `false` if the input cannot be read or has
+		 *         an invalid format.
+		 *
+		 * @note On failure, the graph is reset to an empty state.
+		 */
+		bool read_dimacs(string filename, weight_file_extension type = weight_file_extension::none) {
+			return read_dimacs(filename, static_cast<int>(type)) == 0;	
+		}
 
 		/**
 		* @brief Reads weights from an external file (only weights)

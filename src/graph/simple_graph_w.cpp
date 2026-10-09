@@ -174,24 +174,23 @@ ostream& Base_Graph_W<GraphT, WeightT>::write_dimacs(ostream& os) const
 	graph_.header_dimacs(os, false);
 		
 	//write DIMACS nodes n <v> <w>
-	const int NV = graph_.num_vertices();
-	for (int v = 0; v < NV; ++v ) {
-		os << "n " << v + 1 << " " << weight(v) << endl;
+	const vertex_t NV = graph_.num_vertices();
+	for (vertex_t v = 0; v < NV; ++v ) {
+		os << "n " << v + 1 << " " << weight(v) << '\n';
 	}
 	
-	//write undirected edges (1-based vertex notation dimacs)
-	for (int v = 0; v < NV; ++v) {
-		for (int w = 0; w < NV; ++w) {
-			if (v == w) continue;
-			if (graph_.is_edge(v, w)) {									//O(log) for sparse graphs: specialize
-				os << "e " << v + 1 << " " << w + 1 << endl;			//1 based vertex notation dimacs
+	// 1-based vertex notation (dimacs)
+	// bidirectional edges 
+	for (vertex_t v = 0; v < NV; ++v) {
+		for (vertex_t w = 0; w < NV; ++w) {
+			if (v != w && graph_.is_edge(v, w)) {						//O(log) for sparse graphs: specialize
+				os << "e " << v + 1 << " " << w + 1 << '\n';			//1 based vertex notation dimacs
 			}
 		}
 	}
 
 	return os;
 }
-
 
 template<class GraphT, class WeightT>
 int Base_Graph_W<GraphT, WeightT>::read_dimacs (string filename, int type)
@@ -353,6 +352,7 @@ int Base_Graph_W<GraphT, WeightT>::read_dimacs (string filename, int type)
 		
 	return 0;
 }
+
 
 template<class GraphT, class WeightT>
 int Base_Graph_W<GraphT, WeightT>::read_weights(string filename) 

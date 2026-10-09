@@ -97,28 +97,29 @@ namespace bitgraph {
 
 	template<class WeightT>
 	inline std::ostream&
-	Graph_W<ugraph, WeightT>::write_dimacs(std::ostream& o) {
+	Graph_W<ugraph, WeightT>::write_dimacs(std::ostream& os) {
 
 		//timestamp comment
-		this->graph_.timestamp_dimacs(o);
+		this->graph_.timestamp_dimacs(os);
 
 		//name comment
-		this->graph_.name_dimacs(o);
+		this->graph_.name_dimacs(os);
 
 		//dimacs header - recompute edges
-		this->graph_.header_dimacs(o, false);
+		this->graph_.header_dimacs(os, false);
 
 		//write DIMACS nodes n <v> <w>
-		const int NV = this->graph_.num_vertices();
-		for (int v = 0; v < NV; ++v) {
-			o << "n " << v + 1 << " " << this->weight(v) << endl;
+		const vertex_t NV = this->graph_.num_vertices();
+
+		for (vertex_t v = 0; v < NV; ++v) {
+			os << "n " << v + 1 << " " << this->weight(v) << '\n';
 		}
 
 		//write directed edges (1-based vertex notation dimacs)
-		for (int v = 0; v < NV - 1; ++v) {
-			for (int w = v + 1; w < NV; ++w) {
+		for (vertex_t v = 0; v + 1 < NV ; ++v) {
+			for (vertex_t w = v + 1; w < NV; ++w) {
 				if (this->graph_.is_edge(v, w))							//O(log) for sparse graphs: specialize
-					o << "e " << v + 1 << " " << w + 1 << endl;
+					os << "e " << v + 1 << " " << w + 1 << '\n';
 			}
 		}
 

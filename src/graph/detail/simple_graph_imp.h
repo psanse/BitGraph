@@ -919,13 +919,15 @@ namespace bitgraph {
 	template<class BitsetT>
 	inline
 	bool Graph<BitsetT>::is_edge(vertex_t v, vertex_t w) const {
+		
 		assert(v >= 0 && v < NV_);
 
 		// unnecessary check with perfect contract, but it is a safe guard for the case of sparse graphs
-		// and shrhink_to_fit() functions 
+		// and shrink_to_fit() functions 
 		if (static_cast<unsigned>(w) >= static_cast<unsigned>(NV_)) {
 			return false;
 		}
+
 		return(adj_[v].is_bit(w));
 	}
 
