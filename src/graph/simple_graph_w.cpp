@@ -188,9 +188,9 @@ ostream& Base_Graph_W<GraphT, WeightT>::write_dimacs(ostream& os) const
 			}
 		}
 	}
-
 	return os;
 }
+
 
 template<class GraphT, class WeightT>
 int Base_Graph_W<GraphT, WeightT>::read_dimacs (string filename, int type)
@@ -207,8 +207,7 @@ int Base_Graph_W<GraphT, WeightT>::read_dimacs (string filename, int type)
 	//read header
 	int nV = -1, nEdges = -1;
 	if(io::detail::dimacs::read_dimacs_header(f, nV, nEdges) == -1){
-		reset(); 
-		f.close();
+		reset(); 		
 		return -1;
 	}	
 	
@@ -228,8 +227,7 @@ int Base_Graph_W<GraphT, WeightT>::read_dimacs (string filename, int type)
 	int c = f.peek();
 	if(c == EOF){
 		LOG_ERROR("bizarre EOF when peeking for first char - Base_Graph_W<GraphT, WeightT>::read_dimacs");
-		reset();
-		f.close();
+		reset();		
 		return -1;
 	}
 	char next = static_cast<char>(c);
@@ -244,8 +242,7 @@ int Base_Graph_W<GraphT, WeightT>::read_dimacs (string filename, int type)
 			//assert
 			if (f.bad()) {
 				LOG_ERROR("error when reading vertex-weights - Base_Graph_W<GraphT, WeightT>::read_dimacs");
-				reset();
-				f.close();
+				reset();				
 				return -1;
 			}
 
@@ -299,16 +296,14 @@ int Base_Graph_W<GraphT, WeightT>::read_dimacs (string filename, int type)
 	c = f.peek();
 	if (c == EOF) {
 		LOG_ERROR("bizarre EOF when peeking for first char - Base_Graph_W<GraphT, WeightT>::read_dimacs");
-		reset();
-		f.close();
+		reset();	
 		return -1;
 	}
 	next = static_cast<char>(c);
 
 	if (next != 'e') {
 		LOG_ERROR("Wrong edge format reading edges - Base_Graph_EW<GraphT, WeightT>::read_dimacs");
-		reset();
-		f.close();
+		reset();	
 		return -1;
 	}
 
@@ -319,8 +314,7 @@ int Base_Graph_W<GraphT, WeightT>::read_dimacs (string filename, int type)
 	//assert
 	if(nw != 3){
 		LOGG_ERROR ("Wrong edge format reading first edge line - Base_Graph_W<GraphT, WeightT>::read_dimacs");
-		reset();
-		f.close();
+		reset();		
 		return -1;
 	}
 	
@@ -335,8 +329,7 @@ int Base_Graph_W<GraphT, WeightT>::read_dimacs (string filename, int type)
 		f >> next;
 		if(next != 'e' || f.bad()){
 			LOG_ERROR("Wrong edge format reading edges - Base_Graph_W<GraphT, WeightT>::read_dimacs");
-			reset();
-			f.close();
+			reset();			
 			return -1;
 		}
 		//add bidirectional edge	
@@ -345,8 +338,7 @@ int Base_Graph_W<GraphT, WeightT>::read_dimacs (string filename, int type)
 			
 		std::getline(f, line);  //remove remaining part of the line
 	}
-	f.close();
-	
+		
 	//set name 
 	graph_.set_name(filename);
 		

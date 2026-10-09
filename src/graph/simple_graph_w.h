@@ -435,7 +435,8 @@ namespace bitgraph {
 		 *
 		 * @note On failure, the graph is reset to an empty state.
 		 */
-		bool read_dimacs(string filename, weight_file_extension type = weight_file_extension::none) {
+		bool read_dimacs(string filename, weight_file_extension type = weight_file_extension::none)
+		{
 			return read_dimacs(filename, static_cast<int>(type)) == 0;	
 		}
 
