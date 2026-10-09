@@ -41,6 +41,11 @@ namespace bitgraph {
 	using Vertices = vertices;
 
 	/**
+	 * @brief classical compatibility alias for vertices.
+	 */
+	using vertex_set_t = vertices;
+
+	/**
 	 * @brief Mapping from vertices to vertices or vertex positions.
 	 */
 	using vertex_mapping = std::vector<vertex_t>;

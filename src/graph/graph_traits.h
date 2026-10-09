@@ -38,7 +38,7 @@ namespace bitgraph {
      */
     template<class BitsetT>
     class Ugraph;
-    
+       
 
     /**
      * @brief Provides compile-time properties of a graph type.
@@ -83,7 +83,7 @@ namespace bitgraph {
         using is_edge_weighted_tag =
             std::integral_constant<bool, is_edge_weighted>;
     };
-
+        
     namespace detail {
 
         /**

@@ -45,6 +45,7 @@
 #define __SIMPLE_GRAPH_EDGE_WEIGHTED_H__
 
 //#include "utils/common.h"
+#include "graph_traits.h"
 #include "graph_unweighted.h"
 #include "simple_ugraph.h"
 #include <iostream>
@@ -64,6 +65,7 @@ namespace bitgraph {
 
 	template<class GraphT, class WeightT>
 	class Base_Graph_EW {
+		
 	public:
 				
 		using graph_type = GraphT;								// graph type
@@ -87,8 +89,9 @@ namespace bitgraph {
 		//////////////////////////
 		//constructors / destructor
 
-		Base_Graph_EW() {};										//no memory allocation
-		Base_Graph_EW(graph_type& g, mat_t& lwe) : g_(g), we_(lwe) {}										//creates graph from a non-weighted graph and a set of weights
+		Base_Graph_EW() {};													
+		Base_Graph_EW(graph_type& g, const mat_t& edge_weights) : 
+			g_(g), we_(edge_weights) {}		
 
 		/**
 		* @brief creates a graph with |V|= n and val weights as base line.
@@ -418,7 +421,7 @@ namespace bitgraph {
 
 	protected:
 		graph_type g_;
-		mat_t   we_;								//matrix of vertex and edge-weights 																
+		mat_t   we_;									//matrix of (only) edge-weights 																
 
 	}; //end of class Base_Graph_EW
 

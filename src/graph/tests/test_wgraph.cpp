@@ -23,8 +23,8 @@ class UGraphWTest : public ::testing::Test {
 protected:
 	void SetUp() override {
 		gw.reset(NV, static_cast<ugraph_wi::Weight>(0.0));
-		gw.graph().add_edge(0, 1);
-		gw.graph().add_edge(0, 2);
+		gw.add_edge(0, 1);
+		gw.add_edge(0, 2);
 		gw.set_weight(0, 1);
 		gw.set_weight(1, 2);
 		gw.set_weight(2, 3);
@@ -153,7 +153,7 @@ TEST(UGraphW, constructor_from_file) {
 	//read DIMACS graph from file - no DIMACS weights, sets default weights 
 	ugraph_wi ugw(BITGRAPH_GRAPH_TEST_DATA_DIR  "sample.clq");
 
-	const int NV = ugw.graph().num_vertices();
+	const int NV = ugw.num_vertices();
 
 	EXPECT_EQ(7, NV);
 	EXPECT_EQ(1, ugw.weight(0));
@@ -167,7 +167,7 @@ TEST(UGraphW, gen_weights_dimacs){
 	//read DIMACS graph from file - no DIMACS weights, sets default weights 
 	ugraph_wi ugw (BITGRAPH_GRAPH_TEST_DATA_DIR  "brock200_1.clq");
 
-	const int NV = ugw.graph().num_vertices();
+	const int NV = ugw.num_vertices();
 
 	EXPECT_EQ(200, NV);
 	EXPECT_EQ(ugraph_wi::DEFAULT_WEIGHT, ugw.weight(0));
@@ -194,7 +194,7 @@ TEST(UGraphW, gen_random) {
 	WeightGen<ugraph_wi>::create_weights(ugw, WeightGen<ugraph_wi>::WMOD);
 	
 	/////////////////////
-	EXPECT_EQ(NV, ugw.graph().num_vertices());
+	EXPECT_EQ(NV, ugw.num_vertices());
 	EXPECT_TRUE(ugw.density()< density + 0.001);
 	EXPECT_TRUE(ugw.density()> density - 0.001);
 	////////////////////

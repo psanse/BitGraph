@@ -294,11 +294,22 @@ namespace bitgraph {
 		void reset(std::string filename) noexcept;
 
 		/**
-		* @brief resets to default values (does not deallocate memory)
-		* @details: to deallocate memory -  g = graph()
-		* @details: in general, should not be called directly
-		**/
+		 * @brief Clears the graph contents while preserving internal storage where possible.
+		 *
+		 * Removes all vertices, edges, and associated graph state, leaving the
+		 * object empty and ready for reuse.
+		 *
+		 * @note Prefer `clear()` in user code. `reset()` is retained for API
+		 *       compatibility and internal use.
+		 */
 		void reset() noexcept;
+
+		/**
+		 * @brief Clears the graph contents.
+		 *
+		 * Equivalent to `reset()`.
+		 */
+		void clear()  noexcept { reset(); }	// alias for API
 
 		/**
 		 * @brief Requests removal of unused storage from each adjacency bitset.
@@ -781,34 +792,34 @@ namespace bitgraph {
 			bool trailing_new_line = true) const;
 
 		/**
-		 * @brief Writes the graph's edges in `[v]-->[w]` format.
+		 * @brief Writes the graph's edges to an output stream.
 		 *
-		 * For a directed graph, each edge is written from its source vertex to its
-		 * destination vertex. Derived graph types may override this function to
-		 * control how their edges are listed.
+		 * Edges are written in `[v]-->[w]` format. For directed graphs, each edge
+		 * is listed from its source vertex to its destination vertex. Derived graph
+		 * types may override this function to customize the edge representation.
 		 *
 		 * @param out Output stream.
-		 * @param trailing_new_line If `true`, appends a newline after the final edge.
+		 * @param trailing_newline If `true`, appends a newline after the final edge.
 		 * @return Reference to @p out.
 		 */
 		virtual ostream& print_edges(
 			std::ostream & = std::cout, 
-			bool trailing_new_line = false);
+			bool trailing_newline = false);
 
 		/*
 		* @brief streams edges of the subgraph induced by a set of vertices to output stream
 		* @param bbsg input (bit) set of vertices
 		* @param o output stream
 		*/
-		//template <class U = vertex_bitset_t>
 		ostream& print_edges(
 			const vertex_bitset_t& bbsg,
-			ostream& o = std::cout)	const;
+			ostream& os = std::cout) const;
 
+	protected:
 
 		//////////////////
 		// handlers
-	protected:
+
 		/**
 		 * @brief Reports a graph initialization failure and terminates the program.
 		 *
@@ -822,9 +833,11 @@ namespace bitgraph {
 			std::terminate();
 		}
 
+	protected:
+
+
 		//////////////////////////
 		// data members
-	protected:
 
 		/**
 		* @brief Adjacency matrix represented as one vertex bitset per row.
@@ -854,7 +867,7 @@ namespace bitgraph {
 		* disabled or the edge count is no longer valid.
 		*/
 		mutable std::size_t NE_;
-			
+		
 		
 		/**
 		 * @brief Indicates whether NE_ contains the current number of edges.

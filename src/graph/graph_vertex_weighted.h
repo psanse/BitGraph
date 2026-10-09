@@ -68,9 +68,9 @@ namespace bitgraph {
 
 		/////////////
 		//useful interface-specific for undirected weighted graphs
-		int max_graph_degree() const { return this->g_.max_graph_degree(); }
-		int degree(int v) const { return this->g_.degree(v); }
-		int degree(int v, const Bitset& bbn) const { return this->g_.degree(v, bbn); }
+		int max_graph_degree() const { return this->graph_.max_graph_degree(); }
+		int degree(int v) const { return this->graph_.degree(v); }
+		int degree(int v, const Bitset& bbn) const { return this->graph_.degree(v, bbn); }
 
 		///////////
 		//I/O operations
@@ -80,7 +80,7 @@ namespace bitgraph {
 		*
 		*		 (self-loops are not considered)
 		*/
-		std::ostream& write_dimacs(std::ostream& o = std::cout) override;
+		std::ostream& write_dimacs(std::ostream& o = std::cout);
 	};
 		
 
@@ -100,16 +100,16 @@ namespace bitgraph {
 	Graph_W<ugraph, WeightT>::write_dimacs(std::ostream& o) {
 
 		//timestamp comment
-		this->g_.timestamp_dimacs(o);
+		this->graph_.timestamp_dimacs(o);
 
 		//name comment
-		this->g_.name_dimacs(o);
+		this->graph_.name_dimacs(o);
 
 		//dimacs header - recompute edges
-		this->g_.header_dimacs(o, false);
+		this->graph_.header_dimacs(o, false);
 
 		//write DIMACS nodes n <v> <w>
-		const int NV = this->g_.num_vertices();
+		const int NV = this->graph_.num_vertices();
 		for (int v = 0; v < NV; ++v) {
 			o << "n " << v + 1 << " " << this->weight(v) << endl;
 		}
@@ -117,7 +117,7 @@ namespace bitgraph {
 		//write directed edges (1-based vertex notation dimacs)
 		for (int v = 0; v < NV - 1; ++v) {
 			for (int w = v + 1; w < NV; ++w) {
-				if (this->g_.is_edge(v, w))							//O(log) for sparse graphs: specialize
+				if (this->graph_.is_edge(v, w))							//O(log) for sparse graphs: specialize
 					o << "e " << v + 1 << " " << w + 1 << endl;
 			}
 		}

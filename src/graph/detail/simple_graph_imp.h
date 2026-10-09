@@ -62,13 +62,12 @@ namespace bitgraph {
 	}
 
 	template<class BitsetT>
-	//template<class U>
 	inline
-		std::ostream& Graph<BitsetT>::print_edges(const vertex_bitset_t& bbsg, std::ostream& o) const
+		std::ostream& Graph<BitsetT>::print_edges(const vertex_bitset_t& bbsg, std::ostream& os) const
 	{
 
 		for (vertex_t i = 0; i < NV_ - 1; i++) {
-
+			
 			if (!bbsg.is_bit(i)) continue;
 
 			for (vertex_t j = i + 1; j < NV_; j++) {
@@ -76,14 +75,14 @@ namespace bitgraph {
 				if (!bbsg.is_bit(j)) continue;
 
 				if (is_edge(i, j)) {
-					o << "[" << i << "]" << "-->" << "[" << j << "]" << endl;
+					os << "[" << i << "]" << "-->" << "[" << j << "]" << endl;
 				}
 				if (is_edge(j, i)) {
-					o << "[" << j << "]" << "-->" << "[" << i << "]" << endl;
+					os << "[" << j << "]" << "-->" << "[" << i << "]" << endl;
 				}
 			}
 		}
-		return o;
+		return os;
 	}
 
 	//////////////////////////////////////////
@@ -563,26 +562,26 @@ namespace bitgraph {
 
 	template<class BitsetT>
 	inline
-		ostream& Graph<BitsetT>::print_edges(std::ostream& o, bool eofl) {
+		ostream& Graph<BitsetT>::print_edges(std::ostream& os, bool trailing_newline) {
 
-		for (int i = 0; i < NV_ - 1; ++i) {
-			for (int j = i + 1; j < NV_; ++j) {
+		for (vertex_t v = 0; v < NV_ - 1; ++v) {
+			for (vertex_t w = v + 1; w < NV_; ++w) {
 
-				if (is_edge(i, j)) {
-					o << "[" << i << "]" << "-->" << "[" << j << "]" << endl;
+				if (is_edge(v, w)) {
+					os << "[" << v << "]" << "-->" << "[" << w << "]" << endl;
 				}
-				if (is_edge(j, i)) {
-					o << "[" << j << "]" << "-->" << "[" << i << "]" << endl;
+				if (is_edge(w, v)) {
+					os << "[" << w << "]" << "-->" << "[" << v << "]" << endl;
 				}
 
 			}
 		}
 
-		if (eofl) { o << '\n'; }
-		return o;
+		if (trailing_newline) {
+			os << '\n'; 
+		}
+		return os;
 	}
-
-
 
 	template<class BitsetT>
 	inline
@@ -591,11 +590,11 @@ namespace bitgraph {
 
 		std::size_t NE = 0;
 
-		for (vertex_t i = 0; i < NV_; ++i) {
-			if (bbn.is_bit(i)) {
-				for (vertex_t j = 0; j < NV_; ++j) {
-					if (bbn.is_bit(j)) {						//includes possible self loops
-						if (adj_[i].is_bit(j)) { NE++; }
+		for (vertex_t v = 0; v < NV_; ++v) {
+			if (bbn.is_bit(v)) {
+				for (vertex_t w = 0; w < NV_; ++w) {
+					if (bbn.is_bit(w)) {						//includes possible self loops
+						if (adj_[v].is_bit(w)) { NE++; }
 					}
 				}
 			}
