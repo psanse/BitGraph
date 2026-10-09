@@ -80,20 +80,20 @@ namespace bitgraph {
 		
 		Base_Graph_W() {};																		
 		explicit Base_Graph_W(weights_t& lw)
-			: w_(lw) 
+			: vertex_weights_(lw) 
 		{
 			graph_.reset(lw.size()); 
 		}	
 	
 		Base_Graph_W(graph_t& graph, weights_t& weights)
-			:graph_(graph), w_(weights) 
+			:graph_(graph), vertex_weights_(weights) 
 		{ 
-			assert(w_.size() == graph_.size());
+			assert(vertex_weights_.size() == graph_.size());
 		}									
 
 		Base_Graph_W(graph_t& graph)
 			:graph_(graph), 
-			w_(graph.size(), 
+			vertex_weights_(graph.size(), 
 			DEFAULT_WEIGHT )
 		{}							
 
@@ -125,10 +125,10 @@ namespace bitgraph {
 		// setters and getters
 
 		void set_weight(vertex_t v, weight_t value) noexcept{ 
-			w_[v] = value;
+			vertex_weights_[v] = value;
 		}
 		void set_weight(weight_t value = DEFAULT_WEIGHT) {
-			w_.assign(
+			vertex_weights_.assign(
 				static_cast<std::size_t>(graph_.num_vertices()),
 				value);
 		}
@@ -199,11 +199,11 @@ namespace bitgraph {
 		}
 
 		weight_t weight(vertex_t v) const noexcept{ 
-			return w_[v];
+			return vertex_weights_[v];
 		}
 
 		const std::vector<weight_t>& weight() const noexcept { 
-			return w_;
+			return vertex_weights_;
 		}
 		
 		void set_name(std::string name) {
@@ -251,18 +251,23 @@ namespace bitgraph {
 		const vertex_bitset_t& neighbors(vertex_t v) const { 
 			return graph_.neighbors(v); 
 		}
-			
-
+		
 		//////////////////////////
 		// memory allocation 
 
 		/**
-		* @brief resets to empty graph given name and number of vertices
-		* @param NV number of vertices
-		* @param name name of the instance
-		* @param weight weight of the vertices
-		* @details: fast-fail policy - exits if error
-		**/
+		 * @brief Reinitializes the graph with a given number of isolated vertices.
+		 *
+		 * Existing graph contents are discarded. All vertices are assigned the
+		 * specified weight.
+		 *
+		 * @param NV Number of vertices in the new graph.
+		 * @param weight Initial weight assigned to every vertex.
+		 * @param name Optional graph instance name.
+		 *
+		 * @warning Follows a fail-fast policy and calls `std::terminate()` if
+		 *          the graph or its vertex weights cannot be initialized.
+		 */
 		void reset(
 			std::size_t NV,
 			weight_t weight = DEFAULT_WEIGHT,
@@ -500,7 +505,7 @@ namespace bitgraph {
 		* @note Intended for derived classes and internal algorithms.
 		*/
 		std::vector<weight_t>& weight() noexcept {
-			return w_;
+			return vertex_weights_;
 		}
 
 		/**
@@ -525,7 +530,7 @@ namespace bitgraph {
 		 */
 		void reset() { 
 			graph_.clear(); 
-			w_.clear(); 
+			vertex_weights_.clear(); 
 		}
 
 		/**
@@ -536,22 +541,26 @@ namespace bitgraph {
 		/**
 		 * @brief Vertex-weight vector.
 		 *
-		 * Entry `w_[v]` stores the weight associated with vertex `v`.
+		 * Entry `vertex_weights_[v]` stores the weight associated with vertex `v`.
 		 */
-		std::vector<weight_t> w_;						
+		std::vector<weight_t> vertex_weights_;						
 	};
 
 }//end namespace bitgraph
 
 namespace bitgraph {
 
-	///////////////////////
-	//
-	// Graph_W class 
-	// (main template class to specialize for different types of graphs) 
-	//
-	///////////////////////
-
+	/**
+	 * @brief User-facing vertex-weighted graph class.
+	 *
+	 * Provides the public vertex-weighted graph type built on top of
+	 * `Base_Graph_W`. This facade can be specialized for specific underlying
+	 * graph types while reusing the common weighted-graph implementation
+	 * provided by the base class.
+	 *
+	 * @tparam GraphT Underlying graph type.
+	 * @tparam WeightT Vertex-weight type.
+	 */
 	template<class GraphT, class WeightT>
 	class Graph_W : public Base_Graph_W <GraphT, WeightT> {};
 }
@@ -567,14 +576,14 @@ namespace bitgraph {
 	inline
 		void Base_Graph_W<GraphT, WeightT>::transform_weights(Func f)
 	{
-		for(weight_t & weight : w_) {
+		for(weight_t & weight : vertex_weights_) {
 			if (weight != NO_WEIGHT) {
 				weight = f(weight);
 			}
 		}
 	}
 
-}//end namespace bitgraph
+} // end namespace bitgraph
 
 
 #endif // BITGRAPH_GRAPH__SIMPLE_GRAPH_WEIGHTED_H
