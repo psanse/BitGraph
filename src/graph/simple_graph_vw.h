@@ -1,5 +1,5 @@
 /**
- * @file simple_graph_w.h
+ * @file simple_graph_vw.h
  * @brief Vertex-weighted graph classes built on simple graph types.
  *
  * Defines `Base_Graph_W` and `Graph_W`, which provide vertex-weighted
@@ -11,8 +11,8 @@
  * This code is part of the BITGRAPH C++ library.
  */
 
-#ifndef BITGRAPH_GRAPH__SIMPLE_GRAPH_WEIGHTED_H
-#define BITGRAPH_GRAPH__SIMPLE_GRAPH_WEIGHTED_H
+#ifndef BITGRAPH_GRAPH_SIMPLE_GRAPH_VERTEX_WEIGHTED_H
+#define BITGRAPH_GRAPH_SIMPLE_GRAPH_VERTEX_WEIGHTED_H
 
 
 #include "graph_types.h"
@@ -643,7 +643,7 @@ namespace bitgraph {
 /////////////////////////////////////////////
 // Necessary implementations in header file	
 
-#include "detail/simple_graph_w_imp.h"
+#include "detail/simple_graph_vw_imp.h"
 
 
-#endif // BITGRAPH_GRAPH__SIMPLE_GRAPH_WEIGHTED_H
+#endif // BITGRAPH_GRAPH_SIMPLE_GRAPH_VERTEX_WEIGHTED_H

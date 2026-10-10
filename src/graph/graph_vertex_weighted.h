@@ -1,5 +1,5 @@
 /**
- * @file graph_vertex_weighted.h
+ * @file graph_vw_facade.h
  *
  * @brief Facade specializations and inline implementations for vertex-weighted graphs.
  *
@@ -38,12 +38,12 @@
  * 01/02/2026
  */
 
-#ifndef __GRAPH_VERTEX_WEIGHTED_H__
-#define __GRAPH_VERTEX_WEIGHTED_H__
+#ifndef BITGRAPH_GRAPH_GRAPH_VERTEX_WEIGHTED_FACADE_H
+#define BITGRAPH_GRAPH_GRAPH_VERTEX_WEIGHTED_FACADE_H
 
 #include "graph_types.h"
 #include "graph_unweighted.h"
-#include "simple_graph_w.h"												 // MUST BE AFTER graph_basic.h 
+#include "simple_graph_vw.h"												 // MUST BE AFTER graph_basic.h 
 
 namespace bitgraph {
     
@@ -130,4 +130,4 @@ namespace bitgraph {
 
 
 
-#endif //end __GRAPH_VERTEX_WEIGHTED_H__
+#endif // BITGRAPH_GRAPH_GRAPH_VERTEX_WEIGHTED_FACADE_H__
