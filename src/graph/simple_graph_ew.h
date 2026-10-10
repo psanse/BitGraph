@@ -67,34 +67,42 @@ namespace bitgraph {
 	class Base_Graph_EW : public bitgraph::weight_constants<WeightT> {
 		
 	public:
-				
-		using graph_type = GraphT;								// graph type
-		using bitset_type = typename GraphT::bitset_type;		// bitset type used by graph type 
-		using vertex_bitset_t = bitset_type;					// alias for semantic type
-		using VertexBitset = vertex_bitset_t;					// alias for backward compatibility
-		using Weight = WeightT;								
+
+		using graph_type = GraphT;
+		using graph_t = graph_type;
+		using bitset_type = typename GraphT::bitset_type;
+		using vertex_bitset_t = bitset_type;
+
+		using weight_t = WeightT;
+		using weights_t = std::vector<weight_t>;
+		using weight_matrix_t = std::vector<std::vector<weight_t>>;
 		
-		using mat_t = vector<vector<Weight>>;					// type for a matrix of weights
-						
+		// Backward compatibility.
+		using VertexBitset = vertex_bitset_t;
+		using Weight = weight_t;
+		using mat_t = weight_matrix_t;
+										
 		// constants		
 		using constants_t = weight_constants<WeightT>;
 
 		using constants_t::NO_WEIGHT;
 		using constants_t::ZERO_WEIGHT;
 		using constants_t::DEFAULT_WEIGHT;
-
-
-		//enum to distinguish between vertex and edge weights
-
+					
+				
+		// enum for backward compatibility with previous versions
+		// to remove - this class is only for edge-weighted graphs, so vertex weights are not relevant
 		enum { VERTEX, EDGE, BOTH };
 
 
-		////////////////////////////
-		//constructors / destructor
+		///////////////////////
+		// construction / destruction
 
 		Base_Graph_EW() {};													
-		Base_Graph_EW(graph_type& g, const mat_t& edge_weights) : 
-			g_(g), we_(edge_weights) {}		
+		Base_Graph_EW(graph_t& graph, const weight_matrix_t& edge_weights)
+			: g_(graph), 
+			we_(edge_weights)
+		{}		
 
 		/**
 		* @brief creates a graph with |V|= n and val weights as base line.
@@ -105,20 +113,24 @@ namespace bitgraph {
 		* @details: base line for all weights is set to val, i.e. vertex weights are
 		*			set to val, but edge-weights will be overwritten when edges are added
 		**/
-		Base_Graph_EW(int n, Weight val = ZERO_WEIGHT, bool edge_weighted = false);						//creates empty graph with |V|= n and val weights	
+		//creates empty graph with |V|= n and val weights	
+		Base_Graph_EW(
+			int n, 
+			Weight val = ZERO_WEIGHT, 
+			bool edge_weighted = false);			
 
 		/**
 		* @brief reads graph from file. If ewights are not found it generated them
 		*		 automatically based on the Pullman 2008 formula
 		* @details currently only reads dimacs format (with or without weights)
 		**/
-		explicit Base_Graph_EW(std::string filename);															//read weighted ASCII file or generate weights using formula- CHECK! (21/11/2021))
+		explicit Base_Graph_EW(const std::string& filename);															//read weighted ASCII file or generate weights using formula- CHECK! (21/11/2021))
 
 		//copy constructor, move constructor, copy operator =, move operator =
 		Base_Graph_EW(const Base_Graph_EW& g) = default;
 		Base_Graph_EW(Base_Graph_EW&& g) noexcept = default;
 		Base_Graph_EW& operator = (const Base_Graph_EW& g) = default;
-		Base_Graph_EW& operator = (Base_Graph_EW&& g)		noexcept = default;
+		Base_Graph_EW& operator = (Base_Graph_EW&& g) noexcept = default;
 
 		//destructor
 		virtual	~Base_Graph_EW() = default;
@@ -419,12 +431,10 @@ namespace bitgraph {
 		**/
 		std::ostream& print_vertex_weights(Vertices& lv, std::ostream& o = std::cout) const;
 
-		///////////////////
-		//data members
-
 	protected:
-		graph_type g_;
-		mat_t   we_;									//matrix of (only) edge-weights 																
+
+		graph_t g_;						// edge-weighted graph (no vertex weights) 
+		weight_matrix_t we_;			// matrix of (only) edge-weights 																
 
 	}; //end of class Base_Graph_EW
 

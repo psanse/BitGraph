@@ -204,7 +204,7 @@ template<class GraphT, class WeightT>
  }
 
  template<class GraphT, class WeightT>
-Base_Graph_EW<GraphT, WeightT>::Base_Graph_EW(string filename){
+Base_Graph_EW<GraphT, WeightT>::Base_Graph_EW(const std::string& filename){
 	read_dimacs	(filename);							
 }
 

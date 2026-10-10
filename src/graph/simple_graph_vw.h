@@ -88,7 +88,8 @@ namespace bitgraph {
 		}	
 	
 		Base_Graph_W(graph_t& graph, weights_t& weights)
-			:graph_(graph), vertex_weights_(weights) 
+			:graph_(graph), 
+			vertex_weights_(weights) 
 		{ 
 			assert(vertex_weights_.size() == graph_.size());
 		}									
