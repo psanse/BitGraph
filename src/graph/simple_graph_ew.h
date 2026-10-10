@@ -265,7 +265,7 @@ namespace bitgraph {
 		* @param MODULUS: modulus value [Pullan 2008, DEFAULT_WEIGHT_MODULUS = 200]
 		**/
 		template <bool EraseNonEdges = false>
-		void set_modulus_edge_weight(int MODULUS = DEFAULT_WEIGHT_MODULUS);
+		void set_modulus_edge_weights(int MODULUS = DEFAULT_WEIGHT_MODULUS);
 
 
 		////////////////
@@ -552,7 +552,7 @@ namespace bitgraph {
 	template<class GraphT, class WeightT>
 	template <bool EraseNonEdges>
 	inline
-		void Base_Graph_EW<GraphT, WeightT>::set_modulus_edge_weight(int MODULUS) {
+		void Base_Graph_EW<GraphT, WeightT>::set_modulus_edge_weights(int MODULUS) {
 
 		int NV = num_vertices();
 
