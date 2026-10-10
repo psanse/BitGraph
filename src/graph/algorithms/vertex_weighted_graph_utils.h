@@ -12,7 +12,7 @@
 #ifndef BITGRAPH_GRAPH_VERTEX_WEIGHTED_GRAPH_UTILS_H
 #define BITGRAPH_GRAPH_VERTEX_WEIGHTED_GRAPH_UTILS_H
 
-#include "graph/graph_vertex_weighted.h"
+#include "graph/graph_vw_facade.h"
 #include "graph/graph_traits.h"
 #include "utils/logger.h"
 #include "utils/sort_utils.h"

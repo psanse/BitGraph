@@ -1,5 +1,5 @@
 /**
- * @file graph_vw_facade.h
+ * @file ugraph_vertex_weighted.h
  *
  * @brief Facade specializations and inline implementations for vertex-weighted graphs.
  *
@@ -38,12 +38,12 @@
  * 01/02/2026
  */
 
-#ifndef BITGRAPH_GRAPH_GRAPH_VERTEX_WEIGHTED_FACADE_H
-#define BITGRAPH_GRAPH_GRAPH_VERTEX_WEIGHTED_FACADE_H
+#ifndef BITGRAPH_GRAPH_UGRAPH_VERTEX_WEIGHTED_H
+#define BITGRAPH_GRAPH_UGRAPH_VERTEX_WEIGHTED_H
 
 #include "graph_types.h"
 #include "graph_unweighted.h"
-#include "simple_graph_vw.h"												 // MUST BE AFTER graph_basic.h 
+#include "simple_graph_vw.h"		
 
 namespace bitgraph {
     
@@ -53,24 +53,40 @@ namespace bitgraph {
 	class Graph_W<ugraph, WeightT> : public Base_Graph_W<ugraph, WeightT> {
 	public:
 
-		using BaseT = Base_Graph_W<ugraph, WeightT>;					
-		using graph_type = typename BaseT::graph_type;
-		using bitset_type = typename BaseT::bitset_type;
-		using Weight = typename BaseT::Weight;
-		using vertex_bitset_t = bitset_type;						// alias for semantic information
+		using base_t = Base_Graph_W<ugraph, WeightT>;
+		using graph_t = typename base_t::graph_type;
+		using bitset_t = typename base_t::bitset_type;
+		using weight_t = typename base_t::weight_t;
+		using vertex_bitset_t = bitset_t;
 
-		using BaseT::NO_WEIGHT;
+
+		//using BaseT = Base_Graph_W<ugraph, WeightT>;					
+		//using graph_type = typename BaseT::graph_type;
+		//using bitset_type = typename BaseT::bitset_type;
+		//using Weight = typename BaseT::Weight;
+		//using vertex_bitset_t = bitset_type;						// alias for semantic information
+
+
+		using base_t::NO_WEIGHT;
+		using base_t::ZERO_WEIGHT;
+		using base_t::DEFAULT_WEIGHT;
+
+		/*using BaseT::NO_WEIGHT;
 		using BaseT::ZERO_WEIGHT;
-		using BaseT::DEFAULT_WEIGHT;
+		using BaseT::DEFAULT_WEIGHT;*/
 				
-		//constructors (inherited from Base class)
-		using BaseT::BaseT;
+		
+		// Inherit constructors from Base_Graph_W.
+		using base_t::base_t;
 
-		/////////////
-		//useful interface-specific for undirected weighted graphs
+		//////////////////
+		// Undirected-graph-specific interface.
+
 		int max_graph_degree() const { return this->graph_.max_graph_degree(); }
-		int degree(int v) const { return this->graph_.degree(v); }
-		int degree(int v, const Bitset& bbn) const { return this->graph_.degree(v, bbn); }
+		int degree(vertex_t v) const { return this->graph_.degree(v); }
+		int degree(vertex_t v, const vertex_bitset_t& vertices) const { 
+			return this->graph_.degree(v, vertices);
+		}
 
 		///////////
 		//I/O operations
@@ -80,24 +96,24 @@ namespace bitgraph {
 		*
 		*		 (self-loops are not considered)
 		*/
-		std::ostream& write_dimacs(std::ostream& o = std::cout);
+		std::ostream& write_dimacs(std::ostream& o = std::cout) const;
 	};
 		
 
     // facade types for vertex-weighted ugraphs
-    using ugraph_w = Graph_W<ugraph, double>;                   // simple vertex weighted graph with double weights
-    using ugraph_wi = Graph_W<ugraph, int>;                     // simple vertex weighted graph with int weights
+    using ugraph_w = Graph_W<ugraph, double>;                   
+    using ugraph_wi = Graph_W<ugraph, int>;                    
 }
 
 
 //////////////////////
-// implementation in header file
+// Necessary implementation in header file
 
 namespace bitgraph {
 
 	template<class WeightT>
 	inline std::ostream&
-	Graph_W<ugraph, WeightT>::write_dimacs(std::ostream& os) {
+	Graph_W<ugraph, WeightT>::write_dimacs(std::ostream& os) const {
 
 		//timestamp comment
 		this->graph_.timestamp_dimacs(os);
@@ -130,4 +146,5 @@ namespace bitgraph {
 
 
 
-#endif // BITGRAPH_GRAPH_GRAPH_VERTEX_WEIGHTED_FACADE_H__
+
+#endif // BITGRAPH_GRAPH_UGRAPH_VERTEX_WEIGHTED_H
