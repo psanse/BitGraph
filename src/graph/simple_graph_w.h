@@ -420,7 +420,11 @@ namespace bitgraph {
 		 * @deprecated Use the overload taking `weight_file_extension`.
 		 */
 		[[deprecated("Use the typed read_dimacs overload with weight_file_extension")]]
-		int read_dimacs(string filename, int type);
+		int read_dimacs(string filename, int type) {
+			return read_dimacs(
+				filename,
+				static_cast<weight_file_extension>(type)) ? 0 : -1;
+		}
 
 		/**
 		 * @brief Reads a vertex-weighted graph from a DIMACS file.
@@ -435,10 +439,8 @@ namespace bitgraph {
 		 *
 		 * @note On failure, the graph is reset to an empty state.
 		 */
-		bool read_dimacs(string filename, weight_file_extension type = weight_file_extension::none)
-		{
-			return read_dimacs(filename, static_cast<int>(type)) == 0;	
-		}
+		bool read_dimacs(const std::string& filename,
+			weight_file_extension type = weight_file_extension::none);
 
 		/**
 		* @brief Reads weights from an external file (only weights)
@@ -449,9 +451,9 @@ namespace bitgraph {
 		*		 Weights not assigned in the file are set to 0.0
 		*
 		* @param filename name of the file
-		* @returns 0 if success, -1 if error (empty vector of weights)
+		* @returns true if success, false if error (empty vector of weights)
 		**/
-		int read_weights(string filename);
+		bool read_weights(const std::string& filename);
 
 		/**
 		 * @brief Prints graph information to an output stream.
@@ -486,39 +488,86 @@ namespace bitgraph {
 		}
 
 		/**
-		* @brief streams vertex-weights in the format [v:(val)]
-		* @param o output stream
-		* @param show_vert: if FALSE does not show vertex info but the collection of weights
-		*					in order
-		**/
-		std::ostream& print_weights(std::ostream& o = std::cout, bool show_vert = true)	const;
+		 * @brief Prints vertex weights to an output stream.
+		 *
+		 * By default, each vertex weight is printed in the form `[v:(weight)]`.
+		 * If @p show_vertices is `false`, only the collection of weights is printed,
+		 * preserving vertex order.
+		 *
+		 * @param os Output stream.
+		 * @param show_vertices If `true`, prints vertex identifiers together with
+		 *                      their weights; otherwise, prints only the weights.
+		 * @return Reference to @p o.
+		 */
+		std::ostream& print_weights(
+			std::ostream& os = std::cout, 
+			bool show_vertices = true)	const;
 
 		/**
-		* @brief streams vertex-weights in the subset of vertices  bbsg
-		**/
-		std::ostream& print_weights(vertex_bitset_t& bbsg, std::ostream& o = std::cout) const;
+		 * @brief Prints the weights of the vertices contained in a bitset.
+		 *
+		 * Each set bit identifies a vertex whose weight is written to the output
+		 * stream.
+		 *
+		 * @param vertices Bitset containing the vertices to print.
+		 * @param os Output stream.
+		 * @return Reference to @p o.
+		 *
+		 * @note @p vertices is non-const because scanning updates the internal
+		 *       scan cursor of the bitset, even though the set of bits itself is
+		 *       not modified.
+		 */
+		std::ostream& print_weights(
+			vertex_bitset_t& vertices, 
+			std::ostream& os = std::cout) const;
 
 		/**
-		* @brief prints the weights of the vertices in the stack lv
-		* @param lv: a set of vertices with a stack interface
+		* @brief prints the weights of the vertices in the stack vertices
+		* @param vertices: a set of vertices with a stack interface
 		**/
-		std::ostream& print_weights(utils::FixedStack<int>& lv, ostream& o = std::cout) const;
+		std::ostream& print_weights(
+			const utils::FixedStack<int>& vertices,
+			std::ostream& os = std::cout) const;
 
 		/**
 		* @brief prints the weights of the vertices in the FixedStack lv
 		*		 given a mapping of the vertices
 		* @param mapping: input mapping of the vertices with at least the same size as
 		*				  the FixedStack lv
-		* @param lv: a set of vertices with a FixedStack interface
+		* @param vertices: a set of vertices with a FixedStack interface
 		**/
-		std::ostream& print_weights(utils::FixedStack<int>& lv, const VertexMapping& mapping, std::ostream& o = std::cout)	const;
+		std::ostream& print_weights(
+			const utils::FixedStack<int>& vertices,
+			const VertexMapping& mapping,
+			std::ostream& os = std::cout)	const;
 
 		/**
-		* @brief prints the weights of the vertices in lv
-		* @supports C-arrays
-		**/
-		std::ostream& print_weights(vertex_set_t& vertices, std::ostream& o = std::cout) const;
-		std::ostream& print_weights(int* lv, int n, std::ostream& o = std::cout) const;
+		 * @brief Prints the weights of the vertices contained in a vertex set.
+		 *
+		 * @param vertices Vertex set whose weights are printed.
+		 * @param os Output stream.
+		 * @return Reference to @p os.
+		 *
+		 * @note Supports C-style arrays through `vertex_set_t`.
+		 */
+		std::ostream& print_weights(
+			vertex_set_t& vertices, 
+			std::ostream& os = std::cout) const;
+
+		/**
+		 * @brief Prints the weights of the vertices contained in a C-style array.
+		 *
+		 * @param vertices Pointer to the array of vertex identifiers.
+		 * @param n Number of vertices in the array.
+		 * @param os Output stream.
+		 * @return Reference to @p os.
+		 *
+		 * @note Retained for backward compatibility with code using C-style arrays.
+		 */
+		std::ostream& print_weights(
+			const vertex_t* vertices, 
+			int n, 
+			std::ostream& os = std::cout) const;
 
 		/////////////////////////////////////
 		// data members

@@ -23,6 +23,7 @@
 
 #include <fstream>
 #include <iostream>
+#include <sstream>
 				
 using namespace std;
 using namespace bitgraph;
@@ -61,7 +62,7 @@ auto Base_Graph_W<GraphT, WeightT>::create_complement() const
 template<class GraphT, class WeightT>
 Base_Graph_W<GraphT, WeightT>::Base_Graph_W(const std::string& filename)
 {	
-	if (read_dimacs(filename) == -1) {
+	if (!read_dimacs(filename)) {
 		LOG_ERROR("error reading DIMACS file -Base_Graph_W<GraphT, WeightT>::Base_Graph_W");
 		std::terminate();
 	}
@@ -193,199 +194,171 @@ ostream& Base_Graph_W<GraphT, WeightT>::write_dimacs(ostream& os) const
 
 
 template<class GraphT, class WeightT>
-int Base_Graph_W<GraphT, WeightT>::read_dimacs (string filename, int type)
+bool Base_Graph_W<GraphT, WeightT>::read_dimacs(
+	const std::string& filename, weight_file_extension type)
 {
-	std::string line;
-	
-	fstream f(filename.c_str());
-	if(!f){
-		LOGG_ERROR("error when reading file ", filename, " in DIMACS format - Base_Graph_W<GraphT, WeightT>::read_dimacs");
+	std::ifstream input(filename);
+	if (!input) {
+		LOGG_ERROR("error when reading file ", filename,
+			" in DIMACS format - typed Base_Graph_W::read_dimacs");
 		reset();
-		return -1;
+		return false;
 	}
 
-	//read header
-	int nV = -1, nEdges = -1;
-	if(io::detail::dimacs::read_dimacs_header(f, nV, nEdges) == -1){
-		reset(); 		
-		return -1;
-	}	
-	
-	//allocates memory for the graph, assigns default unit weights
+	int nV = 0;
+	int nEdges = 0;
+	if (io::detail::dimacs::read_dimacs_header(input, nV, nEdges) == -1 ||
+		nV < 0 || nEdges < 0) {
+		reset();
+		return false;
+	}
 
-	/////////////
 	reset(nV);
-	////////////
-	
-	//skips empty lines
-	io::detail::skip_empty_lines(f);
-	
-	//////////////
-	//read vertex weights format <n> <vertex index> <weight> if they exist
-	int v1 = -1, v2 = -1;
-	weight_t wv = -1;
-	int c = f.peek();
-	if(c == EOF){
-		LOG_ERROR("bizarre EOF when peeking for first char - Base_Graph_W<GraphT, WeightT>::read_dimacs");
-		reset();		
-		return -1;
-	}
-	char next = static_cast<char>(c);
-	
-	switch (next) {
-	case 'n':
-	case 'v':						// 'v' format used by Zavalnij in evil_W benchmark 
+	bool has_inline_weights = false;
+	int read_edges = 0;
+	std::string line;
 
-		for (int n = 0; n < nV; ++n) {
-			f >> next >> v1 >> wv;
-			
-			//assert
-			if (f.bad()) {
-				LOG_ERROR("error when reading vertex-weights - Base_Graph_W<GraphT, WeightT>::read_dimacs");
-				reset();				
-				return -1;
-			}
-
-			//non-positive vertex-weight check
-			if (wv <= 0.0) {
-				LOGG_WARNING("non-positive weight read: ", wv, "- Base_Graph_W<GraphT, WeightT>::read_dimacs");
-			}
-
-			////////////////////
-			vertex_weights_[v1 - 1] = wv;
-			////////////////////
-						
-			std::getline(f, line);  //remove remaining part of the line
+	while (std::getline(input, line)) {
+		std::istringstream record(line);
+		std::string token;
+		if (!(record >> token)) {
+			continue;
+		}
+		if (token == "END" || token == "end") {
+			break;
+		}
+		char tag = token.front();
+		/*if (tag >= 'A' && tag <= 'Z') {
+			tag = static_cast<char>(tag - 'A' + 'a');
+		}*/
+		if (tag == 'c') {
+			continue;
 		}
 
-		//skip empty lines
-		io::detail::skip_empty_lines(f);
+		////////////////////
+		// Vertex weights
 
-		break;
-	default:
-		LOGG_DEBUG("Bad weights in file ", filename, " setting unit weights - Base_Graph_W<GraphT, WeightT>::read_dimacs");
+		if (tag == 'n' || tag == 'v') {
+			vertex_t vertex = 0;
+			weight_t weight{};
+			if (!(record >> vertex >> weight) || vertex < 1 || vertex > nV) {
+				reset();
+				return false;
+			}
+			vertex_weights_[static_cast<std::size_t>(vertex - 1)] = weight;
+			has_inline_weights = true;
+			continue;
+		}
+
+		//////////////////
+		// Edges
+
+		if (tag != 'e') {
+			reset();
+			return false;
+		}
+
+		vertex_t first = BBObject::noBit;
+		vertex_t second = BBObject::noBit;
+		if (!(record >> first >> second) ||
+			first < 1 || first > nV ||
+			second < 1 || second > nV) 
+		{
+			reset();
+			return false;
+		}
+
+		if (read_edges >= nEdges) {
+			reset();
+			return false;
+		}
+
+		if (first == second) {
+			LOGG_WARNING(
+				"Self-loop found at vertex ",
+				first,
+				" - Base_Graph_W::read_dimacs");
+
+			reset();
+			return false;
+		}
+
+		graph_.add_edge(first - 1, second - 1);
+		++read_edges;
+	} // end of reading lines
+
+	if (read_edges != nEdges) {
+		reset();
+		return false;
 	}
-			
-	//read weights from external files if necessary 
-	//( @date 9/10/16, the use of additional weight files is deprecated now (26/09/23) )
-	if (vertex_weights_.empty()) {
-		string strExt(filename);					
 
+	// Read weights from a separate file if they were not included inline and a weight file type was specified.
+	if (!has_inline_weights && type != weight_file_extension::none) {
+		std::string weight_filename = filename;
 		switch (type) {
-		case Wext:
-			strExt += ".w";
-			read_weights(strExt);
-			break;
-		case Dext:
-			strExt += ".d";
-			read_weights(strExt);
-			break;
-		case WWWext:
-			strExt += ".www";
-			read_weights(strExt);
-			break;
+		case weight_file_extension::w:   weight_filename += ".w"; break;
+		case weight_file_extension::d:   weight_filename += ".d"; break;
+		case weight_file_extension::www: weight_filename += ".www"; break;
+		case weight_file_extension::none: break;
 		default:
-			;				//no LOG - no weights expected to be read
+			reset();
+			return false;
 		}
-	}
-	
-	////////////////	
-	//read edges
 
-	//read the first edge line - 3 tokens expected (no edge-weights)
-	c = f.peek();
-	if (c == EOF) {
-		LOG_ERROR("bizarre EOF when peeking for first char - Base_Graph_W<GraphT, WeightT>::read_dimacs");
-		reset();	
-		return -1;
-	}
-	next = static_cast<char>(c);
-
-	if (next != 'e') {
-		LOG_ERROR("Wrong edge format reading edges - Base_Graph_EW<GraphT, WeightT>::read_dimacs");
-		reset();	
-		return -1;
-	}
-
-	std::getline(f, line);
-	stringstream sstr(line);
-	int nw = utils::number_of_words (line /*sstr.str()*/);
-
-	//assert
-	if(nw != 3){
-		LOGG_ERROR ("Wrong edge format reading first edge line - Base_Graph_W<GraphT, WeightT>::read_dimacs");
-		reset();		
-		return -1;
-	}
-	
-	//parse the first edge
-	if(nw == 3){
-		sstr >> next >> v1 >> v2;
-		graph_.add_edge(v1 - 1,v2 - 1);
-	}
-	
-	//remaining edges
-	for(int e = 1; e < nEdges; ++e){
-		f >> next;
-		if(next != 'e' || f.bad()){
-			LOG_ERROR("Wrong edge format reading edges - Base_Graph_W<GraphT, WeightT>::read_dimacs");
-			reset();			
-			return -1;
+		std::ifstream weights_input(weight_filename);
+		if (!weights_input) {
+			reset();
+			return false;
 		}
-		//add bidirectional edge	
-		f >> v1 >> v2;
-		graph_.add_edge(v1 - 1,v2 - 1);
-			
-		std::getline(f, line);  //remove remaining part of the line
-	}
-		
-	//set name 
+		std::vector<weight_t> weights(static_cast<std::size_t>(nV));
+		for (weight_t& weight : weights) {
+			if (!(weights_input >> weight)) {
+				reset();
+				return false;
+			}
+		}
+		vertex_weights_ = std::move(weights);
+	} // end of reading weights from a separate file
+
+
 	graph_.set_name(filename);
-		
-	return 0;
+	return true;
 }
 
 
 template<class GraphT, class WeightT>
-int Base_Graph_W<GraphT, WeightT>::read_weights(string filename) 
+bool Base_Graph_W<GraphT, WeightT>::read_weights(const std::string& filename) 
 {
-	////////////////////////////////
 	ifstream f(filename.c_str());
-	////////////////////////////////
 
-	//assert
 	if (!f) {
-		LOGG_WARNING("Weight file ", filename, "could not be found - Base_Graph_W<GraphT, WeightT>::read_weights");
-		return -1;
+		LOGG_WARNING(
+			"Weight file ", filename,
+			" could not be found - Base_Graph_W::read_weights");
+		return false;
 	}
+	
 
-	//debugging IO
-	LOGG_DEBUG("reading vertex weights from: ", filename, "- Base_Graph_W<GraphT, WeightT>::read_weights");
+	LOGG_DEBUG(
+		"Reading vertex weights from: ", filename,
+		" - Base_Graph_W::read_weights");
 
-	//allocation of memory for weights
-	int NV = graph_.num_vertices();
-	vertex_weights_.clear();
-	vertex_weights_.reserve(NV);
 
-	//reads weights
-	double w = -1.0;
-	for (Vertex i = 0; i < NV; ++i) {
-		f >> w;
-		if (f.fail()) {
-			LOGG_ERROR("bad reading of weights in:", filename, "- Base_Graph_W<GraphT, WeightT>::read_weights");
+	const int NV = graph_.num_vertices();
+	vertex_weights_.resize(static_cast<std::size_t>(NV));
+
+	for (vertex_t v = 0; v < NV; ++v) {
+		if (!(f >> vertex_weights_[v])) {
+			LOGG_ERROR(
+				"Error when reading weights from: ", filename,
+				" - Base_Graph_W::read_weights");
+
 			vertex_weights_.clear();
-			return -1;
+			return false;
 		}
-		//////////////
-		vertex_weights_[i] = w;		
-		//////////////
 	}
 
-	/////////////////
-	f.close();
-	////////////////
-
-	return 0;
+	return true;
 }
 
 template<class GraphT, class WeightT>
@@ -395,7 +368,7 @@ ostream& Base_Graph_W<GraphT, WeightT>::print_data(
 	bool trailing_newline) const
 {
 	graph_.print_data(lazy, os, false);
-	os << " [type: vw]";								//adds tag to indicate it is weighted		
+	os << " [type: vw]";					// vertex-weighted graph			
 	
 	if (trailing_newline) {
 		os << '\n';
@@ -404,80 +377,110 @@ ostream& Base_Graph_W<GraphT, WeightT>::print_data(
 }
 
 template <class GraphT, class WeightT>
-ostream& Base_Graph_W<GraphT, WeightT>::print_weights (utils::FixedStack<int>& vertices, ostream& os) const
+ostream& Base_Graph_W<GraphT, WeightT>::print_weights (
+	const utils::FixedStack<int>& vertices,
+	ostream& os) const
 {
-	const int SIZE = static_cast<int>(vertices.size());
-	for(vertex_t v = 0; v < SIZE; ++v){
-		os << "[" << vertices[v] << ":(" << vertex_weights_[vertices[v]] << ")] ";
+	const int vertex_count = static_cast<int>(vertices.size());
+
+	for(int i = 0; i < vertex_count; ++i){
+		const vertex_t v = vertices[i];
+
+		os << "[" << v << ":(" 
+			<< vertex_weights_[static_cast<std::size_t>(v)]
+			<< ")] ";
 	}
-	os << "(" << vertices.size() << ")" <<endl;
+	os << "(" << vertex_count << ")" << '\n';
 	return os;
 }
 
 template <class GraphT, class WeightT>
 ostream& Base_Graph_W<GraphT, WeightT>::print_weights (
-	int* lv, 
+	const vertex_t* vertices, 
 	int NV,
 	ostream& os) const
 {
-	for(vertex_t v = 0; v < NV; ++v){
-		os << "[" << lv[v] << ":(" << vertex_weights_[lv[v]] << ")] ";
+	for(int i = 0; i < NV; ++i){
+		const vertex_t v = vertices[i];
+		os << "[" << v
+			<< ":(" << vertex_weights_[static_cast<std::size_t>(v)] 
+			<< ")] ";
 	}
-	os << "(" << NV << ")" << endl;
+	os << "(" << NV << ")" << '\n';
 	return os;
 }
 
 template <class GraphT, class WeightT>
 ostream& Base_Graph_W<GraphT, WeightT>::print_weights (
-	utils::FixedStack<int>& vertices,
+	const utils::FixedStack<int>& vertices,
 	const VertexMapping& mapping,
 	ostream& os) const
 {
 	const int vertex_count = static_cast<int>(vertices.size());
+
+	for(int i = 0; i < vertex_count; ++i){
+		const vertex_t v = mapping[vertices[i]];
+
+		os << "[" << v << ":(" << vertex_weights_[static_cast<std::size_t>(v)] << ")] ";
+	}
+	os << "(" << vertex_count << ")" << endl;
+	return os;
+}
+
+template <class GraphT, class WeightT>
+ostream& Base_Graph_W<GraphT, WeightT>::print_weights (
+	vertex_set_t& vertices, 
+	ostream& os) const
+{
+	const int vertex_count = static_cast<int>(vertices.size());
+
 	for(vertex_t v = 0; v < vertex_count; ++v){
-		os << "[" << mapping[vertices[v]] << ":(" << vertex_weights_[mapping[vertices[v]]] << ")] ";
+		os << "[" << vertices[v] << ":(" << vertex_weights_[vertices[v]] << ")] ";
 	}
 	os << "(" << vertices.size() << ")" << endl;
 	return os;
 }
 
 template <class GraphT, class WeightT>
-ostream& Base_Graph_W<GraphT, WeightT>::print_weights (vertex_set_t& vertices, ostream& o) const
-{
-	const int vertex_count = static_cast<int>(vertices.size());
-
-	for(vertex_t v = 0; v < vertex_count; ++v){
-		o << "[" << vertices[v] << ":(" << vertex_weights_[vertices[v]] << ")] ";
-	}
-	o << "(" << vertices.size() << ")" << endl;
-	return o;
-}
-
-template <class GraphT, class WeightT>
-ostream& Base_Graph_W<GraphT, WeightT>::print_weights (vertex_bitset_t& bbsg, ostream& os) const
+ostream& Base_Graph_W<GraphT, WeightT>::print_weights (
+	vertex_bitset_t& vertices, 
+	ostream& os) const
 {
 	vertex_t v = bbo::noBit;
 
-	bbsg.init_scan(bbo::NON_DESTRUCTIVE);										/* CHECK sparse graphs */
-	while((v = bbsg.next_bit())!= bbo::noBit){
-		os << "[" << v << ":(" << vertex_weights_[v] << ")] ";
+	vertices.init_scan(bbo::NON_DESTRUCTIVE);		// CHECK sparse graphs
+							
+	while((v = vertices.next_bit())!= bbo::noBit){
+		os << "[" << v
+			<< ":(" << vertex_weights_[v]
+			<< ")] ";
 	}
-	os << "(" << bbsg.count() << ")" << endl;
+
+	os << "(" << vertices.count() << ")" << '\n';
 	return os;
 }
 
 template <class GraphT, class WeightT>
-ostream& Base_Graph_W<GraphT, WeightT>::print_weights (ostream& os, bool show_v) const
+ostream& Base_Graph_W<GraphT, WeightT>::print_weights (
+	ostream& os,
+	bool show_vertices) const
 {
-	const int NV = num_vertices();
-	if(show_v){
-		for(Vertex i = 0; i < NV; ++i){
-			os << "[" << i << ":(" << vertex_weights_[i] << ")] ";
-		}
-		os << endl;
-	}else{
-		utils::print_collection<vector<Weight>>(vertex_weights_, os, true);
+
+	if (!show_vertices) {
+		utils::print_collection<weights_t>(
+			vertex_weights_, os, true);
+		return os;
 	}
+
+	const int vertex_count = num_vertices();
+
+	for (vertex_t v = 0; v < vertex_count; ++v) {
+		const weight_t weight = vertex_weights_[static_cast<std::size_t>(v)];
+		os << "[" << v
+			<< ":(" << weight << ")] ";
+	}
+	os << '\n';
+	
 	return os;
 }
 
