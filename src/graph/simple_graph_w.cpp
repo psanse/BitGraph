@@ -13,9 +13,8 @@
 #include "graph_types.h"
 #include "graph/graph_unweighted.h"		// required for valid type instantiation 
 #include "graph/simple_graph_w.h"
-#include "bitscan/bitscan.h"
-#include "graph/formats/detail/dimacs_format.h"			
-//#include "utils/common.h"
+#include "graph/formats/detail/dimacs_format.h"		
+#include "bitscan/bitscan.h"	
 #include "utils/logger.h"
 #include "utils/string_utils.h"
 #include "utils/collection_utils.h"
@@ -23,9 +22,8 @@
 
 #include <fstream>
 #include <iostream>
-#include <sstream>
-				
-using namespace std;
+#include <sstream>			
+
 using namespace bitgraph;
 
 ///////////////////////////////////////////////
@@ -224,19 +222,24 @@ bool Base_Graph_W<GraphT, WeightT>::read_dimacs(
 		if (!(record >> token)) {
 			continue;
 		}
+
+		/* instance specific - not DIMACS protocol */
 		if (token == "END" || token == "end") {
 			break;
 		}
 		char tag = token.front();
+
+		/* again, not DIMACS protocol */
 		/*if (tag >= 'A' && tag <= 'Z') {
 			tag = static_cast<char>(tag - 'A' + 'a');
 		}*/
+
 		if (tag == 'c') {
 			continue;
 		}
 
 		////////////////////
-		// Vertex weights
+		// vertex weights
 
 		if (tag == 'n' || tag == 'v') {
 			vertex_t vertex = 0;
@@ -251,7 +254,7 @@ bool Base_Graph_W<GraphT, WeightT>::read_dimacs(
 		}
 
 		//////////////////
-		// Edges
+		// edges
 
 		if (tag != 'e') {
 			reset();
