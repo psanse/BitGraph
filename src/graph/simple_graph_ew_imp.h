@@ -1,5 +1,5 @@
  /**
-   * @file simple_graph_ew.cpp
+   * @file simple_graph_ew_imp.h
    * @brief implementation for Base_Graph_EW and Graph_EW classes (edge-weighted graphs)
    *
    * @created 16/01/19
@@ -16,10 +16,10 @@
 #include "graph_types.h"
 #include "graph/formats/detail/dimacs_format.h"
 #include "graph/simple_graph_ew.h"
-//#include "utils/common.h"
 #include "utils/logger.h"
 #include "utils/string_utils.h"
 #include "utils/precise_timer.h"
+
 #include <fstream>
 #include <iostream>
 #include <cassert>							//NDEBUG should be undefined - (normally in compiler DEBUG mode)
@@ -27,6 +27,156 @@
 
 using namespace bitgraph;
 
+
+template <class GraphT, class WeightT>
+template <bool EraseNonEdges>
+void Base_Graph_EW< GraphT, WeightT>::set_weight(mat_t& lw, bool edges_only) {
+
+	auto NV = num_vertices();
+
+	/////////////////////////
+	assert(lw.size() == NV);
+	/////////////////////////
+
+	/*if (lw.size() != NV) {
+		LOG_ERROR("bizarre matrix of weights-Base_Graph_EW<GraphT,WeightT >::set_edge_weight(mat_t...)");
+		return -1;
+	}*/
+
+	//set to empty wv and non-edges
+	for (int v = 0; v < NV; ++v) {
+		for (int w = 0; w < NV; ++w) {
+
+			if (edges_only && v == w) continue;			//skips vertex weights if required
+
+			if (g_.is_edge(v, w)) {
+				we_[v][w] = lw[v][w];
+			}
+			else {
+				//cleans non-edge weights if required
+				if (EraseNonEdges) { we_[v][w] = NO_WEIGHT; }
+			}
+		}
+	}
+}
+
+template<class GraphT, class WeightT>
+template<class Func>
+void Base_Graph_EW<GraphT, WeightT>::transform_weights(Func f, int type)
+{
+	auto NV = num_vertices();
+
+	switch (type) {
+		//edge-weights
+	case EDGE:
+		for (auto i = 0; i < NV - 1; ++i) {
+			for (auto j = i + 1; j < NV; ++j) {
+				if (we_[i][j] != NO_WEIGHT) {
+					we_[i][j] = f(we_[i][j]);
+				}
+				if (we_[j][i] != NO_WEIGHT) {
+					we_[j][i] = f(we_[j][i]);
+				}
+			}
+		}
+		break;
+		//vertex-weights
+	case VERTEX:
+		for (auto i = 0; i < NV; ++i) {
+			if (we_[i][i] != NO_WEIGHT) {
+				we_[i][i] = f(we_[i][i]);
+			}
+		}
+		break;
+	case BOTH:
+		//vertex and edge-weights
+		for (auto i = 0; i < NV; ++i) {
+			for (auto j = 0; j < NV; ++j) {
+				if (we_[i][j] != NO_WEIGHT) {
+					we_[i][j] = f(we_[i][j]);
+				}
+			}
+		}
+		break;
+	default:
+		//should not happen	
+		LOG_ERROR("unknown type -  Base_Graph_EW<GraphT, WeightT>::transform_weights");
+		LOG_ERROR("exiting");
+		std::exit(EXIT_FAILURE);
+	}
+}
+
+template <class GraphT, class WeightT>
+template<bool EraseNonEdges>
+void Base_Graph_EW< GraphT, WeightT>::set_edge_weight(Weight val) {
+
+	auto NV = num_vertices();
+
+	//set to empty weight the non-edges
+	for (int v = 0; v < NV; v++) {
+		for (int w = 0; w < NV; w++) {
+			if (g_.is_edge(v, w)) {
+				we_[v][w] = val;
+			}
+			else {
+				if (EraseNonEdges) { we_[v][w] = NO_WEIGHT; }
+			}
+		}
+	}
+}
+
+template<class GraphT, class WeightT>
+template <bool EraseNonEdges>
+void Base_Graph_EW<GraphT, WeightT>::set_modulus_edge_weights(int MODULUS) {
+
+	int NV = num_vertices();
+
+	for (int v = 0; v < NV; ++v) {
+		for (int w = 0; w < NV; ++w) {
+
+			if (g_.is_edge(v, w)) {
+
+				///////////////////////////////////////
+				set_weight(v, w, (1 + ((v + w + 2 /* 0-based index*/) % MODULUS)));
+				///////////////////////////////////////
+			}
+			else {
+				if (EraseNonEdges) {
+					set_edge_weight(v, w, NO_WEIGHT);
+				}
+			}
+		}
+	}
+}
+
+
+template<class GraphT, class WeightT>
+template<bool EdgeWeightedGraph>
+void Base_Graph_EW<GraphT, WeightT>::reset(std::size_t NV, Weight val, string name)
+{
+	///////////////
+	g_.reset(NV);
+	////////////////
+
+	try {
+		we_.assign(NV, vector<WeightT>(NV, val));
+	}
+	catch (...) {
+		LOG_ERROR("bad weight assignment - Base_Graph_EW<GraphT, Weight>::reset");
+		LOG_ERROR("exiting");
+		std::exit(EXIT_FAILURE);
+	}
+
+	//set vertex weights to NO_WEIGHT if required
+	if (EdgeWeightedGraph) {
+		for (auto v = 0u; v < NV; ++v) {
+			we_[v][v] = NO_WEIGHT;
+		}
+	}
+
+	g_.set_name(name);
+
+}
 
 template<class GraphT, class WeightT>
  bool Base_Graph_EW<GraphT, WeightT>::is_consistent(){
@@ -622,17 +772,18 @@ void Base_Graph_EW<GraphT, WeightT>::make_edge_weighted(bool erase_non_edges)
 
 
 ////////////////////////////////////////////
-//list of valid types to allow generic code in *.cpp files 
+// list of valid types to allow generic code in *.cpp files 
+// DEPRECATED (10/10/2026)
 
-namespace bitgraph {
-
-	template class  Base_Graph_EW<ugraph, int>;
-	template class  Base_Graph_EW<ugraph, double>;
-	//template class  Graph_EW<ugraph, int>;
-	//template class  Graph_EW<ugraph, double>;
-
-	//other specializations... (sparse_graph)
-
-} //namespace bitgraph
+//namespace bitgraph {
+//
+//	template class  Base_Graph_EW<ugraph, int>;
+//	template class  Base_Graph_EW<ugraph, double>;
+//	//template class  Graph_EW<ugraph, int>;
+//	//template class  Graph_EW<ugraph, double>;
+//
+//	//other specializations... (sparse_graph)
+//
+//} //namespace bitgraph
 
 ////////////////////////////////////////////

@@ -1,6 +1,7 @@
 /**
  * @file weight_constants.h
  * @brief Common constants for weighted graph types.
+ * @date 2024-10-10
  */
 
 #ifndef BITGRAPH_GRAPH_WEIGHT_CONSTANTS_H
@@ -13,9 +14,9 @@ namespace bitgraph {
 	struct weight_constants {
 		using weight_t = WeightT;
 
-		static constexpr weight_t NO_WEIGHT{ -1 };
-		static constexpr weight_t ZERO_WEIGHT{ 0 };
-		static constexpr weight_t DEFAULT_WEIGHT{ 1 };
+		static constexpr weight_t NO_WEIGHT = -1;
+		static constexpr weight_t ZERO_WEIGHT = 0;
+		static constexpr weight_t DEFAULT_WEIGHT = 1;
 	};
 
 } 
