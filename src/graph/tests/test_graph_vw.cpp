@@ -1,5 +1,5 @@
 /*
-* @file test_wgraph.cpp  
+* @file test_graph_vw.cpp  
 * @brief tests for vertex-weighted graphs
 * @date 9/10/16
 * @last modified 01/02/2026
@@ -8,7 +8,7 @@
 * @todo - ADD TESTS and check disabled / commented out tests at the end of file (09/01/25)
 */
 
-#include "graph/graph_vw_facade.h"
+#include "graph/ugraph_vertex_weighted.h"
 #include "graph/algorithms/graph_gen.h"
 #include "gtest/gtest.h"
 #include "utils/common_paths.h"

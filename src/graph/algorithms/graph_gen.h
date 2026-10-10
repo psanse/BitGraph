@@ -41,16 +41,16 @@
 #ifndef BITGRAPH_GRAPH_GEN_H
 #define BITGRAPH_GRAPH_GEN_H
 
+#include "utils/path_utils.h"
+#include "graph/ugraph_vertex_weighted.h"						// facade types 
+#include "graph/graph_edge_weighted.h"							// facade types 
+#include "graph_fast_sort.h"
+
 #include <iostream>
 #include <sstream>
 #include <random>								
 #include <cassert>
 
-//#include "utils/common.h"
-#include "utils/path_utils.h"
-#include "graph/graph_vw_facade.h"								// facade types 
-#include "graph/graph_edge_weighted.h"							// facade types 
-#include "graph_fast_sort.h"
 
 namespace bitgraph {
 

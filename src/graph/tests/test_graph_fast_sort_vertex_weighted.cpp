@@ -10,7 +10,7 @@
 
 #include "graph/algorithms/graph_fast_sort.h"
 #include "graph/algorithms/graph_fast_sort_vertex_weighted.h"
-#include "graph/graph_vw_facade.h"
+#include "graph/ugraph_vertex_weighted.h"
 
 #include "gtest/gtest.h"
 

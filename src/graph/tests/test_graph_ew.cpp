@@ -1,5 +1,5 @@
 /*
-* @file test_wegraph.cpp
+* @file test_graph_we.cpp
 * @brief Unit tests for edge-weighted graphs
 * @created 20/7/18
 * @last_update 27/01/25
