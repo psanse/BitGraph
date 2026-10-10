@@ -1,20 +1,28 @@
-/*
-* @file test_graph_vw.cpp  
-* @brief tests for vertex-weighted graphs
-* @date 9/10/16
-* @last modified 01/02/2026
-* @author pss
-* 
-* @todo - ADD TESTS and check disabled / commented out tests at the end of file (09/01/25)
-*/
+/**
+ * @file test_graph_vw.cpp
+ * @brief Unit tests for vertex-weighted graph classes.
+ *
+ * Contains tests for construction, assignment, graph initialization,
+ * vertex weights, weight transformations, DIMACS I/O, and graph generation
+ * for vertex-weighted graph types.
+ *
+ * @author pss
+ *
+ * @details Created 09/10/2016, last updated 10/10/2026.
+ * 
+ * TODO: check tests at the end of the file (some are disabled) 
+ */
 
 #include "graph/ugraph_vertex_weighted.h"
 #include "graph/algorithms/graph_gen.h"
 #include "gtest/gtest.h"
-#include "utils/common_paths.h"
+
 #include "utils/logger.h"
 #include "utils/math_utils.h"
 #include <iostream>
+#include <cstdio>
+#include <fstream>
+
 
 using namespace std;
 using namespace bitgraph;
@@ -137,6 +145,22 @@ TEST_F(UGraphWTest, reset) {
 	/////////////////////////////////
 }
 
+TEST_F(UGraphWTest, reset_clears_graph)
+{
+	ASSERT_EQ(2, gw.num_edges());
+
+	gw.reset(3, 2, "reset_graph");
+
+	EXPECT_EQ(3, gw.num_vertices());
+	EXPECT_EQ(0, gw.num_edges());
+
+	EXPECT_EQ(2, gw.weight(0));
+	EXPECT_EQ(2, gw.weight(1));
+	EXPECT_EQ(2, gw.weight(2));
+
+	EXPECT_STREQ("reset_graph", gw.name().c_str());
+}
+
 TEST_F(UGraphWTest, DISABLED_printing) {
 //visual test - default disabled
 
@@ -146,6 +170,309 @@ TEST_F(UGraphWTest, DISABLED_printing) {
 	LOG_INFO("press any key to continue");	
 	cin.get();
 
+}
+
+TEST_F(UGraphWTest, unit_weighted)
+{
+	gw.set_weight(1);
+
+	EXPECT_TRUE(gw.is_unit_weighted());
+
+	gw.set_weight(2, 3);
+
+	EXPECT_FALSE(gw.is_unit_weighted());
+}
+
+TEST_F(UGraphWTest, maximum_weight)
+{
+	vertex_t v = BBObject::noBit;
+
+	const auto max_weight = gw.maximum_weight(v);
+
+	EXPECT_EQ(3, max_weight);
+	EXPECT_EQ(2, v);
+}
+
+TEST(UGraphW, modulus_weights)
+{
+	ugraph_wi gw;
+	gw.reset(201);
+
+	gw.set_modulus_weights(200);
+
+
+	EXPECT_EQ(2, gw.weight(0));
+	EXPECT_EQ(3, gw.weight(1));
+	EXPECT_EQ(200, gw.weight(198));
+	EXPECT_EQ(1, gw.weight(199));
+	EXPECT_EQ(2, gw.weight(200));
+}
+
+TEST_F(UGraphWTest, transform_weights_ignores_no_weight)
+{
+	gw.set_weight(1, ugraph_wi::NO_WEIGHT);
+
+	gw.transform_weights(
+		utils::Scale<ugraph_wi::weight_t>(5));
+
+	EXPECT_EQ(5, gw.weight(0));
+	EXPECT_EQ(ugraph_wi::NO_WEIGHT, gw.weight(1));
+	EXPECT_EQ(15, gw.weight(2));
+}
+
+TEST(UGraphW, read_dimacs_inline_weights)
+{
+	const std::string filename = "test_vw_inline.clq";
+
+	{
+		std::ofstream f(filename);
+
+		f << "c weighted test graph\n";
+		f << "p edge 3 2\n";
+		f << "n 1 10\n";
+		f << "n 2 20\n";
+		f << "n 3 30\n";
+		f << "e 1 2\n";
+		f << "e 2 3\n";
+	}
+
+	ugraph_wi gw;
+
+	ASSERT_TRUE(gw.read_dimacs(
+		filename,
+		ugraph_wi::weight_file_extension::none));
+
+	EXPECT_EQ(3, gw.num_vertices());
+	EXPECT_EQ(2, gw.num_edges());
+
+	EXPECT_EQ(10, gw.weight(0));
+	EXPECT_EQ(20, gw.weight(1));
+	EXPECT_EQ(30, gw.weight(2));
+
+	EXPECT_TRUE(gw.is_edge(0, 1));
+	EXPECT_TRUE(gw.is_edge(1, 2));
+	EXPECT_FALSE(gw.is_edge(0, 2));
+
+	std::remove(filename.c_str());
+}
+
+TEST(UGraphW, read_dimacs_v_weight_format)
+{
+	const std::string filename = "test_vw_v_format.clq";
+
+	{
+		std::ofstream f(filename);
+
+		f << "p edge 2 1\n";
+		f << "v 1 7\n";
+		f << "v 2 11\n";
+		f << "e 1 2\n";
+	}
+
+	ugraph_wi gw;
+
+	ASSERT_TRUE(gw.read_dimacs(
+		filename,
+		ugraph_wi::weight_file_extension::none));
+
+	EXPECT_EQ(7, gw.weight(0));
+	EXPECT_EQ(11, gw.weight(1));
+	EXPECT_TRUE(gw.is_edge(0, 1));
+
+	std::remove(filename.c_str());
+}
+
+TEST(UGraphW, read_dimacs_default_unit_weights)
+{
+	const std::string filename = "test_vw_unit.clq";
+
+	{
+		std::ofstream f(filename);
+
+		f << "p edge 3 2\n";
+		f << "e 1 2\n";
+		f << "e 2 3\n";
+	}
+
+	ugraph_wi gw;
+
+	ASSERT_TRUE(gw.read_dimacs(
+		filename,
+		ugraph_wi::weight_file_extension::none));
+
+	EXPECT_TRUE(gw.is_unit_weighted());
+
+	EXPECT_EQ(1, gw.weight(0));
+	EXPECT_EQ(1, gw.weight(1));
+	EXPECT_EQ(1, gw.weight(2));
+
+	std::remove(filename.c_str());
+}
+
+TEST(UGraphW, read_dimacs_rejects_self_loop)
+{
+	const std::string filename = "test_vw_self_loop.clq";
+
+	{
+		std::ofstream f(filename);
+
+		f << "p edge 3 1\n";
+		f << "e 2 2\n";
+	}
+
+	ugraph_wi gw;
+
+	EXPECT_FALSE(gw.read_dimacs(
+		filename,
+		ugraph_wi::weight_file_extension::none));
+
+	// Failure leaves the graph empty.
+	EXPECT_EQ(0, gw.num_vertices());
+
+	std::remove(filename.c_str());
+}
+
+TEST(UGraphW, read_dimacs_rejects_invalid_vertex)
+{
+	const std::string filename = "test_vw_bad_vertex.clq";
+
+	{
+		std::ofstream f(filename);
+
+		f << "p edge 3 1\n";
+		f << "e 1 4\n";
+	}
+
+	ugraph_wi gw;
+
+	EXPECT_FALSE(gw.read_dimacs(
+		filename,
+		ugraph_wi::weight_file_extension::none));
+
+	EXPECT_EQ(0, gw.num_vertices());
+
+	std::remove(filename.c_str());
+}
+
+TEST(UGraphW, read_dimacs_rejects_malformed_edge)
+{
+	const std::string filename = "test_vw_bad_edge.clq";
+
+	{
+		std::ofstream f(filename);
+
+		f << "p edge 3 1\n";
+		f << "e 1 x\n";
+	}
+
+	ugraph_wi gw;
+
+	EXPECT_FALSE(gw.read_dimacs(
+		filename,
+		ugraph_wi::weight_file_extension::none));
+
+	EXPECT_EQ(0, gw.num_vertices());
+
+	std::remove(filename.c_str());
+}
+
+TEST(UGraphW, read_dimacs_rejects_missing_edges)
+{
+	const std::string filename = "test_vw_missing_edges.clq";
+
+	{
+		std::ofstream f(filename);
+
+		f << "p edge 3 2\n";
+		f << "e 1 2\n";
+	}
+
+	ugraph_wi gw;
+
+	EXPECT_FALSE(gw.read_dimacs(
+		filename,
+		ugraph_wi::weight_file_extension::none));
+
+	EXPECT_EQ(0, gw.num_vertices());
+
+	std::remove(filename.c_str());
+}
+
+
+TEST(UGraphW, read_dimacs_rejects_extra_edges)
+{
+	const std::string filename = "test_vw_extra_edges.clq";
+
+	{
+		std::ofstream f(filename);
+
+		f << "p edge 3 1\n";
+		f << "e 1 2\n";
+		f << "e 2 3\n";
+	}
+
+	ugraph_wi gw;
+
+	EXPECT_FALSE(gw.read_dimacs(
+		filename,
+		ugraph_wi::weight_file_extension::none));
+
+	EXPECT_EQ(0, gw.num_vertices());
+
+	std::remove(filename.c_str());
+}
+
+TEST_F(UGraphWTest, dimacs_round_trip)
+{
+	const std::string filename = "test_vw_roundtrip.clq";
+
+	{
+		std::ofstream f(filename);
+		ASSERT_TRUE(f.good());
+
+		gw.write_dimacs(f);
+	}
+
+	ugraph_wi copy;
+
+	ASSERT_TRUE(copy.read_dimacs(
+		filename,
+		ugraph_wi::weight_file_extension::none));
+
+	ASSERT_EQ(gw.num_vertices(), copy.num_vertices());
+	ASSERT_EQ(gw.num_edges(), copy.num_edges());
+
+	for (vertex_t v = 0; v < gw.num_vertices(); ++v) {
+		EXPECT_EQ(gw.weight(v), copy.weight(v));
+	}
+
+	EXPECT_TRUE(copy.is_edge(0, 1));
+	EXPECT_TRUE(copy.is_edge(0, 2));
+	EXPECT_FALSE(copy.is_edge(1, 2));
+
+	std::remove(filename.c_str());
+}
+
+TEST(UGraphW, read_dimacs_edgeless_graph)
+{
+	const std::string filename = "test_vw_edgeless.clq";
+
+	{
+		std::ofstream f(filename);
+		f << "p edge 4 0\n";
+	}
+
+	ugraph_wi gw;
+
+	ASSERT_TRUE(gw.read_dimacs(
+		filename,
+		ugraph_wi::weight_file_extension::none));
+
+	EXPECT_EQ(4, gw.num_vertices());
+	EXPECT_EQ(0, gw.num_edges());
+	EXPECT_TRUE(gw.is_unit_weighted());
+
+	std::remove(filename.c_str());
 }
 
 TEST(UGraphW, constructor_from_file) {
@@ -161,6 +488,8 @@ TEST(UGraphW, constructor_from_file) {
 	EXPECT_EQ(1, ugw.weight(6));
 
 }
+
+
 
 TEST(UGraphW, gen_weights_dimacs){
 		

@@ -1,41 +1,26 @@
 /**
  * @file ugraph_vertex_weighted.h
+ * @brief Facade specialization for vertex-weighted undirected graphs.
  *
- * @brief Facade specializations and inline implementations for vertex-weighted graphs.
+ * Defines the specialization `Graph_W<ugraph, WeightT>` and the
+ * interface-specific operations required by vertex-weighted undirected
+ * graphs.
  *
- * This header binds the generic vertex-weighted graph template
- * `Graph_W<GraphT, WeightT>` to concrete *facade graph types*, in particular
- * undirected graphs (`ugraph`).
+ * This header provides the binding between the generic vertex-weighted
+ * graph implementation (`Base_Graph_W` / `Graph_W`) and the `ugraph`
+ * facade type.
  *
- * In addition to declaring the facade specialization
- * `Graph_W<ugraph, WeightT>`, this file also provides **inline implementations**
- * of facade-specific methods whose behavior depends on the undirected graph
- * interface (e.g. DIMACS output routines).
+ * It may also contain inline definitions of operations whose implementation
+ * depends specifically on the undirected graph interface, such as DIMACS
+ * output.
  *
- * @details
- * This file acts as the *facade binding layer* between:
- *  - the **generic implementation** of vertex-weighted graphs
- *    (`simple_graph_w.h`, `Base_Graph_W`)
- *  - and the **named facade graph types** defined in the basic graph layer
- *    (e.g. `ugraph`)
+ * Generic vertex-weighted graph functionality should remain in
+ * `simple_graph_w.h` and its corresponding implementation header.
  *
- * Only code that is:
- *  - specific to the `ugraph` facade, and
- *  - safe to define inline in a header (ODR-compliant)
- * should be placed here.
+ * @note This header depends on the definition of `ugraph`.
  *
- * Representation-dependent code and generic algorithms must remain in the
- * corresponding implementation headers.
- *
- * @note
- * This header must be included **after** `graph_basic.h`, as it relies on the
- * definition of the `ugraph` facade type.
- *
- * @author
- * Pablo San Segundo (pss)
- *
- * @date
- * 01/02/2026
+ * @author Pablo San Segundo (pss)
+ * @details Created 01/02/2026, last updated 10/10/2026.
  */
 
 #ifndef BITGRAPH_GRAPH_UGRAPH_VERTEX_WEIGHTED_H
@@ -54,39 +39,30 @@ namespace bitgraph {
 	public:
 
 		using base_t = Base_Graph_W<ugraph, WeightT>;
-		using graph_t = typename base_t::graph_type;
-		using bitset_t = typename base_t::bitset_type;
-		using weight_t = typename base_t::weight_t;
-		using vertex_bitset_t = bitset_t;
-
-
-		//using BaseT = Base_Graph_W<ugraph, WeightT>;					
-		//using graph_type = typename BaseT::graph_type;
-		//using bitset_type = typename BaseT::bitset_type;
-		//using Weight = typename BaseT::Weight;
-		//using vertex_bitset_t = bitset_type;						// alias for semantic information
-
-
-		using base_t::NO_WEIGHT;
-		using base_t::ZERO_WEIGHT;
-		using base_t::DEFAULT_WEIGHT;
-
-		/*using BaseT::NO_WEIGHT;
-		using BaseT::ZERO_WEIGHT;
-		using BaseT::DEFAULT_WEIGHT;*/
-				
 		
 		// Inherit constructors from Base_Graph_W.
 		using base_t::base_t;
-
+	
 		//////////////////
 		// Undirected-graph-specific interface.
+		// The full underlying graph API remains accessible through graph().
 
-		int max_graph_degree() const { return this->graph_.max_graph_degree(); }
-		int degree(vertex_t v) const { return this->graph_.degree(v); }
-		int degree(vertex_t v, const vertex_bitset_t& vertices) const { 
-			return this->graph_.degree(v, vertices);
+	/*
+		int max_graph_degree() const {
+			return this->graph_.max_graph_degree();
 		}
+
+		int degree(vertex_t v) const {
+			return this->graph_.degree(v);
+		}
+
+		int degree(
+			vertex_t v,
+			const vertex_bitset_t& vertices) const
+		{
+			return this->graph_.degree(v, vertices);
+		}*/
+
 
 		///////////
 		//I/O operations
@@ -96,7 +72,7 @@ namespace bitgraph {
 		*
 		*		 (self-loops are not considered)
 		*/
-		std::ostream& write_dimacs(std::ostream& o = std::cout) const;
+		std::ostream& write_dimacs(std::ostream& o = std::cout) const override;
 	};
 		
 
@@ -139,7 +115,7 @@ namespace bitgraph {
 			}
 		}
 
-		return o;
+		return os;
 	}
 
 } //end namespace bitgraph

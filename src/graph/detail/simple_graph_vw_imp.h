@@ -75,7 +75,7 @@ Base_Graph_W<GraphT, WeightT>::Base_Graph_W(const std::string& filename)
 }
 
 template<class GraphT, class WeightT>
-void Base_Graph_W<GraphT, WeightT>::set_modulus_weight(int modulus)
+void Base_Graph_W<GraphT, WeightT>::set_modulus_weights(int modulus)
  {
 
 	if (modulus <= 0) {

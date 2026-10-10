@@ -174,7 +174,7 @@ namespace bitgraph {
 		 *       starts at 2. Pullan (2008) uses `modulus = 200` for the
 		 *       DIMACS-VW instances.
 		 */
-		void set_modulus_weight(int modulus = bitgraph::DEFAULT_WEIGHT_MODULUS);
+		void set_modulus_weights(int modulus = bitgraph::DEFAULT_WEIGHT_MODULUS);
 
 		const graph_t& graph() const {
 			return graph_;
@@ -400,7 +400,7 @@ namespace bitgraph {
 		 * @param os Output stream.
 		 * @return Reference to @p os.
 		 */
-		ostream& write_dimacs(std::ostream& os = std::cout) const;
+		virtual ostream& write_dimacs(std::ostream& os = std::cout) const;
 			
 		/**
 		 * @brief Reads a vertex-weighted graph from a DIMACS file.

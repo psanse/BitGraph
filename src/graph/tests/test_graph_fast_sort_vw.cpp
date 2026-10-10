@@ -1,5 +1,5 @@
 /**
- * @file test_graph_fast_sort_vertex_weighted.cpp
+ * @file test_graph_fast_sort_vw.cpp
  * @brief Unit tests for `GraphFastRootSort_VW`.
  *
  * Tests vertex-ordering and graph-reordering functionality for

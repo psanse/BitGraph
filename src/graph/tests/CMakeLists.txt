@@ -8,10 +8,10 @@ add_executable (
   test_graph_utils.cpp
   test_graph.cpp
   test_ugraph.cpp
-  test_wgraph.cpp
-  test_wegraph.cpp
+  test_graph_vw.cpp
+  test_graph_ew.cpp
   test_graph_fast_sort.cpp
-  test_graph_fast_sort_vertex_weighted.cpp
+  test_graph_fast_sort_vw.cpp
   test_random_graph.cpp
   test_graph_conversions.cpp
   test_sparse_graph.cpp

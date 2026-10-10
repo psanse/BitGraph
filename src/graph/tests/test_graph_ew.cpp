@@ -1,5 +1,5 @@
 /*
-* @file test_graph_we.cpp
+* @file test_graph_ew.cpp
 * @brief Unit tests for edge-weighted graphs
 * @created 20/7/18
 * @last_update 27/01/25
@@ -14,8 +14,6 @@
 #include "graph/graph_edge_weighted.h"
 #include "utils/logger.h"	
 #include "utils/math_utils.h"
-//#include "utils/common_paths.h"
-//#include "utils/common.h"
 
 using namespace std;
 using namespace bitgraph;
