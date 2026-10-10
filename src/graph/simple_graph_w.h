@@ -14,12 +14,10 @@
 #ifndef BITGRAPH_GRAPH__SIMPLE_GRAPH_WEIGHTED_H
 #define BITGRAPH_GRAPH__SIMPLE_GRAPH_WEIGHTED_H
 
-#include "graph_traits.h"
-#include "simple_ugraph.h"
+
 #include "graph_types.h"
 #include <iostream>
 #include <vector>
-#include <algorithm>
 #include <utility>
 
 namespace bitgraph {
@@ -646,21 +644,32 @@ namespace bitgraph {
 //
 // Necessary implementations in header file	
 
-namespace bitgraph {
+#include "simple_graph_imp_w.h"
 
-	template<class GraphT, class WeightT>
-	template<class Func>
-	inline
-		void Base_Graph_W<GraphT, WeightT>::transform_weights(Func f)
-	{
-		for(weight_t & weight : vertex_weights_) {
-			if (weight != NO_WEIGHT) {
-				weight = f(weight);
-			}
-		}
-	}
-
-} // end namespace bitgraph
+//namespace bitgraph {
+//
+//	template<class GraphT, class WeightT>
+//	const WeightT Base_Graph_W<GraphT, WeightT>::NO_WEIGHT = static_cast<WeightT>{-1};
+//
+//	template<class GraphT, class WeightT>
+//	constexpr WeightT Base_Graph_W<GraphT, WeightT>::ZERO_WEIGHT;
+//
+//	template<class GraphT, class WeightT>
+//	constexpr WeightT Base_Graph_W<GraphT, WeightT>::DEFAULT_WEIGHT;
+//
+//	template<class GraphT, class WeightT>
+//	template<class Func>
+//	inline
+//		void Base_Graph_W<GraphT, WeightT>::transform_weights(Func f)
+//	{
+//		for(weight_t & weight : vertex_weights_) {
+//			if (weight != NO_WEIGHT) {
+//				weight = f(weight);
+//			}
+//		}
+//	}
+//
+//} // end namespace bitgraph
 
 
 #endif // BITGRAPH_GRAPH__SIMPLE_GRAPH_WEIGHTED_H

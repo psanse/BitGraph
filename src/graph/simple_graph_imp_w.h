@@ -1,41 +1,49 @@
 /**
- * @file simple_graph_w.cpp
- * @brief implementation of classes Base_Graph_W and Graph_W for simple weighted graphs
+ * @file simple_graph_w_imp.h
+ * @brief Template implementation for vertex-weighted simple graph classes.
  *
- * @created 16/01/19
- * @last_update 06/01/25
+ * Contains the definitions of the template members declared for
+ * `Base_Graph_W` and `Graph_W`.
+ *
+ * This file is intended to be included by the corresponding public header
+ * and should not normally be included directly by user code.
+ *
  * @author pss
  *
- * @comments see end of file for valid template types
- *
+ * @details Created 16/01/2019, last updated 06/01/2025.
+ * @note See the end of the file for the supported template types.
  */
 
-#include "graph_types.h"
-#include "graph/graph_unweighted.h"		// required for valid type instantiation 
-#include "graph/simple_graph_w.h"
+
 #include "graph/formats/detail/dimacs_format.h"		
-#include "bitscan/bitscan.h"	
 #include "utils/logger.h"
-#include "utils/string_utils.h"
 #include "utils/collection_utils.h"
-#include "utils/precise_timer.h"
 
 #include <fstream>
-#include <iostream>
 #include <sstream>			
 
 using namespace bitgraph;
 
-///////////////////////////////////////////////
-template<class GraphT, class WeightT>
-const WeightT Base_Graph_W <GraphT, WeightT >::NO_WEIGHT;
 
 template<class GraphT, class WeightT>
-constexpr WeightT Base_Graph_W <GraphT, WeightT >::ZERO_WEIGHT;
+const WeightT Base_Graph_W<GraphT, WeightT>::NO_WEIGHT = static_cast<WeightT>{-1};
 
 template<class GraphT, class WeightT>
-constexpr WeightT Base_Graph_W <GraphT, WeightT >::DEFAULT_WEIGHT;
-///////////////////////////////////////////////
+constexpr WeightT Base_Graph_W<GraphT, WeightT>::ZERO_WEIGHT;
+
+template<class GraphT, class WeightT>
+constexpr WeightT Base_Graph_W<GraphT, WeightT>::DEFAULT_WEIGHT;
+
+template<class GraphT, class WeightT>
+template<class Func>
+void Base_Graph_W<GraphT, WeightT>::transform_weights(Func f)
+{
+	for (weight_t& weight : vertex_weights_) {
+		if (weight != NO_WEIGHT) {
+			weight = f(weight);
+		}
+	}
+}
 
 template<class GraphT, class WeightT>
 void Base_Graph_W<GraphT, WeightT>::create_complement(Base_Graph_W& g) const
@@ -504,21 +512,21 @@ ostream& Base_Graph_W<GraphT, WeightT>::print_weights (
 }
 
 
-////////////////////////////////////////////
-//list of valid types for generic code in *.cpp files 
+//////////////////////////////////////////////
+// list of valid types for generic code in *.cpp files 
+// DEPRECATED (10/10/2026)
+//
+//namespace bitgraph {
+//	
+//	template class  Base_Graph_W<ugraph, int>;
+//	template class  Base_Graph_W<ugraph, double>;
+//	//template class  Graph_W<ugraph, int>;
+//	//template class  Graph_W<ugraph, double>;
+//
+//	//other specializations... (sparse_graph)
+//
+//} // namespace bitgraph
 
-namespace bitgraph {
-	
-	template class  Base_Graph_W<ugraph, int>;
-	template class  Base_Graph_W<ugraph, double>;
-	//template class  Graph_W<ugraph, int>;
-	//template class  Graph_W<ugraph, double>;
-
-	//other specializations... (sparse_graph)
-
-} // namespace bitgraph
-
-////////////////////////////////////////////
 
 
 

@@ -25,7 +25,7 @@ list(
 
 add_library  (
     graph STATIC
-    simple_graph_w.cpp
+   # simple_graph_w.cpp
     simple_graph_ew.cpp
     formats/detail/mmio.cpp
     algorithms/ordering_decoder.cpp
