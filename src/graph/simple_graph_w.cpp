@@ -223,7 +223,7 @@ int Base_Graph_W<GraphT, WeightT>::read_dimacs (string filename, int type)
 	//////////////
 	//read vertex weights format <n> <vertex index> <weight> if they exist
 	int v1 = -1, v2 = -1;
-	Weight wv = -1;
+	weight_t wv = -1;
 	int c = f.peek();
 	if(c == EOF){
 		LOG_ERROR("bizarre EOF when peeking for first char - Base_Graph_W<GraphT, WeightT>::read_dimacs");
