@@ -245,6 +245,10 @@ bool Base_Graph_W<GraphT, WeightT>::read_dimacs(
 			vertex_t vertex = 0;
 			weight_t weight{};
 			if (!(record >> vertex >> weight) || vertex < 1 || vertex > nV) {
+				LOGG_WARNING(
+					"Bad vertex weight found ",
+					" vertex: ", vertex, 
+					" weight: ", weight);
 				reset();
 				return false;
 			}
@@ -257,6 +261,9 @@ bool Base_Graph_W<GraphT, WeightT>::read_dimacs(
 		// edges
 
 		if (tag != 'e') {
+			LOGG_WARNING( 
+				"Bad tag for edge found ",
+				tag );
 			reset();
 			return false;
 		}
@@ -267,11 +274,20 @@ bool Base_Graph_W<GraphT, WeightT>::read_dimacs(
 			first < 1 || first > nV ||
 			second < 1 || second > nV) 
 		{
+			LOGG_WARNING(
+				"Bad edge found ",
+				"(", first, ", ", second, ")",
+				" - Base_Graph_W::read_dimacs");
 			reset();
 			return false;
 		}
 
 		if (read_edges >= nEdges) {
+			LOGG_WARNING(
+				"Bizarre number of edged found ",
+				read_edges,
+				" - expected ", nEdges, 
+				" - Base_Graph_W::read_dimacs");
 			reset();
 			return false;
 		}
