@@ -41,10 +41,9 @@
  * This file is part of the GRAPH 1.0 C++ library.
  */
 
-#ifndef __SIMPLE_GRAPH_EDGE_WEIGHTED_H__
-#define __SIMPLE_GRAPH_EDGE_WEIGHTED_H__
+#ifndef BITGRAPH_GRAPH_SIMPLE_GRAPH_EDGE_WEIGHTED_H
+#define BITGRAPH_GRAPH_SIMPLE_GRAPH_EDGE_WEIGHTED_H
 
-//#include "utils/common.h"
 #include "graph_traits.h"
 #include "graph_unweighted.h"
 #include "simple_ugraph.h"
@@ -609,4 +608,4 @@ namespace bitgraph {
 
 
 
-#endif 
+#endif  // BITGRAPH_GRAPH_SIMPLE_GRAPH_EDGE_WEIGHTED_H
