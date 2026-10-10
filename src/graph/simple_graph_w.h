@@ -643,7 +643,7 @@ namespace bitgraph {
 /////////////////////////////////////////////
 // Necessary implementations in header file	
 
-#include "simple_graph_w_imp.h"
+#include "detail/simple_graph_w_imp.h"
 
 
 #endif // BITGRAPH_GRAPH__SIMPLE_GRAPH_WEIGHTED_H

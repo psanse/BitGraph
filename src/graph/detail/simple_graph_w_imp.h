@@ -164,9 +164,7 @@ auto Base_Graph_W<GraphT, WeightT>::maximum_weight(vertex_t& v) const -> weight_
 }
 
 ///////////////
-//
 // I/O operations
-
 
 template<class GraphT, class WeightT>
 ostream& Base_Graph_W<GraphT, WeightT>::write_dimacs(ostream& os) const
