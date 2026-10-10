@@ -45,6 +45,7 @@
 #define BITGRAPH_GRAPH_SIMPLE_GRAPH_EDGE_WEIGHTED_H
 
 #include "graph_traits.h"
+#include "weighted_constants.h"
 #include "graph_unweighted.h"
 #include "simple_ugraph.h"
 #include <iostream>
@@ -63,7 +64,7 @@ namespace bitgraph {
 	
 
 	template<class GraphT, class WeightT>
-	class Base_Graph_EW {
+	class Base_Graph_EW : public bitgraph::weight_constants<WeightT> {
 		
 	public:
 				
@@ -76,16 +77,23 @@ namespace bitgraph {
 		using mat_t = vector<vector<Weight>>;					// type for a matrix of weights
 		
 		//enum to distinguish between vertex and edge weights
+
 		enum { VERTEX, EDGE, BOTH };
 
+		
+		// constants		
+		using constants_t = weight_constants<WeightT>;
+
+		using constants_t::NO_WEIGHT;
+		using constants_t::ZERO_WEIGHT;
+		using constants_t::DEFAULT_WEIGHT;
+
+
+		//static constexpr Weight NO_WEIGHT { -1 };					//possibly change sentinel to std::numeric_limits<WeightT>::max() ?		
+		//static constexpr Weight ZERO_WEIGHT{ 0 };
+		//static constexpr Weight DEFAULT_WEIGHT{ 1 };				//default weight value for weights (1.0)	
+
 		////////////////////////////
-		//constants / globals
-
-		static constexpr Weight NO_WEIGHT { -1 };					//possibly change sentinel to std::numeric_limits<WeightT>::max() ?		
-		static constexpr Weight ZERO_WEIGHT{ 0 };
-		static constexpr Weight DEFAULT_WEIGHT{ 1 };				//default weight value for weights (1.0)	
-
-		//////////////////////////
 		//constructors / destructor
 
 		Base_Graph_EW() {};													

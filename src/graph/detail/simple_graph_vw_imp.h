@@ -25,14 +25,6 @@
 using namespace bitgraph;
 
 
-template<class GraphT, class WeightT>
-const WeightT Base_Graph_W<GraphT, WeightT>::NO_WEIGHT = static_cast<WeightT>{-1};
-
-template<class GraphT, class WeightT>
-constexpr WeightT Base_Graph_W<GraphT, WeightT>::ZERO_WEIGHT;
-
-template<class GraphT, class WeightT>
-constexpr WeightT Base_Graph_W<GraphT, WeightT>::DEFAULT_WEIGHT;
 
 template<class GraphT, class WeightT>
 template<class Func>

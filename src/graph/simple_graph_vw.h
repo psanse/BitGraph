@@ -16,6 +16,7 @@
 
 
 #include "graph_types.h"
+#include "weighted_constants.h"
 #include <iostream>
 #include <vector>
 #include <utility>
@@ -38,7 +39,7 @@ namespace bitgraph {
 	 */
 
 	template<class GraphT, class WeightT>
-	class Base_Graph_W {
+	class Base_Graph_W : public bitgraph::weight_constants<WeightT> {
 			
 	public:
 		
@@ -55,12 +56,15 @@ namespace bitgraph {
 		using Weight = weight_t;							// backward compatibility
 
 		using weights_t = std::vector<weight_t>;			
+		
+		// constants 
+		using constants_t = weight_constants<WeightT>;
+		
+		using constants_t::NO_WEIGHT;
+		using constants_t::ZERO_WEIGHT;
+		using constants_t::DEFAULT_WEIGHT;
 
 		
-		static constexpr weight_t NO_WEIGHT{ -1 };			// valid weights are non-negative
-		static constexpr weight_t ZERO_WEIGHT{ 0 };
-		static constexpr weight_t DEFAULT_WEIGHT{ 1 };
-
 		// file extensions for weighted graphs (for I/O operations)
 		// see read_dimacs functions (check)
 		enum class weight_file_extension { 

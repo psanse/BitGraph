@@ -25,19 +25,8 @@
 #include <cassert>							//NDEBUG should be undefined - (normally in compiler DEBUG mode)
 
 
-using namespace std;	
 using namespace bitgraph;
 
-///////////////////////////////////////////////////
-template<class GraphT, class WeightT>
-const WeightT Base_Graph_EW <GraphT, WeightT >::NO_WEIGHT;	
-
-template<class GraphT, class WeightT>
-const WeightT Base_Graph_EW <GraphT, WeightT >::DEFAULT_WEIGHT;
-
-template<class GraphT, class WeightT>
-const WeightT Base_Graph_EW <GraphT, WeightT >::ZERO_WEIGHT;
-///////////////////////////////////////////////
 
 template<class GraphT, class WeightT>
  bool Base_Graph_EW<GraphT, WeightT>::is_consistent(){
