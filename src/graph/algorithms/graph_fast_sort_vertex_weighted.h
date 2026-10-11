@@ -355,7 +355,7 @@ namespace bitgraph {
 			base_t::set_ordering();
 					
 			utils::has_greater_val< vertex_t, std::vector<weight_t> > pred(
-				graphw_.weight());
+				graphw_.weights());
 
 			std::stable_sort(this->nodes_.begin(), this->nodes_.end(), pred);
 			
@@ -378,7 +378,7 @@ namespace bitgraph {
 			base_t::set_ordering();
 					
 			utils::has_smaller_val< int, std::vector<Weight> > pred(
-				graphw_.weight());
+				graphw_.weights());
 
 			std::stable_sort(this->nodes_.begin(), this->nodes_.end(), pred);
 			

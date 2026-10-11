@@ -134,7 +134,7 @@ namespace bitgraph {
 			Vertices& sort_w(const GraphT& g, Vertices& lv, bool min_sort = true) {
 
 				//sorting criteria
-				const auto& weights = g.weight();
+				const auto& weights = g.weights();
 
 				//sorting lambdas
 				auto compare_smaller = [&weights](int a, int b) {
@@ -168,7 +168,7 @@ namespace bitgraph {
 			Vertex* sort_w(const GraphT& g, Vertex* lv, std::size_t size, bool min_sort = true) {
 
 				//sorting criteria
-				const auto& weights = g.weight();
+				const auto& weights = g.weights();
 
 				//sorting lambdas
 				auto compare_smaller = [&weights](int a, int b) {

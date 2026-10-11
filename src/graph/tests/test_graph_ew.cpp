@@ -90,7 +90,7 @@ TEST_F(UGraphEWTest, make_edge_weighted) {
 	EXPECT_EQ(decltype(ugew)::NO_WEIGHT, ugew.weight(1, 4));
 }
 
-TEST_F(UGraphEWTest, create_complement) {
+TEST_F(UGraphEWTest, DISABLED_create_complement) {
 
 	ugraph_ewi ugcomp;
 

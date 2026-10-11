@@ -205,115 +205,180 @@ namespace bitgraph {
 			vertex_t w,
 			weight_t val);
 
-
 		/**
-		*  @brief sets all edge-weights to val IF there is a corresponding edge.
-		*		  Vertex weights are not modified.
-		*  @param lw matrix of edge weights
-		*  @param template Erase: if TRUE weights of non-edges are set to NO_WEIGHT
-		*						  (aditional cleaning)
-		**/
-		template<bool EraseNonEdges = false>
-		void set_weights(Weight val = DEFAULT_WEIGHT);
-
-		/**
-		*  @brief sets edge weights in @lw  if there is a corresponding edge.
-		*		  Vertex weights are not modified.
-		*  @param edge_weights matrix of edge weights
-		*  @param template Erase: if TRUE weights of non-edges are set to NO_WEIGHT
-		*						  (aditional cleaning)
-		*  @details: asserts  @lw.size() == |V|
-		**/
-		template<bool EraseNonEdges = false>
-		void set_weights(weight_matrix_t& edge_weights, bool edges_only = true);
+		 * @brief Sets all existing edge weights to the same value.
+		 *
+		 * Assigns @p weight to every existing edge. Entries corresponding to
+		 * non-edges are set to `NO_WEIGHT`.
+		 *
+		 * @param weight Weight assigned to every existing edge.
+		 *
+		 * @pre @p weight must be different from `NO_WEIGHT`.
+		 *
+		 * @warning Follows a fail-fast policy and calls `std::terminate()` if
+		 *          @p weight is `NO_WEIGHT`.
+		 */
+		void set_weights(weight_t weight = DEFAULT_WEIGHT);
 		
 		/**
-		* @brief sets new edge-weights based on modulus operation [Pullan 2008, MODULUS = 200]
-		*
-		*			I. we(v, w) = 1 + ((v + w) % MODULUS)	(1-based index)
-		*
-		*			II. vertex-weigths are not changed
-		* @param template EraseNonEdges:  if TRUE, non-edges are set to NO_WEIGHT
-		* @param MODULUS: modulus value [Pullan 2008, DEFAULT_WEIGHT_MODULUS = 200]
-		**/
-		template <bool EraseNonEdges = false>
-		void set_modulus_edge_weights(int MODULUS = DEFAULT_WEIGHT_MODULUS);
+		 * @brief Replaces the edge-weight matrix.
+		 *
+		 * Sets the edge weights from @p edge_weights. The matrix must be square,
+		 * match the number of graph vertices, and be consistent with the current
+		 * graph topology: existing edges must have a weight different from
+		 * `NO_WEIGHT`, while non-edges must have weight `NO_WEIGHT`.
+		 *
+		 * @param edge_weights New edge-weight matrix.
+		 *
+		 * @warning Follows a fail-fast policy and calls `std::terminate()` if
+		 *          @p edge_weights is invalid or inconsistent with the graph.
+		 */
+		void set_weights(const weight_matrix_t& edge_weights);
 
+		/**
+		 * @brief Assigns Pullan-style modulus-based weights to all existing edges.
+		 *
+		 * Sets each edge weight according to a cyclic rule based on the sum of
+		 * its endpoint indices. For 0-based vertex indices, the generated weights
+		 * lie in the range `[2, modulus]`:
+		 *
+		 * `weight(v,w) = 2 + ((v + w) % (modulus - 1))`.
+		 *
+		 * Non-edges retain weight `NO_WEIGHT`.
+		 *
+		 * @param modulus Upper bound of the generated edge-weight range.
+		 *
+		 * @pre @p modulus must be at least 2.
+		 *
+		 * @note This weighting scheme follows the convention used in the Pullan
+		 *       benchmark generators for weighted graph instances.
+		 * @note Although the parameter is named @p modulus, the actual modulus
+		 *       used in the formula is `modulus - 1`; @p modulus denotes the
+		 *       maximum generated weight.
+		 *
+		 * @warning Follows a fail-fast policy and calls `std::terminate()` if
+		 *          @p modulus is less than 2.
+		 */
+		void set_modulus_weights(int modulus = DEFAULT_WEIGHT_MODULUS);
+
+		/**
+		 * @brief Returns the underlying graph.
+		 *
+		 * Provides read-only access to the graph topology.
+		 *
+		 * @return Const reference to the underlying graph.
+		 */
+		const graph_t& graph() const noexcept {
+			return graph_;
+		}
+	
+		/**
+		 * @brief Returns mutable access to the underlying graph.
+		 *
+		 * This accessor is intended for internal use by algorithms that require
+		 * direct access to the wrapped graph.
+		 *
+		 * @return Reference to the underlying graph.
+		 *
+		 * @note Mutable access is not part of the public API contract.
+		 *       Modifying the graph directly may invalidate invariants maintained
+		 *       by the weighted-graph wrapper.
+		 */
+		graph_t& graph() { return graph_; }
+		
 		/**
 		* @brief getter for edge-weights
 		* @param v, Weight: edge
 		* @details: no check for vertex existence
 		**/
-		Weight weight(int v, int w)	const { return edge_weights_[v][w]; }
+		Weight weight(int v, int w)	const noexcept{
+			return edge_weights_[v][w];
+		}
 
 		/**
-		* @brief getter for vertex-weights
-		* @param v: vertex
-		* @details: no check for vertex existence
-		**/
-		Weight weight(int v) const { return edge_weights_[v][v]; }
-
-		/*
-		*  @brief getter for the specific subset of vertex-weights
-		*/
-		std::vector<Weight> vertex_weights() const;
-
-		/**
-		*  @brief getter for the all the weights (vertex and edge-weights)
-		**/
-		mat_t& weights() { return edge_weights_; }
-		const mat_t& weights() const { return edge_weights_; }
-
-		/**
-		*  @brief getter for the graph (no weight information just edges)
-		**/
-		GraphT& graph() { return graph_; }
-		const GraphT& graph() const { return graph_; }
+		 * @brief Returns the complete edge-weight matrix.
+		 *
+		 * Provides read-only access to the stored edge weights.
+		 *
+		 * @return Const reference to the edge-weight matrix.
+		 */
+		const weight_matrix_t& weights() const noexcept {
+			return edge_weights_;
+		}
+				
+		void set_name(std::string name) {
+			graph_.set_name(std::move(name));
+		}
+		const std::string& name() const noexcept {
+			return graph_.name(); 
+		}
+		void set_path(std::string path) {
+			graph_.set_path(std::move(path));
+		}
+		const std::string& path() const noexcept {
+			return graph_.path();
+		}
+		
+		/////////////////////////
+		// Basic graph operations
+		// Mostly convenience wrappers around the underlying graph API.
 
 		/**
 		* @brief number of vertices of the graph
 		* @returns: number of vertices (int type)
 		* @details: internal use
 		**/
-		int num_vertices() const { return graph_.num_vertices(); }
+		int num_vertices() const {
+			return graph_.num_vertices();
+		}
 
 		/**
 		* @brief number of vertices of the graph - consumer code
 		* @returns: number of vertices (std::size_t type)
 		* @details: for consumer code
 		**/
-		std::size_t size() const { return graph_.size(); }
+		std::size_t size() const {
+			return graph_.size();
+		}
 
-		std::size_t num_edges(bool lazy = true) { return graph_.num_edges(lazy); }
+		std::size_t num_edges(bool lazy = true) {
+			return graph_.num_edges(lazy);
+		}
+
+		/**
+		 * @brief Adds an edge with the specified weight.
+		 *
+		 * Adds the edge (@p v, @p w) to the graph and assigns @p weight to it.
+		 * If the edge already exists, its weight is replaced by @p weight.
+		 *
+		 * @param v Source vertex.
+		 * @param w Target vertex.
+		 * @param weight Weight assigned to the edge.
+		 */
+		virtual	void add_edge(
+			vertex_t v, 
+			vertex_t w, 
+			weight_t weight = DEFAULT_WEIGHT);
 
 		/**
 		* @brief neighbor set of vertex @v
 		* @param v input vertex
 		**/
-		const vertex_bitset_t& neighbors(int v) const { return graph_.neighbors(v); }
-		vertex_bitset_t& neighbors(int v) { return graph_.neighbors(v); }
-
-		void set_name(std::string str) { graph_.set_name(str); }
-		string name() const { return graph_.name(); }
-		void set_path(std::string path_name) { graph_.set_path(path_name); }
-		string path() const { return graph_.path(); }
-
-		double density(bool lazy = true) { return graph_.density(lazy); }
-
-			
-
-		
-
-		/////////////////////////
-		// basic operations
-
-			/**
-			* @brief Adds an edge (v, w) with weight val
-			*	      (if the edge exists, sets val)
-			**/
-		virtual	void add_edge(int v, int w, Weight val = ZERO_WEIGHT);
-
-		
+		/*const vertex_bitset_t& neighbors(int v) const {
+			return graph_.neighbors(v);
+		}*/
+				
+		/**
+		 * @brief Returns the graph density.
+		 *
+		 * @param lazy If `true`, uses the lazy density computation provided by
+		 *             the underlying graph.
+		 * @return Graph density.
+		 */
+		double density(bool lazy = true) {
+			return graph_.density(lazy);
+		}
+				
 
 
 		////////////////
@@ -460,20 +525,34 @@ namespace bitgraph {
 	protected:
 
 		/**
-		 * @brief Validates the consistency of the edge-weight matrix.
+		 * @brief Validates an edge-weight matrix against the current graph topology.
 		 *
-		 * Checks that the edge-weight matrix is square, matches the number of graph
-		 * vertices, and is consistent with the graph topology. Existing edges must
-		 * have a weight different from `NO_WEIGHT`, while non-edges must have
-		 * weight `NO_WEIGHT`.
+		 * Checks that @p edge_weights is square, matches the number of graph
+		 * vertices, and is consistent with the current graph topology. Existing
+		 * edges must have a weight different from `NO_WEIGHT`, while non-edges
+		 * must have weight `NO_WEIGHT`.
 		 *
-		 * Self-loops and self-loop weights are not allowed.
+		 * @param edge_weights Edge-weight matrix to validate.
+		 *
+		 * @warning Follows a fail-fast policy and calls `std::terminate()` if
+		 *          @p edge_weights is invalid or inconsistent with the graph.
+		 */
+		void validate_weight_matrix(
+			const weight_matrix_t& edge_weights) const;
+
+		/**
+		 * @brief Validates the current edge-weight matrix.
+		 *
+		 * Checks that the stored edge-weight matrix is square, matches the number
+		 * of graph vertices, and is consistent with the current graph topology.
 		 *
 		 * @warning Follows a fail-fast policy and calls `std::terminate()` if the
-		 *          edge-weight matrix is invalid or inconsistent with the graph.
+		 *          current edge-weight matrix is invalid or inconsistent with the graph.
 		 */
-		void validate_weight_matrix() const;
-
+		void validate_weight_matrix() const {
+			validate_weight_matrix(edge_weights_);
+		}
+			
 		/**
 		 * @brief Initializes the edge-weight matrix from the current graph topology.
 		 *

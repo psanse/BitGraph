@@ -19,7 +19,7 @@
 #include "utils/file_utils.h"
 #include <string>
 
-#include "graph/graph_vertex_weighted.h"
+#include "graph/ugraph_vertex_weighted.h"
 
 using namespace std;
 using namespace bitgraph;

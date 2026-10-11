@@ -275,7 +275,14 @@ namespace bitgraph {
 		 */
 		void set_modulus_weights(int modulus = bitgraph::DEFAULT_WEIGHT_MODULUS);
 
-		const graph_t& graph() const {
+		/**
+		 * @brief Returns the underlying graph.
+		 *
+		 * Provides read-only access to the graph topology.
+		 *
+		 * @return Const reference to the underlying graph.
+		 */
+		const graph_t& graph() const noexcept {
 			return graph_;
 		}
 
@@ -299,12 +306,12 @@ namespace bitgraph {
 			return vertex_weights_[v];
 		}
 
-		const std::vector<weight_t>& weight() const noexcept { 
+		const std::vector<weight_t>& weights() const noexcept { 
 			return vertex_weights_;
 		}
 		
 		void set_name(std::string name) {
-			graph_.set_name(name);
+			graph_.set_name(std::move(name));
 		}
 
 		const std::string& name() const noexcept {
@@ -312,49 +319,38 @@ namespace bitgraph {
 		}
 
 		void set_path(std::string path) {
-			graph_.set_path(path);
+			graph_.set_path(std::move(path));
 		}
 
 		const std::string& path() const noexcept {
 			return graph_.path();
 		}
+		
+		/////////////////////////
+		// Basic graph operations
+		// Mostly convenience wrappers around the underlying graph API.
 
 		/**
 		* @brief number of vertices of the graph
 		* @returns: number of vertices (int type)
 		* @details: internal use
 		**/
-		int num_vertices() const { return graph_.num_vertices(); }
+		int num_vertices() const {
+			return graph_.num_vertices();
+		}
 
 		/**
 		* @brief number of vertices of the graph - consumer code
 		* @returns: number of vertices (std::size_t type)
 		* @details: for consumer code
 		**/
-		std::size_t size() const { return graph_.size(); }
-
-		std::size_t num_edges(bool lazy = true) { return graph_.num_edges(lazy); }
-
-		/**
-		 * @brief Finds a vertex of maximum weight.
-		 *
-		 * @param v Output vertex attaining the maximum weight.
-		 * @return Weight of vertex `v`.
-		 *
-		 * @warning Calls `std::terminate()` if the graph has no vertex weights.
-		 */
-		weight_t maximum_weight(vertex_t& v) const;
-
-		const vertex_bitset_t& neighbors(vertex_t v) const { 
-			return graph_.neighbors(v); 
+		std::size_t size() const {
+			return graph_.size();
 		}
-		
-		
 
-
-		/////////////////////////
-		// Basic graph operations
-		// Convenience wrappers around the underlying graph API.
+		std::size_t num_edges(bool lazy = true) {
+			return graph_.num_edges(lazy);
+		}
 
 		/**
 		 * @brief Adds an edge between two vertices.
@@ -364,10 +360,18 @@ namespace bitgraph {
 		 *
 		 * @note Self-loops are not allowed.
 		 */
-		void add_edge(vertex_t v, vertex_t w) { 
+		void add_edge(vertex_t v, vertex_t w) {
 			graph_.add_edge(v, w);
 		}
-
+						
+		/**
+		* @brief neighbor set of vertex @v
+		* @param v input vertex
+		**/
+		/*const vertex_bitset_t& neighbors(vertex_t v) const {
+			return graph_.neighbors(v);
+		}*/
+				
 		/**
 		 * @brief Returns the graph density.
 		 *
@@ -390,6 +394,16 @@ namespace bitgraph {
 		void gen_random_edges(double p) {
 			graph_.gen_random_edges(p);
 		}
+
+		/**
+		 * @brief Finds a vertex of maximum weight.
+		 *
+		 * @param v Output vertex attaining the maximum weight.
+		 * @return Weight of vertex `v`.
+		 *
+		 * @warning Calls `std::terminate()` if the graph has no vertex weights.
+		 */
+		weight_t maximum_weight(vertex_t& v) const;
 
 		/////////////
 		// Boolean properties
