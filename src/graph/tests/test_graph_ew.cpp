@@ -20,8 +20,11 @@ using namespace bitgraph;
 
 class UGraphEWTest : public ::testing::Test {
 protected:
+	UGraphEWTest()
+		: ugew(NV)
+	{}
+
 	void SetUp() override {
-		ugew.reset(NV, ugraph_ewi::ZERO_WEIGHT);				//all weights to ZERO_WEIGHT, edges, non-edges and vertices
 		ugew.add_edge(0, 1, 1);
 		ugew.add_edge(0, 2, 2);
 		ugew.add_edge(1, 3, 3);
@@ -36,7 +39,7 @@ protected:
 
 TEST_F(UGraphEWTest, basic_setup) {
 	
-	EXPECT_EQ(ugraph_ewi::ZERO_WEIGHT, ugew.weight(1, 4));
+	EXPECT_EQ(ugraph_ewi::NO_WEIGHT, ugew.weight(1, 4));
 	EXPECT_EQ(1, ugew.weight(0, 1));
 	EXPECT_EQ(2, ugew.weight(0, 2));
 	EXPECT_EQ(3, ugew.weight(1, 3));
@@ -70,23 +73,14 @@ TEST_F(UGraphEWTest, set_edge_weights) {
 	EXPECT_EQ(7, ugew.weight(1, 3) );
 }
 
-TEST_F(UGraphEWTest, complement_weights) {
-
-	ugew.complement_weights();			
-
-	EXPECT_EQ(-1, ugew.weight(0, 1));
-	EXPECT_EQ(-2, ugew.weight(0, 2));
-	EXPECT_EQ(-3, ugew.weight(1, 3));
-}
-
 TEST_F(UGraphEWTest, make_edge_weighted) {
 
 	//sets vertex weights to NO_WEIGHT
 	ugew.make_edge_weighted(false);
 
 	EXPECT_EQ(decltype(ugew)::NO_WEIGHT, ugew.weight(0, 0));			
-	EXPECT_EQ(decltype(ugew)::ZERO_WEIGHT, ugew.weight(1, 2));			
-	EXPECT_EQ(decltype(ugew)::ZERO_WEIGHT, ugew.weight(1, 4));
+	EXPECT_EQ(decltype(ugew)::NO_WEIGHT, ugew.weight(1, 2));
+	EXPECT_EQ(decltype(ugew)::NO_WEIGHT, ugew.weight(1, 4));
 
 	//also sets non-edges to NO_WEIGHT
 	ugew.make_edge_weighted(true);
@@ -119,10 +113,10 @@ TEST_F(UGraphEWTest, transform_weights) {
 	EXPECT_EQ(5,  ugew.weight(0, 1));
 	EXPECT_EQ(10, ugew.weight(0, 2));
 	EXPECT_EQ(15, ugew.weight(1, 3));
-	EXPECT_EQ(decltype(ugew)::ZERO_WEIGHT, ugew.weight(1, 4));		//NO_WEIGHT - non-edge
+	EXPECT_EQ(decltype(ugew)::NO_WEIGHT, ugew.weight(1, 4));		//NO_WEIGHT - non-edge
 	
 
-	EXPECT_EQ(decltype(ugew)::ZERO_WEIGHT, ugew.weight(1, 4));		//NO_WEIGHT - non-edge
+	EXPECT_EQ(decltype(ugew)::NO_WEIGHT, ugew.weight(1, 4));		//NO_WEIGHT - non-edge
 
 	//same using the scale functor utility
 	ugew.transform_weights(utils::Scale<decltype(ugew)::Weight>(5));

@@ -123,7 +123,9 @@ namespace bitgraph {
 		 *
 		 * @pre The number of weights must equal the number of vertices in @p graph.
 		 */
-		Base_Graph_VW(const graph_t& graph, const weights_t& weights)
+		Base_Graph_VW(
+			const graph_t& graph, 
+			const weights_t& weights)
 			:graph_(graph), 
 			vertex_weights_(weights) 
 		{ 
@@ -142,7 +144,7 @@ namespace bitgraph {
 		 *
 		 * @param graph Graph whose topology is copied.
 		 */
-		 Base_Graph_VW(const graph_t& graph)
+		 explicit Base_Graph_VW(const graph_t& graph)
 			:graph_(graph), 
 			vertex_weights_(
 				graph.size(),
@@ -182,6 +184,27 @@ namespace bitgraph {
 
 		//destructor
 		virtual	~Base_Graph_VW() = default;
+
+		//////////////////////////
+		// memory allocation 
+
+		/**
+		 * @brief Resets the graph to a vertex-weighted graph with a given number of vertices.
+		 *
+		 * Reinitializes the graph with @p NV isolated vertices and assigns @p weight
+		 * to every vertex. Any previous graph topology and vertex weights are discarded.
+		 *
+		 * @param NV Number of vertices.
+		 * @param weight Initial weight assigned to every vertex.
+		 * @param name Optional graph instance name.
+		 *
+		 * @warning Follows a fail-fast policy and calls `std::terminate()` if the
+		 *          graph cannot be reinitialized.
+		 */
+		void reset(
+			std::size_t NV,
+			weight_t weight = DEFAULT_WEIGHT,
+			string name = "") noexcept;
 
 		/////////////
 		// setters and getters
@@ -314,26 +337,7 @@ namespace bitgraph {
 			return graph_.neighbors(v); 
 		}
 		
-		//////////////////////////
-		// memory allocation 
-
-		/**
-		 * @brief Reinitializes the graph with a given number of isolated vertices.
-		 *
-		 * Existing graph contents are discarded. All vertices are assigned the
-		 * specified weight.
-		 *
-		 * @param NV Number of vertices in the new graph.
-		 * @param weight Initial weight assigned to every vertex.
-		 * @param name Optional graph instance name.
-		 *
-		 * @warning Follows a fail-fast policy and calls `std::terminate()` if
-		 *          the graph or its vertex weights cannot be initialized.
-		 */
-		void reset(
-			std::size_t NV,
-			weight_t weight = DEFAULT_WEIGHT,
-			string name = "") noexcept;
+		
 
 
 		/////////////////////////

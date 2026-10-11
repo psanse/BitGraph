@@ -102,26 +102,47 @@ namespace bitgraph {
 		// construction / destruction
 
 		Base_Graph_EW() = default;
-
-		Base_Graph_EW(graph_t& graph, const weight_matrix_t& edge_weights)
-			: g_(graph), 
-			we_(edge_weights)
-		{}		
+		
+		/**
+		 * @brief Constructs an edge-weighted graph from an existing graph and an
+		 *        edge-weight matrix.
+		 *
+		 * Copies the topology of @p graph and the supplied edge weights.
+		 *
+		 * @param graph Graph whose topology is copied.
+		 * @param edge_weights Edge-weight matrix.
+		 *
+		 * @warning Calls `std::terminate()` if the edge-weight matrix is invalid
+		 *          or inconsistent with the graph topology.
+		 */
+		Base_Graph_EW(
+			const graph_t& graph,
+			const weight_matrix_t& edge_weights)
+			: graph_(graph),
+			edge_weights_(edge_weights)		
+		{
+			validate_weight_matrix();
+		}
 
 		/**
-		* @brief creates a graph with |V|= n and val weights as base line.
-		* @param n number of vertices
-		* @param val weight value
-		* @param edge_weighted if TRUE creates an edge-weighted graph
-		*			(vertex weights are set to NO_WEIGHT, instead of val)
-		* @details: base line for all weights is set to val, i.e. vertex weights are
-		*			set to val, but edge-weights will be overwritten when edges are added
-		**/
-		//creates empty graph with |V|= n and val weights	
-		Base_Graph_EW(
-			int n, 
-			Weight val = ZERO_WEIGHT, 
-			bool edge_weighted = false);			
+		 * @brief Constructs an edge-weighted graph from an existing graph.
+		 *
+		 * Copies the topology of @p graph and initializes the edge-weight matrix.
+		 * Existing edges are assigned `DEFAULT_WEIGHT`, while non-edges are assigned
+		 * `NO_WEIGHT`.
+		 *
+		 * @param graph Graph whose topology is copied.
+		 */
+		explicit Base_Graph_EW(const graph_t& graph)
+			: graph_(graph)
+		{
+			initialize_edge_weights(DEFAULT_WEIGHT);
+		}
+
+		explicit Base_Graph_EW(std::size_t NV)
+		{
+			reset(NV);
+		}
 
 		/**
 		* @brief reads graph from file. If ewights are not found it generated them
@@ -139,6 +160,27 @@ namespace bitgraph {
 		//destructor
 		virtual	~Base_Graph_EW() = default;
 
+
+		//////////////////////////
+		// memory allocation (API)
+
+		/**
+		 * @brief Resets the graph to an empty edge-weighted graph.
+		 *
+		 * Reinitializes the graph with @p NV isolated vertices and initializes
+		 * the entire edge-weight matrix to `NO_WEIGHT`. Any previous graph
+		 * topology and edge weights are discarded.
+		 *
+		 * @param NV Number of vertices.
+		 * @param name Optional graph instance name.
+		 *
+		 * @warning Follows a fail-fast policy and calls `std::terminate()` if the
+		 *          graph or its edge-weight matrix cannot be reinitialized.
+		 */
+		void reset(std::size_t NV, string name = "") noexcept;
+			
+
+
 		/////////////
 		// setters and getters	
 
@@ -147,14 +189,14 @@ namespace bitgraph {
 		* @param v, Weight: edge
 		* @details: no check for vertex existence
 		**/
-		Weight weight(int v, int w)	const { return we_[v][w]; }
+		Weight weight(int v, int w)	const { return edge_weights_[v][w]; }
 
 		/**
 		* @brief getter for vertex-weights
 		* @param v: vertex
 		* @details: no check for vertex existence
 		**/
-		Weight weight(int v) const { return we_[v][v]; }
+		Weight weight(int v) const { return edge_weights_[v][v]; }
 
 		/*
 		*  @brief getter for the specific subset of vertex-weights
@@ -164,63 +206,49 @@ namespace bitgraph {
 		/**
 		*  @brief getter for the all the weights (vertex and edge-weights)
 		**/
-		mat_t& weights() { return we_; }
-		const mat_t& weights() const { return we_; }
+		mat_t& weights() { return edge_weights_; }
+		const mat_t& weights() const { return edge_weights_; }
 
 		/**
 		*  @brief getter for the graph (no weight information just edges)
 		**/
-		GraphT& graph() { return g_; }
-		const GraphT& graph() const { return g_; }
+		GraphT& graph() { return graph_; }
+		const GraphT& graph() const { return graph_; }
 
 		/**
 		* @brief number of vertices of the graph
 		* @returns: number of vertices (int type)
 		* @details: internal use
 		**/
-		int num_vertices() const { return g_.num_vertices(); }
+		int num_vertices() const { return graph_.num_vertices(); }
 
 		/**
 		* @brief number of vertices of the graph - consumer code
 		* @returns: number of vertices (std::size_t type)
 		* @details: for consumer code
 		**/
-		std::size_t size() const { return g_.size(); }
+		std::size_t size() const { return graph_.size(); }
 
-		std::size_t num_edges(bool lazy = true) { return g_.num_edges(lazy); }
+		std::size_t num_edges(bool lazy = true) { return graph_.num_edges(lazy); }
 
 		/**
 		* @brief neighbor set of vertex @v
 		* @param v input vertex
 		**/
-		const vertex_bitset_t& neighbors(int v) const { return g_.neighbors(v); }
-		vertex_bitset_t& neighbors(int v) { return g_.neighbors(v); }
+		const vertex_bitset_t& neighbors(int v) const { return graph_.neighbors(v); }
+		vertex_bitset_t& neighbors(int v) { return graph_.neighbors(v); }
 
-		void set_name(std::string str) { g_.set_name(str); }
-		string name() const { return g_.name(); }
-		void set_path(std::string path_name) { g_.set_path(path_name); }
-		string path() const { return g_.path(); }
+		void set_name(std::string str) { graph_.set_name(str); }
+		string name() const { return graph_.name(); }
+		void set_path(std::string path_name) { graph_.set_path(path_name); }
+		string path() const { return graph_.path(); }
 
-		double density(bool lazy = true) { return g_.density(lazy); }
+		double density(bool lazy = true) { return graph_.density(lazy); }
 
-		//////////////////////////
-		// memory allocation
 
-	protected:
-		/**
-		* @brief clearing without deallocation - internal use only
-		**/
-		void reset() { g_.reset(); we_.clear(); }
+		
 
-	public:
-		/**
-		* @brief resets to a graph with |V|= n with weight val in everey vertex and edge
-		* @param n number of vertices
-		* @param name name of the instance
-		* @details: fast-fail policy - exits if failure
-		**/
-		template<bool EdgeWeightedGraph = false>
-		void reset(std::size_t n, Weight val = ZERO_WEIGHT, string name = "");					//before: int init (int n, Weight val = NO_WEIGHT, bool reset_name = true);
+		
 
 		/////////////////////////
 		// basic operations
@@ -235,7 +263,7 @@ namespace bitgraph {
 		*  @brief sets vertex-weight
 		*  @details: vertex-weights are stored as self-loop edge-weights
 		**/
-		void set_weight(int v, Weight val) { we_[v][v] = val; }
+		void set_weight(int v, Weight val) { edge_weights_[v][v] = val; }
 
 		/**
 		*  @brief sets edge-weight to an EXISTNG given directed edge (v, w)
@@ -305,7 +333,7 @@ namespace bitgraph {
 		/////////////////////////
 		// boolean properties
 
-		bool is_edge(int v, int w) const { return g_.is_edge(v, w); }
+		bool is_edge(int v, int w) const { return graph_.is_edge(v, w); }
 
 		/*
 		* @brief consistency check
@@ -437,8 +465,50 @@ namespace bitgraph {
 
 	protected:
 
-		graph_t g_;						// edge-weighted graph (no vertex weights) 
-		weight_matrix_t we_;			// matrix of (only) edge-weights 																
+		/**
+		 * @brief Validates the consistency of the edge-weight matrix.
+		 *
+		 * Checks that the edge-weight matrix is square, matches the number of graph
+		 * vertices, and is consistent with the graph topology. Existing edges must
+		 * have a weight different from `NO_WEIGHT`, while non-edges must have
+		 * weight `NO_WEIGHT`.
+		 *
+		 * Self-loops and self-loop weights are not allowed.
+		 *
+		 * @warning Follows a fail-fast policy and calls `std::terminate()` if the
+		 *          edge-weight matrix is invalid or inconsistent with the graph.
+		 */
+		void validate_weight_matrix() const;
+
+		/**
+		 * @brief Initializes the edge-weight matrix from the current graph topology.
+		 *
+		 * Resizes the edge-weight matrix to match the number of graph vertices.
+		 * Existing edges are assigned @p weight, while non-edges are assigned
+		 * `NO_WEIGHT`.
+		 *
+		 * @param weight Weight assigned to existing edges.
+		 */
+		void initialize_edge_weights(
+			weight_t weight = DEFAULT_WEIGHT);
+	
+		/**
+		 * @brief Resets the graph to an empty state.
+		 *
+		 * Removes all vertices, edges, and edge weights.
+		 */
+		void reset() {
+			graph_.reset();
+			edge_weights_.clear();
+		}
+		
+
+
+		/////////////////
+		// data members
+
+		graph_t graph_;							
+		weight_matrix_t edge_weights_;			// matrix of (only) edge-weights 																
 
 	}; //end of class Base_Graph_EW
 

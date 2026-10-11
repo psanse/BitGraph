@@ -63,7 +63,7 @@ namespace bitgraph {
 
 		//constructors (inherited)
 		using BaseT::BaseT;
-
+		
 		/////////////////////////
 		// basic operations
 
@@ -125,9 +125,9 @@ namespace bitgraph {
 		/////////////
 		//useful interface for graph operations (no weights)
 
-		int max_graph_degree() const { return this->g_.max_graph_degree(); }
-		int degree(int v) const { return this->g_.degree(v); }
-		int degree(int v, const vertex_bitset_t& bbn) const { return this->g_.degree(v, bbn); }
+		int max_graph_degree() const { return this->graph_.max_graph_degree(); }
+		int degree(int v) const { return this->graph_.degree(v); }
+		int degree(int v, const vertex_bitset_t& bbn) const { return this->graph_.degree(v, bbn); }
 
 		/////////////
 		//other operations
@@ -185,14 +185,14 @@ namespace bitgraph {
 		//set to empty wv and non-edges UPPER-T
 		for (int v = 0; v < NV - 1; v++) {
 			for (int w = v + 1; w < NV; w++) {
-				if (this->g_.is_edge(v, w)) {
-					this->we_[v][w] = val;
-					this->we_[w][v] = val;
+				if (this->graph_.is_edge(v, w)) {
+					this->edge_weights_[v][w] = val;
+					this->edge_weights_[w][v] = val;
 				}
 				else {
 					if (EraseNonEdges) {
-						this->we_[v][w] = BaseT::NO_WEIGHT;
-						this->we_[w][v] = BaseT::NO_WEIGHT;
+						this->edge_weights_[v][w] = BaseT::NO_WEIGHT;
+						this->edge_weights_[w][v] = BaseT::NO_WEIGHT;
 					}
 				}
 			}
@@ -200,7 +200,7 @@ namespace bitgraph {
 
 		//vertex weights
 		/*for (int v = 0; v < NV; v++) {
-			this->we_[v][v] = val;
+			this->edge_weights_[v][v] = val;
 		}*/
 	}
 
@@ -224,14 +224,14 @@ namespace bitgraph {
 		//sets edge-weights
 		for (int v = 0; v < NV - 1; ++v) {
 			for (int w = v + 1; w < NV; ++w) {
-				if (this->g_.is_edge(v, w)) {
-					this->we_[v][w] = lw[v][w];
-					this->we_[w][v] = lw[w][v];
+				if (this->graph_.is_edge(v, w)) {
+					this->edge_weights_[v][w] = lw[v][w];
+					this->edge_weights_[w][v] = lw[w][v];
 				}
 				else {
 					if (EraseNonEdges) {
-						this->we_[v][w] = BaseT::NO_WEIGHT;
-						this->we_[w][v] = BaseT::NO_WEIGHT;
+						this->edge_weights_[v][w] = BaseT::NO_WEIGHT;
+						this->edge_weights_[w][v] = BaseT::NO_WEIGHT;
 					}
 				}
 			}
@@ -240,7 +240,7 @@ namespace bitgraph {
 		//vertex weights
 		if (!edges_only) {
 			for (int v = 0; v < NV; v++) {
-				this->we_[v][v] = lw[v][v];
+				this->edge_weights_[v][v] = lw[v][v];
 			}
 		}
 	}
@@ -257,7 +257,7 @@ namespace bitgraph {
 		//sets weights of undirected edges
 		for (int v = 0; v < NV - 1; ++v) {
 			for (int w = v + 1; w < NV; ++w) {
-				if (this->g_.is_edge(v, w)) {
+				if (this->graph_.is_edge(v, w)) {
 
 					///////////////////////////////////////
 					set_weight(v, w, (1 + ((v + w + 2 /* 0-based index*/) % MODULUS)));
@@ -280,8 +280,8 @@ namespace bitgraph {
 		for (int i = 0; i < NV - 1; ++i) {
 			for (int j = i + 1; j < NV; ++j) {
 
-				if (this->g_.is_edge(i, j)) {
-					o << "[" << i << "]" << "--(" << this->we_[i][j] << ")-->" << "[" << j << "]" << endl;
+				if (this->graph_.is_edge(i, j)) {
+					o << "[" << i << "]" << "--(" << this->edge_weights_[i][j] << ")-->" << "[" << j << "]" << endl;
 				}
 			}
 		}
@@ -294,11 +294,11 @@ namespace bitgraph {
 	void Graph_EW<ugraph, WeightT>::add_edge(int v, int w, Weight val)
 	{
 		//sets undirected edge
-		this->g_.add_edge(v, w);
+		this->graph_.add_edge(v, w);
 
 		//sets both weights
-		this->we_[v][w] = val;
-		this->we_[w][v] = val;
+		this->edge_weights_[v][w] = val;
+		this->edge_weights_[w][v] = val;
 	}
 
 	template <class W>
@@ -309,12 +309,12 @@ namespace bitgraph {
 		assert(v != w);
 		//////////////////
 
-		auto is_edge = this->g_.is_edge(v, w);
+		auto is_edge = this->graph_.is_edge(v, w);
 
 
 		if (is_edge || (val == BaseT::NO_WEIGHT && !is_edge)) {
-			this->we_[v][w] = val;
-			this->we_[w][v] = val;
+			this->edge_weights_[v][w] = val;
+			this->edge_weights_[w][v] = val;
 		}
 		else {
 			LOGG_WARNING("edge-weight cannot be added to a non-edge",
@@ -329,7 +329,7 @@ namespace bitgraph {
 		const int NV = this->num_vertices();
 
 		//removes all edges
-		this->g_.remove_edges();
+		this->graph_.remove_edges();
 
 		//sets directed edges with probability p
 		for (auto i = 0; i < NV - 1; ++i) {
@@ -354,8 +354,8 @@ namespace bitgraph {
 		else {								//outputs to stream edge-weights in matrix form
 			for (auto i = 0; i < NV - 1; ++i) {
 				for (auto j = i + 1; j < NV; ++j) {
-					if (this->we_[i][j] != BaseT::NO_WEIGHT) {
-						o << this->we_[i][j] << '\t';
+					if (this->edge_weights_[i][j] != BaseT::NO_WEIGHT) {
+						o << this->edge_weights_[i][j] << '\t';
 					}
 					else {
 						o << "--" << '\t';
@@ -374,10 +374,10 @@ namespace bitgraph {
 		const int SIZE = static_cast<int>(lv.size());
 		for (int i = 0; i < SIZE - 1; ++i) {
 			for (int j = i + 1; j < SIZE; ++j) {
-				if (this->we_[lv[i]][lv[j]] != BaseT::NO_WEIGHT) {
+				if (this->edge_weights_[lv[i]][lv[j]] != BaseT::NO_WEIGHT) {
 
 					/////////////////////////////////////////////////////////////////////////////////////////	
-					//o << "[" << lv[i] << "-" << lv[j] << " (" << this->we_[lv[i]][lv[j]] << ")] " << endl;
+					//o << "[" << lv[i] << "-" << lv[j] << " (" << this->edge_weights_[lv[i]][lv[j]] << ")] " << endl;
 					///////////////////////////////////////////////////////////////////////////////////////////
 
 					///////////////////////////////////////////////////////////////////////////////////////////
@@ -397,26 +397,26 @@ namespace bitgraph {
 		const int NV = this->num_vertices();
 
 		//timestamp 
-		this->g_.timestamp_dimacs(o);
+		this->graph_.timestamp_dimacs(o);
 
 		//name
-		this->g_.name_dimacs(o);
+		this->graph_.name_dimacs(o);
 
 		//dimacs header - recompute edges
-		this->g_.header_dimacs(o, false);
+		this->graph_.header_dimacs(o, false);
 
 		//write vertex weights
 		for (int v = 0; v < NV; ++v) {
-			if (this->we_[v][v] != BaseT::NO_WEIGHT) {
-				o << "n " << v + 1 << " " << this->we_[v][v] << endl;
+			if (this->edge_weights_[v][v] != BaseT::NO_WEIGHT) {
+				o << "n " << v + 1 << " " << this->edge_weights_[v][v] << endl;
 			}
 		}
 
 		//write undirected edges and edge weights
 		for (int v = 0; v < NV - 1; ++v) {
 			for (int w = v + 1; w < NV; ++w) {
-				if (this->g_.is_edge(v, w)) {														//O(log) for sparse graphs: specialize
-					o << "e " << v + 1 << " " << w + 1 << " " << this->we_[v][w] << endl;			//1-based vertex notation dimacs
+				if (this->graph_.is_edge(v, w)) {														//O(log) for sparse graphs: specialize
+					o << "e " << v + 1 << " " << w + 1 << " " << this->edge_weights_[v][w] << endl;			//1-based vertex notation dimacs
 				}
 			}
 		}
