@@ -2,12 +2,12 @@
  * @file ugraph_vertex_weighted.h
  * @brief Facade specialization for vertex-weighted undirected graphs.
  *
- * Defines the specialization `Graph_W<ugraph, WeightT>` and the
+ * Defines the specialization `Graph_VW<ugraph, WeightT>` and the
  * interface-specific operations required by vertex-weighted undirected
  * graphs.
  *
  * This header provides the binding between the generic vertex-weighted
- * graph implementation (`Base_Graph_W` / `Graph_W`) and the `ugraph`
+ * graph implementation (`Base_Graph_VW` / `Graph_VW`) and the `ugraph`
  * facade type.
  *
  * It may also contain inline definitions of operations whose implementation
@@ -35,12 +35,12 @@ namespace bitgraph {
 	// specialization for undirected graphs
 	
 	template<class WeightT>
-	class Graph_W<ugraph, WeightT> : public Base_Graph_W<ugraph, WeightT> {
+	class Graph_VW<ugraph, WeightT> : public Base_Graph_VW<ugraph, WeightT> {
 	public:
 
-		using base_t = Base_Graph_W<ugraph, WeightT>;
+		using base_t = Base_Graph_VW<ugraph, WeightT>;
 		
-		// Inherit constructors from Base_Graph_W.
+		// Inherit constructors from Base_Graph_VW.
 		using base_t::base_t;
 	
 		//////////////////
@@ -77,8 +77,8 @@ namespace bitgraph {
 		
 
     // facade types for vertex-weighted ugraphs
-    using ugraph_w = Graph_W<ugraph, double>;                   
-    using ugraph_wi = Graph_W<ugraph, int>;                    
+    using ugraph_w = Graph_VW<ugraph, double>;                   
+    using ugraph_wi = Graph_VW<ugraph, int>;                    
 }
 
 
@@ -89,7 +89,7 @@ namespace bitgraph {
 
 	template<class WeightT>
 	inline std::ostream&
-	Graph_W<ugraph, WeightT>::write_dimacs(std::ostream& os) const {
+	Graph_VW<ugraph, WeightT>::write_dimacs(std::ostream& os) const {
 
 		//timestamp comment
 		this->graph_.timestamp_dimacs(os);

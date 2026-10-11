@@ -3,7 +3,7 @@
  * @brief Template implementation for vertex-weighted simple graph classes.
  *
  * Contains the definitions of the template members declared for
- * `Base_Graph_W` and `Graph_W`.
+ * `Base_Graph_VW` and `Graph_W`.
  *
  * This file is intended to be included by the corresponding public header
  * and should not normally be included directly by user code.
@@ -28,7 +28,7 @@ using namespace bitgraph;
 
 template<class GraphT, class WeightT>
 template<class Func>
-void Base_Graph_W<GraphT, WeightT>::transform_weights(Func f)
+void Base_Graph_VW<GraphT, WeightT>::transform_weights(Func f)
 {
 	for (weight_t& weight : vertex_weights_) {
 		if (weight != NO_WEIGHT) {
@@ -38,7 +38,7 @@ void Base_Graph_W<GraphT, WeightT>::transform_weights(Func f)
 }
 
 template<class GraphT, class WeightT>
-void Base_Graph_W<GraphT, WeightT>::create_complement(Base_Graph_W& g) const
+void Base_Graph_VW<GraphT, WeightT>::create_complement(Base_Graph_VW& g) const
 {
 	g.set_name(name());
 	g.set_path(path());
@@ -48,30 +48,30 @@ void Base_Graph_W<GraphT, WeightT>::create_complement(Base_Graph_W& g) const
 }
 
 template<class GraphT, class WeightT>
-auto Base_Graph_W<GraphT, WeightT>::create_complement() const
--> Base_Graph_W
+auto Base_Graph_VW<GraphT, WeightT>::create_complement() const
+-> Base_Graph_VW
 {
-	Base_Graph_W complement;
+	Base_Graph_VW complement;
 	create_complement(complement);
 	return complement;
 }
 
 
 template<class GraphT, class WeightT>
-Base_Graph_W<GraphT, WeightT>::Base_Graph_W(const std::string& filename)
+Base_Graph_VW<GraphT, WeightT>::Base_Graph_VW(const std::string& filename)
 {	
 	if (!read_dimacs(filename)) {
-		LOG_ERROR("error reading DIMACS file -Base_Graph_W<GraphT, WeightT>::Base_Graph_W");
+		LOG_ERROR("error reading DIMACS file -Base_Graph_VW<GraphT, WeightT>::Base_Graph_VW");
 		std::terminate();
 	}
 }
 
 template<class GraphT, class WeightT>
-void Base_Graph_W<GraphT, WeightT>::set_modulus_weights(int modulus)
+void Base_Graph_VW<GraphT, WeightT>::set_modulus_weights(int modulus)
  {
 
 	if (modulus <= 0) {
-		LOG_ERROR("Invalid modulus - Base_Graph_W::set_modulus_weight(...)");
+		LOG_ERROR("Invalid modulus - Base_Graph_VW::set_modulus_weight(...)");
 		std::terminate();
 	}
 
@@ -87,7 +87,7 @@ void Base_Graph_W<GraphT, WeightT>::set_modulus_weights(int modulus)
 }
 
 template<class GraphT, class WeightT>
-bool Base_Graph_W<GraphT, WeightT>::is_unit_weighted() const noexcept
+bool Base_Graph_VW<GraphT, WeightT>::is_unit_weighted() const noexcept
 {
 	for (weight_t weight : vertex_weights_) {
 		if (weight != DEFAULT_WEIGHT) {
@@ -99,7 +99,7 @@ bool Base_Graph_W<GraphT, WeightT>::is_unit_weighted() const noexcept
 }
 
 template<class GraphT, class WeightT>
-void Base_Graph_W<GraphT, WeightT>::reset(
+void Base_Graph_VW<GraphT, WeightT>::reset(
 	std::size_t NV,
 	weight_t weight,
 	std::string name) noexcept
@@ -110,18 +110,18 @@ void Base_Graph_W<GraphT, WeightT>::reset(
 		graph_.set_name(std::move(name));
 	}
 	catch (...) {
-		LOG_ERROR("Failed to reset Base_Graph_W");
+		LOG_ERROR("Failed to reset Base_Graph_VW");
 		std::terminate();
 	}
 }
 
 
 template <class GraphT, class WeightT>
-void Base_Graph_W<GraphT,WeightT >::set_weight (const vector<weight_t>& weights)
+void Base_Graph_VW<GraphT,WeightT >::set_weight (const vector<weight_t>& weights)
 {
 	//assert
 	if( weights.size() != graph_.size() ){
-		LOG_ERROR("Invalid number of vertex weights - Base_Graph_W::set_weight(...)");
+		LOG_ERROR("Invalid number of vertex weights - Base_Graph_VW::set_weight(...)");
 		std::terminate();
 	}
 
@@ -129,10 +129,10 @@ void Base_Graph_W<GraphT,WeightT >::set_weight (const vector<weight_t>& weights)
 }
 
 template <class GraphT, class WeightT>
-void Base_Graph_W<GraphT, WeightT >::set_weight(std::vector<weight_t>&& weights)
+void Base_Graph_VW<GraphT, WeightT >::set_weight(std::vector<weight_t>&& weights)
 {
 	if (weights.size() != graph_.size()) {
-		LOG_ERROR("Invalid number of vertex weights - Base_Graph_W::set_weight(...)");
+		LOG_ERROR("Invalid number of vertex weights - Base_Graph_VW::set_weight(...)");
 		std::terminate();
 	}
 
@@ -140,10 +140,10 @@ void Base_Graph_W<GraphT, WeightT >::set_weight(std::vector<weight_t>&& weights)
 }
 
 template <class GraphT, class WeightT>
-auto Base_Graph_W<GraphT, WeightT>::maximum_weight(vertex_t& v) const -> weight_t
+auto Base_Graph_VW<GraphT, WeightT>::maximum_weight(vertex_t& v) const -> weight_t
 {
 	if (vertex_weights_.empty()) {
-		LOG_ERROR("Empty weight vector - Base_Graph_W::maximum_weight(...)");
+		LOG_ERROR("Empty weight vector - Base_Graph_VW::maximum_weight(...)");
 		std::terminate();
 	}
 
@@ -159,7 +159,7 @@ auto Base_Graph_W<GraphT, WeightT>::maximum_weight(vertex_t& v) const -> weight_
 // I/O operations
 
 template<class GraphT, class WeightT>
-ostream& Base_Graph_W<GraphT, WeightT>::write_dimacs(ostream& os) const
+ostream& Base_Graph_VW<GraphT, WeightT>::write_dimacs(ostream& os) const
 {
 	//timestamp comment
 	graph_.timestamp_dimacs(os);
@@ -190,13 +190,13 @@ ostream& Base_Graph_W<GraphT, WeightT>::write_dimacs(ostream& os) const
 
 
 template<class GraphT, class WeightT>
-bool Base_Graph_W<GraphT, WeightT>::read_dimacs(
+bool Base_Graph_VW<GraphT, WeightT>::read_dimacs(
 	const std::string& filename, weight_file_extension type)
 {
 	std::ifstream input(filename);
 	if (!input) {
 		LOGG_ERROR("error when reading file ", filename,
-			" in DIMACS format - typed Base_Graph_W::read_dimacs");
+			" in DIMACS format - typed Base_Graph_VW::read_dimacs");
 		reset();
 		return false;
 	}
@@ -275,7 +275,7 @@ bool Base_Graph_W<GraphT, WeightT>::read_dimacs(
 			LOGG_WARNING(
 				"Bad edge found ",
 				"(", first, ", ", second, ")",
-				" - Base_Graph_W::read_dimacs");
+				" - Base_Graph_VW::read_dimacs");
 			reset();
 			return false;
 		}
@@ -285,7 +285,7 @@ bool Base_Graph_W<GraphT, WeightT>::read_dimacs(
 				"Bizarre number of edged found ",
 				read_edges,
 				" - expected ", nEdges, 
-				" - Base_Graph_W::read_dimacs");
+				" - Base_Graph_VW::read_dimacs");
 			reset();
 			return false;
 		}
@@ -294,7 +294,7 @@ bool Base_Graph_W<GraphT, WeightT>::read_dimacs(
 			LOGG_WARNING(
 				"Self-loop found at vertex ",
 				first,
-				" - Base_Graph_W::read_dimacs");
+				" - Base_Graph_VW::read_dimacs");
 
 			reset();
 			return false;
@@ -344,21 +344,21 @@ bool Base_Graph_W<GraphT, WeightT>::read_dimacs(
 
 
 template<class GraphT, class WeightT>
-bool Base_Graph_W<GraphT, WeightT>::read_weights(const std::string& filename) 
+bool Base_Graph_VW<GraphT, WeightT>::read_weights(const std::string& filename) 
 {
 	ifstream f(filename.c_str());
 
 	if (!f) {
 		LOGG_WARNING(
 			"Weight file ", filename,
-			" could not be found - Base_Graph_W::read_weights");
+			" could not be found - Base_Graph_VW::read_weights");
 		return false;
 	}
 	
 
 	LOGG_DEBUG(
 		"Reading vertex weights from: ", filename,
-		" - Base_Graph_W::read_weights");
+		" - Base_Graph_VW::read_weights");
 
 
 	const int NV = graph_.num_vertices();
@@ -368,7 +368,7 @@ bool Base_Graph_W<GraphT, WeightT>::read_weights(const std::string& filename)
 		if (!(f >> vertex_weights_[v])) {
 			LOGG_ERROR(
 				"Error when reading weights from: ", filename,
-				" - Base_Graph_W::read_weights");
+				" - Base_Graph_VW::read_weights");
 
 			vertex_weights_.clear();
 			return false;
@@ -379,7 +379,7 @@ bool Base_Graph_W<GraphT, WeightT>::read_weights(const std::string& filename)
 }
 
 template<class GraphT, class WeightT>
-ostream& Base_Graph_W<GraphT, WeightT>::print_data(
+ostream& Base_Graph_VW<GraphT, WeightT>::print_data(
 	bool lazy,
 	std::ostream& os, 
 	bool trailing_newline) const
@@ -394,7 +394,7 @@ ostream& Base_Graph_W<GraphT, WeightT>::print_data(
 }
 
 template <class GraphT, class WeightT>
-ostream& Base_Graph_W<GraphT, WeightT>::print_weights (
+ostream& Base_Graph_VW<GraphT, WeightT>::print_weights (
 	const utils::FixedStack<int>& vertices,
 	ostream& os) const
 {
@@ -412,7 +412,7 @@ ostream& Base_Graph_W<GraphT, WeightT>::print_weights (
 }
 
 template <class GraphT, class WeightT>
-ostream& Base_Graph_W<GraphT, WeightT>::print_weights (
+ostream& Base_Graph_VW<GraphT, WeightT>::print_weights (
 	const vertex_t* vertices, 
 	int NV,
 	ostream& os) const
@@ -428,7 +428,7 @@ ostream& Base_Graph_W<GraphT, WeightT>::print_weights (
 }
 
 template <class GraphT, class WeightT>
-ostream& Base_Graph_W<GraphT, WeightT>::print_weights (
+ostream& Base_Graph_VW<GraphT, WeightT>::print_weights (
 	const utils::FixedStack<int>& vertices,
 	const VertexMapping& mapping,
 	ostream& os) const
@@ -445,7 +445,7 @@ ostream& Base_Graph_W<GraphT, WeightT>::print_weights (
 }
 
 template <class GraphT, class WeightT>
-ostream& Base_Graph_W<GraphT, WeightT>::print_weights (
+ostream& Base_Graph_VW<GraphT, WeightT>::print_weights (
 	vertex_set_t& vertices, 
 	ostream& os) const
 {
@@ -459,7 +459,7 @@ ostream& Base_Graph_W<GraphT, WeightT>::print_weights (
 }
 
 template <class GraphT, class WeightT>
-ostream& Base_Graph_W<GraphT, WeightT>::print_weights (
+ostream& Base_Graph_VW<GraphT, WeightT>::print_weights (
 	vertex_bitset_t& vertices, 
 	ostream& os) const
 {
@@ -478,7 +478,7 @@ ostream& Base_Graph_W<GraphT, WeightT>::print_weights (
 }
 
 template <class GraphT, class WeightT>
-ostream& Base_Graph_W<GraphT, WeightT>::print_weights (
+ostream& Base_Graph_VW<GraphT, WeightT>::print_weights (
 	ostream& os,
 	bool show_vertices) const
 {
@@ -508,8 +508,8 @@ ostream& Base_Graph_W<GraphT, WeightT>::print_weights (
 //
 //namespace bitgraph {
 //	
-//	template class  Base_Graph_W<ugraph, int>;
-//	template class  Base_Graph_W<ugraph, double>;
+//	template class  Base_Graph_VW<ugraph, int>;
+//	template class  Base_Graph_VW<ugraph, double>;
 //	//template class  Graph_W<ugraph, int>;
 //	//template class  Graph_W<ugraph, double>;
 //

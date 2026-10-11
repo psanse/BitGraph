@@ -2,7 +2,7 @@
  * @file simple_graph_vw.h
  * @brief Vertex-weighted graph classes built on simple graph types.
  *
- * Defines `Base_Graph_W` and `Graph_W`, which provide vertex-weighted
+ * Defines `Base_Graph_VW` and `Graph_W`, which provide vertex-weighted
  * graph functionality on top of the underlying graph representation.
  *
  * @author pss
@@ -39,7 +39,7 @@ namespace bitgraph {
 	 */
 
 	template<class GraphT, class WeightT>
-	class Base_Graph_W : public bitgraph::weight_constants<WeightT> {
+	class Base_Graph_VW : public bitgraph::weight_constants<WeightT> {
 			
 	public:
 		
@@ -80,7 +80,7 @@ namespace bitgraph {
 		///////////////////////
 		// construction / destruction
 		
-		Base_Graph_W() = default;	
+		Base_Graph_VW() = default;	
 
 		/**
 		 * @brief Constructs a vertex-weighted graph from a collection of weights.
@@ -91,7 +91,7 @@ namespace bitgraph {
 		 * @param weights Vertex weights. The number of graph vertices is set to
 		 *                `weights.size()`.
 		 */
-		explicit Base_Graph_W(const weights_t& weights)
+		explicit Base_Graph_VW(const weights_t& weights)
 			: vertex_weights_(weights) 
 		{
 			graph_.reset(weights.size()); 
@@ -105,7 +105,7 @@ namespace bitgraph {
 		 *
 		 * @param weights Vertex weights to move into the graph.
 		 */
-		explicit Base_Graph_W(weights_t&& weights)
+		explicit Base_Graph_VW(weights_t&& weights)
 			: vertex_weights_(std::move(weights))
 		{
 			graph_.reset(vertex_weights_.size());
@@ -123,13 +123,13 @@ namespace bitgraph {
 		 *
 		 * @pre The number of weights must equal the number of vertices in @p graph.
 		 */
-		Base_Graph_W(const graph_t& graph, const weights_t& weights)
+		Base_Graph_VW(const graph_t& graph, const weights_t& weights)
 			:graph_(graph), 
 			vertex_weights_(weights) 
 		{ 
 			if (vertex_weights_.size() !=
 				static_cast<std::size_t>(graph_.num_vertices())) {
-				LOG_ERROR("Graph/weight size mismatch - Base_Graph_W constructor");
+				LOG_ERROR("Graph/weight size mismatch - Base_Graph_VW constructor");
 				std::terminate();
 			}
 		}									
@@ -142,7 +142,7 @@ namespace bitgraph {
 		 *
 		 * @param graph Graph whose topology is copied.
 		 */
-		 Base_Graph_W(const graph_t& graph)
+		 Base_Graph_VW(const graph_t& graph)
 			:graph_(graph), 
 			vertex_weights_(
 				graph.size(),
@@ -158,7 +158,7 @@ namespace bitgraph {
 		 * @param NV Number of vertices.
 		 * @param weight Initial weight assigned to every vertex.
 		 */
-		explicit Base_Graph_W(std::size_t NV, weight_t weight = DEFAULT_WEIGHT)
+		explicit Base_Graph_VW(std::size_t NV, weight_t weight = DEFAULT_WEIGHT)
 		{ 
 			reset(NV, weight);
 		}		
@@ -172,16 +172,16 @@ namespace bitgraph {
 		 *
 		 * @param filename Name of the DIMACS graph file.
 		 */
-		explicit Base_Graph_W(const std::string& filename);
+		explicit Base_Graph_VW(const std::string& filename);
 
 		//copy constructor, move constructor, copy operator =, move operator =
-		Base_Graph_W(const Base_Graph_W& g) = default;
-		Base_Graph_W(Base_Graph_W&& g) noexcept = default;
-		Base_Graph_W& operator = (const Base_Graph_W& g) = default;
-		Base_Graph_W& operator = (Base_Graph_W&& g)	 noexcept = default;
+		Base_Graph_VW(const Base_Graph_VW& g) = default;
+		Base_Graph_VW(Base_Graph_VW&& g) noexcept = default;
+		Base_Graph_VW& operator = (const Base_Graph_VW& g) = default;
+		Base_Graph_VW& operator = (Base_Graph_VW&& g)	 noexcept = default;
 
 		//destructor
-		virtual	~Base_Graph_W() = default;
+		virtual	~Base_Graph_VW() = default;
 
 		/////////////
 		// setters and getters
@@ -436,7 +436,7 @@ namespace bitgraph {
 		 *       This output-parameter overload is retained for internal use and
 		 *       backward compatibility.
 		 */
-		void create_complement(Base_Graph_W& g) const;
+		void create_complement(Base_Graph_VW& g) const;
 
 		/**
 		 * @brief Creates and returns the complement of the vertex-weighted graph.
@@ -449,7 +449,7 @@ namespace bitgraph {
 		 * @note This overload should be implemented in the `Graph_W` facade
 		 *       to return the user-facing type and avoid slicing in polymorphic use.
 		 */
-		Base_Graph_W create_complement() const;
+		Base_Graph_VW create_complement() const;
 		
 
 		////////////
@@ -693,7 +693,7 @@ namespace bitgraph {
 	 * @brief User-facing vertex-weighted graph class.
 	 *
 	 * Provides the public vertex-weighted graph type built on top of
-	 * `Base_Graph_W`. This facade can be specialized for specific underlying
+	 * `Base_Graph_VW`. This facade can be specialized for specific underlying
 	 * graph types while reusing the common weighted-graph implementation
 	 * provided by the base class.
 	 *
@@ -701,7 +701,7 @@ namespace bitgraph {
 	 * @tparam WeightT Vertex-weight type.
 	 */
 	template<class GraphT, class WeightT>
-	class Graph_W : public Base_Graph_W <GraphT, WeightT> {};
+	class Graph_VW : public Base_Graph_VW <GraphT, WeightT> {};
 }
 
 /////////////////////////////////////////////
