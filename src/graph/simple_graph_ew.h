@@ -71,16 +71,19 @@ namespace bitgraph {
 		using graph_type = GraphT;
 		using graph_t = graph_type;
 		using bitset_type = typename GraphT::bitset_type;
+		
 		using vertex_bitset_t = bitset_type;
+		using VertexBitset = vertex_bitset_t;		// Backward compatibility.
+		
+		using vertex_set_t = bitgraph::vertex_set_t;
 
 		using weight_t = WeightT;
 		using weights_t = std::vector<weight_t>;
 		using weight_matrix_t = std::vector<std::vector<weight_t>>;
 		
-		// Backward compatibility.
-		using VertexBitset = vertex_bitset_t;
-		using Weight = weight_t;
-		using mat_t = weight_matrix_t;
+		
+		using Weight = weight_t;				// backward compatibility
+		using mat_t = weight_matrix_t;			// backward compatibility
 										
 		// constants		
 		using constants_t = weight_constants<WeightT>;
@@ -98,7 +101,8 @@ namespace bitgraph {
 		///////////////////////
 		// construction / destruction
 
-		Base_Graph_EW() {};													
+		Base_Graph_EW() = default;
+
 		Base_Graph_EW(graph_t& graph, const weight_matrix_t& edge_weights)
 			: g_(graph), 
 			we_(edge_weights)

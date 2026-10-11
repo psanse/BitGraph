@@ -80,40 +80,99 @@ namespace bitgraph {
 		///////////////////////
 		// construction / destruction
 		
-		Base_Graph_W() {};																		
-		explicit Base_Graph_W(weights_t& lw)
-			: vertex_weights_(lw) 
+		Base_Graph_W() = default;	
+
+		/**
+		 * @brief Constructs a vertex-weighted graph from a collection of weights.
+		 *
+		 * Creates an edgeless graph with one vertex for each entry in @p weights.
+		 * The supplied weights are copied into the graph.
+		 *
+		 * @param weights Vertex weights. The number of graph vertices is set to
+		 *                `weights.size()`.
+		 */
+		explicit Base_Graph_W(const weights_t& weights)
+			: vertex_weights_(weights) 
 		{
-			graph_.reset(lw.size()); 
+			graph_.reset(weights.size()); 
 		}	
+
+		/**
+		 * @brief Constructs a vertex-weighted graph by moving a collection of weights.
+		 *
+		 * Creates an edgeless graph with one vertex for each supplied weight.
+		 * Ownership of the weight vector is transferred to the graph.
+		 *
+		 * @param weights Vertex weights to move into the graph.
+		 */
+		explicit Base_Graph_W(weights_t&& weights)
+			: vertex_weights_(std::move(weights))
+		{
+			graph_.reset(vertex_weights_.size());
+		}
 	
-		Base_Graph_W(graph_t& graph, weights_t& weights)
+		/**
+		 * @brief Constructs a vertex-weighted graph from an existing graph and a
+		 *        collection of vertex weights.
+		 *
+		 * Copies the graph topology and the supplied vertex weights into the new
+		 * vertex-weighted graph.
+		 *
+		 * @param graph Graph whose topology is copied.
+		 * @param weights Vertex weights, indexed by vertex.
+		 *
+		 * @pre The number of weights must equal the number of vertices in @p graph.
+		 */
+		Base_Graph_W(const graph_t& graph, const weights_t& weights)
 			:graph_(graph), 
 			vertex_weights_(weights) 
 		{ 
-			assert(vertex_weights_.size() == graph_.size());
+			if (vertex_weights_.size() !=
+				static_cast<std::size_t>(graph_.num_vertices())) {
+				LOG_ERROR("Graph/weight size mismatch - Base_Graph_W constructor");
+				std::terminate();
+			}
 		}									
 
-		Base_Graph_W(graph_t& graph)
+		/**
+		 * @brief Constructs a unit-weighted graph from an existing graph.
+		 *
+		 * Copies the topology of @p graph and assigns `DEFAULT_WEIGHT` to every
+		 * vertex.
+		 *
+		 * @param graph Graph whose topology is copied.
+		 */
+		 Base_Graph_W(const graph_t& graph)
 			:graph_(graph), 
-			vertex_weights_(graph.size(), 
-			DEFAULT_WEIGHT )
+			vertex_weights_(
+				graph.size(),
+				DEFAULT_WEIGHT )
 		{}							
 
-		explicit Base_Graph_W(int N, weight_t weight = DEFAULT_WEIGHT)
+		 /**
+		 * @brief Constructs a vertex-weighted graph with a given number of vertices.
+		 *
+		 * Creates an edgeless graph with @p NV vertices and assigns @p weight
+		 * to every vertex.
+		 *
+		 * @param NV Number of vertices.
+		 * @param weight Initial weight assigned to every vertex.
+		 */
+		explicit Base_Graph_W(std::size_t NV, weight_t weight = DEFAULT_WEIGHT)
 		{ 
-			reset(N, weight);
+			reset(NV, weight);
 		}		
 
-
 		/**
-		* @brief Reads weighted graph from ASCII file in DIMACS format
-		*
-		*		 If unable to read weights generates modulus weights [Pullman 2008]
-		*
-		*		 TODO: add support for other formats
-		**/
-		Base_Graph_W(const std::string& filename);
+		 * @brief Constructs a vertex-weighted graph from a DIMACS file.
+		 *
+		 * Reads the graph topology and, when available, its vertex weights from
+		 * @p filename. If no vertex weights are provided, default unit weights are
+		 * assigned.
+		 *
+		 * @param filename Name of the DIMACS graph file.
+		 */
+		explicit Base_Graph_W(const std::string& filename);
 
 		//copy constructor, move constructor, copy operator =, move operator =
 		Base_Graph_W(const Base_Graph_W& g) = default;
