@@ -327,20 +327,19 @@ void Base_Graph_EW<GraphT, WeightT >::set_weight(
 	edge_weights_[v][w] = weight;
 }
 
-
 ///////////////
 // I/O
-
 
 template<class GraphT, class WeightT>
 int Base_Graph_EW<GraphT, WeightT>::read_dimacs (const std::string& filename)
 {
 		
-	string line;	
+	std::string line;	
 		
-	fstream f(filename.c_str());
+	std::ifstream f(filename);
 	if(!f){
-		LOGG_ERROR("error when reading file ", filename, " in DIMACS format - Base_Graph_EW<GraphT, WeightT>::read_dimacs");
+		LOGG_ERROR("error when reading file ", filename,
+			" in DIMACS format - Base_Graph_EW<GraphT, WeightT>::read_dimacs");
 		reset();
 		return -1;
 	}
@@ -350,8 +349,7 @@ int Base_Graph_EW<GraphT, WeightT>::read_dimacs (const std::string& filename)
 	 if (io::detail::dimacs::read_dimacs_header (f, nV, nEdges) == -1)
 	 {
 		 LOG_ERROR("error when reading dimacs header / allocation - Base_Graph_EW<GraphT, WeightT>::read_dimacs");
-		 reset();
-		 f.close();
+		 reset();		
 		 return -1;
 	 }
 
@@ -370,8 +368,7 @@ int Base_Graph_EW<GraphT, WeightT>::read_dimacs (const std::string& filename)
 	 int c = f.peek();
 	 if (c == EOF) {
 		 LOG_ERROR("bizarre EOF when peeking for first char - Base_Graph_EW<GraphT, WeightT>::read_dimacs");
-		 reset();
-		 f.close();
+		 reset();		
 		 return -1;
 	 }
 	 char next = static_cast<char>(c);
@@ -386,8 +383,7 @@ int Base_Graph_EW<GraphT, WeightT>::read_dimacs (const std::string& filename)
 			 //assert
 			 if (f.bad()) {
 				 LOG_ERROR("error when reading vertex-weights - Base_Graph_EW<GraphT, WeightT>::read_dimacs");
-				 reset();
-				 f.close();
+				 reset();				
 				 return -1;
 			 }
 
@@ -418,8 +414,7 @@ int Base_Graph_EW<GraphT, WeightT>::read_dimacs (const std::string& filename)
 	 c = f.peek();
 	 if (c == EOF) {
 		 LOG_ERROR("bizarre EOF when peeking for first char - Base_Graph_EW<GraphT, WeightT>::read_dimacs");
-		 reset();
-		 f.close();
+		 reset();		
 		 return -1;
 	 } 
 	 next = static_cast<char>(c);
@@ -427,8 +422,7 @@ int Base_Graph_EW<GraphT, WeightT>::read_dimacs (const std::string& filename)
 
 	 if (next != 'e') {
 		 LOG_ERROR("Wrong edge format reading edges - Base_Graph_EW<GraphT, WeightT>::read_dimacs");
-		 reset();
-		 f.close();
+		 reset();		
 		 return -1;
 	 }
 
@@ -445,8 +439,7 @@ int Base_Graph_EW<GraphT, WeightT>::read_dimacs (const std::string& filename)
 	 case 3: edge_weights_found = false;  break;	//expeceted: e <v> <w>  	
 	 default:
 		 LOG_ERROR("Wrong edge format - Base_Graph_EW<GraphT, WeightT>::read_dimacs");
-		 reset();
-		 f.close();
+		 reset();		
 		 return -1;
 	 }
 
@@ -477,8 +470,7 @@ int Base_Graph_EW<GraphT, WeightT>::read_dimacs (const std::string& filename)
 		 f >> next;
 		 if ( f.bad() || next != 'e'  ) {
 			 LOG_ERROR("Wrong edge format reading edges - Base_Graph_EW<GraphT, WeightT>::read_dimacs");
-			 reset();
-			 f.close();
+			 reset();			
 			 return -1;
 		 }
 
@@ -506,8 +498,7 @@ int Base_Graph_EW<GraphT, WeightT>::read_dimacs (const std::string& filename)
 	 }
 
 	 //name (removes path)
-	 graph_.set_name(filename);
-	 f.close();	
+	 graph_.set_name(filename);		
 	 return 0;
 }
 

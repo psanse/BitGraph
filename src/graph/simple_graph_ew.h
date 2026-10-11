@@ -480,7 +480,6 @@ namespace bitgraph {
 		virtual	std::ostream& write_dimacs(
 			std::ostream& os = std::cout) const;
 
-
 		/**
 		* @brief Reads weighted directed graph from file in DIMACS format
 		*
