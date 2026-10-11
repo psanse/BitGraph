@@ -117,7 +117,7 @@ void Base_Graph_VW<GraphT, WeightT>::reset(
 
 
 template <class GraphT, class WeightT>
-void Base_Graph_VW<GraphT,WeightT >::set_weight (const vector<weight_t>& weights)
+void Base_Graph_VW<GraphT,WeightT >::set_weights (const vector<weight_t>& weights)
 {
 	//assert
 	if( weights.size() != graph_.size() ){
@@ -129,7 +129,7 @@ void Base_Graph_VW<GraphT,WeightT >::set_weight (const vector<weight_t>& weights
 }
 
 template <class GraphT, class WeightT>
-void Base_Graph_VW<GraphT, WeightT >::set_weight(std::vector<weight_t>&& weights)
+void Base_Graph_VW<GraphT, WeightT >::set_weights(std::vector<weight_t>&& weights)
 {
 	if (weights.size() != graph_.size()) {
 		LOG_ERROR("Invalid number of vertex weights - Base_Graph_VW::set_weight(...)");

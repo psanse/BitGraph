@@ -116,7 +116,10 @@ template<class GraphT, class WeightT>
 
 template <class GraphT, class WeightT>
 template <bool EraseNonEdges>
-void Base_Graph_EW< GraphT, WeightT>::set_weight(mat_t& lw, bool edges_only) {
+void Base_Graph_EW< GraphT, WeightT>::set_weights(
+	weight_matrix_t& edge_weights,
+	bool edges_only) 
+{
 
 	auto NV = num_vertices();
 
@@ -136,7 +139,7 @@ void Base_Graph_EW< GraphT, WeightT>::set_weight(mat_t& lw, bool edges_only) {
 			if (edges_only && v == w) continue;			//skips vertex weights if required
 
 			if (graph_.is_edge(v, w)) {
-				edge_weights_[v][w] = lw[v][w];
+				edge_weights_[v][w] = edge_weights[v][w];
 			}
 			else {
 				//cleans non-edge weights if required
@@ -194,7 +197,7 @@ void Base_Graph_EW<GraphT, WeightT>::transform_weights(Func f, int type)
 
 template <class GraphT, class WeightT>
 template<bool EraseNonEdges>
-void Base_Graph_EW< GraphT, WeightT>::set_edge_weight(Weight val) {
+void Base_Graph_EW< GraphT, WeightT>::set_weights(Weight val) {
 
 	auto NV = num_vertices();
 
@@ -279,83 +282,36 @@ void Base_Graph_EW<GraphT, WeightT>::add_edge(int v, int w, Weight val)
 	edge_weights_[v][w] = val;	
 }
 
-template<class GraphT, class WeightT>
-void Base_Graph_EW<GraphT, WeightT>::set_vertex_weight( Weight val) {
 
-	auto NV = num_vertices();
-
-	for (int v = 0; v < NV; v++) {
-			edge_weights_[v][v] = val;
-	}	
-
-}
 
 template <class GraphT, class WeightT>
-void Base_Graph_EW<GraphT, WeightT >::set_weight(int v, int w, Weight val) {
-	
-	////////////////
-	assert(v != w);
-	////////////////
-
-	bool is_edge = graph_.is_edge(v, w);	
-
-	if (is_edge || (val == NO_WEIGHT && !is_edge)) {
-		edge_weights_[v][w] = val;
+void Base_Graph_EW<GraphT, WeightT >::set_weight(
+	vertex_t v, 
+	vertex_t w, 
+	weight_t weight) {
+		
+	if (v == w) {
+		LOG_ERROR(
+			"Attempting to set a self-loop weight - "
+			"Base_Graph_EW::set_weight");
+		std::terminate();
 	}
-	else {
-		LOGG_WARNING("attempting to set an edge-weight to a non-edge", "(", v, ",", w, ")",
-						 "- Base_Graph_EW<GraphT,WeightT >::set_weight"							);		
+
+	if (!graph_.is_edge(v, w)) {
+		LOG_ERROR(
+			"Attempting to set an edge weight to a non-edge - "
+			"Base_Graph_EW::set_weight");
+		std::terminate();
 	}
-}
 
-
-
-template<class GraphT, class WeightT>
- void Base_Graph_EW<GraphT, WeightT>::complement_weights(int type){
-
-	auto NV = num_vertices();	
-
-	switch (type) {
-	case EDGE:
-		for (auto i = 0; i < NV-1; ++i) {
-			for (auto j = i + 1; j < NV; ++j) {
-				if (edge_weights_[i][j] != NO_WEIGHT) {
-
-					////////////////////////
-					edge_weights_[i][j] = - edge_weights_[i][j];
-					////////////////////////
-				}
-			}
-		}
-		break;
-	case VERTEX:
-		for (auto i = 0; i < NV; ++i) {
-			if (edge_weights_[i][i] != NO_WEIGHT) {
-
-				////////////////////////
-				edge_weights_[i][i] = - edge_weights_[i][i];
-				////////////////////////
-			}
-		}	
-		break;
-	case BOTH:
-		//vertex and edge-weights
-		for (auto i = 0; i < NV; ++i) {
-			for (auto j = 0; j < NV; ++j) {
-				if (edge_weights_[i][j] != NO_WEIGHT) {
-					//////////////////////////
-					edge_weights_[i][j] = - edge_weights_[i][j];
-					///////////////////////////
-				}
-			}
-		}
-		break;
-	default:	
-		LOG_ERROR("unknown type -  Base_Graph_EW<GraphT, WeightT>::complement_weights");
-		LOG_ERROR("exiting");
-		std::exit(EXIT_FAILURE);
+	if (weight == NO_WEIGHT) {
+		LOG_ERROR(
+			"Attempting to assign NO_WEIGHT to an existing edge - "
+			"Base_Graph_EW::set_weight");
+		std::terminate();
 	}
 	
+	edge_weights_[v][w] = weight;
 }
 
 

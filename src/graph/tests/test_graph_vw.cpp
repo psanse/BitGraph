@@ -174,7 +174,7 @@ TEST_F(UGraphWTest, DISABLED_printing) {
 
 TEST_F(UGraphWTest, unit_weighted)
 {
-	gw.set_weight(1);
+	gw.set_weights(1);
 
 	EXPECT_TRUE(gw.is_unit_weighted());
 

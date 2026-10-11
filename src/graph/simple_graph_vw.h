@@ -209,10 +209,22 @@ namespace bitgraph {
 		/////////////
 		// setters and getters
 
+		/**
+		 * @brief Sets the weight of a vertex.
+		 */
 		void set_weight(vertex_t v, weight_t value) noexcept{ 
 			vertex_weights_[v] = value;
 		}
-		void set_weight(weight_t value = DEFAULT_WEIGHT) {
+
+		/**
+		 * @brief Sets all vertex weights to the same value.
+		 *
+		 * Assigns @p value to every vertex in the graph, replacing all existing
+		 * vertex weights.
+		 *
+		 * @param value Weight assigned to every vertex.
+		 */
+		void set_weights(weight_t value = DEFAULT_WEIGHT) {
 			vertex_weights_.assign(
 				static_cast<std::size_t>(graph_.num_vertices()),
 				value);
@@ -227,7 +239,7 @@ namespace bitgraph {
 		 * @warning Calls `std::terminate()` if the number of weights does not
 		 *          match the number of vertices.
 		 */
-		void set_weight(const std::vector<weight_t>& weights);
+		void set_weights(const std::vector<weight_t>& weights);
 
 		/**
 		 * @brief Sets the weights of all vertices by moving a weight vector.
@@ -238,7 +250,7 @@ namespace bitgraph {
 		 * @warning Calls `std::terminate()` if the number of weights does not
 		 *          match the number of vertices.
 		 */
-		void set_weight(std::vector<weight_t>&& weights);
+		void set_weights(std::vector<weight_t>&& weights);
 
 		/**
 		 * @brief Assigns vertex weights using the Pullan modulus scheme.

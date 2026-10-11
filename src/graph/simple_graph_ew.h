@@ -160,7 +160,6 @@ namespace bitgraph {
 		//destructor
 		virtual	~Base_Graph_EW() = default;
 
-
 		//////////////////////////
 		// memory allocation (API)
 
@@ -177,12 +176,68 @@ namespace bitgraph {
 		 * @warning Follows a fail-fast policy and calls `std::terminate()` if the
 		 *          graph or its edge-weight matrix cannot be reinitialized.
 		 */
-		void reset(std::size_t NV, string name = "") noexcept;
-			
+		void reset(std::size_t NV,
+			string name = "") noexcept;
 
 
 		/////////////
 		// setters and getters	
+
+
+		/**
+		 * @brief Sets the weight of an existing directed edge.
+		 *
+		 * Assigns @p weight to the directed edge (@p v, @p w).
+		 *
+		 * @param v Source vertex.
+		 * @param w Target vertex.
+		 * @param weight New edge weight.
+		 *
+		 * @pre (@p v, @p w) must be an existing edge.
+		 * @pre @p v and @p w must be different vertices.
+		 * @pre @p weight must be different from `NO_WEIGHT`.
+		 *
+		 * @warning Follows a fail-fast policy and calls `std::terminate()` if any
+		 *          precondition is violated.
+		 */
+		virtual	void set_weight(
+			vertex_t v, 
+			vertex_t w,
+			weight_t val);
+
+
+		/**
+		*  @brief sets all edge-weights to val IF there is a corresponding edge.
+		*		  Vertex weights are not modified.
+		*  @param lw matrix of edge weights
+		*  @param template Erase: if TRUE weights of non-edges are set to NO_WEIGHT
+		*						  (aditional cleaning)
+		**/
+		template<bool EraseNonEdges = false>
+		void set_weights(Weight val = DEFAULT_WEIGHT);
+
+		/**
+		*  @brief sets edge weights in @lw  if there is a corresponding edge.
+		*		  Vertex weights are not modified.
+		*  @param edge_weights matrix of edge weights
+		*  @param template Erase: if TRUE weights of non-edges are set to NO_WEIGHT
+		*						  (aditional cleaning)
+		*  @details: asserts  @lw.size() == |V|
+		**/
+		template<bool EraseNonEdges = false>
+		void set_weights(weight_matrix_t& edge_weights, bool edges_only = true);
+		
+		/**
+		* @brief sets new edge-weights based on modulus operation [Pullan 2008, MODULUS = 200]
+		*
+		*			I. we(v, w) = 1 + ((v + w) % MODULUS)	(1-based index)
+		*
+		*			II. vertex-weigths are not changed
+		* @param template EraseNonEdges:  if TRUE, non-edges are set to NO_WEIGHT
+		* @param MODULUS: modulus value [Pullan 2008, DEFAULT_WEIGHT_MODULUS = 200]
+		**/
+		template <bool EraseNonEdges = false>
+		void set_modulus_edge_weights(int MODULUS = DEFAULT_WEIGHT_MODULUS);
 
 		/**
 		* @brief getter for edge-weights
@@ -245,8 +300,7 @@ namespace bitgraph {
 
 		double density(bool lazy = true) { return graph_.density(lazy); }
 
-
-		
+			
 
 		
 
@@ -259,61 +313,7 @@ namespace bitgraph {
 			**/
 		virtual	void add_edge(int v, int w, Weight val = ZERO_WEIGHT);
 
-		/**
-		*  @brief sets vertex-weight
-		*  @details: vertex-weights are stored as self-loop edge-weights
-		**/
-		void set_weight(int v, Weight val) { edge_weights_[v][v] = val; }
-
-		/**
-		*  @brief sets edge-weight to an EXISTNG given directed edge (v, w)
-		*		  (in a non-edge it can only set weight to NO_WEIGHT)
-		*  @param v input vertex
-		*  @param Weight input vertex
-		*  @param val input weight value
-
-		*  @details: asserts it REALLY is an edge (and not a self-loop)
-		*  @details: in a non-edge it can only set weight to NO_WEIGHT
-		**/
-		virtual	void set_weight(int v, int w, Weight val);
-
-		/**
-		*  @brief sets edge weights in @lw  if there is a corresponding edge.
-		*		  Vertex weights are not modified.
-		*  @param lw matrix of edge weights
-		*  @param template Erase: if TRUE weights of non-edges are set to NO_WEIGHT
-		*						  (aditional cleaning)
-		*  @details: asserts  @lw.size() == |V|
-		**/
-		template<bool EraseNonEdges = false>
-		void set_weight(mat_t& lw, bool edges_only = true);
-
-		/**
-		*  @brief sets all vertex-weights (self-loop edge weights) to the same weight @val
-		**/
-		void set_vertex_weight(Weight val = ZERO_WEIGHT);
-
-		/**
-		*  @brief sets all edge-weights to val IF there is a corresponding edge.
-		*		  Vertex weights are not modified.
-		*  @param lw matrix of edge weights
-		*  @param template Erase: if TRUE weights of non-edges are set to NO_WEIGHT
-		*						  (aditional cleaning)
-		**/
-		template<bool EraseNonEdges = false>
-		void set_edge_weight(Weight val = ZERO_WEIGHT);
-
-		/**
-		* @brief sets new edge-weights based on modulus operation [Pullan 2008, MODULUS = 200]
-		*
-		*			I. we(v, w) = 1 + ((v + w) % MODULUS)	(1-based index)
-		*
-		*			II. vertex-weigths are not changed
-		* @param template EraseNonEdges:  if TRUE, non-edges are set to NO_WEIGHT
-		* @param MODULUS: modulus value [Pullan 2008, DEFAULT_WEIGHT_MODULUS = 200]
-		**/
-		template <bool EraseNonEdges = false>
-		void set_modulus_edge_weights(int MODULUS = DEFAULT_WEIGHT_MODULUS);
+		
 
 
 		////////////////
@@ -357,13 +357,7 @@ namespace bitgraph {
 		template<class Func>
 		void transform_weights(Func f, int type = BOTH);
 
-		/**
-		* @brief specific transformation of weights (excluding NO_WEIGHT values)
-		*		 from positive to negative, i.e.,  we(i, j) = - we(i, j)
-		* @param type: EDGE, VERTEX or BOTH
-		**/
-		void complement_weights(int type = BOTH);
-
+		
 		////////////////////////
 		// other operations
 
