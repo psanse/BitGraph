@@ -363,26 +363,7 @@ namespace bitgraph {
 		void add_edge(vertex_t v, vertex_t w) {
 			graph_.add_edge(v, w);
 		}
-						
-		/**
-		* @brief neighbor set of vertex @v
-		* @param v input vertex
-		**/
-		/*const vertex_bitset_t& neighbors(vertex_t v) const {
-			return graph_.neighbors(v);
-		}*/
-				
-		/**
-		 * @brief Returns the graph density.
-		 *
-		 * @param lazy If `true`, uses the lazy density computation provided by
-		 *             the underlying graph.
-		 * @return Graph density.
-		 */
-		double density(bool lazy = true) const {
-			return graph_.density(lazy);
-		}
-
+	
 		/**
 		 * @brief Generates random edges with probability @p p.
 		 *
@@ -660,10 +641,7 @@ namespace bitgraph {
 			const vertex_t* vertices, 
 			int n, 
 			std::ostream& os = std::cout) const;
-
-		/////////////////////////////////////
-		// data members
-
+			
 	protected:
 		
 		/**

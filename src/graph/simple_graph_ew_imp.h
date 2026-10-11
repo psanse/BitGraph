@@ -79,6 +79,50 @@ void Base_Graph_EW<GraphT, WeightT>::validate_weight_matrix(
 	}
 }
 
+template<class GraphT, class WeightT>
+bool Base_Graph_EW<GraphT, WeightT>::is_consistent() const noexcept
+{
+
+	const std::size_t NV =
+		static_cast<std::size_t>(graph_.num_vertices());
+
+	if (edge_weights_.size() != NV) {
+		return false;
+	}
+
+	for (std::size_t v = 0; v < NV; ++v) {
+
+		if (edge_weights_[v].size() != NV) {
+			return false;
+		}
+
+		for (std::size_t w = 0; w < NV; ++w) {
+
+			const vertex_t vv = static_cast<vertex_t>(v);
+			const vertex_t ww = static_cast<vertex_t>(w);
+
+			const bool is_edge = graph_.is_edge(vv, ww);
+			const bool has_weight =
+				edge_weights_[v][w] != NO_WEIGHT;
+
+			// Self-loops are not allowed.
+			if (v == w) {
+				if (is_edge || has_weight) {
+					return false;
+				}
+				continue;
+			}
+
+			// Topology and edge weights must agree.
+			if (is_edge != has_weight) {
+				return false;
+			}
+		}
+	}
+
+	return true;
+}
+
  template<class GraphT, class WeightT>
  void Base_Graph_EW<GraphT, WeightT>::initialize_edge_weights(
 	 weight_t weight = DEFAULT_WEIGHT)
@@ -111,48 +155,30 @@ void Base_Graph_EW<GraphT, WeightT>::validate_weight_matrix(
 
 template<class GraphT, class WeightT>
 template<class Func>
-void Base_Graph_EW<GraphT, WeightT>::transform_weights(Func f, int type)
+void Base_Graph_EW<GraphT, WeightT>::transform_weights(Func f)
 {
-	auto NV = num_vertices();
+	const vertex_t NV = graph_.num_vertices();
 
-	switch (type) {
-		//edge-weights
-	case EDGE:
-		for (auto i = 0; i < NV - 1; ++i) {
-			for (auto j = i + 1; j < NV; ++j) {
-				if (edge_weights_[i][j] != NO_WEIGHT) {
-					edge_weights_[i][j] = f(edge_weights_[i][j]);
+	for (vertex_t v = 0; v < NV; ++v) {
+		for (vertex_t w = 0; w < NV; ++w) {
+
+			const std::size_t vv = static_cast<std::size_t>(v);
+			const std::size_t ww = static_cast<std::size_t>(w);
+
+			if (edge_weights_[vv][ww] != NO_WEIGHT) {
+				const weight_t weight = f(edge_weights_[vv][ww]);
+
+				if (weight == NO_WEIGHT) {
+					LOG_ERROR(
+						"Weight transformation generated NO_WEIGHT - "
+						"Base_Graph_EW::transform_weights");
+					std::terminate();
 				}
-				if (edge_weights_[j][i] != NO_WEIGHT) {
-					edge_weights_[j][i] = f(edge_weights_[j][i]);
-				}
+
+				edge_weights_[vv][ww] = weight;
 			}
 		}
-		break;
-		//vertex-weights
-	case VERTEX:
-		for (auto i = 0; i < NV; ++i) {
-			if (edge_weights_[i][i] != NO_WEIGHT) {
-				edge_weights_[i][i] = f(edge_weights_[i][i]);
-			}
-		}
-		break;
-	case BOTH:
-		//vertex and edge-weights
-		for (auto i = 0; i < NV; ++i) {
-			for (auto j = 0; j < NV; ++j) {
-				if (edge_weights_[i][j] != NO_WEIGHT) {
-					edge_weights_[i][j] = f(edge_weights_[i][j]);
-				}
-			}
-		}
-		break;
-	default:
-		//should not happen	
-		LOG_ERROR("unknown type -  Base_Graph_EW<GraphT, WeightT>::transform_weights");
-		LOG_ERROR("exiting");
-		std::exit(EXIT_FAILURE);
-	}
+	}	
 }
 
 template <class GraphT, class WeightT>
@@ -254,23 +280,6 @@ void Base_Graph_EW<GraphT, WeightT>::reset(
 	}
 }
 
-template<class GraphT, class WeightT>
- bool Base_Graph_EW<GraphT, WeightT>::is_consistent(){
-
-	auto NV = num_vertices();
-
-	for (auto i = 0; i < NV; ++i) {
-		for (auto j = 0; j < NV; ++j) {
-
-			if ( edge_weights_[i][j] == NO_WEIGHT &&  graph_.is_edge(i, j) ) {
-				LOGG_WARNING ("edge [", i, ", ", j ,")] with NO_WEIGHT - Base_Graph_EW<GraphT, WeightT>::is_consistent()");
-				return false;
-			}
-
-		}
-	}
-	return true;
-}
 
 template<class GraphT, class WeightT>
 void Base_Graph_EW<GraphT, WeightT>::add_edge(
@@ -320,13 +329,12 @@ void Base_Graph_EW<GraphT, WeightT >::set_weight(
 
 
 ///////////////
-//
 // I/O
-//
-//////////////
+
 
 template<class GraphT, class WeightT>
-int Base_Graph_EW<GraphT, WeightT>::read_dimacs (string filename){
+int Base_Graph_EW<GraphT, WeightT>::read_dimacs (const std::string& filename)
+{
 		
 	string line;	
 		
@@ -504,36 +512,35 @@ int Base_Graph_EW<GraphT, WeightT>::read_dimacs (string filename){
 }
 
 template<class GraphT, class WeightT>
-std::ostream& Base_Graph_EW<GraphT, WeightT>::write_dimacs (std::ostream& o) {
-	
-	auto NV = num_vertices();
+std::ostream& Base_Graph_EW<GraphT, WeightT>::write_dimacs (std::ostream& os) const
+{
+	const int NV = num_vertices();
 
 	//timestamp 
-	graph_.timestamp_dimacs(o);
+	graph_.timestamp_dimacs(os);
 	
 	//name
-	graph_.name_dimacs(o);
+	graph_.name_dimacs(os);
 
 	//dimacs header - recompute edges
-	graph_.header_dimacs(o, false);
-
-	//write vertex weights (edge weights of self loops are considered vertex weights)
-	for (int v = 0; v < NV; ++v) {
-		if (edge_weights_[v][v] != NO_WEIGHT) {
-			o << "n " << v + 1 << " " << edge_weights_[v][v] << std::endl;
-		}
-	}
+	graph_.header_dimacs(os, false);
 		
-	//write (directed) edges and edge-weights
-	for(int v = 0; v < NV; ++v){
-		for(int w = 0; w < NV; ++w){
-			if (v != w && graph_.is_edge(v, w)) {										
-				o << "e " << v + 1 << " " << w + 1 << edge_weights_[v][w] << std::endl;			//1-based vertex notation dimacs format	
+	// Directed edges and edge weights.
+	for(vertex_t v = 0; v < NV; ++v){
+		for(vertex_t w = 0; w < NV; ++w){
+
+			if (graph_.is_edge(v, w)) {
+				os << "e "
+					<< v + 1 << ' '
+					<< w + 1 << ' '
+					<< edge_weights_[static_cast<std::size_t>(v)]
+					[static_cast<std::size_t>(w)]
+					<< '\n';
 			}
 		}
 	}
 
-	return o;
+	return os;
 }
 
 template <class GraphT, class WeightT>
@@ -665,6 +672,13 @@ std::ostream& Base_Graph_EW<GraphT, WeightT>::print_vertex_weights(Vertices& lv,
 }
 
 template<class GraphT, class WeightT>
+void Base_Graph_EW<GraphT, WeightT>::gen_random_edges(double p, weight_t weight)
+{
+	graph_.gen_random_edges(p);
+	set_weights(weight);
+}
+
+template<class GraphT, class WeightT>
 ostream& Base_Graph_EW<GraphT, WeightT>::print_data (bool lazy, std::ostream& o, bool eofl) {
 	graph_.print_data(lazy, o, false);
 	o << " [type:ew]";								//"WeightT" for vertex-weighted graphs in GRAPH lib
@@ -673,17 +687,27 @@ ostream& Base_Graph_EW<GraphT, WeightT>::print_data (bool lazy, std::ostream& o,
 }
 
 template<class GraphT, class WeightT>
-std::ostream& Base_Graph_EW<GraphT, WeightT>::print_edge(int v, int w, std::ostream& o, bool eofl) const
+std::ostream& Base_Graph_EW<GraphT, WeightT>::print_edge(
+	vertex_t v, 
+	vertex_t w,
+	std::ostream& os,
+	bool trailing_newline) const
 {
 	if (graph_.is_edge(v, w)) {
-		o << "[" << v << "]--(" << edge_weights_[v][w] << ")-->" << "[" << w << "]";
+		os << "[" << v << "]--("
+		   << edge_weights_[v][w] 
+		   << ")-->"
+		   << "[" << w << "]";
 	}
 	else {
-		o << "[" << v << "]--(NO_EDGE)-->" << "[" << w << "]";
+		os << "[" << v << "]--(NO_EDGE)-->"
+		   << "[" << w << "]";
 	}
 
-	if (eofl) { o << std::endl; }	
-	return o;
+	if (trailing_newline) {
+		os << '\n';
+	}
+	return os;
 }
 
 template<class GraphT, class WeightT>
@@ -716,67 +740,24 @@ std::ostream& Base_Graph_EW<GraphT, WeightT>::print_edges(std::ostream& o, bool 
 	return o;
 }
 
-template<class GraphT, class WeightT>
-void Base_Graph_EW<GraphT, WeightT>::create_complement(Base_Graph_EW<graph_type, Weight>& g) const
-{
-	g.set_name(this->name());
-	g.set_path(this->path());
-	g.set_weights(edge_weights_);
-
-	/////////////////////////////////////////
-	graph_.create_complement(g.graph());
-	/////////////////////////////////////////
-}
 
 template<class GraphT, class WeightT>
-void Base_Graph_EW<GraphT, WeightT>::gen_random_edges(double p, Weight val)
+bool bitgraph::Base_Graph_EW<GraphT, WeightT>::is_unit_weighted() const noexcept
 {
-	const auto NV = graph_.num_vertices();
+	const vertex_t NV = graph_.num_vertices();
 
-	//removes all edges
-	graph_.remove_edges();
+	for (vertex_t v = 0; v < NV; ++v) {
+		for (vertex_t w = 0; w < NV; ++w) {
 
-	//sets directed edges with probability p
-	for (auto i = 0; i < NV - 1; ++i) {
-		for (auto j = i + 1; j < NV; ++j) {
-
-			//considers both directed edges separately
-			if (utils::uniform_dist(p)) {
-				add_edge(i, j, val);				
-			}
-			if (utils::uniform_dist(p)) {
-				add_edge(j, i, val);
+			if (graph_.is_edge(v, w) &&
+				edge_weights_[static_cast<std::size_t>(v)]
+							 [static_cast<std::size_t>(w)] != DEFAULT_WEIGHT) {
+				return false;
 			}
 		}
 	}
-}
 
-template<class GraphT, class WeightT>
-void Base_Graph_EW<GraphT, WeightT>::erase_non_edge_weights() {
-
-	const auto NV = graph_.num_vertices();
-
-	for (auto i = 0; i < NV - 1; ++i) {
-		for (auto j = i + 1; j < NV; ++j) {
-
-			if (!graph_.is_edge(i, j)) {
-				this->set_weight(i, j, Base_Graph_EW<GraphT, WeightT>::NO_WEIGHT);
-			}
-		}
-	}
-}
-
-template<class GraphT, class WeightT>
-void Base_Graph_EW<GraphT, WeightT>::make_edge_weighted(bool erase_non_edges)
-{
-	//sets all vertex weights to NO_WEIGHT
-	for (auto v = 0u; v < graph_.size(); ++v) {
-		edge_weights_[v][v] = Base_Graph_EW<GraphT, WeightT>::NO_WEIGHT;	
-	}
-
-	if (erase_non_edges) {
-		erase_non_edge_weights();
-	}
+	return true;
 }
 
 

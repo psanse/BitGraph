@@ -524,8 +524,8 @@ TEST(UGraphW, gen_random) {
 	
 	/////////////////////
 	EXPECT_EQ(NV, ugw.num_vertices());
-	EXPECT_TRUE(ugw.density()< density + 0.001);
-	EXPECT_TRUE(ugw.density()> density - 0.001);
+	EXPECT_TRUE(ugw.graph().density() < density + 0.001);
+	EXPECT_TRUE(ugw.graph().density() > density - 0.001);
 	////////////////////
 }
 

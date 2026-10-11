@@ -359,11 +359,14 @@ namespace bitgraph {
 		void remove_edge(int v, int w) override;
 
 		/**
-		* @brief generates undirected edges with probability p, exactly.
-		* @param p probability of an edge
-		* @details:
-		* - uses a different more precise model than legacy code which operated edge by edge
-		**/
+		 * @brief Generates a uniformly random graph with approximately density @p p.
+		 *
+		 * Selects exactly `round(p * C(n,2))` edges uniformly at random from all
+		 * possible undirected edges.
+		 *
+		 * @note This corresponds to a fixed-edge-count random graph model similar
+		 *       to G(n,m), rather than the independent-edge G(n,p) model.
+		 */
 		void gen_random_edges(double p)	override;
 
 		//////////////	

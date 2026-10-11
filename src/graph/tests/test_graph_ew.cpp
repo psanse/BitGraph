@@ -73,38 +73,6 @@ TEST_F(UGraphEWTest, set_edge_weights) {
 	EXPECT_EQ(7, ugew.weight(1, 3) );
 }
 
-TEST_F(UGraphEWTest, make_edge_weighted) {
-
-	//sets vertex weights to NO_WEIGHT
-	ugew.make_edge_weighted(false);
-
-	EXPECT_EQ(decltype(ugew)::NO_WEIGHT, ugew.weight(0, 0));			
-	EXPECT_EQ(decltype(ugew)::NO_WEIGHT, ugew.weight(1, 2));
-	EXPECT_EQ(decltype(ugew)::NO_WEIGHT, ugew.weight(1, 4));
-
-	//also sets non-edges to NO_WEIGHT
-	ugew.make_edge_weighted(true);
-
-	EXPECT_EQ(decltype(ugew)::NO_WEIGHT, ugew.weight(0, 0));
-	EXPECT_EQ(decltype(ugew)::NO_WEIGHT, ugew.weight(1, 2));
-	EXPECT_EQ(decltype(ugew)::NO_WEIGHT, ugew.weight(1, 4));
-}
-
-TEST_F(UGraphEWTest, DISABLED_create_complement) {
-
-	ugraph_ewi ugcomp;
-
-	///////////////////////////////
-	ugew.create_complement(ugcomp);
-	///////////////////////////////
-
-	EXPECT_EQ(ugew.size(), ugcomp.size());
-	EXPECT_FALSE(ugcomp.is_edge(0,1));
-	EXPECT_FALSE(ugcomp.is_edge(0, 2));
-	EXPECT_FALSE(ugcomp.is_edge(1, 3));
-	EXPECT_TRUE(ugcomp.is_edge(0, 3));
-}
-
 TEST_F(UGraphEWTest, transform_weights) {
 
 	//multiply all weigths (vertex and edge-weights) by 5
@@ -137,7 +105,7 @@ TEST_F(UGraphEWTest, generate_weights) {
 	EXPECT_EQ(4, ugew.weight(0, 1));
 	EXPECT_EQ(5, ugew.weight(0, 2));
 	EXPECT_EQ(7, ugew.weight(1, 3));
-	EXPECT_TRUE(ugew.is_consistent());
+	EXPECT_TRUE(ugew.is_consistent());  // validate_weight_matrix()
 
 	//I/O
 	//ugew.print_weights()

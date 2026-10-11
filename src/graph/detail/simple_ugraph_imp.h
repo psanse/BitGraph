@@ -292,26 +292,38 @@ namespace bitgraph {
 
 	template<class BitsetT>
 	inline
-		void Ugraph<BitsetT>::gen_random_edges(double p) {
+		void Ugraph<BitsetT>::gen_random_edges(double p) 
+	{
+		assert(p >= 0.0 && p <= 1.0);
+
 
 		//removes all edges
 		this->remove_edges();
 
-		using edge_t = std::pair<int, int>;
+		using edge_t = std::pair<vertex_t, vertex_t>;
 		std::vector<edge_t> edges;
-		edges.reserve(this->NV_ * (this->NV_ - 1) / 2);
-		for (int i = 0; i < this->NV_ - 1; ++i) {
-			for (auto j = i + 1; j < this->NV_; ++j) {
-				edges.emplace_back(i, j);
+
+		const std::size_t NV = static_cast<std::size_t>(this->NV_);
+		if (NV < 2) {
+			return;
+		}
+		edges.reserve(NV * (NV - 1) / 2);
+				
+		for (vertex_t v = 0; v < this->NV_ - 1; ++v) {
+			for (vertex_t w = v + 1; w < this->NV_; ++w) {
+				edges.emplace_back(v, w);
 			}
 		}
-
-		//rounds edges to the nearest integer value
+				
 		const std::size_t N = edges.size();
-		std::size_t M = static_cast<std::size_t>(std::llround(p * N)); 
-		if (M > N) { M = N; };
+		const std::size_t M =
+			static_cast<std::size_t>(std::llround(p * N));
+		
 
-		std::shuffle(edges.begin(), edges.end(), bitgraph::utils::detail::g_iugen.engine() /*std::mt19937_64(std::random_device{}())*/);
+		std::shuffle(
+			edges.begin(), 
+			edges.end(), 
+			bitgraph::utils::detail::g_iugen.engine());
 
 		//take the first M edges
 		for (std::size_t i = 0; i < M; ++i) {

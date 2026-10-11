@@ -287,12 +287,17 @@ namespace bitgraph {
 		graph_t& graph() { return graph_; }
 		
 		/**
-		* @brief getter for edge-weights
-		* @param v, Weight: edge
-		* @details: no check for vertex existence
-		**/
-		Weight weight(int v, int w)	const noexcept{
-			return edge_weights_[v][w];
+		 * @brief Returns the weight of an edge.
+		 *
+		 * @param v Source vertex.
+		 * @param w Target vertex.
+		 * @return Weight associated with the edge (@p v, @p w).
+		 *
+		 * @note No bounds checking is performed.
+		 */
+		weight_t weight(vertex_t v, vertex_t w)	const noexcept{
+			return edge_weights_[static_cast<size_t>(v)]
+								[static_cast<size_t>(w)];
 		}
 
 		/**
@@ -359,94 +364,150 @@ namespace bitgraph {
 			vertex_t v, 
 			vertex_t w, 
 			weight_t weight = DEFAULT_WEIGHT);
-
+	
 		/**
-		* @brief neighbor set of vertex @v
-		* @param v input vertex
-		**/
-		/*const vertex_bitset_t& neighbors(int v) const {
-			return graph_.neighbors(v);
-		}*/
-				
-		/**
-		 * @brief Returns the graph density.
+		 * @brief Disabled maximum edge-weight query.
 		 *
-		 * @param lazy If `true`, uses the lazy density computation provided by
-		 *             the underlying graph.
-		 * @return Graph density.
+		 * This overload is intentionally unavailable for edge-weighted graphs.
+		 *
+		 * @param v First endpoint of the edge.
+		 * @param w Second endpoint of the edge.
+		 *
+		 * @return This function is deleted and cannot be called.
 		 */
-		double density(bool lazy = true) {
-			return graph_.density(lazy);
+		weight_t maximum_weight(vertex_t& v, vertex_t& w) const = delete;
+
+		/////////////
+		// Boolean properties
+
+		/**
+		 * @brief Tests whether two vertices are adjacent.
+		 *
+		 * @param v First vertex.
+		 * @param w Second vertex.
+		 * @return `true` if `(v,w)` is an edge; otherwise, `false`.
+		 */
+		bool is_edge(vertex_t v, vertex_t w) const {
+			return graph_.is_edge(v, w);
 		}
-				
-
-
-		////////////////
-		// Conversions 
 
 		/**
-		* @brief sets all vertex weights to NO_WEIGHT
-		* @param erase_non_edges if TRUE, sets non-edges to NO_WEIGHT
-		**/
-		void make_edge_weighted(bool erase_non_edges = false);
+		 * @brief Checks whether the graph is unit edge-weighted.
+		 *
+		 * An edge-weighted graph is unit-weighted if every existing edge has weight
+		 * equal to `DEFAULT_WEIGHT`. Non-edges are ignored.
+		 *
+		 * @return `true` if all existing edges have weight `DEFAULT_WEIGHT`;
+		 *         otherwise, `false`.
+		 *
+		 * @note An edgeless graph is considered unit-weighted.
+		 */
+		bool is_unit_weighted() const noexcept;
+
 
 		/**
-		* @brief sets all non-edges to weight NO_WEIGHT.
-		**/
-		void erase_non_edge_weights();
-
-		/////////////////////////
-		// boolean properties
-
-		bool is_edge(int v, int w) const { return graph_.is_edge(v, w); }
-
-		/*
-		* @brief consistency check
-		*
-		*		 I. edges with NO_WEGHT weight values
-		*
-		* @returns true if consistent, false otherwise
-		*
-		*  TODO... other checks
-		*/
-		bool is_consistent();
+		 * @brief Checks whether the edge-weighted graph is internally consistent.
+		 *
+		 * Verifies that the edge-weight matrix matches the graph topology and
+		 * satisfies the class invariants. In particular, the matrix dimensions
+		 * must match the number of vertices, existing edges must have a weight
+		 * different from `NO_WEIGHT`, and non-edges must have weight `NO_WEIGHT`.
+		 *
+		 * @return `true` if the graph and edge-weight matrix are consistent;
+		 *         otherwise, `false`.
+		 */
+		bool is_consistent() const noexcept;
 
 		////////////////////////
-		//weight operations
+		// Edge weight operations
 
 		/**
-		* @brief transforms weights (excluding NO_WEIGHT values) using functor f
-		* @param f functor
-		* @param type: EDGE (edge-weights), VERTEX (vertex-weights) or BOTH
-		**/
+		 * @brief Applies a transformation to all existing edge weights.
+		 *
+		 * Replaces each existing edge weight `w` with `f(w)`. Entries corresponding
+		 * to non-edges remain equal to `NO_WEIGHT`.
+		 *
+		 * @tparam Func Unary callable type accepting a `weight_t` and returning
+		 *              a value convertible to `weight_t`.
+		 * @param f Transformation applied to each existing edge weight.
+		 *
+		 * @warning Follows a fail-fast policy and calls `std::terminate()` if the
+		 *          transformation produces `NO_WEIGHT` for an existing edge.
+		 */
 		template<class Func>
-		void transform_weights(Func f, int type = BOTH);
-
+		void transform_weights(Func f);
 		
 		////////////////////////
-		// other operations
-
-			/**
-			* @brief created complement graph in @g
-			* @param g output graph
-			* @returns 0 if success, -1 if error
-			**/
-		void create_complement(Base_Graph_EW<graph_type, Weight>& g) const;
-
+		// other operations		
+	
 		/**
-		* @brief generates random edges uniformly with probability p and weight val
-		**/
-		virtual void gen_random_edges(double, Weight val);
+		 * @brief Generates a random edge set with fixed cardinality and assigns a common weight.
+		 *
+		 * Replaces the current edge set with a uniformly random subset of
+		 * `M = round(p * C(NV, 2))` undirected edges, where `NV` is the number of
+		 * vertices. All generated edges are assigned @p weight, while non-edges
+		 * are assigned `NO_WEIGHT`.
+		 *
+		 * @param p Target edge density in the range `[0, 1]`.
+		 * @param weight Weight assigned to every generated edge.
+		 *
+		 * @note This implements a fixed-edge-count random graph model of the
+		 *       `G(n,m)` type, with
+		 *       `m = round(p * C(n,2))`, rather than the independent-edge
+		 *       Erdos-Renyi `G(n,p)` model.
+		 *
+		 * @warning Follows the validation policy of the underlying graph generator
+		 *          and `set_weights()`.
+		 */
+		void gen_random_edges(double p, weight_t weight = DEFAULT_WEIGHT);
 
 		////////////
 		// I/O 
 
-		virtual std::ostream& print_data(bool lazy = true, std::ostream& o = std::cout, bool endl = true);
+		/**
+		 * @brief Writes the edge-weighted graph to an output stream in DIMACS format.
+		 *
+		 * Writes the DIMACS header followed by one record for each existing edge.
+		 * Each edge record contains the 1-based endpoint identifiers and the
+		 * corresponding edge weight.
+		 *
+		 * @param os Output stream.
+		 * @return Reference to @p os.
+		 *
+		 * @note This generic implementation writes directed edges. For undirected
+		 *       graphs, a specialization should avoid writing each edge twice.
+		 */
+		virtual	std::ostream& write_dimacs(
+			std::ostream& os = std::cout) const;
+
+
+		/**
+		* @brief Reads weighted directed graph from file in DIMACS format
+		*
+		*			I. vertex weights are read in lines n <v> <w>, if missing, weights are set to NO_WEIGHT
+		*
+		*			II. if the file has edges with no edge weights, weights are set to NO_WEIGHT
+		*
+		* @param filename name of the file
+		* @returns 0 if success, -1 if error
+		* 
+		* TODO - Check (12/10/2026)
+		**/
+		int read_dimacs(const std::string& filename);
+		
+		virtual std::ostream& print_data(
+			bool lazy = true,
+			std::ostream& os = std::cout,
+			bool trailing_newline = true);
 
 		/**
 		* @brief prints the edge (v, w) in line format: [v]-(val)->[w], one edge per line
 		**/
-		std::ostream& print_edge(int v, int w, std::ostream& o = std::cout, bool endl = true) const;
+		std::ostream& print_edge(
+			vertex_t v, 
+			vertex_t w, 
+			std::ostream& os = std::cout, 
+			bool trailing_newline = true) const;
 
 		/**
 		* @brief streams the vertex @v in format [v:(val)]
@@ -465,35 +526,7 @@ namespace bitgraph {
 		**/
 		std::ostream& print_weights(Vertices& lv, std::ostream& o = std::cout, int type = BOTH)	const;
 
-		///////////
-		// read/write operations
-
-		/**
-		* @brief Reads weighted directed graph from file in DIMACS format
-		*
-		*			I. vertex weights are read in lines n <v> <w>, if missing, weights are set to NO_WEIGHT
-		*
-		*			II. if the file has edges with no edge weights, weights are set to NO_WEIGHT
-		*
-		* @param filename name of the file
-		* @returns 0 if success, -1 if error
-		**/
-		int read_dimacs(std::string filename);
-
-		/**
-		* @brief Writes directed graph to stream in dimacs format
-		*
-		*		 I. weights in self-loops are considered vertex weights
-		*
-		*		II. vertex weights with value NO_WEIGHT are not written to file
-		*
-		*		III.For every edge, a weight is written (including NO_WEIGHT)
-		*
-		* @param o output stream
-		* @returns output stream
-		**/
-		virtual	std::ostream& write_dimacs(std::ostream& o);
-
+		
 		/////////////////////
 		//private I/O
 
@@ -539,6 +572,7 @@ namespace bitgraph {
 		 */
 		void validate_weight_matrix(
 			const weight_matrix_t& edge_weights) const;
+
 
 		/**
 		 * @brief Validates the current edge-weight matrix.

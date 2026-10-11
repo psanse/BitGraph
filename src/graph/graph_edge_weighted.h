@@ -135,7 +135,7 @@ namespace bitgraph {
 		/**
 		* @brief generates random edges uniformly with probability p and weight val
 		**/
-		void gen_random_edges(double, Weight val = BaseT::ZERO_WEIGHT) override;
+		//void gen_random_edges(double p, Weight val = DEFAULT_WEIGHT) ;
 
 		/////////////
 		// I/O operations
@@ -323,24 +323,6 @@ namespace bitgraph {
 
 	}
 
-	template<class WeightT>
-	void Graph_EW<ugraph, WeightT>::gen_random_edges(double p, Weight val)
-	{
-		const int NV = this->num_vertices();
-
-		//removes all edges
-		this->graph_.remove_edges();
-
-		//sets directed edges with probability p
-		for (auto i = 0; i < NV - 1; ++i) {
-			for (auto j = i + 1; j < NV; ++j) {
-
-				if (utils::uniform_dist(p)) {
-					add_edge(i, j, val);
-				}
-			}
-		}
-	}
 
 	template<class WeightT>
 	std::ostream& Graph_EW<ugraph, WeightT>::print_edge_weights(std::ostream& o, bool line_format) const
@@ -392,36 +374,43 @@ namespace bitgraph {
 
 
 	template<class WeightT>
-	ostream& Graph_EW<ugraph, WeightT>::write_dimacs(ostream& o)
+	ostream& Graph_EW<ugraph, WeightT>::write_dimacs(ostream& os) 
 	{
 		const int NV = this->num_vertices();
 
 		//timestamp 
-		this->graph_.timestamp_dimacs(o);
+		this->graph_.timestamp_dimacs(os);
 
 		//name
-		this->graph_.name_dimacs(o);
+		this->graph_.name_dimacs(os);
 
 		//dimacs header - recompute edges
-		this->graph_.header_dimacs(o, false);
+		this->graph_.header_dimacs(os, false);
 
 		//write vertex weights
 		for (int v = 0; v < NV; ++v) {
 			if (this->edge_weights_[v][v] != BaseT::NO_WEIGHT) {
-				o << "n " << v + 1 << " " << this->edge_weights_[v][v] << endl;
+				os << "n " << v + 1 << " " << this->edge_weights_[v][v] << endl;
 			}
 		}
 
 		//write undirected edges and edge weights
-		for (int v = 0; v < NV - 1; ++v) {
-			for (int w = v + 1; w < NV; ++w) {
+		for (vertex_t v = 0; v < NV - 1; ++v) {
+			for (vertex_t w = v + 1; w < NV; ++w) {
 				if (this->graph_.is_edge(v, w)) {														//O(log) for sparse graphs: specialize
-					o << "e " << v + 1 << " " << w + 1 << " " << this->edge_weights_[v][w] << endl;			//1-based vertex notation dimacs
+					os << "e " 
+					   << v + 1
+					   << " "
+					   << w + 1
+					   << " "
+					   << this->edge_weights_[static_cast<std::size_t>(v)]
+											[static_cast<std::size_t>(w)] 
+					   << '\n';	
 				}
 			}
 		}
 
-		return o;
+		return os;
 	}
 }
 
