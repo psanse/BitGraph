@@ -22,7 +22,9 @@
 namespace bitgraph{
 
 	template<>
-	inline Graph<BBScanSp>& Graph<BBScanSp>::create_subgraph(int first_k, Graph<BBScanSp>& newg) const
+	inline Graph<BBScanSp>& Graph<BBScanSp>::create_subgraph_first_k(
+		int first_k,
+		Graph<BBScanSp>& newg) const
 	{
 		//assertions
 		if (first_k >= NV_ || first_k <= 0) {

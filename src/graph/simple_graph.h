@@ -629,13 +629,52 @@ namespace bitgraph {
 		// Induced subgraphs
 
 		/**
-		* @brief computes the induced subgraph by the first k vertices in the current graph
-		* @param first_k first k vertices to be included in the new graph
-		* @param g output new induced subgraph
-		* @returns the new induced subgraph (if the operation fails, g remains unchanged)
-		**/
-		Graph& create_subgraph(int first_k, Graph& graph) const;
-				
+		 * @brief Creates the subgraph induced by a list of vertices.
+		 *
+		 * @param[out] graph Output directed graph, overwritten by the induced subgraph.
+		 * @param[in] vertices Vertices of the original graph to retain.
+		 *
+		 * @pre All vertices must be valid and distinct.
+		 * @pre The output graph must differ from the source graph.
+		 *
+		 * @note Vertex i in the output graph corresponds to vertices[i]
+		 *       in the original graph.
+		 * @note An empty vertex list produces an empty graph.
+		 */
+		void create_subgraph(Graph& graph,
+			const vertex_set_t& vertices) const;
+
+		/**
+		 * @brief Creates the subgraph induced by the outgoing neighbors of a vertex.
+		 *
+		 * @param[out] graph Output directed graph, overwritten by the induced subgraph.
+		 * @param[in] v Vertex whose outgoing neighborhood defines the subgraph.
+		 *
+		 * @pre v must be a valid vertex of the original graph.
+		 * @pre The output graph must differ from the source graph.
+		 *
+		 * @note The vertex v itself is excluded if the graph has no self-loops.
+		 * @note A vertex with no outgoing neighbors produces an empty graph.
+		 */
+		void create_subgraph(Graph& graph,
+			vertex_t v) const;
+
+		/**
+		 * @brief Creates the subgraph induced by the first k vertices.
+		 *
+		 * @param[in] first_k Number of vertices to retain.
+		 * @param[out] graph Output graph, overwritten by the induced subgraph.
+		 * @return Reference to the output graph.
+		 *
+		 * @pre 0 <= first_k <= NV_.
+		 * @pre The output graph must differ from the source graph.
+		 *
+		 * @note Vertex indices are preserved.
+		 * @note An empty subgraph is produced when first_k is zero.
+		 * @note Adjacency blocks are copied directly for efficiency.
+		 */
+		Graph& create_subgraph_first_k(int first_k, Graph& graph) const;
+						
 		/**
 		 * @brief Creates and returns the subgraph induced by the first vertices.
 		 *
@@ -645,7 +684,7 @@ namespace bitgraph {
 		 * @param first_k Number of leading vertices included in the subgraph.
 		 * @return Subgraph induced by vertices `[0, first_k)`.
 		 */
-		Graph create_subgraph(int first_k) const {
+		Graph create_subgraph_first_k(int first_k) const {
 			Graph induced;
 			create_subgraph(first_k, induced);
 			return induced;
@@ -762,13 +801,19 @@ namespace bitgraph {
 		*
 		* @param o output stream
 		*/
-		virtual	void  write_dimacs(std::ostream& o);
+		virtual	void write_dimacs(std::ostream& o);
 
-		/*
-		* @brief writes directed graph in edge list format
-		* @param o output stream
-		*/
-		virtual	void  write_EDGES(std::ostream& o);
+		/**
+		 * @brief Writes the directed graph as an edge list.
+		 *
+		 * @param[out] os Output stream.
+		 *
+		 * @note Vertices are numbered from 1 in the output.
+		 * @note Each directed edge is written once.
+		 * @note Comment lines start with '%'.
+		 * @note Self-loops are not written.
+		 */
+		virtual	void write_EDGES(std::ostream& o);
 
 		/** @name DIMACS output primitives
 		 * These functions write individual parts of a DIMACS file. They are intended

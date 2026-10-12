@@ -45,6 +45,7 @@ namespace bitgraph {
 		 * @brief Makes the base-class `remove_edges` overloads visible.
 		 */
 		using base_t::remove_edges;
+		using base_t::create_subgraph;
 
 		////////////
 		// Named factories to create simple graphs
@@ -460,64 +461,179 @@ namespace bitgraph {
 		// Induced subgraphs
 		
 		/**
-		*  @brief Computes the subgraph induced by a set of vertices
-		*  @param lv input set of vertices (std::vector<int>)
-		*  @returns 0 if success, -1 if error
-		**/
-		int create_subgraph(Ugraph& g, Vertices& lv) const;
+		 * @brief Creates the subgraph induced by a given vertex set.
+		 *
+		 * @param[out] graph Output undirected graph, overwritten by the induced subgraph.
+		 * @param[in] vertices Vertices of the original graph to retain.
+		 *
+		 * @pre All vertices must belong to the original graph.
+		 * @pre The output graph must differ from the source graph.
+		 *
+		 * @note Vertices are renumbered consecutively according to
+		 *       the scanning order of the vertex set.
+		 * @note An empty vertex set produces an empty graph.
+		 */
+		void create_subgraph(Ugraph& graph, 
+			const vertex_set_t& vertices) const;
 
 		/**
-		*  @brief Computes the subgraph induced by the neighborhood of a vertex (29/08/21)
-		*
-		*		 Calls create_subgraph(Ugraph& g, Vertices& lv)
-		*
-		*  @param v input vertex which determines the neighborhood
-		*  @returns 0 if success, -1 if error
-		**/
-		int create_subgraph(Ugraph& g, int v) const;
+		 * @brief Creates the subgraph induced by a vertex set.
+		 *
+		 * @param[in] vertices Vertices of the original graph to retain.
+		 * @return The induced undirected subgraph.
+		 *
+		 * @pre All vertices in the set must belong to the original graph.
+		 *
+		 * @note Vertices are renumbered consecutively according to
+		 *       the iteration order of the vertex set.
+		 */
+		Ugraph create_subgraph(const vertex_set_t& vertices) const {
+			Ugraph induced;
+			this->create_subgraph(induced, vertices);
+			return induced;
+		}
 
-
-		////////////
-		// Write basic operations
-		// Note: Read operations are inherited from the base class Graph (using the Template Pattern)
-	public:
 		/**
-		* @brief writes undirected graph in dimacs format
-		* @param o output stream
-		**/
+		 * @brief Creates the subgraph induced by the neighbors of a vertex.
+		 *
+		 * @param[out] ug Output undirected graph, overwritten by the induced subgraph.
+		 * @param[in] v Vertex whose neighborhood defines the subgraph.
+		 *
+		 * @pre v must be a valid vertex of the original graph.
+		 * @pre The output graph must differ from the source graph.
+		 *
+		 * @note The vertex v itself is not included in the induced subgraph.
+		 * @note An isolated vertex produces an empty graph.
+		 */
+		void create_subgraph(Ugraph& graph, vertex_t v) const;
+		
+		/**
+		 * @brief Creates the subgraph induced by the neighbors of a vertex.
+		 *
+		 * @param[in] v Vertex whose neighborhood defines the subgraph.
+		 * @return The induced undirected subgraph.
+		 *
+		 * @pre v must be a valid vertex of the original graph.
+		 *
+		 * @note The vertex v itself is not included in the induced subgraph.
+		 * @note An isolated vertex produces an empty graph.
+		 */
+		Ugraph create_subgraph(vertex_t v) const {
+			Ugraph induced;
+			this->create_subgraph(induced, v);
+			return induced;
+		}
+
+		/**
+		 * @brief Creates the subgraph induced by the first k vertices.
+		 *
+		 * @param[in] first_k Number of vertices to retain.
+		 * @return The induced undirected graph.
+		 *
+		 * @pre 0 <= first_k <= NV_.
+		 *
+		 * @note Vertex indices are preserved.
+		 * @note A value of zero produces an empty graph.
+		 */
+		Ugraph create_subgraph_first_k(int first_k) const {
+			Ugraph induced;
+			base_t::create_subgraph_first_k(first_k, induced);
+			return induced;
+		}
+
+		////////////////////////////
+		// Basic read/write operations
+		// Read operations are inherited from Graph<BitsetT>.
+		// Write operations are specialized to preserve undirected graph semantics.
+		
+		/**
+		 * @brief Writes the undirected graph in DIMACS edge format.
+		 *
+		 * @param[out] filename Output stream.
+		 *
+		 * @note Vertices are numbered from 1 in the output.
+		 * @note Each undirected edge is written exactly once.
+		 * @note The edge count is recomputed before writing.
+		 * @note Self-loops are not supported.
+		 */
 		void write_dimacs(std::ostream& filename) override;
 
 		/**
-		* @brief writes undirected graph in edge list format
-		* @param o output stream
-		**/
+		 * @brief Writes the undirected graph as an edge list.
+		 *
+		 * @param[out] os Output stream.
+		 *
+		 * @note Vertices are numbered from 1 in the output.
+		 * @note Each undirected edge is written exactly once.
+		 * @note Comment lines start with '%'.
+		 * @note Self-loops are not written.
+		 */
 		void write_EDGES(std::ostream& filename) override;
 
 		/**
-		* @brief writes undirected graph in MMX (Matrix Exchange) format
-		* @param o output stream
-		**/
-		void write_mtx(std::ostream& filename);				//MTX format only for Ugraph? (03/01/2025)
+		 * @brief Writes the undirected graph in Matrix Market coordinate format.
+		 *
+		 * @param[out] os Output stream.
+		 *
+		 * @note Uses the Matrix Market pattern symmetric format.
+		 * @note Vertices are numbered from 1 in the output.
+		 * @note Each undirected edge is written exactly once.
+		 * @note The edge count is recomputed before writing.
+		 * @note Self-loops are not supported.
+		 */
+		void write_mtx(std::ostream& filename);				
 
 		/////////////////	
 		//	I/O basic operations
-	public:
-
-		std::ostream& print_degrees(std::ostream & = std::cout)	const;
-		std::ostream& print_edges(std::ostream & = std::cout, bool eofl = false) override;
-
-		std::ostream& print_edges(vertex_bitset_t& bbsg, std::ostream&);
-		std::ostream& print_adjacency_matrix(std::ostream & = std::cout) const;
-
-		//////////////	
-		// deleted methods legacy - CHECK	
-		virtual void remove_vertices(const Bitset& bbn) override = delete;				//commented out implementation - EXPERIMENTAL
+	
+		/**
+		 * @brief Prints the degree of each vertex to an output stream.
+		 *
+		 * @param[out] os Output stream (std::cout by default).
+		 * @return Reference to the output stream.
+		 *
+		 * @note Does not modify the graph.
+		 */
+		std::ostream& print_degrees(
+			std::ostream & = std::cout)	const;
 
 		/**
-		*  @brief enlarges the graph with a new vertex (provided its neighborhood)
-		*		  TODO - code removed, BUGGY (should not be called , unit tests DISABLED)
-		**/
-		int add_vertex(bitset_type* neigh = nullptr) = delete;
+		 * @brief Prints the edges of the undirected graph to an output stream.
+		 *
+		 * @param[out] os Output stream (std::cout by default).
+		 * @param[in] trailing_newline Whether to append a newline.
+		 * @return Reference to the output stream.
+		 *
+		 * @note Each undirected edge is printed exactly once.
+		 * @note Does not modify the graph.
+		 */
+		std::ostream& print_edges(std::ostream & = std::cout,
+			bool trailing_newline = false) override;
+
+		/**
+		 * @brief Prints the edges associated with a given vertex set.
+		 *
+		 * @param[in] vertices Bitset specifying the vertices to consider.
+		 * @param[out] os Output stream.
+		 * @return Reference to the output stream.
+		 *
+		 * @note Each undirected edge is printed exactly once.
+		 * @note The vertex bitset may have its scan state modified.
+		 */
+		std::ostream& print_edges(vertex_bitset_t& vertices,
+			std::ostream&);
+
+		/**
+		 * @brief Prints the adjacency matrix of the graph.
+		 *
+		 * @param[out] os Output stream (std::cout by default).
+		 * @return Reference to the output stream.
+		 *
+		 * @note Does not modify the graph.
+		 */
+		std::ostream& print_adjacency_matrix(
+			std::ostream & = std::cout) const;
+				
 	};
 
 }//end namespace bitgraph

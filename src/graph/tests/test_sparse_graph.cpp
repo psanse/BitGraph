@@ -164,7 +164,7 @@ TEST(Graph_sparse, create_subgraph) {
 
 	//create graph with first 50 vertices
 	sparse_graph g1;
-	g.create_subgraph(50, g1);
+	g.create_subgraph_first_k(50, g1);
 
 	/////////////////////////////////////////////
 	EXPECT_EQ	(50, g1.num_vertices());
@@ -172,7 +172,7 @@ TEST(Graph_sparse, create_subgraph) {
 	/////////////////////////////////////////////
 
 	//create graph with first 3 vertices
-	g.create_subgraph(3, g1);
+	g.create_subgraph_first_k(3, g1);
 	
 	/////////////////////////////////////////
 	EXPECT_EQ	(3, g1.num_vertices());
@@ -180,7 +180,9 @@ TEST(Graph_sparse, create_subgraph) {
 	/////////////////////////////////////////
 
 	//creating a wrong size subgraph - g1 remains unchanged
-	EXPECT_EQ	(g1.num_vertices(), (g.create_subgraph(0, g1)).num_vertices());
+	EXPECT_EQ	(g1.num_vertices(),
+				(g.create_subgraph_first_k(0, g1)).
+					num_vertices());
 
 }
 

@@ -322,12 +322,10 @@ TEST(Ugraph, create_subgraph) {
 	lv.push_back(2);  lv.push_back(3); lv.push_back(5); lv.push_back(6);
 
 	////////////////////////////////
-	ugraph ugi;
-	int status = g.create_subgraph(ugi, lv);		 //G[set of vertices]
+	ugraph ugi = g.create_subgraph(lv);		 //G[set of vertices]
 	////////////////////////////////
 
 	////////////////////////////////
-	ASSERT_EQ	(0, status);
 	EXPECT_EQ	(4, ugi.num_vertices());
 	EXPECT_EQ	(2, ugi.num_edges(true));
 	EXPECT_TRUE	(ugi.is_edge(0,1));					//edge (2,3)
@@ -335,11 +333,10 @@ TEST(Ugraph, create_subgraph) {
 	////////////////////////////////
 
 	////////////////////////////////
-	status = g.create_subgraph(ugi, 0);				//G[N(0)] 
+	g.create_subgraph(ugi, 0);				//G[N(0)] 
 	////////////////////////////////
 
 	////////////////////////////////
-	ASSERT_EQ	(0, status);
 	EXPECT_EQ	(2, ugi.num_vertices());
 	EXPECT_EQ	(0, ugi.num_edges(true));
 	////////////////////////////////

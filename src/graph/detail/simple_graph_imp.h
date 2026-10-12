@@ -1,3 +1,4 @@
+#include "simple_graph.h"
 /**
  * @file simple_graph_impl.h
  * @brief Provides template and inline implementations for the Graph class.
@@ -162,7 +163,8 @@ namespace bitgraph {
 		//check size - must fit in int type
 		if (NV > static_cast<std::size_t>(std::numeric_limits<int>::max())) {
 			graph_initialization_error(
-				"Graph size exceeds the supported vertex-index range - reset(std::size_t NV, std::string name).");
+				"Graph size exceeds the supported vertex-index range - "
+				" Graph<BitsetT>::reset(std::size_t NV, std::string name).");
 		}
 		
 		try {
@@ -184,7 +186,7 @@ namespace bitgraph {
 			adj_.swap(new_adjacency);
 
 			NV_ = static_cast<int>(NV);
-			NBB_ = static_cast<int>(INDEX_1TO1(NV_));
+			NBB_ = (NV_ == 0) ? 0 : static_cast<int>(INDEX_1TO1(NV_));
 			NE_ = 0;
 			edge_count_valid_ = true;
 
@@ -214,32 +216,41 @@ namespace bitgraph {
 
 	template<class BitsetT>
 	inline
-		Graph<BitsetT>& Graph<BitsetT>::create_subgraph(int first_k, Graph<BitsetT>& newg) const {
-
-		//assert is size required is greater or equal current size
-		if (first_k >= NV_ || first_k <= 0) {
-			LOG_ERROR("Bad new size - graph remains unchangedGraph<BitsetT>&- Graph<BitsetT>::create_subgraph");
-			return newg;
+	auto Graph<BitsetT>::create_subgraph_first_k(
+			int first_k, 
+			Graph<BitsetT>& graph) const -> Graph&
+	{
+		// Preconditions
+		assert(&graph != this);
+		assert(first_k >= 0 && first_k <= NV_);
+		
+		// Initialize output graph
+		graph.reset(static_cast<std::size_t>(first_k));
+		
+		if (first_k == 0) {
+			return graph;
 		}
-
-		//////////////////////
-		newg.reset(static_cast<std::size_t>(first_k));
-		///////////////////////
-				
-		auto bbh = WDIV(first_k - 1);
-
-		//copy the relevant vertices of the adjacency matrix
-		for (int i = 0; i < newg.NV_; ++i) {
-			for (int j = 0; j <= bbh; ++j) {
-				newg.adj_[i].block(j) = adj_[i].block(j);
+			
+		const int last_block = WDIV(first_k - 1);
+		
+		// Copy the relevant blocks of the adjacency matrix
+		for (vertex_t v = 0; v < graph.NV_; ++v) {
+			for (int j = 0; j <= last_block; ++j) {
+				graph.adj_[v].block(j) = adj_[v].block(j);
 			}
-			//trims last bitblock
-			newg.adj_[i].block(bbh) &= ~Tables::mask_high[WMOD(first_k - 1)];
+
+			// Trim the last block
+			graph.adj_[v].block(last_block) &=
+				bblock::MASK_1_LOW(WMOD(first_k - 1));
+
+			/*graph.adj_[v].block(last_block) &=
+				~Tables::mask_high[WMOD(first_k - 1)];*/
 		}
 
-		// edges count is not valid for the new graph, so it will be recomputed when needed
-		newg.edge_count_valid_ = false;		
-		return newg;
+		// Edge count must be recomputed when needed
+		graph.edge_count_valid_ = false;	
+
+		return graph;
 	}
 
 	
@@ -393,8 +404,10 @@ namespace bitgraph {
 
 	template<class BitsetT>
 	inline
-		std::ostream& Graph<BitsetT>::timestamp_dimacs(std::ostream& o) const {
-		o << "c File written by GRAPH:" << PrecisionTimer::local_timestamp();
+		std::ostream& Graph<BitsetT>::timestamp_dimacs(
+			std::ostream& o) const {
+		o << "c File written by BITGRAPH:" 
+			<< PrecisionTimer::local_timestamp();
 		return o;
 	}
 
@@ -526,26 +539,41 @@ namespace bitgraph {
 
 	template<class BitsetT>
 	inline
-		ostream& Graph<BitsetT>::print_data(bool lazy, std::ostream& o, bool eofl) const
+		ostream& Graph<BitsetT>::print_data(
+			bool lazy,
+			std::ostream& os,
+			bool trailing_newline) const
 	{
 
-		if (!name_.empty()) { o << name_.c_str() << '\t'; }
+		if (!name_.empty()) {
+			os << name_.c_str() << '\t'; 
+		}
 
-		////////////////////////////////////////////////////////////////
-		o << "n:= " << num_vertices() << "\t"
-			<< std::fixed << "m:= " << num_edges(lazy) << "\t"
-			<< std::setprecision(3) << "p:= " << density(true);
-		////////////////////////////////////////////////////////////////
+		os << "n:= " << num_vertices() << '\t'
+			<< "m:= " << num_edges(lazy) << '\t';
 
-		/*Note: lazy comp. of density since the number of edges have already been computed previously */
+		// Save stream formatting
+		const auto flags = os.flags();
+		const auto precision = os.precision();
 
-		if (eofl) { o << '\n'; }
-		return o;
+		os << std::fixed << std::setprecision(3)
+			<< "p:= " << density(true);
+
+		// Restore stream formatting
+		os.flags(flags);
+		os.precision(precision);
+
+		if (trailing_newline) {
+			os << '\n'; 
+		}
+		return os;
 	}
 
 	template<class BitsetT>
 	inline
-		ostream& Graph<BitsetT>::print_edges(std::ostream& os, bool trailing_newline) {
+		ostream& Graph<BitsetT>::print_edges(
+			std::ostream& os, bool trailing_newline)
+	{
 
 		for (vertex_t v = 0; v < NV_ - 1; ++v) {
 			for (vertex_t w = v + 1; w < NV_; ++w) {
@@ -568,7 +596,8 @@ namespace bitgraph {
 
 	template<class BitsetT>
 	inline
-		std::size_t Graph<BitsetT>::num_edges(const vertex_bitset_t& vertices) const
+		std::size_t Graph<BitsetT>::num_edges(
+			const vertex_bitset_t& vertices) const
 	{
 
 		std::size_t NE = 0;
@@ -658,8 +687,8 @@ namespace bitgraph {
 		std::size_t non_empty_blocks = 0;
 
 		for (vertex_t vertex = 0; vertex < NV_; ++vertex) {
-			for (block_index_t block = 0; block < NBB_; ++block) {
-				if (adj_[vertex].block(block) != 0) {
+			for (block_index_t block_id = 0; block_id < NBB_; ++block_id) {
+				if (adj_[vertex].block(block_id) != 0) {
 					++non_empty_blocks;
 				}
 			}
@@ -843,24 +872,70 @@ namespace bitgraph {
 	}
 
 	template<class BitsetT>
+	inline 
+		void Graph<BitsetT>::create_subgraph(
+			Graph& graph, 
+			const vertex_set_t& vertices) const
+	{
+		assert(&graph != this);
+		
+		const vertex_t NV = static_cast<int>(vertices.size());
+
+		// Preconditions
+		for (vertex_t v : vertices) {
+			assert(v >= 0 && v < NV_);
+		}
+
+		
+		// Initialize output graph
+		graph.reset(NV);
+
+
+		// Add directed edges
+		for (vertex_t v = 0; v < nV; ++v) {
+			for (vertex_t w = 0; w < nV; ++w) {
+				if (this->is_edge(vertices[v], vertices[w])) {
+					graph.add_edge(v, w);
+				}
+			}
+		}
+	}
+
+	template<class BitsetT>
+	inline 
+		void Graph<BitsetT>::create_subgraph(
+			Graph& graph,
+			vertex_t v) const
+	{
+		assert(v >= 0 && v < NV_);
+		assert(&graph != this);
+
+		vertex_set_t vnn;
+		this->neighbors(v).extract(vnn);
+
+		create_subgraph(graph, vnn);
+	
+	}
+
+	template<class BitsetT>
 	inline
-		void Graph<BitsetT>::write_dimacs(ostream& o) {
+		void Graph<BitsetT>::write_dimacs(ostream& os) {
 
-		//timestamp comment
-		timestamp_dimacs(o);
+		// Timestamp comment
+		timestamp_dimacs(os);
 
-		//name comment
-		name_dimacs(o);
+		// Graph name
+		name_dimacs(os);
 
-		//dimacs header - recompute edges
-		header_dimacs(o, false);
+		// DIMACS header
+		header_dimacs(os, false);
 
 		//write edges 1-based vertex notation 
-		for (int v = 0; v < NV_; ++v) {
-			for (int w = 0; w < NV_; ++w) {
-				if (v == w) continue;
-				if (is_edge(v, w)) {								//O(log) for sparse graphs: specialize
-					o << "e " << v + 1 << " " << w + 1 << endl;
+		//O(log) for sparse graphs: specialize
+		for (vertex_t v = 0; v < NV_; ++v) {
+			for (vertex_t w = 0; w < NV_; ++w) {
+				if (v != w && is_edge(v, w)) {
+					os << "e " << v + 1 << " " << w + 1 << '\n';
 				}
 			}
 		}
@@ -868,23 +943,22 @@ namespace bitgraph {
 
 	template<class BitsetT>
 	inline
-		void  Graph<BitsetT>::write_EDGES(ostream& o) {
+		void  Graph<BitsetT>::write_EDGES(ostream& os) {
 
-		//timestamp comment
-		o << "% File written by GRAPH:" << PrecisionTimer::local_timestamp();
-
-		//name comment
+		// Timestamp comment
+		timestamp_dimacs(os);
+	
+		// Graph name
 		if (!name_.empty())
-			o << "\n%  " << name_.c_str() << endl;
+			os << "\n%  " << name_.c_str() << endl;
 
-		//write edges 1-based vertex notation
-		for (int v = 0; v < NV_; ++v) {
-			for (int w = 0; w < NV_; ++w) {
-				if (v == w) continue;
-				if (is_edge(v, w)) {							//O(log) for sparse graphs: specialize
-					o << v + 1 << " " << w + 1 << endl;
+		// Write directed edges (1-based vertex indices)
+		// O(log) for sparse graphs: specialize
+		for (vertex_t v = 0; v < NV_; ++v) {
+			for (vertex_t w = 0; w < NV_; ++w) {
+				if (v != w && is_edge(v, w)) {
+					os << v + 1 << " " << w + 1 << '\n';
 				}
-
 			}
 		}
 	}
@@ -905,8 +979,5 @@ namespace bitgraph {
 	}
 
 } //end namespace bitgraph
-
-
-
 
 #endif // BITGRAPH_GRAPH_SIMPLE_GRAPH_IMP_H	

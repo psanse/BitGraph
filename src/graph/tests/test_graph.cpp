@@ -391,7 +391,7 @@ TEST(Graph, shrink_to_fit_only_capacity) {
 
 }
 
-TEST(Graph, create_subgraph){
+TEST(Graph, create_subgraph_first_k){
 
 	const int NV = 100;
 
@@ -407,7 +407,7 @@ TEST(Graph, create_subgraph){
 
 	//creates subgraph with first 50 vertices
 	graph g1;
-	g.create_subgraph(50, g1);
+	g.create_subgraph_first_k(50, g1);
 
 	////////////////////////////////////////
 	EXPECT_EQ(50, g1.num_vertices());
@@ -415,7 +415,7 @@ TEST(Graph, create_subgraph){
 	////////////////////////////////////////
 
 	//creates subgraph with first 3 vertices
-	g.create_subgraph(3, g1);
+	g.create_subgraph_first_k(3, g1);
 	EXPECT_EQ(3, g1.num_vertices());
 	EXPECT_EQ(2, g1.num_edges());			//0->1, 1->2 
 	

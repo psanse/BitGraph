@@ -429,11 +429,13 @@ namespace bitgraph {
 
 	template<class BitsetT>
 	inline
-		std::ostream& Ugraph<BitsetT>::print_degrees(std::ostream& o) const {
-		for (int i = 0; i < this->NV_; ++i) {
-			o << "deg(" << i << ")" << ":" << degree(i) << " ";
+		std::ostream& Ugraph<BitsetT>::print_degrees(std::ostream& o) const
+	{
+		for (vertex_t v = 0; v < this->NV_; ++v) {
+			os << "deg(" << v << ")" 
+			  << ":" << degree(v) << " ";
 		}
-		return o;
+		return os;
 	}
 
 	template<class BitsetT>
@@ -461,63 +463,41 @@ namespace bitgraph {
 
 	template<class BitsetT>
 	inline
-		ostream& Ugraph<BitsetT>::print_adjacency_matrix(std::ostream& o) const
+		ostream& Ugraph<BitsetT>::print_adjacency_matrix(std::ostream& os) const
 	{
-		for (int i = 0; i < this->NV_; ++i) {
-			for (int j = 0; j < this->NV_; ++j) {
-				if (this->is_edge(i, j)) {
-					o << "1";
+		for (vertex_t v = 0; v < this->NV_; ++v) {
+			for (vertex_t w = 0; w < this->NV_; ++w) {
+				if (this->is_edge(v, w)) {
+					os << "1";
 				}
 				else {
-					o << "0";
+					os << "0";
 				}
 			}
-			o << endl;
+			os << endl;
 		}
-		return o;
+		return os;
 	}
-
-
+		
 	template<class BitsetT>
 	inline
-		void Ugraph<BitsetT>::write_dimacs(ostream& o) {
+		void Ugraph<BitsetT>::write_dimacs(ostream& os) {
 
-		//timestamp comment 
-		o << "c File written by GRAPH:" << PrecisionTimer::local_timestamp() << endl;
-
-		//name comment
-		if (!this->name_.empty())
-			o << "c " << this->name_.c_str() << endl;
-
-		//dimacs header
-		o << "p edge " << this->NV_ << " " << num_edges(false /* recompute */) << endl << endl;
-
-		//bidirectional edges (1 based in dimacs)
-		for (int v = 0; v < this->NV_ - 1; ++v) {
-			for (int w = v + 1; w < this->NV_; ++w) {
-				if (this->is_edge(v, w)) {										//O(log) for sparse graphs: specialize
-					o << "e " << v + 1 << " " << w + 1 << endl;
-				}
-			}
-		}
-	}
-
-	template<class BitsetT>
-	inline
-		void  Ugraph<BitsetT>::write_EDGES(ostream& o) {
-
-		//timestamp comment
-		o << "% File written by GRAPH:" << PrecisionTimer::local_timestamp() << endl;
-
-		//name coment
-		if (!this->name_.empty())
-			o << "% " << this->name_.c_str() << endl;
-
-		//write edges - 1 based vertex notation
-		for (int v = 0; v < this->NV_ - 1; ++v) {
-			for (int w = v + 1; w < this->NV_; ++w) {
-				if (this->is_edge(v, w)) {							//O(log) for sparse graphs: specialize
-					o << v + 1 << " " << w + 1 << endl;
+		// Timestamp comment 
+		this->timestamp_dimacs(os);
+	
+		// Graph name
+		this->name_dimacs(os);
+		
+		// DIMACS header
+		this->header_dimacs(os, false);
+			
+		// Write undirected edges (1-based vertex indices)
+		// O(log) for sparse graphs: TODO - specialize
+		for (vertex_t v = 0; v < this->NV_ - 1; ++v) {
+			for (vertex_t w = v + 1; w < this->NV_; ++w) {
+				if (this->is_edge(v, w)) {
+					os << "e " << v + 1 << " " << w + 1 << '\n';
 				}
 			}
 		}
@@ -525,27 +505,51 @@ namespace bitgraph {
 
 	template<class BitsetT>
 	inline
-		void Ugraph<BitsetT>::write_mtx(ostream& o) {
+		void  Ugraph<BitsetT>::write_EDGES(ostream& os) {
 
-		//header comment
-		o << "%%MatrixMarket matrix coordinate pattern symmetric" << endl;
+		// Timestamp comment 
+		os << "% File written by BITGRAPH:" 
+			<< PrecisionTimer::local_timestamp() << endl;
 
-		//timestamp comment
-		o << "% File written by GRAPH:" << PrecisionTimer::local_timestamp() << endl;
-
-		//name comment
+		// Graph name
 		if (!this->name_.empty())
-			o << "% " << this->name_.c_str() << endl;
+			os << "% " << this->name_.c_str() << endl;
 
-		//number of vertices and edges
-		this->NE_ = 0;																			//eliminates lazy evaluation of edge count 
-		o << this->NV_ << " " << this->NV_ << " " << num_edges() << endl;
+		// write edges - 1 based vertex notation
+		// O(log) for sparse graphs: specialize
+		for (vertex_t v = 0; v < this->NV_ - 1; ++v) {
+			for (vertex_t w = v + 1; w < this->NV_; ++w) {
+				if (this->is_edge(v, w)) {							
+					os << v + 1 << " " << w + 1 << '\n';
+				}
+			}
+		}
+	}
 
-		//writes edges 1-based vertex notation
-		for (int v = 0; v < this->NV_ - 1; ++v) {
-			for (int w = v + 1; w < this->NV_; ++w) {
-				if (this->is_edge(v, w)) {														//O(log) for sparse graphs: specialize
-					o << v + 1 << " " << w + 1 << endl;
+	template<class BitsetT>
+	inline
+		void Ugraph<BitsetT>::write_mtx(ostream& os) {
+
+		// Matrix Market header
+		os << "%%MatrixMarket matrix coordinate pattern symmetric" << endl;
+
+		// Timestamp comment
+		os << "% File written by GRAPH:" << PrecisionTimer::local_timestamp() << endl;
+
+		// Graph name
+		if (!this->name_.empty())
+			os << "% " << this->name_.c_str() << endl;
+
+		// Matrix dimensions and number of entries
+		os << this->NV_ << " "
+			<< this->NV_ << " "
+			<< this->num_edges(false /* recompute */) << '\n';
+
+		// Write undirected edges (1-based vertex indices)
+		for (vertex_t v = 0; v < this->NV_ - 1; ++v) {
+			for (vertex_t w = v + 1; w < this->NV_; ++w) {
+				if (this->is_edge(v, w)) {
+					os << v + 1 << " " << w + 1 << '\n';
 				}
 			}
 		}
@@ -649,40 +653,45 @@ namespace bitgraph {
 		}
 	}
 
-
 	template<class BitsetT>
-	int Ugraph<BitsetT>::create_subgraph(Ugraph& ug, int v) const
+	void Ugraph<BitsetT>::create_subgraph(Ugraph& ug, vertex_t v) const
 	{
-		vector<int> vnn;
+		assert(v >= 0 && v < NV_);
+		assert(&ug != this);
+
+		vertex_set_t vnn;
 		this->neighbors(v).extract(vnn);
 
-		return create_subgraph(ug, vnn);
+		create_subgraph(ug, vnn);
 	}
 
 	template<class BitsetT>
-	int Ugraph<BitsetT>::create_subgraph(Ugraph& ug, Vertices& lv) const
+	void Ugraph<BitsetT>::create_subgraph(
+		Ugraph& ug,
+		const vertex_set_t& vertices) const
 	{
-		if (lv.empty()) {
-			LOG_ERROR("empty set found while creating an induced graph - Ugraph<BitsetT>::create_induced");
-			return -1;
-		}
-				
-		///////////////
-		ug.reset(lv.size());
-		///////////////
-		
-		//add appropiate edges
-		const int nV = static_cast<int>(lv.size());
-		for (int i = 0; i < nV - 1; i++) {
-			for (int j = i + 1; j < nV; j++) {
+		const int NV = static_cast<int>(vertices.size());
 
-				if (this->is_edge(lv[i], lv[j])) {
-					ug.add_edge(i, j);						//adds bidirected edge
+		// Preconditions
+		assert(&ug != this);
+		assert(NV > 0);
+
+		for (vertex_t v : vertices) {
+			assert(v >= 0 && v < NV_);
+		}
+
+		// Initialize output graph
+		ug.reset(NV);
+				
+		
+		// Add undirected edges
+		for (vertex_t v = 0; v < NV - 1; ++v) {
+			for (vertex_t w = v + 1; w < NV; ++w) {
+				if (this->is_edge(vertices[v], vertices[w])) {
+					ug.add_edge(v, w);
 				}
 			}
-		}
-
-		return 0;
+		}		
 	}
 
 }//end namespace bitgraph
