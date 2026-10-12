@@ -72,17 +72,16 @@ namespace bitgraph {
 		std::ostream& write_dimacs(
 			std::ostream& os = std::cout) const override;
 	};
-		
-
+	
 	/**
 	 * @brief Vertex-weighted undirected graph with `double` weights.
 	 */
-    using ugraph_w = Graph_VW<ugraph, double>;  
+    using ugraph_vw = Graph_VW<ugraph, double>;  
 
 	/**
 	 * @brief Vertex-weighted undirected graph with `int` weights.
 	 */
-    using ugraph_wi = Graph_VW<ugraph, int>;                    
+    using ugraph_vwi = Graph_VW<ugraph, int>;                    
 }
 
 

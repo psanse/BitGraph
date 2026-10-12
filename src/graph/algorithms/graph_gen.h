@@ -236,8 +236,8 @@ namespace bitgraph {
 		class WeightGen
 		{
 			//filter out invalid types - currently only non-sparse vertex weighted graphs
-			static_assert(std::is_same<GraphT, ugraph_w>::value ||
-						std::is_same<GraphT, ugraph_wi>::value,						
+			static_assert(std::is_same<GraphT, ugraph_vw>::value ||
+						std::is_same<GraphT, ugraph_vwi>::value,						
 						"WeightGen<GraphT> : GraphT must be a simple, non-sparse,  vertex-weighted graph type ");
 
 		public:

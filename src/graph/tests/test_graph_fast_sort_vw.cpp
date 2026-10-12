@@ -54,7 +54,7 @@ namespace {
          */
         const int NV = 6;
 
-        ugraph_w ugw;
+        ugraph_vw ugw;
     };
 
 }
@@ -65,7 +65,7 @@ namespace {
 
 TEST_F(GraphFastRootSortVertexWeightedTest, constructor) {
 
-    using gt = GraphFastRootSort_VW<ugraph_w>;
+    using gt = GraphFastRootSort_VW<ugraph_vw>;
 
     gt sorter(ugw);
 
@@ -91,7 +91,7 @@ TEST_F(GraphFastRootSortVertexWeightedTest, constructor) {
 
 TEST_F(GraphFastRootSortVertexWeightedTest, new_order_unweighted) {
 
-    using gt = GraphFastRootSort_VW<ugraph_w>;
+    using gt = GraphFastRootSort_VW<ugraph_vw>;
 
     gt sorter(ugw);
 
@@ -114,7 +114,7 @@ TEST_F(GraphFastRootSortVertexWeightedTest, new_order_unweighted) {
 
 TEST_F(GraphFastRootSortVertexWeightedTest, new_order_non_increasing_weight_n2o) {
 
-    using gt = GraphFastRootSort_VW<ugraph_w>;
+    using gt = GraphFastRootSort_VW<ugraph_vw>;
 
     gt sorter(ugw);
 
@@ -149,7 +149,7 @@ TEST_F(GraphFastRootSortVertexWeightedTest, new_order_non_increasing_weight_n2o)
 
 TEST_F(GraphFastRootSortVertexWeightedTest, new_order_non_decreasing_weight_n2o) {
 
-    using gt = GraphFastRootSort_VW<ugraph_w>;
+    using gt = GraphFastRootSort_VW<ugraph_vw>;
 
     gt sorter(ugw);
 
@@ -182,7 +182,7 @@ TEST_F(GraphFastRootSortVertexWeightedTest, new_order_non_decreasing_weight_n2o)
 
 TEST_F(GraphFastRootSortVertexWeightedTest, stable_weight_sort) {
 
-    using gt = GraphFastRootSort_VW<ugraph_w>;
+    using gt = GraphFastRootSort_VW<ugraph_vw>;
 
     gt sorter(ugw);
 
@@ -214,9 +214,9 @@ TEST_F(GraphFastRootSortVertexWeightedTest, stable_weight_sort) {
 
 TEST(GraphFastRootSortVertexWeightedMappingTest, mapping_direction) {
 
-    using gt = GraphFastRootSort_VW<ugraph_w>;
+    using gt = GraphFastRootSort_VW<ugraph_vw>;
 
-    ugraph_w graph;
+    ugraph_vw graph;
     graph.reset(4);
 
     graph.set_weight(0, 2.0);
@@ -280,9 +280,9 @@ TEST(GraphFastRootSortVertexWeightedMappingTest, mapping_direction) {
 
 TEST(GraphFastRootSortVertexWeightedMappingTest, last_to_first) {
 
-    using gt = GraphFastRootSort_VW<ugraph_w>;
+    using gt = GraphFastRootSort_VW<ugraph_vw>;
 
-    ugraph_w graph;
+    ugraph_vw graph;
     graph.reset(4);
 
     graph.set_weight(0, 2.0);
@@ -320,7 +320,7 @@ TEST(GraphFastRootSortVertexWeightedMappingTest, last_to_first) {
 
 TEST_F(GraphFastRootSortVertexWeightedTest, reorder) {
 
-    using gt = GraphFastRootSort_VW<ugraph_w>;
+    using gt = GraphFastRootSort_VW<ugraph_vw>;
 
     gt sorter(ugw);
 
@@ -329,7 +329,7 @@ TEST_F(GraphFastRootSortVertexWeightedTest, reorder) {
         gt::placement_t::first_to_last,
         gt::sort_order_t::old_to_new);      // [OLD] -> [NEW]
 
-    ugraph_w reordered = sorter.reorder(order_o2n);
+    ugraph_vw reordered = sorter.reorder(order_o2n);
 
     EXPECT_EQ(ugw.num_vertices(), reordered.num_vertices());
     EXPECT_EQ(ugw.num_edges(), reordered.num_edges());
@@ -369,7 +369,7 @@ TEST_F(GraphFastRootSortVertexWeightedTest, reorder) {
 
 TEST_F(GraphFastRootSortVertexWeightedTest, reorder_weights) {
 
-    using gt = GraphFastRootSort_VW<ugraph_w>;
+    using gt = GraphFastRootSort_VW<ugraph_vw>;
 
     gt sorter(ugw);
 
@@ -378,7 +378,7 @@ TEST_F(GraphFastRootSortVertexWeightedTest, reorder_weights) {
         gt::placement_t::first_to_last,
         gt::sort_order_t::old_to_new);
 
-    ugraph_w reordered = sorter.reorder(order_o2n);
+    ugraph_vw reordered = sorter.reorder(order_o2n);
 
     /*
      * Sorted by non-increasing weight:
@@ -401,7 +401,7 @@ TEST_F(GraphFastRootSortVertexWeightedTest, reorder_weights) {
 
 TEST_F(GraphFastRootSortVertexWeightedTest, reorder_static) {
 
-    using gt = GraphFastRootSort_VW<ugraph_w>;
+    using gt = GraphFastRootSort_VW<ugraph_vw>;
 
     gt sorter(ugw);
 
@@ -410,7 +410,7 @@ TEST_F(GraphFastRootSortVertexWeightedTest, reorder_static) {
         gt::placement_t::first_to_last,
         gt::sort_order_t::old_to_new);
 
-    ugraph_w reordered = gt::reorder(
+    ugraph_vw reordered = gt::reorder(
         ugw,
         order_o2n,
         nullptr);
@@ -447,9 +447,9 @@ TEST_F(GraphFastRootSortVertexWeightedTest, reorder_static) {
 
 TEST(GraphFastRootSortVertexWeightedMappingTest, reorder_non_self_inverse_mapping) {
 
-    using gt = GraphFastRootSort_VW<ugraph_w>;
+    using gt = GraphFastRootSort_VW<ugraph_vw>;
 
-    ugraph_w graph;
+    ugraph_vw graph;
     graph.reset(4);
 
     graph.add_edge(0, 1);
@@ -481,7 +481,7 @@ TEST(GraphFastRootSortVertexWeightedMappingTest, reorder_non_self_inverse_mappin
 
     ASSERT_EQ(expected_o2n, order_o2n);
 
-    ugraph_w reordered = sorter.reorder(order_o2n);
+    ugraph_vw reordered = sorter.reorder(order_o2n);
 
     // Weights must follow the relabeling.
     for (vertex_t v = 0; v < graph.num_vertices(); ++v) {

@@ -30,7 +30,7 @@ using namespace bitgraph;
 class UGraphWTest : public ::testing::Test {
 protected:
 	void SetUp() override {
-		gw.reset(NV, static_cast<ugraph_wi::Weight>(0.0));
+		gw.reset(NV, static_cast<ugraph_vwi::Weight>(0.0));
 		gw.add_edge(0, 1);
 		gw.add_edge(0, 2);
 		gw.set_weight(0, 1);
@@ -42,7 +42,7 @@ protected:
 
 	//undirected graph instance	
 	const int NV = 5;
-	ugraph_wi gw;											//undirected graph with integer weights
+	ugraph_vwi gw;											//undirected graph with integer weights
 };
 
 TEST_F(UGraphWTest, scale_transformation) {
@@ -74,7 +74,7 @@ TEST_F(UGraphWTest, contruction) {
 
 TEST_F(UGraphWTest, copy_constructor) {
 
-	ugraph_wi gw_copy(gw);
+	ugraph_vwi gw_copy(gw);
 
 	//////////////////////////////////
 	EXPECT_EQ	(NV, gw_copy.num_vertices());
@@ -97,7 +97,7 @@ TEST_F(UGraphWTest, copy_constructor) {
 
 TEST_F(UGraphWTest, assignment) {
 
-	ugraph_wi gw1;
+	ugraph_vwi gw1;
 	gw1 = gw;
 
 	//////////////////////////////////
@@ -195,7 +195,7 @@ TEST_F(UGraphWTest, maximum_weight)
 
 TEST(UGraphW, modulus_weights)
 {
-	ugraph_wi gw;
+	ugraph_vwi gw;
 	gw.reset(201);
 
 	gw.set_modulus_weights(200);
@@ -210,13 +210,13 @@ TEST(UGraphW, modulus_weights)
 
 TEST_F(UGraphWTest, transform_weights_ignores_no_weight)
 {
-	gw.set_weight(1, ugraph_wi::NO_WEIGHT);
+	gw.set_weight(1, ugraph_vwi::NO_WEIGHT);
 
 	gw.transform_weights(
-		utils::Scale<ugraph_wi::weight_t>(5));
+		utils::Scale<ugraph_vwi::weight_t>(5));
 
 	EXPECT_EQ(5, gw.weight(0));
-	EXPECT_EQ(ugraph_wi::NO_WEIGHT, gw.weight(1));
+	EXPECT_EQ(ugraph_vwi::NO_WEIGHT, gw.weight(1));
 	EXPECT_EQ(15, gw.weight(2));
 }
 
@@ -236,11 +236,11 @@ TEST(UGraphW, read_dimacs_inline_weights)
 		f << "e 2 3\n";
 	}
 
-	ugraph_wi gw;
+	ugraph_vwi gw;
 
 	ASSERT_TRUE(gw.read_dimacs(
 		filename,
-		ugraph_wi::weight_file_extension::none));
+		ugraph_vwi::weight_file_extension::none));
 
 	EXPECT_EQ(3, gw.num_vertices());
 	EXPECT_EQ(2, gw.num_edges());
@@ -269,11 +269,11 @@ TEST(UGraphW, read_dimacs_v_weight_format)
 		f << "e 1 2\n";
 	}
 
-	ugraph_wi gw;
+	ugraph_vwi gw;
 
 	ASSERT_TRUE(gw.read_dimacs(
 		filename,
-		ugraph_wi::weight_file_extension::none));
+		ugraph_vwi::weight_file_extension::none));
 
 	EXPECT_EQ(7, gw.weight(0));
 	EXPECT_EQ(11, gw.weight(1));
@@ -294,11 +294,11 @@ TEST(UGraphW, read_dimacs_default_unit_weights)
 		f << "e 2 3\n";
 	}
 
-	ugraph_wi gw;
+	ugraph_vwi gw;
 
 	ASSERT_TRUE(gw.read_dimacs(
 		filename,
-		ugraph_wi::weight_file_extension::none));
+		ugraph_vwi::weight_file_extension::none));
 
 	EXPECT_TRUE(gw.is_unit_weighted());
 
@@ -320,11 +320,11 @@ TEST(UGraphW, read_dimacs_rejects_self_loop)
 		f << "e 2 2\n";
 	}
 
-	ugraph_wi gw;
+	ugraph_vwi gw;
 
 	EXPECT_FALSE(gw.read_dimacs(
 		filename,
-		ugraph_wi::weight_file_extension::none));
+		ugraph_vwi::weight_file_extension::none));
 
 	// Failure leaves the graph empty.
 	EXPECT_EQ(0, gw.num_vertices());
@@ -343,11 +343,11 @@ TEST(UGraphW, read_dimacs_rejects_invalid_vertex)
 		f << "e 1 4\n";
 	}
 
-	ugraph_wi gw;
+	ugraph_vwi gw;
 
 	EXPECT_FALSE(gw.read_dimacs(
 		filename,
-		ugraph_wi::weight_file_extension::none));
+		ugraph_vwi::weight_file_extension::none));
 
 	EXPECT_EQ(0, gw.num_vertices());
 
@@ -365,11 +365,11 @@ TEST(UGraphW, read_dimacs_rejects_malformed_edge)
 		f << "e 1 x\n";
 	}
 
-	ugraph_wi gw;
+	ugraph_vwi gw;
 
 	EXPECT_FALSE(gw.read_dimacs(
 		filename,
-		ugraph_wi::weight_file_extension::none));
+		ugraph_vwi::weight_file_extension::none));
 
 	EXPECT_EQ(0, gw.num_vertices());
 
@@ -387,11 +387,11 @@ TEST(UGraphW, read_dimacs_rejects_missing_edges)
 		f << "e 1 2\n";
 	}
 
-	ugraph_wi gw;
+	ugraph_vwi gw;
 
 	EXPECT_FALSE(gw.read_dimacs(
 		filename,
-		ugraph_wi::weight_file_extension::none));
+		ugraph_vwi::weight_file_extension::none));
 
 	EXPECT_EQ(0, gw.num_vertices());
 
@@ -411,11 +411,11 @@ TEST(UGraphW, read_dimacs_rejects_extra_edges)
 		f << "e 2 3\n";
 	}
 
-	ugraph_wi gw;
+	ugraph_vwi gw;
 
 	EXPECT_FALSE(gw.read_dimacs(
 		filename,
-		ugraph_wi::weight_file_extension::none));
+		ugraph_vwi::weight_file_extension::none));
 
 	EXPECT_EQ(0, gw.num_vertices());
 
@@ -433,11 +433,11 @@ TEST_F(UGraphWTest, dimacs_round_trip)
 		gw.write_dimacs(f);
 	}
 
-	ugraph_wi copy;
+	ugraph_vwi copy;
 
 	ASSERT_TRUE(copy.read_dimacs(
 		filename,
-		ugraph_wi::weight_file_extension::none));
+		ugraph_vwi::weight_file_extension::none));
 
 	ASSERT_EQ(gw.num_vertices(), copy.num_vertices());
 	ASSERT_EQ(gw.num_edges(), copy.num_edges());
@@ -462,11 +462,11 @@ TEST(UGraphW, read_dimacs_edgeless_graph)
 		f << "p edge 4 0\n";
 	}
 
-	ugraph_wi gw;
+	ugraph_vwi gw;
 
 	ASSERT_TRUE(gw.read_dimacs(
 		filename,
-		ugraph_wi::weight_file_extension::none));
+		ugraph_vwi::weight_file_extension::none));
 
 	EXPECT_EQ(4, gw.num_vertices());
 	EXPECT_EQ(0, gw.num_edges());
@@ -478,7 +478,7 @@ TEST(UGraphW, read_dimacs_edgeless_graph)
 TEST(UGraphW, constructor_from_file) {
 
 	//read DIMACS graph from file - no DIMACS weights, sets default weights 
-	ugraph_wi ugw(BITGRAPH_GRAPH_TEST_DATA_DIR  "sample.clq");
+	ugraph_vwi ugw(BITGRAPH_GRAPH_TEST_DATA_DIR  "sample.clq");
 
 	const int NV = ugw.num_vertices();
 
@@ -494,17 +494,17 @@ TEST(UGraphW, constructor_from_file) {
 TEST(UGraphW, gen_weights_dimacs){
 		
 	//read DIMACS graph from file - no DIMACS weights, sets default weights 
-	ugraph_wi ugw (BITGRAPH_GRAPH_TEST_DATA_DIR  "brock200_1.clq");
+	ugraph_vwi ugw (BITGRAPH_GRAPH_TEST_DATA_DIR  "brock200_1.clq");
 
 	const int NV = ugw.num_vertices();
 
 	EXPECT_EQ(200, NV);
-	EXPECT_EQ(ugraph_wi::DEFAULT_WEIGHT, ugw.weight(0));
-	EXPECT_EQ(ugraph_wi::DEFAULT_WEIGHT, ugw.weight(1));
-	EXPECT_EQ(ugraph_wi::DEFAULT_WEIGHT, ugw.weight(199));
+	EXPECT_EQ(ugraph_vwi::DEFAULT_WEIGHT, ugw.weight(0));
+	EXPECT_EQ(ugraph_vwi::DEFAULT_WEIGHT, ugw.weight(1));
+	EXPECT_EQ(ugraph_vwi::DEFAULT_WEIGHT, ugw.weight(199));
 
 	//generate modulus weights 
-	WeightGen< ugraph_wi >::create_weights(ugw, WeightGen<ugraph_wi>::WMOD, 200);
+	WeightGen< ugraph_vwi >::create_weights(ugw, WeightGen<ugraph_vwi>::WMOD, 200);
 		
 	EXPECT_EQ(2, ugw.weight(0));
 	EXPECT_EQ(3, ugw.weight(1));
@@ -518,9 +518,9 @@ TEST(UGraphW, gen_random) {
 	const double density = 0.31;
 		
 	//creates random graph of size NV with modulus weights
-	ugraph_wi ugw;
-	RandomGen<ugraph_wi>::create_graph(ugw, NV, density);							/* empty vertex weights by default */
-	WeightGen<ugraph_wi>::create_weights(ugw, WeightGen<ugraph_wi>::WMOD);
+	ugraph_vwi ugw;
+	RandomGen<ugraph_vwi>::create_graph(ugw, NV, density);							/* empty vertex weights by default */
+	WeightGen<ugraph_vwi>::create_weights(ugw, WeightGen<ugraph_vwi>::WMOD);
 	
 	/////////////////////
 	EXPECT_EQ(NV, ugw.num_vertices());

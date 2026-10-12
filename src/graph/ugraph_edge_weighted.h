@@ -1,37 +1,28 @@
 /**
  * @file ugraph_edge_weighted.h
+ * @brief Facade specialization for edge-weighted undirected graphs.
  *
- * @brief Facade specializations and public aliases for edge-weighted graphs.
+ * Defines the specialization `Graph_EW<ugraph, WeightT>` and the public
+ * aliases for commonly used edge-weighted undirected graph types.
  *
- * This header binds the generic edge-weighted graph template
- * `Graph_EW<GraphT, WeightT>` to concrete *facade graph types*, in particular
- * undirected graphs (`ugraph`).
+ * This header provides the binding between the generic edge-weighted graph
+ * implementation (`Base_Graph_EW` / `Graph_EW`) and the `ugraph` facade type.
+ * It also contains inline implementations of operations whose behavior
+ * depends specifically on the undirected graph interface.
  *
- * It provides:
- *  - Specializations of `Graph_EW` for facade graph types (e.g. `ugraph`)
- *  - A user-facing, stable interface for edge-weighted undirected graphs
- *  - Convenience aliases for commonly used weight types
+ * In particular, the specialization preserves the symmetry of edge weights
+ * and ensures that each undirected edge is handled only once where required,
+ * for example when printing or writing graph instances.
  *
- *  In addition to declaring the facade specialization
- * `Graph_EW<ugraph, WeightT>`, this file also provides **inline implementations**
- * of facade-specific methods whose behavior depends on the undirected graph
- * interface .
- * 
- * @details
- * This file acts as the *facade binding layer* between:
- *  - the **generic implementation** of edge-weighted graphs
- *    (`simple_graph_ew.h`, `Base_Graph_EW`)
- *  - and the **named facade graph types** defined elsewhere (e.g. `ugraph`)
- * 
- * @note
- * This header must be included **after** `graph_basic.h`, as it relies on the
- * definition of the `ugraph` facade type.
+ * @note Generic edge-weighted graph functionality should remain in
+ *       `simple_graph_ew.h`. Only behavior specific to `ugraph` should be
+ *       implemented in this header.
  *
- * @author
- * Pablo San Segundo (pss)
+ * @note This header depends on the definition of the `ugraph` facade type.
  *
- * @date
- * 01/02/2026
+ * @author Pablo San Segundo (pss)
+ *
+ * @details Created 01/02/2026, last updated 12/10/2026.
  */
 
 #ifndef BITGAPH_GRAPH_UGRAPH_EDGE_WEIGHTED_H
@@ -43,14 +34,29 @@
 
 namespace bitgraph {
 		 
-	// specialization for undirected graphs
-
+	/**
+	 * @brief Facade specialization for edge-weighted undirected graphs.
+	 *
+	 * Specializes the user-facing `Graph_EW` interface for `ugraph`. Generic
+	 * edge-weighted functionality is inherited from `Base_Graph_EW`, while
+	 * operations that depend on the undirected graph representation are
+	 * implemented in this specialization.
+	 *
+	 * In particular, edge weights are kept symmetric: for every edge
+	 * `(v,w)`, the entries `(v,w)` and `(w,v)` store the same weight.
+	 * Undirected edges are also processed only once where appropriate, such
+	 * as when printing or writing graph instances.
+	 *
+	 * The underlying graph API remains accessible through `graph()`.
+	 *
+	 * @tparam WeightT Type used to represent edge weights.
+	 */
 	template <class WeightT>
 	class Graph_EW<ugraph, WeightT> : public Base_Graph_EW<ugraph, WeightT> {
 	public:
 
-		using base_type = Base_Graph_EW<ugraph, WeightT>;
-		using base_t = base_type;
+		using base_t = Base_Graph_EW<ugraph, WeightT>;
+		using base_type = base_t;						// alias for backward compatibility				
 		
 		using edge_print_format = typename base_t::edge_print_format;	
 		
@@ -119,19 +125,7 @@ namespace bitgraph {
 		**/
 		void set_modulus_weights(
 			int modulus = this->DEFAULT_WEIGHT_MODULUS) override;
-						
-		/////////////
-		//other operations
-
-		/**
-		* @brief generates random edges uniformly with probability p and weight val
-		**/
-		//void gen_random_edges(double p, Weight val = DEFAULT_WEIGHT) ;
-
-		/////////////
-		// I/O operations
-				
-	
+			
 		/**
 		 * @brief Writes the edge-weighted graph to an output stream in DIMACS format.
 		 *
@@ -148,10 +142,41 @@ namespace bitgraph {
 		std::ostream& write_dimacs(
 			std::ostream& os = std::cout) const override;
 
+		/**
+		 * @brief Prints an undirected edge and its weight.
+		 *
+		 * Overrides the generic edge representation provided by `Base_Graph_EW`
+		 * to use an undirected format. If (@p v, @p w) is an existing edge,
+		 * prints it in the form `[v]--(weight)--[w]`. Otherwise, prints
+		 * `[v]--(NO_EDGE)--[w]`.
+		 *
+		 * @param v First endpoint of the edge.
+		 * @param w Second endpoint of the edge.
+		 * @param os Output stream.
+		 * @param trailing_newline If `true`, appends a newline after the output.
+		 * @return Reference to @p os.
+		 */
+		std::ostream& print_edge(
+			vertex_t v,
+			vertex_t w,
+			std::ostream& os = std::cout,
+			bool trailing_newline = true) const override;
 
 		/**
-		* @brief prints the edges of the graph in line format [v]-(val)->[w], one edge per line
-		**/
+		 * @brief Prints the edges of the graph and their weights.
+		 *
+		 * Edges are written using the format specified by @p format. In
+		 * `edge_list` mode, each existing edge is printed individually. In
+		 * `edge_matrix` mode, the complete edge-weight matrix is printed, using
+		 * `NO_WEIGHT` entries to represent non-edges.
+		 *
+		 * @param os Output stream.
+		 * @param format Edge-printing format.
+		 * @param trailing_newline If `true`, appends an additional newline after
+		 *                         the complete output.
+		 *
+		 * @return Reference to @p os.
+		 */
 		std::ostream& print_edges(
 			std::ostream& o = std::cout,
 			edge_print_format format = edge_print_format::edge_list,
@@ -175,11 +200,20 @@ namespace bitgraph {
 			const weight_matrix_t& edge_weights) const override;
 
 	}; //end of Graph_EW class
+
+
 	      
 	// edge-weighted facade types
 
-    using ugraph_ew = Graph_EW<ugraph, double>;                 // simple edge weighted graph with double weights
-    using ugraph_ewi = Graph_EW<ugraph, int>;                   // simple edge weighted graph with integer weights
+	/**
+	 * @brief Edge-weighted undirected graph with `double` weights.
+	*/
+    using ugraph_ew = Graph_EW<ugraph, double>;               
+   
+	/**
+	 * @brief Edge-weighted undirected graph with `int` weights.
+	 */
+	using ugraph_ewi = Graph_EW<ugraph, int>;                  
 }
 
 //////////////////////
@@ -392,6 +426,32 @@ namespace bitgraph {
 					   << '\n';	
 				}
 			}
+		}
+
+		return os;
+	}
+
+	template<class WeightT>
+	std::ostream& Graph_EW<ugraph, WeightT>::print_edge(
+		vertex_t v,
+		vertex_t w,
+		std::ostream& os, 
+		bool trailing_newline) const
+	{
+		if (graph_.is_edge(v, w)) {
+			os << "[" << v << "]--("
+				<< edge_weights_[static_cast<std::size_t>(v)]
+				[static_cast<std::size_t>(w)]
+				<< ")--"
+				<< "[" << w << "]";
+		}
+		else {
+			os << "[" << v << "]--(NO_EDGE)--"
+				<< "[" << w << "]";
+		}
+
+		if (trailing_newline) {
+			os << '\n';
 		}
 
 		return os;

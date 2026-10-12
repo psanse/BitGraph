@@ -42,7 +42,7 @@ namespace {
 	class GraphUtilsTestW : public ::testing::Test {
 	protected:
 		void SetUp() override {
-			ugw.reset(NV, ugraph_wi::NO_WEIGHT);
+			ugw.reset(NV, ugraph_vwi::NO_WEIGHT);
 			ugw.add_edge(0, 1);
 			ugw.add_edge(1, 2);
 			ugw.add_edge(0, 2);
@@ -56,7 +56,7 @@ namespace {
 
 		//undirected graph instance	
 		const int NV = 5;
-		ugraph_wi ugw;											//undirected graph with integer weights
+		ugraph_vwi ugw;											//undirected graph with integer weights
 	};
 
 

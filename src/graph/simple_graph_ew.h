@@ -537,7 +537,7 @@ namespace bitgraph {
 		 * @param trailing_newline If `true`, appends a newline after the output.
 		 * @return Reference to @p os.
 		 */
-		std::ostream& print_edge(
+		virtual std::ostream& print_edge(
 			vertex_t v, 
 			vertex_t w, 
 			std::ostream& os = std::cout, 
