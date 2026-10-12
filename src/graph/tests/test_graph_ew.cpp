@@ -9,6 +9,7 @@
 */
 
 #include <iostream>
+#include <sstream>
 #include "gtest/gtest.h"
 #include "graph/algorithms/graph_gen.h"	
 #include "graph/graph_edge_weighted.h"
@@ -133,6 +134,35 @@ TEST(UGraphEW, constructor_file) {
 	EXPECT_EQ(67, ugew.weight(3, 4));
 }
 
+TEST(UGraphEW, print_edges_formats) {
+	ugraph_ewi graph(3);
+	graph.add_edge(0, 1, 2);
+	graph.add_edge(1, 2, 5);
+
+	// Check virtual dispatch through the base as well as the returned stream.
+	const Base_Graph_EW<ugraph, int>& base = graph;
+	std::ostringstream edge_list;
+	EXPECT_EQ(&edge_list, &base.print_edges(edge_list));
+	EXPECT_EQ("[0]--(2)-->[1]\n[1]--(5)-->[2]\n", edge_list.str());
+
+	std::ostringstream matrix;
+	EXPECT_EQ(&matrix, &base.print_edges(
+		matrix, ugraph_ewi::edge_print_format::edge_matrix, true));
+	ASSERT_FALSE(matrix.str().empty());
+	EXPECT_EQ('\n', matrix.str().back());
+
+	// The undirected matrix lists each pair once, including missing edges.
+	std::istringstream entries(matrix.str());
+	std::string entry;
+	ASSERT_TRUE(static_cast<bool>(entries >> entry));
+	EXPECT_EQ("2", entry);
+	ASSERT_TRUE(static_cast<bool>(entries >> entry));
+	EXPECT_EQ("--", entry);
+	ASSERT_TRUE(static_cast<bool>(entries >> entry));
+	EXPECT_EQ("5", entry);
+	EXPECT_FALSE(static_cast<bool>(entries >> entry));
+}
+
 //////////////////
 //
 // DISABLED TESTS - CHECK
@@ -145,7 +175,7 @@ TEST_F(UGraphEWTest, DISABLED_printing) {
 	//I/O
 	ugew.print_data();
 	ugew.print_edge(0, 1);
-	ugew.print_weights(cout, true);
+	ugew.print_edges(cout, ugraph_ewi::edge_print_format::edge_list, true);
 
 	LOG_INFO("push any key to continue...");	
 	cin.get();

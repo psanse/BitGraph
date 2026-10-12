@@ -532,7 +532,7 @@ namespace bitgraph{
 
 		switch (type) {
 		case WMOD:
-			g.set_modulus_edge_weight(wmod);
+			g.set_modulus_weights(wmod);
 			break;
 		default:
 			LOG_INFO("bad weight generation mode - EdgeWeightGen<GraphT>::create_weights");
@@ -557,7 +557,7 @@ namespace bitgraph{
 			}
 
 			///////////////////////////
-			g.print_weights(f, false);			//NOWT weight values are not streamed - vertex index is not streamed with the weight value
+			g.print_edges(f, GraphT::edge_print_format::edge_matrix, false);
 			///////////////////////////
 
 			f.close();

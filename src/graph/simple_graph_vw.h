@@ -651,7 +651,7 @@ namespace bitgraph {
 		*
 		* @note Intended for derived classes and internal algorithms.
 		*/
-		std::vector<weight_t>& weight() noexcept {
+		std::vector<weight_t>& weights() noexcept {
 			return vertex_weights_;
 		}
 

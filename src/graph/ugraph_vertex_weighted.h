@@ -32,8 +32,15 @@
 
 namespace bitgraph {
     
-	// specialization for undirected graphs
-	
+	/**
+	 * @brief Facade specialization for vertex-weighted undirected graphs.
+	 *
+	 * Specializes the user-facing `Graph_VW` interface for `ugraph`. Generic
+	 * vertex-weighted functionality is inherited from `Base_Graph_VW`, while
+	 * undirected-graph-specific operations are implemented in this specialization.
+	 *
+	 * @tparam WeightT Type used to represent vertex weights.
+	 */
 	template<class WeightT>
 	class Graph_VW<ugraph, WeightT> : public Base_Graph_VW<ugraph, WeightT> {
 	public:
@@ -47,37 +54,34 @@ namespace bitgraph {
 		// Undirected-graph-specific interface.
 		// The full underlying graph API remains accessible through graph().
 
-	/*
-		int max_graph_degree() const {
-			return this->graph_.max_graph_degree();
-		}
-
-		int degree(vertex_t v) const {
-			return this->graph_.degree(v);
-		}
-
-		int degree(
-			vertex_t v,
-			const vertex_bitset_t& vertices) const
-		{
-			return this->graph_.degree(v, vertices);
-		}*/
-
 
 		///////////
 		//I/O operations
 
-		/*
-		* @brief Writes undirected graph to stream in dimacs format
-		*
-		*		 (self-loops are not considered)
-		*/
-		std::ostream& write_dimacs(std::ostream& o = std::cout) const override;
+		/**
+		 * @brief Writes the undirected vertex-weighted graph in DIMACS format.
+		 *
+		 * Writes the graph topology and vertex weights to @p os using 1-based
+		 * vertex identifiers. Each undirected edge is written exactly once.
+		 *
+		 * @param os Output stream.
+		 * @return Reference to @p os.
+		 *
+		 * @note Self-loops are not supported and are therefore not written.
+		 */
+		std::ostream& write_dimacs(
+			std::ostream& os = std::cout) const override;
 	};
 		
 
-    // facade types for vertex-weighted ugraphs
-    using ugraph_w = Graph_VW<ugraph, double>;                   
+	/**
+	 * @brief Vertex-weighted undirected graph with `double` weights.
+	 */
+    using ugraph_w = Graph_VW<ugraph, double>;  
+
+	/**
+	 * @brief Vertex-weighted undirected graph with `int` weights.
+	 */
     using ugraph_wi = Graph_VW<ugraph, int>;                    
 }
 

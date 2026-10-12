@@ -4,41 +4,34 @@
  * @brief Generic base and implementation templates for edge-weighted graphs.
  *
  * This header defines the generic classes `Base_Graph_EW` and `Graph_EW`,
- * which provide support for **edge-weighted graphs** where **self-loops are
- * interpreted as vertex weights**.
+ * which provide support for edge-weighted graphs.
  *
  * @details
- * The weighting model implemented in this file is intentionally restricted:
- *  - Edge weights are associated with edges {u, v}, u ≠ v
- *  - Self-loops (u, u) are interpreted as **vertex weights**
+ * Edge weights are stored in a weight matrix synchronized with the topology
+ * of the underlying graph. Existing edges have a weight different from
+ * `NO_WEIGHT`, while entries corresponding to non-edges are set to
+ * `NO_WEIGHT`.
  *
- * Therefore, this implementation does **not** represent the most general case
- * of graphs with independent vertex and edge weights. Nevertheless, it is
- * sufficient for many applications where vertex weights can be encoded as
- * self-loops (e.g., maximum clique variants, train scheduling models, etc.).
+ * Self-loops are not supported; consequently, diagonal entries of the
+ * edge-weight matrix are always `NO_WEIGHT`.
  *
- * The class `Base_Graph_EW` provides common infrastructure shared across
- * different graph types and enables specialization of behavior according to
- * the underlying graph representation.
+ * `Base_Graph_EW` provides the common implementation independently of the
+ * concrete graph representation and serves as the base for graph-specific
+ * specializations.
  *
  * The user-facing class is `Graph_EW<GraphT, WeightT>`, which extends
- * `Base_Graph_EW` with a public interface for edge-weighted graph operations.
+ * `Base_Graph_EW` with graph-specific behavior where required.
  *
- * @note
- * This header contains **generic implementation code** and must not depend on
- * facade graph types. Facade-specific bindings (e.g., for `ugraph`) are defined
- * in higher-level headers.
+ * @note This header contains generic implementation code and must not depend
+ *       on facade graph types. Facade-specific bindings and specializations
+ *       (e.g., for `ugraph`) are defined in higher-level headers.
  *
  * @par Historical notes
- *  - created: 16/01/2019
- *  - Milestone application: Train scheduling (10/11/2021)
- *  - Last update: 01/02/2026
+ * - Created: 16/01/2019
+ * - Milestone application: Train scheduling (10/11/2021)
+ * - Last update: 12/10/2026
  *
- * @author
- * Pablo San Segundo (pss)
- *
- * @copyright
- * This file is part of the GRAPH 1.0 C++ library.
+ * @author Pablo San Segundo (pss)
  */
 
 #ifndef BITGRAPH_GRAPH_SIMPLE_GRAPH_EDGE_WEIGHTED_H
@@ -53,16 +46,32 @@
 
 namespace bitgraph {
 	
-	///////////////////////
-	//
-	// class Base_Graph_EW 
-	// (used to be able to specialize functions according to the type of graph only)
-	//
-	// Note: user class is Graph_EW (see below) 
-	// 
-	// @todo there are some common parts with Base_Graph_W for weights in the vertices (12/12/2025)
-	
-
+	/**
+	 * @brief Generic base implementation for edge-weighted graphs.
+	 *
+	 * Associates an edge-weight matrix with an underlying graph of type
+	 * @p GraphT. Existing edges have a weight different from `NO_WEIGHT`,
+	 * while entries corresponding to non-edges are set to `NO_WEIGHT`.
+	 *
+	 * This class provides the common implementation of edge-weighted graph
+	 * operations independently of the concrete graph type. Graph-specific
+	 * behavior can be provided by specializations of `Graph_EW`.
+	 *
+	 * The user-facing class is `Graph_EW`; `Base_Graph_EW` is intended primarily
+	 * as an implementation base and specialization layer.
+	 *
+	 * @tparam GraphT Underlying graph type.
+	 * @tparam WeightT Type used to represent edge weights.
+	 *
+	 * @invariant The edge-weight matrix is square and its dimensions match the
+	 *            number of graph vertices.
+	 * @invariant An entry `(v,w)` is different from `NO_WEIGHT` if and only if
+	 *            `(v,w)` is an existing edge.
+	 * @invariant Self-loops are not allowed and diagonal entries are `NO_WEIGHT`.
+	 *
+	 * @todo Review common functionality shared with the vertex-weighted graph
+	 *       implementation (`Base_Graph_VW`).
+	 */
 	template<class GraphT, class WeightT>
 	class Base_Graph_EW : public bitgraph::weight_constants<WeightT> {
 		
@@ -97,6 +106,10 @@ namespace bitgraph {
 		// to remove - this class is only for edge-weighted graphs, so vertex weights are not relevant
 		enum { VERTEX, EDGE, BOTH };
 
+		enum class edge_print_format {
+			edge_list,
+			edge_matrix
+		};
 
 		///////////////////////
 		// construction / destruction
@@ -218,7 +231,7 @@ namespace bitgraph {
 		 * @warning Follows a fail-fast policy and calls `std::terminate()` if
 		 *          @p weight is `NO_WEIGHT`.
 		 */
-		void set_weights(weight_t weight = DEFAULT_WEIGHT);
+		virtual void set_weights(weight_t weight = DEFAULT_WEIGHT);
 		
 		/**
 		 * @brief Replaces the edge-weight matrix.
@@ -259,7 +272,8 @@ namespace bitgraph {
 		 * @warning Follows a fail-fast policy and calls `std::terminate()` if
 		 *          @p modulus is less than 2.
 		 */
-		void set_modulus_weights(int modulus = DEFAULT_WEIGHT_MODULUS);
+		virtual void set_modulus_weights(
+			int modulus = DEFAULT_WEIGHT_MODULUS);
 
 		/**
 		 * @brief Returns the underlying graph.
@@ -494,14 +508,35 @@ namespace bitgraph {
 		**/
 		int read_dimacs(const std::string& filename);
 		
+		/**
+		 * @brief Prints graph information to an output stream.
+		 *
+		 * Prints the underlying graph data and appends a tag identifying the graph
+		 * as vertex-weighted.
+		 *
+		 * @param lazy Passed to the underlying graph `print_data()` operation.
+		 * @param os Output stream.
+		 * @param trailing_newline If `true`, appends a newline after the output.
+		 * @return Reference to the output stream.
+		 */
 		virtual std::ostream& print_data(
 			bool lazy = true,
 			std::ostream& os = std::cout,
-			bool trailing_newline = true);
+			bool trailing_newline = true) const;
 
 		/**
-		* @brief prints the edge (v, w) in line format: [v]-(val)->[w], one edge per line
-		**/
+		 * @brief Prints an edge and its weight.
+		 *
+		 * If (@p v, @p w) is an existing edge, prints it in the form
+		 * `[v]--(weight)-->[w]`. Otherwise, prints
+		 * `[v]--(NO_EDGE)-->[w]`.
+		 *
+		 * @param v Source vertex.
+		 * @param w Target vertex.
+		 * @param os Output stream.
+		 * @param trailing_newline If `true`, appends a newline after the output.
+		 * @return Reference to @p os.
+		 */
 		std::ostream& print_edge(
 			vertex_t v, 
 			vertex_t w, 
@@ -509,49 +544,40 @@ namespace bitgraph {
 			bool trailing_newline = true) const;
 
 		/**
-		* @brief streams non-empty (excluding NO_WEIGHT value) weight info
-		*		 for all directed edges.
-		**/
-		std::ostream& print_weights(
+		 * @brief Prints the edges of the graph and their weights.
+		 *
+		 * Edges are written using the format specified by @p format. In
+		 * `edge_list` mode, each existing edge is printed individually. In
+		 * `edge_matrix` mode, the complete edge-weight matrix is printed, using
+		 * `NO_WEIGHT` entries to represent non-edges.
+		 *
+		 * @param os Output stream.
+		 * @param format Edge-printing format.
+		 * @param trailing_newline If `true`, appends an additional newline after
+		 *                         the complete output.
+		 *
+		 * @return Reference to @p os.
+		 */
+		virtual std::ostream& print_edges(
 			std::ostream& os = std::cout,
-			bool line_format = true) const
-		{
-			return print_edge_weights(os, line_format);
-		}
-		
+			edge_print_format format = edge_print_format::edge_list,
+			bool trailing_newline = false) const;
+
 		/**
-		* @brief streams non-empty (excluding NO_WEIGHT value)  weights
-		*		 of directed edges induced by the subgraph of vertices in lv
-		**/
-		std::ostream& print_weights(
+		 * @brief Prints the edges induced by a set of vertices.
+		 *
+		 * Prints all existing directed edges whose endpoints both belong to
+		 * @p vertices, together with their corresponding edge weights.
+		 *
+		 * @param vertices Set of vertices defining the induced subgraph.
+		 * @param os Output stream.
+		 *
+		 * @return Reference to @p os.
+		 */
+		std::ostream& print_edges(
 			vertex_set_t& vertices,
-			std::ostream& os = std::cout)	const
-		{
-			return print_edge_weights(vertices, os);	
-		}
-
-		
-		/////////////////////
-		//private I/O
-
-	protected:
-		/**
-		* @brief prints the edges of the graph in line format [v]-(val)->[w], one edge per line
-		**/
-		virtual std::ostream& print_edges(std::ostream& o = std::cout, bool eofl = true) const;
-
-		/**
-		* @brief prints edges in different formats
-		* @param line_format: if TRUE, prints one edge per line, otherwise in matrix format
-		**/
-		virtual	std::ostream& print_edge_weights(std::ostream& o = std::cout, bool line_format = true) const;
-		
-		/**
-		* @brief prints the edges of the graph induced by the vertices of lv in line format
-		* @param vertices: input set of vertices of the induced subgraph
-		**/
-		virtual	std::ostream& print_edge_weights(vertex_set_t& vertices, std::ostream& o = std::cout)	const;
-			
+			std::ostream& o = std::cout) const;
+					
 
 	protected:
 
@@ -568,7 +594,7 @@ namespace bitgraph {
 		 * @warning Follows a fail-fast policy and calls `std::terminate()` if
 		 *          @p edge_weights is invalid or inconsistent with the graph.
 		 */
-		void validate_weight_matrix(
+		virtual void validate_weight_matrix(
 			const weight_matrix_t& edge_weights) const;
 
 
@@ -596,6 +622,29 @@ namespace bitgraph {
 		 */
 		void initialize_edge_weights(
 			weight_t weight = DEFAULT_WEIGHT);
+
+		/**
+		* @brief Returns mutable access to the vertex-weight vector.
+		*
+		* @return Reference to the internal vertex-weight vector.
+		*
+		* @note Intended for derived classes and internal algorithms.
+		*/
+		weight_matrix_t& weights() noexcept {
+			return edge_weights_;
+		}
+
+		/**
+		* @brief Returns mutable access to the neighborhood of a vertex.
+		*
+		* @param v Vertex whose neighborhood is requested.
+		* @return Reference to the neighborhood bitset of `v`.
+		*
+		* @note Intended for derived classes and internal algorithms.
+		*/
+		vertex_bitset_t& neighbors(vertex_t v) noexcept {
+			return graph_.neighbors(v);
+		}
 	
 		/**
 		 * @brief Resets the graph to an empty state.
@@ -607,12 +656,21 @@ namespace bitgraph {
 			edge_weights_.clear();
 		}
 		
-
 		/////////////////
 		// data members
 
-		graph_t graph_;							
-		weight_matrix_t edge_weights_;			// matrix of (only) edge-weights 																
+		/**
+		 * @brief Underlying graph.
+		 */
+		graph_t graph_;	
+
+		/**
+		 * @brief Edge-weight matrix.
+		 *
+		 * Entry `edge_weights_[v][w]` stores the weight associated with the edge
+		 * (v, w). Non-edges are represented by `NO_WEIGHT`.
+		 */
+		weight_matrix_t edge_weights_;																			
 
 	}; //end of class Base_Graph_EW
 
