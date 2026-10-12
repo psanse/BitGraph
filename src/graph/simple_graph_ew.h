@@ -101,11 +101,7 @@ namespace bitgraph {
 		using constants_t::ZERO_WEIGHT;
 		using constants_t::DEFAULT_WEIGHT;
 					
-				
-		// enum for backward compatibility with previous versions
-		// to remove - this class is only for edge-weighted graphs, so vertex weights are not relevant
-		enum { VERTEX, EDGE, BOTH };
-
+		
 		enum class edge_print_format {
 			edge_list,
 			edge_matrix
