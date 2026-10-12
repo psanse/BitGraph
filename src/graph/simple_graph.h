@@ -66,8 +66,7 @@ namespace bitgraph {
 
 	template<class BitsetT = BBScan>
 	class Graph {
-
-		// filter BBScan and BBScanSP types
+				
 		static_assert(std::is_same<BBScan, BitsetT>::value ||
 							std::is_same<BBScanSp, BitsetT>::value, "is not a valid Graph type");
 
@@ -226,11 +225,14 @@ namespace bitgraph {
 		virtual	std::size_t num_edges(bool lazy = true) const;
 
 		/**
-		* @brief Counts the number of edges	in an induced subgraph by a set of vertices
-		* @param set input bitset of vertices that induces the subgraph
-		* @returns number of edges
-		**/
-		virtual std::size_t num_edges(const BitsetT& set) const;
+		 * @brief Counts the number of edges in the subgraph induced by a vertex set.
+		 *
+		 * Counts all edges whose endpoints both belong to @p vertices.
+		 *
+		 * @param vertices Bitset containing the vertices that induce the subgraph.
+		 * @return Number of edges in the induced subgraph.
+		 */
+		virtual std::size_t num_edges(const vertex_bitset_t& vertices) const;
 		
 		/**
 		 * @brief Returns the bitset-based adjacency matrix.
@@ -388,7 +390,7 @@ namespace bitgraph {
 		 *
 		 * @pre Every set bit in @p vertices must identify a valid graph vertex.
 		 */
-		virtual double density(const BitsetT& vertices) const;
+		virtual double density(const vertex_bitset_t& vertices) const;
 	
 		/**
 		 * @brief Computes the proportion of nonempty adjacency bit blocks.
@@ -451,39 +453,7 @@ namespace bitgraph {
 		 * @note This operation is defined only for Graph<BBScanSp>.
 		 */
 		double average_block_density_sparse() const = delete;
-
-
-		/**
-		 * @brief Returns the out-degree of a vertex.
-		 *
-		 * Counts the edges directed from @p v to other vertices. In an undirected
-		 * graph, this is the ordinary degree of @p v.
-		 *
-		 * @param v Vertex whose out-degree is requested.
-		 * @return Number of outgoing edges from @p v.
-		 *
-		 * @pre `0 <= v < num_vertices()`.
-		 * 
-		 * @note The implementation includes self-loops in the count.
-		 */
-		int degree_out(vertex_t v) const;
-
-
-		/**
-		 * @brief Returns the in-degree of a vertex.
-		 *
-		 * Counts edges directed toward @p v. In an undirected graph, this equals
-		 * the ordinary degree of @p v.
-		 *
-		 * @param v Vertex whose in-degree is requested.
-		 * @return Number of incoming edges to @p v.
-		 *
-		 * @pre `0 <= v < num_vertices()`.
-		 *
-		 * @note The implementation includes self-loops in the count.
-		 */
-		int degree_in(vertex_t v) const;
-
+		
 		/**
 		 * @brief Computes the complement of this directed graph.
 		 *
@@ -504,11 +474,63 @@ namespace bitgraph {
 		 *       allocation of the output graph fails.
 		 */
 		void create_complement(Graph& gcomp) const;
+		
+		/**
+		 * @brief Creates and returns the complement graph.
+		 *
+		 * Constructs the complement of the current graph and returns it by value.
+		 * The returned graph has the same vertex set as the current graph, while
+		 * its edge set is replaced by the complement edge set.
+		 *
+		 * @return Complement of the current graph.
+		 * 
+		 * @note The returned graph has an empty name.
+		 */
+		Graph create_complement() const {
+			Graph gcomp;
+			create_complement(gcomp);
+			return gcomp;
+		}
+
+		/////////////
+		// degree-related operations
+
+		/**
+		 * @brief Returns the out-degree of a vertex.
+		 *
+		 * Counts the edges directed from @p v to other vertices. In an undirected
+		 * graph, this is the ordinary degree of @p v.
+		 *
+		 * @param v Vertex whose out-degree is requested.
+		 * @return Number of outgoing edges from @p v.
+		 *
+		 * @pre `0 <= v < num_vertices()`.
+		 *
+		 * @note The implementation includes self-loops in the count.
+		 */
+		degree_t degree_out(vertex_t v) const;
+
+
+		/**
+		 * @brief Returns the in-degree of a vertex.
+		 *
+		 * Counts edges directed toward @p v. In an undirected graph, this equals
+		 * the ordinary degree of @p v.
+		 *
+		 * @param v Vertex whose in-degree is requested.
+		 * @return Number of incoming edges to @p v.
+		 *
+		 * @pre `0 <= v < num_vertices()`.
+		 *
+		 * @note The implementation includes self-loops in the count.
+		 */
+		degree_t degree_in(vertex_t v) const;
+				
+	public:
 
 		//////////////	
 		// Modifiers
 
-	public:
 		/**
 		 * @brief Adds a directed edge from @p v to @p w.
 		 *
@@ -554,7 +576,7 @@ namespace bitgraph {
 		 * @note The cached edge count is invalidated and will be recomputed when
 		 *       next requested.
 		 */
-		void remove_edges(vertex_t v);
+		virtual void remove_edges(vertex_t v);
 
 		/**
 		 * @brief Removes every edge from the graph.
@@ -580,14 +602,15 @@ namespace bitgraph {
 		// random generation
 
 		/**
-		* @brief generates directed edges with probability p.
-		*
-		*		 I. (v, v) not allowed.
-		*
-		* @param v input endpoint
-		* @param w input endpoint
-		* @returns 0 is success, -1 if error
-		**/
+		 * @brief Generates a random directed graph using independent edge sampling.
+		 *
+		 * Removes all existing edges and independently adds each possible directed
+		 * edge with probability @p p. Self-loops are not created.
+		 *
+		 * @param p Probability of including each directed edge.
+		 *
+		 * @pre @p p must lie in the interval `[0, 1]`.
+		 */
 		virtual void gen_random_edges(double p);
 
 		/**
@@ -612,7 +635,21 @@ namespace bitgraph {
 		* @returns the new induced subgraph (if the operation fails, g remains unchanged)
 		**/
 		Graph& create_subgraph(int first_k, Graph& graph) const;
-		Graph create_subgraph(int first_k) const = delete;				// TODO in the future?
+				
+		/**
+		 * @brief Creates and returns the subgraph induced by the first vertices.
+		 *
+		 * Constructs the subgraph induced by vertices with identifiers in the range
+		 * `[0, first_k)`, and returns it by value.
+		 *
+		 * @param first_k Number of leading vertices included in the subgraph.
+		 * @return Subgraph induced by vertices `[0, first_k)`.
+		 */
+		Graph create_subgraph(int first_k) const {
+			Graph induced;
+			create_subgraph(first_k, induced);
+			return induced;
+		}
 		
 		/**
 		* @brief creates the subgraph induced by the vertices NOT in the input set

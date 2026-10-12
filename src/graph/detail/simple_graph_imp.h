@@ -41,23 +41,21 @@ namespace bitgraph {
 
 	template<class BitsetT>
 	inline
-		double Graph<BitsetT>::density(const BitsetT& vertices) const 
+		double Graph<BitsetT>::density(const vertex_bitset_t& vertices) const 
 	{
-		const BITBOARD num_vertices =
-			static_cast<BITBOARD>(vertices.count());
+		const std::size_t num_vertices = vertices.count();
 
 		if (num_vertices < 2) {
 			return 0.0;
 		}
 
-		const BITBOARD edges =
-			static_cast<BITBOARD>(num_edges(vertices));
+		const std::size_t num_edges = this->num_edges(vertices);
 
-		const BITBOARD maxEdges =
+		const std::size_t max_edges =
 			num_vertices * (num_vertices - 1);		// directed graph
 
-		return static_cast<double>(edges) /
-			static_cast<double>(maxEdges);
+		return static_cast<double>(num_edges) /
+			static_cast<double>(max_edges);
 
 	}
 
@@ -570,22 +568,26 @@ namespace bitgraph {
 
 	template<class BitsetT>
 	inline
-		std::size_t Graph<BitsetT>::num_edges(const BitsetT& bbn) const
+		std::size_t Graph<BitsetT>::num_edges(const vertex_bitset_t& vertices) const
 	{
 
 		std::size_t NE = 0;
 
-		for (vertex_t v = 0; v < NV_; ++v) {
-			if (bbn.is_bit(v)) {
-				for (vertex_t w = 0; w < NV_; ++w) {
-					if (bbn.is_bit(w)) {						//includes possible self loops
-						if (adj_[v].is_bit(w)) { NE++; }
-					}
+		for (vertex_t v = 0; v < this->NV_; ++v) {
+
+			if (!vertices.is_bit(v)) {
+				continue;
+			}
+
+			for (vertex_t w = 0; w < this->NV_; ++w) {
+				if (vertices.is_bit(w) &&
+					this->adj_[static_cast<std::size_t>(v)].is_bit(w)) {
+					++NE;
 				}
 			}
 		}
 
-		return NE;
+		return NE;;
 	}
 
 	template<class BitsetT>
@@ -609,8 +611,6 @@ namespace bitgraph {
 		return adj_[v];
 	}
 
-
-
 	template<class BitsetT>
 	inline
 		std::size_t Graph<BitsetT>::num_edges(bool lazy) const {
@@ -628,19 +628,7 @@ namespace bitgraph {
 		return NE_;
 	}
 
-	/**
-	 * @brief Computes the edge density of the directed graph.
-	 *
-	 * The density is defined as
-	 * \f[
-	 *     \frac{|E|}{|V|(|V|-1)}
-	 * \f]
-	 * for a directed graph without self-loops.
-	 *
-	 * @param lazy If `true`, num_edges() may use its cached edge count.
-	 * @return Graph density in the interval `[0,1]`. Returns `0.0` when the graph
-	 *         contains fewer than two vertices.
-	 */
+
 	template<class BitsetT>
 	inline
 		double Graph<BitsetT>::density(bool lazy) const
@@ -750,11 +738,11 @@ namespace bitgraph {
 
 	template<class BitsetT>
 	inline
-		int Graph<BitsetT>::degree_in(vertex_t v) const 
+		degree_t Graph<BitsetT>::degree_in(vertex_t v) const 
 	{
 		assert(v >= 0 && v < NV_);
 		
-		int degree = 0;
+		degree_t degree = 0;
 
 		for (vertex_t source = 0; source < NV_; source++) {
 			if (adj_[source].is_bit(v)) {
@@ -767,7 +755,7 @@ namespace bitgraph {
 
 	template<class BitsetT>
 	inline
-		int Graph<BitsetT>::degree_out(vertex_t v) const
+		degree_t Graph<BitsetT>::degree_out(vertex_t v) const
 	{
 		assert(v >= 0 && v < NV_);
 
@@ -827,10 +815,10 @@ namespace bitgraph {
 		remove_edges();
 
 		//sets directed edges with probability p
-		for (int i = 0; i < NV_; ++i) {
-			for (int j = 0; j < NV_; ++j) {
+		for (vertex_t v = 0; v < NV_; ++v) {
+			for (vertex_t w = 0; w < NV_; ++w) {
 				if (utils::uniform_dist(p)) {
-					add_edge(i, j);
+					add_edge(v, w);
 				}
 			}
 		}

@@ -41,6 +41,11 @@ namespace bitgraph {
 		using vertex_bitset_t = bitset_type;								// alias for semantic type
 		using VertexBitset = vertex_bitset_t;								// alias for backward compatibility
 
+		/**
+		 * @brief Makes the base-class `remove_edges` overloads visible.
+		 */
+		using base_t::remove_edges;
+
 		////////////
 		// Named factories to create simple graphs
 
@@ -182,9 +187,14 @@ namespace bitgraph {
 		std::size_t num_edges(bool lazy = true)	const override;
 
 		/**
-		* @brief Counts the number of edges	in an induced subgraph by a set of vertices
-		**/
-		std::size_t num_edges(const BitsetT&) 	const override;
+		 * @brief Counts the number of edges in the subgraph induced by a vertex set.
+		 *
+		 * Counts all edges whose endpoints both belong to @p vertices.
+		 *
+		 * @param vertices Bitset containing the vertices that induce the subgraph.
+		 * @return Number of edges in the induced subgraph.
+		 */
+		std::size_t num_edges(const vertex_bitset_t& vertices) 	const override;
 
 		/////////////
 		// Basic operations
@@ -224,132 +234,181 @@ namespace bitgraph {
 		 *
 		 * @pre Every set bit in @p vertices must identify a valid graph vertex.
 		 */
-		double density(const BitsetT& vertices) const override;
+		double density(const vertex_bitset_t& vertices) const override;
 
 		/**
-		 * @brief Computes the complement of this undirected graph.
+		 * @brief Creates the complement of the current undirected graph.
 		 *
-		 * For every pair of distinct vertices `{v,w}`, @p ugcomp contains the edge
-		 * `{v,w}` exactly when this graph does not contain it. Self-loops are
-		 * excluded.
+		 * Replaces @p ugcomp with the complement of the current graph. The output
+		 * graph has the same number of vertices, and two distinct vertices are
+		 * adjacent in @p ugcomp if and only if they are not adjacent in the
+		 * current graph.
 		 *
-		 * The output graph is reset to the same number of vertices as this graph
-		 * before construction. Any previous contents of @p ugcomp are discarded.
-		 * Only the strict upper triangle of the adjacency matrix is inspected, and
-		 * each complement edge is inserted once through Ugraph::add_edge().
+		 * Self-loops are not created.
 		 *
-		 * @param ugcomp Output graph that receives the complement.
+		 * @param ugcomp Destination graph receiving the complement.
 		 *
-		 * @pre @p ugcomp must be a different object from this graph.
-		 *
-		 * @note Edge-count metadata is maintained by add_edge().
-		 * @note This function follows the graph fail-fast policy and terminates if
-		 *       the input and output objects are the same or output allocation fails.
+		 * @pre @p ugcomp must be different from the current graph.
+		 * @note The name of @p ugcomp is cleared.
+		 * @warning Follows the graph initialization error policy if the input and
+		 *          output graphs are the same object.
 		 */
 		void create_complement(Ugraph& ugcomp) const;
 
+		/**
+		 * @brief Creates and returns the complement of the undirected graph.
+		 *
+		 * Constructs the complement of the current graph and returns it by value.
+		 * The returned graph has the same number of vertices as the current graph,
+		 * while its edge set is replaced by the complement edge set.
+		 *
+		 * @return Complement of the current undirected graph.
+		 *
+		 * @note The returned graph has an empty name.
+		 */
+		Ugraph create_complement() const {
+			Ugraph ugcomp(this->num_vertices());
+			this->create_complement(ugcomp);
+			return ugcomp;
+		}
 
 		/////////////
 		// degree-related operations
-		// 
-		// TODO implement bitstring conversions according to the templates properly (3/4/18) - CHECK (02/01/2025)
-	public:
 
 		/**
-		* @brief Computes the number of neighbors of v (deg(v))	*
-		**/
-		int degree(vertex_t v) const { return this->adj_[v].count(); }
+		 * @brief Returns the degree of a vertex.
+		 *
+		 * @param v Vertex identifier.
+		 * @return Number of neighbors of @p v.
+		 *
+		 * @pre @p v must be a valid vertex.
+		 */
+		degree_t degree(vertex_t v) const {
+			assert(v >= 0 && v < this->NV_);
+			return this->adj_[static_cast<size_t>(v)].count();
+		}
 
 		/**
-		*  @brief number of neighbors of v in a set of vertices
-		*
-		*		  (specialized for sparse graphs)
-		*
-		*  @param bbn input non-sparse (bit) set of vertices
-		**/
-		int degree(vertex_t v, const Bitset& bbn) const;
+		 * @brief Returns the degree of a vertex within an induced subgraph.
+		 *
+		 * Counts the neighbors of @p v that belong to @p vertices.
+		 *
+		 * @param v Vertex identifier.
+		 * @param vertices Bitset defining the induced subgraph.
+		 * @return Number of neighbors of @p v contained in @p vertices.
+		 *
+		 * @pre @p v must be a valid vertex.
+		 */
+		degree_t degree(vertex_t v,
+			const vertex_bitset_t& vertices) const;
+		
+		/**
+		 * @brief Returns the degree of a vertex truncated at an upper bound.
+		 *
+		 * Counts the neighbors of @p v that belong to @p vertices. If the actual
+		 * degree exceeds @p upper_bound, the function returns @p upper_bound.
+		 *
+		 * @param v Vertex identifier.
+		 * @param upper_bound Maximum value returned.
+		 * @param vertices Bitset containing the vertices of interest.
+		 * @return Degree of @p v within @p vertices, truncated at @p upper_bound.
+		 *
+		 * @note This overload is specialized for sparse graph processing.
+		 */
+		degree_t degree(
+			vertex_t v, 
+			degree_t upper_bound,
+			const vertex_bitset_t& vertices) const; 
+				
+		/**
+		 * @brief Returns the number of higher-indexed neighbors of a vertex.
+		 *
+		 * Counts the neighbors of @p v that belong to @p vertices and whose
+		 * vertex identifier is strictly greater than @p v.
+		 *
+		 * This operation is useful, for example, in pivot-based clique
+		 * enumeration strategies.
+		 *
+		 * @param v Vertex identifier.
+		 * @param vertices Bitset containing the vertices of interest.
+		 * @return Number of neighbors of @p v in @p vertices with index greater
+		 *         than @p v.
+		 *
+		 * @pre @p v must be a valid vertex.
+		 */
+		degree_t degree_up(vertex_t v,
+			const vertex_bitset_t& vertices) const;  
 
 		/**
-		*  @brief number of neighbors of v in a sparse encoded set of vertices
-		*
-		*		  (sparse graphs ONLY )
-		*
-		*  @param bbn input sparse (bit) set of vertices
-		*
-		* TODO - currently not implemented, only for sparse graphs (03/03/2025)
-		**/
-		int degree(int v, const BitsetSp& bbs) const;
-
-		/**
-		*  @brief truncated number of neighbors of v in a set of vertices
-		*
-		*		  (specialized for sparse graphs)
-		*
-		*  @param bbn input (bit) set of vertices
-		*  @returns neighbors of v if <= UB, otherwise UB
-		**/
-		int degree(int v, int UB, const Bitset& bbn) const;  //truncated degree (14/2/2016)
-
-		/**
-		*  @brief truncated number of neighbors of v in a sparse enconded set of vertices
-		*
-		*		  (ONLY for sparse graphs)
-		*
-		*  @param bbn input sparse (bit) set of vertices
-		*  @returns neighbors of v if <= UB, otherwise UB
-		*
-		* TODO - currently not implemented, only for sparse graphs (03/03/2025)
-		**/
-		int degree(int v, int UB, const BitsetSp& bbs) const;	//truncated degree  (14/2/2016)
-
-		/**
-		*  @brief number of neighbors of v in a vertex set with higher index than v
-		*
-		*		  (applied as pivotal strategy for clique enumeration)
-		*
-		* @param v: input vertex
-		* @param bbn: input (bit) set of vertices
-		*
-		**/
-		int degree_up(int v, const Bitset& bbn)	const;  //TODO: test (27/4/2016)
-
-		/**
-		* @brief number of neighbors of v that come after v
-		*
-		* @param v: input vertex
-		**/
-		int degree_up(int v) const;
+		 * @brief Returns the number of higher-indexed neighbors of a vertex.
+		 *
+		 * Counts the neighbors of @p v whose vertex identifier is strictly
+		 * greater than @p v.
+		 *
+		 * This operation is useful, for example, in pivot-based clique
+		 * enumeration strategies.
+		 *
+		 * @param v Vertex identifier.
+		 * @return Number of neighbors of @p v with index greater than @p v.
+		 *
+		 * @pre @p v must be a valid vertex.
+		 */
+		degree_t degree_up(vertex_t v) const;
 
 		/**
 		*  @brief returns the maximum degree of the graph,
 		*         i.e., the maximum degree of any of its vertices
 		**/
-		int max_graph_degree() const;
+		degree_t max_degree() const;
 
 		/**
-		*  @brief returns the maximum degree of an induced subgraph
-		*  @param sg input (bit) set of vertices of the subgraph
-		**/
-		template<class VertexSet>
-		int max_subgraph_degree(VertexSet& sg) const;
-
+		 * @brief Returns the maximum degree in an induced subgraph.
+		 *
+		 * Computes the maximum degree among the vertices contained in
+		 * @p vertices, considering only neighbors that also belong to
+		 * @p vertices.
+		 *
+		 * The bitset contents are not modified, but its internal scan cursor
+		 * is used during the computation.
+		 *
+		 * @param vertices Bitset containing the vertices that induce the subgraph.
+		 * @return Maximum degree in the induced subgraph. Returns 0 if
+		 *         @p vertices is empty.
+		 */
+		degree_t max_subgraph_degree(
+			vertex_bitset_t& vertices) const;
 
 		/**
-		* @brief number of edges with a single endpoint in a vertex from @sg
-		* @param sg input (bit) set of vertices
-		**/
-		template<class VertexSet>
-		int outgoing_degree(VertexSet& sg) const;
+		 * @brief Returns the number of edges leaving a vertex set.
+		 *
+		 * Counts the edges with exactly one endpoint in @p vertices and the
+		 * other endpoint outside the set.
+		 *
+		 * The bitset contents are not modified, but its internal scan cursor
+		 * is used during the computation.
+		 *
+		 * @param vertices Bitset containing the vertices of the set.
+		 * @return Number of edges between @p vertices and its complement.
+		 */
+		degree_t outgoing_degree(
+			vertex_bitset_t& vertices) const;
 
 		/**
-		* @brief number of edges with a single endpoint in a vertex from @sg
-		* @param sg input (vector) set of vertices
-		**/
-		int outgoing_degree(std::vector<int> sg) const;
+		 * @brief Returns the number of edges leaving a vertex set.
+		 *
+		 * Counts the edges with exactly one endpoint in @p vertices and the
+		 * other endpoint outside the set.
+		 *
+		 * @param vertices Set of vertices.
+		 * @return Number of edges between @p vertices and its complement.
+		 */
+		degree_t outgoing_degree(
+			const vertex_set_t& vertices) const;
+			
+	public:
 
 		//////////////	
 		// Modifiers
-	public:
 
 		/**
 		* @brief Adds bidirectional edge {v, w}
@@ -358,16 +417,33 @@ namespace bitgraph {
 		* @param v endpoint
 		* @param w endpoint
 		**/
-		void add_edge(int v, int w)	override;
+		void add_edge(vertex_t v, vertex_t w)	override;
 
 		/**
-		* @brief Removes bidirectional edge {v, w}
-		*		 a) if self_loop (v = w), graph remains unchanged
-		*		 b) keeps track of the number of edges
-		* @param v endpoint
-		* @param w endpoint
-		**/
-		void remove_edge(int v, int w) override;
+		 * @brief Removes an undirected edge.
+		 *
+		 * Removes the edge between @p v and @p w if it exists, updating both
+		 * symmetric adjacency entries and the stored number of edges.
+		 *
+		 * If @p v == @p w or the edge does not exist, the graph remains unchanged.
+		 *
+		 * @param v First endpoint of the edge.
+		 * @param w Second endpoint of the edge.
+		 */
+		void remove_edge(vertex_t v, vertex_t w) override;
+
+		/**
+		 * @brief Removes all edges incident to a vertex.
+		 *
+		 * Removes every edge having @p v as an endpoint. Since the graph is
+		 * undirected, the corresponding symmetric adjacency entries are also
+		 * removed.
+		 *
+		 * @param v Vertex whose incident edges are removed.
+		 *
+		 * @pre @p v must be a valid vertex.
+		 */
+		void remove_edges(vertex_t v) override;
 
 		/**
 		 * @brief Generates a uniformly random graph with approximately density @p p.
@@ -382,9 +458,7 @@ namespace bitgraph {
 
 		//////////////	
 		// Induced subgraphs
-
-		//TODO	Graph& create_subgraph	(std::size_t first_k, Graph& g) const  override;
-
+		
 		/**
 		*  @brief Computes the subgraph induced by a set of vertices
 		*  @param lv input set of vertices (std::vector<int>)
