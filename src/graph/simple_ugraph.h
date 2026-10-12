@@ -1,15 +1,19 @@
 /**
- * @file simple_ugraph.h 
- * @brief class Ugraph for simple undirected graphs	(no self loops)
+ * @file simple_ugraph.h
+ * @brief Definition of Ugraph<BitsetT>, a simple undirected graph class.
  *
- * @created 17/6/10
- * @last_update 21/09/26
+ * @details Implements simple undirected graphs (without self-loops)
+ *          using bitset-based adjacency matrices.
+ *          Supports dense and sparse bitset representations.
+ *
  * @author pss
+ * @date 17/06/2010
+ * @details last_update 13/10/2026	
  *
- * This code is part of the GRAPH 1.0 C++ library 
+ * @copyright Part of the BITGRAPH C++ library.
  *
- * @todo implement min_degree functions (03/01/2025)
- **/
+ * @todo Implement minimum-degree functions (03/01/2025).
+ */
 
 #ifndef BITGRAPH_GRAPH_SIMPLE_UGRAPH_H
 #define BITGRAPH_GRAPH_SIMPLE_UGRAPH_H
@@ -18,14 +22,19 @@
 
 namespace bitgraph {
 	
-	//////////////////
-	//
-	// Generic class Ugraph<BitsetT>
-	// 
-	// (BitsetT is limited to bitarray and sparse_bitarray types)
-	// 
-	//////////////////
-
+	/**
+	 * @brief Undirected graph represented by a bitset-based adjacency matrix.
+	 *
+	 * @tparam BitsetT Bitset type used to store vertex neighborhoods.
+	 *         Supported types are BBScan (dense) and BBScanSp (sparse).
+	 *
+	 * @details Inherits common graph functionality from Graph<BitsetT>
+	 *          and specializes operations to preserve undirected graph semantics.
+	 *          Each edge (u,v) is represented symmetrically in the adjacency matrix.
+	 *
+	 * @note Vertices are indexed from 0 to NV_-1.
+	 * @note Self-loops are not supported.
+	 */
 	template<class BitsetT = BBScan>
 	class Ugraph : public Graph<BitsetT> {
 
@@ -141,21 +150,21 @@ namespace bitgraph {
 		/**
 		 * @brief Constructs an undirected graph from an adjacency matrix.
 		 *
-		 * The constructor reads the strict upper triangle of @p adjacency. Every
-		 * nonzero entry `adjacency[v][w]`, with `v < w`, creates the undirected edge
+		 * The constructor reads the strict upper triangle of @p adj_matrix. Every
+		 * nonzero entry `adj_matrix[v][w]`, with `v < w`, creates the undirected edge
 		 * `{v,w}`. The symmetric adjacency entries are generated internally by
 		 * add_edge().
 		 *
 		 * Diagonal entries are ignored, so the resulting graph contains no
 		 * self-loops. Entries in the lower triangle are not inspected.
 		 *
-		 * @param numVertices Number of rows and columns in @p adjacency.
+		 * @param NV Number of rows and columns in @p adj_matrix.
 		 * @param adj_matrix Input adjacency matrix. A null pointer is permitted only
-		 *        when @p numVertices is zero.
+		 *        when @p NV is zero.
 		 * @param name Optional graph instance name or source filename.
 		 *
-		 * @pre If @p numVertices is greater than zero, @p adjacency and each of its
-		 *      rows must point to valid arrays containing at least @p numVertices
+		 * @pre If @p NV is greater than zero, @p adj_matrix and each of its
+		 *      rows must point to valid arrays containing at least @p NV
 		 *      integer entries.
 		 *
 		 * @note Every nonzero upper-triangle entry is interpreted as an edge.
@@ -181,10 +190,15 @@ namespace bitgraph {
 		// setters and getters
 		
 		/**
-		* @brief Counts the number of edges	(includes self loops)
-		* @param lazy if TRUE (reads value @NE_)
-		*			  if FALSE counts and updates @NE_
-		**/
+		 * @brief Returns the number of edges of the graph.
+		 *
+		 * Each undirected edge is counted once. Self-loops are not supported.
+		 *
+		 * @param lazy If `true`, a valid cached edge count may be used.
+		 *             If `false`, the count is recomputed from the adjacency
+		 *             matrix and the cache is updated.
+		 * @return Number of edges.
+		 */
 		std::size_t num_edges(bool lazy = true)	const override;
 
 		/**
@@ -496,7 +510,7 @@ namespace bitgraph {
 		/**
 		 * @brief Creates the subgraph induced by the neighbors of a vertex.
 		 *
-		 * @param[out] ug Output undirected graph, overwritten by the induced subgraph.
+		 * @param[out] graph Output undirected graph, overwritten by the induced subgraph.
 		 * @param[in] v Vertex whose neighborhood defines the subgraph.
 		 *
 		 * @pre v must be a valid vertex of the original graph.
@@ -549,14 +563,14 @@ namespace bitgraph {
 		/**
 		 * @brief Writes the undirected graph in DIMACS edge format.
 		 *
-		 * @param[out] filename Output stream.
+		 * @param[out] os Output stream.
 		 *
 		 * @note Vertices are numbered from 1 in the output.
 		 * @note Each undirected edge is written exactly once.
 		 * @note The edge count is recomputed before writing.
 		 * @note Self-loops are not supported.
 		 */
-		void write_dimacs(std::ostream& filename) override;
+		void write_dimacs(std::ostream& os) override;
 
 		/**
 		 * @brief Writes the undirected graph as an edge list.
@@ -568,7 +582,7 @@ namespace bitgraph {
 		 * @note Comment lines start with '%'.
 		 * @note Self-loops are not written.
 		 */
-		void write_EDGES(std::ostream& filename) override;
+		void write_EDGES(std::ostream& os) override;
 
 		/**
 		 * @brief Writes the undirected graph in Matrix Market coordinate format.
@@ -581,7 +595,7 @@ namespace bitgraph {
 		 * @note The edge count is recomputed before writing.
 		 * @note Self-loops are not supported.
 		 */
-		void write_mtx(std::ostream& filename);				
+		void write_mtx(std::ostream& os);
 
 		/////////////////	
 		//	I/O basic operations
@@ -644,33 +658,3 @@ namespace bitgraph {
 #include "graph/detail/simple_ugraph_imp.h"
 
 #endif // BITGRAPH_GRAPH_SIMPLE_UGRAPH_H
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

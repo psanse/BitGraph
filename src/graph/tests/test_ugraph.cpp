@@ -48,6 +48,25 @@ TEST(Ugraph, constructor_file){
 
 }
 
+TEST(Ugraph, reset_zero_vertices) {
+	ugraph g(5);
+	g.add_edge(0, 1);
+	g.set_name("old");
+
+	g.reset(0);
+
+	EXPECT_EQ(0, g.num_vertices());
+	EXPECT_EQ(0, g.num_blocks());
+	EXPECT_EQ(0, g.num_edges());
+	EXPECT_EQ(0, g.num_edges(false));
+
+	//reusable after an empty reset
+	g.reset(3);
+	g.add_edge(0, 2);
+	EXPECT_EQ(3, g.num_vertices());
+	EXPECT_EQ(1, g.num_edges());
+}
+
 TEST(Ugraph, read_dimacs) {
 	
 	ugraph ug(BITGRAPH_GRAPH_TEST_DATA_DIR "dimacs_format_graph.clq");

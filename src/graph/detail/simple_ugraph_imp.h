@@ -22,7 +22,7 @@
 #define BITGRAPH_GRAPH_SIMPLE_UGRAPH_IMP_H
 
 #include <algorithm>
-#include "simple_ugraph.h"
+#include "graph/simple_ugraph.h"
 
 namespace bitgraph {
 	
