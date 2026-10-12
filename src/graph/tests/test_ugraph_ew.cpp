@@ -333,22 +333,7 @@ TEST_F(UGraphEWTest, add_edge_symmetric_and_default_weight) {
 }
 
 TEST_F(UGraphEWTest, add_edge_existing_replaces_weight) {
-	{
-		ugraph u(3);
-		u.add_edge(0, 1);
-		u.add_edge(1, 2);
-		std::cerr << "DBG u after 2 edges: " << u.num_edges() << "\n";
-		u.add_edge(0, 1);
-		std::cerr << "DBG u after dup: " << u.num_edges() << "\n";
-		std::cerr << "DBG ugew graph lazy before: " << ugew.graph().num_edges() << "\n";
-		ugew.graph().add_edge(0, 1);
-		std::cerr << "DBG ugew graph lazy after dup: " << ugew.graph().num_edges() << "\n";
-	}
 	ugew.add_edge(0, 1, 42);						// (0,1) already exists
-	{
-		const std::size_t n = ugew.num_edges();
-		std::cerr << "DBG ew lazy after dup: " << n << "\n";
-	}
 
 	EXPECT_EQ(3u, ugew.num_edges());
 	EXPECT_EQ(42, ugew.weight(0, 1));
