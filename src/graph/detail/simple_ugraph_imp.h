@@ -1,5 +1,5 @@
  /**
-  * @file simple_ugraph_impl.h
+  * @file simple_ugraph_imp.h
   * @brief Provides template and inline implementations for the Ugraph class.
   *
   * This file contains the definitions of template member functions and inline
@@ -12,7 +12,7 @@
   * @note All definitions in this file belong to the bitgraph namespace.
   *
   * @date Created: 17/06/2010
-  * @date Last updated: 21/09/2026
+  * @date Last updated: 13/10/2026
   * @author Pablo San Segundo
   *
   * @todo Implement the minimum-degree operations (03/01/2025)
@@ -89,19 +89,20 @@ namespace bitgraph {
 
 	template<class BitsetT>
 	inline
-	ostream& Ugraph<BitsetT>::print_edges(vertex_bitset_t& bbsg, std::ostream& o)
+	std::ostream& Ugraph<BitsetT>::print_edges(
+		vertex_bitset_t& vertices, std::ostream& os)
 	{
 		for (int i = 0; i < this->NV_ - 1; ++i) {
-			if (!bbsg.is_bit(i)) continue;
+			if (!vertices.is_bit(i)) continue;
 			for (int j = i + 1; j < this->NV_; ++j) {
-				if (!bbsg.is_bit(j)) continue;
+				if (!vertices.is_bit(j)) continue;
 				if (this->is_edge(i, j)) {
-					o << "[" << i << "]" << "--" << "[" << j << "]" << endl;
+					os << "[" << i << "]" << "--" << "[" << j << "]" << '\n';
 				}
 			}
 		}
 
-		return o;
+		return os;
 	}
 	
 	template<class BitsetT>
@@ -233,7 +234,7 @@ namespace bitgraph {
 			 * and diagonal entries are excluded.
 			 */
 			for (vertex_t v = 0; v + 1 < this->NV_; ++v) {
-				this->NE_ += adj_[static_cast<std::size_t>(v)]
+				this->NE_ += this->adj_[static_cast<std::size_t>(v)]
 					.count(v + 1, -1);
 			}
 					
@@ -292,10 +293,10 @@ namespace bitgraph {
 	inline
 		void Ugraph<BitsetT>::add_edge(vertex_t v, vertex_t w)
 	{
-		assert(v >= 0 && v < NV_);
-		assert(w >= 0 && w < NV_);
+		assert(v >= 0 && v < this->NV_);
+		assert(w >= 0 && w < this->NV_);
 		
-		if (v != w && !adj_[v].is_bit(w)) {
+		if (v != w && !this->adj_[v].is_bit(w)) {
 			this->adj_[v].set_bit(w);
 			this->adj_[w].set_bit(v);
 			this->NE_++;
@@ -306,7 +307,9 @@ namespace bitgraph {
 	inline
 		void Ugraph<BitsetT>::remove_edge(vertex_t v, vertex_t w)
 	{
-		
+		assert(v >= 0 && v < this->NV_);
+		assert(w >= 0 && w < this->NV_);
+
 		if (v != w && this->adj_[v].is_bit(w)) {
 			this->adj_[v].erase_bit(w);
 			this->adj_[w].erase_bit(v);
@@ -429,7 +432,7 @@ namespace bitgraph {
 
 	template<class BitsetT>
 	inline
-		std::ostream& Ugraph<BitsetT>::print_degrees(std::ostream& o) const
+		std::ostream& Ugraph<BitsetT>::print_degrees(std::ostream& os) const
 	{
 		for (vertex_t v = 0; v < this->NV_; ++v) {
 			os << "deg(" << v << ")" 
@@ -440,7 +443,7 @@ namespace bitgraph {
 
 	template<class BitsetT>
 	inline
-		ostream& Ugraph<BitsetT>::print_edges(
+		std::ostream& Ugraph<BitsetT>::print_edges(
 			std::ostream& os,
 			bool trailing_newline)
 	{
@@ -463,7 +466,7 @@ namespace bitgraph {
 
 	template<class BitsetT>
 	inline
-		ostream& Ugraph<BitsetT>::print_adjacency_matrix(std::ostream& os) const
+		std::ostream& Ugraph<BitsetT>::print_adjacency_matrix(std::ostream& os) const
 	{
 		for (vertex_t v = 0; v < this->NV_; ++v) {
 			for (vertex_t w = 0; w < this->NV_; ++w) {
@@ -474,14 +477,14 @@ namespace bitgraph {
 					os << "0";
 				}
 			}
-			os << endl;
+			os << '\n';
 		}
 		return os;
 	}
 		
 	template<class BitsetT>
 	inline
-		void Ugraph<BitsetT>::write_dimacs(ostream& os) {
+		void Ugraph<BitsetT>::write_dimacs(std::ostream& os) {
 
 		// Timestamp comment 
 		this->timestamp_dimacs(os);
@@ -505,15 +508,15 @@ namespace bitgraph {
 
 	template<class BitsetT>
 	inline
-		void  Ugraph<BitsetT>::write_EDGES(ostream& os) {
+		void  Ugraph<BitsetT>::write_EDGES(std::ostream& os) {
 
 		// Timestamp comment 
 		os << "% File written by BITGRAPH:" 
-			<< PrecisionTimer::local_timestamp() << endl;
+			<< PrecisionTimer::local_timestamp() << '\n';
 
 		// Graph name
 		if (!this->name_.empty())
-			os << "% " << this->name_.c_str() << endl;
+			os << "% " << this->name_.c_str() << '\n';
 
 		// write edges - 1 based vertex notation
 		// O(log) for sparse graphs: specialize
@@ -528,17 +531,18 @@ namespace bitgraph {
 
 	template<class BitsetT>
 	inline
-		void Ugraph<BitsetT>::write_mtx(ostream& os) {
+		void Ugraph<BitsetT>::write_mtx(std::ostream& os)
+		{
 
 		// Matrix Market header
-		os << "%%MatrixMarket matrix coordinate pattern symmetric" << endl;
+		os << "%%MatrixMarket matrix coordinate pattern symmetric" << '\n';
 
 		// Timestamp comment
-		os << "% File written by GRAPH:" << PrecisionTimer::local_timestamp() << endl;
+		os << "% File written by BITGRAPH:" << PrecisionTimer::local_timestamp() << '\n';
 
 		// Graph name
 		if (!this->name_.empty())
-			os << "% " << this->name_.c_str() << endl;
+			os << "% " << this->name_.c_str() << '\n';
 
 		// Matrix dimensions and number of entries
 		os << this->NV_ << " "
@@ -568,7 +572,7 @@ namespace bitgraph {
 		const int block_index = WDIV(v);
 
 		// Count complete blocks strictly above the block containing v.
-		for (int i = block_index + 1; i < this->NBB_; ++i) {
+		for (block_index_t i = block_index + 1; i < this->NBB_; ++i) {
 			degree += bblock::count(
 				this->adj_[static_cast<size_t>(v)].block(i) &
 				bbn.block(i));
@@ -588,6 +592,8 @@ namespace bitgraph {
 	inline
 		degree_t Ugraph<BitsetT>::degree_up(vertex_t v) const
 	{
+		assert(v >= 0 && v < this->NV_);
+		
 		degree_t degree = 0;
 		
 		const int block_index = WDIV(v);
@@ -656,7 +662,7 @@ namespace bitgraph {
 	template<class BitsetT>
 	void Ugraph<BitsetT>::create_subgraph(Ugraph& ug, vertex_t v) const
 	{
-		assert(v >= 0 && v < NV_);
+		assert(v >= 0 && v < this->NV_);
 		assert(&ug != this);
 
 		vertex_set_t vnn;
@@ -674,10 +680,9 @@ namespace bitgraph {
 
 		// Preconditions
 		assert(&ug != this);
-		assert(NV > 0);
 
 		for (vertex_t v : vertices) {
-			assert(v >= 0 && v < NV_);
+			assert(v >= 0 && v < this->NV_);
 		}
 
 		// Initialize output graph
@@ -698,34 +703,4 @@ namespace bitgraph {
 
 
 
-#endif // BITGRAPH_GRAPH_SIMPLE_UGRAPH_H
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+#endif // BITGRAPH_GRAPH_SIMPLE_UGRAPH_IMP_H

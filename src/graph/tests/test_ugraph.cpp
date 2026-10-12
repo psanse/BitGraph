@@ -67,6 +67,50 @@ TEST(Ugraph, reset_zero_vertices) {
 	EXPECT_EQ(1, g.num_edges());
 }
 
+TEST(Ugraph, print_degrees) {
+	ugraph g(3);
+	g.add_edge(0, 1);
+	g.add_edge(0, 2);
+
+	std::ostringstream os;
+	g.print_degrees(os);
+
+	EXPECT_EQ("deg(0):2 deg(1):1 deg(2):1 ", os.str());
+}
+
+TEST(Ugraph, create_subgraph_empty_vertex_set) {
+	ugraph g = ugraph::make_triangle();
+	ugraph sub(4);
+
+	g.create_subgraph(sub, vertex_set_t{});
+
+	EXPECT_EQ(0, sub.num_vertices());
+	EXPECT_EQ(0, sub.num_edges());
+}
+
+TEST(Ugraph, create_subgraph_isolated_vertex_neighborhood) {
+	ugraph g(3);
+	g.add_edge(0, 1);			//vertex 2 is isolated
+	ugraph sub(4);
+
+	g.create_subgraph(sub, 2);
+
+	EXPECT_EQ(0, sub.num_vertices());
+	EXPECT_EQ(0, sub.num_edges());
+}
+
+TEST(Ugraph, create_subgraph_neighborhood) {
+	ugraph g = ugraph::make_star(4);		//center 0
+	g.add_edge(1, 2);
+	ugraph sub;
+
+	g.create_subgraph(sub, 0);				//induced on {1,2,3}
+
+	EXPECT_EQ(3, sub.num_vertices());
+	EXPECT_EQ(1, sub.num_edges());
+	EXPECT_TRUE(sub.is_edge(0, 1));
+}
+
 TEST(Ugraph, read_dimacs) {
 	
 	ugraph ug(BITGRAPH_GRAPH_TEST_DATA_DIR "dimacs_format_graph.clq");
@@ -463,187 +507,3 @@ TEST(Ugraph, outgoing_degree) {
 }
 
 
-/////////////////////////////
-//
-// DISABLED TESTS
-//
-/////////////////////////////
-
-TEST(Ugraph, DISABLED_add_vertex_multiple) {
-	///////////////////
-	// Extends the graph with a new vertex
-	//
-	// COMMENTS
-	// Currently BUGGY- TEST EXITS (DISABLE)
-	LOG_INFO("Ugraph: add_vertex_multiple ------------");
-
-	const int NV = 10;
-
-	ugraph g(NV);
-	g.add_edge(0, 1);
-	g.add_edge(1, 2);
-	g.add_edge(2, 3);
-	g.add_edge(0, 3);
-
-
-	///////////////////
-	//Extends graph according to this neighborhood
-	graph::vertex_bitset_t bbn(NV + 1 /* MUST BE THE NEW SIZE! */);
-	bbn.set_bit(0);
-	bbn.set_bit(3);
-
-	//g.add_vertex(&bbn);			//extends graph according to the @bbn neighborhood
-	//g.add_vertex(&bbn);			//extends graph according to the @bbn neighborhood
-	//g.add_vertex(&bbn);			//extends graph according to the @bbn neighborhood
-
-/////////////////
-//TESTS
-	EXPECT_EQ(g.num_vertices(), NV + 3);
-	EXPECT_EQ(g.num_edges(false), 4 + 6);
-
-	int v = NV;
-	EXPECT_TRUE(g.is_edge(v, 0));
-	EXPECT_TRUE(g.is_edge(v, 3));
-	EXPECT_FALSE(g.is_edge(v, 1));
-
-	v = NV + 1;
-	EXPECT_TRUE(g.is_edge(v, 0));
-	EXPECT_TRUE(g.is_edge(v, 3));
-	EXPECT_FALSE(g.is_edge(v, 1));
-
-	v = NV + 2;
-	EXPECT_TRUE(g.is_edge(v, 0));
-	EXPECT_TRUE(g.is_edge(v, 3));
-	EXPECT_FALSE(g.is_edge(v, 1));
-
-	LOG_INFO("Ugraph: END add_vertex_multiple --------");
-#ifdef TEST_GRAPH_STEP_BY_STEP
-	LOG_ERROR("press any key to continue");
-	cin.get();
-#endif
-}
-
-TEST(Ugraph, DISABLED_add_single_vertex) {
-	///////////////////
-	// Extends the graph with a new vertex
-	//
-	// COMMENTS
-	// Currently BUGGY- TEST EXITS (DISABLE)
-	LOG_INFO("Ugraph: add_single_vertex ------------");
-
-	const int NV = 10;
-
-	ugraph g(NV);
-	g.add_edge(0, 1);
-	g.add_edge(1, 2);
-	g.add_edge(2, 3);
-	g.add_edge(0, 3);
-
-	///////////////////
-	//Extends graph according to this neighborhood
-	graph::vertex_bitset_t bbn(NV + 1 /* MUST BE THE NEW SIZE! */);
-	bbn.set_bit(0);
-	bbn.set_bit(3);
-
-	//g.add_vertex(&bbn);			//extends graph according to the @bbn neighborhood
-
-#ifdef	print_graph_logs
-	g.print_data(false, cout, true);
-	g.print_edges();
-#endif
-
-	/////////////////
-	//TESTS
-	int v = NV;
-	EXPECT_EQ(g.num_vertices(), NV + 1);
-	EXPECT_EQ(g.num_edges(false), 4 + 2);
-	EXPECT_TRUE(g.is_edge(v, 0));
-	EXPECT_TRUE(g.is_edge(v, 3));
-	EXPECT_FALSE(g.is_edge(v, 1));
-
-	///////////////////
-	//Extends graph by one vertex with empty neighborhood
-
-		//g.add_vertex();	
-	EXPECT_EQ(g.num_vertices(), NV + 2);
-	EXPECT_EQ(g.num_edges(false), 4 + 2);
-	v = NV + 1;
-	EXPECT_FALSE(g.is_edge(v, 0));
-
-
-	LOG_INFO("Ugraph: END add_single_vertex --------");
-#ifdef TEST_GRAPH_STEP_BY_STEP
-	LOG_ERROR("press any key to continue");
-	cin.get();
-#endif
-}
-
-//////////////////
-//
-// TDOD@REFACTOR for the new Graph types
-//
-/////////////////
-
-
-//TEST(Graph_test,average_block_density){
-//	const int NUM_BB=4;
-//	graph g(64*NUM_BB);
-//	g.add_edge(0,1);
-//	g.add_edge(1,2);
-//	g.add_edge(0,2);
-//	
-//	int nV=g.num_vertices();
-//	EXPECT_DOUBLE_EQ(2.0/(nV*NUM_BB) ,g.block_density());		//around 1/500 of useful bitblocks
-//	
-//	sparse_graph g1(64*NUM_BB);
-//	g1.add_edge(0,1);
-//	g1.add_edge(1,2);
-//	g1.add_edge(0,2);
-//
-//	EXPECT_DOUBLE_EQ(1.0, g1.block_density());					//all bitblocks are supposed to be non empty
-//	
-//	//almost full density
-//	ugraph g2(4);
-//	g2.add_edge(0,1);
-//	g2.add_edge(1,2);
-//	g2.add_edge(0,2);
-//
-//	EXPECT_DOUBLE_EQ(3.0/g2.num_vertices(), g2.block_density());		
-//
-//	//spare case
-//	sparse_ugraph g3(4);
-//	g3.add_edge(0,1);
-//	g3.add_edge(1,2);
-//	g3.add_edge(0,2);
-//
-//	EXPECT_DOUBLE_EQ(1.0, g3.block_density());	
-//}
-
-//
-//TEST(Ugraph_test,removing_vertices){
-//	ugraph g("sample.clq");
-//		
-//	BitBoardN bbn(4);
-//	bbn.set_bit(0, 3);
-//	g.remove_vertices(bbn);
-//
-//	EXPECT_EQ(3, g.num_vertices());		//7-4=3 vertices which form a clique (proper)
-//	EXPECT_EQ(3, g.num_edges());
-//}
-//
-//TEST(Ugraph_test,numberof_edges){
-//	ugraph g("brock200_1.clq");
-//		
-//	EXPECT_EQ(14834, g.num_edges());		//7-4=3 vertices which form a clique (proper)
-//}
-//
-//TEST(Graph_test, block_density_index){
-//////////////////////
-//// block density: number of blocks / total possible number of blocks 
-//	sparse_ugraph sg(100);
-//	sg.add_edge(0,1);
-//	sg.add_edge(1,2);
-//	
-//	EXPECT_EQ(3/ceil(10000/64.0),sg.block_density_index());		
-//}
-//
