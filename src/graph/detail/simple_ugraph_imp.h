@@ -106,7 +106,7 @@ namespace bitgraph {
 
 	template<class BitsetT>
 	inline
-		Ugraph<BitsetT> Ugraph<BitsetT>::make_clique(std::size_t NV)
+		Ugraph<BitsetT> Ugraph<BitsetT>::make_complete_graph(std::size_t NV)
 	{
 
 		Ugraph<BitsetT> clique(NV);
@@ -124,6 +124,11 @@ namespace bitgraph {
 			clique.neighbors(v).erase_bit(v);
 		}
 	 
+		// update edge count
+		clique.NE_ =
+			static_cast<std::size_t>(vertex_count) *
+			(static_cast<std::size_t>(vertex_count) - 1) / 2;
+
 		return clique;
 	}
 
@@ -132,17 +137,14 @@ namespace bitgraph {
 		Ugraph<BitsetT> Ugraph<BitsetT>::make_cycle(std::size_t NV)
 	{
 		if (NV < 3) {
-			BaseT::graph_initialization_error(
+			base_t::graph_initialization_error(
 				"A simple cycle graph requires at least three vertices.");
 		}
 
 		Ugraph<BitsetT> cycle(NV);
-
-		//sets the adjacency matrix to ONE except for the main diagonal
+				
 		const vertex_t vertex_count = cycle.num_vertices();
-		if (vertex_count == 0) {
-			return cycle;
-		}
+		
 				
 		for (vertex_t v = 0; v + 1 < vertex_count; ++v) {
 			cycle.add_edge(v, v + 1);
@@ -159,20 +161,19 @@ namespace bitgraph {
 		Ugraph<BitsetT> Ugraph<BitsetT>::make_star(std::size_t NV)
 	{
 				
-		if (NV == 0) {
-			BaseT::graph_initialization_error(
-				"A star graph requires at least one vertex - make_star(std::size_t NV) ");
+		if(NV == 0) {
+			base_t::graph_initialization_error(
+				"A star graph requires at least one vertex.");
 		}
 
 		Ugraph<BitsetT> star(NV);
 
-		//sets the adjacency matrix to ONE except for the main diagonal
 		const vertex_t vertex_count = star.num_vertices();
-				
+
 		for (vertex_t v = 1; v < vertex_count; ++v) {
 			star.add_edge(0, v);
-		}		
-		
+		}
+
 		return star;
 	}
 
@@ -182,25 +183,28 @@ namespace bitgraph {
 		Ugraph<BitsetT>::Ugraph(
 			std::size_t NV,
 			const int * const adj[], 
-			string name) noexcept
-		: BaseT()
+			std::string name) noexcept
+		: base_t()
 	{
 		// A null matrix is valid only when constructing an empty graph.
 		assert(adj != nullptr || NV == 0);
 			
 		this->reset(NV, std::move(name));
 
-		const vertex_t num_vertex = static_cast<vertex_t>(NV);	
-		
-		// Read only the strict upper triangle. add_edge() stores both directions.
-		for (vertex_t i = 0; i < num_vertex - 1; ++i) {
-			for (vertex_t j = i + 1; j < num_vertex; ++j) {
-				if (adj[i][j] != 0) {
-					this->add_edge(i, j);
+		const vertex_t vertex_count =
+			static_cast<vertex_t>(NV);
+				
+		// Read only the strict upper triangle.
+		// add_edge() stores both directions.
+		for (vertex_t v = 0; v < vertex_count - 1; ++v) {
+			assert(adj[v] != nullptr);
+
+			for (vertex_t w = v + 1; w < vertex_count; ++w) {
+				if (adj[v][w] != 0) {
+					this->add_edge(v, w);
 				}
 			}
-		}
-		
+		}		
 	}
 
 
@@ -570,7 +574,7 @@ namespace bitgraph {
 	void Ugraph<BitsetT>::create_complement(Ugraph& ugcomp) const 
 	{
 		if (this == &ugcomp) {
-			BaseT::graph_initialization_error(
+			base_t::graph_initialization_error(
 				"Input and output graphs must be different in "
 				"Ugraph::create_complement(Ugraph& ugcomp).");
 		}

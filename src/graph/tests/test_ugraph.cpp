@@ -393,7 +393,7 @@ TEST(Ugraph, remove_edges){
 
 TEST(Ugraph, make_graphs) {
 	auto tri = bitgraph::Ugraph<bitarray>::make_triangle();
-	auto clique = bitgraph::Ugraph<bitarray>::make_clique(4);
+	auto clique = bitgraph::Ugraph<bitarray>::make_complete_graph(4);
 	auto cycle = bitgraph::Ugraph<bitarray>::make_cycle(4);
 	auto star = bitgraph::Ugraph<bitarray>::make_star(4);				//vertex 0 is the center of the star
 

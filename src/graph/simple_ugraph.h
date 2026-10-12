@@ -33,75 +33,74 @@ namespace bitgraph {
 
 	public:
 
-		//set of (named) factories to create simple graphs
+		// type aliases			
+		using base_t = Graph<BitsetT>;
+		using BaseT = base_t;					// alias for backward compatibility
 
+		using bitset_type = typename base_t::bitset_type;
+		using vertex_bitset_t = bitset_type;								// alias for semantic type
+		using VertexBitset = vertex_bitset_t;								// alias for backward compatibility
+
+		////////////
+		// Named factories to create simple graphs
+
+		/**
+		 * @brief Creates a triangle graph.
+		 *
+		 * Returns the complete undirected graph on three vertices, with vertex
+		 * set `{0, 1, 2}` and edges `(0,1)`, `(0,2)`, and `(1,2)`.
+		 *
+		 * @return A triangle graph with three vertices and three edges.
+		 */
 		static Ugraph make_triangle();
 
 		/**
 		 * @brief Creates a complete undirected graph.
 		 *
-		 * Constructs the complete graph \f$K_n\f$, in which every pair of distinct
-		 * vertices is connected by an edge. The graph contains no self-loops.
+		 * Returns the complete graph on @p NV vertices. Every pair of distinct
+		 * vertices is adjacent and self-loops are excluded.
 		 *
-		 * @param NV Number of vertices in the complete graph.
-		 * @return Complete graph containing @p NV vertices and
-		 *         \f$NV(NV-1)/2\f$ edges.
-		 *
-		 * @note The empty graph \f$K_0\f$ and the single-vertex graph \f$K_1\f$ are
-		 *       valid results.
-		 * @note Construction follows the graph fail-fast policy and terminates if
-		 *       graph allocation fails.
+		 * @param NV Number of vertices.
+		 * @return Complete undirected graph with @p NV vertices.
 		 */
-		static Ugraph make_clique(std::size_t NV);
+		static Ugraph make_complete_graph(std::size_t NV);
 
 		/**
-		 * @brief Creates a simple undirected cycle graph.
+		 * @brief Creates a simple cycle graph.
 		 *
-		 * Constructs the cycle graph \f$C_n\f$, where every vertex has degree two.
-		 * Consecutive vertices are adjacent, and the last vertex is connected to
-		 * vertex zero.
+		 * Returns the undirected cycle graph on @p NV vertices. Consecutive
+		 * vertices are adjacent, and the last vertex is connected to vertex 0.
 		 *
-		 * @param NV Number of vertices in the cycle. It must be at least
-		 *        three.
-		 * @return Cycle graph containing @p NV vertices and
-		 *         @p NV edges.
+		 * @param NV Number of vertices.
+		 * @return Cycle graph with @p NV vertices and @p NV edges.
 		 *
-		 * @note Construction follows the graph fail-fast policy and terminates if
-		 *       @p NV is smaller than three or graph allocation fails.
+		 * @pre @p NV must be at least 3.
+		 * @warning Follows the graph initialization error policy if @p NV < 3.
 		 */
 		static Ugraph make_cycle(std::size_t NV);
 
 		/**
-		 * @brief Creates an undirected star graph centered at vertex zero.
+		 * @brief Creates a star graph.
 		 *
-		 * Constructs the star graph \f$K_{1,n-1}\f$. Vertex `0` is the center and is
-		 * adjacent to every other vertex; no edges exist between the remaining
-		 * vertices.
+		 * Returns the undirected star graph on @p NV vertices, with vertex 0
+		 * as the center and vertices `1, ..., NV-1` as leaves.
 		 *
-		 * @param	NV Total number of vertices. It must be at least one.
-		 * @return Star graph containing @p NV vertices and
-		 *         `NV	 - 1` edges.
+		 * @param NV Number of vertices.
+		 * @return Star graph with @p NV vertices and @p NV - 1 edges.
 		 *
-		 * @note Construction follows the graph fail-fast policy and terminates if
-		 *       @p NV is zero or allocation fails.
+		 * @pre @p NV must be at least 1.
+		 * @warning Follows the graph initialization error policy if @p NV == 0.
 		 */
 		static Ugraph make_star(std::size_t NV);
-
-		// @todo other named factories... (03/01/2025)
-			
-		// type aliases
-
-		using BaseT = Graph<BitsetT>;		//parent type
-
-		using bitset_type = typename BaseT::bitset_type;
-		using vertex_bitset_t = bitset_type;								// alias for semantic type
-		using VertexBitset = vertex_bitset_t;								// alias for backward compatibility
-
+					
+		
 		/////////////			
 		//construction (cannot all be inherited) / destruction 	
 		
 
-		/** @brief Constructs an empty graph with no vertices. */
+		/**
+		 * @brief Constructs an empty undirected graph.
+		 */
 		Ugraph() noexcept = default;										
 		
 		/**
@@ -112,7 +111,9 @@ namespace bitgraph {
 		 *
 		 * @note Construction follows the graph fail-fast policy.
 		 */
-		explicit Ugraph(std::size_t NV) noexcept: BaseT(NV) {}					
+		explicit Ugraph(std::size_t NV) noexcept
+			: base_t(NV)
+		{}					
 		
 		/**
 		 * @brief Constructs an undirected graph by reading it from a file.
@@ -126,7 +127,10 @@ namespace bitgraph {
 		 *       file cannot be read in a supported format.
 		 */
 		explicit Ugraph(std::string filename) noexcept
-			: BaseT() { this->reset(std::move(filename)); }	
+			: base_t() 
+		{ 
+			this->reset(std::move(filename));
+		}	
 
 		/**
 		 * @brief Constructs an undirected graph from an adjacency matrix.
@@ -140,7 +144,7 @@ namespace bitgraph {
 		 * self-loops. Entries in the lower triangle are not inspected.
 		 *
 		 * @param numVertices Number of rows and columns in @p adjacency.
-		 * @param adjacency Input adjacency matrix. A null pointer is permitted only
+		 * @param adj_matrix Input adjacency matrix. A null pointer is permitted only
 		 *        when @p numVertices is zero.
 		 * @param name Optional graph instance name or source filename.
 		 *
@@ -152,14 +156,21 @@ namespace bitgraph {
 		 * @note Construction follows the graph fail-fast policy and terminates if the
 		 *       graph cannot be represented or allocated.
 		 */
-		Ugraph(std::size_t NV, const int * const adj[], string name) noexcept;			
+		[[deprecated("Raw adjacency-matrix construction is deprecated.")]]
+		Ugraph(
+			std::size_t NV,
+			const int * const adj_matrix[],
+			std::string name = "") noexcept;
 
-		// @todo: copy constructor, move constructor, copy operator =, move operator = (1/1/2025)
+		// Copy and move semantics are allowed.
+		Ugraph(const Ugraph&) = default;
+		Ugraph& operator=(const Ugraph&) = default;
 
-		/** @brief Destroys the graph. */
+		Ugraph(Ugraph&&) noexcept = default;
+		Ugraph& operator=(Ugraph&&) noexcept = default;
+			
 		~Ugraph() override = default;
 	
-
 		/////////////
 		// setters and getters
 		

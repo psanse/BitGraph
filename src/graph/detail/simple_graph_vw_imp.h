@@ -24,8 +24,6 @@
 
 using namespace bitgraph;
 
-
-
 template<class GraphT, class WeightT>
 template<class Func>
 void Base_Graph_VW<GraphT, WeightT>::transform_weights(Func f)

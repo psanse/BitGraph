@@ -95,7 +95,10 @@ namespace bitgraph {
 	    * @note This constructor follows a fail-fast policy and terminates the program
 		*       if graph initialization fails.
 	    */
-		explicit Graph(std::size_t NV) noexcept;										
+		explicit Graph(std::size_t NV) noexcept
+		{
+			reset(NV);
+		}
 			
 		/**
 		* @brief Constructs a graph by reading it from @p filename.
@@ -103,8 +106,11 @@ namespace bitgraph {
 		* @note This constructor follows a fail-fast policy and terminates the program
 		*       if graph cannot be parsed.
 		*/
-		explicit Graph(std::string filename) noexcept;								
-
+		explicit Graph(std::string filename) noexcept
+		{
+			reset(std::move(filename));
+		}
+		
 		/**
 		 * @brief Constructs a graph from an old-style adjacency matrix.
 		 *
@@ -121,13 +127,18 @@ namespace bitgraph {
 		 * @note This constructor follows a fail-fast policy and terminates the program
 		 *       if graph initialization fails.
 		 */
-		Graph(std::size_t NV,const int * const adj[], std::string filename = "") noexcept;		
+		[[deprecated("Raw adjacency-matrix construction is deprecated.")]]
+		Graph(
+			std::size_t NV,
+			const int * const adj[],
+			std::string name = "") noexcept;		
 
-		//move and copy semantics allowed
-		Graph(const Graph& g) = default;
-		Graph& operator = (const Graph& g) = default;
-		Graph(Graph&& g) noexcept = default;
-		Graph& operator = (Graph&& g) noexcept = default;
+		// Copy and move semantics are supported.
+		Graph(const Graph&) = default;
+		Graph& operator=(const Graph&) = default;
+
+		Graph(Graph&&) noexcept = default;
+		Graph& operator=(Graph&&) noexcept = default;
 
 		virtual	~Graph() = default;
 

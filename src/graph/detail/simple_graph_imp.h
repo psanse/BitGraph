@@ -95,26 +95,13 @@ namespace bitgraph {
 		NV_(0), NBB_(0), NE_(0),edge_count_valid_(false),
 		name_(""), path_("")
 	{ }
-
-	template<class BitsetT>
-	inline
-		Graph<BitsetT>::Graph(std::string filename) noexcept
-		: Graph() 		
-	{
-		reset(std::move(filename));		
-	}
-
-	template<class BitsetT>
-	inline 
-		Graph<BitsetT>::Graph(std::size_t NV) noexcept
-		: Graph()
-	{		
-		reset(NV);
-	}
-
+			
 	template <class BitsetT>
 	inline
-		Graph<BitsetT>::Graph(std::size_t NV, const int * const adj[], std::string filename) noexcept 
+		Graph<BitsetT>::Graph(
+			std::size_t NV, 
+			const int * const adj[],
+			std::string name) noexcept 
 		: Graph()
 	{
 		// A null matrix is valid only when constructing an empty graph.
@@ -122,7 +109,7 @@ namespace bitgraph {
 
 		const vertex_t num_vertex = static_cast<vertex_t>(NV);
 
-		reset(NV, std::move(filename));
+		reset(NV, std::move(name));
 
 		for (vertex_t v = 0; v < num_vertex; ++v) {
 			assert(adj[v] != nullptr);
@@ -132,9 +119,7 @@ namespace bitgraph {
 					add_edge(v, w);
 				}
 			}
-		}
-
-		// note: the edge count NE_ is valid 
+		}		
 	}
 
 
