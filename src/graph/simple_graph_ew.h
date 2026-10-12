@@ -495,16 +495,30 @@ namespace bitgraph {
 			std::ostream& os = std::cout) const;
 
 		/**
-		* @brief Reads weighted directed graph from file in DIMACS format
+		* @brief Reads an edge-weighted graph from a file in DIMACS format
 		*
-		*			I. vertex weights are read in lines n <v> <w>, if missing, weights are set to NO_WEIGHT
+		*			I.   edges are read from lines `e <v> <w> [<weight>]` (1-based vertices);
+		*			     if no edge in the file has a weight, weights are generated with
+		*			     set_modulus_weights() (Pullan 2008); otherwise an edge with no
+		*			     weight is assigned DEFAULT_WEIGHT
 		*
-		*			II. if the file has edges with no edge weights, weights are set to NO_WEIGHT
+		*			II.  vertex-weight lines (`n`/`v`) are ignored: vertex weights are not
+		*			     supported and the diagonal of the weight matrix stays NO_WEIGHT
+		*
+		*			III. edges are inserted through the (virtual) add_edge(), so graph-specific
+		*			     behaviour (e.g. symmetric weights in undirected graphs) is preserved
+		*
+		* The input is rejected if the header is invalid, the number of edges differs
+		* from the header, a vertex is out of range, an edge is a self-loop, an edge
+		* weight is unreadable or equals NO_WEIGHT, or an unknown record tag is found.
 		*
 		* @param filename name of the file
 		* @returns 0 if success, -1 if error
-		* 
-		* TODO - Check (12/10/2026)
+		*
+		* @note On failure the graph is reset to an empty state.
+		* @note When called from a constructor of this class, add_edge() is not
+		*       virtual: derived classes with different add_edge() semantics must
+		*       call read_dimacs() from their own constructors.
 		**/
 		int read_dimacs(const std::string& filename);
 		

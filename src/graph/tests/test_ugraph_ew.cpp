@@ -122,19 +122,50 @@ TEST(UGraphEW, constructor_file) {
 	EXPECT_EQ(5, ugew.num_vertices());
 	EXPECT_EQ(5, ugew.num_edges());
 
-	//all vertex weights 
-	EXPECT_EQ(10, ugew.weight(0, 0));
-	EXPECT_EQ(20, ugew.weight(1, 1));
-	EXPECT_EQ(30, ugew.weight(2, 2));
-	EXPECT_EQ(40, ugew.weight(3, 3));
-	EXPECT_EQ(50, ugew.weight(4, 4));
+	//vertex weights in the file are ignored: the diagonal is always NO_WEIGHT
+	for (vertex_t v = 0; v < 5; ++v) {
+		EXPECT_EQ(ugraph_ewi::NO_WEIGHT, ugew.weight(v, v));
+	}
 
-	//all (undirected) edge weights
+	//all (undirected) edge weights, in both directions
 	EXPECT_EQ(27, ugew.weight(0, 1));
 	EXPECT_EQ(37, ugew.weight(0, 2));
 	EXPECT_EQ(47, ugew.weight(0, 3));
 	EXPECT_EQ(57, ugew.weight(2, 4));
 	EXPECT_EQ(67, ugew.weight(3, 4));
+
+	EXPECT_EQ(27, ugew.weight(1, 0));
+	EXPECT_EQ(37, ugew.weight(2, 0));
+	EXPECT_EQ(47, ugew.weight(3, 0));
+	EXPECT_EQ(57, ugew.weight(4, 2));
+	EXPECT_EQ(67, ugew.weight(4, 3));
+
+	EXPECT_TRUE(ugew.is_consistent());
+}
+
+TEST(UGraphEW, constructor_file_no_weights_generates_modulus_weights) {
+	const std::string name = "bitgraph_ugew_mod.clq";
+	{
+		std::ofstream f(name.c_str());
+		f << "p edge 3 2\ne 1 2\ne 2 3\n";
+	}
+
+	ugraph_ewi g(name);
+	std::remove(name.c_str());
+
+	EXPECT_EQ(3, g.weight(0, 1));				// 2 + (0 + 1) % 199
+	EXPECT_EQ(3, g.weight(1, 0));
+	EXPECT_EQ(5, g.weight(1, 2));				// 2 + (1 + 2) % 199
+	EXPECT_EQ(5, g.weight(2, 1));
+	EXPECT_TRUE(g.is_consistent());
+}
+
+TEST(UGraphEW, read_dimacs_symmetric_weights) {
+	ugraph_ewi g;
+	ASSERT_EQ(0, g.read_dimacs(BITGRAPH_GRAPH_TEST_DATA_DIR "toy_ew_dimacs.txt"));
+
+	EXPECT_EQ(27, g.weight(1, 0));
+	EXPECT_TRUE(g.is_consistent());
 }
 
 TEST(UGraphEW, print_edges_formats) {

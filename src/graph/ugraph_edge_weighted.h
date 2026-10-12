@@ -64,6 +64,19 @@ namespace bitgraph {
 		using base_t::Base_Graph_EW;
 
 		/**
+		 * @brief Constructs an undirected edge-weighted graph from a DIMACS file.
+		 *
+		 * Hides the inherited file constructor: reading is done here, so that the
+		 * undirected `add_edge()` (symmetric weights) is used for every edge.
+		 * On failure the graph is empty.
+		 *
+		 * @param filename Name of the DIMACS file.
+		 */
+		explicit Graph_EW(const std::string& filename) {
+			this->read_dimacs(filename);
+		}
+
+		/**
 		 * @brief Makes the base-class `set_weights` overloads visible.
 		 */
 		base_t::set_weights;

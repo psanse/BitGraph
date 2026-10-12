@@ -21,6 +21,7 @@
 #include "utils/precise_timer.h"
 
 #include <fstream>
+#include <sstream>
 #include <iostream>
 #include <cassert>							//NDEBUG should be undefined - (normally in compiler DEBUG mode)
 
@@ -125,7 +126,7 @@ bool Base_Graph_EW<GraphT, WeightT>::is_consistent() const noexcept
 
  template<class GraphT, class WeightT>
  void Base_Graph_EW<GraphT, WeightT>::initialize_edge_weights(
-	 weight_t weight = DEFAULT_WEIGHT)
+	 weight_t weight)
  {
 
 	 const std::size_t NV =
@@ -309,173 +310,128 @@ void Base_Graph_EW<GraphT, WeightT >::set_weight(
 template<class GraphT, class WeightT>
 int Base_Graph_EW<GraphT, WeightT>::read_dimacs (const std::string& filename)
 {
-		
-	std::string line;	
-		
-	std::ifstream f(filename);
-	if(!f){
+	std::ifstream input(filename);
+	if (!input) {
 		LOGG_ERROR("error when reading file ", filename,
-			" in DIMACS format - Base_Graph_EW<GraphT, WeightT>::read_dimacs");
+			" in DIMACS format - Base_Graph_EW::read_dimacs");
 		reset();
 		return -1;
 	}
 
-	//read header
-	 int nV = -1, nEdges = -1;
-	 if (io::detail::dimacs::read_dimacs_header (f, nV, nEdges) == -1)
-	 {
-		 LOG_ERROR("error when reading dimacs header / allocation - Base_Graph_EW<GraphT, WeightT>::read_dimacs");
-		 reset();		
-		 return -1;
-	 }
+	int nV = 0;
+	int nEdges = 0;
+	if (io::detail::dimacs::read_dimacs_header(input, nV, nEdges) == -1 ||
+		nV < 0 || nEdges < 0) {
+		LOG_ERROR("error when reading DIMACS header - Base_Graph_EW::read_dimacs");
+		reset();
+		return -1;
+	}
 
-	 //allocates memory for the graph - no allocation for edge-weights
-	 reset(nV);
+	// isolated vertices, all edge weights set to NO_WEIGHT
+	reset(static_cast<std::size_t>(nV));
 
-	 //skips empty lines
-	 io::detail::skip_empty_lines(f);
+	int read_edges = 0;
+	int weighted_edges = 0;
+	std::string line;
 
-	 //////////////
-	//read vertex-weights format <n> <vertex index> <weight> if they exist
-	 int v1 = -1, v2 = -1;
-	 WeightT wv = NO_WEIGHT;
-	 
-	 //peek next non-empty character
-	 int c = f.peek();
-	 if (c == EOF) {
-		 LOG_ERROR("bizarre EOF when peeking for first char - Base_Graph_EW<GraphT, WeightT>::read_dimacs");
-		 reset();		
-		 return -1;
-	 }
-	 char next = static_cast<char>(c);
-	 
-	 switch (next) {
-	 case 'n':
-	 case 'v':									// 'v' format used by Zavalnij in evil_W benchmark 
+	while (std::getline(input, line)) {
+		std::istringstream record(line);
+		std::string token;
+		if (!(record >> token)) {
+			continue;											// empty line
+		}
 
-		 for (int n = 0; n < nV; ++n) {
-			 f >> next >> v1 >> wv;
+		/* instance specific - not DIMACS protocol */
+		if (token == "END" || token == "end") {
+			break;
+		}
 
-			 //assert
-			 if (f.bad()) {
-				 LOG_ERROR("error when reading vertex-weights - Base_Graph_EW<GraphT, WeightT>::read_dimacs");
-				 reset();				
-				 return -1;
-			 }
+		const char tag = token.front();
 
-			 //non-positive vertex-weight check
-			 if (wv <= static_cast<WeightT>(0)) {
-				 LOGG_WARNING("non-positive weight read: ", wv, "- Base_Graph_EW<GraphT, WeightT>::read_dimacs");
-			 }
+		if (tag == 'c') {
+			continue;											// comment
+		}
 
-			 //////////////////////////
-			 edge_weights_[v1 - 1][v1 - 1] = wv;
-			 //////////////////////////
-			 
-			 // Consume rest of line
-			 std::getline(f, line);  
-		 }
+		// vertex weights are not supported in edge-weighted graphs:
+		// the diagonal of the weight matrix must remain NO_WEIGHT
+		if (tag == 'n' || tag == 'v') {
+			LOGG_DEBUG("vertex weight ignored: ", line,
+				" - Base_Graph_EW::read_dimacs");
+			continue;
+		}
 
-		 // Skip possible empty lines after vertex section
-		 io::detail::skip_empty_lines(f);
-		 break;
-	 default:
-		 LOGG_DEBUG("missing vertex-weights in file ", filename, " setting unit weights - Base_Graph_EW<GraphT, WeightT>::read_dimacs");
-	 }//end of switch
-	 	
-	 /////////////////////	
-	 //read edges
-	 
-	 //read the first edge line - 4 tokens expected (e <v> <w> <edge-weight>)
-	 c = f.peek();
-	 if (c == EOF) {
-		 LOG_ERROR("bizarre EOF when peeking for first char - Base_Graph_EW<GraphT, WeightT>::read_dimacs");
-		 reset();		
-		 return -1;
-	 } 
-	 next = static_cast<char>(c);
-	 
+		if (tag != 'e') {
+			LOGG_WARNING("Bad tag found: ", tag,
+				" - Base_Graph_EW::read_dimacs");
+			reset();
+			return -1;
+		}
 
-	 if (next != 'e') {
-		 LOG_ERROR("Wrong edge format reading edges - Base_Graph_EW<GraphT, WeightT>::read_dimacs");
-		 reset();		
-		 return -1;
-	 }
+		//////////////////
+		// edge: e <v> <w> [<weight>]
 
-	 // Read first edge line to detect presence of edge weights
-	
-	 std::getline(f, line);
-	 stringstream sstr(line);
+		vertex_t first = -1;
+		vertex_t second = -1;
+		if (!(record >> first >> second) ||
+			first < 1 || first > nV ||
+			second < 1 || second > nV) {
+			LOGG_WARNING("Bad edge found (", first, ", ", second,
+				") - Base_Graph_EW::read_dimacs");
+			reset();
+			return -1;
+		}
 
-	 //determine if edge weights are present
-	 int nw = utils::number_of_words(line);
-	 bool edge_weights_found = true;
-	 switch (nw) {
-	 case 4: edge_weights_found = true;	break; 		//expected: e <v> <w> <edge-weight> 
-	 case 3: edge_weights_found = false;  break;	//expeceted: e <v> <w>  	
-	 default:
-		 LOG_ERROR("Wrong edge format - Base_Graph_EW<GraphT, WeightT>::read_dimacs");
-		 reset();		
-		 return -1;
-	 }
+		if (first == second) {
+			LOGG_WARNING("Self-loop found at vertex ", first,
+				" - Base_Graph_EW::read_dimacs");
+			reset();
+			return -1;
+		}
 
-	 WeightT we = NO_WEIGHT;
+		if (read_edges >= nEdges) {
+			LOGG_WARNING("Bizarre number of edges found: ", read_edges,
+				" - expected ", nEdges,
+				" - Base_Graph_EW::read_dimacs");
+			reset();
+			return -1;
+		}
 
-	 //parse the first edge
-	 if (edge_weights_found) {
+		// an edge with no weight is assigned DEFAULT_WEIGHT (provisionally if
+		// no edge in the file has a weight: see modulus weights below)
+		weight_t weight = DEFAULT_WEIGHT;
+		record >> std::ws;
+		if (!record.eof()) {
+			if (!(record >> weight) || weight == NO_WEIGHT) {
+				LOGG_WARNING("Bad edge weight found in line: ", line,
+					" - Base_Graph_EW::read_dimacs");
+				reset();
+				return -1;
+			}
+			++weighted_edges;
+		}
 
-		 /////////////////////////////
-		 sstr >> next >> v1 >> v2 >> we;
-		 ////////////////////////////
+		// add_edge keeps graph and weights synchronized
+		add_edge(first - 1, second - 1, weight);
+		++read_edges;
+	}
 
-		 graph_.add_edge(v1 - 1, v2 - 1);
-		 set_weight (v1 - 1, v2 - 1, we);
-	 }
-	 else {	
+	if (read_edges != nEdges) {
+		LOGG_WARNING("Wrong number of edges found: ", read_edges,
+			" - expected ", nEdges,
+			" - Base_Graph_EW::read_dimacs");
+		reset();
+		return -1;
+	}
 
-		 ///////////////////////
-		 sstr >> next >> v1 >> v2;
-		 ///////////////////////
+	// no weights found in the file: generate Pullan modulus weights
+	if (read_edges > 0 && weighted_edges == 0) {
+		LOGG_DEBUG("no edge weights found in ", filename,
+			" - generating modulus weights - Base_Graph_EW::read_dimacs");
+		set_modulus_weights();
+	}
 
-		 graph_.add_edge(v1 - 1, v2 - 1);
-		 set_weight (v1 - 1, v2 - 1, NO_WEIGHT);				//no edge-weights in file - set NO_WEIGHT value
-	 }
-	 
-	 // Parse remaining edges
-	 for (int e = 1; e < nEdges; ++e) {
-		 f >> next;
-		 if ( f.bad() || next != 'e'  ) {
-			 LOG_ERROR("Wrong edge format reading edges - Base_Graph_EW<GraphT, WeightT>::read_dimacs");
-			 reset();			
-			 return -1;
-		 }
-
-		 //add weighted edge	
-		 if (edge_weights_found) {
-
-			 /////////////////////
-			 f >> v1 >> v2 >> we;
-			 /////////////////////
-
-			 graph_.add_edge (v1 - 1, v2 - 1);
-			 set_weight (v1 - 1, v2 - 1, we);
-		 }
-		 else {
-			 ///////////////
-			 f >> v1 >> v2;
-			 ///////////////
-
-			 graph_.add_edge(v1 - 1, v2 - 1);
-			 set_weight (v1 - 1, v2 - 1, NO_WEIGHT);			//no edge-weights in file - set NO_WEIGHT value
-		 }
-
-		 // Consume rest of edge line
-		 std::getline(f, line); 
-	 }
-
-	 //name (removes path)
-	 graph_.set_name(filename);		
-	 return 0;
+	graph_.set_name(filename);
+	return 0;
 }
 
 template<class GraphT, class WeightT>
