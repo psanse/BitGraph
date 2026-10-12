@@ -144,9 +144,8 @@ TEST_F(UGraphEWTest, DISABLED_printing) {
 
 	//I/O
 	ugew.print_data();
-	ugew.print_vertex(1);	
 	ugew.print_edge(0, 1);
-	ugew.print_weights(cout, true, decltype(ugew)::EDGE);
+	ugew.print_weights(cout, true);
 
 	LOG_INFO("push any key to continue...");	
 	cin.get();

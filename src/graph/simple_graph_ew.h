@@ -509,21 +509,26 @@ namespace bitgraph {
 			bool trailing_newline = true) const;
 
 		/**
-		* @brief streams the vertex @v in format [v:(val)]
-		**/
-		std::ostream& print_vertex(int v, std::ostream& o = std::cout, bool endl = true) const;
-
-		/**
 		* @brief streams non-empty (excluding NO_WEIGHT value) weight info
 		*		 for all directed edges.
 		**/
-		std::ostream& print_weights(std::ostream& o = std::cout, bool line_format = true, int type = BOTH)	const;
-
+		std::ostream& print_weights(
+			std::ostream& os = std::cout,
+			bool line_format = true) const
+		{
+			return print_edge_weights(os, line_format);
+		}
+		
 		/**
 		* @brief streams non-empty (excluding NO_WEIGHT value)  weights
 		*		 of directed edges induced by the subgraph of vertices in lv
 		**/
-		std::ostream& print_weights(Vertices& lv, std::ostream& o = std::cout, int type = BOTH)	const;
+		std::ostream& print_weights(
+			vertex_set_t& vertices,
+			std::ostream& os = std::cout)	const
+		{
+			return print_edge_weights(vertices, os);	
+		}
 
 		
 		/////////////////////
@@ -540,19 +545,13 @@ namespace bitgraph {
 		* @param line_format: if TRUE, prints one edge per line, otherwise in matrix format
 		**/
 		virtual	std::ostream& print_edge_weights(std::ostream& o = std::cout, bool line_format = true) const;
-		std::ostream& print_vertex_weights(std::ostream& o = std::cout) const;
-
+		
 		/**
 		* @brief prints the edges of the graph induced by the vertices of lv in line format
-		* @param lv: input set of vertices of the induced subgraph
+		* @param vertices: input set of vertices of the induced subgraph
 		**/
-		virtual	std::ostream& print_edge_weights(Vertices& lv, std::ostream& o = std::cout)	const;
-
-		/**
-		* @brief prints the vertices of the vertices of lv
-		* @param lv: input set of vertices
-		**/
-		std::ostream& print_vertex_weights(Vertices& lv, std::ostream& o = std::cout) const;
+		virtual	std::ostream& print_edge_weights(vertex_set_t& vertices, std::ostream& o = std::cout)	const;
+			
 
 	protected:
 
@@ -608,7 +607,6 @@ namespace bitgraph {
 			edge_weights_.clear();
 		}
 		
-
 
 		/////////////////
 		// data members
