@@ -12,7 +12,7 @@
 #ifndef BITGRAPH_GRAPH_EDGE_WEIGHTED_GRAPH_UTILS_H
 #define BITGRAPH_GRAPH_EDGE_WEIGHTED_GRAPH_UTILS_H
 
-#include "graph/graph_edge_weighted.h"
+#include "graph/ugraph_edge_weighted.h"
 #include "graph/graph_traits.h"
 #include "utils/logger.h"
 #include "utils/sort_utils.h"

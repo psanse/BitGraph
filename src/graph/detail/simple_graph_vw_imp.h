@@ -40,11 +40,8 @@ void Base_Graph_VW<GraphT, WeightT>::transform_weights(Func f)
 template<class GraphT, class WeightT>
 void Base_Graph_VW<GraphT, WeightT>::create_complement(Base_Graph_VW& g) const
 {
-	g.set_name(name());
-	g.set_path(path());
-	g.set_weight(vertex_weights_);
-
 	graph_.create_complement(g.graph());
+	g.set_weights(vertex_weights_);
 }
 
 template<class GraphT, class WeightT>
@@ -175,9 +172,11 @@ ostream& Base_Graph_VW<GraphT, WeightT>::write_dimacs(ostream& os) const
 	for (vertex_t v = 0; v < NV; ++v ) {
 		os << "n " << v + 1 << " " << weight(v) << '\n';
 	}
-	
-	// 1-based vertex notation (dimacs)
-	// bidirectional edges 
+		
+	// TODO
+	//graph_.write_dimacs_edges(os, false);		// delegate to the specific graph type (specialization)
+
+	// Only works for directed graphs - used here for testing
 	for (vertex_t v = 0; v < NV; ++v) {
 		for (vertex_t w = 0; w < NV; ++w) {
 			if (v != w && graph_.is_edge(v, w)) {						//O(log) for sparse graphs: specialize

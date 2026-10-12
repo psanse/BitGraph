@@ -330,7 +330,7 @@ namespace bitgraph {
 	{
 		assert(v >= 0 && v < NV_);
 		assert(w >= 0 && w < NV_);
-				
+		
 		if (v != w && !adj_[v].is_bit(w)) {
 			adj_[v].set_bit(w);
 			++NE_;

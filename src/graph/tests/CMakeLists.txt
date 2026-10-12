@@ -8,8 +8,9 @@ add_executable (
   test_graph_utils.cpp
   test_graph.cpp
   test_ugraph.cpp
+  test_ugraph_vw.cpp
   test_graph_vw.cpp
-  test_graph_ew.cpp
+  test_ugraph_ew.cpp
   test_graph_fast_sort.cpp
   test_graph_fast_sort_vw.cpp
   test_random_graph.cpp

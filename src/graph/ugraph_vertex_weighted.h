@@ -48,7 +48,7 @@ namespace bitgraph {
 		using base_t = Base_Graph_VW<ugraph, WeightT>;
 		
 		// Inherit constructors from Base_Graph_VW.
-		using base_t::base_t;
+		using base_t::Base_Graph_VW;
 	
 		//////////////////
 		// Undirected-graph-specific interface.

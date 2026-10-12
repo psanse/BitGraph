@@ -61,7 +61,31 @@ namespace bitgraph {
 		using edge_print_format = typename base_t::edge_print_format;	
 		
 		// Inherit constructors from the base class
-		using base_t::base_t;
+		using base_t::Base_Graph_EW;
+
+		/**
+		 * @brief Makes the base-class `set_weights` overloads visible.
+		 */
+		base_t::set_weights;
+
+		/**
+		 * @brief Makes the base-class `print_edges` overloads visible.
+		 */
+		base_t::print_edges;
+
+
+		///////////////////////
+		// construction / destruction
+
+		Graph_EW() = default;
+		
+		Graph_EW(
+			const graph_t& graph,
+			const weight_matrix_t& edge_weights)
+			: base_t(graph, edge_weights)
+		{
+			validate_weight_symmetry(edge_weights);
+		}
 
 		//////////////////
 		// Undirected-graph-specific interface.
@@ -112,7 +136,7 @@ namespace bitgraph {
 		 * @warning Follows a fail-fast policy and calls `std::terminate()` if
 		 *          @p weight is `NO_WEIGHT`.
 		 */
-		void set_weights(weight_t weight = this->DEFAULT_WEIGHT) override;
+		void set_weights(weight_t weight = DEFAULT_WEIGHT) override;
 
 
 		/**
@@ -124,7 +148,7 @@ namespace bitgraph {
 		* @param MODULUS: modulus value [Pullan 2008, DEFAULT_WEIGHT_MODULUS = 200]
 		**/
 		void set_modulus_weights(
-			int modulus = this->DEFAULT_WEIGHT_MODULUS) override;
+			int modulus = DEFAULT_WEIGHT_MODULUS) override;
 			
 		/**
 		 * @brief Writes the edge-weighted graph to an output stream in DIMACS format.
@@ -197,7 +221,15 @@ namespace bitgraph {
 		 *          @p edge_weights is invalid or inconsistent with the graph.
 		 */
 		void validate_weight_matrix(
-			const weight_matrix_t& edge_weights) const override;
+			const weight_matrix_t& edge_weights)
+		{
+			this->validate_weight_matrix_base(edge_weights);
+			validate_weight_symmetry(edge_weights);
+		}
+
+		
+		void validate_weight_symmetry(
+			const weight_matrix_t& edge_weights) const;
 
 	}; //end of Graph_EW class
 
@@ -220,8 +252,8 @@ namespace bitgraph {
 // implementation in header files
 
 namespace bitgraph {
-		
-	
+
+
 	template<class WeightT>
 	void Graph_EW<ugraph, WeightT>::set_modulus_weights(int modulus)
 	{
@@ -262,7 +294,7 @@ namespace bitgraph {
 	std::ostream& Graph_EW<ugraph, WeightT>::print_edges(
 		std::ostream& os,
 		edge_print_format format,
-		bool trailing_newline) const 
+		bool trailing_newline) const
 	{
 		const vertex_t NV = this->num_vertices();
 
@@ -314,23 +346,23 @@ namespace bitgraph {
 	template<class WeightT>
 	void Graph_EW<ugraph, WeightT>::add_edge(
 		vertex_t v,
-		vertex_t w, 
-		weight_t weight) 
+		vertex_t w,
+		weight_t weight)
 	{
 		//sets undirected edge
 		this->graph_.add_edge(v, w);
 
 		//sets both weights
 		this->edge_weights_[static_cast<std::size_t>(v)]
-						   [static_cast<std::size_t>(w)] = weight;
+			[static_cast<std::size_t>(w)] = weight;
 		this->edge_weights_[static_cast<std::size_t>(w)]
-						   [static_cast<std::size_t>(v)] = weight;
+			[static_cast<std::size_t>(v)] = weight;
 	}
 
 	template <class W>
 	void Graph_EW< ugraph, W >::set_weight(
 		vertex_t v,
-		vertex_t w, 
+		vertex_t w,
 		weight_t weight)
 	{
 
@@ -387,7 +419,7 @@ namespace bitgraph {
 				this->edge_weights_[static_cast<std::size_t>(w)]
 					[static_cast<std::size_t>(v)] = edge_weight;
 			}
-		}	
+		}
 	}
 
 
@@ -416,14 +448,14 @@ namespace bitgraph {
 		for (vertex_t v = 0; v < NV - 1; ++v) {
 			for (vertex_t w = v + 1; w < NV; ++w) {
 				if (this->graph_.is_edge(v, w)) {														//O(log) for sparse graphs: specialize
-					os << "e " 
-					   << v + 1
-					   << " "
-					   << w + 1
-					   << " "
-					   << this->edge_weights_[static_cast<std::size_t>(v)]
-											[static_cast<std::size_t>(w)] 
-					   << '\n';	
+					os << "e "
+						<< v + 1
+						<< " "
+						<< w + 1
+						<< " "
+						<< this->edge_weights_[static_cast<std::size_t>(v)]
+						[static_cast<std::size_t>(w)]
+						<< '\n';
 				}
 			}
 		}
@@ -435,7 +467,7 @@ namespace bitgraph {
 	std::ostream& Graph_EW<ugraph, WeightT>::print_edge(
 		vertex_t v,
 		vertex_t w,
-		std::ostream& os, 
+		std::ostream& os,
 		bool trailing_newline) const
 	{
 		if (graph_.is_edge(v, w)) {
@@ -458,16 +490,11 @@ namespace bitgraph {
 	}
 
 	template<class WeightT>
-	void Graph_EW<ugraph, WeightT>::validate_weight_matrix(
+	void Graph_EW<ugraph, WeightT>::validate_weight_symmetry(
 		const weight_matrix_t& edge_weights) const
 	{
-				
-		// Validate dimensions and consistency with the graph topology.
-		base_t::validate_weight_matrix(edge_weights);
-		 
 		const vertex_t NV = this->graph_.num_vertices();
 
-		// Undirected edges must have symmetric weights.
 		for (vertex_t v = 0; v < NV; ++v) {
 			for (vertex_t w = v + 1; w < NV; ++w) {
 
@@ -478,14 +505,15 @@ namespace bitgraph {
 					[static_cast<std::size_t>(v)]) {
 
 					LOG_ERROR(
-						"Asymmetric edge weights in undirected graph - "
-						"Graph_EW<ugraph>::validate_weight_matrix");
+						"Asymmetric edge weights - "
+						"Graph_EW<ugraph>::validate_weight_symmetry");
 					std::terminate();
 				}
 			}
-		}	
+		}
 	}
-}
+} // end of namespace bitgraph
+
 
 
 

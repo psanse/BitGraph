@@ -28,7 +28,7 @@
 using namespace bitgraph;
 
 template<class GraphT, class WeightT>
-void Base_Graph_EW<GraphT, WeightT>::validate_weight_matrix(
+void Base_Graph_EW<GraphT, WeightT>::validate_weight_matrix_base(
 	const weight_matrix_t& edge_weights) const
 {
 	const std::size_t NV =
@@ -206,7 +206,7 @@ template<class GraphT, class WeightT>
 void Base_Graph_EW<GraphT, WeightT>::set_weights(
 	const weight_matrix_t& edge_weights)
 {
-	validate_weight_matrix(edge_weights);
+	validate_weight_matrix_base(edge_weights);
 	edge_weights_ = edge_weights;
 }
 

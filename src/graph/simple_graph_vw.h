@@ -436,16 +436,16 @@ namespace bitgraph {
 		// other operations
 
 		/**
-		 * @brief Creates the complement of the vertex-weighted graph.
+		 * @brief Creates the complement graph.
 		 *
-		 * The resulting graph has the complementary topology and preserves the
-		 * vertex weights, name, and path of the original graph.
+		 * Builds in @p g the complement of the current graph, preserving the
+		 * vertex weights. The resulting graph has the same vertex set and vertex
+		 * weights as the current graph, while its edge set is replaced by the
+		 * complement edge set.
 		 *
-		 * @param g Output graph containing the complement.
+		 * The name of @p g is cleared.
 		 *
-		 * @note Prefer the value-returning `create_complement()` overload in new code.
-		 *       This output-parameter overload is retained for internal use and
-		 *       backward compatibility.
+		 * @param g Destination graph receiving the complement.
 		 */
 		void create_complement(Base_Graph_VW& g) const;
 
@@ -467,13 +467,22 @@ namespace bitgraph {
 		// I/O
 	
 		/**
-		 * @brief Writes the vertex-weighted graph to an output stream in DIMACS format.
+		 * @brief Writes the vertex-weighted graph in DIMACS format.
 		 *
-		 * Vertex weights are written as `n <v> <weight>` records and edges using
-		 * DIMACS edge records. Vertex identifiers are 1-based. Self-loops are ignored.
+		 * Writes graph metadata, vertex weights, and directed edges to @p os
+		 * using 1-based vertex identifiers.
+		 *
+		 * This generic implementation assumes a directed graph representation,
+		 * where each adjacency entry corresponds to a distinct directed edge.
+		 * Graph types with different edge semantics, such as undirected graphs,
+		 * must override this function.
 		 *
 		 * @param os Output stream.
 		 * @return Reference to @p os.
+		 *
+		 * @note IMPORTANT! This implementation is intended for directed graph types.
+		 *       Undirected graph specializations must provide their own
+		 *       implementation to avoid writing each edge twice.
 		 */
 		virtual ostream& write_dimacs(std::ostream& os = std::cout) const;
 			
@@ -651,7 +660,7 @@ namespace bitgraph {
 		*
 		* @note Intended for derived classes and internal algorithms.
 		*/
-		std::vector<weight_t>& weights() noexcept {
+		std::vector<weight_t>& mutable_weights() noexcept {
 			return vertex_weights_;
 		}
 

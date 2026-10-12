@@ -269,9 +269,12 @@ namespace bitgraph {
 
 	template<class BitsetT>
 	inline
-		void Ugraph<BitsetT>::add_edge(int v, int w) {
-
-		if (v != w) {
+		void Ugraph<BitsetT>::add_edge(int v, int w)
+	{
+		assert(v >= 0 && v < NV_);
+		assert(w >= 0 && w < NV_);
+		
+		if (v != w && !adj_[v].is_bit(w)) {
 			this->adj_[v].set_bit(w);
 			this->adj_[w].set_bit(v);
 			this->NE_++;

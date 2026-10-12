@@ -134,7 +134,7 @@ namespace bitgraph {
 			: graph_(graph),
 			edge_weights_(edge_weights)		
 		{
-			validate_weight_matrix();
+			validate_weight_matrix_base();
 		}
 
 		/**
@@ -594,7 +594,7 @@ namespace bitgraph {
 		 * @warning Follows a fail-fast policy and calls `std::terminate()` if
 		 *          @p edge_weights is invalid or inconsistent with the graph.
 		 */
-		virtual void validate_weight_matrix(
+		virtual void validate_weight_matrix_base(
 			const weight_matrix_t& edge_weights) const;
 
 
@@ -607,8 +607,8 @@ namespace bitgraph {
 		 * @warning Follows a fail-fast policy and calls `std::terminate()` if the
 		 *          current edge-weight matrix is invalid or inconsistent with the graph.
 		 */
-		void validate_weight_matrix() const {
-			validate_weight_matrix(edge_weights_);
+		void validate_weight_matrix_base() const {
+			validate_weight_matrix_base(edge_weights_);
 		}
 			
 		/**
@@ -630,7 +630,7 @@ namespace bitgraph {
 		*
 		* @note Intended for derived classes and internal algorithms.
 		*/
-		weight_matrix_t& weights() noexcept {
+		weight_matrix_t& mutable_weights() noexcept {
 			return edge_weights_;
 		}
 

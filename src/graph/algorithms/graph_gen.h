@@ -43,7 +43,7 @@
 
 #include "utils/path_utils.h"
 #include "graph/ugraph_vertex_weighted.h"						// facade types 
-#include "graph/graph_edge_weighted.h"							// facade types 
+#include "graph/ugraph_edge_weighted.h"							// facade types 
 #include "graph_fast_sort.h"
 
 #include <iostream>

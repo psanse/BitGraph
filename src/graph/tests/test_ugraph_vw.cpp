@@ -1,16 +1,16 @@
 /**
- * @file test_graph_vw.cpp
- * @brief Unit tests for vertex-weighted graph classes.
+ * @file test_ugraph_vw.cpp
+ * @brief Unit tests for vertex-weighted undirected graphs.
  *
- * Contains tests for construction, assignment, graph initialization,
- * vertex weights, weight transformations, DIMACS I/O, and graph generation
- * for vertex-weighted graph types.
+ * Contains GoogleTest-based tests for construction, assignment,
+ * graph initialization, vertex weights, weight transformations,
+ * DIMACS I/O, and graph generation for `Graph_VW<ugraph, WeightT>`.
  *
- * @author pss
+ * @author Pablo San Segundo (pss)
  *
  * @details Created 09/10/2016, last updated 10/10/2026.
- * 
- * TODO: check tests at the end of the file (some are disabled) 
+ *
+ * @todo Review the tests at the end of the file; some are currently disabled.
  */
 
 #include "graph/ugraph_vertex_weighted.h"
