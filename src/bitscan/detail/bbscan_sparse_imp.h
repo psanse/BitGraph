@@ -1,16 +1,19 @@
 /**
  * @file bbscan_sparse_imp.h
- * @brief header for sparse class equivalent to the BBScan class
- *		  manages sparse bit strings with efficient bitscanning capabilities
- * @author pss
- * @details: created 2012, last_update 25/02/2025
+ * @brief Implementation of the BBScanSp class for sparse bitsets.
  *
- * TODO refactoring and testing 25/02/2025
- **/
+ * Provides efficient bit-scanning operations on sparse bitsets,
+ * including forward, reverse, destructive, and non-destructive scanning.
+ *
+ * @author pss
+ * @date Created 2012
+ * @date Last updated 25/02/2025
+ *
+ * @todo Refactor and extend unit tests (25/02/2025).
+ */
 
 #ifndef BITGRAPH_BITSCAN_BBSCAN_SPARSE_IMP_H
 #define BITGRAPH_BITSCAN_BBSCAN_SPARSE_IMP_H
-
 
 
 namespace bitgraph {

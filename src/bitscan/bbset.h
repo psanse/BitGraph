@@ -1115,7 +1115,7 @@ namespace bitgraph {
 
 		/**
 		* @brief Determines if the bitstring has all 0-bits in the closed range [firstBlock, lastBlock]
-		*		  If lastBlock == npos the range is [firstBlock, nBB_]
+		*		 If lastBlock == npos the range is [firstBlock, nBB_]
 		*
 		* @param firstBlock, lastBlock: range of blocks (0<=firstBlock<=lastBlock<nBB_).
 		* @returns TRUE if the bitstring has all 0-bits in the given range
