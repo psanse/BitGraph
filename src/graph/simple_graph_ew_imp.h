@@ -471,7 +471,7 @@ namespace bitgraph {
 
 	template<class GraphT, class WeightT>
 	std::ostream& Base_Graph_EW<GraphT, WeightT>::print_edges(
-		constvertex_set_t& vertices,
+		const vertex_set_t& vertices,
 		std::ostream& os) const
 	{
 		const std::size_t vertex_count = vertices.size();

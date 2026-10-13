@@ -301,6 +301,45 @@ TEST_F(BaseGraphEWTest, add_edge_existing_replaces_weight) {
 	EXPECT_TRUE(g.is_consistent());
 }
 
+#ifndef NDEBUG
+// add_edge validates its arguments with assert(): death tests only apply in Debug
+TEST_F(BaseGraphEWTest, add_edge_invalid_aborts) {
+	EXPECT_DEATH(g.add_edge(2, 2, 5), "");						// self-loop
+	EXPECT_DEATH(g.add_edge(0, 4, ew_int::NO_WEIGHT), "");		// NO_WEIGHT
+}
+#endif
+
+TEST_F(BaseGraphEWTest, num_edges_const) {
+	const ew_int& cg = g;
+
+	EXPECT_EQ(4u, cg.num_edges());
+	EXPECT_EQ(4u, cg.num_edges(false));
+}
+
+namespace {
+	// exposes the protected initialize_edge_weights()
+	struct EWInit : public ew_int {
+		explicit EWInit(const ew_int::graph_t& dg) : ew_int(dg) {}
+		using ew_int::initialize_edge_weights;
+	};
+}
+
+TEST(BaseGraphEW, initialize_edge_weights_custom_weight) {
+	graph dg(3);
+	dg.add_edge(0, 1);
+	dg.add_edge(2, 1);
+
+	EWInit g(dg);
+	g.initialize_edge_weights(7);
+
+	EXPECT_EQ(7, g.weight(0, 1));
+	EXPECT_EQ(7, g.weight(2, 1));
+	EXPECT_EQ(N, g.weight(1, 0));						// non-edge
+	EXPECT_EQ(N, g.weight(1, 1));						// diagonal
+	EXPECT_FALSE(g.is_unit_weighted());
+	EXPECT_TRUE(g.is_consistent());
+}
+
 TEST_F(BaseGraphEWTest, set_weight) {
 	g.set_weight(1, 3, 11);
 
