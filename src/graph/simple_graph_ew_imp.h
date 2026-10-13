@@ -246,7 +246,7 @@ namespace bitgraph {
 
 	template<class GraphT, class WeightT>
 	void Base_Graph_EW<GraphT, WeightT>::reset(
-		std::size_t NV, string name) noexcept
+		std::size_t NV, std::string name) noexcept
 	{
 		try {
 			graph_.reset(NV);

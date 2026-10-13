@@ -192,7 +192,7 @@ namespace bitgraph {
 		 *          graph or its edge-weight matrix cannot be reinitialized.
 		 */
 		void reset(std::size_t NV,
-			string name = "") noexcept;
+			std::string name = "") noexcept;
 
 
 		/////////////
@@ -218,7 +218,7 @@ namespace bitgraph {
 		virtual	void set_weight(
 			vertex_t v, 
 			vertex_t w,
-			weight_t val);
+			weight_t weight);
 
 		/**
 		 * @brief Sets all existing edge weights to the same value.
@@ -362,7 +362,7 @@ namespace bitgraph {
 			return graph_.size();
 		}
 
-		std::size_t num_edges(bool lazy = true) {
+		std::size_t num_edges(bool lazy = true) const {
 			return graph_.num_edges(lazy);
 		}
 
@@ -528,7 +528,7 @@ namespace bitgraph {
 		 * @brief Prints graph information to an output stream.
 		 *
 		 * Prints the underlying graph data and appends a tag identifying the graph
-		 * as vertex-weighted.
+		 * as edge-weighted.
 		 *
 		 * @param lazy Passed to the underlying graph `print_data()` operation.
 		 * @param os Output stream.
@@ -640,9 +640,9 @@ namespace bitgraph {
 			weight_t weight = DEFAULT_WEIGHT);
 
 		/**
-		* @brief Returns mutable access to the vertex-weight vector.
+		* @brief Returns mutable access to the edge-weight matrix.
 		*
-		* @return Reference to the internal vertex-weight vector.
+		* @return Reference to the internal edge-weight matrix.
 		*
 		* @note Intended for derived classes and internal algorithms.
 		*/
