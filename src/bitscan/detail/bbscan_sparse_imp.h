@@ -18,7 +18,7 @@
 
 namespace bitgraph {
 
-	inline int BBScanSp::next_bit()
+	inline int BBScanSp::next_bit() const
 	{
 
 		if (!has_valid_cursor()) {
@@ -94,7 +94,7 @@ namespace bitgraph {
 		return BBObject::noBit;
 	}
 
-	inline int BBScanSp::prev_bit() 
+	inline int BBScanSp::prev_bit() const
 	{
 
 		if (!has_valid_cursor()) {
@@ -331,17 +331,34 @@ namespace bitgraph {
 		pair<bool, int> p = find_block_pos(bbL);
 		///////////////////////////////////////////////////
 
-		//no blocks with index greater or equal to bbL, nothing to scan
-		if (p.second == BBObject::noBit) {
-			invalidate_scan();
-			return;
-		}
 
+		//p.second: position of the first block with index >= bbL (noBit if there is none)
 		switch (sct) {
 		case NON_DESTRUCTIVE:
-		case NON_DESTRUCTIVE_REVERSE:
+			//no blocks with index greater or equal to bbL, nothing to scan
+			if (p.second == BBObject::noBit) {
+				invalidate_scan();
+				return;
+			}
 			scan_block(p.second);
 			(p.first) ? scan_bit(firstBit - WMUL(bbL)) : scan_bit(MASK_LIM);
+			break;
+		case NON_DESTRUCTIVE_REVERSE:
+			if (p.first) {
+				//block of firstBit exists: scan its bits below firstBit, then the previous blocks
+				scan_block(p.second);
+				scan_bit(firstBit - WMUL(bbL));
+			}
+			else {
+				//block of firstBit is absent: start at the last block with a lower index (all of its bits)
+				const int pos = (p.second == BBObject::noBit) ? static_cast<int>(vBB_.size()) : p.second;
+				if (pos == 0) {
+					invalidate_scan();				//no blocks with index lower than bbL
+					return;
+				}
+				scan_block(pos - 1);
+				scan_bit(WORD_SIZE);
+			}
 			break;
 		case DESTRUCTIVE:
 		case DESTRUCTIVE_REVERSE:

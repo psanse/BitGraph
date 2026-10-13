@@ -14,7 +14,8 @@
 
 #include "bbsentinel.h"      // Non-sparse hierarchy
 #include "bbscan_sparse.h"   // Sparse hierarchy
-#include "bbscan_view.h"     // Independent scan views
+#include "bbscan_view.h"     // Independent scan views (non-sparse)
+#include "bbscan_view_sparse.h" // Independent scan views (sparse)
 #include "bbutils.h"         // Basic bitset algorithms
 
 namespace bitgraph {
@@ -60,12 +61,20 @@ namespace bitgraph {
 	namespace view {
 
 		// Facade aliases for the independent scanning views, which are not tied to a specific bitset type.
-		// currently only of non-sparse bitsets (bitgraph::bitarray), but to be extended to sparse bitsets in the future.
+		// scan..scanDR: non-sparse bitsets (bitgraph::bitarray); view::sparse::scan..scanDR: sparse bitsets (bitgraph::sparse_bitarray).
 
 		using scan = bitgraph::view::Forward;
 		using scanR = bitgraph::view::Reverse;
 		using scanD = bitgraph::view::DestructiveForward;
-		using scanDR = bitgraph::view::DestructiveReverse;	
+		using scanDR = bitgraph::view::DestructiveReverse;
+
+		// Same for sparse bitsets (bitgraph::sparse_bitarray)
+		namespace sparse {
+			using scan = bitgraph::view::ForwardSp;
+			using scanR = bitgraph::view::ReverseSp;
+			using scanD = bitgraph::view::DestructiveForwardSp;
+			using scanDR = bitgraph::view::DestructiveReverseSp;
+		}
 
 	} // namespace view
 } // namespace bitgraph

@@ -55,7 +55,35 @@ namespace bitgraph {
 				
 		using BitsetSp::BitsetSp;		//inherit constructors
 
-		//TODO...check copy and move assignments - should be forbidden
+		BBScanSp() = default;			//not implicitly declared once copy/move constructors are user-provided
+
+		/**
+		* @brief Copy constructor: copies the bitstring only.
+		* @details A newly constructed BBScanSp never inherits an active scan from
+		*          another object: its scan cursor is default-initialized (no scan).
+		**/
+		BBScanSp(const BBScanSp& other) : BitsetSp(other), scan_() {}
+
+		/**
+		* @brief Move constructor: moves the bitstring only. Same rule as the copy constructor.
+		**/
+		BBScanSp(BBScanSp&& other) noexcept : BitsetSp(std::move(other)), scan_() {}
+
+		/**
+		* @brief Copy assignment: copies the bitstring only.
+		* @details The scan cursor of this object is left untouched; the cursor of
+		*          @other is never transferred (same rule as BBScan).
+		**/
+		BBScanSp& operator=(const BBScanSp& other) {
+			BitsetSp::operator=(other);
+			return *this;
+		}
+
+		/** @brief Move assignment: moves the bitstring only. Same rule as the copy assignment. */
+		BBScanSp& operator=(BBScanSp&& other) noexcept {
+			BitsetSp::operator=(std::move(other));
+			return *this;
+		}
 
 		~BBScanSp() = default;
 
@@ -127,7 +155,7 @@ namespace bitgraph {
 		* @details Since the scan does not delete the scanned bit from the bitstring,
 		*		   it has to cache the last scanned bit for the next call
 		**/
-		inline int next_bit();
+		inline int next_bit() const;
 		inline int next_bit(BBScanSp& bitset);
 
 		/**
@@ -166,7 +194,7 @@ namespace bitgraph {
 		* @details Since the scan does not delete the scanned bit from the bitstring,
 		*		   it has to cache the last scanned bit for the next call
 		**/
-		inline int prev_bit();
+		inline int prev_bit() const;
 		inline int prev_bit(BBScanSp& bitset);
 
 		/////////////////
@@ -193,14 +221,15 @@ namespace bitgraph {
 			scan_bit(BBObject::noBit);
 		}
 
+		/** @brief TRUE if the cursor points to an existing block (also false after the blocks were removed). One unsigned comparison. */
 		bool has_valid_cursor() const noexcept {
-			return scan_.bbi_ != BBObject::noBit;
+			return static_cast<std::size_t>(scan_.bbi_) < vBB_.size();
 		}
 
 	//////////////////
 	// data members
 
-		scan_t scan_;
+		mutable scan_t scan_;		// mutable: non-destructive scans can be run on a const object (same as BBScan)
 	};
 
 }//end namespace bitgraph
