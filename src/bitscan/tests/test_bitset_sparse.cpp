@@ -9,9 +9,12 @@
 **/
 
 #include "bitscan/bbscan_sparse.h"
+#include "bitscan/bbset.h"
 #include "gtest/gtest.h"
 #include <iostream>
 #include <algorithm>
+#include <random>
+#include <type_traits>
 
 using namespace std;
 using namespace bitgraph;
@@ -1065,4 +1068,307 @@ TEST(BitsetSp_api, extract_functions) {
 	BitsetSp be(300);
 	be.extract_array(arr, sz);
 	EXPECT_EQ(0u, sz);
+}
+
+
+//////////////////////////////////////////////
+// Step 7 (performance work): regression tests of the rewritten functions
+
+TEST(BitsetSp_perf, next_prev_bit_with_gaps_and_zero_blocks) {
+	BitsetSp bb(1000, { 5, 63, 64, 300, 301, 700, 999 });
+	bb.set(450).erase_bit(450);					//zero block in the middle
+
+	std::vector<int> fwd, bwd;
+	for (int v = bb.next_bit(BBObject::noBit); v != BBObject::noBit; v = bb.next_bit(v)) fwd.push_back(v);
+	for (int v = bb.prev_bit(BBObject::noBit); v != BBObject::noBit; v = bb.prev_bit(v)) bwd.push_back(v);
+
+	EXPECT_EQ((std::vector<int>{ 5, 63, 64, 300, 301, 700, 999 }), fwd);
+	EXPECT_EQ((std::vector<int>{ 999, 700, 301, 300, 64, 63, 5 }), bwd);
+
+	//starting points which are not set bits, in missing blocks and in zero blocks
+	EXPECT_EQ(300, bb.next_bit(200));			//block 3 absent -> next non-empty
+	EXPECT_EQ(700, bb.next_bit(450));			//zero block
+	EXPECT_EQ(BBObject::noBit, bb.next_bit(999));
+	EXPECT_EQ(301, bb.prev_bit(450));
+	EXPECT_EQ(BBObject::noBit, bb.prev_bit(5));
+	EXPECT_EQ(5, bb.prev_bit(63));
+
+	BitsetSp be(100);
+	EXPECT_EQ(BBObject::noBit, be.next_bit(BBObject::noBit));
+	EXPECT_EQ(BBObject::noBit, be.next_bit(10));
+	EXPECT_EQ(BBObject::noBit, be.prev_bit(10));
+}
+
+TEST(BitsetSp_perf, or_eq_interleaved_and_edge_cases) {
+	auto bits = [](const BitsetSp& b) { return static_cast<bitpos_list>(b); };
+
+	BitsetSp a(500, { 1, 130, 300, 450 });
+	BitsetSp b(500, { 2, 70, 130, 200, 499 });
+	a |= b;
+	EXPECT_EQ((bitpos_list{ 1, 2, 70, 130, 200, 300, 450, 499 }), bits(a));
+
+	BitsetSp e(500);							//empty this
+	e |= b;
+	EXPECT_EQ(bits(b), bits(e));
+
+	BitsetSp c(b);
+	c |= BitsetSp(500);						//empty rhs
+	EXPECT_EQ(bits(b), bits(c));
+
+	c |= c;									//self
+	EXPECT_EQ(bits(b), bits(c));
+
+	BitsetSp lo(500, { 1, 2 }), hi(500, { 400, 401 });	//rhs entirely after / before
+	BitsetSp x(lo); x |= hi;
+	EXPECT_EQ((bitpos_list{ 1, 2, 400, 401 }), bits(x));
+	BitsetSp y(hi); y |= lo;
+	EXPECT_EQ((bitpos_list{ 1, 2, 400, 401 }), bits(y));
+	for (std::size_t i = 1; i < y.bitset().size(); ++i) {
+		EXPECT_LT(y.bitset()[i - 1].idx_, y.bitset()[i].idx_);		//still sorted
+	}
+}
+
+TEST(BitsetSp_perf, set_bit_orders) {
+	BitsetSp inc(500), dec(500), mix(500);
+	for (int v = 0; v < 500; v += 7) inc.set_bit(v);
+	for (int v = 497; v >= 0; v -= 7) dec.set_bit(v);
+	EXPECT_EQ(static_cast<bitpos_list>(inc), static_cast<bitpos_list>(dec));
+	for (int v : { 400, 3, 200, 3, 450, 64, 63 }) mix.set_bit(v);
+	EXPECT_EQ((bitpos_list{ 3, 63, 64, 200, 400, 450 }), static_cast<bitpos_list>(mix));
+}
+
+TEST(BitsetSp_perf, xor_eq_and_extract) {
+	auto bits = [](const BitsetSp& b) { return static_cast<bitpos_list>(b); };
+
+	BitsetSp a(500, { 1, 130, 300, 450 });
+	BitsetSp b(500, { 2, 70, 130, 200, 450, 499 });
+	BitsetSp x(a);
+	x ^= b;
+	EXPECT_EQ((bitpos_list{ 1, 2, 70, 200, 300, 499 }), bits(x));
+
+	BitsetSp e(500);
+	e ^= b;
+	EXPECT_EQ(bits(b), bits(e));
+
+	BitsetSp c(b);
+	c ^= BitsetSp(500);
+	EXPECT_EQ(bits(b), bits(c));
+
+	c ^= c;										//self: empty
+	EXPECT_TRUE(c.is_empty());
+	EXPECT_EQ(0, c.count());
+
+	BitsetSp y(a);
+	y ^= a;
+	EXPECT_TRUE(y.is_empty());
+
+	//sorted after a merge with new blocks
+	BitsetSp lo(500, { 1 }), hi(500, { 400 });
+	hi ^= lo;
+	ASSERT_EQ(2u, hi.bitset().size());
+	EXPECT_LT(hi.bitset()[0].idx_, hi.bitset()[1].idx_);
+
+	//extract with zero blocks, and a reused (non-empty) output vector
+	BitsetSp z(500, { 5, 100, 400 });
+	z.erase_bit(100);
+	bitpos_list out = { 9, 9, 9 };
+	z.extract(out);
+	EXPECT_EQ((bitpos_list{ 5, 400 }), out);
+	BitsetSp ze(100);
+	ze.extract(out);
+	EXPECT_TRUE(out.empty());
+}
+
+
+//////////////////////////////////////////////
+// Additional tests of the Bitset-compatible API
+
+TEST(BitsetSp_api, assign_bit_edge_cases) {
+	auto bits = [](const BitsetSp& b) { return static_cast<bitpos_list>(b); };
+
+	//empty rhs empties THIS but keeps its population size
+	BitsetSp dst(200, { 5, 100 });
+	dst.assign_bit(BitsetSp(200));
+	EXPECT_TRUE(dst.is_empty());
+	EXPECT_EQ(4u, dst.num_blocks());
+
+	//THIS larger than rhs: takes the blocks of rhs, keeps its own population size
+	BitsetSp big(500, { 400 });
+	BitsetSp small(100, { 3, 70 });
+	big.assign_bit(small);
+	EXPECT_EQ((bitpos_list{ 3, 70 }), bits(big));
+	EXPECT_EQ(8u, big.num_blocks());
+
+	//zero blocks in rhs are copied as zero blocks (the bitstring is the same)
+	BitsetSp rhs(200, { 5, 100 });
+	rhs.erase_bit(100);
+	BitsetSp t(200, { 150 });
+	t.assign_bit(rhs);
+	EXPECT_EQ((bitpos_list{ 5 }), bits(t));
+	EXPECT_EQ(1, t.count());
+
+	//the blocks in THIS stay sorted after dropping blocks of a larger rhs
+	BitsetSp r2(300, { 1, 70, 130, 250 });
+	BitsetSp t2(140);
+	t2.assign_bit(r2);
+	EXPECT_EQ((bitpos_list{ 1, 70, 130 }), bits(t2));
+
+	//rhs is not modified
+	EXPECT_EQ((bitpos_list{ 1, 70, 130, 250 }), bits(r2));
+}
+
+TEST(BitsetSp_api, erase_bit_returns_reference) {
+	BitsetSp bb(200, { 1, 2, 100 });
+	BitsetSp& ref = bb.erase_bit();
+	EXPECT_EQ(&bb, &ref);
+	EXPECT_TRUE(bb.is_empty());
+	EXPECT_EQ(4u, bb.num_blocks());
+
+	bb.set(7).set(8).clear(7);					//chaining
+	EXPECT_EQ((bitpos_list{ 8 }), static_cast<bitpos_list>(bb));
+	EXPECT_EQ(&bb, &bb.clear_all());
+	EXPECT_EQ(&bb, &bb.erase_all_bits());
+}
+
+TEST(BitsetSp_api, signature_properties) {
+	//queries which cannot throw
+	BitsetSp b(10);
+	const BitsetSp cb(10);
+	EXPECT_TRUE(noexcept(cb.is_bit(1)));
+	EXPECT_TRUE(noexcept(cb.test(1)));
+	EXPECT_TRUE(noexcept(cb.next_bit(1)));
+	EXPECT_TRUE(noexcept(cb.prev_bit(1)));
+	EXPECT_TRUE(noexcept(cb.is_empty()));
+	EXPECT_TRUE(noexcept(cb.is_disjoint(cb)));
+	EXPECT_TRUE(noexcept(cb.is_singleton()));
+	EXPECT_TRUE(noexcept(cb.find_first_common(cb)));
+	EXPECT_TRUE(noexcept(cb.count()));
+	EXPECT_TRUE(noexcept(b.erase_bit()));
+
+	//no implicit conversion to a vector of bits, an explicit one exists
+	EXPECT_FALSE((std::is_convertible<BitsetSp, bitpos_list>::value));
+	EXPECT_TRUE((std::is_constructible<bitpos_list, BitsetSp>::value));
+
+	//same return types as Bitset for the shared queries
+	EXPECT_TRUE((std::is_same<decltype(cb.is_singleton()), decltype(Bitset(10).is_singleton())>::value));
+	EXPECT_TRUE((std::is_same<decltype(cb.find_first_common(cb)), decltype(Bitset(10).find_first_common(Bitset(10)))>::value));
+	EXPECT_TRUE((std::is_same<decltype(cb.count()), decltype(Bitset(10).count())>::value));
+	EXPECT_TRUE((std::is_same<decltype(b.set(1)), BitsetSp&>::value));
+}
+
+TEST(BitsetSp_api, zero_blocks_in_queries) {
+	BitsetSp a(300, { 1, 100, 200 });
+	BitsetSp b(300, { 100, 250 });
+	a.set(150).erase_bit(150);					//zero blocks in both operands
+	b.set(20).erase_bit(20);
+
+	EXPECT_EQ(100, a.find_first_common(b));
+	EXPECT_FALSE(a.is_disjoint(b));
+	a.erase_bit(100);
+	EXPECT_EQ(BBObject::noBit, a.find_first_common(b));
+	EXPECT_TRUE(a.is_disjoint(b));
+
+	BitsetSp z(300, { 7 });
+	z.erase_bit(7);								//only a zero block
+	EXPECT_TRUE(z.is_empty());
+	EXPECT_EQ(0, z.is_singleton());
+	EXPECT_EQ(BBObject::noBit, z.find_first_common(b));
+	EXPECT_EQ(BBObject::noBit, z.next_bit(BBObject::noBit));
+	EXPECT_EQ(BBObject::noBit, z.prev_bit(BBObject::noBit));
+	EXPECT_EQ(0, z.count());
+}
+
+//////////////////////////////////////////////
+// Differential test: BitsetSp must behave as Bitset for the shared API
+
+namespace {
+
+	struct Pair {
+		Bitset d;
+		BitsetSp s;
+		explicit Pair(int nPop) : d(nPop), s(nPop) {}
+	};
+
+	void fill(Pair& p, std::mt19937& rng, int nPop, int nbits) {
+		std::uniform_int_distribution<int> pos(0, nPop - 1);
+		for (int i = 0; i < nbits; ++i) {
+			const int v = pos(rng);
+			p.d.set_bit(v);
+			p.s.set_bit(v);
+		}
+	}
+
+	bitpos_list bits_of(const Bitset& b) { return static_cast<bitpos_list>(b); }
+	bitpos_list bits_of(const BitsetSp& b) { return static_cast<bitpos_list>(b); }
+
+	void expect_same(const Pair& p) {
+		EXPECT_EQ(bits_of(p.d), bits_of(p.s));
+		EXPECT_EQ(p.d.count(), p.s.count());
+		EXPECT_EQ(p.d.is_empty(), p.s.is_empty());
+		EXPECT_EQ(p.d.is_singleton(), p.s.is_singleton());
+		EXPECT_EQ(p.d.msb(), p.s.msb());
+		EXPECT_EQ(p.d.lsb(), p.s.lsb());
+	}
+}
+
+TEST(BitsetSp_api, differential_against_bitset) {
+	std::mt19937 rng(2026);
+	const int nPop = 1000;
+
+	for (int round = 0; round < 60; ++round) {
+		//densities from very sparse to dense, including empty and singleton
+		const int nA = (round % 6 == 0) ? 0 : (round % 6 == 1) ? 1 : 1 + static_cast<int>(rng() % 400);
+		const int nB = static_cast<int>(rng() % 400);
+		Pair a(nPop), b(nPop);
+		fill(a, rng, nPop, nA);
+		fill(b, rng, nPop, nB);
+		expect_same(a);
+
+		//scanning in both directions, from every 37th position
+		for (int v = 0; v < nPop; v += 37) {
+			EXPECT_EQ(a.d.next_bit(v), a.s.next_bit(v)) << "next_bit " << v;
+			EXPECT_EQ(a.d.prev_bit(v), a.s.prev_bit(v)) << "prev_bit " << v;
+			EXPECT_EQ(a.d.is_bit(v), a.s.is_bit(v));
+		}
+		EXPECT_EQ(a.d.next_bit(BBObject::noBit), a.s.next_bit(BBObject::noBit));
+		EXPECT_EQ(a.d.prev_bit(BBObject::noBit), a.s.prev_bit(BBObject::noBit));
+
+		//binary queries
+		EXPECT_EQ(a.d.is_disjoint(b.d), a.s.is_disjoint(b.s));
+		EXPECT_EQ(a.d.find_first_common(b.d), a.s.find_first_common(b.s));
+
+		//modifying operations
+		Pair x = a; x.d &= b.d; x.s &= b.s; expect_same(x);
+		Pair y = a; y.d |= b.d; y.s |= b.s; expect_same(y);
+		Pair z = a; z.d ^= b.d; z.s ^= b.s; expect_same(z);
+		Pair w = a; w.d.erase_bit(b.d); w.s.erase_bit(b.s); expect_same(w);
+		Pair u = a; u.d.andnot_eq(b.d); u.s.andnot_eq(b.s); expect_same(u);
+		Pair v1 = a; v1.d.and_eq(b.d); v1.s.and_eq(b.s); expect_same(v1);
+		Pair v2 = a; v2.d.or_eq(b.d); v2.s.or_eq(b.s); expect_same(v2);
+		Pair v3 = a; v3.d.assign_bit(b.d); v3.s.assign_bit(b.s); expect_same(v3);
+
+		//erasing single bits (leaves zero blocks in the sparse bitset)
+		Pair e = a;
+		for (int v : bits_of(a.d)) {
+			if (v % 3 == 0) { e.d.erase_bit(v); e.s.erase_bit(v); }
+		}
+		expect_same(e);
+		EXPECT_EQ(e.d.is_disjoint(b.d), e.s.is_disjoint(b.s));
+		EXPECT_EQ(e.d.find_first_common(b.d), e.s.find_first_common(b.s));
+
+		//extraction functions
+		bit_index_set ds, ss;
+		a.d.extract_set(ds);
+		a.s.extract_set(ss);
+		EXPECT_EQ(ds, ss);
+
+		std::vector<int> da(nPop), sa(nPop);
+		std::size_t dn = 0, sn = 0;
+		for (bool rev : { false, true }) {
+			a.d.extract_array(da.data(), dn, rev);
+			a.s.extract_array(sa.data(), sn, rev);
+			ASSERT_EQ(dn, sn);
+			EXPECT_TRUE(std::equal(da.begin(), da.begin() + dn, sa.begin()));
+		}
+	}
 }

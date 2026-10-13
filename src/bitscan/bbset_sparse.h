@@ -457,8 +457,8 @@ namespace bitgraph {
 		* @details alias to popcn64, calls the function
 		* @details To be used instead of popcn64 (12/02/2025)
 		**/
-		int count()	const { return popcn64(); }
-		int count(int firstBit, int lastBit) const { return popcn64(firstBit, lastBit); }
+		int count() const noexcept { return popcn64(); }
+		int count(int firstBit, int lastBit) const noexcept { return popcn64(firstBit, lastBit); }
 
 	protected:
 		/**
@@ -1040,6 +1040,18 @@ namespace bitgraph {
 		assert(bb < nBB_);
 		//////////////////////
 
+		//fast path: bit in a block after the last one (increasing insertion order) - O(1) append
+		if (vBB_.empty() || bb > vBB_.back().idx_) {
+			vBB_.emplace_back(SparseBlock(bb, bblock::MASK_BIT(bit - WMUL(bb) /* WMOD(bit) */)));
+			return *this;
+		}
+
+		//fast path: bit in the last block (increasing insertion order, several bits per block)
+		if (bb == vBB_.back().idx_) {
+			vBB_.back().bb_ |= bblock::MASK_BIT(bit - WMUL(bb) /* WMOD(bit) */);
+			return *this;
+		}
+
 		//find closest block to bb in THIS
 		auto pL = find_block_ext(bb);
 
@@ -1083,28 +1095,24 @@ namespace bitgraph {
 			return lsb();
 		}
 
-		//find the block containing nBit or closest one with less index 
-		int bbL = WDIV(firstBit);
+		//first block with index >= block of firstBit: O(log blocks), not a scan from the first block
+		const int bbL = WDIV(firstBit);
+		auto it = std::lower_bound(vBB_.cbegin(), vBB_.cend(), SparseBlock(bbL), pBlock_less());
 
-		for (auto i = 0u; i < vBB_.size(); ++i) {
+		//block bbL exists - look for a bit after firstBit in it
+		if (it != vBB_.cend() && it->idx_ == bbL) {
 
-			//block bbL exists - find msb
-			if (vBB_[i].idx_ == bbL) {
-
-				int pos = bblock::lsb(vBB_[i].bb_ & Tables::mask_high[firstBit - WMUL(bbL)]);
-
-				//exits if a bit is found
-				if (pos != BBObject::noBit) {
-					return (WMUL(bbL) + pos);
-				}
-				else {
-					continue;		//next block
-				}
+			const int pos = bblock::lsb(it->bb_ & Tables::mask_high[firstBit - WMUL(bbL)]);
+			if (pos != BBObject::noBit) {
+				return (WMUL(bbL) + pos);
 			}
+			++it;
+		}
 
-			//first non-zero block with greater index than bbL
-			if (vBB_[i].bb_ && vBB_[i].idx_ > bbL) {
-				return bblock::lsb(vBB_[i].bb_) + static_cast<int>(WMUL(vBB_[i].idx_));
+		//first non-zero block with greater index than bbL
+		for (; it != vBB_.cend(); ++it) {
+			if (it->bb_) {
+				return bblock::lsb(it->bb_) + static_cast<int>(WMUL(it->idx_));
 			}
 		}
 
@@ -1119,25 +1127,24 @@ namespace bitgraph {
 			return msb();
 		}
 
-		//find the block containing nBit or closest one with less index 
-		int bbL = WDIV(lastBit);
-		const auto size = static_cast<int>(vBB_.size());
+		//first block with index >= block of lastBit: O(log blocks)
+		const int bbL = WDIV(lastBit);
+		auto it = std::lower_bound(vBB_.cbegin(), vBB_.cend(), SparseBlock(bbL), pBlock_less());
 
-		for (int i = size - 1; i >= 0; --i) {
+		//block bbL exists - look for a bit before lastBit in it
+		if (it != vBB_.cend() && it->idx_ == bbL) {
 
-			//block bbL exists - find msb
-			if (vBB_[i].idx_ == bbL) {
-
-				int pos = bblock::msb(vBB_[i].bb_ & Tables::mask_low[lastBit - WMUL(bbL)]);
-				if (pos != BBObject::noBit) {
-					return (WMUL(bbL) + pos);
-				}
-				continue;
+			const int pos = bblock::msb(it->bb_ & Tables::mask_low[lastBit - WMUL(bbL)]);
+			if (pos != BBObject::noBit) {
+				return (WMUL(bbL) + pos);
 			}
+		}
 
-			//first block with less index than bbL
-			if (vBB_[i].bb_ && vBB_[i].idx_ < bbL) {
-				return bblock::msb(vBB_[i].bb_) + static_cast<int>(WMUL(vBB_[i].idx_));
+		//last non-zero block with less index than bbL
+		while (it != vBB_.cbegin()) {
+			--it;
+			if (it->bb_) {
+				return bblock::msb(it->bb_) + static_cast<int>(WMUL(it->idx_));
 			}
 		}
 

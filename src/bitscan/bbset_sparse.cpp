@@ -704,109 +704,70 @@ BitsetSp& BitsetSp::operator &= (const BitsetSp& rhs){
 	return *this;
 }
 
+namespace {
+
+	/**
+	* @brief In-place merge of the sorted block vector R into L: L = L op R (op applied to the blocks
+	*		 with the same index, blocks only in R are copied). O(blocks), no sorting.
+	* @details 1. counts the blocks of R which are not in L (index-only merge)
+	*		   2. makes room at the end of L and merges from the back
+	*		   Used by operator |= and ^=.
+	**/
+	template<class BlockVec, class Op>
+	void merge_blocks_in_place(BlockVec& L, const BlockVec& R, Op op) {
+
+		const std::ptrdiff_t nL = static_cast<std::ptrdiff_t>(L.size());
+		const std::ptrdiff_t nR = static_cast<std::ptrdiff_t>(R.size());
+
+		std::ptrdiff_t extra = 0, i = 0, j = 0;
+		while (i < nL && j < nR) {
+			if (L[i].idx_ < R[j].idx_) { ++i; }
+			else if (L[i].idx_ > R[j].idx_) { ++extra; ++j; }
+			else { ++i; ++j; }
+		}
+		extra += nR - j;
+
+		//when extra=0 it only applies op to the blocks in common
+		L.resize(static_cast<std::size_t>(nL + extra));
+
+		i = nL - 1;
+		j = nR - 1;
+		std::ptrdiff_t k = nL + extra - 1;
+		while (j >= 0) {
+			if (i >= 0 && L[i].idx_ > R[j].idx_) {
+				L[k--] = L[i--];
+			}
+			else if (i >= 0 && L[i].idx_ == R[j].idx_) {
+				L[k--] = typename BlockVec::value_type(L[i].idx_, op(L[i].bb_, R[j].bb_));
+				--i;
+				--j;
+			}
+			else {
+				L[k--] = R[j--];
+			}
+		}
+		//remaining blocks of L (i >= 0) are already in place (k == i)
+	}
+}
+
 BitsetSp& BitsetSp::operator |= (const BitsetSp& rhs){
 
-	index_t posL = 0;					//position *this
-	auto itR = rhs.cbegin();		//iterator to rhs
-	auto sizeL = vBB_.size();		//stores the original size of *this since it will be modified
-	bool flag_sort = false;			//flag to sort the collection
-		
-	//OR before all the blocks of one of the bitsets have been examined
-	while (posL < static_cast<int>(sizeL) && itR != rhs.vBB_.end()) {
-			
-		if(vBB_[posL].idx_ < itR->idx_)
-		{
-			posL++;
-		}else if(vBB_[posL].idx_ > itR->idx_ )
-		{
-			//////////////////////////////////
-			vBB_.emplace_back(*itR);
-			///////////////////////////////////
-			flag_sort = true;
-			itR++;
-		}else{
+	if (this == &rhs || rhs.vBB_.empty()) { return *this; }
 
-			//equal indexes
-
-			///////////////////////////////////////////
-			vBB_[posL].bb_ |= itR->bb_;
-			///////////////////////////////////////////
-
-			posL++;
-			itR++;
-		}
-	}
-
-	//rhs unfinished with index below the last block of *this
-	if (posL == static_cast<int>(sizeL)) {
-
-		for (; itR != rhs.vBB_.end(); ++itR) {
-
-			//////////////////////////////////
-			vBB_.emplace_back(*itR);
-			///////////////////////////////////
-		}
-	}
-
-	//keep the collection sorted
-	if (flag_sort) {
-		sort();
-	}	
-	
+	merge_blocks_in_place(vBB_, rhs.vBB_, [](BITBOARD a, BITBOARD b) { return a | b; });
 	return *this;
 }
 
 BitsetSp& BitsetSp::operator ^= (const BitsetSp& rhs) {
 
-	index_t posL = 0;					//position *this	
-	auto itR = rhs.cbegin();		//iterator to rhs
-	auto sizeL = vBB_.size();		//stores the original size of *this since it will be modified
-	bool flag_sort = false;			//flag to sort the collection
-	
-	//XOR before all the blocks of one of the bitsets have been examined
-	while ((posL < static_cast<int>(sizeL)) && (itR !=  rhs.vBB_.end())) {
-
-		if (vBB_[posL].idx_ < itR->idx_)
-		{
-			posL++;
-		}
-		else if (vBB_[posL].idx_ > itR->idx_)
-		{
-			//////////////////////////////////
-			vBB_.emplace_back(*itR);
-			///////////////////////////////////
-			flag_sort = true;
-			itR++;
-		}
-		else {
-
-			//equal indexes
-
-			/////////////////////////////
-			vBB_[posL].bb_ ^= itR->bb_;
-			/////////////////////////////
-
-			posL++;
-			itR++;
-		}
+	if (this == &rhs) {
+		//x ^ x = 0 (blocks are kept, as in the other erasing operations)
+		for (auto& blk : vBB_) { blk.bb_ = 0; }
+		return *this;
 	}
+	if (rhs.vBB_.empty()) { return *this; }
 
-	//rhs unfinished with index below the last block of *this
-	if (posL == static_cast<int>(sizeL)) {
-
-		for (; itR != rhs.vBB_.end(); ++itR) {
-
-			//////////////////////////////////
-			vBB_.emplace_back(*itR);
-			///////////////////////////////////
-		}
-	}
-
-	//keep the collection sorted
-	if (flag_sort) {
-		sort();
-	}	
-
+	merge_blocks_in_place(vBB_, rhs.vBB_, [](BITBOARD a, BITBOARD b) { return a ^ b; });
 	return *this;
 }
 
@@ -905,15 +866,6 @@ string BitsetSp::to_string ()  const{
 	return sstr.str();
 }
 
-void BitsetSp::extract (bitpos_list& lb) const{
-
-	lb.clear();
-
-	int nBit = BBObject::noBit;
-	while((nBit = next_bit(nBit)) != BBObject::noBit ){
-		lb.push_back(nBit);
-	}
-}
 
 BitsetSp::operator bitpos_list() const
 {
@@ -950,6 +902,13 @@ namespace {
 			}
 		}
 	}
+}
+
+void BitsetSp::extract (bitpos_list& lb) const{
+
+	lb.clear();
+	lb.reserve(static_cast<std::size_t>(count()));
+	for_each_bit(vBB_, [&lb](int bit) { lb.push_back(bit); });		//block scan: O(blocks + bits)
 }
 
 void BitsetSp::extract_set(bit_index_set& ls) const {
