@@ -154,11 +154,17 @@ namespace bitgraph {
 		}
 
 		/**
-		* @brief reads graph from file. If ewights are not found it generated them
-		*		 automatically based on the Pullman 2008 formula
-		* @details currently only reads dimacs format (with or without weights)
-		**/
-		explicit Base_Graph_EW(const std::string& filename);															//read weighted ASCII file or generate weights using formula- CHECK! (21/11/2021))
+		 * @brief Constructs an edge-weighted graph from a DIMACS file.
+		 *
+		 * @param[in] filename Path to the input DIMACS file.
+		 *
+		 * @details Reads a graph in DIMACS format, with or without edge weights.
+		 *          If weights are not provided, they are generated automatically
+		 *          using the Pullman (2008) formula.
+		 *
+		 * @note Fails fast if the file cannot be read or contains invalid data.
+		 */
+		explicit Base_Graph_EW(const std::string& filename);														
 
 		//copy constructor, move constructor, copy operator =, move operator =
 		Base_Graph_EW(const Base_Graph_EW& g) = default;
@@ -655,6 +661,7 @@ namespace bitgraph {
 		vertex_bitset_t& neighbors(vertex_t v) noexcept {
 			return graph_.neighbors(v);
 		}
+						
 	
 		/**
 		 * @brief Resets the graph to an empty state.
@@ -665,10 +672,26 @@ namespace bitgraph {
 			graph_.reset();
 			edge_weights_.clear();
 		}
+
+	private:
+		/**
+		 * @brief Reports a fatal graph initialization error.
+		 *
+		 * @param[in] message Description of the error.
+		 *
+		 * @note Terminates the program without returning.
+		 */
+		[[noreturn]]
+		void graph_initialization_error(const std::string& message)
+		{
+			std::cerr << "[BITGRAPH ERROR] " << message << '\n';
+			std::terminate();
+		}
 		
 		/////////////////
 		// data members
 
+	protected:
 		/**
 		 * @brief Underlying graph.
 		 */

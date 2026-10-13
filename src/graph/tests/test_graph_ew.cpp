@@ -194,10 +194,12 @@ TEST(BaseGraphEW, constructor_file) {
 }
 
 TEST(BaseGraphEW, constructor_missing_file) {
-	ew_int g("this_file_does_not_exist.clq");
-
-	EXPECT_EQ(0, g.num_vertices());
-	EXPECT_EQ(0u, g.num_edges(false));
+	EXPECT_DEATH(
+		{
+			ew_int g("this_file_does_not_exist.clq");
+		},
+		"Failed to read DIMACS file"
+	);
 }
 
 TEST_F(BaseGraphEWTest, copy_and_move) {
@@ -682,11 +684,12 @@ TEST(BaseGraphEW, print_edges_matrix) {
 	std::ostringstream os;
 	g.print_edges(os, ew_int::edge_print_format::edge_matrix, true);
 
-	// full N x N matrix in row-major order, tab separated
+	// full N x N matrix, one tab-terminated row per line, plus the trailing newline
 	EXPECT_EQ(
-		"--\t2\t--\t"
-		"--\t--\t--\t"
-		"5\t--\t--\t\n",
+		"--\t2\t--\t\n"
+		"--\t--\t--\t\n"
+		"5\t--\t--\t\n"
+		"\n",
 		os.str());
 }
 
