@@ -592,7 +592,7 @@ namespace bitgraph {
 		 */
 		std::ostream& print_edges(
 			vertex_set_t& vertices,
-			std::ostream& o = std::cout) const;
+			std::ostream& os = std::cout) const;
 					
 
 	protected:

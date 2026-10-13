@@ -500,7 +500,7 @@ namespace bitgraph {
 	}
 
 	template<class GraphT, class WeightT>
-	ostream& Base_Graph_EW<GraphT, WeightT>::print_data(
+	std::ostream& Base_Graph_EW<GraphT, WeightT>::print_data(
 		bool lazy,
 		std::ostream& os,
 		bool trailing_newline) const
@@ -596,27 +596,6 @@ namespace bitgraph {
 		return os;
 	}
 
-	//template<class GraphT, class WeightT>
-	//std::ostream& Base_Graph_EW<GraphT, WeightT>::print_edges(std::ostream& o, bool eofl) const{
-	//
-	//	const auto NV = graph_.num_vertices();
-	//	for (auto i = 0; i < NV - 1; ++i) {
-	//		for (auto j = i + 1; j < NV; ++j) {
-	//
-	//			if (is_edge(i, j)) {
-	//				o << "[" << i << "]" << "--(" << weight(i, j) << ")-->" << "[" << j << "]" << endl;
-	//			}
-	//			if (is_edge(j, i)) {
-	//				o << "[" << j << "]" << "--(" << weight(i, j) << ")--->" <<  "[" << i << "]" << endl;
-	//			}
-	//
-	//		}
-	//	}
-	//
-	//	if (eofl) {	o << std::endl;	}
-	//	return o;
-	//}
-
 
 	template<class GraphT, class WeightT>
 	bool bitgraph::Base_Graph_EW<GraphT, WeightT>::is_unit_weighted() const noexcept
@@ -640,19 +619,3 @@ namespace bitgraph {
 } // namespace bitgraph
 
 
-////////////////////////////////////////////
-// list of valid types to allow generic code in *.cpp files 
-// DEPRECATED (10/10/2026)
-
-//namespace bitgraph {
-//
-//	template class  Base_Graph_EW<ugraph, int>;
-//	template class  Base_Graph_EW<ugraph, double>;
-//	//template class  Graph_EW<ugraph, int>;
-//	//template class  Graph_EW<ugraph, double>;
-//
-//	//other specializations... (sparse_graph)
-//
-//} //namespace bitgraph
-
-////////////////////////////////////////////
