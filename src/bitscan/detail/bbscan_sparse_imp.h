@@ -12,6 +12,7 @@
 #define BITGRAPH_BITSCAN_BBSCAN_SPARSE_IMP_H
 
 
+
 namespace bitgraph {
 
 	inline int BBScanSp::next_bit()
