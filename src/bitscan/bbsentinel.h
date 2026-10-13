@@ -1,16 +1,26 @@
- /**
-  * @file bbsentinel.h file
-  * @brief header file of the BBSentinel class.
-  *		   Manages efficient bitset operations by circumscribing them to the range [low_sentinel, high_sentinel] 
-  * @details The lower sentinel is the first non-zero bitblock in the bitstring
-  * @detials The higher sentinel is the last non-zero bitblock in the bitstring
-  * @details created?,  last_updated 13/02/2025
-  * @details used to enhance a clique algorithm (results published in [XXX))
-  * 
-  * @author pss
-  *
-  * TODO- PENDING FULL REFACTORING, namespace experimental (14/10/2026)
-  **/
+/**
+ * @file bbsentinel.h
+ * @brief Defines the BBSentinel class for efficient bitset operations
+ *        using block-level sentinels.
+ *
+ * BBSentinel restricts bitset operations to the range of bitblocks
+ * delimited by two sentinels:
+ * - The lower sentinel identifies the first non-zero bitblock.
+ * - The upper sentinel identifies the last non-zero bitblock.
+ *
+ * This representation can improve performance by avoiding unnecessary
+ * processing of leading and trailing zero bitblocks.
+ *
+ * @author pss
+ * @date Created: unknown
+ * @date Last updated: 14/10/2026
+ *
+ * @note Originally developed to improve the performance of an exact
+ *       maximum clique algorithm (publication reference pending).
+ *
+ * @todo Full refactoring and testing required (14/10/2026).
+ * @todo Move BBSentinel to the experimental namespace (14/10/2026).
+ */
 
 #ifndef BITGRAPH_BITSCAN_BB_SENTINEL_H
 #define BITGRAPH_BITSCAN_BB_SENTINEL_H
