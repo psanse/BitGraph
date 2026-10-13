@@ -8,6 +8,7 @@ file(
     "${CMAKE_CURRENT_SOURCE_DIR}/*.h"
     "${CMAKE_CURRENT_SOURCE_DIR}/algorithms/*.h"
     "${CMAKE_CURRENT_SOURCE_DIR}/algorithms/clique/*.h"
+     "${CMAKE_CURRENT_SOURCE_DIR}/algorithms/detail/*.h"
     "${CMAKE_CURRENT_SOURCE_DIR}/formats/*.h"
     "${CMAKE_CURRENT_SOURCE_DIR}/formats/detail/*.h"
     "${CMAKE_CURRENT_SOURCE_DIR}/detail/*.h"

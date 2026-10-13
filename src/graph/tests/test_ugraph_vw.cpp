@@ -489,8 +489,6 @@ TEST(UGraphW, constructor_from_file) {
 
 }
 
-
-
 TEST(UGraphW, gen_weights_dimacs){
 		
 	//read DIMACS graph from file - no DIMACS weights, sets default weights 
@@ -504,7 +502,10 @@ TEST(UGraphW, gen_weights_dimacs){
 	EXPECT_EQ(ugraph_vwi::DEFAULT_WEIGHT, ugw.weight(199));
 
 	//generate modulus weights 
-	WeightGen< ugraph_vwi >::create_weights(ugw, WeightGen<ugraph_vwi>::WMOD, 200);
+	experimental::WeightGen< ugraph_vwi >::create_weights(
+		ugw,
+		experimental::WeightGen<ugraph_vwi>::WMOD, 
+		200);
 		
 	EXPECT_EQ(2, ugw.weight(0));
 	EXPECT_EQ(3, ugw.weight(1));
@@ -520,7 +521,8 @@ TEST(UGraphW, gen_random) {
 	//creates random graph of size NV with modulus weights
 	ugraph_vwi ugw;
 	RandomGen<ugraph_vwi>::create_graph(ugw, NV, density);							/* empty vertex weights by default */
-	WeightGen<ugraph_vwi>::create_weights(ugw, WeightGen<ugraph_vwi>::WMOD);
+	experimental::WeightGen<ugraph_vwi>::create_weights(ugw, 
+		experimental::WeightGen<ugraph_vwi>::WMOD);
 	
 	/////////////////////
 	EXPECT_EQ(NV, ugw.num_vertices());

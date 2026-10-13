@@ -1,11 +1,23 @@
 /**
-* @file graph_fast_sort.h
-* @brief header for GraphFastRootSort class which sorts graphs by different criteria
-* @details: changed nodes_ stack to vector (18/03/19)
-*			- now working with subgraphs (30/11/2025)
-* @date: created 12/03/15,  last_update 27/01/25
-* @author pss
-**/
+ * @file graph_fast_sort.h
+ * @brief Fast vertex ordering and graph reordering for undirected graphs.
+ *
+ * @details Implements the GraphFastRootSort class, providing degree-based,
+ * degeneracy-based, and neighborhood-support-based vertex ordering strategies.
+ * Supports graph reordering and vertex ordering on induced subgraphs.
+ *
+ * Supported graph types are Ugraph<BBScan> and Ugraph<BBScanSp>.
+ *
+ * @author pss
+ * @date Created: 12/03/2015
+ * @date Last updated: 13/10/2026
+ *
+ * @par Revision history
+ * - 18/03/2019: Replaced the nodes_ stack with a vector.
+ * - 30/11/2025: Added support for induced subgraphs.
+ *
+ * @copyright This file is part of the BITGRAPH C++ library.
+ */
 
 #ifndef BITGRAPH_GRAPH_GRAPH_FAST_SORT_H
 #define BITGRAPH_GRAPH_GRAPH_FAST_SORT_H
@@ -30,13 +42,19 @@ namespace bitgraph {
 
 	namespace graph_utils {
 
-		///////////////////////////
-		//
-		// GraphFastRootSort class
-		// (GraphT should be restricted to ugraph and sparse_ugraph types)
-		//
-		////////////////////////////
-
+		/**
+		 * @brief Efficient vertex ordering and graph reordering for undirected graphs.
+		 *
+		 * Provides degree-based and degeneracy-based vertex ordering strategies,
+		 * including variants that use neighborhood support as a tiebreaker.
+		 * Also supports graph reordering and the generation of induced subgraphs.
+		 *
+		 * @tparam GraphT Undirected graph type. Supported types are
+		 *         Ugraph<BBScan> and Ugraph<BBScanSp>.
+		 *
+		 * @note Only undirected graph types are supported.
+		 * @note Vertex orderings can be represented as old-to-new or new-to-old mappings.
+		 */
 		template <class GraphT>
 		class GraphFastRootSort {
 			

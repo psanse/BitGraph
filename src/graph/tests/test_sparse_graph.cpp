@@ -387,7 +387,7 @@ TEST(Ugraph_sparse, DISABLED_adjacency_matrix){
             for(int rep=0;rep<REP_MAX;rep++){
 				 cout<<"--------------------------------------------------------"<<endl;
 				sparse_ugraph ug;
-				SparseRandomGen<sparse_ugraph>().create_ugraph(ug,(std::size_t)N,P);
+				experimental::SparseRandomGen<sparse_ugraph>().create_ugraph(ug,(std::size_t)N,P);
 				sparse_ugraph ug2(ug);
 			
 
