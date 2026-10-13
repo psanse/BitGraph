@@ -798,8 +798,8 @@ namespace bitgraph {
 		 * @return Reference to this modified bitset.		
 		 * @note The current storage allocation and bit capacity are preserved.
 		 */
-		Bitset& clear_all(bit_index_t bit) noexcept {
-			return erase_bit(bit); 
+		Bitset& clear_all() noexcept {
+			return erase_bit();
 		}				
 
 		/**

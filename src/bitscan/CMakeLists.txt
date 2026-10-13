@@ -139,3 +139,13 @@ if(BUILD_EXAMPLES AND BITSCAN_BUILD_EXAMPLES)
     add_subdirectory(examples)
 endif()
 
+
+###################
+# BENCHMARKS for BITSCAN lib
+###################
+# Not built by default (they are timing programs, not tests).
+option(BITSCAN_BUILD_BENCHMARKS "Build bitscan benchmarks." OFF)
+
+if(BITSCAN_BUILD_BENCHMARKS)
+    add_subdirectory(benchmarks)
+endif()
