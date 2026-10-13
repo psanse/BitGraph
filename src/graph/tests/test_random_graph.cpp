@@ -13,6 +13,8 @@
 #include "graph/algorithms/graph_gen.h"
 #include "gtest/gtest.h"
 #include <iostream>
+#include <cstdio>
+#include <sstream>
 #include <cmath>
 
 using namespace std;
@@ -64,12 +66,42 @@ TEST(Random_Graph, sparse_ugraph){
 ////////////////////
 
 
-TEST(Random_Graph, DISABLE_create_benchmark) {
+TEST(Random_Graph, create_benchmark) {
 
-	//will crate a benchmark in default (project) directory
+	// creates the benchmark in the system temporary directory
+	const std::string path = ::testing::TempDir();
 	random_attr_t r(100, 150, .3, .5, 1, 50, .1);
-	RandomGen<ugraph>::create_graph_benchmark(".", r);
-	//RandomGen<ugraph>::create_graph_benchmark(".", r);
+	RandomGen<ugraph>::create_graph_benchmark(path, r);
+
+	// expected files r<n>_<p>_<k>.txt - same naming loop as create_graph_benchmark
+	int num_files = 0;
+	for (std::size_t n = r.nLB; n <= r.nUB; n += r.incN) {
+		for (std::size_t pi = 0; ; ++pi) {
+			const double p = r.pLB + pi * r.incP;
+			if (p > r.pUB)
+				break;
+
+			for (std::size_t k = 0; k < r.nRep; ++k) {
+				std::ostringstream os;
+				os << path << "r" << n << "_" << p << "_" << k << ".txt";
+
+				// the file is a valid DIMACS graph with n vertices
+				{
+					ugraph g(os.str());
+					EXPECT_EQ(n, g.num_vertices());
+				}
+
+				// cleanup - removing also checks that the file was written
+				EXPECT_EQ(0, std::remove(os.str().c_str()));
+				++num_files;
+			}
+
+			if (p >= r.pUB)
+				break;
+		}
+	}
+
+	EXPECT_EQ(6, num_files);
 }
 
 TEST(Random_Graph, DISABLE_create_sparse_benchmark) {
