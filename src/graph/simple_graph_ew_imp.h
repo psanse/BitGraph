@@ -1,16 +1,15 @@
- /**
-   * @file simple_graph_ew_imp.h
-   * @brief implementation for Base_Graph_EW and Graph_EW classes (edge-weighted graphs)
-   *
-   * @created 16/01/19
-   * @last_update 06/01/25
-   * @author pss
-   *
-   * @comments see end of file for valid template types
-   *
-   * This code is part of the GRAPH 1.0 C++ library
-   *
-   **/
+/**
+ * @file simple_graph_ew_imp.h
+ * @brief Implementation of the Base_Graph_EW and Graph_EW class templates.
+ *
+ * @details Provides the implementation of edge-weighted graph operations.
+ *          Supported template types are documented at the end of the file.
+ *
+ * @author pss
+ * @date 16/01/2019
+ *
+ * @copyright Part of the BITGRAPH C++ library.
+ */
 
 #include "bitscan/bitscan.h"
 #include "graph_types.h"
@@ -472,7 +471,7 @@ namespace bitgraph {
 
 	template<class GraphT, class WeightT>
 	std::ostream& Base_Graph_EW<GraphT, WeightT>::print_edges(
-		vertex_set_t& vertices,
+		constvertex_set_t& vertices,
 		std::ostream& os) const
 	{
 		const std::size_t vertex_count = vertices.size();

@@ -591,7 +591,7 @@ namespace bitgraph {
 		 * @return Reference to @p os.
 		 */
 		std::ostream& print_edges(
-			vertex_set_t& vertices,
+			const vertex_set_t& vertices,
 			std::ostream& os = std::cout) const;
 					
 
