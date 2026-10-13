@@ -356,3 +356,90 @@ TEST_F(BBScanClassTest_1, miscellanous){
 }
 
 
+
+
+//////////////////////////////////////////////
+// copy / move: a new BBScan never inherits an active scan
+
+namespace {
+	// exposes the protected scan cursor
+	struct BBScanProbe : public BBScan {
+		using BBScan::BBScan;
+		BBScanProbe() = default;
+		BBScanProbe(const BBScanProbe&) = default;
+		BBScanProbe(BBScanProbe&&) noexcept = default;
+		BBScanProbe& operator=(const BBScanProbe&) = default;
+		BBScanProbe& operator=(BBScanProbe&&) noexcept = default;
+		int block() const { return scan_block(); }
+		int bit() const { return scan_bit(); }
+	};
+}
+
+TEST_F(BBScanClassTest, copy_constructor_does_not_inherit_scan) {
+	BBScanProbe src(301);
+	for (int v : sol) src.set_bit(v);
+	src.init_scan(bbo::NON_DESTRUCTIVE);
+	ASSERT_EQ(0, src.next_bit());			// active scan, cursor moved
+
+	BBScanProbe cpy(src);
+	EXPECT_TRUE(cpy == src);				// same bitstring
+	EXPECT_EQ(bbo::noBit, cpy.block());		// default cursor
+	EXPECT_EQ(MASK_LIM, cpy.bit());
+
+	// source scan keeps going from where it was
+	EXPECT_EQ(50, src.next_bit());
+
+	// copy can be scanned from scratch
+	std::set<int> res;
+	cpy.init_scan(bbo::NON_DESTRUCTIVE);
+	int b;
+	while ((b = cpy.next_bit()) != bbo::noBit) res.insert(b);
+	EXPECT_EQ(sol, res);
+}
+
+TEST_F(BBScanClassTest, move_constructor_does_not_inherit_scan) {
+	BBScanProbe src(301);
+	for (int v : sol) src.set_bit(v);
+	src.init_scan(bbo::NON_DESTRUCTIVE);
+	ASSERT_EQ(0, src.next_bit());
+
+	BBScanProbe mv(std::move(src));
+	EXPECT_EQ(bbo::noBit, mv.block());
+	EXPECT_EQ(MASK_LIM, mv.bit());
+
+	std::set<int> res;
+	mv.init_scan(bbo::NON_DESTRUCTIVE);
+	int b;
+	while ((b = mv.next_bit()) != bbo::noBit) res.insert(b);
+	EXPECT_EQ(sol, res);
+}
+
+TEST_F(BBScanClassTest, assignment_keeps_target_cursor) {
+	BBScanProbe src(301);
+	for (int v : sol) src.set_bit(v);
+	src.init_scan(bbo::NON_DESTRUCTIVE);
+	ASSERT_EQ(0, src.next_bit());
+
+	BBScanProbe dst(301);
+	const int blk = dst.block(), pos = dst.bit();	// fresh cursor
+
+	dst = src;
+	EXPECT_TRUE(dst == src);
+	EXPECT_EQ(blk, dst.block());
+	EXPECT_EQ(pos, dst.bit());
+
+	BBScanProbe dst2(301);
+	dst2 = std::move(src);
+	EXPECT_EQ(blk, dst2.block());
+	EXPECT_EQ(pos, dst2.bit());
+}
+
+TEST_F(BBScanClassTest, self_assignment) {
+	BBScan& ref = bbsc;
+	bbsc = ref;
+	std::set<int> res;
+	bbsc.init_scan(bbo::NON_DESTRUCTIVE);
+	int b;
+	while ((b = bbsc.next_bit()) != bbo::noBit) res.insert(b);
+	EXPECT_EQ(sol, res);
+}

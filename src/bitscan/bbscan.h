@@ -18,7 +18,10 @@
 #include "bbset.h"	
 #include <cassert>
 #include <type_traits>
+#include <utility>			// std::move
 #include <exception>		// std::terminate
+#include <cstdio>			// stderr
+#include <initializer_list>
 
 namespace bitgraph{
 		
@@ -77,7 +80,41 @@ namespace bitgraph{
 			//inherit constructors	
 			using Bitset::Bitset;
 
-			//TODO...check copy and move assignments 
+			BBScan() = default;		// not implicitly declared once copy/move constructors are user-provided
+
+			/**
+			* @brief Copy constructor: copies the bitstring only.
+			* @details A newly constructed BBScan never inherits an active scan from
+			*          another object: its scan cursor is default-initialized.
+			**/
+			BBScan(const BBScan& other) : Bitset(other), scan_() {}
+
+			/**
+			* @brief Move constructor: moves the bitstring only.
+			* @details A newly constructed BBScan never inherits an active scan from
+			*          another object: its scan cursor is default-initialized.
+			**/
+			BBScan(BBScan&& other) noexcept : Bitset(std::move(other)), scan_() {}
+
+			/**
+			* @brief Copy assignment: copies the bitstring only.
+			* @details The scan cursor of this object is left untouched; the cursor
+			*          of @other is never transferred.
+			**/
+			BBScan& operator=(const BBScan& other) {
+				Bitset::operator=(other);
+				return *this;
+			}
+
+			/**
+			* @brief Move assignment: moves the bitstring only.
+			* @details The scan cursor of this object is left untouched; the cursor
+			*          of @other is never transferred.
+			**/
+			BBScan& operator=(BBScan&& other) noexcept {
+				Bitset::operator=(std::move(other));
+				return *this;
+			}
 
 			~BBScan() = default;				
 		
