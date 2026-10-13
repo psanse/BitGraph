@@ -13,6 +13,7 @@
 #include "graph/algorithms/graph_gen.h"
 #include "gtest/gtest.h"
 #include <iostream>
+#include <cmath>
 
 using namespace std;
 using namespace bitgraph;	
@@ -77,6 +78,107 @@ TEST(Random_Graph, DISABLE_create_sparse_benchmark) {
 	//random_attr_t r(100, 150, .3, .5, 1, 50, .1); 
 	//RandomGen<sparse_ugraph>::create_graph_benchmark(".", r);
 	////RandomGen<sparse_ugraph>::create_graph_benchmark(".", r);
+}
+
+TEST(Sparse_Random_Graph, edge_cases) {
+
+	sparse_ugraph g;
+
+	// single vertex - no edges 
+	experimental::SparseRandomGen<sparse_ugraph>::create_ugraph(g, 1, 0.5);
+	EXPECT_EQ(1, g.num_vertices());
+	EXPECT_EQ(0, g.num_edges(false));
+
+	// p = 0 - empty graph 
+	experimental::SparseRandomGen<sparse_ugraph>::create_ugraph(g, 100, 0.0);
+	EXPECT_EQ(100, g.num_vertices());
+	EXPECT_EQ(0, g.num_edges(false));
+
+	// p = 1 - complete graph 
+	const std::size_t NV = 60;
+	experimental::SparseRandomGen<sparse_ugraph>::create_ugraph(g, NV, 1.0);
+	EXPECT_EQ(NV * (NV - 1) / 2, g.num_edges(false));
+	for (std::size_t i = 0; i < NV; ++i) {
+		EXPECT_FALSE(g.is_edge((int)i, (int)i));
+	}
+}
+
+TEST(Sparse_Random_Graph, seed) {
+
+	sparse_ugraph g1, g2, g3;
+
+	experimental::SparseRandomGen<sparse_ugraph>::create_ugraph(g1, 1000, 0.01, 7);
+	experimental::SparseRandomGen<sparse_ugraph>::create_ugraph(g2, 1000, 0.01, 7);
+	experimental::SparseRandomGen<sparse_ugraph>::create_ugraph(g3, 1000, 0.01, 8);
+
+	auto same_edges = [](sparse_ugraph& ga, sparse_ugraph& gb) {
+		if (ga.num_vertices() != gb.num_vertices()) return false;
+		for (int i = 0; i < (int)ga.num_vertices(); ++i)
+			for (int j = i + 1; j < (int)ga.num_vertices(); ++j)
+				if (ga.is_edge(i, j) != gb.is_edge(i, j)) return false;
+		return true;
+	};
+
+	// same seed, same graph 
+	EXPECT_EQ(g1.num_edges(false), g2.num_edges(false));
+	EXPECT_TRUE(same_edges(g1, g2));
+
+	// different seed, different graph (with overwhelming probability) 
+	EXPECT_FALSE(same_edges(g1, g3));
+}
+
+TEST(Sparse_Random_Graph, density) {
+
+	const std::size_t NV = 20000;
+	const double p = 1e-4;
+	const double m = NV * (NV - 1) / 2.0;
+	const int NREP = 10;
+
+	std::uint64_t num_edges = 0;
+	std::uint64_t num_bad = 0;			// edges (i, j) with i >= j in the upper triangle (lower is symmetric)
+	std::uint64_t num_loops = 0;
+
+	for (int s = 1; s <= NREP; ++s) {
+
+		sparse_ugraph g;
+		experimental::SparseRandomGen<sparse_ugraph>::create_ugraph(g, NV, p, s);
+		ASSERT_EQ(NV, g.num_vertices());
+
+		for (std::size_t i = 0; i < NV; ++i) {
+			num_loops += g.is_edge((int)i, (int)i);
+			int j = static_cast<int>(i);
+			while ((j = g.neighbors((int)i).next_bit(j)) != BBObject::noBit) {
+				num_bad += (static_cast<std::size_t>(j) <= i);
+				++num_edges;
+			}
+		}
+	}
+
+	EXPECT_EQ(0, num_bad);
+	EXPECT_EQ(0, num_loops);
+
+	// mean number of edges within 5 standard deviations of the binomial mean 
+	const double mean = m * p;
+	const double sd = std::sqrt(m * p * (1 - p) / NREP);
+	EXPECT_NEAR(mean, static_cast<double>(num_edges) / NREP, 5 * sd);
+}
+
+TEST(Sparse_Random_Graph, first_edge) {
+
+	// regression: the first candidate edge (0, 1) must be reachable,
+	// with probability p 
+	const int NREP = 2000;
+	const double p = 0.3;
+	int count = 0;
+
+	for (int s = 1; s <= NREP; ++s) {
+		sparse_ugraph g;
+		experimental::SparseRandomGen<sparse_ugraph>::create_ugraph(g, 50, p, s);
+		count += g.is_edge(0, 1);
+	}
+
+	const double sd = std::sqrt(p * (1 - p) / NREP);
+	EXPECT_NEAR(p, static_cast<double>(count) / NREP, 5 * sd);
 }
 
 ////////////////////

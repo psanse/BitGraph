@@ -48,8 +48,12 @@
 
 #include <iostream>
 #include <sstream>
-#include <random>								
+#include <random>
+#include <cmath>
+#include <cstdint>
+#include <limits>
 #include <cassert>
+#include <algorithm>
 
 namespace bitgraph {
 		
@@ -213,59 +217,85 @@ namespace bitgraph {
 	
 	namespace experimental {
 
-		/////////////////
-		//
-		// class SparseRandomGen
-		// (random generation of generic sparse unweighted graphs)
-		// 
-		// Currently only for undirected graphs
-		//
-		//////////////////
-		template<class GraphT, int logSizeTable = 35000 >
-		class SparseRandomGen {};
+		/**
+		 * @brief Experimental random graph generator for sparse graphs.
+		 *
+		 * Generates random unweighted graph structures using sparse
+		 * graph representations. Currently supports only undirected graphs.
+		 *
+		 * @tparam GraphT Sparse graph type (only sparse_ugraph is supported).
+		 *
+		 * @warning Experimental implementation. Not part of the stable BITGRAPH API.
+		 */
+		template<class GraphT>
+		class SparseRandomGen {
+			static_assert(sizeof(GraphT) == 0,
+				"SparseRandomGen<GraphT> : only sparse_ugraph is currently supported");
+		};
 
-		/////////////////
-		//
-		// Specialization of SparseRandomGen for sparse_ugraph
-		// (massive sparse uniform graph generator)
-		// 
-		//////////////////
-
-		template< int logSizeTable >
-		class SparseRandomGen <sparse_ugraph, logSizeTable>
-		{
-			/*
-			*  @brief decodes undimensional edge index to upper triangle of adjacency matrix
-			*
-			*		  (see [Fast Random graph generation, 2011], personal comm. with authors)
-			*/
-			static void decode(BITBOARD edge_index, unsigned int& i, unsigned int& j, unsigned int n);
-
+		/**
+		 * @brief Experimental random graph generator for massive sparse undirected graphs.
+		 *
+		 * Specialization of SparseRandomGen for sparse_ugraph.
+		 * Generates G(n, p) random graphs by geometric skipping over the
+		 * n(n-1)/2 candidate edges [Batagelj & Brandes, 2005], so that the
+		 * cost is proportional to the number of generated edges.
+		 *
+		 * @warning Experimental implementation. Not part of the stable BITGRAPH API.
+		 */
+		template<>
+		class SparseRandomGen<sparse_ugraph>	{
 		public:
 
-			//constructor
-			SparseRandomGen() { init_log_table(); }
-
-			//driver
-			int create_ugraph(sparse_ugraph& g, std::size_t n, double p);
+			/**
+			 * @brief Generates a simple random undirected graph G(n, p).
+			 *
+			 * @param[out] graph Generated graph (existing contents are replaced).
+			 * @param[in] NV Number of vertices, in [1, max(vertex_t)].
+			 * @param[in] p Edge probability in [0, 1].
+			 * @param[in] seed Seed of the random engine (same seed, same graph).
+			 *
+			 * @note Invalid parameters cause program termination (fail-fast).
+			 */
+			static void create_ugraph(
+				sparse_ugraph& graph,
+				std::size_t NV, 
+				double p,
+				std::uint64_t seed = utils::detail::RandomUniformGen<>::FIXED_RANDOM_SEED);
 
 		private:
-			/*
-			* @brief 16-bit table for precomputed logarithms
-			*/
-			void init_log_table();
 
-
-			///////////////////////
-			// data
-		private:
-
-			double log_[logSizeTable];
+			/**
+			 * @brief Decodes a linear edge index into a pair of vertices.
+			 *
+			 * Maps an edge index to the corresponding position (i, j) in the
+			 * upper triangular part of the adjacency matrix, excluding the diagonal.
+			 * The mapping represents an undirected graph without self-loops.
+			 *
+			 * The row is estimated in floating point and then corrected with
+			 * exact integer arithmetic, so the result is exact for any NV.
+			 *
+			 * @param[in] edge_index Linear index of the edge.
+			 * @param[out] i First vertex of the decoded edge.
+			 * @param[out] j Second vertex of the decoded edge.
+			 * @param[in] NV Number of vertices.
+			 *
+			 * @pre NV >= 2.
+			 * @pre edge_index < NV * (NV - 1) / 2.
+			 *
+			 * @note The resulting vertices satisfy 0 <= i < j < NV.
+			 * @see Fast Random Graph Generation (2011).
+			 */
+			static void decode(
+				std::uint64_t edge_index,
+				vertex_t& i,
+				vertex_t& j,
+				std::size_t NV);
 		};
 
 	}//end of namespace experimental
 
-	//using experimental::SparseRandomGen;		//alias for SparseRandomGen<GraphT, logSizeTable>
+	//using experimental::SparseRandomGen;		//alias for SparseRandomGen<GraphT>
 
 }//end of namespace bitgraph
 
