@@ -399,6 +399,23 @@ namespace bitgraph {
 		return true;
 	}
 
+	// Single-bit updates: inline, they are called in loops (building bitsets, graph construction).
+	// (defined in the header so the compiler can inline them into the calling loops)
+
+	inline
+	Bitset& Bitset::set_bit(bit_index_t bit) noexcept {
+
+		vBB_[WDIV(bit)] |= Tables::mask[WMOD(bit)];
+		return *this;
+	}
+
+	inline
+	Bitset& Bitset::erase_bit(bit_index_t nBit) noexcept {
+
+		vBB_[WDIV(nBit)] &= ~Tables::mask[WMOD(nBit)];
+		return *this;
+	}
+
 } // end namespace bitgraph
 
 #endif // BITGRAPH_BITSCAN_BBSET_IMP_H

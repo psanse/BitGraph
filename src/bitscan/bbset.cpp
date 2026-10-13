@@ -750,12 +750,6 @@ namespace bitgraph {
 		}
 
 
-		Bitset& Bitset::set_bit(bit_index_t bit) noexcept {
-
-			vBB_[WDIV(bit)] |= Tables::mask[WMOD(bit)];
-			return *this;
-		}
-
 
 
 		Bitset& Bitset::set_bit(bit_index_t firstBit, bit_index_t lastBit) noexcept {
@@ -864,12 +858,6 @@ namespace bitgraph {
 				a[i] = ZERO;
 			}
 
-			return *this;
-		}
-
-		Bitset& Bitset::erase_bit(bit_index_t nBit) noexcept {
-
-			vBB_[WDIV(nBit)] &= ~Tables::mask[WMOD(nBit)];
 			return *this;
 		}
 
