@@ -1929,12 +1929,10 @@ namespace bitgraph {
 
 			if (itL->idx_ < itR->idx_) {
 				res.vBB_.push_back(BitsetSp::SparseBlock(itL->idx_, itL->bb_));
-				res.print(std::cout, true);
 				itL++;
 			}
 			else if (itL->idx_ > itR->idx_) {
 				res.vBB_.push_back(BitsetSp::SparseBlock(itR->idx_, itR->bb_));
-				res.print(std::cout, true);
 				itR++;
 			}
 			else {
