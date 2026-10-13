@@ -12,8 +12,7 @@
 #define BITGRAPH_BITSCAN_BBSCAN_SPARSE_H
 
 #include "detail/persistent_scan.h"
-#include "bitscan/bbset_sparse.h"
-#include "bbexcep_hand.h"
+#include "bbset_sparse.h"
 #include <cassert>
 
 using namespace std;
