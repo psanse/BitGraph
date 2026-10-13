@@ -41,7 +41,7 @@ namespace bitgraph {
 	 * @brief Non-sparse bit array with sentinel-based scanning support.
 	 * @details currently trial version, not fully tested
 	 */
-	using watched_bitarray = _impl::BBSentinel;
+	using watched_bitarray = experimental::BBSentinel;
 
 	//sparse
 	

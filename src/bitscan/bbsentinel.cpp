@@ -20,7 +20,7 @@ using namespace bitgraph;
 
 namespace bitgraph {
 
-	namespace _impl {
+	namespace experimental {
 
 		BBSentinel& AND(const Bitset& lhs, const BBSentinel& rhs, BBSentinel& res) {
 			res.m_BBL = rhs.m_BBL;
@@ -33,13 +33,13 @@ namespace bitgraph {
 
 	}
 
-	//using _impl::AND;
+	//using experimental::AND;
 
 }
 
 namespace bitgraph {
 
-	namespace _impl {
+	namespace experimental {
 
 		void BBSentinel::init_sentinels(bool update) {
 			////////////////
@@ -316,6 +316,6 @@ namespace bitgraph {
 			return  *this;
 		}
 
-	} //end namespace _impl
+	} //end namespace experimental
 }//end namespace bitgraph
 
