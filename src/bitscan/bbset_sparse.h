@@ -13,6 +13,7 @@
 
 #include "bitscan/bbobject.h"
 #include "bitscan/bitblock.h"
+#include "utils/fixed_stack.h"
 #include "utils/logger.h"
 
 #include <vector>	
@@ -35,6 +36,8 @@ namespace bitgraph {
 		using index_t = BBObject::index_t;
 		using BaseT = BBObject;
 		using BaseT::bitpos_list;
+		using BaseT::bit_index_set;
+		using BaseT::bit_index_t;
 
 		static constexpr int DEFAULT_CAPACITY = 2;		//initial allocation of bit blocks for any new sparse bitstring - CHECK efficiency (17/02/2025)
 
@@ -181,6 +184,12 @@ namespace bitgraph {
 		**/
 		explicit  BitsetSp(std::size_t nPop, std::initializer_list<int> lv);
 
+		/**
+		* @brief Creates a bitset with the 1-bits of the list, with the smallest population
+		*		 size that contains them (maximum bit + 1). Empty list: empty bitset, 0 blocks.
+		**/
+		explicit BitsetSp(const bitpos_list& bits);
+
 		//Allows copy and move semantics
 		BitsetSp(const BitsetSp& bbN) = default;
 		BitsetSp(BitsetSp&&) noexcept = default;
@@ -216,6 +225,11 @@ namespace bitgraph {
 		* @details: fast-fail policy, exception caught inside and the program exits
 		**/
 		void init(std::size_t nPop, bool is_popsize = true) noexcept;
+
+		/**
+		* @brief resets the sparse bitset to a new population size with lv 1-bits (alias of reset)
+		**/
+		void init(std::size_t nPop, const bitpos_list& lv) noexcept { reset(nPop, lv); }
 
 		/**
 		* @brief reallocates memory to the number of blocks of the bitset
@@ -389,7 +403,7 @@ namespace bitgraph {
 		* @details: SAFE but not efficient. USE ONLY for basic bitscanning.
 		* @details: O(log n) worst-case complexity, n is the number of blocks in the bitset
 		**/
-		inline	int next_bit(int firstBit) const;
+		inline	int next_bit(int firstBit) const noexcept;
 
 		/**
 		* @brief Computes the next most significant 1-bit in the bitstring BEFORE  lastBit
@@ -401,7 +415,7 @@ namespace bitgraph {
 		* @details: SAFE but not efficient. USE ONLY for basic bitscanning.
 		* @details: O(n) worst-case complexity, n is the number of blocks in the bitset
 		**/
-		inline	int prev_bit(int lastBit) const;
+		inline	int prev_bit(int lastBit) const noexcept;
 
 	protected:
 
@@ -453,7 +467,7 @@ namespace bitgraph {
 		* @details implementation depends of POPCN64 switch in bbconfig.h
 		*		   By default - intrinsic HW assembler instructions
 		**/
-		virtual inline int popcn64() const;
+		inline int popcn64() const noexcept;
 
 	protected:
 		/**
@@ -464,14 +478,14 @@ namespace bitgraph {
 		* @details efficiently implemented as a lookup table or with HW instructions
 		*			depending  on an internal switch (see config.h)
 		**/
-		virtual	inline int popcn64(int firstBit, int lastBit) const;
+		inline int popcn64(int firstBit, int lastBit) const noexcept;
 
 		/**
 		* @brief number of 1-bits in the range [nBit, END(
 		* @details implementation depends of POPCN64 switch in bbconfig.h
 		*		   By default - intrinsic HW assembler instructions
 		**/
-		virtual inline int popcn64(int firstBit) const;
+		inline int popcn64(int firstBit) const noexcept;
 
 
 	public:
@@ -592,7 +606,7 @@ namespace bitgraph {
 		* @brief sets all bits to 0
 		* @details: As opposed to the non-sparse case, this is an O(1) operation
 		**/
-		void  erase_bit() { vBB_.clear(); }
+		BitsetSp& erase_bit() noexcept { vBB_.clear(); return *this; }
 
 		/**
 		* @brief Removes the 1-bits from bitset (inside *this num_blocks).
@@ -688,7 +702,7 @@ namespace bitgraph {
 		 /**
 		 * @brief TRUE if there is a 1-bit in the position bit
 		 **/
-		inline	bool is_bit(int bit) const;
+		inline	bool is_bit(int bit) const noexcept;
 
 		/**
 		* @brief TRUE if the bitstring has all 0-bits
@@ -696,18 +710,85 @@ namespace bitgraph {
 		*			that there are blocks with all 0-bits, so all of them need
 		*			to be checked.
 		**/
-		inline	bool is_empty()	const;
+		inline	bool is_empty()	const noexcept;
 
 		/**
 		* @brief TRUE if this bitstring has no bits in common with rhs
 		**/
-		inline	bool is_disjoint(const BitsetSp& bb) const;
+		inline	bool is_disjoint(const BitsetSp& bb) const noexcept;
 
 		/**
 		* @brief TRUE if this bitstring has no bits in common with rhs
 		*		 in the closed range [firstBlock, lastBlock]
 		**/
 		inline	bool is_disjoint_block(index_t firstBlock, index_t lastBlock, const BitsetSp& bb) const;
+
+		////////////////////////
+		// Bitset-compatible API (see docs/bitsetsp_api_parity.md)
+		// Aliases are inline forwarders: no extra cost.
+
+		/** @brief alias of is_bit(bit) */
+		bool test(int bit) const noexcept { return is_bit(bit); }
+
+		/** @brief alias of set_bit(bit) */
+		BitsetSp& set(int bit) { return set_bit(bit); }
+
+		/** @brief alias of erase_bit(bit) */
+		BitsetSp& clear(int bit) { return erase_bit(bit); }
+
+		/** @brief alias of erase_bit(): removes all the blocks, the population size is preserved */
+		BitsetSp& clear_all() noexcept { return erase_bit(); }
+
+		/** @brief alias of clear_all() */
+		BitsetSp& erase_all_bits() noexcept { return clear_all(); }
+
+		/** @brief alias of erase_bit(rhs): set difference THIS = THIS \ rhs */
+		BitsetSp& andnot_eq(const BitsetSp& rhs) { return erase_bit(rhs); }
+
+		/** @brief alias of operator &= */
+		BitsetSp& and_eq(const BitsetSp& rhs) { return *this &= rhs; }
+
+		/** @brief alias of operator |= */
+		BitsetSp& or_eq(const BitsetSp& rhs) { return *this |= rhs; }
+
+		/** @brief maximum number of bits the bitset can hold: num_blocks() * WORD_SIZE */
+		std::size_t bit_capacity() const noexcept { return static_cast<std::size_t>(nBB_) * WORD_SIZE; }
+
+		/**
+		* @brief Sets THIS to the blocks of rhs (THIS = rhs, keeping the population size of THIS)
+		* @details O(blocks of rhs), reuses the storage of THIS. Blocks of rhs with index
+		*		   >= num_blocks() of THIS are dropped.
+		**/
+		BitsetSp& assign_bit(const BitsetSp& rhs);
+
+		/**
+		* @brief Sets the bits of the list. Bits must be in [0, population size).
+		* @details amortized O(1) per bit if the list is sorted in increasing order
+		**/
+		BitsetSp& set_bit(const bitpos_list& bits);
+
+		/**
+		* @brief TRUE if the bitstring has a single 1-bit
+		* @returns 1 if singleton, 0 if empty, -1 if more than one bit (same as Bitset::is_singleton)
+		* @details single pass over the blocks, early exit at the second bit. Zero blocks are skipped.
+		**/
+		inline int is_singleton() const noexcept;
+
+		/**
+		* @brief lowest bit in common between rhs and THIS, noBit if they are disjoint
+		* @details merge of the sorted blocks with early exit (same loop as is_disjoint)
+		**/
+		inline int find_first_common(const BitsetSp& rhs) const noexcept;
+
+		/**
+		* @brief Extracts the bits as a set / stack / array in increasing order
+		*		 (decreasing if rev is true, array only).
+		* @details These scan the blocks directly: O(blocks + bits), independent of next_bit
+		*		   @lv has to have room for count() elements
+		**/
+		void extract_set(bit_index_set& ls) const;
+		void extract_stack(utils::FixedStack<bit_index_t>& s) const;
+		void extract_array(int* lv, std::size_t& size, bool rev = false) const;
 
 		////////////////////////
 		 //Other operations 
@@ -753,7 +834,7 @@ namespace bitgraph {
 		*		 (convenience function for the API)
 		* @details calls to_vector
 		**/
-		operator bitpos_list () const;
+		explicit operator bitpos_list () const;
 
 		/////////////////////
 		//data members
@@ -775,7 +856,7 @@ namespace bitgraph {
 
 namespace bitgraph {
 
-	bool BitsetSp::is_bit(int bit)	const {
+	bool BitsetSp::is_bit(int bit)	const noexcept {
 
 		int bb = WDIV(bit);
 
@@ -789,7 +870,7 @@ namespace bitgraph {
 	}
 
 
-	bool BitsetSp::is_empty()	const {
+	bool BitsetSp::is_empty()	const noexcept {
 
 		if (!vBB_.empty()) {
 
@@ -805,7 +886,7 @@ namespace bitgraph {
 	}
 
 
-	bool BitsetSp::is_disjoint(const BitsetSp& rhs) const {
+	bool BitsetSp::is_disjoint(const BitsetSp& rhs) const noexcept {
 
 		auto itL = vBB_.begin();
 		auto itR = rhs.vBB_.begin();
@@ -874,6 +955,42 @@ namespace bitgraph {
 		return true;
 	}
 
+
+	int BitsetSp::is_singleton() const noexcept {
+
+		int pc = 0;
+		for (const auto& blk : vBB_) {
+			if (blk.bb_ && (pc += bblock::popc64(blk.bb_)) > 1) {
+				return -1;
+			}
+		}
+		return pc;			// 1 singleton, 0 empty
+	}
+
+	int BitsetSp::find_first_common(const BitsetSp& rhs) const noexcept {
+
+		auto itL = vBB_.cbegin();
+		auto itR = rhs.vBB_.cbegin();
+		const auto endL = vBB_.cend();
+		const auto endR = rhs.vBB_.cend();
+
+		while (itL != endL && itR != endR) {
+			if (itL->idx_ < itR->idx_) {
+				++itL;
+			}
+			else if (itL->idx_ > itR->idx_) {
+				++itR;
+			}
+			else {
+				if (const BITBOARD bb = itL->bb_ & itR->bb_) {
+					return bblock::lsb(bb) + static_cast<int>(WMUL(itL->idx_));
+				}
+				++itL;
+				++itR;
+			}
+		}
+		return BBObject::noBit;
+	}
 	///////////////////
 	// Bit updates
 
@@ -959,7 +1076,7 @@ namespace bitgraph {
 	}
 
 
-	int BitsetSp::next_bit(int firstBit)  const {
+	int BitsetSp::next_bit(int firstBit)  const noexcept {
 
 		//special case - first bitscan
 		if (firstBit == BBObject::noBit) {
@@ -995,7 +1112,7 @@ namespace bitgraph {
 	}
 
 
-	int BitsetSp::prev_bit(int lastBit) const {
+	int BitsetSp::prev_bit(int lastBit) const noexcept {
 
 		//special case - first bitscan
 		if (lastBit == BBObject::noBit) {
@@ -1198,7 +1315,7 @@ namespace bitgraph {
 	}
 
 
-	int BitsetSp::popcn64() const {
+	int BitsetSp::popcn64() const noexcept {
 
 		BITBOARD pc = 0;
 
@@ -1210,7 +1327,7 @@ namespace bitgraph {
 	}
 
 
-	int BitsetSp::popcn64(int firstBit) const {
+	int BitsetSp::popcn64(int firstBit) const noexcept {
 
 		auto bbL = WDIV(firstBit);
 		auto it = lower_bound(vBB_.begin(), vBB_.end(), SparseBlock(bbL), pBlock_less());
@@ -1233,7 +1350,7 @@ namespace bitgraph {
 	}
 
 
-	int BitsetSp::popcn64(int firstBit, int lastBit) const
+	int BitsetSp::popcn64(int firstBit, int lastBit) const noexcept
 	{
 		////////////////////////////////
 		if (lastBit == -1) {
@@ -1935,6 +2052,24 @@ namespace bitgraph {
 
 }//end namespace bitgraph
 
+
+
+///////////////////
+// convenient helpers for BitsetSp construction
+// (sparse counterparts of make_bitset; there is no "full" variant, it would not be sparse)
+
+namespace bitgraph {
+
+	/** @brief Creates an empty BitsetSp given a maximum number of bits @nPop. */
+	inline BitsetSp make_bitset_sp(int nPop) { return BitsetSp(nPop); }
+
+	/** @brief Creates a BitsetSp given a maximum @nPop and a list of values in brackets. */
+	inline BitsetSp make_bitset_sp(int nPop, std::initializer_list<int> lv) { return BitsetSp(nPop, lv); }
+
+	/** @brief Creates a BitsetSp given a maximum @nPop and a container of 1-bits. */
+	inline BitsetSp make_bitset_sp(int nPop, const bitpos_list& lv) { return BitsetSp(nPop, lv); }
+
+} // namespace bitgraph
 
 
 //////////////////////////

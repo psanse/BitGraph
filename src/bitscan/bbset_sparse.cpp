@@ -66,6 +66,19 @@ BitsetSp::BitsetSp(std::size_t nPop, const bitpos_list& lv):
 	}
 }
 
+BitsetSp::BitsetSp(const bitpos_list& bits) :
+	nBB_(0)
+{
+	if (bits.empty()) { return; }
+
+	const int maxBit = *std::max_element(bits.begin(), bits.end());
+	assert(maxBit >= 0);
+
+	nBB_ = static_cast<int>(INDEX_0TO1(maxBit));
+	vBB_.reserve(DEFAULT_CAPACITY);
+	set_bit(bits);
+}
+
 BitsetSp::BitsetSp(std::size_t nPop, std::initializer_list<int> lv) :
 	nBB_(static_cast<int>(INDEX_1TO1(nPop)))
 {
@@ -907,6 +920,78 @@ BitsetSp::operator bitpos_list() const
 	bitpos_list lb;
 	extract(lb);
 	return lb;
+}
+
+namespace {
+
+	/** @brief calls f(bit) for each 1-bit of the sparse blocks in increasing order. O(blocks + bits) */
+	template<class BlockVec, class F>
+	inline void for_each_bit(const BlockVec& vBB, F&& f) {
+		for (const auto& blk : vBB) {
+			BITBOARD bb = blk.bb_;
+			const int base = static_cast<int>(WMUL(blk.idx_));
+			while (bb) {
+				f(base + bblock::lsb(bb));
+				bb &= (bb - 1);					//clears the lowest 1-bit
+			}
+		}
+	}
+
+	/** @brief same in decreasing order */
+	template<class BlockVec, class F>
+	inline void for_each_bit_rev(const BlockVec& vBB, F&& f) {
+		for (auto it = vBB.rbegin(); it != vBB.rend(); ++it) {
+			BITBOARD bb = it->bb_;
+			const int base = static_cast<int>(WMUL(it->idx_));
+			while (bb) {
+				const int p = bblock::msb(bb);
+				f(base + p);
+				bb &= ~bblock::MASK_BIT(p);
+			}
+		}
+	}
+}
+
+void BitsetSp::extract_set(bit_index_set& ls) const {
+	ls.clear();
+	for_each_bit(vBB_, [&ls](int bit) { ls.insert(ls.end(), bit); });	//hint: increasing order
+}
+
+void BitsetSp::extract_stack(utils::FixedStack<bit_index_t>& s) const {
+	s.clear();
+	for_each_bit(vBB_, [&s](int bit) { s.push(bit); });
+}
+
+void BitsetSp::extract_array(int* lv, std::size_t& size, bool rev) const {
+	size = 0;
+	if (rev) {
+		for_each_bit_rev(vBB_, [&](int bit) { lv[size++] = bit; });
+	}
+	else {
+		for_each_bit(vBB_, [&](int bit) { lv[size++] = bit; });
+	}
+}
+
+BitsetSp& BitsetSp::assign_bit(const BitsetSp& rhs) {
+
+	if (this == &rhs) { return *this; }
+
+	vBB_ = rhs.vBB_;							//reuses the storage of THIS if it is large enough
+
+	//drops blocks outside the population size of THIS (only if rhs is larger)
+	if (rhs.nBB_ > nBB_) {
+		auto it = std::lower_bound(vBB_.begin(), vBB_.end(), SparseBlock(nBB_), pBlock_less());
+		vBB_.erase(it, vBB_.end());
+	}
+	return *this;
+}
+
+BitsetSp& BitsetSp::set_bit(const bitpos_list& bits) {
+	for (const int bit : bits) {
+		assert(bit >= 0 && bit < static_cast<int>(bit_capacity()));
+		set_bit(bit);
+	}
+	return *this;
 }
 
 ///////////////////////////////

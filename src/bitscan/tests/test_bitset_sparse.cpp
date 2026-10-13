@@ -909,3 +909,160 @@ TEST(Sparse, DISABLED_clear_bits) {
 //	bbsp.erase_block_pos(3,bberase);
 //	EXPECT_FALSE(bbsp.is_bit(9000));
 //}
+
+
+//////////////////////////////////////////////
+// Bitset-compatible API of BitsetSp (see docs/bitsetsp_api_parity.md)
+
+TEST(BitsetSp_api, aliases) {
+	BitsetSp bb(200);
+	bb.set(10).set(70).set(130);
+	EXPECT_TRUE(bb.test(10));
+	EXPECT_TRUE(bb.test(70));
+	EXPECT_FALSE(bb.test(11));
+	EXPECT_EQ(3, bb.count());
+
+	bb.clear(70);
+	EXPECT_FALSE(bb.test(70));
+	EXPECT_EQ(2, bb.count());
+
+	EXPECT_EQ(200 / 64 + 1, static_cast<int>(bb.num_blocks()));
+	EXPECT_EQ(bb.num_blocks() * 64, bb.bit_capacity());
+
+	bb.clear_all();
+	EXPECT_TRUE(bb.is_empty());
+	EXPECT_EQ(0, bb.count());
+	EXPECT_EQ(4u, bb.num_blocks());			//population size preserved
+
+	bb.set(5);
+	bb.erase_all_bits();
+	EXPECT_TRUE(bb.is_empty());
+}
+
+TEST(BitsetSp_api, masking_aliases) {
+	BitsetSp a(200, { 1, 70, 130, 199 });
+	BitsetSp b(200, { 70, 130, 150 });
+
+	BitsetSp x(a);
+	x.and_eq(b);
+	EXPECT_EQ((bitpos_list{ 70, 130 }), static_cast<bitpos_list>(x));
+
+	BitsetSp y(a);
+	y.or_eq(b);
+	EXPECT_EQ((bitpos_list{ 1, 70, 130, 150, 199 }), static_cast<bitpos_list>(y));
+
+	BitsetSp z(a);
+	z.andnot_eq(b);
+	EXPECT_EQ((bitpos_list{ 1, 199 }), static_cast<bitpos_list>(z));
+}
+
+TEST(BitsetSp_api, is_singleton) {
+	BitsetSp bb(200);
+	EXPECT_EQ(0, bb.is_singleton());			//empty
+
+	bb.set(100);
+	EXPECT_EQ(1, bb.is_singleton());
+
+	bb.set(101);
+	EXPECT_EQ(-1, bb.is_singleton());			//same block
+
+	bb.erase_bit(101);
+	bb.set(5);
+	EXPECT_EQ(-1, bb.is_singleton());			//different blocks
+
+	//zero blocks must be skipped
+	bb.erase_bit(5);
+	EXPECT_EQ(1, bb.is_singleton());
+	bb.erase_bit(100);
+	EXPECT_EQ(0, bb.is_singleton());
+	EXPECT_FALSE(bb.bitset().empty());			//blocks remain, all zero
+}
+
+TEST(BitsetSp_api, find_first_common) {
+	BitsetSp a(300, { 1, 70, 130, 250 });
+	BitsetSp b(300, { 2, 130, 250 });
+	BitsetSp c(300, { 3, 71 });
+
+	EXPECT_EQ(130, a.find_first_common(b));
+	EXPECT_EQ(130, b.find_first_common(a));
+	EXPECT_EQ(BBObject::noBit, a.find_first_common(c));
+	EXPECT_EQ(BBObject::noBit, a.find_first_common(BitsetSp(300)));
+
+	BitsetSp d(300, { 70 });
+	EXPECT_EQ(70, a.find_first_common(d));
+	EXPECT_EQ(a.is_disjoint(c), a.find_first_common(c) == BBObject::noBit);
+}
+
+TEST(BitsetSp_api, assign_bit) {
+	BitsetSp src(200, { 3, 70, 190 });
+	BitsetSp dst(200, { 5, 6, 100 });
+
+	dst.assign_bit(src);
+	EXPECT_TRUE(dst == src);
+	EXPECT_EQ(4u, dst.num_blocks());
+
+	dst.assign_bit(dst);						//self-assignment
+	EXPECT_TRUE(dst == src);
+
+	BitsetSp small(100);						//2 blocks: bit 190 is out of range
+	small.assign_bit(src);
+	EXPECT_EQ((bitpos_list{ 3, 70 }), static_cast<bitpos_list>(small));
+}
+
+TEST(BitsetSp_api, set_bit_list_and_constructor_from_list) {
+	const bitpos_list lv = { 190, 3, 70, 64 };		//unsorted on purpose
+
+	BitsetSp bb(200);
+	bb.set_bit(lv);
+	EXPECT_EQ((bitpos_list{ 3, 64, 70, 190 }), static_cast<bitpos_list>(bb));
+
+	BitsetSp bc(lv);							//population size from the maximum bit
+	EXPECT_EQ(static_cast<bitpos_list>(bb), static_cast<bitpos_list>(bc));	//== also compares the population size
+	EXPECT_EQ(190 / 64 + 1, static_cast<int>(bc.num_blocks()));
+
+	BitsetSp be((bitpos_list()));				//empty list
+	EXPECT_TRUE(be.is_empty());
+	EXPECT_EQ(0u, be.num_blocks());
+
+	BitsetSp bi;
+	bi.init(200, lv);
+	EXPECT_TRUE(bi == bb);
+}
+
+TEST(BitsetSp_api, make_bitset_sp) {
+	auto a = make_bitset_sp(200);
+	EXPECT_TRUE(a.is_empty());
+	auto b = make_bitset_sp(200, { 1, 2, 100 });
+	EXPECT_EQ(3, b.count());
+	bitpos_list lv = { 7, 8 };
+	auto c = make_bitset_sp(200, lv);
+	EXPECT_EQ(2, c.count());
+}
+
+TEST(BitsetSp_api, extract_functions) {
+	BitsetSp bb(300, { 0, 63, 64, 70, 200, 299 });
+	//a zero block in the middle must not matter
+	bb.set(130).erase_bit(130);
+
+	bit_index_set ls;
+	bb.extract_set(ls);
+	EXPECT_EQ((bit_index_set{ 0, 63, 64, 70, 200, 299 }), ls);
+
+	utils::FixedStack<int> st(10);
+	bb.extract_stack(st);
+	EXPECT_EQ(6, static_cast<int>(st.size()));
+
+	int arr[10];
+	std::size_t sz = 0;
+	bb.extract_array(arr, sz);
+	ASSERT_EQ(6u, sz);
+	EXPECT_EQ((std::vector<int>{ 0, 63, 64, 70, 200, 299 }), std::vector<int>(arr, arr + sz));
+
+	bb.extract_array(arr, sz, true);
+	ASSERT_EQ(6u, sz);
+	EXPECT_EQ((std::vector<int>{ 299, 200, 70, 64, 63, 0 }), std::vector<int>(arr, arr + sz));
+
+	BitsetSp be(300);
+	be.extract_array(arr, sz);
+	EXPECT_EQ(0u, sz);
+}
