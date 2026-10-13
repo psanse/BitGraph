@@ -48,6 +48,7 @@
 
 #include <iostream>
 #include <sstream>
+#include <fstream>
 #include <random>
 #include <cmath>
 #include <cstdint>
@@ -305,47 +306,73 @@ namespace bitgraph {
 
 	namespace experimental {
 		
-		/////////////////
-		//
-		// Class WeightGen
-		// (generates weights for vertex-weighted graphs)
-		// 
-		// TODO specialize for sparse-graphs
-		// TODO SFINAE to control template graph type deduction (07/03/2025)
-		// 
-		// TODO - in general revise the whole logic of the generator classes for different graph types (07/03/2025)
-		//
-		////////////////
-
+		/**
+		 * @brief Experimental vertex weight generator for weighted graphs.
+		 *
+		 * Provides strategies for assigning vertex weights based on vertex
+		 * indices (modulus-based) or vertex degrees.
+		 * Existing weights are overwritten, and generated weights can
+		 * optionally be written to a file.
+		 *
+		 * @tparam GraphT Vertex-weighted graph type.
+		 *
+		 * @note Currently supports non-sparse vertex-weighted graphs.
+		 * @warning Experimental implementation. Not part of the stable BITGRAPH API.
+		 */
 		template <class GraphT>
-		class WeightGen
+		class VertexWeightGen
 		{
 			//filter out invalid types - currently only non-sparse vertex weighted graphs
 			static_assert(std::is_same<GraphT, ugraph_vw>::value ||
-						 std::is_same<GraphT, ugraph_vwi>::value,						
-						"WeightGen<GraphT> : GraphT must be a simple, non-sparse,  vertex-weighted graph type ");
+						  std::is_same<GraphT, ugraph_vwi>::value,						
+						 "VertexWeightGen<GraphT> : GraphT must be a simple, non-sparse,  vertex-weighted graph type ");
 
 		public:
-			enum type_t { WMOD = 0, WDEG };
 
-			/*
-			* @brief Overrites new vertex weights in the graph
-			*
-			*		I. we(v) = 1 + (v % mod) [Pullham 2008]
-			*
-			*		II. Optionally the weights are written to a file
-			*
-			*		TODO: specialize for sparse-graphs
-			*
-			* @returns -1 if error, 0 if OK
-			*/
-			static int create_weights(GraphT& g, type_t, int wmod = DEFAULT_WEIGHT_MODULUS,
-				std::string FILE_EXTENSION = "", std::string FILE_PATH = "");
+			using graph_t = GraphT;
+
+			/**
+			 * @brief Strategies for generating vertex weights.
+			 */
+			enum class weight_type {
+				modulus = 0,   ///< Weight derived from the vertex index modulo a given value.
+				degree         ///< Weight derived from the vertex degree.
+			};
+
+			/**
+			 * @brief Generates and overwrites vertex weights in a graph.
+			 *
+			 * Supports two weight generation strategies:
+			 * - Modulus-based: w(v) = 1 + ((v + 1) % wmod), i.e., w(i) = 1 + (i % wmod)
+			 *   for 1-based vertex indices i = v + 1 [Pullan, 2008].
+			 * - Degree-based: w(v) = degree(v) (isolated vertices get weight 0).
+			 *
+			 * Optionally writes the generated weights to a file.
+			 *
+			 * @param[in,out] graph Graph whose vertex weights are overwritten.
+			 * @param[in] type_of_weights Weight generation strategy.
+			 * @param[in] wmod Modulus for index-based weights (must be positive).
+			 * @param[in] file_extension Extension appended to the graph name.
+			 * @param[in] file_path Output directory for the weight file.
+			 *
+			 * @note File output is enabled only when both file_extension and
+			 *       file_path are non-empty. The file is named
+			 *       <file_path>/<graph name><file_extension> and contains the
+			 *       weights only, in vertex order (see print_weights).
+			 * @note Invalid parameters or file I/O failures cause program termination.
+			 *
+			 * @todo Add support for sparse graphs.
+			 */
+			static void create_weights(
+				graph_t& graph,
+				weight_type type_of_weights,
+				int wmod = DEFAULT_WEIGHT_MODULUS,
+				const std::string& file_extension = "",
+				const std::string& file_path = "");
 		};
 
 	}//end of namespace experimental
 
-//	using experimental::WeightGen;		//alias for WeightGen<GraphT>
 
 }//end of namespace bitgraph
 
@@ -354,46 +381,66 @@ namespace bitgraph {
 
 	namespace experimental {
 
-		/////////////////
-		//
-		// Class EdgeWeightGen
-		// (generates weights for edge-weighted graphs)
-		//
-		// TODO refactor to the new type (22/01/19)
-		// TODO specialize for sparse-graphs (08/01/2025)
-		// TODO add more weight generation modes (08/01/2025)
-		// TODO SFINAE to control template graph type deduction (07/03/2025)
-		//
-		////////////////
-
-
+		/**
+		 * @brief Experimental edge weight generator for weighted graphs.
+		 *
+		 * Generates edge weights for existing edges using a modulus-based
+		 * strategy. Graph topology is preserved, and generated weights
+		 * can optionally be written to a file.
+		 *
+		 * @tparam GraphT Edge-weighted graph type.
+		 *
+		 * @note Currently supports non-sparse edge-weighted graphs.
+		 * @warning Experimental implementation. Not part of the stable BITGRAPH API.
+		 *
+		 * @todo Refactor to support the new graph types (22/01/2019).
+		 * @todo Add support for sparse graphs (08/01/2025).
+		 * @todo Add more edge weight generation strategies (08/01/2025).
+		 * @todo Consider SFINAE for restricting supported graph types (07/03/2025).
+		 */
 		template<class GraphT>
 		class EdgeWeightGen
 		{
-			// filter out invalid types - currently only non-sparse vertex weighted graphs
-			static_assert(std::is_same<GraphT, ugraph_ew>::value ||
-						  std::is_same<GraphT, ugraph_ewi>::value,
-							"EdgeWeightGen<GraphT> : GraphT must be a simple, non-sparse,  edge-weighted graph type ");
-
+			// Restrict GraphT to supported non-sparse edge-weighted graph types
+			static_assert(
+				std::is_same<GraphT, ugraph_ew>::value ||
+				std::is_same<GraphT, ugraph_ewi>::value,
+				"EdgeWeightGen<GraphT>: unsupported edge-weighted graph type"
+				);
 
 		public:
-			enum type_t { WMOD = 0 };
 
-			/*
-			* @brief Generates weights for existing edges in a graph
-			*
-			*		I. we(v, w) = 1 + ((v + w) % mod) [Pullham 2008]
-			*
-			*		II. we(v, v) and non-edge weights are set to NOWT
-			*
-			*		III. Optionally the weights are written to a file
-			*
-			*		TODO: specialize for sparse-graphs
-			*
-			* @returns -1 if error, 0 if OK
-			*/
-			static int create_weights(GraphT& g, type_t, int wmod = DEFAULT_WEIGHT_MODULUS,
-				std::string FILE_EXTENSION = "", std::string FILE_PATH = "");
+			using graph_t = GraphT;
+					
+			/**
+			 * @brief Generates and overwrites edge weights in a graph.
+			 *
+			 * Assigns weights to existing edges with graph_t::set_modulus_weights(),
+			 * for 0-based vertex indices:
+			 * w(v, u) = 2 + ((v + u) % (wmod - 1)), with weights in [2, wmod].
+			 *
+			 * Pullan-style scheme; not identical to Pullan's (2008) 1-based
+			 * formula w(i, j) = 1 + ((i + j) % wmod).
+			 *
+			 * Non-edges are assigned NO_WEIGHT; the diagonal (self-loops) is not modified.
+			 * Optionally writes the resulting edge-weight matrix to a file.
+			 *
+			 * @param[in,out] graph Graph whose edge weights are overwritten.
+			 * @param[in] wmod Maximum generated weight (must be at least 2).
+			 * @param[in] file_extension Extension appended to the graph name.
+			 * @param[in] file_path Output directory for the weight file.
+			 *
+			 * @note File output is enabled only when both file_extension and
+			 *       file_path are non-empty.
+			 * @note Invalid parameters or file I/O failures cause program termination.
+			 *
+			 * @todo Add support for sparse graphs.
+			 */
+			static void create_weights(
+				graph_t& graph, 
+				int wmod = DEFAULT_WEIGHT_MODULUS,
+				const std::string& file_extension = "",
+				const std::string& file_path = "");
 
 		};
 	}//end of namespace experimental

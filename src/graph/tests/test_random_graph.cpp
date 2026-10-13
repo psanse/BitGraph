@@ -14,6 +14,7 @@
 #include "gtest/gtest.h"
 #include <iostream>
 #include <cstdio>
+#include <fstream>
 #include <sstream>
 #include <cmath>
 
@@ -211,6 +212,223 @@ TEST(Sparse_Random_Graph, first_edge) {
 
 	const double sd = std::sqrt(p * (1 - p) / NREP);
 	EXPECT_NEAR(p, static_cast<double>(count) / NREP, 5 * sd);
+}
+
+////////////////////
+//
+// WEIGHT GENERATION
+//
+////////////////////
+
+TEST(VertexWeightGen, modulus_dimacs){
+		
+	//read DIMACS graph from file - no DIMACS weights, sets default weights 
+	ugraph_vwi ugw (BITGRAPH_GRAPH_TEST_DATA_DIR  "brock200_1.clq");
+
+	const int NV = ugw.num_vertices();
+
+	EXPECT_EQ(200, NV);
+	EXPECT_EQ(ugraph_vwi::DEFAULT_WEIGHT, ugw.weight(0));
+	EXPECT_EQ(ugraph_vwi::DEFAULT_WEIGHT, ugw.weight(1));
+	EXPECT_EQ(ugraph_vwi::DEFAULT_WEIGHT, ugw.weight(199));
+
+	//generate modulus weights 
+	experimental::VertexWeightGen< ugraph_vwi >::create_weights(
+		ugw,
+		experimental::VertexWeightGen<ugraph_vwi>::weight_type::modulus, 
+		200);
+		
+	EXPECT_EQ(2, ugw.weight(0));
+	EXPECT_EQ(3, ugw.weight(1));
+	EXPECT_EQ(200, ugw.weight(198));
+	EXPECT_EQ(1, ugw.weight(199));			//unit weight - check!
+}
+
+TEST(VertexWeightGen, random_graph_modulus) {
+	
+	const int NV = 50;
+	const double density = 0.31;
+		
+	//creates random graph of size NV with modulus weights
+	ugraph_vwi ugw;
+	RandomGen<ugraph_vwi>::create_graph(ugw, NV, density);							/* empty vertex weights by default */
+	experimental::VertexWeightGen<ugraph_vwi>::create_weights(ugw,
+		experimental::VertexWeightGen<ugraph_vwi>::weight_type::modulus);
+	
+	/////////////////////
+	EXPECT_EQ(NV, ugw.num_vertices());
+	EXPECT_TRUE(ugw.graph().density() < density + 0.001);
+	EXPECT_TRUE(ugw.graph().density() > density - 0.001);
+	////////////////////
+}
+
+TEST(VertexWeightGen, degree) {
+
+	using gen_t = experimental::VertexWeightGen<ugraph_vwi>;
+
+	ugraph_vwi ugw(6);
+	ugw.add_edge(0, 1);
+	ugw.add_edge(0, 2);
+	ugw.add_edge(0, 3);
+	ugw.add_edge(1, 2);					// vertices 4 and 5 are isolated 
+
+	gen_t::create_weights(ugw, gen_t::weight_type::degree);
+
+	EXPECT_EQ(3, ugw.weight(0));
+	EXPECT_EQ(2, ugw.weight(1));
+	EXPECT_EQ(2, ugw.weight(2));
+	EXPECT_EQ(1, ugw.weight(3));
+	EXPECT_EQ(0, ugw.weight(4));			// isolated vertices get weight 0 
+	EXPECT_EQ(0, ugw.weight(5));
+}
+
+TEST(VertexWeightGen, modulus) {
+
+	using gen_t = experimental::VertexWeightGen<ugraph_vwi>;
+
+	ugraph_vwi ugw(7);
+
+	// w(v) = 1 + ((v + 1) % wmod) 
+	gen_t::create_weights(ugw, gen_t::weight_type::modulus, 3);
+
+	EXPECT_EQ(2, ugw.weight(0));
+	EXPECT_EQ(3, ugw.weight(1));
+	EXPECT_EQ(1, ugw.weight(2));
+	EXPECT_EQ(2, ugw.weight(3));
+	EXPECT_EQ(3, ugw.weight(4));
+	EXPECT_EQ(1, ugw.weight(5));
+	EXPECT_EQ(2, ugw.weight(6));
+}
+
+TEST(VertexWeightGen, to_file) {
+
+	using gen_t = experimental::VertexWeightGen<ugraph_vwi>;
+
+	ugraph_vwi ugw(10);
+	ugw.add_edge(0, 1);
+	ugw.add_edge(2, 3);
+	ugw.set_name("gen_weights_to_file_test");
+
+	// writes <TempDir>/gen_weights_to_file_test.w 
+	const std::string path = ::testing::TempDir();
+	gen_t::create_weights(ugw, gen_t::weight_type::modulus, 4, ".w", path);
+
+	const std::string filename = path + "gen_weights_to_file_test.w";
+
+	// file contents are the generated weights, as streamed by print_weights 
+	{
+		std::ifstream f(filename);
+		ASSERT_TRUE(f.good());
+		std::ostringstream contents, expected;
+		contents << f.rdbuf();
+		ugw.print_weights(expected, false);
+		EXPECT_EQ(expected.str(), contents.str());
+	}
+
+	// cleanup - removing also checks that the file was written 
+	EXPECT_EQ(0, std::remove(filename.c_str()));
+}
+
+TEST(EdgeWeightGen, modulus) {
+
+	const int NV = 5;
+	ugraph_ewi ugew(NV);
+	ugew.add_edge(0, 1, 1);
+	ugew.add_edge(0, 2, 2);
+	ugew.add_edge(1, 3, 3);
+
+	//generate modulus-weights on the edges 
+	experimental::EdgeWeightGen<ugraph_ewi>::create_weights (
+		ugew,
+		DEFAULT_WEIGHT_MODULUS);
+
+	EXPECT_EQ(NV, ugew.graph().num_vertices());
+	EXPECT_EQ(3, ugew.weight(0, 1));
+	EXPECT_EQ(4, ugew.weight(0, 2));
+	EXPECT_EQ(6, ugew.weight(1, 3));
+	EXPECT_TRUE(ugew.is_consistent());  // validate_weight_matrix()
+}
+
+TEST(EdgeWeightGen, modulus_non_default) {
+
+	using gen_t = experimental::EdgeWeightGen<ugraph_ewi>;
+
+	const int NV = 6;
+	ugraph_ewi ugew(NV);
+	ugew.add_edge(0, 1);
+	ugew.add_edge(0, 4);
+	ugew.add_edge(2, 5);
+	ugew.add_edge(4, 5);
+
+	// w(v, w) = 2 + ((v + w) % (wmod - 1)), weights in [2, wmod] 
+	gen_t::create_weights(ugew, 4);
+
+	EXPECT_EQ(3, ugew.weight(0, 1));		// 2 + (1 % 3) 
+	EXPECT_EQ(3, ugew.weight(0, 4));		// 2 + (4 % 3) 
+	EXPECT_EQ(3, ugew.weight(2, 5));		// 2 + (7 % 3) 
+	EXPECT_EQ(2, ugew.weight(4, 5));		// 2 + (9 % 3) 
+
+	// symmetric weights 
+	EXPECT_EQ(ugew.weight(0, 1), ugew.weight(1, 0));
+	EXPECT_EQ(ugew.weight(4, 5), ugew.weight(5, 4));
+
+	// non-edges have no weight 
+	EXPECT_EQ(ugraph_ewi::NO_WEIGHT, ugew.weight(0, 2));
+	EXPECT_EQ(ugraph_ewi::NO_WEIGHT, ugew.weight(3, 5));
+
+	// all weights in [2, wmod] 
+	for (int v = 0; v < NV; ++v) {
+		for (int w = v + 1; w < NV; ++w) {
+			if (ugew.graph().is_edge(v, w)) {
+				EXPECT_GE(ugew.weight(v, w), 2);
+				EXPECT_LE(ugew.weight(v, w), 4);
+			}
+		}
+	}
+
+	EXPECT_TRUE(ugew.is_consistent());
+}
+
+TEST(EdgeWeightGen, invalid_modulus_terminates) {
+
+	using gen_t = experimental::EdgeWeightGen<ugraph_ewi>;
+
+	ugraph_ewi ugew(3);
+	ugew.add_edge(0, 1);
+
+	EXPECT_DEATH(gen_t::create_weights(ugew, 1), "");
+	EXPECT_DEATH(gen_t::create_weights(ugew, 0), "");
+	EXPECT_DEATH(gen_t::create_weights(ugew, -5), "");
+}
+
+TEST(EdgeWeightGen, to_file) {
+
+	using gen_t = experimental::EdgeWeightGen<ugraph_ewi>;
+
+	ugraph_ewi ugew(5);
+	ugew.add_edge(0, 1);
+	ugew.add_edge(1, 3);
+	ugew.add_edge(2, 4);
+	ugew.set_name("edge_weight_gen_to_file_test");
+
+	// writes <TempDir>/edge_weight_gen_to_file_test.ew 
+	const std::string path = ::testing::TempDir();
+	gen_t::create_weights(ugew, DEFAULT_WEIGHT_MODULUS, ".ew", path);
+
+	const std::string filename = path + "edge_weight_gen_to_file_test.ew";
+
+	// file contents are the edge-weight matrix, as streamed by print_edges 
+	{
+		std::ifstream f(filename);
+		ASSERT_TRUE(f.good());
+		std::ostringstream contents, expected;
+		contents << f.rdbuf();
+		ugew.print_edges(expected, ugraph_ewi::edge_print_format::edge_matrix, false);
+		EXPECT_EQ(expected.str(), contents.str());
+	}
+
+	// cleanup - removing also checks that the file was written 
+	EXPECT_EQ(0, std::remove(filename.c_str()));
 }
 
 ////////////////////

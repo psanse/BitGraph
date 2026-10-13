@@ -99,22 +99,6 @@ TEST_F(UGraphEWTest, transform_weights) {
 
 }
 
-TEST_F(UGraphEWTest, generate_weights) {
-
-	//generate modulus-weights on the edges 
-	experimental::EdgeWeightGen<ugraph_ewi>::create_weights (
-		ugew,
-		experimental::EdgeWeightGen<ugraph_ewi>::WMOD,
-		DEFAULT_WEIGHT_MODULUS);
-
-	EXPECT_EQ(NV, ugew.graph().num_vertices());
-	EXPECT_EQ(3, ugew.weight(0, 1));
-	EXPECT_EQ(4, ugew.weight(0, 2));
-	EXPECT_EQ(6, ugew.weight(1, 3));
-	EXPECT_TRUE(ugew.is_consistent());  // validate_weight_matrix()
-}
-
-
 TEST(UGraphEW, constructor_file) {
 
 	ugraph_ewi ugew(BITGRAPH_GRAPH_TEST_DATA_DIR "toy_ew_dimacs.txt");

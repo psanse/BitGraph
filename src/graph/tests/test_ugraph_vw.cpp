@@ -22,6 +22,7 @@
 #include <iostream>
 #include <cstdio>
 #include <fstream>
+#include <sstream>
 
 
 using namespace std;
@@ -489,48 +490,6 @@ TEST(UGraphW, constructor_from_file) {
 
 }
 
-TEST(UGraphW, gen_weights_dimacs){
-		
-	//read DIMACS graph from file - no DIMACS weights, sets default weights 
-	ugraph_vwi ugw (BITGRAPH_GRAPH_TEST_DATA_DIR  "brock200_1.clq");
-
-	const int NV = ugw.num_vertices();
-
-	EXPECT_EQ(200, NV);
-	EXPECT_EQ(ugraph_vwi::DEFAULT_WEIGHT, ugw.weight(0));
-	EXPECT_EQ(ugraph_vwi::DEFAULT_WEIGHT, ugw.weight(1));
-	EXPECT_EQ(ugraph_vwi::DEFAULT_WEIGHT, ugw.weight(199));
-
-	//generate modulus weights 
-	experimental::WeightGen< ugraph_vwi >::create_weights(
-		ugw,
-		experimental::WeightGen<ugraph_vwi>::WMOD, 
-		200);
-		
-	EXPECT_EQ(2, ugw.weight(0));
-	EXPECT_EQ(3, ugw.weight(1));
-	EXPECT_EQ(200, ugw.weight(198));
-	EXPECT_EQ(1, ugw.weight(199));			//unit weight - check!
-}
-
-TEST(UGraphW, gen_random) {
-	
-	const int NV = 50;
-	const double density = 0.31;
-		
-	//creates random graph of size NV with modulus weights
-	ugraph_vwi ugw;
-	RandomGen<ugraph_vwi>::create_graph(ugw, NV, density);							/* empty vertex weights by default */
-	experimental::WeightGen<ugraph_vwi>::create_weights(ugw, 
-		experimental::WeightGen<ugraph_vwi>::WMOD);
-	
-	/////////////////////
-	EXPECT_EQ(NV, ugw.num_vertices());
-	EXPECT_TRUE(ugw.graph().density() < density + 0.001);
-	EXPECT_TRUE(ugw.graph().density() > density - 0.001);
-	////////////////////
-}
-
 ///////////////
 //
 // DISABLED TESTS
@@ -551,8 +510,8 @@ TEST(UGraphW, gen_random) {
 //	const int NV=ugw.graph().num_vertices();
 //	
 //	//generate weights WDEG mode
-//	WeightGen< Graph_W<ugraph, int> >::create_weights(ugw, 
-//													WeightGen<Graph_W<ugraph, int>>::WMOD, 
+//	VertexWeightGen< Graph_W<ugraph, int> >::create_weights(ugw, 
+//													VertexWeightGen<Graph_W<ugraph, int>>::WMOD, 
 //													DEFAULT_WEIGHT_MODULUS,
 //													".d", 
 //													TEST_GRAPH_PATH_LOG			
@@ -635,7 +594,7 @@ TEST(UGraphW, gen_random) {
 //	ug.add_edge(0,2);
 //	
 //	//generate weights WDEG mode
-//	WeightGen<ugraph>::create_wgraph(ug, WeightGen<ugraph>::WDEG, ".d");
+//	VertexWeightGen<ugraph>::create_wgraph(ug, VertexWeightGen<ugraph>::WDEG, ".d");
 //	ug.print_weights();
 //	EXPECT_EQ(ug.degree(0), ug.get_wv(0));
 //	EXPECT_EQ(ug.degree(1), ug.get_wv(1));
@@ -645,7 +604,7 @@ TEST(UGraphW, gen_random) {
 //	EXPECT_TRUE(ug.is_weighted_v());
 //
 //	//generate weights WMOD mode
-//	WeightGen<ugraph>::create_wgraph(ug, WeightGen<ugraph>::WMOD, ".d");
+//	VertexWeightGen<ugraph>::create_wgraph(ug, VertexWeightGen<ugraph>::WMOD, ".d");
 //	ug.print_weights();
 //	EXPECT_EQ(1, ug.get_wv(0));
 //	EXPECT_EQ(2, ug.get_wv(1));
@@ -654,7 +613,7 @@ TEST(UGraphW, gen_random) {
 //	EXPECT_EQ(5, ug.get_wv(4));
 //
 //	//generate weights WMOD mode, param 2
-//	WeightGen<ugraph>::create_wgraph(ug, WeightGen<ugraph>::WMOD, ".r","", 2);
+//	VertexWeightGen<ugraph>::create_wgraph(ug, VertexWeightGen<ugraph>::WMOD, ".r","", 2);
 //	ug.print_weights();
 //	EXPECT_EQ(1, ug.get_wv(0));
 //	EXPECT_EQ(2, ug.get_wv(1));
@@ -844,7 +803,7 @@ TEST(UGraphW, gen_random) {
 //	ug.add_edge(0,2);
 //	
 //	//generate weights WDEG mode
-//	WeightGen<ugraph>::create_wgraph(ug, WeightGen<ugraph>::WDEG);
+//	VertexWeightGen<ugraph>::create_wgraph(ug, VertexWeightGen<ugraph>::WDEG);
 //	ug.print_weights();
 //	EXPECT_EQ(ug.degree(0), ug.get_wv(0));
 //	EXPECT_EQ(ug.degree(1), ug.get_wv(1));
@@ -854,7 +813,7 @@ TEST(UGraphW, gen_random) {
 //	EXPECT_TRUE(ug.is_weighted_v());
 //
 //	//generate weights WMOD mode
-//	WeightGen<ugraph>::create_wgraph(ug, WeightGen<ugraph>::WMOD);
+//	VertexWeightGen<ugraph>::create_wgraph(ug, VertexWeightGen<ugraph>::WMOD);
 //	ug.print_weights();
 //	EXPECT_EQ(1, ug.get_wv(0));
 //	EXPECT_EQ(2, ug.get_wv(1));
@@ -863,7 +822,7 @@ TEST(UGraphW, gen_random) {
 //	EXPECT_EQ(5, ug.get_wv(4));
 //
 //	//generate weights WMOD mode, param 2
-//	WeightGen<ugraph>::create_wgraph(ug, WeightGen<ugraph>::WMOD,2);
+//	VertexWeightGen<ugraph>::create_wgraph(ug, VertexWeightGen<ugraph>::WMOD,2);
 //	ug.print_weights();
 //	EXPECT_EQ(1, ug.get_wv(0));
 //	EXPECT_EQ(2, ug.get_wv(1));

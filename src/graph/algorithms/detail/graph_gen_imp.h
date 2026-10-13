@@ -73,14 +73,14 @@ namespace bitgraph{
 					std::ofstream f(os.str());
 
 					if (!f) {
-						LOG_ERROR("Cannot open file: {}", os.str());
+						LOGG_ERROR("Cannot open file: ", os.str(), " - RandomGen<GraphT>::create_graph_benchmark");
 						std::terminate();
 					}
 
 					g.write_dimacs(f);
 
 					if (!f) {
-						LOG_ERROR("Cannot write graph to file: {}", os.str());
+						LOGG_ERROR("Cannot write graph to file: ", os.str(), " - RandomGen<GraphT>::create_graph_benchmark");
 						std::terminate();
 					}
 				}
@@ -262,102 +262,113 @@ namespace bitgraph{
 
 	template<class GraphT>
 	inline
-		int experimental::WeightGen<GraphT>::create_weights(
-			GraphT& g, 
-			type_t type, 
+		void experimental::VertexWeightGen<GraphT>::create_weights(
+			graph_t& graph,
+			weight_type type_of_weights,
 			int wmod, 
-			std::string FILE_EXTENSION,
-			std::string FILE_PATH) 
+			const std::string& file_extension,
+			const std::string& file_path) 
 	{
 
-		const int NV = g.num_vertices();
+		const int NV = graph.num_vertices();
 
-		//no need to clear the current weights since they are overwritten
+		// Validate parameters
+		if (type_of_weights == weight_type::modulus && wmod <= 0) {
+			LOG_ERROR("Invalid modulus - VertexWeightGen<GraphT>::create_weights");
+			std::terminate();
+		}
 
-		switch (type) {
-		case WDEG:
-			for (int v = 0; v < NV; ++v) {
-				g.set_weight(v, g.graph().degree(v));
+		// Generate weights (existing weights are overwritten)
+		switch (type_of_weights) {
+				
+		case weight_type::degree:
+			for (vertex_t v = 0; v < NV; ++v) {
+				graph.set_weight(v, graph.graph().degree(v));
 			}
 			break;
-		case WMOD:
-			for (int v = 0; v < NV; ++v) {
-				g.set_weight(v, (1 + ((v + 1) % wmod)));
+
+		case weight_type::modulus:
+			for (vertex_t v = 0; v < NV; ++v) {
+				graph.set_weight(v, 1 + ((v + 1) % wmod));
 			}
 			break;
+
 		default:
-			LOG_INFO("incorrect weight generation mode - WeightGen<GraphT>::create_weights");
-			return -1;
+			LOG_ERROR("Invalid weight generation mode - VertexWeightGen<GraphT>::create_weights");
+			std::terminate();
 		}
 
-		/////////////////////////////
-		//streams weights to file
-		if (!FILE_EXTENSION.empty() && !FILE_PATH.empty()) {
+		// Optionally write weights to file
+		if (!file_extension.empty() && !file_path.empty()) {
 
-			//determines the filename
-			std::string path = FILE_PATH;
+			std::string path = file_path;
 			utils::append_slash(path);
-			std::string filename = path + g.graph().name() + FILE_EXTENSION;
 
-			//streams weights to file
+			const std::string filename =
+				path + graph.graph().name() + file_extension;
+
 			std::ofstream f(filename);
+
 			if (!f) {
-				LOGG_INFO("WeightGen<GraphT>::create_weights () - cannot write weights to file ", filename);
-				return -1;
+				LOGG_ERROR("Cannot open weight file: ", filename, " - VertexWeightGen<GraphT>::create_weights");
+				std::terminate();
 			}
 
-			///////////////////////////
-			g.print_weights(f, false);			//no vertex index is streamed with the weight value
-			///////////////////////////
+			// Write weights without vertex indices
+			graph.print_weights(f, false);
 
-			f.close();
+			if (!f) {
+				LOGG_ERROR("Cannot write weights to file: ", filename, " - VertexWeightGen<GraphT>::create_weights");
+				std::terminate();
+			}
 		}
-
-		return 0;
 	}
 
 	template<class GraphT>
 	inline
-		int	experimental::EdgeWeightGen<GraphT>::create_weights(
-			GraphT& g, 
-			type_t type,
+		void experimental::EdgeWeightGen<GraphT>::create_weights(
+			graph_t& graph, 
 			int wmod, 
-			std::string FILE_EXTENSION, std::string FILE_PATH)
+			const std::string& file_extension,
+			const std::string& file_path	)
 	{
-		switch (type) {
-		case WMOD:
-			g.set_modulus_weights(wmod);
-			break;
-		default:
-			LOG_INFO("bad weight generation mode - EdgeWeightGen<GraphT>::create_weights");
-			LOG_INFO("original weights unchanged");
-			return -1;
+		// Validate parameters - same precondition as graph_t::set_modulus_weights
+		if (wmod < 2) {
+			LOG_ERROR("Invalid modulus - EdgeWeightGen<GraphT>::create_weights");
+			std::terminate();
 		}
 
-		/////////////////////////////
-		//streams weights to file
-		if (!FILE_EXTENSION.empty() && !FILE_PATH.empty()) {
+		// Generate edge weights
+		graph.set_modulus_weights(wmod);
+				
 
-			//determines the filename
-			std::string path = FILE_PATH;
+		// Optionally write weights to file
+		if (!file_extension.empty() && !file_path.empty()) {
+
+			std::string path = file_path;
 			utils::append_slash(path);
-			std::string filename = path + g.graph().name() + FILE_EXTENSION;
 
-			//streams weights to file
+			const std::string filename =
+				path + graph.name() + file_extension;
+
 			std::ofstream f(filename);
+
 			if (!f) {
-				LOGG_INFO("cannot write edge-weights to file ", filename, " - EdgeWeightGen<GraphT>::create_weights");
-				return -1;
+				LOGG_ERROR("Cannot open edge-weight file: ", filename, " - EdgeWeightGen<GraphT>::create_weights");
+				std::terminate();
 			}
 
-			///////////////////////////
-			g.print_edges(f, GraphT::edge_print_format::edge_matrix, false);
-			///////////////////////////
+			graph.print_edges(
+				f,
+				GraphT::edge_print_format::edge_matrix,
+				false);
 
-			f.close();
+			if (!f) {
+				LOGG_ERROR("Cannot write edge weights to file: ", filename, " - EdgeWeightGen<GraphT>::create_weights");
+				std::terminate();
+			}
 		}
-
-		return 0;
+		
 	}
 
 }//end namespace bitgraph

@@ -265,8 +265,8 @@ namespace bitgraph {
 		 *
 		 * @pre @p modulus must be at least 2.
 		 *
-		 * @note This weighting scheme follows the convention used in the Pullan
-		 *       benchmark generators for weighted graph instances.
+		 * @note This weighting scheme is Pullan-style but not identical to
+		 *       Pullan's (2008) 1-based formula `w(i,j) = 1 + ((i + j) % modulus)`.
 		 * @note Although the parameter is named @p modulus, the actual modulus
 		 *       used in the formula is `modulus - 1`; @p modulus denotes the
 		 *       maximum generated weight.

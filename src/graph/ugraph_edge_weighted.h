@@ -153,12 +153,18 @@ namespace bitgraph {
 
 
 		/**
-		* @brief sets new edge-weights based on modulus operation [Pullan 2008, MODULUS = 200]
+		* @brief Assigns Pullan-style modulus-based weights to all existing edges
+		*		 (symmetric specialization for undirected graphs).
 		*
-		*			I.  we(v, w) = 1 + ((v + w) % MODULUS)	(1-based index)
-		*			II. Non-edges and vertex-weights are not modified
-		* @param template Erase: if TRUE weights of non-edges are set to NO_WEIGHT
-		* @param MODULUS: modulus value [Pullan 2008, DEFAULT_WEIGHT_MODULUS = 200]
+		*			I.   w(v, w) = 2 + ((v + w) % (modulus - 1))	(0-based index),
+		*			     i.e., weights lie in [2, modulus]
+		*			II.  Non-edges are set to NO_WEIGHT (both directions)
+		*			III. The diagonal and vertex weights are not modified
+		*
+		* @param modulus: maximum generated weight (DEFAULT_WEIGHT_MODULUS = 200)
+		*
+		* @note Not identical to Pullan's (2008) 1-based formula w(i, j) = 1 + ((i + j) % modulus).
+		* @warning Calls std::terminate() if @p modulus is less than 2.
 		**/
 		void set_modulus_weights(
 			int modulus = DEFAULT_WEIGHT_MODULUS) override;
