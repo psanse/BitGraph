@@ -241,17 +241,19 @@ namespace bitgraph {
 		//setters and getters (will not allocate memory)
 
 		/**
-		* @brief number of non-zero bitblocks in the sparse bitset
-		* @details As opposed to the non-sparse case, it can be zero if there are no 1-bits
-		*		   even though the maximum number of bitblocks determined in construction nBB_
-		*		   can be anything.
+		* @brief number of bitblocks stored in the sparse bitset (the size of the block collection)
+		* @details As opposed to the non-sparse case (where it is always num_blocks()), it can be zero
+		*		   if there are no blocks, even though the maximum number of bitblocks determined in
+		*		   construction (num_blocks()) can be anything.
+		*		   It is NOT the number of blocks with 1-bits: erase operations (erase_bit(bit), &=, ^=, ...)
+		*		   can leave blocks with all 0-bits in the collection, so size() can be greater than that number.
 		**/
 		std::size_t size() const noexcept { return vBB_.size(); }
 
 		/**
-		* @brief number of non-zero bitblocks in the sparse bitset
-		* @details the num_blocks is determined by the population size (construction),
-		* 		   - comment: NOT the size of @vBB_, which is the non-zero bitblocks in the bitset
+		* @brief maximum number of bitblocks of the bitset (the number of blocks of its universe)
+		* @details determined by the population size (construction). It is NOT the size of the
+		*		   block collection (see size()), which only stores some of these blocks.
 		**/
 		std::size_t num_blocks() const noexcept { return nBB_; }
 

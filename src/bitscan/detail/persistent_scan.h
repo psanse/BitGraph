@@ -20,6 +20,7 @@
 #include "bitscan/bbobject.h"
 
 namespace bitgraph {
+
     namespace detail {
 
 		/**
@@ -268,6 +269,7 @@ namespace bitgraph {
         };
 
     } // namespace detail
+
 } // namespace bitgraph
 
 #endif // BITGRAPH_BITSCAN_DETAIL_PERSISTENT_SCAN_H	

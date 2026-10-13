@@ -247,11 +247,11 @@ std::ostream& Bitset::print(std::ostream& o, bool show_pc, bool endl ) const
 	return o;
 }
 
-string Bitset::to_string ()
+string Bitset::to_string () const
 {
 	ostringstream sstr;
 
-	print(sstr);
+	print(sstr, true, false);		//no end of line, as BitsetSp::to_string
 
 	/*sstr << "[";
 

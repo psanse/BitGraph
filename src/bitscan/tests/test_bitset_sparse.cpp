@@ -917,7 +917,7 @@ TEST(Sparse, DISABLED_clear_bits) {
 //////////////////////////////////////////////
 // Bitset-compatible API of BitsetSp (see docs/bitsetsp_api_parity.md)
 
-TEST(BitsetSp_api, aliases) {
+TEST(Sparse, aliases) {
 	BitsetSp bb(200);
 	bb.set(10).set(70).set(130);
 	EXPECT_TRUE(bb.test(10));
@@ -942,7 +942,7 @@ TEST(BitsetSp_api, aliases) {
 	EXPECT_TRUE(bb.is_empty());
 }
 
-TEST(BitsetSp_api, masking_aliases) {
+TEST(Sparse, masking_aliases) {
 	BitsetSp a(200, { 1, 70, 130, 199 });
 	BitsetSp b(200, { 70, 130, 150 });
 
@@ -959,7 +959,7 @@ TEST(BitsetSp_api, masking_aliases) {
 	EXPECT_EQ((bitpos_list{ 1, 199 }), static_cast<bitpos_list>(z));
 }
 
-TEST(BitsetSp_api, is_singleton) {
+TEST(Sparse, is_singleton) {
 	BitsetSp bb(200);
 	EXPECT_EQ(0, bb.is_singleton());			//empty
 
@@ -981,7 +981,7 @@ TEST(BitsetSp_api, is_singleton) {
 	EXPECT_FALSE(bb.bitset().empty());			//blocks remain, all zero
 }
 
-TEST(BitsetSp_api, find_first_common) {
+TEST(Sparse, find_first_common_bit) {
 	BitsetSp a(300, { 1, 70, 130, 250 });
 	BitsetSp b(300, { 2, 130, 250 });
 	BitsetSp c(300, { 3, 71 });
@@ -996,7 +996,7 @@ TEST(BitsetSp_api, find_first_common) {
 	EXPECT_EQ(a.is_disjoint(c), a.find_first_common(c) == BBObject::noBit);
 }
 
-TEST(BitsetSp_api, assign_bit) {
+TEST(Sparse, assign_bit) {
 	BitsetSp src(200, { 3, 70, 190 });
 	BitsetSp dst(200, { 5, 6, 100 });
 
@@ -1012,7 +1012,7 @@ TEST(BitsetSp_api, assign_bit) {
 	EXPECT_EQ((bitpos_list{ 3, 70 }), static_cast<bitpos_list>(small));
 }
 
-TEST(BitsetSp_api, set_bit_list_and_constructor_from_list) {
+TEST(Sparse, set_bit_list_and_constructor_from_list) {
 	const bitpos_list lv = { 190, 3, 70, 64 };		//unsorted on purpose
 
 	BitsetSp bb(200);
@@ -1032,17 +1032,28 @@ TEST(BitsetSp_api, set_bit_list_and_constructor_from_list) {
 	EXPECT_TRUE(bi == bb);
 }
 
-TEST(BitsetSp_api, make_bitset_sp) {
-	auto a = make_bitset_sp(200);
-	EXPECT_TRUE(a.is_empty());
-	auto b = make_bitset_sp(200, { 1, 2, 100 });
-	EXPECT_EQ(3, b.count());
-	bitpos_list lv = { 7, 8 };
-	auto c = make_bitset_sp(200, lv);
-	EXPECT_EQ(2, c.count());
+//////////////////////////////////////////////
+// HELPERS TESTS (same names as in test_bitset.cpp)
+
+TEST(Sparse, make_bitset_empty) {
+	auto bb = make_bitset_sp(200);
+	EXPECT_TRUE(bb.is_empty());
+	EXPECT_EQ(0, bb.count());
+	EXPECT_EQ(4u, bb.num_blocks());
 }
 
-TEST(BitsetSp_api, extract_functions) {
+TEST(Sparse, make_bitset_from) {
+	auto bb = make_bitset_sp(200, { 1, 2, 100 });
+	EXPECT_EQ(3, bb.count());
+	EXPECT_TRUE(bb.is_bit(100));
+
+	bitpos_list lv = { 7, 8 };
+	auto bc = make_bitset_sp(200, lv);
+	EXPECT_EQ(2, bc.count());
+	EXPECT_TRUE(bc.is_bit(8));
+}
+
+TEST(Sparse, extract_functions) {
 	BitsetSp bb(300, { 0, 63, 64, 70, 200, 299 });
 	//a zero block in the middle must not matter
 	bb.set(130).erase_bit(130);
@@ -1074,7 +1085,7 @@ TEST(BitsetSp_api, extract_functions) {
 //////////////////////////////////////////////
 // Step 7 (performance work): regression tests of the rewritten functions
 
-TEST(BitsetSp_perf, next_prev_bit_with_gaps_and_zero_blocks) {
+TEST(Sparse, next_prev_bit_with_gaps_and_zero_blocks) {
 	BitsetSp bb(1000, { 5, 63, 64, 300, 301, 700, 999 });
 	bb.set(450).erase_bit(450);					//zero block in the middle
 
@@ -1099,7 +1110,7 @@ TEST(BitsetSp_perf, next_prev_bit_with_gaps_and_zero_blocks) {
 	EXPECT_EQ(BBObject::noBit, be.prev_bit(10));
 }
 
-TEST(BitsetSp_perf, or_eq_interleaved_and_edge_cases) {
+TEST(Sparse, or_eq_interleaved_and_edge_cases) {
 	auto bits = [](const BitsetSp& b) { return static_cast<bitpos_list>(b); };
 
 	BitsetSp a(500, { 1, 130, 300, 450 });
@@ -1128,7 +1139,7 @@ TEST(BitsetSp_perf, or_eq_interleaved_and_edge_cases) {
 	}
 }
 
-TEST(BitsetSp_perf, set_bit_orders) {
+TEST(Sparse, set_bit_orders) {
 	BitsetSp inc(500), dec(500), mix(500);
 	for (int v = 0; v < 500; v += 7) inc.set_bit(v);
 	for (int v = 497; v >= 0; v -= 7) dec.set_bit(v);
@@ -1137,7 +1148,7 @@ TEST(BitsetSp_perf, set_bit_orders) {
 	EXPECT_EQ((bitpos_list{ 3, 63, 64, 200, 400, 450 }), static_cast<bitpos_list>(mix));
 }
 
-TEST(BitsetSp_perf, xor_eq_and_extract) {
+TEST(Sparse, xor_eq_and_extract) {
 	auto bits = [](const BitsetSp& b) { return static_cast<bitpos_list>(b); };
 
 	BitsetSp a(500, { 1, 130, 300, 450 });
@@ -1183,7 +1194,7 @@ TEST(BitsetSp_perf, xor_eq_and_extract) {
 //////////////////////////////////////////////
 // Additional tests of the Bitset-compatible API
 
-TEST(BitsetSp_api, assign_bit_edge_cases) {
+TEST(Sparse, assign_bit_edge_cases) {
 	auto bits = [](const BitsetSp& b) { return static_cast<bitpos_list>(b); };
 
 	//empty rhs empties THIS but keeps its population size
@@ -1217,7 +1228,7 @@ TEST(BitsetSp_api, assign_bit_edge_cases) {
 	EXPECT_EQ((bitpos_list{ 1, 70, 130, 250 }), bits(r2));
 }
 
-TEST(BitsetSp_api, erase_bit_returns_reference) {
+TEST(Sparse, erase_bit_returns_reference) {
 	BitsetSp bb(200, { 1, 2, 100 });
 	BitsetSp& ref = bb.erase_bit();
 	EXPECT_EQ(&bb, &ref);
@@ -1230,7 +1241,7 @@ TEST(BitsetSp_api, erase_bit_returns_reference) {
 	EXPECT_EQ(&bb, &bb.erase_all_bits());
 }
 
-TEST(BitsetSp_api, signature_properties) {
+TEST(Sparse, signature_properties) {
 	//queries which cannot throw
 	BitsetSp b(10);
 	const BitsetSp cb(10);
@@ -1256,7 +1267,7 @@ TEST(BitsetSp_api, signature_properties) {
 	EXPECT_TRUE((std::is_same<decltype(b.set(1)), BitsetSp&>::value));
 }
 
-TEST(BitsetSp_api, zero_blocks_in_queries) {
+TEST(Sparse, zero_blocks_in_queries) {
 	BitsetSp a(300, { 1, 100, 200 });
 	BitsetSp b(300, { 100, 250 });
 	a.set(150).erase_bit(150);					//zero blocks in both operands
@@ -1311,7 +1322,7 @@ namespace {
 	}
 }
 
-TEST(BitsetSp_api, differential_against_bitset) {
+TEST(Sparse, differential_against_bitset) {
 	std::mt19937 rng(2026);
 	const int nPop = 1000;
 

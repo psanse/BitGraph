@@ -13,8 +13,10 @@ add_executable(
     test_bitset.cpp
     test_bbscan_sparse.cpp
     test_bitset_sparse.cpp
+    test_bitset_api.cpp
     test_bbscan_sparse_nested.cpp
     test_bbscan_view.cpp
+    test_bbscan_view_sparse.cpp
 
     # Tests to be checked:
     # test_algorithms.cpp

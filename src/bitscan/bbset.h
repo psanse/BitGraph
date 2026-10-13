@@ -1227,7 +1227,7 @@ namespace bitgraph {
 		*
 		* TODO implement - cast operator	(24/02/2025)
 		**/
-		std::string to_string();
+		std::string to_string() const;
 
 		/**
 		* @brief Fills std::vector lb with the 1-bits of the bitset.
