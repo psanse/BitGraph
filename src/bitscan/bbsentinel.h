@@ -9,7 +9,7 @@
   * 
   * @author pss
   *
-  * TODO- PENDING FULL REFACTORING, namespace experimental (13/02/2025)
+  * TODO- PENDING FULL REFACTORING, namespace experimental (14/10/2026)
   **/
 
 #ifndef BITGRAPH_BITSCAN_BB_SENTINEL_H
@@ -17,7 +17,6 @@
 
 #include "bitscan/bbscan.h"
 #include "bitscan/bbutils.h"			//MIN, MAX
-
 
 namespace bitgraph {
 	
@@ -34,13 +33,15 @@ namespace bitgraph {
 
 			////////////
 			// setters / getters
+
 			void set_sentinel_H(unsigned int i) { m_BBH = i; }
 			void set_sentinel_L(unsigned int i) { m_BBL = i; }
 			void set_sentinels(int low, int high);
 			void init_sentinels(bool update = false);								//sets sentinels to maximum scope of current bit string
-			void clear_sentinels();												//sentinels to EMPTY
+			void clear_sentinels();													//sentinels to EMPTY
 			int get_sentinel_L() { return m_BBL; }
 			int get_sentinel_H() { return m_BBH; }
+			
 			/////////////
 			// basic sentinel
 
@@ -56,9 +57,9 @@ namespace bitgraph {
 
 				//erase: will not update sentinels	
 			virtual	void  erase_bit();											//in sentinel range
-			virtual	void  erase_bit(int nBit) { Bitset::erase_bit(nBit); }	//required because of the cast-to-int construction of sentinels (1)
-			void  erase_bit_and_update(int nBit);									//erases and updates sentinels			
-			BBSentinel& erase_bit(const Bitset&);							//(1): required for SEQ coloring
+			virtual	void  erase_bit(int nBit) { Bitset::erase_bit(nBit); }		//required because of the cast-to-int construction of sentinels (1)
+			void  erase_bit_and_update(int nBit);								//erases and updates sentinels			
+			BBSentinel& erase_bit(const Bitset&);								//(1): required for SEQ coloring
 
 			virtual	bool is_empty()const noexcept;
 			virtual	bool is_empty(int nBBL, int nBBH) const;					//is empty in range
