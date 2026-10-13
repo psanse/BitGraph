@@ -171,10 +171,17 @@ void Bitset::reset(std::size_t nPop, const bit_indices& bits) noexcept {
 // (size is determined by *this)
 /////////////////////////
 
+// The loops below hoist the data pointers and the number of blocks into locals: writing a BITBOARD through
+// vBB_ could modify (for the compiler, which does not use type-based aliasing in MSVC) the members vBB_ or
+// nBB_, so otherwise they are reloaded in every iteration and the loop is neither unrolled nor vectorized
+// (4x slower than std::bitset in bench_masking).
 Bitset& Bitset::operator &=	(const Bitset& bbn) noexcept{
 
-	for (auto i = 0; i < nBB_; ++i) {
-		vBB_[i] &= bbn.vBB_[i];
+	BITBOARD* a = vBB_.data();
+	const BITBOARD* b = bbn.vBB_.data();
+	const int n = nBB_;
+	for (auto i = 0; i < n; ++i) {
+		a[i] &= b[i];
 	}
 				
 	return *this;
@@ -182,8 +189,11 @@ Bitset& Bitset::operator &=	(const Bitset& bbn) noexcept{
 
 Bitset& Bitset::operator |=	(const Bitset& bbn) noexcept{
 	
-	for (auto i = 0; i < nBB_; ++i) {
-		vBB_[i] |= bbn.vBB_[i];
+	BITBOARD* a = vBB_.data();
+	const BITBOARD* b = bbn.vBB_.data();
+	const int n = nBB_;
+	for (auto i = 0; i < n; ++i) {
+		a[i] |= b[i];
 	}
 
 	return *this;
@@ -191,8 +201,11 @@ Bitset& Bitset::operator |=	(const Bitset& bbn) noexcept{
 
 Bitset& Bitset::operator ^=	(const Bitset& bbn) noexcept {
 	
-	for (auto i = 0; i < nBB_; ++i) {
-		vBB_[i] ^= bbn.vBB_[i];
+	BITBOARD* a = vBB_.data();
+	const BITBOARD* b = bbn.vBB_.data();
+	const int n = nBB_;
+	for (auto i = 0; i < n; ++i) {
+		a[i] ^= b[i];
 	}
 
 	return *this;
@@ -202,8 +215,10 @@ Bitset& Bitset::operator ^=	(const Bitset& bbn) noexcept {
 
 Bitset& Bitset::flip () noexcept {
 
-	for (auto i = 0; i < nBB_; ++i) {
-		vBB_[i] = ~vBB_[i];
+	BITBOARD* a = vBB_.data();
+	const int n = nBB_;
+	for (auto i = 0; i < n; ++i) {
+		a[i] = ~a[i];
 	}
 
 	return *this;
@@ -354,8 +369,12 @@ namespace bitgraph {
 
 	Bitset& AND(const Bitset& lhs, const Bitset& rhs, Bitset& res) {
 
-		for (auto i = 0; i < lhs.nBB_; ++i) {
-			res.vBB_[i] = lhs.vBB_[i] & rhs.vBB_[i];
+		BITBOARD* r = res.vBB_.data();
+		const BITBOARD* l = lhs.vBB_.data();
+		const BITBOARD* b = rhs.vBB_.data();
+		const int n = lhs.nBB_;
+		for (auto i = 0; i < n; ++i) {
+			r[i] = l[i] & b[i];
 		}
 
 		return res;
@@ -363,8 +382,12 @@ namespace bitgraph {
 
 	Bitset& OR(const Bitset& lhs, const Bitset& rhs, Bitset& res) {
 
-		for (auto i = 0; i < lhs.nBB_; ++i) {
-			res.vBB_[i] = lhs.vBB_[i] | rhs.vBB_[i];
+		BITBOARD* r = res.vBB_.data();
+		const BITBOARD* l = lhs.vBB_.data();
+		const BITBOARD* b = rhs.vBB_.data();
+		const int n = lhs.nBB_;
+		for (auto i = 0; i < n; ++i) {
+			r[i] = l[i] | b[i];
 		}
 
 		return res;
@@ -383,8 +406,12 @@ namespace bitgraph {
 	Bitset& erase_bit(const Bitset& lhs, const Bitset& rhs, Bitset& res) {
 
 
-		for (auto i = 0; i < lhs.nBB_; ++i) {
-			res.vBB_[i] = lhs.vBB_[i] & ~rhs.vBB_[i];
+		BITBOARD* r = res.vBB_.data();
+		const BITBOARD* l = lhs.vBB_.data();
+		const BITBOARD* b = rhs.vBB_.data();
+		const int n = lhs.nBB_;
+		for (auto i = 0; i < n; ++i) {
+			r[i] = l[i] & ~b[i];
 		}
 
 		return res;
@@ -768,8 +795,11 @@ namespace bitgraph {
 			assert(nBB_ <= bb_add.nBB_);
 			/////////////////////////////////
 
-			for (auto i = 0; i < nBB_; ++i) {
-				vBB_[i] |= bb_add.vBB_[i];
+			BITBOARD* a = vBB_.data();
+			const BITBOARD* b = bb_add.vBB_.data();
+			const int n = nBB_;
+			for (auto i = 0; i < n; ++i) {
+				a[i] |= b[i];
 			}
 
 			return *this;
@@ -781,8 +811,11 @@ namespace bitgraph {
 			assert(nBB_ <= bb_add.nBB_);
 			/////////////////////////////////
 
-			for (auto i = 0; i < nBB_; ++i) {
-				vBB_[i] = bb_add.vBB_[i];
+			BITBOARD* a = vBB_.data();
+			const BITBOARD* b = bb_add.vBB_.data();
+			const int n = nBB_;
+			for (auto i = 0; i < n; ++i) {
+				a[i] = b[i];
 			}
 
 			return *this;
@@ -825,8 +858,10 @@ namespace bitgraph {
 
 		Bitset& Bitset::erase_bit() noexcept {
 
-			for (auto i = 0; i < nBB_; ++i) {
-				vBB_[i] = ZERO;
+			BITBOARD* a = vBB_.data();
+			const int n = nBB_;
+			for (auto i = 0; i < n; ++i) {
+				a[i] = ZERO;
 			}
 
 			return *this;
@@ -1156,8 +1191,11 @@ namespace bitgraph {
 
 		Bitset& Bitset::erase_bit(const Bitset& bbn) {
 
-			for (auto i = 0; i < nBB_; ++i) {
-				vBB_[i] &= ~bbn.vBB_[i];
+			BITBOARD* a = vBB_.data();
+			const BITBOARD* b = bbn.vBB_.data();
+			const int n = nBB_;
+			for (auto i = 0; i < n; ++i) {
+				a[i] &= ~b[i];
 			}
 
 			return *this;
@@ -1209,8 +1247,12 @@ namespace bitgraph {
 
 		Bitset& Bitset::erase_bit(const Bitset& bb_lhs, const Bitset& bb_rhs) {
 
-			for (auto i = 0; i < nBB_; i++) {
-				vBB_[i] &= ~(bb_lhs.vBB_[i] | bb_rhs.vBB_[i]);
+			BITBOARD* a = vBB_.data();
+			const BITBOARD* l = bb_lhs.vBB_.data();
+			const BITBOARD* r = bb_rhs.vBB_.data();
+			const int n = nBB_;
+			for (auto i = 0; i < n; i++) {
+				a[i] &= ~(l[i] | r[i]);
 			}
 
 			return *this;
