@@ -100,5 +100,21 @@ if (BUILD_TESTING AND UTILS_BUILD_TESTS)
 
 endif()
 
+#############
+# EXAMPLES for UTILS lib
+#############
+
+option(
+    UTILS_BUILD_EXAMPLES
+    "Build utilities examples."
+    ON
+)
+
+if (BUILD_EXAMPLES AND UTILS_BUILD_EXAMPLES)
+
+    add_subdirectory(examples)
+
+endif()
+
 
 
