@@ -14,6 +14,11 @@
  * are allocated by this implementation; callers are responsible for releasing
  * them with the matching C allocation function.
  *
+ * @note Third-party code. Based on the Matrix Market I/O library for ANSI C
+ *       distributed by the National Institute of Standards and Technology
+ *       (NIST); NIST is acknowledged as the source. See the note in mmio.h and
+ *       THIRD_PARTY_NOTICES.md in the repository root.
+ *
  * @see https://math.nist.gov/MatrixMarket/
  * @see mmio.h
  *

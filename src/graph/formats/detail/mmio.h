@@ -18,7 +18,15 @@
  * The declarations live in @c bitgraph::io::detail because they are internal
  * format-support infrastructure rather than a general graph-facing API.
  *
- * @created ?
+ * @note Third-party code. Based on the Matrix Market I/O library for ANSI C
+ *       distributed by the National Institute of Standards and Technology
+ *       (NIST), https://math.nist.gov/MatrixMarket/. The upstream sources carry
+ *       no license statement. NIST states that software developed by its
+ *       employees is not subject to copyright protection within the United
+ *       States, and asks users to acknowledge NIST as the source of the
+ *       software; NIST is acknowledged here as the source. See
+ *       THIRD_PARTY_NOTICES.md in the repository root.
+ *
  * @last_update 27/01/2025
  *
  * @see https://math.nist.gov/MatrixMarket/

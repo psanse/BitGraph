@@ -157,7 +157,7 @@ The latest release is **v2.0.0** (October 2026). Version 2.0 is a major refactor
 
 ## License
 
-BitGraph is free software, released under the [GNU General Public License v3.0](LICENSE). Under the GPL, a program that you distribute and that links BitGraph is generally expected to be released under the GPL as well; this is a summary, not legal advice. Contact the author if you need different terms.
+BitGraph is free software, released under the [GNU General Public License v3.0](LICENSE). Under the GPL, a program that you distribute and that links BitGraph is generally expected to be released under the GPL as well; this is a summary, not legal advice. Contact the author if you need different terms. Third-party code that BitGraph adapts or uses is listed in [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
 
 ## Citation
 
