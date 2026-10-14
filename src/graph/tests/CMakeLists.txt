@@ -19,14 +19,9 @@ add_executable (
   test_sparse_graph.cpp
   test_format.cpp 
   test_decode.cpp
-  test_clq_func.cpp
   test_ordering_map.cpp
   test_graph_benchmark.cpp
   test_algorithm_info.cpp
-
-  # Tests to be checked:
-  # test_kcore.cpp             # to fix (26/09/2026)
-  # test_graph_sort.cpp        # deprecated class 
 )
 
 target_compile_definitions(
