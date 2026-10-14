@@ -11,9 +11,9 @@ endif()
 ###########
 
 set(LIBNAME "BitGraph")
-set(LIB_MAJOR_VERS "1")
-set(LIB_MINOR_VERS "4")
-set(LIB_PATCH_VERS "3")
+set(LIB_MAJOR_VERS "2")
+set(LIB_MINOR_VERS "0")
+set(LIB_PATCH_VERS "0")
 
 project(
     ${LIBNAME} 

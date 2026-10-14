@@ -1,1 +1,8 @@
 build/
+build_vscode/
+install/
+.vs/
+
+# files written to the repo root by running tests/examples from there
+/*.gml
+/r[0-9]*_*_*.txt
