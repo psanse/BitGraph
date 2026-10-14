@@ -4,420 +4,706 @@
  * @brief Generic base and implementation templates for edge-weighted graphs.
  *
  * This header defines the generic classes `Base_Graph_EW` and `Graph_EW`,
- * which provide support for **edge-weighted graphs** where **self-loops are
- * interpreted as vertex weights**.
+ * which provide support for edge-weighted graphs.
  *
  * @details
- * The weighting model implemented in this file is intentionally restricted:
- *  - Edge weights are associated with edges {u, v}, u ≠ v
- *  - Self-loops (u, u) are interpreted as **vertex weights**
+ * Edge weights are stored in a weight matrix synchronized with the topology
+ * of the underlying graph. Existing edges have a weight different from
+ * `NO_WEIGHT`, while entries corresponding to non-edges are set to
+ * `NO_WEIGHT`.
  *
- * Therefore, this implementation does **not** represent the most general case
- * of graphs with independent vertex and edge weights. Nevertheless, it is
- * sufficient for many applications where vertex weights can be encoded as
- * self-loops (e.g., maximum clique variants, train scheduling models, etc.).
+ * Self-loops are not supported; consequently, diagonal entries of the
+ * edge-weight matrix are always `NO_WEIGHT`.
  *
- * The class `Base_Graph_EW` provides common infrastructure shared across
- * different graph types and enables specialization of behavior according to
- * the underlying graph representation.
+ * `Base_Graph_EW` provides the common implementation independently of the
+ * concrete graph representation and serves as the base for graph-specific
+ * specializations.
  *
  * The user-facing class is `Graph_EW<GraphT, WeightT>`, which extends
- * `Base_Graph_EW` with a public interface for edge-weighted graph operations.
+ * `Base_Graph_EW` with graph-specific behavior where required.
  *
- * @note
- * This header contains **generic implementation code** and must not depend on
- * facade graph types. Facade-specific bindings (e.g., for `ugraph`) are defined
- * in higher-level headers.
+ * @note This header contains generic implementation code and must not depend
+ *       on facade graph types. Facade-specific bindings and specializations
+ *       (e.g., for `ugraph`) are defined in higher-level headers.
  *
  * @par Historical notes
- *  - created: 16/01/2019
- *  - Milestone application: Train scheduling (10/11/2021)
- *  - Last update: 01/02/2026
+ * - Created: 16/01/2019
+ * - Milestone application: Train scheduling (10/11/2021)
+ * - Last update: 12/10/2026
  *
- * @author
- * Pablo San Segundo (pss)
- *
- * @copyright
- * This file is part of the GRAPH 1.0 C++ library.
+ * @author Pablo San Segundo (pss)
  */
 
-#ifndef __SIMPLE_GRAPH_EDGE_WEIGHTED_H__
-#define __SIMPLE_GRAPH_EDGE_WEIGHTED_H__
+#ifndef BITGRAPH_GRAPH_SIMPLE_GRAPH_EDGE_WEIGHTED_H
+#define BITGRAPH_GRAPH_SIMPLE_GRAPH_EDGE_WEIGHTED_H
 
-#include "utils/common.h"
-#include "graph_basic.h"
+#include "graph_traits.h"
+#include "weighted_constants.h"
+#include "graph_unweighted.h"
 #include "simple_ugraph.h"
 #include <iostream>
 #include <vector>
 
 namespace bitgraph {
 	
-	///////////////////////
-	//
-	// class Base_Graph_EW 
-	// (used to be able to specialize functions according to the type of graph only)
-	//
-	// Note: user class is Graph_EW (see below) 
-	// 
-	// @todo there are some common parts with Base_Graph_W for weights in the vertices (12/12/2025)
-	
-
+	/**
+	 * @brief Generic base implementation for edge-weighted graphs.
+	 *
+	 * Associates an edge-weight matrix with an underlying graph of type
+	 * @p GraphT. Existing edges have a weight different from `NO_WEIGHT`,
+	 * while entries corresponding to non-edges are set to `NO_WEIGHT`.
+	 *
+	 * This class provides the common implementation of edge-weighted graph
+	 * operations independently of the concrete graph type. Graph-specific
+	 * behavior can be provided by specializations of `Graph_EW`.
+	 *
+	 * The user-facing class is `Graph_EW`; `Base_Graph_EW` is intended primarily
+	 * as an implementation base and specialization layer.
+	 *
+	 * @tparam GraphT Underlying graph type.
+	 * @tparam WeightT Type used to represent edge weights.
+	 *
+	 * @invariant The edge-weight matrix is square and its dimensions match the
+	 *            number of graph vertices.
+	 * @invariant An entry `(v,w)` is different from `NO_WEIGHT` if and only if
+	 *            `(v,w)` is an existing edge.
+	 * @invariant Self-loops are not allowed and diagonal entries are `NO_WEIGHT`.
+	 *
+	 * @todo Review common functionality shared with the vertex-weighted graph
+	 *       implementation (`Base_Graph_VW`).
+	 */
 	template<class GraphT, class WeightT>
-	class Base_Graph_EW {
+	class Base_Graph_EW : public bitgraph::weight_constants<WeightT> {
+		
 	public:
-				
-		using graph_type = GraphT;								// graph type
-		using bitset_type = typename GraphT::bitset_type;		// bitset type used by graph type 
-		using VertexBitset = bitset_type;						// alias for semantic type
-		using Weight = WeightT;								
+
+		using graph_type = GraphT;
+		using graph_t = graph_type;
+		using bitset_type = typename GraphT::bitset_type;
 		
-		using mat_t = vector<vector<Weight>>;					// type for a matrix of weights
+		using vertex_bitset_t = bitset_type;
+		using VertexBitset = vertex_bitset_t;		// Backward compatibility.
 		
-		//enum to distinguish between vertex and edge weights
-		enum { VERTEX, EDGE, BOTH };
+		using vertex_set_t = bitgraph::vertex_set_t;
 
-		////////////////////////////
-		//constants / globals
+		using weight_t = WeightT;
+		using weights_t = std::vector<weight_t>;
+		using weight_matrix_t = std::vector<std::vector<weight_t>>;
+		
+		
+		using Weight = weight_t;				// backward compatibility
+		using mat_t = weight_matrix_t;			// backward compatibility
+										
+		// constants		
+		using constants_t = weight_constants<WeightT>;
 
-		static constexpr Weight NO_WEIGHT { -1 };					//possibly change sentinel to std::numeric_limits<WeightT>::max() ?		
-		static constexpr Weight ZERO_WEIGHT{ 0 };
-		static constexpr Weight DEFAULT_WEIGHT{ 1 };				//default weight value for weights (1.0)	
+		using constants_t::NO_WEIGHT;
+		using constants_t::ZERO_WEIGHT;
+		using constants_t::DEFAULT_WEIGHT;
+					
+		
+		enum class edge_print_format {
+			edge_list,
+			edge_matrix
+		};
 
-		//////////////////////////
-		//constructors / destructor
+		///////////////////////
+		// construction / destruction
 
-		Base_Graph_EW() {};										//no memory allocation
-		Base_Graph_EW(graph_type& g, mat_t& lwe) : g_(g), we_(lwe) {}										//creates graph from a non-weighted graph and a set of weights
+		Base_Graph_EW() = default;
+		
+		/**
+		 * @brief Constructs an edge-weighted graph from an existing graph and an
+		 *        edge-weight matrix.
+		 *
+		 * Copies the topology of @p graph and the supplied edge weights.
+		 *
+		 * @param graph Graph whose topology is copied.
+		 * @param edge_weights Edge-weight matrix.
+		 *
+		 * @warning Calls `std::terminate()` if the edge-weight matrix is invalid
+		 *          or inconsistent with the graph topology.
+		 */
+		Base_Graph_EW(
+			const graph_t& graph,
+			const weight_matrix_t& edge_weights)
+			: graph_(graph),
+			edge_weights_(edge_weights)		
+		{
+			validate_weight_matrix_base();
+		}
 
 		/**
-		* @brief creates a graph with |V|= n and val weights as base line.
-		* @param n number of vertices
-		* @param val weight value
-		* @param edge_weighted if TRUE creates an edge-weighted graph
-		*			(vertex weights are set to NO_WEIGHT, instead of val)
-		* @details: base line for all weights is set to val, i.e. vertex weights are
-		*			set to val, but edge-weights will be overwritten when edges are added
-		**/
-		Base_Graph_EW(int n, Weight val = ZERO_WEIGHT, bool edge_weighted = false);						//creates empty graph with |V|= n and val weights	
+		 * @brief Constructs an edge-weighted graph from an existing graph.
+		 *
+		 * Copies the topology of @p graph and initializes the edge-weight matrix.
+		 * Existing edges are assigned `DEFAULT_WEIGHT`, while non-edges are assigned
+		 * `NO_WEIGHT`.
+		 *
+		 * @param graph Graph whose topology is copied.
+		 */
+		explicit Base_Graph_EW(const graph_t& graph)
+			: graph_(graph)
+		{
+			initialize_edge_weights(DEFAULT_WEIGHT);
+		}
+
+		explicit Base_Graph_EW(std::size_t NV)
+		{
+			reset(NV);
+		}
 
 		/**
-		* @brief reads graph from file. If ewights are not found it generated them
-		*		 automatically based on the Pullman 2008 formula
-		* @details currently only reads dimacs format (with or without weights)
-		**/
-		explicit Base_Graph_EW(std::string filename);															//read weighted ASCII file or generate weights using formula- CHECK! (21/11/2021))
+		 * @brief Constructs an edge-weighted graph from a DIMACS file.
+		 *
+		 * @param[in] filename Path to the input DIMACS file.
+		 *
+		 * @details Reads a graph in DIMACS format, with or without edge weights.
+		 *          If weights are not provided, they are generated automatically
+		 *          using the Pullman (2008) formula.
+		 *
+		 * @note Fails fast if the file cannot be read or contains invalid data.
+		 */
+		explicit Base_Graph_EW(const std::string& filename);														
 
 		//copy constructor, move constructor, copy operator =, move operator =
 		Base_Graph_EW(const Base_Graph_EW& g) = default;
 		Base_Graph_EW(Base_Graph_EW&& g) noexcept = default;
 		Base_Graph_EW& operator = (const Base_Graph_EW& g) = default;
-		Base_Graph_EW& operator = (Base_Graph_EW&& g)		noexcept = default;
+		Base_Graph_EW& operator = (Base_Graph_EW&& g) noexcept = default;
 
 		//destructor
 		virtual	~Base_Graph_EW() = default;
 
+		//////////////////////////
+		// memory allocation (API)
+
+		/**
+		 * @brief Resets the graph to an empty edge-weighted graph.
+		 *
+		 * Reinitializes the graph with @p NV isolated vertices and initializes
+		 * the entire edge-weight matrix to `NO_WEIGHT`. Any previous graph
+		 * topology and edge weights are discarded.
+		 *
+		 * @param NV Number of vertices.
+		 * @param name Optional graph instance name.
+		 *
+		 * @warning Follows a fail-fast policy and calls `std::terminate()` if the
+		 *          graph or its edge-weight matrix cannot be reinitialized.
+		 */
+		void reset(std::size_t NV,
+			std::string name = "") noexcept;
+
+
 		/////////////
 		// setters and getters	
 
-		/**
-		* @brief getter for edge-weights
-		* @param v, Weight: edge
-		* @details: no check for vertex existence
-		**/
-		Weight weight(int v, int w)	const { return we_[v][w]; }
 
 		/**
-		* @brief getter for vertex-weights
-		* @param v: vertex
-		* @details: no check for vertex existence
-		**/
-		Weight weight(int v) const { return we_[v][v]; }
-
-		/*
-		*  @brief getter for the specific subset of vertex-weights
-		*/
-		std::vector<Weight> vertex_weights() const;
+		 * @brief Sets the weight of an existing directed edge.
+		 *
+		 * Assigns @p weight to the directed edge (@p v, @p w).
+		 *
+		 * @param v Source vertex.
+		 * @param w Target vertex.
+		 * @param weight New edge weight.
+		 *
+		 * @pre (@p v, @p w) must be an existing edge.
+		 * @pre @p v and @p w must be different vertices.
+		 * @pre @p weight must be different from `NO_WEIGHT`.
+		 *
+		 * @warning Follows a fail-fast policy and calls `std::terminate()` if any
+		 *          precondition is violated.
+		 */
+		virtual	void set_weight(
+			vertex_t v, 
+			vertex_t w,
+			weight_t weight);
 
 		/**
-		*  @brief getter for the all the weights (vertex and edge-weights)
-		**/
-		mat_t& weights() { return we_; }
-		const mat_t& weights() const { return we_; }
+		 * @brief Sets all existing edge weights to the same value.
+		 *
+		 * Assigns @p weight to every existing edge. Entries corresponding to
+		 * non-edges are set to `NO_WEIGHT`.
+		 *
+		 * @param weight Weight assigned to every existing edge.
+		 *
+		 * @pre @p weight must be different from `NO_WEIGHT`.
+		 *
+		 * @warning Follows a fail-fast policy and calls `std::terminate()` if
+		 *          @p weight is `NO_WEIGHT`.
+		 */
+		virtual void set_weights(weight_t weight = DEFAULT_WEIGHT);
+		
+		/**
+		 * @brief Replaces the edge-weight matrix.
+		 *
+		 * Sets the edge weights from @p edge_weights. The matrix must be square,
+		 * match the number of graph vertices, and be consistent with the current
+		 * graph topology: existing edges must have a weight different from
+		 * `NO_WEIGHT`, while non-edges must have weight `NO_WEIGHT`.
+		 *
+		 * @param edge_weights New edge-weight matrix.
+		 *
+		 * @warning Follows a fail-fast policy and calls `std::terminate()` if
+		 *          @p edge_weights is invalid or inconsistent with the graph.
+		 */
+		void set_weights(const weight_matrix_t& edge_weights);
 
 		/**
-		*  @brief getter for the graph (no weight information just edges)
-		**/
-		GraphT& graph() { return g_; }
-		const GraphT& graph() const { return g_; }
+		 * @brief Assigns Pullan-style modulus-based weights to all existing edges.
+		 *
+		 * Sets each edge weight according to a cyclic rule based on the sum of
+		 * its endpoint indices. For 0-based vertex indices, the generated weights
+		 * lie in the range `[2, modulus]`:
+		 *
+		 * `weight(v,w) = 2 + ((v + w) % (modulus - 1))`.
+		 *
+		 * Non-edges retain weight `NO_WEIGHT`.
+		 *
+		 * @param modulus Upper bound of the generated edge-weight range.
+		 *
+		 * @pre @p modulus must be at least 2.
+		 *
+		 * @note This weighting scheme is Pullan-style but not identical to
+		 *       Pullan's (2008) 1-based formula `w(i,j) = 1 + ((i + j) % modulus)`.
+		 * @note Although the parameter is named @p modulus, the actual modulus
+		 *       used in the formula is `modulus - 1`; @p modulus denotes the
+		 *       maximum generated weight.
+		 *
+		 * @warning Follows a fail-fast policy and calls `std::terminate()` if
+		 *          @p modulus is less than 2.
+		 */
+		virtual void set_modulus_weights(
+			int modulus = DEFAULT_WEIGHT_MODULUS);
+
+		/**
+		 * @brief Returns the underlying graph.
+		 *
+		 * Provides read-only access to the graph topology.
+		 *
+		 * @return Const reference to the underlying graph.
+		 */
+		const graph_t& graph() const noexcept {
+			return graph_;
+		}
+	
+		/**
+		 * @brief Returns mutable access to the underlying graph.
+		 *
+		 * This accessor is intended for internal use by algorithms that require
+		 * direct access to the wrapped graph.
+		 *
+		 * @return Reference to the underlying graph.
+		 *
+		 * @note Mutable access is not part of the public API contract.
+		 *       Modifying the graph directly may invalidate invariants maintained
+		 *       by the weighted-graph wrapper.
+		 */
+		graph_t& graph() { return graph_; }
+		
+		/**
+		 * @brief Returns the weight of an edge.
+		 *
+		 * @param v Source vertex.
+		 * @param w Target vertex.
+		 * @return Weight associated with the edge (@p v, @p w).
+		 *
+		 * @note No bounds checking is performed.
+		 */
+		weight_t weight(vertex_t v, vertex_t w)	const noexcept{
+			return edge_weights_[static_cast<size_t>(v)]
+								[static_cast<size_t>(w)];
+		}
+
+		/**
+		 * @brief Returns the complete edge-weight matrix.
+		 *
+		 * Provides read-only access to the stored edge weights.
+		 *
+		 * @return Const reference to the edge-weight matrix.
+		 */
+		const weight_matrix_t& weights() const noexcept {
+			return edge_weights_;
+		}
+				
+		void set_name(std::string name) {
+			graph_.set_name(std::move(name));
+		}
+		const std::string& name() const noexcept {
+			return graph_.name(); 
+		}
+		void set_path(std::string path) {
+			graph_.set_path(std::move(path));
+		}
+		const std::string& path() const noexcept {
+			return graph_.path();
+		}
+		
+		/////////////////////////
+		// Basic graph operations
+		// Mostly convenience wrappers around the underlying graph API.
 
 		/**
 		* @brief number of vertices of the graph
 		* @returns: number of vertices (int type)
 		* @details: internal use
 		**/
-		int num_vertices() const { return g_.num_vertices(); }
+		int num_vertices() const {
+			return graph_.num_vertices();
+		}
 
 		/**
 		* @brief number of vertices of the graph - consumer code
 		* @returns: number of vertices (std::size_t type)
 		* @details: for consumer code
 		**/
-		std::size_t size() const { return g_.size(); }
+		std::size_t size() const {
+			return graph_.size();
+		}
 
-		std::size_t num_edges(bool lazy = true) { return g_.num_edges(lazy); }
-
-		/**
-		* @brief neighbor set of vertex @v
-		* @param v input vertex
-		**/
-		const VertexBitset& neighbors(int v) const { return g_.neighbors(v); }
-		VertexBitset& neighbors(int v) { return g_.neighbors(v); }
-
-		void set_name(std::string str) { g_.set_name(str); }
-		string name() const { return g_.name(); }
-		void set_path(std::string path_name) { g_.set_path(path_name); }
-		string path() const { return g_.path(); }
-
-		double density(bool lazy = true) { return g_.density(lazy); }
-
-		//////////////////////////
-		// memory allocation
-
-	protected:
-		/**
-		* @brief clearing without deallocation - internal use only
-		**/
-		void reset() { g_.reset(); we_.clear(); }
-
-	public:
-		/**
-		* @brief resets to a graph with |V|= n with weight val in everey vertex and edge
-		* @param n number of vertices
-		* @param name name of the instance
-		* @details: fast-fail policy - exits if failure
-		**/
-		template<bool EdgeWeightedGraph = false>
-		void reset(std::size_t n, Weight val = ZERO_WEIGHT, string name = "");					//before: int init (int n, Weight val = NO_WEIGHT, bool reset_name = true);
-
-		/////////////////////////
-		// basic operations
-
-			/**
-			* @brief Adds an edge (v, w) with weight val
-			*	      (if the edge exists, sets val)
-			**/
-		virtual	void add_edge(int v, int w, Weight val = ZERO_WEIGHT);
+		std::size_t num_edges(bool lazy = true) const {
+			return graph_.num_edges(lazy);
+		}
 
 		/**
-		*  @brief sets vertex-weight
-		*  @details: vertex-weights are stored as self-loop edge-weights
-		**/
-		void set_weight(int v, Weight val) { we_[v][v] = val; }
+		 * @brief Adds an edge with the specified weight.
+		 *
+		 * Adds the edge (@p v, @p w) to the graph and assigns @p weight to it.
+		 * If the edge already exists, its weight is replaced by @p weight.
+		 *
+		 * @param v Source vertex.
+		 * @param w Target vertex.
+		 * @param weight Weight assigned to the edge.
+		 */
+		virtual	void add_edge(
+			vertex_t v, 
+			vertex_t w, 
+			weight_t weight = DEFAULT_WEIGHT);
+	
+		/**
+		 * @brief Disabled maximum edge-weight query.
+		 *
+		 * This overload is intentionally unavailable for edge-weighted graphs.
+		 *
+		 * @param v First endpoint of the edge.
+		 * @param w Second endpoint of the edge.
+		 *
+		 * @return This function is deleted and cannot be called.
+		 */
+		weight_t maximum_weight(vertex_t& v, vertex_t& w) const = delete;
+
+		/////////////
+		// Boolean properties
 
 		/**
-		*  @brief sets edge-weight to an EXISTNG given directed edge (v, w)
-		*		  (in a non-edge it can only set weight to NO_WEIGHT)
-		*  @param v input vertex
-		*  @param Weight input vertex
-		*  @param val input weight value
-
-		*  @details: asserts it REALLY is an edge (and not a self-loop)
-		*  @details: in a non-edge it can only set weight to NO_WEIGHT
-		**/
-		virtual	void set_weight(int v, int w, Weight val);
-
-		/**
-		*  @brief sets edge weights in @lw  if there is a corresponding edge.
-		*		  Vertex weights are not modified.
-		*  @param lw matrix of edge weights
-		*  @param template Erase: if TRUE weights of non-edges are set to NO_WEIGHT
-		*						  (aditional cleaning)
-		*  @details: asserts  @lw.size() == |V|
-		**/
-		template<bool EraseNonEdges = false>
-		void set_weight(mat_t& lw, bool edges_only = true);
+		 * @brief Tests whether two vertices are adjacent.
+		 *
+		 * @param v First vertex.
+		 * @param w Second vertex.
+		 * @return `true` if `(v,w)` is an edge; otherwise, `false`.
+		 */
+		bool is_edge(vertex_t v, vertex_t w) const {
+			return graph_.is_edge(v, w);
+		}
 
 		/**
-		*  @brief sets all vertex-weights (self-loop edge weights) to the same weight @val
-		**/
-		void set_vertex_weight(Weight val = ZERO_WEIGHT);
+		 * @brief Checks whether the graph is unit edge-weighted.
+		 *
+		 * An edge-weighted graph is unit-weighted if every existing edge has weight
+		 * equal to `DEFAULT_WEIGHT`. Non-edges are ignored.
+		 *
+		 * @return `true` if all existing edges have weight `DEFAULT_WEIGHT`;
+		 *         otherwise, `false`.
+		 *
+		 * @note An edgeless graph is considered unit-weighted.
+		 */
+		bool is_unit_weighted() const noexcept;
+
 
 		/**
-		*  @brief sets all edge-weights to val IF there is a corresponding edge.
-		*		  Vertex weights are not modified.
-		*  @param lw matrix of edge weights
-		*  @param template Erase: if TRUE weights of non-edges are set to NO_WEIGHT
-		*						  (aditional cleaning)
-		**/
-		template<bool EraseNonEdges = false>
-		void set_edge_weight(Weight val = ZERO_WEIGHT);
-
-		/**
-		* @brief sets new edge-weights based on modulus operation [Pullan 2008, MODULUS = 200]
-		*
-		*			I. we(v, w) = 1 + ((v + w) % MODULUS)	(1-based index)
-		*
-		*			II. vertex-weigths are not changed
-		* @param template EraseNonEdges:  if TRUE, non-edges are set to NO_WEIGHT
-		* @param MODULUS: modulus value [Pullan 2008, DEFAULT_WEIGHT_MODULUS = 200]
-		**/
-		template <bool EraseNonEdges = false>
-		void set_modulus_edge_weight(int MODULUS = DEFAULT_WEIGHT_MODULUS);
-
-
-		////////////////
-		// Conversions 
-
-		/**
-		* @brief sets all vertex weights to NO_WEIGHT
-		* @param erase_non_edges if TRUE, sets non-edges to NO_WEIGHT
-		**/
-		void make_edge_weighted(bool erase_non_edges = false);
-
-		/**
-		* @brief sets all non-edges to weight NO_WEIGHT.
-		**/
-		void erase_non_edge_weights();
-
-		/////////////////////////
-		// boolean properties
-
-		bool is_edge(int v, int w) const { return g_.is_edge(v, w); }
-
-		/*
-		* @brief consistency check
-		*
-		*		 I. edges with NO_WEGHT weight values
-		*
-		* @returns true if consistent, false otherwise
-		*
-		*  TODO... other checks
-		*/
-		bool is_consistent();
+		 * @brief Checks whether the edge-weighted graph is internally consistent.
+		 *
+		 * Verifies that the edge-weight matrix matches the graph topology and
+		 * satisfies the class invariants. In particular, the matrix dimensions
+		 * must match the number of vertices, existing edges must have a weight
+		 * different from `NO_WEIGHT`, and non-edges must have weight `NO_WEIGHT`.
+		 *
+		 * @return `true` if the graph and edge-weight matrix are consistent;
+		 *         otherwise, `false`.
+		 */
+		bool is_consistent() const noexcept;
 
 		////////////////////////
-		//weight operations
+		// Edge weight operations
 
 		/**
-		* @brief transforms weights (excluding NO_WEIGHT values) using functor f
-		* @param f functor
-		* @param type: EDGE (edge-weights), VERTEX (vertex-weights) or BOTH
-		**/
+		 * @brief Applies a transformation to all existing edge weights.
+		 *
+		 * Replaces each existing edge weight `w` with `f(w)`. Entries corresponding
+		 * to non-edges remain equal to `NO_WEIGHT`.
+		 *
+		 * @tparam Func Unary callable type accepting a `weight_t` and returning
+		 *              a value convertible to `weight_t`.
+		 * @param f Transformation applied to each existing edge weight.
+		 *
+		 * @warning Follows a fail-fast policy and calls `std::terminate()` if the
+		 *          transformation produces `NO_WEIGHT` for an existing edge.
+		 */
 		template<class Func>
-		void transform_weights(Func f, int type = BOTH);
-
-		/**
-		* @brief specific transformation of weights (excluding NO_WEIGHT values)
-		*		 from positive to negative, i.e.,  we(i, j) = - we(i, j)
-		* @param type: EDGE, VERTEX or BOTH
-		**/
-		void complement_weights(int type = BOTH);
-
+		void transform_weights(Func f);
+		
 		////////////////////////
-		// other operations
-
-			/**
-			* @brief created complement graph in @g
-			* @param g output graph
-			* @returns 0 if success, -1 if error
-			**/
-		int create_complement(Base_Graph_EW<graph_type, Weight>& g) const;
-
+		// other operations		
+	
 		/**
-		* @brief generates random edges uniformly with probability p and weight val
-		**/
-		virtual void gen_random_edges(double, Weight val);
+		 * @brief Generates a random edge set with fixed cardinality and assigns a common weight.
+		 *
+		 * Replaces the current edge set with a uniformly random subset of
+		 * `M = round(p * C(NV, 2))` undirected edges, where `NV` is the number of
+		 * vertices. All generated edges are assigned @p weight, while non-edges
+		 * are assigned `NO_WEIGHT`.
+		 *
+		 * @param p Target edge density in the range `[0, 1]`.
+		 * @param weight Weight assigned to every generated edge.
+		 *
+		 * @note This implements a fixed-edge-count random graph model of the
+		 *       `G(n,m)` type, with
+		 *       `m = round(p * C(n,2))`, rather than the independent-edge
+		 *       Erdos-Renyi `G(n,p)` model.
+		 *
+		 * @warning Follows the validation policy of the underlying graph generator
+		 *          and `set_weights()`.
+		 */
+		void gen_random_edges(double p, weight_t weight = DEFAULT_WEIGHT);
 
 		////////////
 		// I/O 
 
-		virtual std::ostream& print_data(bool lazy = true, std::ostream& o = std::cout, bool endl = true);
+		/**
+		 * @brief Writes the edge-weighted graph to an output stream in DIMACS format.
+		 *
+		 * Writes the DIMACS header followed by one record for each existing edge.
+		 * Each edge record contains the 1-based endpoint identifiers and the
+		 * corresponding edge weight.
+		 *
+		 * @param os Output stream.
+		 * @return Reference to @p os.
+		 *
+		 * @note This generic implementation writes directed edges. For undirected
+		 *       graphs, a specialization should avoid writing each edge twice.
+		 */
+		virtual	std::ostream& write_dimacs(
+			std::ostream& os = std::cout) const;
 
 		/**
-		* @brief prints the edge (v, w) in line format: [v]-(val)->[w], one edge per line
-		**/
-		std::ostream& print_edge(int v, int w, std::ostream& o = std::cout, bool endl = true) const;
-
-		/**
-		* @brief streams the vertex @v in format [v:(val)]
-		**/
-		std::ostream& print_vertex(int v, std::ostream& o = std::cout, bool endl = true) const;
-
-		/**
-		* @brief streams non-empty (excluding NO_WEIGHT value) weight info
-		*		 for all directed edges.
-		**/
-		std::ostream& print_weights(std::ostream& o = std::cout, bool line_format = true, int type = BOTH)	const;
-
-		/**
-		* @brief streams non-empty (excluding NO_WEIGHT value)  weights
-		*		 of directed edges induced by the subgraph of vertices in lv
-		**/
-		std::ostream& print_weights(VertexList& lv, std::ostream& o = std::cout, int type = BOTH)	const;
-
-		///////////
-		// read/write operations
-
-		/**
-		* @brief Reads weighted directed graph from file in DIMACS format
+		* @brief Reads an edge-weighted graph from a file in DIMACS format
 		*
-		*			I. vertex weights are read in lines n <v> <w>, if missing, weights are set to NO_WEIGHT
+		*			I.   edges are read from lines `e <v> <w> [<weight>]` (1-based vertices);
+		*			     if no edge in the file has a weight, weights are generated with
+		*			     set_modulus_weights() (Pullan 2008); otherwise an edge with no
+		*			     weight is assigned DEFAULT_WEIGHT
 		*
-		*			II. if the file has edges with no edge weights, weights are set to NO_WEIGHT
+		*			II.  vertex-weight lines (`n`/`v`) are ignored: vertex weights are not
+		*			     supported and the diagonal of the weight matrix stays NO_WEIGHT
+		*
+		*			III. edges are inserted through the (virtual) add_edge(), so graph-specific
+		*			     behaviour (e.g. symmetric weights in undirected graphs) is preserved
+		*
+		* The input is rejected if the header is invalid, the number of edges differs
+		* from the header, a vertex is out of range, an edge is a self-loop, an edge
+		* weight is unreadable or equals NO_WEIGHT, or an unknown record tag is found.
 		*
 		* @param filename name of the file
 		* @returns 0 if success, -1 if error
+		*
+		* @note On failure the graph is reset to an empty state.
+		* @note When called from a constructor of this class, add_edge() is not
+		*       virtual: derived classes with different add_edge() semantics must
+		*       call read_dimacs() from their own constructors.
 		**/
-		int read_dimacs(std::string filename);
+		int read_dimacs(const std::string& filename);
+		
+		/**
+		 * @brief Prints graph information to an output stream.
+		 *
+		 * Prints the underlying graph data and appends a tag identifying the graph
+		 * as edge-weighted.
+		 *
+		 * @param lazy Passed to the underlying graph `print_data()` operation.
+		 * @param os Output stream.
+		 * @param trailing_newline If `true`, appends a newline after the output.
+		 * @return Reference to the output stream.
+		 */
+		virtual std::ostream& print_data(
+			bool lazy = true,
+			std::ostream& os = std::cout,
+			bool trailing_newline = true) const;
 
 		/**
-		* @brief Writes directed graph to stream in dimacs format
-		*
-		*		 I. weights in self-loops are considered vertex weights
-		*
-		*		II. vertex weights with value NO_WEIGHT are not written to file
-		*
-		*		III.For every edge, a weight is written (including NO_WEIGHT)
-		*
-		* @param o output stream
-		* @returns output stream
-		**/
-		virtual	std::ostream& write_dimacs(std::ostream& o);
+		 * @brief Prints an edge and its weight.
+		 *
+		 * If (@p v, @p w) is an existing edge, prints it in the form
+		 * `[v]--(weight)-->[w]`. Otherwise, prints
+		 * `[v]--(NO_EDGE)-->[w]`.
+		 *
+		 * @param v Source vertex.
+		 * @param w Target vertex.
+		 * @param os Output stream.
+		 * @param trailing_newline If `true`, appends a newline after the output.
+		 * @return Reference to @p os.
+		 */
+		virtual std::ostream& print_edge(
+			vertex_t v, 
+			vertex_t w, 
+			std::ostream& os = std::cout, 
+			bool trailing_newline = true) const;
 
-		/////////////////////
-		//private I/O
+		/**
+		 * @brief Prints the edges of the graph and their weights.
+		 *
+		 * Edges are written using the format specified by @p format. In
+		 * `edge_list` mode, each existing edge is printed individually. In
+		 * `edge_matrix` mode, the complete edge-weight matrix is printed, using
+		 * `NO_WEIGHT` entries to represent non-edges.
+		 *
+		 * @param os Output stream.
+		 * @param format Edge-printing format.
+		 * @param trailing_newline If `true`, appends an additional newline after
+		 *                         the complete output.
+		 *
+		 * @return Reference to @p os.
+		 */
+		virtual std::ostream& print_edges(
+			std::ostream& os = std::cout,
+			edge_print_format format = edge_print_format::edge_list,
+			bool trailing_newline = false) const;
+
+		/**
+		 * @brief Prints the edges induced by a set of vertices.
+		 *
+		 * Prints all existing directed edges whose endpoints both belong to
+		 * @p vertices, together with their corresponding edge weights.
+		 *
+		 * @param vertices Set of vertices defining the induced subgraph.
+		 * @param os Output stream.
+		 *
+		 * @return Reference to @p os.
+		 */
+		std::ostream& print_edges(
+			const vertex_set_t& vertices,
+			std::ostream& os = std::cout) const;
+					
+
+	protected:
+
+		/**
+		 * @brief Validates an edge-weight matrix against the current graph topology.
+		 *
+		 * Checks that @p edge_weights is square, matches the number of graph
+		 * vertices, and is consistent with the current graph topology. Existing
+		 * edges must have a weight different from `NO_WEIGHT`, while non-edges
+		 * must have weight `NO_WEIGHT`.
+		 *
+		 * @param edge_weights Edge-weight matrix to validate.
+		 *
+		 * @warning Follows a fail-fast policy and calls `std::terminate()` if
+		 *          @p edge_weights is invalid or inconsistent with the graph.
+		 */
+		virtual void validate_weight_matrix_base(
+			const weight_matrix_t& edge_weights) const;
+
+
+		/**
+		 * @brief Validates the current edge-weight matrix.
+		 *
+		 * Checks that the stored edge-weight matrix is square, matches the number
+		 * of graph vertices, and is consistent with the current graph topology.
+		 *
+		 * @warning Follows a fail-fast policy and calls `std::terminate()` if the
+		 *          current edge-weight matrix is invalid or inconsistent with the graph.
+		 */
+		void validate_weight_matrix_base() const {
+			validate_weight_matrix_base(edge_weights_);
+		}
+			
+		/**
+		 * @brief Initializes the edge-weight matrix from the current graph topology.
+		 *
+		 * Resizes the edge-weight matrix to match the number of graph vertices.
+		 * Existing edges are assigned @p weight, while non-edges are assigned
+		 * `NO_WEIGHT`.
+		 *
+		 * @param weight Weight assigned to existing edges.
+		 */
+		void initialize_edge_weights(
+			weight_t weight = DEFAULT_WEIGHT);
+
+		/**
+		* @brief Returns mutable access to the edge-weight matrix.
+		*
+		* @return Reference to the internal edge-weight matrix.
+		*
+		* @note Intended for derived classes and internal algorithms.
+		*/
+		weight_matrix_t& mutable_weights() noexcept {
+			return edge_weights_;
+		}
+
+		/**
+		* @brief Returns mutable access to the neighborhood of a vertex.
+		*
+		* @param v Vertex whose neighborhood is requested.
+		* @return Reference to the neighborhood bitset of `v`.
+		*
+		* @note Intended for derived classes and internal algorithms.
+		*/
+		vertex_bitset_t& neighbors(vertex_t v) noexcept {
+			return graph_.neighbors(v);
+		}
+						
+	
+		/**
+		 * @brief Resets the graph to an empty state.
+		 *
+		 * Removes all vertices, edges, and edge weights.
+		 */
+		void reset() {
+			graph_.reset();
+			edge_weights_.clear();
+		}
+
+	private:
+		/**
+		 * @brief Reports a fatal graph initialization error.
+		 *
+		 * @param[in] message Description of the error.
+		 *
+		 * @note Terminates the program without returning.
+		 */
+		[[noreturn]]
+		void graph_initialization_error(const std::string& message)
+		{
+			std::cerr << "[BITGRAPH ERROR] " << message << '\n';
+			std::terminate();
+		}
+		
+		/////////////////
+		// data members
 
 	protected:
 		/**
-		* @brief prints the edges of the graph in line format [v]-(val)->[w], one edge per line
-		**/
-		virtual std::ostream& print_edges(std::ostream& o = std::cout, bool eofl = true) const;
+		 * @brief Underlying graph.
+		 */
+		graph_t graph_;	
 
 		/**
-		* @brief prints edges in different formats
-		* @param line_format: if TRUE, prints one edge per line, otherwise in matrix format
-		**/
-		virtual	std::ostream& print_edge_weights(std::ostream& o = std::cout, bool line_format = true) const;
-		std::ostream& print_vertex_weights(std::ostream& o = std::cout) const;
-
-		/**
-		* @brief prints the edges of the graph induced by the vertices of lv in line format
-		* @param lv: input set of vertices of the induced subgraph
-		**/
-		virtual	std::ostream& print_edge_weights(VertexList& lv, std::ostream& o = std::cout)	const;
-
-		/**
-		* @brief prints the vertices of the vertices of lv
-		* @param lv: input set of vertices
-		**/
-		std::ostream& print_vertex_weights(VertexList& lv, std::ostream& o = std::cout) const;
-
-		///////////////////
-		//data members
-
-	protected:
-		graph_type g_;
-		mat_t   we_;								//matrix of vertex and edge-weights 																
+		 * @brief Edge-weight matrix.
+		 *
+		 * Entry `edge_weights_[v][w]` stores the weight associated with the edge
+		 * (v, w). Non-edges are represented by `NO_WEIGHT`.
+		 */
+		weight_matrix_t edge_weights_;																			
 
 	}; //end of class Base_Graph_EW
 
@@ -441,168 +727,9 @@ namespace bitgraph {
 }
 
 //////////////////////////////////////////////////////////////////
-//  
 // Necessary implementations in header file
 
-namespace bitgraph {
-
-	template <class GraphT, class WeightT>
-	template <bool EraseNonEdges>
-	inline
-		void Base_Graph_EW< GraphT, WeightT>::set_weight(mat_t& lw, bool edges_only) {
-
-		auto NV = num_vertices();
-
-		/////////////////////////
-		assert(lw.size() == NV);
-		/////////////////////////
-
-		/*if (lw.size() != NV) {
-			LOG_ERROR("bizarre matrix of weights-Base_Graph_EW<GraphT,WeightT >::set_edge_weight(mat_t...)");
-			return -1;
-		}*/
-
-		//set to empty wv and non-edges
-		for (int v = 0; v < NV; ++v) {
-			for (int w = 0; w < NV; ++w) {
-
-				if (edges_only && v == w) continue;			//skips vertex weights if required
-
-				if (g_.is_edge(v, w)) {
-					we_[v][w] = lw[v][w];
-				}
-				else {
-					//cleans non-edge weights if required
-					if (EraseNonEdges) { we_[v][w] = NO_WEIGHT; }
-				}
-			}
-		}
-	}
-
-	template<class GraphT, class WeightT>
-	template<class Func>
-	inline
-		void Base_Graph_EW<GraphT, WeightT>::transform_weights(Func f, int type)
-	{
-		auto NV = num_vertices();
-
-		switch (type) {
-			//edge-weights
-		case EDGE:
-			for (auto i = 0; i < NV - 1; ++i) {
-				for (auto j = i + 1; j < NV; ++j) {
-					if (we_[i][j] != NO_WEIGHT) {
-						we_[i][j] = f(we_[i][j]);
-					}
-					if (we_[j][i] != NO_WEIGHT) {
-						we_[j][i] = f(we_[j][i]);
-					}
-				}
-			}
-			break;
-			//vertex-weights
-		case VERTEX:
-			for (auto i = 0; i < NV; ++i) {
-				if (we_[i][i] != NO_WEIGHT) {
-					we_[i][i] = f(we_[i][i]);
-				}
-			}
-			break;
-		case BOTH:
-			//vertex and edge-weights
-			for (auto i = 0; i < NV; ++i) {
-				for (auto j = 0; j < NV; ++j) {
-					if (we_[i][j] != NO_WEIGHT) {
-						we_[i][j] = f(we_[i][j]);
-					}
-				}
-			}
-			break;
-		default:
-			//should not happen	
-			LOG_ERROR("unknown type -  Base_Graph_EW<GraphT, WeightT>::transform_weights");
-			LOG_ERROR("exiting");
-			std::exit(EXIT_FAILURE);
-		}
-	}
-
-	template <class GraphT, class WeightT>
-	template<bool EraseNonEdges>
-	inline
-		void Base_Graph_EW< GraphT, WeightT>::set_edge_weight(Weight val) {
-
-		auto NV = num_vertices();
-
-		//set to empty weight the non-edges
-		for (int v = 0; v < NV; v++) {
-			for (int w = 0; w < NV; w++) {
-				if (g_.is_edge(v, w)) {
-					we_[v][w] = val;
-				}
-				else {
-					if (EraseNonEdges) { we_[v][w] = NO_WEIGHT; }
-				}
-			}
-		}
-	}
-
-	template<class GraphT, class WeightT>
-	template <bool EraseNonEdges>
-	inline
-		void Base_Graph_EW<GraphT, WeightT>::set_modulus_edge_weight(int MODULUS) {
-
-		int NV = num_vertices();
-
-		for (int v = 0; v < NV; ++v) {
-			for (int w = 0; w < NV; ++w) {
-
-				if (g_.is_edge(v, w)) {
-
-					///////////////////////////////////////
-					set_weight(v, w, (1 + ((v + w + 2 /* 0-based index*/) % MODULUS)));
-					///////////////////////////////////////
-				}
-				else {
-					if (EraseNonEdges) {
-						set_edge_weight(v, w, NO_WEIGHT);
-					}
-				}
-			}
-		}
-	}
-
-	
-	template<class GraphT, class WeightT>
-	template<bool EdgeWeightedGraph>
-	inline
-		void Base_Graph_EW<GraphT, WeightT>::reset(std::size_t NV, Weight val, string name)
-	{
-		///////////////
-		g_.reset(NV);
-		////////////////
-		
-		try {
-			we_.assign(NV, vector<WeightT>(NV, val));
-		}
-		catch (...) {
-			LOG_ERROR("bad weight assignment - Base_Graph_EW<GraphT, Weight>::reset");
-			LOG_ERROR("exiting");
-			std::exit(EXIT_FAILURE);
-		}
-
-		//set vertex weights to NO_WEIGHT if required
-		if (EdgeWeightedGraph) {
-			for (auto v = 0u; v < NV; ++v) {
-				we_[v][v] = NO_WEIGHT;
-			}
-		}
-
-		g_.set_name(name);
-	
-	}
-
-}//end of namespace bitgraph
+#include "simple_graph_ew_imp.h"
 
 
-
-#endif
+#endif  // BITGRAPH_GRAPH_SIMPLE_GRAPH_EDGE_WEIGHTED_H

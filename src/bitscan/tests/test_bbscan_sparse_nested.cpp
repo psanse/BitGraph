@@ -23,14 +23,6 @@ protected:
 
 	BBScanSp bb;
 };
-
-TEST(BitScanNestedSparse, exception_handlers) {
-
-	BBScanSp bbsp(130);
-
-	EXPECT_THROW(BBScanSp::scan sc1(bbsp), BitScanError);
-
-}
 	
 //tests the 4 types of scanning
 TEST_F(BitScanNestedSparseTest, basic) {
@@ -149,6 +141,7 @@ TEST(BitScanNestedSparse, scanning_empty_bitsets) {
 
 	//no empty check - necessary if there is a doubt it can be empty 
 	BBScanSp::scan sc1(bbsp);
+	sc1.init_scan();		
 	int bit = BBObject::noBit;	
 	while( (bit = sc1.next_bit()) != BBObject::noBit){
 		lb.push_back(bit);
@@ -163,22 +156,12 @@ TEST(BitScanNestedSparse, scanning_empty_bitsets) {
 	bbsp.erase_bit();
 	lb.clear();
 
-	EXPECT_THROW(sc1.init_scan(), BitScanError);		//empty bitset cannot be scanned
+	// empty sparse bitset is a valid state
+	EXPECT_NO_THROW(
+		sc1.init_scan(BBObject::NON_DESTRUCTIVE)
+	);
 
-	////starts a new scan  - MUST capture the return val of init_scan
-	////if there is a risk the bitset to be scanned is empty
-	//if ( sc1.init_scan() == 0 ) {
-	//	while ((bit = sc1.next_bit()) != BBObject::noBit) {
-	//		lb.push_back(bit);
-	//	}
-
-	//	///////////////////////
-	//	EXPECT_EQ(10, lb[0]);
-	//	EXPECT_EQ(20, lb[1]);
-	//	EXPECT_EQ(64, lb[2]);
-	//	///////////////////////
-	//}
-
+	EXPECT_EQ(BBObject::noBit, sc1.next_bit());
 }
 
 TEST_F(BitScanNestedSparseTest, block_info) {

@@ -25,13 +25,15 @@ int main() {
 	//A sorting object	
 	bitgraph::GraphFastRootSort<bitgraph::ugraph> gs(ug);
 
-	//A new ordering of the vertices - minimum degree first (degenerate) {1->0, 0->1, 2->2, 3->3, 4->4}	
+	//A new ordering of the vertices - minimum degree first (degenerate), in [OLD]->[NEW] format
 	//In a degenerate ordering, each vertex sorted is removed and the sorting criterion is computed for the remaining vertices
-	auto order = gs.new_order(bitgraph::GraphFastRootSort<bitgraph::ugraph>::MIN_DEGEN, false);
-	
+	using sorter_t = bitgraph::GraphFastRootSort<bitgraph::ugraph>;
+	auto order = gs.new_order(sorter_t::strategy::min_degeneracy,
+							  sorter_t::placement::first_to_last,
+							  sorter_t::sort_order::old_to_new);
+
 	//create an isomorphism of the original graph according to the new ordering
-	bitgraph::ugraph ug_sorted;
-	gs.reorder(order, ug_sorted);
+	bitgraph::ugraph ug_sorted = sorter_t::reorder(ug, order);
 
 
 	//I/O

@@ -1,7 +1,27 @@
 /**
-* @file bitboard.cpp
-* @brief Implementation of the BitBoard class 
-**/
+ * @file bitblock.cpp
+ * @brief Implementation of low-level 64-bit bitblock operations.
+ *
+ * @details
+ * This file implements the algorithms in @c bitgraph::bblock for operating
+ * on a single @c BITBOARD. The routines provide population counts, least- and
+ * most-significant-bit searches, formatted output, and masked copy helpers
+ * used by the dense and sparse bitset implementations.
+ *
+ * Several bit-scan and population-count variants are provided so the library
+ * can select an implementation appropriate to the configured platform and
+ * lookup tables. Empty bitblocks return @c BBObject::noBit from search
+ * functions; valid bit positions within a block are zero-based in the range
+ * [0, 63].
+ *
+ * @author pss
+ * @date Last updated: 14 October 2026
+ *
+ * @see bitblock.h
+ * @see tables.h
+ * @note The public declarations are in @c bitblock.h, whose include guard
+ *       retains the historical @c BITGRAPH_BITSCAN_BITBLOCK_H name.
+ */
 
 #include "bitblock.h"
 #include <iostream>
@@ -12,7 +32,7 @@ namespace bitgraph {
 
 	namespace bblock {
 
-		using bitgraph::_impl::Tables;						
+		using bitgraph::detail::Tables;
 
 		int popc64_lup(const BITBOARD bb_dato) {
 
@@ -23,7 +43,7 @@ namespace bitgraph {
 
 			val.b = bb_dato;
 
-			return (Tables::pc[val.c[0]] + Tables::pc[val.c[1]] + Tables::pc[val.c[2]] + Tables::pc[val.c[3]]); //Suma de poblaciones 
+			return (Tables::pc[val.c[0]] + Tables::pc[val.c[1]] + Tables::pc[val.c[2]] + Tables::pc[val.c[3]]);		//Suma de poblaciones 
 		}
 
 
@@ -197,10 +217,9 @@ namespace bitgraph {
 			//add right part of the block (excluding bit)
 			dest |= destOri & Tables::mask_high[bit];
 		}
+	
 
 	}//end namespace bblock
 
 }//end namespace bitgraph
-
-
 

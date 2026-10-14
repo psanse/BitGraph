@@ -9,144 +9,196 @@
 
 #include <iostream>
 #include <sstream>
+#include <cstdio>
+#include <fstream>
+#include <sstream>
+#include <string>
+
 #include "gtest/gtest.h"
-#include "utils/file.h"
+#include "utils/file_utils.h"
 
 using namespace std;
 using namespace bitgraph;
 
-//no real test, just to show how to use the macro
-TEST(FileTest, example_macro){
-	const char* FILENAME = "log.txt";   
 
-    /////////////////////////////////////////////////////////////////
-	FILE_LOG(FILENAME, WRITE)	<< "hello world"		<< endl;
-	FILE_LOG(FILENAME, APPEND)	<< "appends hello world"<< endl;
-    /////////////////////////////////////////////////////////////////
-
-    std::remove(FILENAME);
+namespace {
+    
+    bool fileExists(const std::string& filename) {
+        std::ifstream file(filename);
+        return file.good();
+    }
 }
 
-// Helper function to check if a file exists
-bool fileExists(const std::string& filename) {
-    std::ifstream file(filename);
-    return file.good();
-}
+/**
+ * @test Verifies that FILE_LOG supports writing and appending to a file.
+ */
+TEST(FileTest, file_log_macro_writes_and_appends)
+{
+    const char* filename = "file_log_macro_test.txt";
 
-// Test case for writing to a file
-TEST(FileTest, WriteToFile) {
+    // Remove any file left by an earlier interrupted test.
+    std::remove(filename);
 
-    const char* filename = "test_write.txt";
+    FILE_LOG(filename, WRITE)
+        << "hello world\n";
+
+    FILE_LOG(filename, APPEND)
+        << "appends hello world\n";
+
+    std::string contents;
 
     {
-        File file(filename, File::WRITE);
-        std::fstream& fs = file.stream();
-        fs << "Hello, world!";
+        std::ifstream input(filename);
+        ASSERT_TRUE(input.is_open());
+
+        std::ostringstream buffer;
+        buffer << input.rdbuf();
+        contents = buffer.str();
+    } // Close the input stream before removing the file on Windows.
+
+    EXPECT_EQ(
+        "hello world\n"
+        "appends hello world\n",
+        contents);
+
+    EXPECT_EQ(0, std::remove(filename));
+}
+
+
+// Test case for writing to a file
+TEST(FileTest, WriteToFile)
+{
+    const char* filename = "test_write.txt";
+    std::remove(filename);
+
+    {
+        File file(filename, File::Mode::WRITE);
+        std::fstream& stream = file.stream();
+
+        stream << "Hello, world!";
+        ASSERT_TRUE(stream.good());
     }
 
-	//reads the file and ckecks the content
-    std::ifstream ifs(filename);
-    std::string content;
-    std::getline(ifs, content);
+    std::string contents;
 
-    ////////////////////////////////////////
-    EXPECT_EQ(content, "Hello, world!");
-    ///////////////////////////////////////
-    
-    ifs.close();
-    std::remove(filename);
+    {
+        std::ifstream input(filename);
+        ASSERT_TRUE(input.is_open());
+
+        std::getline(input, contents);
+    }
+
+    EXPECT_EQ("Hello, world!", contents);
+    EXPECT_EQ(0, std::remove(filename));
 }
 
 // Test case for reading from a file
-TEST(FileTest, ReadFromFile) {
-
-    //write to a file
+TEST(FileTest, ReadFromFile)
+{
     const char* filename = "test_read.txt";
-    {
-        std::ofstream ofs(filename);
-        ofs << "Hello, world!";
-        ofs.close();
-    }
-
-    //reads the file and checks the content
-    {
-        File file(filename, File::READ);
-        std::fstream& fs = file.stream();
-        std::string content;
-        std::getline(fs, content);
-
-        ////////////////////////////////////////
-        EXPECT_EQ(content, "Hello, world!");
-        ////////////////////////////////////////
-    }
-
     std::remove(filename);
+
+    {
+        std::ofstream output(filename);
+        ASSERT_TRUE(output.is_open());
+
+        output << "Hello, world!";
+        ASSERT_TRUE(output.good());
+    }
+
+    std::string contents;
+
+    {
+        File file(filename, File::Mode::READ);
+        std::fstream& stream = file.stream();
+
+        std::getline(stream, contents);
+    }
+
+    EXPECT_EQ("Hello, world!", contents);
+    EXPECT_EQ(0, std::remove(filename));
 }
 
 // Test case for appending to a file
-TEST(FileTest, AppendToFile) {
-
+TEST(FileTest, AppendToFile)
+{
     const char* filename = "test_append.txt";
-    {
-        std::ofstream ofs(filename);
-        ofs << "Hello";
-        ofs.close();
-    }
-
-    //appends to the file
-    {
-        File file(filename, File::APPEND);
-        std::fstream& fs = file.stream();
-        fs << ", world!";
-    }
-
-	//checks the content of the file
-    std::ifstream ifs(filename);
-    std::string content;
-    std::getline(ifs, content);
-
-	////////////////////////////////////////
-    EXPECT_EQ(content, "Hello, world!");
-	////////////////////////////////////////
-    
-    ifs.close();
     std::remove(filename);
+
+    {
+        std::ofstream output(filename);
+        ASSERT_TRUE(output.is_open());
+
+        output << "Hello";
+        ASSERT_TRUE(output.good());
+    }
+
+    {
+        File file(filename, File::Mode::APPEND);
+        std::fstream& stream = file.stream();
+
+        stream << ", world!";
+        ASSERT_TRUE(stream.good());
+    }
+
+    std::string contents;
+
+    {
+        std::ifstream input(filename);
+        ASSERT_TRUE(input.is_open());
+
+        std::getline(input, contents);
+    }
+
+    EXPECT_EQ("Hello, world!", contents);
+    EXPECT_EQ(0, std::remove(filename));
 }
 
 // Test case for read/write mode
-TEST(FileTest, ReadWriteFile) {
-
+TEST(FileTest, ReadWriteFile)
+{
     const char* filename = "test_read_write.txt";
-    {
-        std::ofstream file(filename);
-        file << "Hello";
-        file.close();
-    }
-
-    {
-        File file(filename, File::READ_WRITE);
-        std::fstream& fs = file.stream();
-        fs.seekp(0, std::ios::end);
-        fs << ", world!";
-    }
-
-
-    //checks the content of the file
-    std::ifstream ifs(filename);
-    std::string content;
-    std::getline(ifs, content);
-
-    ////////////////////////////////////////
-    EXPECT_EQ(content, "Hello, world!");
-    ////////////////////////////////////////
-
-    ifs.close();
     std::remove(filename);
+
+    {
+        std::ofstream output(filename);
+        ASSERT_TRUE(output.is_open());
+
+        output << "Hello";
+        ASSERT_TRUE(output.good());
+    }
+
+    {
+        File file(filename, File::Mode::READ_WRITE);
+        std::fstream& stream = file.stream();
+
+        stream.seekp(0, std::ios::end);
+        ASSERT_TRUE(stream.good());
+
+        stream << ", world!";
+        ASSERT_TRUE(stream.good());
+    }
+
+    std::string contents;
+
+    {
+        std::ifstream input(filename);
+        ASSERT_TRUE(input.is_open());
+
+        std::getline(input, contents);
+    }
+
+    EXPECT_EQ("Hello, world!", contents);
+    EXPECT_EQ(0, std::remove(filename));
 }
 
-// Test case for file not found
-TEST(FileTest, FileNotFound) {
+// Test case for a missing input file
+TEST(FileTest, FileNotFound)
+{
     const char* filename = "non_existent_file.txt";
-	    
-    EXPECT_THROW(File file(filename, File::READ), const char*);
- }
+    std::remove(filename);
+
+    EXPECT_THROW(
+        File file(filename, File::Mode::READ),
+        std::runtime_error);
+}

@@ -1,8 +1,36 @@
+/**
+ * @file tables.cpp
+ * @brief Definition and initialization of BITSCAN lookup tables.
+ *
+ * @details
+ * This translation unit owns the storage for the lookup tables declared by
+ * @c bitgraph::detail::Tables. The tables cover population counts, least- and
+ * most-significant-bit positions, single-bit and interval masks, and the
+ * De Bruijn indices used by low-level 64-bit bitblock operations.
+ *
+ * A translation-unit-local initializer invokes @c Tables::InitAllTables()
+ * during static initialization so the tables are ready before normal library
+ * use. Optional tables are compiled only when their corresponding build
+ * configuration macros, such as @c EXTENDED_LOOKUPS or
+ * @c CACHED_INDEX_OPERATIONS, are enabled.
+ *
+ * The definitions in this file are implementation details of BITSCAN and are
+ * not intended to be accessed directly by application code.
+ *
+ * @author Pablo San Segundo
+ * @date Last updated: 14 October 2026
+ *
+ * @see tables.h
+ * @see bitblock.h
+ * @warning Initialization order for unrelated global objects in other
+ *          translation units remains subject to the C++ static-initialization
+ *          rules.
+ */
 #include "tables.h"
 
 
 using namespace bitgraph;
-using bitgraph::_impl::Tables;
+using bitgraph::detail::Tables;
 
 //common masks and lookup tables always available
 int Tables::pc[65536];								//1_bit population in 16 bit blocks
@@ -35,10 +63,32 @@ int Tables::t_wmodindex[MAX_CACHED_INDEX];
 int Tables::lsb_l[65536][16];				//LSB position list of 1-bits in BITBOARD16
 #endif
 
-//global initialization of tables
-struct Init{
-	Init(){Tables::InitAllTables();}
-} initTables;
+
+/**
+ * @brief Initializes the BITSCAN lookup tables during program startup.
+ *
+ * This initializer runs when the library is loaded, before ordinary runtime
+ * use of the lookup tables.
+ *
+ * @warning The initialization order relative to global objects defined in
+ *          other translation units is unspecified.
+ */
+namespace {
+
+	struct TablesInitializer {
+		TablesInitializer() noexcept
+		{
+			bitgraph::detail::Tables::InitAllTables();
+		}
+	};
+
+	/**
+	 * @brief Translation-unit-local object that triggers lookup-table initialization.
+	 */
+	const TablesInitializer tables_initializer{};
+
+} // unnamed namespace
+
 
 ////////////////////
 // magic number tables of 64 bits (always available since space requierement is trivial)
@@ -187,16 +237,16 @@ void Tables::init_popc(){
 	}
 
 
-	//Implementacion Shift+Add: 
-	pc_sa[0]=0;					//null bits population
+	//Implementacion Shift+Add: TO CHECK! (19/09/2026) 
+	//pc_sa[0]=0;					//null bits population
 
-	for (c=1;c<65536;c++)	{
-		n=0;
-		for(k=0;k<13;k+=4)
-				n+=0xF & (c>>k);  //Sum of the number of bits every 4
-		
-		pc_sa[c]=n;
-	}
+	//for (c=1;c<65536;c++)	{
+	//	n=0;
+	//	for(k=0;k<13;k+=4)
+	//			n+=0xF & (c>>k);  //Sum of the number of bits every 4
+	//	
+	//	pc_sa[c]=n;
+	//}
 }
 
 ////////////////////////////////////////
@@ -311,13 +361,11 @@ void Tables::init_cached_index()
 
 //boot tables in RAM
 
-int Tables::InitAllTables(){
+void Tables::InitAllTables(){
 	init_mlsb();
     init_popc();
     init_popc8();
     init_masks(); 
 	init_lsb_l();
 	init_cached_index();
-
-return 1;
 }

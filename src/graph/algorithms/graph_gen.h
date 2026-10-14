@@ -35,57 +35,77 @@
  *
  * @todo Simplify class architecture for graph generation (07/03/2025).
  *
- * @author
- * Pablo San Segundo (pss)
+ * @author pss
  */
 
-#ifndef __GRAPH_GEN_H__
-#define __GRAPH_GEN_H__
+#ifndef BITGRAPH_GRAPH_GEN_H
+#define BITGRAPH_GRAPH_GEN_H
+
+#include "utils/path_utils.h"
+#include "graph/ugraph_vertex_weighted.h"						// facade types 
+#include "graph/ugraph_edge_weighted.h"							// facade types 
+#include "graph_fast_sort.h"
 
 #include <iostream>
 #include <sstream>
-#include <random>								
+#include <fstream>
+#include <random>
+#include <cmath>
+#include <cstdint>
+#include <limits>
 #include <cassert>
-
-#include "utils/common.h"
-#include "graph/graph_vertex_weighted.h"						// facade types 
-#include "graph/graph_edge_weighted.h"							// facade types 
-#include "graph_fast_sort.h"
+#include <algorithm>
 
 namespace bitgraph {
-
-	namespace _impl {
-
-		/////////////////
-		//
-		// struct random_attr_t
-		// (data for random graph generation)
-		//
-		//////////////////
-
+		
+		/**
+		 * @brief Parameters for random graph generation.
+		 */
 		struct random_attr_t {
-			friend std::ostream& operator << (std::ostream& o, const random_attr_t& r) {
-				o << "[" << r.nLB << " " << r.nUB << " "
-					<< r.pLB << " " << r.pUB << " " << r.nRep << " "
-					<< r.incN << " " << r.incP << "]" << endl;
-				return o;
-			}
-
+			
 			//constructor
-			random_attr_t(std::size_t nLB, std::size_t  nUB, double pLB, double pUB, std::size_t  nRep, std::size_t  incN, double incP) {
-				set(nLB, nUB, pLB, pUB, nRep, incN, incP);
-				assert(nLB <= nUB && pLB <= pUB && incP > 0 && "bad parameters - random_attr_t");
+			random_attr_t(std::size_t nLB, std::size_t  nUB,
+				double pLB, double pUB, 
+				std::size_t  nRep,
+				std::size_t  incN, double incP) 
+			{
+				set(nLB, nUB, pLB, pUB, nRep, incN, incP);				
 			}
 
 			//setter
-			void set(std::size_t  nLB, std::size_t  nUB, double pLB, double pUB, std::size_t  nRep, std::size_t  incN, double incP) {
-				this->nLB = nLB; this->nUB = nUB;
-				this->pLB = pLB; this->pUB = pUB;
+			void set(std::size_t  nLB, std::size_t  nUB, 
+				double pLB, double pUB,
+				std::size_t  nRep, 
+				std::size_t  incN, double incP) 
+			{
+				assert(nLB <= nUB);
+				assert(0.0 <= pLB && pLB <= pUB && pUB <= 1.0);
+				assert(nRep > 0);
+				assert(nLB == nUB || incN > 0);
+				assert(pLB == pUB || incP > 0.0);
+				assert(nLB <= nUB && pLB <= pUB && incP > 0 && "bad parameters - random_attr_t");
+
+				this->nLB = nLB;
+				this->nUB = nUB;
+				this->pLB = pLB;
+				this->pUB = pUB;
 				this->nRep = nRep;
-				this->incN = incN; this->incP = incP;
+				this->incN = incN;
+				this->incP = incP;
 			}
 
-			//data
+			friend std::ostream& operator<<(std::ostream& os,
+				const random_attr_t& r)
+			{
+				return os << '['
+					<< r.nLB << ' ' << r.nUB << ' '
+					<< r.pLB << ' ' << r.pUB << ' '
+					<< r.nRep << ' '
+					<< r.incN << ' ' << r.incP << ']'
+					<< '\n';
+			}
+			
+
 			std::size_t  nLB;					//range of vertices [nLB, nUB]
 			std::size_t  nUB;
 			double pLB;							//range of densities [pLB, pUB]	
@@ -94,473 +114,344 @@ namespace bitgraph {
 			std::size_t  incN;					//increment of vertices
 			double incP;						//increment of densities
 		};
-	}//end of namespace _impl
-
-	using _impl::random_attr_t;					//alias for random_attr_t
 
 }//end of namespace bitgraph	
 
 namespace bitgraph {
-	namespace _impl {
 
-		/////////////////
-		//
-		// class RandomGen
-		// (random generation of generic non-sparse and unweighted graphs)
-		// Important: GraphT can be a graph weighted type. The class will operate only on the graph structure.
-		//
-		//////////////////
+	/**
+	 * @brief Random generation of graph structures.
+	 *
+	 * Supports unweighted and weighted graph types.
+	 * For weighted graphs, only the graph topology is generated.
+	 *
+	 * @tparam GraphT Graph type.
+	 */
+	template<class GraphT>
+	class RandomGen {
+	public:
 
+		using graph_t = GraphT;
+
+		/**
+		 * @brief Generates a simple random graph G(n, p).
+		 *
+		 * Each possible edge is generated independently with probability @p p.
+		 *
+		 * - No self-loops are generated.
+		 * - Directed or undirected edges are generated according to GraphT.
+		 * - The graph is named "r<NV>_<p>.txt".
+		 * - Any existing graph contents are replaced.
+		 *
+		 * @param[out] graph Generated random graph.
+		 * @param[in] NV Number of vertices (must be greater than 0).
+		 * @param[in] p Edge probability in [0, 1].
+		 *
+		 * @note Invalid parameters cause program termination (fail-fast).
+		 */
+		static void  create_graph(
+			graph_t& graph,
+			std::size_t NV,
+			double p);
+
+		/**
+		 * @brief Creates and returns a simple random graph G(n, p).
+		 *
+		 * Each possible edge is generated independently with probability @p p.
+		 *
+		 * - No self-loops are generated.
+		 * - Directed or undirected edges are generated according to GraphT.
+		 * - The graph is named "r<NV>_<p>.txt".
+		 *
+		 * @param[in] NV Number of vertices (must be greater than 0).
+		 * @param[in] p Edge probability in [0, 1].
+		 * @return Generated random graph.
+		 *
+		 * @note Invalid parameters cause program termination (fail-fast).
+		 */
+		static graph_t create_graph(std::size_t NV,
+			double p) 
+		{
+			graph_t g;
+			create_graph(g, NV, p);
+			return g;
+		}
+
+		/**
+		 * @brief Generates and saves a benchmark collection of random graphs.
+		 *
+		 * Generates simple random graphs G(n, p) for the specified
+		 * ranges of vertices and edge probabilities.
+		 *
+		 * For each (n, p) combination, generates nRep independent
+		 * graph instances and writes them in DIMACS format.
+		 *
+		 * Output filenames follow the convention:
+		 * "r<n>_<p>_<k>.txt", where k is the repetition index.
+		 *
+		 * @param[in] path Output directory.
+		 * @param[in] rd Random graph generation parameters.
+		 *
+		 * @note The output directory must already exist.
+		 * @note Invalid parameters or file I/O failures cause
+		 *       program termination (fail-fast).
+		 */
+		static void create_graph_benchmark(const std::string& path, 
+			const random_attr_t& rd);
+
+		/**
+		 * @brief Creates an isomorphic graph by randomly permuting the vertices
+		 *        of the source graph using std::shuffle.
+		 *
+		 * @param[out] g_iso Generated isomorphic graph.
+		 * @param[in] g_source Source graph (not modified).
+		 *
+		 * @note Uses a fixed random seed for reproducibility.
+		 */
+		static void create_isomorphism(graph_t& g_iso,
+			graph_t& g);
+	};	
+
+}//end of namespace bitgraph	
+
+namespace bitgraph {
+	
+	namespace experimental {
+
+		/**
+		 * @brief Experimental random graph generator for sparse graphs.
+		 *
+		 * Generates random unweighted graph structures using sparse
+		 * graph representations. Currently supports only undirected graphs.
+		 *
+		 * @tparam GraphT Sparse graph type (only sparse_ugraph is supported).
+		 *
+		 * @warning Experimental implementation. Not part of the stable BITGRAPH API.
+		 */
 		template<class GraphT>
-		class RandomGen {
+		class SparseRandomGen {
+			static_assert(sizeof(GraphT) == 0,
+				"SparseRandomGen<GraphT> : only sparse_ugraph is currently supported");
+		};
+
+		/**
+		 * @brief Experimental random graph generator for massive sparse undirected graphs.
+		 *
+		 * Specialization of SparseRandomGen for sparse_ugraph.
+		 * Generates G(n, p) random graphs by geometric skipping over the
+		 * n(n-1)/2 candidate edges [Batagelj & Brandes, 2005], so that the
+		 * cost is proportional to the number of generated edges.
+		 *
+		 * @warning Experimental implementation. Not part of the stable BITGRAPH API.
+		 */
+		template<>
+		class SparseRandomGen<sparse_ugraph>	{
 		public:
-
-			/*
-			* @brief generates uniform simple random graph (n, p)
-			*
-			*			I. no self-loops
-			*
-			*			II. name r<n>_<p>.txt
-			*
-			* @param g output graph
-			* @param n number of vertices
-			* @param p probability of edge creation
-			* @returns 0 if OK, -1 if ERROR
-			*/
-			static int create_graph(GraphT& g, std::size_t n, double p);
-
-			/*
-			* @brief creates a set uniform random (n, p) directed/undirected graphs
-			*
-			*			I. no self-loops
-			*
-			*			II. names  r<n_<p>.txt
-			*
-			* @param path input directory where the files are created
-			* @param rd input data to generate the benchmark
-			*
-			* @returns 0 if OK, -1 if ERROR
-			*/
-			static int create_graph_benchmark(const std::string& path, const random_attr_t& rd);
 
 			/**
-			* @brief creates an isomorphi grap g_iso by shuffling the vertices of the input graph g
-			*		 randomly (uses std::shuffle)
-			* @param g: input graph
-			* @param g_iso: output isomorphic graph to g
-			* @returns 0 if successful, -1 otherwise
-			* @details: TODO - Unit test (14/04/2025)
-			**/
-			static int create_isomorphism(GraphT& g_iso, GraphT& g);
-		};
-	}//end of namespace _impl	
-
-	using _impl::RandomGen;		//alias for RandomGen<GraphT>
-
-}//end of namespace bitgraph	
-
-namespace bitgraph {
-	namespace _impl {
-
-		/////////////////
-		//
-		// class SparseRandomGen
-		// (random generation of generic sparse unweighted graphs)
-		// 
-		// Currently only for undirected graphs
-		//
-		//////////////////
-		template<class GraphT, int logSizeTable = 35000 >
-		class SparseRandomGen {};
-
-		/////////////////
-		//
-		// Specialization of SparseRandomGen for sparse_ugraph
-		// (massive sparse uniform graph generator)
-		// 
-		//////////////////
-
-		template< int logSizeTable >
-		class SparseRandomGen <sparse_ugraph, logSizeTable>
-		{
-			/*
-			*  @brief decodes undimensional edge index to upper triangle of adjacency matrix
-			*
-			*		  (see [Fast Random graph generation, 2011], personal comm. with authors)
-			*/
-			static void decode(BITBOARD edge_index, unsigned int& i, unsigned int& j, unsigned int n);
-
-		public:
-
-			//constructor
-			SparseRandomGen() { init_log_table(); }
-
-			//driver
-			int create_ugraph(sparse_ugraph& g, std::size_t n, double p);
+			 * @brief Generates a simple random undirected graph G(n, p).
+			 *
+			 * @param[out] graph Generated graph (existing contents are replaced).
+			 * @param[in] NV Number of vertices, in [1, max(vertex_t)].
+			 * @param[in] p Edge probability in [0, 1].
+			 * @param[in] seed Seed of the random engine (same seed, same graph).
+			 *
+			 * @note Invalid parameters cause program termination (fail-fast).
+			 */
+			static void create_ugraph(
+				sparse_ugraph& graph,
+				std::size_t NV, 
+				double p,
+				std::uint64_t seed = utils::detail::RandomUniformGen<>::FIXED_RANDOM_SEED);
 
 		private:
-			/*
-			* @brief 16-bit table for precomputed logarithms
-			*/
-			void init_log_table();
 
-
-			///////////////////////
-			// data
-		private:
-
-			double log_[logSizeTable];
+			/**
+			 * @brief Decodes a linear edge index into a pair of vertices.
+			 *
+			 * Maps an edge index to the corresponding position (i, j) in the
+			 * upper triangular part of the adjacency matrix, excluding the diagonal.
+			 * The mapping represents an undirected graph without self-loops.
+			 *
+			 * The row is estimated in floating point and then corrected with
+			 * exact integer arithmetic, so the result is exact for any NV.
+			 *
+			 * @param[in] edge_index Linear index of the edge.
+			 * @param[out] i First vertex of the decoded edge.
+			 * @param[out] j Second vertex of the decoded edge.
+			 * @param[in] NV Number of vertices.
+			 *
+			 * @pre NV >= 2.
+			 * @pre edge_index < NV * (NV - 1) / 2.
+			 *
+			 * @note The resulting vertices satisfy 0 <= i < j < NV.
+			 * @see Fast Random Graph Generation (2011).
+			 */
+			static void decode(
+				std::uint64_t edge_index,
+				vertex_t& i,
+				vertex_t& j,
+				std::size_t NV);
 		};
-	}//end of namespace _impl
 
-	using _impl::SparseRandomGen;		//alias for SparseRandomGen<GraphT, logSizeTable>
+	}//end of namespace experimental
+
+	//using experimental::SparseRandomGen;		//alias for SparseRandomGen<GraphT>
+
 }//end of namespace bitgraph
 
 
 
 namespace bitgraph {
-	namespace _impl {
-		/////////////////
-		//
-		// Class WeightGen
-		// (generates weights for vertex-weighted graphs)
-		// 
-		// TODO specialize for sparse-graphs
-		// TODO SFINAE to control template graph type deduction (07/03/2025)
-		// 
-		// TODO - in general revise the whole logic of the generator classes for different graph types (07/03/2025)
-		//
-		////////////////
 
+	namespace experimental {
+		
+		/**
+		 * @brief Experimental vertex weight generator for weighted graphs.
+		 *
+		 * Provides strategies for assigning vertex weights based on vertex
+		 * indices (modulus-based) or vertex degrees.
+		 * Existing weights are overwritten, and generated weights can
+		 * optionally be written to a file.
+		 *
+		 * @tparam GraphT Vertex-weighted graph type.
+		 *
+		 * @note Currently supports non-sparse vertex-weighted graphs.
+		 * @warning Experimental implementation. Not part of the stable BITGRAPH API.
+		 */
 		template <class GraphT>
-		class WeightGen
+		class VertexWeightGen
 		{
 			//filter out invalid types - currently only non-sparse vertex weighted graphs
-			static_assert(std::is_same<GraphT, ugraph_w>::value ||
-						std::is_same<GraphT, ugraph_wi>::value,						
-						"WeightGen<GraphT> : GraphT must be a simple, non-sparse,  vertex-weighted graph type ");
+			static_assert(std::is_same<GraphT, ugraph_vw>::value ||
+						  std::is_same<GraphT, ugraph_vwi>::value,						
+						 "VertexWeightGen<GraphT> : GraphT must be a simple, non-sparse,  vertex-weighted graph type ");
 
 		public:
-			enum type_t { WMOD = 0, WDEG };
 
-			/*
-			* @brief Overrites new vertex weights in the graph
-			*
-			*		I. we(v) = 1 + (v % mod) [Pullham 2008]
-			*
-			*		II. Optionally the weights are written to a file
-			*
-			*		TODO: specialize for sparse-graphs
-			*
-			* @returns -1 if error, 0 if OK
-			*/
-			static int create_weights(GraphT& g, type_t, int wmod = DEFAULT_WEIGHT_MODULUS,
-				std::string FILE_EXTENSION = "", std::string FILE_PATH = "");
+			using graph_t = GraphT;
+
+			/**
+			 * @brief Strategies for generating vertex weights.
+			 */
+			enum class weight_type {
+				modulus = 0,   ///< Weight derived from the vertex index modulo a given value.
+				degree         ///< Weight derived from the vertex degree.
+			};
+
+			/**
+			 * @brief Generates and overwrites vertex weights in a graph.
+			 *
+			 * Supports two weight generation strategies:
+			 * - Modulus-based: w(v) = 1 + ((v + 1) % wmod), i.e., w(i) = 1 + (i % wmod)
+			 *   for 1-based vertex indices i = v + 1 [Pullan, 2008].
+			 * - Degree-based: w(v) = degree(v) (isolated vertices get weight 0).
+			 *
+			 * Optionally writes the generated weights to a file.
+			 *
+			 * @param[in,out] graph Graph whose vertex weights are overwritten.
+			 * @param[in] type_of_weights Weight generation strategy.
+			 * @param[in] wmod Modulus for index-based weights (must be positive).
+			 * @param[in] file_extension Extension appended to the graph name.
+			 * @param[in] file_path Output directory for the weight file.
+			 *
+			 * @note File output is enabled only when both file_extension and
+			 *       file_path are non-empty. The file is named
+			 *       <file_path>/<graph name><file_extension> and contains the
+			 *       weights only, in vertex order (see print_weights).
+			 * @note Invalid parameters or file I/O failures cause program termination.
+			 *
+			 * @todo Add support for sparse graphs.
+			 */
+			static void create_weights(
+				graph_t& graph,
+				weight_type type_of_weights,
+				int wmod = DEFAULT_WEIGHT_MODULUS,
+				const std::string& file_extension = "",
+				const std::string& file_path = "");
 		};
-	}//end of namespace _impl
 
-	using _impl::WeightGen;		//alias for WeightGen<GraphT>
+	}//end of namespace experimental
+
+
 }//end of namespace bitgraph
 
 
 namespace bitgraph {
-	namespace _impl {
-		/////////////////
-		//
-		// Class EdgeWeightGen
-		// (generates weights for edge-weighted graphs)
-		//
-		// TODO refactor to the new type (22/01/19)
-		// TODO specialize for sparse-graphs (08/01/2025)
-		// TODO add more weight generation modes (08/01/2025)
-		// TODO SFINAE to control template graph type deduction (07/03/2025)
-		//
-		////////////////
 
+	namespace experimental {
 
+		/**
+		 * @brief Experimental edge weight generator for weighted graphs.
+		 *
+		 * Generates edge weights for existing edges using a modulus-based
+		 * strategy. Graph topology is preserved, and generated weights
+		 * can optionally be written to a file.
+		 *
+		 * @tparam GraphT Edge-weighted graph type.
+		 *
+		 * @note Currently supports non-sparse edge-weighted graphs.
+		 * @warning Experimental implementation. Not part of the stable BITGRAPH API.
+		 *
+		 * @todo Refactor to support the new graph types (22/01/2019).
+		 * @todo Add support for sparse graphs (08/01/2025).
+		 * @todo Add more edge weight generation strategies (08/01/2025).
+		 * @todo Consider SFINAE for restricting supported graph types (07/03/2025).
+		 */
 		template<class GraphT>
 		class EdgeWeightGen
 		{
-			//filter out invalid types - currently only non-sparse vertex weighted graphs
-			static_assert(std::is_same<GraphT, ugraph_ew>::value ||
-						 std::is_same<GraphT, ugraph_ewi>::value,
-							"EdgeWeightGen<GraphT> : GraphT must be a simple, non-sparse,  edge-weighted graph type ");
-
+			// Restrict GraphT to supported non-sparse edge-weighted graph types
+			static_assert(
+				std::is_same<GraphT, ugraph_ew>::value ||
+				std::is_same<GraphT, ugraph_ewi>::value,
+				"EdgeWeightGen<GraphT>: unsupported edge-weighted graph type"
+				);
 
 		public:
-			enum type_t { WMOD = 0 };
 
-			/*
-			* @brief Generates weights for existing edges in a graph
-			*
-			*		I. we(v, w) = 1 + ((v + w) % mod) [Pullham 2008]
-			*
-			*		II. we(v, v) and non-edge weights are set to NOWT
-			*
-			*		III. Optionally the weights are written to a file
-			*
-			*		TODO: specialize for sparse-graphs
-			*
-			* @returns -1 if error, 0 if OK
-			*/
-			static int create_weights(GraphT& g, type_t, int wmod = DEFAULT_WEIGHT_MODULUS,
-				std::string FILE_EXTENSION = "", std::string FILE_PATH = "");
+			using graph_t = GraphT;
+					
+			/**
+			 * @brief Generates and overwrites edge weights in a graph.
+			 *
+			 * Assigns weights to existing edges with graph_t::set_modulus_weights(),
+			 * for 0-based vertex indices:
+			 * w(v, u) = 2 + ((v + u) % (wmod - 1)), with weights in [2, wmod].
+			 *
+			 * Pullan-style scheme; not identical to Pullan's (2008) 1-based
+			 * formula w(i, j) = 1 + ((i + j) % wmod).
+			 *
+			 * Non-edges are assigned NO_WEIGHT; the diagonal (self-loops) is not modified.
+			 * Optionally writes the resulting edge-weight matrix to a file.
+			 *
+			 * @param[in,out] graph Graph whose edge weights are overwritten.
+			 * @param[in] wmod Maximum generated weight (must be at least 2).
+			 * @param[in] file_extension Extension appended to the graph name.
+			 * @param[in] file_path Output directory for the weight file.
+			 *
+			 * @note File output is enabled only when both file_extension and
+			 *       file_path are non-empty.
+			 * @note Invalid parameters or file I/O failures cause program termination.
+			 *
+			 * @todo Add support for sparse graphs.
+			 */
+			static void create_weights(
+				graph_t& graph, 
+				int wmod = DEFAULT_WEIGHT_MODULUS,
+				const std::string& file_extension = "",
+				const std::string& file_path = "");
 
 		};
-	}//end of namespace _impl
+	}//end of namespace experimental
 
-	using _impl::EdgeWeightGen;		//alias for EdgeWeightGen<GraphT>
+//	using experimental::EdgeWeightGen;		//alias for EdgeWeightGen<GraphT>
+
 }//end of namespace bitgraph
 
-	////////////////////////////////////////////////////////////////////////
-	// Necessary implementations of generic code in header file
+////////////////////////////////////////////////////////////////////////
+// Necessary implementations of generic code in header file
 
-namespace bitgraph{	
+#include "detail/graph_gen_imp.h"
 
-	template<class GraphT>
-	int RandomGen<GraphT>::create_graph(GraphT& g, std::size_t NV, double p) {
-
-		//assert - TODO DEBUG MODE
-		if (NV <= 0) {
-			LOG_ERROR("bad number of vertices - RandomGen<GraphT>::create_graph");
-			return -1;
-		}
-
-		//////////////
-		g.reset(NV);	
-		g.gen_random_edges(p);		//generate edges appropiately (undirected / directed)
-		//////////////////
-
-
-		//name - r<NV>_<p>.txt
-		std::stringstream sstr;
-		sstr << "r" << NV << "_" << p << ".txt";
-		g.set_name(sstr.str());
-
-		return 0;
-	}
-
-	template<class GraphT>
-	int RandomGen<GraphT>::create_graph_benchmark(const std::string& path, const random_attr_t& rd) {
-
-		std::ostringstream o;
-		GraphT g;
-		std::ofstream f;
-
-		//add slash '/' at the end to the path if required
-		std::string mypath(path);
-		_dir::append_slash(mypath);
-
-		for (auto i = rd.nLB; i <= rd.nUB; i += rd.incN) {
-			for (double j = rd.pLB; j <= rd.pUB; j += rd.incP) {
-				for (int k = 0; k < rd.nRep; k++) {
-
-					//////////////////////////
-					create_graph(g, i, j);
-					//////////////////////////
-
-					o.str("");
-					o << mypath.c_str() << "r" << i << "_" << j << "_" << k << ".txt";
-					f.open(o.str().c_str());
-					if (!f) {
-						LOGG_ERROR("error in file name: ", o.str(), "- RandomGen<GraphT>::create_graph_benchmark");
-						std::exit(EXIT_FAILURE);
-					}
-					g.write_dimacs(f);
-					f.close();
-				}
-			}
-		}
-		return 0;		//OK
-	}
-
-	template<class GraphT>
-	inline
-		int RandomGen<GraphT>::create_isomorphism(GraphT& g_iso, GraphT& g_ori)
-	{
-		vector<int> map(g_ori.size(), 0);
-		std::iota(map.begin(), map.end(), 0);
-		std::shuffle(map.begin(),
-			map.end(),
-			std::default_random_engine(_rand::RandomUniformGen<>::FIXED_RANDOM_SEED));
-
-		//creates the isomorphism according to the mapping
-		try {
-			GraphFastRootSort<ugraph> gs(g_ori);
-			gs.reorder(map, g_iso);
-		}
-		catch (std::exception& e) {
-			LOG_ERROR("error during isomorphism generation - RandomGen<GraphT>::create_isomorphism");
-			LOG_ERROR("%s", e.what());
-			return -1;
-		}
-
-		return 0;
-	}
-
-	template<int logSizeTable>
-	inline
-		void SparseRandomGen<sparse_ugraph, logSizeTable>::decode(BITBOARD edge_index, unsigned int& i, unsigned int& j, unsigned int n) {
-		/////////////////////////////
-		// decodes undimensional edge index to upper triangle of adjacency matrix 
-		//
-		// REMARKS: Personal communication with [Fast Random graph generation, 2011] authors
-
-		double a = sqrt((pow((2 * n) - 1.0, 2) - 8 * (edge_index + 1)));
-		BITBOARD r = ceil((((2 * n) - 1.0 - a) / 2 - 1.0));
-		BITBOARD c = edge_index + 1 + r - (r * (2 * n - r - 1) / 2);			//type is important else c overflows unsigned int type for very large graphs
-
-		//cast back to unsigned int
-		i = (unsigned int)r;
-		j = (unsigned int)c;
-
-	};
-
-	template<int logSizeTable>
-	void SparseRandomGen<sparse_ugraph, logSizeTable>::init_log_table() {
-
-		for (int i = 0; i < logSizeTable; i++) {
-			SparseRandomGen::log_[i] = log(i / (double)logSizeTable);
-		}
-	}
-
-	template<int logSizeTable>
-	int SparseRandomGen<sparse_ugraph, logSizeTable>::create_ugraph(sparse_ugraph& g, std::size_t n, double p) {
-
-		BITBOARD m = ((BITBOARD)n * (n - 1) / 2);			//max num edges
-		BITBOARD e = 0;								//**check
-		double logp = log(1 - p);
-		BITBOARD skip;
-		unsigned int i = 0, j = 0;
-		int num = 0;									//optional index which counts edges added to the graph
-
-		default_random_engine generator;
-		uniform_int_distribution<int> distribution(0, logSizeTable - 1);
-		generator.seed((unsigned)time(nullptr));
-
-		g.reset(n);
-		do {
-			int l = ceil(log_[distribution(generator)] / logp) - 1;
-			(l > 0) ? skip = l : skip = 0;
-			if ((e += ++skip) >= m)
-				break;
-
-			decode(e, i, j, n);					//perfectly valid option and similar in O
-			/*while(skip>0){
-			if( (m_n-1-j)>=skip ){
-			j+=skip;
-			break;
-			}else{
-			i++;
-			skip-=(m_n-1-j);
-			j=i;
-			}
-			}*/
-
-			num++;
-			g.add_edge(i, j);					//O(log) because it is a sparse graph
-
-		} while (e < m);
-
-		//opional
-		/*stringstream sstr("");
-		sstr<<m<<":"<<"["<<num<<"]"<<std::endl;
-		cout<<sstr.str();*/
-
-		return 0;
-	}
-
-	template<class GraphT>
-	inline
-		int WeightGen<GraphT>::create_weights(GraphT& g, type_t type, int wmod, std::string FILE_EXTENSION, std::string FILE_PATH) {
-
-		const int NV = g.graph().num_vertices();
-
-		//no need to clear the current weights since they are overwritten
-
-		switch (type) {
-		case WDEG:
-			for (int v = 0; v < NV; ++v) {
-				g.set_weight(v, g.graph().degree(v));
-			}
-			break;
-		case WMOD:
-			for (int v = 0; v < NV; ++v) {
-				g.set_weight(v, (1 + ((v + 1) % wmod)));
-			}
-			break;
-		default:
-			LOG_INFO("incorrect weight generation mode - WeightGen<GraphT>::create_weights");
-			return -1;
-		}
-
-		/////////////////////////////
-		//streams weights to file
-		if (!FILE_EXTENSION.empty() && !FILE_PATH.empty()) {
-
-			//determines the filename
-			std::string path = FILE_PATH;
-			_dir::append_slash(path);
-			std::string filename = path + g.graph().name() + FILE_EXTENSION;
-
-			//streams weights to file
-			std::ofstream f(filename);
-			if (!f) {
-				LOGG_INFO("WeightGen<GraphT>::create_weights () - cannot write weights to file ", filename);
-				return -1;
-			}
-
-			///////////////////////////
-			g.print_weights(f, false);			//no vertex index is streamed with the weight value
-			///////////////////////////
-
-			f.close();
-		}
-
-		return 0;
-	}
-
-	template<class GraphT>
-	inline
-		int EdgeWeightGen<GraphT>::create_weights(GraphT& g, type_t type, int wmod, std::string FILE_EXTENSION, string FILE_PATH) {
-
-		switch (type) {
-		case WMOD:
-			g.set_modulus_edge_weight(wmod);
-			break;
-		default:
-			LOG_INFO("bad weight generation mode - EdgeWeightGen<GraphT>::create_weights");
-			LOG_INFO("original weights unchanged");
-			return -1;
-		}
-
-		/////////////////////////////
-		//streams weights to file
-		if (!FILE_EXTENSION.empty() && !FILE_PATH.empty()) {
-
-			//determines the filename
-			std::string path = FILE_PATH;
-			_dir::append_slash(path);
-			std::string filename = path + g.graph().name() + FILE_EXTENSION;
-
-			//streams weights to file
-			std::ofstream f(filename);
-			if (!f) {
-				LOGG_INFO("cannot write edge-weights to file ", filename, " - EdgeWeightGen<GraphT>::create_weights");
-				return -1;
-			}
-
-			///////////////////////////
-			g.print_weights(f, false);			//NOWT weight values are not streamed - vertex index is not streamed with the weight value
-			///////////////////////////
-
-			f.close();
-		}
-
-		return 0;
-	}
-
-}//end namespace bitgraph
-
-
-#endif //__GRAPH_GEN_H__
+#endif //BITGRAPH_GRAPH_GEN_H__

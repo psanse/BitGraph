@@ -1,18 +1,41 @@
 /**
  * @file bbscan_sparse.h
- * @brief header for sparse class equivalent to the BBScan class
- *		  manages sparse bit strings with efficient bitscanning capabilities
- * @author pss
- * @details: created 2012, last_update 25/02/2025
+ * @brief Persistent-cursor scanning for sparse BITSCAN bitsets.
  *
- * TODO refactoring and testing 25/02/2025
- **/
+ * @details
+ * This header defines @c bitgraph::BBScanSp, the sparse counterpart of
+ * @c BBScan. It extends @c BitsetSp with a mutable scan cursor and optimized
+ * forward and reverse traversal over the collection of non-zero sparse
+ * blocks. The cursor's block component refers to a position in that sparse
+ * block collection, not directly to a logical bitblock index.
+ *
+ * BBScanSp supports non-destructive and destructive scans, scans that apply
+ * results to another sparse bitset, and persistent scanner adapters for each
+ * scan direction and mode. Copy and move operations transfer the sparse
+ * bitset contents but initialize the destination with a fresh scan cursor.
+ * Non-destructive scans may be performed on const objects because the cursor
+ * is mutable.
+ *
+ * Empty sparse bitsets do not provide a valid scan range. Scan initialization
+ * and the scan operations therefore use the class's documented failure or
+ * empty-result behavior rather than assuming that a block exists.
+ *
+ * @author pss
+ * @date Last updated: 14 October 2026
+ *
+ * @see bbset_sparse.h
+ * @see bbscan.h
+ * @see detail/persistent_scan.h
+ * @warning Destructive scan operations clear the bits they return and may
+ *          remove empty sparse blocks from the underlying representation.
+ * @todo Complete interface refactoring and testing.
+ */
 
-#ifndef __BBSCAN_SPARSE_H__
-#define __BBSCAN_SPARSE_H__
+#ifndef BITGRAPH_BITSCAN_BBSCAN_SPARSE_H
+#define BITGRAPH_BITSCAN_BBSCAN_SPARSE_H
 
-#include "bitscan/bbset_sparse.h"
-#include "bbexcep_hand.h"
+#include "detail/persistent_scan.h"
+#include "bbset_sparse.h"
 #include <cassert>
 
 using namespace std;
@@ -26,33 +49,64 @@ namespace bitgraph {
 	//
 	///////////////////////////////////
 
-	class BBScanSp : public BitsetSp {
+	class BBScanSp  : public BitsetSp {
 
 	public:
 
-		template <class U>
-		friend struct BBObject::Scan;
-		template <class U>
-		friend struct BBObject::ScanDest;
-		template <class U>
-		friend struct BBObject::ScanRev;
-		template <class U>
-		friend struct BBObject::ScanDestRev;
+		template<class>
+		friend class detail::PersistentScan;
+
+		template<class>
+		friend class detail::PersistentScanReverse;
+
+		template<class>
+		friend class detail::PersistentScanDestructive;
+
+		template<class>
+		friend class detail::PersistentScanDestructiveReverse;
 
 	public:
 
 		//aliases for bitscanning 
-		using scan   = typename BBObject::Scan<BBScanSp>;
-		using scanR  = typename BBObject::ScanRev<BBScanSp>;
-		using scanD  = typename BBObject::ScanDest<BBScanSp>;
-		using scanDR = typename BBObject::ScanDestRev<BBScanSp>;			
+		using scan = detail::PersistentScan<BBScanSp>;
+		using scanR = detail::PersistentScanReverse<BBScanSp>;
+		using scanD = detail::PersistentScanDestructive<BBScanSp>;
+		using scanDR = detail::PersistentScanDestructiveReverse<BBScanSp>;
 
 		//////////////////////////////
 		//construction / destruction
 				
 		using BitsetSp::BitsetSp;		//inherit constructors
 
-		//TODO...check copy and move assignments - should be forbidden
+		BBScanSp() = default;			//not implicitly declared once copy/move constructors are user-provided
+
+		/**
+		* @brief Copy constructor: copies the bitstring only.
+		* @details A newly constructed BBScanSp never inherits an active scan from
+		*          another object: its scan cursor is default-initialized (no scan).
+		**/
+		BBScanSp(const BBScanSp& other) : BitsetSp(other), scan_() {}
+
+		/**
+		* @brief Move constructor: moves the bitstring only. Same rule as the copy constructor.
+		**/
+		BBScanSp(BBScanSp&& other) noexcept : BitsetSp(std::move(other)), scan_() {}
+
+		/**
+		* @brief Copy assignment: copies the bitstring only.
+		* @details The scan cursor of this object is left untouched; the cursor of
+		*          @other is never transferred (same rule as BBScan).
+		**/
+		BBScanSp& operator=(const BBScanSp& other) {
+			BitsetSp::operator=(other);
+			return *this;
+		}
+
+		/** @brief Move assignment: moves the bitstring only. Same rule as the copy assignment. */
+		BBScanSp& operator=(BBScanSp&& other) noexcept {
+			BitsetSp::operator=(std::move(other));
+			return *this;
+		}
 
 		~BBScanSp() = default;
 
@@ -71,12 +125,10 @@ namespace bitgraph {
 		* @brief Configures the initial block and bit position for bitscanning
 		*		 according to one of the 4 scan types passed as argument
 		* @param sct: type of scan
-		* @returns 0 if successful, -1 otherwise (now exits (08/07/2025))
 		* @details : sparse bitsets may have no blocks, in which case the scan is not possible and
 		*		     the function returns -1 -
-		* @details : (08/07/2025) throws  BitScanError for empty sparse bitset
 		**/
-		int init_scan(scan_types sct);
+		void init_scan(scan_types sct) noexcept;
 
 		/**
 		* @brief Configures the initial block and bit position for bitscanning
@@ -86,14 +138,12 @@ namespace bitgraph {
 		*		 If firstBit is -1 (BBObject::noBit), the scan starts from the beginning.
 		* @param firstBit: starting bit
 		* @param sct: type of scan
-		* @returns 0 if successful, -1 otherwise (now exits (08/07/2025))
 		* @details : sparse bitsets may have no blocks, in which case the scan is not possible and
 		*		     the function returns -1
 		* @details : (08/07/2025) throws  BitScanError for empty sparse bitset
-		*
-		* @todo - extend to NON-DESTRUCTIVE cases
+		*	
 		**/
-		int init_scan(int firstBit, scan_types sct);
+		void init_scan(int firstBit, scan_types sct) noexcept;
 
 		////////////////
 		// bitscan forward
@@ -128,7 +178,7 @@ namespace bitgraph {
 		* @details Since the scan does not delete the scanned bit from the bitstring,
 		*		   it has to cache the last scanned bit for the next call
 		**/
-		inline int next_bit();
+		inline int next_bit() const;
 		inline int next_bit(BBScanSp& bitset);
 
 		/**
@@ -167,7 +217,7 @@ namespace bitgraph {
 		* @details Since the scan does not delete the scanned bit from the bitstring,
 		*		   it has to cache the last scanned bit for the next call
 		**/
-		inline int prev_bit();
+		inline int prev_bit() const;
 		inline int prev_bit(BBScanSp& bitset);
 
 		/////////////////
@@ -179,462 +229,39 @@ namespace bitgraph {
 	//inline int next_bit					(int& nBB);								//nBB: index of bitblock in the bitstring	(not in the collection)				
 	//inline int prev_bit_del				(int& nBB);
 
+
+	protected:
+		
+		// terminating handlers
+		[[noreturn]]
+		inline void invalid_scan_type() noexcept {
+			LOG_ERROR("Unknown scan type in BBScanSp::init_scan");
+			std::terminate();
+		}
+
+		void invalidate_scan() noexcept {
+			scan_block(BBObject::noBit);
+			scan_bit(BBObject::noBit);
+		}
+
+		/** @brief TRUE if the cursor points to an existing block (also false after the blocks were removed). One unsigned comparison. */
+		bool has_valid_cursor() const noexcept {
+			return static_cast<std::size_t>(scan_.bbi_) < vBB_.size();
+		}
+
 	//////////////////
 	// data members
-	protected:
-		scan_t scan_;
+
+		mutable scan_t scan_;		// mutable: non-destructive scans can be run on a const object (same as BBScan)
 	};
 
 }//end namespace bitgraph
 
 ///////////////////////
-// Inline implementations, necessary in header file for generic code
+// Necessary implementations, necessary in header file for generic code
 
-namespace bitgraph {
+#include "detail/bbscan_sparse_imp.h"
 
-	inline int BBScanSp::next_bit() {
 
-		Ul posInBB;
 
-		//search for next bit in the last block
-		if (_BitScanForward64(&posInBB, vBB_[scan_.bbi_].bb_ & Tables::mask_high[scan_.pos_])) {
-
-			//stores the current bit for next call
-			scan_.pos_ = posInBB;
-
-			return (posInBB + static_cast<int>(WMUL(vBB_[scan_.bbi_].idx_)));
-
-		}
-		else {
-
-			//Searches for next bit in the remaining blocks
-			for (auto i = scan_.bbi_ + 1; i < (int)vBB_.size(); ++i) {
-				if (_BitScanForward64(&posInBB, vBB_[i].bb_)) {
-					//stores the current block and bit for next call
-					scan_.bbi_ = i;
-					scan_.pos_ = posInBB;
-
-					return (posInBB + static_cast<int>(WMUL(vBB_[i].idx_)));
-				}
-			}
-		}
-
-		return BBObject::noBit;
-
-	}
-
-	inline int BBScanSp::next_bit(BBScanSp& bitset)
-	{
-		Ul posInBB;
-
-		//search for next bit in the last block
-		if (_BitScanForward64(&posInBB, vBB_[scan_.bbi_].bb_ & Tables::mask_high[scan_.pos_])) {
-
-			//stores the current bit for next call
-			scan_.pos_ = posInBB;
-
-			//delete the bit from the input bitset
-			bitset.erase_bit(posInBB);
-
-			return (posInBB + static_cast<int>(WMUL(vBB_[scan_.bbi_].idx_)));
-
-		}
-		else {
-
-			//Searches for next bit in the remaining blocks
-			for (auto i = scan_.bbi_ + 1; i < (int)	vBB_.size(); ++i) {
-				if (_BitScanForward64(&posInBB, vBB_[i].bb_)) {
-					//stores the current block and bit for next call
-					scan_.bbi_ = i;
-					scan_.pos_ = posInBB;
-
-					//delete the bit from the input bitset
-					bitset.erase_bit(posInBB);
-
-					return (posInBB + static_cast<int>(WMUL(vBB_[i].idx_)));
-				}
-			}
-		}
-
-		return BBObject::noBit;
-	}
-
-	inline int BBScanSp::prev_bit() {
-
-		Ul posInBB;
-
-		//searches for previous bit in the last scanned block
-		if (_BitScanReverse64(&posInBB, vBB_[scan_.bbi_].bb_ & Tables::mask_low[scan_.pos_])) {
-			//stores the current bit for next call
-			scan_.pos_ = posInBB;
-
-			return (posInBB + static_cast<int>(WMUL(vBB_[scan_.bbi_].idx_)));
-		}
-		else {
-			//Searches for previous bit in the remaining blocks
-			for (auto i = scan_.bbi_ - 1; i >= 0; --i) {
-
-				if (_BitScanReverse64(&posInBB, vBB_[i].bb_)) {
-
-					//stores the current block and bit for next call
-					scan_.bbi_ = i;
-					scan_.pos_ = posInBB;
-
-					return (posInBB + static_cast<int>(WMUL(vBB_[i].idx_)));
-				}
-			}
-		}
-
-		return BBObject::noBit;
-
-	}
-
-	inline int BBScanSp::prev_bit(BBScanSp& bitset)
-	{
-		Ul posInBB;
-
-		//searches for previous bit in the last scanned block
-		if (_BitScanReverse64(&posInBB, vBB_[scan_.bbi_].bb_ & Tables::mask_low[scan_.pos_])) {
-			//stores the current bit for next call
-			scan_.pos_ = posInBB;
-
-			//delete the bit from the input bitset
-			bitset.erase_bit(posInBB);
-
-			return (posInBB + static_cast<int>(WMUL(vBB_[scan_.bbi_].idx_)));
-		}
-		else {
-			//Searches for previous bit in the remaining blocks
-			for (auto i = scan_.bbi_ - 1; i >= 0; --i) {
-
-				if (_BitScanReverse64(&posInBB, vBB_[i].bb_)) {
-
-					//stores the current block and bit for next call
-					scan_.bbi_ = i;
-					scan_.pos_ = posInBB;
-
-					//delete the bit from the input bitset
-					bitset.erase_bit(posInBB);
-
-					return (posInBB + static_cast<int>(WMUL(vBB_[i].idx_)));
-				}
-			}
-		}
-
-		return BBObject::noBit;
-	}
-
-
-	inline int BBScanSp::next_bit_del() {
-
-		Ul posInBB;
-
-		for (auto i = scan_.bbi_; i < (int)vBB_.size(); ++i) {
-
-			if (_BitScanForward64(&posInBB, vBB_[i].bb_)) {
-
-				//stores the current block
-				scan_.bbi_ = i;
-
-				//deletes the current bit before returning
-				vBB_[i].bb_ &= ~Tables::mask[posInBB];
-
-				return (posInBB + static_cast<int>(WMUL(vBB_[i].idx_)));
-			}
-
-		}
-
-		return BBObject::noBit;
-
-	}
-
-	inline int BBScanSp::next_bit_del(BBScanSp& bitset)
-	{
-		Ul posInBB;
-
-		for (auto i = scan_.bbi_; i < (int)vBB_.size(); ++i) {
-
-			if (_BitScanForward64(&posInBB, vBB_[i].bb_)) {
-
-				//stores the current block
-				scan_.bbi_ = i;
-
-				//deletes the current bit before returning
-				vBB_[i].bb_ &= ~Tables::mask[posInBB];
-
-				//delete the bit from the input bitset
-				bitset.erase_bit(posInBB);
-
-				return (posInBB + static_cast<int>(WMUL(vBB_[i].idx_)));
-			}
-
-		}
-
-		return BBObject::noBit;
-	}
-
-	inline int BBScanSp::prev_bit_del() {
-
-		Ul posInBB;
-
-		for (int i = scan_.bbi_; i >= 0; --i) {
-
-			if (_BitScanReverse64(&posInBB, vBB_[i].bb_)) {
-
-				//stores the current block for the next call
-				scan_.bbi_ = i;
-
-				//deletes the current bit from the bitset before returning
-				vBB_[i].bb_ &= ~Tables::mask[posInBB];
-
-				return (posInBB + static_cast<int>(WMUL(vBB_[i].idx_)));
-			}
-		}
-
-		return BBObject::noBit;
-	}
-
-	inline int BBScanSp::prev_bit_del(BBScanSp& bitset)
-	{
-		Ul posInBB;
-
-		for (int i = scan_.bbi_; i >= 0; --i) {
-
-			if (_BitScanReverse64(&posInBB, vBB_[i].bb_)) {
-
-				//stores the current block for the next call
-				scan_.bbi_ = i;
-
-				//deletes the current bit from the bitset before returning
-				vBB_[i].bb_ &= ~Tables::mask[posInBB];
-
-				//delete the bit from the input bitset
-				bitset.erase_bit(posInBB);
-
-				return (posInBB + static_cast<int>(WMUL(vBB_[i].idx_)));
-			}
-		}
-
-		return BBObject::noBit;
-	}
-
-	inline
-		int BBScanSp::init_scan(scan_types sct)  {
-
-		//necessary check since sparse bitstrings have empty semantics (i.e. sparse graphs)
-		if (vBB_.empty()) {
-			//LOG_ERROR("empty sparse bitstring, cannot be scanned - BBScanSp::init_scan...exiting");
-			throw BitScanError("empty sparse bitstring, cannot be scanned - BBScanSp::init_scan");		
-		}			
-
-		switch (sct) {
-		case NON_DESTRUCTIVE:
-			scan_block(0);
-			scan_bit(MASK_LIM);
-			break;
-		case NON_DESTRUCTIVE_REVERSE:
-			scan_block(static_cast<int>(vBB_.size()) - 1);
-			scan_bit(WORD_SIZE);
-			break;
-		case DESTRUCTIVE:
-			scan_block(0);
-			break;
-		case DESTRUCTIVE_REVERSE:
-			scan_block(static_cast<int>(vBB_.size()) - 1);
-			break;
-		default:
-			LOG_ERROR("unknown scan type in BBScanSp::init_scan");
-			assert(false);
-			//throw BitScanError("unknown scan type in BBScanSp::init_scan");		//will not be handled - terminates the program
-	
-		}
-
-		return 0;
-	}
-
-	inline
-		int BBScanSp::init_scan(int firstBit, scan_types sct)  {
-
-		//necessary check 
-		if (vBB_.empty()) {
-			//LOG_ERROR("empty sparse bitstring, cannot be scanned - BBScanSp::init_scan...exiting");
-			throw BitScanError("empty sparse bitstring, cannot be scanned - BBScanSp::init_scan");		
-		}
-
-		//special case - first bitscan
-		if (firstBit == BBObject::noBit) {
-			return init_scan(sct);
-		}
-
-		//determine the index of the starting block (not its ID)
-		auto bbL = WDIV(firstBit);
-
-		////////////////////////////////////////////////////
-		pair<bool, int> p = find_block_pos(bbL);
-		///////////////////////////////////////////////////
-
-		//no blocks with index greater or equal to bbL, nothing to scan
-		if (p.second == BBObject::noBit) {
-			return -1;
-		}
-
-		switch (sct) {
-		case NON_DESTRUCTIVE:
-		case NON_DESTRUCTIVE_REVERSE:
-			scan_block(p.second);
-			(p.first) ? scan_bit(firstBit - WMUL(bbL)) : scan_bit(MASK_LIM);
-			break;
-		case DESTRUCTIVE:
-		case DESTRUCTIVE_REVERSE:
-			//scan_block(p.second);
-			LOG_ERROR("destructive scan type currently not available in BBScanSp::init_scan...exiting");
-			std::exit(EXIT_FAILURE);
-			//throw BitScanError("incorrect destructive scan type in BBScanSp::init_scan");		
-			break;
-		default:
-			LOG_ERROR("unknown scan type in BBScanSp::init_scan...exiting");
-			std::exit(EXIT_FAILURE);
-			//throw BitScanError("unknown scan type in BBScanSp::init_scan");		
-		}
-
-		//nothing to scan or error
-		return 0;
-	}
-
-
-	////////////////////////////////
-	//
-	// DEPRECATED
-	//
-	//////////////////////////////////
-	//inline 
-	//int BBScanSp::next_bit_del(int& block_index) {
-	//	////////////////////////////
-	//	//
-	//	// date: 23/3/12
-	//	// Destructive bitscan for sparse bitstrings using intrinsics
-	//	//
-	//	// COMMENTS
-	//	// 1-Requires previous assignment scan_.bbi=0 
-	//
-	//	unsigned long posbb;
-	//
-	//	for (int i = scan_.bbi_; i < vBB_.size(); i++) {
-	//		if (_BitScanForward64(&posbb, vBB_[i].bb_)) {
-	//			scan_.bbi_ = i;
-	//			block_index = vBB_[i].idx_;
-	//			vBB_[i].bb_ &= ~Tables::mask[posbb];			//deleting before the return
-	//			return (posbb + WMUL(vBB_[i].idx_));
-	//		}
-	//	}
-	//
-	//	return EMPTY_ELEM;
-	//}
-	//
-	//
-	//inline int BBScanSp::next_bit_del(int& block_index, BBScanSp& bbN_del) {
-	//	////////////////////////////
-	//	//
-	//	// date: 06/07/2019 (EXPERIMENTAL)
-	//	// Destructive bitscan for sparse bitstrings using intrinsics
-	//	//
-	//	// COMMENTS
-	//	// 1-added for compatibility with BBIntrin
-	//	// 1-Requires previous assignment scan_.bbi=0 
-	//
-	//	unsigned long posbb;
-	//
-	//	for (int i = scan_.bbi_; i < vBB_.size(); i++) {
-	//		if (_BitScanForward64(&posbb, vBB_[i].bb_)) {
-	//			scan_.bbi_ = i;
-	//			block_index = vBB_[i].idx_;
-	//			vBB_[i].bb_ &= ~Tables::mask[posbb];			//deleting before the return
-	//			bbN_del.vBB_[i].bb_ &= ~Tables::mask[posbb];
-	//			return (posbb + WMUL(vBB_[i].idx_));
-	//		}
-	//	}
-	//
-	//	return EMPTY_ELEM;
-	//}
-	//
-	//inline int BBScanSp::next_bit_del_pos(int& posBB) {
-	//	////////////////////////////
-	//	//
-	//	// date: 29/10/14
-	//	// Destructive bitscan which returns the position of the bitblock scanned in the collection
-	//	// (not the index attribute)
-	//	//
-	//	// COMMENTS
-	//	// 1-Requires previous assignment scan_.bbi=0 
-	//
-	//	unsigned long posbb;
-	//
-	//	for (int i = scan_.bbi_; i < vBB_.size(); i++) {
-	//		if (_BitScanForward64(&posbb, vBB_[i].bb_)) {
-	//			posBB = scan_.bbi_ = i;
-	//			vBB_[i].bb_ &= ~Tables::mask[posbb];			//deleting before the return
-	//			return (posbb + WMUL(vBB_[i].idx_));
-	//		}
-	//	}
-	//
-	//	return EMPTY_ELEM;
-	//}
-
-	//inline int BBScanSp::next_bit(int& block_index) {
-	//	////////////////////////////
-	//	// date:5/9/2014
-	//	// non destructive bitscan for sparse bitstrings using intrinsics
-	//	// caches index in the collection and pos inside the bitblock
-	//	//
-	//	// comments
-	//	// 1-require previous assignment scan_.bbi=0 and scan_.pos_=mask_lim
-	//
-	//	unsigned long posbb;
-	//
-	//	//search for next bit in the last block
-	//	if (_BitScanForward64(&posbb, vBB_[scan_.bbi_].bb_ & Tables::mask_high[scan_.pos_])) {
-	//		scan_.pos_ = posbb;
-	//		block_index = vBB_[scan_.bbi_].idx_;
-	//		return (posbb + WMUL(vBB_[scan_.bbi_].idx_));
-	//	}
-	//	else {											//search in the remaining blocks
-	//		for (int i = scan_.bbi_ + 1; i < vBB_.size(); i++) {
-	//			if (_BitScanForward64(&posbb, vBB_[i].bb_)) {
-	//				scan_.bbi_ = i;
-	//				scan_.pos_ = posbb;
-	//				block_index = vBB_[i].idx_;
-	//				return (posbb + WMUL(vBB_[i].idx_));
-	//			}
-	//		}
-	//	}
-	//
-	//	return EMPTY_ELEM;
-	//}
-
-	//inline int BBScanSp::prev_bit_del(int& bb_index) {
-	//	////////////////////////////
-	//	//
-	//	// date: 23/3/12
-	//	// Destructive bitscan for sparse bitstrings using intrinsics
-	//	//
-	//	// COMMENTS
-	//	// 1-Requires previous assignment scan_.bbi=number of bitblocks-1
-	//
-	//	unsigned long posbb;
-	//
-	//	for (int i = scan_.bbi_; i >= 0; i--) {
-	//		if (_BitScanReverse64(&posbb, vBB_[i].bb_)) {
-	//			scan_.bbi_ = i;
-	//			bb_index = vBB_[i].idx_;
-	//			vBB_[i].bb_ &= ~Tables::mask[posbb];			//deleting before the return
-	//			return (posbb + WMUL(vBB_[i].idx_));
-	//		}
-	//	}
-	//
-	//	return BBObject::noBit;
-	//}
-
-}//end namespace bitgraph
-
-
-#endif 
+#endif // BITGRAPH_BITSCAN_BBSCAN_SPARSE_H

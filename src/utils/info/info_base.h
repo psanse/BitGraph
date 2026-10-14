@@ -1,14 +1,32 @@
 /**
- *@file info_base.h
-* @brief: interface for result logs of clique and clique-based algorithms
- *@details: created 12/12/2024, last_update 12/09/2025
- *@dev pss
- **/
+ * @file info_base.h
+ * @brief Result metadata and reporting interface for clique-based algorithms.
+ *
+ * @details
+ * Declares the legacy `paramBase` and `infoBase` utility types used to store
+ * problem parameters, execution limits, timing data, and formatted reports
+ * for clique and clique-based algorithm runs. The interface supports timer
+ * management for preprocessing, incumbent, and search phases, together with
+ * table and verbose report output.
+ *
+ * This is a legacy compatibility interface. New result and reporting types
+ * have moved to the graph subsystem, and this class is retained for existing
+ * clients and historical tests.
+ *
+ * @author pss
+ * @date Created: 12/12/2024
+ * @date Last updated: 12/09/2025
+ * @note Deprecated class; tests disabled and new types moved to graph
+ *       (26/09/2026).
+ *
+ * @see info_base.cpp
+ */
 
-#ifndef _INFO_BASE_H_
-#define _INFO_BASE_H_
+#ifndef BITGRAPH_UTILS_INFO_BASE_H
+#define BITGRAPH_UTILS_INFO_BASE_H
 
-#include "utils/prec_timer.h"
+#include "utils/precise_timer.h"
+#include "utils/time_utils.h"
 #include <iostream>
 #include <string>
 #include <limits>
@@ -17,7 +35,7 @@
 
 namespace bitgraph {
 
-	namespace com {
+	namespace utils {
 		
 		//////////////////////////
 		//
@@ -43,7 +61,7 @@ namespace bitgraph {
 
 			void startTimer() { startTime = PrecisionTimer::clock_t::now(); }
 			double readTimer() {  
-				timeElapsed = com::_time::toDouble(PrecisionTimer::clock_t::now() - startTime); 
+				timeElapsed = to_seconds(PrecisionTimer::clock_t::now() - startTime); 
 				return timeElapsed;
 			}
 			
@@ -98,7 +116,7 @@ namespace bitgraph {
 			* @param start_time - starting time point to determine duration
 			* @returns elapsed time in seconds
 			* @details: utility for time measurement outside the class
-			* @details - moved to utilities utils::com::_time namespace (common.h) 31/08/2025
+			* @details - moved to utilities utils::utils::_time namespace (common.h) 31/08/2025
 			*/
 			//static d ouble elapsedTime(tpoint_t start_time);
 
@@ -216,18 +234,22 @@ namespace bitgraph {
 
 		};
 
-	}//end namespace com
+		// Namespace-scope declaration: the friend declaration above is only found by ADL,
+		// so the using-declaration below needs this one to name the operator (required by GCC).
+		std::ostream& operator<< (std::ostream&, const infoBase&);
 
-	using com::paramBase;
-	using com::infoBase;
-	using com::operator<<;
+	}//end namespace utils
+
+	using utils::paramBase;
+	using utils::infoBase;
+	using utils::operator<<;
 
 	
 }//end namespace bitgraph
 
 
 
-#endif
+#endif // BITGRAPH_UTILS_INFO_BASE_H
 
 
 

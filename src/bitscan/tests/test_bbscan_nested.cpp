@@ -30,13 +30,12 @@ protected:
 //tests the 4 types of scanning
 TEST_F(BitScanNestedTest, basic) {
 		
-	int bit = BBObject::noBit;
 	std::vector<int> lbits;
 	std::vector<int> lbits_exp;
 
 	//direct scanning
 	BBScan::scan sc1(bb);
-	bit = BBObject::noBit;
+	int bit = BBObject::noBit;
 	while ((bit = sc1.next_bit()) != BBObject::noBit) {
 		lbits.emplace_back(bit);
 	}

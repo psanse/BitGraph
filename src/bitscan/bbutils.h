@@ -1,16 +1,37 @@
- /**
-  * @file bbutils.h
-  * @brief contains composite bitset classes and other utility functions for the BITSCAN library
-  * @author pss
-  * @details created 2017, last_update 08/12/2025
- **/
+/**
+ * @file bbutils.h
+ * @brief Utility algorithms and composite bitset helpers for BITSCAN.
+ *
+ * @details
+ * This header provides generic helpers for converting and sampling bitsets,
+ * creating random 64-bit blocks, and extracting set-bit indices. It also
+ * defines lightweight composition types that add cached population counts,
+ * stack semantics, or fixed-size collections of bitsets to the core BITSCAN
+ * hierarchy.
+ *
+ * The utilities are template-based and operate on bitset types that expose
+ * the common @c BBObject/bitset interface. @c BitSetWithPC deliberately keeps
+ * a cached population count that may be managed independently from the actual
+ * bitset contents, while @c BitSetStack maintains a synchronized stack view
+ * of set bits. These wrappers are intended for algorithm-specific use and do
+ * not replace the underlying bitset classes.
+ *
+ * @author pss
+ * @date Last updated: 14 October 2026
+ *
+ * @see bbobject.h
+ * @see bbset.h
+ * @see bitblock.h
+ * @warning A cached count in @c BitSetWithPC can become stale if the wrapped
+ *          bitset is modified without using the wrapper's operations.
+ */
 
-#ifndef  __BBUTILS_H__
-#define  __BBUTILS_H__
+#ifndef  BITGRAPH_BITSCAN_BBUTILS_H
+#define  BITGRAPH_BITSCAN_BBUTILS_H
 
-#include "utils/common.h"
 #include "utils/logger.h"
 #include "bitscan/bbset.h"
+#include "utils/random_utils.h"
 #include <array>
 
 namespace bitgraph {
@@ -183,7 +204,7 @@ namespace bitgraph {
 
 namespace bitgraph {
 
-	namespace _impl {
+	namespace detail {
 
 		//////////////////////
 		// 
@@ -355,7 +376,7 @@ namespace bitgraph {
 			std::array<bitset_type, SIZE> bb_;
 		};
 
-	}//end namespace _impl
+	}//end namespace detail
 
 }//end namespace bitgraph
 
@@ -365,11 +386,11 @@ namespace bitgraph {
 
 namespace bitgraph {
 
-	using _impl::Tables;
+	using detail::Tables;
 
 	template <class BitsetT, int SIZE>
 	inline
-		Bitset& _impl::BitSetArray<BitsetT, SIZE>::set_bit(int bitsetID, int bit, bool& is_first_bit) {
+		Bitset& detail::BitSetArray<BitsetT, SIZE>::set_bit(int bitsetID, int bit, bool& is_first_bit) {
 
 		//adds bit
 		bb_[bitsetID].set_bit(bit);
@@ -384,7 +405,7 @@ namespace bitgraph {
 
 	template <class BitsetT, int SIZE>
 	inline
-		std::ostream& _impl::BitSetArray<BitsetT, SIZE>::print(std::ostream& o, bool show_pc, bool eofl)  const {
+		std::ostream& detail::BitSetArray<BitsetT, SIZE>::print(std::ostream& o, bool show_pc, bool eofl)  const {
 		for (auto i = 0; i < bb_.size(); ++i) {
 			if (!bb_[i].is_empty()) {
 				bb_[i].print(o, show_pc, true);
@@ -396,7 +417,7 @@ namespace bitgraph {
 
 	template <class BitsetT>
 	inline
-		std::ostream& _impl::BitSetStack<BitsetT>::print(print_t t, std::ostream& o, bool eofl) {
+		std::ostream& detail::BitSetStack<BitsetT>::print(print_t t, std::ostream& o, bool eofl) {
 
 		switch (t) {
 		case STACK:
@@ -419,7 +440,7 @@ namespace bitgraph {
 
 	template <class BitsetT>
 	inline
-		bool _impl::BitSetStack<BitsetT>::is_sync() {
+		bool detail::BitSetStack<BitsetT>::is_sync() {
 
 		//same population count
 		if (bb_.count() != static_cast<int>(stack_.size())) {
@@ -438,7 +459,7 @@ namespace bitgraph {
 
 	template <class BitsetT>
 	inline
-		void _impl::BitSetStack<BitsetT>::sync_bitset() {
+		void detail::BitSetStack<BitsetT>::sync_bitset() {
 
 		bb_.erase_bit();
 		for (auto i = 0; i < stack_.size(); i++) {
@@ -448,7 +469,7 @@ namespace bitgraph {
 
 	template <class BitsetT>
 	inline
-		void _impl::BitSetStack<BitsetT>::sync_stack() {
+		void detail::BitSetStack<BitsetT>::sync_stack() {
 
 		//cleans stack
 		stack_.clear();
@@ -466,7 +487,7 @@ namespace bitgraph {
 
 	template <class BitsetT>
 	inline
-		void  _impl::BitSetStack<BitsetT>::reset(int MAX_POP_SIZE) {
+		void  detail::BitSetStack<BitsetT>::reset(int MAX_POP_SIZE) {
 
 		//cleans stack
 		stack_.clear();
@@ -489,7 +510,7 @@ namespace bitgraph {
 
 	template <class BitsetT>
 	inline
-		void _impl::BitSetStack<BitsetT>::push(int bit) {
+		void detail::BitSetStack<BitsetT>::push(int bit) {
 
 		if (!bb_.is_bit(bit)) {
 			bb_.set_bit(bit);
@@ -499,7 +520,7 @@ namespace bitgraph {
 
 	template <class BitsetT>
 	inline
-		int _impl::BitSetStack<BitsetT>::pop() {
+		int detail::BitSetStack<BitsetT>::pop() {
 
 		if (stack_.size() > 0) {
 			int bit = stack_.back();
@@ -512,7 +533,7 @@ namespace bitgraph {
 
 	template <class BitsetT>
 	inline
-		void _impl::BitSetStack<BitsetT>::erase_bit() {
+		void detail::BitSetStack<BitsetT>::erase_bit() {
 		for (int i = 0; i < stack_.size(); i++) {
 			bb_.erase_bit(stack_[i]);
 		}
@@ -542,7 +563,7 @@ namespace bitgraph {
 		BITBOARD bb = 0;
 
 		for (auto i = 0; i < WORD_SIZE; i++) {
-			if (com::_rand::uniform_dist(p)) {
+			if (utils::uniform_dist(p)) {
 				bb |= Tables::mask[i];
 			}
 		}
@@ -573,5 +594,5 @@ namespace bitgraph {
 }//end namespace bitgraph
 
 
-#endif
+#endif // BITGRAPH_BITSCAN_BBUTILS_H
 

@@ -40,8 +40,8 @@ int main() {
 
 	cout << "****************************" << endl;
 
-	//non-destructive forward bitscanning (specialized scanning objects)
-	bitgraph::bbo::Scan<bitgraph::bitarray> sc(bb);
+	//non-destructive forward bitscanning (specialized scanning objects nested in the bitset type)
+	bitgraph::bitarray::scan sc(bb);
 	while ( (nBit = sc.next_bit()) != bitgraph::bbo::noBit) {
 		cout << "bit scanned:" << nBit << endl;
 	}
@@ -49,7 +49,7 @@ int main() {
 	cout << "****************************" << endl;
 
 	//non-destructive forward bitscanning for sparse bitsets
-	bitgraph::bbo::Scan<bitgraph::sparse_bitarray> scSparse(sb);
+	bitgraph::sparse_bitarray::scan scSparse(sb);
 	while ((nBit = scSparse.next_bit()) != bitgraph::bbo::noBit) {
 		cout << "sparse bit scanned:" << nBit << endl;
 	}

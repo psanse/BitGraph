@@ -1,0 +1,748 @@
+/**
+ * @file simple_graph_vw.h
+ * @brief Generic vertex-weighted graph classes and public facade types.
+ *
+ * @details
+ * This header defines @c Base_Graph_VW and @c Graph_VW, which combine an
+ * underlying graph representation with one weight value per vertex. The
+ * classes provide construction and reset operations, weight assignment and
+ * transformation, maximum-weight queries, graph-topology access, complement
+ * creation, random-edge generation, DIMACS and external-weight I/O, and
+ * formatted weight output.
+ *
+ * The vertex-weight vector and the underlying graph share the same vertex
+ * count. Weight constants such as @c NO_WEIGHT, @c ZERO_WEIGHT, and
+ * @c DEFAULT_WEIGHT are supplied by @c weight_constants. The implementation
+ * is included from @c detail/simple_graph_vw_imp.h so template definitions
+ * remain visible to translation units using custom graph or weight types.
+ *
+ * @author pss
+ * @date Created 16/01/2019
+ * @date Last updated 09/10/2026
+ *
+ * @see weighted_constants.h
+ * @see simple_graph.h
+ * @see detail/simple_graph_vw_imp.h
+ * @warning Mutating the underlying graph directly can invalidate the
+ *          graph/weight-size invariant maintained by the weighted wrapper.
+ *
+ * This code is part of the BITGRAPH C++ library.
+ */
+
+#ifndef BITGRAPH_GRAPH_SIMPLE_GRAPH_VERTEX_WEIGHTED_H
+#define BITGRAPH_GRAPH_SIMPLE_GRAPH_VERTEX_WEIGHTED_H
+
+
+#include "graph_types.h"
+#include "weighted_constants.h"
+#include <iostream>
+#include <vector>
+#include <utility>
+
+namespace bitgraph {
+	
+	/**
+	 * @brief Base implementation for vertex-weighted graph classes.
+	 *
+	 * Provides the common functionality required by `Graph_W`, while keeping
+	 * the underlying graph type and weight type generic.
+	 *
+	 * This base class exists primarily to enable specialization of operations
+	 * with respect to the underlying graph type.
+	 *
+	 * @tparam GraphT Underlying graph type.
+	 * @tparam WeightT Vertex-weight type.
+	 *
+	 * @note `Graph_W` is the intended user-facing graph type.
+	 */
+
+	template<class GraphT, class WeightT>
+	class Base_Graph_VW : public bitgraph::weight_constants<WeightT> {
+			
+	public:
+		
+		using graph_type = GraphT;							// graph type	
+		using graph_t = graph_type;
+		using bitset_type = typename GraphT::bitset_type;
+
+		using vertex_bitset_t = bitset_type;
+		using VertexBitset = vertex_bitset_t;				// backward compatibility
+		
+		using vertex_set_t = bitgraph::vertex_set_t;
+
+		using weight_t = WeightT;
+		using Weight = weight_t;							// backward compatibility
+
+		using weights_t = std::vector<weight_t>;			
+		
+		// constants 
+		using constants_t = weight_constants<WeightT>;
+		
+		using constants_t::NO_WEIGHT;
+		using constants_t::ZERO_WEIGHT;
+		using constants_t::DEFAULT_WEIGHT;
+
+		
+		// file extensions for weighted graphs (for I/O operations)
+		// see read_dimacs functions (check)
+		enum class weight_file_extension { 
+			w = 0,
+			d,
+			www,
+			none
+		};		
+		
+		// present for backward compatibility with existing code
+		enum { Wext = 0, Dext, WWWext, NOext };				
+
+		///////////////////////
+		// construction / destruction
+		
+		Base_Graph_VW() = default;	
+
+		/**
+		 * @brief Constructs a vertex-weighted graph from a collection of weights.
+		 *
+		 * Creates an edgeless graph with one vertex for each entry in @p weights.
+		 * The supplied weights are copied into the graph.
+		 *
+		 * @param weights Vertex weights. The number of graph vertices is set to
+		 *                `weights.size()`.
+		 */
+		explicit Base_Graph_VW(const weights_t& weights)
+			: vertex_weights_(weights) 
+		{
+			graph_.reset(weights.size()); 
+		}	
+
+		/**
+		 * @brief Constructs a vertex-weighted graph by moving a collection of weights.
+		 *
+		 * Creates an edgeless graph with one vertex for each supplied weight.
+		 * Ownership of the weight vector is transferred to the graph.
+		 *
+		 * @param weights Vertex weights to move into the graph.
+		 */
+		explicit Base_Graph_VW(weights_t&& weights)
+			: vertex_weights_(std::move(weights))
+		{
+			graph_.reset(vertex_weights_.size());
+		}
+	
+		/**
+		 * @brief Constructs a vertex-weighted graph from an existing graph and a
+		 *        collection of vertex weights.
+		 *
+		 * Copies the graph topology and the supplied vertex weights into the new
+		 * vertex-weighted graph.
+		 *
+		 * @param graph Graph whose topology is copied.
+		 * @param weights Vertex weights, indexed by vertex.
+		 *
+		 * @pre The number of weights must equal the number of vertices in @p graph.
+		 */
+		Base_Graph_VW(
+			const graph_t& graph, 
+			const weights_t& weights)
+			:graph_(graph), 
+			vertex_weights_(weights) 
+		{ 
+			if (vertex_weights_.size() !=
+				static_cast<std::size_t>(graph_.num_vertices())) {
+				LOG_ERROR("Graph/weight size mismatch - Base_Graph_VW constructor");
+				std::terminate();
+			}
+		}									
+
+		/**
+		 * @brief Constructs a unit-weighted graph from an existing graph.
+		 *
+		 * Copies the topology of @p graph and assigns `DEFAULT_WEIGHT` to every
+		 * vertex.
+		 *
+		 * @param graph Graph whose topology is copied.
+		 */
+		 explicit Base_Graph_VW(const graph_t& graph)
+			:graph_(graph), 
+			vertex_weights_(
+				graph.size(),
+				DEFAULT_WEIGHT )
+		{}							
+
+		 /**
+		 * @brief Constructs a vertex-weighted graph with a given number of vertices.
+		 *
+		 * Creates an edgeless graph with @p NV vertices and assigns @p weight
+		 * to every vertex.
+		 *
+		 * @param NV Number of vertices.
+		 * @param weight Initial weight assigned to every vertex.
+		 */
+		explicit Base_Graph_VW(std::size_t NV, weight_t weight = DEFAULT_WEIGHT)
+		{ 
+			reset(NV, weight);
+		}		
+
+		/**
+		 * @brief Constructs a vertex-weighted graph from a DIMACS file.
+		 *
+		 * Reads the graph topology and, when available, its vertex weights from
+		 * @p filename. If no vertex weights are provided, default unit weights are
+		 * assigned.
+		 *
+		 * @param filename Name of the DIMACS graph file.
+		 */
+		explicit Base_Graph_VW(const std::string& filename);
+
+		//copy constructor, move constructor, copy operator =, move operator =
+		Base_Graph_VW(const Base_Graph_VW& g) = default;
+		Base_Graph_VW(Base_Graph_VW&& g) noexcept = default;
+		Base_Graph_VW& operator = (const Base_Graph_VW& g) = default;
+		Base_Graph_VW& operator = (Base_Graph_VW&& g)	 noexcept = default;
+
+		//destructor
+		virtual	~Base_Graph_VW() = default;
+
+		//////////////////////////
+		// memory allocation 
+
+		/**
+		 * @brief Resets the graph to a vertex-weighted graph with a given number of vertices.
+		 *
+		 * Reinitializes the graph with @p NV isolated vertices and assigns @p weight
+		 * to every vertex. Any previous graph topology and vertex weights are discarded.
+		 *
+		 * @param NV Number of vertices.
+		 * @param weight Initial weight assigned to every vertex.
+		 * @param name Optional graph instance name.
+		 *
+		 * @warning Follows a fail-fast policy and calls `std::terminate()` if the
+		 *          graph cannot be reinitialized.
+		 */
+		void reset(
+			std::size_t NV,
+			weight_t weight = DEFAULT_WEIGHT,
+			string name = "") noexcept;
+
+		/////////////
+		// setters and getters
+
+		/**
+		 * @brief Sets the weight of a vertex.
+		 */
+		void set_weight(vertex_t v, weight_t value) noexcept{ 
+			vertex_weights_[v] = value;
+		}
+
+		/**
+		 * @brief Sets all vertex weights to the same value.
+		 *
+		 * Assigns @p value to every vertex in the graph, replacing all existing
+		 * vertex weights.
+		 *
+		 * @param value Weight assigned to every vertex.
+		 */
+		void set_weights(weight_t value = DEFAULT_WEIGHT) {
+			vertex_weights_.assign(
+				static_cast<std::size_t>(graph_.num_vertices()),
+				value);
+		}
+
+		/**
+		 * @brief Sets the weights of all vertices.
+		 *
+		 * @param weights Vertex weights. The vector size must equal the number
+		 *                of vertices in the graph.
+		 *
+		 * @warning Calls `std::terminate()` if the number of weights does not
+		 *          match the number of vertices.
+		 */
+		void set_weights(const std::vector<weight_t>& weights);
+
+		/**
+		 * @brief Sets the weights of all vertices by moving a weight vector.
+		 *
+		 * @param weights Vertex weights. The vector size must equal the number
+		 *                of vertices in the graph.
+		 *
+		 * @warning Calls `std::terminate()` if the number of weights does not
+		 *          match the number of vertices.
+		 */
+		void set_weights(std::vector<weight_t>&& weights);
+
+		/**
+		 * @brief Assigns vertex weights using the Pullan modulus scheme.
+		 *
+		 * For a 0-based internal vertex index `v`, the weight is
+		 *
+		 * \f[
+		 *   w(v) = ((v + 1) \bmod modulus) + 1.
+		 * \f]
+		 *
+		 * This corresponds to the DIMACS convention of Pullan (2008),
+		 * where vertices are numbered from 1 and vertex `i` receives
+		 * weight `i mod modulus + 1`.
+		 *
+		 * @param modulus Modulus used to generate the vertex weights.
+		 *
+		 * @warning Calls `std::terminate()` if `modulus <= 0`.
+		 *
+		 * @note For 0-based internal indexing, the generated weight sequence
+		 *       starts at 2. Pullan (2008) uses `modulus = 200` for the
+		 *       DIMACS-VW instances.
+		 */
+		void set_modulus_weights(int modulus = bitgraph::DEFAULT_WEIGHT_MODULUS);
+
+		/**
+		 * @brief Returns the underlying graph.
+		 *
+		 * Provides read-only access to the graph topology.
+		 *
+		 * @return Const reference to the underlying graph.
+		 */
+		const graph_t& graph() const noexcept {
+			return graph_;
+		}
+
+		/**
+		 * @brief Returns mutable access to the underlying graph.
+		 *
+		 * This accessor is intended for internal use by algorithms that require
+		 * direct access to the wrapped graph.
+		 *
+		 * @return Reference to the underlying graph.
+		 *
+		 * @note Mutable access is not part of the public API contract.
+		 *       Modifying the graph directly may invalidate invariants maintained
+		 *       by the weighted-graph wrapper.
+		 */
+		graph_t& graph() noexcept {
+			return graph_;
+		}
+
+		weight_t weight(vertex_t v) const noexcept{ 
+			return vertex_weights_[v];
+		}
+
+		const std::vector<weight_t>& weights() const noexcept { 
+			return vertex_weights_;
+		}
+		
+		void set_name(std::string name) {
+			graph_.set_name(std::move(name));
+		}
+
+		const std::string& name() const noexcept {
+			return graph_.name();
+		}
+
+		void set_path(std::string path) {
+			graph_.set_path(std::move(path));
+		}
+
+		const std::string& path() const noexcept {
+			return graph_.path();
+		}
+		
+		/////////////////////////
+		// Basic graph operations
+		// Mostly convenience wrappers around the underlying graph API.
+
+		/**
+		* @brief number of vertices of the graph
+		* @returns: number of vertices (int type)
+		* @details: internal use
+		**/
+		int num_vertices() const {
+			return graph_.num_vertices();
+		}
+
+		/**
+		* @brief number of vertices of the graph - consumer code
+		* @returns: number of vertices (std::size_t type)
+		* @details: for consumer code
+		**/
+		std::size_t size() const {
+			return graph_.size();
+		}
+
+		std::size_t num_edges(bool lazy = true) {
+			return graph_.num_edges(lazy);
+		}
+
+		/**
+		 * @brief Adds an edge between two vertices.
+		 *
+		 * @param v First endpoint.
+		 * @param w Second endpoint.
+		 *
+		 * @note Self-loops are not allowed.
+		 */
+		void add_edge(vertex_t v, vertex_t w) {
+			graph_.add_edge(v, w);
+		}
+	
+		/**
+		 * @brief Generates random edges with probability @p p.
+		 *
+		 * This operation modifies only the graph topology; vertex weights are
+		 * not affected.
+		 *
+		 * @param p Probability of generating each edge.
+		 */
+		void gen_random_edges(double p) {
+			graph_.gen_random_edges(p);
+		}
+
+		/**
+		 * @brief Finds a vertex of maximum weight.
+		 *
+		 * @param v Output vertex attaining the maximum weight.
+		 * @return Weight of vertex `v`.
+		 *
+		 * @warning Calls `std::terminate()` if the graph has no vertex weights.
+		 */
+		weight_t maximum_weight(vertex_t& v) const;
+
+		/////////////
+		// Boolean properties
+
+		/**
+		 * @brief Tests whether two vertices are adjacent.
+		 *
+		 * @param v First vertex.
+		 * @param w Second vertex.
+		 * @return `true` if `(v,w)` is an edge; otherwise, `false`.
+		 */
+		bool is_edge(vertex_t v, vertex_t w) const {
+			return graph_.is_edge(v, w);
+		}
+
+		/**
+		 * @brief Checks whether the graph is unit-weighted.
+		 *
+		 * A graph is unit-weighted if every vertex has weight equal to
+		 * `DEFAULT_WEIGHT` (1).
+		 *
+		 * @return `true` if all vertex weights are equal to 1; otherwise, `false`.
+		 *
+		 * @note An empty graph is considered unit-weighted.
+		 * @note A unit-weighted graph is equivalent to an unweighted graph
+		 *       from the perspective of vertex-weighted optimization.
+		 */ 
+		bool is_unit_weighted() const noexcept;
+
+
+		///////////////////////////
+		// Vertex weight operations
+
+		/**
+		 * @brief Applies a transformation to all vertex weights except `NO_WEIGHT`.
+		 *
+		 * For each valid weight `w`, the operation performs `w = f(w)`.
+		 * Entries equal to `NO_WEIGHT` are left unchanged.
+		 *
+		 * @tparam Func Callable accepting a `weight_t` and returning a value
+		 *              assignable to `weight_t`.
+		 * @param f Transformation function.
+		 */
+		template<class Func>
+		void transform_weights(Func f);
+				
+
+		////////////////////////
+		// other operations
+
+		/**
+		 * @brief Creates the complement graph.
+		 *
+		 * Builds in @p g the complement of the current graph, preserving the
+		 * vertex weights. The resulting graph has the same vertex set and vertex
+		 * weights as the current graph, while its edge set is replaced by the
+		 * complement edge set.
+		 *
+		 * The name of @p g is cleared.
+		 *
+		 * @param g Destination graph receiving the complement.
+		 */
+		void create_complement(Base_Graph_VW& g) const;
+
+		/**
+		 * @brief Creates and returns the complement of the vertex-weighted graph.
+		 *
+		 * The resulting graph has the complementary topology and preserves the
+		 * vertex weights, name, and path of the original graph.
+		 *
+		 * @return The complement graph.
+		 * 
+		 * @note This overload should be implemented in the `Graph_W` facade
+		 *       to return the user-facing type and avoid slicing in polymorphic use.
+		 */
+		Base_Graph_VW create_complement() const;
+		
+
+		////////////
+		// I/O
+	
+		/**
+		 * @brief Writes the vertex-weighted graph in DIMACS format.
+		 *
+		 * Writes graph metadata, vertex weights, and directed edges to @p os
+		 * using 1-based vertex identifiers.
+		 *
+		 * This generic implementation assumes a directed graph representation,
+		 * where each adjacency entry corresponds to a distinct directed edge.
+		 * Graph types with different edge semantics, such as undirected graphs,
+		 * must override this function.
+		 *
+		 * @param os Output stream.
+		 * @return Reference to @p os.
+		 *
+		 * @note IMPORTANT! This implementation is intended for directed graph types.
+		 *       Undirected graph specializations must provide their own
+		 *       implementation to avoid writing each edge twice.
+		 */
+		virtual ostream& write_dimacs(std::ostream& os = std::cout) const;
+			
+		/**
+		 * @brief Reads a vertex-weighted graph from a DIMACS file.
+		 *
+		 * Vertex weights may be contained in the DIMACS file itself or read from
+		 * an optional separate weight file.
+		 *
+		 * @param filename Name of the DIMACS graph file.
+		 * @param type Format of the optional separate weight file.
+		 * @return 0 on success; `-1` if the input cannot be read or has
+		 *         an invalid format.
+		 *
+		 * @note On failure, the graph is reset to an empty state.
+		 *
+		 * @deprecated Use the overload taking `weight_file_extension`.
+		 */
+		[[deprecated("Use the typed read_dimacs overload with weight_file_extension")]]
+		int read_dimacs(string filename, int type) {
+			return read_dimacs(
+				filename,
+				static_cast<weight_file_extension>(type)) ? 0 : -1;
+		}
+
+		/**
+		 * @brief Reads a vertex-weighted graph from a DIMACS file.
+		 *
+		 * Vertex weights may be contained in the DIMACS file itself or read from
+		 * an optional separate weight file.
+		 *
+		 * @param filename Name of the DIMACS graph file.
+		 * @param type Format of the optional separate weight file.
+		 * @return `true` on success; `false` if the input cannot be read or has
+		 *         an invalid format.
+		 *
+		 * @note On failure, the graph is reset to an empty state.
+		 */
+		bool read_dimacs(const std::string& filename,
+			weight_file_extension type = weight_file_extension::none);
+
+		/**
+		* @brief Reads weights from an external file (only weights)
+		*
+		*		 Format: numbers ordered and separated (line, space)
+		*				  i.e. {5 6 7 ...} -> w(1)=5, w(2)=6, w(3)=7,...
+		*
+		*		 Weights not assigned in the file are set to 0.0
+		*
+		* @param filename name of the file
+		* @returns true if success, false if error (empty vector of weights)
+		**/
+		bool read_weights(const std::string& filename);
+
+		/**
+		 * @brief Prints graph information to an output stream.
+		 *
+		 * Prints the underlying graph data and appends a tag identifying the graph
+		 * as vertex-weighted.
+		 *
+		 * @param lazy Passed to the underlying graph `print_data()` operation.
+		 * @param os Output stream.
+		 * @param trailing_newline If `true`, appends a newline after the output.
+		 * @return Reference to the output stream.
+		 */
+		std::ostream& print_data(
+			bool lazy = true,
+			std::ostream& os = std::cout, 
+			bool trailing_newline = true) const;
+
+		/**
+		 * @brief Prints the graph edges to an output stream.
+		 *
+		 * Forwards the operation to the underlying graph.
+		 *
+		 * @param os Output stream.
+		 * @param trailing_newline If `true`, appends a newline after the output.
+		 * @return Reference to the output stream.
+		 */
+		std::ostream& print_edges(
+			std::ostream& os = std::cout,
+			bool trailing_newline = false) 
+		{
+			return graph_.print_edges(os, trailing_newline);
+		}
+
+		/**
+		 * @brief Prints vertex weights to an output stream.
+		 *
+		 * By default, each vertex weight is printed in the form `[v:(weight)]`.
+		 * If @p show_vertices is `false`, only the collection of weights is printed,
+		 * preserving vertex order.
+		 *
+		 * @param os Output stream.
+		 * @param show_vertices If `true`, prints vertex identifiers together with
+		 *                      their weights; otherwise, prints only the weights.
+		 * @return Reference to @p o.
+		 */
+		std::ostream& print_weights(
+			std::ostream& os = std::cout, 
+			bool show_vertices = true)	const;
+
+		/**
+		 * @brief Prints the weights of the vertices contained in a bitset.
+		 *
+		 * Each set bit identifies a vertex whose weight is written to the output
+		 * stream.
+		 *
+		 * @param vertices Bitset containing the vertices to print.
+		 * @param os Output stream.
+		 * @return Reference to @p o.
+		 *
+		 * @note @p vertices is non-const because scanning updates the internal
+		 *       scan cursor of the bitset, even though the set of bits itself is
+		 *       not modified.
+		 */
+		std::ostream& print_weights(
+			vertex_bitset_t& vertices, 
+			std::ostream& os = std::cout) const;
+
+		/**
+		* @brief prints the weights of the vertices in the stack vertices
+		* @param vertices: a set of vertices with a stack interface
+		**/
+		std::ostream& print_weights(
+			const utils::FixedStack<int>& vertices,
+			std::ostream& os = std::cout) const;
+
+		/**
+		* @brief prints the weights of the vertices in the FixedStack lv
+		*		 given a mapping of the vertices
+		* @param mapping: input mapping of the vertices with at least the same size as
+		*				  the FixedStack lv
+		* @param vertices: a set of vertices with a FixedStack interface
+		**/
+		std::ostream& print_weights(
+			const utils::FixedStack<int>& vertices,
+			const VertexMapping& mapping,
+			std::ostream& os = std::cout)	const;
+
+		/**
+		 * @brief Prints the weights of the vertices contained in a vertex set.
+		 *
+		 * @param vertices Vertex set whose weights are printed.
+		 * @param os Output stream.
+		 * @return Reference to @p os.
+		 *
+		 * @note Supports C-style arrays through `vertex_set_t`.
+		 */
+		std::ostream& print_weights(
+			vertex_set_t& vertices, 
+			std::ostream& os = std::cout) const;
+
+		/**
+		 * @brief Prints the weights of the vertices contained in a C-style array.
+		 *
+		 * @param vertices Pointer to the array of vertex identifiers.
+		 * @param n Number of vertices in the array.
+		 * @param os Output stream.
+		 * @return Reference to @p os.
+		 *
+		 * @note Retained for backward compatibility with code using C-style arrays.
+		 */
+		std::ostream& print_weights(
+			const vertex_t* vertices, 
+			int n, 
+			std::ostream& os = std::cout) const;
+			
+	protected:
+		
+		/**
+		* @brief Returns mutable access to the vertex-weight vector.
+		*
+		* @return Reference to the internal vertex-weight vector.
+		*
+		* @note Intended for derived classes and internal algorithms.
+		*/
+		std::vector<weight_t>& mutable_weights() noexcept {
+			return vertex_weights_;
+		}
+
+		/**
+		* @brief Returns mutable access to the neighborhood of a vertex.
+		*
+		* @param v Vertex whose neighborhood is requested.
+		* @return Reference to the neighborhood bitset of `v`.
+		*
+		* @note Intended for derived classes and internal algorithms.
+		*/
+		vertex_bitset_t& neighbors(vertex_t v) noexcept {
+			return graph_.neighbors(v);
+		}
+		/**
+		 * @brief Resets the graph and vertex weights without explicitly deallocating storage.
+		 *
+		 * Clears the underlying graph state and the vertex-weight vector.
+		 *
+		 * @note Intended for derived classes and internal use.
+		 * @note To release owned storage, destroy the object or assign a freshly
+		 *       constructed instance as appropriate.
+		 */
+		void reset() { 
+			graph_.clear(); 
+			vertex_weights_.clear(); 
+		}
+
+		/**
+		 * @brief Underlying graph.
+		 */
+		graph_t graph_;								
+		
+		/**
+		 * @brief Vertex-weight vector.
+		 *
+		 * Entry `vertex_weights_[v]` stores the weight associated with vertex `v`.
+		 */
+		std::vector<weight_t> vertex_weights_;						
+	};
+
+}//end namespace bitgraph
+
+namespace bitgraph {
+
+	/**
+	 * @brief User-facing vertex-weighted graph class.
+	 *
+	 * Provides the public vertex-weighted graph type built on top of
+	 * `Base_Graph_VW`. This facade can be specialized for specific underlying
+	 * graph types while reusing the common weighted-graph implementation
+	 * provided by the base class.
+	 *
+	 * @tparam GraphT Underlying graph type.
+	 * @tparam WeightT Vertex-weight type.
+	 */
+	template<class GraphT, class WeightT>
+	class Graph_VW : public Base_Graph_VW <GraphT, WeightT> {};
+}
+
+/////////////////////////////////////////////
+// Necessary implementations in header file	
+
+#include "detail/simple_graph_vw_imp.h"
+
+
+#endif // BITGRAPH_GRAPH_SIMPLE_GRAPH_VERTEX_WEIGHTED_H

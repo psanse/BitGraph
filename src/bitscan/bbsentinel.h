@@ -1,27 +1,41 @@
- /**
-  * @file bbsentinel.h file
-  * @brief header file of the BBSentinel class.
-  *		   Manages efficient bitset operations by circumscribing them to the range [low_sentinel, high_sentinel] 
-  * @details The lower sentinel is the first non-zero bitblock in the bitstring
-  * @detials The higher sentinel is the last non-zero bitblock in the bitstring
-  * @details created?,  last_updated 13/02/2025
-  * @details used to enhance a clique algorithm (results published in [XXX))
-  * 
-  * @author pss
-  *
-  * TODO- PENDING FULL REFACTORING, namespace _impl (13/02/2025)
-  **/
+/**
+ * @file bbsentinel.h
+ * @brief Defines the BBSentinel class for efficient bitset operations
+ *        using block-level sentinels.
+ *
+ * BBSentinel restricts bitset operations to the range of bitblocks
+ * delimited by two sentinels:
+ * - The lower sentinel identifies the first non-zero bitblock.
+ * - The upper sentinel identifies the last non-zero bitblock.
+ *
+ * This representation can improve performance by avoiding unnecessary
+ * processing of leading and trailing zero bitblocks.
+ *
+ * @author pss
+ * @date Created: unknown
+ * @date Last updated: 14/10/2026
+ *
+ * @note Originally developed to improve the performance of an exact
+ *       maximum clique algorithm (publication reference pending).
+ * 
+ * @warning EXPERIMENTAL: This class is part of the experimental
+ *          namespace and has not been fully refactored or tested.
+ *          Its API and implementation are subject to change.
+ *
+ * @todo Complete refactoring and testing (14/10/2026).
+ *
+ * @todo Full refactoring and testing required (14/10/2026).
+ */
 
-#ifndef __BB_SENTINEL_H__
-#define __BB_SENTINEL_H__
+#ifndef BITGRAPH_BITSCAN_BB_SENTINEL_H
+#define BITGRAPH_BITSCAN_BB_SENTINEL_H
 
 #include "bitscan/bbscan.h"
 #include "bitscan/bbutils.h"			//MIN, MAX
 
-
 namespace bitgraph {
 	
-	namespace _impl {
+	namespace experimental {
 
 		class BBSentinel : public BBScan {
 			friend BBSentinel& AND(const Bitset& lhs, const BBSentinel& rhs, BBSentinel& res);		//updates sentinels
@@ -34,13 +48,15 @@ namespace bitgraph {
 
 			////////////
 			// setters / getters
+
 			void set_sentinel_H(unsigned int i) { m_BBH = i; }
 			void set_sentinel_L(unsigned int i) { m_BBL = i; }
 			void set_sentinels(int low, int high);
 			void init_sentinels(bool update = false);								//sets sentinels to maximum scope of current bit string
-			void clear_sentinels();												//sentinels to EMPTY
+			void clear_sentinels();													//sentinels to EMPTY
 			int get_sentinel_L() { return m_BBL; }
 			int get_sentinel_H() { return m_BBH; }
+			
 			/////////////
 			// basic sentinel
 
@@ -56,15 +72,15 @@ namespace bitgraph {
 
 				//erase: will not update sentinels	
 			virtual	void  erase_bit();											//in sentinel range
-			virtual	void  erase_bit(int nBit) { Bitset::erase_bit(nBit); }	//required because of the cast-to-int construction of sentinels (1)
-			void  erase_bit_and_update(int nBit);									//erases and updates sentinels			
-			BBSentinel& erase_bit(const Bitset&);							//(1): required for SEQ coloring
+			virtual	void  erase_bit(int nBit) { Bitset::erase_bit(nBit); }		//required because of the cast-to-int construction of sentinels (1)
+			void  erase_bit_and_update(int nBit);								//erases and updates sentinels			
+			BBSentinel& erase_bit(const Bitset&);								//(1): required for SEQ coloring
 
-			virtual	bool is_empty()const;
+			virtual	bool is_empty()const noexcept;
 			virtual	bool is_empty(int nBBL, int nBBH) const;					//is empty in range
 
 #ifdef POPCOUNT_INTRINSIC_64
-			int popcn64() const;
+			int popcn64() const noexcept;
 #endif
 
 			////////////////
@@ -80,13 +96,13 @@ namespace bitgraph {
 			/////////////////
 			// bit scanning operations 
 
-			int init_scan(scan_types sct) noexcept override;
+			void init_scan(scan_types sct) noexcept override;
 
 			inline int prev_bit_del() override;							//**TODO- empty bitstring
 			inline	int next_bit_del() override;
 			inline	int next_bit_del(BBSentinel& bbN_del);				//Does not override! CHECK (12/02/2025)
 
-			inline	int next_bit() override;
+			inline	int next_bit() const override;
 
 			//inline	int next_bit(int& nBB) override;
 
@@ -97,7 +113,7 @@ namespace bitgraph {
 			int m_BBL;										//explicit storage for sentinel low index
 		};
 
-	}//namespace _impl
+	}//namespace experimental
 
 }//namespace bitgraph
 
@@ -107,7 +123,7 @@ namespace bitgraph {
 
 namespace bitgraph {
 
-	inline int _impl::BBSentinel::popcn64() const {
+	inline int experimental::BBSentinel::popcn64() const noexcept {
 		BITBOARD pc = 0;
 		for (int i = m_BBL; i <= m_BBH; ++i) {
 			pc += __popcnt64(vBB_[i]);
@@ -123,7 +139,7 @@ namespace bitgraph {
 
 	//specializes the only bitscan function used
 
-	int _impl::BBSentinel::prev_bit_del() {
+	int experimental::BBSentinel::prev_bit_del() {
 		//////////////
 		// BitScan reverse order and distructive
 		//
@@ -143,7 +159,7 @@ namespace bitgraph {
 	}
 
 
-	int _impl::BBSentinel::next_bit_del() {
+	int experimental::BBSentinel::next_bit_del() {
 		//////////////
 		// Bitscan distructive between sentinels
 		//
@@ -163,7 +179,7 @@ namespace bitgraph {
 	}
 
 
-	int _impl::BBSentinel::next_bit_del(BBSentinel& bbN_del) {
+	int experimental::BBSentinel::next_bit_del(BBSentinel& bbN_del) {
 		//////////////
 		// Bitscan distructive between sentinels
 		//
@@ -186,7 +202,7 @@ namespace bitgraph {
 
 
 
-	int _impl::BBSentinel::next_bit() {
+	int experimental::BBSentinel::next_bit() const {
 		////////////////////////////
 		// last update:31/12/2013
 		// BitScan non destructive
@@ -243,7 +259,7 @@ namespace bitgraph {
 
 }//end namespace bitgraph
 
-#endif 
+#endif //BITGRAPH_BITSCAN_BB_SENTINEL_H
 
 
 

@@ -1,11 +1,29 @@
- /**
-  * @file bbset_sparse.cpp
-  * @brief implementations for the sparse BitsetSp class wrapper for sparse bitstrings (header bbset_sparse.h)
-  * @author pss
-  * @details created 10/02/2015?, @last_update 20/02/2025
-  *
-  * TODO refactoring and testing 15/02/2025 - follow the interface of the refactored BitSet
-  **/
+/**
+ * @file bbset_sparse.cpp
+ * @brief Implementation of the sparse @c bitgraph::BitsetSp type.
+ *
+ * @details
+ * A @c BitsetSp represents a logical bit string by storing only the non-zero
+ * bitblocks in a collection of indexed @c SparseBlock records. The logical
+ * population size is retained separately, while absent blocks represent runs
+ * of zero bits. The collection is kept ordered by block index so that updates,
+ * range operations, comparisons, and sparse set operations can traverse only
+ * the blocks that are present.
+ *
+ * This file implements construction, block and bit updates, sparse AND/OR and
+ * subtraction operations, copying, comparisons, I/O helpers, and population
+ * queries. It provides the sparse storage layer but does not maintain the
+ * additional scan state used by specialized high-performance bit scanners.
+ *
+ * @author pss
+ * @date Last updated: 14 October 2026
+ *
+ * @see bbset_sparse.h
+ * @warning The sparse implementation and its interface are still undergoing
+ *          refactoring and testing; behavior may change.
+ * @todo Align the interface fully with @c Bitset and complete refactoring and
+ *       testing.
+ */
 
 #include "bbset_sparse.h"
 #include "utils/logger.h"
@@ -64,6 +82,19 @@ BitsetSp::BitsetSp(std::size_t nPop, const bitpos_list& lv):
 		LOG_ERROR("exiting...");
 		std::exit(EXIT_FAILURE);
 	}
+}
+
+BitsetSp::BitsetSp(const bitpos_list& bits) :
+	nBB_(0)
+{
+	if (bits.empty()) { return; }
+
+	const int maxBit = *std::max_element(bits.begin(), bits.end());
+	assert(maxBit >= 0);
+
+	nBB_ = static_cast<int>(INDEX_0TO1(maxBit));
+	vBB_.reserve(DEFAULT_CAPACITY);
+	set_bit(bits);
 }
 
 BitsetSp::BitsetSp(std::size_t nPop, std::initializer_list<int> lv) :
@@ -576,14 +607,14 @@ int BitsetSp::clear_bit (int firstBit, int lastBit){
 			if(bbh==bbl){		
 				
 				//case update in the same bitblock
-				BITBOARD bb_low = pl.second->bb_ & _impl::Tables::mask_high[lastBit - WMUL(bbh)];
-				BITBOARD bb_high = pl.second->bb_ & _impl::Tables::mask_low[firstBit - WMUL(bbl)];
+				BITBOARD bb_low = pl.second->bb_ & detail::Tables::mask_high[lastBit - WMUL(bbh)];
+				BITBOARD bb_high = pl.second->bb_ & detail::Tables::mask_low[firstBit - WMUL(bbl)];
 				pl.second->bb_ = bb_low | bb_high;
 				return 0;
 			}
 
 			//update lower block
-			pl.second->bb_ &= _impl::Tables::mask_low[firstBit - WMUL(bbl)];
+			pl.second->bb_ &= detail::Tables::mask_low[firstBit - WMUL(bbl)];
 			++pl.second;
 		}
 
@@ -594,14 +625,14 @@ int BitsetSp::clear_bit (int firstBit, int lastBit){
 			if(bbh==bbl){		
 				
 				//case update in the same bitblock
-				BITBOARD bb_low = pl.second->bb_ & _impl::Tables::mask_high[lastBit - WMUL(bbh)];
-				BITBOARD bb_high = pl.second->bb_ & _impl::Tables::mask_low[firstBit - WMUL(bbl)];
+				BITBOARD bb_low = pl.second->bb_ & detail::Tables::mask_high[lastBit - WMUL(bbh)];
+				BITBOARD bb_high = pl.second->bb_ & detail::Tables::mask_low[firstBit - WMUL(bbl)];
 				pl.second->bb_ = bb_low | bb_high;
 				return 0;
 			}
 
 			//update lower block
-			ph.second->bb_ &= _impl::Tables::mask_high[lastBit - WMUL(bbh)];
+			ph.second->bb_ &= detail::Tables::mask_high[lastBit - WMUL(bbh)];
 		}
 
 		//remaining
@@ -691,109 +722,70 @@ BitsetSp& BitsetSp::operator &= (const BitsetSp& rhs){
 	return *this;
 }
 
+namespace {
+
+	/**
+	* @brief In-place merge of the sorted block vector R into L: L = L op R (op applied to the blocks
+	*		 with the same index, blocks only in R are copied). O(blocks), no sorting.
+	* @details 1. counts the blocks of R which are not in L (index-only merge)
+	*		   2. makes room at the end of L and merges from the back
+	*		   Used by operator |= and ^=.
+	**/
+	template<class BlockVec, class Op>
+	void merge_blocks_in_place(BlockVec& L, const BlockVec& R, Op op) {
+
+		const std::ptrdiff_t nL = static_cast<std::ptrdiff_t>(L.size());
+		const std::ptrdiff_t nR = static_cast<std::ptrdiff_t>(R.size());
+
+		std::ptrdiff_t extra = 0, i = 0, j = 0;
+		while (i < nL && j < nR) {
+			if (L[i].idx_ < R[j].idx_) { ++i; }
+			else if (L[i].idx_ > R[j].idx_) { ++extra; ++j; }
+			else { ++i; ++j; }
+		}
+		extra += nR - j;
+
+		//when extra=0 it only applies op to the blocks in common
+		L.resize(static_cast<std::size_t>(nL + extra));
+
+		i = nL - 1;
+		j = nR - 1;
+		std::ptrdiff_t k = nL + extra - 1;
+		while (j >= 0) {
+			if (i >= 0 && L[i].idx_ > R[j].idx_) {
+				L[k--] = L[i--];
+			}
+			else if (i >= 0 && L[i].idx_ == R[j].idx_) {
+				L[k--] = typename BlockVec::value_type(L[i].idx_, op(L[i].bb_, R[j].bb_));
+				--i;
+				--j;
+			}
+			else {
+				L[k--] = R[j--];
+			}
+		}
+		//remaining blocks of L (i >= 0) are already in place (k == i)
+	}
+}
+
 BitsetSp& BitsetSp::operator |= (const BitsetSp& rhs){
 
-	index_t posL = 0;					//position *this
-	auto itR = rhs.cbegin();		//iterator to rhs
-	auto sizeL = vBB_.size();		//stores the original size of *this since it will be modified
-	bool flag_sort = false;			//flag to sort the collection
-		
-	//OR before all the blocks of one of the bitsets have been examined
-	while (posL < static_cast<int>(sizeL) && itR != rhs.vBB_.end()) {
-			
-		if(vBB_[posL].idx_ < itR->idx_)
-		{
-			posL++;
-		}else if(vBB_[posL].idx_ > itR->idx_ )
-		{
-			//////////////////////////////////
-			vBB_.emplace_back(*itR);
-			///////////////////////////////////
-			flag_sort = true;
-			itR++;
-		}else{
+	if (this == &rhs || rhs.vBB_.empty()) { return *this; }
 
-			//equal indexes
-
-			///////////////////////////////////////////
-			vBB_[posL].bb_ |= itR->bb_;
-			///////////////////////////////////////////
-
-			posL++;
-			itR++;
-		}
-	}
-
-	//rhs unfinished with index below the last block of *this
-	if (posL == static_cast<int>(sizeL)) {
-
-		for (; itR != rhs.vBB_.end(); ++itR) {
-
-			//////////////////////////////////
-			vBB_.emplace_back(*itR);
-			///////////////////////////////////
-		}
-	}
-
-	//keep the collection sorted
-	if (flag_sort) {
-		sort();
-	}	
-	
+	merge_blocks_in_place(vBB_, rhs.vBB_, [](BITBOARD a, BITBOARD b) { return a | b; });
 	return *this;
 }
 
 BitsetSp& BitsetSp::operator ^= (const BitsetSp& rhs) {
 
-	index_t posL = 0;					//position *this	
-	auto itR = rhs.cbegin();		//iterator to rhs
-	auto sizeL = vBB_.size();		//stores the original size of *this since it will be modified
-	bool flag_sort = false;			//flag to sort the collection
-	
-	//XOR before all the blocks of one of the bitsets have been examined
-	while ((posL < static_cast<int>(sizeL)) && (itR !=  rhs.vBB_.end())) {
-
-		if (vBB_[posL].idx_ < itR->idx_)
-		{
-			posL++;
-		}
-		else if (vBB_[posL].idx_ > itR->idx_)
-		{
-			//////////////////////////////////
-			vBB_.emplace_back(*itR);
-			///////////////////////////////////
-			flag_sort = true;
-			itR++;
-		}
-		else {
-
-			//equal indexes
-
-			/////////////////////////////
-			vBB_[posL].bb_ ^= itR->bb_;
-			/////////////////////////////
-
-			posL++;
-			itR++;
-		}
+	if (this == &rhs) {
+		//x ^ x = 0 (blocks are kept, as in the other erasing operations)
+		for (auto& blk : vBB_) { blk.bb_ = 0; }
+		return *this;
 	}
+	if (rhs.vBB_.empty()) { return *this; }
 
-	//rhs unfinished with index below the last block of *this
-	if (posL == static_cast<int>(sizeL)) {
-
-		for (; itR != rhs.vBB_.end(); ++itR) {
-
-			//////////////////////////////////
-			vBB_.emplace_back(*itR);
-			///////////////////////////////////
-		}
-	}
-
-	//keep the collection sorted
-	if (flag_sort) {
-		sort();
-	}	
-
+	merge_blocks_in_place(vBB_, rhs.vBB_, [](BITBOARD a, BITBOARD b) { return a ^ b; });
 	return *this;
 }
 
@@ -892,21 +884,91 @@ string BitsetSp::to_string ()  const{
 	return sstr.str();
 }
 
-void BitsetSp::extract (bitpos_list& lb) const{
-
-	lb.clear();
-
-	int nBit = BBObject::noBit;
-	while((nBit = next_bit(nBit)) != BBObject::noBit ){
-		lb.push_back(nBit);
-	}
-}
 
 BitsetSp::operator bitpos_list() const
 {
 	bitpos_list lb;
 	extract(lb);
 	return lb;
+}
+
+namespace {
+
+	/** @brief calls f(bit) for each 1-bit of the sparse blocks in increasing order. O(blocks + bits) */
+	template<class BlockVec, class F>
+	inline void for_each_bit(const BlockVec& vBB, F&& f) {
+		for (const auto& blk : vBB) {
+			BITBOARD bb = blk.bb_;
+			const int base = static_cast<int>(WMUL(blk.idx_));
+			while (bb) {
+				f(base + bblock::lsb(bb));
+				bb &= (bb - 1);					//clears the lowest 1-bit
+			}
+		}
+	}
+
+	/** @brief same in decreasing order */
+	template<class BlockVec, class F>
+	inline void for_each_bit_rev(const BlockVec& vBB, F&& f) {
+		for (auto it = vBB.rbegin(); it != vBB.rend(); ++it) {
+			BITBOARD bb = it->bb_;
+			const int base = static_cast<int>(WMUL(it->idx_));
+			while (bb) {
+				const int p = bblock::msb(bb);
+				f(base + p);
+				bb &= ~bblock::MASK_BIT(p);
+			}
+		}
+	}
+}
+
+void BitsetSp::extract (bitpos_list& lb) const{
+
+	lb.clear();
+	lb.reserve(static_cast<std::size_t>(count()));
+	for_each_bit(vBB_, [&lb](int bit) { lb.push_back(bit); });		//block scan: O(blocks + bits)
+}
+
+void BitsetSp::extract_set(bit_index_set& ls) const {
+	ls.clear();
+	for_each_bit(vBB_, [&ls](int bit) { ls.insert(ls.end(), bit); });	//hint: increasing order
+}
+
+void BitsetSp::extract_stack(utils::FixedStack<bit_index_t>& s) const {
+	s.clear();
+	for_each_bit(vBB_, [&s](int bit) { s.push(bit); });
+}
+
+void BitsetSp::extract_array(int* lv, std::size_t& size, bool rev) const {
+	size = 0;
+	if (rev) {
+		for_each_bit_rev(vBB_, [&](int bit) { lv[size++] = bit; });
+	}
+	else {
+		for_each_bit(vBB_, [&](int bit) { lv[size++] = bit; });
+	}
+}
+
+BitsetSp& BitsetSp::assign_bit(const BitsetSp& rhs) {
+
+	if (this == &rhs) { return *this; }
+
+	vBB_ = rhs.vBB_;							//reuses the storage of THIS if it is large enough
+
+	//drops blocks outside the population size of THIS (only if rhs is larger)
+	if (rhs.nBB_ > nBB_) {
+		auto it = std::lower_bound(vBB_.begin(), vBB_.end(), SparseBlock(nBB_), pBlock_less());
+		vBB_.erase(it, vBB_.end());
+	}
+	return *this;
+}
+
+BitsetSp& BitsetSp::set_bit(const bitpos_list& bits) {
+	for (const int bit : bits) {
+		assert(bit >= 0 && bit < static_cast<int>(bit_capacity()));
+		set_bit(bit);
+	}
+	return *this;
 }
 
 ///////////////////////////////

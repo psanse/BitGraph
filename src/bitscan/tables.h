@@ -1,40 +1,51 @@
-/*  
- * tables.h file from the BITSCAN library, a C++ library for bit 
- * sets optimization. It has been used to implement BBMC, a very
- * succesful bit-parallel algorithm for exact maximum clique. 
- * (see license file for references)
+/**
+ * @file tables.h
+ * @brief Internal lookup tables and masks for BITSCAN bit operations.
  *
- * Copyright (C)
- * Author: Pablo San Segundo
- * Intelligent Control Research Group (CSIC-UPM) 
+ * @details
+ * This header declares the non-instantiable @c bitgraph::detail::Tables
+ * holder used by the low-level bitblock algorithms. Its static data includes
+ * single-bit, interval, and word masks; population-count and least/most-
+ * significant-bit lookup tables; De Bruijn index tables; and optional caches
+ * controlled by the BITSCAN configuration macros.
  *
- * Permission to use, modify and distribute this software is
- * granted provided that this copyright notice appears in all 
- * copies, in source code or in binaries. For precise terms 
- * see the accompanying LICENSE file.
+ * The public @c Tables::InitAllTables() function is the initialization driver
+ * for the generated mutable tables. The library invokes it during startup so
+ * the lookup data is ready before normal bitset operations. Compile-time
+ * options such as @c EXTENDED_LOOKUPS and @c CACHED_INDEX_OPERATIONS control
+ * whether the corresponding optional tables are declared and initialized.
  *
- * This software is provided "AS IS" with no warranty of any 
- * kind, express or implied, and with no claim as to its
- * suitability for any purpose.
+ * The tables use the 64-bit @c BITBOARD and related types defined in
+ * @c bbtypes.h. They are shared implementation state and should be accessed
+ * through the BITSCAN operations rather than modified by client code.
+ *
+ * @author Pablo San Segundo
+ * @date Last updated: 14 October 2026
+ *
+ * @see bbtypes.h
+ * @see bitblock.h
+ * @see tables.cpp
+ * @warning The declarations in @c bitgraph::detail are implementation details
+ *          and are not part of the supported public API.
  */
 
-#ifndef __TABLES_H__
-#define __TABLES_H__
+#ifndef BITGRAPH_BITSCAN_TABLES_H
+#define BITGRAPH_BITSCAN_TABLES_H
 
 #include "bbtypes.h"
 
 namespace bitgraph {
 
-	namespace _impl {
+	namespace detail {
 
 		class Tables {
 
-		private:
-			Tables() {};
-			virtual ~Tables() {};
-
+			Tables() = delete;
+			~Tables() = delete;
+		
 		public:
-			static int InitAllTables();							//Driver for all inits
+			static void InitAllTables();							//Driver for all inits
+		
 		private:
 			static void init_masks();
 			static void init_popc8();
@@ -95,8 +106,8 @@ namespace bitgraph {
 
 		};
 
-	}//end of namespace _impl
+	}//end of namespace detail
 
 }//end of namespace bitgraph
 
-#endif
+#endif // BITGRAPH_BITSCAN_TABLES_H

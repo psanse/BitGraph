@@ -1,23 +1,26 @@
-
 #########################
 #headers for BITSCAN lib
 #########################
 
-file(GLOB HEADER_FILES  ${CMAKE_CURRENT_SOURCE_DIR}/*.h)
+file(GLOB HEADER_FILES
+    CONFIGURE_DEPENDS
+    "${CMAKE_CURRENT_SOURCE_DIR}/*.h"
+    "${CMAKE_CURRENT_SOURCE_DIR}/detail/*.h"
+)
 
 ###################
 #creates BITSCAN lib
 ###################
-add_library (bitscan STATIC
-bbsentinel.cpp 
-bitblock.cpp 
-bbset.cpp  
-bbset_sparse.cpp 
-tables.cpp
-${HEADER_FILES}
-)
 
-target_compile_features(bitscan PUBLIC cxx_std_14)
+add_library (
+    bitscan STATIC
+    bbsentinel.cpp 
+    bitblock.cpp 
+    bbset.cpp  
+    bbset_sparse.cpp 
+    tables.cpp
+    ${HEADER_FILES}
+)
 
 set_target_properties(bitscan PROPERTIES CXX_EXTENSIONS NO
     #CXX_STANDARD 14					
@@ -32,9 +35,22 @@ set_target_properties(bitscan PROPERTIES CXX_EXTENSIONS NO
 # Make sure the compiler can find include files for our bitscan library
 # when other libraries or executables link to bitscan
 target_include_directories(bitscan PUBLIC 
-#  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
   $<BUILD_INTERFACE:${BITGRAPH_ROOT_INCLUDE_DIR}>
   $<INSTALL_INTERFACE:${include_install_dir}>    # <prefix>/include/<PROJECT_NAME>
+)
+
+# BITSCAN depends on UTILS. These dependencies are PUBLIC so their
+# usage requirements propagate correctly to BITSCAN consumers, although users
+# normally link against the umbrella BitGraph target.
+
+target_link_libraries(
+    bitscan
+    PUBLIC
+        utils
+)
+
+target_compile_features(bitscan
+    PUBLIC cxx_std_14
 )
 
 # Enable compiler warnings.
@@ -47,40 +63,89 @@ endif()
 
 #############
 # Install BITSCAN lib
-# BITSCAN lib header files are deployed manually
-# to preserve internal structure
+# (preserves internal structure)
 #############
 
 if(INSTALL_BITGRAPH)
 
-#Install BITSCAN library
-install(
-   TARGETS bitscan
-   EXPORT  "${TARGETS_EXPORT_NAME}"
-   ARCHIVE DESTINATION lib
-   LIBRARY DESTINATION lib
-   RUNTIME DESTINATION bin
-   INCLUDES DESTINATION include
-)
+    install(
+        TARGETS bitscan
+        EXPORT "${TARGETS_EXPORT_NAME}"
+        ARCHIVE DESTINATION "${CMAKE_INSTALL_LIBDIR}"
+        LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}"
+        RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}"
+        INCLUDES DESTINATION "${include_install_dir}"
+    )
 
-#install header files
-file(GLOB_RECURSE DEPLOY_FILES_AND_DIRS "${source_code_dir}/bitscan/*.h")
-foreach(ITEM ${DEPLOY_FILES_AND_DIRS})
-    file(RELATIVE_PATH REL_PATH ${source_code_dir} ${ITEM})
-    get_filename_component(DIR_PATH ${REL_PATH} DIRECTORY)
-    install(FILES ${ITEM} DESTINATION ${include_install_dir}/${DIR_PATH})	 
- endforeach()
+    # Installs header files as <prefix>/include/BitGraph/bitscan/...
+    install(
+        DIRECTORY "${source_code_dir}/bitscan"
+        DESTINATION "${include_install_dir}"
+        FILES_MATCHING
+        PATTERN "*.h"
+        PATTERN "*.hpp"
+    )
+   
+   ###########
+   #deprecated scripts 
+   ###########
 
-endif(INSTALL_BITGRAPH)
+   # install(
+   #    TARGETS bitscan
+   #    EXPORT  "${TARGETS_EXPORT_NAME}"
+   #    ARCHIVE DESTINATION lib
+   #    LIBRARY DESTINATION lib
+   #    RUNTIME DESTINATION bin
+   #    INCLUDES DESTINATION include
+   # )
+
+  #install header files (working, preserves internal structure)
+  #  file(GLOB_RECURSE DEPLOY_FILES_AND_DIRS "${source_code_dir}/bitscan/*.h")
+  #  foreach(ITEM ${DEPLOY_FILES_AND_DIRS})
+  #      file(RELATIVE_PATH REL_PATH ${source_code_dir} ${ITEM})
+  #      get_filename_component(DIR_PATH ${REL_PATH} DIRECTORY)
+  #      install(FILES ${ITEM} DESTINATION ${include_install_dir}/${DIR_PATH})	 
+  #   endforeach()
+
+endif()
 
 ###################
 # UNIT TESTS for BITSCAN lib  
 ###################
-#option(bitscan_build_tests "Build bitscan tests." ON)
-if (BUILD_TESTS)
 
-	add_subdirectory(tests)
+# Per-target option to enable building unit tests for the bitscan target
+option(BITSCAN_BUILD_TESTS "Build bitscan tests." ON)
+
+# If the project-wide BUILD_TESTS is enabled and the per-target option is ON,
+# prepare GoogleTest and add the tests subdirectory. Use FetchContent so tests
+# can be built even when google test is not installed on the system.
+if (BUILD_TESTING AND BITSCAN_BUILD_TESTS)
+
+    add_subdirectory(tests)
 
 endif()
 
+###################
+# EXAMPLES for BITSCAN lib  
+###################
+# Per-target option to enable building examples for the bitscan target
+option(
+    BITSCAN_BUILD_EXAMPLES
+    "Build bitscan examples."
+    ON
+)
 
+if(BUILD_EXAMPLES AND BITSCAN_BUILD_EXAMPLES)
+    add_subdirectory(examples)
+endif()
+
+
+###################
+# BENCHMARKS for BITSCAN lib
+###################
+# Not built by default (they are timing programs, not tests).
+option(BITSCAN_BUILD_BENCHMARKS "Build bitscan benchmarks." OFF)
+
+if(BITSCAN_BUILD_BENCHMARKS)
+    add_subdirectory(benchmarks)
+endif()

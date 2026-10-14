@@ -1,204 +1,436 @@
 /**
- * @file simple_ugraph.h 
- * @brief class Ugraph for simple undirected graphs	(no self loops)
+ * @file simple_ugraph.h
+ * @brief Public definition of the simple undirected graph class `Ugraph`.
  *
- * @created 17/6/10
- * @last_update 23/05/25
+ * @details
+ * Defines `Ugraph<BitsetT>`, a bitset-backed graph without self-loops.
+ * Adjacency is stored symmetrically, so an edge `(u, v)` is represented in
+ * both endpoint rows. The class builds on `Graph<BitsetT>` and supports both
+ * dense and sparse bitset implementations through its `BitsetT` parameter.
+ *
+ * The header also provides named graph factories and the undirected-graph
+ * operations that complement the common functionality inherited from the
+ * base graph class. Vertices are indexed from `0` through `NV_ - 1`.
+ *
  * @author pss
+ * @date 17/06/2010
+ * @details last_update 13/10/2026
  *
- * This code is part of the GRAPH 1.0 C++ library 
+ * @copyright Part of the BITGRAPH C++ library.
  *
- * @todo implement min_degree functions (03/01/2025)
- **/
+ * @see Graph
+ * @todo Implement minimum-degree functions (03/01/2025).
+ */
 
-#ifndef __SIMPLE_UGRAPH_H__
-#define __SIMPLE_UGRAPH_H__
+#ifndef BITGRAPH_GRAPH_SIMPLE_UGRAPH_H
+#define BITGRAPH_GRAPH_SIMPLE_UGRAPH_H
 
 #include "simple_graph.h"
-#include "utils/prec_timer.h"
-#include "graph_types.h"
-
 
 namespace bitgraph {
 	
-	//////////////////
-	//
-	// Generic class Ugraph<BitsetT>
-	// 
-	// (BitsetT is limited to bitarray and sparse_bitarray types)
-	// 
-	//////////////////
-
+	/**
+	 * @brief Undirected graph represented by a bitset-based adjacency matrix.
+	 *
+	 * @tparam BitsetT Bitset type used to store vertex neighborhoods.
+	 *         Supported types are BBScan (dense) and BBScanSp (sparse).
+	 *
+	 * @details Inherits common graph functionality from Graph<BitsetT>
+	 *          and specializes operations to preserve undirected graph semantics.
+	 *          Each edge (u,v) is represented symmetrically in the adjacency matrix.
+	 *
+	 * @note Vertices are indexed from 0 to NV_-1.
+	 * @note Self-loops are not supported.
+	 */
 	template<class BitsetT = BBScan>
 	class Ugraph : public Graph<BitsetT> {
 
-		friend class _impl::GraphConversion;
+		friend class detail::GraphConversion;
 
 	public:
 
-		//set of (static) methods to create simple graphs
-		static Ugraph make_triangle();
-		static Ugraph make_clique(std::size_t n);
-		static Ugraph make_cycle(std::size_t n);
-		static Ugraph make_star(std::size_t n);
+		// type aliases			
+		using base_t = Graph<BitsetT>;
+		using BaseT = base_t;					// alias for backward compatibility
 
-		// @todo other helpers... (03/01/2025)
-					
-		using BaseT = Graph<BitsetT>;		//parent type
-
-		using bitset_type = typename BaseT::bitset_type;
-		using VertexBitset = typename BaseT::VertexBitset;											// alias for semantic type
-
-		//constructors - cannot all be inherited	
-		Ugraph() : Graph<BitsetT>() {}																// creates empty graph
-		explicit Ugraph(std::size_t n) : Graph<BitsetT>(n) {}										// creates empty graph of size n=|V|	
-		explicit Ugraph(std::string filename) { this->reset(filename); }							// reads graph from file
+		using bitset_type = typename base_t::bitset_type;
+		using vertex_bitset_t = bitset_type;								// alias for semantic type
+		using VertexBitset = vertex_bitset_t;								// alias for backward compatibility
 
 		/**
-		* @brief Creates a graph from an C-style adjacency matrix
-		*
-		*		Reads only the upper triangle of the adjacency matrix
-		**/
-		Ugraph(std::size_t n, int* adj[], string name);			// C-style adjacency matrix
+		 * @brief Makes the base-class `remove_edges` overloads visible.
+		 */
+		using base_t::remove_edges;
+		using base_t::create_subgraph;
 
-		// @todo: copy constructor, move constructor, copy operator =, move operator = (1/1/2025)
+		////////////
+		// Named factories to create simple graphs
 
-		//destructor
-		~Ugraph() = default;
+		/**
+		 * @brief Creates a triangle graph.
+		 *
+		 * Returns the complete undirected graph on three vertices, with vertex
+		 * set `{0, 1, 2}` and edges `(0,1)`, `(0,2)`, and `(1,2)`.
+		 *
+		 * @return A triangle graph with three vertices and three edges.
+		 */
+		static Ugraph make_triangle();
 
+		/**
+		 * @brief Creates a complete undirected graph.
+		 *
+		 * Returns the complete graph on @p NV vertices. Every pair of distinct
+		 * vertices is adjacent and self-loops are excluded.
+		 *
+		 * @param NV Number of vertices.
+		 * @return Complete undirected graph with @p NV vertices.
+		 */
+		static Ugraph make_complete_graph(std::size_t NV);
+
+		/**
+		 * @brief Creates a simple cycle graph.
+		 *
+		 * Returns the undirected cycle graph on @p NV vertices. Consecutive
+		 * vertices are adjacent, and the last vertex is connected to vertex 0.
+		 *
+		 * @param NV Number of vertices.
+		 * @return Cycle graph with @p NV vertices and @p NV edges.
+		 *
+		 * @pre @p NV must be at least 3.
+		 * @warning Follows the graph initialization error policy if @p NV < 3.
+		 */
+		static Ugraph make_cycle(std::size_t NV);
+
+		/**
+		 * @brief Creates a star graph.
+		 *
+		 * Returns the undirected star graph on @p NV vertices, with vertex 0
+		 * as the center and vertices `1, ..., NV-1` as leaves.
+		 *
+		 * @param NV Number of vertices.
+		 * @return Star graph with @p NV vertices and @p NV - 1 edges.
+		 *
+		 * @pre @p NV must be at least 1.
+		 * @warning Follows the graph initialization error policy if @p NV == 0.
+		 */
+		static Ugraph make_star(std::size_t NV);
+					
+		
+		/////////////			
+		//construction (cannot all be inherited) / destruction 	
+		
+
+		/**
+		 * @brief Constructs an empty undirected graph.
+		 */
+		Ugraph() noexcept = default;										
+		
+		/**
+		 * @brief Constructs an undirected graph with isolated vertices.
+		 *
+		 * @param NV Number of vertices. The resulting graph contains no
+		 *        edges.
+		 *
+		 * @note Construction follows the graph fail-fast policy.
+		 */
+		explicit Ugraph(std::size_t NV) noexcept
+			: base_t(NV)
+		{}					
+		
+		/**
+		 * @brief Constructs an undirected graph by reading it from a file.
+		 *
+		 * The supported input formats are tried according to the policy implemented
+		 * by reset(std::string).
+		 *
+		 * @param filename Input graph filename.
+		 *
+		 * @note Construction follows the graph fail-fast policy and terminates if the
+		 *       file cannot be read in a supported format.
+		 */
+		explicit Ugraph(std::string filename) noexcept
+			: base_t() 
+		{ 
+			this->reset(std::move(filename));
+		}	
+
+		/**
+		 * @brief Constructs an undirected graph from an adjacency matrix.
+		 *
+		 * The constructor reads the strict upper triangle of @p adj_matrix. Every
+		 * nonzero entry `adj_matrix[v][w]`, with `v < w`, creates the undirected edge
+		 * `{v,w}`. The symmetric adjacency entries are generated internally by
+		 * add_edge().
+		 *
+		 * Diagonal entries are ignored, so the resulting graph contains no
+		 * self-loops. Entries in the lower triangle are not inspected.
+		 *
+		 * @param NV Number of rows and columns in @p adj_matrix.
+		 * @param adj_matrix Input adjacency matrix. A null pointer is permitted only
+		 *        when @p NV is zero.
+		 * @param name Optional graph instance name or source filename.
+		 *
+		 * @pre If @p NV is greater than zero, @p adj_matrix and each of its
+		 *      rows must point to valid arrays containing at least @p NV
+		 *      integer entries.
+		 *
+		 * @note Every nonzero upper-triangle entry is interpreted as an edge.
+		 * @note Construction follows the graph fail-fast policy and terminates if the
+		 *       graph cannot be represented or allocated.
+		 */
+		[[deprecated("Raw adjacency-matrix construction is deprecated.")]]
+		Ugraph(
+			std::size_t NV,
+			const int * const adj_matrix[],
+			std::string name = "") noexcept;
+
+		// Copy and move semantics are allowed.
+		Ugraph(const Ugraph&) = default;
+		Ugraph& operator=(const Ugraph&) = default;
+
+		Ugraph(Ugraph&&) noexcept = default;
+		Ugraph& operator=(Ugraph&&) noexcept = default;
+			
+		~Ugraph() override = default;
+	
 		/////////////
 		// setters and getters
 		
 		/**
-		* @brief Counts the number of edges	(includes self loops)
-		* @param lazy if TRUE (reads value @NE_)
-		*			  if FALSE counts and updates @NE_
-		**/
-		std::size_t num_edges(bool lazy = true)	 override;
+		 * @brief Returns the number of edges of the graph.
+		 *
+		 * Each undirected edge is counted once. Self-loops are not supported.
+		 *
+		 * @param lazy If `true`, a valid cached edge count may be used.
+		 *             If `false`, the count is recomputed from the adjacency
+		 *             matrix and the cache is updated.
+		 * @return Number of edges.
+		 */
+		std::size_t num_edges(bool lazy = true)	const override;
 
 		/**
-		* @brief Counts the number of edges	in an induced subgraph by a set of vertices
-		**/
-		std::size_t num_edges(const VertexBitset&) 	const override;
+		 * @brief Counts the number of edges in the subgraph induced by a vertex set.
+		 *
+		 * Counts all edges whose endpoints both belong to @p vertices.
+		 *
+		 * @param vertices Bitset containing the vertices that induce the subgraph.
+		 * @return Number of edges in the induced subgraph.
+		 */
+		std::size_t num_edges(const vertex_bitset_t& vertices) 	const override;
 
 		/////////////
 		// Basic operations
 
 		/**
-		* @brief density of the undirected graph
-		* @param lazy reads NE_ cached value if TRUE
-		**/
-		double density(bool lazy = true) override;
+		 * @brief Computes the density of the undirected graph.
+		 *
+		 * For an undirected simple graph without self-loops, density is defined as
+		 * \f[
+		 *     d = \frac{|E|}{|V|(|V|-1)/2}.
+		 * \f]
+		 *
+		 * Each undirected edge is counted once.
+		 *
+		 * @param lazy If `true`, num_edges() may use a previously cached edge count.
+		 *             If `false`, the edge count is recomputed from the adjacency
+		 *             matrix.
+		 * @return Graph density in the interval `[0,1]`. Returns `0.0` when the graph
+		 *         contains fewer than two vertices.
+		 */
+		double density(bool lazy = true) const override;
+	
+		/**
+		 * @brief Computes the density of the undirected subgraph induced by
+		 *        @p vertices.
+		 *
+		 * For the selected vertex set \f$S\f$, density is defined as
+		 * \f[
+		 *     d = \frac{|E(S)|}{|S|(|S|-1)/2},
+		 * \f]
+		 * where \f$E(S)\f$ is the set of edges whose endpoints both belong to
+		 * \f$S\f$. Each undirected edge is counted once, and self-loops are excluded.
+		 *
+		 * @param vertices Bitset containing the vertices that induce the subgraph.
+		 * @return Induced-subgraph density in the interval `[0,1]`. Returns `0.0`
+		 *         when fewer than two vertices are selected.
+		 *
+		 * @pre Every set bit in @p vertices must identify a valid graph vertex.
+		 */
+		double density(const vertex_bitset_t& vertices) const override;
 
 		/**
-		* @brief Computes complement graph
-		* @param g output complement graph
-		* @return 0 if success, -1 if error
-		**/
-		int create_complement(Ugraph& g) const;
+		 * @brief Creates the complement of the current undirected graph.
+		 *
+		 * Replaces @p ugcomp with the complement of the current graph. The output
+		 * graph has the same number of vertices, and two distinct vertices are
+		 * adjacent in @p ugcomp if and only if they are not adjacent in the
+		 * current graph.
+		 *
+		 * Self-loops are not created.
+		 *
+		 * @param ugcomp Destination graph receiving the complement.
+		 *
+		 * @pre @p ugcomp must be different from the current graph.
+		 * @note The name of @p ugcomp is cleared.
+		 * @warning Follows the graph initialization error policy if the input and
+		 *          output graphs are the same object.
+		 */
+		void create_complement(Ugraph& ugcomp) const;
 
+		/**
+		 * @brief Creates and returns the complement of the undirected graph.
+		 *
+		 * Constructs the complement of the current graph and returns it by value.
+		 * The returned graph has the same number of vertices as the current graph,
+		 * while its edge set is replaced by the complement edge set.
+		 *
+		 * @return Complement of the current undirected graph.
+		 *
+		 * @note The returned graph has an empty name.
+		 */
+		Ugraph create_complement() const {
+			Ugraph ugcomp(this->num_vertices());
+			this->create_complement(ugcomp);
+			return ugcomp;
+		}
 
 		/////////////
 		// degree-related operations
-		// 
-		// TODO implement bitstring conversions according to the templates properly (3/4/18) - CHECK (02/01/2025)
-	public:
 
 		/**
-		* @brief Computes the number of neighbors of v (deg(v))	*
-		**/
-		int degree(int v) const { return (int)this->adj_[v].count(); }
+		 * @brief Returns the degree of a vertex.
+		 *
+		 * @param v Vertex identifier.
+		 * @return Number of neighbors of @p v.
+		 *
+		 * @pre @p v must be a valid vertex.
+		 */
+		degree_t degree(vertex_t v) const {
+			assert(v >= 0 && v < this->NV_);
+			return this->adj_[static_cast<size_t>(v)].count();
+		}
 
 		/**
-		*  @brief number of neighbors of v in a set of vertices
-		*
-		*		  (specialized for sparse graphs)
-		*
-		*  @param bbn input non-sparse (bit) set of vertices
-		**/
-		int degree(int v, const Bitset& bbn) const;
+		 * @brief Returns the degree of a vertex within an induced subgraph.
+		 *
+		 * Counts the neighbors of @p v that belong to @p vertices.
+		 *
+		 * @param v Vertex identifier.
+		 * @param vertices Bitset defining the induced subgraph.
+		 * @return Number of neighbors of @p v contained in @p vertices.
+		 *
+		 * @pre @p v must be a valid vertex.
+		 */
+		degree_t degree(vertex_t v,
+			const vertex_bitset_t& vertices) const;
+		
+		/**
+		 * @brief Returns the degree of a vertex truncated at an upper bound.
+		 *
+		 * Counts the neighbors of @p v that belong to @p vertices. If the actual
+		 * degree exceeds @p upper_bound, the function returns @p upper_bound.
+		 *
+		 * @param v Vertex identifier.
+		 * @param upper_bound Maximum value returned.
+		 * @param vertices Bitset containing the vertices of interest.
+		 * @return Degree of @p v within @p vertices, truncated at @p upper_bound.
+		 *
+		 * @note This overload is specialized for sparse graph processing.
+		 */
+		degree_t degree(
+			vertex_t v, 
+			degree_t upper_bound,
+			const vertex_bitset_t& vertices) const; 
+				
+		/**
+		 * @brief Returns the number of higher-indexed neighbors of a vertex.
+		 *
+		 * Counts the neighbors of @p v that belong to @p vertices and whose
+		 * vertex identifier is strictly greater than @p v.
+		 *
+		 * This operation is useful, for example, in pivot-based clique
+		 * enumeration strategies.
+		 *
+		 * @param v Vertex identifier.
+		 * @param vertices Bitset containing the vertices of interest.
+		 * @return Number of neighbors of @p v in @p vertices with index greater
+		 *         than @p v.
+		 *
+		 * @pre @p v must be a valid vertex.
+		 */
+		degree_t degree_up(vertex_t v,
+			const vertex_bitset_t& vertices) const;  
 
 		/**
-		*  @brief number of neighbors of v in a sparse encoded set of vertices
-		*
-		*		  (sparse graphs ONLY )
-		*
-		*  @param bbn input sparse (bit) set of vertices
-		*
-		* TODO - currently not implemented, only for sparse graphs (03/03/2025)
-		**/
-		int degree(int v, const BitsetSp& bbs) const;
-
-		/**
-		*  @brief truncated number of neighbors of v in a set of vertices
-		*
-		*		  (specialized for sparse graphs)
-		*
-		*  @param bbn input (bit) set of vertices
-		*  @returns neighbors of v if <= UB, otherwise UB
-		**/
-		int degree(int v, int UB, const Bitset& bbn) const;  //truncated degree (14/2/2016)
-
-		/**
-		*  @brief truncated number of neighbors of v in a sparse enconded set of vertices
-		*
-		*		  (ONLY for sparse graphs)
-		*
-		*  @param bbn input sparse (bit) set of vertices
-		*  @returns neighbors of v if <= UB, otherwise UB
-		*
-		* TODO - currently not implemented, only for sparse graphs (03/03/2025)
-		**/
-		int degree(int v, int UB, const BitsetSp& bbs) const;	//truncated degree  (14/2/2016)
-
-		/**
-		*  @brief number of neighbors of v in a vertex set with higher index than v
-		*
-		*		  (applied as pivotal strategy for clique enumeration)
-		*
-		* @param v: input vertex
-		* @param bbn: input (bit) set of vertices
-		*
-		**/
-		int degree_up(int v, const Bitset& bbn)	const;  //TODO: test (27/4/2016)
-
-		/**
-		* @brief number of neighbors of v that come after v
-		*
-		* @param v: input vertex
-		**/
-		int degree_up(int v) const;
+		 * @brief Returns the number of higher-indexed neighbors of a vertex.
+		 *
+		 * Counts the neighbors of @p v whose vertex identifier is strictly
+		 * greater than @p v.
+		 *
+		 * This operation is useful, for example, in pivot-based clique
+		 * enumeration strategies.
+		 *
+		 * @param v Vertex identifier.
+		 * @return Number of neighbors of @p v with index greater than @p v.
+		 *
+		 * @pre @p v must be a valid vertex.
+		 */
+		degree_t degree_up(vertex_t v) const;
 
 		/**
 		*  @brief returns the maximum degree of the graph,
 		*         i.e., the maximum degree of any of its vertices
 		**/
-		int max_graph_degree() const;
+		degree_t max_degree() const;
 
 		/**
-		*  @brief returns the maximum degree of an induced subgraph
-		*  @param sg input (bit) set of vertices of the subgraph
-		**/
-		template<class VertexSet>
-		int max_subgraph_degree(VertexSet& sg) const;
-
+		 * @brief Returns the maximum degree in an induced subgraph.
+		 *
+		 * Computes the maximum degree among the vertices contained in
+		 * @p vertices, considering only neighbors that also belong to
+		 * @p vertices.
+		 *
+		 * The bitset contents are not modified, but its internal scan cursor
+		 * is used during the computation.
+		 *
+		 * @param vertices Bitset containing the vertices that induce the subgraph.
+		 * @return Maximum degree in the induced subgraph. Returns 0 if
+		 *         @p vertices is empty.
+		 */
+		degree_t max_subgraph_degree(
+			vertex_bitset_t& vertices) const;
 
 		/**
-		* @brief number of edges with a single endpoint in a vertex from @sg
-		* @param sg input (bit) set of vertices
-		**/
-		template<class VertexSet>
-		int outgoing_degree(VertexSet& sg) const;
+		 * @brief Returns the number of edges leaving a vertex set.
+		 *
+		 * Counts the edges with exactly one endpoint in @p vertices and the
+		 * other endpoint outside the set.
+		 *
+		 * The bitset contents are not modified, but its internal scan cursor
+		 * is used during the computation.
+		 *
+		 * @param vertices Bitset containing the vertices of the set.
+		 * @return Number of edges between @p vertices and its complement.
+		 */
+		degree_t outgoing_degree(
+			vertex_bitset_t& vertices) const;
 
 		/**
-		* @brief number of edges with a single endpoint in a vertex from @sg
-		* @param sg input (vector) set of vertices
-		**/
-		int outgoing_degree(std::vector<int> sg) const;
+		 * @brief Returns the number of edges leaving a vertex set.
+		 *
+		 * Counts the edges with exactly one endpoint in @p vertices and the
+		 * other endpoint outside the set.
+		 *
+		 * @param vertices Set of vertices.
+		 * @return Number of edges between @p vertices and its complement.
+		 */
+		degree_t outgoing_degree(
+			const vertex_set_t& vertices) const;
+			
+	public:
 
 		//////////////	
 		// Modifiers
-	public:
 
 		/**
 		* @brief Adds bidirectional edge {v, w}
@@ -207,89 +439,222 @@ namespace bitgraph {
 		* @param v endpoint
 		* @param w endpoint
 		**/
-		void add_edge(int v, int w)	override;
+		void add_edge(vertex_t v, vertex_t w)	override;
 
 		/**
-		* @brief Removes bidirectional edge {v, w}
-		*		 a) if self_loop (v = w), graph remains unchanged
-		*		 b) keeps track of the number of edges
-		* @param v endpoint
-		* @param w endpoint
-		**/
-		void remove_edge(int v, int w) override;
+		 * @brief Removes an undirected edge.
+		 *
+		 * Removes the edge between @p v and @p w if it exists, updating both
+		 * symmetric adjacency entries and the stored number of edges.
+		 *
+		 * If @p v == @p w or the edge does not exist, the graph remains unchanged.
+		 *
+		 * @param v First endpoint of the edge.
+		 * @param w Second endpoint of the edge.
+		 */
+		void remove_edge(vertex_t v, vertex_t w) override;
 
 		/**
-		* @brief generates undirected edges with probability p, exactly.
-		* @param p probability of an edge
-		* @details:
-		* - uses a different more precise model than legacy code which operated edge by edge
-		**/
+		 * @brief Removes all edges incident to a vertex.
+		 *
+		 * Removes every edge having @p v as an endpoint. Since the graph is
+		 * undirected, the corresponding symmetric adjacency entries are also
+		 * removed.
+		 *
+		 * @param v Vertex whose incident edges are removed.
+		 *
+		 * @pre @p v must be a valid vertex.
+		 */
+		void remove_edges(vertex_t v) override;
+
+		/**
+		 * @brief Generates a uniformly random graph with approximately density @p p.
+		 *
+		 * Selects exactly `round(p * C(n,2))` edges uniformly at random from all
+		 * possible undirected edges.
+		 *
+		 * @note This corresponds to a fixed-edge-count random graph model similar
+		 *       to G(n,m), rather than the independent-edge G(n,p) model.
+		 */
 		void gen_random_edges(double p)	override;
 
 		//////////////	
 		// Induced subgraphs
-
-		//TODO	Graph& create_subgraph	(std::size_t first_k, Graph& g) const  override;
+		
+		/**
+		 * @brief Creates the subgraph induced by a given vertex set.
+		 *
+		 * @param[out] graph Output undirected graph, overwritten by the induced subgraph.
+		 * @param[in] vertices Vertices of the original graph to retain.
+		 *
+		 * @pre All vertices must belong to the original graph.
+		 * @pre The output graph must differ from the source graph.
+		 *
+		 * @note Vertices are renumbered consecutively according to
+		 *       the scanning order of the vertex set.
+		 * @note An empty vertex set produces an empty graph.
+		 */
+		void create_subgraph(Ugraph& graph, 
+			const vertex_set_t& vertices) const;
 
 		/**
-		*  @brief Computes the subgraph induced by a set of vertices
-		*  @param lv input set of vertices (std::vector<int>)
-		*  @returns 0 if success, -1 if error
-		**/
-		int create_subgraph(Ugraph& g, VertexList& lv) const;
+		 * @brief Creates the subgraph induced by a vertex set.
+		 *
+		 * @param[in] vertices Vertices of the original graph to retain.
+		 * @return The induced undirected subgraph.
+		 *
+		 * @pre All vertices in the set must belong to the original graph.
+		 *
+		 * @note Vertices are renumbered consecutively according to
+		 *       the iteration order of the vertex set.
+		 */
+		Ugraph create_subgraph(const vertex_set_t& vertices) const {
+			Ugraph induced;
+			this->create_subgraph(induced, vertices);
+			return induced;
+		}
 
 		/**
-		*  @brief Computes the subgraph induced by the neighborhood of a vertex (29/08/21)
-		*
-		*		 Calls create_subgraph(Ugraph& g, VertexList& lv)
-		*
-		*  @param v input vertex which determines the neighborhood
-		*  @returns 0 if success, -1 if error
-		**/
-		int create_subgraph(Ugraph& g, int v) const;
-
-
-		////////////
-		// Write basic operations
-		// Note: Read operations are inherited from the base class Graph (using the Template Pattern)
-	public:
+		 * @brief Creates the subgraph induced by the neighbors of a vertex.
+		 *
+		 * @param[out] graph Output undirected graph, overwritten by the induced subgraph.
+		 * @param[in] v Vertex whose neighborhood defines the subgraph.
+		 *
+		 * @pre v must be a valid vertex of the original graph.
+		 * @pre The output graph must differ from the source graph.
+		 *
+		 * @note The vertex v itself is not included in the induced subgraph.
+		 * @note An isolated vertex produces an empty graph.
+		 */
+		void create_subgraph(Ugraph& graph, vertex_t v) const;
+		
 		/**
-		* @brief writes undirected graph in dimacs format
-		* @param o output stream
-		**/
-		void write_dimacs(std::ostream& filename) override;
+		 * @brief Creates the subgraph induced by the neighbors of a vertex.
+		 *
+		 * @param[in] v Vertex whose neighborhood defines the subgraph.
+		 * @return The induced undirected subgraph.
+		 *
+		 * @pre v must be a valid vertex of the original graph.
+		 *
+		 * @note The vertex v itself is not included in the induced subgraph.
+		 * @note An isolated vertex produces an empty graph.
+		 */
+		Ugraph create_subgraph(vertex_t v) const {
+			Ugraph induced;
+			this->create_subgraph(induced, v);
+			return induced;
+		}
 
 		/**
-		* @brief writes undirected graph in edge list format
-		* @param o output stream
-		**/
-		void write_EDGES(std::ostream& filename) override;
+		 * @brief Creates the subgraph induced by the first k vertices.
+		 *
+		 * @param[in] first_k Number of vertices to retain.
+		 * @return The induced undirected graph.
+		 *
+		 * @pre 0 <= first_k <= NV_.
+		 *
+		 * @note Vertex indices are preserved.
+		 * @note A value of zero produces an empty graph.
+		 */
+		Ugraph create_subgraph_first_k(int first_k) const {
+			Ugraph induced;
+			base_t::create_subgraph_first_k(first_k, induced);
+			return induced;
+		}
+
+		////////////////////////////
+		// Basic read/write operations
+		// Read operations are inherited from Graph<BitsetT>.
+		// Write operations are specialized to preserve undirected graph semantics.
+		
+		/**
+		 * @brief Writes the undirected graph in DIMACS edge format.
+		 *
+		 * @param[out] os Output stream.
+		 *
+		 * @note Vertices are numbered from 1 in the output.
+		 * @note Each undirected edge is written exactly once.
+		 * @note The edge count is recomputed before writing.
+		 * @note Self-loops are not supported.
+		 */
+		void write_dimacs(std::ostream& os) override;
 
 		/**
-		* @brief writes undirected graph in MMX (Matrix Exchange) format
-		* @param o output stream
-		**/
-		void write_mtx(std::ostream& filename);				//MTX format only for Ugraph? (03/01/2025)
+		 * @brief Writes the undirected graph as an edge list.
+		 *
+		 * @param[out] os Output stream.
+		 *
+		 * @note Vertices are numbered from 1 in the output.
+		 * @note Each undirected edge is written exactly once.
+		 * @note Comment lines start with '%'.
+		 * @note Self-loops are not written.
+		 */
+		void write_EDGES(std::ostream& os) override;
+
+		/**
+		 * @brief Writes the undirected graph in Matrix Market coordinate format.
+		 *
+		 * @param[out] os Output stream.
+		 *
+		 * @note Uses the Matrix Market pattern symmetric format.
+		 * @note Vertices are numbered from 1 in the output.
+		 * @note Each undirected edge is written exactly once.
+		 * @note The edge count is recomputed before writing.
+		 * @note Self-loops are not supported.
+		 */
+		void write_mtx(std::ostream& os);
 
 		/////////////////	
 		//	I/O basic operations
-	public:
-
-		std::ostream& print_degrees(std::ostream & = std::cout)	const;
-		std::ostream& print_edges(std::ostream & = std::cout, bool eofl = false) override;
-
-		std::ostream& print_edges(VertexBitset& bbsg, std::ostream&);
-		std::ostream& print_adjacency_matrix(std::ostream & = std::cout) const;
-
-		//////////////	
-		// deleted methods legacy - CHECK	
-		virtual void remove_vertices(const Bitset& bbn) override = delete;				//commented out implementation - EXPERIMENTAL
+	
+		/**
+		 * @brief Prints the degree of each vertex to an output stream.
+		 *
+		 * @param[out] os Output stream (std::cout by default).
+		 * @return Reference to the output stream.
+		 *
+		 * @note Does not modify the graph.
+		 */
+		std::ostream& print_degrees(
+			std::ostream & = std::cout)	const;
 
 		/**
-		*  @brief enlarges the graph with a new vertex (provided its neighborhood)
-		*		  TODO - code removed, BUGGY (should not be called , unit tests DISABLED)
-		**/
-		int add_vertex(bitset_type* neigh = nullptr) = delete;
+		 * @brief Prints the edges of the undirected graph to an output stream.
+		 *
+		 * @param[out] os Output stream (std::cout by default).
+		 * @param[in] trailing_newline Whether to append a newline.
+		 * @return Reference to the output stream.
+		 *
+		 * @note Each undirected edge is printed exactly once.
+		 * @note Does not modify the graph.
+		 */
+		std::ostream& print_edges(std::ostream & = std::cout,
+			bool trailing_newline = false) override;
+
+		/**
+		 * @brief Prints the edges associated with a given vertex set.
+		 *
+		 * @param[in] vertices Bitset specifying the vertices to consider.
+		 * @param[out] os Output stream.
+		 * @return Reference to the output stream.
+		 *
+		 * @note Each undirected edge is printed exactly once.
+		 * @note The vertex bitset may have its scan state modified.
+		 */
+		std::ostream& print_edges(vertex_bitset_t& vertices,
+			std::ostream&);
+
+		/**
+		 * @brief Prints the adjacency matrix of the graph.
+		 *
+		 * @param[out] os Output stream (std::cout by default).
+		 * @return Reference to the output stream.
+		 *
+		 * @note Does not modify the graph.
+		 */
+		std::ostream& print_adjacency_matrix(
+			std::ostream & = std::cout) const;
+				
 	};
 
 }//end namespace bitgraph
@@ -297,557 +662,6 @@ namespace bitgraph {
 /////////////////////////////////////////////////////////////
 // Necessary implementation of template methods in header file
 
-namespace bitgraph {
-	
-	template<class BitsetT>
-	template<class VertexSet>
-	inline
-		int Ugraph<BitsetT>::max_subgraph_degree(VertexSet& sg) const {
+#include "graph/detail/simple_ugraph_imp.h"
 
-		int max_degree = 0;
-
-		int v = BBObject::noBit;
-		if (sg.init_scan(bbo::NON_DESTRUCTIVE) != BBObject::noBit) {
-			while ((v = sg.next_bit()) != BBObject::noBit) {
-
-				//compute max_degree circumscribed to subgraph
-				if (max_degree < degree(v, sg)) {
-					max_degree = degree(v, sg);
-				}
-			}
-		}
-
-		return max_degree;
-	}
-
-	template<class BitsetT>
-	template<class VertexSet>
-	inline int Ugraph<BitsetT>::outgoing_degree(VertexSet& sg) const
-	{
-		//number of edges
-		int nE = 0;
-
-		//scan declaration
-		int retVal = sg.init_scan(bbo::NON_DESTRUCTIVE);
-
-		////////////////////////
-		assert(retVal != BBObject::noBit);
-		///////////////////////
-
-		//main loop
-		int v = BBObject::noBit;
-		while ((v = sg.next_bit()) != BBObject::noBit) {
-			for (auto nBB = 0; nBB < this->NBB_; ++nBB) {
-				BITBOARD bb = this->neighbors(v).block(nBB) & ~sg.block(nBB);		//neighbors of v NOT in sg
-				nE += bblock::popc64(bb);
-			}
-		}
-
-		return nE;
-	}
-
-	template<class BitsetT>
-	inline int Ugraph<BitsetT>::outgoing_degree(std::vector<int> sg) const
-	{
-		BitsetT bbsg{ this->size(), sg };
-		return (outgoing_degree(bbsg));
-	}
-
-
-	template<class BitsetT>
-	inline
-	ostream& Ugraph<BitsetT>::print_edges(VertexBitset& bbsg, std::ostream& o)
-	{
-		for (int i = 0; i < this->NV_ - 1; ++i) {
-			if (!bbsg.is_bit(i)) continue;
-			for (int j = i + 1; j < this->NV_; ++j) {
-				if (!bbsg.is_bit(j)) continue;
-				if (this->is_edge(i, j)) {
-					o << "[" << i << "]" << "--" << "[" << j << "]" << endl;
-				}
-			}
-		}
-
-		return o;
-	}
-	
-	template<class BitsetT>
-	inline
-		Ugraph<BitsetT> Ugraph<BitsetT>::make_triangle()
-	{
-		Ugraph<BitsetT> tri(3);
-		tri.add_edge(0, 1);
-		tri.add_edge(0, 2);
-		tri.add_edge(1, 2);
-
-		return tri;
-	}
-
-	template<class BitsetT>
-	inline
-		Ugraph<BitsetT> Ugraph<BitsetT>::make_clique(std::size_t NV)
-	{
-		Ugraph<BitsetT> clique(NV);
-
-		//sets the adjacency matrix to ONE except for the main diagonal
-		const auto nV = static_cast<int>(NV);
-		for (int v = 0; v < nV; ++v) {
-			clique.neighbors(v).set_bit(0, nV - 1);
-			clique.neighbors(v).erase_bit(v);
-		}
-
-		return clique;
-	}
-
-	template<class BitsetT>
-	inline
-		Ugraph<BitsetT> Ugraph<BitsetT>::make_cycle(std::size_t NV)
-	{
-		Ugraph<BitsetT> cycle(NV);
-
-		const auto nV = static_cast<int>(NV);
-		for (int v = 0; v < nV - 1; ++v) {
-			cycle.add_edge(v, v + 1);
-		}
-		cycle.add_edge(nV - 1, 0);
-
-		return cycle;
-	}
-
-	template<class BitsetT>
-	inline
-		Ugraph<BitsetT> Ugraph<BitsetT>::make_star(std::size_t NV) {
-		Ugraph<BitsetT> star(NV);
-
-		const auto nV = static_cast<int>(NV);
-		for (int v = 1; v < nV; ++v) {
-			star.add_edge(0, v);
-		}
-
-		return star;
-	}
-
-
-	template <class BitsetT>
-	inline
-		Ugraph<BitsetT>::Ugraph(std::size_t NV, int* adj[], string name) {
-
-		this->reset(NV);
-		this->set_name(name);
-		
-		for (int i = 0; i < this->NV_ - 1; ++i) {
-			for (int j = i + 1; j < this->NV_; ++j) {
-				if (adj[i][j] == 1) {
-					add_edge(i, j);
-				}
-			}
-		}
-	}
-
-	template<class BitsetT>
-	inline
-		std::size_t Ugraph<BitsetT>::num_edges(bool lazy ) {
-
-		if (!lazy || this->NE_ == 0) {
-			this->NE_ = 0;
-
-			//adds all edges and divides by 2 for efficiency - checks for self loops	
-			for (int i = 0; i < this->NV_; ++i) {
-				this->NE_ += this->adj_[i].count();
-			}
-
-			//////////////////////////////
-			if (this->NE_ % 2 != 0) {
-				LOG_ERROR("odd number of edges found in simple undirected graph - Ugraph<BitsetT>::num_edges");
-				LOG_ERROR("exiting...");
-				exit(-1);
-			}
-			//////////////////////////////
-
-			this->NE_ /= 2;						//MUST be even at this point			
-		}
-
-		return this->NE_;
-	}
-
-	template<class BitsetT>
-	inline
-		std::size_t Ugraph<BitsetT>::num_edges(const VertexBitset& bbn) const {
-		std::size_t NE = 0;
-
-		//reads only the upper triangle of the adjacency matrix
-		for (int i = 0; i < this->NV_ - 1; ++i) {
-			if (bbn.is_bit(i)) {
-				for (int j = i + 1; j < this->NV_; ++j) {
-					if (bbn.is_bit(j)) {
-						if (this->adj_[i].is_bit(j)) { ++NE; }
-					}
-				}
-			}
-		}
-
-		return NE;
-	}
-
-	template<class BitsetT>
-	inline
-		int Ugraph<BitsetT>::degree(int v, const Bitset& bbn) const {
-
-		int ndeg = 0;
-		for (auto i = 0; i < this->NBB_; i++) {
-			ndeg += bblock::popc64(this->adj_[v].block(i) & bbn.block(i));
-		}
-
-		return ndeg;
-	}
-
-	template<class BitsetT>
-	inline
-		int Ugraph<BitsetT>::degree(int v, const BitsetSp& bbs)	const {
-		LOG_ERROR("function not yet implemented, should not be called - Ugraph<BitsetT>::degree");
-		LOG_ERROR("exiting...");
-		std::exit(EXIT_FAILURE);
-	}
-
-
-	template<class BitsetT>
-	inline
-		void Ugraph<BitsetT>::add_edge(int v, int w) {
-
-		if (v != w) {
-			this->adj_[v].set_bit(w);
-			this->adj_[w].set_bit(v);
-			this->NE_++;
-		}
-	}
-
-	template<class BitsetT>
-	inline
-		void Ugraph<BitsetT>::remove_edge(int v, int w) {
-		if (v != w) {
-			this->adj_[v].erase_bit(w);
-			this->adj_[w].erase_bit(v);
-			this->NE_--;
-		}
-	}
-
-	template<class BitsetT>
-	inline
-		void Ugraph<BitsetT>::gen_random_edges(double p) {
-
-		//removes all edges
-		this->remove_edges();
-
-		using edge_t = std::pair<int, int>;
-		std::vector<edge_t> edges;
-		edges.reserve(this->NV_ * (this->NV_ - 1) / 2);
-		for (int i = 0; i < this->NV_ - 1; ++i) {
-			for (auto j = i + 1; j < this->NV_; ++j) {
-				edges.emplace_back(i, j);
-			}
-		}
-
-		//rounds edges to the nearest integer value
-		const std::size_t N = edges.size();
-		std::size_t M = static_cast<std::size_t>(std::llround(p * N)); 
-		if (M > N) { M = N; };
-
-		std::shuffle(edges.begin(), edges.end(), bitgraph::com::_rand::g_iugen.engine() /*std::mt19937_64(std::random_device{}())*/);
-
-		//take the first M edges
-		for (std::size_t i = 0; i < M; ++i) {
-			add_edge(edges[i].first, edges[i].second);
-		}
-
-	}
-
-	template<class BitsetT>
-	inline
-		int Ugraph<BitsetT>::max_graph_degree() const {
-
-		int max_degree = 0, temp = 0;
-
-		for (int i = 0; i < this->NV_; ++i) {
-			temp = degree(i);
-			if (temp > max_degree)
-				max_degree = temp;
-		}
-
-		return max_degree;
-	}
-
-	template<class BitsetT>
-	inline
-		double Ugraph<BitsetT>::density(bool lazy) {
-
-		BITBOARD max_edges = this->NV_;
-		max_edges *= (max_edges - 1);
-		return (2 * num_edges(lazy) / static_cast<double> (max_edges));
-	}
-
-	template<class BitsetT>
-	inline
-		ostream& Ugraph<BitsetT>::print_degrees(std::ostream& o) const {
-		for (int i = 0; i < this->NV_; ++i) {
-			o << "deg(" << i << ")" << ":" << degree(i) << " ";
-		}
-		return o;
-	}
-
-	template<class BitsetT>
-	inline
-		ostream& Ugraph<BitsetT>::print_edges(std::ostream& o, bool eofl) {
-
-		for (int i = 0; i < this->NV_ - 1; ++i) {
-			for (int j = i + 1; j < this->NV_; ++j) {
-
-				if (this->is_edge(i, j)) {
-					o << "[" << i << "]" << "--" << "[" << j << "]" << endl;
-				}
-			}
-		}
-
-		if (eofl) { o << std::endl; }
-		return o;
-	}
-
-	template<class BitsetT>
-	inline
-		ostream& Ugraph<BitsetT>::print_adjacency_matrix(std::ostream& o) const
-	{
-		for (int i = 0; i < this->NV_; ++i) {
-			for (int j = 0; j < this->NV_; ++j) {
-				if (this->is_edge(i, j)) {
-					o << "1";
-				}
-				else {
-					o << "0";
-				}
-			}
-			o << endl;
-		}
-		return o;
-	}
-
-
-	template<class BitsetT>
-	inline
-		void Ugraph<BitsetT>::write_dimacs(ostream& o) {
-
-		//timestamp comment 
-		o << "c File written by GRAPH:" << PrecisionTimer::local_timestamp() << endl;
-
-		//name comment
-		if (!this->name_.empty())
-			o << "c " << this->name_.c_str() << endl;
-
-		//dimacs header
-		o << "p edge " << this->NV_ << " " << num_edges(false /* recompute */) << endl << endl;
-
-		//bidirectional edges (1 based in dimacs)
-		for (int v = 0; v < this->NV_ - 1; ++v) {
-			for (int w = v + 1; w < this->NV_; ++w) {
-				if (this->is_edge(v, w)) {										//O(log) for sparse graphs: specialize
-					o << "e " << v + 1 << " " << w + 1 << endl;
-				}
-			}
-		}
-	}
-
-	template<class BitsetT>
-	inline
-		void  Ugraph<BitsetT>::write_EDGES(ostream& o) {
-
-		//timestamp comment
-		o << "% File written by GRAPH:" << PrecisionTimer::local_timestamp() << endl;
-
-		//name coment
-		if (!this->name_.empty())
-			o << "% " << this->name_.c_str() << endl;
-
-		//write edges - 1 based vertex notation
-		for (int v = 0; v < this->NV_ - 1; ++v) {
-			for (int w = v + 1; w < this->NV_; ++w) {
-				if (this->is_edge(v, w)) {							//O(log) for sparse graphs: specialize
-					o << v + 1 << " " << w + 1 << endl;
-				}
-			}
-		}
-	}
-
-	template<class BitsetT>
-	inline
-		void Ugraph<BitsetT>::write_mtx(ostream& o) {
-
-		//header comment
-		o << "%%MatrixMarket matrix coordinate pattern symmetric" << endl;
-
-		//timestamp comment
-		o << "% File written by GRAPH:" << PrecisionTimer::local_timestamp() << endl;
-
-		//name comment
-		if (!this->name_.empty())
-			o << "% " << this->name_.c_str() << endl;
-
-		//number of vertices and edges
-		this->NE_ = 0;																			//eliminates lazy evaluation of edge count 
-		o << this->NV_ << " " << this->NV_ << " " << num_edges() << endl;
-
-		//writes edges 1-based vertex notation
-		for (int v = 0; v < this->NV_ - 1; ++v) {
-			for (int w = v + 1; w < this->NV_; ++w) {
-				if (this->is_edge(v, w)) {														//O(log) for sparse graphs: specialize
-					o << v + 1 << " " << w + 1 << endl;
-				}
-			}
-		}
-	}
-
-	template<class BitsetT>
-	inline
-		int Ugraph<BitsetT>::degree_up(int v, const Bitset& bbn) const {
-
-		int nDeg = 0, nBB = WDIV(v);
-
-		for (int i = nBB + 1; i < this->NBB_; ++i) {
-			nDeg += bblock::popc64(this->adj_[v].block(i) & bbn.block(i));
-		}
-
-		//truncate the bitblock of v
-		nDeg += bblock::popc64(bblock::MASK_1(WMOD(v) + 1, 63) &
-			this->adj_[v].block(nBB) & bbn.block(nBB)
-		);
-
-		return nDeg;
-	}
-
-	template<class BitsetT>
-	inline
-		int Ugraph<BitsetT>::degree_up(int v) const
-	{
-		int nDeg = 0, nBB = WDIV(v);
-
-		for (int i = nBB + 1; i < this->NBB_; ++i) {
-			nDeg += bblock::popc64(this->adj_[v].block(i));
-		}
-
-		//truncate the bitblock of v
-		nDeg += bblock::popc64(bblock::MASK_1(WMOD(v) + 1, 63) &
-			this->adj_[v].block(nBB));
-
-		return nDeg;
-	}
-
-	template<class BitsetT>
-	inline
-		int Ugraph<BitsetT>::degree(int v, int UB, const Bitset& bbn) const {
-
-		int nDeg = 0;
-		for (int i = 0; i < this->NBB_; ++i) {
-
-			nDeg += bblock::popc64(this->adj_[v].block(i) & bbn.block(i));
-
-			if (nDeg >= UB) { return UB; }
-		}
-
-		return nDeg;
-	}
-
-	template<class BitsetT>
-	int Ugraph<BitsetT>::degree(int v, int UB, const BitsetSp& bbn) const {
-		LOG_ERROR("function not yet implemented, should not be called - Ugraph<BitsetT>::degree");
-		LOG_ERROR("exiting...");
-		std::exit(EXIT_FAILURE);
-	}
-
-
-	template<class BitsetT>
-	int Ugraph<BitsetT>::create_complement(Ugraph& ug) const {
-
-		//resets ug with new allocation
-		ug.reset(this->NV_);
-			
-		for (int i = 0; i < this->NV_ - 1; ++i) {
-			for (int j = i + 1; j < this->NV_; ++j) {
-
-				if (!this->adj_[i].is_bit(j)) {
-					ug.add_edge(i, j);
-				}
-
-			}
-		}
-
-		return 0;
-	}
-
-
-	template<class BitsetT>
-	int Ugraph<BitsetT>::create_subgraph(Ugraph& ug, int v) const
-	{
-		vector<int> vnn;
-		this->neighbors(v).extract(vnn);
-
-		return create_subgraph(ug, vnn);
-	}
-
-	template<class BitsetT>
-	int Ugraph<BitsetT>::create_subgraph(Ugraph& ug, VertexList& lv) const
-	{
-		if (lv.empty()) {
-			LOG_ERROR("empty set found while creating an induced graph - Ugraph<BitsetT>::create_induced");
-			return -1;
-		}
-				
-		///////////////
-		ug.reset(lv.size());
-		///////////////
-		
-		//add appropiate edges
-		const int nV = static_cast<int>(lv.size());
-		for (int i = 0; i < nV - 1; i++) {
-			for (int j = i + 1; j < nV; j++) {
-
-				if (this->is_edge(lv[i], lv[j])) {
-					ug.add_edge(i, j);						//adds bidirected edge
-				}
-			}
-		}
-
-		return 0;
-	}
-
-}//end namespace bitgraph
-
-
-
-#endif // end  __SIMPLE_UGRAPH_H__
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+#endif // BITGRAPH_GRAPH_SIMPLE_UGRAPH_H

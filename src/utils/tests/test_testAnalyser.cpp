@@ -6,6 +6,7 @@
  * @author pss
  * 
  * TODO - change Result class to new class infoCLQ	
+ * TODO - Currently deprecated, all tests disabled
  */
 
 #include "gtest/gtest.h"
@@ -19,7 +20,7 @@ using namespace std;
 #define NUM_ALG	2
 #define INSTANCE_NAME	"graph"
 
-TEST(TestAnalyser, basic){
+TEST(TestAnalyser, DISABLED_basic){
 		
 	TestAnalyser ta;
 	for(auto r = 0; r < NUM_REP; ++r){
@@ -68,7 +69,7 @@ TEST(TestAnalyser, basic){
 	////////////////////
 }
 
-TEST(TestAnalyser, info){
+TEST(TestAnalyser, DISABLED_info){
 		
 	TestAnalyser ta;
 	for(int r = 0; r < NUM_REP; ++r){
@@ -106,7 +107,7 @@ TEST(TestAnalyser, info){
 	
 }
 
-TEST(TestAnalyser, all_fail){
+TEST(TestAnalyser, DISABLED_all_fail){
 		
 	TestAnalyser ta;
 	for(auto r = 0; r < NUM_REP; ++r){
@@ -139,7 +140,7 @@ TEST(TestAnalyser, all_fail){
 	
 }
 
-TEST(TestAnalyser, only_one_test_and_fails){
+TEST(TestAnalyser, DISABLED_only_one_test_and_fails){
 		
 	TestAnalyser ta;
 	for(auto r = 0; r < 1; ++r){			//one test only

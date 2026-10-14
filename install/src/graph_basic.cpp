@@ -44,7 +44,7 @@ int main() {
 	cout << "****************************" << endl;
 
 	//unit weighted graph with 10 vertices and vertex weights set at  3.0
-	bitgraph::ugraph_w ugw(10, 3.0);
+	bitgraph::ugraph_vw ugw(10, 3.0);
 
 	ugw.add_edge(0, 1);
 	ugw.add_edge(0, 2);
@@ -54,13 +54,13 @@ int main() {
 
 	cout << "****************************" << endl;
 
-	//edge-weighted graph with 10 vertices, no edges and vertex weights set at 8.0
-	bitgraph::ugraph_ew ugew(10, 8.0);
+	//edge-weighted graph with 10 vertices and no edges; each edge carries its own weight
+	bitgraph::ugraph_ew ugew(10);
 
 	ugew.add_edge(0, 1, 4.5);
 	ugew.add_edge(0, 2, 5.3);
 	ugew.print_data();
-	ugew.print_weights();
+	ugew.print_edges();		//edges with their weights
 
 	cout << "****************************" << endl;
 

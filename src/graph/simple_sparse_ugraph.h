@@ -1,20 +1,33 @@
 /**
-  * @file simple_sparse_ugraph.h
-  * @brief contains specializations the class Ugraph for sparse graphs
-  *
-  * @created 03/01/2025 
-  * @last_update 26/01/2025
-  * @author pss
-  *
-  * This code is part of the GRAPH 1.0 C++ library
-  *
-  **/
+ * @file simple_sparse_ugraph.h
+ * @brief Sparse-graph specializations of the generic Ugraph implementation.
+ *
+ * @details
+ * This header defines the Ugraph<BBScanSp> specializations used by the
+ * sparse undirected-graph facade. The specializations provide sparse-aware
+ * edge counting and degree computations while preserving the public graph
+ * interface supplied by simple_ugraph.h.
+ *
+ * The implementation operates on sparse BITSCAN adjacency rows and counts
+ * undirected edges according to the graph's upper-triangular convention.
+ * It is intended to be included as part of the graph implementation rather
+ * than used as a standalone public interface.
+ *
+ * This code is part of the GRAPH 1.0 C++ library.
+ *
+ * @author pss
+ * @created 03/01/2025
+ * @last_update 26/01/2025
+ *
+ * @see simple_ugraph.h
+ * @see ../bitscan/bbscan_sparse.h
+ */
 
 #ifndef __SIMPLE_SPARSE_UGRAPH_H__
 #define __SIMPLE_SPARSE_UGRAPH_H__
 
 #include "simple_ugraph.h"
-#include "utils/prec_timer.h"
+#include "utils/precise_timer.h"
 #include <iostream>
 #include <string>
 #include <vector>
@@ -31,16 +44,21 @@ namespace bitgraph {
 
 	template<>
 	inline
-	std::size_t Ugraph<BBScanSp>::num_edges(bool lazy) {
+	std::size_t Ugraph<BBScanSp>::num_edges(bool lazy) const
+	{
 
-		if (lazy || this->NE_ == 0) {
+		if (lazy || !this->edge_count_valid_ ) {
 
 			this->NE_ = 0;
 			for (int i = 0; i < this->NV_ - 1; i++) {
 
-				//popuation count from i + 1 onwards
+				// Count only neighbors with a greater vertex index so that each
+				// undirected edge is counted exactly once.
 				this->NE_ += adj_[i].count(i + 1, -1);
 			}
+
+			// NE_ now matches the current adjacency matrix.
+			this->edge_count_valid_ = true;
 		}
 
 		return this->NE_;
@@ -49,9 +67,12 @@ namespace bitgraph {
 
 	template<>
 	inline
-	int Ugraph<BBScanSp>::degree_up(int v) const
+	degree_t Ugraph<BBScanSp>::degree_up(vertex_t v) const
 	{
-		int nDeg = 0, nBB = WDIV(v);
+		assert(v >= 0 && v < this->NV_);
+
+		degree_t degree = 0;
+		auto nBB = WDIV(v);
 
 		//find the bitblock of v
 		auto it = adj_[v].cbegin();
@@ -65,97 +86,103 @@ namespace bitgraph {
 		}
 
 		//truncate the bitblock of v and count the number of neighbors
-		nDeg += bblock::popc64(bblock::MASK_1(WMOD(v) + 1, 63) & it->bb_);
+		degree += bblock::popc64(
+			bblock::MASK_1(WMOD(v) + 1, 63) &
+			it->bb_);
 
-		//add the rest of neighbours in the bitblocks that follow
+		//add the rest of neighbors in the bitblocks that follow
 		++it;
 		for (; it != adj_[v].cend(); ++it) {
-			nDeg += bblock::popc64(it->bb_);
+			degree += bblock::popc64(it->bb_);
 		}
 
-		return nDeg;
+		return degree;
 	}
 
 	template<>
 	inline
-	int Ugraph<BBScanSp>::degree(int v) const 
+	degree_t Ugraph<BBScanSp>::degree(vertex_t v) const 
 	{
-		if (Graph<sparse_bitarray>::adj_[v].is_empty()) return 0;
+		assert(v >= 0 && v < this->NV_);
+
+		if (Graph<sparse_bitarray>::adj_[v].is_empty()) {
+			return 0;
+		}
+
 		return Graph<sparse_bitarray>::adj_[v].count();
 	}
 
 	template<>
 	inline
-	int Ugraph<BBScanSp>::degree(int v, const Bitset& bbn) const
+	degree_t Ugraph<BBScanSp>::degree(
+		vertex_t v, 
+		const BBScanSp& vertices) const
 	{
-		int ndeg = 0;
-		for (auto it = adj_[v].cbegin(); it != adj_[v].cend(); ++it) {
-			ndeg += bblock::popc64(it->bb_ & bbn.block(it->idx_));
-		}
-		return ndeg;
-	}
+		assert(v >= 0 && v < this->NV_);
 
-	template<>
-	inline
-	int Ugraph<BBScanSp>::degree(int v, const BitsetSp& bbs) const 
-	{
-		int ndeg = 0;
-		auto itv = adj_[v].cbegin();
-		auto itbb = bbs.cbegin();
+		degree_t degree = 0;
 
-		while (itv != adj_[v].cend() && itbb != bbs.cend()) {
+		auto it_adj = adj_[v].cbegin();
+		auto it_vertices = vertices.cbegin();
 
-			if (itv->idx_ < itbb->idx_) {
-				++itv;
+		while (it_adj != adj_[v].cend() &&
+				it_vertices != vertices.cend())
+		{
+			if (it_adj->idx_ < it_vertices->idx_) {
+				++it_adj;
 			}
-			else if (itv->idx_ > itbb->idx_) {
-				++itbb;
+			else if (it_adj->idx_ > it_vertices->idx_) {
+				++it_vertices;
 			}
 			else { //same index
-				ndeg += bblock::popc64(itv->bb_ & itbb->bb_);
-				++itv; ++itbb;
+				degree += bblock::popc64(
+					it_adj->bb_ & it_vertices->bb_);
+				
+				++it_adj;
+				++it_vertices;
 			}
 		}
-		return ndeg;
+		return degree;
 	}
 
+	
 	template<>
 	inline
-	int Ugraph<BBScanSp>::degree(int v, int UB, const Bitset& bbn) const
+	degree_t Ugraph<BBScanSp>::degree(
+		vertex_t v, 
+		degree_t upper_bound,
+		const BBScanSp& vertices) const
 	{
-		int ndeg = 0;
-		for (auto it = adj_[v].cbegin(); it != adj_[v].cend(); ++it) {
-			ndeg += bblock::popc64(it->bb_ & bbn.block(it->idx_));
-			if (ndeg >= UB) return UB;
+		assert(v >= 0 && v < this->NV_);
+
+		degree_t degree = 0;
+
+		auto it_adj = adj_[v].cbegin();
+		auto it_vertices = vertices.cbegin();
+
+		while (it_adj != this->adj_[v].cend() &&
+			it_vertices != vertices.cend())
+		{
+			if (it_adj->idx_ < it_vertices->idx_) {
+				++it_adj;
+			}
+			else if (it_adj->idx_ > it_vertices->idx_) {
+				++it_vertices;
+			}
+			else {
+				degree += bblock::popc64(
+					it_adj->bb_ & it_vertices->bb_);
+
+				if (degree >= upper_bound) {
+					return upper_bound;
+				}
+
+				++it_adj;
+				++it_vertices;
+			}
 		}
 
-		return ndeg;
-	}
-
-	template<>
-	inline
-	int Ugraph<BBScanSp>::degree(int v, int UB, const BitsetSp& bbs) const
-	{
-		int ndeg = 0;
-		auto itv = adj_[v].cbegin();
-		auto itbb = bbs.cbegin();
-
-		while (itv != adj_[v].cend() && itbb != bbs.cend()) {
-
-			if (itv->idx_ < itbb->idx_) {
-				++itv;
-			}
-			else if (itv->idx_ > itbb->idx_) {
-				++itbb;
-			}
-			else { //same index
-				ndeg += bblock::popc64(itv->bb_ & itbb->bb_);
-				if (ndeg >= UB) return UB;
-				++itv; ++itbb;
-			}
-		}
-
-		return ndeg;
+		return degree;
 	}
 	
 	template<>

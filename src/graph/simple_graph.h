@@ -1,7 +1,7 @@
  /**
   * @file simple_graph.h
   *
-  * @brief Generic graph container for simple (unweighted) graphs.
+  * @brief Generic graph container for simple (unweighted, sparse and non-sparse) graphs.
   *
   * This header defines the primary template `Graph<BitsetT>`, which represents
   * a simple graph using a bitset-based adjacency structure.
@@ -23,41 +23,38 @@
   * Higher-level graph abstractions (e.g. undirected graphs, weighted graphs,
   * and facade graph types) are built on top of this class.
   *
-  *
   * @note
   * This header is a core dependency of most BitGraph components and should be
   * included before facade or algorithm-level headers.
   *
-  * @author
-  * Pablo San Segundo (pss)
+  * @author Pablo San Segundo (pss)
   *
-  * @date
-  * Created: 17/06/2010
-  * Last update: 06/01/2025
+  * @date Created: 17/06/2010
+  * @date Last update: 20/09/2026
   */
 
+#ifndef BITSCAN_GRAPH_SIMPLE_GRAPH_H
+#define BITSCAN_GRAPH_SIMPLE_GRAPH_H
 
-#ifndef __SIMPLE_GRAPH_H__
-#define __SIMPLE_GRAPH_H__
-
-#include "bitscan/bitscan.h"					//dependency to BITSCAN lib				
-#include "formats/dimacs_format.h"
-#include "formats/mmio.h"
-#include "formats/edges_format.h"
-#include "formats/mmx_format.h"
+#include "bitscan/bitscan.h"	
 #include "utils/logger.h"
-#include "utils/prec_timer.h"
+#include "utils/precise_timer.h"
+#include "graph_types.h"
+#include "graph/formats/detail/dimacs_format.h"
+#include "graph/formats/detail/edges_format.h"
+#include "graph/formats/detail/matrix_market_format.h"
 
 #include <iostream>
-#include <iomanip>
-#include <fstream>
 #include <string>
 #include <vector>
+#include <iomanip>  
 
 namespace bitgraph {
 	
 	// forward declaration
-	namespace _impl { class GraphConversion;}
+	namespace detail { 
+		class GraphConversion;
+	}
 
 	//////////////////
 	//
@@ -69,30 +66,78 @@ namespace bitgraph {
 
 	template<class BitsetT = BBScan>
 	class Graph {
-
-		//filter out invalid types
+				
 		static_assert(std::is_same<BBScan, BitsetT>::value ||
 							std::is_same<BBScanSp, BitsetT>::value, "is not a valid Graph type");
 
-		friend class _impl::GraphConversion;
+		friend class detail::GraphConversion;
 
 	public:
 						
-		using bitset_type = BitsetT;				// basic type (a type of bitset)
-		using VertexBitset = bitset_type;			// alias for semantic type
+		using bitset_type = BitsetT;				
+		using vertex_set_type = bitset_type;
+
+		// aliases for backward compatibility
+		using vertex_bitset_t = vertex_set_type;
+		using VertexBitset = vertex_bitset_t;		
 		
 		/////////////			
 		//construction / destruction
-		Graph() noexcept;													// creates empty graph
-		explicit Graph(std::size_t NV);										// creates graph with n=|V| and m=0 	
-		explicit Graph(std::string filename);								// creates graph from file		
-		Graph(std::size_t n, int* adj[], std::string filename = "");		// old-style adjacency matrix
 
-		//move and copy semantics allowed
-		Graph(const Graph& g) = default;
-		Graph& operator = (const Graph& g) = default;
-		Graph(Graph&& g) noexcept = default;
-		Graph& operator = (Graph&& g) noexcept = default;
+		  /** @brief Constructs an empty graph. */
+		Graph() noexcept;													// creates empty graph
+
+		/**
+	    * @brief Constructs a graph containing @p NV isolated vertices
+	    *		(n = NV and m = 0)
+	    *
+	    * @note This constructor follows a fail-fast policy and terminates the program
+		*       if graph initialization fails.
+	    */
+		explicit Graph(std::size_t NV) noexcept
+		{
+			reset(NV);
+		}
+			
+		/**
+		* @brief Constructs a graph by reading it from @p filename.
+		*
+		* @note This constructor follows a fail-fast policy and terminates the program
+		*       if graph cannot be parsed.
+		*/
+		explicit Graph(std::string filename) noexcept
+		{
+			reset(std::move(filename));
+		}
+		
+		/**
+		 * @brief Constructs a graph from an old-style adjacency matrix.
+		 *
+		 * Every nonzero entry `adjacency[v][w]` represents the directed edge `(v,w)`.
+		 * For an undirected graph, the input matrix is expected to be symmetric.
+		 *
+		 * @param NV Number of rows and columns in @p adjacency.
+		 * @param adjacency Input adjacency matrix.
+		 * @param filename Optional graph instance name or source filename.
+		 *
+		 * @pre If @p NV is greater than zero, @p adjacency and each of its
+		 *      rows must be valid.
+		 *
+		 * @note This constructor follows a fail-fast policy and terminates the program
+		 *       if graph initialization fails.
+		 */
+		[[deprecated("Raw adjacency-matrix construction is deprecated.")]]
+		Graph(
+			std::size_t NV,
+			const int * const adj[],
+			std::string name = "") noexcept;		
+
+		// Copy and move semantics are supported.
+		Graph(const Graph&) = default;
+		Graph& operator=(const Graph&) = default;
+
+		Graph(Graph&&) noexcept = default;
+		Graph& operator=(Graph&&) noexcept = default;
 
 		virtual	~Graph() = default;
 
@@ -100,15 +145,49 @@ namespace bitgraph {
 		// setters and getters
 
 		/**
-		* @brief Sets instance name.
-		* @param instance name of instance
-		* @details: Separates path and instance name internally (if applicable)
-		**/
-		void set_name(std::string instance);
-		std::string name() const noexcept { return name_; }
+		 * @brief Sets the graph instance name and extracts its directory path.
+		 *
+		 * If @p name_or_path contains a directory separator, the final component is
+		 * stored as the instance name and the preceding portion, including the final
+		 * separator, is stored as the path. Both Unix (`/`) and Windows (`\`)
+		 * separators are recognized.
+		 *
+		 * If no separator is present, the complete argument becomes the instance name
+		 * and the stored path is cleared.
+		 *
+		 * @param name_or_path Instance name or complete file path.
+		 */
+		void set_name(std::string name_or_path);
 
-		void set_path(std::string path_name) { path_ = std::move(path_name); }
-		std::string path() const noexcept { return path_; }
+		/**
+		 * @brief Returns the graph instance name without its directory path.
+		 *
+		 * @return Constant reference to the stored instance name.
+		 *
+		 * @note The returned reference remains valid until the graph name is modified
+		 *       or the graph object is destroyed.
+		 */
+		const std::string& name() const noexcept { return name_; }
+
+		/**
+		 * @brief Sets the directory path associated with the graph instance.
+		 *
+		 * The path is stored exactly as supplied; no normalization is performed and
+		 * no trailing directory separator is added automatically.
+		 *
+		 * @param pathName Directory path to store.
+		 */
+		void set_path(std::string path_name) { path_.swap(path_name); }
+
+		/**
+		 * @brief Returns the directory path associated with the graph instance.
+		 *
+		 * The stored path includes its final directory separator when it was extracted
+		 * from a complete filename.
+		 *
+		 * @return Constant reference to the stored directory path.
+		 */
+		const std::string& path() const noexcept { return path_; }
 
 		/**
 		* @brief number of vertices of the graph. Alias to num_vertices()
@@ -128,180 +207,410 @@ namespace bitgraph {
 		*		 of all bitsets.
 		**/
 		int num_blocks() const noexcept { return NBB_; }
-
-		/*
-		* @brief Counts the number of edges	(includes self loops)		
-		* @param lazy if TRUE (reads value @NE_)
-		*			  if FALSE counts and updates @NE_
-		* @returns number of edges
-		* @details: it can be a heavy operation for massive graphs
-		*/
-		virtual	std::size_t num_edges(bool lazy = true);
+			
 
 		/**
-		* @brief Counts the number of edges	in an induced subgraph by a set of vertices
-		* @param set input bitset of vertices that induces the subgraph
-		* @returns number of edges
-		**/
-		virtual	std::size_t num_edges(const VertexBitset& set)	const;
+		 * @brief Returns the number of edges in the graph.
+		 *
+		 * @param lazy If `true`, returns a previously computed nonzero value when
+		 *             available. If `false`, always recomputes the value from the
+		 *             adjacency matrix.
+		 * @return Number of adjacency entries.
+		 *
+		 * @note A zero cached value is treated as an uninitialized value. Therefore,
+		 *       edgeless graphs are recomputed on every lazy call.
+		 * @note Operations that modify the adjacency matrix must update or invalidate
+		 *       NE_ to prevent a stale (wrong) nonzero result.
+		 */
+		virtual	std::size_t num_edges(bool lazy = true) const;
 
-		const vector<VertexBitset>& adjacency_matrix()		const { return adj_; }
-		const VertexBitset& neighbors(int v)					const { return adj_[v]; }
-		VertexBitset& neighbors(int v) { return adj_[v]; }
+		/**
+		 * @brief Counts the number of edges in the subgraph induced by a vertex set.
+		 *
+		 * Counts all edges whose endpoints both belong to @p vertices.
+		 *
+		 * @param vertices Bitset containing the vertices that induce the subgraph.
+		 * @return Number of edges in the induced subgraph.
+		 */
+		virtual std::size_t num_edges(const vertex_bitset_t& vertices) const;
+		
+		/**
+		 * @brief Returns the bitset-based adjacency matrix.
+		 *
+		 * Each element of the returned vector represents one adjacency row. Row
+		 * `v` contains the outgoing neighbors of vertex `v`. For an undirected graph,
+		 * the adjacency matrix is symmetric.
+		 *
+		 * @return Constant reference to the adjacency matrix.
+		 *
+		 * @note The reference remains valid until an operation reallocates or replaces
+		 *       the adjacency matrix, such as reset().
+		*/
+		const vector<vertex_bitset_t>& adjacency_matrix() const { return adj_; }
+
+		/**
+		 * @brief Returns the neighbors of a vertex.
+		 *
+		 * For a directed graph, the returned bitset contains the outgoing neighbors
+		 * of @p vertex.
+		 *
+		 * @param vertex Vertex whose neighborhood is requested.
+		 * @return Constant reference to the vertex-neighborhood bitset.
+		 *
+		 * @pre `0 <= vertex < num_vertices()`.
+		 */
+		const vertex_bitset_t& neighbors(vertex_t v) const;
+
+		/**
+		 * @brief Returns modifiable access to the neighbors of a vertex.
+		 *
+		 * The cached edge count is invalidated because the caller may modify the
+		 * returned adjacency row.
+		 *
+		 * @param vertex Vertex whose neighborhood is requested.
+		 * @return Modifiable reference to the vertex-neighborhood bitset.
+		 *
+		 * @pre `0 <= vertex < num_vertices()`.
+		 *
+		 * @warning For an undirected graph, the caller is responsible for preserving
+		 *          adjacency-matrix symmetry and the no-self-loop invariant.
+		 */
+		vertex_bitset_t& neighbors(vertex_t v);
+		
 
 		//////////////////////////
 		// memory allocation 
 	public:
-
+		
 		/**
-		* @brief resets to empty graph given name and number of vertices
-		* @param NV number of vertices
-		* @param name name of the instance
-		* @details: fast-fail policy - exits if failure
-		* @date: created 31/12/24, last_update 07/12/25
-		**/
-		void reset(std::size_t NV, string name = "") noexcept;
+		 * @brief Reinitializes the graph with @p NV isolated vertices.
+		 *
+		 * Existing graph contents are discarded. The resulting graph contains no
+		 * edges, and every adjacency bitset is initialized with all bits cleared.
+		 *
+		 * @param NV Number of vertices in the new graph.
+		 * @param name Optional graph instance name or path.
+		 *
+		 * @note This function follows a fail-fast policy and terminates the program
+		 *       if the requested graph cannot be represented or allocated.
+		 * @date created 31/12/24
+		 * @date last_update 20/09/26
+		 */
+		void reset(std::size_t NV, std::string name = "") noexcept;
 
 		/**
 		* @brief sets graph from file in dimacs/MTX/Edges formats (in this order)
 		* @param filename file
-		* @details: fast-fail policy - exits if failure
+		* @note This function follows a fail-fast policy and terminates the program
+		*       if the requested graph cannot be represented or allocated.
 		**/
 		void reset(std::string filename) noexcept;
 
 		/**
-		* @brief resets to default values (does not deallocate memory)
-		* @details: to deallocate memory -  g = graph()
-		* @details: in general, should not be called directly
-		**/
+		 * @brief Clears the graph contents while preserving internal storage where possible.
+		 *
+		 * Removes all vertices, edges, and associated graph state, leaving the
+		 * object empty and ready for reuse.
+		 *
+		 * @note Prefer `clear()` in user code. `reset()` is retained for API
+		 *       compatibility and internal use.
+		 */
 		void reset() noexcept;
 
 		/**
-		* @brief reduces the capacity to the size of the bitsets that make
-		*		 the adjacency matrix.
-		* @details: calls the STL shrink_to_fit function for each bitset
-		*			of the adjacency matrix
-		**/
+		 * @brief Clears the graph contents.
+		 *
+		 * Equivalent to `reset()`.
+		 */
+		void clear()  noexcept { reset(); }	// alias for API
+
+		/**
+		 * @brief Requests removal of unused storage from each adjacency bitset.
+		 *
+		 * The graph's vertices, edges, and cached edge count remain unchanged.
+		 * The amount of storage released depends on the bitset implementation and
+		 * is not guaranteed.
+		 */
 		void shrink_to_fit();
 
 		/**
-		* @brief reduces the graph to the first N vertices (deallocation takes place)
-		*
-		*		(currently only for sparse graphs)
-		*
-		* @param N: number of vertices of the new graph, which must be strictly less
-		*		    than the current number of vertices NV_
-		* @returns 0 if success, otherwise -1 (graph unchanged)
-		**/
-		int shrink_to_fit(std::size_t N);
+		 * @brief Reduces the graph to its first @p new_size vertices.
+		 *
+		 * Keeps vertices in `[0, new_size)` and removes all other vertices and their
+		 * incident edges. The remaining adjacency rows are cleared beyond the new
+		 * vertex range, and the cached edge count is invalidated.
+		 *
+		 * @param new_size Number of vertices to retain. It must be smaller than the
+		 *        current number of vertices.
+		 * @return `0` on success; `-1` if @p new_size is invalid, in which case the
+		 *         graph remains unchanged.
+		 *
+		 * @note Whether adjacency bit blocks are physically deallocated depends on
+		 *       the bitset implementation.
+		 */
+		int shrink_to_fit(std::size_t new_size);
 
 		//////////////	
 		// Basic operations	
 	public:
-		/**
-		* @brief density of the directed graph
-		* @param lazy reads NE_ cached value if TRUE
-		**/
-
-		virtual	double density(bool lazy = true);
 
 		/**
-		* @brief density of the subgraph induced by a set of vertices
-		* @param set input (bit) set of vertices
-		**/
-		template <class U = VertexBitset>
-		double density(const U& set);
+		 * @brief Computes the density of the graph.
+		 *
+		 * For a directed graph without self-loops, density is defined as
+		 * \f[
+		 *     d = \frac{|E|}{|V|(|V|-1)}.
+		 * \f]
+		 *
+		 * @param lazy If `true`, num_edges() may use a previously cached edge count.
+		 *             If `false`, the edge count is recomputed from the adjacency
+		 *             matrix.
+		 * @return Graph density in the interval `[0,1]`. Returns `0.0` when the graph
+		 *         contains fewer than two vertices.
+		 *
+		 * @note Derived graph classes may override this function to use a different
+		 *       maximum-edge formula. For example, an undirected simple graph uses
+		 *       \f$|V|(|V|-1)/2\f$.
+		 */
+		virtual	double density(bool lazy = true) const;
 
 		/**
-		* @brief number of non-empty bit blocks / total number of bit blocks
-		*
-				 Specialized for sparse graphs
-		*		 (in the case of sparse graphs, density is expected to be 1.0)
-		*
-		**/
-		double block_density()						const;
+		 * @brief Computes the density of the subgraph induced by @p vertices.
+		 *
+		 * The density is defined as the number of directed edges in the induced
+		 * subgraph divided by the maximum possible number of directed edges:
+		 * \f[
+		 *     d = \frac{|E(S)|}{|S|(|S|-1)},
+		 * \f]
+		 * where \f$S\f$ is the selected vertex set. Self-loops are not considered.
+		 *
+		 * @param vertices Bitset containing the vertices that induce the subgraph.
+		 * @return Induced-subgraph density in the interval `[0,1]`. Returns `0.0`
+		 *         when fewer than two vertices are selected.
+		 *
+		 * @pre Every set bit in @p vertices must identify a valid graph vertex.
+		 */
+		virtual double density(const vertex_bitset_t& vertices) const;
+	
+		/**
+		 * @brief Computes the proportion of nonempty adjacency bit blocks.
+		 *
+		 * For a dense graph representation, block density is defined as the number
+		 * of adjacency blocks containing at least one set bit divided by the total
+		 * number of blocks in the adjacency matrix:
+		 * \f[
+		 *     d_B =
+		 *     \frac{\text{number of nonempty blocks}}
+		 *          {|V| \cdot \text{blocks per adjacency row}}.
+		 * \f]
+		 *
+		 * @return Block density in the interval `[0,1]`. Returns `0.0` when the graph
+		 *         contains no adjacency blocks.
+		 *
+		 * @note Sparse graph representations may provide a specialized implementation.
+		 */
+		double block_density() const;
+		
+		 /**
+		  * @brief Computes the global storage density of the sparse adjacency matrix.
+		  *
+		  * The density is the number of allocated sparse bit blocks divided by the
+		  * number of blocks required by the equivalent dense adjacency matrix:
+		  * \f[
+		  *     d_B =
+		  *     \frac{\text{allocated blocks}}
+		  *          {|V| \cdot \text{blocks per adjacency row}}.
+		  * \f]
+		  *
+		  * @return Sparse-storage density in the interval `[0,1]`. Returns `0.0` when
+		  *         the graph contains no possible adjacency blocks.
+		  */
+
+		double block_density_sparse() const = delete;
+			
+		/**
+		 * @brief Computes the average bit occupancy of the sparse adjacency rows.
+		 *
+		 * For each vertex with allocated adjacency blocks, the row occupancy is
+		 * defined as
+		 * \f[
+		 *     d_v =
+		 *     \frac{\text{number of set bits in row }v}
+		 *          {\text{allocated blocks in row }v \cdot \mathrm{WORD\_SIZE}}.
+		 * \f]
+		 *
+		 * The function returns the arithmetic mean of these row occupancies over all
+		 * graph vertices:
+		 * \f[
+		 *     \bar{d} = \frac{1}{|V|}\sum_{v\in V} d_v.
+		 * \f]
+		 *
+		 * Adjacency rows without allocated blocks contribute zero to the average.
+		 *
+		 * @return Average sparse-row bit occupancy in the interval `[0,1]`. Returns
+		 *         `0.0` when the graph contains no vertices.
+		 *
+		 * @note This operation is defined only for Graph<BBScanSp>.
+		 */
+		double average_block_density_sparse() const = delete;
+		
+		/**
+		 * @brief Computes the complement of this directed graph.
+		 *
+		 * For every ordered pair of distinct vertices `(v,w)`, the output graph
+		 * contains the edge `(v,w)` exactly when this graph does not contain it.
+		 * Self-loops are excluded.
+		 *
+		 * The output graph is reset and reallocated as necessary before the complement
+		 * is constructed. Its previous contents are discarded.
+		 *
+		 * @param gcomp Output graph that receives the complement.
+		 *
+		 * @pre @p gcomp must be a different object from this graph.
+		 *
+		 * @note The input and output graphs have the same number of vertices.
+		 * @note Edge-count metadata is maintained through add_edge().
+		 * @note This function follows the graph fail-fast policy and terminates if
+		 *       allocation of the output graph fails.
+		 */
+		void create_complement(Graph& gcomp) const;
+		
+		/**
+		 * @brief Creates and returns the complement graph.
+		 *
+		 * Constructs the complement of the current graph and returns it by value.
+		 * The returned graph has the same vertex set as the current graph, while
+		 * its edge set is replaced by the complement edge set.
+		 *
+		 * @return Complement of the current graph.
+		 * 
+		 * @note The returned graph has an empty name.
+		 */
+		Graph create_complement() const {
+			Graph gcomp;
+			create_complement(gcomp);
+			return gcomp;
+		}
+
+		/////////////
+		// degree-related operations
 
 		/**
-		* @brief number of allocated blocks / total possible number of blocks
-		*
-		*		 I.ONLY for sparse graphs
-		**/
-		double block_density_sparse()						const;
+		 * @brief Returns the out-degree of a vertex.
+		 *
+		 * Counts the edges directed from @p v to other vertices. In an undirected
+		 * graph, this is the ordinary degree of @p v.
+		 *
+		 * @param v Vertex whose out-degree is requested.
+		 * @return Number of outgoing edges from @p v.
+		 *
+		 * @pre `0 <= v < num_vertices()`.
+		 *
+		 * @note The implementation includes self-loops in the count.
+		 */
+		degree_t degree_out(vertex_t v) const;
+
 
 		/**
-		* @brief average measure of block density (averages the density of each sparse bitset)
-		*
-		*		 I.ONLY for sparse graphs
-		**/
-		double average_block_density_sparse()						const;
-
-		/**
-		* @brief number of outgoing edges from v
-		* @param v input vertex
-		**/
-		int degree_out(int v)					const { return adj_[v].count(); }
-
-		/**
-		* @brief number edges incident to v
-		* @param v input vertex
-		**/
-		int degree_in(int v)					const;
-
-		/**
-		* @brief Computes complement graph
-		* @param g: output complement graph
-		* @return 0 if success, -1 if error
-		**/
-		int create_complement(Graph& g)					 const;
+		 * @brief Returns the in-degree of a vertex.
+		 *
+		 * Counts edges directed toward @p v. In an undirected graph, this equals
+		 * the ordinary degree of @p v.
+		 *
+		 * @param v Vertex whose in-degree is requested.
+		 * @return Number of incoming edges to @p v.
+		 *
+		 * @pre `0 <= v < num_vertices()`.
+		 *
+		 * @note The implementation includes self-loops in the count.
+		 */
+		degree_t degree_in(vertex_t v) const;
+				
+	public:
 
 		//////////////	
 		// Modifiers
 
-	public:
 		/**
-		* @brief adds edge {v -> w} to the graph,
-		*		 no self loops allowed
-		* @param v: outgoing endpoint
-		* @param w: ingoing endpoint
-		*
-		**/
-		virtual void add_edge(int v, int w);
+		 * @brief Adds a directed edge from @p v to @p w.
+		 *
+		 * If the edge already exists, the graph is unchanged. Self-loops are ignored.
+		 * The cached edge count is incremented only when a new edge is inserted.
+		 *
+		 * @param v Source vertex.
+		 * @param w Destination vertex.
+		 *
+		 * @pre `0 <= v < num_vertices()` and `0 <= w < num_vertices()`.
+		 *
+		 * @note If the edge-count cache was previously invalid, it remains invalid;
+		 *       num_edges() recomputes the count before returning it.
+		 */
+		virtual void add_edge(vertex_t v, vertex_t w);
 
 		/**
-		* @brief removes edge {v -> w} from the graph
-		* @param v outgoing endpoint
-		* @param w ingoing endpoint
-		**/
-		virtual void remove_edge(int v, int w);
+		 * @brief Removes the directed edge from @p v to @p w.
+		 *
+		 * If the edge is absent, the graph is unchanged. Self-loops are not stored
+		 * and therefore have no effect.
+		 *
+		 * @param v Source vertex.
+		 * @param w Destination vertex.
+		 *
+		 * @pre `0 <= v < num_vertices()` and `0 <= w < num_vertices()`.
+		 *
+		 * @note If the edge-count cache is valid, it is decremented when an edge is
+		 *       removed. An invalid cache remains invalid until num_edges()
+		 *       recomputes it.
+		 */
+		virtual void remove_edge(vertex_t v, vertex_t w);
 
 		/**
-		* @brief removes edges with endpoint in v (outgoing/ingoing)
-		* @param v input vertex
-		**/
-		void remove_edges(int v);
+		 * @brief Removes all edges incident to a vertex.
+		 *
+		 * Removes every outgoing edge from @p v and every incoming edge to @p v.
+		 * Any self-loop at @p v is also removed.
+		 *
+		 * @param v Vertex whose incident edges are removed.
+		 * @pre `0 <= v < num_vertices()`.
+		 *
+		 * @note The cached edge count is invalidated and will be recomputed when
+		 *       next requested.
+		 */
+		virtual void remove_edges(vertex_t v);
 
 		/**
-		* @brief removes all edges
-		**/
+		 * @brief Removes every edge from the graph.
+		 *
+		 * The vertices and adjacency storage are retained. After this call, the
+		 * graph contains no edges and its cached edge count is zero.
+		 */
 		void remove_edges();
 
 
 		/**
-		* @brief makes all edges bidirected (conversion to undirected graph)
-		**/
+		 * @brief Adds the reverse edge for every existing directed edge.
+		 *
+		 * After this call, distinct vertices @p i and @p j are adjacent in both
+		 * directions whenever either directed edge existed before the call.
+		 * Existing edges are retained; self-loops are unchanged.
+		 *
+		 * @note The edge count remains valid because add_edge() maintains it.
+		 */
 		void make_bidirected();
 
-		//random generation
+		///////////////
+		// random generation
 
 		/**
-		* @brief generates directed edges with probability p.
-		*
-		*		 I. (v, v) not allowed.
-		*
-		* @param v input endpoint
-		* @param w input endpoint
-		* @returns 0 is success, -1 if error
-		**/
+		 * @brief Generates a random directed graph using independent edge sampling.
+		 *
+		 * Removes all existing edges and independently adds each possible directed
+		 * edge with probability @p p. Self-loops are not created.
+		 *
+		 * @param p Probability of including each directed edge.
+		 *
+		 * @pre @p p must lie in the interval `[0, 1]`.
+		 */
 		virtual void gen_random_edges(double p);
 
 		/**
@@ -314,19 +623,73 @@ namespace bitgraph {
 		* @param w input endpoint
 		* @returns 0 is success, -1 if error
 		**/
-		int gen_random_edge(int v, int w, double p);
+		int gen_random_edge(vertex_t v, vertex_t w, double p);
 
-		//////////////	
+		/////////////	
 		// Induced subgraphs
 
 		/**
-		* @brief computes the induced subgraph by the first k vertices in the current graph
-		* @param first_k first k vertices to be included in the new graph
-		* @param g output new induced subgraph
-		* @returns the new induced subgraph (if the operation fails, g remains unchanged)
-		**/
-		virtual	Graph& create_subgraph(int first_k, Graph& g) const;
+		 * @brief Creates the subgraph induced by a list of vertices.
+		 *
+		 * @param[out] graph Output directed graph, overwritten by the induced subgraph.
+		 * @param[in] vertices Vertices of the original graph to retain.
+		 *
+		 * @pre All vertices must be valid and distinct.
+		 * @pre The output graph must differ from the source graph.
+		 *
+		 * @note Vertex i in the output graph corresponds to vertices[i]
+		 *       in the original graph.
+		 * @note An empty vertex list produces an empty graph.
+		 */
+		void create_subgraph(Graph& graph,
+			const vertex_set_t& vertices) const;
 
+		/**
+		 * @brief Creates the subgraph induced by the outgoing neighbors of a vertex.
+		 *
+		 * @param[out] graph Output directed graph, overwritten by the induced subgraph.
+		 * @param[in] v Vertex whose outgoing neighborhood defines the subgraph.
+		 *
+		 * @pre v must be a valid vertex of the original graph.
+		 * @pre The output graph must differ from the source graph.
+		 *
+		 * @note The vertex v itself is excluded if the graph has no self-loops.
+		 * @note A vertex with no outgoing neighbors produces an empty graph.
+		 */
+		void create_subgraph(Graph& graph,
+			vertex_t v) const;
+
+		/**
+		 * @brief Creates the subgraph induced by the first k vertices.
+		 *
+		 * @param[in] first_k Number of vertices to retain.
+		 * @param[out] graph Output graph, overwritten by the induced subgraph.
+		 * @return Reference to the output graph.
+		 *
+		 * @pre 0 <= first_k <= NV_.
+		 * @pre The output graph must differ from the source graph.
+		 *
+		 * @note Vertex indices are preserved.
+		 * @note An empty subgraph is produced when first_k is zero.
+		 * @note Adjacency blocks are copied directly for efficiency.
+		 */
+		Graph& create_subgraph_first_k(int first_k, Graph& graph) const;
+						
+		/**
+		 * @brief Creates and returns the subgraph induced by the first vertices.
+		 *
+		 * Constructs the subgraph induced by vertices with identifiers in the range
+		 * `[0, first_k)`, and returns it by value.
+		 *
+		 * @param first_k Number of leading vertices included in the subgraph.
+		 * @return Subgraph induced by vertices `[0, first_k)`.
+		 */
+		Graph create_subgraph_first_k(int first_k) const {
+			Graph induced;
+			create_subgraph(first_k, induced);
+			return induced;
+		}
+		
 		/**
 		* @brief creates the subgraph induced by the vertices NOT in the input set
 		* @param set input set of vertices
@@ -335,31 +698,67 @@ namespace bitgraph {
 		void remove_vertices(const Bitset& set, Graph& g);
 
 		//////////////	
-		// deleted - CHECK	
-		virtual void remove_vertices(const Bitset& set) = delete;	//commented out implementation - EXPERIMENTAL
+		// deleted - 
+		
+		virtual void remove_vertices(const Bitset& set) = delete;		// TODO in the future?
+		
 
 		/////////////
 		// Boolean properties
 	public:
 
-		virtual	bool is_edge(int v, int w)			const { return(adj_[v].is_bit(w)); }
+		/**
+		 * @brief Tests whether the graph contains the edge from @p v to @p w.
+		 *
+		 * For directed graphs, the order of the vertices is significant and the
+		 * function tests the edge `(v,w)`. For undirected graphs, it tests whether
+		 * @p v and @p w are adjacent.
+		 *
+		 * @param v Source vertex. It must be a valid vertex index.
+		 * @param w Destination vertex. An invalid index is treated as a non-adjacent
+		 *          vertex.
+		 * @return `true` if the edge `(v,w)` exists; otherwise, `false`.
+		 *
+		 * @pre `0 <= v < num_vertices()`.
+		 *
+		 * @note The validity of @p v is checked only by an assertion. The explicit
+		 *       run-time check on @p w protects accesses involving sparse or reduced
+		 *       graph representations.
+		 */
+		virtual	bool is_edge(vertex_t v, vertex_t w) const;
 
 		/**
 		* @brief returns TRUE if (v, v) edges are present
 		**/
-		bool is_self_loop()						const;
+		bool is_self_loop() const;
 
 		////////////////
 		//Comparisons
 	public:
+
 		/**
-		* @brief determines if two graphs have the same adjacency matrices
-		* @param lhs left hand side graph
-		* @param rhs right hand side graph
-		* @returns TRUE if lhs.adj_ == rhs.adj_
-		**/
+		 * @brief Compares two graphs for structural equality.
+		 *
+		 * Graphs are equal when they have the same number of vertices and identical
+		 * adjacency matrices. Names, paths, and cached edge counts are ignored.
+		 *
+		 * @tparam U Bitset type used by both graphs.
+		 * @param lhs First graph.
+		 * @param rhs Second graph.
+		 * @return `true` if the graphs are structurally equal; otherwise, `false`.
+		 */
 		template <class U>
 		friend bool operator ==	 (const Graph<U>& lhs, const Graph<U>& rhs);
+
+		/**
+		 * @brief Compares two graphs for structural inequality.
+		 *
+		 * @tparam U Bitset type used by both graphs.
+		 * @param lhs First graph.
+		 * @param rhs Second graph.
+		 * @return `true` if the vertex counts or adjacency matrices differ;
+		 *         otherwise, `false`.
+		 */
 		template <class U>
 		friend bool operator !=	 (const Graph<U>& lhs, const Graph<U>& rhs);
 
@@ -402,7 +801,25 @@ namespace bitgraph {
 		*
 		* @param o output stream
 		*/
-		virtual	void  write_dimacs(std::ostream& o);
+		virtual	void write_dimacs(std::ostream& o);
+
+		/**
+		 * @brief Writes the directed graph as an edge list.
+		 *
+		 * @param[out] os Output stream.
+		 *
+		 * @note Vertices are numbered from 1 in the output.
+		 * @note Each directed edge is written once.
+		 * @note Comment lines start with '%'.
+		 * @note Self-loops are not written.
+		 */
+		virtual	void write_EDGES(std::ostream& o);
+
+		/** @name DIMACS output primitives
+		 * These functions write individual parts of a DIMACS file. They are intended
+		 * for graph format implementations and advanced callers.
+		 * @{
+		 */
 
 		/**
 		* @brief writes timestamp for dimacs format
@@ -415,59 +832,154 @@ namespace bitgraph {
 		std::ostream& name_dimacs(std::ostream& o = std::cout) const;
 
 		/**
-		* @brief writes graph header for dimacs format
-		**/
-		std::ostream& header_dimacs(std::ostream& o = std::cout, bool lazy = true);
-
-		/*
-		* @brief writes directed graph in edge list format
-		* @param o output stream
-		*/
-		virtual	void  write_EDGES(std::ostream& o);
+		 * @brief Writes the DIMACS problem line for this graph.
+		 *
+		 * Writes `p edge n m`, where `n` is the number of vertices and `m` is the
+		 * number of edges.
+		 *
+		 * @param out Output stream.
+		 * @param lazy If `true`, num_edges() may use a valid cached edge count.
+		 *             If `false`, the edge count is recomputed.
+		 * @return Reference to @p out.
+		 */
+		std::ostream& header_dimacs(
+			std::ostream& o = std::cout,
+			bool lazy = true) const;
+		
+		/** @} */
 
 		////////////
-		// I/O basic operations
+		// I/O 
 
 		/**
-		* @brief prints basic data of the graph to the output stream (n, m and density)
-		* @param lazy if TRUE, reads the number of edges from the cached value @NE_ to compute density
-		* @details Uses the Template Method Pattern (num_edges will be overriden in derived classes)
-		* @details Density can be a heavy operation to compute, since it requires the number of edges.
-		*		   If  @lazy is TRUE the number of edges is read from the cached value @NE_
-		**/
-		ostream& print_data(bool lazy = true, std::ostream & = std::cout, bool eofl = true);
+		 * @brief Writes the graph's vertex count, edge count, and density.
+		 *
+		 * The edge count and density are obtained through num_edges() and density(),
+		 * so derived graph types use their corresponding implementations.
+		 *
+		 * @param lazy If `true`, a valid cached edge count may be used. If `false`,
+		 *             the edge count is recomputed from the adjacency matrix.
+		 * @param out Output stream.
+		 * @param trailing_new_line If `true`, appends a newline after the data.
+		 * @return Reference to @p out.
+		 *
+		 * @note Recomputing the edge count may be costly for large graphs.
+		 */
+		ostream& print_data(
+			bool lazy = true,
+			std::ostream & = std::cout, 
+			bool trailing_new_line = true) const;
 
 		/**
-		* @brief Adjacency matrix to the output stream, in a readable 0-1 format
-		**/
-		ostream& print_adj(std::ostream & = std::cout, bool eofl = true) const;
+		 * @brief Writes the adjacency matrix in a readable 0–1 format.
+		 *
+		 * Each row represents a vertex, and each column indicates whether an edge
+		 * from that vertex to the corresponding vertex exists.
+		 *
+		 * @param out Output stream.
+		 * @param trailing_new_line If `true`, appends a newline after the matrix.
+		 * @return Reference to @p out.
+		 */
+		ostream& print_adj(
+			std::ostream & = std::cout, 
+			bool trailing_new_line = true) const;
 
 		/**
-		* @brief streams edges of the graph to the output stream in format [v]-->[w]
-		**/
-		virtual ostream& print_edges(std::ostream & = std::cout, bool eofl = false);
+		 * @brief Writes the graph's edges to an output stream.
+		 *
+		 * Edges are written in `[v]-->[w]` format. For directed graphs, each edge
+		 * is listed from its source vertex to its destination vertex. Derived graph
+		 * types may override this function to customize the edge representation.
+		 *
+		 * @param out Output stream.
+		 * @param trailing_newline If `true`, appends a newline after the final edge.
+		 * @return Reference to @p out.
+		 */
+		virtual ostream& print_edges(
+			std::ostream & = std::cout, 
+			bool trailing_newline = false);
 
 		/*
 		* @brief streams edges of the subgraph induced by a set of vertices to output stream
 		* @param bbsg input (bit) set of vertices
 		* @param o output stream
 		*/
-		template <class U = VertexBitset>
-		ostream& print_edges(U& bbsg, ostream& o = std::cout)	const;
+		ostream& print_edges(
+			const vertex_bitset_t& bbsg,
+			ostream& os = std::cout) const;
+
+	protected:
+
+		//////////////////
+		// handlers
+
+		/**
+		 * @brief Reports a graph initialization failure and terminates the program.
+		 *
+		 * @param message Description of the failure.
+		 */
+		[[noreturn]]
+		static void graph_initialization_error(const char* message) noexcept
+		{
+			LOG_ERROR("%s", message);
+			LOG_ERROR("Terminating the program.");
+			std::terminate();
+		}
+
+	protected:
+
 
 		//////////////////////////
 		// data members
-	protected:
-		std::vector<VertexBitset> adj_;		//adjacency matrix 
 
-		int NV_;						// number of vertices
-		std::size_t NE_;				// number of edges (can be very large)
-		int NBB_;						// number of bit blocks per row (in the case of sparse graphs this is a maximum value)
+		/**
+		* @brief Adjacency matrix represented as one vertex bitset per row.
+		*
+		* Row `v` contains the outgoing neighbors of vertex `v`. For undirected
+		* graphs, the matrix is symmetric.
+		*/
+		std::vector<vertex_bitset_t> adj_;		
 
-		//names
-		std::string name_;				//name of instance, without path	
-		std::string path_;				//path of instance
-	};
+		/**
+		* @brief Number of vertices in the graph.
+		*/
+		int NV_ = 0;
+
+		/**
+		* @brief Number of bit blocks required for each adjacency row.
+		*
+		* For sparse bitset representations, this is the maximum possible number
+		* of blocks rather than the number currently allocated in every row.
+		*/
+		int NBB_ = 0;
+
+		/**
+		* @brief Cached number of edges in the graph.
+		*
+		* This value may be recomputed by num_edges() when lazy evaluation is
+		* disabled or the edge count is no longer valid.
+		*/
+		mutable std::size_t NE_;
+		
+		
+		/**
+		 * @brief Indicates whether NE_ contains the current number of edges.
+		 *
+		 * If false, num_edges() must recompute the edge count from the adjacency
+		 * matrix before returning or caching it.
+		 */
+		mutable bool edge_count_valid_ = false;								
+
+		/**
+		 * @brief Graph instance name without its directory path.
+		 */
+		std::string name_;	
+
+		/**
+		 * @brief Directory path associated with the graph instance.
+		 */
+		std::string path_;						
+	};	
 		
 	
 }//end namespace bitgraph
@@ -475,759 +987,8 @@ namespace bitgraph {
 //////////////////////////////////////////
 // Necessary implementation of template methods in header file
 
+#include "detail/simple_graph_imp.h"
+#include "detail/simple_sparse_graph_imp.h"			// specialized implementation for sparse graphs
 
-namespace bitgraph {
-	
-	template <class U>
-	bool operator== (const Graph<U>& lhs, const Graph<U>& rhs) {
-		return lhs.adj_ == rhs.adj_;
-	}
 
-	template <class U>
-	bool operator!= (const Graph<U>& lhs, const Graph<U>& rhs) {
-		return lhs.adj_ != rhs.adj_;
-	}
-
-} // namespace bitgraph
-
-
-namespace bitgraph {
-
-	template<class BitsetT>
-	template <class U>
-	inline
-		double Graph<BitsetT>::density(const U& bbN) {
-		BITBOARD  edges = num_edges(bbN);
-		if (edges == 0) { return 0.0; }
-
-		BITBOARD  pc = bbN.popcn64();
-		return edges / static_cast<double>(pc * (pc - 1) / 2);
-	}
-
-	template<class BitsetT>
-	template<class U>
-	inline
-		std::ostream& Graph<BitsetT>::print_edges(U& bbsg, std::ostream& o) const {
-
-		for (int i = 0; i < NV_ - 1; i++) {
-
-			if (!bbsg.is_bit(i)) continue;
-
-			for (int j = i + 1; j < NV_; j++) {
-
-				if (!bbsg.is_bit(j)) continue;
-
-				if (is_edge(i, j)) {
-					o << "[" << i << "]" << "-->" << "[" << j << "]" << endl;
-				}
-				if (is_edge(j, i)) {
-					o << "[" << j << "]" << "-->" << "[" << i << "]" << endl;
-				}
-			}
-		}
-		return o;
-	}
-
-	//////////////////////////////////////////
-	//
-	// class Graph<BitsetT> implementation
-
-	template<class BitsetT>
-	inline
-		Graph<BitsetT>::Graph(void) noexcept :
-		NV_(0), NE_(0), NBB_(0),
-		name_(""), path_("")
-	{
-	}
-
-	template<class BitsetT>
-	inline
-		Graph<BitsetT>::Graph(string filename) :
-		NV_(0), NE_(0), NBB_(0),
-		name_(""), path_("")
-	{
-		reset(filename);		
-	}
-
-	template<class BitsetT>
-	inline
-		Graph<BitsetT>::Graph(std::size_t NV) {
-		name_.clear();
-		path_.clear();
-		reset(NV);
-	}
-
-	template <class BitsetT>
-	inline
-		Graph<BitsetT>::Graph(std::size_t NV, int* adj[], string filename) {
-		
-		///////////////
-		reset(NV);
-		//////////////
-		
-		set_name(filename);
-
-		//add edges
-		const auto nV = static_cast<int>(NV);
-		for (auto i = 0; i < nV; i++) {
-			for (int j = 0; j < nV; j++) {
-				if (adj[i][j] == 1) {
-					add_edge(i, j);
-				}
-			}
-		}
-	}
-
-
-	template<class BitsetT>
-	inline
-		void Graph<BitsetT>::set_name(std::string name) {
-
-		//update name
-		size_t found = name.find_last_of("/\\");
-
-		//update path and name
-		if (found != string::npos) {
-			name_ = name.substr(found + 1);
-			path_ = name.substr(0, found + 1);  //includes slash
-		}
-		else {
-			name_ = std::move(name);
-			path_.clear();
-		}
-	}
-
-	template<class BitsetT>
-	inline
-		void Graph<BitsetT>::reset() noexcept {
-		adj_.clear(), name_.clear(), path_.clear();
-		NV_ = 0, NBB_ = 0, NE_ = 0;
-	}
-
-	template<class BitsetT>
-	inline
-		void Graph<BitsetT>::reset(std::size_t NV, string name) noexcept {
-		
-		//check size - must fit in int type
-		if (NV > std::numeric_limits<int>::max()) {
-			LOGG_ERROR("Invalid graph size ", NV, " - Graph<BitsetT>::reset");
-			LOG_ERROR("exiting... ");
-			std::exit(EXIT_FAILURE);
-		}
-
-		//initialization
-		NV_ = static_cast<int>(NV);
-		NBB_ = INDEX_1TO1(NV_);
-		NE_ = 0;
-
-		try {
-			//////////////////////////////
-			adj_.assign(NV, BitsetT(NV));				//bitsets initialize to 0 - CHECK 		
-			//////////////////////////////
-		}
-		catch (const std::bad_alloc& e) {
-			LOG_ERROR("memory for graph not allocated - Graph<BitsetT>::reset");
-			LOG_ERROR("%s", e.what());
-			LOG_ERROR("exiting... ");
-			std::exit(EXIT_FAILURE);
-		}
-
-		//update instance name
-		this->set_name(std::move(name));
-
-	}
-
-	template<class BitsetT>
-	inline
-		Graph<BitsetT>& Graph<BitsetT>::create_subgraph(int first_k, Graph<BitsetT>& newg) const {
-
-		//assert is size required is greater or equal current size
-		if (first_k >= NV_ || first_k <= 0) {
-			LOG_ERROR("Bad new size - graph remains unchangedGraph<BitsetT>&- Graph<BitsetT>::create_subgraph");
-			return newg;
-		}
-
-		//////////////////////
-		newg.reset(static_cast<std::size_t>(first_k));
-		///////////////////////
-				
-		auto bbh = WDIV(first_k - 1);
-
-		//copy the relevant vertices of the adjacency matrix
-		for (int i = 0; i < newg.NV_; ++i) {
-			for (int j = 0; j <= bbh; ++j) {
-				newg.adj_[i].block(j) = adj_[i].block(j);
-			}
-			//trims last bitblock
-			newg.adj_[i].block(bbh) &= ~Tables::mask_high[WMOD(first_k - 1)];
-		}
-
-		return newg;
-	}
-
-	template<class BitsetT>
-	inline
-		void Graph<BitsetT>::shrink_to_fit() {
-
-		for (int v = 0; v < NV_; ++v) {
-			adj_[v].shrink_to_fit();
-		}
-
-	}
-
-	template<class BitsetT>
-	inline
-		int Graph<BitsetT>::shrink_to_fit(std::size_t N) {
-
-		/*LOG_ERROR("not yet implemented for non-sparse graphs - Graph<BitsetT>::shrink_to_fit");
-		LOG_ERROR("graph remains unchanged");*/
-
-		//assertions
-		if (NV_ <= N) {
-			LOGG_WARNING("Wrong shrinking size ", N, " the graph remains unchanged - Graph<BitsetT>::shrink_to_fit");
-			return -1;
-		}
-
-		//sets to 0 bitblocks outside the range but
-		//does not remove the empty bitbloks
-		for (int v = 0; v < NV_; ++v) {
-			adj_[v].erase_bit(NV_, -1);
-		}
-
-		//resizes adjacency matrix
-		adj_.resize(N);
-		NV_ = static_cast<int>(N);
-		NE_ = 0;												//so that when required, the value will be recomputed
-		NBB_ = INDEX_1TO1(NV_);									//maximum number of bitblocks per row (for sparse graphs)		
-
-		return 0;
-	}
-
-	template<class BitsetT>
-	inline
-		void Graph<BitsetT>::reset(string filename) noexcept {
-		if (read_dimacs(filename) == -1) {
-			if (read_mtx(filename) == -1) {
-				if (read_EDGES(filename) == -1) {
-					if (read_01(filename) == -1) {
-						LOGG_ERROR("Unable to read a graph from file ", filename, "- Graph<BitsetT>::reset");
-						LOG_ERROR("Formats considered: DIMACS / MTX / EDGES / 01");
-						LOG_ERROR("exiting...");
-						std::exit(EXIT_FAILURE);
-					}
-				}
-			}
-		}		
-	}
-
-	template<class BitsetT>
-	inline
-		void Graph<BitsetT>::add_edge(int v, int w) {
-		if (v != w) {
-			adj_[v].set_bit(w);
-			NE_++;
-		}
-	}
-
-	template<class BitsetT>
-	inline
-		void Graph<BitsetT>::remove_edge(int v, int w) {
-		adj_[v].erase_bit(w);
-		NE_--;
-	}
-
-	template<class BitsetT>
-	inline
-		void Graph<BitsetT>::remove_edges(int v) {
-
-		//erases all outgoing edges from v
-		adj_[v].erase_bit();
-
-		//erases all ingoing edges
-		for (int w = 0; w < NV_; w++) {
-			if (w == v) continue;
-			adj_[w].erase_bit(v);
-		}
-
-		//updates edges
-		NE_ = 0;					//resets edges to avoid lazy evaluation later
-
-	}
-
-	template<class BitsetT>
-	inline
-		void Graph<BitsetT>::remove_edges() {
-		for (int v = 0; v < NV_; ++v) {
-			adj_[v].erase_bit();
-		}
-
-		NE_ = 0;
-	}
-
-	template <class BitsetT>
-	inline
-		ostream& Graph<BitsetT>::print_adj(std::ostream& o, bool eofl) const {
-
-		for (int i = 0; i < NV_; ++i) {
-			for (int j = 0; j < NV_; ++j) {
-				if (is_edge(i, j)) {
-					o << "1" << " ";
-				}
-				else {
-					o << "0" << " ";
-				}
-			}
-			o << endl;
-		}
-
-		if (eofl) o << endl;
-		return o;
-	}
-
-	template<class BitsetT>
-	inline
-		std::ostream& Graph<BitsetT>::timestamp_dimacs(std::ostream& o) const {
-		o << "c File written by GRAPH:" << PrecisionTimer::local_timestamp();
-		return o;
-	}
-
-	template<class BitsetT>
-	inline
-		std::ostream& Graph<BitsetT>::name_dimacs(std::ostream& o) const {
-		if (!name_.empty())
-			o << "\nc " << name_.c_str() << endl;
-		return o;
-	}
-
-	template<class BitsetT>
-	inline
-		std::ostream& Graph<BitsetT>::header_dimacs(std::ostream& o, bool lazy) {
-		o << "p edge " << NV_ << " " << num_edges(lazy) << endl << endl;
-		return o;
-	}
-
-	template<class BitsetT>
-	inline
-		int Graph<BitsetT>::read_dimacs(const string& filename) noexcept{
-
-		int n = 0, m = 0, v1 = 0, v2 = 0;			
-
-		fstream f(filename.c_str());
-		if (!f) {
-			LOG_ERROR("Graph<BitsetT>::read_dimacs-File could not be opened reading DIMACS format");
-			reset();
-			return -1;
-		}
-
-		if (gio::dimacs::read_dimacs_header(f, n, m) == -1) {
-			reset();
-			f.close();
-			return -1;
-		}
-
-		reset(n);
-		gio::skip_empty_lines(f);   
-		
-		////////////////////////
-		//parse edges directly from the stream
-		string line; char c;
-		for (int e = 0; e < m; e++) {			//iterates on the number of edges, TODO - iterate on lines and check edges
-			f >> c;
-			if (c != 'e') {
-				LOGG_ERROR(filename, ":wrong header for edges reading DIMACS format");
-				reset();
-				f.close();
-				return -1;
-			}
-
-			//read and add edge
-			f >> v1 >> v2;
-#ifdef DIMACS_INDEX_0_FORMAT 
-			add_edge(v1, v2);
-#else
-			add_edge(v1 - 1, v2 - 1);
-#endif
-					
-			//removes remaining part of the line
-			std::getline(f, line);		
-		}
-
-		f.close();
-				
-		set_name(filename);			//removes full path
-		return 0;
-	}
-
-	template<class BitsetT>
-	inline
-		int Graph<BitsetT>::read_01(const string& filename) noexcept {
-
-
-		int size;
-		char ch, line[250];
-
-		fstream f(filename.c_str());
-		if (!f) {
-			LOG_ERROR("Graph<BitsetT>::read_01-File could not be opened reading DIMACS format");
-			reset();
-			f.close();
-			return -1;
-		}
-
-		//read size
-		f >> size;
-
-		///////////////
-		reset(size);
-		///////////////
-
-		f.getline(line, 250);  //remove final part of the line
-
-		//read rows		
-		for (int r = 0; r < size; r++) {
-			for (int c = 0; c < size; c++) {
-				f >> ch;
-				if ((r < c) && ch == '1') {
-					add_edge(r, c);
-				}
-			}
-			f.getline(line, 250);  //remove final part of the line
-		}
-		f.close();
-
-		//name (removes path)
-		set_name(filename);
-		return 0;
-	}
-
-	template<class BitsetT>
-	inline
-		int  Graph<BitsetT>::read_mtx(const string& filename) noexcept {
-
-
-		MMI<Graph<BitsetT> > myreader(*this);
-		return (myreader.read(filename));
-	}
-
-	template<class BitsetT>
-	inline
-		int  Graph<BitsetT>::read_EDGES(const string& filename) noexcept {
-
-		EDGES<Graph<BitsetT> > myreader(filename, *this);
-		return (myreader.read());
-	}
-
-	template<class BitsetT>
-	inline
-		ostream& Graph<BitsetT>::print_data(bool lazy, std::ostream& o, bool eofl) {
-
-		if (!name_.empty()) { o << name_.c_str() << '\t'; }
-
-		////////////////////////////////////////////////////////////////
-		o << "n:= " << num_vertices() << "\t"
-			<< std::fixed << "m:= " << num_edges(lazy) << "\t"
-			<< std::setprecision(3) << "p:= " << density(true);
-		////////////////////////////////////////////////////////////////
-
-		/*Note: lazy comp. of density since the number of edges have already been computed previously */
-
-		if (eofl) { o << std::endl; }
-		return o;
-	}
-
-	template<class BitsetT>
-	inline
-		ostream& Graph<BitsetT>::print_edges(std::ostream& o, bool eofl) {
-
-		for (int i = 0; i < NV_ - 1; ++i) {
-			for (int j = i + 1; j < NV_; ++j) {
-
-				if (is_edge(i, j)) {
-					o << "[" << i << "]" << "-->" << "[" << j << "]" << endl;
-				}
-				if (is_edge(j, i)) {
-					o << "[" << j << "]" << "-->" << "[" << i << "]" << endl;
-				}
-
-			}
-		}
-
-		if (eofl) { o << std::endl; }
-		return o;
-	}
-
-
-
-	template<class BitsetT>
-	inline
-		std::size_t Graph<BitsetT>::num_edges(const BitsetT& bbn) const {
-
-		std::size_t NE = 0;
-
-		for (int i = 0; i < NV_; ++i) {
-			if (bbn.is_bit(i)) {
-				for (int j = 0; j < NV_; ++j) {
-					if (bbn.is_bit(j)) {						//includes possible self loops
-						if (adj_[i].is_bit(j)) { NE++; }
-					}
-				}
-			}
-		}
-
-		return NE;
-	}
-
-	template<class BitsetT>
-	inline
-		std::size_t Graph<BitsetT>::num_edges(bool lazy) {
-
-		if (!lazy || NE_ == 0) {					//no lazy evaluation if NE_ = 0
-			NE_ = 0;
-			for (int i = 0; i < NV_; i++) {
-				NE_ += adj_[i].count();
-			}
-		}
-
-		return NE_;
-	}
-
-	template<class BitsetT>
-	inline
-		double Graph<BitsetT>::density(bool lazy) {
-		BITBOARD max_edges = NV_;								//type MUST BE for very large graphs as (I) is bigger than unsigned int
-		max_edges *= (max_edges - 1);							//(I)
-		return (num_edges(lazy) / (double)max_edges);		//n*(n-1) edges (since it is a directed graph))
-	}
-
-	template<class BitsetT>
-	inline
-		double Graph<BitsetT>::block_density()	const {
-
-		size_t nBB = 0;
-		for (auto v = 0u; v < NV_; ++v) {
-			for (auto bb = 0u; bb < NBB_; bb++) {
-				if (adj_[v].block(bb))		//non-empty bitblock
-					nBB++;
-			}
-		}
-
-		return (nBB / static_cast<double>(NBB_ * NV_));
-	}
-
-	template<class BitsetT>
-	inline
-		double Graph<BitsetT>::block_density_sparse()	const {
-
-		LOG_ERROR("function only for sparse graphs - Graph<BitsetT>::block_density_sparse");
-		return -1;
-	}
-
-	template<class BitsetT>
-	inline
-		double Graph<BitsetT>::average_block_density_sparse()	const {
-
-		LOG_ERROR("function only for sparse graphs - Graph<BitsetT>::average_block_density_sparse");
-		return -1;
-	}
-
-
-	template<class BitsetT>
-	inline
-		bool Graph<BitsetT>::is_self_loop() const {
-		for (auto i = 0u; i < NV_; i++)
-			if (adj_[i].is_bit(i)) {
-				return true;
-			}
-		return false;
-	}
-
-	template<class BitsetT>
-	inline
-		void Graph<BitsetT>::remove_vertices(const Bitset& bbn, Graph& g) {
-
-		//determine the size of the graph g
-		auto pc = bbn.count();
-		auto new_size = NV_ - pc;
-
-		if (new_size <= 0) {
-			LOG_ERROR("empty graph after deletion - Graph<BitsetT>::remove_vertices");
-			g.reset();
-			return;
-		}
-
-		//initialize new graph
-		if (g.reset(new_size) == -1) {
-			LOG_ERROR("memory for graph not allocated - Graph<BitsetT>::remove_vertices");
-			return;
-		}
-
-		//computes the induced graph in g
-		g.name(this->name_);
-		int l = 0;
-
-		//adds the edges with endpoints not in the bbn set
-		for (int i = 0; i < NV_ - 1; i++) {
-			if (bbn.is_bit(i)) continue;				//jumps over vertices marked for deletion
-			int m = l + 1;
-			for (int j = i + 1; j < NV_; j++) {
-				if (bbn.is_bit(j)) continue;				//jumps over vertices marked for deletion
-				if (adj_[i].is_bit(j)) {
-					g.add_edge(l, m);
-				}
-				m++;
-			}
-			l++;
-		}
-
-	}
-
-	//template<class BitsetT>
-	//void Graph<BitsetT>::remove_vertices (const Bitset& bbn){
-	/////////////////
-	//// Experimental: deletes input list of nodes by creating a temporal graph
-	////
-	//// OBSERVATIONS:
-	//// 1.Inefficient implementation with double allocation of memory
-	//
-	//	Graph<BitsetT> g;
-	//	this->remove_vertices(bbn,g);			//allocation 1
-	//	(*this)=g;								//allocation 2	
-	//}
-
-	template<class BitsetT>
-	inline
-		int Graph<BitsetT>::degree_in(int v) const {
-
-		int res = 0;
-		for (auto i = 0u; i < NV_; i++) {
-			if (i == v) continue;
-			if (adj_[i].is_bit(v)) { res++; }
-
-		}
-		return res;
-	}
-
-	template<class BitsetT>
-	inline
-		int Graph<BitsetT>::create_complement(Graph& g) const
-	{
-		//resets g with new allocation
-		if (g.reset(NV_) == -1) return -1;
-
-		for (int i = 0; i < NV_ - 1; ++i) {
-			for (int j = i + 1; j < NV_; ++j) {
-
-				if (!adj_[i].is_bit(j)) {
-					g.add_edge(i, j);
-				}
-
-				if (!adj_[j].is_bit(i)) {
-					g.add_edge(j, i);
-				}
-			}
-		}
-
-		return 0;
-	}
-
-	template<class BitsetT>
-	inline
-		void Graph<BitsetT>::make_bidirected() {
-
-		for (int i = 0; i < NV_; ++i) {
-			for (int j = 0; j < NV_; ++j) {
-				if (is_edge(i, j)) add_edge(j, i);
-				if (is_edge(j, i)) add_edge(i, j);
-			}
-		}
-
-		NE_ = 0;	//resets edges to avoid lazy evaluation later
-	}
-
-	template<class BitsetT>
-	inline
-		void Graph<BitsetT>::gen_random_edges(double p) {
-
-		//removes all edges
-		remove_edges();
-
-		//sets directed edges with probability p
-		for (int i = 0; i < NV_; ++i) {
-			for (int j = 0; j < NV_; ++j) {
-				if (_rand::uniform_dist(p)) {
-					add_edge(i, j);
-				}
-			}
-		}
-	}
-
-	template<class BitsetT>
-	inline
-		int Graph<BitsetT>::gen_random_edge(int v, int w, double p) {
-
-		//assert - TODO condition to DEBUG mode
-		if (v == w || v >= NV_ || w >= NV_ || p < 0 || p > 1) {
-			LOG_ERROR("wrong input params - Graph<BitsetT>::gen_random_edge");
-			return -1;
-		}
-
-		//generates edge
-		if (_rand::uniform_dist(p)) {
-			add_edge(v, w);
-		}
-
-		return 0;
-	}
-
-	template<class BitsetT>
-	inline
-		void Graph<BitsetT>::write_dimacs(ostream& o) {
-
-		//timestamp comment
-		timestamp_dimacs(o);
-
-		//name comment
-		name_dimacs(o);
-
-		//dimacs header - recompute edges
-		header_dimacs(o, false);
-
-		//write edges 1-based vertex notation 
-		for (int v = 0; v < NV_; ++v) {
-			for (int w = 0; w < NV_; ++w) {
-				if (v == w) continue;
-				if (is_edge(v, w)) {								//O(log) for sparse graphs: specialize
-					o << "e " << v + 1 << " " << w + 1 << endl;
-				}
-			}
-		}
-	}
-
-	template<class BitsetT>
-	inline
-		void  Graph<BitsetT>::write_EDGES(ostream& o) {
-
-		//timestamp comment
-		o << "% File written by GRAPH:" << PrecisionTimer::local_timestamp();
-
-		//name comment
-		if (!name_.empty())
-			o << "\n%  " << name_.c_str() << endl;
-
-		//write edges 1-based vertex notation
-		for (int v = 0; v < NV_; ++v) {
-			for (int w = 0; w < NV_; ++w) {
-				if (v == w) continue;
-				if (is_edge(v, w)) {							//O(log) for sparse graphs: specialize
-					o << v + 1 << " " << w + 1 << endl;
-				}
-
-			}
-		}
-	}
-
-}//end namespace bitgraph
-
-
-
-#endif
+#endif // BITSCAN_GRAPH_SIMPLE_GRAPH_H

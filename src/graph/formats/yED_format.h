@@ -1,11 +1,23 @@
 /**
-* @file yED_format.h
-* @brief stateless API to work with yED lib
-* @details created 10/07/2019, last_update 27/01/25
-* @dev pss
-* 
-* TODO - add tests (09/07/2025)
-**/
+ * @file yED_format.h
+ * @brief Stateless helpers for writing graph data in the yEd GML format.
+ *
+ * @details
+ * Provides constants, color definitions, and inline output helpers for
+ * generating yEd-compatible GML nodes and edges. The API is organized under
+ * `bitgraph::io::yed` and writes directly to caller-provided output streams,
+ * allowing graph exporters to control file ownership and stream handling.
+ *
+ * The format helpers are lightweight and do not maintain graph state. They
+ * are intended for graph visualization output and currently include support
+ * for vertex styling, edge styling, and yEd-oriented layout attributes.
+ *
+ * @author pss
+ * @date Created: 10/07/2019
+ * @date Last updated: 27/01/25
+ *
+ * @todo Add tests (09/07/2025).
+ */
 
 #ifndef	__GRAPH_INPUT_OUTPUT_H__
 #define __GRAPH_INPUT_OUTPUT_H__
@@ -15,9 +27,10 @@
 #include <iostream>
 #include <array>
 
-#include "utils/file.h"
+#include "utils/collection_utils.h"
+#include "utils/file_utils.h"
 #include "utils/logger.h"
-#include "utils/common.h"
+//#include "utils/common.h"
 
 #define  _USE_MATH_DEFINES				//for PI
 #include <math.h>
@@ -32,93 +45,96 @@ namespace bitgraph {
 //useful alias
 namespace bitgraph {
 
-	namespace gio {
+	namespace io {
 
 		namespace yed {
+								
 
-			using namespace std;
-			using namespace bitgraph;
+				/**********************************************
+				*
+				*	 Utilities to write in gml format (yED)
+				*    (experimental)
+				*
+				************************************************/
 
-			/**********************************************
-			*
-			*	 Utilities to write in gml format (yED)
-			*    (experimental)
-			*
-			************************************************/
+				constexpr int MAX_COL_RGB_GML = 23;
+				//constexpr std::array<const char*, 23> table_RGB = { "#990000", "#ff0000", "#ff6666",  "#999900", "#ffff00", "#ffff66",  "#009900", "#00ff00", "#66ff66", "#004C99", "#0080ff", "#66b2ff",
+				//												    "#990099", "#ff00ff", "#ff66ff",  "#404040", "#808080", "#c0c0c0" , "#009999", "#00ffff", "#66ffff"  "#ffcc00", "#000000",  "#ffffff" };
+				//enum col_t {
+				//	DARK_RED, RED, LIGHT_RED, DARK_YEL, YEL, LIGHT_YEL, DARK_GREEN, GREEN, LIGHT_GREEN, DARK_BLUE, BLUE, LIGHT_BLUE, DARK_PURPLE, PURPLE, LIGHT_PURPLE,
+				//	DARK_GREY, GREY, LIGHT_GREY, DARK_CYAN, CYAN, LIGHT_CYAN, DEFAULT /* yellow of yEd */, BLACK, WHITE																					};
 
-			constexpr int MAX_COL_RGB_GML = 23;
-			//constexpr std::array<const char*, 23> table_RGB = { "#990000", "#ff0000", "#ff6666",  "#999900", "#ffff00", "#ffff66",  "#009900", "#00ff00", "#66ff66", "#004C99", "#0080ff", "#66b2ff",
-			//												    "#990099", "#ff00ff", "#ff66ff",  "#404040", "#808080", "#c0c0c0" , "#009999", "#00ffff", "#66ffff"  "#ffcc00", "#000000",  "#ffffff" };
-			//enum col_t {
-			//	DARK_RED, RED, LIGHT_RED, DARK_YEL, YEL, LIGHT_YEL, DARK_GREEN, GREEN, LIGHT_GREEN, DARK_BLUE, BLUE, LIGHT_BLUE, DARK_PURPLE, PURPLE, LIGHT_PURPLE,
-			//	DARK_GREY, GREY, LIGHT_GREY, DARK_CYAN, CYAN, LIGHT_CYAN, DEFAULT /* yellow of yEd */, BLACK, WHITE																					};
+				constexpr std::array<const char*, MAX_COL_RGB_GML> table_RGB = { "#FF0000", "#FFFF00", "#008000",  "#00FFFF", "#0000FF", "#FF00FF", "#800080", "#800000", "#FF7F50",  "#FA8072", "#FFA500", "#FFD700",   "#FFFF00",  "#008B8B",  "#40E0D0",
+					"#00008B",  "#8A2BE2",  "#FFC0CB", "#F5DEB3", "	#A0522D",	"#ffcc00", "#000000",  "#ffffff" };
+				enum col_t {
+					RED = 0, YELLOW, GREEN, CYAN, BLUE, MAGENTA, PURPLE, BROWN, CORAL, SALMON, ORANGE, GOLD, LIME, DARK_CYAN, TURQUOISE, DARK_BLUE, BLUE_VIOLET,
+					PINK, WHEAT, SIENNA, DEFAULT /* yellow of yEd */, BLACK, WHITE
+				};
+				enum edge_t {
+					DASHED, NONE
+				};
 
-			constexpr std::array<const char*, MAX_COL_RGB_GML> table_RGB = { "#FF0000", "#FFFF00", "#008000",  "#00FFFF", "#0000FF", "#FF00FF", "#800080", "#800000", "#FF7F50",  "#FA8072", "#FFA500", "#FFD700",   "#FFFF00",  "#008B8B",  "#40E0D0",
-				"#00008B",  "#8A2BE2",  "#FFC0CB", "#F5DEB3", "	#A0522D",	"#ffcc00", "#000000",  "#ffffff" };
-			enum col_t {
-				RED = 0, YELLOW, GREEN, CYAN, BLUE, MAGENTA, PURPLE, BROWN, CORAL, SALMON, ORANGE, GOLD, LIME, DARK_CYAN, TURQUOISE, DARK_BLUE, BLUE_VIOLET,
-				PINK, WHEAT, SIENNA, DEFAULT /* yellow of yEd */, BLACK, WHITE
-			};
-			enum edge_t {
-				DASHED, NONE
-			};
 
-			inline
-				std::ostream& add_vertex(std::ostream& gml, int i, double x = 0, double y = 0, double scale = 7.5, col_t COL = DEFAULT, double w = 11.0, double h = 11.0, string type = "roundrectangle", int font_size = 7) {
-				///////////////////////////
-				// param@i: id, label:= i+1
+				namespace detail {
 
-				gml << "node  [ "
-					<< "id " << i
-					<< " graphics  [ x " << x * scale
-					<< " y " << y * scale
-					<< " w " << w
-					<< " h " << h
-					<< " type \"roundrectangle\" fill \"" << table_RGB[COL]
-					<< "\"]"
+				inline
+					std::ostream& add_vertex(std::ostream& gml, int i, double x = 0, double y = 0, double scale = 7.5, col_t COL = DEFAULT, double w = 11.0, double h = 11.0, string type = "roundrectangle", int font_size = 7) {
+					///////////////////////////
+					// param@i: id, label:= i+1
+
+					gml << "node  [ "
+						<< "id " << i
+						<< " graphics  [ x " << x * scale
+						<< " y " << y * scale
+						<< " w " << w
+						<< " h " << h
+						<< " type \"roundrectangle\" fill \"" << table_RGB[COL]
+						<< "\"]"
 						<< " LabelGraphics  [ "
 						<< " text " << i + 1
 						<< " fontSize " << font_size
 						<< " ] "
 						<< " ]  " << std::endl;
 					return gml;
-			}
-
-			inline
-				std::ostream& add_edge(std::ostream& gml, int i, int j, col_t COL = BLACK, edge_t E_STYLE = NONE) {
-				gml << " edge   [ "
-					<< " source  " << i
-					<< " target " << j
-					<< " graphics  [ "
-					<< "  fill \"" << table_RGB[COL] << "\"";
-
-				//edge style
-				switch (E_STYLE) {
-				case NONE:
-					break;
-				case DASHED:
-					gml << " style \"dashed\"";
-					break;
-				default:
-					LOG_ERROR("error edge style - gio::yed::add_edge");
 				}
 
-				gml << " ]"
-					<< " ]" << std::endl;
-				return gml;
-			}
+				inline
+					std::ostream& add_edge(std::ostream& gml, int i, int j, col_t COL = BLACK, edge_t E_STYLE = NONE) {
+					gml << " edge   [ "
+						<< " source  " << i
+						<< " target " << j
+						<< " graphics  [ "
+						<< "  fill \"" << table_RGB[COL] << "\"";
 
-			inline
-				std::ostream& HEADER(std::ostream& gml) {
-				gml << "graph  [ hierarchic  1  directed  1 \n\n" << std::endl;
-				return gml;
-			}
+					//edge style
+					switch (E_STYLE) {
+					case NONE:
+						break;
+					case DASHED:
+						gml << " style \"dashed\"";
+						break;
+					default:
+						LOG_ERROR("error edge style - io::yed::add_edge");
+					}
 
-			inline
-				std::ostream& CLOSE_HEADER(std::ostream& gml) {
-				gml << "\n] \n\n" << endl;
-				return gml;
-			}
+					gml << " ]"
+						<< " ]" << std::endl;
+					return gml;
+				}
+
+				inline
+					std::ostream& HEADER(std::ostream& gml) {
+					gml << "graph  [ hierarchic  1  directed  1 \n\n" << std::endl;
+					return gml;
+				}
+
+				inline
+					std::ostream& CLOSE_HEADER(std::ostream& gml) {
+					gml << "\n] \n\n" << endl;
+					return gml;
+				}
+
+			} //namespace detail	
 
 			/*******************
 			*
@@ -130,19 +146,19 @@ namespace bitgraph {
 				int graph_to_gml(GraphT& g, std::string filename, double scale = 7.5, int flag_edges = 1) 
 			{
 				const auto N = g.num_vertices();
-				if (N == 0) { LOG_INFO("cannot paint the empty graph, will produce no output -gio::yed::graph_to_gml"); return 0; }
+				if (N == 0) { LOG_INFO("cannot paint the empty graph, will produce no output -io::yed::graph_to_gml"); return 0; }
 				std::string filenameExt = filename + ".gml";
 				std::ofstream grafo(filenameExt);
-				if (!grafo) { LOGG_ERROR("file: ", filenameExt, "could no be opened", " -gio::yed::graph_to_gml(...)"); return -1; }
+				if (!grafo) { LOGG_ERROR("file: ", filenameExt, "could no be opened", " -io::yed::graph_to_gml(...)"); return -1; }
 
 				//////////////////////////////////
-				HEADER(grafo);
+				io::yed::detail::HEADER(grafo);
 				//////////////////////////////////
 
 				///////////////
 				//vertices
 				for (int i = 0; i < N; ++i) {
-					add_vertex(grafo, i, 0, 0, scale, gio::yed::DEFAULT);
+					io::yed::detail::add_vertex(grafo, i, 0, 0, scale, io::yed::DEFAULT);
 				}
 
 				//////////////////
@@ -151,14 +167,14 @@ namespace bitgraph {
 					for (int i = 0; i < N - 1; ++i) {
 						for (int j = i + 1; j < N; ++j) {
 							if (g.is_edge(i, j)) {
-								add_edge(grafo, i, j, gio::yed::BLACK);
+								io::yed::detail::add_edge(grafo, i, j, io::yed::BLACK);
 							}
 						}
 					}
 				}
 
 				//////////////////////////////////
-				CLOSE_HEADER(grafo);
+				io::yed::detail::CLOSE_HEADER(grafo);
 				//////////////////////////////////		
 
 				grafo.close();
@@ -176,26 +192,26 @@ namespace bitgraph {
 				int graph_to_gml(GraphT& g, vint& vset, std::string filename, col_t col = yed::GREEN, double scale = 7.5, int flag_edges = 1, std::string path = "") 
 			{
 				const auto N = g.num_vertices();
-				if (N == 0) { LOG_INFO("cannot paint the empty graph, will produce no output- gio::yed::graph_to_gml"); return 0; }
+				if (N == 0) { LOG_INFO("cannot paint the empty graph, will produce no output- io::yed::graph_to_gml"); return 0; }
 				std::string filenameExt = path + filename + ".gml";
 				std::ofstream grafo(filenameExt);
 				if (!grafo) { LOGG_ERROR("file: ", filenameExt, "could no be opened", " -graph_to_gml(...)"); return -1; }
-				typename GraphT::VertexBitset bbclq(N, vset);
+				typename GraphT::vertex_bitset_t bbclq(N, vset);
 				//bbclq.print(cout, true);
 
 
 				//////////////////////////////////
-				HEADER(grafo);
+				io::yed::detail::HEADER(grafo);
 				//////////////////////////////////
 
 				///////////////
 				//vertices
 				for (int i = 0; i < N; ++i) {
 					if (bbclq.is_bit(i)) {
-						add_vertex(grafo, i, 0, 0, scale, col);
+						io::yed::detail::add_vertex(grafo, i, 0, 0, scale, col);
 					}
 					else {
-						add_vertex(grafo, i, 0, 0, scale, gio::yed::DEFAULT);
+						io::yed::detail::add_vertex(grafo, i, 0, 0, scale, io::yed::DEFAULT);
 					}
 				}
 
@@ -205,14 +221,14 @@ namespace bitgraph {
 					for (int i = 0; i < N - 1; ++i) {
 						for (int j = i + 1; j < N; ++j) {
 							if (g.is_edge(i, j)) {
-								add_edge(grafo, i, j, gio::yed::BLACK);
+								io::yed::detail::add_edge(grafo, i, j, io::yed::BLACK);
 							}
 						}
 					}
 				}
 
 				//////////////////////////////////
-				CLOSE_HEADER(grafo);
+				io::yed::detail::CLOSE_HEADER(grafo);
 				//////////////////////////////////		
 
 				grafo.close();
@@ -228,29 +244,34 @@ namespace bitgraph {
 			template<class GraphT>
 			inline
 				int graph_to_gml_clique(GraphT& g, vint& clq, std::string filename, col_t col_clq = yed::GREEN, 
-										col_t col = gio::yed::DEFAULT, double scale = 7.5, int flag_edges = 1, std::string path = "") 
+										col_t col = io::yed::DEFAULT, double scale = 7.5, int flag_edges = 1, std::string path = "") 
 			{
 				const auto N = g.num_vertices();
-				if (N == 0) { LOG_INFO("cannot paint the empty graph, will produce no output -gio::yed::graph_to_gml_clique"); return 0; }
+				if (N == 0) { 
+					LOG_INFO("cannot paint the empty graph, will produce no output -io::yed::graph_to_gml_clique"); return 0; }
 				std::string filenameExt = path + filename + ".gml";
 				std::ofstream grafo(filenameExt);
-				if (!grafo) { LOGG_ERROR("file: ", filenameExt, " could no be opened", " -gio::yed::graph_to_gml_clique(...)"); return -1; }
-				typename GraphT::VertexBitset bbclq(N, clq);
-				//bbclq.print(cout, true);
-
-
+				if (!grafo) { 
+					LOGG_ERROR(
+						"file: ", 
+						filenameExt, 
+						" could no be opened", " -io::yed::graph_to_gml_clique(...)");
+					return -1; 
+				}
+				typename GraphT::vertex_bitset_t bbclq(N, clq);
+				
 				//////////////////////////////////
-				HEADER(grafo);
+				io::yed::detail::HEADER(grafo);
 				//////////////////////////////////
 
 				///////////////
 				//vertices
 				for (int i = 0; i < N; ++i) {
 					if (bbclq.is_bit(i)) {
-						add_vertex(grafo, i, 0, 0, scale, col_clq);
+						io::yed::detail::add_vertex(grafo, i, 0, 0, scale, col_clq);
 					}
 					else {
-						add_vertex(grafo, i, 0, 0, scale, col);
+						io::yed::detail::add_vertex(grafo, i, 0, 0, scale, col);
 					}
 				}
 
@@ -261,10 +282,10 @@ namespace bitgraph {
 						for (int j = i + 1; j < N; ++j) {
 							if (g.is_edge(i, j)) {
 								if (bbclq.is_bit(i) && bbclq.is_bit(j)) {
-									add_edge(grafo, i, j, gio::yed::GREEN, gio::yed::DASHED);
+									io::yed::detail::add_edge(grafo, i, j, io::yed::GREEN, io::yed::DASHED);
 								}
 								else {
-									add_edge(grafo, i, j, gio::yed::BLACK);
+									io::yed::detail::add_edge(grafo, i, j, io::yed::BLACK);
 								}
 							}
 						}
@@ -272,7 +293,7 @@ namespace bitgraph {
 				}
 
 				//////////////////////////////////
-				CLOSE_HEADER(grafo);
+				io::yed::detail::CLOSE_HEADER(grafo);
 				//////////////////////////////////		
 
 				grafo.close();
@@ -289,11 +310,11 @@ namespace bitgraph {
 			inline int graph_to_gml_color(GraphT& g, vector<vint>& isets, std::string filename, double scale = 7.5, int flag_edges = 1)
 			{
 				const auto N = g.num_vertices();
-				if (N == 0) { LOG_INFO("cannot paint the empty graph, will produce no output -gio::yed::graph_to_gml_color"); return 0; }
+				if (N == 0) { LOG_INFO("cannot paint the empty graph, will produce no output -io::yed::graph_to_gml_color"); return 0; }
 				std::string filenameExt = filename + ".gml";
 				std::ofstream grafo(filenameExt);
 				if (!grafo) {
-					LOGG_ERROR("file: ", filenameExt, "could no be opened", " -gio::yed::graph_to_gml_color(...)");
+					LOGG_ERROR("file: ", filenameExt, "could no be opened", " -io::yed::graph_to_gml_color(...)");
 					return -1;
 				}
 
@@ -306,19 +327,19 @@ namespace bitgraph {
 					}
 				}
 				LOG_INFO("******************");
-				_stl::print_collection(isets_aux, cout, true);
+				utils::print_collection(isets_aux, cout, true);
 				LOG_INFO("******************");
 				///////////////////////
 
 
 				//////////////////////////////////
-				HEADER(grafo);
+				io::yed::detail::HEADER(grafo);
 				//////////////////////////////////
 
 				///////////////
 				//vertices
 				for (int i = 0; i < N; ++i) {
-					add_vertex(grafo, i, 0, 0, scale, (gio::yed::col_t)isets_aux[i]);
+					io::yed::detail::add_vertex(grafo, i, 0, 0, scale, (io::yed::col_t)isets_aux[i]);
 				}
 
 				//////////////////
@@ -327,14 +348,14 @@ namespace bitgraph {
 					for (int i = 0; i < N - 1; ++i) {
 						for (int j = i + 1; j < N; ++j) {
 							if (g.is_edge(i, j)) {
-								add_edge(grafo, i, j, gio::yed::BLACK);
+								io::yed::detail::add_edge(grafo, i, j, io::yed::BLACK);
 							}
 						}
 					}
 				}
 
 				//////////////////////////////////
-				CLOSE_HEADER(grafo);
+				io::yed::detail::CLOSE_HEADER(grafo);
 				//////////////////////////////////		
 
 				grafo.close();
@@ -356,11 +377,11 @@ namespace bitgraph {
 				const  auto N = g.num_vertices();
 				string filenameExt = filename + ".gml";
 				ofstream grafo(filenameExt);
-				if (!grafo) { LOGG_ERROR("file: ", filenameExt, "could no be opened", "--gio::yed::graph_to_gml_layered(...)"); return -1; }
+				if (!grafo) { LOGG_ERROR("file: ", filenameExt, "could no be opened", "--io::yed::graph_to_gml_layered(...)"); return -1; }
 
 
 				///////////////////////////////
-				gio::yed::HEADER(grafo);
+				io::yed::detail::HEADER(grafo);
 				//////////////////////////////
 
 				auto i = 0, col = 0 /* RED */;
@@ -373,19 +394,24 @@ namespace bitgraph {
 						continue;
 					}
 					///////////////////////////////////////////////////////////
-					gio::yed::add_vertex(grafo, v, vx++, vy, scale, (gio::yed::col_t)col);
+					io::yed::detail::add_vertex(grafo, v, vx++, vy, scale, (io::yed::col_t)col);
 					///////////////////////////////////////////////////////////
 					i++;
 				}
 
 				if (i != N) {
-					LOGG_ERROR("not all vertices are in the layers, FAILURE", "--gio::yed::graph_layered_to_gml");
-					gio::yed::CLOSE_HEADER(grafo);
+					LOGG_ERROR(
+						"not all vertices are in the layers, FAILURE",
+						"- io::yed::graph_layered_to_gml");
+					io::yed::detail::CLOSE_HEADER(grafo);
 					return -1;
 				}
 
-				if (col > gio::yed::MAX_COL_RGB_GML) {
-					LOGG_ERROR("too many colors:", col, "layered graph not created--gio::yed::graph_to_gml_layered");
+				if (col > io::yed::MAX_COL_RGB_GML) {
+					LOGG_ERROR(
+						"too many colors:",
+						col,
+						"layered graph not created - io::yed::graph_to_gml_layered");
 					return -1;
 				}
 
@@ -395,7 +421,7 @@ namespace bitgraph {
 						for (int j = i + 1; j < N; j++) {
 							if (g.is_edge(i, j)) {
 								///////////////////////////////////////////////
-								gio::yed::add_edge(grafo, i, j);
+								io::yed::detail::add_edge(grafo, i, j);
 								///////////////////////////////////////////////
 							}
 						}
@@ -403,7 +429,7 @@ namespace bitgraph {
 				}
 
 				/////////////////////////////////////
-				gio::yed::CLOSE_HEADER(grafo);
+				io::yed::detail::CLOSE_HEADER(grafo);
 				/////////////////////////////////////
 				return 0;
 			}
@@ -426,7 +452,7 @@ namespace bitgraph {
 				}
 
 				///////////////////////////////
-				gio::yed::HEADER(grafo);
+				io::yed::detail::HEADER(grafo);
 				//////////////////////////////
 
 				///////////////
@@ -436,7 +462,7 @@ namespace bitgraph {
 				for ( int i = 0; i < N; ++i) {
 					x = radius * cos(angle);
 					y = radius * sin(angle);
-					add_vertex(grafo, i, x, y, scale, gio::yed::DEFAULT);
+					detail::add_vertex(grafo, i, x, y, scale, io::yed::DEFAULT);
 					angle -= inc;											//anticlockwise
 				}
 
@@ -446,7 +472,7 @@ namespace bitgraph {
 						for ( int j = i + 1; j < N; j++) {
 							if (g.is_edge(i, j)) {
 								///////////////////////////////////////////////
-								gio::yed::add_edge(grafo, i, j);
+								io::yed::detail::add_edge(grafo, i, j);
 								///////////////////////////////////////////////
 							}
 						}
@@ -454,14 +480,14 @@ namespace bitgraph {
 				}
 
 				/////////////////////////////////////
-				gio::yed::CLOSE_HEADER(grafo);
+				io::yed::detail::CLOSE_HEADER(grafo);
 				/////////////////////////////////////
 				return 0;
 			}
 
 		}//end of namespace yed
 
-	}//end of namespace gio
+	}//end of namespace io
 
 } //end of namespace bitgraph
 

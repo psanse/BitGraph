@@ -4,23 +4,22 @@
 
 file(GLOB HEADER_FILES   ${CMAKE_CURRENT_SOURCE_DIR}/*.h 
                          ${CMAKE_CURRENT_SOURCE_DIR}/info/*.h
+                         ${CMAKE_CURRENT_SOURCE_DIR}/detail/*.h
 )
 
 #creates utils library
-add_library (utils STATIC
-    benchmark.cpp 
-    #result.cpp
-    #batch_analyser.cpp
-    common.cpp
-    common_types.cpp
-    info/info_base.cpp   
-    #logger.cpp 
+add_library (utils STATIC     
+    random_utils.cpp 
+    time_utils.cpp
+    path_utils.cpp
+    sort_utils.cpp  
+    info/info_base.cpp     # deprecated, refactored andmoved to graph
     ${HEADER_FILES}
 )
 
 ##############
 # LOGGER LEVEL - default level debug
-# (utils/logger.h) 
+# (utils/logger_utils.h) 
 
 set(LOGGER_LEVEL "debug" CACHE STRING "Logger level used at run time")
 set_property(CACHE LOGGER_LEVEL PROPERTY STRINGS debug verbose error)
@@ -88,16 +87,34 @@ foreach(ITEM ${DEPLOY_FILES_AND_DIRS})
  
 endif(INSTALL_BITGRAPH)
 
-
- 
-
 #############
 # UNIT TESTS for UTILS lib
 #############
-#option(utils_build_tests "Build utils tests." ON)
-if (BUILD_TESTS)
 
-	add_subdirectory(tests)
+# Per-target option to enable building unit tests for the graph lib
+option(UTILS_BUILD_TESTS "Build utilities tests." ON)
+
+if (BUILD_TESTING AND UTILS_BUILD_TESTS)
+
+    add_subdirectory(tests)
 
 endif()
+
+#############
+# EXAMPLES for UTILS lib
+#############
+
+option(
+    UTILS_BUILD_EXAMPLES
+    "Build utilities examples."
+    ON
+)
+
+if (BUILD_EXAMPLES AND UTILS_BUILD_EXAMPLES)
+
+    add_subdirectory(examples)
+
+endif()
+
+
 

@@ -1,15 +1,35 @@
-/** 
- * @file bitboard.h
- * @brief Header file for the class BitBoard of the BITSCAN 1.0 library
- * @details The BitBoard class manages bitsets of 64-bit length
- * @created ?
- * @last_update 30/01/2025 (refactored, added trimming functions, Doxygen tags)
+/**
+ * @file bitblock.h
+ * @brief Low-level operations for individual 64-bit BITSCAN bitblocks.
+ *
+ * @details
+ * This header declares the functions and masks in @c bitgraph::bblock for
+ * operating on one @c BITBOARD. The API includes least- and
+ * most-significant-bit searches, population counts, bit tests, range masks,
+ * trimming helpers, masked copying, and formatted output.
+ *
+ * Multiple implementations are available for bit scans and population
+ * counts, including lookup-table, De Bruijn, and processor-intrinsic paths.
+ * The selected defaults depend on the platform and BITSCAN configuration.
+ * Empty blocks return @c BBObject::noBit from bit-position search functions;
+ * valid bit indices are zero-based in the inclusive range [0, 63].
+ *
+ * This header also provides the platform-specific compiler and intrinsic
+ * adapters required by the low-level implementations. The lookup tables used
+ * by the masks and table-based algorithms are defined by @c tables.h.
+ *
  * @author pss
- * 
- **/
+ * @date Last updated: 14 October 2026
+ *
+ * @see bbtypes.h
+ * @see bbobject.h
+ * @see tables.h
+ * @warning Functions that accept bit indices expect values in the documented
+ *          [0, 63] range; callers are responsible for validating indices.
+ */
 
-#ifndef __BITBLOCK_H__
-#define __BITBLOCK_H__
+#ifndef BITGRAPH_BITSCAN_BITBLOCK_H
+#define BITGRAPH_BITSCAN_BITBLOCK_H
 
 #include <iostream>
 //#include "bbtypes.h"
@@ -78,7 +98,7 @@
 
 namespace bitgraph {
 
-	using _impl::Tables;
+	using detail::Tables;
 
 	/////////////////////////////////
 	//
@@ -185,7 +205,7 @@ namespace bitgraph {
 		* @param bb: input 64-bit bitblock
 		* @returns index of the least significant bit or -1 if empty
 		**/
-		inline	int lsb(const BITBOARD bb) { return lsb64_intrinsic(bb); }
+		inline int lsb(const BITBOARD bb) { return lsb64_intrinsic(bb); }
 
 
 		/**
@@ -275,56 +295,49 @@ namespace bitgraph {
 		* @param bit: bit in the bitblock [0...63]
 		* @returns 64-bit bitblock mask with only one bit set
 		**/
-		inline
-			BITBOARD MASK_BIT(int bit) { return Tables::mask[bit]; }
+		inline BITBOARD MASK_BIT(int bit) { return Tables::mask[bit]; }
 
 		/**
 		* @brief Sets to 1 the bits inside the closed range [low, high], sets to 0 the rest
 		* @param low, high: positions in the bitblock [0...63]
 		* @returns 64-bit bitblock mask
 		**/
-		inline
-			BITBOARD MASK_1(int low, int high) { return Tables::mask_mid[low][high]; };
+		inline BITBOARD MASK_1(int low, int high) { return Tables::mask_mid[low][high]; };
 
 		/**
-		* @brief Sets to 1 all bits in the closed range [0, 63]
+		* @brief Sets to 1 all bits in the closed range [0, idx]
 		* @param idx: input reference bit position [0...63]
 		* @returns 64-bit bitblock mask
 		**/
-		inline
-			BITBOARD MASK_1_LOW(int idx) { return ~Tables::mask_high[idx]; }
+		inline BITBOARD MASK_1_LOW(int idx) { return ~Tables::mask_high[idx]; }
 
 		/**
 		* @brief Sets to 1 all bits in the closed range [idx, 63]
 		* @param idx: input reference bit position [0...63]
 		* @returns 64-bit bitblock mask
 		**/
-		inline
-			BITBOARD MASK_1_HIGH(int idx) { return ~Tables::mask_low[idx]; }
+		inline BITBOARD MASK_1_HIGH(int idx) { return ~Tables::mask_low[idx]; }
 
 		/**
 		* @brief Sets to 0 the bits inside the closed range [low, high], sets to 1 the rest
 		* @param low, high: positions in the bitblock [0...63]
 		* @returns 64-bit bitblock mask
 		**/
-		inline
-			BITBOARD MASK_0(int low, int high) { return ~Tables::mask_mid[low][high]; }
+		inline BITBOARD MASK_0(int low, int high) { return ~Tables::mask_mid[low][high]; }
 
 		/**
 	   * @brief Sets to 0 all bits in the closed range [0, idx]
 	   * @param idx: input reference bit position [0...63]
 	   * @returns 64-bit bitblock mask
 	   **/
-		inline
-			BITBOARD MASK_0_LOW(int idx) { return Tables::mask_high[idx]; }
+		inline BITBOARD MASK_0_LOW(int idx) { return Tables::mask_high[idx]; }
 
 		/**
 	   * @brief Sets to 0 all bits in the closed range [idx, 63]
 	   * @param idx: input reference bit position [0...63]
 	   * @returns 64-bit bitblock mask
 	   **/
-		inline
-			BITBOARD MASK_0_HIGH(int idx) { return Tables::mask_low[idx]; }
+		inline BITBOARD MASK_0_HIGH(int idx) { return Tables::mask_low[idx]; }
 
 		/**
 		* @brief sets to 0 the bits of the bitblock bb to the right of index (the index-bit is not trimmed)
@@ -333,8 +346,7 @@ namespace bitgraph {
 		* @returns the trimmed bitblock
 		* @date 30/01/2015
 		**/
-		inline
-			BITBOARD trim_low(BITBOARD bb, int idx) { return bb & ~Tables::mask_low[idx]; }
+		inline BITBOARD trim_low(BITBOARD bb, int idx) { return bb & ~Tables::mask_low[idx]; }
 
 		/**
 		* @brief sets to 0 the bits of the bitblock bb to the left side of index (the index-bit is not trimmed)
@@ -383,16 +395,14 @@ namespace bitgraph {
 
 }//end namespace bitgraph
 
-
-//////////////////////////////
-// inline implementations in header file 
+//////////////////
+// inline function definitions for hot paths
 
 namespace bitgraph {
-
 	namespace bblock {
-				
 
-		inline int lsb64_intrinsic(const BITBOARD bb_dato) {
+		inline
+			int lsb64_intrinsic(const BITBOARD bb_dato) {
 			unsigned long index;
 			if (_BitScanForward64(&index, bb_dato))
 				return(index);
@@ -400,8 +410,8 @@ namespace bitgraph {
 			return BBObject::noBit;
 		}
 
-
-		inline int msb64_intrinsic(const BITBOARD bb_dato) {
+		inline
+			int msb64_intrinsic(const BITBOARD bb_dato) {
 			unsigned long index;
 			if (_BitScanReverse64(&index, bb_dato))
 				return(index);
@@ -409,8 +419,8 @@ namespace bitgraph {
 			return BBObject::noBit;
 		}
 
-
-		inline int popc64(const BITBOARD bb_dato) {
+		inline
+			int popc64(const BITBOARD bb_dato) {
 
 #ifdef POPCOUNT_INTRINSIC_64
 			return (int)__popcnt64(bb_dato);
@@ -427,17 +437,16 @@ namespace bitgraph {
 #endif
 
 		}
-		
-		inline int lsb64_de_Bruijn(const BITBOARD bb_dato) {
-					
+		inline
+			int lsb64_de_Bruijn(const BITBOARD bb_dato) {
+
 #ifdef ISOLANI_LSB
-			return (bb_dato == 0) ? BBObject::noBit : _impl::Tables::indexDeBruijn64_ISOL[((bb_dato & -bb_dato) * DEBRUIJN_MN_64_ISOL) >> DEBRUIJN_MN_64_SHIFT];
+			return (bb_dato == 0) ? BBObject::noBit : detail::Tables::indexDeBruijn64_ISOL[((bb_dato & -bb_dato) * DEBRUIJN_MN_64_ISOL) >> DEBRUIJN_MN_64_SHIFT];
 #else
-			return (bb_dato == 0) ? BBObject::noBit : _impl::Tables::indexDeBruijn64_SEP[((bb_dato ^ (bb_dato - 1)) * DEBRUIJN_MN_64_SEP) >> DEBRUIJN_MN_64_SHIFT];
+			return (bb_dato == 0) ? BBObject::noBit : detail::Tables::indexDeBruijn64_SEP[((bb_dato ^ (bb_dato - 1)) * DEBRUIJN_MN_64_SEP) >> DEBRUIJN_MN_64_SHIFT];
 #endif
 
 		}
-
 		inline
 			int msb64_de_Bruijn(const BITBOARD bb_dato) {
 
@@ -453,11 +462,13 @@ namespace bitgraph {
 			bb |= bb >> 32;
 
 			//applys same computation as for LSB-de Bruijn
-			return _impl::Tables::indexDeBruijn64_SEP[(bb * DEBRUIJN_MN_64_SEP) >> DEBRUIJN_MN_64_SHIFT];
+			return detail::Tables::indexDeBruijn64_SEP[(bb * DEBRUIJN_MN_64_SEP) >> DEBRUIJN_MN_64_SHIFT];
 		}
-	}//end namespace bblock
 
-}//end namespace bitgraph
+	} // end namespace bblock
+
+} // end namespace bitgraph
 
 
-#endif
+
+#endif // BITGRAPH_BITSCAN_BITBLOCK_H

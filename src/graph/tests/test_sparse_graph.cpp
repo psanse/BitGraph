@@ -52,10 +52,10 @@ TEST(Graph_sparse, max_subgraph_degree) {
 TEST(Graph_sparse,constructor_file){
 
 	//undirected graphs read by directed graph class (all edges are non symmetrical)
-	sparse_graph g1(PATH_GRAPH_TESTS_CMAKE_SRC_CODE "brock200_1.clq");
-	sparse_graph g2(PATH_GRAPH_TESTS_CMAKE_SRC_CODE "brock200_2.clq");
-	sparse_graph g3(PATH_GRAPH_TESTS_CMAKE_SRC_CODE "brock200_3.clq");
-	sparse_graph g4(PATH_GRAPH_TESTS_CMAKE_SRC_CODE "brock200_4.clq");
+	sparse_graph g1(BITGRAPH_GRAPH_TEST_DATA_DIR "brock200_1.clq");
+	sparse_graph g2(BITGRAPH_GRAPH_TEST_DATA_DIR "brock200_2.clq");
+	sparse_graph g3(BITGRAPH_GRAPH_TEST_DATA_DIR "brock200_3.clq");
+	sparse_graph g4(BITGRAPH_GRAPH_TEST_DATA_DIR "brock200_4.clq");
 
 	//number of vertices
 	EXPECT_EQ	(200, g1.num_vertices());
@@ -95,7 +95,7 @@ TEST(Graph_sparse,constructor_file){
 
 TEST(Graph_sparse,constructor_copy){
 
-	sparse_graph g	(PATH_GRAPH_TESTS_CMAKE_SRC_CODE "brock200_2.clq");
+	sparse_graph g	(BITGRAPH_GRAPH_TEST_DATA_DIR "brock200_2.clq");
 	sparse_graph g1	(g);
 
 	////////////////////////////////////////////////////////////
@@ -117,7 +117,7 @@ TEST(Graph_sparse,constructor_copy){
 
 TEST(Graph_sparse_test,is_edge){
 	
-	sparse_graph g(PATH_GRAPH_TESTS_CMAKE_SRC_CODE "sample.clq");
+	sparse_graph g(BITGRAPH_GRAPH_TEST_DATA_DIR "sample.clq");
 	
 	EXPECT_TRUE(g.is_edge(1,0));
 	EXPECT_TRUE(g.is_edge(2,0));
@@ -164,7 +164,7 @@ TEST(Graph_sparse, create_subgraph) {
 
 	//create graph with first 50 vertices
 	sparse_graph g1;
-	g.create_subgraph(50, g1);
+	g.create_subgraph_first_k(50, g1);
 
 	/////////////////////////////////////////////
 	EXPECT_EQ	(50, g1.num_vertices());
@@ -172,7 +172,7 @@ TEST(Graph_sparse, create_subgraph) {
 	/////////////////////////////////////////////
 
 	//create graph with first 3 vertices
-	g.create_subgraph(3, g1);
+	g.create_subgraph_first_k(3, g1);
 	
 	/////////////////////////////////////////
 	EXPECT_EQ	(3, g1.num_vertices());
@@ -180,7 +180,9 @@ TEST(Graph_sparse, create_subgraph) {
 	/////////////////////////////////////////
 
 	//creating a wrong size subgraph - g1 remains unchanged
-	EXPECT_EQ	(g1.num_vertices(), (g.create_subgraph(0, g1)).num_vertices());
+	EXPECT_EQ	(g1.num_vertices(),
+				(g.create_subgraph_first_k(0, g1)).
+					num_vertices());
 
 }
 
@@ -243,7 +245,7 @@ TEST(Ugraph_sparse, number_of_edges) {
 
 TEST(Ugraph_sparse, degree_induced){
 	
-	sparse_ugraph g(PATH_GRAPH_TESTS_CMAKE_SRC_CODE "sample.clq");
+	sparse_ugraph g(BITGRAPH_GRAPH_TEST_DATA_DIR "sample.clq");
 	
 	////////////////////////////
 	EXPECT_EQ (3,g.degree(1));
@@ -271,7 +273,7 @@ TEST(Ugraph_sparse, degree_induced){
 
 TEST(Ugraph_sparse, degree_brock){
 	
-	sparse_ugraph g(PATH_GRAPH_TESTS_CMAKE_SRC_CODE "brock200_1.clq");
+	sparse_ugraph g(BITGRAPH_GRAPH_TEST_DATA_DIR "brock200_1.clq");
 	
 	/////////////////////////////////
 	EXPECT_FALSE(g.is_edge(0, 1));		//(1)
@@ -315,10 +317,10 @@ TEST(Ugraph_sparse, degree_up) {
 
 TEST(Ugraph_sparse,ugraph_from_file){
 
-	sparse_ugraph g1(PATH_GRAPH_TESTS_CMAKE_SRC_CODE "brock200_1.clq");
-	sparse_ugraph g2(PATH_GRAPH_TESTS_CMAKE_SRC_CODE "brock200_2.clq");
-	sparse_ugraph g3(PATH_GRAPH_TESTS_CMAKE_SRC_CODE "brock200_3.clq");
-	sparse_ugraph g4(PATH_GRAPH_TESTS_CMAKE_SRC_CODE "brock200_4.clq");
+	sparse_ugraph g1(BITGRAPH_GRAPH_TEST_DATA_DIR "brock200_1.clq");
+	sparse_ugraph g2(BITGRAPH_GRAPH_TEST_DATA_DIR "brock200_2.clq");
+	sparse_ugraph g3(BITGRAPH_GRAPH_TEST_DATA_DIR "brock200_3.clq");
+	sparse_ugraph g4(BITGRAPH_GRAPH_TEST_DATA_DIR "brock200_4.clq");
 
 	//number of vertices
 	EXPECT_EQ(200, g1.num_vertices());
@@ -385,7 +387,7 @@ TEST(Ugraph_sparse, DISABLED_adjacency_matrix){
             for(int rep=0;rep<REP_MAX;rep++){
 				 cout<<"--------------------------------------------------------"<<endl;
 				sparse_ugraph ug;
-				SparseRandomGen<sparse_ugraph>().create_ugraph(ug,(std::size_t)N,P);
+				experimental::SparseRandomGen<sparse_ugraph>().create_ugraph(ug,(std::size_t)N,P);
 				sparse_ugraph ug2(ug);
 			
 
