@@ -35,11 +35,11 @@ and many others.
 
 ### System platforms
 
-The repository has been tested on Linux (24.x.x) and Windows 10 OS.
+The repository has been tested on Linux (Ubuntu 24.04, GCC 13) and Windows (Visual Studio / MSVC).
 
 ## Releases 
 
-The latest release, v1.4.3 (April 2026), remains compatible with C++14. 
+The latest release is **v2.0.0** (October 2026). It requires C++14 and CMake 3.14 or later. Version 2.0 is a major refactoring and is not source-compatible with 1.x: see [CHANGELOG.md](CHANGELOG.md) for the list of changes and a migration table. The 1.x series (last release v1.4.3) is frozen.
 
 ## Acknowledgements
 

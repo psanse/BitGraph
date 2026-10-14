@@ -20,7 +20,7 @@ The library currently offers a variety of graph types, the most relevant ones be
 * `ugraph`: for undirected graphs
 * `sparse_graph`: for sparse directed graphs
 * `sparse_ugraph`: for sparse undirected graphs
-* `ugraph_w`: for undirected vertex-weighted graphs
+* `ugraph_vw`: for undirected vertex-weighted graphs
 * `ugraph_ew`: for undirected edge-weighted graphs
  
 To include the GRAPH library in your project, add the header #include "BitGraph/graph/graph.h". In the following example, a simple undirected graphs with 10 vertices and 3 edges is declared.
@@ -28,7 +28,7 @@ To include the GRAPH library in your project, add the header #include "BitGraph/
 ``` plaintext
 #include "BitGraph/graph/graph.h"
 //...
-ugraph g(10);
+ugraph ug(10);
 
 ug.add_edge(0, 1);
 ug.add_edge(0, 2);
