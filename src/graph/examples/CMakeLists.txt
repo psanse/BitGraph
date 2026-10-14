@@ -13,7 +13,10 @@ target_link_libraries (graph_formats LINK_PUBLIC graph bitscan utils)
 #add_executable ( kcore lb_kcore.cpp)
 #target_link_libraries ( kcore LINK_PUBLIC graph bitscan utils)
 
-set_target_properties( gen_random_benchmark graph_formats kcore
+set_target_properties( 
+	gen_random_benchmark
+	graph_formats 
+	#kcore
 		PROPERTIES
 	#    ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
 	#    LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
