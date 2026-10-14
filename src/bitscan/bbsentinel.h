@@ -17,9 +17,14 @@
  *
  * @note Originally developed to improve the performance of an exact
  *       maximum clique algorithm (publication reference pending).
+ * 
+ * @warning EXPERIMENTAL: This class is part of the experimental
+ *          namespace and has not been fully refactored or tested.
+ *          Its API and implementation are subject to change.
+ *
+ * @todo Complete refactoring and testing (14/10/2026).
  *
  * @todo Full refactoring and testing required (14/10/2026).
- * @todo Move BBSentinel to the experimental namespace (14/10/2026).
  */
 
 #ifndef BITGRAPH_BITSCAN_BB_SENTINEL_H

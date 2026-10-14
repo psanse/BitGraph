@@ -20,7 +20,7 @@
  * flip() and the (nPop, true) constructor.
  *
  * @date Created: 14/10/2026
- * @author P. San Segundo
+ * @author P. San Segundo and Claude
  */
 
 #include "bitscan/bitscan.h"
