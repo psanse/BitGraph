@@ -812,7 +812,7 @@ namespace bitgraph {
 		/**
 		 * @brief Writes the directed graph as an edge list.
 		 *
-		 * @param[out] os Output stream.
+		 * @param[out] o Output stream.
 		 *
 		 * @note Vertices are numbered from 1 in the output.
 		 * @note Each directed edge is written once.

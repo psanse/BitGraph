@@ -192,7 +192,7 @@ namespace bitgraph {
 		* @brief AND between lhs and rhs bitsets in the CLOSED bit-range [firstBit, lastBit]
 		*		 The result is stored in bitset res. The remaining bits of res outside the range
 		*		 are set to 0 if the template parameter Erase  is true.
-		* @param template<Erase>: if true, the bits of res outside [firstBit, lastBit] are set to 0
+		* @tparam Erase if true, the bits of res outside [firstBit, lastBit] are set to 0
 		* @param firstBit, lastBit: closed bit-range 0 <= firstBit <= lastBit
 		* @param lhs, rhs: input bitsets
 		* @param res: output bitset
@@ -234,7 +234,7 @@ namespace bitgraph {
 		*
 		*		I.  The num_blocks of lhs and rhs must be the same.
 		*		II. The num_blocks of res must be at least the same as lhs nand rhs
-		* @param template<Erase>: if true, the bits of res outside [firstBit, lastBit] are set to 0
+		* @tparam Erase if true, the bits of res outside [firstBit, lastBit] are set to 0
 		* @param lhs, rhs: input bitsets
 		* @param res: output bitset
 		* @returns reference to the resulting bitstring res
@@ -325,7 +325,7 @@ namespace bitgraph {
 		*
 		*		I.  The num_blocks of lhs and rhs must be the same.
 		*		II. The num_blocks of res must be at least the same as lhs nand rhs
-		* @param template<Erase>: if true, the bits of res outside [firstBit, lastBit] are set to 0
+		* @tparam Erase if true, the bits of res outside [firstBit, lastBit] are set to 0
 		* @param lhs, rhs: input bitsets
 		* @param res: output bitset
 		* @returns reference to the resulting bitstring res
