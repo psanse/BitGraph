@@ -14,6 +14,7 @@ GRAPH is the graph library of [BitGraph](../../README.md). It represents a graph
 - [Weighted graphs](#weighted-graphs)
 - [Vertex orderings](#vertex-orderings)
 - [File formats](#file-formats)
+- [Performance](#performance)
 - [Examples and tests](#examples-and-tests)
 - [Folder layout](#folder-layout)
 - [License and citation](#license-and-citation)
@@ -186,6 +187,10 @@ g.write_mtx(out);              // also write_dimacs(out) and write_EDGES(out)
 ```
 
 Sample graphs in each format are in [data/](data).
+
+## Performance
+
+There is no counterpart to compare GRAPH with: no standard library, and no widely used library, offers graphs stored as bitset adjacency matrices with these operations. GRAPH is therefore not benchmarked against another library, and no speedup is claimed for it. Its performance is that of the [BITSCAN](../bitscan/README.md#performance) bitset operations on the adjacency rows, which are benchmarked against `std::bitset` and `boost::dynamic_bitset` in [docs/benchmarks.md](../../docs/benchmarks.md). The dense types (`ugraph`) use dense rows and the sparse types (`sparse_ugraph`) use sparse rows, so the dense and sparse trade-offs described there apply to the graphs.
 
 ## Examples and tests
 

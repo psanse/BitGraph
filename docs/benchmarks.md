@@ -176,5 +176,7 @@ taskset -c <core> ./build/bin/benchmarks/bench_hotpaths 200
 
 ## Graphs
 
-No comparable third-party baseline is benchmarked for `ugraph`/`sparse_ugraph`. Graph operations are
-built on the bitset operations above, so these results are the reference for graph performance.
+There is no counterpart to compare GRAPH with: no standard library, and no widely used library, offers graphs stored
+as bitset adjacency matrices with these operations. GRAPH (`ugraph`, `sparse_ugraph`) is therefore not benchmarked
+against another library, and no speedup is claimed for it. Its performance is that of the BITSCAN operations it is built
+on, measured above; the colouring benchmark is a graph algorithm written on bitset rows.

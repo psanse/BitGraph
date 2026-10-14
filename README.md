@@ -140,13 +140,23 @@ BitGraph/
 
 ## Performance
 
-Measured on a Xeon Gold 6342 with GCC 13 (`-O3`), on 100,000-bit sets. Full tables, method and caveats are in [docs/benchmarks.md](docs/benchmarks.md).
+BITSCAN and GRAPH are different cases. BITSCAN has direct counterparts (`std::bitset`, `boost::dynamic_bitset`), so it is benchmarked against them. GRAPH has none. Full tables, method and caveats are in [docs/benchmarks.md](docs/benchmarks.md).
+
+### BITSCAN
+
+Measured on a Xeon Gold 6342 with GCC 13 (`-O3`), on 100,000-bit sets, and on Windows with MSVC.
 
 - **Sparse bitsets** are the clear win when few blocks are populated. At 1% occupancy, `&=` is about 50 times faster than `std::bitset`, `count()` about 80 times, and scanning about 5 times faster than libstdc++'s own `_Find_next`.
 - **Dense bitsets** match `std::bitset` on bulk operations (`&=`, `count()`) and are not faster than it. Their value is a sizes-at-run-time API with scans that the standard library lacks: the reverse scan is 4 to 44 times faster than the only portable alternative, and the forward scan is 3 to 43 times faster than a `test(i)` loop, but it is not faster than libstdc++'s non-portable `_Find_next`.
 - **Scan while modifying a set**, the core loop of bit-parallel graph algorithms, runs at parity with `boost::dynamic_bitset` (the runtime-sized alternative) and is 1.2 to 2 times slower than `std::bitset<N>` when `N` is a compile-time constant. There is measurable headroom in the library's dense paths.
 - **Where the standard library has no find-next (MSVC)**, BitGraph scans 3 to 42 times faster than the portable `std::bitset` loop, and its colouring loop is 1.05 to 14 times faster, growing with size and density.
 - **Trade-off:** random access on sparse bitsets is slower than on dense ones (about 4 times slower at 1% occupancy), so choose the sparse types for large, mostly empty sets.
+
+### GRAPH
+
+There is no counterpart to compare GRAPH with: no standard library, and no widely used library, offers graphs stored as bitset adjacency matrices with these operations. For that reason GRAPH is **not benchmarked against another library**, and no speedup is claimed for it.
+
+What can be said is how its performance arises. Row *v* of the adjacency matrix is a BITSCAN bitset, so graph operations such as common neighbours, induced subgraphs and candidate filtering are the BITSCAN operations measured above. The colouring benchmark in the BITSCAN part is exactly such a graph algorithm, written on bitset rows. The dense and sparse trade-off carries over: `ugraph` uses dense rows, and `sparse_ugraph` uses sparse rows, which makes very large graphs possible (a dense adjacency matrix for 1,000,000 vertices would need 125 GB).
 
 ## Platforms and releases
 
