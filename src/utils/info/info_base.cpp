@@ -1,8 +1,21 @@
-/*
- *info_base.cpp: implementation of info_base class for result logs of clique and clique-based algorithms
- *@date 12/12/2012
- *@last_update 13/23/2024
- *@author pss
+/**
+ * @file info_base.cpp
+ * @brief Implementation of the `infoBase` result-reporting utilities.
+ *
+ * @details
+ * Implements the reporting, timing, and stream-output behavior used to
+ * record results from clique and clique-based algorithms. The implementation
+ * formats parameter summaries, timing data, and tabular or verbose reports,
+ * and provides the stream insertion operator for `infoBase`.
+ *
+ * Timer values are associated with the major algorithm phases and are emitted
+ * through the reporting interface together with the problem and run metadata.
+ *
+ * @author pss
+ * @date 12/12/2012
+ * @last_update 13/23/2024
+ *
+ * @see info_base.h
  */
 
 #include "info_base.h"

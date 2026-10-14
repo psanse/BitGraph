@@ -30,6 +30,7 @@
 #include "utils/time_utils.h"
 
 
- // #include "utils/logger.h"			has to be set explicitly, sice it has MACROS 
+
+// #include "utils/logger.h"			should be set explicitly, since it has MACROS 
 
 #endif // BITGRAPH_UTILS_UTILS_H

@@ -8,17 +8,11 @@
 * @TODO - SUBGRAPH ORDERING TESTS DISABLED - CHECK  (27/12/2024)
 **/ 
 
-#include "graph/algorithms/graph_fast_sort.h"				//includes #include "graph/simple_ugraph.h"
-#include "graph/algorithms/graph_fast_sort_vertex_weighted.h"
-
+#include "graph/algorithms/graph_fast_sort.h"	
 #include "gtest/gtest.h"
-#include <iostream>
-//#include "utils/common.h"
-#include "utils/common_paths.h"
-#include "utils/logger.h"
-#include "utils/file_utils.h"
 #include <string>
 
+#include "graph/simple_ugraph.h"
 #include "graph/ugraph_vertex_weighted.h"
 
 using namespace std;

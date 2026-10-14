@@ -1,5 +1,23 @@
-/** @file random_uniform_gen.h
- *  @brief A simple random number generator.
+/**
+ * @file random_uniform_gen.h
+ * @brief Shared-state uniform random-number generator utilities.
+ *
+ * @details
+ * Defines the `bitgraph::utils::detail::RandomUniformGen` template, a thin
+ * wrapper around a standard uniform distribution and random engine. Each
+ * distribution/engine type pair owns shared static state, including the
+ * current range and seed, so all instances with the same template arguments
+ * observe the same generator configuration.
+ *
+ * The utility supports fixed, explicit, and system-derived seeding, as well
+ * as changing the distribution range. It is an implementation-detail helper
+ * and is not intended to be used as a general-purpose public API.
+ *
+ * @note Access to the shared engine and distribution is not synchronized;
+ *       concurrent use requires external synchronization.
+ *
+ * @see std::uniform_int_distribution
+ * @see std::mt19937
  */
 
 #ifndef BITGRAPH_UTILS_RANDOM_UNIFORM_GEN_H

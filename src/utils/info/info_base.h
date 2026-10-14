@@ -1,10 +1,26 @@
 /**
  * @file info_base.h
- * @brief: interface for result logs of clique and clique-based algorithms
- * @details: created 12/12/2024, last_update 12/09/2025
- * @dev pss
- * @note: deprecated class, tests disable, new types moved to graph (26/09/2026)
- **/
+ * @brief Result metadata and reporting interface for clique-based algorithms.
+ *
+ * @details
+ * Declares the legacy `paramBase` and `infoBase` utility types used to store
+ * problem parameters, execution limits, timing data, and formatted reports
+ * for clique and clique-based algorithm runs. The interface supports timer
+ * management for preprocessing, incumbent, and search phases, together with
+ * table and verbose report output.
+ *
+ * This is a legacy compatibility interface. New result and reporting types
+ * have moved to the graph subsystem, and this class is retained for existing
+ * clients and historical tests.
+ *
+ * @author pss
+ * @date Created: 12/12/2024
+ * @date Last updated: 12/09/2025
+ * @note Deprecated class; tests disabled and new types moved to graph
+ *       (26/09/2026).
+ *
+ * @see info_base.cpp
+ */
 
 #ifndef BITGRAPH_UTILS_INFO_BASE_H
 #define BITGRAPH_UTILS_INFO_BASE_H
