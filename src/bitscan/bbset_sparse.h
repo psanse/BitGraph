@@ -139,7 +139,7 @@ namespace bitgraph {
 		/**
 		* @brief AND between lhs and rhs bitsets in the CLOSED block-range [firstBlock, lastBlock]
 		*		 The result is stored in bitset res. Outside the range, res is set to 0.
-		* @param firstBit, lastBit: closed bit-range 0 <= firstBit <= lastBit <= num_blocks()
+		* @param firstBlock, lastBlock: closed block-range 0 <= firstBlock <= lastBlock <= num_blocks()
 		* @param lhs, rhs: input bitsets
 		* @param res: output bitset
 		* @returns reference to the resulting bitstring res
@@ -311,9 +311,9 @@ namespace bitgraph {
 		*		 provides bitblock closes to blockID with greater index. Depending on the Policy parameter, it can also provide
 			*		 the position of the latter bitblock.
 			* @param blockID: index of the block
-			* @param pos: OUTPUT param which provides I) the position of the block in the collection with index BlockID,
+			* @param insert_pos: OUTPUT param which provides I) the position of the block in the collection with index BlockID,
 			*			  II) BBObject::noBit depending if the block does not exist or the Policy parameter
-			* param ReturnInsertPos: template param which, if true, asks for the position of the block returned
+			* @tparam ReturnInsertPos: template param which, if true, asks for the position of the block returned
 			* @returns: iterator to the closest bitblock with index greater or equal to blocKID
 			*			or END() if the block does not exist. Depending on the Policy parameter, it can also provide
 			*			the position of the bitblock pointed by the iterator. If the block does not exist, and the Policy iterPos = false
@@ -325,7 +325,7 @@ namespace bitgraph {
 		SparseBlockVecConstIt find_block(index_t blockID, index_t& insert_pos)	const;
 
 		template<bool ReturnInsertPos = false>
-		SparseBlockVecIt   find_block(index_t blockID, index_t& pos);
+		SparseBlockVecIt   find_block(index_t blockID, index_t& insert_pos);
 
 		/**
 		* @brief extended version of find_block. The template parameter UseLowerBound determines

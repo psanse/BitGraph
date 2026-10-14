@@ -482,7 +482,7 @@ namespace bitgraph {
 			 *
 			 * No trailing newline is written.
 			 *
-			 * @param out Output stream.
+			 * @param o Output stream.
 			 * @return Reference to @p out.
 			 */
 			std::ostream& print(std::ostream& o) const;

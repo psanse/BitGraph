@@ -369,7 +369,7 @@ namespace bitgraph {
 		/**
 		* @brief replaces bits in the range [bit, 63] of source bitblock (source)
 		*		  in destination bitblock (dest)
-		* @param firstBit, lastBit: closed range of bits [0...63]
+		* @param bit: index of the bit in [0...63]
 		* @param source, dest: input bitblocks
 		**/
 		void copy_high(int bit, const BITBOARD& source, BITBOARD& dest);
@@ -377,7 +377,7 @@ namespace bitgraph {
 		/**
 		* @brief replaces bits in the range [0, bit] of source bitblock (source)
 		*		  in destination bitblock (dest)
-		* @param firstBit, lastBit: closed range of bits [0...63]
+		* @param bit: index of the bit in [0...63]
 		* @param source, dest: input bitblocks
 		**/
 		void copy_low(int bit, const BITBOARD& source, BITBOARD& dest);

@@ -364,7 +364,7 @@ namespace bitgraph {
 			 * Derived information classes may override this function to append
 			 * algorithm-specific parameters.
 			 *
-			 * @param out Destination output stream.
+			 * @param o Destination output stream.
 			 * @return Reference to @p out.
 			 */
 			virtual	std::ostream& print_params(
@@ -376,7 +376,7 @@ namespace bitgraph {
 			 * Floating-point values are written in fixed notation with four decimal
 			 * places. The stream's original formatting state is restored before return.
 			 *
-			 * @param out Destination stream.
+			 * @param o Destination stream.
 			 * @return Reference to @p out.
 			 */
 			std::ostream& print_timers(

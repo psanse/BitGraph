@@ -175,7 +175,7 @@ namespace bitgraph {
 		public:
 			/**
 			* @brief Constructs a scaling function.
-			* @param factor Multiplicative scale factor.
+			* @param s Multiplicative scale factor.
 			*/
 			explicit Scale(T s) :
 				factor_(s)

@@ -75,11 +75,11 @@ namespace bitgraph {
 		 * @brief Creates a system-clock time point from local calendar components.
 		 *
 		 * @param year Full calendar year.
-		 * @param month Month in the range [1, 12].
+		 * @param mon Month in the range [1, 12].
 		 * @param day Day of the month.
 		 * @param hour Hour in the range [0, 23].
-		 * @param minute Minute in the range [0, 59].
-		 * @param second Second in the range [0, 60].
+		 * @param min Minute in the range [0, 59].
+		 * @param sec Second in the range [0, 60].
 		 * @return Corresponding system-clock time point.
 		 */
 		std::chrono::system_clock::time_point

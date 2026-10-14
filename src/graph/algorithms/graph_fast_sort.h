@@ -298,7 +298,7 @@ namespace bitgraph {
 			 * The sorter stores a non-owning reference to @p graph. The graph must remain
 			 * alive and must not be structurally modified while the sorter is in use.
 			 *
-			 * @param graph Graph to analyze.
+			 * @param gout Graph to analyze.
 			 */
 			explicit GraphFastRootSort(graph_t& gout)
 				: graph_(gout),

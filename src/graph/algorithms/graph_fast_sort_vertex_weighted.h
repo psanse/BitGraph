@@ -156,8 +156,8 @@ namespace bitgraph {
 			 *
 			 * @param strategy Weighted sorting strategy.
 			 * @param placement Vertex placement policy.
-			 * @param old_to_new If `true`, returns the ordering in [OLD]->[NEW] format;
-			 *                   otherwise, in [NEW]->[OLD] format.
+			 * @param order Ordering format to return: `sort_order::old_to_new` for [OLD]->[NEW]
+			 *                   or `sort_order::new_to_old` for [NEW]->[OLD].
 			 * @return The computed vertex ordering.
 			 *
 			 * @warning Calls `std::terminate()` if `strategy` is not a valid

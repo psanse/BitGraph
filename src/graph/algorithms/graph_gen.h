@@ -204,7 +204,7 @@ namespace bitgraph {
 		 *        of the source graph using std::shuffle.
 		 *
 		 * @param[out] g_iso Generated isomorphic graph.
-		 * @param[in] g_source Source graph (not modified).
+		 * @param[in] g Source graph (not modified).
 		 *
 		 * @note Uses a fixed random seed for reproducibility.
 		 */

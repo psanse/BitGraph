@@ -863,11 +863,11 @@ namespace bitgraph {
 		* @brief ORs the 1-bits from the bitstring @p bb_add in the closed range [firstBlock, lastBlock]
 		*		 If lastBlock = npos, the range is [firstBlock, nBB_]
 		*
-		*		 0 <= FirstBlock <= LastBLock < the number of bitblocks in the bitstring
+		*		 0 <= firstBlock <= lastBlock < the number of bitblocks in the bitstring
 		*
 		* @param bb_add: input bitstring whose bits are added
-		* @param FirstBlock: the first bitblock to be modified
-		* @param LastBLock: the last bitblock to be modified
+		* @param firstBlock: the first bitblock to be modified
+		* @param lastBlock: the last bitblock to be modified
 		* @returns reference to the modified bitstring
 		**/
 		Bitset& set_block(
@@ -879,10 +879,10 @@ namespace bitgraph {
 		* @brief Overwrites / Copies the blocks of 1-bits from the bitstring @p bb_add
 		*		 in the closed range [firstBlock, lastBlock] to this bitstring.
 		*		 If LastBlock = npos, the range is [firstBlock, nBB_]
-		*		 0 <= FirstBlock <= LastBLock < the number of bitblocks in the bitstring
+		*		 0 <= firstBlock <= lastBlock < the number of bitblocks in the bitstring
 		* @param bb_add: input bitstring whose bits are copied
-		* @param FirstBlock: the first bitblock to be modified
-		* @param LastBLock: the last bitblock to be modified
+		* @param firstBlock: the first bitblock to be modified
+		* @param lastBlock: the last bitblock to be modified
 		* returns reference to the modified bitstring
 		**/
 		Bitset& assign_block(
@@ -1148,7 +1148,7 @@ namespace bitgraph {
 		* @brief Determines if the caller bitstring has a single 1-bit in the
 		*		 closed bit-range [firstBit, lastBit]
 		*
-		* @param firstBlock, lastBlock: range of blocks (0<=firstBlock<=lastBlock<nBB_).
+		* @param firstBit, lastBit: closed bit-range (0<=firstBit<=lastBit).
 		* @returns 1 if singleton, 0 if empty, -1 if more than one bit in the specifed range
 		* @details optimized for non-sparse bitsets - early exit
 		**/
@@ -1171,7 +1171,7 @@ namespace bitgraph {
 		 *
 		 * Two bitsets are disjoint when they have no set-bit positions in common.
 		 *
-		 * @param other Bitset to compare with this bitset.
+		 * @param bitset Bitset to compare with this bitset.
 		 * @return `true` if the bitsets have no set bits in common; otherwise,
 		 *         `false`.
 		 *
@@ -1185,7 +1185,7 @@ namespace bitgraph {
 		 * Two bitsets intersect when they have at least one set-bit position in
 		 * common.
 		 *
-		 * @param other Bitset to compare with this bitset.
+		 * @param bitset Bitset to compare with this bitset.
 		 * @return `true` if the bitsets have at least one set bit in common;
 		 *         otherwise, `false`.
 		 *

@@ -122,11 +122,11 @@ namespace bitgraph {
 		 * Every nonzero entry `adjacency[v][w]` represents the directed edge `(v,w)`.
 		 * For an undirected graph, the input matrix is expected to be symmetric.
 		 *
-		 * @param NV Number of rows and columns in @p adjacency.
-		 * @param adjacency Input adjacency matrix.
-		 * @param filename Optional graph instance name or source filename.
+		 * @param NV Number of rows and columns in @p adj.
+		 * @param adj Input adjacency matrix.
+		 * @param name Optional graph instance name or source filename.
 		 *
-		 * @pre If @p NV is greater than zero, @p adjacency and each of its
+		 * @pre If @p NV is greater than zero, @p adj and each of its
 		 *      rows must be valid.
 		 *
 		 * @note This constructor follows a fail-fast policy and terminates the program
@@ -181,7 +181,7 @@ namespace bitgraph {
 		 * The path is stored exactly as supplied; no normalization is performed and
 		 * no trailing directory separator is added automatically.
 		 *
-		 * @param pathName Directory path to store.
+		 * @param path_name Directory path to store.
 		 */
 		void set_path(std::string path_name) { path_.swap(path_name); }
 
@@ -260,7 +260,7 @@ namespace bitgraph {
 		 * For a directed graph, the returned bitset contains the outgoing neighbors
 		 * of @p vertex.
 		 *
-		 * @param vertex Vertex whose neighborhood is requested.
+		 * @param v Vertex whose neighborhood is requested.
 		 * @return Constant reference to the vertex-neighborhood bitset.
 		 *
 		 * @pre `0 <= vertex < num_vertices()`.
@@ -273,7 +273,7 @@ namespace bitgraph {
 		 * The cached edge count is invalidated because the caller may modify the
 		 * returned adjacency row.
 		 *
-		 * @param vertex Vertex whose neighborhood is requested.
+		 * @param v Vertex whose neighborhood is requested.
 		 * @return Modifiable reference to the vertex-neighborhood bitset.
 		 *
 		 * @pre `0 <= vertex < num_vertices()`.
@@ -843,7 +843,7 @@ namespace bitgraph {
 		 * Writes `p edge n m`, where `n` is the number of vertices and `m` is the
 		 * number of edges.
 		 *
-		 * @param out Output stream.
+		 * @param o Output stream.
 		 * @param lazy If `true`, num_edges() may use a valid cached edge count.
 		 *             If `false`, the edge count is recomputed.
 		 * @return Reference to @p out.
@@ -873,7 +873,7 @@ namespace bitgraph {
 		 */
 		ostream& print_data(
 			bool lazy = true,
-			std::ostream & = std::cout, 
+			std::ostream& out = std::cout, 
 			bool trailing_new_line = true) const;
 
 		/**
@@ -887,7 +887,7 @@ namespace bitgraph {
 		 * @return Reference to @p out.
 		 */
 		ostream& print_adj(
-			std::ostream & = std::cout, 
+			std::ostream& out = std::cout, 
 			bool trailing_new_line = true) const;
 
 		/**
@@ -902,7 +902,7 @@ namespace bitgraph {
 		 * @return Reference to @p out.
 		 */
 		virtual ostream& print_edges(
-			std::ostream & = std::cout, 
+			std::ostream& out = std::cout, 
 			bool trailing_newline = false);
 
 		/*

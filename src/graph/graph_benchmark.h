@@ -197,7 +197,7 @@ namespace bitgraph {
 	
 			/**
 			 * @brief Constructs a benchmark for a dataset path.
-			 * @param path Common path for all benchmark instances.
+			 * @param path_name Common path for all benchmark instances.
 			 */
 			explicit BasicGraphBenchmark(std::string path_name);
 

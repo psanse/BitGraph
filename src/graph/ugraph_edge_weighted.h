@@ -133,7 +133,7 @@ namespace bitgraph {
 		*		  (in a non-edge it can only set the weight to NO_WEIGHT)
 		*  @param v input vertex
 		*  @param w input vertex
-		*  @param we input weight value
+		*  @param val input weight value
 		*
 		*	(weights in self-loops are always added - considered vertex weights)
 		*
@@ -222,17 +222,17 @@ namespace bitgraph {
 		 * `edge_matrix` mode, the complete edge-weight matrix is printed, using
 		 * `NO_WEIGHT` entries to represent non-edges.
 		 *
-		 * @param os Output stream.
+		 * @param o Output stream.
 		 * @param format Edge-printing format.
 		 * @param trailing_newline If `true`, appends an additional newline after
 		 *                         the complete output.
 		 *
-		 * @return Reference to @p os.
+		 * @return Reference to @p o.
 		 */
 		std::ostream& print_edges(
 			std::ostream& o = std::cout,
 			edge_print_format format = edge_print_format::edge_list,
-			bool traling_newline = false) const override;
+			bool trailing_newline = false) const override;
 
 	protected:
 		/**

@@ -191,7 +191,6 @@ namespace bitgraph{
 			* 		III. First call requires initialization with init_scan(DESTRUCTIVE)
 			*
 			* @param bitset: a bitset from which the scanned bit is erased
-			* @param block: output parameter with the current bitblock
 			* @returns the next bit in the bitstring, BBObject::noBit if there are no more bits
 			**/
 			virtual int next_bit_del(BBScan& bitset);
@@ -282,7 +281,6 @@ namespace bitgraph{
 			*		II. erases the current scanned bit
 			* 		IV. First call requires initialization with init_scan(DESTRUCTIVE, REVERSE)
 			*
-			* @param block: output bitblock of the retrieved bit
 			* @param bitset: bitset from which the retrieved bit is erased
 			* @returns the next lsb bit in the bitstring, BBObject::noBit if there are no more bits
 			* @details Created   23/3/12, last update 09/02/2025

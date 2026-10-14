@@ -616,7 +616,7 @@ namespace bitgraph {
 		 * @note Does not modify the graph.
 		 */
 		std::ostream& print_degrees(
-			std::ostream & = std::cout)	const;
+			std::ostream& os = std::cout)	const;
 
 		/**
 		 * @brief Prints the edges of the undirected graph to an output stream.
@@ -628,7 +628,7 @@ namespace bitgraph {
 		 * @note Each undirected edge is printed exactly once.
 		 * @note Does not modify the graph.
 		 */
-		std::ostream& print_edges(std::ostream & = std::cout,
+		std::ostream& print_edges(std::ostream& os = std::cout,
 			bool trailing_newline = false) override;
 
 		/**
@@ -642,7 +642,7 @@ namespace bitgraph {
 		 * @note The vertex bitset may have its scan state modified.
 		 */
 		std::ostream& print_edges(vertex_bitset_t& vertices,
-			std::ostream&);
+			std::ostream& os);
 
 		/**
 		 * @brief Prints the adjacency matrix of the graph.
@@ -653,7 +653,7 @@ namespace bitgraph {
 		 * @note Does not modify the graph.
 		 */
 		std::ostream& print_adjacency_matrix(
-			std::ostream & = std::cout) const;
+			std::ostream& os = std::cout) const;
 				
 	};
 
