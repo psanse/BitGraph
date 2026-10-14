@@ -90,7 +90,8 @@ namespace bitgraph{
 			using scanDR = detail::PersistentScanDestructiveReverse<BBScan>;
 
 			// for basic bitscanning operatins - they are hidden by next_bit()
-			using Bitset::next_bit;				
+			using Bitset::next_bit;
+			using Bitset::prev_bit;			// stateless predecessor, also hidden by prev_bit()
 
 			//////////////////////////////
 			//construction / destruction

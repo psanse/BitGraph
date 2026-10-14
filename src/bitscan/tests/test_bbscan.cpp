@@ -7,6 +7,7 @@
 **/
 
 #include "bitscan/bbscan.h"
+#include "bitscan/bbscan_sparse.h"
 #include "bitscan/bbutils.h"
 #include "gtest/gtest.h"
 #include <iostream>
@@ -442,4 +443,60 @@ TEST_F(BBScanClassTest, self_assignment) {
 	int b;
 	while ((b = bbsc.next_bit()) != bbo::noBit) res.insert(b);
 	EXPECT_EQ(sol, res);
+}
+
+TEST(BBScanExtractFirstK, first_k_bits) {
+	BBScan bb(100);
+	bb.set_bit(10);
+	bb.set_bit(64);
+	bb.set_bit(65);
+
+	std::vector<int> lv(3, -1);
+
+	// exactly the first two bits, in increasing order
+	EXPECT_EQ(2, extract_first_k(2, bb, lv));
+	EXPECT_EQ((std::vector<int>{10, 64}), lv);
+
+	// k equal to the population count
+	EXPECT_EQ(3, extract_first_k(3, bb, lv));
+	EXPECT_EQ((std::vector<int>{10, 64, 65}), lv);
+
+	// k larger than the population count: only the existing bits, no noBit entries
+	EXPECT_EQ(3, extract_first_k(10, bb, lv));
+	EXPECT_EQ((std::vector<int>{10, 64, 65}), lv);
+
+	// k = 0
+	EXPECT_EQ(0, extract_first_k(0, bb, lv));
+	EXPECT_TRUE(lv.empty());
+}
+
+TEST(BBScanExtractFirstK, empty_bitset) {
+	BBScan bb(100);
+	std::vector<int> lv{7, 8};
+	EXPECT_EQ(0, extract_first_k(5, bb, lv));
+	EXPECT_TRUE(lv.empty());
+}
+
+TEST(BBScanExtractFirstK, sparse_bitset) {
+	BBScanSp bb(100000);
+	bb.set_bit(5);
+	bb.set_bit(70000);
+	bb.set_bit(99999);
+
+	std::vector<int> lv;
+	EXPECT_EQ(2, extract_first_k(2, bb, lv));
+	EXPECT_EQ((std::vector<int>{5, 70000}), lv);
+}
+
+TEST(BBScanPrevBit, stateless_predecessor) {
+	BBScan bb(130);
+	bb.set_bit(3);
+	bb.set_bit(64);
+	bb.set_bit(100);
+
+	// prev_bit(bit): next 1-bit towards lower positions; noBit as argument starts from the highest
+	EXPECT_EQ(100, bb.prev_bit(BBObject::noBit));
+	EXPECT_EQ(64, bb.prev_bit(100));
+	EXPECT_EQ(3, bb.prev_bit(64));
+	EXPECT_EQ(BBObject::noBit, bb.prev_bit(3));
 }

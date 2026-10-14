@@ -576,18 +576,17 @@ namespace bitgraph {
 
 		lv.clear();
 
-		///////////////////////////////////////////////////////////////
-		if (bb.init_scan(bbo::NON_DESTRUCTIVE) == -1) { return 0; }
-		///////////////////////////////////////////////////////////////
+		bb.init_scan(bbo::NON_DESTRUCTIVE);
 
+		// stops after k bits, or earlier if the bitset has fewer than k 1-bits
 		int nBits = 0;
 		int bit = BBObject::noBit;
-		while ((bit = bb.next_bit()) != BBObject::noBit || nBits < k) {
+		while (nBits < k && (bit = bb.next_bit()) != BBObject::noBit) {
 			lv.emplace_back(bit);
 			nBits++;
 		}
 
-		//number of bits found (ideally the first-k)
+		//number of bits found (k, or the population count if smaller)
 		return nBits;
 	}
 

@@ -185,6 +185,7 @@ namespace bitgraph {
 		* @brief for basic bitscanning - they are hidden by next_bit()
 		**/
 		using BitsetSp::next_bit;
+		using BitsetSp::prev_bit;		// stateless predecessor, also hidden by prev_bit()
 
 		////////////////
 		// bitscan backwards
