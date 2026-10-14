@@ -1,0 +1,77 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 320" width="1280" height="320" role="img" aria-labelledby="t d">
+  <title id="t">BitGraph 2.0</title>
+  <desc id="d">BitGraph 2.0: bit-parallel sets and graphs for combinatorial optimization in C++. A small graph and the bit string of one vertex neighbourhood.</desc>
+
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0b1220"/>
+      <stop offset="1" stop-color="#1b2a44"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#22d3ee"/>
+      <stop offset="1" stop-color="#818cf8"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#22d3ee" stop-opacity="0.28"/>
+      <stop offset="1" stop-color="#22d3ee" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <!-- background -->
+  <rect width="1280" height="320" rx="18" fill="url(#bg)"/>
+  <ellipse cx="1030" cy="130" rx="330" ry="190" fill="url(#glow)"/>
+
+  <!-- faint bit string running across the bottom -->
+  <text x="40" y="304" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace" font-size="20" letter-spacing="6" fill="#22d3ee" opacity="0.10">0110100111010010 1011001010110100 0100111010010110 1101001011010011 0010110101101001</text>
+
+  <!-- title -->
+  <text x="60" y="150" font-family="Inter,'Segoe UI',system-ui,-apple-system,Helvetica,Arial,sans-serif" font-size="96" font-weight="800" letter-spacing="-2"><tspan fill="#f8fafc">Bit</tspan><tspan fill="url(#accent)">Graph</tspan><tspan fill="#fbbf24" dx="22" font-size="64" font-weight="700">2.0</tspan></text>
+  <text x="64" y="204" font-family="Inter,'Segoe UI',system-ui,-apple-system,Helvetica,Arial,sans-serif" font-size="27" fill="#cbd5e1">Bit-parallel sets and graphs for combinatorial optimization in C++</text>
+  <text x="64" y="252" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace" font-size="19" letter-spacing="5" fill="#94a3b8">BITSCAN  ·  GRAPH  ·  UTILS</text>
+
+  <!-- graph -->
+  <g stroke="#475569" stroke-width="3" stroke-linecap="round">
+    <line x1="872" y1="82"  x2="1000" y2="48"/>
+    <line x1="1000" y1="48" x2="1132" y2="94"/>
+    <line x1="1132" y1="94" x2="1172" y2="180"/>
+    <line x1="1172" y1="180" x2="1040" y2="214"/>
+    <line x1="1040" y1="214" x2="902" y2="178"/>
+    <line x1="902" y1="178" x2="872" y2="82"/>
+    <line x1="1132" y1="94" x2="1020" y2="124"/>
+    <line x1="1020" y1="124" x2="1040" y2="214"/>
+    <line x1="1020" y1="124" x2="902" y2="178"/>
+  </g>
+  <!-- highlighted triangle 0-1-6 -->
+  <g stroke="#fbbf24" stroke-width="4.5" stroke-linecap="round">
+    <line x1="872" y1="82" x2="1000" y2="48"/>
+    <line x1="1000" y1="48" x2="1020" y2="124"/>
+    <line x1="1020" y1="124" x2="872" y2="82"/>
+  </g>
+  <g stroke="#22d3ee" stroke-width="4.5" stroke-linecap="round">
+    <line x1="1020" y1="124" x2="1132" y2="94"/>
+    <line x1="1020" y1="124" x2="1040" y2="214"/>
+    <line x1="1020" y1="124" x2="902" y2="178"/>
+  </g>
+
+  <g font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace" font-size="17" font-weight="700" text-anchor="middle" fill="#0b1220">
+    <circle cx="872"  cy="82"  r="20" fill="#fbbf24"/><text x="872"  y="88">0</text>
+    <circle cx="1000" cy="48"  r="20" fill="#fbbf24"/><text x="1000" y="54">1</text>
+    <circle cx="1132" cy="94"  r="20" fill="#22d3ee"/><text x="1132" y="100">2</text>
+    <circle cx="1172" cy="180" r="20" fill="#64748b"/><text x="1172" y="186">3</text>
+    <circle cx="1040" cy="214" r="20" fill="#22d3ee"/><text x="1040" y="220">4</text>
+    <circle cx="902"  cy="178" r="20" fill="#22d3ee"/><text x="902"  y="184">5</text>
+    <circle cx="1020" cy="124" r="24" fill="#f8fafc"/><text x="1020" y="130">6</text>
+  </g>
+
+  <!-- neighbourhood of vertex 6 as a bit string: 1110110 -->
+  <text x="868" y="262" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace" font-size="17" fill="#94a3b8" text-anchor="end">N(6)</text>
+  <g font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace" font-size="19" font-weight="700" text-anchor="middle">
+    <rect x="884"  y="240" width="40" height="34" rx="6" fill="#22d3ee"/><text x="904"  y="263" fill="#0b1220">1</text>
+    <rect x="928"  y="240" width="40" height="34" rx="6" fill="#22d3ee"/><text x="948"  y="263" fill="#0b1220">1</text>
+    <rect x="972"  y="240" width="40" height="34" rx="6" fill="#22d3ee"/><text x="992"  y="263" fill="#0b1220">1</text>
+    <rect x="1016" y="240" width="40" height="34" rx="6" fill="#1e293b" stroke="#334155"/><text x="1036" y="263" fill="#64748b">0</text>
+    <rect x="1060" y="240" width="40" height="34" rx="6" fill="#22d3ee"/><text x="1080" y="263" fill="#0b1220">1</text>
+    <rect x="1104" y="240" width="40" height="34" rx="6" fill="#22d3ee"/><text x="1124" y="263" fill="#0b1220">1</text>
+    <rect x="1148" y="240" width="40" height="34" rx="6" fill="#1e293b" stroke="#334155"/><text x="1168" y="263" fill="#64748b">0</text>
+  </g>
+</svg>

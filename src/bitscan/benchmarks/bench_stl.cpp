@@ -97,6 +97,13 @@ namespace {
 			long long c = 0;
 			for (std::size_t i = 0; i < a.size(); ++i) if (a.test(i)) c += static_cast<long long>(i);
 			g_sink += c; }, min_ms));
+#if defined(__GLIBCXX__)
+		// libstdc++ extension (non-portable): the fastest scan std::bitset offers on GCC
+		report(type, occ, "scan (libstdc++ _Find_first/_Find_next)", time_ns([&] {
+			long long c = 0;
+			for (std::size_t i = a._Find_first(); i < a.size(); i = a._Find_next(i)) c += static_cast<long long>(i);
+			g_sink += c; }, min_ms));
+#endif
 	}
 
 	void run_vector_bool(double occ, int min_ms, const std::vector<int>& la) {
