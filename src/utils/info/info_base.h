@@ -234,6 +234,10 @@ namespace bitgraph {
 
 		};
 
+		// Namespace-scope declaration: the friend declaration above is only found by ADL,
+		// so the using-declaration below needs this one to name the operator (required by GCC).
+		std::ostream& operator<< (std::ostream&, const infoBase&);
+
 	}//end namespace utils
 
 	using utils::paramBase;

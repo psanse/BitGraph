@@ -23,7 +23,9 @@
 #ifndef BITGRAPH_UTILS_RANDOM_UNIFORM_GEN_H
 #define BITGRAPH_UTILS_RANDOM_UNIFORM_GEN_H
 
+#include <chrono>
 #include <random>
+#include <stdexcept>
 
 namespace bitgraph {
 

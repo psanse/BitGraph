@@ -17,8 +17,8 @@ namespace {
 	template<class ParamT>
 	class TestBatch : public Batch<ParamT>{
 	public:
-		using Batch::add_test;
-		using Batch::operator+=;
+		using Batch<ParamT>::add_test;
+		using Batch<ParamT>::operator+=;
 
 	}; // end class TestBatch
 }

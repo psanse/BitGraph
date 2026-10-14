@@ -66,11 +66,11 @@ namespace bitgraph {
 		inline
 			bool all_unique(const CollectionT& collection)
 		{
-			using value_type = typename Collection::value_type;
+			using value_type = typename CollectionT::value_type;
 
 			std::unordered_set< value_type> unique_elements(
-				v.begin(), 
-				v.end()
+				collection.begin(),
+				collection.end()
 			);
 
 			return unique_elements.size() == collection.size();
@@ -141,7 +141,7 @@ namespace bitgraph {
 					out << '[' << count << "] ";
 				}
 				
-				out << *iterator << " "; nC++;
+				out << *iterator << " ";
 				
 			}
 			out << '[' << count << ']';
