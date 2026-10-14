@@ -537,17 +537,15 @@ namespace bitgraph {
 			int blockL = WDIV(bit);
 
 			//looks for the next bit in the current block
-			int pos = bblock::lsb64_de_Bruijn(Tables::mask_high[bit - WMUL(blockL) /*WMOD(bit)*/] & vBB_[blockL]);
-			if (pos >= 0) {
-				//////////////////////////////
-				return (pos + WMUL(blockL));
-				////////////////////////////
+			Ul posInBB;
+			if (_BitScanForward64(&posInBB, Tables::mask_high[bit - WMUL(blockL) /*WMOD(bit)*/] & vBB_[blockL])) {
+				return (posInBB + WMUL(blockL));
 			}
 
 			//looks in remaining biblocks
 			for (auto i = blockL + 1; i < nBB_; ++i) {
-				if (vBB_[i]) {
-					return(bblock::lsb64_de_Bruijn(vBB_[i]) + WMUL(i));
+				if (_BitScanForward64(&posInBB, vBB_[i])) {
+					return (posInBB + WMUL(i));
 				}
 			}
 
@@ -567,25 +565,15 @@ namespace bitgraph {
 			int blockH = WDIV(bit);
 
 			//looks for the msb in the (trimmed) current block
-			int pos = bblock::msb64_lup(Tables::mask_low[ /*bit - WMUL(blockH)*/  WMOD(bit) ] & vBB_[blockH]);
-			if (pos != BBObject::noBit) {
-				return (pos + WMUL(blockH));
+			Ul posInBB;
+			if (_BitScanReverse64(&posInBB, Tables::mask_low[WMOD(bit)] & vBB_[blockH])) {
+				return (posInBB + WMUL(blockH));
 			}
 
 			//looks for the msb in the remaining blocks
-			union u {
-				U16 c[4];
-				BITBOARD b;
-			}val{};
-
-			for (int i = static_cast<int>(blockH - 1) /* must be signed! */; i >= 0; --i)
-			{
-				val.b = vBB_[i];
-				if (val.b) {
-					if (val.c[3]) return (Tables::msba[3][val.c[3]] + WMUL(i));
-					if (val.c[2]) return (Tables::msba[2][val.c[2]] + WMUL(i));
-					if (val.c[1]) return (Tables::msba[1][val.c[1]] + WMUL(i));
-					if (val.c[0]) return (Tables::msba[0][val.c[0]] + WMUL(i));
+			for (int i = blockH - 1 /* must be signed! */; i >= 0; --i) {
+				if (_BitScanReverse64(&posInBB, vBB_[i])) {
+					return (posInBB + WMUL(i));
 				}
 			}
 

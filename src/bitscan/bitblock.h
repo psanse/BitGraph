@@ -48,32 +48,13 @@
 #else
 	#define __popcnt64 __builtin_popcountll
 
-	#if defined(__x86_64__)
-		#include <x86intrin.h>
-		static inline unsigned char _BitScanForward64(unsigned long* Index, unsigned long long Mask)
-		{
-			unsigned long long Ret;
-			__asm__(
-				"bsfq %[Mask], %[Ret]"
-				: [Ret] "=r" (Ret)
-				: [Mask] "mr" (Mask)
-			);
-			*Index = (unsigned long)Ret;
-			return Mask ? 1 : 0;
-		}
-
-		static inline unsigned char _BitScanReverse64(unsigned long* Index, unsigned long long Mask)
-		{
-			unsigned long long Ret;
-			__asm__(
-				"bsrq %[Mask], %[Ret]"
-				: [Ret] "=r" (Ret)
-				: [Mask] "mr" (Mask)
-			);
-			*Index = (unsigned long)Ret;
-			return Mask ? 1 : 0;
-		}
-	#elif defined(__aarch64__)
+	#if defined(__x86_64__) || defined(__aarch64__)
+		// Compiler builtins instead of inline asm: transparent to the optimizer, so the zero test is fused
+		// with the scan (bsf flags) and tzcnt/lzcnt are used when BMI/LZCNT is enabled (e.g. -march=native).
+		// Index is only written when Mask != 0, as with MSVC.
+		#if defined(__x86_64__)
+			#include <x86intrin.h>
+		#endif
 		static inline unsigned char _BitScanForward64(unsigned long* Index, unsigned long long Mask)
 		{
 			if (Mask == 0) return 0;

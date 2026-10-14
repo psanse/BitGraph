@@ -47,9 +47,9 @@ at 50% occupancy).
 | 50% | 81,668 | **24,611** | 26,035 | **10,082** |
 
 - Against the portable `std::bitset` loop, the dense scanner is 43x / 12x / 3x faster (1% / 10% / 50%).
-- Against libstdc++'s `_Find_next` extension, the **dense scanner is not faster**: it is about 1.7x slower at 1%,
-  1.2x at 10% and 1.06x at 50%. The dense scanner's value is a portable, uniform API (forward, reverse,
-  destructive and non-destructive scans), not raw speed over `_Find_next`.
+- Against libstdc++'s `_Find_next` extension, the dense scanner **was not faster** in this run (before the scanning
+  optimisation described under "Hot paths"): about 1.7x slower at 1%, 1.2x at 10% and 1.06x at 50%. After the
+  optimisation it is about 1.9 to 2.1x faster at 10% and 50% occupancy.
 - The **sparse scanner is the fastest**: 4.6x / 2.7x / 2.4x faster than `_Find_next`.
 
 ### Sparse bitsets: large wins when few blocks are populated
@@ -86,13 +86,34 @@ The tables above come from `bench_stl`. A second benchmark, [bench_hotpaths.cpp]
 | BITSCAN stateless `next_bit(bit)` | 1,853 | 8,543 | 38,471 |
 | hand-written loop over `block(i)` with `bblock::lsb` | 1,094 | 1,645 | 4,208 |
 
-What this shows:
+What this showed **before the scanning optimisation** (see the next section for the current numbers):
 
-- The persistent scanner is **not faster** than `_Find_next` or `boost::dynamic_bitset::find_next`. It is about equal at 10% and 50% occupancy, and 1.7 to 1.9 times slower at 1% (against `_Find_next` and `boost::dynamic_bitset`). The cursor is kept in the bitset and written back on every bit.
-- `view::scan` is 1.1 to 1.3 times faster than `_Find_next` at 10% and 50% occupancy, and 1.25 to 1.5 times faster than `boost::dynamic_bitset`.
+- The persistent scanner was **not faster** than `_Find_next` or `boost::dynamic_bitset::find_next`. It was about equal at 10% and 50% occupancy, and 1.7 to 1.9 times slower at 1% (against `_Find_next` and `boost::dynamic_bitset`).
+- `view::scan` was 1.1 to 1.3 times faster than `_Find_next` at 10% and 50% occupancy, and 1.25 to 1.5 times faster than `boost::dynamic_bitset`.
 - A scan written by hand over the exposed 64-bit blocks (`block(i)`, `bblock::lsb`, clear the lowest bit) is **3.5 to 6 times faster** than `_Find_next` at 10% and 50%. BITSCAN exposes its blocks, so this is available; `std::bitset` offers no equivalent. The library's own scanners do not yet reach that speed, because they keep the cursor in memory and must tolerate changes to the set while scanning.
 
-### Reverse scan (100,000 bits, ns for the whole scan)
+### After the scanning optimisation (same machine and flags, whole-scan ns)
+
+The first set of numbers above exposed two avoidable costs on GCC/x86-64, which were removed:
+
+- `_BitScanForward64` and `_BitScanReverse64` were inline `asm` (`bsfq`/`bsrq`), opaque to the optimizer. They now use `__builtin_ctzll`/`__builtin_clzll`, so the zero test is fused with the scan and `tzcnt`/`lzcnt` are used when the target has them.
+- The scans cleared the returned bit with a table lookup (`Tables::mask[pos]`); they now compute `~(1 << pos)`.
+- The stateless `next_bit(bit)` / `prev_bit(bit)` of the dense bitset used de Bruijn and 16-bit lookup tables; they now use the same intrinsics as the cursor scans.
+
+| Method | 1% | 10% | 50% |
+|---|---:|---:|---:|
+| `std::bitset` `_Find_next` (GCC only) | 1,429 | 5,686 | 24,921 |
+| BITSCAN `bitarray::scan` (persistent scanner) | 1,706 | 3,001 | 11,850 |
+| BITSCAN `view::scan` (independent view) | 1,984 | 2,324 | 7,509 |
+| BITSCAN stateless `next_bit(bit)` | 1,477 | 5,520 | 24,491 |
+| BITSCAN `bitarray::scanR` (reverse; `std::bitset` has none) | 1,262 | 4,657 | 21,874 |
+
+- The persistent scanner is now **1.9 to 2.1 times faster** than `_Find_next` at 10% and 50% occupancy (it was equal), and `view::scan` is 2.4 to 3.3 times faster. At 1% occupancy the library is still about 1.2 times **slower** than `_Find_next`: there the cost is dominated by skipping empty blocks, not by finding bits.
+- The stateless `next_bit(bit)` improved by 1.3 times at 10% and 1.6 times at 50% and is now equal to `_Find_next`.
+- With `-march=native` the reverse scan is a further 1.9 to 2.3 times faster (`lzcnt`); the forward scans change little.
+- The scan-while-modifying colouring (below) improved only slightly (up to about 10%), so the scan itself is no longer its bottleneck: the `andnot_eq` / `erase_block` work on the neighbour row dominates. The colouring table below shows the numbers before the change; the new ones are, in microseconds for the destructive scan / + range: n=256 p=0.5: 2.5 / 2.4; n=1024 p=0.1: 14.3 / 13.2, p=0.5: 14.6 / 13.7, p=0.9: 16.7 / 15.6; n=4096 p=0.1: 209 / 168, p=0.5: 219 / 191, p=0.9: 254 / 225.
+
+### Reverse scan (100,000 bits, ns for the whole scan; before the optimisation)
 
 | Method | 1% | 10% | 50% |
 |---|---:|---:|---:|
@@ -152,10 +173,10 @@ The advantage grows with the number of vertices and the density, because each sc
 
 ### What this means
 
-- Dense BITSCAN is **not faster** than `std::bitset` or `boost::dynamic_bitset` for bulk operations or for plain scanning. On Linux with GCC it matches `boost::dynamic_bitset` and trails `std::bitset<N>` when `N` is a compile-time constant. It matches the runtime-sized alternative and loses to `std::bitset<N>` when `N` is known at compile time.
+- Dense BITSCAN is **not faster** than `std::bitset` or `boost::dynamic_bitset` for bulk operations. For scanning on Linux with GCC it is now about 2 times faster than libstdc++'s `_Find_next` on dense sets (10% and 50% occupancy), but still slower on very sparse content (1% occupancy). In the scan-while-modifying colouring loop it matches `boost::dynamic_bitset` and trails `std::bitset<N>` when `N` is a compile-time constant.
 - **Portability is a real advantage.** Where the standard library offers no find-next (MSVC), BITSCAN scans 3 to 42 times faster than the only portable `std::bitset` loop, and its scan-while-modifying colouring loop is 1.05 to 14 times faster (see the MSVC section above).
 - BITSCAN's strengths are elsewhere: sizes chosen at run time with a portable API, **reverse and destructive scans** that other libraries do not offer (reverse is 4 to 44 times faster than the only alternative), independent scan views, range-restricted operations, direct access to the 64-bit blocks, and the **sparse** types, which are the large wins in the first part of this report.
-- There is measurable headroom in the library's own dense paths: a hand-written block loop scans 3.5 to 6 times faster than the persistent scanner, and `std::bitset<N>` vectorizes its bulk operations where BITSCAN's runtime-length loops do not.
+- There is still measurable headroom in the library's own dense paths: a hand-written block loop scans about 3 times faster than the persistent scanner (the scanners are `virtual` and keep the cursor in memory), and `std::bitset<N>` vectorizes its bulk operations where BITSCAN's runtime-length loops do not.
 
 ## Reproducing
 

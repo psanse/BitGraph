@@ -10,6 +10,10 @@ Changes since the 2.0.0 tag.
 - `Graph::create_subgraph_first_k(first_k)` (by-value overload for directed graphs) did not compile when used; it now calls the existing `create_subgraph_first_k(first_k, out)`.
 - `bitarray` and `sparse_bitarray` now expose the stateless `prev_bit(bit)` next to `next_bit(bit)`; it was hidden by the stateful `prev_bit()` overloads.
 
+### Performance
+
+- Bit scanning is about 2 times faster than libstdc++'s `_Find_next` on dense content (it was equal) and the reverse scan is faster too. On GCC (x86-64 and aarch64) `_BitScanForward64` / `_BitScanReverse64` now use `__builtin_ctzll` / `__builtin_clzll` instead of inline `asm`; the scans compute the bit-clear mask with a shift instead of a table lookup; the stateless `Bitset::next_bit(bit)` / `prev_bit(bit)` use the intrinsics instead of de Bruijn and lookup tables. Measurements in [docs/benchmarks.md](docs/benchmarks.md).
+
 ### Added
 
 - Opt-in Doxygen API reference: configure with `-DBITGRAPH_BUILD_DOCS=ON` and build the `docs` target (see [docs/README.md](docs/README.md)).

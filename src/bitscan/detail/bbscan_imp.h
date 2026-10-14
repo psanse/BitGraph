@@ -35,7 +35,7 @@ namespace bitgraph {
 				scan_.bbi_ = i;
 
 				//deletes the current bit before returning
-				vBB_[i] &= ~Tables::mask[posInBB];
+				vBB_[i] &= ~(BITBOARD(1) << posInBB);
 
 				return (posInBB + WMUL(i));
 			}
@@ -61,10 +61,10 @@ namespace bitgraph {
 				scan_.bbi_ = i;
 
 				//deletes the current bit before returning
-				vBB_[i] &= ~Tables::mask[posInBB];
+				vBB_[i] &= ~(BITBOARD(1) << posInBB);
 
 				//erases from the bitset passed the scanned bit
-				bbN_del.vBB_[i] &= ~Tables::mask[posInBB];
+				bbN_del.vBB_[i] &= ~(BITBOARD(1) << posInBB);
 
 				return (posInBB + WMUL(i));
 			}
@@ -129,7 +129,7 @@ namespace bitgraph {
 			//block = scan_.bbi_;
 
 			//deletes the bit from the input bitset
-			bitset.vBB_[scan_.bbi_] &= ~Tables::mask[posInBB];
+			bitset.vBB_[scan_.bbi_] &= ~(BITBOARD(1) << posInBB);
 
 			return (posInBB + WMUL(scan_.bbi_));
 		}
@@ -146,7 +146,7 @@ namespace bitgraph {
 					//block = i;
 
 					//deletes the bit from the input bitset
-					bitset.vBB_[i] &= ~Tables::mask[posInBB];
+					bitset.vBB_[i] &= ~(BITBOARD(1) << posInBB);
 
 					return (posInBB + WMUL(i));
 				}
@@ -207,7 +207,7 @@ namespace bitgraph {
 			scan_.pos_ = posInBB;									//current block has not changed, so not stored			
 
 			//deletes the bit from the input bitset
-			bitset.vBB_[scan_.bbi_] &= ~Tables::mask[posInBB];
+			bitset.vBB_[scan_.bbi_] &= ~(BITBOARD(1) << posInBB);
 
 			return (posInBB + WMUL(scan_.bbi_));
 
@@ -224,7 +224,7 @@ namespace bitgraph {
 					scan_.pos_ = posInBB;
 
 					//deletes the bit from the input bitset
-					bitset.vBB_[scan_.bbi_] &= ~Tables::mask[posInBB];
+					bitset.vBB_[scan_.bbi_] &= ~(BITBOARD(1) << posInBB);
 
 					return (posInBB + WMUL(i));
 				}
@@ -251,7 +251,7 @@ namespace bitgraph {
 				scan_.bbi_ = i;
 
 				//deletes the current bit from the bitset before returning
-				vBB_[i] &= ~Tables::mask[posInBB];
+				vBB_[i] &= ~(BITBOARD(1) << posInBB);
 
 				return (posInBB + WMUL(i));
 			}
@@ -276,14 +276,14 @@ namespace bitgraph {
 				scan_.bbi_ = i;
 
 				//deletes the current bit from the bitset before returning
-				vBB_[i] &= ~Tables::mask[posInBB];
+				vBB_[i] &= ~(BITBOARD(1) << posInBB);
 
 
 				//outputs the current block
 				//block = i;
 
 				//erases the bit from the input bitset
-				bitset.vBB_[i] &= ~Tables::mask[posInBB];
+				bitset.vBB_[i] &= ~(BITBOARD(1) << posInBB);
 
 				return (posInBB + WMUL(i));
 			}

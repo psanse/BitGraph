@@ -146,7 +146,7 @@ for (int bit = scan.next_bit(); bit != BBObject::noBit; bit = scan.next_bit())
 Measured on a Xeon Gold 6342 with GCC 13 (`-O3`), on 100,000-bit sets. Details and caveats are in [docs/benchmarks.md](../../docs/benchmarks.md).
 
 - Dense `&=` and `count()` run at the same speed as `std::bitset`: not faster.
-- The dense forward scanner is 3 to 43 times faster than the portable `test(i)` loop, but not faster than libstdc++'s non-portable `_Find_next`. The reverse scanner `scanR` is 4 to 44 times faster than the only portable alternative.
+- The dense forward scanner is 3 to 43 times faster than the portable `test(i)` loop, and about 2 times faster than libstdc++'s non-portable `_Find_next` on dense content (10% to 50% occupancy; slower at 1%). The reverse scanner `scanR` is 4 to 44 times faster than the only portable alternative.
 - Scanning while modifying a set (greedy colouring) runs at parity with `boost::dynamic_bitset` and is 1.2 to 2 times slower than `std::bitset<N>` with a compile-time `N`.
 - Where the standard library has no find-next (MSVC), the forward scanner is 3 to 42 times faster than the portable `std::bitset` loop and the colouring loop is 1.05 to 14 times faster.
 - Sparse bitsets are about 50 times faster than `std::bitset` for `&=` and about 80 times for `count()` at 1% occupancy, and their scanner is 2 to 5 times faster than `_Find_next`. The price is slower random access (`test`), so use them for large, mostly empty sets.
