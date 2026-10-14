@@ -1,14 +1,34 @@
- /**
-  * @file bbutils.h
-  * @brief contains composite bitset classes and other utility functions for the BITSCAN library
-  * @author pss
-  * @details created 2017, last_update 08/12/2025
- **/
+/**
+ * @file bbutils.h
+ * @brief Utility algorithms and composite bitset helpers for BITSCAN.
+ *
+ * @details
+ * This header provides generic helpers for converting and sampling bitsets,
+ * creating random 64-bit blocks, and extracting set-bit indices. It also
+ * defines lightweight composition types that add cached population counts,
+ * stack semantics, or fixed-size collections of bitsets to the core BITSCAN
+ * hierarchy.
+ *
+ * The utilities are template-based and operate on bitset types that expose
+ * the common @c BBObject/bitset interface. @c BitSetWithPC deliberately keeps
+ * a cached population count that may be managed independently from the actual
+ * bitset contents, while @c BitSetStack maintains a synchronized stack view
+ * of set bits. These wrappers are intended for algorithm-specific use and do
+ * not replace the underlying bitset classes.
+ *
+ * @author pss
+ * @date Last updated: 14 October 2026
+ *
+ * @see bbobject.h
+ * @see bbset.h
+ * @see bitblock.h
+ * @warning A cached count in @c BitSetWithPC can become stale if the wrapped
+ *          bitset is modified without using the wrapper's operations.
+ */
 
 #ifndef  BITGRAPH_BITSCAN_BBUTILS_H
 #define  BITGRAPH_BITSCAN_BBUTILS_H
 
-//#include "utils/common.h"
 #include "utils/logger.h"
 #include "bitscan/bbset.h"
 #include "utils/random_utils.h"

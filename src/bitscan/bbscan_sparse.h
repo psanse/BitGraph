@@ -1,12 +1,35 @@
 /**
  * @file bbscan_sparse.h
- * @brief header for sparse class equivalent to the BBScan class
- *		  manages sparse bit strings with efficient bitscanning capabilities
- * @author pss
- * @details: created 2012, last_update 25/02/2025
+ * @brief Persistent-cursor scanning for sparse BITSCAN bitsets.
  *
- * TODO refactoring and testing 25/02/2025
- **/
+ * @details
+ * This header defines @c bitgraph::BBScanSp, the sparse counterpart of
+ * @c BBScan. It extends @c BitsetSp with a mutable scan cursor and optimized
+ * forward and reverse traversal over the collection of non-zero sparse
+ * blocks. The cursor's block component refers to a position in that sparse
+ * block collection, not directly to a logical bitblock index.
+ *
+ * BBScanSp supports non-destructive and destructive scans, scans that apply
+ * results to another sparse bitset, and persistent scanner adapters for each
+ * scan direction and mode. Copy and move operations transfer the sparse
+ * bitset contents but initialize the destination with a fresh scan cursor.
+ * Non-destructive scans may be performed on const objects because the cursor
+ * is mutable.
+ *
+ * Empty sparse bitsets do not provide a valid scan range. Scan initialization
+ * and the scan operations therefore use the class's documented failure or
+ * empty-result behavior rather than assuming that a block exists.
+ *
+ * @author pss
+ * @date Last updated: 14 October 2026
+ *
+ * @see bbset_sparse.h
+ * @see bbscan.h
+ * @see detail/persistent_scan.h
+ * @warning Destructive scan operations clear the bits they return and may
+ *          remove empty sparse blocks from the underlying representation.
+ * @todo Complete interface refactoring and testing.
+ */
 
 #ifndef BITGRAPH_BITSCAN_BBSCAN_SPARSE_H
 #define BITGRAPH_BITSCAN_BBSCAN_SPARSE_H

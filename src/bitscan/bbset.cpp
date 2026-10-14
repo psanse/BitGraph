@@ -1,8 +1,28 @@
 /**
- * @file bbset.cpp file
- * @brief implementation of the Bitset class for non-sparse bitarrays
+ * @file bbset.cpp
+ * @brief Implementation of the dense @c bitgraph::Bitset type.
+ *
+ * @details
+ * A @c Bitset stores a fixed-size logical bit string as a contiguous vector
+ * of machine-word bitblocks. This implementation provides construction,
+ * resizing, bit access, set operations, comparisons, population queries, and
+ * basic bit scanning without maintaining auxiliary sentinel or scan-cache
+ * state. Operations that require optimized block traversal are implemented
+ * directly over the underlying dense block storage.
+ *
+ * The final bitblock is masked when the logical bit count does not align with
+ * the block width, ensuring that unused high bits cannot affect results. The
+ * class uses the block and index definitions supplied by @c BBObject and is
+ * intended to be extended by specialized types such as @c BBScan.
+ *
  * @author pss
- **/
+ * @date Last updated: 14 October 2026
+ *
+ * @see bbset.h
+ * @see bbscan.h
+ * @warning This is a dense representation; use the sparse bitset types when
+ *          the set contains very few bits relative to its logical size.
+ */
 
 #include "bbset.h"
 #include <iostream>

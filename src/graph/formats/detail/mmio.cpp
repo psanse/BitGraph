@@ -1,10 +1,24 @@
 /**
-* @file mmio.cpp
-* @brief Implementation of Matrix Market I/O library for ANSI C
-*        (see http://math.nist.gov/MatrixMarket for details).
-* @created ?
-* @last_update 27/01/2025
-**/ 
+ * @file mmio.cpp
+ * @brief Matrix Market coordinate-format I/O implementation.
+ *
+ * This file provides the low-level routines used to read and write Matrix
+ * Market files, including their banners, matrix dimensions, coordinate
+ * entries, and type codes. The implementation supports sparse matrices with
+ * real, complex, integer, and pattern-valued entries where permitted by the
+ * Matrix Market format.
+ *
+ * The routines are kept in @c bitgraph::io::detail and use the C stdio and
+ * memory-allocation interfaces for compatibility with the original Matrix
+ * Market reference implementation. Arrays returned through output pointers
+ * are allocated by this implementation; callers are responsible for releasing
+ * them with the matching C allocation function.
+ *
+ * @see https://math.nist.gov/MatrixMarket/
+ * @see mmio.h
+ *
+ * @date 27 January 2025
+ */
 
 #include <stdio.h>
 #include <string.h>

@@ -1,20 +1,34 @@
 /**
  * @file bbscan_view_sparse.h
- * @brief Independent scan views over sparse bitsets (BitsetSp / BBScanSp).
- *		  Sparse counterpart of BBScanViewT (bbscan_view.h).
- * @details Each view owns an independent cursor, so several non-destructive views
- *          can scan the same sparse bitset at the same time. For hot paths that can
- *          use a cursor stored in the bitset, prefer the persistent scanners of BBScanSp.
+ * @brief Independent compile-time scan views for sparse bitsets.
  *
- *          The cursor refers to the position of a block in the sparse collection
- *          (not to the block index in the bitstring), as in BBScanSp.
- *          Views do not keep any other state: no allocation, all functions are inline.
+ * @details
+ * This header defines @c bitgraph::BBScanViewSpT, the sparse counterpart of
+ * @c BBScanViewT. Each view references a @c BitsetSp-compatible object and
+ * owns its own scan cursor, allowing multiple non-destructive views to scan
+ * the same sparse bitset independently. Forward, reverse, destructive, and
+ * non-destructive modes are selected at compile time through
+ * @c BBObject::scan_types.
  *
- * @note The referenced bitset must remain valid, and its blocks must not be inserted or removed,
- *       while the view is in use (clearing bits is fine, destructive views do it).
- * @created 14/10/2026
+ * The cursor's block component is an index into the sparse block collection,
+ * not the logical block number in the represented bitstring. Views perform no
+ * allocation and the implementation is inline. Convenience aliases for
+ * generic sparse bitsets and @c BBScanSp are available in @c bitgraph::view.
+ *
+ * An empty sparse bitset produces an exhausted scan. Passing a starting bit
+ * outside the valid logical range terminates the program, consistent with the
+ * class's fail-fast initialization policy. Destructive views clear returned
+ * bits, but the sparse block collection must not be structurally modified
+ * while any view is active.
+ *
  * @author pss
- **/
+ * @date Created: 14 October 2026
+ *
+ * @see bbscan_sparse.h
+ * @see bbscan_view.h
+ * @warning The referenced bitset must outlive the view. Do not insert or
+ *          remove sparse blocks while a view is using it.
+ */
 
 #ifndef BITGRAPH_BITSCAN_BBSCAN_VIEW_SPARSE_H
 #define BITGRAPH_BITSCAN_BBSCAN_VIEW_SPARSE_H

@@ -1,7 +1,27 @@
 /**
-* @file bitboard.cpp
-* @brief Implementation of the BitBoard class 
-**/
+ * @file bitblock.cpp
+ * @brief Implementation of low-level 64-bit bitblock operations.
+ *
+ * @details
+ * This file implements the algorithms in @c bitgraph::bblock for operating
+ * on a single @c BITBOARD. The routines provide population counts, least- and
+ * most-significant-bit searches, formatted output, and masked copy helpers
+ * used by the dense and sparse bitset implementations.
+ *
+ * Several bit-scan and population-count variants are provided so the library
+ * can select an implementation appropriate to the configured platform and
+ * lookup tables. Empty bitblocks return @c BBObject::noBit from search
+ * functions; valid bit positions within a block are zero-based in the range
+ * [0, 63].
+ *
+ * @author pss
+ * @date Last updated: 14 October 2026
+ *
+ * @see bitblock.h
+ * @see tables.h
+ * @note The public declarations are in @c bitblock.h, whose include guard
+ *       retains the historical @c BITGRAPH_BITSCAN_BITBLOCK_H name.
+ */
 
 #include "bitblock.h"
 #include <iostream>

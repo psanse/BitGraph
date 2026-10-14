@@ -1,15 +1,33 @@
- /**
-  * @file bbscan.h file
-  * @brief header file of the BBScan class from the BITSCAN library.
-  *		   Manages efficient bitscanning (for hot paths).
-		   Alternatives: i) using the nested bitscanning classes in BBObject (hot paths)
-						 ii) using the external scanning feature in BBScanView (simple commodity, not hot paths)
-  * @details Use external scanning feature for commodity. Use this class for specific tuning of bitscans
-  * @details last_updated 13/02/2025
-  * @author pss
-  * 
-  * TODO - Compare efficiency with nested bitscanning classes in BBObject (13/02/2025)
-  **/
+/**
+ * @file bbscan.h
+ * @brief Persistent-cursor bit scanning for dense BITSCAN bitsets.
+ *
+ * @details
+ * This header defines @c bitgraph::BBScan, a @c Bitset-derived type that
+ * stores a mutable scan cursor alongside the bitset data. The persistent
+ * cursor is designed for hot paths that repeatedly scan a bitset, avoiding
+ * the setup and state transfer required by a standalone scanner.
+ *
+ * BBScan supports forward and reverse scans, both non-destructive and
+ * destructive, as well as scans that apply their result to another bitset.
+ * It also exposes lightweight scanner adapters backed by the same cursor.
+ * Copying or moving a BBScan transfers the bitset contents but does not copy
+ * an active scan position.
+ *
+ * Only one scan may be active on a given BBScan object at a time. Initializing
+ * another scan overwrites the stored cursor; independent BBScan objects may
+ * be scanned concurrently. For general-purpose scanning, prefer the external
+ * scanning views; use BBScan when persistent cursor state is beneficial.
+ *
+ * @author pss
+ * @date Last updated: 14 October 2026
+ *
+ * @see bbset.h
+ * @see bbobject.h
+ * @see bbscan_view.h
+ * @see detail/persistent_scan.h
+ * @warning Destructive scan operations clear the bits they return.
+ */
 
 #ifndef BITGRAPH_BITSCAN_BBSCAN_H
 #define BITGRAPH_BITSCAN_BBSCAN_H

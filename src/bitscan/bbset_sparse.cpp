@@ -1,11 +1,29 @@
- /**
-  * @file bbset_sparse.cpp
-  * @brief implementations for the sparse BitsetSp class wrapper for sparse bitstrings (header bbset_sparse.h)
-  * @author pss
-  * @details created 10/02/2015?, @last_update 20/02/2025
-  *
-  * TODO refactoring and testing 15/02/2025 - follow the interface of the refactored BitSet
-  **/
+/**
+ * @file bbset_sparse.cpp
+ * @brief Implementation of the sparse @c bitgraph::BitsetSp type.
+ *
+ * @details
+ * A @c BitsetSp represents a logical bit string by storing only the non-zero
+ * bitblocks in a collection of indexed @c SparseBlock records. The logical
+ * population size is retained separately, while absent blocks represent runs
+ * of zero bits. The collection is kept ordered by block index so that updates,
+ * range operations, comparisons, and sparse set operations can traverse only
+ * the blocks that are present.
+ *
+ * This file implements construction, block and bit updates, sparse AND/OR and
+ * subtraction operations, copying, comparisons, I/O helpers, and population
+ * queries. It provides the sparse storage layer but does not maintain the
+ * additional scan state used by specialized high-performance bit scanners.
+ *
+ * @author pss
+ * @date Last updated: 14 October 2026
+ *
+ * @see bbset_sparse.h
+ * @warning The sparse implementation and its interface are still undergoing
+ *          refactoring and testing; behavior may change.
+ * @todo Align the interface fully with @c Bitset and complete refactoring and
+ *       testing.
+ */
 
 #include "bbset_sparse.h"
 #include "utils/logger.h"

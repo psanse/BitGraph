@@ -1,14 +1,29 @@
 /**
- * @file bbsentinel.cpp file
- * @brief Source file of the BBSentinel class (header bbsentinel.h)
- *		   Manages efficient bitset operations by circumscribing them to the range [low_sentinel, high_sentinel]
- * @details The lower sentinel is the first non-zero bitblock in the bitstring
- * @detials The higher sentinel is the last non-zero bitblock in the bitstring
- * @details created?,  last_updated 13/02/2025
- * @author pss
+ * @file bbsentinel.cpp
+ * @brief Implementation of the experimental @c BBSentinel bitset type.
  *
- * TODO- EXPERIMENTAL - NOT CHECKED (13/02/2025)
- **/
+ * @details
+ * A @c BBSentinel is a block-oriented bitset that tracks an inclusive range
+ * of potentially non-zero bitblocks. The lower sentinel identifies the first
+ * active block and the upper sentinel identifies the last active block. The
+ * sentinel range allows scanning, population-count, and bitwise operations to
+ * skip leading and trailing zero blocks.
+ *
+ * This file implements sentinel maintenance, sentinel-aware destructive bit
+ * scans, bitset operations, and the helper overload for combining a regular
+ * @c Bitset with a @c BBSentinel. Destructive scan functions clear the bit
+ * they return and update the corresponding sentinel as they proceed.
+ *
+ * The implementation belongs to @c bitgraph::experimental and is intended for
+ * internal or experimental use. The API and behavior may change until the
+ * implementation is fully refactored and tested.
+ *
+ * @author pss
+ * @date Last updated: 14 October 2026
+ *
+ * @see bbsentinel.h
+ * @warning Experimental implementation; not fully validated for production use.
+ */
 
 #include "bbsentinel.h"
 #include <algorithm>			//std::max

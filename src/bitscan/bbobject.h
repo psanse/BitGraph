@@ -1,10 +1,27 @@
-/**  
+/**
  * @file bbobject.h
- * @brief Interface for the BITSCAN library hierarchy of classes
-   * @details created ?, last_update 14/02/2025
- * @author: pss
+ * @brief Common abstract interface for BITSCAN bitset objects.
  *
- **/
+ * @details
+ * @c bitgraph::BBObject is the polymorphic base of the BITSCAN bitset
+ * hierarchy. It defines the shared index and container aliases, sentinel
+ * values for invalid blocks and bits, scan-mode identifiers, and the small
+ * state object used to track a bitblock and bit position during scans.
+ *
+ * Derived dense, sparse, and scan-enabled bitset types provide their own
+ * storage and scanning behavior while exposing a common stream-printing
+ * interface. The class does not own bitset storage itself; it supplies the
+ * vocabulary and minimal virtual interface shared by the implementations.
+ *
+ * @author pss
+ * @date Last updated: 14 October 2026
+ *
+ * @see bbset.h
+ * @see bbset_sparse.h
+ * @see bbscan.h
+ * @see bbtypes.h
+ * @see bbconfig.h
+ */
 
 #ifndef BITGRAPH_BITSCAN_BBOBJECT_H
 #define BITGRAPH_BITSCAN_BBOBJECT_H
@@ -14,14 +31,18 @@
 #include "bbconfig.h"
 
 namespace bitgraph {
-		
-	//////////////////
-	//
-	// BBObject class
-	// (abstract class - base of the bitset hierarchy)
-	//
-	//////////////////
 
+	/**
+	 * @brief Abstract base class of the BITSCAN bitset hierarchy.
+	 *
+	 * Provides common types, constants, and interfaces shared by
+	 * dense and sparse bitset implementations.
+	 *
+	 * Serves as the base class for Bitset, BitsetSp, and their
+	 * derived scanning classes.
+	 *
+	 * @note BBObject is not intended to be instantiated directly.
+	 */
 	class BBObject {
 	public:
 		

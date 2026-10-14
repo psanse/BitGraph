@@ -1,19 +1,31 @@
 /**
- * @file bbscan_view_impl.h
- * @brief Inline and template implementations for BITSCAN scan views.
+ * @file bbscan_view_imp.h
+ * @brief Inline template implementation of BITSCAN scan views.
  *
- * This file implements the scan-view classes declared in bbscan_view.h.
- * Scan views own an independent cursor, allowing multiple non-destructive
- * views to traverse the same bitset independently.
+ * @details
+ * This implementation fragment defines the operations declared by
+ * @c bitgraph::BBScanViewT. It performs forward and reverse searches over
+ * dense bitblock storage and dispatches at compile time between
+ * non-destructive and destructive scan paths. Destructive paths clear each
+ * returned bit from the referenced bitset; non-destructive paths update only
+ * the view's independent cursor.
  *
- * For performance-critical paths that can use a cursor stored directly in the
- * bitset, prefer the persistent scanning interface provided by BBScan.
+ * Empty bitsets are represented by an invalid cursor and return
+ * @c BBObject::noBit when scanned. Valid scans retain the current block and
+ * bit position so that subsequent calls continue from the previously found
+ * bit in the configured direction.
  *
- * This implementation header is included at the end of bbscan_view.h and
- * should not be included directly by user code.
+ * This file is included at the end of @c bbscan_view.h because the definitions
+ * are templates. It must not be included directly by application code.
+ * For a scan cursor stored inside the bitset itself, use @c BBScan instead.
  *
- * @date Created: 11/09/2026
  * @author P. San Segundo
+ * @date Created: 11 September 2026
+ *
+ * @see ../bbscan_view.h
+ * @see ../bbscan.h
+ * @warning Destructive implementations modify the referenced bitset and are
+ *          incompatible with overlapping scans on the same storage.
  */
 
 #ifndef BITGRAPH_BITSCAN_BBSCAN_VIEW_IMP_H

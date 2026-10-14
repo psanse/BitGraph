@@ -1,12 +1,36 @@
 /**
  * @file bitscan.h
- * @brief facade aliases for consumer code of the BITSCAN lib, a C++ library for bitset optimization.
- * @details The BITSCAN library is currently released as part of the BITGRAPH C++ library. 
+ * @brief Public facade for the BITSCAN bitset and scanning APIs.
+ *
  * @details
- *  - date 2014
- *  - last modified 16/09/2026
+ * This header is the consumer-facing entry point for BITSCAN as distributed
+ * with the BITGRAPH C++ library. It includes the dense and sparse bitset
+ * hierarchies, persistent scanners, independent scan views, sentinel-based
+ * experimental support, and common bitset utilities.
+ *
+ * The facade provides concise aliases for the primary types:
+ * @c bitgraph::bitarray for dense persistent scanning,
+ * @c bitgraph::sparse_bitarray for sparse persistent scanning, and the
+ * corresponding @c simple_* aliases for bitsets without persistent scan
+ * state. View aliases are exposed under @c bitgraph::view, with sparse view
+ * aliases under @c bitgraph::view::sparse.
+ *
+ * Persistent scanners store their cursor in the bitset. View scanners instead
+ * own an independent cursor and reference an existing bitset. Destructive
+ * scanner variants clear the bits they return. The
+ * @c bitgraph::watched_bitarray alias remains experimental and is not fully
+ * validated.
+ *
  * @author pss
- **/
+ * @date Last updated: 16 September 2026
+ *
+ * @see bbscan.h
+ * @see bbscan_sparse.h
+ * @see bbscan_view.h
+ * @see bbscan_view_sparse.h
+ * @warning The aliases do not change the ownership or mutation semantics of
+ *          the underlying types; consult the referenced class documentation.
+ */
 
 
 #ifndef BITGRAPH_BITSCAN_BITSCAN_H

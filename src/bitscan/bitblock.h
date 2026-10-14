@@ -1,12 +1,32 @@
-/** 
- * @file bitboard.h
- * @brief Header file for the class BitBoard of the BITSCAN 1.0 library
- * @details The BitBoard class manages bitsets of 64-bit length
- * @created ?
- * @last_update 30/01/2025 (refactored, added trimming functions, Doxygen tags)
+/**
+ * @file bitblock.h
+ * @brief Low-level operations for individual 64-bit BITSCAN bitblocks.
+ *
+ * @details
+ * This header declares the functions and masks in @c bitgraph::bblock for
+ * operating on one @c BITBOARD. The API includes least- and
+ * most-significant-bit searches, population counts, bit tests, range masks,
+ * trimming helpers, masked copying, and formatted output.
+ *
+ * Multiple implementations are available for bit scans and population
+ * counts, including lookup-table, De Bruijn, and processor-intrinsic paths.
+ * The selected defaults depend on the platform and BITSCAN configuration.
+ * Empty blocks return @c BBObject::noBit from bit-position search functions;
+ * valid bit indices are zero-based in the inclusive range [0, 63].
+ *
+ * This header also provides the platform-specific compiler and intrinsic
+ * adapters required by the low-level implementations. The lookup tables used
+ * by the masks and table-based algorithms are defined by @c tables.h.
+ *
  * @author pss
- * 
- **/
+ * @date Last updated: 14 October 2026
+ *
+ * @see bbtypes.h
+ * @see bbobject.h
+ * @see tables.h
+ * @warning Functions that accept bit indices expect values in the documented
+ *          [0, 63] range; callers are responsible for validating indices.
+ */
 
 #ifndef BITGRAPH_BITSCAN_BITBLOCK_H
 #define BITGRAPH_BITSCAN_BITBLOCK_H

@@ -1,11 +1,33 @@
- /**
-  * @file bbscan_view.h file
-  * @brief header file of the BBScanView class from the BITSCAN library.
-  *		   Manages efficient bitscanning as a separate view. For hot paths use BBScan.
-  * @created 11/09/2026
-  * @author pss
-  * 
-  **/
+/**
+ * @file bbscan_view.h
+ * @brief Compile-time-configured scan views for BITSCAN bitsets.
+ *
+ * @details
+ * This header defines @c bitgraph::BBScanViewT, a lightweight scanning view
+ * that references an existing bitset and owns an independent scan cursor. The
+ * scan direction and destructive behavior are selected through the
+ * @c BBObject::scan_types template argument, allowing the implementation to
+ * dispatch without storing a run-time scan mode.
+ *
+ * Forward, reverse, non-destructive, and destructive views are provided, with
+ * convenient aliases in @c bitgraph::view. A view does not own its referenced
+ * bitset, so that bitset must remain alive and must not be concurrently
+ * modified in a way that invalidates the active scan. Destructive views clear
+ * each bit they return from the referenced bitset.
+ *
+ * The implementation is included from @c detail/bbscan_view_imp.h because the
+ * primary type is a template. For persistent cursor state stored inside the
+ * bitset itself, use @c BBScan instead.
+ *
+ * @author pss
+ * @date Created: 11 September 2026
+ *
+ * @see bbscan.h
+ * @see bbobject.h
+ * @see detail/bbscan_view_imp.h
+ * @warning A view stores a reference, not a copy. The referenced bitset must
+ *          outlive the view.
+ */
 
 #ifndef BITGRAPH_BITSCAN_BBSCAN_VIEW_H
 #define BITGRAPH_BITSCAN_BBSCAN_VIEW_H

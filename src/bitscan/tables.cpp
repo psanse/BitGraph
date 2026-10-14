@@ -1,3 +1,31 @@
+/**
+ * @file tables.cpp
+ * @brief Definition and initialization of BITSCAN lookup tables.
+ *
+ * @details
+ * This translation unit owns the storage for the lookup tables declared by
+ * @c bitgraph::detail::Tables. The tables cover population counts, least- and
+ * most-significant-bit positions, single-bit and interval masks, and the
+ * De Bruijn indices used by low-level 64-bit bitblock operations.
+ *
+ * A translation-unit-local initializer invokes @c Tables::InitAllTables()
+ * during static initialization so the tables are ready before normal library
+ * use. Optional tables are compiled only when their corresponding build
+ * configuration macros, such as @c EXTENDED_LOOKUPS or
+ * @c CACHED_INDEX_OPERATIONS, are enabled.
+ *
+ * The definitions in this file are implementation details of BITSCAN and are
+ * not intended to be accessed directly by application code.
+ *
+ * @author Pablo San Segundo
+ * @date Last updated: 14 October 2026
+ *
+ * @see tables.h
+ * @see bitblock.h
+ * @warning Initialization order for unrelated global objects in other
+ *          translation units remains subject to the C++ static-initialization
+ *          rules.
+ */
 #include "tables.h"
 
 

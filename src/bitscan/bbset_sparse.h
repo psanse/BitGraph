@@ -1,12 +1,33 @@
- /**
-  * @file bbset_sparse.h
-  * @brief header for sparse class equivalent to the BitsetSp class
-  * @author pss
-  * @details created 19/12/2015?, @last_update 08/12/2025 (improved design, types etc.)
-  *
-  * TODO - Improve BitSet class interface (08/12/2025)	
-  * TODO - check inlining and header / cpp implementations (08/12/2025) 
-  **/
+/**
+ * @file bbset_sparse.h
+ * @brief Sparse bitset storage and set operations for BITSCAN.
+ *
+ * @details
+ * This header defines @c bitgraph::BitsetSp, a @c BBObject-derived bitset
+ * that stores logical bitblocks as indexed @c SparseBlock records rather than
+ * allocating a dense block array for the entire population. The logical
+ * capacity and the number of block records are tracked separately: a sparse
+ * bitset may have a large universe while containing few stored blocks.
+ *
+ * The class provides constructors, indexed block lookup, bit and range updates,
+ * population queries, basic scanning, comparisons, and sparse AND, OR, and
+ * subtraction operations. Stored blocks are maintained in block-index order
+ * to support logarithmic lookup and efficient merge-style operations. Some
+ * erase operations clear blocks without immediately removing their records;
+ * callers should use the provided compaction operation when that distinction
+ * matters.
+ *
+ * @author pss
+ * @date Last updated: 14 October 2026
+ *
+ * @see bbobject.h
+ * @see bitblock.h
+ * @see bbscan_sparse.h
+ * @warning The sparse interface is still being refactored. In particular,
+ *          stored-block count and logical block capacity are different values.
+ * @todo Align the interface fully with @c Bitset and complete implementation
+ *       and inline-definition testing.
+ */
 
 #ifndef BITGRAPH_BITSCAN_BBSET_SPARSE_H
 #define BITGRAPH_BITSCAN_BBSET_SPARSE_H	

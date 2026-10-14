@@ -1,15 +1,33 @@
 /**
  * @file bbscan_sparse_imp.h
- * @brief Implementation of the BBScanSp class for sparse bitsets.
+ * @brief Inline implementation of sparse persistent bit scanning.
  *
- * Provides efficient bit-scanning operations on sparse bitsets,
- * including forward, reverse, destructive, and non-destructive scanning.
+ * @details
+ * This header contains the inline definitions of @c bitgraph::BBScanSp,
+ * declared in @c bbscan_sparse.h. The implementation scans the ordered
+ * collection of non-zero sparse blocks in forward or reverse order while
+ * retaining the current collection position and intra-block bit position in
+ * the object's persistent cursor.
+ *
+ * Both non-destructive and destructive scans are implemented, including
+ * overloads that remove the discovered bit from a supplied sparse bitset.
+ * Search functions return @c BBObject::noBit when the cursor is invalid or no
+ * matching bit remains. Initialization also translates a logical starting bit
+ * into the corresponding sparse-block position; the overload accepting a
+ * starting bit is intended for non-destructive scans.
+ *
+ * This file is an implementation fragment and is included by
+ * @c bbscan_sparse.h after the @c BBScanSp declaration. It should not be
+ * included directly by application code.
  *
  * @author pss
- * @date Created 2012
- * @date Last updated 25/02/2025
+ * @date Last updated: 14 October 2026
  *
- * @todo Refactor and extend unit tests (25/02/2025).
+ * @see ../bbscan_sparse.h
+ * @see ../bbset_sparse.h
+ * @see persistent_scan.h
+ * @warning Destructive scans modify the target sparse bitset and may change
+ *          its stored block collection as empty blocks are removed.
  */
 
 #ifndef BITGRAPH_BITSCAN_BBSCAN_SPARSE_IMP_H

@@ -1,17 +1,34 @@
 /**
  * @file persistent_scan.h
- * @brief Lightweight scanners using scan state stored in the source bitset.
+ * @brief Template scanners backed by a bitset's persistent scan cursor.
  *
- * The scanner classes in this file provide forward, reverse, destructive,
- * and destructive-reverse traversal over set bits.
+ * @details
+ * This header defines the four scanner adapters used by @c BBScan and related
+ * bitset types: forward, reverse, destructive-forward, and
+ * destructive-reverse traversal. Each adapter is a lightweight reference to
+ * a compatible bitset and delegates cursor management and bit retrieval to
+ * that bitset's persistent scanning interface.
  *
- * Unlike BBScanViewT, these scanners do not own an independent cursor. They
- * use the persistent scan cursor stored in the referenced bitset to minimize
- * overhead in performance-critical bit-parallel graph algorithms.
+ * Persistent scanners do not own an independent cursor, unlike
+ * @c BBScanViewT. This minimizes per-scan state and setup overhead in
+ * performance-critical bit-parallel algorithms. The overloads accepting a
+ * second bitset scan the source while clearing each returned position from
+ * that target bitset.
  *
- * @warning Only one persistent scan may be active on a given bitset at a
- *          time. Constructing or reinitializing another persistent scanner
- *          on the same bitset invalidates any scan already in progress.
+ * The referenced bitset must outlive its scanner. Only one persistent scan may
+ * be active on a given bitset at a time: constructing or reinitializing
+ * another scanner on the same bitset overwrites the shared cursor and
+ * invalidates the previous scan. Destructive scanners also modify the source
+ * bitset as they return set-bit positions.
+ *
+ * @author pss
+ * @date Last updated: 14 October 2026
+ *
+ * @see ../bbscan.h
+ * @see ../bbscan_view.h
+ * @see ../bbobject.h
+ * @warning Persistent scanner instances are non-owning references and must
+ *          not outlive the bitset they scan.
  */
 
 #ifndef BITGRAPH_BITSCAN_DETAIL_PERSISTENT_SCAN_H

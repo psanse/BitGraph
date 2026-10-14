@@ -1,19 +1,33 @@
- /**
-  * @file tables.h
-  * @brief Declares internal masks and lookup tables used by BITSCAN.
-  *
-  * This header declares precomputed tables used by low-level bit operations,
-  * including population counts, least- and most-significant-bit lookup tables,
-  * bit masks, De Bruijn lookup tables, and optional cached index conversions.
-  *
-  * The tables are initialized once during library startup by
-  * Tables::InitAllTables().
-  *
-  * @warning The declarations in bitgraph::detail are implementation details
-  *          and are not part of the supported public API.
-  *
-  * @author Pablo San Segundo
-  */
+/**
+ * @file tables.h
+ * @brief Internal lookup tables and masks for BITSCAN bit operations.
+ *
+ * @details
+ * This header declares the non-instantiable @c bitgraph::detail::Tables
+ * holder used by the low-level bitblock algorithms. Its static data includes
+ * single-bit, interval, and word masks; population-count and least/most-
+ * significant-bit lookup tables; De Bruijn index tables; and optional caches
+ * controlled by the BITSCAN configuration macros.
+ *
+ * The public @c Tables::InitAllTables() function is the initialization driver
+ * for the generated mutable tables. The library invokes it during startup so
+ * the lookup data is ready before normal bitset operations. Compile-time
+ * options such as @c EXTENDED_LOOKUPS and @c CACHED_INDEX_OPERATIONS control
+ * whether the corresponding optional tables are declared and initialized.
+ *
+ * The tables use the 64-bit @c BITBOARD and related types defined in
+ * @c bbtypes.h. They are shared implementation state and should be accessed
+ * through the BITSCAN operations rather than modified by client code.
+ *
+ * @author Pablo San Segundo
+ * @date Last updated: 14 October 2026
+ *
+ * @see bbtypes.h
+ * @see bitblock.h
+ * @see tables.cpp
+ * @warning The declarations in @c bitgraph::detail are implementation details
+ *          and are not part of the supported public API.
+ */
 
 #ifndef BITGRAPH_BITSCAN_TABLES_H
 #define BITGRAPH_BITSCAN_TABLES_H
