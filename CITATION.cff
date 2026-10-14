@@ -1,0 +1,20 @@
+cff-version: 1.2.0
+message: "If you use BitGraph in your research, please cite it using the metadata in this file, and cite the papers behind the algorithms you use (see the README)."
+type: software
+title: "BitGraph: bit-parallel sets and graphs for combinatorial optimization"
+abstract: "BitGraph is a C++ library for fast set and graph operations. BITSCAN provides dense and sparse bitsets with very fast bit scanning, GRAPH represents graphs as bitsets, and UTILS provides supporting utilities."
+authors:
+  - family-names: "San Segundo"
+    given-names: "Pablo"
+    affiliation: "Centro de Automática y Robótica (CAR), UPM-CSIC"
+version: 2.0.0
+date-released: 2026-10-14
+repository-code: "https://github.com/psanse/BitGraph"
+url: "https://github.com/psanse/BitGraph"
+keywords:
+  - bitset
+  - bit-parallelism
+  - graph algorithms
+  - combinatorial optimization
+  - maximum clique
+  - C++
