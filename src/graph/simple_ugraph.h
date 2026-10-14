@@ -1,17 +1,24 @@
 /**
  * @file simple_ugraph.h
- * @brief Definition of Ugraph<BitsetT>, a simple undirected graph class.
+ * @brief Public definition of the simple undirected graph class `Ugraph`.
  *
- * @details Implements simple undirected graphs (without self-loops)
- *          using bitset-based adjacency matrices.
- *          Supports dense and sparse bitset representations.
+ * @details
+ * Defines `Ugraph<BitsetT>`, a bitset-backed graph without self-loops.
+ * Adjacency is stored symmetrically, so an edge `(u, v)` is represented in
+ * both endpoint rows. The class builds on `Graph<BitsetT>` and supports both
+ * dense and sparse bitset implementations through its `BitsetT` parameter.
+ *
+ * The header also provides named graph factories and the undirected-graph
+ * operations that complement the common functionality inherited from the
+ * base graph class. Vertices are indexed from `0` through `NV_ - 1`.
  *
  * @author pss
  * @date 17/06/2010
- * @details last_update 13/10/2026	
+ * @details last_update 13/10/2026
  *
  * @copyright Part of the BITGRAPH C++ library.
  *
+ * @see Graph
  * @todo Implement minimum-degree functions (03/01/2025).
  */
 

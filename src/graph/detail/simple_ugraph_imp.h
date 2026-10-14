@@ -1,22 +1,26 @@
- /**
-  * @file simple_ugraph_imp.h
-  * @brief Provides template and inline implementations for the Ugraph class.
-  *
-  * This file contains the definitions of template member functions and inline
-  * operations for simple undirected graphs. Ugraph represents loopless
-  * undirected graphs using bitset-based adjacency rows.
-  *
-  * This implementation header is included at the end of simple_ugraph.h and
-  * should not normally be included directly by client code.
-  *
-  * @note All definitions in this file belong to the bitgraph namespace.
-  *
-  * @date Created: 17/06/2010
-  * @date Last updated: 13/10/2026
-  * @author Pablo San Segundo
-  *
-  * @todo Implement the minimum-degree operations (03/01/2025)
-  */
+/**
+ * @file simple_ugraph_imp.h
+ * @brief Template and inline implementations for the `Ugraph` class.
+ *
+ * @details
+ * Defines the template member functions and inline operations for loopless
+ * undirected graphs backed by bitset-based adjacency rows. The implementation
+ * covers degree calculations, subgraph measurements, neighborhood traversal,
+ * and other operations that extend the common functionality inherited from
+ * `Graph<BitsetT>` while preserving undirected-graph semantics.
+ *
+ * This implementation header is included by `simple_ugraph.h` and is intended
+ * for use through that public header rather than direct inclusion by clients.
+ * All definitions in this file belong to the `bitgraph` namespace.
+ *
+ * @author Pablo San Segundo
+ * @date Created: 17/06/2010
+ * @date Last updated: 13/10/2026
+ *
+ * @see ../simple_ugraph.h
+ * @see ../simple_graph.h
+ * @todo Implement the minimum-degree operations (03/01/2025)
+ */
 
 #ifndef BITGRAPH_GRAPH_SIMPLE_UGRAPH_IMP_H
 #define BITGRAPH_GRAPH_SIMPLE_UGRAPH_IMP_H

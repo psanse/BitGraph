@@ -1,11 +1,23 @@
 /**
-* @file yED_format.h
-* @brief stateless API to work with yED lib
-* @details created 10/07/2019, last_update 27/01/25
-* @dev pss
-* 
-* TODO - add tests (09/07/2025)
-**/
+ * @file yED_format.h
+ * @brief Stateless helpers for writing graph data in the yEd GML format.
+ *
+ * @details
+ * Provides constants, color definitions, and inline output helpers for
+ * generating yEd-compatible GML nodes and edges. The API is organized under
+ * `bitgraph::io::yed` and writes directly to caller-provided output streams,
+ * allowing graph exporters to control file ownership and stream handling.
+ *
+ * The format helpers are lightweight and do not maintain graph state. They
+ * are intended for graph visualization output and currently include support
+ * for vertex styling, edge styling, and yEd-oriented layout attributes.
+ *
+ * @author pss
+ * @date Created: 10/07/2019
+ * @date Last updated: 27/01/25
+ *
+ * @todo Add tests (09/07/2025).
+ */
 
 #ifndef	__GRAPH_INPUT_OUTPUT_H__
 #define __GRAPH_INPUT_OUTPUT_H__

@@ -1,14 +1,21 @@
 /**
  * @file vertex_utils.h
- * @brief Utility operations for graph vertex collections.
+ * @brief Inline utilities for constructing graph vertex collections.
  *
- * This header provides lightweight helper functions for creating and
- * manipulating collections of vertex indices used by the GRAPH library.
+ * @details
+ * Provides lightweight helpers for creating and initializing collections of
+ * graph vertex indices used throughout the BITGRAPH library. The utilities
+ * use the library's `vertex_t` type and generate the zero-based sequence
+ * `[0, vertex_count)`.
  *
- * @note Small utility functions are implemented directly in this header.
+ * Existing collection contents are replaced by the generated sequence. The
+ * functions are implemented directly in this header so they can be inlined
+ * at call sites.
  *
  * @author Pablo San Segundo
  * @date Last updated: 23/09/2026
+ *
+ * @see graph_types.h
  */
 
 #ifndef BITGRAPH_GRAPH_VERTEX_UTILS_H

@@ -1,13 +1,27 @@
 /**
-* @file vertex_weighted_graph_utils.h
-* @brief main header for namespace gfunc providing general purpose functions for graphs
-* @details: 
-*  - date 07/3/2017
-*  - last_modified 30/01/2025  
-* @author pss
-*
-* @todo CHECK edgeW::ew_shift_2_highest_index function  (09/01/25)
-**/
+ * @file vertex_weighted_graph_utils.h
+ * @brief Utility functions for graphs with weighted vertices.
+ *
+ * @details
+ * Declares generic algorithms in the bitgraph::graph_utils namespace for
+ * aggregating and processing vertex weights. The overloads operate on graph
+ * vertex bitsets, explicit vertex collections, complete graphs, and vertex
+ * neighborhoods, allowing callers to reuse the same weight-aware operations
+ * across compatible graph types.
+ *
+ * The utilities are templates and are implemented in this header so that
+ * graph-specific weight and vertex types remain available at instantiation.
+ * They depend on the vertex-weighted graph interface and associated graph
+ * traits rather than on a single concrete graph representation.
+ *
+ * @author pss
+ * @date 07/3/2017
+ * @last_modified 30/01/2025
+ *
+ * @see ugraph_vertex_weighted.h
+ * @see graph_traits.h
+ * @todo Check edgeW::ew_shift_2_highest_index function (09/01/25).
+ */
 
 #ifndef BITGRAPH_GRAPH_VERTEX_WEIGHTED_GRAPH_UTILS_H
 #define BITGRAPH_GRAPH_VERTEX_WEIGHTED_GRAPH_UTILS_H

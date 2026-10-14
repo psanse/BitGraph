@@ -1,28 +1,29 @@
 /**
  * @file ugraph_edge_weighted.h
- * @brief Facade specialization for edge-weighted undirected graphs.
+ * @brief Edge-weighted undirected-graph facade specialization.
  *
- * Defines the specialization `Graph_EW<ugraph, WeightT>` and the public
- * aliases for commonly used edge-weighted undirected graph types.
+ * @details
+ * Defines `Graph_EW<ugraph, WeightT>` and the public aliases used for
+ * edge-weighted undirected graphs. The specialization binds the generic
+ * edge-weighted implementation (`Base_Graph_EW` / `Graph_EW`) to the
+ * `ugraph` facade and supplies operations whose behavior depends on the
+ * undirected graph interface.
  *
- * This header provides the binding between the generic edge-weighted graph
- * implementation (`Base_Graph_EW` / `Graph_EW`) and the `ugraph` facade type.
- * It also contains inline implementations of operations whose behavior
- * depends specifically on the undirected graph interface.
+ * Edge weights remain symmetric for both orientations of an edge. Operations
+ * that enumerate, print, or write edges process each undirected edge only
+ * once where required by the corresponding graph format or API contract.
  *
- * In particular, the specialization preserves the symmetry of edge weights
- * and ensures that each undirected edge is handled only once where required,
- * for example when printing or writing graph instances.
- *
- * @note Generic edge-weighted graph functionality should remain in
- *       `simple_graph_ew.h`. Only behavior specific to `ugraph` should be
- *       implemented in this header.
+ * Generic edge-weighted behavior belongs in `simple_graph_ew.h`; this header
+ * is reserved for behavior specific to the `ugraph` facade.
  *
  * @note This header depends on the definition of the `ugraph` facade type.
  *
  * @author Pablo San Segundo (pss)
+ * @date Created 01/02/2026
+ * @date Last updated 12/10/2026
  *
- * @details Created 01/02/2026, last updated 12/10/2026.
+ * @see simple_graph_ew.h
+ * @see graph_unweighted.h
  */
 
 #ifndef BITGAPH_GRAPH_UGRAPH_EDGE_WEIGHTED_H

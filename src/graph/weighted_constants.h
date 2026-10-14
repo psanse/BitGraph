@@ -1,7 +1,22 @@
 /**
- * @file weight_constants.h
- * @brief Common constants for weighted graph types.
+ * @file weighted_constants.h
+ * @brief Common sentinel and default values for weighted graph types.
+ *
  * @date 2024-10-10
+ *
+ * @details
+ * Defines the `weight_constants<WeightT>` traits structure used by weighted
+ * graph implementations to obtain consistent values for an absent weight,
+ * a zero weight, and the default edge or vertex weight. The constants are
+ * parameterized by the graph's weight type and are available at compile time.
+ *
+ * @tparam WeightT Numeric type used to represent graph weights.
+ *
+ * @note `NO_WEIGHT` uses the value `-1`; callers should ensure that the
+ *       selected weight type can represent this sentinel.
+ *
+ * @see simple_graph_ew.h
+ * @see ugraph_vertex_weighted.h
  */
 
 #ifndef BITGRAPH_GRAPH_WEIGHT_CONSTANTS_H

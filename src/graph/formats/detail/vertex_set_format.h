@@ -1,16 +1,26 @@
 /**
- * @file vertex_set_io.h
- * @brief Input and output utilities for graph vertex sets.
+ * @file vertex_set_format.h
+ * @brief Vertex-set input and output utilities for graph file formats.
  *
- * This header provides functions for writing collections of vertex indices
- * and reading vertex-interdiction masks.
+ * @details
+ * Declares the format-specific helpers used to write collections of vertex
+ * indices and to read binary vertex-interdiction masks. The writing helper
+ * emits a `size N` header followed by one vertex index per line, while the
+ * mask reader collects the zero-valued positions using zero-based indexing.
+ *
+ * The functions are implementation details of the graph I/O subsystem and
+ * provide error-reporting behavior suitable for callers that do not want
+ * parsing or file-opening exceptions to escape the I/O boundary.
  *
  * @author Pablo San Segundo
  * @date Last updated: 23/09/2026
+ *
+ * @see vertex_set_format.cpp
  * 
+ * 
+ * @todo: add unit tests (23/09/2026)
  */
 
-// TODO: add unit tests (23/09/2026)
 
 #ifndef BITGRAPH_GRAPH_IO_VERTEX_SET_IO_H
 #define BITGRAPH_GRAPH_IO_VERTEX_SET_IO_H

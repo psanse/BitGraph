@@ -1,14 +1,27 @@
 /**
-  * @file simple_sparse_ugraph.h
-  * @brief contains specializations the class Ugraph for sparse graphs
-  *
-  * @created 03/01/2025 
-  * @last_update 26/01/2025
-  * @author pss
-  *
-  * This code is part of the GRAPH 1.0 C++ library
-  *
-  **/
+ * @file simple_sparse_ugraph.h
+ * @brief Sparse-graph specializations of the generic Ugraph implementation.
+ *
+ * @details
+ * This header defines the Ugraph<BBScanSp> specializations used by the
+ * sparse undirected-graph facade. The specializations provide sparse-aware
+ * edge counting and degree computations while preserving the public graph
+ * interface supplied by simple_ugraph.h.
+ *
+ * The implementation operates on sparse BITSCAN adjacency rows and counts
+ * undirected edges according to the graph's upper-triangular convention.
+ * It is intended to be included as part of the graph implementation rather
+ * than used as a standalone public interface.
+ *
+ * This code is part of the GRAPH 1.0 C++ library.
+ *
+ * @author pss
+ * @created 03/01/2025
+ * @last_update 26/01/2025
+ *
+ * @see simple_ugraph.h
+ * @see ../bitscan/bbscan_sparse.h
+ */
 
 #ifndef __SIMPLE_SPARSE_UGRAPH_H__
 #define __SIMPLE_SPARSE_UGRAPH_H__
