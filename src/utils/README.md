@@ -21,7 +21,7 @@ UTILS is part of [BitGraph](../../README.md). [BITSCAN](../bitscan/README.md) an
 | `fixed_stack.h` | `FixedStack`: a fixed-capacity contiguous stack for trivial types, with constant-time operations |
 | `precise_timer.h` | `PrecisionTimer`: elapsed time on a monotonic clock (`std::chrono::steady_clock`) |
 | `time_utils.h` | converting durations to seconds, measuring elapsed time, formatting timestamps |
-| `random_utils.h` | uniform random numbers, with seeding for reproducible sequences |
+| `random_utils.h` | `uniform_dist(p)`: a Bernoulli trial on a shared generator (not thread-safe). Seeding for reproducible sequences goes through the generator handles in `utils::detail`, as in the example. |
 | `collection_utils.h` | helpers to inspect collections (`all_equal`, `all_unique`) and print them (`print_collection`) |
 | `sort_utils.h` | comparison functors that order elements by an external criterion |
 | `string_utils.h` | inspecting and tokenizing strings |
@@ -85,7 +85,7 @@ When you log a message that is not a literal, pass it as an argument, for exampl
 |---|---|
 | [utils_collections_simple.cpp](examples/utils_collections_simple.cpp) | collection helpers and `FixedStack` |
 | [utils_time_simple.cpp](examples/utils_time_simple.cpp) | `PrecisionTimer` and timestamps |
-| [utils_random_simple.cpp](examples/utils_random_simple.cpp) | uniform random generators and reproducible seeding |
+| [utils_random_simple.cpp](examples/utils_random_simple.cpp) | seeding the shared generators and `uniform_dist(p)` |
 | [utils_file_path_simple.cpp](examples/utils_file_path_simple.cpp) | the `File` wrapper and path helpers |
 | [utils_task_simple.cpp](examples/utils_task_simple.cpp) | running a callable and a member function asynchronously |
 
