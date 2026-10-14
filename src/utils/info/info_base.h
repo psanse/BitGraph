@@ -43,6 +43,11 @@ namespace bitgraph {
 		// (General parameter info for all combinatorial algorithms)
 		//
 		//////////////////////////
+		/**
+		 * @brief General parameter information shared by combinatorial algorithms.
+		 *
+		 * @see infoBase
+		 */
 		struct paramBase {
 
 			using tpoint_t = PrecisionTimer::timepoint_t;
@@ -104,6 +109,15 @@ namespace bitgraph {
 		//
 		///////////////////////
 
+		/**
+		 * @brief Base structure to report the results of graph algorithms.
+		 *
+		 * @details Holds the basic configuration of a run (graph name and size, time-outs,
+		 *          number of threads) and phase timers for parsing, preprocessing, search and
+		 *          the last incumbent. Derived structures add algorithm-specific results.
+		 *
+		 * @see paramBase
+		 */
 		struct infoBase {
 
 			using tpoint_t = PrecisionTimer::timepoint_t;

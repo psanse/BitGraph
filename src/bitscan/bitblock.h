@@ -142,12 +142,12 @@ namespace bitgraph {
 		* @details T_64[67] returns the index of the single 1-bit
 		*		   in the family of bitblocks 000...1...000
 		* @returns index of the least significant bit or -1 if empty
-		* @comment Modulus operation is not efficient.
+		* @note Modulus operation is not efficient.
 		**/
 		int  lsb64_mod(const BITBOARD bb);
 
 		/**
-		* @brief Index of the least significant bit in @bb implemented
+		* @brief Index of the least significant bit in @p bb implemented
 		*		 with a 16-bit lookup table
 		* @param bb: input 64-bit bitblock
 		* @returns index of the least significant bit or -1 if empty
@@ -155,7 +155,7 @@ namespace bitgraph {
 		int  lsb64_lup(const BITBOARD bb);
 
 		/**
-		* @brief Index of the least significant bit in @bb implemented
+		* @brief Index of the least significant bit in @p bb implemented
 		*		 with a 16-bit lookup table
 		* @param bb: input 64-bit bitblock
 		* @returns index of the least significant bit or -1 if empty
@@ -165,7 +165,7 @@ namespace bitgraph {
 		int  lsb64_lup_eff(const BITBOARD bb);
 
 		/**
-		* @brief Index of the least significant bit in @bb implemented
+		* @brief Index of the least significant bit in @p bb implemented
 		*		 as a population count operation
 		* @param bb: input 64-bit bitblock
 		* @returns index of the least significant bit or -1 if empty
@@ -174,7 +174,7 @@ namespace bitgraph {
 		int  lsb64_pc(const BITBOARD bb);
 
 		/**
-		* @brief Index of the least significant bit in @bb function implemented
+		* @brief Index of the least significant bit in @p bb function implemented
 		*		 with a De Bruijn magic word for perfect hashing as
 		*		 a product and a shift operation.
 		* @param bb: input 64-bit bitblock
@@ -191,7 +191,7 @@ namespace bitgraph {
 		int lsb64_de_Bruijn(const BITBOARD bb);
 
 		/**
-		* @brief Index of the least significant bit in @bb (default)
+		* @brief Index of the least significant bit in @p bb (default)
 		*		(intrin.h WIN / x86intrin.h Linux lib)
 		* @param bb: input 64-bit bitblock
 		* @details implemented by calling processor instructions
@@ -200,7 +200,7 @@ namespace bitgraph {
 		int lsb64_intrinsic(const BITBOARD bb);
 
 		/**
-		* @brief Index of the least significant bit in @bb
+		* @brief Index of the least significant bit in @p bb
 		*		 (RECOMMENDED to use - calls lsb64_intrinsic)
 		* @param bb: input 64-bit bitblock
 		* @returns index of the least significant bit or -1 if empty
@@ -209,7 +209,7 @@ namespace bitgraph {
 
 
 		/**
-		* @brief Index of the most significant bit in @bb implemented
+		* @brief Index of the most significant bit in @p bb implemented
 		*		 with a 16-bit lookup table
 		* @param bb: input 64-bit bitblock
 		* @returns Index of the most least significant bit or -1 if empty
@@ -217,7 +217,7 @@ namespace bitgraph {
 		int msb64_lup(const BITBOARD bb);
 
 		/**
-		* @brief Index of the most significant bit of @bb implemented
+		* @brief Index of the most significant bit of @p bb implemented
 		*		 with a De Bruijn magic word for perfect hashing as
 		*		 a product and a shift operation.
 		*
@@ -231,7 +231,7 @@ namespace bitgraph {
 		int  msb64_de_Bruijn(const BITBOARD bb);		
 
 		/**
-		* @brief Index of the most significant bit in @bb implemented with processor instructions
+		* @brief Index of the most significant bit in @p bb implemented with processor instructions
 		*		(intrin.h WIN / x86intrin.h Linux lib).
 		* @param bb: input 64-bit bitblock
 		* @returns index of the most significant bit or -1 if empty
@@ -240,7 +240,7 @@ namespace bitgraph {
 		int msb64_intrinsic(const BITBOARD bb);
 
 		/**
-		* @brief Index of the most significant bit in @bb. Alias for msb64_intrinsic (recommended).
+		* @brief Index of the most significant bit in @p bb. Alias for msb64_intrinsic (recommended).
 		* @param bb: input 64-bit bitblock
 		* @returns index of the most significant bit or -1 if empty
 		* @details: recommended choice for MSB 
@@ -279,12 +279,12 @@ namespace bitgraph {
 		int popc64(const BITBOARD bb);
 						
 		/**
-		* @brief convenient alias for population count in @bb
+		* @brief convenient alias for population count in @p bb
 		**/
 		inline int count(const BITBOARD bb) { return popc64(bb); }
 
 		/**
-		* @brief deprecated alias for population count in @bb
+		* @brief deprecated alias for population count in @p bb
 		**/
 		inline int size(const BITBOARD bb) = delete;    //{ return popc64(bb); }
 

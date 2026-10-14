@@ -144,6 +144,18 @@ namespace bitgraph {
 	// @details Does not use HW dependent instructions (intrinsics), nor does it cache information for very fast bitscanning
 	//
 	///////////////////////////////////
+	/**
+	 * @brief Dense bitset: a set of non-negative integers stored as a string of bits.
+	 *
+	 * @details Manages bit strings larger than one machine word, with one 64-bit block
+	 *          per 64 positions. Bit positions are zero-based and bit ranges are closed
+	 *          (both ends included). Modifying functions return `*this`, so calls can be
+	 *          chained. This class does not cache any scanning state: use BBScan (alias
+	 *          `bitarray`) for persistent bit scanning.
+	 *
+	 * @see BBScan
+	 * @see BitsetSp
+	 */
 	class Bitset : public BBObject {
 
 		using BaseT = BBObject;
@@ -675,7 +687,7 @@ namespace bitgraph {
 
 		/**
 		* @brief sets the bits in the closed range [firstBit, lastBit] to 1 in the bitstring
-		* @params firstBit, lastBit:  0 <= firstBit <= lastBit
+		* @param firstBit, lastBit:  0 <= firstBit <= lastBit
 		* @date 22/9/14
 		* @last_update 01/02/25
 		**/
@@ -685,7 +697,7 @@ namespace bitgraph {
 
 		/**
 		* @brief API core alias for set_bit(bit_index_t firstBit, bit_index_t lastBit)
-		* @params firstBit, lastBit:  0 <= firstBit <= lastBit
+		* @param firstBit, lastBit:  0 <= firstBit <= lastBit
 		* @created 18/09/26
 		**/
 		Bitset& set_range(
@@ -707,7 +719,7 @@ namespace bitgraph {
 		Bitset& set_bit(const Bitset& bb_add);
 
 		/**
-		* @brief Overwrites this bitstring with @bb_add (equivalent to operator=)
+		* @brief Overwrites this bitstring with @p bb_add (equivalent to operator=)
 		*
 		*		 Note: The bitblock size of bb_add must be at least as large as this bitstring.
 		*
@@ -752,7 +764,7 @@ namespace bitgraph {
 		/**
 		* @brief sets the bits in the closed range [firstBit, lastBit] to 0 in the bitstring
 		*		 If lastBit == -1, the range is [firstBit, endOfBitset)
-		* @params firstBit, lastBit: 0 <= firstBit <= lastBit
+		* @param firstBit, lastBit: 0 <= firstBit <= lastBit
 		* @created 22/9/14
 		* @details last_update 01/02/25
 		**/
@@ -763,7 +775,7 @@ namespace bitgraph {
 		/**
 		* @brief API core for erase_bit(firstBit, lastBit). sets the bits in the closed range [firstBit, lastBit] to 0 in the bitstring
 		*		 If lastBit == -1, the range is [firstBit, endOfBitset)
-		* @params firstBit, lastBit: 0 <= firstBit <= lastBit
+		* @param firstBit, lastBit: 0 <= firstBit <= lastBit
 		* @created 18/09/26
 		**/
 		Bitset& clear_range(
@@ -803,7 +815,7 @@ namespace bitgraph {
 		}				
 
 		/**
-		* @brief Removes the bits from the bitstring @bitset inside the population range.
+		* @brief Removes the bits from the bitstring @p bitset inside the population range.
 		*
 		*		 I. bitset must have a maximum population
 		*			greater or equal than the bitstring.
@@ -818,7 +830,7 @@ namespace bitgraph {
 		}
 
 		/**
-		* @brief Removes the bits  from the bitstring @bitset inside the
+		* @brief Removes the bits  from the bitstring @p bitset inside the
 		*		 closed range [firstBit, lastBit].
 		*		 If lastBit == -1, the range is [firstBit, endOfBitset)
 		*
@@ -848,7 +860,7 @@ namespace bitgraph {
 		//BitBlock operations 
 
 		/**
-		* @brief ORs the 1-bits from the bitstring @bb_add in the closed range [firstBlock, lastBlock]
+		* @brief ORs the 1-bits from the bitstring @p bb_add in the closed range [firstBlock, lastBlock]
 		*		 If lastBlock = npos, the range is [firstBlock, nBB_]
 		*
 		*		 0 <= FirstBlock <= LastBLock < the number of bitblocks in the bitstring
@@ -864,7 +876,7 @@ namespace bitgraph {
 			const Bitset& bb_add);
 
 		/**
-		* @brief Overwrites / Copies the blocks of 1-bits from the bitstring @bb_add
+		* @brief Overwrites / Copies the blocks of 1-bits from the bitstring @p bb_add
 		*		 in the closed range [firstBlock, lastBlock] to this bitstring.
 		*		 If LastBlock = npos, the range is [firstBlock, nBB_]
 		*		 0 <= FirstBlock <= LastBLock < the number of bitblocks in the bitstring
@@ -1260,7 +1272,7 @@ namespace bitgraph {
 		**/
 		void extract_stack(utils::FixedStack<bit_index_t>& s) const;
 		/**
-		* @brief Fills array @lv and sets @size
+		* @brief Fills array @p lv and sets @p size
 		* @param lv: must point to an array of capacity >= population size of this bitset (external ownership)
 		* @param size: output size of the array, should be the same as this->count()
 		* @param rev: if true, the array is filled in reverse order

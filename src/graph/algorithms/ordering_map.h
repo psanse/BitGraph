@@ -337,7 +337,7 @@ namespace bitgraph {
 		// Boolean operations
 
 		/**
-		 * @brief checks if the internal mapping state @left_to_right_, @right_to_left_ is consistent
+		 * @brief checks if the internal mapping state @p left_to_right_, @p right_to_left_ is consistent
 		 **/
 		bool is_consistent() const noexcept;
 

@@ -56,14 +56,20 @@ namespace bitgraph {
 		class GraphConversion;
 	}
 
-	//////////////////
-	//
-	// Generic class Graph<BitsetT>
-	// 
-	// (BitsetT is a bitset currently limited to the BBScan and BBScanSP types)
-	// 
-	//////////////////
-
+	/**
+	 * @brief Directed graph represented by a bitset-based adjacency matrix.
+	 *
+	 * @tparam BitsetT Bitset type used to store the neighbourhood of each vertex. Currently
+	 *         limited to BBScan (dense graphs) and BBScanSp (sparse graphs).
+	 *
+	 * @details Row `v` of the adjacency matrix is the bitset of the out-neighbours of `v`, so
+	 *          neighbourhood queries and induced subgraphs reduce to bitset operations.
+	 *          Vertices are numbered from 0 to `num_vertices() - 1`. The aliases `graph`
+	 *          and `sparse_graph` name the dense and sparse instantiations. Ugraph derives
+	 *          from this class for undirected graphs.
+	 *
+	 * @see Ugraph
+	 */
 	template<class BitsetT = BBScan>
 	class Graph {
 				

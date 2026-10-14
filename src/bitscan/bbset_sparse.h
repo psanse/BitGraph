@@ -45,13 +45,16 @@
 
 namespace bitgraph {
 		
-	/////////////////////////////////
-	//
-	// class BitsetSp
-	// (manages sparse bit strings, except efficient bitscanning)
-	//
-	///////////////////////////////////
-
+	/**
+	 * @brief Sparse bitset: stores only the non-empty 64-bit blocks.
+	 *
+	 * @details Intended for large sets with few elements, where a dense bitset would waste
+	 *          memory. It offers the same operations as Bitset. Efficient persistent bit
+	 *          scanning is provided by the derived class BBScanSp (alias `sparse_bitarray`).
+	 *
+	 * @see BBScanSp
+	 * @see Bitset
+	 */
 	class BitsetSp : public BBObject {
 				
 		using index_t = BBObject::index_t;
@@ -554,7 +557,7 @@ namespace bitgraph {
 
 		/**
 		* @brief sets bits in the closed range [firstBit, lastBit]
-		* @params firstBit, lastBit: range
+		* @param firstBit, lastBit: range
 		* @returns 0 if the bits were set, -1 if error
 		* @details only one binary search is performed for the lower block
 		* @details  I.  O(n)  to update/add blocks, where n = lastBit - firstBit
@@ -807,7 +810,7 @@ namespace bitgraph {
 		* @brief Extracts the bits as a set / stack / array in increasing order
 		*		 (decreasing if rev is true, array only).
 		* @details These scan the blocks directly: O(blocks + bits), independent of next_bit
-		*		   @lv has to have room for count() elements
+		*		   @p lv has to have room for count() elements
 		**/
 		void extract_set(bit_index_set& ls) const;
 		void extract_stack(utils::FixedStack<bit_index_t>& s) const;
@@ -2088,13 +2091,13 @@ namespace bitgraph {
 
 namespace bitgraph {
 
-	/** @brief Creates an empty BitsetSp given a maximum number of bits @nPop. */
+	/** @brief Creates an empty BitsetSp given a maximum number of bits @p nPop. */
 	inline BitsetSp make_bitset_sp(int nPop) { return BitsetSp(nPop); }
 
-	/** @brief Creates a BitsetSp given a maximum @nPop and a list of values in brackets. */
+	/** @brief Creates a BitsetSp given a maximum @p nPop and a list of values in brackets. */
 	inline BitsetSp make_bitset_sp(int nPop, std::initializer_list<int> lv) { return BitsetSp(nPop, lv); }
 
-	/** @brief Creates a BitsetSp given a maximum @nPop and a container of 1-bits. */
+	/** @brief Creates a BitsetSp given a maximum @p nPop and a container of 1-bits. */
 	inline BitsetSp make_bitset_sp(int nPop, const bitpos_list& lv) { return BitsetSp(nPop, lv); }
 
 } // namespace bitgraph

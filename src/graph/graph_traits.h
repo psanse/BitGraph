@@ -28,11 +28,8 @@
 
 namespace bitgraph {
 
-    /**
-     * @brief Forward declaration of the non-sparse undirected graph class template.
-     *
-	 * @tparam BitsetT Bitset type used to encode the graph's adjacency matrix.
-     */
+    // Forward declaration of the undirected graph class template Ugraph<BitsetT>
+    // (BitsetT: bitset type used to encode the adjacency matrix). Documented in simple_ugraph.h.
     template<class BitsetT>
     class Ugraph;
        

@@ -37,6 +37,12 @@ namespace bitgraph {
 	
 	namespace experimental {
 
+		/**
+		 * @brief Experimental BBScan whose operations are restricted to the range of
+		 *        non-zero blocks, delimited by a lower and an upper sentinel.
+		 *
+		 * @warning EXPERIMENTAL: not fully refactored or tested; its API may change.
+		 */
 		class BBSentinel : public BBScan {
 			friend BBSentinel& AND(const Bitset& lhs, const BBSentinel& rhs, BBSentinel& res);		//updates sentinels
 

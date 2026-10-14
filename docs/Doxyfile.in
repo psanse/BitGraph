@@ -20,7 +20,8 @@ TAB_SIZE               = 4
 
 # Tags used in the BitGraph headers that Doxygen does not know
 ALIASES                = "created=@par Created:^^" \
-                         "last_update=@par Last update:^^"
+                         "last_update=@par Last update:^^" \
+                         "last_modified=@par Last modified:^^"
 
 #---------------------------------------------------------------------------
 # Input: the three libraries, the landing page and the hand-written pages

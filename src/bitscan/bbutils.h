@@ -47,13 +47,13 @@ namespace bitgraph {
 	/**
 	* @brief Creates a random BITBOARD (64-bits) with density p of 1-bits
 	*
-	* @TODO: Not precise generator (but acceptable since the population is at most 64).
+	* @todo: Not precise generator (but acceptable since the population is at most 64).
 	*		 better to generate a collection of 64 elements with 64*p 1s and shuffle it
 	**/
 	BITBOARD random_bitblock(double p);
 
 	/**
-	* @brief extracts the first k 1-bits in the bitset @bb
+	* @brief extracts the first k 1-bits in the bitset @p bb
 	* @param k: the number of bits to find
 	* @param bb: the input bitset
 	* @param lv: the output vector of integers

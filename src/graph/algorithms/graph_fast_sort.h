@@ -464,7 +464,7 @@ namespace bitgraph {
 
 			/**
 			 * @brief Experimental alternative implementation.
-			 * @details This implementation does not require cached degree information of vertices in @nb_neigh_.
+			 * @details This implementation does not require cached degree information of vertices in @p nb_neigh_.
 			 *
 			 * @warning Experimental API. May change or be removed without notice.
 			 */

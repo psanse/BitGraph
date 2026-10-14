@@ -41,13 +41,15 @@ namespace bitgraph {
 
 	namespace graph_utils {
 
-		///////////////////////////
-		//
-		// class GraphFastRootSort_EW
-		// (sorting for vertex weighted graphs)
-		//
-		////////////////////////////
-
+		/**
+		 * @brief Vertex-ordering utilities for edge-weighted graphs.
+		 *
+		 * @tparam GraphEW Edge-weighted graph type (for example `ugraph_ew`).
+		 *
+		 * @details Extends GraphFastRootSort with orderings based on edge weights.
+		 *
+		 * @see GraphFastRootSort
+		 */
 		template <class GraphEW>
 		class GraphFastRootSort_EW : public GraphFastRootSort <typename GraphEW::graph_type> {
 

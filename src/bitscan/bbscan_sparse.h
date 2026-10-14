@@ -42,13 +42,15 @@ using namespace std;
 
 namespace bitgraph {
 
-	/////////////////////////////////
-	//
-	// Class BBScanSp
-	// (Uses a number of optimizations for sparse bit scanning)
-	//
-	///////////////////////////////////
-
+	/**
+	 * @brief Sparse bitset with persistent bit scanning (alias `sparse_bitarray`).
+	 *
+	 * @details Extends BitsetSp with a cursor stored in the bitset and the scanners
+	 *          `scan`, `scanR`, `scanD` and `scanDR` (forward, reverse, destructive
+	 *          forward and destructive reverse), using optimizations for sparse bit scanning.
+	 *
+	 * @see BitsetSp
+	 */
 	class BBScanSp  : public BitsetSp {
 
 	public:
@@ -95,7 +97,7 @@ namespace bitgraph {
 		/**
 		* @brief Copy assignment: copies the bitstring only.
 		* @details The scan cursor of this object is left untouched; the cursor of
-		*          @other is never transferred (same rule as BBScan).
+		*          @p other is never transferred (same rule as BBScan).
 		**/
 		BBScanSp& operator=(const BBScanSp& other) {
 			BitsetSp::operator=(other);

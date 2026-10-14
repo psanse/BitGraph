@@ -118,7 +118,7 @@ namespace bitgraph{
 			/**
 			* @brief Copy assignment: copies the bitstring only.
 			* @details The scan cursor of this object is left untouched; the cursor
-			*          of @other is never transferred.
+			*          of @p other is never transferred.
 			**/
 			BBScan& operator=(const BBScan& other) {
 				Bitset::operator=(other);
@@ -128,7 +128,7 @@ namespace bitgraph{
 			/**
 			* @brief Move assignment: moves the bitstring only.
 			* @details The scan cursor of this object is left untouched; the cursor
-			*          of @other is never transferred.
+			*          of @p other is never transferred.
 			**/
 			BBScan& operator=(BBScan&& other) noexcept {
 				Bitset::operator=(std::move(other));
@@ -335,19 +335,19 @@ namespace bitgraph{
 namespace bitgraph {
 
 	/**
-	 * @brief Creates a BBScan object given a maximum number of bits  @nPop (all bits set to 0).
+	 * @brief Creates a BBScan object given a maximum number of bits  @p nPop (all bits set to 0).
 	 **/
 	inline
 		BBScan make_BBScan(int nPop) { return BBScan(nPop, false); }
 
 	/**
-	 * @brief Creates a BBScan object given a maximum number of bits  @nPop (all bits set to 1).
+	 * @brief Creates a BBScan object given a maximum number of bits  @p nPop (all bits set to 1).
 	 **/
 	inline
 		BBScan make_BBScan_full(int nPop) { return BBScan(nPop, true); }
 
 	/**
-	* @brief Creates a BBScan object given a maximum @nPop and a list of values in brackets
+	* @brief Creates a BBScan object given a maximum @p nPop and a list of values in brackets
 	* @details: - negative values are ignored (asserted in debug mode).
 	*			- values >= nPop are ignored.
 	**/

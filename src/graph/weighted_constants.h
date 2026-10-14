@@ -25,6 +25,14 @@
 
 namespace bitgraph {
 
+	/**
+	 * @brief Sentinel and default weight values for a weight type.
+	 *
+	 * @tparam WeightT Weight type (for example `int` or `double`).
+	 *
+	 * `NO_WEIGHT` (-1) marks a missing weight, `ZERO_WEIGHT` is 0 and `DEFAULT_WEIGHT` (1) is the
+	 * weight given when none is supplied.
+	 */
 	template<class WeightT>
 	struct weight_constants {
 		using weight_t = WeightT;
