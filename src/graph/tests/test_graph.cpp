@@ -421,6 +421,25 @@ TEST(Graph, create_subgraph_first_k){
 	
 }
 
+TEST(Graph, create_subgraph_first_k_by_value) {
+
+	graph g(5);
+	g.add_edge(0, 1);
+	g.add_edge(1, 2);
+	g.add_edge(3, 4);
+
+	// the by-value overload returns the subgraph induced by the first 3 vertices
+	graph g1 = g.create_subgraph_first_k(3);
+	EXPECT_EQ(3, g1.num_vertices());
+	EXPECT_EQ(2, g1.num_edges());			//0->1, 1->2
+	EXPECT_TRUE(g1.is_edge(0, 1));
+	EXPECT_FALSE(g1.is_edge(1, 0));			// directed
+
+	// a zero-vertex subgraph is empty
+	graph g0 = g.create_subgraph_first_k(0);
+	EXPECT_EQ(0, g0.num_vertices());
+}
+
 //////////////////
 //
 // CHECK THE FOLLOWING TESTS

@@ -686,7 +686,7 @@ namespace bitgraph {
 		 */
 		Graph create_subgraph_first_k(int first_k) const {
 			Graph induced;
-			create_subgraph(first_k, induced);
+			create_subgraph_first_k(first_k, induced);
 			return induced;
 		}
 		
