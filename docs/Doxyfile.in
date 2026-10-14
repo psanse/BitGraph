@@ -15,7 +15,12 @@ STRIP_FROM_PATH        = "@PROJECT_SOURCE_DIR@/src"
 STRIP_FROM_INC_PATH    = "@PROJECT_SOURCE_DIR@/src"
 JAVADOC_AUTOBRIEF      = YES
 MARKDOWN_SUPPORT       = YES
+MARKDOWN_ID_STYLE      = GITHUB
 TAB_SIZE               = 4
+
+# Tags used in the BitGraph headers that Doxygen does not know
+ALIASES                = "created=@par Created:^^" \
+                         "last_update=@par Last update:^^"
 
 #---------------------------------------------------------------------------
 # Input: the three libraries, the landing page and the hand-written pages
@@ -24,7 +29,10 @@ INPUT                  = "@PROJECT_SOURCE_DIR@/README.md" \
                          "@PROJECT_SOURCE_DIR@/src/bitscan" \
                          "@PROJECT_SOURCE_DIR@/src/graph" \
                          "@PROJECT_SOURCE_DIR@/src/utils" \
-                         "@PROJECT_SOURCE_DIR@/docs/api"
+                         "@PROJECT_SOURCE_DIR@/docs/api" \
+                         "@PROJECT_SOURCE_DIR@/docs/benchmarks.md" \
+                         "@PROJECT_SOURCE_DIR@/CHANGELOG.md" \
+                         "@PROJECT_SOURCE_DIR@/THIRD_PARTY_NOTICES.md"
 FILE_PATTERNS          = *.h *.md
 RECURSIVE              = YES
 USE_MDFILE_AS_MAINPAGE = "@PROJECT_SOURCE_DIR@/README.md"
