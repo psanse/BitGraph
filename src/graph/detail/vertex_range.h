@@ -1,6 +1,6 @@
 /**
  * @file vertex_range.h
- * @brief Defines an internal closed range of graph vertices.
+ * @brief [EXPERIMENTAL] Defines an internal closed range of graph vertices.
  *
  * This header provides a lightweight value type representing a closed interval
  * of nonnegative vertex indices. It is intended for internal use by GRAPH
@@ -8,8 +8,10 @@
  *
  * @author Pablo San Segundo
  * @date Last updated: 26/09/2026
- * 
- * @note Currently under development and may be subject to change.
+ *
+ * @warning EXPERIMENTAL: this component lives in namespace bitgraph::experimental.
+ *          Its interface is not stable and may change or be removed in any
+ *          release without notice.
  */
 
 #ifndef BITGRAPH_GRAPH_DETAIL_VERTEX_RANGE_H
