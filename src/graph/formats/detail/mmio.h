@@ -1,10 +1,32 @@
 /**
-* @file mmio.h
-* @brief Matrix Market I/O library for ANSI C
-*        See http://math.nist.gov/MatrixMarket for details.
-* @created ?
-* @last_update 27/01/2025
-**/
+ * @file mmio.h
+ * @brief Low-level Matrix Market banner, metadata, and coordinate I/O API.
+ *
+ * @details
+ * This header declares the C-compatible helper routines and macros used by
+ * BitGraph's Matrix Market readers and writers. A @c MM_typecode is a
+ * four-character descriptor for matrix kind, storage layout, data type, and
+ * symmetry scheme. Query and setter macros operate on those four fields, while
+ * the function declarations parse or emit Matrix Market banners, dimensions,
+ * coordinate entries, and array sizes.
+ *
+ * The API reports parsing and writing failures through the @c MM_* error-code
+ * constants. High-level coordinate readers may allocate output arrays through
+ * the C allocation interface; callers are responsible for releasing returned
+ * buffers with the matching deallocation function.
+ *
+ * The declarations live in @c bitgraph::io::detail because they are internal
+ * format-support infrastructure rather than a general graph-facing API.
+ *
+ * @created ?
+ * @last_update 27/01/2025
+ *
+ * @see https://math.nist.gov/MatrixMarket/
+ * @see matrix_market_format.h
+ * @warning The typecode macros expect a valid four-character @c MM_typecode;
+ *          callers must ensure that the referenced storage is writable when
+ *          using setter macros.
+ */
 
 #ifndef __MM_IO_H__
 #define __MM_IO_H__

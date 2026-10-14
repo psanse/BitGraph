@@ -1,17 +1,30 @@
-/** 
+/**
  * @file graph.h
- * @brief  Header file for the main facade graph types of the BitGraph library to be used by consumer code
- *		    
- * @notes:
- *	BitGraph is an efficient C++ library for simple graphs.
- *	BitGraph stores the adjacency matrix in full, where each row is encoded as a
- *	bitstring. BitGraph is at the core of a number of state-of-the-art-leading 
- *	exact algorithms for NP-hard problems. 
+ * @brief Public facade header BitGraph graph types.
  *
- * @author: pss (main developper)
- * @details: last_modified 01/02/2026 
- * 
- **/
+ * @details
+ * This header is the main consumer-facing entry point for BitGraph graph
+ * representations. It brings together the graph type definitions, unweighted
+ * graph aliases, and vertex- and edge-weighted undirected graph
+ * specializations.
+ *
+ * BitGraph represents graph adjacency through bitset-backed rows, enabling
+ * compact storage and fast set-oriented operations used by exact algorithms
+ * for difficult graph problems. The concrete aliases exposed by the included
+ * headers cover directed and undirected unweighted graphs, sparse variants,
+ * and weighted undirected graphs with common numeric weight types.
+ *
+ * This facade contains type declarations and includes; graph construction and
+ * algorithm behavior are documented in the specialized headers it includes.
+ *
+ * @author pss (main developer)
+ * @date Last updated: 1 February 2026
+ *
+ * @see graph_types.h
+ * @see graph_unweighted.h
+ * @see ugraph_vertex_weighted.h
+ * @see ugraph_edge_weighted.h
+ */
 
 #ifndef BITSCAN_GRAPH_MAIN_HEADER_H
 #define BITSCAN_GRAPH_MAIN_HEADER_H

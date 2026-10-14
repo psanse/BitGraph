@@ -1,12 +1,33 @@
 /**
-* @file edges_format.h
-* @bried header of class MMXI to read MMX format in GRAPH
-* 		 Currently only reads matrix from a configuration MCPS
-* @details created 19/11/2014, last_update 27/01/2025
-* @dev pss
-* 
-* TODO - old code, refactoring needed (09/07/25)
-**/
+ * @file edges_format.h
+ * @brief Legacy header-only reader for simple edge-list graph files.
+ *
+ * @details
+ * This header defines the templated @c bitgraph::io::detail::EDGES reader.
+ * It parses a vertex-count/edge-count header followed by pairs of
+ * one-based vertex indices, converts them to the library's zero-based
+ * representation, and populates the supplied graph object through its
+ * @c reset() and @c add_edge() operations.
+ *
+ * Header comment lines beginning with `#` or `%` are skipped. Matrix Market
+ * banners beginning with `%%` are rejected, and self-loops are ignored while
+ * the remaining edges are loaded. The reader also assigns the source file's
+ * name to the graph and reports parsing conditions through its legacy error
+ * handling and logging paths.
+ *
+ * @tparam GraphT Graph type providing @c name(), @c set_name(), @c reset(), and
+ *           @c add_edge(vertex, vertex) operations.
+ *
+ * @author pss
+ * @date Created: 19 November 2014
+ * @date Last updated: 27 January 2025
+ *
+ * @see mmio.h
+ * @warning This is legacy code with limited validation and console-oriented
+ *          diagnostics; it is retained for compatibility and requires
+ *          refactoring before being treated as a modern format abstraction.
+ * @todo Refactor the reader and replace unqualified stream/type usage.
+ */
 
 #include <cstdio>
 #include <fstream>
@@ -24,11 +45,11 @@ namespace bitgraph {
 	namespace io {
 		namespace detail {
 
-			template<class T>
+			template<class GraphT>
 			class EDGES {
 				enum { PREMATURE_EOF = -4, COULD_NOT_READ_FILE, HEADER_ERROR, INVALID_EDGE };
 			public:
-				EDGES(string filename, T& gout);
+				EDGES(string filename, GraphT& gout);
 				~EDGES() { f.close(); }
 				int read();
 
@@ -37,12 +58,12 @@ namespace bitgraph {
 				int read_number_of_vertices(int& nEdges);			//header comments %, # are removed (%% is discarded as MTX format)
 				int remove_comments();
 				void what(int error_code, ostream & = cerr);
-				T& g;
+				GraphT& g;
 				ifstream f;
 			};
 
-			template<class T>
-			EDGES<T>::EDGES(string filename, T& gout) :g(gout) {
+			template<class GraphT>
+			EDGES<GraphT>::EDGES(string filename, GraphT& gout) :g(gout) {
 				f.open(filename, ios::in);
 				if (!f) {
 					cerr << filename.c_str() << " not opened correctly" << endl;
@@ -52,8 +73,8 @@ namespace bitgraph {
 				g.set_name(filename);
 			}
 
-			template<class T>
-			int EDGES<T>::remove_comments() {
+			template<class GraphT>
+			int EDGES<GraphT>::remove_comments() {
 				////////////////
 				// remove lines starting with # or % (accepted comments)
 				// lines starting with %% are not accepted as comment (format mtx)
@@ -75,8 +96,8 @@ namespace bitgraph {
 				return 0;
 			}
 
-			template<class T>
-			int EDGES<T>::read() {
+			template<class GraphT>
+			int EDGES<GraphT>::read() {
 				int N, M, v, w;
 				bool loops = false;
 
@@ -109,10 +130,10 @@ namespace bitgraph {
 				}
 
 				if (loops) {
-					LOG_ERROR("loops found and removed - EDGES<T>::read");
+					LOG_ERROR("loops found and removed - EDGES<GraphT>::read");
 				}
 				else {
-					LOG_INFO("graph read correctly - EDGES<T>::read");
+					LOG_INFO("graph read correctly - EDGES<GraphT>::read");
 				}
 
 				//set name (without path)
@@ -122,8 +143,8 @@ namespace bitgraph {
 			}
 
 
-			template<class T>
-			int EDGES<T>::read_number_of_vertices(int& M) {
+			template<class GraphT>
+			int EDGES<GraphT>::read_number_of_vertices(int& M) {
 				/////////////////
 				// It is assumed f is valid
 				// Header comments starting with % or # are removed
@@ -158,8 +179,8 @@ namespace bitgraph {
 				return nV;
 			}
 
-			template<class T>
-			void EDGES<T>::what(int error_code, ostream& o) {
+			template<class GraphT>
+			void EDGES<GraphT>::what(int error_code, ostream& o) {
 				switch (error_code) {
 				case PREMATURE_EOF:
 					o << "premature end of file" << endl;

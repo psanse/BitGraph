@@ -1,11 +1,33 @@
 /**
-* @file matrix_market_format.h
-* @brief header of class MMI to read MMX format in GRAPH
-*		 Currently only reads matrix format for configuration MCPS
-*		 Based on Matrix Market I/O library for ANSI C repo (see header mmio.h)
-* @details: created 6/10/2014
-* @details: last_update 30/06/2025  (added bitgraph namespace)
-**/
+ * @file matrix_market_format.h
+ * @brief Header-only Matrix Market coordinate reader for graph adjacency data.
+ *
+ * @details
+ * This header defines the templated @c bitgraph::io::detail::MMI reader. It
+ * uses the Matrix Market I/O helpers from @c mmio.h to load sparse pattern
+ * matrices into a graph-like object. The input must describe a square matrix;
+ * one-based matrix coordinates are converted to BitGraph's zero-based vertex
+ * indices and each coordinate becomes a graph edge.
+ *
+ * By default the reader accepts sparse pattern matrices and, when
+ * @c ALLOW_DIRECTED_GRAPHS is enabled, does not require a symmetric Matrix
+ * Market banner. Self-loops are reported and passed to the graph object, and
+ * failures are logged before returning `-1`. The graph is resized to the
+ * matrix dimension and receives the input filename as its name.
+ *
+ * @tparam T Graph type providing @c reset(), @c add_edge(), and @c set_name()
+ *           operations compatible with the reader.
+ *
+ * @author pss
+ * @date Created: 6/10/2014
+ * @date Last updated: 30/06/2025 (added bitgraph namespace)
+ *
+ * @see mmio.h
+ * @see graph.h
+ * @warning This reader is intentionally limited to sparse pattern matrices
+ *          and square adjacency matrices; unsupported Matrix Market types or
+ *          non-square inputs are rejected.
+ */
 
 #include "mmio.h"
 #include "utils/logger.h"

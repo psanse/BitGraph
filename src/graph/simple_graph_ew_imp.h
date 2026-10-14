@@ -1,13 +1,29 @@
 /**
  * @file simple_graph_ew_imp.h
- * @brief Implementation of the Base_Graph_EW and Graph_EW class templates.
+ * @brief Inline template implementations for edge-weighted graph classes.
  *
- * @details Provides the implementation of edge-weighted graph operations.
- *          Supported template types are documented at the end of the file.
+ * @details
+ * This implementation fragment defines the operations declared by
+ * @c Base_Graph_EW and @c Graph_EW. It keeps graph topology and the symmetric
+ * edge-weight matrix synchronized while implementing construction, reset and
+ * validation, weight assignment and transformation, DIMACS input/output,
+ * random-edge generation, consistency checks, and graph/edge printing.
+ *
+ * The special value @c NO_WEIGHT represents a missing edge weight. Self-loop
+ * weights are rejected, and weight matrices must be square and consistent
+ * with the graph's adjacency structure. The template definitions are included
+ * from @c simple_graph_ew.h so that supported graph and weight combinations can
+ * be instantiated where needed.
  *
  * @author pss
  * @date 16/01/2019
  *
+ * @see simple_graph_ew.h
+ * @see formats/detail/dimacs_format.h
+ * @see weighted_constants.h
+ * @warning Invalid weight matrices, missing-edge assignments, and self-loop
+ *          weights follow the fail-fast error policy implemented by the graph
+ *          classes.
  * @copyright Part of the BITGRAPH C++ library.
  */
 

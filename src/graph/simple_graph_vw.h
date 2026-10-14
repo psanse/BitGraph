@@ -1,12 +1,30 @@
 /**
  * @file simple_graph_vw.h
- * @brief Vertex-weighted graph classes built on simple graph types.
+ * @brief Generic vertex-weighted graph classes and public facade types.
  *
- * Defines `Base_Graph_VW` and `Graph_W`, which provide vertex-weighted
- * graph functionality on top of the underlying graph representation.
+ * @details
+ * This header defines @c Base_Graph_VW and @c Graph_VW, which combine an
+ * underlying graph representation with one weight value per vertex. The
+ * classes provide construction and reset operations, weight assignment and
+ * transformation, maximum-weight queries, graph-topology access, complement
+ * creation, random-edge generation, DIMACS and external-weight I/O, and
+ * formatted weight output.
+ *
+ * The vertex-weight vector and the underlying graph share the same vertex
+ * count. Weight constants such as @c NO_WEIGHT, @c ZERO_WEIGHT, and
+ * @c DEFAULT_WEIGHT are supplied by @c weight_constants. The implementation
+ * is included from @c detail/simple_graph_vw_imp.h so template definitions
+ * remain visible to translation units using custom graph or weight types.
  *
  * @author pss
- * @details Created 16/01/2019, last updated 09/10/2026.
+ * @date Created 16/01/2019
+ * @date Last updated 09/10/2026
+ *
+ * @see weighted_constants.h
+ * @see simple_graph.h
+ * @see detail/simple_graph_vw_imp.h
+ * @warning Mutating the underlying graph directly can invalidate the
+ *          graph/weight-size invariant maintained by the weighted wrapper.
  *
  * This code is part of the BITGRAPH C++ library.
  */

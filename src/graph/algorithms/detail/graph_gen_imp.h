@@ -1,14 +1,32 @@
 ﻿/**
  * @file graph_gen_imp.h
- * @brief Implementation of the RandomGen class for random graph generation.
+ * @brief Inline template implementations for graph and weight generation.
  *
- * @details Provides implementations for generating random graphs,
- * benchmark collections, and isomorphic graphs through vertex permutations.
- * Supports directed and undirected graph types.
+ * @details
+ * This implementation fragment defines the generation routines declared by
+ * @c graph_gen.h. It creates random graphs for supported graph types, writes
+ * parameterized DIMACS benchmark collections, constructs isomorphic graphs by
+ * applying shuffled vertex permutations, and provides experimental sparse
+ * graph generation and edge-index decoding.
+ *
+ * The fragment also implements vertex- and edge-weight generation utilities.
+ * Generated benchmark and weight files are written to caller-provided paths;
+ * graph and weight objects are updated in place. Invalid generation
+ * parameters, file-open failures, and file-write failures follow the
+ * fail-fast policy used by the public generator API and terminate after
+ * logging an error.
+ *
+ * This file is included by @c graph_gen.h because the implementations are
+ * templates. It should not be included directly by application code.
  *
  * @author pss
  * @date Last updated: 13/10/2026
  *
+ * @see ../graph_gen.h
+ * @see ../graph_fast_sort.h
+ * @see ../../formats/detail/dimacs_format.h
+ * @warning Experimental sparse-generation and weight-generation paths may
+ *          have stricter preconditions than the general random graph API.
  * @copyright This file is part of the BITGRAPH C++ library.
  */
 

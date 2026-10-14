@@ -1,16 +1,37 @@
- /**
-  * @file simple_sparse_graph.h 
-  * @brief contains specializations the class Graph for sparse graphs
-  *
-  * @date 30/12/2024
-  * @last modified 01/02/2026
-  * @author pss
-  * 
-  * @todo - check logic for efficiency (01/02/2026)
-  */
+/**
+ * @file simple_sparse_graph_imp.h
+ * @brief Sparse-graph specializations of the generic Graph implementation.
+ *
+ * @details
+ * This implementation fragment defines the `Graph<BBScanSp>` specializations
+ * used by the `bitgraph::sparse_graph` facade. It adapts subgraph creation,
+ * vertex-range shrinking, DIMACS output, and block-density measurements to
+ * adjacency rows stored in sparse BITSCAN bitsets.
+ *
+ * Sparse rows store only allocated bitblocks, so the implementation tracks
+ * logical block capacity separately from the number of allocated blocks.
+ * Operations that change the vertex range also invalidate cached edge counts
+ * and refresh the sparse graph's block-capacity metadata.
+ *
+ * This file is intended to be included by the sparse graph public header and
+ * should not normally be included directly by client code.
+ *
+ * @author pss
+ * @date 30/12/2024
+ * @last modified 01/02/2026
+ *
+ * @see ../simple_graph.h
+ * @see ../graph_unweighted.h
+ * @see ../../bitscan/bbscan_sparse.h
+ * @warning Sparse specializations rely on the invariants of `Graph<BBScanSp>`;
+ *          invalid sizes or incompatible adjacency storage follow the graph
+ *          class's documented error policy.
+ *
+ * @todo Check logic for efficiency (01/02/2026).
+ */
 
-#ifndef BITGRAPH_GRAPH_SIMPLE_SPARSE_GRAPH_H
-#define BITGRAPH_GRAPH_SIMPLE_SPARSE_GRAPH_H
+#ifndef BITGRAPH_GRAPH_SIMPLE_SPARSE_GRAPH_IMP_H
+#define BITGRAPH_GRAPH_SIMPLE_SPARSE_GRAPH_IMP_H
 
 ////////////////////////
 //
@@ -202,4 +223,5 @@ namespace bitgraph{
 } //end of namespace bitgraph
 
 
-#endif // BITGRAPH_GRAPH_SIMPLE_SPARSE_GRAPH_H
+
+#endif // BITGRAPH_GRAPH_SIMPLE_SPARSE_GRAPH_IMP_H

@@ -1,14 +1,30 @@
 /**
  * @file vertex_set_format.cpp
- * @brief Implementation of vertex-set mask file parsing utilities.
+ * @brief Implementation of vertex-interdiction mask parsing.
  *
- * A vertex mask contains one character per vertex: `0` identifies an
- * interdicted vertex and `1` identifies an unrestricted vertex. Whitespace
- * may be used as a separator and is ignored by the parser.
+ * @details
+ * This translation unit implements the non-template reader declared in
+ * @c vertex_set_format.h. It parses a text mask in which each non-whitespace
+ * character represents one zero-based vertex position: `0` identifies an
+ * interdicted vertex and `1` identifies an unrestricted vertex. Whitespace,
+ * including platform-specific line endings, is accepted as a separator.
+ *
+ * The parser validates the complete file before replacing the output vector,
+ * so malformed input or an I/O failure cannot leave partially parsed results
+ * in the caller's collection. Errors are reported through the project's
+ * logging facility and the function returns `-1` rather than propagating an
+ * exception.
+ *
+ * @author Pablo San Segundo
+ * @date Last updated: 14 October 2026
+ *
+ * @see vertex_set_format.h
+ * @warning Mask positions are counted only for `0` and `1` characters;
+ *          whitespace does not consume a vertex position.
  */
 
 #include "vertex_set_format.h"
-#include <cctype>       // for std::isspace
+#include <cctype>                   // for std::isspace
 
 
 namespace bitgraph {

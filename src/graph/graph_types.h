@@ -1,16 +1,26 @@
 /**
  * @file graph_types.h
- * @brief Defines common types and constants used by the GRAPH library.
+ * @brief Shared vertex, collection, ordering, and weight types for GRAPH.
  *
- * This header provides the fundamental vertex type, semantic collection
- * aliases, and constants shared by BitGraph graph classes and algorithms.
+ * @details
+ * This header defines the fundamental scalar and container types used across
+ * BitGraph graph classes and algorithms, including vertex identifiers, degree
+ * values, vertex collections, vertex mappings, orderings, and the default
+ * weight modulus.
  *
- * Both snake_case and CamelCase aliases are currently provided for API
- * compatibility.
+ * The API intentionally contains several redundant aliases for backward
+ * compatibility. The preferred modern names use snake_case, while aliases
+ * such as @c Vertex, @c Vertices, @c VertexMapping, @c VertexOrdering,
+ * @c vertex_set_t, and @c DEFAULT_WEIGHT_MODULUS preserve compatibility with
+ * older graph code. New code should use the canonical snake_case names where
+ * possible.
  *
  * @date Created: 30/06/2025
  * @date Last updated: 19/09/2026
  * @author Pablo San Segundo
+ *
+ * @warning The compatibility aliases are type synonyms, not distinct types;
+ *          changing the underlying canonical type affects all aliases.
  */
 
 #ifndef BITGRAPH_GRAPH_TYPES_H

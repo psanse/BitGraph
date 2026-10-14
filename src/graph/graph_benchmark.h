@@ -1,13 +1,29 @@
 /**
- * @file benchmark.h
- * @brief Defines the GraphBenchmark base class for graph test datasets.
+ * @file graph_benchmark.h
+ * @brief Dataset and reference-value management for graph benchmarks.
  *
- * GraphBenchmark manages a collection of graph instance filenames sharing a common
- * base path. Each instance may also have an associated integer value, typically
- * a known optimum or bound used by an algorithm-testing framework.
+ * @details
+ * This header defines the templated @c bitgraph::BasicGraphBenchmark class,
+ * which stores graph-instance filenames under a common dataset path and
+ * optionally associates each instance with a reference value. The values may
+ * represent known optima, bounds, or other algorithm-specific annotations.
+ *
+ * Instance paths are normalized by appending the supplied filename to the
+ * configured base path. The class provides registration, lookup, clearing,
+ * formatted output, and aliases for the common integer and floating-point
+ * benchmark variants. The template definitions are kept in this header so
+ * users can instantiate the class with custom value types.
+ *
+ * @tparam ValueT Type of the optional reference value associated with each
+ *                graph instance.
  *
  * @author Pablo San Segundo
- * @date Last updated: 23/09/2026
+ * @date Last updated: 23 September 2026
+ *
+ * @see path_utils.h
+ * @see graph_benchmark.cpp
+ * @warning The benchmark stores filenames and metadata; it does not load or
+ *          validate the graph files themselves.
  */
 
 #ifndef BITGRAPH_GRAPH_BENCHMARK_H

@@ -1,13 +1,34 @@
 /**
-* @file edge_weighted_graph_utils.h
-* @brief main header for namespace gfunc providing general purpose functions for graphs
-* @details: 
-*  - date 07/3/2017
-*  - last_modified 30/01/2025  
-* @author pss
-*
-* @todo CHECK edgeW::ew_shift_2_highest_index function  (09/01/25)
-**/
+ * @file edge_weighted_graph_utils.h
+ * @brief Header-only algorithms for undirected edge-weighted graphs.
+ *
+ * @details
+ * This header defines utilities in @c bitgraph::graph_utils for aggregating
+ * edge weights and redistributing the weights of a selected vertex-induced
+ * subproblem. The @c wesum overloads support complete weighted graphs and
+ * vertex collections, with an option to include or exclude diagonal
+ * vertex-weight entries. The @c UEW alias provides a convenient weighted
+ * undirected graph specialization backed by the public dense bit-array type.
+ *
+ * @c ew_shift_2_highest_index initializes a caller-provided weight array and
+ * shifts each selected edge's weight between its endpoints, assigning the
+ * proportion controlled by @p wper to the endpoint with the higher vertex
+ * index. The utility functions are templates and are defined inline in this
+ * header.
+ *
+ * @author pss
+ * @date Created: 7 March 2017
+ * @date Last updated: 30 January 2025
+ *
+ * @see ugraph_edge_weighted.h
+ * @see graph_traits.h
+ * @see sort_utils.h
+ * @warning Callers of @c ew_shift_2_highest_index must provide a valid output
+ *          array covering the referenced vertex indices; @p wper is intended
+ *          to lie in the interval [0, 1].
+ * @todo Review and test @c ew_shift_2_highest_index, especially for integral
+ *       weight types.
+ */
 
 #ifndef BITGRAPH_GRAPH_EDGE_WEIGHTED_GRAPH_UTILS_H
 #define BITGRAPH_GRAPH_EDGE_WEIGHTED_GRAPH_UTILS_H

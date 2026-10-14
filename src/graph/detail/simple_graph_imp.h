@@ -1,22 +1,33 @@
-#include "simple_graph.h"
 /**
- * @file simple_graph_impl.h
- * @brief Provides template and inline implementations for the Graph class.
+ * @file simple_graph_imp.h
+ * @brief Inline template implementations for the generic Graph class.
  *
- * This file contains definitions that must remain visible to translation
- * units using Graph, including template member functions and inline graph
- * operations.
+ * @details
+ * This implementation fragment defines the template and inline operations
+ * declared by @c bitgraph::Graph. It covers graph construction and reset,
+ * adjacency and edge-count maintenance, density and degree queries, neighbor
+ * access, subgraph and complement creation, random-edge generation, graph
+ * metadata, formatted output, and DIMACS, Matrix Market, and edge-list input.
  *
- * The implementation supports graph representations whose adjacency sets are
- * stored using compatible BITSCAN bitset types.
+ * The graph stores adjacency rows through a compatible BITSCAN bitset type.
+ * Operations that modify adjacency invalidate cached edge counts as needed,
+ * while readers and density queries maintain the graph's consistency rules.
+ * The definitions are kept in this header so templates can be instantiated for
+ * dense and sparse adjacency representations.
  *
- * This file is included at the end of simple_graph.h and should not normally
- * be included directly by client code.
- *
- * @note All definitions in this file belong to the bitgraph namespace.
+ * This file is included at the end of @c simple_graph.h and should not normally
+ * be included directly by client code. All definitions belong to the
+ * @c bitgraph namespace.
  *
  * @date created: 20/09/2026
  * @author P. San Segundo
+ *
+ * @see ../simple_graph.h
+ * @see ../formats/detail/dimacs_format.h
+ * @see ../formats/detail/matrix_market_format.h
+ * @warning Graph operations require an adjacency bitset type compatible with
+ *          the interface expected by @c Graph; invalid vertex indices follow
+ *          the validation and error policies of the public graph class.
  */
 
 #ifndef BITGRAPH_GRAPH_SIMPLE_GRAPH_IMP_H

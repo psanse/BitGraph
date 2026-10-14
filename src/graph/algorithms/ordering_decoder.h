@@ -1,14 +1,31 @@
 /**
  * @file ordering_decoder.h
- * @brief Defines utilities for composing and decoding graph vertex orderings.
+ * @brief Composition, inversion, and decoding of graph vertex orderings.
  *
- * Provides OrderingDecoder, which stores a sequence of vertex orderings and
- * maps vertices or collections of vertices back through their composition.
+ * @details
+ * This header defines @c bitgraph::OrderingDecoder, which owns a sequence of
+ * vertex permutations and maps individual vertices or vertex collections back
+ * through the complete composition. Each stored ordering is interpreted as a
+ * mapping from indices in a reordered graph to indices in the preceding graph;
+ * decoding applies those mappings in reverse insertion order to recover the
+ * original-graph indices.
+ *
+ * The class also provides inverse-permutation helpers, in-place and
+ * value-returning decode operations, read-only access to the stored mappings,
+ * and backward-compatible aliases for historical method names. Ordering
+ * vectors are expected to be valid zero-based permutations of their index
+ * range; relevant preconditions are checked with assertions in debug builds.
  *
  * @author Pablo San Segundo
  * @date 29/11/13
  * @last_update 17/12/24
  * @date Last updated: 26/09/2026
+ *
+ * @see graph_types.h
+ * @see graph_fast_sort.h
+ * @warning Decoding requires each stored ordering to cover the vertex index
+ *          being decoded. Invalid or mismatched permutations violate the
+ *          documented preconditions.
  */
 
 #ifndef BITGRAPH_GRAPH_ALGORITHMS_ORDERING_DECODER_H

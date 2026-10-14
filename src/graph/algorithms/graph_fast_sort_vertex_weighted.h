@@ -1,12 +1,33 @@
 /**
  * @file graph_fast_sort_vertex_weighted.h
- * @brief Vertex-ordering algorithms for vertex-weighted graphs.
+ * @brief Vertex ordering and reordering utilities for vertex-weighted graphs.
  *
- * Defines `GraphFastRootSort_VW`, which extends `GraphFastRootSort`
- * with vertex-ordering strategies based on vertex weights.
+ * @details
+ * This header defines the templated
+ * @c bitgraph::graph_utils::GraphFastRootSort_VW adapter. It extends
+ * @c GraphFastRootSort with non-increasing and non-decreasing vertex-weight
+ * strategies while retaining the degree, degeneracy, and other unweighted
+ * strategies inherited from the base sorter.
+ *
+ * The class supports typed and legacy strategy selection, old-to-new and
+ * new-to-old ordering representations, induced ordering through the base API,
+ * and graph reordering with optional @c OrderingDecoder tracking. Reordering
+ * preserves the vertex-weighted graph structure and remaps vertex weights to
+ * their new indices.
+ *
+ * @tparam GraphW Vertex-weighted graph type exposing a @c graph_type alias,
+ *                a @c Weight type, vertex-weight accessors, and the graph
+ *                operations required by @c GraphFastRootSort.
  *
  * @author pss
- * @details Created 12/03/2021, last updated 08/10/2026.
+ * @date Created 12/03/2021
+ * @date Last updated 08/10/2026
+ *
+ * @see graph_fast_sort.h
+ * @see ordering_decoder.h
+ * @warning The sorter keeps a non-owning reference to the graph supplied at
+ *          construction; that graph must outlive the sorter and remain
+ *          structurally stable while operations are in progress.
  */
 
 #ifndef BITGRAPH_GRAPH_GRAPH_FAST_SORT_VERTEX_WEIGHTED_H

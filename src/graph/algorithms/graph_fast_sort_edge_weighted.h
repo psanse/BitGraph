@@ -1,16 +1,31 @@
 /**
-* @file graph_fast_sort_edge_weighted.h
-* @brief header for GraphFastRootSort_EW_W class which sorts
-*		 weighted graphs according to different criteria
-* @details : created 08/12/2021
-* @last_update 29/01/2026 
-* @author pss
-* 
-* @todo
-* - unit tests for GraphFastRootSort_EW  (30/06/2025)
-* - check everything works as expected (29/01/2026)
-* 
-**/
+ * @file graph_fast_sort_edge_weighted.h
+ * @brief Vertex ordering and reordering utilities for edge-weighted graphs.
+ *
+ * @details
+ * This header defines the templated @c bitgraph::graph_utils::GraphFastRootSort_EW
+ * adapter. It extends the unweighted @c GraphFastRootSort ordering strategies
+ * to edge-weighted graph types and provides static and instance operations for
+ * rebuilding a graph after a vertex permutation.
+ *
+ * Reordering preserves graph metadata, remaps vertex weights, and transfers
+ * edge weights to the corresponding reordered endpoints. The sorter stores a
+ * non-owning reference to the weighted graph supplied at construction, while
+ * the static reorder operation returns a reordered graph value. Optional
+ * @c OrderingDecoder support records the mapping used during reordering.
+ *
+ * @author pss
+ * @date Created: 08/12/2021
+ * @date Last updated: 14/10/2026
+ *
+ * @see graph_fast_sort.h
+ * @see ordering_decoder.h
+ * @see ugraph_edge_weighted.h
+ * @warning The template argument must expose the weighted graph interface
+ *          expected by the implementation, including topology, vertex-weight,
+ *          and edge-weight accessors.
+ *
+ */
 
 #ifndef BITGRAPH_GRAPH_GRAPH_FAST_SORT_EDGE_WEIGHTED_H
 #define BITGRAPH_GRAPH_GRAPH_FAST_SORT_EDGE_WEIGHTED_H

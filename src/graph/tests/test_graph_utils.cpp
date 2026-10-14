@@ -11,10 +11,11 @@
  * @date Last updated: 27/09/2026
  */
 
-#include "graph/algorithms/graph_utils.h"
 
 #include "gtest/gtest.h"
-#include "graph/graph.h"				//	facade types
+#include "graph/graph.h"											//	facade types
+#include "graph/algorithms/unweighted_graph_utils.h"	
+#include "graph/algorithms/vertex_weighted_graph_utils.h"
 #include <iostream>
 
 using namespace bitgraph;

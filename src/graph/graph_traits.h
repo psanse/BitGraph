@@ -21,9 +21,6 @@
  * @todo Add specializations for vertex- and edge-weighted graph families.
  */
 
- // TODO Add graph_traits specializations for vertex- and edge-weighted
- // graph families when those types are integrated.
-
 #ifndef BITGRAPH_GRAPH_TRAITS_H
 #define BITGRAPH_GRAPH_TRAITS_H
 

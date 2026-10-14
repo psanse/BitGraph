@@ -2,11 +2,18 @@
  * @file graph_fast_sort.h
  * @brief Fast vertex ordering and graph reordering for undirected graphs.
  *
- * @details Implements the GraphFastRootSort class, providing degree-based,
- * degeneracy-based, and neighborhood-support-based vertex ordering strategies.
- * Supports graph reordering and vertex ordering on induced subgraphs.
+ * @details
+ * This header defines the templated @c bitgraph::graph_utils::GraphFastRootSort
+ * utility. It computes degree-based, degeneracy-based, composite, and
+ * neighborhood-support tie-breaker orderings, and can apply those orderings to
+ * graphs or to induced subgraphs. The resulting mappings can be represented in
+ * either new-to-old or old-to-new form and can be consumed by
+ * @c OrderingDecoder.
  *
- * Supported graph types are Ugraph<BBScan> and Ugraph<BBScanSp>.
+ * Supported graph types are @c Ugraph<BBScan> and @c Ugraph<BBScanSp>, or
+ * compatible undirected graph types satisfying the required graph traits. The
+ * sorter stores a non-owning reference to its input graph; that graph must
+ * remain alive and structurally unchanged while sorting is in progress.
  *
  * @author pss
  * @date Created: 12/03/2015
@@ -16,7 +23,13 @@
  * - 18/03/2019: Replaced the nodes_ stack with a vector.
  * - 30/11/2025: Added support for induced subgraphs.
  *
+ * @see graph_traits.h
+ * @see ordering_decoder.h
+ * @see vertex_utils.h
  * @copyright This file is part of the BITGRAPH C++ library.
+ * @warning The API supports only undirected graph types; invalid strategy or
+ *          range arguments follow the failure policies documented by the
+ *          individual operations.
  */
 
 #ifndef BITGRAPH_GRAPH_GRAPH_FAST_SORT_H

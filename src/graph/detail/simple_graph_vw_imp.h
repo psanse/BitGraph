@@ -1,16 +1,30 @@
 /**
- * @file simple_graph_w_imp.h
- * @brief Template implementation for vertex-weighted simple graph classes.
+ * @file simple_graph_vw_imp.h
+ * @brief Inline template implementations for vertex-weighted graph classes.
  *
- * Contains the definitions of the template members declared for
- * `Base_Graph_VW` and `Graph_W`.
+ * @details
+ * This implementation fragment defines the template members declared by
+ * @c Base_Graph_VW and @c Graph_VW. It implements vertex-weight
+ * transformations, complement creation, reset and weight assignment,
+ * maximum-weight queries, unit/modulus weight generation, DIMACS and external
+ * weight-file I/O, and formatted weight output.
  *
- * This file is intended to be included by the corresponding public header
- * and should not normally be included directly by user code.
+ * The implementation maintains the invariant that the vertex-weight vector
+ * has one entry for every vertex in the underlying graph. Missing or invalid
+ * weights are handled according to the constants and fail-fast policies of
+ * the public weighted-graph classes. The file is included by
+ * @c simple_graph_vw.h so template definitions remain visible to users.
  *
  * @author pss
+ * @date Created 16/01/2019
+ * @date Last updated 06/01/2025
  *
- * @details Created 16/01/2019, last updated 06/01/2025.
+ * @see ../simple_graph_vw.h
+ * @see ../../formats/detail/dimacs_format.h
+ * @see ../weighted_constants.h
+ * @warning This implementation fragment should not normally be included
+ *          directly by client code; use the public vertex-weighted graph
+ *          header instead.
  * @note See the end of the file for the supported template types.
  */
 

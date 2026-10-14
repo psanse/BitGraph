@@ -1,8 +1,28 @@
 /**
-* @file dimacs_format.h
-* @brief utilities to parse dimacs format
-* @details: creation 30/09/2018, last_update 09/07/2025
-**/
+ * @file dimacs_format.h
+ * @brief Header-only helpers for reading and writing DIMACS edge files.
+ *
+ * @details
+ * This header provides the low-level utilities in
+ * @c bitgraph::io::detail::dimacs for the DIMACS graph format. The parser
+ * skips blank lines and comment lines beginning with `c`, then validates the
+ * `p edge <number_of_vertices> <number_of_edges>` header. The writer delegates
+ * graph serialization to a graph type's @c write_dimacs() member function.
+ *
+ * The functions are inline and use non-throwing error-return conventions at
+ * their public boundaries: header parsing returns the declared vertex count
+ * on success and `-1` on failure, while file writing returns `0` on success
+ * and `-1` if the output file cannot be opened. Errors are reported through
+ * the project's logging utilities.
+ *
+ * @author pss
+ * @date Created: 30 September 2018
+ * @date Last updated: 9 July 2025
+ *
+ * @see file_utils.h
+ * @warning @c graph_to_dimacs requires its graph type to provide a compatible
+ *          @c write_dimacs(std::ostream&) member function.
+ */
 
 #include <fstream>
 #include <sstream>

@@ -1,14 +1,27 @@
 /**
  * @file ordering_decoder.cpp
- * @brief Implements graph vertex-ordering decoding utilities.
+ * @brief Implementation of graph vertex-ordering composition and decoding.
  *
- * Contains the non-inline definitions of the OrderingDecoder class, including
- * permutation inversion and the decoding of individual vertices and vertex
- * collections through a composition of stored orderings.
+ * @details
+ * This translation unit implements the non-inline operations of
+ * @c bitgraph::OrderingDecoder. Each stored ordering maps indices in a
+ * reordered graph to indices in the preceding graph. Decoding therefore
+ * applies the stored mappings in reverse insertion order to recover the
+ * corresponding indices in the original graph.
+ *
+ * The implementation also computes inverse permutations and applies decoding
+ * to individual vertices or complete vertex-ordering collections. In-place
+ * collection decoding uses a transformation over the existing container;
+ * the value-returning overload leaves its input unchanged.
  *
  * @author Pablo San Segundo
- * @date created: 29/11/2013
- * @date last updated: 26/09/2026
+ * @date Created: 29 November 2013
+ * @date Last updated: 26 September 2026
+ *
+ * @see ordering_decoder.h
+ * @warning Ordering vectors are expected to contain valid zero-based
+ *          permutations. Debug builds validate the relevant index bounds with
+ *          assertions.
  */
 
 #include "ordering_decoder.h"
