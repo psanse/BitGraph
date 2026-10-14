@@ -565,6 +565,11 @@ namespace bitgraph {
 
 	using graph_utils::GraphFastRootSort;
 
+	// API alias - in the future, GraphSort will be the main interface for graph sorting and reordering.
+	template<class GraphT>
+	using GraphSort = graph_utils::GraphFastRootSort<GraphT>;
+	
+
 }//end of namespace bitgraph
 
 
@@ -1321,6 +1326,7 @@ namespace bitgraph {
 		}
 
 	} // namespace graph_utils
+
 
 }//end of namespace bitgraph	
 

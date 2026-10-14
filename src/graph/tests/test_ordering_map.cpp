@@ -13,7 +13,7 @@
 
 namespace bitgraph {
 	using  ugraph =	 Ugraph<bitarray>;
-	using GraphSort = GraphFastRootSort<ugraph>;
+	using GraphSortU = GraphSort<ugraph>;
 }
 
 using namespace std;
@@ -46,10 +46,10 @@ TEST_F(OrderingMapTest, build_mapping_2_orderings) {
 	//degrees: {0(3), 1(2), 2(3), 3(2)}
 	 
 	OrderingMap gm;
-	gm.build_mapping<GraphSort> (
+	gm.build_mapping<GraphSortU> (
 		ug, 
-		GraphSort::MAX, GraphSort::FIRST_TO_LAST,
-		GraphSort::MIN, GraphSort::FIRST_TO_LAST, 
+		GraphSortU::MAX, GraphSortU::FIRST_TO_LAST,
+		GraphSortU::MIN, GraphSortU::FIRST_TO_LAST, 
 		"MAX F2L", "MIN F2L"	);
 		
 	//////////////////////////////////												  
@@ -94,12 +94,12 @@ TEST_F(OrderingMapTest, build_mapping_2_orderings) {
 TEST_F(OrderingMapTest, build_mapping_enum_overload) {
 
 	OrderingMap gm;
-	gm.build_mapping<GraphSort>(
+	gm.build_mapping<GraphSortU>(
 		ug,
-		GraphSort::strategy::max,
-		GraphSort::placement::first_to_last,
-		GraphSort::strategy::min,
-		GraphSort::placement::first_to_last,
+		GraphSortU::strategy::max,
+		GraphSortU::placement::first_to_last,
+		GraphSortU::strategy::min,
+		GraphSortU::placement::first_to_last,
 		"MAX F2L",
 		"MIN F2L");
 
@@ -114,16 +114,16 @@ TEST_F(OrderingMapTest, build_mapping_enum_overload) {
 TEST_F(OrderingMapTest, build_mapping_from_known_o2n_orderings) {
 
 	// same orderings as build_mapping_2_orderings, given explicitly in [OLD]->[NEW] format
-	GraphSort gs(ug);
-	VertexMapping lhs_o2n = gs.new_order(GraphSort::MAX, GraphSort::FIRST_TO_LAST, true);
-	VertexMapping rhs_o2n = gs.new_order(GraphSort::MIN, GraphSort::FIRST_TO_LAST, true);
+	GraphSortU gs(ug);
+	VertexMapping lhs_o2n = gs.new_order(GraphSortU::MAX, GraphSortU::FIRST_TO_LAST, true);
+	VertexMapping rhs_o2n = gs.new_order(GraphSortU::MIN, GraphSortU::FIRST_TO_LAST, true);
 
 	OrderingMap gm;
 	gm.build_mapping(lhs_o2n, rhs_o2n, "MAX F2L", "MIN F2L");
 
 	OrderingMap gm_ref;
-	gm_ref.build_mapping<GraphSort>(ug, GraphSort::MAX, GraphSort::FIRST_TO_LAST,
-									GraphSort::MIN, GraphSort::FIRST_TO_LAST);
+	gm_ref.build_mapping<GraphSortU>(ug, GraphSortU::MAX, GraphSortU::FIRST_TO_LAST,
+									GraphSortU::MIN, GraphSortU::FIRST_TO_LAST);
 
 	EXPECT_EQ(NV, gm.size());
 	EXPECT_TRUE(gm.is_consistent());
@@ -145,7 +145,7 @@ TEST_F(OrderingMapTest, build_mapping_single_ordering){
 	//degrees: {0(3), 1(2), 2(3), 3(2)}
 
 	OrderingMap gm;
-	gm.build_mapping< GraphSort > (ug, GraphSort::MIN, GraphSort::FIRST_TO_LAST, "MIN_DEG");
+	gm.build_mapping< GraphSortU > (ug, GraphSortU::MIN, GraphSortU::FIRST_TO_LAST, "MIN_DEG");
 	
 	EXPECT_EQ(NV, gm.size());
 
@@ -186,8 +186,8 @@ TEST_F(OrderingMapTest, predefined_single_ordering){
 	//degrees: {0(3), 1(2), 2(3), 3(2)}
 
 	//predefined ordering
-	GraphSort gol(ug); 
-	VertexOrdering n2o = gol.new_order(GraphSort::MIN, GraphSort::FIRST_TO_LAST, false);			 //n2o = {1,3,0,2}			
+	GraphSortU gol(ug); 
+	VertexOrdering n2o = gol.new_order(GraphSortU::MIN, GraphSortU::FIRST_TO_LAST, false);			 //n2o = {1,3,0,2}			
 
 	OrderingMap gm;
 	gm.build_mapping(n2o, "MIN F2L");			// builds mapping according to the given ordering
@@ -225,8 +225,8 @@ TEST_F(OrderingMapTest, mapBetweenBitsets_2orderings) {
 	//l2r = {2, 3, 0 ,1}, r2l = {2, 3, 0, 1}
 
 	OrderingMap gm;
-	gm.build_mapping<GraphSort>(ug, GraphSort::MAX, GraphSort::FIRST_TO_LAST,
-									 GraphSort::MIN, GraphSort::FIRST_TO_LAST, "MAX F2L", "MIN F2L");
+	gm.build_mapping<GraphSortU>(ug, GraphSortU::MAX, GraphSortU::FIRST_TO_LAST,
+									 GraphSortU::MIN, GraphSortU::FIRST_TO_LAST, "MAX F2L", "MIN F2L");
 
 	auto NV = ug.num_vertices();
 
@@ -267,7 +267,7 @@ TEST_F(OrderingMapTest, mapBetweenBitsets_single_ordering) {
 	//r2l ={ 1, 3, 0, 2 }  -  [NEW] to [OLD / original index]
 
 	OrderingMap gm;
-	gm.build_mapping< GraphSort >(ug, GraphSort::MIN, GraphSort::FIRST_TO_LAST, "MIN_DEG");
+	gm.build_mapping< GraphSortU >(ug, GraphSortU::MIN, GraphSortU::FIRST_TO_LAST, "MIN_DEG");
 
 	auto NV = ug.num_vertices();
 
