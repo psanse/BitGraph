@@ -1267,7 +1267,7 @@ namespace bitgraph {
 		explicit operator bit_index_set() const;
 		
 		/**
-		* @brief Fills stack @s
+		* @brief Fills stack @p s
 		* @param s: output stack object (external ownership)
 		**/
 		void extract_stack(utils::FixedStack<bit_index_t>& s) const;

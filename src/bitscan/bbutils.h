@@ -156,7 +156,7 @@ namespace bitgraph {
 		}
 
 		/**
-		* @brief synchronizes the cached population count @pc_ with the real population count of the bitset
+		* @brief synchronizes the cached population count @p pc_ with the real population count of the bitset
 		* @returns the updated population count
 		* @details
 		*	Does not take into account inference chains, active vertices etc. 

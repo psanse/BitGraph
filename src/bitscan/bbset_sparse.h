@@ -118,7 +118,7 @@ namespace bitgraph {
 		friend  BitsetSp& AND(const BitsetSp& lhs, const BitsetSp& rhs, BitsetSp& res);
 
 		/**
-		* @brief AND between lhs and rhs bitsets - stores the result in @lhs
+		* @brief AND between lhs and rhs bitsets - stores the result in @p lhs
 		* @returns resulting bitset
 		**/
 		friend BitsetSp AND(BitsetSp lhs, const BitsetSp& rhs);
@@ -297,10 +297,10 @@ namespace bitgraph {
 		SparseBlockVec & bitset() { return vBB_; }
 
 		/**
-		* @brief Finds the bitblock corresponding to @blockIDx
+		* @brief Finds the bitblock corresponding to @p blockID
 		*		 Block not found returns 0 (does not throw)
 		* @param blockID: index of the block to find
-		* @returns bitblock of the block index @blockID - 0 if the block does not exist
+		* @returns bitblock of the block index @p blockID - 0 if the block does not exist
 		* @details O(log) complexity
 		*		 - does not dissambiguate between non-existing block and existing empty block
 		**/
@@ -549,7 +549,7 @@ namespace bitgraph {
 		* @param bit: position of the bit to set
 		* @returns 0 if the bit was set, -1 if error
 		* @details emplaces pBlock in the bitstring or changes an existing bitblock
-		* @detials O (log n) to determine if the block constaining firstBit is present
+		* @details O (log n) to determine if the block constaining firstBit is present
 		* @details O (log n) to insert the new block according to index
 		*		   ( + n potential shifts since it is a vector)
 		**/
@@ -825,7 +825,7 @@ namespace bitgraph {
 		//I/O 
 
 		/**
-		* @brief streams bb and its size to @o  with format
+		* @brief streams bb and its size to @p o  with format
 		*		 [bit1 bit2 bit3 ... <(pc)>] - (if empty: [ ])
 		* @param o: output stream
 		* @param show_pc: if true, shows popcount

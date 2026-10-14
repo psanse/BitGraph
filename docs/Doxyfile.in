@@ -33,7 +33,11 @@ INPUT                  = "@PROJECT_SOURCE_DIR@/README.md" \
                          "@PROJECT_SOURCE_DIR@/docs/api" \
                          "@PROJECT_SOURCE_DIR@/docs/benchmarks.md" \
                          "@PROJECT_SOURCE_DIR@/CHANGELOG.md" \
-                         "@PROJECT_SOURCE_DIR@/THIRD_PARTY_NOTICES.md"
+                         "@PROJECT_SOURCE_DIR@/THIRD_PARTY_NOTICES.md" \
+                         "@PROJECT_SOURCE_DIR@/docs/README.md" \
+                         "@PROJECT_SOURCE_DIR@/docs/bitsetsp_api_parity.md" \
+                         "@PROJECT_SOURCE_DIR@/docs/bitsetsp_api_parity_plan.md" \
+                         "@PROJECT_SOURCE_DIR@/src/README.md"
 FILE_PATTERNS          = *.h *.md
 RECURSIVE              = YES
 USE_MDFILE_AS_MAINPAGE = "@PROJECT_SOURCE_DIR@/README.md"
