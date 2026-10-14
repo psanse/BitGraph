@@ -5,8 +5,7 @@
 #add_executable ( gen_random_benchmark gen_random_bench.cpp)
 #target_link_libraries (gen_random_benchmark LINK_PUBLIC graph bitscan utils)
 
-#add_executable ( graph_formats graph_formats.cpp)
-#target_link_libraries (graph_formats LINK_PUBLIC graph bitscan utils)
+
 
 # Small introductory example for the dense/sparse and directed/undirected
 # unweighted graph representations.  Existing examples above are kept
@@ -30,6 +29,9 @@ target_link_libraries (graph_weighted_simple LINK_PUBLIC graph bitscan utils)
 add_executable ( graph_reading_simple graph_reading_simple.cpp)
 target_link_libraries (graph_reading_simple LINK_PUBLIC graph bitscan utils)
 
+add_executable ( graph_formats graph_formats.cpp)
+target_link_libraries (graph_formats LINK_PUBLIC graph bitscan utils)
+
 #add_executable ( kcore lb_kcore.cpp)
 #target_link_libraries ( kcore LINK_PUBLIC graph bitscan utils)
 
@@ -50,6 +52,7 @@ set_target_properties(
 	graph_sorting_simple
 	graph_weighted_simple
 	graph_reading_simple
+	graph_formats
 	PROPERTIES
 	RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin/examples/GRAPH"
 )
