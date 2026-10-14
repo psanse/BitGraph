@@ -9,6 +9,7 @@
 #include "bitscan/bbset.h"	
 #include "bitscan/bbutils.h"
 #include "gtest/gtest.h"
+#include <algorithm>
 #include <iostream>
 #include <set>	
 #include <vector>	

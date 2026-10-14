@@ -81,8 +81,8 @@ TYPED_TEST(BitsetApiTest, member_functions_returning_a_reference_to_the_bitset) 
 	API_RETURNS(B_.clear_all(), B&);
 	API_RETURNS(B_.erase_all_bits(), B&);
 	API_RETURNS(B_.andnot_eq(CB_), B&);
-	API_RETURNS(B_.and_eq(CB_), B&);
-	API_RETURNS(B_.or_eq(CB_), B&);
+	API_RETURNS(B_.and_assign(CB_), B&);
+	API_RETURNS(B_.or_assign(CB_), B&);
 	API_RETURNS(B_.assign_bit(CB_), B&);
 	API_RETURNS(B_.set_block(0, 1, CB_), B&);
 	API_RETURNS(B_.erase_block(0, 1, CB_), B&);

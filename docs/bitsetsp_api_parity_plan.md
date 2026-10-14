@@ -35,7 +35,7 @@ Branch: `develop_sparse`. Companion document: [bitsetsp_api_parity.md](bitsetsp_
 
 ### Step 3: additions (done)
 
-`test`, `set`, `clear`, `clear_all`, `erase_all_bits`, `and_eq`, `or_eq`, `andnot_eq`, `bit_capacity`, `assign_bit`, `set_bit(bitpos_list)`, `is_singleton`, `find_first_common`, `extract_set`, `extract_stack`, `extract_array`, `init(nPop, bits)`, constructor `BitsetSp(bitpos_list)`, `make_bitset_sp`. Tests: `BitsetSp_api.*` in `test_bitset_sparse.cpp`.
+`test`, `set`, `clear`, `clear_all`, `erase_all_bits`, `and_assign`, `or_assign`, `andnot_eq`, `bit_capacity`, `assign_bit`, `set_bit(bitpos_list)`, `is_singleton`, `find_first_common`, `extract_set`, `extract_stack`, `extract_array`, `init(nPop, bits)`, constructor `BitsetSp(bitpos_list)`, `make_bitset_sp`. Tests: `BitsetSp_api.*` in `test_bitset_sparse.cpp`.
 Pending from this step:
 - Free `OR_block`: the dense version is a templated range operation and needs its own design.
 - Galloping search in `find_first_common` and `is_disjoint` when one operand is much smaller.

@@ -947,11 +947,11 @@ TEST(Sparse, masking_aliases) {
 	BitsetSp b(200, { 70, 130, 150 });
 
 	BitsetSp x(a);
-	x.and_eq(b);
+	x.and_assign(b);
 	EXPECT_EQ((bitpos_list{ 70, 130 }), static_cast<bitpos_list>(x));
 
 	BitsetSp y(a);
-	y.or_eq(b);
+	y.or_assign(b);
 	EXPECT_EQ((bitpos_list{ 1, 70, 130, 150, 199 }), static_cast<bitpos_list>(y));
 
 	BitsetSp z(a);
@@ -1354,8 +1354,8 @@ TEST(Sparse, differential_against_bitset) {
 		Pair z = a; z.d ^= b.d; z.s ^= b.s; expect_same(z);
 		Pair w = a; w.d.erase_bit(b.d); w.s.erase_bit(b.s); expect_same(w);
 		Pair u = a; u.d.andnot_eq(b.d); u.s.andnot_eq(b.s); expect_same(u);
-		Pair v1 = a; v1.d.and_eq(b.d); v1.s.and_eq(b.s); expect_same(v1);
-		Pair v2 = a; v2.d.or_eq(b.d); v2.s.or_eq(b.s); expect_same(v2);
+		Pair v1 = a; v1.d.and_assign(b.d); v1.s.and_assign(b.s); expect_same(v1);
+		Pair v2 = a; v2.d.or_assign(b.d); v2.s.or_assign(b.s); expect_same(v2);
 		Pair v3 = a; v3.d.assign_bit(b.d); v3.s.assign_bit(b.s); expect_same(v3);
 
 		//erasing single bits (leaves zero blocks in the sparse bitset)

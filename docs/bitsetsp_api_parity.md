@@ -79,7 +79,7 @@ Action codes: **OK** already matches, **ADD** missing, **ALIGN** exists with a d
 | Bitset | BitsetSp | Action | Notes |
 |---|---|---|---|
 | `&=`, `\|=`, `^=` | same | OK | merge passes; `\|=` allocates (benchmark, step 7) |
-| `and_eq`, `or_eq` | none | ADD | inline forwarders |
+| `and_assign`, `or_assign` | none | ADD | inline forwarders |
 | `AND_block`/`OR_block` member (first,last) | `AND_block(first, rhs)`; the (first,last) form is deleted | ALIGN | |
 | free `AND(lhs, rhs, res)`, `AND(lhs, rhs)`, `OR(lhs, rhs, res)` | same | OK | |
 | free `AND_block`, `OR_block` | `AND_block` only | ADD | `OR_block` |
@@ -102,7 +102,7 @@ Action codes: **OK** already matches, **ADD** missing, **ALIGN** exists with a d
 ## Summary
 
 - **OK:** about 25 entries already match (constructors, copy/move, `msb`/`lsb`, `count`, `set_bit`/`erase_bit` families, `&=` / `|=` / `^=`, `==`, `print`, `extract`).
-- **ADD (no behaviour change, step 3):** `test`, `set`, `clear`, `clear_all`, `erase_all_bits`, `and_eq`, `or_eq`, `andnot_eq`, `assign_bit`, `is_singleton`, `find_first_common`, `bit_capacity`, `init(nPop, bits)`, `set_bit(bit_indices)`, the `bit_indices` constructor, `make_bitset_sp*`, `OR_block`, `extract_set`, `extract_stack`, `extract_array`.
+- **ADD (no behaviour change, step 3):** `test`, `set`, `clear`, `clear_all`, `erase_all_bits`, `and_assign`, `or_assign`, `andnot_eq`, `assign_bit`, `is_singleton`, `find_first_common`, `bit_capacity`, `init(nPop, bits)`, `set_bit(bit_indices)`, the `bit_indices` constructor, `make_bitset_sp*`, `OR_block`, `extract_set`, `extract_stack`, `extract_array`.
 - **ALIGN (step 4, touches signatures):** `erase_bit()` return type, `noexcept` on query functions, `num_blocks()` type, the implicit cast, the deleted range overloads.
 - **DIFF (documented, not unified):** the block accessors, sparse-only storage functions, `reset_bit`, `clear_bit`.
 
@@ -113,6 +113,6 @@ Action codes: **OK** already matches, **ADD** missing, **ALIGN** exists with a d
 
 ## Progress
 
-**Step 3 done (2026-10-13):** added to `BitsetSp`: `test`, `set`, `clear`, `clear_all`, `erase_all_bits`, `and_eq`, `or_eq`, `andnot_eq`, `bit_capacity`, `assign_bit`, `set_bit(bitpos_list)`, `is_singleton`, `find_first_common`, `extract_set`, `extract_stack`, `extract_array`, `init(nPop, bits)`, the `BitsetSp(bitpos_list)` constructor and `make_bitset_sp`. Tests: `BitsetSp_api.*` in `test_bitset_sparse.cpp`. Not done: free `OR_block` (the dense one is a templated range operation; needs its own design), galloping search in `find_first_common`.
+**Step 3 done (2026-10-13):** added to `BitsetSp`: `test`, `set`, `clear`, `clear_all`, `erase_all_bits`, `and_assign`, `or_assign`, `andnot_eq`, `bit_capacity`, `assign_bit`, `set_bit(bitpos_list)`, `is_singleton`, `find_first_common`, `extract_set`, `extract_stack`, `extract_array`, `init(nPop, bits)`, the `BitsetSp(bitpos_list)` constructor and `make_bitset_sp`. Tests: `BitsetSp_api.*` in `test_bitset_sparse.cpp`. Not done: free `OR_block` (the dense one is a templated range operation; needs its own design), galloping search in `find_first_common`.
 
 **Step 4 done (2026-10-13):** `erase_bit()` now returns `BitsetSp&` (and is `noexcept`); `next_bit`, `prev_bit`, `is_bit`, `is_empty`, `is_disjoint`, `is_singleton`, `find_first_common`, `test` are `noexcept`; `operator bitpos_list()` is `explicit`. Left as they are: `num_blocks()` type (`size_t` vs `int`, would ripple through callers), `set_bit`/`erase_bit(bit)` stay without `noexcept` (they may allocate), the deleted range overloads (`set_bit(first,last,rhs)`, `AND(first,last,...)`, `AND_block(first,last,rhs)`), and the free `erase_bit(lhs, rhs)` shape.

@@ -769,10 +769,10 @@ namespace bitgraph {
 		BitsetSp& andnot_eq(const BitsetSp& rhs) { return erase_bit(rhs); }
 
 		/** @brief alias of operator &= */
-		BitsetSp& and_eq(const BitsetSp& rhs) { return *this &= rhs; }
+		BitsetSp& and_assign(const BitsetSp& rhs) { return *this &= rhs; }
 
 		/** @brief alias of operator |= */
-		BitsetSp& or_eq(const BitsetSp& rhs) { return *this |= rhs; }
+		BitsetSp& or_assign(const BitsetSp& rhs) { return *this |= rhs; }
 
 		/** @brief maximum number of bits the bitset can hold: num_blocks() * WORD_SIZE */
 		std::size_t bit_capacity() const noexcept { return static_cast<std::size_t>(nBB_) * WORD_SIZE; }

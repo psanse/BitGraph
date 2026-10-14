@@ -918,14 +918,14 @@ namespace bitgraph {
 		* @details For set intersection
 		**/
 		Bitset& operator &=				(const Bitset& bbn) noexcept;
-		Bitset & and_eq					(const Bitset & rhs) noexcept { return *this &= rhs; }
+		Bitset & and_assign					(const Bitset & rhs) noexcept { return *this &= rhs; }
 
 		/**
 		* @brief Bitwise OR operator with bbn
 		* @details For set union
 		**/
 		Bitset& operator |=				(const Bitset& bbn) noexcept;
-		Bitset & or_eq					(const Bitset & rhs) noexcept { return *this |= rhs; }
+		Bitset & or_assign					(const Bitset & rhs) noexcept { return *this |= rhs; }
 
 		/**
 		* @brief Bitwise XOR operator with bbn

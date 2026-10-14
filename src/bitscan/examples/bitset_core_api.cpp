@@ -70,14 +70,14 @@ int main()
 
 	// Intersection: {3,20,21,25} intersect {3,25,64} = {3,25}.
 	bitarray intersection = bits;
-	intersection. and_eq (rhs);
+	intersection. and_assign (rhs);
 
 	std::cout << "Intersection population: "
 		<< intersection.count() << '\n';
 
 	// Union: {3,20,21,25} union {3,25,64} = {3,20,21,25,64}.
 	bitarray union_set = bits;
-	union_set. or_eq (rhs);
+	union_set. or_assign (rhs);
 
 	std::cout << "Union population: "
 		<< union_set.count() << '\n';
