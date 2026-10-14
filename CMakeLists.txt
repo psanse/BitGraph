@@ -159,6 +159,19 @@ endif()
 
 
 ####################
-# Subdirectories 
+# Subdirectories
 ####################
 add_subdirectory (src)
+
+####################
+# API reference (Doxygen), opt-in: see docs/CMakeLists.txt
+####################
+option(
+    BITGRAPH_BUILD_DOCS
+    "Add a 'docs' target that generates the HTML API reference with Doxygen."
+    OFF
+)
+
+if(BITGRAPH_BUILD_DOCS)
+    add_subdirectory(docs)
+endif()

@@ -1,0 +1,87 @@
+# Doxygen configuration for the BitGraph API reference.
+# Processed by CMake (configure_file, @ONLY): do not run Doxygen on this template directly.
+# Build the reference with:   cmake -DBITGRAPH_BUILD_DOCS=ON ...   then   cmake --build . --target docs
+
+#---------------------------------------------------------------------------
+# Project
+#---------------------------------------------------------------------------
+PROJECT_NAME           = "BitGraph"
+PROJECT_NUMBER         = "@PROJECT_VERSION@"
+PROJECT_BRIEF          = "Bit-parallel sets and graphs for combinatorial optimization in C++"
+OUTPUT_DIRECTORY       = "@BITGRAPH_DOXYGEN_OUTPUT@"
+CREATE_SUBDIRS         = NO
+FULL_PATH_NAMES        = YES
+STRIP_FROM_PATH        = "@PROJECT_SOURCE_DIR@/src"
+STRIP_FROM_INC_PATH    = "@PROJECT_SOURCE_DIR@/src"
+JAVADOC_AUTOBRIEF      = YES
+MARKDOWN_SUPPORT       = YES
+TAB_SIZE               = 4
+
+#---------------------------------------------------------------------------
+# Input: the three libraries, the landing page and the hand-written pages
+#---------------------------------------------------------------------------
+INPUT                  = "@PROJECT_SOURCE_DIR@/README.md" \
+                         "@PROJECT_SOURCE_DIR@/src/bitscan" \
+                         "@PROJECT_SOURCE_DIR@/src/graph" \
+                         "@PROJECT_SOURCE_DIR@/src/utils" \
+                         "@PROJECT_SOURCE_DIR@/docs/api"
+FILE_PATTERNS          = *.h *.md
+RECURSIVE              = YES
+USE_MDFILE_AS_MAINPAGE = "@PROJECT_SOURCE_DIR@/README.md"
+IMAGE_PATH             = "@PROJECT_SOURCE_DIR@/docs/images"
+
+# Not public API: implementation details, tests, examples, benchmarks, sample data
+EXCLUDE_PATTERNS       = */detail/* \
+                         */tests/* \
+                         */examples/* \
+                         */benchmarks/* \
+                         */deprecated/* \
+                         */data/* \
+                         */cmake/*
+EXCLUDE_SYMBOLS        = *::detail \
+                         *::detail::* \
+                         *::_impl \
+                         *::_impl::*
+
+#---------------------------------------------------------------------------
+# What is extracted
+#---------------------------------------------------------------------------
+EXTRACT_ALL            = NO
+EXTRACT_PRIVATE        = NO
+EXTRACT_STATIC         = NO
+EXTRACT_LOCAL_CLASSES  = NO
+HIDE_UNDOC_MEMBERS     = YES
+HIDE_UNDOC_CLASSES     = YES
+
+#---------------------------------------------------------------------------
+# Warnings (the log is written next to the HTML output)
+#---------------------------------------------------------------------------
+QUIET                  = YES
+WARNINGS               = YES
+WARN_IF_UNDOCUMENTED   = YES
+WARN_IF_DOC_ERROR      = YES
+WARN_NO_PARAMDOC       = YES
+WARN_AS_ERROR          = NO
+WARN_LOGFILE           = "@BITGRAPH_DOXYGEN_OUTPUT@/doxygen_warnings.log"
+
+#---------------------------------------------------------------------------
+# Output
+#---------------------------------------------------------------------------
+GENERATE_HTML          = YES
+HTML_OUTPUT            = html
+SEARCHENGINE           = YES
+SOURCE_BROWSER         = NO
+GENERATE_LATEX         = NO
+GENERATE_XML           = @BITGRAPH_DOXYGEN_XML@
+XML_OUTPUT             = xml
+
+#---------------------------------------------------------------------------
+# Diagrams (only when Graphviz is available)
+#---------------------------------------------------------------------------
+HAVE_DOT               = @BITGRAPH_HAVE_DOT@
+CLASS_GRAPH            = YES
+COLLABORATION_GRAPH    = NO
+INCLUDE_GRAPH          = NO
+INCLUDED_BY_GRAPH      = NO
+GRAPHICAL_HIERARCHY    = YES
+DOT_IMAGE_FORMAT       = svg
