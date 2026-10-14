@@ -198,3 +198,8 @@ and many others.
 ## Acknowledgements
 
 This research has been partially funded by the Spanish Ministry of Economy and Competitiveness (MINECO), national grants DPI 2010-21247-C02-01, DPI 2014-53525-C3-1-R and DPI2017-86915-C3-3-R.
+
+Thanks to the people who contributed to the code:
+
+- **Dan Stahlke**, for fixes found by enabling compiler warnings (including an out-of-bounds vector access), documentation corrections, and format-string checking in the logger.
+- **Cristobal Tapia**, for contributions to the BITSCAN unit tests.
