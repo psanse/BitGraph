@@ -18,47 +18,48 @@ namespace bitgraph {
 
     namespace utils {
 		    
+		namespace detail {
 
-		/********************************************************************************************************************************
-		*
-		*		 Sorting of n items (integer) according to non-increasing values of their scores (double)
-		*
-		********************************************************************************************************************************/
-		void sort_non_increasing(int* item, double* score, int n)
-		{
-			int salto, i, j, tempItem;
-			double tempScore;
+			/********************************************************************************************************************************
+			*
+			*		 Sorting of n items (integer) according to non-increasing values of their scores (double)
+			*
+			********************************************************************************************************************************/
+			void sort_non_increasing(int* item, double* score, int n)
+			{
+				int salto, i, j, tempItem;
+				double tempScore;
 
-			for (salto = n / 2; salto > 0; salto /= 2)
-				for (i = salto; i < n; i++)
-					for (j = i - salto; j >= 0; j -= salto) {
-						if (score[j] >= score[j + salto]) break;
-						tempScore = score[j]; score[j] = score[j + salto]; score[j + salto] = tempScore;
-						tempItem = item[j]; item[j] = item[j + salto]; item[j + salto] = tempItem;
-					}
-		}
+				for (salto = n / 2; salto > 0; salto /= 2)
+					for (i = salto; i < n; i++)
+						for (j = i - salto; j >= 0; j -= salto) {
+							if (score[j] >= score[j + salto]) break;
+							tempScore = score[j]; score[j] = score[j + salto]; score[j + salto] = tempScore;
+							tempItem = item[j]; item[j] = item[j + salto]; item[j + salto] = tempItem;
+						}
+			}
 
-		/********************************************************************************************************************************
-		*
-		*  Sorting of n items (integer) according to non-increasing values of their scores (double)
-		*
-		********************************************************************************************************************************/
-		void sort_non_decreasing(int* item, double* score, int n)
+			/********************************************************************************************************************************
+			*
+			*  Sorting of n items (integer) according to non-increasing values of their scores (double)
+			*
+			********************************************************************************************************************************/
+			void sort_non_decreasing(int* item, double* score, int n)
 
-		{
-			int salto, i, j, tempItem;
-			double tempScore;
+			{
+				int salto, i, j, tempItem;
+				double tempScore;
 
-			for (salto = n / 2; salto > 0; salto /= 2)
-				for (i = salto; i < n; i++)
-					for (j = i - salto; j >= 0; j -= salto) {
-						if (score[j] <= score[j + salto]) break;
-						tempScore = score[j]; score[j] = score[j + salto]; score[j + salto] = tempScore;
-						tempItem = item[j]; item[j] = item[j + salto]; item[j + salto] = tempItem;
-					}
-		}
+				for (salto = n / 2; salto > 0; salto /= 2)
+					for (i = salto; i < n; i++)
+						for (j = i - salto; j >= 0; j -= salto) {
+							if (score[j] <= score[j + salto]) break;
+							tempScore = score[j]; score[j] = score[j + salto]; score[j + salto] = tempScore;
+							tempItem = item[j]; item[j] = item[j + salto]; item[j + salto] = tempItem;
+						}
+			}
 
-
+		} // namespace detail
 		
 	} // namespace utils
 

@@ -1,13 +1,22 @@
 /**
  * @file string_utils.h
- * @brief String inspection and token-counting utilities.
+ * @brief Inline utilities for inspecting and tokenizing strings.
  *
- * This header provides lightweight functions for analyzing textual data,
- * including counting word-like sequences in strings.
+ * @details
+ * Provides lightweight string-analysis helpers for the BITGRAPH utility
+ * layer. The current interface includes word-like token counting based on a
+ * regular expression and is implemented inline for direct use by clients.
+ *
+ * This utility component is under development and may grow as common string
+ * handling needs are consolidated. Path-specific operations belong to the
+ * related `path_utils.h` component.
  *
  * @author Pablo San Segundo
  * @date Last updated: 23/09/2026
+ *
+ * @see path_utils.h
  */
+
 #ifndef BITGRAPH_UTILS_STRING_UTILS_H
 #define BITGRAPH_UTILS_STRING_UTILS_H
 
