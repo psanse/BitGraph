@@ -23,33 +23,46 @@
 
 #include "graph_conversions.h"
 
-#include "utils/logger.h"
-#include <iostream>
-
 namespace bitgraph {
 	
 	namespace detail {
 
-		////////////////////////
-		//
-		// GraphConversion 
-		// 
-		// Conversions between different (unweighted) graph types of the GRAPH library
-		// (stateless - globals)
-		// 
-		////////////////////////
-
+		/**
+		 * @brief Utility class for converting between dense and sparse undirected graphs.
+		 *
+		 * @details Provides static conversion functions between `ugraph` and
+		 *          `sparse_ugraph`, preserving the graph's vertices, adjacency
+		 *          information, and name.
+		 *
+		 *          Conversions operate directly on bitblocks for efficiency,
+		 *          bypassing the standard edge insertion interface.
+		 *
+		 *          The class is stateless and cannot be instantiated.
+		 *
+		 * @note Conversion functions invalidate the cached edge count of the
+		 *       destination graph.
+		 */
 		class GraphConversion {
 		public:
 
-			//constructor - deleted
+			/** @brief Deleted constructor: utility class cannot be instantiated. */
 			GraphConversion() = delete;
 
-			/*
-			* @brief conversion from sparse_ugraph to ugraph
-			* @details: failfast policy - exits if memory allocation fails
-			* @date	25/11/16
-			*/
+			/**
+			 * @brief Converts a sparse undirected graph to its dense representation.
+			 *
+			 * @param sug Source sparse undirected graph.
+			 * @param ug Destination dense undirected graph (overwritten).
+			 *
+			 * @details Resets the destination graph and copies all non-zero adjacency
+			 *          bitblocks directly into the dense representation.
+			 *          Vertex indices and graph metadata are preserved.
+			 *
+			 * @note Invalidates the destination graph's cached edge count.
+			 * @warning Memory allocation failures follow the library's fail-fast policy.
+			 *
+			 * @date 25/11/2016
+			 */
 			static void sug2ug(const sparse_ugraph& sug, ugraph& ug)
 			{
 
@@ -74,11 +87,21 @@ namespace bitgraph {
 			}
 
 
-			/*
-			* @brief conversion from ugraph to sparse_ugraph
-			* @details: fast-fail policy- exits if error
-			* @date	25/11/16
-			*/
+			/**
+			 * @brief Converts a dense undirected graph to its sparse representation.
+			 *
+			 * @param ug Source dense undirected graph.
+			 * @param sug Destination sparse undirected graph (overwritten).
+			 *
+			 * @details Resets the destination graph and copies only non-zero adjacency
+			 *          bitblocks into the sparse representation.
+			 *          Vertex indices and graph metadata are preserved.
+			 *
+			 * @note Invalidates the destination graph's cached edge count.
+			 * @warning Memory allocation failures follow the library's fail-fast policy.
+			 *
+			 * @date 25/11/2016
+			 */
 			static	void ug2sug(const ugraph& ug, sparse_ugraph& sug)
 			{
 				const int NV = ug.num_vertices();
@@ -125,4 +148,4 @@ namespace bitgraph {
 }//end of namespace bitgraph
 
 
-#endif
+#endif // BITGRAPH_GRAPH_TYPE_CONVERSIONS_H
