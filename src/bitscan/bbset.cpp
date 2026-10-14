@@ -35,6 +35,12 @@ using namespace std;
 using namespace bitgraph;
 
 /////////////////////////////
+// Out-of-class definitions of the static constexpr members of BBObject.
+// Required in C++14 whenever a member is odr-used (e.g., bound to a const reference).
+constexpr BBObject::block_index_t BBObject::npos;
+constexpr BBObject::bit_index_t BBObject::noBit;
+
+/////////////////////////////
 // BitSet definitions
 
 
