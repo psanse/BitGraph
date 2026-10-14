@@ -1,5 +1,5 @@
 /**
- * @file precision_timer.h
+ * @file precise_timer.h
  * @brief Defines the PrecisionTimer elapsed-time utility.
  *
  * PrecisionTimer measures elapsed time using std::chrono::steady_clock and

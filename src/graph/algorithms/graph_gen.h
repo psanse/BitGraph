@@ -357,7 +357,7 @@ namespace bitgraph {
 			 *
 			 * @note File output is enabled only when both file_extension and
 			 *       file_path are non-empty. The file is named
-			 *       <file_path>/<graph name><file_extension> and contains the
+			 *       `<file_path>/<graph name><file_extension>` and contains the
 			 *       weights only, in vertex order (see print_weights).
 			 * @note Invalid parameters or file I/O failures cause program termination.
 			 *

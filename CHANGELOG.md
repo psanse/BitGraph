@@ -1,5 +1,26 @@
 # Changelog
 
+## Unreleased
+
+Changes since the 2.0.0 tag.
+
+### Fixed
+
+- `extract_first_k(k, bitset, vec)` did not compile for `bitarray`, and its loop condition (`||` instead of `&&`) did not stop after `k` bits. It now returns the first `k` set bits, or all of them if there are fewer.
+- `Graph::create_subgraph_first_k(first_k)` (by-value overload for directed graphs) did not compile when used; it now calls the existing `create_subgraph_first_k(first_k, out)`.
+- `bitarray` and `sparse_bitarray` now expose the stateless `prev_bit(bit)` next to `next_bit(bit)`; it was hidden by the stateful `prev_bit()` overloads.
+
+### Added
+
+- Opt-in Doxygen API reference: configure with `-DBITGRAPH_BUILD_DOCS=ON` and build the `docs` target (see [docs/README.md](docs/README.md)).
+- API overview pages for [BITSCAN](docs/api/bitscan.md), [GRAPH](docs/api/graph.md) and [UTILS](docs/api/utils.md), a [benchmark report](docs/benchmarks.md), [CITATION.cff](CITATION.cff) and [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
+- Rewritten landing and library READMEs, with a banner and compiled examples.
+
+### Documentation
+
+- NIST is acknowledged as the source of the Matrix Market I/O code (`mmio.h`, `mmio.cpp`).
+- Class-level descriptions for the main classes (`Bitset`, `BitsetSp`, `BBScanSp`, `Graph`, `infoBase`, ...), and many corrected `@param` names and Doxygen tags in the headers.
+
 ## 2.0.0
 
 Major refactoring of the BITSCAN, GRAPH and UTILS libraries. **This release is not source-compatible with 1.x**: see [Migrating from 1.x](#migrating-from-1x). The last 1.x release is v1.4.3 and is frozen.

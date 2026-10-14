@@ -14,6 +14,19 @@ Start with the [main README](../README.md) for an overview, a quick start and in
 
 Each guide explains what the library is for and walks through examples. Each API overview lists the main classes and functions, grouped by task.
 
+## Building the full API reference
+
+The headers carry Doxygen comments. To generate the HTML reference you need [Doxygen](https://www.doxygen.nl/) (1.12 or newer is recommended) and, optionally, [Graphviz](https://graphviz.org/) for class diagrams:
+
+```
+cmake -S . -B build -DBITGRAPH_BUILD_DOCS=ON
+cmake --build build --target docs
+```
+
+The result is `build/docs/html/index.html`. Warnings are written to `build/docs/doxygen_warnings.log`. The target is off by default, so a normal build never needs Doxygen. Pass `-DDOXYGEN_EXECUTABLE=<path>` if Doxygen is not on your `PATH`, and `-DBITGRAPH_DOCS_XML=ON` to also produce the XML output.
+
+Only documented public API is included: `detail/`, tests, examples and benchmarks are excluded. To also list every function whose parameters or return value are not documented, set `WARN_NO_PARAMDOC = YES` in [Doxyfile.in](Doxyfile.in).
+
 ## Reference material
 
 - [benchmarks.md](benchmarks.md): measured performance of the BITSCAN bitsets against `std::bitset`, with the method and the commands to reproduce it.

@@ -112,7 +112,7 @@ namespace bitgraph {
 		* @param lhs, rhs: input bitsets
 		* @param res: output bitset
 		* @returns reference to res
-		* #details: currently two implementations, one optimized for THIS having less population and the other
+		* @details: currently two implementations, one optimized for THIS having less population and the other
 		*			assuming both THIS and rhs have similar population
 		**/
 		friend  BitsetSp& AND(const BitsetSp& lhs, const BitsetSp& rhs, BitsetSp& res);
