@@ -53,3 +53,20 @@ target_link_libraries(
     PRIVATE
         bitscan
 )
+
+add_executable(
+    bench_hotpaths
+    bench_hotpaths.cpp
+)
+
+set_target_properties(
+    bench_hotpaths
+    PROPERTIES
+        RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin/benchmarks"
+)
+
+target_link_libraries(
+    bench_hotpaths
+    PRIVATE
+        bitscan
+)

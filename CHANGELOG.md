@@ -15,6 +15,7 @@ Changes since the 2.0.0 tag.
 - Opt-in Doxygen API reference: configure with `-DBITGRAPH_BUILD_DOCS=ON` and build the `docs` target (see [docs/README.md](docs/README.md)).
 - API overview pages for [BITSCAN](docs/api/bitscan.md), [GRAPH](docs/api/graph.md) and [UTILS](docs/api/utils.md), a [benchmark report](docs/benchmarks.md), [CITATION.cff](CITATION.cff) and [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
 - Rewritten landing and library READMEs, with a banner and compiled examples.
+- `bench_hotpaths`: benchmark of dense scanning, reverse scanning and the scan-while-modifying loop (greedy colouring) against `std::bitset` and `boost::dynamic_bitset`, with results for GCC and MSVC in [docs/benchmarks.md](docs/benchmarks.md). The report states where BITSCAN is not faster.
 
 ### Documentation
 

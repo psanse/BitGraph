@@ -143,7 +143,9 @@ BitGraph/
 Measured on a Xeon Gold 6342 with GCC 13 (`-O3`), on 100,000-bit sets. Full tables, method and caveats are in [docs/benchmarks.md](docs/benchmarks.md).
 
 - **Sparse bitsets** are the clear win when few blocks are populated. At 1% occupancy, `&=` is about 50 times faster than `std::bitset`, `count()` about 80 times, and scanning about 5 times faster than libstdc++'s own `_Find_next`.
-- **Dense bitsets** match `std::bitset` on bulk operations (`&=`, `count()`) and give a portable, uniform scanning API. Against the portable `test(i)` loop the dense scanner is 3 to 43 times faster, but it is not faster than libstdc++'s non-portable `_Find_next` extension.
+- **Dense bitsets** match `std::bitset` on bulk operations (`&=`, `count()`) and are not faster than it. Their value is a sizes-at-run-time API with scans that the standard library lacks: the reverse scan is 4 to 44 times faster than the only portable alternative, and the forward scan is 3 to 43 times faster than a `test(i)` loop, but it is not faster than libstdc++'s non-portable `_Find_next`.
+- **Scan while modifying a set**, the core loop of bit-parallel graph algorithms, runs at parity with `boost::dynamic_bitset` (the runtime-sized alternative) and is 1.2 to 2 times slower than `std::bitset<N>` when `N` is a compile-time constant. There is measurable headroom in the library's dense paths.
+- **Where the standard library has no find-next (MSVC)**, BitGraph scans 3 to 42 times faster than the portable `std::bitset` loop, and its colouring loop is 1.05 to 14 times faster, growing with size and density.
 - **Trade-off:** random access on sparse bitsets is slower than on dense ones (about 4 times slower at 1% occupancy), so choose the sparse types for large, mostly empty sets.
 
 ## Platforms and releases
