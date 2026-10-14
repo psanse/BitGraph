@@ -10,6 +10,7 @@ Major refactoring of the BITSCAN, GRAPH and UTILS libraries. **This release is n
   `bitarray::scan`, `scanR`, `scanD`, `scanDR` (and the same for `sparse_bitarray`). Implementation in `bitscan/detail/persistent_scan.h`.
 - New independent-cursor views, `bitgraph::view::scan`, `scanR`, `scanD`, `scanDR` and `view::sparse::*` (`bbscan_view.h`, `bbscan_view_sparse.h`). A view keeps its own cursor and does not touch the bitset's scan state.
 - New objects never inherit a scan cursor on copy or move.
+- `Bitset` and `BitsetSp` provide `and_assign()` and `or_assign()` (forwarders of `&=` and `|=`). They are named so because `and_eq`/`or_eq` are reserved operator keywords in standard C++ and cannot be used as identifiers with GCC or Clang.
 - `BitsetSp` (sparse) extended towards the API of `Bitset` (see [docs/bitsetsp_api_parity.md](docs/bitsetsp_api_parity.md)).
 - Implementation code moved to `bitscan/detail/` (`bbset_imp.h`, `bbscan_imp.h`, ...). `bbexcep_hand.h` removed.
 - `BBSentinel` moved from `_impl::` to `experimental::` (`watched_bitarray`).
@@ -35,6 +36,7 @@ Major refactoring of the BITSCAN, GRAPH and UTILS libraries. **This release is n
 ### Build and docs
 
 - Version is now 2.0.0. C++14 and CMake >= 3.14 are still required.
+- Verified with MSVC (Visual Studio 2026) and GCC 13.3 (Ubuntu 24.04): full build, test suite, examples, and installation consumed through `find_package(BitGraph)`.
 - Many new tests and examples for BITSCAN and GRAPH.
 
 ## Migrating from 1.x
