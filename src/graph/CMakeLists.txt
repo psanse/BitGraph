@@ -26,7 +26,7 @@ add_library  (
     algorithms/ordering_decoder.cpp
     algorithms/graph_conversions.cpp
     formats/detail/vertex_set_format.cpp
-    algorithms/algorithm_info.cpp
+    #algorithms/algorithm_info.cpp
     #graph_benchmark.cpp 
     ${HEADER_FILES}
 )
