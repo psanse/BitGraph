@@ -26,6 +26,10 @@ target_link_libraries (graph_sorting_simple LINK_PUBLIC graph bitscan utils)
 add_executable ( graph_weighted_simple graph_weighted_simple.cpp)
 target_link_libraries (graph_weighted_simple LINK_PUBLIC graph bitscan utils)
 
+# Small introductory example for reading DIMACS, Matrix Market, and edge-list files.
+add_executable ( graph_reading_simple graph_reading_simple.cpp)
+target_link_libraries (graph_reading_simple LINK_PUBLIC graph bitscan utils)
+
 #add_executable ( kcore lb_kcore.cpp)
 #target_link_libraries ( kcore LINK_PUBLIC graph bitscan utils)
 
@@ -45,6 +49,7 @@ set_target_properties(
 	graph_generation_simple
 	graph_sorting_simple
 	graph_weighted_simple
+	graph_reading_simple
 	PROPERTIES
 	RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin/examples/GRAPH"
 )
