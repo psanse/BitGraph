@@ -265,12 +265,12 @@ namespace bitgraph {
 	}
 	catch (const std::bad_alloc& e) {
 		LOG_ERROR("Bitset construction failed: out of memory - Bitset::Bitset(nPop, ColT)");
-		LOG_ERROR(e.what());
+		LOG_ERROR("%s", e.what());
 		std::terminate();
 	}
 	catch (const std::exception& e) {
 		LOG_ERROR("Bitset construction failed: std::exception - Bitset::Bitset(nPop, ColT)");
-		LOG_ERROR(e.what());
+		LOG_ERROR("%s", e.what());
 		std::terminate();
 	}
 	catch (...) {

@@ -921,7 +921,7 @@ namespace bitgraph {
 		[[noreturn]]
 		static void graph_initialization_error(const char* message) noexcept
 		{
-			LOG_ERROR(message);
+			LOG_ERROR("%s", message);
 			LOG_ERROR("Terminating the program.");
 			std::terminate();
 		}

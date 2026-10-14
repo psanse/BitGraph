@@ -65,12 +65,12 @@ vBB_(nBB_, val ? ONE : ZERO)
 }
 catch (const std::bad_alloc& e) {
 	LOG_ERROR("Bitset construction failed: out of memory - Bitset::Bitset()");
-	LOG_ERROR(e.what());
+	LOG_ERROR("%s", e.what());
 	std::terminate();
 }
 catch (const std::exception& e) {
 	LOG_ERROR("Bitset construction failed: std::exception - Bitset::Bitset()");
-	LOG_ERROR(e.what());
+	LOG_ERROR("%s", e.what());
 	std::terminate();
 }
 catch (...) {
@@ -100,12 +100,12 @@ try
 }
 catch (const std::bad_alloc& e) {
 	LOG_ERROR("Bitset construction failed: out of memory - Bitset::Bitset(const bit_indices&)");
-	LOG_ERROR(e.what());
+	LOG_ERROR("%s", e.what());
 	std::terminate();
 }
 catch (const std::exception& e) {
 	LOG_ERROR("Bitset construction failed: std::exception - Bitset::Bitset(const bit_indices&)");
-	LOG_ERROR(e.what());
+	LOG_ERROR("%s", e.what());
 	std::terminate();
 }
 catch (...) {
@@ -133,12 +133,12 @@ try
 
 catch (const std::bad_alloc& e) {
 	LOG_ERROR("Bitset construction failed: out of memory - Bitset::Bitset(nPop, initializer_list)");
-	LOG_ERROR(e.what());
+	LOG_ERROR("%s", e.what());
 	std::terminate();
 }
 catch (const std::exception& e) {
 	LOG_ERROR("Bitset construction failed: std::exception - Bitset::Bitset(nPop, initializer_list)");
-	LOG_ERROR(e.what());
+	LOG_ERROR("%s", e.what());
 	std::terminate();
 }
 catch (...) {
@@ -154,12 +154,12 @@ void Bitset::reset(std::size_t nPop) noexcept {
 	}
 	catch (const std::bad_alloc& e) {
 		LOG_ERROR("init failed: out of memory - Bitset::reset(std::size_t nPop)");
-		LOG_ERROR(e.what());
+		LOG_ERROR("%s", e.what());
 		std::terminate();
 	}
 	catch (const std::exception& e) {
 		LOG_ERROR("init failed: std::exception - Bitset::reset(std::size_t nPop)");
-		LOG_ERROR(e.what());
+		LOG_ERROR("%s", e.what());
 		std::terminate();
 	}
 	catch (...) {

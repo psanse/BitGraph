@@ -88,12 +88,12 @@ namespace bitgraph {
 		/**
 		 * @brief Makes the base-class `set_weights` overloads visible.
 		 */
-		base_t::set_weights;
+		using base_t::set_weights;
 
 		/**
 		 * @brief Makes the base-class `print_edges` overloads visible.
 		 */
-		base_t::print_edges;
+		using base_t::print_edges;
 
 
 		///////////////////////

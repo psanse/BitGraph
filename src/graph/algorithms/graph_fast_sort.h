@@ -38,6 +38,17 @@
 #include "graph/graph_traits.h"		
 #include "graph/vertex_utils.h"
 #include "graph/graph_types.h"
+
+// The typed new_order() overloads delegate to the deprecated integer-based drivers.
+// These macros silence the deprecation warning at those internal calls only
+// (they are undefined at the end of this header).
+#if defined(_MSC_VER)
+#define BITGRAPH_IGNORE_DEPRECATED_BEGIN __pragma(warning(push)) __pragma(warning(disable : 4996))
+#define BITGRAPH_IGNORE_DEPRECATED_END   __pragma(warning(pop))
+#else
+#define BITGRAPH_IGNORE_DEPRECATED_BEGIN _Pragma("GCC diagnostic push") _Pragma("GCC diagnostic ignored \"-Wdeprecated-declarations\"")
+#define BITGRAPH_IGNORE_DEPRECATED_END   _Pragma("GCC diagnostic pop")
+#endif
 #include "utils/logger.h"
 #include "utils/collection_utils.h"
 #include "utils/sort_utils.h"
@@ -196,10 +207,12 @@ namespace bitgraph {
 				placement_t placement = placement_t::last_to_first,
 				sort_order order = sort_order::old_to_new)
 			{
+				BITGRAPH_IGNORE_DEPRECATED_BEGIN
 				return new_order(
-					static_cast<int>(strategy), 
+					static_cast<int>(strategy),
 					placement == placement_t::last_to_first,
 					order == sort_order::old_to_new);
+				BITGRAPH_IGNORE_DEPRECATED_END
 			}
 
 			/**
@@ -247,11 +260,13 @@ namespace bitgraph {
 				placement_t placement = placement_t::last_to_first,
 				sort_order order = sort_order::old_to_new) 
 			{
+				BITGRAPH_IGNORE_DEPRECATED_BEGIN
 				return new_order(
 					static_cast<int>(strategy),
 					vertex_set,
 					placement == placement_t::last_to_first,
 					order == sort_order::old_to_new);
+				BITGRAPH_IGNORE_DEPRECATED_END
 			}
 			
 			/**
@@ -1254,7 +1269,9 @@ namespace bitgraph {
 		
 			// create a new ordering for the subgraph based on existing primitives
 			GraphFastRootSort<graph_t> sort(induced_subgraph);
+			BITGRAPH_IGNORE_DEPRECATED_BEGIN
 			vertex_ordering_t ord_induced = sort.new_order(strategy, last_to_first, false /* n2o format*/);
+			BITGRAPH_IGNORE_DEPRECATED_END
 
 			// map the ordering @ord back to the original graph
 			vertex_ordering_t ord(NV_);
@@ -1341,10 +1358,9 @@ namespace bitgraph {
 	} // namespace graph_utils
 
 
-}//end of namespace bitgraph	
+}//end of namespace bitgraph
 
-
-
-
+#undef BITGRAPH_IGNORE_DEPRECATED_BEGIN
+#undef BITGRAPH_IGNORE_DEPRECATED_END
 
 #endif  // BITGRAPH_GRAPH_GRAPH_FAST_SORT_H
