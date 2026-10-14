@@ -180,7 +180,6 @@ namespace bitgraph {
 			using parameters_type = ParametersT;
 			using time_point_type = PrecisionTimer::timepoint_t;
 			using clock_type = PrecisionTimer::clock_t;
-			using time_point_type = clock_type::time_point;
 					
 			enum class phase_t { SEARCH = 0, PREPROC, LAST_INCUMBENT, PARSE };
 			enum class report_t { VERBOSE = 0, TABLE = 1 };

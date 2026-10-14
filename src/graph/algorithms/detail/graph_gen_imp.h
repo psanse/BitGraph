@@ -126,7 +126,7 @@ namespace bitgraph{
 		std::iota(order.begin(), order.end(), 0);
 		
 		std::default_random_engine rng(
-			_rand::RandomUniformGen<>::FIXED_RANDOM_SEED);
+			utils::detail::RandomUniformGen<>::FIXED_RANDOM_SEED);
 		
 		std::shuffle(order.begin(), order.end(), rng);
 

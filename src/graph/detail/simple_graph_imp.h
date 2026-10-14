@@ -709,8 +709,8 @@ namespace bitgraph {
 			static_cast<std::size_t>(NV_) *
 			static_cast<std::size_t>(NBB_);
 
-		return static_cast<double>(nonemptyBlocks) /
-			static_cast<double>(totalBlocks);
+		return static_cast<double>(non_empty_blocks) /
+			static_cast<double>(total_blocks);
 
 		//size_t nBB = 0;
 		//for (auto v = 0u; v < NV_; ++v) {
@@ -808,7 +808,7 @@ namespace bitgraph {
 		void Graph<BitsetT>::create_complement(Graph& gcomp) const
 	{
 		if (this == &gcomp) {
-			BaseT::graph_initialization_error(
+			graph_initialization_error(
 				"Input and output graphs must be different in "
 				"Graph::create_complement(Graph& gcomp).");
 		}
@@ -875,7 +875,7 @@ namespace bitgraph {
 		}
 
 		//generates edge
-		if (_rand::uniform_dist(p)) {
+		if (utils::uniform_dist(p)) {
 			add_edge(v, w);
 		}
 
@@ -903,8 +903,8 @@ namespace bitgraph {
 
 
 		// Add directed edges
-		for (vertex_t v = 0; v < nV; ++v) {
-			for (vertex_t w = 0; w < nV; ++w) {
+		for (vertex_t v = 0; v < NV; ++v) {
+			for (vertex_t w = 0; w < NV; ++w) {
 				if (this->is_edge(vertices[v], vertices[w])) {
 					graph.add_edge(v, w);
 				}

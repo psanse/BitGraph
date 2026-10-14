@@ -59,8 +59,16 @@ namespace bitgraph {
 		using base_t = Base_Graph_EW<ugraph, WeightT>;
 		using base_type = base_t;						// alias for backward compatibility				
 		
-		using edge_print_format = typename base_t::edge_print_format;	
-		
+		using edge_print_format = typename base_t::edge_print_format;
+
+		// Names from the dependent base class are not found by unqualified lookup
+		// in a template (required by GCC/Clang)
+		using graph_t = typename base_t::graph_t;
+		using weight_t = typename base_t::weight_t;
+		using weight_matrix_t = typename base_t::weight_matrix_t;
+		using base_t::NO_WEIGHT;
+		using base_t::DEFAULT_WEIGHT;
+
 		// Inherit constructors from the base class
 		using base_t::Base_Graph_EW;
 
@@ -336,7 +344,7 @@ namespace bitgraph {
 			for (vertex_t v = 0; v < NV; ++v) {
 				for (vertex_t w = v + 1; w < NV; ++w) {
 
-					const Weight weight =
+					const weight_t weight =
 						this->edge_weights_[static_cast<std::size_t>(v)]
 						[static_cast<std::size_t>(w)];
 
@@ -490,9 +498,9 @@ namespace bitgraph {
 		std::ostream& os,
 		bool trailing_newline) const
 	{
-		if (graph_.is_edge(v, w)) {
+		if (this->graph_.is_edge(v, w)) {
 			os << "[" << v << "]--("
-				<< edge_weights_[static_cast<std::size_t>(v)]
+				<< this->edge_weights_[static_cast<std::size_t>(v)]
 				[static_cast<std::size_t>(w)]
 				<< ")--"
 				<< "[" << w << "]";

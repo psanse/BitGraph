@@ -27,6 +27,7 @@
 #include <iostream>
 #include <array>
 
+#include "utils/collection_utils.h"
 #include "utils/file_utils.h"
 #include "utils/logger.h"
 //#include "utils/common.h"
@@ -326,7 +327,7 @@ namespace bitgraph {
 					}
 				}
 				LOG_INFO("******************");
-				_stl::print_collection(isets_aux, cout, true);
+				utils::print_collection(isets_aux, cout, true);
 				LOG_INFO("******************");
 				///////////////////////
 
@@ -347,7 +348,7 @@ namespace bitgraph {
 					for (int i = 0; i < N - 1; ++i) {
 						for (int j = i + 1; j < N; ++j) {
 							if (g.is_edge(i, j)) {
-								add_edge(grafo, i, j, io::yed::BLACK);
+								io::yed::detail::add_edge(grafo, i, j, io::yed::BLACK);
 							}
 						}
 					}

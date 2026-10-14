@@ -82,6 +82,7 @@ namespace bitgraph {
 						
 			using strategy_t = strategy;
 			using base_strategy_t = typename base_t::strategy_t;
+			using placement_t = typename base_t::placement_t;
 			using sort_order_t = typename base_t::sort_order_t;
 			
 

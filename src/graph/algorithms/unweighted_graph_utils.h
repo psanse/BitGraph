@@ -183,6 +183,18 @@ namespace bitgraph {
 			return result.size();
 		}
 
+		namespace detail {
+
+			// Forward declarations (defined at the end of this header): create_complete()
+			// below calls them with a qualified name, which GCC requires to be declared first
+			template<class GraphT>
+			void create_complete_impl(GraphT& graph, std::size_t vertex_count, std::false_type);
+
+			template<class GraphT>
+			void create_complete_impl(GraphT& graph, std::size_t vertex_count, std::true_type);
+
+		} // namespace detail
+
 		/**
 		 * @brief Reinitializes a graph as a complete graph.
 		 *
@@ -207,7 +219,7 @@ namespace bitgraph {
 			detail::create_complete_impl(
 				graph,
 				vertex_count,
-				graph_traits<GraphT>::is_undirected_tag{});
+				typename graph_traits<GraphT>::is_undirected_tag{});
 		}
 
 

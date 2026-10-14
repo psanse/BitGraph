@@ -801,7 +801,7 @@ namespace bitgraph {
 				
 				vertex_t w = BBObject::noBit;
 				while ((w = node_active_state_.next_bit()) != BBObject::noBit) {
-					deg = graph_.degree(w, node_active_state_);
+					const degree_t deg = graph_.degree(w, node_active_state_);
 					if (deg < min_deg) {											// >= is possible
 						min_deg = deg;
 						v = w;
