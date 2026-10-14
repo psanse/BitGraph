@@ -1,6 +1,9 @@
 build/
 build_vscode/
-install/
+/install/include/
+/install/lib/
+/install/bin/
+/install/build/
 .vs/
 
 # files written to the repo root by running tests/examples from there
