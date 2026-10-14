@@ -1,7 +1,6 @@
-# Output directory for BITSCAN example executables
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY
-    "${CMAKE_BINARY_DIR}/bin/examples/BITSCAN"
-)
+###################
+# BITSCAN lib - Example targets
+###################
 
 add_executable(bitscan_basic
     basic_scanning.cpp
@@ -33,5 +32,15 @@ add_executable(bitset_core
 
 target_link_libraries(bitset_core
     PRIVATE bitscan
+)
+
+# Keep the new introductory examples together in their own output directory.
+set_target_properties(
+	bitscan_basic
+	bitscan_destructive
+	bitscan_views
+	bitset_core
+	PROPERTIES
+	RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin/examples/BITSCAN"
 )
 
