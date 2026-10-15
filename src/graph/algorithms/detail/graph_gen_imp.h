@@ -119,7 +119,7 @@ namespace bitgraph{
 	inline
 		void RandomGen<GraphT>::create_isomorphism(
 			graph_t& g_iso, 
-			graph_t& g_source)
+			const graph_t& g_source)
 	{
 		// Generate a random permutation
 		vertex_ordering order(g_source.size(), 0);
@@ -131,8 +131,7 @@ namespace bitgraph{
 		std::shuffle(order.begin(), order.end(), rng);
 
 		// Construct the isomorphic graph
-		GraphFastRootSort<graph_t> gs(g_source);
-		gs.reorder(order, g_iso);
+		g_iso = GraphFastRootSort<graph_t>::reorder(g_source, order);
 
 	}
 

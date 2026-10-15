@@ -134,19 +134,22 @@ namespace bitgraph {
 		using graph_t = GraphT;
 
 		/**
-		 * @brief Generates a simple random graph G(n, p).
+		 * @brief Generates a simple random graph G(n, m).
 		 *
-		 * Each possible edge is generated independently with probability @p p.
+		 * Generates a graph with exactly m edges, selected uniformly at random
+		 * from all possible edges, where m is determined by the density p.
 		 *
-		 * - No self-loops are generated.
+		 * - No self-loops or multiple edges are generated.
 		 * - Directed or undirected edges are generated according to GraphT.
 		 * - The graph is named "r<NV>_<p>.txt".
 		 * - Any existing graph contents are replaced.
 		 *
 		 * @param[out] graph Generated random graph.
 		 * @param[in] NV Number of vertices (must be greater than 0).
-		 * @param[in] p Edge probability in [0, 1].
+		 * @param[in] p Target edge density in [0, 1].
 		 *
+		 * @note The number of edges is m = round(p * M), where M is the
+		 *       maximum number of edges permitted by GraphT.
 		 * @note Invalid parameters cause program termination (fail-fast).
 		 */
 		static void  create_graph(
@@ -155,18 +158,22 @@ namespace bitgraph {
 			double p);
 
 		/**
-		 * @brief Creates and returns a simple random graph G(n, p).
+		 * @brief Generates a simple random graph G(n, m).
 		 *
-		 * Each possible edge is generated independently with probability @p p.
+		 * Generates a graph with exactly m edges, selected uniformly at random
+		 * from all possible edges, where m is determined by the density p.
 		 *
-		 * - No self-loops are generated.
+		 * - No self-loops or multiple edges are generated.
 		 * - Directed or undirected edges are generated according to GraphT.
 		 * - The graph is named "r<NV>_<p>.txt".
+		 * - Any existing graph contents are replaced.
 		 *
+		 * @param[out] graph Generated random graph.
 		 * @param[in] NV Number of vertices (must be greater than 0).
-		 * @param[in] p Edge probability in [0, 1].
-		 * @return Generated random graph.
+		 * @param[in] p Target edge density in [0, 1].
 		 *
+		 * @note The number of edges is m = round(p * M), where M is the
+		 *       maximum number of edges permitted by GraphT.
 		 * @note Invalid parameters cause program termination (fail-fast).
 		 */
 		static graph_t create_graph(std::size_t NV,
@@ -204,12 +211,12 @@ namespace bitgraph {
 		 *        of the source graph using std::shuffle.
 		 *
 		 * @param[out] g_iso Generated isomorphic graph.
-		 * @param[in] g Source graph (not modified).
+		 * @param[in] g_source Source graph (not modified).
 		 *
 		 * @note Uses a fixed random seed for reproducibility.
 		 */
 		static void create_isomorphism(graph_t& g_iso,
-			graph_t& g);
+			 const graph_t& g_source);
 	};	
 
 }//end of namespace bitgraph	

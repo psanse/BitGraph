@@ -613,9 +613,13 @@ namespace bitgraph {
 		 * Removes all existing edges and independently adds each possible directed
 		 * edge with probability @p p. Self-loops are not created.
 		 *
+		 * @note This implementation follows the G(n, p) model. The derived Ugraph
+		 *       class overrides this method to generate random undirected graphs
+		 *       following the G(n, m) model, with a fixed number of edges.
+		 *
 		 * @param p Probability of including each directed edge.
 		 *
-		 * @pre @p p must lie in the interval `[0, 1]`.
+		 * @pre @p p must lie in the interval [0, 1].
 		 */
 		virtual void gen_random_edges(double p);
 

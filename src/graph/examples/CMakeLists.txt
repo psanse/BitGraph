@@ -17,6 +17,10 @@ target_link_libraries (graph_types_simple LINK_PUBLIC graph bitscan utils)
 add_executable ( graph_generation_simple graph_generation_simple.cpp)
 target_link_libraries (graph_generation_simple LINK_PUBLIC graph bitscan utils)
 
+# Advanced example of G(n,p) random graph generation and isomorphism.
+add_executable ( graph_generation_advanced graph_generation_advanced.cpp)
+target_link_libraries (graph_generation_advanced LINK_PUBLIC graph bitscan utils)
+
 # Small introductory example for degree and degeneracy vertex orderings.
 add_executable ( graph_sorting_simple graph_sorting_simple.cpp)
 target_link_libraries (graph_sorting_simple LINK_PUBLIC graph bitscan utils)
@@ -49,6 +53,7 @@ target_link_libraries (graph_formats LINK_PUBLIC graph bitscan utils)
 set_target_properties(
 	graph_types_simple
 	graph_generation_simple
+	graph_generation_advanced
 	graph_sorting_simple
 	graph_weighted_simple
 	graph_reading_simple
