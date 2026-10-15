@@ -157,7 +157,7 @@ namespace bitgraph {
 		for (int i = m_BBH; i >= m_BBL; i--) {
 			if (_BitScanReverse64(&posInBB, vBB_[i])) {
 				m_BBH = i;
-				vBB_[i] &= ~(BITBOARD(1) << posInBB);			//erase before the return
+				vBB_[i] &= ~Tables::mask[posInBB];			//erase before the return
 				return (posInBB + WMUL(i));
 			}
 		}
@@ -177,7 +177,7 @@ namespace bitgraph {
 		for (int i = m_BBL; i <= m_BBH; i++) {
 			if (_BitScanForward64(&posInBB, vBB_[i])) {
 				m_BBL = i;
-				vBB_[i] &= ~(BITBOARD(1) << posInBB);					//erase before the return
+				vBB_[i] &= ~Tables::mask[posInBB];					//erase before the return
 				return (posInBB + WMUL(i));
 			}
 		}
@@ -197,8 +197,8 @@ namespace bitgraph {
 		for (int i = m_BBL; i <= m_BBH; i++) {
 			if (_BitScanForward64(&posInBB, vBB_[i])) {
 				m_BBL = i;
-				vBB_[i] &= ~(BITBOARD(1) << posInBB);					//erase before the return
-				bbN_del.vBB_[i] &= ~(BITBOARD(1) << posInBB);
+				vBB_[i] &= ~Tables::mask[posInBB];					//erase before the return
+				bbN_del.vBB_[i] &= ~Tables::mask[posInBB];
 				return (posInBB + WMUL(i));
 			}
 		}

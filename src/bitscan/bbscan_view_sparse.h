@@ -140,7 +140,7 @@ namespace bitgraph {
 					if (_BitScanForward64(&posInBB, cand)) {
 						scan_.bbi_ = static_cast<int>(i);
 						scan_.pos_ = static_cast<int>(posInBB);
-						if (is_destructive_scan()) { vBB[i].bb_ &= ~(BITBOARD(1) << posInBB); }
+						if (is_destructive_scan()) { vBB[i].bb_ &= ~Tables::mask[posInBB]; }
 						return static_cast<int>(posInBB) + static_cast<int>(WMUL(vBB[i].idx_));
 					}
 				}
@@ -151,7 +151,7 @@ namespace bitgraph {
 					if (_BitScanReverse64(&posInBB, cand)) {
 						scan_.bbi_ = i;
 						scan_.pos_ = static_cast<int>(posInBB);
-						if (is_destructive_scan()) { vBB[i].bb_ &= ~(BITBOARD(1) << posInBB); }
+						if (is_destructive_scan()) { vBB[i].bb_ &= ~Tables::mask[posInBB]; }
 						return static_cast<int>(posInBB) + static_cast<int>(WMUL(vBB[i].idx_));
 					}
 				}

@@ -48,7 +48,7 @@ namespace bitgraph {
 			if (_BitScanForward64(&posInBB, candidates)) {
 				scan_.bbi_ = i;
 				scan_.pos_ = posInBB;
-				vBB[i] &= ~(BITBOARD(1) << posInBB);
+				vBB[i] &= ~Tables::mask[posInBB];
 				return (posInBB + WMUL(i));
 			}
 		}
@@ -116,7 +116,7 @@ namespace bitgraph {
 			if (_BitScanReverse64(&posInBB, candidates)) {
 				scan_.bbi_ = i;
 				scan_.pos_ = posInBB;
-				vBB[i] &= ~(BITBOARD(1) << posInBB);
+				vBB[i] &= ~Tables::mask[posInBB];
 				return (posInBB + WMUL(i));
 			}
 		}

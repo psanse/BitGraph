@@ -12,7 +12,7 @@ Changes since the 2.0.0 tag.
 
 ### Performance
 
-- Bit scanning is about 2 times faster than libstdc++'s `_Find_next` on dense content (it was equal) and the reverse scan is faster too. On GCC (x86-64 and aarch64) `_BitScanForward64` / `_BitScanReverse64` now use `__builtin_ctzll` / `__builtin_clzll` instead of inline `asm`; the scans compute the bit-clear mask with a shift instead of a table lookup; the stateless `Bitset::next_bit(bit)` / `prev_bit(bit)` use the intrinsics instead of de Bruijn and lookup tables. Measurements in [docs/benchmarks.md](docs/benchmarks.md).
+- Bit scanning is about 2 times faster than libstdc++'s `_Find_next` on dense content (it was equal) and the reverse scan is faster too. On GCC (x86-64 and aarch64) `_BitScanForward64` / `_BitScanReverse64` now use `__builtin_ctzll` / `__builtin_clzll` instead of inline `asm`; the stateless `Bitset::next_bit(bit)` / `prev_bit(bit)` use the intrinsics instead of de Bruijn and lookup tables. Measurements in [docs/benchmarks.md](docs/benchmarks.md).
 
 ### Added
 
