@@ -210,7 +210,7 @@ and many others.
 
 ## Acknowledgements
 
-This research has been partially funded by the Spanish Ministry of Economy and Competitiveness (MINECO), national grants DPI 2010-21247-C02-01, DPI 2014-53525-C3-1-R and DPI2017-86915-C3-3-R.
+This research has been partially funded by the Spanish Ministry of Economy and Competitiveness (MINECO) through national grants DPI2010-21247-C02-01, DPI2014-53525-C3-1-R, and DPI2017-86915-C3-3-R, and is currently supported by the Spanish Ministry of Science, Innovation and Universities (MICIU) through grant PID2024-155948OB-C54.
 
 Thanks to the people who contributed to the code:
 
