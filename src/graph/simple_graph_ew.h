@@ -7,8 +7,10 @@
  * which provide support for edge-weighted graphs.
  *
  * @details
- * Edge weights are stored in a weight matrix synchronized with the topology
- * of the underlying graph. Existing edges have a weight different from
+ * Edge weights are stored in a square weight matrix synchronized with the
+ * topology of the underlying graph. The matrix is kept in one contiguous
+ * row-major buffer; `weights()` exposes it as a non-owning view that supports
+ * `m[v][w]` indexing. Existing edges have a weight different from
  * `NO_WEIGHT`, while entries corresponding to non-edges are set to
  * `NO_WEIGHT`.
  *
@@ -29,7 +31,7 @@
  * @par Historical notes
  * - Created: 16/01/2019
  * - Milestone application: Train scheduling (10/11/2021)
- * - Last update: 12/10/2026
+ * - Last update: 17/10/2026
  *
  * @author Pablo San Segundo (pss)
  */
@@ -89,15 +91,19 @@ namespace bitgraph {
 
 		using weight_t = WeightT;
 		using weights_t = std::vector<weight_t>;
+		/** @brief Nested matrix type used to supply and export weights (not the internal storage). */
 		using weight_matrix_t = std::vector<std::vector<weight_t>>;
 		
 		
 		using Weight = weight_t;				// backward compatibility
 		using mat_t = weight_matrix_t;			// backward compatibility
 
+		/** @brief Read-only view of one matrix row. */
 		using weight_row_view_t = detail::weight_row_view<const weight_t>;
+		/** @brief Read-only, non-owning view of the whole matrix (returned by `weights()`). */
 		using weight_matrix_view_t = detail::weight_matrix_view<const weight_t>;
-		using weight_storage_t = detail::weight_matrix_storage<weight_t>;
+		/** @brief Internal flat row-major storage of the weight matrix. */
+		using weight_storage_t =detail::weight_matrix_storage<weight_t>;
 										
 		// constants		
 		using constants_t = weight_constants<WeightT>;
@@ -325,9 +331,15 @@ namespace bitgraph {
 		/**
 		 * @brief Returns the complete edge-weight matrix.
 		 *
-		 * Provides read-only access to the stored edge weights.
+		 * Provides read-only access to the stored edge weights without copying.
+		 * The view supports `m[v][w]`, `size()`, `empty()`, `data()` and `==`
+		 * (also against a `weight_matrix_t`).
 		 *
-		 * @return Const reference to the edge-weight matrix.
+		 * @return Non-owning view of the edge-weight matrix.
+		 *
+		 * @warning The view is invalidated by any operation that reallocates the
+		 *          storage (e.g. `set_weights(const weight_matrix_t&)`, `reset()`).
+		 *          Use `to_weight_matrix()` to obtain an independent copy.
 		 */
 		weight_matrix_view_t weights() const noexcept {
 			return edge_weights_.view();
@@ -335,6 +347,8 @@ namespace bitgraph {
 				
 		/**
 		 * @brief Returns a nested-vector copy of the edge-weight matrix.
+		 *
+		 * @return Independent nested copy of the matrix.
 		 *
 		 * @note O(N^2) copy; prefer `weight()` or `weights()` for access.
 		 */
@@ -344,7 +358,10 @@ namespace bitgraph {
 
 		/**
 		 * @brief Flattens a nested weight matrix into row-major storage.
-		 * @pre @p m is square; validate with `validate_weight_matrix_base()` first.
+		 * @param m Square nested matrix.
+		 * @return Contiguous `m.size() * m.size()` buffer; entry `(v,w)` is at
+		 *         index `v * m.size() + w`.
+		 * @pre @p m is square; not checked here.
 		 */
 		static weights_t flatten(const weight_matrix_t& m) {
 			return detail::flatten_matrix(m);
@@ -665,7 +682,8 @@ namespace bitgraph {
 		/**
 		* @brief Returns mutable access to the edge-weight matrix.
 		*
-		* @return Reference to the internal edge-weight matrix.
+		* @return Reference to the internal flat weight storage. Entries are
+		*         accessed as `mutable_weights()[v][w]`.
 		*
 		* @note Intended for derived classes and internal algorithms.
 		*/
@@ -723,8 +741,9 @@ namespace bitgraph {
 		/**
 		 * @brief Edge-weight matrix.
 		 *
-		 * Entry `edge_weights_[v][w]` stores the weight associated with the edge
-		 * (v, w). Non-edges are represented by `NO_WEIGHT`.
+		 * Square `NV x NV` matrix held in one contiguous row-major buffer. Entry
+		 * `edge_weights_[v][w]` stores the weight associated with the edge (v, w).
+		 * Non-edges are represented by `NO_WEIGHT`.
 		 */
 		weight_storage_t edge_weights_;																		
 
