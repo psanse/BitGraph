@@ -214,5 +214,8 @@ This research has been partially funded by the Spanish Ministry of Economy and C
 
 Thanks to the people who contributed to the code:
 
+- **[Fabio Furini](https://fabiofurini.github.io/)**, with special thanks for his research collaboration and support.
 - **Dan Stahlke**, for fixes found by enabling compiler warnings (including an out-of-bounds vector access), documentation corrections, and format-string checking in the logger.
 - **Cristobal Tapia**, for contributions to the BITSCAN unit tests.
+
+AI-assisted development tools, including Claude, were used for code review, documentation, test development, and refactoring support.
