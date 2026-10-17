@@ -743,3 +743,39 @@ TEST_F(BaseGraphEWTest, print_edges_induced) {
 	EXPECT_NE(std::string::npos, s.find("[3]--(8)-->[1]"));
 	EXPECT_EQ(std::string::npos, s.find("(2)"));		// edge (0,2) leaves the set
 }
+
+TEST_F(BaseGraphEWTest, to_weight_matrix_and_flatten) {
+	const matrix_int m = g.to_weight_matrix();
+	EXPECT_EQ(g.weights(), m);
+
+	const std::vector<int> flat = ew_int::flatten(m);
+	const size_t NV = static_cast<size_t>(g.num_vertices());
+	ASSERT_EQ(NV * NV, flat.size());
+	for (size_t v = 0; v < NV; ++v) {
+		for (size_t w = 0; w < NV; ++w) {
+			EXPECT_EQ(g.weight(static_cast<int>(v), static_cast<int>(w)),
+				flat[v * NV + w]);
+		}
+	}
+}
+
+TEST_F(BaseGraphEWTest, weights_view_is_contiguous_row_major) {
+	const auto w = g.weights();
+	const size_t NV = static_cast<size_t>(g.num_vertices());
+	ASSERT_EQ(NV, w.size());
+	for (size_t v = 0; v < NV; ++v) {
+		EXPECT_EQ(w.data() + v * NV, w[v].data());
+		ASSERT_EQ(NV, w[v].size());
+		for (size_t u = 0; u < NV; ++u) {
+			EXPECT_EQ(g.weight(static_cast<int>(v), static_cast<int>(u)), w[v][u]);
+		}
+	}
+}
+
+TEST_F(BaseGraphEWTest, reset_resizes_flat_storage) {
+	g = ew_int(7);
+	EXPECT_EQ(7u, g.weights().size());
+	EXPECT_TRUE(g.is_consistent());
+	g = ew_int();
+	EXPECT_TRUE(g.weights().empty());
+}

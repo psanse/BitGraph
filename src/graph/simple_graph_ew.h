@@ -41,6 +41,7 @@
 #include "weighted_constants.h"
 #include "graph_unweighted.h"
 #include "simple_ugraph.h"
+#include "detail/edge_weight_matrix_view.h"
 #include <iostream>
 #include <vector>
 
@@ -93,6 +94,10 @@ namespace bitgraph {
 		
 		using Weight = weight_t;				// backward compatibility
 		using mat_t = weight_matrix_t;			// backward compatibility
+
+		using weight_row_view_t = detail::weight_row_view<const weight_t>;
+		using weight_matrix_view_t = detail::weight_matrix_view<const weight_t>;
+		using weight_storage_t = detail::weight_matrix_storage<weight_t>;
 										
 		// constants		
 		using constants_t = weight_constants<WeightT>;
@@ -128,9 +133,10 @@ namespace bitgraph {
 			const graph_t& graph,
 			const weight_matrix_t& edge_weights)
 			: graph_(graph),
-			edge_weights_(edge_weights)		
+			edge_weights_()
 		{
-			validate_weight_matrix_base();
+			validate_weight_matrix_base(edge_weights);
+			edge_weights_.assign_from(edge_weights);
 		}
 
 		/**
@@ -323,10 +329,27 @@ namespace bitgraph {
 		 *
 		 * @return Const reference to the edge-weight matrix.
 		 */
-		const weight_matrix_t& weights() const noexcept {
-			return edge_weights_;
+		weight_matrix_view_t weights() const noexcept {
+			return edge_weights_.view();
 		}
 				
+		/**
+		 * @brief Returns a nested-vector copy of the edge-weight matrix.
+		 *
+		 * @note O(N^2) copy; prefer `weight()` or `weights()` for access.
+		 */
+		weight_matrix_t to_weight_matrix() const {
+			return edge_weights_.to_nested();
+		}
+
+		/**
+		 * @brief Flattens a nested weight matrix into row-major storage.
+		 * @pre @p m is square; validate with `validate_weight_matrix_base()` first.
+		 */
+		static weights_t flatten(const weight_matrix_t& m) {
+			return detail::flatten_matrix(m);
+		}
+
 		void set_name(std::string name) {
 			graph_.set_name(std::move(name));
 		}
@@ -624,7 +647,7 @@ namespace bitgraph {
 		 *          current edge-weight matrix is invalid or inconsistent with the graph.
 		 */
 		void validate_weight_matrix_base() const {
-			validate_weight_matrix_base(edge_weights_);
+			validate_weight_matrix_base(edge_weights_.to_nested());
 		}
 			
 		/**
@@ -646,7 +669,7 @@ namespace bitgraph {
 		*
 		* @note Intended for derived classes and internal algorithms.
 		*/
-		weight_matrix_t& mutable_weights() noexcept {
+		weight_storage_t& mutable_weights() noexcept {
 			return edge_weights_;
 		}
 
@@ -703,7 +726,7 @@ namespace bitgraph {
 		 * Entry `edge_weights_[v][w]` stores the weight associated with the edge
 		 * (v, w). Non-edges are represented by `NO_WEIGHT`.
 		 */
-		weight_matrix_t edge_weights_;																			
+		weight_storage_t edge_weights_;																		
 
 	}; //end of class Base_Graph_EW
 

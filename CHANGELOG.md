@@ -51,6 +51,7 @@ Major refactoring of the BITSCAN, GRAPH and UTILS libraries. **This release is n
 - File formats now live in `graph/formats/detail/` under namespace `io` (was `gio`): DIMACS, edge list, Matrix Market, vertex-set.
 - New: `algorithm_info.h` (`BasicAlgorithmInfo`, `AlgorithmParameters`, `CriterionCollection`), `graph_benchmark.h` (`BasicGraphBenchmark`, replaces `utils::Benchmark`), `vertex_utils.h`, `weighted_constants.h`.
 - `kcore`, `clq_func` and `graph_sort` are not part of the public API in this release; they are parked in `graph/detail/toMOVE/`.
+- Edge-weighted graphs (`Base_Graph_EW`, `Graph_EW`, `ugraph_ew`) store their weights in one contiguous row-major buffer instead of `vector<vector<>>`. `weights()` now returns a non-owning view (`weight_matrix_view_t`): `g.weights()[v][w]`, `size()`, `empty()` and `==` (also against a `weight_matrix_t`) work as before. Code that binds the result to `const weight_matrix_t&` or copies it must call `to_weight_matrix()`. Constructors and `set_weights()` still take `weight_matrix_t`. New: `to_weight_matrix()`, `flatten()` (`graph/detail/edge_weight_matrix_view.h`).
 - New experimental, unstable component: `bitgraph::experimental::VertexRange` (`graph/detail/vertex_range.h`).
 
 ### UTILS
