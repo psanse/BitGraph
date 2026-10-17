@@ -147,9 +147,7 @@ namespace bitgraph {
 		const std::size_t NV =
 			static_cast<std::size_t>(graph_.num_vertices());
 
-		edge_weights_.assign(
-			NV,
-			std::vector<weight_t>(NV, NO_WEIGHT));
+		edge_weights_.assign(NV, NO_WEIGHT);
 
 		for (std::size_t u = 0; u < NV; ++u) {
 			for (std::size_t v = 0; v < NV; ++v) {
@@ -226,7 +224,7 @@ namespace bitgraph {
 		const weight_matrix_t& edge_weights)
 	{
 		validate_weight_matrix_base(edge_weights);
-		edge_weights_ = edge_weights;
+		edge_weights_.assign_from(edge_weights);
 	}
 
 	template<class GraphT, class WeightT>
@@ -265,9 +263,7 @@ namespace bitgraph {
 	{
 		try {
 			graph_.reset(NV);
-			edge_weights_.assign(
-				NV,
-				weights_t(NV, NO_WEIGHT));
+			edge_weights_.assign(NV, NO_WEIGHT);
 			graph_.set_name(std::move(name));
 		}
 		catch (...) {
