@@ -64,6 +64,7 @@ namespace bitgraph {
 	 * @brief CamelCase compatibility alias for vertex_mapping.
 	 */
 	using VertexMapping = vertex_mapping;
+	using vertex_mapping_t = vertex_mapping;
 
 	/**
 	 * @brief Ordering or permutation of graph vertices.
@@ -74,6 +75,7 @@ namespace bitgraph {
 	 * @brief CamelCase compatibility alias for vertex_ordering.
 	 */
 	using VertexOrdering = vertex_ordering;
+	using vertex_ordering_t = vertex_ordering;
 
 	/**
 	 * @brief Integer type used to identify the degree of a vertex.
