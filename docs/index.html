@@ -1,0 +1,251 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>BitGraph - bit-parallel sets and graphs for C++</title>
+<meta name="description" content="BitGraph is a C++14 library for fast set and graph operations: bitsets with very fast bit scanning (BITSCAN) and graphs stored as bitsets (GRAPH).">
+<style>
+:root{
+  --bg:#0b1220; --bg2:#111b30; --card:#15213a; --line:#243252;
+  --text:#e6ebf5; --muted:#9aa8c4; --a:#22d3ee; --b:#818cf8;
+  --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  --sans:Inter,"Segoe UI",system-ui,-apple-system,Helvetica,Arial,sans-serif;
+}
+@media (prefers-color-scheme: light){
+  :root{--bg:#f7f9fc;--bg2:#eef2f9;--card:#fff;--line:#d9e0ee;--text:#0f1a2e;--muted:#52617f;--a:#0891b2;--b:#4f46e5}
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--text);font:16px/1.6 var(--sans)}
+a{color:var(--a);text-decoration:none}
+a:hover{text-decoration:underline}
+.wrap{max-width:1040px;margin:0 auto;padding:0 20px}
+nav{position:sticky;top:0;z-index:5;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+nav .wrap{display:flex;align-items:center;gap:22px;height:56px;overflow-x:auto;white-space:nowrap}
+nav b{font-size:18px;margin-right:auto}
+nav b span{background:linear-gradient(90deg,var(--a),var(--b));-webkit-background-clip:text;background-clip:text;color:transparent}
+nav a{color:var(--muted);font-size:14px}
+.hero{padding:84px 0 56px;background:radial-gradient(600px 300px at 80% 20%,color-mix(in srgb,var(--a) 22%,transparent),transparent)}
+.hero h1{font-size:clamp(34px,6vw,58px);line-height:1.1;margin:0 0 18px;letter-spacing:-.02em}
+.grad{background:linear-gradient(90deg,var(--a),var(--b));-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero p{max-width:640px;color:var(--muted);font-size:19px;margin:0 0 28px}
+.btns{display:flex;flex-wrap:wrap;gap:12px}
+.btn{display:inline-block;padding:11px 20px;border-radius:10px;font-weight:600;border:1px solid var(--line);color:var(--text)}
+.btn.p{background:linear-gradient(90deg,var(--a),var(--b));color:#06101f;border:0}
+.btn:hover{text-decoration:none;filter:brightness(1.08)}
+.badges{display:flex;flex-wrap:wrap;gap:8px;margin-top:26px}
+.badges span{font:12px var(--mono);padding:4px 10px;border:1px solid var(--line);border-radius:99px;color:var(--muted)}
+section{padding:56px 0}
+section.alt{background:var(--bg2)}
+h2{font-size:30px;margin:0 0 8px;letter-spacing:-.01em}
+.lead{color:var(--muted);max-width:680px;margin:0 0 32px}
+.grid{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px}
+.card h3{margin:0 0 6px;font-size:17px}
+.card p{margin:0;color:var(--muted);font-size:15px}
+.card code,.lead code,td code{font:13px var(--mono);color:var(--a)}
+.tag{font:12px var(--mono);color:var(--b);margin-bottom:8px;display:block}
+/* demo */
+.demo{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px}
+.row{display:flex;align-items:center;gap:12px;margin:10px 0;flex-wrap:wrap}
+.row label{width:96px;font:13px var(--mono);color:var(--muted)}
+.bits{display:flex;gap:4px;flex-wrap:wrap}
+.bit{width:30px;height:34px;border-radius:6px;border:1px solid var(--line);background:transparent;color:var(--muted);font:14px var(--mono);cursor:pointer;padding:0}
+.bit.on{background:linear-gradient(180deg,var(--a),var(--b));color:#06101f;border-color:transparent;font-weight:700}
+.bit.out{cursor:default}
+.idx .bit{border:0;height:18px;font-size:11px;cursor:default}
+.note{font-size:14px;color:var(--muted);margin-top:12px}
+select{background:var(--bg2);color:var(--text);border:1px solid var(--line);border-radius:8px;padding:5px 8px;font:13px var(--mono)}
+/* code */
+pre{margin:0;background:#0a101d;color:#d6e2ff;border:1px solid var(--line);border-radius:14px;padding:18px;overflow-x:auto;font:13.5px/1.55 var(--mono)}
+.k{color:#c4b5fd}.s{color:#7dd3fc}.c{color:#6b7a99}.t{color:#5eead4}
+.two{display:grid;gap:20px;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));align-items:start}
+/* table */
+.tbl{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:15px}
+th,td{text-align:left;padding:10px 14px;border-bottom:1px solid var(--line)}
+th{color:var(--muted);font-weight:600;font-size:13px}
+.stats{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));margin-bottom:24px}
+.stat b{display:block;font-size:34px;line-height:1.1}
+.stat span{color:var(--muted);font-size:14px}
+footer{padding:36px 0;border-top:1px solid var(--line);color:var(--muted);font-size:14px}
+footer .wrap{display:flex;flex-wrap:wrap;gap:12px 24px;justify-content:space-between}
+</style>
+</head>
+<body>
+
+<nav><div class="wrap">
+  <b><span>BitGraph</span></b>
+  <a href="#idea">Idea</a><a href="#demo">Demo</a><a href="#libs">Libraries</a><a href="#code">Code</a>
+  <a href="#perf">Performance</a><a href="#examples">Examples</a><a href="#install">Install</a><a href="https://github.com/psanse/BitGraph">GitHub</a>
+</div></nav>
+
+<header class="hero"><div class="wrap">
+  <h1>Bit-parallel sets and graphs<br>for <span class="grad">combinatorial optimization</span></h1>
+  <p>A set of integers is a string of bits. A graph is a table of such sets. BitGraph is a C++ library that turns neighbourhood intersections, overlap tests and candidate counting into a handful of machine-word operations.</p>
+  <div class="btns">
+    <a class="btn p" href="#install">Get started</a>
+    <a class="btn" href="https://github.com/psanse/BitGraph">View on GitHub</a>
+    <a class="btn" href="benchmarks.md">Benchmarks</a>
+  </div>
+  <div class="badges"><span>release 2.0.0</span><span>C++14</span><span>GCC + MSVC</span><span>Linux + Windows</span><span>GPLv3</span><span>no dependencies</span></div>
+</div></header>
+
+<section id="idea"><div class="wrap">
+  <h2>One idea, from set to graph</h2>
+  <p class="lead">Row <i>v</i> of the adjacency matrix is a bitset holding the neighbours of <i>v</i>. Common neighbours, induced subgraphs and candidate filtering reduce to <code>AND</code>, <code>OR</code> and <code>AND NOT</code>, touching 64 vertices per word.</p>
+  <div class="grid">
+    <div class="card"><span class="tag">scanning</span><h3>Fast bit scans</h3><p>Forward and reverse, destructive or not, through small scanner objects or independent views that each carry their own cursor.</p></div>
+    <div class="card"><span class="tag">dense + sparse</span><h3>Same API, two storages</h3><p><code>bitarray</code> and <code>ugraph</code> store every block. <code>sparse_bitarray</code> and <code>sparse_ugraph</code> store only non-empty ones, so huge, sparse graphs stay small.</p></div>
+    <div class="card"><span class="tag">graphs</span><h3>Weights and file formats</h3><p>Vertex- and edge-weighted graphs, with DIMACS, Matrix Market and edge-list readers and writers and automatic format detection.</p></div>
+    <div class="card"><span class="tag">algorithms</span><h3>Orderings and generators</h3><p>Degree and degeneracy orderings, reversible vertex relabelling, classic graphs and uniform random graphs.</p></div>
+  </div>
+</div></section>
+
+<section id="demo" class="alt"><div class="wrap">
+  <h2>Try it: common neighbours</h2>
+  <p class="lead">Click bits to edit the two neighbourhoods. The result is a single bitwise operation, exactly what <code>g.neighbors(u) &amp;= g.neighbors(v)</code> does on 64 vertices at a time.</p>
+  <div class="demo">
+    <div class="row"><label></label><div class="bits idx" id="idx"></div></div>
+    <div class="row"><label>N(u)</label><div class="bits" id="ra"></div></div>
+    <div class="row"><label>N(v)</label><div class="bits" id="rb"></div></div>
+    <div class="row"><label>op</label>
+      <select id="op"><option value="and">N(u) &amp; N(v)  (common)</option><option value="or">N(u) | N(v)  (union)</option><option value="andnot">N(u) &amp; ~N(v)  (only u)</option></select></div>
+    <div class="row"><label>result</label><div class="bits" id="rr"></div></div>
+    <div class="note" id="info"></div>
+  </div>
+</div></section>
+
+<section id="libs"><div class="wrap">
+  <h2>Three small libraries</h2>
+  <p class="lead">Born from more than 20 years of research in exact algorithms for maximum clique, graph colouring and constraint satisfaction.</p>
+  <div class="grid">
+    <div class="card"><span class="tag">BITSCAN</span><h3>Bitsets with fast scanning</h3><p>Dense and sparse bitsets, forward/reverse scanners.</p><p style="margin-top:10px"><a href="../src/bitscan/README.md">Guide</a> · <a href="api/bitscan.md">API</a></p></div>
+    <div class="card"><span class="tag">GRAPH</span><h3>Graphs stored as bitsets</h3><p>Undirected graphs, weights, I/O, orderings, generators.</p><p style="margin-top:10px"><a href="../src/graph/README.md">Guide</a> · <a href="api/graph.md">API</a></p></div>
+    <div class="card"><span class="tag">UTILS</span><h3>Supporting toolkit</h3><p>Logger, timers, random numbers and helpers.</p><p style="margin-top:10px"><a href="../src/utils/README.md">Guide</a> · <a href="api/utils.md">API</a></p></div>
+  </div>
+</div></section>
+
+<section id="code" class="alt"><div class="wrap">
+  <h2>A taste of the API</h2>
+  <p class="lead">Algorithm code reads the same on a set and on a graph row.</p>
+  <div class="two">
+<pre><span class="k">#include</span> <span class="s">"BitGraph/graph/graph.h"</span>
+<span class="k">using namespace</span> bitgraph;
+
+<span class="t">ugraph</span> g(6);
+g.add_edge(0, 1);  g.add_edge(0, 2);
+g.add_edge(0, 3);  g.add_edge(1, 2);
+g.add_edge(1, 3);  g.add_edge(3, 4);
+
+<span class="c">// common neighbours: one AND</span>
+<span class="t">bitarray</span> common = g.neighbors(0);
+common &amp;= g.neighbors(1);
+
+<span class="t">bitarray::scan</span> scan(common);
+<span class="k">for</span> (<span class="k">int</span> v = scan.next_bit();
+     v != BBObject::noBit;
+     v = scan.next_bit())
+    std::cout &lt;&lt; v &lt;&lt; <span class="s">' '</span>;  <span class="c">// 2 3</span></pre>
+<pre><span class="k">#include</span> <span class="s">"BitGraph/bitscan/bitscan.h"</span>
+<span class="k">using namespace</span> bitgraph;
+
+<span class="c">// 10M elements, few set: stays small</span>
+<span class="t">sparse_bitarray</span> big(10000000);
+big.set_bit(0);
+big.set_bit(900000);
+big.set_bit(9999999);
+
+<span class="t">sparse_bitarray::scan</span> scan(big);
+<span class="k">for</span> (<span class="k">int</span> b = scan.next_bit();
+     b != BBObject::noBit;
+     b = scan.next_bit())
+    std::cout &lt;&lt; b &lt;&lt; <span class="s">' '</span>;
+<span class="c">// 0 900000 9999999</span></pre>
+  </div>
+</div></section>
+
+<section id="perf"><div class="wrap">
+  <h2>Performance, honestly</h2>
+  <p class="lead">Measured on a Xeon Gold 6342, GCC 13 <code>-O3</code>, 100,000-bit sets. Dense bitsets match <code>std::bitset</code> on bulk operations; scanning and sparse storage are where BitGraph wins.</p>
+  <div class="stats">
+    <div class="card stat"><b class="grad">~50x</b><span>sparse <code>&amp;=</code> vs <code>std::bitset</code> at 1% occupancy</span></div>
+    <div class="card stat"><b class="grad">~80x</b><span>sparse <code>count()</code> vs <code>std::bitset</code> at 1%</span></div>
+    <div class="card stat"><b class="grad">~2x</b><span>dense forward scan vs libstdc++ <code>_Find_next</code></span></div>
+    <div class="card stat"><b class="grad">3.6-62x</b><span>reverse scan vs the portable alternative</span></div>
+  </div>
+  <p class="lead" style="margin-bottom:0">GRAPH has no direct counterpart library, so no speedup is claimed for it; its speed comes from the BITSCAN operations on adjacency rows. Full tables, method and caveats: <a href="benchmarks.md">benchmarks</a>.</p>
+</div></section>
+
+<section id="examples"><div class="wrap">
+  <h2>Built with BitGraph</h2>
+  <p class="lead">Two small, header-only projects that show the library in real algorithms. Both build on BitGraph v2.0.0 and use CMake.</p>
+  <div class="grid">
+    <a class="card" href="https://github.com/psanse/KCore"><span class="tag">psanse/KCore</span><h3>k-core decomposition</h3><p>Computes the coreness of every vertex in O(|E|) with the Batagelj-Zaversnik bin-sort algorithm, plus degeneracy orderings and greedy clique heuristics.</p></a>
+    <a class="card" href="https://github.com/psanse/seq_coloring"><span class="tag">psanse/seq_coloring</span><h3>Greedy sequential coloring</h3><p>SEQ and ISEQ vertex coloring heuristics on bitset rows. ISEQ is the upper bound used in exact maximum clique algorithms such as CliSAT.</p></a>
+  </div>
+</div></section>
+
+<section id="install" class="alt"><div class="wrap">
+  <h2>Install</h2>
+  <p class="lead">CMake 3.14+ and a C++14 compiler.</p>
+  <div class="two">
+<pre>git clone https://github.com/psanse/BitGraph.git
+cd BitGraph
+cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+cmake --build build
+cmake --install build</pre>
+<pre><span class="c"># your CMakeLists.txt</span>
+find_package(BitGraph CONFIG REQUIRED)
+target_link_libraries(my_app PRIVATE
+  BitGraph::graph BitGraph::bitscan BitGraph::utils)</pre>
+  </div>
+  <div class="tbl" style="margin-top:28px"><table>
+    <tr><th>Toolchain</th><th>Status</th></tr>
+    <tr><td>GCC 13.3, Ubuntu 24.04</td><td>build, tests, examples, installed-package check pass</td></tr>
+    <tr><td>MSVC 19.5 (VS 2026), Windows</td><td>build, tests, examples, installed-package check pass</td></tr>
+  </table></div>
+  <p class="note">v2.0.0 (October 2026) is not source-compatible with 1.x. See the <a href="../CHANGELOG.md">changelog and migration table</a>.</p>
+</div></section>
+
+<section><div class="wrap">
+  <h2>Used in</h2>
+  <p class="lead">BITSCAN and GRAPH sit at the core of many exact algorithms.</p>
+  <div class="grid">
+    <a class="card" href="https://www.sciencedirect.com/science/article/pii/S0377221722008165"><h3>CliSAT</h3><p>A new exact algorithm for hard maximum clique problems, 2023</p></a>
+    <a class="card" href="https://ieeexplore.ieee.org/abstract/document/10892261"><h3>CliReg</h3><p>Clique-based robust point cloud registration, 2025</p></a>
+    <a class="card" href="https://www.sciencedirect.com/science/article/pii/S0305054815001884"><h3>Massive sparse graphs</h3><p>Exact maximum clique for large sparse graphs, 2016</p></a>
+    <a class="card" href="https://www.sciencedirect.com/science/article/pii/S0305054810001504"><h3>Bit-parallel max clique</h3><p>The 2011 paper where BITSCAN originated</p></a>
+  </div>
+  <p class="note">More in the <a href="../README.md#used-in">README</a>. To cite BitGraph, see <a href="../CITATION.cff">CITATION.cff</a>.</p>
+</div></section>
+
+<footer><div class="wrap">
+  <span>BitGraph is free software under the <a href="../LICENSE">GNU GPL v3.0</a>.</span>
+  <span><a href="https://github.com/psanse/BitGraph">GitHub</a> · <a href="../CHANGELOG.md">Changelog</a> · <a href="README.md">Docs</a></span>
+</div></footer>
+
+<script>
+(function(){
+  var N=16, A=[1,1,0,1,0,0,1,0,1,1,0,0,1,0,0,1], B=[0,1,1,1,0,1,0,0,1,0,0,1,1,0,1,0];
+  var $=function(i){return document.getElementById(i)};
+  function cell(txt,cls,fn){var b=document.createElement('button');b.className='bit '+(cls||'');b.textContent=txt;if(fn)b.onclick=fn;else b.tabIndex=-1;return b}
+  function render(){
+    var op=$('op').value, rows={ra:A,rb:B}, out=[];
+    ['ra','rb'].forEach(function(id){var el=$(id);el.innerHTML='';rows[id].forEach(function(v,i){
+      el.appendChild(cell(v,v?'on':'',function(){rows[id][i]^=1;render()}))})});
+    var rr=$('rr');rr.innerHTML='';
+    for(var i=0;i<N;i++){
+      var r=op==='and'?A[i]&B[i]:op==='or'?A[i]|B[i]:A[i]&(B[i]^1);
+      out.push(r);rr.appendChild(cell(r,'out'+(r?' on':'')));
+    }
+    var set=out.map(function(v,i){return v?i:-1}).filter(function(i){return i>=0});
+    $('info').textContent='count() = '+set.length+'   scan: { '+set.join(', ')+' }';
+  }
+  var idx=$('idx');for(var i=0;i<N;i++)idx.appendChild(cell(i));
+  $('op').onchange=render;render();
+})();
+</script>
+</body>
+</html>
