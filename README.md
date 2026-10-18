@@ -14,6 +14,8 @@
 
 It consists of two main libraries, **BITSCAN** (bitsets with very fast bit scanning) and **GRAPH** (graphs stored as bitsets), plus a small supporting library, **UTILS**. They come from more than 20 years of research in combinatorial optimization and sit at the core of many exact algorithms for hard problems such as maximum clique, graph colouring and constraint satisfaction (see [Used in](#used-in)).
 
+**Website:** [psanse.github.io/BitGraph](https://psanse.github.io/BitGraph/)
+
 ## Contents
 
 - [Why BitGraph](#why-bitgraph)
