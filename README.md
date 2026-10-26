@@ -20,6 +20,7 @@ It consists of two main libraries, **BITSCAN** (bitsets with very fast bit scann
 
 - [Why BitGraph](#why-bitgraph)
 - [Quick start](#quick-start)
+- [Examples and projects built with BitGraph](#examples-and-projects-built-with-bitgraph)
 - [Installation](#installation)
 - [Repository layout](#repository-layout)
 - [Documentation](#documentation)
@@ -92,9 +93,17 @@ int main() {
 }
 ```
 
-More runnable programs are in the `examples/` folder of each library: [BITSCAN](src/bitscan/examples), [GRAPH](src/graph/examples) and [UTILS](src/utils/examples).
+## Examples and projects built with BitGraph
 
-Other projects built on BitGraph 2.0 are listed in [Built with BitGraph](https://psanse.github.io/BitGraph/#examples) on the website.
+**Runnable examples.** Every library ships small, self-contained programs. They are built with the repository (option `BUILD_EXAMPLES`, on by default in a standalone build) and are a good next step after the snippets above.
+
+| Library | Examples | Topics |
+|---|---|---|
+| BITSCAN | [src/bitscan/examples](src/bitscan/examples) | the core bitset API, forward and reverse scanning, destructive scanning, independent views |
+| GRAPH | [src/graph/examples](src/graph/examples) | graph types, reading and writing files (DIMACS, Matrix Market, edge list), generators, sorting, weighted graphs |
+| UTILS | [src/utils/examples](src/utils/examples) | collections, timers, random numbers, files and paths, asynchronous tasks |
+
+**Built with BitGraph.** BitGraph is the base of several separate projects (k-core decomposition, greedy colouring and clique heuristics, and the exact algorithms listed in [Used in](#used-in)). Browse them in [Built with BitGraph](https://psanse.github.io/BitGraph/#examples) on the website.
 
 ## Installation
 
