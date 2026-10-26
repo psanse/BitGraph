@@ -23,8 +23,8 @@
  * @see ../bitscan/bbscan_sparse.h
  */
 
-#ifndef __SIMPLE_SPARSE_UGRAPH_H__
-#define __SIMPLE_SPARSE_UGRAPH_H__
+#ifndef BITGRAPH_SIMPLE_SPARSE_UGRAPH_H
+#define BITGRAPH_SIMPLE_SPARSE_UGRAPH_H
 
 #include "simple_ugraph.h"
 #include "utils/precise_timer.h"
@@ -315,4 +315,4 @@ namespace bitgraph {
 }
 
 
-#endif // end __SIMPLE_SPARSE_UGRAPH_H__
+#endif // end BITGRAPH_SIMPLE_SPARSE_UGRAPH_H
