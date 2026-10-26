@@ -94,7 +94,7 @@ int main() {
 
 More runnable programs are in the `examples/` folder of each library: [BITSCAN](src/bitscan/examples), [GRAPH](src/graph/examples) and [UTILS](src/utils/examples).
 
-For a larger example of a separate project built on BitGraph 2.0, see [CliqueUtils](https://github.com/psanse/CliqueUtils): header-only clique and independent-set utilities (greedy heuristics, a lower bound for the maximum clique, and an upper bound from greedy sequential colouring) written on `ugraph`, with a CMake build that fetches BitGraph.
+For a larger example of a separate project built on BitGraph 2.0, see [CliqueUtils](https://github.com/psanse/CliqueUtils): header-only clique and independent-set utilities (greedy heuristics, a lower bound for the maximum clique, and an upper bound from greedy sequential colouring) written on `ugraph`, with a CMake build that fetches BitGraph. It is listed with other projects in [Built with BitGraph](https://psanse.github.io/BitGraph/#examples) on the website.
 
 ## Installation
 
