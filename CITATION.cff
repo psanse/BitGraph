@@ -7,8 +7,8 @@ authors:
   - family-names: "San Segundo"
     given-names: "Pablo"
     affiliation: "Centro de Automática y Robótica (CAR), UPM-CSIC"
-version: 2.0.0
-date-released: 2026-10-14
+version: 2.0.2
+date-released: 2026-10-28
 repository-code: "https://github.com/psanse/BitGraph"
 url: "https://github.com/psanse/BitGraph"
 keywords:

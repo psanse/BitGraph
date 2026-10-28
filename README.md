@@ -7,7 +7,7 @@
   <img alt="C++14" src="https://img.shields.io/badge/C%2B%2B-14-00599C.svg">
   <img alt="Platforms: Linux and Windows" src="https://img.shields.io/badge/platforms-Linux%20%7C%20Windows-lightgrey.svg">
   <img alt="Compilers: GCC and MSVC" src="https://img.shields.io/badge/compilers-GCC%20%7C%20MSVC-informational.svg">
-  <a href="CHANGELOG.md"><img alt="Release 2.0.0" src="https://img.shields.io/badge/release-2.0.0-success.svg"></a>
+  <a href="CHANGELOG.md"><img alt="Release 2.0.2" src="https://img.shields.io/badge/release-2.0.2-success.svg"></a>
 </p>
 
 **BitGraph** is a C++ library for fast set and graph operations, built on one idea: a set of integers is a string of bits, and a graph is a table of such sets. Intersecting two neighbourhoods, testing whether two sets overlap, or counting a candidate set each become a handful of machine-word operations.
@@ -179,7 +179,7 @@ What can be said is how its performance arises. Row *v* of the adjacency matrix 
 | GCC 13.3, Ubuntu 24.04 | build, tests, examples and installed-package check pass |
 | MSVC 19.5 (Visual Studio 2026), Windows | build, tests, examples and installed-package check pass |
 
-The latest release is **v2.0.0** (October 2026). Version 2.0 is a major refactoring and is **not source-compatible with 1.x**: see [CHANGELOG.md](CHANGELOG.md) for the changes and a migration table. The 1.x series (last release v1.4.3) is frozen.
+The latest release is **v2.0.2** (28 October 2026). Version 2.0 is a major refactoring and is **not source-compatible with 1.x**: see [CHANGELOG.md](CHANGELOG.md) for the changes and a migration table. The 1.x series (last release v1.4.3) is frozen.
 
 ## License
 

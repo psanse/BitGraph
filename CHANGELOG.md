@@ -1,8 +1,24 @@
 # Changelog
 
-## Unreleased
+## 2.0.2 - 2026-10-28
 
-Changes since the 2.0.0 tag.
+### Fixed
+
+- Mark `AlgorithmParameters::reset_base()` and `AlgorithmParameters::print()` as `inline` in `algorithm_info_imp.h` to prevent multiple-definition errors when the header is included in multiple translation units.
+
+### Removed
+
+- Remove the deprecated info utilities (`utils/info/info_base.h` and `info_base.cpp`) and their old tests from the build. Use `graph/algorithms/algorithm_info.h` for algorithm information.
+
+## 2.0.1 - 2026-10-26
+
+- Add graph type aliases and remove a header-level `using namespace bitgraph` directive.
+- Remove the old k-core code from `graph/detail/toMOVE/`.
+- Add the project website, interactive demo, and links to example projects built with BitGraph.
+
+## 2.0.0
+
+Major refactoring of the BITSCAN, GRAPH and UTILS libraries. **This release is not source-compatible with 1.x**: see [Migrating from 1.x](#migrating-from-1x). The last 1.x release is v1.4.3 and is frozen.
 
 ### Fixed
 
@@ -25,10 +41,6 @@ Changes since the 2.0.0 tag.
 
 - NIST is acknowledged as the source of the Matrix Market I/O code (`mmio.h`, `mmio.cpp`).
 - Class-level descriptions for the main classes (`Bitset`, `BitsetSp`, `BBScanSp`, `Graph`, `infoBase`, ...), and many corrected `@param` names and Doxygen tags in the headers.
-
-## 2.0.0
-
-Major refactoring of the BITSCAN, GRAPH and UTILS libraries. **This release is not source-compatible with 1.x**: see [Migrating from 1.x](#migrating-from-1x). The last 1.x release is v1.4.3 and is frozen.
 
 ### BITSCAN
 
