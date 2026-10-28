@@ -19,6 +19,7 @@
 
 using namespace bitgraph;	
 
+inline
 void AlgorithmParameters::reset_base()
 {
 	name.clear();
@@ -34,7 +35,8 @@ void AlgorithmParameters::reset_base()
 	clear_parsing_timer();
 }
 
-//I/O		
+//I/O	
+inline	
 std::ostream& AlgorithmParameters::print(
 	std::ostream& out,
 	bool trailing_newline) const
