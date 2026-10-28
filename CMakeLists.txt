@@ -13,7 +13,7 @@ endif()
 set(LIBNAME "BitGraph")
 set(LIB_MAJOR_VERS "2")
 set(LIB_MINOR_VERS "0")
-set(LIB_PATCH_VERS "0")
+set(LIB_PATCH_VERS "2")
 
 project(
     ${LIBNAME} 
