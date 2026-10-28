@@ -11,7 +11,7 @@ add_executable(
     test_task.cpp
     test_logger.cpp    
     test_batch.cpp
-    test_info_base.cpp          # deprecated, tests disabled.
+    #test_info_base.cpp          # deprecated, tests disabled.
     #test_testAnalyser.cpp      # deprecated, tests disabled.
 )
 

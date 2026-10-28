@@ -13,7 +13,7 @@ add_library (utils STATIC
     time_utils.cpp
     path_utils.cpp
     sort_utils.cpp  
-    info/info_base.cpp     # deprecated, refactored andmoved to graph
+    #info/info_base.cpp     # deprecated, refactored and moved to graph
     ${HEADER_FILES}
 )
 
