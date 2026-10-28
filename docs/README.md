@@ -1,6 +1,10 @@
 # BitGraph documentation
 
-![BitGraph 2.0](images/bitgraph-banner.svg)
+![BitGraph 2.0.2](images/bitgraph-banner.svg)
+
+Latest release: **[v2.0.2](https://github.com/psanse/BitGraph/releases/tag/v2.0.2)** (28 October 2026).
+
+This patch fixes missing `inline` declarations in the algorithm information headers and removes the deprecated info utilities. See the [release notes](../CHANGELOG.md#202---2026-10-28) for details.
 
 Start with the [main README](../README.md) for an overview, a quick start and installation.
 
@@ -30,7 +34,7 @@ Only documented public API is included: `detail/`, tests, examples and benchmark
 ## Reference material
 
 - [benchmarks.md](benchmarks.md): measured performance of the BITSCAN bitsets against `std::bitset`, with the method and the commands to reproduce it.
-- [../CHANGELOG.md](../CHANGELOG.md): what changed in 2.0, with a migration table from 1.x.
+- [../CHANGELOG.md](../CHANGELOG.md): release notes through v2.0.2, with a migration table from 1.x.
 - [../CITATION.cff](../CITATION.cff): how to cite BitGraph.
 
 ## Development notes

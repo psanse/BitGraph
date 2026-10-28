@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="docs/images/bitgraph-banner.svg" alt="BitGraph 2.0 - bit-parallel sets and graphs for combinatorial optimization in C++" width="100%">
+  <img src="docs/images/bitgraph-banner.svg" alt="BitGraph 2.0.2 - bit-parallel sets and graphs for combinatorial optimization in C++" width="100%">
 </p>
 
 <p align="center">
