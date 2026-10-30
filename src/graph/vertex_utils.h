@@ -30,6 +30,8 @@
 
 namespace bitgraph {
     
+    constexpr vertex_t NO_VERTEX = static_cast<vertex_t>(-1);
+        
     /**
      * @brief Fills a vertex collection with consecutive indices.
      *
