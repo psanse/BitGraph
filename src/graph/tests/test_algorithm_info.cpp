@@ -12,7 +12,7 @@
 
 #include "gtest/gtest.h"
 
-#include "graph/algorithms/algorithm_info.h"
+#include "graph/algorithms/algorithm_param.h"
 
 #include <chrono>
 #include <cstddef>

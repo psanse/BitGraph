@@ -15,8 +15,8 @@
   * @date last_update 24/09/2026
   */
 
-#ifndef BITGRAPH_GRAPH_ALGORITHM_INFO_H
-#define BITGRAPH_GRAPH_ALGORITHM_INFO_H
+#ifndef BITGRAPH_GRAPH_ALGORITHM_PARAMETERS_H
+#define BITGRAPH_GRAPH_ALGORITHM_PARAMETERS_H
 
 
 #include "utils/precise_timer.h"
@@ -434,10 +434,10 @@ namespace bitgraph {
 ////////////////////////////////
 // template implementation
 
-#include "detail/algorithm_info_imp.h"
+#include "detail/algorithm_param_imp.h"
 
 
-#endif //  BITGRAPH_GRAPH_ALGORITHMS_INFO_H
+#endif //  BITGRAPH_GRAPH_ALGORITHM_PARAMETERS_H
 
 
 
