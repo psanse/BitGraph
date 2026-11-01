@@ -148,6 +148,15 @@ namespace bitgraph {
 			//static methods 
 
 			/**
+			* @brief Mirrors the position of every vertex of an [OLD]->[NEW] ordering: position i becomes (N - 1 - i).
+			*		 The same transformation applies to the [NEW]->[OLD] format.
+			**/
+			static void mirror(vertex_ordering_t& ord) {
+				const int last = static_cast<int>(ord.size()) - 1;
+				for (auto& pos : ord) { pos = last - pos; }
+			}
+
+			/**
 			 * @brief Computes the degree of every vertex in the graph.
 			 * @param graph Input graph.
 			 * @param deg Output vector where `deg[v]` is the degree of vertex `v`.
