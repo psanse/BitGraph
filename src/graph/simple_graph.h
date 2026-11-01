@@ -80,12 +80,12 @@ namespace bitgraph {
 
 	public:
 						
-		using bitset_type = BitsetT;				
-		using vertex_set_type = bitset_type;
-
+		using bitset_type = BitsetT;	
+		using vertex_bitset_t = bitset_type;			// semantic alias for vertex sets
+		
 		// aliases for backward compatibility
-		using vertex_bitset_t = vertex_set_type;
-		using VertexBitset = vertex_bitset_t;		
+		using vertex_set_type = bitset_type;
+		using VertexBitset = bitset_type;
 		
 		/////////////			
 		//construction / destruction
