@@ -148,13 +148,46 @@ namespace bitgraph {
 			//static methods 
 
 			/**
-			* @brief Mirrors the position of every vertex of an [OLD]->[NEW] ordering: position i becomes (N - 1 - i).
-			*		 The same transformation applies to the [NEW]->[OLD] format.
-			**/
+			 * @brief Reverses the positions in a vertex ordering.
+			 *
+			 * @details Replaces each entry @c i with @c (N - 1 - i), where N is
+			 *          the number of vertices. Works with both [OLD]->[NEW]
+			 *          and [NEW]->[OLD] ordering representations.
+			 *
+			 * @param ord Vertex ordering to modify in place.
+			 */
 			static void mirror(vertex_ordering_t& ord) {
 				const int last = static_cast<int>(ord.size()) - 1;
 				for (auto& pos : ord) { pos = last - pos; }
 			}
+
+			/**
+			 * @brief Checks whether a vertex ordering is a valid permutation.
+			 *
+			 * @details A valid permutation of size N contains every vertex index
+			 *          in [0, N-1] exactly once. The check applies to both
+			 *          [OLD]->[NEW] and [NEW]->[OLD] ordering representations.
+			 *
+			 * @param ord Vertex ordering to validate.
+			 * @return True if @p ord is a valid permutation, false otherwise.
+			 *
+			 * @note An empty ordering is considered a valid permutation.
+			 * @complexity O(N) time and O(N) auxiliary space.
+			 */
+			static bool is_valid_permutation(const vertex_ordering_t& ord)
+			{
+				const size_t n = ord.size();
+				std::vector<bool> seen(n, false);
+
+				for (const auto v : ord) {
+					if (v < 0 || static_cast<size_t>(v) >= n || seen[v]) {
+						return false;
+					}
+					seen[v] = true;
+				}
+				return true;
+			}
+
 
 			/**
 			 * @brief Computes the degree of every vertex in the graph.
