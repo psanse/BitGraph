@@ -25,6 +25,7 @@
 
 #include <cstddef> // for std::size_t
 #include <cstdint>
+#include <iomanip>
 #include <iostream>
 #include <limits>
 #include <ostream>
