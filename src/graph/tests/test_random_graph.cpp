@@ -118,18 +118,18 @@ TEST(Sparse_Random_Graph, edge_cases) {
 	sparse_ugraph g;
 
 	// single vertex - no edges 
-	experimental::SparseRandomGen<sparse_ugraph>::create_ugraph(g, 1, 0.5);
+	bitgraph::experimental::SparseRandomGen<sparse_ugraph>::create_ugraph(g, 1, 0.5);
 	EXPECT_EQ(1, g.num_vertices());
 	EXPECT_EQ(0, g.num_edges(false));
 
 	// p = 0 - empty graph 
-	experimental::SparseRandomGen<sparse_ugraph>::create_ugraph(g, 100, 0.0);
+	bitgraph::experimental::SparseRandomGen<sparse_ugraph>::create_ugraph(g, 100, 0.0);
 	EXPECT_EQ(100, g.num_vertices());
 	EXPECT_EQ(0, g.num_edges(false));
 
 	// p = 1 - complete graph 
 	const std::size_t NV = 60;
-	experimental::SparseRandomGen<sparse_ugraph>::create_ugraph(g, NV, 1.0);
+	bitgraph::experimental::SparseRandomGen<sparse_ugraph>::create_ugraph(g, NV, 1.0);
 	EXPECT_EQ(NV * (NV - 1) / 2, g.num_edges(false));
 	for (std::size_t i = 0; i < NV; ++i) {
 		EXPECT_FALSE(g.is_edge((int)i, (int)i));
@@ -140,9 +140,9 @@ TEST(Sparse_Random_Graph, seed) {
 
 	sparse_ugraph g1, g2, g3;
 
-	experimental::SparseRandomGen<sparse_ugraph>::create_ugraph(g1, 1000, 0.01, 7);
-	experimental::SparseRandomGen<sparse_ugraph>::create_ugraph(g2, 1000, 0.01, 7);
-	experimental::SparseRandomGen<sparse_ugraph>::create_ugraph(g3, 1000, 0.01, 8);
+	bitgraph::experimental::SparseRandomGen<sparse_ugraph>::create_ugraph(g1, 1000, 0.01, 7);
+	bitgraph::experimental::SparseRandomGen<sparse_ugraph>::create_ugraph(g2, 1000, 0.01, 7);
+	bitgraph::experimental::SparseRandomGen<sparse_ugraph>::create_ugraph(g3, 1000, 0.01, 8);
 
 	auto same_edges = [](sparse_ugraph& ga, sparse_ugraph& gb) {
 		if (ga.num_vertices() != gb.num_vertices()) return false;
@@ -174,7 +174,7 @@ TEST(Sparse_Random_Graph, density) {
 	for (int s = 1; s <= NREP; ++s) {
 
 		sparse_ugraph g;
-		experimental::SparseRandomGen<sparse_ugraph>::create_ugraph(g, NV, p, s);
+		bitgraph::experimental::SparseRandomGen<sparse_ugraph>::create_ugraph(g, NV, p, s);
 		ASSERT_EQ(NV, g.num_vertices());
 
 		for (std::size_t i = 0; i < NV; ++i) {
@@ -206,7 +206,7 @@ TEST(Sparse_Random_Graph, first_edge) {
 
 	for (int s = 1; s <= NREP; ++s) {
 		sparse_ugraph g;
-		experimental::SparseRandomGen<sparse_ugraph>::create_ugraph(g, 50, p, s);
+		bitgraph::experimental::SparseRandomGen<sparse_ugraph>::create_ugraph(g, 50, p, s);
 		count += g.is_edge(0, 1);
 	}
 
@@ -233,9 +233,9 @@ TEST(VertexWeightGen, modulus_dimacs){
 	EXPECT_EQ(ugraph_vwi::DEFAULT_WEIGHT, ugw.weight(199));
 
 	//generate modulus weights 
-	experimental::VertexWeightGen< ugraph_vwi >::create_weights(
+	bitgraph::experimental::VertexWeightGen< ugraph_vwi >::create_weights(
 		ugw,
-		experimental::VertexWeightGen<ugraph_vwi>::weight_type::modulus, 
+		bitgraph::experimental::VertexWeightGen<ugraph_vwi>::weight_type::modulus, 
 		200);
 		
 	EXPECT_EQ(2, ugw.weight(0));
@@ -252,8 +252,8 @@ TEST(VertexWeightGen, random_graph_modulus) {
 	//creates random graph of size NV with modulus weights
 	ugraph_vwi ugw;
 	RandomGen<ugraph_vwi>::create_graph(ugw, NV, density);							/* empty vertex weights by default */
-	experimental::VertexWeightGen<ugraph_vwi>::create_weights(ugw,
-		experimental::VertexWeightGen<ugraph_vwi>::weight_type::modulus);
+	bitgraph::experimental::VertexWeightGen<ugraph_vwi>::create_weights(ugw,
+		bitgraph::experimental::VertexWeightGen<ugraph_vwi>::weight_type::modulus);
 	
 	/////////////////////
 	EXPECT_EQ(NV, ugw.num_vertices());
@@ -264,7 +264,7 @@ TEST(VertexWeightGen, random_graph_modulus) {
 
 TEST(VertexWeightGen, degree) {
 
-	using gen_t = experimental::VertexWeightGen<ugraph_vwi>;
+	using gen_t = bitgraph::experimental::VertexWeightGen<ugraph_vwi>;
 
 	ugraph_vwi ugw(6);
 	ugw.add_edge(0, 1);
@@ -284,7 +284,7 @@ TEST(VertexWeightGen, degree) {
 
 TEST(VertexWeightGen, modulus) {
 
-	using gen_t = experimental::VertexWeightGen<ugraph_vwi>;
+	using gen_t = bitgraph::experimental::VertexWeightGen<ugraph_vwi>;
 
 	ugraph_vwi ugw(7);
 
@@ -302,7 +302,7 @@ TEST(VertexWeightGen, modulus) {
 
 TEST(VertexWeightGen, to_file) {
 
-	using gen_t = experimental::VertexWeightGen<ugraph_vwi>;
+	using gen_t = bitgraph::experimental::VertexWeightGen<ugraph_vwi>;
 
 	ugraph_vwi ugw(10);
 	ugw.add_edge(0, 1);
@@ -338,7 +338,7 @@ TEST(EdgeWeightGen, modulus) {
 	ugew.add_edge(1, 3, 3);
 
 	//generate modulus-weights on the edges 
-	experimental::EdgeWeightGen<ugraph_ewi>::create_weights (
+	bitgraph::experimental::EdgeWeightGen<ugraph_ewi>::create_weights (
 		ugew,
 		DEFAULT_WEIGHT_MODULUS);
 
@@ -351,7 +351,7 @@ TEST(EdgeWeightGen, modulus) {
 
 TEST(EdgeWeightGen, modulus_non_default) {
 
-	using gen_t = experimental::EdgeWeightGen<ugraph_ewi>;
+	using gen_t = bitgraph::experimental::EdgeWeightGen<ugraph_ewi>;
 
 	const int NV = 6;
 	ugraph_ewi ugew(NV);
@@ -391,7 +391,7 @@ TEST(EdgeWeightGen, modulus_non_default) {
 
 TEST(EdgeWeightGen, invalid_modulus_terminates) {
 
-	using gen_t = experimental::EdgeWeightGen<ugraph_ewi>;
+	using gen_t = bitgraph::experimental::EdgeWeightGen<ugraph_ewi>;
 
 	ugraph_ewi ugew(3);
 	ugew.add_edge(0, 1);
@@ -403,7 +403,7 @@ TEST(EdgeWeightGen, invalid_modulus_terminates) {
 
 TEST(EdgeWeightGen, to_file) {
 
-	using gen_t = experimental::EdgeWeightGen<ugraph_ewi>;
+	using gen_t = bitgraph::experimental::EdgeWeightGen<ugraph_ewi>;
 
 	ugraph_ewi ugew(5);
 	ugew.add_edge(0, 1);
