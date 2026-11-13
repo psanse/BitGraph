@@ -399,6 +399,43 @@ namespace bitgraph {
 		return true;
 	}
 
+	inline
+	BBObject::block_index_t Bitset::first_non_empty_block() const noexcept
+	{
+		for (block_index_t i = 0; i < nBB_; ++i) {
+			if (vBB_[i]) {
+				return i;
+			}
+		}
+
+		return BBObject::npos;
+	}
+
+	inline
+	BBObject::block_index_t Bitset::last_non_empty_block() const noexcept
+	{
+		for (block_index_t i = nBB_ - 1; i >= 0; --i) {
+			if (vBB_[i]) {
+				return i;
+			}
+		}
+
+		return BBObject::npos;
+	}
+
+	inline
+	std::pair<BBObject::block_index_t, BBObject::block_index_t>
+		Bitset::non_empty_block_range() const noexcept
+	{
+		const block_index_t first = first_non_empty_block();
+		if (first == BBObject::npos) {
+			return { BBObject::npos, BBObject::npos };
+		}
+
+		//last >= first is guaranteed since block first is non-empty
+		return { first, last_non_empty_block() };
+	}
+
 	// Single-bit updates: inline, they are called in loops (building bitsets, graph construction).
 	// (defined in the header so the compiler can inline them into the calling loops)
 

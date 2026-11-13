@@ -23,6 +23,7 @@
 #include <cassert>					
 #include <initializer_list>
 #include <set>
+#include <utility>
 #include <vector>
 
 namespace bitgraph {
@@ -1135,6 +1136,29 @@ namespace bitgraph {
 		**/
 		virtual bool is_empty_block(block_index_t firstBlock,
 			block_index_t lastBlock) const;
+
+		/**
+		* @brief Index of the first (least significant) non-empty bitblock
+		* @returns the block index, or BBObject::npos if the bitset is empty
+		* @details linear scan from block 0 - early exit
+		**/
+		block_index_t first_non_empty_block() const noexcept;
+
+		/**
+		* @brief Index of the last (most significant) non-empty bitblock
+		* @returns the block index, or BBObject::npos if the bitset is empty
+		* @details linear scan from block nBB_ - 1 - early exit
+		**/
+		block_index_t last_non_empty_block() const noexcept;
+
+		/**
+		* @brief Indexes of the first and last non-empty bitblocks (block sentinels)
+		* @returns {first, last}, the closed block-range that contains all the 1-bits,
+		*		   or {BBObject::npos, BBObject::npos} if the bitset is empty
+		* @details the result can be passed directly to the *_block range functions
+		*		   (e.g. is_empty_block, AND_block, OR_block)
+		**/
+		std::pair<block_index_t, block_index_t> non_empty_block_range() const noexcept;
 
 		/**
 		* @brief TRUE if caller bitstring has a single 1-bit

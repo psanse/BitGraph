@@ -980,6 +980,142 @@ TEST(BitSetClass, make_bitset_empty) {
 
 }
 
+TEST(BitSetClass, first_non_empty_block) {
+
+	//no blocks
+	Bitset bb0;
+	EXPECT_EQ(BBObject::npos, bb0.first_non_empty_block());
+
+	//empty bitset
+	Bitset bb(300);															//5 blocks: 0..4
+	EXPECT_EQ(BBObject::npos, bb.first_non_empty_block());
+
+	//only the last block (partial block, bits 256..299)
+	bb.set_bit(299);
+	EXPECT_EQ(4, bb.first_non_empty_block());
+
+	//lower block: first moves down
+	bb.set_bit(128);														//block 2
+	EXPECT_EQ(2, bb.first_non_empty_block());
+
+	//block boundaries: last bit of block 0 and first bit of block 1
+	bb.set_bit(64);
+	EXPECT_EQ(1, bb.first_non_empty_block());
+	bb.set_bit(63);
+	EXPECT_EQ(0, bb.first_non_empty_block());
+
+	//erasing: first moves up past emptied blocks
+	bb.erase_bit(63);
+	EXPECT_EQ(1, bb.first_non_empty_block());
+	bb.erase_bit(64);
+	EXPECT_EQ(2, bb.first_non_empty_block());
+	bb.erase_bit(128);
+	bb.erase_bit(299);
+	EXPECT_EQ(BBObject::npos, bb.first_non_empty_block());
+
+	//single-block bitset
+	Bitset bb1(10);
+	EXPECT_EQ(BBObject::npos, bb1.first_non_empty_block());
+	bb1.set_bit(9);
+	EXPECT_EQ(0, bb1.first_non_empty_block());
+
+	//full bitset
+	Bitset bbf = bitgraph::make_bitset_full(300);
+	EXPECT_EQ(0, bbf.first_non_empty_block());
+}
+
+TEST(BitSetClass, last_non_empty_block) {
+
+	//no blocks
+	Bitset bb0;
+	EXPECT_EQ(BBObject::npos, bb0.last_non_empty_block());
+
+	//empty bitset
+	Bitset bb(300);															//5 blocks: 0..4
+	EXPECT_EQ(BBObject::npos, bb.last_non_empty_block());
+
+	//only the first block
+	bb.set_bit(0);
+	EXPECT_EQ(0, bb.last_non_empty_block());
+
+	//higher block: last moves up
+	bb.set_bit(128);														//block 2
+	EXPECT_EQ(2, bb.last_non_empty_block());
+
+	//block boundaries: last bit of block 2 and first bit of block 3
+	bb.set_bit(191);
+	EXPECT_EQ(2, bb.last_non_empty_block());
+	bb.set_bit(192);
+	EXPECT_EQ(3, bb.last_non_empty_block());
+
+	//last bit of the partial last block
+	bb.set_bit(299);
+	EXPECT_EQ(4, bb.last_non_empty_block());
+
+	//erasing: last moves down past emptied blocks
+	bb.erase_bit(299);
+	EXPECT_EQ(3, bb.last_non_empty_block());
+	bb.erase_bit(192);
+	EXPECT_EQ(2, bb.last_non_empty_block());
+	bb.erase_bit(191);
+	bb.erase_bit(128);
+	EXPECT_EQ(0, bb.last_non_empty_block());
+	bb.erase_bit(0);
+	EXPECT_EQ(BBObject::npos, bb.last_non_empty_block());
+
+	//single-block bitset
+	Bitset bb1(10);
+	EXPECT_EQ(BBObject::npos, bb1.last_non_empty_block());
+	bb1.set_bit(0);
+	EXPECT_EQ(0, bb1.last_non_empty_block());
+
+	//full bitset
+	Bitset bbf = bitgraph::make_bitset_full(300);
+	EXPECT_EQ(4, bbf.last_non_empty_block());
+}
+
+TEST(BitSetClass, non_empty_block_range) {
+
+	//empty bitset
+	Bitset bb(300);															//5 blocks
+	EXPECT_EQ(BBObject::npos, bb.first_non_empty_block());
+	EXPECT_EQ(BBObject::npos, bb.last_non_empty_block());
+	auto r = bb.non_empty_block_range();
+	EXPECT_EQ(BBObject::npos, r.first);
+	EXPECT_EQ(BBObject::npos, r.second);
+
+	//single bit - first == last
+	bb.set_bit(70);															//block 1
+	EXPECT_EQ(1, bb.first_non_empty_block());
+	EXPECT_EQ(1, bb.last_non_empty_block());
+	r = bb.non_empty_block_range();
+	EXPECT_EQ(1, r.first);
+	EXPECT_EQ(1, r.second);
+
+	//bits in several blocks, with an empty block in between
+	bb.set_bit(200);														//block 3
+	r = bb.non_empty_block_range();
+	EXPECT_EQ(1, r.first);
+	EXPECT_EQ(3, r.second);
+
+	//boundary bits: first and last block
+	bb.set_bit(0);
+	bb.set_bit(299);														//block 4
+	r = bb.non_empty_block_range();
+	EXPECT_EQ(0, r.first);
+	EXPECT_EQ(4, r.second);
+
+	//range is consistent with lsb / msb
+	EXPECT_EQ(WDIV(bb.lsb()), r.first);
+	EXPECT_EQ(WDIV(bb.msb()), r.second);
+
+	//bitset with no blocks
+	Bitset bb0;
+	r = bb0.non_empty_block_range();
+	EXPECT_EQ(BBObject::npos, r.first);
+	EXPECT_EQ(BBObject::npos, r.second);
+}
+
 TEST(BitSetClass, make_bitset_full) {
 
 	Bitset bb = bitgraph::make_bitset_full(130);
